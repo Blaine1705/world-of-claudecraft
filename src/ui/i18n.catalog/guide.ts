@@ -544,6 +544,8 @@ export const guideStrings = {
     ifInvertLookY: 'Flips the up and down direction of mouse look.',
     ifShowItemLevel:
       'Adds an item level line to every item tooltip. Off by default, which keeps the classic stat-only tooltip.',
+    ifShowReliquaryTracker:
+      'Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.',
     ifShowPlaytime:
       'Shows your lifetime time played on the character sheet. On by default, and the sheet has an eye button that flips it per device, which is handy if you stream or take screenshots. The total keeps counting either way.',
     ifShowOwnNameplate:
@@ -1238,6 +1240,11 @@ export const guideStrings = {
     formsHeading: 'Shapeshifting',
     formsNote:
       'A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.',
+    // The auto-unshift rule (src/sim/combat/form_auto_unshift.ts): deliberately
+    // spelled out here, because a druid who never presses a spell in form has no
+    // way to discover it. Names no ability, so every locale reads the same.
+    formsAutoUnshift:
+      'A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.',
     formsMoonwing:
       'A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.',
     formLine: {

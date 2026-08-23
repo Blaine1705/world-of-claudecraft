@@ -129,6 +129,10 @@ export const SETTING_RANGES = {
   gamepadCameraSpeed: { min: 0.5, max: 5, def: 2.4 },
   // Rumble intensity (0 silences haptics without disabling the pad entirely).
   gamepadVibration: { min: 0, max: 1, def: 1 },
+  // How much of itself the cross hotbar shows: 0 full (framed, both halves
+  // labelled), 1 compact (no frame, labels only on the armed half), 2 minimal
+  // (nothing until a trigger is held). A taste call, so it is a setting.
+  gamepadCrossHotbarDisplay: { min: 0, max: 2, def: 0 },
 
   // --- Interface & Comfort pack: presentational HUD tuning, applied via CSS
   // custom properties in main.ts. All default to 1.0 (unchanged look) and are
@@ -187,6 +191,13 @@ export const BOOL_SETTINGS = {
   // off by default: invert the vertical axis of the right-stick camera, the
   // classic console/flight-sim preference. Independent of mouse/touch invert.
   gamepadInvertY: { def: false },
+  // on by default: the trigger-modifier cross hotbar. Holding a trigger lights
+  // eight action-bar slots on the d-pad and face diamonds. Off restores the flat
+  // one-action-per-button pad layout, triggers included.
+  gamepadCrossHotbar: { def: true },
+  // on by default: tapping the opposite trigger while holding swaps the cross
+  // hotbar to its second set. Off pins it to the first sixteen slots.
+  gamepadCrossHotbarExpand: { def: true },
   // off by default: mirrors the touch layout so the movement joystick sits on
   // the right and the camera joystick on the left, for left-thumb-dominant
   // players. CSS-only swap gated on body.mobile-left-handed; ignored on desktop.
@@ -196,6 +207,14 @@ export const BOOL_SETTINGS = {
   // gameplay space is the primary camera path; this is an opt-in alternative for
   // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
   mobileCameraJoystick: { def: false },
+  // off by default: replaces every touch gesture menu (the action radial, the
+  // consumables row, the menu control) with a tap-only flow. Opening a menu casts
+  // nothing, a second tap on the control runs its default action, and a tap
+  // outside dismisses. This is what closes WCAG 2.5.1 (Pointer Gestures) for the
+  // touch HUD: without it the 16 directional actions are reachable only by a
+  // path-based flick, and it is also the answer for players who cannot hold and
+  // drag reliably.
+  touchTapMenus: { def: false },
   // on by default: mask configured swear words in chat with ****. Purely a
   // local display choice; the server sends raw text and each client decides.
   // (Slurs are blocked server-side regardless and never reach here.)
@@ -356,6 +375,12 @@ export const BOOL_SETTINGS = {
   // collapsed to just its header. Toggled by clicking the tracker header (the
   // quest-tracker convention); kept here so the choice persists.
   reliquaryTrackerCollapsed: { def: false },
+  // on by default: the on-screen Reliquary tracker (pinned pages, or the
+  // nearly-complete default before any pin) is shown at all. The master
+  // switch above the collapse: off removes the strip entirely. Flipped from
+  // The Reliquary window's eye toggle and the Interface options row; pinning
+  // a page while it is off turns it back on.
+  showReliquaryTracker: { def: true },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.
@@ -482,6 +507,13 @@ export function clickMoveButtonLabel(value: number): string {
   return normalizeClickMoveButton(value) === 2 ? 'Right Click' : 'Left Click';
 }
 
+/**
+ * Fired on `window` after any settings write is persisted. It exists for readers
+ * that would otherwise rebuild the whole store to answer one question on a hot
+ * path (`tapMenusEnabled`), so they can cache and invalidate instead.
+ */
+export const SETTINGS_CHANGE_EVENT = 'woc:settingschange';
+
 export class Settings {
   private values: GameSettings;
 
@@ -509,6 +541,16 @@ export class Settings {
       localStorage.setItem(STORE_KEY, JSON.stringify(this.values));
     } catch {
       /* storage unavailable */
+    }
+    // Every consumer here holds its OWN Settings instance (the options panel
+    // writes through one, main.ts through another), so a live reader that caches
+    // a value cannot see the write any other way. One broadcast per persisted
+    // write, which is a player action, never a frame.
+    // Guarded on the METHOD, not on `window`: several Node suites stub a partial
+    // window global, and a settings write must never throw on a host that has no
+    // event target to broadcast into.
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
     }
   }
 

@@ -171,7 +171,7 @@ repeat at every growth. It owes a release-note line whenever a growth ships.
 | Surface | Notes |
 |---|---|
 | Reliquary window | Primary; DESIGN.md window grammar; mobile full-bleed. |
-| HUD tracker | Always-on pinned-page strip beside the deed tracker; pins persist per character. |
+| HUD tracker | Pinned-page strip beside the deed tracker, on by default behind the `showReliquaryTracker` master switch; pins persist per character (visibility and seat: the subsection below). |
 | Live toast / combat log | Relic logged; page Illumination; rank up. All four emitters are node-built and clickable, deep-linking to the page. |
 | Book of Deeds | Optional soft links from collection deeds, plus the "Titles and Borders" shelf. Earned heraldry options show their canonical seal and material sample; hover and focus preview the world and interaction forms without equipping. |
 | World and unit frames | Active Deed Heraldry renders as a compact forged seal plus name ribbon in the world. The player frame and valid player targets reuse the seal at the circular portrait/name joint and pattern only the name header. No gameplay bar or non-player frame inherits it. |
@@ -181,6 +181,36 @@ repeat at every growth. It owes a release-note line whenever a growth ships.
 | Population rarity | Two optional lines (relic tooltip, page header) served from an anonymous aggregate endpoint; online only, absent offline (section below). |
 | Discord / marquee | Optional marquee only for full-page Illumination or high Curator ranks; never spam per-relic. |
 | Steam / Epic achievements | Mapped ids mirror the Reliquary deeds to linked storefront profiles (see the mirror note below). |
+
+### HUD tracker visibility and seat
+
+The strip is on by default behind one persisted bool, `showReliquaryTracker`
+(`src/game/settings.ts`), which two controls share through the options seam:
+the eye toggle on the window's summary band (`aria-pressed`, pressed means
+shown, the paperdoll helm/playtime eye idiom) and the "Show Reliquary Tracker"
+row in Interface options. A hidden strip pays for no world reads (the view
+core early-outs before any completion or ownership-signature read, and clears
+its previous-build table so a later re-show never flashes fills that landed
+while hidden); pinning a page while it is hidden turns the switch back on (the
+classic objective-tracker convention: the pin expresses "I want this on my
+screen"), and unpinning never touches it. The whole `#right-tracker-stack`
+seats below the minimap column's measured bottom
+(`src/ui/tracker_stack_anchor.ts` over the `tracker_stack_anchor_core.ts`
+math, slow band plus coalesced resize, elided write), never a per-tier CSS
+constant; the stylesheet `top` values are only the no-JS first-paint seat.
+The tracker is DESKTOP ONLY: `body.mobile-touch` hides `#reliquary-tracker`
+outright, because the one line it still painted under the folded list crowded
+the band the minimap and the deed tracker share on touch. The Reliquary window
+itself stays reachable on touch from the More tray's `#mobile-reliquary`
+button, and the window's eye toggle plus the Interface options row still write
+`showReliquaryTracker` there (a cross-device setting that takes visible effect
+on desktop). The compact-tier count chip the stylesheet still declares for both
+trackers therefore renders only for `#deed-tracker` on touch: a small chip
+under the minimap cluster whose 40px tap floor is carried by an invisible hit
+extension (DESIGN.md 10.1) rather than the chip's own box. Pinned by
+`tests/reliquary_tracker_view.test.ts`, `tests/reliquary_tracker_hud.test.ts`,
+`tests/reliquary_window_behavior.test.ts`, and
+`tests/tracker_stack_anchor.test.ts`.
 
 ### Public sheet exposure (privacy note)
 
@@ -597,9 +627,14 @@ None of these is a defect. Each is a product decision with no ruling yet.
   (both pages hold earnable relics). The clean shapes are a per-relic
   unearnable flag that the nearly-complete rule skips, or landing the three
   slots. Recorded rather than fixed, because it is a product call.
-- **Compact-tier mobile collision.** On the compact mobile tier the minimap
-  coordinate readout and clock overprint the tracker chip. Raised during the
-  packet and never ruled on; it ships as-is.
+- **Compact-tier mobile collision (FIXED, kept for the record).** On the
+  compact mobile tier the minimap coordinate readout and clock used to
+  overprint the tracker chip, because the stack's seat was a per-tier CSS
+  constant that could not see the compact transform or a wrapping zone label.
+  Fixed by seating `#right-tracker-stack` below the minimap column's measured
+  bottom (`src/ui/tracker_stack_anchor.ts` over the
+  `tracker_stack_anchor_core.ts` math; `tests/tracker_stack_anchor.test.ts`),
+  with the stylesheet constants kept only as the no-JS first-paint seat.
 - **The Overview shared-uniques note is now imprecise.** It tells the player
   that shelf and page counts list every slot, so a relic on two pages is
   counted by each. Since the outside-completion pages landed, shelf totals skip

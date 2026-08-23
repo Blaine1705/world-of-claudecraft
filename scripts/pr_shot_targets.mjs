@@ -53,6 +53,201 @@ const lowGraphicsSeed = async (page) => {
   );
 };
 
+// --- The touch HUD tiers -----------------------------------------------------
+// The touch rework ships two visibly different layouts and pr_screenshots'
+// `mobile: true` emulation is one fixed phone box, so a tier frame restates its
+// own metrics here. resolveMobileHudLayout picks the tier from them: 402px of
+// height sits at or under the compact ceiling (a landscape phone), and 1180x820
+// clears both tablet gates (short side and width).
+const TOUCH_TIERS = {
+  compact: { width: 874, height: 402, deviceScaleFactor: 2, tierClass: 'hud-mobile-compact' },
+  tablet: { width: 1180, height: 820, deviceScaleFactor: 2, tierClass: 'hud-mobile-tablet' },
+};
+
+/** Both tiers as pr_screenshots variants: touch emulation and the phone UA from
+ *  the first byte (so the client boots into touch mode), the lowest graphics
+ *  preset, and the tier the capture re-measures the viewport to. */
+const TOUCH_TIER_VARIANTS = [
+  {
+    key: 'compact-874x402',
+    tier: 'compact',
+    mobile: true,
+    charClass: 'warrior',
+    charName: 'Thorgar',
+    beforeLoad: lowGraphicsSeed,
+  },
+  {
+    key: 'tablet-1180x820',
+    tier: 'tablet',
+    mobile: true,
+    charClass: 'warrior',
+    charName: 'Thorgar',
+    beforeLoad: lowGraphicsSeed,
+  },
+];
+
+/** Past RADIAL_REVEAL_MS (180) with slack for a software-GL main thread. */
+const TOUCH_REVEAL_HOLD_MS = 500;
+
+/** Re-measure the page to one touch tier and wait until the HUD agrees. */
+async function enterTouchTier(page, tierKey) {
+  const tier = TOUCH_TIERS[tierKey];
+  if (!tier) throw new Error(`unknown touch tier ${tierKey}`);
+  // Both halves are load-bearing: setViewport keeps PUPPETEER's own idea of the
+  // box in sync (the screenshot and the clip clamp are computed from it), and the
+  // raw CDP override adds the screenWidth/screenHeight puppeteer omits, without
+  // which headless fit-scales the page instead of honoring the metrics.
+  await page.setViewport({
+    width: tier.width,
+    height: tier.height,
+    deviceScaleFactor: tier.deviceScaleFactor,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const cdp = await page.createCDPSession();
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: tier.width,
+    height: tier.height,
+    deviceScaleFactor: tier.deviceScaleFactor,
+    mobile: true,
+    screenWidth: tier.width,
+    screenHeight: tier.height,
+    positionX: 0,
+    positionY: 0,
+  });
+  await cdp.send('Emulation.resetPageScaleFactor').catch(() => {});
+  await page.evaluate(() => {
+    document.body.classList.add('mobile-touch', 'game-active');
+    window.dispatchEvent(new Event('resize'));
+  });
+  // The tier class AND a laid-out ring button, so nothing is measured while the
+  // HUD is still reflowing into the new box.
+  await page.waitForFunction(
+    (cls) => {
+      if (!document.body.classList.contains(cls)) return false;
+      const slot = document.querySelector('#mobile-action-ring .mobile-action-slot');
+      return !!slot && slot.getBoundingClientRect().width > 0;
+    },
+    { timeout: 30000, polling: 200 },
+    tier.tierClass,
+  );
+  await wait(700);
+}
+
+/** The world behind every touch frame: a levelled character (so the ring pages
+ *  and the radial carry real abilities), a bag of consumables (so the row has
+ *  something to show) and one accepted quest (so the top band does). */
+async function stageTouchWorld(page) {
+  await dismissEntryOverlays(page);
+  const staged = await page.evaluate(() => {
+    document.querySelector('.gpu-notice-dismiss')?.click();
+    document.querySelector('#gpu-notice')?.remove();
+    const sim = window.__game?.sim;
+    if (!sim?.player) return { ok: false, reason: 'offline world unavailable' };
+    sim.setPlayerLevel?.(20);
+    const consumables = [
+      'healing_potion',
+      'minor_healing_potion',
+      'minor_mana_potion',
+      'elixir_of_the_bear',
+      'baked_bread',
+      'spring_water',
+    ];
+    for (const id of consumables) sim.addItem?.(id, 5);
+    // acceptQuest enforces the giver's proximity gate, so step onto Foreman
+    // Odell, take it, and step back to where the shot is framed.
+    const p = sim.player;
+    const home = { x: p.pos.x, z: p.pos.z };
+    let giver = null;
+    for (const e of sim.entities?.values?.() ?? []) {
+      if (e?.templateId === 'foreman_odell') giver = e;
+    }
+    if (giver?.pos) {
+      p.pos.x = giver.pos.x;
+      p.pos.z = giver.pos.z;
+      sim.acceptQuest?.('q_prof_intro');
+      p.pos.x = home.x;
+      p.pos.z = home.z;
+      p.prevPos = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+    }
+    return { ok: true, quest: sim.questState?.('q_prof_intro') ?? 'none' };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  await wait(1500);
+  await dismissEntryOverlays(page);
+  // The level jump celebrates (a deed plate crosses the middle of the frame),
+  // which is staging noise rather than anything these frames are about.
+  await page.evaluate(() => {
+    const banner = document.querySelector('#banner');
+    if (banner) banner.style.opacity = '0';
+  });
+  return staged;
+}
+
+/** Viewport centre of the first element matching `selector`, or null when it is
+ *  missing or has no box. */
+async function touchPoint(page, selector) {
+  return page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    if (r.width <= 0 || r.height <= 0) return null;
+    return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  }, selector);
+}
+
+/** One finger down on `selector`, held past the reveal timer and LEFT DOWN. The
+ *  radial, its scrim and the ring's receded state all live exactly as long as
+ *  the finger does, so the frame has to be taken with the touch still active;
+ *  every tier variant owns its own page, which pr_screenshots closes right
+ *  after the shot. */
+async function holdOpen(page, selector, holdMs = TOUCH_REVEAL_HOLD_MS) {
+  const pt = await touchPoint(page, selector);
+  if (!pt) throw new Error(`no live touch target for ${selector}`);
+  const touch = await page.touchscreen.touchStart(pt.x, pt.y);
+  await wait(holdMs);
+  return touch;
+}
+
+/** holdOpen, then carry the SAME finger onto one revealed item, so the row's
+ *  live item (and the caption that names it) is what the frame shows. */
+async function dragOpen(page, anchorSelector, itemSelector, holdMs = TOUCH_REVEAL_HOLD_MS) {
+  const touch = await holdOpen(page, anchorSelector, holdMs);
+  const item = await touchPoint(page, itemSelector);
+  if (!item) throw new Error(`no live row item for ${itemSelector}`);
+  await touch.move(item.x, item.y);
+  await wait(400);
+  return touch;
+}
+
+/** dragOpen, then RELEASE on the item, which is how the gesture path chooses:
+ *  the pick runs on the release and the row closes behind it. */
+async function dragPick(page, anchorSelector, itemSelector, holdMs = TOUCH_REVEAL_HOLD_MS) {
+  const touch = await dragOpen(page, anchorSelector, itemSelector, holdMs);
+  await touch.end();
+  await wait(400);
+}
+
+/** A real tap through the input pipeline: these controls are pointer-bound, so a
+ *  synthetic element.click() never reaches them. */
+async function tapEl(page, selector) {
+  const pt = await touchPoint(page, selector);
+  if (!pt) throw new Error(`no live tap target for ${selector}`);
+  await page.touchscreen.tap(pt.x, pt.y);
+}
+
+/** Wait for the surface a frame exists to show, and fail loudly when it never
+ *  comes up rather than shooting a resting HUD that looks like a successful
+ *  capture. POLLED, not probed once: the reveal is a page-side timer, and a
+ *  software-GL main thread can hold it well past its 180ms. */
+async function expectOpen(page, selector, attempts = 20, intervalMs = 400) {
+  for (let i = 0; i < attempts; i++) {
+    if (await page.evaluate((sel) => !!document.querySelector(sel), selector)) return;
+    await wait(intervalMs);
+  }
+  throw new Error(`${selector} never opened`);
+}
+
 // Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
 // passes, then open the Browse tab. Shared by the market filter-chrome targets below.
 //
@@ -359,6 +554,50 @@ async function pinReliquaryTrackerPages(page) {
   await wait(400);
   return picks;
 }
+
+// Standard-mapping button indices the cross-hotbar shots press (mirrors GP in
+// src/game/gamepad_map.ts; duplicated as literals because this script cannot import
+// from src/).
+const GP_Y = 3;
+const GP_LB = 4;
+const GP_LT = 6;
+const GP_RT = 7;
+
+// Install a fake standard-mapping pad before the document loads. The cross hotbar
+// only appears while one is connected, and headless Chrome exposes no Gamepad API,
+// so without this every cross-hotbar shot is just the keyboard HUD. `window.__fakePad`
+// is the handle the capture drives: the manager re-reads getGamepads every frame, so
+// writing `pressed` is enough to hold a trigger. String form because this script runs
+// under tsx (keepNames breaks nested functions inside evaluate callbacks).
+const fakePadSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `window.__fakePad = { pressed: [] };
+     var fakeGetGamepads = function () {
+       var down = window.__fakePad.pressed;
+       var buttons = [];
+       for (var i = 0; i < 17; i++) {
+         var on = down.indexOf(i) >= 0;
+         buttons.push({ pressed: on, touched: on, value: on ? 1 : 0 });
+       }
+       return [{
+         index: 0,
+         id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 02fd)',
+         connected: true,
+         mapping: 'standard',
+         buttons: buttons,
+         axes: [0, 0, 0, 0],
+         timestamp: performance.now(),
+       }];
+     };
+     // getGamepads lives on Navigator.prototype and is not writable through a
+     // plain assignment on the instance, so define it on both.
+     try { Object.defineProperty(Navigator.prototype, 'getGamepads', { value: fakeGetGamepads, configurable: true, writable: true }); } catch (e) {}
+     try { Object.defineProperty(navigator, 'getGamepads', { value: fakeGetGamepads, configurable: true, writable: true }); } catch (e) {}
+     // Headless pages can report themselves unfocused, and the pad manager takes
+     // no input from an unfocused window. Say focused so the poll runs.
+     try { Object.defineProperty(document, 'hasFocus', { value: function () { return true; }, configurable: true, writable: true }); } catch (e) {}`,
+  );
+};
 
 export const TARGETS = [
   {
@@ -9515,6 +9754,113 @@ export const TARGETS = [
     },
   },
   {
+    // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
+    // behavior, so the evidence is a MOMENT, not a window: the same press, one
+    // second in. Before the change the druid is still wearing the beast and the
+    // refusal is on screen; after it, the beast is gone and the heal is casting.
+    // Both variants press through sim.castAbility rather than a bar slot,
+    // because the bear bar is a separate page a player has to populate and the
+    // shot must not depend on that.
+    key: 'druid-auto-unshift',
+    label: 'Wildmend pressed while shapeshifted: the form falls away and the cast runs',
+    when: ['sim/combat/form_auto_unshift', 'ui/hud/action_bar/action_bar_view.ts'],
+    variants: [
+      {
+        key: 'bruin-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'fleet-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'travel_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'bruin-form-mobile',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage: high enough to know every rank of the kit, full mana, self-targeted
+      // so the friendly heal has somewhere to land, then shift through the REAL
+      // cast so the form aura, the parked mana, and the beast model are all live.
+      const staged = await page.evaluate((formAbility) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        sim.targetEntity?.(player.id, player.id);
+        sim.castAbility?.(formAbility, player.id);
+        return { ok: true };
+      }, variant.formAbility);
+      if (!staged.ok) throw new Error(staged.reason);
+      // Wait for the shift to resolve AND its global cooldown to lapse. Polled,
+      // not slept: the offline sim advances on animation frames, so the seconds
+      // just after game-active run at whatever rate the loading tail leaves, and
+      // a press inside the GCD returns silently (classic spams that button), which
+      // would shoot a frame where nothing happened at all.
+      await page.waitForFunction(
+        () => {
+          const player = window.__game?.sim?.player;
+          return (
+            !!player &&
+            player.auras.some((a) => a.kind.startsWith('form_')) &&
+            player.gcdRemaining <= 0 &&
+            player.castingAbility === null
+          );
+        },
+        { timeout: 30000, polling: 100 },
+      );
+      // The press, with an explicit pid (an omitted one is a silent no-op here,
+      // which shoots a frame where nothing happened at all). Read the event
+      // buffer's LENGTH around the call rather than draining it: draining would
+      // eat the very refusal the before-arm frame is supposed to show, and both
+      // arms must run this same recipe.
+      const pressed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const before = sim.events?.length ?? 0;
+        sim.castAbility?.('healing_touch', player.id);
+        return {
+          ok: (sim.events?.length ?? 0) > before || player.castingAbility !== null,
+          reason: 'the press reached no gate: no cast started and the sim said nothing',
+        };
+      });
+      if (!pressed.ok) throw new Error(pressed.reason);
+      // One second in: long enough for the refusal to be painted on the old
+      // behavior, and short enough that the 2.5s heal is still visibly casting
+      // on the new one.
+      await wait(1000);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'swing-timer',
     label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],
@@ -9648,6 +9994,78 @@ export const TARGETS = [
     },
   },
   {
+    key: 'cross-hotbar',
+    label: 'Cross hotbar: resting, a held trigger, the expanded set, arrange mode',
+    when: [
+      'game/cross_hotbar',
+      'game/pad_focus_action',
+      'game/gamepad.ts',
+      'game/gamepad_map.ts',
+      'ui/hud/cross_hotbar/',
+    ],
+    // The bar only exists while a pad is connected, and headless Chrome has no
+    // Gamepad API surface at all, so every variant except `no-pad` installs a
+    // fake pad before the document loads. `no-pad` is the honest BEFORE frame:
+    // it is what a keyboard player still sees, in the same run.
+    variants: [
+      { key: 'no-pad' },
+      { key: 'resting', beforeLoad: fakePadSeed, pad: [] },
+      { key: 'left-trigger', beforeLoad: fakePadSeed, pad: [GP_LT] },
+      { key: 'expanded', beforeLoad: fakePadSeed, expand: true },
+      { key: 'arranging', beforeLoad: fakePadSeed, pad: [], arrange: true },
+    ],
+    async capture(page, variant) {
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      if (!variant?.beforeLoad) return {};
+      // Arrange mode is a CHORD, so it has to be pressed and released like one
+      // rather than set as a steady state; the poll runs on the render loop, so
+      // each step needs frames either side of it.
+      // The expanded set is reached by HOLDING one trigger and TAPPING the other,
+      // not by pressing both: pressed in the same poll they tie and resolve to the
+      // left half, which is why setting both at once photographed the plain bar.
+      if (variant.expand) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}, ${GP_RT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(500);
+      } else if (variant.arrange) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LB}]`);
+        await wait(200);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LB}, ${GP_Y}]`);
+        await wait(200);
+        await page.evaluate('window.__fakePad.pressed = []');
+        await wait(400);
+      } else {
+        await page.evaluate(`window.__fakePad.pressed = ${JSON.stringify(variant.pad ?? [])}`);
+        await wait(600);
+      }
+      // A fake pad that never reached the manager produces a frame identical to
+      // the no-pad one, which reads as "no change" rather than as a broken rig.
+      const seen = await page.evaluate(() => {
+        const el = document.querySelector('#cross-hotbar');
+        return {
+          pads: navigator.getGamepads?.().filter(Boolean).length ?? 0,
+          focused: document.hasFocus(),
+          padMode: document.body.classList.contains('xhb-mode'),
+          barShown: !!el && getComputedStyle(el).display !== 'none',
+        };
+      });
+      if (!seen.barShown) {
+        console.log(`SHOT cross-hotbar: bar not shown (${JSON.stringify(seen)})`);
+      }
+      return {};
+    },
+  },
+  {
     key: 'practice-row',
     label: 'The Highwatch practice row seen from the approach',
     when: ['practice_dummies'],
@@ -9724,6 +10142,112 @@ export const TARGETS = [
       // round trip under SwiftShader, not for the HUD.
       await wait(15000);
       return {};
+    },
+  },
+  // ---------------------------------------------------------------------------
+  // The touch HUD rework. Every surface below is REACHED THE WAY A FINGER
+  // REACHES IT: the rows and radials are opened by a real touch sequence
+  // (page.touchscreen), never by calling the controller through window.__game,
+  // because the whole claim of these frames is that the gesture brings the
+  // surface up. window.__game is used only to STAGE the world behind them (a
+  // level, a bag of consumables, an accepted quest).
+  {
+    key: 'touch-hud-overview',
+    label: 'Touch HUD at rest: the reworked combat cluster, both tiers',
+    // The three surfaces the RESTING touch HUD is made of. Deliberately not
+    // `styles/hud.mobile` or `game/mobile_controls`: those two are the pinned
+    // generic-fallback probes (tests/pr_shot_targets.test.ts), and claiming them
+    // here would silently retire the generic desktop-plus-mobile pair.
+    when: [
+      'ui/hud/quest/quest_strip',
+      'ui/hud/stance/',
+      'action_bar/mobile_action_ring_controller',
+    ],
+    variants: TOUCH_TIER_VARIANTS,
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await stageTouchWorld(page);
+      return {};
+    },
+  },
+  {
+    key: 'touch-radial',
+    label: 'Action radial held open: four petals, the local scrim, the receded ring',
+    when: ['action_bar/radial_gesture_controller', 'action_bar/radial_petal_painter'],
+    variants: TOUCH_TIER_VARIANTS,
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await stageTouchWorld(page);
+      // Held, not released: the petals, the scrim and the ring's receded state
+      // all live for exactly as long as the finger does, so the frame is taken
+      // with the touch still down (each variant owns its own page, which
+      // pr_screenshots closes straight after the shot).
+      await holdOpen(page, '#mobile-action-ring .mobile-action-slot[data-mobile-index="1"]');
+      await expectOpen(page, '#mobile-action-radial.open');
+      return {};
+    },
+  },
+  {
+    key: 'touch-consumable-strip',
+    label: 'Consumables row held open off the ring seat, cancel X over the seat',
+    when: ['action_bar/consumable_strip', 'action_bar/consumable_seat_controller'],
+    variants: TOUCH_TIER_VARIANTS,
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await stageTouchWorld(page);
+      await holdOpen(page, '#mobile-consumable-seat');
+      await expectOpen(page, '#mobile-consumable-strip.open');
+      return {};
+    },
+  },
+  {
+    key: 'touch-quick-actions',
+    label: 'Quick Actions row open with the live caption naming the item under the finger',
+    when: ['ui/hud/menu/menu_strip', 'ui/hud/menu/menu_control_controller'],
+    variants: TOUCH_TIER_VARIANTS,
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await stageTouchWorld(page);
+      // The caption names whatever the finger is OVER, so the hold that opens
+      // the row is continued onto one item rather than released: a released tap
+      // opens the same row with no live item and an empty caption.
+      await dragOpen(page, '#mobile-menu-anchor', '#mobile-menu-map');
+      await expectOpen(page, '#mobile-menu-strip.open');
+      return {};
+    },
+  },
+  {
+    key: 'touch-bar-editor',
+    label: 'Bar editor reached from Quick Actions > More > Edit Bars, one binding picked up',
+    when: ['action_bar/bar_editor'],
+    variants: TOUCH_TIER_VARIANTS,
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await stageTouchWorld(page);
+      // The player's own route to it: hold Quick Actions and swipe to its More
+      // item, then tap the tray's Edit Bars control. The gesture pick rather
+      // than a tap on the revealed item, because a tap there activates the item
+      // TWICE (the row's own pick synthesizes the button's click while the
+      // finger's click reaches it as well), which opens the tray and closes it
+      // again in one press.
+      await dragPick(page, '#mobile-menu-anchor', '#mobile-more');
+      await wait(700);
+      await tapEl(page, '#mobile-bar-editor');
+      if (!(await pollForSize(page, '#bar-editor'))) throw new Error('bar editor did not open');
+      await wait(400);
+      // Tapping a bound cell picks that binding up, which is the state the
+      // caption speaks ("picked up X, tap a cell to move it").
+      const armed = await page.evaluate(() => {
+        const cell = document.querySelector('#bar-editor .bar-editor-cell:not(.empty)');
+        if (!cell) return null;
+        const r = cell.getBoundingClientRect();
+        return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      });
+      if (armed) {
+        await page.touchscreen.tap(armed.x, armed.y);
+        await wait(400);
+      }
+      return { clip: '#bar-editor' };
     },
   },
 ];

@@ -5,11 +5,11 @@ import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
-import { afterActiveAnimationMs } from './game/active_animation_timer';
 import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
 } from './game/app_viewport';
+import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
 import {
@@ -39,6 +39,7 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
+import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
 import { setDisplayChangeTarget } from './game/desktop_display_change';
 import {
@@ -53,6 +54,7 @@ import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
+import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -72,6 +74,7 @@ import {
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
+import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
@@ -135,12 +138,16 @@ import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
+import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { padReelItemId } from './game/pad_reel';
+import { openTargetSubcommands } from './game/pad_subcommands';
+import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
-import { presentationGate } from './game/presentation_gate';
+import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
+import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -160,11 +167,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import {
-  loadingCurtainFadeMs,
-  resolveUiEffectsProfile,
-  worldEntryGpuSettleCoverMs,
-} from './game/ui_effects_profile';
+import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
@@ -242,11 +245,9 @@ import {
   ktx2MipsOnContextLost,
   ktx2MipsRestored,
 } from './render/assets/ktx2_mip_release';
-import {
-  assetsReady,
-  beginBackgroundPreloads,
-  beginDeferredPreloads,
-} from './render/assets/preload';
+import { assetUrl } from './render/assets/media';
+import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
+import { battlegroundAssetPrewarm } from './render/battleground';
 import {
   CharacterPreview,
   npcLookFor,
@@ -277,10 +278,8 @@ import {
   inWorldLookFor,
 } from './render/characters/player_look_core';
 import {
-  onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
-  portraitsReady,
   resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
@@ -295,6 +294,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
+import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -356,6 +356,7 @@ import {
   noteAppearancePanelMounted,
   relocalizeAppearancePanels,
 } from './ui/appearance_panel_locale';
+import { setThornhollowPrewarmHooks } from './ui/arena_window';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -371,6 +372,7 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
+import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -398,6 +400,7 @@ import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
+import { esc } from './ui/esc';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import {
   attachGatherNodeHoverTooltip,
@@ -435,6 +438,7 @@ import {
   prewarmIconCache,
 } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import { LoadingBackdropController } from './ui/loading_backdrop';
 import {
   noteLoadingProgress,
   startSlowConnectionWatch,
@@ -611,25 +615,6 @@ function classDetailAmountRange(min: number, max: number): string {
   return t('abilityUi.tooltip.damageRange', {
     min: formatClassDetailNumber(min),
     max: formatClassDetailNumber(max),
-  });
-}
-
-function escapeHtml(text: string): string {
-  return text.replace(/[&<>"']/g, (char) => {
-    switch (char) {
-      case '&':
-        return '&amp;';
-      case '<':
-        return '&lt;';
-      case '>':
-        return '&gt;';
-      case '"':
-        return '&quot;';
-      case "'":
-        return '&#39;';
-      default:
-        return char;
-    }
   });
 }
 
@@ -822,6 +807,9 @@ preventMobileZoom();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
 window.addEventListener('resize', syncAppViewport);
+// The cross hotbar's lift depends on how tall it renders, which changes with the
+// window and the interface scale, so it is re-measured rather than assumed.
+window.addEventListener('resize', measureCrossHotbarLift);
 window.addEventListener('orientationchange', () => {
   syncAppViewport();
   window.setTimeout(syncAppViewport, 250);
@@ -1040,6 +1028,8 @@ const LOADING_TIP_ROTATE_MS = 5000;
 let loadingHideTimer: number | null = null;
 let loadingTipRotation: LoadingTipRotation | null = null;
 let loadingTipTimer: number | null = null;
+const loadingBackdrop = new LoadingBackdropController($('#loading-screen'), assetUrl);
+loadingBackdrop.prepareInitial();
 
 function loadingCurtainFadeDelayMs(): number {
   const osReducedMotion =
@@ -1057,6 +1047,7 @@ function showLoadingScreen(statusText: string): void {
   }
   el.classList.remove('fade');
   el.classList.add('visible');
+  if (!wasVisible) loadingBackdrop.enterNewCycle();
   if (!wasVisible) $('#ls-fill').style.width = '0%';
   setLoadingStatus(statusText);
   startLoadingTips();
@@ -1117,6 +1108,7 @@ function hideLoadingScreen(): void {
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
+    loadingBackdrop.prepareNextCycle();
   }, loadingCurtainFadeDelayMs());
 }
 
@@ -1535,6 +1527,11 @@ async function startGame(
       dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
+    });
+    setThornhollowPrewarmHooks({
+      startPreview: () => battlegroundAssetPrewarm.startPreview(),
+      pausePreview: () => battlegroundAssetPrewarm.pausePreview(),
+      commit: () => void battlegroundAssetPrewarm.commit(),
     });
     mapMarkerPaletteLifecycle = installMapMarkerPaletteLifecycle(window, () =>
       hud.refreshMapMarkerArtPalette(),
@@ -2082,6 +2079,7 @@ async function startGame(
     onBags: () => hud.toggleBags(),
     onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
+    onBarEditor: () => hud.toggleBarEditor(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
@@ -2171,8 +2169,21 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
+  const crossHotbar = createCrossHotbar(() => hud, keybindScope);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
+    // Cancel backs out one step at a time: the top window, then the target. Only
+    // once there is nothing left to leave does the game menu come up, which is
+    // what keeps this distinct from the menu button rather than a second copy.
+    if (id === GAMEPAD_CANCEL) {
+      if (dismissCameraPrompt() || hud.cancelGroundAim() || hud.closeAll()) return;
+      world.targetEntity(null);
+      return;
+    }
+    if (id === GAMEPAD_CYCLE_HUD) {
+      cycleHudFocus();
+      return;
+    }
     if (id === 'escape') {
       if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
@@ -2195,6 +2206,20 @@ async function startGame(
       case 'targetFriendly':
         world.targetNearestFriendly();
         break;
+      // Selecting the people you talk to. The sim's friendly cycle answers heal
+      // eligibility and so skips every quest giver, which left a pad player with
+      // no way to pick one; targetEntity is the seam that already exists for it.
+      case 'targetNpcNext':
+      case 'targetNpcPrev': {
+        const next = nextNpcTarget(
+          world.entities.values(),
+          world.player.pos,
+          world.player.targetId ?? null,
+          id === 'targetNpcNext' ? 1 : -1,
+        );
+        if (next !== null) world.targetEntity(next);
+        break;
+      }
       case 'targetFriendlyNext':
         world.friendlyTabTarget();
         break;
@@ -2210,7 +2235,7 @@ async function startGame(
           world.useItem(reelRod);
           break;
         }
-        interactKey();
+        padTargetPick.interact();
         break;
       }
       case 'bags':
@@ -2228,6 +2253,14 @@ async function startGame(
       case 'map':
         hud.toggleMap();
         break;
+      // The target's subcommands, or the map when there is no target: one button
+      // for "what can I do with this", the way a console MMO spends its left face
+      // button. The menu itself is the one the mouse opens by right-clicking, so
+      // there is no second menu to keep in step with it.
+      case GAMEPAD_SUBCOMMANDS: {
+        if (!openTargetSubcommands()) hud.toggleMap();
+        break;
+      }
       case 'nameplates':
         renderer.showNameplates = !renderer.showNameplates;
         break;
@@ -2329,9 +2362,16 @@ async function startGame(
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => hud.refreshControllerLabels(),
+    onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
+    onCrossHotbarCast: (action) => {
+      padTargetPick.autoTarget(action);
+      hud.castCrossHotbarAction(action);
+    },
+    onOpenSpellbook: () => hud.openSpellbook(),
+    ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
+  crossHotbar.attach(gamepad);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
@@ -2620,12 +2660,17 @@ async function startGame(
       const v = settings.set('gamepadEnabled', !!value);
       if (v) gamepad.start();
       else gamepad.stop();
+      // stop() releases the pad without an onConnectionChange, so pad mode has to
+      // be re-read here or the player who just turned the controller off is left
+      // with the desktop rows hidden behind a dead cross hotbar.
+      crossHotbar.syncPadMode(gamepad);
       return;
     }
     if (key === 'gamepadInvertY') {
       gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
       return;
     }
+    if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -3079,6 +3124,7 @@ async function startGame(
       entries: () => gamepadBindings.entries(),
       bind: (button, action) => gamepadBindings.bind(button, action),
       reset: () => gamepadBindings.reset(),
+      ...crossHotbar.hooks,
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),
@@ -3396,7 +3442,7 @@ async function startGame(
     ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
       hud.confirmToolEffectUse(prompt, proceed),
   };
-  function interactKey(): void {
+  function interactKey(preferNpcId?: number | null): void {
     if (world.bgInfo?.match?.state === 'active') {
       world.bgFlagAction();
       return;
@@ -3413,11 +3459,16 @@ async function startGame(
         t('errors.nothingInteract'),
         undefined,
         gatherEffectConfirm,
+        preferNpcId,
       ),
       input,
       mobileControls,
     );
   }
+
+  // The pad's own selection rules (which npc a talk press addresses, which enemy
+  // a cast picks) live in src/game/pad_target_pick.ts; this carries the calls.
+  const padTargetPick = createPadTargetPick({ world, interactKey });
 
   function attackNearest(): void {
     const p = world.player;
@@ -3842,56 +3893,39 @@ async function startGame(
         });
       return;
     }
-    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land
-    // anywhere: keep the classic blocking loading screen instead of dropping
-    // the player into a not-yet-built void. The destination rectangle is only
-    // half of it, so the arrival NEIGHBOURHOOD streams behind the same screen
-    // on every such jump, not just a rift exit: landing near a zone border
-    // with the neighbour unprepared leaves the residency clamp holding the
-    // view at MIN_OUTDOOR_FOG_FAR long after the screen lifts.
+    // A teleport-sized jump (rift exit, dungeon door, hearthstone) can land anywhere:
+    // keep the classic blocking loading screen instead of dropping the player into a
+    // not-yet-built void. The destination rectangle is only half of it, so the arrival
+    // NEIGHBOURHOOD streams behind the same screen on every such jump, not just a rift
+    // exit: a border landing with the neighbour unprepared leaves the fog clamp held.
     const resumeInput = gameInputReady;
     gameInputReady = false;
-    showLoadingScreen(t('loading.world'));
-    zoneWarmup = nextPaint()
-      .then(() =>
-        renderer.prepareZoneAt(zoneX, zoneZ, (done, total) =>
-          setLoadingProgressRange(done, total, 0, 55),
-        ),
-      )
-      .then(() =>
-        renderer.prepareZonesAround(
-          zoneX,
-          zoneZ,
-          riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
-          (done, total) => setLoadingProgressRange(done, total, 55, 94),
-        ),
-      )
-      // An arrival with no overworld neighbourhood at all (a dungeon or rift
-      // interior, 99k yards off the strip) reports no progress above, so fill
-      // the band explicitly rather than letting the bar sit at 55.
-      .then(() => setLoadingProgressRange(1, 1, 55, 94))
-      .then(async () => {
-        setLoadingPercent(96, t('loading.enteringWorld'));
-        try {
-          await renderer.prewarmZoneAt(zoneX, zoneZ);
-        } catch (err) {
-          console.warn('Zone shader prewarm failed', err);
-        }
-      })
-      .then(() => setLoadingPercent(100, t('loading.enteringWorld')))
-      .then(nextPaint)
-      .then(() => {
-        hideLoadingScreen();
+    zoneWarmup = runBlockingArrivalWarmup({
+      renderer,
+      holdWorldDraw: gateInput.holdWorldDraw,
+      ui: {
+        showLoadingScreen,
+        setLoadingProgressRange,
+        setLoadingPercent,
+        hideLoadingScreen,
+        nextPaint,
+        fatalOverlay,
+      },
+      t,
+      technicalErrorMessage,
+      zoneX,
+      zoneZ,
+      online: online !== null,
+      neighborRadiusYd: riftExit ? RIFT_EXIT_STREAM_RADIUS : ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+      onRevealed: () => {
         gameInputReady = resumeInput;
         last = performance.now();
         acc = 0;
-      })
-      .catch((err) => {
-        fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
-      })
-      .finally(() => {
+      },
+      onSettled: () => {
         zoneWarmup = null;
-      });
+      },
+    });
   };
 
   // Camera follow state: keyboard turning advances facing in 20Hz sim steps,
@@ -4268,7 +4302,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
+  const gateInput = newPresentationGateInput(DESKTOP_APP);
   function frame(now: number): void {
     requestAnimationFrame(frame);
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4470,12 +4504,13 @@ async function startGame(
         movementFacing;
       const offlineAlpha = acc / DT;
       const offlineViews = renderer.views.size;
-      // A hidden frame skips the draw, so timing it would dilute the renderer
-      // bucket with work that never happened.
+      // A hidden frame's draw is not timed (it never ran); the world draw is
+      // re-read here: maybeWarmCurrentZone above may have held it this frame.
       const rendererStart = gate.render ? perf.startTime() : 0;
+      const drawWorld = presentationGate(gateInput).drawWorld;
       traceStart = perf.startTrace();
       try {
-        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, gate.render);
+        renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null, false, drawWorld);
       } finally {
         perf.finishTrace(
           'renderer.sync',
@@ -4709,9 +4744,8 @@ async function startGame(
     // and the reticle is only consumed by the skipped draw (phase 4 QA F7).
     if (gate.render) syncGroundAimReticle();
     const onlineViews = renderer.views.size;
-    // A hidden frame skips the draw, so timing it would dilute the renderer
-    // bucket with work that never happened.
     const rendererStart = gate.render ? perf.startTime() : 0;
+    const drawWorld = presentationGate(gateInput).drawWorld;
     traceStart = perf.startTrace();
     try {
       renderer.sync(
@@ -4725,7 +4759,7 @@ async function startGame(
         adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
-        gate.render,
+        drawWorld,
       );
     } finally {
       perf.finishTrace(
@@ -4935,8 +4969,11 @@ async function startGame(
   }
   setLoadingPercent(90, t('loading.enteringWorld'));
   loadPhaseStart('prewarm-initial');
+  const initialPrewarmResumeStartGate = createInitialPrewarmResumeStartGate();
+  renderer.armEntryDetailHorizon();
   try {
     const prewarm = await renderer.prewarmInitialScene({
+      resumeAfterFirstPaint: initialPrewarmResumeStartGate.wait,
       onEntryStart: (id, category) =>
         entryDiagnostics.checkpoint('prewarm-start', {
           ...renderEntryDiagnostics(),
@@ -4966,18 +5003,9 @@ async function startGame(
     // has been materialized successfully.
     console.warn('Renderer prewarm failed', err);
   }
+  initialPrewarmResumeStartGate.armBackstop();
   loadPhaseEnd('prewarm-initial');
-  // The entry allocation spike is over: start streaming the mob bodies the
-  // iOS WebKit boot gate deliberately excluded (Safari, other iOS browsers, and
-  // the packaged app; empty everywhere else). A mob whose GLB is still arriving
-  // renders a beat late through the fail-soft view-create path, instead of its
-  // decode competing with the scene build for the WebContent memory ceiling.
-  const streamedCount = startStreamedCharacterPreloads();
-  if (streamedCount > 0) {
-    console.info(`[entry-guard] streaming ${streamedCount} deferred character assets`);
-  }
-  // The paperdoll and portrait preview prewarms no longer hold the curtain:
-  // they start after the reveal (see revealWorld below) as paced background
+  // Paperdoll and portrait preview prewarms start after reveal as paced background
   // GPU units. Measured on the reference desktop, awaiting the paperdoll,
   // armory and portrait prewarms here cost 11 to 26 s of the entry, spent on
   // secondary contexts for windows the player may never open. The ARMORY is
@@ -4990,22 +5018,17 @@ async function startGame(
   // context and retains the documented lazy first-open path.
   if (!GFX.tightMemory) {
     try {
-      hud.prewarmCharPreviewShell();
+      loadSpan('char-preview-shell', () => hud.prewarmCharPreviewShell());
     } catch (err) {
       console.warn('Character preview shell prewarm failed', err);
     }
   }
-  // The far vista has been building eagerly since the renderer was
-  // constructed, overlapping every asset wait above. Hold the curtain
-  // (bounded) until the grid can stand in for the fog, so the first visible
-  // frame carries the finished horizon; without this gate a loaded
-  // production boot starves the build and the fog lifts tens of seconds
-  // into play. On timeout the classic eased flip covers it, as before.
-  const farVistaReady = await loadSpanAsync('far-vista-wait', () => renderer.farVistaReady());
-  entryDiagnostics.checkpoint('far-vista-ready', {
-    ...renderEntryDiagnostics(),
-    farVistaReady,
-  });
+  // The mob-body stream and far-vista settle no longer hold the curtain either.
+  // The mob-body stream starts at the
+  // first-paint checkpoint below (on iOS these are the actionable creature
+  // bodies, and the entry allocation spike has cleared by first paint), while
+  // runPostEntryWarmups (revealWorld below) starts the other two fail-soft once
+  // the revealed world is interactive.
   setLoadingPercent(100, t('loading.enteringWorld'));
   loadPhaseStart('first-frame-wait');
   await nextPaint();
@@ -5022,20 +5045,23 @@ async function startGame(
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       entryDiagnostics.checkpoint('first-paint');
+      initialPrewarmResumeStartGate.release();
       loadPhaseEnd('first-frame-wait');
+      // Kick the deferred creature-body fetches now, before the settle cover and
+      // the curtain fade: until a creature GLB arrives its view, nameplate, and
+      // click target do not exist, so every ms the stream waits past first paint
+      // widens the pop-in window on the tight-memory profile (desktop's stream
+      // set is empty). The allocation spike the stream was deferred past has
+      // cleared by this frame.
+      kickCharacterPreloadStream({
+        startCharacterPreloads: startStreamedCharacterPreloads,
+        onCharacterPreloadsStarted: (count) => {
+          if (count > 0) {
+            console.info(`[entry-guard] streaming ${count} deferred character assets`);
+          }
+        },
+      });
       loadPhaseStart('settle-cover');
-      // Open the background preload lane now that the first frame is actually on
-      // screen: content tagged 'background' (a lazily streamed-in proximity
-      // build that tolerates its assets arriving late) never had to share the
-      // boot gate with the launcher's own fetches; starting it here just keeps
-      // it from competing with the deferred-critical lane for bandwidth/decode
-      // slots during the loading screen either.
-      const backgroundStarted = beginBackgroundPreloads();
-      if (backgroundStarted > 0) {
-        console.info(
-          `[entry-guard] world assets: started ${backgroundStarted} background preloads`,
-        );
-      }
       const revealWorld = (): void => {
         loadPhaseEnd('settle-cover');
         loadPhaseStart('curtain-fade');
@@ -5139,16 +5165,31 @@ async function startGame(
               },
             );
           }
+          // The far-vista stand-in settles after the revealed world is
+          // interactive (the mob-body stream already left at first paint above).
+          // The classic fog remains the complete fallback while the far grid
+          // finishes in parallel. Optional secondary WebGL previews stay lazy:
+          // warming them here would contend with the player's first input.
+          void runPostEntryWarmups({
+            settleFarVista: () => renderer.farVistaReady(),
+            onFarVistaSettled: (farVistaReady) => {
+              entryDiagnostics.checkpoint('far-vista-ready', {
+                ...renderEntryDiagnostics(),
+                farVistaReady,
+              });
+            },
+            onWarmupError: (source, error) => {
+              if (source === 'far-vista') console.warn('Far vista settlement failed', error);
+            },
+          });
         }, loadingCurtainFadeDelayMs());
       };
-      afterActiveAnimationMs(
-        worldEntryGpuSettleCoverMs({
-          adaptiveBudget: GFX.autoGovernor,
-          constrainedMemory: GFX.constrainedMemory,
-          online: online !== null,
-        }),
+      settleWorldEntryCover({
+        adaptiveBudget: GFX.autoGovernor,
+        constrainedMemory: GFX.constrainedMemory,
+        online: online !== null,
         revealWorld,
-      );
+      });
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
@@ -6427,7 +6468,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
   const listEl = $('#realm-list');
   const render = (d: import('./net/online').RealmDirectory) => {
     if (d.realms.length === 0) {
-      listEl.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.noRealms'))}</div>`;
+      listEl.innerHTML = `<div class="realm-loading">${esc(t('realm.noRealms'))}</div>`;
       return;
     }
     // recommend the lowest-population online realm (classic MMOs nudge new players there)
@@ -6442,15 +6483,15 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
         const chars = d.characters[r.name] ?? 0;
         const charTag =
           chars > 0
-            ? `<span class="rn-chars">${escapeHtml(tPlural('hudChrome.plurals.characterCount', chars))}</span>`
+            ? `<span class="rn-chars">${esc(tPlural('hudChrome.plurals.characterCount', chars))}</span>`
             : '';
         const typeKey = realmTypeKeys[r.type as keyof typeof realmTypeKeys];
         const typeLabel = typeKey ? t(typeKey) : r.type;
-        return `<div class="realm-row" data-name="${escapeHtml(r.name)}" data-url="${escapeHtml(r.url)}">
-        <div><div class="realm-name">${escapeHtml(r.name)}${charTag}<span class="rn-rec" data-rec hidden>${escapeHtml(t('realm.recommended'))}</span></div>
-          <div class="realm-sub" data-sub>${escapeHtml(t('realm.checkingStatus'))}</div></div>
+        return `<div class="realm-row" data-name="${esc(r.name)}" data-url="${esc(r.url)}">
+        <div><div class="realm-name">${esc(r.name)}${charTag}<span class="rn-rec" data-rec hidden>${esc(t('realm.recommended'))}</span></div>
+          <div class="realm-sub" data-sub>${esc(t('realm.checkingStatus'))}</div></div>
         <div class="realm-meta">
-          <div class="realm-type">${escapeHtml(typeLabel)}</div>
+          <div class="realm-type">${esc(typeLabel)}</div>
           <div class="realm-pop offline" data-pop>-</div>
         </div>
       </div>`;
@@ -6500,7 +6541,7 @@ function showRealmList(dir?: import('./net/online').RealmDirectory): void {
   };
   if (dir) render(dir);
   else {
-    listEl.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.loading'))}</div>`;
+    listEl.innerHTML = `<div class="realm-loading">${esc(t('realm.loading'))}</div>`;
     void api.realms().then(render);
   }
 }
@@ -6545,18 +6586,18 @@ function toggleRealmDropdown(): void {
 
 function renderRealmDropdown(): void {
   const menu = $('#cs-realm-menu');
-  menu.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.loading'))}</div>`;
+  menu.innerHTML = `<div class="realm-loading">${esc(t('realm.loading'))}</div>`;
   void api.realms().then((d) => {
     if (!realmDropdownOpen) return;
     if (d.realms.length === 0) {
-      menu.innerHTML = `<div class="realm-loading">${escapeHtml(t('realm.noRealms'))}</div>`;
+      menu.innerHTML = `<div class="realm-loading">${esc(t('realm.noRealms'))}</div>`;
       return;
     }
     menu.innerHTML = d.realms
       .map((r) => {
         const sel = r.name === api.realm ? ' sel' : '';
-        return `<div class="realm-row cs-realm-row${sel}" role="option" aria-selected="${r.name === api.realm}" data-name="${escapeHtml(r.name)}" data-url="${escapeHtml(r.url)}">
-        <div class="realm-name">${escapeHtml(r.name)}</div>
+        return `<div class="realm-row cs-realm-row${sel}" role="option" aria-selected="${r.name === api.realm}" data-name="${esc(r.name)}" data-url="${esc(r.url)}">
+        <div class="realm-name">${esc(r.name)}</div>
         <div class="realm-pop offline" data-pop>-</div>
       </div>`;
       })
@@ -6636,7 +6677,7 @@ function renderSortDropdown(): void {
   menu.innerHTML = CHAR_SORT_MODES.map((m) => {
     const sel = m === charSortMode;
     return `<div class="realm-row cs-realm-row cs-sort-row${sel ? ' sel' : ''}" role="option" aria-selected="${sel}" data-mode="${m}">
-        <div class="realm-name">${escapeHtml(t(CHAR_SORT_LABEL_KEYS[m]))}</div>
+        <div class="realm-name">${esc(t(CHAR_SORT_LABEL_KEYS[m]))}</div>
       </div>`;
   }).join('');
   menu.querySelectorAll('.cs-sort-row').forEach((row) => {
@@ -6696,7 +6737,7 @@ async function refreshCharacters(): Promise<void> {
   if (api.realm) $('#charselect-realm').textContent = api.realm;
   updateSortButtonLabel();
   const listEl = $('#char-list');
-  listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.loading'))}</li>`;
+  listEl.innerHTML = `<li class="char-list-message">${esc(t('character.loading'))}</li>`;
   // Drop any stale selection from a previous realm; the default first-row
   // selection below re-arms the shared Enter World button and the preview name.
   charselectSelected = null;
@@ -6713,6 +6754,7 @@ async function refreshCharacters(): Promise<void> {
     if (chars.some((c) => c.skinCatalog === 'mech')) void preloadMechAssets();
     if (api.realm) $('#charselect-realm').textContent = api.realm;
     listEl.innerHTML = '';
+    resetComposedRows();
     // Boot resume: a WebView reload during play sent us here with a persisted
     // active-play marker. If that character still exists on the marker's realm,
     // re-enter the world directly instead of showing char-select (a linkdead
@@ -6735,7 +6777,7 @@ async function refreshCharacters(): Promise<void> {
     }
     if (chars.length === 0) {
       // No characters on this realm, drop straight into the create screen.
-      listEl.innerHTML = `<li class="char-list-message">${escapeHtml(t('character.noneYet'))}</li>`;
+      listEl.innerHTML = `<li class="char-list-message">${esc(t('character.noneYet'))}</li>`;
       show('#charcreate-panel');
       return;
     }
@@ -6753,12 +6795,12 @@ async function refreshCharacters(): Promise<void> {
       // Take Over button is unmissable.
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
       const inWorldHint = c.online
-        ? `<span class="char-inworld-hint">${escapeHtml(t('character.inWorldHint'))}</span>`
+        ? `<span class="char-inworld-hint">${esc(t('character.inWorldHint'))}</span>`
         : '';
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable
-        ? `<button type="button" class="btn reroll-char-btn" title="${escapeHtml(t('character.redesignHint'))}" aria-label="${escapeHtml(t('character.redesignTitle', { name: c.name }))}">${escapeHtml(t('character.redesign'))}</button>`
+        ? `<button type="button" class="btn reroll-char-btn" title="${esc(t('character.redesignHint'))}" aria-label="${esc(t('character.redesignTitle', { name: c.name }))}">${esc(t('character.redesign'))}</button>`
         : '';
       // The chip draws the character's REAL body: their authored modular look
       // (or the mech cosmetic), matching the 3D stage and the world.
@@ -6771,35 +6813,22 @@ async function refreshCharacters(): Promise<void> {
           look: charselectLook(c),
           catalog: c.skinCatalog ?? 'class',
         });
-      // A composed chip cannot hydrate from data attributes, so a row built
-      // before the portrait renderer is ready re-renders its own chip once the
-      // assets land (the crest placeholder shows until then).
-      if (charselectLook(c) && !portraitsReady()) {
-        onPortraitsReady(() => {
-          const chip = row.querySelector('.portrait-chip[data-portrait-composed]');
-          if (!chip?.isConnected) return;
-          chip.outerHTML = chipHtml();
-          // The module-scope onPortraitsReady listener in portrait_chip.ts
-          // (which arms crest-image fallbacks document-wide) is registered
-          // at import time, before this per-row callback, so it already ran
-          // by the time the swap above lands new elements in the DOM. Re-arm
-          // this row's fresh badge/portrait img explicitly, or a blocked or
-          // missing crest asset on it never falls back.
-          hydratePortraits(row);
-        });
-      }
+      // A composed chip cannot hydrate from data attributes, so the row
+      // repaints its own chip once the assets land and again once the composed
+      // capture behind it lands (the crest shows until then).
+      if (charselectLook(c)) trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));
       row.innerHTML = `${chipHtml()}
         <div class="char-id">
-          <span class="char-name">${escapeHtml(c.name)}</span>
-          <span class="char-sub">${escapeHtml(t('character.levelClass', { level: c.level, className }))}${escapeHtml(statusText)}</span>
+          <span class="char-name">${esc(c.name)}</span>
+          <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
           ${inWorldHint}
         </div>
         ${
           c.forceRename
-            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
+            ? `<input class="rename-input" placeholder="${esc(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${esc(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
             : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
+              ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
+              : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -6912,7 +6941,7 @@ async function refreshCharacters(): Promise<void> {
     // armed would auto-enter the world on whatever unrelated refresh (sort,
     // realm switch, rename) happens to succeed next.
     pendingResume = null;
-    listEl.innerHTML = `<li class="char-list-message char-list-error">${escapeHtml(userFacingApiError(err))}</li>`;
+    listEl.innerHTML = `<li class="char-list-message char-list-error">${esc(userFacingApiError(err))}</li>`;
   }
 }
 
@@ -7292,8 +7321,8 @@ function renderClassDetails(
       const pct = Math.min(100, Math.round((val / 25) * 100));
       return `
       <div class="details-stat-bar-row">
-        <span class="details-stat-label">${escapeHtml(statLabel)}</span>
-        <div class="details-stat-bar-track" aria-label="${escapeHtml(t('classDetails.statBarAria', { stat: statLabel, value: val }))}">
+        <span class="details-stat-label">${esc(statLabel)}</span>
+        <div class="details-stat-bar-track" aria-label="${esc(t('classDetails.statBarAria', { stat: statLabel, value: val }))}">
           <div class="details-stat-bar-fill" style="width: 0%;" data-target-width="${pct}%"></div>
         </div>
         <span class="details-stat-val">${val}</span>
@@ -7376,10 +7405,10 @@ function renderClassDetails(
 
       return `
       <li class="details-spell-item">
-        <img class="details-spell-icon-img" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(abilityName)}" width="32" height="32" />
+        <img class="details-spell-icon-img" src="${esc(iconUrl)}" alt="${esc(abilityName)}" width="32" height="32" />
         <div class="details-spell-text">
-          <strong>${escapeHtml(abilityName)}</strong>
-          ${escapeHtml(resolvedDesc)}
+          <strong>${esc(abilityName)}</strong>
+          ${esc(resolvedDesc)}
         </div>
       </li>
     `;
@@ -7394,24 +7423,24 @@ function renderClassDetails(
       <div class="class-details-content fade-out">
         <div class="class-details-header">
           <div class="class-details-header-text">
-            <h3 class="class-details-name">${escapeHtml(classLabel)}</h3>
-            <span class="class-details-role role-${details.roleType}">${escapeHtml(roleLabel)}</span>
+            <h3 class="class-details-name">${esc(classLabel)}</h3>
+            <span class="class-details-role role-${details.roleType}">${esc(roleLabel)}</span>
           </div>
         </div>
-        <p class="class-details-lore">${escapeHtml(classDisplayDescription(className))}</p>
+        <p class="class-details-lore">${esc(classDisplayDescription(className))}</p>
         <div class="class-details-grid">
           <div class="class-details-stats-col">
-            <h4 class="details-section-title">${escapeHtml(t('classDetails.sections.startingStats'))}</h4>
+            <h4 class="details-section-title">${esc(t('classDetails.sections.startingStats'))}</h4>
             ${statBarsHtml}
           </div>
           <div class="class-details-gear-col">
-            <h4 class="details-section-title">${escapeHtml(t('classDetails.sections.equipment'))}</h4>
-            <div class="details-gear-row"><strong>${escapeHtml(t('classDetails.labels.resource'))}:</strong> <span class="badge badge-resource resource-${classDef.resourceType}">${escapeHtml(resourceLabel)}</span></div>
-            <div class="details-gear-row"><strong>${escapeHtml(t('classDetails.labels.armor'))}:</strong> <span class="badge">${escapeHtml(armorLabel)}</span></div>
-            <div class="details-gear-row"><strong>${escapeHtml(t('classDetails.labels.weapons'))}:</strong> <span class="badge">${escapeHtml(weaponsLabel)}</span></div>
+            <h4 class="details-section-title">${esc(t('classDetails.sections.equipment'))}</h4>
+            <div class="details-gear-row"><strong>${esc(t('classDetails.labels.resource'))}:</strong> <span class="badge badge-resource resource-${classDef.resourceType}">${esc(resourceLabel)}</span></div>
+            <div class="details-gear-row"><strong>${esc(t('classDetails.labels.armor'))}:</strong> <span class="badge">${esc(armorLabel)}</span></div>
+            <div class="details-gear-row"><strong>${esc(t('classDetails.labels.weapons'))}:</strong> <span class="badge">${esc(weaponsLabel)}</span></div>
           </div>
           <div class="details-spells-section">
-            <h4 class="details-section-title">${escapeHtml(t('classDetails.sections.signatureAbilities'))}</h4>
+            <h4 class="details-section-title">${esc(t('classDetails.sections.signatureAbilities'))}</h4>
             <ul class="details-spells-list">
               ${spellsHtml}
             </ul>

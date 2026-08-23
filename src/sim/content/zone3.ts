@@ -131,7 +131,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 60, chance: 1 },
       { itemId: 'ridge_stalker_pelt', chance: 0.6, questId: 'q_stalker_pelts' },
       { itemId: 'ridge_stalker_pelt', chance: 0.6, questId: 'q_stalker_cloaks' },
-      { itemId: 'wildgrove_cinch', chance: 0.1 },
+      { itemId: 'wildgrove_cinch', chance: 0.02 },
     ],
     scale: 0.95,
     color: 0x8c8270,
@@ -204,8 +204,8 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       // Rare caster pieces at a grindable long-shot chance, the same pattern
       // as the sabatons above: mail for the shaman/paladin line, leather for
       // the druid line.
-      { itemId: 'peaksong_helm', chance: 0.04 },
-      { itemId: 'moonbark_vestments', chance: 0.04 },
+      { itemId: 'peaksong_helm', chance: 0.002 },
+      { itemId: 'moonbark_vestments', chance: 0.002 },
     ],
     scale: 0.85,
     color: 0x9c7a3c,
@@ -296,7 +296,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 75, chance: 1 },
       { itemId: 'ogre_toe_ring', chance: 0.35 },
-      { itemId: 'cragprowl_belt', chance: 0.1 },
+      { itemId: 'cragprowl_belt', chance: 0.02 },
     ],
     scale: 1.3,
     color: 0x9e7b53,
@@ -535,7 +535,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 90, chance: 1 },
       { itemId: 'wyrmcult_orders', chance: 0.1, questId: 'q_cult_orders' },
       { itemId: 'frayed_prayer_beads', chance: 0.35 },
-      { itemId: 'shardsong_mantle', chance: 0.04 },
+      { itemId: 'shardsong_mantle', chance: 0.002 },
     ],
     // The zealot's fevered chanting claws at a caster's mind, draining Intellect
     // and shrinking their mana pool for a while.
@@ -566,7 +566,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 100, chance: 1 },
       { itemId: 'ritual_phylactery', chance: 0.55, questId: 'q_necromancers' },
       { itemId: 'linen_scrap', chance: 0.3 },
-      { itemId: 'wyrmcult_spellgrips', chance: 0.04 },
+      { itemId: 'wyrmcult_spellgrips', chance: 0.002 },
     ],
     manaBurn: { chance: 0.3, amount: 80, name: 'Mana Sear', school: 'shadow' },
     // Spectral Ward: a shroud of dark wards that lashes back at any caster whose
@@ -632,7 +632,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       // Marrowlord Varkas: a rare per-kill chance so the bonefields are a
       // farmable path to the legwraps, not just the once-per-respawn rare.
       { itemId: 'necromancers_legwraps', chance: 0.001 },
-      { itemId: 'thornpeak_wildwraps', chance: 0.04 },
+      { itemId: 'thornpeak_wildwraps', chance: 0.002 },
     ],
     scale: 1.05,
     color: 0xcacfd2,
@@ -3119,7 +3119,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 180, str: 6, sta: 7 },
     sellValue: 3600,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
     set: 'crownforged', // 3rd Bonewrought piece, unlocks the set's 3-piece bonus
   },
   nighttalon_grips: {
@@ -3169,7 +3169,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stats: { armor: 150, str: 7, sta: 6 },
     sellValue: 3600,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
     set: 'crownforged',
   },
   nighttalon_waistband: {
@@ -3329,7 +3329,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     // and adds a complementary secondary (heroic_variants.ts). Off the stat budget.
     hitRating: 20,
     sellValue: 12000,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   crownforged_warspaulders: {
     id: 'crownforged_warspaulders',
@@ -3342,7 +3342,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 260, str: 7, sta: 8 },
     hitRating: 20,
     sellValue: 12000,
-    requiredClass: ['warrior', 'paladin'],
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   nighttalon_crown: {
     id: 'nighttalon_crown',

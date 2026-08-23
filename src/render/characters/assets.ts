@@ -20,12 +20,14 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
+import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
 import {
   type AttachDef,
@@ -45,6 +47,7 @@ import {
   weaponSkinModelUrl,
   weaponSkinModelUrls,
 } from './manifest';
+import { meshProgramShapeKey } from './material_program_shape_core';
 import {
   bandMaterialSpec,
   DEFAULT_LOOK,
@@ -80,6 +83,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
+import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -516,9 +520,8 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged
-// native app: see GFX.iosMemoryProfile in gfx.ts) carves the mob bodies out of
-// the boot gate and STREAMS them after first frame instead. They are the
+// Every iOS WebKit host carves the mob bodies out of the boot gate and STREAMS
+// them after first frame instead. They are the
 // heaviest character content (creature + skeleton-family GLBs with embedded
 // 1024-class atlases; 47 files, and by far the largest share of the decoded
 // character residency) and nothing on the launcher, the character-select
@@ -527,28 +530,67 @@ const allPreloadUrls = characterPreloadUrls(false);
 // the #2079 seam; mounts already stream exactly this way), so a mob whose GLB
 // is still arriving pops in a beat later instead of crashing anything.
 // Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
-// WebContent at 1.54 GB before the renderer ever existed; streaming defers that
-// mass to after the entry spike has cleared, and that WebContent ceiling is
-// identical whether the process hosts Safari or the packaged app. Weapons and
-// NPC bodies stay in the gate: the char-select preview builds CharacterVisual
-// DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
-// there would throw.
+// WebContent at 1.54 GB before the renderer ever existed. Desktop keeps these
+// actionable bodies critical: until a creature GLB arrives, its view, nameplate,
+// and click target do not exist. Weapons and NPC bodies also stay in the gate:
+// the char-select preview builds CharacterVisual DIRECTLY (not through the
+// fail-soft factory), so a missing held-weapon GLB there would throw.
 const STREAMED_URL_PREFIXES = ['models/creatures/', 'models/chars/enemies/'];
-// Armory weapon-SKIN models stream too (64 of the 78 weapon files): they are
-// cosmetic replacements for base weapons that always stay in the gate, so a
-// wearer whose skin GLB has not arrived yet degrades to their base weapon (the
-// swapAttachDef guard below) instead of throwing. Base item weapons stay
-// resident so the player's own hands are never empty at spawn.
+// Armory weapon-SKIN models stay out of the gate too (64 of the 78 weapon
+// files), but remain on demand instead of joining the bulk post-entry stream.
+// They are cosmetic replacements for base weapons that always stay in the
+// gate, so a wearer whose skin GLB has not arrived yet degrades to their base
+// weapon (the swapAttachDef guard below) instead of throwing. Base item weapons
+// stay resident so the player's own hands are never empty at spawn.
 const streamedSkinUrls = new Set(weaponSkinModelUrls());
-const streamableUrls = allPreloadUrls.filter(
-  (url) =>
-    STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
-);
-let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
+
+/** True for a weapon-skin cosmetic model url. Exported so asset-ready
+ *  consumers (renderer.onCharacterAssetReady) can drop every other character
+ *  GLB arrival, creature bodies included, before scanning live views. */
+export function isWeaponSkinModelUrl(url: string): boolean {
+  return streamedSkinUrls.has(url);
+}
+function streamedCharacterUrlsFor(profile: Readonly<GfxSettings>): string[] {
+  return allPreloadUrls.filter(
+    (url) =>
+      streamedSkinUrls.has(url) ||
+      (profile.iosMemoryProfile && STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix))),
+  );
+}
+function postEntryStreamUrlsFor(urls: readonly string[]): string[] {
+  return urls.filter((url) => STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)));
+}
+let streamedUrls = streamedCharacterUrlsFor(GFX);
 let streamedUrlSet = new Set(streamedUrls);
+let postEntryStreamUrls = postEntryStreamUrlsFor(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
+type CharacterAssetReadyListener = (url: string) => void;
+const characterAssetReadyListeners = new Set<CharacterAssetReadyListener>();
 
+/** Observe a character GLB becoming resident. Consumers use this to replace a
+ *  fail-soft fallback that was built while an on-demand cosmetic was cold. */
+export function onCharacterAssetReady(listener: CharacterAssetReadyListener): () => void {
+  characterAssetReadyListeners.add(listener);
+  return () => characterAssetReadyListeners.delete(listener);
+}
+
+function notifyCharacterAssetReady(url: string): void {
+  for (const listener of characterAssetReadyListeners) {
+    try {
+      listener(url);
+    } catch (error) {
+      console.warn('Character asset-ready listener failed', error);
+    }
+  }
+}
+
+// Keyed on the RAW url for every caller (the eager boot loop and the streamed
+// lanes); readers resolve through assetUrl(url). Consistent today because no
+// url this function loads is aliased (LOW_URL_ALIAS only rewrites the rogue
+// body, which preloads under its own raw entry); an alias added inside
+// models/creatures/ or the weapon-skin set would make that asset look
+// permanently non-resident, so key any such future entry resolved.
 function prepareCharacterUrl(url: string): Promise<void> {
   if (gltfByUrl.has(url)) return Promise.resolve();
   const existing = characterLoadTasks.get(url);
@@ -556,6 +598,7 @@ function prepareCharacterUrl(url: string): Promise<void> {
   const task = loadGltf(url)
     .then((gltf) => {
       gltfByUrl.set(url, gltf);
+      notifyCharacterAssetReady(url);
     })
     .catch((err) => {
       characterLoadTasks.delete(url);
@@ -573,22 +616,12 @@ function characterAssetResident(url: string): boolean {
 /** Kick a streamed character GLB (memoized by loadGltf) and index it on arrival. */
 export function ensureCharacterUrl(url: string | null | undefined): void {
   if (!url || characterAssetResident(url)) return;
-  void loadGltf(url)
-    .then((g) => {
-      // Keyed on the RAW url like the eager boot loop; readers resolve through
-      // assetUrl(url). Consistent today because no streamed url is aliased
-      // (LOW_URL_ALIAS only rewrites the rogue body, never streamed); an alias
-      // added inside models/creatures/ or the skin set would make this asset
-      // look permanently non-resident, so key any such future entry resolved.
-      gltfByUrl.set(url, g);
-    })
-    .catch(() => undefined);
+  void prepareCharacterUrl(url).catch(() => undefined);
 }
 
 /** A streamed url that has not arrived yet must degrade, never throw: return
  *  null so the caller falls back (base weapon / no ranged override) and kick
- *  the fetch so the cosmetic appears on the next swap or view rebuild. Eager
- *  platforms never take the branch: their streamed set is empty. */
+ *  the fetch so the cosmetic appears on the next swap or view rebuild. */
 function residentOrEnsure(url: string | null): string | null {
   if (!url) return null;
   if (!streamedUrlSet.has(url) || characterAssetResident(url)) return url;
@@ -603,10 +636,8 @@ for (const url of preloadUrls) {
 let streamedStarted = false;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
- * this call started). main.ts calls it once the entry is past its allocation
- * spike (prewarm complete). Empty everywhere but iOS WebKit hosts (Safari,
- * other iOS browsers, and the packaged app), where the boot gate above
- * deliberately excluded these urls. A failed fetch re-arms
+ * this call started). main.ts calls it after the first painted world frame,
+ * once the entry allocation spike has cleared. A failed fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
@@ -614,15 +645,10 @@ let streamedStarted = false;
 export function startStreamedCharacterPreloads(): number {
   if (streamedStarted) return 0;
   streamedStarted = true;
-  for (const url of streamedUrls) {
-    void loadGltf(url)
-      .then((g) => {
-        // Raw-url key on purpose: see the keying note in ensureCharacterUrl.
-        gltfByUrl.set(url, g);
-      })
-      .catch(() => undefined);
+  for (const url of postEntryStreamUrls) {
+    void prepareCharacterUrl(url).catch(() => undefined);
   }
-  return streamedUrls.length;
+  return postEntryStreamUrls.length;
 }
 
 // Skin textures: player alternate body atlases, loaded sRGB + flipY=false so
@@ -659,40 +685,37 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-// Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) defers
-// the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
+// Every host defers the whole alternate-atlas sweep out of the boot gate: about
+// 34 1024x1024 atlases
 // decode to well over 100 MB of RGBA inside the same WebContent process whose
 // jetsam ceiling the entry spike already presses against (the iPhone 13 report),
 // and almost all of them are OTHER players' cosmetics. skinTexture() fails soft
 // to the embedded default and every apply site heals through ensureSkinTexture()
 // (visual.ts constructor + setSkin, portrait.ts before its one-shot snapshot),
-// so a deferred atlas costs a brief fallback, never a crash or a stall. Both
-// profile hints derive from static boot signals (never the tier), so this
-// import-time read cannot drift from the live profile the way an import-time
-// TIER read would (the farmCrate P0).
-const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);
+// so a deferred atlas costs a brief fallback, never a crash or a stall.
+// The on-demand recovery seam is platform-neutral, so retaining those atlases
+// before first paint on desktop only lengthens the gate and raises its peak.
+// A deliberate kill-switch, not dead code: flipping it true restores the eager
+// boot sweep and the charactersReady atlas gate below wholesale if the
+// deferral ever has to be reverted; tests/ios_entry_memory.test.ts pins it off.
+const eagerSkinAtlases = false;
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = target.iosMemoryProfile ? streamableUrls : [];
+  const nextStreamedUrls = streamedCharacterUrlsFor(target);
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
   );
-  const skinTasks =
-    target.iosMemoryProfile || target.tightMemory
-      ? []
-      : [...bootSkinUrls].map((url) =>
-          skinTexByUrl.has(url) ? Promise.resolve() : loadSkinTexInto(url, skinTexByUrl),
-        );
-  await Promise.all([...requiredGltf.map(prepareCharacterUrl), ...skinTasks]);
+  await Promise.all(requiredGltf.map(prepareCharacterUrl));
   const nextSignature = nextStreamedUrls.join('|');
   if (nextSignature !== streamedUrls.join('|')) streamedStarted = false;
   streamedUrls = nextStreamedUrls;
   streamedUrlSet = nextStreamedSet;
+  postEntryStreamUrls = postEntryStreamUrlsFor(nextStreamedUrls);
 }
 
 /** Resolve once every boot-time character GLB + skin atlas is cached, retrying
@@ -714,8 +737,9 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    // Deferred atlases (every iOS WebKit host) are not boot assets: gating the
-    // preview on them would re-create the exact entry-footprint spike the deferral removes.
+    // Deferred atlases (every host, see eagerSkinAtlases above) are not boot
+    // assets: gating the preview on them would re-create the exact
+    // entry-footprint spike the deferral removes.
     const missingSkins = eagerSkinAtlases
       ? [...bootSkinUrls].filter((url) => !skinTexByUrl.has(url))
       : [];
@@ -1285,6 +1309,19 @@ function recolored(
   return mat;
 }
 
+/** The head a look's decals ride, inside a composed clone (or null when the
+ *  part set has no such node). */
+function headOf(root: THREE.Object3D, look: ModularLook): THREE.SkinnedMesh | null {
+  const name = headNodeName(look.app.gender);
+  let head: THREE.SkinnedMesh | null = null;
+  root.traverse((o) => {
+    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
+      head = o as THREE.SkinnedMesh;
+    }
+  });
+  return head;
+}
+
 /**
  * Add the stubble/buzz decal, if the look wears one.
  *
@@ -1294,24 +1331,17 @@ function recolored(
  * the recolour sweep below, which is what paints it the hair colour, and before
  * `applyMorphs`, which drives it off the head's own morph dictionary.
  */
-function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
+function attachStubbleDecal(head: THREE.SkinnedMesh, look: ModularLook): THREE.SkinnedMesh | null {
   const sel = stubbleDecals(look.app, look.worn);
-  if (!sel.scalp && !sel.beard) return;
-  const name = headNodeName(look.app.gender);
-  let head: THREE.SkinnedMesh | null = null;
-  root.traverse((o) => {
-    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
-      head = o as THREE.SkinnedMesh;
-    }
-  });
-  if (!head) return;
+  if (!sel.scalp && !sel.beard) return null;
   const decal = buildStubbleDecal(head, sel);
   // Sibling, not child: the head is skinned, so a child would inherit its
   // (bind-pose) transform on top of the skinning it already does.
   if (decal) {
     markFaceDecal(decal);
-    (head as THREE.SkinnedMesh).parent?.add(decal);
+    head.parent?.add(decal);
   }
+  return decal;
 }
 
 /**
@@ -1324,22 +1354,121 @@ function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
  * sweep (see `recolored`), because the mouth is a part standing proud of the
  * skin and a decal on the head at the lip band renders behind it.
  */
-function attachMakeupDecal(root: THREE.Object3D, look: ModularLook): void {
+function attachMakeupDecal(head: THREE.SkinnedMesh, look: ModularLook): THREE.SkinnedMesh | null {
   const sel = makeupSelection(look.app, look.worn);
-  if (!wearsFaceDecal(sel)) return;
-  const name = headNodeName(look.app.gender);
-  let head: THREE.SkinnedMesh | null = null;
-  root.traverse((o) => {
-    if (!head && (o as THREE.SkinnedMesh).isSkinnedMesh && o.name === name) {
-      head = o as THREE.SkinnedMesh;
-    }
-  });
-  if (!head) return;
+  if (!wearsFaceDecal(sel)) return null;
   const decal = buildMakeupDecal(head, sel);
   if (decal) {
     markFaceDecal(decal);
-    (head as THREE.SkinnedMesh).parent?.add(decal);
+    head.parent?.add(decal);
   }
+  return decal;
+}
+
+/** Options of a composed build. */
+export interface AssembleOptions {
+  /** Leave the face decals off when the look's pieces (its decal maps and
+   *  cuts, look_pieces.ts) are not resident, flagging the root
+   *  (`userData.deferredDecals`) for a late attachDeferredFaceDecals; the
+   *  body still builds whole and at once. Off, or with the pieces resident,
+   *  the decals attach here as always. */
+  deferDecals?: boolean;
+  /** Build with no face decals at all and no deferral flag: for a compose
+   *  whose product never carries them. The composed far bake is the one such
+   *  caller (composedFarMeshes drops every face decal from the flatten), and
+   *  the maps it would otherwise mint are the two procedural textures a
+   *  peer's first sight of an unseen style already pays in pieces. */
+  skipDecals?: boolean;
+}
+
+/** The compose's decal step: both decals attached, or deferred (see
+ *  AssembleOptions.deferDecals) when allowed and the look is not ready. */
+export function attachFaceDecals(
+  root: THREE.Object3D,
+  def: VisualDef,
+  look: ModularLook,
+  opts?: AssembleOptions,
+): void {
+  if (opts?.skipDecals) return;
+  const head = headOf(root, look);
+  if (!head) return;
+  if (opts?.deferDecals && !composedLookReady(def, look, head)) {
+    root.userData.deferredDecals = true;
+    return;
+  }
+  attachStubbleDecal(head, look);
+  attachMakeupDecal(head, look);
+}
+
+/**
+ * The late half of a deferred compose: the same two decals attachFaceDecals
+ * would have added, given exactly what the synchronous compose gives every
+ * mesh after attach (the recolour sweep's hair tint on the stubble material,
+ * the look's morph influences), the flag cleared. Returns the decal meshes so
+ * the visual can finish what ITS constructor does per mesh (tint, snapshot,
+ * caster flags) and reveal them through the compile gate. Empty when the root
+ * carries no deferral or the head is gone.
+ */
+export function attachDeferredFaceDecals(
+  root: THREE.Object3D,
+  look: ModularLook,
+): THREE.SkinnedMesh[] {
+  if (!root.userData.deferredDecals) return [];
+  delete root.userData.deferredDecals;
+  const head = headOf(root, look);
+  if (!head) return [];
+  const decals: THREE.SkinnedMesh[] = [];
+  for (const decal of [attachStubbleDecal(head, look), attachMakeupDecal(head, look)]) {
+    if (!decal) continue;
+    recolorMesh(decal, look);
+    // applyMorphs writes each mesh's influences by name from the look alone,
+    // so running it over the decal is the same write the compose sweep does
+    applyMorphs(decal, look);
+    decals.push(decal);
+  }
+  return decals;
+}
+
+/**
+ * The head mesh a look's decals ride, from the CACHED part-set variant, or null
+ * when the part library has not landed (the fail-soft build path reports that
+ * miss itself). Reading the variant is what any compose of this look does
+ * first, so a miss here (about 3 ms once per part set) is the compose's own
+ * cost paid early, not extra work; every later read is a map hit plus a walk.
+ * The head is an unmerged, morph-carrying part, so its geometry is the parsed
+ * scene's own buffer, shared by every variant of the same GLB and stable to
+ * key a decal cut on (stubble.ts / makeup.ts cache per head geometry uuid).
+ */
+export function modularHeadFor(def: VisualDef, look: ModularLook): THREE.SkinnedMesh | null {
+  let root: THREE.Object3D;
+  try {
+    root = modularVariant(def.url, modularPartNames(look.app, look.worn)).root;
+  } catch {
+    return null;
+  }
+  return headOf(root, look);
+}
+
+/** The recolour sweep's per-mesh step: the look's skin, hair, eye, lash,
+ *  lipstick, jewellery and outfit tints onto every material of one mesh (see
+ *  `recolored`), plus the body-mesh flag the legacy skin-atlas swap gates on. */
+export function recolorMesh(mesh: THREE.Mesh, look: ModularLook): void {
+  const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  // Only PLATE is a "body mesh" here: that flag gates the legacy per-class
+  // skin-atlas swap (SKINS/skinTexture), which must never repaint the
+  // colour-picked skin and hair.
+  if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
+  // The mouth part is the one place `mod_skin` must not be the skin tone,
+  // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
+  // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
+  const onMouth = mesh.name.includes('_Mouth_');
+  // GLTFLoader suffixes multi-primitive meshes, so match the stem
+  const onJewel = mesh.name.startsWith('E2_');
+  // ...and a hair band is the E2_ subset that must ignore the earring slot
+  const onBand = mesh.name.startsWith('E2_band_');
+  mesh.material = Array.isArray(mesh.material)
+    ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
+    : recolored(mesh.material, look, onMouth, onJewel, onBand);
 }
 
 /** Compose a modular character: pick parts, recolour skin/hair, attach weapons. */
@@ -1348,34 +1477,28 @@ export function assembleModular(
   look: ModularLook,
   weaponItemId?: string | null,
   offhandItemId?: string | null,
+  opts?: AssembleOptions,
 ): THREE.Object3D {
   const names = modularPartNames(look.app, look.worn);
-  const variant = modularVariant(def.url, names);
-  const root = cloneSkinned(variant.root);
-  attachStubbleDecal(root, look);
-  attachMakeupDecal(root, look);
+  // Nested inside the visual's `view-part:assemble` span; the variant step is
+  // the cache miss (whole-GLB clone + part merge) or a map hit.
+  const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
+  const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
+  // A skipDecals compose records no decal sample: the kind's EMA prices a real
+  // decal step, and the far bake's throwaway would only add zeros to it.
+  if (!opts?.skipDecals) {
+    timeBuildSpan('view-part:assemble:decals', () => attachFaceDecals(root, def, look, opts));
+  }
+  const recolorStarted = performance.now();
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh) return;
-    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-    // Only PLATE is a "body mesh" here: that flag gates the legacy per-class
-    // skin-atlas swap (SKINS/skinTexture), which must never repaint the
-    // colour-picked skin and hair.
-    if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
-    // The mouth part is the one place `mod_skin` must not be the skin tone,
-    // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
-    // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
-    const onMouth = mesh.name.includes('_Mouth_');
-    // GLTFLoader suffixes multi-primitive meshes, so match the stem
-    const onJewel = mesh.name.startsWith('E2_');
-    // ...and a hair band is the E2_ subset that must ignore the earring slot
-    const onBand = mesh.name.startsWith('E2_band_');
-    mesh.material = Array.isArray(mesh.material)
-      ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
-      : recolored(mesh.material, look, onMouth, onJewel, onBand);
+    if (mesh.isMesh) recolorMesh(mesh, look);
   });
-  applyMorphs(root, look);
-  attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
+  recordBuildSpan('view-part:assemble:recolor', performance.now() - recolorStarted, recolorStarted);
+  timeBuildSpan('view-part:assemble:morphs', () => applyMorphs(root, look));
+  timeBuildSpan('view-part:assemble:props', () =>
+    attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null),
+  );
   // The far LOD's material slots, captured HERE and nowhere else, off the SAME
   // filter (composedFarMeshes) the composed bake walks, so slot N here is group
   // N there. Resolving by material NAME could not promise that: `mod_skin` is on
@@ -1465,9 +1588,10 @@ export function assembleModel(
   weaponItemId?: string | null,
   offhandItemId?: string | null,
   look?: ModularLook | null,
+  opts?: AssembleOptions,
 ): THREE.Object3D {
   if (def.modular) {
-    return assembleModular(def, look ?? DEFAULT_LOOK, weaponItemId, offhandItemId);
+    return assembleModular(def, look ?? DEFAULT_LOOK, weaponItemId, offhandItemId, opts);
   }
   const root = cloneSkinned(optimizedScene(def.url));
   // tag the character's own meshes (body + accessories share one texture atlas)
@@ -1770,6 +1894,17 @@ export function releaseTintedMaterials(claims: Iterable<string>): void {
   for (const key of claims) matCache.release(key);
 }
 
+/** Which mesh family mounts a tinted clone. The far LOD gets its OWN clone
+ *  objects (same inputs, separate cache entry): three's compileAsync waits on
+ *  a material's `currentProgram`, the variant its LAST draw or compile picked,
+ *  and a clone shared between the skinned rig and the rigid far mesh flips
+ *  that slot to the rig's long-linked variant the frame after the far bake
+ *  compiles, so its gate settled before the far variant had linked (measured
+ *  as 70-160 ms NVIDIA / 360-390 ms iGPU raced first draws). Programs are
+ *  still shared by cache key across the clones; only the material objects,
+ *  and so the polled slot, differ. */
+export type TintedMount = 'rig' | 'far';
+
 export function tintedMaterial(
   src: THREE.Material,
   tint: number | null,
@@ -1778,6 +1913,11 @@ export function tintedMaterial(
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
   claims: TintedMaterialClaims | null = null,
+  mount: TintedMount = 'rig',
+  // No default: a mounted clone is shared only among meshes of ONE program
+  // shape, and an omitted key silently restores the over-sharing this
+  // parameter exists to prevent. A single-shape caller passes '' on purpose.
+  shapeKey: string,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -1785,7 +1925,10 @@ export function tintedMaterial(
   // (its per-frame uTime/uStr writes would land on a material nothing
   // renders), and caching that clone would strand it forever.
   if (!(src as THREE.MeshStandardMaterial).color) return src;
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
+  // shapeKey: a mounted clone is shared only among meshes of one program
+  // shape (material_program_shape_core.ts); single-shape callers (the far
+  // bake) pass nothing.
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}`;
   const build = () =>
     buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
   if (claims) {
@@ -1938,13 +2081,25 @@ export function applyMaterials(
     // skin/emissive override only touches the character's own atlas meshes, not weapons
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
+    const shapeKey = meshProgramShapeKey(mesh);
     if (Array.isArray(source)) {
       mesh.material = source.map((m) =>
-        tintedMaterial(m, materialTint, strength, sk, em, role, claims),
+        tintedMaterial(m, materialTint, strength, sk, em, role, claims, 'rig', shapeKey),
       );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, claims);
+      mesh.material = tintedMaterial(
+        source,
+        materialTint,
+        strength,
+        sk,
+        em,
+        role,
+        claims,
+        'rig',
+        shapeKey,
+      );
     }
+    attachSharedDepthMaterials(mesh, mesh.material);
   });
 }
 
@@ -1974,6 +2129,10 @@ export function tintedFarMaterials(
       isBody[i] ? emisTex : null,
       'body',
       claims,
+      'far',
+      // One baked mesh per far LOD, so there is exactly one shape here and
+      // nothing to partition. Deliberate, not an omission.
+      '',
     ),
   );
 }
@@ -2016,6 +2175,7 @@ const prepared = new Map<string, PreparedVisual>();
 export function resetCharacterProfileCaches(): void {
   optimizedSceneCache.clear();
   matCache.reset();
+  clearSharedDepthMaterials();
   prepared.clear();
 }
 
@@ -2061,8 +2221,11 @@ export function prepareVisual(key: string): PreparedVisual {
     clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
-  // Pose a throwaway clone mid-idle, measure it, and bake the static mesh.
-  const temp = assembleModel(def);
+  // Pose a throwaway clone mid-idle, measure it, and bake the static mesh. No
+  // face decals on a modular throwaway: the flatten drops them (farBakeMeshes),
+  // and the default look's scalp decal would otherwise be minted and thrown
+  // away per modular key, on the far crossing that first prepares the key.
+  const temp = assembleModel(def, null, null, null, { skipDecals: true });
   const idle = clips.get(def.clips.idle);
   if (idle) {
     const mixer = new THREE.AnimationMixer(temp);
@@ -2238,7 +2401,10 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
   // Pose a throwaway composed clone mid-idle and bake it, exactly as
   // prepareVisual does for a fixed rig. The clone is released immediately: it
   // exists only to be flattened, and holding a ref would pin the part set.
-  const temp = assembleModular(def, look);
+  // No face decals: the flatten drops them (composedFarMeshes), and building
+  // them here cost a whole synchronous decal-map mint per unseen style on the
+  // per-frame far crossing (production 2026-08-19: 186 ms in one frame).
+  const temp = assembleModular(def, look, null, null, { skipDecals: true });
   const idle = prep.clips.get(def.clips.idle);
   if (idle) {
     const mixer = new THREE.AnimationMixer(temp);
