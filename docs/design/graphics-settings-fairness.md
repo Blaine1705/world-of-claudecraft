@@ -76,6 +76,16 @@ COSMETIC (may be tiered down on lower presets):
   low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a redraw-smoothness
   shed this list already sanctions for the portrait.
 
+- The armour DYE of a picked outfit colorway (`src/render/characters/armor_dye.ts`,
+  `outfitDye` in `modular.ts`). The colorway itself is IDENTITY the player chose in the
+  creator, so it may never be dropped outright; what a tier with no shader stage may shed is
+  its FIDELITY. On standard tier and above, `attachArmorDye` remaps the atlas's steel, trim,
+  leather, and cloth zones independently in a fragment shader. On low tier, every rig
+  material rebuilds as flat Lambert with no `onBeforeCompile` hook to run that shader in, so
+  `outfitDyeFallbackHex` (`modular.ts`) stands in with a single, value-normalized multiply
+  toward the colorway's own hue: a rougher, whole-armour approximation of the same colour
+  rather than the atlas's undyed default. Pinned by `tests/tinted_material.test.ts`.
+
 - Edge anti-aliasing, and WHICH edge anti-aliasing a tier gets. High and above run the SMAA
   tail; medium (and any mix that resolves to the grade-only chain) runs the FXAA arm fused
   into `OutputGradePass`; low and the memory-constrained WebKit rungs run none, because they
@@ -270,6 +280,12 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   governor; a source-scan pins that party frames are not tiered.
 - `tests/architecture.test.ts`: `ui_tier_knobs.ts` is a registered UI_PURE_CORE (no governor,
   DOM, or render import).
+- `tests/tinted_material.test.ts`: an active outfit colorway renders as a genuinely different
+  colour on low tier too (never the atlas's undyed default), the low-tier fallback is
+  value-normalized so it cannot crush the whole armour toward black the way a naive multiply
+  of the swatch chip would, a non-armour material (skin) is proven untouched by the fallback,
+  and the standard-tier shader-dyed material's own `.color` is proven unchanged by the fix
+  (the shader still carries the dye there).
 - `tests/professions_graphics_fairness.test.ts`: the professions actionable set (the fishing
   bobber pair, the minimap markers and painter, the node tooltip, the node prop ladder) is
   scanned profile- and governor-free with comment-stripped sources, the tier ladder is
