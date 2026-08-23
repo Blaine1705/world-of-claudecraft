@@ -67,6 +67,12 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
 const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const strippedHudSource = stripComments(hudSource);
+const uiSources = tsFilesUnder(uiRoot).map(({ file, full }) => ({
+  file,
+  full,
+  source: stripComments(readFileSync(full, 'utf8')),
+}));
 
 // Raw source to the parser (a `//` inside one of hud.ts's regex literals or
 // template strings truncates a line for a comment stripper, and ts.createSourceFile
@@ -174,8 +180,7 @@ interface GatedModule {
 
 function discoverGatedModules(): GatedModule[] {
   const out: GatedModule[] = [];
-  for (const { file, full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { file, source } of uiSources) {
     if (!EMITS_TEXT.test(source)) continue;
     const declared = [...source.matchAll(MEMO_DECL)].map((m) => m[1]);
     // A memo is only a REPAINT gate when the module compares it. A retained
@@ -705,15 +710,14 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     const armCalls = new Set(scan.sites.map((s) => s.call));
     const uncalled: string[] = [];
     const scanned: string[] = [];
-    for (const { file, full } of tsFilesUnder(uiRoot)) {
-      const source = stripComments(readFileSync(full, 'utf8'));
+    for (const { file, source } of uiSources) {
       if (!/^\s{2}relocalize\(/m.test(source)) continue;
       scanned.push(file);
       const cls = /export class (\w+)/.exec(source)?.[1] ?? '';
       // Map the class back to the Hud field that holds it, then look for an arm
       // on that field. A module whose relocalize is reached through a wrapper
       // (LockpickWindow via LockpickController) is credited by the wrapper's arm.
-      const fields = [...stripComments(hudSource).matchAll(/(\w+)\s*=\s*new (\w+)\(/g)]
+      const fields = [...strippedHudSource.matchAll(/(\w+)\s*=\s*new (\w+)\(/g)]
         .filter(([, , constructed]) => constructed === cls)
         .map(([, field]) => field);
       const credited =
@@ -754,13 +758,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
  *  an exemption. */
 function builderOwns(armCall: string, cls: string): boolean {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const hud = stripComments(hudSource);
-  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(strippedHudSource);
   if (!assigned) return false;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(strippedHudSource);
   if (!built) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { source } of uiSources) {
     if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
     return new RegExp(`new ${cls}\\(`).test(source);
   }
@@ -769,12 +771,9 @@ function builderOwns(armCall: string, cls: string): boolean {
 
 function wrapperOwns(armCall: string, cls: string): boolean {
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(
-    stripComments(hudSource),
-  );
+  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(strippedHudSource);
   if (!constructed) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { source } of uiSources) {
     if (!new RegExp(`export class ${constructed[1]}\\b`).test(source)) continue;
     // The wrapper must both hold one of these and forward to it.
     return (

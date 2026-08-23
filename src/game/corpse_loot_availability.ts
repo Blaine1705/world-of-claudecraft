@@ -64,7 +64,7 @@ export function corpseLootAvailability(
   // function that restated a sim rule instead of importing it, which is exactly
   // how it drifted: the rest already delegate (hasSharedLootRights below).
   const harvestable =
-    mob.ownerId === null &&
+    mob.ownerId == null &&
     harvestStateReliable &&
     isHarvestableCorpse(componentTags) &&
     mob.harvestClaimedBy === null;
