@@ -172,3 +172,33 @@ describe('market env documentation matches the code', () => {
     ).toEqual([]);
   });
 });
+
+describe('compose passes through every operator-tunable market knob', () => {
+  // The known drift class: a knob documented in .env.example but absent from
+  // docker-compose.yml is silently discarded in the compose deployment (the
+  // operator sets it, the code default wins). The dev pair is the ONE
+  // sanctioned exception: compose is the production deployment and the dev
+  // economy must be unreachable from it, the ALLOW_DEV_COMMANDS posture.
+  const COMPOSE_EXEMPT = new Set(['WOC_MARKET_DEV_SERVICE', 'WOC_MARKET_DEV_PRICE_MICRO_USD']);
+
+  it('forwards every read WOC_MARKET_ name, minus the sanctioned dev pair', () => {
+    const compose = read('docker-compose.yml');
+    const missing = [...readNames()]
+      .filter((n) => n.startsWith('WOC_MARKET_') && !COMPOSE_EXEMPT.has(n))
+      .filter((n) => !compose.includes(`${n}: \${${n}:-}`))
+      .sort();
+    expect(
+      missing,
+      'read by the server but not passed through docker-compose.yml; an operator override is silently discarded',
+    ).toEqual([]);
+  });
+
+  it('keeps the dev pair OUT of compose (the exemption is a refusal, not a gap)', () => {
+    const compose = read('docker-compose.yml');
+    for (const name of COMPOSE_EXEMPT) {
+      expect(compose.includes(`${name}: \${`), `${name} must not be passed through`).toBe(false);
+    }
+    // The exemption list stays honest: both names are really read by code.
+    for (const name of COMPOSE_EXEMPT) expect(readNames()).toContain(name);
+  });
+});
