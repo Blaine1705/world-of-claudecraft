@@ -248,6 +248,7 @@ describe('CI workflow parity', () => {
       '          sparse-checkout: |',
       '            /*',
       '            !/docs/screenshots/*/',
+      '            /docs/screenshots/account-set-password/',
       '            /docs/screenshots/admin-cheater-mark/',
       '            /docs/screenshots/admin-guild-bank-panel/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
