@@ -1,0 +1,113 @@
+import { describe, expect, it } from 'vitest';
+
+import {
+  VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS,
+  VARKHUL_FORGE_FINAL_BEAM_SECONDS,
+  VARKHUL_FORGE_FINAL_GAP_SECONDS,
+  VARKHUL_FORGE_FINAL_HP_THRESHOLD,
+  VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD,
+  VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC,
+  VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL,
+  VARKHUL_FORGE_LOCAL_POS,
+  VARKHUL_FORGE_PORTAL_ABILITY_ID,
+  VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
+  VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
+  VARKHUL_FORGE_TEACHING_BEAM_SECONDS,
+  VARKHUL_FORGE_TEACHING_GAP_SECONDS,
+  VARKHUL_FORGE_TEACHING_HP_THRESHOLD,
+  VARKHUL_WORK_FACING,
+  VARKHUL_WORK_LOCAL_POS,
+  varkhulForgeBeamIsActive,
+  varkhulForgeBeamWindowMask,
+  varkhulForgeIntermissionSeconds,
+  varkhulForgeIntermissionWave,
+  varkhulForgeIntermissionWaveCount,
+} from '../src/sim/varkhul_forge_intermission';
+
+describe('Varkhul forge intermission contract', () => {
+  it('pins the teaching, final and portal cadence', () => {
+    expect(VARKHUL_FORGE_TEACHING_HP_THRESHOLD).toBe(0.8);
+    expect(VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD).toBe(0.5);
+    expect(VARKHUL_FORGE_FINAL_HP_THRESHOLD).toBe(0.2);
+    expect(VARKHUL_FORGE_TEACHING_BEAM_SECONDS).toBe(8);
+    expect(VARKHUL_FORGE_TEACHING_GAP_SECONDS).toBe(2);
+    expect(VARKHUL_FORGE_FINAL_BEAM_SECONDS).toBe(8);
+    expect(VARKHUL_FORGE_FINAL_GAP_SECONDS).toBe(4);
+    expect(VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS).toBe(2);
+    expect(VARKHUL_FORGE_PORTAL_ABILITY_ID).toBe('Forge Legion Portal');
+    expect(VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS).toBe(8);
+  });
+
+  it('activates the intended pillar in every window', () => {
+    expect(varkhulForgeBeamWindowMask('idle')).toBe(0);
+    expect(varkhulForgeBeamWindowMask('teaching_left')).toBe(1);
+    expect(varkhulForgeBeamWindowMask('teaching_gap')).toBe(0);
+    expect(varkhulForgeBeamWindowMask('teaching_right')).toBe(2);
+    expect(varkhulForgeBeamWindowMask('intermission')).toBe(3);
+    expect(varkhulForgeBeamWindowMask('final_left')).toBe(1);
+    expect(varkhulForgeBeamWindowMask('final_gap_left')).toBe(0);
+    expect(varkhulForgeBeamWindowMask('final_right')).toBe(2);
+    expect(varkhulForgeBeamWindowMask('final_gap_right')).toBe(0);
+    expect(varkhulForgeBeamIsActive(1, 0)).toBe(true);
+    expect(varkhulForgeBeamIsActive(1, 1)).toBe(false);
+    expect(varkhulForgeBeamIsActive(2, 0)).toBe(false);
+    expect(varkhulForgeBeamIsActive(2, 1)).toBe(true);
+    expect(varkhulForgeBeamIsActive(3, 0)).toBe(true);
+    expect(varkhulForgeBeamIsActive(3, 1)).toBe(true);
+  });
+
+  it('uses three Normal waves and four Heroic waves without an Artificer', () => {
+    expect(VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL).toBe(60);
+    expect(VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC).toBe(70);
+    expect(varkhulForgeIntermissionSeconds('normal')).toBe(60);
+    expect(varkhulForgeIntermissionSeconds('heroic')).toBe(70);
+    expect(varkhulForgeIntermissionWaveCount('normal')).toBe(3);
+    expect(varkhulForgeIntermissionWaveCount('heroic')).toBe(4);
+
+    const normal = Array.from({ length: 3 }, (_, wave) =>
+      varkhulForgeIntermissionWave('normal', wave),
+    ).flat();
+    const heroic = Array.from({ length: 4 }, (_, wave) =>
+      varkhulForgeIntermissionWave('heroic', wave),
+    ).flat();
+    expect(normal).toHaveLength(12);
+    expect(heroic).toHaveLength(20);
+    expect(normal.filter((spawn) => spawn.templateId === 'ignivar_crucible_warden')).toHaveLength(
+      3,
+    );
+    expect(heroic.filter((spawn) => spawn.templateId === 'ignivar_crucible_warden')).toHaveLength(
+      4,
+    );
+    expect([...normal, ...heroic].some((spawn) => spawn.templateId.includes('artificer'))).toBe(
+      false,
+    );
+  });
+
+  it('uses all four separated room portals and rotates the Warden source', () => {
+    expect(VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS).toEqual([
+      { x: -27, z: -22 },
+      { x: 27, z: -22 },
+      { x: -30, z: 12 },
+      { x: 30, z: 12 },
+    ]);
+    expect(
+      new Set(VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS.map((portal) => `${portal.x}:${portal.z}`)).size,
+    ).toBe(4);
+    expect(
+      Array.from(
+        { length: 4 },
+        (_, wave) =>
+          varkhulForgeIntermissionWave('heroic', wave).find(
+            (spawn) => spawn.templateId === 'ignivar_crucible_warden',
+          )?.portalIndex,
+      ),
+    ).toEqual([0, 1, 2, 3]);
+  });
+
+  it('places Varkhul south of the anvil facing north with his back to the raid', () => {
+    expect(VARKHUL_FORGE_LOCAL_POS).toEqual({ x: 0, z: 22 });
+    expect(VARKHUL_WORK_LOCAL_POS).toEqual({ x: 0, z: 16 });
+    expect(VARKHUL_WORK_LOCAL_POS.z).toBeLessThan(VARKHUL_FORGE_LOCAL_POS.z);
+    expect(VARKHUL_WORK_FACING).toBe(0);
+  });
+});

@@ -5,7 +5,7 @@
 
 export const VARKHUL_CINDER_ORBS_TARGETS = 3;
 export const VARKHUL_CINDER_ORBS_MARK_SECONDS = 4;
-export const VARKHUL_CINDER_FIRE_RADIUS = 2.4;
+export const VARKHUL_CINDER_FIRE_RADIUS = 3.5;
 export const VARKHUL_CINDER_FIRE_TICK_SECONDS = 1;
 export const VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP = 0.04;
 // Twenty full three-player releases is beyond the intended encounter envelope.

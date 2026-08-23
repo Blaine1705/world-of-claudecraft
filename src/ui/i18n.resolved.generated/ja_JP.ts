@@ -2288,12 +2288,25 @@ export const ja_JP: EnTranslations = {
       "leather": "革",
       "mail": "鎖"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "左の鍛冶柱が充填中。3秒後に点火する！",
+      "rightPillarCharging": "右の鍛冶柱が充填中。3秒後に点火する！",
+      "bothPillarsCharging": "鍛冶柱が充填中。3秒後に点火する！",
+      "leftPillar": "左の鍛冶柱が点火した！",
+      "rightPillar": "右の鍛冶柱が点火した！",
+      "bothPillars": "鍛冶柱が点火した！",
+      "portalsOpening": "鍛冶炉のポータルが開き始めた！",
+      "heat75": "鍛冶炉の熱が75%に達した！",
+      "heat90": "鍛冶炉メルトダウンが迫っている！",
+      "addsDefeated": "鍛冶軍団を倒した。ヴァークルが無防備になった！"
+    },
     "auraEffect": {
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
       "varkhulSentinelsGaze": "残り火の番兵に追われている。倒すまでレイドから離しておくこと。",
       "varkhulMoltenCore": "このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。",
-      "varkhulForgeLink": "部屋の外周で自分のシンボルと同じルーンを探す。内側の円に入ると左回転、外側のリングに入ると右回転する。外に出ると停止し、シンボルがソケットに届くと自動的に固定される。",
+      "varkhulForgeLink": "作動中の柱の光線が鍛冶炉に届く前に遮断する。未遮断の光線は1秒ごとに熱を6%上昇させる。ノーマルでは遮断中と柱の停止中に冷却されるが、ヒロイックでは熱は下がらない。100%で致命的な鍛冶炉メルトダウンが発生する。",
+      "varkhulCrucibleExposure": "るつぼの光線を遮断すると、1秒ごとに最大体力基準のダメージが増加する。スタックはノーマルでは光線を離れて10秒後、ヒロイックでは60秒後にリセットされる。",
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
       "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",

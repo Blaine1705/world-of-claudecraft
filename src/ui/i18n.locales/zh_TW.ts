@@ -7204,7 +7204,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sharedPyre':
     '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。',
   'hudChrome.auraEffect.varkhulForgeLink':
-    '在房間周圍找到與你符號相符的符文。站進內圈可向左旋轉，站進外環可向右旋轉。離開控制區即可停止；符號到達插槽時會自動鎖定。',
+    '在啟動的立柱光束抵達鍛爐前將其攔截。未攔截的光束每秒增加6%熱量。普通難度下，已攔截的光束和關閉的立柱會讓鍛爐冷卻；英雄難度下熱量永不降低。達到100%時會觸發致命的鍛爐熔毀。',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    '攔截坩堝光束時，每秒受到的最大生命值傷害都會提高。離開光束後，普通難度10秒、英雄難度60秒後重置層數。',
+  'hudChrome.varkhulCallout.leftPillarCharging': '左側鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.rightPillarCharging': '右側鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.bothPillarsCharging': '鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.leftPillar': '左側鍛爐立柱點燃了！',
+  'hudChrome.varkhulCallout.rightPillar': '右側鍛爐立柱點燃了！',
+  'hudChrome.varkhulCallout.bothPillars': '鍛爐立柱點燃了！',
+  'hudChrome.varkhulCallout.portalsOpening': '鍛爐傳送門正在開啟！',
+  'hudChrome.varkhulCallout.heat75': '鍛爐熱量達到75%！',
+  'hudChrome.varkhulCallout.heat90': '鍛爐熔毀迫在眉睫！',
+  'hudChrome.varkhulCallout.addsDefeated': '鍛爐軍團已被擊敗，瓦庫爾暴露了！',
   'hudChrome.auraEffect.absorb': '吸收 {value} 點傷害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 點受到的治療',
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',

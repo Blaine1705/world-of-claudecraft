@@ -1,7 +1,4 @@
 import {
-  VARKHUL_ASSEMBLY_CORE_AURA_ID,
-  VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
-  VARKHUL_ASSEMBLY_LINK_AURA_ID,
   VARKHUL_BOSS_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
@@ -32,9 +29,6 @@ export interface VarkhulEncounterVisualPlan {
   cinderOrbsProgress: number;
   frontalVisible: boolean;
   frontalProgress: number;
-  fixateVisible: boolean;
-  moltenCoreVisible: boolean;
-  linkSymbol: number | null;
   inverseEntityScale: number;
 }
 
@@ -51,14 +45,7 @@ export function varkhulEncounterBypassesCharacterCulling(entity: VarkhulVisualEn
   return (
     (entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_FRONTAL_CAST_ID) ||
     (entity.kind === 'player' &&
-      entity.auras.some((aura) =>
-        [
-          VARKHUL_CINDER_ORBS_AURA_ID,
-          VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
-          VARKHUL_ASSEMBLY_CORE_AURA_ID,
-          VARKHUL_ASSEMBLY_LINK_AURA_ID,
-        ].includes(aura.id),
-      ))
+      entity.auras.some((aura) => aura.id === VARKHUL_CINDER_ORBS_AURA_ID))
   );
 }
 
@@ -85,9 +72,6 @@ export function varkhulEncounterVisualPlan(
     entity.kind === 'player'
       ? entity.auras.find((aura) => aura.id === VARKHUL_CINDER_ORBS_AURA_ID)
       : undefined;
-  const fixate = entity.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_FIXATE_AURA_ID);
-  const moltenCore = entity.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_CORE_AURA_ID);
-  const link = entity.auras.find((aura) => aura.id === VARKHUL_ASSEMBLY_LINK_AURA_ID);
   const frontalVisible =
     entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_FRONTAL_CAST_ID;
   return {
@@ -103,9 +87,6 @@ export function varkhulEncounterVisualPlan(
           Math.max(0, 1 - (entity.castRemaining ?? 0) / Math.max(0.01, entity.castTotal ?? 0.01)),
         )
       : 0,
-    fixateVisible: fixate !== undefined,
-    moltenCoreVisible: moltenCore !== undefined,
-    linkSymbol: link ? Math.max(0, Math.min(9, Math.floor((link.stacks ?? 1) - 1))) : null,
     inverseEntityScale: 1 / Math.max(0.01, entity.scale ?? 1),
   };
 }

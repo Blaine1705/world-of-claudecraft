@@ -7608,7 +7608,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sharedPyre':
     'Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).',
   'hudChrome.auraEffect.varkhulForgeLink':
-    'Найдите по краю комнаты руну со своим символом. Встаньте во внутренний круг, чтобы вращать влево, или во внешнее кольцо, чтобы вращать вправо. Выйдите, чтобы остановить вращение; символ автоматически зафиксируется, достигнув гнезда.',
+    'Перехватите луч активной колонны до того, как он достигнет кузни. Свободный луч добавляет 6% жара в секунду. В обычном режиме заблокированные лучи и выключенные колонны охлаждают кузню; в героическом жар не снижается. При 100% происходит смертоносное расплавление кузни.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Перехват луча горнила каждую секунду наносит всё больший урон от максимального здоровья. Эффект сбрасывается через 10 секунд вне луча в обычном режиме и через 60 секунд в героическом.',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    'Левая колонна кузни заряжается. Она зажжётся через 3 секунды!',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    'Правая колонна кузни заряжается. Она зажжётся через 3 секунды!',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    'Колонны кузни заряжаются. Они зажгутся через 3 секунды!',
+  'hudChrome.varkhulCallout.leftPillar': 'Левая колонна кузни зажигается!',
+  'hudChrome.varkhulCallout.rightPillar': 'Правая колонна кузни зажигается!',
+  'hudChrome.varkhulCallout.bothPillars': 'Колонны кузни зажигаются!',
+  'hudChrome.varkhulCallout.portalsOpening': 'Порталы кузни открываются!',
+  'hudChrome.varkhulCallout.heat75': 'Жар кузни достиг 75%!',
+  'hudChrome.varkhulCallout.heat90': 'Расплавление кузни неизбежно!',
+  'hudChrome.varkhulCallout.addsDefeated': 'Легион кузни повержен: Варкхул уязвим!',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',

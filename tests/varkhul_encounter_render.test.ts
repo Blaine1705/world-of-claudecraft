@@ -8,18 +8,12 @@ import {
   syncVarkhulEncounterVisuals,
   VARKHUL_BRAND_VISUAL_NAME,
   VARKHUL_CINDER_ORBS_VISUAL_NAME,
-  VARKHUL_CORE_CARRY_VISUAL_NAME,
-  VARKHUL_FIXATE_VISUAL_NAME,
-  VARKHUL_LINK_VISUAL_NAME,
 } from '../src/render/varkhul_encounter';
 import {
   varkhulEncounterBypassesCharacterCulling,
   varkhulEncounterViewVisibleDuringCompile,
 } from '../src/render/varkhul_encounter_core';
 import {
-  VARKHUL_ASSEMBLY_CORE_AURA_ID,
-  VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
-  VARKHUL_ASSEMBLY_LINK_AURA_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
 } from '../src/sim/encounters/varkhul';
@@ -55,7 +49,7 @@ describe('Varkhul encounter rendering', () => {
   it('builds three marked cinder orbs without the removed hammer telegraph', () => {
     const cinderOrbs = buildVarkhulCinderOrbsTelegraph();
     expect(cinderOrbs.userData.actionable).toBe(true);
-    expect(cinderOrbs.userData.radius).toBe(2.4);
+    expect(cinderOrbs.userData.radius).toBe(3.5);
     expect(cinderOrbs.getObjectByName('varkhulCinderOrbsCrown')?.children).toHaveLength(3);
     expect(cinderOrbs.getObjectByName('varkhulCinderOrbCore')).toBeDefined();
     expect(cinderOrbs.getObjectByName('varkhulMarkedHammersHammer')).toBeUndefined();
@@ -65,7 +59,7 @@ describe('Varkhul encounter rendering', () => {
     for (let index = 0; index < positions.count; index++) {
       outerRadius = Math.max(outerRadius, Math.hypot(positions.getX(index), positions.getZ(index)));
     }
-    expect(outerRadius).toBeCloseTo(2.4, 5);
+    expect(outerRadius).toBeCloseTo(3.5, 5);
   });
 
   it('keeps the cinder crown visible above its player for the four-second spread mark', () => {
@@ -149,28 +143,18 @@ describe('Varkhul encounter rendering', () => {
     expect(varkhulEncounterBypassesCharacterCulling(boss)).toBe(true);
   });
 
-  it('puts an eye, molten core, and one of ten matching symbols over players', () => {
+  it('does not resurrect removed Assembly player marks', () => {
     const group = new THREE.Group();
     const marked = player([
-      { id: VARKHUL_ASSEMBLY_FIXATE_AURA_ID },
-      { id: VARKHUL_ASSEMBLY_CORE_AURA_ID },
-      { id: VARKHUL_ASSEMBLY_LINK_AURA_ID, stacks: 10, value: 0 },
+      { id: 'varkhul_assembly_fixate' },
+      { id: 'varkhul_molten_core' },
+      { id: 'varkhul_forge_link', stacks: 10, value: 0 },
     ]);
     syncVarkhulEncounterVisuals(group, marked, 0.1);
-    expect(group.getObjectByName(VARKHUL_FIXATE_VISUAL_NAME)?.visible).toBe(true);
-    expect(group.getObjectByName(VARKHUL_CORE_CARRY_VISUAL_NAME)?.visible).toBe(true);
-    const links = group.getObjectByName(VARKHUL_LINK_VISUAL_NAME) as THREE.Group;
-    expect(links.visible).toBe(true);
-    expect(links.getObjectByName('varkhulAssemblyRuneSymbol9')?.visible).toBe(true);
-    expect(links.getObjectByName('varkhulAssemblyRuneSymbol3')?.visible).toBe(false);
-    syncVarkhulEncounterVisuals(
-      group,
-      player([{ id: VARKHUL_ASSEMBLY_LINK_AURA_ID, stacks: 4, value: 0 }]),
-      0.1,
-    );
-    expect(links.getObjectByName('varkhulAssemblyRuneSymbol9')?.visible).toBe(false);
-    expect(links.getObjectByName('varkhulAssemblyRuneSymbol3')?.visible).toBe(true);
-    expect(varkhulEncounterBypassesCharacterCulling(marked)).toBe(true);
+    expect(group.getObjectByName('varkhulAssemblyFixateEye')).toBeUndefined();
+    expect(group.getObjectByName('varkhulMoltenCoreCarry')).toBeUndefined();
+    expect(group.getObjectByName('varkhulAssemblyLinkSymbol')).toBeUndefined();
+    expect(varkhulEncounterBypassesCharacterCulling(marked)).toBe(false);
   });
 
   it('disposes all lazily attached Varkhul visuals before a rig is pooled', () => {

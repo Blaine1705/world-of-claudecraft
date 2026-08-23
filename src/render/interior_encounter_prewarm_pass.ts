@@ -21,15 +21,21 @@ import {
 } from './interior_encounter_prewarm';
 import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_host';
 import { collectObjectTextures } from './material_texture_slots';
+import {
+  buildVarkhulForgePortalPrewarmVisual,
+  type VarkhulForgePortalPrewarmVisual,
+} from './necromancy_army_portal_fx';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
-import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
 import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
+import { buildVarkhulForgeBeamPrewarmVisual } from './varkhul_forge_beam_visual';
+import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam_visual';
 import { WEAPON_VFX } from './weapon_vfx';
 
 const startedByHost = new WeakMap<object, Set<string>>();
 const keepAliveByHost = new WeakMap<object, CharacterVisual[]>();
 const varkhulKeepAliveByHost = new WeakMap<object, THREE.Group[]>();
+const varkhulPortalKeepAliveByHost = new WeakMap<object, VarkhulForgePortalPrewarmVisual[]>();
 const liveWarmedByVisual = new WeakMap<CharacterVisual, Set<string>>();
 // One live body warms at a time, per host. Each pass waits for its own idle
 // slot, but a raid arrives together: six independent waits resolve in the SAME
@@ -155,6 +161,7 @@ async function runInteriorEncounterPrewarm(
   placeHiddenPrewarmGroup(host, group);
   const keepAlive: CharacterVisual[] = [];
   const varkhulKeepAlive: THREE.Group[] = [];
+  const varkhulPortalKeepAlive: VarkhulForgePortalPrewarmVisual[] = [];
   let idx = 0;
   const place = (visual: CharacterVisual): void => {
     visual.root.visible = true;
@@ -202,11 +209,16 @@ async function runInteriorEncounterPrewarm(
       ? [
           () => {
             const encounter = buildVarkhulEncounterPrewarmVisual();
-            const assembly = buildVarkhulAssemblyPrewarmVisual();
+            const forgeBeams = buildVarkhulForgeBeamPrewarmVisual();
+            const interceptBeam = buildVarkhulInterceptBeamPrewarmVisual();
+            const forgePortals = buildVarkhulForgePortalPrewarmVisual();
             encounter.position.set(-12, 0, 0);
-            assembly.position.set(12, 0, 0);
-            group.add(encounter, assembly);
-            varkhulKeepAlive.push(encounter, assembly);
+            forgeBeams.position.set(12, 0, 0);
+            interceptBeam.position.set(0, 0, 12);
+            forgePortals.root.position.set(0, 0, 12);
+            group.add(encounter, forgeBeams, interceptBeam, forgePortals.root);
+            varkhulKeepAlive.push(encounter, forgeBeams, interceptBeam, forgePortals.root);
+            varkhulPortalKeepAlive.push(forgePortals);
           },
         ]
       : []),
@@ -236,6 +248,9 @@ async function runInteriorEncounterPrewarm(
       visual.removeFromParent();
       visual.visible = false;
     }
+    const heldPortals = varkhulPortalKeepAliveByHost.get(host) ?? [];
+    heldPortals.push(...varkhulPortalKeepAlive);
+    varkhulPortalKeepAliveByHost.set(host, heldPortals);
   }
 }
 

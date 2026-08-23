@@ -2288,12 +2288,25 @@ export const es: EnTranslations = {
       "leather": "Cuero",
       "mail": "Malla"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "¡El pilar izquierdo de la forja está cargándose! Se encenderá en 3 s.",
+      "rightPillarCharging": "¡El pilar derecho de la forja está cargándose! Se encenderá en 3 s.",
+      "bothPillarsCharging": "¡Los pilares de la forja están cargándose! Se encenderán en 3 s.",
+      "leftPillar": "¡El pilar izquierdo de la forja se enciende!",
+      "rightPillar": "¡El pilar derecho de la forja se enciende!",
+      "bothPillars": "¡Los pilares de la forja se encienden!",
+      "portalsOpening": "¡Los portales de la forja se están abriendo!",
+      "heat75": "¡La forja ha alcanzado un 75% de calor!",
+      "heat90": "¡La Fusión de la forja es inminente!",
+      "addsDefeated": "¡La legión de la forja ha caído: Varkhul está expuesto!"
+    },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
       "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Find your matching rune around the room. Stand in its inner circle to rotate left or its outer ring to rotate right. Step out to stop; the symbol locks automatically when it reaches the socket.",
+      "varkhulForgeLink": "Intercepta el rayo de un pilar activo antes de que alcance la forja. Un rayo libre añade un 6% de calor por segundo. En Normal, los rayos bloqueados y los pilares apagados enfrían la forja; en Heroico, el calor nunca baja. Al 100%, la forja sufre una Fusión letal.",
+      "varkhulCrucibleExposure": "Bloquear un Rayo del Crisol inflige cada segundo más daño según tu salud máxima. Las acumulaciones se reinician 10 s después de salir del rayo en Normal y 60 s después en Heroico.",
       "dot": "Inflige {value} de daño de {school} cada {interval} s",
       "hot": "Restaura {value} de salud cada {interval} s",
       "mendingCurrent": "Almacena {value} de sanación, liberada con el tiempo o consumida por Remiendo en Cascada",

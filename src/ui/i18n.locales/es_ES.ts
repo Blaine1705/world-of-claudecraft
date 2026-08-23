@@ -516,6 +516,24 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrHeader': 'Eso no parece un código de diseño.',
   'auth.designCodeErrVersion':
     'Ese código de diseño procede de una versión más reciente del juego.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Intercepta el rayo de un pilar activo antes de que alcance la forja. Un rayo libre añade un 6% de calor por segundo. En Normal, los rayos bloqueados y los pilares apagados enfrían la forja; en Heroico, el calor nunca baja. Al 100%, la forja sufre una Fusión letal.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Bloquear un Rayo del Crisol inflige cada segundo más daño según tu salud máxima. Las acumulaciones se reinician 10 s después de salir del rayo en Normal y 60 s después en Heroico.',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    '¡El pilar izquierdo de la forja está cargándose! Se encenderá en 3 s.',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    '¡El pilar derecho de la forja está cargándose! Se encenderá en 3 s.',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    '¡Los pilares de la forja están cargándose! Se encenderán en 3 s.',
+  'hudChrome.varkhulCallout.leftPillar': '¡El pilar izquierdo de la forja se enciende!',
+  'hudChrome.varkhulCallout.rightPillar': '¡El pilar derecho de la forja se enciende!',
+  'hudChrome.varkhulCallout.bothPillars': '¡Los pilares de la forja se encienden!',
+  'hudChrome.varkhulCallout.portalsOpening': '¡Los portales de la forja se están abriendo!',
+  'hudChrome.varkhulCallout.heat75': '¡La forja ha alcanzado un 75% de calor!',
+  'hudChrome.varkhulCallout.heat90': '¡La Fusión de la forja es inminente!',
+  'hudChrome.varkhulCallout.addsDefeated':
+    '¡La legión de la forja ha caído: Varkhul está expuesto!',
   'auth.designCodeErrMalformed':
     'Ese código de diseño está dañado. Copia el código completo e inténtalo de nuevo.',
 };

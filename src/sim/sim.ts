@@ -567,13 +567,22 @@ import {
   type ActiveVarkhulAnvilMeteorWarning,
   activeVarkhulAnvilMeteorWarnings,
 } from './varkhul_anvil_meteors';
-import { type ActiveVarkhulAssembly, activeVarkhulAssembly } from './varkhul_assembly';
+import {
+  type ActiveVarkhulAssembly,
+  activeVarkhulAssembly,
+  inactiveVarkhulAssembly,
+  VARKHUL_ASSEMBLY_FORGE_LOCAL_POS,
+} from './varkhul_assembly';
 import {
   type ActiveVarkhulCinderFire,
   type ActiveVarkhulCinderOrbProjectile,
   activeVarkhulCinderFires,
   activeVarkhulCinderOrbProjectiles,
 } from './varkhul_cinder_orbs';
+import {
+  activeVarkhulForgePortalTelegraphs,
+  type VarkhulForgePortalTelegraph,
+} from './varkhul_forge_intermission';
 import {
   type ActiveVarkhulForgestormWarning,
   activeVarkhulForgestormWarnings,
@@ -2260,16 +2269,39 @@ export class Sim {
   get activeVarkhulAssemblies(): ActiveVarkhulAssembly[] {
     const assemblies: ActiveVarkhulAssembly[] = [];
     for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
-      const active = activeVarkhulAssembly(
-        entity.id,
-        entity.varkhul,
-        entity.pos,
-        (id) => this.entities.get(id)?.pos,
-      );
+      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead) continue;
+      const instance = this.instances.find((candidate) => candidate.mobIds.includes(entity.id));
+      const origin = instance ? this.instanceOriginOf(instance) : null;
+      const forge = origin
+        ? this.groundPos(
+            origin.x + VARKHUL_ASSEMBLY_FORGE_LOCAL_POS.x,
+            origin.z + VARKHUL_ASSEMBLY_FORGE_LOCAL_POS.z,
+          )
+        : entity.pos;
+      const active = entity.varkhul
+        ? activeVarkhulAssembly(entity.id, entity.varkhul, forge, entity.pos, (id) =>
+            this.entities.get(id),
+          )
+        : inactiveVarkhulAssembly(entity.id, instance?.difficulty ?? 'normal', forge);
       if (active) assemblies.push(active);
     }
     return assemblies;
+  }
+  get activeVarkhulForgePortalTelegraphs(): VarkhulForgePortalTelegraph[] {
+    const telegraphs: VarkhulForgePortalTelegraph[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
+      const instance = this.instances.find((candidate) => candidate.mobIds.includes(entity.id));
+      if (!instance) continue;
+      telegraphs.push(
+        ...activeVarkhulForgePortalTelegraphs(
+          entity.id,
+          entity.varkhul,
+          this.instanceOriginOf(instance),
+        ),
+      );
+    }
+    return telegraphs;
   }
   get activeVarkhulCinderFires(): ActiveVarkhulCinderFire[] {
     const fires: ActiveVarkhulCinderFire[] = [];

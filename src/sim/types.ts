@@ -6,7 +6,12 @@ import type { GatheringProfessionId, ToolEffectId } from './content/professions'
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
-import type { VarkhulAssemblyPhase, VarkhulAssemblyRuneControl } from './varkhul_assembly';
+import type {
+  VarkhulAssemblyDifficulty,
+  VarkhulAssemblyPhase,
+  VarkhulAssemblyRuneControl,
+} from './varkhul_assembly';
+import type { VarkhulForgeBeamWindow } from './varkhul_forge_intermission';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -3431,6 +3436,7 @@ export interface DungeonSpawn {
   mobId: string;
   x: number; // relative to instance origin
   z: number;
+  facing?: number;
 }
 
 export interface DungeonNpcSpawn {
@@ -4629,6 +4635,7 @@ export interface Entity extends ClientMirroredEntityFields {
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
   varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
+  varkhulAssemblyAttempt?: number; // survives encounter resets so Heroic rune slots reshuffle per pull
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
@@ -5069,10 +5076,22 @@ export interface VarkhulEncounterState {
     remaining: number;
     points: Vec3[];
   }>;
-  majorAbility: 'none' | 'frontal' | 'cinderOrbs' | 'forgestorm' | 'anvil';
+  interceptBeamTimer: number;
+  interceptBeamCastKey: number;
+  interceptBeamCastRemaining: number;
+  interceptBeamTargetId: number | null;
+  interceptBeamBlockerId: number | null;
+  majorAbility: 'none' | 'frontal' | 'cinderOrbs' | 'forgestorm' | 'anvil' | 'interceptBeam';
   assemblyTriggered: boolean;
+  assemblyRuneDifficulty: VarkhulAssemblyDifficulty;
   assemblyPhase: VarkhulAssemblyPhase;
   assemblyAddIds: number[];
+  assemblyLinkAddIds: number[];
+  assemblyLinkWardenIdsByWave: Array<number | null>;
+  assemblyLinkWardenSpawns: Array<{
+    wave: number;
+    remaining: number;
+  }>;
   assemblyRemaining: number;
   assemblyWipeResolved: boolean;
   assemblyDroppedAddIds: number[];
@@ -5086,6 +5105,22 @@ export interface VarkhulEncounterState {
     burdenTickTimer: number;
   }>;
   assemblyForgeHp: number;
+  assemblyForgeOverheat: number;
+  forgeBeamWindow: VarkhulForgeBeamWindow;
+  forgeBeamWindowRemaining: number;
+  forgeBeamTeachingTriggered: boolean;
+  forgeBeamFinalTriggered: boolean;
+  forgeHeatWarningMask: number;
+  assemblyForgeBeamActiveMask: number;
+  assemblyForgeBeamWarmupRemaining: number;
+  assemblyForgeBeamBlockerIds: Array<number | null>;
+  assemblyForgeBeamDamageTimers: number[];
+  assemblyForgeMeltdownRemaining: number;
+  assemblyForgeMeltdownTickTimer: number;
+  assemblyPortalSpawns: Array<{ wave: number; spawnIndex: number; remaining: number }>;
+  assemblyNextWaveIndex: number;
+  assemblyNextWaveRemaining: number;
+  assemblyIntermissionWaves: number;
   assemblyDeliveryWindowRemaining: number;
   assemblyDeliveredCoreIds: string[];
   assemblyArtificerRepaired: boolean;
@@ -5098,6 +5133,12 @@ export interface VarkhulEncounterState {
   }>;
   assemblyRuneAngles: number[];
   assemblyRuneControls: VarkhulAssemblyRuneControl[];
+  assemblyRuneControlHoldSeconds: number[];
+  assemblyRuneAlignmentHoldSeconds: number[];
+  assemblyRuneRescuerIds: Array<number | null>;
+  assemblyRuneUnavailablePlayerIds: number[];
+  assemblyRuneSlots: number[];
+  assemblyRuneLayoutKey: number;
   assemblyLinkFireballTimer: number;
   assemblyLinkFireballWave: number;
   assemblyRuneRound: number;
@@ -5455,6 +5496,21 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  | {
+      type: 'varkhulCallout';
+      sourceId: number;
+      call:
+        | 'leftPillarCharging'
+        | 'rightPillarCharging'
+        | 'bothPillarsCharging'
+        | 'leftPillar'
+        | 'rightPillar'
+        | 'bothPillars'
+        | 'portalsOpening'
+        | 'heat75'
+        | 'heat90'
+        | 'addsDefeated';
+    }
   | {
       type: 'aura';
       targetId: number;

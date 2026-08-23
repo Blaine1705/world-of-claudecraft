@@ -5135,7 +5135,7 @@
     display: none;
     z-index: 100;
     pointer-events: none;
-    max-width: 280px;
+    max-width: min(720px, calc(100vw - 16px));
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;

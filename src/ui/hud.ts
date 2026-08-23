@@ -755,6 +755,7 @@ import { buildVcupHudView } from './vale_cup_hud_view';
 import { ValeCupIndicator } from './vale_cup_indicator';
 import { buildVcupIndicatorView } from './vale_cup_indicator_view';
 import { ValeCupWindow, vcupNationName } from './vale_cup_window';
+import { varkhulCalloutKey } from './varkhul_callout';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
@@ -12821,6 +12822,12 @@ export class Hud {
           }
           this.questDialog.refresh();
           break;
+        case 'varkhulCallout': {
+          const text = t(varkhulCalloutKey(ev.call));
+          this.questBanner.show(text);
+          this.combatAnnouncer.push(text, performance.now());
+          break;
+        }
         case 'chat': {
           // OFFLINE ONLY. Online, the server drops an ignored player's public chat
           // before it reaches us (and honours the whisper/roll carve-outs), so

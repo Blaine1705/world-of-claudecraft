@@ -345,9 +345,13 @@ export function enterDungeon(
     ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
     return false;
   }
-  const difficulty =
-    ignivarSourceClaim?.difficulty ??
-    claimDifficultyForDungeon(dungeonId, ctx.dungeonDifficulty(r.meta.entityId));
+  const selectedDifficulty =
+    bypass && isIgnivarRaidRoom(dungeonId)
+      ? ctx.dungeonDifficulty(r.meta.entityId)
+      : claimDifficultyForDungeon(dungeonId, ctx.dungeonDifficulty(r.meta.entityId));
+  const difficulty = bypass
+    ? selectedDifficulty
+    : (ignivarSourceClaim?.difficulty ?? selectedDifficulty);
   // An existing claim for this group ALWAYS wins, whatever the current selection:
   // the claimed difficulty is fixed for the instance's life, so a mid-run
   // selection flip (or a ghost corpse-running back after one) rejoins the
@@ -801,7 +805,7 @@ function claimInstance(
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
     applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
-    mob.facing = Math.PI; // face the entrance
+    mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);

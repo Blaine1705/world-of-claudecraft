@@ -8,6 +8,9 @@ import {
   VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
   VARKHUL_ASSEMBLY_LINK_AURA_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
+  VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_DURATION,
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
@@ -66,7 +69,7 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ id: VARKHUL_CINDER_ORBS_AURA_ID, kind: 'vulnerability', value: 0 })).toBeNull();
   });
 
-  it('teaches each live Assembly assignment from its authoritative constants', () => {
+  it('teaches the legacy Assembly auras and the live escalating beam exposure', () => {
     expect(desc({ id: VARKHUL_ASSEMBLY_FIXATE_AURA_ID, kind: 'vulnerability', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.varkhulSentinelsGaze',
       nums: {},
@@ -78,6 +81,25 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ id: VARKHUL_ASSEMBLY_LINK_AURA_ID, kind: 'vulnerability', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.varkhulForgeLink',
       nums: {},
+    });
+    expect(
+      desc({ id: VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID, kind: 'vulnerability', value: 0 }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.varkhulCrucibleExposure',
+      nums: {},
+    });
+  });
+
+  it('explains that Tempered Wound increases damage taken from Varkhul', () => {
+    expect(
+      desc({
+        id: VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+        kind: 'vuln_source',
+        value: VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.sourceVuln',
+      nums: { pct: 50 },
     });
   });
 

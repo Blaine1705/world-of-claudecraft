@@ -123,7 +123,26 @@ export type {
 // 9 = Varkhul's Forge Links became ten individual room runes with concentric
 // movement controls. Mixed binaries disagree about actionable raid instructions,
 // so they must fail closed before entering the world.
-export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
+// 10 = Heroic Forge Links added orphaned-rune rescue state and neighbor signals.
+// Older clients cannot render who is authorized to rescue an orphan.
+// 11 = Forge Links became one five-track rune loom with moving controls, two
+// waves on both difficulties, and explicit Normal/Heroic wire identity. Older
+// clients would render ten overlapping stations and give unsafe instructions.
+// 12 = Forge Links returned to ten separate room stations while retaining the
+// moving controls and two-wave flow. Epoch 11 clients would stack every rune at
+// one shared center and present the wrong interaction geometry.
+// 13 = Forge Links added two authoritative crucible beams, blocker endpoints,
+// forge overheat, and Forge Meltdown. Epoch 12 clients cannot show or react to
+// those lethal signals, so mixed binaries must fail closed.
+// 14 = Forge Links removed the rune interface and became persistent crucible
+// pillars plus timed beam windows, forge heat and portal add waves. Epoch 13
+// clients would still render obsolete runes and hide inactive pillar hardware.
+// 15 = Varkhul added an authoritative moving Tempering Ray with a first-body
+// interceptor. Epoch 14 clients cannot render its lethal line or safe blocker.
+// 16 = Varkhul enlarged Cinder Orb fire from 2.4 to 3.5 yards. The persistent
+// fire radius is authoritative, but the four-second player warning is compiled
+// into the client, so epoch 15 clients would preview a dangerously smaller area.
+export const ONLINE_WORLD_LAYOUT_VERSION = 16 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

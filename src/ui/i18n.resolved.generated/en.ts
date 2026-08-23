@@ -2288,12 +2288,25 @@ export const en: EnTranslations = {
       "leather": "Leather",
       "mail": "Mail"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "The left forge pillar is charging. It will ignite in 3 sec!",
+      "rightPillarCharging": "The right forge pillar is charging. It will ignite in 3 sec!",
+      "bothPillarsCharging": "The forge pillars are charging. They will ignite in 3 sec!",
+      "leftPillar": "The left forge pillar ignites!",
+      "rightPillar": "The right forge pillar ignites!",
+      "bothPillars": "The forge pillars ignite!",
+      "portalsOpening": "The forge portals are opening!",
+      "heat75": "The forge is at 75% heat!",
+      "heat90": "Forge Meltdown is imminent!",
+      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!"
+    },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
       "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Find your matching rune around the room. Stand in its inner circle to rotate left or its outer ring to rotate right. Step out to stop; the symbol locks automatically when it reaches the socket.",
+      "varkhulForgeLink": "Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.",
+      "varkhulCrucibleExposure": "Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.",
       "dot": "Deals {value} {school} damage every {interval} sec",
       "hot": "Restores {value} health every {interval} sec",
       "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",

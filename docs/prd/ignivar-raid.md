@@ -260,6 +260,27 @@ health on Normal and 90% on Heroic. The facing does not follow the target after
 the cast begins. Its full actionable footprint remains visible on every graphics
 tier.
 
+### Tempering Ray
+
+Varkhul first casts Tempering Ray after seventeen seconds and repeats it every
+thirty-two seconds while no other major sequence or forge-beam window is active.
+He fixates a non-tank for 3.5 seconds. The complete 2.7-yard corridor follows the
+marked player's current position for the whole cast instead of locking its facing
+at the start.
+
+The first other living player between Varkhul and the marked target intercepts the
+ray. A successful interceptor takes 70% maximum health on Normal or 85% on Heroic;
+without an interceptor, the marked player takes 90% or 120% respectively. Damage
+immunity can absorb the hit. The player chosen by the final line check, including
+an immune interceptor, receives Tempered Wound for thirty seconds and takes 50%
+more damage from Varkhul. This forces tank or immunity rotations instead of letting
+one player cover every cast.
+
+The warning is authoritative snapshot state. Its orange corridor and target reticle
+move with the marked player; a valid first-body intercept adds a cyan segment and
+shield reticle without removing the original target line. Low graphics and reduced
+motion retain the full corridor, both endpoints, interception state, width, and timer.
+
 ### Cinder Orbs
 
 Varkhul marks three non-tanks for four seconds. The marked players must spread
@@ -269,7 +290,7 @@ equal to 30% maximum health. Both effects are encounter-owned and cannot be
 dispelled. Healers remove the absorb by healing through it.
 
 After the four-second mark, each living target permanently scars their current
-position with a 2.4-yard fire field that deals 4% maximum health every second. At
+position with a 3.5-yard fire field that deals 4% maximum health every second. At
 the same instant, six oversized Cinder Orbs burst radially from each target and
 travel across the room at nine yards per second for 5.5 seconds. Every orb deals
 20% maximum health on contact and can hit each player only once. The marked player
@@ -301,56 +322,70 @@ apply camera shake.
 
 ### The Master's Assembly
 
-At 50% health Varkhul becomes immune, moves to the grand forge, and begins a
-45-second assembly sequence. He creates one automaton of each role:
+Two crucible pillars stand permanently on opposite sides of the room. They are dark
+outside their assigned windows, so the raid can learn their positions before they
+activate. An active pillar charges for three seconds and then projects a continuous
+fire beam into the forge. A living player blocks a lane by standing within 1.35 yards
+of its centerline, but only between 12% and 80% of the lane; the shared mouth beside
+the forge cannot let one player cover both beams. The first body struck owns that lane,
+and one player can never block both pillars.
 
-- The Cinder Artificer is a repair automaton. It enters from the south-west
-  corner, walks toward Varkhul, and heals him for 15% maximum health if it
-  arrives. Players can slow, root, and stun it.
-- The Ember Sentinel fixates a non-tank. A large eye over that player's head
-  identifies the chase target. It melees while pursuing and every third landed
-  swing releases Tempered Sweep, applying Tempered Cinders to players it hits.
-- The Crucible Warden pursues and melees its target while casting. Its
-  interruptible Crucible Quake opens after 1.5 seconds and starts again every
-  12 seconds, measured from cast start.
+Each beam window first announces which pillar is charging. The beam remains harmless
+through the full three-second warning, then a second callout announces the actual
+ignition as the lane becomes blockable.
 
-Each dead automaton drops one Molten Core. A nearby player automatically picks it
-up and must carry it within three yards of the forge. The carrier suffers Molten
-Burden every two seconds, ramping through 2%, 4%, 6%, 8%, and 10% maximum health
-per tick. A delivered core removes 20 of the forge's 100 health, but ordinary
-deliveries cannot reduce it below 40. All three cores must reach the forge inside
-the same six-second delivery window. Succeeding causes Unstable Reaction for the
-remaining 40 health; failing the window ejects the cores so the raid can try
-again. The forge has a persistent world-space health display throughout this
-phase.
+Blocking is an escalating healer check rather than a static soak. Damage ticks once
+per second: 6% maximum health on the first Normal tick and 8% on Heroic, increasing by
+2 or 3 percentage points respectively for every consecutive tick. Leaving the beam
+does not immediately remove the exposure. Its stack limit resets after ten seconds on
+Normal and after sixty seconds on Heroic, so repeated Heroic assignments require real
+rotation planning.
 
-Breaking the forge pulls every living raider to the center of the room and begins
-a four-second Forge Convergence channel. No symbols are assigned during this
-transition. When the channel completes, Forge Links starts as a ten-player spatial
-interface inspired by rotating-rune encounters. Ten distinct runes appear on a
-fixed 30-yard ring around the room center, not around the forge. Every living
-raider receives one unique symbol above their head and owns the matching rune.
-Each rune has a moving copy of that symbol on its circular track and a bright
-socket at a deterministic random angle outside the track. Standing in the inner
-control circle rotates the symbol counter-clockwise. Standing in the outer
-control ring rotates it clockwise. The neutral band and the space outside the
-rune stop it. Crossing the socket snaps the symbol into place and locks that rune
-automatically, with no brake control or hold timer. Other players cannot drive an
-assigned rune, and a dead assignee is not replaced. Normal gives one 25-second
-round; Heroic gives one 22-second round and sends five crossing fireballs through
-the room instead of three. Ten locks shatter Varkhul's shield, stun him for 15
-seconds, and increase damage taken by 50%. Six to nine locks still end the
-interface with an eight-second stun and 25% increased damage taken. Zero to five
-locks end it without a stun and deal
-20% maximum-health raid damage on Normal or 25% on Heroic. The interface therefore
-always resolves when its timer expires and never waits indefinitely.
+The pillars first teach this interaction at 80% boss health: the left lane burns for
+eight seconds, both lanes rest for two seconds, then the right lane burns for eight
+seconds. Major boss sequences pause during this lesson. At 50%, Varkhul becomes immune,
+moves to his fixed forging position immediately in front of the anvil, faces the forge
+with his back to the raid, and activates both pillars for the full intermission. At 20%,
+the final burn loops left for eight seconds, rests four, burns right for eight, and
+rests four until Varkhul dies. No rune interface, symbol assignment, forced raid
+teleport, Molten Core delivery, or Cinder Artificer exists in this version.
+
+Four large forge-fire portals stand near the room corners. Each add wave receives a
+two-second portal warning before its enemies emerge, and waves begin eight seconds
+apart. Normal schedules three waves of one Crucible Warden and three Ember Sentinels
+for twelve adds total. Heroic schedules four waves of one Warden and four Sentinels for
+twenty adds total. The intermission lasts at most sixty seconds on Normal or seventy on
+Heroic and ends early only after every scheduled add has spawned and died. The Warden
+pursues and melees while casting interruptible Crucible Quake every twelve seconds;
+Sentinels use ordinary melee pursuit. Both add types enter already targeting the living
+tank with the highest threat on Varkhul, then obey normal threat and taunts. When the
+last add falls, Varkhul is stunned for fifteen seconds and takes 50% increased damage.
+
+An overhead ten-segment ring and exact percentage label display persistent forge heat
+from 0% to 100%. Each active unblocked beam adds 6% per second. On Normal, each active
+blocked beam cools 2% per second and a fully inactive forge cools 3% per second. Heroic
+heat never cools: successful blocking only prevents new heat. At 75% and 90%, the raid
+receives explicit danger callouts. At 100%, Forge Meltdown deals 65% maximum-health raid
+damage on Normal or 75% on Heroic, then pulses every second for five seconds for 15% or
+20% respectively. The meter remains fully red throughout the pulses.
+During an intermission Meltdown, portal countdowns and future wave scheduling pause for
+the five-second pulse sequence. Varkhul stays immune and enemies already in the room keep
+attacking. When the forge vents back to 0%, both pillars give a fresh three-second charging
+warning, pending portals resume from their preserved countdowns, and every future wave is
+still required. Only killing all scheduled adds ends the intermission correctly and grants
+the fifteen-second vulnerability window.
+
+Quest-style top-center callouts announce the left pillar, right pillar, both pillars,
+opening portals, both heat warnings, and the death of the last intermission add. These
+messages reinforce the world VFX without replacing them and are delivered individually
+to every player in the encounter.
 
 ### Masterpiece Unbound
 
-At 20% health non-tank mechanics run 25% faster while the living forge pulses for
-5% maximum health every three seconds. Varkhul must die within 45 seconds. Maker's
-Brand keeps its 14-second cadence so the tank-swap rhythm does not change during
-the final burn.
+At 20% health non-tank mechanics run 25% faster while the forge begins the repeating
+left/rest/right/rest pillar cycle described above. Varkhul must die within 45 seconds.
+Maker's Brand keeps its 14-second cadence so the tank-swap rhythm does not change
+during the final burn.
 
 ## Music
 

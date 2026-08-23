@@ -111,6 +111,7 @@ import {
   type VcNationId,
 } from '../src/sim/types';
 import { isAtSowfield } from '../src/sim/vale_cup_layout';
+import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../src/sim/varkhul_forge_intermission';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
@@ -1055,6 +1056,9 @@ export interface ClientSession {
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
+  // A resumed socket missed one-shot forge portal events while linkdead. Replay
+  // the current authoritative warnings once, after its first full snapshot.
+  needsVarkhulPortalReplay: boolean;
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
@@ -3920,6 +3924,7 @@ export class GameServer {
       lastInputSeq: 0,
       lastInputAt: this.sim.time,
       lastSent: {},
+      needsVarkhulPortalReplay: false,
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
       petSpecialWireVersion:
@@ -4170,6 +4175,7 @@ export class GameServer {
     // trackers instead, or the gates serve a stale view until their
     // staleness backstops.
     session.lastSent = {};
+    session.needsVarkhulPortalReplay = true;
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     session.petSpecialWireVersion =
@@ -8507,6 +8513,17 @@ export class GameServer {
       activeVarkhulAnvilMeteors: this.sim.activeVarkhulAnvilMeteors,
       activeVarkhulAssemblies: this.sim.activeVarkhulAssemblies,
     };
+    let varkhulPortalReplayNeeded = false;
+    for (const session of this.clients.values()) {
+      if (session.needsVarkhulPortalReplay) {
+        varkhulPortalReplayNeeded = true;
+        break;
+      }
+    }
+    const varkhulPortalReplayEvents = varkhulPortalReplayNeeded
+      ? this.sim.activeVarkhulForgePortalTelegraphs
+      : [];
+    const varkhulPortalReplayFragments = serializeEventFragments(varkhulPortalReplayEvents);
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8755,6 +8772,20 @@ export class GameServer {
           session,
           `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${ignivarMeteorsJson}${varkhulEncounterJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
+        if (session.needsVarkhulPortalReplay) {
+          session.needsVarkhulPortalReplay = false;
+          const portalReplay: string[] = [];
+          for (let index = 0; index < varkhulPortalReplayEvents.length; index++) {
+            const event = varkhulPortalReplayEvents[index];
+            const anchor = this.eventAnchor(event);
+            if (anchor && dist2d(anchorEntity.pos, anchor) > EVENT_RADIUS) continue;
+            const fragment = varkhulPortalReplayFragments[index];
+            if (fragment !== undefined) portalReplay.push(fragment);
+          }
+          if (portalReplay.length > 0) {
+            this.sendRaw(session, assembleEventsFrame(portalReplay));
+          }
+        }
       },
       (err, resolved) =>
         console.error(
@@ -10259,6 +10290,9 @@ export class GameServer {
           const anchor = this.eventAnchor(ev);
           if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
             mine.push(fragments[i]);
+            if (ev.type === 'spellfxAt' && ev.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID) {
+              session.needsVarkhulPortalReplay = false;
+            }
           }
         }
         // sendRaw (not send) so the pre-serialized fragments are not re-stringified;

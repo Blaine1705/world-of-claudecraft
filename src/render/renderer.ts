@@ -7857,13 +7857,20 @@ export class Renderer {
         if (ev.ability === 'abyssal_rift' && ev.fx === 'nova') {
           this.abyssalRiftFx.spawn({ x: ev.x, z: ev.z, radius: ev.radius ?? 8, duration: 2.2 });
         }
-        if (ev.ability === 'army_of_the_dead' && ev.fx === 'burst') {
+        if (
+          (ev.ability === 'army_of_the_dead' || ev.ability === 'Forge Legion Portal') &&
+          ev.fx === 'burst'
+        ) {
+          const source = ev.sourceId === undefined ? undefined : this.sim.entities.get(ev.sourceId);
           this.necromancyArmyPortalFx.spawn({
             x: ev.x,
             z: ev.z,
             facing:
-              ev.sourceId === undefined ? 0 : (this.sim.entities.get(ev.sourceId)?.facing ?? 0),
-            duration: 2.8,
+              ev.ability === 'Forge Legion Portal' && source
+                ? Math.atan2(source.pos.x - ev.x, source.pos.z - ev.z)
+                : (source?.facing ?? 0),
+            duration: ev.duration ?? 2.8,
+            palette: ev.ability === 'Forge Legion Portal' ? 'forge' : 'necromancy',
           });
         }
         // Spec-driven ground-cast visuals claim the point-anchored cues first

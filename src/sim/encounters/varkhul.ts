@@ -42,40 +42,14 @@ import {
   varkhulAnvilsDecreeDamageMaxHp,
 } from '../varkhul_anvils_decree';
 import {
-  VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS,
-  VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS,
-  VARKHUL_ASSEMBLY_CORE_BASE_DAMAGE,
-  VARKHUL_ASSEMBLY_CORE_PICKUP_RADIUS,
-  VARKHUL_ASSEMBLY_CORE_WINDOW_SECONDS,
-  VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS,
+  VARKHUL_ASSEMBLY_FORGE_LOCAL_POS,
   VARKHUL_ASSEMBLY_FORGE_MAX_HP,
-  VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_HEROIC,
-  VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_NORMAL,
-  VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_HEROIC,
-  VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_NORMAL,
-  VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
-  VARKHUL_ASSEMBLY_LINK_FIREBALL_RADIUS,
-  VARKHUL_ASSEMBLY_PARTIAL_DAMAGE_TAKEN_BONUS,
-  VARKHUL_ASSEMBLY_PARTIAL_STUN_SECONDS,
   VARKHUL_ASSEMBLY_RUNE_COUNT,
-  VARKHUL_ASSEMBLY_RUNE_RADIUS,
-  VARKHUL_ASSEMBLY_RUNE_STATION_DISTANCE,
+  VARKHUL_ASSEMBLY_RUNE_OWNER_RADIUS,
   VARKHUL_ASSEMBLY_STUN_DAMAGE_TAKEN_BONUS,
   VARKHUL_ASSEMBLY_STUN_SECONDS,
-  VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE,
-  varkhulAssemblyBurdenDamageMaxHp,
-  varkhulAssemblyFireballCadence,
-  varkhulAssemblyFireballPattern,
   varkhulAssemblyRounds,
-  varkhulAssemblyRuneAligned,
-  varkhulAssemblyRuneAssignments,
-  varkhulAssemblyRuneControlAt,
-  varkhulAssemblyRuneOutcome,
-  varkhulAssemblyRuneSeconds,
-  varkhulAssemblyRuneStartAngle,
-  varkhulAssemblyRuneStation,
-  varkhulAssemblyRuneTargetAngle,
-  varkhulAssemblyStepRune,
+  varkhulAssemblyRuneSlots,
 } from '../varkhul_assembly';
 import {
   VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
@@ -96,7 +70,40 @@ import {
   varkhulCinderFireId,
   varkhulCinderOrbProjectileId,
 } from '../varkhul_cinder_orbs';
-import { positionVarkhulLinkPracticeBots } from '../varkhul_dev_raid';
+import {
+  VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
+  VARKHUL_FORGE_BEAM_COUNT,
+  VARKHUL_FORGE_BEAM_WARMUP_SECONDS,
+  VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS,
+  VARKHUL_FORGE_MELTDOWN_TICK_SECONDS,
+  varkhulForgeBeamAssignments,
+  varkhulForgeBeamBlockDamageMaxHp,
+  varkhulForgeBeamExposureResetSeconds,
+  varkhulForgeBeamOverheatAfterTick,
+  varkhulForgeMeltdownInitialDamageMaxHp,
+  varkhulForgeMeltdownTickDamageMaxHp,
+} from '../varkhul_forge_beams';
+import {
+  activeVarkhulForgePortalTelegraphs,
+  VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS,
+  VARKHUL_FORGE_FINAL_BEAM_SECONDS,
+  VARKHUL_FORGE_FINAL_GAP_SECONDS,
+  VARKHUL_FORGE_FINAL_HP_THRESHOLD,
+  VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD,
+  VARKHUL_FORGE_PORTAL_ABILITY_ID,
+  VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
+  VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
+  VARKHUL_FORGE_TEACHING_BEAM_SECONDS,
+  VARKHUL_FORGE_TEACHING_GAP_SECONDS,
+  VARKHUL_FORGE_TEACHING_HP_THRESHOLD,
+  VARKHUL_WORK_FACING,
+  VARKHUL_WORK_LOCAL_POS,
+  varkhulForgeBeamIsActive,
+  varkhulForgeBeamWindowMask,
+  varkhulForgeIntermissionSeconds,
+  varkhulForgeIntermissionWave,
+  varkhulForgeIntermissionWaveCount,
+} from '../varkhul_forge_intermission';
 import {
   VARKHUL_FORGESTORM_RADIUS,
   VARKHUL_FORGESTORM_WARNING_SECONDS,
@@ -107,8 +114,21 @@ import {
   VARKHUL_FRONTAL_CAST_SECONDS,
   varkhulFrontalDamageMaxHp,
 } from '../varkhul_frontal';
+import {
+  VARKHUL_INTERCEPT_BEAM_CAST_ID,
+  VARKHUL_INTERCEPT_BEAM_CAST_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_EVERY_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS,
+  varkhulInterceptBeamBlocker,
+  varkhulInterceptBeamDamageMaxHp,
+} from '../varkhul_intercept_beam';
 
 export { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
+export { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
 export const VARKHUL_EMBER_SENTINEL_ID = IGNIVAR_EMBER_SENTINEL_ID;
 export const VARKHUL_CRUCIBLE_WARDEN_ID = IGNIVAR_CRUCIBLE_WARDEN_ID;
 export const VARKHUL_CINDER_ARTIFICER_ID = IGNIVAR_CINDER_ARTIFICER_ID;
@@ -168,7 +188,7 @@ export {
   VARKHUL_FORGESTORM_RADIUS,
   VARKHUL_FORGESTORM_WARNING_SECONDS,
 } from '../varkhul_forgestorm';
-export const VARKHUL_FORGE_LOCAL_POS = { x: 0, z: 22 } as const;
+export const VARKHUL_FORGE_LOCAL_POS = VARKHUL_ASSEMBLY_FORGE_LOCAL_POS;
 
 export const VARKHUL_MASTERS_ASSEMBLY_CAST_ID = "The Master's Assembly";
 export const VARKHUL_MASTERS_ASSEMBLY_AURA_ID = 'varkhul_masters_assembly';
@@ -182,7 +202,11 @@ export const VARKHUL_ASSEMBLY_STUN_AURA_ID = 'varkhul_forge_shattered';
 export const VARKHUL_ASSEMBLY_REPAIR_CAST_ID = 'Repair Protocol';
 export const VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID = 'Forge Convergence';
 export const VARKHUL_ASSEMBLY_LINK_CAST_ID = 'Forge Links';
+export const VARKHUL_FORGE_BEAM_ABILITY_ID = 'Crucible Beam';
+export const VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID = 'varkhul_crucible_exposure';
+export const VARKHUL_FORGE_MELTDOWN_ABILITY_ID = 'Forge Meltdown';
 export const VARKHUL_ASSEMBLY_REPAIR_HEAL_MAX_HP = 0.15;
+export const VARKHUL_HEROIC_LINK_WARDEN_DELAY_SECONDS = 2;
 
 export const VARKHUL_MASTERPIECE_UNBOUND_AURA_ID = 'varkhul_masterpiece_unbound';
 export const VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD = 0.2;
@@ -202,11 +226,17 @@ const VARKHUL_FORGESTORM_EVERY = 38;
 const VARKHUL_ANVIL_EVERY = 42;
 const VARKHUL_WIPE_DAMAGE_MULTIPLIER = 100;
 const VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS = 1.5;
-const VARKHUL_ASSEMBLY_ADD_OFFSETS = [
-  { id: VARKHUL_EMBER_SENTINEL_ID, x: -10, z: 11 },
-  { id: VARKHUL_CRUCIBLE_WARDEN_ID, x: 10, z: 11 },
-  { id: VARKHUL_CINDER_ARTIFICER_ID, x: -28, z: -28 },
-] as const;
+
+export {
+  VARKHUL_INTERCEPT_BEAM_CAST_ID,
+  VARKHUL_INTERCEPT_BEAM_CAST_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME,
+  VARKHUL_INTERCEPT_BEAM_DEBUFF_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_EVERY_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS,
+} from '../varkhul_intercept_beam';
 
 function encounterInstance(ctx: SimContext, boss: Entity) {
   return ctx.instances.find((instance) => instance.mobIds.includes(boss.id)) ?? null;
@@ -290,15 +320,43 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       anvilStrikeRemaining: 0,
       anvilMeteorCastKey: 0,
       anvilMeteorBatches: [],
+      interceptBeamTimer: VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS,
+      interceptBeamCastKey: 0,
+      interceptBeamCastRemaining: 0,
+      interceptBeamTargetId: null,
+      interceptBeamBlockerId: null,
       majorAbility: 'none',
       assemblyTriggered: false,
+      assemblyRuneDifficulty: 'normal',
       assemblyPhase: 'done',
       assemblyAddIds: [],
+      assemblyLinkAddIds: [],
+      assemblyLinkWardenIdsByWave: [],
+      assemblyLinkWardenSpawns: [],
       assemblyRemaining: 0,
       assemblyWipeResolved: false,
       assemblyDroppedAddIds: [],
       assemblyCores: [],
       assemblyForgeHp: VARKHUL_ASSEMBLY_FORGE_MAX_HP,
+      assemblyForgeOverheat: 0,
+      forgeBeamWindow: 'idle',
+      forgeBeamWindowRemaining: 0,
+      forgeBeamTeachingTriggered: false,
+      forgeBeamFinalTriggered: false,
+      forgeHeatWarningMask: 0,
+      assemblyForgeBeamActiveMask: 0,
+      assemblyForgeBeamWarmupRemaining: 0,
+      assemblyForgeBeamBlockerIds: Array.from({ length: VARKHUL_FORGE_BEAM_COUNT }, () => null),
+      assemblyForgeBeamDamageTimers: Array.from(
+        { length: VARKHUL_FORGE_BEAM_COUNT },
+        () => VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
+      ),
+      assemblyForgeMeltdownRemaining: 0,
+      assemblyForgeMeltdownTickTimer: VARKHUL_FORGE_MELTDOWN_TICK_SECONDS,
+      assemblyPortalSpawns: [],
+      assemblyNextWaveIndex: 0,
+      assemblyNextWaveRemaining: 0,
+      assemblyIntermissionWaves: 0,
       assemblyDeliveryWindowRemaining: 0,
       assemblyDeliveredCoreIds: [],
       assemblyArtificerRepaired: false,
@@ -307,6 +365,12 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       assemblyRuneAssignments: [],
       assemblyRuneAngles: [],
       assemblyRuneControls: [],
+      assemblyRuneControlHoldSeconds: [],
+      assemblyRuneAlignmentHoldSeconds: [],
+      assemblyRuneRescuerIds: [],
+      assemblyRuneUnavailablePlayerIds: [],
+      assemblyRuneSlots: Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, (_, symbol) => symbol),
+      assemblyRuneLayoutKey: boss.varkhulAssemblyAttempt ?? 0,
       assemblyLinkFireballTimer: 0,
       assemblyLinkFireballWave: 0,
       assemblyRuneRound: 0,
@@ -359,7 +423,9 @@ export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): v
         aura.id !== VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID &&
         aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID &&
         aura.id !== VARKHUL_ASSEMBLY_CORE_AURA_ID &&
-        aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID) ||
+        aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID &&
+        aura.id !== VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID &&
+        aura.id !== VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID) ||
       (sourceId !== undefined && aura.sourceId !== sourceId),
   );
 }
@@ -381,6 +447,9 @@ function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterS
   st.anvilStrikeIndex = 0;
   st.anvilStrikeRemaining = 0;
   st.anvilMeteorBatches = [];
+  st.interceptBeamCastRemaining = 0;
+  st.interceptBeamTargetId = null;
+  st.interceptBeamBlockerId = null;
   clearBossCast(boss);
 }
 
@@ -559,6 +628,146 @@ function updateFrontal(
   boss.castingAbility = VARKHUL_FRONTAL_CAST_ID;
   boss.castRemaining = st.frontalCastRemaining;
   if (st.frontalCastRemaining <= CAST_COMPLETE_EPS) releaseFrontal(ctx, boss, st, players);
+}
+
+function temperedWoundActive(player: Entity, bossId: number): boolean {
+  return player.auras.some(
+    (aura) =>
+      aura.id === VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID &&
+      aura.sourceId === bossId &&
+      aura.remaining > CAST_COMPLETE_EPS,
+  );
+}
+
+function applyTemperedWound(ctx: SimContext, boss: Entity, target: Entity): void {
+  const existing = target.auras.find(
+    (aura) => aura.id === VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID && aura.sourceId === boss.id,
+  );
+  if (existing) {
+    existing.remaining = VARKHUL_INTERCEPT_BEAM_DEBUFF_SECONDS;
+    existing.duration = VARKHUL_INTERCEPT_BEAM_DEBUFF_SECONDS;
+    existing.value = VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN;
+    ctx.emit({ type: 'aura', targetId: target.id, name: existing.name, gained: true });
+    return;
+  }
+  ctx.applyAura(target, {
+    id: VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+    name: VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME,
+    kind: 'vuln_source',
+    remaining: VARKHUL_INTERCEPT_BEAM_DEBUFF_SECONDS,
+    duration: VARKHUL_INTERCEPT_BEAM_DEBUFF_SECONDS,
+    value: VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
+    sourceId: boss.id,
+    school: 'fire',
+    encounterOwned: true,
+  });
+}
+
+function startInterceptBeam(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  const tanks = tankIds(ctx, boss);
+  const nonTanks = players.filter((player) => !player.dead && !tanks.has(player.id));
+  const unscarred = nonTanks.filter((player) => !temperedWoundActive(player, boss.id));
+  const pool =
+    unscarred.length > 0
+      ? unscarred
+      : nonTanks.length > 0
+        ? nonTanks
+        : players.filter((player) => !player.dead);
+  if (pool.length === 0) {
+    st.interceptBeamTimer = 2;
+    return;
+  }
+  st.interceptBeamCastKey++;
+  const target = pool[st.interceptBeamCastKey % pool.length];
+  st.majorAbility = 'interceptBeam';
+  st.interceptBeamTimer = VARKHUL_INTERCEPT_BEAM_EVERY_SECONDS;
+  st.interceptBeamCastRemaining = VARKHUL_INTERCEPT_BEAM_CAST_SECONDS;
+  st.interceptBeamTargetId = target.id;
+  st.interceptBeamBlockerId =
+    varkhulInterceptBeamBlocker(boss.pos, target.pos, target.id, players)?.blockerId ?? null;
+  boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
+  boss.castingAbility = VARKHUL_INTERCEPT_BEAM_CAST_ID;
+  boss.castTotal = VARKHUL_INTERCEPT_BEAM_CAST_SECONDS;
+  boss.castRemaining = VARKHUL_INTERCEPT_BEAM_CAST_SECONDS;
+  boss.castTargetId = target.id;
+  boss.castAim = { ...target.pos };
+  boss.channeling = false;
+}
+
+function releaseInterceptBeam(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  const target = players.find((player) => player.id === st.interceptBeamTargetId && !player.dead);
+  if (target) {
+    const hit = varkhulInterceptBeamBlocker(boss.pos, target.pos, target.id, players);
+    const victim = hit
+      ? players.find((player) => player.id === hit.blockerId && !player.dead)
+      : target;
+    if (victim) {
+      const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+      dealFractionalDamage(
+        ctx,
+        boss,
+        victim,
+        varkhulInterceptBeamDamageMaxHp(difficulty, hit !== null),
+        VARKHUL_INTERCEPT_BEAM_CAST_ID,
+      );
+      if (!victim.dead) applyTemperedWound(ctx, boss, victim);
+      ctx.emit({
+        type: 'spellfxAt',
+        x: victim.pos.x,
+        z: victim.pos.z,
+        school: 'fire',
+        fx: 'burst',
+        sourceId: boss.id,
+        radius: 2.4,
+        ability: VARKHUL_INTERCEPT_BEAM_CAST_ID,
+      });
+    }
+  }
+  st.interceptBeamCastRemaining = 0;
+  st.interceptBeamTargetId = null;
+  st.interceptBeamBlockerId = null;
+  st.majorAbility = 'none';
+  clearBossCast(boss);
+}
+
+function updateInterceptBeam(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+  speed: number,
+): void {
+  const target = players.find((player) => player.id === st.interceptBeamTargetId && !player.dead);
+  if (!target) {
+    st.interceptBeamTimer = Math.min(st.interceptBeamTimer, 4);
+    st.interceptBeamCastRemaining = 0;
+    st.interceptBeamTargetId = null;
+    st.interceptBeamBlockerId = null;
+    st.majorAbility = 'none';
+    clearBossCast(boss);
+    return;
+  }
+  const hit = varkhulInterceptBeamBlocker(boss.pos, target.pos, target.id, players);
+  st.interceptBeamBlockerId = hit?.blockerId ?? null;
+  st.interceptBeamCastRemaining = Math.max(0, st.interceptBeamCastRemaining - DT * speed);
+  boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
+  boss.castingAbility = VARKHUL_INTERCEPT_BEAM_CAST_ID;
+  boss.castRemaining = st.interceptBeamCastRemaining;
+  boss.castTargetId = target.id;
+  boss.castAim = { ...target.pos };
+  if (st.interceptBeamCastRemaining <= CAST_COMPLETE_EPS) {
+    releaseInterceptBeam(ctx, boss, st, players);
+  }
 }
 
 function applyRedHotMetal(ctx: SimContext, boss: Entity, target: Entity): void {
@@ -890,6 +1099,21 @@ function anvilWorldPosition(ctx: SimContext, boss: Entity): Vec3 {
   return ctx.groundPos(origin.x + VARKHUL_FORGE_LOCAL_POS.x, origin.z + VARKHUL_FORGE_LOCAL_POS.z);
 }
 
+function varkhulWorkWorldPosition(ctx: SimContext, boss: Entity): Vec3 {
+  const instance = encounterInstance(ctx, boss);
+  if (!instance) return { ...boss.spawnPos };
+  const origin = ctx.instanceOriginOf(instance);
+  return ctx.groundPos(origin.x + VARKHUL_WORK_LOCAL_POS.x, origin.z + VARKHUL_WORK_LOCAL_POS.z);
+}
+
+function placeVarkhulAtAnvil(ctx: SimContext, boss: Entity): void {
+  const work = varkhulWorkWorldPosition(ctx, boss);
+  boss.pos = { ...work };
+  boss.prevPos = { ...work };
+  boss.facing = VARKHUL_WORK_FACING;
+  boss.prevFacing = VARKHUL_WORK_FACING;
+}
+
 function startAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   st.majorAbility = 'anvil';
   st.anvilTimer = VARKHUL_ANVIL_EVERY;
@@ -897,8 +1121,7 @@ function startAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterSt
   st.anvilMeteorCastKey++;
   st.anvilStrikeRemaining = VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
   const forge = anvilWorldPosition(ctx, boss);
-  boss.pos = { ...forge };
-  boss.prevPos = { ...forge };
+  placeVarkhulAtAnvil(ctx, boss);
   boss.castingAbility = VARKHUL_ANVILS_DECREE_CAST_ID;
   boss.castTotal = VARKHUL_ANVILS_DECREE_STRIKES * VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
   boss.castRemaining = boss.castTotal;
@@ -1041,9 +1264,12 @@ function spawnAssemblyAdd(
   add.inCombat = true;
   add.aiState = 'attack';
   add.aggroTargetId = boss.aggroTargetId;
+  // Portal adds belong to the encounter, not to their individual portal. They
+  // must be able to cross the room to the raid without the ordinary trash
+  // leash turning them around halfway through the pull.
+  add.ignoreHardLeash = true;
   if (templateId === VARKHUL_CRUCIBLE_WARDEN_ID) {
     add.bigCastTimer = VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS;
-    add.ignoreHardLeash = true;
   }
   ctx.addEntity(add);
   boss.summonedIds.push(add.id);
@@ -1051,60 +1277,189 @@ function spawnAssemblyAdd(
   return add;
 }
 
-function assignAssemblyFixate(
+function emitVarkhulCallout(
+  ctx: SimContext,
+  boss: Entity,
+  call: Extract<import('../types').SimEvent, { type: 'varkhulCallout' }>['call'],
+): void {
+  for (const player of playersInEncounter(ctx, boss, true)) {
+    ctx.emit({ type: 'varkhulCallout', pid: player.id, sourceId: boss.id, call });
+  }
+}
+
+function highestThreatTankTarget(
+  ctx: SimContext,
+  boss: Entity,
+  players: readonly Entity[],
+): Entity | null {
+  const authoredTankIds = new Set<number>();
+  for (const meta of ctx.players.values()) {
+    if (meta.talentMods.role === 'tank') authoredTankIds.add(meta.entityId);
+  }
+  const tanks = players.filter((player) => !player.dead && authoredTankIds.has(player.id));
+  const pool = tanks.length > 0 ? tanks : players.filter((player) => !player.dead);
+  let best: Entity | null = null;
+  let bestThreat = Number.NEGATIVE_INFINITY;
+  for (const player of pool) {
+    const threat = boss.threat.get(player.id) ?? (boss.aggroTargetId === player.id ? 1 : 0);
+    if (threat > bestThreat || (threat === bestThreat && (best === null || player.id < best.id))) {
+      best = player;
+      bestThreat = threat;
+    }
+  }
+  return best;
+}
+
+function sendAssemblyAddTowardTank(
+  ctx: SimContext,
+  boss: Entity,
+  add: Entity,
+  players: readonly Entity[],
+): void {
+  const target = highestThreatTankTarget(ctx, boss, players);
+  add.forcedTargetId = null;
+  add.forcedTargetTimer = 0;
+  add.threat.clear();
+  add.aggroTargetId = target?.id ?? null;
+  if (!target) return;
+  add.threat.set(target.id, Math.max(1, boss.threat.get(target.id) ?? 1));
+  add.facing = steadyAngleTo(add.pos, target.pos, add.facing);
+  const profile = mobCombatProfile(add);
+  if (!ctx.isRooted(add) && dist2d(add.pos, target.pos) > profile.meleeRange) {
+    ctx.moveToward(
+      add,
+      target.pos,
+      add.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(add),
+    );
+    add.aiState = 'chase';
+  }
+}
+
+function emitForgePortalTelegraph(
+  ctx: SimContext,
+  boss: Entity,
+  origin: { x: number; z: number },
+  portalIndex: number,
+  duration: number,
+): void {
+  const portal = VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS[portalIndex];
+  if (!portal) return;
+  ctx.emit({
+    type: 'spellfxAt',
+    x: origin.x + portal.x,
+    z: origin.z + portal.z,
+    school: 'fire',
+    fx: 'burst',
+    sourceId: boss.id,
+    radius: 4,
+    duration,
+    ability: VARKHUL_FORGE_PORTAL_ABILITY_ID,
+  });
+}
+
+function retelegraphPendingForgePortals(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
-  sentinelOverride?: Entity,
-): Entity | null {
-  const players = playersInEncounter(ctx, boss);
-  const current = players.find((player) => player.id === st.assemblyFixateTargetId) ?? null;
-  const sentinel =
-    sentinelOverride ??
-    st.assemblyAddIds
-      .map((id) => ctx.entities.get(id))
-      .find((add) => add?.templateId === VARKHUL_EMBER_SENTINEL_ID);
-  if (current) return current;
-  if (st.assemblyFixateTargetId !== null) {
-    const previous = ctx.entities.get(st.assemblyFixateTargetId);
-    if (previous) {
-      previous.auras = previous.auras.filter(
-        (aura) => aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID || aura.sourceId !== boss.id,
-      );
-    }
+): void {
+  const instance = encounterInstance(ctx, boss);
+  if (!instance) return;
+  const origin = ctx.instanceOriginOf(instance);
+  for (const telegraph of activeVarkhulForgePortalTelegraphs(boss.id, st, origin)) {
+    ctx.emit(telegraph);
   }
-  const nonTanks = players.filter((player) => !tankIds(ctx, boss).has(player.id));
-  const pool = nonTanks.length > 0 ? nonTanks : players;
-  const target = pool.length > 0 ? pool[boss.id % pool.length] : null;
-  st.assemblyFixateTargetId = target?.id ?? null;
-  if (!sentinel || !target) return target;
-  sentinel.ignoreHardLeash = true;
-  sentinel.forcedTargetId = target.id;
-  sentinel.forcedTargetTimer = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
-  sentinel.aggroTargetId = target.id;
-  ctx.applyAura(target, {
-    id: VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
-    name: "Sentinel's Gaze",
-    kind: 'vulnerability',
-    remaining: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
-    duration: VARKHUL_MASTERS_ASSEMBLY_SECONDS,
-    value: 0,
-    sourceId: boss.id,
-    school: 'fire',
-    encounterOwned: true,
-  });
-  return target;
+}
+
+function queueForgeAddWave(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  wave: number,
+): void {
+  const instance = encounterInstance(ctx, boss);
+  if (!instance) return;
+  const origin = ctx.instanceOriginOf(instance);
+  const plan = varkhulForgeIntermissionWave(st.assemblyRuneDifficulty, wave);
+  const telegraphedPortals = [false, false, false, false];
+  for (let spawnIndex = 0; spawnIndex < plan.length; spawnIndex++) {
+    const spawn = plan[spawnIndex];
+    st.assemblyPortalSpawns.push({
+      wave,
+      spawnIndex,
+      remaining: VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
+    });
+    if (telegraphedPortals[spawn.portalIndex]) continue;
+    telegraphedPortals[spawn.portalIndex] = true;
+    emitForgePortalTelegraph(
+      ctx,
+      boss,
+      origin,
+      spawn.portalIndex,
+      VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
+    );
+  }
+}
+
+function updateForgeAddSpawns(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  const players = playersInEncounter(ctx, boss);
+  const pending: VarkhulEncounterState['assemblyPortalSpawns'] = [];
+  for (const scheduled of st.assemblyPortalSpawns) {
+    const remaining = Math.max(0, scheduled.remaining - DT);
+    if (remaining > CAST_COMPLETE_EPS) {
+      pending.push({ ...scheduled, remaining });
+      continue;
+    }
+    const plan = varkhulForgeIntermissionWave(st.assemblyRuneDifficulty, scheduled.wave);
+    const planned = plan[scheduled.spawnIndex];
+    const portal = planned ? VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS[planned.portalIndex] : undefined;
+    if (!planned || !portal) continue;
+    const add = spawnAssemblyAdd(ctx, boss, planned.templateId, portal.x, portal.z);
+    if (!add) {
+      pending.push({ ...scheduled, remaining: DT });
+      continue;
+    }
+    st.assemblyAddIds.push(add.id);
+    sendAssemblyAddTowardTank(ctx, boss, add, players);
+  }
+  st.assemblyPortalSpawns = pending;
+
+  if (st.assemblyNextWaveIndex >= st.assemblyIntermissionWaves) return;
+  st.assemblyNextWaveRemaining = Math.max(0, st.assemblyNextWaveRemaining - DT);
+  if (st.assemblyNextWaveRemaining > CAST_COMPLETE_EPS) return;
+  queueForgeAddWave(ctx, boss, st, st.assemblyNextWaveIndex);
+  st.assemblyNextWaveIndex++;
+  st.assemblyNextWaveRemaining = VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS;
 }
 
 function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
   cancelMajorAbility(ctx, boss, st);
   st.assemblyTriggered = true;
+  st.assemblyRuneDifficulty = difficulty;
   st.assemblyPhase = 'adds';
-  st.assemblyRemaining = VARKHUL_MASTERS_ASSEMBLY_SECONDS;
+  st.assemblyRemaining = varkhulForgeIntermissionSeconds(difficulty);
   st.assemblyWipeResolved = false;
   st.assemblyDroppedAddIds = [];
+  st.assemblyLinkAddIds = [];
+  st.assemblyLinkWardenIdsByWave = [];
+  st.assemblyLinkWardenSpawns = [];
   st.assemblyCores = [];
   st.assemblyForgeHp = VARKHUL_ASSEMBLY_FORGE_MAX_HP;
+  st.forgeBeamWindow = 'intermission';
+  st.forgeBeamWindowRemaining = st.assemblyRemaining;
+  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
+  st.assemblyForgeBeamWarmupRemaining = VARKHUL_FORGE_BEAM_WARMUP_SECONDS;
+  st.assemblyForgeBeamBlockerIds = Array.from({ length: VARKHUL_FORGE_BEAM_COUNT }, () => null);
+  st.assemblyForgeBeamDamageTimers = Array.from(
+    { length: VARKHUL_FORGE_BEAM_COUNT },
+    () => VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
+  );
+  st.assemblyForgeMeltdownRemaining = 0;
+  st.assemblyForgeMeltdownTickTimer = VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
+  st.assemblyPortalSpawns = [];
+  st.assemblyIntermissionWaves = varkhulForgeIntermissionWaveCount(difficulty);
+  st.assemblyNextWaveIndex = 1;
+  st.assemblyNextWaveRemaining = VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS;
   st.assemblyDeliveryWindowRemaining = 0;
   st.assemblyDeliveredCoreIds = [];
   st.assemblyArtificerRepaired = false;
@@ -1112,23 +1467,23 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyRuneAssignments = [];
   st.assemblyRuneAngles = [];
   st.assemblyRuneControls = [];
+  st.assemblyRuneControlHoldSeconds = [];
+  st.assemblyRuneAlignmentHoldSeconds = [];
+  st.assemblyRuneRescuerIds = [];
+  st.assemblyRuneUnavailablePlayerIds = [];
+  boss.varkhulAssemblyAttempt = (boss.varkhulAssemblyAttempt ?? -1) + 1;
+  st.assemblyRuneLayoutKey = boss.varkhulAssemblyAttempt;
   st.assemblyLinkFireballTimer = 0;
   st.assemblyLinkFireballWave = 0;
   st.assemblyRuneRound = 0;
-  st.assemblyRuneRounds = varkhulAssemblyRounds(
-    encounterInstance(ctx, boss)?.difficulty ?? 'normal',
-  );
+  st.assemblyRuneRounds = varkhulAssemblyRounds(difficulty);
+  st.assemblyRuneSlots = varkhulAssemblyRuneSlots(difficulty, st.assemblyRuneLayoutKey);
   st.assemblyRuneRemaining = 0;
   st.assemblyStunRemaining = 0;
   boss.damageImmune = true;
   boss.knockbackResistance = 1;
-  const forge = anvilWorldPosition(ctx, boss);
-  boss.pos = { ...forge };
-  boss.prevPos = { ...forge };
-  const adds = VARKHUL_ASSEMBLY_ADD_OFFSETS.map((spawn) =>
-    spawnAssemblyAdd(ctx, boss, spawn.id, spawn.x, spawn.z),
-  ).filter((add): add is Entity => add !== null);
-  st.assemblyAddIds = adds.map((add) => add.id);
+  placeVarkhulAtAnvil(ctx, boss);
+  st.assemblyAddIds = [];
   ctx.applyAura(boss, {
     id: VARKHUL_MASTERS_ASSEMBLY_AURA_ID,
     name: VARKHUL_MASTERS_ASSEMBLY_CAST_ID,
@@ -1140,8 +1495,9 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
     school: 'fire',
     encounterOwned: true,
   });
-  const sentinel = adds.find((add) => add.templateId === VARKHUL_EMBER_SENTINEL_ID);
-  assignAssemblyFixate(ctx, boss, st, sentinel);
+  emitVarkhulCallout(ctx, boss, 'bothPillarsCharging');
+  emitVarkhulCallout(ctx, boss, 'portalsOpening');
+  queueForgeAddWave(ctx, boss, st, 0);
 }
 
 function clearAssemblyPlayerAuras(ctx: SimContext, boss: Entity): void {
@@ -1170,147 +1526,30 @@ function finishAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState
     const add = ctx.entities.get(id);
     if (add) clearBossCast(add);
   }
-}
-
-function dropDeadAssemblyCores(ctx: SimContext, st: VarkhulEncounterState): void {
-  for (const addId of st.assemblyAddIds) {
-    if (st.assemblyDroppedAddIds.includes(addId)) continue;
-    const add = ctx.entities.get(addId);
-    if (!add?.dead) continue;
-    st.assemblyDroppedAddIds.push(addId);
-    st.assemblyCores.push({
-      id: `varkhul-core:${addId}`,
-      sourceAddId: addId,
-      pos: { ...add.pos },
-      carrierId: null,
-      delivered: false,
-      burdenStacks: 0,
-      burdenTickTimer: VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS,
-    });
+  for (const id of st.assemblyLinkAddIds) {
+    const add = ctx.entities.get(id);
+    if (add) clearBossCast(add);
   }
+  ctx.despawnSummonedAdds(boss);
+  st.assemblyAddIds = [];
+  st.assemblyLinkAddIds = [];
+  st.assemblyLinkWardenIdsByWave = [];
+  st.assemblyLinkWardenSpawns = [];
+  st.assemblyPortalSpawns = [];
+  st.assemblyNextWaveIndex = 0;
+  st.assemblyNextWaveRemaining = 0;
+  st.assemblyIntermissionWaves = 0;
+  st.assemblyRuneRescuerIds.fill(null);
+  st.assemblyRuneUnavailablePlayerIds = [];
+  st.forgeBeamWindow = 'idle';
+  st.forgeBeamWindowRemaining = 0;
+  st.assemblyForgeBeamActiveMask = 0;
+  st.assemblyForgeBeamWarmupRemaining = 0;
+  st.assemblyForgeBeamBlockerIds.fill(null);
+  st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
+  st.assemblyForgeMeltdownRemaining = 0;
+  st.assemblyForgeMeltdownTickTimer = VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
 }
-
-function removeCoreAura(player: Entity): void {
-  player.auras = player.auras.filter((aura) => aura.id !== VARKHUL_ASSEMBLY_CORE_AURA_ID);
-}
-
-function ejectDeliveredCores(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  const forge = anvilWorldPosition(ctx, boss);
-  const delivered = st.assemblyCores.filter((core) => core.delivered);
-  for (let index = 0; index < delivered.length; index++) {
-    const core = delivered[index];
-    const angle = (index * Math.PI * 2) / Math.max(1, delivered.length) + 0.45;
-    core.delivered = false;
-    core.carrierId = null;
-    core.pos = ctx.groundPos(forge.x + Math.sin(angle) * 5, forge.z + Math.cos(angle) * 5);
-  }
-  st.assemblyDeliveredCoreIds = [];
-  st.assemblyDeliveryWindowRemaining = 0;
-}
-
-function applyLinkAuras(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  for (const assignment of st.assemblyRuneAssignments) {
-    const player = ctx.entities.get(assignment.playerId);
-    if (player?.kind !== 'player' || player.dead) continue;
-    ctx.applyAura(player, {
-      id: VARKHUL_ASSEMBLY_LINK_AURA_ID,
-      name: 'Forge Link',
-      kind: 'vulnerability',
-      remaining: st.assemblyRuneRemaining,
-      duration: st.assemblyRuneRemaining,
-      value: 0,
-      stacks: assignment.symbol + 1,
-      sourceId: boss.id,
-      school: 'fire',
-      encounterOwned: true,
-    });
-  }
-}
-
-function startAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  const instance = encounterInstance(ctx, boss);
-  if (!instance) return;
-  const origin = ctx.instanceOriginOf(instance);
-  const center = ctx.groundPos(origin.x, origin.z);
-  for (const player of playersInEncounter(ctx, boss)) {
-    player.pos = { ...center };
-    player.prevPos = { ...center };
-    player.vx = 0;
-    player.vy = 0;
-    player.vz = 0;
-    player.jumping = false;
-    player.onGround = true;
-    player.fallStartY = center.y;
-    ctx.rebucket(player);
-  }
-  clearAssemblyPlayerAuras(ctx, boss);
-  st.assemblyRuneCenter = { ...center };
-  st.assemblyPhase = 'convergence';
-  st.assemblyWipeResolved = false;
-  st.assemblyRuneAssignments = [];
-  st.assemblyRuneAngles = [];
-  st.assemblyRuneControls = [];
-  st.assemblyLinkFireballTimer = 0;
-  st.assemblyLinkFireballWave = 0;
-  st.assemblyRuneRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
-  boss.castingAbility = VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID;
-  boss.castTotal = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
-  boss.castRemaining = VARKHUL_ASSEMBLY_CONVERGENCE_SECONDS;
-  boss.castTargetId = null;
-  boss.castAim = { ...center };
-  boss.channeling = true;
-  ctx.emit({
-    type: 'spellfxAt',
-    x: center.x,
-    z: center.z,
-    school: 'fire',
-    fx: 'nova',
-    sourceId: boss.id,
-    radius: 6,
-    ability: VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID,
-  });
-}
-
-function updateAssemblyConvergence(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  st.assemblyRuneRemaining = Math.max(0, st.assemblyRuneRemaining - DT);
-  boss.castingAbility = VARKHUL_ASSEMBLY_CONVERGENCE_CAST_ID;
-  boss.castRemaining = st.assemblyRuneRemaining;
-  if (st.assemblyRuneRemaining <= CAST_COMPLETE_EPS) startAssemblyLinkRound(ctx, boss, st, 0);
-}
-
-function startAssemblyLinkRound(
-  ctx: SimContext,
-  boss: Entity,
-  st: VarkhulEncounterState,
-  round: number,
-): void {
-  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
-  const players = playersInEncounter(ctx, boss);
-  st.assemblyPhase = 'links';
-  st.assemblyWipeResolved = false;
-  st.assemblyRuneRound = round;
-  st.assemblyRuneRemaining = varkhulAssemblyRuneSeconds(difficulty);
-  st.assemblyRuneAssignments = varkhulAssemblyRuneAssignments(
-    players.map((player) => player.id),
-    boss.id,
-    round,
-  ).map((assignment) => ({ ...assignment, locked: false }));
-  st.assemblyRuneAngles = Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, (_, symbol) =>
-    varkhulAssemblyRuneStartAngle(boss.id, symbol, round),
-  );
-  st.assemblyRuneControls = Array.from({ length: VARKHUL_ASSEMBLY_RUNE_COUNT }, () => 'off');
-  st.assemblyLinkFireballTimer = 1.2;
-  st.assemblyLinkFireballWave = 0;
-  clearAssemblyPlayerAuras(ctx, boss);
-  applyLinkAuras(ctx, boss, st);
-  boss.castingAbility = VARKHUL_ASSEMBLY_LINK_CAST_ID;
-  boss.castTotal = st.assemblyRuneRemaining;
-  boss.castRemaining = st.assemblyRuneRemaining;
-  boss.castTargetId = null;
-  boss.castAim = null;
-  boss.channeling = true;
-}
-
 function shatterAssemblyForge(
   ctx: SimContext,
   boss: Entity,
@@ -1348,255 +1587,231 @@ function shatterAssemblyForge(
     ability: 'Unstable Reaction',
   });
 }
-
-function deliverCore(
+function triggerForgeMeltdown(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
-  core: VarkhulEncounterState['assemblyCores'][number],
-  carrier: Entity,
+  players: readonly Entity[],
+  forge: Vec3,
 ): void {
-  removeCoreAura(carrier);
-  core.carrierId = null;
-  core.delivered = true;
-  core.pos = anvilWorldPosition(ctx, boss);
-  st.assemblyForgeHp = Math.max(
-    VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE,
-    st.assemblyForgeHp - VARKHUL_ASSEMBLY_CORE_BASE_DAMAGE,
-  );
-  if (st.assemblyDeliveryWindowRemaining <= 0) {
-    st.assemblyDeliveredCoreIds = [];
-    st.assemblyDeliveryWindowRemaining = VARKHUL_ASSEMBLY_CORE_WINDOW_SECONDS;
+  const difficulty = st.assemblyRuneDifficulty;
+  const resumesIntermission = st.assemblyTriggered && st.assemblyPhase === 'adds';
+  cancelMajorAbility(ctx, boss, st);
+  // An intermission Meltdown pauses its scheduler but never removes combatants
+  // or rewards the failure by skipping planned waves. Teaching and final-burn
+  // failures remain terminal beam windows without touching the future 50% floor.
+  if (!resumesIntermission) {
+    st.assemblyPhase = 'done';
+    st.assemblyRemaining = 0;
+    st.assemblyRuneRemaining = 0;
+  } else if (st.assemblyRemaining <= CAST_COMPLETE_EPS) {
+    st.assemblyRemaining = 0;
   }
-  st.assemblyDeliveredCoreIds.push(core.id);
+  st.forgeBeamWindow = 'meltdown';
+  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('meltdown');
+  st.assemblyWipeResolved = resumesIntermission ? st.assemblyRemaining <= CAST_COMPLETE_EPS : true;
+  st.assemblyForgeOverheat = 1;
+  st.assemblyForgeMeltdownRemaining = VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS;
+  st.assemblyForgeMeltdownTickTimer = VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
+  clearBossCast(boss);
+  boss.aiState = 'attack';
+  const damage = varkhulForgeMeltdownInitialDamageMaxHp(difficulty);
+  for (const player of players) {
+    if (!player.dead) {
+      dealFractionalDamage(ctx, boss, player, damage, VARKHUL_FORGE_MELTDOWN_ABILITY_ID);
+    }
+  }
   ctx.emit({
     type: 'spellfxAt',
-    x: core.pos.x,
-    z: core.pos.z,
+    x: forge.x,
+    z: forge.z,
     school: 'fire',
-    fx: 'nova',
+    fx: 'meteorImpact',
     sourceId: boss.id,
-    radius: VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS,
-    ability: 'Molten Core',
+    radius: VARKHUL_ASSEMBLY_RUNE_OWNER_RADIUS,
+    ability: VARKHUL_FORGE_MELTDOWN_ABILITY_ID,
   });
-  if (st.assemblyDeliveredCoreIds.length < 3) return;
-  st.assemblyForgeHp = Math.max(0, st.assemblyForgeHp - VARKHUL_ASSEMBLY_UNSTABLE_REACTION_DAMAGE);
-  startAssemblyConvergence(ctx, boss, st);
+  if (resumesIntermission) boss.aiState = 'idle';
 }
 
-function updateAssemblyCores(
+function updateForgeMeltdown(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): boolean {
-  const forge = anvilWorldPosition(ctx, boss);
-  for (const core of st.assemblyCores) {
-    if (core.delivered) continue;
-    const carrier =
-      core.carrierId === null
-        ? null
-        : (players.find((player) => player.id === core.carrierId) ?? null);
-    const detachedCarrier =
-      core.carrierId === null ? null : (ctx.entities.get(core.carrierId) ?? null);
-    if (carrier?.kind === 'player' && !carrier.dead) {
-      core.pos = { ...carrier.pos };
-      core.burdenTickTimer -= DT;
-      if (core.burdenTickTimer <= CAST_COMPLETE_EPS) {
-        core.burdenTickTimer += VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS;
-        core.burdenStacks++;
-        dealFractionalDamage(
-          ctx,
-          boss,
-          carrier,
-          varkhulAssemblyBurdenDamageMaxHp(core.burdenStacks),
-          'Molten Burden',
-        );
-      }
-      if (!carrier.dead && dist2d(carrier.pos, forge) <= VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS) {
-        deliverCore(ctx, boss, st, core, carrier);
-        if (st.assemblyPhase === 'convergence') return true;
-      }
-      continue;
-    }
-    if (detachedCarrier) removeCoreAura(detachedCarrier);
-    core.carrierId = null;
-    const player = players.find(
-      (candidate) =>
-        !candidate.dead &&
-        !st.assemblyCores.some((other) => other.carrierId === candidate.id) &&
-        dist2d(candidate.pos, core.pos) <= VARKHUL_ASSEMBLY_CORE_PICKUP_RADIUS,
-    );
-    if (!player) continue;
-    core.carrierId = player.id;
-    core.burdenStacks = 0;
-    core.burdenTickTimer = VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS;
-    ctx.applyAura(player, {
-      id: VARKHUL_ASSEMBLY_CORE_AURA_ID,
-      name: 'Molten Core',
-      kind: 'vulnerability',
-      remaining: 999,
-      duration: 999,
-      value: 0,
-      sourceId: boss.id,
-      school: 'fire',
-      encounterOwned: true,
-    });
-  }
-  if (st.assemblyDeliveryWindowRemaining > 0) {
-    st.assemblyDeliveryWindowRemaining = Math.max(0, st.assemblyDeliveryWindowRemaining - DT);
-    if (st.assemblyDeliveryWindowRemaining <= CAST_COMPLETE_EPS) {
-      ejectDeliveredCores(ctx, boss, st);
-    }
-  }
-  return false;
-}
-
-function spawnAssemblyLinkFireballs(
-  ctx: SimContext,
-  boss: Entity,
-  st: VarkhulEncounterState,
-  forge: Vec3,
-): void {
-  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
-  for (const [index, fireball] of varkhulAssemblyFireballPattern(
-    forge,
-    difficulty,
-    st.assemblyRuneRound,
-    st.assemblyLinkFireballWave,
-  ).entries()) {
-    st.cinderOrbProjectiles.push({
-      id: `${boss.id}:assembly-links:${st.assemblyRuneRound}:${st.assemblyLinkFireballWave}:${index}`,
-      ownerId: boss.id,
-      pos: ctx.groundPos(fireball.x, fireball.z),
-      dir: { x: fireball.dirX, z: fireball.dirZ },
-      remaining: VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
-      hitPlayerIds: [],
-      radius: VARKHUL_ASSEMBLY_LINK_FIREBALL_RADIUS,
-      duration: VARKHUL_ASSEMBLY_LINK_FIREBALL_DURATION,
-      speed: VARKHUL_CINDER_ORB_SPEED,
-      damageMaxHp:
-        difficulty === 'heroic'
-          ? VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_HEROIC
-          : VARKHUL_ASSEMBLY_LINK_FIREBALL_DAMAGE_NORMAL,
-      ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
-    });
-  }
-  st.assemblyLinkFireballWave++;
-  st.assemblyLinkFireballTimer += varkhulAssemblyFireballCadence(difficulty);
-}
-
-function updateAssemblyLinks(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  st.assemblyRuneRemaining = Math.max(0, st.assemblyRuneRemaining - DT);
-  boss.castingAbility = VARKHUL_ASSEMBLY_LINK_CAST_ID;
-  boss.castRemaining = st.assemblyRuneRemaining;
-  const forge = anvilWorldPosition(ctx, boss);
-  const instance = encounterInstance(ctx, boss);
-  if (!instance) return;
-  const origin = ctx.instanceOriginOf(instance);
-  const roomCenter = ctx.groundPos(origin.x, origin.z);
-  positionVarkhulLinkPracticeBots(ctx, roomCenter, boss.id, st);
-  const players = playersInEncounter(ctx, boss);
-  const difficulty = instance.difficulty ?? 'normal';
-  st.assemblyLinkFireballTimer -= DT;
-  if (st.assemblyLinkFireballTimer <= CAST_COMPLETE_EPS) {
-    spawnAssemblyLinkFireballs(ctx, boss, st, forge);
-  }
-  for (const assignment of st.assemblyRuneAssignments) {
-    const player = ctx.entities.get(assignment.playerId);
-    const aura = player?.auras.find((entry) => entry.id === VARKHUL_ASSEMBLY_LINK_AURA_ID);
-    if (aura) aura.remaining = st.assemblyRuneRemaining;
-  }
-  for (const assignment of st.assemblyRuneAssignments) {
-    if (assignment.locked) continue;
-    const player = ctx.entities.get(assignment.playerId);
-    const station = varkhulAssemblyRuneStation(roomCenter, assignment.symbol, st.assemblyRuneRound);
-    const targetAngle = varkhulAssemblyRuneTargetAngle(
-      boss.id,
-      assignment.symbol,
-      st.assemblyRuneRound,
-    );
-    const previousAngle =
-      st.assemblyRuneAngles[assignment.symbol] ??
-      varkhulAssemblyRuneStartAngle(boss.id, assignment.symbol, st.assemblyRuneRound);
-    const control =
-      player?.kind === 'player' && !player.dead
-        ? varkhulAssemblyRuneControlAt(station, player.pos)
-        : 'off';
-    const glyphAngle = varkhulAssemblyStepRune(previousAngle, control, difficulty, DT, targetAngle);
-    st.assemblyRuneAngles[assignment.symbol] = glyphAngle;
-    st.assemblyRuneControls[assignment.symbol] = control;
-    if (!varkhulAssemblyRuneAligned(glyphAngle, targetAngle)) continue;
-    assignment.locked = true;
-    if (player) {
-      player.auras = player.auras.filter(
-        (aura) => aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID || aura.sourceId !== boss.id,
-      );
-    }
-    ctx.emit({
-      type: 'spellfxAt',
-      x: station.x,
-      z: station.z,
-      school: 'fire',
-      fx: 'nova',
-      sourceId: boss.id,
-      radius: VARKHUL_ASSEMBLY_RUNE_RADIUS,
-      ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
-    });
-  }
-  if (
-    st.assemblyRuneAssignments.length === VARKHUL_ASSEMBLY_RUNE_COUNT &&
-    st.assemblyRuneAssignments.every((assignment) => assignment.locked)
-  ) {
-    if (st.assemblyRuneRound + 1 < st.assemblyRuneRounds) {
-      startAssemblyLinkRound(ctx, boss, st, st.assemblyRuneRound + 1);
-    } else {
-      shatterAssemblyForge(ctx, boss, st);
-    }
-    return;
-  }
-  boss.castRemaining = st.assemblyRuneRemaining;
-  if (st.assemblyRuneRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
-    st.assemblyWipeResolved = true;
-    const lockedRunes = st.assemblyRuneAssignments.filter((assignment) => assignment.locked).length;
-    const outcome = varkhulAssemblyRuneOutcome(lockedRunes);
-    if (outcome === 'partial') {
-      shatterAssemblyForge(
-        ctx,
-        boss,
-        st,
-        VARKHUL_ASSEMBLY_PARTIAL_STUN_SECONDS,
-        VARKHUL_ASSEMBLY_PARTIAL_DAMAGE_TAKEN_BONUS,
-      );
-      return;
-    }
-    finishAssembly(ctx, boss, st);
-    st.assemblyPhase = 'done';
-    st.assemblyAddIds = [];
-    clearBossCast(boss);
-    boss.aiState = 'attack';
-    const damage =
-      difficulty === 'heroic'
-        ? VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_HEROIC
-        : VARKHUL_ASSEMBLY_LINK_FAILURE_DAMAGE_NORMAL;
+  if (st.assemblyForgeMeltdownRemaining <= CAST_COMPLETE_EPS) return false;
+  st.assemblyForgeMeltdownRemaining = Math.max(0, st.assemblyForgeMeltdownRemaining - DT);
+  st.assemblyForgeMeltdownTickTimer -= DT;
+  if (st.assemblyForgeMeltdownTickTimer <= CAST_COMPLETE_EPS) {
+    st.assemblyForgeMeltdownTickTimer += VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
+    const damage = varkhulForgeMeltdownTickDamageMaxHp(st.assemblyRuneDifficulty);
     for (const player of players) {
       if (!player.dead) {
-        dealFractionalDamage(ctx, boss, player, damage, VARKHUL_ASSEMBLY_LINK_CAST_ID);
+        dealFractionalDamage(ctx, boss, player, damage, VARKHUL_FORGE_MELTDOWN_ABILITY_ID);
       }
     }
+    const forge = anvilWorldPosition(ctx, boss);
     ctx.emit({
       type: 'spellfxAt',
       x: forge.x,
       z: forge.z,
       school: 'fire',
-      fx: 'meteorImpact',
+      fx: 'nova',
       sourceId: boss.id,
-      radius: VARKHUL_ASSEMBLY_RUNE_STATION_DISTANCE,
-      ability: VARKHUL_ASSEMBLY_LINK_CAST_ID,
+      radius: 12,
+      ability: VARKHUL_FORGE_MELTDOWN_ABILITY_ID,
     });
   }
+  if (st.assemblyForgeMeltdownRemaining <= CAST_COMPLETE_EPS) {
+    st.assemblyForgeMeltdownRemaining = 0;
+    st.assemblyForgeOverheat = 0;
+    if (st.assemblyTriggered && st.assemblyPhase === 'adds') {
+      st.forgeBeamWindow = 'intermission';
+      st.forgeBeamWindowRemaining = st.assemblyRemaining;
+      st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
+      st.assemblyForgeBeamWarmupRemaining = VARKHUL_FORGE_BEAM_WARMUP_SECONDS;
+      emitVarkhulCallout(ctx, boss, 'bothPillarsCharging');
+      emitVarkhulCallout(ctx, boss, 'portalsOpening');
+      retelegraphPendingForgePortals(ctx, boss, st);
+    } else {
+      st.forgeBeamWindow = 'idle';
+      st.forgeBeamWindowRemaining = 0;
+      st.assemblyForgeBeamActiveMask = 0;
+      st.assemblyForgeBeamWarmupRemaining = 0;
+    }
+    st.assemblyForgeBeamBlockerIds.fill(null);
+    st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
+  }
+  // Even the terminal tick belongs wholly to Meltdown. The scheduler resumes
+  // on the next fixed tick, after the fresh pillar warning has been published.
+  return true;
 }
 
+function updateAssemblyForgeBeams(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+  forge: Vec3,
+): boolean {
+  const activeMask = st.assemblyForgeBeamActiveMask;
+  const activeBeamCount =
+    Number(varkhulForgeBeamIsActive(activeMask, 0)) +
+    Number(varkhulForgeBeamIsActive(activeMask, 1));
+  if (activeBeamCount === 0) {
+    st.assemblyForgeBeamWarmupRemaining = 0;
+    st.assemblyForgeBeamBlockerIds.fill(null);
+    st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
+    st.assemblyForgeOverheat = varkhulForgeBeamOverheatAfterTick(
+      st.assemblyForgeOverheat,
+      st.assemblyRuneDifficulty,
+      0,
+      0,
+      DT,
+    );
+    return false;
+  }
+  const assignments = varkhulForgeBeamAssignments(
+    forge,
+    players.map((player) => ({
+      id: player.id,
+      x: player.pos.x,
+      z: player.pos.z,
+      dead: player.dead,
+    })),
+  );
+  const previousBlockerIds = [...st.assemblyForgeBeamBlockerIds];
+  st.assemblyForgeBeamBlockerIds = assignments.map((assignment) =>
+    varkhulForgeBeamIsActive(activeMask, assignment.index) ? assignment.blockerId : null,
+  );
+  if (st.assemblyForgeBeamWarmupRemaining > CAST_COMPLETE_EPS) {
+    st.assemblyForgeBeamBlockerIds.fill(null);
+    const remaining = Math.max(0, st.assemblyForgeBeamWarmupRemaining - DT);
+    st.assemblyForgeBeamWarmupRemaining = remaining <= CAST_COMPLETE_EPS ? 0 : remaining;
+    st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
+    if (st.assemblyForgeBeamWarmupRemaining === 0) {
+      if (activeMask === 1) emitVarkhulCallout(ctx, boss, 'leftPillar');
+      else if (activeMask === 2) emitVarkhulCallout(ctx, boss, 'rightPillar');
+      else if (activeMask === 3) emitVarkhulCallout(ctx, boss, 'bothPillars');
+    }
+    return false;
+  }
+
+  let blockedCount = 0;
+  for (const assignment of assignments) {
+    const blockerId = varkhulForgeBeamIsActive(activeMask, assignment.index)
+      ? assignment.blockerId
+      : null;
+    if (blockerId === null) {
+      st.assemblyForgeBeamDamageTimers[assignment.index] =
+        VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS;
+      continue;
+    }
+    blockedCount++;
+    if (previousBlockerIds[assignment.index] !== blockerId) {
+      st.assemblyForgeBeamDamageTimers[assignment.index] =
+        VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS;
+    }
+    st.assemblyForgeBeamDamageTimers[assignment.index] =
+      (st.assemblyForgeBeamDamageTimers[assignment.index] ??
+        VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS) - DT;
+    if (st.assemblyForgeBeamDamageTimers[assignment.index] > CAST_COMPLETE_EPS) continue;
+    st.assemblyForgeBeamDamageTimers[assignment.index] +=
+      VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS;
+    const blocker = ctx.entities.get(blockerId);
+    if (blocker?.kind === 'player' && !blocker.dead) {
+      const resetSeconds = varkhulForgeBeamExposureResetSeconds(st.assemblyRuneDifficulty);
+      const exposure = blocker.auras.find(
+        (aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID && aura.sourceId === boss.id,
+      );
+      const exposureStack = (exposure?.stacks ?? 0) + 1;
+      if (exposure) {
+        exposure.remaining = resetSeconds;
+        exposure.duration = resetSeconds;
+        exposure.stacks = exposureStack;
+      } else {
+        ctx.applyAura(blocker, {
+          id: VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
+          name: 'Crucible Exposure',
+          kind: 'vulnerability',
+          remaining: resetSeconds,
+          duration: resetSeconds,
+          value: 0,
+          stacks: exposureStack,
+          sourceId: boss.id,
+          school: 'fire',
+          encounterOwned: true,
+        });
+      }
+      dealFractionalDamage(
+        ctx,
+        boss,
+        blocker,
+        varkhulForgeBeamBlockDamageMaxHp(st.assemblyRuneDifficulty, exposureStack),
+        VARKHUL_FORGE_BEAM_ABILITY_ID,
+      );
+    }
+  }
+  st.assemblyForgeOverheat = varkhulForgeBeamOverheatAfterTick(
+    st.assemblyForgeOverheat,
+    st.assemblyRuneDifficulty,
+    activeBeamCount,
+    blockedCount,
+    DT,
+  );
+  if (st.assemblyForgeOverheat >= 0.75 && (st.forgeHeatWarningMask & 1) === 0) {
+    st.forgeHeatWarningMask |= 1;
+    emitVarkhulCallout(ctx, boss, 'heat75');
+  }
+  if (st.assemblyForgeOverheat >= 0.9 && (st.forgeHeatWarningMask & 2) === 0) {
+    st.forgeHeatWarningMask |= 2;
+    emitVarkhulCallout(ctx, boss, 'heat90');
+  }
+  if (st.assemblyForgeOverheat < 1) return false;
+  triggerForgeMeltdown(ctx, boss, st, players, forge);
+  return true;
+}
 function updateMastersAssembly(
   ctx: SimContext,
   boss: Entity,
@@ -1605,9 +1820,9 @@ function updateMastersAssembly(
 ): boolean {
   if (!st.assemblyTriggered || st.assemblyPhase === 'done') return false;
   const forge = anvilWorldPosition(ctx, boss);
-  boss.pos = { ...forge };
-  boss.prevPos = { ...forge };
+  placeVarkhulAtAnvil(ctx, boss);
   if (st.assemblyPhase === 'stunned') {
+    updateAssemblyForgeBeams(ctx, boss, st, players, forge);
     st.assemblyStunRemaining = Math.max(0, st.assemblyStunRemaining - DT);
     boss.aiState = 'idle';
     boss.aggroTargetId = null;
@@ -1618,36 +1833,114 @@ function updateMastersAssembly(
     }
     return st.assemblyPhase !== 'done';
   }
-  if (st.assemblyPhase === 'links') {
-    updateAssemblyLinks(ctx, boss, st);
-    return true;
-  }
-  if (st.assemblyPhase === 'convergence') {
-    updateAssemblyConvergence(ctx, boss, st);
-    return true;
-  }
-  const adds = st.assemblyAddIds.map((id) => ctx.entities.get(id)).filter(Boolean) as Entity[];
-  const liveAdds = adds.filter((add) => !add.dead);
-  dropDeadAssemblyCores(ctx, st);
-  const sentinel = adds.find((add) => add.templateId === VARKHUL_EMBER_SENTINEL_ID);
-  if (sentinel?.dead && st.assemblyFixateTargetId !== null) {
-    const target = ctx.entities.get(st.assemblyFixateTargetId);
-    if (target) {
-      target.auras = target.auras.filter(
-        (aura) => aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID || aura.sourceId !== boss.id,
-      );
-    }
-    st.assemblyFixateTargetId = null;
-  }
-  if (liveAdds.length === 0) st.assemblyPhase = 'cores';
-  if (st.assemblyPhase === 'cores' && updateAssemblyCores(ctx, boss, st, players)) return true;
+  st.forgeBeamWindow = 'intermission';
+  st.forgeBeamWindowRemaining = st.assemblyRemaining;
+  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
+  if (updateAssemblyForgeBeams(ctx, boss, st, players, forge)) return true;
+  updateForgeAddSpawns(ctx, boss, st);
   st.assemblyRemaining = Math.max(0, st.assemblyRemaining - DT);
+  st.forgeBeamWindowRemaining = st.assemblyRemaining;
+  const allWavesQueued = st.assemblyNextWaveIndex >= st.assemblyIntermissionWaves;
+  const allAddsSpawned = allWavesQueued && st.assemblyPortalSpawns.length === 0;
+  const liveAdds = st.assemblyAddIds.some((id) => {
+    const add = ctx.entities.get(id);
+    return add !== undefined && !add.dead;
+  });
+  if (allAddsSpawned && !liveAdds) {
+    emitVarkhulCallout(ctx, boss, 'addsDefeated');
+    shatterAssemblyForge(ctx, boss, st);
+    return true;
+  }
   if (st.assemblyRemaining <= CAST_COMPLETE_EPS && !st.assemblyWipeResolved) {
     st.assemblyWipeResolved = true;
-    wipeEncounter(ctx, boss, players, VARKHUL_MASTERS_ASSEMBLY_CAST_ID);
+    triggerForgeMeltdown(ctx, boss, st, players, forge);
   }
-  boss.aiState = 'attack';
+  boss.aiState = 'idle';
   return true;
+}
+
+function startForgeBeamWindow(
+  st: VarkhulEncounterState,
+  window: VarkhulEncounterState['forgeBeamWindow'],
+  seconds: number,
+): void {
+  st.forgeBeamWindow = window;
+  st.forgeBeamWindowRemaining = seconds;
+  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask(window);
+  st.assemblyForgeBeamBlockerIds.fill(null);
+  st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
+  st.assemblyForgeBeamWarmupRemaining =
+    st.assemblyForgeBeamActiveMask === 0 ? 0 : VARKHUL_FORGE_BEAM_WARMUP_SECONDS;
+}
+
+function advanceForgeBeamWindow(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  switch (st.forgeBeamWindow) {
+    case 'teaching_left':
+      startForgeBeamWindow(st, 'teaching_gap', VARKHUL_FORGE_TEACHING_GAP_SECONDS);
+      break;
+    case 'teaching_gap':
+      startForgeBeamWindow(st, 'teaching_right', VARKHUL_FORGE_TEACHING_BEAM_SECONDS);
+      emitVarkhulCallout(ctx, boss, 'rightPillarCharging');
+      break;
+    case 'teaching_right':
+      startForgeBeamWindow(st, 'idle', 0);
+      break;
+    case 'final_left':
+      startForgeBeamWindow(st, 'final_gap_left', VARKHUL_FORGE_FINAL_GAP_SECONDS);
+      break;
+    case 'final_gap_left':
+      startForgeBeamWindow(st, 'final_right', VARKHUL_FORGE_FINAL_BEAM_SECONDS);
+      emitVarkhulCallout(ctx, boss, 'rightPillarCharging');
+      break;
+    case 'final_right':
+      startForgeBeamWindow(st, 'final_gap_right', VARKHUL_FORGE_FINAL_GAP_SECONDS);
+      break;
+    case 'final_gap_right':
+      startForgeBeamWindow(st, 'final_left', VARKHUL_FORGE_FINAL_BEAM_SECONDS);
+      emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
+      break;
+    default:
+      break;
+  }
+}
+
+function updateForgeBeamWindows(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): boolean {
+  st.assemblyRuneDifficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  const hpPct = boss.maxHp > 0 ? boss.hp / boss.maxHp : 0;
+  if (
+    !st.forgeBeamTeachingTriggered &&
+    hpPct <= VARKHUL_FORGE_TEACHING_HP_THRESHOLD &&
+    hpPct > VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD &&
+    st.majorAbility === 'none'
+  ) {
+    st.forgeBeamTeachingTriggered = true;
+    startForgeBeamWindow(st, 'teaching_left', VARKHUL_FORGE_TEACHING_BEAM_SECONDS);
+    emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
+  }
+  if (
+    !st.forgeBeamFinalTriggered &&
+    hpPct <= VARKHUL_FORGE_FINAL_HP_THRESHOLD &&
+    st.majorAbility === 'none'
+  ) {
+    st.forgeBeamFinalTriggered = true;
+    startForgeBeamWindow(st, 'final_left', VARKHUL_FORGE_FINAL_BEAM_SECONDS);
+    emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
+  }
+
+  const forge = anvilWorldPosition(ctx, boss);
+  const wasWarming = st.assemblyForgeBeamWarmupRemaining > CAST_COMPLETE_EPS;
+  if (updateAssemblyForgeBeams(ctx, boss, st, players, forge)) return true;
+  if (st.forgeBeamWindow === 'idle') return false;
+  if (!wasWarming) {
+    st.forgeBeamWindowRemaining = Math.max(0, st.forgeBeamWindowRemaining - DT);
+  }
+  if (st.forgeBeamWindowRemaining <= CAST_COMPLETE_EPS) advanceForgeBeamWindow(ctx, boss, st);
+  return st.forgeBeamWindow.startsWith('teaching_');
 }
 
 export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): boolean {
@@ -1655,8 +1948,9 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
   for (const entity of ctx.entities.values()) {
     if (
       entity.templateId === VARKHUL_BOSS_TEMPLATE_ID &&
-      entity.varkhul?.assemblyPhase === 'adds' &&
-      entity.varkhul.assemblyAddIds.includes(add.id)
+      (entity.varkhul?.assemblyAddIds.includes(add.id) ||
+        (entity.varkhul?.assemblyPhase === 'links' &&
+          entity.varkhul.assemblyLinkAddIds.includes(add.id)))
     ) {
       boss = entity;
       break;
@@ -1664,50 +1958,8 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
   }
   if (!boss?.varkhul) return false;
   add.inCombat = true;
-  if (add.templateId === VARKHUL_CINDER_ARTIFICER_ID) {
-    add.castingAbility = VARKHUL_ASSEMBLY_REPAIR_CAST_ID;
-    add.castTotal = 0;
-    add.castRemaining = 0;
-    add.castTargetId = boss.id;
-    add.castAim = { ...boss.pos };
-    add.channeling = false;
-    if (ctx.isStunned(add)) return true;
-    if (dist2d(add.pos, boss.pos) <= VARKHUL_ASSEMBLY_FORGE_DELIVERY_RADIUS) {
-      add.aiState = 'attack';
-      if (!boss.varkhul.assemblyArtificerRepaired) {
-        boss.varkhul.assemblyArtificerRepaired = true;
-        ctx.applyHeal(
-          add,
-          boss,
-          Math.ceil(boss.maxHp * VARKHUL_ASSEMBLY_REPAIR_HEAL_MAX_HP),
-          VARKHUL_ASSEMBLY_REPAIR_CAST_ID,
-          undefined,
-          false,
-        );
-        ctx.emit({
-          type: 'spellfx',
-          sourceId: add.id,
-          targetId: boss.id,
-          school: 'fire',
-          fx: 'projectile',
-        });
-      }
-      return true;
-    }
-    add.aiState = 'chase';
-    if (!ctx.isRooted(add)) {
-      ctx.moveToward(add, boss.pos, add.moveSpeed * ctx.moveSpeedMult(add));
-    }
-    add.facing = steadyAngleTo(add.pos, boss.pos, add.facing);
-    return true;
-  }
-  if (add.templateId === VARKHUL_EMBER_SENTINEL_ID) {
-    const fixateTarget = assignAssemblyFixate(ctx, boss, boss.varkhul, add);
-    if (!fixateTarget) return true;
-    add.forcedTargetId = fixateTarget.id;
-    add.forcedTargetTimer = Math.max(add.forcedTargetTimer, DT * 2);
-    add.aggroTargetId = fixateTarget.id;
-  }
+  // Sentinels use the ordinary threat driver in the new add intermission. They
+  // inherit a tank target at spawn, then taunts and threat work normally.
   if (add.templateId === VARKHUL_CRUCIBLE_WARDEN_ID) {
     const bigCast = MOBS[add.templateId]?.bigCast;
     if (!bigCast) return false;
@@ -1825,6 +2077,8 @@ export function resetVarkhulEncounter(ctx: SimContext, boss: Entity): void {
   boss.damageImmune = false;
   boss.damageFloorHp = Math.ceil(boss.maxHp * VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD);
   boss.knockbackResistance = 0;
+  boss.facing = VARKHUL_WORK_FACING;
+  boss.prevFacing = VARKHUL_WORK_FACING;
   boss.auras = boss.auras.filter(
     (aura) =>
       aura.id !== VARKHUL_MASTERS_ASSEMBLY_AURA_ID &&
@@ -1857,6 +2111,10 @@ function updateMajorAbility(
     updateAnvilsDecree(ctx, boss, st, players, speed);
     return true;
   }
+  if (st.majorAbility === 'interceptBeam') {
+    updateInterceptBeam(ctx, boss, st, players, speed);
+    return true;
+  }
   return false;
 }
 
@@ -1871,6 +2129,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   const st = initVarkhulEncounter(boss);
+  if (updateForgeMeltdown(ctx, boss, st, players)) return;
   updateCinderFires(ctx, boss, st, players);
   updateCinderOrbProjectiles(ctx, boss, st, players);
   updateAnvilMeteors(ctx, boss, st, players);
@@ -1885,6 +2144,9 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     startMastersAssembly(ctx, boss, st);
   }
   if (updateMastersAssembly(ctx, boss, st, players)) return;
+
+  const forgeBeamWindowActive = updateForgeBeamWindows(ctx, boss, st, players);
+  if (st.assemblyForgeMeltdownRemaining > CAST_COMPLETE_EPS) return;
 
   if (
     !st.masterpieceTriggered &&
@@ -1908,16 +2170,39 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
 
   if (updateMajorAbility(ctx, boss, st, players, speed)) return;
 
+  if (forgeBeamWindowActive) {
+    boss.swingTimer = Math.max(0, boss.swingTimer - DT);
+    tryMobMeleeSwingInRange(ctx, boss, target);
+    if (pursueTarget) {
+      const profile = mobCombatProfile(boss);
+      if (dist2d(boss.pos, target.pos) > profile.desiredRange && !ctx.isRooted(boss)) {
+        ctx.moveToward(
+          boss,
+          target.pos,
+          boss.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(boss),
+        );
+      }
+      boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
+      tryMobMeleeSwingInRange(ctx, boss, target);
+    }
+    return;
+  }
+
   st.cinderOrbsTimer -= DT * speed;
   st.frontalTimer -= DT * speed;
   st.forgestormTimer -= DT * speed;
   st.anvilTimer -= DT * speed;
+  st.interceptBeamTimer -= DT * speed;
   if (st.frontalTimer <= CAST_COMPLETE_EPS) {
     startFrontal(ctx, boss, st, players);
     return;
   }
   if (st.cinderOrbsTimer <= CAST_COMPLETE_EPS) {
     startCinderOrbs(ctx, boss, st, players);
+    return;
+  }
+  if (st.interceptBeamTimer <= CAST_COMPLETE_EPS) {
+    startInterceptBeam(ctx, boss, st, players);
     return;
   }
   if (st.forgestormTimer <= CAST_COMPLETE_EPS) {

@@ -3,15 +3,7 @@ import { IGNIVAR_RAID_ARENA_ID, IGNIVAR_SECOND_WING_ID } from './ignivar_raid_id
 import { enterDungeon, instanceAt } from './instances/dungeons';
 import { resetRaidDevBot, reviveRaidDevBotInPlace } from './raid_dev_bot';
 import type { SimContext } from './sim_context';
-import type { DungeonDifficulty, Entity, VarkhulEncounterState, Vec3 } from './types';
-import {
-  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
-  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
-  varkhulAssemblyBestRuneControl,
-  varkhulAssemblyRuneStartAngle,
-  varkhulAssemblyRuneStation,
-  varkhulAssemblyRuneTargetAngle,
-} from './varkhul_assembly';
+import type { DungeonDifficulty } from './types';
 
 const VARKHUL_DEV_FORMATION = [
   { x: -24, z: -20 },
@@ -26,70 +18,8 @@ const VARKHUL_DEV_FORMATION = [
 ] as const;
 
 export type VarkhulDevRaidResult =
-  | { ok: true; allies: number; reused: boolean }
+  | { ok: true; allies: number; reused: boolean; difficulty: DungeonDifficulty }
   | { ok: false; message: string };
-
-function movePracticeBot(ctx: SimContext, bot: Entity, point: Vec3): void {
-  bot.pos = { ...point };
-  bot.prevPos = { ...point };
-  bot.vx = 0;
-  bot.vy = 0;
-  bot.vz = 0;
-  bot.jumping = false;
-  bot.onGround = true;
-  bot.fallStartY = point.y;
-  ctx.rebucket(bot);
-}
-
-/** Lets sanctioned stationary bots demonstrate the physical controls while the human solves. */
-export function positionVarkhulLinkPracticeBots(
-  ctx: SimContext,
-  roomCenter: Vec3,
-  bossId: number,
-  state: Pick<
-    VarkhulEncounterState,
-    'assemblyRuneAssignments' | 'assemblyRuneAngles' | 'assemblyRuneRound'
-  >,
-): void {
-  for (const assignment of state.assemblyRuneAssignments) {
-    if (assignment.locked) continue;
-    const meta = ctx.players.get(assignment.playerId);
-    const bot = ctx.entities.get(assignment.playerId);
-    if (!meta?.isDevBot || !meta.devAnchored || bot?.kind !== 'player' || bot.dead) continue;
-    const station = varkhulAssemblyRuneStation(
-      roomCenter,
-      assignment.symbol,
-      state.assemblyRuneRound,
-    );
-    const targetAngle = varkhulAssemblyRuneTargetAngle(
-      bossId,
-      assignment.symbol,
-      state.assemblyRuneRound,
-    );
-    const control = varkhulAssemblyBestRuneControl(
-      state.assemblyRuneAngles[assignment.symbol] ??
-        varkhulAssemblyRuneStartAngle(bossId, assignment.symbol, state.assemblyRuneRound),
-      targetAngle,
-    );
-    if (control === 'counterclockwise') {
-      movePracticeBot(ctx, bot, ctx.groundPos(station.x, station.z));
-      continue;
-    }
-    const outwardAngle = Math.atan2(station.x - roomCenter.x, station.z - roomCenter.z);
-    const outerRadius =
-      (VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS +
-        VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS) /
-      2;
-    movePracticeBot(
-      ctx,
-      bot,
-      ctx.groundPos(
-        station.x + Math.sin(outwardAngle) * outerRadius,
-        station.z + Math.cos(outwardAngle) * outerRadius,
-      ),
-    );
-  }
-}
 
 function allRaidMembersInInnerCrucible(
   ctx: SimContext,
@@ -137,7 +67,7 @@ export function stageVarkhulDevRaid(ctx: SimContext, pid: number): VarkhulDevRai
     }
     instance.enteredBy.add(botPids[index]);
   }
-  return { ok: true, allies: botPids.length, reused: true };
+  return { ok: true, allies: botPids.length, reused: true, difficulty: instance.difficulty };
 }
 
 /** Creates or reuses the sanctioned practice roster, then enters Varkhul's room. */

@@ -44,6 +44,7 @@ import {
   VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
   VARKHUL_ASSEMBLY_LINK_AURA_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
+  VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MAKERS_BRAND_DURATION,
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
@@ -128,6 +129,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       key: `${KEY}.varkhulForgeLink`,
       nums: {},
     };
+  }
+  if (a.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID) {
+    return { key: `${KEY}.varkhulCrucibleExposure`, nums: {} };
   }
   if (a.id === 'shaman_mending_current') {
     return a.poolPct !== undefined

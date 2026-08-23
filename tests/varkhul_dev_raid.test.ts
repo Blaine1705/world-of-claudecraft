@@ -1,14 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { updateVarkhulEncounter, VARKHUL_FORGE_LOCAL_POS } from '../src/sim/encounters/varkhul';
-import { IGNIVAR_SECOND_WING_ID, VARKHUL_BOSS_ID } from '../src/sim/ignivar_raid_ids';
+import { updateVarkhulEncounter, VARKHUL_BOSS_ID } from '../src/sim/encounters/varkhul';
+import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { Sim } from '../src/sim/sim';
-import {
-  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS,
-  VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS,
-  varkhulAssemblyRuneStation,
-  varkhulAssemblyRuneTargetAngle,
-} from '../src/sim/varkhul_assembly';
-import { positionVarkhulLinkPracticeBots } from '../src/sim/varkhul_dev_raid';
+import type { Entity } from '../src/sim/types';
+import { varkhulForgeBeamAssignments } from '../src/sim/varkhul_forge_beams';
+import { VARKHUL_FORGE_LOCAL_POS } from '../src/sim/varkhul_forge_intermission';
 
 function devSim(devCommands = true): Sim {
   const sim = new Sim({ seed: 6112, playerClass: 'warrior', autoEquip: true, devCommands });
@@ -56,6 +52,55 @@ describe('/dev varkhulraid', () => {
     const zs = bots.map((meta) => sim.entities.get(meta.entityId)?.pos.z ?? 0);
     expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThanOrEqual(48);
     expect(Math.max(...zs) - Math.min(...zs)).toBeGreaterThanOrEqual(46);
+    const instance = sim.instances.find(
+      (candidate) =>
+        candidate.dungeonId === IGNIVAR_SECOND_WING_ID &&
+        candidate.partyKey === sim.ctx.instanceKeyFor(sim.player.id),
+    );
+    if (!instance) throw new Error('Inner Crucible practice instance disappeared');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const botRows = bots.map((meta) => {
+      const bot = sim.entities.get(meta.entityId);
+      if (!bot) throw new Error(`Missing Varkhul practice bot ${meta.name}`);
+      return { id: bot.id, x: bot.pos.x, z: bot.pos.z, dead: bot.dead };
+    });
+    expect(
+      varkhulForgeBeamAssignments(
+        { x: origin.x + VARKHUL_FORGE_LOCAL_POS.x, z: origin.z + VARKHUL_FORGE_LOCAL_POS.z },
+        botRows,
+      ).map((beam) => beam.blockerId),
+    ).toEqual([null, null]);
+
+    const boss = instance.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((entity) => entity?.templateId === VARKHUL_BOSS_ID);
+    if (!boss) throw new Error('Varkhul practice boss disappeared');
+    const positionsBeforeIntermission = bots.map((meta) => {
+      const bot = sim.entities.get(meta.entityId);
+      if (!bot) throw new Error(`Missing Varkhul practice bot ${meta.name}`);
+      return { id: meta.entityId, pos: { ...bot.pos } };
+    });
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = sim.player.id;
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    updateVarkhulEncounter(sim.ctx, boss);
+    if (!boss.varkhul) throw new Error('Varkhul practice intermission did not start');
+    boss.varkhul.assemblyForgeBeamWarmupRemaining = 0;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul.assemblyForgeBeamBlockerIds).toEqual([null, null]);
+    expect(
+      positionsBeforeIntermission.map(({ id }) => {
+        const bot = sim.entities.get(id);
+        if (!bot) throw new Error(`Missing Varkhul practice bot ${id}`);
+        return { id, pos: { ...bot.pos } };
+      }),
+    ).toEqual(positionsBeforeIntermission);
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
+      runes: [],
+      assignments: [],
+      cores: [],
+    });
   });
 
   it('can create the practice raid directly on Heroic and reuses it on reset', () => {
@@ -134,97 +179,26 @@ describe('/dev varkhulraid', () => {
     ).toBe('normal');
   });
 
-  it('moves anchored bots between their assigned inner and outer rune controls', () => {
+  it('switches an existing Normal practice room to Heroic when the command requests it', () => {
     const sim = devSim();
-    sim.chat('/dev varkhulraid normal');
-    const boss = [...sim.entities.values()].find((entity) => entity.templateId === VARKHUL_BOSS_ID);
-    const bots = raidBots(sim)
-      .slice(0, 2)
-      .map((meta) => sim.entities.get(meta.entityId));
-    const [clockwiseBot, counterclockwiseBot] = bots;
-    if (!boss || !clockwiseBot || !counterclockwiseBot) {
-      throw new Error('Varkhul practice room is incomplete');
-    }
-    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
-    if (!instance) throw new Error('Inner Crucible instance disappeared');
-    const origin = sim.ctx.instanceOriginOf(instance);
-    const roomCenter = sim.ctx.groundPos(origin.x, origin.z);
-    const clockwiseTarget = varkhulAssemblyRuneTargetAngle(boss.id, 0, 0);
-    const counterclockwiseTarget = varkhulAssemblyRuneTargetAngle(boss.id, 4, 0);
-    const state = {
-      assemblyRuneAssignments: [
-        { playerId: clockwiseBot.id, symbol: 0, locked: false },
-        { playerId: counterclockwiseBot.id, symbol: 4, locked: false },
-      ],
-      assemblyRuneAngles: [clockwiseTarget - 1, 0, 0, 0, counterclockwiseTarget + 1, 0, 0, 0, 0, 0],
-      assemblyRuneRound: 0,
+    const difficultyAt = (entity: Entity) => {
+      const claimId = sim.ctx.instanceClaimIdAt(entity.pos);
+      return sim.instances.find((instance) => instance.exitId === claimId)?.difficulty;
     };
+    sim.chat('/dev varkhulraid normal');
+    expect(difficultyAt(sim.player)).toBe('normal');
 
-    positionVarkhulLinkPracticeBots(sim.ctx, roomCenter, boss.id, state);
-    const clockwiseStation = varkhulAssemblyRuneStation(roomCenter, 0, 0);
-    const counterclockwiseStation = varkhulAssemblyRuneStation(roomCenter, 4, 0);
-    const outerDistance = Math.hypot(
-      clockwiseBot.pos.x - clockwiseStation.x,
-      clockwiseBot.pos.z - clockwiseStation.z,
-    );
-    expect(outerDistance).toBeGreaterThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS);
-    expect(outerDistance).toBeLessThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS);
-    expect(counterclockwiseBot.pos).toMatchObject(counterclockwiseStation);
+    sim.chat('/dev varkhulraid heroic');
 
-    state.assemblyRuneAngles[0] = clockwiseTarget + 1;
-    state.assemblyRuneAngles[4] = counterclockwiseTarget - 1;
-    positionVarkhulLinkPracticeBots(sim.ctx, roomCenter, boss.id, state);
-    expect(clockwiseBot.pos).toMatchObject(clockwiseStation);
-    const secondOuterDistance = Math.hypot(
-      counterclockwiseBot.pos.x - counterclockwiseStation.x,
-      counterclockwiseBot.pos.z - counterclockwiseStation.z,
-    );
-    expect(secondOuterDistance).toBeGreaterThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_INNER_RADIUS);
-    expect(secondOuterDistance).toBeLessThan(VARKHUL_ASSEMBLY_RUNE_OUTER_CONTROL_OUTER_RADIUS);
-
-    boss.pos = sim.ctx.groundPos(
-      origin.x + VARKHUL_FORGE_LOCAL_POS.x,
-      origin.z + VARKHUL_FORGE_LOCAL_POS.z,
-    );
-    boss.prevPos = { ...boss.pos };
-    clockwiseBot.pos = { ...boss.pos };
-    counterclockwiseBot.pos = { ...boss.pos };
-    updateVarkhulEncounter(sim.ctx, boss);
-    if (!boss.varkhul) throw new Error('Varkhul state did not initialize');
-    boss.varkhul.makersBrandTimer = 999;
-    boss.varkhul.frontalTimer = 999;
-    boss.varkhul.cinderOrbsTimer = 999;
-    boss.varkhul.forgestormTimer = 999;
-    boss.varkhul.anvilTimer = 999;
-    boss.varkhul.assemblyTriggered = true;
-    boss.varkhul.assemblyPhase = 'links';
-    boss.varkhul.assemblyRemaining = 45;
-    boss.varkhul.assemblyWipeResolved = false;
-    boss.varkhul.assemblyRuneAssignments = state.assemblyRuneAssignments;
-    boss.varkhul.assemblyRuneAngles = [
-      clockwiseTarget - 0.01,
-      0,
-      0,
-      0,
-      counterclockwiseTarget + 0.01,
-      0,
-      0,
-      0,
-      0,
-      0,
-    ];
-    boss.varkhul.assemblyRuneControls = Array.from({ length: 10 }, () => 'off');
-    boss.varkhul.assemblyLinkFireballTimer = 999;
-    boss.varkhul.assemblyRuneRound = 0;
-    boss.varkhul.assemblyRuneRounds = 1;
-    boss.varkhul.assemblyRuneRemaining = 25;
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(clockwiseBot.pos).not.toMatchObject(clockwiseStation);
-    expect(counterclockwiseBot.pos).toMatchObject(counterclockwiseStation);
-    expect(boss.varkhul.assemblyRuneAssignments).toEqual([
-      { playerId: clockwiseBot.id, symbol: 0, locked: true },
-      { playerId: counterclockwiseBot.id, symbol: 4, locked: true },
-    ]);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_SECOND_WING_ID);
+    expect(difficultyAt(sim.player)).toBe('heroic');
+    const party = sim.partyOf(sim.player.id);
+    if (!party) throw new Error('Varkhul practice raid disappeared during difficulty switch');
+    for (const memberId of party.members) {
+      const member = sim.entities.get(memberId);
+      if (!member) throw new Error(`Varkhul practice member ${memberId} disappeared`);
+      expect(difficultyAt(member)).toBe('heroic');
+    }
   });
 
   it('is inert when development commands are disabled', () => {

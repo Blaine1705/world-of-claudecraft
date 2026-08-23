@@ -2288,12 +2288,25 @@ export const ko_KR: EnTranslations = {
       "leather": "가죽",
       "mail": "사슬"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "왼쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
+      "rightPillarCharging": "오른쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
+      "bothPillarsCharging": "용광로 기둥들이 충전 중입니다. 3초 후 점화됩니다!",
+      "leftPillar": "왼쪽 용광로 기둥이 점화됩니다!",
+      "rightPillar": "오른쪽 용광로 기둥이 점화됩니다!",
+      "bothPillars": "용광로 기둥들이 점화됩니다!",
+      "portalsOpening": "용광로 차원문이 열리고 있습니다!",
+      "heat75": "용광로 열기가 75%에 도달했습니다!",
+      "heat90": "용광로 용융이 임박했습니다!",
+      "addsDefeated": "용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!"
+    },
     "auraEffect": {
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
       "varkhulSentinelsGaze": "잔불 감시자가 당신을 추격합니다. 처치할 때까지 공격대에서 멀리 떨어뜨리세요.",
       "varkhulMoltenCore": "이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.",
-      "varkhulForgeLink": "방 가장자리에서 자신의 문양과 일치하는 룬을 찾으세요. 안쪽 원에 들어가면 왼쪽으로, 바깥쪽 고리에 들어가면 오른쪽으로 회전합니다. 영역에서 나오면 멈추고, 문양이 소켓에 닿으면 자동으로 고정됩니다.",
+      "varkhulForgeLink": "활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.",
+      "varkhulCrucibleExposure": "도가니 광선을 막으면 매초 최대 생명력 기반 피해가 증가합니다. 광선을 벗어난 뒤 일반에서는 10초, 영웅에서는 60초 후 중첩이 초기화됩니다.",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",

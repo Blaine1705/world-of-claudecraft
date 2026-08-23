@@ -21,7 +21,7 @@ describe('Varkhul Cinder Orbs projection', () => {
   it('pins three spread marks, permanent fire, and six traveling orbs per target', () => {
     expect(VARKHUL_CINDER_ORBS_TARGETS).toBe(3);
     expect(VARKHUL_CINDER_ORBS_MARK_SECONDS).toBe(4);
-    expect(VARKHUL_CINDER_FIRE_RADIUS).toBe(2.4);
+    expect(VARKHUL_CINDER_FIRE_RADIUS).toBe(3.5);
     expect(VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP).toBe(0.04);
     expect(VARKHUL_CINDER_FIRE_MAX_FIELDS).toBe(60);
     expect(VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET).toBe(6);
@@ -62,7 +62,7 @@ describe('Varkhul Cinder Orbs projection', () => {
         sourceId: 91,
         x: 8,
         z: 9,
-        radius: 2.4,
+        radius: 3.5,
       },
     ]);
     expect(activeVarkhulCinderOrbProjectiles(91, state)).toEqual([

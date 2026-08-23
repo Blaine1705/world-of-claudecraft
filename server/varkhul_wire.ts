@@ -74,9 +74,16 @@ export function varkhulEncounterWireJson(
       );
       const runes = assembly.runes.map(
         (rune) =>
-          `{"sym":${rune.symbol},"x":${round2(rune.x)},"z":${round2(rune.z)},"r":${round2(rune.radius)},"ta":${round2(rune.targetAngle)},"ga":${round2(rune.glyphAngle)},"c":${rune.control === 'counterclockwise' ? 1 : rune.control === 'clockwise' ? 2 : 0},"al":${rune.aligned ? 1 : 0},"lock":${rune.locked ? 1 : 0}}`,
+          `{"sym":${rune.symbol},"x":${round2(rune.x)},"z":${round2(rune.z)},"r":${round2(rune.radius)},"ti":${rune.trackIndex},"tr":${round2(rune.trackRadius)},"oa":${round2(rune.ownerAngle)},"ta":${round2(rune.targetAngle)},"ga":${round2(rune.glyphAngle)},"c":${rune.control === 'counterclockwise' ? 1 : rune.control === 'clockwise' ? 2 : 0},"cp":${round2(rune.controlProgress)},"ap":${round2(rune.alignmentProgress)},"al":${rune.aligned ? 1 : 0},"lock":${rune.locked ? 1 : 0},"or":${rune.orphaned ? 1 : 0}}`,
       );
-      return `{"bossId":${assembly.bossId},"phase":${JSON.stringify(assembly.phase)},"fx":${round2(assembly.forgeX)},"fz":${round2(assembly.forgeZ)},"hp":${round2(assembly.forgeHp)},"mhp":${round2(assembly.forgeMaxHp)},"win":${round2(assembly.deliveryWindowRemaining)},"round":${assembly.round},"rounds":${assembly.rounds},"rem":${round2(assembly.remaining)},"cores":[${cores.join(',')}],"assign":[${assignments.join(',')}],"runes":[${runes.join(',')}]}`;
+      const beams = assembly.forgeBeams.map(
+        (beam) =>
+          `{"i":${beam.index},"cx":${round2(beam.columnX)},"cz":${round2(beam.columnZ)},"ix":${round2(beam.impactX)},"iz":${round2(beam.impactZ)},"a":${beam.active ? 1 : 0},"bid":${beam.blockerId ?? 'null'}}`,
+      );
+      const interceptBeam = assembly.interceptBeam
+        ? `{"sid":${assembly.interceptBeam.sourceId},"tid":${assembly.interceptBeam.targetId},"bid":${assembly.interceptBeam.blockerId ?? 'null'},"sx":${round2(assembly.interceptBeam.sourceX)},"sz":${round2(assembly.interceptBeam.sourceZ)},"tx":${round2(assembly.interceptBeam.targetX)},"tz":${round2(assembly.interceptBeam.targetZ)},"bx":${assembly.interceptBeam.blockerX === null ? 'null' : round2(assembly.interceptBeam.blockerX)},"bz":${assembly.interceptBeam.blockerZ === null ? 'null' : round2(assembly.interceptBeam.blockerZ)},"w":${round2(assembly.interceptBeam.width)},"dur":${round2(assembly.interceptBeam.duration)},"rem":${round2(assembly.interceptBeam.remaining)}}`
+        : 'null';
+      return `{"bossId":${assembly.bossId},"hc":${assembly.difficulty === 'heroic' ? 1 : 0},"phase":${JSON.stringify(assembly.phase)},"fx":${round2(assembly.forgeX)},"fz":${round2(assembly.forgeZ)},"hp":${round2(assembly.forgeHp)},"mhp":${round2(assembly.forgeMaxHp)},"oh":${round2(assembly.forgeOverheat)},"bm":${assembly.forgeBeamActiveMask},"bw":${round2(assembly.forgeBeamWarmupRemaining)},"mr":${round2(assembly.forgeMeltdownRemaining)},"win":${round2(assembly.deliveryWindowRemaining)},"round":${assembly.round},"rounds":${assembly.rounds},"rem":${round2(assembly.remaining)},"ib":${interceptBeam},"beams":[${beams.join(',')}],"cores":[${cores.join(',')}],"assign":[${assignments.join(',')}],"runes":[${runes.join(',')}]}`;
     });
   const forgestormJson =
     forgestorm.length > 0 ? `,"varkhulForgestorm":[${forgestorm.join(',')}]` : '';

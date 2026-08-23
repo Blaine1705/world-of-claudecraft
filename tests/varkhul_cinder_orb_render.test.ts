@@ -16,7 +16,7 @@ const FIRE: ActiveVarkhulCinderFire = {
   sourceId: 42,
   x: 7,
   z: -5,
-  radius: 2.4,
+  radius: 3.5,
 };
 
 const ORB: ActiveVarkhulCinderOrbProjectile = {
@@ -37,7 +37,7 @@ describe('Varkhul Cinder Orbs POWERFUL VFX', () => {
     expect(group.userData).toMatchObject({
       actionable: true,
       fireId: FIRE.id,
-      radius: 2.4,
+      radius: 3.5,
       permanent: true,
     });
     expect(group.position.toArray()).toEqual([7, 2.09, -5]);

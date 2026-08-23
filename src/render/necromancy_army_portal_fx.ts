@@ -13,6 +13,7 @@ export interface NecromancyArmyPortalSpawn {
   z: number;
   facing: number;
   duration?: number;
+  palette?: 'necromancy' | 'forge';
 }
 
 interface PortalVisual {
@@ -63,7 +64,7 @@ export class NecromancyArmyPortalFx {
   private quality = 1;
 
   constructor(
-    private readonly scene: THREE.Scene,
+    private readonly scene: THREE.Object3D,
     private readonly groundY: (x: number, z: number) => number,
   ) {}
 
@@ -152,6 +153,20 @@ export class NecromancyArmyPortalFx {
       streams.points.material,
       ...shadows.materials,
     ];
+    if (opts.palette === 'forge') {
+      membraneMaterial.color.setHex(0x210400);
+      outerRingMaterial.color.setHex(0xff4b0b);
+      innerRingMaterial.color.setHex(0xffd46a);
+      runes.lines.material.color.setHex(0xffe4a3);
+      chains.lines.material.color.setHex(0xa82d0d);
+      floorSeal.mesh.material.color.setHex(0xff6518);
+      streams.points.material.color.setHex(0xff9a35);
+      for (const material of shadows.materials) {
+        (material as THREE.MeshBasicMaterial).color.setHex(0x5c1108);
+      }
+      group.name = 'varkhul-forge-legion-portal';
+      group.userData.palette = 'forge';
+    }
     const portal: PortalVisual = {
       group,
       membrane,
@@ -453,4 +468,26 @@ export class NecromancyArmyPortalFx {
     for (const material of portal.materials) material.dispose();
     for (const geometry of portal.geometries) geometry.dispose();
   }
+}
+
+export interface VarkhulForgePortalPrewarmVisual {
+  root: THREE.Group;
+  dispose(): void;
+}
+
+/** Four simultaneous forge portals are the encounter's cold-start worst case. */
+export function buildVarkhulForgePortalPrewarmVisual(): VarkhulForgePortalPrewarmVisual {
+  const root = new THREE.Group();
+  root.name = 'varkhul-forge-portal-prewarm';
+  const fx = new NecromancyArmyPortalFx(root, () => 0);
+  for (const [x, z, facing] of [
+    [-8, -4, 0.2],
+    [-3, 4, 0.7],
+    [3, 4, -0.7],
+    [8, -4, -0.2],
+  ] as const) {
+    fx.spawn({ x, z, facing, duration: 3, palette: 'forge' });
+  }
+  root.userData.portalCount = MAX_PORTALS;
+  return { root, dispose: () => fx.dispose() };
 }

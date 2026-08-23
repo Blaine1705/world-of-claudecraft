@@ -780,7 +780,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Varkhul raid ${result.reused ? 'reset' : 'ready'}: ${result.allies} stationary, invulnerable allies spread around the Inner Crucible. Use /dev varkhulraid normal or /dev varkhulraid heroic to rebuild the room at that difficulty.`,
+        `[dev] Varkhul raid ${result.reused ? 'reset' : 'ready'} (${result.difficulty === 'heroic' ? 'Heroic' : 'Normal'}): ${result.allies} stationary, invulnerable allies spread around the Inner Crucible. Use /dev varkhulraid normal or /dev varkhulraid heroic to rebuild the room at that difficulty.`,
       );
     }
     return null;

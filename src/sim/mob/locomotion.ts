@@ -90,6 +90,7 @@ import {
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
+import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
@@ -437,8 +438,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         mob.wanderTimer = 3;
         mob.pos = { ...mob.spawnPos };
         mob.prevPos = { ...mob.pos };
-        mob.facing = Math.PI;
-        mob.prevFacing = Math.PI;
+        const homeFacing = isVarkhul ? VARKHUL_WORK_FACING : Math.PI;
+        mob.facing = homeFacing;
+        mob.prevFacing = homeFacing;
         const template = MOBS[mob.templateId];
         let detected: Entity | null = null;
         let detectedD = Infinity;

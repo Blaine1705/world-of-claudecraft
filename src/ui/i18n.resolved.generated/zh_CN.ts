@@ -2288,12 +2288,25 @@ export const zh_CN: EnTranslations = {
       "leather": "皮甲",
       "mail": "锁甲"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "左侧锻炉立柱正在充能，3秒后点燃！",
+      "rightPillarCharging": "右侧锻炉立柱正在充能，3秒后点燃！",
+      "bothPillarsCharging": "锻炉立柱正在充能，3秒后点燃！",
+      "leftPillar": "左侧锻炉立柱点燃了！",
+      "rightPillar": "右侧锻炉立柱点燃了！",
+      "bothPillars": "锻炉立柱点燃了！",
+      "portalsOpening": "锻炉传送门正在开启！",
+      "heat75": "锻炉热量达到75%！",
+      "heat90": "锻炉熔毁迫在眉睫！",
+      "addsDefeated": "锻炉军团已被击败，瓦库尔暴露了！"
+    },
     "auraEffect": {
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
       "varkhulSentinelsGaze": "余烬哨兵正在追击你。将它带离团队，直到它被消灭。",
       "varkhulMoltenCore": "将核心运到锻炉。熔融重压每 {interval} 秒造成不断提高的伤害，从最大生命值的 {min}% 增至 {max}%。",
-      "varkhulForgeLink": "在房间周围找到与你符号匹配的符文。站进内圈可向左旋转，站进外环可向右旋转。离开控制区即可停止；符号到达插槽时会自动锁定。",
+      "varkhulForgeLink": "在激活的立柱光束抵达锻炉前将其拦截。未拦截的光束每秒增加6%热量。普通难度下，已拦截的光束和关闭的立柱会让锻炉冷却；英雄难度下热量永不降低。达到100%时会触发致命的锻炉熔毁。",
+      "varkhulCrucibleExposure": "拦截坩埚光束时，每秒受到的最大生命值伤害都会提高。离开光束后，普通难度10秒、英雄难度60秒后重置层数。",
       "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
       "hot": "每 {interval} 秒恢复 {value} 点生命值",
       "mendingCurrent": "储存 {value} 点治疗量，随时间释放或由湍流愈合消耗",

@@ -7499,7 +7499,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.sharedPyre':
     '各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。',
   'hudChrome.auraEffect.varkhulForgeLink':
-    '部屋の外周で自分のシンボルと同じルーンを探す。内側の円に入ると左回転、外側のリングに入ると右回転する。外に出ると停止し、シンボルがソケットに届くと自動的に固定される。',
+    '作動中の柱の光線が鍛冶炉に届く前に遮断する。未遮断の光線は1秒ごとに熱を6%上昇させる。ノーマルでは遮断中と柱の停止中に冷却されるが、ヒロイックでは熱は下がらない。100%で致命的な鍛冶炉メルトダウンが発生する。',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'るつぼの光線を遮断すると、1秒ごとに最大体力基準のダメージが増加する。スタックはノーマルでは光線を離れて10秒後、ヒロイックでは60秒後にリセットされる。',
+  'hudChrome.varkhulCallout.leftPillarCharging': '左の鍛冶柱が充填中。3秒後に点火する！',
+  'hudChrome.varkhulCallout.rightPillarCharging': '右の鍛冶柱が充填中。3秒後に点火する！',
+  'hudChrome.varkhulCallout.bothPillarsCharging': '鍛冶柱が充填中。3秒後に点火する！',
+  'hudChrome.varkhulCallout.leftPillar': '左の鍛冶柱が点火した！',
+  'hudChrome.varkhulCallout.rightPillar': '右の鍛冶柱が点火した！',
+  'hudChrome.varkhulCallout.bothPillars': '鍛冶柱が点火した！',
+  'hudChrome.varkhulCallout.portalsOpening': '鍛冶炉のポータルが開き始めた！',
+  'hudChrome.varkhulCallout.heat75': '鍛冶炉の熱が75%に達した！',
+  'hudChrome.varkhulCallout.heat90': '鍛冶炉メルトダウンが迫っている！',
+  'hudChrome.varkhulCallout.addsDefeated': '鍛冶軍団を倒した。ヴァークルが無防備になった！',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',

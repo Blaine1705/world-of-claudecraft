@@ -1023,7 +1023,9 @@ const IGNIVAR_FORGE_APPROACH_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: 4, z: 32 },
 ];
 
-const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [{ mobId: VARKHUL_BOSS_ID, x: 0, z: 0 }];
+const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: VARKHUL_BOSS_ID, x: 0, z: 16, facing: 0 },
+];
 
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {

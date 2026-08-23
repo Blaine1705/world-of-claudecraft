@@ -6320,7 +6320,7 @@ describe('Varkhul Forgestorm snapshot parity', () => {
 });
 
 describe('Varkhul Cinder Orbs snapshot parity', () => {
-  it('rebuilds Heroic meteors and all ten room runes after reconnect', () => {
+  it('rebuilds Heroic meteors and all ten individual rune stations after reconnect', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
       t: 'snap',
@@ -6329,11 +6329,33 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
       varkhulAssemblies: [
         {
           bossId: 7,
+          hc: 1,
           phase: 'links',
           fx: 10,
           fz: 20,
           hp: 0,
           mhp: 100,
+          oh: 0.42,
+          bw: 2.25,
+          mr: 0,
+          beams: [
+            { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, bid: 1 },
+            { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, bid: null },
+          ],
+          ib: {
+            sid: 7,
+            tid: 1,
+            bid: 4,
+            sx: 2,
+            sz: 4,
+            tx: 14,
+            tz: 20,
+            bx: 8,
+            bz: 12,
+            w: 1.35,
+            dur: 3.5,
+            rem: 2.25,
+          },
           win: 0,
           round: 1,
           rounds: 2,
@@ -6345,9 +6367,14 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
             x: sym === 2 ? 14 : sym,
             z: sym === 2 ? 24 : -sym,
             r: 3.3,
+            ti: sym,
+            tr: 3,
+            oa: Math.PI / 10 + (sym * Math.PI) / 5,
             ta: sym === 2 ? 1.2 : 0,
             ga: sym === 2 ? 1.25 : 1,
             c: sym === 2 ? 2 : 0,
+            cp: sym === 2 ? 0.5 : 0,
+            ap: 0,
             al: 0,
             lock: 0,
           })),
@@ -6359,13 +6386,77 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
       expect.objectContaining({ id: 'meteor:1', radius: 3.5, remaining: 1.2 }),
     ]);
     expect(client.activeVarkhulAssemblies).toEqual([
-      expect.objectContaining({ bossId: 7, phase: 'links', round: 1, rounds: 2 }),
+      expect.objectContaining({
+        bossId: 7,
+        difficulty: 'heroic',
+        phase: 'links',
+        forgeOverheat: 0.42,
+        forgeBeamWarmupRemaining: 2.25,
+        round: 1,
+        rounds: 2,
+      }),
     ]);
     expect(client.activeVarkhulAssemblies[0].runes).toHaveLength(10);
+    expect(client.activeVarkhulAssemblies[0].forgeBeams).toEqual([
+      expect.objectContaining({ index: 0, blockerId: 1, blocked: true }),
+      expect.objectContaining({ index: 1, blockerId: null, blocked: false }),
+    ]);
+    expect(client.activeVarkhulAssemblies[0].interceptBeam).toEqual({
+      sourceId: 7,
+      targetId: 1,
+      blockerId: 4,
+      sourceX: 2,
+      sourceZ: 4,
+      targetX: 14,
+      targetZ: 20,
+      blockerX: 8,
+      blockerZ: 12,
+      width: 1.35,
+      duration: 3.5,
+      remaining: 2.25,
+    });
     expect(client.activeVarkhulAssemblies[0].runes[2]).toMatchObject({
       assignedPlayerId: 1,
+      trackIndex: 2,
+      trackRadius: 3,
       control: 'clockwise',
+      controlProgress: 0.5,
     });
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulAssemblies: [
+        {
+          bossId: 7,
+          hc: 1,
+          phase: 'done',
+          fx: 10,
+          fz: 20,
+          hp: 0,
+          mhp: 100,
+          oh: 1,
+          bw: 0,
+          mr: 4.5,
+          beams: [],
+          win: 0,
+          round: 1,
+          rounds: 2,
+          rem: 0,
+          cores: [],
+          assign: [],
+          runes: [],
+        },
+      ],
+    });
+    expect(client.activeVarkhulAssemblies).toEqual([
+      expect.objectContaining({
+        phase: 'done',
+        forgeOverheat: 1,
+        forgeMeltdownRemaining: 4.5,
+        forgeBeams: [],
+        interceptBeam: null,
+      }),
+    ]);
     (client as any).applySnapshot({ t: 'snap', ents: [] });
     expect(client.activeVarkhulAnvilMeteors).toEqual([]);
     expect(client.activeVarkhulAssemblies).toEqual([]);
@@ -6472,7 +6563,7 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
       expect.objectContaining({
         id: `${boss.id}:cinder-fire:6:0`,
         sourceId: boss.id,
-        r: 2.4,
+        r: 3.5,
       }),
     ]);
     expect(lastSnap(fc.sent).varkhulCinderOrbs).toEqual([

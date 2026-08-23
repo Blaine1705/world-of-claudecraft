@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { VARKHUL_CINDER_FIRE_RADIUS } from '../sim/varkhul_cinder_orbs';
-import { buildVarkhulRuneSymbol } from './varkhul_assembly_visual';
 import {
   buildVarkhulCinderFire,
   buildVarkhulCinderOrbProjectile,
@@ -14,9 +13,6 @@ import {
 
 export const VARKHUL_CINDER_ORBS_VISUAL_NAME = 'varkhulCinderOrbsTelegraph';
 export const VARKHUL_BRAND_VISUAL_NAME = 'varkhulMakersBrandTelegraph';
-export const VARKHUL_FIXATE_VISUAL_NAME = 'varkhulAssemblyFixateEye';
-export const VARKHUL_LINK_VISUAL_NAME = 'varkhulAssemblyLinkSymbol';
-export const VARKHUL_CORE_CARRY_VISUAL_NAME = 'varkhulMoltenCoreCarry';
 
 function warningMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
@@ -66,64 +62,6 @@ export function buildVarkhulCinderOrbsTelegraph(): THREE.Group {
   group.userData.ringMaterial = ringMaterial;
   group.userData.coreMaterial = coreMaterial;
   group.userData.shellMaterial = shellMaterial;
-  group.visible = false;
-  return group;
-}
-
-function buildFixateEye(): THREE.Group {
-  const group = new THREE.Group();
-  group.name = VARKHUL_FIXATE_VISUAL_NAME;
-  group.userData.renderCategory = 'ui3d';
-  group.userData.actionable = true;
-  const outline = new THREE.Mesh(
-    new THREE.SphereGeometry(0.68, 18, 12, 0, Math.PI * 2, 0.7, 1.75),
-    warningMaterial(0xff4020, 0.86),
-  );
-  outline.scale.set(1.45, 0.72, 0.28);
-  const pupil = new THREE.Mesh(
-    new THREE.SphereGeometry(0.27, 16, 12),
-    warningMaterial(0xffd04a, 1),
-  );
-  pupil.position.z = 0.2;
-  group.add(outline, pupil);
-  group.position.y = 4.25;
-  group.visible = false;
-  return group;
-}
-
-function buildLinkMark(): THREE.Group {
-  const group = new THREE.Group();
-  group.name = VARKHUL_LINK_VISUAL_NAME;
-  group.userData.renderCategory = 'ui3d';
-  group.userData.actionable = true;
-  for (let symbol = 0; symbol < 10; symbol++) {
-    const mesh = buildVarkhulRuneSymbol(symbol, 0.84);
-    mesh.name = `varkhulAssemblyRuneSymbol${symbol}`;
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.visible = false;
-    group.add(mesh);
-  }
-  group.position.y = 4.3;
-  group.visible = false;
-  return group;
-}
-
-function buildCoreCarry(): THREE.Group {
-  const group = new THREE.Group();
-  group.name = VARKHUL_CORE_CARRY_VISUAL_NAME;
-  group.userData.renderCategory = 'ui3d';
-  group.userData.actionable = true;
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.52, 1), warningMaterial(0xffe89a, 1));
-  const shell = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(0.78, 1),
-    warningMaterial(0xff3908, 0.62),
-  );
-  const halo = new THREE.Mesh(
-    new THREE.TorusGeometry(0.95, 0.08, 8, 28),
-    warningMaterial(0xffa323, 0.9),
-  );
-  group.add(core, shell, halo);
-  group.position.y = 3.55;
   group.visible = false;
   return group;
 }
@@ -237,44 +175,6 @@ export function syncVarkhulEncounterVisuals(
     group.add(brand);
   }
   if (brand) syncBrandTelegraph(brand, plan.makersBrandStacks, plan.inverseEntityScale);
-
-  let fixate = group.getObjectByName(VARKHUL_FIXATE_VISUAL_NAME);
-  if (!fixate && plan.fixateVisible) {
-    fixate = buildFixateEye();
-    group.add(fixate);
-  }
-  if (fixate) {
-    fixate.visible = plan.fixateVisible;
-    fixate.scale.setScalar(plan.inverseEntityScale);
-    fixate.rotation.y = reducedMotion ? 0 : Number(fixate.userData.phase ?? 0) + dt * 1.8;
-    fixate.userData.phase = fixate.rotation.y;
-  }
-
-  let link = group.getObjectByName(VARKHUL_LINK_VISUAL_NAME);
-  if (!link && plan.linkSymbol !== null) {
-    link = buildLinkMark();
-    group.add(link);
-  }
-  if (link) {
-    link.visible = plan.linkSymbol !== null;
-    link.scale.setScalar(plan.inverseEntityScale);
-    for (let symbol = 0; symbol < 10; symbol++) {
-      const mark = link.getObjectByName(`varkhulAssemblyRuneSymbol${symbol}`);
-      if (mark) mark.visible = symbol === plan.linkSymbol;
-    }
-    if (!reducedMotion) link.rotation.y += Math.max(0, dt) * 0.65;
-  }
-
-  let core = group.getObjectByName(VARKHUL_CORE_CARRY_VISUAL_NAME);
-  if (!core && plan.moltenCoreVisible) {
-    core = buildCoreCarry();
-    group.add(core);
-  }
-  if (core) {
-    core.visible = plan.moltenCoreVisible;
-    core.scale.setScalar(plan.inverseEntityScale);
-    if (!reducedMotion) core.rotation.y += Math.max(0, dt) * 2.4;
-  }
 }
 
 export function hasVisibleVarkhulEncounterTelegraph(group: THREE.Group): boolean {
@@ -292,9 +192,6 @@ export function buildVarkhulEncounterPrewarmVisual(): THREE.Group {
     buildVarkhulFrontalVisual(),
     buildVarkhulCinderOrbsTelegraph(),
     buildVarkhulMakersBrandTelegraph(),
-    buildFixateEye(),
-    buildLinkMark(),
-    buildCoreCarry(),
     buildVarkhulCinderFire(
       { id: 'prewarm-fire', sourceId: 0, x: 0, z: 0, radius: VARKHUL_CINDER_FIRE_RADIUS },
       0,
@@ -332,9 +229,6 @@ export function disposeVarkhulEncounterVisuals(group: THREE.Group): void {
   for (const name of [
     VARKHUL_CINDER_ORBS_VISUAL_NAME,
     VARKHUL_BRAND_VISUAL_NAME,
-    VARKHUL_FIXATE_VISUAL_NAME,
-    VARKHUL_LINK_VISUAL_NAME,
-    VARKHUL_CORE_CARRY_VISUAL_NAME,
     VARKHUL_FRONTAL_VISUAL_NAME,
   ]) {
     const visual = group.getObjectByName(name);

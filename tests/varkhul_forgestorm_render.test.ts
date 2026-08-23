@@ -93,6 +93,12 @@ describe('Varkhul Forgestorm rendering', () => {
     ).toHaveLength(2);
     expect(visual).toContain('world.activeVarkhulCinderFires');
     expect(visual).toContain('world.activeVarkhulCinderOrbProjectiles');
+    expect(visual).toContain('this.forgeBeamVisuals.sync(world.activeVarkhulAssemblies)');
+    expect(visual).toContain('this.forgeBeamVisuals.update(dt, reducedMotion)');
+    expect(visual).toContain('this.forgeBeamVisuals.dispose()');
+    expect(visual).toContain('this.interceptBeamVisuals.sync(world.activeVarkhulAssemblies)');
+    expect(visual).toContain('this.interceptBeamVisuals.update(dt, reducedMotion)');
+    expect(visual).toContain('this.interceptBeamVisuals.dispose()');
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');
   });
 });
