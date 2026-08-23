@@ -156,6 +156,8 @@ export function eventDigest(events: readonly unknown[]): string {
 export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'name', // display/identity
   'guild', // server-set display only
+  'pledgeGuild', // server-set display only (guild pledge board)
+  'guildTier', // server-set display only (guild colour tier)
   'prevPos', // render interpolation
   'prevFacing',
   'netUpdatedAt', // online wire cadence

@@ -22,6 +22,69 @@ import type { SimEvent } from '../src/sim/types';
 
 class FakeDb implements SocialDb {
   private chars = new Map<number, CharInfo & { activeTitle: string | null }>();
+  // guild pledges (docs/prd/guild-pledge-board.md)
+  pledges = new Map<number, { guildId: number; sinceMs: number }>();
+  pledgeSettingsByGuild = new Map<number, { enabled: boolean; minLevel: number; note: string }>();
+  ladder = new Map<string, { rejectCount: number; rejectedAtMs: number }>();
+  accountOf = new Map<number, number>();
+  guildXpTotals = new Map<number, number>();
+
+  async guildByName(name: string): Promise<{ id: number; name: string } | null> {
+    for (const [id, gname] of this.guilds) {
+      if (gname.toLowerCase() === name.toLowerCase()) return { id, name: gname };
+    }
+    return null;
+  }
+  async guildPledgeSettings(guildId: number) {
+    return this.pledgeSettingsByGuild.get(guildId) ?? { enabled: true, minLevel: 1, note: '' };
+  }
+  async setGuildPledgeSettings(
+    guildId: number,
+    settings: { enabled: boolean; minLevel: number; note: string },
+  ) {
+    this.pledgeSettingsByGuild.set(guildId, settings);
+  }
+  async guildPledges(guildId: number) {
+    const rows: (CharInfo & { sinceMs: number })[] = [];
+    for (const [charId, p] of this.pledges) {
+      if (p.guildId !== guildId) continue;
+      const c = this.chars.get(charId);
+      if (c) rows.push({ ...c, sinceMs: p.sinceMs });
+    }
+    return rows;
+  }
+  async pledgeOf(charId: number) {
+    const p = this.pledges.get(charId);
+    if (!p) return null;
+    return { guildId: p.guildId, guildName: this.guilds.get(p.guildId) ?? '', sinceMs: p.sinceMs };
+  }
+  async upsertPledge(charId: number, guildId: number) {
+    this.pledges.set(charId, { guildId, sinceMs: 0 });
+  }
+  async deletePledge(charId: number) {
+    this.pledges.delete(charId);
+  }
+  async accountIdForCharacter(charId: number) {
+    return this.accountOf.get(charId) ?? charId + 1000;
+  }
+  async pledgeLadder(guildId: number, accountId: number) {
+    return this.ladder.get(`${guildId}:${accountId}`) ?? null;
+  }
+  async bumpPledgeLadder(guildId: number, accountId: number) {
+    const key = `${guildId}:${accountId}`;
+    const prior = this.ladder.get(key);
+    const next = { rejectCount: (prior?.rejectCount ?? 0) + 1, rejectedAtMs: this.nowMs };
+    this.ladder.set(key, next);
+    return next.rejectCount;
+  }
+  async wipePledgeLadder(guildId: number, accountId: number) {
+    this.ladder.delete(`${guildId}:${accountId}`);
+  }
+  async guildLifetimeXpTotal(guildId: number) {
+    return this.guildXpTotals.get(guildId) ?? 0;
+  }
+  /** The fake clock bumpPledgeLadder stamps rejections with (tests advance it). */
+  nowMs = 1_000_000;
   private friends = new Map<number, Set<number>>();
   blocks = new Map<number, Set<number>>();
   ignores = new Map<number, Set<number>>();
@@ -236,6 +299,10 @@ class FakeDb implements SocialDb {
 }
 
 class FakeTransport implements SocialTransport {
+  pledgeStamps: { characterId: number; pledgeGuild: string; guildTier: number }[] = [];
+  applyPledge(characterId: number, pledgeGuild: string, guildTier: number): void {
+    this.pledgeStamps.push({ characterId, pledgeGuild, guildTier });
+  }
   online = new Set<number>();
   presence = new Map<number, Presence>();
   delivered = new Map<number, SocialEvent[]>();

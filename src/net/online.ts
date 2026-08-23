@@ -1502,6 +1502,8 @@ function blankEntity(id: number): Entity {
     equippedItems: {},
     equippedInstances: {},
     guild: '',
+    pledgeGuild: '',
+    guildTier: 0,
     title: null,
     border: null,
   };
@@ -3033,6 +3035,8 @@ export class ClientWorld implements IWorld {
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
+        e.pledgeGuild = w.pg ?? '';
+        e.guildTier = w.gt ?? 0;
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
         e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
         if (e.kind === 'npc') {
@@ -4891,6 +4895,18 @@ export class ClientWorld implements IWorld {
   }
   guildAccept(): void {
     this.cmd({ cmd: 'guild_accept' });
+  }
+  guildPledge(name: string): void {
+    this.cmd({ cmd: 'guild_pledge', name });
+  }
+  guildPledgeWithdraw(): void {
+    this.cmd({ cmd: 'guild_pledge_withdraw' });
+  }
+  guildPledgeDecide(name: string, accept: boolean): void {
+    this.cmd({ cmd: 'guild_pledge_decide', name, accept });
+  }
+  setGuildPledgeSettings(enabled: boolean, minLevel: number, note: string): void {
+    this.cmd({ cmd: 'guild_pledge_settings', enabled, minLevel, note });
   }
   guildDecline(): void {
     this.cmd({ cmd: 'guild_decline' });

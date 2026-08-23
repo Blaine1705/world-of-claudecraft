@@ -4147,6 +4147,14 @@ export interface Entity extends ClientMirroredEntityFields {
   name: string;
   level: number;
   guild: string;
+  // Guild pledge (docs/prd/guild-pledge-board.md): the guild this character
+  // has publicly pledged to JOIN, '' for none and always '' for members (a
+  // pledge clears on joining any guild). Server-set display only, like guild.
+  pledgeGuild: string;
+  // The guild colour tier for the guild line (sim/guild_tier.ts): derived
+  // from the guild's (or pledged guild's) collective lifetime XP. 0 for the
+  // base look and for the unguilded. Server-set display only.
+  guildTier: number;
   // Book of Deeds display title: a deed id (never display text), null/absent
   // for untitled players and every mob/npc. Written by the sim title setter
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;

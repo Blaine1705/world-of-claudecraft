@@ -103,6 +103,13 @@ export interface IWorldSocialGraph {
   ignoreRemove(name: string): void;
   guildCreate(name: string): void;
   guildInvite(name: string): void;
+  // Guild pledge board (docs/prd/guild-pledge-board.md): the public
+  // aspiration, its withdrawal, the officer decision, and the recruiting
+  // settings. Online-only like every guild op; the offline Sim no-ops.
+  guildPledge(name: string): void;
+  guildPledgeWithdraw(): void;
+  guildPledgeDecide(name: string, accept: boolean): void;
+  setGuildPledgeSettings(enabled: boolean, minLevel: number, note: string): void;
   guildAccept(): void;
   guildDecline(): void;
   guildLeave(): void;

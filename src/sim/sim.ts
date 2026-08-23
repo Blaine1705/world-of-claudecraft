@@ -4572,6 +4572,16 @@ export class Sim {
    *  full retro pass grants exactly that one deed and re-checks the rest as
    *  no-ops. Any later membership change is a genuine live join: mark dirty for
    *  the normal unlock path (banner, audio, broadcast gate). */
+  /** Server-stamped guild pledge presentation (docs/prd/guild-pledge-board.md):
+   *  the pledged guild's name ('' for none) and the guild colour tier for the
+   *  nameplate line. Display only; membership stays setPlayerGuild's. */
+  setPlayerPledge(pid: number, pledgeGuild: string, guildTier: number): void {
+    const e = this.entities.get(pid);
+    if (!e) return;
+    e.pledgeGuild = pledgeGuild;
+    e.guildTier = guildTier;
+  }
+
   setPlayerGuild(pid: number, guild: string, opts: { retroDeeds?: boolean } = {}): void {
     const e = this.entities.get(pid);
     if (!e) return;
@@ -10511,6 +10521,10 @@ export class Sim {
   ignoreRemove(_name: string): void {}
   guildCreate(_name: string): void {}
   guildInvite(_name: string): void {}
+  guildPledge(_name: string): void {}
+  guildPledgeWithdraw(): void {}
+  guildPledgeDecide(_name: string, _accept: boolean): void {}
+  setGuildPledgeSettings(_enabled: boolean, _minLevel: number, _note: string): void {}
   guildAccept(): void {}
   guildDecline(): void {}
   guildLeave(): void {}

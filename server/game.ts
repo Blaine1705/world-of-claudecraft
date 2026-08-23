@@ -1413,6 +1413,8 @@ function identityFields(e: Entity): Record<string, unknown> {
   // streamer flag is off has none here, whatever is stored against it.
   if (e.streamerLinks && hasStreamerLink(e.streamerLinks)) out.slk = e.streamerLinks;
   if (e.guild) out.gd = e.guild;
+  if (e.pledgeGuild) out.pg = e.pledgeGuild; // guild pledge (display only; '' for members)
+  if (e.guildTier) out.gt = e.guildTier; // guild colour tier (sim/guild_tier.ts)
   if (e.title) out.title = e.title; // Book of Deeds active title (a deed id; the client localizes)
   if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.dungeonId) out.dgn = e.dungeonId;
@@ -2546,6 +2548,11 @@ export class GameServer {
       pushSnapshot: (id) => {
         void this.sendSocialSnapshot(id);
       },
+      applyPledge: (id, pledgeGuild, guildTier) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return;
+        this.sim.setPlayerPledge(s.pid, pledgeGuild, guildTier);
+      },
       onGuildRenamed: (id, guildId, oldName, newName) => {
         const s = this.sessionByCharacterId(id);
         if (!s) return;
@@ -2726,6 +2733,14 @@ export class GameServer {
         this.sim.setPlayerGuildMembership(
           session.pid,
           snap.guild ? { guildId: snap.guild.id, rank: snap.guild.rank } : null,
+        );
+        // The pledge nameplate line + guild colour tier ride the same fenced
+        // stamp: a member tiers by their own guild, a pledge by the pledged
+        // one, everyone else reads 0 (docs/prd/guild-pledge-board.md).
+        this.sim.setPlayerPledge(
+          session.pid,
+          snap.guild ? '' : (snap.myPledge?.guildName ?? ''),
+          snap.guild?.tier ?? snap.myPledge?.tier ?? 0,
         );
       }
       // remember who to track for the live position push (friends + guildmates)
@@ -7618,6 +7633,34 @@ export class GameServer {
         break;
       case 'guild_accept':
         void this.social.guildAccept(this.actorFor(session)).catch(logSocialErr);
+        break;
+      case 'guild_pledge':
+        if (typeof msg.name === 'string')
+          void this.social.guildPledge(this.actorFor(session), msg.name).catch(logSocialErr);
+        break;
+      case 'guild_pledge_withdraw':
+        void this.social.guildPledgeWithdraw(this.actorFor(session)).catch(logSocialErr);
+        break;
+      case 'guild_pledge_decide':
+        if (typeof msg.name === 'string' && typeof msg.accept === 'boolean')
+          void this.social
+            .guildPledgeDecide(this.actorFor(session), msg.name, msg.accept)
+            .catch(logSocialErr);
+        break;
+      case 'guild_pledge_settings':
+        if (
+          typeof msg.enabled === 'boolean' &&
+          typeof msg.minLevel === 'number' &&
+          Number.isFinite(msg.minLevel) &&
+          typeof msg.note === 'string'
+        )
+          void this.social
+            .setGuildPledgeSettings(this.actorFor(session), {
+              enabled: msg.enabled,
+              minLevel: msg.minLevel,
+              note: msg.note,
+            })
+            .catch(logSocialErr);
         break;
       case 'guild_decline':
         this.social.guildDecline(this.actorFor(session));
