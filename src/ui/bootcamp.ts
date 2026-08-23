@@ -36,6 +36,7 @@ import { startingAttackFor } from '../sim/tutorial/starting_attack';
 import { groundHeight, WATER_LEVEL } from '../sim/world';
 import { WORLD_SEED } from '../sim/world_seed';
 import type { IWorld } from '../world_api';
+import { bagsWindowShown } from './bags_view';
 import {
   BELL_STEP_TARGET,
   type BootcampParam,
@@ -452,7 +453,10 @@ export class BootcampOverlay {
     // menu row pulses once the bags are up and the menu is open.
     const touch = currentInputHintMode() === 'touch';
     const bagsEl = document.getElementById('bags');
-    const bagsOpen = bagsEl !== null && bagsEl.style.display === 'block';
+    // bagsWindowShown, never a literal display compare: the bags open as
+    // 'flex', and a 'block' compare here left the Use/Equip menu row glow
+    // permanently unarmed (CX round 3).
+    const bagsOpen = bagsEl !== null && bagsWindowShown(bagsEl.style.display);
     const charEl = document.getElementById('char-window');
     const charOpen = charEl !== null && charEl.style.display === 'block';
     const wantsBags = (bagItem !== null || ringEquip) && !vendorOpen && !bagsOpen;

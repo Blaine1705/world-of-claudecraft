@@ -28,3 +28,12 @@ describe('the coach glow pulse', () => {
     expect(bootcamp).toMatch(/el\.style\.animationDelay = '';/);
   });
 });
+
+describe('the bags-open gate', () => {
+  it('reads bagsWindowShown, never a literal display compare', () => {
+    // The bags open as display:flex; a 'block' compare left the Use/Equip
+    // menu row glow permanently unarmed. The shared predicate owns the truth.
+    expect(bootcamp).toMatch(/bagsWindowShown\(bagsEl\.style\.display\)/);
+    expect(bootcamp).not.toMatch(/bagsEl\.style\.display === 'block'/);
+  });
+});
