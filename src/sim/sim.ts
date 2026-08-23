@@ -2331,11 +2331,11 @@ export class Sim {
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
-        const wasLivingPlayerFall =
-          source === null && ability === 'Falling' && target.kind === 'player' && !target.dead;
+        const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // Keep the deed observer out of the shared pure movement kernel.
-        if (wasLivingPlayerFall && target.dead) {
+        // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
+        const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
+        if (isPlayerFall && wasAlive && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },
