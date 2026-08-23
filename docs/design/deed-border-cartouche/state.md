@@ -5,44 +5,45 @@ contract is `implementation-plan.md`.
 
 ## Resume point
 
-Phases 1-8 are complete on `feature/deed-border-cartouche`. Phase 8 returned
-**READY WITH NOTES** technically and **SHIP WITH NOTES** visually. The complete
-E1-E58 audit, exact command log, final reviewer findings/fixes, screenshot map,
-and remaining notes are in `progress.md`.
+Phases 1-9 are complete on `feature/deed-border-cartouche`. Phase 9 merged
+`origin/release/v0.40.0`, refined the family from a rounded ribbon into the
+approved pointed plaque direction, and added E59-E63 without weakening E1-E58.
+A subsequent five-pass craft session corrected Book preview alignment, gave the
+world seal a protected plaque gap, and rebuilt Inspect as a centered ceremonial
+mantle with one honor rail and a quieter paperdoll stage. Its final verdict is
+**SHIP WITH NOTES**; both fresh specialist reviews are **READY**, and the exact
+findings and fix-forward evidence are recorded in `progress.md`.
 
-The final live album is
-`docs/screenshots/deed-border-cartouche/phase-07/`. It proves normal-distance
-world hierarchy, all four rewards through real Book option clicks, player and
-target frames, inspect, previews, None, borderless controls, mobile, Parchment,
-forced colors, low/high bloom-only fairness, slug swaps, reconnect, and the long
-localized Cheater target. No sim, server, persistence, wire, net, world API, or
-IWorld feature path changed.
+The final plaque album is
+`docs/screenshots/deed-border-cartouche/phase-09/`. It proves normal-distance
+world hierarchy, all four seals together and in grayscale, player and target
+frames, picker, inspect, mobile, Parchment, forced colors, and unobscured
+low/high bloom-only fairness. The retained `phase-07/` album continues to prove
+the real Book equip/preview flow, None, borderless controls, slug swaps,
+reconnect, and the long localized Cheater target. No sim, server, persistence,
+wire, net, world API, or IWorld feature path changed.
 
 Do not commit, stage, push, or open the PR unless the operator explicitly asks.
 
 ## Blocker
 
-None in the Deed Heraldry implementation or Phase 8 evidence.
-
-Merge-readiness note: this branch is 12 commits ahead and 9 behind the advanced
-`origin/release/v0.39.0`. Integrate the current release base and rerun the
-canonical gate before merge.
+None in the Deed Heraldry implementation, v0.40 integration, or Phase 9
+evidence. The branch is 0 commits behind and 17 commits ahead of
+`origin/release/v0.40.0`.
 
 ## Next action
 
-1. Preserve the current worktree and all Phase 1-8 changes.
-2. Integrate the latest `origin/release/v0.39.0` only when authorized.
-3. Rerun `GATE_SELECT_BASE=origin/release/v0.39.0 node scripts/gate_select.mjs`
-   after integration.
-4. Open a PR only when explicitly authorized.
+1. Preserve the current worktree and all Phase 1-9 changes.
+2. Do not start another feature phase without operator direction.
+3. Open a PR only when explicitly authorized.
 
 ## Active locked decisions
 
-- The approved experience is two-scale Deed Heraldry: compact world seal +
-  quiet name ribbon, richer social reveal on interaction.
+- The approved experience is two-scale Deed Heraldry: compact world seal plus
+  shallow pointed name plaque, richer social reveal on interaction.
 - Four slugs and motifs only: catalogue, vault, ward, laurel. No new deed,
   reward, title, slug, motif, or family silhouette.
-- The world ribbon owns the name row only. The selected title returns to the
+- The world plaque owns the name row only. The selected title returns to the
   secondary line.
 - No full nameplate perimeter, corner brackets, or central clasp. The motif is
   enlarged into the readable face of the forged seal.
@@ -51,19 +52,21 @@ canonical gate before merge.
 - Player and target frames receive the seal at the portrait/name joint and a
   restrained pattern on the name header only. Portraits stay circular. No full
   HUD reskin.
-- Inspect is the ceremonial reveal and uses real name/title/deed copy. Picker
-  uses actual seals/materials plus live previews. `.deed-title-option`, focus,
-  aria, and the 40x40 touch floor remain.
+- Inspect is the ceremonial reveal and uses real name/title/deed copy in a 60px
+  centered mantle with an overlapping 56px seal. Existing standing and badges
+  remain secondary in one responsive honor rail. Picker uses actual
+  seals/materials plus live previews. `.deed-title-option`, focus, aria, and
+  the 40x40 touch floor remain.
 - Catalogue brass remains `#c9b17a` / `#2a2214` / `#f3ebcf`, distinct from
   Eternal Spoils `#f4ca43` and elite/quest `#f2c84b`.
 - Borderless stays clean. Identity exists on every graphics tier. Only bloom
   may shed. Prefer no motion.
 - World runtime stays code-native, sprite-free, and allocation-free per plate
   per frame. The generated concept is reference-only.
-- The old pad/radius/extraLift values are history. Phase 5 remeasured them, and
-  the accepted world values are now locked: ribbon pad 7/1, radius 2,
-  midnight alpha 0.48, seal 18, seal/ribbon overlap 3, extra lift 8, and
-  declutter X/Y/stack 95/26/28. Both y-walks consume the same 8px lift.
+- The old radius is history. The accepted world values are plaque pad 7/1,
+  fixed 8px tip, fixed 4px notch, midnight alpha 0.62, seal 18, protected
+  seal/plaque gap 2, hidden joint overlap 2, extra lift 8, and declutter
+  X/Y/stack 95/26/28. Both y-walks consume the same 8px lift.
 - `PlayerMeta.activeBorder`, `deed_set_border`, eligibility, persistence, and
   the wire remain unchanged. No sim/server/IWorld work is expected.
 
@@ -85,6 +88,15 @@ canonical gate before merge.
 - Phase 8 complete: **READY WITH NOTES / SHIP WITH NOTES**. E1-E58, final live
   family album, art direction, accessibility/themes, responsive behavior,
   bloom-only fairness, full selective gate, and specialist reviews passed.
+- Phase 9 complete: **SHIP WITH NOTES**. v0.40 is integrated, E59-E63 are
+  audited, the pointed plaque family is live across
+  world/player/target/picker/inspect, the full-mode 12-step gate is green, and
+  both fresh specialist reviews are READY.
+- Post-Phase 9 five-pass craft polish complete: Book motifs are optically
+  centered, world and picker plaques preserve the 2px seal gap, Inspect is one
+  responsive ceremonial composition, the final full-mode 12-step gate is green,
+  and both post-fix specialist reviews are READY. Final verdict: **SHIP WITH
+  NOTES**. No new feature phase was begun.
 
 ## Phase 8 closeout evidence
 
@@ -118,10 +130,44 @@ canonical gate before merge.
   canonical browser suite, deterministic accessibility/responsive/style
   coverage, hot-path guards, and final selective gate passed.
 
+## Phase 9 closeout evidence
+
+- `origin/release/v0.40.0@14ab2e8630` merged as `2e15170f9c` with no conflict.
+  `git rev-list --left-right --count origin/release/v0.40.0...HEAD` returned
+  `0 17`.
+- The shared plaque authority is `src/ui/deed_heraldry_plaque_core.ts`: compact,
+  mirrored, and ceremonial clip paths use fixed 8px tips and 4px notches. The
+  world core imports the same measurements and remains caller-owned.
+- The world painter uses one six-point Canvas2D path, one inset glint, the
+  existing seal and frozen motif primitives, and no image, gradient, filter,
+  animation, tier, governor, or per-call container allocation.
+- The Phase 9 album is
+  `docs/screenshots/deed-border-cartouche/phase-09/`. Normal distance was judged
+  before `all-four-world-crop.png`; the grayscale comparison remains distinct.
+  Low/high, mobile, Parchment, picker, inspect, and real forced-colors evidence
+  are enumerated in `live-qa-evidence.json`.
+- `GATE_SELECT_BASE=origin/release/v0.40.0 node scripts/gate_select.mjs` selected
+  full mode and passed all 12 steps: 2,986 test files passed with 12 skipped,
+  41,995 tests passed with 2 expected failures and 115 skipped, 28 browser test
+  files passed, and types/build/artifacts/security checks were green.
+- Fresh `woc_test_coverage` and `woc_frontend` reviews both returned **READY**.
+  The confirmed E63 ordering gap was fixed so every page-creation arm now pins
+  `newPage`, probe cleanup, then storage seed/navigation. An unused plaque
+  string getter and its misleading primitive-identity assertion were removed.
+  The final focused suite passed 13 files and 385 tests; TypeScript,
+  `git diff --check`, and `npm run ci:changed` also passed.
+- No generated concept was used as QA evidence and no runtime image, deed, slug,
+  motif, title, lore, or player-facing string was added.
+- Remaining notes are non-blocking: offline captures logged proxy 502s and
+  seven unrelated skipped mobile NPC models, and no separate browser axe,
+  dedicated mobile E2E, or ARM3 wall-clock run was performed. Canonical browser,
+  accessibility/responsive, allocation, typecheck, build, and full-gate
+  coverage passed.
+
 ## Existing implementation surfaces
 
 - `src/ui/deed_border_view.ts`: one slug -> palette + normalized static motif owner.
-- `src/render/nameplate_heraldry_core.ts`: caller-owned world seal/ribbon
+- `src/render/nameplate_heraldry_core.ts`: caller-owned world seal/plaque
   geometry. The Phase 4 cartouche core is deleted.
 - `src/render/nameplate_canvas.ts`: thin world consumer.
 - `src/render/nameplate_painter.ts`: border slug resolution.
@@ -131,7 +177,8 @@ canonical gate before merge.
 - `src/ui/hud.ts`, `index.html`, `play.html`, `src/styles/hud.css`: player and
   valid-player-target seal/header markup and style.
 - `src/ui/inspect_view.ts`, `src/ui/inspect_window.ts`,
-  `src/styles/shell.css`: compact inspect heraldry banner.
+  `src/styles/shell.css`: centered ceremonial Inspect mantle, standing row,
+  responsive honor rail, and quiet class-hazed paperdoll stage.
 - `src/ui/deeds_view.ts`, `src/ui/deeds_window.ts`,
   `src/styles/components.css`: canonical picker samples and event previews.
 - `scripts/pr_shot_targets.mjs`: Phase 8 recipes for world, unit frames,

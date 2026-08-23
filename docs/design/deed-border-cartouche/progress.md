@@ -10,6 +10,8 @@
 | 6. QA: world heraldry | complete: SHIP | Normal-distance and grayscale craft review passed. Live `phase-05/` album complete. E1-E46 audited, confirmed test gaps fixed forward, both reviewers READY, full 12-step gate green. |
 | 7. Social reveal family | complete | Player/target name header, refined circle, inspect banner, picker seals + event previews. E47-E58 are mapped below. |
 | 8. QA: full heraldry family | complete: READY WITH NOTES / SHIP WITH NOTES | E1-E58 audited. Final family album accepted. Focused suites, full selective gate, coverage, frontend, and gate-integrity reviews are green. |
+| 9. v0.40 integration and plaque refinement | complete: SHIP WITH NOTES | Release v0.40 merged, E59-E63 audited, pointed plaque family accepted at world and interaction scales, final album complete, full 12-step gate green, both fresh reviewers READY. |
+| Post-9. Five-pass craft polish | complete: SHIP WITH NOTES | Book alignment and protected plaque gap corrected; Inspect rebuilt as one ceremonial mantle; desktop, mobile, Parchment, forced colors, Unicode, all-badge, and borderless evidence accepted; both fresh reviewers READY. |
 
 Phase 4 closed technically on 2026-08-18. The same-day visual review returned
 NEEDS ANOTHER PASS: the perimeter read as UI chrome, motifs vanished at normal
@@ -36,6 +38,13 @@ coverage, craft, responsive, accessibility, theme, tier-fairness, and live-flow
 review. Final verdicts are **READY WITH NOTES** and **SHIP WITH NOTES**. The
 notes are branch synchronization with the advanced release base and unrelated
 headless mobile asset warnings; neither changes the accepted heraldry behavior.
+
+Phase 9 completed on 2026-08-23 with a **SHIP WITH NOTES** verdict. The feature
+is current with `origin/release/v0.40.0`, and the generated reference has been
+translated into a convincing code-native pointed plaque without compromising
+MMORPG readability, accessibility, graphics-tier fairness, or the world hot
+path. The only notes are unrelated offline capture warnings and optional
+platform-specific profiling listed below.
 
 ## Coverage map (filled by QA phases)
 
@@ -473,6 +482,238 @@ E29-E31 remain live only because Phase 7, not Phase 5, owns those social visuals
 - Final Phase 8 verdict: **READY WITH NOTES** technically and **SHIP WITH
   NOTES** visually. Both permit shipping, so Phase 8 is complete. No commit,
   stage, push, or PR action was performed.
+
+## Phase 9 notes: v0.40 integration and plaque refinement
+
+- The first command was `git status --short --branch`; the worktree was clean
+  before release integration. `git merge --no-edit origin/release/v0.40.0`
+  completed without conflict as merge commit `2e15170f9c`, with release parent
+  `14ab2e8630`. `git rev-list --left-right --count
+  origin/release/v0.40.0...HEAD` returned `0 17`.
+- `pnpm install --frozen-lockfile` passed. The immediate post-merge baseline
+  passed `npm run i18n:gen`, a 16-file / 459-test focused suite,
+  `npx tsc --noEmit`, and `git diff --check`; generated i18n files were not
+  rewritten.
+- The generated direction remains reference-only. The accepted implementation
+  now reads as a shared pointed plaque family: a compact world form, a mirrored
+  target form, a full name-header interaction form, and a larger ceremonial
+  inspect form. No new imagegen output or runtime image was needed.
+- E59-E63 coverage:
+  - E59: `tests/deed_heraldry_plaque_core.test.ts` pins frozen compact, mirror,
+    and ceremonial clip paths to one fixed 8px tip / 4px notch authority and
+    binds the world core to the same measurements.
+  - E60: `tests/nameplate_heraldry_core.test.ts` pins accepted world geometry;
+    `tests/nameplate_canvas.test.ts` pins the exact six-point Canvas2D path,
+    inset glint order, seal joint, motif primitives, and absence of the old
+    rounded perimeter.
+  - E61: `tests/deed_heraldry_plaque_core.test.ts` pins player/target host
+    nesting, mirror direction, full bar-column width, and centered name.
+    Existing E47-E50 unit painter and semantic tests remain green.
+  - E62: the same family test pins picker and inspect hosts, sprite-free static
+    CSS, and all three silhouettes. Existing E51-E57 contrast, responsive,
+    forced-colors, and tier tests remain green.
+  - E63: `tests/pr_shot_targets.test.ts` pins crash-probe removal on all four
+    isolated browser boot paths before variant storage seeds.
+- Confirmed fix-forward work:
+  - The world rounded ribbon was replaced with a hand-built shallow six-point
+    plaque. The core remains pure and caller-owned; the painter uses no runtime
+    image, gradient, filter, animation, tier/governor input, or per-call
+    container syntax. One static inset line supplies the worked-metal glint.
+  - Player and target plaques now span their existing name-header columns,
+    center the identity line, and mirror correctly. Portraits, level, title,
+    sanction, health, resource, absorb, cast, auras, and target-of-target remain
+    outside and unchanged.
+  - Inspect widened its ceremonial plaque from 420px to 450px and the seal from
+    34px to 40px while staying below 15 percent of the 400px paperdoll stage.
+  - The world well alpha moved from 0.48 to 0.62 so the plaque reads against a
+    crowded town without allowing metal or pattern to outrank the name.
+  - The first canonical mobile tier capture failed because v0.40's
+    `woc_entry_probe` correctly interpreted the previous harness-owned
+    `page.close()` as a killed world, then stepped the next seeded preset down.
+    `scripts/pr_screenshots.mjs` now clears only that intentional close probe on
+    every isolated page before `beforeLoad`. The rerun captured all four
+    variants with the asserted preset 1/3 and low/high states.
+- Deterministic commands and outcomes:
+  - `npx vitest run tests/pr_shot_targets.test.ts
+    tests/deed_heraldry_plaque_core.test.ts
+    tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts
+    tests/deed_border_accent.test.ts tests/deeds_border_picker.test.ts
+    tests/deeds_window.test.ts tests/inspect_window.test.ts
+    tests/inspect_view.test.ts tests/unit_frame_painter.test.ts
+    tests/unit_frame.test.ts tests/architecture.test.ts
+    tests/monolith_budget.test.ts` passed 13 files and 385 tests after reducing
+    `nameplate_canvas.ts` back to its 852-line ceiling.
+  - `npx tsc --noEmit` and `git diff --check` passed.
+  - `npm run ci:changed` passed over 31 files with 13 pre-existing release-base
+    warnings for undeclared screenshot env vars and literal template
+    placeholders.
+  - `GATE_SELECT_BASE=origin/release/v0.40.0 node scripts/gate_select.mjs`
+    selected full mode and passed all 12 steps with 8 workers: 2,986 test files
+    passed and 12 skipped; 41,995 tests passed, 2 expected failures, and 115
+    skipped; 28 browser test files passed; all typecheck, production build,
+    generated artifact, malware, and changed-file checks were green.
+- Live-client commands:
+  - Canonical unit frames:
+    `GAME_URL=http://127.0.0.1:5187
+    SHOTS_DIR=docs/screenshots/deed-border-cartouche/phase-09
+    DIFF_FILE=tmp/plaque-unit.diff NAV_TIMEOUT_MS=120000
+    ENTRY_SELECTOR_TIMEOUT_MS=60000 node scripts/pr_screenshots.mjs`.
+  - The ignored, removed-after-use target harness drove the repository's real
+    `enterOfflineGame` plus canonical picker/inspect recipes for desktop,
+    mobile, Parchment, and Chromium forced-colors emulation. A second ignored
+    harness spawned four real offline peers and equipped each through
+    `setActiveBorder` for the normal-distance town frame.
+- The final album is
+  `docs/screenshots/deed-border-cartouche/phase-09/`. Normal distance was judged
+  first in `all-four-world-normal-low.png`; only then were
+  `all-four-world-crop.png`, `all-four-world-grayscale.png`, and
+  `all-four-color-grayscale-comparison.png` created. Name reads first, seal
+  second, and metal third. Catalogue pages, Vault diamond, Ward key, and Laurel
+  fan remain distinct without color.
+- Low/high evidence is
+  `01-deed-heraldry-unit-frames-desktop-low.png` and
+  `02-deed-heraldry-unit-frames-desktop-high.png`; neither is occluded. Mobile
+  and Parchment are 03 and 04. Picker and inspect desktop/mobile/Parchment
+  frames use their descriptive filenames. Real forced-colors evidence is
+  `forced-colors-player-target-picker.png`, with the media query active and
+  player, target, and picker all reporting `curators_gilt`.
+- `live-qa-evidence.json` records release ids, all four deed/slug pairs, normal
+  distance order, grayscale reads, tier assertions, forced-colors state, and
+  exact screenshot paths. The canonical manifest records non-blocking offline
+  proxy 502s and seven skipped unrelated mobile NPC models.
+- No sim, server, persistence, wire, net, world API, or IWorld feature path
+  changed. No deed, slug, motif, title, lore, gameplay power, player-facing
+  string, generated runtime art, sparkle, or animation was added.
+- Fresh read-only `woc_test_coverage` and `woc_frontend` reviews both returned
+  **READY** with high confidence and no remaining blocking or non-blocking
+  findings. Frontend accepted normal-distance hierarchy, grayscale identity,
+  interaction framing, mobile, Parchment, forced colors, bloom-only fairness,
+  accessibility semantics, and allocation-free world rendering.
+- Coverage initially found that E63 counted four cleanup calls without proving
+  their order. `tests/pr_shot_targets.test.ts` now slices all four page-creation
+  arms independently and requires `newPage`, then probe cleanup, then the first
+  storage seed or navigation. Coverage re-review confirmed that moving or
+  removing any cleanup now fails. The same review identified a misleading
+  primitive-identity assertion around an unused silhouette getter; the dead
+  getter was removed and the test now honestly pins one frozen literal table.
+- After those review fixes, the 13-file focused suite again passed 385 tests,
+  `npx tsc --noEmit` and `git diff --check` passed, and `npm run ci:changed`
+  again passed over 31 files with the same 13 pre-existing warnings.
+- Remaining risks: the offline manifest contains proxy 502 messages and seven
+  skipped unrelated mobile NPC models. Browser axe, a dedicated mobile E2E
+  pass, and ARM3 wall-clock profiling were not separately rerun. The canonical
+  28-file browser suite, deterministic accessibility/responsive coverage,
+  allocation guards, typechecks, production build, and full gate passed.
+- Final Phase 9 verdict: **SHIP WITH NOTES**. No implementation or evidence
+  blocker remains. No stage, push, or PR action was performed.
+
+## Post-Phase 9 notes: five-pass craft polish
+
+- This was a polish session, not a new feature phase. It preserved the four
+  slugs, motifs, deeds, palettes, gameplay data, strings, and code-native asset
+  contract.
+- Pass 1 pinned the two reported defects before production changes. The Book
+  interaction-preview motif was 7px above the 34px header center, and the Book
+  world-preview seal overlapped its plaque by 3px. The world core now owns a
+  protected 2px seal/plaque gap with a hidden 2px joint bridge; unit-frame and
+  Book motifs use `top:50%` plus `translateY(-50%)`; both Book preview plaques
+  keep the same 2px gap.
+- Pass 2 harmonized the world, player/target, unit-frame, and picker family
+  without changing the intentional portrait/seal hardware joint. The world
+  core remains pure and caller-owned. No per-call object, array, path, raster,
+  sprite, gradient, filter, animation, graphics-tier, or governor branch was
+  added.
+- Pass 3 rebuilt Inspect as one ceremonial identity composition. A 60px clipped
+  plaque face sits inside a centered 620px host, while the 56px seal remains an
+  unclipped sibling overlapping the shoulder by 14px. Name, optional title,
+  and localized deed stay in one ellipsizing identity stack. Standing and the
+  existing holder, Discord, developer, and curator badges are collected into
+  one responsive honor rail. No visible copy or remote-card markup changed.
+- Pass 4 completed the responsive and theme treatment. Mobile keeps the card in
+  a centered column and narrows the mantle without hiding identity. Parchment
+  uses panel-aware honor tiles while the earned plaque keeps its fixed dark
+  heraldry well. Forced colors uses Canvas and CanvasText with no shadows. The
+  equipment heading gained engraved hairlines and the paperdoll stage now uses
+  a quiet neutral keyline, class-colored haze, and pedestal rather than a loud
+  class border. Equipment slots and gameplay bars were not decorated.
+- Pass 5 reviewed live results at normal gameplay scale before crop inspection,
+  then checked desktop, mobile, Parchment, low/high, long Unicode, all badges,
+  borderless, and actual Chromium forced-colors. The all-badge measurement was
+  face `578x60`, seal `56x56`, rail `620x133.53125`, four honors, and no
+  horizontal overflow.
+- Live-client commands and evidence:
+  - `GAME_URL=http://127.0.0.1:5187
+    SHOTS_DIR=tmp/deed-heraldry-five-pass/pass-02
+    DIFF_FILE=tmp/deed-heraldry-pass-02.diff NAV_TIMEOUT_MS=30000
+    ENTRY_SELECTOR_TIMEOUT_MS=30000 node scripts/pr_screenshots.mjs` produced
+    the seven world, unit-frame, picker, mobile, and Parchment files under
+    `tmp/deed-heraldry-five-pass/pass-02/`. It was intentionally stopped after
+    those scoped targets, so the process exit was 130 rather than a completed
+    full recipe run.
+  - `GAME_URL=http://127.0.0.1:5187
+    SHOTS_DIR=tmp/deed-heraldry-five-pass/pass-04
+    DIFF_FILE=tmp/deed-heraldry-pass-03.diff NAV_TIMEOUT_MS=30000
+    ENTRY_SELECTOR_TIMEOUT_MS=30000 node scripts/pr_screenshots.mjs` completed
+    the five canonical Inspect desktop, mobile, and Parchment captures.
+  - A temporary ignored live-browser harness, removed after use, added
+    `inspect-all-badges-long-unicode.png`, `inspect-borderless-control.png`, and
+    `inspect-forced-colors-all-badges.png` to the same pass-04 directory. The
+    forced-colors capture asserted `matchMedia('(forced-colors: active)')`.
+- Deterministic checks:
+  - `npx vitest run tests/nameplate_heraldry_core.test.ts
+    tests/nameplate_canvas.test.ts tests/deed_heraldry_plaque_core.test.ts`
+    passed 3 files and 67 tests after the geometry fix.
+  - `npx vitest run tests/inspect_window.test.ts
+    tests/deed_border_accent.test.ts
+    tests/deed_heraldry_plaque_core.test.ts` passed 3 files and 78 tests after
+    the ceremonial Inspect rebuild.
+  - The proportional 19-file UI, architecture, mobile, theme, and painter list
+    passed 459 tests. `pnpm run check:ts` and `git diff --check` passed.
+  - The first final `GATE_SELECT_BASE=origin/release/v0.40.0 node
+    scripts/gate_select.mjs` stopped only at changed-file formatting. After
+    formatting, its full suite found one stale `charscreen_css.test.ts` source
+    pin for the old model-stage border. The test was corrected to pin the
+    neutral showcase edge plus class-color outline and haze; `npx vitest run
+    tests/charscreen_css.test.ts` then passed 18 tests.
+  - The final `GATE_SELECT_BASE=origin/release/v0.40.0 node
+    scripts/gate_select.mjs` selected `mode=full` and passed all 12 merge-gate
+    steps: 2,986 test files passed and 12 skipped; 41,998 tests passed, 2
+    expected failures, and 115 skipped; all 28 browser files and 256 browser
+    tests passed; typechecks, builds, artifacts, security scans, and changed-file
+    checks were green.
+  - Final `pnpm run ci:changed` and `git diff --check` passed. The changed-file
+    check retained 13 known warnings for screenshot environment variables and
+    literal template placeholders.
+- Remaining evidence notes: the canonical offline captures logged expected
+  local proxy 502 messages and unrelated unavailable NPC models. None obscures
+  a reviewed plaque, picker, or Inspect surface. Screenshots remain ignored
+  working evidence under `tmp/`; the durable Phase 9 album remains under
+  `docs/screenshots/deed-border-cartouche/phase-09/`.
+- Fresh read-only `woc_frontend` review returned **READY** with no production
+  finding. It accepted the normal-distance hierarchy, protected seal gap,
+  centered picker motifs, desktop/mobile/Parchment Inspect composition, long
+  Unicode, all badges, borderless control, actual forced colors, grayscale seal
+  identity, bloom-only low/high fairness, and the sprite-free/allocation-free
+  implementation seams. Its only non-blocking note was offline proxy and
+  unavailable background-creature noise in the pass-04 capture manifest.
+- Fresh read-only `woc_test_coverage` review initially found six test-strength
+  gaps: shared picker centering, exact Inspect face/seal sibling placement,
+  distinct standing-row children, mobile Inspect composition, the class-color
+  producer, and Parchment/forced-colors honor treatment. All six were fixed
+  forward in tests without changing production behavior. The post-fix command
+  `npx vitest run tests/deed_heraldry_plaque_core.test.ts
+  tests/inspect_window.test.ts tests/deed_border_accent.test.ts
+  tests/charscreen_css.test.ts` passed 4 files and 96 tests. The broader
+  20-file heraldry, painter, Inspect, mobile, style, architecture, and theme
+  slice passed 477 tests; `pnpm run check:ts`, `pnpm run ci:changed`, and
+  `git diff --check` passed. The fresh re-review returned **READY** with high
+  confidence and no remaining coverage finding, weakened assertion, focused
+  test, or new skip.
+- Final post-Phase 9 verdict: **SHIP WITH NOTES**. The result meets the craft,
+  MMORPG hierarchy, responsiveness, accessibility, theme, graphics-fairness,
+  sprite-free, and allocation-free bars. The notes are evidence-environment
+  hygiene only: ignored working screenshots, offline proxy 502 messages, and
+  unrelated unavailable background models. No new feature phase was begun.
 
 ## Phase 3 notes
 

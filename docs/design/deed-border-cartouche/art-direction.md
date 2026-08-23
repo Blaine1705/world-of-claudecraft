@@ -1,6 +1,7 @@
 # Deed Heraldry: approved art direction
 
-Status: approved on 2026-08-18 after the Phase 4 visual review.
+Status: approved on 2026-08-18 after the Phase 4 visual review and refined on
+2026-08-23 after the `release/v0.40.0` integration.
 
 This document supersedes the Phase 1-4 cartouche as the visual acceptance
 target. It does not erase that work: the saved-state path, palette lookup,
@@ -15,12 +16,19 @@ mockup text is illustrative. Shipping copy must come from the live deed catalog
 and `t()` keys. Do not add the mockup's descriptive labels as new deeds, slugs,
 titles, or lore.
 
+The post-v0.40 craft pass resolves the reference as a plaque, not a rounded
+ribbon. The world form is a shallow fixed-pixel point and notch joined to the
+existing round seal. Interaction surfaces expand the same silhouette across
+the name-header column, and inspect uses its largest ceremonial form. The
+shared geometry stays code-native and the four reward identities still come
+only from their existing seal motifs and palettes.
+
 ## Decision
 
 The reward is no longer a border treatment. It is a two-scale identity system:
 
 1. **Seen at a glance.** In the world, a small forged deed seal sits beside the
-   player's name on a quiet midnight ribbon. This is the recognition token.
+   player's name on a quiet midnight plaque. This is the recognition token.
 2. **Honored up close.** On the player/target frame and inspect card, the same
    seal, metal, and restrained heraldic pattern expand into a richer social
    reveal. This is the reward moment.
@@ -58,10 +66,10 @@ is too much chrome for the first job and too little identity for the second.
 ### World nameplate: recognition token
 
 - A 16-18 CSS-pixel forged seal sits immediately left of the centered name
-  group. It overlaps or keys into the ribbon like real attached hardware.
+  group. It overlaps or keys into the plaque like real attached hardware.
 - The existing motif is the seal face. It must be readable by silhouette at
   normal nameplate distance, not only in a zoomed crop.
-- A shallow blue-black ribbon sits behind the name row only. It may have a
+- A shallow blue-black pointed plaque sits behind the name row only. It may have a
   restrained leather or woven grain and one fine antique-metal structural
   edge. It is not a full perimeter frame.
 - The chosen title returns to its existing secondary text line outside the
@@ -72,7 +80,7 @@ is too much chrome for the first job and too little identity for the second.
 - The shared `#14110c` well near 0.4 alpha remains the starting material. The
   Phase 5 screenshot pass may tune dimensions and alpha if normal-distance
   evidence requires it. The old 9/5 pad, radius 6, and extraLift 14 are
-  implementation history, not locked acceptance values for the new ribbon.
+  implementation history, not locked acceptance values for the new plaque.
 
 ### Player and target HUD: interaction reveal
 
@@ -156,7 +164,7 @@ The work is not visually complete unless all are true:
 - Player/target painters continue through elided DOM writers. Richer inspect and
   picker work is cold-path or event-driven.
 - No graphics tier, governor, or effects-profile input may hide the seal,
-  ribbon, pattern, or structural edge. Only the existing bloom path may scale.
+  plaque, pattern, or structural edge. Only the existing bloom path may scale.
 - The selective gate, painter budget, monolith budget, and focused allocation
   pins must stay green.
 

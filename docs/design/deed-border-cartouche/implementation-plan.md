@@ -1,7 +1,7 @@
 # Deed Heraldry: implementation plan
 
 Turn the Book of Deeds wearable border into a two-scale MMORPG identity reward:
-a compact forged seal and quiet name ribbon in the world, then a richer
+a compact forged seal and shallow pointed name plaque in the world, then a richer
 heraldic reveal on the player/target frame, inspect card, and picker. Cosmetic
 identity only. No power and no actionable information.
 
@@ -9,7 +9,7 @@ The filename remains `deed-border-cartouche/implementation-plan.md` because it
 is the continuity packet for the existing branch. The Phase 1-4 cartouche is
 implemented and QA-green, but the post-Phase 4 art review rejected it as the
 shipping visual direction: it reads as UI outline, not a reward worth wearing.
-Phases 5-8 are the active completion plan and supersede the old visual target.
+Phases 5-9 are the active completion plan and supersede the old visual target.
 
 Companion documents: `docs/design/deeds.md` (reward definition),
 `docs/design/reliquary.md` (Eternal Spoils / `reliquary_gilt`),
@@ -22,7 +22,7 @@ This packet does not change who earns a border, how it is stored
 (`PlayerMeta.activeBorder` is still a deed id), or the wear command
 (`deed_set_border`). It changes how a worn slug is drawn.
 
-## Why eight phases
+## Why nine phases
 
 Phases 1-4 are completed implementation history. They established the saved
 state, pure geometry seam, palette table, fairness pins, and screenshot
@@ -41,10 +41,12 @@ coverage, but their visual result is not accepted for shipping.
    portrait treatment, inspect banner, and meaningful picker preview.
 8. **QA: heraldry family.** Prove beauty, identity, accessibility, theme and
    tier fairness, performance, and the complete social experience.
+9. **v0.40 and plaque refinement.** Integrate the current release and resolve
+   the generated direction as one pointed plaque family at three UI scales.
 
 Each new build slice has a dedicated QA phase. Phase 5 must not start the
 social surfaces, and Phase 7 must not begin until the world token is accepted.
-The contribution is not ready for a PR until Phase 8 is green.
+The contribution is not ready for a PR until Phase 9 is green.
 
 ## Current behavior (ownership)
 
@@ -228,10 +230,12 @@ placement, or old geometry literals. It must preserve or replace the behavioral
 invariants those tests protected: centering, badge clearance, y-walk agreement,
 declutter, no sprites, forced colors, borderless behavior, and no wire drift.
 
-## Active edge-case matrix (Phases 5-8)
+## Active edge-case matrix (Phases 5-9)
 
 Every row needs a decisive automated assertion and the visual rows also need
 named screenshot evidence. Phase 6 maps E37-E46. Phase 8 maps E47-E58.
+The post-v0.40 plaque refinement maps E59-E63 without superseding any earlier
+behavioral contract.
 
 | Id | Case | Required read | Phase |
 |---|---|---|---|
@@ -257,6 +261,11 @@ named screenshot evidence. Phase 6 maps E37-E46. Phase 8 maps E47-E58.
 | E56 | Themes and contrast | Classic, midnight, parchment, highContrast, and forced colors keep the name readable, the seal identifiable, and selection visible. | 7 / 8 |
 | E57 | Tier and motion | Full identity exists at low and high. Only bloom may differ. No continuous animation; reduced motion has nothing essential to remove. | 7 / 8 |
 | E58 | Persistence and wire | Equip/unequip, slug swap, character-sheet refresh, reconnect, and online mirror still use `activeBorder`; no sim/server/wire/IWorld change. | 7 / 8 |
+| E59 | Shared plaque silhouette | Compact, mirrored, and ceremonial forms use one fixed-pixel 8px tip / 4px notch authority across canvas and CSS. Long localized names do not stretch the hardware. | 9 |
+| E60 | World plaque geometry | The world token is a six-point plaque with the existing round seal, one quiet inset glint, no rounded rectangle, and the retained 7/1 pad, 18px seal, protected 2px seal/plaque gap, hidden 2px joint bridge, and 8px lift. | 9 |
+| E61 | Interaction-scale plaque | Player and target plaques span the existing name-header column, mirror correctly, center the name, and leave portrait, level, bars, title, sanction, cast, and auras unchanged. | 9 |
+| E62 | Cold-surface plaque family | Picker previews and inspect use the same silhouette/material family across desktop, mobile, Parchment, low/high, and forced colors. Inspect remains subordinate to the paperdoll. | 9 |
+| E63 | Capture isolation | Intentional screenshot page closes clear the v0.40 entry crash probe before the next storage seed, so tier evidence cannot silently step down. | 9 |
 
 Phase 5 must remeasure `extraLift` and the declutter constants from the new
 world geometry. The old 14 / 32 / 34 literals remain history until replaced by
@@ -675,6 +684,36 @@ changed. Only then may the operator open a PR.
 
 Starter prompt: `phase-08-qa-heraldry-family.md`.
 
+## Phase 9: v0.40 integration and plaque refinement
+
+**Outcome.** The feature is rebased onto `release/v0.40.0`, and the approved
+generated direction reads as one convincing crafted plaque family rather than
+a thin rounded ribbon or a full gameplay-frame reskin.
+
+**In scope.**
+
+- Merge `origin/release/v0.40.0` without discarding the completed E1-E58 work.
+- Replace the compact rounded name ribbon with a shallow pointed plaque using
+  fixed-pixel tips and notches that remain stable for localized names.
+- Expand the player and target version across the existing name-header column,
+  mirror the target form, and keep every gameplay bar and status slot ordinary.
+- Give picker previews and inspect the same code-native silhouette family at
+  their appropriate interaction and ceremonial scales.
+- Preserve the caller-owned world core, static frozen motifs, sprite-free
+  Canvas2D painter, elided DOM writers, and allocation-free per-frame path.
+- Capture a new live-client album under `phase-09/`, judging the world at normal
+  distance before crops and proving grayscale identity, low/high parity,
+  responsive and Parchment layout, forced colors, picker, and inspect.
+- Run the complete repository gate and fresh test-coverage and frontend reviews.
+
+**Out of scope.** New deeds, slugs, motifs, titles, lore, runtime images,
+gameplay power, wire/persistence changes, animation, sparkle, or a full unit
+frame skin.
+
+**Exit.** E1-E58 remain green, E59-E63 are decisive, the v0.40 gate passes, and
+the permanent album proves that name reads first, seal second, and metal third
+in a crowded town. A shipping verdict still requires the independent reviews.
+
 ## Risks
 
 - Extra lift colliding with raid marks or emotes if only `drawBase` is
@@ -718,5 +757,5 @@ git status --short --branch
 ```
 
 Work only there on `feature/deed-border-cartouche`, diff vs
-`origin/release/v0.39.0`. Do not recreate the branch, implement on the release
+`origin/release/v0.40.0`. Do not recreate the branch, implement on the release
 checkout, or base on `main`.
