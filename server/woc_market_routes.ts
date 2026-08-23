@@ -1317,7 +1317,12 @@ export const routes: RouteDef[] = [
     method: 'GET',
     path: '/api/woc-market/me',
     surface: 'api',
-    middleware: [readAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    // Full-scope guard on purpose: this read returns the caller's own
+    // financial history, and OAuth companion tokens carry scope 'read', so
+    // the read guard would hand it to any third-party app the player
+    // authorized for character reads. Pinned by the guard-tier scan in
+    // tests/server/woc_market_routes.test.ts.
+    middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     handler: myActivityHandler,
   },
   {

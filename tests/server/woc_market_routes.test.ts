@@ -1087,6 +1087,19 @@ describe('the route table shape', () => {
       expect(block, path).toContain('activeAccount');
       expect(block, path).not.toMatch(/middleware: \[readAccount/);
     }
+    // /me is the one GET that returns the caller's own financial history
+    // (open bids and amounts, settlement states, strikes, terms acceptance),
+    // so it takes the FULL-scope guard: an OAuth companion token is minted
+    // scope 'read' (server/oauth.ts issueReadToken), and a third-party app
+    // authorized to read a character must not see marketplace finances. The
+    // public reads (status, browse, detail, estimate, histories) stay on the
+    // read guard deliberately: they expose nothing account-private.
+    const meBlock = src
+      .split(/\n {2}\{\n/)
+      .find((b) => b.includes("path: '/api/woc-market/me'"));
+    expect(meBlock).toBeDefined();
+    expect(meBlock).toContain('activeAccount');
+    expect(meBlock).not.toMatch(/middleware: \[readAccount/);
   });
 });
 
