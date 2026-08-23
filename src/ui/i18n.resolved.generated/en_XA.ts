@@ -866,11 +866,52 @@ export const en_XA: EnTranslations = {
       "actionRing": "[Çóɱƀáţ áçţíóñš]",
       "actionPageToggle": "[Šŵíţçĥ áçţíóñ þáĝé]",
       "actionPageIndicator": "[{page}]",
+      "actionRadial": "[Áçţíóñ ðíŕéçţíóñš]",
+      "actionRadialCancel": "[Çáñçéļ áçţíóñ]",
+      "radialCenter": "[Çéñţŕé]",
+      "radialUp": "[Úþ]",
+      "radialRight": "[Ŕíĝĥţ]",
+      "radialDown": "[Ðóŵñ]",
+      "radialLeft": "[Ļéƒţ]",
+      "consumableSeat": "[Çóñšúɱáƀļéš]",
+      "menuControl": "[Ɱéñúš]",
+      "menuControlAria": "[Ɱéñúš. Ţáþ ţó óþéñ çĥáţ, óŕ ĥóļð áñð šŵíþé ŕíĝĥţ ƒóŕ ɱóúñţš, ɱáþ, ƀáĝš áñð ɱóŕé.]",
+      "menuControlAriaTap": "[Ɱéñúš. Ţáþ ţó óþéñ ţĥé ɱéñú ŕóŵ: ɱóúñţš, ɱáþ, ƀáĝš áñð ɱóŕé. Ţáþ áĝáíñ ƒóŕ çĥáţ.]",
+      "menuLabel": "[Ɱéñú]",
+      "quickActions": "[Ɋúíçķ Áçţíóñš]",
+      "quickActionsAria": "[Ɋúíçķ Áçţíóñš. Ţáþ ţó óþéñ ţĥé ŕóŵ óƒ ɱóúñţ, çĥáţ, ɱáþ, ƀáĝš áñð ɱóŕé, óŕ ĥóļð áñð šŵíþé ŕíĝĥţ ţó þíçķ óñé.]",
+      "quickActionsAriaTap": "[Ɋúíçķ Áçţíóñš. Ţáþ ţó óþéñ ţĥé ŕóŵ óƒ ɱóúñţ, çĥáţ, ɱáþ, ƀáĝš áñð ɱóŕé, ţĥéñ ţáþ áñ íţéɱ. Ţáþ ţĥé çóñţŕóļ áĝáíñ ţó çļóšé.]",
+      "quickActionsLabel": "[Áçţíóñš]",
+      "stanceRadial": "[Šţáñçéš]",
+      "stanceAnchorAria": "[Šţáñçé: {stance}. Ţáþ ţó óþéñ ţĥé šţáñçé ŕíñĝ, ţĥéñ þíçķ áñóţĥéŕ šţáñçé.]",
+      "stanceAnchorEmptyAria": "[Ñó šţáñçé. Ţáþ ţó óþéñ ţĥé šţáñçé ŕíñĝ, ţĥéñ þíçķ á šţáñçé.]",
+      "questStripAria": "[Ţŕáçķéð ɋúéšţ {position} óƒ {total}: {title}. Áçţíʋáţé ƒóŕ ţĥé ñéẋţ ɋúéšţ.]",
+      "questStripAriaSingle": "[Ţŕáçķéð ɋúéšţ: {title}]",
+      "questStripCounter": "[{position}/{total}]",
+      "questStripMore": "[+{count} ɱóŕé]",
       "targetCycle": "[Šŵáþ ţáŕĝéţ]",
       "targetCycleShort": "[Ţáŕĝéţ]",
       "spellbookPageLabel": "[Þáĝé {page}]",
       "hideKeyboard": "[Ĥíðé ķéýƀóáŕð]",
-      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (! ƒóŕ çóɱɱúñíţý çóɱɱáñðš)]"
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (! ƒóŕ çóɱɱúñíţý çóɱɱáñðš)]",
+      "barEditor": "[Éðíţ Ɓáŕš]",
+      "barEditorAria": "[Éðíţ ţĥé áçţíóñ ƀáŕ ļáýóúţ]"
+    },
+    "barEditor": {
+      "title": "[Éðíţ Áçţíóñ Ɓáŕ]",
+      "close": "[Çļóšé ƀáŕ éðíţóŕ]",
+      "pages": "[Áçţíóñ ƀáŕ þáĝéš]",
+      "pageTab": "[Þáĝé {page}]",
+      "buttonHeader": "[Ɓúţţóñ {button}]",
+      "cellAria": "[Ɓúţţóñ {button}, {direction}: {action}]",
+      "emptyCellAria": "[Ɓúţţóñ {button}, {direction}: éɱþţý]",
+      "hint": "[Ţáþ á šļóţ, ţĥéñ áñóţĥéŕ, ţó šŵáþ ţĥéɱ.]",
+      "armed": "[Ţáþ á šļóţ ţó þļáçé {name}.]",
+      "picked": "[Ţáþ áñóţĥéŕ šļóţ ţó šŵáþ ŵíţĥ {name}.]",
+      "locked": "[Áçţíóñ ƀáŕš áŕé ļóçķéð íñ Íñţéŕƒáçé óþţíóñš.]",
+      "clear": "[Çļéáŕ]",
+      "clearAria": "[Çļéáŕ á šļóţ]",
+      "clearArmed": "[Ţáþ á šļóţ ţó çļéáŕ íţ.]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -1415,7 +1456,9 @@ export const en_XA: EnTranslations = {
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
       "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",
-      "mobileLeftHanded": "[Ļéƒţ-ĥáñðéð ļáýóúţ]"
+      "mobileLeftHanded": "[Ļéƒţ-ĥáñðéð ļáýóúţ]",
+      "touchTapMenus": "[Ţáþ ɱéñúš]",
+      "touchTapMenusNote": "[Óþéñ ţĥé áçţíóñ, çóñšúɱáƀļé áñð ɱéñú çóñţŕóļš ŵíţĥ á ţáþ íñšţéáð óƒ á šŵíþé. Ţáþ áñ íţéɱ ţó úšé íţ, ţáþ ţĥé çóñţŕóļ áĝáíñ ƒóŕ íţš úšúáļ áçţíóñ, óŕ ţáþ óúţšíðé ţó çļóšé.]"
     },
     "talentRows": {
       "tab": "[Çĥóíçéš]",
@@ -2504,7 +2547,8 @@ export const en_XA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",
-      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]"
+      "removeFromBarAria": "[Ŕéɱóʋé {name} ƒŕóɱ áçţíóñ ƀáŕ]",
+      "assignAria": "[Çĥóóšé á šļóţ ƒóŕ {name}]"
     },
     "nameplate": {
       "mobLevel": "[{level}]",
