@@ -197,8 +197,7 @@ const EMOTE_STYLE: TextSpriteStyle = {
   lineWidth: 1,
 };
 
-// Pen sizes for the world-scale forged seal and its quiet ribbon. All geometry
-// and layout measurements live in the pure heraldry core.
+// Pen sizes for the world-scale forged seal; geometry lives in the pure heraldry core.
 const HERALDRY_EDGE_WIDTH = 2;
 const HERALDRY_FRAME_WIDTH = 1;
 const HERALDRY_MOTIF_WIDTH = 1.25;
@@ -607,9 +606,7 @@ export class NameplateCanvasSurface {
     return rowHeight;
   }
 
-  // One world-scale deed seal joined to the name-only ribbon. Geometry is
-  // caller-owned, motif lines are frozen shared data, and every mark is a
-  // Canvas2D shape drawn before readable content.
+  // Caller-owned geometry and frozen motif data draw before readable content.
   private drawDeedHeraldry(slug: string, plateAlpha: number): void {
     const accent = borderAccent(slug);
     const heraldry = this.heraldry;
@@ -617,14 +614,16 @@ export class NameplateCanvasSurface {
     if (!accent || !heraldry.active || !kind) return;
     const ctx = this.ctx;
     const forcedColors = this.forcedColorsActive();
-    roundedRect(
-      ctx,
-      heraldry.ribbon.x,
-      heraldry.ribbon.y,
-      heraldry.ribbon.w,
-      heraldry.ribbon.h,
-      heraldry.ribbonRadius,
-    );
+    const plaque = heraldry.plaque;
+    const plaqueMiddleY = plaque.y + plaque.h / 2;
+    ctx.beginPath();
+    ctx.moveTo(plaque.x, plaque.y);
+    ctx.lineTo(heraldry.plaqueShoulderX, plaque.y);
+    ctx.lineTo(plaque.x + plaque.w, plaqueMiddleY);
+    ctx.lineTo(heraldry.plaqueShoulderX, plaque.y + plaque.h);
+    ctx.lineTo(plaque.x, plaque.y + plaque.h);
+    ctx.lineTo(heraldry.plaqueNotchX, plaqueMiddleY);
+    ctx.closePath();
     if (forcedColors) {
       ctx.fillStyle = 'Canvas';
       ctx.fill();
@@ -640,6 +639,16 @@ export class NameplateCanvasSurface {
     ctx.lineWidth = HERALDRY_FRAME_WIDTH;
     ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.frame;
     ctx.stroke();
+
+    // One static inset glint reads as worked metal at normal town distance.
+    ctx.beginPath();
+    ctx.moveTo(plaque.x + 5, plaque.y + 2);
+    ctx.lineTo(heraldry.plaqueShoulderX - 2, plaque.y + 2);
+    if (!forcedColors) ctx.globalAlpha = plateAlpha * 0.42;
+    ctx.lineWidth = HERALDRY_FRAME_WIDTH;
+    ctx.strokeStyle = forcedColors ? 'CanvasText' : accent.glow;
+    ctx.stroke();
+    if (!forcedColors) ctx.globalAlpha = plateAlpha;
 
     ctx.beginPath();
     ctx.rect(heraldry.joint.x, heraldry.joint.y, heraldry.joint.w, heraldry.joint.h);

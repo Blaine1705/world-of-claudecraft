@@ -339,18 +339,49 @@ describe('the portrait ring consumes the palette table, and holds no colors of i
     // rather than inheriting the gap the ring just closed.
     const shell = read('src/styles/shell.css');
     const forced = shell.match(
-      /@media \(forced-colors: active\) \{\s*\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /@media \(forced-colors: active\) \{\s*\.inspect-heraldry-face\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     expect(forced, 'the inspect header accent has no forced-colors arm').toBeTruthy();
     expect(forced).toContain('border-color: CanvasText;');
     expect(forced).toContain('outline-color: CanvasText;');
     expect(forced).toContain('box-shadow: none;');
+    expect(forced).toContain('background-color: CanvasText;');
+    const forcedStart = shell.indexOf(
+      '@media (forced-colors: active)',
+      shell.indexOf('.inspect-heraldry-deed'),
+    );
+    const forcedFamily = shell.slice(
+      forcedStart,
+      shell.indexOf('\n  .inspect-title {', forcedStart),
+    );
+    const forcedSeal = forcedFamily.match(
+      /\n {4}\.inspect-heraldry-banner \.deed-heraldry-seal \{([^}]*)\}/,
+    )?.[1];
+    const forcedPattern = forcedFamily.match(
+      /\n {4}\.inspect-heraldry-face \.deed-heraldry-pattern \{([^}]*)\}/,
+    )?.[1];
+    const forcedHonor = forcedFamily.match(
+      /\n {4}\.inspect-honor-rail \.inspect-holder \{([^}]*)\}/,
+    )?.[1];
+    expect(forcedSeal, 'the inspect seal has no forced-colors arm').toContain(
+      'background-color: Canvas;',
+    );
+    expect(forcedSeal).toContain('border-color: CanvasText;');
+    expect(forcedSeal).toContain('box-shadow: none;');
+    expect(forcedPattern, 'the inspect motif has no forced-colors arm').toContain(
+      'stroke: CanvasText;',
+    );
+    expect(forcedHonor, 'the inspect honor rail has no forced-colors arm').toContain(
+      'background: Canvas;',
+    );
+    expect(forcedHonor).toContain('border-color: CanvasText;');
+    expect(forcedHonor).toContain('box-shadow: none;');
   });
 
   it('the inspect banner rule gates on a NON-EMPTY slug and holds no color', () => {
     const shell = read('src/styles/shell.css');
     const rule = shell.match(
-      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-face\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     expect(rule, 'the inspect header accent rule is missing from shell.css').toBeTruthy();
     // Every color arrives through the painter's custom properties, and the
@@ -604,7 +635,7 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(canvas).not.toContain('THEME_PRESETS');
     expect(canvas).not.toContain('parchment');
     const inspectRule = read('src/styles/shell.css').match(
-      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-face\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     expect(inspectRule, 'inspect banner rule missing').toBeTruthy();
     expect(inspectRule).toContain('var(--border-accent-frame');
@@ -668,9 +699,13 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       /\n {2}\.inspect-heraldry-banner \.inspect-title \{([^}]*)\}/,
     )?.[1];
     const inspectBanner = shell.match(
-      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-face\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     const inspectDeed = shell.match(/\n {2}\.inspect-heraldry-deed \{([^}]*)\}/)?.[1];
+    const inspectHonorSub = shell.match(
+      /\n {2}\.inspect-honor-rail \.inspect-holder-sub \{([^}]*)\}/,
+    )?.[1];
+    const inspectHonor = shell.match(/\n {2}\.inspect-holder \{([^}]*)\}/)?.[1];
     expect(option).toContain('color: var(--color-text-overlay);');
     expect(optionHover).toContain('color: var(--color-deed-banner-text);');
     expect(previewRibbon).toContain('color: var(--color-text-overlay);');
@@ -678,14 +713,20 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     expect(previewDeed).toContain('color: var(--color-text-overlay);');
     expect(inspectTitle).toContain('color: var(--color-text-overlay);');
     expect(inspectDeed).toContain('color: var(--color-text-overlay);');
+    expect(inspectHonorSub).toContain('var(--color-text-overlay) 72%');
+    expect(inspectHonor).toContain(
+      'background: color-mix(in srgb, var(--panel-base) 28%, #08080d);',
+    );
     expect(option).toContain('background: linear-gradient(160deg, #17130c, #0c0a07);');
     expect(preview).toContain('var(--deed-heraldry-well, transparent) 74%');
-    expect(inspectBanner).toContain('var(--deed-heraldry-well, transparent) 82%');
+    expect(inspectBanner).toContain('var(--deed-heraldry-well, transparent) 88%');
 
     const vars = themeCssVars(THEME_PRESETS.parchment);
     const overlayText = vars['--color-text-overlay'];
     const panel = vars['--panel-base'];
     const well = DEED_HERALDRY_WELL_FILL;
+    const honorBackground = mixHex(panel, '#08080d', 0.72);
+    const honorSub = mixHex(overlayText, honorBackground, 0.28);
     const optionBackgrounds = ['#17130c', '#0c0a07'];
     const translucentHeraldryBackgrounds = [mixHex(well, panel, 0.18), mixHex(well, panel, 0.26)];
     for (const background of [well, ...optionBackgrounds, ...translucentHeraldryBackgrounds]) {
@@ -694,6 +735,10 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
         `Parchment overlay text on ${background}`,
       ).toBeGreaterThanOrEqual(4.5);
     }
+    expect(
+      contrastRatio(honorSub, honorBackground),
+      `Parchment honor sub-line ${honorSub} on ${honorBackground}`,
+    ).toBeGreaterThanOrEqual(4.5);
 
     const tokens = read('src/styles/tokens.css');
     const hoverText = tokens.match(/--color-deed-banner-text:\s*(#[0-9a-fA-F]{6});/)?.[1];
@@ -790,7 +835,7 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
 
   it('E57: social heraldry adds no continuous motion', () => {
     const inspectRule = read('src/styles/shell.css').match(
-      /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+      /\n {2}\.inspect-heraldry-face\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
     )?.[1];
     const header = HUD_CSS.match(
       /\n {2}\.uf-name-header\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
@@ -836,6 +881,36 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     )?.[1];
     expect(mobilePreview, 'mobile preview stack rule missing').toBeTruthy();
     expect(mobilePreview).toContain('grid-template-columns: 1fr;');
+    const inspectCard = mobile.match(
+      /\n {2}body\.mobile-touch #inspect-window \.inspect-card \{([^}]*)\}/,
+    )?.[1];
+    expect(inspectCard, 'mobile inspect card composition missing').toBeTruthy();
+    expect(inspectCard).toContain('flex-direction: column;');
+    expect(inspectCard).toContain('align-items: center;');
+    const inspectWidths = mobile.match(
+      /\n {2}body\.mobile-touch #inspect-window \.inspect-heraldry-banner,\n {2}body\.mobile-touch #inspect-window \.inspect-standing-row,\n {2}body\.mobile-touch #inspect-window \.inspect-honor-rail \{([^}]*)\}/,
+    )?.[1];
+    expect(inspectWidths, 'mobile mantle width group missing').toContain('width: 100%;');
+    const narrowInspectAt = mobile.indexOf(
+      '@media (max-width: 520px)',
+      mobile.indexOf('body.mobile-touch #inspect-window .inspect-model-panel'),
+    );
+    const narrowInspect = mobile.slice(
+      narrowInspectAt,
+      mobile.indexOf('body.mobile-touch #social-window', narrowInspectAt),
+    );
+    expect(narrowInspectAt, 'narrow inspect media query missing').toBeGreaterThan(-1);
+    expect(narrowInspect).toContain('padding-left: 38px;');
+    expect(narrowInspect).toContain('width: 52px;');
+    expect(narrowInspect).toContain('height: 52px;');
+    expect(narrowInspect).toContain('padding-right: 62px;');
+    expect(narrowInspect).toContain('padding-left: 21px;');
+    expect(narrowInspect).toContain('right: 12px;');
+    expect(narrowInspect).toContain('width: 48px;');
+    expect(narrowInspect).toContain('height: 48px;');
+    expect(mobile).toMatch(
+      /body\.mobile-touch #inspect-window \.inspect-honor-rail \{[^}]*grid-template-columns: minmax\(0, 300px\);/,
+    );
 
     for (const rel of [
       'src/styles/hud.css',
@@ -873,7 +948,7 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       [
         'inspect banner',
         read('src/styles/shell.css').match(
-          /\n {2}\.inspect-heraldry-banner\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
+          /\n {2}\.inspect-heraldry-face\[data-border\]:not\(\[data-border=""\]\) \{([^}]*)\}/,
         )?.[1],
       ],
       ['picker swatch', components.match(/\n {2}\.deed-border-swatch \{([^}]*)\}/)?.[1]],

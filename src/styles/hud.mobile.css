@@ -4241,9 +4241,8 @@
      but on touch it joins the sheet. Its select is the one interactive control, so
      the sheet pin plus the touch floor below is all it needs (no reflow hazard). */
   /* Inspect (player profile) on mobile: a full-width, viewport-capped scrollable
-     window. The showcase compact language keeps the two columns flanking the
-     class-colored stage (not stacked); the shared body.mobile-touch socket / tile
-     rules below (in the character-window block) drive the sockets and stats. */
+     window. The ceremonial identity remains one centered column while the shared
+     paperdoll keeps its two equipment columns around the smaller model stage. */
   body.mobile-touch #inspect-window {
     left: 10px;
     right: 10px;
@@ -4255,19 +4254,44 @@
     box-sizing: border-box;
     overflow-y: auto;
   }
-  /* Compact header goes horizontal; the class-colored stage shrinks to the mobile
-     stage size (the shared .char-model-panel mobile size below applies its width). */
+  /* The mantle, standing, and honor ledger stay ordered instead of wrapping into
+     an unrelated badge cloud. */
   body.mobile-touch #inspect-window .inspect-card {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    gap: 8px 10px;
+    gap: 8px;
     padding: 2px 2px 8px;
+  }
+  body.mobile-touch #inspect-window .inspect-heraldry-banner,
+  body.mobile-touch #inspect-window .inspect-standing-row,
+  body.mobile-touch #inspect-window .inspect-honor-rail {
+    width: 100%;
   }
   body.mobile-touch #inspect-window .inspect-model-panel {
     flex: 0 0 230px;
     width: 230px;
     min-height: 220px;
+  }
+  @media (max-width: 520px) {
+    body.mobile-touch #inspect-window .inspect-heraldry-banner {
+      padding-left: 38px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-banner .deed-heraldry-seal {
+      width: 52px;
+      height: 52px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-face {
+      padding-right: 62px;
+      padding-left: 21px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-face .deed-heraldry-pattern {
+      right: 12px;
+      width: 48px;
+      height: 48px;
+    }
+    body.mobile-touch #inspect-window .inspect-honor-rail {
+      grid-template-columns: minmax(0, 300px);
+    }
   }
   body.mobile-touch #social-window,
   body.mobile-touch #trade-window {

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { PlayerClass } from '../src/sim/types';
 import { borderAccent, borderMotifPrimitives } from '../src/ui/deed_border_view';
 import { deedName, deedTitleText } from '../src/ui/deed_i18n';
+import { classColorCss } from '../src/ui/inspect_view';
 import { type InspectEntity, InspectWindow } from '../src/ui/inspect_window';
 
 // The inspect ("Profile") window painter is a DOM module. Most guards below are
@@ -94,11 +95,10 @@ describe('inspect_window: thin painter, deps-only Hud access', () => {
 describe('inspect_window: the Curator standing surfaces', () => {
   it('renders the sigil badge AFTER the three older ones, in the same card', () => {
     // Array/append ORDER is a contract here: the four badge rows are string
-    // concatenation inside .inspect-card, so the sigil landing before devHtml
-    // would silently re-rank the column. Pin the sequence, not just presence.
-    const card = code.slice(code.indexOf('<div class="inspect-card">'));
+    // concatenation inside one honor rail, so the sigil landing before devHtml
+    // would silently re-rank the collection. Pin the sequence, not just presence.
+    const card = code.slice(code.indexOf('const honorHtml ='));
     const order = [
-      'this.curatorLineHtml(model.curator)',
       'this.holderHtml(model.badges.holder)',
       'this.discordHtml(model.badges.discord)',
       'this.devHtml(model.badges.dev)',
@@ -261,17 +261,24 @@ describe('inspect_window: the Curator standing surfaces', () => {
     expect(shell.match(/\.inspect-meta\.inspect-reliquary\s*\{/g) ?? []).toHaveLength(0);
   });
 
-  it('E52: keeps the ceremonial banner compact beside the paperdoll stage', () => {
+  it('E52: keeps the rendered ceremonial face at 15 percent of the paperdoll stage', () => {
     const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
     const banner = shell.match(/\n {2}\.inspect-heraldry-banner \{([^}]*)\}/)?.[1];
+    const face = shell.match(/\n {2}\.inspect-heraldry-face \{([^}]*)\}/)?.[1];
+    const honors = shell.match(/\n {2}\.inspect-honor-rail \{([^}]*)\}/)?.[1];
     const stage = shell.match(/\n {2}#inspect-window \.inspect-model-panel \{([^}]*)\}/)?.[1];
     expect(banner, 'inspect heraldry banner rule missing').toBeTruthy();
-    expect(banner).toContain('width: min(100%, 420px);');
+    expect(face, 'inspect heraldry face rule missing').toBeTruthy();
+    expect(banner).toContain('width: min(100%, 620px);');
+    expect(face).toContain('height: 60px;');
+    expect(honors).toContain(
+      'grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 300px));',
+    );
+    expect(honors).toContain('justify-content: center;');
     expect(stage).toContain('min-height: 400px;');
-    const sealSize = Number(banner?.match(/grid-template-columns:\s*(\d+)px/)?.[1]);
-    const verticalPadding = Number(banner?.match(/padding:\s*(\d+)px/)?.[1]) * 2;
+    const faceHeight = Number(face?.match(/height:\s*(\d+)px/)?.[1]);
     const stageHeight = Number(stage?.match(/min-height:\s*(\d+)px/)?.[1]);
-    expect(sealSize + verticalPadding).toBeLessThanOrEqual(stageHeight * 0.15);
+    expect(faceHeight).toBeLessThanOrEqual(stageHeight * 0.15);
   });
 });
 
@@ -319,6 +326,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
   const openWith = (
     e: InspectEntity,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
+    showDevBadges = false,
   ): HTMLElement => {
     const realCreate = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
@@ -338,7 +346,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       captureFocus: () => null,
       restoreFocus: vi.fn(),
       slotName: (slot) => slot,
-      showDevBadges: () => false,
+      showDevBadges: () => showDevBadges,
       mountPreview: vi.fn(),
       // A real data URL, not '': an empty-string src resolves against the
       // document URL in happy-dom and fetches. NOTE the honest scope: this
@@ -403,8 +411,16 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(banner?.getAttribute('data-motif')).toBe('vault');
     expect(banner?.getAttribute('style')).toContain('--border-accent-frame:#f4ca43;');
     expect(banner?.getAttribute('style')).toContain('--deed-heraldry-well:#14110c;');
-    expect(banner?.querySelector('.deed-heraldry-seal')).not.toBeNull();
-    expect(banner?.querySelector('.deed-heraldry-pattern')).not.toBeNull();
+    const face = banner?.querySelector('.inspect-heraldry-face');
+    const seal = banner?.querySelector('.deed-heraldry-seal');
+    expect(face?.getAttribute('data-border')).toBe('reliquary_gilt');
+    expect(face?.getAttribute('data-motif')).toBe('vault');
+    expect(seal).not.toBeNull();
+    expect(face?.contains(seal ?? null)).toBe(false);
+    expect(face?.parentElement).toBe(banner);
+    expect(seal?.parentElement).toBe(banner);
+    expect(face?.nextElementSibling).toBe(seal);
+    expect(face?.querySelector('.deed-heraldry-pattern')).not.toBeNull();
     const accent = borderAccent('reliquary_gilt');
     expect(borderMotifPrimitives('vault')).toHaveLength(5);
     for (const path of banner?.querySelectorAll('path') ?? []) {
@@ -417,6 +433,62 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(banner?.querySelector('.inspect-heraldry-deed')?.textContent).toBe(
       deedName('col_reliquary_rank_5'),
     );
+  });
+
+  it('composes standing and every earned honor into one stable ceremonial hierarchy', () => {
+    const root = openWith(
+      {
+        ...baseEntity,
+        border: 'col_reliquary_rank_5',
+        curatorRank: 5,
+        relicsOwned: 300,
+        relicsTotal: 300,
+        holderTier: 3,
+        holderBalance: 4200,
+        discordTier: 1,
+        discordName: 'Aurelia',
+        discordJoined: 1_699_000_000_000,
+        devTier: 2,
+        devMergedPrs: 17,
+        githubLogin: 'aurelia',
+      },
+      null,
+      true,
+    );
+    const standing = root.querySelector('.inspect-standing-row');
+    const standingItems = [...(standing?.children ?? [])];
+    expect(standingItems).toHaveLength(2);
+    expect(standingItems[0]?.className).toBe('inspect-meta');
+    expect(standingItems[0]?.textContent).toContain('60');
+    expect(standingItems[1]?.classList.contains('inspect-reliquary')).toBe(true);
+    expect(standingItems[1]?.textContent).toContain('300');
+    const rail = root.querySelector('.inspect-honor-rail');
+    const honors = [...root.querySelectorAll('.inspect-holder')];
+    expect(honors).toHaveLength(4);
+    expect(honors.every((honor) => honor.parentElement === rail)).toBe(true);
+    const modelPanel = root.querySelector<HTMLElement>('.inspect-model-panel');
+    expect(modelPanel?.style.getPropertyValue('--inspect-class-color')).toBe(
+      classColorCss(baseEntity.templateId),
+    );
+  });
+
+  it('keeps a bordered no-title long Unicode identity inside the fixed ceremonial face', () => {
+    const name = 'Æthelflæd 星渡りの守護者 Zorya-of-the-Long-Road';
+    const root = openWith({
+      ...baseEntity,
+      name,
+      border: 'col_reliquary_rank_5',
+      title: null,
+    });
+    const face = root.querySelector('.inspect-heraldry-face');
+    expect(face?.querySelector('.inspect-name')?.textContent).toBe(name);
+    expect(face?.querySelector('.inspect-title')).toBeNull();
+    expect(face?.querySelector('.inspect-heraldry-deed')).not.toBeNull();
+    const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
+    const nameRule = shell.match(/\n {2}\.inspect-heraldry-banner \.inspect-name \{([^}]*)\}/)?.[1];
+    expect(nameRule).toContain('overflow: hidden;');
+    expect(nameRule).toContain('text-overflow: ellipsis;');
+    expect(nameRule).toContain('white-space: nowrap;');
   });
 
   it('leaves a borderless card clean, with no empty heraldry shell', () => {

@@ -202,21 +202,23 @@ export class InspectWindow {
     );
     markDialogRoot(el, { labelledBy: 'inspect-window-title' });
     const { header } = model;
+    const standingHtml = `<div class="inspect-meta">${esc(
+      t('itemUi.equipment.levelClass', {
+        level: formatNumber(header.level, { maximumFractionDigits: 0 }),
+        className: classDisplayName(cls),
+      }),
+    )}</div>${this.curatorLineHtml(model.curator)}`;
+    const honorHtml =
+      this.holderHtml(model.badges.holder) +
+      this.discordHtml(model.badges.discord) +
+      this.devHtml(model.badges.dev) +
+      this.curatorHtml(model.badges.curator);
     el.innerHTML =
       this.panelTitleHtml() +
       `<div class="inspect-card">` +
       this.headerHtml(header) +
-      `<div class="inspect-meta">${esc(
-        t('itemUi.equipment.levelClass', {
-          level: formatNumber(header.level, { maximumFractionDigits: 0 }),
-          className: classDisplayName(cls),
-        }),
-      )}</div>` +
-      this.curatorLineHtml(model.curator) +
-      this.holderHtml(model.badges.holder) +
-      this.discordHtml(model.badges.discord) +
-      this.devHtml(model.badges.dev) +
-      this.curatorHtml(model.badges.curator) +
+      `<div class="inspect-standing-row">${standingHtml}</div>` +
+      (honorHtml ? `<div class="inspect-honor-rail">${honorHtml}</div>` : '') +
       `</div>` +
       // The class-colored model stage, delivered as a CSS custom property so the
       // stylesheet paints the border / glow / haze in the inspected player's hue.
@@ -322,13 +324,15 @@ export class InspectWindow {
     if (!border) return `<div class="inspect-name">${esc(header.name)}</div>${titleHtml}`;
     return (
       `<div class="inspect-heraldry-banner"${this.borderAttrs(border)}>` +
-      `<span class="deed-heraldry-seal" aria-hidden="true">${deedHeraldryMotifSvg(border.motif, 'deed-heraldry-seal-art')}</span>` +
+      `<div class="inspect-heraldry-face deed-heraldry-plaque deed-heraldry-plaque-ceremonial"${this.borderIdentityAttrs(border)}>` +
       deedHeraldryMotifSvg(border.motif, 'deed-heraldry-pattern') +
       `<div class="inspect-heraldry-copy">` +
       `<div class="inspect-name">${esc(header.name)}</div>` +
       titleHtml +
       `<div class="inspect-heraldry-deed">${esc(border.deedName)}</div>` +
-      `</div></div>`
+      `</div></div>` +
+      `<span class="deed-heraldry-seal" aria-hidden="true">${deedHeraldryMotifSvg(border.motif, 'deed-heraldry-seal-art')}</span>` +
+      `</div>`
     );
   }
 
@@ -336,10 +340,13 @@ export class InspectWindow {
   // carries the exact material tokens every cold heraldry surface consumes.
   private borderAttrs(border: InspectBorderModel | null): string {
     if (!border) return '';
+    return `${this.borderIdentityAttrs(border)} style="${esc(deedHeraldryStyle(border))}"`;
+  }
+
+  private borderIdentityAttrs(border: InspectBorderModel): string {
     return (
       ` ${DEED_HERALDRY_ATTR}="${esc(border.slug)}"` +
-      ` ${DEED_HERALDRY_MOTIF_ATTR}="${border.motif}"` +
-      ` style="${esc(deedHeraldryStyle(border))}"`
+      ` ${DEED_HERALDRY_MOTIF_ATTR}="${border.motif}"`
     );
   }
 

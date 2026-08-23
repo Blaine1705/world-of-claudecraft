@@ -13,7 +13,7 @@ import {
 } from '../src/render/nameplate_canvas';
 import {
   NAMEPLATE_HERALDRY_EXTRA_LIFT,
-  NAMEPLATE_HERALDRY_RIBBON_PAD_X,
+  NAMEPLATE_HERALDRY_PLAQUE_PAD_X,
   NAMEPLATE_HERALDRY_WELL_ALPHA,
   NAMEPLATE_HERALDRY_WELL_FILL,
 } from '../src/render/nameplate_heraldry_core';
@@ -23,6 +23,7 @@ import {
   borderAccent,
   borderMotifPrimitives,
 } from '../src/ui/deed_border_view';
+import { DEED_HERALDRY_PLAQUE_TIP_PX } from '../src/ui/deed_heraldry_plaque_core';
 import { scanReachableHotPath } from './helpers/hot_path_allocations';
 
 // jsdom rewrites a literal `new URL('...', import.meta.url)` to an http URL.
@@ -111,8 +112,9 @@ const spriteCount = (surface: NameplateCanvasSurface): number =>
 interface HeraldrySurfaceAccess {
   heraldry: {
     active: boolean;
-    ribbon: { x: number; y: number; w: number; h: number };
-    ribbonRadius: number;
+    plaque: { x: number; y: number; w: number; h: number };
+    plaqueShoulderX: number;
+    plaqueNotchX: number;
     seal: { x: number; y: number; size: number };
     joint: { x: number; y: number; w: number; h: number };
     rivets: [{ x: number; y: number }, { x: number; y: number }];
@@ -646,7 +648,7 @@ describe('nameplate canvas surface', () => {
     const heraldry = heraldryOf(surface);
     expect(heraldry.seal.size).toBe(18);
     expect(heraldry.motifKind).toBe('vault');
-    // One outer seal, one recessed face, and two quiet joint rivets. The ribbon
+    // One outer seal, one recessed face, and two quiet joint rivets. The plaque
     // itself is path geometry, never a raster or a second text pass.
     expect(traces[0].arc).toHaveBeenCalledTimes(4);
     expect(traces[0].fillStyles).toContain(NAMEPLATE_HERALDRY_WELL_FILL);
@@ -706,7 +708,6 @@ describe('nameplate canvas surface', () => {
       'borderMotifPrimitives',
       'drawDeedHeraldry',
       'forcedColorsActive',
-      'roundedRect',
     ]);
     expect(scan.allocations).toEqual([]);
     expect(scan.unresolvedCalls).toEqual([]);
@@ -721,7 +722,7 @@ describe('nameplate canvas surface', () => {
 
   it('E44: drawEmote and drawBase share the 8px lift so the bubble clears the token', () => {
     // drawEmote re-walks drawBase's y-steps to find its anchor. Both consume
-    // the same named extraLift, so the bubble stays above the seal and ribbon.
+    // the same named extraLift, so the bubble stays above the seal and plaque.
     vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
     vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(32);
     const surface = new NameplateCanvasSurface(document.createElement('div'));
@@ -759,12 +760,12 @@ describe('nameplate canvas surface', () => {
     expect(withAccent?.[1]).toBe(withoutAccent?.[1]);
     expect(withAccent?.[2]).toBe((withoutAccent?.[2] as number) - NAMEPLATE_HERALDRY_EXTRA_LIFT);
     expect(nameWith).toBe((nameWithout as number) - NAMEPLATE_HERALDRY_EXTRA_LIFT);
-    expect(heraldry.ribbon.y).toBeLessThan(nameWith as number);
+    expect(heraldry.plaque.y).toBeLessThan(nameWith as number);
     expect(withAccent?.[2]).toBeLessThan(heraldry.seal.y);
     expect(NAMEPLATE_HERALDRY_EXTRA_LIFT).toBe(8);
   });
 
-  it('E46: forced colors keep the seal and ribbon on the Canvas system pair', () => {
+  it('E46: forced colors keep the seal and plaque on the Canvas system pair', () => {
     const previousMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -905,7 +906,7 @@ describe('nameplate canvas surface', () => {
     }
   });
 
-  it('E38: the ribbon owns the name row and the equipped title stays outside', () => {
+  it('E38: the plaque owns the name row and the equipped title stays outside', () => {
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = createNameplateCanvasState();
     Object.assign(state, {
@@ -924,20 +925,20 @@ describe('nameplate canvas surface', () => {
     expect(rasterizedText).toContain('Gilded One');
     expect(traces[0].fillStyles).toContain(NAMEPLATE_HERALDRY_WELL_FILL);
     const heraldry = heraldryOf(surface);
-    const ribbonWidth = heraldry.ribbon.w;
+    const plaqueWidth = heraldry.plaque.w;
     const title = drawSpy.mock.calls.find((call) => call[1] === 'Gate Keeper');
     expect(title?.[2]).toBe(heraldry.titleCenterX);
     expect(title?.[3]).toBe(heraldry.titleBaseline);
     expect(heraldry.titleCenterX).toBe(320);
-    expect(heraldry.titleBaseline).toBeGreaterThan(heraldry.ribbon.y + heraldry.ribbon.h);
-    expect(heraldry.titleBaseline - (heraldry.ribbon.y + heraldry.ribbon.h)).toBe(8);
+    expect(heraldry.titleBaseline).toBeGreaterThan(heraldry.plaque.y + heraldry.plaque.h);
+    expect(heraldry.titleBaseline - (heraldry.plaque.y + heraldry.plaque.h)).toBe(8);
 
     // Title width is deliberately absent from the heraldry input: even a title
-    // much wider than the name cannot turn the name ribbon back into a plaque.
+    // much wider than the name cannot widen the name-owned plaque.
     state.title = 'Keeper of the Impossibly Wide Secondary Line';
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
-    expect(heraldryOf(surface).ribbon.w).toBe(ribbonWidth);
+    expect(heraldryOf(surface).plaque.w).toBe(plaqueWidth);
   });
 
   it('E39: Unicode, chips, and 15/24px badges stay centered and clear the seal', () => {
@@ -965,17 +966,18 @@ describe('nameplate canvas surface', () => {
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     const heraldry = heraldryOf(surface);
-    const contentWidth = heraldry.ribbon.w - NAMEPLATE_HERALDRY_RIBBON_PAD_X * 2;
+    const contentWidth =
+      heraldry.plaqueShoulderX - heraldry.plaque.x - NAMEPLATE_HERALDRY_PLAQUE_PAD_X * 2;
     expect(contentWidth).toBe(296);
     expect(heraldry.nameRowLeft).toBe(172);
     expect(heraldry.nameRowLeft + contentWidth / 2).toBe(320);
-    expect(heraldry.ribbon.x).toBe(165);
-    expect(heraldry.ribbon.w).toBe(310);
-    expect(heraldry.ribbon.h).toBe(26);
-    expect(heraldry.nameRowTop - heraldry.ribbon.y).toBe(1);
-    expect(heraldry.ribbon.y + heraldry.ribbon.h - (heraldry.nameRowTop + 24)).toBe(1);
+    expect(heraldry.plaque.x).toBe(165);
+    expect(heraldry.plaque.w).toBe(318);
+    expect(heraldry.plaque.h).toBe(26);
+    expect(heraldry.nameRowTop - heraldry.plaque.y).toBe(1);
+    expect(heraldry.plaque.y + heraldry.plaque.h - (heraldry.nameRowTop + 24)).toBe(1);
     expect(heraldry.seal.x + heraldry.seal.size).toBeLessThan(heraldry.nameRowLeft);
-    expect(heraldry.nameRowLeft - (heraldry.seal.x + heraldry.seal.size)).toBe(4);
+    expect(heraldry.nameRowLeft - (heraldry.seal.x + heraldry.seal.size)).toBe(9);
     expect(heraldry.joint.x + heraldry.joint.w).toBeLessThanOrEqual(heraldry.nameRowLeft);
     const ai = drawSpy.mock.calls.find((call) => call[1] === '[AI]');
     const cheater = drawSpy.mock.calls.find((call) => call[1] === '< Cheater >');
@@ -1007,8 +1009,8 @@ describe('nameplate canvas surface', () => {
     expect(ai?.[3]).toBe(heraldry.nameBaseline);
     expect(cheater?.[3]).toBe(heraldry.nameBaseline);
     expect(name?.[3]).toBe(heraldry.nameBaseline);
-    expect(heraldry.nameBaseline).toBeGreaterThan(heraldry.ribbon.y);
-    expect(heraldry.nameBaseline).toBeLessThan(heraldry.ribbon.y + heraldry.ribbon.h);
+    expect(heraldry.nameBaseline).toBeGreaterThan(heraldry.plaque.y);
+    expect(heraldry.nameBaseline).toBeLessThan(heraldry.plaque.y + heraldry.plaque.h);
   });
 
   it('E43: pairs ordinary 12px/16px/18px sizing against target 14px/18px/20px', () => {
@@ -1023,8 +1025,8 @@ describe('nameplate canvas surface', () => {
     expect((ordinary?.[4] as { font?: string } | undefined)?.font).toBe(
       '700 12px Cinzel, Georgia, serif',
     );
-    expect(heraldryOf(surface).ribbon.h - 2).toBe(16);
-    expect(heraldryOf(surface).ribbon.h).toBe(18);
+    expect(heraldryOf(surface).plaque.h - 2).toBe(16);
+    expect(heraldryOf(surface).plaque.h).toBe(18);
 
     Object.assign(state, { name: 'Target', currentTarget: true });
     surface.beginFrame(640, 360, 1);
@@ -1033,8 +1035,8 @@ describe('nameplate canvas surface', () => {
     expect((target?.[4] as { font?: string } | undefined)?.font).toBe(
       '700 14px Cinzel, Georgia, serif',
     );
-    expect(heraldryOf(surface).ribbon.h - 2).toBe(18);
-    expect(heraldryOf(surface).ribbon.h).toBe(20);
+    expect(heraldryOf(surface).plaque.h - 2).toBe(18);
+    expect(heraldryOf(surface).plaque.h).toBe(20);
   });
 
   it.each(
@@ -1043,7 +1045,7 @@ describe('nameplate canvas surface', () => {
       { border, name: 'AFK [GM] Ångström界', width: 147 },
     ]),
   )(
-    'E37/E40: pins the exact ribbon and $border seal path grammar for $name',
+    'E37/E40: pins the exact plaque and $border seal path grammar for $name',
     ({ border, name, width }) => {
       const surface = new NameplateCanvasSurface(document.createElement('div'));
       const state = createNameplateCanvasState();
@@ -1055,37 +1057,25 @@ describe('nameplate canvas surface', () => {
 
       const trace = traces[0];
       const heraldry = heraldryOf(surface);
-      const { ribbon, ribbonRadius: r, joint, seal } = heraldry;
+      const { plaque, plaqueShoulderX, plaqueNotchX, joint, seal } = heraldry;
+      const plaqueMiddleY = plaque.y + plaque.h / 2;
       const sealCenterX = seal.x + seal.size / 2;
       const sealCenterY = seal.y + seal.size / 2;
       const expected: PathOp[] = [
         { op: 'beginPath', args: [] },
-        { op: 'moveTo', args: [ribbon.x + r, ribbon.y] },
-        { op: 'lineTo', args: [ribbon.x + ribbon.w - r, ribbon.y] },
-        {
-          op: 'quadraticCurveTo',
-          args: [ribbon.x + ribbon.w, ribbon.y, ribbon.x + ribbon.w, ribbon.y + r],
-        },
-        { op: 'lineTo', args: [ribbon.x + ribbon.w, ribbon.y + ribbon.h - r] },
-        {
-          op: 'quadraticCurveTo',
-          args: [
-            ribbon.x + ribbon.w,
-            ribbon.y + ribbon.h,
-            ribbon.x + ribbon.w - r,
-            ribbon.y + ribbon.h,
-          ],
-        },
-        { op: 'lineTo', args: [ribbon.x + r, ribbon.y + ribbon.h] },
-        {
-          op: 'quadraticCurveTo',
-          args: [ribbon.x, ribbon.y + ribbon.h, ribbon.x, ribbon.y + ribbon.h - r],
-        },
-        { op: 'lineTo', args: [ribbon.x, ribbon.y + r] },
-        { op: 'quadraticCurveTo', args: [ribbon.x, ribbon.y, ribbon.x + r, ribbon.y] },
+        { op: 'moveTo', args: [plaque.x, plaque.y] },
+        { op: 'lineTo', args: [plaqueShoulderX, plaque.y] },
+        { op: 'lineTo', args: [plaque.x + plaque.w, plaqueMiddleY] },
+        { op: 'lineTo', args: [plaqueShoulderX, plaque.y + plaque.h] },
+        { op: 'lineTo', args: [plaque.x, plaque.y + plaque.h] },
+        { op: 'lineTo', args: [plaqueNotchX, plaqueMiddleY] },
         { op: 'closePath', args: [] },
         { op: 'fill', args: [] },
         { op: 'stroke', args: [] },
+        { op: 'stroke', args: [] },
+        { op: 'beginPath', args: [] },
+        { op: 'moveTo', args: [plaque.x + 5, plaque.y + 2] },
+        { op: 'lineTo', args: [plaqueShoulderX - 2, plaque.y + 2] },
         { op: 'stroke', args: [] },
         { op: 'beginPath', args: [] },
         { op: 'rect', args: [joint.x, joint.y, joint.w, joint.h] },
@@ -1135,13 +1125,15 @@ describe('nameplate canvas surface', () => {
         { op: 'fill', args: [] },
       );
 
-      expect(heraldry.ribbon.w).toBe(width + NAMEPLATE_HERALDRY_RIBBON_PAD_X * 2);
+      expect(heraldry.plaque.w).toBe(
+        width + NAMEPLATE_HERALDRY_PLAQUE_PAD_X * 2 + DEED_HERALDRY_PLAQUE_TIP_PX,
+      );
       expect(trace.pathOps).toEqual(expected);
-      expect(trace.stroke).toHaveBeenCalledTimes(6);
+      expect(trace.stroke).toHaveBeenCalledTimes(7);
     },
   );
 
-  it('E37: replaces the old perimeter hardware with one forged seal and ribbon path', () => {
+  it('E37: replaces the old perimeter hardware with one forged seal and plaque path', () => {
     expect(existsSync(new URL('../src/render/nameplate_cartouche_core.ts', import.meta.url))).toBe(
       false,
     );
@@ -1153,14 +1145,14 @@ describe('nameplate canvas surface', () => {
     const drawBody = source.slice(drawAt, nextAt);
     expect(drawAt).toBeGreaterThan(-1);
     expect(nextAt).toBeGreaterThan(drawAt);
-    expect(drawBody).toContain('heraldry.ribbon');
+    expect(drawBody).toContain('heraldry.plaque');
     expect(drawBody).toContain('heraldry.seal');
     for (const retired of ['.outer', '.inner', '.brackets', '.clasp']) {
       expect(drawBody).not.toContain(retired);
     }
   });
 
-  it('retains E9: draws the dev-tier name outline after the ribbon, never under it', () => {
+  it('retains E9: draws the dev-tier name outline after the plaque, never under it', () => {
     const source = readSource('../src/render/nameplate_canvas.ts');
     const accentAt = source.indexOf('if (heraldry.active) this.drawDeedHeraldry');
     const outlineAt = source.indexOf(
@@ -1180,12 +1172,12 @@ describe('nameplate canvas surface', () => {
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     expect(traces[0].fillStyles).toContain(NAMEPLATE_HERALDRY_WELL_FILL);
-    const ribbonFillOrder = traces[0].fill.mock.invocationCallOrder[0];
+    const plaqueFillOrder = traces[0].fill.mock.invocationCallOrder[0];
     const outlineOrder = drawSpy.mock.invocationCallOrder[0];
-    expect(ribbonFillOrder).toBeLessThan(outlineOrder);
+    expect(plaqueFillOrder).toBeLessThan(outlineOrder);
   });
 
-  it('E41: keeps guild below the health bar and outside the name ribbon', () => {
+  it('E41: keeps guild below the health bar and outside the name plaque', () => {
     const source = readSource('../src/render/nameplate_canvas.ts');
     const guildAt = source.indexOf('if (state.guild)');
     const liftAt = source.indexOf('y -= this.heraldryLift(state)');
@@ -1210,7 +1202,7 @@ describe('nameplate canvas surface', () => {
     expect(traces[0].fillStyles).toContain(NAMEPLATE_HERALDRY_WELL_FILL);
     const guild = drawSpy.mock.calls.find((call) => call[1] === '<The Testers>');
     const heraldry = heraldryOf(surface);
-    expect(guild?.[3]).toBeGreaterThan(heraldry.ribbon.y + heraldry.ribbon.h);
+    expect(guild?.[3]).toBeGreaterThan(heraldry.plaque.y + heraldry.plaque.h);
   });
 
   it('E41: pins every pair in the cast, HP, guild, quest, combo, raid, and emote y-walk', () => {
@@ -1254,8 +1246,8 @@ describe('nameplate canvas surface', () => {
     surface.drawBase(state, 320, 220);
     surface.drawEmote(state, 320, 220);
     const heraldry = heraldryOf(surface);
-    const ribbonTop = heraldry.ribbon.y;
-    const ribbonBottom = heraldry.ribbon.y + heraldry.ribbon.h;
+    const plaqueTop = heraldry.plaque.y;
+    const plaqueBottom = heraldry.plaque.y + heraldry.plaque.h;
     const cast = drawSpy.mock.calls.find((call) => call[1] === 'Cast');
     const guild = drawSpy.mock.calls.find((call) => call[1] === '<The Testers>');
     const quest = drawSpy.mock.calls.find((call) => call[1] === '!');
@@ -1297,8 +1289,8 @@ describe('nameplate canvas surface', () => {
       }
     }
     expect(cast?.[3]).toBe(217);
-    expect(cast?.[3]).toBeGreaterThan(ribbonBottom);
-    expect(quest?.[3]).toBeLessThan(ribbonTop);
+    expect(cast?.[3]).toBeGreaterThan(plaqueBottom);
+    expect(quest?.[3]).toBeLessThan(plaqueTop);
   });
 
   it('E43: death hides HP but keeps the equipped Deed Heraldry token', () => {
@@ -1318,7 +1310,7 @@ describe('nameplate canvas surface', () => {
     expect(heraldryOf(surface).motifKind).toBe('laurel');
   });
 
-  it('E43: stealth opacity applies to both the token and its midnight ribbon', () => {
+  it('E43: stealth opacity applies to both the token and its midnight plaque', () => {
     const surface = new NameplateCanvasSurface(document.createElement('div'));
     const state = createNameplateCanvasState();
     Object.assign(state, {
@@ -1330,8 +1322,8 @@ describe('nameplate canvas surface', () => {
     surface.beginFrame(640, 360, 1);
     surface.drawBase(state, 320, 220);
     expect(traces[0].globalAlphas).toContain(0.55);
-    expect(NAMEPLATE_HERALDRY_WELL_ALPHA).toBe(0.48);
-    expect(traces[0].globalAlphas).toContain(0.55 * 0.48);
+    expect(NAMEPLATE_HERALDRY_WELL_ALPHA).toBe(0.62);
+    expect(traces[0].globalAlphas).toContain(0.55 * 0.62);
     expect(traces[0].fillStyles).toContain(NAMEPLATE_HERALDRY_WELL_FILL);
   });
 
@@ -1366,7 +1358,7 @@ describe('nameplate canvas surface', () => {
     surface.drawBase(state, 320, 220);
     const target = drawSpy.mock.calls.filter((call) => call[1] === 'Target').at(-1);
     expect((target?.[4] as { font?: string } | undefined)?.font).toContain('14px');
-    expect(heraldryOf(surface).ribbon.h).toBe(20);
+    expect(heraldryOf(surface).plaque.h).toBe(20);
   });
 
   it('E42: a borderless plate paints no token and retains the secondary title line', () => {
@@ -1383,7 +1375,7 @@ describe('nameplate canvas surface', () => {
     expect(traces[0].stroke).toHaveBeenCalledTimes(0);
     expect(heraldryOf(surface).active).toBe(false);
     expect(heraldryOf(surface).seal.size).toBe(0);
-    expect(heraldryOf(surface).ribbon.w).toBe(0);
+    expect(heraldryOf(surface).plaque.w).toBe(0);
     const rasterizedText = traces.flatMap((trace) =>
       trace.fillText.mock.calls.map(([value]) => value),
     );
@@ -1406,7 +1398,7 @@ describe('nameplate canvas surface', () => {
       expect(traces[0].stroke, slug || '(empty)').toHaveBeenCalledTimes(0);
       expect(heraldryOf(surface).active, slug || '(empty)').toBe(false);
       expect(heraldryOf(surface).seal.size, slug || '(empty)').toBe(0);
-      expect(heraldryOf(surface).ribbon.w, slug || '(empty)').toBe(0);
+      expect(heraldryOf(surface).plaque.w, slug || '(empty)').toBe(0);
     }
   });
 

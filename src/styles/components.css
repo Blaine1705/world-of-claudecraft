@@ -8065,6 +8065,92 @@
     min-width: 40px;
     min-height: 40px;
   }
+  /* One code-native silhouette family connects the world token, unit frames,
+     picker preview, and inspect card. Fixed-pixel shoulders keep long localized
+     names from stretching the forged ends into oversized wedges. Borderless
+     hosts keep their original rectangle because clipping is earned-chrome only. */
+  .deed-heraldry-plaque {
+    --deed-heraldry-plaque-clip: polygon(
+      0 0,
+      calc(100% - 8px) 0,
+      100% 50%,
+      calc(100% - 8px) 100%,
+      0 100%,
+      4px 50%
+    );
+  }
+  .deed-heraldry-plaque-mirror {
+    --deed-heraldry-plaque-clip: polygon(
+      8px 0,
+      100% 0,
+      calc(100% - 4px) 50%,
+      100% 100%,
+      8px 100%,
+      0 50%
+    );
+  }
+  .deed-heraldry-plaque-ceremonial {
+    --deed-heraldry-plaque-clip: polygon(
+      8px 0,
+      calc(100% - 8px) 0,
+      100% 50%,
+      calc(100% - 8px) 100%,
+      8px 100%,
+      0 50%
+    );
+  }
+  .deed-heraldry-plaque[data-border]:not([data-border=""]),
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque {
+    position: relative;
+    isolation: isolate;
+    clip-path: var(--deed-heraldry-plaque-clip);
+    background-color: var(--border-accent-frame, transparent);
+  }
+  .deed-heraldry-plaque[data-border]:not([data-border=""])::before,
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--deed-heraldry-plaque-clip);
+    background: linear-gradient(
+      180deg,
+      color-mix(
+          in srgb,
+          var(--border-accent-frame, transparent) 24%,
+          var(--deed-heraldry-plaque-fill, var(--deed-heraldry-well, transparent))
+        )
+        0%,
+      var(--deed-heraldry-plaque-fill, var(--deed-heraldry-well, transparent)) 42%,
+      color-mix(
+          in srgb,
+          var(--border-accent-edge, transparent) 28%,
+          var(--deed-heraldry-plaque-fill, var(--deed-heraldry-well, transparent))
+        )
+        100%
+    );
+    pointer-events: none;
+  }
+  .deed-heraldry-plaque[data-border]:not([data-border=""])::after,
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    z-index: 2;
+    width: 2px;
+    height: 2px;
+    border: 1px solid var(--border-accent-frame, transparent);
+    border-radius: 50%;
+    background: var(--border-accent-edge, transparent);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .deed-heraldry-plaque-mirror[data-border]:not([data-border=""])::after,
+  .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque-mirror::after {
+    right: auto;
+    left: 7px;
+  }
   /* Shared code-native forged seal. Every surface supplies one canonical palette
      and motif path; the round material chassis never changes by slug. */
   .deed-heraldry-seal {
@@ -8190,12 +8276,12 @@
   }
   .deed-heraldry-preview-ribbon {
     min-width: 0;
-    margin-left: -3px;
-    padding: 2px 8px 2px 7px;
+    margin-left: 2px;
+    padding: 3px 14px 3px 8px;
     overflow: hidden;
     border: 1px solid var(--border-accent-frame, transparent);
-    border-radius: 2px;
-    background: var(--deed-heraldry-well, transparent);
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: var(--deed-heraldry-well, transparent);
     color: var(--color-text-overlay);
     font-family: var(--title-font);
     font-size: 11px;
@@ -8221,20 +8307,22 @@
     position: relative;
     min-width: 0;
     flex: 1;
-    margin-left: -3px;
-    padding: 3px 6px 3px 7px;
+    margin-left: 2px;
+    padding: 4px 8px 4px 13px;
     overflow: hidden;
     box-shadow:
       inset 0 1px var(--border-accent-frame, transparent),
       inset 0 -1px var(--border-accent-edge, transparent);
-    background: var(--deed-heraldry-well, transparent);
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: var(--deed-heraldry-well, transparent);
   }
   .deed-heraldry-preview-header .deed-heraldry-pattern {
     position: absolute;
-    top: -9px;
+    top: 50%;
     right: 2px;
     width: 38px;
     height: 38px;
+    transform: translateY(-50%);
     opacity: 0.1;
     stroke: var(--border-accent-frame, transparent);
     stroke-width: 1.5;
@@ -8280,9 +8368,18 @@
       border-color: CanvasText;
       outline: 1px solid CanvasText;
       outline-offset: -1px;
-      background: Canvas;
+      background-color: CanvasText;
       color: CanvasText;
       box-shadow: none;
+    }
+    .deed-heraldry-plaque[data-border]:not([data-border=""])::before,
+    .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::before {
+      background: Canvas;
+    }
+    .deed-heraldry-plaque[data-border]:not([data-border=""])::after,
+    .deed-heraldry-preview[data-border]:not([data-border=""]) .deed-heraldry-plaque::after {
+      border-color: CanvasText;
+      background: CanvasText;
     }
   }
   body.mobile-touch .deed-heraldry-preview {

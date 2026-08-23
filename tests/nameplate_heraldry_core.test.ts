@@ -4,10 +4,8 @@ import {
   createNameplateHeraldry,
   NAMEPLATE_HERALDRY_EXTRA_LIFT,
   NAMEPLATE_HERALDRY_NAME_BASELINE_FROM_CENTER,
-  NAMEPLATE_HERALDRY_RIBBON_PAD_X,
-  NAMEPLATE_HERALDRY_RIBBON_PAD_Y,
-  NAMEPLATE_HERALDRY_RIBBON_RADIUS,
-  NAMEPLATE_HERALDRY_SEAL_RIBBON_OVERLAP,
+  NAMEPLATE_HERALDRY_PLAQUE_PAD_X,
+  NAMEPLATE_HERALDRY_PLAQUE_PAD_Y,
   NAMEPLATE_HERALDRY_SEAL_SIZE,
   NAMEPLATE_HERALDRY_TITLE_BASELINE,
   NAMEPLATE_HERALDRY_TITLE_STEP,
@@ -49,14 +47,12 @@ function layout(over: Partial<NameplateHeraldryInput> = {}) {
 }
 
 describe('nameplate heraldry named constants', () => {
-  it('pins the accepted Phase 5 CSS-pixel measurements to literals', () => {
-    expect(NAMEPLATE_HERALDRY_RIBBON_PAD_X).toBe(7);
-    expect(NAMEPLATE_HERALDRY_RIBBON_PAD_Y).toBe(1);
-    expect(NAMEPLATE_HERALDRY_RIBBON_RADIUS).toBe(2);
-    expect(NAMEPLATE_HERALDRY_WELL_ALPHA).toBe(0.48);
+  it('pins the accepted plaque CSS-pixel measurements to literals', () => {
+    expect(NAMEPLATE_HERALDRY_PLAQUE_PAD_X).toBe(7);
+    expect(NAMEPLATE_HERALDRY_PLAQUE_PAD_Y).toBe(1);
+    expect(NAMEPLATE_HERALDRY_WELL_ALPHA).toBe(0.62);
     expect(NAMEPLATE_HERALDRY_WELL_FILL).toBe('#14110c');
     expect(NAMEPLATE_HERALDRY_SEAL_SIZE).toBe(18);
-    expect(NAMEPLATE_HERALDRY_SEAL_RIBBON_OVERLAP).toBe(3);
     expect(NAMEPLATE_HERALDRY_EXTRA_LIFT).toBe(8);
     expect(NAMEPLATE_HERALDRY_TITLE_STEP).toBe(11);
     expect(NAMEPLATE_HERALDRY_TITLE_BASELINE).toBe(9);
@@ -74,7 +70,7 @@ describe('nameplate heraldry named constants', () => {
   });
 });
 
-describe('E37 world silhouette: one seal attached to one shallow name ribbon', () => {
+describe('E37 world silhouette: one seal attached to one shallow name plaque', () => {
   it('emits only the heraldry geometry surface and retires the cartouche core', () => {
     const out = layout({ slug: 'deepward' });
     expect(Object.keys(out).sort()).toEqual([
@@ -88,22 +84,24 @@ describe('E37 world silhouette: one seal attached to one shallow name ribbon', (
       'nameBaseline',
       'nameRowLeft',
       'nameRowTop',
-      'ribbon',
-      'ribbonRadius',
+      'plaque',
+      'plaqueNotchX',
+      'plaqueShoulderX',
       'rivets',
       'seal',
       'titleBaseline',
       'titleCenterX',
     ]);
     expect(out.active).toBe(true);
-    expect(out.ribbon.w).toBeGreaterThan(out.ribbon.h * 3);
-    expect(out.ribbonRadius).toBe(2);
+    expect(out.plaque.w).toBeGreaterThan(out.plaque.h * 3);
+    expect(out.plaqueShoulderX).toBe(out.plaque.x + out.plaque.w - 8);
+    expect(out.plaqueNotchX).toBe(out.plaque.x + 4);
     expect(out.seal.size).toBe(18);
-    expect(out.seal.x + out.seal.size - out.ribbon.x).toBe(3);
+    expect(out.plaque.x - (out.seal.x + out.seal.size)).toBe(2);
     expect(out.joint.w).toBeGreaterThan(0);
     expect(out.joint.h).toBeGreaterThan(0);
-    expect(out.joint.x).toBeGreaterThanOrEqual(out.ribbon.x);
-    expect(out.joint.x + out.joint.w).toBeLessThanOrEqual(out.seal.x + out.seal.size);
+    expect(out.joint.x).toBeLessThan(out.seal.x + out.seal.size);
+    expect(out.joint.x + out.joint.w).toBeGreaterThan(out.plaque.x);
     expect(out.rivets).toHaveLength(2);
     for (const rivet of out.rivets) {
       expect(rivet.x).toBeGreaterThanOrEqual(out.joint.x);
@@ -121,7 +119,7 @@ describe('E37 world silhouette: one seal attached to one shallow name ribbon', (
 });
 
 describe('E38 name and secondary title geometry', () => {
-  it('pins the normal seal, ribbon, name, and outside-title positions', () => {
+  it('pins the normal seal, plaque, name, and outside-title positions', () => {
     const out = layout({
       screenX: 320,
       nameRowBottomY: 200,
@@ -133,17 +131,19 @@ describe('E38 name and secondary title geometry', () => {
     expect(out.nameRowLeft).toBe(285);
     expect(out.nameRowTop).toBe(184);
     expect(out.nameBaseline).toBe(197);
-    expect(out.ribbon).toEqual({ x: 278, y: 183, w: 84, h: 18 });
-    expect(out.seal).toEqual({ x: 263, y: 183, size: 18 });
-    expect(out.seal.x + out.seal.size).toBe(281);
-    expect(out.nameRowLeft - (out.seal.x + out.seal.size)).toBe(4);
+    expect(out.plaque).toEqual({ x: 278, y: 183, w: 92, h: 18 });
+    expect(out.plaqueShoulderX).toBe(362);
+    expect(out.plaqueNotchX).toBe(282);
+    expect(out.seal).toEqual({ x: 258, y: 183, size: 18 });
+    expect(out.seal.x + out.seal.size).toBe(276);
+    expect(out.nameRowLeft - (out.seal.x + out.seal.size)).toBe(9);
     expect(out.titleBaseline).toBe(209);
     expect(out.titleCenterX).toBe(320);
-    expect(out.titleBaseline).toBeGreaterThan(out.ribbon.y + out.ribbon.h);
-    expect(out.titleBaseline - (out.ribbon.y + out.ribbon.h)).toBe(8);
+    expect(out.titleBaseline).toBeGreaterThan(out.plaque.y + out.plaque.h);
+    expect(out.titleBaseline - (out.plaque.y + out.plaque.h)).toBe(8);
   });
 
-  it('does not accept title width, so a wide title cannot widen the name ribbon', () => {
+  it('does not accept title width, so a wide title cannot widen the name plaque', () => {
     const source = read(CORE_PATH);
     const inputBody = source.match(/export interface NameplateHeraldryInput\s*\{([^}]*)\}/)?.[1];
     expect(inputBody).toBeDefined();
@@ -168,14 +168,14 @@ describe('E39 measured name-row variants stay centered and clear the seal', () =
       slug: 'prestige_laurels',
     });
     expect(out.nameRowLeft + rowWidth / 2).toBe(411);
-    expect(out.ribbon.x).toBe(out.nameRowLeft - 7);
-    expect(out.ribbon.w).toBe(rowWidth + 14);
-    expect(out.ribbon.y).toBe(out.nameRowTop - 1);
-    expect(out.ribbon.h).toBe(rowHeight + 2);
-    expect(out.nameRowLeft - (out.seal.x + out.seal.size)).toBe(4);
-    expect(out.seal.x + out.seal.size - out.ribbon.x).toBe(3);
-    expect(out.nameBaseline).toBeGreaterThan(out.ribbon.y);
-    expect(out.nameBaseline).toBeLessThan(out.ribbon.y + out.ribbon.h);
+    expect(out.plaque.x).toBe(out.nameRowLeft - 7);
+    expect(out.plaque.w).toBe(rowWidth + 22);
+    expect(out.plaque.y).toBe(out.nameRowTop - 1);
+    expect(out.plaque.h).toBe(rowHeight + 2);
+    expect(out.nameRowLeft - (out.seal.x + out.seal.size)).toBe(9);
+    expect(out.plaque.x - (out.seal.x + out.seal.size)).toBe(2);
+    expect(out.nameBaseline).toBeGreaterThan(out.plaque.y);
+    expect(out.nameBaseline).toBeLessThan(out.plaque.y + out.plaque.h);
     expect(out.titleCenterX).toBe(411);
   });
 });
@@ -236,7 +236,7 @@ describe('E42 borderless, stale, removed, and title-reward ids reset inactive st
     (slug) => {
       const out = createNameplateHeraldry();
       const refs = {
-        ribbon: out.ribbon,
+        plaque: out.plaque,
         seal: out.seal,
         joint: out.joint,
         rivets: out.rivets,
@@ -248,8 +248,9 @@ describe('E42 borderless, stale, removed, and title-reward ids reset inactive st
       nameplateHeraldryInto(out, input({ slug }));
       expect(out.active).toBe(false);
       expect(out.extraLift).toBe(0);
-      expect(out.ribbonRadius).toBe(0);
-      expect(out.ribbon).toEqual({ x: 0, y: 0, w: 0, h: 0 });
+      expect(out.plaqueShoulderX).toBe(0);
+      expect(out.plaqueNotchX).toBe(0);
+      expect(out.plaque).toEqual({ x: 0, y: 0, w: 0, h: 0 });
       expect(out.seal).toEqual({ x: 0, y: 0, size: 0 });
       expect(out.joint).toEqual({ x: 0, y: 0, w: 0, h: 0 });
       expect(out.rivets[0]).toEqual({ x: 0, y: 0 });
@@ -263,7 +264,7 @@ describe('E42 borderless, stale, removed, and title-reward ids reset inactive st
       expect(out.nameBaseline).toBe(197);
       expect(out.titleBaseline).toBe(209);
       expect(out.titleCenterX).toBe(320);
-      expect(out.ribbon).toBe(refs.ribbon);
+      expect(out.plaque).toBe(refs.plaque);
       expect(out.seal).toBe(refs.seal);
       expect(out.joint).toBe(refs.joint);
       expect(out.rivets).toBe(refs.rivets);
@@ -277,7 +278,7 @@ describe('E44 CSS pixels and caller-owned reference stability', () => {
   it('fills and returns the same record without replacing any nested geometry', () => {
     const out = createNameplateHeraldry();
     const refs = {
-      ribbon: out.ribbon,
+      plaque: out.plaque,
       seal: out.seal,
       joint: out.joint,
       rivets: out.rivets,
@@ -296,7 +297,7 @@ describe('E44 CSS pixels and caller-owned reference stability', () => {
       'nameplate heraldry core',
     );
     expect(nameplateHeraldryInto(out, first)).toBe(out);
-    expect(out.ribbon).toBe(refs.ribbon);
+    expect(out.plaque).toBe(refs.plaque);
     expect(out.seal).toBe(refs.seal);
     expect(out.joint).toBe(refs.joint);
     expect(out.rivets).toBe(refs.rivets);
@@ -305,7 +306,7 @@ describe('E44 CSS pixels and caller-owned reference stability', () => {
 
     const other = createNameplateHeraldry();
     expect(other).not.toBe(out);
-    expect(other.ribbon).not.toBe(out.ribbon);
+    expect(other.plaque).not.toBe(out.plaque);
     expect(other.seal).not.toBe(out.seal);
     expect(other.joint).not.toBe(out.joint);
     expect(other.rivets).not.toBe(out.rivets);

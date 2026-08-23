@@ -1,26 +1,30 @@
 // Book of Deeds world heraldry geometry. This pure core keeps the name row
-// centered while attaching one forged seal to a shallow ribbon. The canvas
-// owns paint and normalized motif lines; callers own and reuse this output.
+// centered while attaching one forged seal to a shallow pointed plaque. The
+// canvas owns paint and normalized motif lines; callers own and reuse this output.
 
 import {
   type BorderMotifKind,
   borderAccent,
   DEED_HERALDRY_WELL_FILL,
 } from '../ui/deed_border_view';
+import {
+  DEED_HERALDRY_PLAQUE_NOTCH_PX,
+  DEED_HERALDRY_PLAQUE_TIP_PX,
+} from '../ui/deed_heraldry_plaque_core';
 
-export const NAMEPLATE_HERALDRY_RIBBON_PAD_X = 7;
-export const NAMEPLATE_HERALDRY_RIBBON_PAD_Y = 1;
-export const NAMEPLATE_HERALDRY_RIBBON_RADIUS = 2;
-export const NAMEPLATE_HERALDRY_WELL_ALPHA = 0.48;
+export const NAMEPLATE_HERALDRY_PLAQUE_PAD_X = 7;
+export const NAMEPLATE_HERALDRY_PLAQUE_PAD_Y = 1;
+export const NAMEPLATE_HERALDRY_WELL_ALPHA = 0.62;
 export const NAMEPLATE_HERALDRY_WELL_FILL = DEED_HERALDRY_WELL_FILL;
 export const NAMEPLATE_HERALDRY_SEAL_SIZE = 18;
-export const NAMEPLATE_HERALDRY_SEAL_RIBBON_OVERLAP = 3;
+export const NAMEPLATE_HERALDRY_SEAL_PLAQUE_GAP = 2;
 export const NAMEPLATE_HERALDRY_EXTRA_LIFT = 8;
 export const NAMEPLATE_HERALDRY_TITLE_STEP = 11;
 export const NAMEPLATE_HERALDRY_TITLE_BASELINE = 9;
 export const NAMEPLATE_HERALDRY_NAME_BASELINE_FROM_CENTER = 5;
 
 const NAMEPLATE_HERALDRY_JOINT_HEIGHT = 8;
+const NAMEPLATE_HERALDRY_JOINT_OVERLAP = 2;
 const NAMEPLATE_HERALDRY_MOTIF_SCALE = 6;
 
 export interface NameplateHeraldryRect {
@@ -54,8 +58,9 @@ export interface NameplateHeraldryInput {
 export interface NameplateHeraldry {
   active: boolean;
   extraLift: number;
-  ribbon: NameplateHeraldryRect;
-  ribbonRadius: number;
+  plaque: NameplateHeraldryRect;
+  plaqueShoulderX: number;
+  plaqueNotchX: number;
   seal: NameplateHeraldrySeal;
   joint: NameplateHeraldryRect;
   rivets: [NameplateHeraldryPoint, NameplateHeraldryPoint];
@@ -80,8 +85,9 @@ function writeRect(rect: NameplateHeraldryRect, x: number, y: number, w: number,
 function zeroHeraldry(out: NameplateHeraldry): void {
   out.active = false;
   out.extraLift = 0;
-  writeRect(out.ribbon, 0, 0, 0, 0);
-  out.ribbonRadius = 0;
+  writeRect(out.plaque, 0, 0, 0, 0);
+  out.plaqueShoulderX = 0;
+  out.plaqueNotchX = 0;
   out.seal.x = 0;
   out.seal.y = 0;
   out.seal.size = 0;
@@ -100,8 +106,9 @@ export function createNameplateHeraldry(): NameplateHeraldry {
   return {
     active: false,
     extraLift: 0,
-    ribbon: { x: 0, y: 0, w: 0, h: 0 },
-    ribbonRadius: 0,
+    plaque: { x: 0, y: 0, w: 0, h: 0 },
+    plaqueShoulderX: 0,
+    plaqueNotchX: 0,
     seal: { x: 0, y: 0, size: 0 },
     joint: { x: 0, y: 0, w: 0, h: 0 },
     rivets: [
@@ -140,29 +147,27 @@ export function nameplateHeraldryInto(
     return out;
   }
 
-  const ribbonX = out.nameRowLeft - NAMEPLATE_HERALDRY_RIBBON_PAD_X;
-  const ribbonY = out.nameRowTop - NAMEPLATE_HERALDRY_RIBBON_PAD_Y;
-  const ribbonWidth = nameRowWidth + NAMEPLATE_HERALDRY_RIBBON_PAD_X * 2;
-  const ribbonHeight = nameRowHeight + NAMEPLATE_HERALDRY_RIBBON_PAD_Y * 2;
-  const sealX = ribbonX - (NAMEPLATE_HERALDRY_SEAL_SIZE - NAMEPLATE_HERALDRY_SEAL_RIBBON_OVERLAP);
-  const sealY = ribbonY + (ribbonHeight - NAMEPLATE_HERALDRY_SEAL_SIZE) / 2;
+  const plaqueX = out.nameRowLeft - NAMEPLATE_HERALDRY_PLAQUE_PAD_X;
+  const plaqueY = out.nameRowTop - NAMEPLATE_HERALDRY_PLAQUE_PAD_Y;
+  const plaqueBodyWidth = nameRowWidth + NAMEPLATE_HERALDRY_PLAQUE_PAD_X * 2;
+  const plaqueWidth = plaqueBodyWidth + DEED_HERALDRY_PLAQUE_TIP_PX;
+  const plaqueHeight = nameRowHeight + NAMEPLATE_HERALDRY_PLAQUE_PAD_Y * 2;
+  const sealX = plaqueX - NAMEPLATE_HERALDRY_SEAL_SIZE - NAMEPLATE_HERALDRY_SEAL_PLAQUE_GAP;
+  const sealY = plaqueY + (plaqueHeight - NAMEPLATE_HERALDRY_SEAL_SIZE) / 2;
   const jointY = sealY + (NAMEPLATE_HERALDRY_SEAL_SIZE - NAMEPLATE_HERALDRY_JOINT_HEIGHT) / 2;
-  const rivetX = ribbonX + NAMEPLATE_HERALDRY_SEAL_RIBBON_OVERLAP / 2;
+  const jointX = sealX + NAMEPLATE_HERALDRY_SEAL_SIZE - NAMEPLATE_HERALDRY_JOINT_OVERLAP;
+  const jointWidth = NAMEPLATE_HERALDRY_SEAL_PLAQUE_GAP + NAMEPLATE_HERALDRY_JOINT_OVERLAP * 2;
+  const rivetX = plaqueX + NAMEPLATE_HERALDRY_JOINT_OVERLAP / 2;
 
   out.active = true;
   out.extraLift = NAMEPLATE_HERALDRY_EXTRA_LIFT;
-  writeRect(out.ribbon, ribbonX, ribbonY, ribbonWidth, ribbonHeight);
-  out.ribbonRadius = NAMEPLATE_HERALDRY_RIBBON_RADIUS;
+  writeRect(out.plaque, plaqueX, plaqueY, plaqueWidth, plaqueHeight);
+  out.plaqueShoulderX = plaqueX + plaqueBodyWidth;
+  out.plaqueNotchX = plaqueX + DEED_HERALDRY_PLAQUE_NOTCH_PX;
   out.seal.x = sealX;
   out.seal.y = sealY;
   out.seal.size = NAMEPLATE_HERALDRY_SEAL_SIZE;
-  writeRect(
-    out.joint,
-    ribbonX,
-    jointY,
-    NAMEPLATE_HERALDRY_SEAL_RIBBON_OVERLAP,
-    NAMEPLATE_HERALDRY_JOINT_HEIGHT,
-  );
+  writeRect(out.joint, jointX, jointY, jointWidth, NAMEPLATE_HERALDRY_JOINT_HEIGHT);
   out.rivets[0].x = rivetX;
   out.rivets[0].y = jointY + 2;
   out.rivets[1].x = rivetX;
