@@ -207,6 +207,7 @@ import {
   CHARACTER_LOD_RANGE_SQ,
   type CharacterLodBands,
   characterLodBandsInto,
+  movingHoldoutActive,
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
@@ -416,7 +417,7 @@ import { NecromancyArmyPortalFx } from './necromancy_army_portal_fx';
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import { facingAlpha, POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -10677,6 +10678,23 @@ export class Renderer {
         combatTargetId,
         combatTarget?.ownerId ?? null,
       );
+      // Online remote entities interpolate on a per-entity clock that saturates
+      // once network updates stop. A stale raw pos/prevPos delta must not keep
+      // the far-LOD rig held out forever after that clock has settled.
+      const ea = isSelf
+        ? Math.min(1, alpha)
+        : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
+      const farHoldoutAlphaCap =
+        !isSelf && e.netUpdatedAt !== undefined && e.netInterval !== undefined
+          ? POS_EXTRAPOLATION_CAP
+          : 1;
+      const movingFarHoldout = movingHoldoutActive(
+        e.pos,
+        e.prevPos,
+        ea,
+        farHoldoutAlphaCap,
+        e.vx !== 0 || e.vz !== 0,
+      );
       let wantShadow = true;
       let inProxyBand = false;
       if (isSelf) {
@@ -10742,7 +10760,7 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
+        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose, movingFarHoldout);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of
@@ -10756,9 +10774,6 @@ export class Renderer {
       // turn stream, mouselook, click-move via the sent facing). Remote
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
-      const ea = isSelf
-        ? Math.min(1, alpha)
-        : remoteEntityAlpha(now, e.netUpdatedAt, e.netInterval, alpha);
       const x = isSelf ? selfPos.x : e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
       const y = isSelf ? selfPos.y : e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;

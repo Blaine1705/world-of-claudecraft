@@ -274,8 +274,16 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40 batch merge-forward over the loading review fixes:
 // renderer.ts and prewarm_policy.ts now seal the combined release-batch tree.
 // No capture was retaken.
+// Re-minted for the loading review fixes (rebuild reveal gates, inactive
+// horizon fast path, display-pacing admission, and restored rationale): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the sliding-far-mob-freeze fix (the far-mesh swap now also
+// holds out a moving entity): the renderer integration leaf moved. No
+// capture was retaken.
+// Re-minted for the stale remote-entity holdout repair (renderer.ts): the
+// renderer integration leaf moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c8d4055f59403f58660ee17aa8ea194c939fe32ba29aa1ef33e00ac66e748f2e';
+  '0e16be84880a3666d2ff746c4de15b2fcf1129b49edbc2e288c9a30d6f60c817';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
