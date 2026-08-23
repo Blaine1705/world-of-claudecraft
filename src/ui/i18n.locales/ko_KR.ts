@@ -13139,4 +13139,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': '슬롯 비우기',
   'hudChrome.barEditor.clearArmed': '슬롯을 탭하면 비워집니다.',
   'hudChrome.spellbook.assignAria': '{name}을(를) 놓을 칸 선택',
+  'hudChrome.meters.threatFrozen': '{name}에 대한 최종 위협',
+  'hudChrome.account.setPasswordTitle': '비밀번호 설정',
+  'hudChrome.account.setPasswordHint':
+    '이 계정은 Apple 로그인 또는 Discord로 생성되었으며 아직 비밀번호가 없습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 같은 다른 기기에서 로그인하고 추가 로그인 방법을 연결할 수 있습니다.',
+  'hudChrome.account.setPasswordSubmit': '비밀번호 설정',
+  'hudChrome.account.passwordSet':
+    '비밀번호가 설정되었습니다. 이제 어디서든 사용자 이름과 비밀번호로 로그인할 수 있습니다.',
+  'hudChrome.crafting.craftFeeLine': '제작 수수료: 개당 {fee}',
+  'hudChrome.deeds.stillToVisit': '아직 방문할 곳: {places}',
+  'apiError.account.password_already_set':
+    '이 계정에는 이미 비밀번호가 있습니다. 대신 비밀번호 변경을 사용하세요.',
+  'sim.rift.lootRecoveryNotice':
+    '균열 입구는 아직 한동안 버팁니다. 파티가 쓰러져도 획득한 것을 되찾으러 걸어 돌아갈 수 있습니다.',
+  'abilityUi.tooltip.anyTarget': '적 또는 아군 대상',
+  'entities.abilities.melting_acid.name': '용해 산',
+  'entities.abilities.melting_acid.description':
+    '대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다.',
+  'entities.abilities.nightshade_coating.name': '가지독 코팅',
+  'entities.abilities.nightshade_coating.description':
+    '대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
 };

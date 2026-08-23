@@ -67,6 +67,19 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
 const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const strippedHudSource = stripComments(hudSource);
+const uiTsFiles = [...tsFilesUnder(uiRoot)];
+const uiSources = uiTsFiles.map(({ file, full }) => ({
+  file,
+  full,
+  source: stripComments(readFileSync(full, 'utf8')),
+}));
+const hudFieldsByClass = new Map<string, string[]>();
+for (const [, field, constructed] of strippedHudSource.matchAll(/(\w+)\s*=\s*new (\w+)\(/g)) {
+  const fields = hudFieldsByClass.get(constructed) ?? [];
+  fields.push(field);
+  hudFieldsByClass.set(constructed, fields);
+}
 
 // Raw source to the parser (a `//` inside one of hud.ts's regex literals or
 // template strings truncates a line for a comment stripper, and ts.createSourceFile
@@ -174,8 +187,7 @@ interface GatedModule {
 
 function discoverGatedModules(): GatedModule[] {
   const out: GatedModule[] = [];
-  for (const { file, full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { file, source } of uiSources) {
     if (!EMITS_TEXT.test(source)) continue;
     const declared = [...source.matchAll(MEMO_DECL)].map((m) => m[1]);
     // A memo is only a REPAINT gate when the module compares it. A retained
@@ -509,11 +521,9 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
-    const wiring = stripComments(hudSource).match(
-      /document\.addEventListener\('woc:languagechange'/g,
-    );
+    const wiring = strippedHudSource.match(/document\.addEventListener\('woc:languagechange'/g);
     expect(wiring, 'hud.ts no longer listens for woc:languagechange').toHaveLength(1);
-    expect(stripComments(hudSource)).toContain(
+    expect(strippedHudSource).toContain(
       "document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());",
     );
   });
@@ -574,7 +584,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // src/ui is the one DEEP scan root in this repo, so the floor has to sit
     // above what a NON-recursive read returns (about 300 top-level files today)
     // or it cannot detect the failure its own message names.
-    const corpus = tsFilesUnder(uiRoot);
+    const corpus = uiTsFiles;
     expect(corpus.length, 'the src/ui walk came back short').toBeGreaterThan(400);
     expect(
       corpus.filter((f) => f.file.includes('/')).length,
@@ -705,22 +715,17 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     const armCalls = new Set(scan.sites.map((s) => s.call));
     const uncalled: string[] = [];
     const scanned: string[] = [];
-    for (const { file, full } of tsFilesUnder(uiRoot)) {
-      const source = stripComments(readFileSync(full, 'utf8'));
+    const ownedRelocalizeClasses = relocalizeOwnedClasses(armCalls);
+    for (const { file, source } of uiSources) {
       if (!/^\s{2}relocalize\(/m.test(source)) continue;
       scanned.push(file);
       const cls = /export class (\w+)/.exec(source)?.[1] ?? '';
       // Map the class back to the Hud field that holds it, then look for an arm
       // on that field. A module whose relocalize is reached through a wrapper
       // (LockpickWindow via LockpickController) is credited by the wrapper's arm.
-      const fields = [...stripComments(hudSource).matchAll(/(\w+)\s*=\s*new (\w+)\(/g)]
-        .filter(([, , constructed]) => constructed === cls)
-        .map(([, field]) => field);
+      const fields = hudFieldsByClass.get(cls) ?? [];
       const credited =
-        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) ||
-        [...armCalls].some(
-          (c) => c.endsWith('.relocalize') && (wrapperOwns(c, cls) || builderOwns(c, cls)),
-        );
+        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) || ownedRelocalizeClasses.has(cls);
       if (!credited) uncalled.push(`${file} (${cls || 'unnamed class'})`);
     }
     // The filter above is the whole test: an empty `uncalled` proves nothing if
@@ -752,34 +757,47 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
  *  the same chain the coordinator does (field <- builder result <- builder
  *  function <- the module that news the class) so the credit stays a proof, not
  *  an exemption. */
-function builderOwns(armCall: string, cls: string): boolean {
-  const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const hud = stripComments(hudSource);
-  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return false;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
-  if (!built) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
-    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
-    return new RegExp(`new ${cls}\\(`).test(source);
+function relocalizeOwnedClasses(armCalls: ReadonlySet<string>): Set<string> {
+  const owned = new Set<string>();
+  for (const armCall of armCalls) {
+    if (!armCall.endsWith('.relocalize')) continue;
+    for (const cls of builderOwnedClasses(armCall)) owned.add(cls);
+    for (const cls of wrapperOwnedClasses(armCall)) owned.add(cls);
   }
-  return false;
+  return owned;
 }
 
-function wrapperOwns(armCall: string, cls: string): boolean {
+function builderOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(
-    stripComments(hudSource),
-  );
-  if (!constructed) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  const hud = strippedHudSource;
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
+  if (!assigned) return owned;
+  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  if (!built) return owned;
+  for (const { source } of uiSources) {
+    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
+    for (const [, cls] of source.matchAll(/\bnew (\w+)\(/g)) owned.add(cls);
+    return owned;
+  }
+  return owned;
+}
+
+function wrapperOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
+  const field = armCall.slice('this.'.length, -'.relocalize'.length);
+  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(strippedHudSource);
+  if (!constructed) return owned;
+  for (const { source } of uiSources) {
     if (!new RegExp(`export class ${constructed[1]}\\b`).test(source)) continue;
     // The wrapper must both hold one of these and forward to it.
-    return (
-      new RegExp(`:\\s*${cls}\\b|new ${cls}\\(`).test(source) && /\.relocalize\(\)/.test(source)
-    );
+    if (!/\.relocalize\(\)/.test(source)) return owned;
+    if (/:\s*\b/.test(source)) owned.add('');
+    for (const match of source.matchAll(/:\s*(\w+)\b|\bnew (\w+)\(/g)) {
+      const cls = match[1] ?? match[2];
+      if (cls) owned.add(cls);
+    }
+    return owned;
   }
-  return false;
+  return owned;
 }

@@ -13130,4 +13130,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': 'スロットをクリア',
   'hudChrome.barEditor.clearArmed': 'スロットをタップするとクリアします。',
   'hudChrome.spellbook.assignAria': '{name}を配置するスロットを選択',
+  'hudChrome.meters.threatFrozen': '{name}への最終脅威',
+  'hudChrome.account.setPasswordTitle': 'パスワードを設定',
+  'hudChrome.account.setPasswordHint':
+    'このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードがありません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他の端末でもサインインでき、追加のサインイン方法も連携できます。',
+  'hudChrome.account.setPasswordSubmit': 'パスワードを設定',
+  'hudChrome.account.passwordSet':
+    'パスワードを設定しました。これでどこでもユーザー名とパスワードでサインインできます。',
+  'hudChrome.crafting.craftFeeLine': '製作手数料：1個あたり {fee}',
+  'hudChrome.deeds.stillToVisit': '未訪問：{places}',
+  'apiError.account.password_already_set':
+    'このアカウントにはすでにパスワードがあります。代わりにパスワード変更を使用してください。',
+  'sim.rift.lootRecoveryNotice':
+    '裂け目の入口はまだしばらく保たれます。パーティーが倒れても、得たものを取り戻しに歩いて戻れます。',
+  'abilityUi.tooltip.anyTarget': '敵または味方の対象',
+  'entities.abilities.melting_acid.name': '溶解酸',
+  'entities.abilities.melting_acid.description':
+    '対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。',
+  'entities.abilities.nightshade_coating.name': 'ナス科毒の塗布',
+  'entities.abilities.nightshade_coating.description':
+    '対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。',
 };

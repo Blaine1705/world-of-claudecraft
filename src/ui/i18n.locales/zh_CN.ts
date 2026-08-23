@@ -12900,4 +12900,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': '清除一个槽位',
   'hudChrome.barEditor.clearArmed': '点击一个槽位即可清除。',
   'hudChrome.spellbook.assignAria': '为{name}选择一个栏位',
+  'hudChrome.meters.threatFrozen': '对{name}的最终威胁',
+  'hudChrome.account.setPasswordTitle': '设置密码',
+  'hudChrome.account.setPasswordHint':
+    '此账号是通过 Apple 登录或 Discord 创建的，目前还没有密码。设置密码后，你就可以在 Mac、Windows 桌面应用或网页等其他设备上用它登录，并关联其他登录方式。',
+  'hudChrome.account.setPasswordSubmit': '设置密码',
+  'hudChrome.account.passwordSet': '密码已设置。你现在可以在任何地方使用用户名和密码登录。',
+  'hudChrome.crafting.craftFeeLine': '制作费：每件 {fee}',
+  'hudChrome.deeds.stillToVisit': '仍需造访：{places}',
+  'apiError.account.password_already_set': '此账号已经设置了密码。请改用更改密码。',
+  'sim.rift.lootRecoveryNotice':
+    '裂隙入口还会维持一段时间：如果你的队伍倒下，仍可返回取回已获得的东西。',
+  'abilityUi.tooltip.anyTarget': '敌方或友方目标',
+  'entities.abilities.melting_acid.name': '溶解酸',
+  'entities.abilities.melting_acid.description':
+    '向目标泼洒腐蚀性毒液，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。',
+  'entities.abilities.nightshade_coating.name': '夜影涂层',
+  'entities.abilities.nightshade_coating.description':
+    '用夜影覆盖目标，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。',
 };

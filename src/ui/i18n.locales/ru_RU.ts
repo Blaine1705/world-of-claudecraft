@@ -13308,4 +13308,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': 'Очистить ячейку',
   'hudChrome.barEditor.clearArmed': 'Нажмите на ячейку, чтобы очистить её.',
   'hudChrome.spellbook.assignAria': 'Выберите ячейку для {name}',
+  'hudChrome.meters.threatFrozen': 'Итоговая угроза против {name}',
+  'hudChrome.account.setPasswordTitle': 'Задать пароль',
+  'hudChrome.account.setPasswordHint':
+    'Эта учётная запись создана через вход Apple или Discord и пока не имеет пароля. Задайте его, чтобы входить на других устройствах, например в приложениях для Mac и Windows или в веб-версии, а также привязать дополнительные способы входа.',
+  'hudChrome.account.setPasswordSubmit': 'Задать пароль',
+  'hudChrome.account.passwordSet':
+    'Пароль задан. Теперь вы можете входить с именем пользователя и паролем где угодно.',
+  'hudChrome.crafting.craftFeeLine': 'Плата за изготовление: {fee} за штуку',
+  'hudChrome.deeds.stillToVisit': 'Ещё нужно посетить: {places}',
+  'apiError.account.password_already_set':
+    'У этой учётной записи уже есть пароль. Используйте смену пароля.',
+  'sim.rift.lootRecoveryNotice':
+    'Вход в разлом ещё продержится: если ваша группа падёт, вы всё ещё сможете вернуться пешком за добытым.',
+  'abilityUi.tooltip.anyTarget': 'Вражеская или дружественная цель',
+  'entities.abilities.melting_acid.name': 'Плавящая кислота',
+  'entities.abilities.melting_acid.description':
+    'Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая её броню на 5% на 12 сек.',
+  'entities.abilities.nightshade_coating.name': 'Покрытие паслёном',
+  'entities.abilities.nightshade_coating.description':
+    'Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
 };
