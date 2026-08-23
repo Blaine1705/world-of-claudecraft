@@ -3832,6 +3832,7 @@ export const ko_KR: EnTranslations = {
       "unlockedBorderHint": "새 테두리 획득: {name}. 업적의 서에서 착용할 수 있습니다.",
       "broadcastLine": "{name} 님이 업적을 달성했습니다: {deed}",
       "rarityLine": "모험가 중 {percent} 달성",
+      "stillToVisit": "아직 방문하지 않은 곳: {places}",
       "trackerLabel": "업적",
       "collapseHint": "업적 추적기 접기",
       "expandHint": "업적 추적기 펼치기",

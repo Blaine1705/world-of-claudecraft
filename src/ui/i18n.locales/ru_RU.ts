@@ -9724,6 +9724,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Летопись наверстала упущенное: записано деяний: {count}.',
   'hudChrome.deeds.broadcastLine': '{name} совершает деяние: {deed}',
   'hudChrome.deeds.rarityLine': 'Совершили {percent} искателей приключений',
+  'hudChrome.deeds.stillToVisit': 'Ещё предстоит посетить: {places}',
   'hudChrome.deeds.trackerLabel': 'Деяния',
   'hudChrome.deeds.collapseHint': 'Свернуть список деяний',
   'hudChrome.deeds.expandHint': 'Развернуть список деяний',

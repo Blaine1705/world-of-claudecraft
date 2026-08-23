@@ -3832,6 +3832,7 @@ export const it_IT: EnTranslations = {
       "unlockedBorderHint": "Nuovo bordo ottenuto: {name}. Indossalo dal Libro delle Imprese.",
       "broadcastLine": "{name} ha compiuto un'impresa: {deed}",
       "rarityLine": "Ottenuta dal {percent} degli avventurieri",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Imprese",
       "collapseHint": "Comprimi il riquadro Imprese",
       "expandHint": "Espandi il riquadro Imprese",

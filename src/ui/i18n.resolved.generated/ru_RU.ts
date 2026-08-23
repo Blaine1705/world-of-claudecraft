@@ -3832,6 +3832,7 @@ export const ru_RU: EnTranslations = {
       "unlockedBorderHint": "Новая рамка: {name}. Наденьте её в Книге деяний.",
       "broadcastLine": "{name} совершает деяние: {deed}",
       "rarityLine": "Совершили {percent} искателей приключений",
+      "stillToVisit": "Ещё предстоит посетить: {places}",
       "trackerLabel": "Деяния",
       "collapseHint": "Свернуть список деяний",
       "expandHint": "Развернуть список деяний",

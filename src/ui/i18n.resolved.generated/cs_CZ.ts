@@ -3832,6 +3832,7 @@ export const cs_CZ: EnTranslations = {
       "unlockedBorderHint": "Získán nový rámeček: {name}. Nasadíš si jej v Knize skutků.",
       "broadcastLine": "{name} završuje skutek: {deed}",
       "rarityLine": "Vykonalo jej {percent} dobrodruhů",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Skutky",
       "collapseHint": "Sbalit panel skutků",
       "expandHint": "Rozbalit panel skutků",

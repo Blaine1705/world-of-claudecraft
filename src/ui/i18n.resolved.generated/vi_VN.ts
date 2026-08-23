@@ -3832,6 +3832,7 @@ export const vi_VN: EnTranslations = {
       "unlockedBorderHint": "Đã nhận viền mới: {name}. Hãy đeo nó từ Sách Kỳ Công.",
       "broadcastLine": "{name} vừa lập một kỳ công: {deed}",
       "rarityLine": "Đã có {percent} nhà phiêu lưu lập được",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Kỳ Công",
       "collapseHint": "Thu gọn bảng theo dõi kỳ công",
       "expandHint": "Mở rộng bảng theo dõi kỳ công",

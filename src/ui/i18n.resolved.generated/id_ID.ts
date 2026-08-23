@@ -3832,6 +3832,7 @@ export const id_ID: EnTranslations = {
       "unlockedBorderHint": "Bingkai baru diraih: {name}. Kenakan lewat Kitab Jasa.",
       "broadcastLine": "{name} telah mengukir jasa: {deed}",
       "rarityLine": "Diraih oleh {percent} petualang",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Jasa",
       "collapseHint": "Ciutkan pelacak jasa",
       "expandHint": "Bentangkan pelacak jasa",

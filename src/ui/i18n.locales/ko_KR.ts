@@ -9558,6 +9558,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.deedsRetroSummary.other': '연대기가 따라잡았습니다: 업적 {count}개 기록.',
   'hudChrome.deeds.broadcastLine': '{name} 님이 업적을 달성했습니다: {deed}',
   'hudChrome.deeds.rarityLine': '모험가 중 {percent} 달성',
+  'hudChrome.deeds.stillToVisit': '아직 방문하지 않은 곳: {places}',
   'hudChrome.deeds.trackerLabel': '업적',
   'hudChrome.deeds.collapseHint': '업적 추적기 접기',
   'hudChrome.deeds.expandHint': '업적 추적기 펼치기',

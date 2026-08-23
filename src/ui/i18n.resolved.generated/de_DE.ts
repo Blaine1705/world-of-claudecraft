@@ -3832,6 +3832,7 @@ export const de_DE: EnTranslations = {
       "unlockedBorderHint": "Neuer Rahmen errungen: {name}. Trage ihn über das Buch der Taten.",
       "broadcastLine": "{name} hat eine Tat vollbracht: {deed}",
       "rarityLine": "Errungen von {percent} der Abenteurer",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Taten",
       "collapseHint": "Tatenverfolgung einklappen",
       "expandHint": "Tatenverfolgung ausklappen",

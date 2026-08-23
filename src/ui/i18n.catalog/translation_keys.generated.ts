@@ -8331,6 +8331,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.deeds.renownLabel'
   | 'hudChrome.deeds.searchAria'
   | 'hudChrome.deeds.searchPlaceholder'
+  | 'hudChrome.deeds.stillToVisit'
   | 'hudChrome.deeds.title'
   | 'hudChrome.deeds.titleChip'
   | 'hudChrome.deeds.titledName'

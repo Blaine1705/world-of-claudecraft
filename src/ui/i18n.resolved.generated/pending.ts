@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "es_ES": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "fr_FR": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "fr_CA": [
+    "hudChrome.deeds.stillToVisit"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "de_DE": [
+    "hudChrome.deeds.stillToVisit"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.deeds.stillToVisit"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "nl_NL": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "pl_PL": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "id_ID": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "tr_TR": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "sv_SE": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "vi_VN": [
+    "hudChrome.deeds.stillToVisit"
+  ],
+  "da_DK": [
+    "hudChrome.deeds.stillToVisit"
+  ]
 };

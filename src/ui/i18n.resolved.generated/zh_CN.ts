@@ -3832,6 +3832,7 @@ export const zh_CN: EnTranslations = {
       "unlockedBorderHint": "获得新边框：{name}。可在功绩之书中佩戴。",
       "broadcastLine": "{name} 达成了功绩：{deed}",
       "rarityLine": "{percent} 的冒险者已达成",
+      "stillToVisit": "尚待探访：{places}",
       "trackerLabel": "功绩",
       "collapseHint": "折叠功绩追踪器",
       "expandHint": "展开功绩追踪器",
