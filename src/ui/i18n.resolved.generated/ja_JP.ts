@@ -866,11 +866,52 @@ export const ja_JP: EnTranslations = {
       "actionRing": "戦闘アクション",
       "actionPageToggle": "行動ページ切替",
       "actionPageIndicator": "{page}ページ",
+      "actionRadial": "アクション方向",
+      "actionRadialCancel": "アクションをキャンセル",
+      "radialCenter": "中央",
+      "radialUp": "Up",
+      "radialRight": "右",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "消耗品",
+      "menuControl": "メニュー",
+      "menuControlAria": "メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。",
+      "menuControlAriaTap": "メニュー。タップでメニュー列（騎乗、地図、バッグなど）を開きます。もう一度タップするとチャットが開きます。",
+      "menuLabel": "Menu",
+      "quickActions": "クイック操作",
+      "quickActionsAria": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開きます。長押しして右にスワイプすると項目を選べます。",
+      "quickActionsAriaTap": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開き、項目をタップして選びます。もう一度タップすると閉じます。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "スタンス",
+      "stanceAnchorAria": "スタンス：{stance}。タップしてスタンスリングを開き、別のスタンスを選びます。",
+      "stanceAnchorEmptyAria": "スタンスなし。タップしてスタンスリングを開き、スタンスを選びます。",
+      "questStripAria": "追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。",
+      "questStripAriaSingle": "追跡中のクエスト: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "他 {count} 件",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "アクションバーの配置を編集"
+    },
+    "barEditor": {
+      "title": "アクションバーの編集",
+      "close": "アクションバー編集を閉じる",
+      "pages": "アクションバーのページ",
+      "pageTab": "Page {page}",
+      "buttonHeader": "ボタン{button}",
+      "cellAria": "ボタン{button}、{direction}：{action}",
+      "emptyCellAria": "ボタン{button}、{direction}：空き",
+      "hint": "スロットをタップし、もう一つタップすると入れ替わります。",
+      "armed": "スロットをタップして{name}を配置します。",
+      "picked": "別のスロットをタップして{name}と入れ替えます。",
+      "locked": "アクションバーはインターフェース設定でロックされています。",
+      "clear": "クリア",
+      "clearAria": "スロットをクリア",
+      "clearArmed": "スロットをタップするとクリアします。"
     },
     "tutorialGreeting": {
       "bodyFirst": "見かけない顔だね、旅の人。この土地では、冒険を始める者が修練の浜を訪れるのが習わしだ。海峡の先にある静かな島だよ。あそこなら世界の試練に挑む前に腕を磨き、この土地に慣れることができる。渡し船は行きも帰りも出ているし、行っても行かなくても誰も君を軽んじたりはしないよ。",
@@ -1395,7 +1436,9 @@ export const ja_JP: EnTranslations = {
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "touchTapMenus": "タップメニュー",
+      "touchTapMenusNote": "アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。"
     },
     "talentRows": {
       "tab": "選択",
@@ -2484,7 +2527,8 @@ export const ja_JP: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
-      "removeFromBarAria": "{name}をアクションバーから削除"
+      "removeFromBarAria": "{name}をアクションバーから削除",
+      "assignAria": "{name}を配置するスロットを選択"
     },
     "nameplate": {
       "mobLevel": "{level}",

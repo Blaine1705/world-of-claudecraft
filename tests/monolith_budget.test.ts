@@ -61,20 +61,9 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    // Re-pinned 19488 -> 19620 for the Proving Shore tutorial island, a
-    // maintainer decision prepared for PR review: the island's logic lives in
-    // extracted modules (bootcamp.ts + bootcamp_view.ts, noticeboard_popup.ts,
-    // the sim-side credit modules) and hud.ts carries only their drive calls,
-    // the noticeboard event arm, and the vendor-stock hoist the tool-gate
-    // source scan needs. Re-pinned 19620 -> 19623 by the review fixes: the
-    // greeting's island prewarm takes the idle-pace two-call streaming idiom
-    // (three lines). LOWERED 19623 -> 19517 by the v0.39.0 base merge: the
-    // release lowered its own arm to 19387, and the island wiring lands on top
-    // of that smaller file. Exact merged count: any further growth reds again.
-    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
-    // combined tree lands below the branch ceilings, so keep the exact merged
-    // count.
-    ceiling: 19232,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    ceiling: 18790,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -128,22 +117,9 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Re-pinned 13689 -> 13716 for the Proving Shore tutorial island: the
-    // island's visuals live in extracted modules (quest_beacon_core.ts,
-    // decor_torch_fx.ts) and the renderer carries their hookup, the beacon's
-    // per-frame memo, and the entity-loop sparkle arm. Re-pinned
-    // 13716 -> 13729 by the review fixes: the beacon memo gains its island
-    // rectangle gate and the shared off-island empty set. LOWERED
-    // 13729 -> 13712 by the noob-friendliness pass: the beacon memo, the
-    // sparkle arm, and the new golden-trail hookup all moved out into
-    // island_guidance.ts, leaving two one-line call sites. Re-pinned
-    // 13712 -> 13767 by the v0.39.0 base merge: the release arm sat at 13744
-    // (delve tracker, mount prewarm, shadow-depth prewarm) and the island's
-    // two call sites ride on top of it. Exact merged count.
-    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
-    // combined tree lands below the branch ceilings, so keep the exact merged
-    // count.
-    ceiling: 13361,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    ceiling: 13329,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -152,28 +128,14 @@ const MONOLITHS: MonolithRow[] = [
     // both parents' additions combine, so keep the exact merged count.
     // Re-pinned for the local tutorial-tweaks merge (the staged first death and
     // the ability drill hook into the coordinator); exact merged count.
-    ceiling: 12463,
+    ceiling: 12492,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
     file: 'src/main.ts',
-    // Re-pinned 11490 -> 11533 for the Proving Shore tutorial island: the
-    // arrival cinematic and teleport camera snap live in src/game/ modules
-    // (arrival_cinematic.ts, teleport_camera.ts, ferry_prewarm.ts) and
-    // main.ts carries their frame-loop and warm-lane wiring. Re-pinned
-    // 11533 -> 11583 by the review fixes: the cinematic step moved out of
-    // maybeWarmCurrentZone into its own frame-loop block (real frameDt, the
-    // look/zoom cancel arms), the ferry warm gained its idle-pace and
-    // hidden-shell arms, the camera snap its origin tracking, and the
-    // greeting hook its reduce-motion gate; all consumers of the extracted
-    // modules, kept here because each needs the frame loop's private state.
-    // Re-pinned 11583 -> 11590 by the v0.39.0 base merge: the release adds
-    // seven lines of its own bootstrap wiring, which auto-merged alongside the
-    // island's. Exact merged count.
-    // Re-pinned to the eastbrook-plus-tutorial integration merge output: the
-    // combined tree lands below the branch ceilings, so keep the exact merged
-    // count.
-    ceiling: 11621,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    ceiling: 11606,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -225,9 +187,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    // Re-pinned to the eastbrook-plus-tutorial integration merge output:
-    // both parents' additions combine, so keep the exact merged count.
-    ceiling: 2583,
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    ceiling: 2621,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
