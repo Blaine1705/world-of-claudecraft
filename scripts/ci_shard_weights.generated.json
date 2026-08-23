@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 2960,
+    "files": 3006,
     "mergedLocal": "2026-08-24",
     "mergedFiles": 46,
     "note": "v0.40.0 sync into feature/woc-marketplace: release CI harvest kept for shared files; the 46 branch-only test files keep their previously merged local durations"

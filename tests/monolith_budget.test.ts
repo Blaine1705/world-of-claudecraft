@@ -356,8 +356,14 @@ const MONOLITHS: MonolithRow[] = [
     // ea9377db8e): release-side growth only (the druid auto-unshift strip at
     // cast commit and the aggro/taunt boolean gates); the branch's delegates
     // are unchanged. Exact merged count, still under the release's own 12660.
+    // Re-pinned 12531 -> 12560 at the third v0.40.0 sync merge (release tip
+    // b39b16022e): release-side growth only (the bot-meta welcome-mail gate
+    // from issue #3560, the inert instance-corpse skip in the mob update
+    // loop, and the delve-band guard on combat sight checks); the branch's
+    // delegates are unchanged. Exact merged count, still under the release's
+    // own 12660.
     file: 'src/sim/sim.ts',
-    ceiling: 12531,
+    ceiling: 12560,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
