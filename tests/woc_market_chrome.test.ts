@@ -102,7 +102,7 @@ describe('woc_market_chrome: the browse control row', () => {
     const unset = strip();
     // The Any option is selected on both filter selects while no filter is
     // applied (the '' value carries the null).
-    expect(/filter-quality[^]*?value="" selected/.test(unset)).toBe(true);
+    expect(/filter-quality[\s\S]*?value="" selected/.test(unset)).toBe(true);
     const set = strip({ quality: 'legendary', format: 'buy_now', itemQuery: 'sword' });
     expect(set).toContain('value="legendary" selected');
     expect(set).toContain('value="buy_now" selected');
