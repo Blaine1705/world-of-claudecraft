@@ -1213,7 +1213,11 @@ async function withdrawOfferHandler(ctx: Ctx): Promise<void> {
 }
 
 async function tradePartnerHandler(ctx: Ctx): Promise<void> {
-  const name = new URL(ctx.req.url ?? '', 'http://x').searchParams.get('name') ?? '';
+  // ctx.query, not a re-parse of ctx.req.url: the router already parsed and
+  // validated the query, and a second parser on an auth-relevant enumeration
+  // can desync from it (server/internal.ts's param helper documents the same).
+  const raw = ctx.query.name;
+  const name = typeof raw === 'string' ? raw : '';
   const partner = await useService().tradePartner(ctxAccountId(ctx), stringField(name, 64));
   if (!partner) throw new HttpError(404, 'woc_market.not_found');
   json(ctx.res, 200, { partner });

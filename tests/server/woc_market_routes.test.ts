@@ -674,6 +674,34 @@ describe('the refusal-to-wire mapping', () => {
   });
 });
 
+describe('trade-partner reads the router-parsed query', () => {
+  it('passes ctx.query.name to the service, not a re-parse of req.url', async () => {
+    // The handler reads ctx.query, the value the router already parsed and
+    // validated; a second parser over ctx.req.url can desync from it. The
+    // fake ctx sets query without a matching url, so the old re-parse would
+    // have read an empty name here.
+    let seen: string | null = null;
+    service({
+      tradePartner: async (_account: number, name: string) => {
+        seen = name;
+        return { name, walletVerified: true } as Awaited<ReturnType<WocMarketService['tradePartner']>>;
+      },
+    });
+    const ctx = readCtx({ query: { name: 'Aldan' } });
+    await handlerFor('GET', '/api/woc-market/trade-partner')(ctx);
+    expect(seen).toBe('Aldan');
+    expect(sent(ctx).status).toBe(200);
+  });
+
+  it('404s when the partner does not resolve', async () => {
+    service({ tradePartner: async () => null });
+    const ctx = readCtx({ query: { name: 'Nobody' } });
+    await expect(
+      handlerFor('GET', '/api/woc-market/trade-partner')(ctx),
+    ).rejects.toMatchObject({ status: 404 });
+  });
+});
+
 describe('the create-listing format gate', () => {
   /** Drive the create handler and report the params the service was handed, or
    *  the HttpError the schema gate raised before the service was reached. */
