@@ -663,14 +663,11 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // The park-ledger cap (the rider's growth bound) sits many multiples
     // above the sweep batch: each pass can park at most one batch per arm,
     // so the cap only bites a mass-park event while steady state never
-    // grazes it. SWEEP_BATCH is a woc_market.ts module-private const, so
-    // scrape it like the siblings above.
+    // grazes it. SWEEP_BATCH moved to woc_market_budgets.ts (the ratchet's
+    // sibling split) and is exported there, so import it instead of the old
+    // module-private source scrape.
     const { WOC_LOCAL_PARK_MAX_ENTRIES } = await import('../../server/woc_market_local_ledgers');
-    const sweepBatchMatch = stripComments(read('server/woc_market.ts')).match(
-      /^const SWEEP_BATCH = (\d+);$/m,
-    );
-    expect(sweepBatchMatch).not.toBeNull();
-    const sweepBatch = Number(sweepBatchMatch?.[1]);
+    const { SWEEP_BATCH: sweepBatch } = await import('../../server/woc_market_budgets');
     expect(sweepBatch).toBeGreaterThan(0);
     expect(WOC_LOCAL_PARK_MAX_ENTRIES).toBeGreaterThanOrEqual(sweepBatch * 8);
     // And it stays SQL-sane: the cap bounds the batch reads' exclusion

@@ -49,11 +49,14 @@ import {
 } from './wallet_bridge_reason_text';
 import { overWalletBalance } from './woc_affordable_core';
 import {
-  wocBondScheduleNotesHtml,
+  wocBidDisclosuresHtml,
   wocBrowseStripHtml,
+  wocBuyNowHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
   wocLoadingStatusHtml,
+  wocMarketBannersHtml,
+  wocMarketFootHtml,
   wocSalesHistoryHtml,
   wocSellEmptyHtml,
   wocSpinnerHtml,
@@ -100,6 +103,11 @@ export interface WocMarketWindowDeps {
   hooks(): WocMarketHooks | null;
   closeOthers(): void;
   hideTooltip(): void;
+  /** Open the shared wallet connect flow (the woc:wallet-verify event the
+   *  store, bags and daily rewards buttons dispatch): the unlinked-wallet
+   *  banner's shortcut, so the window never says 'link a wallet' without a
+   *  way to do it right there. */
+  openWallet(): void;
   /** The shared hover/focus tooltip binder (Hud.attachTooltip). It owns the
    *  positioning and the only forced-reflow reads involved, which is what keeps
    *  this cold window's no-layout-read contract intact. */
@@ -233,6 +241,11 @@ export class WocMarketWindow {
   private sellDurationHours: number | null = null;
   private sellOfferNext = false;
   private acceptTerms = false;
+  /** The bid form's disclosure well, collapsed by default so Place bid sits
+   *  above the fold (the whole point of the toggle). Painter state, not DOM
+   *  state: the poll-band rebuild would silently re-collapse an open well
+   *  held only in the DOM. Reset on close so every visit starts compact. */
+  private bidTermsOpen = false;
   private pendingQuote: PendingQuote | null = null;
   /** The bid preview's timer-free coalescing (see onBidPriceInput): the price
    *  still awaiting an estimate, and whether one is already out. */
@@ -325,6 +338,7 @@ export class WocMarketWindow {
     this.busy = false;
     this.busyLabel = null;
     this.busyGen++;
+    this.bidTermsOpen = false;
   }
 
   /** Full refetch (open, tab change, after a mutation). */
@@ -764,51 +778,23 @@ export class WocMarketWindow {
       }),
     );
 
-    // The two standing banners (a paused realm, an unlinked wallet) live under
-    // the tabs: they change on an operator action or a wallet link, never on
-    // a click, so the tab panel does not shift under the pointer.
-    const banners =
-      (model.paused
-        ? `<div class="wm-banner wm-banner-paused">${esc(t('hudChrome.wocMarket.pausedBanner'))}</div>`
-        : '') +
-      (model.walletLinked
-        ? ''
-        : `<div class="wm-banner wm-banner-wallet">${esc(t('hudChrome.wocMarket.walletBanner'))}</div>`);
-    const bannerStrip = banners === '' ? '' : `<div class="wm-strip">${banners}</div>`;
-
-    // The footer status bar: the rate note rests there, and the toast strip
-    // (a mutation in flight, its outcome) joins it in the SAME slot, so a
-    // notice that comes and goes never moves the rows or the form above it.
-    // Under the paused banner the rate reads as the last known print, with
-    // its date, never as a live rate.
-    const rate =
-      model.tokensPerUsd !== null && model.priceAsOfMs !== null
-        ? `<div class="wm-rate">${esc(
-            model.paused
-              ? t('hudChrome.wocMarket.rateNotePaused', {
-                  tokens: this.tokens(model.tokensPerUsd),
-                  time: formatDateTime(model.priceAsOfMs, {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  }),
-                })
-              : t('hudChrome.wocMarket.rateNote', {
-                  tokens: this.tokens(model.tokensPerUsd),
-                  time: formatDateTime(model.priceAsOfMs, { timeStyle: 'short' }),
-                }),
-          )}</div>`
-        : '';
-    const notice = this.notice
-      ? `<div class="wm-notice ${this.notice.error ? 'wm-notice-error' : ''}" role="status">${
-          this.notice.error ? svgIcon('alert') : ''
-        }<span>${esc(this.resolveNotice(this.notice))}</span></div>`
-      : '';
-    // The busy line moves (the shared ring): a signed transaction awaiting the
-    // chain used to be indistinguishable from a wedged panel.
-    const busy = this.busy
-      ? `<div class="wm-busy" role="status">${wocSpinnerHtml()}<span>${esc(t(this.busyLabel ?? 'hudChrome.wocMarket.confirming'))}</span></div>`
-      : '';
-    const foot = `<div class="wm-foot">${rate}${notice}${busy}</div>`;
+    // The standing banners and the footer are chrome builders (the pure-core
+    // split); the window resolves its own state (notice sentence, busy label)
+    // and the builders own the markup.
+    const bannerStrip = wocMarketBannersHtml({
+      paused: model.paused,
+      walletLinked: model.walletLinked,
+    });
+    const foot = wocMarketFootHtml({
+      paused: model.paused,
+      tokensPerUsd: model.tokensPerUsd,
+      priceAsOfMs: model.priceAsOfMs,
+      tokens: (value) => this.tokens(value),
+      notice: this.notice
+        ? { text: this.resolveNotice(this.notice), error: this.notice.error }
+        : null,
+      busyText: this.busy ? t(this.busyLabel ?? 'hudChrome.wocMarket.confirming') : null,
+    });
 
     const body =
       this.pendingQuote !== null
@@ -941,33 +927,18 @@ export class WocMarketWindow {
     const overBuyNow = overWalletBalance(this.buyNowTokens, this.walletTokens());
     const buyNow =
       d.row.buyNowCents !== null && !d.row.mine
-        ? // Buy now claims the listing and walking away has a cost (the
-          // re-claim cooldown and the hourly cap): said BEFORE the button, like
-          // the bid form's disclosures precede Place bid. A locked listing says
-          // WHY its button is disabled (the badge lives in the table, which a
-          // phone has scrolled away).
-          `<div class="wm-disclosures">` +
-          `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>` +
-          (d.row.buyNowLocked
-            ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowLockedTip'))}</p>`
-            : '') +
-          `</div>` +
-          `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${d.row.id}" ` +
-          `${model.paused || !model.walletLinked || d.row.buyNowLocked || overBuyNow ? 'disabled' : ''} ` +
-          `aria-label="${esc(t('hudChrome.wocMarket.buyNowAria', { item: name, usd: this.usd(d.row.buyNowCents) }))}" data-focus-key="wm-buy-now">` +
-          `${esc(t('hudChrome.wocMarket.buyNowButton', { usd: this.usd(d.row.buyNowCents) }))}</button>` +
-          // The buy-now price in tokens, from its own quote (the detail's
-          // estimate priced the current bid, not this).
-          (this.buyNowTokens === null
-            ? ''
-            : `<p class="wm-bid-equiv${overBuyNow ? ' over-balance' : ''}">${esc(
-                t('hudChrome.trade.woc.equivalent', { tokens: this.tokens(this.buyNowTokens) }),
-              )}</p>`) +
-          (overBuyNow
-            ? `<p class="wm-over-balance">${esc(
-                t('hudChrome.trade.woc.hintInsufficientBalance'),
-              )}</p>`
-            : '')
+        ? // The chrome builder: the walk-away-cost disclosure BEFORE the
+          // button, the token equivalence off buy-now's own quote.
+          wocBuyNowHtml({
+            listingId: d.row.id,
+            itemName: name,
+            buyNowCents: d.row.buyNowCents,
+            locked: d.row.buyNowLocked,
+            disabled: model.paused || !model.walletLinked || d.row.buyNowLocked || overBuyNow,
+            tokensText: this.buyNowTokens === null ? null : this.tokens(this.buyNowTokens),
+            overBalance: overBuyNow,
+            usd: (c) => this.usd(c),
+          })
         : '';
     // The shared cancel predicate (woc_market_view.ts canCancelListing): a
     // cancel-pending listing offers no second Cancel here either.
@@ -1043,43 +1014,25 @@ export class WocMarketWindow {
         ? `<p class="wm-over-balance">${esc(t('hudChrome.trade.woc.hintInsufficientBalance'))}</p>`
         : '') +
       this.confirmFieldsHtml(model) +
-      // The commitment disclosures, BEFORE the first bond charge, grouped as
-      // one well: the bond schedule for THIS listing (both figures are
-      // server-computed and shipped on the row: the client computes no money,
-      // the PRD rule), the binding rule with its forfeit and strike (stated
-      // once, here), the closing rule, the second-chance cascade with the
-      // resolved settlement window, the variable-token warning, and the
-      // payment deadline (H13's pre-bid disclosure gap).
-      `<div class="wm-disclosures">` +
-      `<p class="wm-note">${esc(
-        t('hudChrome.wocMarket.bidBondNote', {
-          bond: this.usd(d.row.minNextBidBondCents),
-          bid: this.usd(d.row.minNextBidCents),
-        }),
-      )}</p>` +
-      (model.bondSchedule === null
-        ? ''
-        : wocBondScheduleNotesHtml({
-            ...model.bondSchedule,
-            payWindowText: this.countdown(model.bondSchedule.pendingTtlSeconds),
-            usd: (c) => this.usd(c),
-          })) +
-      `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidBindingNote'))}</p>` +
-      `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidCloseNote'))}</p>` +
-      (d.offerNext
-        ? `<p class="wm-note">${esc(
-            t('hudChrome.wocMarket.offerNextNote', {
-              duration: this.countdown(model.settlementWindowSeconds),
-            }),
-          )}</p>`
-        : '') +
-      `<p class="wm-note">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>` +
-      `<p class="wm-note">${esc(
-        t('hudChrome.wocMarket.settlementDeadlineNote', {
-          duration: this.countdown(model.settlementWindowSeconds),
-        }),
-      )}</p>` +
-      `</div>` +
+      // The commitment disclosures (H13), composed by the chrome builder:
+      // collapsed behind the Bid terms toggle, always in the DOM before the
+      // commit control. Both bond figures are server-computed and ride the
+      // row; the client computes no money (the PRD rule).
+      wocBidDisclosuresHtml({
+        open: this.bidTermsOpen,
+        bondCents: d.row.minNextBidBondCents,
+        bidCents: d.row.minNextBidCents,
+        schedule:
+          model.bondSchedule === null
+            ? null
+            : {
+                ...model.bondSchedule,
+                payWindowText: this.countdown(model.bondSchedule.pendingTtlSeconds),
+              },
+        offerNext: d.offerNext,
+        settlementWindowText: this.countdown(model.settlementWindowSeconds),
+        usd: (c) => this.usd(c),
+      }) +
       `<button type="button" class="wm-primary" data-action="place-bid" data-listing="${listingId}" ${disabled} ` +
       `aria-label="${esc(t('hudChrome.wocMarket.bidAria', { item: itemName }))}" data-focus-key="wm-bid-submit">` +
       `${esc(t('hudChrome.wocMarket.bidButton'))}</button></div>`
@@ -2138,6 +2091,15 @@ export class WocMarketWindow {
         break;
       case 'quote-cancel':
         void this.cancelPendingQuote();
+        break;
+      case 'toggle-bid-terms':
+        this.bidTermsOpen = !this.bidTermsOpen;
+        this.render();
+        break;
+      case 'connect-wallet':
+        // The shared connect flow owns everything from here (connect, verify,
+        // link); the poll picks the linked state up and retires the banner.
+        this.deps.openWallet();
         break;
       default:
         break;

@@ -55,8 +55,14 @@ const MONOLITHS: MonolithRow[] = [
     // Down 2618 -> 2614 when the recent-sales list and the empty-sell caption
     // followed (wocSalesHistoryHtml / wocSellEmptyHtml), paying for the
     // resolved bond disclosures and the select-scroll command.
+    // Down 2614 -> 2612 at the Exchange UX round: the banners, the foot, the
+    // bid disclosures well and the buy-now face followed the chrome out
+    // (wocMarketBannersHtml / wocMarketFootHtml / wocBidDisclosuresHtml /
+    // wocBuyNowHtml), paying for the collapsed Bid terms toggle and the
+    // banner's connect shortcut. This also cleared the 36 lines the file had
+    // drifted over its own ceiling before this round.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2614,
+    ceiling: 2612,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -110,7 +116,11 @@ const MONOLITHS: MonolithRow[] = [
     // back: this branch moved its only call site into
     // src/ui/preview_prewarm_wiring.ts, which imports it directly.
     // Exact merged count, zero headroom: the next line added fails.
-    ceiling: 19154,
+    // Down 19154 -> 19152 at the Exchange UX round: the woc:wallet-verify
+    // dispatch moved to src/ui/wallet_verify_request.ts on the rule of three
+    // (the Exchange banner's connect shortcut was the fourth copy), paying
+    // for that shortcut's dep. Exact count, zero headroom kept.
+    ceiling: 19152,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -373,7 +383,10 @@ const MONOLITHS: MonolithRow[] = [
     // listingReturnCustodyRef imported here with its only use gone to
     // woc_market_delivery.ts. The ratchet's own rule, an extraction lowers
     // the ceiling, applies to the dead line the extraction forgot too.
-    ceiling: 4036,
+    // Down 4036 -> 4032 at the Exchange UX round: the pass budgets and
+    // deadlines moved to woc_market_budgets.ts (the sibling pattern), which
+    // also cleared the 6 lines the file had drifted over this ceiling.
+    ceiling: 4032,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

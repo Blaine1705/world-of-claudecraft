@@ -1288,9 +1288,12 @@ describe('woc_market_window: a price the wallet cannot cover', () => {
 
   it('gates BUY NOW on its own quote, since the detail estimate prices the bid', () => {
     // listingDetail estimates currentBidCents ?? startCents, which is not the
-    // buy-now price: reusing it would compare the wrong number.
+    // buy-now price: reusing it would compare the wrong number. The chrome
+    // builder renders the face, so the gate rides its disabled and
+    // overBalance args from here.
     expect(painter).toContain('overWalletBalance(this.buyNowTokens, this.walletTokens())');
-    expect(painter).toContain('|| overBuyNow ?');
+    expect(painter).toContain('|| overBuyNow,');
+    expect(painter).toContain('overBalance: overBuyNow,');
   });
 
   it('reads the VERIFIED balance, not a merely-connected wallet', () => {
@@ -1719,31 +1722,61 @@ describe('woc_market_window: the Activity tab is an honest, actionable ledger (H
 describe('woc_market_window: informed commitment before the first charge (H13/R9)', () => {
   const bidForm = betweenCode('private bidFormHtml(', 'private confirmFieldsHtml(');
   const confirmFields = betweenCode('private confirmFieldsHtml(', 'private sellHtml(');
+  // The disclosure markup lives in the chrome builders (the monolith
+  // ratchet's extraction); the discipline pins follow it there, and the
+  // window keeps the ordering pin: the composed well still precedes the
+  // commit control. Comment-stripped for the same reason `code` is.
+  const chromeCode = stripComments(
+    readFileSync(new URL('../src/ui/woc_market_chrome.ts', import.meta.url), 'utf8'),
+  );
+  const chromeBetween = (start: string, end: string): string => {
+    const from = chromeCode.indexOf(start);
+    expect(from, `anchor missing: ${start}`).toBeGreaterThanOrEqual(0);
+    const to = chromeCode.indexOf(end, from);
+    expect(to, `anchor missing after ${start}: ${end}`).toBeGreaterThan(from);
+    return chromeCode.slice(from, to);
+  };
+  const bidWell = chromeBetween(
+    'export function wocBidDisclosuresHtml(',
+    'export function wocBuyNowHtml(',
+  );
+  const buyNowFace = chromeBetween(
+    'export function wocBuyNowHtml(',
+    'export function wocSalesHistoryHtml(',
+  );
 
   it('the pre-bid disclosures precede the Place bid control', () => {
     // Binding-bid (no withdraw after the bond signs), the close-movement
     // honesty pair (anti-snipe extension; a late payment refunds), and the
-    // seller's second-chance disclosure when opted in.
-    expect(bidForm).toContain('hudChrome.wocMarket.bidBindingNote');
-    expect(bidForm).toContain('hudChrome.wocMarket.bidCloseNote');
-    // The second-chance disclosure renders only when the seller opted in, and
-    // resolves the settlement window it names (the payment deadline the cascade
-    // gives the promoted bidder).
-    expect(bidForm).toContain('d.offerNext\n        ? `<p class="wm-note">${esc(');
+    // seller's second-chance disclosure when opted in, all composed in the
+    // well the chrome builder owns, ahead of its own toggle-driven hidden
+    // attribute ever removing them from the DOM (it never does).
+    expect(bidWell).toContain('hudChrome.wocMarket.bidBindingNote');
+    expect(bidWell).toContain('hudChrome.wocMarket.bidCloseNote');
+    // The second-chance disclosure renders only when the seller opted in.
+    expect(bidWell).toContain('args.offerNext');
+    expect(bidWell).toContain('hudChrome.wocMarket.offerNextNote');
+    // The window feeds the builder the resolved settlement window (the
+    // payment deadline the cascade gives the promoted bidder) and composes
+    // the well BEFORE the button, where the player still decides.
+    expect(bidForm).toContain('wocBidDisclosuresHtml({');
     expect(bidForm).toContain(
-      "t('hudChrome.wocMarket.offerNextNote', {\n              duration: this.countdown(model.settlementWindowSeconds),",
+      'settlementWindowText: this.countdown(model.settlementWindowSeconds)',
     );
-    // BEFORE the button, where the player still decides.
-    expect(bidForm.indexOf('bidBindingNote')).toBeLessThan(bidForm.indexOf('place-bid'));
+    expect(bidForm.indexOf('wocBidDisclosuresHtml(')).toBeLessThan(bidForm.indexOf('place-bid'));
   });
 
   it('buy now discloses its walk-away cost BEFORE its button', () => {
     // Buy now claims the listing; leaving without paying pauses the buyer's
     // Buy Now (the re-claim cooldown and the hourly cap). Said where the bid
     // form says its own: ahead of the control that commits.
+    expect(buyNowFace).toContain('hudChrome.wocMarket.buyNowNote');
+    expect(buyNowFace.indexOf('buyNowNote')).toBeLessThan(
+      buyNowFace.indexOf('data-action="buy-now"'),
+    );
+    // And the window renders that builder for every buy-now face.
     const detail = betweenCode('private detailPaneHtml(', 'private bidFormHtml(');
-    expect(detail).toContain('hudChrome.wocMarket.buyNowNote');
-    expect(detail.indexOf('buyNowNote')).toBeLessThan(detail.indexOf('data-action="buy-now"'));
+    expect(detail).toContain('wocBuyNowHtml({');
   });
 
   it('the consent checkbox LINKS the Marketplace terms at the moment of acceptance (10.3)', () => {

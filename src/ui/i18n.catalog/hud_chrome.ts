@@ -5268,10 +5268,16 @@ export const hudChromeStrings = {
     pausedBanner:
       'Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.',
     walletBanner: 'Link and verify a wallet to bid, buy, or sell on the Exchange.',
-    rateNote: 'Rate: about {tokens} $WOC per USD as of {time}.',
+    // The banner's own shortcut into the shared wallet connect flow (the
+    // woc:wallet-verify event the store and daily rewards buttons dispatch),
+    // so an unlinked player is never told to link with nowhere to do it.
+    walletBannerCta: 'Connect wallet',
+    // The rate is per ONE dollar, said outright: 'per USD' read as a unit
+    // label and players asked per how many.
+    rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',
     // Under the paused banner the print is the last KNOWN rate, dated, never a
     // live one.
-    rateNotePaused: 'Last known rate: about {tokens} $WOC per USD as of {time}.',
+    rateNotePaused: 'Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.',
     // Anchored to the amount it converts (the current bid, else the starting
     // bid: the same rule the server priced); the fixed-at-payment rule lives
     // in the bid form's own warning.
@@ -5323,6 +5329,10 @@ export const hudChromeStrings = {
     bidPlaceholder: 'Enter a USD amount',
     bidButton: 'Place bid',
     bidAria: 'Place a bid on {item}',
+    // The disclosure well's toggle: the full commitment disclosures collapsed
+    // behind one line so Place bid stays above the fold (aria-expanded says
+    // which state the button is in; the label never changes).
+    bidTermsToggle: 'Bid terms',
     // The row activator opens the listing (a buy-now-only listing takes no
     // bids, and neither does your own), so its name says that.
     rowOpenAria: 'View the listing for {item}',

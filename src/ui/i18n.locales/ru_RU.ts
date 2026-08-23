@@ -8951,6 +8951,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
   'hudChrome.wocMarket.walletBanner':
     'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
+  'hudChrome.wocMarket.walletBannerCta': 'Подключить кошелёк',
   'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
   'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
@@ -8987,6 +8988,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidPlaceholder': 'Введите сумму в USD',
   'hudChrome.wocMarket.bidButton': 'Сделать ставку',
   'hudChrome.wocMarket.bidAria': 'Сделать ставку на {item}',
+  'hudChrome.wocMarket.bidTermsToggle': 'Условия ставок',
   'hudChrome.wocMarket.buyNowButton': 'Купить сейчас за {usd}',
   'hudChrome.wocMarket.buyNowAria': 'Купить {item} сейчас за {usd}',
   'hudChrome.wocMarket.cancelButton': 'Отменить лот',

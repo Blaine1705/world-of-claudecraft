@@ -143,6 +143,182 @@ export function wocBondScheduleNotesHtml(args: {
 }
 
 /**
+ * The two standing banners under the tab strip (a paused realm, an unlinked
+ * wallet): they change on an operator action or a wallet link, never on a
+ * click, so the tab panel does not shift under the pointer. The wallet banner
+ * carries its own way in: the same shared connect flow the store and daily
+ * rewards buttons open (the window's connect-wallet click action), one click
+ * from where the player was told to link.
+ */
+export function wocMarketBannersHtml(args: { paused: boolean; walletLinked: boolean }): string {
+  const banners =
+    (args.paused
+      ? `<div class="wm-banner wm-banner-paused">${esc(t('hudChrome.wocMarket.pausedBanner'))}</div>`
+      : '') +
+    (args.walletLinked
+      ? ''
+      : `<div class="wm-banner wm-banner-wallet"><span>${esc(t('hudChrome.wocMarket.walletBanner'))}</span>` +
+        `<button type="button" data-action="connect-wallet" ${FOCUS_KEY_ATTR}="wm-connect-wallet">${esc(
+          t('hudChrome.wocMarket.walletBannerCta'),
+        )}</button></div>`);
+  return banners === '' ? '' : `<div class="wm-strip">${banners}</div>`;
+}
+
+/**
+ * The footer status bar: the rate note rests there, and the toast strip (a
+ * mutation in flight, its outcome) joins it in the SAME slot, so a notice
+ * that comes and goes never moves the rows or the form above it. Under the
+ * paused banner the rate reads as the last KNOWN print, with its date, never
+ * a live rate. The busy line moves (the shared ring): a signed transaction
+ * awaiting the chain used to be indistinguishable from a wedged panel.
+ */
+export function wocMarketFootHtml(args: {
+  paused: boolean;
+  tokensPerUsd: number | null;
+  priceAsOfMs: number | null;
+  /** The window's token formatter, so every surface spells $WOC one way. */
+  tokens(value: number): string;
+  /** The ALREADY-RESOLVED notice sentence (the window's resolveNotice), so a
+   *  runtime language switch never leaves a stale-locale sentence here. */
+  notice: { text: string; error: boolean } | null;
+  busyText: string | null;
+}): string {
+  const rate =
+    args.tokensPerUsd !== null && args.priceAsOfMs !== null
+      ? `<div class="wm-rate">${esc(
+          args.paused
+            ? t('hudChrome.wocMarket.rateNotePaused', {
+                tokens: args.tokens(args.tokensPerUsd),
+                time: formatDateTime(args.priceAsOfMs, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }),
+              })
+            : t('hudChrome.wocMarket.rateNote', {
+                tokens: args.tokens(args.tokensPerUsd),
+                time: formatDateTime(args.priceAsOfMs, { timeStyle: 'short' }),
+              }),
+        )}</div>`
+      : '';
+  const notice = args.notice
+    ? `<div class="wm-notice ${args.notice.error ? 'wm-notice-error' : ''}" role="status">${
+        args.notice.error ? svgIcon('alert') : ''
+      }<span>${esc(args.notice.text)}</span></div>`
+    : '';
+  const busy =
+    args.busyText === null
+      ? ''
+      : `<div class="wm-busy" role="status">${wocSpinnerHtml()}<span>${esc(args.busyText)}</span></div>`;
+  return `<div class="wm-foot">${rate}${notice}${busy}</div>`;
+}
+
+/**
+ * The bid form's commitment disclosures, BEFORE the first bond charge,
+ * grouped as one well: the bond schedule for THIS listing (both figures are
+ * server-computed and shipped on the row: the client computes no money, the
+ * PRD rule), the binding rule with its forfeit and strike (stated once,
+ * here), the closing rule, the second-chance cascade with the resolved
+ * settlement window, the variable-token warning, and the payment deadline
+ * (H13's pre-bid disclosure gap).
+ *
+ * Collapsed by default behind the toggle, never removed: the well is always
+ * composed (resolved figures and all) and precedes Place bid in DOM order,
+ * but eight always-open paragraphs pushed the commit control below the fold
+ * on every screen (the PRD's collapsed-by-default presentation). The hidden
+ * attribute needs its own CSS arm: .wm-disclosures sets display:flex, which
+ * outranks the UA's [hidden] rule.
+ */
+export function wocBidDisclosuresHtml(args: {
+  open: boolean;
+  /** The bond for the minimum next bid, and that bid, both off the row. */
+  bondCents: number;
+  bidCents: number;
+  /** The /status schedule figures, or null on an older server (the
+   *  figure-free bidBondNote then stands alone). */
+  schedule: {
+    rateBps: number;
+    minCents: number;
+    maxCents: number;
+    payWindowText: string;
+  } | null;
+  offerNext: boolean;
+  /** The pre-localized settlement window (the window's countdown formatter). */
+  settlementWindowText: string;
+  usd(cents: number): string;
+}): string {
+  return (
+    `<button type="button" class="wm-terms-toggle" data-action="toggle-bid-terms" ` +
+    `aria-expanded="${args.open ? 'true' : 'false'}" aria-controls="wm-bid-terms" ` +
+    `${FOCUS_KEY_ATTR}="wm-bid-terms-toggle">${esc(t('hudChrome.wocMarket.bidTermsToggle'))}</button>` +
+    `<div class="wm-disclosures" id="wm-bid-terms"${args.open ? '' : ' hidden'}>` +
+    `<p class="wm-note">${esc(
+      t('hudChrome.wocMarket.bidBondNote', {
+        bond: args.usd(args.bondCents),
+        bid: args.usd(args.bidCents),
+      }),
+    )}</p>` +
+    (args.schedule === null ? '' : wocBondScheduleNotesHtml({ ...args.schedule, usd: args.usd })) +
+    `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidBindingNote'))}</p>` +
+    `<p class="wm-note">${esc(t('hudChrome.wocMarket.bidCloseNote'))}</p>` +
+    (args.offerNext
+      ? `<p class="wm-note">${esc(
+          t('hudChrome.wocMarket.offerNextNote', { duration: args.settlementWindowText }),
+        )}</p>`
+      : '') +
+    `<p class="wm-note">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>` +
+    `<p class="wm-note">${esc(
+      t('hudChrome.wocMarket.settlementDeadlineNote', { duration: args.settlementWindowText }),
+    )}</p>` +
+    `</div>`
+  );
+}
+
+/**
+ * The detail pane's buy-now face: the walk-away-cost disclosure (the re-claim
+ * cooldown and the hourly cap) said BEFORE the button, like the bid form's
+ * disclosures precede Place bid; a locked listing says WHY its button is
+ * disabled (the badge lives in the table, which a phone has scrolled away);
+ * then the price in tokens off buy-now's own quote, and the refusal in words
+ * beside a button that is actually disabled (never colour alone).
+ */
+export function wocBuyNowHtml(args: {
+  listingId: number;
+  itemName: string;
+  buyNowCents: number;
+  locked: boolean;
+  disabled: boolean;
+  /** The buy-now price in tokens (the window's formatter), or null until its
+   *  own quote lands: the detail's estimate priced the current bid, not this. */
+  tokensText: string | null;
+  overBalance: boolean;
+  usd(cents: number): string;
+}): string {
+  return (
+    `<div class="wm-disclosures">` +
+    `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowNote'))}</p>` +
+    (args.locked ? `<p class="wm-note">${esc(t('hudChrome.wocMarket.buyNowLockedTip'))}</p>` : '') +
+    `</div>` +
+    `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${args.listingId}" ` +
+    `${args.disabled ? 'disabled' : ''} ` +
+    `aria-label="${esc(
+      t('hudChrome.wocMarket.buyNowAria', {
+        item: args.itemName,
+        usd: args.usd(args.buyNowCents),
+      }),
+    )}" ${FOCUS_KEY_ATTR}="wm-buy-now">` +
+    `${esc(t('hudChrome.wocMarket.buyNowButton', { usd: args.usd(args.buyNowCents) }))}</button>` +
+    (args.tokensText === null
+      ? ''
+      : `<p class="wm-bid-equiv${args.overBalance ? ' over-balance' : ''}">${esc(
+          t('hudChrome.trade.woc.equivalent', { tokens: args.tokensText }),
+        )}</p>`) +
+    (args.overBalance
+      ? `<p class="wm-over-balance">${esc(t('hudChrome.trade.woc.hintInsufficientBalance'))}</p>`
+      : '')
+  );
+}
+
+/**
  * The detail pane's recent-sales list. Null sales means the history round
  * trip is still out: 'still loading', never 'no recorded sales', which
  * would assert what the client does not know.

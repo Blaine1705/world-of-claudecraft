@@ -755,6 +755,7 @@ import { buildVcupIndicatorView } from './vale_cup_indicator_view';
 import { ValeCupWindow, vcupNationName } from './vale_cup_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
+import { requestWalletVerify } from './wallet_verify_request';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
 import { promptWikiVisit } from './wiki_link';
@@ -4681,7 +4682,7 @@ export class Hud {
     wocBalanceHtml: () => this.wocBalanceHtml(),
     claudiumLauncherHtml: () => this.claudiumLauncherHtml(),
     openClaudium: () => this.toggleClaudium(),
-    openWallet: () => window.dispatchEvent(new CustomEvent('woc:wallet-verify')),
+    openWallet: requestWalletVerify,
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     cancelPetFeed: () => this.cancelPetFeed(),
@@ -5224,6 +5225,7 @@ export class Hud {
     hooks: () => this.wocMarketHooks,
     closeOthers: () => this.closeOtherWindows('#woc-market-window'),
     hideTooltip: () => this.hideTooltip(),
+    openWallet: requestWalletVerify,
     ...this.windowFocus('#woc-market-window'),
   });
   // Daily rewards window painter. It owns the async rewards reads, spin action,
@@ -5242,9 +5244,7 @@ export class Hud {
       this.applyDailyRewardsLauncherStatus(status);
     },
     onClose: () => this.refreshDailyRewardsLauncher(true),
-    onWalletConnect: () => {
-      window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
-    },
+    onWalletConnect: requestWalletVerify,
     storeEnabled: () => this.claudiumHooks !== null,
     storeSnapshot: async () => {
       const snapshot = await this.claudiumHooks?.storeSnapshot();
@@ -5314,9 +5314,7 @@ export class Hud {
       return snapshot;
     },
     buy: (rail, sku) => this.claudiumHooks?.buy(rail, sku) ?? Promise.resolve(),
-    onWalletConnect: () => {
-      window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
-    },
+    onWalletConnect: requestWalletVerify,
     walletState: () => walletConnectionView(),
     ...this.windowFocus('#claudium-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),

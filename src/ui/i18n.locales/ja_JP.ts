@@ -8826,6 +8826,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。',
   'hudChrome.wocMarket.walletBanner':
     'ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。',
+  'hudChrome.wocMarket.walletBannerCta': 'ウォレットを接続',
   'hudChrome.wocMarket.rateNote': 'レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} は現在のレートで約 {tokens} $WOC です。',
   'hudChrome.wocMarket.browseEmpty': '現在出品はありません。また後で確認してください。',
@@ -8862,6 +8863,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidPlaceholder': 'USD 金額を入力',
   'hudChrome.wocMarket.bidButton': '入札する',
   'hudChrome.wocMarket.bidAria': '{item} に入札する',
+  'hudChrome.wocMarket.bidTermsToggle': '入札条件',
   'hudChrome.wocMarket.buyNowButton': '{usd} で今すぐ購入',
   'hudChrome.wocMarket.buyNowAria': '{item} を {usd} で今すぐ購入',
   'hudChrome.wocMarket.cancelButton': '出品を取り下げる',

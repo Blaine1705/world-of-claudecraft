@@ -22,6 +22,11 @@ import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 import { throwProvedRollback } from './pg_rollback_proof';
+import {
+  BOND_PAYOUT_BUDGET_MS,
+  SWEEP_BATCH,
+  WOC_MARKET_ME_READOUT_DEADLINE_MS,
+} from './woc_market_budgets';
 import { createWocMarketDeliveryArms, type WocMarketDeliveryArms } from './woc_market_delivery';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
 import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
@@ -1251,24 +1256,9 @@ export type Refused = {
 const refuse = (reason: WocMarketRefusal, params?: Record<string, string | number>): Refused =>
   params === undefined ? { ok: false, reason } : { ok: false, reason, params };
 
-// Sweep pass budgets: every arm is bounded per pass so one huge backlog can
-// never starve the others; the next pass continues where this one stopped.
-const SWEEP_BATCH = 25;
-/** Wall-clock budget for the LOCKED bond-payout walk: the segment holds the
- *  advisory lock and its client while refund/forfeit RPCs run, so a degraded
- *  service (every RPC riding its full timeout) must stop the walk early
- *  rather than camp the lock for the whole batch. Rows left behind stay
- *  durably due and the next pass resumes; worst hold is about this budget
- *  plus one RPC timeout, comfortably under the watchdog's 60s alarm. */
-export const BOND_PAYOUT_BUDGET_MS = 30_000;
-
-/** Wall-clock bound on the activity readout's six SEQUENTIAL reads: each is
- *  its own implicit pool checkout with its own 5s connect deadline, so under
- *  a saturated pool the sequencing turned one 5s worst case into six back to
- *  back (30s of held socket per poll). One checkout timeout plus slack: the
- *  between-reads check fails the readout fast and the client's poll retries
- *  on its next beat. */
-export const WOC_MARKET_ME_READOUT_DEADLINE_MS = 6_000;
+// The pass budgets and deadlines live in woc_market_budgets.ts (the ratchet's
+// sibling-module pattern); the public pair keeps this import path.
+export { BOND_PAYOUT_BUDGET_MS, WOC_MARKET_ME_READOUT_DEADLINE_MS } from './woc_market_budgets';
 
 /** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
  *  silent idle pass and a permanently starved backlog look identical without

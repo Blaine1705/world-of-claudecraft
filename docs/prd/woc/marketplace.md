@@ -110,6 +110,12 @@ withdraw; forfeit and a strike on non-payment), the anti-snipe close extension
 and the late-payment refund, and, when the seller opted in, the automatic
 second-chance cascade (the outbid bidder can become the buyer at their own bid
 with the bond re-held).
+The disclosures are grouped in a Bid terms well the form keeps collapsed by
+default, behind one toggle directly above the Place bid control: fully open
+they pushed the commit control below the fold on every screen. The well is
+always composed with its resolved figures and precedes the control in reading
+order; expanding it is never required to bid, and the terms-acceptance
+checkbox stays inline beside its linked terms.
 
 Every bid requires: a verified linked wallet (`server/wallet.ts`), sufficient
 $WOC balance at bid time (`server/woc_balance.ts` cached read), an established

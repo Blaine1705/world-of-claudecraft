@@ -16412,6 +16412,15 @@
   #woc-market-window .wm-banner-wallet {
     border-color: var(--color-accent);
   }
+  /* The banner's connect shortcut rides the flex row's far edge: the label
+     soaks the remaining width, the button keeps its own. */
+  #woc-market-window .wm-banner-wallet span {
+    flex: 1;
+  }
+  #woc-market-window .wm-banner-wallet button {
+    flex: none;
+    white-space: nowrap;
+  }
   /* The shared ring (hud.css .woc-spinner) inside a flex line: the container's
      gap owns the spacing. */
   #woc-market-window .wm-busy .woc-spinner,
@@ -16784,6 +16793,31 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background: color-mix(in srgb, var(--color-bg-dark) 70%, transparent);
+  }
+  /* The collapsed state the Bid terms toggle drives. Its own arm because the
+     flex rule above outranks the UA's [hidden] display, the same trap the
+     combo listbox answers below. */
+  #woc-market-window .wm-disclosures[hidden] {
+    display: none;
+  }
+  /* The disclosure toggle: the window's ordinary control chrome sized to its
+     label, with a caret that answers to aria-expanded so the state is visible
+     as well as spoken. */
+  #woc-market-window .wm-terms-toggle {
+    align-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+  #woc-market-window .wm-terms-toggle::before {
+    content: "";
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 6px solid currentColor;
+    transition: transform var(--transition-speed) var(--transition-ease);
+  }
+  #woc-market-window .wm-terms-toggle[aria-expanded="true"]::before {
+    transform: rotate(90deg);
   }
   #woc-market-window .wm-note,
   #woc-market-window .wm-sales-empty {

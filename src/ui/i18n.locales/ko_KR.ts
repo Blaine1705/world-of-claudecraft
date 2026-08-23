@@ -8793,6 +8793,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.',
   'hudChrome.wocMarket.walletBanner':
     '지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.',
+  'hudChrome.wocMarket.walletBannerCta': '지갑 연결',
   'hudChrome.wocMarket.rateNote': '환율: {time} 기준 1 USD당 약 {tokens} $WOC.',
   'hudChrome.wocMarket.estimateNote': '{usd}는 현재 환율로 약 {tokens} $WOC입니다.',
   'hudChrome.wocMarket.browseEmpty': '지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.',
@@ -8829,6 +8830,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.bidPlaceholder': 'USD 금액 입력',
   'hudChrome.wocMarket.bidButton': '입찰',
   'hudChrome.wocMarket.bidAria': '{item}에 입찰',
+  'hudChrome.wocMarket.bidTermsToggle': '입찰 약관',
   'hudChrome.wocMarket.buyNowButton': '{usd}에 즉시 구매',
   'hudChrome.wocMarket.buyNowAria': '{item}을(를) {usd}에 즉시 구매',
   'hudChrome.wocMarket.cancelButton': '등록 취소',

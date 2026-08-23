@@ -236,6 +236,7 @@ interface Rig {
   tooltips: Map<Element, () => string>;
   closeOthers: ReturnType<typeof vi.fn<() => void>>;
   restoreFocus: ReturnType<typeof vi.fn<(target: HTMLElement | null) => void>>;
+  openWallet: ReturnType<typeof vi.fn<() => void>>;
 }
 
 function rig(
@@ -258,6 +259,7 @@ function rig(
   const tooltips = new Map<Element, () => string>();
   const closeOthers = vi.fn<() => void>();
   const restoreFocus = vi.fn<(target: HTMLElement | null) => void>();
+  const openWallet = vi.fn<() => void>();
   const deps: WocMarketWindowDeps = {
     root: () => root,
     world: () => world as unknown as IWorld,
@@ -270,9 +272,21 @@ function rig(
     itemTooltip: (item) => `<b>${item.id}</b>`,
     captureFocus: () => document.activeElement as HTMLElement | null,
     restoreFocus,
+    openWallet,
   };
   const win = new WocMarketWindow(deps);
-  return { win, root, fake, hooks, signMessage, world, tooltips, closeOthers, restoreFocus };
+  return {
+    win,
+    root,
+    fake,
+    hooks,
+    signMessage,
+    world,
+    tooltips,
+    closeOthers,
+    restoreFocus,
+    openWallet,
+  };
 }
 
 const q = <T extends HTMLElement>(root: ParentNode, sel: string): T => {
@@ -305,8 +319,10 @@ describe('WocMarketWindow live rig: open, browse, select', () => {
     expect(q(r.root, '.wm-row-open').textContent).toContain(NAME_OF(EPIC));
     // The item cell carries the shared stat tooltip (bound after each rebuild).
     expect([...r.tooltips.keys()].some((el) => el.classList.contains('wm-name'))).toBe(true);
-    // The rate note renders the server's price print through the formatters.
+    // The rate note renders the server's price print through the formatters,
+    // and says outright that the figure is per ONE dollar.
     expect(r.root.querySelector('.wm-rate')?.textContent).toContain('7,812.5');
+    expect(r.root.querySelector('.wm-rate')?.textContent).toContain('per $1.00 USD');
   });
 
   it('a row click loads the detail (detail, estimate for buy-now, history) and paints the bid form', async () => {
@@ -322,10 +338,69 @@ describe('WocMarketWindow live rig: open, browse, select', () => {
     expect(r.root.querySelector('input[data-field="bid-usd"]')).not.toBeNull();
     expect(r.root.querySelector('button[data-action="buy-now"]')).not.toBeNull();
     // The disclosures precede the commit control in DOM order (node positions,
-    // never indexOf: a renamed class must not pass as -1 < N).
+    // never indexOf: a renamed class must not pass as -1 < N), and so does the
+    // toggle that reveals them: the reading order stays terms, then commit.
     const note = q(r.root, '.wm-bid-form .wm-disclosures p');
+    const toggle = q(r.root, '.wm-bid-form .wm-terms-toggle');
     const btn = q(r.root, 'button[data-action="place-bid"]');
     expect(note.compareDocumentPosition(btn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(toggle.compareDocumentPosition(btn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('the bid terms well starts collapsed, expands on its toggle, and survives a rebuild', async () => {
+    const r = rig();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-row-open').click();
+    await flush();
+    // Collapsed by default: the well is composed (its figures resolved) but
+    // hidden, and the toggle says so, which is what keeps Place bid above the
+    // fold. The well never leaves the DOM: H13's disclosures stay ahead of the
+    // commit control in reading order whichever state the toggle is in.
+    const well = q(r.root, '.wm-bid-form .wm-disclosures');
+    const toggle = q<HTMLButtonElement>(r.root, '.wm-bid-form .wm-terms-toggle');
+    expect(well.hasAttribute('hidden')).toBe(true);
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle.getAttribute('aria-controls')).toBe(well.id);
+    toggle.focus();
+    toggle.click();
+    await flush();
+    const openWell = q(r.root, '.wm-bid-form .wm-disclosures');
+    expect(openWell.hasAttribute('hidden')).toBe(false);
+    expect(q(r.root, '.wm-bid-form .wm-terms-toggle').getAttribute('aria-expanded')).toBe('true');
+    // The rebuild kept the keyboard player's place on the toggle it re-made.
+    expect(document.activeElement).toBe(q(r.root, '.wm-bid-form .wm-terms-toggle'));
+    // An expanded well is painter state, not DOM state: a poll-band rebuild
+    // repaints it open rather than silently re-collapsing it mid-read.
+    r.win.render();
+    expect(q(r.root, '.wm-bid-form .wm-disclosures').hasAttribute('hidden')).toBe(false);
+    // Close resets the preference: the next visit starts compact again.
+    r.win.close();
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-row-open').click();
+    await flush();
+    expect(q(r.root, '.wm-bid-form .wm-disclosures').hasAttribute('hidden')).toBe(true);
+  });
+
+  it('the unlinked-wallet banner carries the connect shortcut into the shared flow', async () => {
+    const r = rig({ walletLinked: false });
+    r.win.open();
+    await flush();
+    const button = q<HTMLButtonElement>(
+      r.root,
+      '.wm-banner-wallet button[data-action="connect-wallet"]',
+    );
+    button.click();
+    expect(r.openWallet).toHaveBeenCalledTimes(1);
+  });
+
+  it('a linked wallet paints no banner and no connect shortcut', async () => {
+    const r = rig({ walletLinked: true });
+    r.win.open();
+    await flush();
+    expect(r.root.querySelector('.wm-banner-wallet')).toBeNull();
+    expect(r.root.querySelector('button[data-action="connect-wallet"]')).toBeNull();
   });
 
   it('page-next asks the server for the next page and page-prev walks back', async () => {
@@ -910,6 +985,7 @@ describe('WocMarketWindow live rig: the platform gate', () => {
       itemTooltip: () => '',
       captureFocus: () => null,
       restoreFocus: () => {},
+      openWallet: () => {},
     });
     gated.open();
     expect(r.root.style.display).toBe('none');
