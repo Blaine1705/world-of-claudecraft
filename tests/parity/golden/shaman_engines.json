@@ -32,7 +32,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1002,
-      "state": "4b38a71f",
+      "state": "da64ba0c",
       "events": "0b207508",
       "rng": {
         "draws": 0,
@@ -43,7 +43,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1002,
-      "state": "e45974ed",
+      "state": "460bba96",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1002,
-      "state": "1eef3977",
+      "state": "1edce7cc",
       "events": "842deeb9",
       "rng": {
         "draws": 154,
@@ -65,7 +65,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1002,
-      "state": "767ca186",
+      "state": "0aa211bd",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -76,7 +76,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1002,
-      "state": "6ffaa536",
+      "state": "9861471d",
       "events": "9a546a60",
       "rng": {
         "draws": 508,
@@ -87,7 +87,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1002,
-      "state": "6ffaa536",
+      "state": "9861471d",
       "events": "741638a5",
       "rng": {
         "draws": 508,
@@ -556,7 +556,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 103,
+          "attackPower": 113,
           "combatTimer": 104,
           "comboUntil": -1,
           "critChance": 0.0675,
@@ -774,8 +774,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 1002,
-      "state": "0f835c7e",
-      "events": "7468ebec",
+      "state": "652898ce",
+      "events": "e57f8ee0",
       "rng": {
         "draws": 696,
         "digest": "b7ac8b45"
@@ -785,7 +785,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1002,
-      "state": "c569310b",
+      "state": "5d3a3df9",
       "events": "741638a5",
       "rng": {
         "draws": 921,
@@ -796,8 +796,8 @@
       "tick": 160,
       "time": 8,
       "nextId": 1002,
-      "state": "7ea37d08",
-      "events": "0c7e125b",
+      "state": "8f783667",
+      "events": "c584e2ed",
       "rng": {
         "draws": 1159,
         "digest": "34b764c3"
@@ -807,7 +807,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1002,
-      "state": "b521a452",
+      "state": "bb3746a1",
       "events": "741638a5",
       "rng": {
         "draws": 1423,
@@ -818,7 +818,7 @@
       "tick": 182,
       "time": 9.1,
       "nextId": 1002,
-      "state": "884efb78",
+      "state": "652b744b",
       "events": "741638a5",
       "rng": {
         "draws": 1452,
@@ -941,12 +941,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 122
+            "damageDealt": 134
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 122
+              "dummyDamage": 134
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1291,7 +1291,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 103,
+          "attackPower": 113,
           "auras": [
             {
               "duration": 1800,
@@ -1530,7 +1530,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999652,
+          "hp": 999640,
           "id": 1001,
           "inCombat": true,
           "kind": "mob",
@@ -1566,7 +1566,7 @@
             ],
             [
               998,
-              122
+              134
             ]
           ],
           "weapon": {
@@ -1579,8 +1579,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 1002,
-      "state": "b4251f78",
-      "events": "caf992ce",
+      "state": "b1fbe507",
+      "events": "1d9cc0d6",
       "rng": {
         "draws": 1710,
         "digest": "d846842a"
@@ -1590,7 +1590,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1002,
-      "state": "32575d8d",
+      "state": "9b9244d0",
       "events": "741638a5",
       "rng": {
         "draws": 1866,
@@ -1601,7 +1601,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 1002,
-      "state": "01d6f882",
+      "state": "a1b0e4ff",
       "events": "741638a5",
       "rng": {
         "draws": 1886,
@@ -1724,12 +1724,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 271
+            "damageDealt": 287
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 271
+              "dummyDamage": 287
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2059,7 +2059,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 103,
+          "attackPower": 113,
           "auras": [
             {
               "duration": 1800,
@@ -2333,7 +2333,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999503,
+          "hp": 999487,
           "id": 1001,
           "inCombat": true,
           "kind": "mob",
@@ -2369,7 +2369,7 @@
             ],
             [
               998,
-              531.75
+              554.75
             ]
           ],
           "weapon": {
@@ -2382,7 +2382,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 1002,
-      "state": "ed10d829",
+      "state": "0d6c0446",
       "events": "e578d714",
       "rng": {
         "draws": 2008,
@@ -2393,8 +2393,8 @@
       "tick": 260,
       "time": 13,
       "nextId": 1002,
-      "state": "e93ac9e6",
-      "events": "7308770c",
+      "state": "30c51c51",
+      "events": "8e868a34",
       "rng": {
         "draws": 2177,
         "digest": "55b32668"
@@ -2404,7 +2404,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 1002,
-      "state": "b3d78178",
+      "state": "22c0e1a1",
       "events": "6ab3a31a",
       "rng": {
         "draws": 2341,
@@ -2415,8 +2415,8 @@
       "tick": 300,
       "time": 15,
       "nextId": 1002,
-      "state": "e18533e8",
-      "events": "6c9d569f",
+      "state": "11584eab",
+      "events": "144a83e8",
       "rng": {
         "draws": 2541,
         "digest": "f3291dfc"
@@ -2426,7 +2426,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 1002,
-      "state": "50dfdcb3",
+      "state": "6ca832a4",
       "events": "741638a5",
       "rng": {
         "draws": 2588,
@@ -2549,12 +2549,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 435
+            "damageDealt": 458
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 435
+              "dummyDamage": 458
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2884,7 +2884,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 103,
+          "attackPower": 113,
           "auras": [
             {
               "duration": 1800,
@@ -3167,7 +3167,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999339,
+          "hp": 999316,
           "id": 1001,
           "inCombat": true,
           "kind": "mob",
@@ -3203,7 +3203,7 @@
             ],
             [
               998,
-              982.75
+              1025
             ]
           ],
           "weapon": {
@@ -3216,7 +3216,7 @@
       "tick": 306,
       "time": 15.3,
       "nextId": 1002,
-      "state": "50dfdcb3",
+      "state": "6ca832a4",
       "events": "741638a5",
       "rng": {
         "draws": 2588,
@@ -3339,12 +3339,12 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 435
+            "damageDealt": 458
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 435
+              "dummyDamage": 458
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3674,7 +3674,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 103,
+          "attackPower": 113,
           "auras": [
             {
               "duration": 1800,
@@ -3957,7 +3957,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999339,
+          "hp": 999316,
           "id": 1001,
           "inCombat": true,
           "kind": "mob",
@@ -3993,7 +3993,7 @@
             ],
             [
               998,
-              982.75
+              1025
             ]
           ],
           "weapon": {
