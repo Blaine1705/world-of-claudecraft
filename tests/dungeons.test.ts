@@ -162,6 +162,40 @@ describe('dungeons: door-trigger entry/exit', () => {
     expect(inst.exitId).not.toBeNull();
   });
 
+  // Bug repro: jumping into a dungeon door mid-air (the reported "jump into the
+  // outer entrance" crypt repro) carries the overworld jump's airborne state
+  // across the teleport. Every other sim teleport (portals.ts, sim.ts charge/
+  // follow, unstuck.ts, spirit.ts) resets vy/jumping/onGround/fallStartY as
+  // part of landing "settled"; enterDungeon/leaveDungeon must do the same, or
+  // the next vertical pass computes a bogus drop against the stale overworld
+  // fallStartY and deals fall damage unrelated to any real fall.
+  it('jumping into a dungeon door lands settled, with no fall damage from the leftover overworld jump', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Jumper');
+    const p = sim.entities.get(pid) as AnyEntity;
+    p.maxHp = p.hp = 100_000;
+    const door = hollowDoor(sim);
+    teleport(sim, p, door.pos.x, door.pos.z);
+    // Mid-air from a jump taken just before crossing the door trigger: the
+    // ratcheted fallStartY (player_motion.ts's Math.max climb while airborne)
+    // sits well above the door, same as a real jump approaching from higher
+    // ground would leave it.
+    p.onGround = false;
+    p.jumping = true;
+    p.vy = -1;
+    p.fallStartY = p.pos.y + 30;
+
+    updateDoorTriggers(sim.ctx, p);
+    expect(sim.instanceSlotAt(p.pos)).not.toBeNull(); // confirms entry actually happened
+
+    sim.tick();
+
+    expect(p.hp).toBe(100_000);
+    expect(p.onGround).toBe(true);
+    expect(p.jumping).toBe(false);
+    expect(p.fallStartY).toBeCloseTo(p.pos.y, 5);
+  });
+
   it('a party of two walking the same door shares ONE instance (instanceKeyFor)', () => {
     const sim = makeSim();
     const a = sim.addPlayer('warrior', 'Aaa');
