@@ -4329,6 +4329,10 @@ export const zh_TW: EnTranslations = {
     "deeds": {
       "invalid_input": "輸入無效。"
     },
+    "guilds": {
+      "invalid_roster_name": "公會名稱無效。",
+      "unknown": "沒有這個名字的公會。"
+    },
     "steam": {
       "disabled": "Steam 連結目前無法使用。",
       "invalid_ticket": "Steam 無法驗證此連結請求。請在桌面應用程式中重試。",

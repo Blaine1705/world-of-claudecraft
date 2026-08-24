@@ -4329,6 +4329,10 @@ export const en: EnTranslations = {
     "deeds": {
       "invalid_input": "Invalid input."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Steam linking is not available right now.",
       "invalid_ticket": "Steam could not verify this link request. Try again from the desktop app.",

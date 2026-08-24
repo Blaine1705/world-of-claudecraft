@@ -4329,6 +4329,10 @@ export const ko_KR: EnTranslations = {
     "deeds": {
       "invalid_input": "입력이 올바르지 않습니다."
     },
+    "guilds": {
+      "invalid_roster_name": "길드 이름이 유효하지 않습니다.",
+      "unknown": "그런 이름의 길드가 없습니다."
+    },
     "steam": {
       "disabled": "현재 Steam 연동을 사용할 수 없습니다.",
       "invalid_ticket": "Steam이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.",

@@ -4329,6 +4329,10 @@ export const pl_PL: EnTranslations = {
     "deeds": {
       "invalid_input": "Nieprawidłowe dane."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Łączenie kont Steam jest obecnie niedostępne.",
       "invalid_ticket": "Steam nie mógł zweryfikować tej prośby o połączenie. Spróbuj ponownie z aplikacji na komputer.",

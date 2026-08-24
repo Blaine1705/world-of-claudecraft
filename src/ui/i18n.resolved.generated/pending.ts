@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -650,6 +652,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "es_ES": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -1290,6 +1294,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "fr_FR": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -1930,6 +1936,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "fr_CA": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -2571,6 +2579,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -3211,6 +3221,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "de_DE": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -3911,6 +3923,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.radialUp"
   ],
   "pt_BR": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -4566,6 +4580,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.radialUp"
   ],
   "cs_CZ": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -5206,6 +5222,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "nl_NL": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -5846,6 +5864,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "pl_PL": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -6486,6 +6506,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "id_ID": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -7126,6 +7148,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "tr_TR": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -7766,6 +7790,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "sv_SE": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -8406,6 +8432,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "vi_VN": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",
@@ -9046,6 +9074,8 @@ export const pending: Record<string, readonly string[]> = {
     "sim.rift.lootRecoveryNotice"
   ],
   "da_DK": [
+    "apiError.guilds.invalid_roster_name",
+    "apiError.guilds.unknown",
     "apiError.woc_market.already_pending",
     "apiError.woc_market.bid_too_low",
     "apiError.woc_market.bond_window_closed",

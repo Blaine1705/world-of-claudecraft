@@ -4329,6 +4329,10 @@ export const vi_VN: EnTranslations = {
     "deeds": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Hiện không thể liên kết Steam.",
       "invalid_ticket": "Steam không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.",

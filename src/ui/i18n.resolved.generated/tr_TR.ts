@@ -4329,6 +4329,10 @@ export const tr_TR: EnTranslations = {
     "deeds": {
       "invalid_input": "Geçersiz girdi."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Steam bağlama şu anda kullanılamıyor.",
       "invalid_ticket": "Steam bu bağlama isteğini doğrulayamadı. Masaüstü uygulamasından tekrar dene.",

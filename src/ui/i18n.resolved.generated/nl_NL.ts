@@ -4329,6 +4329,10 @@ export const nl_NL: EnTranslations = {
     "deeds": {
       "invalid_input": "Ongeldige invoer."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Koppelen met Steam is op dit moment niet beschikbaar.",
       "invalid_ticket": "Steam kon dit koppelverzoek niet verifiëren. Probeer het opnieuw vanuit de desktop-app.",

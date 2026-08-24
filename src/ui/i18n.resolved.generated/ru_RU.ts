@@ -4329,6 +4329,10 @@ export const ru_RU: EnTranslations = {
     "deeds": {
       "invalid_input": "Недопустимые данные."
     },
+    "guilds": {
+      "invalid_roster_name": "Недопустимое название гильдии.",
+      "unknown": "Гильдии с таким названием нет."
+    },
     "steam": {
       "disabled": "Привязка Steam сейчас недоступна.",
       "invalid_ticket": "Steam не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.",

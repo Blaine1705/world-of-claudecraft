@@ -4329,6 +4329,10 @@ export const zh_CN: EnTranslations = {
     "deeds": {
       "invalid_input": "输入无效。"
     },
+    "guilds": {
+      "invalid_roster_name": "公会名称无效。",
+      "unknown": "没有这个名字的公会。"
+    },
     "steam": {
       "disabled": "Steam 关联当前不可用。",
       "invalid_ticket": "Steam 无法验证此关联请求。请在桌面客户端中重试。",

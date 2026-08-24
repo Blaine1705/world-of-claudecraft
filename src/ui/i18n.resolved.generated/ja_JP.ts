@@ -4329,6 +4329,10 @@ export const ja_JP: EnTranslations = {
     "deeds": {
       "invalid_input": "入力が無効です。"
     },
+    "guilds": {
+      "invalid_roster_name": "ギルド名が無効です。",
+      "unknown": "その名前のギルドはありません。"
+    },
     "steam": {
       "disabled": "Steam連携は現在利用できません。",
       "invalid_ticket": "Steamがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。",

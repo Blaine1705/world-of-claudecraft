@@ -4329,6 +4329,10 @@ export const en_XA: EnTranslations = {
     "deeds": {
       "invalid_input": "[Íñʋáļíð íñþúţ.]"
     },
+    "guilds": {
+      "invalid_roster_name": "[Íñʋáļíð ĝúíļð ñáɱé.]",
+      "unknown": "[Ñó ĝúíļð ƀý ţĥáţ ñáɱé.]"
+    },
     "steam": {
       "disabled": "[Šţéáɱ ļíñķíñĝ íš ñóţ áʋáíļáƀļé ŕíĝĥţ ñóŵ.]",
       "invalid_ticket": "[Šţéáɱ çóúļð ñóţ ʋéŕíƒý ţĥíš ļíñķ ŕéɋúéšţ. Ţŕý áĝáíñ ƒŕóɱ ţĥé ðéšķţóþ áþþ.]",

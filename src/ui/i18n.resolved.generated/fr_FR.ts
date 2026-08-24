@@ -4329,6 +4329,10 @@ export const fr_FR: EnTranslations = {
     "deeds": {
       "invalid_input": "Saisie invalide."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "La liaison Steam n'est pas disponible pour le moment.",
       "invalid_ticket": "Steam n'a pas pu vérifier cette demande de liaison. Réessayez depuis l'application de bureau.",

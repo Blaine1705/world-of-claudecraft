@@ -4329,6 +4329,10 @@ export const sv_SE: EnTranslations = {
     "deeds": {
       "invalid_input": "Ogiltig indata."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Steam-länkning är inte tillgänglig just nu.",
       "invalid_ticket": "Steam kunde inte verifiera länkbegäran. Försök igen från skrivbordsappen.",

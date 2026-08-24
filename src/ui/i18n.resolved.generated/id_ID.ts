@@ -4329,6 +4329,10 @@ export const id_ID: EnTranslations = {
     "deeds": {
       "invalid_input": "Masukan tidak valid."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Penautan Steam sedang tidak tersedia.",
       "invalid_ticket": "Steam tidak dapat memverifikasi permintaan penautan ini. Coba lagi dari aplikasi desktop.",

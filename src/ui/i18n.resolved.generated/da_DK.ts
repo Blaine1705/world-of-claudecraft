@@ -4329,6 +4329,10 @@ export const da_DK: EnTranslations = {
     "deeds": {
       "invalid_input": "Ugyldig indtastning."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Steam-tilknytning er ikke tilgængelig lige nu.",
       "invalid_ticket": "Steam kunne ikke bekræfte denne tilknytningsanmodning. Prøv igen fra skrivebordsappen.",
