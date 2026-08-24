@@ -282,6 +282,7 @@ import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
   type GuildLeaderboardPage,
+  type GuildRosterInfo,
   LEADERBOARD_PAGE_SIZE,
   type LeaderboardPage,
   paginateDeedsLeaderboard,
@@ -4823,6 +4824,12 @@ export class Sim {
   // state. Online play overrides this with the cached, realm-scoped server query.
   guildLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<GuildLeaderboardPage> {
     return Promise.resolve(paginateGuildLeaderboard([], page, pageSize));
+  }
+  // Same server-only reasoning as the board above: the offline world has no
+  // guild to drill into, so the roster read resolves null and the signpost
+  // window renders its localized empty state.
+  guildRoster(_name: string): Promise<GuildRosterInfo | null> {
+    return Promise.resolve(null);
   }
   // The developer board is sourced from GitHub's contributor stats, which the
   // offline world cannot fetch, so it ranks none: an empty page through the same

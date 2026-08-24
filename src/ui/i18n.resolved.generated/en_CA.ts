@@ -2058,12 +2058,6 @@ export const en_CA: EnTranslations = {
       "linkHint": "Shift-click to link this item in chat."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
-      },
       "guildMembers": {
         "one": "your guild rank is {rank}; {count} member",
         "few": "your guild rank is {rank}; {count} members",
@@ -2994,6 +2988,8 @@ export const en_CA: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Nothing seems posted.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

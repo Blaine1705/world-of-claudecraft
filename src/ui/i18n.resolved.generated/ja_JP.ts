@@ -2058,12 +2058,6 @@ export const ja_JP: EnTranslations = {
       "linkHint": "Shift + クリックでこのアイテムをチャットにリンクします。"
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count}人のメンバー、累計経験値{xp}",
-        "few": "{count}人のメンバー、累計経験値{xp}",
-        "many": "{count}人のメンバー、累計経験値{xp}",
-        "other": "{count}人のメンバー、累計経験値{xp}"
-      },
       "guildMembers": {
         "one": "あなたは{rank}、{count}人のメンバー",
         "few": "あなたは{rank}、{count}人のメンバー",
@@ -2994,6 +2988,8 @@ export const ja_JP: EnTranslations = {
     },
     "noticeboard": {
       "empty": "何も貼られていないようだ。",
+      "subtitle": "ワールドのギルド",
+      "rosterTitle": "{guild}のメンバー一覧を見る",
       "popupTitle": "ギルドの掲示柱",
       "close": "閉じる"
     },

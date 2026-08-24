@@ -2058,12 +2058,6 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count}명 회원, 누적 경험치 {xp}",
-        "few": "{count}명 회원, 누적 경험치 {xp}",
-        "many": "{count}명 회원, 누적 경험치 {xp}",
-        "other": "{count}명 회원, 누적 경험치 {xp}"
-      },
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",
         "few": "당신은 {rank}, {count}명 회원",
@@ -2994,6 +2988,8 @@ export const ko_KR: EnTranslations = {
     },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다.",
+      "subtitle": "월드의 길드",
+      "rosterTitle": "{guild}의 명단 보기",
       "popupTitle": "길드 게시 기둥",
       "close": "닫기"
     },

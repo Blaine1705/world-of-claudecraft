@@ -2058,12 +2058,6 @@ export const fr_FR: EnTranslations = {
       "linkHint": "Maj-clic pour lier cet objet dans le canal de discussion."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
-      },
       "guildMembers": {
         "one": "vous êtes {rank}, {count} membre",
         "few": "vous êtes {rank}, {count} membres",
@@ -2994,6 +2988,8 @@ export const fr_FR: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Rien ne semble affiché.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

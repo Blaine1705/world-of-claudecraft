@@ -31,6 +31,21 @@ export interface RankedPage<T> {
 
 export type LeaderboardPage = RankedPage<LeaderboardEntry>;
 export type GuildLeaderboardPage = RankedPage<GuildLeaderboardEntry>;
+
+/** One roster row of the signpost guild board's drill-in (host-agnostic like
+ *  the page shapes above: the facet re-exports it). */
+export interface GuildRosterEntry {
+  name: string;
+  rank: 'leader' | 'officer' | 'member';
+  level: number;
+  lifetimeXp: number;
+}
+
+/** The public roster read (GET /api/guilds/roster, server/guild_roster.ts). */
+export interface GuildRosterInfo {
+  guild: string;
+  members: GuildRosterEntry[];
+}
 export type DevLeaderboardPage = RankedPage<DevLeaderboardEntry>;
 // The Renown board page also carries the viewer's own standing when the
 // server resolved one (an authenticated, ranked caller); the paginator never

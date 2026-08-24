@@ -531,22 +531,7 @@ function liveGame(): GameServer {
   // max-two pool. The coordinator cap equals that pool exactly, so it creates
   // no pg waiters and leaves every shared-pool client to auth/save work. The
   // constructor default keeps DB-mocked unit worlds independent from config.
-  if (!gameInstance) {
-    gameInstance = new GameServer();
-    // Guild-signpost fill (server/noticeboard_guilds.ts): the game swaps an
-    // 'empty' noticeboard read for the realm guild board, served from the
-    // SAME cached window the REST guilds board pages through.
-    // Stale-while-refresh: a stale or missing window kicks the shared
-    // single-flight refresh (getGuildLeaderboard catches its own errors) and
-    // this read serves whatever window is current meanwhile.
-    gameInstance.noticeboardGuilds = () => {
-      const cached = guildLeaderboardCache.realm;
-      if (!cached || Date.now() - cached.at >= LEADERBOARD_TTL_MS) {
-        void getGuildLeaderboard('realm');
-      }
-      return cached?.entries ?? null;
-    };
-  }
+  gameInstance ??= new GameServer();
   return gameInstance;
 }
 
@@ -3400,10 +3385,6 @@ export async function startServer(): Promise<http.Server> {
   await ensureSchema();
   await seedOAuthClients();
   const game = liveGame();
-  // Warm the realm guild-board window so the very first signpost read after
-  // boot already carries listings (fire-and-forget: the read catches its own
-  // errors, and the signpost fill falls back to the 'empty' arm meanwhile).
-  void getGuildLeaderboard('realm');
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],
     onResync: (accountIds, policies) => {

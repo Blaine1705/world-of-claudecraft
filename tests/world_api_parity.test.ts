@@ -370,6 +370,7 @@ export const IWORLD_MEMBERS = [
   { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
+  { name: 'guildRoster', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
   { name: 'prestige', kind: 'method' },
   // --- daily WOC-holder rewards (IWorldDailyRewards; all async) ---
@@ -595,7 +596,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // market Sell-tab price reference adds marketSellPriceCheck (IWorldMarket,
     // a method). The release arm's neutral trade close (tradeClose, a sibling
     // of tradeCancel that ends a session without calling it a cancellation)
-    // adds one command member. On this branch the New Eastbrook program
+    // adds one command member. The signpost guild board's roster drill-in
+    // adds guildRoster (IWorldProgressionXp, a method). On this branch the
+    // New Eastbrook program
     // retires the Vale Cup facet (docs/design/eastbrook-revamp/master-plan.md),
     // removing cupInfo (data) plus the cup methods, and the tutorial greeting
     // adds startTutorial (IWorldQuests, a method). The merged tree carries
@@ -609,9 +612,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(322);
+    expect(IWORLD_MEMBERS.length).toBe(323);
     expect(DATA_MEMBERS.length).toBe(85);
-    expect(METHOD_MEMBERS.length).toBe(237);
+    expect(METHOD_MEMBERS.length).toBe(238);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -763,6 +766,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildPledgeDecide',
       'guildPledgeWithdraw',
       'guildPromote',
+      'guildRoster',
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
@@ -1143,6 +1147,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildPledgeDecide',
       'guildPledgeWithdraw',
       'guildPromote',
+      'guildRoster',
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
@@ -1469,6 +1474,7 @@ const FACET_PROGRESSION_XP = [
   'gatheringProficiency',
   'leaderboard',
   'guildLeaderboard',
+  'guildRoster',
   'devLeaderboard',
   'prestige',
 ] as const satisfies readonly (keyof IWorldProgressionXp)[];
@@ -1881,8 +1887,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(322);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(322);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

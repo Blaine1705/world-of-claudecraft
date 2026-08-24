@@ -600,45 +600,10 @@
     padding: 8px 10px;
     background: #00000022;
   }
-  .nb-head {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .nb-rank {
-    font-size: 12px;
-    color: #b9ae93;
-    min-width: 1.1em;
-    text-align: right;
-  }
   .nb-guild {
     font-size: 13px;
     font-weight: 700;
     color: var(--gold);
-  }
-  /* Server-filled guild-board rows: the recruiting status chips beside the
-     name, and the members-plus-XP stat line under it. */
-  .nb-status {
-    font-size: 11px;
-    border: 1px solid #ffffff1c;
-    border-radius: 6px;
-    padding: 1px 6px;
-    white-space: nowrap;
-  }
-  .nb-status.open {
-    color: #9fd489;
-  }
-  .nb-status.closed {
-    color: #b9ae93;
-  }
-  .nb-status.floor {
-    color: #d8d0bc;
-  }
-  .nb-stats {
-    margin-top: 2px;
-    font-size: 11.5px;
-    color: #b9ae93;
   }
   .nb-note {
     margin-top: 3px;

@@ -2058,12 +2058,6 @@ export const sv_SE: EnTranslations = {
       "linkHint": "Skift-klicka för att länka det här föremålet i chatten."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
-      },
       "guildMembers": {
         "one": "du är {rank}, {count} medlem",
         "few": "du är {rank}, {count} medlemmar",
@@ -2994,6 +2988,8 @@ export const sv_SE: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Inget verkar vara uppsatt.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

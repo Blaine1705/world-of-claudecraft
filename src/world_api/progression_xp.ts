@@ -1,8 +1,12 @@
 import type {
   DevLeaderboardPage,
   GuildLeaderboardPage,
+  GuildRosterInfo,
   LeaderboardPage,
 } from '../sim/leaderboard_page';
+
+export type { GuildRosterEntry, GuildRosterInfo } from '../sim/leaderboard_page';
+
 import type { PlayerClass } from '../sim/types';
 
 // One ranked row of the lifetime-XP leaderboard (Max-Level XP Overflow). Always
@@ -95,6 +99,12 @@ export interface IWorldProgressionXp {
   // lifetime XP), paged server-side the same way as the player board. Guilds are
   // a server-only social system, so the offline Sim resolves an empty page.
   guildLeaderboard(page?: number, pageSize?: number): Promise<GuildLeaderboardPage>;
+  /** The public roster drill-in behind the signpost guild board: the Guild
+   *  Master, then officers, then members, each rank tier ranked by lifetime
+   *  XP. Guilds are online-only, so the offline Sim resolves null (the
+   *  client renders its localized empty state); ClientWorld fetches the
+   *  cached server read. Null also answers an unknown guild. */
+  guildRoster(name: string): Promise<GuildRosterInfo | null>;
   // The developer high-score board (contributors ranked by merged PRs), sourced
   // from the repo's GitHub pulls API and paged the same way. The same data for
   // every realm; the offline Sim resolves an empty page.

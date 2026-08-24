@@ -1919,6 +1919,7 @@
   /* ---------- leaderboard ---------- */
   /* lifetime-XP leaderboard panel (modeled on the quest-log window) */
   #leaderboard-window,
+  #guild-board-window,
   #daily-rewards-window {
     width: 480px;
   }
@@ -1928,8 +1929,45 @@
      leftover height instead of staying pinned to its 56vh cap. flex-direction is
      unconditional because the inline display:flex is; with the shell default (row)
      the header, tabs and board would lay out side by side. */
-  #leaderboard-window {
+  #leaderboard-window,
+  #guild-board-window {
     flex-direction: column;
+  }
+  /* The signpost guild board's own chrome: the roster drill-in's back/header
+     row and the rank chips; everything else rides the lb-* family. */
+  #guild-board-window .gb-roster-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  #guild-board-window .gb-roster-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 2px;
+  }
+  #guild-board-window .gb-roster-guild {
+    font-family: var(--title-font);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+  }
+  #guild-board-window .gb-roster-xp {
+    margin-left: auto;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  #guild-board-window .gb-rank-chip {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    min-width: 84px;
+  }
+  #guild-board-window .gb-rank-chip.gb-rank-leader {
+    color: var(--gold);
   }
   #daily-rewards-window {
     top: 24px;

@@ -2058,12 +2058,6 @@ export const zh_CN: EnTranslations = {
       "linkHint": "Shift + 点击可在聊天中链接该物品。"
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count}名成员，{xp}终身经验",
-        "few": "{count}名成员，{xp}终身经验",
-        "many": "{count}名成员，{xp}终身经验",
-        "other": "{count}名成员，{xp}终身经验"
-      },
       "guildMembers": {
         "one": "你是{rank}，{count}名成员",
         "few": "你是{rank}，{count}名成员",
@@ -2994,6 +2988,8 @@ export const zh_CN: EnTranslations = {
     },
     "noticeboard": {
       "empty": "看起来没有张贴任何内容。",
+      "subtitle": "本服务器的公会",
+      "rosterTitle": "查看{guild}的成员名单",
       "popupTitle": "公会告示柱",
       "close": "关闭"
     },

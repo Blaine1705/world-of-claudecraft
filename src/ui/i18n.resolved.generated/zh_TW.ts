@@ -2058,12 +2058,6 @@ export const zh_TW: EnTranslations = {
       "linkHint": "Shift + 點擊可在聊天中連結該物品。"
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count}名成員，{xp}終身經驗",
-        "few": "{count}名成員，{xp}終身經驗",
-        "many": "{count}名成員，{xp}終身經驗",
-        "other": "{count}名成員，{xp}終身經驗"
-      },
       "guildMembers": {
         "one": "你是{rank}，{count}名成員",
         "few": "你是{rank}，{count}名成員",
@@ -2994,6 +2988,8 @@ export const zh_TW: EnTranslations = {
     },
     "noticeboard": {
       "empty": "看起來沒有張貼任何內容。",
+      "subtitle": "本世界的公會",
+      "rosterTitle": "查看{guild}的成員名單",
       "popupTitle": "公會告示柱",
       "close": "關閉"
     },

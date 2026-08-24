@@ -2058,12 +2058,6 @@ export const tr_TR: EnTranslations = {
       "linkHint": "Bu eşyayı sohbete bağlamak için Shift+tıkla."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
-      },
       "guildMembers": {
         "one": "rütben {rank}, {count} üye",
         "few": "rütben {rank}, {count} üye",
@@ -2994,6 +2988,8 @@ export const tr_TR: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Görünüşe göre hiçbir şey asılmamış.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

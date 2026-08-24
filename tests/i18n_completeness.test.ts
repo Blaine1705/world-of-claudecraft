@@ -427,7 +427,6 @@ describe('i18n CLDR pluralization', () => {
       'deedsRetroSummary',
       'finderPartySize',
       'guildMembers',
-      'noticeboardGuildStats',
       'playersMatching',
       'playersOnline',
       'playtimeDays',

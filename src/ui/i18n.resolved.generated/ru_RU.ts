@@ -2058,12 +2058,6 @@ export const ru_RU: EnTranslations = {
       "linkHint": "Shift + клик, чтобы вставить ссылку на этот предмет в чат."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} участник, {xp} опыта за все время",
-        "few": "{count} участника, {xp} опыта за все время",
-        "many": "{count} участников, {xp} опыта за все время",
-        "other": "{count} участника, {xp} опыта за все время"
-      },
       "guildMembers": {
         "one": "вы {rank}, {count} участник",
         "few": "вы {rank}, {count} участника",
@@ -2994,6 +2988,8 @@ export const ru_RU: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Похоже, здесь ничего не опубликовано.",
+      "subtitle": "Гильдии мира",
+      "rosterTitle": "Просмотреть состав гильдии {guild}",
       "popupTitle": "Гильдейский столб",
       "close": "Закрыть"
     },

@@ -249,6 +249,8 @@ export type {
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
+  GuildRosterEntry,
+  GuildRosterInfo,
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {

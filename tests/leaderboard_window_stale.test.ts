@@ -46,7 +46,6 @@ function fakeDeps(
     captureFocus: () => null,
     restoreFocus: () => {},
     showDevBadges: () => true,
-    maskPlayerText: (text) => text,
     ...overrides,
   };
 }

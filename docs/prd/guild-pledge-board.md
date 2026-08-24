@@ -11,17 +11,26 @@ discovery surface that ranks guilds so the aspiration has somewhere to point.
 
 ## What ships
 
-### The guilds board (extends the existing leaderboard tab)
+### The guilds board (the town signpost window)
 
-The leaderboard window's existing `guilds` board (guilds ranked by the SUM of
-every member's lifetime XP, `server/db.ts` guild high-score board) grows a
-recruitment column:
+REVISED 2026-08-25 (owner decision): the discovery surface is the WORLD's
+guild signposts, not the leaderboard window. Interacting with any town
+noticeboard opens the Guild Signpost window (`src/ui/hud/guild_board/`):
+guilds ranked by the SUM of every member's lifetime XP (`server/db.ts` guild
+high-score board) with the recruitment column:
 
 - Each row shows the guild's pledge note (a short free-text line the guild
   sets: "not accepting pledges", "serious raiders", "chill, invites open"),
-  whether pledging is open, and any minimum level.
+  whether pledging is open, and any minimum level. The note is length-clamped
+  and hard-tier censored at write time (`server/social.ts`); soft profanity
+  masks client-side by the viewer's own filter setting.
 - An eligible viewer gets a Pledge button on the row; an ineligible one sees
   why (closed, level cap, their own cooldown).
+- Clicking a guild name drills into its public roster (GET
+  `/api/guilds/roster`, `server/guild_roster.ts`): the Guild Master, then
+  officers, then members, each rank tier ranked by lifetime XP.
+- The leaderboard window's `guilds` tab stays the PLAIN ranking (no
+  recruitment column, no pledge affordances).
 
 ### Pledging
 

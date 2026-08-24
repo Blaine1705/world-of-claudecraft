@@ -120,6 +120,7 @@ import {
   type GuildBankLogEntry,
   type GuildBankLogView,
   type GuildLeaderboardPage,
+  type GuildRosterInfo,
   type IWorld,
   isOverheadEmoteId,
   type LeaderboardEntry,
@@ -5642,6 +5643,23 @@ export class ClientWorld implements IWorld {
       };
     } catch {
       return empty;
+    }
+  }
+  // The signpost guild board's roster drill-in (REST GET, no wire command):
+  // the cached public read behind /api/guilds/roster. Null on an unknown
+  // guild, a failed fetch, or offline, so the window renders its localized
+  // empty state instead of throwing.
+  async guildRoster(name: string): Promise<GuildRosterInfo | null> {
+    try {
+      const res = await fetch(
+        apiUrl(`/api/guilds/roster?name=${encodeURIComponent(name)}`, this.base),
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (typeof data?.guild !== 'string' || !Array.isArray(data?.members)) return null;
+      return { guild: data.guild, members: data.members };
+    } catch {
+      return null;
     }
   }
   // Developer high-score board (REST GET, no wire command): ?board=devs ranks

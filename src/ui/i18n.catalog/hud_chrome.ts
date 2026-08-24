@@ -2551,14 +2551,6 @@ export const hudChromeStrings = {
   // carry the real distinct forms only in the locales that need them (ru_RU). The
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
-    // The signpost popup's per-guild stat line (noticeboard_popup.ts): both
-    // numbers arrive pre-formatted through formatNumber.
-    noticeboardGuildStats: {
-      one: '{count} member, {xp} lifetime XP',
-      few: '{count} members, {xp} lifetime XP',
-      many: '{count} members, {xp} lifetime XP',
-      other: '{count} members, {xp} lifetime XP',
-    },
     guildMembers: {
       one: 'your guild rank is {rank}; {count} member',
       few: 'your guild rank is {rank}; {count} members',
@@ -3858,6 +3850,11 @@ export const hudChromeStrings = {
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
+    // The signpost guild board window (src/ui/hud/guild_board/): the title
+    // reuses popupTitle below; the subtitle and the roster drill-in link
+    // title are its own.
+    subtitle: 'Guilds of the realm',
+    rosterTitle: 'View the roster of {guild}',
     // The 'listings' arm of the noticeboard event opens the signpost popup
     // (src/ui/noticeboard_popup.ts). Guild names and notes are world data,
     // spliced verbatim like player names, never translated.

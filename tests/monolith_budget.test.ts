@@ -120,7 +120,11 @@ const MONOLITHS: MonolithRow[] = [
     // parent pins, so the ratchet follows it down. Exact count, zero slack.
     // Plus 1 for the board-note soft mask: the ONE line is the leaderboard
     // deps' maskPlayerText wiring onto the existing maskChat. Exact count.
-    ceiling: 18468,
+    // Re-pinned for the signpost guild board window: the construction bag,
+    // the openGuildBoard seam, the noticeboard-event arm, and the close and
+    // relocalize wiring (the window itself lives in
+    // src/ui/hud/guild_board/). Exact count, zero slack.
+    ceiling: 18489,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -219,7 +223,10 @@ const MONOLITHS: MonolithRow[] = [
     // sanctioned both-worlds implementation seam. Exact count.
     // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
     // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
-    ceiling: 12524,
+    // Plus 7 for the guildRoster IWorld stub (guilds are online-only, so the
+    // offline arm resolves null; the sanctioned both-worlds seam). Exact
+    // count, zero slack.
+    ceiling: 12531,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -272,9 +279,12 @@ const MONOLITHS: MonolithRow[] = [
     // (thin-consumer wiring; the mapping and fill logic live in that
     // module). Exact count, zero slack. Plus 4 for the board-note hard-tier
     // screen: the SocialService construction wires ChatFilter.findHardHit
-    // (the screening logic lives in chat_filter.ts and social.ts). Exact
-    // count, zero slack.
-    ceiling: 10656,
+    // (the screening logic lives in chat_filter.ts and social.ts). Then
+    // LOWERED to the exact count again when the signpost fill moved out of
+    // routeEvents into the guild board window's live REST read (the
+    // noticeboard_guilds event transform is deleted). Exact count, zero
+    // slack.
+    ceiling: 10645,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -288,7 +298,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.40.0 sync merge: both
     // arms added wire-mirror code, so the merged file lands above either
     // parent pin. Exact count, zero slack.
-    ceiling: 5825,
+    // Plus 18 for the guildRoster REST mirror (the signpost guild board's
+    // roster drill-in; the cached read lives in server/guild_roster.ts).
+    // Exact count, zero slack.
+    ceiling: 5843,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

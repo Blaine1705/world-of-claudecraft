@@ -465,6 +465,7 @@ import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
+import { GuildBoardWindow } from './hud/guild_board';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -1973,7 +1974,7 @@ export class Hud {
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
   private bootcamp = new BootcampOverlay();
-  private noticeboardPopup = new NoticeboardPopup((text) => this.maskChat(text));
+  private noticeboardPopup = new NoticeboardPopup();
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -3539,6 +3540,9 @@ export class Hud {
         break;
       case 'leaderboard-window':
         this.leaderboardWindow.close();
+        break;
+      case 'guild-board-window':
+        this.guildBoardWindow.close();
         break;
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
@@ -5122,6 +5126,15 @@ export class Hud {
     ...this.windowFocus('#leaderboard-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+  });
+  // The signpost guild board (src/ui/hud/guild_board/): opened by the world's
+  // noticeboard interaction, never a menu button; the board lives in the world.
+  private readonly guildBoardWindow = new GuildBoardWindow({
+    root: () => $('#guild-board-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#guild-board-window'),
+    ...this.windowFocus('#guild-board-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
   });
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
@@ -6471,6 +6484,7 @@ export class Hud {
     this.tutorial.relocalize(this.sim, this.keybinds);
     this.bootcamp.relocalize(this.sim, this.keybinds);
     this.noticeboardPopup.relocalize();
+    this.guildBoardWindow.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -12017,18 +12031,19 @@ export class Hud {
           break;
         case 'noticeboard':
           // The structured private event keeps this feedback localized and
-          // identical offline and online. A board carrying listings opens
-          // the signpost popup (guild names and notes are world data,
-          // spliced verbatim like player names); an empty board mirrors the
-          // durable log line into the shared transient banner instead of
-          // making a successful interaction look inert (mobile keeps the
-          // chat log collapsed during normal play).
+          // identical offline and online. A board carrying authored listings
+          // opens the signpost popup (guild names and notes are world data,
+          // spliced verbatim like player names); every other board opens the
+          // guild board window below.
           if (ev.state === 'listings') {
             this.noticeboardPopup.show(ev.listings);
           } else {
-            const message = t('hudChrome.noticeboard.empty');
-            this.showBanner(message);
-            this.log(message, '#c8b98f');
+            // A board with no authored listings IS the guild board: the
+            // signpost opens the realm's ranked pledge surface
+            // (src/ui/hud/guild_board/). Offline the window renders its
+            // localized nothing-posted state, so the interaction never
+            // looks inert on any host.
+            this.openGuildBoard();
           }
           break;
         case 'mailArrived': {
@@ -16829,6 +16844,12 @@ export class Hud {
   // which consumes the paged leaderboard() and owns the page index + focus.
   toggleLeaderboard(): void {
     this.leaderboardWindow.toggle();
+  }
+
+  /** The signpost guild board: opened by the world's noticeboard interaction
+   *  (and the E2E capture rigs); there is no menu launcher on purpose. */
+  openGuildBoard(): void {
+    this.guildBoardWindow.open();
   }
 
   toggleDailyRewards(): void {

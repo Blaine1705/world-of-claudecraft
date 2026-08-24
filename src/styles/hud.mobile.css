@@ -3625,6 +3625,7 @@
     min-height: 48px;
   }
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window,
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
@@ -3867,6 +3868,7 @@
   body.mobile-touch #card-duel-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window,
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
   body.mobile-touch #dev-command-window,
@@ -4381,7 +4383,8 @@
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
-  body.mobile-touch #leaderboard-window {
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
   }
   /* Loot Settings is a small dialog; JS docks it beside the party frames on desktop

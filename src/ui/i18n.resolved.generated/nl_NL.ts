@@ -2058,12 +2058,6 @@ export const nl_NL: EnTranslations = {
       "linkHint": "Shift-klik om dit voorwerp in de chat te delen."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
-      },
       "guildMembers": {
         "one": "je bent {rank}, {count} lid",
         "few": "je bent {rank}, {count} leden",
@@ -2994,6 +2988,8 @@ export const nl_NL: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

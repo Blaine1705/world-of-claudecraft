@@ -2058,12 +2058,6 @@ export const cs_CZ: EnTranslations = {
       "linkHint": "Shift + kliknutí vloží odkaz na tento předmět do chatu."
     },
     "plurals": {
-      "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
-      },
       "guildMembers": {
         "one": "jste {rank}, {count} člen",
         "few": "jste {rank}, {count} členové",
@@ -2994,6 +2988,8 @@ export const cs_CZ: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Zdá se, že tu nic nevisí.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },
