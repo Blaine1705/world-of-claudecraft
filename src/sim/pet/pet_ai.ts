@@ -135,7 +135,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     target &&
     (target.dead ||
       !ctx.isHostileTo(pet, target) ||
-      !petCanSeeTarget(pet, target) ||
+      !petCanSeeTarget(target) ||
       petQuestGateBlocksTarget(ctx, pet, target))
   )
     target = null;
@@ -244,7 +244,7 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
     target.dead ||
     !ctx.isHostileTo(pet, target) ||
     petQuestGateBlocksTarget(ctx, pet, target) ||
-    !petCanSeeTarget(pet, target) ||
+    !petCanSeeTarget(target) ||
     dist2d(pet.pos, target.pos) > range;
   if (canceled) {
     clearWaterJetChannel(ctx, pet, true);
@@ -625,7 +625,7 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
     if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) return;
     if (petQuestGateBlocksTarget(ctx, pet, m)) return;
-    if (!petCanSeeTarget(pet, m)) return;
+    if (!petCanSeeTarget(m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
     // "Assist my target": the owner has this thing targeted AND is actually engaged with
@@ -662,8 +662,9 @@ function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity):
 // way a mob gets. petCanSeeStealthedTarget owns that rule; keep it identical to
 // the combat/damage.ts hit gate, or a pet could strike what it cannot see.
 // updatePet re-checks this every tick, so a target that Vanishes or Stealths is
-// dropped, not just never acquired.
-function petCanSeeTarget(_pet: Entity, target: Entity): boolean {
+// dropped, not just never acquired. The observing pet is irrelevant (the rule
+// keys on the target's stealth alone), so it takes no pet argument.
+function petCanSeeTarget(target: Entity): boolean {
   if (target.kind !== 'player') return true;
   return petCanSeeStealthedTarget(target);
 }

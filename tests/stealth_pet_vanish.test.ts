@@ -5,7 +5,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { petCanSeeStealthedTarget } from '../src/sim/threat';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 
 // Bug: pets could still see and hit stealthed rogues (proximity detection like a
 // mob), and Vanish did not force enemies off the rogue. Pets now perceive stealth
@@ -55,6 +55,23 @@ function addPet(sim: TestSim, ownerId: number): Entity {
   return pet;
 }
 
+// Add an enemy player in an active duel with the rogue. A duel is what makes the
+// pair hostile to each other (isHostileTo), so both the enemy player and any pet
+// it owns count as real hunters of the stealthing rogue.
+function duelRival(sim: TestSim, cls: PlayerClass): number {
+  const rival = sim.addPlayer(cls, 'Rival');
+  const duel = {
+    a: sim.playerId,
+    b: rival,
+    state: 'active' as const,
+    timer: 0,
+    controlled: new Map(),
+  };
+  sim.ctx.duels.set(sim.playerId, duel);
+  sim.ctx.duels.set(rival, duel);
+  return rival;
+}
+
 describe('pets cannot see stealthed rogues', () => {
   it('petCanSeeStealthedTarget: blind to Rogue stealth AND Druid prowl, sees otherwise', () => {
     const sim = rogue();
@@ -80,16 +97,7 @@ describe('pets cannot see stealthed rogues', () => {
 
   it('a pet drops a target that stealths (updatePet re-validates each tick)', () => {
     const sim = rogue();
-    const rival = sim.addPlayer('warrior', 'Rival');
-    const duel = {
-      a: sim.playerId,
-      b: rival,
-      state: 'active' as const,
-      timer: 0,
-      controlled: new Map(),
-    };
-    sim.ctx.duels.set(sim.playerId, duel);
-    sim.ctx.duels.set(rival, duel);
+    const rival = duelRival(sim, 'warrior');
     const pet = addPet(sim, sim.playerId); // the rogue's own pet, hunting the rival
     const rivalEntity = sim.entities.get(rival)!;
     pet.aggroTargetId = rival; // a pet's combat target is aggroTargetId
@@ -113,6 +121,13 @@ describe('Vanish forces enemies off the rogue', () => {
     mob.forcedTargetId = sim.playerId;
     mob.forcedTargetTimer = 3;
     sim.castAbility('vanish');
+    // Assert the flip SYNCHRONOUSLY, at cast time: base drops a wild mob to evade
+    // and out of combat immediately (even through a Kidney Shot stun, when the mob
+    // AI cannot run), and the new sweep must not starve that bookkeeping. Checked
+    // before the tick because a mob already sitting on its spawn completes the
+    // walk-home and resets to idle on the very next tick.
+    expect(mob.aiState).toBe('evade');
+    expect(mob.inCombat).toBe(false);
     sim.tick();
     expect(mob.threat.has(sim.playerId)).toBe(false);
     expect(mob.aggroTargetId).toBe(null);
@@ -122,7 +137,8 @@ describe('Vanish forces enemies off the rogue', () => {
 
   it('drops an enemy pet locked onto the rogue', () => {
     const sim = rogue();
-    const enemyPet = addPet(sim, 999_999);
+    const rival = duelRival(sim, 'hunter');
+    const enemyPet = addPet(sim, rival); // owned by the hostile rival, so a true enemy pet
     enemyPet.aggroTargetId = sim.playerId; // a pet's combat target
     enemyPet.targetId = sim.playerId;
     sim.castAbility('vanish');
@@ -133,16 +149,7 @@ describe('Vanish forces enemies off the rogue', () => {
 
   it('drops a hostile (dueling) enemy player targeting the rogue', () => {
     const sim = rogue();
-    const rival = sim.addPlayer('mage', 'Rival');
-    const duel = {
-      a: sim.playerId,
-      b: rival,
-      state: 'active' as const,
-      timer: 0,
-      controlled: new Map(),
-    };
-    sim.ctx.duels.set(sim.playerId, duel);
-    sim.ctx.duels.set(rival, duel);
+    const rival = duelRival(sim, 'mage');
     const rivalEntity = sim.entities.get(rival)!;
     rivalEntity.targetId = sim.playerId;
     sim.castAbility('vanish');
@@ -157,5 +164,75 @@ describe('Vanish forces enemies off the rogue', () => {
     allyEntity.targetId = sim.playerId;
     dropTargetsOnStealth(sim.ctx, sim.player);
     expect(allyEntity.targetId).toBe(sim.playerId);
+  });
+});
+
+// The Vanish threat WIPE is exclusive to Vanish (dropSelfFromHostileFocus). A
+// plain stealth opener (Duskveil/Stalk) only releases the live lock and leaves
+// the hate table for classic mob detection to prune, so it is not a repeatable
+// free threat dump on a 10 sec cooldown. It still drops a mob it can no longer
+// see, and it still drops enemy players (they never see stealth), but a mob that
+// can still detect the rogue keeps its hate.
+describe('a plain stealth opener is not a Vanish-tier threat wipe', () => {
+  it('releases a mob live lock but leaves the hate table intact', () => {
+    const sim = rogue();
+    const mob = addMob(sim);
+    mob.threat.set(sim.playerId, 500);
+    mob.aggroTargetId = sim.playerId;
+    mob.targetId = sim.playerId;
+    // Enter stealth directly (Duskveil is a plain opener: no Vanish combat drop).
+    sim.player.auras.push(stealthAura('prowl', 'Stalk'));
+    sim.player.stealthed = true;
+    dropTargetsOnStealth(sim.ctx, sim.player);
+    // Live lock released so the mob re-evaluates through classic detection...
+    expect(mob.aggroTargetId).toBe(null);
+    expect(mob.targetId).toBe(null);
+    // ...but the hate table survives: only Vanish dumps threat outright.
+    expect(mob.threat.has(sim.playerId)).toBe(true);
+  });
+
+  it('leaves a non-hostile mob alone (only enemies lose their lock)', () => {
+    const sim = rogue();
+    const critter = addMob(sim);
+    critter.hostile = false; // neutral: not an enemy of the rogue
+    critter.aggroTargetId = sim.playerId;
+    critter.targetId = sim.playerId;
+    sim.player.auras.push(stealthAura());
+    sim.player.stealthed = true;
+    dropTargetsOnStealth(sim.ctx, sim.player);
+    expect(critter.aggroTargetId).toBe(sim.playerId);
+    expect(critter.targetId).toBe(sim.playerId);
+  });
+});
+
+describe('Greater Invisibility vanishes like Smokestep', () => {
+  function mageWithGreaterInvis(seed = 21): TestSim {
+    const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true }) as TestSim;
+    sim.setPlayerLevel(20);
+    if (!sim.applyTalents({ spec: 'frost', rows: { 8: 'mag_r8_greater_invis' } }))
+      throw new Error('greater invisibility talent not granted');
+    sim.player.resource = sim.player.maxResource;
+    return sim;
+  }
+
+  it('"Vanish for 20 sec" wipes a mob to evade and drops an enemy player', () => {
+    const sim = mageWithGreaterInvis();
+    const mob = addMob(sim);
+    mob.threat.set(sim.playerId, 500);
+    mob.aggroTargetId = sim.playerId;
+    mob.targetId = sim.playerId;
+    const rival = duelRival(sim, 'warrior');
+    const rivalEntity = sim.entities.get(rival)!;
+    rivalEntity.targetId = sim.playerId;
+    sim.castAbility('greater_invisibility');
+    expect(sim.player.stealthed).toBe(true);
+    // Same full drop as Vanish: hate table wiped, mob flipped to evade and out of
+    // combat, live target cleared, and the enemy player loses its lock.
+    expect(mob.threat.has(sim.playerId)).toBe(false);
+    expect(mob.aggroTargetId).toBe(null);
+    expect(mob.targetId).toBe(null);
+    expect(mob.aiState).toBe('evade');
+    expect(mob.inCombat).toBe(false);
+    expect(rivalEntity.targetId).toBe(null);
   });
 });

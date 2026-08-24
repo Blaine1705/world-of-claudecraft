@@ -3099,6 +3099,16 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // The tooltip is literally "Vanish for 20 sec", so Greater Invisibility
+        // gets the SAME hostile drop as Smokestep/Vanish: dropSelfFromHostileFocus
+        // wipes the mob hate tables and drops the mage from combat, then
+        // dropTargetsOnStealth clears the residual mob target and every enemy
+        // player's lock (pets already go blind via petCanSeeStealthedTarget).
+        // Same order and same p.stealthed gate as the selfBuff/Vanish path above.
+        if (p.stealthed) {
+          dropSelfFromHostileFocus(ctx, p);
+          dropTargetsOnStealth(ctx, p);
+        }
         break;
       }
       case 'aoeAllyDamage': {
@@ -3524,10 +3534,6 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
-        // Entering stealth (Duskveil/Smokestep/Stalk) drops every hostile hunter's
-        // lock on the caster: the classic Vanish threat wipe. The toggle-OFF path
-        // above breaks before this apply, so it only fires on the way IN.
-        if (eff.kind === 'stealth' && p.kind === 'player') dropTargetsOnStealth(ctx, p);
         if (eff.kind === 'form_lich') {
           ctx.emit({
             type: 'spellfx',
@@ -3538,8 +3544,23 @@ export function runEffects(
             ability: ability.id,
           });
         }
+        // Vanish (dropsCombatOnStealth) drops the rogue from combat and wipes every
+        // hostile mob's hate table, flipping a wild mob to evade the instant it
+        // dropped something. This MUST run BEFORE dropTargetsOnStealth below: that
+        // sweep clears the mob's live aggro, and running it first would starve this
+        // pass's "did I drop anything" detection so the evade / combat-exit flip
+        // would never fire (a Kidney Shot into Vanish would leave the stunned mob
+        // chasing in combat for the whole stun).
         if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
           dropSelfFromHostileFocus(ctx, p);
+        }
+        // Entering stealth (Duskveil/Smokestep/Stalk/Vanish) releases every hostile
+        // hunter's live lock on the caster. Gated on p.stealthed (applyAura sets it
+        // synchronously) so an aura rejected by an early return never wipes the
+        // board while the caster never actually hid. The toggle-OFF path above
+        // breaks before this apply, so it only fires on the way IN.
+        if (eff.kind === 'stealth' && p.kind === 'player' && p.stealthed) {
+          dropTargetsOnStealth(ctx, p);
         }
         recalcPlayerStats(
           p,
