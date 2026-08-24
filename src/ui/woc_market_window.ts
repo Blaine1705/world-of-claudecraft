@@ -2153,19 +2153,13 @@ export class WocMarketWindow {
     const format = this.field<HTMLSelectElement>('[data-field="sell-format"]')?.value ?? 'auction';
     const reserveCents = this.numberFieldCents('[data-field="sell-reserve"]');
     const buyNowCents = this.numberFieldCents('[data-field="sell-buy-now"]');
-    // A pure buy-now renders no starting-bid field: the start describes
-    // bidding, and a buy-now takes no bids. The server still requires
-    // startCents on every format (validListingParams; it is the browse sort
-    // key, per the detail view's "exists only for sorting"), and a public
-    // buy-now must price STRICTLY above it, so synthesize the maximal valid
-    // value: one cent under the price. Never shown (the detail suppresses the
-    // starting-bid line for buy-now) and never bid against.
+    // A pure buy-now renders no starting-bid field but the server still
+    // requires startCents (the browse sort key), and it accepts start === price
+    // since there is no bidding (validListingParams). Synthesize the price:
+    // price - 1 put a 25c listing at 24, under the floor, refused as bad_start
+    // only AFTER the wallet step-up.
     const startCents =
-      format === 'buy_now'
-        ? buyNowCents === null
-          ? null
-          : buyNowCents - 1
-        : this.numberFieldCents('[data-field="sell-start"]');
+      format === 'buy_now' ? buyNowCents : this.numberFieldCents('[data-field="sell-start"]');
     const durationHours = Number(
       this.field<HTMLSelectElement>('[data-field="sell-duration"]')?.value ?? '',
     );
@@ -2183,10 +2177,16 @@ export class WocMarketWindow {
     const submitFormat = format === 'auction' && buyNowCents !== null ? 'auction_buy_now' : format;
     // The buy-now price has to beat the starting bid, and the reserve if one is
     // set. Checked here so the seller is told which field is wrong before a round
-    // trip; validListingParams re-checks it server-side, which is the authority.
+    // trip; validListingParams re-checks it server-side, which is the authority,
+    // so this mirrors it exactly: a PURE buy-now takes no bids, so start === price
+    // is valid (the natural 25c-floor listing) and only the combined auction keeps
+    // the strict-above rule. The reserve is nulled for a pure buy-now, as the body
+    // below nulls it.
     if (buyNowCents !== null) {
-      const floor = Math.max(startCents, reserveCents ?? 0);
-      if (buyNowCents <= floor) {
+      const effectiveReserve = submitFormat === 'buy_now' ? null : reserveCents;
+      const floor = Math.max(startCents, effectiveReserve ?? 0);
+      const belowFloor = submitFormat === 'buy_now' ? buyNowCents < floor : buyNowCents <= floor;
+      if (belowFloor) {
         this.notice = { kind: 'key', key: 'hudChrome.wocMarket.sellBuyNowAboveStart', error: true };
         this.render();
         return;

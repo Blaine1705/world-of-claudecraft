@@ -1045,6 +1045,34 @@ describe('WocMarketWindow live rig: the busyGen close guard', () => {
     expect(r.root.textContent).toContain(t('hudChrome.wocMarket.listingCreated'));
   });
 
+  it('a 25c pure buy-now sends startCents equal to the price, not price minus one', async () => {
+    // The synthesized start for a pure buy-now is the price itself, not
+    // price - 1: at the 25c floor, price - 1 = 24 fell under the minimum and
+    // the server refused with an unactionable bad_start AFTER the wallet
+    // step-up. Assert the exact figures the client puts on the wire.
+    const r = rig();
+    r.signMessage.mockImplementation(async () => 'sig');
+    r.win.open();
+    await flush();
+    q<HTMLButtonElement>(r.root, '.wm-tab[data-tab="sell"]').click();
+    const input = q<HTMLInputElement>(r.root, '.wm-combo-input');
+    input.focus();
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    q(r.root, '.wm-combo-item').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    q<HTMLSelectElement>(r.root, '[data-field="sell-format"]').value = 'buy_now';
+    q<HTMLSelectElement>(r.root, '[data-field="sell-format"]').dispatchEvent(
+      new Event('change', { bubbles: true }),
+    );
+    q<HTMLInputElement>(r.root, '[data-field="sell-buy-now"]').value = '0.25';
+    q<HTMLButtonElement>(r.root, 'button[data-action="sell-submit"]').click();
+    await flush();
+    const create = r.fake.calls.find((c) => c.startsWith('createListing:'));
+    expect(create, 'the buy-now listing reached createListing').toBeDefined();
+    expect(create).toContain('"startCents":25');
+    expect(create).toContain('"buyNowCents":25');
+    expect(create).not.toContain('"startCents":24');
+  });
+
   it("an abandoned run resolving late never clears a NEWER run's guard (the generation guard)", async () => {
     // Run A parks on a hung signer, the window closes and reopens, run B
     // starts on its own signer. A resolves first: without the busyGen check in

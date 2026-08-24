@@ -1051,19 +1051,27 @@ describe('woc_market_window: buy-now must beat the starting bid', () => {
       'private async submitListing(): Promise<void> {',
       'private async payBond(',
     );
-    expect(submit).toContain('const floor = Math.max(startCents, reserveCents ?? 0)');
-    expect(submit).toContain('buyNowCents <= floor');
+    expect(submit).toContain('const floor = Math.max(startCents, effectiveReserve ?? 0)');
+    // Mirrors validListingParams: a pure buy-now takes no bids so start === price
+    // is valid (< floor refused), while the combined auction keeps the strict
+    // rule (<= floor refused).
+    expect(submit).toContain(
+      "submitFormat === 'buy_now' ? buyNowCents < floor : buyNowCents <= floor",
+    );
     expect(submit).toContain('hudChrome.wocMarket.sellBuyNowAboveStart');
   });
 
   it('compares against the RESERVE too, not just the start', () => {
     // A buy-now under a hidden reserve could never sell: the reserve would block
-    // every bid at or below it while the buy-now invited exactly that price.
+    // every bid at or below it while the buy-now invited exactly that price. The
+    // reserve is nulled for a pure buy-now (effectiveReserve), as the body nulls it.
     const submit = between(
       'private async submitListing(): Promise<void> {',
       'private async payBond(',
     );
-    expect(submit).toContain('reserveCents ?? 0');
+    expect(submit).toContain(
+      "const effectiveReserve = submitFormat === 'buy_now' ? null : reserveCents",
+    );
   });
 });
 
@@ -1470,15 +1478,16 @@ describe('woc_market_window: the Sell form offers only what the format permits',
     ).toBeGreaterThan(gate);
   });
 
-  it('submits a synthesized starting bid for a pure buy-now (sort key only, strictly below)', () => {
-    // The server REQUIRES startCents on every format and a public buy-now must
-    // price STRICTLY above it (woc_market_rules validListingParams), while the
-    // detail view documents the start as existing "only for sorting" on a
-    // buy-now. So the hidden field is synthesized maximal-valid: one cent under
-    // the price, never typed by the seller.
+  it('synthesizes the pure buy-now start as the price itself (sort key only, no bidding)', () => {
+    // The server REQUIRES startCents on every format, and a pure buy-now takes
+    // no bids, so start === price is valid (woc_market_rules validListingParams)
+    // and the detail view documents the start as existing "only for sorting" on
+    // a buy-now. So the hidden field is synthesized as the price: price - 1 put a
+    // 25c listing's start at 24, under the floor, and refused with an
+    // unactionable bad_start after the wallet step-up.
     const submit = betweenCode('private async submitListing(', 'private async payBond(');
     expect(submit).toContain("format === 'buy_now'");
-    expect(submit, 'the synthetic start is one cent under the buy-now price').toContain(
+    expect(submit, 'the synthetic start equals the buy-now price, not one under it').not.toContain(
       'buyNowCents - 1',
     );
   });

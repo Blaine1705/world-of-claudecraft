@@ -428,21 +428,44 @@ describe('validListingParams', () => {
     });
   });
 
-  it('refuses a buy-now price at or below the starting bid', () => {
-    // STRICTLY above, not merely at it. A buy-now equal to the start is not a
-    // price, it is the same number twice: the opening bid would already match it.
+  it('accepts a pure buy-now priced AT the start, and refuses one below it', () => {
+    // A pure buy-now takes no bids, so its start is only the browse sort key
+    // and start === price is a coherent single price (no opening bid can match
+    // it). This is what lets a mount list at exactly the 25c minimum: the
+    // client synthesizes start = price, and price - 1 = 24 used to fall under
+    // the floor and refuse with an unactionable bad_start.
     expect(
       validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 1000 })),
-    ).toEqual({ ok: false, reason: 'bad_buy_now' });
+    ).toEqual({ ok: true });
+    expect(
+      validListingParams(
+        params({
+          format: 'buy_now',
+          startCents: WOC_MARKET_MIN_PRICE_CENTS,
+          buyNowCents: WOC_MARKET_MIN_PRICE_CENTS,
+        }),
+      ),
+    ).toEqual({ ok: true });
+    // Below the start is still incoherent (the sort key would sit above the
+    // price), so it is refused.
     expect(
       validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 999 })),
     ).toEqual({ ok: false, reason: 'bad_buy_now' });
+  });
+
+  it('keeps the STRICT floor on a combined auction (a bid could match an equal buy-now)', () => {
+    // auction_buy_now has real bidding, so a buy-now equal to the start would
+    // be matched by the opening bid, leaving two prices for one sale. Equal is
+    // refused here even though the pure format above accepts it.
     expect(
-      validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 500 })),
+      validListingParams(
+        params({ format: 'auction_buy_now', startCents: 1000, buyNowCents: 1000 }),
+      ),
     ).toEqual({ ok: false, reason: 'bad_buy_now' });
-    // One cent above is the boundary, and it is accepted.
     expect(
-      validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 1001 })),
+      validListingParams(
+        params({ format: 'auction_buy_now', startCents: 1000, buyNowCents: 1001 }),
+      ),
     ).toEqual({ ok: true });
   });
 
@@ -821,16 +844,23 @@ describe('a directed sale (the p2p trade agreed in the trade window)', () => {
       ok: false,
       reason: 'bad_buy_now',
     });
-    // And the public rule is genuinely the opposite, which is what proves the
-    // two arms are separate rather than one accidentally covering both: the SAME
-    // params with no designated buyer are refused for having equal prices.
-    expect(validListingParams(directed({ directedBuyerAccount: null }))).toEqual({
+    // And a public AUCTION buy-now is genuinely the opposite, which is what
+    // proves the two arms are separate rather than one accidentally covering
+    // both: the same equal prices with no designated buyer, as an auction with
+    // real bidding, are refused for NOT differing (a public pure buy-now takes
+    // no bids and accepts equal prices, tested above; the strict-differ rule is
+    // the auction's).
+    expect(
+      validListingParams(directed({ directedBuyerAccount: null, format: 'auction_buy_now' })),
+    ).toEqual({
       ok: false,
       reason: 'bad_buy_now',
     });
-    expect(validListingParams(directed({ directedBuyerAccount: null, buyNowCents: 3000 }))).toEqual(
-      { ok: true },
-    );
+    expect(
+      validListingParams(
+        directed({ directedBuyerAccount: null, format: 'auction_buy_now', buyNowCents: 3000 }),
+      ),
+    ).toEqual({ ok: true });
   });
 });
 

@@ -488,10 +488,17 @@ export function validListingParams(
       if (p.buyNowCents !== p.startCents) return { ok: false, reason: 'bad_buy_now' };
     } else {
       const floor = Math.max(p.startCents, p.reserveCents ?? 0);
-      // STRICTLY above the floor, not at it. A buy-now equal to the starting bid
-      // is not a price, it is the same number twice: the first bid would match it
-      // and the listing's two prices would say different things about one sale.
-      if (p.buyNowCents <= floor) return { ok: false, reason: 'bad_buy_now' };
+      // A pure buy-now takes NO bids, so its start is only the browse sort key
+      // and buyNowCents === startCents is a coherent single price: it is the
+      // natural listing at the floor, e.g. a mount at exactly the 25c minimum,
+      // which the strict rule below refused with an unactionable bad_start once
+      // the client synthesized start = price - 1 = 24 (under the floor). The
+      // strict inequality is an AUCTION concern: on auction_buy_now the opening
+      // bid could match a buy-now equal to the start, leaving two prices for one
+      // sale, so that format alone keeps the strict floor. For a pure buy-now
+      // reserve is forbidden above, so the floor is exactly the start.
+      const belowFloor = p.format === 'buy_now' ? p.buyNowCents < floor : p.buyNowCents <= floor;
+      if (belowFloor) return { ok: false, reason: 'bad_buy_now' };
     }
   }
   return { ok: true };
