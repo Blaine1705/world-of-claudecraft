@@ -3855,6 +3855,7 @@ export const hudChromeStrings = {
     // title are its own.
     subtitle: 'Guilds of the realm',
     rosterTitle: 'View the roster of {guild}',
+    back: 'Back',
     // The 'listings' arm of the noticeboard event opens the signpost popup
     // (src/ui/noticeboard_popup.ts). Guild names and notes are world data,
     // spliced verbatim like player names, never translated.

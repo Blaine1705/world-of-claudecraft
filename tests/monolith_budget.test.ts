@@ -299,9 +299,11 @@ const MONOLITHS: MonolithRow[] = [
     // arms added wire-mirror code, so the merged file lands above either
     // parent pin. Exact count, zero slack.
     // Plus 18 for the guildRoster REST mirror (the signpost guild board's
-    // roster drill-in; the cached read lives in server/guild_roster.ts).
-    // Exact count, zero slack.
-    ceiling: 5843,
+    // roster drill-in; the cached read lives in server/guild_roster.ts),
+    // then re-pinned when the mirror gained the trust-boundary row
+    // validation and the 404-vs-transport-failure split. Exact count, zero
+    // slack.
+    ceiling: 5854,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

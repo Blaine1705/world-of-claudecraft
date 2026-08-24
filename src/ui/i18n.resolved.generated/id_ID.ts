@@ -2990,6 +2990,7 @@ export const id_ID: EnTranslations = {
       "empty": "Sepertinya tidak ada yang ditempel.",
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

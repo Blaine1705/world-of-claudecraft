@@ -2990,6 +2990,7 @@ export const en_XA: EnTranslations = {
       "empty": "[Ñóţĥíñĝ šééɱš þóšţéð.]",
       "subtitle": "[Ĝúíļðš óƒ ţĥé ŕéáļɱ]",
       "rosterTitle": "[Ʋíéŵ ţĥé ŕóšţéŕ óƒ {guild}]",
+      "back": "[Ɓáçķ]",
       "popupTitle": "[Ĝúíļð Šíĝñþóšţ]",
       "close": "[Çļóšé]"
     },

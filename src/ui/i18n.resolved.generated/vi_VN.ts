@@ -2990,6 +2990,7 @@ export const vi_VN: EnTranslations = {
       "empty": "Có vẻ như chưa có gì được dán lên.",
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

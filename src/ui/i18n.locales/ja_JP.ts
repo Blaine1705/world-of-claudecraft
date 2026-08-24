@@ -8691,6 +8691,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.noticeboard.empty': '何も貼られていないようだ。',
   'hudChrome.noticeboard.subtitle': 'ワールドのギルド',
   'hudChrome.noticeboard.rosterTitle': '{guild}のメンバー一覧を見る',
+  'hudChrome.noticeboard.back': '戻る',
   'hudChrome.noticeboard.popupTitle': 'ギルドの掲示柱',
   'hudChrome.noticeboard.close': '閉じる',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',

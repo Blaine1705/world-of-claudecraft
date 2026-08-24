@@ -2990,6 +2990,7 @@ export const sv_SE: EnTranslations = {
       "empty": "Inget verkar vara uppsatt.",
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

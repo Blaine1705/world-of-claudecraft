@@ -2990,6 +2990,7 @@ export const da_DK: EnTranslations = {
       "empty": "Der ser ikke ud til at være slået noget op.",
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

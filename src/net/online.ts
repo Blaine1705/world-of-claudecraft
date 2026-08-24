@@ -5646,21 +5646,32 @@ export class ClientWorld implements IWorld {
     }
   }
   // The signpost guild board's roster drill-in (REST GET, no wire command):
-  // the cached public read behind /api/guilds/roster. Null on an unknown
-  // guild, a failed fetch, or offline, so the window renders its localized
-  // empty state instead of throwing.
+  // the cached public read behind /api/guilds/roster. Null answers an
+  // UNKNOWN guild (the window's honest empty state); a transport failure or
+  // a malformed body REJECTS so the window can show its retry state instead
+  // of misreading a dead server as an empty board. Rows are re-validated at
+  // this trust boundary (numbers coerced, rank narrowed) before the view
+  // core consumes them.
   async guildRoster(name: string): Promise<GuildRosterInfo | null> {
-    try {
-      const res = await fetch(
-        apiUrl(`/api/guilds/roster?name=${encodeURIComponent(name)}`, this.base),
-      );
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (typeof data?.guild !== 'string' || !Array.isArray(data?.members)) return null;
-      return { guild: data.guild, members: data.members };
-    } catch {
-      return null;
+    const res = await fetch(
+      apiUrl(`/api/guilds/roster?name=${encodeURIComponent(name)}`, this.base),
+    );
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`guild roster read failed (${res.status})`);
+    const data = await res.json();
+    if (typeof data?.guild !== 'string' || !Array.isArray(data?.members)) {
+      throw new Error('guild roster read returned a malformed body');
     }
+    const members = (data.members as Record<string, unknown>[]).map((m) => ({
+      name: String(m.name ?? ''),
+      rank: (m.rank === 'leader' || m.rank === 'officer' ? m.rank : 'member') as
+        | 'leader'
+        | 'officer'
+        | 'member',
+      level: Number(m.level) || 0,
+      lifetimeXp: Number(m.lifetimeXp) || 0,
+    }));
+    return { guild: data.guild, members };
   }
   // Developer high-score board (REST GET, no wire command): ?board=devs ranks
   // contributors by landed commits. The same data for every realm, paged exactly

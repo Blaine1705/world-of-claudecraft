@@ -24,6 +24,11 @@ export const GUILD_ROSTER_TTL_MS = 30_000;
  *  somehow reaches it the whole cache resets rather than growing. */
 const ROSTER_CACHE_MAX = 512;
 
+/** Row bound on the anonymous, cached read: far above the server's guild
+ *  size in practice, and an explicit ceiling so a pathological roster can
+ *  never balloon the cached payload. */
+const ROSTER_MEMBER_LIMIT = 500;
+
 /** The uncached read. The eligibility screen matches topGuilds (server/db.ts):
  *  a banned or suspended member drops off the roster without delisting the
  *  guild. Ranks order leader, officer, member; inside a rank tier lifetime XP
@@ -42,7 +47,8 @@ export async function readGuildRoster(guildName: string): Promise<GuildRosterInf
                        WHERE a.id = c.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
         WHERE g.realm = $1 AND lower(g.name) = lower($2) AND c.state IS NOT NULL
         ORDER BY CASE gm.rank WHEN 'leader' THEN 0 WHEN 'officer' THEN 1 ELSE 2 END,
-                 lifetime_xp DESC, c.name ASC`,
+                 lifetime_xp DESC, c.name ASC
+        LIMIT ${ROSTER_MEMBER_LIMIT}`,
       [REALM, guildName],
     ),
   );

@@ -9331,6 +9331,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.nativeUpdate.notNow'
   | 'hudChrome.nativeUpdate.title'
   | 'hudChrome.nativeUpdate.update'
+  | 'hudChrome.noticeboard.back'
   | 'hudChrome.noticeboard.close'
   | 'hudChrome.noticeboard.empty'
   | 'hudChrome.noticeboard.popupTitle'

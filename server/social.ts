@@ -453,9 +453,9 @@ export class SocialService {
     private readonly isNameOffensive: (name: string) => boolean,
     // Chat-filter hard tier for the pledge board note, the same injected-screen
     // doctrine as isNameOffensive (production wires ChatFilter.findHardHit,
-    // server/game.ts): the note fans out to every town signpost
-    // (server/noticeboard_guilds.ts) and the guilds board, so a hard word is
-    // refused at write time like a chat line, never stored. Soft words are
+    // server/game.ts): the note fans out to every town signpost's guild board
+    // (src/ui/hud/guild_board/), so a hard word is refused at write time like
+    // a chat line, never stored. Soft words are
     // deliberately untouched here; each client masks them by its own filter
     // setting, the chat doctrine.
     private readonly findHardHit: (text: string) => string | null,

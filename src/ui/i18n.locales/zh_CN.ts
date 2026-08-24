@@ -8319,6 +8319,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
   'hudChrome.noticeboard.subtitle': '本服务器的公会',
   'hudChrome.noticeboard.rosterTitle': '查看{guild}的成员名单',
+  'hudChrome.noticeboard.back': '返回',
   'hudChrome.noticeboard.popupTitle': '公会告示柱',
   'hudChrome.noticeboard.close': '关闭',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',

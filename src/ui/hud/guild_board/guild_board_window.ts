@@ -40,11 +40,22 @@ export interface GuildBoardWindowDeps {
 
 const PAGE_SIZE = 20;
 
-type Focus = 'open' | 'action' | 'page' | 'view' | null;
+/** CSS.escape for the attribute selector the back-out focus uses (guild names
+ *  are player-authored; a quote or bracket must not break the query). */
+function cssEscape(value: string): string {
+  return typeof CSS !== 'undefined' && CSS.escape
+    ? CSS.escape(value)
+    : value.replace(/[^a-zA-Z0-9_-]/g, (ch) => `\\${ch}`);
+}
+
+type Focus = 'open' | 'action' | 'prev' | 'next' | 'view' | 'back' | null;
 
 export class GuildBoardWindow {
   /** null = the ranked board; a name = that guild's roster drill-in. */
   private rosterOf: string | null = null;
+  /** The guild whose roster was just left: the back-out focus target, so a
+   *  keyboard user paging deep into the board never loses their row. */
+  private returnTo: string | null = null;
   private page = 0;
   private renderSeq = 0;
   private openerFocus: HTMLElement | null = null;
@@ -148,12 +159,14 @@ export class GuildBoardWindow {
     );
     if (view.kind === 'error') {
       body.innerHTML = `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
+      if (focus !== null && focus !== 'open') this.focusClose(el);
       return;
     }
     if (view.kind === 'empty') {
       // The offline sandbox and a fresh realm both land here: the signpost
       // honestly has nothing posted.
       body.innerHTML = `<div class="lb-empty">${esc(t('hudChrome.noticeboard.empty'))}</div>`;
+      if (focus !== null && focus !== 'open') this.focusClose(el);
       return;
     }
     if (view.kind !== 'ranked') return;
@@ -162,11 +175,26 @@ export class GuildBoardWindow {
       this.boardHeaderHtml() +
       view.rows.map((r) => this.boardRowHtml(r)).join('') +
       this.pagerHtml(view.pager);
-    this.wirePager(body as HTMLElement);
+    this.wirePager(body as HTMLElement, focus);
     this.wirePledgeButtons(body as HTMLElement);
     this.wireRosterLinks(body as HTMLElement);
     if (focus === 'view')
       (body.querySelector('[data-guild-roster]') as HTMLElement | null)?.focus();
+    if (focus === 'back') {
+      // Land on the roster link of the guild just left, not row one.
+      const wanted = this.returnTo
+        ? body.querySelector<HTMLElement>(`[data-guild-roster="${cssEscape(this.returnTo)}"]`)
+        : null;
+      (wanted ?? (body.querySelector('[data-guild-roster]') as HTMLElement | null))?.focus();
+      this.returnTo = null;
+    }
+    // A pledge click destroyed the button it re-rendered as a chip; keep
+    // keyboard focus inside the window on the close button (WCAG 2.4.3).
+    if (focus === 'action') this.focusClose(el);
+  }
+
+  private focusClose(el: HTMLElement): void {
+    (el.querySelector('[data-close]') as HTMLElement | null)?.focus();
   }
 
   private boardHeaderHtml(): string {
@@ -260,15 +288,24 @@ export class GuildBoardWindow {
     );
   }
 
-  private wirePager(body: HTMLElement): void {
+  private wirePager(body: HTMLElement, focus: Focus): void {
     body.querySelectorAll<HTMLButtonElement>('[data-board-page]').forEach((button) => {
       button.addEventListener('click', () => {
         if (button.disabled) return;
-        this.page += button.dataset.boardPage === 'next' ? 1 : -1;
+        const forward = button.dataset.boardPage === 'next';
+        this.page += forward ? 1 : -1;
         if (this.page < 0) this.page = 0;
-        void this.render('page');
+        void this.render(forward ? 'next' : 'prev');
       });
     });
+    // Keyboard focus-return after an async page change: land on the control
+    // just activated when it survives (still enabled), else the close button,
+    // so the keyboard user is never dumped back to <body> (WCAG 2.4.3).
+    if (focus === 'prev' || focus === 'next') {
+      const wanted = body.querySelector<HTMLButtonElement>(`[data-board-page="${focus}"]`);
+      if (wanted && !wanted.disabled) wanted.focus();
+      else this.focusClose(this.deps.root());
+    }
   }
 
   // ---------------------------------------------------------------------
@@ -295,7 +332,7 @@ export class GuildBoardWindow {
 
     const back =
       `<button type="button" class="btn gb-back" data-board-back>` +
-      `${esc(t('hud.options.back'))}</button>`;
+      `${esc(t('hudChrome.noticeboard.back'))}</button>`;
     const heading =
       view.kind === 'loaded'
         ? `<div class="gb-roster-head">${back}<span class="gb-roster-guild guild-tier-${view.tier}">${esc(view.guild)}</span>` +
@@ -312,8 +349,9 @@ export class GuildBoardWindow {
     }
     const backBtn = body.querySelector('[data-board-back]') as HTMLElement | null;
     backBtn?.addEventListener('click', () => {
+      this.returnTo = this.rosterOf;
       this.rosterOf = null;
-      void this.render('view');
+      void this.render('back');
     });
     if (focus === 'view') backBtn?.focus();
   }

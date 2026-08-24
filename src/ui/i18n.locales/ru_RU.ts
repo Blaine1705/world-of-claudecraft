@@ -8811,6 +8811,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.noticeboard.empty': 'Похоже, здесь ничего не опубликовано.',
   'hudChrome.noticeboard.subtitle': 'Гильдии мира',
   'hudChrome.noticeboard.rosterTitle': 'Просмотреть состав гильдии {guild}',
+  'hudChrome.noticeboard.back': 'Назад',
   'hudChrome.noticeboard.popupTitle': 'Гильдейский столб',
   'hudChrome.noticeboard.close': 'Закрыть',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',

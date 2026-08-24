@@ -2990,6 +2990,7 @@ export const ru_RU: EnTranslations = {
       "empty": "Похоже, здесь ничего не опубликовано.",
       "subtitle": "Гильдии мира",
       "rosterTitle": "Просмотреть состав гильдии {guild}",
+      "back": "Назад",
       "popupTitle": "Гильдейский столб",
       "close": "Закрыть"
     },

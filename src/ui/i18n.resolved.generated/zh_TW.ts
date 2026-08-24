@@ -2990,6 +2990,7 @@ export const zh_TW: EnTranslations = {
       "empty": "看起來沒有張貼任何內容。",
       "subtitle": "本世界的公會",
       "rosterTitle": "查看{guild}的成員名單",
+      "back": "返回",
       "popupTitle": "公會告示柱",
       "close": "關閉"
     },

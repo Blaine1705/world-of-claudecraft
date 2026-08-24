@@ -2990,6 +2990,7 @@ export const zh_CN: EnTranslations = {
       "empty": "看起来没有张贴任何内容。",
       "subtitle": "本服务器的公会",
       "rosterTitle": "查看{guild}的成员名单",
+      "back": "返回",
       "popupTitle": "公会告示柱",
       "close": "关闭"
     },

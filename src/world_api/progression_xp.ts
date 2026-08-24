@@ -101,9 +101,11 @@ export interface IWorldProgressionXp {
   guildLeaderboard(page?: number, pageSize?: number): Promise<GuildLeaderboardPage>;
   /** The public roster drill-in behind the signpost guild board: the Guild
    *  Master, then officers, then members, each rank tier ranked by lifetime
-   *  XP. Guilds are online-only, so the offline Sim resolves null (the
-   *  client renders its localized empty state); ClientWorld fetches the
-   *  cached server read. Null also answers an unknown guild. */
+   *  XP. Guilds are online-only, so the offline Sim resolves null, and null
+   *  also answers an unknown guild (both render the localized empty state).
+   *  ClientWorld fetches the cached server read and REJECTS on a transport
+   *  failure or malformed body, so the window can show its retry state
+   *  instead of misreading a dead server as an empty board. */
   guildRoster(name: string): Promise<GuildRosterInfo | null>;
   // The developer high-score board (contributors ranked by merged PRs), sourced
   // from the repo's GitHub pulls API and paged the same way. The same data for

@@ -2990,6 +2990,7 @@ export const cs_CZ: EnTranslations = {
       "empty": "Zdá se, že tu nic nevisí.",
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

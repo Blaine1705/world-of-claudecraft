@@ -2990,6 +2990,7 @@ export const it_IT: EnTranslations = {
       "empty": "Non sembra esserci nulla di affisso.",
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },

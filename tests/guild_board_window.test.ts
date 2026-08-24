@@ -161,6 +161,58 @@ describe('GuildBoardWindow', () => {
     });
   });
 
+  it('keeps keyboard focus on the close button after a pledge click (WCAG 2.4.3)', async () => {
+    // Arrange
+    await openAndSettle();
+
+    // Act: the clicked button re-renders as the Pledged chip.
+    (root.querySelector('[data-guild-pledge]') as HTMLButtonElement).click();
+    await vi.waitFor(() => {
+      if (!root.querySelector('.lb-pledge-chip.on')) throw new Error('pending');
+    });
+
+    // Assert: focus landed on the close button, never <body>.
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+  });
+
+  it('returns keyboard focus to the drilled-into guild on back-out', async () => {
+    // Arrange
+    await openAndSettle();
+    (root.querySelector('[data-guild-roster="Stormcallers"]') as HTMLButtonElement).click();
+    await vi.waitFor(() => {
+      if (!root.querySelector('[data-board-back]')) throw new Error('pending');
+    });
+
+    // Act
+    (root.querySelector('[data-board-back]') as HTMLButtonElement).click();
+    await vi.waitFor(() => {
+      if (!root.querySelector('.lb-guild-entry')) throw new Error('pending');
+    });
+
+    // Assert: the guild just left holds focus, not row one.
+    expect(document.activeElement).toBe(root.querySelector('[data-guild-roster="Stormcallers"]'));
+  });
+
+  it('shows the retry error state when the roster read rejects (a dead server)', async () => {
+    // Arrange
+    world = fakeWorld({
+      guildRoster: async () => {
+        throw new Error('network down');
+      },
+    } as never);
+    await openAndSettle();
+
+    // Act
+    (root.querySelector('[data-guild-roster="Stormcallers"]') as HTMLButtonElement).click();
+    await vi.waitFor(() => {
+      if (!root.querySelector('.lb-error')) throw new Error('pending');
+    });
+
+    // Assert: the retry message, never the nothing-posted misread.
+    expect(root.querySelector('.lb-error')?.textContent).not.toBe('');
+    expect(root.querySelector('[data-board-back]')).not.toBeNull();
+  });
+
   it('renders the localized nothing-posted state when the board is empty (offline)', async () => {
     // Arrange
     world = fakeWorld({

@@ -8319,6 +8319,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.noticeboard.empty': '看起來沒有張貼任何內容。',
   'hudChrome.noticeboard.subtitle': '本世界的公會',
   'hudChrome.noticeboard.rosterTitle': '查看{guild}的成員名單',
+  'hudChrome.noticeboard.back': '返回',
   'hudChrome.noticeboard.popupTitle': '公會告示柱',
   'hudChrome.noticeboard.close': '關閉',
   'hudChrome.mailbox.subtitle': '渡鴉郵驛',

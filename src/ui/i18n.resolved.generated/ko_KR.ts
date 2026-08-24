@@ -2990,6 +2990,7 @@ export const ko_KR: EnTranslations = {
       "empty": "게시된 내용이 없는 것 같습니다.",
       "subtitle": "월드의 길드",
       "rosterTitle": "{guild}의 명단 보기",
+      "back": "뒤로",
       "popupTitle": "길드 게시 기둥",
       "close": "닫기"
     },

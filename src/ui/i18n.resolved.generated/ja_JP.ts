@@ -2990,6 +2990,7 @@ export const ja_JP: EnTranslations = {
       "empty": "何も貼られていないようだ。",
       "subtitle": "ワールドのギルド",
       "rosterTitle": "{guild}のメンバー一覧を見る",
+      "back": "戻る",
       "popupTitle": "ギルドの掲示柱",
       "close": "閉じる"
     },
