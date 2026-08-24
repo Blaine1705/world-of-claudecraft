@@ -88,6 +88,18 @@ describe('loadMailState (pure read: union of partition rows, backfill owns migra
     // marker probe, no legacy read, no write-back.
     expect(dbMock.query).toHaveBeenCalledTimes(1);
     expect(dbMock.query.mock.calls[0][1]).toEqual([`mail:${REALM}:r:`, `mail:${REALM}:r;`]);
+    // Pins the literal COLLATE "C" qualifier (the same pattern as
+    // market_backfill.test.ts's WORLD_STATE_UPSERT_SQL pin): a linguistic
+    // Postgres collation (glibc en_US.utf8, ICU, the non-Alpine/non-C-locale
+    // default) sorts punctuation with no primary weight, so this range would
+    // otherwise silently match nothing and the realm's ENTIRE mail book would
+    // read back empty on boot. Both range bounds AND the ORDER BY must force
+    // byte-order comparison, or a plan-dependent collation mismatch between
+    // them can reopen the same bug on just one arm.
+    const sql = dbMock.query.mock.calls[0][0] as string;
+    expect(sql).toContain('(key COLLATE "C") >= $1');
+    expect(sql).toContain('(key COLLATE "C") < $2');
+    expect(sql).toContain('ORDER BY key COLLATE "C"');
   });
 
   it('returns null when the backfill marker exists and no partition row does (a genuinely empty realm)', async () => {
