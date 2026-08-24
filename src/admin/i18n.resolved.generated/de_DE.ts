@@ -797,6 +797,7 @@ export const de_DE: AdminTranslations = {
   "error.flagNotFound": "Flagge nicht gefunden",
   "error.flagInvalidStatus": "Ungültiger Flaggenstatus",
   "error.flagInvalidTransition": "Diese Statusänderung ist nicht zulässig",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "ein Hinweis ist erforderlich",
   "error.addNoteFailed": "Hinzufügen der Notiz fehlgeschlagen",
   "error.chatStrikesResetFailed": "Zurücksetzen der Chat-Verwarnungen fehlgeschlagen",

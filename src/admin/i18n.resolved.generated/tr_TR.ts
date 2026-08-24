@@ -797,6 +797,7 @@ export const tr_TR: AdminTranslations = {
   "error.flagNotFound": "bayrak bulunamadı",
   "error.flagInvalidStatus": "geçersiz bayrak durumu",
   "error.flagInvalidTransition": "bu durum değişikliğine izin verilmiyor",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "bir not gerekli",
   "error.addNoteFailed": "not eklenemedi",
   "error.chatStrikesResetFailed": "sohbet ihlalleri sıfırlanamadı",

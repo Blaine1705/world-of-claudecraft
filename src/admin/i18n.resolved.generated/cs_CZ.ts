@@ -797,6 +797,7 @@ export const cs_CZ: AdminTranslations = {
   "error.flagNotFound": "vlajka nenalezena",
   "error.flagInvalidStatus": "neplatný stav vlajky",
   "error.flagInvalidTransition": "že změna stavu není povolena",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "je vyžadována poznámka",
   "error.addNoteFailed": "přidání poznámky selhalo",
   "error.chatStrikesResetFailed": "vynulování chatových přestupků selhalo",

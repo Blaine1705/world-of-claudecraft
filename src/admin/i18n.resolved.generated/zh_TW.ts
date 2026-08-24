@@ -797,6 +797,7 @@ export const zh_TW: AdminTranslations = {
   "error.flagNotFound": "未找到標誌",
   "error.flagInvalidStatus": "無效標誌狀態",
   "error.flagInvalidTransition": "不允許狀態更改",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "需要備註",
   "error.addNoteFailed": "新增備註失敗",
   "error.chatStrikesResetFailed": "聊天違規次數重置失敗",

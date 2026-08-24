@@ -797,6 +797,7 @@ export const en_XA: AdminTranslations = {
   "error.flagNotFound": "[ƒļáĝ ñóţ ƒóúñð]",
   "error.flagInvalidStatus": "[íñʋáļíð ƒļáĝ šţáţúš]",
   "error.flagInvalidTransition": "[ţĥáţ šţáţúš çĥáñĝé íš ñóţ áļļóŵéð]",
+  "error.flagActiveExists": "[ţĥíš áççóúñţ áļŕéáðý ĥáš áñ óþéñ ƒļáĝ óƒ ţĥáţ ķíñð]",
   "error.flagNoteRequired": "[á ñóţé íš ŕéɋúíŕéð]",
   "error.addNoteFailed": "[ƒáíļéð ţó áðð ñóţé]",
   "error.chatStrikesResetFailed": "[çĥáţ šţŕíķéš ŕéšéţ ƒáíļéð]",

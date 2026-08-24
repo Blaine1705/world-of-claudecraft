@@ -797,6 +797,7 @@ export const sv_SE: AdminTranslations = {
   "error.flagNotFound": "Flaggan hittades inte",
   "error.flagInvalidStatus": "ogiltig flaggstatus",
   "error.flagInvalidTransition": "den statusändringen är inte tillåten",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "en anteckning krävs",
   "error.addNoteFailed": "kunde inte lägga till anteckningen",
   "error.chatStrikesResetFailed": "återställningen av chattprickar misslyckades",

@@ -797,6 +797,7 @@ export const id_ID: AdminTranslations = {
   "error.flagNotFound": "bendera tidak ditemukan",
   "error.flagInvalidStatus": "status bendera tidak valid",
   "error.flagInvalidTransition": "perubahan status itu tidak diperbolehkan",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "diperlukan catatan",
   "error.addNoteFailed": "gagal menambahkan catatan",
   "error.chatStrikesResetFailed": "penyetelan ulang peringatan obrolan gagal",

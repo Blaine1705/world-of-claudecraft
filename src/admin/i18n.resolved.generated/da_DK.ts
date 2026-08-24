@@ -797,6 +797,7 @@ export const da_DK: AdminTranslations = {
   "error.flagNotFound": "flag ikke fundet",
   "error.flagInvalidStatus": "ugyldig flagstatus",
   "error.flagInvalidTransition": "at statusændring ikke er tilladt",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "en note er påkrævet",
   "error.addNoteFailed": "kunne ikke tilføje note",
   "error.chatStrikesResetFailed": "nulstilling af chat-anmærkninger mislykkedes",

@@ -797,6 +797,7 @@ export const ru_RU: AdminTranslations = {
   "error.flagNotFound": "флаг не найден",
   "error.flagInvalidStatus": "неверный статус флага",
   "error.flagInvalidTransition": "это изменение статуса не разрешено",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "требуется примечание",
   "error.addNoteFailed": "не удалось добавить примечание",
   "error.chatStrikesResetFailed": "не удалось сбросить нарушения чата",

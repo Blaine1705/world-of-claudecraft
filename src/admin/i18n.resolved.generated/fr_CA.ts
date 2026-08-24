@@ -797,6 +797,7 @@ export const fr_CA: AdminTranslations = {
   "error.flagNotFound": "drapeau introuvable",
   "error.flagInvalidStatus": "statut de drapeau invalide",
   "error.flagInvalidTransition": "ce changement de statut n'est pas autorisé",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "une note est requise",
   "error.addNoteFailed": "échec de l'ajout de la note",
   "error.chatStrikesResetFailed": "échec de la remise à zéro des infractions de chat",

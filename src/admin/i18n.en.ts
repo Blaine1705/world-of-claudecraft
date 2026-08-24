@@ -826,6 +826,7 @@ export const en = {
   'error.flagNotFound': 'flag not found',
   'error.flagInvalidStatus': 'invalid flag status',
   'error.flagInvalidTransition': 'that status change is not allowed',
+  'error.flagActiveExists': 'this account already has an open flag of that kind',
   'error.flagNoteRequired': 'a note is required',
   'error.addNoteFailed': 'failed to add note',
   'error.chatStrikesResetFailed': 'chat strikes reset failed',

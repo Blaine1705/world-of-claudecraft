@@ -124,7 +124,8 @@ export interface SuspiciousPlayer {
     name: string;
     ip: string;
   };
-  // CONFIRMED = an automated moderator report went out for this session.
+  // CONFIRMED = an automated case (a suspicion flag, or a moderator report on a
+  // host without the flag store) went out for this session.
   state: 'SUSPICIOUS' | 'CONFIRMED';
   snapshot: {
     capturedAt: number;

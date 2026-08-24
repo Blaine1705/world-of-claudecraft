@@ -797,6 +797,7 @@ export const ko_KR: AdminTranslations = {
   "error.flagNotFound": "플래그를 찾을 수 없습니다",
   "error.flagInvalidStatus": "잘못된 플래그 상태",
   "error.flagInvalidTransition": "그 상태 변경은 허용되지 않습니다",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "메모가 필요합니다",
   "error.addNoteFailed": "메모 추가에 실패했습니다",
   "error.chatStrikesResetFailed": "채팅 경고 초기화에 실패했습니다",

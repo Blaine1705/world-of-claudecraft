@@ -797,6 +797,7 @@ export const it_IT: AdminTranslations = {
   "error.flagNotFound": "bandiera non trovata",
   "error.flagInvalidStatus": "stato di contrassegno non valido",
   "error.flagInvalidTransition": "quel cambiamento di stato non è consentito",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "è necessaria una nota",
   "error.addNoteFailed": "aggiunta della nota non riuscita",
   "error.chatStrikesResetFailed": "azzeramento delle infrazioni chat non riuscito",

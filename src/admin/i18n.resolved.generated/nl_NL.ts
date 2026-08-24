@@ -797,6 +797,7 @@ export const nl_NL: AdminTranslations = {
   "error.flagNotFound": "vlag niet gevonden",
   "error.flagInvalidStatus": "ongeldige vlagstatus",
   "error.flagInvalidTransition": "die statusverandering is niet toegestaan",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "een notitie is vereist",
   "error.addNoteFailed": "notitie toevoegen mislukt",
   "error.chatStrikesResetFailed": "resetten van chatstrafpunten mislukt",

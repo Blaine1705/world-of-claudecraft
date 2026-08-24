@@ -1,13 +1,16 @@
 // Suspicion-flag emitters and the Flagged-view cache: the logic half over
 // suspicion_flags_db.ts. Two emitters feed the store today:
 //
-//   1. Bot detector: each antibot tick hands the live suspicious-session list
-//      to recordDetectorSuspicionFlags (a one-line hook in
-//      server/game.ts runAntibotTick). Only CONFIRMED sessions persist (the
-//      detector's own bar for filing an automated report); writes ride a
-//      fire-and-forget FIFO (the bank_ledger.ts pattern) behind a per-account
-//      re-record throttle so a confirmed session cannot hammer the table once
-//      per tick.
+//   1. Bot detector: the detector PUSHES at its own decision points through
+//      the BotDetectorHost it is handed at boot (attachDetectorFlagHost, one
+//      line in server/game.ts). It records a case when it decides one, and
+//      refreshes the case's details when the evidence behind it grows; nothing
+//      here polls or samples detector state, so occurrences counts decisions
+//      and last_seen_at is a real observation time. Storage policy, including
+//      the write cadence, stays on this side of the seam: the detector build
+//      is bundled independently, so refreshes are paced and coalesced per
+//      account here rather than trusted to the detector's own pacing. Writes
+//      ride a fire-and-forget FIFO (the bank_ledger.ts pattern).
 //   2. Registration bursts: moderation_db.ts calls flagRegistrationBurst
 //      beside its existing automated player_report, carrying the tripped
 //      signals and the burst cohort as related accounts.
@@ -16,72 +19,55 @@
 // source 'economy_watch' through upsertSuspicionFlag and everything downstream
 // (workflow, audit trail, admin UI) works unchanged.
 
-import type { SuspiciousPlayer } from './bot_detector/contract';
+import type {
+  BotDetector,
+  BotDetectorHost,
+  SuspicionFlagObservation,
+} from './bot_detector/contract';
 import { type CachedRead, createCachedRead } from './cached_read';
-import { severityForDetectorState, severityForRegistrationBurst } from './suspicion_flag_workflow';
+import { DETECTOR_FLAG_SEVERITY, severityForRegistrationBurst } from './suspicion_flag_workflow';
 import {
+  refreshSuspicionFlagDetails as refreshFlagDetailsSql,
   SUSPICION_FLAG_DETAILS_MAX,
   type SuspicionFlagDataset,
-  type SuspicionFlagUpsertInput,
   upsertSuspicionFlag,
 } from './suspicion_flags_db';
 
-// One flag per confirmed account per detector, not per evidence row: the kind
-// is stable so re-confirmations dedupe onto one active flag.
+// One flag per account per detector, not per evidence row: the kind is stable
+// so repeat decisions bump one active flag instead of stacking rows.
 export const DETECTOR_FLAG_KIND = 'session_automation';
 
-// A confirmed session stays confirmed while it lasts, so re-record at most
-// once per window per account; occurrences on the row still count each window.
-export const DETECTOR_FLAG_RERECORD_MS = 5 * 60_000;
-
-/** Compact evidence summary for the flag details column. */
-export function detectorFlagDetails(player: SuspiciousPlayer): string {
-  const evidence = player.evidence
-    .map((e) => {
-      const times = e.occurrences !== undefined && e.occurrences > 1 ? ` x${e.occurrences}` : '';
-      return `${e.kind}${times}`;
-    })
-    .join(', ');
-  const name = player.ref.name ? ` (${player.ref.name})` : '';
-  return `Bot detector confirmed${name}: score ${Math.round(player.score)}; evidence: ${
-    evidence || 'none'
-  }`.slice(0, SUSPICION_FLAG_DETAILS_MAX);
-}
-
-/** The persistable inputs in one detector snapshot: CONFIRMED sessions only
- *  (pure; the throttle and the queue live in recordDetectorSuspicionFlags). */
-export function detectorFlagInputs(
-  players: readonly SuspiciousPlayer[],
-): SuspicionFlagUpsertInput[] {
-  const inputs: SuspicionFlagUpsertInput[] = [];
-  for (const player of players) {
-    if (player.state !== 'CONFIRMED') continue;
-    if (!Number.isSafeInteger(player.ref.accountId) || player.ref.accountId <= 0) continue;
-    inputs.push({
-      accountId: player.ref.accountId,
-      source: 'bot_detector',
-      kind: DETECTOR_FLAG_KIND,
-      severity: severityForDetectorState(player.state),
-      details: detectorFlagDetails(player),
-    });
-  }
-  return inputs;
-}
+// The per-account floor between two details refreshes. Sits under the
+// detector's own pacing (it refreshes at most every 30 s per case), so a
+// well-behaved detector never hits it; a runaway one is capped at one indexed
+// UPDATE per account per window, and its latest summary still lands on the
+// next accepted refresh (every summary is the whole evidence list, not a
+// delta). A queued refresh for the same account is replaced, latest wins, so
+// a slow database never stacks duplicate rewrites.
+export const DETECTOR_FLAG_REFRESH_FLOOR_MS = 10_000;
 
 // The fire-and-forget FIFO (the bank_ledger.ts recordBankOp shape): callers on
-// the tick path never await; failures log and drop the one write.
+// the tick path never await; failures log and drop the one write. Each write
+// also resolves its own outcome for a caller that wants it (the detector host
+// hands it back to the detector so a lost write can be retried). The Flagged
+// view cache busts only for writes that change the flag set or its ordering
+// (a record, a burst); a details refresh rides the 15 s TTL, or the cache
+// would be busted every few seconds by a handful of live confirmed sessions.
 let writeTail: Promise<void> = Promise.resolve();
-const lastDetectorRecordAt = new Map<number, number>();
 
-function enqueueFlagWrite(run: () => Promise<void>): void {
-  writeTail = writeTail
-    .then(run)
-    .then(() => {
-      bustSuspicionFlagCache();
-    })
-    .catch((err) => {
+function enqueueFlagWrite(run: () => Promise<void>, bust: boolean): Promise<boolean> {
+  const landed = writeTail.then(run).then(
+    () => {
+      if (bust) bustSuspicionFlagCache();
+      return true;
+    },
+    (err) => {
       console.error('suspicion flag write failed:', err);
-    });
+      return false;
+    },
+  );
+  writeTail = landed.then(() => {});
+  return landed;
 }
 
 /** Drain pending flag writes (shutdown, tests). */
@@ -89,33 +75,96 @@ export function suspicionFlagsIdle(): Promise<void> {
   return writeTail.then(() => {});
 }
 
-/** Test-only: clear the per-account detector re-record throttle. */
-export function resetDetectorFlagThrottleForTests(): void {
-  lastDetectorRecordAt.clear();
+function validObservation(observation: SuspicionFlagObservation): boolean {
+  return Number.isSafeInteger(observation.accountId) && observation.accountId > 0;
+}
+
+interface PendingRefresh {
+  details: string;
+  landed: Promise<boolean>;
 }
 
 /**
- * The antibot-tick hook: persist a flag for every CONFIRMED session, at most
- * once per DETECTOR_FLAG_RERECORD_MS per account. Fire-and-forget; never
- * blocks the tick.
+ * The host the detector pushes through. Storage policy stays here: source,
+ * kind, severity, dedupe (the active partial index), the details cap, and the
+ * refresh cadence. The detector supplies the decision and its own evidence
+ * summary, nothing else.
  */
-export function recordDetectorSuspicionFlags(
-  players: readonly SuspiciousPlayer[],
-  now: number = Date.now(),
-): void {
-  for (const input of detectorFlagInputs(players)) {
-    const last = lastDetectorRecordAt.get(input.accountId);
-    if (last !== undefined && now - last < DETECTOR_FLAG_RERECORD_MS) continue;
-    lastDetectorRecordAt.set(input.accountId, now);
-    enqueueFlagWrite(() => upsertSuspicionFlag(input));
-  }
-  // The throttle map is bounded by live confirmed sessions in practice; drop
-  // entries old enough to be inert so a long-lived process never accumulates.
-  if (lastDetectorRecordAt.size > 10_000) {
-    for (const [accountId, at] of lastDetectorRecordAt) {
-      if (now - at >= DETECTOR_FLAG_RERECORD_MS) lastDetectorRecordAt.delete(accountId);
+export function createDetectorFlagHost(now: () => number = () => Date.now()): BotDetectorHost {
+  const lastRefreshAt = new Map<number, number>();
+  const pendingRefresh = new Map<number, PendingRefresh>();
+  const forgetStaleRefreshes = (at: number): void => {
+    if (lastRefreshAt.size <= 10_000) return;
+    for (const [accountId, last] of lastRefreshAt) {
+      if (at - last >= DETECTOR_FLAG_REFRESH_FLOOR_MS) lastRefreshAt.delete(accountId);
     }
+  };
+  return {
+    recordSuspicionFlag(observation) {
+      if (!validObservation(observation)) return Promise.resolve(false);
+      return enqueueFlagWrite(
+        () =>
+          upsertSuspicionFlag({
+            accountId: observation.accountId,
+            source: 'bot_detector',
+            kind: DETECTOR_FLAG_KIND,
+            severity: DETECTOR_FLAG_SEVERITY,
+            details: observation.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
+          }),
+        true,
+      );
+    },
+    refreshSuspicionFlagDetails(observation) {
+      if (!validObservation(observation)) return Promise.resolve(false);
+      const accountId = observation.accountId;
+      const queued = pendingRefresh.get(accountId);
+      if (queued) {
+        queued.details = observation.details;
+        return queued.landed;
+      }
+      const at = now();
+      const last = lastRefreshAt.get(accountId);
+      if (last !== undefined && at - last < DETECTOR_FLAG_REFRESH_FLOOR_MS) {
+        return Promise.resolve(true);
+      }
+      lastRefreshAt.set(accountId, at);
+      forgetStaleRefreshes(at);
+      const pending: PendingRefresh = {
+        details: observation.details,
+        landed: Promise.resolve(true),
+      };
+      pendingRefresh.set(accountId, pending);
+      pending.landed = enqueueFlagWrite(async () => {
+        pendingRefresh.delete(accountId);
+        await refreshFlagDetailsSql({
+          accountId,
+          source: 'bot_detector',
+          kind: DETECTOR_FLAG_KIND,
+          details: pending.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
+        });
+      }, false);
+      return pending.landed;
+    },
+  };
+}
+
+/**
+ * Boot wiring: hand the detector its host if this detector build accepts one.
+ * Returns whether it did, and says so on the console either way, so an
+ * operator reading the boot log knows where automated cases land (Flagged, or
+ * the Reports inbox the detector falls back to without a host).
+ */
+export function attachDetectorFlagHost(
+  detector: BotDetector,
+  log: (line: string) => void = (line) => console.log(line),
+): boolean {
+  if (typeof detector.attachHost !== 'function') {
+    log('[bot-detector] suspicion-flag host: not accepted by this detector build');
+    return false;
   }
+  detector.attachHost(createDetectorFlagHost());
+  log('[bot-detector] suspicion-flag host: attached');
+  return true;
 }
 
 /** The registration-burst emitter, called by moderation_db.ts beside its
@@ -126,18 +175,20 @@ export function flagRegistrationBurst(input: {
   cohortAccountIds: readonly number[];
 }): void {
   if (input.signals.length === 0) return;
-  enqueueFlagWrite(() =>
-    upsertSuspicionFlag({
-      accountId: input.accountId,
-      source: 'registration_burst',
-      kind: 'registration_burst',
-      severity: severityForRegistrationBurst(input.signals.length),
-      details: `Automated registration pattern: ${input.signals.join('; ')}`.slice(
-        0,
-        SUSPICION_FLAG_DETAILS_MAX,
-      ),
-      relatedAccountIds: input.cohortAccountIds,
-    }),
+  enqueueFlagWrite(
+    () =>
+      upsertSuspicionFlag({
+        accountId: input.accountId,
+        source: 'registration_burst',
+        kind: 'registration_burst',
+        severity: severityForRegistrationBurst(input.signals.length),
+        details: `Automated registration pattern: ${input.signals.join('; ')}`.slice(
+          0,
+          SUSPICION_FLAG_DETAILS_MAX,
+        ),
+        relatedAccountIds: input.cohortAccountIds,
+      }),
+    true,
   );
 }
 

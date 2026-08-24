@@ -23,6 +23,8 @@ import {
   resetRateLimits,
   setRateLimitClock,
 } from '../../server/ratelimit';
+import { ADMIN_ERROR_KEYS } from '../../src/admin/i18n';
+import { en } from '../../src/admin/i18n.en';
 import { type FakeRes, fakeCtx } from './helpers';
 
 const BEARER = `Bearer ${'a'.repeat(64)}`;
@@ -396,7 +398,7 @@ describe('POST /admin/api/flags/:id/status', () => {
     expect(transitionSuspicionFlag).not.toHaveBeenCalled();
   });
 
-  it('400s a transition the state machine refuses and 404s a missing flag', async () => {
+  it('400s a refused transition, 409s an active-sibling collision, 404s a missing flag', async () => {
     authedAdminDb({
       transitionSuspicionFlag: vi.fn(async () => ({ ok: false, error: 'invalid_transition' })),
       adminFlagWriteRateLimited: vi.fn(allowed),
@@ -412,6 +414,28 @@ describe('POST /admin/api/flags/:id/status', () => {
       data: null,
       error: 'that status change is not allowed',
     });
+
+    authedAdminDb({
+      transitionSuspicionFlag: vi.fn(async () => ({ ok: false, error: 'active_flag_exists' })),
+      adminFlagWriteRateLimited: vi.fn(allowed),
+    });
+    const collided = await runRoute('POST', '/admin/api/flags/:id/status', {
+      headers: { authorization: BEARER },
+      params: { id: '11' },
+      body: { status: 'under_review' },
+    });
+    expect(collided.status).toBe(409);
+    expect(collided.body).toEqual({
+      success: false,
+      data: null,
+      error: 'this account already has an open flag of that kind',
+    });
+    // The admin SPA re-localizes the prose through its reverse map: pin the
+    // server literal to its catalog key so neither side can drift silently.
+    expect(ADMIN_ERROR_KEYS['this account already has an open flag of that kind']).toBe(
+      'error.flagActiveExists',
+    );
+    expect(en['error.flagActiveExists']).toBe('this account already has an open flag of that kind');
 
     authedAdminDb({
       transitionSuspicionFlag: vi.fn(async () => ({ ok: false, error: 'not_found' })),

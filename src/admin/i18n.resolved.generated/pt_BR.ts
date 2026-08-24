@@ -797,6 +797,7 @@ export const pt_BR: AdminTranslations = {
   "error.flagNotFound": "bandeira não encontrada",
   "error.flagInvalidStatus": "status de sinalizador inválido",
   "error.flagInvalidTransition": "essa mudança de status não é permitida",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "é necessária uma nota",
   "error.addNoteFailed": "falha ao adicionar a observação",
   "error.chatStrikesResetFailed": "falha ao zerar as advertências de chat",

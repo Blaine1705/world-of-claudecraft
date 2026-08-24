@@ -797,6 +797,7 @@ export const ja_JP: AdminTranslations = {
   "error.flagNotFound": "フラグが見つかりません",
   "error.flagInvalidStatus": "無効なフラグステータス",
   "error.flagInvalidTransition": "ステータスの変更は許可されていないこと",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "メモが必要です",
   "error.addNoteFailed": "メモの追加に失敗しました",
   "error.chatStrikesResetFailed": "チャット違反回数のリセットに失敗しました",

@@ -797,6 +797,7 @@ export const vi_VN: AdminTranslations = {
   "error.flagNotFound": "không tìm thấy cờ",
   "error.flagInvalidStatus": "trạng thái cờ không hợp lệ",
   "error.flagInvalidTransition": "việc thay đổi trạng thái đó là không được phép",
+  "error.flagActiveExists": "this account already has an open flag of that kind",
   "error.flagNoteRequired": "cần có một ghi chú",
   "error.addNoteFailed": "thêm ghi chú thất bại",
   "error.chatStrikesResetFailed": "đặt lại điểm cảnh cáo chat thất bại",
