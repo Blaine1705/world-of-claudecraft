@@ -26,6 +26,14 @@ export class NoticeboardPopup {
   private root: HTMLElement | null = null;
   private listings: readonly NoticeboardListing[] = [];
 
+  /** The note is player-authored free text, so it runs the same cosmetic soft
+   *  profanity mask as every other player-authored body (the Hud's maskChat:
+   *  respects the player's filter setting; slurs never got stored, the
+   *  server's hard tier refused them at write time). Guild names stay
+   *  verbatim, the player-name rule (they pass the offensive-name screen at
+   *  creation). Required on purpose: the construction site decides. */
+  constructor(private readonly maskNote: (text: string) => string) {}
+
   show(listings: readonly NoticeboardListing[]): void {
     this.listings = listings;
     this.hide();
@@ -95,7 +103,7 @@ export class NoticeboardPopup {
       if (listing.note !== '') {
         const note = document.createElement('div');
         note.className = 'nb-note';
-        note.textContent = listing.note;
+        note.textContent = this.maskNote(listing.note);
         item.appendChild(note);
       }
       list.appendChild(item);

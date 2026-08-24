@@ -1973,7 +1973,7 @@ export class Hud {
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
   private bootcamp = new BootcampOverlay();
-  private noticeboardPopup = new NoticeboardPopup();
+  private noticeboardPopup = new NoticeboardPopup((text) => this.maskChat(text));
   private lastPetBarSig = '';
   // Value-diffed body-class flag: true while a live pet bar is shown. The mobile
   // top-band layout reads body.mobile-pet-active to yield the top-centre line to the
@@ -5122,6 +5122,7 @@ export class Hud {
     ...this.windowFocus('#leaderboard-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+    maskPlayerText: (text) => this.maskChat(text),
   });
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
   // only. Openable only once main.ts attaches the hooks (attachWocMarket); the

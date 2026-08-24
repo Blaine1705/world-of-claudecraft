@@ -72,6 +72,10 @@ export interface LeaderboardWindowDeps {
   onVisibilityChange?(): void;
   /** The viewer's developer-badge display preference; also hides the Developers tab. */
   showDevBadges(): boolean;
+  /** Cosmetic soft-profanity mask for player-authored free text (the guild
+   *  board note); the Hud wires its maskChat so the player's filter setting
+   *  applies. Required on purpose: the construction site decides. */
+  maskPlayerText(text: string): string;
 }
 
 /** Where focus should land after a (re)render: into the window on open, back onto
@@ -602,7 +606,9 @@ export class LeaderboardWindow {
         ? `<span class="lb-pledge-floor">${esc(t('hudChrome.pledge.minLevel', { level: formatNumber(r.minLevel, { maximumFractionDigits: 0 }) }))}</span>`
         : '';
     // The note is Guild-Master-controlled text: escaped, never linkified.
-    const note = r.note ? `<span class="lb-guild-note">${esc(r.note)}</span>` : '';
+    const note = r.note
+      ? `<span class="lb-guild-note">${esc(this.deps.maskPlayerText(r.note))}</span>`
+      : '';
     return `<div class="lb-guild-entry">${row}<div class="lb-guild-sub">${status}${floor}${note}${this.pledgeCellHtml(r)}</div></div>`;
   }
 

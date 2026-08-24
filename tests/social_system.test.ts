@@ -439,13 +439,24 @@ class FakeTransport implements SocialTransport {
 
 // Test harness: characters 1..N, with helpers to flip presence. Tests that
 // exercise guild-name screening inject their own predicate; everything else
-// runs with the harness default (screen nothing). The constructor itself has
-// no default: every host must decide what it screens.
-function setup(cfg: { isNameOffensive?: (name: string) => boolean } = {}) {
+// runs with the harness default (screen nothing). The constructors themselves
+// have no defaults: every host must decide what it screens.
+function setup(
+  cfg: {
+    isNameOffensive?: (name: string) => boolean;
+    findHardHit?: (text: string) => string | null;
+  } = {},
+) {
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
-  const svc = new SocialService(db, tx, () => clock, cfg.isNameOffensive ?? (() => false));
+  const svc = new SocialService(
+    db,
+    tx,
+    () => clock,
+    cfg.isNameOffensive ?? (() => false),
+    cfg.findHardHit ?? (() => null),
+  );
   const actors = new Map<number, { characterId: number; name: string }>();
   const add = (id: number, name: string, opts: { cls?: string; level?: number } = {}) => {
     db.addChar(id, name, opts.cls, opts.level);
@@ -959,10 +970,11 @@ describe('guilds', () => {
   it('requires every SocialService construction site to choose a screening predicate', () => {
     const db = new FakeDb();
     const tx = new FakeTransport(db);
-    // Fail-closed pin: the 4th constructor param deliberately has no default,
-    // so a host that forgets it fails to compile. Restoring a fail-open
-    // default makes this construction legal and tsc then rejects the
-    // unused expect-error, failing the gate.
+    // Fail-closed pin: the 4th and 5th constructor params (the offensive-name
+    // and hard-word screens) deliberately have no defaults, so a host that
+    // forgets either fails to compile. Restoring a fail-open default makes
+    // this construction legal and tsc then rejects the unused expect-error,
+    // failing the gate.
     // @ts-expect-error three args must not construct a SocialService
     const svc = new SocialService(db, tx, () => 1000);
     expect(svc).toBeInstanceOf(SocialService);
@@ -977,7 +989,9 @@ describe('guilds', () => {
     const game = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
     const site = game.slice(game.indexOf('new SocialService('));
     expect(site.length).toBeGreaterThan(0);
-    expect(site.slice(0, 400)).toContain('offensiveName(');
+    expect(site.slice(0, 700)).toContain('offensiveName(');
+    // The 5th param must be the real chat filter's hard tier, same rationale.
+    expect(site.slice(0, 700)).toContain('chatFilter.findHardHit(');
   });
 
   it('fires onGuildFounded exactly once, on the committed create only (the soc_guild_founded feed)', async () => {
@@ -2361,8 +2375,8 @@ describe('guild bank guard on last-member guildLeave (Guild Bank Phase 3)', () =
 describe('guild pledges', () => {
   const DAY = 24 * 60 * 60 * 1000;
 
-  async function seed() {
-    const h = setup();
+  async function seed(cfg: Parameters<typeof setup>[0] = {}) {
+    const h = setup(cfg);
     h.add(1, 'Leader');
     h.add(2, 'Officer');
     h.add(3, 'Plain');
@@ -2489,6 +2503,28 @@ describe('guild pledges', () => {
     expect(after.enabled).toBe(false);
     expect(after.minLevel).toBe(5);
     expect(after.note).toHaveLength(90);
+  });
+
+  it('refuses a board note the chat filter hard tier hits, storing nothing', async () => {
+    const h = await seed({
+      findHardHit: (text) => (text.includes('slurword') ? 'slurword' : null),
+    });
+    const before = await h.db.guildPledgeSettings(h.guildId);
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: false,
+      minLevel: 7,
+      note: 'we are a slurword guild',
+    });
+    // The whole write is refused, not just the note: nothing changed.
+    expect(await h.db.guildPledgeSettings(h.guildId)).toEqual(before);
+    expect(h.tx.errorsFor(1).at(-1)).toBe('That board note is not allowed.');
+    // A clean note from the same guild still writes.
+    await h.svc.setGuildPledgeSettings(h.actor(1), {
+      enabled: true,
+      minLevel: 7,
+      note: 'we are a friendly guild',
+    });
+    expect((await h.db.guildPledgeSettings(h.guildId)).note).toBe('we are a friendly guild');
   });
 
   it('the snapshot shows pledges to officers only, and myPledge to the pledger', async () => {

@@ -15,7 +15,9 @@ describe('NoticeboardPopup', () => {
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="ui"></div>';
-    popup = new NoticeboardPopup();
+    // The identity mask keeps existing render assertions literal; the masking
+    // test below builds its own popup with a real mask.
+    popup = new NoticeboardPopup((text) => text);
   });
 
   afterEach(() => {
@@ -93,6 +95,28 @@ describe('NoticeboardPopup', () => {
     expect(item.querySelector('.nb-status')).toBeNull();
     expect(item.querySelector('.nb-stats')).toBeNull();
     expect(item.querySelector('.nb-note')?.textContent).toBe('hand-written call');
+  });
+
+  it('runs the note, and only the note, through the injected profanity mask', () => {
+    // Arrange
+    const masked = new NoticeboardPopup((text) => text.replace(/grog/g, '****'));
+    const listing: NoticeboardListing = {
+      guild: 'Grog Fanciers',
+      note: 'we love grog',
+      lifetimeXp: 500,
+      members: 3,
+      pledgesOpen: true,
+    };
+
+    // Act
+    masked.show([listing]);
+    const root = document.querySelector('.nb-popup') as HTMLElement;
+
+    // Assert: the note masks, the guild name stays verbatim (the player-name
+    // rule; names pass the offensive-name screen at creation instead).
+    expect(root.querySelector('.nb-note')?.textContent).toBe('we love ****');
+    expect(root.querySelector('.nb-guild')?.textContent).toBe('Grog Fanciers');
+    masked.hide();
   });
 
   it('numbers the rows in board order', () => {

@@ -2003,6 +2003,10 @@ export class GameServer {
       () => Date.now(),
       // Guild names run the same offensive-name screen as character names.
       (name) => offensiveName(name),
+      // The pledge board note runs the chat filter's hard tier at write time
+      // (soft words stay client-masked); admin list edits apply live through
+      // the shared ChatFilter instance.
+      (text) => this.chatFilter.findHardHit(text),
     );
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
