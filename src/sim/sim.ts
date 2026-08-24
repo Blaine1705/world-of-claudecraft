@@ -31,6 +31,7 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
@@ -184,6 +185,7 @@ import {
   type SavedCooldowns,
   serializeCooldowns,
 } from './cooldown_persist';
+import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
@@ -265,6 +267,7 @@ import { formatMoney } from './format_money';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
+import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -4802,31 +4805,10 @@ export class Sim {
     return Promise.resolve(paginateDeedsLeaderboard([], page, pageSize));
   }
 
+  // The offline constant readout (#1307) lives in daily_rewards_stub.ts, the
+  // one file the $WOC token firewall allows to name chain vocabulary.
   dailyRewards(): Promise<DailyRewardStatus> {
-    const day = '1970-01-01';
-    return Promise.resolve({
-      enabled: true,
-      day,
-      resetAt: '1970-01-02T00:00:00.000Z',
-      prizePoolUsd: 0,
-      prizePoolSol: null,
-      eligibility: {
-        eligible: false,
-        reason: 'no_wallet',
-        banReason: null,
-        walletPubkey: null,
-        wocBalance: null,
-        wocUsdPrice: null,
-        usdValue: null,
-        minUsd: 20,
-      },
-      score: 0,
-      rank: null,
-      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: [],
-      leaderboard: [],
-      leaderboardTotal: 0,
-    });
+    return dailyRewardsStub();
   }
 
   dailyRewardLeaderboard(
@@ -9014,6 +8996,17 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
+  // The broker custody pair (extraction into escrow, grant back) lives in
+  // broker_custody.ts; these stay as the delegates server/woc_market_custody.ts
+  // resolves on the Sim facade.
+  extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
+    return extractTradableCopyImpl(this.ctx, pid, ref);
+  }
+
+  grantTradableCopy(pid: number | undefined, slot: InvSlot): boolean {
+    return grantTradableCopyImpl(this.ctx, pid, slot);
+  }
+
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible
   // stack counts, and so does an instanced copy that is not itself already
   // enchanted (e.g. crafting.ts's single-copy rare+ grant or a
@@ -11151,6 +11144,10 @@ export class Sim {
     tradeMod.tradeCancel(this.ctx, pid);
   }
 
+  tradeClose(pid?: number): void {
+    tradeMod.tradeClose(this.ctx, pid);
+  }
+
   // offerCovered / closeTrade are module-internal in social/trade.ts now (no Sim
   // delegate; only the moved trade methods used them).
 
@@ -11423,6 +11420,22 @@ export class Sim {
   // mailInfoFor rebuild. Null while the player is not at a raven pillar.
   mailRevFor(pid: number): number | null {
     return this.postOffice.mailRevFor(pid);
+  }
+
+  // Custody mail (the server's $WOC Exchange escrow returns and deliveries):
+  // thin delegates so a foreign caller resolves these on the Sim facade like
+  // every other mail entry, instead of reaching into sim.postOffice directly.
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: import('./content/letters').LetterDef,
+    items: InvSlot[],
+    custodyRef?: string,
+  ): boolean {
+    return this.postOffice.mailSystemParcel(recipient, letter, items, custodyRef);
+  }
+
+  hasCustodyParcel(custodyRef: string): boolean {
+    return this.postOffice.hasCustodyParcel(custodyRef);
   }
 
   mailUnreadFor(pid: number): number {

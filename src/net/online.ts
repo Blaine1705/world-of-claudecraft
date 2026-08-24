@@ -4834,6 +4834,9 @@ export class ClientWorld implements IWorld {
   tradeCancel(): void {
     this.cmd({ cmd: 'trade_cancel' });
   }
+  tradeClose(): void {
+    this.cmd({ cmd: 'trade_close' });
+  }
   // --- IWorldDuelArena: duel + rated-arena-queue + 2v2 Fiesta augment-pick sends
   // (duelInfo/arenaInfo are snapshot reads; fiesta dynamics ride the events queue). ---
   duelRequest(targetPid: number): void {
