@@ -1,3 +1,4 @@
+import { applyCourserDaze } from './combat/hunter_shared';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
@@ -191,6 +192,14 @@ export function handleDevChat(
       ctx.handleDeath(target, player ?? null);
       emitDevLog(ctx, pid, `[dev] Killed ${target.name}.`);
     }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+daze|devdaze)\s*$/i.test(raw)) {
+    const player = ctx.entities.get(pid);
+    if (!player) return null;
+    applyCourserDaze(ctx, player);
+    emitDevLog(ctx, pid, "[dev] Applied the Courser's Guise daze (movement speed halved for 4s).");
     return null;
   }
 
@@ -770,7 +779,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }
