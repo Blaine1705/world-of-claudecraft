@@ -235,6 +235,7 @@ import {
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { dropTargetsOnStealth } from './stealth';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { warlockFearBreakThreshold } from './warlock_fear';
@@ -3523,6 +3524,10 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
+        // Entering stealth (Duskveil/Smokestep/Stalk) drops every hostile hunter's
+        // lock on the caster: the classic Vanish threat wipe. The toggle-OFF path
+        // above breaks before this apply, so it only fires on the way IN.
+        if (eff.kind === 'stealth' && p.kind === 'player') dropTargetsOnStealth(ctx, p);
         if (eff.kind === 'form_lich') {
           ctx.emit({
             type: 'spellfx',

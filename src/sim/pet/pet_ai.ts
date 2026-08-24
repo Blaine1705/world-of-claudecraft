@@ -45,7 +45,7 @@ import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
-import { canDetectStealthedTarget } from '../threat';
+import { petCanSeeStealthedTarget } from '../threat';
 import {
   type Aura,
   armorReduction,
@@ -657,15 +657,13 @@ function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity):
   return target.kind === 'mob' && questGateBlocksAggro(ctx.players, target, pet);
 }
 
-// Stealth detection scales off a BASE RADIUS, not off how far the observer can be
-// interested in something. A mob passes its own aggro radius (mob/targeting.ts), so
-// PET_AGGRESSIVE_RANGE, the pet's analogue of that, is the base of the same ORDER; the
-// 50yd assist RANGE that used to be passed is a scan span, and reusing it as a radius
-// gave the pet roughly three times a mob's reach on a stealthed player. Not the
-// identical rule: a mob's base also carries a level term and the delve detect
-// multiplier, which no pet path has ever applied. Keep this identical to the base
-// combat/damage.ts passes, or a pet could hit what it cannot see.
-function petCanSeeTarget(pet: Entity, target: Entity): boolean {
+// A pet cannot see a stealthed enemy player AT ALL, exactly like the enemy
+// player it is fighting beside cannot: no close-range proximity detection, the
+// way a mob gets. petCanSeeStealthedTarget owns that rule; keep it identical to
+// the combat/damage.ts hit gate, or a pet could strike what it cannot see.
+// updatePet re-checks this every tick, so a target that Vanishes or Stealths is
+// dropped, not just never acquired.
+function petCanSeeTarget(_pet: Entity, target: Entity): boolean {
   if (target.kind !== 'player') return true;
-  return canDetectStealthedTarget(pet, target, PET_AGGRESSIVE_RANGE);
+  return petCanSeeStealthedTarget(target);
 }

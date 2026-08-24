@@ -32,7 +32,6 @@ import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
-import { PET_AGGRESSIVE_RANGE } from '../pet/pet_ai';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
@@ -40,7 +39,7 @@ import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
-import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
+import { addThreat, clearThreat, petCanSeeStealthedTarget } from '../threat';
 import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
@@ -137,7 +136,6 @@ const VICTORY_RUSH_WINDOW = 20;
 const PURSUIT_SPEED_DURATION = 6;
 const BLOODBATH_DURATION = 8;
 const BLOODBATH_MAX_STACKS = 5;
-const PET_STEALTH_DETECTION_RADIUS = PET_AGGRESSIVE_RANGE;
 
 // Baseline uninterruptible casts and a resolved talent modifier can each block
 // classic-era damage pushback. The resolved check is player-only and reads the
@@ -192,11 +190,14 @@ export function dealDamage(
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;
+  // A pet (an owned mob) cannot strike a stealthed enemy player, just as it
+  // cannot see or acquire one (pet/pet_ai.ts). No proximity detection, unlike a
+  // wild mob.
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
     target.kind === 'player' &&
-    !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
+    !petCanSeeStealthedTarget(target)
   )
     return 0;
   if (target.gm || target.devGod || (target.profilerInvulnerable && ctx.devCommands)) {
