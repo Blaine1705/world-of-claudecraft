@@ -945,6 +945,22 @@ const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = 
 // NYTHRAXIS_PARTY_INTERACT_RANGE / NYTHRAXIS_VISION_LINE_DELAY moved to
 // encounters/nythraxis.ts (N1) with the crypt-quest helpers that read them.
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
+// Feared-PLAYER wall guard: while a player flees under fear, if their heading
+// would run them into a wall within FEAR_WALL_LOOKAHEAD yards, steer to the most
+// open heading instead of grinding (or clipping) into it. Deterministic (probes
+// the collider set, draws no rng) and player-only, so feared-mob movement and its
+// parity draw order are untouched.
+const FEAR_WALL_LOOKAHEAD = 2; // yards ahead to watch for a wall (turn late, near the wall)
+const FEAR_WALL_PROBE_STEP = 1; // probe cadence; with BODY_RADIUS 0.5 the probe discs overlap, no gap
+const FEAR_TURN_FAN = [
+  Math.PI / 4,
+  -Math.PI / 4,
+  Math.PI / 2,
+  -Math.PI / 2,
+  (3 * Math.PI) / 4,
+  -(3 * Math.PI) / 4,
+  Math.PI,
+]; // headings to try (smallest turn first, ties broken by fan order) when blocked ahead
 const CHARGE_SPEED_MULT = 3; // warrior charge runs at 3x normal speed
 const CHARGE_ARRIVE_RANGE = MELEE_RANGE - 1; // stop inside melee range
 const FOLLOW_STOP_DIST = 3; // /follow trails this close behind the leader (yards)
@@ -6453,10 +6469,47 @@ export class Sim {
     const aura = this.fearAura(e);
     if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
       return false;
-    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    let angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    // Player-only wall guard: redirect the flee heading away from a wall it is
+    // about to run into, and remember the new heading on the aura so it holds
+    // until the next wall. Feared mobs keep their untouched movement (and the
+    // parity draw order with it), matching the vertical snap's player scoping.
+    if (e.kind === 'player') {
+      angle = this.steerFearFromWalls(e, angle);
+      aura.value = angle;
+    }
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
     return true;
+  }
+  // Yards the feared player can travel straight along `heading` before a wall,
+  // capped at FEAR_WALL_LOOKAHEAD. Uses the player's own mover height, so a low
+  // prop it steps over is not mistaken for a wall. Draws no rng.
+  private fearWallOpenDistance(e: Entity, heading: number): number {
+    const sinA = Math.sin(heading);
+    const cosA = Math.cos(heading);
+    for (let d = FEAR_WALL_PROBE_STEP; d <= FEAR_WALL_LOOKAHEAD; d += FEAR_WALL_PROBE_STEP) {
+      const x = e.pos.x + sinA * d;
+      const z = e.pos.z + cosA * d;
+      const r = this.resolveMovePoint(x, z, BODY_RADIUS, e);
+      if (Math.hypot(r.x - x, r.z - z) > 0.05) return d - FEAR_WALL_PROBE_STEP;
+    }
+    return FEAR_WALL_LOOKAHEAD;
+  }
+  // If the flee heading is clear for the lookahead, keep it; otherwise turn to the
+  // most open heading in FEAR_TURN_FAN (smallest turn first, ties by fan order).
+  private steerFearFromWalls(e: Entity, heading: number): number {
+    let bestOpen = this.fearWallOpenDistance(e, heading);
+    if (bestOpen >= FEAR_WALL_LOOKAHEAD) return heading;
+    let best = heading;
+    for (const off of FEAR_TURN_FAN) {
+      const open = this.fearWallOpenDistance(e, heading + off);
+      if (open > bestOpen) {
+        bestOpen = open;
+        best = heading + off;
+      }
+    }
+    return best;
   }
   private mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean {
     return !!template;
