@@ -117,9 +117,11 @@ export function applyDungeonMobTuning(
   const tuning = HEROIC_DUNGEON_TUNING[dungeonId];
   if (!tuning) return;
   mob.mechanicDamageMult =
+    tuning.mechanicDamageMultiplierByMob?.[mob.templateId] ??
     tuning.damageMultiplierByMob?.[mob.templateId] ??
     (role?.summonedAdd ? tuning.addDamageMultiplier : tuning.damageMultiplier);
   mob.mechanicHealMult = tuning.healthMultiplier;
+  mob.mechanicBurnDamageMult = tuning.burnDamageMultiplierByMob?.[mob.templateId];
   if (MOBS[mob.templateId]?.boss) {
     mob.ccImmune = true;
     mob.slowImmune = true;

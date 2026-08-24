@@ -7509,6 +7509,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.rightPillar': '右の鍛冶柱が点火した！',
   'hudChrome.varkhulCallout.bothPillars': '鍛冶柱が点火した！',
   'hudChrome.varkhulCallout.portalsOpening': '鍛冶炉のポータルが開き始めた！',
+  'hudChrome.varkhulCallout.artificerApproaches': '火の粉の技工士が鍛冶炉へ接近している！',
+  'hudChrome.varkhulWaveStatus': 'ウェーブ {wave}/{waves} | 敵: {remaining}',
   'hudChrome.varkhulCallout.heat75': '鍛冶炉の熱が75%に達した！',
   'hudChrome.varkhulCallout.heat90': '鍛冶炉メルトダウンが迫っている！',
   'hudChrome.varkhulCallout.addsDefeated': '鍛冶軍団を倒した。ヴァークルが無防備になった！',

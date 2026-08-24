@@ -2296,6 +2296,7 @@ export const ru_RU: EnTranslations = {
       "rightPillar": "Правая колонна кузни зажигается!",
       "bothPillars": "Колонны кузни зажигаются!",
       "portalsOpening": "Порталы кузни открываются!",
+      "artificerApproaches": "Искровой механик приближается к кузне!",
       "heat75": "Жар кузни достиг 75%!",
       "heat90": "Расплавление кузни неизбежно!",
       "addsDefeated": "Легион кузни повержен: Варкхул уязвим!",
@@ -2303,6 +2304,7 @@ export const ru_RU: EnTranslations = {
       "worldfireClosing": "Мировое пламя сжимается. Двигайтесь к центру!",
       "worldfireConsumed": "Всё горнило охвачено огнём!"
     },
+    "varkhulWaveStatus": "Волна {wave}/{waves} | Врагов: {remaining}",
     "auraEffect": {
       "sharedPyre": "Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).",
       "makersBrand": "В течение {duration} сек. каждый эффект повышает урон от Варкхула на {pct}%. Суммируется до {max} раз. Танкам следует сменяться при {swap} эффектах.",

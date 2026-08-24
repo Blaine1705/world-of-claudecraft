@@ -2296,6 +2296,7 @@ export const es: EnTranslations = {
       "rightPillar": "¡El pilar derecho de la forja se enciende!",
       "bothPillars": "¡Los pilares de la forja se encienden!",
       "portalsOpening": "¡Los portales de la forja se están abriendo!",
+      "artificerApproaches": "¡Un Artífice de Ceniza se acerca a la forja!",
       "heat75": "¡La forja ha alcanzado un 75% de calor!",
       "heat90": "¡La Fusión de la forja es inminente!",
       "addsDefeated": "¡La legión de la forja ha caído: Varkhul está expuesto!",
@@ -2303,6 +2304,7 @@ export const es: EnTranslations = {
       "worldfireClosing": "¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!",
       "worldfireConsumed": "¡Todo el crisol está en llamas!"
     },
+    "varkhulWaveStatus": "Oleada {wave}/{waves} | Enemigos: {remaining}",
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",

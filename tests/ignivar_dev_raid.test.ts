@@ -4,7 +4,6 @@ import {
   IGNIVAR_BRAND_AURA_ID,
   IGNIVAR_BRAND_RADIUS,
   IGNIVAR_SOAK_RADIUS,
-  IGNIVAR_SOAK_SHARED_MAX_HP,
   updateIgnivarEncounter,
 } from '../src/sim/encounters/ignivar';
 import {
@@ -180,7 +179,7 @@ describe('/dev ignivarraid', () => {
     expect(bot.dead).toBe(false);
   });
 
-  it('forms a full raid of stationary, invulnerable participants in spread soak pods', () => {
+  it('forms a full raid of stationary, invulnerable participants in spread groups', () => {
     const sim = devSim();
     const player = sim.player;
     sim.chat('/dev dungeon ignivar_raid_arena normal');
@@ -258,43 +257,6 @@ describe('/dev ignivarraid', () => {
     expect(sim.partyOf(sim.playerId)?.members).toHaveLength(10);
     expect(first.hp).toBe(first.maxHp);
     expect(dist2d(sim.player.pos, first.pos)).toBeGreaterThan(IGNIVAR_BRAND_RADIUS);
-  });
-
-  it('lets the tester complete the four-player Shared Pyre by joining the marked pod', () => {
-    const sim = devSim();
-    sim.chat('/dev dungeon ignivar_raid_arena normal');
-    sim.chat('/dev ignivarraid');
-    const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
-    if (!boss) throw new Error('Ignivar did not spawn');
-    boss.inCombat = true;
-    boss.aiState = 'attack';
-    boss.aggroTargetId = sim.player.id;
-    boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.rotatingRaysTimer = 999;
-    boss.ignivar.forgeWaveTimer = 999;
-    boss.ignivar.meteorTimer = 999;
-    boss.ignivar.soakTimer = 0;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    expect(sim.players.get(marked?.id ?? -1)?.isDevBot).toBe(true);
-    if (!marked) throw new Error('Shared Pyre did not mark a test bot');
-    sim.player.pos = { ...marked.pos };
-    sim.player.prevPos = { ...sim.player.pos };
-    sim.player.hp = sim.player.maxHp;
-    boss.ignivar.soakRemaining = DT;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    expect(sim.player.hp).toBe(
-      sim.player.maxHp - Math.ceil(sim.player.maxHp * (IGNIVAR_SOAK_SHARED_MAX_HP / 4)),
-    );
   });
 
   it('keeps its invulnerable mechanic bots alive through an Apocalypse wipe', () => {
@@ -557,7 +519,7 @@ describe('/dev ignivarraid', () => {
     );
   });
 
-  it('can skip the approach and place the full raid in boss soak pods', () => {
+  it('can skip the approach and place the full raid in the boss formation', () => {
     const sim = devSim();
 
     sim.chat('/dev ignivarraid boss');

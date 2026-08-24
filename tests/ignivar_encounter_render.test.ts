@@ -1470,6 +1470,10 @@ describe('Ignivar encounter renderer', () => {
       (soakBeacon.children[2] as THREE.Points).material as THREE.Material,
       'dispose',
     );
+    const soakFlameDispose = vi.spyOn(
+      soak.getObjectByName('ignivarSoakCallInFlame') as THREE.InstancedMesh,
+      'dispose',
+    );
 
     disposeIgnivarEncounterVisuals(group);
 
@@ -1483,6 +1487,7 @@ describe('Ignivar encounter renderer', () => {
     expect(nestedOuterMaterialDispose).toHaveBeenCalledOnce();
     expect(soakBeaconGeometryDispose).toHaveBeenCalledOnce();
     expect(soakEmberMaterialDispose).toHaveBeenCalledOnce();
+    expect(soakFlameDispose).toHaveBeenCalledOnce();
   });
 
   it('pins the production renderer integration for cleanup, stable conduits, and facing', () => {

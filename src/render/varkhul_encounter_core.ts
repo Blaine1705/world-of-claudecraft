@@ -5,11 +5,18 @@ import {
   VARKHUL_MAKERS_BRAND_MAX_STACKS,
 } from '../sim/encounters/varkhul';
 import { VARKHUL_FRONTAL_CAST_ID } from '../sim/varkhul_frontal';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+} from '../sim/varkhul_shared_pyre';
 
 export type VarkhulVisualEntity = {
+  id?: number;
   kind: string;
   templateId: string;
   scale?: number;
+  dead?: boolean;
+  pos?: { x: number; z: number };
   castingAbility?: string | null;
   castRemaining?: number;
   castTotal?: number;
@@ -29,6 +36,9 @@ export interface VarkhulEncounterVisualPlan {
   cinderOrbsProgress: number;
   frontalVisible: boolean;
   frontalProgress: number;
+  sharedPyreVisible: boolean;
+  sharedPyreProgress: number;
+  sharedPyreRequiredPlayers: number;
   inverseEntityScale: number;
 }
 
@@ -45,7 +55,9 @@ export function varkhulEncounterBypassesCharacterCulling(entity: VarkhulVisualEn
   return (
     (entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_FRONTAL_CAST_ID) ||
     (entity.kind === 'player' &&
-      entity.auras.some((aura) => aura.id === VARKHUL_CINDER_ORBS_AURA_ID))
+      entity.auras.some((aura) => aura.id === VARKHUL_CINDER_ORBS_AURA_ID)) ||
+    (entity.kind === 'player' &&
+      entity.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID))
   );
 }
 
@@ -74,6 +86,10 @@ export function varkhulEncounterVisualPlan(
       : undefined;
   const frontalVisible =
     entity.templateId === VARKHUL_BOSS_ID && entity.castingAbility === VARKHUL_FRONTAL_CAST_ID;
+  const sharedPyre =
+    entity.kind === 'player'
+      ? entity.auras.find((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)
+      : undefined;
   return {
     makersBrandStacks: brand
       ? Math.max(1, Math.min(VARKHUL_MAKERS_BRAND_MAX_STACKS, brand.stacks ?? 1))
@@ -87,6 +103,12 @@ export function varkhulEncounterVisualPlan(
           Math.max(0, 1 - (entity.castRemaining ?? 0) / Math.max(0.01, entity.castTotal ?? 0.01)),
         )
       : 0,
+    sharedPyreVisible: sharedPyre !== undefined,
+    sharedPyreProgress: auraProgress(sharedPyre),
+    sharedPyreRequiredPlayers: Math.max(
+      1,
+      Math.floor(sharedPyre?.stacks ?? VARKHUL_SHARED_PYRE_REQUIRED_NORMAL),
+    ),
     inverseEntityScale: 1 / Math.max(0.01, entity.scale ?? 1),
   };
 }

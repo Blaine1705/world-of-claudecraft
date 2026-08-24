@@ -13465,6 +13465,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.rightPillar': '¡El pilar derecho de la forja se enciende!',
   'hudChrome.varkhulCallout.bothPillars': '¡Los pilares de la forja se encienden!',
   'hudChrome.varkhulCallout.portalsOpening': '¡Los portales de la forja se están abriendo!',
+  'hudChrome.varkhulCallout.artificerApproaches':
+    '¡Un Artífice de Ceniza se acerca a la forja!',
+  'hudChrome.varkhulWaveStatus': 'Oleada {wave}/{waves} | Enemigos: {remaining}',
   'hudChrome.varkhulCallout.heat75': '¡La forja ha alcanzado un 75% de calor!',
   'hudChrome.varkhulCallout.heat90': '¡La Fusión de la forja es inminente!',
   'hudChrome.varkhulCallout.addsDefeated':

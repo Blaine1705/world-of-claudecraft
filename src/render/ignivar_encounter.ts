@@ -80,6 +80,9 @@ function disposeMaterial(material: THREE.Material | THREE.Material[]): void {
 function disposeOwnedVisual(root: THREE.Object3D): void {
   root.traverse((object) => {
     const renderable = object as THREE.Mesh | THREE.Line;
+    if ((renderable as THREE.InstancedMesh).isInstancedMesh) {
+      (renderable as THREE.InstancedMesh).dispose();
+    }
     if ('geometry' in renderable && renderable.geometry) renderable.geometry.dispose();
     if ('material' in renderable && renderable.material) disposeMaterial(renderable.material);
   });

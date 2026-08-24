@@ -56,7 +56,6 @@ import {
   VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
-  VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
   VARKHUL_CINDER_REPAIR_CAST_ID,
   VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
   VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
@@ -64,8 +63,9 @@ import {
   VARKHUL_CINDER_REPAIR_RANGE,
   VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
   VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
+  VARKHUL_CINDER_REPAIR_TICK_SECONDS,
   varkhulCinderArtificerPortalIndex,
-  varkhulCinderRepairAmount,
+  varkhulCinderRepairTickAmount,
 } from '../varkhul_cinder_artificer';
 import {
   VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
@@ -102,7 +102,6 @@ import {
 } from '../varkhul_forge_beams';
 import {
   activeVarkhulForgePortalTelegraphs,
-  VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS,
   VARKHUL_FORGE_FINAL_BEAM_SECONDS,
   VARKHUL_FORGE_FINAL_GAP_SECONDS,
   VARKHUL_FORGE_FINAL_HP_THRESHOLD,
@@ -117,17 +116,15 @@ import {
   VARKHUL_FORGE_TEACHING_HP_THRESHOLD,
   VARKHUL_WORK_FACING,
   VARKHUL_WORK_LOCAL_POS,
+  varkhulCrucibleQuakeDamageRange,
   varkhulForgeBeamIsActive,
   varkhulForgeBeamWindowMask,
   varkhulForgeIntermissionSeconds,
   varkhulForgeIntermissionWave,
   varkhulForgeIntermissionWaveCount,
+  varkhulForgeIntermissionWaveDelay,
   varkhulForgePressureWindow,
 } from '../varkhul_forge_intermission';
-import {
-  VARKHUL_FORGESTORM_RADIUS,
-  VARKHUL_FORGESTORM_WARNING_SECONDS,
-} from '../varkhul_forgestorm';
 import {
   pointInVarkhulFrontal,
   VARKHUL_FRONTAL_CAST_ID,
@@ -146,6 +143,17 @@ import {
   varkhulInterceptBeamBlocker,
   varkhulInterceptBeamDamageMaxHp,
 } from '../varkhul_intercept_beam';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_CAST_SECONDS,
+  VARKHUL_SHARED_PYRE_EVERY_SECONDS,
+  VARKHUL_SHARED_PYRE_FIRST_SECONDS,
+  VARKHUL_SHARED_PYRE_NAME,
+  VARKHUL_SHARED_PYRE_RADIUS,
+  varkhulSharedPyreDamageFraction,
+  varkhulSharedPyreEligibleTargets,
+  varkhulSharedPyreRequiredPlayers,
+} from '../varkhul_shared_pyre';
 import {
   VARKHUL_WORLDFIRE_ABILITY_ID,
   VARKHUL_WORLDFIRE_TICK_SECONDS,
@@ -253,7 +261,6 @@ const VARKHUL_FIRST_FORGESTORM_SECONDS = 20;
 const VARKHUL_FIRST_ANVIL_SECONDS = 32;
 const VARKHUL_CINDER_ORBS_EVERY = 34;
 const VARKHUL_FRONTAL_EVERY = 26;
-const VARKHUL_FORGESTORM_EVERY = 38;
 const VARKHUL_ANVIL_EVERY = 42;
 const VARKHUL_WIPE_DAMAGE_MULTIPLIER = 100;
 const VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS = 1.5;
@@ -346,6 +353,9 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       forgestormWaveIndex: 0,
       forgestormWarningRemaining: 0,
       forgestormPoints: [],
+      sharedPyreTimer: VARKHUL_SHARED_PYRE_FIRST_SECONDS,
+      sharedPyreTargetId: null,
+      sharedPyreRemaining: 0,
       anvilTimer: VARKHUL_FIRST_ANVIL_SECONDS,
       anvilStrikeIndex: 0,
       anvilStrikeRemaining: 0,
@@ -388,6 +398,7 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       assemblyForgeHammerTimer: VARKHUL_FORGE_HAMMER_EVERY_SECONDS,
       assemblyForgeVentedThisTick: false,
       assemblyPortalSpawns: [],
+      assemblyOrdinaryAddWaves: [],
       assemblyNextWaveIndex: 0,
       assemblyNextWaveRemaining: 0,
       assemblyIntermissionWaves: 0,
@@ -460,6 +471,7 @@ export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): v
         aura.id !== VARKHUL_CINDER_ORBS_AURA_ID &&
         aura.id !== VARKHUL_RED_HOT_METAL_AURA_ID &&
         aura.id !== VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID &&
+        aura.id !== VARKHUL_SHARED_PYRE_AURA_ID &&
         aura.id !== VARKHUL_ASSEMBLY_FIXATE_AURA_ID &&
         aura.id !== VARKHUL_ASSEMBLY_CORE_AURA_ID &&
         aura.id !== VARKHUL_ASSEMBLY_LINK_AURA_ID &&
@@ -472,7 +484,9 @@ export function clearVarkhulEncounterAuras(player: Entity, sourceId?: number): v
 function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   for (const player of playersInEncounter(ctx, boss, true)) {
     player.auras = player.auras.filter(
-      (aura) => aura.id !== VARKHUL_CINDER_ORBS_AURA_ID || aura.sourceId !== boss.id,
+      (aura) =>
+        (aura.id !== VARKHUL_CINDER_ORBS_AURA_ID && aura.id !== VARKHUL_SHARED_PYRE_AURA_ID) ||
+        aura.sourceId !== boss.id,
     );
   }
   clearEncounterWarnings(ctx, boss);
@@ -483,6 +497,8 @@ function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterS
   st.cinderOrbsTargetIds = [];
   st.forgestormWarningRemaining = 0;
   st.forgestormPoints = [];
+  st.sharedPyreTargetId = null;
+  st.sharedPyreRemaining = 0;
   st.anvilStrikeIndex = 0;
   st.anvilStrikeRemaining = 0;
   st.anvilMeteorBatches = [];
@@ -1020,114 +1036,100 @@ function updateCinderOrbProjectiles(
   }
 }
 
-function addForgestormWarnings(ctx: SimContext, boss: Entity, points: readonly Vec3[]): void {
-  for (const point of points) {
-    ctx.groundAoEs.push({
-      sourceId: boss.id,
-      abilityId: VARKHUL_FORGESTORM_CAST_ID,
-      ability: VARKHUL_FORGESTORM_CAST_ID,
-      pos: { ...point },
-      radius: VARKHUL_FORGESTORM_RADIUS,
-      min: 0,
-      max: 0,
-      remaining: VARKHUL_FORGESTORM_WARNING_SECONDS + DT * 2,
-      interval: 999,
-      tickTimer: 999,
-      school: 'fire',
-    });
-  }
-}
-
-function startForgestormWave(
+function startSharedPyre(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
-  waveIndex: number,
-): void {
-  const instance = encounterInstance(ctx, boss);
-  if (!instance) return;
-  const origin = ctx.instanceOriginOf(instance);
-  st.forgestormWaveIndex = waveIndex;
-  st.forgestormWarningRemaining = VARKHUL_FORGESTORM_WARNING_SECONDS;
-  st.forgestormPoints = varkhulForgestormPattern(st.forgestormCastKey, waveIndex, origin).map(
-    (point) => ctx.groundPos(point.x, point.z),
-  );
-  addForgestormWarnings(ctx, boss, st.forgestormPoints);
-}
-
-function startForgestorm(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  st.majorAbility = 'forgestorm';
-  st.forgestormTimer = VARKHUL_FORGESTORM_EVERY;
-  st.forgestormCastKey++;
-  boss.castingAbility = VARKHUL_FORGESTORM_CAST_ID;
-  boss.castTotal = VARKHUL_FORGESTORM_WAVES * VARKHUL_FORGESTORM_WARNING_SECONDS;
-  boss.castRemaining = boss.castTotal;
-  boss.castTargetId = null;
+  players: readonly Entity[],
+): boolean {
+  const candidates = varkhulSharedPyreEligibleTargets(players, tankIds(ctx, boss));
+  if (candidates.length === 0) {
+    st.sharedPyreTimer = 1;
+    return false;
+  }
+  const target = candidates[ctx.rng.int(0, candidates.length - 1)];
+  const requiredPlayers = varkhulSharedPyreRequiredPlayers(st.assemblyRuneDifficulty);
+  st.majorAbility = 'sharedPyre';
+  st.sharedPyreTargetId = target.id;
+  st.sharedPyreRemaining = VARKHUL_SHARED_PYRE_CAST_SECONDS;
+  st.sharedPyreTimer = VARKHUL_SHARED_PYRE_EVERY_SECONDS;
+  boss.castingAbility = VARKHUL_SHARED_PYRE_NAME;
+  boss.castTotal = VARKHUL_SHARED_PYRE_CAST_SECONDS;
+  boss.castRemaining = VARKHUL_SHARED_PYRE_CAST_SECONDS;
+  boss.castTargetId = target.id;
   boss.castAim = null;
-  boss.channeling = true;
-  startForgestormWave(ctx, boss, st, 0);
+  boss.channeling = false;
+  ctx.applyAura(target, {
+    id: VARKHUL_SHARED_PYRE_AURA_ID,
+    name: VARKHUL_SHARED_PYRE_NAME,
+    kind: 'vulnerability',
+    remaining: VARKHUL_SHARED_PYRE_CAST_SECONDS,
+    duration: VARKHUL_SHARED_PYRE_CAST_SECONDS,
+    value: 0,
+    stacks: requiredPlayers,
+    sourceId: boss.id,
+    school: 'fire',
+    encounterOwned: true,
+  });
+  return true;
 }
 
-function resolveForgestormWave(
+function resolveSharedPyre(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
-  for (const point of st.forgestormPoints) {
+  const target =
+    st.sharedPyreTargetId === null ? undefined : ctx.entities.get(st.sharedPyreTargetId);
+  const soakers = target
+    ? players.filter(
+        (player) => !player.dead && dist2d(player.pos, target.pos) <= VARKHUL_SHARED_PYRE_RADIUS,
+      )
+    : [];
+  if (soakers.length > 0) {
+    const fraction = varkhulSharedPyreDamageFraction(st.assemblyRuneDifficulty, soakers.length);
+    for (const player of soakers) {
+      dealFractionalDamage(ctx, boss, player, fraction, VARKHUL_SHARED_PYRE_NAME);
+    }
+  }
+  if (target) {
+    target.auras = target.auras.filter(
+      (aura) => aura.id !== VARKHUL_SHARED_PYRE_AURA_ID || aura.sourceId !== boss.id,
+    );
     ctx.emit({
-      type: 'spellfxAt',
-      x: point.x,
-      z: point.z,
-      school: 'fire',
-      fx: 'meteorImpact',
+      type: 'spellfx',
       sourceId: boss.id,
-      radius: VARKHUL_FORGESTORM_RADIUS,
-      ability: VARKHUL_FORGESTORM_CAST_ID,
+      targetId: target.id,
+      school: 'fire',
+      fx: 'nova',
+      ability: VARKHUL_SHARED_PYRE_NAME,
     });
   }
-  for (const player of players) {
-    if (
-      !st.forgestormPoints.some(
-        (point) =>
-          Math.hypot(player.pos.x - point.x, player.pos.z - point.z) <= VARKHUL_FORGESTORM_RADIUS,
-      )
-    )
-      continue;
-    dealFractionalDamage(
-      ctx,
-      boss,
-      player,
-      VARKHUL_FORGESTORM_DAMAGE_MAX_HP,
-      VARKHUL_FORGESTORM_CAST_ID,
-    );
-  }
-  clearEncounterWarnings(ctx, boss);
-  st.forgestormPoints = [];
-  const nextWave = st.forgestormWaveIndex + 1;
-  if (nextWave < VARKHUL_FORGESTORM_WAVES) {
-    startForgestormWave(ctx, boss, st, nextWave);
-    return;
-  }
-  st.forgestormWarningRemaining = 0;
+  st.sharedPyreTargetId = null;
+  st.sharedPyreRemaining = 0;
   st.majorAbility = 'none';
   clearBossCast(boss);
 }
 
-function updateForgestorm(
+function updateSharedPyre(
   ctx: SimContext,
   boss: Entity,
   st: VarkhulEncounterState,
   players: readonly Entity[],
   speed: number,
 ): void {
-  st.forgestormWarningRemaining = Math.max(0, st.forgestormWarningRemaining - DT * speed);
-  boss.castingAbility = VARKHUL_FORGESTORM_CAST_ID;
-  boss.castRemaining =
-    (VARKHUL_FORGESTORM_WAVES - 1 - st.forgestormWaveIndex) * VARKHUL_FORGESTORM_WARNING_SECONDS +
-    st.forgestormWarningRemaining;
-  if (st.forgestormWarningRemaining <= CAST_COMPLETE_EPS) {
-    resolveForgestormWave(ctx, boss, st, players);
+  st.sharedPyreRemaining = Math.max(0, st.sharedPyreRemaining - DT * speed);
+  boss.castingAbility = VARKHUL_SHARED_PYRE_NAME;
+  boss.castRemaining = st.sharedPyreRemaining;
+  const target =
+    st.sharedPyreTargetId === null ? undefined : ctx.entities.get(st.sharedPyreTargetId);
+  const aura = target?.auras.find(
+    (entry) => entry.id === VARKHUL_SHARED_PYRE_AURA_ID && entry.sourceId === boss.id,
+  );
+  if (aura) aura.remaining = st.sharedPyreRemaining;
+  if (st.sharedPyreRemaining <= CAST_COMPLETE_EPS || !target || target.dead) {
+    resolveSharedPyre(ctx, boss, st, players);
   }
 }
 
@@ -1472,6 +1474,7 @@ function queueForgeArtificer(ctx: SimContext, boss: Entity, st: VarkhulEncounter
     remaining: VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
   });
   st.assemblyArtificerSpawnIndex++;
+  emitVarkhulCallout(ctx, boss, 'artificerApproaches');
   emitForgePortalTelegraph(
     ctx,
     boss,
@@ -1529,16 +1532,33 @@ function updateForgeAddSpawns(ctx: SimContext, boss: Entity, st: VarkhulEncounte
       continue;
     }
     st.assemblyAddIds.push(add.id);
+    st.assemblyOrdinaryAddWaves.push({ addId: add.id, wave: scheduled.wave });
     sendAssemblyAddTowardTank(ctx, boss, add, players);
   }
   st.assemblyPortalSpawns = pending;
 
   if (st.assemblyNextWaveIndex >= st.assemblyIntermissionWaves) return;
+  const previousWave = st.assemblyNextWaveIndex - 1;
+  const previousPending = st.assemblyPortalSpawns.some(
+    (scheduled) => scheduled.wave === previousWave,
+  );
+  const previousAlive = st.assemblyOrdinaryAddWaves.some(({ addId, wave }) => {
+    const add = wave === previousWave ? ctx.entities.get(addId) : undefined;
+    return add !== undefined && !add.dead;
+  });
+  if (st.assemblyRuneDifficulty === 'normal') {
+    if (previousPending || previousAlive) {
+      st.assemblyNextWaveRemaining = varkhulForgeIntermissionWaveDelay('normal');
+      return;
+    }
+  } else if (!previousPending && !previousAlive) {
+    st.assemblyNextWaveRemaining = 0;
+  }
   st.assemblyNextWaveRemaining = Math.max(0, st.assemblyNextWaveRemaining - DT);
   if (st.assemblyNextWaveRemaining > CAST_COMPLETE_EPS) return;
   queueForgeAddWave(ctx, boss, st, st.assemblyNextWaveIndex);
   st.assemblyNextWaveIndex++;
-  st.assemblyNextWaveRemaining = VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS;
+  st.assemblyNextWaveRemaining = varkhulForgeIntermissionWaveDelay(st.assemblyRuneDifficulty);
 }
 
 function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
@@ -1568,9 +1588,10 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyForgeMeltdownTickTimer = VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
   st.assemblyForgeHammerTimer = VARKHUL_FORGE_HAMMER_FIRST_SECONDS;
   st.assemblyPortalSpawns = [];
+  st.assemblyOrdinaryAddWaves = [];
   st.assemblyIntermissionWaves = varkhulForgeIntermissionWaveCount(difficulty);
   st.assemblyNextWaveIndex = 1;
-  st.assemblyNextWaveRemaining = VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS;
+  st.assemblyNextWaveRemaining = varkhulForgeIntermissionWaveDelay(difficulty);
   st.assemblyArtificerNextSpawnRemaining = VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS;
   st.assemblyArtificerSpawnIndex = 0;
   st.assemblyArtificerPortalSpawns = [];
@@ -1650,6 +1671,7 @@ function finishAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState
   st.assemblyLinkWardenIdsByWave = [];
   st.assemblyLinkWardenSpawns = [];
   st.assemblyPortalSpawns = [];
+  st.assemblyOrdinaryAddWaves = [];
   st.assemblyNextWaveIndex = 0;
   st.assemblyNextWaveRemaining = 0;
   st.assemblyIntermissionWaves = 0;
@@ -2151,7 +2173,8 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
       add.castRemaining = Math.max(0, add.castRemaining - DT);
       add.channelTickTimer = Math.max(0, add.channelTickTimer - DT);
       if (add.channelTickTimer <= CAST_COMPLETE_EPS) {
-        add.channelTickTimer = VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS;
+        add.channelTickTimer += VARKHUL_CINDER_REPAIR_TICK_SECONDS;
+        add.channelTicksLeft = Math.max(0, add.channelTicksLeft - 1);
         ctx.emit({
           type: 'spellfx',
           sourceId: add.id,
@@ -2160,22 +2183,22 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
           fx: 'beam',
           ability: VARKHUL_CINDER_REPAIR_CAST_ID,
         });
+        ctx.applyHeal(
+          add,
+          boss,
+          varkhulCinderRepairTickAmount(boss.maxHp, boss.varkhul.assemblyRuneDifficulty),
+          VARKHUL_CINDER_REPAIR_NAME,
+          VARKHUL_CINDER_REPAIR_CAST_ID,
+          false,
+          false,
+          false,
+        );
+        boss.varkhul.assemblyArtificerRepaired = true;
       }
       if (add.castRemaining > CAST_COMPLETE_EPS) return true;
 
       cancelRepair();
       add.bigCastTimer = VARKHUL_CINDER_REPAIR_RETRY_SECONDS;
-      ctx.applyHeal(
-        add,
-        boss,
-        varkhulCinderRepairAmount(boss.maxHp, boss.varkhul.assemblyRuneDifficulty),
-        VARKHUL_CINDER_REPAIR_NAME,
-        VARKHUL_CINDER_REPAIR_CAST_ID,
-        false,
-        false,
-        false,
-      );
-      boss.varkhul.assemblyArtificerRepaired = true;
       ctx.emit({
         type: 'spellfx',
         sourceId: add.id,
@@ -2213,10 +2236,10 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
     add.castTargetId = boss.id;
     add.castAim = null;
     add.channeling = true;
-    add.channelTickTimer = VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS;
-    add.channelTickEvery = VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS;
+    add.channelTickTimer = VARKHUL_CINDER_REPAIR_TICK_SECONDS;
+    add.channelTickEvery = VARKHUL_CINDER_REPAIR_TICK_SECONDS;
     add.channelTicksLeft = Math.ceil(
-      VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
+      VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_TICK_SECONDS,
     );
     ctx.emit({
       type: 'spellfx',
@@ -2274,9 +2297,8 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
         ctx.emit({ type: 'spellfx', sourceId: add.id, targetId: add.id, school, fx: 'nova' });
         for (const player of playersInEncounter(ctx, boss)) {
           if (dist2d(player.pos, add.pos) > bigCast.radius) continue;
-          const damage = Math.round(
-            ctx.rng.range(bigCast.min, bigCast.max) * (add.mechanicDamageMult ?? 1),
-          );
+          const quakeDamage = varkhulCrucibleQuakeDamageRange(boss.varkhul.assemblyRuneDifficulty);
+          const damage = Math.round(ctx.rng.range(quakeDamage.min, quakeDamage.max));
           ctx.dealDamage(add, player, damage, false, school, bigCast.name, 'hit', true);
         }
         if (
@@ -2286,6 +2308,7 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
         ) {
           boss.varkhul.assemblyForgeOverheat = varkhulForgeOverheatAfterQuake(
             boss.varkhul.assemblyForgeOverheat,
+            boss.varkhul.assemblyRuneDifficulty,
           );
         }
       }
@@ -2460,7 +2483,12 @@ function updateMajorAbility(
     return true;
   }
   if (st.majorAbility === 'forgestorm') {
-    updateForgestorm(ctx, boss, st, players, speed);
+    st.majorAbility = 'none';
+    clearBossCast(boss);
+    return true;
+  }
+  if (st.majorAbility === 'sharedPyre') {
+    updateSharedPyre(ctx, boss, st, players, speed);
     return true;
   }
   if (st.majorAbility === 'anvil') {
@@ -2556,7 +2584,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   st.anvilTimer -= DT * speed;
   if (!worldfireFinale) {
     st.cinderOrbsTimer -= DT * speed;
-    st.forgestormTimer -= DT * speed;
+    st.sharedPyreTimer -= DT * speed;
     st.interceptBeamTimer -= DT * speed;
   }
   if (st.frontalTimer <= CAST_COMPLETE_EPS) {
@@ -2571,8 +2599,8 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     startInterceptBeam(ctx, boss, st, players);
     return;
   }
-  if (!worldfireFinale && st.forgestormTimer <= CAST_COMPLETE_EPS) {
-    startForgestorm(ctx, boss, st);
+  if (!worldfireFinale && st.sharedPyreTimer <= CAST_COMPLETE_EPS) {
+    startSharedPyre(ctx, boss, st, players);
     return;
   }
   if (st.anvilTimer <= CAST_COMPLETE_EPS) {

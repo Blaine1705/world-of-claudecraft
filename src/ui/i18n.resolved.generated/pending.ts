@@ -205,6 +205,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -216,7 +217,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "fr_CA": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -286,6 +288,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -297,7 +300,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "en_CA": [],
   "it_IT": [
@@ -368,6 +372,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -379,7 +384,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "de_DE": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -449,6 +455,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -460,7 +467,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition"
@@ -542,6 +550,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -553,7 +562,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition"
@@ -626,6 +636,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -637,7 +648,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "nl_NL": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -707,6 +719,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -718,7 +731,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "pl_PL": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -788,6 +802,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -799,7 +814,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "id_ID": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -869,6 +885,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -880,7 +897,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "tr_TR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -950,6 +968,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -961,7 +980,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "sv_SE": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1031,6 +1051,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -1042,7 +1063,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "vi_VN": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1112,6 +1134,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -1123,7 +1146,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ],
   "da_DK": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1193,6 +1217,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild",
     "hudChrome.varkhulCallout.addsDefeated",
+    "hudChrome.varkhulCallout.artificerApproaches",
     "hudChrome.varkhulCallout.bothPillars",
     "hudChrome.varkhulCallout.bothPillarsCharging",
     "hudChrome.varkhulCallout.heat75",
@@ -1204,6 +1229,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.rightPillarCharging",
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
-    "hudChrome.varkhulCallout.worldfireConsumed"
+    "hudChrome.varkhulCallout.worldfireConsumed",
+    "hudChrome.varkhulWaveStatus"
   ]
 };

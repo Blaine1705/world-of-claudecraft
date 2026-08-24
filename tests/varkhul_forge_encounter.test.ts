@@ -18,6 +18,8 @@ import {
   VARKHUL_FORGESTORM_CAST_ID,
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MASTERPIECE_UNBOUND_AURA_ID,
+  VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
+  VARKHUL_RED_HOT_METAL_AURA_ID,
 } from '../src/sim/encounters/varkhul';
 import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
@@ -27,13 +29,13 @@ import {
   VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
-  VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
   VARKHUL_CINDER_REPAIR_CAST_ID,
   VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
   VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
   VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
   VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
-  varkhulCinderRepairAmount,
+  VARKHUL_CINDER_REPAIR_TICK_SECONDS,
+  varkhulCinderRepairTickAmount,
 } from '../src/sim/varkhul_cinder_artificer';
 import {
   VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
@@ -44,11 +46,12 @@ import {
   varkhulForgeMeltdownTickDamageMaxHp,
 } from '../src/sim/varkhul_forge_beams';
 import {
+  VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS,
+  VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS,
   VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC,
   VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL,
   VARKHUL_FORGE_LOCAL_POS,
   VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
-  VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_FORGE_PRESSURE_BEAM_SECONDS,
   VARKHUL_FORGE_PRESSURE_HP_THRESHOLD,
   VARKHUL_FORGE_TEACHING_BEAM_SECONDS,
@@ -56,6 +59,13 @@ import {
   VARKHUL_WORK_FACING,
   VARKHUL_WORK_LOCAL_POS,
 } from '../src/sim/varkhul_forge_intermission';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_EVERY_SECONDS,
+  VARKHUL_SHARED_PYRE_FIRST_SECONDS,
+  VARKHUL_SHARED_PYRE_NAME,
+  VARKHUL_SHARED_PYRE_RADIUS,
+} from '../src/sim/varkhul_shared_pyre';
 import {
   VARKHUL_WORLDFIRE_ABILITY_ID,
   VARKHUL_WORLDFIRE_DAMAGE_MAX_HP,
@@ -226,6 +236,12 @@ describe('Varkhul forge pillars and add intermission', () => {
     updateVarkhulEncounter(sim.ctx, boss);
     const state = boss.varkhul;
     if (!state) throw new Error('Varkhul state missing');
+    for (const pending of state.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    for (const id of state.assemblyAddIds) {
+      const add = sim.entities.get(id);
+      if (add && add.templateId !== VARKHUL_CINDER_ARTIFICER_ID) add.dead = true;
+    }
     const nextWaveIndex = state.assemblyNextWaveIndex;
     state.assemblyNextWaveRemaining = DT;
     state.assemblyArtificerNextSpawnRemaining = DT;
@@ -237,11 +253,16 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyArtificerPortalSpawns).toEqual([{ portalIndex: 0, remaining: 2 }]);
     expect(state.assemblyArtificerSpawnIndex).toBe(1);
     expect(state.assemblyArtificerNextSpawnRemaining).toBe(VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS);
+    expect(
+      sim.events.filter(
+        (event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches',
+      ),
+    ).toHaveLength(1);
 
     const ordinaryRemaining = state.assemblyNextWaveRemaining;
     const artificerRemaining = state.assemblyArtificerNextSpawnRemaining;
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyNextWaveRemaining).toBeCloseTo(ordinaryRemaining - DT, 8);
+    expect(state.assemblyNextWaveRemaining).toBe(ordinaryRemaining);
     expect(state.assemblyArtificerNextSpawnRemaining).toBeCloseTo(artificerRemaining - DT, 8);
 
     state.assemblyArtificerPortalSpawns[0].remaining = DT;
@@ -398,7 +419,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(artificer.castTargetId).toBe(boss.id);
     expect(artificer.castRemaining).toBe(VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS);
     expect(artificer.channeling).toBe(true);
-    expect(artificer.channelTickTimer).toBe(VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS);
+    expect(artificer.channelTickTimer).toBe(VARKHUL_CINDER_REPAIR_TICK_SECONDS);
     expect(sim.events.slice(eventStart)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -428,23 +449,30 @@ describe('Varkhul forge pillars and add intermission', () => {
             event.ability === VARKHUL_CINDER_REPAIR_CAST_ID,
         );
     expect(beamEvents()).toHaveLength(1);
-    for (let tick = 0; tick < 8; tick++) {
+    for (let tick = 0; tick < VARKHUL_CINDER_REPAIR_TICK_SECONDS / DT - 1; tick++) {
       updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     }
     expect(beamEvents()).toHaveLength(1);
+    expect(boss.hp).toBe(hpBefore);
     updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     expect(beamEvents()).toHaveLength(2);
+    const tickHeal = varkhulCinderRepairTickAmount(boss.maxHp, state.assemblyRuneDifficulty);
+    expect(boss.hp).toBe(hpBefore + tickHeal);
 
-    for (let tick = 9; tick < VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / DT - 1; tick++) {
+    for (
+      let tick = VARKHUL_CINDER_REPAIR_TICK_SECONDS / DT;
+      tick < VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / DT - 1;
+      tick++
+    ) {
       updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     }
-    expect(boss.hp).toBe(hpBefore);
     expect(artificer.castingAbility).toBe(VARKHUL_CINDER_REPAIR_CAST_ID);
     const completionStart = sim.events.length;
     updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
 
     expect(boss.hp).toBe(
-      hpBefore + varkhulCinderRepairAmount(boss.maxHp, state.assemblyRuneDifficulty),
+      hpBefore +
+        tickHeal * (VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_TICK_SECONDS),
     );
     expect(artificer.castingAbility).toBeNull();
     expect(artificer.channeling).toBe(false);
@@ -548,7 +576,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(artificer.castingAbility).toBeNull();
   });
 
-  it('repairs exactly six percent in Normal through the real six-second channel', () => {
+  it('repairs two percent each second for six seconds in Normal', () => {
     const { sim, boss } = claimedEncounter(743);
     boss.hp = Math.floor(boss.maxHp * 0.5);
     updateVarkhulEncounter(sim.ctx, boss);
@@ -567,14 +595,170 @@ describe('Varkhul forge pillars and add intermission', () => {
     const hpBefore = boss.hp;
 
     updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
-    for (let tick = 0; tick < 119; tick++) {
+    const tickHeal = varkhulCinderRepairTickAmount(boss.maxHp, 'normal');
+    for (let second = 1; second <= 6; second++) {
+      for (let tick = 1; tick < VARKHUL_CINDER_REPAIR_TICK_SECONDS / DT; tick++) {
+        updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+      }
+      expect(boss.hp - hpBefore).toBe(tickHeal * (second - 1));
       updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+      expect(boss.hp - hpBefore).toBe(tickHeal * second);
     }
-    expect(boss.hp).toBe(hpBefore);
-    updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
-
-    expect(boss.hp - hpBefore).toBe(Math.round(boss.maxHp * 0.06));
+    expect(boss.hp - hpBefore).toBe(Math.round(boss.maxHp * 0.12));
     expect(state.assemblyArtificerRepaired).toBe(true);
+  });
+
+  it.each([
+    { heroic: false, required: 4, totalDamage: 1.4 },
+    { heroic: true, required: 5, totalDamage: 2 },
+  ])(
+    'casts Shared Pyre on a clean non-tank and splits its $heroic damage',
+    ({ heroic, required, totalDamage }) => {
+      const { sim, boss } = claimedEncounter(heroic ? 781 : 780, heroic);
+      const clean = [
+        addEncounterPlayer(sim, boss, 'PyreCleanA'),
+        addEncounterPlayer(sim, boss, 'PyreCleanB'),
+        addEncounterPlayer(sim, boss, 'PyreCleanC'),
+        addEncounterPlayer(sim, boss, 'PyreCleanD'),
+      ];
+      const redHot = addEncounterPlayer(sim, boss, 'PyreRedHot');
+      const absorbed = addEncounterPlayer(sim, boss, 'PyreAbsorbed');
+      sim.ctx.applyAura(redHot, {
+        id: VARKHUL_RED_HOT_METAL_AURA_ID,
+        name: 'Red-hot Metal',
+        kind: 'dot',
+        remaining: 10,
+        duration: 10,
+        value: 1,
+        sourceId: boss.id,
+        school: 'fire',
+      });
+      sim.ctx.applyAura(absorbed, {
+        id: VARKHUL_RED_HOT_METAL_ABSORB_AURA_ID,
+        name: 'Red-hot Metal Barrier',
+        kind: 'heal_absorb',
+        remaining: 10,
+        duration: 10,
+        value: 1,
+        sourceId: boss.id,
+        school: 'fire',
+      });
+      updateVarkhulEncounter(sim.ctx, boss);
+      const state = boss.varkhul;
+      if (!state) throw new Error('Varkhul state missing');
+      state.forgeBeamTeachingTriggered = true;
+      state.frontalTimer = 999;
+      state.cinderOrbsTimer = 999;
+      state.anvilTimer = 999;
+      state.interceptBeamTimer = 999;
+      state.sharedPyreTimer = DT;
+
+      updateVarkhulEncounter(sim.ctx, boss);
+
+      const target =
+        state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+      if (!target) throw new Error('Shared Pyre did not select a target');
+      expect(clean.map((player) => player.id)).toContain(target.id);
+      expect([sim.player.id, redHot.id, absorbed.id]).not.toContain(target.id);
+      expect(
+        target.auras.find(
+          (aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID && aura.sourceId === boss.id,
+        ),
+      ).toMatchObject({ stacks: required, remaining: 6, duration: 6 });
+
+      const allPlayers = [sim.player, ...clean, redHot, absorbed];
+      for (const [index, player] of allPlayers.entries()) {
+        player.maxHp = 100_000;
+        player.hp = 100_000;
+        player.damageImmune = false;
+        player.pos = sim.ctx.groundPos(boss.pos.x + 30 + index * 2, boss.pos.z);
+        player.prevPos = { ...player.pos };
+      }
+      const inside = [
+        target,
+        sim.player,
+        ...clean.filter((player) => player.id !== target.id),
+      ].slice(0, required + 1);
+      const anchor = sim.ctx.groundPos(boss.pos.x + 10, boss.pos.z);
+      for (const [index, player] of inside.entries()) {
+        player.pos =
+          index === inside.length - 1
+            ? sim.ctx.groundPos(anchor.x + VARKHUL_SHARED_PYRE_RADIUS, anchor.z)
+            : sim.ctx.groundPos(anchor.x + index * 0.35, anchor.z);
+        player.prevPos = { ...player.pos };
+      }
+      for (let tick = 0; tick < 120; tick++) updateVarkhulEncounter(sim.ctx, boss);
+
+      for (const player of inside) {
+        expect(player.hp).toBe(100_000 - Math.ceil((100_000 * totalDamage) / inside.length));
+      }
+      for (const player of allPlayers.filter(
+        (candidate) => !inside.some((player) => player.id === candidate.id),
+      )) {
+        expect(player.hp).toBe(100_000);
+      }
+      expect(state.majorAbility).toBe('none');
+      expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+    },
+  );
+
+  it('starts Shared Pyre naturally at twenty seconds and recasts thirty-eight seconds later', () => {
+    const { sim, boss } = claimedEncounter(782);
+    addEncounterPlayer(sim, boss, 'PyreCadenceDps');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.forgeBeamTeachingTriggered = true;
+    state.frontalTimer = 999;
+    state.cinderOrbsTimer = 999;
+    state.anvilTimer = 999;
+    state.interceptBeamTimer = 999;
+    expect(state.sharedPyreTimer).toBeCloseTo(VARKHUL_SHARED_PYRE_FIRST_SECONDS - DT, 8);
+
+    for (let tick = 2; tick < VARKHUL_SHARED_PYRE_FIRST_SECONDS / DT; tick++) {
+      updateVarkhulEncounter(sim.ctx, boss);
+      expect(state.majorAbility).toBe('none');
+    }
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('sharedPyre');
+    for (let tick = 0; tick < 120; tick++) updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTimer).toBe(VARKHUL_SHARED_PYRE_EVERY_SECONDS);
+
+    for (let tick = 1; tick < VARKHUL_SHARED_PYRE_EVERY_SECONDS / DT; tick++) {
+      updateVarkhulEncounter(sim.ctx, boss);
+      expect(state.majorAbility).toBe('none');
+    }
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('sharedPyre');
+  });
+
+  it('waits when every living non-tank still carries Red-hot Metal', () => {
+    const { sim, boss } = claimedEncounter(783);
+    const marked = addEncounterPlayer(sim, boss, 'PyreMarkedDps');
+    sim.ctx.applyAura(marked, {
+      id: VARKHUL_RED_HOT_METAL_AURA_ID,
+      name: 'Red-hot Metal',
+      kind: 'dot',
+      remaining: 10,
+      duration: 10,
+      value: 1,
+      sourceId: boss.id,
+      school: 'fire',
+    });
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.forgeBeamTeachingTriggered = true;
+    state.frontalTimer = 999;
+    state.cinderOrbsTimer = 999;
+    state.anvilTimer = 999;
+    state.interceptBeamTimer = 999;
+    state.sharedPyreTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(state.sharedPyreTimer).toBe(1);
   });
 
   it.each(['silence', 'range', 'boss-death'] as const)(
@@ -796,7 +980,7 @@ describe('Varkhul forge pillars and add intermission', () => {
   });
 
   it('pauses Meltdown, then resumes pending and future portals with a fresh pillar warning', () => {
-    const { sim, boss } = claimedEncounter(731);
+    const { sim, boss } = claimedEncounter(731, true);
     const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
     if (!instance) throw new Error('Varkhul instance missing');
     const origin = sim.ctx.instanceOriginOf(instance);
@@ -994,7 +1178,8 @@ describe('Varkhul forge pillars and add intermission', () => {
       sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'bothPillars'),
     ).toHaveLength(ignitionCalloutsBeforeResume + 1);
 
-    expect(state.assemblyNextWaveIndex).toBe(state.assemblyIntermissionWaves);
+    expect(state.assemblyNextWaveIndex).toBe(nextWaveIndexBeforeMeltdown + 1);
+    expect(state.assemblyNextWaveIndex).toBeLessThan(state.assemblyIntermissionWaves);
     expect(state.assemblyPortalSpawns).toEqual([]);
 
     state.assemblyRemaining = DT;
@@ -1013,9 +1198,19 @@ describe('Varkhul forge pillars and add intermission', () => {
       5,
     );
 
-    for (const id of state.assemblyAddIds) {
-      const add = sim.entities.get(id);
-      if (add) add.dead = true;
+    const killAllAdds = () => {
+      for (const id of state.assemblyAddIds) {
+        const add = sim.entities.get(id);
+        if (add) add.dead = true;
+      }
+    };
+    killAllAdds();
+    while (state.assemblyNextWaveIndex < state.assemblyIntermissionWaves) {
+      state.assemblyNextWaveRemaining = DT;
+      updateVarkhulEncounter(sim.ctx, boss);
+      for (const pending of state.assemblyPortalSpawns) pending.remaining = DT;
+      updateVarkhulEncounter(sim.ctx, boss);
+      killAllAdds();
     }
     updateVarkhulEncounter(sim.ctx, boss);
     expect(state.assemblyPhase).toBe('stunned');
@@ -1036,15 +1231,15 @@ describe('Varkhul forge pillars and add intermission', () => {
     state.assemblyForgeBeamActiveMask = 1;
     state.assemblyForgeBeamWarmupRemaining = 0;
     state.assemblyForgeOverheat = 0.999;
-    state.majorAbility = 'forgestorm';
-    state.forgestormWarningRemaining = DT;
-    state.forgestormPoints = [{ ...sim.player.pos }];
+    state.majorAbility = 'sharedPyre';
+    state.sharedPyreRemaining = DT;
+    state.sharedPyreTargetId = sim.player.id;
     state.makersBrandTimer = DT;
     state.frontalTimer = DT;
     state.cinderOrbsTimer = DT;
-    state.forgestormTimer = DT;
+    state.sharedPyreTimer = DT;
     state.anvilTimer = DT;
-    boss.castingAbility = 'forgestorm';
+    boss.castingAbility = VARKHUL_SHARED_PYRE_NAME;
     boss.castRemaining = DT;
     boss.hp = boss.maxHp * 0.19;
 
@@ -1097,7 +1292,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     if (!state) throw new Error('Varkhul state missing');
     state.frontalTimer = 10;
     state.cinderOrbsTimer = 10;
-    state.forgestormTimer = 10;
+    state.sharedPyreTimer = 10;
     state.anvilTimer = 10;
     state.interceptBeamTimer = 10;
     boss.hp = Math.floor(boss.maxHp * 0.8);
@@ -1108,14 +1303,14 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect([
       state.frontalTimer,
       state.cinderOrbsTimer,
-      state.forgestormTimer,
+      state.sharedPyreTimer,
       state.anvilTimer,
       state.interceptBeamTimer,
     ]).toEqual([10, 10, 10, 10, 10]);
     const majorTimers = () => [
       state.frontalTimer,
       state.cinderOrbsTimer,
-      state.forgestormTimer,
+      state.sharedPyreTimer,
       state.anvilTimer,
       state.interceptBeamTimer,
     ];
@@ -1403,11 +1598,11 @@ describe('Varkhul forge pillars and add intermission', () => {
     },
   );
 
-  it.each(['cinderOrbs', 'forgestorm', 'interceptBeam', 'anvil'] as const)(
+  it.each(['cinderOrbs', 'sharedPyre', 'interceptBeam', 'anvil'] as const)(
     'preserves an active %s sequence when Normal crosses 20%%',
     (majorAbility) => {
       const { sim, boss } = claimedEncounter(
-        770 + ['cinderOrbs', 'forgestorm', 'interceptBeam', 'anvil'].indexOf(majorAbility),
+        770 + ['cinderOrbs', 'sharedPyre', 'interceptBeam', 'anvil'].indexOf(majorAbility),
       );
       updateVarkhulEncounter(sim.ctx, boss);
       const state = boss.varkhul;
@@ -1421,11 +1616,25 @@ describe('Varkhul forge pillars and add intermission', () => {
       state.cinderOrbsTargetIds = [sim.player.id];
       state.forgestormWarningRemaining = 1;
       state.forgestormPoints = [{ ...sim.player.pos }];
+      state.sharedPyreTargetId = sim.player.id;
+      state.sharedPyreRemaining = 1;
       state.interceptBeamCastRemaining = 1;
       state.interceptBeamTargetId = sim.player.id;
       state.anvilStrikeRemaining = 1;
       boss.castingAbility = `active-${majorAbility}`;
       boss.castRemaining = 1;
+      if (majorAbility === 'sharedPyre') {
+        sim.ctx.applyAura(sim.player, {
+          id: VARKHUL_SHARED_PYRE_AURA_ID,
+          name: VARKHUL_SHARED_PYRE_NAME,
+          kind: 'vulnerability',
+          remaining: 1,
+          duration: 1,
+          value: 0,
+          sourceId: boss.id,
+          school: 'fire',
+        });
+      }
       boss.damageFloorHp = undefined;
       boss.hp = Math.floor(boss.maxHp * 0.2);
 
@@ -1435,7 +1644,7 @@ describe('Varkhul forge pillars and add intermission', () => {
       expect(state.majorAbility).toBe(majorAbility);
       expect(boss.castingAbility).not.toBeNull();
       if (majorAbility === 'cinderOrbs') expect(state.cinderOrbsMarkRemaining).toBeLessThan(1);
-      if (majorAbility === 'forgestorm') expect(state.forgestormWarningRemaining).toBeLessThan(1);
+      if (majorAbility === 'sharedPyre') expect(state.sharedPyreRemaining).toBeLessThan(1);
       if (majorAbility === 'interceptBeam') {
         expect(state.interceptBeamCastRemaining).toBeLessThan(1);
       }
@@ -1458,7 +1667,7 @@ describe('Varkhul forge pillars and add intermission', () => {
 
     state.makersBrandTimer = DT;
     state.cinderOrbsTimer = DT;
-    state.forgestormTimer = DT;
+    state.sharedPyreTimer = DT;
     state.interceptBeamTimer = DT;
     state.frontalTimer = 999;
     state.anvilTimer = 999;
@@ -1474,7 +1683,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.majorAbility).toBe('none');
     expect(state.makersBrandTimer).toBe(DT);
     expect(state.cinderOrbsTimer).toBe(DT);
-    expect(state.forgestormTimer).toBe(DT);
+    expect(state.sharedPyreTimer).toBe(DT);
     expect(state.interceptBeamTimer).toBe(DT);
     expect(abilities).not.toContain('Living Forge');
     expect(
@@ -1988,111 +2197,105 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyForgeBeamBlockerIds).toEqual([sim.player.id, rightBlocker.id]);
   });
 
-  it.each([
-    { heroic: false, waves: 3, adds: 12, lastSpawnTick: 360 },
-    { heroic: true, waves: 4, adds: 20, lastSpawnTick: 520 },
-  ])(
-    'uses real two-second portals and eight-second $heroic wave cadence without runes or teleports',
-    ({ heroic, waves, adds, lastSpawnTick }) => {
-      const { sim, boss } = claimedEncounter(heroic ? 711 : 712, heroic);
-      const rightBlocker = addTank(sim, boss, 'RightBlocker');
-      const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
-      if (!instance) throw new Error('Varkhul instance missing');
-      const origin = sim.ctx.instanceOriginOf(instance);
-      const forge = {
-        x: origin.x + VARKHUL_FORGE_LOCAL_POS.x,
-        z: origin.z + VARKHUL_FORGE_LOCAL_POS.z,
-      };
-      sim.player.pos = sim.ctx.groundPos(forge.x - 14, forge.z);
-      sim.player.prevPos = { ...sim.player.pos };
-      rightBlocker.pos = sim.ctx.groundPos(forge.x + 14, forge.z);
-      rightBlocker.prevPos = { ...rightBlocker.pos };
-      const positionsBefore = [sim.player, rightBlocker].map((player) => ({ ...player.pos }));
-      boss.hp = Math.floor(boss.maxHp * 0.5);
+  it('waits for a Normal wave to die, then telegraphs the next wave after three seconds', () => {
+    const { sim, boss } = claimedEncounter(712);
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.assemblyArtificerNextSpawnRemaining = 999;
+    const portalEvents = () =>
+      sim.events.filter(
+        (event) => event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
+      );
+    expect(state.assemblyIntermissionWaves).toBe(3);
+    expect(portalEvents()).toHaveLength(4);
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
+      addWave: 1,
+      addWaves: 3,
+      addsRemaining: 4,
+    });
+    for (const pending of state.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyAddIds).toHaveLength(4);
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addWave: 1, addsRemaining: 4 });
 
+    state.assemblyNextWaveRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyNextWaveIndex).toBe(1);
+    expect(state.assemblyNextWaveRemaining).toBe(VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS);
+    expect(state.assemblyPortalSpawns).toEqual([]);
+
+    for (const id of state.assemblyAddIds) {
+      const add = sim.entities.get(id);
+      if (add) add.dead = true;
+    }
+    for (let tick = 1; tick < VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS / DT; tick++) {
       updateVarkhulEncounter(sim.ctx, boss);
-      const state = boss.varkhul;
-      if (!state) throw new Error('Varkhul state missing');
-      expect(state.assemblyPortalSpawns).toHaveLength(heroic ? 5 : 4);
-      expect(state.assemblyAddIds).toEqual([]);
-      expect(state.assemblyRemaining).toBeCloseTo(
-        (heroic
-          ? VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC
-          : VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL) - DT,
-        5,
-      );
-      expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
-        runes: [],
-        assignments: [],
-        cores: [],
-      });
-      const portalEvents = () =>
-        sim.events.filter(
-          (event) =>
-            event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
-        );
-      expect(portalEvents()).toHaveLength(4);
-      expect(
-        new Set(
-          portalEvents().map((event) =>
-            event.type === 'spellfxAt'
-              ? `${(event.x - origin.x).toFixed(2)}:${(event.z - origin.z).toFixed(2)}`
-              : '',
-          ),
-        ),
-      ).toEqual(
-        new Set(
-          VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS.map(
-            (portal) => `${portal.x.toFixed(2)}:${portal.z.toFixed(2)}`,
-          ),
-        ),
-      );
-      expect(
-        portalEvents().every(
-          (event) =>
-            event.type === 'spellfxAt' && event.duration === VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
-        ),
-      ).toBe(true);
+    }
+    expect(state.assemblyNextWaveIndex).toBe(1);
+    expect(state.assemblyPortalSpawns).toEqual([]);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyNextWaveIndex).toBe(2);
+    expect(state.assemblyPortalSpawns).toHaveLength(4);
+    expect(portalEvents()).toHaveLength(8);
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addWave: 2, addsRemaining: 4 });
+  });
 
-      for (let tick = 0; tick < 38; tick++) updateVarkhulEncounter(sim.ctx, boss);
-      expect(state.assemblyAddIds).toEqual([]);
-      updateVarkhulEncounter(sim.ctx, boss);
-      expect(state.assemblyAddIds).toHaveLength(heroic ? 5 : 4);
+  it('counts an Artificer while its independent portal is pending and after it spawns', () => {
+    const { sim, boss } = claimedEncounter(714);
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addsRemaining: 4 });
+    state.assemblyArtificerPortalSpawns.push({ portalIndex: 0, remaining: DT });
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addsRemaining: 5 });
 
-      for (let totalTick = 41; totalTick <= lastSpawnTick; totalTick++) {
-        updateVarkhulEncounter(sim.ctx, boss);
-        if (totalTick % 160 === 0) {
-          const independentArtificerPortals = totalTick >= 200 ? 1 : 0;
-          expect(portalEvents()).toHaveLength(
-            4 * (totalTick / 160 + 1) + independentArtificerPortals,
-          );
-        }
-        if (totalTick >= 200 && (totalTick - 40) % 160 === 0) {
-          const spawnedWaves = (totalTick - 40) / 160 + 1;
-          const ordinaryAdds = state.assemblyAddIds.filter(
-            (id) => sim.entities.get(id)?.templateId !== VARKHUL_CINDER_ARTIFICER_ID,
-          );
-          expect(ordinaryAdds).toHaveLength(spawnedWaves * (heroic ? 5 : 4));
-        }
-      }
-      expect(portalEvents()).toHaveLength(waves * 4 + 1);
-      const ordinaryAdds = state.assemblyAddIds.filter(
-        (id) => sim.entities.get(id)?.templateId !== VARKHUL_CINDER_ARTIFICER_ID,
-      );
-      expect(ordinaryAdds).toHaveLength(adds);
-      expect(
-        state.assemblyAddIds.filter(
-          (id) => sim.entities.get(id)?.templateId === VARKHUL_CINDER_ARTIFICER_ID,
-        ),
-      ).toHaveLength(1);
-      expect([sim.player.pos, rightBlocker.pos]).toEqual(positionsBefore);
-      expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
-        runes: [],
-        assignments: [],
-        cores: [],
-      });
-    },
-  );
+    updateVarkhulEncounter(sim.ctx, boss);
+    const artificer = state.assemblyAddIds
+      .map((id) => sim.entities.get(id))
+      .find((add) => add?.templateId === VARKHUL_CINDER_ARTIFICER_ID);
+    if (!artificer) throw new Error('Artificer did not spawn for projection coverage');
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addsRemaining: 5 });
+    artificer.dead = true;
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addsRemaining: 4 });
+  });
+
+  it('overlaps Heroic waves after fourteen seconds or queues early when the prior wave dies', () => {
+    const timed = claimedEncounter(711, true);
+    timed.boss.hp = Math.floor(timed.boss.maxHp * 0.5);
+    updateVarkhulEncounter(timed.sim.ctx, timed.boss);
+    const timedState = timed.boss.varkhul;
+    if (!timedState) throw new Error('Varkhul state missing');
+    timedState.assemblyArtificerNextSpawnRemaining = 999;
+    for (const pending of timedState.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(timed.sim.ctx, timed.boss);
+    expect(timedState.assemblyAddIds).toHaveLength(5);
+    timedState.assemblyNextWaveRemaining = DT;
+    updateVarkhulEncounter(timed.sim.ctx, timed.boss);
+    expect(timedState.assemblyNextWaveIndex).toBe(2);
+    expect(timedState.assemblyPortalSpawns).toHaveLength(5);
+    expect(timedState.assemblyNextWaveRemaining).toBe(VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS);
+
+    const early = claimedEncounter(713, true);
+    early.boss.hp = Math.floor(early.boss.maxHp * 0.5);
+    updateVarkhulEncounter(early.sim.ctx, early.boss);
+    const earlyState = early.boss.varkhul;
+    if (!earlyState) throw new Error('Varkhul state missing');
+    earlyState.assemblyArtificerNextSpawnRemaining = 999;
+    for (const pending of earlyState.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(early.sim.ctx, early.boss);
+    for (const id of earlyState.assemblyAddIds) {
+      const add = early.sim.entities.get(id);
+      if (add) add.dead = true;
+    }
+    earlyState.assemblyNextWaveRemaining = 13;
+    updateVarkhulEncounter(early.sim.ctx, early.boss);
+    expect(earlyState.assemblyNextWaveIndex).toBe(2);
+    expect(earlyState.assemblyPortalSpawns).toHaveLength(5);
+    expect(earlyState.assemblyNextWaveRemaining).toBe(VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS);
+  });
 
   it('waits for future and pending waves even when every add already spawned is dead', () => {
     const { sim, boss } = claimedEncounter(725);
@@ -2375,6 +2578,7 @@ describe('Varkhul forge pillars and add intermission', () => {
         sim.player.auras.find((aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID),
       ).toMatchObject({ stacks: 1, remaining: resetSeconds });
     },
+    40_000,
   );
 
   it('cools idle Normal heat, preserves Heroic heat, and announces both danger thresholds once', () => {
@@ -2463,7 +2667,7 @@ describe('Varkhul forge pillars and add intermission', () => {
   });
 
   it('makes each portal Warden pursue, melee, cast Quake, and recast on cadence', () => {
-    const { sim, boss } = claimedEncounter(704);
+    const { sim, boss } = claimedEncounter(704, true);
     sim.player.autoAttack = false;
     sim.player.damageImmune = false;
     sim.player.maxHp = 100_000;
@@ -2560,12 +2764,24 @@ describe('Varkhul forge pillars and add intermission', () => {
     warden.swingTimer = 999;
     state.assemblyForgeOverheat = 0.2;
     const hpBeforeQuake = sim.player.hp;
+    const quakeDamage: number[] = [];
     for (let tick = 0; tick < 60 && warden.castingAbility === 'crucible_quake'; tick++) {
-      sim.tick();
+      for (const event of sim.tick()) {
+        if (
+          event.type === 'damage' &&
+          event.sourceId === warden.id &&
+          event.ability === 'Crucible Quake'
+        ) {
+          quakeDamage.push(event.amount);
+        }
+      }
     }
     expect(warden.castingAbility).toBeNull();
     expect(sim.player.hp).toBeLessThan(hpBeforeQuake);
-    expect(state.assemblyForgeOverheat).toBeCloseTo(0.28, 8);
+    expect(quakeDamage).toHaveLength(1);
+    expect(quakeDamage[0]).toBeGreaterThanOrEqual(260);
+    expect(quakeDamage[0]).toBeLessThanOrEqual(330);
+    expect(state.assemblyForgeOverheat).toBeCloseTo(0.3, 8);
     for (let tick = 0; tick < 240 && warden.castingAbility !== 'crucible_quake'; tick++) {
       sim.tick();
     }

@@ -2296,6 +2296,7 @@ export const ja_JP: EnTranslations = {
       "rightPillar": "右の鍛冶柱が点火した！",
       "bothPillars": "鍛冶柱が点火した！",
       "portalsOpening": "鍛冶炉のポータルが開き始めた！",
+      "artificerApproaches": "火の粉の技工士が鍛冶炉へ接近している！",
       "heat75": "鍛冶炉の熱が75%に達した！",
       "heat90": "鍛冶炉メルトダウンが迫っている！",
       "addsDefeated": "鍛冶軍団を倒した。ヴァークルが無防備になった！",
@@ -2303,6 +2304,7 @@ export const ja_JP: EnTranslations = {
       "worldfireClosing": "世界炎が迫っている。中央へ移動せよ！",
       "worldfireConsumed": "るつぼ全体が炎に包まれた！"
     },
+    "varkhulWaveStatus": "ウェーブ {wave}/{waves} | 敵: {remaining}",
     "auraEffect": {
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",

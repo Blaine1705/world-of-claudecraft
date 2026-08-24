@@ -19,6 +19,7 @@ const VARKHUL_CALLOUT_CUES = {
   rightPillar: 'impact_fire',
   bothPillars: 'impact_fire',
   portalsOpening: 'rift_portal_spawn',
+  artificerApproaches: 'rift_portal_spawn',
   heat75: 'impact_metal',
   heat90: 'meteor',
   addsDefeated: 'ui_achievement',

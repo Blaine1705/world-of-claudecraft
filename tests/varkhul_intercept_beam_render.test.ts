@@ -20,6 +20,9 @@ function assembly(blocked = false): ActiveVarkhulAssembly {
     forgeBeamActiveMask: 0,
     forgeBeamWarmupRemaining: 0,
     forgeMeltdownRemaining: 0,
+    addWave: 0,
+    addWaves: 0,
+    addsRemaining: 0,
     forgeBeams: [],
     interceptBeam: {
       sourceId: 90,

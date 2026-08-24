@@ -255,6 +255,10 @@ export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[]
       (assembly.mr as number) < 0 ||
       (assembly.win as number) < 0 ||
       (assembly.rem as number) < 0 ||
+      !(assembly.aw === undefined || nonNegativeInteger(assembly.aw)) ||
+      !(assembly.aws === undefined || nonNegativeInteger(assembly.aws)) ||
+      !(assembly.ar === undefined || nonNegativeInteger(assembly.ar)) ||
+      ((assembly.aw as number | undefined) ?? 0) > ((assembly.aws as number | undefined) ?? 0) ||
       !nonNegativeInteger(assembly.round) ||
       !nonNegativeInteger(assembly.rounds) ||
       (assembly.rounds as number) <= 0 ||
@@ -328,6 +332,9 @@ export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[]
           (assembly.bm as number | undefined) ?? (assembly.phase === 'links' ? 3 : 0),
         forgeBeamWarmupRemaining: assembly.bw as number,
         forgeMeltdownRemaining: assembly.mr as number,
+        addWave: (assembly.aw as number | undefined) ?? 0,
+        addWaves: (assembly.aws as number | undefined) ?? 0,
+        addsRemaining: (assembly.ar as number | undefined) ?? 0,
         forgeBeams: decodedBeams,
         interceptBeam,
         cores: cores as ActiveVarkhulMoltenCore[],

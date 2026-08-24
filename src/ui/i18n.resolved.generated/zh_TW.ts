@@ -2296,6 +2296,7 @@ export const zh_TW: EnTranslations = {
       "rightPillar": "右側鍛爐立柱點燃了！",
       "bothPillars": "鍛爐立柱點燃了！",
       "portalsOpening": "鍛爐傳送門正在開啟！",
+      "artificerApproaches": "燼火工匠正在接近鍛爐！",
       "heat75": "鍛爐熱量達到75%！",
       "heat90": "鍛爐熔毀迫在眉睫！",
       "addsDefeated": "鍛爐軍團已被擊敗，瓦庫爾暴露了！",
@@ -2303,6 +2304,7 @@ export const zh_TW: EnTranslations = {
       "worldfireClosing": "世界之火正在逼近，往中央移動！",
       "worldfireConsumed": "整座熔爐大廳都在燃燒！"
     },
+    "varkhulWaveStatus": "波次 {wave}/{waves} | 敵人: {remaining}",
     "auraEffect": {
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",

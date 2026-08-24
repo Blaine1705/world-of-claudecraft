@@ -7502,6 +7502,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.rightPillar': '오른쪽 용광로 기둥이 점화됩니다!',
   'hudChrome.varkhulCallout.bothPillars': '용광로 기둥들이 점화됩니다!',
   'hudChrome.varkhulCallout.portalsOpening': '용광로 차원문이 열리고 있습니다!',
+  'hudChrome.varkhulCallout.artificerApproaches': '불씨 기계공이 용광로로 접근합니다!',
+  'hudChrome.varkhulWaveStatus': '웨이브 {wave}/{waves} | 적: {remaining}',
   'hudChrome.varkhulCallout.heat75': '용광로 열기가 75%에 도달했습니다!',
   'hudChrome.varkhulCallout.heat90': '용광로 용융이 임박했습니다!',
   'hudChrome.varkhulCallout.addsDefeated': '용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!',

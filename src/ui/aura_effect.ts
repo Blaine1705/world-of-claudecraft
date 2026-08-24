@@ -61,6 +61,13 @@ import {
   SUNDER_ARMOR_PCT_PER_STACK,
 } from '../sim/types';
 import { VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS } from '../sim/varkhul_assembly';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_REQUIRED_HEROIC,
+  VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+  VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
+  VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
+} from '../sim/varkhul_shared_pyre';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -147,6 +154,18 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
         players: IGNIVAR_SOAK_REQUIRED_PLAYERS,
         perPlayer: round(total / IGNIVAR_SOAK_REQUIRED_PLAYERS),
       },
+    };
+  }
+  if (a.id === VARKHUL_SHARED_PYRE_AURA_ID) {
+    const players = Math.max(1, Math.floor(a.stacks ?? VARKHUL_SHARED_PYRE_REQUIRED_NORMAL));
+    const total = pctFromFrac(
+      players >= VARKHUL_SHARED_PYRE_REQUIRED_HEROIC
+        ? VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC
+        : VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
+    );
+    return {
+      key: `${KEY}.sharedPyre`,
+      nums: { total, players, perPlayer: round(total / players) },
     };
   }
   if (a.id === VARKHUL_MAKERS_BRAND_AURA_ID) {

@@ -2669,6 +2669,7 @@ export const hudChromeStrings = {
     rightPillar: 'The right forge pillar ignites!',
     bothPillars: 'The forge pillars ignite!',
     portalsOpening: 'The forge portals are opening!',
+    artificerApproaches: 'A Cinder Artificer is approaching the forge!',
     heat75: 'The forge is at 75% heat!',
     heat90: 'Forge Meltdown is imminent!',
     addsDefeated: 'The forge legion is defeated: Varkhul is exposed!',
@@ -2677,6 +2678,7 @@ export const hudChromeStrings = {
     worldfireClosing: 'Worldfire closes in. Move toward the center!',
     worldfireConsumed: 'The entire crucible is burning!',
   },
+  varkhulWaveStatus: 'Wave {wave}/{waves} | Enemies: {remaining}',
   auraEffect: {
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",

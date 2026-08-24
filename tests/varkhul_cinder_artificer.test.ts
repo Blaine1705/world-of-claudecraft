@@ -7,14 +7,14 @@ import {
   VARKHUL_CINDER_ARTIFICER_HEAL_PCT_NORMAL,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
-  VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
   VARKHUL_CINDER_REPAIR_CAST_ID,
   VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
   VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
   VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
   VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
+  VARKHUL_CINDER_REPAIR_TICK_SECONDS,
   varkhulCinderArtificerPortalIndex,
-  varkhulCinderRepairAmount,
+  varkhulCinderRepairTickAmount,
 } from '../src/sim/varkhul_cinder_artificer';
 
 describe('Varkhul Cinder Artificer', () => {
@@ -23,7 +23,7 @@ describe('Varkhul Cinder Artificer', () => {
     expect(VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS).toBe(18);
     expect(VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS).toBe(2);
     expect(VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS).toBe(6);
-    expect(VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS).toBe(0.45);
+    expect(VARKHUL_CINDER_REPAIR_TICK_SECONDS).toBe(1);
     expect(VARKHUL_CINDER_REPAIR_RETRY_SECONDS).toBe(2);
     expect(VARKHUL_CINDER_REPAIR_CAST_ID).toBe('cinder_recalibrate');
     expect(VARKHUL_CINDER_REPAIR_START_ANIMATION_ID).toBe('cinder_recalibrate_start');
@@ -39,10 +39,18 @@ describe('Varkhul Cinder Artificer', () => {
     ).toEqual([0, 1, 2, 3, 0, 1, 2, 3, 0]);
   });
 
-  it('repairs a fixed fraction of Varkhul on each completed channel', () => {
-    expect(VARKHUL_CINDER_ARTIFICER_HEAL_PCT_NORMAL).toBe(0.06);
-    expect(VARKHUL_CINDER_ARTIFICER_HEAL_PCT_HEROIC).toBe(0.08);
-    expect(varkhulCinderRepairAmount(80_000, 'normal')).toBe(4_800);
-    expect(varkhulCinderRepairAmount(80_000, 'heroic')).toBe(6_400);
+  it('repairs every second for six ticks, with a harsher Heroic channel', () => {
+    expect(VARKHUL_CINDER_ARTIFICER_HEAL_PCT_NORMAL).toBe(0.02);
+    expect(VARKHUL_CINDER_ARTIFICER_HEAL_PCT_HEROIC).toBe(0.03);
+    expect(varkhulCinderRepairTickAmount(120_000, 'normal')).toBe(2_400);
+    expect(varkhulCinderRepairTickAmount(200_000, 'heroic')).toBe(6_000);
+    expect(
+      varkhulCinderRepairTickAmount(120_000, 'normal') *
+        (VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_TICK_SECONDS),
+    ).toBe(14_400);
+    expect(
+      varkhulCinderRepairTickAmount(200_000, 'heroic') *
+        (VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_TICK_SECONDS),
+    ).toBe(36_000);
   });
 });

@@ -742,7 +742,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering in a spread formation. Defeat all three automaton packs to open the Herald gate, then use /dev ignivarraid again in Ignivar's room to place the soak pods. Use /dev ignivarraid boss to skip there now.`,
+        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering in a spread formation. Defeat all three automaton packs to open the Herald gate, then use /dev ignivarraid again in Ignivar's room to place the raid formation. Use /dev ignivarraid boss to skip there now.`,
       );
       return null;
     }
@@ -763,7 +763,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Ignivar raid ${result.reused ? 'reset' : 'ready'}: ${result.allies} stationary, invulnerable allies in spread soak pods. They stay outside Brand range; join the marked pod as the fourth Shared Pyre soaker. On Heroic, Chains of the Forge links all 10 players into five proximity pairs; stay within 10 yards of your partner, and never cross another pair's chain because it severs and kills the intruder.`,
+        `[dev] Ignivar raid ${result.reused ? 'reset' : 'ready'}: ${result.allies} stationary, invulnerable allies in spread groups outside Brand range. On Heroic, Chains of the Forge links all 10 players into five proximity pairs; stay within 10 yards of your partner, and never cross another pair's chain because it severs and kills the intruder.`,
       );
     }
     return null;

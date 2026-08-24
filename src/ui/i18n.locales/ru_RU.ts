@@ -7621,6 +7621,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.rightPillar': 'Правая колонна кузни зажигается!',
   'hudChrome.varkhulCallout.bothPillars': 'Колонны кузни зажигаются!',
   'hudChrome.varkhulCallout.portalsOpening': 'Порталы кузни открываются!',
+  'hudChrome.varkhulCallout.artificerApproaches':
+    'Искровой механик приближается к кузне!',
+  'hudChrome.varkhulWaveStatus': 'Волна {wave}/{waves} | Врагов: {remaining}',
   'hudChrome.varkhulCallout.heat75': 'Жар кузни достиг 75%!',
   'hudChrome.varkhulCallout.heat90': 'Расплавление кузни неизбежно!',
   'hudChrome.varkhulCallout.addsDefeated': 'Легион кузни повержен: Варкхул уязвим!',

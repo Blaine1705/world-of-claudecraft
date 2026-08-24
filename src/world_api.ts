@@ -147,7 +147,10 @@ export type {
 // 18 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
 // 120 degrees to 42 yards and 140 degrees. Epoch 17 clients would display a
 // dangerously smaller warning than the authoritative server damage.
-export const ONLINE_WORLD_LAYOUT_VERSION = 18 as const;
+// 19 = Shared Pyre moved from Ignivar to Varkhul with a different Normal and
+// Heroic split. Epoch 18 clients would receive the aura but omit its lethal
+// player-following soak warning.
+export const ONLINE_WORLD_LAYOUT_VERSION = 19 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

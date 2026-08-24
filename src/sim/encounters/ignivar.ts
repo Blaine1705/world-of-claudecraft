@@ -1144,115 +1144,15 @@ function clearSoakMark(player: Entity | undefined, bossId: number): void {
   );
 }
 
-function startSharedPyre(
+function clearLegacySharedPyreState(
   ctx: SimContext,
   boss: Entity,
   st: IgnivarEncounterState,
-  players: readonly Entity[],
-): void {
-  const tankIds = new Set<number>([boss.aggroTargetId ?? -1]);
-  for (const meta of ctx.players.values()) {
-    if (meta.talentMods.role === 'tank') tankIds.add(meta.entityId);
-  }
-  const unbranded = players.filter(
-    (player) =>
-      !tankIds.has(player.id) && !player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID),
-  );
-  const nonTanks = players.filter((player) => !tankIds.has(player.id));
-  const candidates =
-    unbranded.length > 0 ? unbranded : nonTanks.length > 0 ? nonTanks : [...players];
-  if (candidates.length === 0) return;
-  const target = candidates[ctx.rng.int(0, candidates.length - 1)];
-  st.soakTargetId = target.id;
-  st.soakRemaining = IGNIVAR_SOAK_CAST_SECONDS;
-  st.soakTimer = IGNIVAR_SOAK_EVERY;
-  ctx.applyAura(target, {
-    id: IGNIVAR_SOAK_AURA_ID,
-    name: 'Shared Pyre',
-    kind: 'vulnerability',
-    remaining: IGNIVAR_SOAK_CAST_SECONDS,
-    duration: IGNIVAR_SOAK_CAST_SECONDS,
-    value: 0,
-    sourceId: boss.id,
-    school: 'physical',
-    encounterOwned: true,
-  });
-  emitMobYell(ctx, boss, 'Four must share the pyre, or all will burn!');
-}
-
-function resolveSharedPyre(
-  ctx: SimContext,
-  boss: Entity,
-  st: IgnivarEncounterState,
-  players: readonly Entity[],
 ): void {
   const target = st.soakTargetId === null ? undefined : ctx.entities.get(st.soakTargetId);
-  const soakers = target
-    ? players.filter(
-        (player) =>
-          Math.hypot(player.pos.x - target.pos.x, player.pos.z - target.pos.z) <=
-          IGNIVAR_SOAK_RADIUS,
-      )
-    : [];
-  if (soakers.length > 0) {
-    const fraction = IGNIVAR_SOAK_SHARED_MAX_HP / soakers.length;
-    for (const player of soakers) {
-      ctx.dealDamage(
-        boss,
-        player,
-        Math.ceil(player.maxHp * fraction),
-        false,
-        'fire',
-        'Shared Pyre',
-        'hit',
-        true,
-        undefined,
-        false,
-        false,
-        true,
-      );
-    }
-  }
-  if (target) {
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: boss.id,
-      targetId: target.id,
-      school: 'fire',
-      fx: 'nova',
-    });
-  }
   clearSoakMark(target, boss.id);
   st.soakTargetId = null;
   st.soakRemaining = 0;
-}
-
-function updateSharedPyre(
-  ctx: SimContext,
-  boss: Entity,
-  st: IgnivarEncounterState,
-  players: readonly Entity[],
-  allowStart: boolean,
-): boolean {
-  if (st.soakTargetId === null) {
-    if (!allowStart) return false;
-    st.soakTimer -= DT;
-    if (st.soakTimer <= 0) {
-      startSharedPyre(ctx, boss, st, players);
-      return true;
-    }
-    return false;
-  }
-  st.soakRemaining = Math.max(0, st.soakRemaining - DT);
-  const target = ctx.entities.get(st.soakTargetId);
-  const aura = target?.auras.find(
-    (entry) => entry.id === IGNIVAR_SOAK_AURA_ID && entry.sourceId === boss.id,
-  );
-  if (aura) aura.remaining = st.soakRemaining;
-  if (st.soakRemaining > CAST_COMPLETE_EPS && target && !target.dead) return true;
-  resolveSharedPyre(ctx, boss, st, players);
-  spaceIgnivarMajorAbilities(st);
-  return true;
 }
 
 function updateLastInferno(
@@ -1574,6 +1474,9 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   const st = initIgnivarEncounter(boss);
+  // Shared Pyre now belongs to Varkhul. Clear an in-flight legacy mark from an
+  // older snapshot instead of letting it block Ignivar's remaining phases.
+  clearLegacySharedPyreState(ctx, boss, st);
   const conduits = conduitEntities(ctx, boss);
   updateMobTarget(ctx, boss);
   let target = resolveLivingTarget(boss, players);
@@ -1611,8 +1514,9 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
       return;
     }
   }
-  const sharedPyreBusy =
-    !finalPhase && updateSharedPyre(ctx, boss, st, players, !ignivarMajorAbilityActive(st));
+  // Shared Pyre moved to Varkhul. Keep the legacy state fields inert so old
+  // snapshots and developer fixtures remain readable during this branch.
+  const sharedPyreBusy = false;
   updateMeteorRain(ctx, boss, st, players, heroic);
   players = playersInEncounter(ctx, boss);
   target = resolveLivingTarget(boss, players);

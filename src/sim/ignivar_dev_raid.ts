@@ -103,11 +103,9 @@ export function stageIgnivarDevRaidAtApproach(ctx: SimContext, pid: number): Ign
 
 /**
  * Builds a deterministic, non-offensive raid roster for a solo Ignivar tester.
- * Three spread pods keep every bot outside Brand of the Pyre range while each
- * pod's three members remain inside Shared Pyre range. The tester joins the
- * marked pod as its fourth soaker. On Heroic, Forge Chains links all ten raid
- * members into five proximity pairs; standing beside a bot makes it the
- * tester's likely partner.
+ * Three spread groups keep every bot outside Brand of the Pyre range. On
+ * Heroic, Forge Chains links all ten raid members into five proximity pairs;
+ * standing beside a bot makes it the tester's likely partner.
  * Bots remain stationary and invulnerable.
  */
 export function setupIgnivarDevRaid(ctx: SimContext, pid: number): IgnivarDevRaidResult {

@@ -14,11 +14,11 @@ The route is ordered and shares one instance family:
 2. Crucible of the Last Spring: Ignivar, Herald of the Last Flame.
 3. Inner Crucible: Varkhul, Forgefather of the Last Flame.
 
-Normal Ignivar's fire, tank swap, frontal, conduit, movement cones, group soak,
-priority add, and final burn loops are playable. Varkhul adds a second tank
-swap, deterministic forge patterns, an add intermission, and a timed final burn.
-Heroic expansion beyond the existing Ignivar behavior remains deferred until
-Normal has been group-playtested.
+Normal Ignivar's fire, tank swap, frontal, conduit, movement cones, priority add,
+and final burn loops are playable. Varkhul adds a second tank swap, deterministic
+forge patterns, Shared Pyre, an escalating add intermission, and a timed final
+burn. Both encounters have explicit Heroic tuning, though final human raid
+balance remains gated on group playtesting and parse review.
 
 ## Story
 
@@ -153,18 +153,6 @@ geometry omits both gaps instead of covering them with decorative fire. No
 closed shock ring, lingering circular decal, or graphics setting may obscure or
 remove the safe lanes.
 
-## Shared Pyre
-
-After a 24-second opening delay and every 34 seconds thereafter, Ignivar marks a
-non-tank player with Shared Pyre for six seconds. The target gains a visible
-5.5-unit orange gathering circle. The intended group solution uses at least four
-living players. On resolution, the circle always splits 120% maximum health across
-only the living players inside it; players outside never take Shared Pyre damage.
-Fewer participants each receive a larger share, while an immune target can absorb a
-solo resolution without harming the raid. If the marked player dies first, the
-circle still resolves at their final position. Normal avoids selecting a Brand of
-the Pyre carrier when an unbranded non-tank is available.
-
 ## Tank swap
 
 Ignivar uses Forge Strike every 14 seconds while its target is in melee range.
@@ -189,7 +177,7 @@ At 20% health Ignivar enters Last Inferno. His attack speed increases by 20% and
 his melee damage increases by 35%. Falling Cinders repeats every nine seconds,
 Revolving Inferno repeats every 24 seconds and rotates at 160% of its normal
 speed, and a dedicated eight-second sequence alternates Searing Torrent with Rain
-of Cinders. Brand, Shared Pyre, Forge Strike, and Forge Wave stop queuing so the
+of Cinders. Brand, Forge Strike, and Forge Wave stop queuing so the
 finale remains demanding but readable. The raid has 45 seconds to kill him. Expiry
 is a hard encounter wipe and does not occupy the boss cast bar.
 
@@ -242,7 +230,9 @@ Varkhul waits in the Inner Crucible beside his grand forge and fights with a
 separate one-handed warhammer. The encounter uses existing cast, aura, facing,
 and ground-warning contracts wherever possible. Every actionable warning must
 retain the same geometry on Low and Ultra graphics and across offline and online
-worlds.
+worlds. Both bosses use 120,000 health on Normal. Heroic raises Ignivar to
+210,000 and Varkhul to 200,000 so the second encounter gains a substantial
+progression check without simply copying Nythraxis's 60% Heroic multiplier.
 
 ### Maker's Brand
 
@@ -300,12 +290,20 @@ the center and spread apart to separate the eighteen projectile origins. Fire
 positions, projectile positions, directions, and remaining travel times are
 authoritative snapshot state.
 
-### Forgestorm
+### Shared Pyre
 
-Forgestorm releases three waves of five deterministic impact circles. Every wave
-warns for 2.5 seconds, then deals 30% maximum health inside each four-yard circle.
-The active warnings are snapshot state, not event-only decoration, so reconnects
-and online clients receive the same remaining time and geometry.
+Shared Pyre replaces Forgestorm in Varkhul's ordinary major-ability rotation. It
+marks a non-tank for six seconds with a player-following 5.5-yard gathering circle.
+The target selector never chooses a player who still carries Red-hot Metal or its
+healing absorb. If no clean non-tank is available, the cast waits and retries instead
+of rewarding an uncleared fire mark with a hidden soak. Normal splits 140% maximum
+health across the living players in the circle and visually asks for four players;
+Heroic splits 200% and asks for five. Fewer players each take a larger share.
+
+The mechanic never overlaps an active crucible-pillar window, Tempering Ray, the
+add intermission, or Heroic Worldfire. Its occupancy runes, countdown and radius
+remain visible on every graphics tier, follow the marked player, and survive
+snapshot/reconnect through the authoritative aura.
 
 ### Anvil's Decree
 
@@ -358,14 +356,20 @@ Normal it replaces the pressure soak with the final pillar cycle. On Heroic it s
 the pillars down permanently and vents forge heat to 0% before Worldfire begins.
 
 Four large forge-fire portals stand near the room corners. Each add wave receives a
-two-second portal warning before its enemies emerge, and waves begin eight seconds
-apart. Normal schedules three waves of one Crucible Warden and three Ember Sentinels
-for twelve adds total. Heroic schedules four waves of one Warden and four Sentinels for
-twenty adds total. The intermission lasts at most sixty seconds on Normal or seventy on
-Heroic and ends early only after every scheduled add has spawned and died. The Warden
-pursues and melees while casting interruptible Crucible Quake every twelve seconds;
-every completed Quake also adds 8 percentage points of forge heat, while an interrupted
-Quake adds none. During the intermission Varkhul strikes the anvil every two seconds,
+two-second portal warning before its enemies emerge. Normal schedules three waves of
+one Crucible Warden and three Ember Sentinels for twelve adds total; the next portal
+waits until the current ordinary wave is dead, then opens three seconds later. Heroic
+schedules four waves of one Warden and four Sentinels for twenty adds total; the next
+portal opens as soon as the current wave dies or after fourteen seconds, whichever
+comes first, so slow kills deliberately overlap. A persistent forge label shows
+`Wave X/Y | Enemies: N`. The intermission lasts at most sixty seconds on Normal or
+seventy on Heroic and ends early only after every scheduled add has spawned and died.
+The Warden pursues and melees while casting interruptible Crucible Quake every twelve
+seconds. A completed Quake adds 8 percentage points of forge heat on Normal or 10 on
+Heroic; an interrupted Quake adds none. Heroic also raises Sentinel
+health by 20% and its melee, sweep and burn by 25%, and raises Warden health and melee
+by 25% while increasing Quake from 180-230 to 260-330 damage. During the intermission
+Varkhul strikes the anvil every two seconds,
 driving a visible forge burst, a hammer swing, and a positional metal impact cue.
 Sentinels use ordinary melee pursuit. Both add types enter already targeting the living
 tank with the highest threat on Varkhul, then obey normal threat and taunts. When the
@@ -376,9 +380,12 @@ delays an ordinary Warden/Sentinel wave. The first Artificer portal opens ten se
 after the intermission begins and another opens every eighteen seconds while the phase
 continues, rotating deterministically through the four corners. After its two-second
 portal warning, the Artificer runs directly to Varkhul and channels Recalibrate for six
-seconds. A completed repair restores 6% of Varkhul's maximum health on Normal or 8% on
-Heroic. The Artificer has roughly 55% more health than a Warden, but remains fully
-stunnable, rootable, slowable, silenceable, and interruptible. Its channel visibly uses
+seconds. Recalibrate heals once after each complete second: 2% of Varkhul's maximum
+health per tick on Normal and 3% on Heroic, for 12% or 18% if the full channel
+completes. Interrupting or controlling the Artificer stops future ticks without undoing
+healing already applied. The Artificer has 30% more Heroic health than its Normal
+counterpart and remains fully stunnable, rootable, slowable, silenceable, and
+interruptible. Its channel visibly uses
 Channel Start, the loopable Channel take, then Channel End only after a successful
 repair. Artificers use their own scheduler and do not change ordinary wave timing, but
 an Artificer whose portal has already opened must still be killed before the
@@ -428,7 +435,7 @@ geometry on Low graphics or reduced motion.
 The Heroic final phase deliberately strips the rotation down to Worldfire, Forgefather's
 Sweep, Anvil's Decree meteors, and ordinary melee. Entering it cancels any active major
 sequence, disables both pillars, freezes forge heat at 0%, and suppresses Maker's Brand,
-Cinder Orbs, Forgestorm, and Tempering Ray. Reaching the 45-second deadline fires the
+Cinder Orbs, Shared Pyre, and Tempering Ray. Reaching the 45-second deadline fires the
 hard-wipe hit once, but a surviving immune player remains inside permanent full-room
 Worldfire; the flames and their one-second lethal ticks only end when Varkhul dies or
 resets.
@@ -473,8 +480,7 @@ the media manifest. Concept art is not a substitute for the six shipping GLBs.
 6. Last Inferno, stack-responsive mark visuals, warning yells, and automated
    2-2-6 encounter-flow validation. Done. Human group tuning, final models,
    authored audio, and final dialogue remain.
-7. Rain of Cinders movement cones and the four-player Shared Pyre soak. Done for
-   Normal. Human group tuning remains.
+7. Rain of Cinders movement cones. Done for Normal. Shared Pyre moved to Varkhul.
 8. Revolving Inferno and Forge Wave movement patterns. Done for Normal. Manual
    visual validation and human group tuning remain.
 9. Judgment of the Forge intermission and the accelerated, alternating Last
@@ -483,7 +489,7 @@ the media manifest. Concept art is not a substitute for the six shipping GLBs.
     instance lifetime. Done for Normal.
 11. Maelin's three-quest lore chain, three records, and Ignivar core reveal.
     Done for the hidden development route.
-12. Varkhul's Maker's Brand, Cinder Orbs, Red-hot Metal, Forgestorm, Anvil's Decree,
+12. Varkhul's Maker's Brand, Cinder Orbs, Red-hot Metal, Shared Pyre, Anvil's Decree,
     Master's Assembly, and Masterpiece Unbound. Done for Normal; human tuning and
     final visual proof remain.
 13. Three authored ambient themes with per-room routing and versioned streams.

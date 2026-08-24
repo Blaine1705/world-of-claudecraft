@@ -22,9 +22,7 @@ import {
   VARKHUL_CINDER_ORBS_TARGETS,
   VARKHUL_FORGE_LOCAL_POS,
   VARKHUL_FORGESTORM_CAST_ID,
-  VARKHUL_FORGESTORM_DAMAGE_MAX_HP,
   VARKHUL_FORGESTORM_IMPACTS_PER_WAVE,
-  VARKHUL_FORGESTORM_WARNING_SECONDS,
   VARKHUL_FORGESTORM_WAVES,
   VARKHUL_FRONTAL_CAST_ID,
   VARKHUL_FRONTAL_DAMAGE_MAX_HP_HEROIC,
@@ -63,6 +61,7 @@ import {
   VARKHUL_ANVIL_METEOR_RADIUS,
 } from '../src/sim/varkhul_anvil_meteors';
 import { VARKHUL_WORK_LOCAL_POS } from '../src/sim/varkhul_forge_intermission';
+import { VARKHUL_SHARED_PYRE_AURA_ID } from '../src/sim/varkhul_shared_pyre';
 
 function claimedEncounter(seed = 42): { sim: Sim; boss: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', devCommands: true });
@@ -597,60 +596,22 @@ describe('Varkhul encounter behavior', () => {
     expect(sim.activeVarkhulCinderOrbProjectiles).toEqual([]);
   });
 
-  it('publishes five GroundAoE warnings before each Forgestorm impact', () => {
+  it('does not schedule legacy Forgestorm after Shared Pyre replaces it', () => {
     const { sim, boss } = claimedEncounter(44);
-    sim.player.maxHp = 1_000;
-    sim.player.hp = 1_000;
     updateVarkhulEncounter(sim.ctx, boss);
     const state = isolateMechanics(boss);
-    state.forgestormTimer = DT;
+    state.forgestormTimer = 0;
 
-    updateVarkhulEncounter(sim.ctx, boss);
+    for (let tick = 0; tick < 600; tick++) updateVarkhulEncounter(sim.ctx, boss);
 
-    const warnings = sim.ctx.groundAoEs.filter(
-      (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
-    );
-    expect(warnings).toHaveLength(VARKHUL_FORGESTORM_IMPACTS_PER_WAVE);
-    expect(sim.activeVarkhulForgestormWarnings).toHaveLength(VARKHUL_FORGESTORM_IMPACTS_PER_WAVE);
-    expect(sim.activeVarkhulForgestormWarnings[0]).toMatchObject({
-      sourceId: boss.id,
-      radius: 4,
-      duration: VARKHUL_FORGESTORM_WARNING_SECONDS,
-      remaining: VARKHUL_FORGESTORM_WARNING_SECONDS,
-    });
-    expect(warnings[0].remaining).toBeCloseTo(VARKHUL_FORGESTORM_WARNING_SECONDS + DT * 2, 5);
-    sim.player.pos = { ...state.forgestormPoints[0] };
-    state.forgestormWarningRemaining = DT;
-
-    updateVarkhulEncounter(sim.ctx, boss);
-
-    expect(sim.player.hp).toBe(1_000 - 1_000 * VARKHUL_FORGESTORM_DAMAGE_MAX_HP);
-    expect(state.forgestormWaveIndex).toBe(1);
+    expect(state.forgestormPoints).toEqual([]);
+    expect(state.forgestormWarningRemaining).toBe(0);
+    expect(sim.activeVarkhulForgestormWarnings).toEqual([]);
     expect(
       sim.ctx.groundAoEs.filter(
         (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
       ),
-    ).toHaveLength(VARKHUL_FORGESTORM_IMPACTS_PER_WAVE);
-
-    sim.player.pos = { ...boss.pos };
-    state.forgestormWarningRemaining = DT;
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.forgestormWaveIndex).toBe(2);
-    expect(
-      sim.ctx.groundAoEs.filter(
-        (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
-      ),
-    ).toHaveLength(VARKHUL_FORGESTORM_IMPACTS_PER_WAVE);
-
-    state.forgestormWarningRemaining = DT;
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.majorAbility).toBe('none');
-    expect(boss.castingAbility).toBeNull();
-    expect(
-      sim.ctx.groundAoEs.filter(
-        (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
-      ),
-    ).toHaveLength(0);
+    ).toEqual([]);
   });
 
   it.each([
@@ -869,7 +830,7 @@ describe('Varkhul encounter behavior', () => {
     state.assemblyTriggered = true;
     boss.hp = Math.floor(boss.maxHp * 0.2);
     state.cinderOrbsTimer = 10;
-    state.forgestormTimer = 10;
+    state.sharedPyreTimer = 10;
     state.anvilTimer = 10;
     state.makersBrandTimer = 10;
 
@@ -877,7 +838,7 @@ describe('Varkhul encounter behavior', () => {
 
     expect(boss.auras.some((aura) => aura.id === VARKHUL_MASTERPIECE_UNBOUND_AURA_ID)).toBe(true);
     expect(state.cinderOrbsTimer).toBeCloseTo(10 - DT * 1.25, 5);
-    expect(state.forgestormTimer).toBeCloseTo(10 - DT * 1.25, 5);
+    expect(state.sharedPyreTimer).toBeCloseTo(10 - DT * 1.25, 5);
     expect(state.anvilTimer).toBeCloseTo(10 - DT * 1.25, 5);
     expect(state.makersBrandTimer).toBeCloseTo(10 - DT, 5);
 
@@ -896,7 +857,7 @@ describe('Varkhul encounter behavior', () => {
   it('cleans in-claim auras, warnings, casts, and enrage on reset', () => {
     const { sim, boss } = claimedEncounter(48);
     updateVarkhulEncounter(sim.ctx, boss);
-    const state = isolateMechanics(boss);
+    isolateMechanics(boss);
     sim.player.auras.push({
       id: VARKHUL_MAKERS_BRAND_AURA_ID,
       name: "Maker's Brand",
@@ -908,9 +869,31 @@ describe('Varkhul encounter behavior', () => {
       school: 'fire',
       encounterOwned: true,
     });
-    state.forgestormTimer = DT;
-    updateVarkhulEncounter(sim.ctx, boss);
-    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(true);
+    sim.player.auras.push({
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: 'Shared Pyre',
+      kind: 'vulnerability',
+      remaining: 6,
+      duration: 6,
+      value: 0,
+      stacks: 4,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.groundAoEs.push({
+      sourceId: boss.id,
+      abilityId: VARKHUL_FORGESTORM_CAST_ID,
+      ability: VARKHUL_FORGESTORM_CAST_ID,
+      pos: { ...boss.pos },
+      radius: 4,
+      min: 0,
+      max: 0,
+      remaining: 1,
+      interval: 999,
+      tickTimer: 999,
+      school: 'fire',
+    });
 
     resetVarkhulEncounter(sim.ctx, boss);
 

@@ -265,7 +265,7 @@ describe('Ignivar raid lore content', () => {
       'Cinder Orbs',
       'Red-hot Metal',
       'Red-hot Metal Barrier',
-      'Forgestorm',
+      'Shared Pyre',
       "Anvil's Decree",
       "The Master's Assembly",
       'Crucible Guard',

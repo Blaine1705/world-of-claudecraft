@@ -4603,6 +4603,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // multiply by these AFTER the rng draw. undefined = 1 (normal difficulty).
   mechanicDamageMult?: number;
   mechanicHealMult?: number;
+  // Optional per-spawn multiplier for persistent burn auras applied through
+  // mob/dragonkin_brood.ts. Kept separate from mechanicDamageMult so one raid
+  // add can scale its DoT without retuning every legacy brood burn.
+  mechanicBurnDamageMult?: number;
   // Ranged petSpell scaling for a TUNED instance spawn, the third fire-time
   // multiplier beside the two above. A hostile mob's petSpell damage is rolled
   // from the base MOBS table and multiplied by petDamageMult, which returns a
@@ -5066,6 +5070,9 @@ export interface VarkhulEncounterState {
   forgestormWaveIndex: number;
   forgestormWarningRemaining: number;
   forgestormPoints: Vec3[];
+  sharedPyreTimer: number;
+  sharedPyreTargetId: number | null;
+  sharedPyreRemaining: number;
   anvilTimer: number;
   anvilStrikeIndex: number;
   anvilStrikeRemaining: number;
@@ -5081,7 +5088,14 @@ export interface VarkhulEncounterState {
   interceptBeamCastRemaining: number;
   interceptBeamTargetId: number | null;
   interceptBeamBlockerId: number | null;
-  majorAbility: 'none' | 'frontal' | 'cinderOrbs' | 'forgestorm' | 'anvil' | 'interceptBeam';
+  majorAbility:
+    | 'none'
+    | 'frontal'
+    | 'cinderOrbs'
+    | 'forgestorm'
+    | 'sharedPyre'
+    | 'anvil'
+    | 'interceptBeam';
   assemblyTriggered: boolean;
   assemblyRuneDifficulty: VarkhulAssemblyDifficulty;
   assemblyPhase: VarkhulAssemblyPhase;
@@ -5121,6 +5135,7 @@ export interface VarkhulEncounterState {
   assemblyForgeHammerTimer: number;
   assemblyForgeVentedThisTick: boolean;
   assemblyPortalSpawns: Array<{ wave: number; spawnIndex: number; remaining: number }>;
+  assemblyOrdinaryAddWaves: Array<{ addId: number; wave: number }>;
   assemblyNextWaveIndex: number;
   assemblyNextWaveRemaining: number;
   assemblyIntermissionWaves: number;
@@ -5515,6 +5530,7 @@ export type SimEvent = { pid?: number } & (
         | 'rightPillar'
         | 'bothPillars'
         | 'portalsOpening'
+        | 'artificerApproaches'
         | 'heat75'
         | 'heat90'
         | 'addsDefeated'

@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   activeVarkhulForgePortalTelegraphs,
-  VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS,
+  VARKHUL_CRUCIBLE_QUAKE_DAMAGE_HEROIC,
+  VARKHUL_CRUCIBLE_QUAKE_DAMAGE_NORMAL,
+  VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS,
+  VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS,
   VARKHUL_FORGE_FINAL_BEAM_SECONDS,
   VARKHUL_FORGE_FINAL_GAP_SECONDS,
   VARKHUL_FORGE_FINAL_HP_THRESHOLD,
@@ -20,6 +23,7 @@ import {
   VARKHUL_FORGE_TEACHING_HP_THRESHOLD,
   VARKHUL_WORK_FACING,
   VARKHUL_WORK_LOCAL_POS,
+  varkhulCrucibleQuakeDamageRange,
   varkhulForgeBeamIsActive,
   varkhulForgeBeamWindowMask,
   varkhulForgeIntermissionSeconds,
@@ -41,7 +45,12 @@ describe('Varkhul forge intermission contract', () => {
     expect(VARKHUL_FORGE_FINAL_GAP_SECONDS).toBe(4);
     expect(VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS).toBe(2);
     expect(VARKHUL_FORGE_PORTAL_ABILITY_ID).toBe('Forge Legion Portal');
-    expect(VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS).toBe(8);
+    expect(VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS).toBe(3);
+    expect(VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS).toBe(14);
+    expect(VARKHUL_CRUCIBLE_QUAKE_DAMAGE_NORMAL).toEqual({ min: 180, max: 230 });
+    expect(VARKHUL_CRUCIBLE_QUAKE_DAMAGE_HEROIC).toEqual({ min: 260, max: 330 });
+    expect(varkhulCrucibleQuakeDamageRange('normal')).toEqual({ min: 180, max: 230 });
+    expect(varkhulCrucibleQuakeDamageRange('heroic')).toEqual({ min: 260, max: 330 });
   });
 
   it('activates the intended pillar in every window', () => {

@@ -7214,6 +7214,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.rightPillar': '右側鍛爐立柱點燃了！',
   'hudChrome.varkhulCallout.bothPillars': '鍛爐立柱點燃了！',
   'hudChrome.varkhulCallout.portalsOpening': '鍛爐傳送門正在開啟！',
+  'hudChrome.varkhulCallout.artificerApproaches': '燼火工匠正在接近鍛爐！',
+  'hudChrome.varkhulWaveStatus': '波次 {wave}/{waves} | 敵人: {remaining}',
   'hudChrome.varkhulCallout.heat75': '鍛爐熱量達到75%！',
   'hudChrome.varkhulCallout.heat90': '鍛爐熔毀迫在眉睫！',
   'hudChrome.varkhulCallout.addsDefeated': '鍛爐軍團已被擊敗，瓦庫爾暴露了！',
