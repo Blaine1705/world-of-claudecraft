@@ -1064,9 +1064,10 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
       // Ravenpost authored letters: welcome + Heroic Marks reward + mastery
-      // reset notice + quest letters + Guild trend letters + master tier
-      // letters (keyed pair -> tier), 3 fields each.
-      (3 +
+      // reset notice + the three $WOC Exchange custody letters + quest
+      // letters + Guild trend letters + master tier letters (keyed pair ->
+      // tier), 3 fields each.
+      (6 +
         Object.keys(QUEST_LETTERS).length +
         Object.keys(GUILD_TREND_LETTERS).length +
         Object.values(MASTER_TIER_LETTERS).reduce(

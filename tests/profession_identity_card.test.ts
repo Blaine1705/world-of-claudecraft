@@ -1017,25 +1017,29 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
 });
 
 describe('craftResult deny toast names the station (source pins)', () => {
+  // The reason-to-key mapping moved out of hud.ts into the
+  // src/ui/crafting_deny_core.ts pure core (whose own suite pins the table
+  // behaviorally and exhaustively); these pins follow the code they pin.
   const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  const core = readFileSync(path.resolve(process.cwd(), 'src/ui/crafting_deny_core.ts'), 'utf8');
 
   it('station_required resolves the type from recipe content (no station field rides the event)', () => {
-    expect(hud).toMatch(
-      /ev\.reason === 'station_required' \? recipeById\(ev\.recipeId\)\?\.stationType : undefined/,
+    expect(core).toMatch(
+      /reason === 'station_required' \? recipeById\(recipeId\)\?\.stationType : undefined/,
     );
   });
 
   it('a resolved type renders the NAMED toast via stationRequired + stationNameText', () => {
     expect(hud).toContain("t('hudChrome.crafting.stationRequired', {");
-    expect(hud).toContain('station: stationNameText(deniedStationType),');
+    expect(hud).toContain('station: stationNameText(deny.stationType),');
   });
 
   it('no_bag_space pairs with the noBagSpace toast, insufficientMaterials as the chain tail', () => {
     // The reason chain reads no_bag_space ? noBagSpace : insufficientMaterials,
     // so pin the pairing (a key swap in the ternary tail must fail here) rather
     // than a bare presence check that two swapped keys could still satisfy.
-    expect(hud).toMatch(
-      /ev\.reason === 'no_bag_space'\s*\?\s*'hudChrome\.crafting\.noBagSpace'\s*:\s*'hudChrome\.crafting\.insufficientMaterials'/,
+    expect(core).toMatch(
+      /reason === 'no_bag_space'\s*\?\s*'hudChrome\.crafting\.noBagSpace'\s*:\s*'hudChrome\.crafting\.insufficientMaterials'/,
     );
   });
 });
