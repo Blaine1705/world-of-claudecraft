@@ -9,7 +9,9 @@ The filename remains `deed-border-cartouche/implementation-plan.md` because it
 is the continuity packet for the existing branch. The Phase 1-4 cartouche is
 implemented and QA-green, but the post-Phase 4 art review rejected it as the
 shipping visual direction: it reads as UI outline, not a reward worth wearing.
-Phases 5-9 are the active completion plan and supersede the old visual target.
+Phases 5-9 are the completed refinement plan and supersede the old visual
+target. The per-phase execution prompts were removed at contribution close;
+their full text remains available in git history.
 
 Companion documents: `docs/design/deeds.md` (reward definition),
 `docs/design/reliquary.md` (Eternal Spoils / `reliquary_gilt`),
@@ -261,7 +263,7 @@ behavioral contract.
 | E56 | Themes and contrast | Classic, midnight, parchment, highContrast, and forced colors keep the name readable, the seal identifiable, and selection visible. | 7 / 8 |
 | E57 | Tier and motion | Full identity exists at low and high. Only bloom may differ. No continuous animation; reduced motion has nothing essential to remove. | 7 / 8 |
 | E58 | Persistence and wire | Equip/unequip, slug swap, character-sheet refresh, reconnect, and online mirror still use `activeBorder`; no sim/server/wire/IWorld change. | 7 / 8 |
-| E59 | Shared plaque silhouette | Compact, mirrored, and ceremonial forms use one fixed-pixel 8px tip / 4px notch authority across canvas and CSS. Long localized names do not stretch the hardware. | 9 |
+| E59 | Shared plaque silhouette | One frozen CSS authority binds each scale to fixed-pixel hardware: compact and mirrored use an 8px tip / 4px notch, ceremonial uses symmetric 16px shoulders, and the attached provenance tab uses symmetric 10px shoulders. Long localized names do not stretch any end. | 9 |
 | E60 | World plaque geometry | The world token is a six-point plaque with the existing round seal, one quiet inset glint, no rounded rectangle, and the retained 7/1 pad, 18px seal, protected 2px seal/plaque gap, hidden 2px joint bridge, and 8px lift. | 9 |
 | E61 | Interaction-scale plaque | Player and target plaques span the existing name-header column, mirror correctly, center the name, and leave portrait, level, bars, title, sanction, cast, and auras unchanged. | 9 |
 | E62 | Cold-surface plaque family | Picker previews and inspect use the same silhouette/material family across desktop, mobile, Parchment, low/high, and forced colors. Inspect remains subordinate to the paperdoll. | 9 |
@@ -365,7 +367,7 @@ locked to `extraLift`. No new sprites. Borderless path has an explicit
 "no well / no hardware" pin. Fairness scan still green. `progress.md`
 and `state.md` updated. No Phase 3 work in the tree.
 
-Starter prompt: `phase-01-chassis.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 2: QA, chassis
 
@@ -406,7 +408,7 @@ are fixed and re-checked.
 committed. Reviewer findings fixed or recorded as non-blocking with
 evidence. `state.md` lists the first Phase 3 action.
 
-Starter prompt: `phase-02-qa-chassis.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 3: identity and family
 
@@ -457,7 +459,7 @@ npx @biomejs/biome check --write <changed files>
 readable in the core's primitive lists. Catalogue uniqueness re-pinned.
 No Phase 4 screenshot work left to the implementer except smoke.
 
-Starter prompt: `phase-03-identity.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 4: QA, identity and family
 
@@ -499,7 +501,7 @@ communicate reward. That review opened Phases 5-8.
 and referenced. `progress.md` marks Phases 1-4 complete, but the feature is not
 ready to ship until Phase 8 closes.
 
-Starter prompt: `phase-04-qa-identity.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 5: world Deed Heraldry
 
@@ -551,7 +553,7 @@ not weakened. There is one active core, no sprite/allocation/tier regression,
 and no Phase 7 surface work in the tree. `progress.md` and `state.md` point to
 Phase 6.
 
-Starter prompt: `phase-05-heraldry-nameplate.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 6: QA, world heraldry
 
@@ -589,7 +591,7 @@ under `direction/`, record its prompt, and keep it separate from captured proof.
 finding, and the normal-distance album earns a visual verdict of SHIP or SHIP
 WITH NOTES. "Readable when zoomed" is not enough. `state.md` points to Phase 7.
 
-Starter prompt: `phase-06-qa-heraldry-nameplate.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 7: social reveal family
 
@@ -642,7 +644,7 @@ npx @biomejs/biome check --write <changed files>
 surface. Mobile/focus/forced-colors contracts are pinned. No gameplay bar or
 wire path changed. `progress.md` and `state.md` point to Phase 8.
 
-Starter prompt: `phase-07-social-reveal.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 8: QA, full Deed Heraldry family
 
@@ -682,7 +684,7 @@ green, reviewers are READY or READY WITH NOTES without a blocking craft issue,
 the final album proves the approved art direction, and no unsupported system
 changed. Only then may the operator open a PR.
 
-Starter prompt: `phase-08-qa-heraldry-family.md`.
+Historical starter prompt removed at contribution close.
 
 ## Phase 9: v0.40 integration and plaque refinement
 

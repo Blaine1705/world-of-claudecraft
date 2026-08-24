@@ -23,6 +23,13 @@ the name-header column, and inspect uses its largest ceremonial form. The
 shared geometry stays code-native and the four reward identities still come
 only from their existing seal motifs and palettes.
 
+The final ceremonial refinement keeps that family but gives each scale the
+hardware it needs. Compact and mirrored gameplay plaques retain their shallow
+8px point and 4px notch. Inspect uses a dark 60px forged face with 16px
+shoulders, a keyed 64px medallion, and a quiet 18px provenance tab with 10px
+shoulders. The larger values are fixed hardware measurements, not proportions
+that stretch with localized copy.
+
 ## Decision
 
 The reward is no longer a border treatment. It is a two-scale identity system:
@@ -97,13 +104,17 @@ is too much chrome for the first job and too little identity for the second.
 
 ### Inspect: ceremonial reveal
 
-- Use the largest treatment in the family: a compact heraldic banner integrated
-  into the parchment card, with the same seal, blackened metal, fine edge, and
-  a low-contrast pattern derived from the existing motif.
-- Show the real player name, equipped title when present, and the localized name
-  of the deed that granted the active heraldry. Do not invent a new reward name.
+- Use the largest treatment in the family: a 580x72px ceremonial host with a
+  dark 60px forged face, fine inset edge, and low-contrast pattern derived from
+  the existing motif.
+- Key the 64px seal into the face through a short blackened collar. It is
+  attached hardware, not an icon floating in a grid cell.
+- Keep the real player name and equipped title centered in the face. Put the
+  localized granting-deed name in the attached 18px provenance tab rather than
+  compressing it into a third identity line. Do not invent a new reward name.
 - The banner must support the paperdoll rather than dominate it. Equipment,
-  standing, badges, and stats remain the content hierarchy.
+  standing, badges, and stats remain the content hierarchy. Existing honors
+  collect on one quiet rail rather than becoming independent dashboard cards.
 - Parchment is the acid test. Antique brass must remain visible without turning
   into saturated yellow or thick chrome.
 
@@ -112,6 +123,8 @@ is too much chrome for the first job and too little identity for the second.
 - Reuse `.deed-title-option`, its focus rules, and the 40x40 mobile touch floor.
 - Each earned option shows the actual seal plus a small material sample and the
   existing deed name. Do not reduce identity to anonymous color stripes.
+- The interaction preview uses a dark, metal-keyed portrait cameo. It may stay
+  abstract, but must not read as an empty white placeholder on Parchment.
 - None stays visibly empty and never impersonates an earned material.
 - The selected option drives a live preview of the world token and the richer
   target/inspect treatment. A player should know exactly what enabling it does.

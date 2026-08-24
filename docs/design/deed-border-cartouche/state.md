@@ -1,48 +1,57 @@
 # Deed Heraldry: state
 
-Resume here. The active direction is `art-direction.md`; the complete phased
-contract is `implementation-plan.md`.
+Contribution closeout. The approved direction is `art-direction.md`; the
+completed implementation and QA contract is `implementation-plan.md`.
 
-## Resume point
+## Final state
 
 Phases 1-9 are complete on `feature/deed-border-cartouche`. Phase 9 merged
 `origin/release/v0.40.0`, refined the family from a rounded ribbon into the
 approved pointed plaque direction, and added E59-E63 without weakening E1-E58.
-A subsequent five-pass craft session corrected Book preview alignment, gave the
-world seal a protected plaque gap, and rebuilt Inspect as a centered ceremonial
-mantle with one honor rail and a quieter paperdoll stage. Its final verdict is
+Three subsequent five-pass craft sessions corrected Book preview alignment, gave
+the world and interaction seals protected plaque air, and rebuilt Inspect as a
+centered forged mantle with a keyed medallion, attached provenance tab, one
+honor rail, and a quieter paperdoll stage. The third session then audited every
+live placement, fixed the tablet honor rail from 3+1 to 2x2, integrated the
+current release tip, and recaptured the official evidence. The final verdict is
 **SHIP WITH NOTES**; both fresh specialist reviews are **READY**, and the exact
 findings and fix-forward evidence are recorded in `progress.md`.
 
 The final plaque album is
-`docs/screenshots/deed-border-cartouche/phase-09/`. It proves normal-distance
-world hierarchy, all four seals together and in grayscale, player and target
-frames, picker, inspect, mobile, Parchment, forced colors, and unobscured
+`docs/screenshots/deed-border-cartouche/phase-09/final-five-pass/`. Its 54-file
+canonical/matrix/overview ledger proves normal-distance world hierarchy, all
+four seals together and in grayscale, player and target frames, every Book and
+Inspect reward, borderless and remote controls, mobile/tablet/rotate behavior,
+Parchment, Midnight, High Contrast, actual forced colors, and unobscured
 low/high bloom-only fairness. The retained `phase-07/` album continues to prove
-the real Book equip/preview flow, None, borderless controls, slug swaps,
-reconnect, and the long localized Cheater target. No sim, server, persistence,
-wire, net, world API, or IWorld feature path changed.
+the real Book equip/preview flow, slug swaps, reconnect, and the long localized
+Cheater target. No sim, server, persistence, wire, net, world API, or IWorld
+feature path changed.
 
-Do not commit, stage, push, or open the PR unless the operator explicitly asks.
+The final five-pass files are ready for task-scoped closeout commits. On
+2026-08-23 the operator explicitly authorized committing, pushing, and opening
+a PR targeting `release/v0.40.0`.
 
 ## Blocker
 
-None in the Deed Heraldry implementation, v0.40 integration, or Phase 9
-evidence. The branch is 0 commits behind and 17 commits ahead of
-`origin/release/v0.40.0`.
+None. `origin/release/v0.40.0@b39b16022e` is integrated by merge commit
+`98589bb615dedfb4eb86d0078be81080152269b2`; the branch is 21 commits ahead and
+0 behind. The post-merge official evidence was recaptured and the complete
+12-step gate is green.
 
 ## Next action
 
-1. Preserve the current worktree and all Phase 1-9 changes.
-2. Do not start another feature phase without operator direction.
-3. Open a PR only when explicitly authorized.
+1. Preserve all Phase 1-9 and craft-pass changes.
+2. Commit and push the remaining final-pass work with task-scoped staging.
+3. Open the authorized PR against `release/v0.40.0` and do not start another
+   feature phase without operator direction.
 
 ## Active locked decisions
 
 - The approved experience is two-scale Deed Heraldry: compact world seal plus
   shallow pointed name plaque, richer social reveal on interaction.
 - Four slugs and motifs only: catalogue, vault, ward, laurel. No new deed,
-  reward, title, slug, motif, or family silhouette.
+  reward, title, slug, motif, or reward identity.
 - The world plaque owns the name row only. The selected title returns to the
   secondary line.
 - No full nameplate perimeter, corner brackets, or central clasp. The motif is
@@ -52,11 +61,12 @@ evidence. The branch is 0 commits behind and 17 commits ahead of
 - Player and target frames receive the seal at the portrait/name joint and a
   restrained pattern on the name header only. Portraits stay circular. No full
   HUD reskin.
-- Inspect is the ceremonial reveal and uses real name/title/deed copy in a 60px
-  centered mantle with an overlapping 56px seal. Existing standing and badges
-  remain secondary in one responsive honor rail. Picker uses actual
-  seals/materials plus live previews. `.deed-title-option`, focus, aria, and
-  the 40x40 touch floor remain.
+- Inspect is the ceremonial reveal: a `580x72` host contains a dark 60px face,
+  keyed `64x64` seal with 16px shoulder overlap, centered real name/title, and
+  an attached `260x18` localized deed tab. Existing standing and badges remain
+  secondary in one responsive honor rail. Picker uses actual seals/materials,
+  a dark keyed portrait cameo, and live previews. `.deed-title-option`, focus,
+  aria, and the 40x40 touch floor remain.
 - Catalogue brass remains `#c9b17a` / `#2a2214` / `#f3ebcf`, distinct from
   Eternal Spoils `#f4ca43` and elite/quest `#f2c84b`.
 - Borderless stays clean. Identity exists on every graphics tier. Only bloom
@@ -67,6 +77,9 @@ evidence. The branch is 0 commits behind and 17 commits ahead of
   fixed 8px tip, fixed 4px notch, midnight alpha 0.62, seal 18, protected
   seal/plaque gap 2, hidden joint overlap 2, extra lift 8, and declutter
   X/Y/stack 95/26/28. Both y-walks consume the same 8px lift.
+- The frozen cold-surface silhouettes use scale-specific fixed hardware:
+  compact/mirrored 8px point and 4px notch, ceremonial symmetric 16px
+  shoulders, and provenance-tab symmetric 10px shoulders.
 - `PlayerMeta.activeBorder`, `deed_set_border`, eligibility, persistence, and
   the wire remain unchanged. No sim/server/IWorld work is expected.
 
@@ -97,6 +110,21 @@ evidence. The branch is 0 commits behind and 17 commits ahead of
   responsive ceremonial composition, the final full-mode 12-step gate is green,
   and both post-fix specialist reviews are READY. Final verdict: **SHIP WITH
   NOTES**. No new feature phase was begun.
+- Second post-Phase 9 five-pass convergence complete: shared forged material,
+  scale-specific shoulders, 3px unit seam air, a keyed `580x72` Inspect mantle,
+  attached deed tab, dark Book cameo, final responsive/theme stress evidence,
+  decisive coverage, and the full 12-step gate are green. Both fresh reviewers
+  are READY. Final verdict: **SHIP WITH NOTES** because origin advanced by an
+  unrelated two-commit release merge during closeout. No new feature phase was
+  begun.
+- Third post-Phase 9 five-pass final surface audit complete: **SHIP WITH
+  NOTES**. The 54-file final-five-pass album covers every live placement and
+  meaningful edge state; the tablet Inspect honor rail is a measured 2x2 with
+  no overflow; current v0.40 is integrated; the focused 229-test slice, 42,006
+  full-suite tests, 256 browser tests, all builds, and all 12 gate steps are
+  green. Fresh frontend and test-coverage reviews are READY. The only remaining
+  note is physical notched-iOS safe-area validation; no new feature phase was
+  begun.
 
 ## Phase 8 closeout evidence
 
@@ -135,9 +163,11 @@ evidence. The branch is 0 commits behind and 17 commits ahead of
 - `origin/release/v0.40.0@14ab2e8630` merged as `2e15170f9c` with no conflict.
   `git rev-list --left-right --count origin/release/v0.40.0...HEAD` returned
   `0 17`.
-- The shared plaque authority is `src/ui/deed_heraldry_plaque_core.ts`: compact,
-  mirrored, and ceremonial clip paths use fixed 8px tips and 4px notches. The
-  world core imports the same measurements and remains caller-owned.
+- The shared plaque authority is `src/ui/deed_heraldry_plaque_core.ts`: compact
+  and mirrored clip paths use fixed 8px tips and 4px notches, the ceremonial
+  face uses fixed symmetric 16px shoulders, and the attached deed tab uses
+  fixed symmetric 10px shoulders. The world core imports only the compact
+  measurements and remains caller-owned.
 - The world painter uses one six-point Canvas2D path, one inset glint, the
   existing seal and frozen motif primitives, and no image, gradient, filter,
   animation, tier, governor, or per-call container allocation.

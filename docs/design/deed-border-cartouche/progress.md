@@ -12,6 +12,12 @@
 | 8. QA: full heraldry family | complete: READY WITH NOTES / SHIP WITH NOTES | E1-E58 audited. Final family album accepted. Focused suites, full selective gate, coverage, frontend, and gate-integrity reviews are green. |
 | 9. v0.40 integration and plaque refinement | complete: SHIP WITH NOTES | Release v0.40 merged, E59-E63 audited, pointed plaque family accepted at world and interaction scales, final album complete, full 12-step gate green, both fresh reviewers READY. |
 | Post-9. Five-pass craft polish | complete: SHIP WITH NOTES | Book alignment and protected plaque gap corrected; Inspect rebuilt as one ceremonial mantle; desktop, mobile, Parchment, forced colors, Unicode, all-badge, and borderless evidence accepted; both fresh reviewers READY. |
+| Post-9. Second five-pass plaque convergence | complete: SHIP WITH NOTES | Shared forged material, scale-specific shoulders, keyed Inspect medallion and deed tab, picker cameo, final stress evidence, decisive coverage, and both fresh reviews accepted. |
+| Post-9. Third five-pass final surface audit | complete: SHIP WITH NOTES | Complete live placement matrix accepted; tablet Inspect 3+1 honor rail fixed to 2x2; current v0.40 release merged; 42,006 core and 256 browser tests passed; all 12 gate steps and both fresh reviews are green. |
+
+Contribution cleanup removed the eight completed per-phase execution prompts.
+The durable art direction, implementation contract, QA ledger, and screenshot
+albums remain in-tree; the prompt text remains available in git history.
 
 Phase 4 closed technically on 2026-08-18. The same-day visual review returned
 NEEDS ANOTHER PASS: the perimeter read as UI chrome, motifs vanished at normal
@@ -714,6 +720,309 @@ E29-E31 remain live only because Phase 7, not Phase 5, owns those social visuals
   sprite-free, and allocation-free bars. The notes are evidence-environment
   hygiene only: ignored working screenshots, offline proxy 502 messages, and
   unrelated unavailable background models. No new feature phase was begun.
+
+## Post-Phase 9 notes: second five-pass plaque convergence
+
+- This was a second independent craft loop over the existing four-reward
+  family. It added no deed, slug, motif, title, lore, player-facing string,
+  runtime image, gameplay state, wire field, persistence path, or new feature
+  phase.
+- Pass 1 froze the compact gameplay geometry. World rendering was left
+  unchanged. Player and target frames preserve the intentional portrait/seal
+  joint while adding 2px of seam-side header compensation, which increases the
+  seal/plaque optical air to 3px without moving bars, titles, markers, or
+  status information.
+- Pass 2 refined the shared cold-surface metal. Compact and mirrored plaques
+  retain their 8px point and 4px notch; the ceremonial face uses symmetric
+  16px shoulders; the quiet deed tab uses symmetric 10px shoulders. Two fixed
+  rivets, restrained 135-degree grain, a clipped inset keyline, and a round
+  finishing rim use static CSS only. The world hot path remains unchanged,
+  sprite-free, and allocation-free.
+- Pass 3 rebuilt the Inspect mantle around the reference hierarchy. The host is
+  `580x72`, the near-black face is `60px` high, the `64x64` medallion overlaps
+  the shoulder by 16px through a blackened collar, and the localized granting
+  deed sits in an attached `260x18` provenance tab. Name and optional title
+  remain centered in the face; the motif is a subordinate watermark. The honor
+  cards remain one responsive collection on a shortened 1px rail, while the
+  paperdoll and equipment remain the dominant content.
+- Pass 4 harmonized the Book. Both live previews are centered in one column;
+  the world plaque caps at 220px and the interaction plaque at 260px without
+  compression. The portrait-left preview now uses the outward compact shape,
+  and its 34px cameo uses the existing dark heraldry well plus a metal inset so
+  it no longer becomes an empty white disc on Parchment. Option semantics,
+  focus, active state, localized labels, and the 40x40 touch floor did not
+  change.
+- Pass 5 judged the normal-distance world and unit-frame hierarchy before
+  reviewing ceremonial crops, then checked desktop, mobile, Parchment, long
+  Unicode with and without title, all four honors, borderless, actual Chromium
+  forced colors, and low/high bloom-only fairness. Name reads first, seal
+  second, and metal third; the paperdoll remains primary in Inspect.
+- Initial red contracts used
+  `npx vitest run tests/deed_heraldry_plaque_core.test.ts
+  tests/inspect_window.test.ts tests/deed_border_accent.test.ts` and produced
+  eight intended failures with 72 passes. After implementation,
+  `npx vitest run tests/deed_heraldry_plaque_core.test.ts
+  tests/inspect_window.test.ts tests/deed_border_accent.test.ts
+  tests/charscreen_css.test.ts` passed 4 files and 98 tests.
+- The broader command
+  `npx vitest run tests/pr_shot_targets.test.ts
+  tests/deed_heraldry_plaque_core.test.ts
+  tests/nameplate_heraldry_core.test.ts tests/nameplate_canvas.test.ts
+  tests/deed_border_accent.test.ts tests/deeds_border_picker.test.ts
+  tests/deeds_window.test.ts tests/inspect_window.test.ts
+  tests/inspect_view.test.ts tests/unit_frame_painter.test.ts
+  tests/unit_frame.test.ts tests/charscreen_css.test.ts
+  tests/mobile_window_coverage.test.ts tests/mobile_window_layout.test.ts
+  tests/mobile_window_transform.test.ts tests/css_value_validity.test.ts
+  tests/theme.test.ts tests/ui_effects_profile.test.ts
+  tests/architecture.test.ts tests/monolith_budget.test.ts` passed 20 files and
+  504 tests. `pnpm run check:ts`, `pnpm run ci:changed`, and
+  `git diff --check` passed.
+- `npm run gate` passed all 12 full-mode steps with 8 workers: 2,986 test files
+  passed and 12 skipped; 42,000 tests passed, 2 expected failures, and 115
+  skipped; all 28 browser files and 256 browser tests passed; typechecks,
+  builds, generated artifacts, malware scanning, and changed-file checks were
+  green.
+- Canonical second-loop evidence is under
+  `tmp/deed-heraldry-five-pass/pass-05-second/`: files 03-06 cover low, high,
+  mobile, and Parchment unit frames; files 07-09 cover the Book picker; files
+  10-12 cover Inspect desktop, mobile, and Parchment. The final stress album is
+  `tmp/deed-heraldry-five-pass/pass-05-second-final/`: title, no-title, long
+  Unicode, all honors, borderless, forced colors, mobile, Parchment, and
+  `evidence.json`. Its measurements record a `580x72` host, `532x60` face,
+  `64x64` seal, `260x18` tab, and all four honors grouped.
+- After the frontend reviewer noted that the Book cameo was still light on
+  Parchment, the final canonical picker rerun wrote desktop, mobile, and
+  Parchment frames 07-09 under
+  `tmp/deed-heraldry-five-pass/pass-05-second-final-ui/`. The new dark cameo
+  reads as keyed heraldic hardware in both dark and Parchment themes. The run
+  was intentionally stopped after the scoped picker evidence, so it has no
+  completed manifest.
+- Fresh read-only `woc_frontend` returned **READY**. It accepted the forged
+  Inspect hierarchy, long/no-title cases, honor rail, borderless behavior,
+  responsive and Parchment layout, actual forced colors, unit-frame seam,
+  sprite-free material, and bloom-only tier behavior. Its one nonblocking Book
+  cameo note was fixed and visually recaptured.
+- Fresh read-only `woc_test_coverage` found test-strength gaps in the new seal,
+  material, Book, borderless, honor-rail, forced-colors, tier, Parchment, and
+  selector-to-silhouette contracts. Tests were fixed forward without weakening
+  prior coverage. The unused ceremonial-notch export was removed. The final
+  re-review returned **READY** with high confidence and no remaining focused,
+  skipped, deleted, or weak changed test.
+- The evidence runs logged expected local proxy 502s and unrelated unavailable
+  background-creature models. Every scoped frame completed and no message
+  obscured the reviewed UI. Browser axe, a dedicated mobile E2E run, and ARM3
+  wall-clock profiling were not separately rerun; the canonical browser suite,
+  deterministic accessibility/responsive coverage, allocation guards, and
+  full gate passed.
+- During closeout, `origin/release/v0.40.0` advanced from merged base
+  `14ab2e8630` to `788009b38d` through Warspirit-only commit `e197b852ff`.
+  `git rev-list --left-right --count origin/release/v0.40.0...HEAD` now reports
+  `2 20`. The hotfix does not overlap the heraldry files, but it must be
+  integrated and the gate rerun before a PR.
+- Final second-loop verdict: **SHIP WITH NOTES**. No heraldry implementation,
+  craft, accessibility, responsive, fairness, performance, or test blocker
+  remains. Notes are the expected offline evidence noise and the newly arrived
+  release drift. No stage, commit, push, or PR action was performed for this
+  second loop.
+
+## Post-Phase 9 notes: Book of Deeds selected-row spacing
+
+- A real offline Book flow reproduced the reported overlap on both desktop and
+  mobile landscape. Adjacent border rows had a `4px` gap, while the
+  shell-authoritative focus indicator reaches `5px` beyond the selected button
+  (`3px` outline plus `2px` offset). The selected/focused ring therefore crossed
+  the following row by `1px`; the preview itself retained a safe `10px` seam.
+- A test-first contract was added in `tests/deeds_window.test.ts`. The initial
+  command `npx vitest run tests/deeds_window.test.ts` produced the intended one
+  failure with 54 passes. The contract reads the authoritative focus rule and
+  independently requires at least `3px` of post-ring desktop air and `5px` of
+  post-ring touch air. Its declaration parser requires the exact CSS property,
+  so `column-gap`, custom properties, suffix properties, and commented-out
+  declarations cannot satisfy it.
+- The production fix changes only shelf spacing: `.deeds-titles` and
+  `.deeds-borders` now use an `8px` desktop gap, with a `10px` mobile-touch
+  override. Row height, option semantics, selection, focus, scroll behavior,
+  previews, the pinned mobile filter bar, titles, swatches, strings, and
+  gameplay data are unchanged.
+- Follow-up visual review found a second, independent containment defect. The
+  larger vertical gaps kept adjacent rows separate, but the shelf retained only
+  `2px` of inline padding around a focus indicator that reaches `5px`. The
+  selected row was therefore cut off by `3px` at both scroll-shelf edges on
+  desktop and mobile. The follow-up test-first run
+  `npx vitest run tests/deeds_window.test.ts` produced the intended one failure
+  with 54 passes because the shelf had no explicit inline-clearance contract.
+- The forward fix adds `padding-inline: 8px` to both desktop shelves and a
+  `10px` mobile-touch override. The same regression test now derives the
+  authoritative `3px` outline plus `2px` offset, pins the resulting `5px`
+  reach, evaluates effective row gap and inline padding in declaration order,
+  and checks inline start and inline end independently. It accounts for gap and
+  padding shorthands, logical and physical side overrides, duplicate
+  declarations, and priority, while forbidding `!important` in the base and
+  touch shelf rules so their cross-rule cascade remains deterministic. This
+  rejects one-sided values such as `8px 0` as well as custom, suffix,
+  wrong-axis, stale-first-declaration, and base-versus-touch priority escapes.
+- Live post-fix selection of Eternal Spoils measured four consecutive `8px`
+  gaps on desktop and four `10px` gaps at `844x390` mobile landscape. The
+  selected row was also the focused row after the click and DOM rebuild. This
+  leaves `3px` of visible desktop air and `5px` of visible mobile air outside
+  the full focus ring. Durable evidence is in the final album at
+  `matrix/07-book-desktop-all-elements.png`,
+  `matrix/26-book-mobile-compact-landscape.png`,
+  `matrix/28-book-mobile-tablet-landscape.png`, and
+  `matrix/30-book-mobile-small-landscape.png`.
+- A second real-client pass used the same offline Book flow and selected
+  Eternal Spoils after the DOM rebuild. Desktop measured the row at
+  `678..1058` inside a `670..1066` shelf: `8px` inset minus the `5px` focus
+  reach leaves `3px` clear on both sides. Mobile at `844x390`, DPR 2, measured
+  the row at `34..810` inside a `24..820` shelf: `10px` inset leaves `5px`
+  clear on both sides. The durable final-album frames above supersede the
+  intermediate capture directory.
+- Focused verification passed:
+  `npx vitest run tests/deeds_window.test.ts
+  tests/deed_border_accent.test.ts tests/deed_heraldry_plaque_core.test.ts`
+  (3 files, 106 tests), followed by the broader deeds/CSS/mobile slice (6
+  files, 143 tests). The final strengthened single-file contract passed all 55
+  tests. `npm run ci:changed`, `npx tsc --noEmit`, Biome, and
+  `git diff --check` passed; changed-file output retained only known warnings.
+- `npm run gate` passed all 12 full-mode steps with 8 workers: 2,986 test files
+  passed and 12 skipped; 42,001 tests passed, 2 expected failures, and 115
+  skipped; all 28 browser files and 256 browser tests passed. Typechecks,
+  Svelte diagnostics, client/server/env/bot builds, i18n and manifest
+  freshness, changed-file checks, and malware scanning were green. One earlier
+  gate attempt stopped at changed-file formatting for the new test helper and
+  was corrected with `npx biome format --write tests/deeds_window.test.ts`.
+  The next attempt was explicitly interrupted during Vitest when the reviewer
+  found the final cross-rule priority escape. After that test-only hardening,
+  the 55-test targeted rerun, TypeScript, Biome, and `git diff --check` passed,
+  followed by the complete successful gate above.
+- Fresh read-only `woc_frontend` review returned **READY** with no finding. It
+  accepted desktop density, the mobile pinned-filter/scroll composition, and
+  the visible selected-row clearance in both final frames. Fresh read-only
+  `woc_test_coverage` found and verified fixes for exact-property, asymmetric
+  inline, source-order shorthand, row-gap, and cross-rule priority false
+  positives. Its final mutation audit returned **READY** with high confidence,
+  no focused or skipped test, and no remaining finding.
+- Final row-spacing verdict: **SHIP WITH NOTES**. The selected-row overlap is
+  resolved on desktop and mobile with decisive regression coverage. At this
+  checkpoint the branch still had release drift; the subsequent final surface
+  audit integrated it before PR closeout.
+
+## Post-Phase 9 notes: third five-pass final surface audit
+
+- Five independent craft passes reviewed the reward at normal MMORPG distance
+  before crops, then across the complete world, player frame, target frame,
+  Book, Inspect, responsive, theme, forced-colors, borderless, Unicode,
+  all-honor, and graphics-tier matrix. The accepted hierarchy remains name
+  first, seal second, metal third. Catalogue pages, Vault diamond/bar, Ward
+  key, and Laurel fan remain distinct without color; the dark plaque stays
+  shallow and quiet; titles, guilds, bars, markers, emotes, and unrelated
+  equipment UI remain outside and unchanged.
+- The audit found one confirmed production defect. At `1180x820` tablet size,
+  the mobile `width: 100%` override widened `.inspect-honor-rail` to `1160px`,
+  allowing an unbalanced 3+1 auto-fit layout. The test-first forward fix in
+  `src/styles/hud.mobile.css` removes the honor rail from that full-width rule
+  so the base `width: min(100%, 620px)` remains authoritative. The final live
+  measurement is two `300px` columns with no root, banner, or vertical
+  overflow. World and live unit geometry were deliberately left frozen.
+- The durable evidence root is
+  `docs/screenshots/deed-border-cartouche/phase-09/final-five-pass/` (54 files).
+  `README.md` is the review ledger. Its exact groups are `canonical/` (11
+  official targets), `matrix/` (34 raw placement/state captures), and
+  `overview/` (8 contact/grayscale sheets). The fastest review paths are:
+  `overview/canonical-contact-sheet.png`,
+  `overview/matrix-world-unit-contact.png`,
+  `overview/matrix-book-contact.png`,
+  `overview/matrix-inspect-contact.png`,
+  `overview/matrix-theme-contact.png`,
+  `overview/responsive-contact-sheet.png`,
+  `overview/world-all-four-color-grayscale.png`, and
+  `overview/world-all-four-grayscale.png`.
+- Raw world/unit evidence is `matrix/01-world-all-four-normal-low.png`,
+  `02-world-current-target-and-unit-frames.png`, and
+  `03-unit-frame-prestige_laurels.png` through
+  `06-unit-frame-reliquary_gilt.png`. Book evidence is
+  `07-book-desktop-all-elements.png`, all four selected states at `08` through
+  `11`, and `12-book-borderless-none.png`. Inspect evidence is all four rewards
+  at `13` through `16`, `17-inspect-long-unicode-no-title-all-honors.png`,
+  `18-inspect-borderless-control.png`, and `19-inspect-remote-control.png`.
+  Theme/accessibility evidence is the Book and Inspect pairs at `20` Parchment,
+  `22` Midnight, `23` High Contrast, plus
+  `24-forced-colors-book.png` and `25-forced-colors-inspect.png`. Responsive
+  evidence is `26` through `31` for compact/tablet/small landscape and
+  `32-mobile-portrait-real-rotate-state.png`. The fixed tablet frame is
+  `matrix/29-inspect-mobile-tablet-landscape.png`.
+- The official album was recaptured after release integration with:
+  `GAME_URL=http://127.0.0.1:5187
+  SHOTS_DIR=tmp/deed-heraldry-five-pass/audit-current/post-release-canonical
+  DIFF_FILE=tmp/deed-heraldry-five-pass/audit-current/heraldry.diff
+  NAV_TIMEOUT_MS=60000 ENTRY_SELECTOR_TIMEOUT_MS=60000 node
+  scripts/pr_screenshots.mjs`. It exited 0 with 11 screenshots. The custom
+  placement matrix used `GAME_URL=http://127.0.0.1:5187
+  SHOTS_DIR=tmp/deed-heraldry-five-pass/audit-current/matrix node
+  tmp/deed-heraldry-five-pass/audit-current/capture_matrix.mjs` and completed
+  all 34 frames. Tablet remeasurement used the same harness with `MODE=tablet`
+  and `SHOTS_DIR=tmp/deed-heraldry-five-pass/audit-current/tablet-fixed`.
+- Capture-only noise was limited to expected offline proxy 502s and existing
+  skipped non-preloaded NPC models. No message, missing model, or generated
+  concept obscured the reviewed heraldry UI. No generated art was used as QA
+  evidence and no runtime image asset was added.
+- Release commits through `origin/release/v0.40.0@b39b16022e` were integrated
+  by merge commit `98589bb615dedfb4eb86d0078be81080152269b2`. The final
+  `git rev-list --left-right --count HEAD...origin/release/v0.40.0` result is
+  `21 0`: 21 ahead, 0 behind. The incoming Warlock and Warspirit tests and
+  implementation are preserved; there is no semantic release reversion.
+- Focused verification passed:
+  `npx vitest run tests/deed_border_accent.test.ts
+  tests/inspect_window.test.ts tests/deed_heraldry_plaque_core.test.ts
+  tests/deeds_window.test.ts tests/unit_frame_painter.test.ts
+  tests/mobile_window_coverage.test.ts tests/mobile_window_layout.test.ts
+  tests/mobile_window_transform.test.ts tests/css_value_validity.test.ts
+  tests/charscreen_css.test.ts` (10 files, 229 tests). `npx tsc --noEmit`,
+  `npm run ci:changed`, Biome on the changed plaque CSS/tests, and
+  `git diff --check` passed; changed-file output retained only known warnings.
+- `node scripts/gate_select.mjs` selected full mode against
+  `origin/release/v0.40.0` and passed all 12 steps with 8 Vitest workers. The
+  core suite passed 2,986 files with 12 skipped, 42,006 tests with 2 expected
+  failures and 115 skipped. Browser regressions passed 28 files and 256 tests.
+  TypeScript/Svelte diagnostics, env/server/bot builds, client bundle, i18n,
+  wiki/media/manifests, backdrop survival, changed-file checks, and security
+  checks were green. Expected output noise included unavailable localStorage,
+  canvas, localhost services, and deliberately injected error paths.
+- Fresh read-only `woc_frontend` review returned **READY**. It accepted the
+  normal-distance and grayscale hierarchy, player/target seams, Book
+  containment, Inspect edge cases and fixed tablet 2x2, all four themes,
+  forced colors, low/high fairness, rotate state, semantics, and the
+  code-native allocation-free world path. No frontend defect remains.
+- Fresh read-only `woc_test_coverage` review returned **READY** with high
+  confidence after mutation testing. Fix-forward coverage now scans every
+  mobile honor-rail rule and grid shorthand, the complete Book shelf cascade
+  and edge geometry, every graphics-tier `--fx-shadow` use across relevant
+  sheets, and all 14 unknown-slug unit-frame clears. E37-E63 and the complete
+  E1-E36 supersession ledger remain decisive; no weakened, deleted, focused,
+  or skipped changed test remains.
+- Contribution closeout removed the eight obsolete per-phase execution prompts
+  and the accidental final-album `.DS_Store`. About 88 MB of ignored,
+  intermediate capture files were moved to the macOS Trash after their durable
+  evidence was retained in the 54-file final album. The art direction,
+  implementation contract, QA ledger, and all referenced screenshot albums
+  remain in-tree.
+- After that cleanup, `node scripts/gate_select.mjs` again selected full mode
+  against `origin/release/v0.40.0` and passed all 12 steps. Core Vitest passed
+  2,986 files with 12 skipped and 42,006 tests with 2 expected failures and 115
+  skipped. Browser regressions passed 28 files and 256 tests. TypeScript,
+  Svelte diagnostics, env/server/bot/client builds, artifacts, i18n, backdrop,
+  changed-file, and malware checks were green.
+- The final closeout `woc_test_coverage` review returned **READY** with high
+  confidence and no finding. The final `woc_frontend` review found only stale
+  pre-authorization wording in `state.md`; that documentation gap was corrected
+  before commit, with no runtime or craft finding.
+- Final third-loop verdict: **SHIP WITH NOTES**. The only remaining risk is
+  physical-device validation of notched-iOS hardware safe-area insets; browser
+  emulation proves the responsive rotate state but cannot reproduce every
+  device cutout. This is not a plaque implementation blocker. The operator
+  authorized task-scoped commits, push, and a PR targeting
+  `release/v0.40.0`; no additional feature phase or runtime content began.
 
 ## Phase 3 notes
 
