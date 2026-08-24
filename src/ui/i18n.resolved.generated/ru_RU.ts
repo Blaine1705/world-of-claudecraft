@@ -2059,10 +2059,10 @@ export const ru_RU: EnTranslations = {
     },
     "plurals": {
       "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
+        "one": "{count} участник, {xp} опыта за все время",
+        "few": "{count} участника, {xp} опыта за все время",
+        "many": "{count} участников, {xp} опыта за все время",
+        "other": "{count} участника, {xp} опыта за все время"
       },
       "guildMembers": {
         "one": "вы {rank}, {count} участник",

@@ -41,7 +41,9 @@ export function guildBoardListings(
  *  The provider resolves lazily, once per batch, so ticks without a
  *  noticeboard read never touch it; a null or empty window leaves the
  *  'empty' arm in place (a realm with no guilds honestly has nothing
- *  posted). */
+ *  posted). INVARIANT: the one listings array is shared BY REFERENCE across
+ *  every replaced event in the batch, so nothing downstream may mutate a
+ *  listing per recipient (serialization only reads). */
 export function fillEmptyNoticeboardEvents(
   events: SimEvent[],
   provider: () => readonly GuildLeaderboardEntry[] | null,

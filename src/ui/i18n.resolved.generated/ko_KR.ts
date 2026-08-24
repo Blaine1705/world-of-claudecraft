@@ -2059,10 +2059,10 @@ export const ko_KR: EnTranslations = {
     },
     "plurals": {
       "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
+        "one": "{count}명 회원, 누적 경험치 {xp}",
+        "few": "{count}명 회원, 누적 경험치 {xp}",
+        "many": "{count}명 회원, 누적 경험치 {xp}",
+        "other": "{count}명 회원, 누적 경험치 {xp}"
       },
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",

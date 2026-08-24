@@ -2059,10 +2059,10 @@ export const ja_JP: EnTranslations = {
     },
     "plurals": {
       "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
+        "one": "{count}人のメンバー、累計経験値{xp}",
+        "few": "{count}人のメンバー、累計経験値{xp}",
+        "many": "{count}人のメンバー、累計経験値{xp}",
+        "other": "{count}人のメンバー、累計経験値{xp}"
       },
       "guildMembers": {
         "one": "あなたは{rank}、{count}人のメンバー",

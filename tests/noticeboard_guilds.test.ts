@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   fillEmptyNoticeboardEvents,
@@ -160,5 +161,25 @@ describe('fillEmptyNoticeboardEvents', () => {
     expect(provider).toHaveBeenCalledTimes(1);
     expect(busy[0]).toMatchObject({ state: 'listings', pid: 1 });
     expect(busy[1]).toMatchObject({ state: 'listings', pid: 2 });
+  });
+});
+
+describe('routeEvents ordering (source pin)', () => {
+  it('runs the fill before the batch is serialized, inside routeEvents', () => {
+    // Arrange: the serialize-once invariant (server/game.ts routeEvents) means
+    // a replaced event only reaches the wire if the replacement precedes
+    // serializeEventFragments. Pin the source order so a future move of the
+    // fill below the serialization reds here instead of shipping a desync.
+    const src = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const route = src.slice(src.indexOf('private routeEvents('));
+
+    // Act
+    const fillAt = route.indexOf('fillEmptyNoticeboardEvents(events');
+    const serializeAt = route.indexOf('serializeEventFragments(events)');
+
+    // Assert
+    expect(fillAt).toBeGreaterThan(-1);
+    expect(serializeAt).toBeGreaterThan(-1);
+    expect(fillAt).toBeLessThan(serializeAt);
   });
 });

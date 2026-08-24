@@ -2059,10 +2059,10 @@ export const zh_CN: EnTranslations = {
     },
     "plurals": {
       "noticeboardGuildStats": {
-        "one": "{count} member, {xp} lifetime XP",
-        "few": "{count} members, {xp} lifetime XP",
-        "many": "{count} members, {xp} lifetime XP",
-        "other": "{count} members, {xp} lifetime XP"
+        "one": "{count}名成员，{xp}终身经验",
+        "few": "{count}名成员，{xp}终身经验",
+        "many": "{count}名成员，{xp}终身经验",
+        "other": "{count}名成员，{xp}终身经验"
       },
       "guildMembers": {
         "one": "你是{rank}，{count}名成员",

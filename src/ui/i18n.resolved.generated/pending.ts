@@ -3869,11 +3869,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.questStripCounter",
     "hudChrome.mobile.radialDown",
     "hudChrome.mobile.radialLeft",
-    "hudChrome.mobile.radialUp",
-    "hudChrome.plurals.noticeboardGuildStats.few",
-    "hudChrome.plurals.noticeboardGuildStats.many",
-    "hudChrome.plurals.noticeboardGuildStats.one",
-    "hudChrome.plurals.noticeboardGuildStats.other"
+    "hudChrome.mobile.radialUp"
   ],
   "zh_TW": [
     "hudChrome.barEditor.pageTab",
@@ -3888,11 +3884,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.questStripCounter",
     "hudChrome.mobile.radialDown",
     "hudChrome.mobile.radialLeft",
-    "hudChrome.mobile.radialUp",
-    "hudChrome.plurals.noticeboardGuildStats.few",
-    "hudChrome.plurals.noticeboardGuildStats.many",
-    "hudChrome.plurals.noticeboardGuildStats.one",
-    "hudChrome.plurals.noticeboardGuildStats.other"
+    "hudChrome.mobile.radialUp"
   ],
   "ko_KR": [
     "hudChrome.barEditor.pageTab",
@@ -3907,11 +3899,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.questStripCounter",
     "hudChrome.mobile.radialDown",
     "hudChrome.mobile.radialLeft",
-    "hudChrome.mobile.radialUp",
-    "hudChrome.plurals.noticeboardGuildStats.few",
-    "hudChrome.plurals.noticeboardGuildStats.many",
-    "hudChrome.plurals.noticeboardGuildStats.one",
-    "hudChrome.plurals.noticeboardGuildStats.other"
+    "hudChrome.mobile.radialUp"
   ],
   "ja_JP": [
     "hudChrome.barEditor.pageTab",
@@ -3926,11 +3914,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.questStripCounter",
     "hudChrome.mobile.radialDown",
     "hudChrome.mobile.radialLeft",
-    "hudChrome.mobile.radialUp",
-    "hudChrome.plurals.noticeboardGuildStats.few",
-    "hudChrome.plurals.noticeboardGuildStats.many",
-    "hudChrome.plurals.noticeboardGuildStats.one",
-    "hudChrome.plurals.noticeboardGuildStats.other"
+    "hudChrome.mobile.radialUp"
   ],
   "pt_BR": [
     "apiError.woc_market.already_pending",
@@ -4586,11 +4570,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobile.questStripCounter",
     "hudChrome.mobile.radialDown",
     "hudChrome.mobile.radialLeft",
-    "hudChrome.mobile.radialUp",
-    "hudChrome.plurals.noticeboardGuildStats.few",
-    "hudChrome.plurals.noticeboardGuildStats.many",
-    "hudChrome.plurals.noticeboardGuildStats.one",
-    "hudChrome.plurals.noticeboardGuildStats.other"
+    "hudChrome.mobile.radialUp"
   ],
   "cs_CZ": [
     "apiError.woc_market.already_pending",
