@@ -99,6 +99,11 @@ interface ServiceRequest {
 function privateHttpHostAllowed(hostname: string): boolean {
   if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') return true;
   if (hostname === 'host.docker.internal') return true;
+  // A bracketed hostname is an IPv6 literal; [::1] is handled above, and every
+  // other IPv6 address is unbracketed by no '.' and would otherwise slip
+  // through the single-label docker-name branch below (a public [2001:db8::1]
+  // has no dot). Only loopback rides plaintext.
+  if (hostname.startsWith('[')) return false;
   if (!hostname.includes('.')) return true;
   if (/\.(?:test|internal|local|localhost)$/.test(hostname)) return true;
   if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) return true;

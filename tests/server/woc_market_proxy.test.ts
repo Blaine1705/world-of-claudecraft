@@ -106,6 +106,9 @@ describe('the base URL may not carry the secret onto the open internet', () => {
     ['embedded credentials', 'https://user:pw@economy.example.com/v1/market/'],
     ['a non-http scheme', 'ftp://economy.test/v1/market/'],
     ['an unparseable base', 'not a url'],
+    // A public IPv6 literal is dotless, so it must not ride the single-label
+    // docker-name branch; only [::1] loopback may carry the secret in the clear.
+    ['a public http IPv6 host', 'http://[2001:db8::1]:8798/v1/market/'],
   ])('refuses %s without calling out', async (_label, base) => {
     process.env.WOC_MARKET_SERVICE_URL = base;
     const price = await createWocMarketEconomyProxy().price();
@@ -120,6 +123,7 @@ describe('the base URL may not carry the secret onto the open internet', () => {
     ['http to a docker service name', 'http://economy:8798/v1/market/'],
     ['http to the docker host alias', 'http://host.docker.internal:8798/v1/market/'],
     ['http to an RFC1918 address', 'http://10.0.0.7:8798/v1/market/'],
+    ['http to IPv6 loopback', 'http://[::1]:8798/v1/market/'],
   ])('allows %s', async (_label, base) => {
     process.env.WOC_MARKET_SERVICE_URL = base;
     respond = () => ({ status: 200, body: { healthy: true, tokensPerUsd: 1000, asOfMs: 1 } });
