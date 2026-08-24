@@ -215,6 +215,29 @@ describe('the detector flag host', () => {
     ).toEqual(['v1', 'v2']);
   });
 
+  it('releases the floor slot when a write is lost, so an immediate retry writes', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    dbMock.upsertSuspicionFlag.mockRejectedValueOnce(new Error('db down'));
+    dbMock.refreshSuspicionFlagDetails.mockRejectedValueOnce(new Error('db down'));
+    const host = createDetectorFlagHost(() => 1_700_000_000_000);
+    // A record is the write that mints the case: a false ack standing for the
+    // whole floor window would leave the case invisible until the next
+    // escalation, so the retry must be admitted inside the window.
+    await expect(host.recordSuspicionFlag({ accountId: 42, details: 'v1' })).resolves.toBe(false);
+    await expect(host.recordSuspicionFlag({ accountId: 42, details: 'v2' })).resolves.toBe(true);
+    expect(dbMock.upsertSuspicionFlag).toHaveBeenCalledTimes(2);
+    expect(dbMock.upsertSuspicionFlag.mock.calls[1][0]).toMatchObject({ details: 'v2' });
+    // Same rule on the refresh path, kept symmetric.
+    await expect(host.refreshSuspicionFlagDetails({ accountId: 42, details: 'r1' })).resolves.toBe(
+      false,
+    );
+    await expect(host.refreshSuspicionFlagDetails({ accountId: 42, details: 'r2' })).resolves.toBe(
+      true,
+    );
+    expect(dbMock.refreshSuspicionFlagDetails).toHaveBeenCalledTimes(2);
+    err.mockRestore();
+  });
+
   it('resolves true for a refresh whose flag an admin already cleared (nothing to retry)', async () => {
     dbMock.refreshSuspicionFlagDetails.mockResolvedValueOnce(false);
     const host = createDetectorFlagHost();
@@ -284,6 +307,10 @@ describe('createAccountWriteFloor', () => {
     expect(floor.accept(1, 10_999)).toBe(false);
     expect(floor.accept(2, 1_000)).toBe(true);
     expect(floor.accept(1, 11_000)).toBe(true);
+    // forget releases only that account's slot.
+    floor.forget(1);
+    expect(floor.accept(1, 11_001)).toBe(true);
+    expect(floor.accept(2, 1_001)).toBe(false);
 
     // The memory is bounded: past 10k accounts, entries old enough to be
     // inert (a stale entry blocks nobody) are dropped. Only size() can pin

@@ -102,12 +102,18 @@ function validObservation(observation: SuspicionFlagObservation): boolean {
 export interface AccountWriteFloor {
   /** True when accountId may write at `at`; false inside the floor window. */
   accept(accountId: number, at: number): boolean;
+  /** Release the slot accept() took: the write it guarded did not land, so a
+   *  retry must be admitted however fast it arrives. */
+  forget(accountId: number): void;
   size(): number;
 }
 
 export function createAccountWriteFloor(floorMs: number): AccountWriteFloor {
   const lastAt = new Map<number, number>();
   return {
+    forget(accountId) {
+      lastAt.delete(accountId);
+    },
     accept(accountId, at) {
       const last = lastAt.get(accountId);
       if (last !== undefined && at - last < floorMs) return false;
@@ -157,6 +163,9 @@ export function createDetectorFlagHost(now: () => number = () => Date.now()): Bo
         landed: Promise.resolve(true),
       };
       pendingRecord.set(accountId, pending);
+      // A lost write releases the floor slot before the caller sees false: a
+      // record is the write that mints the case, so a retry inside the window
+      // must write, not be acknowledged against a row that does not exist.
       pending.landed = enqueueFlagWrite(async () => {
         pendingRecord.delete(accountId);
         await upsertSuspicionFlag({
@@ -166,7 +175,10 @@ export function createDetectorFlagHost(now: () => number = () => Date.now()): Bo
           severity: DETECTOR_FLAG_SEVERITY,
           details: pending.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
         });
-      }, true);
+      }, true).then((landed) => {
+        if (!landed) recordFloor.forget(accountId);
+        return landed;
+      });
       return pending.landed;
     },
     refreshSuspicionFlagDetails(observation) {
@@ -185,7 +197,9 @@ export function createDetectorFlagHost(now: () => number = () => Date.now()): Bo
       pendingRefresh.set(accountId, pending);
       // Deleted BEFORE the awaited write, not after: a refresh arriving while
       // this one is mid-flight must queue its newer summary, not fold into a
-      // write whose details are already on the wire.
+      // write whose details are already on the wire. And a lost write releases
+      // the floor slot (the record path's rule, kept symmetric) so a retry is
+      // admitted however fast it arrives.
       pending.landed = enqueueFlagWrite(async () => {
         pendingRefresh.delete(accountId);
         await refreshFlagDetailsSql({
@@ -194,7 +208,10 @@ export function createDetectorFlagHost(now: () => number = () => Date.now()): Bo
           kind: DETECTOR_FLAG_KIND,
           details: pending.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
         });
-      }, false);
+      }, false).then((landed) => {
+        if (!landed) refreshFloor.forget(accountId);
+        return landed;
+      });
       return pending.landed;
     },
   };
