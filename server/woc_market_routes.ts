@@ -950,10 +950,7 @@ async function sellerHistoryHandler(ctx: Ctx): Promise<void> {
   // name no longer resolves (renamed or deleted), and the sales stand alone.
   json(ctx.res, 200, {
     sales: out.sales.map(saleView),
-    seller:
-      out.profile === null
-        ? null
-        : { guildName: out.profile.guildName, createdAtMs: out.profile.createdAtMs },
+    seller: out.profile === null ? null : { guildName: out.profile.guildName },
   });
 }
 

@@ -5478,9 +5478,6 @@ export const hudChromeStrings = {
     sellerBack: 'Back to Browse',
     sellerEmpty: 'No completed trades yet.',
     sellerError: 'Recent trades could not be loaded.',
-    // The pane's character-age line (the guild tag rides the title through
-    // the shared builder and needs no key of its own here).
-    sellerSince: 'Character created {date}',
     sellerSaleRow: '{time}: {item} to {buyer} for {usd}',
     detailTitle: 'Listing',
     detailSeller: 'Sold by {name}',

@@ -618,7 +618,6 @@ describeDb('woc market realm scoping against real Postgres', () => {
       ]);
       const profile = await marketDb.sellerProfile(alpha, name);
       expect(profile?.guildName).toBe(`Monarchs-${seq}`);
-      expect(profile?.createdAtMs).toBeGreaterThan(0);
       // The realm qual is a scoping predicate: the SAME name probed on the
       // other realm resolves nothing (the renamed-or-deleted arm's shape).
       expect(await marketDb.sellerProfile(beta, name)).toBeNull();

@@ -8448,7 +8448,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellerTitle': '{name} 最近的成交',
   'hudChrome.wocMarket.sellerBack': '返回浏览',
   'hudChrome.wocMarket.sellerEmpty': '暂无成交记录。',
-  'hudChrome.wocMarket.sellerSince': '角色创建于 {date}',
   'hudChrome.wocMarket.sellerError': '无法加载最近的成交。',
   'hudChrome.wocMarket.sellerSaleRow': '{time}：{item} 以 {usd} 售予 {buyer}',
   'hudChrome.wocMarket.colSeller': '卖家',

@@ -307,7 +307,7 @@ async function sellerHistoryBody(): Promise<Record<string, unknown>> {
   service({
     sellerSalesHistory: async () => ({
       sales: [saleRow()],
-      profile: { createdAtMs: 1_820_000_000_000, guildName: 'Monarchs' },
+      profile: { guildName: 'Monarchs' },
     }),
   });
   const ctx = readCtx({
@@ -422,13 +422,12 @@ describe('market wire views expose exactly their pinned key sets', () => {
 
   it('sellerHistoryView', async () => {
     // The seller click-through's readout: the same saleView rows plus the
-    // public profile line (facts the world already shows: the nameplate
-    // guild tag, plus the character's creation date). EXACTLY these keys.
+    // public profile line: ONLY facts the world already shows (the nameplate
+    // guild tag). The character creation date was dropped as an unspecced
+    // account-age disclosure, so the seller shape is exactly guildName.
     const body = await sellerHistoryBody();
     expect(Object.keys(body).sort()).toEqual(['sales', 'seller'].sort());
-    expect(Object.keys(body.seller as Record<string, unknown>).sort()).toEqual(
-      ['createdAtMs', 'guildName'].sort(),
-    );
+    expect(Object.keys(body.seller as Record<string, unknown>).sort()).toEqual(['guildName']);
     expect(Object.keys((body.sales as Record<string, unknown>[])[0]).sort()).toEqual(
       ['atMs', 'buyerName', 'id', 'itemId', 'priceCents', 'sellerName'].sort(),
     );

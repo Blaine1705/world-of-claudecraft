@@ -4062,7 +4062,6 @@ export const en_XA: EnTranslations = {
       "sellerBack": "[Ɓáçķ ţó Ɓŕóŵšé]",
       "sellerEmpty": "[Ñó çóɱþļéţéð ţŕáðéš ýéţ.]",
       "sellerError": "[Ŕéçéñţ ţŕáðéš çóúļð ñóţ ƀé ļóáðéð.]",
-      "sellerSince": "[Çĥáŕáçţéŕ çŕéáţéð {date}]",
       "sellerSaleRow": "[{time}: {item} ţó {buyer} ƒóŕ {usd}]",
       "detailTitle": "[Ļíšţíñĝ]",
       "detailSeller": "[Šóļð ƀý {name}]",

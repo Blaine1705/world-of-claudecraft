@@ -6802,12 +6802,10 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
     // (the renamed-or-deleted shape) while the sales still stand.
     expect(bySeller.profile).toBeNull();
     h.db.sellerProfiles.set(`${REALM}\x1f${mine[0].sellerName}`, {
-      createdAtMs: 1_800_000_000_000,
       guildName: 'Monarchs',
     });
     const withProfile = await h.service.sellerSalesHistory(mine[0].sellerName);
     expect(withProfile.profile).toEqual({
-      createdAtMs: 1_800_000_000_000,
       guildName: 'Monarchs',
     });
     expect(await h.service.sellerSalesHistory('NoSuchSeller')).toEqual({

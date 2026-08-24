@@ -4062,7 +4062,6 @@ export const pl_PL: EnTranslations = {
       "sellerBack": "Back to Browse",
       "sellerEmpty": "No completed trades yet.",
       "sellerError": "Recent trades could not be loaded.",
-      "sellerSince": "Character created {date}",
       "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
       "detailTitle": "Listing",
       "detailSeller": "Sold by {name}",

@@ -4062,7 +4062,6 @@ export const zh_CN: EnTranslations = {
       "sellerBack": "返回浏览",
       "sellerEmpty": "暂无成交记录。",
       "sellerError": "无法加载最近的成交。",
-      "sellerSince": "角色创建于 {date}",
       "sellerSaleRow": "{time}：{item} 以 {usd} 售予 {buyer}",
       "detailTitle": "挂单详情",
       "detailSeller": "卖家：{name}",

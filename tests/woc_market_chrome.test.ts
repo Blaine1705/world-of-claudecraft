@@ -147,13 +147,13 @@ describe('woc_market_chrome: the exact end time', () => {
       'utf8',
     ).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
     const calls = src.match(/formatDateTime\([^)]*\)/g) ?? [];
-    // Eight: the two endsAt readings, the sales-history row date (the detail
+    // Seven: the two endsAt readings, the sales-history row date (the detail
     // pane's recent-sales builder moved here with the hot-path work), the
     // foot's two rate prints (live time-only; paused dated: the last KNOWN
     // rate names its day), the quote face's settlement deadline, and the
-    // seller pane's row date plus its character-created line, all landed
-    // across the Exchange UX rounds.
-    expect(calls.length, 'every reading comes from the shared formatter').toBe(8);
+    // seller pane's row date. The seller pane's character-created line was
+    // dropped as an unspecced account-age disclosure.
+    expect(calls.length, 'every reading comes from the shared formatter').toBe(7);
     expect(calls.filter((c) => c.includes("timeZone: 'UTC'")).length).toBe(1);
     expect(src).toMatch(/utc:\s*formatDateTime\([^)]*timeZone: 'UTC'/);
   });

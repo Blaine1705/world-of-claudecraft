@@ -4550,15 +4550,16 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null> {
-    // The seller pane's public profile line: facts the world already shows
-    // (the nameplate guild tag) plus the character's creation date. LEFT
-    // JOIN so an unguilded character resolves with a null guild; a name
-    // that no longer exists resolves null outright (the sales are
-    // provenance and stand alone). characters.name is UNIQUE, so the realm
-    // qual is scoping, not disambiguation; LIMIT 1 mirrors the
-    // guildNameForCharacter join it descends from (db.ts).
+    // The seller pane's public profile line: only facts the world already
+    // shows (the nameplate guild tag). The character's creation date was
+    // dropped as an unspecced account-age disclosure. LEFT JOIN so an
+    // unguilded character resolves with a null guild; a name that no longer
+    // exists resolves null outright (the sales are provenance and stand
+    // alone). characters.name is UNIQUE, so the realm qual is scoping, not
+    // disambiguation; LIMIT 1 mirrors the guildNameForCharacter join it
+    // descends from (db.ts).
     const res = await this.pool.query(
-      `SELECT c.created_at, g.name AS guild_name
+      `SELECT g.name AS guild_name
          FROM characters c
          LEFT JOIN guild_members gm ON gm.character_id = c.id
          LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = c.realm
@@ -4569,7 +4570,6 @@ export class PgWocMarketDb implements WocMarketDb {
     const row = res.rows[0];
     if (!row) return null;
     return {
-      createdAtMs: new Date(row.created_at).getTime(),
       guildName: row.guild_name ?? null,
     };
   }

@@ -296,10 +296,11 @@ export interface WocBrowseRequest {
 }
 
 /** The seller pane's public profile line, or null when the seller's name no
- *  longer resolves to a character (renamed or deleted). */
+ *  longer resolves to a character (renamed or deleted). Only the guild tag,
+ *  which the world already shows; the character creation date was dropped as
+ *  an unspecced account-age disclosure. */
 export interface WocSellerView {
   guildName: string | null;
-  createdAtMs: number;
 }
 
 export class WocMarketClient {
@@ -511,7 +512,7 @@ export class WocMarketClient {
 
   /** A seller's recent completed trades (the Browse seller click-through):
    *  the same public sale rows as history, pivoted by seller name, plus
-   *  their public profile line (guild, character age). */
+   *  their public profile line (the guild tag). */
   async sellerHistory(
     name: string,
   ): Promise<{ ok: true; sales: WocSaleView[]; seller: WocSellerView | null } | WocMarketFail> {

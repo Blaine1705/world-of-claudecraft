@@ -4062,7 +4062,6 @@ export const ko_KR: EnTranslations = {
       "sellerBack": "둘러보기로 돌아가기",
       "sellerEmpty": "아직 완료된 거래가 없습니다.",
       "sellerError": "최근 거래를 불러올 수 없습니다.",
-      "sellerSince": "캐릭터 생성일: {date}",
       "sellerSaleRow": "{time}: {item}을(를) {buyer}에게 {usd}에 판매",
       "detailTitle": "등록 정보",
       "detailSeller": "판매자: {name}",

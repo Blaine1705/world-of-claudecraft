@@ -427,9 +427,9 @@ export function wocSellerPaneHtml(args: {
   name: string;
   failed: boolean;
   /** The seller's public profile line, or null when the name no longer
-   *  resolves to a character (renamed or deleted): the meta rows simply do
+   *  resolves to a character (renamed or deleted): the guild tag simply does
    *  not render, and the sales stand alone. */
-  profile: { guildName: string | null; createdAtMs: number } | null;
+  profile: { guildName: string | null } | null;
   sales: readonly { atMs: number; itemName: string; buyerName: string; usdText: string }[] | null;
 }): string {
   const body = args.failed
@@ -451,17 +451,9 @@ export function wocSellerPaneHtml(args: {
                 )}</li>`,
             )
             .join('')}</ul>`;
-  // The classic `<Guild>` tag (the shared builder) rides the title line
-  // beside the name; the character-age line sits under it. Both render only
-  // when the profile resolved.
-  const meta =
-    args.profile === null
-      ? ''
-      : `<p class="wm-seller-meta">${esc(
-          t('hudChrome.wocMarket.sellerSince', {
-            date: formatDateTime(args.profile.createdAtMs, { dateStyle: 'long' }),
-          }),
-        )}</p>`;
+  // The classic `<Guild>` tag (the shared builder) rides the title line beside
+  // the name, the one profile fact the world already shows. The character
+  // creation date was dropped as an unspecced account-age disclosure.
   return (
     `<div class="wm-seller-pane">` +
     `<button type="button" data-action="seller-back" ${FOCUS_KEY_ATTR}="wm-seller-back">${esc(
@@ -471,7 +463,6 @@ export function wocSellerPaneHtml(args: {
       args.profile?.guildName,
       'wm-seller-guild',
     )}</h3>` +
-    meta +
     body +
     `</div>`
   );

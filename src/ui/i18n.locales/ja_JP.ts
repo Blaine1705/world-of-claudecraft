@@ -8855,7 +8855,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellerTitle': '{name} の最近の取引',
   'hudChrome.wocMarket.sellerBack': '出品一覧に戻る',
   'hudChrome.wocMarket.sellerEmpty': 'まだ成立した取引はありません。',
-  'hudChrome.wocMarket.sellerSince': 'キャラクター作成日: {date}',
   'hudChrome.wocMarket.sellerError': '最近の取引を読み込めませんでした。',
   'hudChrome.wocMarket.sellerSaleRow': '{time}: {item} を {buyer} に {usd} で売却',
   'hudChrome.wocMarket.colSeller': '出品者',

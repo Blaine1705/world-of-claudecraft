@@ -4062,7 +4062,6 @@ export const ja_JP: EnTranslations = {
       "sellerBack": "出品一覧に戻る",
       "sellerEmpty": "まだ成立した取引はありません。",
       "sellerError": "最近の取引を読み込めませんでした。",
-      "sellerSince": "キャラクター作成日: {date}",
       "sellerSaleRow": "{time}: {item} を {buyer} に {usd} で売却",
       "detailTitle": "出品の詳細",
       "detailSeller": "出品者: {name}",

@@ -192,7 +192,7 @@ function fakeClient(rows: WocListingView[] = [listing(1)]): FakeClient {
           atMs: NOW - 60_000,
         },
       ],
-      seller: { guildName: 'Monarchs', createdAtMs: NOW - 90 * 24 * 3_600_000 },
+      seller: { guildName: 'Monarchs' },
     }),
     me: async () => ({ ok: true, activity: EMPTY_ACTIVITY }),
     stepUpChallenge: async () => ({
@@ -493,10 +493,11 @@ describe('WocMarketWindow live rig: open, browse, select', () => {
     expect(pane.textContent).toContain('Aurelia');
     expect(pane.textContent).toContain(NAME_OF(EPIC));
     expect(pane.textContent).toContain('Borin');
-    // The public profile line: the classic <Guild> tag beside the title and
-    // the character-age line under it.
+    // The public profile line: the classic <Guild> tag beside the title, the
+    // one fact the world already shows. The character-age line was dropped as
+    // an unspecced disclosure, so the pane carries no wm-seller-meta.
     expect(q(r.root, '.wm-seller-guild').textContent).toBe('<Monarchs>');
-    expect(q(r.root, '.wm-seller-meta').textContent).toContain('Character created');
+    expect(r.root.querySelector('.wm-seller-meta')).toBeNull();
     // Back restores the table: page, sort and filters all live on the class.
     q<HTMLButtonElement>(r.root, 'button[data-action="seller-back"]').click();
     await flush();

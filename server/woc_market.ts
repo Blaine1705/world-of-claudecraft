@@ -314,11 +314,13 @@ export interface NewWocListing {
   directedOfferId: number | null;
 }
 
-/** The seller click-through's public profile line: facts the game already
- *  shows in the world (the guild tag on nameplates and rosters) plus the
- *  character's creation date. Derived per read, never stored on sale rows. */
+/** The seller click-through's public profile line: only facts the game
+ *  already shows in the world (the guild tag on nameplates and rosters).
+ *  Derived per read, never stored on sale rows. The character's creation
+ *  date was dropped: it is account-age data the world does not otherwise
+ *  surface and no PRD authorizes disclosing (a deliberate re-add is a PRD
+ *  decision, not a default). */
 export interface WocSellerProfile {
-  createdAtMs: number;
   guildName: string | null;
 }
 

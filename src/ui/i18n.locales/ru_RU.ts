@@ -8980,7 +8980,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellerTitle': 'Недавние сделки продавца {name}',
   'hudChrome.wocMarket.sellerBack': 'Назад к обзору',
   'hudChrome.wocMarket.sellerEmpty': 'Завершённых сделок пока нет.',
-  'hudChrome.wocMarket.sellerSince': 'Персонаж создан {date}',
   'hudChrome.wocMarket.sellerError': 'Не удалось загрузить недавние сделки.',
   'hudChrome.wocMarket.sellerSaleRow': '{time}: {item} продан {buyer} за {usd}',
   'hudChrome.wocMarket.colSeller': 'Продавец',

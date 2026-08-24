@@ -10465,7 +10465,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocMarket.sellerError'
   | 'hudChrome.wocMarket.sellerLinkAria'
   | 'hudChrome.wocMarket.sellerSaleRow'
-  | 'hudChrome.wocMarket.sellerSince'
   | 'hudChrome.wocMarket.sellerTitle'
   | 'hudChrome.wocMarket.settlementConfirmedDelivering'
   | 'hudChrome.wocMarket.settlementConfirming'

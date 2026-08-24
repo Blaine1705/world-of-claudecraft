@@ -4062,7 +4062,6 @@ export const ru_RU: EnTranslations = {
       "sellerBack": "Назад к обзору",
       "sellerEmpty": "Завершённых сделок пока нет.",
       "sellerError": "Не удалось загрузить недавние сделки.",
-      "sellerSince": "Персонаж создан {date}",
       "sellerSaleRow": "{time}: {item} продан {buyer} за {usd}",
       "detailTitle": "Лот",
       "detailSeller": "Продавец: {name}",

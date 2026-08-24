@@ -8822,7 +8822,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellerTitle': '{name}의 최근 거래',
   'hudChrome.wocMarket.sellerBack': '둘러보기로 돌아가기',
   'hudChrome.wocMarket.sellerEmpty': '아직 완료된 거래가 없습니다.',
-  'hudChrome.wocMarket.sellerSince': '캐릭터 생성일: {date}',
   'hudChrome.wocMarket.sellerError': '최근 거래를 불러올 수 없습니다.',
   'hudChrome.wocMarket.sellerSaleRow': '{time}: {item}을(를) {buyer}에게 {usd}에 판매',
   'hudChrome.wocMarket.colSeller': '판매자',
