@@ -4462,8 +4462,7 @@ export class GameServer {
                   );
             });
           } catch (err) {
-            // The whole escrow rolled back, mail partitions included (rearmMailPartitionsOnFailure).
-            rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm);
+            rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // mail half of the rollback
             // The live sim is now ahead of durable truth for those books
             // until a later save or a reconcile lands, which is exactly the
             // window the dupe guards live in, so it must be visible in
@@ -4518,6 +4517,7 @@ export class GameServer {
         // saves. Only an explicit false is a fence-out: the no-nonce legacy path
         // returns true, so a strict comparison never mistakes an ordinary save for one.
         if (saved === false) {
+          rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // false, not a throw: catch's rearm never ran
           // Same dupe-sensitive shape as the throw above, reached the other
           // way: the write matched no row, so nothing persisted. Counted only
           // when this save actually carried books (an ordinary fenced-out
@@ -4701,7 +4701,6 @@ export class GameServer {
     }
   }
 
-  // The Ravenpost mail book: one row per recipient (#3561), reconstructed by loadMailState.
   async loadMail(): Promise<void> {
     try {
       this.sim.loadMail(await loadMailState());
@@ -4710,16 +4709,17 @@ export class GameServer {
     }
   }
 
-  // Persists only what changed since the last call (#3561); a quiet interval writes nothing.
   async saveMail(): Promise<void> {
-    const partitions = this.sim.takeDirtyMailPartitions();
-    if (partitions.length === 0) return;
-    try {
-      await this.enqueueMarketWrite(() => saveMailPartitions(partitions));
-    } catch (err) {
-      console.error('failed to save mail:', err);
-      rearmMailPartitionsOnFailure(this.sim, partitions);
-    }
+    await this.enqueueMarketWrite(async () => {
+      const partitions = this.sim.takeDirtyMailPartitions();
+      if (partitions.length === 0) return;
+      try {
+        await saveMailPartitions(partitions);
+      } catch (err) {
+        console.error('failed to save mail:', err);
+        rearmMailPartitionsOnFailure(this.sim, partitions);
+      }
+    });
   }
 
   // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book

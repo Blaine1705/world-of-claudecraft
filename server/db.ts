@@ -57,6 +57,11 @@ import {
 } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
 import {
+  assertMailPartitionWriteGateOpen,
+  openMailPartitionWriteGate,
+  writeMailPartitions,
+} from './mail_db';
+import {
   mailPartitionMarkerKey,
   mailRecipientKey,
   mailStateKey,
@@ -91,6 +96,10 @@ import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
 
+// The mail partition write gate lives in server/mail_db.ts (split out purely
+// to stay under this file's monolith ceiling); re-export both gate toggles so
+// pre-existing test consumers keep importing them from ./db unchanged.
+export { closeMailPartitionWriteGateForTests, openMailPartitionWriteGate } from './mail_db';
 // Same discipline for the mail partition backfill: mailStateKey (the legacy
 // whole-book key) and mailRecipientKey (the partitioned key) live in
 // server/mail_partition_backfill.ts; re-export both so pre-existing consumers
@@ -3508,20 +3517,13 @@ export async function saveCharacterAndMarketState(
       [marketStateKey(REALM), JSON.stringify(market)],
     );
     if (mailPartitions.length > 0) {
-      // Same partitioned key + batched UPSERT shape as saveMailPartitions
-      // (the periodic autosave path), just inside this transaction's own
-      // client instead of the pool, and gated the same way: a leave flush
-      // must not persist mail:<realm>:r:* rows before ensureSchema's mail
-      // partition backfill has run.
+      // Same writeMailPartitions shape as saveMailPartitions (the periodic
+      // autosave path), just inside this transaction's own client instead of
+      // the pool, and gated the same way: a leave flush must not persist
+      // mail:<realm>:r:* rows before ensureSchema's mail partition backfill
+      // has run.
       assertMailPartitionWriteGateOpen();
-      const keys = mailPartitions.map((p) => mailRecipientKey(REALM, p.recipientKey));
-      const datas = mailPartitions.map((p) => JSON.stringify({ mail: p.letters }));
-      await client.query(
-        `INSERT INTO world_state (key, data, updated_at)
-         SELECT k, d::jsonb, now() FROM UNNEST($1::text[], $2::text[]) AS t(k, d)
-         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-        [keys, datas],
-      );
+      await writeMailPartitions(client, REALM, mailPartitions);
     }
     // Guild bank books ride the SAME fenced transaction (Guild Bank Phase 3):
     // the character UPDATE above already passed the lease fence, so these can
@@ -4500,17 +4502,28 @@ export async function saveMarketState(save: MarketSave): Promise<void> {
 // rows, and only a pre-backfill database (no marker yet) falls back to the
 // retained legacy blob, exactly like loadMarketState.
 async function loadAllMailPartitions(realm: string): Promise<MailSave['mail']> {
-  // Half-open range on the key column selects every `mail:<realm>:r:*` row
-  // without a LIKE pattern (collation-sensitive prefix matching); ';' is the
-  // ASCII character immediately after ':', so this bounds the exact prefix.
-  // Boot-time only, not a hot path, so a plain range scan is the right shape
-  // (see server/CLAUDE.md "SQL shape on hot paths").
+  // Half-open range on the key column selects every `mail:<realm>:r:*` row;
+  // ';' is the ASCII character immediately after ':', so this bounds the
+  // exact prefix UNDER BYTE ORDER ONLY. `>=`/`<` on `text` are themselves
+  // collation-sensitive (an earlier revision of this comment claimed the
+  // opposite): under a linguistic collation (glibc en_US.utf8, ICU), the
+  // default for a non-Alpine/non-C-locale Postgres, punctuation carries no
+  // primary weight, so 'mail:<realm>:r;' can sort BEFORE every real
+  // partition key and this range silently matches nothing. `COLLATE "C"`
+  // forces byte-order comparison regardless of the column's declared
+  // collation, on both sides, so this is correct everywhere; `ORDER BY` under
+  // the same collation keeps boot-to-boot mail order deterministic instead of
+  // plan-dependent (a seq scan and an index scan can otherwise disagree).
+  // Boot-time only, not a hot path, so the missing index for this collation
+  // is an accepted cost (see server/CLAUDE.md "SQL shape on hot paths").
   const lo = `mail:${realm}:r:`;
   const hi = `mail:${realm}:r;`;
-  const res = await pool.query('SELECT data FROM world_state WHERE key >= $1 AND key < $2', [
-    lo,
-    hi,
-  ]);
+  const res = await pool.query(
+    `SELECT data FROM world_state
+      WHERE (key COLLATE "C") >= $1 AND (key COLLATE "C") < $2
+      ORDER BY key COLLATE "C"`,
+    [lo, hi],
+  );
   const out: MailSave['mail'] = [];
   for (const row of res.rows) {
     const letters = (row.data as { mail?: MailSave['mail'] } | null)?.mail;
@@ -4549,48 +4562,12 @@ export async function saveMailState(save: MailSave): Promise<void> {
   await saveWorldState(mailStateKey(REALM), save);
 }
 
-// Boot-ordering write gate for the partitioned mail rows, the same shape as
-// assertMarketWriteGateOpen: before ensureSchema's mail partition backfill
-// has run and recorded its marker, a realm process must not persist
-// `mail:<realm>:r:*` rows, or the 30 s autosave could race ahead of the
-// backfill and leave the realm with a mix of legacy and partitioned state.
-let mailPartitionWriteGateOpen = false;
-
-export function openMailPartitionWriteGate(): void {
-  mailPartitionWriteGateOpen = true;
-}
-
-// Test-only: re-close the gate so a fresh test starts from the boot default.
-export function closeMailPartitionWriteGateForTests(): void {
-  mailPartitionWriteGateOpen = false;
-}
-
-function assertMailPartitionWriteGateOpen(): void {
-  if (!mailPartitionWriteGateOpen) {
-    throw new Error(
-      'mail partition write blocked: ensureSchema must confirm the mail partition marker first (see server/mail_partition_backfill.ts)',
-    );
-  }
-}
-
-// The incremental autosave write (#3561): persists ONLY the given recipient
-// partitions in one batched multi-row upsert (a single round trip regardless
-// of how many recipients are dirty), instead of re-serializing and re-writing
-// the whole realm mailbook every 30 s. An empty `partitions` array (a quiet
-// interval with no mail mutations) issues no SQL at all.
 export async function saveMailPartitions(
   partitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
 ): Promise<void> {
   if (partitions.length === 0) return;
   assertMailPartitionWriteGateOpen();
-  const keys = partitions.map((p) => mailRecipientKey(REALM, p.recipientKey));
-  const datas = partitions.map((p) => JSON.stringify({ mail: p.letters }));
-  await pool.query(
-    `INSERT INTO world_state (key, data, updated_at)
-     SELECT k, d::jsonb, now() FROM UNNEST($1::text[], $2::text[]) AS t(k, d)
-     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-    [keys, datas],
-  );
+  await writeMailPartitions(pool, REALM, partitions);
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are

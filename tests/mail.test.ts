@@ -862,6 +862,76 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
     expect(dirty[0].letters[0].recipientName).toBe('NewDisplay');
   });
 
+  it('mailTake on an ALREADY-READ letter still dirties the partition (regression: gold/item duplication across a restart)', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Gift', 'For you.', 500, [], alice);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    sim.takeDirtyMailPartitions(); // drain the send + delivery
+
+    moveToMailbox(sim, bob);
+    // biome-ignore lint/suspicious/noExplicitAny: read the live book to find the id.
+    const giftId = (sim.postOffice as any).mail.find(
+      (m: { subject: string }) => m.subject === 'Gift',
+    ).id as number;
+
+    // The ordinary UI flow: opening a letter (mailbox_window.ts) reads it
+    // FIRST, as its own separate action; Take is a second, later click.
+    sim.mailMarkRead(giftId, bob);
+    sim.takeDirtyMailPartitions(); // drain the read flip; Take starts from a clean dirty set
+
+    sim.mailTake(giftId, bob);
+    const dirty = sim.takeDirtyMailPartitions();
+    const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
+    expect(dirty.map((p) => p.recipientKey)).toEqual([bobKey]);
+    const persisted = dirty[0].letters.find((m) => m.id === giftId);
+    // The persisted snapshot must actually reflect the take (copper gone),
+    // not the stale pre-take state a missed dirty mark would leave behind.
+    expect(persisted?.copper).toBe(0);
+  });
+
+  it("loadMail's soulbound-return migration keeps BOTH halves dirty (regression: re-runs forever / duplicates the item)", () => {
+    const sim = makeWorld();
+    // A legacy player parcel carrying a soulbound item: loadMail auto-splits
+    // it into a return-to-sender parcel (the item can never stay with a
+    // recipient it was mailed to under the modern soulbound rule).
+    sim.loadMail({
+      mail: [
+        {
+          recipientKey: '100',
+          recipientName: 'Later',
+          senderName: 'Ghost',
+          senderKey: '200',
+          kind: 'player',
+          subject: 'Old parcel',
+          body: 'x',
+          copper: 0,
+          delaySeconds: 0,
+          items: [{ itemId: 'reins_terrorspark_groundshaker', count: 1 }],
+        },
+      ],
+    } as never);
+
+    const dirty = sim.takeDirtyMailPartitions();
+    // '100' (the item stripped off) and '200' (the new return parcel) must
+    // BOTH be dirty: neither half of this migration is durable state yet.
+    // A missed mark here means it silently re-runs (minting a fresh return
+    // parcel with a new id) on every future boot, and can duplicate the item
+    // once the other half is later dirtied by something unrelated.
+    expect(dirty.map((p) => p.recipientKey).sort()).toEqual(['100', '200']);
+    const stripped = dirty
+      .find((p) => p.recipientKey === '100')
+      ?.letters.find((m) => m.subject === 'Old parcel');
+    expect(stripped?.items).toEqual([]);
+    const returned = dirty.find((p) => p.recipientKey === '200')?.letters[0];
+    expect(returned?.items).toEqual([{ itemId: 'reins_terrorspark_groundshaker', count: 1 }]);
+  });
+
   it('round-trips to the EXACT same book as a full serializeMail, across a realistic mutation sequence', () => {
     // A tiny fake per-recipient store mirroring server/db.ts's
     // saveMailPartitions (write only what's dirty) + loadMailState (union

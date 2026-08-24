@@ -12,6 +12,7 @@ import {
   mailStateKey,
   partitionMailByRecipient,
   runMailPartitionBackfill,
+  verifyMailPartitionConservation,
 } from '../../server/mail_partition_backfill';
 import type { MailSave } from '../../src/sim/sim';
 
@@ -73,23 +74,55 @@ describe('partitionMailByRecipient', () => {
     const a1 = mkLetter({ id: 1, recipientKey: 'alice' });
     const b1 = mkLetter({ id: 2, recipientKey: 'bob' });
     const a2 = mkLetter({ id: 3, recipientKey: 'alice' });
-    const grouped = partitionMailByRecipient([a1, b1, a2]);
-    expect([...grouped.keys()]).toEqual(['alice', 'bob']);
-    expect(grouped.get('alice')).toEqual([a1, a2]);
-    expect(grouped.get('bob')).toEqual([b1]);
+    const plan = partitionMailByRecipient([a1, b1, a2]);
+    expect([...plan.byRecipient.keys()]).toEqual(['alice', 'bob']);
+    expect(plan.byRecipient.get('alice')).toEqual([a1, a2]);
+    expect(plan.byRecipient.get('bob')).toEqual([b1]);
+    expect(plan.kept).toEqual([a1, b1, a2]);
+    expect(plan.droppedCount).toBe(0);
   });
 
-  it('drops a letter with a non-string recipientKey (a corrupt row) rather than throwing', () => {
+  it('drops a letter with a non-string recipientKey (a corrupt row) rather than throwing, and counts it', () => {
     const good = mkLetter({ id: 1, recipientKey: 'alice' });
     const corrupt = { ...mkLetter({ id: 2 }), recipientKey: null } as unknown as Letter;
-    const grouped = partitionMailByRecipient([good, corrupt]);
-    expect([...grouped.keys()]).toEqual(['alice']);
-    expect(grouped.get('alice')).toEqual([good]);
+    const plan = partitionMailByRecipient([good, corrupt]);
+    expect([...plan.byRecipient.keys()]).toEqual(['alice']);
+    expect(plan.byRecipient.get('alice')).toEqual([good]);
+    expect(plan.kept).toEqual([good]);
+    expect(plan.droppedCount).toBe(1);
   });
 
-  it('an empty or undefined mail array yields an empty map', () => {
-    expect(partitionMailByRecipient([]).size).toBe(0);
-    expect(partitionMailByRecipient(undefined as unknown as Letter[]).size).toBe(0);
+  it('an empty or undefined mail array yields an empty plan', () => {
+    expect(partitionMailByRecipient([]).byRecipient.size).toBe(0);
+    expect(partitionMailByRecipient(undefined as unknown as Letter[]).byRecipient.size).toBe(0);
+  });
+});
+
+describe('verifyMailPartitionConservation', () => {
+  it('passes when the partition union exactly reproduces the kept letters', () => {
+    const a = mkLetter({
+      id: 1,
+      recipientKey: 'alice',
+      copper: 50,
+      items: [{ itemId: 'x', count: 2 }],
+    });
+    const b = mkLetter({ id: 2, recipientKey: 'bob', copper: 10 });
+    const plan = partitionMailByRecipient([a, b]);
+    const result = verifyMailPartitionConservation(plan.kept, plan.byRecipient);
+    expect(result.ok).toBe(true);
+    expect(result.expected).toEqual({ letterCount: 2, escrowCopper: 60, escrowItemCount: 2 });
+    expect(result.actual).toEqual(result.expected);
+  });
+
+  it('fails when a partition bucket is missing a letter the kept list has', () => {
+    const a = mkLetter({ id: 1, recipientKey: 'alice', copper: 50 });
+    const plan = partitionMailByRecipient([a]);
+    const tampered = new Map(plan.byRecipient);
+    tampered.set('alice', []); // simulate a dropped bucket entry
+    const result = verifyMailPartitionConservation(plan.kept, tampered);
+    expect(result.ok).toBe(false);
+    expect(result.actual.letterCount).toBe(0);
+    expect(result.expected.letterCount).toBe(1);
   });
 });
 
@@ -98,7 +131,13 @@ describe('runMailPartitionBackfill', () => {
     const client = makeClient({ marker: [{ data: { legacyRowFound: true } }] });
     const res = await runMailPartitionBackfill({ client, realm: 'Home' });
 
-    expect(res).toEqual({ ran: false, legacyRowFound: false, recipientCount: 0, letterCount: 0 });
+    expect(res).toEqual({
+      ran: false,
+      legacyRowFound: false,
+      recipientCount: 0,
+      letterCount: 0,
+      droppedCount: 0,
+    });
     expect(client.query).toHaveBeenCalledTimes(1);
     expect(client.calls[0].params[0]).toBe('mail_partition_done:Home');
   });
@@ -118,10 +157,14 @@ describe('runMailPartitionBackfill', () => {
     const client = makeClient({ marker: [], legacy: [] });
     const res = await runMailPartitionBackfill({ client, realm: 'Home', log: () => {} });
 
-    expect(res).toEqual({ ran: true, legacyRowFound: false, recipientCount: 0, letterCount: 0 });
-    const partitionUpserts = client.calls.filter(
-      (c) => c.text.startsWith('INSERT') && String(c.params[0]).includes(':r:'),
-    );
+    expect(res).toEqual({
+      ran: true,
+      legacyRowFound: false,
+      recipientCount: 0,
+      letterCount: 0,
+      droppedCount: 0,
+    });
+    const partitionUpserts = client.calls.filter((c) => /UNNEST/i.test(c.text));
     expect(partitionUpserts).toHaveLength(0);
     const marker = client.calls.find(
       (c) => c.text.startsWith('INSERT') && c.params[0] === 'mail_partition_done:Home',
@@ -131,6 +174,7 @@ describe('runMailPartitionBackfill', () => {
       legacyRowFound: false,
       recipientCount: 0,
       letterCount: 0,
+      droppedCount: 0,
     });
   });
 
@@ -151,27 +195,24 @@ describe('runMailPartitionBackfill', () => {
       legacyRowFound: true,
       recipientCount: 2,
       letterCount: 3,
+      droppedCount: 0,
     });
-    const partitionUpserts = client.calls.filter(
-      (c) => c.text.startsWith('INSERT') && String(c.params[0]).includes(':r:'),
-    );
-    expect(partitionUpserts.map((c) => c.params[0]).sort()).toEqual([
-      'mail:Home:r:alice',
-      'mail:Home:r:bob',
-    ]);
-    const aliceRow = JSON.parse(
-      String(partitionUpserts.find((c) => c.params[0] === 'mail:Home:r:alice')?.params[1]),
-    ) as { mail: Letter[] };
+    // ONE batched multi-row UPSERT, never one query per recipient.
+    const partitionUpserts = client.calls.filter((c) => /UNNEST/i.test(c.text));
+    expect(partitionUpserts).toHaveLength(1);
+    const [keys, datas] = partitionUpserts[0].params as [string[], string[]];
+    expect([...keys].sort()).toEqual(['mail:Home:r:alice', 'mail:Home:r:bob']);
+    const aliceRow = JSON.parse(datas[keys.indexOf('mail:Home:r:alice')]) as { mail: Letter[] };
     expect(aliceRow.mail.map((m) => m.id)).toEqual([1, 3]);
-    const bobRow = JSON.parse(
-      String(partitionUpserts.find((c) => c.params[0] === 'mail:Home:r:bob')?.params[1]),
-    ) as { mail: Letter[] };
+    const bobRow = JSON.parse(datas[keys.indexOf('mail:Home:r:bob')]) as { mail: Letter[] };
     expect(bobRow.mail.map((m) => m.id)).toEqual([2]);
     // Legacy retention: no DELETE anywhere, and the legacy key is never
     // re-written by this migration (the rollback artifact stays byte-exact).
     for (const c of client.calls) {
       expect(c.text).not.toContain('DELETE');
-      if (c.text.startsWith('INSERT')) expect(c.params[0]).not.toBe('mail:Home');
+      if (c.text.startsWith('INSERT') && !/UNNEST/i.test(c.text)) {
+        expect(c.params[0]).not.toBe('mail:Home');
+      }
     }
   });
 
@@ -183,10 +224,9 @@ describe('runMailPartitionBackfill', () => {
     const client = makeClient({ legacy: [{ data: legacy }] });
     await runMailPartitionBackfill({ client, realm: 'Home', log: () => {} });
 
-    const partitionUpserts = client.calls.filter(
-      (c) => c.text.startsWith('INSERT') && String(c.params[0]).includes(':r:'),
-    );
-    expect(partitionUpserts.map((c) => c.params[0])).toEqual(['mail:Home:r:weird%3Aname']);
+    const partitionUpserts = client.calls.filter((c) => /UNNEST/i.test(c.text));
+    const [keys] = partitionUpserts[0].params as [string[], string[]];
+    expect(keys).toEqual(['mail:Home:r:weird%3Aname']);
   });
 
   it('pins the load-bearing SQL fragments to literal text', async () => {

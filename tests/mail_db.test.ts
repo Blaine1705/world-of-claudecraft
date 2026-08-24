@@ -132,13 +132,13 @@ describe('saveMailPartitions (the incremental autosave write, #3561)', () => {
     expect(dbMock.query).not.toHaveBeenCalled();
   });
 
-  it('writes every dirty recipient in ONE batched multi-row UPSERT, never one query per recipient', async () => {
+  it('writes every non-empty dirty recipient in ONE batched multi-row UPSERT, never one query per recipient', async () => {
     openMailPartitionWriteGate();
     dbMock.query.mockResolvedValueOnce({ rows: [] });
 
     await saveMailPartitions([
       { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
-      { recipientKey: 'bob', letters: [] as never },
+      { recipientKey: 'carol', letters: [{ id: 2, recipientKey: 'carol' }] as never },
     ]);
 
     expect(dbMock.query).toHaveBeenCalledTimes(1);
@@ -146,9 +146,63 @@ describe('saveMailPartitions (the incremental autosave write, #3561)', () => {
     expect(String(sql)).toMatch(/UNNEST/i);
     expect(String(sql)).toMatch(/ON CONFLICT \(key\) DO UPDATE/i);
     const [keys, datas] = params as [string[], string[]];
-    expect(keys).toEqual([`mail:${REALM}:r:alice`, `mail:${REALM}:r:bob`]);
+    expect(keys).toEqual([`mail:${REALM}:r:alice`, `mail:${REALM}:r:carol`]);
     expect(JSON.parse(datas[0])).toEqual({ mail: [{ id: 1, recipientKey: 'alice' }] });
-    expect(JSON.parse(datas[1])).toEqual({ mail: [] }); // an emptied-out mailbox is still a legitimate row
+    expect(JSON.parse(datas[1])).toEqual({ mail: [{ id: 2, recipientKey: 'carol' }] });
+  });
+
+  it('an emptied-out mailbox is DELETEd, never upserted as {"mail":[]} (retention, #3561)', async () => {
+    openMailPartitionWriteGate();
+    dbMock.query.mockResolvedValueOnce({ rows: [] });
+
+    await saveMailPartitions([{ recipientKey: 'bob', letters: [] as never }]);
+
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(String(sql)).toMatch(/DELETE FROM world_state WHERE key = ANY/i);
+    expect(params).toEqual([[`mail:${REALM}:r:bob`]]);
+  });
+
+  it('splits a mixed batch into one UPSERT for non-empty buckets and one DELETE for emptied ones', async () => {
+    openMailPartitionWriteGate();
+    dbMock.query.mockResolvedValue({ rows: [] });
+
+    await saveMailPartitions([
+      { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
+      { recipientKey: 'bob', letters: [] as never },
+    ]);
+
+    expect(dbMock.query).toHaveBeenCalledTimes(2);
+    const upsertCall = dbMock.query.mock.calls.find((c) => /UNNEST/i.test(String(c[0])));
+    const deleteCall = dbMock.query.mock.calls.find((c) =>
+      /DELETE FROM world_state/i.test(String(c[0])),
+    );
+    if (!upsertCall || !deleteCall) throw new Error('missing expected query');
+    const [upsertKeys] = upsertCall[1] as [string[], string[]];
+    expect(upsertKeys).toEqual([`mail:${REALM}:r:alice`]);
+    expect(deleteCall[1]).toEqual([[`mail:${REALM}:r:bob`]]);
+  });
+
+  it('de-dupes a repeated recipientKey by last-write-wins, so no key ever reaches the SQL twice', async () => {
+    openMailPartitionWriteGate();
+    dbMock.query.mockResolvedValueOnce({ rows: [] });
+
+    await saveMailPartitions([
+      { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
+      {
+        recipientKey: 'alice',
+        letters: [
+          { id: 1, recipientKey: 'alice' },
+          { id: 2, recipientKey: 'alice' },
+        ] as never,
+      },
+    ]);
+
+    expect(dbMock.query).toHaveBeenCalledTimes(1);
+    const [, params] = dbMock.query.mock.calls[0];
+    const [keys, datas] = params as [string[], string[]];
+    expect(keys).toEqual([`mail:${REALM}:r:alice`]); // one key, not two
+    expect(JSON.parse(datas[0]).mail).toHaveLength(2); // the LATER (fuller) entry won
   });
 
   it('blocks the write when the mail partition gate is closed (ensureSchema has not confirmed the marker yet)', async () => {
