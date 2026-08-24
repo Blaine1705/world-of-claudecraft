@@ -2523,7 +2523,8 @@ interface PainterHarness {
 function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHarness[] {
   const harnesses: PainterHarness[] = [];
 
-  // xp_bar: setWidth + setStyleProp (--xp-fill on bar + frame, rested geometry) + setText + toggleClass.
+  // xp_bar: setWidth + setStyleProp (--xp-fill on bar + frame, rested geometry) + setText
+  // + setAttr (the always-visible percent, on both bar and frame) + toggleClass.
   {
     const bar = fakeEl();
     const fill = fakeEl();
@@ -2531,7 +2532,13 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
     const label = fakeEl();
     const playerFrame = fakeEl();
     const painter = new XpBarPainter(facet, bar, fill, rested, label, playerFrame);
-    const view: XpBarView = { fillFrac: 0.5, restedFrac: 0.1, label: 'XP 1 / 2', postCap: false };
+    const view: XpBarView = {
+      fillFrac: 0.5,
+      restedFrac: 0.1,
+      label: 'XP 1 / 2',
+      percentText: '50%',
+      postCap: false,
+    };
     harnesses.push({ name: 'xp_bar', drive: () => painter.paint(view) });
   }
 

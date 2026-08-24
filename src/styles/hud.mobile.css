@@ -2239,6 +2239,26 @@
     );
     box-shadow: 0 0 9px rgba(245, 200, 67, 0.34);
   }
+  /* The always-visible XP percent (new-player-first-hour): touch has no
+     hover at all and #xpbar itself (plus its .label) is hidden here, so the
+     ring was the ONLY XP surface with no numeric readout whatsoever. Reads
+     the same data-percent attribute the painter already writes onto
+     #player-frame alongside --xp-fill (the ring's own established
+     dual-target pattern), captioned just under the ring rather than over the
+     portrait face. */
+  body.mobile-touch #player-frame::after {
+    content: attr(data-percent);
+    position: absolute;
+    left: -5px;
+    top: 68px;
+    width: 73px;
+    z-index: 2;
+    font-size: 9px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+  }
   body.mobile-touch #xpbar .fill,
   body.mobile-touch #xpbar .ticks {
     display: none;

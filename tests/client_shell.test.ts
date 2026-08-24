@@ -1784,6 +1784,12 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch #player-frame::before {\n      left: -5px;\n      top: -5px;\n      width: 73px;\n      height: 73px;',
     );
+    // The always-visible XP percent badge, captioned just under the ring
+    // (never over the portrait face): reads the SAME data-percent attribute
+    // xp_bar_painter.ts writes onto #player-frame alongside --xp-fill.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #player-frame::after {\n    content: attr(data-percent);',
+    );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #target-frame {\n    left: max(20px, calc(env(safe-area-inset-left) + 10px));\n    top: max(8px, env(safe-area-inset-top));',
     );

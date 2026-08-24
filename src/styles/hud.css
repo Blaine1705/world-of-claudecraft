@@ -2227,6 +2227,28 @@
   #xpbar:hover .label {
     opacity: 1;
   }
+  /* Always-visible percent (new-player-first-hour: the number was hover-only
+     before, invisible on touch entirely since mobile has no hover). Reads the
+     xp_bar_painter data-percent attribute rather than a new DOM element, so it
+     needs no markup change; swaps out for the fuller .label on hover instead
+     of overlapping it. */
+  #xpbar::after {
+    content: attr(data-percent);
+    position: absolute;
+    inset: 0;
+    padding-right: 4px;
+    font-size: 10px;
+    color: #fff;
+    text-align: right;
+    line-height: 10px;
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.15s;
+  }
+  #xpbar:hover::after {
+    opacity: 0;
+  }
   /* Post-cap overflow bar (Max-Level XP Overflow): gold/prestige tint. */
   #xpbar.overflow {
     outline-color: #b8902a;
