@@ -3733,6 +3733,11 @@ export interface ZonePropsDef {
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
+    /** A standable top (crate/rock family, see `colliders.ts`): this many yd
+     * above ground, a mover may land and stand on it instead of the piece
+     * colliding as a full-height wall. Requires `r` (or `hw`/`hd`) for the
+     * footprint; omit for ordinary full-height or walk-through decor. */
+    standableTop?: number;
   }[];
 }
 

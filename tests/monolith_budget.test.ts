@@ -399,9 +399,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    // Lowered from 2660 after the cell-index math moved out to
-    // collider_cells.ts (the ratchet rule: extraction lowers the ceiling).
-    ceiling: 2630,
+    // Lowered from 2630 after the decorProps collider builder moved out to
+    // decor_prop_colliders.ts (the ratchet rule: extraction lowers the ceiling).
+    ceiling: 2610,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
