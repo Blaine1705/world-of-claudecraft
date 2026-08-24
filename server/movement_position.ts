@@ -11,8 +11,8 @@ import type { Sim } from '../src/sim/sim';
 import { DT, type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
 import { waterLevelAt } from '../src/sim/world';
 import {
-  groundedMovementEndpointWithinInputBudgetY,
   groundedMovementEndpointWithinBudgetY,
+  groundedMovementEndpointWithinInputBudgetY,
   groundedMovementEndpointY,
   movementInputDirection,
 } from './movement_position_reachability';

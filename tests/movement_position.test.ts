@@ -13,8 +13,8 @@ import { isDeepWaterAt, isSwimming, swimSurfaceY, wadeSpeedMult } from '../src/s
 import { Sim } from '../src/sim/sim';
 import { DT, emptyMoveInput, RUN_SPEED } from '../src/sim/types';
 import { groundHeight, terrainHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
-import { EMPTY_TEST_WORLD } from './sim_shared';
 import { wallFootFixture } from './helpers/wall_foot';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function setup(seed = 42): { sim: Sim; session: MovementPositionSession } {
   const sim = new Sim({ seed, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
