@@ -56,6 +56,12 @@ import {
   mergeGuildBankRow,
 } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
+import {
+  mailPartitionMarkerKey,
+  mailRecipientKey,
+  mailStateKey,
+  runMailPartitionBackfill,
+} from './mail_partition_backfill';
 import { MAPS_SCHEMA } from './maps_db';
 import {
   LEGACY_MARKET_KEY,
@@ -85,6 +91,11 @@ import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
 
+// Same discipline for the mail partition backfill: mailStateKey (the legacy
+// whole-book key) and mailRecipientKey (the partitioned key) live in
+// server/mail_partition_backfill.ts; re-export both so pre-existing consumers
+// keep importing from ./db unchanged.
+export { mailRecipientKey, mailStateKey } from './mail_partition_backfill';
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
 // db.ts can import it without a cycle). Only marketStateKey was ever part of
@@ -1367,11 +1378,30 @@ export async function ensureSchema(): Promise<void> {
         `[market-backfill] applied for realm ${REALM} (legacyRowFound=${backfill.legacyRowFound})`,
       );
     }
+    // Partitioned Ravenpost mail backfill (#3561): splits this realm's
+    // `mail:<realm>` blob per recipient so autosave can persist only what
+    // changed. Runs in the same advisory-lock transaction as the market
+    // backfill above, right before COMMIT, for the same reason: a racing
+    // autosave must never observe a half-migrated realm. See
+    // server/mail_partition_backfill.ts.
+    const mailBackfill = await runMailPartitionBackfill({
+      client,
+      realm: REALM,
+      log: (line) => console.log(line),
+    });
+    if (mailBackfill.ran) {
+      console.log(
+        `[mail-partition-backfill] applied for realm ${REALM} (legacyRowFound=${mailBackfill.legacyRowFound}, recipients=${mailBackfill.recipientCount})`,
+      );
+    }
     await client.query('COMMIT');
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
     // (backfill.ran === false, i.e. the marker already existed).
     openMarketWriteGate();
+    // Same discipline for the mail partition gate: no mail:<realm>:r:* write
+    // can land before this realm's marker is durable.
+    openMailPartitionWriteGate();
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
@@ -3407,20 +3437,28 @@ export async function saveCharacterState(
   return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
 
-// Persist a character row AND this realm's World Market + Ravenpost mail blobs
-// in ONE transaction. They live in different tables (characters / world_state),
-// but a Market listing and a mail attachment are both escrows: the item leaves
-// the character's bags (character state) and becomes a listing / a letter
-// parcel (world state) in the same Sim action. Saving them as independent
-// writes lets an unclean crash persist one half and not the other, vaporising
-// the item or duplicating it across bags and book. The leave path uses this so
-// a logout flush of bags can never tear away from either escrow.
+// Persist a character row AND this realm's World Market + Ravenpost mail
+// state in ONE transaction. They live in different tables (characters /
+// world_state), but a Market listing and a mail attachment are both escrows:
+// the item leaves the character's bags (character state) and becomes a
+// listing / a letter parcel (world state) in the same Sim action. Saving them
+// as independent writes lets an unclean crash persist one half and not the
+// other, vaporising the item or duplicating it across bags and book. The
+// leave path uses this so a logout flush of bags can never tear away from
+// either escrow.
+//
+// mailPartitions carries only the recipient mailboxes dirtied since the last
+// mail save (Sim.takeDirtyMailPartitions, #3561), not the whole realm book:
+// the atomicity this function exists for only ever needed to protect the
+// one or two mailboxes THIS session's own action actually touched, the same
+// as the periodic autosave's incremental write. An empty array (no mail
+// mutation this session) issues no mail SQL at all.
 export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
   state: CharacterState,
   market: MarketSave,
-  mail: MailSave,
+  mailPartitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
   leaseNonce?: string,
   // Guild bank books dirtied by this character's session (Guild Bank Phase 3):
   // they are escrows exactly like the market/mail blobs (an item leaves the
@@ -3469,11 +3507,22 @@ export async function saveCharacterAndMarketState(
       // is written to a key nothing loads and the item is stranded on next boot.
       [marketStateKey(REALM), JSON.stringify(market)],
     );
-    await client.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      [mailStateKey(REALM), JSON.stringify(mail)],
-    );
+    if (mailPartitions.length > 0) {
+      // Same partitioned key + batched UPSERT shape as saveMailPartitions
+      // (the periodic autosave path), just inside this transaction's own
+      // client instead of the pool, and gated the same way: a leave flush
+      // must not persist mail:<realm>:r:* rows before ensureSchema's mail
+      // partition backfill has run.
+      assertMailPartitionWriteGateOpen();
+      const keys = mailPartitions.map((p) => mailRecipientKey(REALM, p.recipientKey));
+      const datas = mailPartitions.map((p) => JSON.stringify({ mail: p.letters }));
+      await client.query(
+        `INSERT INTO world_state (key, data, updated_at)
+         SELECT k, d::jsonb, now() FROM UNNEST($1::text[], $2::text[]) AS t(k, d)
+         ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+        [keys, datas],
+      );
+    }
     // Guild bank books ride the SAME fenced transaction (Guild Bank Phase 3):
     // the character UPDATE above already passed the lease fence, so these can
     // never land for a displaced session, and a failure anywhere rolls back
@@ -4438,18 +4487,110 @@ export async function saveMarketState(save: MarketSave): Promise<void> {
   await saveWorldState(marketStateKey(REALM), save);
 }
 
-// The Ravenpost mail book: realm-scoped like the market, one JSONB blob per
-// realm under `mail:<realm>`. Born realm-scoped, so no legacy migration.
-export function mailStateKey(realm: string): string {
-  return `mail:${realm}`;
+// The Ravenpost mail book: realm-scoped like the market. Used to live as one
+// JSONB blob per realm under `mail:<realm>`; ensureSchema's partitioned
+// backfill (server/mail_partition_backfill.ts, #3561) now splits that into
+// one row per recipient (`mail:<realm>:r:<key>`) so the 30 s autosave persists
+// only the recipients that actually changed instead of re-serializing the
+// WHOLE book every cycle. The `mail:<realm>` key itself is RETAINED as the
+// rollback artifact and never written again after the backfill runs, mirroring
+// the market's legacy-blob retention.
+//
+// loadMailState is a pure READ: it serves the union of this realm's partition
+// rows, and only a pre-backfill database (no marker yet) falls back to the
+// retained legacy blob, exactly like loadMarketState.
+async function loadAllMailPartitions(realm: string): Promise<MailSave['mail']> {
+  // Half-open range on the key column selects every `mail:<realm>:r:*` row
+  // without a LIKE pattern (collation-sensitive prefix matching); ';' is the
+  // ASCII character immediately after ':', so this bounds the exact prefix.
+  // Boot-time only, not a hot path, so a plain range scan is the right shape
+  // (see server/CLAUDE.md "SQL shape on hot paths").
+  const lo = `mail:${realm}:r:`;
+  const hi = `mail:${realm}:r;`;
+  const res = await pool.query('SELECT data FROM world_state WHERE key >= $1 AND key < $2', [
+    lo,
+    hi,
+  ]);
+  const out: MailSave['mail'] = [];
+  for (const row of res.rows) {
+    const letters = (row.data as { mail?: MailSave['mail'] } | null)?.mail;
+    if (Array.isArray(letters)) out.push(...letters);
+  }
+  return out;
 }
 
 export async function loadMailState(): Promise<MailSave | null> {
+  const letters = await loadAllMailPartitions(REALM);
+  if (letters.length > 0) {
+    // nextMailId is deliberately NOT reconstructed from the partition rows:
+    // PostOffice.loadMail already derives it as
+    // max(this.nextMailId, save.nextMailId, every loaded letter's id + 1), so
+    // a neutral 1 here is exactly as safe as the market's per-realm nextListingId
+    // carry-forward, without needing a second synchronized counter row.
+    return { mail: letters, nextMailId: 1 };
+  }
+  // No partition rows. If the backfill has recorded its marker, this realm
+  // genuinely has an empty mailbook (never write or fall back): only a
+  // database that predates the backfill (no marker) still falls back to a
+  // back-compat READ of the retained legacy blob. On a normal boot this
+  // fallback is unreachable (ensureSchema always confirms the marker before
+  // game.loadMail runs); it is a defensive net for an out-of-band caller
+  // hitting a pre-backfill database.
+  const marker = await loadWorldState<unknown>(mailPartitionMarkerKey(REALM));
+  if (marker !== null) return null;
   return loadWorldState<MailSave>(mailStateKey(REALM));
 }
 
+// Retained for the pre-existing `saveMailState`/db-mock surface (many
+// unrelated tests stub the whole `server/db` module and reference this name);
+// production no longer calls it on the hot path (see saveMailPartitions
+// below), but it remains a correct, complete whole-book write.
 export async function saveMailState(save: MailSave): Promise<void> {
   await saveWorldState(mailStateKey(REALM), save);
+}
+
+// Boot-ordering write gate for the partitioned mail rows, the same shape as
+// assertMarketWriteGateOpen: before ensureSchema's mail partition backfill
+// has run and recorded its marker, a realm process must not persist
+// `mail:<realm>:r:*` rows, or the 30 s autosave could race ahead of the
+// backfill and leave the realm with a mix of legacy and partitioned state.
+let mailPartitionWriteGateOpen = false;
+
+export function openMailPartitionWriteGate(): void {
+  mailPartitionWriteGateOpen = true;
+}
+
+// Test-only: re-close the gate so a fresh test starts from the boot default.
+export function closeMailPartitionWriteGateForTests(): void {
+  mailPartitionWriteGateOpen = false;
+}
+
+function assertMailPartitionWriteGateOpen(): void {
+  if (!mailPartitionWriteGateOpen) {
+    throw new Error(
+      'mail partition write blocked: ensureSchema must confirm the mail partition marker first (see server/mail_partition_backfill.ts)',
+    );
+  }
+}
+
+// The incremental autosave write (#3561): persists ONLY the given recipient
+// partitions in one batched multi-row upsert (a single round trip regardless
+// of how many recipients are dirty), instead of re-serializing and re-writing
+// the whole realm mailbook every 30 s. An empty `partitions` array (a quiet
+// interval with no mail mutations) issues no SQL at all.
+export async function saveMailPartitions(
+  partitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
+): Promise<void> {
+  if (partitions.length === 0) return;
+  assertMailPartitionWriteGateOpen();
+  const keys = partitions.map((p) => mailRecipientKey(REALM, p.recipientKey));
+  const datas = partitions.map((p) => JSON.stringify({ mail: p.letters }));
+  await pool.query(
+    `INSERT INTO world_state (key, data, updated_at)
+     SELECT k, d::jsonb, now() FROM UNNEST($1::text[], $2::text[]) AS t(k, d)
+     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+    [keys, datas],
+  );
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are

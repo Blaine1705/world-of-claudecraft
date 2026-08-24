@@ -11455,6 +11455,20 @@ export class Sim {
     return this.postOffice.serializeMail();
   }
 
+  // Incremental autosave seam (#3561): every recipient bucket that changed
+  // since the last call, drained. An idle interval returns [].
+  takeDirtyMailPartitions(): { recipientKey: string; letters: MailSave['mail'] }[] {
+    return this.postOffice.takeDirtyMailPartitions();
+  }
+
+  // Failed-write recovery: re-arms recipient keys taken by
+  // takeDirtyMailPartitions() whose persistence attempt failed, so the next
+  // autosave cycle retries their (by-then-current) state instead of silently
+  // dropping it.
+  markMailPartitionsDirty(recipientKeys: readonly string[]): void {
+    this.postOffice.markPartitionsDirty(recipientKeys);
+  }
+
   loadMail(save: MailSave | null | undefined): void {
     this.postOffice.loadMail(save);
   }
