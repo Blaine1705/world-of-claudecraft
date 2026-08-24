@@ -204,9 +204,7 @@ import {
   consumeHealCue,
   groundTickAbilityCue,
   impactCueForDamage,
-  type MobVoiceAction,
   mobVoiceActionForDamage,
-  mobVoiceCue,
   mobVoiceCueWithFallback,
   novaAbilityCue,
   playerSwingCueForDamage,
@@ -502,6 +500,7 @@ import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
 import { unitFrameCurrentMaxText } from './hud_frames';
+import { availableMobVoiceCue, sfxHasCue, yellVoiceKey } from './hud_voice_cues';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -1235,27 +1234,6 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
   if (className) span.className = className;
   parent.appendChild(span);
   return span;
-}
-
-function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
-  return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
-}
-
-/** The `hasCue` probe playerVoiceCue resolves its gendered key against, same
- *  injection the mob resolver above uses. */
-function sfxHasCue(key: string): boolean {
-  return sfx.hasVariants(key);
-}
-
-// Stable voice-clip key for a spoken yell line. MUST match the generator slug in
-// scripts/voices/extra_lines.mjs (yellKey) so encounter dialogue (e.g. the
-// Nythraxis raid) plays the right clip from the live chat event text.
-function yellVoiceKey(text: string): string {
-  return `yell__${text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 60)}`;
 }
 
 const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';

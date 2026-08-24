@@ -91,7 +91,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count after reconciling the OSSBrain
     // v0.40 batch with the current release branch. The merged file is smaller
     // than both parent pins, so the ratchet follows it down with zero slack.
-    ceiling: 18694,
+    // Re-pinned from 18694 after the voice-clip key resolvers moved out to
+    // src/ui/hud_voice_cues.ts: wiring the gendered player voice needed lines
+    // in a file the v0.40 merge had left sitting exactly on its ceiling, so
+    // the cues were extracted rather than the ceiling raised.
+    ceiling: 18685,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
