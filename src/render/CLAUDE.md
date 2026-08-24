@@ -402,6 +402,50 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   (`characters/far_lod_reveal_core.ts` `farMeshShown`: the articulated rig keeps
   drawing until the baked mesh links). `entity_gate_stand_in_core.ts` holds the
   rule: `ENTITY_GATE_STAND_INS` (one row per gate call site, naming what it hides
+- **The camera-occluder fade is a GATED flip (`occluder_fade_gate.ts`).** A
+  structure that blocks the eye-to-camera segment fades by flipping
+  `transparent` on its per-structure clones (`occluder_fade.ts`) or by drawing
+  a pooled transparent stand-in (`instanced_occluder_ghosts.ts`), and three
+  keys a SECOND program on that flip. The boot manifest stages one hidden twin
+  per fade program (`props.ghost-fade-variants`, `foliage.materials`), but both
+  entries are droppable and resume in the lowest lane, while the player's
+  first camera turn after the curtain is exactly when a house or a tree
+  crosses the segment: on a boot that dropped them the flip linked inside that
+  live frame. So the flip consults a reveal gate whose key is the program
+  identity (`occluder_ghost_variant_key.ts`, or `instancedGhostKey`) and whose
+  root is a hidden twin on that program (`buildOccluderFadeTwin`, the ONE
+  recipe the prewarm and the gate share; `instancedGhostTwin` for the pools,
+  built with the live stand-in's own `createInstancedGhostMaterial`). A cold
+  key fires the twin's compile through the reveal compile host and holds: an
+  EDGE consult (the camera is inside the structure now) names the actionable
+  floor, `compile(root, imminent, namedPriority)`, and escalates a key a
+  prefetch already queued at the ordinary priority (one more compile of the
+  same twin, the key settling on either result); the painter's per-frame path is
+  `advanceOccluderFade`, which keeps the structure OPAQUE while its alpha keeps
+  stepping and writes the flip the frame the link settles; the tree hides ask
+  `InstancedOccluderGhosts.allReady` for every part before the first acquire.
+  Restoring to the authored state never consults, and a structure that
+  clears the camera while still held never flips at all. WHAT THE PLAYER SEES
+  during a hold is the structure itself, opaque, exactly as before it crossed
+  the segment: the hold delays a cosmetic see-through, never a representation
+  (every entity behind the wall keeps drawing; the camera cannot see through
+  the wall yet, as it could not before the fade existed), the same trade the
+  character-effect swap makes, and the hold ends on the twin's settle or the
+  reveal watchdog, never on a clock. Structures within
+  `OCCLUDER_FADE_PREFETCH_YD` of the camera (geometry: the cinematic's opening
+  pull-back, past the wheel range) ask ahead of their first occlusion,
+  `prefetchOccluderFadeWithin` / `prefetchAll`, at the ordinary reveal
+  priority, or imminent under an arrival cover so the covered wait links them
+  too. No installed gate (no async compile, tests, the editor) means the
+  historical immediate flip; `renderer_resource_lifecycle.ts` uninstalls it
+  with the renderer, and the twins (one per program, retained for the gate's
+  life, never disposed while installed) go with it. A new fade painter uses
+  `advanceOccluderFade` and mints its records with `occluderFadeRecordFor`
+  (one record per material AND mesh variant: a plain and an instanced mesh
+  of one material are two programs); every instanced-ghost consumer (trees,
+  the Yumi maze walls, the battleground placements) decides through
+  `occluderKeepsInstances` before `acquire`. Pinned by
+  `tests/occluder_fade_gate.test.ts` and `tests/occluder_fade_core.test.ts`.
   and what still draws), `applyCharacterFormVisibility` (the base body is the
   stand-in for a linking FORM rig, held there by `characterFormReadyMask`, which
   treats a rig behind its gate as absent), and `entityHasNoBody`, which the

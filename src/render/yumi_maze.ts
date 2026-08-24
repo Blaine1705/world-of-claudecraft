@@ -17,6 +17,7 @@ import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
   occluderFadeSettled,
+  occluderKeepsInstances,
   occluderSegmentHitsBox,
   stepOccluderFade,
 } from './occluder_fade_core';
@@ -176,6 +177,9 @@ export function buildYumiMaze(
   walls.receiveShadow = true;
   group.add(walls);
   const wallGhosts = new InstancedOccluderGhosts();
+  // The one source every stub ghosts from, in the pool's parts shape, built
+  // once so the per-frame consult allocates nothing.
+  const wallParts = [{ mesh: walls }];
 
   // Occluder fade over the shared wall batch: an occluding stub swaps its
   // instance for a pooled ghost mesh at the fade alpha (the tree pattern).
@@ -199,7 +203,7 @@ export function buildYumiMaze(
     for (let i = 0; i < wallHideables.length; i++) {
       const h = wallHideables[i];
       const hide = occluderSegmentHitsBox(h.x, h.z, h.hw, h.hd, topY, ex, eyeY, ez, cx, camY, cz);
-      if (!hide && h.ghost === null) {
+      if (occluderKeepsInstances(hide, h.ghost !== null, wallGhosts, wallParts)) {
         h.hidden = false;
         h.alpha = 1;
         continue;

@@ -283,7 +283,7 @@ interface AttributionTargetFixture {
 // Re-minted for the stale remote-entity holdout repair (renderer.ts): the
 // renderer integration leaf moved. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4ad25d5f19db674748329dcc5150a4b2c5efa27f22ef52bfc422ccacb036a6c4';
+  'd52cd4d487da50dd641eff43ba74e6496a21e47edacce8304b2d8ede88b14800';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

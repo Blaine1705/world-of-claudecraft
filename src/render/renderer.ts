@@ -434,6 +434,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import { installOccluderFadeGate } from './occluder_fade_gate';
 import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
 import {
   type OpaqueSortPolicyInput,
@@ -2589,6 +2590,7 @@ export class Renderer {
         createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
       );
       this.foliageRevealGate = createRevealGate(revealHost, (key) => this.foliage.revealRoots(key));
+      installOccluderFadeGate(revealHost);
     }
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads

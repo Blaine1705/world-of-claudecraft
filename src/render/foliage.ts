@@ -123,7 +123,12 @@ import {
   registerGroundDecorPrewarmDraw,
 } from './ground_decor_prewarm';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
-import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  occluderFadeSettled,
+  occluderKeepsInstances,
+  stepOccluderFade,
+  withinOccluderFadePrefetch,
+} from './occluder_fade_core';
 import {
   advanceInstanceCountInto,
   farFieldDensityFractionForValues,
@@ -786,6 +791,8 @@ interface TreeHideable {
   /** Live ghost stand-ins while the fade is active (empty = instanced). */
   ghosts: InstancedGhostHandle[];
   parts: TreeHidePart[];
+  /** The ghost programs were asked for ahead of the first occlusion. */
+  prefetched: boolean;
 }
 
 // distance caps for the LOD windows. The dense sculpted barks are ~70% of a
@@ -1583,6 +1590,7 @@ function placeSpecies(
         alpha: 1,
         ghosts: [],
         parts: [],
+        prefetched: false,
       }));
       hideRegistry.push(...handles);
       return { ...g, handles };
@@ -3679,8 +3687,12 @@ function updateTreeHides(
   // shadow clones are untouched either way, so faded trees keep their shadows.
   for (let i = 0; i < trees.length; i++) {
     const t = trees[i];
+    if (!t.prefetched && withinOccluderFadePrefetch(t.x, t.z, camX, camZ)) {
+      t.prefetched = true;
+      ghosts.prefetchAll(t.parts);
+    }
     const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
-    if (!hide && t.ghosts.length === 0) {
+    if (occluderKeepsInstances(hide, t.ghosts.length > 0, ghosts, t.parts)) {
       t.hidden = false;
       t.alpha = 1;
       continue;

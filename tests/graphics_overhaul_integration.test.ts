@@ -49,14 +49,17 @@ describe('graphics-overhaul integration', () => {
     const consumers = [
       'src/render/props.ts',
       'src/render/foliage.ts',
-      'src/render/dungeon.ts',
+      'src/render/arena_wall_fade.ts',
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',
       'src/render/battleground_placements.ts',
     ];
     for (const file of consumers) {
       const text = source(file);
-      expect(text, file).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\)/s);
+      // Either the core's step (the instanced-ghost consumers) or the gated
+      // stepper over it (occluder_fade.ts advanceOccluderFade, the fade
+      // painters); both take the flag as their last argument.
+      expect(text, file).toMatch(/(?:step|advance)OccluderFade\([^)]+,\s*reducedMotion,?\s*\)/s);
     }
   });
 

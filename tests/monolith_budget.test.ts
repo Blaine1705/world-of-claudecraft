@@ -446,7 +446,9 @@ const MONOLITHS: MonolithRow[] = [
     // current count per the ratchet's rule; any further growth reds, and the
     // fix is extraction behind the seam named here.
     file: 'src/render/dungeon.ts',
-    ceiling: 2882,
+    // Lowered after extracting the arena-wall camera-occluder fade (footprint
+    // hit test plus the per-frame gated step) into src/render/arena_wall_fade.ts.
+    ceiling: 2804,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
