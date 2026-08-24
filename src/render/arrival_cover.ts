@@ -52,6 +52,14 @@ export interface ArrivalRevealWaitOptions {
 // bare boolean let whichever dropped first clear the other's cover and
 // un-refuse the boot-debt and background admission lanes mid-arrival.
 let coverDepth = 0;
+// The ESTABLISHING SHOT: the world-entry cover is about to lift on the
+// first-spawn cinematic (spawn_cinematic.ts), whose opening pose is a wide,
+// high view of the whole spawn village rather than the chase camera among the
+// buildings. Under it every reveal consult counts as IMMINENT (reveal_gate.ts):
+// what that shot sees is what the player sees first, and the entry wait
+// (arrival_warmup.ts settleWorldEntryCover) is what gives it time to link.
+// Set only by the entry-cover owner, read only while the cover is up.
+let establishingShot = false;
 const gates = new Set<WeakRef<ArrivalRevealGate>>();
 // Module-level like the flag: a graphics rebuild mints a fresh renderer, and
 // the player's last position is not something a rebuild should forget.
@@ -76,6 +84,16 @@ export function registerRevealGateForArrival(gate: ArrivalRevealGate): void {
 
 export function arrivalCoverActive(): boolean {
   return coverDepth > 0;
+}
+
+export function setArrivalEstablishingShot(active: boolean): void {
+  establishingShot = active;
+}
+
+/** True while the entry cover is up on an establishing shot: with the cover
+ *  down the flag is inert, whatever its owner last wrote. */
+export function arrivalEstablishingShotActive(): boolean {
+  return establishingShot && coverDepth > 0;
 }
 
 /** Imminent keys still held across every registered gate. */
@@ -166,6 +184,7 @@ export function noteArrivalIfTeleported(x: number, z: number, missingViews: numb
 
 export function resetArrivalCoverForTest(): void {
   coverDepth = 0;
+  establishingShot = false;
   gates.clear();
   arrivalDetector = createArrivalDetector();
 }

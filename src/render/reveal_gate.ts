@@ -34,9 +34,13 @@
 // link, upload and touch pieces at the imminent priority so the decor the
 // camera stands in is what the driver links first. Every gate joins the
 // arrival-cover registry on creation, so a teleport's loading screen can wait
-// on exactly those holds before it lifts.
+// on exactly those holds before it lifts. Under the entry cover's ESTABLISHING
+// SHOT (arrival_cover.ts: the first-spawn cinematic's wide opening view) every
+// consult is imminent, since everything that view reveals is what the player
+// sees first; that too only reorders and extends the covered wait, it never
+// reveals early.
 
-import { registerRevealGateForArrival } from './arrival_cover';
+import { arrivalEstablishingShotActive, registerRevealGateForArrival } from './arrival_cover';
 import {
   gpuPrepNow,
   noteRevealImminentHold,
@@ -206,7 +210,11 @@ export function createRevealGate(
     },
     { onImminentHold: noteRevealImminentHold },
   );
+  const allow = gate.allow;
   const revealGate = Object.assign(gate, {
+    allow(key: string, imminent?: boolean): boolean {
+      return allow(key, imminent === true || arrivalEstablishingShotActive());
+    },
     noteRootRevealed(_key: string): void {
       noteRevealRootPiecewise();
     },

@@ -335,7 +335,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count after reconciling the OSSBrain
     // v0.40 batch with the current release branch. This preserves the branch
     // wiring and the release-side More-tray launcher without adding slack.
-    ceiling: 11497,
+    // Lowered after extracting the first-spawn intro's seen-marker persistence
+    // into src/game/spawn_intro_seen.ts (the establishing-shot entry wait
+    // needed one more line here, and the ratchet pays for it by extraction).
+    ceiling: 11494,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -7,6 +7,7 @@ import {
   ARRIVAL_REVEAL_POLL_MS,
   type ArrivalRevealGate,
   arrivalCoverActive,
+  arrivalEstablishingShotActive,
   arrivalHeldImminentKeys,
   awaitArrivalReveals,
   noteArrivalEvent,
@@ -14,6 +15,7 @@ import {
   registerRevealGateForArrival,
   resetArrivalCoverForTest,
   setArrivalCover,
+  setArrivalEstablishingShot,
 } from '../src/render/arrival_cover';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 
@@ -247,5 +249,45 @@ describe('awaitArrivalReveals', () => {
     const timer = fakeTimer();
     await awaitArrivalReveals(0, { now: () => 0, schedule: timer.schedule });
     expect(timer.pending()).toBe(0);
+  });
+});
+
+describe('arrival establishing shot', () => {
+  it('is inert while the cover is down, whatever its owner last wrote', () => {
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalEstablishingShot(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    setArrivalCover(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+  });
+
+  it('clears with its owner, so a later plain cover is not an establishing shot', () => {
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    setArrivalEstablishingShot(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+    setArrivalCover(false);
+  });
+
+  it('a teleport cover nested inside the entry cover keeps the shot readable until the entry drops', () => {
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    setArrivalCover(false);
+    expect(arrivalEstablishingShotActive()).toBe(true);
+    setArrivalEstablishingShot(false);
+    setArrivalCover(false);
+    expect(arrivalEstablishingShotActive()).toBe(false);
+  });
+
+  it('resets with the cover for tests', () => {
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    resetArrivalCoverForTest();
+    setArrivalCover(true);
+    expect(arrivalEstablishingShotActive()).toBe(false);
   });
 });

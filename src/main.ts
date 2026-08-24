@@ -165,6 +165,7 @@ import {
   spawnCinematicFor,
   spawnCinematicPose,
 } from './game/spawn_cinematic';
+import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
@@ -238,6 +239,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import { setArrivalEstablishingShot } from './render/arrival_cover';
 import {
   prepareGraphicsProfileAssets,
   resetGraphicsProfileDerivedCaches,
@@ -4841,14 +4843,7 @@ async function startGame(
   // has no Escape key) skips straight to the end; other input is swallowed
   // while it runs. Seen-state persists per character so it plays exactly once;
   // reduce-motion players go straight to gameplay.
-  const INTRO_SEEN_KEY = `woc_spawn_intro_seen:${keybindScope}`;
-  let introSeen = true;
-  try {
-    introSeen = localStorage.getItem(INTRO_SEEN_KEY) === '1';
-  } catch {
-    // storage unavailable: the seen marker can't persist, so treat the intro as
-    // seen rather than replaying it on every boot
-  }
+  const introSeen = readSpawnIntroSeen(keybindScope);
   let intro: { cinematic: SpawnCinematic; startedAt: number | null } | null = null;
   // Wordmark overlay: fades in/hold/out over the opening of the intro cinematic
   // (see logo_fade.ts for the pure timing curve), well clear of the landing.
@@ -4869,6 +4864,9 @@ async function startGame(
     if (!intro) return;
     const end = intro.cinematic.end;
     intro = null;
+    // A skip under the curtain: the establishing shot is off, so the entry
+    // cover's remaining consults go back to the ordinary priority.
+    setArrivalEstablishingShot(false);
     if (skipToEnd) {
       input.camYaw = end.yaw;
       input.camPitch = end.pitch;
@@ -4878,11 +4876,7 @@ async function startGame(
     setIntroUiHidden(false);
     window.removeEventListener('keydown', skipIntro, true);
     window.removeEventListener('pointerdown', skipIntro, true);
-    try {
-      localStorage.setItem(INTRO_SEEN_KEY, '1');
-    } catch {
-      // storage unavailable: worst case the intro replays next session
-    }
+    markSpawnIntroSeen(keybindScope);
   };
   const introTaps: number[] = [];
   const skipIntro = (e: Event): void => {
@@ -5199,6 +5193,9 @@ async function startGame(
         adaptiveBudget: GFX.autoGovernor,
         constrainedMemory: GFX.constrainedMemory,
         online: online !== null,
+        // The intro opens on a wide establishing shot of the village: hold the
+        // curtain, bounded, until what that shot sees has linked.
+        establishingShot: intro !== null,
         revealWorld,
       });
     }),

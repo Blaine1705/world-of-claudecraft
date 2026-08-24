@@ -334,7 +334,9 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   escaping bands are consulted in distance order (`prop_cull_core.ts`
   `updatePropCullables` over a reused `PropCullPass`; the sort runs only on a
   frame with two or more of them). `gpu_prep_events.ts` counts the marked keys
-  as `imminentHolds`.
+  as `imminentHolds` (under the entry cover's establishing shot, below, EVERY
+  consulted key is marked, so a first-spawn entry's count is the whole
+  opening view, not the keys the camera stood among).
   TWO REACH FLOORS, and they are the only reveals that may draw a root
   unlinked: colliders are never invisible at arm's length. Bands keep
   `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
@@ -350,7 +352,13 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   The ARRIVAL COVER (`arrival_cover.ts`, raised by `src/game/arrival_warmup.ts`
   for the whole blocking teleport chain, and at world entry) does two things and
   neither of them reveals anything. It makes the curtain WAIT on the gates
-  (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online)
+  (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online
+  with ONE exception: the world entry that opens on the first-spawn cinematic's
+  ESTABLISHING SHOT, `settleWorldEntryCover` `establishingShot`, waits the same
+  bound online, and while that cover is up EVERY reveal consult is imminent,
+  `arrival_cover.ts` `arrivalEstablishingShotActive` read by `reveal_gate.ts`,
+  because the wide opening view of the village is what a new player sees
+  first and the chase camera's imminence radius does not describe it)
   so an arrival lifts with its decor linked the way boot does. Its first check
   happens after ONE poll interval, never synchronously: the wait starts before
   any cull has consulted a gate at the new position, so a synchronous check read
@@ -394,14 +402,6 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   presentation: `startAfterInitialPaint` starts the reveal compile and both
   clocks together after the first painted world frame. Later arrivals read the
   already-settled page boundary and retain the normal immediate clock.
-- **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
-  A gate hides a still-linking object so its reveal draw cannot stall the frame;
-  the link is not cancellable and the gate timeout is diagnostic only, so the
-  hidden window is UNBOUNDED. That is fair only while something else still tells
-  the player the entity is there. The reference is the far-bake gate
-  (`characters/far_lod_reveal_core.ts` `farMeshShown`: the articulated rig keeps
-  drawing until the baked mesh links). `entity_gate_stand_in_core.ts` holds the
-  rule: `ENTITY_GATE_STAND_INS` (one row per gate call site, naming what it hides
 - **The camera-occluder fade is a GATED flip (`occluder_fade_gate.ts`).** A
   structure that blocks the eye-to-camera segment fades by flipping
   `transparent` on its per-structure clones (`occluder_fade.ts`) or by drawing
@@ -446,6 +446,14 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the Yumi maze walls, the battleground placements) decides through
   `occluderKeepsInstances` before `acquire`. Pinned by
   `tests/occluder_fade_gate.test.ts` and `tests/occluder_fade_core.test.ts`.
+- **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
+  A gate hides a still-linking object so its reveal draw cannot stall the frame;
+  the link is not cancellable and the gate timeout is diagnostic only, so the
+  hidden window is UNBOUNDED. That is fair only while something else still tells
+  the player the entity is there. The reference is the far-bake gate
+  (`characters/far_lod_reveal_core.ts` `farMeshShown`: the articulated rig keeps
+  drawing until the baked mesh links). `entity_gate_stand_in_core.ts` holds the
+  rule: `ENTITY_GATE_STAND_INS` (one row per gate call site, naming what it hides
   and what still draws), `applyCharacterFormVisibility` (the base body is the
   stand-in for a linking FORM rig, held there by `characterFormReadyMask`, which
   treats a rig behind its gate as absent), and `entityHasNoBody`, which the
