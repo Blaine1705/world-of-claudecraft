@@ -6,8 +6,68 @@ import { isAuraDebuff } from './auras_view';
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 type SpellFxEvent = Extract<SimEvent, { type: 'spellfx' }>;
 type AuraEvent = Extract<SimEvent, { type: 'aura' }>;
+type VarkhulCallout = Extract<SimEvent, { type: 'varkhulCallout' }>['call'];
+type VarkhulCalloutEvent = Extract<SimEvent, { type: 'varkhulCallout' }>;
 type MagicSchool = 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 export type MobVoiceAction = 'aggro' | 'attack' | 'death' | 'hurt' | 'idle';
+
+const VARKHUL_CALLOUT_CUES = {
+  leftPillarCharging: 'cast_fire',
+  rightPillarCharging: 'cast_fire',
+  bothPillarsCharging: 'cast_fire',
+  leftPillar: 'impact_fire',
+  rightPillar: 'impact_fire',
+  bothPillars: 'impact_fire',
+  portalsOpening: 'rift_portal_spawn',
+  heat75: 'impact_metal',
+  heat90: 'meteor',
+  addsDefeated: 'ui_achievement',
+  worldfireBegins: 'flamestrike',
+  worldfireClosing: 'rift_lava_tick',
+  worldfireConsumed: 'meteor',
+} as const satisfies Record<VarkhulCallout, SfxId>;
+
+export function varkhulCalloutCue(call: VarkhulCallout): SfxId {
+  return VARKHUL_CALLOUT_CUES[call];
+}
+
+export interface VarkhulCalloutSfxPlan {
+  cue: SfxId;
+  x: number;
+  y: number;
+  z: number;
+  gain: number;
+  cooldown: number;
+  jitter: false;
+}
+
+export function varkhulCalloutSfxPlan(
+  event: VarkhulCalloutEvent,
+  entityOf: (entityId: number) => Pick<Entity, 'pos'> | undefined,
+): VarkhulCalloutSfxPlan | null {
+  const source = entityOf(event.sourceId);
+  if (!source) return null;
+  return {
+    cue: varkhulCalloutCue(event.call),
+    x: source.pos.x,
+    y: source.pos.y,
+    z: source.pos.z,
+    gain: 0.9,
+    cooldown: 0.08,
+    jitter: false,
+  };
+}
+
+export function dispatchVarkhulCalloutSfx(
+  event: VarkhulCalloutEvent,
+  entityOf: (entityId: number) => Pick<Entity, 'pos'> | undefined,
+  sink: (plan: VarkhulCalloutSfxPlan) => void,
+): boolean {
+  const plan = varkhulCalloutSfxPlan(event, entityOf);
+  if (!plan) return false;
+  sink(plan);
+  return true;
+}
 
 const SILENT_ASCENSION_AURA_IDS: ReadonlySet<string> = new Set([
   'divine_ascension',

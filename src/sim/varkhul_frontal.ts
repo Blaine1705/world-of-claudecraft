@@ -6,8 +6,8 @@ export type VarkhulDifficulty = 'normal' | 'heroic';
 
 export const VARKHUL_FRONTAL_CAST_ID = "Forgefather's Sweep";
 export const VARKHUL_FRONTAL_CAST_SECONDS = 2.5;
-export const VARKHUL_FRONTAL_RANGE = 30;
-export const VARKHUL_FRONTAL_HALF_ANGLE = Math.PI / 3;
+export const VARKHUL_FRONTAL_RANGE = 42;
+export const VARKHUL_FRONTAL_HALF_ANGLE = (Math.PI * 7) / 18;
 export const VARKHUL_FRONTAL_DAMAGE_MAX_HP_NORMAL = 0.65;
 export const VARKHUL_FRONTAL_DAMAGE_MAX_HP_HEROIC = 0.9;
 

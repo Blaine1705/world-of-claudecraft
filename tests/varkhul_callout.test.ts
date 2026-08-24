@@ -18,6 +18,9 @@ describe('Varkhul encounter callouts', () => {
       varkhulCalloutKey('heat75'),
       varkhulCalloutKey('heat90'),
       varkhulCalloutKey('addsDefeated'),
+      varkhulCalloutKey('worldfireBegins'),
+      varkhulCalloutKey('worldfireClosing'),
+      varkhulCalloutKey('worldfireConsumed'),
     ]).toEqual([
       'hudChrome.varkhulCallout.leftPillarCharging',
       'hudChrome.varkhulCallout.rightPillarCharging',
@@ -29,6 +32,9 @@ describe('Varkhul encounter callouts', () => {
       'hudChrome.varkhulCallout.heat75',
       'hudChrome.varkhulCallout.heat90',
       'hudChrome.varkhulCallout.addsDefeated',
+      'hudChrome.varkhulCallout.worldfireBegins',
+      'hudChrome.varkhulCallout.worldfireClosing',
+      'hudChrome.varkhulCallout.worldfireConsumed',
     ]);
   });
 
@@ -47,6 +53,9 @@ describe('Varkhul encounter callouts', () => {
       expect(localizeSimAuraName('Crucible Exposure')).toBe('Exposición al Crisol');
       expect(localizeSimAuraName('Tempering Ray')).toBe('Rayo de temple');
       expect(localizeSimAuraName('Tempered Wound')).toBe('Herida templada');
+      expect(localizeSimAuraName('Worldfire')).toBe('Fuego del Mundo');
+      expect(localizeSimAuraName('crucible_quake')).toBe('Seísmo del Crisol');
+      expect(localizeSimAuraName('cinder_recalibrate')).toBe('Recalibrar');
     } finally {
       setLanguage('en');
     }

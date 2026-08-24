@@ -5109,6 +5109,7 @@ export interface VarkhulEncounterState {
   forgeBeamWindow: VarkhulForgeBeamWindow;
   forgeBeamWindowRemaining: number;
   forgeBeamTeachingTriggered: boolean;
+  forgeBeamPressureTriggered: boolean;
   forgeBeamFinalTriggered: boolean;
   forgeHeatWarningMask: number;
   assemblyForgeBeamActiveMask: number;
@@ -5117,10 +5118,15 @@ export interface VarkhulEncounterState {
   assemblyForgeBeamDamageTimers: number[];
   assemblyForgeMeltdownRemaining: number;
   assemblyForgeMeltdownTickTimer: number;
+  assemblyForgeHammerTimer: number;
+  assemblyForgeVentedThisTick: boolean;
   assemblyPortalSpawns: Array<{ wave: number; spawnIndex: number; remaining: number }>;
   assemblyNextWaveIndex: number;
   assemblyNextWaveRemaining: number;
   assemblyIntermissionWaves: number;
+  assemblyArtificerNextSpawnRemaining: number;
+  assemblyArtificerSpawnIndex: number;
+  assemblyArtificerPortalSpawns: Array<{ portalIndex: number; remaining: number }>;
   assemblyDeliveryWindowRemaining: number;
   assemblyDeliveredCoreIds: string[];
   assemblyArtificerRepaired: boolean;
@@ -5148,6 +5154,8 @@ export interface VarkhulEncounterState {
   masterpieceTriggered: boolean;
   masterpieceRemaining: number;
   masterpiecePulseTimer: number;
+  masterpieceWorldfireStage: number;
+  masterpieceWorldfireTickTimer: number;
   masterpieceWipeResolved: boolean;
 }
 
@@ -5509,7 +5517,10 @@ export type SimEvent = { pid?: number } & (
         | 'portalsOpening'
         | 'heat75'
         | 'heat90'
-        | 'addsDefeated';
+        | 'addsDefeated'
+        | 'worldfireBegins'
+        | 'worldfireClosing'
+        | 'worldfireConsumed';
     }
   | {
       type: 'aura';

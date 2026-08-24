@@ -485,6 +485,8 @@ uniform float uTime;
 uniform float uHeat;
 uniform float uFlame;
 uniform float uErupt;
+uniform float uInnerRadiusRatio;
+uniform float uPatternScale;
 varying vec2 vP;
 float h21(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float vnoise(vec2 p) {
@@ -519,18 +521,19 @@ vec3 fireRamp(float t) {
 }
 void main() {
   float r = length(vP);
-  if (r > 1.0) discard;
+  if (r > 1.0 || r < uInnerRadiusRatio) discard;
   float glow = max(uHeat, uFlame);
   if (glow < 0.004 && uErupt < 0.004) discard;
+  vec2 patternP = vP * uPatternScale;
   // scorch grain + reveal jitter (static per world position, so the pattern
   // holds still while its heat moves)
-  float n = vnoise(vP * 4.0) * 0.65 + vnoise(vP * 9.0 + 7.3) * 0.35;
+  float n = vnoise(patternP * 4.0) * 0.65 + vnoise(patternP * 9.0 + 7.3) * 0.35;
   // domain-warped dual-scale Voronoi: big rock PLATES with craggy borders,
   // plus a finer secondary cracking inside them
-  vec2 wp = vP * 3.2 + (vec2(vnoise(vP * 7.0), vnoise(vP * 7.0 + 31.7)) - 0.5) * 0.55;
+  vec2 wp = patternP * 3.2 + (vec2(vnoise(patternP * 7.0), vnoise(patternP * 7.0 + 31.7)) - 0.5) * 0.55;
   vec2 F = vor(wp);
   float edge = F.y - F.x;
-  vec2 wp2 = vP * 6.5 + (vec2(vnoise(vP * 11.0 + 5.2), vnoise(vP * 11.0 + 17.9)) - 0.5) * 0.4;
+  vec2 wp2 = patternP * 6.5 + (vec2(vnoise(patternP * 11.0 + 5.2), vnoise(patternP * 11.0 + 17.9)) - 0.5) * 0.4;
   vec2 G = vor(wp2);
   float edge2 = G.y - G.x;
   float coreCrack = 1.0 - smoothstep(0.0, 0.055, edge);   // white-hot fissure line
@@ -544,7 +547,7 @@ void main() {
   );
   float pulse = 0.75 + 0.25 * sin(uTime * 5.0 + r * 6.0);
   float ring = smoothstep(0.90, 0.955, r) * (1.0 - smoothstep(0.975, 1.0, r));
-  float churn = vnoise(vP * 3.0 + vec2(uTime * 0.35, -uTime * 0.22));
+  float churn = vnoise(patternP * 3.0 + vec2(uTime * 0.35, -uTime * 0.22));
   vec3 col = vec3(0.0);
   float a = 0.0;
   // scorched fill darkens the ground under everything
@@ -581,21 +584,26 @@ void main() {
 const AOE_FLAME_VERT = `
 ${FLAME_COMMON}
 uniform float uErupt;
+uniform float uInnerRadiusRatio;
+uniform float uOuterRadiusRatio;
+uniform float uLocalFlameScale;
 void main() {
   vSeed = iSeed;
   float dur = 0.5 + 0.5 * h11(iSeed + 2.3);
   float life = fract(uTime / dur + iSeed * 7.13);
   vLife = life;
   float ang = h11(iSeed + 1.7) * 6.2831853;
-  float rad = sqrt(h11(iSeed + 3.1)) * 0.82; // area-uniform across the disc
+  float outer = uOuterRadiusRatio;
+  float inner = min(uInnerRadiusRatio + 0.012, outer - 0.01);
+  float rad = sqrt(mix(inner * inner, outer * outer, h11(iSeed + 3.1)));
   float dir = sign(h11(iSeed + 6.9) - 0.5);
   float sw = ang + uTime * (0.25 + 0.45 * h11(iSeed + 5.3)) * dir * 0.4;
-  vec3 pos = vec3(cos(sw) * rad, 0.02 + life * (0.55 + 0.75 * h11(iSeed + 8.1)), sin(sw) * rad);
-  pos.x += sin(uTime * 5.0 + iSeed * 43.0 + life * 5.0) * 0.05 * life;
-  pos.z += cos(uTime * 4.3 + iSeed * 29.0 + life * 4.0) * 0.05 * life;
+  vec3 pos = vec3(cos(sw) * rad, (0.02 + life * (0.55 + 0.75 * h11(iSeed + 8.1))) * uLocalFlameScale, sin(sw) * rad);
+  pos.x += sin(uTime * 5.0 + iSeed * 43.0 + life * 5.0) * 0.05 * life * uLocalFlameScale;
+  pos.z += cos(uTime * 4.3 + iSeed * 29.0 + life * 4.0) * 0.05 * life * uLocalFlameScale;
   vec4 world = modelMatrix * vec4(pos, 1.0);
   float mscale = length(modelMatrix[1].xyz);
-  float size = (0.16 + 0.42 * pow(life, 0.7)) * (0.75 + 0.5 * h11(iSeed + 9.7)) * mscale;
+  float size = (0.16 + 0.42 * pow(life, 0.7)) * (0.75 + 0.5 * h11(iSeed + 9.7)) * mscale * uLocalFlameScale;
   float rot = h11(iSeed + 4.4) * 6.2831853 + uTime * (h11(iSeed + 6.1) - 0.5) * 2.0;
   vec2 rc = vec2(position.x * cos(rot) - position.y * sin(rot),
                  position.x * sin(rot) + position.y * cos(rot));
@@ -1004,8 +1012,20 @@ function getFlameTex(url: string): THREE.Texture {
   }
   return t;
 }
-let aoeDiscGeo: THREE.CircleGeometry | null = null;
+const aoeDiscGeos = new Map<string, THREE.BufferGeometry>();
 const aoeFlameGeos = new Map<number, THREE.InstancedBufferGeometry>();
+function getAoeDiscGeo(innerRadiusRatio: number): THREE.BufferGeometry {
+  const key = innerRadiusRatio.toFixed(6);
+  let geometry = aoeDiscGeos.get(key);
+  if (!geometry) {
+    geometry =
+      innerRadiusRatio <= 0
+        ? new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2)
+        : new THREE.RingGeometry(innerRadiusRatio, 1, 96).rotateX(-Math.PI / 2);
+    aoeDiscGeos.set(key, geometry);
+  }
+  return geometry;
+}
 function getAoeFlameGeo(n: number): THREE.InstancedBufferGeometry {
   let g = aoeFlameGeos.get(n);
   if (!g) {
@@ -1029,9 +1049,15 @@ function getAoeFlameGeo(n: number): THREE.InstancedBufferGeometry {
 export interface GroundFireAoeOptions {
   /** world radius of the circle. Default 1.2. */
   radius?: number;
+  /** Optional safe hole, in world units, for an annular field. */
+  innerRadius?: number;
   /** flame sprites in the burn phase. Default 56; drop for low spec. */
   count?: number;
   flameTexUrl?: string;
+  /** Use an instance clock so callers can freeze the fire for reduced motion. */
+  localTime?: boolean;
+  /** Keep a full disc so the safe inner radius can move without rebuilding geometry. */
+  dynamicInnerRadius?: boolean;
 }
 
 export interface GroundFireAoeHandle {
@@ -1042,7 +1068,9 @@ export interface GroundFireAoeHandle {
   /** phase 1: the telegraph -- cracks spread, rim pulses, no damage yet */
   heatup(): void;
   /** phase 2: the burn -- eruption flash, then a looping sea of flames */
-  erupt(): void;
+  erupt(immediate?: boolean): void;
+  /** Move the safe inner edge. Requires dynamicInnerRadius at construction. */
+  setInnerRadius(innerRadius: number): void;
   /** choke the fire off; safe to dispose() ~1s later once it fades */
   stop(): void;
   phase(): 'off' | 'heatup' | 'fire';
@@ -1060,9 +1088,13 @@ export interface GroundFireAoeHandle {
  *   setTimeout(() => { scene.remove(aoe.group); aoe.dispose(); }, 1000);
  */
 export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFireAoeHandle {
-  const radius = opts.radius ?? 1.2;
+  const radius = Math.max(0.01, opts.radius ?? 1.2);
+  let innerRadius = Math.max(0, Math.min(radius * 0.98, opts.innerRadius ?? 0));
+  const innerRadiusRatio = innerRadius / radius;
+  const localFlameScale = Math.min(1, 3.5 / radius);
   const count = opts.count ?? 56;
-  const uTime = sharedUniforms.uTime ?? { value: 0 };
+  const usesLocalTime = opts.localTime === true;
+  const uTime = usesLocalTime ? { value: 0 } : (sharedUniforms.uTime ?? { value: 0 });
   const uHeat = { value: 0 };
   const uFlame = { value: 0 };
   const uErupt = { value: 0 };
@@ -1071,9 +1103,19 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
   const group = new THREE.Group();
   group.name = 'ground_fire_aoe';
   group.scale.setScalar(radius); // flames + disc share the local unit circle
+  group.userData.visualLanguage = 'ignivar-ground-fire';
+  group.userData.innerRadius = innerRadius;
+  group.userData.outerRadius = radius;
 
   const discMat = new THREE.ShaderMaterial({
-    uniforms: { uTime, uHeat, uFlame, uErupt },
+    uniforms: {
+      uTime,
+      uHeat,
+      uFlame,
+      uErupt,
+      uInnerRadiusRatio: { value: innerRadiusRatio },
+      uPatternScale: { value: Math.max(1, radius / 3.5) },
+    },
     vertexShader: AOE_DISC_VERT,
     fragmentShader: AOE_DISC_FRAG,
     transparent: true,
@@ -1083,10 +1125,12 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
     polygonOffsetFactor: -1,
     polygonOffsetUnits: -1,
   });
-  if (!aoeDiscGeo) aoeDiscGeo = new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2);
-  const disc = new THREE.Mesh(aoeDiscGeo, discMat);
+  const disc = new THREE.Mesh(
+    getAoeDiscGeo(opts.dynamicInnerRadius === true ? 0 : innerRadiusRatio),
+    discMat,
+  );
   disc.name = 'ground_fire_aoe__disc';
-  disc.position.y = 0.02;
+  disc.position.y = 0.02 * localFlameScale;
   disc.renderOrder = 1;
   group.add(disc);
 
@@ -1095,6 +1139,11 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
       uTime,
       uFlame,
       uErupt,
+      uInnerRadiusRatio: { value: innerRadiusRatio },
+      uOuterRadiusRatio: {
+        value: opts.dynamicInnerRadius === true || innerRadiusRatio > 0.001 ? 0.97 : 0.82,
+      },
+      uLocalFlameScale: { value: localFlameScale },
       uIntensity,
       uReach: { value: 1 }, // declared by FLAME_COMMON, unused here
       uTex: { value: getFlameTex(opts.flameTexUrl ?? '/textures/vfx/ignivar_flame_6x6.webp') },
@@ -1117,7 +1166,8 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
   return {
     group,
     update(dt: number) {
-      dt = Math.min(dt, 0.05);
+      dt = Math.min(Math.max(0, dt), 0.05);
+      if (usesLocalTime) uTime.value = (uTime.value + dt) % 1000;
       uHeat.value +=
         (heatTarget - uHeat.value) * Math.min(1, dt * (heatTarget > uHeat.value ? 2.2 : 3.0));
       uFlame.value +=
@@ -1128,10 +1178,19 @@ export function createGroundFireAoe(opts: GroundFireAoeOptions = {}): GroundFire
       heatTarget = 1;
       flameTarget = 0;
     },
-    erupt() {
+    erupt(immediate = false) {
       heatTarget = 1; // the ground stays molten under the burn
       flameTarget = 1;
-      uErupt.value = 1;
+      uHeat.value = immediate ? 1 : uHeat.value;
+      uFlame.value = immediate ? 1 : uFlame.value;
+      uErupt.value = immediate ? 0 : 1;
+    },
+    setInnerRadius(nextInnerRadius: number) {
+      if (opts.dynamicInnerRadius !== true) return;
+      innerRadius = Math.max(0, Math.min(radius * 0.98, nextInnerRadius));
+      discMat.uniforms.uInnerRadiusRatio.value = innerRadius / radius;
+      flameMat.uniforms.uInnerRadiusRatio.value = innerRadius / radius;
+      group.userData.innerRadius = innerRadius;
     },
     stop() {
       heatTarget = 0;

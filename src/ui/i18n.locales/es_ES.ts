@@ -534,6 +534,11 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.heat90': '¡La Fusión de la forja es inminente!',
   'hudChrome.varkhulCallout.addsDefeated':
     '¡La legión de la forja ha caído: Varkhul está expuesto!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '¡El Fuego del Mundo prende en el borde de la sala! El crisol quedará consumido en 42 s.',
+  'hudChrome.varkhulCallout.worldfireClosing':
+    '¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!',
+  'hudChrome.varkhulCallout.worldfireConsumed': '¡Todo el crisol está en llamas!',
   'auth.designCodeErrMalformed':
     'Ese código de diseño está dañado. Copia el código completo e inténtalo de nuevo.',
 };

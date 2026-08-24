@@ -600,7 +600,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 
-  it('fails closed when an auth-world-16 client reaches an auth-world-15 server', () => {
+  it('fails closed when an auth-world-18 client reaches an auth-world-17 server', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
@@ -614,13 +614,13 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-16',
+          t: 'auth-world-18',
           token: 't',
           character: 1,
         }),
       );
 
-      // An auth-world-15 server rejects this unknown future epoch before admission.
+      // An auth-world-17 server rejects this unknown future epoch before admission.
       w.onMessage(
         JSON.stringify({
           t: 'error',

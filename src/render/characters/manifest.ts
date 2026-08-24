@@ -6,7 +6,12 @@ import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
-import { IGNIVAR_CRUCIBLE_WARDEN_ID, IGNIVAR_EMBER_SENTINEL_ID } from '../../sim/ignivar_raid_ids';
+import {
+  IGNIVAR_CINDER_ARTIFICER_ID,
+  IGNIVAR_CRUCIBLE_WARDEN_ID,
+  IGNIVAR_EMBER_SENTINEL_ID,
+} from '../../sim/ignivar_raid_ids';
+import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import {
   ALL_CLASSES,
   type Entity,
@@ -14,6 +19,10 @@ import {
   isMechWearer,
   type PlayerClass,
 } from '../../sim/types';
+import {
+  VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
+  VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
+} from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
@@ -731,18 +740,36 @@ const IGNIVAR_CRUCIBLE_WARDEN: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
+  attackByAbility: { [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 'JumpSlam' },
+  attackTimeScaleByAbility: { [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 0.8 },
   hit: ['Hit'],
   death: 'Death',
 };
 
-// This supplied rig has no dedicated Attack take. Hit is a full-body forward
-// brace that reads acceptably as its temporary claw strike. Do not also map it
-// as a hit reaction, or taking damage can restart the active attack one-shot.
 const IGNIVAR_EMBER_SENTINEL: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
-  attack: ['Hit'],
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+const IGNIVAR_CINDER_ARTIFICER: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  attackByAbility: {
+    [VARKHUL_CINDER_REPAIR_START_ANIMATION_ID]: 'ChannelStart',
+    [VARKHUL_CINDER_REPAIR_END_ANIMATION_ID]: 'ChannelEnd',
+  },
+  attackTimeScaleByAbility: {
+    [VARKHUL_CINDER_REPAIR_START_ANIMATION_ID]: 1,
+    [VARKHUL_CINDER_REPAIR_END_ANIMATION_ID]: 1,
+  },
+  cast: 'Channel',
+  hit: ['Hit'],
   death: 'Death',
 };
 
@@ -2276,6 +2303,14 @@ export const VISUALS: Record<string, VisualDef> = {
     envMapIntensity: 1.35,
     clips: IGNIVAR_EMBER_SENTINEL,
   },
+  mob_ignivar_cinder_artificer: {
+    url: `${CREATURES}/cinder_artificer.glb`,
+    height: 2.1,
+    yaw: 0,
+    selfIllumination: 0.18,
+    envMapIntensity: 1.35,
+    clips: IGNIVAR_CINDER_ARTIFICER,
+  },
   mob_water_elemental: {
     url: `${CREATURES}/water_elemental.glb`,
     height: 2.65,
@@ -3068,6 +3103,7 @@ const MOB_KEYS: Record<string, string> = {
   ignivar_heart_of_the_end: 'mob_ignivar_heart_of_the_end',
   [IGNIVAR_CRUCIBLE_WARDEN_ID]: 'mob_ignivar_crucible_warden',
   [IGNIVAR_EMBER_SENTINEL_ID]: 'mob_ignivar_ember_sentinel',
+  [IGNIVAR_CINDER_ARTIFICER_ID]: 'mob_ignivar_cinder_artificer',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',

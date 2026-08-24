@@ -5,6 +5,8 @@ import {
   buildVarkhulForgestormTelegraph,
   VarkhulForgestormVisuals,
 } from '../src/render/varkhul_forgestorm_visual';
+import { VARKHUL_MASTERPIECE_UNBOUND_AURA_ID } from '../src/sim/encounters/varkhul';
+import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import type { ActiveVarkhulForgestormWarning } from '../src/sim/varkhul_forgestorm';
 
 const WARNING: ActiveVarkhulForgestormWarning = {
@@ -15,6 +17,29 @@ const WARNING: ActiveVarkhulForgestormWarning = {
   radius: 4,
   duration: 2.5,
   remaining: 2.5,
+};
+
+const WORLDFIRE_ASSEMBLY: ActiveVarkhulAssembly = {
+  bossId: 42,
+  difficulty: 'heroic',
+  phase: 'done',
+  forgeX: 100,
+  forgeZ: 222,
+  forgeHp: 100,
+  forgeMaxHp: 100,
+  forgeOverheat: 0,
+  forgeBeamActiveMask: 0,
+  forgeBeamWarmupRemaining: 0,
+  forgeMeltdownRemaining: 0,
+  forgeBeams: [],
+  interceptBeam: null,
+  cores: [],
+  deliveryWindowRemaining: 0,
+  assignments: [],
+  runes: [],
+  round: 0,
+  rounds: 0,
+  remaining: 0,
 };
 
 describe('Varkhul Forgestorm rendering', () => {
@@ -82,6 +107,36 @@ describe('Varkhul Forgestorm rendering', () => {
     expect(countdown.scale.z).toBeCloseTo(0.5);
   });
 
+  it('wires Worldfire through the real Forgestorm compositor lifecycle', () => {
+    const scene = new THREE.Scene();
+    const visuals = new VarkhulForgestormVisuals(scene, () => 0);
+    visuals.syncWorld({
+      activeVarkhulForgestormWarnings: [],
+      activeVarkhulCinderFires: [],
+      activeVarkhulCinderOrbProjectiles: [],
+      activeVarkhulAssemblies: [WORLDFIRE_ASSEMBLY],
+      player: { id: 1, pos: { x: 0, z: 0 }, auras: [] },
+      entities: new Map([
+        [
+          42,
+          {
+            auras: [
+              {
+                id: VARKHUL_MASTERPIECE_UNBOUND_AURA_ID,
+                remaining: 24,
+                duration: 45,
+              },
+            ],
+          },
+        ],
+      ]),
+    });
+    expect(scene.getObjectByName('varkhul-worldfire-42')).toBeTruthy();
+    visuals.update(0.5, true);
+    visuals.dispose();
+    expect(scene.getObjectByName('varkhul-worldfire-42')).toBeUndefined();
+  });
+
   it('reconciles the world projection in both renderer frame paths', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const visual = readFileSync(
@@ -99,6 +154,13 @@ describe('Varkhul Forgestorm rendering', () => {
     expect(visual).toContain('this.interceptBeamVisuals.sync(world.activeVarkhulAssemblies)');
     expect(visual).toContain('this.interceptBeamVisuals.update(dt, reducedMotion)');
     expect(visual).toContain('this.interceptBeamVisuals.dispose()');
+    expect(visual).toContain(
+      'this.worldfireVisuals.sync(world.activeVarkhulAssemblies, world.entities)',
+    );
+    expect(visual).toContain('this.worldfireVisuals.update(dt, reducedMotion)');
+    expect(visual).toContain('this.worldfireVisuals.dispose()');
+    expect(renderer).toContain('dispatchVarkhulForgeHammerAttack(ev');
+    expect(renderer).toContain('this.triggerAttack(entityId, abilityId)');
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');
   });
 });

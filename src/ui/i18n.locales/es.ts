@@ -13469,6 +13469,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.heat90': '¡La Fusión de la forja es inminente!',
   'hudChrome.varkhulCallout.addsDefeated':
     '¡La legión de la forja ha caído: Varkhul está expuesto!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '¡El Fuego del Mundo prende en el borde de la sala! El crisol quedará consumido en 42 s.',
+  'hudChrome.varkhulCallout.worldfireClosing':
+    '¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!',
+  'hudChrome.varkhulCallout.worldfireConsumed': '¡Todo el crisol está en llamas!',
   'gpuNotice.bodyDiscreteInactive':
     'El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
 };

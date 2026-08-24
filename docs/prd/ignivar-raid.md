@@ -255,7 +255,7 @@ tank's stacks.
 ### Forgefather's Sweep
 
 Every 26 seconds Varkhul locks his facing toward a non-tank and winds up for 2.5
-seconds. He then sweeps a 120-degree, 30-yard frontal that deals 65% maximum
+seconds. He then sweeps a 140-degree, 42-yard frontal that deals 65% maximum
 health on Normal and 90% on Heroic. The facing does not follow the target after
 the cast begins. Its full actionable footprint remains visible on every graphics
 tier.
@@ -348,7 +348,14 @@ moves to his fixed forging position immediately in front of the anvil, faces the
 with his back to the raid, and activates both pillars for the full intermission. At 20%,
 the final burn loops left for eight seconds, rests four, burns right for eight, and
 rests four until Varkhul dies. No rune interface, symbol assignment, forced raid
-teleport, Molten Core delivery, or Cinder Artificer exists in this version.
+teleport, or Molten Core delivery exists in this version.
+
+After the add intermission, a single pressure soak begins at 35% health. One pillar,
+chosen deterministically for that pull, gives the ordinary three-second warning and
+then burns for six seconds. New major sequences pause during this short check. If the
+raid pushes Varkhul to 20% while it is active, Masterpiece Unbound takes priority. On
+Normal it replaces the pressure soak with the final pillar cycle. On Heroic it shuts
+the pillars down permanently and vents forge heat to 0% before Worldfire begins.
 
 Four large forge-fire portals stand near the room corners. Each add wave receives a
 two-second portal warning before its enemies emerge, and waves begin eight seconds
@@ -357,9 +364,29 @@ for twelve adds total. Heroic schedules four waves of one Warden and four Sentin
 twenty adds total. The intermission lasts at most sixty seconds on Normal or seventy on
 Heroic and ends early only after every scheduled add has spawned and died. The Warden
 pursues and melees while casting interruptible Crucible Quake every twelve seconds;
+every completed Quake also adds 8 percentage points of forge heat, while an interrupted
+Quake adds none. During the intermission Varkhul strikes the anvil every two seconds,
+driving a visible forge burst, a hammer swing, and a positional metal impact cue.
 Sentinels use ordinary melee pursuit. Both add types enter already targeting the living
 tank with the highest threat on Varkhul, then obey normal threat and taunts. When the
 last add falls, Varkhul is stunned for fifteen seconds and takes 50% increased damage.
+
+A Cinder Artificer runs on a separate portal clock and never replaces, consumes, or
+delays an ordinary Warden/Sentinel wave. The first Artificer portal opens ten seconds
+after the intermission begins and another opens every eighteen seconds while the phase
+continues, rotating deterministically through the four corners. After its two-second
+portal warning, the Artificer runs directly to Varkhul and channels Recalibrate for six
+seconds. A completed repair restores 6% of Varkhul's maximum health on Normal or 8% on
+Heroic. The Artificer has roughly 55% more health than a Warden, but remains fully
+stunnable, rootable, slowable, silenceable, and interruptible. Its channel visibly uses
+Channel Start, the loopable Channel take, then Channel End only after a successful
+repair. Artificers use their own scheduler and do not change ordinary wave timing, but
+an Artificer whose portal has already opened must still be killed before the
+intermission can end early.
+
+Crucible Quake uses the Warden's authored JumpSlam take; ordinary Warden melee uses its
+separate Attack animation. Sentinels likewise use their authored melee Attack and Hit
+reactions.
 
 An overhead ten-segment ring and exact percentage label display persistent forge heat
 from 0% to 100%. Each active unblocked beam adds 6% per second. On Normal, each active
@@ -378,14 +405,33 @@ the fifteen-second vulnerability window.
 Quest-style top-center callouts announce the left pillar, right pillar, both pillars,
 opening portals, both heat warnings, and the death of the last intermission add. These
 messages reinforce the world VFX without replacing them and are delivered individually
-to every player in the encounter.
+to every player in the encounter. Heroic Worldfire adds distinct start, closing, and
+full-room callouts.
 
 ### Masterpiece Unbound
 
-At 20% health non-tank mechanics run 25% faster while the forge begins the repeating
-left/rest/right/rest pillar cycle described above. Varkhul must die within 45 seconds.
-Maker's Brand keeps its 14-second cadence so the tank-swap rhythm does not change
-during the final burn.
+At 20% health on Normal, non-tank mechanics run 25% faster while the forge begins the
+repeating left/rest/right/rest pillar cycle described above. Varkhul must die within
+45 seconds. Maker's Brand keeps its 14-second cadence so the tank-swap rhythm does not
+change during the final burn.
+
+On Heroic, Worldfire simultaneously ignites the outer four yards of the room. The safe
+circle then contracts through six deterministic steps, one every seven seconds: 36,
+30, 24, 18, 12, 6, and finally 0 yards of safe radius. Standing in the fire deals 12%
+maximum health as fire damage every second. At 42 seconds the entire room burns and
+those ticks rise to 30%, leaving three final seconds before the existing 45-second hard
+wipe. One continuous field uses the same molten-crack floor and flipbook flames as
+Cinder Orb fire; only one clean ground-level ring marks its advancing inner edge, with
+a localized countdown above the room. It never uses smoke and does not remove actionable
+geometry on Low graphics or reduced motion.
+
+The Heroic final phase deliberately strips the rotation down to Worldfire, Forgefather's
+Sweep, Anvil's Decree meteors, and ordinary melee. Entering it cancels any active major
+sequence, disables both pillars, freezes forge heat at 0%, and suppresses Maker's Brand,
+Cinder Orbs, Forgestorm, and Tempering Ray. Reaching the 45-second deadline fires the
+hard-wipe hit once, but a surviving immune player remains inside permanent full-room
+Worldfire; the flames and their one-second lethal ticks only end when Varkhul dies or
+resets.
 
 ## Music
 

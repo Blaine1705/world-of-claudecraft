@@ -30,6 +30,7 @@ export const VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS = 1;
 export const VARKHUL_FORGE_BEAM_OVERHEAT_PER_UNBLOCKED_SECOND = 0.06;
 export const VARKHUL_FORGE_BEAM_COOLING_PER_BLOCKED_SECOND = 0.02;
 export const VARKHUL_FORGE_BEAM_IDLE_COOLING_PER_SECOND_NORMAL = 0.03;
+export const VARKHUL_FORGE_QUAKE_OVERHEAT = 0.08;
 export const VARKHUL_FORGE_MELTDOWN_TICK_SECONDS = 1;
 export const VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS = 5;
 const PROGRESS_EPSILON = 1e-9;
@@ -140,6 +141,10 @@ export function varkhulForgeBeamOverheatAfterTick(
           ? safeBlockedCount * VARKHUL_FORGE_BEAM_COOLING_PER_BLOCKED_SECOND
           : 0);
   return Math.max(0, Math.min(1, current + deltaPerSecond * Math.max(0, dt)));
+}
+
+export function varkhulForgeOverheatAfterQuake(current: number): number {
+  return Math.max(0, Math.min(1, current + VARKHUL_FORGE_QUAKE_OVERHEAT));
 }
 
 export function varkhulForgeBeamBlockDamageMaxHp(

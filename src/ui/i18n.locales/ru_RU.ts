@@ -7624,6 +7624,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.heat75': 'Жар кузни достиг 75%!',
   'hudChrome.varkhulCallout.heat90': 'Расплавление кузни неизбежно!',
   'hudChrome.varkhulCallout.addsDefeated': 'Легион кузни повержен: Варкхул уязвим!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    'Мировое пламя вспыхивает по краю зала. Через 42 сек горнило будет поглощено!',
+  'hudChrome.varkhulCallout.worldfireClosing': 'Мировое пламя сжимается. Двигайтесь к центру!',
+  'hudChrome.varkhulCallout.worldfireConsumed': 'Всё горнило охвачено огнём!',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',

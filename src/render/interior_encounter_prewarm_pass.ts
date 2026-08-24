@@ -30,6 +30,7 @@ import { setRenderCategory } from './renderer_diagnostics';
 import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
 import { buildVarkhulForgeBeamPrewarmVisual } from './varkhul_forge_beam_visual';
 import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam_visual';
+import { buildVarkhulWorldfirePrewarmVisual } from './varkhul_worldfire_visual';
 import { WEAPON_VFX } from './weapon_vfx';
 
 const startedByHost = new WeakMap<object, Set<string>>();
@@ -212,12 +213,20 @@ async function runInteriorEncounterPrewarm(
             const forgeBeams = buildVarkhulForgeBeamPrewarmVisual();
             const interceptBeam = buildVarkhulInterceptBeamPrewarmVisual();
             const forgePortals = buildVarkhulForgePortalPrewarmVisual();
+            const worldfire = buildVarkhulWorldfirePrewarmVisual();
             encounter.position.set(-12, 0, 0);
             forgeBeams.position.set(12, 0, 0);
             interceptBeam.position.set(0, 0, 12);
             forgePortals.root.position.set(0, 0, 12);
-            group.add(encounter, forgeBeams, interceptBeam, forgePortals.root);
-            varkhulKeepAlive.push(encounter, forgeBeams, interceptBeam, forgePortals.root);
+            worldfire.position.set(0, 0, -12);
+            group.add(encounter, forgeBeams, interceptBeam, forgePortals.root, worldfire);
+            varkhulKeepAlive.push(
+              encounter,
+              forgeBeams,
+              interceptBeam,
+              forgePortals.root,
+              worldfire,
+            );
             varkhulPortalKeepAlive.push(forgePortals);
           },
         ]

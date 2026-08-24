@@ -13,6 +13,9 @@ const CALLOUT_KEYS = {
   heat75: 'hudChrome.varkhulCallout.heat75',
   heat90: 'hudChrome.varkhulCallout.heat90',
   addsDefeated: 'hudChrome.varkhulCallout.addsDefeated',
+  worldfireBegins: 'hudChrome.varkhulCallout.worldfireBegins',
+  worldfireClosing: 'hudChrome.varkhulCallout.worldfireClosing',
+  worldfireConsumed: 'hudChrome.varkhulCallout.worldfireConsumed',
 } as const;
 
 export function varkhulCalloutKey(call: VarkhulCallout): (typeof CALLOUT_KEYS)[VarkhulCallout] {

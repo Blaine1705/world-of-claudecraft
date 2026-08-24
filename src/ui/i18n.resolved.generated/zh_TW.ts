@@ -2298,7 +2298,10 @@ export const zh_TW: EnTranslations = {
       "portalsOpening": "鍛爐傳送門正在開啟！",
       "heat75": "鍛爐熱量達到75%！",
       "heat90": "鍛爐熔毀迫在眉睫！",
-      "addsDefeated": "鍛爐軍團已被擊敗，瓦庫爾暴露了！"
+      "addsDefeated": "鍛爐軍團已被擊敗，瓦庫爾暴露了！",
+      "worldfireBegins": "世界之火從房間邊緣燃起，42秒後整座熔爐大廳將被吞沒！",
+      "worldfireClosing": "世界之火正在逼近，往中央移動！",
+      "worldfireConsumed": "整座熔爐大廳都在燃燒！"
     },
     "auraEffect": {
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",

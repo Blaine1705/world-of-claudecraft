@@ -7512,6 +7512,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.heat75': '鍛冶炉の熱が75%に達した！',
   'hudChrome.varkhulCallout.heat90': '鍛冶炉メルトダウンが迫っている！',
   'hudChrome.varkhulCallout.addsDefeated': '鍛冶軍団を倒した。ヴァークルが無防備になった！',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '世界炎が部屋の外縁で燃え上がる。42秒後にるつぼ全体が炎に包まれる！',
+  'hudChrome.varkhulCallout.worldfireClosing': '世界炎が迫っている。中央へ移動せよ！',
+  'hudChrome.varkhulCallout.worldfireConsumed': 'るつぼ全体が炎に包まれた！',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',

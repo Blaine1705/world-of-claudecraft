@@ -2298,7 +2298,10 @@ export const id_ID: EnTranslations = {
       "portalsOpening": "The forge portals are opening!",
       "heat75": "The forge is at 75% heat!",
       "heat90": "Forge Meltdown is imminent!",
-      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!"
+      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!",
+      "worldfireBegins": "Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!",
+      "worldfireClosing": "Worldfire closes in. Move toward the center!",
+      "worldfireConsumed": "The entire crucible is burning!"
     },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",

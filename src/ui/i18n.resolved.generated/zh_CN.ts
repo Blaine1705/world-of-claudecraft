@@ -2298,7 +2298,10 @@ export const zh_CN: EnTranslations = {
       "portalsOpening": "锻炉传送门正在开启！",
       "heat75": "锻炉热量达到75%！",
       "heat90": "锻炉熔毁迫在眉睫！",
-      "addsDefeated": "锻炉军团已被击败，瓦库尔暴露了！"
+      "addsDefeated": "锻炉军团已被击败，瓦库尔暴露了！",
+      "worldfireBegins": "世界之火从房间边缘燃起，42秒后整个熔炉大厅将被吞没！",
+      "worldfireClosing": "世界之火正在逼近，向中央移动！",
+      "worldfireConsumed": "整个熔炉大厅都在燃烧！"
     },
     "auraEffect": {
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",

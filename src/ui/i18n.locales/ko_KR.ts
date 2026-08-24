@@ -7505,6 +7505,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.heat75': '용광로 열기가 75%에 도달했습니다!',
   'hudChrome.varkhulCallout.heat90': '용광로 용융이 임박했습니다!',
   'hudChrome.varkhulCallout.addsDefeated': '용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '세계불꽃이 방 가장자리에서 타오릅니다. 42초 후 도가니 전체가 불길에 휩싸입니다!',
+  'hudChrome.varkhulCallout.worldfireClosing': '세계불꽃이 다가옵니다. 중앙으로 이동하세요!',
+  'hudChrome.varkhulCallout.worldfireConsumed': '도가니 전체가 불타고 있습니다!',
   'hudChrome.auraEffect.absorb': '{value}의 피해를 흡수합니다',
   'hudChrome.auraEffect.healAbsorb': '들어오는 치유를 {value}만큼 흡수합니다',
   'hudChrome.auraEffect.thorns': '공격자에게 {value}의 {school} 피해를 입힙니다',

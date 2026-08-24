@@ -2,6 +2,7 @@
 // clients derive every actionable warning from existing casts, auras, facing,
 // and GroundAoE snapshots.
 
+import { isLockedOut, isSilenced } from '../combat/cc';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import {
@@ -52,6 +53,21 @@ import {
   varkhulAssemblyRuneSlots,
 } from '../varkhul_assembly';
 import {
+  VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
+  VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
+  VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
+  VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
+  VARKHUL_CINDER_REPAIR_CAST_ID,
+  VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
+  VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
+  VARKHUL_CINDER_REPAIR_NAME,
+  VARKHUL_CINDER_REPAIR_RANGE,
+  VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
+  VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
+  varkhulCinderArtificerPortalIndex,
+  varkhulCinderRepairAmount,
+} from '../varkhul_cinder_artificer';
+import {
   VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
   VARKHUL_CINDER_FIRE_RADIUS,
   VARKHUL_CINDER_FIRE_TICK_SECONDS,
@@ -82,6 +98,7 @@ import {
   varkhulForgeBeamOverheatAfterTick,
   varkhulForgeMeltdownInitialDamageMaxHp,
   varkhulForgeMeltdownTickDamageMaxHp,
+  varkhulForgeOverheatAfterQuake,
 } from '../varkhul_forge_beams';
 import {
   activeVarkhulForgePortalTelegraphs,
@@ -93,6 +110,8 @@ import {
   VARKHUL_FORGE_PORTAL_ABILITY_ID,
   VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
   VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
+  VARKHUL_FORGE_PRESSURE_BEAM_SECONDS,
+  VARKHUL_FORGE_PRESSURE_HP_THRESHOLD,
   VARKHUL_FORGE_TEACHING_BEAM_SECONDS,
   VARKHUL_FORGE_TEACHING_GAP_SECONDS,
   VARKHUL_FORGE_TEACHING_HP_THRESHOLD,
@@ -103,6 +122,7 @@ import {
   varkhulForgeIntermissionSeconds,
   varkhulForgeIntermissionWave,
   varkhulForgeIntermissionWaveCount,
+  varkhulForgePressureWindow,
 } from '../varkhul_forge_intermission';
 import {
   VARKHUL_FORGESTORM_RADIUS,
@@ -126,6 +146,14 @@ import {
   varkhulInterceptBeamBlocker,
   varkhulInterceptBeamDamageMaxHp,
 } from '../varkhul_intercept_beam';
+import {
+  VARKHUL_WORLDFIRE_ABILITY_ID,
+  VARKHUL_WORLDFIRE_TICK_SECONDS,
+  VARKHUL_WORLDFIRE_TOTAL_SECONDS,
+  varkhulWorldfireBurnsPosition,
+  varkhulWorldfireDamageMaxHp,
+  varkhulWorldfireStage,
+} from '../varkhul_worldfire';
 
 export { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 export { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
@@ -210,11 +238,14 @@ export const VARKHUL_HEROIC_LINK_WARDEN_DELAY_SECONDS = 2;
 
 export const VARKHUL_MASTERPIECE_UNBOUND_AURA_ID = 'varkhul_masterpiece_unbound';
 export const VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD = 0.2;
-export const VARKHUL_MASTERPIECE_UNBOUND_SECONDS = 45;
+export const VARKHUL_MASTERPIECE_UNBOUND_SECONDS = VARKHUL_WORLDFIRE_TOTAL_SECONDS;
 export const VARKHUL_MASTERPIECE_UNBOUND_SPEED_MULTIPLIER = 1.25;
 export const VARKHUL_MASTERPIECE_UNBOUND_DAMAGE_BONUS = 0.25;
 export const VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS = 3;
 export const VARKHUL_MASTERPIECE_UNBOUND_PULSE_MAX_HP = 0.05;
+export const VARKHUL_FORGE_HAMMER_ABILITY_ID = "Forgefather's Hammer";
+export const VARKHUL_FORGE_HAMMER_FIRST_SECONDS = 0.6;
+export const VARKHUL_FORGE_HAMMER_EVERY_SECONDS = 2;
 
 const VARKHUL_FIRST_CINDER_ORBS_SECONDS = 8;
 const VARKHUL_FIRST_FRONTAL_SECONDS = 13;
@@ -342,6 +373,7 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       forgeBeamWindow: 'idle',
       forgeBeamWindowRemaining: 0,
       forgeBeamTeachingTriggered: false,
+      forgeBeamPressureTriggered: false,
       forgeBeamFinalTriggered: false,
       forgeHeatWarningMask: 0,
       assemblyForgeBeamActiveMask: 0,
@@ -353,10 +385,15 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       ),
       assemblyForgeMeltdownRemaining: 0,
       assemblyForgeMeltdownTickTimer: VARKHUL_FORGE_MELTDOWN_TICK_SECONDS,
+      assemblyForgeHammerTimer: VARKHUL_FORGE_HAMMER_EVERY_SECONDS,
+      assemblyForgeVentedThisTick: false,
       assemblyPortalSpawns: [],
       assemblyNextWaveIndex: 0,
       assemblyNextWaveRemaining: 0,
       assemblyIntermissionWaves: 0,
+      assemblyArtificerNextSpawnRemaining: 0,
+      assemblyArtificerSpawnIndex: 0,
+      assemblyArtificerPortalSpawns: [],
       assemblyDeliveryWindowRemaining: 0,
       assemblyDeliveredCoreIds: [],
       assemblyArtificerRepaired: false,
@@ -380,6 +417,8 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       masterpieceTriggered: false,
       masterpieceRemaining: 0,
       masterpiecePulseTimer: VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS,
+      masterpieceWorldfireStage: 0,
+      masterpieceWorldfireTickTimer: VARKHUL_WORLDFIRE_TICK_SECONDS,
       masterpieceWipeResolved: false,
     };
   }
@@ -1114,6 +1153,26 @@ function placeVarkhulAtAnvil(ctx: SimContext, boss: Entity): void {
   boss.prevFacing = VARKHUL_WORK_FACING;
 }
 
+function updateAssemblyForging(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  st.assemblyForgeHammerTimer -= DT;
+  if (st.assemblyForgeHammerTimer > CAST_COMPLETE_EPS) return;
+  st.assemblyForgeHammerTimer += VARKHUL_FORGE_HAMMER_EVERY_SECONDS;
+  boss.aiState = 'attack';
+  const forge = anvilWorldPosition(ctx, boss);
+  ctx.emit({
+    type: 'spellfxAt',
+    x: forge.x,
+    z: forge.z,
+    school: 'fire',
+    fx: 'burst',
+    sourceId: boss.id,
+    radius: 2.4,
+    duration: 0.7,
+    ability: VARKHUL_FORGE_HAMMER_ABILITY_ID,
+    sfxKey: 'impact_metal',
+  });
+}
+
 function startAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   st.majorAbility = 'anvil';
   st.anvilTimer = VARKHUL_ANVIL_EVERY;
@@ -1270,6 +1329,9 @@ function spawnAssemblyAdd(
   add.ignoreHardLeash = true;
   if (templateId === VARKHUL_CRUCIBLE_WARDEN_ID) {
     add.bigCastTimer = VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS;
+  } else if (templateId === VARKHUL_CINDER_ARTIFICER_ID) {
+    add.aggroTargetId = boss.id;
+    add.bigCastTimer = 0;
   }
   ctx.addEntity(add);
   boss.summonedIds.push(add.id);
@@ -1400,6 +1462,54 @@ function queueForgeAddWave(
   }
 }
 
+function queueForgeArtificer(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  const instance = encounterInstance(ctx, boss);
+  if (!instance) return;
+  const origin = ctx.instanceOriginOf(instance);
+  const portalIndex = varkhulCinderArtificerPortalIndex(st.assemblyArtificerSpawnIndex);
+  st.assemblyArtificerPortalSpawns.push({
+    portalIndex,
+    remaining: VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
+  });
+  st.assemblyArtificerSpawnIndex++;
+  emitForgePortalTelegraph(
+    ctx,
+    boss,
+    origin,
+    portalIndex,
+    VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
+  );
+}
+
+function updateForgeArtificerSpawns(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+): void {
+  const pending: VarkhulEncounterState['assemblyArtificerPortalSpawns'] = [];
+  for (const scheduled of st.assemblyArtificerPortalSpawns) {
+    const remaining = Math.max(0, scheduled.remaining - DT);
+    if (remaining > CAST_COMPLETE_EPS) {
+      pending.push({ ...scheduled, remaining });
+      continue;
+    }
+    const portal = VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS[scheduled.portalIndex];
+    if (!portal) continue;
+    const add = spawnAssemblyAdd(ctx, boss, VARKHUL_CINDER_ARTIFICER_ID, portal.x, portal.z);
+    if (!add) {
+      pending.push({ ...scheduled, remaining: DT });
+      continue;
+    }
+    st.assemblyAddIds.push(add.id);
+  }
+  st.assemblyArtificerPortalSpawns = pending;
+
+  st.assemblyArtificerNextSpawnRemaining = Math.max(0, st.assemblyArtificerNextSpawnRemaining - DT);
+  if (st.assemblyArtificerNextSpawnRemaining > CAST_COMPLETE_EPS) return;
+  queueForgeArtificer(ctx, boss, st);
+  st.assemblyArtificerNextSpawnRemaining = VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS;
+}
+
 function updateForgeAddSpawns(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   const players = playersInEncounter(ctx, boss);
   const pending: VarkhulEncounterState['assemblyPortalSpawns'] = [];
@@ -1456,10 +1566,14 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   );
   st.assemblyForgeMeltdownRemaining = 0;
   st.assemblyForgeMeltdownTickTimer = VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
+  st.assemblyForgeHammerTimer = VARKHUL_FORGE_HAMMER_FIRST_SECONDS;
   st.assemblyPortalSpawns = [];
   st.assemblyIntermissionWaves = varkhulForgeIntermissionWaveCount(difficulty);
   st.assemblyNextWaveIndex = 1;
   st.assemblyNextWaveRemaining = VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS;
+  st.assemblyArtificerNextSpawnRemaining = VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS;
+  st.assemblyArtificerSpawnIndex = 0;
+  st.assemblyArtificerPortalSpawns = [];
   st.assemblyDeliveryWindowRemaining = 0;
   st.assemblyDeliveredCoreIds = [];
   st.assemblyArtificerRepaired = false;
@@ -1539,6 +1653,10 @@ function finishAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState
   st.assemblyNextWaveIndex = 0;
   st.assemblyNextWaveRemaining = 0;
   st.assemblyIntermissionWaves = 0;
+  st.assemblyArtificerNextSpawnRemaining = 0;
+  st.assemblyArtificerSpawnIndex = 0;
+  st.assemblyArtificerPortalSpawns = [];
+  st.assemblyForgeHammerTimer = VARKHUL_FORGE_HAMMER_EVERY_SECONDS;
   st.assemblyRuneRescuerIds.fill(null);
   st.assemblyRuneUnavailablePlayerIds = [];
   st.forgeBeamWindow = 'idle';
@@ -1666,6 +1784,7 @@ function updateForgeMeltdown(
   if (st.assemblyForgeMeltdownRemaining <= CAST_COMPLETE_EPS) {
     st.assemblyForgeMeltdownRemaining = 0;
     st.assemblyForgeOverheat = 0;
+    st.assemblyForgeVentedThisTick = true;
     if (st.assemblyTriggered && st.assemblyPhase === 'adds') {
       st.forgeBeamWindow = 'intermission';
       st.forgeBeamWindowRemaining = st.assemblyRemaining;
@@ -1833,15 +1952,20 @@ function updateMastersAssembly(
     }
     return st.assemblyPhase !== 'done';
   }
+  updateAssemblyForging(ctx, boss, st);
   st.forgeBeamWindow = 'intermission';
   st.forgeBeamWindowRemaining = st.assemblyRemaining;
   st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
   if (updateAssemblyForgeBeams(ctx, boss, st, players, forge)) return true;
   updateForgeAddSpawns(ctx, boss, st);
+  updateForgeArtificerSpawns(ctx, boss, st);
   st.assemblyRemaining = Math.max(0, st.assemblyRemaining - DT);
   st.forgeBeamWindowRemaining = st.assemblyRemaining;
   const allWavesQueued = st.assemblyNextWaveIndex >= st.assemblyIntermissionWaves;
-  const allAddsSpawned = allWavesQueued && st.assemblyPortalSpawns.length === 0;
+  const allAddsSpawned =
+    allWavesQueued &&
+    st.assemblyPortalSpawns.length === 0 &&
+    st.assemblyArtificerPortalSpawns.length === 0;
   const liveAdds = st.assemblyAddIds.some((id) => {
     const add = ctx.entities.get(id);
     return add !== undefined && !add.dead;
@@ -1873,6 +1997,15 @@ function startForgeBeamWindow(
     st.assemblyForgeBeamActiveMask === 0 ? 0 : VARKHUL_FORGE_BEAM_WARMUP_SECONDS;
 }
 
+function disableForgeBeamsForWorldfire(st: VarkhulEncounterState): void {
+  startForgeBeamWindow(st, 'idle', 0);
+  st.forgeBeamFinalTriggered = true;
+  st.forgeHeatWarningMask = 0;
+  st.assemblyForgeOverheat = 0;
+  st.assemblyForgeMeltdownRemaining = 0;
+  st.assemblyForgeMeltdownTickTimer = VARKHUL_FORGE_MELTDOWN_TICK_SECONDS;
+}
+
 function advanceForgeBeamWindow(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   switch (st.forgeBeamWindow) {
     case 'teaching_left':
@@ -1883,6 +2016,10 @@ function advanceForgeBeamWindow(ctx: SimContext, boss: Entity, st: VarkhulEncoun
       emitVarkhulCallout(ctx, boss, 'rightPillarCharging');
       break;
     case 'teaching_right':
+      startForgeBeamWindow(st, 'idle', 0);
+      break;
+    case 'pressure_left':
+    case 'pressure_right':
       startForgeBeamWindow(st, 'idle', 0);
       break;
     case 'final_left':
@@ -1916,6 +2053,7 @@ function updateForgeBeamWindows(
     !st.forgeBeamTeachingTriggered &&
     hpPct <= VARKHUL_FORGE_TEACHING_HP_THRESHOLD &&
     hpPct > VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD &&
+    st.forgeBeamWindow === 'idle' &&
     st.majorAbility === 'none'
   ) {
     st.forgeBeamTeachingTriggered = true;
@@ -1923,8 +2061,27 @@ function updateForgeBeamWindows(
     emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
   }
   if (
+    !st.forgeBeamPressureTriggered &&
+    st.assemblyTriggered &&
+    st.assemblyPhase === 'done' &&
+    hpPct <= VARKHUL_FORGE_PRESSURE_HP_THRESHOLD &&
+    hpPct > VARKHUL_FORGE_FINAL_HP_THRESHOLD &&
+    st.forgeBeamWindow === 'idle' &&
+    st.majorAbility === 'none'
+  ) {
+    st.forgeBeamPressureTriggered = true;
+    const pressureWindow = varkhulForgePressureWindow(boss.id);
+    startForgeBeamWindow(st, pressureWindow, VARKHUL_FORGE_PRESSURE_BEAM_SECONDS);
+    emitVarkhulCallout(
+      ctx,
+      boss,
+      pressureWindow === 'pressure_left' ? 'leftPillarCharging' : 'rightPillarCharging',
+    );
+  }
+  if (
     !st.forgeBeamFinalTriggered &&
     hpPct <= VARKHUL_FORGE_FINAL_HP_THRESHOLD &&
+    (st.forgeBeamWindow === 'idle' || st.forgeBeamWindow.startsWith('pressure_')) &&
     st.majorAbility === 'none'
   ) {
     st.forgeBeamFinalTriggered = true;
@@ -1940,7 +2097,7 @@ function updateForgeBeamWindows(
     st.forgeBeamWindowRemaining = Math.max(0, st.forgeBeamWindowRemaining - DT);
   }
   if (st.forgeBeamWindowRemaining <= CAST_COMPLETE_EPS) advanceForgeBeamWindow(ctx, boss, st);
-  return st.forgeBeamWindow.startsWith('teaching_');
+  return st.forgeBeamWindow.startsWith('teaching_') || st.forgeBeamWindow.startsWith('pressure_');
 }
 
 export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): boolean {
@@ -1958,6 +2115,127 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
   }
   if (!boss?.varkhul) return false;
   add.inCombat = true;
+  if (add.templateId === VARKHUL_CINDER_ARTIFICER_ID) {
+    add.ignoreHardLeash = true;
+    add.aggroTargetId = boss.id;
+    add.facing = steadyAngleTo(add.pos, boss.pos, add.facing);
+
+    const cancelRepair = (): void => {
+      clearBossCast(add);
+      add.channelTickTimer = 0;
+      add.channelTickEvery = 0;
+      add.channelTicksLeft = 0;
+    };
+    if (ctx.isStunned(add)) {
+      if (add.castingAbility === VARKHUL_CINDER_REPAIR_CAST_ID) {
+        cancelRepair();
+        add.bigCastTimer = VARKHUL_CINDER_REPAIR_RETRY_SECONDS;
+      }
+      add.aiState = 'idle';
+      return true;
+    }
+    if (isSilenced(add) || isLockedOut(add, 'fire')) {
+      if (add.castingAbility === VARKHUL_CINDER_REPAIR_CAST_ID) cancelRepair();
+      add.aiState = 'idle';
+      return true;
+    }
+
+    const distanceToBoss = dist2d(add.pos, boss.pos);
+    if (add.castingAbility === VARKHUL_CINDER_REPAIR_CAST_ID) {
+      if (distanceToBoss > VARKHUL_CINDER_REPAIR_RANGE + 0.5 || boss.dead) {
+        cancelRepair();
+        add.bigCastTimer = VARKHUL_CINDER_REPAIR_RETRY_SECONDS;
+        return true;
+      }
+      add.aiState = 'attack';
+      add.castRemaining = Math.max(0, add.castRemaining - DT);
+      add.channelTickTimer = Math.max(0, add.channelTickTimer - DT);
+      if (add.channelTickTimer <= CAST_COMPLETE_EPS) {
+        add.channelTickTimer = VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS;
+        ctx.emit({
+          type: 'spellfx',
+          sourceId: add.id,
+          targetId: boss.id,
+          school: 'fire',
+          fx: 'beam',
+          ability: VARKHUL_CINDER_REPAIR_CAST_ID,
+        });
+      }
+      if (add.castRemaining > CAST_COMPLETE_EPS) return true;
+
+      cancelRepair();
+      add.bigCastTimer = VARKHUL_CINDER_REPAIR_RETRY_SECONDS;
+      ctx.applyHeal(
+        add,
+        boss,
+        varkhulCinderRepairAmount(boss.maxHp, boss.varkhul.assemblyRuneDifficulty),
+        VARKHUL_CINDER_REPAIR_NAME,
+        VARKHUL_CINDER_REPAIR_CAST_ID,
+        false,
+        false,
+        false,
+      );
+      boss.varkhul.assemblyArtificerRepaired = true;
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: add.id,
+        targetId: boss.id,
+        school: 'fire',
+        fx: 'windup',
+        ability: VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
+      });
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: add.id,
+        targetId: boss.id,
+        school: 'fire',
+        fx: 'nova',
+        ability: VARKHUL_CINDER_REPAIR_CAST_ID,
+      });
+      return true;
+    }
+
+    add.bigCastTimer = Math.max(0, add.bigCastTimer - DT);
+    if (distanceToBoss > VARKHUL_CINDER_REPAIR_RANGE) {
+      add.aiState = 'chase';
+      if (!ctx.isRooted(add)) {
+        ctx.moveToward(add, boss.pos, add.moveSpeed * ctx.moveSpeedMult(add));
+      }
+      add.facing = steadyAngleTo(add.pos, boss.pos, add.facing);
+      return true;
+    }
+    add.aiState = 'idle';
+    if (add.bigCastTimer > CAST_COMPLETE_EPS || boss.dead) return true;
+
+    add.castingAbility = VARKHUL_CINDER_REPAIR_CAST_ID;
+    add.castTotal = VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS;
+    add.castRemaining = VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS;
+    add.castTargetId = boss.id;
+    add.castAim = null;
+    add.channeling = true;
+    add.channelTickTimer = VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS;
+    add.channelTickEvery = VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS;
+    add.channelTicksLeft = Math.ceil(
+      VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
+    );
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: add.id,
+      targetId: boss.id,
+      school: 'fire',
+      fx: 'windup',
+      ability: VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
+    });
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: add.id,
+      targetId: boss.id,
+      school: 'fire',
+      fx: 'beam',
+      ability: VARKHUL_CINDER_REPAIR_CAST_ID,
+    });
+    return true;
+  }
   // Sentinels use the ordinary threat driver in the new add intermission. They
   // inherit a tank target at spawn, then taunts and threat work normally.
   if (add.templateId === VARKHUL_CRUCIBLE_WARDEN_ID) {
@@ -2001,6 +2279,15 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
           );
           ctx.dealDamage(add, player, damage, false, school, bigCast.name, 'hit', true);
         }
+        if (
+          boss.varkhul.assemblyPhase === 'adds' &&
+          boss.varkhul.assemblyForgeMeltdownRemaining <= CAST_COMPLETE_EPS &&
+          !boss.varkhul.assemblyForgeVentedThisTick
+        ) {
+          boss.varkhul.assemblyForgeOverheat = varkhulForgeOverheatAfterQuake(
+            boss.varkhul.assemblyForgeOverheat,
+          );
+        }
       }
       return true;
     }
@@ -2012,18 +2299,30 @@ export function updateVarkhulAssemblyAutomaton(ctx: SimContext, add: Entity): bo
       add.castTargetId = null;
       add.castAim = null;
       add.channeling = false;
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: add.id,
+        targetId: add.id,
+        school: bigCast.school ?? 'fire',
+        fx: 'windup',
+        ability: bigCast.castId,
+      });
     }
     return true;
   }
   return false;
 }
 
-function startMasterpieceUnbound(boss: Entity, st: VarkhulEncounterState): void {
+function startMasterpieceUnbound(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  if (st.assemblyRuneDifficulty === 'heroic') cancelMajorAbility(ctx, boss, st);
   st.masterpieceTriggered = true;
   st.masterpieceRemaining = VARKHUL_MASTERPIECE_UNBOUND_SECONDS;
   st.masterpiecePulseTimer = VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS;
+  st.masterpieceWorldfireStage = 0;
+  st.masterpieceWorldfireTickTimer = VARKHUL_WORLDFIRE_TICK_SECONDS;
   st.masterpieceWipeResolved = false;
   boss.enraged = true;
+  if (st.assemblyRuneDifficulty === 'heroic') disableForgeBeamsForWorldfire(st);
   boss.auras.push({
     id: VARKHUL_MASTERPIECE_UNBOUND_AURA_ID,
     name: 'Masterpiece Unbound',
@@ -2035,6 +2334,25 @@ function startMasterpieceUnbound(boss: Entity, st: VarkhulEncounterState): void 
     school: 'fire',
     encounterOwned: true,
   });
+  if (st.assemblyRuneDifficulty === 'heroic') {
+    emitVarkhulCallout(ctx, boss, 'worldfireBegins');
+  }
+}
+
+function maybeStartMasterpieceUnbound(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+): void {
+  if (
+    st.masterpieceTriggered ||
+    !st.assemblyTriggered ||
+    st.assemblyPhase !== 'done' ||
+    boss.hp / boss.maxHp > VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD
+  ) {
+    return;
+  }
+  startMasterpieceUnbound(ctx, boss, st);
 }
 
 function updateMasterpieceUnbound(
@@ -2043,22 +2361,60 @@ function updateMasterpieceUnbound(
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
-  if (!st.masterpieceTriggered || st.masterpieceWipeResolved) return;
-  st.masterpieceRemaining = Math.max(0, st.masterpieceRemaining - DT);
-  st.masterpiecePulseTimer -= DT;
-  if (st.masterpiecePulseTimer <= CAST_COMPLETE_EPS) {
-    st.masterpiecePulseTimer += VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS;
-    for (const player of players) {
-      dealFractionalDamage(
-        ctx,
-        boss,
-        player,
-        VARKHUL_MASTERPIECE_UNBOUND_PULSE_MAX_HP,
-        'Living Forge',
-      );
+  if (!st.masterpieceTriggered) return;
+  if (!st.masterpieceWipeResolved) {
+    st.masterpieceRemaining = Math.max(0, st.masterpieceRemaining - DT);
+    if (st.assemblyRuneDifficulty !== 'heroic') {
+      st.masterpiecePulseTimer -= DT;
+      if (st.masterpiecePulseTimer <= CAST_COMPLETE_EPS) {
+        st.masterpiecePulseTimer += VARKHUL_MASTERPIECE_UNBOUND_PULSE_SECONDS;
+        for (const player of players) {
+          dealFractionalDamage(
+            ctx,
+            boss,
+            player,
+            VARKHUL_MASTERPIECE_UNBOUND_PULSE_MAX_HP,
+            'Living Forge',
+          );
+        }
+      }
     }
   }
-  if (st.masterpieceRemaining <= CAST_COMPLETE_EPS) {
+  if (st.assemblyRuneDifficulty === 'heroic') {
+    const aura = boss.auras.find((entry) => entry.id === VARKHUL_MASTERPIECE_UNBOUND_AURA_ID);
+    if (aura) {
+      // This aura is also the snapshot marker consumed by the Worldfire painter.
+      // Preserve the finite countdown until the deadline, then publish a permanent
+      // final-stage marker so snapshot aging and reconnects cannot remove the fire.
+      if (st.masterpieceRemaining > CAST_COMPLETE_EPS) {
+        aura.remaining = st.masterpieceRemaining;
+        aura.duration = VARKHUL_MASTERPIECE_UNBOUND_SECONDS;
+        aura.permanent = false;
+      } else {
+        aura.remaining = Number.POSITIVE_INFINITY;
+        aura.duration = Number.POSITIVE_INFINITY;
+        aura.permanent = true;
+      }
+    }
+    const stage = varkhulWorldfireStage(st.masterpieceRemaining);
+    const previousStage = st.masterpieceWorldfireStage;
+    st.masterpieceWorldfireStage = stage;
+    if (previousStage < 4 && stage >= 4) emitVarkhulCallout(ctx, boss, 'worldfireClosing');
+    if (previousStage < 6 && stage >= 6) emitVarkhulCallout(ctx, boss, 'worldfireConsumed');
+
+    st.masterpieceWorldfireTickTimer -= DT;
+    if (st.masterpieceWorldfireTickTimer <= CAST_COMPLETE_EPS) {
+      st.masterpieceWorldfireTickTimer += VARKHUL_WORLDFIRE_TICK_SECONDS;
+      const instance = encounterInstance(ctx, boss);
+      const center = instance ? ctx.instanceOriginOf(instance) : boss.spawnPos;
+      const damageMaxHp = varkhulWorldfireDamageMaxHp(stage);
+      for (const player of players) {
+        if (!varkhulWorldfireBurnsPosition(center, player.pos, stage)) continue;
+        dealFractionalDamage(ctx, boss, player, damageMaxHp, VARKHUL_WORLDFIRE_ABILITY_ID);
+      }
+    }
+  }
+  if (!st.masterpieceWipeResolved && st.masterpieceRemaining <= CAST_COMPLETE_EPS) {
     st.masterpieceWipeResolved = true;
     wipeEncounter(ctx, boss, players, 'Masterpiece Unbound');
   }
@@ -2129,7 +2485,15 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
   const st = initVarkhulEncounter(boss);
-  if (updateForgeMeltdown(ctx, boss, st, players)) return;
+  st.assemblyForgeVentedThisTick = false;
+  maybeStartMasterpieceUnbound(ctx, boss, st);
+  if (st.assemblyRuneDifficulty === 'heroic' && st.masterpieceTriggered) {
+    disableForgeBeamsForWorldfire(st);
+  }
+  if (updateForgeMeltdown(ctx, boss, st, players)) {
+    updateMasterpieceUnbound(ctx, boss, st, players);
+    return;
+  }
   updateCinderFires(ctx, boss, st, players);
   updateCinderOrbProjectiles(ctx, boss, st, players);
   updateAnvilMeteors(ctx, boss, st, players);
@@ -2144,15 +2508,12 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     startMastersAssembly(ctx, boss, st);
   }
   if (updateMastersAssembly(ctx, boss, st, players)) return;
+  maybeStartMasterpieceUnbound(ctx, boss, st);
 
   const forgeBeamWindowActive = updateForgeBeamWindows(ctx, boss, st, players);
-  if (st.assemblyForgeMeltdownRemaining > CAST_COMPLETE_EPS) return;
-
-  if (
-    !st.masterpieceTriggered &&
-    boss.hp / boss.maxHp <= VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD
-  ) {
-    startMasterpieceUnbound(boss, st);
+  if (st.assemblyForgeMeltdownRemaining > CAST_COMPLETE_EPS) {
+    updateMasterpieceUnbound(ctx, boss, st, players);
+    return;
   }
   updateMasterpieceUnbound(ctx, boss, st, players);
   players = playersInEncounter(ctx, boss);
@@ -2160,12 +2521,15 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   if (!target) return;
 
   const speed = st.masterpieceTriggered ? VARKHUL_MASTERPIECE_UNBOUND_SPEED_MULTIPLIER : 1;
-  st.makersBrandTimer -= DT;
-  if (st.makersBrandTimer <= CAST_COMPLETE_EPS && castMakersBrand(ctx, boss, target)) {
-    st.makersBrandTimer = VARKHUL_MAKERS_BRAND_EVERY;
-    players = playersInEncounter(ctx, boss);
-    target = resolveLivingTarget(boss, players);
-    if (!target) return;
+  const worldfireFinale = st.assemblyRuneDifficulty === 'heroic' && st.masterpieceTriggered;
+  if (!worldfireFinale) {
+    st.makersBrandTimer -= DT;
+    if (st.makersBrandTimer <= CAST_COMPLETE_EPS && castMakersBrand(ctx, boss, target)) {
+      st.makersBrandTimer = VARKHUL_MAKERS_BRAND_EVERY;
+      players = playersInEncounter(ctx, boss);
+      target = resolveLivingTarget(boss, players);
+      if (!target) return;
+    }
   }
 
   if (updateMajorAbility(ctx, boss, st, players, speed)) return;
@@ -2188,24 +2552,26 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
 
-  st.cinderOrbsTimer -= DT * speed;
   st.frontalTimer -= DT * speed;
-  st.forgestormTimer -= DT * speed;
   st.anvilTimer -= DT * speed;
-  st.interceptBeamTimer -= DT * speed;
+  if (!worldfireFinale) {
+    st.cinderOrbsTimer -= DT * speed;
+    st.forgestormTimer -= DT * speed;
+    st.interceptBeamTimer -= DT * speed;
+  }
   if (st.frontalTimer <= CAST_COMPLETE_EPS) {
     startFrontal(ctx, boss, st, players);
     return;
   }
-  if (st.cinderOrbsTimer <= CAST_COMPLETE_EPS) {
+  if (!worldfireFinale && st.cinderOrbsTimer <= CAST_COMPLETE_EPS) {
     startCinderOrbs(ctx, boss, st, players);
     return;
   }
-  if (st.interceptBeamTimer <= CAST_COMPLETE_EPS) {
+  if (!worldfireFinale && st.interceptBeamTimer <= CAST_COMPLETE_EPS) {
     startInterceptBeam(ctx, boss, st, players);
     return;
   }
-  if (st.forgestormTimer <= CAST_COMPLETE_EPS) {
+  if (!worldfireFinale && st.forgestormTimer <= CAST_COMPLETE_EPS) {
     startForgestorm(ctx, boss, st);
     return;
   }

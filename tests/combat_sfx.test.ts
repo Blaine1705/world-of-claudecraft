@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { describe, expect, it, vi } from 'vitest';
 import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
 import { ABILITIES } from '../src/sim/content/classes';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
@@ -6,6 +7,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  dispatchVarkhulCalloutSfx,
   groundTickAbilityCue,
   impactCueForDamage,
   MOB_VOICE_CUES,
@@ -18,6 +20,8 @@ import {
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
+  varkhulCalloutCue,
+  varkhulCalloutSfxPlan,
   weaponSwingCue,
 } from '../src/ui/combat_sfx';
 
@@ -901,5 +905,60 @@ describe('combat SFX policy', () => {
 
   it('a heal with no source (leech, second wind, companion heals, ...) has no consume cue', () => {
     expect(consumeHealCue(heal({ amount: 25 }))).toBeNull();
+  });
+
+  it('gives every Varkhul warning a sampled timing cue', () => {
+    expect(varkhulCalloutCue('leftPillarCharging')).toBe('cast_fire');
+    expect(varkhulCalloutCue('rightPillarCharging')).toBe('cast_fire');
+    expect(varkhulCalloutCue('bothPillarsCharging')).toBe('cast_fire');
+    expect(varkhulCalloutCue('leftPillar')).toBe('impact_fire');
+    expect(varkhulCalloutCue('rightPillar')).toBe('impact_fire');
+    expect(varkhulCalloutCue('bothPillars')).toBe('impact_fire');
+    expect(varkhulCalloutCue('portalsOpening')).toBe('rift_portal_spawn');
+    expect(varkhulCalloutCue('heat75')).toBe('impact_metal');
+    expect(varkhulCalloutCue('heat90')).toBe('meteor');
+    expect(varkhulCalloutCue('addsDefeated')).toBe('ui_achievement');
+    expect(varkhulCalloutCue('worldfireBegins')).toBe('flamestrike');
+    expect(varkhulCalloutCue('worldfireClosing')).toBe('rift_lava_tick');
+    expect(varkhulCalloutCue('worldfireConsumed')).toBe('meteor');
+
+    const event = {
+      type: 'varkhulCallout',
+      pid: 1,
+      sourceId: 42,
+      call: 'worldfireClosing',
+    } as const satisfies Extract<SimEvent, { type: 'varkhulCallout' }>;
+    expect(
+      varkhulCalloutSfxPlan(event, (entityId) =>
+        entityId === 42 ? { pos: { x: 4, y: 5, z: 6 } } : undefined,
+      ),
+    ).toEqual({
+      cue: 'rift_lava_tick',
+      x: 4,
+      y: 5,
+      z: 6,
+      gain: 0.9,
+      cooldown: 0.08,
+      jitter: false,
+    });
+    expect(varkhulCalloutSfxPlan(event, () => undefined)).toBeNull();
+    const sink = vi.fn();
+    expect(
+      dispatchVarkhulCalloutSfx(
+        event,
+        (entityId) => (entityId === 42 ? { pos: { x: 4, y: 5, z: 6 } } : undefined),
+        sink,
+      ),
+    ).toBe(true);
+    expect(sink).toHaveBeenCalledOnce();
+    expect(sink).toHaveBeenCalledWith(
+      expect.objectContaining({ cue: 'rift_lava_tick', x: 4, y: 5, z: 6 }),
+    );
+    expect(dispatchVarkhulCalloutSfx(event, () => undefined, sink)).toBe(false);
+    expect(sink).toHaveBeenCalledOnce();
+
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain("case 'varkhulCallout'");
+    expect(hud).toContain('dispatchVarkhulCalloutSfx(');
   });
 });

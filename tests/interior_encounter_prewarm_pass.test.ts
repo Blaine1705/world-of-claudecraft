@@ -213,6 +213,7 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(host.compiled).toContain('varkhul-forge-beam-prewarm');
     expect(host.compiled).toContain('varkhul-tempering-ray-prewarm');
     expect(host.compiled).toContain('varkhul-forge-portal-prewarm');
+    expect(host.compiled).toContain('varkhul-worldfire-prewarm');
 
     const afterFirst = host.compiled.length;
     startInteriorEncounterPrewarm('ignivar_depths', host);

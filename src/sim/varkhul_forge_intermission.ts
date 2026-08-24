@@ -15,6 +15,8 @@ export type VarkhulForgeBeamWindow =
   | 'teaching_left'
   | 'teaching_gap'
   | 'teaching_right'
+  | 'pressure_left'
+  | 'pressure_right'
   | 'intermission'
   | 'final_left'
   | 'final_gap_left'
@@ -29,9 +31,11 @@ export interface VarkhulForgeAddSpawn {
 
 export const VARKHUL_FORGE_TEACHING_HP_THRESHOLD = 0.8;
 export const VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD = 0.5;
+export const VARKHUL_FORGE_PRESSURE_HP_THRESHOLD = 0.35;
 export const VARKHUL_FORGE_FINAL_HP_THRESHOLD = 0.2;
 export const VARKHUL_FORGE_TEACHING_BEAM_SECONDS = 8;
 export const VARKHUL_FORGE_TEACHING_GAP_SECONDS = 2;
+export const VARKHUL_FORGE_PRESSURE_BEAM_SECONDS = 6;
 export const VARKHUL_FORGE_FINAL_BEAM_SECONDS = 8;
 export const VARKHUL_FORGE_FINAL_GAP_SECONDS = 4;
 export const VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS = 2;
@@ -51,6 +55,10 @@ export const VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS = [
   { x: 30, z: 12 },
 ] as const;
 
+export function varkhulForgePressureWindow(bossId: number): 'pressure_left' | 'pressure_right' {
+  return bossId % 2 === 0 ? 'pressure_left' : 'pressure_right';
+}
+
 export type VarkhulForgePortalTelegraph = Extract<SimEvent, { type: 'spellfxAt' }>;
 
 export interface VarkhulForgePortalProjectionState {
@@ -58,6 +66,7 @@ export interface VarkhulForgePortalProjectionState {
   assemblyRuneDifficulty: VarkhulAssemblyDifficulty;
   assemblyForgeMeltdownRemaining: number;
   assemblyPortalSpawns: readonly { wave: number; spawnIndex: number; remaining: number }[];
+  assemblyArtificerPortalSpawns: readonly { portalIndex: number; remaining: number }[];
 }
 
 /** Rebuilds the still-actionable portal warning for reconnect recovery. */
@@ -75,6 +84,13 @@ export function activeVarkhulForgePortalTelegraphs(
     if (!planned) continue;
     durationByPortal[planned.portalIndex] = Math.max(
       durationByPortal[planned.portalIndex] ?? 0,
+      scheduled.remaining,
+    );
+  }
+  for (const scheduled of state.assemblyArtificerPortalSpawns) {
+    if (!VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS[scheduled.portalIndex]) continue;
+    durationByPortal[scheduled.portalIndex] = Math.max(
+      durationByPortal[scheduled.portalIndex] ?? 0,
       scheduled.remaining,
     );
   }
@@ -101,9 +117,11 @@ export function activeVarkhulForgePortalTelegraphs(
 export function varkhulForgeBeamWindowMask(window: VarkhulForgeBeamWindow): number {
   switch (window) {
     case 'teaching_left':
+    case 'pressure_left':
     case 'final_left':
       return 1;
     case 'teaching_right':
+    case 'pressure_right':
     case 'final_right':
       return 2;
     case 'intermission':

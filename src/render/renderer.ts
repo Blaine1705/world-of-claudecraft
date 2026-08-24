@@ -179,6 +179,7 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
+import { shouldStartDamageAttackAnimation } from './characters/damage_attack_animation';
 import {
   activeCharacterFormVisual,
   characterFormMaskForAura,
@@ -191,10 +192,7 @@ import {
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { modularLookChanged } from './characters/player_look_core';
 import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
-import {
-  playerRangedAttackAlreadyStarted,
-  playerRangedAttackStartsAtLaunch,
-} from './characters/skin_attack';
+import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
@@ -681,6 +679,7 @@ import { ValeCupPracticeSky } from './vale_cup_practice_sky';
 import { buildValeCupStadium, type ValeCupStadiumView } from './vale_cup_stadium';
 import { buildValeCupTeamRings, type ValeCupTeamRingsView } from './vale_cup_team_ring';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
+import { dispatchVarkhulForgeHammerAttack } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
@@ -7873,6 +7872,9 @@ export class Renderer {
             palette: ev.ability === 'Forge Legion Portal' ? 'forge' : 'necromancy',
           });
         }
+        dispatchVarkhulForgeHammerAttack(ev, (entityId, abilityId) =>
+          this.triggerAttack(entityId, abilityId),
+        );
         // Spec-driven ground-cast visuals claim the point-anchored cues first
         // (aimed 'nova'/'burst' landings and 'tick' zone pulses). The painter
         // deliberately never claims meteorFall/snowZone/runeCircle/orb: those
@@ -7998,11 +8000,20 @@ export class Renderer {
         // carrying the typed launch cue already began its cosmetic one-shot,
         // so do not restart that same shot when its damage lands.
         const source = this.sim.entities.get(ev.sourceId);
-        const rangedShotAlreadyStarted = playerRangedAttackAlreadyStarted(
-          source?.kind,
-          ev.attackAnimationStarted,
-        );
-        if (ev.school === 'physical' && ev.sourceId !== -1 && !rangedShotAlreadyStarted)
+        const sourceView = this.views.get(ev.sourceId);
+        const sourceVisual = sourceView ? this.activeVisual(sourceView) : null;
+        const authoredCastOwnsBody =
+          source?.kind === 'mob' &&
+          source.castingAbility !== null &&
+          source.castingAbility !== undefined &&
+          sourceVisual?.hasAttackClipOverride(source.castingAbility) === true;
+        const startsAttackAnimation = shouldStartDamageAttackAnimation({
+          sourceKind: source?.kind,
+          attackAnimationStarted: ev.attackAnimationStarted,
+          castingAbility: source?.castingAbility,
+          authoredCastOwnsBody,
+        });
+        if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
         if (ev.kind === 'hit' && ev.amount > 0) {
           // landed blows flinch the victim (rate-limited inside the visual)

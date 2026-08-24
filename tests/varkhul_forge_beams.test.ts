@@ -9,6 +9,7 @@ import {
   VARKHUL_FORGE_BEAM_WARMUP_SECONDS,
   VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS,
   VARKHUL_FORGE_MELTDOWN_TICK_SECONDS,
+  VARKHUL_FORGE_QUAKE_OVERHEAT,
   varkhulForgeBeamAssignments,
   varkhulForgeBeamBlockDamageMaxHp,
   varkhulForgeBeamColumns,
@@ -16,6 +17,7 @@ import {
   varkhulForgeBeamOverheatAfterTick,
   varkhulForgeMeltdownInitialDamageMaxHp,
   varkhulForgeMeltdownTickDamageMaxHp,
+  varkhulForgeOverheatAfterQuake,
 } from '../src/sim/varkhul_forge_beams';
 
 const FORGE = { x: 100, z: 220 };
@@ -125,5 +127,11 @@ describe('Varkhul forge beams', () => {
     expect(VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS).toBe(5);
     expect(varkhulForgeMeltdownTickDamageMaxHp('normal')).toBe(0.15);
     expect(varkhulForgeMeltdownTickDamageMaxHp('heroic')).toBe(0.2);
+  });
+
+  it('adds eight forge-heat points only when a Crucible Quake resolves', () => {
+    expect(VARKHUL_FORGE_QUAKE_OVERHEAT).toBe(0.08);
+    expect(varkhulForgeOverheatAfterQuake(0.4)).toBeCloseTo(0.48, 8);
+    expect(varkhulForgeOverheatAfterQuake(0.97)).toBe(1);
   });
 });

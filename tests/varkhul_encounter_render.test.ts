@@ -127,18 +127,23 @@ describe('Varkhul encounter rendering', () => {
     syncVarkhulEncounterVisuals(group, boss, 0.1);
     const visual = group.getObjectByName('varkhulForgefatherSweepTelegraph') as THREE.Group;
     expect(visual.visible).toBe(true);
-    expect(visual.userData).toMatchObject({ actionable: true, radius: 30 });
+    expect(visual.userData).toMatchObject({ actionable: true, radius: 42 });
+    expect(visual.userData.halfAngle).toBeCloseTo((Math.PI * 7) / 18, 8);
     expect(visual.scale.x).toBeCloseTo(0.5);
     const fill = visual.getObjectByName('varkhulFrontalFill') as THREE.Mesh;
     fill.geometry.computeBoundingBox();
     expect(fill.geometry.boundingBox?.min.z).toBeGreaterThanOrEqual(-0.001);
-    expect(fill.geometry.boundingBox?.max.z).toBeCloseTo(30, 5);
-    for (const name of ['varkhulFrontalEdgeLeft', 'varkhulFrontalEdgeRight']) {
+    expect(fill.geometry.boundingBox?.max.z).toBeCloseTo(42, 5);
+    for (const [name, expectedAngle] of [
+      ['varkhulFrontalEdgeLeft', (-Math.PI * 7) / 18],
+      ['varkhulFrontalEdgeRight', (Math.PI * 7) / 18],
+    ] as const) {
       const edge = visual.getObjectByName(name) as THREE.Mesh;
       const angle = Number(edge.userData.angle);
+      expect(angle).toBeCloseTo(expectedAngle, 8);
       expect(edge.rotation.y).toBeCloseTo(angle, 6);
-      expect(edge.position.x).toBeCloseTo(Math.sin(angle) * 15, 6);
-      expect(edge.position.z).toBeCloseTo(Math.cos(angle) * 15, 6);
+      expect(edge.position.x).toBeCloseTo(Math.sin(angle) * 21, 6);
+      expect(edge.position.z).toBeCloseTo(Math.cos(angle) * 21, 6);
     }
     expect(varkhulEncounterBypassesCharacterCulling(boss)).toBe(true);
   });

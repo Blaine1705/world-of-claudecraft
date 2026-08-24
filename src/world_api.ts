@@ -142,7 +142,12 @@ export type {
 // 16 = Varkhul enlarged Cinder Orb fire from 2.4 to 3.5 yards. The persistent
 // fire radius is authoritative, but the four-second player warning is compiled
 // into the client, so epoch 15 clients would preview a dangerously smaller area.
-export const ONLINE_WORLD_LAYOUT_VERSION = 16 as const;
+// 17 = Heroic Varkhul added Worldfire, a compiled six-stage room-filling fire
+// wall. Epoch 16 clients would take lethal damage from bands they cannot see.
+// 18 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
+// 120 degrees to 42 yards and 140 degrees. Epoch 17 clients would display a
+// dangerously smaller warning than the authoritative server damage.
+export const ONLINE_WORLD_LAYOUT_VERSION = 18 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

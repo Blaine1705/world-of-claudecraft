@@ -2,17 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 
 describe('expanded Ignivar raid visual manifest', () => {
-  it('keeps only unfinished Varkhul bodies on the visible elemental fallback', () => {
-    for (const templateId of [
-      'ignivar_cinder_artificer',
-      'varkhul_forgefather_of_the_last_flame',
-    ]) {
-      expect(visualKeyFor({ kind: 'mob', templateId } as never)).toBe('mob_elemental');
-    }
+  it('keeps only the unfinished Varkhul body on the visible elemental fallback', () => {
+    expect(
+      visualKeyFor({ kind: 'mob', templateId: 'varkhul_forgefather_of_the_last_flame' } as never),
+    ).toBe('mob_elemental');
     expect(VISUALS.mob_elemental.url).toBe('models/creatures/golelingevolved.glb');
   });
 
-  it('routes both second-boss adds to their dedicated automa bodies', () => {
+  it('routes all three second-boss adds to their dedicated automa bodies and authored clips', () => {
     expect(visualKeyFor({ kind: 'mob', templateId: 'ignivar_crucible_warden' } as never)).toBe(
       'mob_ignivar_crucible_warden',
     );
@@ -28,6 +25,8 @@ describe('expanded Ignivar raid visual manifest', () => {
         walk: 'Walk',
         run: 'Run',
         attack: ['Attack'],
+        attackByAbility: { crucible_quake: 'JumpSlam' },
+        attackTimeScaleByAbility: { crucible_quake: 0.8 },
         hit: ['Hit'],
         death: 'Death',
       },
@@ -40,11 +39,32 @@ describe('expanded Ignivar raid visual manifest', () => {
         idle: 'Idle',
         walk: 'Walk',
         run: 'Run',
-        attack: ['Hit'],
+        attack: ['Attack'],
+        hit: ['Hit'],
         death: 'Death',
       },
     });
-    expect(VISUALS.mob_ignivar_ember_sentinel.clips.hit).toBeUndefined();
+    expect(visualKeyFor({ kind: 'mob', templateId: 'ignivar_cinder_artificer' } as never)).toBe(
+      'mob_ignivar_cinder_artificer',
+    );
+    expect(VISUALS.mob_ignivar_cinder_artificer).toMatchObject({
+      url: 'models/creatures/cinder_artificer.glb',
+      height: 2.1,
+      yaw: 0,
+      clips: {
+        idle: 'Idle',
+        walk: 'Walk',
+        run: 'Run',
+        attack: ['Attack'],
+        attackByAbility: {
+          cinder_recalibrate_start: 'ChannelStart',
+          cinder_recalibrate_end: 'ChannelEnd',
+        },
+        cast: 'Channel',
+        hit: ['Hit'],
+        death: 'Death',
+      },
+    });
   });
 
   it('reuses the established archivist body for Maelin Emberward', () => {

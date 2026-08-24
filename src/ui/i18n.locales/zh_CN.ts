@@ -7217,6 +7217,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.heat75': '锻炉热量达到75%！',
   'hudChrome.varkhulCallout.heat90': '锻炉熔毁迫在眉睫！',
   'hudChrome.varkhulCallout.addsDefeated': '锻炉军团已被击败，瓦库尔暴露了！',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '世界之火从房间边缘燃起，42秒后整个熔炉大厅将被吞没！',
+  'hudChrome.varkhulCallout.worldfireClosing': '世界之火正在逼近，向中央移动！',
+  'hudChrome.varkhulCallout.worldfireConsumed': '整个熔炉大厅都在燃烧！',
   'hudChrome.auraEffect.absorb': '吸收 {value} 点伤害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 点受到的治疗',
   'hudChrome.auraEffect.thorns': '对攻击者造成 {value} 点{school}伤害',

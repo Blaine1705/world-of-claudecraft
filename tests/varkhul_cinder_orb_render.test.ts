@@ -41,7 +41,12 @@ describe('Varkhul Cinder Orbs POWERFUL VFX', () => {
       permanent: true,
     });
     expect(group.position.toArray()).toEqual([7, 2.09, -5]);
-    expect(group.getObjectByName('ground_fire_aoe__flames')).toBeInstanceOf(THREE.Mesh);
+    const flames = group.getObjectByName('ground_fire_aoe__flames') as THREE.Mesh<
+      THREE.BufferGeometry,
+      THREE.ShaderMaterial
+    >;
+    expect(flames).toBeInstanceOf(THREE.Mesh);
+    expect(flames.material.uniforms.uOuterRadiusRatio.value).toBe(0.82);
     expect(group.getObjectByName('varkhul-cinder-orb-core')).toBeUndefined();
 
     const edge = group.getObjectByName('varkhul-cinder-fire-edge') as THREE.Mesh;

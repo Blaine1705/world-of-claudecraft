@@ -1,4 +1,5 @@
 import type { Aura } from '../types';
+import { VARKHUL_CINDER_REPAIR_CAST_ID } from '../varkhul_cinder_artificer';
 
 // The scripted cast id updateHealerHold puts on a channelHeal mob (Malric, the
 // Nythraxis spirit healer) so its heal renders a real, interruptible cast bar.
@@ -13,4 +14,5 @@ export const VARKHUL_CRUCIBLE_QUAKE_CAST_ID = 'crucible_quake';
 export const SCRIPTED_INTERRUPTIBLE_CHANNELS: Record<string, { school: Aura['school'] }> = {
   [NYTHRAXIS_SPIRIT_MENDING_CAST_ID]: { school: 'shadow' },
   [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: { school: 'fire' },
+  [VARKHUL_CINDER_REPAIR_CAST_ID]: { school: 'fire' },
 };

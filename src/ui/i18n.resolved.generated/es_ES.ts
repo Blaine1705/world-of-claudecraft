@@ -2298,7 +2298,10 @@ export const es_ES: EnTranslations = {
       "portalsOpening": "¡Los portales de la forja se están abriendo!",
       "heat75": "¡La forja ha alcanzado un 75% de calor!",
       "heat90": "¡La Fusión de la forja es inminente!",
-      "addsDefeated": "¡La legión de la forja ha caído: Varkhul está expuesto!"
+      "addsDefeated": "¡La legión de la forja ha caído: Varkhul está expuesto!",
+      "worldfireBegins": "¡El Fuego del Mundo prende en el borde de la sala! El crisol quedará consumido en 42 s.",
+      "worldfireClosing": "¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!",
+      "worldfireConsumed": "¡Todo el crisol está en llamas!"
     },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",

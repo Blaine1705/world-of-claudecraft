@@ -213,7 +213,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "fr_CA": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -291,7 +294,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "en_CA": [],
   "it_IT": [
@@ -370,7 +376,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "de_DE": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -448,7 +457,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "zh_CN": [
     "hudChrome.controller.crossHotbarPosition"
@@ -538,7 +550,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "ru_RU": [
     "hudChrome.controller.crossHotbarPosition"
@@ -619,7 +634,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "nl_NL": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -697,7 +715,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "pl_PL": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -775,7 +796,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "id_ID": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -853,7 +877,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "tr_TR": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -931,7 +958,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "sv_SE": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1009,7 +1039,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "vi_VN": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1087,7 +1120,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ],
   "da_DK": [
     "entities.dungeons.ignivar_forge_approach.enterText",
@@ -1165,6 +1201,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.leftPillarCharging",
     "hudChrome.varkhulCallout.portalsOpening",
     "hudChrome.varkhulCallout.rightPillar",
-    "hudChrome.varkhulCallout.rightPillarCharging"
+    "hudChrome.varkhulCallout.rightPillarCharging",
+    "hudChrome.varkhulCallout.worldfireBegins",
+    "hudChrome.varkhulCallout.worldfireClosing",
+    "hudChrome.varkhulCallout.worldfireConsumed"
   ]
 };

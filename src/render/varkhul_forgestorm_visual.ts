@@ -14,6 +14,7 @@ import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import { VarkhulCinderOrbVisuals } from './varkhul_cinder_orb_visual';
 import { VarkhulForgeBeamVisuals } from './varkhul_forge_beam_visual';
 import { VarkhulInterceptBeamVisuals } from './varkhul_intercept_beam_visual';
+import { VarkhulWorldfireVisuals } from './varkhul_worldfire_visual';
 
 const SEGMENTS = 64;
 const GROUND_LIFT = 0.09;
@@ -121,6 +122,7 @@ export class VarkhulForgestormVisuals {
   private readonly cinderOrbVisuals: VarkhulCinderOrbVisuals;
   private readonly forgeBeamVisuals: VarkhulForgeBeamVisuals;
   private readonly interceptBeamVisuals: VarkhulInterceptBeamVisuals;
+  private readonly worldfireVisuals: VarkhulWorldfireVisuals;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -129,6 +131,7 @@ export class VarkhulForgestormVisuals {
     this.cinderOrbVisuals = new VarkhulCinderOrbVisuals(scene, groundY);
     this.forgeBeamVisuals = new VarkhulForgeBeamVisuals(scene, groundY);
     this.interceptBeamVisuals = new VarkhulInterceptBeamVisuals(scene, groundY);
+    this.worldfireVisuals = new VarkhulWorldfireVisuals(scene, groundY);
   }
 
   sync(
@@ -177,9 +180,14 @@ export class VarkhulForgestormVisuals {
       pos: { x: number; z: number };
       auras: readonly { id: string; sourceId: number; stacks?: number }[];
     };
+    entities: ReadonlyMap<
+      number,
+      { auras: readonly { id: string; remaining: number; duration: number }[] }
+    >;
   }): void {
     this.forgeBeamVisuals.sync(world.activeVarkhulAssemblies);
     this.interceptBeamVisuals.sync(world.activeVarkhulAssemblies);
+    this.worldfireVisuals.sync(world.activeVarkhulAssemblies, world.entities);
     this.sync(
       world.activeVarkhulForgestormWarnings,
       world.activeVarkhulCinderFires,
@@ -191,6 +199,7 @@ export class VarkhulForgestormVisuals {
     this.cinderOrbVisuals.update(dt, reducedMotion);
     this.forgeBeamVisuals.update(dt, reducedMotion);
     this.interceptBeamVisuals.update(dt, reducedMotion);
+    this.worldfireVisuals.update(dt, reducedMotion);
     for (const visual of this.visuals.values()) {
       if (!reducedMotion) {
         visual.phase = (visual.phase + Math.max(0, dt) * 5) % (Math.PI * 2);
@@ -210,6 +219,7 @@ export class VarkhulForgestormVisuals {
     this.cinderOrbVisuals.dispose();
     this.forgeBeamVisuals.dispose();
     this.interceptBeamVisuals.dispose();
+    this.worldfireVisuals.dispose();
     for (const visual of this.visuals.values()) disposeVisual(visual);
     this.visuals.clear();
     this.activeIds.clear();

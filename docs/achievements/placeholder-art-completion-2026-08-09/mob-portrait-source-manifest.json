@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "0bffb282846c891357df57a72a0340354fdcadcc7bcf7362cefb3744966ff2b0",
+  "rendererFingerprint": "10a7c62ce97133184ae7a19cf6b79a27640775c1dcb1e8af4ddbe10606e5cc4f",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4265911,
-      "sha256": "b3e52fcb165d5191f56d376faa792659a133012317990a367bdb2a46c15820c0",
+      "bytes": 4266588,
+      "sha256": "c7ad6cacb7cf98ba2d8912522b0a227bb9a1945d41f405e9d2866fd30d830bf5",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3132,34 +3132,34 @@
       "id": "ignivar_cinder_artificer",
       "family": "elemental",
       "finderEncounter": false,
-      "visualKey": "mob_elemental",
+      "visualKey": "mob_ignivar_cinder_artificer",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/golelingevolved.glb",
-          "path": "public/models/creatures/golelingevolved.glb",
-          "bytes": 85588,
-          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+          "url": "models/creatures/cinder_artificer.glb",
+          "path": "public/models/creatures/cinder_artificer.glb",
+          "bytes": 1501648,
+          "sha256": "3bb3e1d1cc51bed6b5c8873e3c7f18b7ac213185d40c3364ef6a9226dde94366"
         },
-        "idle": "Flying_Idle",
-        "height": 2.2,
-        "yaw": null,
-        "hover": 0.3,
+        "idle": "Idle",
+        "height": 2.1,
+        "yaw": 0,
+        "hover": null,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.4
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#d17936",
-        "strength": 0.4
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "7687c709bf5666500f0fe1b318445145d42491de4269f42b71d53823409169a0",
+      "sourceFingerprint": "ac182348126ac080c3bca146f16e4af96aed4558fb71ba3879efa4870a222902",
       "output": {
         "path": "public/ui/mobs/ignivar_cinder_artificer.webp",
-        "bytes": 2190,
-        "sha256": "f02d657588961464634d296cecd48be08b86df42c48d7856fb6c4e74728a7b90"
+        "bytes": 2224,
+        "sha256": "f491b779ab0f686a6a50b6656bdf65db9a15f88c574c5860a2da2c8a4b333d3e"
       }
     },
     {
@@ -3171,8 +3171,8 @@
         "model": {
           "url": "models/creatures/crucible_warden.glb",
           "path": "public/models/creatures/crucible_warden.glb",
-          "bytes": 346648,
-          "sha256": "3654b6db685a0db79d956378126b37643f2f36b61397251f3aa0a8e1bf33a7aa"
+          "bytes": 1560992,
+          "sha256": "03d02c97cde096423b49be95be0c74e6f448bc6de801e3abfff80004d3c306f6"
         },
         "idle": "Idle",
         "height": 2.2,
@@ -3189,11 +3189,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "fca9eeae3b07a7f1e16f5687194d05c61f606ce29ff9583584e15339328bbca0",
+      "sourceFingerprint": "905cf139af1f401835f37e3015c319cc93452f5af9675b1160a66ff1145d5369",
       "output": {
         "path": "public/ui/mobs/ignivar_crucible_warden.webp",
-        "bytes": 2656,
-        "sha256": "72bb027632881f614f68850484937127bee353514b4f3c1894f7bcfa4b9dd309"
+        "bytes": 2816,
+        "sha256": "0778b22b7045e0efcdefdcef478d2b5dd8d6382a2ff1dcd8059fdd95ebf7802f"
       }
     },
     {
@@ -3205,8 +3205,8 @@
         "model": {
           "url": "models/creatures/ember_sentinel.glb",
           "path": "public/models/creatures/ember_sentinel.glb",
-          "bytes": 335460,
-          "sha256": "7667f2f6965f1abb7efe729b3e96c11ad4a38f38ea7d905e6f5761d17a2ed471"
+          "bytes": 1505736,
+          "sha256": "dcdcf7e8bb77c6d8bc7cd6de8558793e9dbbfdcffc2e8a0d74316ebc38b6068e"
         },
         "idle": "Idle",
         "height": 2.3,
@@ -3223,11 +3223,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "36fde3d25e38e6c8b9807986b5618ebae736a534022bf4404c709216a84222dd",
+      "sourceFingerprint": "deabc374783072a48e4836bc0b170dd50e49105b4112bec8814454e5a92fca50",
       "output": {
         "path": "public/ui/mobs/ignivar_ember_sentinel.webp",
-        "bytes": 2146,
-        "sha256": "d749146493d74a9f62c282469efdc51d0b75b803193223f9715501d5ed88d587"
+        "bytes": 2276,
+        "sha256": "7349ad52e9601a5dfaf492e65bb14a679d007ea3d519c6d9938f0284696025eb"
       }
     },
     {

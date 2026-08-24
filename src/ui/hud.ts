@@ -207,6 +207,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  dispatchVarkhulCalloutSfx,
   groundTickAbilityCue,
   impactCueForDamage,
   type MobVoiceAction,
@@ -11331,6 +11332,18 @@ export class Hud {
         sfx.unloop(`cast:${ev.entityId}`, 0.2);
         this.castLoopIds.delete(ev.entityId);
         return;
+      case 'varkhulCallout': {
+        dispatchVarkhulCalloutSfx(
+          ev,
+          (entityId) => sim.entities.get(entityId),
+          (plan) =>
+            this.combat(plan.cue, plan.x, plan.y, plan.z, plan.gain, {
+              cooldown: plan.cooldown,
+              jitter: plan.jitter,
+            }),
+        );
+        return;
+      }
       case 'spellfx': {
         if (ev.fx === 'temporalClock') {
           const source = sim.entities.get(ev.sourceId) ?? sim.entities.get(ev.targetId);

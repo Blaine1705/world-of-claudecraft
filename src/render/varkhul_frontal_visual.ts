@@ -1,4 +1,4 @@
-// Forgefather's Sweep presentation. The exact 120 degree footprint is always
+// Forgefather's Sweep presentation. The exact 140 degree footprint is always
 // rendered; heat bands and a rising flame wall add force without hiding it.
 
 import * as THREE from 'three';

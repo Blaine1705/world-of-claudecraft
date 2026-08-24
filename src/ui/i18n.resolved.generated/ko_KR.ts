@@ -2298,7 +2298,10 @@ export const ko_KR: EnTranslations = {
       "portalsOpening": "용광로 차원문이 열리고 있습니다!",
       "heat75": "용광로 열기가 75%에 도달했습니다!",
       "heat90": "용광로 용융이 임박했습니다!",
-      "addsDefeated": "용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!"
+      "addsDefeated": "용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!",
+      "worldfireBegins": "세계불꽃이 방 가장자리에서 타오릅니다. 42초 후 도가니 전체가 불길에 휩싸입니다!",
+      "worldfireClosing": "세계불꽃이 다가옵니다. 중앙으로 이동하세요!",
+      "worldfireConsumed": "도가니 전체가 불타고 있습니다!"
     },
     "auraEffect": {
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
