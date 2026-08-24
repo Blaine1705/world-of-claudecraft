@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolvePosition } from '../src/sim/colliders';
+import { MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { type Aura, dist2d, type Entity } from '../src/sim/types';
@@ -93,6 +95,28 @@ describe('Fear steers players away from walls', () => {
     const { sim, aura } = fearedAt(START.x, START.z, AWAY);
     sim.tick();
     expect(aura.value).toBe(AWAY); // no wall ahead, no redirect
+  });
+
+  it('does NOT steer a feared MOB (player-only guard keeps mob movement and parity)', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true }) as Sim & {
+      addEntity(e: Entity): void;
+      nextId: number;
+    };
+    sim.setPlayerLevel(20);
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 20, {
+      x: START.x,
+      y: groundHeight(START.x, START.z, WORLD_SEED),
+      z: START.z,
+    });
+    mob.hostile = true;
+    mob.moveSpeed = 5; // so the fear actually moves it: keeps the test non-vacuous
+    sim.addEntity(mob);
+    const from = { x: mob.pos.x, y: mob.pos.y, z: mob.pos.z };
+    mob.auras.push(fearAura(INTO_WALL)); // feared straight into the same building
+    for (let i = 0; i < 5; i++) sim.tick();
+    const aura = mob.auras.find((a) => a.id === 'fear_incap');
+    expect(aura?.value).toBe(INTO_WALL); // mob keeps its fixed heading; the guard skips mobs
+    expect(dist2d(mob.pos, from)).toBeGreaterThan(0); // updateFearMovement DID run (not vacuous)
   });
 
   it('/dev fear applies a fear along the player facing (solo test hook)', () => {

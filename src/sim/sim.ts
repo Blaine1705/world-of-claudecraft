@@ -6498,6 +6498,9 @@ export class Sim {
   }
   // If the flee heading is clear for the lookahead, keep it; otherwise turn to the
   // most open heading in FEAR_TURN_FAN (smallest turn first, ties by fan order).
+  // In a fully enclosed pocket (every candidate blocked no farther than the
+  // straight one) `best` stays the original heading, which degrades gracefully to
+  // the pre-guard behavior (the player pins on the wall) rather than jittering.
   private steerFearFromWalls(e: Entity, heading: number): number {
     let bestOpen = this.fearWallOpenDistance(e, heading);
     if (bestOpen >= FEAR_WALL_LOOKAHEAD) return heading;
