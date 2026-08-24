@@ -114,8 +114,8 @@ export const IGNIVAR_SKYFIRE_RANGE = 24;
 export const IGNIVAR_SKYFIRE_HALF_ANGLE = Math.PI / 10;
 export const IGNIVAR_SKYFIRE_CONE_COUNT = 3;
 export const IGNIVAR_ROTATING_RAYS_CAST_ID = 'Revolving Inferno';
-export const IGNIVAR_FIRST_ROTATING_RAYS_SECONDS = 32;
-export const IGNIVAR_ROTATING_RAYS_EVERY = 40;
+export const IGNIVAR_FIRST_ROTATING_RAYS_SECONDS = 30;
+export const IGNIVAR_ROTATING_RAYS_EVERY = 36;
 export const IGNIVAR_ROTATING_RAYS_WINDUP_SECONDS = 2;
 export const IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS = 8;
 export const IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED = Math.PI / 10;
@@ -123,7 +123,7 @@ export const IGNIVAR_ROTATING_RAYS_PULSE_SECONDS = 0.5;
 export const IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP = 0.2;
 export const IGNIVAR_MAJOR_ABILITY_GAP_SECONDS = 6;
 export const IGNIVAR_FINAL_METEOR_EVERY = 9;
-export const IGNIVAR_FINAL_ROTATING_RAYS_EVERY = 24;
+export const IGNIVAR_FINAL_ROTATING_RAYS_EVERY = 18;
 export const IGNIVAR_FINAL_ROTATING_RAYS_SPEED_MULTIPLIER = 1.6;
 export const IGNIVAR_FINAL_FRONTAL_EVERY = 8;
 export const IGNIVAR_FINAL_FIRST_METEOR_SECONDS = 2;
@@ -135,6 +135,7 @@ export const IGNIVAR_SOAK_EVERY = 34;
 export const IGNIVAR_SOAK_REQUIRED_PLAYERS = 4;
 export const IGNIVAR_SOAK_RADIUS = 5.5;
 export const IGNIVAR_SOAK_SHARED_MAX_HP = 1.2;
+export const IGNIVAR_DEATH_YELL = 'Varkhul... the seal is broken.';
 
 const IGNIVAR_FIRST_BRAND_SECONDS = 2;
 const IGNIVAR_FIRST_FORGE_STRIKE_SECONDS = 12;
@@ -149,6 +150,11 @@ const IGNIVAR_APOCALYPSE_SPAWN_OFFSET_Z = 9;
 
 function encounterInstance(ctx: SimContext, boss: Entity) {
   return ctx.instances.find((instance) => instance.mobIds.includes(boss.id)) ?? null;
+}
+
+export function announceIgnivarDeath(ctx: SimContext, boss: Entity): void {
+  if (!boss.ignivar) return;
+  emitMobYell(ctx, boss, IGNIVAR_DEATH_YELL);
 }
 
 function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false): Entity[] {

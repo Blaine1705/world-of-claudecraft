@@ -2305,6 +2305,29 @@ export const es: EnTranslations = {
       "worldfireConsumed": "¡Todo el crisol está en llamas!"
     },
     "varkhulWaveStatus": "Oleada {wave}/{waves} | Enemigos: {remaining}",
+    "raidBossGuide": {
+      "title": "Guía de jefe",
+      "button": "Guía: {boss}",
+      "subtitle": "{boss} | Normal y Heroico",
+      "close": "Cerrar guía de jefe",
+      "ignivar": {
+        "brand": "Marca de la Pira: sepárate. Orienta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.",
+        "movement": "Movimiento: evita los conos y meteoros de Lluvia de brasas, acompaña Infierno giratorio y usa los dos huecos de Onda de la Forja.",
+        "apocalypse": "Apocalipsis: mata al Corazón del Fin antes de que termine su lanzamiento de 20 s.",
+        "judgment": "Juicio de la Forja: recuerda el refugio distinto durante el aviso y apilaos dentro de su límite marcado cuando arda el suelo.",
+        "finale": "Último Infierno: por debajo del 20%, mata a Ignivar en 45 s mientras continúan meteoros, frontales e Infierno giratorio acelerados.",
+        "heroic": "Heroico: las parejas deben permanecer juntas durante Cadenas de la Forja; Marca también castiga a jugadores cercanos durante Juicio."
+      },
+      "varkhul": {
+        "tanks": "Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a alcance cuerpo a cuerpo.",
+        "orbs": "Orbes de ceniza: los marcados se separan hacia el borde. Sus charcos duran todo el combate y los orbes liberados cruzan la sala.",
+        "pyre": "Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro en Normal o cinco en Heroico dentro del círculo móvil.",
+        "ray": "Rayo de temple: otro jugador intercepta la línea entre Varkhul y el objetivo. Quien recibe el golpe sufre una herida de 30 s.",
+        "forge": "Pilares: bloquea los rayos antes de que alcancen la forja. Rota bloqueadores al crecer la exposición; al 100% la forja colapsa.",
+        "adds": "Ensamblaje: mata cada oleada e interrumpe Seísmo del Crisol. Aturde o ralentiza a los Artífices antes de que Recalibrar cure a Varkhul.",
+        "heroic": "Heroico: las oleadas se solapan si tardan, el calor no baja, Pira compartida exige cinco y Fuego del Mundo cierra la sala desde el 20%."
+      }
+    },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",

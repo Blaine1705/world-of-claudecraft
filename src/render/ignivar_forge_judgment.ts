@@ -18,6 +18,8 @@ export const IGNIVAR_JUDGMENT_WARNINGS_NAME = 'ignivarForgeJudgmentWarnings';
 export const IGNIVAR_JUDGMENT_FIRE_NAME = 'ignivarForgeJudgmentFire';
 export const IGNIVAR_JUDGMENT_SHELTERS_NAME = 'ignivarForgeJudgmentShelters';
 export const IGNIVAR_JUDGMENT_SAFE_MARKER_NAME = 'ignivarForgeJudgmentSafeMarker';
+export const IGNIVAR_JUDGMENT_SAFE_BOUNDARY_NAME = 'ignivarForgeJudgmentSafeBoundary';
+export const IGNIVAR_JUDGMENT_SAFE_CHEVRONS_NAME = 'ignivarForgeJudgmentSafeChevrons';
 export const IGNIVAR_JUDGMENT_CUES_NAME = 'ignivarForgeJudgmentCues';
 export const IGNIVAR_JUDGMENT_DANGER_SCAR_NAME = 'ignivarForgeJudgmentDangerScar';
 export const IGNIVAR_JUDGMENT_WALL_CRACKS_NAME = 'ignivarForgeJudgmentWallCracks';
@@ -124,7 +126,64 @@ function buildSafeMarker(): THREE.Group {
   );
   crown.rotation.x = Math.PI / 2;
   crown.position.y = 2.8;
-  marker.add(innerRune, beacon, crown);
+
+  // The previous marker identified only the shelter's centre. During the active
+  // burn the actual gameplay question is where its 5.5-yard boundary ends, so a
+  // full-radius ring and eight inward chevrons now outline that exact footprint.
+  // The arrows make the answer readable without relying on the cyan colour.
+  const safeBoundary = new THREE.Mesh(
+    new THREE.RingGeometry(
+      IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.42,
+      IGNIVAR_JUDGMENT_SHELTER_RADIUS,
+      64,
+    ),
+    additiveMaterial(0x8cffe0, 0.98),
+  );
+  safeBoundary.name = IGNIVAR_JUDGMENT_SAFE_BOUNDARY_NAME;
+  safeBoundary.rotation.x = -Math.PI / 2;
+  safeBoundary.position.y = 0.18;
+  safeBoundary.renderOrder = 10;
+
+  const chevronPoints: THREE.Vector3[] = [];
+  for (let index = 0; index < 8; index++) {
+    const angle = (index * Math.PI * 2) / 8;
+    const apexRadius = IGNIVAR_JUDGMENT_SHELTER_RADIUS - 1.08;
+    const armRadius = IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.32;
+    const angularWidth = 0.11;
+    const apex = new THREE.Vector3(
+      Math.sin(angle) * apexRadius,
+      0.19,
+      Math.cos(angle) * apexRadius,
+    );
+    chevronPoints.push(
+      new THREE.Vector3(
+        Math.sin(angle - angularWidth) * armRadius,
+        0.19,
+        Math.cos(angle - angularWidth) * armRadius,
+      ),
+      apex,
+      new THREE.Vector3(
+        Math.sin(angle + angularWidth) * armRadius,
+        0.19,
+        Math.cos(angle + angularWidth) * armRadius,
+      ),
+      apex.clone(),
+    );
+  }
+  const safeChevrons = new THREE.LineSegments(
+    new THREE.BufferGeometry().setFromPoints(chevronPoints),
+    new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.96,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  safeChevrons.name = IGNIVAR_JUDGMENT_SAFE_CHEVRONS_NAME;
+  safeChevrons.renderOrder = 11;
+  marker.userData.gameplayRadius = IGNIVAR_JUDGMENT_SHELTER_RADIUS;
+  marker.add(innerRune, beacon, crown, safeBoundary, safeChevrons);
   return marker;
 }
 

@@ -124,7 +124,7 @@ takes 35% maximum health as fire damage.
 
 ## Revolving Inferno
 
-After a 32-second opening delay, Revolving Inferno begins a 40-second recharge.
+After a 30-second opening delay, Revolving Inferno begins a 36-second recharge.
 Ignivar projects three narrow rays at equal angles for a two-second stationary
 warning, then rotates them for eight seconds at 18 degrees per second, completing
 144 degrees during the active window. The direction alternates between clockwise
@@ -175,7 +175,7 @@ wipes the raid. Killing the add cancels it.
 
 At 20% health Ignivar enters Last Inferno. His attack speed increases by 20% and
 his melee damage increases by 35%. Falling Cinders repeats every nine seconds,
-Revolving Inferno repeats every 24 seconds and rotates at 160% of its normal
+Revolving Inferno repeats every 18 seconds and rotates at 160% of its normal
 speed, and a dedicated eight-second sequence alternates Searing Torrent with Rain
 of Cinders. Brand, Forge Strike, and Forge Wave stop queuing so the
 finale remains demanding but readable. The raid has 45 seconds to kill him. Expiry

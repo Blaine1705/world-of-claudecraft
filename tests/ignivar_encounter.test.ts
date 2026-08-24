@@ -15,6 +15,7 @@ import {
   IGNIVAR_CLEANSING_BACKLASH_DAMAGE_MAX_HP,
   IGNIVAR_CLEANSING_BACKLASH_ID,
   IGNIVAR_CONDUIT_ACTIVE_SECONDS,
+  IGNIVAR_DEATH_YELL,
   IGNIVAR_FIRST_ROTATING_RAYS_SECONDS,
   IGNIVAR_FIRST_SKYFIRE_SECONDS,
   IGNIVAR_FIRST_SOAK_SECONDS,
@@ -743,8 +744,8 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_METEOR_TELEGRAPH_SECONDS).toBe(2.5);
     expect(IGNIVAR_METEOR_REVEAL_DELAY_SECONDS).toBe(0.75);
     expect(IGNIVAR_METEOR_DAMAGE_MAX_HP).toBe(0.35);
-    expect(IGNIVAR_FIRST_ROTATING_RAYS_SECONDS).toBe(32);
-    expect(IGNIVAR_ROTATING_RAYS_EVERY).toBe(40);
+    expect(IGNIVAR_FIRST_ROTATING_RAYS_SECONDS).toBe(30);
+    expect(IGNIVAR_ROTATING_RAYS_EVERY).toBe(36);
     expect(IGNIVAR_ROTATING_RAYS_WINDUP_SECONDS).toBe(2);
     expect(IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS).toBe(8);
     expect(IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED).toBe(Math.PI / 10);
@@ -911,15 +912,15 @@ describe('Ignivar encounter', () => {
     expect(forgeWaveCadenceTrace(418)).toEqual(first);
     expect(first).toEqual([
       {
-        startTick: 959,
-        endTick: 1069,
-        facingSlot: 0,
+        startTick: 919,
+        endTick: 1029,
+        facingSlot: 3,
         windupFrames: 50,
         activeFrames: 60,
       },
       {
-        startTick: 2056,
-        endTick: 2166,
+        startTick: 2016,
+        endTick: 2126,
         facingSlot: 3,
         windupFrames: 50,
         activeFrames: 60,
@@ -2663,7 +2664,7 @@ describe('Ignivar encounter', () => {
     });
 
     boss.dead = true;
-    sim.tick();
+    const deathEvents = sim.tick();
 
     expect(boss.ignivar).toBeUndefined();
     expect(boss.enraged).toBe(false);
@@ -2671,6 +2672,20 @@ describe('Ignivar encounter', () => {
     expect(boss.castingAbility).toBeNull();
     expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.ready);
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(
+      deathEvents.filter(
+        (event) =>
+          event.type === 'chat' && event.channel === 'yell' && event.text === IGNIVAR_DEATH_YELL,
+      ),
+    ).toHaveLength(1);
+    expect(
+      sim
+        .tick()
+        .filter(
+          (event) =>
+            event.type === 'chat' && event.channel === 'yell' && event.text === IGNIVAR_DEATH_YELL,
+        ),
+    ).toHaveLength(0);
   });
 
   it('ticks the frontal cadence during its cast and honors forced-target threat', () => {

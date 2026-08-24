@@ -67,6 +67,7 @@ import type { Vfx } from '../src/render/vfx';
 import {
   IGNIVAR_BRAND_AURA_ID,
   IGNIVAR_BRAND_RADIUS,
+  IGNIVAR_DEATH_YELL,
   IGNIVAR_FORGE_WAVE_CAST_ID,
   IGNIVAR_FRONTAL_CAST_ID,
   IGNIVAR_JUDGMENT_CAST_ID,
@@ -77,6 +78,7 @@ import {
   IGNIVAR_SOAK_AURA_ID,
   IGNIVAR_SOAK_RADIUS,
 } from '../src/sim/encounters/ignivar';
+import { VARKHUL_DEATH_YELL } from '../src/sim/encounters/varkhul';
 import {
   IGNIVAR_ROTATING_RAYS_HALF_WIDTH,
   IGNIVAR_ROTATING_RAYS_INNER_RANGE,
@@ -915,6 +917,10 @@ describe('Ignivar encounter renderer', () => {
     expect(localizeSimText('The last flame consumes all!')).not.toBeNull();
     expect(localizeSimText('The sky itself will burn!')).not.toBeNull();
     expect(localizeSimText('Four must share the pyre, or all will burn!')).not.toBeNull();
+    expect(IGNIVAR_DEATH_YELL).toBe('Varkhul... the seal is broken.');
+    expect(VARKHUL_DEATH_YELL).toBe('Master... I have failed you.');
+    expect(localizeSimText(IGNIVAR_DEATH_YELL)).not.toBeNull();
+    expect(localizeSimText(VARKHUL_DEATH_YELL)).not.toBeNull();
   });
 
   it('shows all three rotating rays only for the Revolving Inferno channel', () => {

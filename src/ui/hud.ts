@@ -646,6 +646,7 @@ import {
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
 import { questProgressEventText } from './quest_progress_text';
+import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import {
@@ -3504,6 +3505,9 @@ export class Hud {
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.dungeonFinderWindow.close();
         break;
+      case 'raid-boss-guide-window':
+        this.raidBossGuideWindow.close();
+        break;
       case 'valecup-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.valeCupWindow.close();
@@ -4920,6 +4924,16 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
     ...this.windowFocus('#dungeon-finder-window'),
+  });
+
+  // Contextual raid guide opened from beneath the party frames. Selection is
+  // driven by the current raid room; the guide itself always includes its clearly
+  // labelled Heroic-only rule so a mid-run difficulty selection cannot hide mechanics.
+  private readonly raidBossGuideWindow = new RaidBossGuideWindow({
+    root: () => $('#raid-boss-guide-window'),
+    closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
+    contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
+    ...this.windowFocus('#raid-boss-guide-window'),
   });
 
   // The WoW-style "group found" prompt: opened by the dfProposal SimEvent,
@@ -6421,6 +6435,7 @@ export class Hud {
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    this.raidBossGuideWindow.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
@@ -17958,6 +17973,8 @@ export class Hud {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     const info = this.sim.partyInfo;
+    const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
+    this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
     // Drop the frames below the target frame only when the measured target
     // stack (frame + #tf-debuffs strip) actually overlaps their column: the
     // painter keeps --party-below-target-bottom current (measuring only when

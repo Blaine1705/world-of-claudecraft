@@ -18,6 +18,7 @@ import {
   tryMobMeleeSwingInRange,
 } from '../mob/combat_profile';
 import { updateMobTarget } from '../mob/targeting';
+import { emitMobYell } from '../mob/yells';
 import type { SimContext } from '../sim_context';
 import {
   CAST_COMPLETE_EPS,
@@ -169,6 +170,12 @@ export { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
 export const VARKHUL_EMBER_SENTINEL_ID = IGNIVAR_EMBER_SENTINEL_ID;
 export const VARKHUL_CRUCIBLE_WARDEN_ID = IGNIVAR_CRUCIBLE_WARDEN_ID;
 export const VARKHUL_CINDER_ARTIFICER_ID = IGNIVAR_CINDER_ARTIFICER_ID;
+export const VARKHUL_DEATH_YELL = 'Master... I have failed you.';
+
+export function announceVarkhulDeath(ctx: SimContext, boss: Entity): void {
+  if (!boss.varkhul) return;
+  emitMobYell(ctx, boss, VARKHUL_DEATH_YELL);
+}
 
 export const VARKHUL_MAKERS_BRAND_AURA_ID = 'varkhul_makers_brand';
 export const VARKHUL_MAKERS_BRAND_CAST_ID = "Maker's Brand";

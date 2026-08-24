@@ -247,6 +247,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
+  'src/ui/raid_boss_guide_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/playtime_view.ts',
   'src/ui/stat_tooltip_view.ts',
@@ -1908,6 +1909,7 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/professions_window.ts',
+  'src/ui/raid_boss_guide_window.ts',
   'src/ui/reconnect_overlay.ts',
   // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
   // pinned page set persists per character in localStorage (the deeds_window

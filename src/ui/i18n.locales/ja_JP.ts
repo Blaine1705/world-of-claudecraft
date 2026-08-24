@@ -7511,6 +7511,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.portalsOpening': '鍛冶炉のポータルが開き始めた！',
   'hudChrome.varkhulCallout.artificerApproaches': '火の粉の技工士が鍛冶炉へ接近している！',
   'hudChrome.varkhulWaveStatus': 'ウェーブ {wave}/{waves} | 敵: {remaining}',
+  'hudChrome.raidBossGuide.title': 'ボス攻略',
+  'hudChrome.raidBossGuide.button': '攻略: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 通常・英雄',
+  'hudChrome.raidBossGuide.close': 'ボス攻略を閉じる',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '移動: 灰の雨の扇形と隕石を避け、回転する業火に合わせて動き、鍛冶波の二つの隙間を使う。',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '黙示録: 20秒の詠唱が終わる前に終焉の心臓を倒す。',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '鍛冶場の審判: 予告中に異なる避難所を覚え、床が燃えたら表示された境界内に集合する。',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '最後の業火: 20%未満では45秒以内に倒す。加速した隕石、前方攻撃、回転する業火が続く。',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '英雄: 鍛冶の鎖ではペア同士が近くに留まる。審判中は印が近くの味方も罰する。',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '灰のオーブ: 対象者は部屋の外周へ散開する。炎の床は戦闘中残り、放たれたオーブは部屋を横切る。',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '共有の火葬: 赤熱した金属がない対象だけを選ぶ。移動する円内に通常4人、英雄5人で集合する。',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '焼き入れ光線: 別のプレイヤーがヴァークルと対象の間で遮る。被弾者は30秒の傷を受ける。',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '炉の柱: 光線が炉に届く前に遮る。曝露の増加に合わせて担当を交代し、熱が100%になると炉が溶融する。',
+  'hudChrome.raidBossGuide.varkhul.adds':
+    '組立: 各ポータル波を倒し、るつぼの地震を中断する。再調整で回復される前に灰の技工士を妨害する。',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '英雄: 処理が遅いと波が重なり、炉の熱は下がらない。共有の火葬は5人必要で、20%から世界炎が部屋を閉じる。',
   'hudChrome.varkhulCallout.heat75': '鍛冶炉の熱が75%に達した！',
   'hudChrome.varkhulCallout.heat90': '鍛冶炉メルトダウンが迫っている！',
   'hudChrome.varkhulCallout.addsDefeated': '鍛冶軍団を倒した。ヴァークルが無防備になった！',

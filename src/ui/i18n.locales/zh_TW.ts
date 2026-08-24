@@ -7216,6 +7216,36 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.portalsOpening': '鍛爐傳送門正在開啟！',
   'hudChrome.varkhulCallout.artificerApproaches': '燼火工匠正在接近鍛爐！',
   'hudChrome.varkhulWaveStatus': '波次 {wave}/{waves} | 敵人: {remaining}',
+  'hudChrome.raidBossGuide.title': '首領指南',
+  'hudChrome.raidBossGuide.button': '指南: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 普通與英雄',
+  'hudChrome.raidBossGuide.close': '關閉首領指南',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '柴堆印記: 分散站位。將灼熱洪流引向可用水道，再獨自穿過水流完成淨化。',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '移動: 躲避燼雨的錐形攻擊與隕石，跟隨旋轉煉獄移動，並利用熔爐波的兩個缺口。',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '末日: 在終焉之心完成20秒施法前將其擊殺。',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '熔爐審判: 預警時記住不同的庇護點，地面燃燒後在標記邊界內集合。',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '最終煉獄: 生命值低於20%後，在45秒內擊殺伊格尼瓦爾，同時應對加速的隕石、正面攻擊與旋轉煉獄。',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '英雄: 熔爐鎖鏈期間成對玩家必須保持靠近；審判期間印記也會懲罰附近玩家。',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    '坦克: 製作者印記達到2層時換坦，並讓瓦爾庫爾保持在近戰範圍內。',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '燼火寶珠: 被標記者分散到房間邊緣。火池會持續整場戰鬥，釋放的寶珠會穿過房間。',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '共享柴堆: 只選擇沒有熾熱金屬的玩家。在移動圓圈內，普通需要4人，英雄需要5人。',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '淬火射線: 另一名玩家站在瓦爾庫爾與目標之間攔截。承受傷害者會獲得持續30秒的傷口。',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '熔爐柱: 在射線抵達熔爐前阻擋。暴露疊加後輪換阻擋者；熱量達到100%時熔爐會崩毀。',
+  'hudChrome.raidBossGuide.varkhul.adds':
+    '組裝階段: 擊殺每波傳送門敵人並打斷坩堝震擊。在重新校準治療瓦爾庫爾前控制或減速燼火工匠。',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '英雄: 擊殺太慢會使波次重疊，熔爐熱量不會下降，共享柴堆需要5人，20%起世界之火會封鎖房間。',
   'hudChrome.varkhulCallout.heat75': '鍛爐熱量達到75%！',
   'hudChrome.varkhulCallout.heat90': '鍛爐熔毀迫在眉睫！',
   'hudChrome.varkhulCallout.addsDefeated': '鍛爐軍團已被擊敗，瓦庫爾暴露了！',

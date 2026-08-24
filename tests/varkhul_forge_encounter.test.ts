@@ -8,6 +8,7 @@ import {
   VARKHUL_CINDER_ARTIFICER_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_CRUCIBLE_WARDEN_ID,
+  VARKHUL_DEATH_YELL,
   VARKHUL_EMBER_SENTINEL_ID,
   VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
   VARKHUL_FORGE_HAMMER_ABILITY_ID,
@@ -132,6 +133,31 @@ function addEncounterPlayer(
 }
 
 describe('Varkhul forge pillars and add intermission', () => {
+  it('names his unseen master once when Varkhul dies', () => {
+    const { sim, boss } = claimedEncounter(699);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul).toBeDefined();
+
+    boss.dead = true;
+    const deathEvents = sim.tick();
+
+    expect(
+      deathEvents.filter(
+        (event) =>
+          event.type === 'chat' && event.channel === 'yell' && event.text === VARKHUL_DEATH_YELL,
+      ),
+    ).toHaveLength(1);
+    expect(boss.varkhul).toBeUndefined();
+    expect(
+      sim
+        .tick()
+        .filter(
+          (event) =>
+            event.type === 'chat' && event.channel === 'yell' && event.text === VARKHUL_DEATH_YELL,
+        ),
+    ).toHaveLength(0);
+  });
+
   it('keeps the authored boss set-piece in front of the anvil, facing away from the raid', () => {
     const { sim, boss } = claimedEncounter(701, false, false);
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);

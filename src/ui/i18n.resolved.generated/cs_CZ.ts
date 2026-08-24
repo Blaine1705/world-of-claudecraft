@@ -2305,6 +2305,29 @@ export const cs_CZ: EnTranslations = {
       "worldfireConsumed": "The entire crucible is burning!"
     },
     "varkhulWaveStatus": "Wave {wave}/{waves} | Enemies: {remaining}",
+    "raidBossGuide": {
+      "title": "Boss Guide",
+      "button": "Boss Guide: {boss}",
+      "subtitle": "{boss} | Normal and Heroic",
+      "close": "Close boss guide",
+      "ignivar": {
+        "brand": "Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.",
+        "movement": "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
+        "apocalypse": "Apocalypse: kill the Heart of the End before its 20 sec cast completes.",
+        "judgment": "Judgment of the Forge: remember the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.",
+        "finale": "Last Inferno: below 20%, kill Ignivar within 45 sec while faster meteors, frontals, and Revolving Inferno continue.",
+        "heroic": "Heroic: paired players must remain close during Chains of the Forge; Brand also punishes nearby players during Judgment."
+      },
+      "varkhul": {
+        "tanks": "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
+        "orbs": "Cinder Orbs: marked players spread to the room edge. Their fire pools remain for the pull and the released orbs cross the room.",
+        "pyre": "Shared Pyre: only a player without Red-hot Metal is selected. Stack four players in Normal or five in Heroic inside the moving circle.",
+        "ray": "Tempering Ray: another player intercepts the line between Varkhul and its target. The victim gains a 30 sec damage-taken wound.",
+        "forge": "Forge pillars: block active beams before they reach the forge. Rotate blockers as exposure grows; at 100% heat the forge melts down.",
+        "adds": "Assembly: kill each portal wave and interrupt Crucible Quake. Stun or slow Cinder Artificers before Recalibrate heals Varkhul.",
+        "heroic": "Heroic: waves overlap if killed slowly, forge heat never cools, Shared Pyre needs five players, and Worldfire closes the room from 20%."
+      }
+    },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",

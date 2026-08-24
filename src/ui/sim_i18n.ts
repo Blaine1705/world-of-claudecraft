@@ -494,6 +494,8 @@ const baseEnTable = {
   'dialogue.ignivarLastFlame': 'The last flame consumes all!',
   'dialogue.ignivarSkyBurns': 'The sky itself will burn!',
   'dialogue.ignivarSharePyre': 'Four must share the pyre, or all will burn!',
+  'dialogue.ignivarDeath': 'Varkhul... the seal is broken.',
+  'dialogue.varkhulDeath': 'Master... I have failed you.',
   'lore.ignivarFirstTempering':
     'Tempering Record I: "Water remembers shape. Fire commands it to endure."',
   'lore.ignivarLivingMetal':
@@ -8448,6 +8450,8 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.ignivarLastFlame': '¡La última llama lo consume todo!',
       'dialogue.ignivarSkyBurns': '¡Hasta el propio cielo arderá!',
       'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
+      'dialogue.ignivarDeath': 'Varkhul... el sello se ha roto.',
+      'dialogue.varkhulDeath': 'Maestro... te he fallado.',
     },
     es_ES: {
       'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
@@ -8476,6 +8480,8 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.ignivarLastFlame': '¡La última llama lo consume todo!',
       'dialogue.ignivarSkyBurns': '¡Hasta el propio cielo arderá!',
       'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
+      'dialogue.ignivarDeath': 'Varkhul... el sello se ha roto.',
+      'dialogue.varkhulDeath': 'Maestro... te he fallado.',
     },
     ja_JP: {
       'mechanic.varkhulWorldfire': '世界炎',

@@ -7504,6 +7504,36 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.portalsOpening': '용광로 차원문이 열리고 있습니다!',
   'hudChrome.varkhulCallout.artificerApproaches': '불씨 기계공이 용광로로 접근합니다!',
   'hudChrome.varkhulWaveStatus': '웨이브 {wave}/{waves} | 적: {remaining}',
+  'hudChrome.raidBossGuide.title': '우두머리 공략',
+  'hudChrome.raidBossGuide.button': '공략: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 일반 및 영웅',
+  'hudChrome.raidBossGuide.close': '우두머리 공략 닫기',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '이동: 잿불비의 부채꼴과 운석을 피하고, 회전하는 지옥불과 함께 움직이며, 대장간 파도의 두 틈을 사용합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '대재앙: 20초 시전이 끝나기 전에 종말의 심장을 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '대장간의 심판: 경고 중 다른 피난처를 기억하고 바닥이 타오르면 표시된 경계 안에 모입니다.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '마지막 지옥불: 생명력 20% 아래에서 45초 안에 처치합니다. 빨라진 운석, 전방 공격, 회전 지옥불이 계속됩니다.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 합니다. 심판 중 징표는 주변 아군도 공격합니다.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    '방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 전투 내내 남고 방출된 구슬은 방을 가로지릅니다.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 이동하는 원 안에 일반 4명, 영웅 5명이 모입니다.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '담금질 광선: 다른 플레이어가 바르쿨과 대상 사이에서 가로막습니다. 피격자는 30초 동안 상처를 입습니다.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '대장간 기둥: 광선이 대장간에 닿기 전에 막습니다. 노출이 쌓이면 교대하며 열이 100%가 되면 대장간이 붕괴합니다.',
+  'hudChrome.raidBossGuide.varkhul.adds':
+    '조립: 각 차원문 웨이브를 처치하고 도가니 지진을 차단합니다. 재조정이 바르쿨을 치유하기 전에 잿불 기술자를 방해합니다.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '영웅: 처치가 늦으면 웨이브가 겹치고 열이 식지 않습니다. 공유 장작더미는 5명이 필요하며 20%부터 세계불꽃이 방을 닫습니다.',
   'hudChrome.varkhulCallout.heat75': '용광로 열기가 75%에 도달했습니다!',
   'hudChrome.varkhulCallout.heat90': '용광로 용융이 임박했습니다!',
   'hudChrome.varkhulCallout.addsDefeated': '용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!',

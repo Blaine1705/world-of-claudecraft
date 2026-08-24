@@ -39,12 +39,14 @@ import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import {
+  announceIgnivarDeath,
   IGNIVAR_APOCALYPSE_ADD_ID,
   resetIgnivarEncounter,
   updateIgnivarApocalypseAdd,
   updateIgnivarEncounter,
 } from '../encounters/ignivar';
 import {
+  announceVarkhulDeath,
   resetVarkhulEncounter,
   updateVarkhulAssemblyAutomaton,
   updateVarkhulEncounter,
@@ -157,10 +159,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
   if (mob.dead) {
     if (mob.templateId === IGNIVAR_BOSS_ID) {
-      if (mob.ignivar) resetIgnivarEncounter(ctx, mob);
+      if (mob.ignivar) {
+        announceIgnivarDeath(ctx, mob);
+        resetIgnivarEncounter(ctx, mob);
+      }
       unlockIgnivarRaidGate(ctx, mob);
     }
-    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) resetVarkhulEncounter(ctx, mob);
+    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) {
+      announceVarkhulDeath(ctx, mob);
+      resetVarkhulEncounter(ctx, mob);
+    }
     ctx.onBossDeath(mob);
     if (
       mob.ownerId !== null &&

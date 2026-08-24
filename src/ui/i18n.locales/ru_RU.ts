@@ -7624,6 +7624,36 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.artificerApproaches':
     'Искровой механик приближается к кузне!',
   'hudChrome.varkhulWaveStatus': 'Волна {wave}/{waves} | Врагов: {remaining}',
+  'hudChrome.raidBossGuide.title': 'Тактика на босса',
+  'hudChrome.raidBossGuide.button': 'Тактика: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | Обычный и героический',
+  'hudChrome.raidBossGuide.close': 'Закрыть тактику',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Клеймо костра: рассредоточьтесь. Направьте Жгучий поток в готовый водовод и пройдите через воду в одиночку, чтобы очиститься.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Движение: избегайте конусов и метеоров Дождя углей, двигайтесь с Вращающимся инферно и используйте два разрыва Волны кузни.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Апокалипсис: уничтожьте Сердце конца до завершения его 20-секундного заклинания.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Суд кузни: запомните отличающееся убежище во время предупреждения и соберитесь внутри отмеченной границы, когда загорится пол.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Последний инферно: ниже 20% убейте Игнивара за 45 секунд, пока продолжаются ускоренные метеоры, фронтальные атаки и Вращающийся инферно.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Героический: связанные игроки должны держаться рядом во время Цепей кузни; Клеймо также наказывает соседей во время Суда.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Танки: меняйтесь на двух зарядах Клейма создателя и держите Вархала в радиусе ближнего боя.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Угольные сферы: отмеченные игроки расходятся к краю комнаты. Огненные лужи остаются до конца боя, а сферы пересекают комнату.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Общий костёр: выбирается только игрок без Раскалённого металла. В движущемся круге нужны четыре игрока в обычном режиме или пять в героическом.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Закалочный луч: другой игрок перехватывает линию между Вархалом и целью. Получивший удар получает рану на 30 секунд.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Столпы кузни: перекрывайте лучи до их попадания в кузню. Меняйте игроков по мере роста воздействия; при 100% жара кузня плавится.',
+  'hudChrome.raidBossGuide.varkhul.adds':
+    'Сборка: убивайте каждую волну порталов и прерывайте Землетрясение тигля. Оглушайте или замедляйте Угольных мастеров до лечения Вархала.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Героический: медленные волны накладываются, жар не спадает, для Общего костра нужны пять игроков, а с 20% Мировой огонь сжимает комнату.',
   'hudChrome.varkhulCallout.heat75': 'Жар кузни достиг 75%!',
   'hudChrome.varkhulCallout.heat90': 'Расплавление кузни неизбежно!',
   'hudChrome.varkhulCallout.addsDefeated': 'Легион кузни повержен: Варкхул уязвим!',

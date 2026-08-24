@@ -532,6 +532,36 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.portalsOpening': '¡Los portales de la forja se están abriendo!',
   'hudChrome.varkhulCallout.artificerApproaches': '¡Un Artífice de Ceniza se acerca a la forja!',
   'hudChrome.varkhulWaveStatus': 'Oleada {wave}/{waves} | Enemigos: {remaining}',
+  'hudChrome.raidBossGuide.title': 'Guía de jefe',
+  'hudChrome.raidBossGuide.button': 'Guía: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | Normal y Heroico',
+  'hudChrome.raidBossGuide.close': 'Cerrar guía de jefe',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Marca de la Pira: sepárate. Orienta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Movimiento: evita los conos y meteoros de Lluvia de brasas, acompaña Infierno giratorio y usa los dos huecos de Onda de la Forja.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Apocalipsis: mata al Corazón del Fin antes de que termine su lanzamiento de 20 s.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Juicio de la Forja: recuerda el refugio distinto durante el aviso y apilaos dentro de su límite marcado cuando arda el suelo.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Último Infierno: por debajo del 20%, mata a Ignivar en 45 s mientras continúan meteoros, frontales e Infierno giratorio acelerados.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Heroico: las parejas deben permanecer juntas durante Cadenas de la Forja; Marca también castiga a jugadores cercanos durante Juicio.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a alcance cuerpo a cuerpo.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Orbes de ceniza: los marcados se separan hacia el borde. Sus charcos duran todo el combate y los orbes liberados cruzan la sala.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro en Normal o cinco en Heroico dentro del círculo móvil.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Rayo de temple: otro jugador intercepta la línea entre Varkhul y el objetivo. Quien recibe el golpe sufre una herida de 30 s.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Pilares: bloquea los rayos antes de que alcancen la forja. Rota bloqueadores al crecer la exposición; al 100% la forja colapsa.',
+  'hudChrome.raidBossGuide.varkhul.adds':
+    'Ensamblaje: mata cada oleada e interrumpe Seísmo del Crisol. Aturde o ralentiza a los Artífices antes de que Recalibrar cure a Varkhul.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Heroico: las oleadas se solapan si tardan, el calor no baja, Pira compartida exige cinco y Fuego del Mundo cierra la sala desde el 20%.',
   'hudChrome.varkhulCallout.heat75': '¡La forja ha alcanzado un 75% de calor!',
   'hudChrome.varkhulCallout.heat90': '¡La Fusión de la forja es inminente!',
   'hudChrome.varkhulCallout.addsDefeated':

@@ -10,6 +10,8 @@ import { IGNIVAR_FIRE_BEAM_CORE_NAME } from '../src/render/ignivar_fire_beams';
 import {
   buildIgnivarForgeJudgmentVisual,
   IGNIVAR_JUDGMENT_FIRE_NAME,
+  IGNIVAR_JUDGMENT_SAFE_BOUNDARY_NAME,
+  IGNIVAR_JUDGMENT_SAFE_CHEVRONS_NAME,
   IGNIVAR_JUDGMENT_SAFE_MARKER_NAME,
   IGNIVAR_JUDGMENT_SHELTERS_NAME,
   IGNIVAR_JUDGMENT_VISUAL_NAME,
@@ -626,7 +628,6 @@ describe('Ignivar Forge Judgment', () => {
       'raysActive',
       'waveWindup',
       'waveActive',
-      'soak',
     ] as const;
     for (const blocker of blockers) {
       const { sim, boss } = claimedEncounter(7310 + blockers.indexOf(blocker));
@@ -640,11 +641,6 @@ describe('Ignivar Forge Judgment', () => {
       if (blocker === 'raysActive') boss.ignivar.rotatingRaysActiveRemaining = DT;
       if (blocker === 'waveWindup') boss.ignivar.forgeWaveWindupRemaining = DT;
       if (blocker === 'waveActive') boss.ignivar.forgeWaveActiveRemaining = DT;
-      if (blocker === 'soak') {
-        boss.ignivar.soakTargetId = sim.player.id;
-        boss.ignivar.soakRemaining = 1;
-      }
-
       sim.tick();
 
       expect(boss.ignivar.forgeJudgmentPhase, blocker).toBe('idle');
@@ -654,7 +650,7 @@ describe('Ignivar Forge Judgment', () => {
   it('enters the twenty-percent finale and guarantees alternating frontals', () => {
     expect(IGNIVAR_LAST_INFERNO_HP_THRESHOLD).toBe(0.2);
     expect(IGNIVAR_FINAL_METEOR_EVERY).toBe(9);
-    expect(IGNIVAR_FINAL_ROTATING_RAYS_EVERY).toBe(24);
+    expect(IGNIVAR_FINAL_ROTATING_RAYS_EVERY).toBe(18);
     expect(IGNIVAR_FINAL_ROTATING_RAYS_SPEED_MULTIPLIER).toBe(1.6);
     expect(IGNIVAR_FINAL_FRONTAL_EVERY).toBe(8);
 
@@ -1018,6 +1014,42 @@ describe('Ignivar Forge Judgment', () => {
         (group) => group.getObjectByName(IGNIVAR_JUDGMENT_SAFE_MARKER_NAME)?.visible,
       ),
     ).toEqual([false, false, true]);
+    const safeMarker = shelterGroups[safeIndex].getObjectByName(IGNIVAR_JUDGMENT_SAFE_MARKER_NAME);
+    const safeBoundary = safeMarker?.getObjectByName(IGNIVAR_JUDGMENT_SAFE_BOUNDARY_NAME) as
+      | THREE.Mesh<THREE.RingGeometry>
+      | undefined;
+    const safeChevrons = safeMarker?.getObjectByName(IGNIVAR_JUDGMENT_SAFE_CHEVRONS_NAME) as
+      | THREE.LineSegments
+      | undefined;
+    expect(safeBoundary?.geometry.parameters.outerRadius).toBe(IGNIVAR_JUDGMENT_SHELTER_RADIUS);
+    expect(safeBoundary?.geometry.parameters.innerRadius).toBe(
+      IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.42,
+    );
+    expect(safeBoundary?.renderOrder).toBeGreaterThan(surface.renderOrder);
+    expect(safeChevrons).toBeInstanceOf(THREE.LineSegments);
+    const chevronPositions = safeChevrons?.geometry.getAttribute('position');
+    expect(chevronPositions?.count).toBe(32);
+    if (!chevronPositions) throw new Error('Judgment safe-zone chevrons were not built');
+    for (let index = 0; index < 8; index++) {
+      const angle = (index * Math.PI * 2) / 8;
+      const armRadius = IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.32;
+      const apexRadius = IGNIVAR_JUDGMENT_SHELTER_RADIUS - 1.08;
+      const firstArm = index * 4;
+      const apex = firstArm + 1;
+      const secondArm = firstArm + 2;
+      const repeatedApex = firstArm + 3;
+      expect(chevronPositions.getX(firstArm)).toBeCloseTo(Math.sin(angle - 0.11) * armRadius, 6);
+      expect(chevronPositions.getZ(firstArm)).toBeCloseTo(Math.cos(angle - 0.11) * armRadius, 6);
+      expect(chevronPositions.getX(apex)).toBeCloseTo(Math.sin(angle) * apexRadius, 6);
+      expect(chevronPositions.getZ(apex)).toBeCloseTo(Math.cos(angle) * apexRadius, 6);
+      expect(chevronPositions.getX(secondArm)).toBeCloseTo(Math.sin(angle + 0.11) * armRadius, 6);
+      expect(chevronPositions.getZ(secondArm)).toBeCloseTo(Math.cos(angle + 0.11) * armRadius, 6);
+      expect(chevronPositions.getX(repeatedApex)).toBeCloseTo(chevronPositions.getX(apex), 6);
+      expect(chevronPositions.getZ(repeatedApex)).toBeCloseTo(chevronPositions.getZ(apex), 6);
+      expect(Math.hypot(chevronPositions.getX(apex), chevronPositions.getZ(apex))).toBeLessThan(
+        Math.hypot(chevronPositions.getX(firstArm), chevronPositions.getZ(firstArm)),
+      );
+    }
 
     syncIgnivarForgeJudgmentVisual(visual, 'hidden', rotation, safeIndex, 1, 0, false);
     expect(visual.visible).toBe(false);
