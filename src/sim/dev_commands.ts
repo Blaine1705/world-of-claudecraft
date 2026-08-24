@@ -204,6 +204,9 @@ export function handleDevChat(
   }
 
   if (/^\/(?:dev\s+fear|devfear)\s*$/i.test(raw)) {
+    // A movement-only test hook for the fear wall guard: it deliberately omits the
+    // breaksOnDamage / breakThreshold / DR handling a real cast fear sets, so the
+    // flee window is stable to watch. Do not "complete" it into a real fear.
     const player = ctx.entities.get(pid);
     if (!player) return null;
     ctx.applyAura(player, {
