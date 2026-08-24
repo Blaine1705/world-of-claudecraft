@@ -287,7 +287,13 @@ const MONOLITHS: MonolithRow[] = [
     // call site and adds only thin wiring for rebuild reveal-gate installation,
     // entry-barrier cleanup and observed display pacing; the policy and timer
     // ownership remain in sibling modules. Exact count, zero slack.
-    ceiling: 13541,
+    // Issue #3479 (rift self-motion prediction) threads a second constructor
+    // argument (riftCollisionToken) through the one SelfMotionPredictor call
+    // site; the call no longer fits one line, +1. No logic to extract: this is
+    // the whole of the wiring. Rebased onto a release/v0.40.0 tip that had
+    // independently drifted 2 lines below the prior pin since this branch
+    // started, so the ceiling here is the exact resolved count, zero slack.
+    ceiling: 13540,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

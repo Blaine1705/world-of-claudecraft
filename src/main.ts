@@ -4704,7 +4704,11 @@ async function startGame(
     // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
     // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
     // fear steer and the charge/follow modes run server-side only), and inside
-    // a delve (the portcullis door clamps are not mirrored client-side).
+    // a delve (the portcullis door clamps are not mirrored client-side). Rifts
+    // are predicted too now (issue #3479): the predictor strips/reapplies the
+    // raised-tier lift and resolves rift walls itself (net.riftFloor +
+    // net.riftCollisionToken), and the ice slide suspends prediction on its own
+    // via Entity.riftSliding (self_motion.ts); no gate needed here for it.
     const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
       ? null
       : selfMotionFrameBuffer.write(
@@ -4712,11 +4716,6 @@ async function startGame(
             !movementFrozen() &&
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x) &&
-            // Rifts (like delves) are server-authoritative instanced content, and
-            // their raised sanctum tiers lift the player's Y server-side. The local
-            // kernel predicts a flat floor, so keep prediction off here and render
-            // the authoritative interpolated Y (no vertical jitter on the stairs).
-            !isRiftPos(pe.pos.x) &&
             // A ledge climb is a server-owned scripted move the client does
             // not re-simulate: predicting a fall through it would fight the
             // authoritative pull-up and show the correction as a stutter.
@@ -4729,6 +4728,7 @@ async function startGame(
           frameDt,
           Math.max(0, cameraLastSnapAge),
           net.snapInterval,
+          net.riftFloor,
         );
     traceStart = perf.startTrace();
     try {

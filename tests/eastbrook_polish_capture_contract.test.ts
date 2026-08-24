@@ -282,8 +282,12 @@ interface AttributionTargetFixture {
 // capture was retaken.
 // Re-minted for the stale remote-entity holdout repair (renderer.ts): the
 // renderer integration leaf moved. No capture was retaken.
+// Re-minted for issue #3479 (rift self-motion prediction): the
+// SelfMotionPredictor construction call site in renderer.ts now threads a
+// second constructor argument (riftCollisionToken), moving the renderer
+// integration leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '4ad25d5f19db674748329dcc5150a4b2c5efa27f22ef52bfc422ccacb036a6c4';
+  '55dc33064ae930846ade17d4924aade22a1c9109368b8200e93b3e2f783a2b72';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

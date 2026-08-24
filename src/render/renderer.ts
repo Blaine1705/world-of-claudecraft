@@ -12796,9 +12796,10 @@ export class Renderer {
     // selfRenderPosition, so enable/disable hands off without a pop, absorbed
     // by the snap/smooth rules on the next frame).
     if (selfMotion) {
-      if (!this.selfMotionPredictor) {
-        this.selfMotionPredictor = new SelfMotionPredictor(this.sim.cfg.seed);
-      }
+      this.selfMotionPredictor ??= new SelfMotionPredictor(
+        this.sim.cfg.seed,
+        this.sim.riftCollisionToken,
+      );
       const predicted = this.selfMotionPredictor.step(p, selfMotion, authoritativeDiscontinuity);
       if (predicted) {
         // Follow the predictor output exactly (it is already continuous;

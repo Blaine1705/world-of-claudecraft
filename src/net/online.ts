@@ -12,6 +12,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -60,6 +61,7 @@ import {
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
+import { riftFloorColliders } from '../sim/rift/rift_gen';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -1688,11 +1690,17 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
-  // The online client never registers a rift collision region of its own (collision
-  // resolution is server-authoritative); 0 keeps findPlayerPath/resolvePlayerDestination
-  // and the swept-landing crest re-resolve (see world_api/dungeons.ts) inert here, same
-  // as outside a rift.
-  readonly riftCollisionToken = 0;
+  // A real per-ClientWorld token (issue #3479): applyRiftStateEvent registers the
+  // mirrored floor's colliders under it (the same pure generator + layoutColliders
+  // the server ran, so no geometry travels the wire), which is what lets the
+  // self-motion predictor (src/render/self_motion.ts) resolve rift walls locally
+  // instead of rendering the full echo latency, and also feeds
+  // findPlayerPath/resolvePlayerDestination and the swept-landing crest re-resolve
+  // (see below) real rift geometry for the first time. The token itself is a fixed
+  // value allocated once at construction (like the live Sim's own
+  // riftCollisionToken), but it carries no registered region (inert, matching
+  // outside-a-rift behavior) until the first riftState event registers one.
+  readonly riftCollisionToken = allocRiftCollisionToken();
   // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
   // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
   // same clock raidLockouts() already relies on). Null while riftFloor is null or
@@ -2184,6 +2192,14 @@ export class ClientWorld implements IWorld {
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
     this.failPendingCommandOutcomes();
+    // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
+    // riftCollisionToken, outside this instance: a session that ends while
+    // mirroring a floor would otherwise strand that region under a token
+    // nothing queries again once this ClientWorld is dropped, on every close/
+    // logout/reconnect-exhausted path that reaches here.
+    if (this.riftFloor) {
+      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
+    }
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
@@ -5477,6 +5493,14 @@ export class ClientWorld implements IWorld {
   // The event still flows to the HUD (drainEvents) for a toast/log line.
   private applyRiftStateEvent(ev: SimEvent): void {
     if (ev.type !== 'riftState') return;
+    // Mirror the server's floor collision lifecycle (spawnRiftFloor /
+    // freeRiftFloorEntities in src/sim/rift/runs.ts): the previously mirrored
+    // floor's region is always cleared before a new one is registered, whether
+    // this event is a descent (a new floor replacing the old one) or a real
+    // exit (no new floor to replace it with).
+    if (this.riftFloor) {
+      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
+    }
     this.riftFloor = ev.active
       ? {
           eventId: ev.eventId,
@@ -5494,6 +5518,22 @@ export class ClientWorld implements IWorld {
           tier: ev.tier,
         }
       : null;
+    if (this.riftFloor) {
+      // riftFloorColliders takes no upgrade: an AI-service manifest only ever
+      // reskins theme/spawns/boss/name (src/sim/rift/upgrade.ts
+      // applyRiftUpgrade), never floor.layout, so the base (unupgraded) plan's
+      // colliders are already identical to the upgraded floor's walls.
+      setRiftRegion(
+        this.riftCollisionToken,
+        this.riftFloor.origin.x,
+        this.riftFloor.origin.z,
+        riftFloorColliders(
+          this.riftFloor.seed,
+          this.riftFloor.baseLevel,
+          this.riftFloor.floorIndex,
+        ),
+      );
+    }
     this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
     // Clear death zones on rift exit so stale rings from a previous run never
     // bleed into a new one. Mid-run cancellations (boss death, evade, floor
