@@ -1,7 +1,8 @@
-// Shared Deed Heraldry plaque silhouettes. CSS consumes the stored clip-path
-// strings, while the world canvas consumes the same fixed-pixel tip and notch
-// measurements. Keeping the compact ends in pixels prevents a long localized
-// player name from stretching the forged hardware into a giant wedge.
+// Shared Deed Heraldry plaque silhouette authority. CSS hardcodes these clip
+// paths and the tests pin each selector to this mirror, while the world canvas
+// consumes the same fixed-pixel tip and notch measurements. Keeping the compact
+// ends in pixels prevents a long localized player name from stretching the
+// forged hardware into a giant wedge.
 
 export type DeedHeraldryPlaqueShape = 'compact' | 'mirror' | 'ceremonial' | 'tab';
 

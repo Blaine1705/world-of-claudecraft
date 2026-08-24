@@ -1134,8 +1134,8 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     }
     expect(
       allTierShadowDeclarations,
-      'the style graph owns 28 reviewed tier-shadow uses',
-    ).toHaveLength(28);
+      'the style graph owns 29 reviewed tier-shadow uses',
+    ).toHaveLength(29);
 
     for (const [name, body] of [
       [

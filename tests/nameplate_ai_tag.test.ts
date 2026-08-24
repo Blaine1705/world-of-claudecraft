@@ -86,12 +86,21 @@ function view(): EntityView {
 
 interface PainterStateAccess {
   states: Map<number, NameplateCanvasState>;
+  anchorScratch: Array<{ id: number; extraLift?: number }>;
 }
 
 function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
   const state = (painter as unknown as PainterStateAccess).states.get(id);
   if (!state) throw new Error(`Missing nameplate state for ${id}`);
   return state;
+}
+
+function anchorOf(painter: NameplatePainter, id: number): { id: number; extraLift?: number } {
+  const anchor = (painter as unknown as PainterStateAccess).anchorScratch.find(
+    (candidate) => candidate.id === id,
+  );
+  if (!anchor) throw new Error(`Missing nameplate anchor for ${id}`);
+  return anchor;
 }
 
 function harness(
@@ -332,12 +341,14 @@ describe('batched canvas nameplate state', () => {
 
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+    expect(anchorOf(painter, 2).extraLift).toBe(8);
 
     // Empty and null selections: the reset must blank the slug the plate
     // already holds instead of leaking a previous seal and ribbon.
     bordered.border = '';
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('');
+    expect(anchorOf(painter, 2).extraLift).toBe(0);
     bordered.border = 'col_reliquary_rank_5';
     painter.update(true);
     expect(stateOf(painter, 2).border).toBe('reliquary_gilt');

@@ -4236,8 +4236,10 @@ export class Hud {
     // governor. spawn() reads this per event.
     { getFxTier: () => this.fxTier() },
   );
-  // First unit-frame painter instance. The player name remains static and the
-  // optional heraldry hosts are captured once here, never queried per frame.
+  // First unit-frame painter instance; heraldry hosts are captured once. The name
+  // stays login-owned, and player dead/range state is absent, so no stateClasses.
+  // CSS keeps this visible, so no shownDisplay; setup owns the portrait, so no
+  // repaintPortrait.
   private readonly playerFramePainter = new UnitFramePainter(this.writerFacet, {
     frame: this.playerFrameEl,
     level: this.pfLevelEl,
@@ -4283,8 +4285,11 @@ export class Hud {
     },
     { resolveCastLabel: (s) => s.label },
   );
-  // Second unit-frame painter instance. Its optional heraldry hosts are player
-  // identity only; target validity is gated at the descriptor call site.
+  // Second unit-frame painter instance; heraldry hosts are player identity only.
+  // Target validity stays call-site gated. Elite and reaction CSS stay there too;
+  // dead/out-of-range are deliberately pinned false, so no stateClasses.
+  // shownDisplay and repaintPortrait remain because target identity can appear,
+  // disappear, and change portrait.
   private readonly targetFramePainter = new UnitFramePainter(
     this.writerFacet,
     {

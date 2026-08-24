@@ -15,6 +15,8 @@ export interface NameplateAnchor {
   id: number;
   sx: number;
   sy: number;
+  /** Extra pixels painted above the name row. Zero for borderless plates. */
+  extraLift?: number;
 }
 
 export interface NameplateDeclutterMetrics {
@@ -24,21 +26,22 @@ export interface NameplateDeclutterMetrics {
   spatialHashResizes: number;
 }
 
-// Anchors within this horizontal distance are treated as colliding: nameplate
-// labels render much wider than the anchor point itself (name + level + hp
-// bar), so this approximates half of a typical label's on-screen width rather
-// than the anchor point spacing.
-export const OVERLAP_THRESHOLD_X_PX = 95;
-// Vertical anchors this close are considered the "same row". A worn heraldry
-// ribbon adds NAMEPLATE_HERALDRY_EXTRA_LIFT above the name, so the old 18px
-// same-row window would miss two bordered name-only plates that now overlap.
-export const OVERLAP_THRESHOLD_Y_PX = 18 + NAMEPLATE_HERALDRY_EXTRA_LIFT;
-// Vertical gap applied between stacked members of a cluster. 20px no longer
-// clears a 16px name row plus the heraldry extra lift.
-export const STACK_OFFSET_PX = 20 + NAMEPLATE_HERALDRY_EXTRA_LIFT;
+// Borderless plates retain the established label envelope. A pair expands to
+// the heraldry envelope only when at least one anchor actually paints the seal
+// and ribbon, so ordinary town crowds do not pay for absent reward chrome.
+export const OVERLAP_THRESHOLD_X_PX = 80;
+export const OVERLAP_THRESHOLD_Y_PX = 18;
+export const STACK_OFFSET_PX = 20;
+// The accepted E45 world-heraldry envelope reserves 15px beyond the established
+// 80px label reach for the left-mounted seal hardware.
+export const HERALDRY_OVERLAP_THRESHOLD_X_PX = 95;
+export const HERALDRY_OVERLAP_THRESHOLD_Y_PX =
+  OVERLAP_THRESHOLD_Y_PX + NAMEPLATE_HERALDRY_EXTRA_LIFT;
+export const HERALDRY_STACK_OFFSET_PX = STACK_OFFSET_PX + NAMEPLATE_HERALDRY_EXTRA_LIFT;
 
-// Cell size equals the collision thresholds, so two colliding anchors are never
-// more than one cell apart on either axis and a 3x3 neighbourhood is exhaustive.
+// Cell size equals the BORDERLESS thresholds, so every cell remains an atomic
+// collision clique. Heraldry reach is less than two cells on either axis, so a
+// 5x5 neighbourhood is exhaustive without making borderless cells wider.
 function cellCoord(v: number, size: number): number | null {
   if (!Number.isFinite(v)) return null;
   const coord = Math.floor(v / size);
@@ -69,7 +72,13 @@ let cellSortedEnd = new Int32Array(128);
 let anchorCellSlot = new Int32Array(64);
 let suffixMinY = new Float64Array(64);
 let suffixMaxY = new Float64Array(64);
-const neighborSlots = new Int32Array(9);
+let suffixMinHeraldryY = new Float64Array(64);
+let suffixMaxHeraldryY = new Float64Array(64);
+let cellMinHeraldryX = new Float64Array(128);
+let cellMaxHeraldryX = new Float64Array(128);
+let cellMinHeraldryY = new Float64Array(128);
+let cellMaxHeraldryY = new Float64Array(128);
+const neighborSlots = new Int32Array(25);
 let cellEpoch = 0;
 const hashFloat = new Float64Array(1);
 const hashBits = new Uint32Array(hashFloat.buffer);
@@ -85,6 +94,10 @@ function ensureSpatialHashCapacity(count: number): number {
     cellVisitedStamp = new Uint32Array(tableCapacity);
     cellSortedStart = new Int32Array(tableCapacity);
     cellSortedEnd = new Int32Array(tableCapacity);
+    cellMinHeraldryX = new Float64Array(tableCapacity);
+    cellMaxHeraldryX = new Float64Array(tableCapacity);
+    cellMinHeraldryY = new Float64Array(tableCapacity);
+    cellMaxHeraldryY = new Float64Array(tableCapacity);
     cellEpoch = 0;
     resizes++;
   }
@@ -94,6 +107,8 @@ function ensureSpatialHashCapacity(count: number): number {
     anchorCellSlot = new Int32Array(anchorCapacity);
     suffixMinY = new Float64Array(anchorCapacity);
     suffixMaxY = new Float64Array(anchorCapacity);
+    suffixMinHeraldryY = new Float64Array(anchorCapacity);
+    suffixMaxHeraldryY = new Float64Array(anchorCapacity);
     resizes++;
   }
   cellEpoch = (cellEpoch + 1) >>> 0;
@@ -135,6 +150,37 @@ function lastAnchorInCell(slot: number): number {
   return spatialOrder[cellSortedEnd[slot] - 1];
 }
 
+function hasHeraldry(anchor: NameplateAnchor): boolean {
+  return (anchor.extraLift ?? 0) > 0;
+}
+
+function cellHasHeraldry(slot: number): boolean {
+  return cellMinHeraldryX[slot] !== Number.POSITIVE_INFINITY;
+}
+
+function candidateOverlapsSuffix(
+  candidate: NameplateAnchor,
+  leftStart: number,
+  leftEnd: number,
+  leftIsLower: boolean,
+  anchors: NameplateAnchor[],
+  overlapX: number,
+  overlapY: number,
+  heraldryOnly: boolean,
+): boolean {
+  let low = leftStart;
+  let high = leftEnd;
+  while (low < high) {
+    const mid = (low + high) >>> 1;
+    if (candidate.sx - anchors[spatialOrder[mid]].sx > overlapX) low = mid + 1;
+    else high = mid;
+  }
+  if (low >= leftEnd) return false;
+  const minY = heraldryOnly ? suffixMinHeraldryY[low] : suffixMinY[low];
+  const maxY = heraldryOnly ? suffixMaxHeraldryY[low] : suffixMaxY[low];
+  return leftIsLower ? candidate.sy - maxY <= overlapY : minY - candidate.sy <= overlapY;
+}
+
 /**
  * Cells are cliques because their width and height equal the inclusive overlap
  * thresholds. This tests whether two neighbouring cliques share at least one
@@ -146,21 +192,37 @@ function cellsOverlap(
   anchors: NameplateAnchor[],
   metrics?: NameplateDeclutterMetrics,
 ): boolean {
+  const aHasHeraldry = cellHasHeraldry(aSlot);
+  const bHasHeraldry = cellHasHeraldry(bSlot);
+  const hasHeraldryPair = aHasHeraldry || bHasHeraldry;
+  const cellDeltaX = Math.abs(cellX[aSlot] - cellX[bSlot]);
+  const cellDeltaY = Math.abs(cellY[aSlot] - cellY[bSlot]);
+  const canBaseOverlap = cellDeltaX <= 1 && cellDeltaY <= 1;
+  if (!canBaseOverlap && !hasHeraldryPair) return false;
+
   if (cellY[aSlot] === cellY[bSlot]) {
     const left = cellX[aSlot] < cellX[bSlot] ? aSlot : bSlot;
     const right = left === aSlot ? bSlot : aSlot;
+    const rightMinX = anchors[firstAnchorInCell(right)].sx;
+    const leftMaxX = anchors[lastAnchorInCell(left)].sx;
+    if (canBaseOverlap && rightMinX - leftMaxX <= OVERLAP_THRESHOLD_X_PX) return true;
+    if (!hasHeraldryPair) return false;
     return (
-      anchors[firstAnchorInCell(right)].sx - anchors[lastAnchorInCell(left)].sx <=
-      OVERLAP_THRESHOLD_X_PX
+      cellMinHeraldryX[right] - leftMaxX <= HERALDRY_OVERLAP_THRESHOLD_X_PX ||
+      rightMinX - cellMaxHeraldryX[left] <= HERALDRY_OVERLAP_THRESHOLD_X_PX
     );
   }
 
   if (cellX[aSlot] === cellX[bSlot]) {
     const lower = cellY[aSlot] < cellY[bSlot] ? aSlot : bSlot;
     const upper = lower === aSlot ? bSlot : aSlot;
+    const upperMinY = suffixMinY[cellSortedStart[upper]];
+    const lowerMaxY = suffixMaxY[cellSortedStart[lower]];
+    if (canBaseOverlap && upperMinY - lowerMaxY <= OVERLAP_THRESHOLD_Y_PX) return true;
+    if (!hasHeraldryPair) return false;
     return (
-      suffixMinY[cellSortedStart[upper]] - suffixMaxY[cellSortedStart[lower]] <=
-      OVERLAP_THRESHOLD_Y_PX
+      cellMinHeraldryY[upper] - lowerMaxY <= HERALDRY_OVERLAP_THRESHOLD_Y_PX ||
+      upperMinY - cellMaxHeraldryY[lower] <= HERALDRY_OVERLAP_THRESHOLD_Y_PX
     );
   }
 
@@ -173,23 +235,64 @@ function cellsOverlap(
   const leftStart = cellSortedStart[left];
   const leftEnd = cellSortedEnd[left];
   const leftIsLower = cellY[left] < cellY[right];
-  for (let p = cellSortedStart[right]; p < cellSortedEnd[right]; p++) {
-    if (metrics) metrics.candidateChecks++;
-    const candidate = anchors[spatialOrder[p]];
-    let low = leftStart;
-    let high = leftEnd;
-    while (low < high) {
-      const mid = (low + high) >>> 1;
-      if (candidate.sx - anchors[spatialOrder[mid]].sx > OVERLAP_THRESHOLD_X_PX) low = mid + 1;
-      else high = mid;
+  const rightStart = cellSortedStart[right];
+  const rightEnd = cellSortedEnd[right];
+  if (canBaseOverlap) {
+    for (let p = rightStart; p < rightEnd; p++) {
+      if (metrics) metrics.candidateChecks++;
+      if (
+        candidateOverlapsSuffix(
+          anchors[spatialOrder[p]],
+          leftStart,
+          leftEnd,
+          leftIsLower,
+          anchors,
+          OVERLAP_THRESHOLD_X_PX,
+          OVERLAP_THRESHOLD_Y_PX,
+          false,
+        )
+      ) {
+        return true;
+      }
     }
-    if (low >= leftEnd) continue;
-    if (
-      leftIsLower
-        ? candidate.sy - suffixMaxY[low] <= OVERLAP_THRESHOLD_Y_PX
-        : suffixMinY[low] - candidate.sy <= OVERLAP_THRESHOLD_Y_PX
-    ) {
-      return true;
+  }
+  if (!hasHeraldryPair) return false;
+
+  for (let p = rightStart; p < rightEnd; p++) {
+    const candidate = anchors[spatialOrder[p]];
+    if (hasHeraldry(candidate)) {
+      if (metrics) metrics.candidateChecks++;
+      if (
+        candidateOverlapsSuffix(
+          candidate,
+          leftStart,
+          leftEnd,
+          leftIsLower,
+          anchors,
+          HERALDRY_OVERLAP_THRESHOLD_X_PX,
+          HERALDRY_OVERLAP_THRESHOLD_Y_PX,
+          false,
+        )
+      ) {
+        return true;
+      }
+    }
+    if (cellHasHeraldry(left)) {
+      if (metrics) metrics.candidateChecks++;
+      if (
+        candidateOverlapsSuffix(
+          candidate,
+          leftStart,
+          leftEnd,
+          leftIsLower,
+          anchors,
+          HERALDRY_OVERLAP_THRESHOLD_X_PX,
+          HERALDRY_OVERLAP_THRESHOLD_Y_PX,
+          true,
+        )
+      ) {
+        return true;
+      }
     }
   }
   return false;
@@ -253,13 +356,30 @@ export function declutterNameplatesInPlace(
   for (const slot of occupiedSlots) {
     let minY = Number.POSITIVE_INFINITY;
     let maxY = Number.NEGATIVE_INFINITY;
+    let minHeraldryX = Number.POSITIVE_INFINITY;
+    let maxHeraldryX = Number.NEGATIVE_INFINITY;
+    let minHeraldryY = Number.POSITIVE_INFINITY;
+    let maxHeraldryY = Number.NEGATIVE_INFINITY;
     for (let p = cellSortedEnd[slot] - 1; p >= cellSortedStart[slot]; p--) {
-      const sy = anchors[spatialOrder[p]].sy;
+      const anchor = anchors[spatialOrder[p]];
+      const sy = anchor.sy;
       minY = Math.min(minY, sy);
       maxY = Math.max(maxY, sy);
       suffixMinY[p] = minY;
       suffixMaxY[p] = maxY;
+      if (hasHeraldry(anchor)) {
+        minHeraldryX = Math.min(minHeraldryX, anchor.sx);
+        maxHeraldryX = Math.max(maxHeraldryX, anchor.sx);
+        minHeraldryY = Math.min(minHeraldryY, sy);
+        maxHeraldryY = Math.max(maxHeraldryY, sy);
+      }
+      suffixMinHeraldryY[p] = minHeraldryY;
+      suffixMaxHeraldryY[p] = maxHeraldryY;
     }
+    cellMinHeraldryX[slot] = minHeraldryX;
+    cellMaxHeraldryX[slot] = maxHeraldryX;
+    cellMinHeraldryY[slot] = minHeraldryY;
+    cellMaxHeraldryY[slot] = maxHeraldryY;
   }
 
   for (const seedSlot of occupiedSlots) {
@@ -280,8 +400,8 @@ export function declutterNameplatesInPlace(
       if (metrics) metrics.candidateChecks += end - start;
 
       let neighborSlotCount = 0;
-      for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dy = -2; dy <= 2; dy++) {
           const neighbor = findCellSlot(cellX[slot] + dx, cellY[slot] + dy, false);
           if (neighbor < 0 || neighbor === slot) continue;
           let seenSlot = false;
@@ -305,12 +425,16 @@ export function declutterNameplatesInPlace(
     cluster.sort((a, b) => anchors[a].id - anchors[b].id);
 
     let sum = 0;
-    for (const j of cluster) sum += anchors[j].sy;
+    let stackOffset = STACK_OFFSET_PX;
+    for (const j of cluster) {
+      sum += anchors[j].sy;
+      if (hasHeraldry(anchors[j])) stackOffset = HERALDRY_STACK_OFFSET_PX;
+    }
     const baseSy = sum / cluster.length;
     const mid = (cluster.length - 1) / 2;
     for (let k = 0; k < cluster.length; k++) {
       const j = cluster[k];
-      anchors[j].sy = baseSy + (k - mid) * STACK_OFFSET_PX;
+      anchors[j].sy = baseSy + (k - mid) * stackOffset;
     }
   }
 

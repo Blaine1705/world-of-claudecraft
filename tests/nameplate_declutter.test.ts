@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   declutterNameplates,
   declutterNameplatesInPlace,
+  HERALDRY_OVERLAP_THRESHOLD_X_PX,
+  HERALDRY_OVERLAP_THRESHOLD_Y_PX,
+  HERALDRY_STACK_OFFSET_PX,
   type NameplateAnchor,
   type NameplateDeclutterMetrics,
   OVERLAP_THRESHOLD_X_PX,
@@ -9,15 +12,38 @@ import {
   STACK_OFFSET_PX,
 } from '../src/render/nameplate_declutter';
 
+// Independent oracle literals. This reference exists to catch drift in the
+// optimized spatial-hash implementation, so it must not import the production
+// thresholds it is checking.
+const BASE_OVERLAP_X = 80;
+const BASE_OVERLAP_Y = 18;
+const BASE_STACK = 20;
+const HERALDRY_OVERLAP_X = 95;
+const HERALDRY_OVERLAP_Y = 26;
+const HERALDRY_STACK = 28;
+const HERALDRY_EXTRA_LIFT = 8;
+
+function liftOf(anchor: NameplateAnchor): number {
+  return anchor.extraLift ?? 0;
+}
+
+function heraldryAnchor(id: number, sx: number, sy: number): NameplateAnchor {
+  return { id, sx, sy, extraLift: HERALDRY_EXTRA_LIFT };
+}
+
+function referenceAnchorsOverlap(a: NameplateAnchor, b: NameplateAnchor): boolean {
+  const hasHeraldry = liftOf(a) > 0 || liftOf(b) > 0;
+  const overlapX = hasHeraldry ? HERALDRY_OVERLAP_X : BASE_OVERLAP_X;
+  const overlapY = hasHeraldry ? HERALDRY_OVERLAP_Y : BASE_OVERLAP_Y;
+  return Math.abs(a.sx - b.sx) <= overlapX && Math.abs(a.sy - b.sy) <= overlapY;
+}
+
 /**
  * Straightforward O(N^2) connected-component oracle: the spatial-hash hot path
  * must agree with it anchor-for-anchor on every input, or nameplates would
  * silently stack differently in a crowd than they do in the unit tests.
  */
 function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
-  const OVERLAP_X = OVERLAP_THRESHOLD_X_PX;
-  const OVERLAP_Y = OVERLAP_THRESHOLD_Y_PX;
-  const STACK = STACK_OFFSET_PX;
   const out = anchors.map((a) => ({ ...a }));
   const byId = new Map(out.map((a) => [a.id, a]));
   const visited = new Set<number>();
@@ -33,10 +59,7 @@ function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
       cluster.push(current);
       for (const other of ordered) {
         if (visited.has(other.id) || discovered.has(other.id)) continue;
-        if (
-          Math.abs(other.sx - current.sx) <= OVERLAP_X &&
-          Math.abs(other.sy - current.sy) <= OVERLAP_Y
-        ) {
+        if (referenceAnchorsOverlap(other, current)) {
           discovered.add(other.id);
           queue.push(other);
         }
@@ -48,9 +71,10 @@ function declutterReference(anchors: NameplateAnchor[]): NameplateAnchor[] {
     }
     cluster.sort((a, b) => a.id - b.id);
     const baseSy = cluster.reduce((sum, a) => sum + a.sy, 0) / cluster.length;
+    const stack = cluster.some((member) => liftOf(member) > 0) ? HERALDRY_STACK : BASE_STACK;
     cluster.forEach((member, i) => {
       const target = byId.get(member.id);
-      if (target) target.sy = baseSy + (i - (cluster.length - 1) / 2) * STACK;
+      if (target) target.sy = baseSy + (i - (cluster.length - 1) / 2) * stack;
       visited.add(member.id);
     });
   }
@@ -76,36 +100,79 @@ describe('nameplate declutter', () => {
   });
 
   it('E45: two heraldry plates 25px apart vertically clear at the accepted 28px pitch', () => {
-    const anchors: NameplateAnchor[] = [
-      { id: 1, sx: 200, sy: 100 },
-      { id: 2, sx: 200, sy: 125 },
-    ];
+    const anchors: NameplateAnchor[] = [heraldryAnchor(1, 200, 100), heraldryAnchor(2, 200, 125)];
     const out = declutterNameplates(anchors);
-    expect(OVERLAP_THRESHOLD_Y_PX).toBe(26);
-    expect(STACK_OFFSET_PX).toBe(28);
+    expect(OVERLAP_THRESHOLD_Y_PX).toBe(18);
+    expect(STACK_OFFSET_PX).toBe(20);
     expect(Math.abs((out[0]?.sy ?? 0) - (out[1]?.sy ?? 0))).toBe(28);
   });
 
-  it('E45: the left-mounted 18px seal keeps colliding through its 3px ribbon overlap', () => {
-    // The seal projects 15px beyond the old ribbon-only reach: the right
-    // plate's seal still overlaps the left plate when their anchors are 95px
-    // apart, so the declutter pass must not leave them on the same row.
-    const ribbonOnlyThreshold = 80;
-    const sealSize = 18;
-    const sealRibbonOverlap = 3;
+  it('E45: the left-mounted seal keeps the accepted 95px heraldry reach', () => {
+    // The world-heraldry envelope reserves 15px beyond the established 80px
+    // label reach, so two rewarded plates at the 95px boundary must stack.
+    const heraldryReach = 95;
     const anchors: NameplateAnchor[] = [
-      { id: 1, sx: 200, sy: 100 },
-      {
-        id: 2,
-        sx: 200 + ribbonOnlyThreshold + sealSize - sealRibbonOverlap,
-        sy: 100,
-      },
+      heraldryAnchor(1, 200, 100),
+      heraldryAnchor(2, 200 + heraldryReach, 100),
     ];
 
     const out = declutterNameplates(anchors);
 
-    expect(OVERLAP_THRESHOLD_X_PX).toBe(95);
+    expect(OVERLAP_THRESHOLD_X_PX).toBe(80);
     expect(Math.abs((out[0]?.sy ?? 0) - (out[1]?.sy ?? 0))).toBe(28);
+  });
+
+  it('keeps borderless crowds on the established collision envelope and stack pitch', () => {
+    const widePair: NameplateAnchor[] = [
+      { id: 1, sx: 100, sy: 100 },
+      { id: 2, sx: 190, sy: 100 },
+    ];
+    const tallPair: NameplateAnchor[] = [
+      { id: 1, sx: 100, sy: 100 },
+      { id: 2, sx: 100, sy: 125 },
+    ];
+    const denseCrowd: NameplateAnchor[] = [
+      { id: 1, sx: 100, sy: 100 },
+      { id: 2, sx: 100, sy: 100 },
+      { id: 3, sx: 100, sy: 100 },
+    ];
+
+    expect(declutterNameplates(widePair)).toEqual(widePair);
+    expect(declutterNameplates(tallPair)).toEqual(tallPair);
+    expect(declutterNameplates(denseCrowd).map((anchor) => anchor.sy)).toEqual([80, 100, 120]);
+  });
+
+  it.each([
+    ['left plate wears heraldry', true, HERALDRY_OVERLAP_X, HERALDRY_OVERLAP_Y, true],
+    ['right plate wears heraldry', false, HERALDRY_OVERLAP_X, HERALDRY_OVERLAP_Y, true],
+    ['horizontal reach is exceeded', true, HERALDRY_OVERLAP_X + 0.0001, 0, false],
+    ['vertical reach is exceeded', false, 0, HERALDRY_OVERLAP_Y + 0.0001, false],
+  ])('uses the exact heraldry envelope when the %s', (_label, heraldryLeft, dx, dy, collides) => {
+    const left = heraldryLeft ? heraldryAnchor(1, 100, 100) : { id: 1, sx: 100, sy: 100 };
+    const right = heraldryLeft
+      ? { id: 2, sx: 100 + dx, sy: 100 + dy }
+      : heraldryAnchor(2, 100 + dx, 100 + dy);
+    const anchors: NameplateAnchor[] = [left, right];
+
+    const out = declutterNameplates(anchors);
+
+    expect(HERALDRY_OVERLAP_THRESHOLD_X_PX).toBe(HERALDRY_OVERLAP_X);
+    expect(HERALDRY_OVERLAP_THRESHOLD_Y_PX).toBe(HERALDRY_OVERLAP_Y);
+    expect(HERALDRY_STACK_OFFSET_PX).toBe(HERALDRY_STACK);
+    expect(out[0].sy !== anchors[0].sy || out[1].sy !== anchors[1].sy).toBe(collides);
+    if (collides) expect(Math.abs(out[0].sy - out[1].sy)).toBe(HERALDRY_STACK);
+  });
+
+  it('uses the heraldry pitch for a transitive component without widening borderless pairs', () => {
+    const anchors: NameplateAnchor[] = [
+      { id: 1, sx: 0, sy: 100 },
+      { id: 2, sx: 70, sy: 100 },
+      heraldryAnchor(3, 165, 100),
+    ];
+
+    const out = declutterNameplates(anchors);
+
+    expect(out.map((anchor) => anchor.sy)).toEqual([72, 100, 128]);
   });
 
   it('separates two anchors that project to nearly the same spot', () => {
@@ -153,7 +220,7 @@ describe('nameplate declutter', () => {
 
   it('stacks a transitive chain where the endpoints do not directly overlap', () => {
     // A overlaps B (70px apart) and B overlaps C (70px apart), but A and C
-    // are 140px apart, beyond OVERLAP_THRESHOLD_X_PX (95px). All three still
+    // are 140px apart, beyond OVERLAP_THRESHOLD_X_PX (80px). All three still
     // belong to the same collision component and must be stacked together.
     const anchors: NameplateAnchor[] = [
       { id: 1, sx: 0, sy: 100 },
@@ -217,6 +284,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
           id: Math.floor(rng() * 100000),
           sx: Math.round(rng() * 400 - (trial % 2 === 0 ? 0 : 200)),
           sy: Math.round(rng() * 90 - (trial % 2 === 0 ? 0 : 45)),
+          extraLift: rng() < 0.35 ? HERALDRY_EXTRA_LIFT : 0,
         });
       // ids must be unique (entity ids are)
       const seen = new Set<number>();
@@ -350,6 +418,21 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     expect(anchors[1].sy - anchors[0].sy).toBe(STACK_OFFSET_PX);
     expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(STACK_OFFSET_PX);
     expect(metrics.candidateChecks).toBeLessThan(anchors.length * 8);
+  });
+
+  it('keeps the heraldry-only diagonal scan linear in a large mixed chain', () => {
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 4_000; i++) {
+      const anchor = { id: i, sx: i * 90, sy: i * 24 };
+      anchors.push(i % 2 === 0 ? heraldryAnchor(anchor.id, anchor.sx, anchor.sy) : anchor);
+    }
+    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(anchors[1].sy - anchors[0].sy).toBe(HERALDRY_STACK);
+    expect(anchors[anchors.length - 1].sy - anchors[anchors.length - 2].sy).toBe(HERALDRY_STACK);
+    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 12);
   });
 
   it('does not rescan a dense collision bucket for every component member', () => {
