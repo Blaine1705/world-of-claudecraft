@@ -215,6 +215,16 @@ ALTER TABLE woc_market_listings
   ADD COLUMN IF NOT EXISTS category TEXT;
 ALTER TABLE woc_market_listings
   ADD COLUMN IF NOT EXISTS subcategory TEXT;
+-- The boot backfill's worklist read (listingItemIdsMissingCategory:
+-- SELECT DISTINCT item_id WHERE category IS NULL) runs at every boot, so a
+-- partial index over exactly the un-stamped rows keeps it off a growing
+-- seq scan. It is SELF-LIMITING: new rows stamp category at escrow and never
+-- enter this index, and once the one-shot backfill converges it covers zero
+-- rows, so the read is an index scan over an empty index for the life of the
+-- table. Predicate matches the query text verbatim (the shared-SQL rule).
+CREATE INDEX IF NOT EXISTS woc_market_listings_category_missing
+  ON woc_market_listings(item_id)
+  WHERE category IS NULL;
 -- The converge arm's read, on the shared rotation order (a stamped listing
 -- whose buyer PAID skips every pass until that settlement resolves, which
 -- can be operator-scale time; rotation plus the caller's backoff exclusion
