@@ -315,8 +315,13 @@ const MONOLITHS: MonolithRow[] = [
     // loop, and the delve-band guard on combat sight checks); the branch's
     // delegates are unchanged. Exact merged count, still under the release's
     // own 12660.
+    // Re-pinned 12560 -> 12570 for the fear wall guard: the steering unit
+    // lives in src/sim/combat/fear_steering.ts; the residual here is the
+    // import plus the player-only redirect delegation in updateFearMovement.
+    // Exact merged count against release/v0.40.0 (tip eb20752e9e), still
+    // far under the pre-marketplace 12660 row.
     file: 'src/sim/sim.ts',
-    ceiling: 12560,
+    ceiling: 12570,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

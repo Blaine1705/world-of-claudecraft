@@ -88,6 +88,7 @@ import {
 import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -6434,7 +6435,16 @@ export class Sim {
     const aura = this.fearAura(e);
     if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
       return false;
-    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    let angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    // Player-only wall guard (combat/fear_steering.ts): redirect the flee heading
+    // away from a wall it is about to run into, and remember the new heading on the
+    // aura so it holds until the next wall. Feared mobs keep their untouched
+    // movement (and the parity draw order with it), matching the vertical snap's
+    // player-only scoping.
+    if (e.kind === 'player') {
+      angle = steerFearFromWalls(this.ctx, e, angle);
+      aura.value = angle;
+    }
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
     return true;
