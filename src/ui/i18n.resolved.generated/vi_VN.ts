@@ -2058,6 +2058,12 @@ export const vi_VN: EnTranslations = {
       "linkHint": "Shift-click để chia sẻ vật phẩm này trong khung chat."
     },
     "plurals": {
+      "noticeboardGuildStats": {
+        "one": "{count} member, {xp} lifetime XP",
+        "few": "{count} members, {xp} lifetime XP",
+        "many": "{count} members, {xp} lifetime XP",
+        "other": "{count} members, {xp} lifetime XP"
+      },
       "guildMembers": {
         "one": "bạn là {rank}, {count} thành viên",
         "few": "bạn là {rank}, {count} thành viên",

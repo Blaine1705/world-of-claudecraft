@@ -265,7 +265,11 @@ const MONOLITHS: MonolithRow[] = [
     // itself lives in server/social.ts. Exact count.
     // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
     // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
-    ceiling: 10641,
+    // Raised +11 for the guild-signpost fill: the noticeboardGuilds provider
+    // field and the one routeEvents call into server/noticeboard_guilds.ts
+    // (thin-consumer wiring; the mapping and fill logic live in that
+    // module). Exact count, zero slack.
+    ceiling: 10652,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

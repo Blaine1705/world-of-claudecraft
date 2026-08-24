@@ -2058,6 +2058,12 @@ export const ru_RU: EnTranslations = {
       "linkHint": "Shift + клик, чтобы вставить ссылку на этот предмет в чат."
     },
     "plurals": {
+      "noticeboardGuildStats": {
+        "one": "{count} member, {xp} lifetime XP",
+        "few": "{count} members, {xp} lifetime XP",
+        "many": "{count} members, {xp} lifetime XP",
+        "other": "{count} members, {xp} lifetime XP"
+      },
       "guildMembers": {
         "one": "вы {rank}, {count} участник",
         "few": "вы {rank}, {count} участника",

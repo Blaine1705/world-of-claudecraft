@@ -6712,10 +6712,22 @@ export interface NoticeboardDef {
 
 /** One posted notice on an interactable noticeboard, carried verbatim on the
  *  'listings' arm of the noticeboard event: guild names and notes are world
- *  data the client splices like player names, never translation keys. */
+ *  data the client splices like player names, never translation keys. The
+ *  optional fields ride only on server-filled guild-board listings
+ *  (server/noticeboard_guilds.ts, the realm guild board on every signpost);
+ *  authored rows omit them and render as the bare guild-plus-note card. */
 export interface NoticeboardListing {
   guild: string;
   note: string;
+  /** The guild's summed lifetime XP: the client derives the colour tier from
+   *  it (guildTierForLifetimeXp) and formats the number itself. */
+  lifetimeXp?: number;
+  members?: number;
+  /** The recruiting status; absent means the row carries no pledge facts at
+   *  all (an authored listing), never a guessed default. */
+  pledgesOpen?: boolean;
+  /** Minimum pledge level, present only when above 1 and pledging is open. */
+  pledgeMinLevel?: number;
 }
 
 /** A non-interactive authored muster board whose visible footprint is solid. */

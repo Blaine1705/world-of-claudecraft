@@ -2058,6 +2058,12 @@ export const ko_KR: EnTranslations = {
       "linkHint": "Shift + 클릭하면 이 아이템을 채팅에 연결합니다."
     },
     "plurals": {
+      "noticeboardGuildStats": {
+        "one": "{count} member, {xp} lifetime XP",
+        "few": "{count} members, {xp} lifetime XP",
+        "many": "{count} members, {xp} lifetime XP",
+        "other": "{count} members, {xp} lifetime XP"
+      },
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",
         "few": "당신은 {rank}, {count}명 회원",

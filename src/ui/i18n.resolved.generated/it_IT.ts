@@ -2058,6 +2058,12 @@ export const it_IT: EnTranslations = {
       "linkHint": "Shift-clic per collegare questo oggetto in chat."
     },
     "plurals": {
+      "noticeboardGuildStats": {
+        "one": "{count} member, {xp} lifetime XP",
+        "few": "{count} members, {xp} lifetime XP",
+        "many": "{count} members, {xp} lifetime XP",
+        "other": "{count} members, {xp} lifetime XP"
+      },
       "guildMembers": {
         "one": "sei {rank}, {count} membro",
         "few": "sei {rank}, {count} membri",

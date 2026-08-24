@@ -2551,6 +2551,14 @@ export const hudChromeStrings = {
   // carry the real distinct forms only in the locales that need them (ru_RU). The
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
+    // The signpost popup's per-guild stat line (noticeboard_popup.ts): both
+    // numbers arrive pre-formatted through formatNumber.
+    noticeboardGuildStats: {
+      one: '{count} member, {xp} lifetime XP',
+      few: '{count} members, {xp} lifetime XP',
+      many: '{count} members, {xp} lifetime XP',
+      other: '{count} members, {xp} lifetime XP',
+    },
     guildMembers: {
       one: 'your guild rank is {rank}; {count} member',
       few: 'your guild rank is {rank}; {count} members',

@@ -118,6 +118,7 @@ import {
 } from '../src/world_api';
 import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { sameAppearance } from '../src/world_api/appearance';
+import type { GuildLeaderboardEntry } from '../src/world_api/progression_xp';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
@@ -310,6 +311,7 @@ import {
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
+import { fillEmptyNoticeboardEvents } from './noticeboard_guilds';
 import {
   createParseSubsystem,
   type FightParticipant,
@@ -1711,6 +1713,10 @@ const GUILD_CREATION_FEE_GOLD = ((): number => {
 })();
 
 export class GameServer {
+  /** Realm guild-board rows for the signpost fill (noticeboard_guilds.ts),
+   *  wired by main.ts to the leaderboard's cached window. Null until wired
+   *  (DB-mocked unit worlds and the offline hosts never see a fill). */
+  noticeboardGuilds: (() => readonly GuildLeaderboardEntry[] | null) | null = null;
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
@@ -9845,6 +9851,11 @@ export class GameServer {
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
     const suppressedInvites = this.suppressBlockedSocialInvites(events);
+    // Guild-signpost fill: swap each 'empty' noticeboard read for the realm
+    // guild-board listings (server/noticeboard_guilds.ts). Whole-element
+    // replacement in the batch array, in the same pre-serialization window
+    // the flair stamp uses; a replaced event serializes like any other.
+    if (this.noticeboardGuilds) fillEmptyNoticeboardEvents(events, this.noticeboardGuilds);
     // Serialize each event exactly once for the whole batch (after the flair stamp
     // above, so the fragment carries the final wire shape). Every recipient's frame is
     // then assembled by joining the fragments it selects, index-aligned with `events`,
@@ -9853,8 +9864,8 @@ export class GameServer {
     // INVARIANT: nothing in the per-session loop below may mutate a SimEvent after this
     // point, or a recipient's fragment would stop matching its event. The one in-loop
     // visitor that takes `ev` is botDetector.observeEvent, an observer that writes the
-    // tracking context and never the event; the once-per-batch flair stamp above is the
-    // only event mutation and correctly precedes this serialization.
+    // tracking context and never the event; the flair stamp and the noticeboard
+    // fill above are the only event writes and correctly precede this serialization.
     const fragments = serializeEventFragments(events);
     // Resolved once per batch, applied per session below against that session's
     // ANCHOR pid (so a spectator watching a fighter refreshes with them).

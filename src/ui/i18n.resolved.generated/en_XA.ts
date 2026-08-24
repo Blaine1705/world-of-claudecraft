@@ -2058,6 +2058,12 @@ export const en_XA: EnTranslations = {
       "linkHint": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš íţéɱ íñ çĥáţ.]"
     },
     "plurals": {
+      "noticeboardGuildStats": {
+        "one": "[{count} ɱéɱƀéŕ, {xp} ļíƒéţíɱé ẊÞ]",
+        "few": "[{count} ɱéɱƀéŕš, {xp} ļíƒéţíɱé ẊÞ]",
+        "many": "[{count} ɱéɱƀéŕš, {xp} ļíƒéţíɱé ẊÞ]",
+        "other": "[{count} ɱéɱƀéŕš, {xp} ļíƒéţíɱé ẊÞ]"
+      },
       "guildMembers": {
         "one": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕ]",
         "few": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
