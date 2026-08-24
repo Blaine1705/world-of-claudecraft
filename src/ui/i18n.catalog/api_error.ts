@@ -90,6 +90,7 @@ export const apiErrorStrings = {
     // reuses hudChrome.account.deactivatedLocked
     deactivated: 'This account has been deactivated. Contact an admin to restore it.',
     not_found: 'Account not found.',
+    password_already_set: 'This account already has a password. Use Change Password instead.',
   },
   // character: character creation, selection, and world-entry failures.
   character: {

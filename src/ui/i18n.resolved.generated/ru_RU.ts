@@ -1113,6 +1113,7 @@ export const ru_RU: EnTranslations = {
       "seconds": "{s} сек.",
       "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.",
       "threatFallback": "Нет данных об угрозе: показан урон по {name}",
+      "threatFrozen": "Итоговая угроза против {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Прочее ({count})",
@@ -2204,6 +2205,10 @@ export const ru_RU: EnTranslations = {
       "errPasswordLong": "Новый пароль должен содержать не более 128 символов.",
       "errPasswordUnchanged": "Новый пароль должен отличаться от текущего.",
       "errPasswordConfirm": "Новые пароли не совпадают.",
+      "setPasswordTitle": "Задать пароль",
+      "setPasswordHint": "Эта учётная запись создана через вход Apple или Discord и пока не имеет пароля. Задайте его, чтобы входить на других устройствах, например в приложениях для Mac и Windows или в веб-версии, а также привязать дополнительные способы входа.",
+      "setPasswordSubmit": "Задать пароль",
+      "passwordSet": "Пароль задан. Теперь вы можете входить с именем пользователя и паролем где угодно.",
       "emailLabel": "Эл. почта (необязательно)",
       "emailHint": "Используется только для восстановления аккаунта. Мы не рассылаем рекламные письма.",
       "saveEmail": "Сохранить почту",
@@ -3418,6 +3423,7 @@ export const ru_RU: EnTranslations = {
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(потратит отборный сорт: {count})",
+      "craftFeeLine": "Плата за изготовление: {fee} за штуку",
       "empty": "Известных рецептов пока нет.",
       "resultAria": "Создать {name}",
       "craftedToast": "Создано: {name}",
@@ -3969,6 +3975,7 @@ export const ru_RU: EnTranslations = {
       "unlockedBorderHint": "Новая рамка: {name}. Наденьте её в Книге деяний.",
       "broadcastLine": "{name} совершает деяние: {deed}",
       "rarityLine": "Совершили {percent} искателей приключений",
+      "stillToVisit": "Ещё нужно посетить: {places}",
       "trackerLabel": "Деяния",
       "collapseHint": "Свернуть список деяний",
       "expandHint": "Развернуть список деяний",
@@ -4259,7 +4266,8 @@ export const ru_RU: EnTranslations = {
       "password_too_long": "Новый пароль должен содержать не более 128 символов.",
       "characters_online": "Выйдите из всех персонажей перед деактивацией.",
       "deactivated": "Этот аккаунт деактивирован. Для восстановления обратитесь к администратору.",
-      "not_found": "Аккаунт не найден."
+      "not_found": "Аккаунт не найден.",
+      "password_already_set": "У этой учётной записи уже есть пароль. Используйте смену пароля."
     },
     "character": {
       "name_invalid": "Недопустимое имя персонажа. Используйте 2-16 букв.",
@@ -7523,6 +7531,7 @@ export const ru_RU: EnTranslations = {
       "portalOpens": "В {zone} разверзся разлом ранга {tier}!",
       "portalSealed": "Разлом ранга {tier} в {zone} запечатан.",
       "portalCollapses": "Разлом ранга {tier} в {zone} обрушился.",
+      "lootRecoveryNotice": "Вход в разлом ещё продержится: если ваша группа падёт, вы всё ещё сможете вернуться пешком за добытым.",
       "levelGate": "Войти в этот разлом могут лишь искатели приключений уровня {level} и выше.",
       "deadEntry": "Мертвым нельзя войти в разлом.",
       "deadEntryCombat": "Ваша группа все еще в бою. Мертвые смогут вернуться, когда бой закончится.",
@@ -8261,6 +8270,9 @@ export const ru_RU: EnTranslations = {
       "reload": "Перезагрузить",
       "quit": "Выйти",
       "fatalBody": "World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта."
+    },
+    "titlebar": {
+      "exitGame": "Выйти из игры"
     }
   },
   "gpuNotice": {
@@ -9198,6 +9210,7 @@ export const ru_RU: EnTranslations = {
       "offGlobalCooldown": "Вне глобального восстановления",
       "friendlyTarget": "Дружественная цель",
       "enemyTarget": "Вражеская цель",
+      "anyTarget": "Вражеская или дружественная цель",
       "selfOnly": "Только на себя",
       "damageRange": "от {min} до {max}",
       "finisherDamage": "{base} плюс {perCombo} за прием серии"
@@ -9985,6 +9998,14 @@ export const ru_RU: EnTranslations = {
       "crippling_poison": {
         "name": "Свинцовый яд",
         "description": "Поражает цель свинцовым ядом, нанося {damage} ед. урона от сил природы и замедляя ее скорость передвижения на 50% на 12 сек."
+      },
+      "melting_acid": {
+        "name": "Плавящая кислота",
+        "description": "Обливает цель едким ядом, нанося {damage} ед. урона от сил природы и снижая её броню на 5% на 12 сек."
+      },
+      "nightshade_coating": {
+        "name": "Покрытие паслёном",
+        "description": "Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек."
       },
       "expose_armor": {
         "name": "Пролом брони",

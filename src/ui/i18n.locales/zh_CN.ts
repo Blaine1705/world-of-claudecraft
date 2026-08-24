@@ -7592,6 +7592,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': '游戏画面已停止响应。要重新加载吗？',
   'desktop.crash.reload': '重新加载',
   'desktop.crash.quit': '退出',
+  'desktop.titlebar.exitGame': '退出游戏',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
@@ -13254,6 +13255,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新后才能进行游戏。下载完成后将立即应用。',
   'hudChrome.otaUpdate.progressLabel': '更新下载进度',
   'hudChrome.otaUpdate.title': '游戏更新',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': '编辑动作条布局',
   'hudChrome.barEditor.title': '编辑动作条',
   'hudChrome.barEditor.close': '关闭动作条编辑器',
@@ -13269,4 +13271,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': '清除一个槽位',
   'hudChrome.barEditor.clearArmed': '点击一个槽位即可清除。',
   'hudChrome.spellbook.assignAria': '为{name}选择一个栏位',
+  'hudChrome.meters.threatFrozen': '对{name}的最终威胁',
+  'hudChrome.account.setPasswordTitle': '设置密码',
+  'hudChrome.account.setPasswordHint':
+    '此账号是通过 Apple 登录或 Discord 创建的，目前还没有密码。设置密码后，你就可以在 Mac、Windows 桌面应用或网页等其他设备上用它登录，并关联其他登录方式。',
+  'hudChrome.account.setPasswordSubmit': '设置密码',
+  'hudChrome.account.passwordSet': '密码已设置。你现在可以在任何地方使用用户名和密码登录。',
+  'hudChrome.crafting.craftFeeLine': '制作费：每件 {fee}',
+  'hudChrome.deeds.stillToVisit': '仍需造访：{places}',
+  'apiError.account.password_already_set': '此账号已经设置了密码。请改用更改密码。',
+  'sim.rift.lootRecoveryNotice':
+    '裂隙入口还会维持一段时间：如果你的队伍倒下，仍可返回取回已获得的东西。',
+  'abilityUi.tooltip.anyTarget': '敌方或友方目标',
+  'entities.abilities.melting_acid.name': '溶解酸',
+  'entities.abilities.melting_acid.description':
+    '向目标泼洒腐蚀性毒液，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。',
+  'entities.abilities.nightshade_coating.name': '夜影涂层',
+  'entities.abilities.nightshade_coating.description':
+    '用夜影覆盖目标，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。',
 };

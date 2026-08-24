@@ -7896,6 +7896,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
+  'desktop.titlebar.exitGame': 'ゲームを終了',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
@@ -13537,6 +13538,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
   'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'アクションバーの配置を編集',
   'hudChrome.barEditor.title': 'アクションバーの編集',
   'hudChrome.barEditor.close': 'アクションバー編集を閉じる',
@@ -13552,4 +13554,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': 'スロットをクリア',
   'hudChrome.barEditor.clearArmed': 'スロットをタップするとクリアします。',
   'hudChrome.spellbook.assignAria': '{name}を配置するスロットを選択',
+  'hudChrome.meters.threatFrozen': '{name}への最終脅威',
+  'hudChrome.account.setPasswordTitle': 'パスワードを設定',
+  'hudChrome.account.setPasswordHint':
+    'このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードがありません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他の端末でもサインインでき、追加のサインイン方法も連携できます。',
+  'hudChrome.account.setPasswordSubmit': 'パスワードを設定',
+  'hudChrome.account.passwordSet':
+    'パスワードを設定しました。これでどこでもユーザー名とパスワードでサインインできます。',
+  'hudChrome.crafting.craftFeeLine': '製作手数料：1個あたり {fee}',
+  'hudChrome.deeds.stillToVisit': '未訪問：{places}',
+  'apiError.account.password_already_set':
+    'このアカウントにはすでにパスワードがあります。代わりにパスワード変更を使用してください。',
+  'sim.rift.lootRecoveryNotice':
+    '裂け目の入口はまだしばらく保たれます。パーティーが倒れても、得たものを取り戻しに歩いて戻れます。',
+  'abilityUi.tooltip.anyTarget': '敵または味方の対象',
+  'entities.abilities.melting_acid.name': '溶解酸',
+  'entities.abilities.melting_acid.description':
+    '対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。',
+  'entities.abilities.nightshade_coating.name': 'ナス科毒の塗布',
+  'entities.abilities.nightshade_coating.description':
+    '対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。',
 };

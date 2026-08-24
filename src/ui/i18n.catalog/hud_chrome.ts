@@ -1062,6 +1062,13 @@ export const hudChromeStrings = {
     // so is the point: a frozen damage readout under a "Threat" heading is what
     // players read as the meter having stopped updating.
     threatFallback: 'No live threat: showing damage to {name}',
+    // Threat tab subtitle when the engaged mob died or left mid-segment but DID
+    // have a live hate table on this segment: these are still real threat
+    // numbers, just latched at the last moment they were readable, not
+    // recalculated from damage. Distinct from threatFallback above (which has
+    // no threat numbers to show at all) so a tank who watched their threat
+    // climb past a boss's health does not read the kill as having erased it.
+    threatFrozen: 'Final threat vs {name}',
     // Hover breakdown for one bar: a header line, then one row per ability. On
     // the threat tab each contributor (member or pet) has its own bar, so the
     // panel is narrowed to that contributor's abilities.
@@ -2589,6 +2596,12 @@ export const hudChromeStrings = {
     errPasswordLong: 'New password must be at most 128 characters.',
     errPasswordUnchanged: 'New password must be different from the current one.',
     errPasswordConfirm: 'New passwords do not match.',
+    // Set a Password (Apple/Discord-provisioned accounts with no password yet)
+    setPasswordTitle: 'Set a Password',
+    setPasswordHint:
+      'This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.',
+    setPasswordSubmit: 'Set Password',
+    passwordSet: 'Password set. You can now sign in with your username and password anywhere.',
     // Email
     emailLabel: 'Email (optional)',
     emailHint: 'Used only for account recovery. Use Change Email below to update it.',
@@ -4409,6 +4422,12 @@ export const hudChromeStrings = {
     // D8 downward substitution, 2x gather value), so the spend is stated
     // before the click instead of silent after it.
     reagentFineSub: '(spends {count} fine-grade)',
+    // The #1301 gold-sink fee (src/sim/professions/crafting.ts
+    // resolveCraftForRecipe), charged on every successful craft but never
+    // shown anywhere before this: {fee} is the already-localized formatMoney
+    // string, so no separate number param is needed. "Each" matters because
+    // the row's Create and Create All controls can submit multi-craft batches.
+    craftFeeLine: 'Craft fee: {fee} each',
     empty: 'No recipes known yet.',
     resultAria: 'Craft {name}',
     // The SOLE player-visible line for a craft grant (#2430). The grant hub's
@@ -5309,6 +5328,11 @@ export const hudChromeStrings = {
     unlockedBorderHint: 'New border earned: {name}. Wear it from the Book of Deeds.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
+    // The exploration-deed card's still-missing-places line (deeds_window.ts
+    // missingPoiLabels): which named places an unearned wayfarer deed still
+    // needs, so a player is never left guessing which one of the ten never
+    // registered.
+    stillToVisit: 'Still to visit: {places}',
     trackerLabel: 'Deeds',
     collapseHint: 'Collapse deed tracker',
     expandHint: 'Expand deed tracker',

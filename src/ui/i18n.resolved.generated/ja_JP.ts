@@ -1113,6 +1113,7 @@ export const ja_JP: EnTranslations = {
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
       "threatFallback": "リアルタイムのヘイトなし：{name}へのダメージを表示",
+      "threatFrozen": "{name}への最終脅威",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
@@ -2204,6 +2205,10 @@ export const ja_JP: EnTranslations = {
       "errPasswordLong": "新しいパスワードは128文字以内にしてください。",
       "errPasswordUnchanged": "新しいパスワードは現在のものと異なる必要があります。",
       "errPasswordConfirm": "新しいパスワードが一致しません。",
+      "setPasswordTitle": "パスワードを設定",
+      "setPasswordHint": "このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードがありません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他の端末でもサインインでき、追加のサインイン方法も連携できます。",
+      "setPasswordSubmit": "パスワードを設定",
+      "passwordSet": "パスワードを設定しました。これでどこでもユーザー名とパスワードでサインインできます。",
       "emailLabel": "メールアドレス（任意）",
       "emailHint": "アカウント復旧にのみ使用します。宣伝メールは一切送信しません。",
       "saveEmail": "メールを保存",
@@ -3418,6 +3423,7 @@ export const ja_JP: EnTranslations = {
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（上質な等級を{count}個消費）",
+      "craftFeeLine": "製作手数料：1個あたり {fee}",
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
@@ -3969,6 +3975,7 @@ export const ja_JP: EnTranslations = {
       "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
       "broadcastLine": "{name}が功績「{deed}」を達成しました",
       "rarityLine": "冒険者の{percent}が達成",
+      "stillToVisit": "未訪問：{places}",
       "trackerLabel": "功績",
       "collapseHint": "功績トラッカーを折りたたむ",
       "expandHint": "功績トラッカーを展開",
@@ -4259,7 +4266,8 @@ export const ja_JP: EnTranslations = {
       "password_too_long": "新しいパスワードは128文字以内にしてください。",
       "characters_online": "無効化する前にすべてのキャラクターからログアウトしてください。",
       "deactivated": "このアカウントは無効化されています。復元するには管理者に連絡してください。",
-      "not_found": "アカウントが見つかりません。"
+      "not_found": "アカウントが見つかりません。",
+      "password_already_set": "このアカウントにはすでにパスワードがあります。代わりにパスワード変更を使用してください。"
     },
     "character": {
       "name_invalid": "キャラクター名が無効です。2-16文字の英字を使用してください。",
@@ -7523,6 +7531,7 @@ export const ja_JP: EnTranslations = {
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
+      "lootRecoveryNotice": "裂け目の入口はまだしばらく保たれます。パーティーが倒れても、得たものを取り戻しに歩いて戻れます。",
       "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。",
       "deadEntry": "死亡した状態では裂け目に入れない。",
       "deadEntryCombat": "パーティーはまだ戦闘中だ。戦いが終われば、死者も再び入れる。",
@@ -8261,6 +8270,9 @@ export const ja_JP: EnTranslations = {
       "reload": "再読み込み",
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
+    },
+    "titlebar": {
+      "exitGame": "ゲームを終了"
     }
   },
   "gpuNotice": {
@@ -9198,6 +9210,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
+      "anyTarget": "敵または味方の対象",
       "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
@@ -9985,6 +9998,14 @@ export const ja_JP: EnTranslations = {
       "crippling_poison": {
         "name": "鉛の毒",
         "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。"
+      },
+      "melting_acid": {
+        "name": "溶解酸",
+        "description": "対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。"
+      },
+      "nightshade_coating": {
+        "name": "ナス科毒の塗布",
+        "description": "対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。"
       },
       "expose_armor": {
         "name": "装甲破り",

@@ -1113,6 +1113,7 @@ export const ko_KR: EnTranslations = {
       "seconds": "{s}초",
       "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
       "threatFallback": "실시간 위협 없음: {name}에게 입힌 피해 표시",
+      "threatFrozen": "{name}에 대한 최종 위협",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",
@@ -2204,6 +2205,10 @@ export const ko_KR: EnTranslations = {
       "errPasswordLong": "새 비밀번호는 128자 이하여야 합니다.",
       "errPasswordUnchanged": "새 비밀번호는 현재 비밀번호와 달라야 합니다.",
       "errPasswordConfirm": "새 비밀번호가 서로 일치하지 않습니다.",
+      "setPasswordTitle": "비밀번호 설정",
+      "setPasswordHint": "이 계정은 Apple 로그인 또는 Discord로 생성되었으며 아직 비밀번호가 없습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 같은 다른 기기에서 로그인하고 추가 로그인 방법을 연결할 수 있습니다.",
+      "setPasswordSubmit": "비밀번호 설정",
+      "passwordSet": "비밀번호가 설정되었습니다. 이제 어디서든 사용자 이름과 비밀번호로 로그인할 수 있습니다.",
       "emailLabel": "이메일(선택 사항)",
       "emailHint": "계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.",
       "saveEmail": "이메일 저장",
@@ -3418,6 +3423,7 @@ export const ko_KR: EnTranslations = {
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
+      "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
@@ -3969,6 +3975,7 @@ export const ko_KR: EnTranslations = {
       "unlockedBorderHint": "새 테두리 획득: {name}. 업적의 서에서 착용할 수 있습니다.",
       "broadcastLine": "{name} 님이 업적을 달성했습니다: {deed}",
       "rarityLine": "모험가 중 {percent} 달성",
+      "stillToVisit": "아직 방문할 곳: {places}",
       "trackerLabel": "업적",
       "collapseHint": "업적 추적기 접기",
       "expandHint": "업적 추적기 펼치기",
@@ -4259,7 +4266,8 @@ export const ko_KR: EnTranslations = {
       "password_too_long": "새 비밀번호는 128자 이하여야 합니다.",
       "characters_online": "비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.",
       "deactivated": "이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.",
-      "not_found": "계정을 찾을 수 없습니다."
+      "not_found": "계정을 찾을 수 없습니다.",
+      "password_already_set": "이 계정에는 이미 비밀번호가 있습니다. 대신 비밀번호 변경을 사용하세요."
     },
     "character": {
       "name_invalid": "캐릭터 이름이 올바르지 않습니다. 2-16자의 글자를 사용하세요.",
@@ -7523,6 +7531,7 @@ export const ko_KR: EnTranslations = {
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
+      "lootRecoveryNotice": "균열 입구는 아직 한동안 버팁니다. 파티가 쓰러져도 획득한 것을 되찾으러 걸어 돌아갈 수 있습니다.",
       "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.",
       "deadEntry": "죽은 상태로는 균열에 들어갈 수 없습니다.",
       "deadEntryCombat": "파티가 아직 전투 중입니다. 전투가 끝나면 죽은 자도 다시 들어갈 수 있습니다.",
@@ -8261,6 +8270,9 @@ export const ko_KR: EnTranslations = {
       "reload": "다시 불러오기",
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
+    },
+    "titlebar": {
+      "exitGame": "게임 종료"
     }
   },
   "gpuNotice": {
@@ -9198,6 +9210,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "anyTarget": "적 또는 아군 대상",
       "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
@@ -9985,6 +9998,14 @@ export const ko_KR: EnTranslations = {
       "crippling_poison": {
         "name": "둔중한 독",
         "description": "둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
+      },
+      "melting_acid": {
+        "name": "용해 산",
+        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다."
+      },
+      "nightshade_coating": {
+        "name": "가지독 코팅",
+        "description": "대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",

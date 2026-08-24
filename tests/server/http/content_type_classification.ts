@@ -87,6 +87,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/releases': PROBLEM_JSON,
   '/api/account': PROBLEM_JSON,
   '/api/account/password': PROBLEM_JSON,
+  '/api/account/password/set-initial': PROBLEM_JSON,
   '/api/account/password/forgot': PROBLEM_JSON,
   '/api/account/password/reset': PROBLEM_JSON,
   '/api/account/logout': PROBLEM_JSON,

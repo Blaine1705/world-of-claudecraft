@@ -88,62 +88,10 @@ const MONOLITHS: MonolithRow[] = [
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
-    // The release-side row had meanwhile been raised 19420 -> 19432 (+12) for
-    // the desktop-client-update packet (a maintainer decision, PR #3406) and
-    // re-pinned to 19433 after its own v0.38.0 sync; the exact merged count
-    // below supersedes that release pin.
-    // Re-pinned from 19170 after the v0.39.0 sync merge: the release stopped
-    // warming the Armory catalog on a schedule and moved the ability
-    // description prose out to src/ui/ability_description.ts, so the merged
-    // file landed SMALLER again and the ratchet follows it down (exact count).
-    // Re-pinned 19120 -> 19170 at the second v0.39.0 sync merge (release tip
-    // f48c7a3a9b): the castle-branch merge grew hud.ts on the release side
-    // (its row went to 19488 there), and the merged file here lands at exactly
-    // 19170. Re-derived from the merged tree, not taken from either side,
-    // keeping the zero-headroom posture: the next line added fails.
-    // Re-pinned 19170 -> 19069 at the third v0.39.0 sync merge (release tip
-    // b650d9d7d2): the release extracted abilityEffectText into
-    // ability_description.ts and this branch's preview_prewarm_wiring.ts
-    // absorbed the login prewarm trim's flags, so the merged file landed
-    // SMALLER than either side (release row 19387). Exact merged count, zero
-    // headroom: the next line added fails.
-    // Lowered 19069 -> 19043 after the bag $WOC balance chip moved out to
-    // src/ui/woc_balance_chip.ts (the ratchet's own rule: an extraction lowers
-    // the ceiling, never raises it). Exact count, zero headroom.
-    // Re-pinned 19043 -> 19151 at the v0.40.0 sync merge (release tip
-    // a0a30f922b): the release's controller cross-hotbar wiring grew hud.ts
-    // on the release side (its row went to 19490 there, thin-consumer wiring
-    // to the extracted src/ui/hud/cross_hotbar/ domain, a maintainer decision
-    // documented on that row), and it lands here on top of this branch's
-    // woc_balance_chip extraction. The merged file counts exactly 19151.
-    // Re-derived from the merged tree, not taken from either side, keeping
-    // the zero-headroom posture: the next line added fails.
-    // Re-pinned 19151 -> 19154 at the second v0.40.0 sync merge (release tip
-    // 65b91fa190): the release's GPU-preparation scheduler is net zero on
-    // hud.ts, and the whole +3 is its two NEW imports surviving the union
-    // resolution of the branch's own import edits (isComposedPortraitKey,
-    // used by the composed-portrait key arm, and armPreviewOpen from
-    // preview_stand_in). prewarmPlayerPortrait deliberately does NOT come
-    // back: this branch moved its only call site into
-    // src/ui/preview_prewarm_wiring.ts, which imports it directly.
-    // Exact merged count, zero headroom: the next line added fails.
-    // Down 19154 -> 19152 at the Exchange UX round: the woc:wallet-verify
-    // dispatch moved to src/ui/wallet_verify_request.ts on the rule of three
-    // (the Exchange banner's connect shortcut was the fourth copy), paying
-    // for that shortcut's dep. Exact count, zero headroom kept.
-    // LOWERED 18693 -> 18688 by the PR 3606 review fixes: the dead
-    // closeWocMarket() is deleted (its sole occurrence was its definition)
-    // and the mobile More-tray launcher's raw listener moved behind
-    // MobileControls.bindButton with its tray siblings, leaving a comment.
-    // Exact count, zero headroom.
-    // Re-pinned 19152 -> 18693 at the third v0.40.0 sync merge (release tip
-    // b39b16022e): the release ran its own extraction campaign on hud.ts (the
-    // touch radial ring, the consumables seat, the bar editor, the stance
-    // radial and the chrome focus wiring all moved behind their seams, taking
-    // the release row 19490 -> 19031), and those deletions land on top of this
-    // branch's arm, so the merged file lands far BELOW both parents. Exact
-    // merged count, zero headroom: the next line added fails.
-    ceiling: 18688,
+    // Re-pinned to the exact merged count after reconciling the OSSBrain
+    // v0.40 batch with the current release branch. The merged file is smaller
+    // than both parent pins, so the ratchet follows it down with zero slack.
+    ceiling: 18694,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -384,31 +332,10 @@ const MONOLITHS: MonolithRow[] = [
     // b650d9d7d2): release-side growth only (its own row went to 11490); the
     // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
-    // The release side then grew the file for its gamepad work and lowered it
-    // again with the pad-selection extraction (the pad's own targeting rules
-    // moved to src/game/pad_target_pick.ts), and the v0.40.0 GPU-scheduler
-    // work extracted the blocking arrival chain (src/game/arrival_warmup.ts),
-    // taking the release's own row down to 11516.
-    // Re-pinned 11555 -> 11519 at the second v0.40.0 sync merge (release tip
-    // 65b91fa190): the release's extractions net against this branch's three
-    // added lines (the Exchange wiring import plus its attach call, and the
-    // checkout error text now resolved through the shared wallet-bridge
-    // module). Exact merged count, zero headroom: the next line added fails.
-    // Raised 11522 -> 11523 (+1) for the PR 3606 review fixes: the Exchange's
-    // More-tray launcher routes through MobileControlCallbacks, whose bag is
-    // wired here and nowhere else, so the ONE line is
-    // `onWocMarket: () => hud.toggleWocMarket()` (the onBarEditor precedent
-    // exactly; the same change deletes five lines from hud.ts). Maintainer
-    // decision, exact merged count: any further growth reds again.
-    // Re-pinned 11519 -> 11522 at the third v0.40.0 sync merge (release tip
-    // b39b16022e): the release's fast-loading-screen-variety round plus its
-    // review fixes moved its own row 11516 -> 11519, and this branch's three
-    // Exchange lines (the wiring import, its attach call, the shared
-    // wallet-bridge checkout error text) ride on top of it. The merged file
-    // counts exactly 11522. Re-derived from the merged tree, not taken from
-    // either side, keeping the zero-headroom posture: the next line added
-    // fails.
-    ceiling: 11523,
+    // Re-pinned to the exact merged count after reconciling the OSSBrain
+    // v0.40 batch with the current release branch. This preserves the branch
+    // wiring and the release-side More-tray launcher without adding slack.
+    ceiling: 11497,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -427,7 +354,10 @@ const MONOLITHS: MonolithRow[] = [
     // in the self-snapshot build plus its wireParkedMana import); the
     // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
-    ceiling: 10813,
+    // Re-pinned to the exact merged count after reconciling the OSSBrain
+    // v0.40 batch with the current release branch. This conflict resolution
+    // did not alter server/game.ts beyond the merged parents.
+    ceiling: 10837,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

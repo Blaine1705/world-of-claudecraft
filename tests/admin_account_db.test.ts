@@ -207,6 +207,7 @@ describe('admin account detail query', () => {
             character_count: 2,
             max_level: 12,
             playtime_seconds: '3600',
+            total_copper: '4500',
             is_ai: false,
             is_streamer: false,
           },
@@ -228,6 +229,7 @@ describe('admin account detail query', () => {
         characterCount: 2,
         maxLevel: 12,
         playtimeSeconds: 3600,
+        totalCopper: 4500,
         isAi: false,
         isStreamer: false,
       },
@@ -238,11 +240,20 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[0][0]).toContain(
       'FROM play_session_totals t WHERE t.account_id = a.id',
     );
-    expect(mocks.query.mock.calls[0][1]).toEqual(['%ali%', 25, 0]);
+    expect(mocks.query.mock.calls[0][1]).toEqual(['%ali%', 25, 0, null]);
     // The listing read goes through pool.query directly on the default
     // statement timeout; it must not silently grow the heavy-allowance wrap
     // (its per-account subqueries are bounded, unlike accountDetail's).
     expect(mocks.runWithStatementTimeout).not.toHaveBeenCalled();
+  });
+
+  it('does not cast all-digit searches outside PostgreSQL int range', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+    await listAccounts('3000000000', 1, 25);
+
+    expect(mocks.query.mock.calls[0][1]).toEqual(['%3000000000%', 25, 0, null]);
+    expect(mocks.query.mock.calls[1][1]).toEqual(['%3000000000%', null]);
   });
 
   it('defaults the accounts ORDER BY to id DESC, matching the old fixed order', async () => {

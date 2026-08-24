@@ -290,7 +290,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 969,
-      "state": "f8941292",
+      "state": "61dbb701",
       "events": "d595937a",
       "rng": {
         "draws": 0,
@@ -301,7 +301,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 969,
-      "state": "4b0796ed",
+      "state": "62a76c34",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -312,7 +312,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "07cb34d6",
+      "state": "b0c78665",
       "events": "6cd16806",
       "rng": {
         "draws": 2,
@@ -323,7 +323,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "07cb34d6",
+      "state": "b0c78665",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -418,6 +418,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "delveClears": {},
@@ -571,7 +574,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 969,
-      "state": "33ea5994",
+      "state": "553da6eb",
       "events": "f731da68",
       "rng": {
         "draws": 6,
@@ -666,6 +669,9 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "delveClears": {},
@@ -823,7 +829,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 969,
-      "state": "9035e3d8",
+      "state": "8845255f",
       "events": "741638a5",
       "rng": {
         "draws": 68,

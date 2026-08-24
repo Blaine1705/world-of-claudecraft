@@ -70,6 +70,7 @@ import type { Recorder, Scenario } from './record';
 // ----- shared helpers ---------------------------------------------------------
 
 type AnyEntity = Entity & { nythraxis?: NythraxisEncounterState };
+const FRESH_CORPSE_TIMER = 60;
 
 interface SimPrivateHarness {
   completeTame(player: Entity, target: Entity): void;
@@ -1513,6 +1514,7 @@ function partyLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1572,6 +1574,7 @@ function l1LootDistribution(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c];
@@ -1705,6 +1708,7 @@ function masterLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c, d];

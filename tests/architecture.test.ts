@@ -1988,12 +1988,13 @@ const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-
 // Assigned, passed, returned, spread, shorthanded, probed or cast rather than
 // dereferenced: `= document)`, `(document)`, `return document;`, `() => window`,
 // `{ document }`, `[document, window]`, `{ ...globalThis }`,
-// `typeof window !== 'undefined'`, `(window as X).y`. Anchored on a code delimiter
-// at BOTH ends so prose ("close the window, then click") cannot match, and the
-// open brace refuses a `${...}` interpolation so a template variable named
-// `window` (talent_i18n has one) is not mistaken for the global.
+// `typeof window !== 'undefined'`, `(window as X).y`, and ternary value arms such
+// as `enabled ? window : fallback`. Anchored on a code delimiter at BOTH ends so
+// prose ("close the window, then click") cannot match, and the open brace refuses
+// a `${...}` interpolation so a template variable named `window` (talent_i18n has
+// one) is not mistaken for the global.
 const UI_HOST_VALUE_RE = new RegExp(
-  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|\\?\\s*(?:${UI_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
   'm',
 );
 // window.location reached bare. Pinned to the real Location members so a game
@@ -2054,7 +2055,7 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   [
     'a browser global, passed or probed',
     new RegExp(
-      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|\\?\\s*(?:${HELPER_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
       'm',
     ),
   ],
@@ -2117,6 +2118,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
@@ -2477,6 +2479,8 @@ describe('src/ui module classification (every module is swept by exactly one gat
       'const deps = { document };',
       'const hosts = [document, window];',
       'const merged = { ...globalThis };',
+      'const host = enabled ? window : fallback;',
+      'const doc = enabled ? document : fallback;',
     ]) {
       expect(UI_HOST_VALUE_RE.test(positive), positive).toBe(true);
     }
@@ -2552,6 +2556,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect(HELPER_HOST_PATTERNS[0][1].test('document.createElement(x)')).toBe(false);
     expect(HELPER_HOST_PATTERNS[0][1].test('window.innerWidth')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test("typeof localStorage !== 'undefined'")).toBe(true);
+    expect(HELPER_HOST_PATTERNS[1][1].test('const host = enabled ? window : fallback;')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test('return document;')).toBe(false);
     // The helper document rule counts every access, so a second, live-tree call
     // cannot hide behind the sanctioned one.

@@ -10,6 +10,7 @@ const EXPECTED_CODES = [
   'account.characters_online',
   'account.deactivated',
   'account.not_found',
+  'account.password_already_set',
   'account.password_too_long',
   'account.password_too_short',
   'account.username_invalid',

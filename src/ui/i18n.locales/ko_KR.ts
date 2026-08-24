@@ -7886,6 +7886,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.body': '게임 화면이 응답하지 않습니다. 다시 불러올까요?',
   'desktop.crash.reload': '다시 불러오기',
   'desktop.crash.quit': '종료',
+  'desktop.titlebar.exitGame': '게임 종료',
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
   'gpuNotice.bodyDesktop':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
@@ -13539,6 +13540,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '플레이하려면 업데이트가 필요합니다. 다운로드가 끝나는 대로 적용됩니다.',
   'hudChrome.otaUpdate.progressLabel': '업데이트 다운로드 진행률',
   'hudChrome.otaUpdate.title': '게임 업데이트',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': '행동 단축바 배치 편집',
   'hudChrome.barEditor.title': '행동 단축바 편집',
   'hudChrome.barEditor.close': '행동 단축바 편집 닫기',
@@ -13554,4 +13556,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.barEditor.clearAria': '슬롯 비우기',
   'hudChrome.barEditor.clearArmed': '슬롯을 탭하면 비워집니다.',
   'hudChrome.spellbook.assignAria': '{name}을(를) 놓을 칸 선택',
+  'hudChrome.meters.threatFrozen': '{name}에 대한 최종 위협',
+  'hudChrome.account.setPasswordTitle': '비밀번호 설정',
+  'hudChrome.account.setPasswordHint':
+    '이 계정은 Apple 로그인 또는 Discord로 생성되었으며 아직 비밀번호가 없습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 같은 다른 기기에서 로그인하고 추가 로그인 방법을 연결할 수 있습니다.',
+  'hudChrome.account.setPasswordSubmit': '비밀번호 설정',
+  'hudChrome.account.passwordSet':
+    '비밀번호가 설정되었습니다. 이제 어디서든 사용자 이름과 비밀번호로 로그인할 수 있습니다.',
+  'hudChrome.crafting.craftFeeLine': '제작 수수료: 개당 {fee}',
+  'hudChrome.deeds.stillToVisit': '아직 방문할 곳: {places}',
+  'apiError.account.password_already_set':
+    '이 계정에는 이미 비밀번호가 있습니다. 대신 비밀번호 변경을 사용하세요.',
+  'sim.rift.lootRecoveryNotice':
+    '균열 입구는 아직 한동안 버팁니다. 파티가 쓰러져도 획득한 것을 되찾으러 걸어 돌아갈 수 있습니다.',
+  'abilityUi.tooltip.anyTarget': '적 또는 아군 대상',
+  'entities.abilities.melting_acid.name': '용해 산',
+  'entities.abilities.melting_acid.description':
+    '대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다.',
+  'entities.abilities.nightshade_coating.name': '가지독 코팅',
+  'entities.abilities.nightshade_coating.description':
+    '대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
 };

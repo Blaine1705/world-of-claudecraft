@@ -81,6 +81,8 @@ export const ERROR_CODES = deepFreeze({
   'account.deactivated': { params: [] },
   // identity: "account not found" (the account row vanished mid-session)
   'account.not_found': { params: [] },
+  // identity: "this account already has a password, use change password instead"
+  'account.password_already_set': { params: [] },
 
   // character: character creation, selection, and world-entry failures.
   // identity: "invalid character name (2-16 letters)"

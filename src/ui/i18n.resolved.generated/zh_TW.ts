@@ -1113,6 +1113,7 @@ export const zh_TW: EnTranslations = {
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。",
       "threatFallback": "無即時仇恨：顯示對{name}造成的傷害",
+      "threatFrozen": "對{name}的最終威脅",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
@@ -2204,6 +2205,10 @@ export const zh_TW: EnTranslations = {
       "errPasswordLong": "新密碼最多只能包含 128 個字元。",
       "errPasswordUnchanged": "新密碼必須與目前密碼不同。",
       "errPasswordConfirm": "兩次輸入的新密碼不一致。",
+      "setPasswordTitle": "設定密碼",
+      "setPasswordHint": "此帳號是透過 Apple 登入或 Discord 建立的，目前還沒有密碼。設定密碼後，你就可以在 Mac、Windows 桌面應用程式或網頁等其他裝置上用它登入，並連結其他登入方式。",
+      "setPasswordSubmit": "設定密碼",
+      "passwordSet": "密碼已設定。你現在可以在任何地方使用使用者名稱和密碼登入。",
       "emailLabel": "電子郵件（選填）",
       "emailHint": "僅用於帳號復原。我們絕不寄送行銷郵件。",
       "saveEmail": "儲存電子郵件",
@@ -3418,6 +3423,7 @@ export const zh_TW: EnTranslations = {
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 個優質品級）",
+      "craftFeeLine": "製作費：每件 {fee}",
       "empty": "尚無已知配方。",
       "resultAria": "製作{name}",
       "craftedToast": "已製作:{name}",
@@ -3969,6 +3975,7 @@ export const zh_TW: EnTranslations = {
       "unlockedBorderHint": "獲得新邊框：{name}。可在功績之書中佩戴。",
       "broadcastLine": "{name} 達成了功績：{deed}",
       "rarityLine": "{percent} 的冒險者已達成",
+      "stillToVisit": "仍需造訪：{places}",
       "trackerLabel": "功績",
       "collapseHint": "摺疊功績追蹤器",
       "expandHint": "展開功績追蹤器",
@@ -4259,7 +4266,8 @@ export const zh_TW: EnTranslations = {
       "password_too_long": "新密碼最多只能包含 128 個字元。",
       "characters_online": "請先登出所有角色再進行停用。",
       "deactivated": "此帳號已停用。請聯絡管理員以還原。",
-      "not_found": "找不到帳號。"
+      "not_found": "找不到帳號。",
+      "password_already_set": "此帳號已經設定密碼。請改用變更密碼。"
     },
     "character": {
       "name_invalid": "角色名稱無效。請使用 2-16 個字母。",
@@ -7523,6 +7531,7 @@ export const zh_TW: EnTranslations = {
       "portalOpens": "一道{tier}級裂隙在{zone}撕裂而開！",
       "portalSealed": "{zone}的{tier}級裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}級裂隙坍塌了。",
+      "lootRecoveryNotice": "裂隙入口還會維持一段時間：如果你的隊伍倒下，仍可返回取回已獲得的東西。",
       "levelGate": "只有等級達到{level}級或以上的冒險者才能進入這道裂隙。",
       "deadEntry": "死亡狀態下無法進入裂隙。",
       "deadEntryCombat": "你的隊伍仍在戰鬥中。戰鬥結束後，死者方可重新進入。",
@@ -8261,6 +8270,9 @@ export const zh_TW: EnTranslations = {
       "reload": "重新載入",
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
+    },
+    "titlebar": {
+      "exitGame": "離開遊戲"
     }
   },
   "gpuNotice": {
@@ -9198,6 +9210,7 @@ export const zh_TW: EnTranslations = {
       "offGlobalCooldown": "不觸發公共冷卻",
       "friendlyTarget": "友方目標",
       "enemyTarget": "敵方目標",
+      "anyTarget": "敵方或友方目標",
       "selfOnly": "僅對自己",
       "damageRange": "{min} 到 {max}",
       "finisherDamage": "{base} 加每個連擊點 {perCombo}"
@@ -9985,6 +9998,14 @@ export const zh_TW: EnTranslations = {
       "crippling_poison": {
         "name": "沉鉛之毒",
         "description": "用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。"
+      },
+      "melting_acid": {
+        "name": "溶解酸",
+        "description": "向目標潑灑腐蝕性毒液，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。"
+      },
+      "nightshade_coating": {
+        "name": "夜影塗層",
+        "description": "用夜影覆蓋目標，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。"
       },
       "expose_armor": {
         "name": "裂甲",
