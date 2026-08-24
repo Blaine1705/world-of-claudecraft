@@ -2,12 +2,12 @@ import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 import {
   createNameplateHeraldry,
-  NAMEPLATE_HERALDRY_EXTRA_LIFT,
   NAMEPLATE_HERALDRY_TITLE_STEP,
   NAMEPLATE_HERALDRY_WELL_ALPHA,
   NAMEPLATE_HERALDRY_WELL_FILL,
   type NameplateHeraldryInput,
   nameplateHeraldryInto,
+  nameplateHeraldryLift,
 } from './nameplate_heraldry_core';
 import { drawNameplateLootIcon } from './nameplate_loot_icon';
 
@@ -526,7 +526,7 @@ export class NameplateCanvasSurface {
   };
 
   private heraldryLift(state: NameplateCanvasState): number {
-    return state.border && borderAccent(state.border) ? NAMEPLATE_HERALDRY_EXTRA_LIFT : 0;
+    return nameplateHeraldryLift(state.border);
   }
 
   private nameRowHeight(state: NameplateCanvasState): number {

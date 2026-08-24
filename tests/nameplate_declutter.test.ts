@@ -401,7 +401,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     for (let i = 0; i < 4_000; i++) {
       anchors.push({ id: i, sx: 5e6 + i * 1_000, sy: 1e6 + i * 1_000 });
     }
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
     expect(metrics.candidateChecks).toBe(anchors.length);
   });
@@ -411,7 +415,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     for (let i = 0; i < 4_000; i++) {
       anchors.push({ id: i, sx: i * 70, sy: 100 });
     }
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
@@ -420,13 +428,48 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     expect(metrics.candidateChecks).toBeLessThan(anchors.length * 8);
   });
 
+  it('widens the neighbour sweep only when a live anchor wears heraldry', () => {
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 123,
+      spatialHashResizes: 123,
+      neighborCellProbes: 123,
+    };
+
+    declutterNameplatesInPlace([], 0, metrics);
+
+    expect(metrics).toEqual({
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    });
+
+    const borderless: NameplateAnchor[] = [
+      { id: 1, sx: 0, sy: 0 },
+      { id: 2, sx: OVERLAP_THRESHOLD_X_PX * 4, sy: 0 },
+    ];
+
+    declutterNameplatesInPlace(borderless, borderless.length, metrics);
+
+    expect(metrics.neighborCellProbes).toBe(borderless.length * 9);
+
+    const mixed = [heraldryAnchor(1, 0, 0), { id: 2, sx: OVERLAP_THRESHOLD_X_PX * 4, sy: 0 }];
+
+    declutterNameplatesInPlace(mixed, mixed.length, metrics);
+
+    expect(metrics.neighborCellProbes).toBe(mixed.length * 25);
+  });
+
   it('keeps the heraldry-only diagonal scan linear in a large mixed chain', () => {
     const anchors: NameplateAnchor[] = [];
     for (let i = 0; i < 4_000; i++) {
       const anchor = { id: i, sx: i * 90, sy: i * 24 };
       anchors.push(i % 2 === 0 ? heraldryAnchor(anchor.id, anchor.sx, anchor.sy) : anchor);
     }
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
@@ -440,7 +483,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     for (let i = 0; i < 4_000; i++) {
       anchors.push({ id: i, sx: 100, sy: 100 });
     }
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
@@ -455,7 +502,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     for (let i = 0; i < 4_000; i++) {
       anchors.push({ id: 4_000 + i, sx: OVERLAP_THRESHOLD_X_PX * 2 - 1, sy: 100 });
     }
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
@@ -488,7 +539,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       for (let i = 0; i < 2_000; i++) anchors.push({ id: i, ...leftXBound });
       for (let i = 0; i < 2_000; i++) anchors.push({ id: 2_000 + i, ...leftYBound });
       for (let i = 0; i < 4_000; i++) anchors.push({ id: 4_000 + i, ...right });
-      const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+      const metrics: NameplateDeclutterMetrics = {
+        candidateChecks: 0,
+        neighborCellProbes: 0,
+        spatialHashResizes: 0,
+      };
 
       declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
@@ -507,7 +562,7 @@ describe('nameplate declutter: spatial-hash hot path', () => {
     for (let i = 0; i < 10_000; i++) {
       anchors.push({ id: i, sx: i * 1_000, sy: i * 1_000 });
     }
-    const metrics = { candidateChecks: 0, spatialHashResizes: -1 };
+    const metrics = { candidateChecks: 0, neighborCellProbes: 0, spatialHashResizes: -1 };
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
     expect(metrics.spatialHashResizes).toBeGreaterThan(0);
 
@@ -528,7 +583,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       { id: 1, sx: farX, sy: 100 },
       { id: 2, sx: -farX, sy: 500 },
     ];
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
@@ -609,7 +668,11 @@ describe('nameplate declutter: spatial-hash hot path', () => {
       { id: 8, sx: 104, sy: 101 },
     ];
     const invalidBefore = anchors.slice(0, 6).map((anchor) => ({ ...anchor }));
-    const metrics: NameplateDeclutterMetrics = { candidateChecks: 0, spatialHashResizes: 0 };
+    const metrics: NameplateDeclutterMetrics = {
+      candidateChecks: 0,
+      neighborCellProbes: 0,
+      spatialHashResizes: 0,
+    };
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 

@@ -35,7 +35,7 @@ import {
 } from './nameplate_canvas';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
-import { NAMEPLATE_HERALDRY_EXTRA_LIFT } from './nameplate_heraldry_core';
+import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
@@ -233,7 +233,7 @@ export class NameplatePainter {
       }
 
       const anchor = this.anchorScratch[this.anchorCount];
-      const extraLift = state.border ? NAMEPLATE_HERALDRY_EXTRA_LIFT : 0;
+      const extraLift = nameplateHeraldryLift(state.border);
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;

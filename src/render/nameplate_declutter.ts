@@ -22,6 +22,8 @@ export interface NameplateAnchor {
 export interface NameplateDeclutterMetrics {
   /** Anchor visits in component collection and diagonal queries, not total operations. */
   candidateChecks: number;
+  /** Spatial-hash neighbour lookups, used to pin the 3x3/5x5 sweep choice. */
+  neighborCellProbes: number;
   /** Explicit typed-buffer growth events, not transient engine or Array.sort allocations. */
   spatialHashResizes: number;
 }
@@ -316,6 +318,7 @@ export function declutterNameplatesInPlace(
   const n = Math.min(count, anchors.length);
   if (metrics) {
     metrics.candidateChecks = 0;
+    metrics.neighborCellProbes = 0;
     metrics.spatialHashResizes = 0;
   }
   if (n < 2) return anchors;
@@ -325,10 +328,12 @@ export function declutterNameplatesInPlace(
 
   occupiedSlots.length = 0;
   spatialOrder.length = 0;
+  let anyHeraldry = false;
   for (let i = 0; i < n; i++) {
     const cx = cellCoord(anchors[i].sx, OVERLAP_THRESHOLD_X_PX);
     const cy = cellCoord(anchors[i].sy, OVERLAP_THRESHOLD_Y_PX);
     if (cx === null || cy === null) continue;
+    if (hasHeraldry(anchors[i])) anyHeraldry = true;
     const slot = findCellSlot(cx, cy, true);
     anchorCellSlot[i] = slot;
     spatialOrder.push(i);
@@ -382,6 +387,9 @@ export function declutterNameplatesInPlace(
     cellMaxHeraldryY[slot] = maxHeraldryY;
   }
 
+  // Borderless frames retain the original 3x3 sweep. Radius two is required
+  // only when a live heraldry anchor can reach into the second cell ring.
+  const neighborRadius = anyHeraldry ? 2 : 1;
   for (const seedSlot of occupiedSlots) {
     if (cellVisitedStamp[seedSlot] === cellEpoch) continue;
 
@@ -400,8 +408,9 @@ export function declutterNameplatesInPlace(
       if (metrics) metrics.candidateChecks += end - start;
 
       let neighborSlotCount = 0;
-      for (let dx = -2; dx <= 2; dx++) {
-        for (let dy = -2; dy <= 2; dy++) {
+      for (let dx = -neighborRadius; dx <= neighborRadius; dx++) {
+        for (let dy = -neighborRadius; dy <= neighborRadius; dy++) {
+          if (metrics) metrics.neighborCellProbes++;
           const neighbor = findCellSlot(cellX[slot] + dx, cellY[slot] + dy, false);
           if (neighbor < 0 || neighbor === slot) continue;
           let seenSlot = false;
@@ -430,6 +439,9 @@ export function declutterNameplatesInPlace(
       sum += anchors[j].sy;
       if (hasHeraldry(anchors[j])) stackOffset = HERALDRY_STACK_OFFSET_PX;
     }
+    // One wearer selects a uniform 28px pitch for the whole connected
+    // component. Mixed crowds share that pitch deliberately so the fan stays
+    // visually regular instead of alternating between ragged gap sizes.
     const baseSy = sum / cluster.length;
     const mid = (cluster.length - 1) / 2;
     for (let k = 0; k < cluster.length; k++) {

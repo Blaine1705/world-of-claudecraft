@@ -23,6 +23,11 @@ export const NAMEPLATE_HERALDRY_TITLE_STEP = 11;
 export const NAMEPLATE_HERALDRY_TITLE_BASELINE = 9;
 export const NAMEPLATE_HERALDRY_NAME_BASELINE_FROM_CENTER = 5;
 
+/** Extra collision and anchor lift for a slug that can paint world heraldry. */
+export function nameplateHeraldryLift(slug: string): number {
+  return borderAccent(slug) ? NAMEPLATE_HERALDRY_EXTRA_LIFT : 0;
+}
+
 const NAMEPLATE_HERALDRY_JOINT_HEIGHT = 8;
 const NAMEPLATE_HERALDRY_JOINT_OVERLAP = 2;
 const NAMEPLATE_HERALDRY_MOTIF_SCALE = 6;

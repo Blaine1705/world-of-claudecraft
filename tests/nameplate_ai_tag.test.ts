@@ -343,6 +343,14 @@ describe('batched canvas nameplate state', () => {
     expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
     expect(anchorOf(painter, 2).extraLift).toBe(8);
 
+    // The painter and canvas must agree on whether a resolved slug can paint
+    // heraldry. An unknown truthy slug paints no plaque, so it must reserve no
+    // collision lift either.
+    stateOf(painter, 2).border = 'retired_border_slug';
+    bordered.pos = { x: 20, y: 0, z: 0 } as Entity['pos'];
+    painter.update(false);
+    expect(anchorOf(painter, 2).extraLift).toBe(0);
+
     // Empty and null selections: the reset must blank the slug the plate
     // already holds instead of leaking a previous seal and ribbon.
     bordered.border = '';
