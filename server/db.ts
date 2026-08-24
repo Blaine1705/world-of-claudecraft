@@ -4575,10 +4575,12 @@ export async function loadMailState(): Promise<MailSave | null> {
   return loadWorldState<MailSave>(mailStateKey(REALM));
 }
 
-// Retained for the pre-existing `saveMailState`/db-mock surface (many
-// unrelated tests stub the whole `server/db` module and reference this name);
-// production no longer calls it on the hot path (see saveMailPartitions
-// below), but it remains a correct, complete whole-book write.
+// Test-only surface: many unrelated tests stub the whole `server/db` module
+// and reference this name, so it is retained for that, but no production path
+// calls it any more (see saveMailPartitions below). Post-backfill it writes
+// the legacy `mail:<realm>` key, which loadMailState never reads back once
+// the marker is set, so a caller here would be writing into the void; it
+// remains a correct, complete whole-book write for whatever still exercises it.
 export async function saveMailState(save: MailSave): Promise<void> {
   await saveWorldState(mailStateKey(REALM), save);
 }
