@@ -2147,7 +2147,10 @@ let realAdminDb: AdminDb | undefined;
 let adminDbOverride: AdminDb | undefined;
 
 /** The active admin db: a setAdminDbForTests override if present, else the real bundle. */
-function adminDb(): AdminDb {
+// Exported for sibling admin-surface RouteDef modules (woc_market_routes.ts):
+// one live bundle, one test seam, so the ownership sweep's fakes reach every
+// admin route regardless of which module mounts the gate.
+export function adminDb(): AdminDb {
   if (adminDbOverride) return adminDbOverride;
   realAdminDb ??= makeRealAdminDb();
   return realAdminDb;

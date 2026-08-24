@@ -8,7 +8,7 @@ import { addThreat } from '../src/sim/threat';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
-// Entering Duskveil must drop the rogue out of every hostile's targeting.
+// Entering Duskveil must drop the rogue out of every hostile's live targeting.
 //
 // The reported PvP defect: a hunter or warlock pet that already had the rogue
 // as its aggro target kept it through the stealth cast, because updatePet only
@@ -95,7 +95,7 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     slipIntoDuskveil(sim, rogue, rogueId);
 
     expect(pet.aggroTargetId).toBeNull();
-    expect(pet.threat.has(rogue.id)).toBe(false);
+    expect(pet.threat.has(rogue.id)).toBe(true);
     // ...and it does not simply re-acquire on the following ticks.
     for (let i = 0; i < 20; i++) sim.tick();
     expect(pet.aggroTargetId).toBeNull();
@@ -135,7 +135,7 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
     expect(foe.queuedOnSwingCostMultiplier).toBeUndefined();
   });
 
-  it('a hostile mob drops its hate-table entry and taunt lock', () => {
+  it('a hostile mob drops its live lock and then prunes if it cannot re-detect', () => {
     const sim = new Sim({ seed: 17, playerClass: 'rogue', autoEquip: true });
     sim.setPlayerLevel(20);
     const rogue = sim.player;
@@ -154,7 +154,7 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
 
     expect(mob.aggroTargetId).toBeNull();
     expect(mob.forcedTargetId).toBeNull();
-    expect(mob.threat.size).toBe(0);
+    expect(mob.threat.has(rogue.id)).toBe(false);
   });
 
   it('Smokestep drops the rogue AND settles it in a single sweep of the entity map', () => {
@@ -185,15 +185,19 @@ describe('entering Duskveil clears every hostile lock on the rogue', () => {
       (sim as unknown as { entities: Map<number, Entity> }).entities = counted;
       counted.sweeps = 0;
       sim.castAbility(ability);
-      // Either cast really did the work the sweeps are being counted for.
-      expect(mob.threat.has(rogue.id)).toBe(false);
+      // Either cast really did the live-lock work the sweeps are being counted for.
       expect(mob.aggroTargetId).toBeNull();
+      if (ability === 'stealth') {
+        expect(mob.threat.has(rogue.id)).toBe(true);
+      } else {
+        expect(mob.threat.has(rogue.id)).toBe(false);
+      }
       return counted.sweeps;
     };
 
     const plain = sweepsFor('stealth');
     expect(plain).toBe(1);
-    expect(sweepsFor('vanish')).toBe(plain + 1);
+    expect(sweepsFor('vanish')).toBe(plain + 2);
   });
 
   it('Smokestep still drops the rogue out of combat while it clears the lock', () => {

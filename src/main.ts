@@ -170,6 +170,7 @@ import { shouldClearTargetOnGroundClick } from './game/target_click';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentResetDay, currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { attachWocMarketExchange } from './game/woc_market_wiring';
 import { telemetryZoneId } from './game/world_telemetry';
 import { zoneWarmupMode } from './game/zone_transition';
 import { createZoneWarmTracker } from './game/zone_warm_tracker';
@@ -490,6 +491,7 @@ import {
   setWocBalance,
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
+import { claudiumCheckoutErrorText } from './ui/wallet_bridge_reason_text';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import type { IWorld } from './world_api';
 import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
@@ -2087,6 +2089,7 @@ async function startGame(
     onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
     onBarEditor: () => hud.toggleBarEditor(),
+    onWocMarket: () => hud.toggleWocMarket(),
     onTalents: () => hud.toggleTalents(),
     onMap: () => hud.toggleMap(),
     onLeaderboard: () => hud.toggleLeaderboard(),
@@ -3394,14 +3397,9 @@ async function startGame(
             throw new Error(t('hudChrome.claudium.checkoutNotSettled'));
           }
         })().catch((err) => {
-          const message = err instanceof Error ? err.message : '';
-          if (/connect a wallet first/i.test(message)) {
-            throw new Error(t('hudChrome.claudium.checkoutWalletRequired'));
-          }
-          if (/wallet cannot sign and send transactions/i.test(message)) {
-            throw new Error(t('hudChrome.claudium.checkoutWalletUnsupported'));
-          }
-          throw new Error(message || t('hudChrome.claudium.checkoutFailed'));
+          // Classified in the shared wallet-bridge module; raw log for devs.
+          console.warn('[claudium] checkout failed', err);
+          throw new Error(claudiumCheckoutErrorText(err));
         });
       },
       spend: async (itemId, kind, expectedCostClaudium) => {
@@ -3419,6 +3417,12 @@ async function startGame(
         };
       },
     };
+    attachWocMarketExchange({
+      hud,
+      api,
+      online,
+      wallet: { linkedPubkey: () => linkedWalletPubkey, load: loadWallet },
+    });
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);
       if (

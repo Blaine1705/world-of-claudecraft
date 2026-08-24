@@ -13,6 +13,7 @@ import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
 import { CheaterMarkRefused } from './cheater_mark_api';
 import { pool } from './db';
 import { flagRegistrationBurst } from './suspicion_flags';
+import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
 export const REPORT_REASONS = [
   'harassment',
@@ -642,6 +643,9 @@ export async function moderateAccount(input: {
   }
   fireOnAccountModerated();
   fireOnModerationQueueChanged();
+  // Post-commit like the hooks above: the cached guard reads must serve the
+  // committed ban/suspension state, never be re-primed with pre-commit rows.
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 export async function muteAccountChat(input: {
@@ -690,6 +694,7 @@ export async function muteAccountChat(input: {
     client.release();
   }
   fireOnModerationQueueChanged();
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 /**
@@ -851,6 +856,7 @@ export async function liftAccountChatMute(input: {
   } finally {
     client.release();
   }
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 /**
@@ -888,6 +894,7 @@ export async function reactivateAccountAudited(input: {
   } finally {
     client.release();
   }
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 /**
@@ -919,6 +926,7 @@ export async function resetChatStrikesAudited(input: {
       });
     }
     await client.query('COMMIT');
+    if (found) bustWocAuthGuardAccount(input.accountId);
     return found;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});

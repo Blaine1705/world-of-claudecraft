@@ -51,7 +51,7 @@ import {
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
 import { resolveTalentHitMult } from '../talent_hit_mult';
-import { addThreat } from '../threat';
+import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Aura, Entity } from '../types';
 import {
   angleTo,
@@ -237,7 +237,7 @@ import {
   stoneboundThreatMultiplier,
 } from './shaman_warspirit';
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
-import { clearHostileTargetingOnStealth } from './stealth_focus';
+import { dropTargetsOnStealth } from './stealth';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 import { warlockFearBreakThreshold } from './warlock_fear';
@@ -277,15 +277,12 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
 }
 
 /**
- * The combat-drop half of Vanish: clear the caster's own combat state (and the
- * pet's, which escapes with its owner) and report the EXTRA ids the hostile
- * scan must shake loose beyond the caster itself.
- *
- * It deliberately does not run that scan: the caller hands these ids to
- * `clearHostileTargetingOnStealth`, which every stealth entry already runs, so
- * the world-wide entity sweep happens once per cast instead of twice.
+ * The combat-drop half of Vanish / Greater Invisibility: clear the caster's own
+ * combat state, clear the escaping pet, wipe both ids from hostile mob hate, and
+ * return the extra ids the live-target sweep must clear. Ordinary stealth uses
+ * only that live-target sweep, so it never becomes a full threat dump.
  */
-function dropSelfFromCombat(ctx: SimContext, p: Entity): readonly number[] {
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -295,12 +292,34 @@ function dropSelfFromCombat(ctx: SimContext, p: Entity): readonly number[] {
   delete p.queuedOnSwingCostMultiplier;
 
   const pet = ctx.petOf(p.id);
-  if (!pet) return [];
-  pet.combatTimer = 5;
-  pet.inCombat = false;
-  pet.aggroTargetId = null;
-  pet.targetId = null;
-  return [pet.id];
+  const escapeIds = pet ? [p.id, pet.id] : [p.id];
+  if (pet) {
+    pet.combatTimer = 5;
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.targetId = null;
+  }
+
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    let dropped = false;
+    for (const id of escapeIds) {
+      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
+      dropThreat(entity, id);
+      if (entity.aggroTargetId === id) {
+        entity.aggroTargetId = null;
+        dropped = true;
+      }
+    }
+    if (!dropped) continue;
+    if (entity.ownerId !== null) {
+      if (entity.aggroTargetId === null) entity.inCombat = false;
+    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
+      entity.aiState = 'evade';
+      entity.inCombat = false;
+    }
+  }
+  return pet ? [pet.id] : [];
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -3111,6 +3130,16 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // The tooltip is literally "Vanish for 20 sec", so Greater Invisibility
+        // gets the SAME hostile drop as Smokestep/Vanish: dropSelfFromHostileFocus
+        // wipes the mob hate tables and drops the mage from combat, then
+        // dropTargetsOnStealth clears the residual mob target and every enemy
+        // player's lock (pets already go blind via petCanSeeStealthedTarget).
+        // Same order and same p.stealthed gate as the selfBuff/Vanish path above.
+        if (p.stealthed) {
+          const alsoHidden = dropSelfFromHostileFocus(ctx, p);
+          dropTargetsOnStealth(ctx, p, alsoHidden);
+        }
         break;
       }
       case 'aoeAllyDamage': {
@@ -3546,14 +3575,24 @@ export function runEffects(
             ability: ability.id,
           });
         }
-        if (eff.kind === 'stealth') {
-          // Concealment drops every hostile's LOCK on the caster, not just what
-          // they can newly acquire: a pet that already had the rogue targeted
-          // used to keep hitting them right through Duskveil (the PvP report).
-          // Vanish also drops the caster (and pet) out of combat first, so both
-          // halves settle in the SAME hostile sweep rather than one each.
-          const alsoDropped = dropsCombatOnStealth(ability) ? dropSelfFromCombat(ctx, p) : [];
-          clearHostileTargetingOnStealth(ctx, p, alsoDropped);
+        // Vanish (dropsCombatOnStealth) drops the rogue from combat and wipes every
+        // hostile mob's hate table, flipping a wild mob to evade the instant it
+        // dropped something. This MUST run BEFORE dropTargetsOnStealth below: that
+        // sweep clears the mob's live aggro, and running it first would starve this
+        // pass's "did I drop anything" detection so the evade / combat-exit flip
+        // would never fire (a Kidney Shot into Vanish would leave the stunned mob
+        // chasing in combat for the whole stun).
+        const alsoHidden =
+          eff.kind === 'stealth' && dropsCombatOnStealth(ability)
+            ? dropSelfFromHostileFocus(ctx, p)
+            : [];
+        // Entering stealth (Duskveil/Smokestep/Stalk/Vanish) releases every hostile
+        // hunter's live lock on the caster. Gated on p.stealthed (applyAura sets it
+        // synchronously) so an aura rejected by an early return never wipes the
+        // board while the caster never actually hid. The toggle-OFF path above
+        // breaks before this apply, so it only fires on the way IN.
+        if (eff.kind === 'stealth' && p.kind === 'player' && p.stealthed) {
+          dropTargetsOnStealth(ctx, p, alsoHidden);
         }
         recalcPlayerStats(
           p,

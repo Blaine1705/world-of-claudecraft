@@ -719,4 +719,38 @@ describe('moderationStatusForAccount precedence', () => {
     expect(s.deactivated).toBeFalsy();
     expect(s.message).toContain('suspended');
   });
+  // Direct-path parity after the auth_guard_core extraction: the fetch +
+  // compute pair must carry the mute, strike, and LEFT-JOINed policy columns
+  // exactly as the inline compute did, and a lapsed suspension must unlock.
+  it('carries mute, strikes, and the quota policy through the direct read', async () => {
+    const mutedUntil = new Date(Date.now() + 1_800_000).toISOString();
+    accountRow = {
+      banned_at: null,
+      suspended_until: null,
+      moderation_reason: null,
+      chat_muted_until: mutedUntil,
+      chat_strikes: '2',
+      deactivated_at: null,
+      messages: '5',
+      window_minutes: '10',
+    };
+    const s = await moderationStatusForAccount(1);
+    expect(s.locked).toBe(false);
+    expect(s.chatMutedUntil).toBe(new Date(mutedUntil).toISOString());
+    expect(s.chatStrikes).toBe(2);
+    expect(s.generalChatRateLimit).toEqual({ messages: 5, windowMinutes: 10 });
+  });
+  it('a lapsed suspension is unlocked through the direct read (read-time compute)', async () => {
+    accountRow = {
+      banned_at: null,
+      suspended_until: new Date(Date.now() - 1_000).toISOString(),
+      moderation_reason: 'timeout',
+      chat_muted_until: null,
+      chat_strikes: 0,
+      deactivated_at: null,
+    };
+    const s = await moderationStatusForAccount(1);
+    expect(s.locked).toBe(false);
+    expect(s.suspendedUntil).toBeNull();
+  });
 });

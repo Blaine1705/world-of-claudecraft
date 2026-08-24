@@ -451,6 +451,8 @@ const baseEnTable = {
   'aura.sprintRune': 'Sprint',
   'aura.battleRune': 'Battle Rune',
   'aura.wardRune': 'Ward Rune',
+  // Aspect of the Cheetah (Courser's Guise) daze debuff (combat/hunter_shared.ts).
+  'aura.courserDaze': 'Dazed',
   'mechanic.warStomp': 'Shuddering Stomp',
   // Heroic warrior-mob anti-kite charge (MobTemplate.charge, src/sim/mob/charge.ts):
   // the stun debuff on the player and the {mechanic} in the "unleashes" line.
@@ -8481,6 +8483,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Sprint: 'aura.sprintRune',
   'Battle Rune': 'aura.battleRune',
   'Ward Rune': 'aura.wardRune',
+  Dazed: 'aura.courserDaze',
   'Might of the Bear': 'aura.elixirBear',
   // Crafted alchemy elixir auras (content/profession_items.ts): the
   // buff_sta aura display name each crafted elixir pushes on use.
