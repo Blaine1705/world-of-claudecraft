@@ -684,7 +684,9 @@ describe('trade-partner reads the router-parsed query', () => {
     service({
       tradePartner: async (_account: number, name: string) => {
         seen = name;
-        return { name, walletVerified: true } as Awaited<ReturnType<WocMarketService['tradePartner']>>;
+        return { name, walletVerified: true } as Awaited<
+          ReturnType<WocMarketService['tradePartner']>
+        >;
       },
     });
     const ctx = readCtx({ query: { name: 'Aldan' } });
@@ -696,9 +698,9 @@ describe('trade-partner reads the router-parsed query', () => {
   it('404s when the partner does not resolve', async () => {
     service({ tradePartner: async () => null });
     const ctx = readCtx({ query: { name: 'Nobody' } });
-    await expect(
-      handlerFor('GET', '/api/woc-market/trade-partner')(ctx),
-    ).rejects.toMatchObject({ status: 404 });
+    await expect(handlerFor('GET', '/api/woc-market/trade-partner')(ctx)).rejects.toMatchObject({
+      status: 404,
+    });
   });
 });
 
@@ -1122,9 +1124,7 @@ describe('the route table shape', () => {
     // authorized to read a character must not see marketplace finances. The
     // public reads (status, browse, detail, estimate, histories) stay on the
     // read guard deliberately: they expose nothing account-private.
-    const meBlock = src
-      .split(/\n {2}\{\n/)
-      .find((b) => b.includes("path: '/api/woc-market/me'"));
+    const meBlock = src.split(/\n {2}\{\n/).find((b) => b.includes("path: '/api/woc-market/me'"));
     expect(meBlock).toBeDefined();
     expect(meBlock).toContain('activeAccount');
     expect(meBlock).not.toMatch(/middleware: \[readAccount/);

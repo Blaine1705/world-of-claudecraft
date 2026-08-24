@@ -123,9 +123,7 @@ function validatedServiceBase(base: string): URL | null {
   }
   if (url.protocol === 'https:') return url;
   if (url.protocol === 'http:' && privateHttpHostAllowed(url.hostname)) return url;
-  logFailure(
-    new Error('WOC_MARKET_SERVICE_URL must be https, or http to a private host'),
-  );
+  logFailure(new Error('WOC_MARKET_SERVICE_URL must be https, or http to a private host'));
   return null;
 }
 

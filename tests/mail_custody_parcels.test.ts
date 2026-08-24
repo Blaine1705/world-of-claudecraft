@@ -155,10 +155,7 @@ describe('custodyRef book-once dedupe', () => {
     // six-figure-letter class) a this.mail scan is a hot-path walk. The
     // behavior half lives in tests/mail_index.test.ts; this pins that the
     // PostOffice read actually rides it.
-    const src = readFileSync(
-      new URL('../src/sim/mail/post_office.ts', import.meta.url),
-      'utf8',
-    );
+    const src = readFileSync(new URL('../src/sim/mail/post_office.ts', import.meta.url), 'utf8');
     const body = /hasCustodyParcel\(custodyRef: string\): boolean \{([\s\S]*?)\n {2}\}/.exec(src);
     expect(body, 'hasCustodyParcel body not found').not.toBeNull();
     expect(body?.[1]).toContain('this.index.hasCustodyRef(custodyRef)');
