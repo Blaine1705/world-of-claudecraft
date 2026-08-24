@@ -5,6 +5,7 @@ import {
   VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
   VARKHUL_CINDER_ARTIFICER_HEAL_PCT_HEROIC,
   VARKHUL_CINDER_ARTIFICER_HEAL_PCT_NORMAL,
+  VARKHUL_CINDER_ARTIFICER_MINIMUM_WINDOW_SECONDS,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
   VARKHUL_CINDER_REPAIR_CAST_ID,
@@ -13,6 +14,7 @@ import {
   VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
   VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
   VARKHUL_CINDER_REPAIR_TICK_SECONDS,
+  varkhulCinderArtificerCanQueue,
   varkhulCinderArtificerPortalIndex,
   varkhulCinderRepairTickAmount,
 } from '../src/sim/varkhul_cinder_artificer';
@@ -37,6 +39,14 @@ describe('Varkhul Cinder Artificer', () => {
     expect(
       Array.from({ length: 9 }, (_, index) => varkhulCinderArtificerPortalIndex(index)),
     ).toEqual([0, 1, 2, 3, 0, 1, 2, 3, 0]);
+  });
+
+  it('only queues a portal when its warning and full repair channel still fit', () => {
+    expect(VARKHUL_CINDER_ARTIFICER_MINIMUM_WINDOW_SECONDS).toBe(8);
+    expect(varkhulCinderArtificerCanQueue(8)).toBe(true);
+    expect(varkhulCinderArtificerCanQueue(7.95)).toBe(false);
+    expect(varkhulCinderArtificerCanQueue(0)).toBe(false);
+    expect(varkhulCinderArtificerCanQueue(Number.NaN)).toBe(false);
   });
 
   it('repairs every second for six ticks, with a harsher Heroic channel', () => {

@@ -378,7 +378,9 @@ last add falls, Varkhul is stunned for fifteen seconds and takes 50% increased d
 A Cinder Artificer runs on a separate portal clock and never replaces, consumes, or
 delays an ordinary Warden/Sentinel wave. The first Artificer portal opens ten seconds
 after the intermission begins and another opens every eighteen seconds while the phase
-continues, rotating deterministically through the four corners. After its two-second
+continues, rotating deterministically through the four corners. A new portal is not
+queued unless at least eight seconds remain, preserving its full two-second warning and
+six-second repair window. After its two-second
 portal warning, the Artificer runs directly to Varkhul and channels Recalibrate for six
 seconds. Recalibrate heals once after each complete second: 2% of Varkhul's maximum
 health per tick on Normal and 3% on Heroic, for 12% or 18% if the full channel

@@ -64,6 +64,7 @@ import {
   VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
   VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
   VARKHUL_CINDER_REPAIR_TICK_SECONDS,
+  varkhulCinderArtificerCanQueue,
   varkhulCinderArtificerPortalIndex,
   varkhulCinderRepairTickAmount,
 } from '../varkhul_cinder_artificer';
@@ -1509,6 +1510,10 @@ function updateForgeArtificerSpawns(
 
   st.assemblyArtificerNextSpawnRemaining = Math.max(0, st.assemblyArtificerNextSpawnRemaining - DT);
   if (st.assemblyArtificerNextSpawnRemaining > CAST_COMPLETE_EPS) return;
+  if (!varkhulCinderArtificerCanQueue(Math.max(0, st.assemblyRemaining - DT))) {
+    st.assemblyArtificerNextSpawnRemaining = VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS;
+    return;
+  }
   queueForgeArtificer(ctx, boss, st);
   st.assemblyArtificerNextSpawnRemaining = VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS;
 }

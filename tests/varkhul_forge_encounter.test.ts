@@ -297,8 +297,8 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyArtificerSpawnIndex).toBe(1);
   });
 
-  it('opens the first Artificer portal at 10 seconds, spawns it two seconds later, and repeats at 18 seconds', () => {
-    const { sim, boss } = claimedEncounter(742);
+  it('opens Artificer portals at 10, 28 and 46 seconds but omits the unfair late portal', () => {
+    const { sim, boss } = claimedEncounter(742, true);
     boss.hp = Math.floor(boss.maxHp * 0.5);
 
     updateVarkhulEncounter(sim.ctx, boss);
@@ -320,10 +320,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(
       sim.events
         .slice(firstQueueEventStart)
-        .filter(
-          (event) =>
-            event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
-        ),
+        .filter((event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches'),
     ).toHaveLength(1);
 
     for (let tick = 0; tick < 39; tick++) updateVarkhulEncounter(sim.ctx, boss);
@@ -348,11 +345,94 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(
       sim.events
         .slice(secondQueueEventStart)
-        .filter(
-          (event) =>
-            event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
-        ),
+        .filter((event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches'),
     ).toHaveLength(1);
+
+    for (let tick = 0; tick < 359; tick++) updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyArtificerSpawnIndex).toBe(2);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyArtificerSpawnIndex).toBe(3);
+    expect(state.assemblyArtificerPortalSpawns).toEqual([{ portalIndex: 2, remaining: 2 }]);
+
+    for (let tick = 0; tick < 359; tick++) updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyArtificerSpawnIndex).toBe(3);
+    const lateQueueEventStart = sim.events.length;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyRemaining).toBeLessThan(8);
+    expect(state.assemblyArtificerSpawnIndex).toBe(3);
+    expect(state.assemblyArtificerPortalSpawns).toEqual([]);
+    expect(state.assemblyArtificerNextSpawnRemaining).toBe(VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS);
+    expect(
+      sim.events
+        .slice(lateQueueEventStart)
+        .filter((event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches'),
+    ).toHaveLength(0);
+  });
+
+  it('only opens an Artificer portal when the full warning and repair window remains', () => {
+    const setupDuePortal = (seed: number, remaining: number) => {
+      const { sim, boss } = claimedEncounter(seed, true);
+      boss.hp = Math.floor(boss.maxHp * 0.5);
+      updateVarkhulEncounter(sim.ctx, boss);
+      const state = boss.varkhul;
+      if (!state) throw new Error('Varkhul state missing');
+      state.assemblyForgeBeamWarmupRemaining = 999;
+      state.assemblyRemaining = remaining;
+      state.assemblyArtificerNextSpawnRemaining = DT;
+      const eventStart = sim.events.length;
+      updateVarkhulEncounter(sim.ctx, boss);
+      return { sim, boss, state, eventStart };
+    };
+
+    const fair = setupDuePortal(
+      748,
+      VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS +
+        VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS +
+        DT,
+    );
+    expect(fair.state.assemblyArtificerPortalSpawns).toEqual([
+      { portalIndex: 0, remaining: VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS },
+    ]);
+    expect(fair.state.assemblyArtificerSpawnIndex).toBe(1);
+    expect(
+      fair.sim.events
+        .slice(fair.eventStart)
+        .filter((event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches'),
+    ).toHaveLength(1);
+    expect(fair.state.assemblyRemaining).toBeCloseTo(8, 8);
+    for (let tick = 0; tick < VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS / DT - 1; tick++) {
+      updateVarkhulEncounter(fair.sim.ctx, fair.boss);
+    }
+    expect(fair.state.assemblyArtificerPortalSpawns).toHaveLength(1);
+    updateVarkhulEncounter(fair.sim.ctx, fair.boss);
+    expect(fair.state.assemblyArtificerPortalSpawns).toEqual([]);
+    expect(fair.state.assemblyRemaining).toBeCloseTo(VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS, 8);
+    expect(
+      fair.state.assemblyAddIds.some(
+        (id) => fair.sim.entities.get(id)?.templateId === VARKHUL_CINDER_ARTIFICER_ID,
+      ),
+    ).toBe(true);
+
+    const tooLate = setupDuePortal(
+      749,
+      VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS + VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
+    );
+    expect(tooLate.state.assemblyArtificerPortalSpawns).toEqual([]);
+    expect(tooLate.state.assemblyArtificerSpawnIndex).toBe(0);
+    expect(tooLate.state.assemblyArtificerNextSpawnRemaining).toBe(
+      VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
+    );
+    expect(
+      tooLate.sim.events
+        .slice(tooLate.eventStart)
+        .filter((event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches'),
+    ).toHaveLength(0);
+    expect(tooLate.state.assemblyRemaining).toBeCloseTo(
+      VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS +
+        VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS -
+        DT,
+      8,
+    );
   });
 
   it('lets control stop the Artificer, then plays start, loop and end around a real repair', () => {
