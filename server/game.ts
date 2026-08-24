@@ -192,7 +192,6 @@ import {
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
-  saveMailPartitions,
   saveMarketState,
   saveRiftState,
   setAccountWeaponSkinLoadout,
@@ -279,7 +278,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
-import { rearmMailPartitionsOnFailure } from './mail_partition_rearm';
+import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   applyMobScanTick,
@@ -4710,16 +4709,7 @@ export class GameServer {
   }
 
   async saveMail(): Promise<void> {
-    await this.enqueueMarketWrite(async () => {
-      const partitions = this.sim.takeDirtyMailPartitions();
-      if (partitions.length === 0) return;
-      try {
-        await saveMailPartitions(partitions);
-      } catch (err) {
-        console.error('failed to save mail:', err);
-        rearmMailPartitionsOnFailure(this.sim, partitions);
-      }
-    });
+    await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, false);
   }
 
   // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book
@@ -6050,23 +6040,10 @@ export class GameServer {
     await this.saveCharacter(session);
   }
 
-  // Unlike the periodic saveMail() flush, a WocCustodyGameHost caller awaits
-  // this to KNOW the just-booked parcel is durable before advancing its
-  // settlement row (server/woc_market_custody.ts), so a write failure here
-  // must propagate, not just log-and-retry-next-cycle. Still rearms its
-  // drained partitions on failure so an untried #3561 autosave cycle can
-  // recover them instead of the retry finding nothing dirty to resend.
+  // The WocCustodyGameHost durability caller (server/woc_market_custody.ts):
+  // unlike saveMail(), a write failure must propagate.
   async persistMailBlob(): Promise<void> {
-    await this.enqueueMarketWrite(async () => {
-      const partitions = this.sim.takeDirtyMailPartitions();
-      if (partitions.length === 0) return;
-      try {
-        await saveMailPartitions(partitions);
-      } catch (err) {
-        rearmMailPartitionsOnFailure(this.sim, partitions);
-        throw err;
-      }
-    });
+    await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, true);
   }
 
   // Force-close every live session for the account. A bearer token is a reusable

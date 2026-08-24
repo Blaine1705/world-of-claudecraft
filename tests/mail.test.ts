@@ -5,7 +5,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
+import {
+  HEROIC_MARK_LETTER,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+} from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
@@ -1126,6 +1131,31 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
     expect(dirtyJson.length).toBeLessThan(fullJson.length / 100); // >100x smaller payload
     expect(dirtyMs).toBeLessThan(10); // the #3561 acceptance bound
     expect(dirtyMs).toBeLessThan(fullMs); // and strictly cheaper than the old approach it replaces
+  });
+
+  it('a custody parcel keeps its book-once custodyRef through the incremental partition write', () => {
+    // Regression: the extracted serializeLetter() helper this partition write
+    // rides (PostOffice.takeDirtyMailPartitions) originally dropped
+    // custodyRef, which would have silently un-booked every $WOC Exchange
+    // parcel on the next restart and let a retry double-deliver it.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    sim.takeDirtyMailPartitions(); // drain the welcome letter
+
+    const meta = sim.meta(alice);
+    if (!meta) throw new Error('no meta');
+    sim.postOffice.mailSystemParcel(
+      { key: sim.postOffice.mailKeyFor(meta), name: meta.name },
+      WOC_MARKET_DELIVERY_LETTER,
+      [{ itemId: 'rusty_hatchet', count: 1, slot: 3 }],
+      'woc_ref_test_1',
+    );
+
+    const dirty = sim.takeDirtyMailPartitions();
+    const letter = dirty
+      .flatMap((p) => p.letters)
+      .find((m) => m.subject === WOC_MARKET_DELIVERY_LETTER.subject);
+    expect(letter?.custodyRef).toBe('woc_ref_test_1');
   });
 });
 
