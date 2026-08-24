@@ -1746,6 +1746,64 @@ export const TARGETS = [
     },
   },
   {
+    key: 'paladin-ascension-charges',
+    // Extended Dawn (pal_r17_extended_dawn) raises Divine Ascension from 5 to 7
+    // charges; the HUD medallion must light all 7 pips, not just the base 5.
+    label: 'Ascension charge pips (Extended Dawn bonus)',
+    when: [
+      'src/ui/paladin_devotion_view.ts',
+      'src/render/paladin_ascension_core.ts',
+      'paladin-ascension-charges',
+    ],
+    variants: [
+      { key: 'desktop', charClass: 'paladin', charName: 'Dawnrise' },
+      { key: 'mobile', charClass: 'paladin', charName: 'Dawnrise', mobile: true },
+    ],
+    async capture(page, variant) {
+      // enterOfflineGame already dismissed the intro/tutorial/camera-prompt
+      // overlays before capture() runs; a stray Escape here has nothing left
+      // to close and instead TOGGLES the Options window open.
+      const armed = await page.evaluate(() => {
+        const devotion = window.__game?.sim?.player?.paladinDevotion;
+        if (!devotion) return false;
+        devotion.value = 0;
+        devotion.ascensionCharges = 7;
+        devotion.ascensionRemaining = 45;
+        return true;
+      });
+      if (!armed) throw new Error('player has no paladinDevotion state');
+      const ready = await pollForSize(
+        page,
+        '.paladin-devotion.ascended .paladin-ascension-charges',
+        20,
+        250,
+      );
+      if (!ready) throw new Error('ascension charges did not become visible');
+      // The charge-pip strip (.paladin-ascension-charges) is positioned partly
+      // outside the 96x96 medallion frame box (top:-6px, and its right edge
+      // overflows the frame's own width), plus each lit pip's glow extends a
+      // few px further: pad generously rather than clip it off.
+      const box = await page.evaluate(() => {
+        const frame = document.getElementById('paladin-devotion-frame');
+        if (!frame) return null;
+        const r = frame.getBoundingClientRect();
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      });
+      if (!box) throw new Error('#paladin-devotion-frame not found');
+      const pad = 28;
+      const vp = page.viewport() ?? { width: 1600, height: 900 };
+      const x = Math.max(0, box.x - pad);
+      const y = Math.max(0, box.y - pad);
+      const width = Math.min(vp.width, box.x + box.width + pad) - x;
+      const height = Math.min(vp.height, box.y + box.height + pad) - y;
+      await page.screenshot({
+        path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/paladin-ascension-charges-${variant.key}-closeup.png`,
+        clip: { x, y, width, height },
+      });
+      return {};
+    },
+  },
+  {
     key: 'inventory',
     label: 'Inventory / bags',
     when: ['ui/bags', 'ui/inventory', 'ui/item', 'ui/vendor', 'ui/loot', 'sim/content/items'],

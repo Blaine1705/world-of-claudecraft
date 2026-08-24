@@ -1751,7 +1751,7 @@
     left: 14px;
     z-index: 5;
     display: none;
-    width: 68px;
+    width: 94px;
     height: 14px;
     gap: 2px;
   }
@@ -1771,6 +1771,12 @@
     border-color: var(--color-text-light);
     background: var(--color-ascension);
     box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension);
+  }
+  /* The two Extended Dawn bonus charges (beyond the base 5) glow a distinct
+     color so the empowered bonus reads at a glance from peripheral vision. */
+  .paladin-ascension-charges span:nth-child(n + 6).on {
+    background: var(--color-ascension-bonus);
+    box-shadow: 0 0 calc(7px * var(--fx-shadow, 1)) var(--color-ascension-bonus);
   }
   .paladin-devotion.last-charge .paladin-ascension-charges span.on,
   .paladin-devotion.last-charge .paladin-devotion-label {
