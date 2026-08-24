@@ -103,12 +103,17 @@ export interface AccountPurseRefreshCounts {
  *  arm). Accounts whose characters were all deleted get their purse zeroed so
  *  a stale row can never keep a vanished fortune on the rich list.
  *
- *  Both statements scan every characters.state blob, so they ride the heavy
+ *  Both statements scan every characters.state blob, so each rides the heavy
  *  allowance: on the pool default a scan that outgrows 15 s would be cancelled
- *  and retried, identically doomed, every sweep tick. */
+ *  and retried, identically doomed, every sweep tick. One transaction PER
+ *  statement, not one around both: the upsert's ON CONFLICT locks every
+ *  conflicting row even when the DO UPDATE WHERE guard skips it, and those
+ *  locks must release at the statement's own commit rather than be held
+ *  through a second full scan (an account deletion cascading into
+ *  account_wealth would block for the pair otherwise). */
 export async function refreshAccountPurseTotals(): Promise<AccountPurseRefreshCounts> {
-  return runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
-    const upsert = await query(
+  const upsert = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
       `INSERT INTO account_wealth (account_id, purse_copper, total_copper, updated_at)
      SELECT c.account_id,
             COALESCE(sum(COALESCE((c.state->>'copper')::bigint, 0)), 0),
@@ -122,17 +127,19 @@ export async function refreshAccountPurseTotals(): Promise<AccountPurseRefreshCo
          + account_wealth.mail_copper + account_wealth.market_copper,
        updated_at = now()
      WHERE account_wealth.purse_copper IS DISTINCT FROM EXCLUDED.purse_copper`,
-    );
-    const zero = await query(
+    ),
+  );
+  const zero = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
       `UPDATE account_wealth w SET
        purse_copper = 0,
        total_copper = w.mail_copper + w.market_copper,
        updated_at = now()
      WHERE w.purse_copper <> 0
        AND NOT EXISTS (SELECT 1 FROM characters c WHERE c.account_id = w.account_id)`,
-    );
-    return { rowsChanged: upsert.rowCount ?? 0, orphansZeroed: zero.rowCount ?? 0 };
-  });
+    ),
+  );
+  return { rowsChanged: upsert.rowCount ?? 0, orphansZeroed: zero.rowCount ?? 0 };
 }
 
 export interface EscrowStateRow {

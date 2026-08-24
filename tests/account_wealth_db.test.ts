@@ -80,13 +80,15 @@ describe('refreshAccountPurseTotals', () => {
     expect(zero).toMatch(/NOT EXISTS \(SELECT 1 FROM characters/);
   });
 
-  it('runs BOTH full-scan statements on the heavy allowance, never bare on the pool', async () => {
+  it('runs each full-scan statement on its own heavy allowance, never bare on the pool', async () => {
     await refreshAccountPurseTotals();
     // Each statement detoasts every characters.state blob; on the 15 s pool
     // default a scan that outgrows it would be cancelled and retried, doomed,
-    // every tick. One transaction on the raised bound covers both.
-    expect(runWithStatementTimeout).toHaveBeenCalledTimes(1);
-    expect(runWithStatementTimeout).toHaveBeenCalledWith(60_000, expect.any(Function));
+    // every tick. One transaction PER statement: the upsert's ON CONFLICT row
+    // locks must release at its own commit, not be held through the second
+    // full scan.
+    expect(runWithStatementTimeout).toHaveBeenCalledTimes(2);
+    for (const [timeoutMs] of runWithStatementTimeout.mock.calls) expect(timeoutMs).toBe(60_000);
     expect(boundedQuery).toHaveBeenCalledTimes(2);
     expect(boundedQuery.mock.calls[0][0]).toMatch(/INSERT INTO account_wealth/);
     expect(boundedQuery.mock.calls[1][0]).toMatch(/purse_copper = 0/);

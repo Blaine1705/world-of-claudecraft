@@ -202,6 +202,38 @@ describe('moderation report helpers', () => {
     });
   });
 
+  it('degrades a failed signal read instead of losing the report and the flag', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    query
+      .mockResolvedValueOnce(queryResult([{ n: 31, cohort_ids: [42, 41] }])) // same numeric prefix
+      .mockRejectedValueOnce(new Error('statement timeout')) // same IP: the flood-sized read dies
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same /24
+      .mockResolvedValueOnce(queryResult([{ n: 1, cohort_ids: [42] }])) // same UA
+      .mockResolvedValueOnce(queryResult([])) // duplicate report check
+      .mockResolvedValueOnce(queryResult([{ id: 123 }])); // insert
+
+    const result = await createSuspiciousRegistrationReport({
+      accountId: 42,
+      username: 'aintgrave1031',
+      ip: '203.0.113.44',
+      userAgent: 'Mozilla/5.0',
+    });
+
+    // The failed signal reads as no matches; the others still earn the report
+    // and the flag (the loss would land exactly when the box is busiest).
+    expect(result.created).toBe(true);
+    expect(result.signals).toContain('31 accounts with username prefix "aintgrave" in 10 minutes');
+    expect(result.signals.some((s) => s.includes('from IP'))).toBe(false);
+    expect(query.mock.calls[5][0]).toMatch(/INSERT INTO player_reports/);
+    expect(flagRegistrationBurst).toHaveBeenCalledWith({
+      accountId: 42,
+      signals: result.signals,
+      cohortAccountIds: [42, 41],
+    });
+    expect(err).toHaveBeenCalledWith('registration burst signal read failed:', expect.any(Error));
+    err.mockRestore();
+  });
+
   it('unions the burst cohorts of every tripped signal in signal order, deduped', async () => {
     vi.mocked(flagRegistrationBurst).mockClear();
     query

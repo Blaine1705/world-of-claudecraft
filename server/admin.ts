@@ -321,6 +321,12 @@ function flagTransitionFailure(
     case 'invalid_transition':
       fail(res, 400, FLAG_INVALID_TRANSITION);
       return;
+    default: {
+      // Exhaustiveness: a new refusal variant must fail HERE at compile time,
+      // not fall through with no response written and hold the socket open.
+      const unhandled: never = error;
+      throw new Error(`unhandled flag transition refusal: ${String(unhandled)}`);
+    }
   }
 }
 

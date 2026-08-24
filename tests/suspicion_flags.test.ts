@@ -21,8 +21,10 @@ import {
   attachDetectorFlagHost,
   bustSuspicionFlagCache,
   configureSuspicionFlagDataset,
+  createAccountWriteFloor,
   createDetectorFlagHost,
   DETECTOR_FLAG_KIND,
+  DETECTOR_FLAG_RECORD_FLOOR_MS,
   DETECTOR_FLAG_REFRESH_FLOOR_MS,
   flagRegistrationBurst,
   readSuspicionFlagDataset,
@@ -47,6 +49,25 @@ afterEach(async () => {
 describe('the detector flag host', () => {
   it('pins the storage key the active-flag dedupe index is built on', () => {
     expect(DETECTOR_FLAG_KIND).toBe('session_automation');
+  });
+
+  it('pins both write floors to their literals, refresh above record', () => {
+    expect(DETECTOR_FLAG_REFRESH_FLOOR_MS).toBe(10_000);
+    expect(DETECTOR_FLAG_RECORD_FLOOR_MS).toBe(5_000);
+  });
+
+  it('drops an observation whose details is not a string, before burning a floor slot', async () => {
+    const host = createDetectorFlagHost(() => 1_700_000_000_000);
+    const malformed = { accountId: 42, details: 7 as unknown as string };
+    await expect(host.recordSuspicionFlag(malformed)).resolves.toBe(false);
+    await expect(host.refreshSuspicionFlagDetails(malformed)).resolves.toBe(false);
+    // The floor slot was not burned: a well-formed refresh still writes now.
+    await expect(
+      host.refreshSuspicionFlagDetails({ accountId: 42, details: DETAILS }),
+    ).resolves.toBe(true);
+    await suspicionFlagsIdle();
+    expect(dbMock.upsertSuspicionFlag).not.toHaveBeenCalled();
+    expect(dbMock.refreshSuspicionFlagDetails).toHaveBeenCalledOnce();
   });
 
   it('records a decision under the public storage policy (source, kind, severity, cap)', async () => {
@@ -122,11 +143,87 @@ describe('the detector flag host', () => {
     await suspicionFlagsIdle();
     expect(dbMock.refreshSuspicionFlagDetails).toHaveBeenCalledTimes(3);
     expect(dbMock.refreshSuspicionFlagDetails.mock.calls[2][0]).toMatchObject({ details: 'v3' });
-    // A record is never paced: it is a decision, not a rewrite.
+    // Records carry their own, shorter floor: legitimate decisions are a
+    // sync interval apart, so back to back records are a runaway build.
     await host.recordSuspicionFlag({ accountId: 42, details: 'decision' });
-    await host.recordSuspicionFlag({ accountId: 42, details: 'decision again' });
+    await host.recordSuspicionFlag({ accountId: 42, details: 'runaway echo' });
+    await suspicionFlagsIdle();
+    expect(dbMock.upsertSuspicionFlag).toHaveBeenCalledTimes(1);
+    now += DETECTOR_FLAG_RECORD_FLOOR_MS;
+    await host.recordSuspicionFlag({ accountId: 42, details: 'escalation' });
     await suspicionFlagsIdle();
     expect(dbMock.upsertSuspicionFlag).toHaveBeenCalledTimes(2);
+    expect(dbMock.upsertSuspicionFlag.mock.calls[1][0]).toMatchObject({ details: 'escalation' });
+  });
+
+  it('coalesces records queued behind a slow write: latest summary wins, one upsert', async () => {
+    let release: () => void = () => {};
+    const slow = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    dbMock.refreshSuspicionFlagDetails.mockImplementationOnce(async () => {
+      await slow;
+      return true;
+    });
+    const host = createDetectorFlagHost(() => 1_700_000_000_000);
+    // Another account's slow refresh holds the FIFO head.
+    const blocker = host.refreshSuspicionFlagDetails({ accountId: 43, details: 'slow' });
+    const first = host.recordSuspicionFlag({ accountId: 42, details: 'v1' });
+    const second = host.recordSuspicionFlag({ accountId: 42, details: 'v2' });
+    try {
+      expect(second).toBe(first);
+    } finally {
+      release();
+    }
+    await expect(blocker).resolves.toBe(true);
+    await expect(first).resolves.toBe(true);
+    await suspicionFlagsIdle();
+    expect(dbMock.upsertSuspicionFlag).toHaveBeenCalledOnce();
+    expect(dbMock.upsertSuspicionFlag.mock.calls[0][0]).toMatchObject({ details: 'v2' });
+  });
+
+  it('queues a newer summary behind a refresh already on the wire instead of folding into it', async () => {
+    let release: () => void = () => {};
+    const slow = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    dbMock.refreshSuspicionFlagDetails.mockImplementationOnce(async () => {
+      await slow;
+      return true;
+    });
+    let now = 1_700_000_000_000;
+    const host = createDetectorFlagHost(() => now);
+    const first = host.refreshSuspicionFlagDetails({ accountId: 42, details: 'v1' });
+    try {
+      // Let the write start: v1's details are now on the wire, so a refresh
+      // past the floor must queue v2 as its own write, not silently coalesce.
+      await new Promise((resolve) => setImmediate(resolve));
+      now += DETECTOR_FLAG_REFRESH_FLOOR_MS;
+      const second = host.refreshSuspicionFlagDetails({ accountId: 42, details: 'v2' });
+      expect(second).not.toBe(first);
+      release();
+      await expect(first).resolves.toBe(true);
+      await expect(second).resolves.toBe(true);
+    } finally {
+      release();
+    }
+    await suspicionFlagsIdle();
+    expect(
+      dbMock.refreshSuspicionFlagDetails.mock.calls.map(
+        (c) => (c[0] as { details: string }).details,
+      ),
+    ).toEqual(['v1', 'v2']);
+  });
+
+  it('resolves true for a refresh whose flag an admin already cleared (nothing to retry)', async () => {
+    dbMock.refreshSuspicionFlagDetails.mockResolvedValueOnce(false);
+    const host = createDetectorFlagHost();
+    // The write landed; no active row matched. The detector must NOT treat
+    // this as a lost write, or a cleared case becomes a permanent retry loop.
+    await expect(
+      host.refreshSuspicionFlagDetails({ accountId: 42, details: DETAILS }),
+    ).resolves.toBe(true);
+    expect(dbMock.refreshSuspicionFlagDetails).toHaveBeenCalledOnce();
   });
 
   it('coalesces refreshes queued behind a slow write: latest details win, one UPDATE', async () => {
@@ -141,8 +238,11 @@ describe('the detector flag host', () => {
     const decision = host.recordSuspicionFlag({ accountId: 42, details: 'decision' });
     const first = host.refreshSuspicionFlagDetails({ accountId: 42, details: 'v1' });
     const second = host.refreshSuspicionFlagDetails({ accountId: 42, details: 'v2' });
-    expect(second).toBe(first);
-    release();
+    try {
+      expect(second).toBe(first);
+    } finally {
+      release();
+    }
     await expect(decision).resolves.toBe(true);
     await expect(first).resolves.toBe(true);
     await suspicionFlagsIdle();
@@ -174,6 +274,25 @@ describe('the detector flag host', () => {
     expect(order).toEqual(['record', 'refresh']);
     expect(err).toHaveBeenCalled();
     err.mockRestore();
+  });
+});
+
+describe('createAccountWriteFloor', () => {
+  it('admits one write per account per window and prunes its stale memory', () => {
+    const floor = createAccountWriteFloor(10_000);
+    expect(floor.accept(1, 1_000)).toBe(true);
+    expect(floor.accept(1, 10_999)).toBe(false);
+    expect(floor.accept(2, 1_000)).toBe(true);
+    expect(floor.accept(1, 11_000)).toBe(true);
+
+    // The memory is bounded: past 10k accounts, entries old enough to be
+    // inert (a stale entry blocks nobody) are dropped. Only size() can pin
+    // this, deleting the sweep changes no accept() outcome.
+    const big = createAccountWriteFloor(10_000);
+    for (let id = 1; id <= 10_001; id++) big.accept(id, 5_000);
+    expect(big.size()).toBe(10_001);
+    big.accept(10_002, 15_000);
+    expect(big.size()).toBe(1);
   });
 });
 

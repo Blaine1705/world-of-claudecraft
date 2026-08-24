@@ -207,6 +207,22 @@ async function recentRegistrations(
   whereSql: string,
   params: unknown[],
 ): Promise<RecentRegistrations> {
+  // Degrade, never fail: one timed-out signal read must not cost the report
+  // and the flag that the OTHER signals earned (the loss would land exactly
+  // when the box is busiest, which is when the report is wanted). The failed
+  // signal reads as no matches; the readLargeMovementsPane shape.
+  try {
+    return await readRecentRegistrations(whereSql, params);
+  } catch (err) {
+    console.error('registration burst signal read failed:', err);
+    return NO_RECENT_REGISTRATIONS;
+  }
+}
+
+async function readRecentRegistrations(
+  whereSql: string,
+  params: unknown[],
+): Promise<RecentRegistrations> {
   // The window match is materialised once (the CTE is referenced twice) and
   // the cohort is a top-N over it, so the per-registration cost stays one
   // round trip with bounded memory even when the match set is the flood.

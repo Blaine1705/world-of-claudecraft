@@ -46,13 +46,23 @@ export const DETECTOR_FLAG_KIND = 'session_automation';
 // a slow database never stacks duplicate rewrites.
 export const DETECTOR_FLAG_REFRESH_FLOOR_MS = 10_000;
 
+// The same guard on decisions. Legitimate records for one account are at
+// least a sync interval apart (the initial decision, then escalations on the
+// detector's 30 s pacing), so this floor only ever bites a runaway build; a
+// decision it drops within the window is one occurrence bump folded into the
+// previous one, never a lost case (the active flag already exists and the
+// next accepted write carries the full summary).
+export const DETECTOR_FLAG_RECORD_FLOOR_MS = 5_000;
+
 // The fire-and-forget FIFO (the bank_ledger.ts recordBankOp shape): callers on
 // the tick path never await; failures log and drop the one write. Each write
 // also resolves its own outcome for a caller that wants it (the detector host
 // hands it back to the detector so a lost write can be retried). The Flagged
-// view cache busts only for writes that change the flag set or its ordering
-// (a record, a burst); a details refresh rides the 15 s TTL, or the cache
-// would be busted every few seconds by a handful of live confirmed sessions.
+// view cache busts only for writes that change the flag SET (a record, a
+// burst); a details refresh does bump last_seen_at and with it the queue
+// order, but 15 s of stale ordering is exactly what the TTL is defined to
+// tolerate, and busting per refresh would defeat the cache with a handful of
+// live confirmed sessions.
 let writeTail: Promise<void> = Promise.resolve();
 
 function enqueueFlagWrite(run: () => Promise<void>, bust: boolean): Promise<boolean> {
@@ -76,10 +86,46 @@ export function suspicionFlagsIdle(): Promise<void> {
 }
 
 function validObservation(observation: SuspicionFlagObservation): boolean {
-  return Number.isSafeInteger(observation.accountId) && observation.accountId > 0;
+  return (
+    Number.isSafeInteger(observation.accountId) &&
+    observation.accountId > 0 &&
+    // A malformed detector build must not burn the account's floor slot on a
+    // write that can only throw inside the queue.
+    typeof observation.details === 'string'
+  );
 }
 
-interface PendingRefresh {
+/** One write-per-account floor with a bounded memory of who wrote when.
+ *  Exported for its own unit tests: the pruning has no behavioral effect (a
+ *  stale entry no longer blocks anyone), only a memory bound, so only size()
+ *  can pin it. */
+export interface AccountWriteFloor {
+  /** True when accountId may write at `at`; false inside the floor window. */
+  accept(accountId: number, at: number): boolean;
+  size(): number;
+}
+
+export function createAccountWriteFloor(floorMs: number): AccountWriteFloor {
+  const lastAt = new Map<number, number>();
+  return {
+    accept(accountId, at) {
+      const last = lastAt.get(accountId);
+      if (last !== undefined && at - last < floorMs) return false;
+      lastAt.set(accountId, at);
+      // Bounded by live confirmed sessions in practice; drop entries old
+      // enough to be inert so a long-lived process never accumulates.
+      if (lastAt.size > 10_000) {
+        for (const [id, ts] of lastAt) {
+          if (at - ts >= floorMs) lastAt.delete(id);
+        }
+      }
+      return true;
+    },
+    size: () => lastAt.size,
+  };
+}
+
+interface PendingWrite {
   details: string;
   landed: Promise<boolean>;
 }
@@ -87,32 +133,41 @@ interface PendingRefresh {
 /**
  * The host the detector pushes through. Storage policy stays here: source,
  * kind, severity, dedupe (the active partial index), the details cap, and the
- * refresh cadence. The detector supplies the decision and its own evidence
- * summary, nothing else.
+ * write cadence for BOTH calls (the floors above, plus per-account coalescing
+ * while a write is queued). The detector supplies the decision and its own
+ * evidence summary, nothing else.
  */
 export function createDetectorFlagHost(now: () => number = () => Date.now()): BotDetectorHost {
-  const lastRefreshAt = new Map<number, number>();
-  const pendingRefresh = new Map<number, PendingRefresh>();
-  const forgetStaleRefreshes = (at: number): void => {
-    if (lastRefreshAt.size <= 10_000) return;
-    for (const [accountId, last] of lastRefreshAt) {
-      if (at - last >= DETECTOR_FLAG_REFRESH_FLOOR_MS) lastRefreshAt.delete(accountId);
-    }
-  };
+  const recordFloor = createAccountWriteFloor(DETECTOR_FLAG_RECORD_FLOOR_MS);
+  const refreshFloor = createAccountWriteFloor(DETECTOR_FLAG_REFRESH_FLOOR_MS);
+  const pendingRecord = new Map<number, PendingWrite>();
+  const pendingRefresh = new Map<number, PendingWrite>();
   return {
     recordSuspicionFlag(observation) {
       if (!validObservation(observation)) return Promise.resolve(false);
-      return enqueueFlagWrite(
-        () =>
-          upsertSuspicionFlag({
-            accountId: observation.accountId,
-            source: 'bot_detector',
-            kind: DETECTOR_FLAG_KIND,
-            severity: DETECTOR_FLAG_SEVERITY,
-            details: observation.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
-          }),
-        true,
-      );
+      const accountId = observation.accountId;
+      const queued = pendingRecord.get(accountId);
+      if (queued) {
+        queued.details = observation.details;
+        return queued.landed;
+      }
+      if (!recordFloor.accept(accountId, now())) return Promise.resolve(true);
+      const pending: PendingWrite = {
+        details: observation.details,
+        landed: Promise.resolve(true),
+      };
+      pendingRecord.set(accountId, pending);
+      pending.landed = enqueueFlagWrite(async () => {
+        pendingRecord.delete(accountId);
+        await upsertSuspicionFlag({
+          accountId,
+          source: 'bot_detector',
+          kind: DETECTOR_FLAG_KIND,
+          severity: DETECTOR_FLAG_SEVERITY,
+          details: pending.details.slice(0, SUSPICION_FLAG_DETAILS_MAX),
+        });
+      }, true);
+      return pending.landed;
     },
     refreshSuspicionFlagDetails(observation) {
       if (!validObservation(observation)) return Promise.resolve(false);
@@ -122,18 +177,15 @@ export function createDetectorFlagHost(now: () => number = () => Date.now()): Bo
         queued.details = observation.details;
         return queued.landed;
       }
-      const at = now();
-      const last = lastRefreshAt.get(accountId);
-      if (last !== undefined && at - last < DETECTOR_FLAG_REFRESH_FLOOR_MS) {
-        return Promise.resolve(true);
-      }
-      lastRefreshAt.set(accountId, at);
-      forgetStaleRefreshes(at);
-      const pending: PendingRefresh = {
+      if (!refreshFloor.accept(accountId, now())) return Promise.resolve(true);
+      const pending: PendingWrite = {
         details: observation.details,
         landed: Promise.resolve(true),
       };
       pendingRefresh.set(accountId, pending);
+      // Deleted BEFORE the awaited write, not after: a refresh arriving while
+      // this one is mid-flight must queue its newer summary, not fold into a
+      // write whose details are already on the wire.
       pending.landed = enqueueFlagWrite(async () => {
         pendingRefresh.delete(accountId);
         await refreshFlagDetailsSql({

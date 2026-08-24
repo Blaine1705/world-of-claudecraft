@@ -335,6 +335,8 @@ describe('transitionSuspicionFlag', () => {
     expect(statements[statements.length - 1]).toBe('ROLLBACK');
     expect(statements.some((s) => /INSERT INTO account_suspicion_flag_events/.test(s))).toBe(false);
     expect(release).toHaveBeenCalled();
+    // The FLAG_ROW_SQL re-read never runs after a rollback.
+    expect(query).not.toHaveBeenCalled();
   });
 
   it('rethrows any other UPDATE failure after rolling back', async () => {
