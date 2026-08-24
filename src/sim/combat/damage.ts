@@ -590,7 +590,19 @@ export function dealDamage(
 
   if (!resolvedHpLoss && target.kind === 'player' && amount > 0) {
     const meta = ctx.players.get(target.id);
-    if (meta?.cls === 'hunter') breakEnduringCourserBurst(ctx, target);
+    if (meta?.cls === 'hunter') {
+      breakEnduringCourserBurst(ctx, target);
+      // Courser's Guise daze: taking real damage while the aspect (or its Pack
+      // Rally form) is up halves the hunter's speed for 4s. Co-located here so it
+      // shares the canonical hunter-damage-taken guards: post-absorb `amount > 0`
+      // means a fully soaked hit never dazes, `!resolvedHpLoss` means a
+      // pre-resolved damage share never re-dazes, and only hunters pay the scan.
+      // Fall damage, drowning, and fatigue all route through dealDamage and so DO
+      // daze (classic-accurate: fall damage dazing Cheetah is the famous case); an
+      // incidental max-HP-buff HP clamp goes through recalcPlayerStats, never
+      // dealDamage, so it does not.
+      courserGuiseDazeOnDamage(ctx, target);
+    }
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
     const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');
@@ -1127,11 +1139,6 @@ export function dealDamage(
     if (amount > 0 && !target.dead) {
       onDamageTaken(ctx, target, amount);
       onShamanDamageTaken(ctx, target, amount);
-      // Aspect of the Cheetah (Courser's Guise) daze: taking actual damage while
-      // the aspect is up halves the hunter's speed for 4s. It lives in dealDamage
-      // on purpose, so ONLY real damage triggers it: a max-HP buff dropping (a
-      // recalcPlayerStats HP clamp, not damage) never dazes. No-op for everyone else.
-      courserGuiseDazeOnDamage(ctx, target);
     }
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
       const isWarrior = meta?.cls === 'warrior';

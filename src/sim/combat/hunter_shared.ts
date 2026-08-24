@@ -33,7 +33,16 @@ export const PACK_FEROCITY_DAMAGE_PER_STACK = 0.1;
 // it halves whatever the hunter is running at (aspect included), never a flat
 // base-run figure. Self-sourced so it stays out of the enemy crowd-control DR
 // ladder, and refreshed (not stacked) by each hit.
-const COURSER_GUISE_AURA_ID = 'aspect_of_the_cheetah';
+//
+// TWO aura ids count as "Courser's Guise active": the plain aspect, and pack_rally
+// (hun_r17_pack_rally), which resolveHunterSharedAbilityForTalents rewrites an
+// in-combat aspect cast into. Pack Rally's primary self-buff is the identical
+// buff_speed 1.3/1800s stamped under its own ability id, so without the second id
+// a Pack Rally hunter would ride a daze-free +30% (the exact battleground case
+// this drawback targets). NOT the same as GUISE_COURSER_ID (the transient Guise
+// Mastery burst above): that always rides ON TOP of one of these aspect auras, so
+// it is already covered and must not gate the daze on its own.
+const COURSER_GUISE_AURA_IDS: readonly string[] = ['aspect_of_the_cheetah', 'pack_rally'];
 export const COURSER_DAZE_AURA_ID = 'hunter_courser_daze';
 const COURSER_DAZE_SLOW = 0.5; // reduce movement speed to 50% of its current total
 const COURSER_DAZE_DURATION = 4; // seconds; each hit refreshes, never stacks
@@ -177,9 +186,24 @@ function triggerPredatorsPace(ctx: SimContext, hunter: Entity, meta: PlayerMeta)
   applyStateAura(ctx, hunter, PREDATOR_PACE_ICD_ID, "Predator's Pace", 8, 1);
 }
 
-// Apply or refresh the Courser's Guise daze. applyAura replaces the record by
-// (id, sourceId), so a fresh hit resets the 4s timer rather than stacking.
+// Apply or refresh the Courser's Guise daze. When it is already up, reset the
+// timer IN PLACE (the overpower_charge precedent) rather than a fresh applyAura:
+// a hit-per-tick DoT, or the once-a-second drown/fatigue pulse, would otherwise
+// pay applyAura's splice + push + aura event + recalcPlayerStats every time for a
+// value that never changes. The first application still routes through applyAura
+// so it emits the gain event and honors slow_immunity (a slow-immune hunter is
+// never dazed; applyAura refuses the 'slow' kind for them). The daze is
+// deliberately kind 'slow': that keeps slow_immunity clearing it, and it means a
+// dazed hunter reads as snared to the enemy offense predicates (isRootedOrChilled,
+// alreadySlowed), which is classic-accurate (a daze IS a snare) and the cost of
+// choosing to keep the aspect up in combat.
 export function applyCourserDaze(ctx: SimContext, hunter: Entity): void {
+  const existing = hunter.auras.find((aura) => aura.id === COURSER_DAZE_AURA_ID);
+  if (existing) {
+    existing.remaining = COURSER_DAZE_DURATION;
+    existing.duration = COURSER_DAZE_DURATION;
+    return;
+  }
   ctx.applyAura(hunter, {
     id: COURSER_DAZE_AURA_ID,
     name: 'Dazed',
@@ -192,11 +216,11 @@ export function applyCourserDaze(ctx: SimContext, hunter: Entity): void {
   });
 }
 
-// Damage-taken hook: daze the victim only while Courser's Guise is active. A
-// no-op for every other player, since only a hunter running the aspect carries
-// the COURSER_GUISE_AURA_ID buff.
+// Damage-taken hook: daze the victim only while Courser's Guise (the plain aspect
+// or its Pack Rally replacement) is active. Callers gate on cls === 'hunter', so
+// only a hunter running the aspect ever pays the aura scan.
 export function courserGuiseDazeOnDamage(ctx: SimContext, hunter: Entity): void {
-  if (!hunter.auras.some((aura) => aura.id === COURSER_GUISE_AURA_ID)) return;
+  if (!hunter.auras.some((aura) => COURSER_GUISE_AURA_IDS.includes(aura.id))) return;
   applyCourserDaze(ctx, hunter);
 }
 
