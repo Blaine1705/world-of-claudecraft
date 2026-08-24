@@ -1,14 +1,32 @@
-import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
-import { CI_LONG_SUITE_HALVES } from '../scripts/lib/ci_shard_plan.mjs';
+import {
+  CI_LONG_SUITE_HALVES,
+  CI_LONG_SUITES,
+  resolveWorkerCount,
+} from '../scripts/lib/ci_shard_plan.mjs';
 import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import {
   GENERATED_I18N_ARTIFACT_FILES,
   GENERATED_I18N_ARTIFACT_PREFIXES,
+  GENERATED_MANIFEST_ARTIFACT_FILES,
   isGeneratedI18nArtifactPath,
+  isGeneratedManifestArtifactPath,
 } from '../scripts/lib/gate_select_plan.mjs';
-import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
+import {
+  buildFullGateSteps,
+  I18N_ARTIFACTS,
+  I18N_RELEASE_TIER_SUITES,
+  MANIFEST_ARTIFACTS,
+} from '../scripts/lib/gate_steps.mjs';
+import { PLAYWRIGHT_INSTALL_BLOCK } from './helpers/playwright_install_block';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -16,6 +34,21 @@ const detectEntry = readFileSync(
   'utf8',
 );
 const ciShardEntry = readFileSync(new URL('../scripts/ci_shard_test.mjs', import.meta.url), 'utf8');
+// Comment-stripped (same idiom as gateCode below): a source-text pin on the
+// entry must not stay green when the pinned call survives only in a comment.
+const ciShardEntryCode = stripComments(ciShardEntry);
+const ciShardPlanSource = readFileSync(
+  new URL('../scripts/lib/ci_shard_plan.mjs', import.meta.url),
+  'utf8',
+);
+// Stripped for the formula weld: the module's docblocks discuss the default
+// in prose, and a weld a comment can satisfy is not a weld.
+const ciShardPlanCode = stripComments(ciShardPlanSource);
+// ci.yml with full-line YAML comments removed: the worker-trial pins below
+// count KEY occurrences, and a doc comment quoting the env line must neither
+// satisfy a count nor turn it red.
+const workflowCode = workflow.replace(/^[ \t]*#.*$/gm, '');
+const turboJson = readFileSync(new URL('../turbo.json', import.meta.url), 'utf8');
 const packageJson = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { packageManager?: string };
@@ -24,13 +57,15 @@ const preflightCode = readFileSync(
   new URL('../scripts/lib/gate_preflight.mjs', import.meta.url),
   'utf8',
 );
-// gate.mjs with its comments removed, BOTH kinds. A raw-substring pin on a step
-// is not a pin at all: commenting the step out leaves the substring in the file,
+// gate.mjs with its comments removed, BOTH kinds, via the shared single-pass
+// helper (tests/helpers/strip_comments.ts). A raw-substring pin on a step is
+// not a pin at all: commenting the step out leaves the substring in the file,
 // so the assertion stays green while the local gate quietly stops running it.
-// Block comments are stripped first (a `/* ... */` wrapper defeats a line-comment
-// strip just as well), then line comments, leaving anything after `://` alone so
-// a URL inside a string cannot be truncated.
-const gateCode = gate.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+// The single pass consumes each comment exactly once, so a `/* ... */` wrapper
+// cannot defeat the line strip AND a bare /* inside a line comment cannot open
+// a phantom block that swallows the gate's own pin surface; `://` URLs stay
+// intact.
+const gateCode = stripComments(gate);
 // Shared step list (Phase 8): gate.mjs delegates here; pins below use both.
 const gateSteps = buildFullGateSteps(8);
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
@@ -74,6 +109,7 @@ const CHECK_RUN_STEPS = [
   'run: npm run security:gate',
   TYPECHECK_BUILDS_TURBO_RUN,
   'run: npm run wiki:content && npm run build:bundle\n',
+  'run: git ls-files --error-unmatch -- src/game/sfx_manifest.generated.ts',
 ] as const;
 
 // Exact job-level if line for both release jobs. toContain alone would allow a
@@ -96,7 +132,7 @@ const PR_TIER_EVENT_FRAGMENT =
 // classifier's fail-closed doctrine; under the merge queue a skipped required
 // check reads satisfied, so failing toward SKIP would be the wrong direction.
 // (Covers green-but-empty output only: a FAILED changes job skips dependents
-// via needs regardless, which requiring "Detect code path changes" closes.)
+// via needs regardless, which requiring "Classify changes" closes.)
 const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code != 'false'`;
 
 // pr-gate alone splits those two arms across levels (the docs-only matrix
@@ -201,6 +237,152 @@ function jobSource(name: string): string {
 }
 
 describe('CI workflow parity', () => {
+  it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
+    // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
+    // release-gate, release-i18n) exclude docs/screenshots DIRECTORIES
+    // (794 MB of committed PR evidence; the measured 11m21s checkout
+    // pathology scales with the blob payload) except every subtree the repo
+    // actually references. The coupling corpus is EVERY tracked
+    // reference-carrying file outside docs/screenshots, enumerated from the
+    // git index rather than a curated root list: a test-literal-only
+    // coupling shipped and missed two acceptance manifests on its first CI
+    // run, and a curated four-root walk is the same failure shape one level
+    // up (a reference from a root nobody curated in stays invisible).
+    // Existence comes from the GIT INDEX, not the working tree: under the
+    // very cone this verifies, an excluded directory does not exist on disk.
+    const SPARSE_CONE = [
+      '          sparse-checkout: |',
+      '            /*',
+      '            !/docs/screenshots/*/',
+      '            /docs/screenshots/admin-cheater-mark/',
+      '            /docs/screenshots/admin-guild-bank-panel/',
+      '            /docs/screenshots/deed-border-cartouche/',
+      '            /docs/screenshots/eastbrook-grand-armoury/',
+      '            /docs/screenshots/eastbrook-vale-rebuild/',
+      '            /docs/screenshots/far-foliage-impostors/',
+      '            /docs/screenshots/fenbridge-rebuild/',
+      '            /docs/screenshots/guild-bank-tab/',
+      '            /docs/screenshots/guild-social-v1/',
+      '            /docs/screenshots/item-art-consistency-2026-08-09/',
+      '            /docs/screenshots/market-house-redesign/',
+      '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
+      '            /docs/screenshots/r35-admin-professions-inspector/',
+      '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
+      '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/wildheart/',
+      '            /docs/screenshots/woc-market/',
+      '          sparse-checkout-cone-mode: false',
+    ].join('\n');
+    // Job-anchored, not a bare workflow-wide count: each sparse job carries
+    // the block exactly once, the full-tree jobs carry it never (their
+    // freshness diffs, builds, and the browser suite read wider), and the
+    // workflow-wide total closes the no-sixth-copy direction.
+    for (const job of [
+      'pr-gate',
+      'pr-long-sims-a',
+      'pr-long-sims-b',
+      'release-gate',
+      'release-i18n',
+    ]) {
+      expect(jobSource(job).split(SPARSE_CONE), job).toHaveLength(2);
+    }
+    for (const job of ['pr-checks', 'browser-gate', 'release-checks', 'release-version-gate']) {
+      expect(jobSource(job).includes(SPARSE_CONE), job).toBe(false);
+    }
+    expect(workflow.split(SPARSE_CONE)).toHaveLength(6);
+    const coneDirs = new Set<string>(
+      [...SPARSE_CONE.matchAll(/\/docs\/screenshots\/([A-Za-z0-9._-]+)\//g)].map((m) => m[1]),
+    );
+    const repoRootUrl = new URL('..', import.meta.url);
+    const indexDirs = new Set<string>();
+    {
+      const ls = spawnSync('git', ['ls-files', 'docs/screenshots'], {
+        cwd: fileURLToPath(repoRootUrl),
+        encoding: 'utf8',
+      });
+      expect(ls.status).toBe(0);
+      for (const line of ls.stdout.split('\n')) {
+        const match = line.match(/^docs\/screenshots\/([A-Za-z0-9._-]+)\//);
+        if (match) indexDirs.add(match[1]);
+      }
+      // Vacuity floor near the real count (166 subtrees on 2026-08-14).
+      expect(indexDirs.size).toBeGreaterThanOrEqual(160);
+    }
+    // The guard's own file is excluded from the corpus: its SPARSE_CONE
+    // literal above names every cone subtree, so counting it would satisfy
+    // the coupling even over an otherwise empty corpus (the
+    // release_i18n_tier_coverage SELF idiom).
+    const SELF = 'tests/ci_workflow.test.ts';
+    const REFERENCE_EXTENSIONS = [
+      '.ts',
+      '.mts',
+      '.cts',
+      '.tsx',
+      '.mjs',
+      '.cjs',
+      '.js',
+      '.json',
+      '.md',
+    ];
+    const referenced = new Set<string>();
+    {
+      const ls = spawnSync('git', ['ls-files', '-z'], {
+        cwd: fileURLToPath(repoRootUrl),
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      });
+      expect(ls.status).toBe(0);
+      const repoRoot = fileURLToPath(repoRootUrl);
+      const tracked = ls.stdout.split('\0').filter((file) => file.length > 0);
+      const corpusCandidates = tracked.filter(
+        (file) =>
+          file !== SELF &&
+          !file.startsWith('docs/screenshots/') &&
+          REFERENCE_EXTENSIONS.some((ext) => file.endsWith(ext)),
+      );
+      // In a local unstaged feature tree, a retired tracked file is absent by
+      // design until the user stages the deletion. Derive that set from Git
+      // instead of keeping a path allowlist that could become a permanent hole.
+      // Sparse-checkout omissions carry skip-worktree, not a deletion diff, so
+      // an unexpectedly absent corpus candidate in CI still fails loudly.
+      const deleted = spawnSync('git', ['diff', '--name-only', '--diff-filter=D', '-z', '--'], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      });
+      expect(deleted.status).toBe(0);
+      const pendingDeletions = new Set(
+        deleted.stdout.split('\0').filter((file) => file.length > 0),
+      );
+      const missing = corpusCandidates.filter((file) => !existsSync(join(repoRoot, file)));
+      expect(
+        missing.filter((file) => !pendingDeletions.has(file)),
+        `unexpected tracked paths are missing from the screenshot-reference corpus: ${missing.join(', ')}`,
+      ).toEqual([]);
+      const corpus = corpusCandidates.filter((file) => existsSync(join(repoRoot, file)));
+      // Vacuity floor near the real count (about 6,600 tracked
+      // reference-carrying files on 2026-08-14): an emptied enumeration
+      // cannot green the coupling by scanning nothing.
+      expect(corpus.length).toBeGreaterThanOrEqual(6_000);
+      for (const file of corpus) {
+        const source = readFileSync(join(repoRoot, file), 'utf8');
+        for (const match of source.matchAll(/docs\/screenshots\/([A-Za-z0-9._-]+)/g)) {
+          if (indexDirs.has(match[1])) referenced.add(match[1]);
+        }
+      }
+    }
+    // SET EQUALITY, both directions in one assertion: a referenced subtree
+    // missing from the cone is the missing-evidence-in-a-shard failure, and
+    // a cone entry nothing references anymore is dead weight that must leave
+    // (a one-way floor with slack would let a quietly narrowed corpus drop
+    // entries and stay green).
+    expect([...referenced].sort()).toEqual([...coneDirs].sort());
+  });
+
+  it('performs no hand-rolled directory reads (the corpus is the git index)', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
+  });
+
   it('installs with pnpm frozen-lockfile and pins the packageManager version', () => {
     // Full migration: no npm ci install path, cache and install are pnpm-only,
     // and every pnpm/action-setup version matches package.json packageManager so
@@ -267,14 +449,32 @@ describe('CI workflow parity', () => {
     // gate.mjs and gate_select.mjs share one copy; the pin follows it there and
     // additionally holds gate.mjs to still invoking it, which is what actually
     // makes the resolution reachable.
-    expect(workflow).not.toContain('apt-get');
+    // The blanket apt-get ban became a count pin when browser-gate's font
+    // fallback earned the workflow's ONE sanctioned apt use (the two lines of
+    // the Install Chromium block, pinned whole above): FFmpeg stays banned by
+    // name, and any third apt-get line is new creep this count refuses.
+    expect(workflow).not.toMatch(/apt-get[^\n]*ffmpeg/i);
+    expect(workflow.match(/apt-get/g) ?? []).toHaveLength(2);
     expect(preflightCode).toContain("from '../sfx/ffmpeg_paths.mjs'");
     expect(gateCode).toContain('runGatePreflights');
   });
 
   it('runs the opt-in Chromium browser regressions in their own CI job', () => {
     const browserGate = jobSource('browser-gate');
-    expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+    // The install is split: the browser download fails hard, while the
+    // package-manager half (playwright install-deps) is bounded and
+    // best-effort by ruling (2026-08-19: three merge-queue rejections died
+    // at zero mirror throughput with the browser cache-hit). The runner
+    // image already ships Chromium's system libraries, and a genuinely
+    // missing one fails at browser launch, and the fonts install-deps alone
+    // provided are verified by capability with a mirror-swapped targeted
+    // fallback. Pinned as the WHOLE block scalar so a step comment cannot
+    // satisfy it, the hard-fail line cannot grow a fallback, and the bounds
+    // cannot drift silently: the degraded path totals about 3.7 minutes,
+    // sized to stay inside the job's 10-minute bound and its
+    // auto-rerunnable setup class.
+    expect(browserGate).toContain(PLAYWRIGHT_INSTALL_BLOCK);
+    expect(browserGate).not.toContain('--with-deps');
     expect(browserGate).toContain('run: npm run test:browser');
     const browser = gateSteps.find((s) => s.name === 'browser regressions');
     expect(browser?.cmd).toBe('npm');
@@ -313,9 +513,9 @@ describe('CI workflow parity', () => {
     );
     expect(browserGate).toContain("require('playwright/package.json').version");
     expect(browserGate.indexOf('Cache Playwright Chromium browsers')).toBeLessThan(
-      browserGate.indexOf('run: npx playwright install --with-deps chromium'),
+      browserGate.indexOf('npx playwright install chromium'),
     );
-    expect(browserGate).toContain('run: npx playwright install --with-deps chromium');
+    expect(browserGate).toContain('npx playwright install chromium');
     // No restore-keys: the key is already exact-version-scoped, so a prefix
     // fallback could only ever restore a PRIOR Playwright version's binaries
     // alongside the new install. actions/cache never evicts an old entry, so
@@ -369,7 +569,7 @@ describe('CI workflow parity', () => {
       const job = jobSource(jobName);
       // Anchored to the src/ prefix so a future unrelated `git diff
       // --exit-code` step added above this one cannot re-point the pin.
-      const m = job.match(/run: git diff --exit-code -- (src\/[^\n]+)/);
+      const m = job.match(/\n {8}run: git diff --exit-code -- (src\/[^\n]+)/);
       expect(m, `${jobName} must carry the freshness diff step`).not.toBeNull();
       const freshnessPaths = (m as RegExpMatchArray)[1].trim().split(/\s+/).sort();
       expect(classifierPaths).toEqual(freshnessPaths);
@@ -394,6 +594,80 @@ describe('CI workflow parity', () => {
       true,
     );
     expect(isGeneratedI18nArtifactPath('src/guide/content.generated.ts')).toBe(false);
+  });
+
+  it('pins the inert generated-manifest classifier to exactly the freshness-diffed paths', () => {
+    // The second freshness-guarded family holds the same weld family as the
+    // i18n arm above, with one deliberate asymmetry: the freshness DIFF set
+    // (MANIFEST_ARTIFACTS) is a strict SUPERSET of the classifier family.
+    // The SFX generator writes two more tracked files (the runtime pack and
+    // the gain-ceiling cache) that are fs-read data, never graph nodes:
+    // diffing them prevents the local gate from silently healing them
+    // mid-run while CI reads stale committed copies; feeding them to
+    // `related` would select nothing. Both lists are pinned to literals (the
+    // family-growth mitigation: a fourth path moved in lockstep through
+    // every derived side would otherwise stay green), the classifier family
+    // must be contained in the diff set, and BOTH check jobs' argv must
+    // equal the diff set exactly.
+    expect([...GENERATED_MANIFEST_ARTIFACT_FILES].sort()).toEqual([
+      'src/game/sfx_manifest.generated.ts',
+      'src/guide/content.generated.ts',
+      'src/render/assets/manifest.generated.ts',
+    ]);
+    expect([...MANIFEST_ARTIFACTS].sort()).toEqual(
+      [
+        'src/game/sfx_manifest.generated.ts',
+        'src/guide/content.generated.ts',
+        'src/render/assets/manifest.generated.ts',
+        'public/audio/sfx/runtime-pack.json',
+        'scripts/sfx/sfx_gain_ceiling.generated.json',
+      ].sort(),
+    );
+    for (const member of GENERATED_MANIFEST_ARTIFACT_FILES) {
+      expect(MANIFEST_ARTIFACTS, 'every classifier path must be freshness-diffed').toContain(
+        member,
+      );
+    }
+    for (const member of MANIFEST_ARTIFACTS) {
+      expect(isCodePath(member), `${member} must route through the manifest check jobs`).toBe(true);
+    }
+    for (const jobName of ['pr-checks', 'release-checks']) {
+      const job = jobSource(jobName);
+      // The actual run line must first prove every output remains tracked,
+      // then diff the exact same set. Regeneration can recreate a committed
+      // deletion as an untracked file, which `git diff` alone ignores. The
+      // `\n {8}run: ` anchor means a YAML-commented-out command cannot pass.
+      const manifestGuard = job.match(
+        /\n {8}run: git ls-files --error-unmatch -- (src\/[^&\n]+) && git diff --exit-code -- (src\/[^\n]+)/,
+      );
+      expect(
+        manifestGuard,
+        `${jobName} must carry the manifest trackedness and diff guard`,
+      ).toBeTruthy();
+      const trackedPaths = (manifestGuard as RegExpMatchArray)[1].trim().split(/\s+/).sort();
+      const freshnessPaths = (manifestGuard as RegExpMatchArray)[2].trim().split(/\s+/).sort();
+      expect(trackedPaths).toEqual([...MANIFEST_ARTIFACTS].sort());
+      expect(freshnessPaths).toEqual([...MANIFEST_ARTIFACTS].sort());
+      // Regenerate BEFORE diff, inside the same job: the client build
+      // (wiki:content writes the guide content, build:bundle's pregen writes
+      // the SFX and media manifests) must precede the diff, or the diff
+      // proves nothing about this tree's sources.
+      const buildIdx = job.indexOf('run: npm run wiki:content && npm run build:bundle\n');
+      expect(buildIdx).toBeGreaterThan(0);
+      expect(buildIdx).toBeLessThan(job.indexOf((manifestGuard as RegExpMatchArray)[0]));
+    }
+    // Nightly coverage is transitive: release-checks carries the diff (welded
+    // here) and tests/nightly_workflow.test.ts pins nightly's run-line
+    // sequence equal to release-checks', so nightly cannot quietly drop it.
+    // The predicate agrees with the pinned path classes on both sides, and
+    // any OTHER .generated path keeps the widen-to-full behavior.
+    for (const p of GENERATED_MANIFEST_ARTIFACT_FILES) {
+      expect(isGeneratedManifestArtifactPath(p), p).toBe(true);
+    }
+    expect(isGeneratedManifestArtifactPath('src/ui/icons.generated.ts')).toBe(false);
+    expect(
+      isGeneratedManifestArtifactPath('src/ui/i18n.catalog/translation_keys.generated.ts'),
+    ).toBe(false);
   });
 
   it('runs the release tier against a release-to-main pull request merge result', () => {
@@ -479,8 +753,11 @@ describe('CI workflow parity', () => {
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     // Phase 2: pr-gate's test step runs through the selection-aware shard
-    // runner; the runner itself spawns `npm test` (pretest preserved), which
-    // tests/ci_shard_plan.test.ts pins behaviorally.
+    // runner; the entry regenerates the generated artifacts once per job
+    // before its legs (the merged selective leg is a bare vitest-related
+    // invocation with no npm lifecycle), which tests/ci_leg_runner.test.ts
+    // pins at the source level and tests/gate_artifact_skip.test.ts drives
+    // arm by arm.
     expect(prGate).toContain('run: node scripts/ci_shard_test.mjs');
     expect(prGate).not.toContain('run: npm test');
     expect(prChecks).not.toContain('run: npm test');
@@ -503,7 +780,7 @@ describe('CI workflow parity', () => {
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
-    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(11);
+    expect(prChecks.match(/\n {6}- name: /g)).toHaveLength(12);
     // pr-checks is unsharded, so NO step in it may carry a condition: an
     // `if: matrix.shard == 1` copy-pasted here is never true and would disable
     // that step outright.
@@ -532,11 +809,11 @@ describe('CI workflow parity', () => {
       expect(releaseGate).not.toContain(step);
     }
     // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus
-    // seven check steps (i18n gen/summary/freshness, malware, tsc cache, the
-    // combined typecheck + env/server/bot builds turbo call, client build).
-    // An accidental extra step on the checks job would otherwise stay green.
-    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(11);
-    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(11);
+    // eight check steps (i18n gen/summary/freshness, malware, tsc cache, the
+    // combined typecheck + env/server/bot builds turbo call, client build,
+    // manifest freshness). An accidental extra step would otherwise stay green.
+    expect(releaseChecks.match(/\n {6}- name: /g)).toHaveLength(12);
+    expect(jobSource('pr-checks').match(/\n {6}- name: /g)).toHaveLength(12);
     // tsc incremental cache (#2758) must land on both check jobs, never on a
     // matrixed test job (would N-way cache thrash or reintroduce shard-1 gates).
     for (const job of [releaseChecks, jobSource('pr-checks')]) {
@@ -764,13 +1041,13 @@ describe('CI workflow parity', () => {
     // each name exactly.
     const mergeQueueDoc = readFileSync(new URL('../docs/merge-queue.md', import.meta.url), 'utf8');
     const requiredCheckNames = [
-      'Detect code path changes',
-      'PR gate (English-only legal)',
-      'PR gate (long sims A)',
-      'PR gate (long sims B)',
-      'PR checks (freshness, typecheck, builds)',
-      'Format + lint (Biome, changed files)',
-      'Browser regressions (Chromium)',
+      'Classify changes',
+      'PR tests',
+      'PR long sims A',
+      'PR long sims B',
+      'PR checks',
+      'Lint (changed files)',
+      'Browser tests',
     ] as const;
     for (const name of requiredCheckNames) {
       // Anchored to the job-level name: line (4-space indent), so a
@@ -792,13 +1069,13 @@ describe('CI workflow parity', () => {
     expect(neverSectionEnd).toBeGreaterThan(neverIdx);
     const neverSection = mergeQueueDoc.slice(neverIdx, neverSectionEnd);
     const docRequiredNameForms = [
-      '`Detect code path changes`',
-      `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
-      '`PR gate (long sims A)`',
-      '`PR gate (long sims B)`',
-      '`PR checks (freshness, typecheck, builds)`',
-      '`Format + lint (Biome, changed files)`',
-      '`Browser regressions (Chromium)`',
+      '`Classify changes`',
+      `\`PR tests (1)\` through \`(${SHARD_N})\``,
+      '`PR long sims A`',
+      '`PR long sims B`',
+      '`PR checks`',
+      '`Lint (changed files)`',
+      '`Browser tests`',
     ] as const;
     for (const form of docRequiredNameForms) {
       expect(requiredHalf).toContain(form);
@@ -831,30 +1108,32 @@ describe('CI workflow parity', () => {
     // in shape rather than lifted from the checkout-stall replay directly, so
     // every job in this file carries a conscious timeout-minutes value.
     const bounds = [
-      ['pr-gate', 20],
+      // pr-gate: 37 is the 2026-08-14 re-derivation from the worst healthy
+      // SELECTIVE shard wall (16.55 minutes, run 31765273776; selective and
+      // full mode share this one bound and selective is the expensive one,
+      // x 1.60 slow-runner ratio x 1.37 margin = 36.3). The 20-then-40
+      // history, the full-mode measurement trap (a ci.yml-touching PR
+      // always widens to full, so a bounds PR cannot observe selective
+      // walls), and the derivation live on the ci.yml bound.
+      ['pr-gate', 37],
       // release-gate is the one shard matrix that keeps its CI_LONG_SUITES
       // files in-shard (pr-gate hands them to the lanes), so a single shard
       // can draw four of them at once and the bound has to cover a slow
       // runner rather than the healthy median. 20 was sized from a 14.63
       // minute healthy worst case and was bound-killing shard 1 by 2026-08-11
-      // at b160a1ba18; 35 is the 16 minute healthy wall scaled by the 1.60
-      // fast-to-slow runner ratio measured there, at the same 1.37x margin.
-      // The ci.yml comment carries the run ids, the per-suite measurements,
-      // and why the killed attempt's file count must not be extrapolated.
-      ['release-gate', 35],
-      // The single-job lane's bound reached 60 after run 31290316610 measured
-      // ~4400s aggregate suite time on a slow-quartile runner. The lane-diet
-      // PR cut the aggregate several-fold and split the lane in two and sized
-      // 20 from a local-measured projection of under 10 minutes per half.
-      // Run 31450179645 falsified that projection on a healthy CI runner
-      // (lane A 13.73 minutes, lane B 12.55, owned_class_balance_harness
-      // alone 739268ms in-lane), leaving these REQUIRED checks about one slow
-      // runner from bound-killing the merge queue, so both halves take the
-      // same slow-runner sizing METHOD as release-gate (the same formula over
-      // their own healthy job wall, which lands on 30, not on its 35).
-      // Evidence on the ci.yml bound.
-      ['pr-long-sims-a', 30],
-      ['pr-long-sims-b', 30],
+      // at b160a1ba18; 36 is the 2026-08-14 re-derivation from the measured
+      // post-split release-push worst (16.43 minutes, checkout-stall walls
+      // excluded) at the same 1.60 ratio and 1.37 margin; evidence on the
+      // ci.yml bound.
+      ['release-gate', 36],
+      // The lanes: 28 is the 2026-08-14 re-derivation from post-rebalance
+      // healthy walls (worst lane 12.5 minutes, same formula as pr-gate).
+      // The 60-to-20-to-30 history, including the falsified under-10
+      // projection that bans sizing these from estimates, lives on the
+      // ci.yml bound. Both halves share one bound so the a/b assignment can
+      // rebalance without re-sizing.
+      ['pr-long-sims-a', 28],
+      ['pr-long-sims-b', 28],
       ['browser-gate', 10],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
@@ -867,7 +1146,9 @@ describe('CI workflow parity', () => {
       ['lint', 15],
       // pr-checks and release-checks are the same shape as lint but heavier:
       // i18n generation, the malware gate, a typecheck, and four builds. 20
-      // matches the shard matrices' bound.
+      // was sized beside the shard matrices' original bound and still fits
+      // this serialized check list; the test matrices' bounds have since
+      // moved for their own workloads, deliberately without dragging these.
       ['pr-checks', 20],
       ['release-checks', 20],
       // release-version-gate and release-i18n are both unsharded jobs whose
@@ -893,6 +1174,13 @@ describe('CI workflow parity', () => {
       const next = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:[ \t]*(?:#[^\n]*)?\n/);
       return next === -1 ? rest : rest.slice(0, next);
     };
+    // Positive control for the two step-bound regexes below: they are
+    // negative pins on tokens ci.yml never carries, so prove on a synthetic
+    // span that each shape would actually match before trusting the
+    // absences.
+    const stepBoundSample = '\n        timeout-minutes: 5\n      - timeout-minutes: 5\n';
+    expect(stepBoundSample).toMatch(/\n {8}timeout-minutes:/);
+    expect(stepBoundSample).toMatch(/\n {6}- timeout-minutes:/);
     for (const [name, minutes] of bounds) {
       const span = jobSpan(name);
       const jobLevel = span.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
@@ -928,6 +1216,48 @@ describe('CI workflow parity', () => {
     // The routing is the entry's operational point: a timeout kill goes to
     // a rerun, never straight to a code investigation.
     expect(mergeQueueTriage).toContain('re-run the failed jobs and re-queue');
+    // The doc's critical-path arithmetic is WELDED to the table, both
+    // numbers derived rather than hard-coded: this is the second edit to
+    // that sentence in one program, and an unwelded number drifts. The
+    // required set matches the doc's own required-checks list; the changes
+    // bound is the serial prefix (every test job needs it).
+    const requiredJobs = [
+      'pr-gate',
+      'pr-long-sims-a',
+      'pr-long-sims-b',
+      'pr-checks',
+      'lint',
+      'browser-gate',
+    ];
+    const boundOf = (job: string) => bounds.find(([name]) => name === job)?.[1] ?? Number.NaN;
+    const largestRequired = Math.max(...requiredJobs.map(boundOf));
+    const changesBound = boundOf('changes');
+    // EXACTLY ONE occurrence of each welded shape, matched over the whole
+    // doc: a "historical note" decoy carrying the old numbers above the
+    // live sentence would otherwise satisfy a first-match weld while the
+    // live sentence drifts (adversarially demonstrated in review).
+    const pathMatches = [
+      ...mergeQueueTriage.matchAll(/(\d+) \+ (\d+) \(the `changes` bound plus/g),
+    ];
+    expect(pathMatches, 'exactly one critical-path sentence in docs/merge-queue.md').toHaveLength(
+      1,
+    );
+    expect(Number(pathMatches[0][1])).toBe(changesBound);
+    expect(Number(pathMatches[0][2])).toBe(largestRequired);
+    // \s+ because the doc hard-wraps near 72 columns and the wrap point
+    // moves as the number's width changes; the trailing "minute" anchors
+    // the ceiling's end so a 900 cannot satisfy the 90.
+    const sumMatches = [
+      ...mergeQueueTriage.matchAll(
+        /critical path of (\d+)\s+minutes\s+against\s+a\s+(\d+)\s+minute/g,
+      ),
+    ];
+    expect(sumMatches, 'exactly one critical-path sum in docs/merge-queue.md').toHaveLength(1);
+    expect(Number(sumMatches[0][1])).toBe(changesBound + largestRequired);
+    expect(Number(sumMatches[0][2])).toBe(90);
+    // The doc's stated invariant, executable: the required critical path
+    // must stay comfortably under the queue's 90 minute response ceiling.
+    expect(changesBound + largestRequired).toBeLessThan(90);
   });
 
   it('aborts dead checkout transfers workflow-wide instead of riding a job bound', () => {
@@ -963,10 +1293,10 @@ describe('CI workflow parity', () => {
     // Both test jobs fan the ONE suite across the same N-shard matrix.
     // release-gate keeps the raw `npm test -- --shard` run line (selection
     // never touches a release ref); pr-gate runs the same suite through the
-    // selection-aware shard runner, which spawns `npm test` itself so pretest
-    // still regenerates the i18n artifacts in every shard (the S3 guard, guide
-    // freshness, and the git-subprocess suites need them regardless of which
-    // shard they hash into). Never a bare vitest invocation in the workflow.
+    // selection-aware shard runner, whose entry regenerates the i18n
+    // artifacts once per job before any leg (the S3 guard, guide freshness,
+    // and the git-subprocess suites need them regardless of which shard they
+    // hash into). Never a bare vitest invocation in the workflow YAML.
     // fail-fast stays off so shards pass or fail independently and a red run
     // always reports the whole suite.
     const halfCoreCap =
@@ -1004,6 +1334,30 @@ describe('CI workflow parity', () => {
     // Exactly three entry invocations: the shard matrix and the two long-sims
     // lane halves.
     expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(3);
+    // WOC_TEST_WORKERS must not be set ANYWHERE in the workflow: both
+    // alternatives to the half-cores default were measured and regressed
+    // (4 workers, run 31107474546; 3 workers, run 31771637461, three
+    // unrelated default-timeout blowouts for about a minute of wall), so a
+    // reappearing override means someone re-trialing without a new ruling.
+    // Counted as the BARE key on the comment-stripped workflow, which
+    // catches every YAML value form (same-line, next-line, block scalar)
+    // while a doc comment naming the knob stays legal.
+    expect(workflowCode).not.toContain('WOC_TEST_WORKERS');
+    // The knob's declaration must not silently vanish while the entry reads
+    // it, for two mechanisms: biome's suspicious/noUndeclaredEnvVars warns
+    // on any process.env read absent from turbo.json, and turbo's strict
+    // env sandbox strips undeclared variables from task environments (the
+    // turbo-run paths would silently default). Both entries live in the
+    // pass-through list, never a hashed input: neither can change task
+    // outcomes.
+    expect(turboJson).toContain('"WOC_TEST_WORKERS"');
+    expect(turboJson).toContain('"GITHUB_ACTIONS"');
+    // The per-test budgets and the half-cores ruling are calibrated on the
+    // documented 4-vCPU public runner; pin the assumption so a runner move
+    // re-opens the worker decision instead of inheriting it.
+    for (const job of ['pr-gate', 'pr-long-sims-a', 'pr-long-sims-b']) {
+      expect(jobSource(job), job).toContain('runs-on: ubuntu-latest');
+    }
     // Each lane job mirrors the shard step's hardened relay (env block, never
     // run-line interpolation) and runs the entry in its lane-half mode:
     // unsharded, no matrix, two jobs that between them own the
@@ -1066,15 +1420,32 @@ describe('CI workflow parity', () => {
       expect(job).not.toContain('--exclude');
     }
     // The half-cores worker bound moved from pr-gate's run line into the shard
-    // runner. Derive the expected expression FROM halfCoreCap (the release-gate
-    // pin) so the two forms cannot drift apart: same formula, minus the shell
-    // wrapper and with the runner's `os` import in place of require().
+    // runner, and from there into resolveWorkerCount (the WOC_TEST_WORKERS
+    // trial knob's validated resolver). Derive the expected expression FROM
+    // halfCoreCap (the release-gate pin) so the forms cannot drift apart:
+    // same formula, minus the shell wrapper and with the runner's `os` import
+    // in place of require().
     const capExpression = halfCoreCap
       .replace(/^--maxWorkers="\$\(node -p '/, '')
       .replace(/'\)"$/, '')
       .replace('require("node:os")', 'os');
     expect(capExpression).toBe('Math.max(1, Math.floor(os.availableParallelism() / 2))');
-    expect(ciShardEntry).toContain(capExpression);
+    // The weld's consumer: the formula's new home is resolveWorkerCount's
+    // fallback, so the DERIVED expression (cores in place of the os call)
+    // must appear in the plan module. Without this line capExpression is
+    // inert and both sides of the loop below are test-file literals, which
+    // is drift, not a weld.
+    expect(ciShardPlanCode).toContain(capExpression.replace('os.availableParallelism()', 'cores'));
+    // Behavioral weld, second layer: the resolver's default must compute the
+    // SAME value as release-gate's inline formula (sampled core counts, not
+    // an exhaustive proof), and the entry must wire the resolver to the real
+    // inputs (comment-stripped source, so a commented-out call fails).
+    for (const cores of [1, 2, 3, 4, 8]) {
+      expect(resolveWorkerCount({ cores }).workers).toBe(Math.max(1, Math.floor(cores / 2)));
+    }
+    expect(ciShardEntryCode).toContain('resolveWorkerCount({');
+    expect(ciShardEntryCode).toContain('cores: os.availableParallelism()');
+    expect(ciShardEntryCode).toContain('envValue: process.env.WOC_TEST_WORKERS');
     // Legacy N=4 run lines must not remain once SHARD_N has moved on.
     // String(SHARD_N) comparison avoids tsc folding a constant always-true arm.
     if (String(SHARD_N) !== '4') {
@@ -1307,20 +1678,265 @@ describe('CI workflow parity', () => {
     expect(workflow).not.toContain('secrets["');
   });
 
-  it('keeps D11 path-matrix tooling available but unwired after two MISS approaches', () => {
-    // Both LPT and stripe greened with completeness but D11 MISS (ratios 1.59 /
-    // 1.64). Sequencer stays in-tree for a future measured-weight attempt; CI
-    // must not re-wire it without a green D11 probe. Default --shard is back.
-    expect(viteConfig).not.toContain('sequencer: BalancedSequencer');
-    expect(viteConfig).not.toContain("from './scripts/ci_balanced_sequencer.mjs'");
+  it('wires the measured-weight balanced sequencer with its guards intact', () => {
+    // History: LPT and stripe both greened with completeness but MISSED the
+    // D11 bar on STATIC weights (ratios 1.59 / 1.64) and stayed unwired.
+    // Re-wired 2026-08-14 over MEASURED durations (the harvested table in
+    // scripts/ci_shard_weights.generated.json); the review round proved the
+    // measured-scale fallback is load-bearing (raw heuristic units made the
+    // packing worse than contiguous). The wiring itself is behaviorally
+    // pinned in tests/ci_shard_partition.test.ts; this end keeps the
+    // integrity guards welded to it.
+    expect(viteConfig).toContain('sequencer: BalancedSequencer');
+    expect(viteConfig).toContain("from './scripts/ci_balanced_sequencer.mjs'");
     expect(balancedSequencer).toContain('extends BaseSequencer');
     expect(balancedSequencer).toContain('partitionForCi');
-    expect(shardPartition).toContain('export function partitionByStripe');
+    expect(balancedSequencer).toContain('assertPartitionCompleteness');
     expect(shardPartition).toContain('export function partitionByLpt');
     expect(shardPartition).toContain('export function weightForTestFile');
+    expect(shardPartition).toContain('MEASURED_FALLBACK_MS');
     expect(shardPartition).not.toContain("from 'vitest");
-    expect(workflow).toContain('ci_balanced_sequencer.mjs');
-    // Integrity guard kept even with default packs.
+    // An empty pack must stay red, and the workflow's design notes must keep
+    // naming the sequencer so the next reader finds the mechanism.
     expect(viteConfig).toContain('passWithNoTests: false');
+    expect(workflow).toContain('ci_balanced_sequencer.mjs');
+  });
+
+  it('classifies every CI job for the real-SQL merge bar: pg-wired, guarded DB-less, or test-free', () => {
+    // Ruling R16 (the woc-marketplace hardening state): the real-SQL pg
+    // suites classify into the always-run floor but SKIP GREEN without
+    // TEST_DATABASE_URL, so this wiring IS their presence at the merge bar.
+    // Three pin shapes fell before this one: a file-wide count stayed green
+    // when the blocks were relocated onto vitest-free jobs; a hand-listed job
+    // set stayed green when the shard matrix was split into a new job with no
+    // service; and a run-line recognizer (four literal `run: <cmd>` forms)
+    // stayed green when the same split wrote its command in a `run: |` block
+    // scalar or an npm-script indirection. Shape four inverts the burden:
+    // EVERY job key in both files must appear in exactly one class below, so
+    // a new or renamed job in ANY spelling fails this test until a human
+    // classifies it, and the token scan cross-checks that a classification is
+    // not a lie. tests/ci_pg_presence.test.ts is the runtime twin (red inside
+    // any armed run when the variable is absent, and a CI_GUARD_SUITES member
+    // so every selective run executes it on one of its legs).
+    const jobKey = /\n {2}(["']?)([A-Za-z0-9_][A-Za-z0-9_-]*)\1:[ \t]*(?:#[^\n]*)?\n/g;
+    const jobsIn = (source: string) => {
+      // Sliced from the jobs: map so a header key (push, group, contents) can
+      // never satisfy a job lookup; quoted keys and _-or-digit initials are
+      // collected so an unconventional job id is classified, not swallowed
+      // into a neighbour's span.
+      const body = source.slice(source.indexOf('\njobs:'));
+      // Every two-space line in the jobs body must BE a recognized job key
+      // or a comment: a flow-style job (`  x: {steps: [...]}`) or any
+      // spelling the key regex misses would otherwise be swallowed into the
+      // previous job's span instead of forcing a classification.
+      for (const line of body.split('\n')) {
+        if (!/^ {2}\S/.test(line) || line.startsWith('  #')) continue;
+        expect(
+          /^ {2}(["']?)[A-Za-z0-9_][A-Za-z0-9_-]*\1:[ \t]*(?:#[^\n]*)?$/.test(line),
+          `unrecognized two-space line in the jobs body: ${line}`,
+        ).toBe(true);
+      }
+      const keys = [...body.matchAll(jobKey)].map((m) => ({ name: m[2], at: m.index ?? 0 }));
+      return keys.map((k, i) => ({
+        name: k.name,
+        span: body.slice(k.at, i + 1 < keys.length ? keys[i + 1].at : body.length),
+      }));
+    };
+    // Full-line YAML comments leave the scan so prose about tests cannot
+    // convict a test-free job; a trailing comment on a code line still
+    // convicts, which errs toward attention, never toward silence.
+    const codeLines = (span: string) =>
+      span
+        .split('\n')
+        .filter((line) => !line.trimStart().startsWith('#'))
+        .join('\n');
+    // Token scan over span CONTENT, deliberately not anchored to `run: `:
+    // block scalars, npm-script names, and pnpm forms all carry one of these
+    // tokens somewhere in the step that runs them.
+    const testTokens =
+      /vitest|ci_shard_test|npm test|npm run test|npm run gate|yarn test|bun test|turbo run test|node --test|node --run test|pnpm (?:run )?test/;
+    const nightly = readFileSync(
+      new URL('../.github/workflows/nightly.yml', import.meta.url),
+      'utf8',
+    );
+    // The classification. wired: carries the per-leg Postgres service and the
+    // job-level env pinned below. dbless: runs vitest with NO database, each
+    // member covered by a coupled guard below. testFree: never runs the node
+    // test suite at all.
+    const classes = [
+      {
+        source: workflow,
+        wired: ['pr-gate', 'release-gate'],
+        dbless: ['browser-gate', 'pr-long-sims-a', 'pr-long-sims-b', 'release-i18n'],
+        testFree: ['release-version-gate', 'changes', 'lint', 'pr-checks', 'release-checks'],
+      },
+      {
+        source: nightly,
+        wired: ['tests'],
+        dbless: ['browser'],
+        testFree: ['targets', 'checks', 'report'],
+      },
+    ];
+    for (const { source, wired, dbless, testFree } of classes) {
+      const jobs = jobsIn(source);
+      // COMPLETENESS, the load-bearing assertion: a job key missing from the
+      // three lists (new, renamed, or spelled in a way no recognizer guessed)
+      // fails here, toward a human decision, never toward a silent skip.
+      expect(jobs.map((j) => j.name).sort()).toEqual([...wired, ...dbless, ...testFree].sort());
+      for (const { name, span } of jobs) {
+        const code = codeLines(span);
+        // An expression-valued run COMMAND could smuggle a test invocation
+        // past the token scan; no job uses one today, so novelty is refused
+        // in every spelling: inline (quoted or bare) and as the first token
+        // of any line (the block-scalar form). Mid-line expressions in
+        // ARGUMENTS stay legal; the shard index rides one.
+        expect(
+          /run:\s*["']?\$\{\{/.test(code),
+          `${name}: expression-valued run lines are refused`,
+        ).toBe(false);
+        expect(
+          /\n\s*["']?\$\{\{/.test(code),
+          `${name}: a line may not begin with an expression`,
+        ).toBe(false);
+        // A job-level uses: (reusable workflow) is unclassifiable here: its
+        // tests live in another file this pin never reads. None exists
+        // today, so novelty is refused; a future one must extend this pin
+        // with the called workflow's own classification first. (Step-level
+        // `- uses:` actions sit at deeper indent and stay legal.)
+        expect(/\n {4}uses: /.test(span), `${name}: a job-level uses is refused`).toBe(false);
+        if (testFree.includes(name)) {
+          expect(
+            testTokens.test(code),
+            `${name} is classified test-free but its span carries a test token; wire it or exempt it above`,
+          ).toBe(false);
+          continue;
+        }
+        // Both test-running classes must LOOK like it, so a runner migration
+        // that the token scan cannot see fails loudly here instead of
+        // silently reclassifying the job.
+        expect(testTokens.test(code), `${name} is classified test-running`).toBe(true);
+        if (!wired.includes(name)) continue;
+        // One container per wired job leg (isolated fixed-name databases);
+        // the health gate lives in the service options because a wait STEP
+        // would break the step-count pins above.
+        expect(span, name).toContain('    services:\n      postgres:\n');
+        expect(span, name).toContain('        image: postgres:16-alpine\n');
+        expect(span, name).toContain('--health-cmd "pg_isready -U postgres -d wocc_ci"');
+        expect(span, name).toContain('          - 5432:5432\n');
+        // The JOB-LEVEL env lines (a step-level copy would not cover the
+        // leg); other job env keys may precede either one. WOCC_EXPECT_PG
+        // arms the runtime twin on ANY runner, so the sentinel that demands
+        // the database URL travels in the same pinned block as the URL.
+        expect(span, name).toMatch(
+          /\n {4}env:\n(?: {6}\S[^\n]*\n)*? {6}TEST_DATABASE_URL: postgres:\/\/postgres:postgres@127\.0\.0\.1:5432\/wocc_ci\n/,
+        );
+        expect(span, name).toMatch(/\n {4}env:\n(?: {6}\S[^\n]*\n)*? {6}WOCC_EXPECT_PG: '1'\n/);
+        // Exactly ONE occurrence of each variable in the job's code: a
+        // second copy at any indent is a step-level or matrix-conditional
+        // override that could blank the URL on a subset of legs while the
+        // job-level pin above stays satisfied.
+        expect(code.match(/TEST_DATABASE_URL/g) ?? [], name).toHaveLength(1);
+        expect(code.match(/WOCC_EXPECT_PG/g) ?? [], name).toHaveLength(1);
+      }
+    }
+    // THE FORCING FUNCTION for the DB-less class: membership alone would be
+    // the one unguarded door (classify a new pg-suite job "dbless" and it
+    // skips green forever), so every dbless member must name its coupled
+    // guard here, and the label set is pinned to the guards implemented
+    // below; a new exempt job cannot land without a human writing what
+    // makes its DB-lessness safe.
+    const dblessGuard: Record<string, string> = {
+      'pr-long-sims-a': 'lane',
+      'pr-long-sims-b': 'lane',
+      'release-i18n': 'i18n-tier',
+      'browser-gate': 'browser',
+      browser: 'browser',
+    };
+    expect(Object.keys(dblessGuard).sort()).toEqual(classes.flatMap((c) => c.dbless).sort());
+    expect(new Set(Object.values(dblessGuard))).toEqual(new Set(['lane', 'i18n-tier', 'browser']));
+    // The coupled guards for the DB-less classes (labels "lane" and
+    // "i18n-tier"). Lanes and the i18n tier:
+    // no member file may gate on TEST_DATABASE_URL (a pg suite becoming
+    // lane-resident would skip green in the DB-less lane forever). KNOWN
+    // LIMIT, recorded: this is a literal scan of the suite files themselves,
+    // blind to a gate reached through a helper import (today every pg suite
+    // inlines the variable; if the shared pg-gate helper follow-up ever
+    // lands, this guard must move to the helper's importers in the same
+    // change), and stripComments treats a /* inside a string literal as a
+    // block opener, which here blanks code toward a false pass.
+    for (const file of [...CI_LONG_SUITES, ...I18N_RELEASE_TIER_SUITES]) {
+      const gated = stripComments(
+        readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'),
+      ).includes('TEST_DATABASE_URL');
+      expect(gated, `${file} must not gate on TEST_DATABASE_URL (its job has no Postgres)`).toBe(
+        false,
+      );
+    }
+    // The browser jobs run vitest through npm run test:browser against a
+    // separate config (label "browser"); the guard pins the whole chain: the
+    // script targets the browser config, that config collects only
+    // tests/browser, and no file there gates on TEST_DATABASE_URL.
+    const pkg = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
+    expect(pkg).toContain('"test:browser": "vitest run --config vitest.browser.config.ts"');
+    // RAW read on purpose: the include glob's /**/ parses as a block comment
+    // to every stripper in this repo (the documented string-literal caveat in
+    // helpers/strip_comments.ts), so stripping would blank the very line this
+    // asserts on.
+    const browserConfig = readFileSync(
+      new URL('../vitest.browser.config.ts', import.meta.url),
+      'utf8',
+    );
+    expect(browserConfig).toContain("include: ['tests/browser/**/*.browser.test.ts']");
+    const browserFiles = tsFilesUnder(fileURLToPath(new URL('../tests/browser', import.meta.url)));
+    expect(browserFiles.length).toBeGreaterThan(0);
+    for (const { file, full } of browserFiles) {
+      const gated = stripComments(readFileSync(full, 'utf8')).includes('TEST_DATABASE_URL');
+      expect(gated, `tests/browser/${file} must not gate on TEST_DATABASE_URL`).toBe(false);
+    }
+    // FILE-WIDE dead-letter negatives, deliberately on the RAW text (a
+    // commented-out 5433 mapping should red, the safe direction): 5433 is the
+    // dev-compose port that vite.config's intended-dead fallback DATABASE_URL
+    // names; a service mapping it ANYWHERE in CI (any job, quoted or
+    // host-bound) would turn the deliberately-dead unit-suite URLs into live
+    // connections. Positive controls first: the matchers must fire on every
+    // shape they exist to catch, so they cannot rot into unmatchable.
+    const portMap5433 = /5433:\d/;
+    const url5433 = /:5433\//;
+    expect(portMap5433.test('- 5433:5432')).toBe(true);
+    expect(portMap5433.test('- "5433:5432"')).toBe(true);
+    expect(portMap5433.test('- 127.0.0.1:5433:5432')).toBe(true);
+    expect(url5433.test('postgres://u:p@h:5433/db')).toBe(true);
+    for (const source of [workflow, nightly]) {
+      expect(source).not.toMatch(portMap5433);
+      expect(source).not.toMatch(url5433);
+    }
+    // The classification covers the two vitest-carrying workflow files;
+    // every OTHER workflow must stay free of test invocations, and the
+    // corpus is the git index (the shared-walker doctrine), so a NEW
+    // workflow file forces a decision here instead of running tests nobody
+    // classified.
+    const listed = spawnSync('git', ['ls-files', '.github/workflows'], {
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      encoding: 'utf8',
+    })
+      .stdout.trim()
+      .split('\n')
+      .sort();
+    const testFreeWorkflows = [
+      '.github/workflows/audit.yml',
+      '.github/workflows/ci-stall-rerun.yml',
+      '.github/workflows/desktop-publish.yml',
+      '.github/workflows/ota-publish.yml',
+    ];
+    expect(listed).toEqual(
+      ['.github/workflows/ci.yml', '.github/workflows/nightly.yml', ...testFreeWorkflows].sort(),
+    );
+    for (const file of testFreeWorkflows) {
+      const text = codeLines(readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'));
+      expect(
+        testTokens.test(text),
+        `${file} carries a test invocation; classify it in this pin first`,
+      ).toBe(false);
+    }
   });
 });

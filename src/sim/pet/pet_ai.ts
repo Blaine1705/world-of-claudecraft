@@ -36,15 +36,15 @@
 
 import { lineOfSightClear } from '../colliders';
 import { packlordPetHasteMultiplier } from '../combat/hunter_packlord';
-import { hunterPetFerocityDamageMultiplier } from '../combat/hunter_shared';
+import { hunterPetDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
 import { MOBS } from '../data';
-import { pctValue } from '../entity';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { SimContext } from '../sim_context';
-import { canDetectStealthedTarget } from '../threat';
+import { petCanSeeStealthedTarget } from '../threat';
 import {
   type Aura,
   armorReduction,
@@ -130,7 +130,13 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (!travelling) pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
-  if (target && (target.dead || !ctx.isHostileTo(pet, target) || !petCanSeeTarget(pet, target)))
+  if (
+    target &&
+    (target.dead ||
+      !ctx.isHostileTo(pet, target) ||
+      !petCanSeeTarget(target) ||
+      petQuestGateBlocksTarget(ctx, pet, target))
+  )
     target = null;
   // Both arms are the same rule: stop fighting something the owner has left behind.
   // Out of leash range they walked away from it; mounted they rode away from it.
@@ -164,9 +170,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         pet.petTauntTimer <= 0 &&
         (pet.petAutoTaunt || pet.petManualTauntPending)
       ) {
-        ctx.applyTaunt(pet, target);
-        pet.petManualTauntPending = false;
-        pet.petTauntTimer = PET_GROWL_INTERVAL;
+        if (ctx.applyTaunt(pet, target)) {
+          pet.petManualTauntPending = false;
+          pet.petTauntTimer = PET_GROWL_INTERVAL;
+        }
       }
       // Water Elemental: auto-cast Water Jet on cooldown when the owner armed its
       // autocast (right-click), the same idiom as the Growl autocast above. The jet
@@ -235,7 +242,8 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
     !target ||
     target.dead ||
     !ctx.isHostileTo(pet, target) ||
-    !petCanSeeTarget(pet, target) ||
+    petQuestGateBlocksTarget(ctx, pet, target) ||
+    !petCanSeeTarget(target) ||
     dist2d(pet.pos, target.pos) > range;
   if (canceled) {
     clearWaterJetChannel(ctx, pet, true);
@@ -354,10 +362,11 @@ export function petFollow(ctx: SimContext, pet: Entity, owner: Entity): void {
  * Re-derive the owner-inherited half of a hunter pet's stats (pet/pet_scaling.ts).
  *
  * Idempotent, so updatePet can call it every tick and pick up a gear swap the moment
- * it lands: armor and attack power are recomputed from the template base plus the
- * current share, while the health share is swapped as a DELTA rather than recomputed,
- * because the raid stat auras (applyNonPlayerStatAura) write maxHp too and rebuilding
- * the pool from the template would silently eat their contribution.
+ * it lands: armor, attack power, and melee haste are recomputed from the template base
+ * (or, for haste, straight from the owner) plus the current share, while the health
+ * share is swapped as a DELTA rather than recomputed, because the raid stat auras
+ * (applyNonPlayerStatAura) write maxHp too and rebuilding the pool from the template
+ * would silently eat their contribution.
  *
  * Hunter-only on purpose. A warlock demon and the mage Water Elemental are authored
  * as pets with their own tuned pools; a tamed beast is a wild mob template that was
@@ -389,8 +398,10 @@ export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
     maxHp: owner.maxHp,
     armor: owner.stats.armor,
     rangedPower: owner.rangedPower,
+    meleeHaste: owner.meleeHaste,
   });
   pet.attackPower = share.attackPower;
+  pet.meleeHaste = share.meleeHaste;
   pet.stats.armor = Math.round(template.armorPerLevel * (pet.level - 1)) + share.armor;
   const gained = share.hp - pet.petOwnerHpBonus;
   if (gained === 0) return;
@@ -403,14 +414,7 @@ export function applyPetOwnerScaling(ctx: SimContext, pet: Entity): void {
 
 export function petDamageMult(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId === null) return 1;
-  let mult = 1;
-  for (const a of pet.auras) {
-    if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
-  }
-  const ownerMeta = ctx.players.get(pet.ownerId);
-  if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
-  mult *= hunterPetFerocityDamageMultiplier(ctx, pet);
-  return mult;
+  return hunterPetDamageMultiplier(ctx, pet);
 }
 
 export function petCleaveAttack(
@@ -615,7 +619,8 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   // callback's squared d2 to avoid a units mismatch silently changing the radius.
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
     if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) return;
-    if (!petCanSeeTarget(pet, m)) return;
+    if (petQuestGateBlocksTarget(ctx, pet, m)) return;
+    if (!petCanSeeTarget(m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
     // "Assist my target": the owner has this thing targeted AND is actually engaged with
@@ -643,15 +648,18 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   return best;
 }
 
-// Stealth detection scales off a BASE RADIUS, not off how far the observer can be
-// interested in something. A mob passes its own aggro radius (mob/targeting.ts), so
-// PET_AGGRESSIVE_RANGE, the pet's analogue of that, is the base of the same ORDER; the
-// 50yd assist RANGE that used to be passed is a scan span, and reusing it as a radius
-// gave the pet roughly three times a mob's reach on a stealthed player. Not the
-// identical rule: a mob's base also carries a level term and the delve detect
-// multiplier, which no pet path has ever applied. Keep this identical to the base
-// combat/damage.ts passes, or a pet could hit what it cannot see.
-function petCanSeeTarget(pet: Entity, target: Entity): boolean {
+function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity): boolean {
+  return target.kind === 'mob' && questGateBlocksAggro(ctx.players, target, pet);
+}
+
+// A pet cannot see a stealthed enemy player AT ALL, exactly like the enemy
+// player it is fighting beside cannot: no close-range proximity detection, the
+// way a mob gets. petCanSeeStealthedTarget owns that rule; keep it identical to
+// the combat/damage.ts hit gate, or a pet could strike what it cannot see.
+// updatePet re-checks this every tick, so a target that Vanishes or Stealths is
+// dropped, not just never acquired. The observing pet is irrelevant (the rule
+// keys on the target's stealth alone), so it takes no pet argument.
+function petCanSeeTarget(target: Entity): boolean {
   if (target.kind !== 'player') return true;
-  return canDetectStealthedTarget(pet, target, PET_AGGRESSIVE_RANGE);
+  return petCanSeeStealthedTarget(target);
 }

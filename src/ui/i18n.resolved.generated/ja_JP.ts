@@ -441,7 +441,7 @@ export const ja_JP: EnTranslations = {
       "remainingDaysHours": "{days}日{hours}時間",
       "score": "スコア",
       "walletValue": "ウォレット価値 (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "不明",
       "spinTitle": "デイリースピン",
@@ -480,6 +480,88 @@ export const ja_JP: EnTranslations = {
         "price_unavailable": "WOCの価格を取得できないため、報酬は一時的にロックされています。",
         "banned": "デイリー報酬への参加が禁止されています。理由: {reason}",
         "bannedUntil": "デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}"
+      }
+    },
+    "trade": {
+      "windowClosed": "取引ウィンドウを閉じました。",
+      "woc": {
+        "tabGold": "金貨",
+        "tabWoc": "$WOC",
+        "modesLabel": "支払い通貨",
+        "tabWocHint": "$WOC での支払いは、あなた側のテーブルが空で金貨が提示されていないときに使えます。",
+        "priceLabel": "価格（USD）",
+        "pricePlaceholder": "0.00",
+        "equivalent": "現在のレートで約 {tokens} $WOC",
+        "variableWarning": "$WOC の金額はプレビューであり、固定価格ではありません。正確な数量はあなたが支払う時点の最新の見積もりで決まります。",
+        "feeLine": "取引所手数料 {fee}（価格から差し引かれます）",
+        "netLine": "受取額 {net}",
+        "netLineBuyer": "出品者の受取額 {net}",
+        "sendOffer": "$WOC を提示",
+        "offerSent": "オファーを送信しました。{name} が承諾しない場合、10 分で期限切れになります。",
+        "offerSentUntil": "オファーを送信しました。{name} が承諾しない場合、{time} に期限切れになります。",
+        "incomingAccept": "{name} があなたのアイテムに {price} を提示しています。",
+        "notInstant": "$WOC の取引は即時ではありません。双方が承諾するとアイテムはエスクローに移り、支払いが確認され次第、購入者に届きます。",
+        "blockDisabled": "このレルムでは $WOC 取引所を利用できません。",
+        "blockNoWallet": "$WOC でアイテムを売却するには、ウォレットを連携して認証してください。",
+        "blockPartnerUnknown": "そのプレイヤーが $WOC を受け取れるか確認しています…",
+        "blockRecipientNoWallet": "そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。",
+        "hintClearYourItems": "自分のアイテムを外してください。$WOC の提示は相手の出品を買うためのものです。",
+        "hintAwaitTheirItems": "$WOC で売却できるものを相手が出すのを待っています。",
+        "hintOneItem": "$WOC の取引はアイテム 1 点のみが対象です。テーブルに置けるのは売却するアイテムだけです。",
+        "hintEnterPrice": "USD で価格を入力してください。",
+        "hintAcceptNeedsItem": "承諾する前に、売却するアイテムを入れてください。",
+        "hintAcceptLocked": "そのアイテムはロックされています。バッグでロックを解除し、取引から一度外してから入れ直してください。",
+        "hintGoldOffered": "先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。",
+        "ineligibleReason": "ソウルバウンド、クエスト、ロック中のアイテムと、取引所のカテゴリ外のアイテムは $WOC で売却できません。",
+        "incomingTitle": "{name} からの $WOC オファー",
+        "incomingBody": "{name} が {item} を {price} であなたに売却すると提案しています。",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd}（約 {tokens} $WOC）",
+        "waitingOther": "オファーを承諾しました。相手の承諾を待っています。",
+        "payNow": "{usd} を支払う",
+        "awaitingPayment": "支払いの確認を待っています…",
+        "paying": "ウォレットで支払いを承認してください…",
+        "settled": "支払い完了。アイテムはバッグに入っています。バッグに空きがなかった場合はレイヴンポスト便で届きます。",
+        "settledSeller": "支払い完了。アイテムは購入者に届けられました。",
+        "accept": "オファーを承諾",
+        "accepted": "オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。",
+        "decline": "辞退する",
+        "withdraw": "オファーを取り下げる",
+        "hintInsufficientBalance": "接続中のウォレットの $WOC 残高を超えています。",
+        "statusAwaitingBuyer": "購入者の支払いを待っています。",
+        "statusPayingBuyer": "ネットワーク上で支払いを確認しています...",
+        "statusPayingSeller": "購入者の支払いをネットワーク上で確認しています...",
+        "statusReviewBuyer": "あなたの支払いは審査中です。",
+        "statusReviewSeller": "購入者の支払いは審査中です。",
+        "paidSeller": "{item} の代金 {price} を受け取りました。",
+        "paidBuyer": "{item} の代金 {price} を支払いました。",
+        "closedCancelled": "この取引はキャンセルされました。アイテムはレイヴンポスト便で出品者に返送されます。",
+        "closedSuspended": "この取引はゲームマスターにより停止されました。アイテムはレイヴンポスト便で出品者に返送されます。",
+        "closedUnpaid": "この取引は支払いがないまま終了しました。アイテムはレイヴンポスト便で出品者に返送されます。",
+        "closedUnpaidBuyer": "この取引はあなたの支払いがないまま終了しました。アイテムはレイヴンポスト便で出品者に返送されます。承諾した取引を支払わないと、マーケット違反が記録されます。",
+        "cancelSale": "販売をキャンセル",
+        "cancelPendingSeller": "キャンセルを申請しました。購入者が先に支払わない限り、販売は自動的に終了します。",
+        "youDeclined": "オファーを拒否しました。",
+        "youWithdrew": "オファーを取り下げました。",
+        "offerNotPending": "このオファーはすでに保留中ではありません。",
+        "offerDeclined": "$WOC のオファーは拒否されました。",
+        "offerWithdrawn": "$WOC のオファーは取り下げられました。",
+        "offerExpired": "$WOC のオファーは期限切れになりました。",
+        "offerExpiresAt": "オファーは {time} に期限切れになります。",
+        "offerStandsUntil": "あなたの $WOC オファーは {time} まで有効です。相手が承諾したら、もう一度出品者と取引して手続きを完了してください。",
+        "dealAwaitsPayment": "あなたの $WOC 購入はまだ未払いです。もう一度出品者と取引して支払ってください。支払いがない場合、取引は自動的に期限切れになり、未払いにはマーケット違反が記録されます。",
+        "closeSellerHold": "あなたのアイテムは購入者の支払いまで保留されたままです。気が変わった場合は、取引所の「取引履歴」タブから販売をキャンセルしてください。",
+        "closePaymentContinuesBuyer": "あなたの支払いはまだ確認中です。配送は自動的に完了します。",
+        "closePaymentContinuesSeller": "購入者の支払いはまだ確認中です。販売は自動的に完了します。",
+        "p2pBindingNote": "双方が承諾すると、{duration} 以内、または「支払う」を押した時点で始まるより短い期間内に支払う必要があります。支払わなかった場合はマーケット違反が記録されます。",
+        "p2pBindingNoteUntimed": "双方が承諾すると、まもなく、または「支払う」を押した時点で始まるより短い期間内に支払う必要があります。支払わなかった場合はマーケット違反が記録されます。",
+        "p2pPaymentDueAt": "{time} までに支払う必要があります。支払わなかった場合はマーケット違反が記録されます。",
+        "quoteExpiredTrade": "見積もりが失効しました。「あとで」を押してから、もう一度「支払う」を押すと新しい見積もりが取得できます。",
+        "quoteStaged": "{usd} の支払い見積もりが用意できました: {tokens} $WOC、{time} まで有効です。",
+        "paymentConfirmed": "支払いが確認されました。配送が完了するとアイテムはバッグに入ります（空きがない場合はレイヴンポスト便で届きます）。",
+        "statusConfirmedBuyer": "支払いが確認されました。配送を完了しています...",
+        "statusConfirmedSeller": "支払いが確認されました。取引を完了しています...",
+        "hintBelowMin": "取引所の最低価格は {usd} です。"
       }
     },
     "wocStore": {
@@ -734,6 +816,9 @@ export const ja_JP: EnTranslations = {
       "showAmounts": "すべてのClaudium数量を表示",
       "hideAmounts": "追加のClaudium数量を隠す",
       "skuRow": "{usd}で{claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "購入",
       "buyUnavailable": "現在購入できません。",
       "storeTitle": "外見アイテムストア",
@@ -853,6 +938,7 @@ export const ja_JP: EnTranslations = {
       "jump": "ジャンプ",
       "leaderboard": "ランキング",
       "dailyRewards": "ストア",
+      "wocMarket": "取引所",
       "deeds": "功績",
       "mounts": "マウント",
       "professions": "専門技能",
@@ -866,11 +952,52 @@ export const ja_JP: EnTranslations = {
       "actionRing": "戦闘アクション",
       "actionPageToggle": "行動ページ切替",
       "actionPageIndicator": "{page}ページ",
+      "actionRadial": "アクション方向",
+      "actionRadialCancel": "アクションをキャンセル",
+      "radialCenter": "中央",
+      "radialUp": "Up",
+      "radialRight": "右",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "消耗品",
+      "menuControl": "メニュー",
+      "menuControlAria": "メニュー。タップでチャットを開き、長押しして右にスワイプすると騎乗、地図、バッグなどを開けます。",
+      "menuControlAriaTap": "メニュー。タップでメニュー列（騎乗、地図、バッグなど）を開きます。もう一度タップするとチャットが開きます。",
+      "menuLabel": "Menu",
+      "quickActions": "クイック操作",
+      "quickActionsAria": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開きます。長押しして右にスワイプすると項目を選べます。",
+      "quickActionsAriaTap": "クイック操作。タップすると騎乗、チャット、地図、バッグなどの操作列が開き、項目をタップして選びます。もう一度タップすると閉じます。",
+      "quickActionsLabel": "操作",
+      "stanceRadial": "スタンス",
+      "stanceAnchorAria": "スタンス：{stance}。タップしてスタンスリングを開き、別のスタンスを選びます。",
+      "stanceAnchorEmptyAria": "スタンスなし。タップしてスタンスリングを開き、スタンスを選びます。",
+      "questStripAria": "追跡中のクエスト {total} 件中 {position} 件目: {title}。次のクエストを表示するには操作してください。",
+      "questStripAriaSingle": "追跡中のクエスト: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "他 {count} 件",
       "targetCycle": "ターゲット切替",
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "アクションバーの配置を編集"
+    },
+    "barEditor": {
+      "title": "アクションバーの編集",
+      "close": "アクションバー編集を閉じる",
+      "pages": "アクションバーのページ",
+      "pageTab": "Page {page}",
+      "buttonHeader": "ボタン{button}",
+      "cellAria": "ボタン{button}、{direction}：{action}",
+      "emptyCellAria": "ボタン{button}、{direction}：空き",
+      "hint": "スロットをタップし、もう一つタップすると入れ替わります。",
+      "armed": "スロットをタップして{name}を配置します。",
+      "picked": "別のスロットをタップして{name}と入れ替えます。",
+      "locked": "アクションバーはインターフェース設定でロックされています。",
+      "clear": "クリア",
+      "clearAria": "スロットをクリア",
+      "clearArmed": "スロットをタップするとクリアします。"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -953,6 +1080,22 @@ export const ja_JP: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}：{story}",
+      "story": {
+        "undercroft": "地下蔵",
+        "state": "公務の階",
+        "residence": "居住の階",
+        "tower": "見張り塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}：{story}",
+      "story": {
+        "ground": "庭園の階",
+        "solar": "日だまりの間"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "北東",
@@ -970,6 +1113,7 @@ export const ja_JP: EnTranslations = {
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
       "threatFallback": "リアルタイムのヘイトなし：{name}へのダメージを表示",
+      "threatFrozen": "{name}への最終脅威",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
@@ -1367,6 +1511,10 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
       "showPlaytime": "キャラクター画面にプレイ時間を表示",
+      "forceHighPerfGpu": "専用ゲーミングGPUを使用",
+      "forceHighPerfGpuNote": "既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。",
+      "discordPresence": "Discord リッチプレゼンス",
+      "discordPresenceNote": "プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。",
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "showPlayerNameplates": "プレイヤーのネームプレートを表示",
@@ -1382,6 +1530,7 @@ export const ja_JP: EnTranslations = {
       "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
       "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
+      "showReliquaryTracker": "聖遺物庫トラッカーを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
@@ -1394,7 +1543,9 @@ export const ja_JP: EnTranslations = {
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
-      "mobileLeftHanded": "左利き用レイアウト"
+      "mobileLeftHanded": "左利き用レイアウト",
+      "touchTapMenus": "タップメニュー",
+      "touchTapMenusNote": "アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。"
     },
     "talentRows": {
       "tab": "選択",
@@ -1427,9 +1578,29 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
+      "confirmAction": "決定 / 選択",
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
-      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
+      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。",
+      "crossHotbar": "クロスホットバー",
+      "crossHotbarEnable": "クロスホットバーを有効化",
+      "crossHotbarExpand": "ダブルクロスホットバー",
+      "crossHotbarHelp": "トリガーを押している間、方向キーとフェイスボタンに8つのアクションバースロットが表示されます。もう一方のトリガーを軽く押すと、2つ目のセットに切り替わります。",
+      "crossHotbarResetLayout": "クロスホットバーをリセット",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "クロスホットバーが有効な間、トリガーと方向キーはクロスホットバーが使用します。ここではなく下の項目で設定してください。",
+      "cancelAction": "キャンセル / 戻る",
+      "subcommandsAction": "サブコマンド / マップ",
+      "cycleHudAction": "インターフェース切替",
+      "cycleSetAction": "ホットバーセット切替",
+      "crossHotbarDisplay": "バー表示",
+      "crossHotbarDisplayFull": "通常",
+      "crossHotbarDisplayCompact": "コンパクト",
+      "crossHotbarDisplayMinimal": "押している間のみ",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "{action}を持っています。マスで決定を押すと置き、キャンセルで戻します。",
+      "crossHotbarEditHint": "配置変更中：決定でマスまたはスペルブックからアクションを持ち上げてマスに置き、キャンセルでマスを空にします。",
+      "crossHotbarEditHelp": "左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",
@@ -1548,6 +1719,7 @@ export const ja_JP: EnTranslations = {
           "render": "描画  送信 {submit} ミリ秒 | ワールド {world} ミリ秒 | エンティティ {entities} ミリ秒",
           "scene": "シーン   {calls} 呼び出し | {triangles} 三角形 | {views} ビュー",
           "hitches": "カクつき {hitches} | シェーダー {shaders} | アップロード {uploads} | ビュー {views}",
+          "hitchesBuild": "ゾーン構築 {zoneBuilds} | フレーム外 {offFrame} | GC {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "待機中"
         },
@@ -1599,7 +1771,10 @@ export const ja_JP: EnTranslations = {
             "eventCpu": "イベント処理がフレーム時間を消費しています",
             "shaderCompile": "ゲーム中にシェーダーがコンパイルされています",
             "textureUpload": "テクスチャのアップロードでカクつきが発生しています",
+            "zoneBuild": "ゾーンのストリーミング構築でカクつきが発生しています",
             "viewCreate": "エンティティ表示の作成でカクつきが発生しています",
+            "gcHitch": "長いフレーム内でガベージコレクションが実行されています",
+            "offFrameHitch": "長いフレームはレンダーコールバック外の処理に起因しています",
             "otherHitch": "原因不明の長いフレームが残っています",
             "assetStartup": "アセット処理でゲーム開始が遅れています",
             "longTasks": "ブラウザーの長いタスクがフレームを妨げています",
@@ -1739,6 +1914,7 @@ export const ja_JP: EnTranslations = {
       "notEnoughHonor": "名誉が足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
+        "arenaComplete": "アリーナ参戦",
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
         "fiestaWin": "フィエスタ勝利",
@@ -1845,6 +2021,7 @@ export const ja_JP: EnTranslations = {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
     "itemHeroicTag": "[ヒロイック]",
+    "itemHeroicLabel": "ヒロイック",
     "itemSoulbound": "魂縛",
     "itemUniqueEquipped": "装備ユニーク",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const ja_JP: EnTranslations = {
         "few": "あなたは{rank}、{count}人のメンバー",
         "many": "あなたは{rank}、{count}人のメンバー",
         "other": "あなたは{rank}、{count}人のメンバー"
+      },
+      "wocMarketSellChoose": {
+        "one": "{count} 件から選択",
+        "few": "{count} 件から選択",
+        "many": "{count} 件から選択",
+        "other": "{count} 件から選択"
+      },
+      "wocTradeIneligible": {
+        "one": "セットしたアイテムのうち {count} 個は $WOC で売却できません。",
+        "few": "セットしたアイテムのうち {count} 個は $WOC で売却できません。",
+        "many": "セットしたアイテムのうち {count} 個は $WOC で売却できません。",
+        "other": "セットしたアイテムのうち {count} 個は $WOC で売却できません。"
       },
       "finderPartySize": {
         "one": "{count} 人",
@@ -2016,6 +2205,10 @@ export const ja_JP: EnTranslations = {
       "errPasswordLong": "新しいパスワードは128文字以内にしてください。",
       "errPasswordUnchanged": "新しいパスワードは現在のものと異なる必要があります。",
       "errPasswordConfirm": "新しいパスワードが一致しません。",
+      "setPasswordTitle": "パスワードを設定",
+      "setPasswordHint": "このアカウントは Apple でサインインまたは Discord で作成されており、まだパスワードがありません。パスワードを設定すると、Mac や Windows のデスクトップアプリ、Web など他の端末でもサインインでき、追加のサインイン方法も連携できます。",
+      "setPasswordSubmit": "パスワードを設定",
+      "passwordSet": "パスワードを設定しました。これでどこでもユーザー名とパスワードでサインインできます。",
       "emailLabel": "メールアドレス（任意）",
       "emailHint": "アカウント復旧にのみ使用します。宣伝メールは一切送信しません。",
       "saveEmail": "メールを保存",
@@ -2199,6 +2392,10 @@ export const ja_JP: EnTranslations = {
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
       "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
+      "itemAriaLocked": "{item}、数量 {count}、ロック済み",
+      "itemLockedLine": "ロック中",
+      "lockItem": "アイテムをロック",
+      "unlockItem": "アイテムのロック解除",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -2453,12 +2650,14 @@ export const ja_JP: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
-      "removeFromBarAria": "{name}をアクションバーから削除"
+      "removeFromBarAria": "{name}をアクションバーから削除",
+      "assignAria": "{name}を配置するスロットを選択"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "退席"
+      "afkTag": "退席",
+      "cheaterTag": "< チーター >"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",
@@ -3224,11 +3423,13 @@ export const ja_JP: EnTranslations = {
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（上質な等級を{count}個消費）",
+      "craftFeeLine": "製作手数料：1個あたり {fee}",
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
       "craftedToastQty": "製作しました:{name} x{qty}",
       "insufficientMaterials": "材料が不足しています。",
+      "reagentLocked": "その素材はロックされています。",
       "unknownRecipe": "そのレシピは存在しません。",
       "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
       "comboRequires": "調律条件：{craftA} + {craftB}、ティア {tier}。",
@@ -3335,6 +3536,7 @@ export const ja_JP: EnTranslations = {
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
       "notSalvageable": "それは解体できません。",
+      "salvageLocked": "そのアイテムはロックされています。",
       "disenchantBusy": "手が離せません。",
       "salvageBusy": "手が離せません。",
       "enchantBusy": "手が離せません。",
@@ -3710,6 +3912,9 @@ export const ja_JP: EnTranslations = {
       "pinFull": "トラッカーが満杯です（最大 {cap} ページ）",
       "pinAria": "{name}をHUDトラッカーにピン留め",
       "unpinAria": "{name}のピン留めを解除",
+      "trackerToggleLabel": "HUDトラッカー",
+      "trackerToggleShowHint": "聖遺物庫トラッカーを画面に表示する",
+      "trackerToggleHideHint": "聖遺物庫トラッカーを画面から隠す",
       "rarityLine": "収集家の{percent}が発見",
       "pageRarityLine": "収集家の{percent}が照耀",
       "cellAriaWithRarity": "{base}、{rarity}",
@@ -3770,6 +3975,7 @@ export const ja_JP: EnTranslations = {
       "unlockedBorderHint": "新しい枠飾りを獲得: {name}。功績の書で着用できます。",
       "broadcastLine": "{name}が功績「{deed}」を達成しました",
       "rarityLine": "冒険者の{percent}が達成",
+      "stillToVisit": "未訪問：{places}",
       "trackerLabel": "功績",
       "collapseHint": "功績トラッカーを折りたたむ",
       "expandHint": "功績トラッカーを展開",
@@ -3797,6 +4003,220 @@ export const ja_JP: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"
+    },
+    "walletBridge": {
+      "cancelled": "ウォレットへのリクエストはキャンセルされました。何も送信されていません。",
+      "timeout": "ウォレットが時間内に応答しませんでした。ウォレットを開いてもう一度お試しください。",
+      "notConnected": "まずウォレットを接続して認証してから、もう一度お試しください。",
+      "unsupported": "このウォレットではその操作を完了できません。別のウォレットを接続してください。",
+      "unavailable": "ここで利用できるウォレット接続がありません。ウォレットを接続し直してもう一度お試しください。",
+      "badResponse": "ウォレットが利用できない応答を返しました。もう一度お試しください。"
+    },
+    "wocMarket": {
+      "title": "$WOC 取引所",
+      "close": "取引所を閉じる",
+      "launcherLabel": "$WOC 取引所",
+      "tabBrowse": "出品一覧",
+      "tabSell": "出品する",
+      "tabActivity": "マイ取引履歴",
+      "tabsLabel": "$WOC 取引所のセクション",
+      "loading": "取引所を読み込み中...",
+      "loadFailed": "取引所に接続できませんでした。しばらくしてからもう一度お試しください。",
+      "disabledRealm": "このレルムでは $WOC 取引所を利用できません。",
+      "pausedBanner": "取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。",
+      "walletBanner": "ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。",
+      "walletBannerCta": "ウォレットを接続",
+      "rateNote": "レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
+      "rateNotePaused": "最後に確認したレート: {time} 時点で 1 USD あたり約 {tokens} $WOC。",
+      "estimateNote": "{usd} は現在のレートで約 {tokens} $WOC です。",
+      "browseEmpty": "現在出品はありません。また後で確認してください。",
+      "browseError": "出品一覧を読み込めませんでした。",
+      "colItem": "アイテム",
+      "colSeller": "出品者",
+      "colCurrentBid": "現在の入札額",
+      "colBuyNow": "即決価格",
+      "colTimeLeft": "残り時間",
+      "reserveMet": "最低価格到達",
+      "reserveNotMet": "最低価格未到達",
+      "yourListing": "自分の出品",
+      "buyNowLockedBadge": "購入手続き中",
+      "reserveMetTip": "出品者は非公開の最低価格を設定しており、現在の入札額はそれに達しています。",
+      "reserveNotMetTip": "出品者は非公開の最低価格を設定しています。終了時の最高入札額がそれを下回ると、アイテムは売却されず、すべての保証金が返還されます。",
+      "yourListingTip": "あなたが出品したアイテムです。自分の出品には入札できません。入札がない間は、ここまたは「アクティビティ」からキャンセルできます。",
+      "buyNowLockedTip": "別の購入者が支払いの間この出品を確保しています。時間内に支払われなければ、出品は再び開放されます。",
+      "pagePrev": "前のページ",
+      "pageNext": "次のページ",
+      "pageNumber": "{current} ページ",
+      "sortLabel": "並べ替え",
+      "sortEnding": "終了が近い順",
+      "sortNewest": "新着順",
+      "sortPriceAsc": "価格が安い順",
+      "sortPriceDesc": "価格が高い順",
+      "filterQuality": "品質",
+      "filterFormat": "形式",
+      "filterAny": "すべて",
+      "filterFormatAuction": "オークション",
+      "filterFormatBuyNow": "即時購入",
+      "filterItemLabel": "アイテム",
+      "filterItemPlaceholder": "アイテム名で検索",
+      "filterCategory": "カテゴリ",
+      "filterCategoryWeapon": "武器",
+      "filterCategoryArmor": "防具",
+      "filterCategoryMount": "マウント",
+      "filterSubcategory": "種類",
+      "sellerLinkAria": "{name} の最近の取引を見る",
+      "sellerTitle": "{name} の最近の取引",
+      "sellerBack": "出品一覧に戻る",
+      "sellerEmpty": "まだ成立した取引はありません。",
+      "sellerError": "最近の取引を読み込めませんでした。",
+      "sellerSaleRow": "{time}: {item} を {buyer} に {usd} で売却",
+      "detailTitle": "出品の詳細",
+      "detailSeller": "出品者: {name}",
+      "detailEndsAt": "終了: {utc} UTC（現地時間 {local}）",
+      "detailStartingBid": "開始価格: {usd}",
+      "detailCurrentBid": "現在の入札額: {usd}",
+      "detailNoBids": "入札なし",
+      "detailMinNext": "次の最低入札額: {usd}",
+      "detailBuyNow": "即決価格: {usd}",
+      "detailSales": "最近の取引",
+      "detailSaleRow": "{time}: {seller} が {buyer} に {usd} で売却",
+      "detailNoSales": "このアイテムの取引記録はまだありません。",
+      "detailSalesLoading": "最近の取引を読み込み中...",
+      "bidLabel": "入札額（USD）",
+      "bidPlaceholder": "USD 金額を入力",
+      "bidButton": "入札する",
+      "bidAria": "{item} に入札する",
+      "bidTermsToggle": "入札条件",
+      "rowOpenAria": "{item} の出品を見る",
+      "buyNowButton": "{usd} で今すぐ購入",
+      "buyNowAria": "{item} を {usd} で今すぐ購入",
+      "cancelButton": "出品を取り下げる",
+      "cancelAria": "{item} の出品を取り下げる",
+      "bidBondNote": "入札すると、入札額とは別に返還可能な保証金を $WOC で預けます。{bid} の入札で {bond}、入札額が高いほど多くなります。上回られた場合や落札できなかった場合、または落札して支払いを済ませた後に返還されます。次点への譲渡では再び預けられます。",
+      "bidBondSchedule": "保証金は入札額の{rate}%で、最低{min}、最高{max}です。",
+      "bidBondPayWindow": "入札から{duration}以内に保証金を支払わないと、入札は失効します。",
+      "bidBindingNote": "保証金のトランザクションに署名した時点で入札は確定します。入札は取り下げられず、落札して支払わなかった場合は保証金が没収され、アカウントにマーケット違反が記録されます。",
+      "bidCloseNote": "最後の 2 分間に保証金が確認された入札があると、オークションはその入札の 2 分後まで延長されます（予定終了から最大 30 分まで）。オークション終了後に確認された保証金は無効となり、返金されます。",
+      "offerNextNote": "落札者が支払わなかった場合、あなたが自分の入札額で購入者になることがあります。その際は保証金が再び預けられ（すでに返還済みなら再度請求され）、{duration} 以内に支払う必要があります。",
+      "buyNowNote": "「今すぐ購入」は、支払いの間およそ 4 分半この出品をあなたのために確保します。時間内に支払わなかった場合、この出品には 30 分間再挑戦できません。1 時間以内に未払いの「今すぐ購入」が 3 回あると、最初の 1 回から 1 時間経つまで「今すぐ購入」が停止されます。",
+      "variableTokenWarning": "あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。",
+      "quoteFixedNote": "この見積もりは、期限切れまで $WOC の数量を固定します。新しい見積もりでは異なる場合があります。",
+      "settlementDeadlineNote": "落札した場合、オークション終了後 {duration} 以内に支払う必要があります。",
+      "claimCooldownRetry": "最近、即時購入を途中で放棄しています。{duration}後にもう一度お試しください。",
+      "termsLabel": "マーケット利用規約に同意します。",
+      "termsLink": "マーケット利用規約を見る（新しいタブで開きます）",
+      "quoteTitle": "支払いの確認",
+      "quoteTotal": "合計: {tokens} $WOC",
+      "quoteSeller": "出品者の受取额: {tokens} $WOC",
+      "quoteBurn": "バーン（供給量から除外）: {tokens} $WOC",
+      "quoteTreasury": "ゲームのトレジャリーへ: {tokens} $WOC",
+      "quoteExpires": "見積もりの有効期限: あと {duration}",
+      "quoteExpiresAt": "見積もりは {time} に失効します。",
+      "quoteExpired": "見積もりの期限が切れました。新しい見積もりを取得してください。",
+      "quoteSign": "署名して支払う",
+      "quoteRefresh": "新しい見積もり",
+      "quoteCancel": "あとで",
+      "quoteBondFor": "返金可能な入札保証金: {usd}",
+      "quoteBondForItem": "{item} への入札の返還可能な保証金: {usd}",
+      "quoteSettlementFor": "{item} の決済: {usd}",
+      "paymentDueAt": "{time} までに支払う必要があります。",
+      "signing": "ウォレットの承認を待っています...",
+      "signFailed": "ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。",
+      "signFailedConfirm": "ウォレットで確認に署名できませんでした。ウォレットを確認して再試行してください。",
+      "confirming": "チェーン上で確認中...",
+      "listing": "出品しています...",
+      "activityCancelPending": "キャンセル待ち",
+      "activityDirected": "直接取引",
+      "bidPlacedStanding": "入札が有効になりました。あなたが現在の最高入札者です。",
+      "bidPlacedOutbid": "保証金は確認されましたが、先により高い入札が入りました。",
+      "purchaseComplete": "購入が完了しました。アイテムはレイヴンポスト便で届きます。",
+      "paymentConfirmedDelivering": "支払いが確認されました。配送が完了するとアイテムはレイヴンポスト便で届きます。",
+      "listingCreated": "出品が公開されました。",
+      "listingCancelled": "出品を取り下げました。アイテムはレイヴンポスト便で戻ります。",
+      "listingCancelPending": "取り下げ待ち: 購入枠を確保している買い手がいます。支払いがなければ出品は閉じられ、アイテムはレイヴンポスト便で戻ります。",
+      "sellTitle": "出品を作成",
+      "sellEmptyFloor": "バッグに出品できるアイテムがありません。このレルムでは、{floor}品質以上の未バインド装備を取り扱います。",
+      "sellCollectiblesBoth": "マウントとメカクロマプレートも出品できます。",
+      "sellCollectiblesMounts": "マウントも出品できます。",
+      "sellCollectiblesChromas": "メカクロマプレートも出品できます。",
+      "sellLockedHidden": "ロック中のアイテムはここには表示されません。売るにはバッグでロックを解除してください。",
+      "sellSearchPlaceholder": "入力してバッグを絞り込む",
+      "sellClear": "{item} を解除して別のアイテムを選ぶ",
+      "sellChoose": "出品するアイテム",
+      "sellNoMatches": "該当するアイテムがありません",
+      "sellBuyNowAboveStart": "即決価格は開始価格より高く設定してください。",
+      "sellFormat": "形式",
+      "sellFormatAuction": "オークション",
+      "sellFormatBuyNow": "即決のみ",
+      "sellFormatAuctionBuyNow": "オークション + 即決価格",
+      "sellStart": "開始価格（USD）",
+      "sellReserve": "最低落札価格（USD、任意）",
+      "sellReserveNote": "任意で、開始価格以上です。入札者には達したかどうかだけが表示されます。終了時の最高入札額がこれを下回ると、アイテムは売れずにあなたへ戻り、すべての保証金が返還されます。",
+      "sellBuyNowNote": "必須です。即決出品はこの価格で売却され、入札はありません。",
+      "sellBuyNowAuctionNote": "任意。購入者が支払ってオークションを早期終了できる価格です。開始価格と最低希望価格の両方を上回る必要があります。",
+      "sellBuyNowPrice": "即決価格（USD）",
+      "sellDuration": "期間",
+      "sellOfferNext": "落札者が支払わなかった場合、売れ残りにせず、最低価格に達している次点の入札者にその入札額で売却します。",
+      "sellSubmit": "出品する",
+      "sellSubmitAria": "{item} を取引所に出品する",
+      "sellFeeNote": "売買が成立すると、価格から取引所の手数料が差し引かれます。一部はバーンされ、一部はトレジャリーに入り、残りは決済トランザクションであなたの連携ウォレットに届きます。入力した価格に対する手数料はここに表示されます。オークションでは最終価格に応じた手数料になります。",
+      "activityListings": "自分の出品",
+      "activityBids": "自分の入札",
+      "activitySettlements": "自分の決済",
+      "activityEmpty": "まだ入札、出品、決済はありません。あなたの取引所での履歴がここに表示されます。",
+      "activityNoListings": "出品はありません。",
+      "activityNoBids": "入札はありません。",
+      "activityNoSettlements": "決済はありません。",
+      "activityPayNow": "今すぐ支払う",
+      "activityPayNowAria": "決済 {id} を今すぐ支払う",
+      "activityPayNowItemAria": "{item} の {usd} を今すぐ支払う",
+      "activityDeadline": "支払い期限: あと {duration}",
+      "dueAt": "期限: {utc} UTC（現地時間 {local}）",
+      "activityStrikes": "マーケット違反回数: {count}",
+      "activitySuspended": "未払いの取引があったため、取引所の利用が {duration} 停止されます。それまで入札、購入、出品、$WOC 取引はできません。",
+      "strikesTip": "確定した取引の支払いをしなかった場合、そのたびに違反が 1 回記録されます。1 回目以降は、違反のたびに取引所の停止期間が長くなります。3 日、次に 14 日、90 日、そして 1 年です。",
+      "bidStatusPending": "保証金待ち",
+      "bidStatusActive": "最高入札者",
+      "bidStatusOutbid": "上回られました",
+      "bidStatusLapsed": "失効",
+      "bidStatusWon": "落札",
+      "bidStatusDefaulted": "未払い",
+      "bidStatusCancelled": "キャンセル",
+      "bidBondPay": "保証金を支払う",
+      "bidBondPayAria": "出品 {id} への入札の保証金を支払う",
+      "bidBondPayItemAria": "{item} への入札の保証金 {bond} を支払う",
+      "settlementOffered": "支払い待ち",
+      "settlementConfirming": "確認中",
+      "settlementConfirmedDelivering": "支払い確認済み、配送中",
+      "settlementReview": "支払いは審査中です",
+      "settlementDelivered": "配達済み",
+      "settlementExpired": "期限切れ（未払い）",
+      "settlementFailed": "支払い失敗",
+      "settlementFailBurnMissing": "支払いに必要なトークンのバーンが含まれていませんでした。",
+      "settlementFailBurnMismatch": "支払いでバーンされたトークン量が正しくありません。",
+      "settlementFailBurnAuthority": "トークンのバーンが、この購入で指定されていないウォレットから行われました。",
+      "settlementFailUnexpectedCredit": "この購入とは関係のないウォレットへ送金されたトランザクションです。",
+      "settlementFailQuoteExpired": "支払いの見積もりが使用前に失効しました。新しい見積もりを取得して再度支払ってください。",
+      "settlementFailTransaction": "支払いトランザクションがネットワーク上で失敗しました。新しい見積もりを取得してもう一度お試しください。",
+      "settlementFailRefunded": "この支払いはウォレットに返金されました。",
+      "settlementFailSuperseded": "この支払いの試行は、より新しい試行に置き換えられました。",
+      "settlementFailConfirmingOverdue": "この支払いは確認に時間がかかりすぎたため、検証できませんでした。",
+      "settlementFailGeneric": "この支払いを完了できませんでした。",
+      "paymentSeenAwaitingFinality": "台帳で支払いを確認しました。最終確定を待っています。",
+      "paymentNotYetVisible": "台帳にまだ支払いが見えません。表示まで少し時間がかかることがあります。",
+      "paymentServiceUnreachable": "決済サービスに接続できません。支払いは記録済みで、後で再確認されます。",
+      "paymentPendingGeneric": "支払いは送信済みで、確認を待っています。",
+      "bondSeenAwaitingFinality": "保証金の支払いが台帳で確認されました。最終確認を待っています。",
+      "bondNotYetVisible": "保証金の支払いはまだ台帳に表示されていません。表示まで少し時間がかかることがあります。",
+      "bondServiceUnreachable": "決済サービスに接続できません。保証金の支払いは記録されており、後で再確認されます。",
+      "bondPendingGeneric": "保証金の支払いは送信済みで、確認を待っています。",
+      "listingStatusActive": "出品中",
+      "listingStatusSettling": "支払い待ち",
+      "listingStatusSold": "売却済み",
+      "listingStatusReturned": "返却済み",
+      "listingStatusCancelled": "取り下げ済み",
+      "listingStatusSuspended": "停止中",
+      "listingStatusUnsold": "未売却"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const ja_JP: EnTranslations = {
       "password_too_long": "新しいパスワードは128文字以内にしてください。",
       "characters_online": "無効化する前にすべてのキャラクターからログアウトしてください。",
       "deactivated": "このアカウントは無効化されています。復元するには管理者に連絡してください。",
-      "not_found": "アカウントが見つかりません。"
+      "not_found": "アカウントが見つかりません。",
+      "password_already_set": "このアカウントにはすでにパスワードがあります。代わりにパスワード変更を使用してください。"
     },
     "character": {
       "name_invalid": "キャラクター名が無効です。2-16文字の英字を使用してください。",
@@ -3928,6 +4349,61 @@ export const ja_JP: EnTranslations = {
       "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",
       "entitlement_required": "検証済みのSeeker資格が必要です。",
       "current_ownership_required": "現在Seeker Genesis Tokenを所有している必要があります。"
+    },
+    "cheater_mark": {
+      "admin_target": "管理者アカウントにはマークを付けられません。",
+      "reason_required": "理由の入力が必要です。",
+      "invalid_duration": "マークの期間は1秒以上で入力してください。",
+      "not_marked": "そのアカウントはマークされていません。"
+    },
+    "woc_market": {
+      "invalid_input": "入力が無効です。",
+      "disabled": "このレルムでは $WOC 取引所を利用できません。",
+      "paused": "取引所の取引は一時停止中です。オークションのカウントダウンは続行されます。",
+      "wallet_required": "取引所で取引する前に、ウォレットを連携して認証してください。",
+      "recipient_wallet_required": "そのプレイヤーが $WOC の支払いを受け取るには、先にウォレットを接続する必要があります。",
+      "self_offer": "自分自身に $WOC のオファーを送ることはできません。",
+      "offer_expired": "その $WOC オファーは期限切れです。新しいものを依頼してください。",
+      "terms_required": "続行するにはマーケット利用規約に同意してください。",
+      "totp_required": "この金額には二要素認証が必要です。アカウント設定で有効にしてからコードを入力してください。",
+      "totp_invalid": "その二要素認証コードは確認できませんでした。もう一度お試しください。",
+      "suspended": "未払いの取引があったため、取引所の利用が停止されています。入札、購入、出品、$WOC 取引はできません。",
+      "character_invalid": "出品する予定のキャラクターでプレイしてから、もう一度お試しください。",
+      "not_found": "その取引所の項目はもう存在しません。",
+      "not_yours": "その取引所の項目はもう存在しません。",
+      "not_active": "その出品ではこの操作を受け付けていません。",
+      "own_listing": "自分の出品に入札したり購入したりすることはできません。",
+      "has_bids": "入札のある出品は取り下げられません。どうしても必要な場合はサポートに連絡してください。",
+      "bid_too_low": "入札額が現在の入札額に最低増額を加えた金額に届いていません。",
+      "already_pending": "この出品に対する保留中の入札を先に確定するか破棄してください。",
+      "insufficient_balance": "ウォレットの $WOC がこの入札とその保証金に足りません。",
+      "quote_unavailable": "現在、価格見積もりを発行できません。しばらくしてからもう一度お試しください。",
+      "quote_expired": "その見積もりは期限切れです。新しい見積もりを取得してください。取得できない場合、その支払い期間はすでに終了しています。",
+      "not_pending": "その入札はもう保証金を待っている状態ではありません。",
+      "confirm_failed": "トランザクションを確認できませんでした。新しい見積もりを取得して、もう一度お試しください。",
+      "confirm_in_flight": "支払いはまだ確認中です。完了してからもう一度お試しください。",
+      "buy_now_locked": "別の買い手がこの購入を進めています。しばらくしてからもう一度お試しください。",
+      "cancel_pending": "出品者がこの出品を取り消そうとしています。",
+      "claim_cooldown": "最近、即時購入を途中で放棄しています。しばらくしてからもう一度お試しください。",
+      "bond_window_closed": "この入札はもう支払えません。支払い期間が終了しています。もう一度入札して新しい期間を得てください。",
+      "settlement_in_flight": "買い手がこの出品の支払いを進めています。決済が完了してから、もう一度お試しください。",
+      "contended": "取引所はこの出品の別の処理を実行中です。しばらくしてからもう一度お試しください。",
+      "sale_conflict": "この出品には別の有効な販売記録がすでに存在します。先にそちらを除外してください。",
+      "no_buy_now": "この出品には即決価格がありません。",
+      "cap_reached": "取引所への出品数の上限に達しています。",
+      "stale_item": "そのアイテムは変更または移動されました。選び直してから、もう一度お試しください。",
+      "item_mismatch": "買い手が同意したその現物と一致しないか、状態が変化しています（ロックも含まれます）。改めて取引をやり直してください。",
+      "offer_pending": "このプレイヤーとの取引がすでに進行中です。先にそちらを解決してください。",
+      "not_eligible": "そのアイテムは $WOC 取引所に出品できません。",
+      "invalid_params": "開始価格、最低落札価格、即決価格、期間を確認してください。",
+      "signature_reused": "そのトランザクションは既に送信されています。",
+      "item_locked": "そのアイテムはロックされています。売る前にバッグでロックを解除してください。",
+      "stepup_required": "取引所で販売するには、連携済みウォレットの署名が必要です。",
+      "stepup_challenge_invalid": "そのウォレット確認は無効になりました。販売をやり直してください。",
+      "stepup_challenge_expired": "ウォレット確認の期限が切れました。販売をやり直してください。",
+      "stepup_wallet_mismatch": "この確認の発行後に連携済みウォレットが変更されました。販売をやり直してください。",
+      "stepup_binding_mismatch": "そのウォレット確認はこの販売と一致しません。販売をやり直してください。",
+      "stepup_signature_invalid": "ウォレット署名を検証できませんでした。販売をやり直してください。"
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const ja_JP: EnTranslations = {
       "ifHighContrastBackground": "スタート画面とキャラクター画面の背景を、より簡素で高コントラストなものにします。",
       "ifInvertLookY": "マウス視点の上下方向を反転します。",
       "ifShowItemLevel": "すべてのアイテムのツールチップにアイテムレベルの行を加えます。初期設定はオフで、ステータスだけの昔ながらのツールチップが保たれます。",
+      "ifShowReliquaryTracker": "聖遺物庫トラッカー（ピン留めしたページとその進行状況）をHUDに表示するかどうか。聖遺物庫ウィンドウにも対応する目のボタンがあり、ページをピン留めするとトラッカーは再び表示されます。",
       "ifShowPlaytime": "キャラクターシートに累計のプレイ時間を表示します。初期設定はオンで、シートには端末ごとに表示を切り替える目のボタンもあるので、配信やスクリーンショットのときに便利です。合計時間はどちらの場合も数え続けられます。",
       "ifShowOwnNameplate": "自分の頭上のネームプレートを、他のプレイヤーに見えているとおりに、飾りも含めて描画します。昔ながらの見た目にしたいならオフにしましょう。",
       "ifShowPlayerNameplates": "他のプレイヤーのネームプレートを描画します。オフにすると混み合った拠点がすっきりしますし、現在のターゲットはどちらでも読み取れるままです。",
@@ -4735,6 +5212,7 @@ export const ja_JP: EnTranslations = {
       "mageEleJet": "ウォータージェットはペットバーに独立したボタンとして並びます。クリックすれば凍てつく光線を敵一体に固定し、右クリック（モバイルでは長押し）すれば、準備が整うたびにエレメンタルが自分の判断で放つようになります。",
       "formsHeading": "変身",
       "formsNote": "ドルイドは姿を変えて戦います。ドルイドのアビリティはほとんどがいずれか一つの姿に属しているので、今どの姿でいるかが何を使えるかを決めます。変身にはわずかなマナがかかります。戦闘中でも戦闘外でも、好きなだけ変身し、また解くことができます。",
+      "formsAutoUnshift": "変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。",
       "formsMoonwing": "均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。",
       "formLine": {
         "form_bear": "タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。",
@@ -6544,6 +7022,7 @@ export const ja_JP: EnTranslations = {
     "email": "メールアドレス",
     "emailPlaceholder": "mail@example.com",
     "emailError": "有効なメールアドレスを入力してください。",
+    "marketingOptIn": "ゲームのニュースやアップデートをメールで受け取る（任意）",
     "showPassword": "パスワードを表示",
     "hidePassword": "パスワードを非表示",
     "logIn": "ログイン",
@@ -6644,6 +7123,19 @@ export const ja_JP: EnTranslations = {
     "style": "スタイル",
     "resetLook": "外見をリセット",
     "resetShort": "リセット",
+    "shareTab": "共有",
+    "designCode": "デザインコード",
+    "designCodeHint": "このコードをコピーすると、この見た目を保存したり共有したりできます。コードをここに貼り付けてインポートすると読み込めます。",
+    "copyCode": "コードをコピー",
+    "importCode": "インポート",
+    "designCodeCopied": "デザインコードをコピーしました。",
+    "designCodeCopyManual": "ここでは自動コピーができません。コードは選択済みです。キーボードでコピーしてください。",
+    "designCodeImported": "デザインをインポートしました。",
+    "designCodeImportedPartial": "デザインをインポートしました。このバージョンで認識できない値はスキップされました。",
+    "designCodeErrEmpty": "まずデザインコードを貼り付けてください。",
+    "designCodeErrHeader": "これはデザインコードではないようです。",
+    "designCodeErrVersion": "このデザインコードはより新しいゲームバージョンのものです。",
+    "designCodeErrMalformed": "このデザインコードは壊れています。コード全体をコピーしてやり直してください。",
     "browFlat": "平ら",
     "browArched": "アーチ",
     "browThin": "細め",
@@ -7039,6 +7531,7 @@ export const ja_JP: EnTranslations = {
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",
+      "lootRecoveryNotice": "裂け目の入口はまだしばらく保たれます。パーティーが倒れても、得たものを取り戻しに歩いて戻れます。",
       "levelGate": "この裂け目に入れるのはレベル{level}以上の冒険者だけだ。",
       "deadEntry": "死亡した状態では裂け目に入れない。",
       "deadEntryCombat": "パーティーはまだ戦闘中だ。戦いが終われば、死者も再び入れる。",
@@ -7138,6 +7631,7 @@ export const ja_JP: EnTranslations = {
       "shopMarksRequired": "{name}を購入するにはデルヴの刻印が{marks}個必要だ。",
       "shopSealPremiumOnly": "この封印は達人の手にのみ応じる。極上の賭けだけが開くことができる。",
       "passageSealed": "通路は封じられている。",
+      "enemiesRemain": "残りの敵を先に倒せ。",
       "moveCloserPassage": "通路にもっと近づけ。",
       "moveCloserChest": "宝箱にもっと近づけ。",
       "moveCloserReliquary": "聖遺物匣にもっと近づけ。",
@@ -7760,7 +8254,15 @@ export const ja_JP: EnTranslations = {
       "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
       "later": "後で",
-      "dismiss": "閉じる"
+      "dismiss": "閉じる",
+      "whatsNew": "変更内容をブラウザで見る"
+    },
+    "notify": {
+      "updateReadyTitle": "アップデート {version} の準備ができました",
+      "updateReadyTitleNoVersion": "アップデートの準備ができました",
+      "updateReadyBody": "アップデートを適用するには World of ClaudeCraft を再起動してください。",
+      "partyInviteTitle": "パーティ招待",
+      "partyInviteBody": "{name}があなたをパーティに招待しています。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const ja_JP: EnTranslations = {
       "reload": "再読み込み",
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
+    },
+    "titlebar": {
+      "exitGame": "ゲームを終了"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
+    "bodyDiscreteInactive": "ゲームが専用（ゲーミング）GPUを使用しておらず、省電力GPUで動作しているため、パフォーマンスが低下します。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
     "hybridBodyWindows": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
     "hybridBodyLinux": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
@@ -7995,7 +8501,111 @@ export const ja_JP: EnTranslations = {
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
       "mapCanvasLabel": "マップ",
-      "mapSummary": "{zone}のマップ。"
+      "mapSummary": "{zone}のマップ。",
+      "mapMarkerDescription": "{area}。{markers}",
+      "mapMarkerEmpty": "重要なマーカーは表示されていません。",
+      "mapMarkerLocated": "{marker}：{direction}、{distance}。",
+      "mapMarkerLocatedCount": "{marker}：{count}件、{direction}、{distance}。",
+      "mapMarkerMore": "ほかに{count}件のマーカー。",
+      "mapMarkerDirections": {
+        "center": "中央",
+        "north": "北",
+        "northeast": "北東",
+        "east": "東",
+        "southeast": "南東",
+        "south": "南",
+        "southwest": "南西",
+        "west": "西",
+        "northwest": "北西"
+      },
+      "mapMarkerDistances": {
+        "near": "近く",
+        "medium": "中距離",
+        "far": "遠く"
+      },
+      "mapMarkerLabels": {
+        "you": "自分",
+        "availableQuest": "受注可能なクエスト",
+        "readyQuest": "報告可能なクエスト",
+        "repeatQuest": "繰り返し可能なクエスト",
+        "cooldownQuest": "再受注待ちのクエスト",
+        "questObjective": "クエスト目標エリア",
+        "readyOre": "採掘可能な鉱脈",
+        "readyWood": "採集可能な木材",
+        "readyHerb": "採集可能な薬草",
+        "readyLockedOre": "採掘可能な鉱脈、道具未解放",
+        "readyLockedWood": "採集可能な木材、道具未解放",
+        "readyLockedHerb": "採集可能な薬草、道具未解放",
+        "cooldownOre": "枯渇した鉱脈",
+        "cooldownWood": "枯渇した木材",
+        "cooldownHerb": "枯渇した薬草",
+        "cooldownLockedOre": "枯渇した鉱脈、道具未解放",
+        "cooldownLockedWood": "枯渇した木材、道具未解放",
+        "cooldownLockedHerb": "枯渇した薬草、道具未解放",
+        "station": "製作設備：{name}",
+        "service": "施設：{name}",
+        "partyMember": "パーティメンバー：{name}",
+        "deadPartyMember": "死亡したパーティメンバー：{name}",
+        "partyMemberGeneric": "パーティメンバー",
+        "deadPartyMemberGeneric": "死亡したパーティメンバー",
+        "friend": "フレンド：{name}",
+        "guildMember": "ギルドメンバー：{name}",
+        "pointOfInterest": "注目地点：{name}",
+        "dungeonEntrance": "ダンジョン入口：{name}",
+        "dungeonExit": "ダンジョン出口",
+        "delveEntrance": "デルヴ入口：{name}",
+        "worldPassage": "{zone}への通路",
+        "riftEntrance": "リフト入口：{name}",
+        "hostileEnemy": "敵対対象",
+        "aggressiveEnemy": "あなたを攻撃中の敵",
+        "lootableEnemy": "戦利品を回収できる敵",
+        "corpse": "自分の死体",
+        "deathZone": "危険地帯",
+        "teammate": "味方",
+        "deadTeammate": "死亡した味方",
+        "flagCarrier": "旗を運んでいる味方",
+        "ownFlagStand": "自軍の旗台",
+        "enemyFlagStand": "敵軍の旗台",
+        "riftDescent": "リフト下降口",
+        "riftReturnBeacon": "帰還ビーコン",
+        "riftReturnExit": "帰還出口",
+        "ranked": "{marker}、ランク{rank}",
+        "riftTreasureAvailable": "入手可能な宝",
+        "riftTreasureLocked": "施錠された宝",
+        "riftTreasureOpened": "開封済みの宝",
+        "riftTreasureJammed": "作動不良の宝",
+        "riftCacheAvailable": "入手可能なリフトの物資箱",
+        "riftCacheLocked": "施錠された物資箱",
+        "riftCacheOpened": "開封済みの物資箱",
+        "riftCacheJammed": "作動不良の物資箱",
+        "pylonUnlit": "消灯した塔",
+        "pylonLit": "点灯した塔",
+        "sequenceRuneUnlit": "消灯した順序のルーン",
+        "sequenceRuneLit": "点灯した順序のルーン",
+        "iceGoal": "氷の目標地点",
+        "boulderPad": "岩の目標地点",
+        "boulderMovable": "移動可能な岩",
+        "boulderPlaced": "配置済みの岩",
+        "gateSealed": "封印された門",
+        "gateOpen": "開いた門",
+        "switchReady": "使用可能なスイッチ",
+        "switchOn": "作動中のスイッチ",
+        "orbDormant": "休眠中のオーブ",
+        "orbActive": "作動中のオーブ",
+        "rollerHazard": "ローラーの危険物",
+        "delvePassageSealed": "封鎖された通路",
+        "delvePassageOpen": "開いた通路",
+        "delveSurfaceExit": "地上出口",
+        "delveCacheLocked": "施錠されたデルヴの物資箱",
+        "delveCacheReady": "準備完了のデルヴの物資箱",
+        "delveCacheActive": "作動中のデルヴの物資箱",
+        "delveCacheOpened": "開封済みのデルヴの物資箱",
+        "delveReliquaryLocked": "施錠された聖遺物匣",
+        "delveReliquaryReady": "準備完了の聖遺物匣",
+        "delveReliquaryActive": "儀式中の聖遺物匣",
+        "delveReliquaryOpened": "開封済みの聖遺物匣",
+        "bountiful": "豊穣な{marker}"
+      }
     },
     "options": {
       "gameMenu": "ゲームメニュー",
@@ -8035,6 +8645,9 @@ export const ja_JP: EnTranslations = {
       "graphicsReloadNote": "グラフィック品質と地形の詳細は再読み込み後に適用されます。",
       "reloadNow": "今すぐ再読み込み",
       "fullscreen": "フルスクリーン",
+      "displayMode": "表示モード",
+      "displayModeBorderless": "ボーダーレスフルスクリーン",
+      "displayModeWindowed": "ウィンドウ",
       "touchLookSpeed": "タッチ視点速度",
       "joystickSize": "ジョイスティックの大きさ",
       "buttonSize": "ボタンの大きさ",
@@ -8597,6 +9210,7 @@ export const ja_JP: EnTranslations = {
       "offGlobalCooldown": "グローバルクールダウン外",
       "friendlyTarget": "味方対象",
       "enemyTarget": "敵対象",
+      "anyTarget": "敵または味方の対象",
       "selfOnly": "自分のみ",
       "damageRange": "{min}から{max}",
       "finisherDamage": "{base}にコンボポイントごと{perCombo}"
@@ -8911,6 +9525,10 @@ export const ja_JP: EnTranslations = {
       "filterPrimaryStatAll": "すべてのメイン能力値",
       "filterRarity": "レア度",
       "filterRarityAll": "すべてのレア度",
+      "filterSort": "並べ替え",
+      "sortName": "名前 (A-Z)",
+      "sortPriceAsc": "価格: 安い順",
+      "collapseLowest": "最安値のみ表示",
       "weaponSword": "剣",
       "weaponDagger": "短剣",
       "weaponStaff": "杖",
@@ -8941,6 +9559,8 @@ export const ja_JP: EnTranslations = {
       "quantity": "数量",
       "quantityOf": "/ {count}",
       "priceEach": "単価",
+      "lowestPriceLabel": "現在の最安出品価格",
+      "lowestPriceNone": "このアイテムには現在出品がありません。",
       "listButton": "ワールドマーケットに出品",
       "minPriceError": "価格は最低1銅貨にしてください。",
       "collectEmpty": "待機中のものはありません。売上と期限切れの出品はここで受け取ります。",
@@ -9368,6 +9988,7 @@ export const ja_JP: EnTranslations = {
       "cheap_shot": {
         "name": "みぞおち強打",
         "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "descriptionNoStealth": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。",
         "specNote_subtlety": "ダスクヴェールから使うと薄闇の蓄えが1段階進む（最大3）。3段階のときはステルスなしで使用できる：その1回はコストなしで、薄闇の蓄えを3段階すべて消費し、6秒間のヴェールストライクを開始する。"
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const ja_JP: EnTranslations = {
       "crippling_poison": {
         "name": "鉛の毒",
         "description": "対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。"
+      },
+      "melting_acid": {
+        "name": "溶解酸",
+        "description": "対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。"
+      },
+      "nightshade_coating": {
+        "name": "ナス科毒の塗布",
+        "description": "対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。"
       },
       "expose_armor": {
         "name": "装甲破り",
@@ -9580,7 +10209,7 @@ export const ja_JP: EnTranslations = {
       },
       "righteous_fury": {
         "name": "バーニングオース",
-        "description": "神聖ダメージが生む脅威度を常時60%高めます。信仰の守護者専用。"
+        "description": "神聖ダメージが生む脅威度を常時30%高めます。信仰の守護者専用。"
       },
       "retribution_aura": {
         "name": "報復のオーラ",
@@ -9696,7 +10325,7 @@ export const ja_JP: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "石縛の武器",
-        "description": "武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を30%得て、受けるダメージが10%減り、脅威度を二倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。"
+        "description": "武器に30分間力を宿します。一振りごとに{damage}の追加ダメージを与えます。エンハンスメントはさらに防御力を40%、体力を20%得て、受けるダメージが15%減り、クリーチャーからのクリティカルヒットを無効化し、脅威度を2.75倍生みます。大地の衝撃はその対象に3秒間あなたを攻撃させ、雷の守りは3秒間10%のダメージ軽減を与えます。"
       },
       "healing_wave": {
         "name": "癒しの水流",
@@ -9824,7 +10453,7 @@ export const ja_JP: EnTranslations = {
       },
       "fear": {
         "name": "責め苦",
-        "description": "敵に恐怖を刻み、最大8秒間おびえさせます。ダメージを受けると効果が切れます。"
+        "description": "敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。"
       },
       "searing_pain": {
         "name": "灼熱",
@@ -9875,7 +10504,7 @@ export const ja_JP: EnTranslations = {
       },
       "bear_form": {
         "name": "ブルーインフォーム",
-        "description": "熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
+        "description": "熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。"
       },
       "maul": {
         "name": "骨砕き",
@@ -9885,6 +10514,10 @@ export const ja_JP: EnTranslations = {
       "growl": {
         "name": "威嚇",
         "description": "対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。"
+      },
+      "challenging_roar": {
+        "name": "威圧の咆哮",
+        "description": "威圧的に咆哮します。10ヤード以内のすべての敵が挑発され、あなたへの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。"
       },
       "cat_form": {
         "name": "ウルフフォーム",
@@ -9898,7 +10531,7 @@ export const ja_JP: EnTranslations = {
       "ferocious_bite": {
         "name": "血噛み",
         "description": "{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。",
-        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：91にコンボポイントごとに55を加えたダメージの噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを30回復する。"
+        "specNote_feral": "命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費した強力な噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを回復する。"
       },
       "swipe": {
         "name": "薙ぎ払う爪",
@@ -9961,7 +10594,7 @@ export const ja_JP: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼の血",
-        "description": "攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
+        "description": "エネルギーを{rage}回復し、攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。"
       },
       "rip": {
         "name": "血裂",
@@ -10066,7 +10699,7 @@ export const ja_JP: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "納骨の印",
-        "description": "敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
+        "description": "敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
       },
       "unholy_command": {
         "name": "不浄の号令",
@@ -10165,8 +10798,8 @@ export const ja_JP: EnTranslations = {
         "description": "ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）"
       },
       "feral_charge": {
-        "name": "フェラルチャージ",
-        "description": "敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）"
+        "name": "原初の奔流",
+        "description": "原初の力を解き放ちます。ウルフフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）"
       },
       "swiftmend": {
         "name": "スウィフトメンド",
@@ -10182,7 +10815,7 @@ export const ja_JP: EnTranslations = {
       },
       "redharvest": {
         "name": "血の収穫",
-        "description": "古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを30回復する。コンボポイントが0でも使用できる。"
+        "description": "古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。"
       },
       "marrowbreak": {
         "name": "骨髄砕き",
@@ -10422,7 +11055,7 @@ export const ja_JP: EnTranslations = {
       },
       "evocation": {
         "name": "エーテルの井戸",
-        "description": "マナを急速に回復する。（メイジタレント）"
+        "description": "6秒間チャネルします。毎秒100マナを回復し、呪文威力が8上昇します。この効果はチャネル中に累積し、15秒間持続します。（メイジタレント）"
       },
       "flurry_of_knives": {
         "name": "短剣乱舞",
@@ -10430,7 +11063,7 @@ export const ja_JP: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "野生の癒し",
-        "description": "10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）"
+        "description": "10秒かけて最大体力の40%を回復する。熊形態でのみ使用可能。（ドルイドのタレント）"
       },
       "frost_trap": {
         "name": "霧氷の罠",
@@ -10450,11 +11083,11 @@ export const ja_JP: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐怖の遠吠え",
-        "description": "周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）"
+        "description": "周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）"
       },
       "ice_block": {
         "name": "冷たき棺",
-        "description": "自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）"
+        "description": "8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）"
       },
       "inner_focus": {
         "name": "静まる心",
@@ -10663,7 +11296,7 @@ export const ja_JP: EnTranslations = {
       },
       "prowl": {
         "name": "つけ狙い",
-        "description": "ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。"
+        "description": "ウルフフォーム中にステルス状態に入り、移動速度が5%低下する。戦闘中は使用できない。"
       },
       "rake": {
         "name": "皮剥ぎ",
@@ -12218,6 +12851,9 @@ export const ja_JP: EnTranslations = {
       "pristine_claw": {
         "name": "無傷の鉤爪"
       },
+      "dawnhold_posy": {
+        "name": "ドーンホールド庭園の小さな花束"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -13062,6 +13698,15 @@ export const ja_JP: EnTranslations = {
       },
       "training_dummy": {
         "name": "訓練用ダミー"
+      },
+      "friendly_player_dummy": {
+        "name": "味方プレイヤーダミー"
+      },
+      "normal_boss_dummy": {
+        "name": "ノーマルボスダミー"
+      },
+      "heroic_boss_dummy": {
+        "name": "ヒロイックボスダミー"
       },
       "ridge_stalker": {
         "name": "尾根の追跡者"
@@ -16702,6 +17347,11 @@ export const ja_JP: EnTranslations = {
         "enterText": "最後の砦の冷たく静まり返った広間へ足を踏み入れた。",
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
       },
+      "dawnhold_castle": {
+        "name": "ドーンホールド城",
+        "enterText": "花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。",
+        "leaveText": "日差しあふれる庭園の芝生へと戻った。"
+      },
       "drowned_temple": {
         "name": "溺れし神殿",
         "enterText": "月の門をくぐり抜けると——大気は冷たい水と蒼白の光に変わり、歌声が頭上で閉ざされていく。",
@@ -16900,6 +17550,21 @@ export const ja_JP: EnTranslations = {
         "sender": "からくり師ギッゼル",
         "subject": "マスター、ドカン",
         "body": "お前の主専攻の一つがマスターに到達した、まさに頂点、ドカン、梯子まるごと、登り切りだ。俺は褒め言葉なんて配らん、配るのは導火線だ、だがほら、両方持っていけ。お前は見事だし、ちょっとばかり恐ろしい。山々を怯えさせてこい。"
+      },
+      "woc_market_delivery": {
+        "sender": "取引所仲買人",
+        "subject": "取引所でのご購入品",
+        "body": "取引は決済され、品物はあなたのものです。同封の小包には、あなたが代金を支払ったまさにその品が入っています。出品の瞬間から支払いが確定するまで、取引所が責任を持って預かっていました。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
+      },
+      "woc_market_return": {
+        "sender": "取引所仲買人",
+        "subject": "取引所への出品が終了しました",
+        "body": "出品は売買成立に至らず終了しました。買い手がつかなかったか、最低落札価格に届かなかったか、出品が取り下げられたか、あるいは落札者が支払いを済ませなかったのです。お預かりした品は、この手紙とともに預けられたときのままお返しします。\n\n- 取引所仲買人"
+      },
+      "woc_market_sold": {
+        "sender": "取引所仲買人",
+        "subject": "取引所への出品が売れました",
+        "body": "出品した品が売れ、買い手が全額を支払いました。取引所手数料を差し引いた売上金は、決済トランザクションの中で直接あなたの連携ウォレットへ送られました。取引所があなたのお金を預かることは一度もありません。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人"
       }
     },
     "itemSets": {

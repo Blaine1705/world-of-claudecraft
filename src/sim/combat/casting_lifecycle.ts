@@ -85,9 +85,14 @@ import {
   afflictionTargetCastError,
   clearAfflictionConsumeThreads,
   completeAfflictionDrain,
+  completeNeedleOfFateCast,
   consumeFateThreadsForDrain,
   gainDoom,
 } from './affliction';
+import {
+  shouldBufferSentenceDuringGcd,
+  shouldPreserveQueuedSentence,
+} from './affliction_sentence_queue';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -127,6 +132,11 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import {
+  applyAutoUnshift,
+  isFormToggleAbility as isFormToggle,
+  willAutoUnshift,
+} from './form_auto_unshift';
 import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -138,7 +148,11 @@ import { empoweredCastProgress, empoweredStageForProgress } from './glacial_fron
 import { bloodhookStartError } from './hunter_fieldcraft';
 import { packCommandError } from './hunter_packlord';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
-import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
+import {
+  hasDeadGroupMember,
+  hasDeadGroupMemberInReach,
+  isMassResurrectionAbility,
+} from './mass_resurrection';
 import {
   hasActiveOssuaryMark,
   necromancyCastError,
@@ -166,6 +180,7 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { hasTithefiendTarget } from './priest/vespers';
+import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
   detonatorFreeMultiplier,
   gloamBankArmed,
@@ -204,10 +219,6 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'mortal_strike',
   'shield_slam',
 ]);
-
-function isFormToggle(ability: AbilityDef): boolean {
-  return ability.effects.some((e) => e.type === 'selfBuff' && isFormAuraKind(e.kind));
-}
 
 // Forms, stances and stealth are toggles: re-casting cancels the aura, and
 // cancelling is never gated by cost or cooldown (the cooldown gates re-entry).
@@ -365,6 +376,43 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       ctx.error(p.id, 'There are no dead group members to resurrect.');
       return;
     }
+    // Cancel as soon as no reachable body remains (the caster was displaced, or
+    // the members in reach were raised by another source), instead of letting the
+    // cast run on to a completion that must refuse anyway.
+    if (!hasDeadGroupMemberInReach(ctx, p, resurrectionCastRange(activeCast.def.range))) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+  }
+  // The single-target twin of the mass-rez gate above: a combat res whose target
+  // was raised by another source, or whose caster was displaced out of reach
+  // (range + line of sight to the body), cancels now instead of channeling the
+  // rest of an up-to-8-second cast into a certain finish-side refusal.
+  if (activeCast?.def.requiresTarget && activeCast.def.targetsDead) {
+    const dead = resolveDeadAllyTarget(ctx, p, p.castTargetId);
+    if (!dead) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'You must target a dead ally in your group.');
+      return;
+    }
+    const reach = resurrectionReachError(
+      ctx,
+      p,
+      dead,
+      resurrectionCastRange(activeCast.def.range),
+      2,
+    );
+    if (reach === 'range') {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (reach === 'los') {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
   }
   tickUnbrokenRitual(ctx, p, meta);
   // a silence breaks an in-progress spell, but never a non-spell cast (the
@@ -469,16 +517,24 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       fireChannelTick();
     }
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
-      // Flush any fixed-count tick the timer has not reached yet: the tick
-      // accumulator and the channel's end advance separately, so floating-point
-      // drift can leave the final tick a hair short exactly when they coincide,
-      // silently dropping the last missile (the Arcane Missiles 5-barrage bug). A
-      // fixed-count channel must always land exactly channelTicks ticks. Inert for
+      // Flush a fixed-count tick only when its OWN schedule has also reached
+      // (or is a hair past) zero here: the tick accumulator and the channel's
+      // end advance separately, so floating-point drift can leave the final
+      // tick a hair short exactly when they coincide, silently dropping the
+      // last missile (the Arcane Missiles 5-barrage bug). A tick still
+      // meaningfully in the future was not lost to drift: pushbackCast's
+      // channel-fraction branch shortens castRemaining without rescheduling
+      // channelTickTimer, so a big enough pushback can end the channel before
+      // a later tick's timer ever comes due. Classic-era pushback trims the
+      // trailing tick count along with the time, so that tick is dropped too,
+      // never forced out as a same-instant completion burst. Inert for
       // duration-based channels, whose channelTicksLeft is 0.
-      while (p.channelTicksLeft > 0) {
+      while (p.channelTicksLeft > 0 && p.channelTickTimer <= CAST_COMPLETE_EPS) {
         p.channelTicksLeft -= 1;
+        p.channelTickTimer += p.channelTickEvery;
         fireChannelTick();
       }
+      p.channelTicksLeft = 0; // any tick pushback orphaned here owes nothing
       const completed = p.castingAbility ? ctx.resolvedAbility(p.castingAbility, p.id) : null;
       if (completed) completePaladinAegis(ctx, p, completed);
       stopChannelVisual(ctx, p);
@@ -873,6 +929,11 @@ export function castAbility(
     ability.castTime === 0 &&
     (ability.usableWhileCasting === true ||
       (abilityId === 'blink' && ctx.playerMods(meta).global.blinkCast > 0));
+  // Sentence is Hexcraft's release and may already be waiting for the cast or
+  // GCD that produced its final Thread. Repeated generator or release presses
+  // must not jump ahead during either guard, including the one-tick gap after
+  // the GCD timer reaches zero but before updateCasting retries the queue.
+  if (shouldPreserveQueuedSentence(p.queuedCastAbility, abilityId)) return;
   if (p.castingAbility) {
     if (!blinkThrough) {
       // classic-era spell queue: a press during the tail of the current cast
@@ -898,7 +959,13 @@ export function castAbility(
   // (including this GCD check). fireQueuedCast holds the slot instead of calling
   // in when the GCD is still running, so this early return only fires for a
   // same-tick player press racing the GCD, not for a queued follow-up.
-  if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) return; // silent, classic spams this
+  if (!ability.offGcd && p.gcdRemaining > 0 && !blinkThrough) {
+    if (shouldBufferSentenceDuringGcd(abilityId, p.gcdRemaining)) {
+      p.queuedCastAbility = abilityId;
+      p.queuedCastAim = aim ?? null;
+    }
+    return; // silent, classic spams this
+  }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // sharedCooldownIds generalizes the release's shaman-shock special case (it
   // returns the same SHAMAN_SHOCK_COOLDOWN_IDS for those ids), so the shock
@@ -945,6 +1012,16 @@ export function castAbility(
     ctx.error(p.id, afflictionError);
     return;
   }
+  // Auto-unshift (see combat/form_auto_unshift.ts): a healing or damaging spell
+  // pressed in Bruin/Wolf/Fleet Form drops the form and casts. Decided HERE and
+  // applied at the form gate below, because the two questions this answers sit
+  // on either side of it: the cast is billed against the PARKED mana (the live
+  // bar is rage or energy while shifted), and refusing it for cost must leave
+  // the druid still wearing the form rather than stripping it for nothing.
+  const autoUnshift = willAutoUnshift(p.auras, ability);
+  // Fleet Form never swapped the bar, so its pool is already the live one; only
+  // the bar-swapping forms (bear rage, cat energy) park mana in savedMana.
+  const castingPool = autoUnshift && p.resourceType !== 'mana' ? p.savedMana : p.resource;
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
@@ -970,7 +1047,7 @@ export function castAbility(
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   if (
-    p.resource < payableCost &&
+    castingPool < payableCost &&
     (!canCastFree || stormcastArmedForAbility) &&
     !freeBySolarReprisal &&
     !togglingOff &&
@@ -978,13 +1055,18 @@ export function castAbility(
   ) {
     ctx.error(
       p.id,
-      p.resourceType === 'rage'
-        ? 'Not enough rage!'
-        : p.resourceType === 'energy'
-          ? 'Not enough energy!'
-          : p.resourceType === 'focus'
-            ? 'Not enough Focus!'
-            : 'Not enough mana!',
+      // An auto-unshifting cast was weighed against the parked mana, so it is
+      // mana it is short of, never the rage or energy bar it never touches.
+      // Every other arm is the ladder this always had.
+      autoUnshift
+        ? 'Not enough mana!'
+        : p.resourceType === 'rage'
+          ? 'Not enough rage!'
+          : p.resourceType === 'energy'
+            ? 'Not enough energy!'
+            : p.resourceType === 'focus'
+              ? 'Not enough Focus!'
+              : 'Not enough mana!',
     );
     return;
   }
@@ -1060,8 +1142,14 @@ export function castAbility(
       return;
     }
   } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
-    ctx.error(p.id, "You can't do that while shapeshifted.");
-    return;
+    // Only the DECISION is made here, so the ladder below continues for a cast
+    // that will auto-unshift. The form itself is not touched until the cast
+    // commits (see applyAutoUnshift further down): every refusal between here
+    // and there would otherwise strip the form for a cast that never happened.
+    if (!autoUnshift) {
+      ctx.error(p.id, "You can't do that while shapeshifted.");
+      return;
+    }
   }
   if (
     ability.requiresStealth &&
@@ -1080,9 +1168,19 @@ export function castAbility(
     emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
   }
-  if (isMassResurrectionAbility(ability) && !hasDeadGroupMember(ctx, p)) {
-    ctx.error(p.id, 'There are no dead group members to resurrect.');
-    return;
+  if (isMassResurrectionAbility(ability)) {
+    if (!hasDeadGroupMember(ctx, p)) {
+      ctx.error(p.id, 'There are no dead group members to resurrect.');
+      return;
+    }
+    // Dead members exist but every body is beyond resurrection reach (range +
+    // line of sight): refuse up front rather than burn the mana and cooldown on
+    // a cast that can raise nobody. Reach itself is re-applied per member at
+    // completion (resurrectDeadGroupMembers).
+    if (!hasDeadGroupMemberInReach(ctx, p, resurrectionCastRange(ability.range))) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
   }
 
   let target: Entity | null = null;
@@ -1103,14 +1201,20 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget && ability.targetsDead) {
-    // Combat res: the target must be a DEAD group/raid member (no self-cast fallback).
+    // Combat res: the target must be a DEAD group/raid member (no self-cast fallback),
+    // and their body must be within resurrection reach (range + line of sight).
     const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
     if (!dead) {
       ctx.error(p.id, 'You must target a dead ally in your group.');
       return;
     }
-    if (dist2d(p.pos, dead.corpsePos ?? dead.pos) > ability.range) {
+    const reach = resurrectionReachError(ctx, p, dead, resurrectionCastRange(ability.range));
+    if (reach === 'range') {
       ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (reach === 'los') {
+      ctx.error(p.id, 'Line of sight.');
       return;
     }
     target = dead;
@@ -1408,6 +1512,22 @@ export function castAbility(
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
     ctx.breakGhostWolf(p);
   }
+  // Auto-unshift (combat/form_auto_unshift.ts), applied HERE rather than at the
+  // form gate above, and for the same reason the affordability check was hoisted
+  // ABOVE that gate: a druid must never lose a form to a press that goes on to be
+  // refused. Everything that can still say no (target, range, line of sight,
+  // min-range, party membership) has now cleared, so this is the first point at
+  // which the cast is certain. It sits with its siblings deliberately: standing
+  // up, sheathing, breaking Ghost Wolf and dismounting are the same kind of "the
+  // cast is happening, so this state goes" change, and Ghost Wolf is the shaman's
+  // travel form, the exact analogue one line up.
+  //
+  // Still free and still off the GCD (leaving a form has always been free here),
+  // and it precedes all three commit branches below (channel, cast-time, instant)
+  // as well as every billing site, so an instant such as Lunar Tempest fires on
+  // the same press and pays from the restored mana pool. Shifting back IN stays a
+  // normal ability and bills both.
+  if (autoUnshift) applyAutoUnshift(ctx, p, meta, ability);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
   if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.mountCastKey !== '') {
@@ -2206,6 +2326,14 @@ function applyAbility(
       ctx.error(p.id, 'There are no dead group members to resurrect.');
       return;
     }
+    // The finish-side backstop of the per-tick updateCasting reach gate, which
+    // cancels first for any timed cast: this arm arbitrates only a same-tick
+    // displacement or a future instant-cast mass rez, and keeps the completion
+    // unable to spend mana and cooldown on a sweep that can raise nobody.
+    if (!hasDeadGroupMemberInReach(ctx, p, resurrectionCastRange(res.def.range))) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
   }
   // Overload (mage choice row): the armed amplifier bakes the next MANA spell
   // 40% stronger and 50% costlier into a scaled COPY of the resolved ability
@@ -2307,9 +2435,21 @@ function applyAbility(
   } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res finish: the dead ally's id was stored in castTarget at cast start
     // (it is auto-deselected from p.targetId once dead, so we cannot re-derive it).
+    // Reach is re-checked with the same +2 drift slack the other finish arms grant:
+    // the body cannot move, but the caster can be displaced during the cast, and a
+    // finish that skipped the gate would hand out a cross-map resurrection offer.
     const dead = resolveDeadAllyTarget(ctx, p, castTarget);
     if (!dead) {
       ctx.error(p.id, 'You must target a dead ally in your group.');
+      return;
+    }
+    const reach = resurrectionReachError(ctx, p, dead, resurrectionCastRange(ability.range), 2);
+    if (reach === 'range') {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (reach === 'los') {
+      ctx.error(p.id, 'Line of sight.');
       return;
     }
     target = dead;
@@ -2503,6 +2643,9 @@ function applyAbility(
     spendAbilityCost(ctx, p, meta, res, target);
     armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
     res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
+    if (res.effects.some((effect) => effect.type === 'afflictionNeedle')) {
+      completeNeedleOfFateCast(ctx, p, target);
+    }
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,

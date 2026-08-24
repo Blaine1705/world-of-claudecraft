@@ -11,7 +11,10 @@
 import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
+import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
+import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
 import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
@@ -2690,6 +2693,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   vanish: r('shadow', 'shadowPurple', ['shield'], ['motion', 'glow']),
   instant_poison: r('nature', 'venom', ['droplet'], ['glow']),
   deadly_poison: r('nature', 'venom', ['fang'], ['drips']),
+  // The two utility poisons: the venom palette they share with the rest of the
+  // rogue's poisons, distinguished by what each one eats (armor / healing).
+  melting_acid: r('nature', 'venom', ['chestplate', { p: 'droplet', ...TR }], ['drips']),
+  nightshade_coating: r('nature', 'venom', ['heart', { p: 'droplet', ...TR }], ['drips']),
   blind: r('shadow', 'shadowPurple', ['eye'], ['arcs']),
   // paladin
   seal_of_righteousness: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sigil_rune'], ['glow']),
@@ -3140,6 +3147,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
   growl: r('earth', 'earthBrown', ['roar'], ['arcs']),
+  challenging_roar: r('fury', 'earthBrown', ['roar', { p: 'paw', ...BR }], ['arcs']),
   demoralizing_roar: r('shadow', 'earthBrown', ['roar'], ['arcs']),
   cat_form: r('nature', 'leafGreen', ['paw', { p: 'fang', ...BR }]),
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
@@ -3650,6 +3658,13 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // red_banner ability's staff-plus-sunburst language) on the objective gold, so
   // it reads as the flag itself and not as another rune.
   bg_carried_flag: r('fury', 'gold', ['staff', { p: 'sunburst', ...TR, pal: 'gold' }], ['motion']),
+  // The operator-applied Cheater mark (src/sim/moderation/), keyed by AURA id like
+  // the rune buffs above. Without a row here the resolver fell through to the
+  // generic utility fallback, so a SANCTION wore a parchment/gold buff icon in the
+  // debuff bar and, being outside AURA_RECIPE_IDS, also missed the prewarm worker
+  // and composed synchronously on the frame path the first time anyone saw it.
+  // A blood brand-sigil watched by a bone eye: branded, and seen.
+  cheater_mark: r('shadow', 'blood', ['sigil_rune', { p: 'eye', ...BR, pal: 'bone' }], ['glow']),
   // Painted talent/modifier identities are not ABILITIES records, but their
   // runtime timers still need a meaningful synchronous layer while the WebP
   // decodes (and if it ever fails to load).
@@ -4400,6 +4415,10 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   // keeps their Warlock ownership explicit.
   'emberkin_felbolt',
   'gloomshade_abyssal_chain',
+  // Shared pet-bar commands are synthetic action identities rather than player
+  // ABILITIES. Their dedicated folder keeps Hunter, Mage, and Warlock ownership
+  // truthful while still using the action-bar image route.
+  ...PET_ACTION_IMAGE_IDS,
   // Choice-row talents use their own images instead of borrowing spell art.
   ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
@@ -4428,6 +4447,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'instant_poison',
   'adrenaline_rush',
   'deadly_poison',
+  'melting_acid',
+  'nightshade_coating',
   'stealth',
   // warrior (CraftPix premium "RPG Warrior" + "RPG Berserker" packs; rage/fury abilities
   // drew from berserker). taunt has no provoke art and stays procedural.
@@ -4652,6 +4673,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'overbloom',
   'feral_charge',
   'frenzied_regeneration',
+  'challenging_roar',
   'hurricane',
   'innervate',
   'moonkin_form',
@@ -4749,6 +4771,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
+  if (PET_ACTION_IMAGE_IDS.has(id)) return `${SKILL_ICON_DIR}/pet/${id}.webp`;
   const cls =
     ABILITIES[id]?.class ??
     (id === 'colossal_might' ||
@@ -4782,6 +4805,126 @@ export function abilityImageUrl(id: string): string | null {
           ? 'warlock'
           : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
+}
+
+const AURA_ICON_DIR = '/ui/auras';
+
+/** Exact aura-art identities whose shipping files live directly under /ui/auras. */
+export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
+  ...MOB_AURA_IMAGE_IDS,
+  'affliction_doom',
+  'battle_trance',
+  'bg_battle_rune',
+  'bg_carried_flag',
+  'bg_carrier_vulnerability',
+  'bg_sprint_rune',
+  'bg_ward_rune',
+  'boneglass_cut',
+  'brood_burn_hatchling_burn',
+  'brood_burn_seared_scales',
+  'brood_counter_stun',
+  'brood_ward',
+  'cauterize_fatigue',
+  'cauterizing',
+  'cheater_mark',
+  'convergence_cd',
+  'convergence_mark',
+  'deathbloom',
+  'destruction_ruin',
+  'elemental_convergence',
+  'elixir_buff_sta',
+  'fear_incap',
+  'heating_up',
+  'hunter_enduring_courser_burst',
+  'hunter_enduring_courser_icd',
+  'hunter_pack_rally_haste',
+  'hunter_pack_rally_speed',
+  'hunter_pack_rally_spellhaste',
+  'hunter_predators_pace',
+  'hunter_predators_pace_icd',
+  'icicles',
+  'lifebloom',
+  'marrowpoint_rend',
+  'moontide',
+  'nhalia_cantor_shield',
+  'nythraxis_deathless_stun',
+  'nythraxis_dread_curse',
+  'nythraxis_final_stand',
+  'nythraxis_soul_rend',
+  'nythraxis_transition_pause',
+  'nythraxis_transition_stun',
+  'nythraxis_wardstone_lit',
+  'old_blood',
+  'resurrection_sickness',
+  'sated',
+  'set_bonesplinter',
+  'set_clearcasting',
+  'set_fangrush',
+  'set_gravemight',
+  'set_ragged_gash',
+  'set_soulblaze',
+  'set_warfare_ashen_step',
+  'set_warfare_emberward',
+  'set_warfare_thornguard',
+  'set_warfare_unbroken_oath',
+  'shaman_ancestral_bulwark',
+  'shaman_ancestral_bulwark_icd',
+  'shaman_gathering_winds',
+  'shaman_gathering_winds_icd',
+  'shaman_mending_current',
+  'shaman_stonebound_armor',
+  'shaman_stonebound_dr',
+  'shaman_stonebound_stamina',
+  'shaman_stonebound_unleash_guard',
+  'shaman_stonebound_ward_smooth',
+  'shaman_stormcast',
+  'shaman_stormcast_cheap',
+  'shaman_thunder_charges',
+  'shaman_warspirit_cadence',
+  'shaman_wayfarer_grace',
+  'shaman_wayfarer_grace_icd',
+  'soul_fragments',
+  'stomp_stun',
+  'thronebane_arc_slow',
+  'unstuck_sickness',
+  'verdance',
+  'voidsong_echo',
+  'water_jet',
+  'water_jet_slow',
+  'winters_chill',
+  'wlk_forbidden_reflection',
+  'wlk_forbidden_reflection_lock',
+  'wlk_leaden_hex_root',
+  'wlk_leaden_hex_root_lock',
+  'wlk_leaden_hex_slow',
+]);
+
+/** Aura art identities that deliberately reuse another painted UI family. */
+const EXTERNAL_AURA_IMAGE_URLS: ReadonlyMap<string, string> = new Map([
+  ['bad_air', '/ui/delve-affixes/bad_air.webp'],
+  ['pow_berserker', '/ui/fiesta/powerups/pow_berserker.webp'],
+  ['pow_colossus', '/ui/fiesta/powerups/pow_colossus.webp'],
+  ['pow_moon_boots', '/ui/fiesta/powerups/pow_moon_boots.webp'],
+  ['pow_speed_demon', '/ui/fiesta/powerups/pow_speed_demon.webp'],
+]);
+
+/** All exact aura-art identities, including assets shared from another UI family. */
+export const AURA_IMAGE_IDS: ReadonlySet<string> = new Set([
+  ...AURA_FILE_IMAGE_IDS,
+  ...EXTERNAL_AURA_IMAGE_URLS.keys(),
+]);
+
+/** True when an exact runtime aura identity owns dedicated painted art. */
+export function hasAuraImageIdentity(id: string): boolean {
+  return AURA_IMAGE_IDS.has(id);
+}
+
+/** Static art for an exact aura identity, including ordinary ability-art reuse. */
+export function auraImageUrl(id: string): string | null {
+  const external = EXTERNAL_AURA_IMAGE_URLS.get(id);
+  if (external) return external;
+  if (AURA_FILE_IMAGE_IDS.has(id)) return `${AURA_ICON_DIR}/${id}.webp`;
+  return abilityImageUrl(id);
 }
 
 /** True when an aura identity can reuse known ability or modifier artwork. */
@@ -5180,10 +5323,18 @@ const DEED_CREST_PREFIX = 'deed_';
 
 // Exhaustive live-deed art debt ledger, following the ITEM_ART_PENDING model one screen up. The
 // Icons authoring rule in docs/design/deeds.md permits a procedural category fallback while art
-// trails a deed, but every live release deed is painted today. Keep the empty set as the one
-// authoritative ledger: future art debt must be commissioned and filed in
-// docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
-export const DEED_ART_PENDING: ReadonlySet<string> = new Set();
+// trails a deed. Every deed of the release base is painted today; this set is the one
+// authoritative ledger of the debt that remains, and a new entry must be commissioned and filed
+// in docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
+// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
+// unenumerated debt.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // The walk-in castle visit pair: both are 'exploration', so both fall back to
+  // the deed_cat_exploration crest until their commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'exp_the_last_keep',
+  'exp_dawnhold_castle',
+]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
@@ -5306,16 +5457,22 @@ export function cachedProceduralIconDataUrl(
 
 function staticIconUrl(kind: IconKind, id: string): string | null {
   if (kind === 'item') {
+    const currency = currencyImageUrl(id);
+    if (currency) return currency;
     const weapon = weaponIconUrl(id);
     if (weapon) return weapon;
     const img = itemImageUrl(id);
     if (img) return img;
   }
-  // Abilities, and auras that carry a real ability id (a DoT/buff applied by that
-  // ability), share the same image-based skill art. abilityImageUrl returns null
-  // for generic aura_<kind> ids, so those still fall through to the procedural recipe.
-  if (kind === 'ability' || kind === 'aura') {
+  // Abilities use their skill art. Auras first check exact neutral-aura paintings,
+  // then share matching ability art. Generic aura_<kind> ids still fall through to
+  // their procedural recipe.
+  if (kind === 'ability') {
     const img = abilityImageUrl(id);
+    if (img) return img;
+  }
+  if (kind === 'aura') {
+    const img = auraImageUrl(id);
     if (img) return img;
   }
   // Committed deed, class, family, and status paintings short-circuit to a

@@ -125,11 +125,11 @@ describe('ability icons', () => {
   it('pins every ABILITY_RECIPES key and payload by stable content identity', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
-    expect(ids).toHaveLength(435);
+    expect(ids).toHaveLength(438);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('caf4c2352503f7d1fc316e7f42b8191db1ca5631538a4c5643acb7706fe66caf');
+    expect(hash).toBe('ef80a19ffc2a9222d0467f2dffe27bbce0832476f18780ac96e1ca8f0d89d8dc');
   });
 });

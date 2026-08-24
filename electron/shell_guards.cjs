@@ -184,8 +184,15 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
   // by turning them into blob: object URLs and then fetch()ing those URLs (a connect-src
   // request, not img-src). Without blob: here every model renders untextured. img-src and
   // worker-src already list blob: for the same reason (texture <img> decode, decoder workers).
+  // data: is here for the same class of reason: three's ZSTDDecoder (KTX2Loader's Zstandard
+  // path, taken by every UASTC normal/occlusion map) instantiates its WASM with
+  // fetch("data:application/wasm;base64,...").then(r => r.arrayBuffer()), a connect-src request
+  // to a data: URI. Without data: here every Zstandard-supercompressed KTX2 GLB throws
+  // "Refused to connect" and world entry dies on the desktop shell (the only host that ships a
+  // CSP). data: is a self-contained inline scheme, not a network origin, so unlike a remote
+  // host it opens no exfiltration path; img-src already lists it for the same texture reason.
   const connectSrc = [
-    "connect-src 'self' blob:",
+    "connect-src 'self' blob: data:",
     apiOrigin,
     deriveWebSocketOrigin(apiOrigin),
     'wss:',
@@ -243,7 +250,8 @@ function isTrustedSender(frame, allowedOrigins) {
 }
 
 // Decide whether a renderer key event (Electron's before-input-event `input` object)
-// is the DevTools toggle chord. The packaged build runs with setMenu(null) and no
+// is the DevTools toggle chord. The packaged build nulls the application menu on
+// win32/linux (main.cjs, before app ready) and never auto-opens
 // DevTools, so there is otherwise no way to open the inspector to check CSP violations,
 // GPU state, or runtime errors in a shipped app; main.cjs binds this to before-input-event
 // to restore a safe, read-only debug affordance. Only a keyDown counts. The accepted

@@ -46,7 +46,7 @@ talk only to the **`SimContext` seam** (`sim_context.ts`).
 - `world.ts`: `groundHeight`/`terrainHeight` (pure fn of x,z,seed), `WATER_LEVEL`, `generateDecorations`. **Renderer samples the same fns**: keep them identical. The voxel layer below derives from them too. A named unsanctioned monolith (root Modularity): extract, never grow.
 - `voxel.ts` + `voxel_mesh.ts`: the true-3D voxel density field layered over the `world.ts` heightfield, plus its chunked mesher. Tunnels/overhangs come ONLY from hand-authored capsules in `content/tunnels.ts` subtracted from solid terrain; away from a tunnel the field's surface must stay byte-identical to `terrainHeight`, so a heightfield edit is also a voxel edit. Engine-only so far (proven by tests, not yet wired into the renderer; `colliders.ts`/`pathfind.ts` are still heightfield-only).
 - **`physics/`**: the character physics engine (own `CLAUDE.md`): continuous swept collision against the extruded-2D collider set, multi-pass sliding, depenetration, and STEP UP so a walking body climbs low stones and kerbs with no jump. `player_motion.ts` runs it for the OPEN WORLD; instanced interiors stay on `resolveMove`. Pure leaf set (no `SimContext`), pinned by `tests/physics_character.test.ts`.
-- `decoration_dims.ts`: pure leaf, THE source of truth for scatter-decoration size (`rockHeight`/`rockRadius`/`ROCK_SINK_UNITS`). `colliders.ts` builds rock colliders from it and `src/render/foliage.ts` scales the rock GLBs to it, so a stone's silhouette and its collision top cannot drift.
+- `decoration_dims.ts`: pure leaf, THE source of truth for scatter-decoration size (`rockHeight`/`rockRadius`/`ROCK_SINK_UNITS`) and for whether a decoration is solid at all (`decorationHasCollider`). `colliders.ts` builds rock colliders from it and `src/render/foliage.ts` scales the rock GLBs to it, so a stone's silhouette and its collision top cannot drift; `decorationHasCollider` is the same kind of dual-consumer contract (`colliders.ts` gates on it, `src/render/foliage_decimation_core.ts` reads it too, so a graphics preset can never trim a decoration a player can be blocked by).
 - `colliders.ts`: `resolvePosition` (static collision + slide); reads `PROPS` and the dungeon/arena layouts. Parkour heights live here: low props carry a `moveTopY` movement top (`standable` for crates/rocks and the climbable roofs: stall canopies, the dock hut), the optional `MoverHeight` param lets a mover whose feet clear a top pass over it, and `supportHeightAt` is the standable-surface query the movement kernel maxes against the terrain. Callers passing no height (mobs, pathfinding) collide full-height as before. It also OWNS the world's streetlamps: `gridFor` publishes the lamp-free grid, then `addStreetlampColliders` plans the network (`streetlamp_layout.ts`) and plants a full-height post per site, and `streetlampPlacements(seed)` is the one list `src/render/streetlamps.ts` instances from (the `bankerChestSpots` arrangement). That ordering is load-bearing: planning a post calls `resolvePosition`, so the grid must already be cached or the build recurses. Like `world.ts`, a named monolith under the root ratchet (`tests/monolith_budget.test.ts`): extract, never grow.
 - `streetlamp_layout.ts` + `streetlamp_style.ts`: pure leaves. The first lays the lamp network out along the road polylines through caller-supplied probes (spacing tiers, the roadside clearance band, junction dedupe, the road-facing yaw); the second says which fixture stands in which area and how wide a post it presents (`STREETLAMP_COLLIDER_RADIUS`, MEASURED from the shipped GLBs and pinned by `tests/streetlamp_colliders.test.ts`). Both are read by `colliders.ts` AND `src/render/`, which is why they are sim leaves rather than render cores.
 - `dungeon_layout.ts`: plain-number interior layouts; single source for BOTH render geometry and `colliders.ts` interior sets.
@@ -93,7 +93,8 @@ plausibly covers means the table needs a new row in the same change.
 | `pet/` | the pet system: `pet_ai.ts` (`updatePet`, follow, ranged attack, target pick), `pet_commands.ts` (the command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip), `pet_scaling.ts` (owner-to-pet stat inheritance for hunter beasts + the heel-speed floor), `pet_selection.ts` (pure owner/pet identity shared with the HUD mirrors), `pet_taunt_gate.ts` (the shared force-taunt eligibility gate), `warlock_pet_skills.ts` + `warlock_pet_growth.ts` (signature warlock-pet utility; authored per-level visual scale) |
 | `pet/pet_return.ts` + `pet_match_return.ts` + `pet_owner_revive.ts` | THE shared pet round trip (snapshot / unravel-note / restore) and its two consumers: arena-shaped matches and the owner's own death. Keying doctrine: snapshot LIVING pets only (nothing is owed a pet it did not lose); a hunter beast / mage elemental keeps its corpse and revives IN PLACE by entity id, a warlock demon unravels and is REBUILT keyed on the UNRAVEL, never the death, so a deliberate dismissal or re-summon is never overwritten; return hp is the carried hp, or a FRACTION of the pool it returns to. The match half lives on the `ArenaMatch` beside `preMatchPools` (issue #1600); the owner half on `PlayerMeta.deathPet` (session-only, rewritten on EVERY death, restored at the end of `spirit.ts` `reviveAt` at `PET_REVIVE_HP_FRACTION`). All three draw NO rng |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
-| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
+| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate (its body is the dependency-free `transfer_lock.ts` leaf, re-exported here; `exchange_eligibility.ts` imports the leaf directly), the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
+| `broker_custody.ts` | the broker-side custody moves for the server's marketplace, both kept as thin `Sim` delegates the server resolves on the facade: `extractTradableCopyImpl` (one exact copy into escrow through the `inventory_extract.ts` leaf, plus the dismount when a seller escrows the mount they are riding) and `grantTradableCopyImpl` (the copy back into the bags through the shared `canGrantCopies` / `grantCopies` pair, in one call); draws NO rng |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3); `corpse_interaction.ts` is its shared availability predicate (`corpseInteractionAvailability`: loot rights vs harvestability on a dead lootable mob) |
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness; siblings `quests/interact_object_credit.ts` (the per-object credit ledger for multi-count interact objectives, since interact deliberately does not consume the object) and `quests/profession_quest_effects.ts` (the profession-quest effect arms over `professions/archetype.ts`) |
@@ -164,17 +165,28 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
 - `market_listing_ids.ts`: the World Market id allocator, including the reserved house
   band and load-time reissue that keeps one row per id.
 - `resurrection.ts`: both sicknesses (The Keeper's Toll and the shorter Unstuck one),
-  shared by every death site.
+  shared by every death site, PLUS the two "which auras survive this wipe" predicates
+  every wipe site routes through so the rule cannot drift: `aurasSurvivingDeath` (death
+  and every respawn/resurrect path) and `aurasSurvivingCleanSlate` (the harsher arena
+  entry and Fiesta down wipes, which shed even the sicknesses).
 - `ride_height.ts`: the waterline ride height slope gating reads for wading and
   swimming bodies (gating on the RAW lakebed height reads an uneven bed as a wall of
   cliffs and sticks waders in shore pockets).
 - `mob/mechanic_spacing.ts`: the rift boss shared mechanic spacing lock and its
   oldest-due drain; stamped per-spawn by `rift/runs.ts`, consumed by the
   `runMobAttackMechanics` drivers.
+- `stun_dr.ts`: CC diminishing-return categories, PLUS the PvP diminishing-returns
+  ladder: the seven `PVP_*_DR_*` reset/multiplier/duration constants and the
+  player-sourced crowd-control funnel, `crowdControlDurationAfterDr`/
+  `diminishedCrowdControlDuration`.
 - `jail.ts`: moderation-jail cage layout, gate teleport, and visitor spot; the jail
   SYSTEM logic stays on `Sim`.
 - `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency
   display-band heal applied at character load.
+- `daily_rewards_stub.ts`: the offline daily-rewards readout constant, and the
+  ONE file on the $WOC token-firewall allowlist (`tests/architecture.test.ts`
+  pins its read-only-projection shape: one exported function, no control flow,
+  type-only imports).
 
 ## The SimContext seam (final shape)
 `sim_context.ts` defines `SimContext` = `SimContextPrimitives` (live getters onto the

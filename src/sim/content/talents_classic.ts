@@ -52,12 +52,15 @@ const PALADIN_SPECS: SpecDef[] = [
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
     'sunward_disc',
     'Oathward',
-    'Increases all threat you generate by 50%, your armor by 20% and your Stamina by 35%.',
+    'Increases all threat you generate by 40%, your armor by 20% and your Stamina by 35%.',
     // staPct 0.35 carries the 2026-07 tank-parity pass that used to live in
     // SPEC_BASELINES: with no stamina multiplier the paladin sat at 76% of the
     // prot warrior's effective HP. The mastery is where an overhauled class
     // keeps its floor (see Recompense on the warrior), so it lands here.
-    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2, staPct: 0.35 } },
+    // threatPct 0.5 -> 0.4 (v0.38 tank threat parity): one layer of the
+    // Faithwarden triple stack (ability mult x mastery x Burning Oath) trimmed
+    // so the composed total lands near the other tanks.
+    { global: { threatPct: 0.4 }, stats: { armorPct: 0.2, staPct: 0.35 } },
   ),
   spec(
     'retribution',
@@ -144,11 +147,11 @@ const MAGE_SPECS: SpecDef[] = [
     // bypass that learnLevel gate (grants always do).
     'pyroblast',
     'Ignition',
-    'Your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
+    'Your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. Increases critical strike chance by 2%.',
     // The burn fraction is the scalable mastery axis (runtime: fire_mage's
     // igniteOnCrit copies the resolved crit damage); crit chance is the static
     // secondary.
-    { global: { ignitionPct: 0.4 }, stats: { crit: 0.02 } },
+    { global: { ignitionPct: 0.3 }, stats: { crit: 0.02 } },
   ),
   spec(
     'frost',
@@ -225,15 +228,17 @@ const ROGUE_SPECS: SpecDef[] = [
     "A stealth striker. Openers from Duskveil add Gloam; at 3 Gloam your openers work without stealth, and the next one is free and starts the Shadow Veil, doubling your first Lurker's Strike inside it.",
     'hemorrhage',
     // Balance pass (maintainer sheet): tuned down from +40% crit damage and
-    // +10% Agility; the stealth-speed identity comes in instead (the Duskveil
-    // slow eases from 50% toward 25% at full mastery).
+    // +10% Agility; the stealth-speed identity comes in instead. The buffPct
+    // scales the Duskveil aura's own move-speed multiplier (0.5 = half speed),
+    // so 1.0 lifts it to 1.0: the mastery removes the stealth slow outright
+    // rather than easing it to 75%.
     'False Face',
-    'Increases the damage of your critical strikes by 25%, and you move 50% faster while in Duskveil.',
+    'Increases the damage of your critical strikes by 25%, and you move at 100% speed while in Duskveil.',
     {
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     },
   ),
@@ -394,8 +399,8 @@ const DRUID_SPECS: SpecDef[] = [
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear
     // node) into the spec mastery: in Talents 2.0 the bear-tank identity IS this spec.
-    'Increases your physical ability damage by 50%, your bleed damage by 50%, your threat by 20%, and your armor by 15%.',
-    { global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.2 }, stats: { armorPct: 0.15 } },
+    'Increases your physical ability damage by 50%, your bleed damage by 50%, your threat by 45%, and your armor by 15%.',
+    { global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.45 }, stats: { armorPct: 0.15 } },
   ),
   spec(
     'restoration',

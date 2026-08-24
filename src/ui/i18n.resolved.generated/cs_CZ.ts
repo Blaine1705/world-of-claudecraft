@@ -482,6 +482,88 @@ export const cs_CZ: EnTranslations = {
         "bannedUntil": "Ještě {remaining} máš zákaz přístupu k denním odměnám. Přístup se vrátí {until}. Důvod: {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "Obchod WOC",
       "close": "Zavřít obchod WOC",
@@ -734,6 +816,9 @@ export const cs_CZ: EnTranslations = {
       "showAmounts": "Zobrazit všechny nabídky Claudium",
       "hideAmounts": "Skrýt další nabídky Claudium",
       "skuRow": "{claudium} Claudium za {usd}",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Koupit",
       "buyUnavailable": "Nákup nyní není dostupný.",
       "storeTitle": "Obchod s kosmetikou",
@@ -802,9 +887,9 @@ export const cs_CZ: EnTranslations = {
       "note": "Tažením lišty karet chatu přesuneš okno, rohovým úchytem změníš velikost. Reset ho vrátí na výchozí pozici a velikost."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Byl dosažen limit chatu Obecného. Zkus to znovu za {seconds}.",
+      "pending": "Tvoje předchozí zpráva v chatu Obecném se ještě odesílá. Zkus to za chvíli znovu.",
+      "unavailable": "Chat Obecný je dočasně nedostupný. Zkus to znovu brzy."
     },
     "swing": {
       "ready": "Úder",
@@ -853,6 +938,7 @@ export const cs_CZ: EnTranslations = {
       "jump": "Skok",
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
+      "wocMarket": "Exchange",
       "deeds": "Skutky",
       "mounts": "Jízdní zvířata",
       "professions": "Profese",
@@ -866,11 +952,52 @@ export const cs_CZ: EnTranslations = {
       "actionRing": "Bojové akce",
       "actionPageToggle": "Přepnout stránku akcí",
       "actionPageIndicator": "{page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Přepnout cíl",
       "targetCycleShort": "Cíl",
       "spellbookPageLabel": "Strana {page}",
       "hideKeyboard": "Skrýt klávesnici",
-      "chatPlaceholder": "Něco napiš..."
+      "chatPlaceholder": "Něco napiš...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Pohybuj se páčkou pohybu a tažením po obrazovce se rozhlížej. Udělej pár kroků a začni.",
@@ -953,6 +1080,22 @@ export const cs_CZ: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Sklepení",
+        "state": "Reprezentační patro",
+        "residence": "Obytné patro",
+        "tower": "Strážní věž"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Zahradní patro",
+        "solar": "Sluneční komnata"
+      }
+    },
     "compass": {
       "N": "S",
       "NE": "SV",
@@ -970,6 +1113,7 @@ export const cs_CZ: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje.",
       "threatFallback": "Žádný aktivní threat: zobrazuje se poškození vůči {name}",
+      "threatFrozen": "Konečná hrozba vůči {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Ostatní ({count})",
@@ -1367,6 +1511,10 @@ export const cs_CZ: EnTranslations = {
       "showWalletOnCharacterScreen": "Zobrazit peněženku na obrazovce postavy",
       "showWalletOnPlayerCard": "Zobrazit peněženku na kartě hráče",
       "showPlaytime": "Zobrazit odehraný čas na obrazovce postavy",
+      "forceHighPerfGpu": "Používat samostatnou herní grafickou kartu",
+      "forceHighPerfGpuNote": "Ve výchozím nastavení zapnuto: desktopová aplikace požádá tento počítač o jeho samostatnou herní grafickou kartu. Toto vypni, pokud se hra nespustí, otevře se s černou obrazovkou, nebo displej notebooku zhasne. Projeví se až při příštím spuštění hry.",
+      "discordPresence": "Rozšířená aktivita Discordu",
+      "discordPresenceNote": "Zobrazuje zónu, ve které se nacházíš, a jak dlouho hraješ tuto relaci, jako tvou aktivitu na Discordu, a obojí vidí kdokoli, kdo vidí tvůj profil na Discordu. Sdílí se jen název zóny, čas tvé relace a název hry, nikdy tvoje postava, tvůj účet nebo s kým hraješ. Vyžaduje spuštěnou aplikaci Discord na tomto počítači.",
       "showDevBadges": "Zobrazit vývojářské odznaky",
       "showOwnNameplate": "Zobrazit mou jmenovku",
       "showPlayerNameplates": "Zobrazit jmenovky hráčů",
@@ -1382,6 +1530,7 @@ export const cs_CZ: EnTranslations = {
       "mouseoverCast": "Sesílání najetím myší na rámech skupiny",
       "stickyTarget": "Zachovat cíl při kliknutí na zem",
       "showItemLevel": "Zobrazit úroveň předmětu",
+      "showReliquaryTracker": "Zobrazit Reliquary Tracker",
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
@@ -1394,7 +1543,9 @@ export const cs_CZ: EnTranslations = {
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
-      "mobileLeftHanded": "Rozvržení pro leváky"
+      "mobileLeftHanded": "Rozvržení pro leváky",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Volby",
@@ -1427,9 +1578,29 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
+      "confirmAction": "Potvrdit / Vybrat",
       "zoomIn": "Přiblížit",
       "zoomOut": "Oddálit",
-      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
+      "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Povolit Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Podržte spoušť, aby se rozsvítilo osm slotů akčních lišt na d-padu a tlačítkách na obličeji. Klepnutím na další spoušť přepnete na druhou sadu.",
+      "crossHotbarResetLayout": "Resetujte Cross Hotbar",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "Spouštěče a d-pad patří ke křížovému aktivnímu panelu, když je zapnutý, takže se nastavují spíše níže než zde.",
+      "cancelAction": "Storno / Zpět",
+      "subcommandsAction": "Dílčí příkazy / Mapa",
+      "cycleHudAction": "Rozhraní cyklu",
+      "cycleSetAction": "Změnit sadu Hotbar",
+      "crossHotbarDisplay": "Barový displej",
+      "crossHotbarDisplayFull": "Plný",
+      "crossHotbarDisplayCompact": "Kompaktní",
+      "crossHotbarDisplayMinimal": "Pouze při držení",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Přenášení {action}: potvrzením na buňce jej umístíte, zrušením jej vrátíte zpět.",
+      "crossHotbarEditHint": "Uspořádání: potvrzení zvednutí z buňky nebo knihy kouzel a upuštění na buňku, zrušení vymaže jednu.",
+      "crossHotbarEditHelp": "Podržte levý nárazník a stiskněte tlačítko na horní straně pro uspořádání lišty s ovladačem."
     },
     "perf": {
       "title": "Performance overlay",
@@ -1548,6 +1719,7 @@ export const cs_CZ: EnTranslations = {
           "render": "render  odeslání {submit} ms | svět {world} ms | entity {entities} ms",
           "scene": "scéna   {calls} volání | {triangles} troj. | {views} zobr.",
           "hitches": "záseky {hitches} | shadery {shaders} | nahrávky {uploads} | zobrazení {views}",
+          "hitchesBuild": "zóna sestaví {zoneBuilds} | mimo rámec {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "čeká se"
         },
@@ -1599,7 +1771,10 @@ export const cs_CZ: EnTranslations = {
             "eventCpu": "Zpracování událostí zabírá snímek",
             "shaderCompile": "Shadery se kompilují během hraní",
             "textureUpload": "Nahrávání textur způsobuje záseky ve hře",
+            "zoneBuild": "Sestavení zónového streamování způsobují problémy",
             "viewCreate": "Vytváření zobrazení entit způsobuje záseky",
+            "gcHitch": "V dlouhých rámech běží svoz odpadu",
+            "offFrameHitch": "Dlouhé snímky pocházejí z práce mimo zpětné volání vykreslení",
             "otherHitch": "Zůstávají nepřiřazené dlouhé snímky",
             "assetStartup": "Spuštění hry zpožďuje práce s assety",
             "longTasks": "Dlouhé úlohy prohlížeče blokují snímky",
@@ -1739,6 +1914,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
+        "arenaComplete": "Odehrán souboj v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
         "fiestaWin": "Vítězství ve Fiestě",
@@ -1845,6 +2021,7 @@ export const cs_CZ: EnTranslations = {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
     "itemHeroicTag": "[HRDINSKÉ]",
+    "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
     "itemUniqueEquipped": "Jedinečně nositelné",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const cs_CZ: EnTranslations = {
         "few": "jste {rank}, {count} členové",
         "many": "jste {rank}, {count} člena",
         "other": "jste {rank}, {count} členů"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} hráč",
@@ -2016,6 +2205,10 @@ export const cs_CZ: EnTranslations = {
       "errPasswordLong": "Nové heslo smí mít nejvýše 128 znaků.",
       "errPasswordUnchanged": "Nové heslo se musí lišit od aktuálního.",
       "errPasswordConfirm": "Nová hesla se neshodují.",
+      "setPasswordTitle": "Nastavte heslo",
+      "setPasswordHint": "Tento účet byl vytvořen pomocí Přihlášení přes Apple nebo Discord a zatím nemá žádné heslo. Nastavte jeden pro přihlašování na jiných zařízeních, jako jsou desktopové aplikace Mac a Windows nebo web, a pro propojení dalších způsobů přihlašování.",
+      "setPasswordSubmit": "Nastavit heslo",
+      "passwordSet": "Heslo nastaveno. Nyní se můžete přihlásit pomocí svého uživatelského jména a hesla kdekoli.",
       "emailLabel": "E-mail (volitelné)",
       "emailHint": "Používá se jen pro obnovu účtu. Níže použij Změnit e-mail, pokud ho chceš aktualizovat.",
       "saveEmail": "Uložit e-mail",
@@ -2199,6 +2392,10 @@ export const cs_CZ: EnTranslations = {
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
+      "itemAriaLocked": "{item}, počet {count}, zamčeno",
+      "itemLockedLine": "Zamčeno",
+      "lockItem": "Zamknout předmět",
+      "unlockItem": "Odemknout předmět",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",
@@ -2453,12 +2650,14 @@ export const cs_CZ: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Přidat {name} na akční lištu",
-      "removeFromBarAria": "Odebrat {name} z akční lišty"
+      "removeFromBarAria": "Odebrat {name} z akční lišty",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "PRYČ"
+      "afkTag": "PRYČ",
+      "cheaterTag": "< Podvodník >"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -3224,11 +3423,13 @@ export const cs_CZ: EnTranslations = {
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spotřebuje {count} jemné jakosti)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
       "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
+      "reagentLocked": "Reagencie pro to je zamčená.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
       "comboRequires": "Ladění: {craftA} + {craftB}, úroveň {tier}.",
@@ -3335,6 +3536,7 @@ export const cs_CZ: EnTranslations = {
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
       "notSalvageable": "Toto nelze rozebrat.",
+      "salvageLocked": "Tento předmět je zamčený.",
       "disenchantBusy": "Jsi zaneprázdněn(a).",
       "salvageBusy": "Jsi zaneprázdněn(a).",
       "enchantBusy": "Jsi zaneprázdněn(a).",
@@ -3710,6 +3912,9 @@ export const cs_CZ: EnTranslations = {
       "pinFull": "Sledování je plné (nejvýše {cap} stránek)",
       "pinAria": "Připnout {name} do sledování na rozhraní",
       "unpinAria": "Odepnout {name}",
+      "trackerToggleLabel": "HUD tracker",
+      "trackerToggleShowHint": "Ukažte na obrazovce sledovač relikviářů",
+      "trackerToggleHideHint": "Skryjte sledovač relikviářů na obrazovce",
       "rarityLine": "Našlo {percent} sběratelů",
       "pageRarityLine": "Iluminovalo {percent} sběratelů",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const cs_CZ: EnTranslations = {
       "unlockedBorderHint": "Získán nový rámeček: {name}. Nasadíš si jej v Knize skutků.",
       "broadcastLine": "{name} završuje skutek: {deed}",
       "rarityLine": "Vykonalo jej {percent} dobrodruhů",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Skutky",
       "collapseHint": "Sbalit panel skutků",
       "expandHint": "Rozbalit panel skutků",
@@ -3797,6 +4003,220 @@ export const cs_CZ: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Vyžaduje úroveň {level}"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const cs_CZ: EnTranslations = {
       "password_too_long": "Nové heslo smí mít nejvýše 128 znaků.",
       "characters_online": "Před deaktivací odhlas všechny své postavy.",
       "deactivated": "Tento účet byl deaktivován. Kontaktuj admina kvůli obnovení.",
-      "not_found": "Účet nenalezen."
+      "not_found": "Účet nenalezen.",
+      "password_already_set": "Tento účet již má heslo. Místo toho použijte Změnit heslo."
     },
     "character": {
       "name_invalid": "Neplatné jméno postavy. Použij 2-16 písmen.",
@@ -3928,6 +4349,61 @@ export const cs_CZ: EnTranslations = {
       "genesis_token_claimed": "Tento Seeker Genesis Token už byl uplatněn.",
       "entitlement_required": "Je vyžadováno ověřené oprávnění Seeker.",
       "current_ownership_required": "Je vyžadováno aktuální vlastnictví Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Účty operátorů nelze označit.",
+      "reason_required": "Je nutné uvést důvod.",
+      "invalid_duration": "Zadejte dobu označení alespoň jednu sekundu.",
+      "not_marked": "Tento účet není označen."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const cs_CZ: EnTranslations = {
       "ifHighContrastBackground": "Prostší pozadí s vyšším kontrastem za úvodní obrazovkou a obrazovkou postav.",
       "ifInvertLookY": "Obrátí směr nahoru a dolů u rozhlížení myší.",
       "ifShowItemLevel": "Přidá řádek s úrovní předmětu do každého tooltipu. Ve výchozím stavu vypnuto, což zachová klasický tooltip jen se statistikami.",
+      "ifShowReliquaryTracker": "Zda je sledovač relikviářů (vaše připnuté stránky a jejich průběh) umístěn na vašem HUD. Okno Relikviář má odpovídající tlačítko oka a připnutím stránky se sledovač opět zapne.",
       "ifShowPlaytime": "Zobrazí tvůj celoživotní odehraný čas na panelu postavy. Ve výchozím stavu zapnuto, a panel má tlačítko oka, které to přepne pro dané zařízení, což se hodí, pokud streamuješ nebo pořizuješ snímky obrazovky. Celkový čas se počítá dál tak jako tak.",
       "ifShowOwnNameplate": "Vykreslí tvou vlastní jmenovku nad hlavou přesně tak, jak ji vidí ostatní hráči, včetně veškeré parády. Vypni ji pro klasický pohled.",
       "ifShowPlayerNameplates": "Vykreslí jmenovky ostatních hráčů. Vypnutí pročistí přeplněný uzel a tvůj aktuální cíl zůstane čitelný tak jako tak.",
@@ -4735,6 +5212,7 @@ export const cs_CZ: EnTranslations = {
       "mageEleJet": "Vodní proud má na liště mazlíčka vlastní tlačítko: klikni na něj a upevníš mrazivý paprsek na jednoho nepřítele, nebo klikni pravým tlačítkem (na mobilu podrž prst), aby ho elementál vypálil sám, kdykoli bude připravený.",
       "formsHeading": "Změna podoby",
       "formsNote": "Druid bojuje měněním podoby. Většina druidských schopností patří k jedné podobě, takže to, v jaké jsi právě podobě, rozhoduje, co můžeš seslat, a přeměna stojí trochu many. Měnit podobu můžeš v boji i mimo něj, tak často, jak chceš.",
+      "formsAutoUnshift": "Léčení nebo útočné kouzlo seslané v podobě tě z ní samo vyvede. Opuštění podoby tímto způsobem je zdarma a nespotřebuje globální dobu obnovy, takže okamžité kouzlo vyletí hned, jak ho stiskneš. Návrat do podoby je běžná schopnost a stále stojí manu i globální dobu obnovy.",
       "formsMoonwing": "Druid Měsíčního háje získá ještě jednu podobu, Podobu měsíčního křídla, v níž bojuje jako sesilatel. Je to jediná zvířecí podoba, která si ponechá tvá kouzla, a hůlka funguje jen v ní nebo v tvé běžné sesilatelské podobě.",
       "formLine": {
         "form_bear": "Tankovací podoba: silná kůže, vztek místo many a navíc hrozba, aby po tobě nepřátelé dál sekali.",
@@ -6544,6 +7022,7 @@ export const cs_CZ: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "ty@example.com",
     "emailError": "Zadej platnou e-mailovou adresu.",
+    "marketingOptIn": "Chci dostávat novinky a aktualizace hry e-mailem (volitelné)",
     "showPassword": "Zobrazit heslo",
     "hidePassword": "Skrýt heslo",
     "logIn": "Přihlásit se",
@@ -6644,6 +7123,19 @@ export const cs_CZ: EnTranslations = {
     "style": "Styl",
     "resetLook": "Resetovat vzhled",
     "resetShort": "Resetovat",
+    "shareTab": "Sdílet",
+    "designCode": "Kód vzhledu",
+    "designCodeHint": "Zkopírujte tento kód, chcete-li vzhled uložit nebo sdílet. Vložte sem kód a importujte jej, abyste vzhled načetli.",
+    "copyCode": "Kopírovat kód",
+    "importCode": "Importovat",
+    "designCodeCopied": "Kód vzhledu byl zkopírován.",
+    "designCodeCopyManual": "Automatické kopírování je zde zablokováno. Kód je vybraný, zkopírujte jej pomocí klávesnice.",
+    "designCodeImported": "Vzhled byl importován.",
+    "designCodeImportedPartial": "Vzhled byl importován. Hodnoty, které tato verze nezná, byly přeskočeny.",
+    "designCodeErrEmpty": "Nejprve vložte kód vzhledu.",
+    "designCodeErrHeader": "Toto nevypadá jako kód vzhledu.",
+    "designCodeErrVersion": "Tento kód vzhledu pochází z novější verze hry.",
+    "designCodeErrMalformed": "Tento kód vzhledu je poškozený. Zkopírujte celý kód a zkuste to znovu.",
     "browFlat": "Rovné",
     "browArched": "Klenuté",
     "browThin": "Tenké",
@@ -7039,6 +7531,7 @@ export const cs_CZ: EnTranslations = {
       "portalOpens": "Trhlina stupně {tier} se protrhává v {zone}!",
       "portalSealed": "Trhlina stupně {tier} v {zone} byla zapečetěna.",
       "portalCollapses": "Trhlina stupně {tier} v {zone} se hroutí.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Do této trhliny mohou vstoupit jen dobrodruzi na úrovni {level} nebo vyšší.",
       "deadEntry": "Nemůžeš vstoupit do trhliny, když jsi mrtvý.",
       "deadEntryCombat": "Tvá skupina je stále v boji. Mrtví mohou vstoupit znovu, jakmile boj skončí.",
@@ -7138,6 +7631,7 @@ export const cs_CZ: EnTranslations = {
       "shopMarksRequired": "K nákupu {name} potřebuješ {marks} známek výprav.",
       "shopSealPremiumOnly": "Tato pečeť povolí jen mistrovské ruce. Otevře ji pouze prémiová sázka.",
       "passageSealed": "Průchod je zapečetěný.",
+      "enemiesRemain": "Nejprve poraz zbývající nepřátele.",
       "moveCloserPassage": "Přibliž se k průchodu.",
       "moveCloserChest": "Přibliž se k truhle.",
       "moveCloserReliquary": "Přibliž se k relikviáři.",
@@ -7760,7 +8254,15 @@ export const cs_CZ: EnTranslations = {
       "readyBody": "Nainstaluje se při ukončení, nebo restartuj hned.",
       "restart": "Restartovat hned",
       "later": "Později",
-      "dismiss": "Zavřít"
+      "dismiss": "Zavřít",
+      "whatsNew": "Zobrazit změny v prohlížeči"
+    },
+    "notify": {
+      "updateReadyTitle": "Aktualizace {version} je připravena",
+      "updateReadyTitleNoVersion": "Aktualizace je připravena",
+      "updateReadyBody": "Restartuj World of ClaudeCraft, aby se aktualizace použila.",
+      "partyInviteTitle": "Pozvánka do skupiny",
+      "partyInviteBody": "{name} tě pozval(a) do skupiny."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const cs_CZ: EnTranslations = {
       "reload": "Načíst znovu",
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
+    },
+    "titlebar": {
+      "exitGame": "Ukončit hru"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.",
+    "bodyDiscreteInactive": "Hra nepoužívá samostatnou (herní) grafickou kartu a místo toho běží na úsporné grafické kartě, takže výkon utrpí. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows navíc nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.",
     "bodyWeb": "Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.",
     "hybridBodyWindows": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, nastav prohlížeč na Vysoký výkon v Nastavení, Systém, Displej, Grafika, a pak ho restartuj. Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
     "hybridBodyLinux": "Tato relace se vykresluje na integrované (úsporné) grafické kartě. Pokud má tento počítač i samostatnou herní grafickou kartu, tvůj prohlížeč nebo grafický ovladač může mít vlastní nastavení výběru GPU, případně tvoje distribuce může nabízet nástroj pro přepínání grafiky (například PRIME nebo optimus-manager). Desktopová aplikace vybere samostatnou grafickou kartu automaticky.",
@@ -7995,7 +8501,111 @@ export const cs_CZ: EnTranslations = {
       "zoomIn": "Přiblížit",
       "zoomOut": "Oddálit",
       "mapCanvasLabel": "Mapa",
-      "mapSummary": "Mapa oblasti {zone}."
+      "mapSummary": "Mapa oblasti {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Nejsou vidět žádné významné značky.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Další značky: {count}.",
+      "mapMarkerDirections": {
+        "center": "uprostřed",
+        "north": "severně",
+        "northeast": "severovýchodně",
+        "east": "východně",
+        "southeast": "jihovýchodně",
+        "south": "jižně",
+        "southwest": "jihozápadně",
+        "west": "západně",
+        "northwest": "severozápadně"
+      },
+      "mapMarkerDistances": {
+        "near": "blízko",
+        "medium": "ve střední vzdálenosti",
+        "far": "daleko"
+      },
+      "mapMarkerLabels": {
+        "you": "Ty",
+        "availableQuest": "Dostupný úkol",
+        "readyQuest": "Úkol připravený k odevzdání",
+        "repeatQuest": "Opakovatelný úkol",
+        "cooldownQuest": "Úkol čeká na obnovení",
+        "questObjective": "Oblast cíle úkolu",
+        "readyOre": "Dostupná rudná žíla",
+        "readyWood": "Dostupná skupina stromů",
+        "readyHerb": "Dostupný porost bylin",
+        "readyLockedOre": "Dostupná rudná žíla, potřebný nástroj je uzamčený",
+        "readyLockedWood": "Dostupná skupina stromů, potřebný nástroj je uzamčený",
+        "readyLockedHerb": "Dostupný porost bylin, potřebný nástroj je uzamčený",
+        "cooldownOre": "Vytěžená rudná žíla",
+        "cooldownWood": "Vykácená skupina stromů",
+        "cooldownHerb": "Sesbíraný porost bylin",
+        "cooldownLockedOre": "Vytěžená rudná žíla, potřebný nástroj je uzamčený",
+        "cooldownLockedWood": "Vykácená skupina stromů, potřebný nástroj je uzamčený",
+        "cooldownLockedHerb": "Sesbíraný porost bylin, potřebný nástroj je uzamčený",
+        "station": "Řemeslná stanice: {name}",
+        "service": "Služba: {name}",
+        "partyMember": "Člen skupiny: {name}",
+        "deadPartyMember": "Mrtvý člen skupiny: {name}",
+        "partyMemberGeneric": "Člen skupiny",
+        "deadPartyMemberGeneric": "Mrtvý člen skupiny",
+        "friend": "Přítel: {name}",
+        "guildMember": "Člen cechu: {name}",
+        "pointOfInterest": "Zajímavé místo: {name}",
+        "dungeonEntrance": "Vstup do dungeonu: {name}",
+        "dungeonExit": "Východ z dungeonu",
+        "delveEntrance": "Vstup do výpravy: {name}",
+        "worldPassage": "Průchod do oblasti: {zone}",
+        "riftEntrance": "Vstup do trhliny: {name}",
+        "hostileEnemy": "Nepřátelská jednotka",
+        "aggressiveEnemy": "Nepřítel, který na tebe útočí",
+        "lootableEnemy": "Nepřítel s dostupnou kořistí",
+        "corpse": "Tvoje mrtvé tělo",
+        "deathZone": "Nebezpečná zóna",
+        "teammate": "Spoluhráč",
+        "deadTeammate": "Mrtvý spoluhráč",
+        "flagCarrier": "Spoluhráč nesoucí vlajku",
+        "ownFlagStand": "Stojan na tvoji vlajku",
+        "enemyFlagStand": "Stojan na nepřátelskou vlajku",
+        "riftDescent": "Sestup trhlinou",
+        "riftReturnBeacon": "Návratový maják",
+        "riftReturnExit": "Východ zpět",
+        "ranked": "{marker}, stupeň {rank}",
+        "riftTreasureAvailable": "Dostupný poklad",
+        "riftTreasureLocked": "Uzamčený poklad",
+        "riftTreasureOpened": "Otevřený poklad",
+        "riftTreasureJammed": "Poklad se zaseknutým zámkem",
+        "riftCacheAvailable": "Dostupná skrýš trhliny",
+        "riftCacheLocked": "Uzamčená skrýš",
+        "riftCacheOpened": "Otevřená skrýš",
+        "riftCacheJammed": "Skrýš se zaseknutým zámkem",
+        "pylonUnlit": "Zhasnutý runový pilíř",
+        "pylonLit": "Rozsvícený runový pilíř",
+        "sequenceRuneUnlit": "Zhasnutá sekvenční runa",
+        "sequenceRuneLit": "Rozsvícená sekvenční runa",
+        "iceGoal": "Ledový cíl",
+        "boulderPad": "Cíl pro balvan",
+        "boulderMovable": "Balvan k přesunutí",
+        "boulderPlaced": "Umístěný balvan",
+        "gateSealed": "Zapečetěná brána",
+        "gateOpen": "Otevřená brána",
+        "switchReady": "Spínač připravený k aktivaci",
+        "switchOn": "Aktivovaný spínač",
+        "orbDormant": "Spící koule",
+        "orbActive": "Aktivní koule",
+        "rollerHazard": "Nebezpečný valící se balvan",
+        "delvePassageSealed": "Zapečetěný průchod",
+        "delvePassageOpen": "Otevřený průchod",
+        "delveSurfaceExit": "Východ na povrch",
+        "delveCacheLocked": "Uzamčená skrýš výpravy",
+        "delveCacheReady": "Připravená skrýš výpravy",
+        "delveCacheActive": "Aktivní skrýš výpravy",
+        "delveCacheOpened": "Otevřená skrýš výpravy",
+        "delveReliquaryLocked": "Uzamčený relikviář",
+        "delveReliquaryReady": "Připravený relikviář",
+        "delveReliquaryActive": "Probíhá obřad relikviáře",
+        "delveReliquaryOpened": "Otevřený relikviář",
+        "bountiful": "{marker} s bohatou kořistí"
+      }
     },
     "options": {
       "gameMenu": "Herní menu",
@@ -8035,6 +8645,9 @@ export const cs_CZ: EnTranslations = {
       "graphicsReloadNote": "Kvalita grafiky a detail terénu se použijí po obnovení.",
       "reloadNow": "Obnovit hned",
       "fullscreen": "Celá obrazovka",
+      "displayMode": "Režim zobrazení",
+      "displayModeBorderless": "Celá obrazovka bez okrajů",
+      "displayModeWindowed": "Okno",
       "touchLookSpeed": "Rychlost dotykového pohledu",
       "joystickSize": "Velikost joysticku",
       "buttonSize": "Velikost tlačítek",
@@ -8597,6 +9210,7 @@ export const cs_CZ: EnTranslations = {
       "offGlobalCooldown": "Mimo globální dobu obnovy",
       "friendlyTarget": "Přátelský cíl",
       "enemyTarget": "Nepřátelský cíl",
+      "anyTarget": "Nepřítel nebo přátelský cíl",
       "selfOnly": "Pouze na sebe",
       "damageRange": "{min} až {max}",
       "finisherDamage": "{base} plus {perCombo} za combo bod"
@@ -8911,6 +9525,10 @@ export const cs_CZ: EnTranslations = {
       "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
+      "filterSort": "Řazení",
+      "sortName": "Název (A-Z)",
+      "sortPriceAsc": "Cena: od nejnižší po nejvyšší",
+      "collapseLowest": "Pouze nejnižší cena",
       "weaponSword": "Meče",
       "weaponDagger": "Dýky",
       "weaponStaff": "Hole",
@@ -8941,6 +9559,8 @@ export const cs_CZ: EnTranslations = {
       "quantity": "Množství",
       "quantityOf": "z {count}",
       "priceEach": "Cena za kus",
+      "lowestPriceLabel": "Současná nejnižší nabídková cena",
+      "lowestPriceNone": "Pro tento předmět zatím nejsou žádné aktivní nabídky.",
       "listButton": "Nabídnout na Světovém trhu",
       "minPriceError": "Zadej cenu alespoň 1 měď.",
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
@@ -9368,6 +9988,7 @@ export const cs_CZ: EnTranslations = {
       "cheap_shot": {
         "name": "Rána do břicha",
         "description": "Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Musíš být v skrytí. Udělí 2 combo body.",
+        "descriptionNoStealth": "Zasáhni cíl za {damage} poškození a omrač ho na 4 s. Udělí 2 combo body.",
         "specNote_subtlety": "Použití ze Závoje šera přidá 1 Šero (max 3). Při 3 Šeru ji můžeš použít BEZ skrytí: takové použití nic nestojí, spotřebuje všechna 3 Šera a spustí Stínový závoj na 6 s."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const cs_CZ: EnTranslations = {
       "crippling_poison": {
         "name": "Olověný jed",
         "description": "Zasáhne cíl olověným jedem, způsobí {damage} přírodního poškození a zpomalí jeho pohyb o 50 % na 12 s."
+      },
+      "melting_acid": {
+        "name": "Tavící kyselina",
+        "description": "Postříká cíl žíravým jedem, způsobí poškození přírody {damage} a sníží jeho brnění o 5 % na 12 sekund."
+      },
+      "nightshade_coating": {
+        "name": "Nátěr Nightshade",
+        "description": "Pokryje cíl v nočním stínu, způsobí {damage} poškození přírody a sníží léčení, které obdrží, o 25 % po dobu 12 sekund."
       },
       "expose_armor": {
         "name": "Průraz zbroje",
@@ -9580,7 +10209,7 @@ export const cs_CZ: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Hořící přísaha",
-        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 60 %. Pouze Strážce víry."
+        "description": "Pasivně zvyšuje hrozbu vytvářenou tvým svatým poškozením o 30 %. Pouze Strážce víry."
       },
       "retribution_aura": {
         "name": "Aura odplaty",
@@ -9696,7 +10325,7 @@ export const cs_CZ: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
-        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 30 % zbroje, utrpí o 10 % nižší poškození a vytváří dvojnásobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
+        "description": "Prosytí tvou zbraň na 30 min. Každý úder způsobí {damage} dodatečného poškození. Válečný duch navíc získá 40 % zbroje a 20 % výdrže, utrpí o 15 % nižší poškození a je odolný vůči kritickým zásahům od nestvůr a vytváří 2,75násobnou hrozbu. Zemní otřes donutí svůj cíl útočit na tebe po 3 s a Hromová ochrana udělí 10 % snížení poškození na 3 s."
       },
       "healing_wave": {
         "name": "Léčivé vody",
@@ -9824,7 +10453,7 @@ export const cs_CZ: EnTranslations = {
       },
       "fear": {
         "name": "Děs",
-        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 8 s. Jakékoli poškození efekt přeruší."
+        "description": "Vžene nepříteli hrůzu a nechá ho krčit se až 5 s. Poškození v součtu 8 % maximálního zdraví cíle účinek přeruší."
       },
       "searing_pain": {
         "name": "Sežehnutí",
@@ -9875,7 +10504,7 @@ export const cs_CZ: EnTranslations = {
       },
       "bear_form": {
         "name": "Medvědí podoba",
-        "description": "Proměníš se v medvěda: zbroj +130 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
+        "description": "Proměníš se v medvěda: zbroj +110 %, maximální zdraví +30 %, výrazně zvýšená síla útoku, tvoje útoky budují vztek a vytvářejí o 30 % více hrozby. Sesláním znovu se vrátíš do podoby sesilatele."
       },
       "maul": {
         "name": "Drcení kostí",
@@ -9885,6 +10514,10 @@ export const cs_CZ: EnTranslations = {
       "growl": {
         "name": "Hrozba",
         "description": "Zavrčí na cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit. Pouze v medvědí podobě."
+      },
+      "challenging_roar": {
+        "name": "Zlověstný řev",
+        "description": "Zlověstný řev: každý nepřítel do 10 yardů je vyprovokován, jeho hrozba vůči tobě se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a je nucen na tebe 3 s útočit. Pouze v medvědí podobě."
       },
       "cat_form": {
         "name": "Vlčí podoba",
@@ -9898,7 +10531,7 @@ export const cs_CZ: EnTranslations = {
       "ferocious_bite": {
         "name": "Krvavý skus",
         "description": "Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.",
-        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň: kousnutí za 70 plus 43 za combo bod, které navíc okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví 30 energie."
+        "specNote_feral": "Každý zásah přidá 1 Starou krev; při 3 Staré krvi se toto tlačítko změní na Rudou sklizeň, která spotřebuje Starou krev k silnějšímu úderu, okamžitě způsobí veškeré poškození, které by ještě způsobilo tvé Stažení z kůže a Roztržení, a obnoví energii."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
@@ -9961,7 +10594,7 @@ export const cs_CZ: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vlčí krev",
-        "description": "Zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě."
+        "description": "Prudce obnoví {rage} energie a zvýší sílu útoku o {buff} na {duration} s. Pouze ve vlčí podobě."
       },
       "rip": {
         "name": "Krvavá trhlina",
@@ -10066,7 +10699,7 @@ export const cs_CZ: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Na 12 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
+        "description": "Na 15 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10182,7 +10815,7 @@ export const cs_CZ: EnTranslations = {
       },
       "redharvest": {
         "name": "Rudá sklizeň",
-        "description": "Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví 30 energie. Funguje i bez combo bodů."
+        "description": "Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů."
       },
       "marrowbreak": {
         "name": "Lámání morku",
@@ -10422,7 +11055,7 @@ export const cs_CZ: EnTranslations = {
       },
       "evocation": {
         "name": "Éterická studna",
-        "description": "Restaura manu rápidamente. (mágovský talent)"
+        "description": "Kanalizuje po dobu 6 s: každou sekundu obnoví 100 many a získá 8 síly kouzel. Bonus se během kanalizování sčítá a trvá 15 s. (mágovský talent)"
       },
       "flurry_of_knives": {
         "name": "Smršť nožů",
@@ -10430,7 +11063,7 @@ export const cs_CZ: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Divoké zacelení",
-        "description": "Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)"
+        "description": "Během 10 s obnoví 40 % maximálního zdraví. Pouze v Medvědí podobě. (druidský talent)"
       },
       "frost_trap": {
         "name": "Jinovatková léčka",
@@ -10450,11 +11083,11 @@ export const cs_CZ: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Děsivé zavytí",
-        "description": "Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)"
+        "description": "Vyděsí blízké nepřátele až na 5 s. Poškození v součtu 8 % maximálního zdraví cíle přeruší jeho strach. (černokněžnický talent)"
       },
       "ice_block": {
         "name": "Ledová rakev",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)"
+        "description": "Uzavře tě na 8 s do pevného ledu a učiní tě imunním vůči veškerému poškození. Odstraní již aktivní běžné škodlivé efekty a zabrání aplikaci nových běžných ovládacích efektů. Lze použít při omráčení nebo proměnění. Během uvěznění nemůžeš jednat. Opětovným sesláním efekt zrušíš. (mág)"
       },
       "inner_focus": {
         "name": "Ztišená mysl",
@@ -10546,7 +11179,7 @@ export const cs_CZ: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Zrychlená mysl",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)"
+        "description": "Tvé další kouzlo s dobou sesílání bude okamžité. Trvá 60 s. (mágovský talent)"
       },
       "psychic_scream": {
         "name": "Výkřik hrůzy",
@@ -10663,7 +11296,7 @@ export const cs_CZ: EnTranslations = {
       },
       "prowl": {
         "name": "Plížení",
-        "description": "Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 50 % pomaleji. Nelze použít v boji."
+        "description": "Vstoupíš do plížení ve vlčí podobě a pohybuješ se o 5 % pomaleji. Nelze použít v boji."
       },
       "rake": {
         "name": "Stažení z kůže",
@@ -12218,6 +12851,9 @@ export const cs_CZ: EnTranslations = {
       "pristine_claw": {
         "name": "Nedotčený dráp"
       },
+      "dawnhold_posy": {
+        "name": "Kytička ze zahrady zámku Dawnhold"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -13062,6 +13698,15 @@ export const cs_CZ: EnTranslations = {
       },
       "training_dummy": {
         "name": "Cvičný panák"
+      },
+      "friendly_player_dummy": {
+        "name": "Panák přátelského hráče"
+      },
+      "normal_boss_dummy": {
+        "name": "Panák normálního bosse"
+      },
+      "heroic_boss_dummy": {
+        "name": "Panák hrdinského bosse"
       },
       "ridge_stalker": {
         "name": "Hřebenový slídil"
@@ -16702,6 +17347,11 @@ export const cs_CZ: EnTranslations = {
         "enterText": "Vstupuješ do chladných, tichých síní Poslední tvrze.",
         "leaveText": "Zavíráš bránu tvrze za sebou a vracíš se do větru Dračích zemí."
       },
+      "dawnhold_castle": {
+        "name": "Zámek Dawnhold",
+        "enterText": "Vstupuješ do teplých, květinami provoněných síní zámku Dawnhold.",
+        "leaveText": "Vyklouzneš zpátky na sluncem zalitý zahradní trávník."
+      },
       "drowned_temple": {
         "name": "Utopený chrám",
         "enterText": "Projdeš měsíční bránou: vzduch se mění ve studenou vodu a bledé světlo a zpěv se nad tebou zavírá.",
@@ -16900,6 +17550,21 @@ export const cs_CZ: EnTranslations = {
         "sender": "Kutil Gizzel",
         "subject": "MISTROVSTVÍ, kabum",
         "body": "Tvá specializace dosáhla mistrovství, samotného VRCHOLU, kabum, celý žebřík, hotovo. Chválu nerozdávám, rozdávám pojistky, ale tady, vezmi obojí: jsi skvělý(á) a trochu děsivý(á). Jdi znervóznit hory."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

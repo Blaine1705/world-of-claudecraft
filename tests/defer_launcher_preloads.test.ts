@@ -11,15 +11,16 @@
 // ORDER: beginDeferredPreloads() must run before the assetsReady() that gates the
 // Renderer, or placement could outrun a load and re-open the v0.16.0 farmCrate P0.
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   assetsReady,
-  beginBackgroundPreloads,
   beginDeferredPreloads,
   preloadInternalsForTest,
   registerDeferredPreload,
   registerPreload,
 } from '../src/render/assets/preload';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
@@ -27,7 +28,6 @@ const mainSource = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf
 beforeEach(() => {
   preloadInternalsForTest.reset();
 });
-
 describe('deferred preload lane', () => {
   it('does not start a deferred fetch until the lane opens', () => {
     let started = 0;
@@ -110,76 +110,6 @@ describe('deferred preload lane', () => {
   });
 });
 
-// The background lane: a SECOND priority a 'background'-tagged deferred thunk can
-// take. Unlike the critical lane above, assetsReady() must never observe it (that
-// is the entire point: boot no longer blocks on content most sessions never load),
-// and it only starts once main.ts opens it after the first frame is on screen.
-describe('background preload lane', () => {
-  it('does not start a background fetch until the background lane opens', () => {
-    let started = 0;
-    registerDeferredPreload(() => {
-      started++;
-      return Promise.resolve();
-    }, 'background');
-    registerDeferredPreload(() => {
-      started++;
-      return Promise.resolve();
-    }, 'background');
-    expect(started).toBe(0);
-    expect(preloadInternalsForTest.pendingBackground()).toBe(2);
-    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(0);
-
-    expect(beginBackgroundPreloads()).toBe(2);
-    expect(started).toBe(2);
-    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(2);
-    expect(preloadInternalsForTest.pendingBackground()).toBe(0);
-  });
-
-  it('is idempotent, so a second call starts nothing again', () => {
-    registerDeferredPreload(() => Promise.resolve(), 'background');
-    expect(beginBackgroundPreloads()).toBe(1);
-    expect(beginBackgroundPreloads()).toBe(0);
-    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
-  });
-
-  it('starts a late background registration immediately once its lane is open', () => {
-    beginBackgroundPreloads();
-    let started = false;
-    registerDeferredPreload(() => {
-      started = true;
-      return Promise.resolve();
-    }, 'background');
-    expect(started).toBe(true);
-    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
-  });
-
-  it('never lands a background task in the critical tasks list assetsReady() awaits', () => {
-    registerDeferredPreload(() => Promise.resolve(), 'background');
-    beginBackgroundPreloads();
-    expect(preloadInternalsForTest.tasks()).toHaveLength(0);
-    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
-  });
-
-  it('lets assetsReady() resolve without ever waiting on a background task, even one that never settles', async () => {
-    // A background task that NEVER resolves. If assetsReady() awaited it (a
-    // regression back to one flat lane), this test would hang until Vitest's
-    // timeout; it settling is the decisive proof the boot gate genuinely
-    // excludes 'background' work rather than merely reordering it.
-    registerDeferredPreload(() => new Promise(() => {}), 'background');
-    registerPreload(Promise.resolve());
-    beginBackgroundPreloads();
-    await expect(assetsReady()).resolves.toBeUndefined();
-  });
-
-  it('surfaces a synchronously-throwing background thunk without an unhandled rejection', () => {
-    registerDeferredPreload(() => {
-      throw new Error('background exporter blew up');
-    }, 'background');
-    expect(() => beginBackgroundPreloads()).not.toThrow();
-    expect(preloadInternalsForTest.backgroundTasks()).toHaveLength(1);
-  });
-});
-
 describe('startGame wiring', () => {
   it('opens the lane BEFORE the assetsReady that gates the Renderer', () => {
     const beginAt = mainSource.indexOf('beginDeferredPreloads()');
@@ -204,48 +134,30 @@ describe('startGame wiring', () => {
     expect(beginAt).toBeGreaterThan(-1);
     expect(localeAwaitAt).toBeGreaterThan(beginAt);
   });
-
-  // The background lane must open strictly later than everything above: it is
-  // only safe once the boot gate has already resolved and a real frame has
-  // painted, or a 'background' thunk could still stall world entry.
-  it('opens the background lane only once the first frame is on screen', () => {
-    const beginCriticalAt = mainSource.indexOf('beginDeferredPreloads()');
-    const awaitAssetsAt = mainSource.indexOf('await assetsReady(');
-    const firstPaintAt = mainSource.indexOf("checkpoint('first-paint')");
-    const beginBackgroundAt = mainSource.indexOf('beginBackgroundPreloads()');
-    expect(beginCriticalAt).toBeGreaterThan(-1);
-    expect(awaitAssetsAt).toBeGreaterThan(-1);
-    expect(firstPaintAt).toBeGreaterThan(-1);
-    expect(beginBackgroundAt).toBeGreaterThan(-1);
-    expect(beginBackgroundAt).toBeGreaterThan(beginCriticalAt);
-    expect(beginBackgroundAt).toBeGreaterThan(awaitAssetsAt);
-    expect(beginBackgroundAt).toBeGreaterThan(firstPaintAt);
-  });
 });
 
-describe('background-tier retag: only a build path that tolerates late assets', () => {
-  it('tags Thornhollow Fields art background: buildBattleground streams its own pieces in on demand', () => {
+describe('Thornhollow intent-driven preload', () => {
+  it('keeps Thornhollow art on its dedicated intent-driven prewarm', () => {
     const src = readFileSync(new URL('../src/render/battleground.ts', import.meta.url), 'utf8');
-    expect(src).toMatch(
-      /registerDeferredPreload\(\(\) => ensureBattlegroundAssets\(\),\s*'background'\)/,
-    );
+    expect(src).toContain('createBattlegroundAssetPrewarm(');
   });
 
-  // dungeon.ts's kit/bits GLBs and vale_cup_stadium.ts's kit pieces are both read
-  // SYNCHRONOUSLY from the module-local cache by a build step that still runs
-  // BEFORE the first frame: dungeon's interior-shader prewarm entry in
-  // renderer.ts re-awaits ensureDungeonAssets() itself (so tagging it
-  // 'background' would buy nothing, since that await forces the fetch back
-  // before first frame anyway, just serialized after other boot work instead
-  // of overlapped with it), and vale_cup_stadium's buildValeCupStadium() runs
-  // unconditionally in the Renderer constructor and throws "vale cup kit piece
-  // not preloaded" the instant its cache is still empty. Both must stay on the
-  // default critical lane.
-  it('keeps dungeon.ts and vale_cup_stadium.ts on the critical lane', () => {
-    for (const file of ['../src/render/dungeon.ts', '../src/render/vale_cup_stadium.ts']) {
-      const src = readFileSync(new URL(file, import.meta.url), 'utf8');
-      expect(src, file).not.toMatch(/registerDeferredPreload\([^;]*'background'/);
-    }
+  it('starts from the resolved Thornhollow tab and commits before sending queue join', () => {
+    const arena = readFileSync(new URL('../src/ui/arena_window.ts', import.meta.url), 'utf8');
+    const thornhollowArm = arena.slice(
+      arena.indexOf("if (this.tab === 'ravenrift')"),
+      arena.indexOf('this.renderArena(', arena.indexOf("if (this.tab === 'ravenrift')")),
+    );
+    expect(thornhollowArm).toContain('thornhollowPrewarm?.startPreview();');
+
+    const queueHandler = arena.slice(
+      arena.indexOf('el.querySelector(\'[data-act="queue"]\')'),
+      arena.indexOf('el.querySelector(\'[data-act="leave"]\')'),
+    );
+    expect(queueHandler.indexOf('thornhollowPrewarm?.commit();')).toBeLessThan(
+      queueHandler.indexOf('this.deps.world().bgQueueJoin();'),
+    );
+    expect(mainSource).toContain('setThornhollowPrewarmHooks({');
   });
 });
 
@@ -280,7 +192,7 @@ describe('no world module fetches at import', () => {
   ]);
 
   it('leaves only the sanctioned eager registrants', () => {
-    const files = tsFilesUnder(new URL('../src/render', import.meta.url).pathname);
+    const files = tsFilesUnder(fileURLToPath(new URL('../src/render', import.meta.url)));
     // Vacuity floor: an empty or misrooted walk must not pass as "no offenders".
     expect(files.length).toBeGreaterThan(100);
     const offenders: string[] = [];
@@ -289,9 +201,7 @@ describe('no world module fetches at import', () => {
       if (repoRel.endsWith('assets/preload.ts') || EAGER_ALLOWED.has(repoRel)) continue;
       // Strip comments first: this guard polices CODE, not prose that happens to
       // name the eager function while explaining the lanes.
-      const code = readFileSync(full, 'utf8')
-        .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/^[ \t]*\/\/.*$/gm, '');
+      const code = stripComments(readFileSync(full, 'utf8'));
       // Match the call, not the identifier inside registerDeferredPreload.
       if (/(?<!Deferred)\bregisterPreload\s*\(/.test(code)) offenders.push(repoRel);
     }
@@ -307,7 +217,7 @@ describe('every assetsReady host opens the lane', () => {
   // this when the lane landed; the gate stayed green because nothing swept the
   // call sites).
   it('finds no Renderer host awaiting assetsReady without beginDeferredPreloads', () => {
-    const files = tsFilesUnder(new URL('../src', import.meta.url).pathname);
+    const files = tsFilesUnder(fileURLToPath(new URL('../src', import.meta.url)));
     expect(files.length).toBeGreaterThan(400);
     const offenders: string[] = [];
     let hosts = 0;

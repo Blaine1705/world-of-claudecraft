@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createPreviewOpenGate } from '../src/render/characters/preview_open_gate_core';
 import {
   buildPostEntryPreviewPrewarmUnits,
   PREVIEW_PREWARM_BUSY_POLL_MS,
@@ -9,7 +10,7 @@ import {
 } from '../src/ui/preview_prewarm_core';
 
 const unit = (
-  family: 'char' | 'armory',
+  family: 'char',
   label: string,
   run: () => void | Promise<void> = () => {},
 ): PreviewPrewarmUnit => ({ family, label, run });
@@ -18,7 +19,7 @@ describe('runPreviewPrewarmSchedule', () => {
   it('enqueues every unit in order and resolves done', async () => {
     const ran: string[] = [];
     const handle = runPreviewPrewarmSchedule(
-      [unit('char', 'a'), unit('char', 'b'), unit('armory', 'c')],
+      [unit('char', 'a'), unit('char', 'b'), unit('char', 'c')],
       {
         enqueue: async (label, run) => {
           ran.push(label);
@@ -36,7 +37,7 @@ describe('runPreviewPrewarmSchedule', () => {
     const ran: string[] = [];
     const waits: number[] = [];
     let charBusyPolls = 0;
-    const handle = runPreviewPrewarmSchedule([unit('char', 'a'), unit('armory', 'b')], {
+    const handle = runPreviewPrewarmSchedule([unit('char', 'a'), unit('char', 'b')], {
       enqueue: async (label) => {
         ran.push(label);
       },
@@ -81,7 +82,7 @@ describe('runPreviewPrewarmSchedule', () => {
     const ran: string[] = [];
     const failed: string[] = [];
     const handle = runPreviewPrewarmSchedule(
-      [unit('char', 'a'), unit('char', 'boom'), unit('armory', 'c')],
+      [unit('char', 'a'), unit('char', 'boom'), unit('char', 'c')],
       {
         enqueue: async (label) => {
           if (label === 'boom') throw new Error('context lost');
@@ -118,7 +119,7 @@ describe('runPreviewPrewarmSchedule', () => {
     expect(ran).toEqual(['a']);
 
     // Cancellation while paused on a busy window also exits promptly.
-    const stuck = runPreviewPrewarmSchedule([unit('armory', 'x')], {
+    const stuck = runPreviewPrewarmSchedule([unit('char', 'x')], {
       enqueue: async () => {
         throw new Error('must not run');
       },
@@ -183,16 +184,76 @@ describe('runPreviewPrewarmSchedule', () => {
   });
 });
 
+describe('the schedule and the cold-open gate share one linked signature', () => {
+  // The per-skin units warm the SAME visual with different body textures, so
+  // only the first of them links anything: the rest would re-run a compileAsync
+  // that compiles nothing while still blocking the main thread. The open gate
+  // holds the other half of the rule (an open after these skips its warm), so
+  // the two are driven here against the real gate rather than a fake flag.
+  it('the first skin unit links, the rest still upload but skip their compile', async () => {
+    const gate = createPreviewOpenGate();
+    const sig = '["player_warrior",null,null,null,null]';
+    let compiles = 0;
+    let uploads = 0;
+    const ran: string[] = [];
+
+    const units = buildPostEntryPreviewPrewarmUnits({
+      playerClass: 'warrior',
+      allClasses: [],
+      skinCount: () => 3,
+      cardPoses: [],
+      includeCharFamily: true,
+      warmCharSkins: true,
+      // The subject is the per-skin units alone: no poses, no portraits.
+      includeCardPoses: false,
+      portraitFramings: [],
+      renderCharShell: () => {},
+      prewarmCharSkin: () => {
+        if (!gate.isLinked(sig)) {
+          compiles++;
+          gate.noteLinked(sig);
+        }
+        uploads++;
+      },
+      prewarmCardPose: () => {},
+      renderPortrait: () => {},
+    });
+
+    const handle = runPreviewPrewarmSchedule(units, {
+      enqueue: async (label, run) => {
+        ran.push(label);
+        await run();
+      },
+      isFamilyBusy: () => false,
+      delay: async () => {},
+    });
+    await handle.done;
+
+    expect(ran).toEqual([
+      'preview:char-window',
+      'preview:char-skin:0',
+      'preview:char-skin:1',
+      'preview:char-skin:2',
+    ]);
+    expect(compiles).toBe(1);
+    expect(uploads).toBe(3);
+    // ...and the open gate skips too, because it reads the same signature.
+    expect(gate.arm(sig, 0)).toBe(false);
+  });
+});
+
 describe('buildPostEntryPreviewPrewarmUnits', () => {
-  it('orders shell, own skins, card poses, all-class portraits, then armory per mode (boot: includeCharFamily true)', () => {
+  it('orders shell, own skins, card poses, then all-class portraits, and plans NO armory unit (boot: includeCharFamily true)', () => {
     const calls: string[] = [];
     const units = buildPostEntryPreviewPrewarmUnits<string>({
       playerClass: 'hunter',
       allClasses: ['hunter', 'mage'],
       skinCount: (unitId) => (unitId === 'player_hunter' ? 2 : 1),
       cardPoses: ['heroic'],
-      armorySkinIds: ['mech_amber'],
       includeCharFamily: true,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
       renderCharShell: () => {
         calls.push('shell');
       },
@@ -204,12 +265,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       },
       renderPortrait: (cls, skin, framing) => {
         calls.push(`portrait:${cls}:${skin}:${framing}`);
-      },
-      prewarmArmorySkin: (skinId, mode) => {
-        calls.push(`armory:${skinId}:${mode}`);
-      },
-      finishArmoryPrewarm: () => {
-        calls.push('armory:finalize');
       },
     });
     expect(units.map((entry) => entry.label)).toEqual([
@@ -223,14 +278,17 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:hunter:1:body',
       'preview:portrait:mage:0:headshot',
       'preview:portrait:mage:0:body',
-      'preview:armory:mech_amber:character',
-      'preview:armory:mech_amber:weapon',
-      'preview:armory:finalize',
     ]);
-    // The armory rows belong to the armory family (their pause key is the
-    // store window, not the paperdoll); everything before them is 'char'.
-    expect(units.slice(0, 10).every((entry) => entry.family === 'char')).toBe(true);
-    expect(units.slice(10).every((entry) => entry.family === 'armory')).toBe(true);
+    expect(units.every((entry) => entry.family === 'char')).toBe(true);
+    // NEGATIVE pin, and the load-bearing one. The armory catalog was about 2.1
+    // to 2.6 s of live-frame hitches that every online session paid for a window
+    // only some players open, and its cost was positional rather than per skin,
+    // so no gentler schedule was available. It is warmed NOWHERE ahead of time
+    // now: the store's card list needs none of it, and one card's preview is
+    // built on the inspect click. A store-open warm was the attempt this branch
+    // measured and deleted (it moved a cold store open 530.9 ms to 522.8 ms), so
+    // a restored loop fails here instead of silently returning.
+    expect(units.some((entry) => entry.label.startsWith('preview:armory'))).toBe(false);
     for (const entry of units) entry.run();
     expect(calls).toEqual([
       'shell',
@@ -243,12 +301,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:hunter:1:body',
       'portrait:mage:0:headshot',
       'portrait:mage:0:body',
-      'armory:mech_amber:character',
-      'armory:mech_amber:weapon',
-      // The finalize unit runs LAST: the per-unit warmups keep the small
-      // warmup buffer, and this is the one restore that replaces the old
-      // per-unit reallocation + forced full-size draw.
-      'armory:finalize',
     ]);
   });
 
@@ -262,8 +314,10 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       allClasses: ['hunter'],
       skinCount: () => 1,
       cardPoses: [],
-      armorySkinIds: [],
       includeCharFamily: false,
+      warmCharSkins: false,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
       renderCharShell: () => {},
       prewarmCharSkin: () => {},
       prewarmCardPose: () => {},
@@ -271,8 +325,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
         new Promise<void>((resolve) => {
           resolvePortrait = resolve;
         }),
-      prewarmArmorySkin: () => {},
-      finishArmoryPrewarm: () => {},
     });
     const portraitUnit = units.find(
       (entry) => entry.label === 'preview:portrait:hunter:0:headshot',
@@ -289,40 +341,24 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
     expect(settled).toBe(true);
   });
 
-  it('emits no armory finalize unit when the armory catalog is empty', () => {
-    const units = buildPostEntryPreviewPrewarmUnits<string>({
-      playerClass: 'hunter',
-      allClasses: ['hunter'],
-      skinCount: () => 1,
-      cardPoses: [],
-      armorySkinIds: [],
-      includeCharFamily: false,
-      renderCharShell: () => {},
-      prewarmCharSkin: () => {},
-      prewarmCardPose: () => {},
-      renderPortrait: () => {},
-      prewarmArmorySkin: () => {},
-      finishArmoryPrewarm: () => {},
-    });
-    expect(units.some((entry) => entry.label === 'preview:armory:finalize')).toBe(false);
-  });
-
-  it('excludes the char-window shell/skin/pose units on a graphics-rebuild restart, keeping portrait and armory in order (includeCharFamily false)', () => {
+  it('excludes the char-window shell/skin/pose units on a graphics-rebuild restart, keeping the portrait units in order (includeCharFamily false)', () => {
     // The rebuild-restart plan (hud.ts restoreGraphicsPreviewContexts passing
     // includeCharFamily: false) must drop exactly the shell-dependent trio:
     // the shell itself is unbuilt there (its own cover is already down, so
     // building it would hitch a live frame), and the per-skin/per-pose units
     // no-op against a null this.charPreview anyway. Portrait units stay (they
-    // are canvas-2D, no dependence on the shell); armory units stay too (its
-    // own prewarm path lazily rebuilds its stage).
+    // are canvas-2D, no dependence on the shell). There are no armory units in
+    // any plan: that catalog builds per inspected card.
     const calls: string[] = [];
     const units = buildPostEntryPreviewPrewarmUnits<string>({
       playerClass: 'hunter',
       allClasses: ['hunter', 'mage'],
       skinCount: (unitId) => (unitId === 'player_hunter' ? 2 : 1),
       cardPoses: ['heroic'],
-      armorySkinIds: ['mech_amber'],
       includeCharFamily: false,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
       renderCharShell: () => {
         calls.push('shell');
       },
@@ -335,12 +371,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       renderPortrait: (cls, skin, framing) => {
         calls.push(`portrait:${cls}:${skin}:${framing}`);
       },
-      prewarmArmorySkin: (skinId, mode) => {
-        calls.push(`armory:${skinId}:${mode}`);
-      },
-      finishArmoryPrewarm: () => {
-        calls.push('armory:finalize');
-      },
     });
     expect(units.map((entry) => entry.label)).toEqual([
       'preview:portrait:hunter:0:headshot',
@@ -349,9 +379,6 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'preview:portrait:hunter:1:body',
       'preview:portrait:mage:0:headshot',
       'preview:portrait:mage:0:body',
-      'preview:armory:mech_amber:character',
-      'preview:armory:mech_amber:weapon',
-      'preview:armory:finalize',
     ]);
     expect(units.every((entry) => !entry.label.startsWith('preview:char-window'))).toBe(true);
     expect(units.every((entry) => !entry.label.startsWith('preview:char-skin'))).toBe(true);
@@ -364,10 +391,72 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:hunter:1:body',
       'portrait:mage:0:headshot',
       'portrait:mage:0:body',
-      'armory:mech_amber:character',
-      'armory:mech_amber:weapon',
-      'armory:finalize',
     ]);
     expect(calls).not.toContain('shell');
+  });
+
+  const trimDeps = (
+    over: Partial<Parameters<typeof buildPostEntryPreviewPrewarmUnits<string>>[0]>,
+  ) =>
+    buildPostEntryPreviewPrewarmUnits<string>({
+      playerClass: 'hunter',
+      allClasses: ['hunter'],
+      skinCount: () => 2,
+      cardPoses: ['heroic', 'battle'],
+      includeCharFamily: true,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
+      renderCharShell: () => {},
+      prewarmCharSkin: () => {},
+      prewarmCardPose: () => {},
+      renderPortrait: () => {},
+      ...over,
+    });
+
+  it('WS2: warmCharSkins false drops every char-skin unit, keeps the shell (composed look)', () => {
+    const labels = trimDeps({ warmCharSkins: false }).map((u) => u.label);
+    expect(labels).toContain('preview:char-window');
+    expect(labels.some((l) => l.startsWith('preview:char-skin'))).toBe(false);
+    // warmCharSkins true still emits them (the fixed-rig / legacy arm).
+    const warm = trimDeps({ warmCharSkins: true }).map((u) => u.label);
+    expect(warm.filter((l) => l.startsWith('preview:char-skin'))).toEqual([
+      'preview:char-skin:0',
+      'preview:char-skin:1',
+    ]);
+  });
+
+  it('WS1: includeCardPoses false drops every card-pose unit', () => {
+    const labels = trimDeps({ includeCardPoses: false }).map((u) => u.label);
+    expect(labels.some((l) => l.startsWith('preview:card-pose'))).toBe(false);
+    // true still emits one per pose.
+    const warm = trimDeps({ includeCardPoses: true }).map((u) => u.label);
+    expect(warm.filter((l) => l.startsWith('preview:card-pose'))).toEqual([
+      'preview:card-pose:0',
+      'preview:card-pose:1',
+    ]);
+  });
+
+  it('WS3: portraitFramings gates exactly which framing units are emitted', () => {
+    const headshotOnly = trimDeps({ portraitFramings: ['headshot'] }).map((u) => u.label);
+    expect(headshotOnly).toContain('preview:portrait:hunter:0:headshot');
+    expect(headshotOnly.some((l) => l.endsWith(':body'))).toBe(false);
+    const bodyOnly = trimDeps({ portraitFramings: ['body'] }).map((u) => u.label);
+    expect(bodyOnly).toContain('preview:portrait:hunter:0:body');
+    expect(bodyOnly.some((l) => l.endsWith(':headshot'))).toBe(false);
+  });
+
+  it('the login trim (composed look) warms only shell + headshots, no skins/poses/body', () => {
+    // Mirrors what hud.ts passes for a modern composed-look player at login.
+    const labels = trimDeps({
+      warmCharSkins: false,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
+    }).map((u) => u.label);
+    expect(labels).toEqual([
+      'preview:char-window',
+      'preview:portrait:hunter:0:headshot',
+      'preview:portrait:hunter:1:headshot',
+    ]);
   });
 });

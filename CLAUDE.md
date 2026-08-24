@@ -56,8 +56,9 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run server`: esbuild-bundle + run the authoritative server on :8787.
 - `npm test`: Vitest. **Prefer a single file while iterating:** `npx vitest run tests/sim.test.ts`.
 - `node scripts/gate_select.mjs`: **the pre-merge gate.** Same step list as `npm run gate`
-  (nothing dropped) with one substitution: the full vitest run becomes an always-run set
-  plus `vitest related`. Roughly 3x faster; falls back to the full suite for any change it
+  (nothing dropped) with one substitution: the full vitest run becomes ONE merged
+  `vitest related` invocation (the always-run floor rides it as self-selecting seeds,
+  same form as the CI shards). Roughly 3x faster; falls back to the full suite for any change it
   cannot reason about. See `docs/qa-gate.md`.
 - `npm run gate`: the full CI-equivalent gate, still the deeper check (i18n gen + freshness, malware scan,
   changed-files biome, SFX conformance, full tests with bounded workers, the real-browser
@@ -73,6 +74,12 @@ the nested `npm run` forms below are the package.json script names.
 - `npm run env` / `npm run bench`: build + run the headless RL env server.
 - `npm run db:up` / `npm run db:down`: Postgres 16 in Docker (dev DB on :5433).
 - `npm run realms`: run multiple realm processes locally.
+- `node scripts/release_mint.mjs vX.Y.Z`: THE settings step when a new `release/**`
+  branch is minted (re-points the merge-queue ruleset, with an audit dump; run it
+  every mint or the queue goes silently dormant, see `docs/merge-queue.md`,
+  "Minting a release branch"). Merging on the queue-protected branches: `gh pr merge`
+  does not work there; use the `enqueuePullRequest` GraphQL mutation (exact command
+  in `docs/merge-queue.md`).
 
 See `README.md` for the full host/develop/play guide and the classic-fidelity checklist; `DEPLOY.md` for production.
 
@@ -227,6 +234,10 @@ Use the seams this repo already has, do not invent new ones:
   contracts: `src/ui/CLAUDE.md`, `src/ui/hud/CLAUDE.md`, and `src/styles/CLAUDE.md`.
 - New visual system: a new `src/render/<thing>.ts` the renderer calls, not a method bank on
   `renderer.ts` (pure logic goes in a `RENDER_PURE_CORES` core; see `src/render/CLAUDE.md`).
+- New GPU producer (a material, a light, a GL context, a group added to the scene after
+  boot): it is a client of the preparation scheduler, never a free draw. Give it a prewarm
+  home or a gate, and see `src/render/CLAUDE.md` "GPU work: every new producer is a client
+  of the scheduler"; dispatch `render-performance-reviewer` on any such diff.
 - New world GLB prop or building from a reference image: the `image-to-glb` skill owns the
   whole pipeline (exporter, optimizer, fingerprint pins, adapter); do not improvise one.
 - New sim SYSTEM behavior (a combat/mob/social/economy mechanic, not just a data record):
@@ -319,8 +330,9 @@ unsure, or on a smaller or unfamiliar model, use the baseline.
   live in `.claude/agents/` and dispatch via `/qa`; the canonical concern-to-reviewer
   table is in `docs/qa-gate.md`. Highlights: `qa-checklist` (the end-of-contribution
   gate), `content-obligations-reviewer` (any game-content diff), `gate-integrity-reviewer`
-  (any change to the gate/CI selection pipeline), plus the domain reviewers for sim,
-  parity, database, security, frontend, and tests. Skills cover the repeated workflows:
+  (any change to the gate/CI selection pipeline), `render-performance-reviewer` (any diff
+  that produces GPU work: a material, a light, a GL context, a scene attach), plus the
+  domain reviewers for sim, parity, database, security, frontend, and tests. Skills cover the repeated workflows:
   `extract-and-test`, `feature-plan`, `review-pr`, `release-merge-audit`,
   `i18n-locale-fill`, `pr-screenshots`, `ci-triage`, `image-to-glb`, `asset-pipeline`.
 - **State rule scope literally.** Models follow instructions literally and will not

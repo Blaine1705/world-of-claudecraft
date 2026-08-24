@@ -482,6 +482,88 @@ export const tr_TR: EnTranslations = {
         "bannedUntil": "Günlük Ödüller'e erişim yasağın {remaining} daha sürecek. Erişim {until} tarihinde geri açılır. Gerekçe: {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "WOC Mağazası",
       "close": "WOC Mağazasını Kapat",
@@ -734,6 +816,9 @@ export const tr_TR: EnTranslations = {
       "showAmounts": "Tüm Claudium miktarlarını göster",
       "hideAmounts": "Ekstra Claudium miktarlarını gizle",
       "skuRow": "{claudium} Claudium için {usd}",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Satın Al",
       "buyUnavailable": "Şu anda satın alma işlemi yapılamıyor.",
       "storeTitle": "Kozmetik Mağazası",
@@ -802,9 +887,9 @@ export const tr_TR: EnTranslations = {
       "note": "Pencereyi taşımak için sohbet sekme şeridini, yeniden boyutlandırmak için köşe tutamacını sürükleyin. Sıfırla, onu varsayılan konum ve boyutuna döndürür."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Genel sohbet sınırına ulaşıldı. {seconds} içinde tekrar dene.",
+      "pending": "Önceki Genel sohbet mesajın hâlâ gönderiliyor. Birazdan tekrar dene.",
+      "unavailable": "Genel sohbet geçici olarak kullanılamıyor. Kısa süre sonra tekrar dene."
     },
     "swing": {
       "ready": "Vuruş",
@@ -853,6 +938,7 @@ export const tr_TR: EnTranslations = {
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
       "dailyRewards": "Mağaza",
+      "wocMarket": "Exchange",
       "deeds": "Yiğitlikler",
       "mounts": "Binekler",
       "professions": "Meslekler",
@@ -866,11 +952,52 @@ export const tr_TR: EnTranslations = {
       "actionRing": "Savaş eylemleri",
       "actionPageToggle": "İşlem sayfasını değiştir",
       "actionPageIndicator": "Sayfa {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Hedefi değiştir",
       "targetCycleShort": "Hedef",
       "spellbookPageLabel": "Sayfa {page}",
       "hideKeyboard": "Klavyeyi gizle",
-      "chatPlaceholder": "Bir şey söyle..."
+      "chatPlaceholder": "Bir şey söyle...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -953,6 +1080,22 @@ export const tr_TR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Mahzen",
+        "state": "Tören Katı",
+        "residence": "Yaşam Katı",
+        "tower": "Gözetleme Kulesi"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Bahçe Katı",
+        "solar": "Güneş Odası"
+      }
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -970,6 +1113,7 @@ export const tr_TR: EnTranslations = {
       "seconds": "{s}sn",
       "autoShowHint": "Satırlar, partindeki oyuncular hasar vermeye veya iyileştirmeye başladığında otomatik görünür; bu bölüm ise savaş bittikten birkaç saniye sonra kapanır.",
       "threatFallback": "Canlı tehdit yok: {name} için hasar gösteriliyor",
+      "threatFrozen": "{name} için son tehdit",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Diğer ({count})",
@@ -1367,6 +1511,10 @@ export const tr_TR: EnTranslations = {
       "showWalletOnCharacterScreen": "Cüzdanı Karakter Ekranında Göster",
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
       "showPlaytime": "Karakter Ekranında Oynama Süresini Göster",
+      "forceHighPerfGpu": "Ayrık Oyun GPU'sunu Kullan",
+      "forceHighPerfGpuNote": "Varsayılan olarak açık: masaüstü uygulaması bu bilgisayardan ayrık oyun GPU'sunu ister. Oyun başlamıyorsa, siyah bir ekranla açılıyorsa ya da dizüstü bilgisayarın ekranı karararsa bunu kapat. Değişiklik oyunun bir sonraki başlangıcında etkili olur.",
+      "discordPresence": "Discord Zengin Durumu",
+      "discordPresenceNote": "Bulunduğun bölgeyi ve bu oturumda ne kadar süredir oynadığını Discord etkinliğin olarak gösterir, Discord profilini görebilen herkes ikisini de görebilir. Yalnızca bölge adı, oturum süren ve oyun paylaşılır; karakterin, hesabın ya da kiminle oynadığın asla paylaşılmaz. Bu bilgisayarda Discord uygulamasının çalışıyor olması gerekir.",
       "showDevBadges": "Geliştirici Rozetlerini Göster",
       "showOwnNameplate": "Kendi İsim Etiketimi Göster",
       "showPlayerNameplates": "Oyuncu İsim Etiketlerini Göster",
@@ -1382,6 +1530,7 @@ export const tr_TR: EnTranslations = {
       "mouseoverCast": "Grup Çerçevelerinde İmleçle Büyü Yapma",
       "stickyTarget": "Yere Tıklayınca Hedefi Koru",
       "showItemLevel": "Eşya Seviyesini Göster",
+      "showReliquaryTracker": "Emanet Takibini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
@@ -1394,7 +1543,9 @@ export const tr_TR: EnTranslations = {
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
-      "mobileLeftHanded": "Solak düzen"
+      "mobileLeftHanded": "Solak düzen",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Seçimler",
@@ -1427,9 +1578,29 @@ export const tr_TR: EnTranslations = {
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
       "menuAction": "Oyun Menüsü",
+      "confirmAction": "Onayla / Seç",
       "zoomIn": "Yakınlaştır",
       "zoomOut": "Uzaklaştır",
-      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın."
+      "help": "Sol çubuk hareket ettirir, sağ çubuk bakışı yönlendirir. Ekran üzeri işaretçiyi kullanmak için bir pencere açın.",
+      "crossHotbar": "Çapraz Hotbar",
+      "crossHotbarEnable": "Çapraz Hotbar'ı Etkinleştir",
+      "crossHotbarExpand": "Çift Çapraz Hotbar",
+      "crossHotbarHelp": "D-pad ve yüz düğmelerindeki sekiz işlem çubuğu yuvasını yakmak için tetiği basılı tutun. İkinci sete geçmek için diğer tetiğe dokunun.",
+      "crossHotbarResetLayout": "Çapraz Hotbar'ı sıfırla",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "Tetikleyiciler ve yön tuşları, açıkken çapraz kısayol çubuğuna aittir, dolayısıyla burası yerine aşağıda ayarlanırlar.",
+      "cancelAction": "İptal / Geri",
+      "subcommandsAction": "Alt komutlar / Harita",
+      "cycleHudAction": "Döngü Arayüzü",
+      "cycleSetAction": "Hotbar Setini Değiştir",
+      "crossHotbarDisplay": "Çubuk Ekranı",
+      "crossHotbarDisplayFull": "Tam dolu",
+      "crossHotbarDisplayCompact": "Kompakt",
+      "crossHotbarDisplayMinimal": "Yalnızca Tutulurken",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "{action} taşıma: hücreye yerleştirmeyi onaylayın, geri takmak için iptal edin.",
+      "crossHotbarEditHint": "Düzenleme: Bir hücreden veya büyü kitabından alımları onaylayın ve bir hücreye bırakın, iptal birini siler.",
+      "crossHotbarEditHelp": "Çubuğu kontrol cihazıyla ayarlamak için sol tamponu tutun ve üst taraftaki düğmeye basın."
     },
     "perf": {
       "title": "Performans Katmanı",
@@ -1548,6 +1719,7 @@ export const tr_TR: EnTranslations = {
           "render": "işleme  gönderim {submit} ms | dünya {world} ms | varlık {entities} ms",
           "scene": "sahne   {calls} çağrı | {triangles} üçgen | {views} görünüm",
           "hitches": "takılma {hitches} | gölgelendirici {shaders} | yükleme {uploads} | görünüm {views}",
+          "hitchesBuild": "bölge yapıları {zoneBuilds} | çerçeve dışı {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "bekleniyor"
         },
@@ -1599,7 +1771,10 @@ export const tr_TR: EnTranslations = {
             "eventCpu": "Olay işleme kareyi tüketiyor",
             "shaderCompile": "Gölgelendiriciler oynanış sırasında derleniyor",
             "textureUpload": "Doku yüklemeleri oynanış takılmalarına neden oluyor",
+            "zoneBuild": "Bölge akışı derlemeleri aksaklıklara neden oluyor",
             "viewCreate": "Varlık görünümü oluşturma takılmalara neden oluyor",
+            "gcHitch": "Çöp toplama işlemleri uzun çerçeveler içerisinde yürütülüyor",
+            "offFrameHitch": "Uzun kareler, oluşturma geri çağrısının dışındaki işten geliyor",
             "otherHitch": "Nedeni belirlenemeyen uzun kareler kalıyor",
             "assetStartup": "Oyun başlangıcı varlık işi tarafından geciktiriliyor",
             "longTasks": "Uzun tarayıcı görevleri kareleri engelliyor",
@@ -1739,6 +1914,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughHonor": "Yeterli Onur yok.",
       "reasons": {
         "arenaWin": "Arena zaferi",
+        "arenaComplete": "Arena müsabakası yapıldı",
         "fiestaKill": "Fiesta avlaması",
         "fiestaComplete": "Fiesta tamamlandı",
         "fiestaWin": "Fiesta zaferi",
@@ -1845,6 +2021,7 @@ export const tr_TR: EnTranslations = {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
     "itemHeroicTag": "[KAHRAMANCA]",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Ruha Bağlı",
     "itemUniqueEquipped": "Eşsiz Kuşanım",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const tr_TR: EnTranslations = {
         "few": "rütben {rank}, {count} üye",
         "many": "rütben {rank}, {count} üye",
         "other": "rütben {rank}, {count} üye"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} oyuncu",
@@ -2016,6 +2205,10 @@ export const tr_TR: EnTranslations = {
       "errPasswordLong": "Yeni parola en fazla 128 karakter olmalıdır.",
       "errPasswordUnchanged": "Yeni parola mevcut olandan farklı olmalıdır.",
       "errPasswordConfirm": "Yeni parolalar eşleşmiyor.",
+      "setPasswordTitle": "Şifre Belirleyin",
+      "setPasswordHint": "Bu hesap Apple veya Discord ile Giriş Yap kullanılarak oluşturuldu ve henüz şifresi yok. Mac ve Windows masaüstü uygulamaları veya web gibi diğer cihazlarda oturum açmak ve ek oturum açma yöntemlerini bağlamak için birini ayarlayın.",
+      "setPasswordSubmit": "Şifreyi Ayarla",
+      "passwordSet": "Şifre ayarlandı. Artık kullanıcı adınız ve şifrenizle istediğiniz yerden giriş yapabilirsiniz.",
       "emailLabel": "E-posta (isteğe bağlı)",
       "emailHint": "Yalnızca hesap kurtarma için kullanılır. Güncellemek için aşağıdaki E-postayı Değiştir seçeneğini kullanın.",
       "saveEmail": "E-postayı Kaydet",
@@ -2199,6 +2392,10 @@ export const tr_TR: EnTranslations = {
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
       "itemAriaQuest": "{item}, adet {count}, görev eşyası",
+      "itemAriaLocked": "{item}, adet {count}, kilitli",
+      "itemLockedLine": "Kilitli",
+      "lockItem": "Eşyayı Kilitle",
+      "unlockItem": "Eşyanın Kilidini Aç",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",
@@ -2453,12 +2650,14 @@ export const tr_TR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
-      "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır"
+      "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "UZAKTA"
+      "afkTag": "UZAKTA",
+      "cheaterTag": "< Hileci >"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -3224,11 +3423,13 @@ export const tr_TR: EnTranslations = {
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "({count} adet kaliteli harcar)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
       "craftedToastQty": "Hazırlandı: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
+      "reagentLocked": "Bunun için gereken bir reaktif kilitli.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
       "comboRequires": "Uyum: {craftA} + {craftB}, kademe {tier}.",
@@ -3335,6 +3536,7 @@ export const tr_TR: EnTranslations = {
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
       "notSalvageable": "Bunu parçalayamazsınız.",
+      "salvageLocked": "O eşya kilitli.",
       "disenchantBusy": "Meşgulsün.",
       "salvageBusy": "Meşgulsün.",
       "enchantBusy": "Meşgulsün.",
@@ -3710,6 +3912,9 @@ export const tr_TR: EnTranslations = {
       "pinFull": "Takipçi dolu (en çok {cap} sayfa)",
       "pinAria": "{name} sayfasını arayüz takipçisine sabitle",
       "unpinAria": "{name} sabitlemesini kaldır",
+      "trackerToggleLabel": "HUD izleyici",
+      "trackerToggleShowHint": "Reliquary izleyiciyi ekranınızda gösterin",
+      "trackerToggleHideHint": "Reliquary izleyiciyi ekranınızdan gizleyin",
       "rarityLine": "Koleksiyoncuların {percent} kadarı buldu",
       "pageRarityLine": "Koleksiyoncuların {percent} kadarı tezhipledi",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const tr_TR: EnTranslations = {
       "unlockedBorderHint": "Yeni çerçeve kazanıldı: {name}. Yiğitlikler Kitabı'ndan tak.",
       "broadcastLine": "{name} bir yiğitliğe imza attı: {deed}",
       "rarityLine": "Maceracıların {percent} kadarı kazandı",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Yiğitlikler",
       "collapseHint": "Yiğitlik takipçisini daralt",
       "expandHint": "Yiğitlik takipçisini genişlet",
@@ -3797,6 +4003,220 @@ export const tr_TR: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Seviye {level} gerektirir"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const tr_TR: EnTranslations = {
       "password_too_long": "Yeni parola en fazla 128 karakter olmalıdır.",
       "characters_online": "Devre dışı bırakmadan önce tüm karakterlerinizden çıkış yapın.",
       "deactivated": "Bu hesap devre dışı bırakıldı. Geri yüklemek için bir yöneticiyle iletişime geçin.",
-      "not_found": "Hesap bulunamadı."
+      "not_found": "Hesap bulunamadı.",
+      "password_already_set": "Bu hesabın zaten bir şifresi var. Bunun yerine Şifreyi Değiştir'i kullanın."
     },
     "character": {
       "name_invalid": "Geçersiz karakter adı. 2-16 harf kullanın.",
@@ -3928,6 +4349,61 @@ export const tr_TR: EnTranslations = {
       "genesis_token_claimed": "Bu Seeker Genesis Token zaten talep edilmiş.",
       "entitlement_required": "Doğrulanmış bir Seeker hakkı gerekir.",
       "current_ownership_required": "Seeker Genesis Token'a şu anda sahip olmanız gerekir."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatör hesapları işaretlenemez.",
+      "reason_required": "Bir neden belirtilmesi gerekir.",
+      "invalid_duration": "En az bir saniyelik bir işaret süresi gir.",
+      "not_marked": "Bu hesap işaretli değil."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const tr_TR: EnTranslations = {
       "ifHighContrastBackground": "Başlangıç ve karakter ekranlarının arkasında daha sade, daha yüksek kontrastlı bir arka plan.",
       "ifInvertLookY": "Fare bakışının yukarı ve aşağı yönünü ters çevirir.",
       "ifShowItemLevel": "Her eşya ipucuna bir eşya seviyesi satırı ekler. Varsayılan olarak kapalıdır, bu da klasik, yalnızca istatistik gösteren ipucunu korur.",
+      "ifShowReliquaryTracker": "Reliquary izleyicinin (sabitlenmiş sayfalarınız ve ilerlemeleri) HUD'nizde bulunup bulunmadığı. Reliquary penceresinde eşleşen bir göz düğmesi bulunur ve bir sayfayı sabitlemek izleyiciyi tekrar açar.",
       "ifShowPlaytime": "Karakter sayfanızda ömür boyu oynama sürenizi gösterir. Varsayılan olarak açıktır ve sayfada, cihaz başına bunu değiştiren bir göz düğmesi vardır; yayın yapıyorsanız ya da ekran görüntüsü alıyorsanız işinize yarar. Toplam her iki durumda da sayılmaya devam eder.",
       "ifShowOwnNameplate": "Kendi baş üstü ad levhanızı, tüm süslemeleriyle birlikte diğer oyuncuların gördüğü şekilde çizer. Klasik görünüm için kapatın.",
       "ifShowPlayerNameplates": "Diğer oyuncuların ad levhalarını çizer. Kapatmak kalabalık bir merkezi sadeleştirir, mevcut hedefiniz ise her iki durumda da okunaklı kalır.",
@@ -4735,6 +5212,7 @@ export const tr_TR: EnTranslations = {
       "mageEleJet": "Su Jeti, evcil çubuğunda kendi düğmesiyle durur: bir düşmana dondurucu bir ışın kilitlemek için tıkla, ya da elementalin onu hazır olduğunda kendiliğinden ateşlemesine izin vermek için sağ tıkla (mobilde dokunup basılı tut).",
       "formsHeading": "Şekil Değiştirme",
       "formsNote": "Bir druid, şekil değiştirerek dövüşür. Çoğu druid yeteneği tek bir şekle aittir, bu yüzden içinde bulunduğun form neyi büyüleyebileceğine karar verir, ve şekil değiştirmek biraz mana harcar. İstediğin kadar sık, dövüş içinde ya da dışında şekil değiştirebilirsin.",
+      "formsAutoUnshift": "Formdayken yapılan bir iyileştirme ya da hasar büyüsü seni formdan kendiliğinden çıkarır. Formu bu yolla bırakmak bedavadır ve genel bekleme süreni harcamaz, yani anlık bir büyü tuşa bastığın anda çıkar. Forma geri dönmek sıradan bir yetenektir ve yine mana ile genel bekleme süreni tüketir.",
       "formsMoonwing": "Bir Denge druidi bir şekil daha kazanır: Aykuşu Formu, bu uzmanlığın dövüştüğü büyücü şeklidir. Büyülerini koruyan tek hayvan şeklidir ve değneğin yalnızca bu şekilde ya da normal büyücü şeklinde çalışır.",
       "formLine": {
         "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",
@@ -6544,6 +7022,7 @@ export const tr_TR: EnTranslations = {
     "email": "E-posta",
     "emailPlaceholder": "sen@ornek.com",
     "emailError": "Lütfen geçerli bir e-posta adresi gir.",
+    "marketingOptIn": "Bana oyun haberlerini ve güncellemelerini e-postayla gönder (isteğe bağlı)",
     "showPassword": "Parolayı göster",
     "hidePassword": "Parolayı gizle",
     "logIn": "Giriş Yap",
@@ -6644,6 +7123,19 @@ export const tr_TR: EnTranslations = {
     "style": "Stil",
     "resetLook": "Görünümü Sıfırla",
     "resetShort": "Sıfırla",
+    "shareTab": "Paylaş",
+    "designCode": "Görünüm kodu",
+    "designCodeHint": "Bu görünümü kaydetmek veya paylaşmak için kodu kopyala. Bir görünümü yüklemek için kodu buraya yapıştırıp içe aktar.",
+    "copyCode": "Kodu kopyala",
+    "importCode": "İçe aktar",
+    "designCodeCopied": "Görünüm kodu kopyalandı.",
+    "designCodeCopyManual": "Otomatik kopyalama burada engellendi. Kod seçildi; klavyeni kullanarak kopyala.",
+    "designCodeImported": "Görünüm içe aktarıldı.",
+    "designCodeImportedPartial": "Görünüm içe aktarıldı. Bu sürümün tanımadığı değerler atlandı.",
+    "designCodeErrEmpty": "Önce bir görünüm kodu yapıştır.",
+    "designCodeErrHeader": "Bu bir görünüm koduna benzemiyor.",
+    "designCodeErrVersion": "Bu görünüm kodu oyunun daha yeni bir sürümünden geliyor.",
+    "designCodeErrMalformed": "Bu görünüm kodu bozuk. Kodun tamamını kopyalayıp yeniden dene.",
     "browFlat": "Düz",
     "browArched": "Kavisli",
     "browThin": "İnce",
@@ -7039,6 +7531,7 @@ export const tr_TR: EnTranslations = {
       "portalOpens": "{zone} bölgesinde {tier} dereceli bir Yarık açılıyor!",
       "portalSealed": "{zone} bölgesindeki {tier} dereceli Yarık mühürlendi.",
       "portalCollapses": "{zone} bölgesindeki {tier} dereceli Yarık çöküyor.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Bu Yarığa yalnızca {level} seviyesinde veya üzerindeki maceracılar girebilir.",
       "deadEntry": "Ölüyken bir Yarığa giremezsin.",
       "deadEntryCombat": "Grubun hala savaşta. Ölüler, dövüş bittiğinde tekrar girebilir.",
@@ -7138,6 +7631,7 @@ export const tr_TR: EnTranslations = {
       "shopMarksRequired": "{name} satın almak için {marks} Delve Nişanına ihtiyacın var.",
       "shopSealPremiumOnly": "Bu mühür yalnızca bir ustanın eline boyun eğer. Onu yalnızca Premium bedel açabilir.",
       "passageSealed": "Geçit mühürlü.",
+      "enemiesRemain": "Önce kalan düşmanları temizle.",
       "moveCloserPassage": "Geçide yaklaş.",
       "moveCloserChest": "Sandığa yaklaş.",
       "moveCloserReliquary": "Emanetliğe yaklaş.",
@@ -7760,7 +8254,15 @@ export const tr_TR: EnTranslations = {
       "readyBody": "Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
       "restart": "Şimdi Yeniden Başlat",
       "later": "Daha Sonra",
-      "dismiss": "Kapat"
+      "dismiss": "Kapat",
+      "whatsNew": "Değişiklikleri Tarayıcında Gör"
+    },
+    "notify": {
+      "updateReadyTitle": "{version} güncellemesi hazır",
+      "updateReadyTitleNoVersion": "Güncelleme hazır",
+      "updateReadyBody": "Güncellemeyi uygulamak için World of ClaudeCraft'ı yeniden başlat.",
+      "partyInviteTitle": "Grup daveti",
+      "partyInviteBody": "{name} seni grubuna davet etti."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const tr_TR: EnTranslations = {
       "reload": "Yeniden Yükle",
       "quit": "Çık",
       "fatalBody": "World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor."
+    },
+    "titlebar": {
+      "exitGame": "Oyundan Çık"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
+    "bodyDiscreteInactive": "Oyun, ayrık (oyun) GPU'sunu kullanmıyor ve bunun yerine güç tasarruflu GPU üzerinde çalışıyor, bu yüzden performans düşecek. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca oyunu Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla.",
     "bodyWeb": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Tarayıcı ayarlarından donanım hızlandırmayı etkinleştir, grafik sürücülerini güncelleyip tarayıcını yeniden başlat.",
     "hybridBodyWindows": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcını Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla, ardından yeniden başlat. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
     "hybridBodyLinux": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcın veya grafik sürücün kendi GPU seçim ayarını sunabilir, ya da dağıtımın PRIME veya optimus-manager gibi bir GPU değiştirme aracı sağlayabilir. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
@@ -7995,7 +8501,111 @@ export const tr_TR: EnTranslations = {
       "zoomIn": "Yakınlaştır",
       "zoomOut": "Uzaklaştır",
       "mapCanvasLabel": "Harita",
-      "mapSummary": "{zone} haritası."
+      "mapSummary": "{zone} haritası.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Görünen önemli bir işaret yok.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "{count} işaret daha.",
+      "mapMarkerDirections": {
+        "center": "merkezde",
+        "north": "kuzeyde",
+        "northeast": "kuzeydoğuda",
+        "east": "doğuda",
+        "southeast": "güneydoğuda",
+        "south": "güneyde",
+        "southwest": "güneybatıda",
+        "west": "batıda",
+        "northwest": "kuzeybatıda"
+      },
+      "mapMarkerDistances": {
+        "near": "yakında",
+        "medium": "orta mesafede",
+        "far": "uzakta"
+      },
+      "mapMarkerLabels": {
+        "you": "Sen",
+        "availableQuest": "Mevcut görev",
+        "readyQuest": "Teslim edilmeye hazır görev",
+        "repeatQuest": "Tekrarlanabilir görev",
+        "cooldownQuest": "Bekleme süresindeki görev",
+        "questObjective": "Görev hedefi alanı",
+        "readyOre": "Toplanmaya hazır cevher damarı",
+        "readyWood": "Kesilmeye hazır ağaç kümesi",
+        "readyHerb": "Toplanmaya hazır ot öbeği",
+        "readyLockedOre": "Toplanmaya hazır cevher damarı, alet kullanılamıyor",
+        "readyLockedWood": "Kesilmeye hazır ağaç kümesi, alet kullanılamıyor",
+        "readyLockedHerb": "Toplanmaya hazır ot öbeği, alet kullanılamıyor",
+        "cooldownOre": "Tükenmiş cevher damarı",
+        "cooldownWood": "Kesilmiş ağaç kümesi",
+        "cooldownHerb": "Toplanmış ot öbeği",
+        "cooldownLockedOre": "Tükenmiş cevher damarı, alet kullanılamıyor",
+        "cooldownLockedWood": "Kesilmiş ağaç kümesi, alet kullanılamıyor",
+        "cooldownLockedHerb": "Toplanmış ot öbeği, alet kullanılamıyor",
+        "station": "Zanaat istasyonu: {name}",
+        "service": "Hizmet: {name}",
+        "partyMember": "Grup üyesi: {name}",
+        "deadPartyMember": "Ölü grup üyesi: {name}",
+        "partyMemberGeneric": "Grup üyesi",
+        "deadPartyMemberGeneric": "Ölü grup üyesi",
+        "friend": "Arkadaş: {name}",
+        "guildMember": "Lonca üyesi: {name}",
+        "pointOfInterest": "İlgi noktası: {name}",
+        "dungeonEntrance": "Zindan girişi: {name}",
+        "dungeonExit": "Zindan çıkışı",
+        "delveEntrance": "Mağara seferi girişi: {name}",
+        "worldPassage": "{zone} bölgesine geçit",
+        "riftEntrance": "Yarık girişi: {name}",
+        "hostileEnemy": "Düşman",
+        "aggressiveEnemy": "Sana saldıran düşman",
+        "lootableEnemy": "Yağmalanabilir düşman",
+        "corpse": "Cesedin",
+        "deathZone": "Tehlikeli bölge",
+        "teammate": "Takım arkadaşı",
+        "deadTeammate": "Ölü takım arkadaşı",
+        "flagCarrier": "Sancağı taşıyan takım arkadaşı",
+        "ownFlagStand": "Sancağının direği",
+        "enemyFlagStand": "Düşman sancağının direği",
+        "riftDescent": "Yarığa iniş",
+        "riftReturnBeacon": "Dönüş feneri",
+        "riftReturnExit": "Dönüş çıkışı",
+        "ranked": "{marker}, {rank} derecesi",
+        "riftTreasureAvailable": "Hazine hazır",
+        "riftTreasureLocked": "Hazine kilitli",
+        "riftTreasureOpened": "Hazine açılmış",
+        "riftTreasureJammed": "Hazine kilidi sıkışmış",
+        "riftCacheAvailable": "Yarık zulası hazır",
+        "riftCacheLocked": "Zula kilitli",
+        "riftCacheOpened": "Zula açılmış",
+        "riftCacheJammed": "Zulanın kilidi sıkışmış",
+        "pylonUnlit": "Sönük rün sütunu",
+        "pylonLit": "Yanan rün sütunu",
+        "sequenceRuneUnlit": "Sönük sıra rünü",
+        "sequenceRuneLit": "Yanan sıra rünü",
+        "iceGoal": "Buz hedefi",
+        "boulderPad": "Kaya hedefi",
+        "boulderMovable": "Hareket ettirilebilir kaya",
+        "boulderPlaced": "Yerleştirilmiş kaya",
+        "gateSealed": "Mühürlü kapı",
+        "gateOpen": "Açık kapı",
+        "switchReady": "Hazır şalter",
+        "switchOn": "Etkinleştirilmiş şalter",
+        "orbDormant": "Uyuyan küre",
+        "orbActive": "Etkin küre",
+        "rollerHazard": "Tehlikeli yuvarlanan kaya",
+        "delvePassageSealed": "Mühürlü geçit",
+        "delvePassageOpen": "Açık geçit",
+        "delveSurfaceExit": "Yüzeye çıkış",
+        "delveCacheLocked": "Kilitli mağara seferi sandığı",
+        "delveCacheReady": "Mağara seferi sandığı hazır",
+        "delveCacheActive": "Mağara seferi sandığı etkin",
+        "delveCacheOpened": "Mağara seferi sandığı açılmış",
+        "delveReliquaryLocked": "Kilitli emanetlik",
+        "delveReliquaryReady": "Emanetlik hazır",
+        "delveReliquaryActive": "Emanetlik ayini etkin",
+        "delveReliquaryOpened": "Emanetlik açılmış",
+        "bountiful": "Bol ödüllü {marker}"
+      }
     },
     "options": {
       "gameMenu": "Oyun Menüsü",
@@ -8035,6 +8645,9 @@ export const tr_TR: EnTranslations = {
       "graphicsReloadNote": "Grafik Kalitesi ve Arazi Ayrıntısı, yeniden yükledikten sonra uygulanır.",
       "reloadNow": "Şimdi Yeniden Yükle",
       "fullscreen": "Tam Ekran",
+      "displayMode": "Görüntü Modu",
+      "displayModeBorderless": "Kenarlıksız Tam Ekran",
+      "displayModeWindowed": "Pencereli",
       "touchLookSpeed": "Dokunmatik Bakış Hızı",
       "joystickSize": "Yönelteç Boyutu",
       "buttonSize": "Düğme Boyutu",
@@ -8597,6 +9210,7 @@ export const tr_TR: EnTranslations = {
       "offGlobalCooldown": "Genel bekleme süresinden bağımsız",
       "friendlyTarget": "Dost hedef",
       "enemyTarget": "Düşman hedef",
+      "anyTarget": "Düşman veya dost hedef",
       "selfOnly": "Yalnızca kendine",
       "damageRange": "{min} ila {max}",
       "finisherDamage": "{base} artı her kombo puanı için {perCombo}"
@@ -8911,6 +9525,10 @@ export const tr_TR: EnTranslations = {
       "filterPrimaryStatAll": "Herhangi bir birincil nitelik",
       "filterRarity": "Nadirlik",
       "filterRarityAll": "Tüm nadirlikler",
+      "filterSort": "Sırala",
+      "sortName": "Ad (A-Z)",
+      "sortPriceAsc": "Fiyat: düşükten yükseğe",
+      "collapseLowest": "Yalnızca en düşük fiyat",
       "weaponSword": "Kılıçlar",
       "weaponDagger": "Hançerler",
       "weaponStaff": "Asalar",
@@ -8941,6 +9559,8 @@ export const tr_TR: EnTranslations = {
       "quantity": "Miktar",
       "quantityOf": "/ {count}",
       "priceEach": "Adet fiyatı",
+      "lowestPriceLabel": "Mevcut en düşük ilan fiyatı",
+      "lowestPriceNone": "Bu eşya için henüz etkin ilan yok.",
       "listButton": "Dünya Pazarı'na koy",
       "minPriceError": "En az 1 bakır bir fiyat belirleyin.",
       "collectEmpty": "Bekleyen bir şey yok. Satış gelirleri ve süresi dolan ilanlar burada toplanır.",
@@ -9368,6 +9988,7 @@ export const tr_TR: EnTranslations = {
       "cheap_shot": {
         "name": "Mide Yumruğu",
         "description": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.",
+        "descriptionNoStealth": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. 2 kombo puanı kazandırır.",
         "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const tr_TR: EnTranslations = {
       "crippling_poison": {
         "name": "Kurşuni Zehir",
         "description": "Hedefe kurşun gibi ağır bir zehirle vurur, {damage} Doğa hasarı verir ve hareket hızını 12 saniye boyunca %50 yavaşlatır."
+      },
+      "melting_acid": {
+        "name": "Eriyen Asit",
+        "description": "Hedefe yakıcı bir zehir sıçratarak {damage} Nature hasarı verir ve 12 saniye boyunca zırhını %5 azaltır."
+      },
+      "nightshade_coating": {
+        "name": "Gece Gölgesi Kaplama",
+        "description": "Hedefi itüzümüyle kaplayarak {damage} Nature hasarı verir ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır."
       },
       "expose_armor": {
         "name": "Zırh Gediği",
@@ -9580,7 +10209,7 @@ export const tr_TR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Yanan Yemin",
-        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %60 artırır. Yalnızca İnanç muhafızı."
+        "description": "Kutsal hasarının ürettiği tehdidi pasif olarak %30 artırır. Yalnızca İnanç muhafızı."
       },
       "retribution_aura": {
         "name": "Karşılık Aurası",
@@ -9696,7 +10325,7 @@ export const tr_TR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
-        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %30 zırh kazanır, %10 daha az hasar alır ve iki katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
+        "description": "Silahına 30 dakika boyunca işler. Her savurma {damage} ek hasar verir. Güçlendirme ayrıca %40 zırh ve %20 Dayanıklılık kazanır, %15 daha az hasar alır ve yaratıkların kritik vuruşlarına karşı bağışıktır ve 2,75 katı tehdit üretir. Toprak Sarsıntısı hedefini 3 sn boyunca sana saldırmaya zorlar ve Gök Gürültüsü Siperi 3 sn boyunca %10 hasar azaltımı verir."
       },
       "healing_wave": {
         "name": "Onaran Sular",
@@ -9824,7 +10453,7 @@ export const tr_TR: EnTranslations = {
       },
       "fear": {
         "name": "Dehşet",
-        "description": "Düşmanın yüreğine korku salar ve onu 8 saniyeye kadar sinmiş bırakır. Herhangi bir hasar etkiyi bozar."
+        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar."
       },
       "searing_pain": {
         "name": "Dağlama",
@@ -9875,7 +10504,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%130, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",
@@ -9885,6 +10514,10 @@ export const tr_TR: EnTranslations = {
       "growl": {
         "name": "Gözdağı",
         "description": "Hedefe hırlar: tehdidin onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
+      },
+      "challenging_roar": {
+        "name": "Uğursuz Kükreme",
+        "description": "Uğursuz bir kükreme: 10 yarda içindeki her düşman kışkırtılır, tehdidi onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
       },
       "cat_form": {
         "name": "Kurt Formu",
@@ -9898,7 +10531,7 @@ export const tr_TR: EnTranslations = {
       "ferocious_bite": {
         "name": "Kanlı Isırık",
         "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: kombo puanı başına 70 artı 43 hasar veren, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vuran ve 30 enerji geri kazandıran bir ısırık."
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
@@ -9961,7 +10594,7 @@ export const tr_TR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Kurt Kanı",
-        "description": "Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
+        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
       },
       "rip": {
         "name": "Kanlı Yarık",
@@ -10066,7 +10699,7 @@ export const tr_TR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Kemik Damgası",
-        "description": "Bir düşmanı 12 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
+        "description": "Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
       },
       "unholy_command": {
         "name": "Kutsuz Emir",
@@ -10165,8 +10798,8 @@ export const tr_TR: EnTranslations = {
         "description": "Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)"
       },
       "feral_charge": {
-        "name": "Yabani Hücum",
-        "description": "Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)"
+        "name": "İlkel Dalga",
+        "description": "İlkel bir dalga salar. Kurt Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)"
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
@@ -10182,7 +10815,7 @@ export const tr_TR: EnTranslations = {
       },
       "redharvest": {
         "name": "Kızıl Hasat",
-        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve 30 enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
       },
       "marrowbreak": {
         "name": "İlik Kıran",
@@ -10422,7 +11055,7 @@ export const tr_TR: EnTranslations = {
       },
       "evocation": {
         "name": "Eter Kuyusu",
-        "description": "Restaura manayı rápidamente. (büyücü yeteneği)"
+        "description": "6 sn kanalize eder: her saniye 100 mana yeniler ve 8 Büyü Gücü biriktirir. Bonus kanalize ederken birikir ve 15 sn sürer. (büyücü yeteneği)"
       },
       "flurry_of_knives": {
         "name": "Bıçak Sağanağı",
@@ -10430,7 +11063,7 @@ export const tr_TR: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Yaban Onarımı",
-        "description": "10 sn. boyunca 180 sağlık yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
+        "description": "10 sn. boyunca azami sağlığının %40 kadarını yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
       },
       "frost_trap": {
         "name": "Kırağı Tuzağı",
@@ -10450,11 +11083,11 @@ export const tr_TR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",
-        "description": "Yakındaki düşmanları 3 sn. kadar korkutur. Hasar etkiyi bozabilir. (Karabüyücü yeteneği)"
+        "description": "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)"
       },
       "ice_block": {
         "name": "Soğuk Tabut",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sn. (büyücü yeteneği)"
+        "description": "Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)"
       },
       "inner_focus": {
         "name": "Dingin Zihin",
@@ -10546,7 +11179,7 @@ export const tr_TR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Atılgan Zihin",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)"
+        "description": "Büyü yapma süresi olan bir sonraki büyünü anında kullanılır hâle getirir. 60 sn sürer. (büyücü yeteneği)"
       },
       "psychic_scream": {
         "name": "Psişik Çığlık",
@@ -10663,7 +11296,7 @@ export const tr_TR: EnTranslations = {
       },
       "prowl": {
         "name": "Sinsi Sokulma",
-        "description": "Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
+        "description": "Kurt Formundayken gizliliğe geçer ve 5% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
       },
       "rake": {
         "name": "Deri Yüzme",
@@ -12218,6 +12851,9 @@ export const tr_TR: EnTranslations = {
       "pristine_claw": {
         "name": "Kusursuz Pençe"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Bahçesi Çiçek Demeti"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -13062,6 +13698,15 @@ export const tr_TR: EnTranslations = {
       },
       "training_dummy": {
         "name": "Antrenman Kuklası"
+      },
+      "friendly_player_dummy": {
+        "name": "Dost Oyuncu Kuklası"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal Boss Kuklası"
+      },
+      "heroic_boss_dummy": {
+        "name": "Kahramanca Boss Kuklası"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
@@ -16702,6 +17347,11 @@ export const tr_TR: EnTranslations = {
         "enterText": "Son Kale'nin soğuk, sessiz koridorlarına adım atıyorsun.",
         "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
       },
+      "dawnhold_castle": {
+        "name": "Dawnhold Şatosu",
+        "enterText": "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
+        "leaveText": "Güneşli bahçe çimenliğine geri süzülüyorsun."
+      },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",
         "enterText": "Ay geçidinden geçersin — hava soğuk suya ve solgun ışığa dönüşür, şarkı başının üstünde kapanır.",
@@ -16900,6 +17550,21 @@ export const tr_TR: EnTranslations = {
         "sender": "Tamirci Gizzel",
         "subject": "USTALIK, kaboom",
         "body": "Ana dallarınızdan biri ustalığa ulaştı, en TEPE, kaboom, tüm merdiven, bitti. Övgü dağıtmam, fitil dağıtırım, ama işte alın ikisini de: dahisiniz ve hafifçe dehşet vericisiniz. Gidin dağları gerginleştirin."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

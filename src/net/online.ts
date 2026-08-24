@@ -13,7 +13,7 @@ import {
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
-import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
+import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
   computeTalentModifiers,
   emptyAllocation,
@@ -103,6 +103,7 @@ import {
   type CardMinigameInfo,
   type CharacterProfile,
   type CharacterSearchResult,
+  type CivicServicePlacement,
   type ClientCommand,
   type CraftingIdentityView,
   type CraftResultView,
@@ -167,12 +168,17 @@ import type {
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
+import {
+  type CivicServicePlacementsReader,
+  createCivicServicePlacementsReader,
+} from './civic_service_placements';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { isInputSendBackpressured } from './send_backpressure';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -186,6 +192,14 @@ import {
 // individual fields as they are consumed; this alias keeps the decoder local.
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
+
+type InputSendMode = 'periodic' | 'changed' | 'forced-neutral';
+
+interface PendingTransientInput {
+  jump: boolean;
+  turnLeft: boolean;
+  turnRight: boolean;
+}
 
 interface ClientWireAura {
   id: string;
@@ -331,6 +345,9 @@ export interface AccountInfo {
   createdAt: string;
   characterCount: number;
   twoFactorEnabled: boolean;
+  // False for an account provisioned by Apple or Discord sign-in that never got
+  // a real, owner-chosen password (see setInitialPassword below).
+  passwordSet: boolean;
 }
 
 // Carries the HTTP status alongside the server's error text so callers can
@@ -467,6 +484,15 @@ export class Api {
     turnstileToken = '',
     ref = '',
     nativeAttestation: unknown = undefined,
+    // UA analytics extras, all optional: the first-touch attribution payload
+    // (src/attribution.ts), the marketing opt-in checkbox state, and the
+    // player's selected language. The server validates every field
+    // (server/signup_attribution.ts) and none can fail registration.
+    extras: {
+      attribution?: Record<string, string> | null;
+      marketingOptIn?: boolean;
+      locale?: string;
+    } = {},
   ): Promise<{ accountId?: number }> {
     const data = await this.post('/api/register', {
       username,
@@ -475,6 +501,9 @@ export class Api {
       turnstileToken,
       ref,
       nativeAttestation,
+      attribution: extras.attribution ?? undefined,
+      marketingOptIn: extras.marketingOptIn === true ? true : undefined,
+      locale: extras.locale,
     });
     this.token = data.token;
     this.username = data.username;
@@ -699,6 +728,14 @@ export class Api {
 
   async changePassword(current: string, next: string): Promise<void> {
     await this.post('/api/account/password', { current, next });
+  }
+
+  // Set a real password on an account that has none yet (an Apple- or
+  // Discord-provisioned account whose only credential is a random placeholder
+  // hash the owner never saw). Bearer-scoped; the server rejects it once a real
+  // password exists (use changePassword from there).
+  async setInitialPassword(next: string): Promise<void> {
+    await this.post('/api/account/password/set-initial', { next });
   }
 
   // Request a password-reset email (for a locked-out user). Always resolves: the
@@ -1768,6 +1805,17 @@ export class ClientWorld implements IWorld {
   get stationPlacements() {
     return getActiveWorldContent().services?.stations ?? [];
   }
+  // Lazy holder, never a field initializer: bareClient creates ClientWorld via
+  // Object.create(ClientWorld.prototype), so constructor field initialization is skipped.
+  private civicServicePlacementsReader?: CivicServicePlacementsReader;
+  /** Static civic anchors from the active bundled world. Rebuild only when the
+   * editor swaps content, never on the map's redraw cadence. */
+  get civicServicePlacements(): readonly CivicServicePlacement[] {
+    if (this.civicServicePlacementsReader === undefined) {
+      this.civicServicePlacementsReader = createCivicServicePlacementsReader();
+    }
+    return this.civicServicePlacementsReader();
+  }
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
@@ -1938,6 +1986,10 @@ export class ClientWorld implements IWorld {
   private lastInputSig = '';
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
+  // No initializer on purpose: bare ClientWorld test fixtures skip field
+  // initializers, and the lazy accessor below keeps that construction idiom
+  // equivalent to a real instance.
+  private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
@@ -2185,7 +2237,7 @@ export class ClientWorld implements IWorld {
   }
 
   flushInput(now = performance.now()): boolean {
-    return this.sendInput(now, true);
+    return this.sendInput(now, 'changed');
   }
 
   /**
@@ -2197,7 +2249,10 @@ export class ClientWorld implements IWorld {
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
-    return this.sendInput(now);
+    // On an open socket the forced path admits exactly one neutral frame
+    // despite a saturated browser buffer. The accepted neutral frame consumes
+    // any pre-pause engagement intent without putting it on the wire.
+    return this.sendInput(now, 'forced-neutral');
   }
 
   consumeInputEchoSamples(): number[] {
@@ -2238,7 +2293,27 @@ export class ClientWorld implements IWorld {
     ].join(',');
   }
 
-  private sendInput(now = performance.now(), changedOnly = false): boolean {
+  private pendingTransientInputState(): PendingTransientInput {
+    this.pendingTransientInput ??= { jump: false, turnLeft: false, turnRight: false };
+    return this.pendingTransientInput;
+  }
+
+  private retainTransientInput(): void {
+    const pending = this.pendingTransientInputState();
+    pending.jump ||= this.moveInput.jump;
+    pending.turnLeft ||= this.moveInput.turnLeft;
+    pending.turnRight ||= this.moveInput.turnRight;
+  }
+
+  private hasPendingTransientInput(): boolean {
+    return (
+      this.pendingTransientInput?.jump === true ||
+      this.pendingTransientInput?.turnLeft === true ||
+      this.pendingTransientInput?.turnRight === true
+    );
+  }
+
+  private sendInput(now = performance.now(), mode: InputSendMode = 'periodic'): boolean {
     if (
       typeof this.spectating === 'string' ||
       !this.connected ||
@@ -2246,23 +2321,46 @@ export class ClientWorld implements IWorld {
     ) {
       return false;
     }
+    // Shed ordinary input while the browser-owned queue is backed up. Preserve
+    // the three engagement edges that are not idempotent-latest: jump can be
+    // pressed and released inside one shed interval, and keyboard-turn flags
+    // are intentionally present for only their engagement frame. Pause
+    // neutralization is the sole bounded force path and admits one frame.
+    if (mode !== 'forced-neutral' && isInputSendBackpressured(this.ws.bufferedAmount)) {
+      this.retainTransientInput();
+      this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
+      return false;
+    }
     const sig = this.inputSignature();
-    if (changedOnly) {
-      if (sig === this.lastInputSig) return false;
+    const hasPendingTransientInput = this.hasPendingTransientInput();
+    if (mode === 'changed') {
+      if (!hasPendingTransientInput && sig === this.lastInputSig) return false;
       if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
     }
     const mi = this.moveInput;
+    const includePendingTransientInput = mode !== 'forced-neutral';
     const msg: Record<string, unknown> = {
       t: 'input',
       seq: ++this.inputSeq,
       mi: {
         f: mi.forward ? 1 : 0,
         b: mi.back ? 1 : 0,
-        tl: mi.turnLeft ? 1 : 0,
-        tr: mi.turnRight ? 1 : 0,
+        tl:
+          mi.turnLeft ||
+          (includePendingTransientInput && this.pendingTransientInput?.turnLeft === true)
+            ? 1
+            : 0,
+        tr:
+          mi.turnRight ||
+          (includePendingTransientInput && this.pendingTransientInput?.turnRight === true)
+            ? 1
+            : 0,
         sl: mi.strafeLeft ? 1 : 0,
         sr: mi.strafeRight ? 1 : 0,
-        j: mi.jump ? 1 : 0,
+        j:
+          mi.jump || (includePendingTransientInput && this.pendingTransientInput?.jump === true)
+            ? 1
+            : 0,
         dv: mi.dive ? 1 : 0,
         sf: mi.surface ? 1 : 0,
       },
@@ -2277,6 +2375,10 @@ export class ClientWorld implements IWorld {
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     this.ws.send(JSON.stringify(msg));
+    // WebSocket.send accepted the real frame. Pending edges are transport-local
+    // and are consumed exactly once, including when the forced-neutral mode
+    // intentionally cancels them rather than replaying them into the pause.
+    this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
     this.pendingInputSeqSentAt.set(this.inputSeq, now);
@@ -2403,6 +2505,7 @@ export class ClientWorld implements IWorld {
         this.inputSeq = 0;
         this.lastInputSig = '';
         this.lastInputSentAt = 0;
+        this.pendingTransientInput = undefined;
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
@@ -2484,24 +2587,25 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'error') {
       const wasConnected = this.connected;
       this.connected = false;
-      // Mid-reconnect, 'character already in world' is the transient window
-      // where the server has not yet noticed the old socket died (a
-      // black-holed drop sends no FIN/RST): keep backing off, the server's
-      // keepalive sweep flips the held session linkdead within a ping
-      // interval or two and the next retry resumes. Bounded, so a character
+      // 'character already in world' is the transient window where the
+      // server has not yet noticed the old socket died (a black-holed drop
+      // sends no FIN/RST): keep backing off, the server's keepalive sweep
+      // flips the held session linkdead within a ping interval or two and
+      // the next retry resumes. Applies on the very first join attempt too
+      // (a char-select "Enter World" click can land in this same window, see
+      // reconnect_policy.ts), not only mid-reconnect. Bounded, so a character
       // genuinely held by another device's live socket still ends fatal.
-      if (
-        isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
-      ) {
+      if (isTransientReconnectRejection(msg.error, this.conflictRejections)) {
         this.conflictRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
-      // Mid-reconnect, 'authentication timed out' is the other transient
-      // window: a server event-loop stall kept the handshake from processing
-      // the first auth frame in time, or a database failure interrupted the
-      // handshake server-side. Keep backing off; the next retry lands after
-      // the stall clears or the database recovers. Bounded on its own counter.
-      if (isTransientTimeoutRejection(msg.error, this.reconnectAttempts, this.timeoutRejections)) {
+      // 'authentication timed out' is the other transient window: a server
+      // event-loop stall kept the handshake from processing the first auth
+      // frame in time, or a database failure interrupted the handshake
+      // server-side. Keep backing off; the next retry lands after the stall
+      // clears or the database recovers. Bounded on its own counter, and
+      // applies to a first join attempt exactly like a mid-reconnect one.
+      if (isTransientTimeoutRejection(msg.error, this.timeoutRejections)) {
         this.timeoutRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
@@ -2951,6 +3055,12 @@ export class ClientWorld implements IWorld {
         // is authoritative and complete (the server re-sends one whenever flair
         // changes), so this both sets and CLEARS.
         if (e.kind === 'player') this.rememberFlair(e.name, e.aiAccount, streamerLinks);
+        // Operator-applied Cheater tag (src/sim/moderation/). A bare flag: the wire
+        // carries no budget, because only the wearer needs the countdown and the
+        // wearer already has it on the mark's own aura. Written as a strict boolean
+        // like aiAccount above so an identity record WITHOUT `chm` clears a mirror
+        // whose sanction was just lifted, matching Sim.setCheaterMark's own write.
+        e.cheaterMark = w.chm === 1;
         e.scale = w.sc ?? 1;
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
@@ -3065,6 +3175,13 @@ export class ClientWorld implements IWorld {
       e.dead = nowDead;
       e.ghost = !!w.gh; // released spirit: rendered translucent, runs faster
       e.lootable = !!w.loot;
+      // Synthetic sentinel, not a real countdown (same idiom as the paladin
+      // `pasc` note above): 0 once the server's one-shot `cd` corpse-decay
+      // flag has fired, 1 while still inside the loot window.
+      // entity_view_policy_core's admission check only ever tests <= 0, so
+      // this coarse mirror is all it needs; offline Sim entities carry the
+      // real countdown. Same idea as the ffa/lootFfaTimer mirror below.
+      e.corpseTimer = w.cd ? 0 : 1;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
@@ -3246,6 +3363,10 @@ export class ClientWorld implements IWorld {
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;
+      // Parked mana while shapeshifted (server/game.ts self snapshot). Absent
+      // means zero, decoded unconditionally so leaving the form clears it
+      // rather than stranding the last parked pool on the mirror.
+      e.savedMana = typeof s.sm === 'number' ? s.sm : 0;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
       // corpse position while a ghost (null once resurrected). Delta-guarded: kept
@@ -4153,6 +4274,9 @@ export class ClientWorld implements IWorld {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
     else this.cmd({ cmd: 'discard', item: itemId, count, slot: target.slotIndex });
   }
+  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void {
+    this.cmd({ cmd: 'lock_item', item: itemId, locked, slot: target.slotIndex });
+  }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
     // `bulk` and `count` each ride the wire only when non-default (the
     // craftItem `commission` idiom above): an ordinary buy stays
@@ -4491,14 +4615,16 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'set_helm', hidden });
   }
   unequipMechChroma(chromaId: string): void {
-    const itemId = mechChromaItemId(chromaId);
+    // The account-wide unlock (accountCosmetics.mechChromaIds) is permanent,
+    // like a purchased Armory weapon skin: this only reverts the local
+    // player's OWN display, it never revokes ownership.
     const skin = mechChromaSkinIndex(chromaId);
-    if (itemId && skin >= 0 && this.accountCosmetics.mechChromaIds.includes(chromaId)) {
-      this.accountCosmetics = {
-        ...this.accountCosmetics,
-        mechChromaIds: this.accountCosmetics.mechChromaIds.filter((id) => id !== chromaId),
-      };
-      const current = this.entities.get(this.playerId);
+    const current = this.entities.get(this.playerId);
+    if (
+      skin >= 0 &&
+      (this.accountCosmetics.mechChromaIds.includes(chromaId) ||
+        (current?.skinCatalog === 'mech' && current.skin === skin))
+    ) {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
@@ -4512,15 +4638,8 @@ export class ClientWorld implements IWorld {
           current.weaponSkinLoadout,
           current.skinCatalog,
         );
+        this.cosmeticsChanged = true;
       }
-      const existing = this.inventory.find((slot) => slot.itemId === itemId);
-      this.inventory = existing
-        ? this.inventory.map((slot) =>
-            slot.itemId === itemId ? { ...slot, count: slot.count + 1 } : slot,
-          )
-        : [...this.inventory, { itemId, count: 1 }];
-      this.invChanged = true;
-      this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'unequip_mech_chroma', chroma: chromaId });
   }
@@ -4733,6 +4852,9 @@ export class ClientWorld implements IWorld {
   }
   tradeCancel(): void {
     this.cmd({ cmd: 'trade_cancel' });
+  }
+  tradeClose(): void {
+    this.cmd({ cmd: 'trade_close' });
   }
   // --- IWorldDuelArena: duel + rated-arena-queue + 2v2 Fiesta augment-pick sends
   // (duelInfo/arenaInfo are snapshot reads; fiesta dynamics ride the events queue). ---
@@ -5015,8 +5137,13 @@ export class ClientWorld implements IWorld {
       armorClass: query.armorClass,
       primaryStat: query.primaryStat,
       rarity: query.rarity,
+      sort: query.sort,
       page: query.page,
+      collapseLowest: query.collapseLowest,
     });
+  }
+  marketSellPriceCheck(itemId: string | null): void {
+    this.cmd({ cmd: 'market_sell_price_check', item: itemId });
   }
   marketList(itemId: string, count: number, price: number): void {
     this.cmd({ cmd: 'market_list', item: itemId, count, price });

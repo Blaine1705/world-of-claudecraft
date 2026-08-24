@@ -1,5 +1,13 @@
 import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
+import {
+  LARGE_GOLD_MOVEMENT_LIMIT,
+  LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+  readLargeMovementsPane,
+  readTopWealthHolders,
+  redactActiveFlagCounts,
+} from './account_wealth';
+import { accountWealthBreakdown, largeGoldMovementsForAccount } from './account_wealth_db';
 import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
   ACTIVITY_WINDOW_DAYS,
@@ -85,6 +93,12 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import {
+  CHEATER_MARK_ADMIN_TARGET_CODE,
+  cheaterMarkBodySchema,
+  liftCheaterMarkBodySchema,
+  rethrowCheaterMarkRefusal,
+} from './cheater_mark_api';
 import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
@@ -104,7 +118,9 @@ import { emailSecurityIncident } from './email';
 import type { GameServer } from './game';
 import { type GeneralChatRateLimit, setGeneralChatRateLimit } from './general_chat_quota_db';
 import { ctxAccountId } from './http/context';
+import { HttpError } from './http/errors';
 import { logger } from './http/logger';
+import { withBody } from './http/middleware/body';
 import {
   ADMIN_META,
   type AdminAuthDb,
@@ -124,6 +140,7 @@ import {
   forceCharacterRename,
   ignoreReport,
   liftAccountChatMute,
+  liftAccountCheaterMark,
   moderateAccount,
   moderationReportsForAccount,
   muteAccountChat,
@@ -132,13 +149,21 @@ import {
   recordProfessionsRestore,
   resetChatStrikesAudited,
   setAccountAiFlag,
+  setAccountCheaterMark,
   setAccountStreamerFlair,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
 } from './moderation_db';
 import { readModerationQueue } from './moderation_queue_cache';
 import { providerUsageSnapshot } from './provider_usage';
-import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
+import {
+  adminFlagWriteRateLimited,
+  adminOversightReadRateLimited,
+  authThrottled,
+  clearAuthFailures,
+  rateLimited,
+  recordAuthFailure,
+} from './ratelimit';
 import { REALM } from './realm';
 import {
   adminRolesForAccount,
@@ -146,6 +171,16 @@ import {
   roleChangeHistory,
   setAccountAdminRoles,
 } from './staff_db';
+import { flagListResponse } from './suspicion_flag_list';
+import { isSuspicionFlagStatus } from './suspicion_flag_workflow';
+import { bustSuspicionFlagCache, readSuspicionFlagDataset } from './suspicion_flags';
+import {
+  activeSuspicionFlagCounts,
+  addSuspicionFlagNote,
+  type SuspicionFlagTransitionResult,
+  suspicionFlagsForAccount,
+  transitionSuspicionFlag,
+} from './suspicion_flags_db';
 import {
   type UnstuckHotspotRow as DbUnstuckHotspotRow,
   type UnstuckReportPage as DbUnstuckReportPage,
@@ -175,6 +210,17 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
+
+// Economy-oversight endpoints (player search / wealth / flagged workflow).
+// Error literals are reverse-mapped to i18n keys by the admin client
+// (ADMIN_ERROR_KEYS in src/admin/i18n.ts); change one and the mapping in the
+// SAME change.
+const ADMIN_TOO_MANY_REQUESTS = 'too many requests, wait a moment and try again';
+const FLAG_NOT_FOUND = 'flag not found';
+const FLAG_INVALID_STATUS = 'invalid flag status';
+const FLAG_INVALID_TRANSITION = 'that status change is not allowed';
+const FLAG_ACTIVE_EXISTS = 'this account already has an open flag of that kind';
+const FLAG_NOTE_REQUIRED = 'a note is required';
 // Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
 // with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
 // code before a token is minted. Without one, the response is a 200 CHALLENGE (never
@@ -259,6 +305,29 @@ async function respondGeneralChatRateLimit(
   if (!outcome.ok) return fail(res, outcome.status, outcome.error);
   applyLive(input.targetAccountId, outcome.value.after);
   return ok(res, { ok: true });
+}
+
+function flagTransitionFailure(
+  res: http.ServerResponse,
+  error: Exclude<SuspicionFlagTransitionResult, { ok: true }>['error'],
+): void {
+  switch (error) {
+    case 'not_found':
+      fail(res, 404, FLAG_NOT_FOUND);
+      return;
+    case 'active_flag_exists':
+      fail(res, 409, FLAG_ACTIVE_EXISTS);
+      return;
+    case 'invalid_transition':
+      fail(res, 400, FLAG_INVALID_TRANSITION);
+      return;
+    default: {
+      // Exhaustiveness: a new refusal variant must fail HERE at compile time,
+      // not fall through with no response written and hold the socket open.
+      const unhandled: never = error;
+      throw new Error(`unhandled flag transition refusal: ${String(unhandled)}`);
+    }
+  }
 }
 
 function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
@@ -621,6 +690,16 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
 function moderationHistoryTab(params: URLSearchParams): ModerationHistoryTab {
   const tab = params.get('tab');
   return tab === 'mine' || tab === 'notes' ? tab : 'all';
+}
+
+// Stamp each account row with its active suspicion-flag count. Only callers
+// holding moderation.read receive the counts at all (the flag store is
+// moderation data; accounts.read alone must not see it).
+function withActiveFlagCounts<T extends { id: number }>(
+  rows: readonly T[],
+  counts: ReadonlyMap<number, number>,
+): (T & { activeFlagCount: number })[] {
+  return rows.map((row) => ({ ...row, activeFlagCount: counts.get(row.id) ?? 0 }));
 }
 
 function getBlockedIpsForAccount(
@@ -1385,6 +1464,45 @@ export async function handleAdminApi(
       return ok(res, game.startPerfCapture(durationMs));
     }
 
+    const flagStatusMatch = /^\/admin\/api\/flags\/(\d+)\/status$/.exec(path);
+    if (req.method === 'POST' && flagStatusMatch) {
+      if (!adminFlagWriteRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const body = await readBody(req);
+      if (!isSuspicionFlagStatus(body.status)) return fail(res, 400, FLAG_INVALID_STATUS);
+      const note = typeof body.note === 'string' ? body.note.trim() : '';
+      const result = await transitionSuspicionFlag({
+        flagId: Number(flagStatusMatch[1]),
+        adminAccountId: accountId,
+        to: body.status,
+        note,
+      });
+      if (!result.ok) {
+        flagTransitionFailure(res, result.error);
+        return;
+      }
+      bustSuspicionFlagCache();
+      return ok(res, { flag: result.flag });
+    }
+    const flagNoteMatch = /^\/admin\/api\/flags\/(\d+)\/note$/.exec(path);
+    if (req.method === 'POST' && flagNoteMatch) {
+      if (!adminFlagWriteRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const body = await readBody(req);
+      const note = typeof body.note === 'string' ? body.note.trim() : '';
+      if (!note) return fail(res, 400, FLAG_NOTE_REQUIRED);
+      const added = await addSuspicionFlagNote({
+        flagId: Number(flagNoteMatch[1]),
+        adminAccountId: accountId,
+        note,
+      });
+      if (!added) return fail(res, 404, FLAG_NOT_FOUND);
+      bustSuspicionFlagCache();
+      return ok(res, { ok: true });
+    }
+
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
 
     // Current capture status + the last frozen result.
@@ -1481,7 +1599,57 @@ export async function handleAdminApi(
       const { page, limit } = parsePageParams(url.searchParams);
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
       const { sort, dir } = parseAdminAccountSort(url.searchParams);
-      return ok(res, await listAccounts(search, page, limit, sort, dir));
+      const list = await listAccounts(search, page, limit, sort, dir);
+      if (!identity.permissions.has('moderation.read')) return ok(res, list);
+      const counts = await activeSuspicionFlagCounts(list.rows.map((row) => row.id));
+      return ok(res, { ...list, rows: withActiveFlagCounts(list.rows, counts) });
+    }
+    if (path === '/admin/api/wealth/top') {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const rows = await readTopWealthHolders();
+      // Flag counts are moderation data: the same rule as the accounts list.
+      return identity.permissions.has('moderation.read')
+        ? ok(res, { rows })
+        : ok(res, { rows: redactActiveFlagCounts(rows) });
+    }
+    const accountWealthMatch = /^\/admin\/api\/accounts\/(\d+)\/wealth$/.exec(path);
+    if (accountWealthMatch) {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const targetAccountId = Number(accountWealthMatch[1]);
+      const breakdown = await accountWealthBreakdown(targetAccountId);
+      if (breakdown === null) return fail(res, 404, 'account not found');
+      const pane = await readLargeMovementsPane(targetAccountId, () =>
+        largeGoldMovementsForAccount(
+          targetAccountId,
+          LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+          LARGE_GOLD_MOVEMENT_LIMIT,
+        ),
+      );
+      return ok(res, { ...breakdown, ...pane });
+    }
+    const accountFlagsMatch = /^\/admin\/api\/accounts\/(\d+)\/flags$/.exec(path);
+    if (accountFlagsMatch) {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      return ok(res, await suspicionFlagsForAccount(Number(accountFlagsMatch[1])));
+    }
+    if (path === '/admin/api/flags') {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      return ok(
+        res,
+        flagListResponse(
+          await readSuspicionFlagDataset(),
+          url.searchParams,
+          parsePageParams(url.searchParams),
+        ),
+      );
     }
     if (path === '/admin/api/guilds') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1774,6 +1942,10 @@ export type AdminRuntime = Pick<
   // Push an operator's account-flair edit onto the account's live session, so the
   // AI mark / streamer links change without a reconnect.
   | 'applyAccountFlairLive'
+  // Push a Cheater mark change onto the account's live session. Without it a
+  // sanction applied to a logged-in player does nothing until their next login,
+  // which is the session it is most needed in.
+  | 'applyCheaterMarkLive'
   | 'reloadChatFilter'
   | 'reloadBlockedIps'
   | 'disconnectByIp'
@@ -1926,6 +2098,12 @@ function makeRealAdminDb() {
     moderationQueue: readModerationQueue,
     moderationReportsForAccount,
     muteAccountChat,
+    // The Cheater mark: apply/re-length and lift early. Deliberately NO
+    // remaining-budget read here: the apply arm returns what its own transaction
+    // stored, and a second read could be overtaken by a save-path burn and push
+    // a stale budget onto the live session.
+    setAccountCheaterMark,
+    liftAccountCheaterMark,
     accountAndScopeForToken,
     accountMailTarget,
     findAccount,
@@ -1971,6 +2149,20 @@ function makeRealAdminDb() {
     loadAntibotConfig,
     listAntibotConfigHistory,
     saveAntibotConfigChange,
+    // Economy oversight: the materialised wealth reads (top holders is
+    // cache-backed like overviewCounts; an override replaces it outright),
+    // the persisted suspicion-flag workflow, and the dedicated oversight
+    // rate limiters (scoped buckets, see server/ratelimit.ts).
+    topWealthHolders: readTopWealthHolders,
+    accountWealthBreakdown,
+    largeGoldMovementsForAccount,
+    suspicionFlagDataset: readSuspicionFlagDataset,
+    suspicionFlagsForAccount,
+    transitionSuspicionFlag,
+    addSuspicionFlagNote,
+    activeSuspicionFlagCounts,
+    adminOversightReadRateLimited,
+    adminFlagWriteRateLimited,
   };
 }
 
@@ -1982,7 +2174,10 @@ let realAdminDb: AdminDb | undefined;
 let adminDbOverride: AdminDb | undefined;
 
 /** The active admin db: a setAdminDbForTests override if present, else the real bundle. */
-function adminDb(): AdminDb {
+// Exported for sibling admin-surface RouteDef modules (woc_market_routes.ts):
+// one live bundle, one test seam, so the ownership sweep's fakes reach every
+// admin route regardless of which module mounts the gate.
+export function adminDb(): AdminDb {
   if (adminDbOverride) return adminDbOverride;
   realAdminDb ??= makeRealAdminDb();
   return realAdminDb;
@@ -2002,7 +2197,10 @@ export function resetAdminDbForTests(): void {
 // The admin-auth gate reads its two db functions (accountAndScopeForToken and
 // adminRolesForAccount) off the active bundle, so a setAdminDbForTests fake drives
 // it too. AdminDb is a superset of AdminAuthDb, so the getter is assignable.
-const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
+// Exported so sibling admin-surface domain modules (server/ad_spend.ts) mount
+// the SAME gate over the SAME seam, keeping the scope sweep and the
+// setAdminDbForTests injection authoritative for every admin route.
+export const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
 
 /**
  * The four moderation actions the enum route accepts. The central permission gate
@@ -2274,12 +2472,125 @@ async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
 }
 
-/** GET /admin/api/accounts: paged, sortable account search (search clamped to 64 chars). */
+/** GET /admin/api/accounts: paged, sortable account search (search clamped to
+ *  64 chars; an all-digits search also matches exact account/character ids,
+ *  and character names match alongside usernames). Rows carry the materialised
+ *  gold total, plus active suspicion-flag counts for moderation.read holders
+ *  only (the flag store is moderation data). */
 async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
   const { sort, dir } = parseAdminAccountSort(ctx.url.searchParams);
-  ok(ctx.res, await adminDb().listAccounts(search, page, limit, sort, dir));
+  const list = await adminDb().listAccounts(search, page, limit, sort, dir);
+  const identity = adminIdentityOf(ctx);
+  if (!identity?.permissions.has('moderation.read')) return ok(ctx.res, list);
+  const counts = await adminDb().activeSuspicionFlagCounts(list.rows.map((row) => row.id));
+  ok(ctx.res, { ...list, rows: withActiveFlagCounts(list.rows, counts) });
+}
+
+/** GET /admin/api/wealth/top: the rich list (top holders by materialised
+ *  total), served from the TTL cache in server/account_wealth.ts. Flag counts
+ *  are stripped for callers without moderation.read, the same rule as the
+ *  accounts list. */
+async function wealthTopHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const rows = await adminDb().topWealthHolders();
+  const identity = adminIdentityOf(ctx);
+  ok(
+    ctx.res,
+    identity?.permissions.has('moderation.read')
+      ? { rows }
+      : { rows: redactActiveFlagCounts(rows) },
+  );
+}
+
+/** GET /admin/api/accounts/:id/wealth: one account's gold breakdown (per
+ *  character, escrow, guild treasury context) plus its recent large
+ *  bank-ledger movements. */
+async function accountWealthHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const accountId = adminTargetId(ctx);
+  const breakdown = await adminDb().accountWealthBreakdown(accountId);
+  if (breakdown === null) return fail(ctx.res, 404, 'account not found');
+  const pane = await readLargeMovementsPane(accountId, () =>
+    adminDb().largeGoldMovementsForAccount(
+      accountId,
+      LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+      LARGE_GOLD_MOVEMENT_LIMIT,
+    ),
+  );
+  ok(ctx.res, { ...breakdown, ...pane });
+}
+
+/** GET /admin/api/accounts/:id/flags: the account's full flag history (active
+ *  and resolved; flags never silently disappear) with the workflow audit
+ *  trail. */
+async function accountFlagsHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  ok(ctx.res, await adminDb().suspicionFlagsForAccount(adminTargetId(ctx)));
+}
+
+/** GET /admin/api/flags: the Flagged view (cached dataset, filtered and paged
+ *  by flagListResponse). */
+async function flagsHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  ok(
+    ctx.res,
+    flagListResponse(
+      await adminDb().suspicionFlagDataset(),
+      ctx.url.searchParams,
+      parsePageParams(ctx.url.searchParams),
+    ),
+  );
+}
+
+/** POST /admin/api/flags/:id/status: one workflow move (validated against the
+ *  state machine), recorded with the acting admin in the audit trail. */
+async function flagStatusHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminFlagWriteRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const body = await readBody(ctx.req);
+  if (!isSuspicionFlagStatus(body.status)) return fail(ctx.res, 400, FLAG_INVALID_STATUS);
+  const note = typeof body.note === 'string' ? body.note.trim() : '';
+  const result = await adminDb().transitionSuspicionFlag({
+    flagId: adminTargetId(ctx),
+    adminAccountId: ctxAccountId(ctx),
+    to: body.status,
+    note,
+  });
+  if (!result.ok) {
+    flagTransitionFailure(ctx.res, result.error);
+    return;
+  }
+  bustSuspicionFlagCache();
+  ok(ctx.res, { flag: result.flag });
+}
+
+/** POST /admin/api/flags/:id/note: append a note-only audit event. */
+async function flagNoteHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminFlagWriteRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const body = await readBody(ctx.req);
+  const note = typeof body.note === 'string' ? body.note.trim() : '';
+  if (!note) return fail(ctx.res, 400, FLAG_NOTE_REQUIRED);
+  const added = await adminDb().addSuspicionFlagNote({
+    flagId: adminTargetId(ctx),
+    adminAccountId: ctxAccountId(ctx),
+    note,
+  });
+  if (!added) return fail(ctx.res, 404, FLAG_NOT_FOUND);
+  bustSuspicionFlagCache();
+  ok(ctx.res, { ok: true });
 }
 
 /** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
@@ -2613,6 +2924,89 @@ async function forceRenameHandler(ctx: Ctx): Promise<void> {
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'force rename failed');
   }
+}
+
+/**
+ * Refuse a Cheater mark aimed at an operator account.
+ *
+ * Admin accounts are exempt for the same reason they are exempt from
+ * suspend/ban/chat-mute (the isAdminAccount guards above): an operator must not be
+ * able to brand another operator, deliberately or by mistyping an account id.
+ * Applied to the LIFT arm as well as the mark arm, so the pair states the same
+ * rule; the cost is that an account marked BEFORE being promoted to staff has to
+ * be demoted before its tag can be lifted through the API.
+ */
+async function refuseAdminCheaterMarkTarget(targetAccountId: number): Promise<void> {
+  if (await adminDb().isAdminAccount(targetAccountId)) {
+    throw new HttpError(400, CHEATER_MARK_ADMIN_TARGET_CODE);
+  }
+}
+
+/**
+ * POST /admin/api/moderation/accounts/:id/cheater-mark: brand an account with the
+ * Cheater tag for a budget of PLAYED seconds, and push it onto the live session.
+ *
+ * A REGISTRY-ONLY route (no legacy handleAdminApi twin), so it follows the
+ * new-endpoint recipe rather than the chat-mute arm beside it: the body is parsed
+ * by withBody and decoded through a typed schema (a shape failure is the
+ * pipeline's 422 validation.failed), and every refusal is a stable
+ * `cheater_mark.*` code through HttpError, never English prose.
+ */
+async function cheaterMarkHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  // Cheap-reject-first: the decode is pure CPU, the operator-target check is a
+  // db read, so a malformed request never buys a query.
+  const decoded = cheaterMarkBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminCheaterMarkTarget(targetAccountId);
+  // No initializer on purpose: 0 is the wire form of "no mark", so a default
+  // here would mean a future non-throwing arm in the catch below silently LIFTS
+  // a live mark. rethrowCheaterMarkRefusal returns never, which is what makes
+  // the definite assignment hold.
+  let storedSeconds: number;
+  try {
+    storedSeconds = await adminDb().setAccountCheaterMark({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: decoded.value.reason,
+      seconds: decoded.value.seconds,
+    });
+  } catch (err) {
+    rethrowCheaterMarkRefusal(err);
+  }
+  // Push the budget the WRITE ITSELF returned, never the requested one (
+  // moderation_db clamps to CHEATER_MARK_MAX_SECONDS) and never a follow-up
+  // read: the unaudited save-path burn is guarded only by
+  // `cheater_mark_seconds > 0`, so it can land between the COMMIT and a second
+  // SELECT. Re-lengthening a live mark would then push the OLD remaining while
+  // the API answered ok, and the operator's correction would silently vanish.
+  rt.applyCheaterMarkLive(targetAccountId, storedSeconds);
+  ok(ctx.res, { ok: true });
+}
+
+/**
+ * POST /admin/api/moderation/accounts/:id/lift-cheater-mark: clear the tag early
+ * and push the lift onto the live session. Registry-only, same recipe as its
+ * sibling above; 0 seconds is the wire form of "no mark".
+ */
+async function liftCheaterMarkHandler(ctx: Ctx): Promise<void> {
+  const rt = useAdminRuntime();
+  const targetAccountId = adminTargetId(ctx);
+  const decoded = liftCheaterMarkBodySchema.decode(ctx.body ?? {});
+  if (!decoded.ok) throw decoded;
+  await refuseAdminCheaterMarkTarget(targetAccountId);
+  try {
+    await adminDb().liftAccountCheaterMark({
+      accountId: targetAccountId,
+      adminAccountId: ctxAccountId(ctx),
+      reason: decoded.value.reason,
+    });
+  } catch (err) {
+    rethrowCheaterMarkRefusal(err);
+  }
+  rt.applyCheaterMarkLive(targetAccountId, 0);
+  ok(ctx.res, { ok: true });
 }
 
 /** POST /admin/api/moderation/accounts/:id/lift-mute: clear a chat mute + live push. */
@@ -3316,6 +3710,57 @@ export const routes: RouteDef[] = [
     meta: adminTargetMeta('account'),
     handler: resetPasswordHandler,
   },
+
+  // Economy oversight (p2p market launch): the rich list, per-account gold
+  // breakdown, and the persisted suspicion-flag workflow.
+  {
+    method: 'GET',
+    path: '/admin/api/wealth/top',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: wealthTopHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/wealth',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountWealthHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/flags',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountFlagsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/flags',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: flagsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/flags/:id/status',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('flag')],
+    meta: adminTargetMeta('flag'),
+    handler: flagStatusHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/flags/:id/note',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('flag')],
+    meta: adminTargetMeta('flag'),
+    handler: flagNoteHandler,
+  },
   {
     method: 'POST',
     path: '/admin/api/accounts/:id/general-chat-rate-limit',
@@ -3430,6 +3875,26 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: chatMuteHandler,
+  },
+  // The Cheater mark pair. Registry-only (born after the migration, so no legacy
+  // ladder twin), which is why these two are the only admin routes that mount
+  // withBody: the dual-edit parity rule that keeps the migrated handlers
+  // self-reading does not describe a route with nothing to be in parity with.
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/cheater-mark',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
+    meta: adminTargetMeta('account'),
+    handler: cheaterMarkHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account'), withBody()],
+    meta: adminTargetMeta('account'),
+    handler: liftCheaterMarkHandler,
   },
   {
     method: 'POST',

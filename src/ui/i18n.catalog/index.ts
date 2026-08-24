@@ -362,6 +362,7 @@ export const en = {
     email: 'Email',
     emailPlaceholder: 'you@example.com',
     emailError: 'Please enter a valid email address.',
+    marketingOptIn: 'Email me game news and updates (optional)',
     showPassword: 'Show password',
     hidePassword: 'Hide password',
     logIn: 'Log In',
@@ -487,6 +488,23 @@ export const en = {
     // randomize above, and like it, it keeps the body selection.
     resetLook: 'Reset Look',
     resetShort: 'Reset',
+    // The customizer's Share tab: every changeable feature serialized as a
+    // named value in one line (the design code), exported and imported there.
+    shareTab: 'Share',
+    designCode: 'Design code',
+    designCodeHint:
+      'Copy this code to save or share this look. Paste a code here and import it to load one.',
+    copyCode: 'Copy code',
+    importCode: 'Import',
+    designCodeCopied: 'Design code copied.',
+    designCodeCopyManual:
+      'Automatic copy is blocked here. The code is selected, copy it with your keyboard.',
+    designCodeImported: 'Design imported.',
+    designCodeImportedPartial: 'Design imported. Values this version does not know were skipped.',
+    designCodeErrEmpty: 'Paste a design code first.',
+    designCodeErrHeader: 'That does not look like a design code.',
+    designCodeErrVersion: 'That design code comes from a newer game version.',
+    designCodeErrMalformed: 'That design code is damaged. Copy the whole code and try again.',
     browFlat: 'Flat',
     browArched: 'Arched',
     browThin: 'Thin',
@@ -863,6 +881,8 @@ export const en = {
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
+      lootRecoveryNotice:
+        "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       levelGate: 'Only adventurers of level {level} or higher may enter this rift.',
       deadEntry: 'You cannot enter a rift while dead.',
       deadEntryCombat:
@@ -980,6 +1000,7 @@ export const en = {
       shopSealPremiumOnly:
         "This seal yields only to a master's hand. Only the Premium ante can open it.",
       passageSealed: 'The passage is sealed.',
+      enemiesRemain: 'Clear the remaining enemies first.',
       moveCloserPassage: 'Move closer to the passage.',
       moveCloserChest: 'Move closer to the chest.',
       moveCloserReliquary: 'Move closer to the reliquary.',

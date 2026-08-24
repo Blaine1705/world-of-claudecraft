@@ -289,6 +289,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // notification received during later handshake awaits overrides this query's
     // stale value at the synchronous game.join boundary, with no second DB read.
     const generalChatRateLimitHydration = game.beginGeneralChatRateLimitHydration(accountId);
+    // Same capture-before-the-read contract as above, for the sibling
+    // mute/reason/strikes snapshot: see chat_mod_live.ts for why this fence
+    // exists (a live push landing on this same still-linkdead session during
+    // the reads below must never be discarded by the stale snapshot they'd
+    // otherwise resolve to).
+    const chatModerationHydration = game.beginChatModerationHydration(accountId);
     try {
       const status = await moderationStatusForAccount(accountId);
       if (status.locked) {
@@ -305,6 +311,17 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         return;
       }
       const chatMute = await chatMuteStatusForAccount(accountId);
+      // Resolved at each game.join call below, not here: like
+      // generalChatRateLimitHydration, resolving early would leave every
+      // await between here and the synchronous join boundary (adminRolesForAccount,
+      // loadAccountCosmetics, and on the fresh arm bankBonusForAccount, the lease
+      // acquire, and the character reload) unfenced against a live push landing
+      // in that window.
+      const freshModeration = {
+        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
+        reason: chatMute.reason,
+        strikes: status.chatStrikes,
+      };
       // Hard per-IP WS connection limit. The soft threshold (composite score evidence)
       // is handled inside game.join(); this guard blocks egregious bot farms before
       // they consume a session slot.
@@ -329,9 +346,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
-        mutedUntil: status.chatMutedUntil ?? chatMute.mutedUntil,
-        reason: chatMute.reason,
-        chatStrikes: status.chatStrikes,
         accountCosmetics,
         isAdmin,
         adminPermissions,
@@ -362,6 +376,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
       pendingLeaseJoins.add(character.id);
       try {
+        let admittedCharacter = character;
         let leaseNonce: string | undefined;
         let result: ReturnType<GameServer['join']>;
         if (game.hasSessionForCharacter(character.id)) {
@@ -373,6 +388,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           // resumes and keeps its nonce; a live duplicate is rejected) and never
           // re-stamp the row with a fresh acquire that a doomed handshake could
           // leave mismatched.
+          const moderation = chatModerationHydration.resolve(freshModeration);
           result = game.join(
             ws,
             accountId,
@@ -383,6 +399,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             character.is_gm,
             {
               ...joinMeta,
+              mutedUntil: moderation.mutedUntil,
+              reason: moderation.reason,
+              chatStrikes: moderation.strikes,
               generalChatRateLimit: generalChatRateLimitHydration.resolve(
                 status.generalChatRateLimit ?? null,
               ),
@@ -436,18 +455,56 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               rejectHandshake(ws, WS_AUTH_ERROR.alreadyInWorld);
               return;
             }
+
+            // The rollback migration fences new admissions by locking the lease
+            // table. A handshake can read the character before that lock, then wait
+            // here until the migration commits. Reload only AFTER the lease is ours
+            // so game.join never receives the stale pre-migration JSON. Conversely,
+            // when this lease lands first, the migration sees it and refuses apply.
+            // If the reload fails, release the lease before propagating/rejecting so
+            // an unavailable row cannot strand the character until lease expiry.
+            try {
+              const refreshedCharacter = await getCharacter(accountId, character.id);
+              if (!refreshedCharacter) {
+                await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                  console.error('lease release failed:', err),
+                );
+                leaseNonce = undefined;
+                rejectHandshake(ws, WS_AUTH_ERROR.noSuchCharacter);
+                return;
+              }
+              if (refreshedCharacter.force_rename) {
+                await releaseCharacterLease(character.id, leaseNonce).catch((err) =>
+                  console.error('lease release failed:', err),
+                );
+                leaseNonce = undefined;
+                rejectHandshake(ws, WS_AUTH_ERROR.forceRename);
+                return;
+              }
+              admittedCharacter = refreshedCharacter;
+            } catch (err) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((releaseErr) =>
+                console.error('lease release failed:', releaseErr),
+              );
+              leaseNonce = undefined;
+              throw err;
+            }
+            const moderation = chatModerationHydration.resolve(freshModeration);
             result = game.join(
               ws,
               accountId,
-              character.id,
-              character.name,
-              character.class,
-              character.state,
-              character.is_gm,
+              admittedCharacter.id,
+              admittedCharacter.name,
+              admittedCharacter.class,
+              admittedCharacter.state,
+              admittedCharacter.is_gm,
               {
                 ...joinMeta,
                 leaseNonce,
                 bankBonus,
+                mutedUntil: moderation.mutedUntil,
+                reason: moderation.reason,
+                chatStrikes: moderation.strikes,
                 generalChatRateLimit: generalChatRateLimitHydration.resolve(
                   status.generalChatRateLimit ?? null,
                 ),
@@ -476,7 +533,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
           return;
         }
         const session = result;
-        console.log(`+ ${character.name} (${character.class}) joined, ${game.clients.size} online`);
+        console.log(
+          `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
+        );
         ws.on('message', (data) => {
           game.handleMessage(session, String(data));
         });
@@ -524,7 +583,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // saves. Every other socketClosed caller keeps the market halves.
         if (ws.readyState !== ws.OPEN && game.socketClosed(session, ws, { withMarket: false })) {
           console.log(
-            `~ ${character.name} socket died mid-handshake, entering linkdead, ${game.clients.size} online`,
+            `~ ${admittedCharacter.name} socket died mid-handshake, entering linkdead, ${game.clients.size} online`,
           );
         }
       } finally {
@@ -535,6 +594,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       }
     } finally {
       generalChatRateLimitHydration.release();
+      chatModerationHydration.release();
     }
   }
 

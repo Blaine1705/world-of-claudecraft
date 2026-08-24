@@ -78,12 +78,14 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
       [
         'affliction_eye',
         'affliction_eye_secondary',
-        'affliction_fate_threads',
         'affliction_violence',
         'attackspeed',
         'blind',
         'bleed_vuln',
         'cauterize_fatigue',
+        // Cosmetic and mechanically inert: listed only so the operator-applied
+        // Cheater mark's countdown sorts into the debuff bar.
+        'cheater_mark',
         'corrode',
         'cost_tax',
         'critvuln',
@@ -98,6 +100,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'hex',
         'incapacitate',
         'lockout',
+        'melting_acid',
         'mortal_wound',
         'necromancy_harvest_mark',
         'polymorph',

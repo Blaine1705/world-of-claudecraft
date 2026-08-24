@@ -6,6 +6,7 @@ import type {
   ActiveFrostRing,
   ActiveTemporalHourglass,
   BankBonusSource,
+  CivicServicePlacement,
   CraftingIdentityView,
   DailyRewardHistory,
   DailyRewardLeaderboardPage,
@@ -30,11 +31,12 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
+import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
-  lineOfSightClear,
   moverHeight,
   placementFloorHeight,
   resolveMovement,
@@ -86,6 +88,7 @@ import {
 import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -105,7 +108,7 @@ import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraf
 import { clearPacklordState } from './combat/hunter_packlord';
 import {
   clearHunterTalentState,
-  hunterPetFerocityDamageMultiplier,
+  hunterPetDamageMultiplier,
   resolveHunterSharedAbility,
 } from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
@@ -151,7 +154,6 @@ import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
-  mechChromaItemId,
   mechChromaSkinIndex,
   rankAllowsMechChroma,
   rankAllowsSkin,
@@ -183,6 +185,7 @@ import {
   type SavedCooldowns,
   serializeCooldowns,
 } from './cooldown_persist';
+import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
@@ -242,7 +245,6 @@ import {
   createPlayer,
   type PlayerEquipment,
   type PlayerEquipmentInstances,
-  pctValue,
   recalcPlayerStats,
 } from './entity';
 import {
@@ -264,6 +266,7 @@ import { formatMoney } from './format_money';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
+import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -271,6 +274,7 @@ import {
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
+import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import type { JailState } from './jail';
 import {
@@ -284,6 +288,7 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from './leaderboard_page';
+import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
@@ -304,6 +309,7 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   mobCombatProfile as mobCombatProfileFn,
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
@@ -313,9 +319,15 @@ import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
-import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
+import {
+  isInertInstanceCorpse,
+  resetEvadingMob as resetEvadingMobFn,
+  updateMob as updateMobFn,
+} from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
+import { applyPlayerDummyVitals } from './mob/practice_dummies';
+import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
   createMobScanCounters,
   type MobScanCounters,
@@ -327,6 +339,7 @@ import {
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
 import type { MobCombatProfile } from './mob_combat';
+import * as moderationMod from './moderation';
 import {
   cancelMountRace as cancelMountRaceImpl,
   mountRaceViewFor as mountRaceViewForImpl,
@@ -786,7 +799,6 @@ import {
 import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
-  crossesGardenHedge,
   groundHeight,
   nearSteepWalls,
   terrainSteepnessAt,
@@ -1517,6 +1529,10 @@ export interface PlayerMeta {
   // so the player can page through and filter the WHOLE market a window at a time.
   // Never persisted, resets on login.
   marketQuery: MarketQuery;
+  // Session-only: the item id the Sell tab wants a current-lowest-listing-price
+  // reference for (issue #3043), or null when nothing is staged. Never
+  // persisted, resets on login, same as marketQuery.
+  sellPriceItemId: string | null;
   // Flat per-craft skill tracking (#1126): one independent, additive-only skill
   // value per craft on the ten-craft ring (see professions/wheel.ts). Persisted
   // in CharacterState.
@@ -1640,6 +1656,10 @@ export interface PlayerMeta {
   activeTitle: string | null;
   activeBorder: string | null;
   renown: number;
+  // NOTE: the operator-applied Cheater mark (src/sim/moderation/) deliberately
+  // keeps NO copy here. Its live aura is the one source of truth for both the
+  // remaining budget and the worn state (the aura IS the countdown), so a second
+  // field would only be a clock that drifts from it.
   // The Reliquary (src/sim/reliquary.ts): sparse first-find meta, authored
   // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
   // this field is omit-empty on serialize and never a second full discovery set.
@@ -1978,6 +1998,8 @@ export class Sim {
   private readonly worldContent: WorldContent;
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
+  /** Civic services that this Sim actually spawned, captured at construction. */
+  readonly civicServicePlacements: readonly CivicServicePlacement[];
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -2292,6 +2314,10 @@ export class Sim {
       assertCanonicalEastbrookNoticeboardDef(definition);
     }
     this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
+    this.civicServicePlacements = buildCivicServicePlacements(
+      this.worldContent.services?.mailboxes ?? [],
+      this.noticeboardDefinitions,
+    );
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -2312,11 +2338,11 @@ export class Sim {
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
+        const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // The one sim-side observer of a lethal fall (hid_fall_death): the
-        // shared pure kernel labels the hit 'Falling' with a null source, and
-        // this wrapper keeps the deed hook out of the kernel both hosts run.
-        if (source === null && ability === 'Falling' && target.kind === 'player' && target.dead) {
+        // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
+        const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
+        if (isPlayerFall && wasAlive && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },
@@ -2386,6 +2412,11 @@ export class Sim {
           );
           mob.facing = 0;
           mob.prevFacing = 0;
+          // A friendly practice dummy simulates a geared level-20 ally, so its
+          // body comes from the reference kit rather than its own template
+          // numbers (which cannot reach the item tables from content/). Pure and
+          // rng-free, like the rest of this branch.
+          if (template.friendlyPracticeTarget) applyPlayerDummyVitals(mob);
           this.addEntity(mob);
           continue;
         }
@@ -2828,6 +2859,11 @@ export class Sim {
       // never re-emits it). Stamped onto the entity so it rides the identity
       // wire (`app`) to every client in view. Opaque to the sim.
       appearance?: Record<string, unknown> | null;
+      // A synthetic participant (Vale Cup showcase/backfill, fiesta practice,
+      // /dev bots): created pre-welcomed so no mail is ever minted for it. Bot
+      // metas are session-only, but their letters would outlive them in the
+      // shared mail book forever (issue #3560).
+      bot?: boolean;
     },
   ): number {
     const savedState = opts?.state
@@ -3011,6 +3047,7 @@ export class Sim {
       // on load too, since savedState carries no mobile-station field.
       mobileStation: null,
       marketQuery: defaultMarketQuery(),
+      sellPriceItemId: null,
       mailWelcomed: false,
       guildLetterSent: false,
       questCadence: new Map(),
@@ -3043,6 +3080,11 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    this.accountCosmetics = accountCosmeticsWithWornMechChroma(
+      this.accountCosmetics,
+      meta.skinCatalog,
+      meta.skin,
+    );
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -3585,10 +3627,11 @@ export class Sim {
     }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
-    // re-entrant save can never double-book the letter.
+    // re-entrant save can never double-book the letter. Bots flip WITHOUT the
+    // send: their letters would sit in the shared mail book forever.
     if (!meta.mailWelcomed) {
       meta.mailWelcomed = true;
-      this.postOffice.sendWelcome(meta);
+      if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
     // Book of Deeds retro-on-join, after the saved state is fully restored:
     // seed the discovery ledger from current holdings, apply the retro
@@ -3618,7 +3661,7 @@ export class Sim {
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean);
+    const pid = this.addPlayer('mage', clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3645,7 +3688,7 @@ export class Sim {
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
   private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
-    const id = this.addPlayer(cls, name);
+    const id = this.addPlayer(cls, name, { bot: true });
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo
@@ -4027,6 +4070,13 @@ export class Sim {
             honorArenaDaily: {
               date: meta.honorArenaDaily.date,
               winsByOpponent: { ...meta.honorArenaDaily.winsByOpponent },
+              // Optional ranked-loss DR window, on the same absent-when-empty
+              // rule as the battleground one below: a day with no paying loss
+              // writes nothing, so pre-loss-award saves stay byte-equal.
+              ...(meta.honorArenaDaily.lossesByOpponent &&
+              Object.keys(meta.honorArenaDaily.lossesByOpponent).length > 0
+                ? { lossesByOpponent: { ...meta.honorArenaDaily.lossesByOpponent } }
+                : {}),
               fiestaCompletionsByOpponent: {
                 ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
               },
@@ -4614,25 +4664,20 @@ export class Sim {
     return { type: 'mechChroma', chromaId };
   }
 
+  /** Take the mech chroma off the resolved player's own current appearance,
+   *  reverting to the class body. The account-wide unlock
+   *  (accountCosmetics.mechChromaIds) is permanent, exactly like a purchased
+   *  Season 1 Armory weapon skin: this only changes what is CURRENTLY
+   *  displayed, never revokes ownership, so any character on the account can
+   *  freely re-select it later via changeSkin with no item involved. */
   unequipMechChroma(chromaId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
     const skin = mechChromaSkinIndex(chromaId);
-    const itemId = mechChromaItemId(chromaId);
-    if (skin < 0 || !itemId) return false;
-    if (!this.accountCosmetics.mechChromaIds.includes(chromaId)) return false;
-    this.accountCosmetics = {
-      ...this.accountCosmetics,
-      mechChromaIds: this.accountCosmetics.mechChromaIds.filter((id) => id !== chromaId),
-    };
-    for (const meta of this.players.values()) {
-      if (meta.skinCatalog === 'mech' && meta.skin === skin) {
-        this.setPlayerSkin(meta.entityId, 0, 'class');
-      }
-    }
-    // movement: unequipping a mech chroma re-grants the very item equipping it
-    // consumed, so this relocates a copy the account already owns.
-    this.addItem(itemId, 1, r.meta.entityId, MOVEMENT_GRANT);
+    if (skin < 0) return false;
+    const { meta } = r;
+    if (meta.skinCatalog !== 'mech' || meta.skin !== skin) return false;
+    this.setPlayerSkin(meta.entityId, 0, 'class');
     return true;
   }
 
@@ -4760,31 +4805,10 @@ export class Sim {
     return Promise.resolve(paginateDeedsLeaderboard([], page, pageSize));
   }
 
+  // The offline constant readout (#1307) lives in daily_rewards_stub.ts, the
+  // one file the $WOC token firewall allows to name chain vocabulary.
   dailyRewards(): Promise<DailyRewardStatus> {
-    const day = '1970-01-01';
-    return Promise.resolve({
-      enabled: true,
-      day,
-      resetAt: '1970-01-02T00:00:00.000Z',
-      prizePoolUsd: 0,
-      prizePoolSol: null,
-      eligibility: {
-        eligible: false,
-        reason: 'no_wallet',
-        banReason: null,
-        walletPubkey: null,
-        wocBalance: null,
-        wocUsdPrice: null,
-        usdValue: null,
-        minUsd: 20,
-      },
-      score: 0,
-      rank: null,
-      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: [],
-      leaderboard: [],
-      leaderboardTotal: 0,
-    });
+    return dailyRewardsStub();
   }
 
   dailyRewardLeaderboard(
@@ -5821,6 +5845,60 @@ export class Sim {
     if (r) r.e.jailed = enabled;
   }
 
+  // Apply, refresh, or lift the operator-applied Cheater mark. Server-side only:
+  // set at join restore and when an operator changes a sanction; the offline Sim
+  // never calls it. `seconds` is the remaining PLAYED-second budget; 0 lifts.
+  //
+  // The aura is the countdown (one second in world is one second of /played), so
+  // applying the mark and applying its aura are the same act. Both arms go through
+  // the ORDINARY aura paths rather than hand-editing the array, so a parse or a
+  // combat log sees the same events any other aura produces:
+  //  - apply/re-apply: applyAura already treats a same-id same-name re-application
+  //    as a refresh (it displaces the live aura in place and stamps `refresh` on
+  //    the gained event), so a shortened or extended sanction takes effect
+  //    immediately without pre-empting that with a manual splice.
+  //  - lift: remove the live aura and emit its fade, exactly as every other
+  //    removal path does. Without it the tag simply vanished from the client with
+  //    no combat-log trace.
+  // The wire flag is absent-when-empty in both arms and at natural expiry
+  // (combat/auras.ts), never `false`.
+  setCheaterMark(seconds: number, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    // Garbage in, no-op out: normalize collapses NaN and non-numbers to 0, and
+    // 0 is the LIFT arm, so without this guard a corrupt budget from any caller
+    // would silently end a live sanction. Only an explicit finite value may
+    // lift; anything else leaves the mark exactly as it stands.
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds)) return;
+    const mark = moderationMod.normalizeCheaterMark(seconds);
+    if (mark) {
+      this.ctx.applyAura(r.e, moderationMod.cheaterMarkAura(mark, r.e.id));
+      // Derive the flag from the POST-CONDITION, not from the intent. No
+      // applyAura guard can refuse this aura today (they gate on npc/mob kinds,
+      // or on control kinds from a foreign source, and the mark is inert and
+      // self-sourced), but an intent-set flag would survive one of them
+      // widening, and the result is a tag with no countdown: the natural-expiry
+      // hook cannot fire without an aura, so only an operator lift would clear
+      // it. Reading back costs one scan on an operator action, never per tick.
+      r.e.cheaterMark =
+        r.e.auras.some((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID) || undefined;
+      return;
+    }
+    const live = r.e.auras.findIndex((a) => a.id === moderationMod.CHEATER_MARK_AURA_ID);
+    if (live >= 0) {
+      const [lifted] = r.e.auras.splice(live, 1);
+      this.emit({
+        type: 'aura',
+        targetId: r.e.id,
+        name: lifted.name,
+        gained: false,
+        sourceId: lifted.sourceId,
+        abilityId: lifted.id,
+      });
+    }
+    r.e.cheaterMark = undefined;
+  }
+
   // Dev/test convenience: jump a player to a level (learns abilities, recalcs stats).
   setPlayerLevel(level: number, pid?: number): void {
     const r = this.resolve(pid);
@@ -6309,14 +6387,25 @@ export class Sim {
   private shouldSkipIdleMobTick(mob: Entity): boolean {
     const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (
-      mob.dead ||
+    if (mob.dead) {
+      // Instance corpse fields (a cleared rift floor's packs) never decay or
+      // respawn, so once every dead-branch effect is provably spent the corpse
+      // stops paying updateMob. Radius-gated like the live cull: the radius is
+      // the interest-drop radius, so a skipped corpse is outside every
+      // player's replicated view EXCEPT a viewer's own target (targets get
+      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
+      // frozen fields are two timers nothing serializes, and any change to
+      // that must re-check this exception. Dead mobs draw no rng, so the skip
+      // cannot shift the shared draw order.
+      if (!isInertInstanceCorpse(mob)) return false;
+    } else if (
       mob.ownerId !== null ||
       mob.aiState !== 'idle' ||
       mob.inCombat ||
       mob.auras.length > 0
-    )
+    ) {
       return false;
+    }
     if (this.players.size === 0) return true;
     return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
@@ -6346,7 +6435,16 @@ export class Sim {
     const aura = this.fearAura(e);
     if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
       return false;
-    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    let angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    // Player-only wall guard (combat/fear_steering.ts): redirect the flee heading
+    // away from a wall it is about to run into, and remember the new heading on the
+    // aura so it holds until the next wall. Feared mobs keep their untouched
+    // movement (and the parity draw order with it), matching the vertical snap's
+    // player-only scoping.
+    if (e.kind === 'player') {
+      angle = steerFearFromWalls(this.ctx, e, angle);
+      aura.value = angle;
+    }
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
     return true;
@@ -6433,6 +6531,9 @@ export class Sim {
         reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
       else if (a.kind === 'faerie_fire')
         reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
+      // Melting Acid carries its own fraction on the aura (0.05), so a future
+      // rank or talent scales the value rather than a constant here.
+      else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);
     }
     return Math.max(0, armor * (1 - reductionPct));
   }
@@ -6454,14 +6555,7 @@ export class Sim {
 
   private petDamageMult(e: Entity): number {
     if (e.ownerId === null) return 1;
-    let mult = 1;
-    for (const a of e.auras) {
-      if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
-    }
-    const ownerMeta = this.players.get(e.ownerId);
-    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
-    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
-    return mult;
+    return hunterPetDamageMultiplier(this.ctx, e);
   }
 
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
@@ -6888,15 +6982,23 @@ export class Sim {
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
-    const run =
-      this.delveRunForMob(source.id) ??
-      this.delveRunForMob(target.id) ??
-      this.delveRunForPlayer(source.id) ??
-      this.delveRunForPlayer(target.id);
-    return lineOfSightClear(
+    // The delve-run lookup is O(active runs x mobs per run) and allocates a
+    // party key per call, and this method sits on every ranged auto-attack,
+    // AoE pulse, and LOS-gated cast. Only a sight line with an endpoint
+    // inside the delve band can ever consume run.modules (the collider LOS
+    // delve arm keys off from.x), so every other combat sight check skips
+    // all four lookups. Mirrors the movement path's isDelvePos guard.
+    const inDelve = isDelvePos(source.pos.x) || isDelvePos(target.pos.x);
+    const run = inDelve
+      ? (this.delveRunForMob(source.id) ??
+        this.delveRunForMob(target.id) ??
+        this.delveRunForPlayer(source.id) ??
+        this.delveRunForPlayer(target.id))
+      : undefined;
+    return entityLineOfSightClear(
       this.cfg.seed,
-      source.pos,
-      target.pos,
+      source,
+      target,
       0.05,
       run?.modules,
       this.riftCollisionToken,
@@ -7341,7 +7443,12 @@ export class Sim {
 
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
   // the top of the table, and forces the mob onto the caster for 3 seconds.
-  private applyTaunt(p: Entity, mob: Entity): void {
+  private applyTaunt(p: Entity, mob: Entity): boolean {
+    // The one shared taunt entry (single-target, area, hunter/warlock pet growl,
+    // necromancy undead): a quest-gated mob must stay untouchable in this direction
+    // too, or an area taunt swept over a hidden Broodmother egg would still seed
+    // threat/forcedTargetId and force it into combat with a non-quester.
+    if (questGateBlocksAggro(this.players, mob, p)) return false;
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
@@ -7351,11 +7458,11 @@ export class Sim {
     // aggroed it permanently and pinned the attacker in combat forever.
     if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
       this.enterCombat(p, mob);
-      return;
+      return true;
     }
     if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
       this.enterCombat(p, mob);
-      return;
+      return true;
     }
     mob.forcedTargetId = p.id;
     mob.forcedTargetTimer = TAUNT_FORCE_SECONDS;
@@ -7368,6 +7475,7 @@ export class Sim {
       mob.fleeReturnTimer = 0;
     }
     this.enterCombat(p, mob);
+    return true;
   }
 
   // -------------------------------------------------------------------------
@@ -7581,7 +7689,8 @@ export class Sim {
     );
   }
 
-  private enterCombat(a: Entity, b: Entity): void {
+  private enterCombat(a: Entity, b: Entity): boolean {
+    if (questGateBlocksCombat(this.players, a, b)) return false;
     a.combatTimer = 0;
     b.combatTimer = 0;
     a.inCombat = true;
@@ -7609,6 +7718,7 @@ export class Sim {
     ) {
       this.aggroMob(a, b, false);
     }
+    return true;
   }
 
   private handleDeath(e: Entity, killer: Entity | null, killerAbility?: string | null): void {
@@ -7743,7 +7853,7 @@ export class Sim {
     return mobCombatProfileFn(mob);
   }
 
-  aggroMob(mob: Entity, target: Entity, social: boolean): void {
+  aggroMob(mob: Entity, target: Entity, social: boolean): boolean {
     if (
       mob.dead ||
       mob.aiState === 'evade' ||
@@ -7751,7 +7861,10 @@ export class Sim {
       mob.aiState === 'attack' ||
       mob.aiState === 'flee'
     )
-      return;
+      return false;
+    // A quest-gated destructible (e.g. a Broodmother egg) never autonomously pulls a
+    // player its own damage gate would refuse: see mob/quest_gated_aggro.ts.
+    if (questGateBlocksAggro(this.players, mob, target)) return false;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;
@@ -7803,6 +7916,7 @@ export class Sim {
         }
       });
     }
+    return true;
   }
 
   private updateMob(mob: Entity): void {
@@ -7899,9 +8013,10 @@ export class Sim {
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
     // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
-    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    // committed tank just never suffers it from a HOSTILE creature; a player
+    // pet sharing this swing shell keeps its crit (combat/tank_crit_immunity.ts).
     const critRoll = this.rng.chance(0.05);
-    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
+    const crit = critRoll && !isCritImmuneTank(mob, target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -8108,12 +8223,13 @@ export class Sim {
           h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
         if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
-      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       // The Great Maze's hedge walls are hard for mobs too (the maze patrol
-      // knights pace their dead ends instead of drifting through a hedge);
-      // crossesGardenHedge fast-rejects outside the maze, so the open-world
-      // fan pays two comparisons.
-      if (crossesGardenHedge(e.pos.x, e.pos.z, r.x, r.z)) continue;
+      // knights pace their dead ends instead of drifting through a hedge).
+      // resolveMovePoint now does that on its own: the hedges are real collider
+      // boxes, so this no longer needs its own segment test, and keeping one
+      // would reject every candidate for a body that ever ended up inside a
+      // hedge, leaving it stuck instead of letting the push-out carry it clear.
+      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
       if (progress > bestProgress) {
         bestProgress = progress;
@@ -8885,6 +9001,17 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
+  // The broker custody pair (extraction into escrow, grant back) lives in
+  // broker_custody.ts; these stay as the delegates server/woc_market_custody.ts
+  // resolves on the Sim facade.
+  extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
+    return extractTradableCopyImpl(this.ctx, pid, ref);
+  }
+
+  grantTradableCopy(pid: number | undefined, slot: InvSlot): boolean {
+    return grantTradableCopyImpl(this.ctx, pid, slot);
+  }
+
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible
   // stack counts, and so does an instanced copy that is not itself already
   // enchanted (e.g. crafting.ts's single-copy rare+ grant or a
@@ -8996,6 +9123,17 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     items.discardItem(this.ctx, itemId, count, pid, named);
+  }
+
+  setItemLocked(
+    itemId: string,
+    locked: boolean,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    setItemLockedCmd(this.ctx, itemId, locked, pid, named);
   }
 
   equipItem(
@@ -10218,7 +10356,7 @@ export class Sim {
         if (!taken) break;
         name = `${baseName}${n}`;
       }
-      const botPid = this.addPlayer(cls, name);
+      const botPid = this.addPlayer(cls, name, { bot: true });
       const meta = this.players.get(botPid);
       if (meta) meta.isDevBot = true;
       spawnSeq++;
@@ -10401,11 +10539,15 @@ export class Sim {
     duelMod.updateDuels(this.ctx);
   }
 
-  private clearAurasFromSource(target: Entity, sourceId: number): void {
+  private clearAurasFromSource(
+    target: Entity,
+    sourceId: number,
+    shouldClear?: (aura: Aura) => boolean,
+  ): void {
     let statsDirty = false;
     for (let i = target.auras.length - 1; i >= 0; i--) {
       const a = target.auras[i];
-      if (a.sourceId !== sourceId) continue;
+      if (a.sourceId !== sourceId || (shouldClear && !shouldClear(a))) continue;
       target.auras.splice(i, 1);
       this.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
       if (a.kind.startsWith('buff') || a.kind.startsWith('form')) statsDirty = true;
@@ -11007,6 +11149,10 @@ export class Sim {
     tradeMod.tradeCancel(this.ctx, pid);
   }
 
+  tradeClose(pid?: number): void {
+    tradeMod.tradeClose(this.ctx, pid);
+  }
+
   // offerCovered / closeTrade are module-internal in social/trade.ts now (no Sim
   // delegate; only the moved trade methods used them).
 
@@ -11172,6 +11318,10 @@ export class Sim {
     this.market.marketSearch(query, pid);
   }
 
+  marketSellPriceCheck(itemId: string | null, pid?: number): void {
+    this.market.marketSellPriceCheck(itemId, pid);
+  }
+
   marketList(itemId: string, count: number, price: number, pid?: number): void {
     this.market.marketList(itemId, count, price, pid);
   }
@@ -11275,6 +11425,22 @@ export class Sim {
   // mailInfoFor rebuild. Null while the player is not at a raven pillar.
   mailRevFor(pid: number): number | null {
     return this.postOffice.mailRevFor(pid);
+  }
+
+  // Custody mail (the server's $WOC Exchange escrow returns and deliveries):
+  // thin delegates so a foreign caller resolves these on the Sim facade like
+  // every other mail entry, instead of reaching into sim.postOffice directly.
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: import('./content/letters').LetterDef,
+    items: InvSlot[],
+    custodyRef?: string,
+  ): boolean {
+    return this.postOffice.mailSystemParcel(recipient, letter, items, custodyRef);
+  }
+
+  hasCustodyParcel(custodyRef: string): boolean {
+    return this.postOffice.hasCustodyParcel(custodyRef);
   }
 
   mailUnreadFor(pid: number): number {
@@ -11781,10 +11947,6 @@ export class Sim {
 
   private grantDelveClearTo(run: DelveRun, delve: DelveDef, meta: PlayerMeta, pid: number): void {
     runsMod.grantDelveClearTo(this.ctx, run, delve, meta, pid);
-  }
-
-  private grantDelveRewards(run: DelveRun): void {
-    runsMod.grantDelveRewards(this.ctx, run);
   }
 
   private openDelveSurfaceExit(run: DelveRun): void {

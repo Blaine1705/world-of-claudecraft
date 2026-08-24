@@ -48,6 +48,14 @@ import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
+import {
+  newPropCullPass,
+  type PropCullBounds,
+  type PropCullRevealState,
+  propCullKey,
+  propRevealRoots,
+  updatePropCullables,
+} from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
 import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
@@ -90,15 +98,29 @@ export interface PropsResult {
     reducedMotion?: boolean,
   ): void;
   /**
-   * First-reveal compile gating for the far-cell bakes (hitch-hunt P3a): a
-   * cell's first drawn far swap is held in the pixel-identical near
-   * representation until the gate warms its key. No gate keeps the immediate
-   * flip (tests, renderers without async compile; the editor viewport
-   * composes the real Renderer and is therefore gated too).
+   * First-reveal compile gating (hitch-hunt P3a): a far cell's first drawn
+   * far swap is held in the pixel-identical near representation until the
+   * gate warms the key, and its first near flip back, once that bake was
+   * proven, holds on the bake until the `<key>:near` key warms the members'
+   * own programs (prop_cell_core). No gate keeps the immediate flip (tests,
+   * renderers without async compile; the editor viewport composes the real
+   * Renderer and is therefore gated too).
    */
-  setFarCellRevealGate(gate: RevealGateCore | null): void;
-  /** The compile roots behind a far-cell gate key (that cell's bake meshes). */
-  farCellRevealRoots(key: string): readonly THREE.Object3D[];
+  setRevealGate(gate: RevealGateCore | null): void;
+  /**
+   * The same gate for the merged and instanced BANDS: a band's first fog
+   * reveal on a walking approach is held hidden until the gate warms its key
+   * (prop_cull_core). Installed at the start of every scene prewarm, including
+   * graphics rebuilds. The initial-entry first-paint barrier keeps its work
+   * behind the manifest; rebuild prewarms have no barrier and preserve the
+   * historical immediate compile start. Without a gate, a band keeps the
+   * historical immediate cull and latches as revealed.
+   */
+  setBandRevealGate(gate: RevealGateCore | null): void;
+  /** The compile roots behind a gate key: a far cell's bake meshes, its
+   *  members' groups behind the cell's `:near` key, or the one band behind a
+   *  cullable key. */
+  revealRoots(key: string): readonly THREE.Object3D[];
 }
 
 const mergeBandDepth = (): number => (GFX.standardMaterials ? 180 : 90);
@@ -213,6 +235,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexMarket: { url: '/models/biome/hex_market.glb', kit: 'khex' },
   hexWatchtower: { url: '/models/biome/hex_watchtower.glb', kit: 'khex' },
   hexCannonTower: { url: '/models/biome/hex_tower_cannon.glb', kit: 'khex' },
+  hexTowerCatapult: { url: '/models/biome/hex_tower_catapult.glb', kit: 'khex' },
   hexBarracks: { url: '/models/biome/hex_barracks.glb', kit: 'khex' },
   hexCannonballs: { url: '/models/biome/hex_cannonballs.glb', kit: 'khex' },
   hexLumber: { url: '/models/biome/hex_lumber.glb', kit: 'khex' },
@@ -308,6 +331,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kcasBannerRedA: { url: '/models/biome/kcas_banner_red_a.glb', kit: 'kcas' },
   kcasBannerRedShield: { url: '/models/biome/kcas_banner_red_shield.glb', kit: 'kcas' },
   kcasBannerRedTriple: { url: '/models/biome/kcas_banner_red_triple.glb', kit: 'kcas' },
+  // the green colorway for Dawnhold (already-shipped dungeon-kit exports)
+  kcasBannerGreenA: { url: '/models/dungeon/banner_green.glb', kit: 'kcas' },
+  kcasBannerGreenShield: { url: '/models/dungeon/banner_shield_green.glb', kit: 'kcas' },
+  kcasBannerGreenTriple: { url: '/models/dungeon/banner_triple_green.glb', kit: 'kcas' },
   kcasTorch: { url: '/models/biome/kcas_torch.glb', kit: 'kcas' },
   kcasTorchMounted: { url: '/models/biome/kcas_torch_mounted.glb', kit: 'kcas' },
   kcasRubbleLarge: { url: '/models/biome/kcas_rubble_large.glb', kit: 'kcas' },
@@ -333,6 +360,8 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kcasBedroll: { url: '/models/dungeon/bed_floor.glb', kit: 'kcas' },
   kcasChair: { url: '/models/dungeon/chair.glb', kit: 'kcas' },
   kcasStool: { url: '/models/dungeon/stool.glb', kit: 'kcas' },
+  kcasStoolRound: { url: '/models/dungeon/stool_round.glb', kit: 'kcas' },
+  kcasChest: { url: '/models/dungeon/chest.glb', kit: 'kcas' },
   kcasTableRoundSmall: { url: '/models/dungeon/table_round_small.glb', kit: 'kcas' },
   kcasTableRoundMedium: { url: '/models/dungeon/table_round_medium.glb', kit: 'kcas' },
   // NOTE: the laid feast table (table_long_tablecloth_decorated_a) is already
@@ -2271,8 +2300,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       im.computeBoundingSphere();
       im.computeBoundingBox();
       group.add(im);
-      const bounds = cullableBounds(im, im.boundingBox, im.boundingSphere);
-      if (bounds) cullables.push(bounds);
+      pushCullable(cullables, im, im.boundingBox, im.boundingSphere);
     }
   }
 
@@ -2282,8 +2310,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   for (const p of delvePortals) keep.add(p); // shader-driven void: keep its transparency/renderOrder
   const staticMeshes = mergeStaticMeshes(group, keep);
   for (const sm of staticMeshes) {
-    const bounds = cullableBounds(sm, sm.geometry.boundingBox, sm.geometry.boundingSphere);
-    if (bounds) cullables.push(bounds);
+    pushCullable(cullables, sm, sm.geometry.boundingBox, sm.geometry.boundingSphere);
   }
 
   // Far-cell merged bakes for the hideables (dual representation): identical
@@ -2295,18 +2322,24 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // win matters most on the desktop tiers.
   const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
   const farCellsByKey = new Map(farCells.map((cell) => [cell.key, cell]));
-  let farCellRevealGate: RevealGateCore | null = null;
+  const cullablesByKey = new Map(cullables.map((cullable) => [cullable.key, cullable]));
+  const cullPass = newPropCullPass();
+  let revealGate: RevealGateCore | null = null;
+  let bandRevealGate: RevealGateCore | null = null;
 
   return {
     group,
     flames,
     windmillFans,
     fireLights,
-    setFarCellRevealGate(gate: RevealGateCore | null): void {
-      farCellRevealGate = gate;
+    setRevealGate(gate: RevealGateCore | null): void {
+      revealGate = gate;
     },
-    farCellRevealRoots(key: string): readonly THREE.Object3D[] {
-      return farCellsByKey.get(key)?.meshes ?? [];
+    setBandRevealGate(gate: RevealGateCore | null): void {
+      bandRevealGate = gate;
+    },
+    revealRoots(key: string): readonly THREE.Object3D[] {
+      return propRevealRoots<THREE.Object3D>(farCellsByKey, cullablesByKey, key);
     },
     update(
       camX: number,
@@ -2320,17 +2353,27 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       reducedMotion = false,
     ): void {
       const fogFarSq = fogFar * fogFar;
-      for (let i = 0; i < cullables.length; i++) {
-        const c = cullables[i];
-        c.obj.visible = cullableVisible(c, camX, camZ, fogFar, fogFarSq);
-      }
+      // Band fog cull (prop_cull_core): a band's first reveal on a walking
+      // approach holds until the gate has linked its programs, and an arrival
+      // among the bands holds too, with its compiles submitted at the imminent
+      // priority and, on a frame where several bands escape at once, nearest
+      // to the camera first.
+      updatePropCullables(cullables, camX, camZ, fogFar, fogFarSq, bandRevealGate, cullPass);
       // Far-cell swap first (prop_cell_core): distant cells draw their merged
       // bake and suppress the members' individual baked meshes; near cells
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        updatePropCell(cell, camX, camZ, fogFar, undefined, farCellRevealGate);
+        updatePropCell(cell, camX, camZ, fogFar, undefined, revealGate);
       }
+      // Deliberately NO first-sight reveal gate here (unlike the bands): tried
+      // and reverted. Gating each hideable's first fog reveal put 116 keys and
+      // their pieces into the reveal pipeline at once on the Eastbrook ride
+      // (all imminent), the iGPU could not settle them inside the watchdog,
+      // and the buildings stayed hidden 10 s then drew cold anyway. The
+      // unique-material case (a kit only one building carries) is covered by
+      // the far cell's near-flip hold instead (prop_cell_core `:near` key,
+      // a handful of keys with the proven bake as the stand-in).
       for (let i = 0; i < hideables.length; i++) {
         const h = hideables[i];
         const dx = camX - h.x,
@@ -2552,20 +2595,25 @@ function cameraSegmentHitsFootprint(
   return eyeY + (camY - eyeY) * t < h.topY;
 }
 
-interface PropCullable {
+interface PropCullable extends PropCullBounds, PropCullRevealState {
   obj: THREE.Object3D;
-  hasBox: boolean;
-  minX: number;
-  maxX: number;
-  minZ: number;
-  maxZ: number;
-  cx: number;
-  cz: number;
-  r: number;
+}
+
+/** Mints the cullable's reveal-gate key from its slot: stable for the
+ *  view's lifetime, and never colliding with the far-cell grid keys. */
+function pushCullable(
+  cullables: PropCullable[],
+  obj: THREE.Object3D,
+  box: THREE.Box3 | null,
+  sphere: THREE.Sphere | null,
+): void {
+  const bounds = cullableBounds(obj, propCullKey(cullables.length), box, sphere);
+  if (bounds) cullables.push(bounds);
 }
 
 function cullableBounds(
   obj: THREE.Object3D,
+  key: string,
   box: THREE.Box3 | null,
   sphere: THREE.Sphere | null,
 ): PropCullable | undefined {
@@ -2573,6 +2621,9 @@ function cullableBounds(
     const fallback = sphere ?? box.getBoundingSphere(new THREE.Sphere());
     return {
       obj,
+      key,
+      revealed: false,
+      held: false,
       hasBox: true,
       minX: box.min.x,
       maxX: box.max.x,
@@ -2586,6 +2637,9 @@ function cullableBounds(
   if (!sphere) return undefined;
   return {
     obj,
+    key,
+    revealed: false,
+    held: false,
     hasBox: false,
     minX: sphere.center.x - sphere.radius,
     maxX: sphere.center.x + sphere.radius,
@@ -2595,23 +2649,6 @@ function cullableBounds(
     cz: sphere.center.z,
     r: sphere.radius,
   };
-}
-
-function cullableVisible(
-  c: PropCullable,
-  camX: number,
-  camZ: number,
-  fogFar: number,
-  fogFarSq: number,
-): boolean {
-  const dx = camX < c.minX ? c.minX - camX : camX > c.maxX ? camX - c.maxX : 0;
-  const dz = camZ < c.minZ ? c.minZ - camZ : camZ > c.maxZ ? camZ - c.maxZ : 0;
-  if (dx * dx + dz * dz < fogFarSq) return true;
-  if (c.hasBox) return false;
-  const centerDx = c.cx - camX;
-  const centerDz = c.cz - camZ;
-  const reach = fogFar + c.r;
-  return centerDx * centerDx + centerDz * centerDz < reach * reach;
 }
 
 // Far-cell merged bakes for the camera-ghost hideables (dual representation,
@@ -2695,8 +2732,11 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
       geo.computeBoundingBox();
       geo.computeBoundingSphere();
       // Single-instance so the count gate below can skip the color pass
-      // per frame without touching visibility (three's instanced draw path
-      // is a free no-op at count 0).
+      // per frame without touching visibility. Free ONLY because the repo's
+      // three patch keeps a count 0 InstancedMesh out of the render list:
+      // upstream still reached setProgram and linked the bake's colour
+      // program for zero pixels (2.3 s of cold links right after the curtain
+      // on the iGPU, bench batch 17; patches/three@0.185.1.patch).
       const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
       mesh.name = `far-bake:${cellKey}`;
       mesh.setMatrixAt(0, new THREE.Matrix4());

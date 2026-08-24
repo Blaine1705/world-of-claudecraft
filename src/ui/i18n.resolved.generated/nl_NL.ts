@@ -482,6 +482,88 @@ export const nl_NL: EnTranslations = {
         "bannedUntil": "Je bent nog {remaining} uitgesloten van dagelijkse beloningen. De toegang wordt hersteld op {until}. Reden: {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "WOC-winkel",
       "close": "WOC-winkel sluiten",
@@ -734,6 +816,9 @@ export const nl_NL: EnTranslations = {
       "showAmounts": "Toon alle Claudium-bedragen",
       "hideAmounts": "Verberg extra Claudium-bedragen",
       "skuRow": "{usd} voor {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Kopen",
       "buyUnavailable": "Aankoop is momenteel niet mogelijk.",
       "storeTitle": "Cosmetische winkel",
@@ -802,9 +887,9 @@ export const nl_NL: EnTranslations = {
       "note": "Sleep de chattabbladstrook om het venster te verplaatsen, of de hoekgreep om het te vergroten of verkleinen. Resetten zet het terug naar de standaardpositie en -grootte."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limiet voor de algemene chat bereikt. Probeer het over {seconds} opnieuw.",
+      "pending": "Je vorige bericht in de algemene chat wordt nog verzonden. Probeer het zo meteen opnieuw.",
+      "unavailable": "De algemene chat is tijdelijk niet beschikbaar. Probeer het binnenkort opnieuw."
     },
     "swing": {
       "ready": "Slag",
@@ -853,6 +938,7 @@ export const nl_NL: EnTranslations = {
       "jump": "Springen",
       "leaderboard": "Ranglijst",
       "dailyRewards": "Winkel",
+      "wocMarket": "Exchange",
       "deeds": "Daden",
       "mounts": "Rijdieren",
       "professions": "Beroepen",
@@ -866,11 +952,52 @@ export const nl_NL: EnTranslations = {
       "actionRing": "Gevechtsacties",
       "actionPageToggle": "Actiepagina wisselen",
       "actionPageIndicator": "Pag. {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Wissel van doel",
       "targetCycleShort": "Doel",
       "spellbookPageLabel": "Pagina {page}",
       "hideKeyboard": "Toetsenbord verbergen",
-      "chatPlaceholder": "Zeg iets..."
+      "chatPlaceholder": "Zeg iets...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Gebruik de bewegingsstick om te bewegen en sleep over het scherm om rond te kijken. Zet een paar stappen om te beginnen.",
@@ -953,6 +1080,22 @@ export const nl_NL: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "De keldergewelven",
+        "state": "De staatsieverdieping",
+        "residence": "De woonverdieping",
+        "tower": "De wachttoren"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "De tuinverdieping",
+        "solar": "De zonnekamer"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NO",
@@ -970,6 +1113,7 @@ export const nl_NL: EnTranslations = {
       "seconds": "{s}s",
       "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht.",
       "threatFallback": "Geen actieve dreiging: toont schade aan {name}",
+      "threatFrozen": "Einddreiging tegen {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Overig ({count})",
@@ -1367,6 +1511,10 @@ export const nl_NL: EnTranslations = {
       "showWalletOnCharacterScreen": "Portemonnee tonen op personagescherm",
       "showWalletOnPlayerCard": "Portemonnee tonen op spelerskaart",
       "showPlaytime": "Speeltijd tonen op personagescherm",
+      "forceHighPerfGpu": "Toegewijde game-GPU gebruiken",
+      "forceHighPerfGpuNote": "Standaard aan: de desktop-app vraagt deze computer om zijn toegewijde game-GPU. Zet dit uit als het spel niet opstart of met een zwart scherm opent, of als het laptopscherm leeg blijft. Wordt toegepast bij de volgende start van het spel.",
+      "discordPresence": "Discord-activiteit",
+      "discordPresenceNote": "Toont de zone waarin je je bevindt en hoelang je deze sessie al speelt als je Discord-activiteit, en iedereen die je Discord-profiel kan zien, kan beide zien. Alleen de zonenaam, je sessietijd en het spel worden gedeeld, nooit je personage, je account, of met wie je speelt. Vereist dat de Discord-app op deze computer actief is.",
       "showDevBadges": "Ontwikkelaarsinsignes tonen",
       "showOwnNameplate": "Mijn naambordje tonen",
       "showPlayerNameplates": "Spelersnamen Tonen",
@@ -1382,6 +1530,7 @@ export const nl_NL: EnTranslations = {
       "mouseoverCast": "Mouseover-bezwering op groepsframes",
       "stickyTarget": "Doel behouden bij klikken op de grond",
       "showItemLevel": "Itemniveau tonen",
+      "showReliquaryTracker": "Toon Relikwieëntracker",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
@@ -1394,7 +1543,9 @@ export const nl_NL: EnTranslations = {
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
-      "mobileLeftHanded": "Linkshandige indeling"
+      "mobileLeftHanded": "Linkshandige indeling",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Keuzes",
@@ -1427,9 +1578,29 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
+      "confirmAction": "Bevestig / Selecteer",
       "zoomIn": "Inzoomen",
       "zoomOut": "Uitzoomen",
-      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
+      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken.",
+      "crossHotbar": "Steek Hotbar over",
+      "crossHotbarEnable": "Cross-hotbar inschakelen",
+      "crossHotbarExpand": "Dubbele Cross-hotbar",
+      "crossHotbarHelp": "Houd een trekker ingedrukt om acht actiebalkgleuven op de d-pad en gezichtsknoppen te laten oplichten. Tik op de andere trigger om naar de tweede set te wisselen.",
+      "crossHotbarResetLayout": "Cross-hotbar opnieuw instellen",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "De triggers en de d-pad behoren tot de cross-hotbar terwijl deze is ingeschakeld, dus ze zijn hieronder ingesteld in plaats van hier.",
+      "cancelAction": "Annuleren / Terug",
+      "subcommandsAction": "Subopdrachten / Kaart",
+      "cycleHudAction": "Cyclusinterface",
+      "cycleSetAction": "Hotbar-set wijzigen",
+      "crossHotbarDisplay": "Barweergave",
+      "crossHotbarDisplayFull": "Vol",
+      "crossHotbarDisplayCompact": "Compact",
+      "crossHotbarDisplayMinimal": "Alleen tijdens het vasthouden",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "{action} dragen: bevestig op een cel om deze te plaatsen, annuleer om deze terug te plaatsen.",
+      "crossHotbarEditHint": "Schikken: bevestig het ophalen van een cel of het spreukenboek en laat het op een cel vallen, annuleren wist er één.",
+      "crossHotbarEditHelp": "Houd de linkerbumper vast en druk op de bovenste gezichtsknop om de balk met de controller te rangschikken."
     },
     "perf": {
       "title": "Prestatie-overlay",
@@ -1548,6 +1719,7 @@ export const nl_NL: EnTranslations = {
           "render": "render  submit {submit} ms | wereld {world} ms | entiteiten {entities} ms",
           "scene": "scène   {calls} calls | {triangles} tris | {views} weergaven",
           "hitches": "haperingen {hitches} | shaders {shaders} | uploads {uploads} | weergaven {views}",
+          "hitchesBuild": "zonebuilds {zoneBuilds} | buiten beeld {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "wachtend"
         },
@@ -1599,7 +1771,10 @@ export const nl_NL: EnTranslations = {
             "eventCpu": "Gebeurtenisverwerking verbruikt het frame",
             "shaderCompile": "Shaders worden gecompileerd tijdens het spelen",
             "textureUpload": "Textuur-uploads veroorzaken haperingen tijdens het spelen",
+            "zoneBuild": "Zonestreaming-builds veroorzaken haperingen",
             "viewCreate": "Het aanmaken van entiteitweergaven veroorzaakt haperingen",
+            "gcHitch": "De afvalinzameling vindt plaats in lange frames",
+            "offFrameHitch": "Lange frames komen van werk buiten de render-callback",
             "otherHitch": "Er blijven niet-toegewezen lange frames over",
             "assetStartup": "Het opstarten van het spel wordt vertraagd door assetwerk",
             "longTasks": "Lange browsertaken blokkeren frames",
@@ -1739,6 +1914,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughHonor": "Niet genoeg eer.",
       "reasons": {
         "arenaWin": "Arena-overwinning",
+        "arenaComplete": "arenagevecht uitgevochten",
         "fiestaKill": "Fiesta-uitschakeling",
         "fiestaComplete": "Fiesta voltooid",
         "fiestaWin": "Fiesta-overwinning",
@@ -1845,6 +2021,7 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
+    "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",
     "itemUniqueEquipped": "Uniek-Uitgerust",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const nl_NL: EnTranslations = {
         "few": "je bent {rank}, {count} leden",
         "many": "je bent {rank}, {count} leden",
         "other": "je bent {rank}, {count} leden"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} speler",
@@ -2016,6 +2205,10 @@ export const nl_NL: EnTranslations = {
       "errPasswordLong": "Het nieuwe wachtwoord mag hoogstens 128 tekens lang zijn.",
       "errPasswordUnchanged": "Het nieuwe wachtwoord moet verschillen van het huidige.",
       "errPasswordConfirm": "De nieuwe wachtwoorden komen niet overeen.",
+      "setPasswordTitle": "Stel een wachtwoord in",
+      "setPasswordHint": "Dit account is aangemaakt met Inloggen met Apple of Discord en heeft nog geen wachtwoord. Stel er een in om in te loggen op andere apparaten, zoals de Mac- en Windows-desktopapps, of op internet, en om extra inlogmethoden te koppelen.",
+      "setPasswordSubmit": "Wachtwoord instellen",
+      "passwordSet": "Wachtwoord ingesteld. U kunt nu overal inloggen met uw gebruikersnaam en wachtwoord.",
       "emailLabel": "E-mail (optioneel)",
       "emailHint": "Alleen gebruikt voor accountherstel. Gebruik E-mail Wijzigen hieronder om het bij te werken.",
       "saveEmail": "E-mail Opslaan",
@@ -2199,6 +2392,10 @@ export const nl_NL: EnTranslations = {
       "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
       "itemAriaQuest": "{item}, aantal {count}, questvoorwerp",
+      "itemAriaLocked": "{item}, aantal {count}, vergrendeld",
+      "itemLockedLine": "Vergrendeld",
+      "lockItem": "Voorwerp vergrendelen",
+      "unlockItem": "Voorwerp ontgrendelen",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -2453,12 +2650,14 @@ export const nl_NL: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
-      "removeFromBarAria": "{name} verwijderen van actiebalk"
+      "removeFromBarAria": "{name} verwijderen van actiebalk",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Valsspeler >"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3224,11 +3423,13 @@ export const nl_NL: EnTranslations = {
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbruikt {count} van fijne kwaliteit)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
       "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
+      "reagentLocked": "Een reagens daarvoor is vergrendeld.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
       "comboRequires": "Afstemming: {craftA} + {craftB}, rang {tier}.",
@@ -3335,6 +3536,7 @@ export const nl_NL: EnTranslations = {
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
       "notSalvageable": "Je kunt dat niet salvagen.",
+      "salvageLocked": "Dat voorwerp is vergrendeld.",
       "disenchantBusy": "Je bent bezig.",
       "salvageBusy": "Je bent bezig.",
       "enchantBusy": "Je bent bezig.",
@@ -3710,6 +3912,9 @@ export const nl_NL: EnTranslations = {
       "pinFull": "De tracker is vol (tot {cap} bladzijden)",
       "pinAria": "{name} vastzetten in de tracker op de interface",
       "unpinAria": "{name} losmaken",
+      "trackerToggleLabel": "HUD-tracker",
+      "trackerToggleShowHint": "Toon de Reliquary-tracker op uw scherm",
+      "trackerToggleHideHint": "Verberg de Reliquary-tracker van uw scherm",
       "rarityLine": "Gevonden door {percent} van de verzamelaars",
       "pageRarityLine": "Verlucht door {percent} van de verzamelaars",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const nl_NL: EnTranslations = {
       "unlockedBorderHint": "Nieuwe rand verdiend: {name}. Draag hem via het Boek der Daden.",
       "broadcastLine": "{name} heeft een daad volbracht: {deed}",
       "rarityLine": "Behaald door {percent} van de avonturiers",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Daden",
       "collapseHint": "Klap de dadenvolglijst in",
       "expandHint": "Klap de dadenvolglijst uit",
@@ -3797,6 +4003,220 @@ export const nl_NL: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Vereist niveau {level}"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const nl_NL: EnTranslations = {
       "password_too_long": "Nieuw wachtwoord mag maximaal 128 tekens lang zijn.",
       "characters_online": "Log al je personages uit voordat je het account deactiveert.",
       "deactivated": "Dit account is gedeactiveerd. Neem contact op met een beheerder om het te herstellen.",
-      "not_found": "Account niet gevonden."
+      "not_found": "Account niet gevonden.",
+      "password_already_set": "Dit account heeft al een wachtwoord. Gebruik in plaats daarvan Wachtwoord wijzigen."
     },
     "character": {
       "name_invalid": "Ongeldige personagenaam. Gebruik 2-16 letters.",
@@ -3928,6 +4349,61 @@ export const nl_NL: EnTranslations = {
       "genesis_token_claimed": "Dat Seeker Genesis Token is al geclaimd.",
       "entitlement_required": "Geverifieerde Seeker-rechten zijn vereist.",
       "current_ownership_required": "Actueel bezit van het Seeker Genesis Token is vereist."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatoraccounts kunnen niet worden gemarkeerd.",
+      "reason_required": "Een reden is vereist.",
+      "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
+      "not_marked": "Dat account is niet gemarkeerd."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const nl_NL: EnTranslations = {
       "ifHighContrastBackground": "Een eenvoudigere achtergrond met hoger contrast achter het start- en personagescherm.",
       "ifInvertLookY": "Draait de op-en-neerrichting van het muiskijken om.",
       "ifShowItemLevel": "Voegt een itemniveauregel toe aan elke itemtooltip. Standaard uit, wat de klassieke tooltip met alleen stats behoudt.",
+      "ifShowReliquaryTracker": "Of de Reliquary-tracker (uw vastgezette pagina's en hun voortgang) op uw HUD staat. Het Reliquary-venster heeft een bijpassende oogknop, en als u een pagina vastzet, wordt de tracker weer ingeschakeld.",
       "ifShowPlaytime": "Toont je totale speeltijd ooit op het personageblad. Standaard aan, en het blad heeft een oogknop die dit per apparaat omdraait, handig als je streamt of screenshots maakt. De teller blijft hoe dan ook doortellen.",
       "ifShowOwnNameplate": "Tekent je eigen naambordje boven je hoofd precies zoals andere spelers het zien, met alle flair. Zet het uit voor de klassieke weergave.",
       "ifShowPlayerNameplates": "Tekent de naambordjes van andere spelers. Uit maakt een drukke hub overzichtelijker, en je huidige doelwit blijft hoe dan ook leesbaar.",
@@ -4735,6 +5212,7 @@ export const nl_NL: EnTranslations = {
       "mageEleJet": "Waterstraal staat als eigen knop op de huisdierbalk: klik erop om een vertragende straal op één vijand vast te zetten, of klik met rechts (op mobiel aanraken en vasthouden) om de elementaal hem zelf te laten afvuren zodra hij klaar is.",
       "formsHeading": "Gedaanteverwisseling",
       "formsNote": "Een druïde vecht door van gedaante te veranderen. De meeste druïdenvaardigheden horen bij één gedaante, dus de vorm waarin je verkeert bepaalt wat je kunt gebruiken, en van gedaante wisselen kost een beetje mana. Je kunt in of buiten gevecht van gedaante wisselen, zo vaak je wilt.",
+      "formsAutoUnshift": "Een heling of een schadespreuk die je in gedaante uitspreekt, haalt je er vanzelf uit. Een gedaante zo verlaten is gratis en verbruikt je globale afkoeltijd niet, dus een instantspreuk gaat af op het moment dat je drukt. Terugschakelen is een gewone vaardigheid en kost nog steeds mana en je globale afkoeltijd.",
       "formsMoonwing": "Een Balans-druïde krijgt er nog één gedaante bij: de Maanuilvorm, de spreukgedaante waarin hij vecht. Het is de enige diergedaante die je spreuken behoudt, en je toverstaf werkt alleen in deze vorm of in je normale spreukgedaante.",
       "formLine": {
         "form_bear": "De tankgedaante: een zware huid, Woede in plaats van mana, en extra dreiging zodat vijanden jou blijven aanvallen.",
@@ -6544,6 +7022,7 @@ export const nl_NL: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "jij@voorbeeld.nl",
     "emailError": "Voer een geldig e-mailadres in.",
+    "marketingOptIn": "Stuur mij nieuws en updates over het spel per e-mail (optioneel)",
     "showPassword": "Wachtwoord tonen",
     "hidePassword": "Wachtwoord verbergen",
     "logIn": "Inloggen",
@@ -6644,6 +7123,19 @@ export const nl_NL: EnTranslations = {
     "style": "Stijl",
     "resetLook": "Uiterlijk Herstellen",
     "resetShort": "Herstellen",
+    "shareTab": "Delen",
+    "designCode": "Uiterlijkcode",
+    "designCodeHint": "Kopieer deze code om dit uiterlijk op te slaan of te delen. Plak hier een code en importeer die om het uiterlijk te laden.",
+    "copyCode": "Code kopiëren",
+    "importCode": "Importeren",
+    "designCodeCopied": "Uiterlijkcode gekopieerd.",
+    "designCodeCopyManual": "Automatisch kopiëren is hier geblokkeerd. De code is geselecteerd; kopieer hem met je toetsenbord.",
+    "designCodeImported": "Uiterlijk geïmporteerd.",
+    "designCodeImportedPartial": "Uiterlijk geïmporteerd. Waarden die deze versie niet kent, zijn overgeslagen.",
+    "designCodeErrEmpty": "Plak eerst een uiterlijkcode.",
+    "designCodeErrHeader": "Dat lijkt niet op een uiterlijkcode.",
+    "designCodeErrVersion": "Die uiterlijkcode komt uit een nieuwere spelversie.",
+    "designCodeErrMalformed": "Die uiterlijkcode is beschadigd. Kopieer de volledige code en probeer het opnieuw.",
     "browFlat": "Vlak",
     "browArched": "Gebogen",
     "browThin": "Dun",
@@ -7039,6 +7531,7 @@ export const nl_NL: EnTranslations = {
       "portalOpens": "Een {tier}-rangs rift scheurt open in {zone}!",
       "portalSealed": "De {tier}-rangs rift in {zone} is verzegeld.",
       "portalCollapses": "De {tier}-rangs rift in {zone} stort in.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Alleen avonturiers van niveau {level} of hoger mogen deze rift betreden.",
       "deadEntry": "Je kunt geen rift betreden terwijl je dood bent.",
       "deadEntryCombat": "Je groep is nog in gevecht. De doden kunnen opnieuw binnengaan zodra het gevecht stopt.",
@@ -7138,6 +7631,7 @@ export const nl_NL: EnTranslations = {
       "shopMarksRequired": "Je hebt {marks} Delve-Merken nodig om {name} te kopen.",
       "shopSealPremiumOnly": "Dit zegel wijkt alleen voor een meesterhand. Alleen de Premium-inzet kan het openen.",
       "passageSealed": "De doorgang is verzegeld.",
+      "enemiesRemain": "Versla eerst de overgebleven vijanden.",
       "moveCloserPassage": "Kom dichter bij de doorgang.",
       "moveCloserChest": "Kom dichter bij de kist.",
       "moveCloserReliquary": "Kom dichter bij het reliekschrijn.",
@@ -7760,7 +8254,15 @@ export const nl_NL: EnTranslations = {
       "readyBody": "Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
       "restart": "Nu herstarten",
       "later": "Later",
-      "dismiss": "Sluiten"
+      "dismiss": "Sluiten",
+      "whatsNew": "Bekijk wat er is veranderd in je browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is klaar",
+      "updateReadyTitleNoVersion": "Update is klaar",
+      "updateReadyBody": "Herstart World of ClaudeCraft om de update toe te passen.",
+      "partyInviteTitle": "Groepsuitnodiging",
+      "partyInviteBody": "{name} heeft je uitgenodigd voor een groep."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const nl_NL: EnTranslations = {
       "reload": "Opnieuw laden",
       "quit": "Afsluiten",
       "fatalBody": "World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten."
+    },
+    "titlebar": {
+      "exitGame": "Spel afsluiten"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
+    "bodyDiscreteInactive": "Het spel gebruikt niet de game-GPU en draait in plaats daarvan op de energiezuinige GPU, waardoor de prestaties zullen lijden. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
     "bodyWeb": "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
     "hybridBodyWindows": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, stel je browser dan in op Hoge prestaties via Instellingen > Systeem > Beeldscherm > Beeldinstellingen, en herstart hem daarna. De desktop-app kiest de game-GPU automatisch.",
     "hybridBodyLinux": "Deze sessie wordt weergegeven op de geïntegreerde (energiezuinige) GPU. Heeft deze computer ook een game-GPU, dan biedt je browser of grafische stuurprogramma mogelijk een eigen GPU-keuze-instelling, of biedt je distributie een GPU-wisselhulpmiddel (zoals PRIME of optimus-manager). De desktop-app kiest de game-GPU automatisch.",
@@ -7995,7 +8501,111 @@ export const nl_NL: EnTranslations = {
       "zoomIn": "Inzoomen",
       "zoomOut": "Uitzoomen",
       "mapCanvasLabel": "Kaart",
-      "mapSummary": "Kaart van {zone}."
+      "mapSummary": "Kaart van {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Er zijn geen relevante markeringen zichtbaar.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Overige markeringen: {count}.",
+      "mapMarkerDirections": {
+        "center": "in het midden",
+        "north": "in het noorden",
+        "northeast": "in het noordoosten",
+        "east": "in het oosten",
+        "southeast": "in het zuidoosten",
+        "south": "in het zuiden",
+        "southwest": "in het zuidwesten",
+        "west": "in het westen",
+        "northwest": "in het noordwesten"
+      },
+      "mapMarkerDistances": {
+        "near": "dichtbij",
+        "medium": "op middellange afstand",
+        "far": "ver weg"
+      },
+      "mapMarkerLabels": {
+        "you": "Jij",
+        "availableQuest": "Beschikbare quest",
+        "readyQuest": "Quest klaar om in te leveren",
+        "repeatQuest": "Herhaalbare quest",
+        "cooldownQuest": "Quest in afkoeltijd",
+        "questObjective": "Gebied met questdoel",
+        "readyOre": "Beschikbare ertsader",
+        "readyWood": "Beschikbare houtopstand",
+        "readyHerb": "Beschikbaar kruidenveld",
+        "readyLockedOre": "Beschikbare ertsader, gereedschap vergrendeld",
+        "readyLockedWood": "Beschikbare houtopstand, gereedschap vergrendeld",
+        "readyLockedHerb": "Beschikbaar kruidenveld, gereedschap vergrendeld",
+        "cooldownOre": "Uitgeputte ertsader",
+        "cooldownWood": "Uitgeputte houtopstand",
+        "cooldownHerb": "Uitgeput kruidenveld",
+        "cooldownLockedOre": "Uitgeputte ertsader, gereedschap vergrendeld",
+        "cooldownLockedWood": "Uitgeputte houtopstand, gereedschap vergrendeld",
+        "cooldownLockedHerb": "Uitgeput kruidenveld, gereedschap vergrendeld",
+        "station": "Ambachtsstation: {name}",
+        "service": "Dienst: {name}",
+        "partyMember": "Groepslid: {name}",
+        "deadPartyMember": "Dood groepslid: {name}",
+        "partyMemberGeneric": "Groepslid",
+        "deadPartyMemberGeneric": "Dood groepslid",
+        "friend": "Vriend: {name}",
+        "guildMember": "Gildelid: {name}",
+        "pointOfInterest": "Interessepunt: {name}",
+        "dungeonEntrance": "Kerkeringang: {name}",
+        "dungeonExit": "Kerkeruitgang",
+        "delveEntrance": "Delve-ingang: {name}",
+        "worldPassage": "Doorgang naar {zone}",
+        "riftEntrance": "Rift-ingang: {name}",
+        "hostileEnemy": "Vijandig doelwit",
+        "aggressiveEnemy": "Vijand valt je aan",
+        "lootableEnemy": "Plunderbare vijand",
+        "corpse": "Je lichaam",
+        "deathZone": "Gevarenzone",
+        "teammate": "Teamgenoot",
+        "deadTeammate": "Dode teamgenoot",
+        "flagCarrier": "Teamgenoot met de vlag",
+        "ownFlagStand": "Jouw vlaggenstandaard",
+        "enemyFlagStand": "Vlaggenstandaard van de vijand",
+        "riftDescent": "Afdaling in de rift",
+        "riftReturnBeacon": "Terugkeerbaken",
+        "riftReturnExit": "Terugkeeruitgang",
+        "ranked": "{marker}, rang {rank}",
+        "riftTreasureAvailable": "Beschikbare schat",
+        "riftTreasureLocked": "Vergrendelde schat",
+        "riftTreasureOpened": "Geopende schat",
+        "riftTreasureJammed": "Schat met vastgelopen slot",
+        "riftCacheAvailable": "Beschikbare riftbergplaats",
+        "riftCacheLocked": "Vergrendelde bergplaats",
+        "riftCacheOpened": "Geopende bergplaats",
+        "riftCacheJammed": "Bergplaats met vastgelopen slot",
+        "pylonUnlit": "Gedoofde runenpyloon",
+        "pylonLit": "Verlichte runenpyloon",
+        "sequenceRuneUnlit": "Gedoofde reeksrune",
+        "sequenceRuneLit": "Verlichte reeksrune",
+        "iceGoal": "IJsdoel",
+        "boulderPad": "Rotsblokdoel",
+        "boulderMovable": "Verplaatsbaar rotsblok",
+        "boulderPlaced": "Geplaatst rotsblok",
+        "gateSealed": "Verzegelde poort",
+        "gateOpen": "Open poort",
+        "switchReady": "Gebruiksklare schakelaar",
+        "switchOn": "Geactiveerde schakelaar",
+        "orbDormant": "Sluimerende orb",
+        "orbActive": "Actieve orb",
+        "rollerHazard": "Gevaarlijk rollend rotsblok",
+        "delvePassageSealed": "Verzegelde doorgang",
+        "delvePassageOpen": "Open doorgang",
+        "delveSurfaceExit": "Uitgang naar de oppervlakte",
+        "delveCacheLocked": "Vergrendelde delve-kist",
+        "delveCacheReady": "Delve-kist gereed",
+        "delveCacheActive": "Delve-kist actief",
+        "delveCacheOpened": "Geopende delve-kist",
+        "delveReliquaryLocked": "Vergrendeld reliekschrijn",
+        "delveReliquaryReady": "Reliekschrijn gereed",
+        "delveReliquaryActive": "Reliekschrijnritueel actief",
+        "delveReliquaryOpened": "Geopend reliekschrijn",
+        "bountiful": "{marker} met rijke buit"
+      }
     },
     "options": {
       "gameMenu": "Spelmenu",
@@ -8035,6 +8645,9 @@ export const nl_NL: EnTranslations = {
       "graphicsReloadNote": "Beeldkwaliteit en Terreindetail worden na een herlaadbeurt toegepast.",
       "reloadNow": "Nu herladen",
       "fullscreen": "Volledig scherm",
+      "displayMode": "Schermmodus",
+      "displayModeBorderless": "Randloos volledig scherm",
+      "displayModeWindowed": "Venster",
       "touchLookSpeed": "Kijksnelheid bij aanraking",
       "joystickSize": "Joystickgrootte",
       "buttonSize": "Knopgrootte",
@@ -8597,6 +9210,7 @@ export const nl_NL: EnTranslations = {
       "offGlobalCooldown": "Buiten de globale afkoeltijd",
       "friendlyTarget": "Vriendelijk doelwit",
       "enemyTarget": "Vijandig doelwit",
+      "anyTarget": "Vijandelijk of vriendelijk doelwit",
       "selfOnly": "Alleen jezelf",
       "damageRange": "{min} tot {max}",
       "finisherDamage": "{base} plus {perCombo} per combopunt"
@@ -8911,6 +9525,10 @@ export const nl_NL: EnTranslations = {
       "filterPrimaryStatAll": "Elke eigenschap",
       "filterRarity": "Zeldzaamheid",
       "filterRarityAll": "Alle zeldzaamheden",
+      "filterSort": "Sorteren",
+      "sortName": "Naam (A-Z)",
+      "sortPriceAsc": "Prijs: laag naar hoog",
+      "collapseLowest": "Alleen de laagste prijs",
       "weaponSword": "Zwaarden",
       "weaponDagger": "Dolken",
       "weaponStaff": "Staven",
@@ -8941,6 +9559,8 @@ export const nl_NL: EnTranslations = {
       "quantity": "Aantal",
       "quantityOf": "van {count}",
       "priceEach": "Prijs per stuk",
+      "lowestPriceLabel": "Huidige laagste aanbiedingsprijs",
+      "lowestPriceNone": "Er zijn nog geen actieve aanbiedingen voor dit voorwerp.",
       "listButton": "Aanbieden op de Wereldmarkt",
       "minPriceError": "Noem een prijs van minstens 1 koper.",
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
@@ -9368,6 +9988,7 @@ export const nl_NL: EnTranslations = {
       "cheap_shot": {
         "name": "Buikstoot",
         "description": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Moet in sluiptocht zijn. Levert 2 combopunten op.",
+        "descriptionNoStealth": "Treft het doelwit voor {damage} schade en verdooft het 4 sec. Levert 2 combopunten op.",
         "specNote_subtlety": "Vanuit Schemersluier gebruikt voegt dit 1 Schemer toe (max 3). Bij 3 Schemer kun je het gebruiken ZONDER sluiptocht: dat gebruik kost niets, verbruikt alle 3 Schemer, en start de schaduwsluier van 6 sec."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const nl_NL: EnTranslations = {
       "crippling_poison": {
         "name": "Loodzwaar Gif",
         "description": "Treft het doelwit met een loodzwaar gif, brengt {damage} Natuurschade toe en vertraagt de bewegingssnelheid met 50% gedurende 12 sec."
+      },
+      "melting_acid": {
+        "name": "Smeltend zuur",
+        "description": "Bespat het doelwit met een bijtend gif, richt {damage} schade aan de natuur aan en vermindert het pantser met 5% gedurende 12 seconden."
+      },
+      "nightshade_coating": {
+        "name": "Nachtschade-coating",
+        "description": "Bestrijkt het doelwit met nachtschade, richt {damage} natuurschade aan en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden."
       },
       "expose_armor": {
         "name": "Pantserbres",
@@ -9580,7 +10209,7 @@ export const nl_NL: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brandende Eed",
-        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 60%. Alleen Geloofswachter."
+        "description": "Verhoogt passief de dreiging die uw Heilige schade opwekt met 30%. Alleen Geloofswachter."
       },
       "retribution_aura": {
         "name": "Aura van Vergelding",
@@ -9696,7 +10325,7 @@ export const nl_NL: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Steengebonden Wapen",
-        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 30% pantser, krijgt 10% minder schade en wekt tweemaal zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
+        "description": "Doordrenkt uw wapen 30 min lang. Elke slag brengt {damage} extra schade toe. Versterking wint bovendien 40% pantser en 20% Uithouding, krijgt 15% minder schade en is immuun voor kritieke treffers van wezens en wekt 2,75 keer zoveel dreiging op. Aardse Schok dwingt zijn doelwit u 3 sec lang aan te vallen, en Donderwering verleent 3 sec lang 10% schadevermindering."
       },
       "healing_wave": {
         "name": "Helende Wateren",
@@ -9824,7 +10453,7 @@ export const nl_NL: EnTranslations = {
       },
       "fear": {
         "name": "Teisteren",
-        "description": "Jaagt de vijand de stuipen op het lijf, waardoor het maximaal 8 sec ineenkrimpt. Elke schade verbreekt het effect."
+        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect."
       },
       "searing_pain": {
         "name": "Schroeien",
@@ -9875,7 +10504,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +130%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",
@@ -9885,6 +10514,10 @@ export const nl_NL: EnTranslations = {
       "growl": {
         "name": "Bedreigen",
         "description": "Gromt naar het doelwit: je dreiging stijgt tot het niveau van zijn meest gehate vijand en het wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
+      },
+      "challenging_roar": {
+        "name": "Onheilspellend Gebrul",
+        "description": "Een onheilspellend gebrul: elke vijand binnen 10 m wordt bedreigd, zijn dreiging jegens jou stijgt tot het niveau van zijn meest gehate vijand, en wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
       },
       "cat_form": {
         "name": "Wolfsgedaante",
@@ -9898,7 +10531,7 @@ export const nl_NL: EnTranslations = {
       "ferocious_bite": {
         "name": "Bloedbeet",
         "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.",
-        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst: een beet voor 70 plus 43 per combopunt die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en 30 energie herstelt."
+        "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt."
       },
       "swipe": {
         "name": "Vegende Klauwen",
@@ -9961,7 +10594,7 @@ export const nl_NL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolvenbloed",
-        "description": "Verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
+        "description": "Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
       },
       "rip": {
         "name": "Bloedscheur",
@@ -10066,7 +10699,7 @@ export const nl_NL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Markeert een vijand gedurende 12 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 m en creëert 1 Zielfragment."
+        "description": "Markeert een vijand gedurende 15 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 yards en creëert 1 Zielfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10165,8 +10798,8 @@ export const nl_NL: EnTranslations = {
         "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
       },
       "feral_charge": {
-        "name": "Wilde stormloop",
-        "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
+        "name": "Oerkrachtgolf",
+        "description": "Ontketent een golf van oerkracht. In Wolfsgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)"
       },
       "swiftmend": {
         "name": "Snelle genezing",
@@ -10182,7 +10815,7 @@ export const nl_NL: EnTranslations = {
       },
       "redharvest": {
         "name": "Rode Oogst",
-        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en 30 energie herstelt. Werkt ook zonder combopunten."
+        "description": "Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten."
       },
       "marrowbreak": {
         "name": "Mergbreker",
@@ -10422,7 +11055,7 @@ export const nl_NL: EnTranslations = {
       },
       "evocation": {
         "name": "Etherbron",
-        "description": "Restaura mana rápidamente. (magiertalent)"
+        "description": "Kanaliseert 6 sec.: elke seconde herstelt u 100 mana en bouwt u 8 spreukkracht op. De bonus stapelt zich tijdens het kanaliseren en blijft 15 sec. actief. (magiertalent)"
       },
       "flurry_of_knives": {
         "name": "Messenregen",
@@ -10430,7 +11063,7 @@ export const nl_NL: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Wilde genezing",
-        "description": "Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)"
+        "description": "Herstelt 40% van je maximale gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)"
       },
       "frost_trap": {
         "name": "Rijpval",
@@ -10450,11 +11083,11 @@ export const nl_NL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Huiveringwekkende huil",
-        "description": "Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)"
+        "description": "Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
       },
       "ice_block": {
         "name": "Koude kist",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sec. (magiertalent)"
+        "description": "Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert bestaande gewone schadelijke effecten en voorkomt dat nieuwe gewone controle-effecten worden toegepast. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)"
       },
       "inner_focus": {
         "name": "Gestilde geest",
@@ -10546,7 +11179,7 @@ export const nl_NL: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Razende geest",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sec. (magiertalent)"
+        "description": "Maakt uw volgende spreuk met een werptijd onmiddellijk. Blijft 60 sec. actief. (magiertalent)"
       },
       "psychic_scream": {
         "name": "Psychische schreeuw",
@@ -10663,7 +11296,7 @@ export const nl_NL: EnTranslations = {
       },
       "prowl": {
         "name": "Besluipen",
-        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt."
+        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 5% trager. Kan niet in gevecht worden gebruikt."
       },
       "rake": {
         "name": "Villen",
@@ -12218,6 +12851,9 @@ export const nl_NL: EnTranslations = {
       "pristine_claw": {
         "name": "Ongerepte Klauw"
       },
+      "dawnhold_posy": {
+        "name": "Boeketje uit de tuin van Dawnhold"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -13062,6 +13698,15 @@ export const nl_NL: EnTranslations = {
       },
       "training_dummy": {
         "name": "Oefenpop"
+      },
+      "friendly_player_dummy": {
+        "name": "Bevriende spelerpop"
+      },
+      "normal_boss_dummy": {
+        "name": "Normale bosspop"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroïsche bosspop"
       },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"
@@ -16702,6 +17347,11 @@ export const nl_NL: EnTranslations = {
         "enterText": "Je stapt de koude, stille hallen van de Laatste Burcht binnen.",
         "leaveText": "Je trekt de burchtdeur dicht en stapt terug de wind van de Drakenlanden in."
       },
+      "dawnhold_castle": {
+        "name": "Kasteel Dawnhold",
+        "enterText": "Je stapt de warme, naar bloemen geurende zalen van Kasteel Dawnhold binnen.",
+        "leaveText": "Je glipt weer naar buiten, het zonnige gazon van de tuin op."
+      },
       "drowned_temple": {
         "name": "De Verdronken Tempel",
         "enterText": "Je stapt door de maanpoort, de lucht wordt koud water en bleek licht, en het gezang sluit zich boven je hoofd.",
@@ -16900,6 +17550,21 @@ export const nl_NL: EnTranslations = {
         "sender": "Knutselaar Gizzel",
         "subject": "MEESTERSCHAP, kaboom",
         "body": "Een van je hoofdvakken heeft meesterschap bereikt, de allerHOOGSTE, kaboom, de hele ladder, klaar. Ik deel geen lof uit, ik deel lonten uit, maar hier, neem allebei: je bent briljant en enigszins angstaanjagend. Ga de bergen zenuwachtig maken."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

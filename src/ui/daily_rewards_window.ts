@@ -1,5 +1,3 @@
-import type { ArmoryPreviewMode, ArmoryPreviewPrewarmOptions } from '../render/armory_preview';
-import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -22,6 +20,7 @@ import { formatDateTime, formatNumber, t } from './i18n';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
+import { usdDollarsText } from './usd_text';
 import {
   type ArmorySection,
   type ArmorySkinRow,
@@ -159,33 +158,6 @@ export class DailyRewardsWindow {
       return;
     }
     void this.renderCurrent('open');
-  }
-
-  /** Prebuild the store's persistent Armory context while a curtain hides it. */
-  async prewarmArmoryPreview(): Promise<void> {
-    await this.prewarmArmoryPreviewSkins(this.armoryPrewarmSkinIds());
-  }
-
-  /** The full catalog the post-entry prewarm schedule walks, one id per unit. */
-  armoryPrewarmSkinIds(): string[] {
-    if (!this.storeEnabled()) return [];
-    return WEAPON_SKIN_LIST.map((skin) => skin.id);
-  }
-
-  /** Warm one bounded slice of the Armory catalog (post-entry paced units). */
-  async prewarmArmoryPreviewSkins(
-    skinIds: readonly string[],
-    modes?: readonly ArmoryPreviewMode[],
-    options?: ArmoryPreviewPrewarmOptions,
-  ): Promise<void> {
-    if (!this.storeEnabled() || skinIds.length === 0) return;
-    await this.ensureArmoryInspect().prewarm(skinIds, modes, options);
-  }
-
-  /** End a keep-buffer prewarm run (the paced lane's final unit): restore the
-   *  live-size preview buffer once instead of per unit. */
-  finishArmoryPreviewPrewarm(): void {
-    this.armoryInspect?.finishPrewarm();
   }
 
   /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */
@@ -767,10 +739,7 @@ export class DailyRewardsWindow {
         : `${t('hudChrome.dailyRewards.sol', {
             amount: formatNumber(s.prizePoolSol, { maximumFractionDigits: 3 }),
           })} (${t('hudChrome.dailyRewards.usd', {
-            amount: `$${formatNumber(s.prizePoolUsd, {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 2,
-            })}`,
+            amount: usdDollarsText(s.prizePoolUsd),
           })})`;
     const reset = formatDateTime(new Date(s.resetAt), { hour: 'numeric', minute: '2-digit' });
     const remaining = this.remainingText(s.resetAt);
@@ -778,7 +747,7 @@ export class DailyRewardsWindow {
       s.eligibility.usdValue === null
         ? t('hudChrome.dailyRewards.unknown')
         : t('hudChrome.dailyRewards.usd', {
-            amount: `$${formatNumber(s.eligibility.usdValue, { maximumFractionDigits: 2 })}`,
+            amount: usdDollarsText(s.eligibility.usdValue),
           });
     const reason = dailyRewardReasonText(s.eligibility);
     return (
@@ -958,9 +927,9 @@ export class DailyRewardsWindow {
         : history.payouts
             .slice(0, 10)
             .map((row) => {
-              const prize = `$${t('hudChrome.dailyRewards.usd', {
-                amount: formatNumber(row.prizeUsd, { maximumFractionDigits: 2 }),
-              })}`;
+              const prize = t('hudChrome.dailyRewards.usd', {
+                amount: usdDollarsText(row.prizeUsd),
+              });
               return `<div class="dr-rank"><span>${esc(row.day)} #${row.rank}</span><b>${esc(row.name)}</b><strong>${esc(prize)}</strong></div>`;
             })
             .join('');

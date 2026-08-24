@@ -13,6 +13,17 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
+import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
+import {
+  buildColliderCellIndex,
+  type ColliderCellIndex,
+  cellKey,
+  cellKeyAt,
+  colliderBounds,
+  colliderCellAt,
+  GRID_CELL,
+  MAX_BODY_RADIUS,
+} from './collider_cells';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -38,12 +49,19 @@ import {
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
+  riftNearestFloorOriginZ,
   STRIP_MAX_X,
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
+
+// Re-exported from the extracted cell-index module so existing importers keep
+// their './colliders' path.
+export { MAX_BODY_RADIUS } from './collider_cells';
+
+import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
 import {
-  ROCK_COLLIDER_MIN_SCALE,
+  decorationHasCollider,
   ROCK_RADIUS_PER_SCALE,
   rockHeight,
   rockRadius,
@@ -54,6 +72,7 @@ import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
+  DAWNHOLD_LAYOUT,
   DROWNED_COURT_LAYOUT,
   LASTKEEP_LAYOUT,
   layoutColliders,
@@ -102,12 +121,20 @@ import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
 import {
-  crossesGardenHedge,
   crossesSealedBorder,
   type Decoration,
   farshorePalmSpots,
+  gardenMazeCellPieces,
+  generateDecorations,
   generateDecorationsInBounds,
   groundHeight,
+  MAZE_CELL,
+  MAZE_COLS,
+  MAZE_ROWS,
+  MAZE_WALL_DEPTH,
+  MAZE_WALL_HEIGHT,
+  MAZE_X0,
+  MAZE_Z1,
   reachPalmSpots,
   roadDistance,
   terrainHeight,
@@ -244,7 +271,7 @@ export function colliderTopAt(c: Collider, x: number, z: number): number {
  */
 export const MANTLE_REACH = 0.9;
 /** Float slack when comparing feet height against a collider top. */
-const MOVE_TOP_EPS = 1e-3;
+export const MOVE_TOP_EPS = 1e-3;
 // How much of the body radius must overlap a standable top before it supports
 // the mover: standing needs the center meaningfully over the prop, while the
 // full collision radius still gates entry, so a jump can graze past a rim
@@ -254,7 +281,6 @@ export const SUPPORT_OVERLAP = 0.5;
 // tops above stay untouched: cameraTopY for a campfire includes the flame,
 // but the SOLID obstacle is only the log pile, which is what a jump clears.
 // Exported so tests pin against the one authoritative value.
-export const CRATE_TOP = 1.35;
 export const CAMPFIRE_MOVE_TOP = 0.55;
 export { campCrateShape } from './prop_layout';
 // Standable roofs, all MEASURED from the shipped GLBs at the scales the
@@ -481,6 +507,61 @@ function staticWorldColliders(seed: number): Collider[] {
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, 6),
     });
+  // The castles' outside climbing chains: corbelled shelves up each curtain
+  // so the wall-walk is reachable by parkour as well as by the flights.
+  // These are the only STANDABLE tops either castle has outdoors, because
+  // the walls themselves are lift terrain rather than colliders and terrain
+  // grants no ledge to grab.
+  for (const l of CASTLE_WALL_LEDGES) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: l.top,
+      standable: true,
+      cameraTopY: l.top,
+    });
+  }
+  for (const l of DAWNHOLD_WALL_LEDGES) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: l.top,
+      standable: true,
+      cameraTopY: l.top,
+    });
+  }
+  // ...and the crenellated parapet along each wall-walk's OUTER edge, from the
+  // same plan the renderer lays its battlement modules from. The curtain is
+  // terrain, and terrain gives a body no standoff at a DOWN edge, so the walk
+  // was a 3.0yd strip with nothing at either lip and four ticks of drift put a
+  // player over the side.
+  //
+  // moveTopY WITHOUT standable, the campfire's semantic further down this file:
+  // a body whose feet are below the stone is blocked by it, and nobody may ever
+  // the shelves right beside it, so the chase camera does not yank in on a
+  // knee-high rail.
+  for (const seg of [...castleParapetSegments(), ...dawnholdParapetSegments()]) {
+    const alongHalf = (seg.a1 - seg.a0) / 2;
+    const mid = (seg.a0 + seg.a1) / 2;
+    out.push({
+      type: 'obb',
+      x: seg.axis === 'z' ? seg.line : mid,
+      z: seg.axis === 'z' ? mid : seg.line,
+      hw: seg.axis === 'z' ? PARAPET_HALF : alongHalf,
+      hd: seg.axis === 'z' ? alongHalf : PARAPET_HALF,
+      rot: 0,
+      moveTopY: seg.top,
+      cameraTopY: seg.top,
+    });
+  }
   // ...and the Drakelands' giant ember lilies: the huge and giant tiers
   // carry a rocky-bed collider (r 0 skirt lilies stay walk-through
   // dressing), same one-list contract as the willows
@@ -687,9 +768,26 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
-  // hand-placed GLB decor: circle collider matched to the model footprint;
-  // r 0/absent entries are walk-through dressing and add no collider
+  // Hand-placed GLB decor. r 0/absent entries are walk-through dressing and add
+  // no collider. An entry carrying hw AND hd collides as the model's real BOX,
+  // oriented by its own rot; everything else keeps the circle it always had.
+  // The box exists because these models are rectangles: a circle drawn round one
+  // stands off its flat walls (that is the invisible wall players walk into) and
+  // a circle drawn inside one cuts its corners off instead.
   for (const d of PROPS.decorProps ?? []) {
+    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
+    if (d.hw !== undefined && d.hd !== undefined) {
+      out.push({
+        type: 'obb',
+        x: d.x,
+        z: d.z,
+        hw: d.hw,
+        hd: d.hd,
+        rot: d.rot ?? 0,
+        cameraTopY,
+      });
+      continue;
+    }
     if (!d.r) continue;
     out.push({
       type: 'circle',
@@ -698,6 +796,48 @@ function staticWorldColliders(seed: number): Collider[] {
       r: d.r,
       cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
     });
+  }
+
+  // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
+  // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
+  // modeled hedge footprint.
+  //
+  // These are new, and their absence was a silent regression rather than a
+  // deletion. The hedge used to be enforced by crossesGardenHedge, a bespoke
+  // segment test living inside resolveMovement. When the parkour physics engine
+  // landed, the OPEN WORLD moved onto moveCharacter (player_motion.ts) and
+  // resolveMovement became the instanced-interior path, so the test simply
+  // stopped being reached for players on foot. Nothing errored: mobs, pets and
+  // Charge still route through resolveMove and still collided, so the maze went
+  // on looking enforced while players walked through the hedges. Two unrelated
+  // branches, the modeled hedge and the physics engine, auto-merged with no
+  // conflict and neither author saw the other's half.
+  //
+  // Real colliders instead of a second bespoke test: the solver, pathfinding and
+  // every mover get it from one place, and the next kernel rewrite inherits it.
+  // Length is the CELL, not the drawn piece: the 0.75yd overlap at each end is
+  // cosmetic leaf interlock, and where a run continues the neighbour's own box
+  // covers the joint. Deliberately NOT merged into colinear runs: colliderBounds
+  // and pruneCandidates both take an OBB's extent as hypot(hw, hd) on both axes,
+  // so one 153yd run registers as a 153yd blob across cells nowhere near it.
+  for (let r = 0; r < MAZE_ROWS; r++) {
+    for (let c = 0; c < MAZE_COLS; c++) {
+      const piece = gardenMazeCellPieces(c, r);
+      if (!piece) continue;
+      const x = MAZE_X0 + (c + 0.5) * MAZE_CELL;
+      const z = MAZE_Z1 - (r + 0.5) * MAZE_CELL;
+      const camTop = topY(seed, x, z, MAZE_WALL_HEIGHT);
+      const half = MAZE_CELL / 2;
+      const depth = MAZE_WALL_DEPTH / 2;
+      // full height on purpose: a 6.1yd hedge is nobody's platform, so no
+      // moveTopY and nothing to stand on or mantle
+      if (piece.h) {
+        out.push({ type: 'obb', x, z, hw: half, hd: depth, rot: 0, cameraTopY: camTop });
+      }
+      if (piece.v) {
+        out.push({ type: 'obb', x, z, hw: depth, hd: half, rot: 0, cameraTopY: camTop });
+      }
+    }
   }
 
   // Ravenpost mailboxes: authored civic furniture, spawned by the Sim at this
@@ -1257,6 +1397,9 @@ function bandSlotColliders(): Collider[] {
 // authoredColliders). Seated on DUNGEON_FLOOR_Y like every derived interior
 // set below, so its standable tops read in the same frame.
 const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefined, DUNGEON_FLOOR_Y);
+// Dawnhold Castle: the Evergarden garden palace, same authored room-graph
+// derivation as The Last Keep (walls minus doorways plus decor footprints).
+const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
 
 // Wildheart follows the same open-field contract, but its walkable bridges and
 // water ribbons are heightfield surfaces rather than blocking props.
@@ -1297,6 +1440,7 @@ export function arenaCollidersForSlot(slot: number): Collider[] {
 const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   wildheart: WILDHEART_COLLIDERS,
   lastkeep: LASTKEEP_COLLIDERS,
+  dawnhold: DAWNHOLD_COLLIDERS,
 };
 
 // Per-DUNGEON interior sets: dungeons sharing a room plan (Hollow Crypt and
@@ -1322,12 +1466,8 @@ function interiorCollidersFor(dungeonId: string | null, interior: string): Colli
 // Spatial grid + movement resolution
 // ---------------------------------------------------------------------------
 
-const GRID_CELL = 16;
-/** Largest mover we resolve for. Doubles as the grid's registration margin:
- *  every collider is inserted into all cells its bounds inflated by this
- *  touch, which is what makes the single-cell support and glue reads below
- *  complete (their reach beyond a collider's bounds never exceeds it). */
-export const MAX_BODY_RADIUS = 0.8;
+// GRID_CELL / MAX_BODY_RADIUS moved to collider_cells.ts (shared with the
+// rift region indexes); imported above.
 /** Fence/blocker wall half-thickness (yards); the editor's blocker overlay
  * reuses it so the drawn wall matches the collider exactly. */
 export const FENCE_HALF_DEPTH = 0.35;
@@ -1368,23 +1508,8 @@ interface ColliderGrid {
   gen: number;
 }
 
-// Grid cells are keyed by a packed integer rather than a `gx,gz` template
-// string. The key is built on every lookup in the movement and line-of-sight
-// hot paths, and a string key allocated there was the single
-// largest source of per-tick garbage in the physics solver (it dominated even
-// on empty ground, where there is no collider work to do at all). The bias
-// keeps negative cells positive; the span covers any world the editor can
-// author (cell 16 yd, so +/- 32768 cells is +/- 524288 yd).
-const CELL_KEY_BIAS = 32768;
-const CELL_KEY_SPAN = 65536;
-function cellKey(gx: number, gz: number): number {
-  return (gx + CELL_KEY_BIAS) * CELL_KEY_SPAN + (gz + CELL_KEY_BIAS);
-}
-/** The grid key covering a WORLD position, for the reads that start from one
- *  (the battleground band's sight test) rather than from a cell range. */
-function cellKeyAt(x: number, z: number): number {
-  return cellKey(Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));
-}
+// cellKey / cellKeyAt moved to collider_cells.ts (shared with the rift
+// region indexes); imported above.
 
 // Grids are cached per (active world content, seed). The WeakMap keeps the
 // built-in world's grid warm forever and lets swapped-out custom maps be
@@ -1397,13 +1522,7 @@ export function invalidateStaticColliders(): void {
   gridCaches.delete(getActiveWorldContent());
 }
 
-function colliderBounds(c: Collider): { minX: number; maxX: number; minZ: number; maxZ: number } {
-  if (c.type === 'circle') {
-    return { minX: c.x - c.r, maxX: c.x + c.r, minZ: c.z - c.r, maxZ: c.z + c.r };
-  }
-  const ext = Math.hypot(c.hw, c.hd);
-  return { minX: c.x - ext, maxX: c.x + ext, minZ: c.z - ext, maxZ: c.z + ext };
-}
+// colliderBounds moved to collider_cells.ts; imported above.
 
 function gridFor(seed: number): ColliderGrid {
   const content = getActiveWorldContent();
@@ -1597,7 +1716,7 @@ const MAX_DECORATION_COLLIDER_RADIUS = 1.6 * ROCK_RADIUS_PER_SCALE;
 
 function decorationCollider(seed: number, d: Decoration): Collider | null {
   if (d.kind === 'rock') {
-    if (d.scale < ROCK_COLLIDER_MIN_SCALE) return null;
+    if (!decorationHasCollider(d)) return null;
     // Height comes from decoration_dims (the one source the renderer scales
     // the rock GLB to), so the collision top IS the silhouette top: a squat
     // field stone is inside the character step height and gets walked over,
@@ -1760,41 +1879,73 @@ interface RiftRegion {
   ox: number;
   oz: number;
   colliders: Collider[];
+  /** Cell index over `colliders`, built once at publish. Movement and sight
+   *  read the sample point's cell instead of scanning the whole floor's list;
+   *  the MAX_BODY_RADIUS registration margin (collider_cells.ts) keeps the
+   *  single-cell read complete for every live resolve radius. */
+  cells: ColliderCellIndex;
 }
-const RIFT_REGIONS = new Map<number, RiftRegion[]>();
+// token -> floor origin z -> region. Every region shares RIFT_X_MIN as its ox
+// and floor origins are RIFT_FLOOR_SPACING (340) apart while regions span
+// +/- RIFT_REGION_HALF_Z (160), so origins never collide and oz is a unique
+// key. riftNearestFloorOriginZ derives the only candidate origin for a
+// position, making the lookup O(1) instead of a scan over every occupied
+// slot (NEVER riftOriginAt here: its slot clamp maps the south half of a
+// floor 0 into the previous slot's top floor).
+const RIFT_REGIONS = new Map<number, Map<number, RiftRegion>>();
 let NEXT_RIFT_TOKEN = 1;
 
 export function allocRiftCollisionToken(): number {
   return NEXT_RIFT_TOKEN++;
 }
 
-export function setRiftRegion(token: number, ox: number, oz: number, colliders: Collider[]): void {
-  let list = RIFT_REGIONS.get(token);
-  if (!list) {
-    list = [];
-    RIFT_REGIONS.set(token, list);
+/** Publish a rift floor's generated collider set. `cellSize` is a test seam:
+ *  the equivalence suite publishes a reference region with cellSize Infinity,
+ *  one all-covering cell that reproduces the pre-index full-list scan (see
+ *  collider_cells.ts: a finite size quadrants at the local origin instead). */
+export function setRiftRegion(
+  token: number,
+  ox: number,
+  oz: number,
+  colliders: Collider[],
+  cellSize?: number,
+): void {
+  let byOz = RIFT_REGIONS.get(token);
+  if (!byOz) {
+    byOz = new Map();
+    RIFT_REGIONS.set(token, byOz);
   }
-  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
-  if (i >= 0) list[i] = { ox, oz, colliders };
-  else list.push({ ox, oz, colliders });
+  // The seam may only WIDEN cells (the reference token's one giant cell): a
+  // smaller-than-GRID_CELL cell would break the registration-margin
+  // completeness argument, so clamp.
+  const size = cellSize === undefined ? undefined : Math.max(cellSize, GRID_CELL);
+  byOz.set(oz, { ox, oz, colliders, cells: buildColliderCellIndex(colliders, size) });
 }
 
 export function clearRiftRegion(token: number, ox: number, oz: number): void {
-  const list = RIFT_REGIONS.get(token);
-  if (!list) return;
-  const i = list.findIndex((r) => r.ox === ox && r.oz === oz);
-  if (i >= 0) list.splice(i, 1);
+  const byOz = RIFT_REGIONS.get(token);
+  if (!byOz) return;
+  // oz is the key (every origin shares RIFT_X_MIN as its ox); the ox guard
+  // keeps a mismatched clear from deleting someone else's region if that
+  // invariant ever breaks. Drop the emptied inner map so throwaway Sims
+  // (character creation constructs one per call) leave nothing behind.
+  if (byOz.get(oz)?.ox === ox) byOz.delete(oz);
+  if (byOz.size === 0) RIFT_REGIONS.delete(token);
 }
 
 function riftRegionAt(token: number, x: number, z: number): RiftRegion | null {
-  const list = RIFT_REGIONS.get(token);
-  if (!list) return null;
-  for (const r of list) {
-    if (Math.abs(x - r.ox) <= RIFT_REGION_HALF_X && Math.abs(z - r.oz) <= RIFT_REGION_HALF_Z) {
-      return r;
-    }
-  }
-  return null;
+  const byOz = RIFT_REGIONS.get(token);
+  if (!byOz) return null;
+  // The nearest floor origin is the only region that can contain (x, z):
+  // regions are 320 deep on 340 spacing, so they never overlap. MUST be the
+  // true nearest-origin derivation (riftNearestFloorOriginZ, allocation-free,
+  // once per movement resolve and per 0.5 yd sight sample), never
+  // riftOriginAt: see the map comment above.
+  const region = byOz.get(riftNearestFloorOriginZ(z));
+  if (!region) return null;
+  if (Math.abs(x - region.ox) > RIFT_REGION_HALF_X || Math.abs(z - region.oz) > RIFT_REGION_HALF_Z)
+    return null;
+  return region;
 }
 
 function instanceLocal(
@@ -1865,7 +2016,16 @@ export function resolvePosition(
   if (isRiftPos(x)) {
     const region = riftRegionAt(riftToken, x, z);
     if (!region) return { x, z };
-    const local = resolveAgainst(region.colliders, x - region.ox, z - region.oz, r, ignoreFences);
+    const lx = x - region.ox;
+    const lz = z - region.oz;
+    // Single-cell read by the ORIGINAL point, the same contract as the
+    // open-world arm below: complete for r <= MAX_BODY_RADIUS via the
+    // registration margin (collider_cells.ts). A wider body (the boulder
+    // push resolves at r = 1.0) falls back to the full floor list, which is
+    // exactly the pre-index scan: rare, per-interaction, and byte-identical.
+    const list = r <= MAX_BODY_RADIUS ? colliderCellAt(region.cells, lx, lz) : region.colliders;
+    if (!list) return { x, z };
+    const local = resolveAgainst(list, lx, lz, r, ignoreFences);
     return { x: local.x + region.ox, z: local.z + region.oz };
   }
   if (x > DUNGEON_X_THRESHOLD && !isBgPos(x)) {
@@ -2238,21 +2398,19 @@ export function resolveMovement(
     z = fromZ;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    let nextX = fromX + dx * t;
+    const nextX = fromX + dx * t;
     // A sealed zone border is a hard wall regardless of terrain slope (the
     // climb gate projects rise along the movement direction, so a shallow
     // diagonal would otherwise sneak over the crest). Clamp z at the crest
     // and keep the x component, so pushing into the wall slides along it.
-    let nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
-    // The Great Maze's hedges are hard walls for the same reason, tested as
-    // a segment crossing (an endpoint-only test teleports a stalled mover
-    // across once its target passes the wall). The faces are axis-aligned,
-    // so slide by dropping whichever axis component pushes into the hedge.
-    if (crossesGardenHedge(x, z, nextX, nextZ)) {
-      if (!crossesGardenHedge(x, z, x, nextZ)) nextX = x;
-      else if (!crossesGardenHedge(x, z, nextX, z)) nextZ = z;
-      else break; // cornered against the hedge
-    }
+    const nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
+    // The Great Maze's hedges used to be tested here as a segment crossing.
+    // They are real collider boxes now (staticWorldColliders), which the slide
+    // below handles like any other wall, and keeping the segment test as well
+    // would be actively harmful: a body that ends up INSIDE a hedge is pushed
+    // out by resolvePosition, and a segment test from where it was to where it
+    // was pushed crosses hedge by definition, so the escape would be cancelled
+    // and the body held there.
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
     const resolved = resolvePosition(
       seed,
@@ -2267,7 +2425,6 @@ export function resolveMovement(
     // ...and a static-collider slide (a tree hugging the crest) must not
     // shove the resolved position across it either
     if (crossesSealedBorder(x, z, resolved.z)) break;
-    if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
     // Rift interiors: a resolution is a SLIDE, never a teleport. When a wide
     // obstacle abuts a thin wall (a chamber-waist stub reaching the side wall),
     // chained pushOuts can walk the centre across the wall centreline and eject
@@ -2329,6 +2486,11 @@ export function pathCrossesFence(
 // Colliders without a known top (the interior wall layouts) always block, the
 // conservative default, and MOVEMENT collision is untouched everywhere.
 export const SIGHT_HEIGHT = 1.6;
+
+interface SightFeetOverride {
+  from?: number;
+  to?: number;
+}
 
 // Does any collider at (x,z) rise above `sightY` (absolute world Y of the
 // sight line at that sample)? Mirrors resolvePosition's zone routing so
@@ -2393,7 +2555,13 @@ function sightBlockedAt(
   }
   if (isRiftPos(x)) {
     const region = riftRegionAt(riftToken, x, z);
-    return region ? overlapsAny(region.colliders, x - region.ox, z - region.oz, false) : false;
+    if (!region) return false;
+    // Cell read per 0.5 yd sight sample: r is lineOfSightClear's 0.05, an
+    // order of magnitude inside the MAX_BODY_RADIUS registration pad, so the
+    // single cell is complete (the battleground arm above documents the same
+    // R-BOUND ASSUMPTION).
+    const list = colliderCellAt(region.cells, x - region.ox, z - region.oz);
+    return list ? overlapsAny(list, x - region.ox, z - region.oz, false) : false;
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
@@ -2411,6 +2579,7 @@ export function lineOfSightClear(
   r = 0.05,
   delveModules?: readonly string[],
   riftToken = 0,
+  sightFeet?: SightFeetOverride,
 ): boolean {
   const dx = to.x - from.x;
   const dz = to.z - from.z;
@@ -2419,23 +2588,17 @@ export function lineOfSightClear(
   // The sight line runs eye-to-eye: lerp the endpoint eye heights per sample so
   // a low prop only blocks when its top actually crosses the line.
   //
-  // Eye height is TERRAIN-DERIVED everywhere except the battleground band, and
-  // that scoping is deliberate. Taking the caller's own `y` is the honest rule
-  // ("what you stand on, you see over"), and the band needs it: its field is
-  // the one instanced region with real sculpted terrain and standable decks,
-  // and its cover was authored against tops measured from the body's real
-  // height. But BOTH live callers pass an Entity.pos, which always carries a
-  // y, so applying it everywhere would silently retune open-world spell line
-  // of sight for every player: a caster standing on a knee-high standable prop
-  // (or mid-jump) would start seeing over cover that blocks them today. That
-  // is a global combat change, not a battleground one, so it stays scoped here
-  // and the open world keeps its historical behavior byte for byte. Widening
-  // it is a deliberate change of its own, with its own tests.
-  const eyeAt = (p: { x: number; y?: number; z: number }): number =>
-    (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed)) +
+  // The battleground keeps caller y because its sculpted terrain, standable
+  // decks, and cover were authored against real fighter height. Raw caller y
+  // remains untrusted everywhere else: entity-aware open-world callers may
+  // opt in only after constraining feet height to terrain or authored support,
+  // so a jump cannot lift the sight line above intended cover.
+  const eyeAt = (p: { x: number; y?: number; z: number }, trustedY?: number): number =>
+    (trustedY ??
+      (isBgPos(p.x) ? (p.y ?? groundHeight(p.x, p.z, seed)) : groundHeight(p.x, p.z, seed))) +
     SIGHT_HEIGHT;
-  const eyeFrom = eyeAt(from);
-  const eyeTo = eyeAt(to);
+  const eyeFrom = eyeAt(from, sightFeet?.from);
+  const eyeTo = eyeAt(to, sightFeet?.to);
   const steps = Math.max(2, Math.ceil(d / 0.5));
   if (isDelvePos(from.x)) {
     const delve = delveAt(from.x);

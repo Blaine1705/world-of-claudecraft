@@ -21,6 +21,7 @@
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
+import { supportHeightAt } from '../../src/sim/colliders';
 import {
   arenaOrigin,
   DELVES,
@@ -30,11 +31,13 @@ import {
   PROPS,
   QUESTS,
 } from '../../src/sim/data';
+import { EASTBROOK_LAYOUT } from '../../src/sim/eastbrook_layout';
 import { createMob } from '../../src/sim/entity';
 import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
+import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
@@ -58,7 +61,8 @@ import {
   type SimEvent,
   xpForLevel,
 } from '../../src/sim/types';
-import { terrainHeight } from '../../src/sim/world';
+import { groundHeight, terrainHeight } from '../../src/sim/world';
+import { WORLD_SEED } from '../../src/sim/world_seed';
 import { runCraft } from '../helpers/enchant_family_cast';
 import { OPEN_FIELD } from '../helpers/open_field';
 import type { Recorder, Scenario } from './record';
@@ -66,6 +70,7 @@ import type { Recorder, Scenario } from './record';
 // ----- shared helpers ---------------------------------------------------------
 
 type AnyEntity = Entity & { nythraxis?: NythraxisEncounterState };
+const FRESH_CORPSE_TIMER = 60;
 
 interface SimPrivateHarness {
   completeTame(player: Entity, target: Entity): void;
@@ -1459,6 +1464,14 @@ function drownedLitany(): Scenario {
         );
         bossTicks(40);
         lethal(sim, p, boss);
+        // Nhalia's own summoned cantors/choir thralls (phase-2 adds, Final Bell's
+        // thralls) can still be alive when she dies. The rite gate now waits for
+        // them (delveHasLiveMobs), so clear the room the same way the choir loft
+        // did above before advancing to the rite choose step.
+        for (const id of [...run.mobIds]) {
+          const m = sim.entities.get(id) as AnyEntity | undefined;
+          if (m) m.dead = true;
+        }
       }
       rec.tick(6); // reliquary + shrines rise, rite awaits the intensity choice
       const reliquary = [...run.objectIds]
@@ -1501,6 +1514,7 @@ function partyLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1560,6 +1574,7 @@ function l1LootDistribution(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c];
@@ -1693,6 +1708,7 @@ function masterLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c, d];
@@ -3925,6 +3941,12 @@ function c4bEffectDispatch(): Scenario {
       ready(eWarlock);
       sim.castAbility('fear', warlock); // 1.5s cast -> incapacitate fear-angle rng.range(-PI,PI)
       rec.tick(32); // finish fear
+      for (let i = 0; i < 48 && !mobL.auras.some((a) => a.id === 'fear_incap'); i++) {
+        rec.tick(1);
+      }
+      rec.notes.warlockFearApplied = mobL.auras.some(
+        (a) => a.id === 'fear_incap' && a.kind === 'incapacitate',
+      );
       rec.snapshot('warlock-fear');
       ready(eWarlock);
       sim.castAbility('summon_imp', warlock); // 5s cast -> summonDemon -> ctx.summonPet
@@ -3992,10 +4014,16 @@ function c4bEffectDispatch(): Scenario {
       sim.castAbility('bear_form', druid); // selfBuff form + recalc
       ready(eDruid);
       sim.castAbility('cat_form', druid); // form switch (exclusive: strips bear)
+      // Read the exclusive switch HERE rather than off the closing state: the
+      // hot below is a healing spell, so it auto-unshifts (combat/
+      // form_auto_unshift.ts) and the druid ends the scenario formless.
+      rec.notes.druidCatFormActive = eDruid.auras.some((a) => a.kind === 'form_cat');
+      rec.notes.druidBearFormStripped = !eDruid.auras.some((a) => a.kind === 'form_bear');
+      rec.snapshot('druid-form-switch');
       ready(eDruid);
       eDruid.hp = Math.max(1, eDruid.maxHp - 1000);
       sim.targetEntity(druid, druid); // self-target the friendly hot
-      sim.castAbility('rejuvenation', druid); // hot
+      sim.castAbility('rejuvenation', druid); // hot, from cat form: auto-unshifts
       rec.snapshot('druid-moonfire-forms');
     },
   };
@@ -4208,7 +4236,9 @@ function marketRoundTrip(): Scenario {
           armorClass: 'all',
           primaryStat: 'all',
           rarity: 'all',
+          sort: 'name',
           page: 0,
+          collapseLowest: false,
         },
         seller,
       );
@@ -4221,7 +4251,9 @@ function marketRoundTrip(): Scenario {
           armorClass: 'all',
           primaryStat: 'all',
           rarity: 'all',
+          sort: 'name',
           page: 0,
+          collapseLowest: false,
         },
         seller,
       );
@@ -4960,6 +4992,7 @@ function shamanEngines(): Scenario {
       'class:shaman (Thundercall, Warspirit, Spiritmend)',
       'Thundercall Arc Bolt build and Earthen Jolt vent',
       'Warspirit dual-wield cadence and Stormcast state',
+      'Stonebound posture riders (armor, Vigor stamina, guard) and the Earthen Jolt compel',
       'Spiritmend Tidecall deposit and Cascading Mend consumption',
       'Shaman spec state in deterministic headless snapshots',
     ],
@@ -5015,6 +5048,20 @@ function shamanEngines(): Scenario {
       warspirit.offhandSwingTimer = 0;
       rec.tick(80);
       rec.snapshot('warspirit-cadence');
+
+      // Stonebound posture: the tank arm of Warspirit. Applies the armor,
+      // Vigor stamina, and guard riders, then vents an Earthen Jolt whose
+      // Stonebound arm compels the target, so the posture sits under the
+      // draw-order detector (v0.38 tank retune).
+      warspirit.resource = warspirit.maxResource;
+      warspirit.gcdRemaining = 0;
+      sim.castAbility('rockbiter_weapon', warspirit.id);
+      rec.tick(2);
+      warspirit.resource = warspirit.maxResource;
+      warspirit.gcdRemaining = 0;
+      sim.castAbility('earth_shock', warspirit.id);
+      rec.tick(40);
+      rec.snapshot('stonebound-posture');
 
       teleport(sim, spiritmend, ally.pos.x, ally.pos.z - 2);
       ally.hp = Math.round(ally.maxHp * 0.35);
@@ -5673,6 +5720,235 @@ function idleMobDistanceCulling(): Scenario {
   };
 }
 
+// The respawnWindow random window (Grix the Tunnelking, the one shipped
+// carrier): handleDeath's respawn resolution draws ONE shared-stream roll for a
+// windowed template where every fixed-schedule death draws none
+// (src/sim/respawn_policy.ts). Two kills pin two independent rolls in the draw
+// digest, so a refactor that moves, drops, or duplicates the death-site roll
+// turns this golden red rather than shipping silently.
+function grixRespawnWindow(): Scenario {
+  return {
+    name: 'grix_respawn_window',
+    coverage: [
+      'respawnWindow: death -> resolveRespawnSeconds rolls rng.range(36, 72) x 25s base',
+      'second kill after an in-place respawnMob rolls an independent window value',
+    ],
+    sampleEvery: 1,
+    build: () => new Sim({ seed: 1016, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.addPlayer('warrior', 'Spelunker');
+      const player = sim.entities.get(pid) as AnyEntity;
+      rec.track(pid);
+      beef(player, 1_000_000);
+      const grix = spawnMob(
+        sim,
+        'grix_the_tunnelking',
+        7,
+        player.pos.x + 2,
+        player.pos.y,
+        player.pos.z + 2,
+      );
+      rec.track(grix.id);
+      lethal(sim, player, grix);
+      rec.notes.firstRoll = grix.respawnTimer;
+      rec.snapshot('first-kill');
+
+      // The rolled wall clock is not the subject, the ROLL is: zero the timers
+      // out-of-band (the mob_lifecycle idiom) and drive the corpse tick to the
+      // in-place respawn, then kill the revived Grix for a second draw.
+      grix.lootable = false;
+      grix.corpseTimer = 0;
+      grix.respawnTimer = 0;
+      asHarness(sim).updateMob(grix); // respawnMob reuses the entity id
+      rec.notes.respawned = !grix.dead;
+      lethal(sim, player, grix);
+      rec.notes.secondRoll = grix.respawnTimer;
+      rec.snapshot('second-kill');
+    },
+  };
+}
+
+// Wolf Form AUTO attacks, the arm druid_engines deliberately does not drive
+// (it scripts specials only): the fixed 1.0s cat cadence swings against a
+// bear-form control on the same staff swinging at the weapon speed. The cat
+// lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
+// window, so a regression in the cat swing timer or the normalized mainhand
+// roll moves this golden's draw digest, not just its state hashes.
+function catFormAutoSwing(): Scenario {
+  return {
+    name: 'cat_form_auto_swing',
+    coverage: [
+      'class:druid (Wildfang cat + Bruin control)',
+      'Wolf Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
+      'bear-form control swinging at the equipped weapon speed on the same loadout',
+    ],
+    sampleEvery: 5,
+    build: () => new Sim({ seed: 2931, playerClass: 'druid', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const catId = sim.addPlayer('druid', 'Pawtrace');
+      const bearId = sim.addPlayer('druid', 'Bruintrace');
+      for (const pid of [catId, bearId]) sim.setPlayerLevel(20, pid);
+      sim.setSpec('feral', catId);
+      sim.setSpec('feral', bearId);
+      const cat = sim.entities.get(catId) as AnyEntity;
+      const bear = sim.entities.get(bearId) as AnyEntity;
+      teleport(sim, cat, -30, -45);
+      teleport(sim, bear, 30, -45);
+      beef(cat, 80000);
+      beef(bear, 80000);
+      const stage = (owner: AnyEntity): AnyEntity => {
+        const m = spawnMob(sim, 'training_dummy', 1, owner.pos.x, owner.pos.y, owner.pos.z + 1.5);
+        beef(m, 1_000_000);
+        m.hostile = true;
+        m.aiState = 'idle';
+        rec.track(m.id);
+        return m;
+      };
+      const catTarget = stage(cat);
+      const bearTarget = stage(bear);
+      sim.targetEntity(catTarget.id, catId);
+      face(cat, catTarget);
+      cat.resource = cat.maxResource;
+      sim.castAbility('cat_form', catId);
+      sim.targetEntity(bearTarget.id, bearId);
+      face(bear, bearTarget);
+      bear.resource = bear.maxResource;
+      sim.castAbility('bear_form', bearId);
+      rec.tick(10);
+      sim.startAutoAttack(catId);
+      sim.startAutoAttack(bearId);
+      // 8 seconds of swings: ~8 cat swings vs ~2-3 staff-speed bear swings.
+      for (let round = 0; round < 8; round++) {
+        for (const [e, m] of [
+          [cat, catTarget],
+          [bear, bearTarget],
+        ] as const) {
+          face(e, m);
+        }
+        rec.tick(20);
+      }
+      rec.snapshot('after-swings');
+      sim.stopAutoAttack(catId);
+      sim.stopAutoAttack(bearId);
+      rec.tick(10);
+    },
+  };
+}
+
+// The entity-aware open-world LOS policy must use real supported feet while
+// continuing to reject an airborne source whose lifted ray clears ordinary
+// cover. Both arms run in the shipping world seed so the positive arm uses the
+// exact Eastbrook stall and the negative arm stays on the same deterministic
+// collider set.
+function supportedElevationLineOfSight(): Scenario {
+  return {
+    name: 'supported_elevation_line_of_sight',
+    coverage: [
+      'Eastbrook standable canopy supplies grounded player eye elevation for a completed heal',
+      'Eastbrook standable canopy keeps a jumping target visible without granting jump height',
+      'airborne player elevation is rejected behind ordinary open-world cover',
+      'shared Sim cast entry point and completion LOS recheck',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: WORLD_SEED, playerClass: 'priest', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const healerId = sim.addPlayer('priest', 'ElevatedHealer') as number;
+      const allyId = sim.addPlayer('warrior', 'SightAlly') as number;
+      const healer = requireEntity(sim, healerId, 'elevated healer');
+      const ally = requireEntity(sim, allyId, 'line-of-sight ally');
+      const stall = EASTBROOK_LAYOUT.market.stalls[0];
+      const terrainY = groundHeight(stall.position.x, stall.position.z, WORLD_SEED);
+      const canopyY = supportHeightAt(
+        WORLD_SEED,
+        stall.position.x,
+        stall.position.z,
+        PLAYER_BODY_RADIUS,
+        terrainY + stall.height,
+      );
+      const place = (
+        entity: AnyEntity,
+        pos: { x: number; y: number; z: number },
+        grounded: boolean,
+      ): void => {
+        entity.pos = { ...pos };
+        entity.prevPos = { ...pos };
+        entity.vx = 0;
+        entity.vy = 0;
+        entity.vz = 0;
+        entity.onGround = grounded;
+        entity.jumping = !grounded;
+        entity.fallStartY = pos.y;
+        sim.rebucket(entity);
+      };
+
+      place(healer, { x: stall.position.x, y: canopyY, z: stall.position.z }, true);
+      place(
+        ally,
+        {
+          x: stall.position.x,
+          y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+          z: stall.position.z + 8,
+        },
+        true,
+      );
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('supported-heal-start');
+      rec.tick(40);
+      rec.snapshot('supported-heal-complete');
+
+      place(
+        healer,
+        {
+          x: stall.position.x,
+          y: groundHeight(stall.position.x, stall.position.z + 8, WORLD_SEED),
+          z: stall.position.z + 8,
+        },
+        true,
+      );
+      place(ally, { x: stall.position.x, y: canopyY, z: stall.position.z }, true);
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      const allyMeta = sim.players.get(allyId);
+      if (!allyMeta) throw new Error('missing line-of-sight ally metadata');
+      allyMeta.moveInput.jump = true;
+      rec.tick();
+      allyMeta.moveInput.jump = false;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('canopy-jump-heal-start');
+      rec.tick(40);
+      rec.snapshot('canopy-jump-heal-complete');
+
+      const from = { x: -224, z: 200 };
+      const to = { x: -224, z: 224 };
+      place(
+        healer,
+        {
+          x: from.x,
+          y: groundHeight(from.x, from.z, WORLD_SEED) + 3,
+          z: from.z,
+        },
+        false,
+      );
+      place(ally, { x: to.x, y: groundHeight(to.x, to.z, WORLD_SEED), z: to.z }, true);
+      ally.hp = 1;
+      healer.resource = healer.maxResource;
+      healer.gcdRemaining = 0;
+      sim.castAbilityOn('lesser_heal', allyId, healerId);
+      rec.snapshot('airborne-cover-denied');
+
+      rec.notes.healerId = healerId;
+      rec.notes.allyId = allyId;
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5739,4 +6015,7 @@ export const SCENARIOS: Scenario[] = [
   professionsToolEffectSlot(),
   idleMobDistanceCulling(),
   riftBossFloor(),
+  grixRespawnWindow(),
+  catFormAutoSwing(),
+  supportedElevationLineOfSight(),
 ];

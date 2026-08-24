@@ -8,13 +8,13 @@
 
 [![CI](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/levy-street/world-of-claudecraft/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Three.js](https://img.shields.io/badge/Three.js-r165-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Vitest](https://img.shields.io/badge/Vitest-4.1-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.37.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.39.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -59,7 +59,7 @@ Same seed, same world, everywhere. Much of what you see is still drawn from code
 - **Native apps on every platform**: signed desktop installers for Windows, Linux, and macOS with automatic updates and optional Steam achievement mirroring, plus iOS and Android builds, all sharing the browser client and the same online world.
 - **Scales to the machine you have**: graphics presets and an automatic frame-rate governor trade visual richness for smoothness, and are held to a fairness rule that keeps them from ever hiding something a player reacts to.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
-- **$WOC utility, fully optional**: wallet linking for holder flair, Daily Rewards, and the cosmetic WOC Store, all non-custodial and never pay-to-win; the details live in [Web3](#web3) below.
+- **$WOC utility, fully optional**: wallet linking for holder flair, Daily Rewards, the cosmetic WOC Store, and a player-to-player item marketplace (built, ships disabled), all non-custodial; the game never sells power. The details live in [Web3](#web3) below.
 
 ## Screenshots
 
@@ -188,8 +188,9 @@ $WOC also has optional utility in the live game:
 - **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, USDC, or $WOC. The $WOC payment rail is discounted against the others.
 - **Season 1 Armory**: spend Claudium on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
 - **Daily Rewards**: eligible verified holders can earn points through a daily spin and rotating tasks, then compete for a share of the daily prize pool.
+- **$WOC Marketplace** (built, ships disabled): a player-to-player auction house and direct-trade rail where players sell eligible already-earned items, stat-bearing gear included, to each other for $WOC. Every sale settles in $WOC with a 10% fee: 7% to the treasury, 3% burned. The game itself is not a party to any marketplace sale and never sells power; enabling it on a production realm awaits legal sign-off (`docs/prd/woc/marketplace.md`).
 
-None of this is needed to play. Wallet linking is optional and non-custodial, there is no pay-to-win, and the whole game plays fine without ever connecting a wallet.
+None of this is needed to play. Wallet linking is optional and non-custodial, and the game never sells power: nothing bought from us, in any currency, grants stats, gear, or progression. The marketplace, when it enables, is players trading their own earned items with each other. The whole game plays fine without ever connecting a wallet.
 
 **$WOC contract address (Solana):**
 

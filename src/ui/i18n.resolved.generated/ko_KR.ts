@@ -441,7 +441,7 @@ export const ko_KR: EnTranslations = {
       "remainingDaysHours": "{days}일 {hours}시간",
       "score": "점수",
       "walletValue": "지갑 가치 (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "알 수 없음",
       "spinTitle": "일일 스핀",
@@ -480,6 +480,88 @@ export const ko_KR: EnTranslations = {
         "price_unavailable": "WOC 가격을 확인할 수 없어 보상이 일시적으로 잠겨 있습니다.",
         "banned": "일일 보상 참여가 금지되었습니다. 사유: {reason}",
         "bannedUntil": "일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}"
+      }
+    },
+    "trade": {
+      "windowClosed": "거래 창이 닫혔습니다.",
+      "woc": {
+        "tabGold": "금화",
+        "tabWoc": "$WOC",
+        "modesLabel": "결제 통화",
+        "tabWocHint": "$WOC 결제는 당신 쪽 거래창이 비어 있고 골드를 제시하지 않았을 때 사용할 수 있습니다.",
+        "priceLabel": "가격 (USD)",
+        "pricePlaceholder": "0.00",
+        "equivalent": "현재 환율 기준 약 {tokens} $WOC",
+        "variableWarning": "$WOC 금액은 미리보기이며 고정 가격이 아닙니다. 정확한 수량은 당신이 결제하는 시점의 최신 견적으로 정해집니다.",
+        "feeLine": "거래소 수수료 {fee} (가격에서 차감)",
+        "netLine": "받는 금액 {net}",
+        "netLineBuyer": "판매자 수령액 {net}",
+        "sendOffer": "$WOC 제안",
+        "offerSent": "제안을 보냈습니다. {name} 님이 수락하지 않으면 10분 후 만료됩니다.",
+        "offerSentUntil": "제안을 보냈습니다. {name} 님이 수락하지 않으면 {time}에 만료됩니다.",
+        "incomingAccept": "{name} 님이 당신의 아이템에 {price}을(를) 제안했습니다.",
+        "notInstant": "$WOC 거래는 즉시 완료되지 않습니다. 양측이 수락하면 아이템이 에스크로로 이동하고, 결제가 확인되면 구매자에게 전달됩니다.",
+        "blockDisabled": "이 서버에서는 $WOC 거래소를 사용할 수 없습니다.",
+        "blockNoWallet": "$WOC로 아이템을 판매하려면 지갑을 연결하고 인증하세요.",
+        "blockPartnerUnknown": "해당 플레이어가 $WOC를 받을 수 있는지 확인하는 중…",
+        "blockRecipientNoWallet": "해당 플레이어가 $WOC 결제를 받으려면 지갑을 연결해야 합니다.",
+        "hintClearYourItems": "내 아이템을 내려주세요. $WOC 제안은 상대가 파는 물건을 사는 것입니다.",
+        "hintAwaitTheirItems": "상대가 $WOC로 판매 가능한 물건을 올리기를 기다리는 중입니다.",
+        "hintOneItem": "$WOC 거래는 아이템 하나만 다룹니다. 거래창에는 판매할 아이템만 올릴 수 있습니다.",
+        "hintEnterPrice": "USD 가격을 입력하세요.",
+        "hintAcceptNeedsItem": "수락하기 전에 판매할 아이템을 올려주세요.",
+        "hintAcceptLocked": "해당 아이템은 잠겨 있습니다. 가방에서 잠금을 해제한 뒤, 거래에서 빼고 다시 올리세요.",
+        "hintGoldOffered": "먼저 골드 제안을 취소하세요. 거래는 골드 또는 $WOC 중 하나만 가능합니다.",
+        "ineligibleReason": "귀속 아이템, 퀘스트 아이템, 잠긴 아이템, 그리고 거래소 범주 밖의 아이템은 $WOC로 판매할 수 없습니다.",
+        "incomingTitle": "{name} 님의 $WOC 제안",
+        "incomingBody": "{name} 님이 {item}을(를) {price}에 판매하겠다고 제안했습니다.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (약 {tokens} $WOC)",
+        "waitingOther": "제안을 수락했습니다. 상대의 수락을 기다리는 중입니다.",
+        "payNow": "{usd} 결제",
+        "awaitingPayment": "결제 확인을 기다리는 중…",
+        "paying": "지갑에서 결제를 승인하세요…",
+        "settled": "결제 완료. 아이템이 가방에 들어 있습니다. 가방이 가득 찼다면 레이븐포스트 우편으로 도착합니다.",
+        "settledSeller": "결제 완료. 아이템이 구매자에게 전달되었습니다.",
+        "accept": "제안 수락",
+        "accepted": "제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.",
+        "decline": "거절",
+        "withdraw": "제안 철회",
+        "hintInsufficientBalance": "연결된 지갑의 $WOC 잔액보다 많습니다.",
+        "statusAwaitingBuyer": "구매자의 결제를 기다리는 중입니다.",
+        "statusPayingBuyer": "네트워크에서 결제를 확인하는 중입니다...",
+        "statusPayingSeller": "구매자의 결제를 네트워크에서 확인하는 중입니다...",
+        "statusReviewBuyer": "당신의 결제가 검토 중입니다.",
+        "statusReviewSeller": "구매자의 결제가 검토 중입니다.",
+        "paidSeller": "{item}에 대한 {price} 결제를 받았습니다.",
+        "paidBuyer": "{item}에 대해 {price}를 결제했습니다.",
+        "closedCancelled": "이 판매는 취소되었습니다. 아이템은 레이븐포스트 우편으로 판매자에게 반환됩니다.",
+        "closedSuspended": "이 판매는 게임 마스터에 의해 중단되었습니다. 아이템은 레이븐포스트 우편으로 판매자에게 반환됩니다.",
+        "closedUnpaid": "이 판매는 결제 없이 종료되었습니다. 아이템은 레이븐포스트 우편으로 판매자에게 반환됩니다.",
+        "closedUnpaidBuyer": "이 판매는 당신의 결제 없이 종료되었습니다. 아이템은 레이븐포스트 우편으로 판매자에게 반환되며, 수락한 거래를 결제하지 않으면 마켓 위반이 기록됩니다.",
+        "cancelSale": "판매 취소",
+        "cancelPendingSeller": "취소를 요청했습니다. 구매자가 먼저 결제하지 않는 한 판매는 자동으로 종료됩니다.",
+        "youDeclined": "제안을 거절했습니다.",
+        "youWithdrew": "제안을 철회했습니다.",
+        "offerNotPending": "이 제안은 더 이상 대기 중이 아닙니다.",
+        "offerDeclined": "$WOC 제안이 거절되었습니다.",
+        "offerWithdrawn": "$WOC 제안이 철회되었습니다.",
+        "offerExpired": "$WOC 제안이 만료되었습니다.",
+        "offerExpiresAt": "제안은 {time}에 만료됩니다.",
+        "offerStandsUntil": "당신의 $WOC 제안은 {time}까지 유효합니다. 상대가 수락하면 판매자와 다시 거래하여 거래를 완료하세요.",
+        "dealAwaitsPayment": "$WOC 구매가 아직 미결제 상태입니다. 판매자와 다시 거래하여 결제하세요. 결제하지 않으면 거래는 자동으로 만료되며, 미결제 시 마켓 위반이 기록됩니다.",
+        "closeSellerHold": "당신의 아이템은 구매자의 결제를 위해 보류된 상태로 남습니다. 마음이 바뀌면 거래소의 활동 탭에서 판매를 취소하세요.",
+        "closePaymentContinuesBuyer": "당신의 결제는 아직 확인 중입니다. 배송은 자동으로 완료됩니다.",
+        "closePaymentContinuesSeller": "구매자의 결제는 아직 확인 중입니다. 판매는 자동으로 완료됩니다.",
+        "p2pBindingNote": "양측이 수락하면 {duration} 안에, 또는 결제를 누른 순간 시작되는 더 짧은 기간 안에 결제해야 합니다. 결제하지 않으면 마켓 위반이 기록됩니다.",
+        "p2pBindingNoteUntimed": "양측이 수락하면 곧, 또는 결제를 누른 순간 시작되는 더 짧은 기간 안에 결제해야 합니다. 결제하지 않으면 마켓 위반이 기록됩니다.",
+        "p2pPaymentDueAt": "{time}까지 결제해야 합니다. 결제하지 않으면 마켓 위반이 기록됩니다.",
+        "quoteExpiredTrade": "견적이 만료되었습니다. 나중에를 누른 뒤 결제를 다시 누르면 새 견적을 받을 수 있습니다.",
+        "quoteStaged": "{usd} 결제 견적이 준비되었습니다: {tokens} $WOC, {time}까지 유효합니다.",
+        "paymentConfirmed": "결제가 확인되었습니다. 배송이 완료되면 아이템이 가방에 들어옵니다(가방이 가득 찼다면 레이븐포스트 우편으로 도착합니다).",
+        "statusConfirmedBuyer": "결제가 확인되었습니다. 전달을 완료하는 중입니다...",
+        "statusConfirmedSeller": "결제가 확인되었습니다. 거래를 완료하는 중입니다...",
+        "hintBelowMin": "거래소 최저 가격은 {usd}입니다."
       }
     },
     "wocStore": {
@@ -734,6 +816,9 @@ export const ko_KR: EnTranslations = {
       "showAmounts": "모든 Claudium 수량 표시",
       "hideAmounts": "추가 Claudium 수량 숨기기",
       "skuRow": "{usd}에 {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "구매",
       "buyUnavailable": "현재 구매할 수 없습니다.",
       "storeTitle": "꾸미기 상점",
@@ -853,6 +938,7 @@ export const ko_KR: EnTranslations = {
       "jump": "점프",
       "leaderboard": "순위",
       "dailyRewards": "상점",
+      "wocMarket": "거래소",
       "deeds": "업적",
       "mounts": "탈것",
       "professions": "전문 기술",
@@ -866,11 +952,52 @@ export const ko_KR: EnTranslations = {
       "actionRing": "전투 행동",
       "actionPageToggle": "행동 페이지 전환",
       "actionPageIndicator": "{page}페이지",
+      "actionRadial": "액션 방향",
+      "actionRadialCancel": "동작 취소",
+      "radialCenter": "가운데",
+      "radialUp": "Up",
+      "radialRight": "오른쪽",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "소모품",
+      "menuControl": "메뉴",
+      "menuControlAria": "메뉴. 탭하면 대화창이 열리고, 길게 누른 뒤 오른쪽으로 밀면 탈것, 지도, 가방 등을 열 수 있습니다.",
+      "menuControlAriaTap": "메뉴. 탭하면 탈것, 지도, 가방 등의 메뉴 줄이 열립니다. 다시 탭하면 대화창이 열립니다.",
+      "menuLabel": "Menu",
+      "quickActions": "빠른 실행",
+      "quickActionsAria": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리고, 길게 누른 뒤 오른쪽으로 밀면 항목을 선택할 수 있습니다.",
+      "quickActionsAriaTap": "빠른 실행. 탭하면 탈것, 채팅, 지도, 가방 등의 실행 줄이 열리며, 항목을 탭해 선택합니다. 컨트롤을 다시 탭하면 닫힙니다.",
+      "quickActionsLabel": "실행",
+      "stanceRadial": "태세",
+      "stanceAnchorAria": "태세: {stance}. 탭하여 태세 링을 열고 다른 태세를 선택하세요.",
+      "stanceAnchorEmptyAria": "태세 없음. 탭하여 태세 링을 열고 태세를 선택하세요.",
+      "questStripAria": "추적 중인 퀘스트 {total}개 중 {position}번째: {title}. 다음 퀘스트를 보려면 누르십시오.",
+      "questStripAriaSingle": "추적 중인 퀘스트: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "외 {count}개",
       "targetCycle": "대상 전환",
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
-      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)"
+      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "행동 단축바 배치 편집"
+    },
+    "barEditor": {
+      "title": "행동 단축바 편집",
+      "close": "행동 단축바 편집 닫기",
+      "pages": "행동 단축바 페이지",
+      "pageTab": "Page {page}",
+      "buttonHeader": "버튼 {button}",
+      "cellAria": "버튼 {button}, {direction}: {action}",
+      "emptyCellAria": "버튼 {button}, {direction}: 비어 있음",
+      "hint": "칸을 누른 뒤 다른 칸을 누르면 서로 바뀝니다.",
+      "armed": "칸을 눌러 {name}을(를) 배치하세요.",
+      "picked": "다른 칸을 눌러 {name}과(와) 바꾸세요.",
+      "locked": "행동 단축바가 인터페이스 설정에서 잠겨 있습니다.",
+      "clear": "비우기",
+      "clearAria": "슬롯 비우기",
+      "clearArmed": "슬롯을 탭하면 비워집니다."
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -953,6 +1080,22 @@ export const ko_KR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "지하 저장고",
+        "state": "의전층",
+        "residence": "주거층",
+        "tower": "망루"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "정원층",
+        "solar": "일광실"
+      }
+    },
     "compass": {
       "N": "북",
       "NE": "북동",
@@ -970,6 +1113,7 @@ export const ko_KR: EnTranslations = {
       "seconds": "{s}초",
       "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
       "threatFallback": "실시간 위협 없음: {name}에게 입힌 피해 표시",
+      "threatFrozen": "{name}에 대한 최종 위협",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",
@@ -1367,6 +1511,10 @@ export const ko_KR: EnTranslations = {
       "showWalletOnCharacterScreen": "캐릭터 화면에 지갑 표시",
       "showWalletOnPlayerCard": "플레이어 카드에 지갑 표시",
       "showPlaytime": "캐릭터 화면에 플레이 시간 표시",
+      "forceHighPerfGpu": "전용 게이밍 GPU 사용",
+      "forceHighPerfGpuNote": "기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.",
+      "discordPresence": "Discord 리치 프레즌스",
+      "discordPresenceNote": "플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.",
       "showDevBadges": "개발자 배지 표시",
       "showOwnNameplate": "내 이름표 표시",
       "showPlayerNameplates": "플레이어 이름표 표시",
@@ -1382,6 +1530,7 @@ export const ko_KR: EnTranslations = {
       "mouseoverCast": "파티 창에서 마우스오버 시전",
       "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
+      "showReliquaryTracker": "성물고 추적기 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
@@ -1394,7 +1543,9 @@ export const ko_KR: EnTranslations = {
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
-      "mobileLeftHanded": "왼손잡이 레이아웃"
+      "mobileLeftHanded": "왼손잡이 레이아웃",
+      "touchTapMenus": "탭 메뉴",
+      "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
     "talentRows": {
       "tab": "선택",
@@ -1427,9 +1578,29 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
+      "confirmAction": "확인 / 선택",
       "zoomIn": "확대",
       "zoomOut": "축소",
-      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
+      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다.",
+      "crossHotbar": "크로스 핫바",
+      "crossHotbarEnable": "크로스 핫바 사용",
+      "crossHotbarExpand": "더블 크로스 핫바",
+      "crossHotbarHelp": "트리거를 누르고 있으면 방향키와 페이스 버튼에 여덟 개의 액션 바 슬롯이 표시됩니다. 다른 트리거를 짧게 누르면 두 번째 세트로 전환됩니다.",
+      "crossHotbarResetLayout": "크로스 핫바 초기화",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "크로스 핫바가 켜져 있는 동안에는 트리거와 방향키를 크로스 핫바가 사용합니다. 여기가 아니라 아래에서 설정하세요.",
+      "cancelAction": "취소 / 뒤로",
+      "subcommandsAction": "하위 명령 / 지도",
+      "cycleHudAction": "인터페이스 전환",
+      "cycleSetAction": "단축바 세트 전환",
+      "crossHotbarDisplay": "바 표시",
+      "crossHotbarDisplayFull": "전체",
+      "crossHotbarDisplayCompact": "간소",
+      "crossHotbarDisplayMinimal": "누르고 있을 때만",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "{action} 을(를) 들고 있습니다. 칸에서 확인을 누르면 놓고, 취소하면 되돌립니다.",
+      "crossHotbarEditHint": "정렬 중: 확인으로 칸이나 마법서에서 액션을 집어 칸에 놓고, 취소로 칸을 비웁니다.",
+      "crossHotbarEditHelp": "왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다."
     },
     "perf": {
       "title": "성능 오버레이",
@@ -1548,6 +1719,7 @@ export const ko_KR: EnTranslations = {
           "render": "렌더  제출 {submit}밀리초 | 월드 {world}밀리초 | 엔티티 {entities}밀리초",
           "scene": "장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개",
           "hitches": "끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}",
+          "hitchesBuild": "구역 빌드 {zoneBuilds} | 프레임 외부 {offFrame} | GC {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "대기 중"
         },
@@ -1599,7 +1771,10 @@ export const ko_KR: EnTranslations = {
             "eventCpu": "이벤트 처리가 프레임 시간을 사용합니다",
             "shaderCompile": "게임 중 셰이더가 컴파일되고 있습니다",
             "textureUpload": "텍스처 업로드가 게임 끊김을 일으킵니다",
+            "zoneBuild": "구역 스트리밍 빌드가 끊김을 일으킵니다",
             "viewCreate": "엔티티 뷰 생성이 끊김을 일으킵니다",
+            "gcHitch": "긴 프레임 안에서 가비지 컬렉션이 실행되고 있습니다",
+            "offFrameHitch": "긴 프레임은 렌더 콜백 외부의 작업에서 발생합니다",
             "otherHitch": "원인을 알 수 없는 긴 프레임이 남아 있습니다",
             "assetStartup": "에셋 작업이 게임 시작을 지연시킵니다",
             "longTasks": "브라우저의 긴 작업이 프레임을 막습니다",
@@ -1739,6 +1914,7 @@ export const ko_KR: EnTranslations = {
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
+        "arenaComplete": "투기장 참전",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
         "fiestaWin": "피에스타 승리",
@@ -1845,6 +2021,7 @@ export const ko_KR: EnTranslations = {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemHeroicTag": "[영웅]",
+    "itemHeroicLabel": "영웅",
     "itemSoulbound": "귀속",
     "itemUniqueEquipped": "착용 시 고유",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const ko_KR: EnTranslations = {
         "few": "당신은 {rank}, {count}명 회원",
         "many": "당신은 {rank}, {count}명 회원",
         "other": "당신은 {rank}, {count}명 회원"
+      },
+      "wocMarketSellChoose": {
+        "one": "{count}개 중에서 선택",
+        "few": "{count}개 중에서 선택",
+        "many": "{count}개 중에서 선택",
+        "other": "{count}개 중에서 선택"
+      },
+      "wocTradeIneligible": {
+        "one": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.",
+        "few": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.",
+        "many": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.",
+        "other": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다."
       },
       "finderPartySize": {
         "one": "{count}인",
@@ -2016,6 +2205,10 @@ export const ko_KR: EnTranslations = {
       "errPasswordLong": "새 비밀번호는 128자 이하여야 합니다.",
       "errPasswordUnchanged": "새 비밀번호는 현재 비밀번호와 달라야 합니다.",
       "errPasswordConfirm": "새 비밀번호가 서로 일치하지 않습니다.",
+      "setPasswordTitle": "비밀번호 설정",
+      "setPasswordHint": "이 계정은 Apple 로그인 또는 Discord로 생성되었으며 아직 비밀번호가 없습니다. 비밀번호를 설정하면 Mac 및 Windows 데스크톱 앱이나 웹 같은 다른 기기에서 로그인하고 추가 로그인 방법을 연결할 수 있습니다.",
+      "setPasswordSubmit": "비밀번호 설정",
+      "passwordSet": "비밀번호가 설정되었습니다. 이제 어디서든 사용자 이름과 비밀번호로 로그인할 수 있습니다.",
       "emailLabel": "이메일(선택 사항)",
       "emailHint": "계정 복구에만 사용됩니다. 마케팅 이메일은 보내지 않습니다.",
       "saveEmail": "이메일 저장",
@@ -2199,6 +2392,10 @@ export const ko_KR: EnTranslations = {
       "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
       "itemAriaQuest": "{item}, 수량 {count}, 퀘스트 아이템",
+      "itemAriaLocked": "{item}, 수량 {count}, 잠김",
+      "itemLockedLine": "잠김",
+      "lockItem": "아이템 잠그기",
+      "unlockItem": "아이템 잠금 해제",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -2453,12 +2650,14 @@ export const ko_KR: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
-      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거"
+      "removeFromBarAria": "{name}을(를) 행동 단축바에서 제거",
+      "assignAria": "{name}을(를) 놓을 칸 선택"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "자리비움"
+      "afkTag": "자리비움",
+      "cheaterTag": "< 부정행위자 >"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
@@ -3224,11 +3423,13 @@ export const ko_KR: EnTranslations = {
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
+      "craftFeeLine": "제작 수수료: 개당 {fee}",
       "empty": "알려진 제작법이 없습니다.",
       "resultAria": "{name} 제작",
       "craftedToast": "제작 완료:{name}",
       "craftedToastQty": "제작 완료:{name} x{qty}",
       "insufficientMaterials": "재료가 부족합니다.",
+      "reagentLocked": "그 재료가 잠겨 있습니다.",
       "unknownRecipe": "해당 제작법이 존재하지 않습니다.",
       "comboRequirementUnmet": "이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.",
       "comboRequires": "조율 조건: {craftA} + {craftB}, 티어 {tier}.",
@@ -3335,6 +3536,7 @@ export const ko_KR: EnTranslations = {
       "notHeld": "해당 아이템을 가지고 있지 않습니다.",
       "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
       "notSalvageable": "해당 아이템은 분해할 수 없습니다.",
+      "salvageLocked": "그 아이템은 잠겨 있습니다.",
       "disenchantBusy": "지금은 바쁩니다.",
       "salvageBusy": "지금은 바쁩니다.",
       "enchantBusy": "지금은 바쁩니다.",
@@ -3710,6 +3912,9 @@ export const ko_KR: EnTranslations = {
       "pinFull": "추적기가 가득 찼습니다 (최대 {cap}개 페이지)",
       "pinAria": "HUD 추적기에 {name} 고정",
       "unpinAria": "{name} 고정 해제",
+      "trackerToggleLabel": "HUD 추적기",
+      "trackerToggleShowHint": "화면에 성물고 추적기 표시",
+      "trackerToggleHideHint": "화면에서 성물고 추적기 숨기기",
       "rarityLine": "수집가 중 {percent} 발견",
       "pageRarityLine": "수집가 중 {percent} 조명",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const ko_KR: EnTranslations = {
       "unlockedBorderHint": "새 테두리 획득: {name}. 업적의 서에서 착용할 수 있습니다.",
       "broadcastLine": "{name} 님이 업적을 달성했습니다: {deed}",
       "rarityLine": "모험가 중 {percent} 달성",
+      "stillToVisit": "아직 방문할 곳: {places}",
       "trackerLabel": "업적",
       "collapseHint": "업적 추적기 접기",
       "expandHint": "업적 추적기 펼치기",
@@ -3797,6 +4003,220 @@ export const ko_KR: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"
+    },
+    "walletBridge": {
+      "cancelled": "지갑 요청이 취소되었습니다. 아무것도 전송되지 않았습니다.",
+      "timeout": "지갑이 제시간에 응답하지 않았습니다. 지갑을 열고 다시 시도하세요.",
+      "notConnected": "먼저 지갑을 연결하고 인증한 뒤 다시 시도하세요.",
+      "unsupported": "이 지갑으로는 해당 작업을 완료할 수 없습니다. 다른 지갑을 연결하세요.",
+      "unavailable": "여기서 사용할 수 있는 지갑 연결이 없습니다. 지갑을 다시 연결하고 시도하세요.",
+      "badResponse": "지갑이 사용할 수 없는 응답을 반환했습니다. 다시 시도하세요."
+    },
+    "wocMarket": {
+      "title": "$WOC 거래소",
+      "close": "거래소 닫기",
+      "launcherLabel": "$WOC 거래소",
+      "tabBrowse": "둘러보기",
+      "tabSell": "판매",
+      "tabActivity": "내 활동",
+      "tabsLabel": "$WOC 거래소 섹션",
+      "loading": "거래소를 불러오는 중...",
+      "loadFailed": "거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
+      "disabledRealm": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
+      "pausedBanner": "거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.",
+      "walletBanner": "지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.",
+      "walletBannerCta": "지갑 연결",
+      "rateNote": "환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
+      "rateNotePaused": "마지막으로 확인된 환율: {time} 기준 1 USD당 약 {tokens} $WOC.",
+      "estimateNote": "{usd}는 현재 환율로 약 {tokens} $WOC입니다.",
+      "browseEmpty": "지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.",
+      "browseError": "등록 목록을 불러올 수 없습니다.",
+      "colItem": "아이템",
+      "colSeller": "판매자",
+      "colCurrentBid": "현재 입찰가",
+      "colBuyNow": "즉시 구매가",
+      "colTimeLeft": "남은 시간",
+      "reserveMet": "최저가 도달",
+      "reserveNotMet": "최저가 미달",
+      "yourListing": "내 등록",
+      "buyNowLockedBadge": "구매 진행 중",
+      "reserveMetTip": "판매자가 비공개 최저가를 설정했고, 현재 입찰가가 이를 충족합니다.",
+      "reserveNotMetTip": "판매자가 비공개 최저가를 설정했습니다. 종료 시 최고 입찰가가 이보다 낮으면 아이템은 판매되지 않고 모든 보증금이 반환됩니다.",
+      "yourListingTip": "당신이 등록한 아이템입니다. 자신의 등록에는 입찰할 수 없으며, 입찰이 없는 동안에는 여기나 활동 탭에서 취소할 수 있습니다.",
+      "buyNowLockedTip": "다른 구매자가 결제하는 동안 이 매물을 확보하고 있습니다. 제때 결제하지 않으면 매물이 다시 열립니다.",
+      "pagePrev": "이전 페이지",
+      "pageNext": "다음 페이지",
+      "pageNumber": "{current}페이지",
+      "sortLabel": "정렬",
+      "sortEnding": "종료 임박순",
+      "sortNewest": "최신순",
+      "sortPriceAsc": "가격 낮은 순",
+      "sortPriceDesc": "가격 높은 순",
+      "filterQuality": "품질",
+      "filterFormat": "방식",
+      "filterAny": "전체",
+      "filterFormatAuction": "경매",
+      "filterFormatBuyNow": "즉시 구매",
+      "filterItemLabel": "아이템",
+      "filterItemPlaceholder": "아이템 이름으로 검색",
+      "filterCategory": "분류",
+      "filterCategoryWeapon": "무기",
+      "filterCategoryArmor": "방어구",
+      "filterCategoryMount": "탈것",
+      "filterSubcategory": "종류",
+      "sellerLinkAria": "{name}의 최근 거래 보기",
+      "sellerTitle": "{name}의 최근 거래",
+      "sellerBack": "둘러보기로 돌아가기",
+      "sellerEmpty": "아직 완료된 거래가 없습니다.",
+      "sellerError": "최근 거래를 불러올 수 없습니다.",
+      "sellerSaleRow": "{time}: {item}을(를) {buyer}에게 {usd}에 판매",
+      "detailTitle": "등록 정보",
+      "detailSeller": "판매자: {name}",
+      "detailEndsAt": "종료: {utc} UTC (현지 시간 {local})",
+      "detailStartingBid": "시작가: {usd}",
+      "detailCurrentBid": "현재 입찰가: {usd}",
+      "detailNoBids": "입찰 없음",
+      "detailMinNext": "다음 최소 입찰가: {usd}",
+      "detailBuyNow": "즉시 구매가: {usd}",
+      "detailSales": "최근 판매",
+      "detailSaleRow": "{time}: {seller}이(가) {buyer}에게 {usd}에 판매",
+      "detailNoSales": "이 아이템의 판매 기록이 아직 없습니다.",
+      "detailSalesLoading": "최근 판매 기록을 불러오는 중...",
+      "bidLabel": "입찰가 (USD)",
+      "bidPlaceholder": "USD 금액 입력",
+      "bidButton": "입찰",
+      "bidAria": "{item}에 입찰",
+      "bidTermsToggle": "입찰 약관",
+      "rowOpenAria": "{item} 매물 보기",
+      "buyNowButton": "{usd}에 즉시 구매",
+      "buyNowAria": "{item}을(를) {usd}에 즉시 구매",
+      "cancelButton": "등록 취소",
+      "cancelAria": "{item} 등록 취소",
+      "bidBondNote": "입찰하면 입찰가와 별도로 환불 가능한 보증금을 $WOC로 예치합니다. {bid} 입찰에 {bond}이며, 입찰가가 높을수록 더 많습니다. 상회 입찰이 나오거나 낙찰되지 못하면 반환되고, 낙찰 후 결제를 마치면 반환됩니다. 차순위 제안 시에는 다시 예치됩니다.",
+      "bidBondSchedule": "보증금은 입찰가의 {rate}%이며, 최소 {min}, 최대 {max}입니다.",
+      "bidBondPayWindow": "입찰 후 {duration} 이내에 보증금을 지불하지 않으면 입찰이 무효화됩니다.",
+      "bidBindingNote": "보증금 거래에 서명하는 순간 입찰은 확정됩니다. 입찰은 철회할 수 없으며, 낙찰 후 결제하지 않으면 보증금이 몰수되고 계정에 마켓 위반이 기록됩니다.",
+      "bidCloseNote": "마지막 2분 안에 보증금이 확인된 입찰이 있으면 경매가 그 입찰 후 2분까지 연장되며, 원래 종료 시각에서 최대 30분까지만 연장됩니다. 경매 종료 후 확인된 보증금은 인정되지 않고 환불됩니다.",
+      "offerNextNote": "낙찰자가 결제하지 않으면 당신이 자신의 입찰가로 구매자가 될 수 있습니다. 이때 보증금이 다시 예치되며(이미 반환된 경우 다시 청구됨), {duration} 안에 결제해야 합니다.",
+      "buyNowNote": "즉시 구매는 결제하는 동안 약 4분 30초간 이 매물을 당신을 위해 확보합니다. 제때 결제하지 않으면 30분 동안 이 매물을 다시 시도할 수 없고, 한 시간 안에 미결제 즉시 구매가 세 번이면 가장 오래된 건이 한 시간을 넘길 때까지 즉시 구매가 중지됩니다.",
+      "variableTokenWarning": "당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.",
+      "quoteFixedNote": "이 견적은 만료될 때까지 $WOC 수량을 고정합니다. 새 견적은 다를 수 있습니다.",
+      "settlementDeadlineNote": "낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.",
+      "claimCooldownRetry": "최근에 즉시 구매를 중도 포기했습니다. {duration} 후에 다시 시도하세요.",
+      "termsLabel": "마켓 약관에 동의합니다.",
+      "termsLink": "마켓 약관 보기(새 탭에서 열림)",
+      "quoteTitle": "결제 확인",
+      "quoteTotal": "합계: {tokens} $WOC",
+      "quoteSeller": "판매자 수령액: {tokens} $WOC",
+      "quoteBurn": "소각(공급량에서 제거): {tokens} $WOC",
+      "quoteTreasury": "게임 트레저리로: {tokens} $WOC",
+      "quoteExpires": "견적 만료까지 {duration}",
+      "quoteExpiresAt": "견적은 {time}에 만료됩니다.",
+      "quoteExpired": "견적이 만료되었습니다. 새 견적을 요청하세요.",
+      "quoteSign": "서명하고 결제",
+      "quoteRefresh": "새 견적",
+      "quoteCancel": "나중에",
+      "quoteBondFor": "환불 가능한 입찰 보증금: {usd}",
+      "quoteBondForItem": "{item} 입찰의 환불 가능한 보증금: {usd}",
+      "quoteSettlementFor": "{item} 정산: {usd}",
+      "paymentDueAt": "{time}까지 결제해야 합니다.",
+      "signing": "지갑 승인을 기다리는 중...",
+      "signFailed": "지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.",
+      "signFailedConfirm": "지갑에서 확인에 서명하지 못했습니다. 지갑을 확인한 후 다시 시도하세요.",
+      "confirming": "체인에서 확인 중...",
+      "listing": "아이템을 등록하는 중...",
+      "activityCancelPending": "취소 대기 중",
+      "activityDirected": "직접 거래",
+      "bidPlacedStanding": "입찰이 확정되었습니다. 현재 최고 입찰자입니다.",
+      "bidPlacedOutbid": "보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.",
+      "purchaseComplete": "구매가 완료되었습니다. 아이템은 레이븐포스트 우편으로 도착합니다.",
+      "paymentConfirmedDelivering": "결제가 확인되었습니다. 배송이 완료되면 아이템은 레이븐포스트 우편으로 도착합니다.",
+      "listingCreated": "등록이 완료되었습니다.",
+      "listingCancelled": "등록이 취소되었습니다. 아이템은 레이븐포스트 우편으로 돌아옵니다.",
+      "listingCancelPending": "취소 대기 중: 한 구매자가 구매 창구를 쥐고 있습니다. 그가 결제하지 않으면 등록이 닫히고 아이템은 레이븐포스트 우편으로 돌아옵니다.",
+      "sellTitle": "등록 만들기",
+      "sellEmptyFloor": "가방에 등록 가능한 아이템이 없습니다. 이 서버는 {floor} 품질 이상의 귀속되지 않은 장비를 취급합니다.",
+      "sellCollectiblesBoth": "탈것과 메크 크로마 플레이트도 등록할 수 있습니다.",
+      "sellCollectiblesMounts": "탈것도 등록할 수 있습니다.",
+      "sellCollectiblesChromas": "메크 크로마 플레이트도 등록할 수 있습니다.",
+      "sellLockedHidden": "잠긴 아이템은 여기에 표시되지 않습니다. 판매하려면 가방에서 잠금을 해제하세요.",
+      "sellSearchPlaceholder": "입력해 가방 필터링",
+      "sellClear": "{item} 선택을 해제하고 다시 선택",
+      "sellChoose": "등록할 아이템",
+      "sellNoMatches": "검색과 일치하는 아이템이 없습니다",
+      "sellBuyNowAboveStart": "즉시 구매가는 시작 입찰가보다 높아야 합니다.",
+      "sellFormat": "형식",
+      "sellFormatAuction": "경매",
+      "sellFormatBuyNow": "즉시 구매만",
+      "sellFormatAuctionBuyNow": "경매 + 즉시 구매",
+      "sellStart": "시작가 (USD)",
+      "sellReserve": "최저가 (USD, 선택)",
+      "sellReserveNote": "선택 사항이며 시작가 이상이어야 합니다. 입찰자에게는 도달 여부만 표시됩니다. 종료 시 최고 입찰가가 이보다 낮으면 아이템은 팔리지 않고 돌아오며 모든 보증금이 반환됩니다.",
+      "sellBuyNowNote": "필수입니다. 즉시 구매 등록은 입찰 없이 이 가격에 판매됩니다.",
+      "sellBuyNowAuctionNote": "선택 사항. 구매자가 지불해 경매를 즉시 끝낼 수 있는 가격입니다. 시작가와 최저가보다 높아야 합니다.",
+      "sellBuyNowPrice": "즉시 구매가 (USD)",
+      "sellDuration": "기간",
+      "sellOfferNext": "낙찰자가 결제하지 않으면 유찰 대신 최저가를 충족한 차순위 입찰자에게 그 입찰가로 판매합니다.",
+      "sellSubmit": "아이템 등록",
+      "sellSubmitAria": "{item}을(를) 거래소에 등록",
+      "sellFeeNote": "판매가 완료되면 가격에서 거래소 수수료가 차감됩니다. 일부는 소각되고 일부는 트레저리로 가며, 나머지는 정산 트랜잭션으로 연동된 지갑에 도착합니다. 입력한 가격에 대한 수수료는 여기에 표시되며, 경매는 최종 가격을 기준으로 합니다.",
+      "activityListings": "내 등록",
+      "activityBids": "내 입찰",
+      "activitySettlements": "내 정산",
+      "activityEmpty": "아직 입찰, 등록, 정산 내역이 없습니다. 내 거래소 활동이 여기에 표시됩니다.",
+      "activityNoListings": "등록한 매물이 없습니다.",
+      "activityNoBids": "입찰이 없습니다.",
+      "activityNoSettlements": "정산이 없습니다.",
+      "activityPayNow": "지금 결제",
+      "activityPayNowAria": "정산 {id} 지금 결제",
+      "activityPayNowItemAria": "{item}에 대해 {usd}을(를) 지금 결제",
+      "activityDeadline": "결제 기한: {duration} 남음",
+      "dueAt": "기한: {utc} UTC (현지 시간 {local})",
+      "activityStrikes": "거래소 경고 횟수: {count}",
+      "activitySuspended": "미결제 거래로 인해 거래소 이용이 {duration} 동안 정지됩니다. 그때까지 입찰, 구매, 등록, $WOC 거래를 할 수 없습니다.",
+      "strikesTip": "확정한 거래를 결제하지 않을 때마다 위반이 1회 기록됩니다. 첫 번째 이후로는 위반마다 거래소 이용 정지 기간이 길어집니다. 3일, 그다음 14일, 90일, 그다음 1년입니다.",
+      "bidStatusPending": "보증금 대기",
+      "bidStatusActive": "최고 입찰자",
+      "bidStatusOutbid": "상회 입찰됨",
+      "bidStatusLapsed": "만료됨",
+      "bidStatusWon": "낙찰",
+      "bidStatusDefaulted": "미결제",
+      "bidStatusCancelled": "취소됨",
+      "bidBondPay": "보증금 결제",
+      "bidBondPayAria": "등록 {id}에 대한 입찰 보증금 결제",
+      "bidBondPayItemAria": "{item} 입찰의 보증금 {bond} 결제",
+      "settlementOffered": "결제 대기",
+      "settlementConfirming": "확인 중",
+      "settlementConfirmedDelivering": "결제 확인됨, 배송 중",
+      "settlementReview": "결제 검토 중",
+      "settlementDelivered": "전달됨",
+      "settlementExpired": "기한 만료(미결제)",
+      "settlementFailed": "결제 실패",
+      "settlementFailBurnMissing": "결제에 필요한 토큰 소각이 포함되어 있지 않았습니다.",
+      "settlementFailBurnMismatch": "결제에서 소각된 토큰 수량이 올바르지 않습니다.",
+      "settlementFailBurnAuthority": "이 구매에서 지정하지 않은 지갑에서 토큰이 소각되었습니다.",
+      "settlementFailUnexpectedCredit": "이 구매와 무관한 지갑으로 송금된 트랜잭션입니다.",
+      "settlementFailQuoteExpired": "결제 견적이 사용 전에 만료되었습니다. 새 견적을 받아 다시 결제하세요.",
+      "settlementFailTransaction": "결제 트랜잭션이 네트워크에서 실패했습니다. 새 견적을 받아 다시 시도하세요.",
+      "settlementFailRefunded": "이 결제는 지갑으로 반환되었습니다.",
+      "settlementFailSuperseded": "이 결제 시도는 더 새로운 시도로 대체되었습니다.",
+      "settlementFailConfirmingOverdue": "이 결제는 확인이 너무 오래 걸려 검증할 수 없었습니다.",
+      "settlementFailGeneric": "이 결제를 완료할 수 없었습니다.",
+      "paymentSeenAwaitingFinality": "원장에서 결제가 확인되었습니다. 최종 확정을 기다리는 중입니다.",
+      "paymentNotYetVisible": "원장에 아직 결제가 보이지 않습니다. 표시되기까지 잠시 걸릴 수 있습니다.",
+      "paymentServiceUnreachable": "결제 서비스에 연결할 수 없습니다. 결제는 기록되어 있으며 나중에 다시 확인됩니다.",
+      "paymentPendingGeneric": "결제가 제출되어 확인을 기다리고 있습니다.",
+      "bondSeenAwaitingFinality": "보증금 결제가 원장에서 확인되었습니다. 최종 확인을 기다리는 중입니다.",
+      "bondNotYetVisible": "보증금 결제가 아직 원장에 보이지 않습니다. 나타나기까지 잠시 걸릴 수 있습니다.",
+      "bondServiceUnreachable": "결제 서비스에 연결할 수 없습니다. 보증금 결제는 기록되어 있으며 나중에 다시 확인됩니다.",
+      "bondPendingGeneric": "보증금 결제가 제출되어 확인을 기다리는 중입니다.",
+      "listingStatusActive": "진행 중",
+      "listingStatusSettling": "결제 대기 중",
+      "listingStatusSold": "판매됨",
+      "listingStatusReturned": "반환됨",
+      "listingStatusCancelled": "취소됨",
+      "listingStatusSuspended": "정지됨",
+      "listingStatusUnsold": "유찰"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const ko_KR: EnTranslations = {
       "password_too_long": "새 비밀번호는 128자 이하여야 합니다.",
       "characters_online": "비활성화하기 전에 모든 캐릭터에서 로그아웃하세요.",
       "deactivated": "이 계정은 비활성화되었습니다. 복원하려면 관리자에게 문의하세요.",
-      "not_found": "계정을 찾을 수 없습니다."
+      "not_found": "계정을 찾을 수 없습니다.",
+      "password_already_set": "이 계정에는 이미 비밀번호가 있습니다. 대신 비밀번호 변경을 사용하세요."
     },
     "character": {
       "name_invalid": "캐릭터 이름이 올바르지 않습니다. 2-16자의 글자를 사용하세요.",
@@ -3928,6 +4349,61 @@ export const ko_KR: EnTranslations = {
       "genesis_token_claimed": "해당 Seeker Genesis Token은 이미 등록되었습니다.",
       "entitlement_required": "인증된 Seeker 자격이 필요합니다.",
       "current_ownership_required": "현재 Seeker Genesis Token을 보유해야 합니다."
+    },
+    "cheater_mark": {
+      "admin_target": "운영자 계정에는 표식을 부여할 수 없습니다.",
+      "reason_required": "사유를 입력해야 합니다.",
+      "invalid_duration": "표식 기간은 최소 1초 이상이어야 합니다.",
+      "not_marked": "해당 계정에는 표식이 없습니다."
+    },
+    "woc_market": {
+      "invalid_input": "입력이 잘못되었습니다.",
+      "disabled": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
+      "paused": "거래소 거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다.",
+      "wallet_required": "거래소에서 거래하기 전에 지갑을 연동하고 인증하세요.",
+      "recipient_wallet_required": "해당 플레이어가 $WOC 결제를 받으려면 먼저 지갑을 연결해야 합니다.",
+      "self_offer": "자신에게 $WOC 제안을 보낼 수 없습니다.",
+      "offer_expired": "해당 $WOC 제안이 만료되었습니다. 새로 요청하세요.",
+      "terms_required": "계속하려면 마켓 약관에 동의하세요.",
+      "totp_required": "이 금액에는 2단계 인증이 필요합니다. 계정 설정에서 활성화한 뒤 코드를 입력하세요.",
+      "totp_invalid": "2단계 인증 코드를 확인할 수 없습니다. 다시 시도하세요.",
+      "suspended": "미결제 거래로 인해 거래소 이용이 정지되었습니다. 입찰, 구매, 등록, $WOC 거래를 할 수 없습니다.",
+      "character_invalid": "등록하려는 캐릭터로 접속한 뒤 다시 시도하세요.",
+      "not_found": "해당 거래소 항목이 더 이상 존재하지 않습니다.",
+      "not_yours": "해당 거래소 항목이 더 이상 존재하지 않습니다.",
+      "not_active": "해당 등록은 더 이상 이 작업을 받을 수 없습니다.",
+      "own_listing": "자신의 등록 물품에는 입찰하거나 구매할 수 없습니다.",
+      "has_bids": "입찰이 있는 등록은 철회할 수 없습니다. 꼭 취소해야 한다면 고객 지원에 문의하세요.",
+      "bid_too_low": "입찰가가 현재 입찰가에 최소 증가액을 더한 금액에 미치지 못합니다.",
+      "already_pending": "이 등록에 대한 대기 중인 입찰을 먼저 확정하거나 포기하세요.",
+      "insufficient_balance": "지갑의 $WOC가 이 입찰과 보증금을 감당하기에 부족합니다.",
+      "quote_unavailable": "지금은 가격 견적을 발급할 수 없습니다. 잠시 후 다시 시도하세요.",
+      "quote_expired": "해당 견적이 만료되었습니다. 새 견적을 요청하세요. 새 견적이 제공되지 않으면 해당 결제 기간이 이미 종료된 것입니다.",
+      "not_pending": "해당 입찰은 더 이상 보증금을 기다리는 상태가 아닙니다.",
+      "confirm_failed": "트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.",
+      "confirm_in_flight": "결제가 아직 확인 중입니다. 완료된 후 다시 시도하세요.",
+      "buy_now_locked": "다른 구매자가 이 구매를 진행 중입니다. 잠시 후 다시 시도하세요.",
+      "cancel_pending": "판매자가 이 판매글을 취소하는 중입니다.",
+      "claim_cooldown": "최근에 즉시 구매를 중도 포기했습니다. 잠시 후 다시 시도하세요.",
+      "bond_window_closed": "이 입찰은 더 이상 결제할 수 없습니다. 결제 기간이 끝났습니다. 다시 입찰하여 새 기간을 받으세요.",
+      "settlement_in_flight": "구매자가 이 등록의 대금을 결제하는 중입니다. 결제가 완료된 후 다시 시도하세요.",
+      "contended": "거래소가 이 등록의 다른 작업을 처리하고 있습니다. 잠시 후 다시 시도하세요.",
+      "sale_conflict": "이 등록에는 이미 다른 유효한 판매 기록이 있습니다. 먼저 해당 기록을 제외하세요.",
+      "no_buy_now": "이 등록에는 즉시 구매가가 없습니다.",
+      "cap_reached": "거래소 등록 한도에 도달했습니다.",
+      "stale_item": "해당 아이템이 변경되었거나 이동했습니다. 다시 선택한 뒤 시도하세요.",
+      "item_mismatch": "구매자가 동의한 바로 그 아이템이 아니거나 상태가 변경되었습니다(잠금도 포함됩니다). 거래를 새로 시작하세요.",
+      "offer_pending": "이 플레이어와 진행 중인 거래가 이미 있습니다. 먼저 해결하세요.",
+      "not_eligible": "해당 아이템은 $WOC 거래소에 등록할 수 없습니다.",
+      "invalid_params": "시작가, 최저가, 즉시 구매가, 기간을 확인하세요.",
+      "signature_reused": "해당 트랜잭션은 이미 제출되었습니다.",
+      "item_locked": "해당 아이템은 잠겨 있습니다. 판매하기 전에 가방에서 잠금을 해제하세요.",
+      "stepup_required": "거래소에서 판매하려면 연동된 지갑의 서명이 필요합니다.",
+      "stepup_challenge_invalid": "해당 지갑 확인은 더 이상 유효하지 않습니다. 판매를 다시 시작하세요.",
+      "stepup_challenge_expired": "지갑 확인이 만료되었습니다. 판매를 다시 시작하세요.",
+      "stepup_wallet_mismatch": "이 확인이 발급된 후 연동된 지갑이 변경되었습니다. 판매를 다시 시작하세요.",
+      "stepup_binding_mismatch": "해당 지갑 확인은 이 판매와 일치하지 않습니다. 판매를 다시 시작하세요.",
+      "stepup_signature_invalid": "지갑 서명을 확인할 수 없습니다. 판매를 다시 시작하세요."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const ko_KR: EnTranslations = {
       "ifHighContrastBackground": "시작 화면과 캐릭터 화면 뒤에 더 단순하고 대비가 높은 배경을 씁니다.",
       "ifInvertLookY": "마우스 시점의 위아래 방향을 뒤집습니다.",
       "ifShowItemLevel": "모든 아이템 툴팁에 아이템 레벨 줄을 더합니다. 기본값은 꺼짐이며, 그러면 능력치만 보여 주는 클래식 툴팁이 유지됩니다.",
+      "ifShowReliquaryTracker": "성물고 추적기(고정한 페이지와 진행도)를 HUD에 표시할지 여부입니다. 성물고 창에 같은 역할의 눈 버튼이 있으며, 페이지를 고정하면 추적기가 다시 켜집니다.",
       "ifShowPlaytime": "캐릭터 정보에 누적 플레이 시간을 표시합니다. 기본값은 켜짐이며, 캐릭터 정보의 눈 버튼으로 기기마다 따로 감출 수 있어 방송을 하거나 스크린샷을 찍을 때 편리합니다. 어느 쪽이든 총합은 계속 쌓입니다.",
       "ifShowOwnNameplate": "다른 플레이어에게 보이는 그대로, 장식까지 그대로 내 머리 위 이름표를 그립니다. 클래식한 화면을 원한다면 꺼 두세요.",
       "ifShowPlayerNameplates": "다른 플레이어의 이름표를 그립니다. 꺼 두면 붐비는 본거지가 한결 깔끔해지며, 어느 쪽이든 현재 대상은 계속 잘 보입니다.",
@@ -4735,6 +5212,7 @@ export const ko_KR: EnTranslations = {
       "mageEleJet": "물 분사는 소환수 바에 자기 버튼으로 따로 자리합니다. 클릭하면 적 하나에게 얼어붙는 물줄기를 집중시키고, 우클릭하면(모바일에서는 길게 누르면) 준비될 때마다 정령이 알아서 쏘게 합니다.",
       "formsHeading": "변신",
       "formsNote": "드루이드는 형태를 바꾸며 싸웁니다. 드루이드의 능력은 대부분 특정 형태에 속하므로, 지금 어떤 형태인지가 무엇을 쓸 수 있는지를 결정하며, 변신에는 약간의 마나가 듭니다. 전투 중이든 아니든 원하는 만큼 자주 변신할 수 있습니다.",
+      "formsAutoUnshift": "변신한 채로 치유 주문이나 공격 주문을 시전하면 형태가 알아서 풀립니다. 이렇게 형태를 벗는 데에는 마나가 들지 않고 공용 재사용 대기시간도 쓰지 않으므로, 즉시 시전 주문은 누른 그 순간에 나갑니다. 다시 변신하는 것은 평범한 능력이라 여전히 마나와 공용 재사용 대기시간이 듭니다.",
       "formsMoonwing": "조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 주문을 그대로 쓸 수 있는 유일한 동물 형태이며, 마법봉은 이 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.",
       "formLine": {
         "form_bear": "방어를 맡는 형태입니다. 두꺼운 가죽을 두르고, 마나 대신 분노를 쓰며, 위협 수준을 더 쌓아 적이 계속 당신을 때리게 합니다.",
@@ -6544,6 +7022,7 @@ export const ko_KR: EnTranslations = {
     "email": "이메일",
     "emailPlaceholder": "you@example.com",
     "emailError": "유효한 이메일 주소를 입력하세요.",
+    "marketingOptIn": "게임 소식 및 업데이트 이메일 받기 (선택 사항)",
     "showPassword": "비밀번호 표시",
     "hidePassword": "비밀번호 숨기기",
     "logIn": "로그인",
@@ -6644,6 +7123,19 @@ export const ko_KR: EnTranslations = {
     "style": "스타일",
     "resetLook": "외형 초기화",
     "resetShort": "초기화",
+    "shareTab": "공유",
+    "designCode": "디자인 코드",
+    "designCodeHint": "이 코드를 복사하면 이 모습을 저장하거나 공유할 수 있습니다. 코드를 여기에 붙여넣고 가져오면 불러올 수 있습니다.",
+    "copyCode": "코드 복사",
+    "importCode": "가져오기",
+    "designCodeCopied": "디자인 코드가 복사되었습니다.",
+    "designCodeCopyManual": "여기서는 자동 복사가 차단되어 있습니다. 코드가 선택되어 있으니 키보드로 복사하세요.",
+    "designCodeImported": "디자인을 가져왔습니다.",
+    "designCodeImportedPartial": "디자인을 가져왔습니다. 이 버전에서 인식할 수 없는 값은 건너뛰었습니다.",
+    "designCodeErrEmpty": "먼저 디자인 코드를 붙여넣으세요.",
+    "designCodeErrHeader": "디자인 코드가 아닌 것 같습니다.",
+    "designCodeErrVersion": "이 디자인 코드는 더 새로운 게임 버전의 것입니다.",
+    "designCodeErrMalformed": "이 디자인 코드는 손상되었습니다. 코드 전체를 복사한 뒤 다시 시도하세요.",
     "browFlat": "일자",
     "browArched": "아치",
     "browThin": "얇게",
@@ -7039,6 +7531,7 @@ export const ko_KR: EnTranslations = {
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",
+      "lootRecoveryNotice": "균열 입구는 아직 한동안 버팁니다. 파티가 쓰러져도 획득한 것을 되찾으러 걸어 돌아갈 수 있습니다.",
       "levelGate": "레벨 {level} 이상의 모험가만 이 균열에 들어갈 수 있습니다.",
       "deadEntry": "죽은 상태로는 균열에 들어갈 수 없습니다.",
       "deadEntryCombat": "파티가 아직 전투 중입니다. 전투가 끝나면 죽은 자도 다시 들어갈 수 있습니다.",
@@ -7138,6 +7631,7 @@ export const ko_KR: EnTranslations = {
       "shopMarksRequired": "{name}을(를) 구매하려면 탐굴 증표 {marks}개가 필요합니다.",
       "shopSealPremiumOnly": "이 봉인은 대가의 손에만 응합니다. 최상급 베팅만이 열 수 있습니다.",
       "passageSealed": "통로가 봉인되어 있습니다.",
+      "enemiesRemain": "남은 적을 먼저 처치하세요.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
       "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
@@ -7760,7 +8254,15 @@ export const ko_KR: EnTranslations = {
       "readyBody": "게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
       "restart": "지금 다시 시작",
       "later": "나중에",
-      "dismiss": "닫기"
+      "dismiss": "닫기",
+      "whatsNew": "변경 사항을 브라우저에서 보기"
+    },
+    "notify": {
+      "updateReadyTitle": "업데이트 {version} 준비 완료",
+      "updateReadyTitleNoVersion": "업데이트 준비 완료",
+      "updateReadyBody": "업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.",
+      "partyInviteTitle": "파티 초대",
+      "partyInviteBody": "{name}님이 파티에 초대했습니다."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const ko_KR: EnTranslations = {
       "reload": "다시 불러오기",
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
+    },
+    "titlebar": {
+      "exitGame": "게임 종료"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
+    "bodyDiscreteInactive": "게임이 전용(게이밍) GPU를 사용하지 않고 절전형 GPU에서 실행되고 있어 성능이 떨어집니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
     "bodyWeb": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.",
     "hybridBodyWindows": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 고성능으로 설정한 다음 다시 시작하세요. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
     "hybridBodyLinux": "이 세션은 통합(절전형) GPU에서 렌더링되고 있습니다. 이 컴퓨터에 별도의 게이밍 GPU도 있다면, 브라우저나 그래픽 드라이버에 자체 GPU 선택 설정이 있거나 배포판에 GPU 전환 도구(PRIME 또는 optimus-manager 등)가 있을 수 있습니다. 데스크톱 앱은 자동으로 전용 GPU를 선택합니다.",
@@ -7995,7 +8501,111 @@ export const ko_KR: EnTranslations = {
       "zoomIn": "확대",
       "zoomOut": "축소",
       "mapCanvasLabel": "지도",
-      "mapSummary": "{zone}의 지도."
+      "mapSummary": "{zone}의 지도.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "표시된 중요 표식이 없습니다.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}개, {direction}, {distance}.",
+      "mapMarkerMore": "표식 {count}개 더 있음.",
+      "mapMarkerDirections": {
+        "center": "중앙",
+        "north": "북쪽",
+        "northeast": "북동쪽",
+        "east": "동쪽",
+        "southeast": "남동쪽",
+        "south": "남쪽",
+        "southwest": "남서쪽",
+        "west": "서쪽",
+        "northwest": "북서쪽"
+      },
+      "mapMarkerDistances": {
+        "near": "가까움",
+        "medium": "중간 거리",
+        "far": "멀리"
+      },
+      "mapMarkerLabels": {
+        "you": "자신",
+        "availableQuest": "수락 가능한 퀘스트",
+        "readyQuest": "완료 가능한 퀘스트",
+        "repeatQuest": "반복 퀘스트",
+        "cooldownQuest": "재사용 대기 중인 퀘스트",
+        "questObjective": "퀘스트 목표 지역",
+        "readyOre": "채광 가능한 광맥",
+        "readyWood": "채집 가능한 목재",
+        "readyHerb": "채집 가능한 약초",
+        "readyLockedOre": "채광 가능한 광맥, 도구 잠김",
+        "readyLockedWood": "채집 가능한 목재, 도구 잠김",
+        "readyLockedHerb": "채집 가능한 약초, 도구 잠김",
+        "cooldownOre": "고갈된 광맥",
+        "cooldownWood": "고갈된 목재",
+        "cooldownHerb": "고갈된 약초",
+        "cooldownLockedOre": "고갈된 광맥, 도구 잠김",
+        "cooldownLockedWood": "고갈된 목재, 도구 잠김",
+        "cooldownLockedHerb": "고갈된 약초, 도구 잠김",
+        "station": "제작 시설: {name}",
+        "service": "편의 시설: {name}",
+        "partyMember": "파티원: {name}",
+        "deadPartyMember": "사망한 파티원: {name}",
+        "partyMemberGeneric": "파티원",
+        "deadPartyMemberGeneric": "사망한 파티원",
+        "friend": "친구: {name}",
+        "guildMember": "길드원: {name}",
+        "pointOfInterest": "주요 지점: {name}",
+        "dungeonEntrance": "던전 입구: {name}",
+        "dungeonExit": "던전 출구",
+        "delveEntrance": "탐굴 입구: {name}",
+        "worldPassage": "{zone}(으)로 가는 통로",
+        "riftEntrance": "균열 입구: {name}",
+        "hostileEnemy": "적대 대상",
+        "aggressiveEnemy": "당신을 공격 중인 적",
+        "lootableEnemy": "전리품을 획득할 수 있는 적",
+        "corpse": "자신의 시체",
+        "deathZone": "위험 지역",
+        "teammate": "아군",
+        "deadTeammate": "사망한 아군",
+        "flagCarrier": "깃발을 운반 중인 아군",
+        "ownFlagStand": "아군 깃발 거치대",
+        "enemyFlagStand": "적군 깃발 거치대",
+        "riftDescent": "균열 하강로",
+        "riftReturnBeacon": "귀환 신호기",
+        "riftReturnExit": "귀환 출구",
+        "ranked": "{marker}, {rank} 등급",
+        "riftTreasureAvailable": "획득 가능한 보물",
+        "riftTreasureLocked": "잠긴 보물",
+        "riftTreasureOpened": "열린 보물",
+        "riftTreasureJammed": "고장 난 보물",
+        "riftCacheAvailable": "획득 가능한 균열 보관함",
+        "riftCacheLocked": "잠긴 보관함",
+        "riftCacheOpened": "열린 보관함",
+        "riftCacheJammed": "고장 난 보관함",
+        "pylonUnlit": "꺼진 기둥",
+        "pylonLit": "켜진 기둥",
+        "sequenceRuneUnlit": "꺼진 순서 룬",
+        "sequenceRuneLit": "켜진 순서 룬",
+        "iceGoal": "얼음 목표 지점",
+        "boulderPad": "바위 목표 지점",
+        "boulderMovable": "움직일 수 있는 바위",
+        "boulderPlaced": "배치된 바위",
+        "gateSealed": "봉인된 문",
+        "gateOpen": "열린 문",
+        "switchReady": "사용 가능한 스위치",
+        "switchOn": "작동 중인 스위치",
+        "orbDormant": "휴면 구슬",
+        "orbActive": "활성 구슬",
+        "rollerHazard": "굴림 장치 위험물",
+        "delvePassageSealed": "봉인된 통로",
+        "delvePassageOpen": "열린 통로",
+        "delveSurfaceExit": "지상 출구",
+        "delveCacheLocked": "잠긴 탐굴 보관함",
+        "delveCacheReady": "준비된 탐굴 보관함",
+        "delveCacheActive": "활성화된 탐굴 보관함",
+        "delveCacheOpened": "열린 탐굴 보관함",
+        "delveReliquaryLocked": "잠긴 성물함",
+        "delveReliquaryReady": "준비된 성물함",
+        "delveReliquaryActive": "의식 진행 중인 성물함",
+        "delveReliquaryOpened": "열린 성물함",
+        "bountiful": "풍요로운 {marker}"
+      }
     },
     "options": {
       "gameMenu": "게임 메뉴",
@@ -8035,6 +8645,9 @@ export const ko_KR: EnTranslations = {
       "graphicsReloadNote": "그래픽 품질과 지형 세부 묘사는 새로고침 후 적용됩니다.",
       "reloadNow": "지금 새로고침",
       "fullscreen": "전체 화면",
+      "displayMode": "디스플레이 모드",
+      "displayModeBorderless": "테두리 없는 전체 화면",
+      "displayModeWindowed": "창 모드",
       "touchLookSpeed": "터치 시점 속도",
       "joystickSize": "조이스틱 크기",
       "buttonSize": "버튼 크기",
@@ -8597,6 +9210,7 @@ export const ko_KR: EnTranslations = {
       "offGlobalCooldown": "공용 재사용 대기시간 없음",
       "friendlyTarget": "아군 대상",
       "enemyTarget": "적 대상",
+      "anyTarget": "적 또는 아군 대상",
       "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
@@ -8911,6 +9525,10 @@ export const ko_KR: EnTranslations = {
       "filterPrimaryStatAll": "모든 주 능력치",
       "filterRarity": "희귀도",
       "filterRarityAll": "모든 희귀도",
+      "filterSort": "정렬",
+      "sortName": "이름 (A-Z)",
+      "sortPriceAsc": "가격: 낮은순",
+      "collapseLowest": "최저가만 표시",
       "weaponSword": "검",
       "weaponDagger": "단검",
       "weaponStaff": "지팡이",
@@ -8941,6 +9559,8 @@ export const ko_KR: EnTranslations = {
       "quantity": "수량",
       "quantityOf": "/ {count}",
       "priceEach": "개당 가격",
+      "lowestPriceLabel": "현재 최저 등록 가격",
+      "lowestPriceNone": "이 아이템은 현재 등록된 판매가 없습니다.",
       "listButton": "세계 시장에 등록",
       "minPriceError": "가격은 최소 1동화여야 합니다.",
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",
@@ -9368,6 +9988,7 @@ export const ko_KR: EnTranslations = {
       "cheap_shot": {
         "name": "명치 가격",
         "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.",
+        "descriptionNoStealth": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 연계 점수 2점을 얻습니다.",
         "specNote_subtlety": "황혼장막 상태에서 사용하면 땅거미가 1단계 쌓입니다(최대 3단계). 땅거미 3단계에서는 은신 없이 사용할 수 있습니다: 이때는 자원이 들지 않고, 땅거미 3단계를 모두 소모하며, 6초 동안 그림자에 휩싸입니다."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const ko_KR: EnTranslations = {
       "crippling_poison": {
         "name": "둔중한 독",
         "description": "둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다."
+      },
+      "melting_acid": {
+        "name": "용해 산",
+        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다."
+      },
+      "nightshade_coating": {
+        "name": "가지독 코팅",
+        "description": "대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",
@@ -9580,7 +10209,7 @@ export const ko_KR: EnTranslations = {
       },
       "righteous_fury": {
         "name": "불타는 맹세",
-        "description": "신성 피해가 만드는 위협 수준을 지속적으로 60% 높입니다. 신앙수호자 전용."
+        "description": "신성 피해가 만드는 위협 수준을 지속적으로 30% 높입니다. 신앙수호자 전용."
       },
       "retribution_aura": {
         "name": "응보의 오라",
@@ -9696,7 +10325,7 @@ export const ko_KR: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
-        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 30% 얻고, 받는 피해가 10% 줄며, 위협 수준을 두 배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
+        "description": "무기에 30분 동안 힘을 깃들입니다. 휘두를 때마다 {damage}의 추가 피해를 입힙니다. 고양은 여기에 더해 방어도를 40%, 체력을 20% 얻고, 받는 피해가 15% 줄며, 야수의 치명타에 면역이 되며, 위협 수준을 2.75배로 만듭니다. 대지의 충격은 그 대상이 3초 동안 당신을 공격하게 하고, 천둥 결계는 3초 동안 10%의 피해 감소를 줍니다."
       },
       "healing_wave": {
         "name": "치유의 물결",
@@ -9824,7 +10453,7 @@ export const ko_KR: EnTranslations = {
       },
       "fear": {
         "name": "번민",
-        "description": "적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다."
+        "description": "적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다."
       },
       "searing_pain": {
         "name": "지지기",
@@ -9875,7 +10504,7 @@ export const ko_KR: EnTranslations = {
       },
       "bear_form": {
         "name": "큰곰 변신",
-        "description": "곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
+        "description": "곰으로 변신합니다. 방어도 +110%, 최대 생명력 +30%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다."
       },
       "maul": {
         "name": "뼈 분쇄",
@@ -9885,6 +10514,10 @@ export const ko_KR: EnTranslations = {
       "growl": {
         "name": "위협",
         "description": "대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
+      },
+      "challenging_roar": {
+        "name": "위압의 포효",
+        "description": "위압적으로 포효합니다. 10미터 내의 모든 적이 도발되어 자신에 대한 위협 수준이 그 적이 가장 증오하는 대상과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용."
       },
       "cat_form": {
         "name": "늑대 변신",
@@ -9898,7 +10531,7 @@ export const ko_KR: EnTranslations = {
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
         "description": "결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용.",
-        "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 91 더하기 연계 점수당 55의 피해를 입히는 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력 30을 회복합니다."
+        "specNote_feral": "적중한 공격마다 오랜 피가 1단계 쌓입니다. 오랜 피 3단계에서 이 버튼이 피의 수확으로 변합니다: 오랜 피를 소모하는 더 강력한 물어뜯기로, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히고 기력을 회복합니다."
       },
       "swipe": {
         "name": "휩쓰는 발톱",
@@ -9961,7 +10594,7 @@ export const ko_KR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "늑대의 피",
-        "description": "전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
+        "description": "기력을 {rage}만큼 즉시 회복하고 전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용."
       },
       "rip": {
         "name": "피의 균열",
@@ -10066,7 +10699,7 @@ export const ko_KR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "납골 표식",
-        "description": "적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다."
+        "description": "적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다."
       },
       "unholy_command": {
         "name": "부정한 명령",
@@ -10165,8 +10798,8 @@ export const ko_KR: EnTranslations = {
         "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
       },
       "feral_charge": {
-        "name": "야성의 돌진",
-        "description": "적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)"
+        "name": "원시 쇄도",
+        "description": "원시의 힘을 폭발시킵니다. 늑대 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)"
       },
       "swiftmend": {
         "name": "신속한 치유",
@@ -10182,7 +10815,7 @@ export const ko_KR: EnTranslations = {
       },
       "redharvest": {
         "name": "피의 수확",
-        "description": "오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력 30을 회복합니다. 연계 점수가 없어도 사용할 수 있습니다."
+        "description": "오랜 피 3단계를 소모합니다: {damage}의 피해를 입히고, 자신의 저미기와 피의 균열이 앞으로 입힐 남은 피해를 즉시 모두 입히며, 두 출혈 효과를 제거하고 기력을 {rage}만큼 회복합니다. 연계 점수가 없어도 사용할 수 있습니다."
       },
       "marrowbreak": {
         "name": "골수분쇄",
@@ -10422,7 +11055,7 @@ export const ko_KR: EnTranslations = {
       },
       "evocation": {
         "name": "에테르샘",
-        "description": "마나를 빠르게 회복합니다. (마법사 특성)"
+        "description": "6초 동안 정신을 집중합니다. 매초 마나를 100 회복하고 주문력이 8 증가합니다. 이 효과는 정신 집중 중 중첩되며 15초 동안 지속됩니다. (마법사 특성)"
       },
       "flurry_of_knives": {
         "name": "칼날 난무",
@@ -10430,7 +11063,7 @@ export const ko_KR: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "야성 치유",
-        "description": "10초에 걸쳐 생명력을 180 회복합니다. 곰 변신 상태에서만 사용할 수 있습니다. (드루이드 특성)"
+        "description": "10초에 걸쳐 최대 생명력의 40%를 회복합니다. 곰 변신 상태에서만 사용할 수 있습니다. (드루이드 특성)"
       },
       "frost_trap": {
         "name": "서리덫",
@@ -10450,11 +11083,11 @@ export const ko_KR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "공포의 울부짖음",
-        "description": "주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 해제될 수 있습니다. (흑마법사 특성)"
+        "description": "주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)"
       },
       "ice_block": {
         "name": "차가운 관",
-        "description": "자신을 얼음 속에 가두어 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (마법사 특성)"
+        "description": "8초 동안 단단한 얼음 속에 자신을 가두어 모든 피해에 면역이 됩니다. 이미 활성화된 일반적인 해로운 효과를 제거하고 새로운 일반 제어 효과가 적용되는 것을 방지합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 갇힌 동안에는 행동할 수 없습니다. 다시 사용하면 취소됩니다. (마법사)"
       },
       "inner_focus": {
         "name": "고요한 마음",
@@ -10663,7 +11296,7 @@ export const ko_KR: EnTranslations = {
       },
       "prowl": {
         "name": "몰래 접근",
-        "description": "늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다."
+        "description": "늑대 변신 상태에서 은신하고 이동 속도가 5% 감소합니다. 전투 중에는 사용할 수 없습니다."
       },
       "rake": {
         "name": "저미기",
@@ -12218,6 +12851,9 @@ export const ko_KR: EnTranslations = {
       "pristine_claw": {
         "name": "온전한 발톱"
       },
+      "dawnhold_posy": {
+        "name": "던홀드 정원 꽃다발"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -13062,6 +13698,15 @@ export const ko_KR: EnTranslations = {
       },
       "training_dummy": {
         "name": "훈련용 허수아비"
+      },
+      "friendly_player_dummy": {
+        "name": "아군 플레이어 허수아비"
+      },
+      "normal_boss_dummy": {
+        "name": "일반 보스 허수아비"
+      },
+      "heroic_boss_dummy": {
+        "name": "영웅 보스 허수아비"
       },
       "ridge_stalker": {
         "name": "산등성이 추적자"
@@ -16702,6 +17347,11 @@ export const ko_KR: EnTranslations = {
         "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
+      "dawnhold_castle": {
+        "name": "던홀드 성",
+        "enterText": "꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.",
+        "leaveText": "햇살 가득한 정원 잔디밭으로 다시 나옵니다."
+      },
       "drowned_temple": {
         "name": "익사한 신전",
         "enterText": "당신은 달의 관문을 지나갑니다 — 공기가 차가운 물과 창백한 빛으로 변하고, 노랫소리가 당신의 머리 위로 닫혀 옵니다.",
@@ -16900,6 +17550,21 @@ export const ko_KR: EnTranslations = {
         "sender": "땜장이 기즐",
         "subject": "통달이야, 콰광",
         "body": "네 주 전공 하나가 통달을 찍었어, 바로 그 꼭대기, 콰광, 사다리 통째로, 끝. 나는 칭찬 같은 거 안 나눠 줘, 도화선을 나눠 주지, 그런데 여기, 둘 다 받아. 넌 눈부시고 살짝 무서워. 가서 산들이 조마조마하게 만들어."
+      },
+      "woc_market_delivery": {
+        "sender": "거래소 중개인",
+        "subject": "거래소 구매 물품",
+        "body": "거래가 정산되어 물품은 이제 당신의 것입니다. 동봉된 소포에는 당신이 값을 치른 바로 그 물건이 들어 있습니다. 등록된 순간부터 대금이 정산될 때까지 거래소가 보관해 왔습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인"
+      },
+      "woc_market_return": {
+        "sender": "거래소 중개인",
+        "subject": "거래소 등록이 종료되었습니다",
+        "body": "등록하신 물품이 판매 완료 없이 종료되었습니다. 경매에 구매자가 없었거나, 최저가에 도달하지 못했거나, 등록이 철회되었거나, 낙찰자가 대금을 치르지 못한 경우입니다. 물품은 맡기신 그대로 이 편지와 함께 돌려드립니다.\n\n- 거래소 중개인"
+      },
+      "woc_market_sold": {
+        "sender": "거래소 중개인",
+        "subject": "거래소 등록 물품이 판매되었습니다",
+        "body": "등록하신 물품이 판매되었고 구매자가 대금을 전액 치렀습니다. 거래소 수수료를 제한 판매 대금은 정산 트랜잭션 안에서 곧바로 연동된 지갑으로 전송되었습니다. 거래소는 당신의 돈을 결코 보관하지 않습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인"
       }
     },
     "itemSets": {

@@ -3,7 +3,17 @@ import {
   STREAMER_PLATFORMS,
   type StreamerLinks,
 } from '../src/sim/account_flair';
-import { pool } from './db';
+// The ONE clamp for a mark's played-second budget, shared with the sim so the
+// route, the database, and the countdown cannot disagree about what is in range.
+import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
+// The mark's refusal vocabulary. A machine token, never an English sentence:
+// `server/` is language-agnostic, so the admin route has to be able to turn a
+// refused write into a stable error code without parsing prose. The module is a
+// pure leaf (schemas + codes, no db), so importing it here adds no cycle.
+import { CheaterMarkRefused } from './cheater_mark_api';
+import { pool, runWithStatementTimeout } from './db';
+import { flagRegistrationBurst } from './suspicion_flags';
+import { bustWocAuthGuardAccount } from './woc_auth_guard_cache';
 
 export const REPORT_REASONS = [
   'harassment',
@@ -13,7 +23,6 @@ export const REPORT_REASONS = [
   'other',
 ] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
-export type ModerationAction = 'ignore' | 'kick' | 'kill' | 'suspend' | 'ban' | 'unban';
 
 // The closed set of values ever written to account_moderation_actions.action. The
 // column is free-text in SQL, so this const is the single source of truth: every
@@ -57,6 +66,13 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // The Cheater mark (src/sim/moderation/). Punitive and visible to every player
+  // in range, so the reason is REQUIRED on both arms: who branded an account, for
+  // how long, and why has to be recoverable long after the tag has worn off.
+  // Only the operator arms are audited; the sim burning the budget down is a
+  // tick, not a decision, and would otherwise write an audit row per save.
+  'cheater_mark',
+  'cheater_mark_lift',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -167,16 +183,68 @@ function ipv4Subnet24(ip: string | null | undefined): string | null {
   return `${octets[0]}.${octets[1]}.${octets[2]}.`;
 }
 
-async function countRecentRegistrations(whereSql: string, params: unknown[]): Promise<number> {
-  const res = await pool.query(
-    `SELECT count(*)::int AS n
-     FROM accounts
-     WHERE created_at > now() - ($1 || ' minutes')::interval
-       AND banned_at IS NULL
-       AND ${whereSql}`,
-    [String(REGISTRATION_BURST_WINDOW_MINUTES), ...params],
+// The burst cohort for the suspicion flag's related-accounts field rides the
+// count query (newest ids first, sliced to this cap) instead of re-running the
+// same window/ban predicate per tripped signal: the re-scan landed exactly
+// when the box was under a registration flood. Bounded: the flag row caps how
+// many related ids it stores anyway.
+const REGISTRATION_COHORT_MAX = 50;
+
+// The burst reads run detached on the registration path with no concurrency
+// cap, and their match set IS the flood they exist to catch: two seconds drops
+// one signal read instead of pinning pooled clients under it for the 15 s
+// session default.
+export const RECENT_REGISTRATIONS_TIMEOUT_MS = 2_000;
+
+interface RecentRegistrations {
+  count: number;
+  cohortIds: number[];
+}
+
+const NO_RECENT_REGISTRATIONS: RecentRegistrations = { count: 0, cohortIds: [] };
+
+async function recentRegistrations(
+  whereSql: string,
+  params: unknown[],
+): Promise<RecentRegistrations> {
+  // Degrade, never fail: one timed-out signal read must not cost the report
+  // and the flag that the OTHER signals earned (the loss would land exactly
+  // when the box is busiest, which is when the report is wanted). The failed
+  // signal reads as no matches; the readLargeMovementsPane shape.
+  try {
+    return await readRecentRegistrations(whereSql, params);
+  } catch (err) {
+    console.error('registration burst signal read failed:', err);
+    return NO_RECENT_REGISTRATIONS;
+  }
+}
+
+async function readRecentRegistrations(
+  whereSql: string,
+  params: unknown[],
+): Promise<RecentRegistrations> {
+  // The window match is materialised once (the CTE is referenced twice) and
+  // the cohort is a top-N over it, so the per-registration cost stays one
+  // round trip with bounded memory even when the match set is the flood.
+  const res = await runWithStatementTimeout(RECENT_REGISTRATIONS_TIMEOUT_MS, (query) =>
+    query(
+      `WITH m AS (
+         SELECT id FROM accounts
+         WHERE created_at > now() - ($1 || ' minutes')::interval
+           AND banned_at IS NULL
+           AND ${whereSql}
+       )
+       SELECT (SELECT count(*)::int FROM m) AS n,
+              ARRAY(SELECT id FROM m ORDER BY id DESC LIMIT ${REGISTRATION_COHORT_MAX}) AS cohort_ids`,
+      [String(REGISTRATION_BURST_WINDOW_MINUTES), ...params],
+    ),
   );
-  return Number(res.rows[0]?.n ?? 0);
+  const row = res.rows[0];
+  const ids: unknown = row?.cohort_ids;
+  return {
+    count: Number(row?.n ?? 0),
+    cohortIds: Array.isArray(ids) ? ids.map((id) => Number(id)) : [],
+  };
 }
 
 export async function createSuspiciousRegistrationReport(input: {
@@ -186,46 +254,59 @@ export async function createSuspiciousRegistrationReport(input: {
   userAgent?: string | null;
 }): Promise<{ created: boolean; signals: string[] }> {
   const signals: string[] = [];
+  // The cohort of every TRIPPED signal, in signal order, so the suspicion flag
+  // can carry the burst cohort as related accounts (see the flag call below).
+  const trippedCohorts: number[][] = [];
   const prefix = numericPrefix(input.username);
   const ip = cleanText(input.ip, 128);
   const userAgent = cleanText(input.userAgent, 512);
   const subnet24 = ipv4Subnet24(ip);
 
-  const prefixCount = prefix
-    ? await countRecentRegistrations(
-        `lower(username) LIKE $2 || '%' AND lower(username) ~ ('^' || $2 || '[0-9]+$')`,
-        [prefix],
-      )
-    : 0;
-  if (prefix && prefixCount >= REGISTRATION_PREFIX_THRESHOLD) {
+  const prefixClause = {
+    whereSql: `lower(username) LIKE $2 || '%' AND lower(username) ~ ('^' || $2 || '[0-9]+$')`,
+    params: [prefix],
+  };
+  const byPrefix = prefix
+    ? await recentRegistrations(prefixClause.whereSql, prefixClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (prefix && byPrefix.count >= REGISTRATION_PREFIX_THRESHOLD) {
     signals.push(
-      `${prefixCount} accounts with username prefix "${prefix}" in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${byPrefix.count} accounts with username prefix "${prefix}" in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(byPrefix.cohortIds);
   }
 
-  const ipCount = ip ? await countRecentRegistrations('created_ip = $2', [ip]) : 0;
-  if (ip && ipCount >= REGISTRATION_IP_THRESHOLD) {
+  const ipClause = { whereSql: 'created_ip = $2', params: [ip] };
+  const byIp = ip
+    ? await recentRegistrations(ipClause.whereSql, ipClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (ip && byIp.count >= REGISTRATION_IP_THRESHOLD) {
     signals.push(
-      `${ipCount} accounts from IP ${ip} in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${byIp.count} accounts from IP ${ip} in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(byIp.cohortIds);
   }
 
-  const subnetCount = subnet24
-    ? await countRecentRegistrations('created_ip LIKE $2', [`${subnet24}%`])
-    : 0;
-  if (subnet24 && subnetCount >= REGISTRATION_SUBNET_THRESHOLD) {
+  const subnetClause = { whereSql: 'created_ip LIKE $2', params: [`${subnet24}%`] };
+  const bySubnet = subnet24
+    ? await recentRegistrations(subnetClause.whereSql, subnetClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (subnet24 && bySubnet.count >= REGISTRATION_SUBNET_THRESHOLD) {
     signals.push(
-      `${subnetCount} accounts from subnet ${subnet24}0/24 in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${bySubnet.count} accounts from subnet ${subnet24}0/24 in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(bySubnet.cohortIds);
   }
 
-  const userAgentCount = userAgent
-    ? await countRecentRegistrations('created_user_agent = $2', [userAgent])
-    : 0;
-  if (userAgent && userAgentCount >= REGISTRATION_USER_AGENT_THRESHOLD) {
+  const userAgentClause = { whereSql: 'created_user_agent = $2', params: [userAgent] };
+  const byUserAgent = userAgent
+    ? await recentRegistrations(userAgentClause.whereSql, userAgentClause.params)
+    : NO_RECENT_REGISTRATIONS;
+  if (userAgent && byUserAgent.count >= REGISTRATION_USER_AGENT_THRESHOLD) {
     signals.push(
-      `${userAgentCount} accounts with the same user agent in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
+      `${byUserAgent.count} accounts with the same user agent in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedCohorts.push(byUserAgent.cohortIds);
   }
 
   if (signals.length === 0) return { created: false, signals };
@@ -262,6 +343,15 @@ export async function createSuspiciousRegistrationReport(input: {
      ) VALUES (NULL, NULL, '', $1, NULL, '', $2, $3)`,
     [input.accountId, 'spam', details],
   );
+  // Mirror the report into the persisted suspicion-flag workflow, carrying the
+  // burst cohort (the newest accounts matching each tripped signal in the
+  // window, already read alongside the counts above) as related accounts.
+  // Fire-and-forget inside the emitter.
+  const cohort = new Set<number>();
+  for (const ids of trippedCohorts) {
+    for (const id of ids) cohort.add(id);
+  }
+  flagRegistrationBurst({ accountId: input.accountId, signals, cohortAccountIds: [...cohort] });
   return { created: true, signals };
 }
 
@@ -586,6 +676,9 @@ export async function moderateAccount(input: {
   }
   fireOnAccountModerated();
   fireOnModerationQueueChanged();
+  // Post-commit like the hooks above: the cached guard reads must serve the
+  // committed ban/suspension state, never be re-primed with pre-commit rows.
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 export async function muteAccountChat(input: {
@@ -634,6 +727,135 @@ export async function muteAccountChat(input: {
     client.release();
   }
   fireOnModerationQueueChanged();
+  bustWocAuthGuardAccount(input.accountId);
+}
+
+/**
+ * Apply or re-length the Cheater mark: `seconds` of PLAYED time the account owes
+ * before the tag lifts. Re-applying replaces the budget rather than adding to
+ * it, so an operator correcting a fat-fingered duration sets the value they
+ * meant instead of having to lift and re-apply.
+ *
+ * Validated here rather than at the route so the ceiling holds for every caller.
+ *
+ * Returns the budget the row now holds, read back by the UPDATE itself. Callers
+ * must use THAT rather than a follow-up SELECT: the unaudited save-path burn
+ * below is guarded only by `cheater_mark_seconds > 0`, so it can land between
+ * this COMMIT and any second read and hand the caller the OLD remaining while
+ * this write reported success.
+ */
+export async function setAccountCheaterMark(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+  seconds: unknown;
+}): Promise<number> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new CheaterMarkRefused('reason_required');
+  const seconds = normalizeCheaterMarkSeconds(input.seconds);
+  if (seconds <= 0) throw new CheaterMarkRefused('invalid_duration');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query<{ cheater_mark_seconds: number }>(
+      `UPDATE accounts
+       SET cheater_mark_seconds = $2, cheater_mark_reason = $3, cheater_mark_set_at = now()
+       WHERE id = $1
+       RETURNING cheater_mark_seconds`,
+      [input.accountId, seconds, reason],
+    );
+    const stored = updated.rows[0]?.cheater_mark_seconds;
+    // Mirrors the lift arm's rowCount check, and for the same reason: an audit
+    // row saying an account was branded, written when the UPDATE matched
+    // nothing, is a false entry in a permanent record. Refusing BEFORE
+    // recordModerationAction is what keeps it out, since the throw rolls the
+    // transaction back.
+    //
+    // A mistyped or purged account id really does reach here from the admin
+    // route: requireAdminTarget only decodes the :id into a positive integer,
+    // and the operator-target guard's isAdminAccount read answers false for an
+    // id with no row. So this is a coded refusal an operator can act on, not an
+    // opaque 500.
+    if ((updated.rowCount ?? 0) === 0 || stored === undefined) {
+      throw new CheaterMarkRefused('no_account');
+    }
+    await recordModerationAction(client, 'cheater_mark', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+    return normalizeCheaterMarkSeconds(stored);
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/** Clear a live Cheater mark early. Refuses when the account is not marked, so a
+ *  double-click cannot write an audit row claiming a sanction was lifted twice. */
+export async function liftAccountCheaterMark(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new CheaterMarkRefused('reason_required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query(
+      `UPDATE accounts
+       SET cheater_mark_seconds = 0, cheater_mark_reason = NULL, cheater_mark_set_at = NULL
+       WHERE id = $1 AND cheater_mark_seconds > 0`,
+      [input.accountId],
+    );
+    if ((updated.rowCount ?? 0) === 0) throw new CheaterMarkRefused('not_marked');
+    await recordModerationAction(client, 'cheater_mark_lift', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/** The remaining played-second budget, 0 when unmarked. Read at world join. */
+export async function accountCheaterMarkSeconds(accountId: number): Promise<number> {
+  const res = await pool.query<{ cheater_mark_seconds: number }>(
+    'SELECT cheater_mark_seconds FROM accounts WHERE id = $1',
+    [accountId],
+  );
+  return normalizeCheaterMarkSeconds(res.rows[0]?.cheater_mark_seconds);
+}
+
+/**
+ * Write the sim's remaining budget back to the account (the session save path).
+ *
+ * NOT audited and NOT an operator action: this is the countdown ticking, so an
+ * audit row per save would bury the two decisions that matter under thousands of
+ * mechanical ones. The `> 0` guard keeps an unmarked account's row untouched, so
+ * the common case costs zero writes.
+ */
+export async function burnAccountCheaterMark(
+  accountId: number,
+  secondsRemaining: number,
+): Promise<void> {
+  await pool.query(
+    `UPDATE accounts
+     SET cheater_mark_seconds = $2,
+         cheater_mark_reason = CASE WHEN $2 = 0 THEN NULL ELSE cheater_mark_reason END,
+         cheater_mark_set_at = CASE WHEN $2 = 0 THEN NULL ELSE cheater_mark_set_at END
+     WHERE id = $1 AND cheater_mark_seconds > 0`,
+    [accountId, normalizeCheaterMarkSeconds(secondsRemaining)],
+  );
 }
 
 export async function liftAccountChatMute(input: {
@@ -667,6 +889,7 @@ export async function liftAccountChatMute(input: {
   } finally {
     client.release();
   }
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 /**
@@ -704,6 +927,7 @@ export async function reactivateAccountAudited(input: {
   } finally {
     client.release();
   }
+  bustWocAuthGuardAccount(input.accountId);
 }
 
 /**
@@ -735,6 +959,7 @@ export async function resetChatStrikesAudited(input: {
       });
     }
     await client.query('COMMIT');
+    if (found) bustWocAuthGuardAccount(input.accountId);
     return found;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});

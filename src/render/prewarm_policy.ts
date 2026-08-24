@@ -16,6 +16,7 @@
 // renderer.ts is the thin consumer that runs the manifest the policy describes.
 
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
+import type { PrewarmSubmitStopVerdict } from './prewarm_submit_stop_core';
 
 /** Manifest entries a constrained device still runs; everything else is skipped. */
 export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
@@ -42,6 +43,15 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * minimal manifest skips is skipped for GPU-footprint reasons (the phone-class
  * per-process memory ceiling) and must stay skipped. An id here is by
  * construction NOT in CONSTRAINED_PREWARM_KEEP.
+ *
+ * vfx.mount-programs is deliberately NOT here. Its units force nine skinned
+ * GLB rigs resident (roughly 10 MB of VRAM after KTX2 transcode, plus an
+ * equal retained CPU copy, since `mounts` is exempt from mip release), and
+ * those assets are lazyPreload precisely so they never weigh on a
+ * constrained client's footprint. That is exactly the GPU-footprint reason
+ * this list otherwise excludes an entry, and the iOS process-kill history in
+ * src/render/CLAUDE.md is reason enough to require a real measurement from a
+ * constrained device before opting this entry in.
  */
 export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
 
@@ -167,6 +177,12 @@ export interface PrewarmPolicy {
   compileMaxMs: number;
   /** Cap on nearby character views built synchronously at entry. */
   maxViews: number;
+  /**
+   * Slots views.nearby may always claim, even with the shared counter drained.
+   * Zero on the constrained profile: its 2-view carve-out is a process-survival
+   * cap and admits no floor on top.
+   */
+  nearbyViewFloor: number;
   /** Yield the event loop (setTimeout 0) between manifest entries. */
   yieldBetweenEntries: boolean;
   /** Run a render (link) pass after each entry, group-by-group. */
@@ -276,15 +292,24 @@ export function prewarmEntryShouldDefer(
  * prologue is synchronous main-thread work, and one uninterrupted loop
  * measured 22 s in production against the 15 s hard deadline, which dropped
  * every entry behind it, the deadline-exempt debt payers included
- * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively, and
- * the Insane finish-full-manifest arm keeps submitting without bound: its
- * contract is a complete manifest behind the cover.
+ * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively.
+ *
+ * Two independent clauses, and only ONE of them is exemptible:
+ * - the manifest DEADLINE, which the Insane finish-full-manifest arm ignores
+ *   (its contract is a complete manifest behind the loading cover), and
+ * - the lane's own HARD STOP (prewarm_submit_stop_core.ts), which nothing
+ *   exempts. Without it that arm had no stop at all, and one lane ate 11.8 s
+ *   of a 12 s budget while twelve entries behind it timed out. The verdict is
+ *   passed in rather than computed here so this stays a pure decision over
+ *   readings the caller already holds.
  */
 export function prewarmSubmitShouldStop(
   nowMs: number,
   gpuSubmitDeadlineMs: number,
   finishFullManifestBeforeReveal: boolean,
+  laneVerdict?: PrewarmSubmitStopVerdict | null,
 ): boolean {
+  if (laneVerdict?.stop === true) return true;
   if (finishFullManifestBeforeReveal) return false;
   return nowMs >= gpuSubmitDeadlineMs;
 }
@@ -295,8 +320,8 @@ export function prewarmSubmitShouldStop(
  * left unpaid, make ordinary first draws stall in live frames (the login
  * storm's blocking reflection and texture-decode hitches). Their resume
  * units run at BOOT_DEBT priority so cosmetic background warming (the
- * char/armory preview lane at BACKGROUND) cannot starve them, which
- * production measured as minutes of unpaid debt after the reveal.
+ * char preview lane at BACKGROUND) cannot starve them, which production
+ * measured as minutes of unpaid debt after the reveal.
  *
  * Deliberately NOT in the set: the per-family VFX warmers
  * (props.ghost-fade-variants, vfx.weapon-skins, vfx.ability-primitives).
@@ -307,17 +332,29 @@ export function prewarmSubmitShouldStop(
  * `programs.compile-submit` here names the SYNTHETIC dropped entry the
  * deferred-submit hand-off pushes (the manifest entry of that id declares no
  * resumeUnits, so no other resume entry can carry it).
+ * `foliage.materials` IS ambient-scene debt: the species it links stream in
+ * with every step of travel (the distant-only pines and far impostors), not on
+ * a specific event, so its dropped units pay on the debt arm too.
  */
 const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
   'programs.compile',
+  'programs.compile-post-paint',
   'programs.compile-submit',
   'textures.scene',
   'surface-detail.textures',
+  'foliage.materials',
 ]);
 
 /** True when a dropped entry's resume units are hitch-causing debt. */
 export function prewarmResumeIsDebt(entryId: string): boolean {
   return PREWARM_DEBT_RESUME_IDS.has(entryId);
+}
+
+/** Only roots in the settled, visible scene are presentation-critical before
+ * first paint. Hidden archetype/material catalogs retain their stand-ins and
+ * enter the bounded debt lane after the curtain has produced one frame. */
+export function compileGroupRunsBeforeInitialPaint(groupId: string): boolean {
+  return groupId === 'scene';
 }
 
 /**
@@ -330,12 +367,20 @@ export function prewarmResumeIsDebt(entryId: string): boolean {
  * preserved.
  */
 export function orderPrewarmResumeEntries<T extends { id: string }>(entries: readonly T[]): T[] {
-  const debt: T[] = [];
+  // Inside the debt class, program links go before texture uploads: a program
+  // the live frame meets unlinked blocks it (a freeze), an unresident texture
+  // is a paced piece. On the iGPU stepped ride the lane spent its first 100 s
+  // on surface-detail + textures.scene (151 units) and never reached the 19
+  // programs.compile-submit units, so the town's unique materials linked cold.
+  const programDebt: T[] = [];
+  const otherDebt: T[] = [];
   const cosmetic: T[] = [];
   for (const entry of entries) {
-    (prewarmResumeIsDebt(entry.id) ? debt : cosmetic).push(entry);
+    if (!prewarmResumeIsDebt(entry.id)) cosmetic.push(entry);
+    else if (entry.id.startsWith('programs.')) programDebt.push(entry);
+    else otherDebt.push(entry);
   }
-  return [...debt, ...cosmetic];
+  return [...programDebt, ...otherDebt, ...cosmetic];
 }
 
 /** The mesh-shape bits three folds into a program's cache key, structurally
@@ -358,6 +403,9 @@ export interface ProgramContentMeshShape {
   morphColorCount?: number;
   /** geometry.attributes.tangent flips vertexTangents. */
   hasTangents?: boolean;
+  /** geometry.attributes.normal flips vertexNormals (a program cache-key bit
+   *  since r185, for every material type). */
+  hasNormals?: boolean;
   /** geometry.attributes.color itemSize (4 flips vertexAlphas); 0 = none. */
   vertexColorItemSize?: number;
   castShadow?: boolean;
@@ -365,13 +413,18 @@ export interface ProgramContentMeshShape {
 
 /**
  * Program-content keys for compile-unit dedupe: one key per material slot,
- * covering the object and geometry bits of three r165's program cache key
+ * covering the object and geometry bits of three r185's program cache key
  * this repo can produce (skinning, instancing and instance colour, batched
- * meshes, morph position/normal/colour presence and counts, tangents, vertex
- * colour item size, shadow casting). Not covered, on purpose: BatchedMesh
- * colour textures (batchingColor) and Points uv presence (pointsUvs), which
- * the repo does not produce on this path; adopt either and this key must
- * learn it. A coarser key elects a stand-in
+ * meshes, morph position/normal/colour presence and counts, tangents, normal
+ * presence, vertex colour item size, shadow casting). Not covered, on
+ * purpose: BatchedMesh colour textures (batchingColor) and Points uv
+ * presence (pointsUvs), which the repo does not produce on this path (adopt
+ * either and this key must learn it); hasPositionAttribute (every drawable
+ * prewarm root carries positions, constant true); reversedDepthBuffer
+ * (renderer-level, never enabled here) and numLightProbeGrids (scene-level,
+ * no grids), constant per session like logarithmicDepthBuffer; and the
+ * material-derived bits (packedNormalMap, decodeVideoTextureEmissive), which
+ * the per-material id axis already separates. A coarser key elects a stand-in
  * whose program variant differs, and every other geometry shape of that
  * material is SKIPPED by the dedupe and relinks synchronously at first draw,
  * which is the stall the compile lane exists to prevent. In-repo fidelity
@@ -386,10 +439,13 @@ export function prewarmProgramContentKeys(
     `${shape.hasInstanceColor ? 'ic' : ''}${shape.isBatchedMesh ? 'b' : ''}` +
     `${shape.hasMorphPositions ? 'P' : ''}p${shape.morphTargetCount ?? 0}` +
     `n${shape.morphNormalCount ?? 0}k${shape.morphColorCount ?? 0}` +
-    `${shape.hasTangents ? 't' : ''}v${shape.vertexColorItemSize ?? 0}` +
-    `${shape.castShadow ? 'c' : ''}`;
+    `${shape.hasTangents ? 't' : ''}${shape.hasNormals ? 'N' : ''}` +
+    `v${shape.vertexColorItemSize ?? 0}${shape.castShadow ? 'c' : ''}`;
   return materialIds.map((id) => `${token}:${id}`);
 }
+
+/** three's NormalBlending, as a literal because this module stays Three-free. */
+const NORMAL_BLENDING = 1;
 
 /** The material half of a program-content key. A program SIGNATURE, not the
  * material uuid: distinct GLB materials by the hundred share the same linked
@@ -400,8 +456,11 @@ export function prewarmProgramContentKeys(
  * inputs three keys program defines on that the mesh-shape token does not
  * already carry: material type, hook identity (customProgramCacheKey, whose
  * three default is onBeforeCompile source), custom vertex/fragment source,
- * defines, the texture-channel presence bits, blending/alpha-test, vertex
- * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * defines, the texture-channel presence bits, three's own `opaque` bit
+ * (transparent + blending + alphaToCoverage, which an earlier version of this
+ * comment claimed while the code carried transparency alone), alphaHash,
+ * dithering, premultipliedAlpha, alpha-test, vertex colors, flat shading, fog
+ * opt-out and side. An imperfect signature is
  * fail-soft: world.initial-frame's own
  * guaranteed submit (its start is bounded ahead of the hard deadline by
  * prewarmCompileAwaitDeadline) links any residue behind the loading cover
@@ -426,6 +485,11 @@ export function materialProgramSignature(material: {
   specularMap?: unknown;
   gradientMap?: unknown;
   transparent?: boolean;
+  blending?: number;
+  alphaToCoverage?: boolean;
+  alphaHash?: boolean;
+  dithering?: boolean;
+  premultipliedAlpha?: boolean;
   alphaTest?: number;
   vertexColors?: boolean;
   flatShading?: boolean;
@@ -459,6 +523,19 @@ export function materialProgramSignature(material: {
     bit(material.specularMap),
     bit(material.gradientMap),
     bit(material.transparent),
+    // three's `opaque` bit verbatim (WebGLPrograms.getParameters): an
+    // additive-blended opaque material and a normal-blended one are two
+    // programs, and folding transparency alone collapsed them onto one
+    // stand-in that never linked the second.
+    bit(
+      material.transparent !== true &&
+        (material.blending ?? NORMAL_BLENDING) === NORMAL_BLENDING &&
+        material.alphaToCoverage !== true,
+    ),
+    bit(material.alphaToCoverage),
+    bit(material.alphaHash),
+    bit(material.dithering),
+    bit(material.premultipliedAlpha),
     bit((material.alphaTest ?? 0) > 0),
     bit(material.vertexColors),
     bit(material.flatShading),
@@ -557,7 +634,17 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       maxMs: input.defaultMaxMs,
       compileMaxMs: input.defaultCompileMaxMs,
       maxViews: baseMaxViews,
-      yieldBetweenEntries: false,
+      // Required and landmark views bypass the shared cap while draining its
+      // counter, and the portal substep draws before nearby, so with the small
+      // 12/16 budgets a landmark-and-portal-heavy spawn could otherwise leave
+      // zero slots for the nearby entity views, the most actionable entry on
+      // the shared budget. The floor guarantees them a minimum slice.
+      nearbyViewFloor: Math.min(NEARBY_VIEW_PREWARM_FLOOR, baseMaxViews),
+      // A macOS Chromium cold entry reproduced the same "page is not
+      // responding" symptom as WebKit while synchronous manifest steps ran.
+      // A zero-delay event-loop handoff between steps keeps the browser alive
+      // without changing which work the deadline admits.
+      yieldBetweenEntries: true,
       linkPassPerEntry: false,
       compileBeforeFirstFrame: asyncCompileSupported,
       skipMonolithCompile: !asyncCompileSupported,
@@ -576,6 +663,9 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     // at entry, the spike that kills Medium on-device in production but not in an
     // empty local world. The rest stream in via the per-frame view-create budget.
     maxViews: Math.min(baseMaxViews, input.maxViewsConstrained),
+    // No floor on top of the constrained cap: 2 views is a process-survival
+    // ceiling, and the deferred mob-body stream covers nearby entities.
+    nearbyViewFloor: 0,
     yieldBetweenEntries: true,
     // A full-scene render is itself the synchronous shader-link monolith when the
     // extension is absent. Never enter that uninterruptible driver call inside the
@@ -614,6 +704,39 @@ export function constrainedEntryViewCreateBudget(
  * persistent-portal, and nearby-view substeps. */
 export function remainingPrewarmViewBudget(maxViews: number, createdViews: number): number {
   return Math.max(0, Math.floor(maxViews) - Math.max(0, Math.floor(createdViews)));
+}
+
+/**
+ * Slots views.nearby is guaranteed on the shared budget even when the earlier
+ * substeps drained the counter. The floor is the policy's `nearbyViewFloor`
+ * (zero on the constrained profile), so in the worst case, required plus
+ * landmark views alone exceeding the cap, entry-view creation is bounded by
+ * maxViews plus the floor, never unbounded and never zero for nearby.
+ */
+export const NEARBY_VIEW_PREWARM_FLOOR = 4;
+
+/**
+ * The persistent-portal substep's slice of the shared budget: whatever remains
+ * past the nearby floor. Portals are the least actionable entry drawing on the
+ * shared cap, so they can never eat the slots reserved for nearby entities.
+ */
+export function portalPrewarmViewBudget(
+  maxViews: number,
+  createdViews: number,
+  nearbyViewFloor: number,
+): number {
+  const floor = Math.max(0, Math.floor(nearbyViewFloor));
+  return Math.max(0, remainingPrewarmViewBudget(maxViews, createdViews) - floor);
+}
+
+/** The nearby substep's slice: the remaining shared budget, floored. */
+export function nearbyPrewarmViewBudget(
+  maxViews: number,
+  createdViews: number,
+  nearbyViewFloor: number,
+): number {
+  const floor = Math.max(0, Math.floor(nearbyViewFloor));
+  return Math.max(remainingPrewarmViewBudget(maxViews, createdViews), floor);
 }
 
 /** True when this manifest entry runs under the given policy. */

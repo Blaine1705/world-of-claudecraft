@@ -482,6 +482,88 @@ export const sv_SE: EnTranslations = {
         "bannedUntil": "Du är avstängd från dagliga belöningar i ytterligare {remaining}. Åtkomsten återkommer {until}. Orsak: {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "WOC-butik",
       "close": "Stäng WOC-butiken",
@@ -734,6 +816,9 @@ export const sv_SE: EnTranslations = {
       "showAmounts": "Visa alla Claudium-belopp",
       "hideAmounts": "Dölj extra Claudium-belopp",
       "skuRow": "{usd} för {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Köp",
       "buyUnavailable": "Det går inte att genomföra köp just nu.",
       "storeTitle": "Kosmetisk butik",
@@ -802,9 +887,9 @@ export const sv_SE: EnTranslations = {
       "note": "Dra chattflikraden för att flytta fönstret, eller hörnhandtaget för att ändra storlek. Återställ sätter det till standardläge och -storlek."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Gränsen för Allmänt-chatten är nådd. Försök igen om {seconds}.",
+      "pending": "Ditt föregående meddelande i Allmänt-chatten skickas fortfarande. Försök igen om en stund.",
+      "unavailable": "Allmänt-chatten är tillfälligt otillgänglig. Försök igen snart."
     },
     "swing": {
       "ready": "Sving",
@@ -853,6 +938,7 @@ export const sv_SE: EnTranslations = {
       "jump": "Hoppa",
       "leaderboard": "Ranking",
       "dailyRewards": "Butik",
+      "wocMarket": "Exchange",
       "deeds": "Bedrifter",
       "mounts": "Riddjur",
       "professions": "Yrken",
@@ -866,11 +952,52 @@ export const sv_SE: EnTranslations = {
       "actionRing": "Stridsaktioner",
       "actionPageToggle": "Byt åtgärdssida",
       "actionPageIndicator": "Sida {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Byt mål",
       "targetCycleShort": "Mål",
       "spellbookPageLabel": "Sida {page}",
       "hideKeyboard": "Dölj tangentbordet",
-      "chatPlaceholder": "Säg något..."
+      "chatPlaceholder": "Säg något...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Använd rörelsespaken för att gå och dra på skärmen för att se dig omkring. Ta några steg för att börja.",
@@ -953,6 +1080,22 @@ export const sv_SE: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Källarvalven",
+        "state": "Paradvåningen",
+        "residence": "Bostadsvåningen",
+        "tower": "Vakttornet"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Trädgårdsvåningen",
+        "solar": "Solkammaren"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -970,6 +1113,7 @@ export const sv_SE: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
       "threatFallback": "Inget levande hot: visar skada mot {name}",
+      "threatFrozen": "Slutligt hot mot {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Övrigt ({count})",
@@ -1367,6 +1511,10 @@ export const sv_SE: EnTranslations = {
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showPlaytime": "Visa tid spelad på karaktärsskärmen",
+      "forceHighPerfGpu": "Använd det separata spelgrafikkortet",
+      "forceHighPerfGpuNote": "På som standard: skrivbordsappen begär datorns separata spelgrafikkort. Stäng av det här om spelet inte startar, öppnas med en svart skärm, eller om den bärbara datorns skärm blir svart. Träder i kraft nästa gång spelet startar.",
+      "discordPresence": "Discord-aktivitet",
+      "discordPresenceNote": "Visar zonen du befinner dig i och hur länge du har spelat den här sessionen som din Discord-aktivitet, och alla som kan se din Discord-profil kan se båda. Endast zonnamnet, din sessionstid och spelet delas, aldrig din karaktär, ditt konto eller vem du spelar med. Kräver att Discord-appen körs på den här datorn.",
       "showDevBadges": "Visa utvecklarmärken",
       "showOwnNameplate": "Visa min namnskylt",
       "showPlayerNameplates": "Visa spelares namnskyltar",
@@ -1382,6 +1530,7 @@ export const sv_SE: EnTranslations = {
       "mouseoverCast": "Kasta via muspekaren på gruppramarna",
       "stickyTarget": "Behåll mål vid markklick",
       "showItemLevel": "Visa föremålsnivå",
+      "showReliquaryTracker": "Visa Relikviespårare",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
@@ -1394,7 +1543,9 @@ export const sv_SE: EnTranslations = {
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",
-      "mobileLeftHanded": "Vänsterhänt layout"
+      "mobileLeftHanded": "Vänsterhänt layout",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Val",
@@ -1427,9 +1578,29 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
+      "confirmAction": "Bekräfta / Välj",
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
-      "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren."
+      "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Aktivera Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Håll en avtryckare för att tända åtta action-bar-fack på d-pad- och ansiktsknapparna. Tryck på den andra utlösaren för att byta till den andra uppsättningen.",
+      "crossHotbarResetLayout": "Återställ Cross Hotbar",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "Triggarna och d-paden tillhör cross hotbar medan den är på, så de ställs in nedan istället för här.",
+      "cancelAction": "Avbryt / Tillbaka",
+      "subcommandsAction": "Underkommandon / Karta",
+      "cycleHudAction": "Cykelgränssnitt",
+      "cycleSetAction": "Ändra Hotbar Set",
+      "crossHotbarDisplay": "Bar Display",
+      "crossHotbarDisplayFull": "Full",
+      "crossHotbarDisplayCompact": "Kompakt",
+      "crossHotbarDisplayMinimal": "Endast medan den hålls",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Bär {action}: bekräfta på en cell för att placera den, avbryt för att sätta tillbaka den.",
+      "crossHotbarEditHint": "Ordna: bekräfta plockar upp från en cell eller stavningsboken och släpper på en cell, avbryt rensar en.",
+      "crossHotbarEditHelp": "Håll i den vänstra stötfångaren och tryck på den övre ansiktsknappen för att placera stången med kontrollen."
     },
     "perf": {
       "title": "Prestandaöverlägg",
@@ -1548,6 +1719,7 @@ export const sv_SE: EnTranslations = {
           "render": "render  inskickning {submit} ms | värld {world} ms | entiteter {entities} ms",
           "scene": "scen    {calls} anrop | {triangles} tri | {views} vyer",
           "hitches": "hack    {hitches} | shaders {shaders} | uppladdningar {uploads} | vyer {views}",
+          "hitchesBuild": "zon bygger {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "väntar"
         },
@@ -1599,7 +1771,10 @@ export const sv_SE: EnTranslations = {
             "eventCpu": "Händelsehantering förbrukar bildtiden",
             "shaderCompile": "Shaders kompileras under spelets gång",
             "textureUpload": "Texturuppladdningar orsakar hack i spelet",
+            "zoneBuild": "Strömmande zoner orsakar problem",
             "viewCreate": "Skapande av entitetsvyer orsakar hack",
+            "gcHitch": "Sophämtning körs inuti långa ramar",
+            "offFrameHitch": "Långa ramar kommer från arbete utanför återuppringningen",
             "otherHitch": "Otillskrivna långa bilder kvarstår",
             "assetStartup": "Speluppstarten fördröjs av resursarbete",
             "longTasks": "Långa webbläsaruppgifter blockerar bilder",
@@ -1739,6 +1914,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
+        "arenaComplete": "arenamatch utkämpad",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
         "fiestaWin": "Fiesta-seger",
@@ -1845,6 +2021,7 @@ export const sv_SE: EnTranslations = {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
     "itemHeroicTag": "[HEROISK]",
+    "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
     "itemUniqueEquipped": "Unikt utrustad",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const sv_SE: EnTranslations = {
         "few": "du är {rank}, {count} medlemmar",
         "many": "du är {rank}, {count} medlemmar",
         "other": "du är {rank}, {count} medlemmar"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} spelare",
@@ -2016,6 +2205,10 @@ export const sv_SE: EnTranslations = {
       "errPasswordLong": "Det nya lösenordet får vara högst 128 tecken.",
       "errPasswordUnchanged": "Det nya lösenordet måste skilja sig från det nuvarande.",
       "errPasswordConfirm": "De nya lösenorden stämmer inte överens.",
+      "setPasswordTitle": "Ange ett lösenord",
+      "setPasswordHint": "Det här kontot skapades med Logga in med Apple eller Discord och har inget lösenord än. Ställ in en för att logga in på andra enheter, som Mac- och Windows-skrivbordsappar eller webben, och för att länka ytterligare inloggningsmetoder.",
+      "setPasswordSubmit": "Ange lösenord",
+      "passwordSet": "Lösenord inställt. Du kan nu logga in med ditt användarnamn och lösenord var som helst.",
       "emailLabel": "E-post (valfritt)",
       "emailHint": "Används endast för kontoåterställning. Använd Ändra e-post nedan för att uppdatera den.",
       "saveEmail": "Spara e-post",
@@ -2199,6 +2392,10 @@ export const sv_SE: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "itemAriaQuest": "{item}, antal {count}, uppdragsföremål",
+      "itemAriaLocked": "{item}, antal {count}, låst",
+      "itemLockedLine": "Låst",
+      "lockItem": "Lås föremål",
+      "unlockItem": "Lås upp föremål",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -2453,12 +2650,14 @@ export const sv_SE: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Lägg till {name} i handlingsfältet",
-      "removeFromBarAria": "Ta bort {name} från handlingsfältet"
+      "removeFromBarAria": "Ta bort {name} från handlingsfältet",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "BV"
+      "afkTag": "BV",
+      "cheaterTag": "< Fuskare >"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -3224,11 +3423,13 @@ export const sv_SE: EnTranslations = {
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(förbrukar {count} av fin kvalitet)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
       "craftedToastQty": "Tillverkad: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
+      "reagentLocked": "En reagens för det är låst.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
       "comboRequires": "Inriktning: {craftA} + {craftB}, nivå {tier}.",
@@ -3335,6 +3536,7 @@ export const sv_SE: EnTranslations = {
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
       "notSalvageable": "Du kan inte bärga det.",
+      "salvageLocked": "Det föremålet är låst.",
       "disenchantBusy": "Du är upptagen.",
       "salvageBusy": "Du är upptagen.",
       "enchantBusy": "Du är upptagen.",
@@ -3710,6 +3912,9 @@ export const sv_SE: EnTranslations = {
       "pinFull": "Spåraren är full (upp till {cap} sidor)",
       "pinAria": "Fäst {name} i gränssnittets spårare",
       "unpinAria": "Lossa {name}",
+      "trackerToggleLabel": "HUD tracker",
+      "trackerToggleShowHint": "Visa Reliquary-spåraren på din skärm",
+      "trackerToggleHideHint": "Göm Reliquary-spåraren från skärmen",
       "rarityLine": "Funnen av {percent} av samlarna",
       "pageRarityLine": "Illuminerad av {percent} av samlarna",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const sv_SE: EnTranslations = {
       "unlockedBorderHint": "Ny ram förtjänad: {name}. Bär den via Bedrifternas bok.",
       "broadcastLine": "{name} har fullbordat en bedrift: {deed}",
       "rarityLine": "Fullbordad av {percent} av äventyrarna",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Bedrifter",
       "collapseHint": "Fäll ihop bedriftsspåraren",
       "expandHint": "Fäll ut bedriftsspåraren",
@@ -3797,6 +4003,220 @@ export const sv_SE: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Kräver nivå {level}"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const sv_SE: EnTranslations = {
       "password_too_long": "Det nya lösenordet får vara högst 128 tecken.",
       "characters_online": "Logga ut alla dina karaktärer innan du inaktiverar kontot.",
       "deactivated": "Detta konto har inaktiverats. Kontakta en administratör för att återställa det.",
-      "not_found": "Kontot hittades inte."
+      "not_found": "Kontot hittades inte.",
+      "password_already_set": "Detta konto har redan ett lösenord. Använd Ändra lösenord istället."
     },
     "character": {
       "name_invalid": "Ogiltigt karaktärsnamn. Använd 2-16 bokstäver.",
@@ -3928,6 +4349,61 @@ export const sv_SE: EnTranslations = {
       "genesis_token_claimed": "Denna Seeker Genesis Token har redan hämtats.",
       "entitlement_required": "Verifierad Seeker-behörighet krävs.",
       "current_ownership_required": "Du måste fortfarande äga din Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Operatörskonton kan inte märkas.",
+      "reason_required": "En anledning krävs.",
+      "invalid_duration": "Ange en märkningslängd på minst en sekund.",
+      "not_marked": "Det kontot är inte märkt."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const sv_SE: EnTranslations = {
       "ifHighContrastBackground": "En enklare bakgrund med högre kontrast bakom start- och karaktärsskärmarna.",
       "ifInvertLookY": "Vänder upp- och nedriktningen för musblicken.",
       "ifShowItemLevel": "Lägger till en rad med föremålsnivå på varje föremåls verktygstips. Avstängt som standard, vilket behåller det klassiska verktygstipset med bara statistik.",
+      "ifShowReliquaryTracker": "Om Reliquary-spåraren (dina fästa sidor och deras framsteg) sitter på din HUD. Reliquary-fönstret har en matchande ögonknapp, och genom att fästa en sida slås spåraren på igen.",
       "ifShowPlaytime": "Visar din livstids speltid på karaktärsbladet. Aktiverat som standard, och bladet har en ögonknapp som slår av och på det per enhet, vilket är praktiskt om du strömmar eller tar skärmbilder. Totalen fortsätter räkna oavsett.",
       "ifShowOwnNameplate": "Ritar din egen namnskylt ovanför huvudet precis som andra spelare ser den, med all dess utsmyckning. Stäng av den för den klassiska vyn.",
       "ifShowPlayerNameplates": "Ritar andra spelares namnskyltar. Avstängt städar upp i en fullpackad knutpunkt, och ditt nuvarande mål förblir läsbart oavsett.",
@@ -4735,6 +5212,7 @@ export const sv_SE: EnTranslations = {
       "mageEleJet": "Vattenstråle har en egen knapp på djurraden: klicka på den för att låsa en kylande stråle på en fiende, eller högerklicka på den (håll intryckt på mobil) för att låta elementaren avfyra den på egen hand så snart den är redo.",
       "formsHeading": "Formskiftning",
       "formsNote": "En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.",
+      "formsAutoUnshift": "En läkning eller en skadetrollformel som kastas i skepnad tar dig ur den åt dig. Att lämna en skepnad på det sättet är gratis och förbrukar inte den globala nedkylningen, så en omedelbar trollformel går av i samma stund du trycker. Att skifta tillbaka är en vanlig förmåga och kostar fortfarande mana och din globala nedkylning.",
       "formsMoonwing": "En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.",
       "formLine": {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
@@ -6544,6 +7022,7 @@ export const sv_SE: EnTranslations = {
     "email": "E-post",
     "emailPlaceholder": "du@exempel.se",
     "emailError": "Ange en giltig e-postadress.",
+    "marketingOptIn": "Skicka mig nyheter och uppdateringar om spelet via e-post (valfritt)",
     "showPassword": "Visa lösenord",
     "hidePassword": "Dölj lösenord",
     "logIn": "Logga in",
@@ -6644,6 +7123,19 @@ export const sv_SE: EnTranslations = {
     "style": "Stil",
     "resetLook": "Återställ utseende",
     "resetShort": "Återställ",
+    "shareTab": "Dela",
+    "designCode": "Utseendekod",
+    "designCodeHint": "Kopiera den här koden för att spara eller dela utseendet. Klistra in en kod här och importera den för att läsa in utseendet.",
+    "copyCode": "Kopiera kod",
+    "importCode": "Importera",
+    "designCodeCopied": "Utseendekoden har kopierats.",
+    "designCodeCopyManual": "Automatisk kopiering är blockerad här. Koden är markerad; kopiera den med tangentbordet.",
+    "designCodeImported": "Utseendet har importerats.",
+    "designCodeImportedPartial": "Utseendet har importerats. Värden som den här versionen inte känner igen hoppades över.",
+    "designCodeErrEmpty": "Klistra in en utseendekod först.",
+    "designCodeErrHeader": "Det där ser inte ut som en utseendekod.",
+    "designCodeErrVersion": "Den utseendekoden kommer från en nyare spelversion.",
+    "designCodeErrMalformed": "Den utseendekoden är skadad. Kopiera hela koden och försök igen.",
     "browFlat": "Platt",
     "browArched": "Bågformad",
     "browThin": "Tunn",
@@ -7039,6 +7531,7 @@ export const sv_SE: EnTranslations = {
       "portalOpens": "En reva av grad {tier} rivs upp i {zone}!",
       "portalSealed": "Revan av grad {tier} i {zone} har förseglats.",
       "portalCollapses": "Revan av grad {tier} i {zone} kollapsar.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Endast äventyrare på nivå {level} eller högre får gå in i denna reva.",
       "deadEntry": "Du kan inte gå in i en reva medan du är död.",
       "deadEntryCombat": "Din grupp är fortfarande i strid. De döda kan gå in igen när striden upphör.",
@@ -7138,6 +7631,7 @@ export const sv_SE: EnTranslations = {
       "shopMarksRequired": "Du behöver {marks} Fördjupningsmärken för att köpa {name}.",
       "shopSealPremiumOnly": "Detta sigill ger vika endast för en mästares hand. Endast Premium-insatsen kan öppna det.",
       "passageSealed": "Passagen är förseglad.",
+      "enemiesRemain": "Besegra de återstående fienderna först.",
       "moveCloserPassage": "Gå närmare passagen.",
       "moveCloserChest": "Gå närmare kistan.",
       "moveCloserReliquary": "Gå närmare relikvariet.",
@@ -7760,7 +8254,15 @@ export const sv_SE: EnTranslations = {
       "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
       "later": "Senare",
-      "dismiss": "Stäng"
+      "dismiss": "Stäng",
+      "whatsNew": "Se vad som har ändrats i din webbläsare"
+    },
+    "notify": {
+      "updateReadyTitle": "Uppdatering {version} är klar",
+      "updateReadyTitleNoVersion": "Uppdatering är klar",
+      "updateReadyBody": "Starta om World of ClaudeCraft för att tillämpa uppdateringen.",
+      "partyInviteTitle": "Gruppinbjudan",
+      "partyInviteBody": "{name} bjöd in dig till en grupp."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const sv_SE: EnTranslations = {
       "reload": "Ladda om",
       "quit": "Avsluta",
       "fatalBody": "World of ClaudeCraft stötte på ett oväntat fel och måste stängas."
+    },
+    "titlebar": {
+      "exitGame": "Avsluta spelet"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
+    "bodyDiscreteInactive": "Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
     "hybridBodyWindows": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort, ställ in din webbläsare på Höga prestanda under Inställningar > System > Bildskärm > Grafik, och starta sedan om den. Skrivbordsappen väljer det separata grafikkortet automatiskt.",
     "hybridBodyLinux": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort kan din webbläsare eller grafikdrivrutin erbjuda en egen inställning för val av grafikkort, eller så kan din distribution erbjuda ett verktyg för att växla grafikkort (till exempel PRIME eller optimus-manager). Skrivbordsappen väljer det separata grafikkortet automatiskt.",
@@ -7995,7 +8501,111 @@ export const sv_SE: EnTranslations = {
       "zoomIn": "Zooma in",
       "zoomOut": "Zooma ut",
       "mapCanvasLabel": "Karta",
-      "mapSummary": "Karta över {zone}."
+      "mapSummary": "Karta över {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Inga relevanta markörer är synliga.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Ytterligare markörer: {count}.",
+      "mapMarkerDirections": {
+        "center": "i mitten",
+        "north": "i norr",
+        "northeast": "i nordost",
+        "east": "i öster",
+        "southeast": "i sydost",
+        "south": "i söder",
+        "southwest": "i sydväst",
+        "west": "i väster",
+        "northwest": "i nordväst"
+      },
+      "mapMarkerDistances": {
+        "near": "i närheten",
+        "medium": "på medellångt avstånd",
+        "far": "långt bort"
+      },
+      "mapMarkerLabels": {
+        "you": "Du",
+        "availableQuest": "Tillgängligt uppdrag",
+        "readyQuest": "Uppdrag redo att lämnas in",
+        "repeatQuest": "Upprepbart uppdrag",
+        "cooldownQuest": "Uppdrag under nedkylning",
+        "questObjective": "Område med uppdragsmål",
+        "readyOre": "Tillgänglig malmåder",
+        "readyWood": "Tillgängligt timmerbestånd",
+        "readyHerb": "Tillgänglig örtfläck",
+        "readyLockedOre": "Tillgänglig malmåder, verktyg låst",
+        "readyLockedWood": "Tillgängligt timmerbestånd, verktyg låst",
+        "readyLockedHerb": "Tillgänglig örtfläck, verktyg låst",
+        "cooldownOre": "Uttömd malmåder",
+        "cooldownWood": "Uttömt timmerbestånd",
+        "cooldownHerb": "Uttömd örtfläck",
+        "cooldownLockedOre": "Uttömd malmåder, verktyg låst",
+        "cooldownLockedWood": "Uttömt timmerbestånd, verktyg låst",
+        "cooldownLockedHerb": "Uttömd örtfläck, verktyg låst",
+        "station": "Hantverksstation: {name}",
+        "service": "Tjänst: {name}",
+        "partyMember": "Gruppmedlem: {name}",
+        "deadPartyMember": "Död gruppmedlem: {name}",
+        "partyMemberGeneric": "Gruppmedlem",
+        "deadPartyMemberGeneric": "Död gruppmedlem",
+        "friend": "Vän: {name}",
+        "guildMember": "Gillesmedlem: {name}",
+        "pointOfInterest": "Intressepunkt: {name}",
+        "dungeonEntrance": "Fängelsehålsingång: {name}",
+        "dungeonExit": "Fängelsehålsutgång",
+        "delveEntrance": "Delve-ingång: {name}",
+        "worldPassage": "Passage till {zone}",
+        "riftEntrance": "Ingång till revan: {name}",
+        "hostileEnemy": "Fientligt mål",
+        "aggressiveEnemy": "Fiende angriper dig",
+        "lootableEnemy": "Plundringsbar fiende",
+        "corpse": "Din kropp",
+        "deathZone": "Farozon",
+        "teammate": "Lagkamrat",
+        "deadTeammate": "Död lagkamrat",
+        "flagCarrier": "Lagkamrat med flaggan",
+        "ownFlagStand": "Din flaggplats",
+        "enemyFlagStand": "Fiendens flaggplats",
+        "riftDescent": "Nedstigning i revan",
+        "riftReturnBeacon": "Återvändningsbåk",
+        "riftReturnExit": "Återvändningsutgång",
+        "ranked": "{marker}, grad {rank}",
+        "riftTreasureAvailable": "Tillgänglig skatt",
+        "riftTreasureLocked": "Låst skatt",
+        "riftTreasureOpened": "Öppnad skatt",
+        "riftTreasureJammed": "Skatt med fastkilat lås",
+        "riftCacheAvailable": "Tillgängligt förråd i revan",
+        "riftCacheLocked": "Låst förråd",
+        "riftCacheOpened": "Öppnat förråd",
+        "riftCacheJammed": "Förråd med fastkilat lås",
+        "pylonUnlit": "Släckt runpelare",
+        "pylonLit": "Tänd runpelare",
+        "sequenceRuneUnlit": "Släckt sekvensruna",
+        "sequenceRuneLit": "Tänd sekvensruna",
+        "iceGoal": "Ismål",
+        "boulderPad": "Stenblocksmål",
+        "boulderMovable": "Flyttbart stenblock",
+        "boulderPlaced": "Placerat stenblock",
+        "gateSealed": "Förseglad port",
+        "gateOpen": "Öppen port",
+        "switchReady": "Brytare redo att användas",
+        "switchOn": "Aktiverad brytare",
+        "orbDormant": "Slumrande orb",
+        "orbActive": "Aktiv orb",
+        "rollerHazard": "Farligt rullande stenblock",
+        "delvePassageSealed": "Förseglad passage",
+        "delvePassageOpen": "Öppen passage",
+        "delveSurfaceExit": "Utgång till ytan",
+        "delveCacheLocked": "Låst delve-kista",
+        "delveCacheReady": "Delve-kista redo",
+        "delveCacheActive": "Delve-kista aktiv",
+        "delveCacheOpened": "Öppnad delve-kista",
+        "delveReliquaryLocked": "Låst relikvarium",
+        "delveReliquaryReady": "Relikvarium redo",
+        "delveReliquaryActive": "Relikvarierit aktiv",
+        "delveReliquaryOpened": "Öppnat relikvarium",
+        "bountiful": "{marker} med rikligt byte"
+      }
     },
     "options": {
       "gameMenu": "Spelmeny",
@@ -8035,6 +8645,9 @@ export const sv_SE: EnTranslations = {
       "graphicsReloadNote": "Grafikkvalitet och terrängdetalj tillämpas efter en omladdning.",
       "reloadNow": "Ladda om nu",
       "fullscreen": "Helskärm",
+      "displayMode": "Visningsläge",
+      "displayModeBorderless": "Kantlös helskärm",
+      "displayModeWindowed": "Fönsterläge",
       "touchLookSpeed": "Pekblickens hastighet",
       "joystickSize": "Styrspakens storlek",
       "buttonSize": "Knappstorlek",
@@ -8597,6 +9210,7 @@ export const sv_SE: EnTranslations = {
       "offGlobalCooldown": "Utanför den globala nedkylningen",
       "friendlyTarget": "Vänligt mål",
       "enemyTarget": "Fiendemål",
+      "anyTarget": "Fiende eller vänligt mål",
       "selfOnly": "Endast dig själv",
       "damageRange": "{min} till {max}",
       "finisherDamage": "{base} plus {perCombo} per kombopoäng"
@@ -8911,6 +9525,10 @@ export const sv_SE: EnTranslations = {
       "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
+      "filterSort": "Sortera",
+      "sortName": "Namn (A-Z)",
+      "sortPriceAsc": "Pris: lågt till högt",
+      "collapseLowest": "Endast lägsta pris",
       "weaponSword": "Svärd",
       "weaponDagger": "Dolkar",
       "weaponStaff": "Stavar",
@@ -8941,6 +9559,8 @@ export const sv_SE: EnTranslations = {
       "quantity": "Antal",
       "quantityOf": "av {count}",
       "priceEach": "Pris per styck",
+      "lowestPriceLabel": "Nuvarande lägsta annonspris",
+      "lowestPriceNone": "Det finns inga aktiva annonser för det här föremålet ännu.",
       "listButton": "Lägg upp på Världsmarknaden",
       "minPriceError": "Ange ett pris på minst 1 koppar.",
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
@@ -9368,6 +9988,7 @@ export const sv_SE: EnTranslations = {
       "cheap_shot": {
         "name": "Magslag",
         "description": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.",
+        "descriptionNoStealth": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.",
         "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const sv_SE: EnTranslations = {
       "crippling_poison": {
         "name": "Blytungt gift",
         "description": "Träffar målet med ett blytungt gift som vållar {damage} naturskada och saktar dess förflyttningshastighet med 50 % i 12 sek."
+      },
+      "melting_acid": {
+        "name": "Smältande syra",
+        "description": "Stänker målet med ett frätande gift, gör {damage} naturskada och minskar dess rustning med 5 % i 12 sekunder."
+      },
+      "nightshade_coating": {
+        "name": "Nightshade beläggning",
+        "description": "Belägger målet i nattskugga, gör {damage} naturskada och minskar läkningen den får med 25 % under 12 sek."
       },
       "expose_armor": {
         "name": "Rustningsbräsch",
@@ -9580,7 +10209,7 @@ export const sv_SE: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Brinnande ed",
-        "description": "Ökar passivt hotet som er Heliga skada alstrar med 60%. Endast Trosväktare."
+        "description": "Ökar passivt hotet som er Heliga skada alstrar med 30%. Endast Trosväktare."
       },
       "retribution_aura": {
         "name": "Vedergällningsaura",
@@ -9696,7 +10325,7 @@ export const sv_SE: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
-        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 30% rustning, tar 10% mindre skada och alstrar dubbelt så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
+        "description": "Genomsyrar ert vapen i 30 min. Varje hugg vållar {damage} extra skada. Förstärkning vinner dessutom 40% rustning och 20% uthållighet, tar 15% mindre skada och är immun mot kritiska träffar från varelser och alstrar 2,75 gånger så mycket hot. Jordstöt tvingar sitt mål att anfalla er i 3 sek, och Åskvärn ger 10% skademinskning i 3 sek."
       },
       "healing_wave": {
         "name": "Lagande vatten",
@@ -9824,7 +10453,7 @@ export const sv_SE: EnTranslations = {
       },
       "fear": {
         "name": "Plåga",
-        "description": "Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten."
+        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten."
       },
       "searing_pain": {
         "name": "Sveda",
@@ -9875,7 +10504,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +130 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
@@ -9885,6 +10514,10 @@ export const sv_SE: EnTranslations = {
       "growl": {
         "name": "Hota",
         "description": "Morrar åt målet: ditt hot stiger till nivån hos dess mest hatade fiende och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
+      },
+      "challenging_roar": {
+        "name": "Olycksbådande vrål",
+        "description": "Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
       },
       "cat_form": {
         "name": "Vargform",
@@ -9898,7 +10531,7 @@ export const sv_SE: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodsbett",
         "description": "Avslutande drag som orsakar {damage}. Endast i Vargform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd: ett bett för 70 plus 43 per kombopoäng som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer 30 energi."
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi."
       },
       "swipe": {
         "name": "Svepande klor",
@@ -9961,7 +10594,7 @@ export const sv_SE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vargblod",
-        "description": "Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
+        "description": "Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
       },
       "rip": {
         "name": "Blodsspricka",
@@ -10066,7 +10699,7 @@ export const sv_SE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Märker en fiende i 12 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 meter och skapar 1 Själfragment."
+        "description": "Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10165,8 +10798,8 @@ export const sv_SE: EnTranslations = {
         "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
       },
       "feral_charge": {
-        "name": "Vild rusning",
-        "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
+        "name": "Urvåg",
+        "description": "Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)"
       },
       "swiftmend": {
         "name": "Snabb läkning",
@@ -10182,7 +10815,7 @@ export const sv_SE: EnTranslations = {
       },
       "redharvest": {
         "name": "Röd Skörd",
-        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer 30 energi. Fungerar utan kombopoäng."
+        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng."
       },
       "marrowbreak": {
         "name": "Märgbräckare",
@@ -10422,7 +11055,7 @@ export const sv_SE: EnTranslations = {
       },
       "evocation": {
         "name": "Eterbrunn",
-        "description": "Restaura mana rápidamente. (magikertalang)"
+        "description": "Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)"
       },
       "flurry_of_knives": {
         "name": "Knivstorm",
@@ -10430,7 +11063,7 @@ export const sv_SE: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Vild läkning",
-        "description": "Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)"
+        "description": "Återställer 40% av din maximala hälsa under 10 sek. Endast i Björngestalt. (druidtalang)"
       },
       "frost_trap": {
         "name": "Rimfälla",
@@ -10450,11 +11083,11 @@ export const sv_SE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Skräckyl",
-        "description": "Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)"
+        "description": "Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)"
       },
       "ice_block": {
         "name": "Kall kista",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)"
+        "description": "Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)"
       },
       "inner_focus": {
         "name": "Stillat sinne",
@@ -10546,7 +11179,7 @@ export const sv_SE: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Rusande sinne",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)"
+        "description": "Gör er nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)"
       },
       "psychic_scream": {
         "name": "Psykiskt skrik",
@@ -10663,7 +11296,7 @@ export const sv_SE: EnTranslations = {
       },
       "prowl": {
         "name": "Smygjaga",
-        "description": "Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid."
+        "description": "Gå i smyg medan du är i vargform och rör dig 5 % långsammare. Kan inte användas i strid."
       },
       "rake": {
         "name": "Flå",
@@ -12218,6 +12851,9 @@ export const sv_SE: EnTranslations = {
       "pristine_claw": {
         "name": "Orörd klo"
       },
+      "dawnhold_posy": {
+        "name": "Bukett från Dawnholds trädgård"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -13062,6 +13698,15 @@ export const sv_SE: EnTranslations = {
       },
       "training_dummy": {
         "name": "Träningsdocka"
+      },
+      "friendly_player_dummy": {
+        "name": "Vänlig spelardocka"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal bossdocka"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroisk bossdocka"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
@@ -16702,6 +17347,11 @@ export const sv_SE: EnTranslations = {
         "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
       },
+      "dawnhold_castle": {
+        "name": "Dawnholds slott",
+        "enterText": "Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.",
+        "leaveText": "Du kliver ut igen på trädgårdens solbelysta gräsmatta."
+      },
       "drowned_temple": {
         "name": "Det dränkta templet",
         "enterText": "Du kliver genom månporten, luften förvandlas till kallt vatten och blekt ljus, och sången sluter sig över ditt huvud.",
@@ -16900,6 +17550,21 @@ export const sv_SE: EnTranslations = {
         "sender": "Fixare Gizzel",
         "subject": "MÄSTERSKAP, kaboom",
         "body": "Ett av dina ämnen nådde mästerskap, absoluta TOPPEN, kaboom, hela stegen, klart. Jag delar inte ut beröm, jag delar ut stubiner, men här, ta båda: du är briljant och lite skrämmande. Gå och få bergen att skaka."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

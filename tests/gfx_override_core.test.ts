@@ -16,6 +16,7 @@ const settings = {
   msaaSamples: 4,
   bloom: true,
   smaa: false,
+  fxaa: true,
   dynamicShadows: true,
   terrainCastShadows: true,
   shadowMap: 4096,
@@ -48,6 +49,7 @@ describe('gfx override parsing', () => {
           'msaaSamples:0',
           'bloom:0',
           'smaa:1',
+          'fxaa:0',
           'dynamicShadows:0',
           'terrainCastShadows:0',
           'shadowMap:2048',
@@ -76,6 +78,7 @@ describe('gfx override parsing', () => {
       msaaSamples: 0,
       bloom: false,
       smaa: true,
+      fxaa: false,
       dynamicShadows: false,
       terrainCastShadows: false,
       shadowMap: 2048,
@@ -153,13 +156,28 @@ describe('gfx override application', () => {
     // JSON.stringify serializes as null) to the bounded 128 (see gfx.ts and
     // tests/character_visual_pool.test.ts), so every desktop-default profile's
     // serialized bytes moved by exactly that one value.
+    // The low row alone was regenerated once more when the desktop-client
+    // branch merged: its phase 5 low retune (bands/caps/grassRadius 72,
+    // characters floor 0.86, pinned per-axis by
+    // tests/gfx_low_monotonicity.test.ts) stacks on top of the C1 value, so
+    // low hashes differently from the release row while the other five match
+    // it byte for byte.
+    // Regenerated across the board for the denseDressing field (the dressing
+    // compensation cohort: lowPlus plus the leanFoliage medium session; see
+    // gfx.ts and tests/gfx.test.ts). Its VALUE is false for every
+    // desktop-default case here, only the serialized key name moves the bytes.
+    // Regenerated across the board for the `fxaa` field (edge AA fused into the
+    // output grade pass; see gfx_aa_policy_core.ts). Unlike the renames above
+    // this one moves a VALUE too: medium and the Advanced grade-only mix are
+    // the profiles the new AA policy grants it to, and low/high/ultra/insane
+    // move only by the serialized key name.
     expect(hashes).toEqual({
-      low: '2b50e2f6a64cf6bc0540aea1138ba729db5ba29cd9e1ce7ae3630f9bb826f9bc',
-      medium: 'e38687c8392fe46ee6941e26374e11473f7208732e9aa251dde7239faa74504e',
-      high: '02a87653c70f90faeeeb22e918cd2bb79ad4fdd14b8115c6745a8e4f575f4547',
-      ultra: 'c7f51f9c5e62bb013db47cf42ad98d904b8f5a675aa072b7b2884f1903017cd2',
-      insane: '393167d184c3029be560b9601bc50a1d103fc2221204d85dae3c79be9dbdc3da',
-      advanced: 'e99d3a399f2a18903f9f31c80320f99e5b46f35af3e84f21a6220c02ca3475b8',
+      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
+      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
+      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
+      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
+      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
+      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
     });
   });
 

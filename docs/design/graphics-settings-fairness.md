@@ -43,7 +43,12 @@ COSMETIC (may be tiered down on lower presets):
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
   screen, so hiding a buff icon removes no actionable information.
 - Portrait and HP-bar redraw smoothness within human reaction tolerance (about 200 ms).
-- Weapon-skin VFX richness (`src/render/weapon_vfx_shed_core.ts`). The rarity rig on a
+- Sun-shadow refresh cadence under budget pressure (`src/render/shadow_cadence_core.ts`).
+  Under sustained over-budget readings the shadow map updates every other frame instead of
+  every frame; shadows are never removed, and a one-frame-stale shadow (50 ms at 20 FPS)
+  conveys nothing a player acts on. This is a GOVERNOR-driven shed by design, like the
+  weapon-VFX `vfx` bucket arm below: a perf-governor output, not a UI tier knob, so the
+  static-preset rule at the bottom of this doc does not apply to it.
   VFX-bearing weapon skin (glow, motes, aurora, shell, cast light) FADES on two inputs.
   Neither reaches zero: what removes a rig is the character LOD swap, which replaces the whole
   articulated rig with one baked mesh and is shared by the entire render path. The fade exists
@@ -59,17 +64,39 @@ COSMETIC (may be tiered down on lower presets):
     that differs between two players looking at the same wearer, and it can only dim.
   What is faded is decoration ON a weapon. The wearer, their nameplate, their cast bar, their
   auras, their position and the weapon model itself are untouched at every scale.
-- The deed border accent's decorative bloom (the Book of Deeds border rewards worn in-world).
-  The accent is IDENTITY: it encodes no health, range, rank, or threat, so it may never be
-  hidden, but its outer glow is pure richness. The identity arms are tier-invariant by
-  construction: the nameplate cartouche is canvas shapes resolved from entity state on the
-  same cadence as the title text (no tier input on the accent path, pinned by the path scan
-  in `tests/deed_border_accent.test.ts`), and the portrait ring's frame border, edge outline,
-  and inset shadow never read a tier token (pinned by the CSS arm of the same suite). The ONE
-  tier-scaled quantity is the ring's outer box-shadow bloom, which rides `--fx-shadow` (0 at
-  low) exactly like the sibling portrait combat glow. The ring also repaints on the existing
-  low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a redraw-smoothness
-  shed this list already sanctions for the portrait.
+- Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
+  surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
+  forged seal, motif, material, and structural edge may never be hidden. The world seal and
+  name ribbon are canvas shapes resolved from entity state on the same cadence as the title
+  text. The player and valid-player-target headers, inspect banner, picker samples, and both
+  picker previews consume the same canonical slug-to-palette-and-motif mapping. None accepts
+  a graphics preset, tier, effects profile, or governor input. `tests/deed_border_accent.test.ts`
+  pins those identity arms and the four normalized motif paths. The ONE tier-scaled quantity
+  is outer box-shadow bloom, which rides `--fx-shadow` and may reach 0 on low. Structural
+  borders, inset edges, seals, motifs, and material fills remain. The target reveal repaints
+  on the existing low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a
+  redraw-smoothness shed this list already sanctions for the portrait. Party, pet,
+  target-of-target, NPC, mob, and object frames receive no heraldry on any tier.
+
+- The armour DYE of a picked outfit colorway (`src/render/characters/armor_dye.ts`,
+  `outfitDye` in `modular.ts`). The colorway itself is IDENTITY the player chose in the
+  creator, so it may never be dropped outright; what a tier with no shader stage may shed is
+  its FIDELITY. On standard tier and above, `attachArmorDye` remaps the atlas's steel, trim,
+  leather, and cloth zones independently in a fragment shader. On low tier, every rig
+  material rebuilds as flat Lambert with no `onBeforeCompile` hook to run that shader in, so
+  `outfitDyeFallbackHex` (`modular.ts`) stands in with a single, value-normalized multiply
+  toward the colorway's own hue: a rougher, whole-armour approximation of the same colour
+  rather than the atlas's undyed default. Pinned by `tests/tinted_material.test.ts`.
+
+- Edge anti-aliasing, and WHICH edge anti-aliasing a tier gets. High and above run the SMAA
+  tail; medium (and any mix that resolves to the grade-only chain) runs the FXAA arm fused
+  into `OutputGradePass`; low and the memory-constrained WebKit rungs run none, because they
+  have no grade pass to fuse into. All three arms filter the display-space image AFTER
+  everything a player reads has been drawn into it, and none of them removes, hides, delays,
+  or repositions anything: an aliased silhouette and an anti-aliased one carry the same
+  information at the same time. Which arm a session gets is a pure function of the STATIC
+  device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
+  governor, so it cannot vary between two players standing in the same spot.
 
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
@@ -152,6 +179,100 @@ cosmetic surface as though it carried the read. `tests/map_terrain.test.ts` pins
 both directions, including that no pixel near the limit is drawn brighter than the water inside
 it, so the boundary cannot creep back in as decoration.
 
+### Low-tier rocks with a real collider stayed invisible (2026-08-15)
+
+Not a HUD tier this time: the same principle applies to a WORLD-scenery LOD trim, and the
+answer is that a physical collision is the sharpest form of actionable information there is,
+sharper than anything on this list so far.
+
+`src/render/foliage.ts` sheds triangle count on `GFX.leanFoliage` tiers (Low, and Medium on a
+weak integrated GPU) by randomly dropping a fraction of scatter decorations from rendering. That
+trim treated every rock the same, with no awareness that `src/sim/colliders.ts` had already given
+some of them a real physical collider (rocks at or above `ROCK_COLLIDER_MIN_SCALE`). The sim side
+is correctly tier-agnostic (the server is authoritative and knows nothing about a client's
+graphics preset), so the collider always existed; only the client's decision about what to draw
+was missing the check. A player on Low could walk into an empty-looking patch of ground and be
+stopped by a rock they could not see.
+
+The fix is a shared predicate, `decorationHasCollider` (`src/sim/decoration_dims.ts`), consumed
+by both `colliders.ts` (which already had the same check inline; it now calls the named,
+shared version instead) and a new pure core, `src/render/foliage_decimation_core.ts`
+(`survivesLeanDecimation`), which exempts any rock the predicate calls solid from the trim before
+falling back to the previous tuned keep rates for everything else. Trees carry the identical
+architectural gap (every tree/tree2 trunk gets an unconditional collider, with no size gate at
+all), but a correct fix there would exempt effectively every tree from the trim, a much larger
+triangle-count and frame-time tradeoff on the weak/software GPUs this tier targets than the rock
+fix is, so it was tracked separately rather than folded in blind at
+levy-street/world-of-claudecraft#3415: see the entry below, where its decimation-trim half is
+fixed for real (a distinct, still-open bucket-culling half is also identified there). A second,
+unrelated invisible-collision gap was found in the same review, in the Evergarden's parterre
+beds and garden-biome pines (a zone-curation exclusion, unconditional on every preset, not this
+tier trim), tracked at levy-street/world-of-claudecraft#3417 and still open.
+
+The rule this adds to the list at the top: ACTIONABLE now explicitly includes "the presence of
+any entity a player can physically collide with", not only HUD/map reads. A render-side decision
+about what to draw must never diverge from what the sim decides a player can be blocked by.
+`tests/foliage_decimation_core.test.ts` pins the predicate itself, and
+`tests/foliage_decimation_wiring.test.ts` source-scans `foliage.ts` so a future re-inlining of
+the old hash-vs-keep-rate filter (which is exactly what caused this) fails loudly instead of
+silently reopening the bug behind a green core test.
+
+### Low-tier trees with a real collider stayed invisible too (2026-08-20)
+
+`levy-street/world-of-claudecraft#3415` (opened alongside the rock fix above) was closed as
+completed on 2026-08-17 with no linked commit or PR: the gap it tracked was never actually
+closed. A player reported the live symptom again on Low graphics: a tree visible from one camera
+angle, then gone after a small camera turn, while still blocking movement in a straight line.
+
+The deliberation the issue asked for (accept the full triangle-count cost, or invent a cheaper
+"kept but budget" stand-in visual) resolves the same way the graphics-fairness principle at the
+top of this file already states it: a preset may shed COSMETIC richness, never ACTIONABLE
+information, and there is no "unless it is expensive" clause. A collider a player cannot see is
+the sharpest form of hidden actionable information there is, so the answer is the rock fix's
+exemption, generalized: `survivesLeanDecimation` now exempts ANY decoration `decorationHasCollider`
+calls solid, not only rocks. Since every tree/tree2 trunk carries an unconditional collider, this
+removes the lean-tier trim for trees entirely; the hash-based keep rate that used to thin them
+(0.68 standard materials / 0.46 otherwise) is now unreachable dead weight and was deleted along
+with the tree-specific branch in `leanKeepRate` (renamed `leanRockKeepRate`, the only decoration
+kind that can still lack a collider).
+
+This is a real, accepted frame-time tradeoff on the weak/software GPUs `GFX.leanFoliage`
+targets, not an oversight, and it is smaller than it first looks: the LEAN arm never had
+impostors to begin with (`src/render/foliage_lod.ts`'s own header: "THE LEAN ARM HAS NO
+IMPOSTORS AT ALL: past the tree-detail distance its trees simply end"), so a tree exempted
+from the decimation trim does not draw at full detail out to the render horizon, only out to
+the same `treeDetailDistance` every other lean-tier tree already ends at. It also still holds
+every species to a single model variant per bucket and skips shadow casters entirely on
+`GFX.leanFoliage` (both unconditional on this tier, collider status aside). Correction from an
+earlier draft of this entry: the bark-cull and billboard-impostor sheds do NOT apply here at
+all; `cullBark` requires `GFX.standardMaterials`, which is false for the plain Low preset (it
+only fires on the lean-MEDIUM weak-integrated-GPU cohort), and impostors require
+`!leanFoliage`. Neither was ever part of what a lean-tier tree degrades through.
+
+`tests/foliage_decimation_core.test.ts` pins the new behavior directly (a tree at either scale
+extreme survives the unluckiest possible hash draw, on both material tiers), and
+`tests/decoration_dims.test.ts` already pinned `decorationHasCollider`'s tree arm before this
+fix, so the only thing that changed is `survivesLeanDecimation` actually trusting it for every
+decoration kind rather than only rocks.
+
+**A second, distinct mechanism can still hide a collider-bearing rock or tree on this tier,
+independent of this fix, found during this entry's own review:** `bucketVisible()`
+(`src/render/foliage_lod.ts`) culls a whole scatter bucket by comparing camera distance to the
+bucket's CENTER against a numeric cap, not the bucket's near edge, and the shipped world's
+buckets run 273-307 yards in radius (two columns splitting the world in half, times depth
+bands), against an effective 106-245 yard lean-tier cap. A player standing right next to a
+decoration near a huge bucket's edge, whose content-weighted center is far away, can still have
+that decoration's entire InstancedMesh set invisible while the sim's collider (which knows
+nothing about camera position) keeps it solid, the same invisible-but-solid shape as the bug
+this entry fixes, through a real-time, camera-position-dependent path rather than a static
+build-time roll, which also better matches a report of a decoration flickering as the camera
+turns (this decimation-trim fix cannot produce that: its keep/drop decision is made once, at
+build time, and cannot change during a session). This affects rocks too, meaning the original
+rock fix above does not fully close the rock case either. Deliberately not folded into this fix
+for the same reason the tree case itself was originally deferred: it is a real, camera-distance
+performance tradeoff across ALL scenery sharing a bucket, cosmetic or not, and deserves its own
+measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -161,6 +282,12 @@ it, so the boundary cannot creep back in as decoration.
   governor; a source-scan pins that party frames are not tiered.
 - `tests/architecture.test.ts`: `ui_tier_knobs.ts` is a registered UI_PURE_CORE (no governor,
   DOM, or render import).
+- `tests/tinted_material.test.ts`: an active outfit colorway renders as a genuinely different
+  colour on low tier too (never the atlas's undyed default), the low-tier fallback is
+  value-normalized so it cannot crush the whole armour toward black the way a naive multiply
+  of the swatch chip would, a non-armour material (skin) is proven untouched by the fallback,
+  and the standard-tier shader-dyed material's own `.color` is proven unchanged by the fix
+  (the shader still carries the dye there).
 - `tests/professions_graphics_fairness.test.ts`: the professions actionable set (the fishing
   bobber pair, the minimap markers and painter, the node tooltip, the node prop ladder) is
   scanned profile- and governor-free with comment-stripped sources, the tier ladder is
@@ -178,6 +305,12 @@ it, so the boundary cannot creep back in as decoration.
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/shadow_cadence_core.test.ts` + `tests/shadow_render_wiring.test.ts`: the sun-shadow
+  cadence shed. The policy core imports nothing (preset, tier, and profile blind; its only
+  inputs are the governor's pressure/enabled plus dt), the dwell thresholds are
+  literal-pinned, the shed is strictly every-other-frame (never a removal: the application
+  writes only the `shadowMap.autoUpdate`/`needsUpdate` flags), and the wiring scan pins the
+  renderer call sites.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
@@ -208,6 +341,15 @@ it, so the boundary cannot creep back in as decoration.
   that WON a slot, so a dropped one keeps reading through the burst. Pinned skips: a dead body,
   a frustum-culled non-actionable rig, and a cast-moment sequence for a band that is actually
   being drawn.
+- `tests/decoration_dims.test.ts`: `decorationHasCollider` classifies a rock at or above
+  `ROCK_COLLIDER_MIN_SCALE` as solid, one below it as dressing, and every tree/tree2 as solid
+  (colliders.ts gives every trunk a collider unconditionally).
+- `tests/foliage_decimation_core.test.ts`: `survivesLeanDecimation` never drops a solid rock or
+  any tree/tree2 regardless of its hash draw, and still decimates sub-floor dressing rocks (the
+  one decoration kind that can lack a collider) at the tuned keep rate.
+- `tests/foliage_decimation_wiring.test.ts`: source-scans `foliage.ts` to prove the leanFoliage
+  decoration filter actually calls `survivesLeanDecimation` and that the old bare
+  `hashAt(d.x, d.z, 83) < keep` shape has not been re-inlined.
   The band's TYPE is itself actionable, not decoration, which is why the cast-moment stand-down
   answers on any band type rather than stun alone: the `cc` archetype flashes the same yellow
   stars for every control ability, so a rooted victim would otherwise read as stunned for the

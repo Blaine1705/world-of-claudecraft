@@ -20,6 +20,7 @@ import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
+import { isItemLocked } from '../item_lock';
 import { removePreferFungible } from '../items';
 import { forceDismount } from '../mounts';
 import { riftSalvageYield } from '../rift/progression';
@@ -57,14 +58,17 @@ export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   legendary: 'spider_leg',
 };
 
-/** Eligible for salvage: an equippable weapon or armor piece, at least
- *  `common` quality (a `poor`/undefined-quality piece has nothing worth
- *  reclaiming). Ineligible items (consumables, quest items, poor-quality
- *  junk, unknown ids) are never salvageable. */
+/** Eligible for salvage: an equippable weapon, armor, or held-offhand piece,
+ *  at least `common` quality (a `poor`/undefined-quality piece has nothing
+ *  worth reclaiming). A held offhand is equipment exactly like a weapon or
+ *  armor piece (it carries quality and requiredClass), so a copy the
+ *  player's class cannot wield is never stuck with no way to recover value
+ *  from it. Ineligible items (consumables, quest items, poor-quality junk,
+ *  unknown ids) are never salvageable. */
 export function isSalvageable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
+    (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'
   );
@@ -107,7 +111,14 @@ export interface SalvageResult {
   /** True when the command admitted and started a SALVAGE_CAST_ID cast
    *  (no materials granted yet). Absent on complete resolves and denials. */
   casting?: boolean;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
+  reason?:
+    | 'unknown_item'
+    | 'not_salvageable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy'
+    | 'locked';
 }
 
 /**
@@ -149,6 +160,7 @@ export function resolveSalvage(
       selectedVictim === undefined
         ? consumeOneScratch(scratch, itemId)
         : (selectedVictim.instance ?? undefined);
+    if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
     const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
     const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
     if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
@@ -225,6 +237,7 @@ export function evaluateSalvageAdmission(
   const selected = consumeSelectedInventorySlot(scratch, itemId, slotIndex);
   if (selected === null) return { ok: false, itemId, reason: 'not_held' };
   const victim = selected === undefined ? consumeOneScratch(scratch, itemId) : selected.instance;
+  if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
   const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
   const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
   if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {

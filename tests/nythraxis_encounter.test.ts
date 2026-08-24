@@ -6,7 +6,9 @@
 // fall-through, and the raid lockout grant.
 
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
+import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
@@ -148,6 +150,7 @@ describe('Nythraxis encounter module (N1)', () => {
       hpFrac: 0.35,
       fallbackDestination: { ...tank.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
     boss.hp = Math.floor(boss.maxHp * 0.69);
     nythraxis.updateNythraxisEncounter(ctx, boss);
@@ -206,6 +209,7 @@ describe('Nythraxis encounter module (N1)', () => {
       hpFrac: 0.35,
       fallbackDestination: { ...tank.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
 
     boss.hp = Math.floor(boss.maxHp * 0.69);
@@ -239,12 +243,14 @@ describe('Nythraxis encounter module (N1)', () => {
       hpFrac: 0.35,
       fallbackDestination: { ...arrivalAnchor.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
     ctx.pendingResurrections.set(arrivalAnchor.id, {
       casterId: tank.id,
       hpFrac: 0.35,
       fallbackDestination: { ...tank.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
 
     boss.hp = Math.floor(boss.maxHp * 0.69);
@@ -326,6 +332,69 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(b.hp).toBe(250);
   });
 
+  it('a Direhowl debuff on the boss cannot save an unstacked heroic Soul Rend mark', () => {
+    // Same fix and reasoning as the Deathless Rage case above: an unstacked
+    // heroic mark (150% of max hp, share 1) is the "guaranteed kill through
+    // any topped-off health bar" this file's own comment promises.
+    const { ctx, boss, dps } = setup({ difficulty: 'heroic', dpsCount: 7 });
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    const [a] = dps;
+    a.maxHp = 1000;
+    a.hp = 1000;
+    st.soulRendMarks = [{ playerId: a.id, remaining: 0 }];
+    ctx.applyAura(boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: a.id,
+      school: 'physical',
+    });
+
+    nythraxis.updateNythraxisSoulRend(ctx, boss, st);
+
+    expect(a.dead).toBe(true);
+  });
+
+  it('a Direhowl debuff still mitigates a stacked heroic Soul Rend split', () => {
+    // A stacked pair (75% each) was never claimed as a guaranteed kill, so
+    // Direhowl mitigating it is the ability working as intended, not the bug
+    // the unstacked case above guards against.
+    const { ctx, boss, dps } = setup({ difficulty: 'heroic', dpsCount: 7 });
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    const [a, b] = dps;
+    b.pos = { ...a.pos };
+    a.maxHp = 1000;
+    a.hp = 1000;
+    b.maxHp = 1000;
+    b.hp = 1000;
+    st.soulRendMarks = [
+      { playerId: a.id, remaining: 0 },
+      { playerId: b.id, remaining: 0 },
+    ];
+    ctx.applyAura(boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: a.id,
+      school: 'physical',
+    });
+
+    nythraxis.updateNythraxisSoulRend(ctx, boss, st);
+
+    // Unmitigated leaves 250 each (see the 75%-per-pair test above); the -20%
+    // Direhowl cut on top of the 75% hit leaves more.
+    expect(a.hp).toBe(400);
+    expect(b.hp).toBe(400);
+  });
+
   it('heroic Deathless Rage is lethal on a failed wardstone channel (115% max hp)', () => {
     const heroic = setup({ difficulty: 'heroic' });
     let st = nythraxis.initNythraxisEncounter(heroic.boss);
@@ -351,6 +420,89 @@ describe('Nythraxis encounter module (N1)', () => {
     for (const p of [normal.tank, ...normal.dps]) {
       expect(p.dead).toBe(false);
       expect(p.hp).toBe(180);
+    }
+  });
+
+  it('a Direhowl debuff on the boss cannot save the raid from a failed heroic channel', () => {
+    // Direhowl (demoralizing_shout) lands a -20% buff_dmg_done aura on the boss
+    // (effect_dispatch.ts aoeAttackPower pct form). Deathless Rage on a failed
+    // heroic channel is a scripted, rng-free wipe calibrated at 115% of max hp
+    // specifically so it clears the raid outright; it must not be pulled back
+    // under 100% just because a warrior timed a raid cooldown on the boss.
+    const heroic = setup({ difficulty: 'heroic' });
+    const st = nythraxis.initNythraxisEncounter(heroic.boss);
+    st.phase = 2;
+    st.deathlessCastRemaining = 0.01; // completes this update, no channels ran
+    for (const p of [heroic.tank, ...heroic.dps]) {
+      p.maxHp = 1000;
+      p.hp = 1000;
+    }
+    heroic.ctx.applyAura(heroic.boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: heroic.tank.id,
+      school: 'physical',
+    });
+    nythraxis.updateNythraxisDeathlessRage(heroic.ctx, heroic.boss, st);
+    for (const p of [heroic.tank, ...heroic.dps]) expect(p.dead).toBe(true);
+  });
+
+  it('Veilbound Mark on the boss cannot save a full-health player from failed heroic Deathless Rage', () => {
+    const heroic = setup({ difficulty: 'heroic' });
+    const st = nythraxis.initNythraxisEncounter(heroic.boss);
+    st.phase = 2;
+    st.deathlessCastRemaining = 0.01; // completes this update, no channels ran
+    heroic.tank.maxHp = 1000;
+    heroic.tank.hp = 1000;
+    heroic.ctx.applyAura(heroic.boss, {
+      id: 'veilbound_mark',
+      name: 'Veil Mark',
+      kind: 'dot',
+      remaining: 6,
+      duration: 6,
+      value: 12,
+      sourceId: heroic.tank.id,
+      school: 'holy',
+    });
+
+    nythraxis.updateNythraxisDeathlessRage(heroic.ctx, heroic.boss, st);
+
+    expect(heroic.tank.dead).toBe(true);
+  });
+
+  it('a Direhowl debuff still mitigates the survivable normal-mode Deathless Rage hit', () => {
+    // Normal's 82% was never calibrated as a guaranteed kill (unlike heroic's
+    // 115%), so the alreadyFinal skip above must stay heroic-only: Direhowl
+    // reducing an ordinary, survivable hit is the ability working as intended,
+    // not the bug this file's heroic test guards against.
+    const normal = setup();
+    const st = nythraxis.initNythraxisEncounter(normal.boss);
+    st.phase = 2;
+    st.deathlessCastRemaining = 0.01;
+    for (const p of [normal.tank, ...normal.dps]) {
+      p.maxHp = 1000;
+      p.hp = 1000;
+    }
+    normal.ctx.applyAura(normal.boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: normal.tank.id,
+      school: 'physical',
+    });
+    nythraxis.updateNythraxisDeathlessRage(normal.ctx, normal.boss, st);
+    // Unmitigated normal Deathless Rage leaves 180 hp (see the 115%/82% test
+    // above); the -20% Direhowl cut on top of the 82% hit leaves more.
+    for (const p of [normal.tank, ...normal.dps]) {
+      expect(p.dead).toBe(false);
+      expect(p.hp).toBe(344);
     }
   });
 
@@ -513,5 +665,106 @@ describe('Nythraxis encounter module (N1)', () => {
     nythraxis.grantNythraxisLockout(ctx, boss);
     expect(sim.players.get(tank.id)!.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(sim.players.get(outsiderPid)!.raidLockouts.has('nythraxis_boss_arena')).toBe(false);
+  });
+});
+
+describe('death mid-wardstone-channel (issue #3400)', () => {
+  // Claim a wardstone with dps[0], then resolve Deathless Rage while their channel is
+  // still incomplete: on heroic the rage deals 115% max hp and kills the channeler,
+  // exactly the prod chain behind fights 373/386/647/1765 on 2026-08-11.
+  function killMidWardChannel(kit: ReturnType<typeof setup>): AnyEntity {
+    const { sim, ctx, boss, dps } = kit;
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    nythraxis.startNythraxisDeathlessRage(ctx, boss, st);
+    const ward = nythraxis.nythraxisWardstones(ctx, boss)[0] as AnyEntity;
+    const victim = dps[0];
+    teleport(sim, victim, ward.pos.x, ward.pos.z, ward.pos.y);
+    expect(nythraxis.tryStartNythraxisWardChannel(ctx, ward, victim)).toBe(true);
+    expect(victim.channeling).toBe(true);
+    st.deathlessCastRemaining = 0.01;
+    nythraxis.updateNythraxisDeathlessRage(ctx, boss, st);
+    expect(victim.dead).toBe(true);
+    return victim;
+  }
+
+  it('death leaves no channel state armed on the corpse', () => {
+    const victim = killMidWardChannel(setup({ difficulty: 'heroic' }));
+    // handleDeath owns this teardown: it nulls castingAbility, after which
+    // clearNythraxisWardChannelCast can never match and clear the rest. If the
+    // channeling flag survives the corpse, the victim's next hard cast runs the
+    // channel tick branch with channelTickEvery still 0 and pulses every sim tick.
+    expect(victim.castingAbility).toBe(null);
+    expect(victim.channeling).toBe(false);
+    expect(victim.castRemaining).toBe(0);
+    expect(victim.channelTicksLeft).toBe(0);
+    expect(victim.castAim).toBe(null);
+    expect(victim.queuedCastAbility).toBe(null);
+    expect(victim.queuedCastAim).toBe(null);
+  });
+
+  it('the next hard cast after the corpse run lands exactly one impact', () => {
+    const kit = setup({ difficulty: 'heroic' });
+    const { sim } = kit;
+    const mage = killMidWardChannel(kit);
+
+    // The prod flow: release, run back, spirit-resurrect at the corpse.
+    sim.releaseSpirit(mage.id);
+    const corpse = mage.corpsePos;
+    expect(corpse).toBeTruthy();
+    teleport(sim, mage, corpse!.x, corpse!.z);
+    sim.resurrectAtCorpse(mage.id);
+    expect(mage.dead).toBe(false);
+
+    // A practice target far outside the room (x-ward: arena slots stack in z, so
+    // distant x is empty world), so no encounter timer or dungeon geometry can
+    // touch the assertion window. Same level as the caster: no resist roll noise.
+    sim.setPlayerLevel(5, mage.id);
+    teleport(sim, mage, mage.pos.x + 2000, mage.pos.z);
+    const dummy = createMob((sim as AnySim).nextId++, MOBS.gravecaller_summoner, 5, {
+      x: mage.pos.x + 20,
+      y: mage.pos.y,
+      z: mage.pos.z,
+    }) as AnyEntity;
+    dummy.hostile = true;
+    dummy.maxHp = 100000;
+    dummy.hp = 100000;
+    (sim as AnySim).addEntity(dummy);
+    mage.hp = mage.maxHp;
+    mage.resource = mage.maxResource;
+
+    mage.targetId = dummy.id;
+    sim.castAbility('fireball', mage.id);
+    const pressEvents = sim.tick() as Array<Record<string, unknown>>;
+    // Surface any rejection reason (out of range, line of sight, mana) in the
+    // failure output instead of a bare null castingAbility.
+    expect(pressEvents.filter((ev) => ev.type === 'error' && ev.pid === mage.id)).toEqual([]);
+    expect(mage.castingAbility).toBe('fireball');
+    const stream: Array<Record<string, unknown>> = [...pressEvents];
+    for (let i = 0; i < 20 * 6; i++) {
+      stream.push(...(sim.tick() as Array<Record<string, unknown>>));
+    }
+    // amount > 1 excludes the rank 1 dot, whose ticks share the display name.
+    const bolts = stream.filter(
+      (ev) =>
+        ev.type === 'damage' &&
+        ev.sourceId === mage.id &&
+        ev.ability === 'Cinderbolt' &&
+        (ev.amount as number) > 1,
+    );
+    // The bug signature is the pulse stream: display-name-only hits with no
+    // abilityId, one per sim tick for the whole cast bar (the 4 to 9k opener
+    // spikes in prod fights 383/391/672/1800). A healthy cast has zero of them
+    // and at most the one id-carrying impact (the real impact still rolls the
+    // ordinary miss table, so 0 impacts is not a failure of THIS bug).
+    const pulses = bolts.filter((ev) => ev.abilityId === undefined);
+    const impacts = bolts.filter((ev) => ev.abilityId === 'fireball');
+    expect(pulses.length).toBe(0);
+    expect(impacts.length).toBeLessThanOrEqual(1);
+    expect(pulses.length + impacts.length).toBe(bolts.length);
+    // The cast itself completed: the discharge must not have eaten the cast.
+    expect(
+      stream.some((ev) => ev.type === 'castStop' && ev.entityId === mage.id && ev.success === true),
+    ).toBe(true);
   });
 });

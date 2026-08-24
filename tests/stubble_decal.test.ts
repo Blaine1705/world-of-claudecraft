@@ -297,9 +297,11 @@ describe('decal geometry', () => {
     for (const name of ['position', 'normal', 'uv', 'skinIndex', 'skinWeight']) {
       expect(geo.getAttribute(name), name).toBeTruthy();
     }
-    expect(geo.morphAttributes.position).toHaveLength(1);
+    // r185 types morphAttributes entries as possibly undefined.
+    const morphPosition = geo.morphAttributes.position ?? [];
+    expect(morphPosition).toHaveLength(1);
     expect(geo.morphTargetsRelative).toBe(true);
-    expect(geo.morphAttributes.position[0].count).toBe(geo.getAttribute('position').count);
+    expect(morphPosition[0].count).toBe(geo.getAttribute('position').count);
     const w = geo.getAttribute('skinWeight');
     for (let i = 0; i < w.count; i++) {
       expect(w.getX(i) + w.getY(i) + w.getZ(i) + w.getW(i)).toBeCloseTo(1, 5);
@@ -463,7 +465,16 @@ describe('decal geometry on the shipped head', () => {
         const [th, a] = headAngles(frame, pos.getX(i), pos.getY(i), pos.getZ(i));
         theta += th / 3;
         az += a / 3;
-        ny += nrm.getY(i) / 3;
+        // Subdivision midpoints carry an unrenormalized AVERAGE of their two
+        // parent normals (see the `midpoint` closure in buildDecalGeometry),
+        // so it is shorter than unit length; the production exclusion filter
+        // renormalizes each vertex normal before averaging its y component
+        // (same as here), and comparing raw components instead can flip the
+        // isNoseUnderside verdict right at the boundary.
+        const nx = nrm.getX(i);
+        const nyv = nrm.getY(i);
+        const nz = nrm.getZ(i);
+        ny += nyv / (Math.hypot(nx, nyv, nz) || 1) / 3;
       }
       if (isNoseUnderside(theta, az, ny)) bad++;
     }

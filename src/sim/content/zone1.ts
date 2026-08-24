@@ -114,8 +114,8 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 8, chance: 1 },
       { itemId: 'wolf_fang', chance: 0.45 },
-      { itemId: 'milepost_boots', chance: 0.1 },
-      { itemId: 'wolfhide_satchel', chance: 0.02 },
+      { itemId: 'milepost_boots', chance: 0.017 },
+      { itemId: 'wolfhide_satchel', chance: 0.003 },
     ],
     scale: 0.9,
     color: 0x7f8c8d,
@@ -171,7 +171,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { copper: 12, chance: 1 },
       { itemId: 'boar_hide', chance: 0.6, questId: 'q_boars' },
       { itemId: 'tough_jerky', chance: 0.3 },
-      { itemId: 'trail_leggings', chance: 0.1 },
+      { itemId: 'trail_leggings', chance: 0.02 },
     ],
     scale: 0.85,
     color: 0x935116,
@@ -204,7 +204,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { copper: 14, chance: 1 },
       { itemId: 'webwood_silk', chance: 0.55, questId: 'q_spiders' },
       { itemId: 'spider_leg', chance: 0.4 },
-      { itemId: 'mosshide_vest', chance: 0.12 },
+      { itemId: 'mosshide_vest', chance: 0.02 },
     ],
     scale: 0.9,
     color: 0x4a235a,
@@ -320,8 +320,8 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'tallow_candle', chance: 0.6 },
       { itemId: 'blessed_wax', chance: 0.45, questId: 'q_rite' },
       { itemId: 'linen_scrap', chance: 0.25 },
-      { itemId: 'mossy_handwraps', chance: 0.15 },
-      { itemId: 'thornling_grips', chance: 0.15 },
+      { itemId: 'mossy_handwraps', chance: 0.01 },
+      { itemId: 'thornling_grips', chance: 0.01 },
     ],
     scale: 0.85,
     color: 0x9c640c,
@@ -336,7 +336,20 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     elite: true,
     canSwim: true,
     ccImmune: true,
-    respawnMult: 432,
+    // Random respawn window, drawn fresh per death: 36 to 72 times the 25s base
+    // is 15 to 30 minutes (was a fixed 432, three hours).
+    //
+    // WHY THE CADENCE MOVED. A level 7 named miniboss is content for players
+    // passing through Zone 1, and an experienced player solos an account to cap
+    // in about four hours, so a three-hour timer meant most of his audience
+    // never saw him at all. WHY THIS WINDOW. Zone 1's rare ladder runs from
+    // Mogger and Old Greyjaw at 4x (100s) up to Wraithbinder Maldrec at 432x
+    // (three hours); the geometric midpoint of that span is about 42x, and this
+    // window brackets it. Grix stays strictly rarer than the plain rares and far
+    // rarer than trash, while a Zone 1 visit now contains two to four of his
+    // spawns instead of a fraction of one. The randomness is separate and is
+    // what stops the camp being clock-farmed.
+    respawnWindow: { minMult: 36, maxMult: 72 },
     hpBase: 280,
     hpPerLevel: 52,
     dmgBase: 11,

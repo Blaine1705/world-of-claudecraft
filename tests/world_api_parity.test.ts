@@ -142,6 +142,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
+  { name: 'civicServicePlacements', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
@@ -155,6 +156,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
+  { name: 'setItemLocked', kind: 'method' },
   { name: 'buyItem', kind: 'method' },
   { name: 'sellItem', kind: 'method' },
   { name: 'sellAllJunk', kind: 'method' },
@@ -229,6 +231,7 @@ export const IWORLD_MEMBERS = [
   { name: 'tradeSetOffer', kind: 'method' },
   { name: 'tradeConfirm', kind: 'method' },
   { name: 'tradeCancel', kind: 'method' },
+  { name: 'tradeClose', kind: 'method' },
   { name: 'duelRequest', kind: 'method' },
   { name: 'duelAccept', kind: 'method' },
   { name: 'duelDecline', kind: 'method' },
@@ -278,6 +281,7 @@ export const IWORLD_MEMBERS = [
   { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
+  { name: 'marketSellPriceCheck', kind: 'method' },
   { name: 'marketList', kind: 'method' },
   { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
@@ -587,9 +591,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // method being the Phase 22 reliquaryRarity), leaving 317. The fourth data
     // member is reliquaryObtainCounts, the Phase 17 per-relic obtain tally.
     // The Phase 19 nameplate border adds the IWorldDeeds pair activeBorder
-    // (data) + setActiveBorder (method), leaving 319. This branch's backward
-    // target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a method),
-    // leaving 320.
+    // (data) + setActiveBorder (method), leaving 319. The v0.37.0 release's
+    // backward target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a
+    // method), and its player item lock (issue #3042) adds setItemLocked
+    // (IWorldInventory, a method). The v0.38.0 release's civic service
+    // anchors add civicServicePlacements (IWorldInteraction, data), and its
+    // market Sell-tab price reference adds marketSellPriceCheck (IWorldMarket,
+    // a method). This branch's neutral trade close (tradeClose, a sibling of
+    // tradeCancel that ends a session without calling it a cancellation) adds
+    // one command member. The merged tree carries all five.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -599,9 +609,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(320);
-    expect(DATA_MEMBERS.length).toBe(85);
-    expect(METHOD_MEMBERS.length).toBe(235);
+    expect(IWORLD_MEMBERS.length).toBe(324);
+    expect(DATA_MEMBERS.length).toBe(86);
+    expect(METHOD_MEMBERS.length).toBe(238);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -666,6 +676,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'civicServicePlacements',
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
@@ -797,6 +808,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -876,6 +888,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setActiveTitle',
       'setDungeonDifficulty',
       'setHelmHidden',
+      'setItemLocked',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoSpecial',
@@ -910,6 +923,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'townFocus',
       'tradeAccept',
       'tradeCancel',
+      'tradeClose',
       'tradeConfirm',
       'tradeInfo',
       'tradeRequest',
@@ -954,6 +968,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'civicServicePlacements',
       'commissionOrders',
       'companionState',
       'companionUpgrades',
@@ -1158,6 +1173,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1217,6 +1233,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setActiveTitle',
       'setDungeonDifficulty',
       'setHelmHidden',
+      'setItemLocked',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoSpecial',
@@ -1244,6 +1261,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleWeaponStow',
       'tradeAccept',
       'tradeCancel',
+      'tradeClose',
       'tradeConfirm',
       'tradeRequest',
       'tradeSetOffer',
@@ -1297,8 +1315,8 @@ describe('membership, not equality: world extras do not fail the gate', () => {
   });
 });
 
-// --- W1: aggregate == disjoint union of the 28 facet member sets --------------------
-// After the facet split (W1), `interface IWorld extends` 28 domain facet interfaces
+// --- W1: aggregate == disjoint union of the facet member sets -----------------------
+// After the facet split (W1), `interface IWorld extends` the domain facet interfaces
 // (src/world_api/<facet>.ts; the owner-backed facets plus IWorldTelemetry, the
 // bank-system's IWorldBank, the Book of Deeds' IWorldDeeds, and the Dungeon Finder's
 // IWorldDungeonFinder). This block proves the split dropped nothing and duplicated
@@ -1368,6 +1386,7 @@ type _ExhaustTargeting = AssertNever<
 >;
 
 const FACET_INTERACTION = [
+  'civicServicePlacements',
   'interact',
   'lootCorpse',
   'harvestCorpse',
@@ -1403,6 +1422,7 @@ const FACET_INVENTORY = [
   'unequipItem',
   'useItem',
   'discardItem',
+  'setItemLocked',
   'buyItem',
   'sellItem',
   'sellAllJunk',
@@ -1521,6 +1541,7 @@ const FACET_TRADE = [
   'tradeSetOffer',
   'tradeConfirm',
   'tradeCancel',
+  'tradeClose',
 ] as const satisfies readonly (keyof IWorldTrade)[];
 type _ExhaustTrade = AssertNever<Exclude<keyof IWorldTrade, (typeof FACET_TRADE)[number]>>;
 
@@ -1598,6 +1619,7 @@ const FACET_MARKET = [
   'marketInfo',
   'marketCollectPending',
   'marketSearch',
+  'marketSellPriceCheck',
   'marketList',
   'marketListInstance',
   'marketBuy',
@@ -1851,7 +1873,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     }
   });
 
-  it('the 28 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1869,8 +1891,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(320);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(320);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(324);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(324);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

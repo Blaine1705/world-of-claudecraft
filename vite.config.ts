@@ -7,6 +7,7 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { browserslistToTargets } from 'lightningcss';
 import { defineConfig } from 'vite';
 import { loadBrowserslistFloors } from './scripts/browserslist_targets.mjs';
+import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // Untyped zero-dep build helper (same convention as the other scripts/*.mjs tools).
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
@@ -422,6 +423,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Dev-only: never let the browser reuse cached asset bytes. GLBs and other
+    // public/ files are fetched LAZILY by the asset loader, after page load, so
+    // even a hard refresh (which bypasses cache only for the document's own
+    // requests) can leave a replaced model serving day-old bytes from disk
+    // cache; a swapped weapon or creature GLB then "looks exactly the same"
+    // through any number of reloads. Prod is unaffected (this is the dev
+    // server block); prod busts via content-hashed /media/ URLs instead.
+    headers: { 'Cache-Control': 'no-store' },
     // Vite's default watch ignore list is only .git, node_modules, test-results,
     // cacheDir and outDir, so the dev watcher otherwise descends into every agent
     // runtime directory at the repo root. A linked worktree parked under one of them
@@ -452,6 +461,10 @@ export default defineConfig({
       // the prod reverse-proxy route (nginx /wiki -> :8080). Needs the container
       // up: `docker compose up -d mediawiki mediawiki-db`.
       '/wiki': { target: 'http://127.0.0.1:8080', changeOrigin: true },
+      // No '/terms' proxy: STATIC_PAGE_ALIASES above already serves the
+      // Marketplace consent links' target from public/terms.html in dev, and a
+      // prefix proxy captured the rewritten '/terms.html' and made the page
+      // depend on a running game server with a built dist/.
     },
   },
   build: {
@@ -494,10 +507,18 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
-    // D11 path-matrix follow-on tried LPT and stripe sequencers under
-    // scripts/ci_balanced_sequencer.mjs; both missed the balance bar and stayed
-    // unwired. Default vitest sha1-contiguous --shard is live. passWithNoTests
-    // false so an empty pack cannot green a future re-wired sequencer.
+    // Sharding: BalancedSequencer (LPT over MEASURED per-file durations,
+    // scripts/ci_shard_weights.generated.json, harvested from green CI runs
+    // by scripts/ci_shard_weights_harvest.mjs). Re-wired 2026-08-14: the D11
+    // follow-on's LPT missed its bar on static import-cost weights and
+    // stripe re-measured WORSE than sha1-contiguous with real durations.
+    // Measured on the lane-excluded shard pool, scored in real ms: contiguous
+    // worst 10.49m, measured-LPT worst 9.79m spread 0.06m; the
+    // measured-scale FALLBACK for unknown files is load-bearing (raw
+    // heuristic units regressed to 11.21m). shard() only runs under --shard, so unsharded
+    // local runs are untouched. passWithNoTests false so an empty pack
+    // cannot green the sequencer.
+    sequence: { sequencer: BalancedSequencer },
     passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any

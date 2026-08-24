@@ -248,9 +248,35 @@ describe('options_window: interface tab split', () => {
     // filters it per tab for applyControls (the same full list also feeds the
     // footer's Reset to Defaults, see the #2341 describe block below).
     expect(painter).toContain(
-      'const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];',
+      'const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];',
     );
     expect(painter).toContain('interfaceControlsForTab(controls, tab)');
+  });
+
+  it('builds the panel env with the desktop GPU row gated on the BRIDGE capability', () => {
+    // The desktop-only row must never be gated on isNativeAppShell(): that flag
+    // is true in the mobile Capacitor shells too, and true for a desktop shell
+    // installed before the preference existed (which cannot serve it). The
+    // whole env literal is pinned so the capability line cannot drift onto the
+    // wrong probe while the other two fields keep their meaning.
+    const start = painter.indexOf('private renderInterface(): void {');
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    // Two independent claims rather than one whole-literal match, which a
+    // reformat would red for no behavioral reason: the flag comes from the
+    // bridge probe, and never from the shell flag it is easily confused with.
+    expect(body).toContain('desktopGpuPref: desktopGpuPrefSupported(desktopBridge())');
+    expect(body).not.toContain('desktopGpuPref: isNativeAppShell(');
+    // The Discord presence row is gated the same way, on its OWN probe: the
+    // shell that has the GPU preference may still predate presence.
+    expect(body).toContain(
+      'desktopDiscordPresence: desktopDiscordPresenceSupported(desktopBridge()),',
+    );
+    expect(body).not.toContain('desktopDiscordPresence: isNativeAppShell(');
+    expect(body).not.toContain('desktopDiscordPresence: desktopGpuPrefSupported(');
+    // the other two env fields keep their own probes
+    expect(body).toContain('touch: useTouchInterface(),');
+    expect(body).toContain('nativeShell: isNativeAppShell(),');
   });
 
   it('places the bespoke rows into their approved tab', () => {
@@ -602,12 +628,28 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     const footer = painter.slice(painter.indexOf('private settingsViewFooter('));
     const body = footer.slice(0, footer.indexOf('\n  }\n'));
     expect(body).toContain('const keys = optionsControlKeys(controls)');
-    // the reset call is scoped, never the bare no-arg full reset
-    expect(body).toContain('hooks.settings.reset(keys)');
+    // the footer hands that scope to the shared reset, never a bare full reset
+    expect(body).toContain('this.resetSettingScope(hooks, keys)');
     expect(body).not.toMatch(/settings\.reset\(\)/);
+
+    const scope = painter.slice(painter.indexOf('private resetSettingScope('));
+    const scopeBody = scope.slice(0, scope.indexOf('\n  }\n'));
+    // the reset call is scoped, never the bare no-arg full reset
+    expect(scopeBody).toContain('hooks.settings.reset(keys)');
+    expect(scopeBody).not.toMatch(/settings\.reset\(\)/);
     // re-apply loop walks only the scoped keys, never settings.all()
-    expect(body).toContain('for (const k of keys)');
-    expect(body).not.toContain('settings.all()');
+    expect(scopeBody).toContain('for (const k of keys)');
+    expect(scopeBody).not.toContain('settings.all()');
+  });
+
+  // The cross-hotbar display picker is painted bespoke (a dropdown beside the bar's
+  // own rows), so the Controller view has to name its key or Reset to Defaults would
+  // walk past the one row the control list cannot see.
+  it('renderController widens its reset scope to the bespoke cross-hotbar display key', () => {
+    const start = painter.indexOf('private renderController(): void {');
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    expect(body).toContain("this.resetSettingScope(hooks, [...keys, 'gamepadCrossHotbarDisplay'])");
   });
 
   it.each([
@@ -689,7 +731,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     const body = rest.slice(0, rest.indexOf('\n  }\n'));
     // the full, untagged list (every tab), not just the current tab's filtered view
     expect(body).toContain(
-      'const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];',
+      'const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];',
     );
     expect(body).toContain('this.settingsViewFooter(controls);');
     // the old bespoke back-button block (no reset) is gone from this method

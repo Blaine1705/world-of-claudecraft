@@ -1045,6 +1045,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Festering Venom"
       },
       {
+        "id": "melting_acid",
+        "name": "Melting Acid"
+      },
+      {
+        "id": "nightshade_coating",
+        "name": "Nightshade Coating"
+      },
+      {
         "id": "blind",
         "name": "Dirt Toss"
       },
@@ -1934,8 +1942,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Menace"
       },
       {
+        "id": "challenging_roar",
+        "name": "Baleful Roar"
+      },
+      {
         "id": "demoralizing_roar",
         "name": "Craven Roar"
+      },
+      {
+        "id": "frenzied_regeneration",
+        "name": "Savage Mending"
       },
       {
         "id": "cat_form",
@@ -2276,7 +2292,6 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
     "families": [
       "spider",
-      "ogre",
       "elemental"
     ]
   },
@@ -3071,19 +3086,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "thornpeak_ogre",
         "model": "mob_ogre",
         "tint": "#9e7b53",
-        "tintStrength": 0.2,
-        "still": "/guide-stills/mob_ogre__9e7b53__s20.webp"
-      },
-      {
-        "name": "Gravenbark Shambler",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "gravenbark_shambler",
-        "model": "mob_treant",
-        "tint": "#4e4a3a",
-        "tintStrength": 0.72,
-        "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_ogre__9e7b53__s12.webp"
       }
     ]
   },
@@ -3266,6 +3270,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#bfe0e8",
         "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__bfe0e8.webp"
+      },
+      {
+        "name": "Gravenbark Shambler",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gravenbark_shambler",
+        "model": "mob_treant",
+        "tint": "#4e4a3a",
+        "tintStrength": 0.72,
+        "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
       },
       {
         "name": "Nightkin Stargazer",
@@ -5558,6 +5573,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "exp_the_last_keep",
+    "name": "The Quiet Halls",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_dawnhold_castle",
+    "name": "An Open Door in the Garden",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 
@@ -8567,8 +8596,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_duskhide_wraps",
         "name": "Duskhide Wraps",
-        "skillReq": 75,
-        "tier": 3,
+        "skillReq": 50,
+        "tier": 2,
         "station": "tannery",
         "acquisition": "known",
         "feeCopper": 0,
@@ -8597,9 +8626,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         },
         "combo": null,
         "gain": {
-          "reducedAt": 100,
-          "minimalAt": 125,
-          "zeroAt": 150
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
         }
       },
       {
@@ -12712,6 +12741,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/kobold.glb",
     "idle": "Idle",
     "height": 2.1,
+    "hover": -0.2,
     "tintStrength": 0.12
   },
   "mob_bandit": {
@@ -12775,10 +12805,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.2
   },
   "mob_ogre": {
-    "url": "models/creatures/giant.glb",
+    "url": "models/creatures/ogre.glb",
     "idle": "Idle",
     "height": 2.8,
-    "tintStrength": 0.2
+    "tintStrength": 0.12
   },
   "mob_elemental": {
     "url": "models/creatures/golelingevolved.glb",

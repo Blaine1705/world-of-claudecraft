@@ -123,6 +123,14 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Informe de error enviado, pero la captura de pantalla era demasiado grande para incluirla.',
   'hudChrome.bugReport.tooLarge':
     'Ese informe es demasiado grande para enviarlo. Inténtalo de nuevo sin la captura de pantalla.',
+  // General chat rate limit HUD notices (es_ES prefers "vuelve a intentarlo" over
+  // es-LatAm "inténtalo de nuevo", matching this file's existing retry phrasing).
+  'hudChrome.chatQuota.limitReached':
+    'Has alcanzado el límite del chat General. Vuelve a intentarlo en {seconds}.',
+  'hudChrome.chatQuota.pending':
+    'Tu mensaje anterior del chat General todavía se está enviando. Vuelve a intentarlo en un momento.',
+  'hudChrome.chatQuota.unavailable':
+    'El chat General no está disponible temporalmente. Vuelve a intentarlo pronto.',
   'delveUi.affix.bad_air': 'Aire viciado',
   'delveUi.affix.candleblind': 'Cegavelas',
   'delveUi.affix.cult_remnants': 'Vestigios del culto',
@@ -239,6 +247,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'sim.delve.duringArena': 'No puedes entrar en una Profundidad durante un combate de arena.',
   'sim.delve.duringDuel': 'No puedes entrar en una Profundidad durante un duelo.',
   'sim.delve.graveFalters': 'El rito sepulcral vacila.',
+  'sim.delve.enemiesRemain': 'Acaba primero con los enemigos restantes.',
   'sim.delve.levelRequired': 'Debes ser nivel {level} para entrar en {name}.',
   'sim.delve.mechanismOpen':
     'Un mecanismo se abre con un chasquido cerca. Se abre un pasaje hacia el norte. Busca el portal de salida más adelante.',
@@ -404,7 +413,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimiento de remate que inflige {damage}. Solo en Forma de lobo.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja: un mordisco de 70 más 43 por punto de combo que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura 30 de energía.',
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía.',
   'entities.abilities.garrote.description':
     'Enrolla un alambre alrededor de la garganta del enemigo, infligiendo {damage} de daño al instante y {overTime} de sangrado a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.garrote.specNote_subtlety':
@@ -418,7 +427,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con mucha amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo equivalente al 18% de tu salud máxima y te devuelve 15 de ira.',
   'entities.abilities.ossuary_mark.description':
-    'Marca a un enemigo durante 12 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 Fragmento de alma.',
+    'Marca a un enemigo durante 15 s, almacenando el 20% del daño que tú y tus no muertos infligís. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 Fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.rake.specNote_feral':
     'Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3).',
@@ -481,4 +490,32 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warlock.doomMeterLock': 'Bloquear la barra de recurso de Aflicción',
   'hudChrome.warlock.doomMeterUnlock': 'Mover la barra de recurso de Aflicción',
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
+  'hudChrome.bags.itemAriaLocked': '{item}, cantidad {count}, artículo bloqueado',
+  'hudChrome.bags.itemLockedLine': 'Artículo bloqueado',
+  'hudChrome.bags.lockItem': 'Bloquear artículo',
+  'hudChrome.bags.unlockItem': 'Desbloquear artículo',
+  'hudChrome.crafting.reagentLocked': 'Un reactivo para eso está bloqueado.',
+  'hudChrome.enchanting.salvageLocked': 'Ese artículo está bloqueado.',
+  'hudChrome.otaUpdate.applying': 'Actualización descargada. Reiniciando el juego para instalarla.',
+  'hudChrome.otaUpdate.continueAnyway': 'Seguir sin actualizar',
+  'hudChrome.otaUpdate.downloading': 'Bajando actualización: {percent}',
+  'hudChrome.otaUpdate.incompatible':
+    'Hace falta actualizar para jugar. Se instalará en cuanto termine la descarga.',
+  'hudChrome.otaUpdate.progressLabel': 'Avance de descarga de la actualización',
+  'hudChrome.otaUpdate.title': 'Actualización del cliente',
+  'apiError.cheater_mark.admin_target': 'Las cuentas de operador no se pueden marcar.',
+  'apiError.cheater_mark.not_marked': 'Esa cuenta no está marcada.',
+  'auth.designCode': 'Código de diseño',
+  'auth.designCodeHint':
+    'Copia este código para guardar o compartir este aspecto. Pega aquí un código e impórtalo para cargarlo.',
+  'auth.designCodeCopied': 'Código de diseño copiado.',
+  'auth.designCodeImported': 'Diseño importado.',
+  'auth.designCodeImportedPartial':
+    'Diseño importado. Se han omitido los valores que esta versión no reconoce.',
+  'auth.designCodeErrEmpty': 'Pega primero un código de diseño.',
+  'auth.designCodeErrHeader': 'Eso no parece un código de diseño.',
+  'auth.designCodeErrVersion':
+    'Ese código de diseño procede de una versión más reciente del juego.',
+  'auth.designCodeErrMalformed':
+    'Ese código de diseño está dañado. Copia el código completo e inténtalo de nuevo.',
 };

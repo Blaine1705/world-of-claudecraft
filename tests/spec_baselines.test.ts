@@ -52,9 +52,14 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
       eviscerate: { dmgPct: 0.32 },
     },
   },
+  // fight-6498 re-band: combat sat ~50 DPS over assassination and ~60 over
+  // subtlety on the heroic Nythraxis check (~240 vs ~189 / ~179, behind the
+  // boss's 798 armor in the /dev BiS probe). apPct and meleeDmgPct were both the
+  // highest of the three rogue specs and drove its auto-heavy kit; trimming them
+  // lands combat at ~200 (the 150-200 band top), leaving the other two untouched.
   'rogue/combat': {
-    stats: { ap: 24, crit: 0.14, apPct: 0.55 },
-    global: { meleeDmgPct: 0.36 },
+    stats: { ap: 24, crit: 0.14, apPct: 0.2 },
+    global: { meleeDmgPct: 0.16 },
     abilities: { sinister_strike: { dmgPct: 0.2, costPct: -0.16 } },
   },
   'rogue/subtlety': {
@@ -104,13 +109,13 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'shaman/enhancement': {
-    stats: { int: 2, ap: 24, apPct: 0.22 },
+    stats: { int: 2, ap: 24, apPct: 0.15 },
     abilities: {
       lightning_bolt: { costPct: -0.2 },
       earth_shock: { costPct: -0.2 },
       flame_shock: { costPct: -0.2 },
       rockbiter_weapon: { dmgPct: 0.4 },
-      stormstrike: { dmgPct: 0.8 },
+      stormstrike: { dmgPct: 0.6 },
     },
   },
   'shaman/restoration': {
@@ -119,6 +124,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/affliction': {
     stats: { int: 6 },
+    global: { spellDmgPct: 0.07 },
     abilities: {
       needle_of_fate: { dmgPct: 0.08, costPct: -0.08 },
       drain_life: { costPct: -0.08 },
@@ -126,6 +132,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/demonology': {
     stats: { sta: 8, armorPct: 0.06, int: 6 },
+    global: { spellDmgPct: 0.1, petDmgPct: 0.15 },
     abilities: {
       soul_harvest: { costPct: -0.08, dmgPct: 0.08 },
       bone_armor: { costPct: -0.08 },
@@ -133,6 +140,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/destruction': {
     stats: { sta: 6 },
+    global: { spellDmgPct: 0.1 },
     abilities: {
       shadow_bolt: { costPct: -0.23, castPct: -0.03 },
       immolate: { costPct: -0.23, castPct: -0.03 },
@@ -345,8 +353,9 @@ describe('v0.28 passive restoration hotfix', () => {
     };
     const bare = apFor(null);
     for (const spec of ['assassination', 'combat']) {
-      // apPct is 0.36 to 0.55 across these specs, plus crit/flat AP; both clear
-      // a 1.3x AP floor over the spec-less rogue. A dropped apPct wiring fails here.
+      // apPct is 0.20 to 0.36 across these specs, plus crit/flat AP (combat's flat
+      // AP 24 carries it over the floor even at the lower apPct); both clear a 1.3x
+      // AP floor over the spec-less rogue. A dropped apPct wiring fails here.
       expect(apFor(spec), spec).toBeGreaterThan(bare * 1.3);
     }
     // 2026-08-09 120s band round: subtlety's apPct stepped 0.35 to 0.12 to

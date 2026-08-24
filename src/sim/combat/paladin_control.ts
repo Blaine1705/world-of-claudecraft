@@ -1,8 +1,10 @@
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import { DT, type Entity } from '../types';
 import { relocateSwept } from './heroic_leap';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
+import { isPullEligible } from './pull_eligibility';
 
 const OATH_CHAIN_PULL_SUFFIX = '_pull';
 
@@ -70,27 +72,29 @@ export function pullPaladinTarget(
   abilityId: string,
   abilityName: string,
 ): void {
-  const dx = target.pos.x - source.pos.x;
-  const dz = target.pos.z - source.pos.z;
-  const distance = Math.hypot(dx, dz);
-  const traveling = distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target);
-  const travelDuration = traveling
-    ? Math.max(0.05, (distance - stopDistance) / Math.max(0.01, travelSpeed) + 1)
-    : slowDuration;
-  ctx.applyAura(target, {
-    id: `${abilityId}_${traveling ? 'pull' : 'slow'}`,
-    name: abilityName,
-    kind: traveling ? 'forced_move' : 'slow',
-    remaining: travelDuration,
-    duration: travelDuration,
-    value: traveling ? 1 : slowMult,
-    sourceId: source.id,
-    school: 'holy',
-    pullStopDistance: traveling ? stopDistance : undefined,
-    pullSpeed: traveling ? travelSpeed : undefined,
-    pullSlowMult: traveling ? slowMult : undefined,
-    pullSlowDuration: traveling ? slowDuration : undefined,
-  });
+  if (isPullEligible(target)) {
+    const dx = target.pos.x - source.pos.x;
+    const dz = target.pos.z - source.pos.z;
+    const distance = Math.hypot(dx, dz);
+    const traveling = distance > stopDistance && distance > 1e-6 && !isVeilboundMarchActive(target);
+    const travelDuration = traveling
+      ? Math.max(0.05, (distance - stopDistance) / Math.max(0.01, travelSpeed) + 1)
+      : slowDuration;
+    ctx.applyAura(target, {
+      id: `${abilityId}_${traveling ? 'pull' : 'slow'}`,
+      name: abilityName,
+      kind: traveling ? 'forced_move' : 'slow',
+      remaining: travelDuration,
+      duration: travelDuration,
+      value: traveling ? 1 : slowMult,
+      sourceId: source.id,
+      school: 'holy',
+      pullStopDistance: traveling ? stopDistance : undefined,
+      pullSpeed: traveling ? travelSpeed : undefined,
+      pullSlowMult: traveling ? slowMult : undefined,
+      pullSlowDuration: traveling ? slowDuration : undefined,
+    });
+  }
   ctx.enterCombat(source, target);
 }
 
@@ -113,7 +117,10 @@ export function pullPaladinTargets(
       .hostilesInRadius(source, source.pos, searchRadius)
       .filter(
         (candidate) =>
-          candidate.id !== primary.id && !candidate.dead && ctx.hasLineOfSight(source, candidate),
+          candidate.id !== primary.id &&
+          !candidate.dead &&
+          isPullEligible(candidate) &&
+          ctx.hasLineOfSight(source, candidate),
       )
       .sort((a, b) => {
         const adx = a.pos.x - source.pos.x;
@@ -148,6 +155,7 @@ export function pulsePaladinThreat(
   const modified = amount * ctx.threatMod(source, 'holy');
   for (const target of ctx.hostilesInRadius(source, source.pos, radius)) {
     if (!ctx.hasLineOfSight(source, target)) continue;
+    if (questGateBlocksAggro(ctx.players, target, source)) continue;
     addThreat(target, source.id, modified);
     ctx.enterCombat(source, target);
   }

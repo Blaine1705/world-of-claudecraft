@@ -10,8 +10,20 @@
 // ONLY that spec's tooltips mention it. Every other rogue spec, an unspecced
 // rogue, and a stalking druid read a plain stealth requirement (owner ruling
 // 2026-07-29: a tooltip never shows another spec's mechanics).
+//
+// Talent scoping: a requirement the RESOLVED ability no longer carries is not a
+// requirement. Cheap Trick bakes ignoreStealthRequirement onto the resolved
+// Gut Punch (content/classes.ts applyTalentMods) and the sim's cast gate honors
+// it (combat/casting_lifecycle.ts), so the line must go with it.
 import type { AbilityDef } from '../../../sim/types';
 import { isSelfOnlyAbility } from './ability_self_only';
+
+/** The resolved-ability fields that can retire a requirement line the base def
+ *  still declares. A structural subset of ResolvedAbility / KnownAbility, so
+ *  either world's resolve can be passed straight through. */
+export interface AbilityRequirementResolve {
+  ignoreStealthRequirement?: boolean;
+}
 
 export interface AbilityRequirementKey {
   key:
@@ -26,6 +38,7 @@ export interface AbilityRequirementKey {
     | 'offGlobalCooldown'
     | 'friendlyTarget'
     | 'enemyTarget'
+    | 'anyTarget'
     | 'selfOnly';
   /** Set only for key 'requiresForm'. */
   form?: NonNullable<AbilityDef['requiresForm']>;
@@ -36,10 +49,11 @@ export interface AbilityRequirementKey {
 export function abilityRequirementKeys(
   def: AbilityDef,
   spec?: string | null,
+  resolved?: AbilityRequirementResolve,
 ): AbilityRequirementKey[] {
   const out: AbilityRequirementKey[] = [];
   if (def.requiresForm) out.push({ key: 'requiresForm', form: def.requiresForm });
-  if (def.requiresStealth) {
+  if (def.requiresStealth && !resolved?.ignoreStealthRequirement) {
     out.push({
       key:
         def.class === 'rogue' && spec === 'subtlety'
@@ -61,6 +75,10 @@ export function abilityRequirementKeys(
   if (def.onNextSwing) out.push({ key: 'onNextSwing' });
   if (def.offGcd) out.push({ key: 'offGlobalCooldown' });
   if (def.targetType === 'friendly') out.push({ key: 'friendlyTarget' });
+  // targetType 'any' really casts on either side (Shadeslip steps to a friend
+  // or a foe), so it must not read as the enemy-only line: the tooltip would
+  // be telling the player the cast they can make is illegal.
+  else if (def.targetType === 'any') out.push({ key: 'anyTarget' });
   else if (def.requiresTarget) out.push({ key: 'enemyTarget' });
   else if (isSelfOnlyAbility(def)) out.push({ key: 'selfOnly' });
   return out;

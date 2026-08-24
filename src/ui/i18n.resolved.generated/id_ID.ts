@@ -482,6 +482,88 @@ export const id_ID: EnTranslations = {
         "bannedUntil": "Kamu dilarang mengikuti Hadiah Harian selama {remaining} lagi. Akses kembali pada {until}. Alasan: {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "Toko WOC",
       "close": "Tutup Toko WOC",
@@ -734,6 +816,9 @@ export const id_ID: EnTranslations = {
       "showAmounts": "Tampilkan semua jumlah Claudium",
       "hideAmounts": "Sembunyikan jumlah Claudium tambahan",
       "skuRow": "{usd} untuk {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Beli",
       "buyUnavailable": "Pembelian tidak tersedia saat ini.",
       "storeTitle": "Toko Kosmetik",
@@ -802,9 +887,9 @@ export const id_ID: EnTranslations = {
       "note": "Seret bilah tab obrolan untuk memindahkan jendela, atau pegangan sudut untuk mengubah ukurannya. Atur Ulang mengembalikannya ke posisi dan ukuran bawaan."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Batas obrolan Umum tercapai. Coba lagi dalam {seconds}.",
+      "pending": "Pesan Umum sebelumnya masih dikirim. Coba lagi sebentar.",
+      "unavailable": "Obrolan Umum untuk sementara tidak tersedia. Coba lagi sebentar lagi."
     },
     "swing": {
       "ready": "Ayun",
@@ -853,6 +938,7 @@ export const id_ID: EnTranslations = {
       "jump": "Lompat",
       "leaderboard": "Peringkat",
       "dailyRewards": "Toko",
+      "wocMarket": "Exchange",
       "deeds": "Jasa",
       "mounts": "Tunggangan",
       "professions": "Profesi",
@@ -866,11 +952,52 @@ export const id_ID: EnTranslations = {
       "actionRing": "Aksi tempur",
       "actionPageToggle": "Ganti halaman tindakan",
       "actionPageIndicator": "Hal. {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Tukar sasaran",
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Halaman {page}",
       "hideKeyboard": "Sembunyikan papan ketik",
-      "chatPlaceholder": "Katakan sesuatu..."
+      "chatPlaceholder": "Katakan sesuatu...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -953,6 +1080,22 @@ export const id_ID: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Ruang Bawah Tanah",
+        "state": "Lantai Kebesaran",
+        "residence": "Lantai Hunian",
+        "tower": "Menara Pengawas"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Lantai Taman",
+        "solar": "Ruang Matahari"
+      }
+    },
     "compass": {
       "N": "U",
       "NE": "TL",
@@ -970,6 +1113,7 @@ export const id_ID: EnTranslations = {
       "seconds": "{s}d",
       "autoShowHint": "Baris muncul secara otomatis setelah partaimu memberikan kerusakan atau penyembuhan, dan segmen ini tertutup beberapa detik setelah pertarungan berakhir.",
       "threatFallback": "Tidak ada ancaman aktif: menampilkan kerusakan pada {name}",
+      "threatFrozen": "Ancaman akhir terhadap {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Lainnya ({count})",
@@ -1367,6 +1511,10 @@ export const id_ID: EnTranslations = {
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
       "showPlaytime": "Tampilkan Waktu Bermain di Lembar Karakter",
+      "forceHighPerfGpu": "Gunakan GPU Gaming Diskret",
+      "forceHighPerfGpuNote": "Aktif secara bawaan: aplikasi desktop meminta GPU gaming diskret dari komputer ini. Nonaktifkan ini jika permainan tidak mau dimulai, terbuka dengan layar hitam, atau layar laptop menjadi kosong. Berlaku mulai lain kali kamu membuka permainan.",
+      "discordPresence": "Status Aktivitas Discord",
+      "discordPresenceNote": "Menampilkan zona tempatmu berada dan sudah berapa lama kamu bermain dalam sesi ini sebagai aktivitas Discord-mu, dan siapa pun yang bisa melihat profil Discord-mu bisa melihat keduanya. Hanya nama zona, waktu sesimu, dan permainan yang dibagikan, tidak pernah karaktermu, akunmu, atau dengan siapa kamu bermain. Membutuhkan aplikasi Discord yang berjalan di komputer ini.",
       "showDevBadges": "Tampilkan Lencana Pengembang",
       "showOwnNameplate": "Tampilkan Papan Namaku",
       "showPlayerNameplates": "Tampilkan Papan Nama Pemain",
@@ -1382,6 +1530,7 @@ export const id_ID: EnTranslations = {
       "mouseoverCast": "Rapal Saat Menyorot Bingkai Kelompok",
       "stickyTarget": "Pertahankan Sasaran Saat Klik Tanah",
       "showItemLevel": "Tampilkan Level Item",
+      "showReliquaryTracker": "Tampilkan Pelacak Relikui",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
@@ -1394,7 +1543,9 @@ export const id_ID: EnTranslations = {
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
-      "mobileLeftHanded": "Tata letak kidal"
+      "mobileLeftHanded": "Tata letak kidal",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Pilihan",
@@ -1427,9 +1578,29 @@ export const id_ID: EnTranslations = {
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",
       "menuAction": "Menu Game",
+      "confirmAction": "Konfirmasi / Pilih",
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
-      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar."
+      "help": "Tuas kiri untuk bergerak, tuas kanan untuk melihat. Buka jendela untuk memakai penunjuk di layar.",
+      "crossHotbar": "Lintas Hotbar",
+      "crossHotbarEnable": "Aktifkan Lintas Hotbar",
+      "crossHotbarExpand": "Hotbar Silang Ganda",
+      "crossHotbarHelp": "Tahan pemicu untuk menyalakan delapan slot bilah tindakan pada d-pad dan tombol muka. Ketuk pemicu lainnya untuk beralih ke set kedua.",
+      "crossHotbarResetLayout": "Setel Ulang Lintas Hotbar",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "Pemicu dan d-pad milik hotbar silang saat aktif, jadi diatur di bawah, bukan di sini.",
+      "cancelAction": "Batal / Kembali",
+      "subcommandsAction": "Subperintah / Peta",
+      "cycleHudAction": "Antarmuka Siklus",
+      "cycleSetAction": "Ubah Kumpulan Hotbar",
+      "crossHotbarDisplay": "Tampilan Batang",
+      "crossHotbarDisplayFull": "Penuh",
+      "crossHotbarDisplayCompact": "Kompak",
+      "crossHotbarDisplayMinimal": "Hanya Saat Diselenggarakan",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Membawa {action}: konfirmasi pada sel untuk meletakkannya, batal untuk memasangnya kembali.",
+      "crossHotbarEditHint": "Pengaturan: konfirmasi pengambilan dari sel atau buku mantra dan dijatuhkan ke sel, batalkan hapus satu.",
+      "crossHotbarEditHelp": "Pegang bemper kiri dan tekan tombol muka atas untuk mengatur palang dengan pengontrol."
     },
     "perf": {
       "title": "Lapisan Performa",
@@ -1548,6 +1719,7 @@ export const id_ID: EnTranslations = {
           "render": "render  kirim {submit} ms | dunia {world} ms | entitas {entities} ms",
           "scene": "adegan   {calls} panggilan | {triangles} tris | {views} tampilan",
           "hitches": "tersendat {hitches} | shader {shaders} | unggahan {uploads} | tampilan {views}",
+          "hitchesBuild": "pembangunan zona {zoneBuilds} | di luar bingkai {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "menunggu"
         },
@@ -1599,7 +1771,10 @@ export const id_ID: EnTranslations = {
             "eventCpu": "Pemrosesan event menghabiskan bingkai",
             "shaderCompile": "Shader sedang dikompilasi selama permainan",
             "textureUpload": "Unggahan tekstur menyebabkan tersendat dalam permainan",
+            "zoneBuild": "Pembangunan streaming zona menyebabkan hambatan",
             "viewCreate": "Pembuatan tampilan entitas menyebabkan tersendat",
+            "gcHitch": "Pengumpulan sampah dilakukan dalam kerangka panjang",
+            "offFrameHitch": "Bingkai panjang berasal dari pekerjaan di luar panggilan balik render",
             "otherHitch": "Bingkai panjang yang tak teratribusi masih tersisa",
             "assetStartup": "Startup permainan tertunda oleh pekerjaan aset",
             "longTasks": "Tugas peramban yang panjang memblokir bingkai",
@@ -1739,6 +1914,7 @@ export const id_ID: EnTranslations = {
       "notEnoughHonor": "Tidak cukup Kehormatan.",
       "reasons": {
         "arenaWin": "Kemenangan arena",
+        "arenaComplete": "Pertarungan arena dijalani",
         "fiestaKill": "Eliminasi Fiesta",
         "fiestaComplete": "Fiesta selesai",
         "fiestaWin": "Kemenangan Fiesta",
@@ -1845,6 +2021,7 @@ export const id_ID: EnTranslations = {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
     "itemHeroicTag": "[HEROIK]",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const id_ID: EnTranslations = {
         "few": "Anda adalah {rank}, {count} anggota",
         "many": "Anda adalah {rank}, {count} anggota",
         "other": "Anda adalah {rank}, {count} anggota"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} pemain",
@@ -2016,6 +2205,10 @@ export const id_ID: EnTranslations = {
       "errPasswordLong": "Kata sandi baru maksimal 128 karakter.",
       "errPasswordUnchanged": "Kata sandi baru harus berbeda dari yang saat ini.",
       "errPasswordConfirm": "Kata sandi baru tidak cocok.",
+      "setPasswordTitle": "Tetapkan Kata Sandi",
+      "setPasswordHint": "Akun ini dibuat dengan Masuk dengan Apple atau Discord dan belum memiliki kata sandi. Atur satu untuk masuk di perangkat lain, seperti aplikasi desktop Mac dan Windows, atau web, dan untuk menghubungkan metode masuk tambahan.",
+      "setPasswordSubmit": "Tetapkan Kata Sandi",
+      "passwordSet": "Kumpulan kata sandi. Anda sekarang dapat masuk dengan nama pengguna dan kata sandi Anda di mana saja.",
       "emailLabel": "Email (opsional)",
       "emailHint": "Hanya digunakan untuk pemulihan akun. Gunakan Ubah Email di bawah untuk memperbaruinya.",
       "saveEmail": "Simpan Email",
@@ -2199,6 +2392,10 @@ export const id_ID: EnTranslations = {
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
       "itemAriaQuest": "{item}, jumlah {count}, barang misi",
+      "itemAriaLocked": "{item}, jumlah {count}, terkunci",
+      "itemLockedLine": "Terkunci",
+      "lockItem": "Kunci Barang",
+      "unlockItem": "Buka Kunci Barang",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -2453,12 +2650,14 @@ export const id_ID: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
-      "removeFromBarAria": "Hapus {name} dari bilah aksi"
+      "removeFromBarAria": "Hapus {name} dari bilah aksi",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Pemain Curang >"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -3224,11 +3423,13 @@ export const id_ID: EnTranslations = {
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(menghabiskan {count} bahan halus)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
       "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
+      "reagentLocked": "Reagen untuk itu terkunci.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
       "comboRequires": "Penyelarasan: {craftA} + {craftB}, tingkat {tier}.",
@@ -3335,6 +3536,7 @@ export const id_ID: EnTranslations = {
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
       "notSalvageable": "Kamu tidak bisa menyalvasi itu.",
+      "salvageLocked": "Barang itu terkunci.",
       "disenchantBusy": "Kamu sedang sibuk.",
       "salvageBusy": "Kamu sedang sibuk.",
       "enchantBusy": "Kamu sedang sibuk.",
@@ -3710,6 +3912,9 @@ export const id_ID: EnTranslations = {
       "pinFull": "Pelacak sudah penuh (maksimal {cap} halaman)",
       "pinAria": "Sematkan {name} ke pelacak antarmuka",
       "unpinAria": "Lepas {name}",
+      "trackerToggleLabel": "pelacak HUD",
+      "trackerToggleShowHint": "Tampilkan pelacak Reliquary di layar Anda",
+      "trackerToggleHideHint": "Sembunyikan pelacak Reliquary dari layar Anda",
       "rarityLine": "Ditemukan oleh {percent} kolektor",
       "pageRarityLine": "Diterangi oleh {percent} kolektor",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const id_ID: EnTranslations = {
       "unlockedBorderHint": "Bingkai baru diraih: {name}. Kenakan lewat Kitab Jasa.",
       "broadcastLine": "{name} telah mengukir jasa: {deed}",
       "rarityLine": "Diraih oleh {percent} petualang",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Jasa",
       "collapseHint": "Ciutkan pelacak jasa",
       "expandHint": "Bentangkan pelacak jasa",
@@ -3797,6 +4003,220 @@ export const id_ID: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Membutuhkan Level {level}"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const id_ID: EnTranslations = {
       "password_too_long": "Kata sandi baru harus maksimal 128 karakter.",
       "characters_online": "Keluarkan semua karakter Anda sebelum menonaktifkan akun.",
       "deactivated": "Akun ini telah dinonaktifkan. Hubungi admin untuk memulihkannya.",
-      "not_found": "Akun tidak ditemukan."
+      "not_found": "Akun tidak ditemukan.",
+      "password_already_set": "Akun ini sudah memiliki kata sandi. Gunakan Ubah Kata Sandi sebagai gantinya."
     },
     "character": {
       "name_invalid": "Nama karakter tidak valid. Gunakan 2-16 huruf.",
@@ -3928,6 +4349,61 @@ export const id_ID: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token itu sudah diklaim.",
       "entitlement_required": "Diperlukan hak akses Seeker yang terverifikasi.",
       "current_ownership_required": "Diperlukan kepemilikan Seeker Genesis Token saat ini."
+    },
+    "cheater_mark": {
+      "admin_target": "Akun operator tidak dapat diberi tanda.",
+      "reason_required": "Alasan wajib diisi.",
+      "invalid_duration": "Masukkan durasi tanda setidaknya satu detik.",
+      "not_marked": "Akun tersebut tidak diberi tanda."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const id_ID: EnTranslations = {
       "ifHighContrastBackground": "Latar belakang yang lebih polos dan berkontras tinggi di balik layar mulai dan layar karakter.",
       "ifInvertLookY": "Membalik arah atas dan bawah pandangan mouse.",
       "ifShowItemLevel": "Menambahkan baris level item pada setiap tooltip barang. Nonaktif secara bawaan, sehingga tooltip klasik yang hanya menampilkan statistik tetap terjaga.",
+      "ifShowReliquaryTracker": "Apakah pelacak Reliquary (halaman yang Anda sematkan dan kemajuannya) ada di HUD Anda. Jendela Reliquary memiliki tombol mata yang cocok, dan menyematkan halaman akan mengaktifkan kembali pelacak.",
       "ifShowPlaytime": "Menampilkan total waktu bermain seumur hidup Anda pada lembar karakter. Aktif secara bawaan, dan lembar itu punya tombol mata yang membaliknya per perangkat, yang berguna jika Anda melakukan streaming atau mengambil tangkapan layar. Totalnya tetap terus terhitung bagaimanapun juga.",
       "ifShowOwnNameplate": "Menampilkan papan nama di atas kepala Anda persis seperti yang dilihat pemain lain, lengkap dengan segala hiasannya. Matikan untuk tampilan klasik.",
       "ifShowPlayerNameplates": "Menampilkan papan nama pemain lain. Menonaktifkannya merapikan hub yang ramai, dan sasaran Anda saat ini tetap terbaca bagaimanapun juga.",
@@ -4735,6 +5212,7 @@ export const id_ID: EnTranslations = {
       "mageEleJet": "Pancaran Air menempati bilah peliharaan sebagai tombolnya sendiri: klik untuk mengunci seberkas sinar pembeku pada satu musuh, atau klik kanan (tekan dan tahan di perangkat seluler) agar elemental itu menembakkannya sendiri kapan pun sudah siap.",
       "formsHeading": "Perubahan Wujud",
       "formsNote": "Seorang druid bertarung dengan berganti wujud. Sebagian besar kemampuan druid terikat pada satu wujud tertentu, jadi wujud yang sedang kamu tempati menentukan apa yang bisa kamu rapalkan, dan berganti wujud menghabiskan sedikit mana. Kamu bisa berubah wujud masuk atau keluar dari pertempuran, sesering yang kamu mau.",
+      "formsAutoUnshift": "Penyembuhan atau sihir serangan yang dirapal saat berwujud akan mengeluarkanmu dari wujud itu secara otomatis. Keluar dari wujud dengan cara ini gratis dan tidak memakai jeda global, jadi sihir instan langsung meluncur begitu kau menekannya. Kembali ke wujud adalah kemampuan biasa dan tetap memakan mana serta jeda global.",
       "formsMoonwing": "Druid Keseimbangan mendapat satu wujud lagi, Wujud Burung Bulan, wujud perapal yang menjadi cara bertarung druid Keseimbangan. Inilah satu-satunya wujud hewan yang tetap mempertahankan mantramu, dan tongkat sihirmu hanya berfungsi dalam wujud ini atau dalam wujud perapal normalmu.",
       "formLine": {
         "form_bear": "Wujud tank: kulit tebal, Amarah alih-alih mana, dan ancaman ekstra agar musuh terus menyerangmu.",
@@ -6544,6 +7022,7 @@ export const id_ID: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "kamu@contoh.com",
     "emailError": "Silakan masukkan alamat email yang valid.",
+    "marketingOptIn": "Kirimkan berita dan pembaruan game ke email saya (opsional)",
     "showPassword": "Tampilkan kata sandi",
     "hidePassword": "Sembunyikan kata sandi",
     "logIn": "Masuk",
@@ -6644,6 +7123,19 @@ export const id_ID: EnTranslations = {
     "style": "Gaya",
     "resetLook": "Atur Ulang Tampilan",
     "resetShort": "Atur Ulang",
+    "shareTab": "Bagikan",
+    "designCode": "Kode tampilan",
+    "designCodeHint": "Salin kode ini untuk menyimpan atau membagikan tampilan ini. Tempel kode di sini lalu impor untuk memuatnya.",
+    "copyCode": "Salin kode",
+    "importCode": "Impor",
+    "designCodeCopied": "Kode tampilan disalin.",
+    "designCodeCopyManual": "Penyalinan otomatis diblokir di sini. Kode sudah dipilih; salin dengan papan ketik.",
+    "designCodeImported": "Tampilan diimpor.",
+    "designCodeImportedPartial": "Tampilan diimpor. Nilai yang tidak dikenali versi ini dilewati.",
+    "designCodeErrEmpty": "Tempel kode tampilan terlebih dahulu.",
+    "designCodeErrHeader": "Itu tampaknya bukan kode tampilan.",
+    "designCodeErrVersion": "Kode tampilan itu berasal dari versi gim yang lebih baru.",
+    "designCodeErrMalformed": "Kode tampilan itu rusak. Salin seluruh kode lalu coba lagi.",
     "browFlat": "Datar",
     "browArched": "Melengkung",
     "browThin": "Tipis",
@@ -7039,6 +7531,7 @@ export const id_ID: EnTranslations = {
       "portalOpens": "Sebuah rift peringkat {tier} terkoyak terbuka di {zone}!",
       "portalSealed": "Rift peringkat {tier} di {zone} telah tersegel.",
       "portalCollapses": "Rift peringkat {tier} di {zone} runtuh.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Hanya petualang level {level} ke atas yang boleh memasuki rift ini.",
       "deadEntry": "Kamu tidak dapat memasuki rift saat tewas.",
       "deadEntryCombat": "Party-mu masih dalam pertempuran. Yang tewas dapat masuk kembali begitu pertarungan berhenti.",
@@ -7138,6 +7631,7 @@ export const id_ID: EnTranslations = {
       "shopMarksRequired": "Kamu butuh {marks} Tanda Delve untuk membeli {name}.",
       "shopSealPremiumOnly": "Segel ini hanya tunduk pada tangan sang ahli. Hanya taruhan Premium yang dapat membukanya.",
       "passageSealed": "Lorong itu tersegel.",
+      "enemiesRemain": "Kalahkan musuh yang tersisa terlebih dahulu.",
       "moveCloserPassage": "Mendekatlah ke lorong.",
       "moveCloserChest": "Mendekatlah ke peti.",
       "moveCloserReliquary": "Mendekatlah ke relikuari.",
@@ -7760,7 +8254,15 @@ export const id_ID: EnTranslations = {
       "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
       "later": "Nanti",
-      "dismiss": "Tutup"
+      "dismiss": "Tutup",
+      "whatsNew": "Lihat apa yang berubah di browsermu"
+    },
+    "notify": {
+      "updateReadyTitle": "Pembaruan {version} siap",
+      "updateReadyTitleNoVersion": "Pembaruan siap",
+      "updateReadyBody": "Mulai ulang World of ClaudeCraft untuk menerapkan pembaruan.",
+      "partyInviteTitle": "Undangan Kelompok",
+      "partyInviteBody": "{name} telah mengundangmu ke kelompoknya."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const id_ID: EnTranslations = {
       "reload": "Muat Ulang",
       "quit": "Keluar",
       "fatalBody": "World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup."
+    },
+    "titlebar": {
+      "exitGame": "Keluar dari Gim"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
+    "bodyDiscreteInactive": "Permainan tidak menggunakan GPU gaming diskret dan sebagai gantinya berjalan pada GPU terintegrasi (hemat daya), sehingga performa akan menurun. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
     "bodyWeb": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Aktifkan akselerasi perangkat keras di pengaturan browsermu, perbarui driver grafismu, lalu nyalakan ulang browsermu.",
     "hybridBodyWindows": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, atur browsermu ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis, lalu mulai ulang browsernya. Aplikasi desktop memilih GPU diskret secara otomatis.",
     "hybridBodyLinux": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, browser atau driver grafismu mungkin punya pengaturan pemilihan GPU sendiri, atau distromu mungkin menyediakan alat pengalihan GPU (seperti PRIME atau optimus-manager). Aplikasi desktop memilih GPU diskret secara otomatis.",
@@ -7995,7 +8501,111 @@ export const id_ID: EnTranslations = {
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
       "mapCanvasLabel": "Peta",
-      "mapSummary": "Peta {zone}."
+      "mapSummary": "Peta {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Tidak ada penanda penting yang terlihat.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "{count} penanda lainnya.",
+      "mapMarkerDirections": {
+        "center": "di tengah",
+        "north": "di utara",
+        "northeast": "di timur laut",
+        "east": "di timur",
+        "southeast": "di tenggara",
+        "south": "di selatan",
+        "southwest": "di barat daya",
+        "west": "di barat",
+        "northwest": "di barat laut"
+      },
+      "mapMarkerDistances": {
+        "near": "dekat",
+        "medium": "jarak sedang",
+        "far": "jauh"
+      },
+      "mapMarkerLabels": {
+        "you": "Kamu",
+        "availableQuest": "Misi tersedia",
+        "readyQuest": "Misi siap diserahkan",
+        "repeatQuest": "Misi berulang",
+        "cooldownQuest": "Misi dalam masa tunggu",
+        "questObjective": "Area tujuan misi",
+        "readyOre": "Urat bijih siap ditambang",
+        "readyWood": "Tegakan pohon siap ditebang",
+        "readyHerb": "Petak herba siap dipanen",
+        "readyLockedOre": "Urat bijih siap ditambang, alat belum dapat digunakan",
+        "readyLockedWood": "Tegakan pohon siap ditebang, alat belum dapat digunakan",
+        "readyLockedHerb": "Petak herba siap dipanen, alat belum dapat digunakan",
+        "cooldownOre": "Urat bijih habis",
+        "cooldownWood": "Tegakan pohon telah ditebang",
+        "cooldownHerb": "Petak herba telah dipanen",
+        "cooldownLockedOre": "Urat bijih habis, alat belum dapat digunakan",
+        "cooldownLockedWood": "Tegakan pohon telah ditebang, alat belum dapat digunakan",
+        "cooldownLockedHerb": "Petak herba telah dipanen, alat belum dapat digunakan",
+        "station": "Stasiun kerajinan: {name}",
+        "service": "Layanan: {name}",
+        "partyMember": "Anggota party: {name}",
+        "deadPartyMember": "Anggota party yang tewas: {name}",
+        "partyMemberGeneric": "Anggota party",
+        "deadPartyMemberGeneric": "Anggota party yang tewas",
+        "friend": "Teman: {name}",
+        "guildMember": "Anggota guild: {name}",
+        "pointOfInterest": "Titik menarik: {name}",
+        "dungeonEntrance": "Pintu masuk dungeon: {name}",
+        "dungeonExit": "Pintu keluar dungeon",
+        "delveEntrance": "Pintu masuk delve: {name}",
+        "worldPassage": "Jalur menuju {zone}",
+        "riftEntrance": "Pintu masuk Rift: {name}",
+        "hostileEnemy": "Musuh yang siap menyerang",
+        "aggressiveEnemy": "Musuh yang menyerangmu",
+        "lootableEnemy": "Musuh yang dapat dijarah",
+        "corpse": "Mayatmu",
+        "deathZone": "Zona bahaya",
+        "teammate": "Rekan satu tim",
+        "deadTeammate": "Rekan satu tim yang tewas",
+        "flagCarrier": "Rekan satu tim yang membawa bendera",
+        "ownFlagStand": "Markas benderamu",
+        "enemyFlagStand": "Markas bendera musuh",
+        "riftDescent": "Jalur turun Rift",
+        "riftReturnBeacon": "Suar kembali",
+        "riftReturnExit": "Jalur keluar untuk kembali",
+        "ranked": "{marker}, peringkat {rank}",
+        "riftTreasureAvailable": "Harta tersedia",
+        "riftTreasureLocked": "Harta terkunci",
+        "riftTreasureOpened": "Harta telah dibuka",
+        "riftTreasureJammed": "Kunci peti harta macet",
+        "riftCacheAvailable": "Peti Rift tersedia",
+        "riftCacheLocked": "Peti terkunci",
+        "riftCacheOpened": "Peti telah dibuka",
+        "riftCacheJammed": "Kunci peti macet",
+        "pylonUnlit": "Pilar rune padam",
+        "pylonLit": "Pilar rune menyala",
+        "sequenceRuneUnlit": "Rune urutan padam",
+        "sequenceRuneLit": "Rune urutan menyala",
+        "iceGoal": "Sasaran es",
+        "boulderPad": "Sasaran batu besar",
+        "boulderMovable": "Batu besar yang dapat dipindahkan",
+        "boulderPlaced": "Batu besar yang telah ditempatkan",
+        "gateSealed": "Gerbang tersegel",
+        "gateOpen": "Gerbang terbuka",
+        "switchReady": "Sakelar siap",
+        "switchOn": "Sakelar diaktifkan",
+        "orbDormant": "Orb tertidur",
+        "orbActive": "Orb aktif",
+        "rollerHazard": "Bahaya batu besar menggelinding",
+        "delvePassageSealed": "Lorong tersegel",
+        "delvePassageOpen": "Lorong terbuka",
+        "delveSurfaceExit": "Pintu keluar ke permukaan",
+        "delveCacheLocked": "Peti delve terkunci",
+        "delveCacheReady": "Peti delve siap",
+        "delveCacheActive": "Peti delve aktif",
+        "delveCacheOpened": "Peti delve telah dibuka",
+        "delveReliquaryLocked": "Relikuari terkunci",
+        "delveReliquaryReady": "Relikuari siap",
+        "delveReliquaryActive": "Ritus relikuari aktif",
+        "delveReliquaryOpened": "Relikuari telah dibuka",
+        "bountiful": "Hadiah berlimpah: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu Permainan",
@@ -8035,6 +8645,9 @@ export const id_ID: EnTranslations = {
       "graphicsReloadNote": "Kualitas Grafik dan Detail Medan berlaku setelah pemuatan ulang.",
       "reloadNow": "Muat Ulang Sekarang",
       "fullscreen": "Layar Penuh",
+      "displayMode": "Mode Layar",
+      "displayModeBorderless": "Layar Penuh Tanpa Bingkai",
+      "displayModeWindowed": "Jendela",
       "touchLookSpeed": "Kecepatan Pandang Sentuh",
       "joystickSize": "Ukuran Joystick",
       "buttonSize": "Ukuran Tombol",
@@ -8597,6 +9210,7 @@ export const id_ID: EnTranslations = {
       "offGlobalCooldown": "Di luar jeda global",
       "friendlyTarget": "Target kawan",
       "enemyTarget": "Target musuh",
+      "anyTarget": "Target musuh atau teman",
       "selfOnly": "Hanya diri sendiri",
       "damageRange": "{min} hingga {max}",
       "finisherDamage": "{base} ditambah {perCombo} per poin kombo"
@@ -8911,6 +9525,10 @@ export const id_ID: EnTranslations = {
       "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",
       "filterRarityAll": "Semua kelangkaan",
+      "filterSort": "Urutkan",
+      "sortName": "Nama (A-Z)",
+      "sortPriceAsc": "Harga: rendah ke tinggi",
+      "collapseLowest": "Hanya harga terendah",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
@@ -8941,6 +9559,8 @@ export const id_ID: EnTranslations = {
       "quantity": "Jumlah",
       "quantityOf": "dari {count}",
       "priceEach": "Harga satuan",
+      "lowestPriceLabel": "Harga penawaran terendah saat ini",
+      "lowestPriceNone": "Belum ada penawaran aktif untuk item ini.",
       "listButton": "Pajang di Pasar Dunia",
       "minPriceError": "Tetapkan harga minimal 1 tembaga.",
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
@@ -9368,6 +9988,7 @@ export const id_ID: EnTranslations = {
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
         "description": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Harus dalam siluman. Memberi 2 poin combo.",
+        "descriptionNoStealth": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Memberi 2 poin combo.",
         "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const id_ID: EnTranslations = {
       "crippling_poison": {
         "name": "Bisa Timah",
         "description": "Menyerang target dengan bisa timah, memberi {damage} kerusakan Alam dan memperlambat kecepatan geraknya sebesar 50% selama 12 detik."
+      },
+      "melting_acid": {
+        "name": "Asam Meleleh",
+        "description": "Mencipratkan racun kaustik ke target, menimbulkan {damage} Kerusakan alam dan mengurangi armornya sebesar 5% selama 12 detik."
+      },
+      "nightshade_coating": {
+        "name": "Lapisan Nightshade",
+        "description": "Melapisi target dalam nightshade, menimbulkan {damage} Kerusakan alam dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik."
       },
       "expose_armor": {
         "name": "Tembus Zirah",
@@ -9580,7 +10209,7 @@ export const id_ID: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
-        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 60%. Hanya Penjaga iman."
+        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 30%. Hanya Penjaga iman."
       },
       "retribution_aura": {
         "name": "Aura Ganjaran",
@@ -9696,7 +10325,7 @@ export const id_ID: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 30% zirah, menerima 10% kerusakan lebih sedikit, dan menghasilkan dua kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
+        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
       },
       "healing_wave": {
         "name": "Air Pemulih",
@@ -9824,7 +10453,7 @@ export const id_ID: EnTranslations = {
       },
       "fear": {
         "name": "Cekaman",
-        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 8 detik. Kerusakan apa pun mematahkan efeknya."
+        "description": "Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya."
       },
       "searing_pain": {
         "name": "Bakar",
@@ -9875,7 +10504,7 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Remuk Tulang",
@@ -9885,6 +10514,10 @@ export const id_ID: EnTranslations = {
       "growl": {
         "name": "Gertakan",
         "description": "Menggeram pada target: ancamanmu naik menyamai musuh yang paling dibencinya dan ia terdorong untuk menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
+      },
+      "challenging_roar": {
+        "name": "Auman Garang",
+        "description": "Sebuah auman garang: semua musuh dalam 10 yard terhasut, ancaman mereka terhadapmu naik menyamai musuh yang paling mereka benci, dan mereka terpaksa menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
       },
       "cat_form": {
         "name": "Wujud Serigala",
@@ -9898,7 +10531,7 @@ export const id_ID: EnTranslations = {
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.",
-        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest: gigitan sebesar 70 plus 43 per poin combo yang juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan 30 energi."
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -9961,7 +10594,7 @@ export const id_ID: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Darah Serigala",
-        "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
+        "description": "Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
         "name": "Celah Darah",
@@ -10066,7 +10699,7 @@ export const id_ID: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Menandai musuh selama 12 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 m dan menciptakan 1 Serpihan Jiwa."
+        "description": "Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10165,8 +10798,8 @@ export const id_ID: EnTranslations = {
         "description": "Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)"
       },
       "feral_charge": {
-        "name": "Terjangan Liar",
-        "description": "Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)"
+        "name": "Gelora Purba",
+        "description": "Lepaskan gelora purba. Dalam Wujud Serigala, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)"
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
@@ -10182,7 +10815,7 @@ export const id_ID: EnTranslations = {
       },
       "redharvest": {
         "name": "Panen Merah",
-        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo."
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo."
       },
       "marrowbreak": {
         "name": "Pematah Sumsum",
@@ -10422,7 +11055,7 @@ export const id_ID: EnTranslations = {
       },
       "evocation": {
         "name": "Sumur Eter",
-        "description": "Restaura mana rápidamente. (talenta mage)"
+        "description": "Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)"
       },
       "flurry_of_knives": {
         "name": "Rentetan Pisau",
@@ -10430,7 +11063,7 @@ export const id_ID: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Pemulihan Liar",
-        "description": "Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
+        "description": "Memulihkan 40% nyawa maksimummu selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
       },
       "frost_trap": {
         "name": "Jerat Rima",
@@ -10450,11 +11083,11 @@ export const id_ID: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",
-        "description": "Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)"
+        "description": "Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)"
       },
       "ice_block": {
         "name": "Peti Es",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)"
+        "description": "Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)"
       },
       "inner_focus": {
         "name": "Pikiran Hening",
@@ -10546,7 +11179,7 @@ export const id_ID: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Pikiran Melaju",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)"
+        "description": "Membuat mantra berikutnya yang memiliki waktu perapalan menjadi instan. Bertahan 60 detik. (talenta mage)"
       },
       "psychic_scream": {
         "name": "Jerit Psikis",
@@ -10663,7 +11296,7 @@ export const id_ID: EnTranslations = {
       },
       "prowl": {
         "name": "Mengintai",
-        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran."
+        "description": "Masuk ke siluman saat dalam Wujud Serigala, bergerak 5% lebih lambat. Tidak dapat digunakan dalam pertempuran."
       },
       "rake": {
         "name": "Kupasan",
@@ -12218,6 +12851,9 @@ export const id_ID: EnTranslations = {
       "pristine_claw": {
         "name": "Cakar Murni"
       },
+      "dawnhold_posy": {
+        "name": "Buket Taman Dawnhold"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -13062,6 +13698,15 @@ export const id_ID: EnTranslations = {
       },
       "training_dummy": {
         "name": "Boneka Latihan"
+      },
+      "friendly_player_dummy": {
+        "name": "Boneka Pemain Sekutu"
+      },
+      "normal_boss_dummy": {
+        "name": "Boneka Bos Normal"
+      },
+      "heroic_boss_dummy": {
+        "name": "Boneka Bos Heroik"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
@@ -16702,6 +17347,11 @@ export const id_ID: EnTranslations = {
         "enterText": "Kau melangkah masuk ke aula-aula dingin dan sunyi Last Keep.",
         "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
       },
+      "dawnhold_castle": {
+        "name": "Kastil Dawnhold",
+        "enterText": "Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.",
+        "leaveText": "Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari."
+      },
       "drowned_temple": {
         "name": "Kuil Tenggelam",
         "enterText": "Kau melangkah melewati gerbang bulan, udara berubah menjadi air dingin dan cahaya pucat, dan nyanyian itu menutup di atas kepalamu.",
@@ -16900,6 +17550,21 @@ export const id_ID: EnTranslations = {
         "sender": "Perajin Gizzel",
         "subject": "KEAHLIAN PENUH, kaboom",
         "body": "Salah satu bidang utamamu mencapai keahlian penuh, puncak TERTINGGI, kaboom, seluruh tangga, selesai. Aku tidak membagi-bagikan pujian, aku membagi-bagikan sekering, tetapi ini, terimalah keduanya: kamu luar biasa dan sedikit menakutkan. Pergi buat gunung-gunung itu gugup."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

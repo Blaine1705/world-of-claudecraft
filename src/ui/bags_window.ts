@@ -21,6 +21,7 @@ import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
+import { isItemLocked } from '../sim/item_lock';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
@@ -60,6 +61,7 @@ import {
   buildBagGrid,
   buildBagListRows,
   resolveDepositSubmit,
+  vendorSellIsInstant,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { markDialogRoot } from './dialog_root';
@@ -76,6 +78,7 @@ import {
   cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
+  lockMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
@@ -104,7 +107,8 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // (outside #bags). A window-level close() removes any that are open so it never leaves
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
-const BAG_PROMPT_SELECTOR = '.discard-item-prompt, .sell-quantity-prompt, .bank-deposit-prompt';
+const BAG_PROMPT_SELECTOR =
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -260,6 +264,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     x: number,
     y: number,
     runDefault: () => void,
+    instance?: ItemInstancePayload,
   ): void;
 }
 
@@ -288,6 +293,17 @@ export class BagsWindow {
   // whatever caused it. -1 is the cold sentinel: a real purse is never negative, so
   // a window shown without a paint would always converge on the first probe.
   private lastMoneyCopper = -1;
+
+  // Set when render() or refreshGrid() skipped a rebuild because a bag row was
+  // mid-drag (see render()'s own comment). Flushed by flushDeferredRender(),
+  // called from the dragged row's own end-of-drag handlers once the drag
+  // concludes.
+  private renderDeferredForDrag = false;
+
+  // Native HTML5 drop fires before dragend. A bag-cell drop consumes dragState
+  // in the drop handler, but the source row still needs to survive until its
+  // dragend handler clears the action-bar drag payload.
+  private nativeBagCellDropAwaitingDragEnd = false;
 
   // Bag hover/focus -> quest-tracker title highlight. One active row at a time;
   // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
@@ -404,6 +420,17 @@ export class BagsWindow {
   }
 
   render(): void {
+    // A native drag's source row dies with the rest of the grid on an innerHTML
+    // rebuild, and a browser never fires dragend on a row that already left the
+    // document: ItemDragState (and the hotbar-eligible dragAction it feeds) would
+    // then stay stuck on the stale drag for the rest of the session, silently
+    // failing every later drop on the action bar or a bag cell. Defer the rebuild
+    // instead of tearing the dragged row out from under it; the row's own dragend
+    // (or the touch drag's onEnd) flushes it once the drag actually concludes.
+    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
+      this.renderDeferredForDrag = true;
+      return;
+    }
     // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
     this.clearTrackerHighlight();
     const el = this.deps.root();
@@ -486,6 +513,19 @@ export class BagsWindow {
       }
       this.close();
     });
+  }
+
+  /** Catch up a rebuild render() or refreshGrid() deferred (see render()'s own
+   *  comment) because a bag row was mid-drag. Called from that row's own
+   *  end-of-drag handlers: native dragend, or the touch drag's onEnd. By the
+   *  time either fires, ItemDragState has already cleared (the ordinary
+   *  dragend/onEnd teardown runs first), so this only needs to check the latch,
+   *  not the live drag state again. */
+  private flushDeferredRender(): void {
+    if (!this.renderDeferredForDrag) return;
+    this.renderDeferredForDrag = false;
+    this.nativeBagCellDropAwaitingDragEnd = false;
+    this.render();
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -871,16 +911,22 @@ export class BagsWindow {
       // corner (a masterwork fine stack keeps its rim).
       const glyphKind = bagInstanceGlyphKind(s.instance);
       const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
+      const locked = isItemLocked(s.instance);
       row.style.setProperty('--bag-slot-quality', qColor);
-      // Accessible name: quest stacks always announce quest item (the seal is
-      // aria-hidden). Instanced stacks keep their per-copy flag. Plain stacks,
-      // fine included, keep the plain label: a fine id's NAME already carries
-      // the grade word (see the fine-grade aria note above the category map).
-      const itemAriaKey = questMark
-        ? 'hudChrome.bags.itemAriaQuest'
-        : glyphKind
-          ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
-          : 'itemUi.bags.itemAria';
+      // Accessible name: the player item lock (issue 3042) outranks every
+      // other announcement, since "this copy is protected" is the single most
+      // actionable fact about a locked slot. Otherwise quest stacks always
+      // announce quest item (the seal is aria-hidden); instanced stacks keep
+      // their per-copy flag; plain stacks, fine included, keep the plain
+      // label (a fine id's NAME already carries the grade word, see the
+      // fine-grade aria note above the category map).
+      const itemAriaKey = locked
+        ? 'hudChrome.bags.itemAriaLocked'
+        : questMark
+          ? 'hudChrome.bags.itemAriaQuest'
+          : glyphKind
+            ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+            : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
@@ -898,7 +944,8 @@ export class BagsWindow {
       // --fx gate). Ready seals share the seal markup and brighten via
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
-      row.innerHTML = `${this.deps.itemIcon(item)}${cornerSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const lockSeal = lockMarkHtml(locked);
+      row.innerHTML = `${this.deps.itemIcon(item)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -948,15 +995,34 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        // Touch has no right-click, so a tap on an item with an action
-        // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
+        // Touch has no right-click, so a tap opens the action menu instead of
         // running the classic action directly; the menu's first row is that
-        // classic action, so nothing is lost. A plain item taps straight through,
-        // byte-identical to today. Long-press still peeks (handled above).
-        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId)) {
+        // classic action, so nothing is lost. Since the player item lock
+        // (issue 3042) added Lock/Unlock to every item's menu, this is now
+        // ALWAYS available (previously only for Disenchant / Salvage / Apply
+        // Enchant items; a plain item tapped straight through). Long-press
+        // still peeks (handled above).
+        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId, s.instance)) {
           this.openItemMenuFor(item, s, ev);
           return;
         }
+        // runBagAction's use/feed/equip/deposit arms call this.render()
+        // SYNCHRONOUSLY: the rebuild's focus-restore ladder re-seats focus
+        // onto the fresh row by data-focus-key before this click event ever
+        // finishes bubbling to Input's window-level mouse-click blur guard
+        // (src/game/input.ts releaseMouseActivatedFocus), so that guard's
+        // "did THIS click activate what's now focused" check never matches
+        // the rebuilt (structurally unrelated) node and never fires. Shed
+        // focus here, before the rebuild can re-seat it, for a real mouse
+        // click only (ev.detail > 0, the same discriminator the window-level
+        // guard already uses): the still-focused button would otherwise
+        // natively reactivate on the very next Space (the #bags panel guard
+        // stops propagation without preventDefault so Tab+Space keyboard
+        // reactivation keeps working), replaying the action and swallowing
+        // the jump (issue: a potion kept drinking instead of jumping).
+        // Keyboard activation (detail 0) is left alone so the restore ladder
+        // still lands Tab users on the next sensible control.
+        if (ev.detail > 0) row.blur();
         this.runBagAction(item, s, ev);
       });
       row.addEventListener('contextmenu', (ev) => {
@@ -975,20 +1041,22 @@ export class BagsWindow {
           ev.preventDefault();
           return;
         }
-        // At a vendor, Ctrl/Meta right-click owns the split-stack sell prompt.
+        // At a vendor, Ctrl/Meta right-click owns the bulk-sell shortcut
+        // (sellBagItem's ctrl arm; the SHIFT arm, not this one, owns the
+        // split-stack quantity prompt).
         if (this.deps.vendorOpen()) {
           if (!ev.ctrlKey && !ev.metaKey) return;
           ev.preventDefault();
-          this.sellBagItem(s, ev);
+          this.sellBagItem(item, s, ev);
           return;
         }
         ev.preventDefault();
-        // An item with an action (Disenchant / Salvage / Apply Enchant)
-        // opens the action menu, whose FIRST row is the classic left-click action
-        // so that binding survives. Every other item keeps today's behavior
-        // byte-identical: right-click runs the SAME action as left-click (use /
-        // equip), never a destroy (destroying is the drag-out-to-world gesture).
-        if (this.itemMenuAvailable(item, s.itemId)) {
+        // The action menu opens, whose FIRST row is the classic left-click
+        // action so that binding survives (right-click never destroys;
+        // destroying is the drag-out-to-world gesture). Every item now offers
+        // at least Lock/Unlock (issue 3042), so this always opens the menu;
+        // left-click is unchanged (still runs the classic action instantly).
+        if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
           this.openItemMenuFor(item, s, ev);
           return;
         }
@@ -1026,6 +1094,7 @@ export class BagsWindow {
         this.deps.setDragAction(null);
         this.deps.clearActionDropTargets();
         this.deps.markEquipDropTargets(null);
+        this.flushDeferredRender();
       });
       // A fresh press clears any stale suppression: the flag is only ever meant to
       // swallow the ONE synthetic click that trails the drag it was set by, so a drag
@@ -1078,6 +1147,7 @@ export class BagsWindow {
         },
         onEnd: () => {
           this.deps.markEquipDropTargets(null);
+          this.flushDeferredRender();
         },
       });
       this.attachRowTooltip(row, item, s);
@@ -1263,6 +1333,7 @@ export class BagsWindow {
       this.deps.dragState.end();
       this.deps.clearActionDropTargets();
       this.deps.markEquipDropTargets(null);
+      this.flushDeferredRender();
     });
     bindTouchItemDrag(row, {
       state: this.deps.dragState,
@@ -1297,6 +1368,7 @@ export class BagsWindow {
       },
       onEnd: () => {
         this.deps.markEquipDropTargets(null);
+        this.flushDeferredRender();
       },
     });
     return row;
@@ -1326,6 +1398,8 @@ export class BagsWindow {
       e.stopPropagation();
       const from = drag.index;
       this.deps.dragState.end();
+      this.nativeBagCellDropAwaitingDragEnd = true;
+      this.renderDeferredForDrag = true;
       this.dropOnBagCell(from, cell);
     });
   }
@@ -1416,7 +1490,7 @@ export class BagsWindow {
         this.deps.showError(t('itemUi.tooltip.cannotVendor'));
         return;
       case 'vendorSell':
-        this.sellBagItem(s, ev);
+        this.sellBagItem(item, s, ev);
         break;
       case 'bankDeposit': {
         // The command is inventory-index-based, so resolve the exact clicked stack
@@ -1582,6 +1656,13 @@ export class BagsWindow {
   // Refresh only the grid contents (used by live search) so the search input keeps
   // focus and caret position across keystrokes.
   private refreshGrid(): void {
+    // Same hazard as render() (see its comment): an innerHTML wipe here would tear a
+    // mid-drag row out of the document just as easily. Defer to the same latch; the
+    // eventual flush runs a full render(), a strict superset of a grid-only refresh.
+    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
+      this.renderDeferredForDrag = true;
+      return;
+    }
     // Grid rebuild tears down hovered cells without mouseleave.
     this.clearTrackerHighlight();
     const grid = this.deps.root().querySelector('.bag-grid') as HTMLElement | null;
@@ -1625,7 +1706,11 @@ export class BagsWindow {
   // The bank arm reads bankOpen for the same reason bagDestroyAction does: a
   // bank view with no deposit target is still the bank owning the slot, and the
   // menu's rows are the very use / equip / destroy actions this surface refuses.
-  private itemMenuAvailable(item: ItemDef, itemId: string): boolean {
+  private itemMenuAvailable(
+    item: ItemDef,
+    itemId: string,
+    instance?: ItemInstancePayload,
+  ): boolean {
     const mode = this.bagMode();
     const inDefaultMode =
       !mode.tradeOpen &&
@@ -1636,7 +1721,7 @@ export class BagsWindow {
       !mode.bankDeposit &&
       !mode.guildBankDeposit &&
       !mode.petFeed;
-    return inDefaultMode && bagItemHasContextActions(item, itemId);
+    return inDefaultMode && bagItemHasContextActions(item, itemId, instance);
   }
 
   // Open the action menu at the event's viewport point (falling back to the row
@@ -1648,7 +1733,15 @@ export class BagsWindow {
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
     const index = bagStackIndex(this.deps.world().inventory, s);
-    this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
+    this.deps.openItemActionMenu(
+      item,
+      s.itemId,
+      index,
+      x,
+      y,
+      () => this.runBagAction(item, s, ev),
+      s.instance,
+    );
   }
 
   /** The copy selection for a clicked stack, or undefined when the stack is no
@@ -1663,16 +1756,42 @@ export class BagsWindow {
     return index >= 0 ? { slotIndex: index } : undefined;
   }
 
-  private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
+  private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
+    const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
     if (ev.ctrlKey || ev.metaKey) {
-      this.deps.world().sellItem(slot.itemId, count);
+      if (instant) {
+        this.deps.world().sellItem(slot.itemId, count);
+      } else if (count > 1) {
+        // Ctrl/meta means "sell now", but that intent does not name WHICH
+        // copy of a stack spanning multiple slots: route through the same
+        // confirm-quantity prompt the shift arm uses (itemId-scoped, exactly
+        // ctrl's own existing bulk-sell semantics), rather than instant-
+        // selling a stack that might carry an enchanted or masterwork unit
+        // with zero confirmation.
+        const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+        this.showSellQuantityPrompt(slot.itemId, heldTotal);
+      } else {
+        // A single, precisely-addressed copy: the same confirm the plain
+        // click below uses, so ctrl-click cannot bypass the safety net this
+        // fix exists to add.
+        this.showSellConfirmPrompt(item, slot);
+      }
     } else if (ev.shiftKey && count > 1) {
       // The prompt's cap is every copy of this item across the whole bag, not just
       // the ONE slot that was clicked: a stackable item's per-slot count tops out at
       // its stackSize (commonly 20), so a player holding more sits in other slots.
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
+    } else if (!instant) {
+      // Anything short of true junk (common+ quality, ANY instance payload:
+      // an enchant, masterwork bake, signer, bound-to, or lock, or a crafted
+      // marker) confirms before it sells. A plain click on gray junk keeps
+      // the existing one-step sale; everything else gets the same safety net
+      // destroy already has (showDiscardItemPrompt), so selling junk one
+      // item at a time can no longer vendor an adjacent, unrelated valuable
+      // item on a single stray click (the enchanted-offhand-vanishes report).
+      this.showSellConfirmPrompt(item, slot);
     } else {
       this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
     }
@@ -1808,6 +1927,67 @@ export class BagsWindow {
     window.setTimeout(() => {
       input.focus();
       input.select();
+    }, 0);
+  }
+
+  /** Confirm before a PLAIN or ctrl-click sells anything vendorSellIsInstant
+   *  (bags_view.ts) does not clear on its own (see sellBagItem). Exactly one unit
+   *  of the SLOT the player clicked, never an itemId-only guess: the index is
+   *  RE-RESOLVED at SUBMIT time (bagStackIndex, reference identity), not the
+   *  index captured when the dialog opened, because the bag can repaint under an
+   *  open prompt (a trade, a mail send, another sale) exactly the way it can
+   *  under the bank deposit prompt (resolveDepositSubmit's own doc: "depositing
+   *  the wrong item is worse than dismissing"). A copy that is no longer there
+   *  REFUSES rather than falling back to sellItem's untargeted, itemId-only
+   *  walk: silently vendoring a DIFFERENT copy of the same id (the enchanted one,
+   *  if it is the only one left) would be exactly the defect this fix exists to
+   *  close. Reuses the sellQuantityTitle/Confirm/Cancel wording rather than
+   *  minting new keys: "Sell {item}" already carries the one thing a confirm
+   *  dialog needs to say, and every locale already has it. */
+  private showSellConfirmPrompt(item: ItemDef, slot: InvSlot): void {
+    document.querySelectorAll('.sell-confirm-prompt').forEach((el) => {
+      el.remove();
+    });
+    const opener = document.activeElement as HTMLElement | null;
+    const stack = document.getElementById('prompt-stack');
+    if (!stack) return;
+    const prompt = document.createElement('div');
+    prompt.className = 'prompt panel sell-confirm-prompt';
+    const itemName = itemDisplayName(item);
+    prompt.innerHTML = `<div class="prompt-text">${esc(t('itemUi.vendor.sellQuantityTitle', { item: itemName }))}</div>`;
+    const confirm = document.createElement('button');
+    confirm.className = 'btn';
+    confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');
+    const cancel = document.createElement('button');
+    cancel.className = 'btn';
+    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
+    const close = () => prompt.remove();
+    prompt.append(confirm, cancel);
+    const { dismiss, dismissAndReturn } = this.installPromptDialog(prompt, opener, close);
+    const submit = () => {
+      const index = bagStackIndex(this.deps.world().inventory, slot);
+      dismiss();
+      if (index < 0) {
+        // The named copy left the bags while the dialog was open: refuse rather
+        // than guess. Voices the sim's own "You don't have that item." line
+        // (sim_i18n.ts error.noItem) so a stale confirm reads exactly like the
+        // sim's own stale-slot refusal everywhere else in this window.
+        this.deps.showError(tSim('error.noItem'));
+        return;
+      }
+      this.deps.world().sellItem(slot.itemId, 1, { slotIndex: index });
+      this.deps.hideTooltip();
+      // A sold unstacked slot (the common case here: every non-junk gear kind is
+      // stack-capped at 1) empties and the 'vendor' event's renderBags() detaches
+      // the opener; land on the always-present close button rather than letting
+      // focus fall to <body>, the same reasoning showDiscardItemPrompt documents.
+      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    };
+    confirm.addEventListener('click', submit);
+    cancel.addEventListener('click', dismissAndReturn);
+    stack.appendChild(prompt);
+    window.setTimeout(() => {
+      confirm.focus();
     }, 0);
   }
 

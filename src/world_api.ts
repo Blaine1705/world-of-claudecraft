@@ -17,7 +17,7 @@
 //   entity_roster.ts    IWorldEntityRoster   cfg/entities/player/moveInput/realm reads
 //   combat.ts           IWorldCombat         ability casts, auto-attack, spirit release
 //   targeting.ts        IWorldTargeting      target selection + tab cycling
-//   interaction.ts      IWorldInteraction    interact / lootCorpse / pickUpObject
+//   interaction.ts      IWorldInteraction    civic-service readout + interact / loot / pickup
 //   loot.ts             IWorldLoot           need/greed loot rolls
 //   inventory.ts        IWorldInventory      bags, equipment, vendor, copper
 //   cosmetics.ts        IWorldCosmetics      account skins + mech chroma
@@ -120,9 +120,9 @@ export type {
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
 // before either binary loads a character into a differently shaped world.
-// 6 = the class-overhauls integration layout on top of the v0.35.0 base layout
-// (both sides of the 2026-08 base merge bumped independently: 4 and 5).
-export const ONLINE_WORLD_LAYOUT_VERSION = 6 as const;
+// 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
+// disagree about the authoritative resource carrier, so they must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 7 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -222,7 +222,11 @@ export {
   type GuildBankLogOp,
   type GuildBankLogView,
 } from './world_api/guild_bank';
-export type { WorldInteractionOutcome } from './world_api/interaction';
+export type {
+  CivicServiceKind,
+  CivicServicePlacement,
+  WorldInteractionOutcome,
+} from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
@@ -355,6 +359,7 @@ export const COMMAND_NAMES = [
   'unequip_item',
   'use',
   'discard',
+  'lock_item',
   'buy',
   'sell',
   'buyback',
@@ -400,6 +405,11 @@ export const COMMAND_NAMES = [
   'trade_offer',
   'trade_confirm',
   'trade_cancel',
+  // Landed beside its trade siblings rather than appended at the tail; this
+  // list feeds only KNOWN_COMMANDS (a Set) and the CommandName union, and
+  // moving an already-shipped token would be the very reorder the tail rule
+  // forbids, so it stays filed here.
+  'trade_close',
   'duel_req',
   'duel_accept',
   'duel_decline',
@@ -433,6 +443,7 @@ export const COMMAND_NAMES = [
   'switchLoadout',
   'deleteLoadout',
   'market_search',
+  'market_sell_price_check',
   'market_list',
   'market_list_instance',
   'market_buy',
@@ -788,6 +799,7 @@ export const COMMAND_FACETS = {
   trade_offer: 'IWorldTrade',
   trade_confirm: 'IWorldTrade',
   trade_cancel: 'IWorldTrade',
+  trade_close: 'IWorldTrade',
   // IWorldDuelArena: duels + rated-arena queue + the 2v2 Fiesta augment pick. Fiesta
   // has no top-level member (it lives in arenaInfo.match.fiesta and flows over the
   // events queue); arena_augment is its only command. duelInfo/arenaInfo are snapshot
@@ -837,6 +849,7 @@ export const COMMAND_FACETS = {
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
+  market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
   market_buy: 'IWorldMarket',

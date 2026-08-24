@@ -31,11 +31,16 @@ import {
 // truth. Keep this list SHORT and justified; prefer a placeholder in the
 // description over a new entry here.
 const NUMBER_ALLOWLIST: Record<string, number[]> = {
+  // Courser's Guise daze lasts COURSER_DAZE_DURATION (combat/hunter_shared.ts),
+  // a fixed constant applied by the damage hook, not an ability effect field.
+  aspect_of_the_cheetah: [4],
   // Grace Devotion's mana cadence is stamped by effect_dispatch from its effect kind.
   grace_devotion: [5],
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
   // an engine constant, not an effects-array value.
   soulwell: [25],
+  // Pact Deepened's magic reduction lives in the talent stat resolver.
+  demon_skin: [5],
   // Flash of Light's Devotion comes from the Paladin generation table, not its heal effect.
   flash_of_light: [1],
   // Lay on Hands Devotion comes from the Paladin generation table, not its heal effect.
@@ -48,19 +53,22 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   charge: [9, 1],
   bear_charge: [9, 1],
   // "30% more threat": the stance threat multiplier inside threatModifier.
-  // Bear form's "armor +130%" is the recalcPlayerStats multiplier (2.3, the
-  // 2026-07 tank-parity pass) in entity.ts, not the form effect's value.
+  // Bear form's "armor +110%" and "maximum health +30%" are the
+  // recalcPlayerStats multipliers (2.1 and 1.3, the v0.38 tank-parity pass)
+  // in entity.ts, not the form effect's value.
   defensive_stance: [30],
   // Battle Stance's rage multiplier is applied by resourceGainMultiplier.
   battle_stance: [10],
   // Valor Roar's Protection-only damage reduction is applied when the party
   // maximum-health aura is created, rather than stored on its shared effect.
   rallying_cry: [5],
-  bear_form: [30, 130],
+  bear_form: [30, 110],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   holy_taunt: [3],
   growl: [3],
+  // Baleful Roar cites the same compel window plus its own aoeTaunt radius.
+  challenging_roar: [3, 10],
   // "attack power +8 plus 2 per level": the cat-form AP constants in
   // recalcPlayerStats (entity.ts), not effect fields.
   cat_form: [8, 2],
@@ -107,7 +115,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   mind_blast: [1, 3, 30],
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
-  rockbiter_weapon: [3, 10],
+  rockbiter_weapon: [3, 10, 15, 20, 40],
   earth_shock: [3, 5, 125],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],
@@ -115,6 +123,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
   // than one shared ability effect array.
   unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 3, 4, 125, 8, 50],
+  // Harrow's deterministic break budget is WARLOCK_FEAR_DAMAGE_BUDGET_PCT
+  // (src/sim/combat/warlock_fear.ts), applied when the aura is created.
+  fear: [8],
   // The shared Temporal Exhaustion gate is owned by combat/haste_burst.ts.
   bloodlust: [10],
   // Divine Ascension's resource price, charge count and lifetime are owned by

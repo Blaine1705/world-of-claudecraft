@@ -482,6 +482,88 @@ export const fr_CA: EnTranslations = {
         "bannedUntil": "Vous êtes exclu des Récompenses quotidiennes pour encore {remaining}. L’accès sera rétabli {until}. Motif : {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "Boutique WOC",
       "close": "Fermer la boutique WOC",
@@ -734,6 +816,9 @@ export const fr_CA: EnTranslations = {
       "showAmounts": "Afficher tous les montants de Claudium",
       "hideAmounts": "Masquer les montants de Claudium supplémentaires",
       "skuRow": "{claudium} Claudium pour {usd}",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Acheter",
       "buyUnavailable": "Les achats sont indisponibles pour le moment.",
       "storeTitle": "Boutique d’objets cosmétiques",
@@ -802,9 +887,9 @@ export const fr_CA: EnTranslations = {
       "note": "Faites glisser la barre d'onglets de la discussion pour déplacer la fenêtre, ou la poignée d'angle pour la redimensionner. Réinitialiser la rétablit à sa position et sa taille par défaut."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Limite du clavardage Général atteinte. Réessayez dans {seconds}.",
+      "pending": "Votre message précédent dans le clavardage Général est toujours en cours d'envoi. Réessayez dans un instant.",
+      "unavailable": "Le clavardage Général est temporairement indisponible. Réessayez d'ici peu."
     },
     "swing": {
       "ready": "Coup",
@@ -853,6 +938,7 @@ export const fr_CA: EnTranslations = {
       "jump": "Sauter",
       "leaderboard": "Classement",
       "dailyRewards": "Boutique",
+      "wocMarket": "Exchange",
       "deeds": "Hauts faits",
       "mounts": "Montures",
       "professions": "Métiers",
@@ -866,11 +952,52 @@ export const fr_CA: EnTranslations = {
       "actionRing": "Actions de combat",
       "actionPageToggle": "Changer de page d'action",
       "actionPageIndicator": "Page {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Échanger la cible",
       "targetCycleShort": "Cible",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Masquer le clavier",
-      "chatPlaceholder": "Dites quelque chose…"
+      "chatPlaceholder": "Dites quelque chose…",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Utilise le joystick de déplacement pour te déplacer et fais glisser l'écran pour regarder autour de toi. Fais quelques pas pour commencer.",
@@ -899,12 +1026,12 @@ export const fr_CA: EnTranslations = {
       "update": "Mettre à jour"
     },
     "otaUpdate": {
-      "title": "Mise à jour du jeu",
-      "downloading": "Téléchargement de la mise à jour : {percent}",
-      "applying": "Mise à jour téléchargée. Le jeu redémarre pour l'appliquer.",
-      "incompatible": "Une mise à jour est nécessaire pour jouer. Elle sera appliquée dès la fin du téléchargement.",
-      "continueAnyway": "Continuer sans mettre à jour",
-      "progressLabel": "Progression du téléchargement de la mise à jour"
+      "title": "Actualización del juego",
+      "downloading": "Descargando actualización: {percent}",
+      "applying": "Actualización descargada. Reiniciando el juego para aplicarla.",
+      "incompatible": "Se necesita una actualización para jugar. Se aplicará en cuanto termine la descarga.",
+      "continueAnyway": "Continuar sin actualizar",
+      "progressLabel": "Progreso de descarga de la actualización"
     },
     "cameraPrompt": {
       "title": "Choisissez votre caméra",
@@ -953,6 +1080,22 @@ export const fr_CA: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep} : {story}",
+      "story": {
+        "undercroft": "La salle basse",
+        "state": "L'étage d'apparat",
+        "residence": "Le logis",
+        "tower": "La tour de guet"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep} : {story}",
+      "story": {
+        "ground": "Le rez-de-jardin",
+        "solar": "La chambre du soleil"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -970,6 +1113,7 @@ export const fr_CA: EnTranslations = {
       "seconds": "{s} s",
       "autoShowHint": "Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.",
       "threatFallback": "Pas de menace en direct : affichage des dégâts sur {name}",
+      "threatFrozen": "Menace finale contre {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Autres ({count})",
@@ -1367,6 +1511,10 @@ export const fr_CA: EnTranslations = {
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "showPlaytime": "Afficher le temps de jeu sur l'écran des personnages",
+      "forceHighPerfGpu": "Utiliser le GPU de jeu dédié",
+      "forceHighPerfGpuNote": "Activé par défaut : l'application de bureau demande à cet ordinateur son GPU de jeu dédié. Désactivez cette option si le jeu ne démarre pas, s'ouvre sur un écran noir, ou si l'écran de l'ordinateur portable reste éteint. Prend effet au prochain démarrage du jeu.",
+      "discordPresence": "Présence enrichie Discord",
+      "discordPresenceNote": "Affiche la zone où vous vous trouvez et depuis combien de temps vous jouez cette session comme votre activité Discord, et toute personne pouvant voir votre profil Discord peut voir les deux. Seuls le nom de la zone, votre temps de session et le jeu sont partagés, jamais votre personnage, votre compte, ou avec qui vous jouez. Nécessite que l'application Discord soit lancée sur cet ordinateur.",
       "showDevBadges": "Afficher les badges de développeur",
       "showOwnNameplate": "Afficher ma plaque de nom",
       "showPlayerNameplates": "Afficher les plaques de noms des joueurs",
@@ -1382,6 +1530,7 @@ export const fr_CA: EnTranslations = {
       "mouseoverCast": "Lancement au survol sur les cadres de groupe",
       "stickyTarget": "Conserver la cible au clic au sol",
       "showItemLevel": "Afficher le niveau d'objet",
+      "showReliquaryTracker": "Afficher le suivi du reliquaire",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
@@ -1394,7 +1543,9 @@ export const fr_CA: EnTranslations = {
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
-      "mobileLeftHanded": "Disposition pour gaucher"
+      "mobileLeftHanded": "Disposition pour gaucher",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Choix",
@@ -1427,9 +1578,29 @@ export const fr_CA: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "confirmAction": "Confirmer / Sélectionner",
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
-      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
+      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran.",
+      "crossHotbar": "Barre de raccourcis croisée",
+      "crossHotbarEnable": "Activer la barre de raccourcis croisée",
+      "crossHotbarExpand": "Barre de raccourcis double croix",
+      "crossHotbarHelp": "Maintenez une gâchette enfoncée pour allumer huit emplacements de barre d'action sur le pavé directionnel et les boutons du visage. Appuyez sur l'autre déclencheur pour passer au deuxième ensemble.",
+      "crossHotbarResetLayout": "Réinitialiser la barre de raccourcis croisée",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "Les déclencheurs et le D-pad appartiennent à la barre de raccourcis croisée lorsqu'elle est activée, ils sont donc configurés ci-dessous plutôt qu'ici.",
+      "cancelAction": "Annuler / Retour",
+      "subcommandsAction": "Sous-commandes / Carte",
+      "cycleHudAction": "Interface de cycles",
+      "cycleSetAction": "Modifier le jeu de barres de raccourcis",
+      "crossHotbarDisplay": "Affichage des barres",
+      "crossHotbarDisplayFull": "Complet",
+      "crossHotbarDisplayCompact": "Compact",
+      "crossHotbarDisplayMinimal": "Uniquement pendant sa détention",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Porter {action} : confirmer sur une cellule pour la placer, annuler pour la remettre.",
+      "crossHotbarEditHint": "Organisation : confirmer le prélèvement dans une cellule ou le livre de sorts et le dépôt sur une cellule, annuler en efface un.",
+      "crossHotbarEditHelp": "Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur."
     },
     "perf": {
       "title": "Surcouche de performance",
@@ -1548,6 +1719,7 @@ export const fr_CA: EnTranslations = {
           "render": "rendu   soumission {submit} ms | monde {world} ms | entités {entities} ms",
           "scene": "scène   {calls} appels | {triangles} tris | {views} vues",
           "hitches": "saccades {hitches} | shaders {shaders} | transferts {uploads} | vues {views}",
+          "hitchesBuild": "constructions de zones {zoneBuilds} | hors cadre {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "en attente"
         },
@@ -1599,7 +1771,10 @@ export const fr_CA: EnTranslations = {
             "eventCpu": "Le traitement des événements consomme le temps d'image",
             "shaderCompile": "Des shaders se compilent en cours de jeu",
             "textureUpload": "Les transferts de textures causent des saccades en jeu",
+            "zoneBuild": "Les versions de streaming de zone provoquent des problèmes",
             "viewCreate": "La création de vues d'entités cause des saccades",
+            "gcHitch": "Les collectes de déchets s'effectuent à l'intérieur de longs cadres",
+            "offFrameHitch": "Les images longues proviennent d'un travail en dehors du rappel de rendu",
             "otherHitch": "Des images longues non attribuées subsistent",
             "assetStartup": "Le démarrage du jeu est retardé par le chargement des ressources",
             "longTasks": "De longues tâches du navigateur bloquent les images",
@@ -1739,6 +1914,7 @@ export const fr_CA: EnTranslations = {
       "notEnoughHonor": "Vous n’avez pas assez d’honneur.",
       "reasons": {
         "arenaWin": "Victoire en arène",
+        "arenaComplete": "combat en arène mené",
         "fiestaKill": "Élimination en Fiesta",
         "fiestaComplete": "Fiesta terminée",
         "fiestaWin": "Victoire en Fiesta",
@@ -1845,6 +2021,7 @@ export const fr_CA: EnTranslations = {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
     "itemHeroicTag": "[HÉROÏQUE]",
+    "itemHeroicLabel": "Héroïque",
     "itemSoulbound": "Lié à l’âme",
     "itemUniqueEquipped": "Unique-équipé",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const fr_CA: EnTranslations = {
         "few": "vous êtes {rank}, {count} membres",
         "many": "vous êtes {rank}, {count} membres",
         "other": "vous êtes {rank}, {count} membres"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} joueur",
@@ -2016,6 +2205,10 @@ export const fr_CA: EnTranslations = {
       "errPasswordLong": "Le nouveau mot de passe doit contenir au plus 128 caractères.",
       "errPasswordUnchanged": "Le nouveau mot de passe doit être différent de l'actuel.",
       "errPasswordConfirm": "Les nouveaux mots de passe ne correspondent pas.",
+      "setPasswordTitle": "Définir un mot de passe",
+      "setPasswordHint": "Ce compte a été créé avec Connectez-vous avec Apple ou Discord et n'a pas encore de mot de passe. Définissez-en un pour vous connecter sur d’autres appareils, tels que les applications de bureau Mac et Windows, ou sur le Web, et pour associer des méthodes de connexion supplémentaires.",
+      "setPasswordSubmit": "Définir le mot de passe",
+      "passwordSet": "Mot de passe défini. Vous pouvez désormais vous connecter avec votre nom d'utilisateur et votre mot de passe n'importe où.",
       "emailLabel": "E-mail (facultatif)",
       "emailHint": "Utilisé uniquement pour la récupération du compte. Nous n'envoyons jamais d'e-mail marketing.",
       "saveEmail": "Enregistrer l'e-mail",
@@ -2199,6 +2392,10 @@ export const fr_CA: EnTranslations = {
       "itemAriaBound": "{item}, quantité {count}, copie liée",
       "itemAriaMasterwork": "{item}, quantité {count}, chef-d'oeuvre",
       "itemAriaQuest": "{item}, quantité {count}, objet de quête",
+      "itemAriaLocked": "{item}, quantité {count}, barré",
+      "itemLockedLine": "Barré",
+      "lockItem": "Barrer l'objet",
+      "unlockItem": "Débarrer l'objet",
       "filterGroupAria": "Filtrer les sacs par catégorie",
       "filterAll": "Tous",
       "filterWeapon": "Armes",
@@ -2453,12 +2650,14 @@ export const fr_CA: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
-      "removeFromBarAria": "Retirer {name} de la barre d'action"
+      "removeFromBarAria": "Retirer {name} de la barre d'action",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Tricheur >"
     },
     "mobTooltip": {
       "levelFamily": "{family} niveau {level}",
@@ -3224,11 +3423,13 @@ export const fr_CA: EnTranslations = {
       "reagentsNeeded": "Nécessite$1",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(dépense {count} de qualité fine)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",
       "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
+      "reagentLocked": "Un composant pour cela est barré.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
       "comboRequires": "Communion : {craftA} + {craftB}, palier {tier}.",
@@ -3335,6 +3536,7 @@ export const fr_CA: EnTranslations = {
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
       "notSalvageable": "Vous ne pouvez pas récupérer cela.",
+      "salvageLocked": "Cet objet est barré.",
       "disenchantBusy": "Vous êtes occupé.",
       "salvageBusy": "Vous êtes occupé.",
       "enchantBusy": "Vous êtes occupé.",
@@ -3710,6 +3912,9 @@ export const fr_CA: EnTranslations = {
       "pinFull": "Le suivi est plein (jusqu'à {cap} pages)",
       "pinAria": "Épingler {name} au suivi de l'interface",
       "unpinAria": "Détacher {name}",
+      "trackerToggleLabel": "Traqueur HUD",
+      "trackerToggleShowHint": "Afficher le tracker Reliquaire sur votre écran",
+      "trackerToggleHideHint": "Cachez le tracker Reliquaire de votre écran",
       "rarityLine": "Trouvée par {percent} des collectionneurs",
       "pageRarityLine": "Enluminée par {percent} des collectionneurs",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const fr_CA: EnTranslations = {
       "unlockedBorderHint": "Nouvelle bordure obtenue : {name}. Portez-la depuis le Livre des hauts faits.",
       "broadcastLine": "{name} a accompli un haut fait: {deed}",
       "rarityLine": "Obtenu par {percent} des aventuriers",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Hauts faits",
       "collapseHint": "Réduire le suivi des hauts faits",
       "expandHint": "Déployer le suivi des hauts faits",
@@ -3797,6 +4003,220 @@ export const fr_CA: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Niveau requis : {level}"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const fr_CA: EnTranslations = {
       "password_too_long": "Le nouveau mot de passe doit contenir au plus 128 caractères.",
       "characters_online": "Déconnectez tous vos personnages avant de désactiver le compte.",
       "deactivated": "Ce compte a été désactivé. Contactez un administrateur pour le rétablir.",
-      "not_found": "Compte introuvable."
+      "not_found": "Compte introuvable.",
+      "password_already_set": "Ce compte a déjà un mot de passe. Utilisez plutôt Modifier le mot de passe."
     },
     "character": {
       "name_invalid": "Nom de personnage invalide. Utilisez 2 à 16 lettres.",
@@ -3928,6 +4349,61 @@ export const fr_CA: EnTranslations = {
       "genesis_token_claimed": "Ce Seeker Genesis Token a déjà été réclamé.",
       "entitlement_required": "Des droits Seeker vérifiés sont requis.",
       "current_ownership_required": "La possession actuelle d'un Seeker Genesis Token est requise."
+    },
+    "cheater_mark": {
+      "admin_target": "Les comptes d'opérateur ne peuvent pas être marqués.",
+      "reason_required": "Un motif est requis.",
+      "invalid_duration": "Entrez une durée de marquage d'au moins une seconde.",
+      "not_marked": "Ce compte n'est pas marqué."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const fr_CA: EnTranslations = {
       "ifHighContrastBackground": "Un arrière-plan plus sobre et à contraste plus élevé derrière les écrans de démarrage et de personnage.",
       "ifInvertLookY": "Inverse le sens haut-bas de la visée à la souris.",
       "ifShowItemLevel": "Ajoute une ligne de niveau d'objet à chaque infobulle d'objet. Désactivé par défaut, ce qui conserve l'infobulle classique, uniquement centrée sur les statistiques.",
+      "ifShowReliquaryTracker": "Si le tracker Reliquaire (vos pages épinglées et leur progression) se trouve sur votre HUD. La fenêtre Reliquaire a un bouton en forme d'œil correspondant, et épingler une page réactive le tracker.",
       "ifShowPlaytime": "Affiche votre temps de jeu cumulé sur la feuille de personnage. Activé par défaut, et la feuille comporte un bouton en forme d'œil qui le bascule par appareil, pratique si vous diffusez ou prenez des captures d'écran. Le total continue de s'accumuler dans tous les cas.",
       "ifShowOwnNameplate": "Affiche votre propre plaque de nom au-dessus de votre tête, exactement comme les autres joueurs la voient, fioritures comprises. Désactivez-la pour la vue classique.",
       "ifShowPlayerNameplates": "Affiche les plaques de nom des autres joueurs. Désactivée, elle désencombre une ville animée, et votre cible actuelle reste lisible dans tous les cas.",
@@ -4735,6 +5212,7 @@ export const fr_CA: EnTranslations = {
       "mageEleJet": "Jet d'eau se trouve sur la barre du familier comme un bouton à part entière : cliquez dessus pour verrouiller un rayon glacial sur un ennemi, ou faites un clic droit (appui long sur tactile) pour laisser l'élémentaire le déclencher de lui-même dès qu'il est prêt.",
       "formsHeading": "Changement de forme",
       "formsNote": "Un druide combat en changeant de forme. La plupart des capacités de druide appartiennent à une forme précise, si bien que la forme que vous portez détermine ce que vous pouvez lancer, et changer de forme coûte un peu de mana. Vous pouvez changer de forme en combat ou hors combat, aussi souvent que vous le souhaitez.",
+      "formsAutoUnshift": "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
       "formsMoonwing": "Un druide Équilibre gagne une forme supplémentaire, la Forme de sélénien, la forme de lanceur de sorts dans laquelle il combat. C'est la seule forme animale qui conserve vos sorts, et votre baguette ne fonctionne que dans cette forme ou dans votre forme de lanceur de sorts normale.",
       "formLine": {
         "form_bear": "La forme de tank : une peau épaisse, de la rage à la place du mana, et davantage de menace pour que les ennemis continuent de vous frapper.",
@@ -6544,6 +7022,7 @@ export const fr_CA: EnTranslations = {
     "email": "E-mail",
     "emailPlaceholder": "vous@exemple.com",
     "emailError": "Veuillez saisir une adresse e-mail valide.",
+    "marketingOptIn": "M'envoyer par e-mail les actualités et mises à jour du jeu (facultatif)",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "logIn": "Se connecter",
@@ -6644,6 +7123,19 @@ export const fr_CA: EnTranslations = {
     "style": "Style",
     "resetLook": "Réinitialiser l'apparence",
     "resetShort": "Réinitialiser",
+    "shareTab": "Partager",
+    "designCode": "Code d'apparence",
+    "designCodeHint": "Copiez ce code pour sauvegarder ou partager cette apparence. Collez un code ici et importez-le pour la charger.",
+    "copyCode": "Copier le code",
+    "importCode": "Importer",
+    "designCodeCopied": "Code d'apparence copié.",
+    "designCodeCopyManual": "La copie automatique est bloquée ici. Le code est sélectionné; copiez-le avec votre clavier.",
+    "designCodeImported": "Apparence importée.",
+    "designCodeImportedPartial": "Apparence importée. Les valeurs inconnues de cette version ont été ignorées.",
+    "designCodeErrEmpty": "Collez d'abord un code d'apparence.",
+    "designCodeErrHeader": "Cela ne ressemble pas à un code d'apparence.",
+    "designCodeErrVersion": "Ce code d'apparence vient d'une version plus récente du jeu.",
+    "designCodeErrMalformed": "Ce code d'apparence est endommagé. Copiez le code au complet et réessayez.",
     "browFlat": "Plat",
     "browArched": "Arqué",
     "browThin": "Fin",
@@ -7039,6 +7531,7 @@ export const fr_CA: EnTranslations = {
       "portalOpens": "Une faille de rang {tier} se déchire dans {zone} !",
       "portalSealed": "La faille de rang {tier} dans {zone} a été scellée.",
       "portalCollapses": "La faille de rang {tier} dans {zone} s'effondre.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Seuls les aventuriers de niveau {level} ou plus peuvent entrer dans cette faille.",
       "deadEntry": "Vous ne pouvez pas entrer dans une faille tant que vous êtes mort.",
       "deadEntryCombat": "Votre groupe est encore en combat. Les morts peuvent entrer à nouveau une fois le combat terminé.",
@@ -7138,6 +7631,7 @@ export const fr_CA: EnTranslations = {
       "shopMarksRequired": "Il vous faut {marks} Marques de plongée pour acheter {name}.",
       "shopSealPremiumOnly": "Ce sceau ne cède qu'à la main d'un maître : seule la mise Supérieure peut l'ouvrir.",
       "passageSealed": "Le passage est scellé.",
+      "enemiesRemain": "Réglez d'abord le sort des ennemis restants.",
       "moveCloserPassage": "Rapprochez-vous du passage.",
       "moveCloserChest": "Rapprochez-vous du coffre.",
       "moveCloserReliquary": "Rapprochez-vous du reliquaire.",
@@ -7760,7 +8254,15 @@ export const fr_CA: EnTranslations = {
       "readyBody": "Elle s'installe à la fermeture, ou redémarrez maintenant.",
       "restart": "Redémarrer maintenant",
       "later": "Plus tard",
-      "dismiss": "Fermer"
+      "dismiss": "Fermer",
+      "whatsNew": "Voir les changements dans votre navigateur"
+    },
+    "notify": {
+      "updateReadyTitle": "La mise à jour {version} est prête",
+      "updateReadyTitleNoVersion": "La mise à jour est prête",
+      "updateReadyBody": "Redémarrez World of ClaudeCraft pour appliquer la mise à jour.",
+      "partyInviteTitle": "Invitation de groupe",
+      "partyInviteBody": "{name} vous invite à rejoindre son groupe."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const fr_CA: EnTranslations = {
       "reload": "Recharger",
       "quit": "Quitter",
       "fatalBody": "World of ClaudeCraft a rencontré une erreur inattendue et doit se fermer."
+    },
+    "titlebar": {
+      "exitGame": "Quitter le jeu"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Le jeu fonctionne sans accélération GPU et sera lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
+    "bodyDiscreteInactive": "Le jeu n'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
     "bodyWeb": "Le jeu fonctionne sans accélération GPU et sera lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
     "hybridBodyWindows": "Cette session s'exécute sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu dédié, définissez votre navigateur sur Performances élevées dans Paramètres > Système > Affichage > Graphiques, puis redémarrez-le. L'application de bureau choisit automatiquement le GPU de jeu.",
     "hybridBodyLinux": "Cette session s'exécute sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu dédié, votre navigateur ou votre pilote graphique propose peut-être son propre réglage de sélection du GPU, ou votre distribution propose peut-être un outil de bascule de GPU (comme PRIME ou optimus-manager). L'application de bureau choisit automatiquement le GPU de jeu.",
@@ -7995,7 +8501,111 @@ export const fr_CA: EnTranslations = {
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
       "mapCanvasLabel": "Carte",
-      "mapSummary": "Carte de {zone}."
+      "mapSummary": "Carte de {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Aucun marqueur pertinent n'est visible.",
+      "mapMarkerLocated": "{marker} : {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker} : {count} ; {direction}, {distance}.",
+      "mapMarkerMore": "Marqueurs supplémentaires : {count}.",
+      "mapMarkerDirections": {
+        "center": "au centre",
+        "north": "au nord",
+        "northeast": "au nord-est",
+        "east": "à l'est",
+        "southeast": "au sud-est",
+        "south": "au sud",
+        "southwest": "au sud-ouest",
+        "west": "à l'ouest",
+        "northwest": "au nord-ouest"
+      },
+      "mapMarkerDistances": {
+        "near": "à proximité",
+        "medium": "à moyenne distance",
+        "far": "à grande distance"
+      },
+      "mapMarkerLabels": {
+        "you": "Vous",
+        "availableQuest": "Quête disponible",
+        "readyQuest": "Quête à rendre",
+        "repeatQuest": "Quête répétable",
+        "cooldownQuest": "Quête en attente",
+        "questObjective": "Zone d'objectif de quête",
+        "readyOre": "Filon de minerai disponible",
+        "readyWood": "Bosquet de bois disponible",
+        "readyHerb": "Parcelle de plantes disponible",
+        "readyLockedOre": "Filon de minerai disponible, outil indisponible",
+        "readyLockedWood": "Bosquet de bois disponible, outil indisponible",
+        "readyLockedHerb": "Parcelle de plantes disponible, outil indisponible",
+        "cooldownOre": "Filon de minerai épuisé",
+        "cooldownWood": "Bosquet de bois épuisé",
+        "cooldownHerb": "Parcelle de plantes épuisée",
+        "cooldownLockedOre": "Filon de minerai épuisé, outil indisponible",
+        "cooldownLockedWood": "Bosquet de bois épuisé, outil indisponible",
+        "cooldownLockedHerb": "Parcelle de plantes épuisée, outil indisponible",
+        "station": "Poste d'artisanat : {name}",
+        "service": "Service : {name}",
+        "partyMember": "Membre du groupe : {name}",
+        "deadPartyMember": "Membre du groupe mort : {name}",
+        "partyMemberGeneric": "Membre du groupe",
+        "deadPartyMemberGeneric": "Membre du groupe mort",
+        "friend": "Ami : {name}",
+        "guildMember": "Membre de la guilde : {name}",
+        "pointOfInterest": "Point d'intérêt : {name}",
+        "dungeonEntrance": "Entrée du donjon : {name}",
+        "dungeonExit": "Sortie du donjon",
+        "delveEntrance": "Entrée de la plongée : {name}",
+        "worldPassage": "Passage vers {zone}",
+        "riftEntrance": "Entrée de la faille : {name}",
+        "hostileEnemy": "Ennemi hostile",
+        "aggressiveEnemy": "Ennemi qui vous attaque",
+        "lootableEnemy": "Ennemi avec du butin",
+        "corpse": "Votre cadavre",
+        "deathZone": "Zone dangereuse",
+        "teammate": "Coéquipier",
+        "deadTeammate": "Coéquipier mort",
+        "flagCarrier": "Coéquipier portant le drapeau",
+        "ownFlagStand": "Stand de votre drapeau",
+        "enemyFlagStand": "Stand du drapeau ennemi",
+        "riftDescent": "Descente de la faille",
+        "riftReturnBeacon": "Balise de retour",
+        "riftReturnExit": "Sortie de retour",
+        "ranked": "{marker}, rang {rank}",
+        "riftTreasureAvailable": "Trésor disponible",
+        "riftTreasureLocked": "Trésor verrouillé",
+        "riftTreasureOpened": "Trésor ouvert",
+        "riftTreasureJammed": "Trésor à la serrure coincée",
+        "riftCacheAvailable": "Cachette de faille disponible",
+        "riftCacheLocked": "Cachette verrouillée",
+        "riftCacheOpened": "Cachette ouverte",
+        "riftCacheJammed": "Cachette à la serrure coincée",
+        "pylonUnlit": "Pylône runique éteint",
+        "pylonLit": "Pylône runique allumé",
+        "sequenceRuneUnlit": "Rune de séquence éteinte",
+        "sequenceRuneLit": "Rune de séquence allumée",
+        "iceGoal": "Cible de glace",
+        "boulderPad": "Cible du rocher",
+        "boulderMovable": "Rocher déplaçable",
+        "boulderPlaced": "Rocher placé",
+        "gateSealed": "Porte scellée",
+        "gateOpen": "Porte ouverte",
+        "switchReady": "Interrupteur prêt",
+        "switchOn": "Interrupteur activé",
+        "orbDormant": "Orbe dormant",
+        "orbActive": "Orbe actif",
+        "rollerHazard": "Rouleau dangereux",
+        "delvePassageSealed": "Passage scellé",
+        "delvePassageOpen": "Passage ouvert",
+        "delveSurfaceExit": "Sortie vers la surface",
+        "delveCacheLocked": "Cachette de plongée verrouillée",
+        "delveCacheReady": "Cachette de plongée prête",
+        "delveCacheActive": "Cachette de plongée active",
+        "delveCacheOpened": "Cachette de plongée ouverte",
+        "delveReliquaryLocked": "Reliquaire verrouillé",
+        "delveReliquaryReady": "Reliquaire prêt",
+        "delveReliquaryActive": "Rite du reliquaire actif",
+        "delveReliquaryOpened": "Reliquaire ouvert",
+        "bountiful": "Récompense opulente : {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu du jeu",
@@ -8035,6 +8645,9 @@ export const fr_CA: EnTranslations = {
       "graphicsReloadNote": "La qualité graphique et le détail du terrain s'appliquent après un rechargement.",
       "reloadNow": "Recharger maintenant",
       "fullscreen": "Plein écran",
+      "displayMode": "Mode d'affichage",
+      "displayModeBorderless": "Plein écran sans bordure",
+      "displayModeWindowed": "Fenêtré",
       "touchLookSpeed": "Vitesse caméra tactile",
       "joystickSize": "Taille du joystick",
       "buttonSize": "Taille des boutons",
@@ -8597,6 +9210,7 @@ export const fr_CA: EnTranslations = {
       "offGlobalCooldown": "Hors temps de recharge global",
       "friendlyTarget": "Cible alliée",
       "enemyTarget": "Cible ennemie",
+      "anyTarget": "Cible ennemie ou amie",
       "selfOnly": "Sur soi uniquement",
       "damageRange": "{min} à {max}",
       "finisherDamage": "{base} plus {perCombo} par point de combo"
@@ -8911,6 +9525,10 @@ export const fr_CA: EnTranslations = {
       "filterPrimaryStatAll": "Toute caractéristique principale",
       "filterRarity": "Rareté",
       "filterRarityAll": "Toutes les raretés",
+      "filterSort": "Trier",
+      "sortName": "Nom (A-Z)",
+      "sortPriceAsc": "Prix : du plus bas au plus élevé",
+      "collapseLowest": "Prix le plus bas uniquement",
       "weaponSword": "Épées",
       "weaponDagger": "Dagues",
       "weaponStaff": "Bâtons",
@@ -8941,6 +9559,8 @@ export const fr_CA: EnTranslations = {
       "quantity": "Quantité",
       "quantityOf": "sur {count}",
       "priceEach": "Prix unitaire",
+      "lowestPriceLabel": "Prix de vente le plus bas actuellement",
+      "lowestPriceNone": "Aucune annonce active pour cet objet pour le moment.",
       "listButton": "Publier au Marché mondial",
       "minPriceError": "Indiquez un prix d'au moins 1 cuivre.",
       "collectEmpty": "Rien en attente. Les recettes et annonces expirées se récupèrent ici.",
@@ -9368,6 +9988,7 @@ export const fr_CA: EnTranslations = {
       "cheap_shot": {
         "name": "Coup au ventre",
         "description": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Camouflage requis. Confère 2 points de combo.",
+        "descriptionNoStealth": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Confère 2 points de combo.",
         "specNote_subtlety": "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage : cette utilisation ne coûte rien, dépense les 3 Pénombre, et déclenche le voile d'ombre de 6 s."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const fr_CA: EnTranslations = {
       "crippling_poison": {
         "name": "Venin de plomb",
         "description": "Frappe la cible avec un venin de plomb, infligeant {damage} dégâts de Nature et réduisant sa vitesse de déplacement de 50% pendant 12 s."
+      },
+      "melting_acid": {
+        "name": "Acide fondant",
+        "description": "Projette la cible d'un poison caustique, infligeant {damage} dégâts de Nature et réduisant son armure de 5% pendant 12 s."
+      },
+      "nightshade_coating": {
+        "name": "Revêtement Morelle",
+        "description": "Enduit la cible de morelle, infligeant {damage} dégâts de Nature et réduisant les soins qu'elle reçoit de 25% pendant 12 s."
       },
       "expose_armor": {
         "name": "Brèche d'armure",
@@ -9580,7 +10209,7 @@ export const fr_CA: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Serment ardent",
-        "description": "Augmente passivement de 60% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
+        "description": "Augmente passivement de 30% la menace générée par vos dégâts Sacrés. Gardien de la foi uniquement."
       },
       "retribution_aura": {
         "name": "Aura de représailles",
@@ -9696,7 +10325,7 @@ export const fr_CA: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Arme Stonebound",
-        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 30% d'armure, subit 10% de dégâts en moins et génère deux fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
+        "description": "Imprègne votre arme pendant 30 min. Chaque coup inflige {damage} points de dégâts supplémentaires. Amélioration gagne en plus 40% d'armure et 20% d'Endurance, subit 15% de dégâts en moins et est insensible aux coups critiques des créatures et génère 2,75 fois plus de menace. Secousse tellurique force sa cible à vous attaquer pendant 3 s, et Garde de tonnerre accorde 10% de réduction des dégâts pendant 3 s."
       },
       "healing_wave": {
         "name": "Eaux guérisseuses",
@@ -9824,7 +10453,7 @@ export const fr_CA: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet."
+        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet."
       },
       "searing_pain": {
         "name": "Cautérisation",
@@ -9875,7 +10504,7 @@ export const fr_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Forme de Bruin",
-        "description": "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
+        "description": "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur."
       },
       "maul": {
         "name": "Brise-os",
@@ -9885,6 +10514,10 @@ export const fr_CA: EnTranslations = {
       "growl": {
         "name": "Menacer",
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
+      },
+      "challenging_roar": {
+        "name": "Rugissement funeste",
+        "description": "Un rugissement funeste : chaque ennemi dans un rayon de 10 mètres est provoqué, sa menace envers vous rejoignant celle de son ennemi le plus haï, et il est forcé de vous attaquer pendant 3 s. Forme de Bruin uniquement."
       },
       "cat_form": {
         "name": "Forme de loup",
@@ -9898,7 +10531,7 @@ export const fr_CA: EnTranslations = {
       "ferocious_bite": {
         "name": "Morsure sanglante",
         "description": "Technique de finition qui inflige {damage}. Forme de loup uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge : une morsure pour 70 plus 43 par point de combo qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure 30 énergie."
+        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie."
       },
       "swipe": {
         "name": "Griffes balayantes",
@@ -9961,7 +10594,7 @@ export const fr_CA: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sang de loup",
-        "description": "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
+        "description": "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
       },
       "rip": {
         "name": "Faille sanglante",
@@ -10045,12 +10678,12 @@ export const fr_CA: EnTranslations = {
         "description": "Relève un compagnon défensif permanent. Le Graveguard provoque automatiquement, intercepte 20% de vos dégâts subis via la Domination des tombes, et Commandement de la moisson le fait provoquer et subir 30% de dégâts en moins pendant 4 s."
       },
       "raise_skeletal_warrior": {
-        "name": "Relever un Skeletal Warrior",
-        "description": "Dépense 1 Fragment d'âme pour ajouter un Skeletal Warrior permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s."
+        "name": "Relever un Guerrier squelette",
+        "description": "Dépense 1 Fragment d'âme pour ajouter un Guerrier squelette permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s."
       },
       "raise_bone_mage": {
-        "name": "Relever un Bone Mage",
-        "description": "Dépense 2 Fragments d'âme pour ajouter un Bone Mage à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%."
+        "name": "Relever un Mage d’os",
+        "description": "Dépense 2 Fragments d'âme pour ajouter un Mage d’os à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%."
       },
       "bone_armor": {
         "name": "Armure d'os",
@@ -10058,7 +10691,7 @@ export const fr_CA: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "Explosion de cadavre",
-        "description": "Sacrifie d'abord un Bone Mage, puis un Skeletal Warrior, et un Gravewing seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi."
+        "description": "Sacrifie d'abord un Mage d’os, puis un Guerrier squelette, et une Aile funéraire seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi."
       },
       "funeral_harvest": {
         "name": "Moisson funéraire",
@@ -10066,7 +10699,7 @@ export const fr_CA: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Marque de l'ossuaire",
-        "description": "Marque un ennemi pendant 12 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 m et crée 1 Fragment d'âme."
+        "description": "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme."
       },
       "unholy_command": {
         "name": "Commandement impie",
@@ -10074,19 +10707,19 @@ export const fr_CA: EnTranslations = {
       },
       "reaping_command": {
         "name": "Commandement de la moisson",
-        "description": "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Skeletal Warriors clouent leur cible, les Bone Mages exposent les défenses magiques, et le Gravewing déchire tous les ennemis touchés."
+        "description": "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés."
       },
       "sacrifice_undead": {
         "name": "Sacrifier un mort-vivant",
         "description": "Détruit un serviteur de Domination pour restaurer 25% de vos points de vie maximum."
       },
       "raise_gravewing": {
-        "name": "Relever un Gravewing",
-        "description": "Dépense 2 Fragments d'âme pour ajouter un Gravewing permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 65% de dégâts toutes les 5 s, et Commandement de la moisson fait que chaque ennemi touché subit 8% de dégâts en plus pendant 5 s."
+        "name": "Relever une Aile funéraire",
+        "description": "Dépense 2 Fragments d'âme pour ajouter une Aile funéraire permanente à votre Domination à 2 emplacements. Une seule peut vous servir à la fois. Elle frappe en zone les ennemis proches pour 65% de dégâts toutes les 5 s, et Commandement de la moisson fait que chaque ennemi touché subit 8% de dégâts en plus pendant 5 s."
       },
       "army_of_the_dead": {
         "name": "Armée des morts",
-        "description": "Ouvre un portail funéraire pour relever temporairement un Skeletal Warrior, un Bone Mage et un Gravewing pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides."
+        "description": "Ouvre un portail funéraire pour relever temporairement un Guerrier squelette, un Mage d’os et une Aile funéraire pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides."
       },
       "metamorphosis": {
         "name": "Forme de liche",
@@ -10126,7 +10759,7 @@ export const fr_CA: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sang froid",
-        "description": "Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Knifework)"
+        "description": "Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)"
       },
       "blade_flurry": {
         "name": "Déluge de lames",
@@ -10134,7 +10767,7 @@ export const fr_CA: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Hémorragie",
-        "description": "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Skulduggery)"
+        "description": "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Fourberie)"
       },
       "power_infusion": {
         "name": "Infusion de puissance",
@@ -10165,12 +10798,12 @@ export const fr_CA: EnTranslations = {
         "description": "Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)"
       },
       "feral_charge": {
-        "name": "Charge farouche",
-        "description": "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)"
+        "name": "Déferlante primordiale",
+        "description": "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)"
       },
       "swiftmend": {
         "name": "Prompte guérison",
-        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Groveheart)"
+        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)"
       },
       "moonlash": {
         "name": "Déferlante lunaire",
@@ -10182,7 +10815,7 @@ export const fr_CA: EnTranslations = {
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend 30 points d'énergie. Fonctionne sans aucun point de combo."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",
@@ -10213,8 +10846,8 @@ export const fr_CA: EnTranslations = {
         "description": "Invoque un Warfiend sous le commandement du démoniste. Le Warfiend est un démon de mêlée résistant qui se jette dans la bataille et tient bon. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
       },
       "summon_infernal": {
-        "name": "Invoquer un Pyre Colossus",
-        "description": "Fait s'abattre un Pyre Colossus sur la zone ciblée et inflige 58-72 points de dégâts de Feu à l'impact. Il combat pendant 30 s sans remplacer votre démon, brûle les ennemis proches toutes les 2 s et génère 1 point de Ruine par seconde."
+        "name": "Invoquer un Colosse du bûcher",
+        "description": "Fait s'abattre un Colosse du bûcher sur la zone ciblée et inflige 58-72 points de dégâts de Feu à l'impact. Il combat pendant 30 s sans remplacer votre démon, brûle les ennemis proches toutes les 2 s et génère 1 point de Ruine par seconde."
       },
       "summon_doomguard": {
         "name": "Invoquer un Wraithborn",
@@ -10422,7 +11055,7 @@ export const fr_CA: EnTranslations = {
       },
       "evocation": {
         "name": "Puits d’éther",
-        "description": "Restaura mana rápidamente. (talent de mage)"
+        "description": "Canalisez pendant 6 s : chaque seconde, vous récupérez 100 points de mana et gagnez 8 points de puissance des sorts. Le bonus se cumule pendant la canalisation et dure 15 s. (talent de Mage)"
       },
       "flurry_of_knives": {
         "name": "Rafale de couteaux",
@@ -10430,7 +11063,7 @@ export const fr_CA: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Régénération sauvage",
-        "description": "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)"
+        "description": "Rend 40% de vos points de vie maximum en 10 s. Forme d'ours uniquement. (talent de Druide)"
       },
       "frost_trap": {
         "name": "Piège de givre",
@@ -10450,11 +11083,11 @@ export const fr_CA: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)"
+        "description": "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
       },
       "ice_block": {
         "name": "Cercueil froid",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)"
+        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)"
       },
       "inner_focus": {
         "name": "Esprit apaisé",
@@ -10546,7 +11179,7 @@ export const fr_CA: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Esprit fulgurant",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)"
+        "description": "Votre prochain sort ayant un temps d’incantation devient instantané. Dure 60 s. (talent de Mage)"
       },
       "psychic_scream": {
         "name": "Cri psychique",
@@ -10602,7 +11235,7 @@ export const fr_CA: EnTranslations = {
       },
       "venom_dart": {
         "name": "Dard venimeux",
-        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.",
+        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Art des lames : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.",
         "specNote_assassination": "Ajoute 1 Rituel du venin et prolonge votre plaie de venin de 6 s (la plaie ne dépasse jamais 20 s)."
       },
       "body_blow": {
@@ -10615,11 +11248,11 @@ export const fr_CA: EnTranslations = {
       },
       "veilstrike": {
         "name": "Frappe du voile",
-        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Skulduggery)"
+        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)"
       },
       "venomrend": {
         "name": "Déchirure venimeuse",
-        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Knifework)"
+        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)"
       },
       "typhoon": {
         "name": "Typhon",
@@ -10663,7 +11296,7 @@ export const fr_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Traquer",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 5%. Inutilisable en combat."
       },
       "rake": {
         "name": "Écorcher",
@@ -12218,6 +12851,9 @@ export const fr_CA: EnTranslations = {
       "pristine_claw": {
         "name": "Griffe immaculée"
       },
+      "dawnhold_posy": {
+        "name": "Bouquet du jardin de Dawnhold"
+      },
       "conjured_water4": {
         "name": "Eau de source conjurée"
       },
@@ -13063,6 +13699,15 @@ export const fr_CA: EnTranslations = {
       "training_dummy": {
         "name": "Mannequin d'entraînement"
       },
+      "friendly_player_dummy": {
+        "name": "Mannequin de joueur allié"
+      },
+      "normal_boss_dummy": {
+        "name": "Mannequin de boss normal"
+      },
+      "heroic_boss_dummy": {
+        "name": "Mannequin de boss héroïque"
+      },
       "ridge_stalker": {
         "name": "Traqueur de crête"
       },
@@ -13634,7 +14279,7 @@ export const fr_CA: EnTranslations = {
         "name": "Maldrec le Lie-spectres"
       },
       "pyre_colossus": {
-        "name": "Pyre Colossus"
+        "name": "Colosse du bûcher"
       },
       "choirmother_selthe": {
         "name": "Selthe, mère de chœur"
@@ -13679,13 +14324,13 @@ export const fr_CA: EnTranslations = {
         "name": "Graveguard"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Guerrier squelette"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Mage d’os"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Aile funéraire"
       }
     },
     "npcs": {
@@ -16702,6 +17347,11 @@ export const fr_CA: EnTranslations = {
         "enterText": "Vous pénétrez dans les salles froides et silencieuses de The Last Keep.",
         "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
       },
+      "dawnhold_castle": {
+        "name": "Château Dawnhold",
+        "enterText": "Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.",
+        "leaveText": "Vous ressortez sur la pelouse ensoleillée du jardin."
+      },
       "drowned_temple": {
         "name": "Le Temple noyé",
         "enterText": "Tu franchis la porte de lune — l'air se mue en eau froide et en lumière blafarde, et le chant se referme au-dessus de ta tête.",
@@ -16900,6 +17550,21 @@ export const fr_CA: EnTranslations = {
         "sender": "Bricoleur Gizzel",
         "subject": "MAITRISE, kaboom",
         "body": "Une de vos majeures a atteint la maîtrise, tout en HAUT, kaboom, toute l'échelle, terminé. Je ne distribue pas d'éloges, je distribue des mèches, mais tenez, prenez les deux : vous êtes brillant et légèrement terrifiant. Allez rendre les montagnes nerveuses."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

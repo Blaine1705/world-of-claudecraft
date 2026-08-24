@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Pool, type QueryResult } from 'pg';
+import { Pool, type PoolClient, type QueryResult } from 'pg';
 import {
   type AccountFlair,
   EMPTY_ACCOUNT_FLAIR,
@@ -10,10 +10,20 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
+import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
+import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
+import {
+  type AccountModerationRow,
+  type AccountModerationStatus,
+  type AuthTokenRow,
+  computeModerationStatus,
+  tokenInfoFromRow,
+} from './auth_guard_core';
 import type { BankBonusFacts } from './bank_entitlements';
 import {
   configureLifetimeXpRankCache,
@@ -38,7 +48,6 @@ import {
   GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
   GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
 } from './general_chat_quota_config';
-import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
 import {
@@ -65,13 +74,18 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
+import { SUSPICION_FLAGS_SCHEMA } from './suspicion_flags_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
+import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard_cache';
+import { WOC_MARKET_SCHEMA } from './woc_market_db';
+import { bustWocMarketActivity } from './woc_market_read_cache';
 
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
@@ -414,6 +428,15 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
+-- ISO 3166-1 alpha-2 country at signup, resolved from a trusted edge geo
+-- header (GEOIP_COUNTRY_HEADER; see server/signup_attribution.ts). Analytics
+-- only, never authorization.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_country TEXT;
+-- Once-guard for the D7Retained ad conversion event: stamped by the atomic
+-- claim in server/ua_capi_db.ts the first time the account opens a session
+-- during day seven after signup, so the event can never double-fire across
+-- sessions, realms, or restarts.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS d7_capi_sent_at TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
 -- Paid weapon ownership and loadouts live outside accounts.cosmetics. Older game
 -- binaries replace that JSON document wholesale, so keeping paid state there would
@@ -769,6 +792,16 @@ CREATE INDEX IF NOT EXISTS bot_detector_config_changes_realm
 -- hard-word (slur) enforcement ladder. A mute blocks chat only, never login.
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_muted_until TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_strikes INT NOT NULL DEFAULT 0;
+-- The operator-applied Cheater mark (src/sim/moderation/): a public tag every
+-- character on the account wears until a budget of PLAYED seconds burns down.
+-- A REMAINING-SECONDS counter and not an expiry timestamp on purpose: a
+-- wall-clock sanction runs out while the account is logged out, which is exactly
+-- the window it would otherwise be waited out in. The sim owns the countdown
+-- while a character is in world and the session save writes the remainder back,
+-- so 0 (the default) means unmarked and is never written for an unmarked row.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_seconds INT NOT NULL DEFAULT 0;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_reason TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_set_at TIMESTAMPTZ;
 -- Admin-managed filter word lists. tier 'soft' = cosmetic (masked client-side
 -- when the player's filter is on); tier 'hard' = enforced (blocked + escalated).
 CREATE TABLE IF NOT EXISTS chat_filter_words (
@@ -1247,6 +1280,17 @@ export async function ensureSchema(): Promise<void> {
     // association arm, so it is created after the retention schema above; on a
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
+    // Progression analytics event logs (level_up_events, ftue_events).
+    // FK-references accounts(id) and characters(id), so they run after SCHEMA.
+    // Applied unconditionally (idempotent), like the other schema modules.
+    await client.query(PROGRESS_EVENTS_SCHEMA);
+    // First-touch signup attribution (one row per account, written at
+    // registration). FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
+    // The hand-entered ad-spend ledger (admin API); no FK dependencies, kept
+    // beside the other analytics schemas. Bounded (one row per campaign-day),
+    // deliberately keep-forever (see ad_spend_db.ts).
+    await client.query(AD_SPEND_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -1283,6 +1327,12 @@ export async function ensureSchema(): Promise<void> {
     // is unaffected: only expired windows match, and a racing UPSERT on a pruned
     // key simply re-inserts a fresh row.
     await client.query(RATELIMIT_PRUNE_SQL);
+    // Admin economy oversight: the materialised per-account wealth totals and
+    // the persisted suspicion-flag workflow tables. Both FK-reference
+    // accounts(id), so they run after SCHEMA. Applied unconditionally
+    // (idempotent), like the other schema modules.
+    await client.query(ACCOUNT_WEALTH_SCHEMA);
+    await client.query(SUSPICION_FLAGS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
@@ -1292,6 +1342,9 @@ export async function ensureSchema(): Promise<void> {
     // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(CONTENT_MODERATION_SCHEMA);
+    // After SCHEMA: every marketplace table FKs accounts(id), and the custody
+    // model rides characters + world_state (the escrow combined save).
+    await client.query(WOC_MARKET_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -1409,26 +1462,10 @@ export interface AccountRow {
   totp_last_window?: string | number | null;
 }
 
-export interface AccountModerationStatus {
-  locked: boolean;
-  banned: boolean;
-  suspendedUntil: string | null;
-  // True only for a self-deactivated account (locked, not banned, no active
-  // suspension). Lets a caller distinguish the deactivation lock from a
-  // suspension so it can surface the correct message/code (e.g. the API pipeline
-  // requireAccount maps it to account.deactivated, not moderation.suspended).
-  deactivated?: boolean;
-  reason: string;
-  message: string;
-  // Chat mute is independent of `locked`: a muted account can still log in and
-  // play, it just can't send chat until `chatMutedUntil` passes. Surfaced here
-  // so the WS auth handshake can seed the live session without a second query.
-  chatMutedUntil: string | null;
-  chatStrikes: number;
-  // Sparse account policy. Null means Unlimited. Loaded in this existing auth
-  // read so a known-unlimited session never performs quota database work.
-  generalChatRateLimit?: GeneralChatRateLimit | null;
-}
+// The status shape (and its compute) moved to server/auth_guard_core.ts so the
+// direct read below and the marketplace guard cache share one source of truth;
+// re-exported here so the existing importers compile unchanged.
+export type { AccountModerationStatus } from './auth_guard_core';
 
 export interface AccountChatMuteStatus {
   mutedUntil: string | null;
@@ -1579,34 +1616,6 @@ export async function grantAccountMechChroma(
   chromaId: string,
 ): Promise<AccountCosmetics> {
   return addAccountCosmeticId(accountId, 'mechChromaIds', chromaId);
-}
-
-export async function revokeAccountMechChroma(
-  accountId: number,
-  chromaId: string,
-): Promise<AccountCosmetics> {
-  const res = await pool.query(
-    `WITH updated AS (
-       UPDATE accounts
-          SET cosmetics = jsonb_set(
-            COALESCE(cosmetics, '{}'::jsonb), '{mechChromaIds}',
-            (SELECT COALESCE(jsonb_agg(to_jsonb(v) ORDER BY ord), '[]'::jsonb)
-               FROM jsonb_array_elements_text(
-                 CASE WHEN jsonb_typeof(cosmetics -> 'mechChromaIds') = 'array'
-                   THEN cosmetics -> 'mechChromaIds' ELSE '[]'::jsonb END)
-                 WITH ORDINALITY AS entries(v, ord)
-              WHERE v <> $2))
-        WHERE id = $1
-        RETURNING id, cosmetics
-     )
-     SELECT updated.cosmetics,
-            awc.skin_ids AS weapon_skin_ids,
-            awc.loadout AS weapon_skin_loadout
-       FROM updated
-       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id`,
-    [accountId, chromaId],
-  );
-  return normalizeAccountCosmeticsRow(res.rows[0]);
 }
 
 /** Additive union in the rollback-safe paid-entitlement row. */
@@ -1799,6 +1808,28 @@ export async function saveToken(
      VALUES ($1, $2, now() + ($3 || ' hours')::interval, $4, $5)`,
     [token, accountId, String(ttlHours), scope, label],
   );
+  // A fresh random token can have no cached guard entry; the call keeps the
+  // auth_tokens writer set exemption-free for the bust discovery pin.
+  bustWocAuthGuardToken(token);
+}
+
+// The raw token-probe row for the guard reads (the cache's refresh source and
+// the direct read's fetch half). The expires_at > now() qual stays as the
+// DB-side belt; expires_at is ALSO selected so tokenInfoFromRow can re-check
+// expiry at read time, which is what makes a cached row safe
+// (server/auth_guard_core.ts owns the pure half).
+export async function authTokenRowForToken(token: string): Promise<AuthTokenRow | null> {
+  const res = await pool.query(
+    'SELECT account_id, scope, expires_at FROM auth_tokens WHERE token = $1 AND expires_at > now()',
+    [token],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    accountId: row.account_id,
+    scope: String(row.scope),
+    expiresAtMs: new Date(row.expires_at).getTime(),
+  };
 }
 
 // Account + scope for a live token. Every caller receives the authority context:
@@ -1806,17 +1837,12 @@ export async function saveToken(
 // require exact full scope. Unknown database values fail closed instead of being
 // promoted to full authority. Such a historical token also cannot authenticate
 // its own logout; account-level revocation remains available to clear the row.
+// Fetch + pure verdict (tokenInfoFromRow), the same pair the marketplace guard
+// cache composes, so the two arms cannot drift.
 export async function accountAndScopeForToken(
   token: string,
 ): Promise<{ accountId: number; scope: TokenScope } | null> {
-  const res = await pool.query(
-    'SELECT account_id, scope FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
-  );
-  const row = res.rows[0];
-  if (!row) return null;
-  if (row.scope !== 'full' && row.scope !== 'read') return null;
-  return { accountId: row.account_id, scope: row.scope };
+  return tokenInfoFromRow(await authTokenRowForToken(token), Date.now());
 }
 
 export interface AccountInfoRow {
@@ -1876,6 +1902,19 @@ export async function updatePasswordHash(accountId: number, passwordHash: string
   if ((res.rowCount ?? 0) > 0) bustDiscordStatus(accountId);
 }
 
+export async function setInitialPasswordHashIfUnset(
+  accountId: number,
+  passwordHash: string,
+): Promise<boolean> {
+  const res = await pool.query(
+    'UPDATE accounts SET password_hash = $2, password_set = TRUE WHERE id = $1 AND password_set = FALSE',
+    [accountId, passwordHash],
+  );
+  const changed = (res.rowCount ?? 0) > 0;
+  if (changed) bustDiscordStatus(accountId);
+  return changed;
+}
+
 // Revoke every token for an account except (optionally) the one in hand.
 // A password change keeps the current device signed in (pass its token);
 // a deactivate revokes everything (pass null).
@@ -1891,10 +1930,13 @@ export async function revokeTokensExcept(
   } else {
     await pool.query('DELETE FROM auth_tokens WHERE account_id = $1', [accountId]);
   }
+  // Account-keyed guard bust (over-busting the kept token costs one re-fetch).
+  bustWocAuthGuardAccount(accountId);
 }
 
 export async function revokeToken(token: string): Promise<void> {
   await pool.query('DELETE FROM auth_tokens WHERE token = $1', [token]);
+  bustWocAuthGuardToken(token);
 }
 
 // Revoke a read-scoped token by value (OAuth/RFC-7009 revocation, companion
@@ -1904,6 +1946,7 @@ export async function revokeReadToken(token: string): Promise<boolean> {
   const res = await pool.query(`DELETE FROM auth_tokens WHERE token = $1 AND scope = 'read'`, [
     token,
   ]);
+  bustWocAuthGuardToken(token);
   return (res.rowCount ?? 0) > 0;
 }
 
@@ -1957,6 +2000,10 @@ export async function revokeCompanionToken(accountId: number, prefix: string): P
       WHERE account_id = $1 AND scope = 'read' AND left(token, 8) = $2`,
     [accountId, prefix],
   );
+  // The cache is keyed by the FULL token this site does not hold, so the
+  // account-keyed bust drops every cached token of the account (over-busting
+  // is the safe direction; the survivors re-fetch).
+  bustWocAuthGuardAccount(accountId);
   return (res.rowCount ?? 0) > 0;
 }
 
@@ -1994,6 +2041,7 @@ export async function setAccountDeactivated(
     `UPDATE accounts SET deactivated_at = CASE WHEN $2 THEN now() ELSE NULL END WHERE id = $1`,
     [accountId, deactivated],
   );
+  bustWocAuthGuardAccount(accountId);
 }
 
 export async function setAccountLocale(accountId: number, locale: string | null): Promise<void> {
@@ -2164,6 +2212,7 @@ export async function consumePasswordResetRequest(
     // after COMMIT like the discord_db.ts sites. The expired/replayed-token arm
     // returns above without writing and must not evict a healthy snapshot.
     bustDiscordStatus(row.account_id);
+    bustWocAuthGuardAccount(row.account_id);
     return { accountId: row.account_id };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -2421,6 +2470,23 @@ export async function exportAccountData(
       ORDER BY claimed_at`,
     [accountId],
   );
+  // Subject-access completeness for the UA instrumentation: the signup
+  // country, the first-touch attribution row, and the per-account analytics
+  // event rows are all account-linked personal data, so they ride the export.
+  const createdCountry = await pool.query('SELECT created_country FROM accounts WHERE id = $1', [
+    accountId,
+  ]);
+  const attribution = await accountAttributionForExport(pool, accountId);
+  const levelUpEvents = await pool.query(
+    `SELECT character_id, level, earned_at
+       FROM level_up_events WHERE account_id = $1 ORDER BY earned_at`,
+    [accountId],
+  );
+  const ftueEvents = await pool.query(
+    `SELECT character_id, kind, quest_id, level, zone, killer, occurred_at
+       FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2429,9 +2495,13 @@ export async function exportAccountData(
       email: acct.email,
       createdAt: acct.created_at,
       locale: acct.locale,
+      createdCountry: createdCountry.rows[0]?.created_country ?? null,
       marketingOptIn: acct.marketing_opt_in,
       twoFactorEnabled,
     },
+    signupAttribution: attribution,
+    levelUpEvents: levelUpEvents.rows,
+    ftueEvents: ftueEvents.rows,
     characters: characters.map((c) => ({
       id: c.id,
       name: c.name,
@@ -2523,11 +2593,15 @@ export async function linkWalletToAccount(accountId: number, pubkey: string): Pr
     if (isUniqueViolation(err)) return false;
     throw err;
   }
+  // Identity changes must not wait out a cache TTL: the Exchange's activity
+  // readout carries the verified wallet (the bustDiscordStatus discipline).
+  bustWocMarketActivity(accountId);
   return true;
 }
 
 export async function unlinkWallet(accountId: number): Promise<void> {
   await pool.query('DELETE FROM wallet_links WHERE account_id = $1', [accountId]);
+  bustWocMarketActivity(accountId);
 }
 
 // ── Shareable player cards + referrals ─────────────────────────────────────
@@ -2789,9 +2863,14 @@ export async function lifetimeXpRankForCharacter(
   return readLifetimeXpRankForCharacter(characterId);
 }
 
-export async function moderationStatusForAccount(
+// The raw moderation row for the guard reads (the cache's refresh source and
+// the direct read's fetch half): the accounts moderation columns plus the
+// LEFT-JOINed chat-quota policy. Every time-dependent verdict is computed from
+// this row by computeModerationStatus (server/auth_guard_core.ts) at read
+// time, which is why the ROW and never the computed result may be cached.
+export async function moderationRowForAccount(
   accountId: number,
-): Promise<AccountModerationStatus> {
+): Promise<AccountModerationRow | null> {
   const res = await pool.query(
     `SELECT a.banned_at, a.suspended_until, a.moderation_reason, a.chat_muted_until,
             a.chat_strikes, a.deactivated_at, q.messages, q.window_minutes
@@ -2800,83 +2879,16 @@ export async function moderationStatusForAccount(
      WHERE a.id = $1`,
     [accountId],
   );
-  const row = res.rows[0];
-  if (!row) {
-    return {
-      locked: false,
-      banned: false,
-      suspendedUntil: null,
-      reason: '',
-      message: '',
-      chatMutedUntil: null,
-      chatStrikes: 0,
-      generalChatRateLimit: null,
-    };
-  }
-  const mutedUntilDate = row.chat_muted_until ? new Date(row.chat_muted_until) : null;
-  const chatMutedUntil =
-    mutedUntilDate && mutedUntilDate.getTime() > Date.now() ? mutedUntilDate.toISOString() : null;
-  const chatStrikes = Number(row.chat_strikes ?? 0);
-  const generalChatRateLimit =
-    row.messages === null || row.messages === undefined
-      ? null
-      : {
-          messages: Number(row.messages),
-          windowMinutes: Number(row.window_minutes),
-        };
-  // Admin-imposed states (ban, then active suspension) outrank a self-imposed
-  // deactivation: a banned+deactivated account must still surface the ban reason
-  // and label, not be relabelled "deactivated". All branches resolve to locked.
-  if (row.banned_at) {
-    return {
-      locked: true,
-      banned: true,
-      suspendedUntil: null,
-      reason: row.moderation_reason ?? '',
-      message: 'This account has been banned.',
-      chatMutedUntil,
-      chatStrikes,
-      generalChatRateLimit,
-    };
-  }
-  const suspendedUntil = row.suspended_until ? new Date(row.suspended_until) : null;
-  if (suspendedUntil && suspendedUntil.getTime() > Date.now()) {
-    return {
-      locked: true,
-      banned: false,
-      suspendedUntil: suspendedUntil.toISOString(),
-      reason: row.moderation_reason ?? '',
-      message: `This account is suspended until ${suspendedUntil.toUTCString()}.`,
-      chatMutedUntil,
-      chatStrikes,
-      generalChatRateLimit,
-    };
-  }
-  // A self-deactivated account is locked out of login + WS auth (same gate as
-  // banned/suspended) until an admin reactivates it.
-  if (row.deactivated_at) {
-    return {
-      locked: true,
-      banned: false,
-      suspendedUntil: null,
-      deactivated: true,
-      reason: '',
-      message: 'This account has been deactivated.',
-      chatMutedUntil,
-      chatStrikes,
-      generalChatRateLimit,
-    };
-  }
-  return {
-    locked: false,
-    banned: false,
-    suspendedUntil: null,
-    reason: '',
-    message: '',
-    chatMutedUntil,
-    chatStrikes,
-    generalChatRateLimit,
-  };
+  return res.rows[0] ?? null;
+}
+
+// Fetch + pure verdict (computeModerationStatus), the same pair the
+// marketplace guard cache composes, so the two arms cannot drift. The
+// decision ladder itself lives in server/auth_guard_core.ts.
+export async function moderationStatusForAccount(
+  accountId: number,
+): Promise<AccountModerationStatus> {
+  return computeModerationStatus(await moderationRowForAccount(accountId), Date.now());
 }
 
 export async function chatMuteStatusForAccount(accountId: number): Promise<AccountChatMuteStatus> {
@@ -3723,6 +3735,38 @@ export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
     if (res.rows.length < GUILD_BANK_BOOT_BATCH) return out;
     lastId = Number(res.rows[res.rows.length - 1].guild_id);
   }
+}
+
+// The character-save arm of the escrow transactions above, reusable inside a
+// caller-owned transaction (the $WOC Exchange listing escrow in
+// woc_market_db.ts commits a character UPDATE and a listing INSERT together,
+// the saveCharacterAndMarketState rationale). Same sanitize + lease fence as
+// saveCharacterState; the caller owns BEGIN/COMMIT/ROLLBACK and any timeout
+// raise. Returns false when the fence matched no row (a displaced session).
+export async function saveCharacterStateOnClient(
+  client: PoolClient,
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  leaseNonce?: string,
+): Promise<boolean> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const res =
+    leaseNonce === undefined
+      ? await client.query(
+          'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+          [characterId, level, JSON.stringify(cleanState)],
+        )
+      : await client.query(
+          `UPDATE characters SET level = $2, state = $3, updated_at = now()
+            WHERE id = $1
+              AND EXISTS (
+                SELECT 1 FROM character_leases
+                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              )`,
+          [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
+        );
+  return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {

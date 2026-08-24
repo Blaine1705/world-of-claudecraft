@@ -19,6 +19,8 @@ import { dist2d, type Entity, INTERACT_RANGE, type LootSlot } from '../src/sim/t
 import type { PartyMemberInfo } from '../src/world_api';
 import { face, makeFullWorld, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
+const FRESH_CORPSE_TIMER = 60;
+
 function mustParty(sim: Sim, pid: number): Party {
   const party = sim.partyOf(pid);
   if (!party) throw new Error(`missing party for ${pid}`);
@@ -66,6 +68,7 @@ describe('parties', () => {
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.tappedById = tapper;
     mob.lootRecipientIds = recipients;
     mob.loot = loot;
@@ -80,6 +83,49 @@ describe('parties', () => {
     sim.partyLeave(b);
     expect(sim.partyOf(a)).toBe(null);
     expect(sim.partyOf(b)).toBe(null);
+  });
+
+  it('removes persistent paladin auras but keeps 30-minute devotion buffs when the caster leaves', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      const member = sim.addPlayer('warrior', 'Member');
+      sim.setPlayerLevel(16, paladin);
+
+      const paladinEntity = sim.entities.get(paladin);
+      if (!paladinEntity) throw new Error('missing paladin entity');
+      sim.castAbility(persistentAura, paladin);
+      paladinEntity.gcdRemaining = 0;
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
+      sim.castAbility('dawn_devotion', paladin);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === 'dawn_devotion')).toBeDefined();
+
+      sim.partyLeave(paladin);
+
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === 'dawn_devotion')).toBeDefined();
+    }
+  });
+
+  it('removes persistent paladin auras from a non-paladin member who leaves', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      const member = sim.addPlayer('warrior', 'Member');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
+
+      sim.castAbility(persistentAura, paladin);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+
+      sim.partyLeave(member);
+
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.entities.get(paladin)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+    }
   });
 
   it('does not replace a pending party invite', () => {

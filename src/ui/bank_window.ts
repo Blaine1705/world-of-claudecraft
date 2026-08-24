@@ -18,6 +18,7 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
+import { isItemLocked } from '../sim/item_lock';
 import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
@@ -50,7 +51,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import {
   GUILD_PANEL_ID,
   GUILD_TAB_ID,
@@ -62,6 +63,7 @@ import { QUALITY_COLOR } from './icons';
 import {
   cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
+  lockMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
@@ -403,7 +405,10 @@ export class BankWindow {
     // whether focus was inside the window or a prompt so it can re-land on the
     // fresh close button instead of dropping to <body> (WCAG 2.4.3).
     const active = document.activeElement as HTMLElement | null;
-    const hadFocus = el.contains(active) || active?.closest(BANK_PROMPT_SELECTOR) != null;
+    // focusedWithin, not a bare root-containment check: the pointer-only focus
+    // drop parks pointer focus on this root, and the parked root is not a control
+    // to re-land on (it resolves no key and would take the close-button fallback).
+    const hadFocus = focusedWithin(el) !== null || active?.closest(BANK_PROMPT_SELECTOR) != null;
     // Search focus survives a FULL rebuild too: the slow-band refreshIfChanged can
     // land a data repaint (a deposit's echo) moments after the player focused the
     // search box, and stealing focus to the close button mid-typing was a live bug
@@ -735,6 +740,11 @@ export class BankWindow {
       const glyphKind = bagInstanceGlyphKind(slot.instance);
       const cornerMark = bagCornerMark(glyphKind, null, fineMark);
       const instanceMark = cornerMarkHtml(cornerMark);
+      // Player item lock (issue 3042): its own bottom-left badge (all-surfaces
+      // family, item_instance_glyph_mark.ts), so a locked copy keeps its mark
+      // visible after deposit exactly like the masterwork/fine seals above.
+      const locked = isItemLocked(slot.instance);
+      const lockSeal = lockMarkHtml(locked);
       // Stale-client guard (R34): an id this bundle predates still holds a
       // real, counted bank slot, so it renders (fallback icon, raw id as the
       // label) instead of vanishing. The withdraw click stays live because the
@@ -744,10 +754,17 @@ export class BankWindow {
       cell.setAttribute(
         'aria-label',
         item
-          ? t(glyphKind ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria', {
-              item: itemDisplayName(item),
-              count: countLabel,
-            })
+          ? t(
+              locked
+                ? 'hudChrome.bags.itemAriaLocked'
+                : glyphKind
+                  ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+                  : 'itemUi.bags.itemAria',
+              {
+                item: itemDisplayName(item),
+                count: countLabel,
+              },
+            )
           : t(
               glyphKind
                 ? UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
@@ -755,7 +772,7 @@ export class BankWindow {
               { id: slot.itemId, count: countLabel },
             ),
       );
-      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
+      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}${lockSeal}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses

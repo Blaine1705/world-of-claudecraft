@@ -1,8 +1,11 @@
 // Classic-MMO-style threat. Values follow the community-verified classic-era
 // research (Kenco's threat research / the classic warrior threat tables):
 //  - threat = (damage * abilityMult + flat bonus) * stance/form modifiers
-//  - Defensive Stance and Bear Form multiply threat by 1.3, Cat Form by 0.71,
-//    Righteous Fury multiplies HOLY damage threat by 1.6
+//  - Defensive Stance and Bear Form multiply threat by 1.3, Cat Form by 0.71.
+//    Burning Oath (Righteous Fury) multiplies HOLY damage threat; classic ran
+//    1.6, but ClaudeCraft's Faithwarden kit stacks per-ability multipliers and
+//    the Oathward mastery on top, so it runs 1.3 here (v0.38 tank threat
+//    parity pass) to keep the composed total in band.
 //  - each point of effective healing = 0.5 threat, split among all enemies
 //    in combat with the healer's party
 //  - a mob switches targets only when an attacker in melee range exceeds
@@ -24,7 +27,7 @@ export const HEAL_THREAT_FACTOR = 0.5;
 export const DEFENSIVE_STANCE_THREAT_MULT = 1.3;
 export const BEAR_FORM_THREAT_MULT = 1.3;
 export const CAT_FORM_THREAT_MULT = 0.71;
-export const RIGHTEOUS_FURY_THREAT_MULT = 1.6; // holy school only
+export const RIGHTEOUS_FURY_THREAT_MULT = 1.3; // holy school only
 export const TAUNT_FORCE_SECONDS = 3;
 // Stealth shrinks detection at equal level; higher-level observers pierce it
 // more easily, lower-level observers struggle. Shared by mobs and players.
@@ -75,6 +78,16 @@ export function canDetectStealthedTarget(
   if (!target.auras.some((a) => a.kind === 'stealth')) return true;
   if (hasEscapeStealth(target)) return false;
   return dist2d(observer.pos, target.pos) <= stealthDetectionRadius(observer, target, baseRadius);
+}
+
+// A PET never perceives a stealthed enemy at all (Rogue Duskveil/Smokestep and
+// Druid Stalk all apply a kind:'stealth' aura), matching exactly what an enemy
+// PLAYER sees. Deliberately NOT the classic proximity model mobs use
+// (canDetectStealthedTarget): a hunter/warlock/mage pet gets zero close-range
+// stealth detection, so a rogue's opener and Vanish work against the pair the
+// same way they work against the player. Pure: no clock, no rng.
+export function petCanSeeStealthedTarget(target: Entity): boolean {
+  return !target.auras.some((a) => a.kind === 'stealth');
 }
 
 export function addThreat(mob: Entity, sourceId: number, amount: number): void {

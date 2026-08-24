@@ -255,6 +255,14 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'gloomshade_abyssal_chain',
   'lingering_dread',
   'overflowing_power',
+  'pet_aggressive',
+  'pet_attack',
+  'pet_defensive',
+  'pet_feed',
+  'pet_growl',
+  'pet_mend',
+  'pet_passive',
+  'pet_water_jet',
   'pursuit',
   'second_wind',
   'snap_polymorph',
@@ -624,9 +632,16 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'pvp_card_duel_first_win',
     ]);
     // Later releases appended more deeds after this historical wave. The
-    // release art audit painted those additions too, so the one exhaustive
-    // DEED_ART_PENDING ledger is empty and no live deed uses fallback art.
-    expect(DEED_ORDER).toHaveLength(271);
+    // release art audit painted those additions, so the wave's own claim is
+    // unchanged: every deed that existed when it landed is painted. The only
+    // artless ids are the walk-in castle visit pair appended after the audit,
+    // riding the category-crest fallback the Icons authoring rule in
+    // docs/design/deeds.md sanctions until their 512px sources are
+    // commissioned (flagged in docs/achievements/icon-brief.md). Read from
+    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
+    // so this file cannot end up naming a different pending set than the
+    // other two art suites. Exhaustive: a third artless deed still reds here.
+    expect(DEED_ORDER).toHaveLength(273);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

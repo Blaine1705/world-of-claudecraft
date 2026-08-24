@@ -482,6 +482,88 @@ export const vi_VN: EnTranslations = {
         "bannedUntil": "Bạn bị cấm nhận Phần Thưởng Hằng Ngày thêm {remaining}. Quyền truy cập trở lại vào {until}. Lý do: {reason}"
       }
     },
+    "trade": {
+      "windowClosed": "Trade window closed.",
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "modesLabel": "Payment currency",
+        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
+        "feeLine": "Exchange fee {fee}, taken out of the price.",
+        "netLine": "You receive {net}",
+        "netLineBuyer": "The seller receives {net}",
+        "sendOffer": "Offer $WOC",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
+        "incomingAccept": "{name} offers {price} for your items.",
+        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
+        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
+        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
+        "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
+        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
+        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
+        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "moneyUsd": "{usd}",
+        "moneyLine": "{usd} (~ {tokens} $WOC)",
+        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
+        "payNow": "Pay {usd}",
+        "awaitingPayment": "Waiting for payment confirmation...",
+        "paying": "Confirm the payment in your wallet...",
+        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
+        "settledSeller": "Paid. The item was delivered to the buyer.",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer",
+        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
+        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
+        "statusPayingBuyer": "Confirming your payment on the network...",
+        "statusPayingSeller": "The buyer's payment is confirming on the network...",
+        "statusReviewBuyer": "Your payment is under review.",
+        "statusReviewSeller": "The buyer's payment is under review.",
+        "paidSeller": "You have received a payment of {price} for your {item}.",
+        "paidBuyer": "You have sent a payment of {price} for {item}.",
+        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
+        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
+        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
+        "cancelSale": "Cancel sale",
+        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
+        "youDeclined": "You declined the offer.",
+        "youWithdrew": "You withdrew your offer.",
+        "offerNotPending": "This offer is no longer pending.",
+        "offerDeclined": "The $WOC offer was declined.",
+        "offerWithdrawn": "The $WOC offer was withdrawn.",
+        "offerExpired": "The $WOC offer expired.",
+        "offerExpiresAt": "Offer expires at {time}.",
+        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
+        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
+        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
+        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
+        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
+        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
+        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
+        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
+        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
+        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
+        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
+        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
+        "hintBelowMin": "The Exchange minimum price is {usd}."
+      }
+    },
     "wocStore": {
       "title": "Cửa hàng WOC",
       "close": "Đóng cửa hàng WOC",
@@ -734,6 +816,9 @@ export const vi_VN: EnTranslations = {
       "showAmounts": "Hiển thị tất cả số lượng Claudium",
       "hideAmounts": "Ẩn số lượng Claudium bổ sung",
       "skuRow": "{usd} đổi lấy {claudium} Claudium",
+      "priceSol": "{amount} SOL",
+      "priceUsdc": "{amount} USDC",
+      "priceWoc": "{amount} WOC",
       "buyButton": "Mua",
       "buyUnavailable": "Mua hàng không có sẵn ngay bây giờ.",
       "storeTitle": "Cửa hàng mỹ phẩm",
@@ -802,9 +887,9 @@ export const vi_VN: EnTranslations = {
       "note": "Kéo dải thẻ trò chuyện để di chuyển cửa sổ, hoặc kéo góc để thay đổi kích thước. Đặt Lại sẽ đưa cửa sổ về vị trí và kích thước mặc định."
     },
     "chatQuota": {
-      "limitReached": "General chat limit reached. Try again in {seconds}.",
-      "pending": "Your previous General chat message is still sending. Try again in a moment.",
-      "unavailable": "General chat is temporarily unavailable. Try again shortly."
+      "limitReached": "Đã đạt giới hạn chat Chung. Hãy thử lại sau {seconds}.",
+      "pending": "Tin nhắn chat Chung trước đó của bạn vẫn đang được gửi. Hãy thử lại sau giây lát.",
+      "unavailable": "Chat Chung hiện tạm thời không khả dụng. Vui lòng thử lại trong thời gian ngắn."
     },
     "swing": {
       "ready": "Vung Đòn",
@@ -853,6 +938,7 @@ export const vi_VN: EnTranslations = {
       "jump": "Nhảy",
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
+      "wocMarket": "Exchange",
       "deeds": "Kỳ Công",
       "mounts": "Thú Cưỡi",
       "professions": "Nghề nghiệp",
@@ -866,11 +952,52 @@ export const vi_VN: EnTranslations = {
       "actionRing": "Hành động chiến đấu",
       "actionPageToggle": "Chuyển trang hành động",
       "actionPageIndicator": "Trang {page}",
+      "actionRadial": "Action directions",
+      "actionRadialCancel": "Cancel action",
+      "radialCenter": "Centre",
+      "radialUp": "Up",
+      "radialRight": "Right",
+      "radialDown": "Down",
+      "radialLeft": "Left",
+      "consumableSeat": "Consumables",
+      "menuControl": "Menus",
+      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
+      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "menuLabel": "Menu",
+      "quickActions": "Quick Actions",
+      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
+      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
+      "quickActionsLabel": "Actions",
+      "stanceRadial": "Stances",
+      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
+      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
+      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
+      "questStripAriaSingle": "Tracked quest: {title}",
+      "questStripCounter": "{position}/{total}",
+      "questStripMore": "+{count} more",
       "targetCycle": "Hoán đổi mục tiêu",
       "targetCycleShort": "Mục tiêu",
       "spellbookPageLabel": "Trang {page}",
       "hideKeyboard": "Ẩn bàn phím",
-      "chatPlaceholder": "Nói gì đó..."
+      "chatPlaceholder": "Nói gì đó...",
+      "barEditor": "Edit Bars",
+      "barEditorAria": "Edit the action bar layout"
+    },
+    "barEditor": {
+      "title": "Edit Action Bar",
+      "close": "Close bar editor",
+      "pages": "Action bar pages",
+      "pageTab": "Page {page}",
+      "buttonHeader": "Button {button}",
+      "cellAria": "Button {button}, {direction}: {action}",
+      "emptyCellAria": "Button {button}, {direction}: empty",
+      "hint": "Tap a slot, then another, to swap them.",
+      "armed": "Tap a slot to place {name}.",
+      "picked": "Tap another slot to swap with {name}.",
+      "locked": "Action bars are locked in Interface options.",
+      "clear": "Clear",
+      "clearAria": "Clear a slot",
+      "clearArmed": "Tap a slot to clear it."
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -953,6 +1080,22 @@ export const vi_VN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Tầng Hầm",
+        "state": "Tầng Nghi Lễ",
+        "residence": "Tầng Sinh Hoạt",
+        "tower": "Tháp Canh"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Tầng Vườn",
+        "solar": "Phòng Nắng"
+      }
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -970,6 +1113,7 @@ export const vi_VN: EnTranslations = {
       "seconds": "{s}g",
       "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc.",
       "threatFallback": "Không có dữ liệu đe dọa trực tiếp: đang hiển thị sát thương gây cho {name}",
+      "threatFrozen": "Mức đe dọa cuối cùng với {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Khác ({count})",
@@ -1367,6 +1511,10 @@ export const vi_VN: EnTranslations = {
       "showWalletOnCharacterScreen": "Hiện Ví Tiền Ở Màn Hình Nhân Vật",
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
       "showPlaytime": "Hiện Thời Gian Chơi Ở Màn Hình Nhân Vật",
+      "forceHighPerfGpu": "Dùng Card Đồ Họa Chơi Game",
+      "forceHighPerfGpuNote": "Mặc định bật: ứng dụng máy tính yêu cầu máy này dùng card đồ họa chơi game của nó. Hãy tắt tùy chọn này nếu trò chơi không khởi động được, mở ra màn hình đen, hoặc màn hình laptop bị tối đen. Có hiệu lực vào lần khởi động trò chơi tiếp theo.",
+      "discordPresence": "Hoạt Động Discord",
+      "discordPresenceNote": "Hiển thị vùng bạn đang ở và thời gian bạn đã chơi trong phiên chơi này dưới dạng hoạt động Discord của bạn, và bất kỳ ai xem được hồ sơ Discord của bạn đều thấy được cả hai. Chỉ tên vùng, thời gian phiên chơi của bạn, và tên trò chơi được chia sẻ, không bao giờ là nhân vật, tài khoản, hay những ai bạn đang chơi cùng. Cần ứng dụng Discord đang chạy trên máy tính này.",
       "showDevBadges": "Hiện Huy Hiệu Nhà Phát Triển",
       "showOwnNameplate": "Hiện Bảng Tên Của Tôi",
       "showPlayerNameplates": "Hiện Bảng Tên Người Chơi",
@@ -1382,6 +1530,7 @@ export const vi_VN: EnTranslations = {
       "mouseoverCast": "Thi Triển Khi Rê Chuột Trên Khung Tổ Đội",
       "stickyTarget": "Giữ Mục Tiêu Khi Nhấp Đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
+      "showReliquaryTracker": "Hiển thị Trình theo dõi Thánh tích",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
@@ -1394,7 +1543,9 @@ export const vi_VN: EnTranslations = {
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
-      "mobileLeftHanded": "Bố cục thuận tay trái"
+      "mobileLeftHanded": "Bố cục thuận tay trái",
+      "touchTapMenus": "Tap menus",
+      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
     "talentRows": {
       "tab": "Lựa chọn",
@@ -1427,9 +1578,29 @@ export const vi_VN: EnTranslations = {
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",
       "menuAction": "Menu Trò Chơi",
+      "confirmAction": "Xác nhận/Chọn",
       "zoomIn": "Phóng To",
       "zoomOut": "Thu Nhỏ",
-      "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình."
+      "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình.",
+      "crossHotbar": "Thanh nóng chéo",
+      "crossHotbarEnable": "Kích hoạt Cross Hotbar",
+      "crossHotbarExpand": "Thanh nóng đôi chéo",
+      "crossHotbarHelp": "Giữ nút kích hoạt để thắp sáng tám khe thanh hành động trên các nút d-pad và mặt. Nhấn vào nút kích hoạt khác để chuyển sang bộ thứ hai.",
+      "crossHotbarResetLayout": "Đặt lại thanh nóng chéo",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "Bộ kích hoạt và d-pad thuộc về thanh hotbar chéo khi nó được bật, vì vậy chúng được thiết lập bên dưới chứ không phải ở đây.",
+      "cancelAction": "Hủy / Quay lại",
+      "subcommandsAction": "Lệnh phụ / Bản đồ",
+      "cycleHudAction": "Giao diện chu trình",
+      "cycleSetAction": "Thay đổi bộ thanh nóng",
+      "crossHotbarDisplay": "Hiển thị thanh",
+      "crossHotbarDisplayFull": "Đầy",
+      "crossHotbarDisplayCompact": "Nhỏ gọn",
+      "crossHotbarDisplayMinimal": "Chỉ khi được giữ",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Mang {action}: xác nhận vào một ô để đặt nó, hủy để đặt lại.",
+      "crossHotbarEditHint": "Sắp xếp: xác nhận nhặt từ một ô hoặc sổ chính tả và thả vào một ô, hủy xóa một ô.",
+      "crossHotbarEditHelp": "Giữ cản trái và nhấn nút mặt trên để sắp xếp thanh với bộ điều khiển."
     },
     "perf": {
       "title": "Lớp Phủ Hiệu Năng",
@@ -1548,6 +1719,7 @@ export const vi_VN: EnTranslations = {
           "render": "kết xuất  gửi {submit} ms | thế giới {world} ms | thực thể {entities} ms",
           "scene": "cảnh   {calls} lệnh vẽ | {triangles} tam giác | {views} khung nhìn",
           "hitches": "khựng hình {hitches} | shader {shaders} | tải lên {uploads} | khung nhìn {views}",
+          "hitchesBuild": "xây dựng khu vực {zoneBuilds} | ngoài khung {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "đang chờ"
         },
@@ -1599,7 +1771,10 @@ export const vi_VN: EnTranslations = {
             "eventCpu": "Xử lý sự kiện đang chiếm dụng khung hình",
             "shaderCompile": "Shader đang biên dịch trong lúc chơi",
             "textureUpload": "Tải Vân Bề Mặt lên đang gây khựng hình lối chơi",
+            "zoneBuild": "Xây dựng phát trực tuyến theo vùng đang gây trở ngại",
             "viewCreate": "Việc tạo khung nhìn thực thể đang gây khựng hình",
+            "gcHitch": "Bộ sưu tập rác đang chạy bên trong khung dài",
+            "offFrameHitch": "Các khung hình dài đến từ công việc bên ngoài lệnh gọi lại kết xuất",
             "otherHitch": "Vẫn còn khung hình dài chưa xác định được nguyên nhân",
             "assetStartup": "Khởi động trò chơi bị trì hoãn bởi việc xử lý tài nguyên",
             "longTasks": "Các tác vụ dài của trình duyệt đang chặn khung hình",
@@ -1739,6 +1914,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughHonor": "Không đủ danh dự.",
       "reasons": {
         "arenaWin": "Chiến thắng đấu trường",
+        "arenaComplete": "Đã đấu trận đấu trường",
         "fiestaKill": "Hạ gục trong Fiesta",
         "fiestaComplete": "Fiesta đã hoàn thành",
         "fiestaWin": "Chiến thắng Fiesta",
@@ -1845,6 +2021,7 @@ export const vi_VN: EnTranslations = {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
     },
     "itemHeroicTag": "[ANH HÙNG]",
+    "itemHeroicLabel": "Anh Hùng",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
     "itemUniqueEquipped": "Độc Nhất Khi Trang Bị",
     "itemSet": {
@@ -1881,6 +2058,18 @@ export const vi_VN: EnTranslations = {
         "few": "bạn là {rank}, {count} thành viên",
         "many": "bạn là {rank}, {count} thành viên",
         "other": "bạn là {rank}, {count} thành viên"
+      },
+      "wocMarketSellChoose": {
+        "one": "Choose from {count} item",
+        "few": "Choose from {count} items",
+        "many": "Choose from {count} items",
+        "other": "Choose from {count} items"
+      },
+      "wocTradeIneligible": {
+        "one": "{count} staged item cannot be sold for $WOC.",
+        "few": "{count} staged items cannot be sold for $WOC.",
+        "many": "{count} staged items cannot be sold for $WOC.",
+        "other": "{count} staged items cannot be sold for $WOC."
       },
       "finderPartySize": {
         "one": "{count} người chơi",
@@ -2016,6 +2205,10 @@ export const vi_VN: EnTranslations = {
       "errPasswordLong": "Mật khẩu mới phải có nhiều nhất 128 ký tự.",
       "errPasswordUnchanged": "Mật khẩu mới phải khác với mật khẩu hiện tại.",
       "errPasswordConfirm": "Mật khẩu mới không khớp.",
+      "setPasswordTitle": "Đặt mật khẩu",
+      "setPasswordHint": "Tài khoản này được tạo bằng Đăng nhập bằng Apple hoặc Discord và chưa có mật khẩu. Đặt một thiết bị để đăng nhập trên các thiết bị khác, chẳng hạn như ứng dụng máy tính để bàn Mac và Windows hoặc web và để liên kết các phương thức đăng nhập bổ sung.",
+      "setPasswordSubmit": "Đặt mật khẩu",
+      "passwordSet": "Đã đặt mật khẩu. Bây giờ bạn có thể đăng nhập bằng tên người dùng và mật khẩu của mình ở bất cứ đâu.",
       "emailLabel": "Email (tùy chọn)",
       "emailHint": "Chỉ dùng để khôi phục tài khoản. Dùng Đổi Email bên dưới để cập nhật.",
       "saveEmail": "Lưu Email",
@@ -2199,6 +2392,10 @@ export const vi_VN: EnTranslations = {
       "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
       "itemAriaQuest": "{item}, số lượng {count}, vật phẩm nhiệm vụ",
+      "itemAriaLocked": "{item}, số lượng {count}, đã khóa",
+      "itemLockedLine": "Đã khóa",
+      "lockItem": "Khóa vật phẩm",
+      "unlockItem": "Mở khóa vật phẩm",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",
@@ -2453,12 +2650,14 @@ export const vi_VN: EnTranslations = {
     },
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",
-      "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng"
+      "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng",
+      "assignAria": "Choose a slot for {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "VắngMặt"
+      "afkTag": "VắngMặt",
+      "cheaterTag": "< Kẻ Gian Lận >"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -3224,11 +3423,13 @@ export const vi_VN: EnTranslations = {
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(tiêu tốn {count} hảo hạng)",
+      "craftFeeLine": "Craft fee: {fee} each",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
       "craftedToastQty": "Đã chế tác: {name} x{qty}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
+      "reagentLocked": "Một nguyên liệu cho việc đó đã bị khóa.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
       "comboRequires": "Thụ ngộ: {craftA} + {craftB}, bậc {tier}.",
@@ -3335,6 +3536,7 @@ export const vi_VN: EnTranslations = {
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
       "notSalvageable": "Bạn không thể tháo dỡ vật phẩm đó.",
+      "salvageLocked": "Vật phẩm đó đã bị khóa.",
       "disenchantBusy": "Bạn đang bận.",
       "salvageBusy": "Bạn đang bận.",
       "enchantBusy": "Bạn đang bận.",
@@ -3710,6 +3912,9 @@ export const vi_VN: EnTranslations = {
       "pinFull": "Bảng theo dõi đã đầy (tối đa {cap} trang)",
       "pinAria": "Ghim {name} vào bảng theo dõi trên giao diện",
       "unpinAria": "Bỏ ghim {name}",
+      "trackerToggleLabel": "Trình theo dõi HUD",
+      "trackerToggleShowHint": "Hiển thị trình theo dõi Thánh tích trên màn hình của bạn",
+      "trackerToggleHideHint": "Ẩn trình theo dõi Thánh tích khỏi màn hình của bạn",
       "rarityLine": "{percent} nhà sưu tầm đã tìm thấy",
       "pageRarityLine": "{percent} nhà sưu tầm đã làm rực sáng",
       "cellAriaWithRarity": "{base}, {rarity}",
@@ -3770,6 +3975,7 @@ export const vi_VN: EnTranslations = {
       "unlockedBorderHint": "Đã nhận viền mới: {name}. Hãy đeo nó từ Sách Kỳ Công.",
       "broadcastLine": "{name} vừa lập một kỳ công: {deed}",
       "rarityLine": "Đã có {percent} nhà phiêu lưu lập được",
+      "stillToVisit": "Still to visit: {places}",
       "trackerLabel": "Kỳ Công",
       "collapseHint": "Thu gọn bảng theo dõi kỳ công",
       "expandHint": "Mở rộng bảng theo dõi kỳ công",
@@ -3797,6 +4003,220 @@ export const vi_VN: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Yêu cầu Cấp {level}"
+    },
+    "walletBridge": {
+      "cancelled": "The wallet request was cancelled. Nothing was sent.",
+      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
+      "notConnected": "Connect and verify a wallet, then try again.",
+      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
+      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
+      "badResponse": "Your wallet returned an unusable answer. Try again."
+    },
+    "wocMarket": {
+      "title": "$WOC Exchange",
+      "close": "Close the Exchange",
+      "launcherLabel": "$WOC Exchange",
+      "tabBrowse": "Browse",
+      "tabSell": "Sell",
+      "tabActivity": "My Activities",
+      "tabsLabel": "$WOC Exchange sections",
+      "loading": "Loading the Exchange...",
+      "loadFailed": "The Exchange could not be reached. Try again shortly.",
+      "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
+      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
+      "walletBannerCta": "Connect wallet",
+      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
+      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
+      "browseEmpty": "No listings right now. Check back soon.",
+      "browseError": "Listings could not be loaded.",
+      "colItem": "Item",
+      "colSeller": "Seller",
+      "colCurrentBid": "Current bid",
+      "colBuyNow": "Buy now",
+      "colTimeLeft": "Time left",
+      "reserveMet": "Reserve met",
+      "reserveNotMet": "Reserve not met",
+      "yourListing": "Your listing",
+      "buyNowLockedBadge": "Purchase in progress",
+      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
+      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
+      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
+      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
+      "pagePrev": "Previous page",
+      "pageNext": "Next page",
+      "pageNumber": "Page {current}",
+      "sortLabel": "Sort",
+      "sortEnding": "Ending soonest",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: low to high",
+      "sortPriceDesc": "Price: high to low",
+      "filterQuality": "Quality",
+      "filterFormat": "Format",
+      "filterAny": "Any",
+      "filterFormatAuction": "Auction",
+      "filterFormatBuyNow": "Buy now",
+      "filterItemLabel": "Item",
+      "filterItemPlaceholder": "Search by item name",
+      "filterCategory": "Category",
+      "filterCategoryWeapon": "Weapons",
+      "filterCategoryArmor": "Armor",
+      "filterCategoryMount": "Mounts",
+      "filterSubcategory": "Type",
+      "sellerLinkAria": "View recent trades by {name}",
+      "sellerTitle": "Recent trades by {name}",
+      "sellerBack": "Back to Browse",
+      "sellerEmpty": "No completed trades yet.",
+      "sellerError": "Recent trades could not be loaded.",
+      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
+      "detailTitle": "Listing",
+      "detailSeller": "Sold by {name}",
+      "detailEndsAt": "Ends {utc} UTC ({local} local)",
+      "detailStartingBid": "Starting bid: {usd}",
+      "detailCurrentBid": "Current bid: {usd}",
+      "detailNoBids": "No bids yet",
+      "detailMinNext": "Minimum next bid: {usd}",
+      "detailBuyNow": "Buy now: {usd}",
+      "detailSales": "Recent sales",
+      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
+      "detailNoSales": "No recorded sales for this item yet.",
+      "detailSalesLoading": "Loading recent sales...",
+      "bidLabel": "Your bid (USD)",
+      "bidPlaceholder": "Enter a USD amount",
+      "bidButton": "Place bid",
+      "bidAria": "Place a bid on {item}",
+      "bidTermsToggle": "Bid terms",
+      "rowOpenAria": "View the listing for {item}",
+      "buyNowButton": "Buy now for {usd}",
+      "buyNowAria": "Buy {item} now for {usd}",
+      "cancelButton": "Cancel listing",
+      "cancelAria": "Cancel your listing of {item}",
+      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
+      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
+      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
+      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
+      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
+      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
+      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
+      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
+      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
+      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
+      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
+      "termsLabel": "I accept the Marketplace terms.",
+      "termsLink": "View the Marketplace terms (opens in a new tab)",
+      "quoteTitle": "Confirm payment",
+      "quoteTotal": "Total: {tokens} $WOC",
+      "quoteSeller": "Seller receives: {tokens} $WOC",
+      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
+      "quoteTreasury": "To the game treasury: {tokens} $WOC",
+      "quoteExpires": "Quote expires in {duration}",
+      "quoteExpiresAt": "Quote expires at {time}.",
+      "quoteExpired": "The quote expired. Request a fresh one.",
+      "quoteSign": "Sign and pay",
+      "quoteRefresh": "New quote",
+      "quoteCancel": "Not now",
+      "quoteBondFor": "Refundable bid bond: {usd}",
+      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
+      "quoteSettlementFor": "Settlement for {item}: {usd}",
+      "paymentDueAt": "Payment is due by {time}.",
+      "signing": "Waiting for your wallet...",
+      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
+      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
+      "confirming": "Confirming on chain...",
+      "listing": "Listing your item...",
+      "activityCancelPending": "Cancel pending",
+      "activityDirected": "Directed sale",
+      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
+      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
+      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
+      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
+      "listingCreated": "Your listing is live.",
+      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
+      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
+      "sellTitle": "Create a listing",
+      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
+      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
+      "sellCollectiblesMounts": "Mounts can also be listed.",
+      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
+      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
+      "sellSearchPlaceholder": "Type to filter your bags",
+      "sellClear": "Clear {item} and choose another",
+      "sellChoose": "Item to list",
+      "sellNoMatches": "No items match that search",
+      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "sellFormat": "Format",
+      "sellFormatAuction": "Auction",
+      "sellFormatBuyNow": "Buy now only",
+      "sellFormatAuctionBuyNow": "Auction with buy now",
+      "sellStart": "Starting bid (USD)",
+      "sellReserve": "Reserve (USD, optional)",
+      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
+      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
+      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
+      "sellBuyNowPrice": "Buy-now price (USD)",
+      "sellDuration": "Duration",
+      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
+      "sellSubmit": "List item",
+      "sellSubmitAria": "List {item} on the Exchange",
+      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
+      "activityListings": "My listings",
+      "activityBids": "My bids",
+      "activitySettlements": "My settlements",
+      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
+      "activityNoListings": "You have no listings.",
+      "activityNoBids": "You have no bids.",
+      "activityNoSettlements": "You have no settlements.",
+      "activityPayNow": "Pay now",
+      "activityPayNowAria": "Pay for settlement {id} now",
+      "activityPayNowItemAria": "Pay {usd} for {item} now",
+      "activityDeadline": "Payment due in {duration}",
+      "dueAt": "Due {utc} UTC ({local} local)",
+      "activityStrikes": "Marketplace strikes: {count}",
+      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
+      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
+      "bidStatusPending": "Awaiting bond",
+      "bidStatusActive": "High bidder",
+      "bidStatusOutbid": "Outbid",
+      "bidStatusLapsed": "Lapsed",
+      "bidStatusWon": "Won",
+      "bidStatusDefaulted": "Defaulted",
+      "bidStatusCancelled": "Cancelled",
+      "bidBondPay": "Pay bond",
+      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
+      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
+      "settlementOffered": "Payment due",
+      "settlementConfirming": "Confirming",
+      "settlementConfirmedDelivering": "Payment confirmed, delivering",
+      "settlementReview": "Payment under review",
+      "settlementDelivered": "Delivered",
+      "settlementExpired": "Expired unpaid",
+      "settlementFailed": "Payment failed",
+      "settlementFailBurnMissing": "The payment did not include the required token burn.",
+      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
+      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
+      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
+      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
+      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
+      "settlementFailRefunded": "This payment was returned to your wallet.",
+      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
+      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
+      "settlementFailGeneric": "This payment could not be completed.",
+      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
+      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
+      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
+      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
+      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
+      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
+      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
+      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
+      "listingStatusActive": "Active",
+      "listingStatusSettling": "Awaiting payment",
+      "listingStatusSold": "Sold",
+      "listingStatusReturned": "Returned",
+      "listingStatusCancelled": "Cancelled",
+      "listingStatusSuspended": "Suspended",
+      "listingStatusUnsold": "Unsold"
     }
   },
   "gatherEvent": {
@@ -3846,7 +4266,8 @@ export const vi_VN: EnTranslations = {
       "password_too_long": "Mật khẩu mới phải có tối đa 128 ký tự.",
       "characters_online": "Hãy đăng xuất tất cả nhân vật của bạn trước khi vô hiệu hóa tài khoản.",
       "deactivated": "Tài khoản này đã bị vô hiệu hóa. Hãy liên hệ quản trị viên để khôi phục.",
-      "not_found": "Không tìm thấy tài khoản."
+      "not_found": "Không tìm thấy tài khoản.",
+      "password_already_set": "Tài khoản này đã có mật khẩu. Thay vào đó hãy sử dụng Thay đổi mật khẩu."
     },
     "character": {
       "name_invalid": "Tên nhân vật không hợp lệ. Dùng 2-16 chữ cái.",
@@ -3928,6 +4349,61 @@ export const vi_VN: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token đó đã được nhận rồi.",
       "entitlement_required": "Cần có quyền lợi Seeker đã được xác minh.",
       "current_ownership_required": "Bạn phải đang sở hữu Seeker Genesis Token."
+    },
+    "cheater_mark": {
+      "admin_target": "Không thể đánh dấu tài khoản điều hành.",
+      "reason_required": "Bắt buộc phải nhập lý do.",
+      "invalid_duration": "Nhập thời hạn đánh dấu ít nhất một giây.",
+      "not_marked": "Tài khoản đó chưa bị đánh dấu."
+    },
+    "woc_market": {
+      "invalid_input": "Invalid input.",
+      "disabled": "The $WOC Exchange is not available on this realm.",
+      "paused": "Exchange trading is paused. Auctions keep counting down.",
+      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
+      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
+      "self_offer": "You cannot send a $WOC offer to yourself.",
+      "offer_expired": "That $WOC offer expired. Ask for a new one.",
+      "terms_required": "Accept the Marketplace terms to continue.",
+      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
+      "totp_invalid": "That two-factor code did not verify. Try again.",
+      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
+      "character_invalid": "Play the character you are listing from, and try again.",
+      "not_found": "That Exchange entry no longer exists.",
+      "not_yours": "That Exchange entry no longer exists.",
+      "not_active": "That listing is no longer open for this action.",
+      "own_listing": "You cannot bid on or buy your own listing.",
+      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
+      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
+      "already_pending": "Confirm or abandon your pending bid on this listing first.",
+      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
+      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
+      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
+      "not_pending": "That bid is no longer awaiting its bond.",
+      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
+      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
+      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
+      "cancel_pending": "The seller is cancelling this listing.",
+      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
+      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
+      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
+      "contended": "The Exchange is busy with this listing. Try again in a moment.",
+      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
+      "no_buy_now": "This listing has no buy-now price.",
+      "cap_reached": "You have reached your Exchange listing limit.",
+      "stale_item": "That item changed or moved. Re-select it and try again.",
+      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
+      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
+      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
+      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
+      "signature_reused": "That transaction was already submitted.",
+      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
+      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
+      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
+      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
+      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
+      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
+      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
   "guide": {
@@ -4304,6 +4780,7 @@ export const vi_VN: EnTranslations = {
       "ifHighContrastBackground": "Một nền đơn giản hơn, tương phản cao hơn phía sau màn hình khởi động và màn hình nhân vật.",
       "ifInvertLookY": "Đảo ngược hướng lên xuống khi nhìn bằng chuột.",
       "ifShowItemLevel": "Thêm một dòng cấp vật phẩm vào mọi chú thích vật phẩm. Mặc định tắt, giữ nguyên chú thích cổ điển chỉ hiện chỉ số.",
+      "ifShowReliquaryTracker": "Trình theo dõi Thánh tích (các trang được ghim của bạn và tiến trình của chúng) có nằm trên HUD của bạn hay không. Cửa sổ Thánh tích có nút mắt phù hợp và việc ghim một trang sẽ bật lại trình theo dõi.",
       "ifShowPlaytime": "Hiện tổng thời gian chơi trọn đời trên bảng nhân vật. Mặc định bật, và bảng nhân vật có một nút hình con mắt để bật/tắt riêng theo từng thiết bị, tiện lợi nếu bạn livestream hoặc chụp ảnh màn hình. Tổng thời gian vẫn tiếp tục được tính dù bật hay tắt.",
       "ifShowOwnNameplate": "Vẽ bảng tên phía trên đầu của chính bạn giống hệt như cách người chơi khác nhìn thấy, đầy đủ mọi điểm nhấn. Tắt đi để có góc nhìn cổ điển.",
       "ifShowPlayerNameplates": "Vẽ bảng tên của người chơi khác. Tắt đi giúp một khu trung tâm đông đúc bớt rối mắt, và mục tiêu hiện tại của bạn vẫn luôn đọc được dù có bật hay không.",
@@ -4735,6 +5212,7 @@ export const vi_VN: EnTranslations = {
       "mageEleJet": "Tia Nước nằm trên thanh thú cưng như một nút bấm riêng: nhấp vào đó để khóa một luồng tia lạnh lên một kẻ địch, hoặc nhấp chuột phải (chạm và giữ trên di động) để nguyên tố tự động tung chiêu bất cứ khi nào nó sẵn sàng.",
       "formsHeading": "Biến Hình",
       "formsNote": "Druid chiến đấu bằng cách đổi hình dạng. Hầu hết kỹ năng của Druid thuộc về một hình dạng riêng, nên hình bạn đang mang quyết định bạn có thể thi triển gì, và việc đổi hình tốn một chút mana. Bạn có thể đổi hình trong hoặc ngoài chiến đấu, bao nhiêu lần tùy thích.",
+      "formsAutoUnshift": "Một phép hồi máu hoặc phép gây sát thương thi triển khi đang ở dạng thú sẽ tự đưa bạn ra khỏi dạng đó. Rời dạng theo cách này miễn phí và không tốn hồi chiêu toàn cục, nên phép tức thời phát ra ngay khi bạn bấm. Vào lại dạng là một kỹ năng bình thường, vẫn tốn mana và hồi chiêu toàn cục.",
       "formsMoonwing": "Một Druid Moongrove có thêm một hình dạng nữa, Dạng Cú Mặt Trăng, hình dạng pháp thuật mà một Druid Cân Bằng chiến đấu trong đó. Đây là hình thú duy nhất giữ lại các phép của bạn, và đũa phép của bạn chỉ dùng được trong hình đó hoặc trong hình pháp sư bình thường.",
       "formLine": {
         "form_bear": "Dạng gánh chịu đòn: một lớp da dày, dùng Nộ Khí thay vì Mana, và tạo thêm đe dọa để kẻ địch luôn nhắm vào bạn.",
@@ -6544,6 +7022,7 @@ export const vi_VN: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "emailError": "Vui lòng nhập một địa chỉ email hợp lệ.",
+    "marketingOptIn": "Gửi cho tôi tin tức và cập nhật trò chơi qua email (tùy chọn)",
     "showPassword": "Hiện mật khẩu",
     "hidePassword": "Ẩn mật khẩu",
     "logIn": "Đăng Nhập",
@@ -6644,6 +7123,19 @@ export const vi_VN: EnTranslations = {
     "style": "Kiểu Dáng",
     "resetLook": "Đặt Lại Diện Mạo",
     "resetShort": "Đặt Lại",
+    "shareTab": "Chia sẻ",
+    "designCode": "Mã ngoại hình",
+    "designCodeHint": "Sao chép mã này để lưu hoặc chia sẻ ngoại hình. Dán mã vào đây rồi nhập để tải ngoại hình.",
+    "copyCode": "Sao chép mã",
+    "importCode": "Nhập",
+    "designCodeCopied": "Đã sao chép mã ngoại hình.",
+    "designCodeCopyManual": "Tính năng tự động sao chép bị chặn tại đây. Mã đã được chọn; hãy dùng bàn phím để sao chép.",
+    "designCodeImported": "Đã nhập ngoại hình.",
+    "designCodeImportedPartial": "Đã nhập ngoại hình. Những giá trị mà phiên bản này không nhận diện được đã bị bỏ qua.",
+    "designCodeErrEmpty": "Trước tiên, hãy dán mã ngoại hình.",
+    "designCodeErrHeader": "Nội dung đó không giống mã ngoại hình.",
+    "designCodeErrVersion": "Mã ngoại hình đó đến từ phiên bản trò chơi mới hơn.",
+    "designCodeErrMalformed": "Mã ngoại hình đó bị hỏng. Hãy sao chép toàn bộ mã rồi thử lại.",
     "browFlat": "Thẳng",
     "browArched": "Cong",
     "browThin": "Mảnh",
@@ -7039,6 +7531,7 @@ export const vi_VN: EnTranslations = {
       "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
       "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
       "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",
+      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
       "levelGate": "Chỉ những nhà thám hiểm cấp độ {level} trở lên mới có thể vào Rạn Nứt này.",
       "deadEntry": "Bạn không thể vào Rạn Nứt khi đang chết.",
       "deadEntryCombat": "Nhóm của bạn vẫn đang trong giao tranh. Người đã chết có thể vào lại khi trận chiến kết thúc.",
@@ -7138,6 +7631,7 @@ export const vi_VN: EnTranslations = {
       "shopMarksRequired": "Bạn cần {marks} Dấu Ấn Thám Hiểm để mua {name}.",
       "shopSealPremiumOnly": "Dấu niêm này chỉ chịu khuất phục trước bàn tay bậc thầy. Chỉ có mức cược Cao Cấp mới mở được nó.",
       "passageSealed": "Lối đi đã bị niêm phong.",
+      "enemiesRemain": "Hãy đánh bại những kẻ địch còn lại trước.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
       "moveCloserReliquary": "Hãy lại gần hộp thánh tích hơn.",
@@ -7760,7 +8254,15 @@ export const vi_VN: EnTranslations = {
       "readyBody": "Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
       "restart": "Khởi động lại ngay",
       "later": "Để sau",
-      "dismiss": "Bỏ Qua"
+      "dismiss": "Bỏ Qua",
+      "whatsNew": "Xem những gì đã thay đổi trong trình duyệt của bạn"
+    },
+    "notify": {
+      "updateReadyTitle": "Bản cập nhật {version} đã sẵn sàng",
+      "updateReadyTitleNoVersion": "Bản cập nhật đã sẵn sàng",
+      "updateReadyBody": "Khởi động lại World of ClaudeCraft để áp dụng bản cập nhật.",
+      "partyInviteTitle": "Lời mời tổ đội",
+      "partyInviteBody": "{name} đã mời bạn gia nhập tổ đội của họ."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7768,10 +8270,14 @@ export const vi_VN: EnTranslations = {
       "reload": "Tải lại",
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
+    },
+    "titlebar": {
+      "exitGame": "Thoát trò chơi"
     }
   },
   "gpuNotice": {
     "bodyDesktop": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.",
+    "bodyDiscreteInactive": "Trò chơi hiện không dùng card đồ họa chơi game mà đang chạy trên GPU tích hợp (tiết kiệm điện), nên hiệu năng sẽ giảm sút. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, cũng hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.",
     "bodyWeb": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, sau đó khởi động lại trình duyệt.",
     "hybridBodyWindows": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, hãy đặt trình duyệt thành Hiệu năng cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa, rồi khởi động lại trình duyệt. Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
     "hybridBodyLinux": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, trình duyệt hoặc trình điều khiển đồ họa của bạn có thể có tùy chọn chọn GPU riêng, hoặc bản phân phối Linux của bạn có thể cung cấp công cụ chuyển GPU (như PRIME hoặc optimus-manager). Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
@@ -7995,7 +8501,111 @@ export const vi_VN: EnTranslations = {
       "zoomIn": "Phóng to",
       "zoomOut": "Thu nhỏ",
       "mapCanvasLabel": "Bản Đồ",
-      "mapSummary": "Bản đồ của {zone}."
+      "mapSummary": "Bản đồ của {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Không thấy dấu mốc quan trọng nào.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "Thêm {count} dấu mốc.",
+      "mapMarkerDirections": {
+        "center": "chính giữa",
+        "north": "phía bắc",
+        "northeast": "đông bắc",
+        "east": "phía đông",
+        "southeast": "đông nam",
+        "south": "phía nam",
+        "southwest": "tây nam",
+        "west": "phía tây",
+        "northwest": "tây bắc"
+      },
+      "mapMarkerDistances": {
+        "near": "gần",
+        "medium": "cách một khoảng vừa phải",
+        "far": "xa"
+      },
+      "mapMarkerLabels": {
+        "you": "Bạn",
+        "availableQuest": "Nhiệm vụ khả dụng",
+        "readyQuest": "Nhiệm vụ sẵn sàng nộp",
+        "repeatQuest": "Nhiệm vụ lặp lại",
+        "cooldownQuest": "Nhiệm vụ đang trong thời gian hồi",
+        "questObjective": "Khu vực mục tiêu nhiệm vụ",
+        "readyOre": "Mạch quặng sẵn sàng",
+        "readyWood": "Cụm cây gỗ sẵn sàng",
+        "readyHerb": "Khóm thảo dược sẵn sàng",
+        "readyLockedOre": "Mạch quặng sẵn sàng, dụng cụ chưa mở khóa",
+        "readyLockedWood": "Cụm cây gỗ sẵn sàng, dụng cụ chưa mở khóa",
+        "readyLockedHerb": "Khóm thảo dược sẵn sàng, dụng cụ chưa mở khóa",
+        "cooldownOre": "Mạch quặng đã cạn",
+        "cooldownWood": "Cụm cây gỗ đã khai thác",
+        "cooldownHerb": "Khóm thảo dược đã hái",
+        "cooldownLockedOre": "Mạch quặng đã cạn, dụng cụ chưa mở khóa",
+        "cooldownLockedWood": "Cụm cây gỗ đã khai thác, dụng cụ chưa mở khóa",
+        "cooldownLockedHerb": "Khóm thảo dược đã hái, dụng cụ chưa mở khóa",
+        "station": "Trạm chế tác: {name}",
+        "service": "Dịch vụ: {name}",
+        "partyMember": "Thành viên tổ đội: {name}",
+        "deadPartyMember": "Thành viên tổ đội đã chết: {name}",
+        "partyMemberGeneric": "Thành viên tổ đội",
+        "deadPartyMemberGeneric": "Thành viên tổ đội đã chết",
+        "friend": "Bạn bè: {name}",
+        "guildMember": "Thành viên bang hội: {name}",
+        "pointOfInterest": "Điểm đáng chú ý: {name}",
+        "dungeonEntrance": "Lối vào hầm ngục: {name}",
+        "dungeonExit": "Lối ra hầm ngục",
+        "delveEntrance": "Lối vào hang sâu: {name}",
+        "worldPassage": "Lối sang {zone}",
+        "riftEntrance": "Lối vào Rạn Nứt: {name}",
+        "hostileEnemy": "Kẻ địch",
+        "aggressiveEnemy": "Kẻ địch đang tấn công bạn",
+        "lootableEnemy": "Kẻ địch có chiến lợi phẩm",
+        "corpse": "Thi thể của bạn",
+        "deathZone": "Vùng nguy hiểm",
+        "teammate": "Đồng đội",
+        "deadTeammate": "Đồng đội đã chết",
+        "flagCarrier": "Đồng đội đang cầm cờ",
+        "ownFlagStand": "Bệ cờ của bạn",
+        "enemyFlagStand": "Bệ cờ địch",
+        "riftDescent": "Lối xuống Rạn Nứt",
+        "riftReturnBeacon": "Đèn hiệu trở về",
+        "riftReturnExit": "Lối ra để trở về",
+        "ranked": "{marker}, hạng {rank}",
+        "riftTreasureAvailable": "Kho báu sẵn sàng",
+        "riftTreasureLocked": "Kho báu bị khóa",
+        "riftTreasureOpened": "Kho báu đã mở",
+        "riftTreasureJammed": "Khóa kho báu bị kẹt",
+        "riftCacheAvailable": "Rương Rạn Nứt sẵn sàng",
+        "riftCacheLocked": "Rương bị khóa",
+        "riftCacheOpened": "Rương đã mở",
+        "riftCacheJammed": "Khóa rương bị kẹt",
+        "pylonUnlit": "Trụ rune chưa sáng",
+        "pylonLit": "Trụ rune đã sáng",
+        "sequenceRuneUnlit": "Rune trình tự chưa sáng",
+        "sequenceRuneLit": "Rune trình tự đã sáng",
+        "iceGoal": "Mục tiêu băng",
+        "boulderPad": "Đích đến của tảng đá",
+        "boulderMovable": "Tảng đá có thể di chuyển",
+        "boulderPlaced": "Tảng đá đã vào vị trí",
+        "gateSealed": "Cổng bị niêm phong",
+        "gateOpen": "Cổng mở",
+        "switchReady": "Công tắc sẵn sàng",
+        "switchOn": "Công tắc đã kích hoạt",
+        "orbDormant": "Quả cầu ngủ yên",
+        "orbActive": "Quả cầu đang hoạt động",
+        "rollerHazard": "Tảng đá lăn nguy hiểm",
+        "delvePassageSealed": "Lối đi bị niêm phong",
+        "delvePassageOpen": "Lối đi mở",
+        "delveSurfaceExit": "Lối ra mặt đất",
+        "delveCacheLocked": "Rương hang sâu bị khóa",
+        "delveCacheReady": "Rương hang sâu sẵn sàng",
+        "delveCacheActive": "Rương hang sâu đang hoạt động",
+        "delveCacheOpened": "Rương hang sâu đã mở",
+        "delveReliquaryLocked": "Hộp thánh tích bị khóa",
+        "delveReliquaryReady": "Hộp thánh tích sẵn sàng",
+        "delveReliquaryActive": "Nghi lễ hộp thánh tích đang hoạt động",
+        "delveReliquaryOpened": "Hộp thánh tích đã mở",
+        "bountiful": "Phần thưởng dồi dào: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu Trò Chơi",
@@ -8035,6 +8645,9 @@ export const vi_VN: EnTranslations = {
       "graphicsReloadNote": "Chất Lượng Đồ Họa và Chi Tiết Địa Hình áp dụng sau khi tải lại.",
       "reloadNow": "Tải Lại Ngay",
       "fullscreen": "Toàn Màn Hình",
+      "displayMode": "Chế Độ Hiển Thị",
+      "displayModeBorderless": "Toàn Màn Hình Không Viền",
+      "displayModeWindowed": "Cửa Sổ",
       "touchLookSpeed": "Tốc Độ Nhìn Cảm Ứng",
       "joystickSize": "Kích Thước Cần Điều Khiển",
       "buttonSize": "Kích thước nút",
@@ -8597,6 +9210,7 @@ export const vi_VN: EnTranslations = {
       "offGlobalCooldown": "Không tính vào hồi chiêu toàn cục",
       "friendlyTarget": "Mục tiêu đồng minh",
       "enemyTarget": "Mục tiêu địch",
+      "anyTarget": "Mục tiêu của kẻ thù hoặc thân thiện",
       "selfOnly": "Chỉ bản thân",
       "damageRange": "{min} đến {max}",
       "finisherDamage": "{base} cộng {perCombo} mỗi điểm combo"
@@ -8911,6 +9525,10 @@ export const vi_VN: EnTranslations = {
       "filterPrimaryStatAll": "Bất kỳ chỉ số chính nào",
       "filterRarity": "Độ hiếm",
       "filterRarityAll": "Tất cả độ hiếm",
+      "filterSort": "Sắp xếp",
+      "sortName": "Tên (A-Z)",
+      "sortPriceAsc": "Giá: thấp đến cao",
+      "collapseLowest": "Chỉ giá thấp nhất",
       "weaponSword": "Kiếm",
       "weaponDagger": "Dao Găm",
       "weaponStaff": "Trượng",
@@ -8941,6 +9559,8 @@ export const vi_VN: EnTranslations = {
       "quantity": "Số lượng",
       "quantityOf": "trong {count}",
       "priceEach": "Giá mỗi món",
+      "lowestPriceLabel": "Giá đăng bán thấp nhất hiện tại",
+      "lowestPriceNone": "Hiện chưa có tin đăng bán nào cho vật phẩm này.",
       "listButton": "Rao bán trên Chợ Thế Giới",
       "minPriceError": "Hãy đặt giá ít nhất 1 đồng.",
       "collectEmpty": "Không có gì đang chờ. Tiền bán và mặt hàng hết hạn sẽ được thu về tại đây.",
@@ -9368,6 +9988,7 @@ export const vi_VN: EnTranslations = {
       "cheap_shot": {
         "name": "Thụi Bụng",
         "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Nhận 2 điểm liên hoàn.",
+        "descriptionNoStealth": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Nhận 2 điểm liên hoàn.",
         "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "sap": {
@@ -9377,6 +9998,14 @@ export const vi_VN: EnTranslations = {
       "crippling_poison": {
         "name": "Nọc Độc Chì",
         "description": "Đánh mục tiêu bằng một loại nọc độc nặng như chì, gây {damage} sát thương Tự Nhiên và giảm 50% tốc độ di chuyển của nó trong 12 giây."
+      },
+      "melting_acid": {
+        "name": "Axit nóng chảy",
+        "description": "Tấn công mục tiêu bằng chất độc ăn da, gây {damage} sát thương tự nhiên và giảm 5% giáp của mục tiêu trong 12 giây."
+      },
+      "nightshade_coating": {
+        "name": "Lớp phủ bóng đêm",
+        "description": "Bao phủ mục tiêu trong màn đêm, gây {damage} sát thương tự nhiên và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây."
       },
       "expose_armor": {
         "name": "Xuyên Phá Giáp",
@@ -9580,7 +10209,7 @@ export const vi_VN: EnTranslations = {
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
-        "description": "Bị động tăng 60% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin."
+        "description": "Bị động tăng 30% mối đe dọa do sát thương Thần Thánh của bạn tạo ra. Chỉ dành cho Hộ vệ đức tin."
       },
       "retribution_aura": {
         "name": "Hào Quang Báo Đền",
@@ -9696,7 +10325,7 @@ export const vi_VN: EnTranslations = {
       },
       "rockbiter_weapon": {
         "name": "Vũ Khí Khắc Đá",
-        "description": "Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 30% giáp, chịu ít hơn 10% sát thương và tạo ra gấp đôi mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây."
+        "description": "Thấm vào vũ khí của bạn trong 30 phút. Mỗi cú vung gây thêm {damage} sát thương. Tăng Cường còn nhận thêm 40% giáp và 20% Thể Lực, chịu ít hơn 15% sát thương và miễn nhiễm với đòn chí mạng từ quái vật và tạo ra gấp 2,75 lần mối đe dọa. Địa Giật buộc mục tiêu của nó tấn công bạn trong 3 giây, còn Bùa Hộ Sấm Sét ban 10% giảm sát thương trong 3 giây."
       },
       "healing_wave": {
         "name": "Dòng Nước Hàn Gắn",
@@ -9824,7 +10453,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng."
+        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
       },
       "searing_pain": {
         "name": "Nung Đốt",
@@ -9875,7 +10504,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Hình Bruin",
-        "description": "Biến hình thành gấu: giáp +130%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
+        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
       },
       "maul": {
         "name": "Nghiền Xương",
@@ -9885,6 +10514,10 @@ export const vi_VN: EnTranslations = {
       "growl": {
         "name": "Hăm Dọa",
         "description": "Gầm gừ với mục tiêu: mối đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
+      },
+      "challenging_roar": {
+        "name": "Tiếng Gầm Hiểm Độc",
+        "description": "Một tiếng gầm hiểm độc: mọi kẻ địch trong vòng 10 thước bị khiêu khích, mối đe dọa của chúng đối với bạn tăng lên ngang bằng kẻ địch mà chúng căm ghét nhất, và chúng bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
       },
       "cat_form": {
         "name": "Hình Sói",
@@ -9898,7 +10531,7 @@ export const vi_VN: EnTranslations = {
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
         "description": "Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -9961,7 +10594,7 @@ export const vi_VN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Huyết Sói",
-        "description": "Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
+        "description": "Trào dâng {rage} năng lượng và tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
       },
       "rip": {
         "name": "Vết Nứt Máu",
@@ -10066,7 +10699,7 @@ export const vi_VN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Dấu Ấn Cốt Táng",
-        "description": "Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
+        "description": "Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
       },
       "unholy_command": {
         "name": "Mệnh Lệnh Tà Ác",
@@ -10165,8 +10798,8 @@ export const vi_VN: EnTranslations = {
         "description": "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)"
       },
       "feral_charge": {
-        "name": "Xung Phong Hoang Dã",
-        "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
+        "name": "Dâng Trào Nguyên Thủy",
+        "description": "Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)"
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
@@ -10182,7 +10815,7 @@ export const vi_VN: EnTranslations = {
       },
       "redharvest": {
         "name": "Thu Hoạch Đỏ",
-        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn."
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn."
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",
@@ -10422,7 +11055,7 @@ export const vi_VN: EnTranslations = {
       },
       "evocation": {
         "name": "Giếng Ête",
-        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+        "description": "Vận sức trong 6 giây: mỗi giây hồi 100 mana và cộng dồn 8 sức mạnh phép thuật. Hiệu ứng cộng dồn trong khi vận sức và kéo dài 15 giây. (thiên phú pháp sư)"
       },
       "flurry_of_knives": {
         "name": "Loạt Dao Xoáy",
@@ -10430,7 +11063,7 @@ export const vi_VN: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Hồi Phục Hoang Dã",
-        "description": "Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
+        "description": "Hồi 40% máu tối đa trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
       },
       "frost_trap": {
         "name": "Bẫy Sương Giá",
@@ -10450,11 +11083,11 @@ export const vi_VN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)"
+        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)"
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+        "description": "Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)"
       },
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
@@ -10546,7 +11179,7 @@ export const vi_VN: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Tâm Trí Tăng Tốc",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+        "description": "Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú pháp sư)"
       },
       "psychic_scream": {
         "name": "Tiếng Thét Tâm Linh",
@@ -10663,7 +11296,7 @@ export const vi_VN: EnTranslations = {
       },
       "prowl": {
         "name": "Rình Rập",
-        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu."
+        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu."
       },
       "rake": {
         "name": "Lóc Xé",
@@ -12218,6 +12851,9 @@ export const vi_VN: EnTranslations = {
       "pristine_claw": {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
+      "dawnhold_posy": {
+        "name": "Bó Hoa Vườn Dawnhold"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -13062,6 +13698,15 @@ export const vi_VN: EnTranslations = {
       },
       "training_dummy": {
         "name": "Hình Nộm Tập Luyện"
+      },
+      "friendly_player_dummy": {
+        "name": "Hình Nộm Người Chơi Đồng Minh"
+      },
+      "normal_boss_dummy": {
+        "name": "Hình Nộm Trùm Thường"
+      },
+      "heroic_boss_dummy": {
+        "name": "Hình Nộm Trùm Anh Hùng"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
@@ -16702,6 +17347,11 @@ export const vi_VN: EnTranslations = {
         "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
       },
+      "dawnhold_castle": {
+        "name": "Lâu Đài Dawnhold",
+        "enterText": "Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.",
+        "leaveText": "Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng."
+      },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",
         "enterText": "Bạn bước qua nguyệt môn, không khí biến thành nước lạnh và ánh sáng nhợt nhạt, và tiếng hát khép lại trên đầu bạn.",
@@ -16900,6 +17550,21 @@ export const vi_VN: EnTranslations = {
         "sender": "Thợ Máy Gizzel",
         "subject": "THÀNH THẠO, kaboom",
         "body": "Một chuyên ngành của bạn đạt thành thạo, chính ĐỈNH, kaboom, cả thang, xong. Tôi không tặng lời khen, tôi tặng ngòi nổ, nhưng đây, hãy lấy cả hai: bạn thực sự xuất chúng và hơi đáng sợ một chút. Hãy đi làm những ngọn núi lo lắng đi."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {
