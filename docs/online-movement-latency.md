@@ -53,15 +53,29 @@ here so the survey is not read as the as-built spec:
   input frames carry the displayed XZ and a client timestamp, then enter a 150
   ms server-side jitter timeline. The server adopts a sample only when its
   incremental path fits elapsed authoritative run-speed credit, remains inside
-  a short authority window, and passes a swept collision check. It rejects
-  non-finite, stale-idle, airborne, rooted, forced-motion, instance, and distant
-  samples. A translational release also gets the stricter endpoint check in
+  a short authority window, and is reachable through the same swept open-world
+  character solver, grounded surface transition, and terrain-wall standoff used
+  by the movement kernel. The sample must also follow the server-derived input
+  and facing path, accepting either the just-completed authoritative segment or
+  a bounded client-lead segment. That reachability check includes terrain
+  slopes, collision sliding, step-up, and prop-edge slope glue. Deep-water entry
+  stays server-owned on and off mounts; movement-speed credit includes the
+  entity's active speed modifiers, mount, backpedal, and wading state. It never
+  adopts an airborne sample. Instead, an established jump or walk-off stream
+  validates each airborne XZ increment against elapsed ground-speed credit and
+  a cumulative authoritative-direction envelope without moving server
+  authority, then may reacquire inside the same short authority window after
+  landing. Swimming stays fully server-owned because its vertical state, stroke
+  ramp, and shore transitions need the complete movement kernel.
+  Invalid, stale-idle, rooted, swimming, charge, leap, follow, forced-move,
+  mounted dismount-channel, mount-race countdown, Valkyr-flight, delve, rift,
+  and distant samples reset or fail the stream. A translational release also
+  gets the stricter endpoint check in
   `server/movement_stop.ts`: the endpoint must lie on the immediately previous
   or next normal-speed authoritative segment. Invalid samples never pull or
   teleport authority. This keeps the server's settled XYZ canonical for every
-  observer while removing ordinary run and release phase corrections. Jump and
-  collision transitions deliberately fall back to server reconciliation and
-  remain follow-up smoothing work.
+  observer while removing ordinary run, landing, collision, and release phase
+  corrections.
 - **The chase camera pivot is rigid.** `camera_pivot_core.ts` derives every axis
   directly from the current displayed-player pose. The speed FOV, landing thump,
   shake, directed camera moves, yaw, ground clearance, and underwater ceiling
