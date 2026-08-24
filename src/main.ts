@@ -326,6 +326,7 @@ import {
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
+import { hasTranslationalMoveInput } from './sim/move_input';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { isSubmerged } from './sim/player_motion';
 import { Sim } from './sim/sim';
@@ -3153,6 +3154,9 @@ async function startGame(
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
+      onlineInputEchoMs = onlineJitterMs = 0;
+      Object.assign(kbTurn, newKeyboardTurnState());
+      renderer.resetSelfMotionPrediction();
       hud.marketResyncAfterReconnect();
       // A fresh join (as opposed to a resume within the linkdead grace window)
       // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
@@ -3839,8 +3843,6 @@ async function startGame(
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
-  // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
-  // perf overlay's Jitter row.
   let onlineJitterMs = 0;
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
@@ -3973,6 +3975,7 @@ async function startGame(
     turnAllowed: false,
     sentFacing: null,
     serverFacing: 0,
+    releaseCommitAcknowledged: false,
     echoMs: 0,
     frameDt: 0,
   };
@@ -4309,6 +4312,7 @@ async function startGame(
     alpha: 0,
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
+  const onlineStopPosition = { x: 0, z: 0 };
 
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
@@ -4589,29 +4593,25 @@ async function startGame(
     const interpServerFacing =
       pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
     const foreignFacing = movementFacing ?? resolved.facing;
-    // Keyboard turns integrate the same TURN_SPEED locally and STREAM the
-    // resulting heading on the facing channel, exactly like mouselook: the
-    // server applies it outright instead of integrating the turn flags one
-    // echo late in 50ms quanta, so there is never a client/server heading
-    // disagreement to reconcile after a turn (the source of every release
-    // stutter this feature has chased). The turn flags are zeroed on the wire
-    // while the local heading owns the channel, or the server would integrate
-    // the turn a second time on top of the streamed facing.
+    // Keyboard turns stream their local heading like mouselook, with turn flags
+    // suppressed after the engage edge so the server never integrates twice.
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
     kbTurnArgs.sentFacing = foreignFacing;
     kbTurnArgs.serverFacing = interpServerFacing;
+    kbTurnArgs.releaseCommitAcknowledged = net.inputFacingAcknowledged(kbTurn.pendingReleaseCommit);
     kbTurnArgs.echoMs = onlineInputEchoMs;
     kbTurnArgs.frameDt = frameDt;
     const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
-    // Streaming the seam/glide corrections (which chase the mirror) would
+    // Streaming fallback glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
     // converges (the observed self-spinning resonance under netem).
     const netFacing = foreignFacing ?? kbTurn.wireFacing;
     const onlineRenderFacing =
       visualFacingFor(resolved.mi, netFacing ?? kbFacing ?? interpServerFacing) ?? netFacing;
+    const wasTranslating = hasTranslationalMoveInput(net.moveInput);
     Object.assign(net.moveInput, resolved.mi);
     if (kbTurn.suppressTurnFlags) {
       net.moveInput.turnLeft = false;
@@ -4621,7 +4621,12 @@ async function startGame(
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
-    if (net.flushInput()) perf.markInputSent(performance.now());
+    const stoppedTranslating = wasTranslating && !hasTranslationalMoveInput(net.moveInput);
+    const movementPositionReady = renderer.copySelfRenderPosition(onlineStopPosition);
+    net.setMovementPosition(movementPositionReady ? onlineStopPosition : null);
+    const stopPosition =
+      stoppedTranslating && movementPositionReady ? onlineStopPosition : undefined;
+    if (net.flushInput(performance.now(), stopPosition)) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
       if (Number.isFinite(sample) && sample >= 0) {
@@ -4708,7 +4713,8 @@ async function startGame(
     const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
       ? null
       : selfMotionFrameBuffer.write(
-          net.spectating === null &&
+          net.connected &&
+            net.spectating === null &&
             !movementFrozen() &&
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x) &&

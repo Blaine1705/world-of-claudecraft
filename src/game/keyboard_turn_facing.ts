@@ -23,13 +23,6 @@
 import { TURN_SPEED } from '../sim/types';
 import { wrapAngle } from './camera_follow';
 
-// Within this of the server facing the display starts SEAMING: the wire
-// rounds facing to 0.01 rad, so the mirror can sit ~0.3deg away from the held
-// heading forever, and any one-frame jump onto it reads as a tiny end-of-turn
-// tick. Inside the seam band the last fraction of a degree is eased at
-// SEAM_RATE instead (sub-perceptual, ~0.33deg per 60fps frame).
-const HANDOFF_EPS = 0.02; // rad (~1.1 degrees)
-const SEAM_RATE = 0.35; // rad/s
 // Fully handed off once within this (sub-pixel at any camera distance).
 const HANDOFF_DONE_EPS = 0.002; // rad (~0.1 degrees)
 // How long a release-time disagreement may stand before we start correcting.
@@ -49,11 +42,12 @@ const MAX_FRAME_DT = 0.25;
 export interface KeyboardTurnState {
   facing: number | null; // null = inactive (the server facing owns the display)
   releaseMs: number; // time spent in the release phase
+  pendingReleaseCommit: number | null;
   /**
    * The heading the caller may put on the wire this frame, or null. Only ever
    * carries values DERIVED FROM INPUT (the live turn integration, the constant
    * held heading): never a value derived from the mirrored server facing. The
-   * seam/glide corrections move the display TOWARD the mirror, and streaming
+   * fallback glide corrections move the display TOWARD the mirror, and streaming
    * them back would make the server chase its own delayed echo, a closed
    * feedback loop that at high RTT never converges (the character visibly
    * spins on its own at the glide rate until the player intervenes).
@@ -80,6 +74,7 @@ export function newKeyboardTurnState(): KeyboardTurnState {
   return {
     facing: null,
     releaseMs: 0,
+    pendingReleaseCommit: null,
     wireFacing: null,
     suppressTurnFlags: false,
     wasTurning: false,
@@ -106,6 +101,8 @@ export interface KeyboardTurnArgs {
   sentFacing: number | null;
   /** Interpolated prev->server facing (alpha capped at 1), the handoff target. */
   serverFacing: number;
+  /** Whether the server acknowledged the pending final keyboard heading. */
+  releaseCommitAcknowledged: boolean;
   /** Measured input echo (ms); scales the release grace so a high-RTT link
    *  gets its full round trip of holding before any correction starts. */
   echoMs: number;
@@ -135,6 +132,7 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     // A foreign path (mouselook, click-move) owns the heading and streams it
     // itself; yield.
     state.facing = null;
+    state.pendingReleaseCommit = null;
     state.wireFacing = null;
     return null;
   }
@@ -145,12 +143,27 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     const base = state.facing ?? args.serverFacing;
     state.facing = wrapAngle(base + dir * TURN_SPEED * dt);
     state.releaseMs = 0;
+    state.pendingReleaseCommit = null;
     state.wireFacing = state.facing; // input-derived: safe to stream
     return state.facing;
   }
   if (state.facing === null) {
     state.wireFacing = null;
     return null;
+  }
+
+  if (state.wasTurning && !args.turnLeft && !args.turnRight) {
+    state.releaseMs = 0;
+    state.pendingReleaseCommit = state.facing;
+    state.wireFacing = state.facing;
+  }
+
+  if (state.pendingReleaseCommit !== null) {
+    if (!args.releaseCommitAcknowledged) {
+      state.wireFacing = state.facing;
+      return state.facing;
+    }
+    state.pendingReleaseCommit = null;
   }
 
   // Release phase: hold the local heading until the mirrored server facing
@@ -162,14 +175,6 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     state.facing = null;
     state.wireFacing = null;
     return args.serverFacing;
-  }
-  if (Math.abs(gap) <= HANDOFF_EPS) {
-    // Seam band: ease the last fraction of a degree (mostly wire rounding)
-    // onto the mirror instead of stepping it in a single frame. Mirror-derived
-    // motion: never streamed (see wireFacing).
-    state.facing = approachAngle(state.facing, args.serverFacing, SEAM_RATE * dt);
-    state.wireFacing = null;
-    return state.facing;
   }
   state.releaseMs += dt * 1000;
   // The grace scales with the measured echo: the mirror cannot possibly show

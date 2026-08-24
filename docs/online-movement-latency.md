@@ -27,18 +27,46 @@ here so the survey is not read as the as-built spec:
   the turn locally and STREAMS the heading on the client-authoritative facing
   channel mouselook has always owned, with the turn flags zeroed on the wire
   (engage-edge excepted for /follow and anti-AFK). Only input-derived headings
-  ever go on the wire.
-- **The position extrapolator's corrector is a delay-aligned servo**, not the
-  simple blend the survey sketched: the authoritative pose is compared against
-  the display's own pose one measured echo ago (history ring), with the gain
-  bounded by the delay so the loop cannot ring, and the leash clamping the pose
-  only. See the header of `src/render/self_motion.ts`. A long render frame is
-  the one sanctioned exception to both halves: it freezes the anchor and then
-  delivers a burst, so the leash lends the block's own ground (bounded by
-  `BLOCK_EPISODE_MAX_MS`) and the servo sits out the resume sweep, pinned by
-  `describe('long render frames')` in `tests/self_motion.test.ts`.
-- **The extrapolation cap landed at 350 ms**, not the surveyed 150 to 200:
-  below the real RTT the display rides the leash and steering feels gluey.
+  ever go on the wire. On turn-key release, the display commits once to the
+  snapshot's 0.01-radian precision and holds that exact heading until the
+  server acknowledges its input sequence; the camera, avatar, and forward
+  prediction therefore never hand off to a stale penultimate heading.
+- **The position extrapolator uses trajectory-window reconciliation**, not the
+  simple blend the survey sketched: measured echo is the center of an eligible
+  recent display trajectory window, while jitter and snapshot cadence widen the
+  window without shifting its center. Timing phase therefore does not become a
+  spatial correction. Off-path residuals still converge under an absolute
+  per-frame speed bound, and stable idle converges exactly to authoritative wire
+  XYZ. See `src/render/self_reconciliation_core.ts` and the header of
+  `src/render/self_motion.ts`. A long render frame remains a bounded exception:
+  the leash lends the block's own ground and reconciliation sits out the resume
+  sweep, pinned by `describe('long render frames')` in
+  `tests/self_motion.test.ts`.
+- **The extrapolation cap is 1500 ms**, supporting healthy 1000 ms input echo
+  plus bounded jitter without riding the leash. A fresh session gets a bounded
+  1000 ms optimistic display budget until its first credible input echo; the
+  bootstrap expires when no echo arrives. Healthy high latency is distinguished
+  from a connection stall by snapshot freshness. A snapshot gap may spend only
+  the unused portion of the 1500 ms horizon, then freezes and re-adopts authority
+  when a prolonged gap resumes.
+- **Grounded locomotion uses bounded client position samples.** Protocol-v2
+  input frames carry the displayed XZ and a client timestamp, then enter a 150
+  ms server-side jitter timeline. The server adopts a sample only when its
+  incremental path fits elapsed authoritative run-speed credit, remains inside
+  a short authority window, and passes a swept collision check. It rejects
+  non-finite, stale-idle, airborne, rooted, forced-motion, instance, and distant
+  samples. A translational release also gets the stricter endpoint check in
+  `server/movement_stop.ts`: the endpoint must lie on the immediately previous
+  or next normal-speed authoritative segment. Invalid samples never pull or
+  teleport authority. This keeps the server's settled XYZ canonical for every
+  observer while removing ordinary run and release phase corrections. Jump and
+  collision transitions deliberately fall back to server reconciliation and
+  remain follow-up smoothing work.
+- **The chase camera pivot is rigid.** `camera_pivot_core.ts` derives every axis
+  directly from the current displayed-player pose. The speed FOV, landing thump,
+  shake, directed camera moves, yaw, ground clearance, and underwater ceiling
+  remain, but no spring or horizontal velocity look-ahead can amplify character
+  reconciliation into a second camera correction.
 - **The rule amendment has three parts**, not two (`src/net/CLAUDE.md`):
   outcome prediction still banned; display-layer pose extrapolation sanctioned
   under four constraints (applies to `src/render/self_motion.ts`); the heading
