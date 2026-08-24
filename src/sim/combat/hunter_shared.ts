@@ -26,6 +26,18 @@ const FOCUS_SPENDERS = new Set(['arcane_shot', 'aimed_shot', 'mongoose_bite']);
 const FOCUS_GENERATORS = new Set(['pack_command', 'measured_shot', 'raptor_strike']);
 export const PACK_FEROCITY_DAMAGE_PER_STACK = 0.1;
 
+// Classic Aspect of the Cheetah drawback. While Courser's Guise (the +30% speed
+// aspect, whose primary self-buff carries the bare ability id) is active, taking
+// damage dazes the hunter, cutting movement speed to half of its current total.
+// The daze is a plain multiplicative slow, so moveSpeedMult returns 0.5 * speed:
+// it halves whatever the hunter is running at (aspect included), never a flat
+// base-run figure. Self-sourced so it stays out of the enemy crowd-control DR
+// ladder, and refreshed (not stacked) by each hit.
+const COURSER_GUISE_AURA_ID = 'aspect_of_the_cheetah';
+export const COURSER_DAZE_AURA_ID = 'hunter_courser_daze';
+const COURSER_DAZE_SLOW = 0.5; // reduce movement speed to 50% of its current total
+const COURSER_DAZE_DURATION = 4; // seconds; each hit refreshes, never stacks
+
 function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   const index = entity.auras.findIndex((aura) => aura.id === id);
   if (index < 0) return;
@@ -163,6 +175,29 @@ function triggerPredatorsPace(ctx: SimContext, hunter: Entity, meta: PlayerMeta)
     school: 'physical',
   });
   applyStateAura(ctx, hunter, PREDATOR_PACE_ICD_ID, "Predator's Pace", 8, 1);
+}
+
+// Apply or refresh the Courser's Guise daze. applyAura replaces the record by
+// (id, sourceId), so a fresh hit resets the 4s timer rather than stacking.
+export function applyCourserDaze(ctx: SimContext, hunter: Entity): void {
+  ctx.applyAura(hunter, {
+    id: COURSER_DAZE_AURA_ID,
+    name: 'Dazed',
+    kind: 'slow',
+    remaining: COURSER_DAZE_DURATION,
+    duration: COURSER_DAZE_DURATION,
+    value: COURSER_DAZE_SLOW,
+    sourceId: hunter.id,
+    school: 'physical',
+  });
+}
+
+// Damage-taken hook: daze the victim only while Courser's Guise is active. A
+// no-op for every other player, since only a hunter running the aspect carries
+// the COURSER_GUISE_AURA_ID buff.
+export function courserGuiseDazeOnDamage(ctx: SimContext, hunter: Entity): void {
+  if (!hunter.auras.some((aura) => aura.id === COURSER_GUISE_AURA_ID)) return;
+  applyCourserDaze(ctx, hunter);
 }
 
 export function grantHunterFocus(

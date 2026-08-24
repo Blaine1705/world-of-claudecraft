@@ -84,6 +84,7 @@ import { clearPacklordState } from './hunter_packlord';
 import {
   breakEnduringCourserBurst,
   clearHunterTalentState,
+  courserGuiseDazeOnDamage,
   hasHunterTalent,
 } from './hunter_shared';
 import {
@@ -1126,6 +1127,11 @@ export function dealDamage(
     if (amount > 0 && !target.dead) {
       onDamageTaken(ctx, target, amount);
       onShamanDamageTaken(ctx, target, amount);
+      // Aspect of the Cheetah (Courser's Guise) daze: taking actual damage while
+      // the aspect is up halves the hunter's speed for 4s. It lives in dealDamage
+      // on purpose, so ONLY real damage triggers it: a max-HP buff dropping (a
+      // recalcPlayerStats HP clamp, not damage) never dazes. No-op for everyone else.
+      courserGuiseDazeOnDamage(ctx, target);
     }
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
       const isWarrior = meta?.cls === 'warrior';
