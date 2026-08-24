@@ -988,6 +988,75 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
     expect(dirty).toHaveLength(1); // not 501: cost is proportional to what changed
     void alice;
   });
+
+  it('at 150k-letter production scale, a dirty write is well under the old whole-book serialize cost (#3561 acceptance criterion)', () => {
+    // Mirrors the scale issue #3561 measured on prod (134,431 letters, ~250ms
+    // JSON.stringify alone) and its own acceptance criterion: "With a
+    // synthetic 150k-letter book, the per-cycle main-thread block is under
+    // 10ms". Shape: 15,000 recipients x 10 letters each, plain system mail
+    // (no escrow), the same "static junk" shape the bot-welcome-letter
+    // problem (#3560) actually produced.
+    const RECIPIENTS = 15_000;
+    const LETTERS_PER_RECIPIENT = 10;
+    const bulk: {
+      recipientKey: string;
+      recipientName: string;
+      senderName: string;
+      kind: 'system';
+      subject: string;
+      body: string;
+      copper: number;
+      delaySeconds: number;
+      items: never[];
+    }[] = [];
+    for (let r = 0; r < RECIPIENTS; r++) {
+      for (let n = 0; n < LETTERS_PER_RECIPIENT; n++) {
+        bulk.push({
+          recipientKey: `bot-${r}`,
+          recipientName: `Bot${r}`,
+          senderName: 'Ravenpost',
+          kind: 'system',
+          subject: 'The ravens now fly for you',
+          body: 'Welcome to ClaudeCraft. Visit any Raven Pillar to check your mail.',
+          copper: 0,
+          delaySeconds: 0,
+          items: [],
+        });
+      }
+    }
+    const sim = makeWorld();
+    sim.loadMail({ mail: bulk } as never);
+    expect(sim.serializeMail().mail.length).toBe(RECIPIENTS * LETTERS_PER_RECIPIENT);
+
+    // The OLD design's per-cycle cost: re-serialize the ENTIRE book every
+    // autosave regardless of what changed.
+    const fullStart = performance.now();
+    const fullJson = JSON.stringify(sim.serializeMail());
+    const fullMs = performance.now() - fullStart;
+
+    // A single real player mutates their OWN mailbox (a plain send): the
+    // ONLY thing a real 30s window would actually need to persist. Resolved
+    // send (mailSendResolved), not name lookup: 'bot-0' exists only as raw
+    // loaded mail data here, not a real Sim character to resolve by name.
+    const alice = sim.addPlayer('warrior', 'Alice');
+    moveToMailbox(sim, alice);
+    sim.meta(alice)!.copper = 100;
+    sim.mailSendResolved({ key: 'bot-0', name: 'Bot0' }, 'Hi', 'A note.', 50, [], alice);
+
+    // The NEW design's per-cycle cost: only the dirty partitions.
+    const dirtyStart = performance.now();
+    const dirty = sim.takeDirtyMailPartitions();
+    const dirtyJson = JSON.stringify(dirty);
+    const dirtyMs = performance.now() - dirtyStart;
+
+    // Exactly the two recipients this send actually touched (Alice's welcome
+    // letter's box, and Bot0's box receiving the new letter), never the
+    // other 14,998 untouched mailboxes.
+    expect(dirty.map((p) => p.recipientKey).sort()).toEqual([String(alice), 'bot-0'].sort());
+    expect(dirtyJson.length).toBeLessThan(fullJson.length / 100); // >100x smaller payload
+    expect(dirtyMs).toBeLessThan(10); // the #3561 acceptance bound
+    expect(dirtyMs).toBeLessThan(fullMs); // and strictly cheaper than the old approach it replaces
+  });
 });
 
 // Character deletion (R43): the deleted character's mailbox leaves the book, but
