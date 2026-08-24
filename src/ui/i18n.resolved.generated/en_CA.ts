@@ -9883,7 +9883,7 @@ export const en_CA: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Courser's Guise",
-        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min."
+        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze)."
       },
       "aimed_shot": {
         "name": "Long Draw",
