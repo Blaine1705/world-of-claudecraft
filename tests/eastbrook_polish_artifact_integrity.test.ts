@@ -852,16 +852,11 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
-// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
-// renderer.ts combines mandatory entry admission with the release's rift
-// long-session resource lifecycle changes. No capture was retaken.
-// Re-minted for the loading review fixes (rebuild reveal gates, inactive
-// horizon fast path, display-pacing admission, and restored rationale): the
-// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the FOV slider fix (renderer.ts moved): no capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'af5eef8bce91fe1add1a94960c39f21273b39452dccd4d2de8e11ff39c1d5375';
+  '9b9828aef1f0292669aaae55915f2497b628f818e63aeba96df4711592838e68';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9c27fa70eb3c517d53238235c4d7baeb3f539fd68c6dfa3e2e1165129140e556';
+  'b783c7b92202202cc84340950057925b89acebd4db735ad80dc820a1d879607b';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1935,15 +1930,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the review-fix round (prewarm_policy.ts and renderer.ts
     // moved): same order, the composite first, then this seal. No capture
     // was retaken.
-    // Re-minted after merging release/v0.40.0 into the loading-hitch branch
-    // (renderer.ts moved on both sides): same order, the composite first,
-    // then this seal. No capture was retaken.
-    // Re-minted for the loading review fixes (renderer.ts): same order, the
+    // Re-minted for the FOV slider fix (renderer.ts moved): same order, the
     // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('f06481cadf8911aca02058a558e2b1a79a90998eeadf108b471e08019a1f86a6');
+    ).toBe('030187701784d6378bac741c0b6a4bc8b2d53612111594f2944fdf5384c1d461');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

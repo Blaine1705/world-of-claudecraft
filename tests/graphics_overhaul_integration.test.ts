@@ -42,7 +42,7 @@ describe('graphics-overhaul integration', () => {
     expect(chaseCamera.match(/\bcx\s*=/g)).toHaveLength(1);
     expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(1);
     expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(1);
-    expect(renderer).toContain('Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel))');
+    expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
   });
 
   it('routes reduced motion through every occluder-fade consumer', () => {

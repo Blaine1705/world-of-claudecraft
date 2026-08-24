@@ -97,9 +97,9 @@ import {
   stepCameraDirector,
 } from './camera_director_core';
 import {
-  cameraFovOffset,
   createCameraFeel,
   punchCameraFov,
+  resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
@@ -1326,6 +1326,7 @@ export class Renderer {
   private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
   private readonly camDirector = createCameraDirector();
+  private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
   private readonly camMirror = {
@@ -4240,7 +4241,7 @@ export class Renderer {
 
   /** Vertical camera field of view in degrees (55..100, default 60). */
   setCameraFov(deg: number): void {
-    this.camera.fov = Math.min(100, Math.max(55, deg));
+    this.camera.fov = this.baseFov = Math.min(100, Math.max(55, deg));
     this.camera.updateProjectionMatrix();
   }
 
@@ -13165,8 +13166,7 @@ export class Renderer {
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    // Base FOV plus the feel kicks; the latter are zero under reduced motion.
-    const fovTarget = Math.min(100, Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel)));
+    const fovTarget = resolveCameraFov(this.baseFov, this.camFeel);
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();

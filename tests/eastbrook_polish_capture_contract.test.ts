@@ -268,14 +268,9 @@ interface AttributionTargetFixture {
 // Re-minted for the review-fix round (the nearby-view floor in
 // prewarm_policy.ts, the weapon-skin early-out wiring in renderer.ts):
 // both runtime leaves moved. No capture was retaken.
-// Re-minted after merging release/v0.40.0 into the loading-hitch branch:
-// renderer.ts combines mandatory entry admission with the release's rift
-// long-session resource lifecycle changes. No capture was retaken.
-// Re-minted for the loading review fixes (rebuild reveal gates, inactive
-// horizon fast path, display-pacing admission, and restored rationale): the
-// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the FOV slider fix (renderer.ts moved): no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9c27fa70eb3c517d53238235c4d7baeb3f539fd68c6dfa3e2e1165129140e556';
+  'b783c7b92202202cc84340950057925b89acebd4db735ad80dc820a1d879607b';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
