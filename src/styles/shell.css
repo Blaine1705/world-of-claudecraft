@@ -6133,23 +6133,38 @@
     color: #f0ead8;
   }
   /* Largest member of the Deed Heraldry family. The face stays a shallow 60px,
-     while the separate medallion overlaps its shoulder like keyed hardware. */
+     while the medallion keys into a blackened collar and the granting deed hangs
+     from one quiet provenance tab below it. */
   .inspect-heraldry-banner {
     position: relative;
     box-sizing: border-box;
-    width: min(100%, 620px);
-    height: 60px;
-    padding-left: 42px;
+    width: min(100%, 580px);
+    height: 72px;
+    padding-left: 48px;
     overflow: visible;
+  }
+  .inspect-heraldry-banner::before {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: 36px;
+    z-index: 2;
+    width: 28px;
+    height: 16px;
+    box-sizing: border-box;
+    border-top: 1px solid var(--border-accent-frame, transparent);
+    border-bottom: 1px solid var(--border-accent-edge, transparent);
+    background: var(--deed-heraldry-well, transparent);
+    pointer-events: none;
   }
   .inspect-heraldry-face {
     position: relative;
     box-sizing: border-box;
     width: 100%;
     height: 60px;
-    padding: 5px 78px 5px 23px;
+    padding: 5px 68px 5px 28px;
     overflow: hidden;
-    text-align: left;
+    text-align: center;
   }
   .inspect-heraldry-face[data-border]:not([data-border=""]) {
     border: 1px solid var(--border-accent-frame, transparent);
@@ -6158,26 +6173,36 @@
     background-color: var(--border-accent-frame, transparent);
     --deed-heraldry-plaque-fill: color-mix(
       in srgb,
+      var(--deed-heraldry-well, transparent) 94%,
+      var(--border-accent-edge, transparent)
+    );
+    --deed-heraldry-plaque-top: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 90%,
+      var(--border-accent-frame, transparent)
+    );
+    --deed-heraldry-plaque-bottom: color-mix(
+      in srgb,
       var(--deed-heraldry-well, transparent) 88%,
-      transparent
+      var(--border-accent-edge, transparent)
     );
     box-shadow: 0 0 calc(4px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
   }
   .inspect-heraldry-banner .deed-heraldry-seal {
     position: absolute;
-    top: 50%;
+    top: 30px;
     left: 0;
     z-index: 3;
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     transform: translateY(-50%);
   }
   .inspect-heraldry-face .deed-heraldry-pattern {
     position: absolute;
     top: 50%;
     right: 18px;
-    width: 58px;
-    height: 58px;
+    width: 44px;
+    height: 44px;
     transform: translateY(-50%);
     opacity: 0.09;
     stroke: var(--border-accent-frame, transparent);
@@ -6192,11 +6217,12 @@
     justify-content: center;
     min-width: 0;
     height: 100%;
+    text-align: center;
   }
   .inspect-heraldry-banner .inspect-name {
     overflow: hidden;
-    font-size: 20px;
-    line-height: 21px;
+    font-size: 21px;
+    line-height: 22px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -6209,12 +6235,29 @@
     white-space: nowrap;
   }
   .inspect-heraldry-deed {
+    position: absolute;
+    left: calc(50% + 24px);
+    bottom: 0;
+    z-index: 4;
+    box-sizing: border-box;
+    width: min(52%, 260px);
+    max-width: 260px;
+    height: 18px;
+    padding: 2px 18px;
     overflow: hidden;
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 92%,
+      var(--border-accent-edge, transparent)
+    );
     color: var(--color-text-overlay);
     font-size: 10px;
-    line-height: 12px;
+    line-height: 14px;
     letter-spacing: 0.06em;
+    text-align: center;
     text-overflow: ellipsis;
+    transform: translateX(-50%);
     white-space: nowrap;
   }
   @media (forced-colors: active) {
@@ -6229,8 +6272,20 @@
       background-color: Canvas;
       box-shadow: none;
     }
+    .inspect-heraldry-banner::before {
+      border-color: CanvasText;
+      background: Canvas;
+    }
     .inspect-heraldry-face .deed-heraldry-pattern {
       stroke: CanvasText;
+    }
+    .inspect-heraldry-deed {
+      color: CanvasText;
+      background-color: CanvasText;
+      box-shadow: none;
+    }
+    .inspect-honor-rail::before {
+      background: CanvasText;
     }
     .inspect-honor-rail .inspect-holder {
       border-color: CanvasText;
@@ -6275,15 +6330,30 @@
     background: none;
   }
   .inspect-honor-rail {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 300px));
     justify-content: center;
     gap: 6px;
     width: min(100%, 620px);
   }
+  .inspect-honor-rail::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 0;
+    width: min(76%, 360px);
+    height: 1px;
+    background: color-mix(in srgb, var(--color-border-showcase) 46%, transparent);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
   /* Earned honors become a secondary ledger beneath the mantle instead of a
      loose column of capsules. Badge art and tier halos remain unchanged. */
   .inspect-holder {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: 8px;

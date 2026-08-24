@@ -492,15 +492,32 @@ describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
     // gate stays closed and no transparent ::after box paints. This matches the
     // nameplate, which early-returns to nothing for the same case, so both
     // surfaces of one identity render a drifted id identically.
-    const calls = paint(playerDescriptor({ borderSlug: 'slug_with_no_palette' }), BORDERED_ELEMENTS)
-      .filter((c) =>
-        [PORTRAIT_BORDER, NAME_HEADER, SEAL_MOTIF, HEADER_PATTERN].includes(
-          c.args[0] as HTMLElement,
-        ),
-      )
-      .map((c) => c.args[2]);
-    expect(calls.every((value) => value === '')).toBe(true);
-    expect(calls.length).toBeGreaterThanOrEqual(12);
+    const calls = paint(
+      playerDescriptor({ borderSlug: 'slug_with_no_palette' }),
+      BORDERED_ELEMENTS,
+    );
+    const expectedClears: Call[] = [
+      { m: 'setAttr', args: [PORTRAIT_BORDER, PORTRAIT_BORDER_ATTR, ''] },
+      { m: 'setAttr', args: [NAME_HEADER, PORTRAIT_BORDER_ATTR, ''] },
+      { m: 'setAttr', args: [SEAL_MOTIF, 'd', ''] },
+      { m: 'setAttr', args: [HEADER_PATTERN, 'd', ''] },
+    ];
+    for (const host of [PORTRAIT_BORDER, NAME_HEADER]) {
+      for (const prop of [
+        PORTRAIT_BORDER_FRAME_PROP,
+        PORTRAIT_BORDER_EDGE_PROP,
+        PORTRAIT_BORDER_GLOW_PROP,
+        DEED_HERALDRY_WELL_PROP,
+      ]) {
+        expectedClears.push({ m: 'setStyleProp', args: [host, prop, ''] });
+      }
+      expectedClears.push({
+        m: 'setAttr',
+        args: [host, DEED_HERALDRY_MOTIF_ATTR, ''],
+      });
+    }
+    expect(expectedClears).toHaveLength(14);
+    expect(calls).toEqual(expect.arrayContaining(expectedClears));
   });
 
   it('elides every border write on a repeat paint (the facet caches, no local field)', () => {

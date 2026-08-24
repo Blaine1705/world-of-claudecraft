@@ -694,7 +694,7 @@ export class DeedsWindow {
       `<div class="deed-heraldry-preview" data-preview-deed="${esc(id)}" ${DEED_HERALDRY_ATTR}="${esc(slug)}" ${DEED_HERALDRY_MOTIF_ATTR}="${accent.motif}" style="${esc(deedHeraldryStyle(accent))}" aria-hidden="true">` +
       `<div class="deed-heraldry-preview-world">${seal}<span class="deed-heraldry-preview-ribbon deed-heraldry-plaque">${playerName}</span></div>` +
       `<div class="deed-heraldry-preview-interaction"><span class="deed-heraldry-preview-portrait"></span>${seal}` +
-      `<span class="deed-heraldry-preview-header deed-heraldry-plaque deed-heraldry-plaque-mirror">${pattern}<span class="deed-heraldry-preview-name">${playerName}</span>` +
+      `<span class="deed-heraldry-preview-header deed-heraldry-plaque">${pattern}<span class="deed-heraldry-preview-name">${playerName}</span>` +
       `<span class="deed-heraldry-preview-deed">${grantingDeed}</span></span></div></div>`
     );
   }

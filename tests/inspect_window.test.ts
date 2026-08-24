@@ -261,24 +261,37 @@ describe('inspect_window: the Curator standing surfaces', () => {
     expect(shell.match(/\.inspect-meta\.inspect-reliquary\s*\{/g) ?? []).toHaveLength(0);
   });
 
-  it('E52: keeps the rendered ceremonial face at 15 percent of the paperdoll stage', () => {
+  it('E52: keeps the forged face compact and its attached deed tab below 18 percent of the stage', () => {
     const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
     const banner = shell.match(/\n {2}\.inspect-heraldry-banner \{([^}]*)\}/)?.[1];
     const face = shell.match(/\n {2}\.inspect-heraldry-face \{([^}]*)\}/)?.[1];
+    const seal = shell.match(
+      /\n {2}\.inspect-heraldry-banner \.deed-heraldry-seal \{([^}]*)\}/,
+    )?.[1];
+    const deed = shell.match(/\n {2}\.inspect-heraldry-deed \{([^}]*)\}/)?.[1];
     const honors = shell.match(/\n {2}\.inspect-honor-rail \{([^}]*)\}/)?.[1];
     const stage = shell.match(/\n {2}#inspect-window \.inspect-model-panel \{([^}]*)\}/)?.[1];
     expect(banner, 'inspect heraldry banner rule missing').toBeTruthy();
     expect(face, 'inspect heraldry face rule missing').toBeTruthy();
-    expect(banner).toContain('width: min(100%, 620px);');
+    expect(banner).toContain('width: min(100%, 580px);');
+    expect(banner).toContain('height: 72px;');
     expect(face).toContain('height: 60px;');
+    expect(seal).toContain('top: 30px;');
+    expect(seal).toContain('left: 0;');
+    expect(seal).toContain('width: 64px;');
+    expect(seal).toContain('height: 64px;');
+    expect(deed).toContain('height: 18px;');
+    expect(deed).toContain('max-width: 260px;');
     expect(honors).toContain(
       'grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 300px));',
     );
     expect(honors).toContain('justify-content: center;');
     expect(stage).toContain('min-height: 400px;');
+    const mantleHeight = Number(banner?.match(/height:\s*(\d+)px/)?.[1]);
     const faceHeight = Number(face?.match(/height:\s*(\d+)px/)?.[1]);
     const stageHeight = Number(stage?.match(/min-height:\s*(\d+)px/)?.[1]);
     expect(faceHeight).toBeLessThanOrEqual(stageHeight * 0.15);
+    expect(mantleHeight).toBeLessThanOrEqual(stageHeight * 0.18);
   });
 });
 
@@ -413,6 +426,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(banner?.getAttribute('style')).toContain('--deed-heraldry-well:#14110c;');
     const face = banner?.querySelector('.inspect-heraldry-face');
     const seal = banner?.querySelector('.deed-heraldry-seal');
+    const deedTab = banner?.querySelector('.inspect-heraldry-deed');
     expect(face?.getAttribute('data-border')).toBe('reliquary_gilt');
     expect(face?.getAttribute('data-motif')).toBe('vault');
     expect(seal).not.toBeNull();
@@ -420,6 +434,11 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(face?.parentElement).toBe(banner);
     expect(seal?.parentElement).toBe(banner);
     expect(face?.nextElementSibling).toBe(seal);
+    expect(deedTab?.parentElement).toBe(banner);
+    expect(face?.contains(deedTab ?? null)).toBe(false);
+    expect(seal?.nextElementSibling).toBe(deedTab);
+    expect(deedTab?.classList.contains('deed-heraldry-plaque-tab')).toBe(true);
+    expect(deedTab?.getAttribute('data-border')).toBe('reliquary_gilt');
     expect(face?.querySelector('.deed-heraldry-pattern')).not.toBeNull();
     const accent = borderAccent('reliquary_gilt');
     expect(borderMotifPrimitives('vault')).toHaveLength(5);
@@ -481,14 +500,21 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       title: null,
     });
     const face = root.querySelector('.inspect-heraldry-face');
+    const deedTab = root.querySelector('.inspect-heraldry-deed');
     expect(face?.querySelector('.inspect-name')?.textContent).toBe(name);
     expect(face?.querySelector('.inspect-title')).toBeNull();
-    expect(face?.querySelector('.inspect-heraldry-deed')).not.toBeNull();
+    expect(face?.querySelector('.inspect-heraldry-deed')).toBeNull();
+    expect(deedTab?.parentElement).toBe(root.querySelector('.inspect-heraldry-banner'));
+    expect(deedTab?.textContent).toBe(deedName('col_reliquary_rank_5'));
     const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
     const nameRule = shell.match(/\n {2}\.inspect-heraldry-banner \.inspect-name \{([^}]*)\}/)?.[1];
+    const deedRule = shell.match(/\n {2}\.inspect-heraldry-deed \{([^}]*)\}/)?.[1];
     expect(nameRule).toContain('overflow: hidden;');
     expect(nameRule).toContain('text-overflow: ellipsis;');
     expect(nameRule).toContain('white-space: nowrap;');
+    expect(deedRule).toContain('overflow: hidden;');
+    expect(deedRule).toContain('text-overflow: ellipsis;');
+    expect(deedRule).toContain('white-space: nowrap;');
   });
 
   it('leaves a borderless card clean, with no empty heraldry shell', () => {
@@ -501,6 +527,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     expect(root.querySelector('.inspect-heraldry-banner')).toBeNull();
     expect(root.querySelector('.deed-heraldry-seal')).toBeNull();
     expect(root.querySelector('.deed-heraldry-pattern')).toBeNull();
+    expect(root.querySelector('.inspect-heraldry-deed')).toBeNull();
   });
 
   it('renders a rank-4 entity WITHOUT the sigil but WITH the line', () => {

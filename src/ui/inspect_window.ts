@@ -329,9 +329,9 @@ export class InspectWindow {
       `<div class="inspect-heraldry-copy">` +
       `<div class="inspect-name">${esc(header.name)}</div>` +
       titleHtml +
-      `<div class="inspect-heraldry-deed">${esc(border.deedName)}</div>` +
       `</div></div>` +
       `<span class="deed-heraldry-seal" aria-hidden="true">${deedHeraldryMotifSvg(border.motif, 'deed-heraldry-seal-art')}</span>` +
+      `<div class="inspect-heraldry-deed deed-heraldry-plaque deed-heraldry-plaque-tab"${this.borderIdentityAttrs(border)}>${esc(border.deedName)}</div>` +
       `</div>`
     );
   }
