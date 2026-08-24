@@ -10,8 +10,8 @@
     "updateDoorTriggers exit portal -> leaveDungeon (~14620)",
     "updateInstances empty-reset -> freeInstance despawn + partyKey null (~14841/14816)"
   ],
-  "draws": 44,
-  "drawDigest": "8329963e",
+  "draws": 41,
+  "drawDigest": "ed59696c",
   "frames": [
     {
       "tick": 0,
@@ -31,7 +31,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1013,
-      "state": "fa62df55",
+      "state": "586ca299",
       "events": "eb5555e6",
       "rng": {
         "draws": 39,
@@ -243,7 +243,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": -1.693743,
           "fiveSecondRule": 99.1,
           "hp": 50000,
           "id": 998,
@@ -912,11 +911,11 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1013,
-      "state": "a4202746",
-      "events": "9ca984d8",
+      "state": "4300622c",
+      "events": "94921daa",
       "rng": {
-        "draws": 42,
-        "digest": "7a78e97c"
+        "draws": 39,
+        "digest": "fc384baa"
       },
       "label": "left",
       "players": [
@@ -935,14 +934,10 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 89060,
-            "deaths": 1
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -954,14 +949,6 @@
             ]
           },
           "deedsEarned": [
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "hid_fall_death",
-              ""
-            ],
             [
               "soc_first_party",
               ""
@@ -991,7 +978,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -1070,17 +1057,29 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.8,
+              "school": "physical",
+              "sourceId": 997
+            }
+          ],
           "blockChance": 0.05,
           "blockValue": 6,
           "combatTimer": 99.2,
           "comboUntil": -1,
           "critChance": 0.06,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -1.618548,
           "fiveSecondRule": 99.2,
+          "hp": 50000,
           "id": 997,
+          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1127,7 +1126,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 35.827155,
+          "fallStartY": -1.618548,
           "fiveSecondRule": 99.2,
           "hp": 50000,
           "id": 998,
@@ -1137,6 +1136,7 @@
           "maxHp": 50000,
           "maxResource": 195,
           "moveSpeed": 7,
+          "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
@@ -1796,55 +1796,55 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1013,
-      "state": "3361a7f3",
-      "events": "e24d45d8",
+      "state": "c0116dcb",
+      "events": "741638a5",
       "rng": {
-        "draws": 42,
-        "digest": "7a78e97c"
+        "draws": 39,
+        "digest": "fc384baa"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "b5d5dafb",
+      "state": "c250a16e",
       "events": "741638a5",
       "rng": {
-        "draws": 42,
-        "digest": "7a78e97c"
+        "draws": 39,
+        "digest": "fc384baa"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
       "nextId": 1013,
-      "state": "9b12fac5",
+      "state": "81664936",
       "events": "741638a5",
       "rng": {
-        "draws": 42,
-        "digest": "7a78e97c"
+        "draws": 39,
+        "digest": "fc384baa"
       }
     },
     {
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "f20e49c7",
+      "state": "4be0bb47",
       "events": "7f81a8b0",
       "rng": {
-        "draws": 44,
-        "digest": "8329963e"
+        "draws": 41,
+        "digest": "ed59696c"
       }
     },
     {
       "tick": 24,
       "time": 1.2,
       "nextId": 1013,
-      "state": "6a673437",
+      "state": "aa0a2432",
       "events": "741638a5",
       "rng": {
-        "draws": 44,
-        "digest": "8329963e"
+        "draws": 41,
+        "digest": "ed59696c"
       },
       "label": "reset",
       "players": [
@@ -1863,14 +1863,10 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 89060,
-            "deaths": 1
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1879,17 +1875,12 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:fallen_chapel"
             ]
           },
           "deedsEarned": [
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "hid_fall_death",
-              ""
-            ],
             [
               "soc_first_party",
               ""
@@ -1919,7 +1910,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -1940,14 +1931,10 @@
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 89060,
-            "deaths": 1
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1956,17 +1943,12 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:fallen_chapel"
             ]
           },
           "deedsEarned": [
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "hid_fall_death",
-              ""
-            ],
             [
               "soc_first_party",
               ""
@@ -1999,7 +1981,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -2010,17 +1992,29 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.8,
+              "school": "physical",
+              "sourceId": 997
+            }
+          ],
           "blockChance": 0.05,
           "blockValue": 6,
           "combatTimer": 100.2,
           "comboUntil": -1,
           "critChance": 0.06,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
+          "hp": 50000,
           "id": 997,
+          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2065,11 +2059,11 @@
           "combatTimer": 100.2,
           "comboUntil": -1,
           "critChance": 0.056,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
+          "hp": 50000,
           "id": 998,
           "kind": "player",
           "level": 1,
@@ -2115,11 +2109,11 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 1013,
-      "state": "6a673437",
+      "state": "aa0a2432",
       "events": "741638a5",
       "rng": {
-        "draws": 44,
-        "digest": "8329963e"
+        "draws": 41,
+        "digest": "ed59696c"
       },
       "label": "final",
       "players": [
@@ -2138,14 +2132,10 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 89060,
-            "deaths": 1
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -2154,17 +2144,12 @@
               "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:fallen_chapel"
             ]
           },
           "deedsEarned": [
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "hid_fall_death",
-              ""
-            ],
             [
               "soc_first_party",
               ""
@@ -2194,7 +2179,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -2215,14 +2200,10 @@
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 89060,
-            "deaths": 1
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "deaths": 1,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -2231,17 +2212,12 @@
               "baked_bread",
               "gnarled_staff",
               "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:fallen_chapel"
             ]
           },
           "deedsEarned": [
-            [
-              "cmb_first_fall",
-              ""
-            ],
-            [
-              "hid_fall_death",
-              ""
-            ],
             [
               "soc_first_party",
               ""
@@ -2274,7 +2250,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 15,
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -2285,17 +2261,29 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.8,
+              "school": "physical",
+              "sourceId": 997
+            }
+          ],
           "blockChance": 0.05,
           "blockValue": 6,
           "combatTimer": 100.2,
           "comboUntil": -1,
           "critChance": 0.06,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
+          "hp": 50000,
           "id": 997,
+          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2340,11 +2328,11 @@
           "combatTimer": 100.2,
           "comboUntil": -1,
           "critChance": 0.056,
-          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fallStartY": -1.618548,
           "fiveSecondRule": 100.2,
+          "hp": 50000,
           "id": 998,
           "kind": "player",
           "level": 1,

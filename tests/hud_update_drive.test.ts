@@ -910,11 +910,15 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the party frames (a pooled painter) AND, via paintLootSettings, the loot-settings window',
   },
   {
-    call: 'this.updateTradeWindow',
+    call: 'this.wocTrade.updateTradeWindow',
     band: 'medium',
     gate: '',
     surface: 'window',
-    guard: { kind: 'hud', proof: 'if (sig === this.lastTradeSig) return;' },
+    guard: {
+      kind: 'module',
+      module: 'hud/woc_trade/woc_trade_controller.ts',
+      proof: 'if (sig === this.lastTradeSig) return;',
+    },
     why: 'the trade window, rebuilt on a signature change; also auto-opens it on a trade start',
   },
   {
@@ -1170,6 +1174,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     surface: 'window',
     guard: { kind: 'module', module: 'market_window.ts', proof: SIG_RETURN },
     why: 'the market window',
+  },
+  {
+    call: 'this.wocMarketWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.wocMarketWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'woc_market_window.ts', proof: SIG_RETURN },
+    why: 'the $WOC Exchange window; its wocMarketViewSig digest folds second-resolution countdowns in, so open auctions tick on the poll without a self-armed driver. This call ALSO carries the window’s background re-ask (pollFromServer, self-throttled to its own much slower cadence by woc_market_poll_core): a rebuild alone can only repaint data already in hand, and could never show a bond the chain has since confirmed',
   },
   {
     call: 'this.mailboxWindow.refreshIfChanged',
@@ -1608,16 +1620,18 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
       // Both sides of every v0.36.0 sync move this bucket split independently
-      // (the branch's reliquary window row and the char-sheet latch against the
-      // release's own window/chrome churn), so it cannot be reconciled by
-      // arithmetic across a merge. The numbers below were set from a suite run
-      // on the merged tree, not from either side's narrative.
+      // (each side's window and chrome churn lands against the other's), so it
+      // cannot be reconciled by arithmetic across a merge. The numbers below
+      // were set from a suite run on the merged tree, not from either side's
+      // narrative.
       // chrome 83 -> 84: the tracker-stack anchor apply (seats the stack below
       // the minimap column; tracker_stack_anchor.ts).
       // window 47 -> 43, chrome 84 -> 81: the Vale Cup retirement (the New
-      // Eastbrook program) removed the cup rows on the other side of this merge.
+      // Eastbrook program) removed the cup rows on this branch.
       // chrome 81 -> 82: the Proving Shore tutorial's coach strip apply.
-    ).toEqual({ window: 43, chrome: 82, none: 17 });
+      // window 43 -> 44: the release arm's woc_market window row rides the
+      // v0.40.0 sync merge back in.
+    ).toEqual({ window: 44, chrome: 82, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1635,11 +1649,16 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // reliquary module guard vs the release's new module-guarded row).
       // Down to 21 with the Vale Cup retirement (the New Eastbrook program):
       // the cup window/briefing/betting module guards left with their painters.
-      module: 21,
-      // 7 = Phase 20's refreshCharSheetIfChanged. Its latch is a HUD field
-      // (lastCharSheetSig), like its profession sibling, because the cold
-      // char_window painter holds no signature of its own to diff.
-      hud: 7,
+      // Up to 23 with the v0.40.0 sync merge: the release arm's
+      // woc_market_window row plus the trade-window row (its guard moved from
+      // a hud latch to the woc_trade controller in the extraction).
+      module: 23,
+      // 6 = Phase 20's refreshCharSheetIfChanged and its siblings. Their
+      // latches are HUD fields (lastCharSheetSig et al) because the cold
+      // char_window painter holds no signature of its own to diff. Down one
+      // with the v0.40.0 sync: the trade row's lastTradeSig latch now lives
+      // in the woc_trade module.
+      hud: 6,
       callsite: 11,
       none: 4,
     });
@@ -1687,7 +1706,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (sig === this.lastCharSheetSig) return;',
         'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
-        'hud.ts: if (sig === this.lastTradeSig) return;',
+        'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
         'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
@@ -1706,6 +1725,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
+        'woc_market_window.ts: if (sig === this.lastSig) return;',
       ].sort(),
     );
     expect(

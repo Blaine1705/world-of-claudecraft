@@ -59,6 +59,7 @@ export const TERRAIN_APPLIER = {
   fenSouthShore: 33,
   provingCoast: 34,
   provingMoat: 35,
+  gardenwalkWestPass: 36,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -114,6 +115,11 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   // provingMoat: like starterMoat, its south open-sea band has unbounded z
   // support, so it stays in the always-run mask
   null,
+  // The Gardenwalk pass floor's west-of-border mirror (applyGardenwalkWestPass):
+  // its smoothstep(26,52,|z-800|) z-falloff and smoothstep(0,58,|x-180|)
+  // x-falloff (centered ON the border, STRIP_MAX_X 180) are both fully zero
+  // outside this box.
+  [bounds(122, 238, 748, 852)],
 ];
 
 interface MutableCell {

@@ -309,11 +309,22 @@ interface AttributionTargetFixture {
 // Re-minted after merging release/v0.40.0 into the loading-hitch branch:
 // renderer.ts combines mandatory entry admission with the release's rift
 // long-session resource lifecycle changes. No capture was retaken.
+// Re-minted for the v0.40 batch merge-forward over the loading review fixes:
+// renderer.ts and prewarm_policy.ts now seal the combined release-batch tree.
+// No capture was retaken.
 // Re-minted for the loading review fixes (rebuild reveal gates, inactive
 // horizon fast path, display-pacing admission, and restored rationale): the
 // renderer integration leaf moved. No capture was retaken.
+// Re-minted for the sliding-far-mob-freeze fix (the far-mesh swap now also
+// holds out a moving entity): the renderer integration leaf moved. No
+// capture was retaken.
+// Re-minted for the stale remote-entity holdout repair (renderer.ts): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
+// OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b61f074a4e1b9c0cd4a0cfe9c69da256fa022bef5528f3d19b32b48feaded080';
+  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

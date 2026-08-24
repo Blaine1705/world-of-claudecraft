@@ -122,6 +122,10 @@ const AUTHENTICATED_NODE_CLIENTS = [
     path: 'scripts/takeover_shot.mjs',
     authSend: 'ws.send(JSON.stringify(worldAuthMessage(token, characterId)));',
   },
+  {
+    path: 'scripts/woc_market_shot.mjs',
+    authSend: 'ws.send(JSON.stringify(worldAuthMessage(token, characterId)));',
+  },
 ] as const;
 // Scripts that open a world socket WITHOUT authenticating, on purpose. The OTA
 // layout preflight sends an empty token deliberately: it only wants to learn

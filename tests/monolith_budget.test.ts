@@ -37,6 +37,56 @@ interface MonolithRow {
 // Ceilings set 2026-08-10 at roughly current size + 200 lines of headroom.
 const MONOLITHS: MonolithRow[] = [
   {
+    // The Exchange window, ratcheted at its exact size with ZERO headroom the
+    // moment it became the largest unpinned UI module (2201 -> 2623 lines
+    // across the polish pass: markup, copy and six small private helpers, none
+    // of it added to a coordinator). It is its own module, so the prime
+    // directive was never broken, but nothing stopped it growing either. The
+    // next line added here fails, and the fix is a sibling module behind the
+    // window's own seam (a pure view-core plus this thin consumer, the
+    // unit_portrait recipe), never a raise.
+    // Re-pinned DOWN from 2623 in the same change that set it: the status
+    // chrome (spinner, loading line, error line, the exact end time a countdown
+    // cell carries) moved to src/ui/woc_market_chrome.ts, which is the seam
+    // named below. The ratchet only works if it tightens after an extraction.
+    // Down 2621 -> 2618 when the browse control row followed the chrome out
+    // (the 15 sign-off round: sort leads the row), paying for the price
+    // cells' token-equivalence tooltips with room to spare.
+    // Down 2618 -> 2614 when the recent-sales list and the empty-sell caption
+    // followed (wocSalesHistoryHtml / wocSellEmptyHtml), paying for the
+    // resolved bond disclosures and the select-scroll command.
+    // Down 2614 -> 2612 at the Exchange UX round: the banners, the foot, the
+    // bid disclosures well and the buy-now face followed the chrome out
+    // (wocMarketBannersHtml / wocMarketFootHtml / wocBidDisclosuresHtml /
+    // wocBuyNowHtml), paying for the collapsed Bid terms toggle and the
+    // banner's connect shortcut. This also cleared the 36 lines the file had
+    // drifted over its own ceiling before this round.
+    // Down 2612 -> 2438 at the second Exchange UX round: the whole My
+    // Activities tab moved verbatim to src/ui/woc_market_activity_html.ts and
+    // the quote face to the chrome (wocQuoteFaceHtml), paying for the Browse
+    // filters, the seller click-through pane, and the hot-path review's
+    // poll-skip and click-dedupe guards, with room to spare.
+    // Up 2438 -> 2487 at the third round (a maintainer-requested feature
+    // pair): the category/subcategory filter axes and the seller pane's
+    // profile line, whose markup all landed in the chrome builders; the
+    // window carries only state, handler arms and passthroughs. Exact
+    // count, zero headroom; the sell-tab combobox block is the next
+    // standing extraction candidate.
+    file: 'src/ui/woc_market_window.ts',
+    ceiling: 2487,
+    seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
+  },
+  {
+    // Deliberately ZERO headroom (the woc marketplace baseline ratchet): the
+    // next line added here fails, and the fix is extraction behind the seam,
+    // never a raise. A raise stays a maintainer decision, per the header.
+    // Re-pinned down from 19338 after the error-text matcher moved out to
+    // src/ui/error_text_i18n_core.ts, then from 19190 after the craft-deny
+    // message table moved to src/ui/crafting_deny_core.ts (the v0.37.0 sync
+    // merge had pushed the file over), keeping the zero-headroom posture.
+    // Re-pinned from 19177 after the v0.38.0 sync merge: the release's map
+    // overhaul extracted marker interaction out of the coordinator, so the
+    // merged file landed SMALLER and the ratchet follows it down.
     file: 'src/ui/hud.ts',
     // Lowered after extracting the ability description prose (the placeholder
     // values, the over-time string and the talent-conditional field choice) into
@@ -65,7 +115,10 @@ const MONOLITHS: MonolithRow[] = [
     // rework); exact merged count.
     // Re-pinned for the tutorial mobile-coach fixes that followed that merge
     // (SCOPED_POPUP_IDS + the greeting-close window-state resync); exact count.
-    ceiling: 18804,
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge that
+    // brings in the OSSBrain v0.40 batch: the merged file lands below both
+    // parent pins, so the ratchet follows it down. Exact count, zero slack.
+    ceiling: 18467,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -125,6 +178,35 @@ const MONOLITHS: MonolithRow[] = [
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
+    // Zero headroom, ratcheted down from 12660 after the broker custody pair
+    // moved to src/sim/broker_custody.ts and the offline daily-rewards readout
+    // to src/sim/daily_rewards_stub.ts (which also took sim.ts off the $WOC
+    // firewall allowlist in tests/architecture.test.ts). Re-pinned to the
+    // merged size after the v0.38.0 sync merge landed the release's civic
+    // service placements in the sim; still under the release's own 12660.
+    // Re-pinned again to the exact merged size after the v0.39.0 sync merge
+    // (release-side growth only; the branch's own delegates are unchanged).
+    // Re-pinned 12508 -> 12527 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): release-side growth only again (the practice dummies'
+    // vitals, the quest-gated aggro/taunt gate, the worn mech-chroma
+    // reconcile, the clearAurasFromSource predicate); the branch's delegates
+    // are unchanged and the merged file stays under the release's own 12660
+    // row. Exact merged count.
+    // Re-pinned 12527 -> 12531 at the fourth v0.39.0 sync merge (release tip
+    // ea9377db8e): release-side growth only (the druid auto-unshift strip at
+    // cast commit and the aggro/taunt boolean gates); the branch's delegates
+    // are unchanged. Exact merged count, still under the release's own 12660.
+    // Re-pinned 12531 -> 12560 at the third v0.40.0 sync merge (release tip
+    // b39b16022e): release-side growth only (the bot-meta welcome-mail gate
+    // from issue #3560, the inert instance-corpse skip in the mob update
+    // loop, and the delve-band guard on combat sight checks); the branch's
+    // delegates are unchanged. Exact merged count, still under the release's
+    // own 12660.
+    // Re-pinned 12560 -> 12570 for the fear wall guard: the steering unit
+    // lives in src/sim/combat/fear_steering.ts; the residual here is the
+    // import plus the player-only redirect delegation in updateFearMovement.
+    // Exact merged count against release/v0.40.0 (tip eb20752e9e), still
+    // far under the pre-marketplace 12660 row.
     file: 'src/sim/sim.ts',
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
     // both parents' additions combine, so keep the exact merged count.
@@ -133,17 +215,41 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned +14 for the guild pledge board: setPlayerPledge (the server's
     // nameplate stamp entry) and the four IWorld facet no-op stubs, the
     // sanctioned both-worlds implementation seam. Exact count.
-    ceiling: 12506,
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    ceiling: 12524,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
+    // Lowered to the exact size after the Claudium checkout error ladder
+    // moved into src/ui/wallet_bridge_reason_text.ts (the ratchet only works
+    // if it tightens with every real extraction).
+    // Re-pinned 11486 -> 11493 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): release-side growth only (its own row went to 11490); the
+    // branch's main.ts lines are unchanged. Exact merged count, zero headroom.
     file: 'src/main.ts',
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 11606,
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    ceiling: 11584,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
+    // Held at the exact pre-existing size: the character-save FIFO, the
+    // save-fixups, and the depth-warn extractions (serial_writer.ts,
+    // character_save_fixups.ts) paid line for line for the marketplace
+    // escrow-persist host seam (enqueueCharacterWrite,
+    // serializeCharacterForPersist, escrowSessionLost, the guild-book flush
+    // pair). Zero headroom on purpose, the standing posture here.
+    // Re-pinned 10818 -> 10807 at the third v0.39.0 sync merge (release tip
+    // b650d9d7d2): the release moved the mech-chroma reconcile out to
+    // server/mech_chroma_reconcile.ts, so the merged file landed SMALLER and
+    // the ratchet follows it down (exact merged count, zero headroom).
+    // Re-pinned 10807 -> 10813 at the fourth v0.39.0 sync merge (release tip
+    // ea9377db8e): release-side growth only (the druid parked-mana sm field
+    // in the self-snapshot build plus its wireParkedMana import); the
+    // branch's own surface is unchanged (exact merged count, zero headroom).
     file: 'server/game.ts',
     // Re-pinned 10900 -> 10909 for the Proving Shore branch: the +9 is the
     // tutorial_start dispatch case (a thin delegate onto sim.startTutorial,
@@ -157,7 +263,9 @@ const MONOLITHS: MonolithRow[] = [
     // validated delegates onto SocialService), the applyPledge transport arm,
     // and the join-time pledge stamp in sendSocialSnapshot; the service logic
     // itself lives in server/social.ts. Exact count.
-    ceiling: 10698,
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
+    // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
+    ceiling: 10641,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -168,7 +276,10 @@ const MONOLITHS: MonolithRow[] = [
     // senders, the entity pg/gt decode, and the social-frame pledge-field
     // normalization (wire mirror code that must live on ClientWorld). Exact
     // count.
-    ceiling: 5803,
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge: both
+    // arms added wire-mirror code, so the merged file lands above either
+    // parent pin. Exact count, zero slack.
+    ceiling: 5825,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -183,13 +294,57 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/world.ts',
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
     // both parents' additions combine, so keep the exact merged count.
-    ceiling: 5318,
+    // Re-pinned again for the v0.40.0 sync merge (the release arm's
+    // gardenwalk pass rides in beside the tutorial island). Exact count,
+    // zero slack.
+    ceiling: 5347,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
     file: 'server/db.ts',
     ceiling: 4980,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
+  },
+  {
+    // Entered the ratchet with the hot-path-scale work, alongside the
+    // drift-warn extraction (woc_market_drift_warn.ts) that paid for the
+    // sweep segment plan; the read caches, price cache, and watchdog are
+    // already sibling modules. The qa gate caught the review rounds growing
+    // the file past the first snapshot, and the local-ledger arithmetic
+    // (woc_market_local_ledgers.ts) moved out to pay for it; the qa
+    // session's fix round then paid its own growth with the step-up flow
+    // (woc_market_stepup_flow.ts). The retention round then folded the
+    // cascade arm's prior-winner fetch into the store and re-pinned at the
+    // shrunken count. The figure is the current count, zero headroom; the
+    // delivery arms are the next standing candidate.
+    // The delivery arms LANDED as the candidate (the escrow write-path
+    // rider): the batch driver, both residue converges, the book-once
+    // custody rail, the hand-off with its grant ledger, and the return
+    // flight moved to server/woc_market_delivery.ts behind a WocDeliveryCtx
+    // slice, paying for the rider's drain rung and re-pinning DOWN at the
+    // exact count (4484 to 3984). The FIFO close then added the
+    // persistGrantSerialized member and its contract doc to the
+    // WocMarketCustody interface the coordinator owns (4000), and the
+    // rider's review round added the remaining declaration-and-rung
+    // surface no sibling can absorb: the escrowSaturated dep with its two
+    // pre-burn rungs (a gate refusal must not consume a signed step-up
+    // challenge), the recorders' typed contended arms, and the busyParks
+    // scope field the delivery budget reads. Exactly 4037, still net 447
+    // DOWN across the rider; the ledgers stay on the service (live state)
+    // and the bond payout walk is the next standing candidate.
+    file: 'server/woc_market.ts',
+    // Down 4037 -> 4036 at the rider QA: the delivery-arms extraction left
+    // listingReturnCustodyRef imported here with its only use gone to
+    // woc_market_delivery.ts. The ratchet's own rule, an extraction lowers
+    // the ceiling, applies to the dead line the extraction forgot too.
+    // Down 4036 -> 4032 at the Exchange UX round: the pass budgets and
+    // deadlines moved to woc_market_budgets.ts (the sibling pattern), which
+    // also cleared the 6 lines the file had drifted over this ceiling.
+    // Down 4032 -> 3989 at the second round: the stuck-custody monitor
+    // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
+    // paying for the seller-history read.
+    ceiling: 3989,
+    seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
     file: 'src/render/foliage.ts',

@@ -357,6 +357,17 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS ad_spend');
   });
 
+  it('applies the $WOC Exchange schema (listings plus a dependent table)', async () => {
+    // WOC_MARKET_SCHEMA (server/woc_market_db.ts) backs every marketplace
+    // table. Same defined-but-unwired hazard as the DISCORD_SCHEMA lesson:
+    // deleting its ensureSchema line in server/db.ts must fail here, not at
+    // the first production listing.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS woc_market_listings');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS woc_market_bids');
+  });
+
   it('applies the compact player-metrics schema without a boot backfill', async () => {
     // Both phases, in the order server/main.ts runs them: the schema
     // transaction, then the CONCURRENTLY builds, which are now a SEPARATE call
@@ -396,8 +407,13 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
 
     // The invalid-carcass check runs under the session lock, before the create
-    // it protects; on a healthy boot (no carcass) nothing is dropped.
-    const carcassCheck = h.calls.findIndex((sql) => sql.includes('indisvalid'));
+    // it protects; on a healthy boot (no carcass) nothing is dropped. Scoped
+    // past the session lock because the boot-DDL schema strings legitimately
+    // carry their own validity gates (the woc_market repair gates) inside the
+    // boot transaction; a -1 (no post-lock check at all) still fails below.
+    const carcassCheck = h.calls.findIndex(
+      (sql, i) => i > sessionLock && sql.includes('indisvalid'),
+    );
     expect(carcassCheck).toBeGreaterThan(sessionLock);
     expect(carcassCheck).toBeLessThan(concurrentIndex);
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
@@ -619,6 +635,8 @@ describe('ensureSchema wires every schema module at boot', () => {
       'bank_ledger_container_recent',
       'player_reports_retention_created',
       'chat_violations_retention_created',
+      'bank_ledger_account_recent',
+      'woc_market_sales_seller',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -653,6 +671,19 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bankLedgerContainer?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
     );
+    // The admin economy-oversight per-account bank_ledger reader
+    // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
+    // same bounded-backwards-scan shape as the guild reader. NOT partial: the
+    // threshold is a parameter here, applied as a trailing Filter.
+    const bankLedgerAccount = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'bank_ledger_account_recent',
+    );
+    expect(bankLedgerAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
+    expect(bankLedgerAccount?.checkSql).toContain("to_regclass('bank_ledger_account_recent')");
+    expect(bankLedgerAccount?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent',
+    );
     // player_reports retention prune (prunePlayerReportsBatch): account-agnostic
     // age scan, so the index leads with created_at rather than either existing
     // account column, and is partial on the resolved-report predicate the
@@ -684,6 +715,20 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(chatViolationsRetention?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS chat_violations_retention_created',
+    );
+    // The Exchange seller click-through read (salesForSeller): concurrent,
+    // never boot DDL, because woc_market_sales is keep-forever and a
+    // transactional build would grow into a boot-time write-blocking lock on
+    // the money path's insertSale.
+    const wocSalesSeller = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'woc_market_sales_seller',
+    );
+    expect(wocSalesSeller?.createSql).toContain(
+      'ON woc_market_sales(realm, seller_name, created_at DESC)',
+    );
+    expect(wocSalesSeller?.checkSql).toContain("to_regclass('woc_market_sales_seller')");
+    expect(wocSalesSeller?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS woc_market_sales_seller',
     );
   });
 
