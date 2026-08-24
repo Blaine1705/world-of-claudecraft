@@ -2234,7 +2234,13 @@ describe('client-side delta merge', () => {
       });
       expect(client.flushInput(100)).toBe(true);
       expect(sent).toEqual([
-        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 } },
+        {
+          t: 'input',
+          seq: 1,
+          mv: 2,
+          mt: 100,
+          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
+        },
       ]);
 
       expect(client.flushInput(105)).toBe(false);
@@ -2248,6 +2254,8 @@ describe('client-side delta merge', () => {
       expect(sent.at(-1)).toEqual({
         t: 'input',
         seq: 2,
+        mv: 2,
+        mt: 120,
         mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
       });
     } finally {
