@@ -58,14 +58,17 @@ const MAIL_EXPIRY_SECONDS = 14 * 24 * 3600; // sim-seconds a read/plain letter l
 // sender, and the returned letter's second window before the sweep deletes it.
 export const MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 * 24 * 3600;
 const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse new)
-// #3561: the window every escrow letter gets its persisted deliverIn/
-// secondsLeft refreshed at least once, staggered by id (one ~1/3600th slice
-// of the escrow population per sim-second, never a synchronized whole-subset
-// burst): bounds staleness against the 30-day attachment window it protects
-// (MAIL_ATTACHMENT_EXPIRY_SECONDS) at roughly 0.14%, nowhere near the tight
-// ~30s bound the old whole-book autosave incidentally provided but never
-// actually needed. See PostOffice.update.
-const MAIL_ESCROW_REFRESH_SECONDS = 3600;
+// #3561: the window every still-live letter with a finite expiresAt gets its
+// persisted deliverIn/secondsLeft refreshed at least once, staggered by id
+// (one ~1/3600th slice of the book per sim-second, never a synchronized
+// whole-book burst): bounds staleness against both the 30-day attachment
+// window it protects (MAIL_ATTACHMENT_EXPIRY_SECONDS, at roughly 0.14%) and
+// the 14-day plain-letter expiry window (MAIL_EXPIRY_SECONDS, at roughly
+// 0.3%), nowhere near the tight ~30s bound the old whole-book autosave
+// incidentally provided but never actually needed. See PostOffice.update.
+// Exported so tests can compute a letter's exact stagger slot (id %
+// MAIL_PERSIST_REFRESH_SECONDS) instead of guessing how long to tick.
+export const MAIL_PERSIST_REFRESH_SECONDS = 3600;
 export const MAIL_SUBJECT_MAX = 64;
 export const MAIL_BODY_MAX = 600;
 
@@ -208,22 +211,23 @@ export class PostOffice {
     // absolute times (sim.time resets to 0 every boot). The old whole-book
     // autosave refreshed every letter every 30 s regardless, so staleness was
     // bounded to one autosave cycle; incremental persistence only refreshes a
-    // letter when something dirties it, so an escrowed parcel nobody touches
-    // could otherwise drift for the rest of the boot's uptime and grant itself
-    // extra life across an eventual restart. Re-dirty the still-in-limbo
-    // escrow subset (items or copper attached, not yet expired) on the same
-    // bounded cadence below, so its persisted countdown can never be staler
-    // than the old design ever allowed. Deliberately scoped to escrow only:
-    // a plain letter with nothing attached carries no economy stake, so a
-    // looser countdown after a restart is an accepted cosmetic trade-off, not
-    // a correctness one, and refreshing it too would sweep most of the book
-    // (nearly every letter without attachments still carries a finite 14-day
-    // expiry) and reopen the exact whole-book cost this design exists to cut.
-    // Staggered by id, one slice of the escrow population per sim-second
-    // (below), never every escrow letter on the same tick: a synchronized
-    // whole-subset burst every MAIL_ESCROW_REFRESH_SECONDS would itself
-    // reopen the #3555 stall class at the escrow population's scale.
-    const refreshSlot = Math.floor(now) % MAIL_ESCROW_REFRESH_SECONDS;
+    // letter when something dirties it, so a letter nobody touches could
+    // otherwise drift for the rest of the boot's uptime and grant itself extra
+    // life across an eventual restart: an escrowed parcel's attachment window
+    // stretches out, or (a P0 originally missed here) a plain letter's 14-day
+    // read/expiry clock never advances at all, so it effectively never expires
+    // across a restart, since realms restart far more often than 14 days. Both
+    // silently defeat the reclaim sweep #3561 exists to keep working, so
+    // re-dirty every still-live letter with a finite expiresAt, escrowed or
+    // plain alike, on the same bounded cadence below: its persisted countdown
+    // can never be staler than the old design ever allowed. Staggered by id,
+    // one slice of the book per sim-second (below), never the whole book on
+    // the same tick: a synchronized whole-book burst every
+    // MAIL_PERSIST_REFRESH_SECONDS would itself reopen the #3555 stall class
+    // at the book's scale. Cheap even so: roughly book-size /
+    // MAIL_PERSIST_REFRESH_SECONDS dirty marks per second (about 42/s at the
+    // #3561 150k-letter benchmark), and a dirty mark is O(1), not a write.
+    const refreshSlot = Math.floor(now) % MAIL_PERSIST_REFRESH_SECONDS;
     for (let i = this.mail.length - 1; i >= 0; i--) {
       const m = this.mail[i];
       if (!m.announced && now >= m.deliverAt) {
@@ -264,11 +268,7 @@ export class PostOffice {
         this.bumpRev();
         continue;
       }
-      if (
-        hasEscrow &&
-        Number.isFinite(m.expiresAt) &&
-        m.id % MAIL_ESCROW_REFRESH_SECONDS === refreshSlot
-      ) {
+      if (Number.isFinite(m.expiresAt) && m.id % MAIL_PERSIST_REFRESH_SECONDS === refreshSlot) {
         this.index.markDirty(m.recipientKey);
       }
     }
