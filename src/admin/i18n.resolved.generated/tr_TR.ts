@@ -788,6 +788,7 @@ export const tr_TR: AdminTranslations = {
   "wealth.guildTreasury": "{amount} hazine, {members} üyeler",
   "wealth.largeMovementsHeader": "Son büyük altın hareketleri",
   "wealth.noLargeMovements": "büyük banka hareketleri kaydedilmedi",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Ne zaman",
   "wealth.colOp": "Operasyon",
   "wealth.colDelta": "Miktar",

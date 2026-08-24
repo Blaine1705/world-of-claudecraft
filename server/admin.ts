@@ -3,6 +3,7 @@ import { verifyLoginTwoFactor } from './account';
 import {
   LARGE_GOLD_MOVEMENT_LIMIT,
   LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+  readLargeMovementsPane,
   readTopWealthHolders,
   redactActiveFlagCounts,
 } from './account_wealth';
@@ -1615,12 +1616,14 @@ export async function handleAdminApi(
       const targetAccountId = Number(accountWealthMatch[1]);
       const breakdown = await accountWealthBreakdown(targetAccountId);
       if (breakdown === null) return fail(res, 404, 'account not found');
-      const largeMovements = await largeGoldMovementsForAccount(
-        targetAccountId,
-        LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
-        LARGE_GOLD_MOVEMENT_LIMIT,
+      const pane = await readLargeMovementsPane(targetAccountId, () =>
+        largeGoldMovementsForAccount(
+          targetAccountId,
+          LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+          LARGE_GOLD_MOVEMENT_LIMIT,
+        ),
       );
-      return ok(res, { ...breakdown, largeMovements });
+      return ok(res, { ...breakdown, ...pane });
     }
     const accountFlagsMatch = /^\/admin\/api\/accounts\/(\d+)\/flags$/.exec(path);
     if (accountFlagsMatch) {
@@ -2507,12 +2510,14 @@ async function accountWealthHandler(ctx: Ctx): Promise<void> {
   const accountId = adminTargetId(ctx);
   const breakdown = await adminDb().accountWealthBreakdown(accountId);
   if (breakdown === null) return fail(ctx.res, 404, 'account not found');
-  const largeMovements = await adminDb().largeGoldMovementsForAccount(
-    accountId,
-    LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
-    LARGE_GOLD_MOVEMENT_LIMIT,
+  const pane = await readLargeMovementsPane(accountId, () =>
+    adminDb().largeGoldMovementsForAccount(
+      accountId,
+      LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+      LARGE_GOLD_MOVEMENT_LIMIT,
+    ),
   );
-  ok(ctx.res, { ...breakdown, largeMovements });
+  ok(ctx.res, { ...breakdown, ...pane });
 }
 
 /** GET /admin/api/accounts/:id/flags: the account's full flag history (active

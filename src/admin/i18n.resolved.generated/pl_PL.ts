@@ -788,6 +788,7 @@ export const pl_PL: AdminTranslations = {
   "wealth.guildTreasury": "{amount} skarbiec, {members} członkowie",
   "wealth.largeMovementsHeader": "Ostatnie duże ruchy złota",
   "wealth.noLargeMovements": "nie zanotowano żadnych dużych ruchów bankowych",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Gdy",
   "wealth.colOp": "Działanie",
   "wealth.colDelta": "Kwota",

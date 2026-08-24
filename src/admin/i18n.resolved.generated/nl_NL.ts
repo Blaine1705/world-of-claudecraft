@@ -788,6 +788,7 @@ export const nl_NL: AdminTranslations = {
   "wealth.guildTreasury": "{amount} schatkist, {members} leden",
   "wealth.largeMovementsHeader": "Recente grote goudbewegingen",
   "wealth.noLargeMovements": "geen grote bankbewegingen geregistreerd",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Wanneer",
   "wealth.colOp": "Operatie",
   "wealth.colDelta": "Hoeveelheid",

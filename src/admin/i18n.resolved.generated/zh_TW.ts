@@ -788,6 +788,7 @@ export const zh_TW: AdminTranslations = {
   "wealth.guildTreasury": "{amount} 財務部，{members} 成員",
   "wealth.largeMovementsHeader": "近期黃金大幅波動",
   "wealth.noLargeMovements": "沒有記錄到大規模的銀行變動",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "什麼時候",
   "wealth.colOp": "手術",
   "wealth.colDelta": "數量",

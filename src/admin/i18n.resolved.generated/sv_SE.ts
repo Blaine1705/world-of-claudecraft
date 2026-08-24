@@ -788,6 +788,7 @@ export const sv_SE: AdminTranslations = {
   "wealth.guildTreasury": "{amount} treasury, {members} medlemmar",
   "wealth.largeMovementsHeader": "Senaste stora guldrörelser",
   "wealth.noLargeMovements": "inga stora bankrörelser registrerade",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "När",
   "wealth.colOp": "Drift",
   "wealth.colDelta": "Belopp",

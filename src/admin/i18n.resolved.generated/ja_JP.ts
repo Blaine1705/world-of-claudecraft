@@ -788,6 +788,7 @@ export const ja_JP: AdminTranslations = {
   "wealth.guildTreasury": "{amount} 財務部、{members} メンバー",
   "wealth.largeMovementsHeader": "最近の金の大きな動き",
   "wealth.noLargeMovements": "大規模な銀行の動きは記録されていない",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "いつ",
   "wealth.colOp": "手術",
   "wealth.colDelta": "額",

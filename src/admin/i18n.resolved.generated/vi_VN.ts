@@ -788,6 +788,7 @@ export const vi_VN: AdminTranslations = {
   "wealth.guildTreasury": "{amount} kho bạc, {members} thành viên",
   "wealth.largeMovementsHeader": "Phong trào vàng lớn gần đây",
   "wealth.noLargeMovements": "không có chuyển động ngân hàng lớn nào được ghi nhận",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Khi",
   "wealth.colOp": "Hoạt động",
   "wealth.colDelta": "Số lượng",

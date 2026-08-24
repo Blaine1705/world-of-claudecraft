@@ -273,6 +273,9 @@ export interface AccountWealthData {
   updatedAt: string | null;
   characters: AccountWealthCharacterRow[];
   largeMovements: LargeGoldMovementRow[];
+  /** The ledger read failed (timed out) after the breakdown was computed:
+   *  largeMovements is empty because it is unknown, not because it is none. */
+  largeMovementsUnavailable?: boolean;
 }
 
 export interface RelatedAccountRef {

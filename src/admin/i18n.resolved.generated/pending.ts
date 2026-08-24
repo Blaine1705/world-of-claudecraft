@@ -11,64 +11,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "es_ES": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "fr_FR": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "fr_CA": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "en_CA": [],
   "it_IT": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "de_DE": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "zh_CN": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "zh_TW": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "ko_KR": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "ja_JP": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "pt_BR": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "ru_RU": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "cs_CZ": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "nl_NL": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "pl_PL": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "id_ID": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "tr_TR": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "sv_SE": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "vi_VN": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ],
   "da_DK": [
-    "error.flagActiveExists"
+    "error.flagActiveExists",
+    "wealth.largeMovementsUnavailable"
   ]
 };

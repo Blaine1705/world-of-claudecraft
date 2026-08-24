@@ -788,6 +788,7 @@ export const da_DK: AdminTranslations = {
   "wealth.guildTreasury": "{amount} treasury, {members} medlemmer",
   "wealth.largeMovementsHeader": "Nylige store guldværker",
   "wealth.noLargeMovements": "ingen store bankbevægelser registreret",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Når",
   "wealth.colOp": "Handling",
   "wealth.colDelta": "Beløb",

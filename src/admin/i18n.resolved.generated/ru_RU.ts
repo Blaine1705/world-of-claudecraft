@@ -788,6 +788,7 @@ export const ru_RU: AdminTranslations = {
   "wealth.guildTreasury": "{amount} казначейство, {members} членов",
   "wealth.largeMovementsHeader": "Недавние крупные движения золота",
   "wealth.noLargeMovements": "крупных движений банков не зафиксировано",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Когда",
   "wealth.colOp": "Операция",
   "wealth.colDelta": "Количество",

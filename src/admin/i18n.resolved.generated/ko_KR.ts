@@ -788,6 +788,7 @@ export const ko_KR: AdminTranslations = {
   "wealth.guildTreasury": "{amount} 재무부, {members} 회원",
   "wealth.largeMovementsHeader": "최근 대규모 금 움직임",
   "wealth.noLargeMovements": "대규모 은행 이동이 기록되지 않았습니다.",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "언제",
   "wealth.colOp": "작업",
   "wealth.colDelta": "양",

@@ -788,6 +788,7 @@ export const id_ID: AdminTranslations = {
   "wealth.guildTreasury": "{amount} perbendaharaan, {members} anggota",
   "wealth.largeMovementsHeader": "Pergerakan emas besar baru-baru ini",
   "wealth.noLargeMovements": "tidak ada pergerakan bank besar yang tercatat",
+  "wealth.largeMovementsUnavailable": "large bank movements could not be loaded (the ledger read timed out); the gold breakdown above is complete",
   "wealth.colWhen": "Kapan",
   "wealth.colOp": "Operasi",
   "wealth.colDelta": "Jumlah",
