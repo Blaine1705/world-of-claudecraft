@@ -730,6 +730,15 @@
 
         <div class="header-actions">
           <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
+          <button
+            type="button"
+            class="desktop-login-exit"
+            id="desktop-login-exit"
+            data-i18n="desktop.titlebar.exitGame"
+            data-i18n-title="desktop.titlebar.exitGame"
+            title="Exit Game"
+            hidden
+          >Exit Game</button>
           <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span data-i18n="nav.donate">Donate</span>
@@ -1382,6 +1391,23 @@
                 </div>
                 <div id="account-password-msg" class="auth-field-msg" aria-live="polite"></div>
                 <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.savePassword">Update Password</button>
+              </form>
+
+              <!-- Shown instead of Change Password for an Apple- or Discord-provisioned
+                   account (passwordSet:false): there is no current password to re-verify. -->
+              <form id="account-set-password-form" class="account-form" novalidate hidden>
+                <h4 class="account-form-title" data-i18n="hudChrome.account.setPasswordTitle">Set a Password</h4>
+                <p class="account-hint" data-i18n="hudChrome.account.setPasswordHint">This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.</p>
+                <div class="auth-field">
+                  <label for="account-set-new-pass" class="auth-label" data-i18n="hudChrome.account.newPassword">New password</label>
+                  <input id="account-set-new-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div class="auth-field">
+                  <label for="account-set-confirm-pass" class="auth-label" data-i18n="hudChrome.account.confirmNewPassword">Confirm new password</label>
+                  <input id="account-set-confirm-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div id="account-set-password-msg" class="auth-field-msg" aria-live="polite"></div>
+                <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.setPasswordSubmit">Set Password</button>
               </form>
 
               <div class="account-form">

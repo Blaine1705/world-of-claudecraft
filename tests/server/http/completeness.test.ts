@@ -268,6 +268,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     // The account portal (server/account.ts).
     { method: 'GET', path: '/api/account' },
     { method: 'POST', path: '/api/account/password' },
+    { method: 'POST', path: '/api/account/password/set-initial' },
     { method: 'POST', path: '/api/account/logout' },
     { method: 'POST', path: '/api/account/email' },
     { method: 'POST', path: '/api/account/deactivate' },

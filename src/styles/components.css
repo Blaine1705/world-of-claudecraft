@@ -5772,6 +5772,14 @@
   .crafting-reagent-line {
     line-height: 1.4;
   }
+  /* The craft fee sub-line (#1301 gold sink): previously charged with no
+     line item anywhere in this window. Same block-plus-gap treatment as
+     .crafting-skill-line below, so it reads as its own row under the
+     reagent list rather than running into it. */
+  .crafting-fee-line {
+    display: block;
+    margin-top: 2px;
+  }
   /* Unsatisfied reagents tint toward the error red; the have/required counts
      in the text are the actual signal (the tint is a redundant hint). */
   .crafting-reagent.unsat {

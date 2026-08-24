@@ -37,7 +37,6 @@ import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
-  lineOfSightClear,
   moverHeight,
   placementFloorHeight,
   resolveMovement,
@@ -89,6 +88,7 @@ import {
 import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -108,7 +108,7 @@ import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraf
 import { clearPacklordState } from './combat/hunter_packlord';
 import {
   clearHunterTalentState,
-  hunterPetFerocityDamageMultiplier,
+  hunterPetDamageMultiplier,
   resolveHunterSharedAbility,
 } from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
@@ -245,7 +245,6 @@ import {
   createPlayer,
   type PlayerEquipment,
   type PlayerEquipmentInstances,
-  pctValue,
   recalcPlayerStats,
 } from './entity';
 import {
@@ -289,6 +288,7 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from './leaderboard_page';
+import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
@@ -2338,11 +2338,11 @@ export class Sim {
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
+        const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // The one sim-side observer of a lethal fall (hid_fall_death): the
-        // shared pure kernel labels the hit 'Falling' with a null source, and
-        // this wrapper keeps the deed hook out of the kernel both hosts run.
-        if (source === null && ability === 'Falling' && target.kind === 'player' && target.dead) {
+        // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
+        const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
+        if (isPlayerFall && wasAlive && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },
@@ -6435,7 +6435,16 @@ export class Sim {
     const aura = this.fearAura(e);
     if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
       return false;
-    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    let angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    // Player-only wall guard (combat/fear_steering.ts): redirect the flee heading
+    // away from a wall it is about to run into, and remember the new heading on the
+    // aura so it holds until the next wall. Feared mobs keep their untouched
+    // movement (and the parity draw order with it), matching the vertical snap's
+    // player-only scoping.
+    if (e.kind === 'player') {
+      angle = steerFearFromWalls(this.ctx, e, angle);
+      aura.value = angle;
+    }
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
     return true;
@@ -6522,6 +6531,9 @@ export class Sim {
         reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
       else if (a.kind === 'faerie_fire')
         reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
+      // Melting Acid carries its own fraction on the aura (0.05), so a future
+      // rank or talent scales the value rather than a constant here.
+      else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);
     }
     return Math.max(0, armor * (1 - reductionPct));
   }
@@ -6543,14 +6555,7 @@ export class Sim {
 
   private petDamageMult(e: Entity): number {
     if (e.ownerId === null) return 1;
-    let mult = 1;
-    for (const a of e.auras) {
-      if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
-    }
-    const ownerMeta = this.players.get(e.ownerId);
-    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
-    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
-    return mult;
+    return hunterPetDamageMultiplier(this.ctx, e);
   }
 
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
@@ -6980,7 +6985,7 @@ export class Sim {
     // The delve-run lookup is O(active runs x mobs per run) and allocates a
     // party key per call, and this method sits on every ranged auto-attack,
     // AoE pulse, and LOS-gated cast. Only a sight line with an endpoint
-    // inside the delve band can ever consume run.modules (lineOfSightClear's
+    // inside the delve band can ever consume run.modules (the collider LOS
     // delve arm keys off from.x), so every other combat sight check skips
     // all four lookups. Mirrors the movement path's isDelvePos guard.
     const inDelve = isDelvePos(source.pos.x) || isDelvePos(target.pos.x);
@@ -6990,10 +6995,10 @@ export class Sim {
         this.delveRunForPlayer(source.id) ??
         this.delveRunForPlayer(target.id))
       : undefined;
-    return lineOfSightClear(
+    return entityLineOfSightClear(
       this.cfg.seed,
-      source.pos,
-      target.pos,
+      source,
+      target,
       0.05,
       run?.modules,
       this.riftCollisionToken,

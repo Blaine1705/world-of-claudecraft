@@ -75,6 +75,7 @@ import {
   curatorRankFromOwned,
   reliquaryWireJson,
 } from '../src/sim/reliquary';
+import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -161,6 +162,12 @@ import {
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
 import { ChatLogger } from './chat_log';
+import {
+  type ChatModerationHydration,
+  ChatModerationLiveState,
+  pushMuteChange,
+  pushStrikesChange,
+} from './chat_mod_live';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
   persistCheaterMark,
@@ -342,6 +349,7 @@ import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport 
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
+import { attachDetectorFlagHost } from './suspicion_flags';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
@@ -1498,6 +1506,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // reliability contract hcb gives harvest claims. Flips once per corpse, so
   // the per-entity dyn cache re-serializes exactly one changed record.
   if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
+  if (e.kind === 'mob' && corpseHasDecayed(e.dead, e.corpseTimer)) out.cd = 1; // corpse decayed
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -1779,6 +1788,7 @@ export class GameServer {
   private readonly moderation: ModerationService<ClientSession>;
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
+  private readonly chatModerationLiveState = new ChatModerationLiveState();
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -1969,6 +1979,7 @@ export class GameServer {
   private readonly riftAssets: RiftAssetCoordinator;
 
   constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
+    attachDetectorFlagHost(this.botDetector);
     this.generalChatQuota = new GeneralChatQuotaCoordinator({
       consume: consumeGeneralChatQuota,
       maxInFlight: generalChatQuotaMaxInFlight,
@@ -3126,6 +3137,10 @@ export class GameServer {
   /** Fence an auth-query policy snapshot against later LISTEN notifications. */
   beginGeneralChatRateLimitHydration(accountId: number): GeneralChatRateLimitHydration {
     return this.generalChatRateLimitLiveState.beginHydration(accountId);
+  }
+
+  beginChatModerationHydration(accountId: number): ChatModerationHydration {
+    return this.chatModerationLiveState.beginHydration(accountId);
   }
 
   generalChatQuotaInFlight(): number {
@@ -6211,6 +6226,7 @@ export class GameServer {
       if (session.accountId !== accountId) continue;
       session.chatMutedUntil = until.getTime();
       session.chatMuteReason = reason.trim();
+      pushMuteChange(this.chatModerationLiveState, session);
       this.send(session, {
         t: 'events',
         list: [{ type: 'error', text: this.chatMuteMessage(session) }],
@@ -6281,6 +6297,7 @@ export class GameServer {
       if (session.accountId === accountId) {
         session.chatMutedUntil = null;
         session.chatMuteReason = '';
+        pushMuteChange(this.chatModerationLiveState, session);
       }
     }
   }
@@ -6288,7 +6305,9 @@ export class GameServer {
   /** Reflect an admin "reset strikes" on any live sessions. */
   resetChatStrikesLive(accountId: number): void {
     for (const session of this.clients.values()) {
-      if (session.accountId === accountId) session.chatStrikes = 0;
+      if (session.accountId !== accountId) continue;
+      session.chatStrikes = 0;
+      pushStrikesChange(this.chatModerationLiveState, session);
     }
   }
 
@@ -10575,9 +10594,11 @@ export class GameServer {
     void applyChatStrike(session.accountId, outcome.muteSeconds)
       .then((applied) => {
         session.chatStrikes = applied.strikes;
-        session.chatMutedUntil = applied.chatMutedUntil
-          ? new Date(applied.chatMutedUntil).getTime()
-          : session.chatMutedUntil;
+        pushStrikesChange(this.chatModerationLiveState, session);
+        if (applied.chatMutedUntil) {
+          session.chatMutedUntil = new Date(applied.chatMutedUntil).getTime();
+          pushMuteChange(this.chatModerationLiveState, session);
+        }
       })
       .catch((err) => console.error('applyChatStrike failed:', err));
     void recordChatViolation({
@@ -10776,7 +10797,6 @@ export class GameServer {
   private send(session: ClientSession, obj: unknown): void {
     this.sendRaw(session, JSON.stringify(obj));
   }
-
   private sendCommandOutcome(session: ClientSession, msg: ClientMessage, succeeded: boolean): void {
     if (!Number.isSafeInteger(msg.rid) || (msg.rid ?? 0) <= 0) return;
     this.send(session, { t: 'commandOutcome', rid: msg.rid, ok: succeeded });

@@ -63,6 +63,7 @@ export const API_ERROR_KEYS = {
   'account.characters_online': 'apiError.account.characters_online',
   'account.deactivated': 'apiError.account.deactivated',
   'account.not_found': 'apiError.account.not_found',
+  'account.password_already_set': 'apiError.account.password_already_set',
 
   // character: creation, selection, and world-entry failures.
   'character.name_invalid': 'apiError.character.name_invalid',

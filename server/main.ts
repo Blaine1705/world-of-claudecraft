@@ -41,10 +41,23 @@ import {
   handleAccountPasswordReset,
   handleAccountSetEmail,
   handleAccountSetInitialEmail,
+  handleAccountSetInitialPassword,
   handleAccountWhoami,
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
+import {
+  configureTopWealthHolders,
+  startAccountWealthSweep,
+  TOP_WEALTH_HOLDERS_LIMIT,
+} from './account_wealth';
+import {
+  applyEscrowTotals,
+  listEscrowStateRows,
+  refreshAccountPurseTotals,
+  topWealthHolders,
+  withAccountWealthSweepLock,
+} from './account_wealth_db';
 import {
   configureAdminGuildBoardCacheBust,
   configureAdminPlayersCap,
@@ -357,6 +370,8 @@ import {
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
+import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
+import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
 import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
@@ -2321,6 +2336,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
       });
     }
+    // Set a real password on an account that has none yet (an Apple- or
+    // Discord-provisioned account whose only credential is a random placeholder
+    // hash the owner never saw). Bearer-scoped; rejects once a real password
+    // already exists (that must go through the change-password flow above).
+    if (req.method === 'POST' && url === '/api/account/password/set-initial') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleAccountSetInitialPassword(req, res, accountId);
+    }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is
     // written to never reveal whether an account exists).
@@ -3818,6 +3842,20 @@ export async function startServer(): Promise<http.Server> {
   // that are empty until the market has ever run.
   wocMarketMonitor.start();
 
+  // Admin economy oversight: wire the cached reads to their SQL sources and
+  // start the account-wealth sweep (self-clocked, non-overlapping; see
+  // server/account_wealth.ts for the materialisation rationale).
+  configureTopWealthHolders(() => topWealthHolders(TOP_WEALTH_HOLDERS_LIMIT));
+  configureSuspicionFlagDataset(listSuspicionFlagDataset);
+  const accountWealthSweep = startAccountWealthSweep({
+    refreshAccountPurseTotals,
+    listEscrowStateRows,
+    applyEscrowTotals,
+    // The sweep's queries are global, so exactly one process across all realms
+    // runs a pass; losers of the advisory lock stand down until their next tick.
+    withSweepLock: withAccountWealthSweepLock,
+  });
+
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
@@ -3846,6 +3884,9 @@ export async function startServer(): Promise<http.Server> {
     wocAuthGuardCache.bustAll();
     await wocMarketMonitor.stop();
     await generalChatQuotaListener.stop();
+    // Stop the wealth sweep's timer (an in-flight pass logs its own failure if
+    // it races the pool close; the next boot's first pass rebuilds the totals).
+    accountWealthSweep.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
@@ -3861,6 +3902,10 @@ export async function startServer(): Promise<http.Server> {
     // transient mismatch). Rejections log inside the writer, so the drain never
     // throws.
     await bankLedgerIdle();
+    // Drain queued suspicion-flag writes for the same reason: a detector
+    // confirmation or burst flag still on the FIFO tail would be rejected by
+    // pool.end(). Rejections log inside the writer, so the drain never throws.
+    await suspicionFlagsIdle();
     // Drain the character_deeds FIFO too: saveAll above already persisted every
     // blob, and an insert still queued here would be rejected by pool.end() and
     // go missing until that character's next login (the join reconcile is the
