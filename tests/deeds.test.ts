@@ -2538,12 +2538,21 @@ describe('POI_VISIT_RADIUS: no two marks a single-zone wayfarer deed needs can o
       'mirefen_marsh',
       'thornpeak_heights',
     ]);
+    // One authored exception: the New Eastbrook program built the town on the
+    // demolished Sowfield parcel (docs/design/eastbrook-revamp/master-plan.md),
+    // and the frozen the_sowfield mark is deliberately earned by visiting the
+    // town that replaced it (src/sim/content/zone1.ts keeps the hidden POI row
+    // so the append-only deeds catalog never strands the trigger). That one
+    // pair may overlap; every other pair keeps the distinct-visit guarantee.
+    const deliberateOverlaps = new Set(['eastbrook_vale:eastbrook|the_sowfield']);
     for (const zoneId of singleZoneWayfarerZoneIds) {
       const zone = ZONES.find((z) => z.id === zoneId)!;
       const pois = zone.pois.filter((p) => p.id !== undefined);
       let tightest = Number.POSITIVE_INFINITY;
       for (let i = 0; i < pois.length; i++) {
         for (let j = i + 1; j < pois.length; j++) {
+          const pairKey = `${zoneId}:${[pois[i].id, pois[j].id].sort().join('|')}`;
+          if (deliberateOverlaps.has(pairKey)) continue;
           const d = Math.hypot(pois[i].x - pois[j].x, pois[i].z - pois[j].z);
           if (d < tightest) tightest = d;
         }
