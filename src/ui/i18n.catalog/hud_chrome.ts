@@ -4608,6 +4608,11 @@ export const hudChromeStrings = {
     disenchant: 'Disenchant',
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
+    // The vendor right-click / tap menu's own default row (Sell, since that is
+    // what it runs there) and its Sell all (N) row (bag_item_context_menu.ts
+    // vendorSellContextActions), the total held across every bag.
+    sell: 'Sell',
+    sellAll: 'Sell all ({count})',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each

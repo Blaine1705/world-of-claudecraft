@@ -3515,7 +3515,9 @@ export const ko_KR: EnTranslations = {
       "equip": "장착",
       "disenchant": "마력 추출",
       "salvage": "분해",
-      "applyEnchant": "마법부여 적용"
+      "applyEnchant": "마법부여 적용",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",

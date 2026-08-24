@@ -3515,7 +3515,9 @@ export const da_DK: EnTranslations = {
       "equip": "Udrust",
       "disenchant": "Affortrylle",
       "salvage": "Bjærg",
-      "applyEnchant": "Anvend fortryllelse"
+      "applyEnchant": "Anvend fortryllelse",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du affortrylles {item}.",

@@ -251,10 +251,12 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  RING position; the HUD resolves the underlying bar slot from the live
    *  page at drop time (the paged-ring mapping is HUD state). */
   dropOnActionRingSlot(itemId: string, ringIndex: number): void;
-  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
-   *  for a stack at a viewport point. `runDefault` runs the exact classic
-   *  left-click action for the clicked slot, so the menu's first row stays
-   *  byte-identical to a plain click. */
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant, or
+   *  at an open vendor, Sell / Sell all) for a stack at a viewport point.
+   *  `runDefault` runs the exact classic left-click action for the clicked
+   *  slot, so the menu's first row stays byte-identical to a plain click.
+   *  `vendorSellCount` is every copy of this item held across the bags,
+   *  supplied only when it should show the vendor row set instead. */
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
@@ -263,6 +265,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     y: number,
     runDefault: () => void,
     instance?: ItemInstancePayload,
+    vendorSellCount?: number,
   ): void;
 }
 
@@ -964,10 +967,21 @@ export class BagsWindow {
         // (issue 3042) added Lock/Unlock to every item's menu, this is now
         // ALWAYS available (previously only for Disenchant / Salvage / Apply
         // Enchant items; a plain item tapped straight through). Long-press
-        // still peeks (handled above).
-        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId, s.instance)) {
-          this.openItemMenuFor(item, s, ev);
-          return;
+        // still peeks (handled above). At an open vendor the profession menu
+        // is unavailable (itemMenuAvailable excludes it, same as every other
+        // special mode), so a sellable item falls into the vendor row set
+        // instead: touch has no shift-click either, so this is its only way
+        // to reach Sell all.
+        if (this.deps.isTouchHud()) {
+          if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
+            this.openItemMenuFor(item, s, ev);
+            return;
+          }
+          const vendorSellCount = this.vendorSellMenuCount(item, s);
+          if (vendorSellCount !== undefined) {
+            this.openItemMenuFor(item, s, ev, vendorSellCount);
+            return;
+          }
         }
         this.runBagAction(item, s, ev);
       });
@@ -987,11 +1001,23 @@ export class BagsWindow {
           ev.preventDefault();
           return;
         }
-        // At a vendor, Ctrl/Meta right-click owns the split-stack sell prompt.
         if (this.deps.vendorOpen()) {
-          if (!ev.ctrlKey && !ev.metaKey) return;
-          ev.preventDefault();
-          this.sellBagItem(s, ev);
+          // Ctrl/Meta right-click keeps its direct split-stack sell-prompt
+          // shortcut, unchanged.
+          if (ev.ctrlKey || ev.metaKey) {
+            ev.preventDefault();
+            this.sellBagItem(s, ev);
+            return;
+          }
+          // Plain right-click opens the vendor row set (Sell, plus Sell all
+          // when more than one copy is held) for a sellable item; a blocked
+          // or soulbound item falls through to the native browser menu, same
+          // as before this row existed.
+          const vendorSellCount = this.vendorSellMenuCount(item, s);
+          if (vendorSellCount !== undefined) {
+            ev.preventDefault();
+            this.openItemMenuFor(item, s, ev, vendorSellCount);
+          }
           return;
         }
         ev.preventDefault();
@@ -1658,7 +1684,12 @@ export class BagsWindow {
   // Open the action menu at the event's viewport point (falling back to the row
   // box for a keyboard-activated click), passing the exact classic action for
   // this slot as the menu's first row.
-  private openItemMenuFor(item: ItemDef, s: InvSlot, ev: MouseEvent): void {
+  private openItemMenuFor(
+    item: ItemDef,
+    s: InvSlot,
+    ev: MouseEvent,
+    vendorSellCount?: number,
+  ): void {
     this.deps.hideTooltip();
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
@@ -1672,7 +1703,19 @@ export class BagsWindow {
       y,
       () => this.runBagAction(item, s, ev),
       s.instance,
+      vendorSellCount,
     );
+  }
+
+  /** N for the vendor right-click/tap menu's Sell all (N) row: every copy of
+   *  this item held across the bags, or undefined when it cannot be
+   *  vendor-sold at all (mirrors bagItemAction's own vendorSell split, so a
+   *  blocked or soulbound item never grows a sell affordance the sim would
+   *  refuse). bagItemAction itself already gates on mode.vendorOpen, so this
+   *  is a no-op outside an open vendor. */
+  private vendorSellMenuCount(item: ItemDef, s: InvSlot): number | undefined {
+    if (bagItemAction(item, this.bagMode(), s.instance) !== 'vendorSell') return undefined;
+    return totalHeldCount(this.deps.world().inventory, s.itemId);
   }
 
   /** The copy selection for a clicked stack, or undefined when the stack is no
@@ -1738,7 +1781,9 @@ export class BagsWindow {
       input.min = '1';
       input.max = String(maxCount);
       input.step = '1';
-      input.value = '1';
+      // Defaults to the FULL stack (a new player's expectation of "destroy
+      // this"), pre-filled and still editable for anyone who wants fewer.
+      input.value = String(maxCount);
       prompt.appendChild(input);
     }
     const confirm = document.createElement('button');

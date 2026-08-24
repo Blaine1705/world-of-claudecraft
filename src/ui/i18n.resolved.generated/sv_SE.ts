@@ -3515,7 +3515,9 @@ export const sv_SE: EnTranslations = {
       "equip": "Utrusta",
       "disenchant": "Avförtrylla",
       "salvage": "Bärga",
-      "applyEnchant": "Applicera förtrollning"
+      "applyEnchant": "Applicera förtrollning",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",

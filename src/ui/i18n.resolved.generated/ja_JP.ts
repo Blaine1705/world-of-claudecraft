@@ -3515,7 +3515,9 @@ export const ja_JP: EnTranslations = {
       "equip": "装備する",
       "disenchant": "魔力分解",
       "salvage": "解体",
-      "applyEnchant": "エンチャントを付与"
+      "applyEnchant": "エンチャントを付与",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",

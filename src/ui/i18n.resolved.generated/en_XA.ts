@@ -3515,7 +3515,9 @@ export const en_XA: EnTranslations = {
       "equip": "[Éɋúíþ]",
       "disenchant": "[Ðíšéñçĥáñţ]",
       "salvage": "[Šáļʋáĝé]",
-      "applyEnchant": "[Áþþļý Éñçĥáñţ]"
+      "applyEnchant": "[Áþþļý Éñçĥáñţ]",
+      "sell": "[Šéļļ]",
+      "sellAll": "[Šéļļ áļļ ({count})]"
     },
     "enchanting": {
       "disenchantedLine": "[Ýóú ðíšéñçĥáñţ {item}.]",

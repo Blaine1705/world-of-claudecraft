@@ -3515,7 +3515,9 @@ export const ru_RU: EnTranslations = {
       "equip": "Надеть",
       "disenchant": "Распылить",
       "salvage": "Разобрать",
-      "applyEnchant": "Наложить чары"
+      "applyEnchant": "Наложить чары",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Вы распыляете {item}.",

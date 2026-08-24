@@ -3515,7 +3515,9 @@ export const en: EnTranslations = {
       "equip": "Equip",
       "disenchant": "Disenchant",
       "salvage": "Salvage",
-      "applyEnchant": "Apply Enchant"
+      "applyEnchant": "Apply Enchant",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "You disenchant {item}.",

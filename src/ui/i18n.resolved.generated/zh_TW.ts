@@ -3515,7 +3515,9 @@ export const zh_TW: EnTranslations = {
       "equip": "裝備",
       "disenchant": "分解",
       "salvage": "拆解",
-      "applyEnchant": "施加附魔"
+      "applyEnchant": "施加附魔",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "你分解了 {item}。",

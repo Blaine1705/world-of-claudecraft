@@ -3515,7 +3515,9 @@ export const it_IT: EnTranslations = {
       "equip": "Equipaggia",
       "disenchant": "Disincanta",
       "salvage": "Smantella",
-      "applyEnchant": "Applica Incantesimo"
+      "applyEnchant": "Applica Incantesimo",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",

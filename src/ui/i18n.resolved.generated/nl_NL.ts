@@ -3515,7 +3515,9 @@ export const nl_NL: EnTranslations = {
       "equip": "Uitrusten",
       "disenchant": "Onbetoveren",
       "salvage": "Salvagen",
-      "applyEnchant": "Betovering aanbrengen"
+      "applyEnchant": "Betovering aanbrengen",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",

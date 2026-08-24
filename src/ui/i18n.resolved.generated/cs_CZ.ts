@@ -3515,7 +3515,9 @@ export const cs_CZ: EnTranslations = {
       "equip": "Vybavit",
       "disenchant": "Rozzačarovat",
       "salvage": "Rozebrat",
-      "applyEnchant": "Aplikovat okouzlení"
+      "applyEnchant": "Aplikovat okouzlení",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",

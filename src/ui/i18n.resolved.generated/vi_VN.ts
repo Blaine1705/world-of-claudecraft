@@ -3515,7 +3515,9 @@ export const vi_VN: EnTranslations = {
       "equip": "Trang Bị",
       "disenchant": "Hủy Pháp Khắc",
       "salvage": "Tháo Dỡ",
-      "applyEnchant": "Áp Dụng Pháp Khắc"
+      "applyEnchant": "Áp Dụng Pháp Khắc",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",

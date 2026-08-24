@@ -4711,8 +4711,8 @@ export class Hud {
       if (ringIndex >= this.mobileRingSlotBtns.length) return;
       this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));
     },
-    openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault, instance) =>
-      this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault, instance),
+    // Untouched forward (hud.ts is at its pinned line-count ceiling).
+    openItemActionMenu: (...args) => this.bagItemActionMenu.open(...args),
   });
   // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.

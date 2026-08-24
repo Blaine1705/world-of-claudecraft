@@ -3515,7 +3515,9 @@ export const id_ID: EnTranslations = {
       "equip": "Pakai",
       "disenchant": "Hancurkan Pemantraan",
       "salvage": "Salvasi",
-      "applyEnchant": "Terapkan Mantrai"
+      "applyEnchant": "Terapkan Mantrai",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",

@@ -3515,7 +3515,9 @@ export const tr_TR: EnTranslations = {
       "equip": "Kuşan",
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
-      "applyEnchant": "Büyü Uygula"
+      "applyEnchant": "Büyü Uygula",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
