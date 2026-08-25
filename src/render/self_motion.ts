@@ -67,6 +67,7 @@ import { isRiftPos } from '../sim/data';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 import type { RiftFloorView } from '../world_api/dungeons';
+import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 import {
   boundedReconciliationCorrectionInto,
   createSelfReconciliation,
@@ -82,7 +83,6 @@ import {
   type TrajectoryResidual,
   trajectoryResidualInto,
 } from './self_reconciliation_core';
-import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 
 // Latency cap on the extrapolation window: at least one snapshot-ish interval
 // so low-ping links still get the start-of-motion snap, and a hard ceiling so
