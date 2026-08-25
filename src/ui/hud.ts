@@ -722,8 +722,7 @@ import {
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
-import { swingTimerState } from './swing_timer';
-import { SwingTimerPainter } from './swing_timer_painter';
+import { SwingTimerBars } from './swing_timer_bars';
 import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
@@ -1549,18 +1548,16 @@ export class Hud {
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
-  // XP + swing bar element refs cached once for their painters (the #xpbar /
-  // .rested / #player-frame / #swingbar refs were re-queried via $()/querySelector
-  // every frame, the leak this fixes).
+  // XP bar element refs cached once for its painter (the #xpbar / .rested /
+  // #player-frame refs were re-queried via $()/querySelector every frame,
+  // the leak this fixes). The swing-timer bars cache their own refs in
+  // src/ui/swing_timer_bars.ts.
   private xpbarEl = $('#xpbar');
   private xpRestedEl = $('#xpbar .rested');
   private playerFrameEl = $('#player-frame');
   // The party-frames container, resolved once (was re-queried every frame); the
   // keyed-pool party painter owns its children.
   private partyFramesEl = $('#party-frames');
-  private swingbarEl = $('#swingbar');
-  private swingFillEl = this.swingbarEl.querySelector('.fill') as HTMLElement;
-  private swingLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
   private ghostPromptEl = $('#ghost-prompt');
@@ -1813,10 +1810,6 @@ export class Hud {
   private readonly riteController: RiteController;
   private readonly questTracker: QuestTrackerController;
   private readonly questDialog: QuestDialogController;
-  // swing timer: the period is captured from the reset edge (swingTimer jumping
-  // up), so the bar tracks real swing speed including haste / ranged weapons.
-  private swingPeriod = 0;
-  private lastSwingTimer = 0;
   private lastLowResourceInput = Number.NaN;
   private lastLowResourceMax = Number.NaN;
   private lastLowResourceType: ResourceType | null | undefined;
@@ -4140,12 +4133,10 @@ export class Hud {
     this.xpLabelEl,
     this.playerFrameEl,
   );
-  private readonly swingTimerPainter = new SwingTimerPainter(
-    this.writerFacet,
-    this.swingbarEl,
-    this.swingFillEl,
-    this.swingLabelEl,
-  );
+  // Main-hand + off-hand (dual-wield melee weaving) swing-timer bars: both
+  // element caching, edge-tracking clocks, and painter instances live behind
+  // this one binding (src/ui/swing_timer_bars.ts).
+  private readonly swingTimerBars = new SwingTimerBars(this.writerFacet);
   // The spell-activation proc overlay (the Rising Phoenix, owner design
   // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
   // (proc_overlay_drag), class-toggled per frame via the elided writers
@@ -8859,15 +8850,10 @@ export class Hud {
     // activity signature is stable (no full rebuild per tick).
     this.paintOpenCraftingCastProgress();
 
-    // swing timer: fills between melee/ranged auto-attack swings. swingTimer
-    // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
-    // reset edge so the bar stays accurate under haste and for ranged weapons. The
-    // period/timer edge-tracking round-trips through the core (parameter-in /
-    // next-state-out): Hud holds the two scalars and feeds them back next frame.
-    const swing = swingTimerState(p, target ?? null, this.swingPeriod, this.lastSwingTimer);
-    this.swingPeriod = swing.nextPeriod;
-    this.lastSwingTimer = swing.nextTimer;
-    this.swingTimerPainter.paint(swing);
+    // Swing timers: fill between melee/ranged auto-attack swings (main-hand,
+    // and the off-hand clock for dual-wield melee weaving). See
+    // src/ui/swing_timer_bars.ts for the edge-tracking + painting detail.
+    this.swingTimerBars.update(p, target ?? null);
     // The phoenix: Heating Up lights its left half, Hot Streak completes it,
     // spending puts it out (pure rule in proc_overlay_view; an unchanged state
     // writes nothing). On the FIRST frame in-world, preview the unlit bird for

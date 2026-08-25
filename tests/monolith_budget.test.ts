@@ -125,7 +125,12 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    ceiling: 18488,
+    // Lowered 18488 -> 18474 after extracting the melee-weaving off-hand
+    // swing-timer bar's element caching, edge-tracking clocks, and painter
+    // instantiation (both the main-hand and off-hand bars) into
+    // src/ui/swing_timer_bars.ts, leaving hud.ts a single per-frame call
+    // (the ratchet's own rule: an extraction lowers the ceiling).
+    ceiling: 18474,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -333,7 +338,10 @@ const MONOLITHS: MonolithRow[] = [
     // release side's touch UI extraction landed below this branch's own rift
     // wiring, so the resolved file is the release's count minus this branch's
     // now-superseded local growth. Exact merged count, zero slack.
-    ceiling: 13328,
+    // Re-pinned for the selected PR #3631 validated-local-locomotion stack:
+    // the renderer keeps only camera-pivot wiring plus the riftCollisionToken
+    // constructor thread into SelfMotionPredictor. Exact count, zero slack.
+    ceiling: 13335,
 
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
@@ -409,7 +417,10 @@ const MONOLITHS: MonolithRow[] = [
     // to src/render/self_motion.ts (selfMotionAllowedAt); the two lines left
     // here are the import and the one-line call, which cannot land behind a
     // seam. Maintainer decision, exact count, no further slack.
-    ceiling: 11568,
+    // Re-pinned for the selected movement/artifact stack's frame-loop wiring:
+    // elapsedFrameDt for display prediction and the already-extracted arrival
+    // cinematic step. Exact count, zero slack.
+    ceiling: 11578,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -458,7 +469,10 @@ const MONOLITHS: MonolithRow[] = [
     // is standing inside. The lookup logic lives in src/sim/rift/runs.ts
     // (riftStateEventFor); nothing left here can move behind a seam.
     // Maintainer decision, exact count, no further slack.
-    ceiling: 10648,
+    // Re-pinned to the exact merged count after the selected movement/artifact
+    // stack plus PR #3648's off-hand melee-weaving snapshot fields
+    // (swingOff and offhandWeapon). Exact count, zero slack.
+    ceiling: 10736,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -491,7 +505,14 @@ const MONOLITHS: MonolithRow[] = [
     // riftSliding nits removed a now-stale explanatory comment (the call
     // site passes the upgrade manifest through instead of documenting why
     // it does not), netting the file back down. Exact count, zero slack.
-    ceiling: 5896,
+    // PR #3648 then lowered its side 5855 -> 5835 after extracting the
+    // static combat-rating-scalar +
+    // weapon/offhand-weapon self-wire mirroring into
+    // src/net/combat_scalar_wire.ts (the account_cosmetics_wire.ts /
+    // guild_bank_log_wire.ts convention), leaving online.ts a single call.
+    // The merged stack keeps the rift mirror wiring and the extracted
+    // combat-scalar/off-hand weapon mirror, landing at the exact count below.
+    ceiling: 5943,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

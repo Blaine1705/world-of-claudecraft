@@ -8893,6 +8893,7 @@ export class GameServer {
       pcd: round2(p.potionCdRemaining),
       fcd: round2(p.firebottleCdRemaining),
       swing: round2(p.swingTimer),
+      swingOff: round2(p.offhandSwingTimer), // off-hand clock, unconditional like swing
       combo: p.comboPoints,
       pdev: p.paladinDevotion
         ? {
@@ -9111,6 +9112,7 @@ export class GameServer {
     }
     maybe('stats', p.stats);
     maybe('weapon', p.weapon);
+    maybe('offhandWeapon', p.offhandWeapon); // client derives dualWielding as !== null
     selfLap?.('self.timers');
     maybe('party', this.partyWire(anchorSession.pid));
     maybe('marks', this.markersWire(anchorSession.pid));

@@ -92,6 +92,7 @@ const DELTA_KEYS = [
   'cds',
   'stats',
   'weapon',
+  'offhandWeapon',
   'party',
   'trade',
   'duel',
@@ -1174,7 +1175,7 @@ describe('delta snapshots', () => {
     // the always-on fields are still present every snapshot. xp/copper moved
     // behind the delta gate alongside the rest of the static combat-rating/
     // progression cohort (server/game.ts), so they are no longer in this list.
-    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'target']) {
+    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'swingOff', 'target']) {
       expect(snap.self).toHaveProperty(key);
     }
     // xp/copper are unchanged since the first broadcast, so they delta-elide here.
@@ -1192,6 +1193,44 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.swingTimer).toBeCloseTo(1.7, 1);
+  });
+
+  it('mirrors the off-hand swing timer and weapon for the melee-weaving HUD bar; dualWielding is derived client-side', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.dualWielding = true;
+    player.offhandWeapon = { min: 3, max: 6, speed: 1.8 };
+    player.offhandSwingTimer = 0.9;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.swingOff).toBeCloseTo(0.9, 1);
+    expect(snap.self.offhandWeapon).toMatchObject({ speed: 1.8 });
+    // dualWielding rides no wire key of its own: it is always exactly
+    // offhandWeapon !== null (src/sim/entity.ts), so it is absent from the
+    // wire and derived by applySelfCombatScalars instead.
+    expect(snap.self).not.toHaveProperty('dualWielding');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.player.offhandSwingTimer).toBeCloseTo(0.9, 1);
+    expect(client.player.dualWielding).toBe(true);
+    expect(client.player.offhandWeapon).toMatchObject({ speed: 1.8 });
+  });
+
+  it('clears a mirrored off-hand weapon back to null when it is unequipped, and re-derives dualWielding false', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.dualWielding = true;
+    player.offhandWeapon = { min: 3, max: 6, speed: 1.8 };
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.player.offhandWeapon).not.toBeNull();
+    expect(client.player.dualWielding).toBe(true);
+
+    player.dualWielding = false;
+    player.offhandWeapon = null;
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.player.offhandWeapon).toBeNull();
+    expect(client.player.dualWielding).toBe(false);
   });
 
   it('mirrors the shared potion cooldown to the online client for the action-bar swipe', () => {
@@ -4351,6 +4390,7 @@ const ALL_DELTA_KEYS = [
   'mntRtd',
   'mst',
   'ncd',
+  'offhandWeapon',
   'party',
   'prk',
   'prof',
@@ -4685,6 +4725,9 @@ function dirtyEveryDeltaField(): {
   };
   p.stats = { ...p.stats, str: 12345, pvpOffense: 0.17, pvpDefense: 0.13 };
   p.weapon = { ...p.weapon, min: 999 };
+  // dualWielding is not a delta key (derived client-side from offhandWeapon,
+  // src/net/combat_scalar_wire.ts); setting offhandWeapon alone dirties it.
+  p.offhandWeapon = { min: 3, max: 6, speed: 1.8 };
   p.resource = 42;
   p.maxResource = 150;
   // corpse: the ghost-run body marker (self-only delta). Non-null = a ghost with a
@@ -5279,7 +5322,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 83 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 84 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5294,9 +5337,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 86. Every v0.36.0 sync conflicts here because each side pins its own
     // additions alone; the merged tree carries all of them, and this number
     // came from a run on the merged tree. The New Eastbrook program's Vale Cup
-    // retirement then removes sport/vcup/vcupb, for 83.
-    expect(ALL_DELTA_KEYS).toHaveLength(83);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(83);
+    // retirement then removes sport/vcup/vcupb, for 83, then the melee-weaving
+    // off-hand bar adds offhandWeapon (delta-guarded like weapon/stats: a gear
+    // swap, not a per-tick change; dualWielding rides no key of its own, it is
+    // always exactly offhandWeapon !== null, so the client derives it), for 84.
+    expect(ALL_DELTA_KEYS).toHaveLength(84);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(84);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5327,8 +5373,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
     // border echo aborder for 85, and the authored modular look `app` for 86.
-    // The Vale Cup retirement then removes sport/vcup/vcupb, for 83.
-    expect(scraped.size).toBe(83);
+    // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, then the
+    // melee-weaving off-hand bar adds offhandWeapon, for 84.
+    expect(scraped.size).toBe(84);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

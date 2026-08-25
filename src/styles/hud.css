@@ -2478,12 +2478,16 @@
     text-shadow: 1px 1px 2px #000;
     font-variant-numeric: tabular-nums;
   }
-  /* swing timer: sits just under the cast bar, steel-on-amber to read as melee */
-  #swingbar {
+  /* Swing timers: sit just under the cast bar, steel-on-amber (main-hand) /
+     steel-on-teal (off-hand, dual-wield only) to read as melee. The off-hand
+     bar is the same family stacked directly under the main-hand one, sharing
+     every rule except position and fill color, so the two read as one
+     melee-weaving cluster without drifting apart on the next edit. */
+  #swingbar,
+  #swingbar-offhand {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 234px;
     width: 220px;
     height: 12px;
     display: none;
@@ -2493,17 +2497,31 @@
     background: #0c0a07;
     overflow: hidden;
   }
-  #swingbar .fill {
+  #swingbar {
+    bottom: 234px;
+  }
+  #swingbar-offhand {
+    bottom: 220px;
+  }
+  #swingbar .fill,
+  #swingbar-offhand .fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
     box-shadow: inset 0 1px 0 #fff4;
     transition: width 60ms linear;
   }
-  #swingbar.ready .fill {
+  #swingbar .fill {
+    background: linear-gradient(#ffcf7a, #d97b1e 60%, #8a4a10);
+  }
+  #swingbar-offhand .fill {
+    background: linear-gradient(#8fe6d6, #1e9d97 60%, #0f5a58);
+  }
+  #swingbar.ready .fill,
+  #swingbar-offhand.ready .fill {
     background: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
   }
-  #swingbar .label {
+  #swingbar .label,
+  #swingbar-offhand .label {
     position: absolute;
     inset: 0;
     text-align: center;
@@ -2800,6 +2818,9 @@
   }
   body.show-actionbar3 #swingbar {
     bottom: 292px;
+  }
+  body.show-actionbar3 #swingbar-offhand {
+    bottom: 278px;
   }
   #actionbar,
   #actionbar2,
