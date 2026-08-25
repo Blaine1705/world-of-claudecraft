@@ -1488,6 +1488,11 @@ export const ru_RU: EnTranslations = {
     },
     "controller": {
       "title": "Геймпад",
+      "glyphStyle": "Обозначения кнопок",
+      "glyphStyleAuto": "Авто",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "Плейстейшен",
+      "glyphStyleNintendo": "Нинтендо",
       "enable": "Включить геймпад",
       "invertY": "Инверсия камеры (Y)",
       "deadzone": "Мёртвая зона стика",

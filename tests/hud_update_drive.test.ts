@@ -793,6 +793,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'hides the ghost prompt while not a corpse-running ghost',
   },
   {
+    call: 'syncDeathControllerHints',
+    band: 'frame',
+    gate: 'p.dead',
+    surface: 'chrome',
+    why: 'keeps the release-spirit and corpse-resurrection controller hints synchronized while dead',
+  },
+  {
     call: 'this.showBanner',
     band: 'medium',
     gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
@@ -1617,7 +1624,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // window 47 -> 43, chrome 84 -> 81: the Vale Cup retirement (the New
       // Eastbrook program) removed the cup rows on the other side of this merge.
       // chrome 81 -> 82: the Proving Shore tutorial's coach strip apply.
-    ).toEqual({ window: 43, chrome: 82, none: 17 });
+    ).toEqual({ window: 43, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

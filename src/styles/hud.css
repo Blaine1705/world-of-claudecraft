@@ -6872,6 +6872,29 @@
   #ghost-prompt .btn {
     pointer-events: auto;
   }
+  /* The death actions use the same live Confirm binding as the rest of pad UI.
+     Generated content leaves the localized button text intact while making the
+     exact Xbox/PS/Nintendo/remapped control visible at the point of action. */
+  body.pad-active #death-overlay .btn[data-gamepad-confirm-label]::before,
+  body.pad-active #ghost-prompt .btn[data-gamepad-confirm-label]::before {
+    content: attr(data-gamepad-confirm-label);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    margin-right: 8px;
+    border: 1px solid #d7ae55;
+    border-radius: 5px;
+    background: #17120d;
+    color: #ffd76a;
+    font: 700 12px / 1 var(--ui-font);
+    box-shadow:
+      inset 0 0 0 1px #000,
+      0 1px 3px #000a;
+    vertical-align: middle;
+  }
   #death-overlay .btn[disabled],
   #ghost-prompt .btn[disabled] {
     opacity: 0.45;

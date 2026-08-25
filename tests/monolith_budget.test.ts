@@ -138,9 +138,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
-    // rework); exact merged count.
-    ceiling: 11606,
+    // Controller-setting dispatch extraction leaves a six-line runway for thin
+    // composition wiring while preventing the removed branches from returning.
+    ceiling: 11594,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

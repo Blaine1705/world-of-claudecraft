@@ -62,10 +62,9 @@ export interface CoachPromptPlan {
   /** The verb under the keycap: Talk, Turn in quest, Pick up, Read, Ring,
    *  Select, Attack. */
   verbKey: TranslationKey;
-  /** 'select' asks for the CLICK that picks the quarry and carries no keycap
-   *  at all (a new player has a mouse or a finger before they have a key
-   *  chart); 'kill' is the same bubble once the quarry IS the target, and
-   *  chips the attack bind (desktop) or the action-bar icon (touch);
+  /** 'select' asks for the pointer press that picks the quarry, or the target
+   *  cycle button on a pad; 'kill' is the same bubble once the quarry IS the
+   *  target, and chips the attack bind (desktop) or the action-bar icon (touch);
    *  'jump' bubbles chip the jump bind (the lane 2 parkour obstacles);
    *  'use' bubbles chip the bags bind (the tide-pool lure). */
   kind: 'interact' | 'select' | 'kill' | 'jump' | 'use';
@@ -379,7 +378,7 @@ export function coachPromptPlan(args: {
       // The ability drill asks for a different press on the same effigies,
       // so its second half names the ability rather than the swing.
       verbKey: selected
-        ? focus.questId === ABILITY_DRILL_QUEST_ID
+        ? focus.questId === ABILITY_DRILL_QUEST_ID || focus.questId === 'q_ps_shell_and_claw'
           ? 'hudChrome.bootcamp.promptUseAbility'
           : 'hudChrome.bootcamp.promptAttack'
         : 'hudChrome.bootcamp.promptSelect',
@@ -527,15 +526,15 @@ export const VEER_NUDGE_COOLDOWN_MS = 45000;
 export const VEER_NUDGES_PER_STATION = 2;
 
 /** The chip text beside the verb: the live interact bind on keyboard, the
- *  fixed pad interact button, a localized "Tap" on touch (chips are keycap
- *  GLYPHS, so the pad's fixed B mapping (gamepad_map.ts) is literal, not
- *  translated). Null hides the chip and shows the verb alone. */
+ *  connected pad's resolved hardware glyph, and no keycap on touch. Null
+ *  hides the chip and shows the verb alone. */
 export function coachPromptChip(
   mode: 'keyboard' | 'touch' | 'pad',
   interactLabel: string,
+  padInteractLabel: string,
 ): { chip: string | null; chipIsKey: boolean } {
   if (mode === 'keyboard') return { chip: interactLabel || null, chipIsKey: true };
-  if (mode === 'pad') return { chip: 'B', chipIsKey: true };
+  if (mode === 'pad') return { chip: padInteractLabel || null, chipIsKey: true };
   return { chip: null, chipIsKey: false };
 }
 
@@ -564,6 +563,8 @@ export interface CoachPromptChipInputs {
   jumpLabel: string;
   bagsLabel: string;
   interactLabel: string;
+  /** Resolved through the live flat/XHB layout and connected pad brand. */
+  padControlCaps: readonly string[];
 }
 
 /** The chip row for a visible ask, per input family. Every desktop interact
@@ -575,23 +576,22 @@ export function coachPromptChips(
   mode: 'keyboard' | 'touch' | 'pad',
   i: CoachPromptChipInputs,
 ): readonly PromptChip[] {
+  if (mode === 'pad') return i.padControlCaps.map((cap) => ({ cap }));
   if (kind === 'select') return [];
   if (kind === 'kill') {
     if (mode === 'keyboard') return i.slotLabel ? [{ cap: i.slotLabel }] : [];
-    if (mode !== 'touch') return [];
     if (i.abilityAsk || i.caster) return [{ abilityIcon: i.killIconId }];
     return [{ buttonIcon: 'attack' }];
   }
   if (kind === 'jump') {
     if (mode === 'keyboard') return i.jumpLabel ? [{ cap: i.jumpLabel }] : [];
-    if (mode === 'pad') return [{ cap: 'A' }];
     return [{ buttonIcon: 'jump' }];
   }
   if (kind === 'use') {
     return mode === 'keyboard' && i.bagsLabel ? [{ cap: i.bagsLabel }] : [];
   }
   if (mode === 'touch') return [{ buttonIcon: 'interact' }];
-  const { chip } = coachPromptChip(mode, i.interactLabel);
+  const { chip } = coachPromptChip(mode, i.interactLabel, '');
   return chip ? [{ cap: chip }] : [];
 }
 

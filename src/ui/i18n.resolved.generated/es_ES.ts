@@ -1488,6 +1488,11 @@ export const es_ES: EnTranslations = {
     },
     "controller": {
       "title": "Mando",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Activar mando",
       "invertY": "Invertir cámara (Y)",
       "deadzone": "Zona muerta del stick",

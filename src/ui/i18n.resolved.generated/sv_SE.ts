@@ -1488,6 +1488,11 @@ export const sv_SE: EnTranslations = {
     },
     "controller": {
       "title": "Handkontroll",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Aktivera handkontroll",
       "invertY": "Invertera kamera (Y)",
       "deadzone": "Spakens dödzon",
