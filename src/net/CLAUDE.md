@@ -234,22 +234,25 @@ failure, kept as stable English that `main.ts` re-localizes.
   reconcile-on-snapshot contract: display-only, and the server's value always
   wins within a bounded window (`tests/target_echo_client.test.ts` pins the
   target one).
-- **Display-layer locomotion anticipation is the one sanctioned prediction**, and
-  it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
-  the LOCAL player that is (a) bounded by measured latency with a hard cap,
-  (b) always blending toward the authoritative server pose, (c) never written
-  into `ClientWorld` mirrored state or any `IWorld` read that logic consumes
-  (targeting, range checks, quest triggers, and interest all use authoritative
-  positions), and (d) never affects what is sent to the server. Widening any of
-  those four constraints is a maintainer decision, see
-  `docs/online-movement-latency.md`. One amendment is already in force, for the
-  long render frame: when a frame outlasts the mirror's snapshot interval the
-  browser applies the snapshots it swallowed in one burst, so for that block
-  episode (a) the leash budget may exceed the latency cap by the ground the
-  frozen anchor did not cover, bounded by `BLOCK_EPISODE_MAX_MS` of run speed,
-  and (b) the blend toward the server pose is held for the settle window that
-  the burst sweep needs. Both live in `src/render/self_motion.ts` and are
-  pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
+- **Local-player movement prediction is the one sanctioned prediction**, and it
+  lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`
+  on movement wire v2; design authority `docs/design/movement-reconciliation.md`):
+  the drawn pose is the shared kernel stepped over the SAME per-tick input
+  frames the client actually sent, reconciled exact-match against the acked
+  authoritative pose (`ackCt` + `px/py/pz/pf`). Its constraints: (a) prediction
+  state is never written into `ClientWorld` mirrored state or any `IWorld` read
+  that logic consumes (targeting, range checks, quest triggers, and interest
+  all use authoritative positions); (b) the drawn pose reflects only input that
+  is really on the wire, never an outcome guess; (c) corrections exist only on
+  server override epochs (`ovE`/`ovA`) and genuine reconcile mismatches, and
+  the display absorbs them through the handoff offset bounded by
+  `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
+  `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
+  must keep it green. Changing this model is a maintainer decision. The legacy
+  v1 display extrapolator (`src/render/self_motion.ts`, leash + servo + block
+  episode, pinned by `tests/self_motion.test.ts`) remains for v1 sessions,
+  gated states, and `?nopredict`, under its original latency-cap constraints;
+  it is deleted when v1 is retired, not before.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright by the server, corpse-guard only)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`

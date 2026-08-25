@@ -65,14 +65,15 @@ import { stripComments } from './helpers/strip_comments';
 // UPDATE_MOVEMENT_BASELINE_DOC only regenerates the committed MARKDOWN from
 // BASELINE; the numbers themselves are always a human transcribing a run.
 //
-// While STRICT_MOVEMENT_TARGETS is off (the default) the assertions hold
-// today's behavior in place, so the reconciliation rework shows up here as a
-// diff in either direction, improvement included. MOVEMENT_FEEL_TARGETS (and
-// MOVEMENT_FEEL_TARGETS_CC where the server legitimately overrides the client)
-// is the bar the rework is aiming at; setting STRICT_MOVEMENT_TARGETS=1 asserts
-// against it instead, and the cells that fail then are exactly the work.
+// STRICT (the default since the reconciliation rework landed) asserts every
+// cell against MOVEMENT_FEEL_TARGETS (and MOVEMENT_FEEL_TARGETS_CC where the
+// server legitimately overrides the client) ON TOP of the baseline pins: the
+// pins catch any silent change in either direction, the targets are the feel
+// bar itself. STRICT_MOVEMENT_TARGETS=0 drops back to pins-only while
+// iterating on a movement change that has not yet re-met the bar; the merge
+// gate always runs with the default.
 
-const STRICT = process.env.STRICT_MOVEMENT_TARGETS === '1';
+const STRICT = process.env.STRICT_MOVEMENT_TARGETS !== '0';
 const UPDATE_TABLE = process.env.UPDATE_MOVEMENT_BASELINE_DOC === '1';
 const BASELINE_DOC = join(import.meta.dirname, 'movement_latency_baseline.md');
 const MAIN_TS = join(import.meta.dirname, '..', 'src', 'main.ts');

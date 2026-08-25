@@ -148,12 +148,14 @@ to be justified by that number, not assumed.
 
 Phase 2 lands the protocol and the server timeline behind negotiation, with
 the old display path untouched (feel unchanged, wire ready). Phase 3 lands the
-client prediction ring, reconciliation, and the override epochs, and deletes
-the servo/leash machinery. Phase 4 flips `STRICT_MOVEMENT_TARGETS` on in
-`tests/movement_latency_baseline.test.ts`, re-pins the baseline table to the
-new measured numbers, and updates `docs/online-movement-latency.md` and
-`src/net/CLAUDE.md` (whose display-anticipation constraints this model
-supersedes for the predicted path).
+client prediction ring, reconciliation, and the override epochs; v2 sessions
+route around the legacy servo/leash machinery, which remains intact for v1
+sessions, gated states, and the kill switch, and is deleted only when v1 is
+retired. Phase 4 makes strict targets the default in
+`tests/movement_latency_baseline.test.ts` (all 40 cells green as of the flip),
+re-pins the baseline table to the measured numbers, and updates
+`docs/online-movement-latency.md` and `src/net/CLAUDE.md` to describe this
+model as the sanctioned prediction.
 
 ## How this is verified
 

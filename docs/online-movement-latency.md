@@ -11,6 +11,19 @@ chosen should get its own spec under `docs/prd/`.
 File references were verified against the tree on the date above; per `docs/CLAUDE.md`,
 trust the intent and re-find exact lines if they have drifted.
 
+## Option 3 note (the later rework)
+
+Option 3, full client-side prediction with server reconciliation, later shipped
+as movement wire v2: per-tick input frames, a server-side input timeline, and
+exact-match replay reconciliation. Its design authority is
+`docs/design/movement-reconciliation.md`, and the mandatory simulated-latency
+harness this report calls for exists as
+`tests/movement_latency_baseline.test.ts` (strict mode is the feel bar). The
+client-authoritative option below remains rejected; the display-extrapolator
+constraints this report frames stay in force only for the retained legacy v1
+path. The note below describes the earlier Option 1/2 rollout this report
+originally shipped with.
+
 ## Implementation note (what actually shipped)
 
 Options 1 and 2 below, the movement-kernel extraction, and the rule amendment
