@@ -598,7 +598,7 @@ describe('world music zone selection', () => {
     // The one supplied track with no composed counterpart: it was written for
     // the island, not remastered from the procedural score. Pinned so the
     // absence reads as deliberate and nobody "fixes" it by inventing a theme.
-    expect(ZONE_STREAM_URLS.proving_shore).toBe('/audio/music/proving_shore.mp3?v=485a6985c03b');
+    expect(ZONE_STREAM_URLS.proving_shore).toBe('/audio/music/proving_shore.mp3?v=51e9b5a6c01f');
     expect(buildMusicThemes().proving_shore).toBeUndefined();
   });
 

@@ -77,7 +77,7 @@ describe('remastered soundtrack catalog', () => {
       ],
       proving_shore: [
         '/audio/music/proving_shore.mp3',
-        '485a6985c03baf0a7f796c62c25553efa838be787164103f78a7f75a9fd4c090',
+        '51e9b5a6c01f1e7ef1c7f602875de81f50a21d7e6428e9335e828897bb478b7c',
       ],
     } as const satisfies Partial<Record<MusicZone, readonly [string, string]>>;
 
