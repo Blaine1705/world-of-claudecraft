@@ -118,6 +118,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.delveRun = null;
   c.companionState = null;
   c.riftFloor = null;
+  // The reserved "no token" sentinel (src/sim/colliders.ts allocRiftCollisionToken
+  // never allocates 0), deliberate here: this bare fixture never runs the real
+  // ClientWorld constructor or applyRiftStateEvent, so it never has a real rift
+  // region to register a token for in the first place.
   c.riftCollisionToken = 0;
   c.lockpickState = null;
   c.delveMarks = 0;

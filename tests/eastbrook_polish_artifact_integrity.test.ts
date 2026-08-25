@@ -1022,17 +1022,23 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // capture was retaken.
 // Re-minted for the stale remote-entity holdout repair (renderer.ts): the
 // renderer integration leaf moved. No capture was retaken.
-// Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
-// OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
-// both sides). No capture was retaken.
-// Re-minted for the release/v0.41.0 merge into the FOV slider fix branch:
-// the resolved renderer.ts combines the release's own inputs with the FOV
-// slider fix's baseFov/resolveCameraFov wiring, so the composite matches
-// neither parent. No capture was retaken.
+// Re-minted for issue #3479 (rift self-motion prediction): the
+// SelfMotionPredictor construction call site in renderer.ts now threads a
+// second constructor argument (riftCollisionToken), moving the renderer
+// integration leaf. No capture was retaken.
+// Meanwhile on the release base: re-minted for the v0.40.0 sync merge into
+// the guild pledge branch (the OSSBrain v0.40 batch landed on the release
+// arm; renderer inputs moved on both sides). No capture was retaken.
+// Re-minted for the merge of release/v0.41.0 into the rift self-motion
+// prediction branch: renderer.ts combines both parents' bytes, so the
+// composite matches neither parent alone. No capture was retaken.
+// Re-minted for the OSSBrain release merge of the FOV slider fix and rift
+// self-motion prediction: renderer.ts now combines both release PR inputs in
+// one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b7a0c1187c0307e444b82f891f30d29c59b2e2476484533cb7a67bdcc0dfbb95';
+  '7c375aeddf6f92bf8b49d8d7b84cd79a42c84312f02f35d05fa4f7e7168adbab';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '3960d9499ffdcc35c91fc8a10ae115a840a21e360da909704719e13ba4ecfbcd';
+  '65cc6be2693767c263bc976d3478461b5291b83df1ffdd7ce06c548ddade9466';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2175,17 +2181,24 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // the composite first, then this seal. No capture was retaken.
     // Re-minted for the stale remote-entity holdout repair (renderer.ts):
     // same order, the composite first, then this seal. No capture was retaken.
-    // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
-    // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
-    // both sides): same order, the composite first, then this seal. No capture
-    // was retaken.
-    // Re-minted for the release/v0.41.0 merge into the FOV slider fix branch
-    // (renderer.ts combines both sides' inputs): same order, the composite
+    // Re-minted for issue #3479 (rift self-motion prediction, renderer.ts):
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Meanwhile on the release base: re-minted for the v0.40.0 sync merge into
+    // the guild pledge branch (the OSSBrain v0.40 batch landed on the release
+    // arm; renderer inputs moved on both sides): same order, the composite
     // first, then this seal. No capture was retaken.
+    // Re-minted for the merge of release/v0.41.0 into the rift self-motion
+    // prediction branch: renderer.ts combines both parents' bytes, so the
+    // composite (and this second-order seal over it) matches neither parent
+    // alone. No capture was retaken.
+    // Re-minted for the OSSBrain release merge of the FOV slider fix and rift
+    // self-motion prediction: renderer.ts now combines both release PR inputs
+    // in one tree, then this second-order seal follows that composite. No
+    // capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('241660c7c5ab87484d7d96daf570d7cadef241a360478c0f0cd0f8f853f379a8');
+    ).toBe('651cf7e6512f14ee70a1a18d5fb0d6e8bd4a8706ccfd7ea01947e853797b63de');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

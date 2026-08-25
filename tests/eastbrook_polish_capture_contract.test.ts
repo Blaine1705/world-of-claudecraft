@@ -320,15 +320,21 @@ interface AttributionTargetFixture {
 // capture was retaken.
 // Re-minted for the stale remote-entity holdout repair (renderer.ts): the
 // renderer integration leaf moved. No capture was retaken.
-// Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
-// OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
-// both sides). No capture was retaken.
-// Re-minted for the release/v0.41.0 merge into the FOV slider fix branch:
-// the resolved renderer.ts combines the release's own inputs with the FOV
-// slider fix's baseFov/resolveCameraFov wiring, so the composite matches
-// neither parent. No capture was retaken.
+// Re-minted for issue #3479 (rift self-motion prediction): the
+// SelfMotionPredictor construction call site in renderer.ts now threads a
+// second constructor argument (riftCollisionToken), moving the renderer
+// integration leaf. No capture was retaken.
+// Meanwhile on the release base: re-minted for the v0.40.0 sync merge into
+// the guild pledge branch (the OSSBrain v0.40 batch landed on the release
+// arm; renderer inputs moved on both sides). No capture was retaken.
+// Re-minted for the merge of release/v0.41.0 into the rift self-motion
+// prediction branch: renderer.ts combines both parents' bytes, so the
+// composite matches neither parent alone. No capture was retaken.
+// Re-minted for the OSSBrain release merge of the FOV slider fix and rift
+// self-motion prediction: renderer.ts now combines both release PR inputs in
+// one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3960d9499ffdcc35c91fc8a10ae115a840a21e360da909704719e13ba4ecfbcd';
+  '65cc6be2693767c263bc976d3478461b5291b83df1ffdd7ce06c548ddade9466';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

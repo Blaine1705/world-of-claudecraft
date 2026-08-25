@@ -179,9 +179,162 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
-    // rework); exact merged count.
-    ceiling: 13329,
+    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
+    // keeps the delve tracker and mount prewarm extractions while preserving
+    // the wrapper's later renderer wiring, so the ceiling is the exact
+    // resolved count.
+    // PR #3468 changes the shadow-depth prewarm material contract, but this
+    // wrapper's combined renderer remains at the same resolved count.
+    // Lowered again on the integration branch, which combines three extractions
+    // out of the renderer: the shadow-depth prewarm material factory
+    // (src/render/prewarm_depth_material.ts, PR #3468), the character-visual
+    // pool take/store halves (src/render/characters/pooled_visual_lifecycle.ts,
+    // PR #3473) and the material texture-slot walk
+    // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
+    // The merged file lands below all three branches' own pins, so the ceiling
+    // is the exact merged count per the ratchet's rule: any growth reds again.
+    // Lowered again by the foliage reveal-gate wiring, which paid for its four
+    // lines by extracting the millisecond rollup into
+    // src/render/frame_ms_stats_core.ts (net -15).
+    // Lowered again by the GPU-preparation admission wiring, which paid for its
+    // lines by extracting the perfStats return-type literal and the renderer's
+    // frame/phase stat shapes into src/render/renderer_perf_stats.ts, so the
+    // report's contract is nameable instead of inline (net -32).
+    // The compile-gate stand-in wiring paid for itself in place: the form/base
+    // visibility fan-out moved to src/render/entity_gate_stand_in_core.ts, which
+    // covers the lines the shapeshift and base-swap stand-ins added (net 0).
+    // Lowered again by the piecewise reveal-gate wiring, which paid for its
+    // soft-deadline binding by extracting the shared reveal compile host
+    // (link, shadow arm, touch tail, learned soft deadline) into
+    // src/render/reveal_compile_host.ts (net -15).
+    // Lowered again by the prewarm slot generalization: the landmark and
+    // weather manifest entries became createPrewarmGroupSlot bindings and the
+    // impact-site prewarm clone moved to its own subsystem module,
+    // buildImpactSitePrewarmGroup in src/render/impact_site.ts (net -2).
+    // Lowered again by the GPU-preparation pacing fixes: three dead type
+    // imports went, and moving the budget's frame boundary into the sync
+    // prologue traded a five-line rationale in the governor for the one that
+    // now sits beside the queue's own noteFrame (net -3).
+    // Lowered again by the live-program telemetry, which paid for its arm by
+    // extracting the renderer's info.programs readouts into
+    // src/render/live_program_watch.ts; the per-draw bracket lives in
+    // frame_present.ts, where the draw is (net -5).
+    // Lowered again when the watch moved onto the injected present host: the
+    // host's placeholder fields went with it (net -1 with the zero-env
+    // prefilter size comment).
+    // Lowered again by the production-named coverage fixes, which paid their
+    // wiring by moving the empty phase-ms fixtures into
+    // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
+    // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
+    // removed after the bench (its entry never ran inside the boot budget and
+    // resumed live), keeping the extraction (net -24).
+    // The touch tail's readiness threading (the gate result down to
+    // src/render/linked_program_readiness.ts) paid for itself in place: the
+    // single-use compilePriorityFor wrapper folded into the one gate that
+    // called it, the core it delegated to being its whole body (net 0).
+    // Lowered again by the build-ledger instrumentation, which paid for its
+    // producers (timed view and zone feature builds, the arrival mark, the
+    // hitch sample's two new fields) by moving the zone prepare report and its
+    // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
+    // factory into scene_census_core.ts (net -1).
+    // Lowered again by the composed-look pieces hold (the live candidate path
+    // consults characters/look_pieces.ts), which paid for its wiring by moving
+    // the zero foliage readout into renderer_frame_telemetry_core.ts beside
+    // the other zero fixtures and the created-view type sampler into
+    // view_candidate_pool_core.ts (net -16).
+    // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
+    // paid for its import and sample line by folding the key-light follow
+    // beside it onto its single statement (net -1).
+    // Lowered again by the deferred-decal stand-in (the live candidate path
+    // builds the body without its face decals and attaches them on the
+    // pieces' arrival), which paid for its wiring by moving the mobile
+    // opening render scale into dynamic_resolution_core.ts (net -1).
+    // Lowered again by the compile gate's piece cut (one queue unit per
+    // material group of the target, compile_gate_pieces.ts): the enumeration
+    // and the per-piece work live in that module, and the gate's rationale
+    // comment was rewritten to the design that ships (net -10).
+    // Lowered again by the hitch sample alignment (hitch_frame_align_core.ts:
+    // the start-of-sync reading and the aligned end-of-sync sample), which
+    // paid for its wiring by extracting the perfStats last-frame deep copy
+    // into src/render/renderer_frame_stats_snapshot.ts (net -21).
+    // Lowered again by the compile gate's variant settle
+    // (program_variant_settle.ts, the third piece arm both gates bind), which
+    // paid for its wiring by moving the open-air fog predicate beside the
+    // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
+    // landing with the shadow arm's every-mesh twin swap in the same change
+    // (net -3).
+    // Lowered again when the world gates' touch tail moved behind
+    // linked_program_touch_lane.ts runWorldGateTouchLane (no walk mark, the
+    // unproven walk recorded as a touch-unproven event) (net -2).
+    // The upstream/main merge landed upstream's own growth (the mount-program
+    // prewarm entry, the delve tracker extraction) on top of this branch's
+    // extractions, so the pin is the exact merged count, still lower than
+    // upstream main's own (13744), and any growth reds again.
+    // RAISED 13546 -> 13548 (+2) by the streamed-prewarm branch. A raise, not a
+    // lowering, and stated as one: the branch extracts the compile SUBMIT LOOP
+    // with its deadline rule and never-drop contract
+    // (runPrewarmCompileSubmission, src/render/prewarm_compile_submission_core.ts,
+    // beside the per-unit submit that module already owned) and the weapon-skin
+    // resume unit PLAN (weaponVfxPrewarmUnits, src/render/weapon_vfx_prewarm.ts,
+    // beside the stage whose failure boundary shares its unit ids), and those
+    // two extractions still do not quite cover what it adds.
+    //
+    // The history matters because it is the failure mode this ratchet exists to
+    // catch. An earlier revision of this branch reported a NET REDUCTION while
+    // deleting 41 lines of load-bearing comments, 11 blank lines and folding
+    // three `let` declarations into one comma statement: the extractions were
+    // real but the number was bought with formatting. Every comment is restored,
+    // the blank lines are back, the declarations are separate again, and the
+    // count below is what the extractions alone earn. Maintainer decision, and
+    // deliberately a visible +2 rather than an invisible -9.
+    // Re-pinned 13548 -> 13551 when the rift long-session perf branch merged
+    // this base: both parents grew the file independently (upstream's interior
+    // resource registry wiring, this branch's object-view material disposal,
+    // sparkle tags and the rift build-key cooldown, all thin consumers of
+    // extracted modules). Exact merged count, zero slack: any further growth
+    // reds again.
+    // Raised +8 in the same branch's review round: the rift build-failure
+    // cooldown swapped its untracked setTimeout (a handle that outlives
+    // teardown and can fire into a recycled renderer) for a timestamp gate.
+    // The gate logic lives in src/render/build_retry_gate.ts; this is the
+    // coordinator's thin-wiring cost (import, field + rationale comment, the
+    // wrapped attempt condition). Exact count, zero slack.
+    // Meanwhile on the release base: re-pinned 13548 -> 13563 (+15) when the
+    // fast-loading-screen-variety branch merged release/v0.40.0 (thin-consumer
+    // wiring to the onCharacterAssetReady seam; substance in
+    // src/render/characters/assets.ts and visual.ts), then 13563 -> 13573
+    // (+10) for its review-fix round (the nearby-view floor on the shared
+    // prewarm budget, decision in src/render/prewarm_policy.ts, and the
+    // weapon-skin early-out predicate in characters/assets.ts).
+    // Re-pinned to the exact count of the merged file: the base's 13573 plus
+    // this branch's +11 across its two arms above. Exact merged count, zero
+    // slack: any further growth reds again.
+    // Entry-detail admission moved the settle step ahead of compile/texture
+    // collection while deleting the old reveal-time arm: exact count, no slack.
+    // Lowered by extracting the initial-scene texture collection and shared
+    // admission cursor into initial_scene_texture_admission.ts.
+    // Lowered again by extracting the compile-root collection, near-first
+    // ordering and program-content dedupe into initial_scene_compile_units.ts.
+    // The release's rift lifecycle wiring brings the combined renderer to this
+    // exact count after formatting, with zero slack.
+    // Review hardening restores the measured residency rationale at its live
+    // call site and adds only thin wiring for rebuild reveal-gate installation,
+    // entry-barrier cleanup and observed display pacing; the policy and timer
+    // ownership remain in sibling modules. Exact count, zero slack.
+    // Issue #3479 (rift self-motion prediction) threads a second constructor
+    // argument (riftCollisionToken) through the one SelfMotionPredictor call
+    // site; the call no longer fits one line, +1. No logic to extract: this is
+    // the whole of the wiring. Rebased onto a release/v0.40.0 tip that had
+    // independently drifted 2 lines below the prior pin since this branch
+    // started, so the ceiling here is the exact resolved count, zero slack.
+    // Meanwhile on the release base: re-pinned to the integration merge of the
+    // latest v0.40.0 (the touch UI rework); exact merged count, 13329.
+    // Merged release/v0.41.0 into the rift self-motion prediction branch: the
+    // release side's touch UI extraction landed below this branch's own rift
+    // wiring, so the resolved file is the release's count minus this branch's
+    // now-superseded local growth. Exact merged count, zero slack.
+    ceiling: 13328,
+
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -312,7 +465,12 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    ceiling: 5855,
+    // Merged release/v0.41.0 into the rift self-motion prediction branch:
+    // this branch's riftCollisionToken registration/deregistration wiring
+    // (issue #3479) combines with the release side's own net-online growth,
+    // so the merged file lands above either parent's pin. Exact merged
+    // count, zero slack.
+    ceiling: 5895,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

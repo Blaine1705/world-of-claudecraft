@@ -250,6 +250,31 @@ failure, kept as stable English that `main.ts` re-localizes.
   and (b) the blend toward the server pose is held for the settle window that
   the burst sweep needs. Both live in `src/render/self_motion.ts` and are
   pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
+  A second amendment (issue #3479): prediction now covers rifts too, the same
+  as the overworld and regular dungeons. The predictor strips and reapplies
+  the raised-tier lift around each kernel step (`self_motion_rift_lift.ts`,
+  mirroring `Sim.updatePlayerMovement`'s `riftPlayerLift` pair in
+  `src/sim/rift/runs.ts`) and resolves rift walls through a real, per-
+  `ClientWorld` `riftCollisionToken` registered on `riftState`
+  (`online.ts` `applyRiftStateEvent`, `src/sim/colliders.ts` `setRiftRegion`,
+  cleared on session end). This is `IWorldDungeons.riftCollisionToken`'s
+  narrower client-side reach only (`src/world_api/dungeons.ts` has the full
+  picture): the swept-collision crest re-resolve behind Blink, Shadowstep,
+  and Heroic Leap reads `SimContext`'s token instead, which is always the
+  authoritative Sim online, so it was never affected by the client's own
+  token being inert and stays exactly as it was. The one rift mechanic still
+  excluded is the ice slide: it is server-driven and unmirrored (only the
+  `riftSliding` boolean rides the wire, never a direction), so prediction
+  suspends on it exactly like a ledge climb. Delves stay excluded (the
+  portcullis door clamps are not mirrored client-side); that gap is tracked
+  separately. A rift's OWN switch-gated portcullis is a runtime clamp too
+  (`inst.gateOpen`, not a static collider `setRiftRegion` publishes), so it is
+  deliberately left leash-bounded rather than locally resolved: the display
+  can lead into a closed gate for at most one latency cap before the
+  authoritative correction pulls it back, same as any other misprediction.
+  Pinned by `describe('rift prediction (issue #3479)')` in
+  `tests/self_motion.test.ts` and the rift case in
+  `tests/player_motion.test.ts`'s kernel parity suite.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright by the server, corpse-guard only)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`
