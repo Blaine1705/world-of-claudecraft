@@ -9,6 +9,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  type OffhandSwingPlayerInput,
+  offhandSwingTimerState,
   type SwingPlayerInput,
   type SwingTargetInput,
   swingTimerState,
@@ -19,6 +21,15 @@ const LIVE_TARGET: SwingTargetInput = { dead: false, kind: 'mob' };
 
 function player(over: Partial<SwingPlayerInput> = {}): SwingPlayerInput {
   return { autoAttack: true, swingTimer: 1, weapon: { speed: 2 }, ...over };
+}
+
+function offhandPlayer(over: Partial<OffhandSwingPlayerInput> = {}): OffhandSwingPlayerInput {
+  return {
+    autoAttack: true,
+    offhandSwingTimer: 1,
+    offhandWeapon: { speed: 1.8 },
+    ...over,
+  };
 }
 
 describe('swingTimerState: visibility gating', () => {
@@ -139,6 +150,107 @@ describe('swingTimerState: determinism + ClientWorld-vs-Sim parity', () => {
     const clientTarget = { dead: false, kind: 'mob', netInterval: 50 };
     const fromSim = swingTimerState(simPlayer, simTarget, 2, 2);
     const fromClient = swingTimerState(clientPlayer, clientTarget, 2, 2);
+    expect(fromSim).toEqual(fromClient);
+    expect(fromSim.visible).toBe(true);
+  });
+});
+
+describe('offhandSwingTimerState: visibility gating', () => {
+  it('is hidden when there is no offhand weapon (mainhand-only, not dual-wielding)', () => {
+    const s = offhandSwingTimerState(offhandPlayer({ offhandWeapon: null }), LIVE_TARGET, 1.8, 1);
+    expect(s.visible).toBe(false);
+  });
+
+  it('is hidden when the player is not auto-attacking or has no live target', () => {
+    expect(
+      offhandSwingTimerState(offhandPlayer({ autoAttack: false }), LIVE_TARGET, 1, 1).visible,
+    ).toBe(false);
+    expect(offhandSwingTimerState(offhandPlayer(), null, 1, 1).visible).toBe(false);
+    expect(offhandSwingTimerState(offhandPlayer(), { dead: true, kind: 'mob' }, 1, 1).visible).toBe(
+      false,
+    );
+  });
+
+  it('is visible while dual-wielding, auto-attacking, against a live target', () => {
+    expect(offhandSwingTimerState(offhandPlayer(), LIVE_TARGET, 0, 0).visible).toBe(true);
+  });
+});
+
+describe('offhandSwingTimerState: runs its own independent clock off offhandWeapon.speed', () => {
+  it('recovers the offhand interval from offhandWeapon.speed, not the mainhand weapon', () => {
+    // offhand speed 1.8, fresh -> period = max(timer, offhand speed) = 1.8.
+    const s = offhandSwingTimerState(
+      offhandPlayer({ offhandSwingTimer: 1.8, offhandWeapon: { speed: 1.8 } }),
+      LIVE_TARGET,
+      0,
+      0,
+    );
+    expect(s.nextPeriod).toBe(1.8);
+    expect(s.frac).toBe(0);
+  });
+
+  it('the mainhand and offhand cores run independently off separate edge-tracking state', () => {
+    // Mainhand mid-swing at 2s speed (frac 0.5); offhand independently 0.2s from
+    // its own 1.8s-speed reset, i.e. nearly ready. Neither call's carried period
+    // leaks into the other.
+    const mh = swingTimerState(player({ swingTimer: 1 }), LIVE_TARGET, 2, 2);
+    const oh = offhandSwingTimerState(
+      offhandPlayer({ offhandSwingTimer: 0.2 }),
+      LIVE_TARGET,
+      1.8,
+      1.8,
+    );
+    expect(mh.frac).toBe(0.5);
+    expect(oh.frac).toBeCloseTo(1 - 0.2 / 1.8, 5);
+  });
+
+  it('reports ready independently once the offhand timer hits 0, regardless of the mainhand state', () => {
+    const oh = offhandSwingTimerState(
+      offhandPlayer({ offhandSwingTimer: 0 }),
+      LIVE_TARGET,
+      1.8,
+      0.3,
+    );
+    expect(oh.ready).toBe(true);
+    expect(oh.labelKind).toBe('ready');
+    expect(oh.frac).toBe(1);
+  });
+});
+
+describe('offhandSwingTimerState: determinism + ClientWorld-vs-Sim parity', () => {
+  it('is deterministic: identical inputs produce a deep-equal result', () => {
+    const a = offhandSwingTimerState(
+      offhandPlayer({ offhandSwingTimer: 0.9 }),
+      LIVE_TARGET,
+      1.8,
+      1.2,
+    );
+    const b = offhandSwingTimerState(
+      offhandPlayer({ offhandSwingTimer: 0.9 }),
+      LIVE_TARGET,
+      1.8,
+      1.2,
+    );
+    expect(a).toEqual(b);
+  });
+
+  it('Sim-shaped and ClientWorld-mirror-shaped inputs render identically', () => {
+    const simPlayer = {
+      autoAttack: true,
+      dualWielding: true,
+      offhandSwingTimer: 0.9,
+      offhandWeapon: { speed: 1.8, min: 3, max: 6 }, // Sim weapon carries dmg range too
+      hp: 100, // Sim-only extra
+    };
+    const clientPlayer = {
+      autoAttack: true,
+      dualWielding: true,
+      offhandSwingTimer: 0.9,
+      offhandWeapon: { speed: 1.8 },
+      netUpdatedAt: 1234, // ClientWorld mirror extras
+    };
+    const fromSim = offhandSwingTimerState(simPlayer, LIVE_TARGET, 1.8, 1.2);
+    const fromClient = offhandSwingTimerState(clientPlayer, LIVE_TARGET, 1.8, 1.2);
     expect(fromSim).toEqual(fromClient);
     expect(fromSim.visible).toBe(true);
   });

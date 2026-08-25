@@ -2261,6 +2261,7 @@ const UI_DOM_MODULES = [
   'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
   'src/ui/store_stack_diag.ts',
+  'src/ui/swing_timer_bars.ts',
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',
   'src/ui/theme.ts',

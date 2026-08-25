@@ -125,7 +125,12 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    ceiling: 18488,
+    // Lowered 18488 -> 18474 after extracting the melee-weaving off-hand
+    // swing-timer bar's element caching, edge-tracking clocks, and painter
+    // instantiation (both the main-hand and off-hand bars) into
+    // src/ui/swing_timer_bars.ts, leaving hud.ts a single per-frame call
+    // (the ratchet's own rule: an extraction lowers the ceiling).
+    ceiling: 18474,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -312,7 +317,11 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    ceiling: 5855,
+    // Lowered 5855 -> 5835 after extracting the static combat-rating-scalar +
+    // weapon/offhand-weapon self-wire mirroring into
+    // src/net/combat_scalar_wire.ts (the account_cosmetics_wire.ts /
+    // guild_bank_log_wire.ts convention), leaving online.ts a single call.
+    ceiling: 5835,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

@@ -2295,6 +2295,25 @@
   body.mobile-touch #swingbar .label {
     display: none;
   }
+  /* Off-hand swing timer (dual-wield only): stacked directly above the
+     main-hand bar, same seat/scale contract, so both independent melee-weaving
+     clocks stay clear of nameplates on a short landscape viewport. */
+  body.mobile-touch #swingbar-offhand {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--mobile-button-row-lift) + 23px);
+    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    min-width: 0;
+    height: 5px;
+    transform: translateX(-50%);
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #swingbar-offhand .label {
+    display: none;
+  }
   body.mobile-touch #actionbar-row {
     display: block;
   }
@@ -7082,6 +7101,11 @@
       min-width: 0;
       height: 4px;
     }
+    body.mobile-touch #swingbar-offhand {
+      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      min-width: 0;
+      height: 4px;
+    }
     /* Same bottom-centre column as portrait, at the landscape frame scale so the
        strip matches the player frame's width.
        0.6 renders the frame ~33px, under the 40px touch floor: deliberately the
@@ -7481,6 +7505,7 @@
   }
   body.mobile-touch.hud-mobile-compact #castbar,
   body.mobile-touch.hud-mobile-compact #swingbar,
+  body.mobile-touch.hud-mobile-compact #swingbar-offhand,
   body.mobile-touch.hud-mobile-compact #pet-frame {
     left: calc(50% - 15px);
   }
@@ -7491,6 +7516,7 @@
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar-offhand,
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
     left: calc(50% + 15px);
   }
@@ -7512,6 +7538,7 @@
     body.mobile-touch.hud-mobile-compact #player-frame,
     body.mobile-touch.hud-mobile-compact #castbar,
     body.mobile-touch.hud-mobile-compact #swingbar,
+    body.mobile-touch.hud-mobile-compact #swingbar-offhand,
     body.mobile-touch.hud-mobile-compact #pet-frame {
       left: calc(50% - 44px);
     }
@@ -7519,6 +7546,7 @@
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar-offhand,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
       left: calc(50% + 44px);
     }
@@ -7561,6 +7589,7 @@
     body.mobile-touch.hud-mobile-tablet #player-frame,
     body.mobile-touch.hud-mobile-tablet #castbar,
     body.mobile-touch.hud-mobile-tablet #swingbar,
+    body.mobile-touch.hud-mobile-tablet #swingbar-offhand,
     body.mobile-touch.hud-mobile-tablet #pet-frame {
       left: calc(50% - 10px);
     }
@@ -7568,6 +7597,7 @@
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar-offhand,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {
       left: calc(50% + 10px);
     }

@@ -166,6 +166,7 @@ import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
+import { applySelfCombatScalars } from './combat_scalar_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
@@ -3512,6 +3513,7 @@ export class ClientWorld implements IWorld {
       this.applySelfTargetFromServer(e, s.target ?? null, true);
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
+      e.offhandSwingTimer = s.swingOff ?? e.offhandSwingTimer;
       e.queuedOnSwing = s.queued ?? null;
       // A rolling deploy can pair this client with an older server whose stats
       // object predates WARFARE. Preserve numeric PvP fields instead of letting
@@ -3519,29 +3521,7 @@ export class ClientWorld implements IWorld {
       if (s.stats !== undefined) {
         e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
       }
-      // Static combat-rating scalars (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat):
-      // delta-guarded on selfWireJson like the rest of this record (server/game.ts),
-      // so an omitted key means unchanged, not zero. Fall back to the prior mirrored
-      // value, the same `s.X ?? e.X` shape already used for `weapon` below.
-      e.attackPower = s.ap ?? e.attackPower;
-      e.rangedPower = s.rp ?? 0;
-      e.spellPower = s.sp ?? e.spellPower;
-      // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
-      // no wiring (the swing timers already ride the snapshot).
-      e.spellHaste = s.sh ?? e.spellHaste;
-      e.critChance = s.crit ?? e.critChance;
-      e.dodgeChance = s.dodge ?? e.dodgeChance;
-      e.blockChance = s.blk ?? e.blockChance;
-      e.blockValue = s.bval ?? e.blockValue;
-      // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
-      // crit/sh above, and hit resolves server-side); delta-guarded like the rest of
-      // this record so the online character sheet keeps showing the last-known value
-      // between gear/talent changes instead of flashing back to the blankEntity 0.
-      // Server-recomputed.
-      e.critRating = s.crat ?? e.critRating;
-      e.hasteRating = s.hrat ?? e.hasteRating;
-      e.hitRating = s.hirat ?? e.hitRating;
-      e.weapon = s.weapon ?? e.weapon;
+      applySelfCombatScalars(e, s);
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
       // the client never derives a sound decision from this local shadow (the
       // server's heal SimEvents already carry sfxTick), so 0 is an inert

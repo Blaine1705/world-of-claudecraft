@@ -640,11 +640,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the player cast bar plus the eat/drink overlay',
   },
   {
-    call: 'this.swingTimerPainter.paint',
+    call: 'this.swingTimerBars.update',
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the auto-attack swing timer',
+    why: 'the main-hand and off-hand (dual-wield melee weaving) swing timers',
   },
   {
     call: 'this.procOverlayEl.classList.add',
