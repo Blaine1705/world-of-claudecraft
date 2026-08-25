@@ -19,6 +19,7 @@
 import {
   BG_BASES,
   BG_GRAVEYARDS,
+  BG_PICKUP_RADIUS,
   BG_POWER_RUNES,
   BG_SPEED_RUNES,
   BG_TEAM_COLORS,
@@ -115,9 +116,13 @@ export const BG_CARRIER_VULN_DELAY = 75;
 export const BG_CARRIER_VULN_INTERVAL = 15;
 export const BG_CARRIER_VULN_PER_STACK = 0.1;
 const BG_FLAG_RETURN_TIME = 20; // a dropped flag auto-returns home after this
-// Reach for the flag action. The stand is paved ground, not a plinth: a runner
-// walks right up to the pole, so the reach stays tight.
-export const BG_PICKUP_RADIUS = 2.5;
+
+// Re-exported: BG_PICKUP_RADIUS now lives in battleground_layout.ts (a pure
+// leaf, alongside BG_TEAM_COLORS) so the client can share the same reach the
+// server checks; kept exported here too, so existing importers of this
+// module are unaffected.
+export { BG_PICKUP_RADIUS };
+
 const BG_CAPTURE_RADIUS = 4; // carry the enemy flag this close to your stand
 const BG_RUNE_RADIUS = 2.5; // step this close to a speed rune to claim it
 const BG_RUNE_COOLDOWN = 30; // a claimed rune recharges over this (owner: 22 felt too fast)
@@ -1202,6 +1207,14 @@ function spawnFlagEntity(ctx: SimContext, flag: BgFlagState): void {
   e.templateId = 'bg_flag';
   e.objectItemId = null;
   e.lootable = false;
+  // The generic per-tick object sweep (sim.ts) counts any non-lootable object
+  // down to respawnTimer<=0 and flips lootable back true; the entity default
+  // is 0, so left unset this fires the very next tick. The flag is driven
+  // entirely by its own pickup-radius mechanic (bgFlagAction), never the
+  // generic respawn system, so it must never re-enter that pool (an
+  // Infinity respawnTimer for a never-generic-respawns object is the
+  // established pattern; see Entity.respawnTimer's runScoped doc).
+  e.respawnTimer = Infinity;
   e.color = BG_TEAM_COLORS[flag.team];
   ctx.addEntity(e);
   flag.entityId = e.id;
@@ -1219,6 +1232,9 @@ function spawnRuneEntity(ctx: SimContext, rune: BgRuneState): void {
   e.templateId = 'bg_rune';
   e.objectItemId = null;
   e.lootable = false;
+  // Same reasoning as spawnFlagEntity above: never let the generic per-tick
+  // object sweep re-lootable this, its own proximity claim owns the pickup.
+  e.respawnTimer = Infinity;
   e.color = visual.color;
   ctx.addEntity(e);
   rune.entityId = e.id;

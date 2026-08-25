@@ -1025,10 +1025,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the battleground flag/rune view-priority fix
+// (entity_view_policy_core.ts moved). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b7f20268e9d15b01de7034b18d451f23367b13576506daae0f486b086554df42';
+  'd69b555db0258daecf0daf230c7a20c00bc3541951335a2673e0a4fa025c3679';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
+  'afc1435d092243c1e6cee1418bad180e9fca942bc838c99467915ac5a78cbdb1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2175,10 +2177,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the battleground flag/rune view-priority fix
+    // (entity_view_policy_core.ts moved): same order, the composite first,
+    // then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('5bae1eefcdba32613ca7fe8ac5db78be891da7b08a56b66c2085e816c903f31f');
+    ).toBe('8d9bcc870606b7d1c4e02f154db1867e6fa7393fc3e60ba4e56e88f37e216f24');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

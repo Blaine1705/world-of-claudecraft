@@ -19,6 +19,7 @@ import {
 import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
+import { shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
 import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
@@ -3430,10 +3431,9 @@ async function startGame(
       }
     }
   }
-  // The deliberate Thornhollow Fields flag press. Inside a live match the bare interact
-  // key also routes here (the field has no other interactables), which gives
-  // the mobile interact button flag parity for free; the world owns every rule
-  // (radius, team, the return-beats-press race), so a stray press is a no-op.
+  // The deliberate Thornhollow Fields flag press: always attempted, the world
+  // owns every rule (radius, team, the return-beats-press race), so a stray
+  // press is a no-op.
   function bgFlagKey(): void {
     if (world.bgInfo?.match) world.bgFlagAction();
   }
@@ -3448,7 +3448,7 @@ async function startGame(
       hud.confirmToolEffectUse(prompt, proceed),
   };
   function interactKey(preferNpcId?: number | null): void {
-    if (world.bgInfo?.match?.state === 'active') {
+    if (shouldRouteInteractToBgFlag(world.bgInfo, world.player, world.entities)) {
       world.bgFlagAction();
       return;
     }

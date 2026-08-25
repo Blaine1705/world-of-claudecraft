@@ -323,8 +323,10 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the battleground flag/rune view-priority fix
+// (entity_view_policy_core.ts moved). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
+  'afc1435d092243c1e6cee1418bad180e9fca942bc838c99467915ac5a78cbdb1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
