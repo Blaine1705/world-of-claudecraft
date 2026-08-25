@@ -311,6 +311,7 @@ import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
   type SelfMotionFrame,
+  selfMotionAllowedAt,
 } from './render/self_motion';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
@@ -4793,6 +4794,7 @@ async function startGame(
             !movementFrozen() &&
             !playerImmobilized() &&
             !isDelvePos(pe.pos.x) &&
+            selfMotionAllowedAt(pe.pos.x, net.riftFloor) &&
             // A ledge climb is a server-owned scripted move the client does
             // not re-simulate: predicting a fall through it would fight the
             // authoritative pull-up and show the correction as a stutter.

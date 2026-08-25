@@ -403,7 +403,13 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Raised 11566 -> 11568 (+2) for the PR #3623 review fix: a resumed
+    // session's fresh ClientWorld starts with riftFloor null, so the self-
+    // motion enable condition also gates on it. The predicate itself moved
+    // to src/render/self_motion.ts (selfMotionAllowedAt); the two lines left
+    // here are the import and the one-line call, which cannot land behind a
+    // seam. Maintainer decision, exact count, no further slack.
+    ceiling: 11568,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -446,7 +452,13 @@ const MONOLITHS: MonolithRow[] = [
     // routeEvents into the guild board window's live REST read (the
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
-    ceiling: 10645,
+    // Raised 10645 -> 10648 (+3) for the PR #3623 review fix: resumeSession
+    // now re-sends riftState (an import, a two-line comment, and the send
+    // call), so a resumed session is not blind to the rift floor its player
+    // is standing inside. The lookup logic lives in src/sim/rift/runs.ts
+    // (riftStateEventFor); nothing left here can move behind a seam.
+    // Maintainer decision, exact count, no further slack.
+    ceiling: 10648,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -470,7 +482,12 @@ const MONOLITHS: MonolithRow[] = [
     // (issue #3479) combines with the release side's own net-online growth,
     // so the merged file lands above either parent's pin. Exact merged
     // count, zero slack.
-    ceiling: 5895,
+    // Raised 5895 -> 5898 (+3) for the PR #3623 review fix: endSession now
+    // also clears riftFloor (a two-line comment plus the assignment), so a
+    // riftState frame arriving after endSession but before the socket
+    // actually closes cannot re-register a region under a token nothing
+    // will ever clear again. Maintainer decision, exact count, no slack.
+    ceiling: 5898,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

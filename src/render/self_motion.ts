@@ -60,6 +60,7 @@
 
 import { moverHeight, resolveMovement } from '../sim/colliders';
 import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
+import { isRiftPos } from '../sim/data';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 import type { RiftFloorView } from '../world_api/dungeons';
@@ -150,6 +151,18 @@ export interface Vec3Like {
 }
 
 const clamp = (n: number, min: number, max: number): number => Math.max(min, Math.min(max, n));
+
+/**
+ * Whether display-only self prediction is allowed to run for the local player
+ * at `posX`. Prediction inside a rift needs the floor descriptor (lift +
+ * wall data); a resumed ClientWorld starts with `riftFloor` null since
+ * enter/descend/exit are the only ordinary riftState emit sites and a resume
+ * replays none of them. `server/game.ts` `resumeSession` re-sends riftState
+ * on resume, so this stays defense in depth for whatever window precedes it.
+ */
+export function selfMotionAllowedAt(posX: number, riftFloor: RiftFloorView | null): boolean {
+  return !isRiftPos(posX) || riftFloor !== null;
+}
 
 export function hasAuthoritativeSelfPositionDiscontinuity(
   events: readonly SimEvent[],

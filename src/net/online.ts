@@ -2181,6 +2181,9 @@ export class ClientWorld implements IWorld {
     if (this.riftFloor) {
       clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
     }
+    // Clear the descriptor too: onMessage has no sessionEnded guard, so a
+    // late riftState frame would re-register a region nothing ever clears.
+    this.riftFloor = null;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
