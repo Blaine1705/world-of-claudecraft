@@ -51,9 +51,7 @@ type EscrowStateKey =
   | { kind: 'mailPartitionMarker'; realm: string };
 
 /** Classify world_state keys the escrow sweep reads; null for unrelated rows. */
-export function parseEscrowStateKey(
-  key: string,
-): EscrowStateKey | null {
+export function parseEscrowStateKey(key: string): EscrowStateKey | null {
   if (key.startsWith(MAIL_PARTITION_MARKER_PREFIX)) {
     const realm = key.slice(MAIL_PARTITION_MARKER_PREFIX.length);
     return realm === '' ? null : { kind: 'mailPartitionMarker', realm };
@@ -84,7 +82,8 @@ export function escrowTotalsFromStateRows(rows: EscrowStateRow[]): EscrowCharact
   for (const { parsed } of parsedRows) {
     if (!parsed) continue;
     if (parsed.kind === 'mailPartitionMarker') migratedMailRealms.add(parsed.realm);
-    if (parsed.kind === 'mail' && parsed.format === 'partition') migratedMailRealms.add(parsed.realm);
+    if (parsed.kind === 'mail' && parsed.format === 'partition')
+      migratedMailRealms.add(parsed.realm);
   }
   const byKey = new Map<string, EscrowCharacterTotal>();
   const bucket = (rawKey: string, realm: string): EscrowCharacterTotal | null => {
