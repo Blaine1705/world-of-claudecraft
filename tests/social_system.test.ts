@@ -5,6 +5,7 @@ import {
   type CharRef,
   type GuildEventRow,
   type GuildRank,
+  PLEDGE_REPLEDGE_COOLDOWN_MS,
   type Presence,
   type SocialDb,
   type SocialEvent,
@@ -63,6 +64,14 @@ class FakeDb implements SocialDb {
   }
   async deletePledge(charId: number) {
     this.pledges.delete(charId);
+  }
+  pledgeCooldowns = new Map<number, number>();
+  cooldownClock = () => 0;
+  async lastPledgeAtMs(charId: number) {
+    return this.pledgeCooldowns.get(charId) ?? null;
+  }
+  async touchPledgeCooldown(charId: number) {
+    this.pledgeCooldowns.set(charId, this.cooldownClock());
   }
   async accountIdForCharacter(charId: number) {
     return this.accountOf.get(charId) ?? charId + 1000;
@@ -450,6 +459,7 @@ function setup(
   const db = new FakeDb();
   const tx = new FakeTransport(db);
   let clock = 1000;
+  db.cooldownClock = () => clock;
   const svc = new SocialService(
     db,
     tx,
@@ -2463,9 +2473,42 @@ describe('guild pledges', () => {
     h.tx.setOnline(4);
     await h.svc.guildInvite(h.actor(2), 'Aspirant');
     expect(await h.db.pledgeLadder(h.guildId, account!)).toBeNull();
-    // And the aspirant may pledge again at once.
+    // And once the global re-pledge cooldown passes, the aspirant may pledge
+    // again with no ladder in the way.
+    h.advance(PLEDGE_REPLEDGE_COOLDOWN_MS);
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).not.toBeNull();
+  });
+
+  it('refuses a re-pledge inside the cooldown window, to any guild', async () => {
+    const h = await seed();
+    await h.db.createGuildWithLeader('Inkwrights', 5);
+    h.add(5, 'Scribe');
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // Switching targets inside the window is refused with the remaining time.
+    h.advance(60_000);
+    await h.svc.guildPledge(h.actor(4), 'Inkwrights');
+    expect(h.tx.errorsFor(4).at(-1)).toBe('You can pledge again in 4 more minutes.');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+    // The last minute reads singular.
+    h.advance(PLEDGE_REPLEDGE_COOLDOWN_MS - 90_000);
+    await h.svc.guildPledge(h.actor(4), 'Inkwrights');
+    expect(h.tx.errorsFor(4).at(-1)).toBe('You can pledge again in 1 more minute.');
+    // Past the window the switch goes through.
+    h.advance(31_000);
+    await h.svc.guildPledge(h.actor(4), 'Inkwrights');
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Inkwrights' });
+  });
+
+  it('withdrawing does not dodge the cooldown: the stamp survives the row delete', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeWithdraw(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.advance(60_000);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    expect(h.tx.errorsFor(4).at(-1)).toBe('You can pledge again in 4 more minutes.');
+    expect(await h.db.pledgeOf(4)).toBeNull();
   });
 
   it('accept resolves the pledge into the standard invite', async () => {

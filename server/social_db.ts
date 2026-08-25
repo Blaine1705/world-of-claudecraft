@@ -154,6 +154,16 @@ CREATE TABLE IF NOT EXISTS guild_pledges (
 );
 CREATE INDEX IF NOT EXISTS guild_pledges_guild ON guild_pledges(guild_id);
 
+-- The re-pledge cooldown stamp, per character: the last time they PLEDGED,
+-- SURVIVING withdraw (which deletes the pledge row itself), so
+-- withdraw-and-re-pledge cannot dodge the anti-spam window
+-- (server/social.ts PLEDGE_REPLEDGE_COOLDOWN_MS). Bounded at one row per
+-- character, so no retention sweep is needed.
+CREATE TABLE IF NOT EXISTS guild_pledge_cooldowns (
+  character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  pledged_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- The rejection ladder, per (guild, ACCOUNT): 1 day, then 1 week, then
 -- forever (sim/guild_pledge_ladder.ts owns the arithmetic). KEEP FOREVER by
 -- design: the third tier is permanent, so rows must outlive every sweep; the
@@ -631,6 +641,23 @@ export class PgSocialDb implements SocialDb {
 
   async deletePledge(charId: number): Promise<void> {
     await this.pool.query('DELETE FROM guild_pledges WHERE character_id = $1', [charId]);
+  }
+
+  async lastPledgeAtMs(charId: number): Promise<number | null> {
+    const res = await this.pool.query(
+      `SELECT (EXTRACT(EPOCH FROM pledged_at) * 1000)::float8 AS ms
+         FROM guild_pledge_cooldowns WHERE character_id = $1`,
+      [charId],
+    );
+    return res.rows[0]?.ms ?? null;
+  }
+
+  async touchPledgeCooldown(charId: number): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO guild_pledge_cooldowns (character_id) VALUES ($1)
+       ON CONFLICT (character_id) DO UPDATE SET pledged_at = now()`,
+      [charId],
+    );
   }
 
   async accountIdForCharacter(charId: number): Promise<number | null> {

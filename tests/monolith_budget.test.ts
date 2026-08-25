@@ -301,9 +301,9 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 18 for the guildRoster REST mirror (the signpost guild board's
     // roster drill-in; the cached read lives in server/guild_roster.ts),
     // then re-pinned when the mirror gained the trust-boundary row
-    // validation and the 404-vs-transport-failure split. Exact count, zero
-    // slack.
-    ceiling: 5854,
+    // validation and the 404-vs-transport-failure split, plus the roster
+    // class field. Exact count, zero slack.
+    ceiling: 5855,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

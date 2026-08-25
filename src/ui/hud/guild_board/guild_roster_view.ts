@@ -12,6 +12,7 @@ import type { GuildRosterEntry, GuildRosterInfo } from '../../../world_api';
 export interface GuildRosterRow {
   name: string;
   rank: GuildRosterEntry['rank'];
+  class: string;
   level: number;
   lifetimeXp: number;
 }
@@ -52,6 +53,7 @@ export function buildGuildRosterView(input: GuildRosterInput): GuildRosterView {
     rows: info.members.map((m) => ({
       name: m.name,
       rank: m.rank,
+      class: m.class,
       level: m.level,
       lifetimeXp: m.lifetimeXp,
     })),

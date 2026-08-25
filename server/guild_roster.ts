@@ -37,7 +37,7 @@ export async function readGuildRoster(guildName: string): Promise<GuildRosterInf
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT g.name AS guild_name, c.name,
-              gm.rank,
+              gm.rank, c.class AS cls,
               COALESCE((c.state->>'level')::int, 0)          AS level,
               COALESCE((c.state->>'lifetimeXp')::bigint, 0)  AS lifetime_xp
          FROM guilds g
@@ -58,6 +58,7 @@ export async function readGuildRoster(guildName: string): Promise<GuildRosterInf
     members: res.rows.map((r) => ({
       name: String(r.name),
       rank: r.rank === 'leader' || r.rank === 'officer' ? r.rank : 'member',
+      class: String(r.cls ?? ''),
       level: Number(r.level),
       lifetimeXp: Number(r.lifetime_xp),
     })),

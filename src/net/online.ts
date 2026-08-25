@@ -5664,6 +5664,7 @@ export class ClientWorld implements IWorld {
     }
     const members = (data.members as Record<string, unknown>[]).map((m) => ({
       name: String(m.name ?? ''),
+      class: String(m.class ?? ''),
       rank: (m.rank === 'leader' || m.rank === 'officer' ? m.rank : 'member') as
         | 'leader'
         | 'officer'

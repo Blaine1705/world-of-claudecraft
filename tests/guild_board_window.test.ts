@@ -39,9 +39,9 @@ const PAGE: GuildLeaderboardPage = {
 const ROSTER: GuildRosterInfo = {
   guild: 'Stormcallers',
   members: [
-    { name: 'Boss', rank: 'leader', level: 20, lifetimeXp: 900_000 },
-    { name: 'Right Hand', rank: 'officer', level: 20, lifetimeXp: 800_000 },
-    { name: 'Fresh Blood', rank: 'member', level: 5, lifetimeXp: 40_000 },
+    { name: 'Boss', rank: 'leader', class: 'warrior', level: 20, lifetimeXp: 900_000 },
+    { name: 'Right Hand', rank: 'officer', class: 'priest', level: 20, lifetimeXp: 800_000 },
+    { name: 'Fresh Blood', rank: 'member', class: 'rogue', level: 5, lifetimeXp: 40_000 },
   ],
 };
 
@@ -152,6 +152,8 @@ describe('GuildBoardWindow', () => {
       'Fresh Blood',
     ]);
     expect(rows[0].querySelector('.gb-rank-chip')?.textContent).toBe('Guild Master');
+    expect(rows[0].querySelector('.gb-class')?.textContent).toBe('Warrior');
+    expect((rows[0].querySelector('.gb-class') as HTMLElement).style.color).not.toBe('');
     expect(rows[1].querySelector('.gb-rank-chip')?.textContent).toBe('Officer');
     expect(rows[2].querySelector('.gb-rank-chip')?.textContent).toBe('Member');
     // The back control returns to the board.

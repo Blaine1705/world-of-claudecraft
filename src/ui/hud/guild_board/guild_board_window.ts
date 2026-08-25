@@ -11,8 +11,11 @@
 // leaderboard-window family's shape (renderSeq staleness, markDialogRoot,
 // focus discipline, inline display:flex open).
 
+import { CLASSES } from '../../../sim/data';
+import type { PlayerClass } from '../../../sim/types';
 import type { GuildLeaderboardPage, IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
+import { classDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import {
   buildGuildLeaderboardView,
@@ -360,6 +363,7 @@ export class GuildBoardWindow {
     return (
       `<div class="lb-row gb-row-roster lb-head"><span class="gb-rank-chip">${esc(t('game.leaderboard.rank'))}</span>` +
       `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
+      `<span class="gb-class">${esc(t('auth.class'))}</span>` +
       `<span class="lb-lvl">${esc(t('game.leaderboard.level'))}</span>` +
       `<span class="lb-xp">${esc(t('game.leaderboard.lifetimeXp'))}</span></div>`
     );
@@ -372,9 +376,16 @@ export class GuildBoardWindow {
         : r.rank === 'officer'
           ? 'hud.social.ranks.officer'
           : 'hud.social.ranks.member';
+    // Class colour from the content table (the classic class-colour rule);
+    // an unknown class id renders the raw id uncoloured rather than hiding
+    // the row.
+    const clsDef = (CLASSES as Record<string, { color: number }>)[r.class];
+    const clsColor = clsDef ? ` style="color: #${clsDef.color.toString(16).padStart(6, '0')}"` : '';
+    const clsName = clsDef ? classDisplayName(r.class as PlayerClass) : r.class;
     return (
       `<div class="lb-row gb-row-roster"><span class="gb-rank-chip gb-rank-${r.rank}">${esc(t(rankKey))}</span>` +
       `<span class="lb-name">${esc(r.name)}</span>` +
+      `<span class="gb-class"${clsColor}>${esc(clsName)}</span>` +
       `<span class="lb-lvl">${formatNumber(r.level, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(r.lifetimeXp)}</span></div>`
     );

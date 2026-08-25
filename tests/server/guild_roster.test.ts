@@ -25,9 +25,30 @@ import { type FakeRes, fakeCtx, makeReq } from './helpers';
 const runMock = vi.mocked(runWithStatementTimeout);
 
 const ROWS = [
-  { guild_name: 'Stormcallers', name: 'Boss', rank: 'leader', level: 20, lifetime_xp: '900000' },
-  { guild_name: 'Stormcallers', name: 'Aide', rank: 'officer', level: 19, lifetime_xp: '500000' },
-  { guild_name: 'Stormcallers', name: 'Newbie', rank: 'member', level: 3, lifetime_xp: '9000' },
+  {
+    guild_name: 'Stormcallers',
+    name: 'Boss',
+    rank: 'leader',
+    cls: 'warrior',
+    level: 20,
+    lifetime_xp: '900000',
+  },
+  {
+    guild_name: 'Stormcallers',
+    name: 'Aide',
+    rank: 'officer',
+    cls: 'priest',
+    level: 19,
+    lifetime_xp: '500000',
+  },
+  {
+    guild_name: 'Stormcallers',
+    name: 'Newbie',
+    rank: 'member',
+    cls: 'rogue',
+    level: 3,
+    lifetime_xp: '9000',
+  },
 ];
 
 function answerRows(rows: unknown[]): void {
@@ -68,9 +89,9 @@ describe('readGuildRoster', () => {
     expect(info).toEqual({
       guild: 'Stormcallers',
       members: [
-        { name: 'Boss', rank: 'leader', level: 20, lifetimeXp: 900_000 },
-        { name: 'Aide', rank: 'officer', level: 19, lifetimeXp: 500_000 },
-        { name: 'Newbie', rank: 'member', level: 3, lifetimeXp: 9_000 },
+        { name: 'Boss', rank: 'leader', class: 'warrior', level: 20, lifetimeXp: 900_000 },
+        { name: 'Aide', rank: 'officer', class: 'priest', level: 19, lifetimeXp: 500_000 },
+        { name: 'Newbie', rank: 'member', class: 'rogue', level: 3, lifetimeXp: 9_000 },
       ],
     });
   });

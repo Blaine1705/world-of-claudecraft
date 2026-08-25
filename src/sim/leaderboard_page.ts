@@ -37,6 +37,9 @@ export type GuildLeaderboardPage = RankedPage<GuildLeaderboardEntry>;
 export interface GuildRosterEntry {
   name: string;
   rank: 'leader' | 'officer' | 'member';
+  /** The character's class id ('warrior', ...); the client localizes the
+   *  display name and colours by the content table. '' when unknown. */
+  class: string;
   level: number;
   lifetimeXp: number;
 }

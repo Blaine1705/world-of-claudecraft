@@ -108,6 +108,11 @@ export interface SocialSnapshot {
 
 // Storage abstraction. The Postgres implementation lives in social_db.ts; the
 // tests provide an in-memory one. Every method is keyed by character id.
+/** One pledge per character per window: the officer-notification fan-out is
+ *  the spam vector, so the cooldown applies to ANY new pledge (switch or
+ *  withdraw-and-re-pledge included; the stamp survives withdraw). */
+export const PLEDGE_REPLEDGE_COOLDOWN_MS = 5 * 60_000;
+
 export interface SocialDb {
   findCharacterByName(name: string): Promise<CharInfo | null>;
   getCharacter(id: number): Promise<CharInfo | null>;
@@ -187,6 +192,11 @@ export interface SocialDb {
   pledgeOf(charId: number): Promise<{ guildId: number; guildName: string; sinceMs: number } | null>;
   upsertPledge(charId: number, guildId: number): Promise<void>;
   deletePledge(charId: number): Promise<void>;
+  /** The last time this character PLEDGED (epoch ms), surviving withdraw;
+   *  null when they never pledged. Backs the re-pledge cooldown. */
+  lastPledgeAtMs(charId: number): Promise<number | null>;
+  /** Stamp now() as the character's last pledge time (upsert). */
+  touchPledgeCooldown(charId: number): Promise<void>;
   accountIdForCharacter(charId: number): Promise<number | null>;
   pledgeLadder(
     guildId: number,
@@ -1056,6 +1066,22 @@ export class SocialService {
   }
 
   async guildPledge(actor: SocialActor, guildName: string): Promise<void> {
+    // Anti-spam cooldown: every successful pledge notifies the target guild's
+    // online officers, so rapid pledge-hopping (pledge, switch, withdraw and
+    // re-pledge) is a broadcast spam vector. One pledge per character per
+    // window, whatever the target; the stamp survives withdraw by design.
+    const lastPledgeMs = await this.db.lastPledgeAtMs(actor.characterId);
+    if (lastPledgeMs !== null) {
+      const remainingMs = PLEDGE_REPLEDGE_COOLDOWN_MS - (this.now() - lastPledgeMs);
+      if (remainingMs > 0) {
+        const minutes = Math.max(1, Math.ceil(remainingMs / 60_000));
+        this.err(
+          actor.characterId,
+          `You can pledge again in ${minutes} more minute${minutes === 1 ? '' : 's'}.`,
+        );
+        return;
+      }
+    }
     if (await this.db.guildMembership(actor.characterId)) {
       this.err(actor.characterId, 'You are already in a guild.');
       return;
@@ -1090,6 +1116,7 @@ export class SocialService {
     }
     const prior = await this.db.pledgeOf(actor.characterId);
     await this.db.upsertPledge(actor.characterId, guild.id);
+    await this.db.touchPledgeCooldown(actor.characterId);
     this.info(actor.characterId, `You have pledged to ${guild.name}.`);
     if (prior && prior.guildId !== guild.id) {
       // Replacing a pledge is one implicit withdraw; the old guild's officers

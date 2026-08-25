@@ -1961,10 +1961,27 @@
     color: var(--color-text-muted);
     font-size: 12px;
   }
+  /* The roster rows carry their own five-column grid (rank chip, name,
+     class, level, XP): the lb-row base grid is shaped for the board tabs
+     and crams the wider rank chip into a 44px rank column. */
+  #guild-board-window .lb-row.gb-row-roster {
+    grid-template-columns: 92px minmax(0, 1fr) 84px 40px 96px;
+  }
+  #guild-board-window .gb-row-roster .lb-xp {
+    white-space: nowrap;
+  }
+  #guild-board-window .gb-class {
+    font-size: 11.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   #guild-board-window .gb-rank-chip {
     font-size: 11px;
     color: var(--color-text-muted);
-    min-width: 84px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   #guild-board-window .gb-rank-chip.gb-rank-leader {
     color: var(--gold);
