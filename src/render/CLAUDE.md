@@ -349,6 +349,27 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   view): every town-spanning static batch anchors at the town centre, so a
   camera standing there is at arm's length of all of them at once, and reach is
   a collider argument a batch cannot make.
+  THE ENTRY HORIZON BOUNDS WHAT IS CONSULTED. The reveal-gated painters (the
+  props view, both town views, foliage) cull against
+  `EntryDetailHorizonAdmission.sceneryCullFar` (`entry_detail_horizon_core.ts`
+  `entrySceneryCullFar`): the frame's cull far capped at the horizon's open
+  ring while the entry horizon is active, at BOTH frame sites (the prewarm
+  frame and the live frame). Before the far-terrain stand-in is complete the
+  renderer culls at scene fog rather than the horizon, and one such frame
+  under the entry cover requested every scenery key out to that fog (measured
+  on the Proving Shore spawn: 81 keys at once, 46 of them beyond the first
+  ring, both mainland towns included), so the spawn's own decor waited behind
+  keys the horizon then hid, whose watchdogs later revealed them cold. A key
+  beyond the ring is not consulted, so nothing is requested for it until the
+  ring reaches it or the camera does (real-geometry keys: foliage SPRITE rows
+  cull against the atmospheric far, which the cap leaves alone, so an impostor
+  bucket beyond the ring still consults its gate). The cap holds on the frames
+  the horizon cannot tick (before `vistaLive()`, `advanceFromFrame` is not
+  fed): that window is the one it exists for, and nothing beyond the ring
+  could draw there anyway, since every such key is gate-held until its link.
+  `snapshot().sceneryCap` reports the ring scenery culled at, distinct from
+  `cap`, which reads the target on those frames. Terrain keeps the wide cull
+  far: nothing it draws rides the reveal lane.
   The ARRIVAL COVER (`arrival_cover.ts`, raised by `src/game/arrival_warmup.ts`
   for the whole blocking teleport chain, and at world entry) does two things and
   neither of them reveals anything. It makes the curtain WAIT on the gates

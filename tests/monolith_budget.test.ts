@@ -181,7 +181,9 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 13329,
+    // +1 for the entry horizon's scenery cull far at the live frame (one local
+    // the four reveal-gated painters share); the prewarm frame inlines it.
+    ceiling: 13330,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

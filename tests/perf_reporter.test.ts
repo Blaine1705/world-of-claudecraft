@@ -596,6 +596,7 @@ function snapshot(): PerfSnapshot {
       entryDetailHorizon: {
         active: false,
         cap: 700,
+        sceneryCap: null,
         targetFar: 700,
         nextCap: null,
         stableFrames: 0,
