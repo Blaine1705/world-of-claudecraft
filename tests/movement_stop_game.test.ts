@@ -28,6 +28,7 @@ vi.mock('../server/db', () => ({
 import { GameServer } from '../server/game';
 import { applyBufferedMovementFrames } from '../server/movement_input_timeline';
 import { finishMovementStops, prepareMovementStops } from '../server/movement_stop';
+import { RUN_SPEED } from '../src/sim/types';
 import { fakeWs, joinServer } from './helpers/bare_client';
 
 describe('authoritative movement stop endpoint wiring', () => {
@@ -195,8 +196,9 @@ describe('authoritative movement stop endpoint wiring', () => {
         p: { x: entity.pos.x, z: startZ },
       }),
     );
-    const targetZ = startZ + 14.3941538753;
     const movementDurationMs = 2_905.4 - 796.2;
+    const renderPhaseCreditSeconds = 1 / 30;
+    const targetZ = startZ + RUN_SPEED * (movementDurationMs / 1000 + renderPhaseCreditSeconds);
     let seq = 2;
     for (let elapsedMs = 50; elapsedMs <= 2_050; elapsedMs += 50) {
       seq++;
