@@ -7,9 +7,10 @@ import {
   BG_GRAVEYARDS,
   BG_POWER_RUNES,
   BG_SPEED_RUNES,
+  battlegroundColliders,
   bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
-import { resolvePosition } from '../src/sim/colliders';
+import { colliderTopAt, moverHeight, resolvePosition } from '../src/sim/colliders';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
 import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
@@ -170,6 +171,57 @@ function forceIntoBgWallTrap(sim: Sim, match: BgMatch, pid: number): Entity {
   sim.ctx.rebucket(e);
   const resolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
   expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeGreaterThan(0.01);
+  return e;
+}
+
+function forceOntoBgStandableCollider(sim: Sim, match: BgMatch, pid: number): Entity {
+  const origin = battlegroundOrigin(match.slot);
+  const standable = must(
+    battlegroundColliders().find((candidate) => {
+      if (!candidate.standable || candidate.moveTopY === undefined) return false;
+      const x = origin.x + candidate.x;
+      const z = origin.z + candidate.z;
+      const y = colliderTopAt(candidate, candidate.x, candidate.z);
+      const fullHeight = resolvePosition(sim.cfg.seed, x, z, PLAYER_BODY_RADIUS);
+      const heightAware = resolvePosition(
+        sim.cfg.seed,
+        x,
+        z,
+        PLAYER_BODY_RADIUS,
+        false,
+        undefined,
+        { y, lift: 0 },
+      );
+      return (
+        Math.hypot(fullHeight.x - x, fullHeight.z - z) > 0.01 &&
+        Math.hypot(heightAware.x - x, heightAware.z - z) <= 1e-6
+      );
+    }),
+    'clear battleground standable collider',
+  );
+  const e = must(sim.entities.get(pid), 'entity');
+  e.pos = {
+    x: origin.x + standable.x,
+    y: colliderTopAt(standable, standable.x, standable.z),
+    z: origin.z + standable.z,
+  };
+  e.prevPos = { ...e.pos };
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = true;
+  e.jumping = false;
+  sim.ctx.rebucket(e);
+  const resolved = resolvePosition(
+    sim.cfg.seed,
+    e.pos.x,
+    e.pos.z,
+    PLAYER_BODY_RADIUS,
+    false,
+    undefined,
+    moverHeight(e),
+  );
+  expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeLessThanOrEqual(1e-6);
   return e;
 }
 
@@ -1248,6 +1300,27 @@ describe('Thornhollow Fields: the graveyard rite', () => {
       }),
     );
     expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+  });
+
+  it('Unstuck does not treat clear standable battleground footing as a wall trap', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    forceOntoBgStandableCollider(sim, match, pid);
+    const meta = must(sim.meta(pid), 'player meta');
+    meta.moveInput.forward = true;
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'moving',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
   });
 
   it('combat still cancels a battleground wall-trap Unstuck countdown', () => {
