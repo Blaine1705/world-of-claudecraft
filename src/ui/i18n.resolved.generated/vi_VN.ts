@@ -999,6 +999,16 @@ export const vi_VN: EnTranslations = {
       "clearAria": "Clear a slot",
       "clearArmed": "Tap a slot to clear it."
     },
+    "tutorialGreeting": {
+      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
+      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
+      "play": "Take the tutorial",
+      "skip": "Skip the tutorial",
+      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
+      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
+      "noteClose": "Understood"
+    },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
       "talkBodyTouch": "Đứng gần Thống Soái Redbrook và chạm nút Dùng để nói chuyện, rồi nhận nhiệm vụ của ông.",
@@ -1010,6 +1020,117 @@ export const vi_VN: EnTranslations = {
       "nextTipQuestLog": "Mở Nhật ký nhiệm vụ ({key}) của bạn để tìm nhiệm vụ tiếp theo ở gần.",
       "nextTipMap": "Kiểm tra Bản đồ thế giới ({key}) để xem nhiệm vụ đang chờ ở đâu.",
       "nextTipSocial": "Mở Xã Hội ({key}) để tìm nhóm có những trận chiến khó khăn hơn."
+    },
+    "bootcamp": {
+      "title": "First Steps",
+      "talkTitle": "Speak to Warden Tam",
+      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
+      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
+      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
+      "forwardTitle": "Walk the first lane",
+      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
+      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
+      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
+      "turnwalkTitle": "Turn, then walk",
+      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
+      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
+      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
+      "strafeTitle": "Turn, then walk",
+      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
+      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
+      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
+      "cameraTitle": "Swing the camera",
+      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "courseProgress": "Flag {current} of {total}",
+      "doneTitle": "Run complete",
+      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
+      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
+      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
+      "coachNextTitle": "Next: {npc}",
+      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
+      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
+      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
+      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
+      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
+      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
+      "coachReadyTitle": "Task complete",
+      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
+      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
+      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
+      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
+      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
+      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
+      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
+      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
+      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
+      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
+      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
+      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
+      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
+      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
+      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
+      "promptTalk": "Talk",
+      "promptTurnIn": "Turn in quest",
+      "promptPickUp": "Pick up",
+      "promptLootPearl": "Loot the pearl",
+      "promptRead": "Read",
+      "promptRing": "Ring",
+      "promptHold": "Hold",
+      "promptSelect": "Select",
+      "promptAttack": "Attack",
+      "promptUseAbility": "Use ability",
+      "promptKneel": "Kneel",
+      "promptOpenBags": "Open your bags",
+      "promptCharacterSheet": "Open your character sheet",
+      "promptLookAround": "Hold right-click and drag to look around",
+      "promptJump": "Jump",
+      "promptSummon": "Summon",
+      "ringEquipTitle": "Wear your prize",
+      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
+      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
+      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
+      "ringAdmireTitle": "Look at you",
+      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "keycapThen": "then",
+      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
+      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
+      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
+      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
+      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
+      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
+      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
+      "bellTitle": "Ring the bell",
+      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
+      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
+      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
     },
     "widgets": {
       "clockTitle": "Giờ địa phương - nhấp để chuyển 12/24 giờ",
@@ -1061,6 +1182,31 @@ export const vi_VN: EnTranslations = {
       "devTierCol": "Huy hiệu",
       "mergedPrs": "PR đã hợp nhất",
       "devEmpty": "Chưa có người đóng góp nào được xếp hạng."
+    },
+    "pledge": {
+      "open": "Accepting pledges",
+      "closed": "Not accepting pledges",
+      "minLevel": "Level {level}+",
+      "action": "Pledge",
+      "actionTitle": "Pledge to {guild}",
+      "pledged": "Pledged",
+      "yourGuild": "Your guild",
+      "tab": "Pledges",
+      "tabWithCount": "Pledges ({count})",
+      "empty": "No one has pledged to your guild yet.",
+      "accept": "Accept",
+      "acceptTitle": "Accept {name}'s pledge",
+      "reject": "Decline",
+      "rejectTitle": "Decline {name}'s pledge",
+      "settings": "Recruitment",
+      "acceptingLabel": "Accept pledges",
+      "minLevelLabel": "Minimum level",
+      "noteLabel": "Board note",
+      "notePlaceholder": "Tell aspiring members what your guild is looking for",
+      "save": "Save",
+      "yourPledge": "Your pledge: {guild}",
+      "since": "Pledged {date}",
+      "withdraw": "Withdraw pledge"
     },
     "raidLockout": {
       "title": "Khóa Raid",
@@ -1153,7 +1299,6 @@ export const vi_VN: EnTranslations = {
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
       "targetPrev": "Luân Phiên Mục Tiêu Ngược",
       "discord": "Discord",
-      "valecup": "Cúp Thung Lũng",
       "bgFlag": "Hành Động Cờ Chiến Trường",
       "sheathe": "Tra/Rút Vũ Khí",
       "dive": "Lặn Xuống",
@@ -1321,146 +1466,6 @@ export const vi_VN: EnTranslations = {
         "graveyard": "Nghĩa Địa"
       }
     },
-    "vcup": {
-      "title": "Cúp Thung Lũng",
-      "shootPower": "LỰC SÚT",
-      "close": "Đóng cửa sổ Cúp Thung Lũng",
-      "offlineNote": "Sổ lịch thi đấu đã gấp lại. Cúp Thung Lũng hiện không mở.",
-      "recordLine": "Thành tích của bạn: {wins} thắng, {losses} thua, {draws} hòa.",
-      "bracketsAria": "Hạng đấu",
-      "bracketLabel": "{n}v{n}",
-      "waitingCount": "{count} đang chờ",
-      "nationsHeading": "Quốc gia cờ hiệu",
-      "nation": {
-        "vale": "Thung Lũng Đông Khê",
-        "mirefen": "Đầm Lầy Bùn Sâu",
-        "thornpeak": "Đỉnh Gai",
-        "coliseum": "Đấu Trường Tro Tàn",
-        "choir": "Hợp Ca Nhợt Nhạt",
-        "ogre": "Các Bộ Tộc Ogre",
-        "moon": "Trăng Nhợt",
-        "copperdig": "Mỏ Đồng"
-      },
-      "awayNote": "Nếu hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.",
-      "rolesHeading": "Vai trò thi đấu",
-      "rolesSmallBracketNote": "Ở hạng đấu 1v1 và 2v2, mọi đấu thủ đều dùng bộ kỹ năng Toàn Năng. Các kỳ công yêu cầu hạng đấu 3v3 trở lên không thể đạt được ở đây.",
-      "role": {
-        "allrounder": {
-          "name": "Toàn Năng",
-          "desc": "Biết một chút mọi thứ: đá bóng, sút bổng, và một cú vai đúng luật."
-        },
-        "striker": {
-          "name": "Tiền Đạo",
-          "desc": "Sống vì cú sút xa và pha lách người chớp nhoáng."
-        },
-        "sweeper": {
-          "name": "Hậu Vệ Quét",
-          "desc": "Húc văng đối thủ khỏi bóng và phá bóng lên."
-        },
-        "keeper": {
-          "name": "Thủ Môn",
-          "desc": "Trấn giữ khung thành với bắt bóng, bay người và phát bóng."
-        }
-      },
-      "queue": "Vào Hàng Chờ",
-      "leaveQueue": "Rời Hàng Chờ",
-      "queueNote": "Xếp hàng từ bất cứ đâu; tiếng còi sẽ gọi bạn tới Sân Heo Nái.",
-      "queuedStatus": "Đang chờ cho {bracket}: vị trí {position} trên {count}.",
-      "blockNation": "Hãy chọn một quốc gia cờ hiệu trước.",
-      "blockPartySize": "Hạng đấu này cần một tổ đội nhỏ hơn.",
-      "blockNotLeader": "Chỉ trưởng nhóm mới có thể xếp hàng cho cả đội.",
-      "inMatchNote": "Đội của bạn đang trên sân. Tiếp tục thi đấu!",
-      "deserterNote": "Quản Sân sẽ nhớ đấy. Bạn có thể xếp hàng lại sau {seconds} giây.",
-      "liveHeading": "Đang diễn ra tại Sân Heo Nái",
-      "liveAria": "Cúp Thung Lũng: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Hãy đi tới Sân Heo Nái để xem từ khán đài.",
-      "noLive": "Sân bóng đang yên ắng. Không có trận nào diễn ra.",
-      "boardHeading": "Bảng vô địch",
-      "boardEmpty": "Chưa có nhà vô địch nào được ghi danh. Chiếc Xô Đồng vẫn đang chờ.",
-      "boardWins": "{count} trận thắng",
-      "enterAsGuild": "Ra sân dưới cờ hiệu của {guild}",
-      "guildRecordLine": "Thành tích bang hội của bạn: {wins} thắng, {losses} thua.",
-      "guildBoardHeading": "Cờ hiệu bang hội",
-      "guildBoardEmpty": "Chưa có bang hội nào ra sân. Hãy giương cao cờ hiệu của bạn!",
-      "guildBoardWl": "{wins} T, {losses} B",
-      "practice": "Tập Luyện Với Máy",
-      "practiceNote": "Bắt đầu ngay một trận riêng với máy trên sân tập của riêng bạn.",
-      "practiceUnratedNote": "Trận tập không tính hạng: bảng xếp hạng và tiến độ Sách Kỳ Công đều không được tính.",
-      "practicingNow": "Đang tập luyện ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Hàng chờ Cúp Thung Lũng: {bracket}, vị trí {position} trên {count}",
-      "indicatorLive": "Cúp Thung Lũng",
-      "indicatorOpen": "Mở cửa sổ Cúp Thung Lũng",
-      "phaseCountdown": "Giao bóng sau {seconds}",
-      "phaseGoal": "VÀO!",
-      "phaseGolden": "BÀN THẮNG VÀNG",
-      "phaseOver": "HẾT GIỜ",
-      "bannerFound": "Cúp Thung Lũng vẫy gọi: {nationA} đấu {nationB}!",
-      "bannerCountdown": "Giao bóng sau {seconds}...",
-      "bannerKickoff": "GIAO BÓNG!",
-      "bannerGoal": "VÀO! {nation} ghi bàn!",
-      "bannerSave": "{name} CẢN PHÁ!",
-      "bannerGolden": "BÀN THẮNG VÀNG: bàn tiếp theo định đoạt trận đấu!",
-      "bannerEnd": "Hết giờ: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Chiến thắng tại Sân Heo Nái!",
-      "bannerDraw": "Một trận hòa tại Sân Heo Nái.",
-      "bannerLoss": "Thất bại tại Sân Heo Nái.",
-      "logQueued": "Bạn tham gia hàng chờ Cúp Thung Lũng cho {bracket} (vị trí {position}).",
-      "logUnqueued": "Bạn rời hàng chờ Cúp Thung Lũng.",
-      "logFound": "Trận Cúp Thung Lũng của bạn đã sẵn sàng: {nationA} đấu {nationB}.",
-      "logRoster": "Phe của bạn: {allies}. Phe đối phương: {enemies}.",
-      "logGoal": "{name} ghi bàn cho {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} cản phá thành công!",
-      "logWin": "Bạn thắng trận đấu tại Sân Heo Nái.",
-      "logDraw": "Trận đấu tại Sân Heo Nái kết thúc với tỷ số hòa.",
-      "logLoss": "Bạn thua trận đấu tại Sân Heo Nái.",
-      "gossipOpen": "Sổ lịch thi đấu",
-      "gossipOpenAria": "Mở cửa sổ Cúp Thung Lũng",
-      "mobileLabel": "Cúp",
-      "briefing": {
-        "subtitle": "Họp trước trận",
-        "vs": "đấu",
-        "rulesHeading": "Cách chơi",
-        "rule1": "Đá hoặc chuyền bóng vào khung thành đối phương để ghi bàn.",
-        "rule2": "Đội đạt 5 bàn trước sẽ thắng, hoặc đội nhiều bàn hơn khi còi hết giờ vang lên.",
-        "rule3": "Trận hòa khi hết giờ sẽ vào bàn thắng vàng: bàn tiếp theo định đoạt.",
-        "rule4": "Cú vai chỉ khiến bạn ngã lăn. Không ai bị thương dưới lệnh hưu chiến mùa gặt.",
-        "rule5": "Ai cũng có thể tới cổ vũ bạn từ trên khán đài.",
-        "kitHeading": "Bộ kỹ năng của bạn",
-        "kitNote": "Các chiêu này thay thế kỹ năng lớp nhân vật của bạn trong trận đấu.",
-        "unratedNote": "Có máy trên sân, nên trận này không tính hạng: bảng xếp hạng không đổi, và kỳ công về bàn thắng, pha cản phá, và trận giữ sạch lưới không được tính.",
-        "practiceUnratedNote": "Đây là trận tập, nên không tính hạng: bảng xếp hạng không đổi, và tiến độ Sách Kỳ Công không được tính.",
-        "rosterHeading": "Danh sách ra sân",
-        "you": "Bạn",
-        "bot": "Máy",
-        "ready": "Tôi sẵn sàng",
-        "readyDone": "Sẵn sàng",
-        "readyAria": "Sẵn sàng cho giờ giao bóng",
-        "waiting": "Đang chờ phía bên kia sẵn sàng...",
-        "whistle": "Tiếng còi vang lên sau {seconds} giây.",
-        "readyCount": "{ready} trên {total} đã sẵn sàng"
-      },
-      "bet": {
-        "title": "Cược Trận Đấu",
-        "aria": "Cá cược trận đấu Cúp Thung Lũng",
-        "closesIn": "Đóng cược sau {seconds} giây",
-        "closed": "Đã đóng cược",
-        "prize": "Quỹ cược {amount}",
-        "splitAria": "Tỷ trọng quỹ cược đặt cho mỗi đội",
-        "expand": "Xem cược và đặt tiền",
-        "collapse": "Ẩn cược",
-        "oddsLabel": "Trả thưởng",
-        "back": "Cược cho {team}",
-        "form": "{wins}T-{losses}B",
-        "mine": "Cược của bạn: {amount} cho {team}",
-        "none": "Bạn chưa đặt cược cho trận này.",
-        "record": "Thành tích cược: {wins}T-{losses}B, {sign}{net}",
-        "wonBanner": "Cược của bạn thắng rồi!",
-        "wonLog": "Cược Cúp Thung Lũng của bạn đã thắng: nhận về {amount}.",
-        "lostLog": "Cược Cúp Thung Lũng của bạn đã thua: {amount}.",
-        "refundLog": "Cược bị hủy, {amount} tiền cược của bạn đã được hoàn lại."
-      }
-    },
     "options": {
       "clickMoveLeft": "Nhấp Trái",
       "clickMoveRight": "Nhấp Phải",
@@ -1570,6 +1575,11 @@ export const vi_VN: EnTranslations = {
     },
     "controller": {
       "title": "Tay Cầm",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Bật Tay Cầm",
       "invertY": "Đảo Ngược Camera (Y)",
       "deadzone": "Vùng Chết Cần Điều Khiển",
@@ -2657,7 +2667,8 @@ export const vi_VN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
-      "cheaterTag": "< Kẻ Gian Lận >"
+      "cheaterTag": "< Kẻ Gian Lận >",
+      "pledgeTag": "Pledge of {guild}"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -2981,7 +2992,12 @@ export const vi_VN: EnTranslations = {
       "tip": "Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân."
     },
     "noticeboard": {
-      "empty": "Có vẻ như chưa có gì được dán lên."
+      "empty": "Có vẻ như chưa có gì được dán lên.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
+      "popupTitle": "Guild Signpost",
+      "close": "Close"
     },
     "bank": {
       "title": "Ngân Hàng",
@@ -4318,6 +4334,10 @@ export const vi_VN: EnTranslations = {
     "deeds": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Hiện không thể liên kết Steam.",
       "invalid_ticket": "Steam không thể xác minh yêu cầu liên kết này. Hãy thử lại từ ứng dụng máy tính.",
@@ -4441,7 +4461,6 @@ export const vi_VN: EnTranslations = {
       "combat": "Chiến Đấu",
       "talents": "Tài Năng",
       "arena": "Đấu Trường & PvP",
-      "valeCup": "Cúp Thung Lũng",
       "thornhollow": "Cánh Đồng Trũng Gai",
       "deeds": "Sách Kỳ Công",
       "reliquary": "Kỳ Trân Các",
@@ -4551,6 +4570,8 @@ export const vi_VN: EnTranslations = {
         "fenBlurb": "Qua khỏi vương miện mùa thu, là một đầm lầy tươi sáng với liễu rủ và mặt nước lặng yên, cùng một thị trấn nép sau con hào.",
         "farshoreName": "Bờ Biển Xa Xôi",
         "farshoreBlurb": "Một hòn đảo bên kia doi cát, nơi bầu trời xé toạc trên Riftfields và Gullhaven rung chuông báo mỗi khi có một vết rạn xuất hiện.",
+        "provingName": "The Proving Shore",
+        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
         "nightName": "Cánh Đồng Dạ Hoa",
         "nightBlurb": "Một xứ sở của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ.",
         "hauntName": "Rừng Oan Hồn",
@@ -4651,7 +4672,6 @@ export const vi_VN: EnTranslations = {
       "reliquary": "Kỳ Trân Các",
       "sheathe": "Tra/Rút Vũ Khí",
       "crafting": "Chế Tác",
-      "valeCup": "Cúp Thung Lũng",
       "mount": "Cưỡi Thú / Xuống Thú",
       "calendar": "Lịch Sự Kiện",
       "dungeonFinder": "Tìm Hầm Ngục",
@@ -5513,6 +5533,10 @@ export const vi_VN: EnTranslations = {
       "farshoreGreeting": "Bạn đã đi qua Ferrywalk sao? Vậy bạn là người đầu tiên trong tuần này, và Vệ Quan sẽ muốn xem xét bạn.",
       "farshoreGreeter": "Người Giữ Chuông Tam, Bến Tàu",
       "farshorePlaceNotes": "Gullhaven là thị trấn duy nhất của hòn đảo này, cũng là đồn lũy của nó. Bến Tàu là nơi Ferrywalk cập bờ, có một chiếc chuông canh đứng sừng sững trên mũi đất; Đồng Cỏ Canh Gác giữ vùng cao phía đông nam thị trấn, nơi một người canh rạn lắng nghe vết rạn tiếp theo; Vách Đá Vỡ Nát nứt toác ở cực nam hòn đảo; còn Riftfields là những hàng lúa đã bị tàn phá ở phía đông Gullhaven, vẫn còn ngập tràn những kẻ đã tràn qua vết rạn tại đó.",
+      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
+      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
+      "provingGreeter": "Instructor Maren, Dawnrest Camp",
+      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
       "travelTitle": "Di chuyển khắp thế giới",
       "travelBody": "Mọi con đường trong vương quốc đều được đi bộ hoặc cưỡi ngựa qua. Không có lộ trình bay, không xe taxi, và không có mạng lưới dịch chuyển tức thời: bản đồ là một vùng đất liền mạch duy nhất, và mọi điểm nối đều là nơi bạn có thể đặt chân lên. Các rặng núi chia vùng đất này với vùng đất kia, và nơi hai vùng đất chung một rặng núi, con đường sẽ leo qua một đèo núi. Nhưng không phải biên giới nào cũng vận hành theo cách đó. Ở phía bắc, một con đê dài đưa con đường vượt qua mặt nước từ Thung Lũng Sương Phủ vào vùng đất tuyết giá xa hơn nữa, còn ở phía nam, một doi cát tự nhiên mỏng manh mang tên Ferrywalk chạy về phía đông từ bờ biển của Vale tới Bến Tàu trên hòn đảo Farshore, hòn đảo hoàn toàn không có biên giới đất liền nào. Và có đúng một cánh cửa thật sự duy nhất trong toàn bộ thế giới mở: một tấm màn hoàng hôn cao trên Đỉnh Gai mở vào Thung Lũng Sương Phủ. Rặng núi phía nam của Thung Lũng bị phong kín không lối nào xuyên qua, nên tấm màn ấy là cách duy nhất để bạn vào lần đầu, và nó khép lại sau lưng bạn trên đường trở về.\n\nDù bạn ngã xuống ở đâu, đường trở về cũng ngắn thôi. Mỗi vùng đất đều giữ ít nhất một nghĩa địa có một Người Canh Giữ Nhợt Nhạt lơ lửng trên những bia đá, và một linh hồn được giải thoát sẽ trỗi dậy tại nghĩa địa gần nhất trong số đó.\n\nBản đồ không kết thúc bằng một bức tường vô hình. Đất liền chạy dài ra thành bãi biển và mũi đất, rồi đến vùng biển khơi. Những đoạn nước mà thế giới muốn bạn bơi qua, các eo biển và đầm nước nằm giữa vùng đất này với vùng đất kia, đều êm ả và an toàn để vượt qua. Nhưng nếu bạn cố bơi ra biển khơi, chính khoảng cách sẽ đẩy bạn quay lại: bạn sẽ được cảnh báo, rồi cảnh báo thêm lần nữa, và nếu bạn vẫn tiếp tục bơi, biển cả sẽ bào mòn sức bạn cho đến khi giết chết bạn. Lặn xuống nước cũng có giới hạn riêng của nó, vì hơi thở của bạn sẽ cạn dần dưới mặt nước, nên hãy trồi lên lấy hơi và quay lại khi nước ra dấu cho bạn.",
       "mountsTitle": "Thú Cưỡi",
@@ -5729,36 +5753,6 @@ export const vi_VN: EnTranslations = {
       "ladderBody": "Mỗi trận đấu đều làm dịch chuyển một điểm xếp hạng chiến trường bền lâu gắn với nhân vật, dù thắng hay thua, và bảng mọi thời đại xếp hạng những nhà vô địch của máy chủ.",
       "rewardsHeading": "Một trận đấu trả những gì",
       "rewardsBody": "Mỗi trận đấu hoàn tất đều trả Danh dự: nhiều hơn cho một chiến thắng, một khoản an ủi cho thất bại hoặc hòa, cộng thêm một chút cho mỗi đòn hạ gục bạn thực hiện và mỗi lần bạn hỗ trợ, nên chiến đấu tránh xa những lá cờ vẫn đáng công. Chiến thắng đầu tiên mỗi ngày của bạn trả thêm một khoản thưởng, và bảng sẽ báo cho bạn biết trong lúc khoản thưởng đó vẫn còn đang chờ bạn. Ngày đó là của riêng Danh dự, và nó luân chuyển theo đồng hồ riêng chứ không theo giờ đặt lại phụ bản của vương quốc. Gặp lại cùng một đội nhiều lần liên tiếp sẽ khiến chính trận đấu đó trả ít hơn sau lần đầu, nhanh chóng ổn định ở một mức sàn thay vì tụt xuống còn con số không, và một trận bị bỏ cuộc thì chẳng trả gì cả. Hãy tiêu số Danh dự kiếm được ở một trong hai Quân Nhu Trưởng Chiến Tranh."
-    },
-    "valeCupPage": {
-      "heading": "Cúp Thung Lũng",
-      "intro": "Bóng Heo Rừng tại Sân Heo Nái: chọn một cờ hiệu, chọn một vai trò, và sút tấm da heo rừng nhồi rơm qua tay thủ môn để giành Chiếc Xô Đồng. Không đổ máu, không chiến lợi phẩm, chỉ có tiếng gầm vang của khán đài.",
-      "loreHeading": "Bóng Heo Rừng và lệnh hưu chiến mùa gặt",
-      "loreOldSow": "Từ rất lâu trước khi người chết thức giấc, đám nông dân Đông Khê đã chơi bóng heo rừng trên những cánh đồng rạ sau mùa gặt: hai đám đông, một tấm da heo rừng nhồi rơm, và hai cánh cổng xe ngựa kéo về hai đầu bãi cỏ. Quả bóng đầu tiên, Heo Nái Già, được mạ đồng treo trên lò sưởi quán rượu.",
-      "loreTruce": "Khi Đấu Trường Tro Tàn bắt đầu tổ chức các trò chơi chiến tranh, Cảnh Trưởng Redbrook đáp lại bằng một điều dịu dàng hơn: một lệnh hưu chiến mùa gặt thường trực trên bãi cỏ xưa. Cánh cổng xe ngựa trở thành cột gôn, bãi cỏ có thêm tường, khán đài và một cái tên, Sân Heo Nái, còn phần thưởng luôn là chiếc xô sữa móp méo mà đội thắng dùng để uống mừng: Chiếc Xô Đồng.",
-      "howHeading": "Cách chơi",
-      "howQueue": "Xếp hàng từ bất cứ đâu qua cửa sổ Cúp Thung Lũng, hoặc trò chuyện với Quản Sân Bram tại cổng Sân Heo Nái. Chọn hạng đấu từ một đấu một tới năm đấu năm, một quốc gia cờ hiệu, và một vai trò thi đấu; xếp hàng một mình hoặc dẫn theo tổ đội.",
-      "howMatch": "Khi giao bóng, bộ kỹ năng lớp nhân vật của bạn được thay bằng bộ kỹ năng thể thao và được khôi phục nguyên vẹn sau trận. Cú đá nhắm vào hồng tâm dưới đất, bóng nảy bật khỏi ván chắn, còn dẫn bóng chỉ đơn giản là chạy cùng bóng. Ghi nhiều bàn hơn đối phương trước khi hết giờ; hòa sẽ bước vào bàn thắng vàng.",
-      "howTruce": "Không ai đổ máu tại Sân Heo Nái: cú vai chỉ khiến bạn ngã lăn, chẳng có gì đau, còn thú cưng thì ngồi ngoài trận đấu.",
-      "spectateBody": "Mỗi lần chỉ có một trận diễn ra tại sân vận động, và bất kỳ ai cũng có thể tới xem từ khán đài.",
-      "bettingHeading": "Một ván cược bên lan can",
-      "bettingBody": "Khán giả ở Sân Heo Nái có thể đặt cược cho một bên khi một trận đang thành hình: tiền cược gộp lại, và ở tiếng còi cuối cùng những người thắng chia quỹ của kẻ thua theo tỷ lệ họ đã đặt. Một trận hòa, hoặc một cú lật kèo không ai đặt, hoàn lại từng đồng. Người chơi có ghế trong trận không thể cược vào nó, và lan can lưu lại thành tích trọn đời của bạn về thắng, thua, và tiền lời ròng.",
-      "practiceHeading": "Những trận tập và sân lúc nhàn rỗi",
-      "practiceBody": "Cửa sổ Cúp Thung Lũng cũng có chế độ tập luyện: một bản sao riêng của sân đấu nơi bot lấp cả hai bên và không gì tính vào thành tích của bạn. Thiếu một hai người cho trận thật? Sau một khoảng chờ ngắn, bot sẽ điền đủ các đội, và bất kỳ trận nào có bot trên sân đều là trận giao hữu, không bao giờ được xếp hạng. Và khi Sân Heo Nái nằm không, đám bot bày ra một trận biểu diễn mà bạn có thể xem, và đặt cược, từ khán đài; ngay khoảnh khắc người chơi thật sẵn sàng, trận biểu diễn nhường lại sân và mọi khoản cược được trả lại.",
-      "nationsHeading": "Tám quốc gia cờ hiệu",
-      "nationsBody": "Mỗi đội thi đấu dưới một lá cờ. Đội trưởng chọn quốc gia, và nếu cả hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.",
-      "nationVale": "Xanh lục và vàng kim, giương cao bó lúa mì: đội chủ nhà, nông dân chính hiệu tới tận xương tủy.",
-      "nationMirefen": "Xanh mòng két và xám dưới cánh diệc: kiên nhẫn, chân dài, không bao giờ vội.",
-      "nationThornpeak": "Xanh băng và trắng dưới đỉnh núi: vững chân và lì lợm.",
-      "nationColiseum": "Đỏ và đen với đôi kiếm chéo: họ chơi như thể đây vẫn là một trò chơi chiến tranh.",
-      "nationChoir": "Xanh nhạt và bạc dưới quả chuông: kỳ dị, chuẩn xác, và rất lặng lẽ.",
-      "nationOgre": "Cam và nâu sẫm sau nắm đấm: lấy vai làm đầu và tự hào về điều đó.",
-      "nationMoon": "Tím và bạc dưới vầng trăng khuyết: những cầu thủ của màn đêm, bước chân nhẹ nhàng.",
-      "nationCopperdig": "Màu đồng và nâu với chiếc cuốc chim: những thợ đào không bao giờ ngừng chạy.",
-      "rolesHeading": "Vai trò thi đấu",
-      "rolesBody": "Vai trò quyết định bộ kỹ năng bạn mang vào sân. Ai cũng đá được; phần còn lại là khí chất. Ở các hạng đấu một người và hai người mỗi bên, mọi người đều chơi bộ kỹ năng toàn diện, nên các lựa chọn vai trò mới thực sự phát huy từ ba người mỗi bên trở lên.",
-      "rewardsHeading": "Luật hưu chiến",
-      "rewardsBody": "Luật hưu chiến nghĩa là không kinh nghiệm và không chiến lợi phẩm: một trận có kết quả được tính vào thành tích của bạn và bảng vô địch, và một chiến thắng còn được tính vào các nhiệm vụ phần thưởng của ngày. Bỏ trận sẽ khiến bạn bị treo lượt, và Quản Sân sẽ nhớ đấy."
     },
     "deedsPage": {
       "intro": "Sách Kỳ Công là nơi thế giới ghi sổ tất cả những gì bạn đã làm, từ những bước chân đầu tiên rời thung lũng khởi đầu cho đến những trận đánh khó nhất mà vương quốc có thể bày ra. Hãy lập kỳ công khi chơi, mang những danh hiệu chúng ban tặng, và nhìn Danh Vọng của bạn leo cao.",
@@ -12851,8 +12845,26 @@ export const vi_VN: EnTranslations = {
       "pristine_claw": {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
+      "ps_castaway_crate": {
+        "name": "Castaway Crate"
+      },
+      "ps_ferry_bell": {
+        "name": "Ferry Bell"
+      },
       "dawnhold_posy": {
         "name": "Bó Hoa Vườn Dawnhold"
+      },
+      "ps_briny_lure": {
+        "name": "Briny Lure"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Lustrous Pearl"
+      },
+      "mother_of_pearl": {
+        "name": "Mother of Pearl"
+      },
+      "ps_passing_stone": {
+        "name": "Passing Stone"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -13894,9 +13906,6 @@ export const vi_VN: EnTranslations = {
       "tolling_bell": {
         "name": "Chuông Ngân Vang"
       },
-      "vale_cup_ball": {
-        "name": "Bóng Da Heo Rừng"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Đỉnh Núi Thức Giấc"
       },
@@ -14193,6 +14202,15 @@ export const vi_VN: EnTranslations = {
       },
       "fisher_bram": {
         "name": "Ngư Dân Bram"
+      },
+      "training_effigy": {
+        "name": "Training Effigy"
+      },
+      "shore_scuttler": {
+        "name": "Shore Scuttler"
+      },
+      "mister_crabs": {
+        "name": "Mister Crabs"
       },
       "rift_hellguard": {
         "name": "Vệ Binh Địa Ngục"
@@ -14494,11 +14512,6 @@ export const vi_VN: EnTranslations = {
         "title": "Người Gác Cõi Chết",
         "greeting": "Nghỉ ngơi đi, hỡi linh hồn. Ta có thể đưa ngươi trở lại thân xác, nhưng chuyến vượt trở về sẽ khiến ngươi suy yếu."
       },
-      "groundskeeper_bram": {
-        "name": "Quản Sân Bram",
-        "title": "Người Trông Coi Sân Heo Nái",
-        "greeting": "Lệnh hưu chiến vẫn giữ vững tại Sân Heo Nái, {className}: chỉ có sút bóng và va vai thôi. Muốn thi đấu vì Chiếc Xô Đồng chứ?"
-      },
       "chronicler_saul": {
         "name": "Sử Quan Saul",
         "title": "Biên Niên Sử Thung Lũng",
@@ -14783,6 +14796,51 @@ export const vi_VN: EnTranslations = {
         "name": "Nhà giả kim Verane",
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
+      },
+      "wayfarer_bryn": {
+        "name": "Wayfarer Bryn",
+        "title": "Harbor Guide",
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+      },
+      "instructor_maren": {
+        "name": "Instructor Maren",
+        "title": "Proving Master",
+        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+      },
+      "quartermaster_finch": {
+        "name": "Quartermaster Finch",
+        "title": "Camp Outfitter",
+        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+      },
+      "ferryman_odo": {
+        "name": "Ferryman Odo",
+        "title": "Keeper of the Crossing",
+        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+      },
+      "bursar_wick": {
+        "name": "Bursar Wick",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+      },
+      "warden_tam": {
+        "name": "Warden Tam",
+        "title": "Keeper of the Gauntlet",
+        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+      },
+      "overseer_pell": {
+        "name": "Overseer Pell",
+        "title": "Gauntlet Overseer",
+        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+      },
+      "drillmaster_rook": {
+        "name": "Drillmaster Rook",
+        "title": "Yard Master",
+        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+      },
+      "tidewarden_nel": {
+        "name": "Tidewarden Nel",
+        "title": "Keeper of the Strand",
+        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -16750,6 +16808,109 @@ export const vi_VN: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Run the Gauntlet",
+        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
+        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "objectives": {
+          "0": {
+            "label": "Gauntlet flag passed"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Strike True",
+        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
+        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "objectives": {
+          "0": {
+            "label": "Training Effigy felled"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Hone the Edge",
+        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
+        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "objectives": {
+          "0": {
+            "label": "Ability landed on an effigy"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Shell and Claw",
+        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
+        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "objectives": {
+          "0": {
+            "label": "Shore Scuttler culled"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Mother of Pearl",
+        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
+        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "objectives": {
+          "0": {
+            "label": "Mister Crabs slain"
+          },
+          "1": {
+            "label": "Lustrous Pearl claimed"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "The Wreck Line",
+        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "objectives": {
+          "0": {
+            "label": "Castaway Crate opened"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Pouch and Purse",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
+        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "objectives": {
+          "0": {
+            "label": "Linen Pouch bought"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Word on the Wind",
+        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
+        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "objectives": {
+          "0": {
+            "label": "Guild signpost read"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "The Long Walk",
+        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
+        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "objectives": {
+          "0": {
+            "label": "Walked back from the dead"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Set Sail",
+        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
+        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "objectives": {
+          "0": {
+            "label": "Report to Ferryman Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Xuôi Theo Windway",
         "text": "Bạn đã vượt qua được cuộc leo trèo, {playerName}, nên gió đã quyết định giữ bạn lại. Wickharbor nằm về phía đông dọc theo con đường đồi, nép mình trong chỗ khuất gió của vịnh nhỏ của nó. Cảng Trưởng Odile đếm từng linh hồn vượt qua đèo núi, và bà ấy sẽ muốn đếm bạn. Nói với bà ấy rằng Windway vẫn còn mở.",
@@ -16947,6 +17108,9 @@ export const vi_VN: EnTranslations = {
           },
           "11": {
             "label": "Đường Đê Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },
@@ -17307,6 +17471,27 @@ export const vi_VN: EnTranslations = {
           },
           "4": {
             "label": "Riftfields"
+          }
+        }
+      },
+      "proving_shore": {
+        "name": "The Proving Shore",
+        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "pois": {
+          "0": {
+            "label": "Dawnrest Camp"
+          },
+          "1": {
+            "label": "The Old Pier"
+          },
+          "2": {
+            "label": "The Practice Yard"
+          },
+          "3": {
+            "label": "The Wreck Line"
+          },
+          "4": {
+            "label": "The Gauntlet"
           }
         }
       }

@@ -999,6 +999,16 @@ export const cs_CZ: EnTranslations = {
       "clearAria": "Clear a slot",
       "clearArmed": "Tap a slot to clear it."
     },
+    "tutorialGreeting": {
+      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
+      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
+      "play": "Take the tutorial",
+      "skip": "Skip the tutorial",
+      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
+      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
+      "noteClose": "Understood"
+    },
     "tutorial": {
       "moveBodyTouch": "Pohybuj se páčkou pohybu a tažením po obrazovce se rozhlížej. Udělej pár kroků a začni.",
       "talkBodyTouch": "Postav se blízko maršála Redbrooka, klepni na Použít, promluv s ním a přijmi jeho úkol.",
@@ -1010,6 +1020,117 @@ export const cs_CZ: EnTranslations = {
       "nextTipQuestLog": "Otevři deník úkolů ({key}) a najdi další úkol v okolí.",
       "nextTipMap": "Podívej se na mapu světa ({key}) a zjisti, kde čekají úkoly.",
       "nextTipSocial": "Otevři okno Společnost ({key}) a najdi skupinu pro těžší boje."
+    },
+    "bootcamp": {
+      "title": "First Steps",
+      "talkTitle": "Speak to Warden Tam",
+      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
+      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
+      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
+      "forwardTitle": "Walk the first lane",
+      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
+      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
+      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
+      "turnwalkTitle": "Turn, then walk",
+      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
+      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
+      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
+      "strafeTitle": "Turn, then walk",
+      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
+      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
+      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
+      "cameraTitle": "Swing the camera",
+      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "courseProgress": "Flag {current} of {total}",
+      "doneTitle": "Run complete",
+      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
+      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
+      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
+      "coachNextTitle": "Next: {npc}",
+      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
+      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
+      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
+      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
+      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
+      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
+      "coachReadyTitle": "Task complete",
+      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
+      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
+      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
+      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
+      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
+      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
+      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
+      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
+      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
+      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
+      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
+      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
+      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
+      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
+      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
+      "promptTalk": "Talk",
+      "promptTurnIn": "Turn in quest",
+      "promptPickUp": "Pick up",
+      "promptLootPearl": "Loot the pearl",
+      "promptRead": "Read",
+      "promptRing": "Ring",
+      "promptHold": "Hold",
+      "promptSelect": "Select",
+      "promptAttack": "Attack",
+      "promptUseAbility": "Use ability",
+      "promptKneel": "Kneel",
+      "promptOpenBags": "Open your bags",
+      "promptCharacterSheet": "Open your character sheet",
+      "promptLookAround": "Hold right-click and drag to look around",
+      "promptJump": "Jump",
+      "promptSummon": "Summon",
+      "ringEquipTitle": "Wear your prize",
+      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
+      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
+      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
+      "ringAdmireTitle": "Look at you",
+      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "keycapThen": "then",
+      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
+      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
+      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
+      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
+      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
+      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
+      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
+      "bellTitle": "Ring the bell",
+      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
+      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
+      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
     },
     "widgets": {
       "clockTitle": "Místní čas - kliknutím přepneš 12/24 h",
@@ -1061,6 +1182,31 @@ export const cs_CZ: EnTranslations = {
       "devTierCol": "Odznak",
       "mergedPrs": "Sloučené PR",
       "devEmpty": "Zatím žádní hodnocení přispěvatelé."
+    },
+    "pledge": {
+      "open": "Accepting pledges",
+      "closed": "Not accepting pledges",
+      "minLevel": "Level {level}+",
+      "action": "Pledge",
+      "actionTitle": "Pledge to {guild}",
+      "pledged": "Pledged",
+      "yourGuild": "Your guild",
+      "tab": "Pledges",
+      "tabWithCount": "Pledges ({count})",
+      "empty": "No one has pledged to your guild yet.",
+      "accept": "Accept",
+      "acceptTitle": "Accept {name}'s pledge",
+      "reject": "Decline",
+      "rejectTitle": "Decline {name}'s pledge",
+      "settings": "Recruitment",
+      "acceptingLabel": "Accept pledges",
+      "minLevelLabel": "Minimum level",
+      "noteLabel": "Board note",
+      "notePlaceholder": "Tell aspiring members what your guild is looking for",
+      "save": "Save",
+      "yourPledge": "Your pledge: {guild}",
+      "since": "Pledged {date}",
+      "withdraw": "Withdraw pledge"
     },
     "raidLockout": {
       "title": "Raidové zámky",
@@ -1153,7 +1299,6 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "targetPrev": "Přepínat cíl zpět",
       "discord": "Discord",
-      "valecup": "Pohár údolí",
       "bgFlag": "Akce s vlajkou na bojišti",
       "sheathe": "Zasunout/Vytasit zbraň",
       "dive": "Potopit se",
@@ -1321,146 +1466,6 @@ export const cs_CZ: EnTranslations = {
         "graveyard": "Hřbitov"
       }
     },
-    "vcup": {
-      "title": "Pohár údolí",
-      "shootPower": "SÍLA",
-      "close": "Zavřít okno Poháru údolí",
-      "offlineNote": "Kniha zápasů je zavřená. Pohár údolí teď není dostupný.",
-      "recordLine": "Tvá bilance: {wins} výher, {losses} proher, {draws} remíz.",
-      "bracketsAria": "Kategorie zápasu",
-      "bracketLabel": "{n} na {n}",
-      "waitingCount": "{count} čeká",
-      "nationsHeading": "Národní zástava",
-      "nation": {
-        "vale": "Eastbrookské údolí",
-        "mirefen": "Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "Popelavé koloseum",
-        "choir": "Bledý chór",
-        "ogre": "Zlobří klany",
-        "moon": "Bledý měsíc",
-        "copperdig": "Měděný důl"
-      },
-      "awayNote": "Pokud obě strany hrají pod stejnou zástavou, hostující strana nastoupí v obrácených barvách.",
-      "rolesHeading": "Sportovní role",
-      "rolesSmallBracketNote": "V kategoriích 1 na 1 a 2 na 2 hraje každý bojovník s výbavou Univerzála. Skutky, které vyžadují kategorii 3 na 3 nebo větší, tu získat nelze.",
-      "role": {
-        "allrounder": {
-          "name": "Univerzál",
-          "desc": "Od všeho trochu: kop, odkop a férové rameno."
-        },
-        "striker": {
-          "name": "Útočník",
-          "desc": "Žije pro dlouhý odkop a rychlou kličku."
-        },
-        "sweeper": {
-          "name": "Zadák",
-          "desc": "Odstrkuje běžce od míče a odkopává ho do bezpečí."
-        },
-        "keeper": {
-          "name": "Brankář",
-          "desc": "Střeží brankoviště chytáním, rybičkou a výkopem."
-        }
-      },
-      "queue": "Vstoupit do fronty",
-      "leaveQueue": "Opustit frontu",
-      "queueNote": "Do fronty se zapiš odkudkoli; píšťalka tě zavolá na Prasečí pole.",
-      "queuedStatus": "Ve frontě na {bracket}: pozice {position} z {count}.",
-      "blockNation": "Nejdřív si vyber národní zástavu.",
-      "blockPartySize": "Tato kategorie vyžaduje menší skupinu.",
-      "blockNotLeader": "Tým může do fronty zapsat jen vůdce skupiny.",
-      "inMatchNote": "Tvůj tým je na hřišti. Hraje se dál!",
-      "deserterNote": "Správce hřiště si to pamatuje. Do fronty se můžeš znovu zapsat za {seconds} s.",
-      "liveHeading": "Právě na Prasečím poli",
-      "liveAria": "Pohár údolí: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Přijď k Prasečímu poli a sleduj zápas z tribun.",
-      "noLive": "Hřiště je tiché. Žádný zápas se nehraje.",
-      "boardHeading": "Tabule vítězů",
-      "boardEmpty": "Zatím nejsou zaznamenáni žádní vítězové. Měděný kbelík čeká.",
-      "boardWins": "{count} výher",
-      "enterAsGuild": "Nastoupit pod zástavou cechu {guild}",
-      "guildRecordLine": "Bilance tvého cechu: {wins} výher, {losses} proher.",
-      "guildBoardHeading": "Cechovní zástavy",
-      "guildBoardEmpty": "Žádný cech zatím nenastoupil na hřiště. Vyvěs svou zástavu!",
-      "guildBoardWl": "{wins} V, {losses} P",
-      "practice": "Trénink proti botům",
-      "practiceNote": "Okamžitě spustí soukromý zápas s boty na tvém vlastním tréninkovém hřišti.",
-      "practiceUnratedNote": "Tréninkové zápasy jsou nehodnocené: tabulka ani postup v Knize skutků se nepočítají.",
-      "practicingNow": "Právě trénují ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Fronta Poháru údolí: {bracket}, pozice {position} z {count}",
-      "indicatorLive": "Pohár údolí",
-      "indicatorOpen": "Otevřít okno Poháru údolí",
-      "phaseCountdown": "Výkop za {seconds}",
-      "phaseGoal": "GÓL!",
-      "phaseGolden": "ZLATÝ GÓL",
-      "phaseOver": "KONEC ZÁPASU",
-      "bannerFound": "Pohár údolí volá: {nationA} proti {nationB}!",
-      "bannerCountdown": "Výkop za {seconds}...",
-      "bannerKickoff": "VÝKOP!",
-      "bannerGoal": "GÓL! {nation} skóruje!",
-      "bannerSave": "{name} CHYTÁ!",
-      "bannerGolden": "ZLATÝ GÓL: další branka vítězí!",
-      "bannerEnd": "Konec zápasu: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Vítězství na Prasečím poli!",
-      "bannerDraw": "Remíza na Prasečím poli.",
-      "bannerLoss": "Porážka na Prasečím poli.",
-      "logQueued": "Zapisuješ se do fronty Poháru údolí na {bracket} (pozice {position}).",
-      "logUnqueued": "Opouštíš frontu Poháru údolí.",
-      "logFound": "Tvůj zápas Poháru údolí je připraven: {nationA} proti {nationB}.",
-      "logRoster": "Tvá strana: {allies}. Jejich strana: {enemies}.",
-      "logGoal": "{name} skóruje za {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} předvádí zákrok!",
-      "logWin": "Vyhráváš zápas na Prasečím poli.",
-      "logDraw": "Zápas na Prasečím poli končí remízou.",
-      "logLoss": "Prohráváš zápas na Prasečím poli.",
-      "gossipOpen": "Kniha zápasů",
-      "gossipOpenAria": "Otevřít okno Poháru údolí",
-      "mobileLabel": "Pohár",
-      "briefing": {
-        "subtitle": "Předzápasová porada",
-        "vs": "proti",
-        "rulesHeading": "Jak hrát",
-        "rule1": "Skóruj kopnutím nebo přihrávkou míče do soupeřovy branky.",
-        "rule2": "Vyhrává, kdo první dá 5 gólů, nebo kdo jich má víc, když zazní konec.",
-        "rule3": "Nerozhodný stav na konci jde do zlatého gólu: další branka vítězí.",
-        "rule4": "Skluzy tě jen povalí. Pod žňovým příměřím se nikomu nic nestane.",
-        "rule5": "Kdokoli může přijít a fandit ti z tribun.",
-        "kitHeading": "Tvá výbava",
-        "kitNote": "Tyto dovednosti po dobu zápasu nahrazují tvé třídní schopnosti.",
-        "unratedNote": "Na hřišti jsou boti, takže je tento zápas nehodnocený: tabulkou to nepohne a skutky za góly, zákroky a čistá konta se nepočítají.",
-        "practiceUnratedNote": "Tohle je tréninkový zápas, takže je nehodnocený: tabulkou to nepohne a postup v Knize skutků se nepočítá.",
-        "rosterHeading": "Soupiska",
-        "you": "Ty",
-        "bot": "Bot",
-        "ready": "Jsem připraven(a)",
-        "readyDone": "Připraven(a)",
-        "readyAria": "Připravit se na výkop",
-        "waiting": "Čeká se, až se připraví druhá strana...",
-        "whistle": "Píšťalka zazní za {seconds} s.",
-        "readyCount": "{ready} z {total} připraveno"
-      },
-      "bet": {
-        "title": "Sázky na zápas",
-        "aria": "Sázky na zápas Poháru údolí",
-        "closesIn": "Sázky se uzavírají za {seconds} s",
-        "closed": "Sázky uzavřeny",
-        "prize": "Bank {amount}",
-        "splitAria": "Rozdělení sázkového banku mezi jednotlivé týmy",
-        "expand": "Zobrazit sázky a vsadit",
-        "collapse": "Skrýt sázky",
-        "oddsLabel": "Vyplácí",
-        "back": "Vsadit na {team}",
-        "form": "{wins}V-{losses}P",
-        "mine": "Tvá sázka: {amount} na {team}",
-        "none": "Na tento zápas zatím nemáš žádnou sázku.",
-        "record": "Sázkařská bilance: {wins}V-{losses}P, {sign}{net}",
-        "wonBanner": "Tvá sázka vyhrála!",
-        "wonLog": "Tvá sázka na Pohár údolí vyhrála: vráceno {amount}.",
-        "lostLog": "Tvá sázka na Pohár údolí prohrála: {amount}.",
-        "refundLog": "Sázky zrušeny, tvůj vklad {amount} byl vrácen."
-      }
-    },
     "options": {
       "clickMoveLeft": "Levé kliknutí",
       "clickMoveRight": "Pravé kliknutí",
@@ -1570,6 +1575,11 @@ export const cs_CZ: EnTranslations = {
     },
     "controller": {
       "title": "Ovladač",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Zapnout ovladač",
       "invertY": "Invertovat kameru (Y)",
       "deadzone": "Mrtvá zóna páčky",
@@ -2657,7 +2667,8 @@ export const cs_CZ: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "PRYČ",
-      "cheaterTag": "< Podvodník >"
+      "cheaterTag": "< Podvodník >",
+      "pledgeTag": "Pledge of {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -2981,7 +2992,12 @@ export const cs_CZ: EnTranslations = {
       "tip": "U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty."
     },
     "noticeboard": {
-      "empty": "Zdá se, že tu nic nevisí."
+      "empty": "Zdá se, že tu nic nevisí.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
+      "popupTitle": "Guild Signpost",
+      "close": "Close"
     },
     "bank": {
       "title": "Banka",
@@ -4318,6 +4334,10 @@ export const cs_CZ: EnTranslations = {
     "deeds": {
       "invalid_input": "Neplatný vstup."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "Propojení účtu Steam není momentálně k dispozici.",
       "invalid_ticket": "Steam nedokázal tuto žádost o propojení ověřit. Zkus to znovu z desktopové aplikace.",
@@ -4441,7 +4461,6 @@ export const cs_CZ: EnTranslations = {
       "combat": "Boj",
       "talents": "Talenty",
       "arena": "Aréna a PvP",
-      "valeCup": "Pohár údolí",
       "thornhollow": "Thornhollowská pole",
       "deeds": "Kniha skutků",
       "reliquary": "Relikviář",
@@ -4551,6 +4570,8 @@ export const cs_CZ: EnTranslations = {
         "fenBlurb": "Za podzimní korunou jasná bažina vrb a klidné vody, a město za vodním příkopem.",
         "farshoreName": "Vzdálené pobřeží",
         "farshoreBlurb": "Ostrov za pískovou kosou, kde se nebe trhá nad Trhlinovými poli a Gullhaven zvoní na zvon při každém průlomu.",
+        "provingName": "The Proving Shore",
+        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
         "nightName": "Noční květ",
         "nightBlurb": "Kraj hvězdné půlnoci, kde cesty osvětlují květiny a Moonrest drží svou hlídku.",
         "hauntName": "Přízračný les",
@@ -4651,7 +4672,6 @@ export const cs_CZ: EnTranslations = {
       "reliquary": "Relikviář",
       "sheathe": "Zasunout/Vytasit zbraň",
       "crafting": "Výroba",
-      "valeCup": "Pohár údolí",
       "mount": "Nasednout / Sesednout",
       "calendar": "Kalendář událostí",
       "dungeonFinder": "Hledač dungeonů",
@@ -5513,6 +5533,10 @@ export const cs_CZ: EnTranslations = {
       "farshoreGreeting": "Přišel jsi přes Přívozní stezku? Pak jsi první za týden, a Strážce si tě bude chtít prohlédnout.",
       "farshoreGreeter": "Strážce zvonu Tam, Přístaviště",
       "farshorePlaceNotes": "Racčí přístav je jediné město ostrova a jeho pevnůstka. Přístaviště je místo, kde se Přívozní stezka dotýká břehu, se strážním zvonem nad výběžkem; Hlídková louka drží vysočinu jihovýchodně od města, kde trhlinohlídač naslouchá dalšímu průlomu; Rozeklané útesy se otevírají na jižním konci ostrova; a Trhlinová pole jsou zpustošené řady obilí východně od Racčího přístavu, stále se hemžící tím, co sem tím průlomem prošlo.",
+      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
+      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
+      "provingGreeter": "Instructor Maren, Dawnrest Camp",
+      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
       "travelTitle": "Cestování",
       "travelBody": "Každou cestou v říši se buď jde pěšky, nebo jede na koni. Nejsou tu žádné letecké trasy, žádná taxi a žádná teleportační síť: mapa je jedna souvislá pevnina a každé spojení je něco, na čem můžeš stát. Hřebeny oddělují jednu říši od druhé, a tam, kde si dvě říše dělí hřeben, stoupá cesta průsmykem. Ne každá hranice ale funguje takhle. Na severu vede dlouhá hráz cestu přes vodu ze Zahalené kotliny do zasněžené krajiny za ní, a zpátky na jihu vede tenká přírodní písečná kosa zvaná Přívozní stezka na východ od pobřeží Údolí k Přístavišti na ostrově Vzdáleného pobřeží, který nemá žádnou pozemní hranici vůbec. A v celém nadzemním světě existují přesně jedny opravdové dveře: závoj soumraku vysoko na Thornpeaku, který se otevírá do Zahalené kotliny. Jižní hřeben Kotliny je zapečetěný bez průsmyku skrz něj, takže tenhle závoj je způsob, jak se tam poprvé dostaneš, a za tebou se zavírá na cestě zpátky.\n\nAť padneš kdekoli, cesta zpátky je krátká. Každá zóna má aspoň jeden hřbitov, nad jehož náhrobky se vznáší Bledý strážce, a propuštěný duch povstane u toho nejbližšího z nich.\n\nMapa nekončí neviditelnou zdí. Země přechází v pláže a mysy, a pak v otevřenou vodu. Přechody, které svět zamýšlí, abys přeplaval, úžiny a jezera mezi jednou říší a druhou, jsou klidné a bezpečné k přeplavání. Vyraz místo toho na otevřené moře a sama vzdálenost tě obrátí zpátky: budeš varován, a pak znovu, a pokud budeš plavat dál, moře tě vyčerpá, dokud tě nezabije. Potápění má svůj vlastní limit, protože ti pod hladinou dojde dech, takže se vynoř na nádech a otoč se zpátky, když ti to voda řekne.",
       "mountsTitle": "Jízdní zvířata",
@@ -5729,36 +5753,6 @@ export const cs_CZ: EnTranslations = {
       "ladderBody": "Každý zápas pohne trvalým hodnocením bojiště vázaným na postavu, ať vyhraješ nebo prohraješ, a tabulka všech dob řadí šampiony říše.",
       "rewardsHeading": "Odměny za zápas",
       "rewardsBody": "Každý dokončený zápas vyplácí čest: víc za výhru, útěchu za prohru nebo remízu, a navíc drobnou částku za každý smrtící úder, který zasadíš, i za každý, na kterém se podílíš, takže boj mimo vlajky se pořád vyplácí. Tvá první výhra dne navíc vyplácí bonus a panel ti ukazuje, dokud na tebe tento bonus ještě čeká. Tento den patří jen cti a přetáčí se podle vlastních hodin, ne podle resetu instancí říše. Opakované střetnutí se stejným týmem vyplácí za samotný zápas méně po tom prvním, rychle se ustálí na dně místo toho, aby se propadlo k nule, a odstoupený zápas nevyplácí nic. Utrať, co si vyděláš, u kteréhokoli intendanta Válečnictví."
-    },
-    "valeCupPage": {
-      "heading": "Pohár údolí",
-      "intro": "Kančbal na Prasečím poli: vyber si zástavu, vyber si roli a dostaň vycpanou kančí kůži za brankáře. Hraje se o Měděný kbelík: žádná krev, žádná kořist, jen řev tribun.",
-      "loreHeading": "Kančbal a žňové příměří",
-      "loreOldSow": "Dávno předtím, než se mrtví probudili, hrávali eastbrookští čeledíni kančbal na strništích po žních: dva houfy, jedna kančí kůže vycpaná slámou a dvě vozové brány dovlečené na oba konce louky. První míč, Stará prasnice, visí pokrytý bronzem nad krbem v hospodě.",
-      "loreTruce": "Když Popelavé koloseum začalo pořádat válečné hry, maršál Redbrook odpověděl něčím laskavějším: stálým žňovým příměřím na staré louce. Z vozových bran se staly branky, louka dostala mantinely, tribuny i jméno, Prasečí pole, a cenou byl vždycky tentýž promáčklý kbelík na mléko, ze kterého vítězové pili: Měděný kbelík.",
-      "howHeading": "Jak hrát",
-      "howQueue": "Do fronty se zapiš odkudkoli přes okno Poháru údolí, nebo si promluv se správcem hřiště Bramem u brány Prasečího pole. Vyber kategorii od jednoho hráče na každé straně až po pět, národní zástavu a sportovní roli; do fronty se postav sám, nebo přiveď svou skupinu.",
-      "howMatch": "Při výkopu se tvá třídní výbava vymění za sportovní a po zápase se přesně obnoví. Kopy míří na zaměřovač na zemi, míč se odráží od mantinelů a driblink je prostě běh s míčem. Dej víc gólů než druhá strana, než zazní konec; remíza jde do zlatého gólu.",
-      "howTruce": "Na Prasečím poli nikdo nekrvácí: skluzy jen povalí, nic nebolí a mazlíčci zápas prosedí venku.",
-      "spectateBody": "Na stadionu se hraje vždy jen jeden zápas a kdokoli může přijít a sledovat ho z tribun.",
-      "bettingHeading": "Sázka u zábradlí",
-      "bettingBody": "Diváci na Prasečím poli mohou vsadit na jednu stranu, dokud se zápas teprve utváří: sázky se slévají dohromady a při závěrečném hvizdu si vítězové rozdělí balík poražených v poměru k tomu, co vsadili. Remíza, nebo překvapení, na které nikdo nevsadil, vrátí každou minci. Hráči nasazení v zápase na něj sázet nemohou a zábradlí uchovává tvou celoživotní bilanci výher, proher a čistého zisku.",
-      "practiceHeading": "Tréninkové zápasy a zahálející hřiště",
-      "practiceBody": "Okno Poháru údolí nabízí i trénink: soukromou kopii hřiště, kde obě strany zaplní boti a nic se nepočítá do tvé bilance. Chybí ti hráč nebo dva na skutečný zápas? Po krátkém čekání týmy doplní boti a jakýkoli zápas s boty na hřišti je přátelák, nikdy hodnocený. A když Prasečí pole zahálí, boti předvedou exhibici, na kterou se můžeš z tribuny dívat, i sázet; v okamžiku, kdy se skuteční hráči připraví, exhibice hřiště uvolní a každá sázka se vrátí.",
-      "nationsHeading": "Osm národních zástav",
-      "nationsBody": "Každý tým hraje pod zástavou. Národ vybírá kapitán, a pokud obě strany hrají pod stejnou, hostující strana nastoupí v obrácených barvách.",
-      "nationVale": "Zelená a zlatá pod snopem pšenice: domácí strana, čeledíni tělem i duší.",
-      "nationMirefen": "Modrozelená a šedá pod volavkou: trpěliví, dlouhonozí, nikdy ve spěchu.",
-      "nationThornpeak": "Ledově modrá a bílá pod horským štítem: jistí v kroku a tvrdohlaví.",
-      "nationColiseum": "Červená a černá se zkříženými meči: hrají, jako by to pořád byla válečná hra.",
-      "nationChoir": "Bledě modrá a stříbrná pod zvonem: strašidelní, přesní a velmi tiší.",
-      "nationOgre": "Oranžová a umbrová za pěstí: napřed ramenem a jsou na to hrdí.",
-      "nationMoon": "Fialová a stříbrná pod srpkem měsíce: noční hráči, lehcí na nohou.",
-      "nationCopperdig": "Měděná a hnědá s krumpáčem: kopáči, kteří nikdy nepřestanou běhat.",
-      "rolesHeading": "Sportovní role",
-      "rolesBody": "Tvá role určuje výbavu, kterou si neseš na hřiště. Kopou všichni; zbytek je povaha. V bracketech jeden na jednoho a dva na dva hrají všichni všestrannou výbavu, takže volba role přijde ke slovu až od tří na tři výš.",
-      "rewardsHeading": "Pravidla příměří",
-      "rewardsBody": "Pravidla příměří znamenají žádné zkušenosti a žádnou kořist: rozhodnutý zápas se počítá do tvé bilance a na tabuli vítězů a výhra se počítá i do denních úkolů o odměny. Dezerce ze zápasu ti zablokuje místo a správce hřiště si to pamatuje."
     },
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",
@@ -12851,8 +12845,26 @@ export const cs_CZ: EnTranslations = {
       "pristine_claw": {
         "name": "Nedotčený dráp"
       },
+      "ps_castaway_crate": {
+        "name": "Castaway Crate"
+      },
+      "ps_ferry_bell": {
+        "name": "Ferry Bell"
+      },
       "dawnhold_posy": {
         "name": "Kytička ze zahrady zámku Dawnhold"
+      },
+      "ps_briny_lure": {
+        "name": "Briny Lure"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Lustrous Pearl"
+      },
+      "mother_of_pearl": {
+        "name": "Mother of Pearl"
+      },
+      "ps_passing_stone": {
+        "name": "Passing Stone"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -13894,9 +13906,6 @@ export const cs_CZ: EnTranslations = {
       "tolling_bell": {
         "name": "Zvonící zvon"
       },
-      "vale_cup_ball": {
-        "name": "Kančbal"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
@@ -14193,6 +14202,15 @@ export const cs_CZ: EnTranslations = {
       },
       "fisher_bram": {
         "name": "Rybář Bram"
+      },
+      "training_effigy": {
+        "name": "Training Effigy"
+      },
+      "shore_scuttler": {
+        "name": "Shore Scuttler"
+      },
+      "mister_crabs": {
+        "name": "Mister Crabs"
       },
       "rift_hellguard": {
         "name": "Pekelná stráž"
@@ -14494,11 +14512,6 @@ export const cs_CZ: EnTranslations = {
         "title": "Strážkyně mrtvých",
         "greeting": "Odpočívej, duchu. Mohu tě vrátit do těla, ale přechod zpět tě oslabí."
       },
-      "groundskeeper_bram": {
-        "name": "Správce hřiště Bram",
-        "title": "Správce Prasečího pole",
-        "greeting": "Na Prasečím poli platí příměří, {className}: jen kopy a ramena. Chceš si zahrát o Měděný kbelík?"
-      },
       "chronicler_saul": {
         "name": "Kronikář Saul",
         "title": "Kronika údolí",
@@ -14783,6 +14796,51 @@ export const cs_CZ: EnTranslations = {
         "name": "Alchymista Verane",
         "title": "Mistr lékárny",
         "greeting": "Dvakrát měř a jednou nalij, {className}. Lékárník nemá trpělivost na rozlité reagencie."
+      },
+      "wayfarer_bryn": {
+        "name": "Wayfarer Bryn",
+        "title": "Harbor Guide",
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+      },
+      "instructor_maren": {
+        "name": "Instructor Maren",
+        "title": "Proving Master",
+        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+      },
+      "quartermaster_finch": {
+        "name": "Quartermaster Finch",
+        "title": "Camp Outfitter",
+        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+      },
+      "ferryman_odo": {
+        "name": "Ferryman Odo",
+        "title": "Keeper of the Crossing",
+        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+      },
+      "bursar_wick": {
+        "name": "Bursar Wick",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+      },
+      "warden_tam": {
+        "name": "Warden Tam",
+        "title": "Keeper of the Gauntlet",
+        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+      },
+      "overseer_pell": {
+        "name": "Overseer Pell",
+        "title": "Gauntlet Overseer",
+        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+      },
+      "drillmaster_rook": {
+        "name": "Drillmaster Rook",
+        "title": "Yard Master",
+        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+      },
+      "tidewarden_nel": {
+        "name": "Tidewarden Nel",
+        "title": "Keeper of the Strand",
+        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -16750,6 +16808,109 @@ export const cs_CZ: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Run the Gauntlet",
+        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
+        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "objectives": {
+          "0": {
+            "label": "Gauntlet flag passed"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Strike True",
+        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
+        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "objectives": {
+          "0": {
+            "label": "Training Effigy felled"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Hone the Edge",
+        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
+        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "objectives": {
+          "0": {
+            "label": "Ability landed on an effigy"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Shell and Claw",
+        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
+        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "objectives": {
+          "0": {
+            "label": "Shore Scuttler culled"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Mother of Pearl",
+        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
+        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "objectives": {
+          "0": {
+            "label": "Mister Crabs slain"
+          },
+          "1": {
+            "label": "Lustrous Pearl claimed"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "The Wreck Line",
+        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "objectives": {
+          "0": {
+            "label": "Castaway Crate opened"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Pouch and Purse",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
+        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "objectives": {
+          "0": {
+            "label": "Linen Pouch bought"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Word on the Wind",
+        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
+        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "objectives": {
+          "0": {
+            "label": "Guild signpost read"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "The Long Walk",
+        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
+        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "objectives": {
+          "0": {
+            "label": "Walked back from the dead"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Set Sail",
+        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
+        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "objectives": {
+          "0": {
+            "label": "Report to Ferryman Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Dolů po Větrné cestě",
         "text": "Zvládl jsi výstup, {playerName}, takže si tě vítr rozhodl nechat. Osadní přístav leží na východ podél cesty přes stráně, schovaný v závětří své zátoky. Přístavní mistr Odile počítá každou duši, která přejde přes průsmyk, a bude si chtít spočítat i tebe. Řekni jí, že Větrná cesta je stále otevřená.",
@@ -16947,6 +17108,9 @@ export const cs_CZ: EnTranslations = {
           },
           "11": {
             "label": "Hráz Vzdáleného pobřeží"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },
@@ -17307,6 +17471,27 @@ export const cs_CZ: EnTranslations = {
           },
           "4": {
             "label": "Trhlinová pole"
+          }
+        }
+      },
+      "proving_shore": {
+        "name": "The Proving Shore",
+        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "pois": {
+          "0": {
+            "label": "Dawnrest Camp"
+          },
+          "1": {
+            "label": "The Old Pier"
+          },
+          "2": {
+            "label": "The Practice Yard"
+          },
+          "3": {
+            "label": "The Wreck Line"
+          },
+          "4": {
+            "label": "The Gauntlet"
           }
         }
       }

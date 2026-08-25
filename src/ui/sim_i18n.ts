@@ -143,6 +143,12 @@ const baseEnTable = {
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  // Tide-pool summon refusals (src/sim/interactions/crab_summon.ts
+  // REASON_MESSAGE). Placeholder-free, so they register in the EXACT matcher
+  // automatically.
+  'error.crabQuestDone': 'You have what you came for. Tidewarden Nel waits on your prize.',
+  'error.crabLureTooFar': 'Carry the lure to the tide pool west of the wreck line.',
+  'error.crabAlreadyUp': 'Mister Crabs already prowls the pool!',
   // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
   'error.firebottleNeeded': 'You need a firebottle to torch that.',
   'error.firebottleNotReady': 'Your firebottle is not ready yet.',
@@ -247,6 +253,8 @@ const baseEnTable = {
   'groundPickup.graveSealedDeny':
     'The grave is sealed against the living until the dead call you to it.',
   'groundPickup.cryptRitualCircleDeny': 'The ritual circle lies cold and dormant.',
+  'groundPickup.castawayCrateDeny': 'Barnacles seal the crate shut.',
+  'groundPickup.ferryBellDeny': 'The ferry bell hangs silent.',
   'groundPickup.supplyCrateEnough': 'You already have enough supply crates.',
   'groundPickup.gravecallerSigilEnough': "You already carry a Gravecaller's Sigil.",
   'groundPickup.ledgerPageEnough': 'You already have enough ledger pages.',
@@ -267,6 +275,8 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  'groundPickup.castawayCrateEnough': 'You already have enough castaway crates.',
+  'groundPickup.ferryBellEnough': 'The ferry bell has nothing to give.',
   // Murloc huts (q_deepfen_purge): the pickup deny arm is defensive (hut clicks
   // route to the firebottle handler first), but the lines exist per the
   // every-object-has-lines rule and localize like the rest.
@@ -354,10 +364,6 @@ const baseEnTable = {
   // distinct object, so this covers all of them (bells rung, lanterns relit,
   // banners planted, carts righted). Emitted from interactObjectForQuests.
   'groundPickup.objectAlreadyCredited': 'You have already done this one.',
-  'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
-  'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
-  'error.vcupNoNation': 'Pick a banner nation first.',
-  'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
   'log.talentsUpdated': 'Talents updated.',
   'log.talentsReset': 'Talents reset.',
   'log.cheatDeathSave': 'Cheat Death saves you!',
@@ -616,6 +622,21 @@ const baseEnTable = {
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
   'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+  // The Proving Shore (tutorial island): the greeting's ferry ride, the two
+  // clicked ferry bells, the startTutorial gate denials
+  // (sim/tutorial/greeting.ts + interactions/ferry_bell.ts), and the
+  // quest-gated vendor row denial (items.ts vendorQuestGates).
+  'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
+  'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
+  'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
+  'error.tutorialFromHere': 'You cannot set sail from here.',
+  'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
+  'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
+  'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
+  'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
+  'log.longWalkHealer':
+    'The Keeper set you on your feet. Next time, walk to your body: it costs you nothing.',
+  'error.vendorQuestGated': 'That item is not for sale to you yet.',
   'aura.bladedEcho': 'Bladed Echo',
   'aura.emboldened': 'Emboldened',
   'aura.enraged': 'Enraged',
@@ -763,6 +784,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
     'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
     'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+    'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
+    'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
+    'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
+    'error.tutorialFromHere': 'You cannot set sail from here.',
+    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
+    'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
+    'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
+    'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
+    'log.longWalkHealer':
+      'The Keeper set you on your feet. Next time, walk to your body: it costs you nothing.',
+    'error.vendorQuestGated': 'That item is not for sale to you yet.',
     'log.deathwardSaves': 'A deathward saves you!',
     'error.lineOfSight': 'Line of sight.',
     'error.bagsFull': 'Your bags are full.',
@@ -827,10 +859,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'That resource node does not exist.',
     'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
     'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
-    'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
-    'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
-    'error.vcupNoNation': 'Pick a banner nation first.',
-    'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
     'log.talentsUpdated': 'Talents updated.',
     'log.talentsReset': 'Talents reset.',
     'log.savedBuild': 'Saved build “{name}”.',
@@ -1087,6 +1115,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tumba está sellada para los vivos hasta que los muertos te llamen a ella.',
     'groundPickup.cryptRitualCircleDeny': 'El círculo ritual yace frío e inerte.',
+    'groundPickup.castawayCrateDeny': 'Los percebes mantienen la caja sellada.',
+    'groundPickup.ferryBellDeny': 'La campana del ferry cuelga en silencio.',
+    'groundPickup.ferryBellEnough': 'La campana del ferry no tiene nada que dar.',
+    'groundPickup.castawayCrateEnough': 'Ya tienes suficientes cajas de náufrago.',
     'groundPickup.supplyCrateEnough': 'Ya tienes suficientes cajones de suministros.',
     'groundPickup.gravecallerSigilEnough': 'Ya llevas un Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Ya tienes suficientes páginas del registro.',
@@ -1268,11 +1300,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Ese nodo de recursos no existe.',
     'error.gatherNodeNotRespawned': 'Este nodo de recursos aún no ha reaparecido para ti.',
     'error.toolEffectSlotFromWindow': 'Engárzalo desde la ventana de Profesiones.',
-    'error.vcupDeserter': 'El Guardacampo lo recuerda. Vuelve más tarde.',
-    'error.vcupPartyTooBig': 'Esa categoría necesita un grupo más pequeño.',
-    'error.vcupNoNation': 'Primero elige una nación de estandarte.',
-    'error.vcupPracticeFull':
-      'Los campos de práctica están todos ocupados. Inténtalo de nuevo en un momento.',
     'log.talentsUpdated': 'Talentos actualizados.',
     'log.talentsReset': 'Talentos restablecidos.',
     'log.cheatDeathSave': '¡Burlar la muerte te salva!',
@@ -1538,6 +1565,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tumba está sellada a los vivos hasta que los muertos te llamen a ella.',
     'groundPickup.cryptRitualCircleDeny': 'El círculo ritual yace frío e inerte.',
+    'groundPickup.castawayCrateDeny': 'Los percebes mantienen la caja sellada.',
+    'groundPickup.ferryBellDeny': 'La campana del ferry cuelga en silencio.',
+    'groundPickup.ferryBellEnough': 'La campana del ferry no tiene nada que dar.',
+    'groundPickup.castawayCrateEnough': 'Ya tienes suficientes cajas de náufrago.',
     'groundPickup.supplyCrateEnough': 'Ya tienes suficientes cajones de suministros.',
     'groundPickup.gravecallerSigilEnough': 'Ya llevas un Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Ya tienes suficientes páginas del libro mayor.',
@@ -1719,11 +1750,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Ese nodo de recursos no existe.',
     'error.gatherNodeNotRespawned': 'Este nodo de recursos aún no ha reaparecido para ti.',
     'error.toolEffectSlotFromWindow': 'Engárzalo desde la ventana de Profesiones.',
-    'error.vcupDeserter': 'El Guardacampo lo recuerda. Vuelve más tarde.',
-    'error.vcupPartyTooBig': 'Esa categoría necesita un grupo más pequeño.',
-    'error.vcupNoNation': 'Primero elige una nación de estandarte.',
-    'error.vcupPracticeFull':
-      'Los campos de práctica están todos ocupados. Inténtalo de nuevo en un momento.',
     'log.talentsUpdated': 'Talentos actualizados.',
     'log.talentsReset': 'Talentos restablecidos.',
     'log.cheatDeathSave': '¡Burlar la muerte te salva!',
@@ -2000,6 +2026,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tombe reste scellée aux vivants tant que les morts ne vous y appellent pas.',
     'groundPickup.cryptRitualCircleDeny': 'Le cercle rituel demeure froid et endormi.',
+    'groundPickup.castawayCrateDeny': 'Les bernacles scellent la caisse.',
+    'groundPickup.ferryBellDeny': 'La cloche du bac pend en silence.',
+    'groundPickup.ferryBellEnough': "La cloche du bac n'a rien à donner.",
+    'groundPickup.castawayCrateEnough': "Vous avez déjà assez de caisses d'épave.",
     'groundPickup.supplyCrateEnough': 'Vous avez déjà assez de caisses de fournitures.',
     'groundPickup.gravecallerSigilEnough': 'Vous portez déjà un sceau de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Vous avez déjà assez de pages de registre.',
@@ -2182,11 +2212,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': "Ce nœud de ressources n'existe pas.",
     'error.gatherNodeNotRespawned': "Ce nœud de ressources n'est pas encore réapparu pour vous.",
     'error.toolEffectSlotFromWindow': 'Sertissez-le depuis la fenêtre des Métiers.',
-    'error.vcupDeserter': "Le Gardien du terrain s'en souvient. Revenez plus tard.",
-    'error.vcupPartyTooBig': 'Cette catégorie exige un groupe plus petit.',
-    'error.vcupNoNation': "Choisissez d'abord une nation de bannière.",
-    'error.vcupPracticeFull':
-      "Tous les terrains d'entraînement sont occupés. Réessayez dans un instant.",
     'log.talentsUpdated': 'Talents mis à jour.',
     'log.talentsReset': 'Talents réinitialisés.',
     'log.cheatDeathSave': 'Trompe-la-mort vous sauve !',
@@ -2462,6 +2487,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tombe est scellée aux vivants tant que les morts ne vous y appellent pas.',
     'groundPickup.cryptRitualCircleDeny': 'Le cercle rituel demeure froid et inerte.',
+    'groundPickup.castawayCrateDeny': 'Les bernacles scellent la caisse.',
+    'groundPickup.ferryBellDeny': 'La cloche du bac pend en silence.',
+    'groundPickup.ferryBellEnough': "La cloche du bac n'a rien à donner.",
+    'groundPickup.castawayCrateEnough': "Vous avez déjà assez de caisses d'épave.",
     'groundPickup.supplyCrateEnough': 'Vous avez déjà assez de caisses de fournitures.',
     'groundPickup.gravecallerSigilEnough': 'Vous portez déjà un Sceau de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Vous avez déjà assez de pages de registre.',
@@ -2645,11 +2674,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': "Ce nœud de ressources n'existe pas.",
     'error.gatherNodeNotRespawned': "Ce nœud de ressources n'est pas encore réapparu pour vous.",
     'error.toolEffectSlotFromWindow': 'Sertissez-le depuis la fenêtre des Métiers.',
-    'error.vcupDeserter': "Le Gardien du terrain s'en souvient. Revenez plus tard.",
-    'error.vcupPartyTooBig': 'Cette catégorie exige un groupe plus petit.',
-    'error.vcupNoNation': "Choisissez d'abord une nation de bannière.",
-    'error.vcupPracticeFull':
-      "Tous les terrains d'entraînement sont occupés. Réessayez dans un instant.",
     'log.talentsUpdated': 'Talents mis à jour.',
     'log.talentsReset': 'Talents réinitialisés.',
     'log.cheatDeathSave': 'Trompe-la-mort vous sauve !',
@@ -2793,6 +2817,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
     'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
     'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+    'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
+    'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
+    'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
+    'error.tutorialFromHere': 'You cannot set sail from here.',
+    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
+    'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
+    'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
+    'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
+    'log.longWalkHealer':
+      'The Keeper set you on your feet. Next time, walk to your body: it costs you nothing.',
+    'error.vendorQuestGated': 'That item is not for sale to you yet.',
     'log.deathwardSaves': 'A deathward saves you!',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
     'log.abilityRankUp': 'Your {name} has improved to Rank {rank}.',
@@ -2936,10 +2971,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'That resource node does not exist.',
     'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
     'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
-    'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
-    'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
-    'error.vcupNoNation': 'Pick a banner nation first.',
-    'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
     'log.talentsUpdated': 'Talents updated.',
     'log.talentsReset': 'Talents reset.',
     'log.savedBuild': 'Saved build “{name}”.',
@@ -3114,6 +3145,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tomba è sigillata ai vivi finché i morti non ti chiamano a sé.',
     'groundPickup.cryptRitualCircleDeny': 'Il cerchio rituale giace freddo e dormiente.',
+    'groundPickup.castawayCrateDeny': 'I cirripedi tengono sigillata la cassa.',
+    'groundPickup.ferryBellDeny': 'La campana del traghetto pende silenziosa.',
+    'groundPickup.ferryBellEnough': 'La campana del traghetto non ha nulla da dare.',
+    'groundPickup.castawayCrateEnough': 'Hai già abbastanza casse alla deriva.',
     'groundPickup.supplyCrateEnough': 'Hai già abbastanza casse di rifornimenti.',
     'groundPickup.gravecallerSigilEnough': 'Porti già con te un Sigillo di Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Hai già abbastanza pagine di registro.',
@@ -3295,10 +3330,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Quel nodo di risorse non esiste.',
     'error.gatherNodeNotRespawned': 'Questo nodo di risorse non è ancora ricomparso per te.',
     'error.toolEffectSlotFromWindow': 'Incastonalo dalla finestra Professioni.',
-    'error.vcupDeserter': 'Il Custode del campo ricorda. Torna più tardi.',
-    'error.vcupPartyTooBig': 'Quella categoria richiede un gruppo più piccolo.',
-    'error.vcupNoNation': 'Prima scegli una nazione della bandiera.',
-    'error.vcupPracticeFull': 'I campi di allenamento sono tutti occupati. Riprova tra poco.',
     'log.talentsUpdated': 'Talenti aggiornati.',
     'log.talentsReset': 'Talenti azzerati.',
     'log.cheatDeathSave': 'Ingannare la morte ti salva!',
@@ -3570,6 +3601,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'Das Grab ist vor den Lebenden versiegelt, bis die Toten Euch zu ihm rufen.',
     'groundPickup.cryptRitualCircleDeny': 'Der Ritualkreis liegt kalt und erloschen da.',
+    'groundPickup.castawayCrateDeny': 'Seepocken halten die Kiste versiegelt.',
+    'groundPickup.ferryBellDeny': 'Die Fährglocke hängt stumm.',
+    'groundPickup.ferryBellEnough': 'Die Fährglocke hat nichts zu geben.',
+    'groundPickup.castawayCrateEnough': 'Ihr habt bereits genug Treibgutkisten.',
     'groundPickup.supplyCrateEnough': 'Ihr habt bereits genug Vorratskisten.',
     'groundPickup.gravecallerSigilEnough': 'Ihr tragt bereits ein Gravecaller-Siegel.',
     'groundPickup.ledgerPageEnough': 'Ihr habt bereits genug Buchseiten.',
@@ -3753,11 +3788,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeNotRespawned':
       'Dieses Ressourcenvorkommen ist für Euch noch nicht erneut erschienen.',
     'error.toolEffectSlotFromWindow': 'Öffnet die Berufe, um das anzubringen.',
-    'error.vcupDeserter': 'Der Platzwart vergisst nicht. Kommt später wieder.',
-    'error.vcupPartyTooBig': 'Diese Klasse braucht eine kleinere Gruppe.',
-    'error.vcupNoNation': 'Wählt zuerst eine Bannernation.',
-    'error.vcupPracticeFull':
-      'Alle Trainingsplätze sind gerade belegt. Versucht es gleich noch einmal.',
     'log.talentsUpdated': 'Talente aktualisiert.',
     'log.talentsReset': 'Talente zurückgesetzt.',
     'log.cheatDeathSave': 'Tod überlisten rettet Euch!',
@@ -4075,6 +4105,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.moongateRubbingDeny': '在守望者开口索要之前，这道铭文还轮不到你来拓印。',
     'groundPickup.graveSealedDeny': '坟墓向生者封闭，直到死者召唤你前来。',
     'groundPickup.cryptRitualCircleDeny': '仪式法阵冰冷沉寂。',
+    'groundPickup.castawayCrateDeny': '藤壶把货箱封得严严实实。',
+    'groundPickup.ferryBellDeny': '渡船铃静静垂着。',
+    'groundPickup.ferryBellEnough': '渡船铃没有什么可给你的。',
+    'groundPickup.castawayCrateEnough': '你已经有足够的漂流货箱了。',
     'groundPickup.supplyCrateEnough': '你已经有足够的补给箱了。',
     'groundPickup.gravecallerSigilEnough': '你身上已经带着一枚唤墓者徽记了。',
     'groundPickup.ledgerPageEnough': '你已经有足够的账页了。',
@@ -4263,10 +4297,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': '那个资源点不存在。',
     'error.gatherNodeNotRespawned': '这个资源点尚未为你刷新。',
     'error.toolEffectSlotFromWindow': '请在专业窗口中镶嵌它。',
-    'error.vcupDeserter': '场地管理员记着呢。稍后再来吧。',
-    'error.vcupPartyTooBig': '这个赛级需要更小的队伍。',
-    'error.vcupNoNation': '请先选择一个旗帜国度。',
-    'error.vcupPracticeFull': '练习场地已全部占用。请稍后再试。',
     'log.talentsUpdated': '天赋已更新。',
     'log.talentsReset': '天赋已重置。',
     'log.cheatDeathSave': '死里逃生救了你！',
@@ -4516,6 +4546,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.moongateRubbingDeny': '在守望者開口索要之前，你無權拓印這道守護符文。',
     'groundPickup.graveSealedDeny': '在亡者召喚你之前，這座墳墓不容生者踏入。',
     'groundPickup.cryptRitualCircleDeny': '儀式法陣冰冷而沉寂。',
+    'groundPickup.castawayCrateDeny': '藤壺把貨箱封得嚴嚴實實。',
+    'groundPickup.ferryBellDeny': '渡船鈴靜靜垂著。',
+    'groundPickup.ferryBellEnough': '渡船鈴沒有什麼可給你的。',
+    'groundPickup.castawayCrateEnough': '你已經有足夠的漂流貨箱了。',
     'groundPickup.supplyCrateEnough': '你已經有足夠的補給箱了。',
     'groundPickup.gravecallerSigilEnough': '你身上已經帶著一枚喚墓者徽記了。',
     'groundPickup.ledgerPageEnough': '你已經有足夠的帳頁了。',
@@ -4704,10 +4738,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': '那個資源點不存在。',
     'error.gatherNodeNotRespawned': '這個資源點尚未為你重新出現。',
     'error.toolEffectSlotFromWindow': '請在專業視窗中鑲嵌它。',
-    'error.vcupDeserter': '場地管理員記著呢。稍後再來吧。',
-    'error.vcupPartyTooBig': '這個賽級需要更小的隊伍。',
-    'error.vcupNoNation': '請先選擇一個旗幟國度。',
-    'error.vcupPracticeFull': '練習場地已全部佔用。請稍後再試。',
     'log.talentsUpdated': '天賦已更新。',
     'log.talentsReset': '天賦已重置。',
     'log.cheatDeathSave': '死裡逃生救了你！',
@@ -4963,6 +4993,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       '죽은 자들이 당신을 부르기 전까지 무덤은 산 자에게 봉인되어 있습니다.',
     'groundPickup.cryptRitualCircleDeny': '의식진은 차갑게 식은 채 잠들어 있습니다.',
+    'groundPickup.castawayCrateDeny': '따개비가 상자를 단단히 봉하고 있습니다.',
+    'groundPickup.ferryBellDeny': '나룻배 종이 조용히 걸려 있습니다.',
+    'groundPickup.ferryBellEnough': '나룻배 종은 줄 것이 없습니다.',
+    'groundPickup.castawayCrateEnough': '표류 상자는 이미 충분히 갖고 있습니다.',
     'groundPickup.supplyCrateEnough': '보급 상자는 이미 충분히 갖고 있습니다.',
     'groundPickup.gravecallerSigilEnough': '무덤부름 인장은 이미 지니고 있습니다.',
     'groundPickup.ledgerPageEnough': '장부 페이지는 이미 충분히 갖고 있습니다.',
@@ -5152,10 +5186,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': '그 자원 지점은 존재하지 않습니다.',
     'error.gatherNodeNotRespawned': '이 자원 지점은 아직 당신에게 다시 생성되지 않았습니다.',
     'error.toolEffectSlotFromWindow': '전문 기술 창에서 장착하세요.',
-    'error.vcupDeserter': '경기장 관리인은 기억하고 있습니다. 나중에 다시 오세요.',
-    'error.vcupPartyTooBig': '해당 등급에는 더 작은 파티가 필요합니다.',
-    'error.vcupNoNation': '먼저 깃발 국가를 선택하세요.',
-    'error.vcupPracticeFull': '연습 경기장이 모두 사용 중입니다. 잠시 후 다시 시도하세요.',
     'log.talentsUpdated': '특성이 갱신되었습니다.',
     'log.talentsReset': '특성이 초기화되었습니다.',
     'log.cheatDeathSave': '죽음 기만이 당신을 구했습니다!',
@@ -5417,6 +5447,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       '死者に呼ばれるそのときまで、墓は生者を拒んで封じられています。',
     'groundPickup.cryptRitualCircleDeny': '儀式の円は冷たく、眠りについています。',
+    'groundPickup.castawayCrateDeny': 'フジツボが木箱を固く閉ざしています。',
+    'groundPickup.ferryBellDeny': '渡しの鐘は静かに掛かっています。',
+    'groundPickup.ferryBellEnough': '渡しの鐘から得られるものはありません。',
+    'groundPickup.castawayCrateEnough': '漂着した木箱はすでに十分あります。',
     'groundPickup.supplyCrateEnough': '補給箱はすでに十分あります。',
     'groundPickup.gravecallerSigilEnough': 'グレイブコーラーの印章はすでに携えています。',
     'groundPickup.ledgerPageEnough': '帳簿のページはすでに十分あります。',
@@ -5612,10 +5646,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'その資源ポイントは存在しません。',
     'error.gatherNodeNotRespawned': 'この資源ポイントは、あなたにはまだ再出現していません。',
     'error.toolEffectSlotFromWindow': '専門技能ウィンドウから装着してください。',
-    'error.vcupDeserter': '整備人は覚えている。また後で来なさい。',
-    'error.vcupPartyTooBig': 'その階級にはもっと小さなパーティーが必要だ。',
-    'error.vcupNoNation': 'まずは旗の国を選ぼう。',
-    'error.vcupPracticeFull': '練習ピッチはすべて使用中です。しばらくして再度お試しください。',
     'log.talentsUpdated': 'タレントを更新しました。',
     'log.talentsReset': 'タレントをリセットしました。',
     'log.cheatDeathSave': '死の欺きがあなたを救いました！',
@@ -5819,6 +5849,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'O túmulo está selado contra os vivos até que os mortos chamem você a ele.',
     'groundPickup.cryptRitualCircleDeny': 'O círculo ritual jaz frio e adormecido.',
+    'groundPickup.castawayCrateDeny': 'Cracas mantêm o caixote lacrado.',
+    'groundPickup.ferryBellDeny': 'O sino da balsa pende em silêncio.',
+    'groundPickup.ferryBellEnough': 'O sino da balsa não tem nada a dar.',
+    'groundPickup.castawayCrateEnough': 'Você já tem caixotes à deriva suficientes.',
     'groundPickup.supplyCrateEnough': 'Você já tem caixotes de suprimentos suficientes.',
     'groundPickup.gravecallerSigilEnough': 'Você já carrega um Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Você já tem páginas de livro-caixa suficientes.',
@@ -5998,11 +6032,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Esse ponto de recursos não existe.',
     'error.gatherNodeNotRespawned': 'Este ponto de recursos ainda não ressurgiu para você.',
     'error.toolEffectSlotFromWindow': 'Encaixe isso pela janela de Profissões.',
-    'error.vcupDeserter': 'O Zelador do campo se lembra. Volte mais tarde.',
-    'error.vcupPartyTooBig': 'Essa categoria exige um grupo menor.',
-    'error.vcupNoNation': 'Escolha primeiro uma nação de bandeira.',
-    'error.vcupPracticeFull':
-      'Os campos de treino estão todos ocupados. Tente novamente em instantes.',
     'log.talentsUpdated': 'Talentos atualizados.',
     'log.talentsReset': 'Talentos redefinidos.',
     'log.cheatDeathSave': 'Enganar a morte salva você!',
@@ -6329,6 +6358,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'Могила запечатана от живых, пока мёртвые сами не призовут вас к ней.',
     'groundPickup.cryptRitualCircleDeny': 'Ритуальный круг остыл и дремлет.',
+    'groundPickup.castawayCrateDeny': 'Ракушки намертво запечатали ящик.',
+    'groundPickup.ferryBellDeny': 'Паромный колокол висит безмолвно.',
+    'groundPickup.ferryBellEnough': 'Паромному колоколу нечего вам дать.',
+    'groundPickup.castawayCrateEnough': 'У вас уже достаточно выброшенных морем ящиков.',
     'groundPickup.supplyCrateEnough': 'У вас уже достаточно ящиков с припасами.',
     'groundPickup.gravecallerSigilEnough': 'Вы уже несёте с собой Сигил Могильного Зова.',
     'groundPickup.ledgerPageEnough': 'У вас уже достаточно страниц погребальной книги.',
@@ -6524,10 +6557,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Этого источника ресурсов не существует.',
     'error.gatherNodeNotRespawned': 'Этот источник ресурсов ещё не восстановился для вас.',
     'error.toolEffectSlotFromWindow': 'Установите его в окне профессий.',
-    'error.vcupDeserter': 'Смотритель поля помнит. Возвращайся позже.',
-    'error.vcupPartyTooBig': 'Для этой категории нужна группа поменьше.',
-    'error.vcupNoNation': 'Сначала выбери знамённую нацию.',
-    'error.vcupPracticeFull': 'Все тренировочные поля заняты. Повторите попытку позже.',
     'log.talentsUpdated': 'Таланты обновлены.',
     'log.talentsReset': 'Таланты сброшены.',
     'log.cheatDeathSave': 'Обман смерти спасает вас!',
@@ -10108,7 +10137,8 @@ type QuestExtraKey =
   | 'awakens'
   | 'aldrenYell'
   | 'malricYell'
-  | 'vossYell';
+  | 'vossYell'
+  | 'crabsYell';
 
 export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string>> = {
   en: {
@@ -10129,6 +10159,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} yells, "None shall disturb the king\'s rest! For Thornpeak!"',
     malricYell: '{name} yells, "Death shall never claim my king! The ritual must endure!"',
     vossYell: '{name} yells, "You will not reach him! The king must endure!"',
+    crabsYell: '{name} yells, "MINE! The pearl is mine, and mine she stays!"',
   },
   en_CA: {
     ritualNeedsKey: 'The ritual circle is silent without the Crypt Keystone.',
@@ -10148,6 +10179,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} yells, "None shall disturb the king\'s rest! For Thornpeak!"',
     malricYell: '{name} yells, "Death shall never claim my king! The ritual must endure!"',
     vossYell: '{name} yells, "You will not reach him! The king must endure!"',
+    crabsYell: '{name} yells, "MINE! The pearl is mine, and mine she stays!"',
   },
   es: {
     ritualNeedsKey: 'El círculo ritual calla sin la Piedra clave de la cripta.',
@@ -10167,6 +10199,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "¡Nadie perturbará el descanso del rey! ¡Por Thornpeak!"',
     malricYell: '{name} grita: "¡La muerte nunca reclamará a mi rey! ¡El ritual debe perdurar!"',
     vossYell: '{name} grita: "¡No llegarás hasta él! ¡El rey debe perdurar!"',
+    crabsYell: '{name} grita: "MIA! La perla es mia, y mia se queda!"',
   },
   es_ES: {
     ritualNeedsKey: 'El círculo ritual calla sin la Piedra clave de la cripta.',
@@ -10186,6 +10219,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "¡Nadie perturbará el descanso del rey! ¡Por Thornpeak!"',
     malricYell: '{name} grita: "¡La muerte nunca reclamará a mi rey! ¡El ritual debe perdurar!"',
     vossYell: '{name} grita: "¡No llegarás hasta él! ¡El rey debe perdurar!"',
+    crabsYell: '{name} grita: "MIA! La perla es mia, y mia se queda!"',
   },
   fr_FR: {
     ritualNeedsKey: 'Le cercle rituel reste muet sans la clef de la crypte.',
@@ -10205,6 +10239,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} crie: "Nul ne troublera le repos du roi! Pour Thornpeak!"',
     malricYell: '{name} crie: "La mort ne prendra jamais mon roi! Le rituel doit durer!"',
     vossYell: '{name} crie: "Vous ne l’atteindrez pas! Le roi doit durer!"',
+    crabsYell: '{name} crie: "A MOI! La perle est a moi, et a moi elle restera!"',
   },
   fr_CA: {
     ritualNeedsKey: 'Le cercle rituel reste muet sans la clef de la crypte.',
@@ -10224,6 +10259,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} crie: "Nul ne troublera le repos du roi! Pour Thornpeak!"',
     malricYell: '{name} crie: "La mort ne prendra jamais mon roi! Le rituel doit durer!"',
     vossYell: '{name} crie: "Vous ne l’atteindrez pas! Le roi doit durer!"',
+    crabsYell: '{name} crie: "A MOI! La perle est a moi, et a moi elle restera!"',
   },
   it_IT: {
     ritualNeedsKey: 'Il cerchio rituale tace senza la Chiave di volta della cripta.',
@@ -10243,6 +10279,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grida: "Nessuno disturberà il riposo del re! Per Thornpeak!"',
     malricYell: '{name} grida: "La morte non reclamerà mai il mio re! Il rituale deve durare!"',
     vossYell: '{name} grida: "Non lo raggiungerai! Il re deve durare!"',
+    crabsYell: '{name} grida: "MIA! La perla e mia, e mia restera!"',
   },
   de_DE: {
     ritualNeedsKey: 'Der Ritualkreis schweigt ohne den Kryptenschlüsselstein.',
@@ -10262,6 +10299,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} ruft: "Niemand stört die Ruhe des Königs! Für Thornpeak!"',
     malricYell: '{name} ruft: "Der Tod soll meinen König nie fordern! Das Ritual muss bestehen!"',
     vossYell: '{name} ruft: "Ihr werdet ihn nicht erreichen! Der König muss bestehen!"',
+    crabsYell: '{name} ruft: "MEINS! Die Perle gehoert mir, und bei mir bleibt sie!"',
   },
   zh_CN: {
     ritualNeedsKey: '没有墓穴钥石，仪式法阵一片沉寂。',
@@ -10281,6 +10319,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}喊道：“谁也不得惊扰国王的安眠！为了 Thornpeak！”',
     malricYell: '{name}喊道：“死亡永远不能带走我的国王！仪式必须延续！”',
     vossYell: '{name}喊道：“你们到不了他身边！国王必须延续！”',
+    crabsYell: '{name}喊道：“我的！珍珠是我的，永远都是我的！”',
   },
   zh_TW: {
     ritualNeedsKey: '沒有墓穴鑰石，儀式法陣一片沉寂。',
@@ -10300,6 +10339,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}喊道：「誰也不得驚擾國王的安眠！為了 Thornpeak！」',
     malricYell: '{name}喊道：「死亡永遠不能帶走我的國王！儀式必須延續！」',
     vossYell: '{name}喊道：「你們到不了他身邊！國王必須延續！」',
+    crabsYell: '{name}喊道：「我的！珍珠是我的，永遠都是我的！」',
   },
   ko_KR: {
     ritualNeedsKey: '무덤 열쇠돌 없이는 의식진이 침묵합니다.',
@@ -10320,6 +10360,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     malricYell:
       '{name}이(가) 외칩니다. "죽음은 결코 내 왕을 데려가지 못한다! 의식은 계속되어야 한다!"',
     vossYell: '{name}이(가) 외칩니다. "너희는 그에게 닿지 못한다! 왕은 이어져야 한다!"',
+    crabsYell: '{name}이(가) 외칩니다. "내 거다! 진주는 내 것, 영원히 내 것이다!"',
   },
   ja_JP: {
     ritualNeedsKey: '墓所の要石がなければ、儀式陣は沈黙したままです。',
@@ -10339,6 +10380,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}が叫ぶ。「王の眠りを乱す者は許さぬ！ Thornpeakのために！」',
     malricYell: '{name}が叫ぶ。「死は我が王を奪えぬ！ 儀式は続かねばならぬ！」',
     vossYell: '{name}が叫ぶ。「お前たちは王に届かぬ！ 王は永らえねばならぬ！」',
+    crabsYell: '{name}が叫ぶ。「わしのだ！真珠はわしのもの、ずっとわしのものじゃ！」',
   },
   pt_BR: {
     ritualNeedsKey: 'O círculo ritual fica em silêncio sem a Pedra-chave da cripta.',
@@ -10358,6 +10400,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "Ninguém perturbará o descanso do rei! Por Thornpeak!"',
     malricYell: '{name} grita: "A morte jamais levará meu rei! O ritual deve perdurar!"',
     vossYell: '{name} grita: "Você não chegará até ele! O rei deve perdurar!"',
+    crabsYell: '{name} grita: "MINHA! A perola e minha, e minha ela fica!"',
   },
   ru_RU: {
     ritualNeedsKey: 'Ритуальный круг молчит без ключ-камня крипты.',
@@ -10378,6 +10421,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     malricYell:
       '{name} кричит: "Смерть никогда не заберет моего короля! Ритуал должен сохраниться!"',
     vossYell: '{name} кричит: "Вы не доберетесь до него! Король должен сохраниться!"',
+    crabsYell: '{name} кричит: "МОЯ! Жемчужина моя, моей и останется!"',
   },
   ...QUEST_NEW,
 };
@@ -11023,6 +11067,10 @@ const RULES: Rule[] = [
   {
     re: /^Deathstalker Voss yells, "You will not reach him! The king must endure!"$/,
     build: () => tQuestExtra('vossYell', { name: locMob('Deathstalker Voss') }),
+  },
+  {
+    re: /^Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"$/,
+    build: () => tQuestExtra('crabsYell', { name: locMob('Mister Crabs') }),
   },
   {
     re: /^You may choose a specialization at level (\d+)\.$/,

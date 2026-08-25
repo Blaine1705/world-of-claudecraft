@@ -13,6 +13,59 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': 'Атака',
+  'hudChrome.bootcamp.keycapThen': 'затем',
+  'hudChrome.bootcamp.promptSummon': 'Призыв',
+  'hudChrome.bootcamp.taskPearlBody':
+    'Иди по золотой тропе к приливной заводи на западном конце берега. Встав у кромки воды, нажми {bagsKey}, чтобы открыть сумки, и щелкни левой кнопкой мыши по Просоленной приманке, чтобы выманить его. Сражайся с ним так же, как с крабами, а когда он падет, нажми {interactKey} на его панцире, чтобы забрать Лучистую жемчужину.',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    'Иди по золотой тропе к приливной заводи на западном конце берега. Встав у кромки воды, открой сумки и коснись Просоленной приманки, чтобы выманить его. Сражайся с ним так же, как с крабами, а когда он падет, коснись его панциря, чтобы забрать Лучистую жемчужину.',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    'Иди по золотой тропе к приливной заводи на западном конце берега. Встав у кромки воды, открой сумки и выбери Просоленную приманку, чтобы выманить его. Сражайся с ним так же, как с крабами, а когда он падет, нажми кнопку взаимодействия у его панциря, чтобы забрать Лучистую жемчужину.',
+  'hudChrome.bootcamp.ringEquipTitle': 'Надень свой трофей',
+  'hudChrome.bootcamp.ringEquipBody':
+    'Мать жемчуга лежит в твоих сумках. Нажми {bagsKey}, чтобы открыть их, затем щелкни по кольцу левой кнопкой мыши, чтобы надеть его на палец.',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    'Мать жемчуга лежит в твоих сумках. Открой их и коснись кольца, чтобы надеть его на палец.',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    'Мать жемчуга лежит в твоих сумках. Открой их и выбери кольцо, чтобы надеть его на палец.',
+  'hudChrome.bootcamp.ringAdmireTitle': 'Только посмотри',
+  'hudChrome.bootcamp.ringAdmireBody':
+    'Оно тебе идет. Нажми {charKey}, чтобы открыть лист персонажа и увидеть кольцо на руке и каждую цифру, которую оно поднимает.',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    'Оно тебе идет. Открой лист персонажа через меню и увидишь кольцо на руке и каждую цифру, которую оно поднимает.',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    'Оно тебе идет. Открой лист персонажа через меню и увидишь кольцо на руке и каждую цифру, которую оно поднимает.',
+  'entities.mobs.mister_crabs.name': 'Господин Краб',
+  'entities.items.ps_briny_lure.name': 'Просоленная приманка',
+  'entities.items.ps_lustrous_pearl.name': 'Лучистая жемчужина',
+  'entities.items.mother_of_pearl.name': 'Мать жемчуга',
+  'entities.quests.q_ps_mother_of_pearl.title': 'Мать жемчуга',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    'Три панциря расколоты, {playerName}, но у линии крушений есть король, и он сидит на сокровище, что дороже всех ящиков этого берега. Отнеси эту Просоленную приманку к приливной заводи на дальнем западном конце берега, за обломками. Встань у кромки воды, нажми B, чтобы открыть сумки, и щелкни по приманке левой кнопкой мыши, чтобы разбудить его. Господин Краб щиплется куда больнее своих мелких сородичей, так что следи за полосой здоровья, не переставай бить и отступай по песку, если нужно перевести дух. Когда он падет, подойди к его панцирю, пока не покажется имя, и нажми F или щелкни левой кнопкой, чтобы забрать Лучистую жемчужину, которую он стережет. Принеси эту жемчужину мне.',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    'Лучистая жемчужина, снятая с самого старого короля отмелей. Мой отец каждое рабочее утро приподнимал шляпу перед этим крабом; уважение положено. Не шевелись... вот так. Нанизана, закреплена, и она твоя, {playerName}: Мать жемчуга. Нажми B, чтобы открыть сумки, и щелкни по кольцу левой кнопкой мыши, чтобы надеть его, а затем нажми C, чтобы открыть лист персонажа и увидеть кольцо на руке. Вещица скромная, но с ней каждая твоя черта станет чуть крепче.',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': 'Господин Краб повержен',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': 'Лучистая жемчужина добыта',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    'Подойди к соломенному чучелу и щелкни по нему левой кнопкой мыши, чтобы взять его в цель: его имя появится вверху экрана. Затем нажми {attackKey} или щелкни по второй кнопке на панели действий, чтобы сотворить заклинание. Твори заклинания, пока одно не развалится.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    'Подойди к соломенному чучелу и коснись его, чтобы взять его в цель. Затем коснись второй кнопки на панели действий, чтобы сотворить заклинание. Твори заклинания, пока одно не развалится.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    'Подойди к соломенному чучелу и нажми кнопку выбора цели, чтобы взять его в цель. Затем нажми вторую кнопку действия, чтобы сотворить заклинание. Твори заклинания, пока одно не развалится.',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    'Крабы щиплются в ответ. Возьми одного в цель щелчком левой кнопки мыши, затем нажми {abilityKey} и примени способность {ability}, продолжая бить с расстояния. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    'Крабы щиплются в ответ. Коснись одного, чтобы взять его в цель, затем коснись способности {ability} на панели действий и бей с расстояния. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    'Крабы щиплются в ответ. Возьми одного в цель, затем нажми кнопку действия со способностью {ability} и бей с расстояния. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.voiceGraduate': 'Колокол звонил по тебе. За водой ждет Истврук, и ты к нему готов.',
+  'hudChrome.bootcamp.voiceVeerOff': 'Постой, дружок, не туда. Золотая тропа осталась позади.',
+  'hudChrome.bootcamp.voiceStationDoneB': 'Дело у тебя спорится, точно говорю.',
+  'hudChrome.bootcamp.voiceStationDoneA': 'Славная работа. Дальше, тропа для тебя уже светится.',
+  'hudChrome.bootcamp.voiceRunDone': 'Чистый забег, ничего не скажешь. Награда у надзирателя Пелла, ступай за ней.',
+  'hudChrome.bootcamp.voiceFirstFlag': 'Один флаг пройден. Не сбавляй шагу, осталось всего два.',
+  'hudChrome.bootcamp.voiceArrival': 'Вот ты и на берегу, дружок. Видишь золотую тропу под ногами? Она знает дорогу лучше меня. Иди по ней.',
   'hudChrome.lastkeepMap.title': '{keep}: {story}',
   'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.classPage.formName.form_cat': 'Облик волка',
@@ -65,6 +118,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': 'AFK',
   'hudChrome.nameplate.cheaterTag': '< Читер >',
+  'hudChrome.nameplate.pledgeTag': 'Присяга: {guild}',
+  'hudChrome.pledge.open': 'Принимает присяги',
+  'hudChrome.pledge.closed': 'Не принимает присяги',
+  'hudChrome.pledge.minLevel': 'Уровень {level}+',
+  'hudChrome.pledge.action': 'Присягнуть',
+  'hudChrome.pledge.actionTitle': 'Присягнуть гильдии {guild}',
+  'hudChrome.pledge.pledged': 'Присяга принесена',
+  'hudChrome.pledge.yourGuild': 'Ваша гильдия',
+  'hudChrome.pledge.tab': 'Присяги',
+  'hudChrome.pledge.tabWithCount': 'Присяги ({count})',
+  'hudChrome.pledge.empty': 'Пока никто не присягнул вашей гильдии.',
+  'hudChrome.pledge.accept': 'Принять',
+  'hudChrome.pledge.acceptTitle': 'Принять присягу {name}',
+  'hudChrome.pledge.reject': 'Отклонить',
+  'hudChrome.pledge.rejectTitle': 'Отклонить присягу {name}',
+  'hudChrome.pledge.settings': 'Набор',
+  'hudChrome.pledge.acceptingLabel': 'Принимать присяги',
+  'hudChrome.pledge.minLevelLabel': 'Минимальный уровень',
+  'hudChrome.pledge.noteLabel': 'Заметка на доске',
+  'hudChrome.pledge.notePlaceholder': 'Расскажите соискателям, кого ищет ваша гильдия',
+  'hudChrome.pledge.save': 'Сохранить',
+  'hudChrome.pledge.yourPledge': 'Ваша присяга: {guild}',
+  'hudChrome.pledge.since': 'Присяга от {date}',
+  'hudChrome.pledge.withdraw': 'Отозвать присягу',
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
@@ -524,8 +601,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro':
     'Создайте новую учётную запись или привяжите Apple к существующей.',
   'hudChrome.auth.appleChoiceExpired': 'Вход через Apple истёк. Войдите через Apple ещё раз.',
-  'hudChrome.vcup.guildBoardWl': '{wins} побед, {losses} поражений',
-  'hudChrome.vcup.shootPower': 'СИЛА',
   'hudChrome.discord.roleTag.coredevs': 'Ведущий разработчик',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'ivan@example.com',
@@ -4599,6 +4674,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': 'Расколотые Утёсы',
   'entities.zones.farshore_isle.pois.4.label': 'Поля Разломов',
   'entities.zones.eastbrook_vale.pois.11.label': 'Коса Дальнего Берега',
+  'entities.zones.eastbrook_vale.pois.12.label': 'Истврукские причалы',
   'entities.mobs.moor_ram.name': 'Вересковый баран',
   'entities.mobs.gale_wisp.name': 'Штормовой дух',
   'entities.mobs.shoal_scuttler.name': 'Отмельный краб',
@@ -5873,6 +5949,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.many': 'Список игроков: на {realm} в сети {count} игроков.',
   'hudChrome.plurals.playersOnline.other': 'Список игроков: на {realm} в сети {count} игрока.',
   'hudChrome.controller.title': 'Геймпад',
+  'hudChrome.controller.glyphStyle': 'Обозначения кнопок',
+  'hudChrome.controller.glyphStyleAuto': 'Авто',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': 'Плейстейшен',
+  'hudChrome.controller.glyphStyleNintendo': 'Нинтендо',
   'hudChrome.controller.enable': 'Включить геймпад',
   'hudChrome.controller.invertY': 'Инверсия камеры (Y)',
   'hudChrome.controller.deadzone': 'Мёртвая зона стика',
@@ -6335,7 +6416,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.reliquary': 'Реликварий',
   'guide.controls.sheathe': 'Убрать/обнажить оружие',
   'guide.controls.crafting': 'Крафт',
-  'guide.controls.valeCup': 'Кубок Долины',
   'guide.controls.mount': 'Сесть / Спешиться',
   'guide.controls.calendar': 'Календарь событий',
   'guide.controls.dungeonFinder': 'Поиск подземелий',
@@ -8606,7 +8686,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_arcane.name': 'Архонт Никсарис',
   'entities.mobs.rift_boss_storm.name': 'Буревой Вхарок',
   'entities.mobs.rift_boss_tide.name': 'Бездонная Пасть',
-  'entities.mobs.vale_cup_ball.name': 'Кабаний мяч',
   'entities.npcs.brother_halven_marsh.name': 'Брат Хальвен',
   'entities.npcs.brother_halven_marsh.title': 'Хранитель Реликвария',
   'entities.npcs.brother_halven_marsh.greeting':
@@ -8644,6 +8723,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': 'Запрос слишком большой. Повторите попытку с меньшим объёмом данных.',
   'apiError.body.unsupported_media_type': 'Неподдерживаемый формат запроса.',
   'apiError.deeds.invalid_input': 'Недопустимые данные.',
+  'apiError.guilds.invalid_roster_name': 'Недопустимое название гильдии.',
+  'apiError.guilds.unknown': 'Гильдии с таким названием нет.',
   'apiError.ota_updates.invalid_input': 'Недопустимые данные.',
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
@@ -8735,6 +8816,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': 'Недостаточно очков.',
   'hudChrome.mailbox.title': 'Почтовый ящик',
   'hudChrome.noticeboard.empty': 'Похоже, здесь ничего не опубликовано.',
+  'hudChrome.noticeboard.subtitle': 'Гильдии мира',
+  'hudChrome.noticeboard.rosterTitle': 'Просмотреть состав гильдии {guild}',
+  'hudChrome.noticeboard.back': 'Назад',
+  'hudChrome.noticeboard.popupTitle': 'Гильдейский столб',
+  'hudChrome.noticeboard.close': 'Закрыть',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',
   'hudChrome.mailbox.close': 'Закрыть почтовый ящик',
   'hudChrome.mailbox.tabInbox': 'Входящие',
@@ -9452,7 +9538,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.questStripAriaSingle': 'Отслеживаемое задание: {title}',
   'hudChrome.mobile.questStripMore': 'ещё {count}',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
-  'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.keybinds.categoryPet': 'Питомец',
   'hudChrome.keybinds.petAttack': 'Питомец: атака',
   'hudChrome.keybinds.petStop': 'Питомец: стоп',
@@ -9460,187 +9545,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': 'Питомец: провокация',
   'hudChrome.keybinds.petDefensive': 'Питомец: защита',
   'hudChrome.keybinds.petAggressive': 'Питомец: агрессия',
-  'hudChrome.vcup.title': 'Кубок Долины',
-  'hudChrome.vcup.close': 'Закрыть окно Кубка Долины',
-  'hudChrome.vcup.offlineNote': 'Книга матчей закрыта. Кубок Долины сейчас недоступен.',
-  'hudChrome.vcup.recordLine': 'Ваш счёт: побед {wins}, поражений {losses}, ничьих {draws}.',
-  'hudChrome.vcup.bracketsAria': 'Формат матча',
-  'hudChrome.vcup.bracketLabel': '{n} на {n}',
-  'hudChrome.vcup.waitingCount': 'в очереди: {count}',
-  'hudChrome.vcup.nationsHeading': 'Знамённая нация',
-  'hudChrome.vcup.nation.vale': 'Истврукская долина',
-  'hudChrome.vcup.nation.mirefen': 'Мирефен',
-  'hudChrome.vcup.nation.thornpeak': 'Терновый пик',
-  'hudChrome.vcup.nation.coliseum': 'Пепельный Колизей',
-  'hudChrome.vcup.nation.choir': 'Бледный хор',
-  'hudChrome.vcup.nation.ogre': 'Кланы огров',
-  'hudChrome.vcup.nation.moon': 'Бледная луна',
-  'hudChrome.vcup.nation.copperdig': 'Медный рудник',
-  'hudChrome.vcup.awayNote':
-    'Если обе стороны подняли одно знамя, гости играют в инвертированных цветах.',
-  'hudChrome.vcup.rolesHeading': 'Игровая роль',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    'В категориях 1 на 1 и 2 на 2 каждый игрок выходит как Универсал. Деяния, требующие категории 3 на 3 или больше, здесь получить нельзя.',
-  'hudChrome.vcup.role.allrounder.name': 'Универсал',
-  'hudChrome.vcup.role.allrounder.desc':
-    'Всего понемногу: удар, дальний удар и честный толчок плечом.',
-  'hudChrome.vcup.role.striker.name': 'Нападающий',
-  'hudChrome.vcup.role.striker.desc': 'Живёт дальним ударом и резким финтом.',
-  'hudChrome.vcup.role.sweeper.name': 'Чистильщик',
-  'hudChrome.vcup.role.sweeper.desc': 'Сбивает бегущих с мяча и выносит его подальше.',
-  'hudChrome.vcup.role.keeper.name': 'Вратарь',
-  'hudChrome.vcup.role.keeper.desc': 'Держит ворота хватом, броском и длинным выбросом.',
-  'hudChrome.vcup.queue': 'Встать в очередь',
-  'hudChrome.vcup.leaveQueue': 'Покинуть очередь',
-  'hudChrome.vcup.queueNote':
-    'Вставайте в очередь откуда угодно; свисток позовёт вас на Свиное поле.',
-  'hudChrome.vcup.queuedStatus': 'В очереди на {bracket}: место {position} из {count}.',
-  'hudChrome.vcup.blockNation': 'Сначала выбери знамённую нацию.',
-  'hudChrome.vcup.blockPartySize': 'Для этой категории нужна группа поменьше.',
-  'hudChrome.vcup.blockNotLeader': 'Поставить команду в очередь может только лидер группы.',
-  'hudChrome.vcup.inMatchNote': 'Ваша команда на поле. Играйте!',
-  'hudChrome.vcup.deserterNote':
-    'Смотритель поля помнит. Снова встать в очередь можно через {seconds} сек.',
-  'hudChrome.vcup.liveHeading': 'Сейчас на Свином поле',
-  'hudChrome.vcup.liveAria': 'Кубок Долины: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.walkUp': 'Подойдите к Свиному полю и смотрите с трибун.',
-  'hudChrome.vcup.noLive': 'На поле тихо. Матч не идёт.',
-  'hudChrome.vcup.boardHeading': 'Доска победителей',
-  'hudChrome.vcup.boardEmpty': 'Победителей пока нет. Медное ведро ждёт.',
-  'hudChrome.vcup.enterAsGuild': 'Выступить под знаменем гильдии {guild}',
-  'hudChrome.vcup.guildRecordLine': 'Счёт вашей гильдии: {wins} побед, {losses} поражений.',
-  'hudChrome.vcup.guildBoardHeading': 'Знамёна гильдий',
-  'hudChrome.vcup.guildBoardEmpty': 'Пока ни одна гильдия не вышла на поле. Поднимите своё знамя!',
-  'hudChrome.vcup.practicingNow': 'Сейчас тренируются ({count}):',
-  'hudChrome.vcup.boardWins': 'побед: {count}',
-  'hudChrome.vcup.practice': 'Тренировка с ботами',
-  'hudChrome.vcup.practiceNote': 'Немедленно начинает полный матч с ботами на Свином поле.',
-  'hudChrome.vcup.practiceUnratedNote':
-    'Тренировочные матчи не рейтинговые: счёт и прогресс Книги деяний не засчитываются.',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.indicatorQueued': 'Очередь Кубка Долины: {bracket}, место {position} из {count}',
-  'hudChrome.vcup.indicatorLive': 'Кубок Долины',
-  'hudChrome.vcup.indicatorOpen': 'Открыть окно Кубка Долины',
-  'hudChrome.vcup.phaseCountdown': 'До начала {seconds}',
-  'hudChrome.vcup.phaseGoal': 'ГОЛ!',
-  'hudChrome.vcup.phaseGolden': 'ЗОЛОТОЙ ГОЛ',
-  'hudChrome.vcup.phaseOver': 'ФИНАЛЬНЫЙ СВИСТОК',
-  'hudChrome.vcup.bannerFound': 'Кубок Долины зовёт: {nationA} против {nationB}!',
-  'hudChrome.vcup.bannerCountdown': 'До начала {seconds} сек...',
-  'hudChrome.vcup.bannerKickoff': 'НАЧАЛО МАТЧА!',
-  'hudChrome.vcup.bannerGoal': 'ГОЛ! Забивает {nation}!',
-  'hudChrome.vcup.bannerSave': '{name} СПАСАЕТ!',
-  'hudChrome.vcup.bannerGolden': 'ЗОЛОТОЙ ГОЛ: следующий гол решает всё!',
-  'hudChrome.vcup.bannerEnd': 'Финальный свисток: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerWin': 'Победа на Свином поле!',
-  'hudChrome.vcup.bannerDraw': 'Ничья на Свином поле.',
-  'hudChrome.vcup.bannerLoss': 'Поражение на Свином поле.',
-  'hudChrome.vcup.logQueued': 'Вы встали в очередь Кубка Долины на {bracket} (место {position}).',
-  'hudChrome.vcup.logUnqueued': 'Вы покинули очередь Кубка Долины.',
-  'hudChrome.vcup.logFound': 'Ваш матч Кубка Долины готов: {nationA} против {nationB}.',
-  'hudChrome.vcup.logRoster': 'Ваша сторона: {allies}. Их сторона: {enemies}.',
-  'hudChrome.vcup.logGoal': '{name} забивает за {nation}! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logSave': '{name} делает сейв!',
-  'hudChrome.vcup.logWin': 'Вы выиграли встречу на Свином поле.',
-  'hudChrome.vcup.logDraw': 'Встреча на Свином поле закончилась вничью.',
-  'hudChrome.vcup.logLoss': 'Вы проиграли встречу на Свином поле.',
-  'hudChrome.vcup.gossipOpen': 'Книга матчей',
-  'hudChrome.vcup.gossipOpenAria': 'Открыть окно Кубка Долины',
-  'hudChrome.vcup.mobileLabel': 'Кубок',
-  'hudChrome.vcup.briefing.subtitle': 'Предматчевый инструктаж',
-  'hudChrome.vcup.briefing.vs': 'против',
-  'hudChrome.vcup.briefing.rulesHeading': 'Как играть',
-  'hudChrome.vcup.briefing.rule1': 'Забейте, пробив или отдав пас в ворота соперника.',
-  'hudChrome.vcup.briefing.rule2': 'Побеждает первый до 5 голов или лучший по голам к финалу.',
-  'hudChrome.vcup.briefing.rule3': 'Ничья к финалу ведёт к золотому голу: следующий гол решает.',
-  'hudChrome.vcup.briefing.rule4':
-    'Подкаты лишь сбивают с ног. Под перемирием жатвы никто не страдает.',
-  'hudChrome.vcup.briefing.rule5': 'Любой может подойти и поболеть за вас с трибун.',
-  'hudChrome.vcup.briefing.kitHeading': 'Ваш набор',
-  'hudChrome.vcup.briefing.kitNote': 'На время матча эти приёмы заменяют способности класса.',
-  'hudChrome.vcup.briefing.unratedNote':
-    'На поле есть боты, поэтому этот матч не рейтинговый: результаты не меняются, а деяния за голы, сейвы и сухие матчи не засчитываются.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    'Это тренировочный матч, поэтому он не рейтинговый: результаты не меняются, а прогресс Книги деяний не засчитывается.',
-  'hudChrome.vcup.briefing.rosterHeading': 'Список состава',
-  'hudChrome.vcup.briefing.you': 'Вы',
-  'hudChrome.vcup.briefing.bot': 'Бот',
-  'hudChrome.vcup.briefing.ready': 'Я готов',
-  'hudChrome.vcup.briefing.readyDone': 'Готов',
-  'hudChrome.vcup.briefing.readyAria': 'Приготовиться к вбрасыванию',
-  'hudChrome.vcup.briefing.waiting': 'Ожидание готовности другой стороны...',
-  'hudChrome.vcup.briefing.whistle': 'Свисток прозвучит через {seconds} с.',
-  'hudChrome.vcup.briefing.readyCount': 'Готовы: {ready} из {total}',
-  'hudChrome.vcup.bet.title': 'Ставки на матч',
-  'hudChrome.vcup.bet.aria': 'Ставки на матч Кубка Долины',
-  'hudChrome.vcup.bet.closesIn': 'Приём ставок закроется через {seconds} с',
-  'hudChrome.vcup.bet.closed': 'Приём ставок закрыт',
-  'hudChrome.vcup.bet.prize': 'Банк {amount}',
-  'hudChrome.vcup.bet.splitAria': 'Доля банка на каждую команду',
-  'hudChrome.vcup.bet.expand': 'Ставки и сделать ставку',
-  'hudChrome.vcup.bet.collapse': 'Скрыть ставки',
-  'hudChrome.vcup.bet.oddsLabel': 'Выплата',
-  'hudChrome.vcup.bet.back': 'Ставка на {team}',
-  'hudChrome.vcup.bet.form': 'В{wins}-П{losses}',
-  'hudChrome.vcup.bet.mine': 'Ваша ставка: {amount} на {team}',
-  'hudChrome.vcup.bet.none': 'Вы ещё не сделали ставку на этот матч.',
-  'hudChrome.vcup.bet.record': 'История ставок: {wins}-{losses}, {sign}{net}',
-  'hudChrome.vcup.bet.wonBanner': 'Ваша ставка сыграла!',
-  'hudChrome.vcup.bet.wonLog': 'Ставка на Кубок Долины сыграла: возвращено {amount}.',
-  'hudChrome.vcup.bet.lostLog': 'Ставка на Кубок Долины проиграна: {amount}.',
-  'hudChrome.vcup.bet.refundLog': 'Ставки аннулированы, ваша ставка {amount} возвращена.',
-  'guide.nav.valeCup': 'Кубок Долины',
-  'guide.valeCupPage.heading': 'Кубок Долины',
-  'guide.valeCupPage.intro':
-    'Кабанбол на Свином поле: выбери знамя, выбери роль и загони набитую соломой кабанью шкуру мимо вратаря ради Медного ведра. Ни крови, ни добычи, только рёв трибун.',
-  'guide.valeCupPage.loreHeading': 'Кабанбол и жатвенное перемирие',
-  'guide.valeCupPage.loreOldSow':
-    'Задолго до того, как проснулись мёртвые, батраки Иструка играли в кабанбол на стерне после жатвы: две ватаги, одна кабанья шкура, набитая соломой, и двое ворот от повозок, притащенных на края луга. Первый мяч, Старая Свинья, покрыт бронзой и висит над очагом таверны.',
-  'guide.valeCupPage.loreTruce':
-    'Когда Пепельный Колизей начал устраивать военные игрища, маршал Редбрук ответил чем-то более мягким: объявил на старом лугу постоянное жатвенное перемирие. Ворота повозок стали штангами, луг получил стены, трибуны и имя, Свиное поле, а призом всегда было одно и то же мятое молочное ведро, из которого пили победители: Медное ведро.',
-  'guide.valeCupPage.howHeading': 'Как играть',
-  'guide.valeCupPage.howQueue':
-    'Вставайте в очередь откуда угодно через окно Кубка Долины или поговорите со смотрителем поля Брамом у ворот Свиного поля. Выберите формат от один на один до пять на пять, знамённую нацию и роль; идите в одиночку или с группой.',
-  'guide.valeCupPage.howMatch':
-    'С началом матча ваш классовый набор заменяется спортивным и после точно восстанавливается. Удары целятся наземным прицелом, мяч отскакивает от бортов, а вести мяч значит просто бежать вместе с ним. Забейте больше соперника до финального свистка; ничья ведёт к золотому голу.',
-  'guide.valeCupPage.howTruce':
-    'На Свином поле никто не проливает кровь: подкаты лишь опрокидывают, ничто не ранит, а питомцы пережидают матч в стороне.',
-  'guide.valeCupPage.spectateBody':
-    'На стадионе идёт только один матч за раз, и любой может подойти и смотреть с трибун.',
-  'guide.valeCupPage.nationsHeading': 'Восемь знамённых наций',
-  'guide.valeCupPage.nationsBody':
-    'Каждая команда играет под знаменем. Капитан выбирает нацию, а если обе стороны подняли одно знамя, гости играют в инвертированных цветах.',
-  'guide.valeCupPage.nationVale':
-    'Зелёный и золотой, сноп пшеницы на знамени: хозяева поля, батраки до мозга костей.',
-  'guide.valeCupPage.nationMirefen':
-    'Бирюзовый и серый под цаплей: терпеливы, длинноноги, никогда не спешат.',
-  'guide.valeCupPage.nationThornpeak':
-    'Ледяная синь и белый под горной вершиной: твёрдый шаг и упрямый нрав.',
-  'guide.valeCupPage.nationColiseum':
-    'Красный и чёрный со скрещёнными мечами: играют так, будто это всё ещё война.',
-  'guide.valeCupPage.nationChoir':
-    'Бледно-голубой и серебро под колоколом: жуткие, точные и очень тихие.',
-  'guide.valeCupPage.nationOgre': 'Оранжевый и умбра за кулаком: плечом вперёд, и этим гордятся.',
-  'guide.valeCupPage.nationMoon':
-    'Фиолетовый и серебро под полумесяцем: ночные игроки, лёгкие на ногу.',
-  'guide.valeCupPage.nationCopperdig':
-    'Медь и бурый с киркой: рудокопы, которые не перестают бегать.',
-  'guide.valeCupPage.rolesHeading': 'Игровые роли',
-  'guide.valeCupPage.rolesBody':
-    'Роль определяет набор, который вы выносите на поле. Бить по мячу умеют все; остальное дело характера. В категориях один на один и два на два все играют набором универсала, так что выбор роли раскрывается начиная с трёх на трёх.',
-  'guide.valeCupPage.rewardsHeading': 'Правила перемирия',
-  'guide.valeCupPage.rewardsBody':
-    'Правила перемирия означают: ни опыта, ни добычи. Результативный матч идёт в ваш счёт и на доску победителей, а победа также засчитывается в дневные задачи наград. Дезертирство оставляет ваше место пустым, и смотритель поля это помнит.',
-  'guide.valeCupPage.bettingHeading': 'Ставка у бортика',
-  'guide.valeCupPage.bettingBody':
-    'Зрители на Свином поле могут поддержать одну из сторон, пока матч собирается: ставки складываются в общий банк, и с финальным свистком победители делят банк проигравших соразмерно поставленному. Ничья или сенсация, на которую никто не ставил, возвращает каждую монету. Игроки, заявленные на матч, ставить на него не могут, а у бортика хранится ваш итоговый счёт побед, поражений и чистых монет.',
-  'guide.valeCupPage.practiceHeading': 'Тренировочные встречи и пустующее поле',
-  'guide.valeCupPage.practiceBody':
-    'Окно Кубка Долины предлагает и тренировку: личную копию поля, где обе стороны заполняют боты и ничто не идёт в ваш счёт. Не хватает игрока-другого для настоящего матча? После недолгого ожидания боты дополнят команды, а любой матч с ботами на поле, это товарищеская встреча, никогда не рейтинговая. А когда Свиное поле пустует, боты устраивают показательный матч, который можно смотреть с трибун и ставить на него; в тот же миг, как настоящие игроки готовы, показательный матч уступает поле, и каждая ставка возвращается.',
-  'entities.npcs.groundskeeper_bram.name': 'Смотритель поля Брам',
-  'entities.npcs.groundskeeper_bram.title': 'Хранитель Свиного поля',
-  'entities.npcs.groundskeeper_bram.greeting':
-    'На Свином поле действует перемирие, {className}: только ноги и плечи. Сыграем за Медное ведро?',
   'entities.npcs.chronicler_saul.name': 'Летописец Саул',
   'entities.npcs.chronicler_saul.title': 'Летопись Истврукской долины',
   'entities.npcs.chronicler_saul.greeting':
@@ -13627,6 +13531,277 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': 'недоступно',
   'hudChrome.perf.diagnostics.report.status.critical': 'критично',
   'hudChrome.perf.diagnostics.report.status.needsAttention': 'требует внимания',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    'Раньше я тебя здесь не видела, друг. В этих краях есть традиция: те, кто начинает свой путь, посещают Берег Испытаний, тихий остров за проливом. Там можно отточить навыки и освоиться в мире, прежде чем принимать его вызовы. Паром ходит в обе стороны, и никто не подумает о тебе хуже, как бы ты ни решил.',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    'Снова здесь, и с новым лицом? Значит, порядок ты знаешь. Но если перед дорогой хочется освежить память, Берег Испытаний никогда не отказывает вернувшимся ученикам, а паром готов, когда готов ты.',
+  'hudChrome.tutorialGreeting.play': 'Пройти обучение',
+  'hudChrome.tutorialGreeting.declineNote':
+    'Как пожелаешь, друг. Передумаешь - паромный колокол у почтового столба Вранопочты в любой час, днем и ночью, перезвонит тебя на Берег Испытаний. Волки ждать не станут, а он подождет.',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    'Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    'Только с переправы? Добро пожаловать на Берег Испытаний. Страж Там держит Полосу на берегу прямо перед тобой: подойди к нему вплотную, пока не покажется его имя, затем нажми F или щелкни по нему левой кнопкой мыши, и его дорожки научат твои ноги всему, что им нужно. А когда соберешься уходить, позвони в колокол, что стоит рядом с моим причалом, и переправа отвезет тебя домой, в Истврук.',
+  'hudChrome.tutorialGreeting.noteClose': 'Понятно',
+  'hudChrome.tutorialGreeting.skip': 'Пропустить обучение',
+  'hudChrome.bootcamp.title': 'Первые шаги',
+  'hudChrome.bootcamp.talkTitle': 'Поговори со Стражем Тамом',
+  'hudChrome.bootcamp.talkBody':
+    'Страж Там стоит у ворот Полосы прямо впереди. Подойди к нему вплотную, пока не покажется его имя, затем нажми {interactKey} или щелкни по нему левой кнопкой мыши, чтобы заговорить: он задаст тебе забег.',
+  'hudChrome.bootcamp.talkBodyTouch':
+    'Страж Там стоит у ворот Полосы прямо впереди. Подойди к нему вплотную, пока не покажется его имя, затем коснись его или коснись кнопки использования, чтобы заговорить: он задаст тебе забег.',
+  'hudChrome.bootcamp.talkBodyPad':
+    'Страж Там стоит у ворот Полосы прямо впереди. Подойди к нему вплотную, пока не покажется его имя, затем нажми кнопку взаимодействия, чтобы заговорить: он задаст тебе забег.',
+  'hudChrome.bootcamp.forwardTitle': 'Пройди первую дорожку',
+  'hudChrome.bootcamp.forwardBody':
+    'Шагни на дорожку рядом с Тамом и, удерживая {forwardKey}, пройди ее на запад до флага.',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    'Шагни на дорожку рядом с Тамом и, толкая стик движения вверх, пройди ее на запад до флага.',
+  'hudChrome.bootcamp.forwardBodyPad':
+    'Шагни на дорожку рядом с Тамом и, толкая левый стик вверх, пройди ее на запад до флага.',
+  'hudChrome.bootcamp.turnwalkTitle': 'Повернись и иди',
+  'hudChrome.bootcamp.turnwalkBody':
+    'Первый флаг взят. Удерживай {turnKey}, чтобы развернуться на месте, пока не встанешь лицом к огороженной дорожке, уходящей на юг, затем снова удерживай {forwardKey} и пройди ее до второго флага.',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    'Первый флаг взят. Проведи пальцем по миру (не по стику движения), чтобы повернуться, пока не встанешь лицом к огороженной дорожке, уходящей на юг, затем толкни стик вверх и пройди ее до второго флага.',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    'Первый флаг взят. Наклони правый стик, чтобы повернуться, пока не встанешь лицом к огороженной дорожке, уходящей на юг, затем толкни левый стик вверх и пройди ее до второго флага.',
+  'hudChrome.bootcamp.strafeTitle':
+    'Развернись и иди',
+  'hudChrome.bootcamp.strafeBody':
+    'Остался один поворот. Удерживай {turnLeftKey}, чтобы развернуться на месте, пока не встанешь лицом к последней дорожке, затем снова удерживай {forwardKey} и иди, пока красный флаг не останется у тебя за спиной.',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    'Остался один поворот. Проведи пальцем по миру (не по стику движения), чтобы развернуться лицом к последней дорожке, затем толкни стик вверх и иди, пока красный флаг не останется у тебя за спиной.',
+  'hudChrome.bootcamp.strafeBodyPad':
+    'Остался один поворот. Толкни правый стик, чтобы развернуться лицом к последней дорожке, затем толкни левый стик вверх и иди, пока красный флаг не останется у тебя за спиной.',
+  'hudChrome.bootcamp.cameraTitle': 'Поверни обзор',
+  'hudChrome.bootcamp.cameraBody':
+    'Последний урок перед тем, как сдать забег: зажми правую кнопку мыши и поводи ею, чтобы обвести обзор полным кругом вокруг себя. Кто знает, что стоит у него за спиной, тот выигрывает бой.',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    'Последний урок перед тем, как сдать забег: проведи пальцем по миру, чтобы обвести обзор полным кругом вокруг себя. Кто знает, что стоит у него за спиной, тот выигрывает бой.',
+  'hudChrome.bootcamp.cameraBodyPad':
+    'Последний урок перед тем, как сдать забег: наклони правый стик, чтобы обвести обзор полным кругом вокруг себя. Кто знает, что стоит у него за спиной, тот выигрывает бой.',
+  'hudChrome.bootcamp.courseProgress': 'Флаг {current} из {total}',
+  'hudChrome.bootcamp.doneTitle': 'Полоса пройдена',
+  'hudChrome.bootcamp.doneBody':
+    'Это все, что нужно знать твоим ногам. Надзиратель Пелл стоит рядом с красным флагом: нажми {interactKey} на нем или щелкни по нему левой кнопкой мыши, чтобы сдать забег и забрать первую награду.',
+  'hudChrome.bootcamp.doneBodyTouch':
+    'Это все, что нужно знать твоим ногам. Надзиратель Пелл стоит рядом с красным флагом: коснись его, чтобы сдать забег и забрать первую награду.',
+  'hudChrome.bootcamp.doneBodyPad':
+    'Это все, что нужно знать твоим ногам. Надзиратель Пелл стоит рядом с красным флагом: нажми на нем кнопку взаимодействия, чтобы сдать забег и забрать первую награду.',
+  'hudChrome.bootcamp.coachNextTitle': 'Дальше: {npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    'Следуй по золотой тропе к персонажу {npc}. Подойди вплотную, пока не покажется имя, затем нажми {interactKey} или щелкни левой кнопкой мыши, чтобы взять следующее поручение.',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    'Следуй по золотой тропе к персонажу {npc}. Подойди вплотную, пока не покажется имя, затем коснись его или коснись кнопки использования, чтобы взять следующее поручение.',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    'Следуй по золотой тропе к персонажу {npc}. Подойди вплотную, пока не покажется имя, затем нажми кнопку взаимодействия, чтобы взять следующее поручение.',
+  'hudChrome.bootcamp.coachTaskBody':
+    'Следуй по золотой тропе к своему заданию. Трекер справа ведет счет, а {mapKey} открывает карту, если собьешься с пути.',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    'Следуй по золотой тропе к своему заданию. Трекер справа ведет счет, а кнопка карты покажет дорогу, если собьешься с пути.',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    'Следуй по золотой тропе к своему заданию. Трекер справа ведет счет, а кнопка карты покажет дорогу, если собьешься с пути.',
+  'hudChrome.bootcamp.coachReadyTitle': 'Поручение выполнено',
+  'hudChrome.bootcamp.coachReadyBody':
+    'Подойди к персонажу {npc} и нажми {interactKey} или щелкни левой кнопкой мыши, чтобы сдать поручение и забрать награду.',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    'Подойди к персонажу {npc} и коснись его, чтобы сдать поручение и забрать награду.',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    'Подойди к персонажу {npc} и нажми кнопку взаимодействия, чтобы сдать поручение и забрать награду.',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    'Подойди к соломенному чучелу и щелкни по нему левой кнопкой мыши, чтобы взять его в цель: его имя появится вверху экрана. Затем нажми {attackKey} или щелкни по первой кнопке на панели действий, чтобы ударить. Бей, пока одно не развалится.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    'Подойди к соломенному чучелу и коснись его, чтобы взять его в цель. Затем коснись первой кнопки на панели действий, чтобы ударить. Бей, пока одно не развалится.',
+  'hudChrome.bootcamp.promptTurnIn':
+    'Сдать задание',
+  'hudChrome.bootcamp.promptSelect':
+    'Выбрать',
+  'hudChrome.bootcamp.promptUseAbility':
+    'Применить способность',
+  'hudChrome.bootcamp.taskHoneBody':
+    'Щелкни по чучелу левой кнопкой мыши, чтобы взять его в цель, затем нажми {abilityKey} и примени способность {ability}. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    'Коснись чучела, чтобы взять его в цель, затем коснись способности {ability} на панели действий. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    'Возьми чучело в цель, затем нажми кнопку действия со способностью {ability}. Это твое собственное умение, а не простой удар. Попади трижды.',
+  'hudChrome.bootcamp.promptOpenBags': 'Открой сумки',
+  'hudChrome.bootcamp.promptCharacterSheet': 'Открой лист персонажа',
+  'hudChrome.bootcamp.promptLookAround': 'Зажми правую кнопку мыши и веди, чтобы осмотреться',
+  'hudChrome.bootcamp.promptKneel':
+    'Преклонить колени',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    'Нажми {bagsKey}, чтобы открыть сумки, и щелкни по Камню Ухода. Он уложит тебя там, где ты стоишь. Здесь тебя ничто не тронет, и это ничего тебе не будет стоить.',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    'Иди на юг по береговой дороге до Камня Ухода и коснись его, чтобы преклонить колени. Здесь тебя ничто не тронет, и это ничего тебе не будет стоить.',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    'Иди на юг по береговой дороге до Камня Ухода и нажми кнопку взаимодействия, чтобы преклонить колени. Здесь тебя ничто не тронет, и это ничего тебе не будет стоить.',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    'Ты погиб. Ничего не потеряно. Нажми «Освободить дух», и ты поднимешься призраком на кладбище за лагерем.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    'Ты погиб. Ничего не потеряно. Коснись «Освободить дух», и ты поднимешься призраком на кладбище за лагерем.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    'Ты погиб. Ничего не потеряно. Выбери «Освободить дух», и ты поднимешься призраком на кладбище за лагерем.',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    'Теперь ты дух, и тебя никто не тронет. Твое тело отмечено на карте: дойди до него, и когда окажешься рядом, появится кнопка «Воскреснуть у тела». Нажми ее, и ты снова цел, совершенно без потерь.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    'Теперь ты дух, и тебя никто не тронет. Твое тело отмечено на карте: дойди до него, и когда окажешься рядом, появится кнопка «Воскреснуть у тела». Коснись ее, и ты снова цел, совершенно без потерь.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    'Теперь ты дух, и тебя никто не тронет. Твое тело отмечено на карте: дойди до него, и когда окажешься рядом, появится кнопка «Воскреснуть у тела». Выбери ее, и ты снова цел, совершенно без потерь.',
+  'hudChrome.bootcamp.promptLootPearl':
+    'Забрать жемчужину',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    'Подойди к соломенному чучелу и нажми кнопку выбора цели, чтобы взять его в цель. Затем нажми первую кнопку действия, чтобы ударить. Бей, пока одно не развалится.',
+  'hudChrome.bootcamp.taskShellBody':
+    'Крабы щиплются в ответ. Возьми одного в цель щелчком левой кнопки мыши, затем нажми {abilityKey} и примени способность {ability}, и не останавливайся. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    'Крабы щиплются в ответ. Коснись одного, чтобы взять его в цель, затем коснись способности {ability} на панели действий. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    'Крабы щиплются в ответ. Возьми одного в цель, затем нажми кнопку действия со способностью {ability}. Если на тебя набросится слишком много разом, отступи назад по тропе: они быстро бросают погоню, а здоровье восстанавливается, пока ты отдыхаешь.',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    'Выброшенные морем ящики выстроились вдоль тропы к лагерю Рассветный Привал. Подойди к выброшенному морем ящику вплотную, пока не покажется название, затем нажми {interactKey} или щелкни по ящику левой кнопкой мыши, чтобы подобрать его. Шесть штук соберут весь груз.',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    'Выброшенные морем ящики выстроились вдоль тропы к лагерю Рассветный Привал. Подойди к выброшенному морем ящику вплотную, пока не покажется название, затем коснись ящика или коснись кнопки использования, чтобы подобрать его. Шесть штук соберут весь груз.',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    'Выброшенные морем ящики выстроились вдоль тропы к лагерю Рассветный Привал. Подойди к выброшенному морем ящику вплотную, пока не покажется название, затем нажми кнопку взаимодействия, чтобы подобрать его. Шесть штук соберут весь груз.',
+  'hudChrome.bootcamp.taskPouchBody':
+    'Нажми {interactKey} рядом с персонажем {npc} или щелкни по нему левой кнопкой мыши, чтобы открыть прилавок, затем щелкни по льняному мешочку левой кнопкой мыши, чтобы купить его.',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    'Коснись персонажа {npc}, чтобы открыть прилавок, затем коснись льняного мешочка, чтобы купить его.',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    'Нажми кнопку взаимодействия рядом с персонажем {npc}, чтобы открыть прилавок, затем выбери льняной мешочек, чтобы купить его.',
+  'hudChrome.bootcamp.readyPouchBody':
+    'Мешочек куплен. Нажми {bagsKey}, чтобы открыть сумки, и щелкни по льняному мешочку левой кнопкой мыши, чтобы пристегнуть его в свободную петлю. Затем подойди к персонажу {npc} и нажми {interactKey}, чтобы показать обновку.',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    'Мешочек куплен. Открой сумки и коснись льняного мешочка, чтобы пристегнуть его в свободную петлю. Затем подойди к персонажу {npc} и коснись его, чтобы показать обновку.',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    'Мешочек куплен. Открой сумки и выбери льняной мешочек, чтобы пристегнуть его в свободную петлю. Затем подойди к персонажу {npc} и нажми кнопку взаимодействия, чтобы показать обновку.',
+  'hudChrome.bootcamp.bellTitle': 'Позвони в колокол',
+  'hudChrome.bootcamp.bellBody':
+    'Переправа заслужена. Подойди к паромному колоколу рядом с причалом и нажми {interactKey} или щелкни по нему левой кнопкой мыши, чтобы отплыть в Истврук.',
+  'hudChrome.bootcamp.bellBodyTouch':
+    'Переправа заслужена. Подойди к паромному колоколу рядом с причалом и коснись его, чтобы отплыть в Истврук.',
+  'hudChrome.bootcamp.bellBodyPad':
+    'Переправа заслужена. Подойди к паромному колоколу рядом с причалом и нажми кнопку взаимодействия, чтобы отплыть в Истврук.',
+  'entities.zones.proving_shore.pois.4.label': 'Полоса испытаний',
+  'entities.items.ps_castaway_crate.name': 'Выброшенный морем ящик',
+  'entities.items.ps_ferry_bell.name': 'Паромный колокол',
+  'entities.mobs.training_effigy.name': 'Тренировочное чучело',
+  'entities.mobs.shore_scuttler.name': 'Береговой краб',
+  'entities.npcs.wayfarer_bryn.name': 'Странница Брин',
+  'entities.npcs.wayfarer_bryn.title': 'Проводница гавани',
+  'entities.npcs.wayfarer_bryn.greeting':
+    'Истврукская долина принимает всех, друг. А для тех, кто еще нетвердо стоит на ногах, всегда есть Берег Испытаний: паромный колокол у почтового столба Вранопочты перезвонит тебя туда в любой день года, а его близнец на острове позвонит домой.',
+  'entities.npcs.instructor_maren.name': 'Наставница Марен',
+  'entities.npcs.instructor_maren.title': 'Мастер испытаний',
+  'entities.npcs.instructor_maren.greeting':
+    'Каждый герой, которого когда-либо благодарила долина, стоял там, где сейчас стоишь ты, {className}, и ни один из них тогда не знал, за какой конец держат клинок. Для того этот берег и нужен. Спрашивай, упражняйся и ошибайся там, где ошибки ничего не стоят.',
+  'entities.npcs.quartermaster_finch.name': 'Интендант Финч',
+  'entities.npcs.quartermaster_finch.title': 'Снабженец лагеря',
+  'entities.npcs.quartermaster_finch.greeting':
+    'На моем прилавке продается ровно одна вещь, {playerName}: запасной мешочек для всего, что подберешь в дороге, и лишь тогда, когда его требует урок. Все остальное здесь просто спасенный груз, которому дорога в долину. Монета покупает мешочек, а труд зарабатывает монету. Вот и вся экономика, и сложнее она не становится. Только больше.',
+  'entities.npcs.ferryman_odo.name': 'Паромщик Одо',
+  'entities.npcs.ferryman_odo.title': 'Хранитель переправы',
+  'entities.npcs.ferryman_odo.greeting':
+    'Только с переправы, {playerName}? Страж Там держит Полосу на берегу сразу к югу от моего причала: сперва пробеги его дорожки, и твои ноги скажут тебе спасибо. Каждый хранитель на этом берегу передает тебя следующему, когда твоя работа сделана, а карточка наверху экрана всегда знает дорогу. А когда долина позовет обратно, позвони в колокол, что стоит рядом с моим причалом, и переправа высадит тебя прямо в Иствруке.',
+  'entities.npcs.warden_tam.name': 'Страж Там',
+  'entities.npcs.warden_tam.title': 'Хранитель Полосы',
+  'entities.npcs.warden_tam.greeting':
+    'Эти дорожки и есть Полоса, {playerName}, и каждый искатель приключений, кого уважает долина, пробегал их. Фонари на оградах горят всю ночь, так что дорожки не закрываются никогда.',
+  'entities.npcs.overseer_pell.name': 'Надзиратель Пелл',
+  'entities.npcs.overseer_pell.title': 'Надзиратель Полосы',
+  'entities.npcs.overseer_pell.greeting':
+    'Я засекаю каждый забег, что сходит с этих дорожек, {playerName}, и видал работу ног куда хуже твоей. Тропа за моей спиной поднимается к учебной площадке: там работа ног превращается в работу клинка.',
+  'entities.npcs.drillmaster_rook.name': 'Мастер муштры Рук',
+  'entities.npcs.drillmaster_rook.title': 'Хозяин площадки',
+  'entities.npcs.drillmaster_rook.greeting':
+    'Сперва солома, потом панцири, {playerName}. Чучело учит руку замаху, а крабы дальше по берегу учат ее попадать по тому, кому это не все равно.',
+  'entities.npcs.tidewarden_nel.name': 'Страж приливов Нел',
+  'entities.npcs.tidewarden_nel.title': 'Хранительница побережья',
+  'entities.npcs.tidewarden_nel.greeting':
+    'Прилив берет, и прилив платит, {playerName}. Я веду счет и тому и другому: тому, что крабы таскают с обломков, и тому, что честные руки несут вверх по этой тропе.',
+  'entities.quests.q_ps_the_gauntlet.title': 'Пробеги Полосу',
+  'entities.quests.q_ps_the_gauntlet.text':
+    'Каждая пара ног, которую уважает долина, сперва пробегала эти дорожки, {playerName}. Пройди первую дорожку на запад до флага, развернись на месте, пройди южную дорожку до второго флага, а последнюю дорожку пройди приставным шагом до красного флага. Флаги проходи по порядку: карточка вверху экрана покажет тебе каждую нужную кнопку по ходу дела. Надзиратель Пелл засекает каждый забег с дальнего конца: когда красный флаг останется позади, он будет стоять прямо там, чтобы принять твой забег.',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    'Этот забег я засек, {playerName}, а заваливал я и более быстрые ноги. Полоса твоя. Тропа за моей спиной поднимается к учебной площадке, где мастер муштры Рук превращает работу ног в работу клинка: следующее поручение у него.',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': 'Флаг Полосы пройден',
+  'entities.npcs.bursar_wick.name': 'Казначей Уик',
+  'entities.npcs.bursar_wick.title': 'Золочёный сундук',
+  'entities.npcs.bursar_wick.greeting':
+    'У Золочёного сундука даже здесь есть свой стол, {playerName}. Все, что ты сдашь мне, будет ждать в одном и том же хранилище за спиной каждого казначея в каждом городе: его не достанут ни волки, ни вода, ни твои собственные опрометчивые решения.',
+  'entities.quests.q_ps_strike_true.title': 'Бей верно',
+  'entities.quests.q_ps_strike_true.text':
+    'Сперва ноги, теперь рука, {playerName}. Учебная площадка лежит вверх по тропе за моей спиной, и ее соломенные чучела сделаны, чтобы их били. Если собьешься с пути, нажми M и открой карту: каждое взятое поручение отмечено на ней. Подойди к чучелу и нажми Tab или щелкни по нему левой кнопкой мыши, чтобы взять его в цель, потом нажми 1 или щелкни по первому значку на панели действий внизу экрана, чтобы ударить. Бей, пока одно не развалится; сдачи оно не даст, чучела не дают никогда. Мастер муштры Рук смотрит за площадкой с ее западного плеча, там, где начинается тропа к берегу: нажми F на нем, чтобы сдать поручение.',
+  'entities.quests.q_ps_strike_true.completion':
+    'Одно чистое падение, и хватка уже увереннее. Запомни это чувство, {playerName}: взял цель, ударил и бей дальше. Соломе все равно. А вот тому, на кого ты замахнешься в следующий раз, будет не все равно.',
+  'entities.quests.q_ps_strike_true.objectives.0.label': 'Повалить тренировочное чучело',
+  'entities.quests.q_ps_shell_and_claw.title': 'Панцирь и клешня',
+  'entities.quests.q_ps_shell_and_claw.text':
+    'Соломе все равно, {playerName}, так что вот тебе тот, кому не все равно. Береговые крабы роются в обломках на дальнем берегу, вдоль полосы кораблекрушений: иди по тропе на запад от моей площадки, и она выведет тебя прямо к ним. Они щиплются в ответ, так что следи за полосой здоровья и не прекращай бить: возьми одного в цель щелчком левой кнопки мыши, примени способность, которой тебя научил двор, и не останавливайся, пока его панцирь не треснет. Трех хватит. Потом поднимись по тропе на северный склон: Страж приливов Нел ведет счет всему на берегу, и твои панцири она тоже сочтет.',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    'Три панциря треснули, и все пальцы целы: достойный первый бой, {playerName}. Крабы растаскивают обломки быстрее, чем прилив приносит новые, так что каждый, кого ты выбраковал, - это монета, которую кто-то сохранит.',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': 'Береговой краб истреблен',
+  'entities.quests.q_ps_the_wreck_line.title': 'Полоса кораблекрушений',
+  'entities.quests.q_ps_the_wreck_line.text':
+    'Мои носильщики снимают добро со старых обломков и тащат его вверх по склону к лагерю Рассветный Привал, {playerName}, и половина ящиков до верха не доходит: их ставят у тропы и забывают. Иди по моей тропе к лагерю, и ты пройдешь прямо мимо этих отставших. Открыть такой ящик просто: подойди к нему вплотную, пока не покажется название, затем нажми F или щелкни по самому ящику левой кнопкой мыши, и он отдаст все, что хранит. Шесть штук расчистят всю полосу, и запомни: F - это одна и та же клавиша для любого сундука, любой жилы и любой двери, какие тебе только встретятся. Интендант Финч держит лагерную лавку и скупает обломки до последней щепки: отнеси добычу ей.',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    'Веревка, смола и полголовы сыра, который море почему-то пощадило: беру все, {playerName}. Спина, что несет найденное, для этого лагеря дороже любого клинка, а твоя только что расчистила всю полосу за один подъем.',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': 'Вскрыть выброшенный морем ящик',
+  'entities.quests.q_ps_pouch_and_purse.title': 'Мешочек и кошелек',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    'Еще один урок перед долиной, {playerName}, и он из тех, что сохраняют искателям приключений жизнь: что ты носишь. В твоем заплечном мешке шестнадцать ячеек, а рядом ждут четыре пустые петли для сумок: каждая пристегнутая сумка добавляет свое место в общий запас. Итак: нажми F на мне еще раз, чтобы открыть мою лавку, щелкни левой кнопкой мыши по льняному мешочку в моих товарах, чтобы купить его, затем нажми B, чтобы открыть сумки, и щелкни там по мешочку левой кнопкой мыши, чтобы пристегнуть его в свободную петлю. Наставница Марен ведет учения у сборного костра в нескольких шагах к востоку: покажи ей мешочек на своем поясе.',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    'Славный мешочек. Если еще не пристегнул его, пристегни: нажми B, чтобы открыть сумки, и щелкни по мешочку левой кнопкой мыши, чтобы усадить его в свободную петлю, и еще шесть ячеек под будущие неприятности твои. А теперь та половина урока, которую не вместит ни одна сумка, {playerName}: что не унесешь, то сбережет Золочёный сундук. Казначей Уик держит свой стол вверх по западной тропе и открывает то самое хранилище, что и любой казначей в любом городе; а когда кошелек подрастет, можно докупить и место в хранилище. Ценное держи в хранилище, а сумки просторными. Набитый доверху мешок оборвал больше приключений, чем любой волк.',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': 'Купить льняной мешочек',
+  'entities.quests.q_ps_hone_the_edge.title':
+    'Наточить клинок',
+  'entities.quests.q_ps_hone_the_edge.text':
+    'Удар есть удар, {playerName}, и солома примет их хоть весь день. Только этим ничего не выигрывают. Посмотри на ряд кнопок внизу экрана: этот ряд и есть твое ремесло, и каждая из них делает то, чего одна рука не может. Одна у тебя уже есть. Вернись к чучелам и примени ее: возьми цель, затем нажми кнопку, которую тебе указывает двор, и так трижды. Не молоти солому просто так, а сделай то, что ты умеешь. Потом возвращайся ко мне.',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    'Вот теперь ты дерешься, а не машешь руками. Этот ряд растет с каждым уровнем, {playerName}, и дольше всех живут те, кто его читает. Соломе все равно, какой кнопкой ты бил. Долине не все равно.',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    'Способность применена по чучелу',
+  'entities.quests.q_ps_the_long_walk.title':
+    'Долгий путь назад',
+  'entities.quests.q_ps_the_long_walk.text':
+    'Остался один урок, {playerName}, и его я не могу тебе рассказать: это надо пройти самому. Ты погибнешь там, снаружи. Погибают все, и это ничего не заканчивает. Возьми этот Камень Ухода. Нажми B, открой сумки и щелкни по нему, и он уложит тебя прямо там, где ты стоишь. Дальше следуй указаниям на экране: освободи дух, дойди до собственного тела и вернись в него. Тело ждет, дорога ничего не стоит, и, пройдя ее, ты ничего не теряешь.',
+  'entities.quests.q_ps_the_long_walk.completion':
+    'И вот ты вернулся, целым и невредимым. Запомни это чувство, {playerName}, потому что в следующий раз в деле будут зубы и рядом не будет никого, кто все объяснит. Тело ждет, дорога бесплатна, и единственное, что смерть действительно забирает, это время на возвращение.',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    'Возвращение из мертвых пешком',
+  'entities.items.ps_passing_stone.name':
+    'Камень Ухода',
+  'entities.quests.q_ps_the_signpost.title': 'Весть на ветру',
+  'entities.quests.q_ps_the_signpost.text':
+    'Осталась последняя привычка, {playerName}, и клинок для нее не нужен: читай доски. Гильдейский столб объявлений стоит у ворот лагеря, в нескольких шагах к юго-западу от моего костра, и гильдии с бродячими артелями вывешивают на нем свои призывы. Подойди к нему вплотную и нажми F или щелкни по нему левой кнопкой мыши, чтобы прочесть, что вывешено, а потом вернись и расскажи мне, что принес ветер. Такая доска стоит в каждом городе, куда ты когда-нибудь войдешь.',
+  'entities.quests.q_ps_the_signpost.completion':
+    'Теперь ты знаешь, как в долине расходятся вести, {playerName}: не с гонцами, а по доскам. Заглядывай на них в каждом городе, что пройдешь; половина приключений начинается с трех строк чернил на такой доске.',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': 'Прочесть гильдейский столб',
+  'entities.quests.q_ps_set_sail.title': 'Отплытие',
+  'entities.quests.q_ps_set_sail.text':
+    'На этом берегу не осталось ничего, что ты бы уже не пробежал, не победил, не открыл или не купил, {playerName}. Ты готов, а в Иствруке ждет настоящая работа. Спустись по береговой дороге обратно к причалу, нажми F на паромщике Одо и передай ему: я сказала, что ты заслужил переправу. А если забудешь, кому и что ты должен, нажми L в любой момент: это твой журнал заданий.',
+  'entities.quests.q_ps_set_sail.completion':
+    'Марен так сказала? Высокая похвала от женщины, что неделю заставляла меня вязать швартовые узлы. Позвони в колокол, что стоит рядом с моим причалом, когда будешь готов, {playerName}, и переправа высадит тебя прямо в Иствруке, посреди города. Берегись волков.',
+  'entities.quests.q_ps_set_sail.objectives.0.label': 'Доложить паромщику Одо',
+  'entities.zones.proving_shore.name': 'Берег Испытаний',
+  'entities.zones.proving_shore.welcome':
+    'Берег Испытаний не просит у тебя ничего, кроме времени. Освойся в лагере, поработай по чучелам, пройди полосу кораблекрушений, а когда будешь готов, паромщик Одо переправит тебя в долину.',
+  'entities.zones.proving_shore.pois.0.label': 'Лагерь Рассветный Привал',
+  'entities.zones.proving_shore.pois.1.label': 'Старый причал',
+  'entities.zones.proving_shore.pois.2.label': 'Тренировочная площадка',
+  'entities.zones.proving_shore.pois.3.label': 'Полоса кораблекрушений',
+  'guide.home.world.provingName': 'Берег Испытаний',
+  'guide.home.world.provingBlurb':
+    'Тихий учебный остров за проливом, где новые искатели приключений встают на ноги, прежде чем долина что-то с них спросит.',
+  'guide.worldPage.provingBlurb':
+    'Тихий остров за проливом от долины, отведенный под учебный лагерь: стоянка, тренировочная площадка, усыпанный обломками берег и паром, который ходит в обе стороны.',
+  'guide.worldPage.provingGreeting':
+    'Каждый герой, которого когда-либо благодарила долина, стоял там, где сейчас стоишь ты, и ни один из них тогда не знал, за какой конец держат клинок.',
+  'guide.worldPage.provingGreeter': 'Наставница Марен, лагерь Рассветный Привал',
+  'guide.worldPage.provingPlaceNotes':
+    'Лагерь Рассветный Привал и есть все поселение острова: несколько палаток, лавка и общий костер. Старый причал смотрит на долину, и круг переправы уносит выпускников через пролив; на Тренировочной площадке к югу от лагеря стоят соломенные чучела для всех, кому они нужны; а Полоса кораблекрушений, усыпанный обломками берег, где прилив расплачивается с островом выброшенными ящиками.',
   'hudChrome.perf.diagnostics.report.status.healthy': 'норма',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':

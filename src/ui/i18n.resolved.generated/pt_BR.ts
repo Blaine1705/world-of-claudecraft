@@ -999,6 +999,16 @@ export const pt_BR: EnTranslations = {
       "clearAria": "Clear a slot",
       "clearArmed": "Tap a slot to clear it."
     },
+    "tutorialGreeting": {
+      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
+      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
+      "play": "Take the tutorial",
+      "skip": "Skip the tutorial",
+      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
+      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
+      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
+      "noteClose": "Understood"
+    },
     "tutorial": {
       "moveBodyTouch": "Use o analógico de movimento para se mover e arraste a tela para olhar ao redor. Dê alguns passos para começar.",
       "talkBodyTouch": "Aproxime-se do marechal Redbrook e toque no botão Usar para falar, então aceite a tarefa dele.",
@@ -1010,6 +1020,117 @@ export const pt_BR: EnTranslations = {
       "nextTipQuestLog": "Abra seu Diário de Missões ({key}) para encontrar a próxima tarefa por perto.",
       "nextTipMap": "Verifique o Mapa Mundial ({key}) para ver onde as missões estão esperando.",
       "nextTipSocial": "Abra a janela Social ({key}) para encontrar um grupo para os combates mais difíceis."
+    },
+    "bootcamp": {
+      "title": "First Steps",
+      "talkTitle": "Speak to Warden Tam",
+      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
+      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
+      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
+      "forwardTitle": "Walk the first lane",
+      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
+      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
+      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
+      "turnwalkTitle": "Turn, then walk",
+      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
+      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
+      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
+      "strafeTitle": "Turn, then walk",
+      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
+      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
+      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
+      "cameraTitle": "Swing the camera",
+      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
+      "courseProgress": "Flag {current} of {total}",
+      "doneTitle": "Run complete",
+      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
+      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
+      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
+      "coachNextTitle": "Next: {npc}",
+      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
+      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
+      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
+      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
+      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
+      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
+      "coachReadyTitle": "Task complete",
+      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
+      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
+      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
+      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
+      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
+      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
+      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
+      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
+      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
+      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
+      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
+      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
+      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
+      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
+      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
+      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
+      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
+      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
+      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
+      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
+      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
+      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
+      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
+      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
+      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
+      "promptTalk": "Talk",
+      "promptTurnIn": "Turn in quest",
+      "promptPickUp": "Pick up",
+      "promptLootPearl": "Loot the pearl",
+      "promptRead": "Read",
+      "promptRing": "Ring",
+      "promptHold": "Hold",
+      "promptSelect": "Select",
+      "promptAttack": "Attack",
+      "promptUseAbility": "Use ability",
+      "promptKneel": "Kneel",
+      "promptOpenBags": "Open your bags",
+      "promptCharacterSheet": "Open your character sheet",
+      "promptLookAround": "Hold right-click and drag to look around",
+      "promptJump": "Jump",
+      "promptSummon": "Summon",
+      "ringEquipTitle": "Wear your prize",
+      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
+      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
+      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
+      "ringAdmireTitle": "Look at you",
+      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
+      "keycapThen": "then",
+      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
+      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
+      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
+      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
+      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
+      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
+      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
+      "bellTitle": "Ring the bell",
+      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
+      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
+      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
     },
     "widgets": {
       "clockTitle": "Horário local - clique para alternar entre 12/24 horas",
@@ -1061,6 +1182,31 @@ export const pt_BR: EnTranslations = {
       "devTierCol": "Insígnia",
       "mergedPrs": "PRs integrados",
       "devEmpty": "Nenhum colaborador classificado ainda."
+    },
+    "pledge": {
+      "open": "Accepting pledges",
+      "closed": "Not accepting pledges",
+      "minLevel": "Level {level}+",
+      "action": "Pledge",
+      "actionTitle": "Pledge to {guild}",
+      "pledged": "Pledged",
+      "yourGuild": "Your guild",
+      "tab": "Pledges",
+      "tabWithCount": "Pledges ({count})",
+      "empty": "No one has pledged to your guild yet.",
+      "accept": "Accept",
+      "acceptTitle": "Accept {name}'s pledge",
+      "reject": "Decline",
+      "rejectTitle": "Decline {name}'s pledge",
+      "settings": "Recruitment",
+      "acceptingLabel": "Accept pledges",
+      "minLevelLabel": "Minimum level",
+      "noteLabel": "Board note",
+      "notePlaceholder": "Tell aspiring members what your guild is looking for",
+      "save": "Save",
+      "yourPledge": "Your pledge: {guild}",
+      "since": "Pledged {date}",
+      "withdraw": "Withdraw pledge"
     },
     "raidLockout": {
       "title": "Bloqueios de raide",
@@ -1153,7 +1299,6 @@ export const pt_BR: EnTranslations = {
       "targetFriendlyNext": "Alternar alvo aliado",
       "targetPrev": "Alternar alvo para trás",
       "discord": "Discord",
-      "valecup": "Copa do Vale",
       "bgFlag": "Ação da Bandeira do Campo de Batalha",
       "sheathe": "Embainhar/Desembainhar Arma",
       "dive": "Nadar para Baixo",
@@ -1321,146 +1466,6 @@ export const pt_BR: EnTranslations = {
         "graveyard": "Cemitério"
       }
     },
-    "vcup": {
-      "title": "A Copa do Vale",
-      "shootPower": "FORÇA",
-      "close": "Fechar a janela da Copa do Vale",
-      "offlineNote": "A tabela de jogos está fechada. A Copa do Vale não está disponível agora.",
-      "recordLine": "Seu histórico: {wins} vitórias, {losses} derrotas, {draws} empates.",
-      "bracketsAria": "Chave da partida",
-      "bracketLabel": "{n}x{n}",
-      "waitingCount": "{count} na espera",
-      "nationsHeading": "Nação do estandarte",
-      "nation": {
-        "vale": "Vale de Eastbrook",
-        "mirefen": "Mirefen",
-        "thornpeak": "Thornpeak",
-        "coliseum": "O Coliseu Cinzento",
-        "choir": "O Coro Pálido",
-        "ogre": "Os Clãs Ogros",
-        "moon": "A Lua Pálida",
-        "copperdig": "A Cava de Cobre"
-      },
-      "awayNote": "Se os dois lados hasteiam o mesmo estandarte, o time visitante joga com a paleta invertida.",
-      "rolesHeading": "Função esportiva",
-      "rolesSmallBracketNote": "Nas chaves 1x1 e 2x2, todo combatente joga com o kit Polivalente. Feitos que exigem a chave 3x3 ou maior não podem ser conquistados aqui.",
-      "role": {
-        "allrounder": {
-          "name": "Polivalente",
-          "desc": "Um pouco de cada coisa: chute, chutão e uma ombrada limpa."
-        },
-        "striker": {
-          "name": "Atacante",
-          "desc": "Vive do chutão longo e da finta rápida."
-        },
-        "sweeper": {
-          "name": "Líbero",
-          "desc": "Tira os corredores da bola na ombrada e afasta o perigo no bicão."
-        },
-        "keeper": {
-          "name": "Goleiro",
-          "desc": "Protege a pequena área com agarrada, mergulho e tiro de meta."
-        }
-      },
-      "queue": "Entrar na Fila",
-      "leaveQueue": "Sair da Fila",
-      "queueNote": "Entre na fila de qualquer lugar; o apito chama você ao Sowfield.",
-      "queuedStatus": "Na fila para {bracket}: posição {position} de {count}.",
-      "blockNation": "Escolha primeiro uma nação de estandarte.",
-      "blockPartySize": "Essa chave exige um grupo menor.",
-      "blockNotLeader": "Só o líder do grupo pode colocar o time na fila.",
-      "inMatchNote": "Seu time está em campo. Bola pra frente!",
-      "deserterNote": "O Zelador não esquece. Você pode entrar na fila de novo em {seconds} s.",
-      "liveHeading": "Agora no Sowfield",
-      "liveAria": "Copa do Vale: {nationA} {scoreA}, {nationB} {scoreB}",
-      "walkUp": "Vá até o Sowfield para assistir das arquibancadas.",
-      "noLive": "O campo está quieto. Nenhuma partida em andamento.",
-      "boardHeading": "Quadro de vencedores",
-      "boardEmpty": "Nenhum vencedor registrado ainda. O Balde de Cobre espera.",
-      "boardWins": "{count} vitórias",
-      "enterAsGuild": "Entrar sob o estandarte de {guild}",
-      "guildRecordLine": "Histórico da sua guilda: {wins} vitórias, {losses} derrotas.",
-      "guildBoardHeading": "Estandartes de guilda",
-      "guildBoardEmpty": "Nenhuma guilda entrou em campo ainda. Hasteie seu estandarte!",
-      "guildBoardWl": "{wins} V, {losses} D",
-      "practice": "Treino contra Bots",
-      "practiceNote": "Inicia na hora uma partida privada contra bots no seu próprio campo de treino.",
-      "practiceUnratedNote": "Partidas de treino não são ranqueadas: a classificação e o progresso no Livro dos Feitos não contam.",
-      "practicingNow": "Treinando agora ({count}):",
-      "clock": "{minutes}:{seconds}",
-      "indicatorQueued": "Fila da Copa do Vale: {bracket}, posição {position} de {count}",
-      "indicatorLive": "Copa do Vale",
-      "indicatorOpen": "Abrir a janela da Copa do Vale",
-      "phaseCountdown": "Bola rolando em {seconds}",
-      "phaseGoal": "GOL!",
-      "phaseGolden": "GOL DE OURO",
-      "phaseOver": "FIM DE JOGO",
-      "bannerFound": "A Copa do Vale convoca: {nationA} x {nationB}!",
-      "bannerCountdown": "Bola rolando em {seconds}...",
-      "bannerKickoff": "BOLA ROLANDO!",
-      "bannerGoal": "GOL! {nation} marca!",
-      "bannerSave": "{name} DEFENDE!",
-      "bannerGolden": "GOL DE OURO: o próximo gol vence!",
-      "bannerEnd": "Fim de jogo: {nationA} {scoreA}, {nationB} {scoreB}",
-      "bannerWin": "Vitória no Sowfield!",
-      "bannerDraw": "Empate no Sowfield.",
-      "bannerLoss": "Derrota no Sowfield.",
-      "logQueued": "Você entra na fila da Copa do Vale para {bracket} (posição {position}).",
-      "logUnqueued": "Você sai da fila da Copa do Vale.",
-      "logFound": "Sua partida da Copa do Vale está pronta: {nationA} x {nationB}.",
-      "logRoster": "Seu lado: {allies}. O lado deles: {enemies}.",
-      "logGoal": "{name} marca para {nation}! {nationA} {scoreA}, {nationB} {scoreB}.",
-      "logSave": "{name} faz a defesa!",
-      "logWin": "Você vence a disputa no Sowfield.",
-      "logDraw": "A disputa no Sowfield termina empatada.",
-      "logLoss": "Você perde a disputa no Sowfield.",
-      "gossipOpen": "A tabela de jogos",
-      "gossipOpenAria": "Abrir a janela da Copa do Vale",
-      "mobileLabel": "Copa",
-      "briefing": {
-        "subtitle": "Preleção pré-jogo",
-        "vs": "x",
-        "rulesHeading": "Como jogar",
-        "rule1": "Chute ou passe a bola para dentro do gol adversário para marcar.",
-        "rule2": "Vence quem fizer 5 gols primeiro, ou quem tiver mais gols quando o apito final soar.",
-        "rule3": "Partida empatada no fim do tempo vai para o gol de ouro: o próximo gol vence.",
-        "rule4": "As ombradas só derrubam você. Ninguém se machuca sob a trégua da colheita.",
-        "rule5": "Qualquer um pode chegar e torcer por você das arquibancadas.",
-        "kitHeading": "Seu kit",
-        "kitNote": "Estes movimentos substituem as habilidades da sua classe durante a partida.",
-        "unratedNote": "Há bots em campo, portanto esta partida não é ranqueada: a classificação não muda e os feitos de gols, defesas e jogos sem sofrer gols não contam.",
-        "practiceUnratedNote": "Esta é uma partida de treino, portanto não é ranqueada: a classificação não muda e o progresso no Livro dos Feitos não conta.",
-        "rosterHeading": "A escalação",
-        "you": "Você",
-        "bot": "Bot",
-        "ready": "Estou pronto",
-        "readyDone": "Pronto",
-        "readyAria": "Ficar pronto para o pontapé inicial",
-        "waiting": "Aguardando o outro lado ficar pronto...",
-        "whistle": "O apito soa em {seconds}s.",
-        "readyCount": "{ready} de {total} prontos"
-      },
-      "bet": {
-        "title": "Apostas da Partida",
-        "aria": "Apostas da partida da Copa do Vale",
-        "closesIn": "Apostas encerram em {seconds}s",
-        "closed": "Apostas encerradas",
-        "prize": "Bolão {amount}",
-        "splitAria": "Parcela do bolão de apostas em cada time",
-        "expand": "Ver apostas e apostar",
-        "collapse": "Ocultar apostas",
-        "oddsLabel": "Paga",
-        "back": "Apostar em {team}",
-        "form": "{wins}V-{losses}D",
-        "mine": "Sua aposta: {amount} em {team}",
-        "none": "Você ainda não apostou nesta partida.",
-        "record": "Histórico de apostas: {wins}V-{losses}D, {sign}{net}",
-        "wonBanner": "Sua aposta venceu!",
-        "wonLog": "Sua aposta na Copa do Vale venceu: {amount} de retorno.",
-        "lostLog": "Sua aposta na Copa do Vale perdeu: {amount}.",
-        "refundLog": "Apostas anuladas, sua entrada de {amount} foi devolvida."
-      }
-    },
     "options": {
       "clickMoveLeft": "Clique esquerdo",
       "clickMoveRight": "Clique direito",
@@ -1570,6 +1575,11 @@ export const pt_BR: EnTranslations = {
     },
     "controller": {
       "title": "Controle",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Ativar Controle",
       "invertY": "Inverter Câmera (Y)",
       "deadzone": "Zona Morta do Analógico",
@@ -2657,7 +2667,8 @@ export const pt_BR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
-      "cheaterTag": "< Trapaceiro >"
+      "cheaterTag": "< Trapaceiro >",
+      "pledgeTag": "Pledge of {guild}"
     },
     "mobTooltip": {
       "levelFamily": "{family} de nível {level}",
@@ -2981,7 +2992,12 @@ export const pt_BR: EnTranslations = {
       "tip": "Receita de vendas ou itens devolvidos estão esperando por você com o Mercador."
     },
     "noticeboard": {
-      "empty": "Parece que não há nada afixado."
+      "empty": "Parece que não há nada afixado.",
+      "subtitle": "Guilds of the realm",
+      "rosterTitle": "View the roster of {guild}",
+      "back": "Back",
+      "popupTitle": "Guild Signpost",
+      "close": "Close"
     },
     "bank": {
       "title": "Banco",
@@ -4318,6 +4334,10 @@ export const pt_BR: EnTranslations = {
     "deeds": {
       "invalid_input": "Entrada inválida."
     },
+    "guilds": {
+      "invalid_roster_name": "Invalid guild name.",
+      "unknown": "No guild by that name."
+    },
     "steam": {
       "disabled": "A vinculação com o Steam não está disponível no momento.",
       "invalid_ticket": "O Steam não conseguiu verificar este pedido de vinculação. Tente novamente pelo aplicativo para desktop.",
@@ -4441,7 +4461,6 @@ export const pt_BR: EnTranslations = {
       "combat": "Combate",
       "talents": "Talentos",
       "arena": "Arena e JcJ",
-      "valeCup": "Copa do Vale",
       "thornhollow": "Campos de Thornhollow",
       "deeds": "Livro dos Feitos",
       "reliquary": "O Relicário",
@@ -4551,6 +4570,8 @@ export const pt_BR: EnTranslations = {
         "fenBlurb": "Além da coroa do outono, um pântano luminoso de salgueiros e águas paradas, e uma cidade atrás de um fosso.",
         "farshoreName": "Farshore",
         "farshoreBlurb": "Uma ilha além do banco de areia, onde o céu se rasga sobre os Campos das Fendas e Gullhaven toca seu sino a cada brecha.",
+        "provingName": "The Proving Shore",
+        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
         "nightName": "Nightbloom",
         "nightBlurb": "Um país de meia-noite estrelada onde as flores iluminam os caminhos e Moonrest mantém sua vigília.",
         "hauntName": "Wraithwood",
@@ -4651,7 +4672,6 @@ export const pt_BR: EnTranslations = {
       "reliquary": "O Relicário",
       "sheathe": "Embainhar/Desembainhar Arma",
       "crafting": "Criação",
-      "valeCup": "Copa do Vale",
       "mount": "Montar / Desmontar",
       "calendar": "Calendário de eventos",
       "dungeonFinder": "Localizador de Masmorras",
@@ -5513,6 +5533,10 @@ export const pt_BR: EnTranslations = {
       "farshoreGreeting": "Você veio pelo Ferrywalk? Então é o primeiro em uma semana, e o Guardião vai querer dar uma olhada em você.",
       "farshoreGreeter": "Guardião do Sino Tam, o Desembarque",
       "farshorePlaceNotes": "Gullhaven é a única cidade da ilha e o seu reduto. O Desembarque é onde o Ferrywalk chega à costa, com um sino de vigia erguido sobre a ponta; o Prado da Vigia ocupa o terreno alto a sudeste da cidade, onde um vigia de fendas escuta pela próxima brecha; as Falésias Rompidas se abrem no extremo sul da ilha; e os Campos das Fendas são as fileiras de grãos arruinadas a leste de Gullhaven, ainda fervilhando com o que veio pela brecha ali.",
+      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
+      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
+      "provingGreeter": "Instructor Maren, Dawnrest Camp",
+      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
       "travelTitle": "Como se locomover",
       "travelBody": "Cada caminho no reino é percorrido a pé ou a cavalo. Não há rotas de voo, não há táxis, e não há rede de teletransporte: o mapa é um único território conectado, e cada ligação é algo em que você pode pisar. Cumeeiras dividem um reino do próximo, e onde dois reinos compartilham uma cumeeira, a estrada sobe por uma passagem. Nem toda fronteira funciona assim, porém. Ao norte, um longo dique leva a estrada sobre a água, saindo do Vale Velado rumo ao país de neve além dele, e mais ao sul, um fino banco de areia natural chamado Ferrywalk corre para leste desde a costa do Vale até o Desembarque, na ilha da Farshore, que não tem fronteira terrestre alguma. E existe exatamente uma verdadeira porta no mundo aberto inteiro: um véu de crepúsculo no alto de Thornpeak que se abre para o Vale Velado. A cumeeira sul do Vale Velado está selada, sem nenhuma passagem por ela, então é por esse véu que você entra pela primeira vez, e ele se fecha atrás de você na volta.\n\nOnde quer que você caia, a caminhada de volta é curta. Cada zona mantém pelo menos um cemitério com um Guardião Pálido pairando sobre as lápides, e um espírito liberado se ergue no mais próximo deles.\n\nO mapa não termina em uma parede invisível. A terra se esvai em praias e promontórios, e depois em mar aberto. As travessias que o mundo espera que você nade, os estreitos e lagoas entre um reino e o próximo, são calmas e seguras de atravessar. Se você seguir mar aberto adentro, é a própria distância que o faz recuar: você recebe um aviso, e depois outro, e se continuar nadando o mar o esgota até matá-lo. Mergulhar tem seu próprio limite, já que seu fôlego se esgota sob a superfície, então suba para respirar e dê meia-volta quando a água mandar.",
       "mountsTitle": "Montarias",
@@ -5729,36 +5753,6 @@ export const pt_BR: EnTranslations = {
       "ladderBody": "Cada partida move uma classificação de campo de batalha persistente e ligada ao personagem, com vitória ou derrota, e o quadro de todos os tempos ordena os campeões do reino.",
       "rewardsHeading": "O que uma partida paga",
       "rewardsBody": "Toda partida concluída paga Honra: mais por uma vitória, uma consolação por uma derrota ou um empate, além de uma pequena quantia por cada abate que você desfere e por cada um em que presta assistência, então lutar longe das bandeiras ainda vale a pena. Sua primeira vitória de cada dia paga um bônus extra, e o painel avisa enquanto esse bônus ainda está à sua espera. Esse dia pertence só à Honra, e reinicia no seu próprio relógio, não junto com o reinício de instâncias do reino. Enfrentar a mesma equipe repetidamente paga menos pela partida em si depois da primeira vez, estabilizando rápido em um piso em vez de cair a nada, e uma partida abandonada não paga absolutamente nada. Gaste o que você ganhar em qualquer um dos intendentes de Guerra."
-    },
-    "valeCupPage": {
-      "heading": "A Copa do Vale",
-      "intro": "Boarball no Sowfield: escolha um estandarte, escolha uma função e chute um couro de javali empalhado para além do goleiro pelo Balde de Cobre. Sem sangue, sem saque, só o rugido das arquibancadas.",
-      "loreHeading": "O Boarball e a trégua da colheita",
-      "loreOldSow": "Muito antes de os mortos despertarem, os lavradores de Eastbrook jogavam Boarball nos restolhos depois da colheita: dois bandos, um couro de javali recheado de palha e dois portões de carroça arrastados para cada ponta do gramado. A primeira bola, a Velha Porca, pende coberta de bronze sobre a lareira da taverna.",
-      "loreTruce": "Quando o Coliseu Cinzento passou a sancionar jogos de guerra, o marechal Redbrook respondeu com algo mais gentil: uma trégua de colheita permanente no velho gramado. Os portões de carroça viraram traves, o gramado ganhou muros, arquibancadas e um nome, o Sowfield, e o prêmio sempre foi o mesmo balde de leite amassado do qual os vencedores bebiam: o Balde de Cobre.",
-      "howHeading": "Como jogar",
-      "howQueue": "Entre na fila de qualquer lugar pela janela da Copa do Vale, ou fale com o Zelador Bram no portão do Sowfield. Escolha uma chave de um contra um até cinco contra cinco, uma nação de estandarte e uma função esportiva; entre na fila sozinho ou traga seu grupo.",
-      "howMatch": "No pontapé inicial, o kit da sua classe é trocado por um kit esportivo e restaurado com exatidão depois. Os chutes miram no retículo no chão, a bola rebate nas placas laterais, e driblar é só correr com a bola. Marque mais gols que o outro lado antes do fim do tempo; um empate vai para o gol de ouro.",
-      "howTruce": "Ninguém sangra no Sowfield: as ombradas derrubam, nada machuca, e os mascotes ficam de fora da partida.",
-      "spectateBody": "Uma partida acontece por vez no estádio, e qualquer um pode chegar e assistir das arquibancadas.",
-      "bettingHeading": "Uma aposta na grade",
-      "bettingBody": "Os espectadores no Sowfield podem apostar em um lado enquanto uma partida se forma: as apostas se juntam num bolo, e ao apito final os vencedores dividem o bolo dos perdedores na proporção do que apostaram. Uma partida empatada, ou uma zebra em que ninguém apostou, devolve cada moeda. Jogadores escalados na partida não podem apostar nela, e a grade guarda seu registro vitalício de vitórias, derrotas e saldo de moedas.",
-      "practiceHeading": "Partidas de treino e o campo ocioso",
-      "practiceBody": "A janela da Copa do Vale também oferece treino: uma cópia privada do campo onde bots preenchem os dois lados e nada conta para o seu histórico. Faltando um jogador ou dois para valer? Depois de uma curta espera, bots completam os times, e qualquer partida com bots em campo é amistosa, nunca ranqueada. E quando o Sowfield fica ocioso, os bots fazem uma exibição que você pode assistir, e apostar, das arquibancadas; no instante em que jogadores reais ficam prontos, a exibição cede o campo e cada aposta é devolvida.",
-      "nationsHeading": "As oito nações de estandarte",
-      "nationsBody": "Cada time joga sob um estandarte. O capitão escolhe a nação, e se os dois lados hasteiam o mesmo, o time visitante joga com a paleta invertida.",
-      "nationVale": "Verde e dourado, hasteando o feixe de trigo: o time da casa, lavradores até o osso.",
-      "nationMirefen": "Azul-petróleo e cinza sob a garça: pacientes, de pernas longas, nunca apressados.",
-      "nationThornpeak": "Azul-gelo e branco sob o pico da montanha: de passo firme e teimosos.",
-      "nationColiseum": "Vermelho e preto com espadas cruzadas: jogam como se ainda fosse um jogo de guerra.",
-      "nationChoir": "Azul-claro e prata sob o sino: etéreos, precisos e muito calados.",
-      "nationOgre": "Laranja e ocre atrás do punho: ombro na frente e orgulhosos disso.",
-      "nationMoon": "Violeta e prata sob o crescente: jogadores da noite, leves nos pés.",
-      "nationCopperdig": "Cobre e marrom com a picareta: escavadores que nunca param de correr.",
-      "rolesHeading": "Funções esportivas",
-      "rolesBody": "Sua função decide o kit que você leva a campo. Todos chutam; o resto é temperamento. Nas categorias de um contra um e dois contra dois, todos jogam com o kit versátil, então a escolha de função ganha peso a partir do três contra três.",
-      "rewardsHeading": "Regras da trégua",
-      "rewardsBody": "As regras da trégua significam nada de experiência e nada de saque: uma partida decidida conta para o seu histórico e para o quadro de vencedores, e uma vitória também conta para as tarefas de recompensa do dia. Desertar de uma partida suspende sua vaga, e o Zelador não esquece."
     },
     "deedsPage": {
       "intro": "O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.",
@@ -12851,8 +12845,26 @@ export const pt_BR: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Imaculada"
       },
+      "ps_castaway_crate": {
+        "name": "Castaway Crate"
+      },
+      "ps_ferry_bell": {
+        "name": "Ferry Bell"
+      },
       "dawnhold_posy": {
         "name": "Ramalhete do jardim de Dawnhold"
+      },
+      "ps_briny_lure": {
+        "name": "Briny Lure"
+      },
+      "ps_lustrous_pearl": {
+        "name": "Lustrous Pearl"
+      },
+      "mother_of_pearl": {
+        "name": "Mother of Pearl"
+      },
+      "ps_passing_stone": {
+        "name": "Passing Stone"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
@@ -13894,9 +13906,6 @@ export const pt_BR: EnTranslations = {
       "tolling_bell": {
         "name": "Sino Badalante"
       },
-      "vale_cup_ball": {
-        "name": "Bola de Javali"
-      },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, o Pico Desperto"
       },
@@ -14193,6 +14202,15 @@ export const pt_BR: EnTranslations = {
       },
       "fisher_bram": {
         "name": "Pescador Bram"
+      },
+      "training_effigy": {
+        "name": "Training Effigy"
+      },
+      "shore_scuttler": {
+        "name": "Shore Scuttler"
+      },
+      "mister_crabs": {
+        "name": "Mister Crabs"
       },
       "rift_hellguard": {
         "name": "Guarda Infernal"
@@ -14494,11 +14512,6 @@ export const pt_BR: EnTranslations = {
         "title": "Vigia dos Mortos",
         "greeting": "Descanse agora, espírito. Posso devolver você ao seu corpo, mas a travessia de volta deixa você fraco."
       },
-      "groundskeeper_bram": {
-        "name": "Zelador Bram",
-        "title": "Zelador do Sowfield",
-        "greeting": "A trégua vale no Sowfield, {className}: só chutes e ombradas. Quer jogar pelo Balde de Cobre?"
-      },
       "chronicler_saul": {
         "name": "Saul, o Cronista",
         "title": "A Crônica do Vale",
@@ -14783,6 +14796,51 @@ export const pt_BR: EnTranslations = {
         "name": "Alquimista Verane",
         "title": "Mestre do Boticário",
         "greeting": "Meça duas vezes e despeje uma vez, {className}. O boticário não tem paciência com reagentes derramados."
+      },
+      "wayfarer_bryn": {
+        "name": "Wayfarer Bryn",
+        "title": "Harbor Guide",
+        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+      },
+      "instructor_maren": {
+        "name": "Instructor Maren",
+        "title": "Proving Master",
+        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+      },
+      "quartermaster_finch": {
+        "name": "Quartermaster Finch",
+        "title": "Camp Outfitter",
+        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+      },
+      "ferryman_odo": {
+        "name": "Ferryman Odo",
+        "title": "Keeper of the Crossing",
+        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+      },
+      "bursar_wick": {
+        "name": "Bursar Wick",
+        "title": "The Gilded Strongbox",
+        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+      },
+      "warden_tam": {
+        "name": "Warden Tam",
+        "title": "Keeper of the Gauntlet",
+        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+      },
+      "overseer_pell": {
+        "name": "Overseer Pell",
+        "title": "Gauntlet Overseer",
+        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+      },
+      "drillmaster_rook": {
+        "name": "Drillmaster Rook",
+        "title": "Yard Master",
+        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+      },
+      "tidewarden_nel": {
+        "name": "Tidewarden Nel",
+        "title": "Keeper of the Strand",
+        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -16750,6 +16808,109 @@ export const pt_BR: EnTranslations = {
           }
         }
       },
+      "q_ps_the_gauntlet": {
+        "title": "Run the Gauntlet",
+        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
+        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "objectives": {
+          "0": {
+            "label": "Gauntlet flag passed"
+          }
+        }
+      },
+      "q_ps_strike_true": {
+        "title": "Strike True",
+        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
+        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "objectives": {
+          "0": {
+            "label": "Training Effigy felled"
+          }
+        }
+      },
+      "q_ps_hone_the_edge": {
+        "title": "Hone the Edge",
+        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
+        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "objectives": {
+          "0": {
+            "label": "Ability landed on an effigy"
+          }
+        }
+      },
+      "q_ps_shell_and_claw": {
+        "title": "Shell and Claw",
+        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
+        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "objectives": {
+          "0": {
+            "label": "Shore Scuttler culled"
+          }
+        }
+      },
+      "q_ps_mother_of_pearl": {
+        "title": "Mother of Pearl",
+        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
+        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "objectives": {
+          "0": {
+            "label": "Mister Crabs slain"
+          },
+          "1": {
+            "label": "Lustrous Pearl claimed"
+          }
+        }
+      },
+      "q_ps_the_wreck_line": {
+        "title": "The Wreck Line",
+        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
+        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "objectives": {
+          "0": {
+            "label": "Castaway Crate opened"
+          }
+        }
+      },
+      "q_ps_pouch_and_purse": {
+        "title": "Pouch and Purse",
+        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
+        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "objectives": {
+          "0": {
+            "label": "Linen Pouch bought"
+          }
+        }
+      },
+      "q_ps_the_signpost": {
+        "title": "Word on the Wind",
+        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
+        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "objectives": {
+          "0": {
+            "label": "Guild signpost read"
+          }
+        }
+      },
+      "q_ps_the_long_walk": {
+        "title": "The Long Walk",
+        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
+        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "objectives": {
+          "0": {
+            "label": "Walked back from the dead"
+          }
+        }
+      },
+      "q_ps_set_sail": {
+        "title": "Set Sail",
+        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
+        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "objectives": {
+          "0": {
+            "label": "Report to Ferryman Odo"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "Descendo a Trilha do Vento",
         "text": "Você fez a subida, {playerName}, então o vento decidiu te manter. Wickharbor fica a leste ao longo da estrada das colinas, protegida a sotavento de sua enseada. A Capitã do Porto Odile conta toda alma que atravessa o desfiladeiro, e vai querer contar você também. Diga a ela que a Trilha do Vento ainda está aberta.",
@@ -16947,6 +17108,9 @@ export const pt_BR: EnTranslations = {
           },
           "11": {
             "label": "A Calçada de Farshore"
+          },
+          "12": {
+            "label": "Eastbrook Docks"
           }
         }
       },
@@ -17307,6 +17471,27 @@ export const pt_BR: EnTranslations = {
           },
           "4": {
             "label": "Os Campos das Fendas"
+          }
+        }
+      },
+      "proving_shore": {
+        "name": "The Proving Shore",
+        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "pois": {
+          "0": {
+            "label": "Dawnrest Camp"
+          },
+          "1": {
+            "label": "The Old Pier"
+          },
+          "2": {
+            "label": "The Practice Yard"
+          },
+          "3": {
+            "label": "The Wreck Line"
+          },
+          "4": {
+            "label": "The Gauntlet"
           }
         }
       }

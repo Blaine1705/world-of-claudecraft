@@ -13,6 +13,59 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bootcamp.promptAttack': '공격',
+  'hudChrome.bootcamp.keycapThen': '다음',
+  'hudChrome.bootcamp.promptSummon': '소환',
+  'hudChrome.bootcamp.taskPearlBody':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 {bagsKey}를 눌러 가방을 열고, 짠물 미끼를 왼쪽 클릭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 {interactKey}를 눌러 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.taskPearlBodyTouch':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 탭해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기를 탭해 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.taskPearlBodyPad':
+    '황금 길을 따라 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 가방을 열고 짠물 미끼를 선택해 녀석을 불러내세요. 종종게와 싸웠던 것처럼 싸우고, 녀석이 쓰러지면 껍데기에 대고 상호작용 버튼을 눌러 영롱한 진주를 차지하세요.',
+  'hudChrome.bootcamp.ringEquipTitle': '전리품을 착용하세요',
+  'hudChrome.bootcamp.ringEquipBody':
+    '진주의 어머니가 가방 안에 있습니다. {bagsKey}를 눌러 가방을 열고, 반지를 왼쪽 클릭해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringEquipBodyTouch':
+    '진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 탭해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringEquipBodyPad':
+    '진주의 어머니가 가방 안에 있습니다. 가방을 열고 반지를 선택해 손가락에 끼우세요.',
+  'hudChrome.bootcamp.ringAdmireTitle': '잘 어울리네요',
+  'hudChrome.bootcamp.ringAdmireBody':
+    '잘 어울립니다. {charKey}를 눌러 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'hudChrome.bootcamp.ringAdmireBodyTouch':
+    '잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'hudChrome.bootcamp.ringAdmireBodyPad':
+    '잘 어울립니다. 메뉴에서 캐릭터 창을 열고, 손에 낀 반지와 반지가 올려 주는 능력치를 확인하세요.',
+  'entities.mobs.mister_crabs.name': '미스터 크랩스',
+  'entities.items.ps_briny_lure.name': '짠물 미끼',
+  'entities.items.ps_lustrous_pearl.name': '영롱한 진주',
+  'entities.items.mother_of_pearl.name': '진주의 어머니',
+  'entities.quests.q_ps_mother_of_pearl.title': '진주의 어머니',
+  'entities.quests.q_ps_mother_of_pearl.text':
+    '껍데기 셋을 깼군요, {playerName}. 하지만 난파선 해안에는 왕이 있고, 그 왕은 이 백사장의 어느 상자보다 값진 보물을 깔고 앉아 있습니다. 이 짠물 미끼를 들고 난파선 너머, 백사장 서쪽 끝의 조수 웅덩이로 가세요. 물가에 서서 B를 눌러 가방을 열고, 미끼를 왼쪽 클릭해 왕을 깨우세요. 미스터 크랩스의 집게는 작은 사촌들보다 훨씬 아픕니다. 생명력 막대를 살피고, 계속 공격하고, 숨을 돌려야 하면 모래 위로 물러나세요. 왕이 쓰러지면 이름이 보일 때까지 껍데기로 다가가 F를 누르거나 왼쪽 클릭해, 왕이 껴안고 있던 영롱한 진주를 차지하세요. 그 진주를 제게 가져오세요.',
+  'entities.quests.q_ps_mother_of_pearl.completion':
+    '영롱한 진주, 그것도 얕은 바다의 늙은 왕에게서 직접 떼어 낸 것이군요. 제 아버지는 일 나가는 아침마다 그 게에게 모자를 들어 인사했습니다. 존경은 마땅히 치러야지요. 가만히... 됐습니다. 실에 꿰고, 고정하고, 이제 당신 것입니다, {playerName}. 진주의 어머니입니다. B를 눌러 가방을 열고 반지를 왼쪽 클릭해 끼워 보세요. 그런 다음 C를 눌러 캐릭터 창을 열면 손에 낀 반지가 보일 겁니다. 작은 물건이지만, 끼고 있으면 당신의 모든 것이 조금씩 나아집니다.',
+  'entities.quests.q_ps_mother_of_pearl.objectives.0.label': '미스터 크랩스 처치',
+  'entities.quests.q_ps_mother_of_pearl.objectives.1.label': '영롱한 진주 획득',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCaster':
+    '짚 허수아비에게 다가가 왼쪽 클릭해 대상으로 잡으세요. 화면 위쪽에 이름이 나타납니다. 그런 다음 {attackKey}를 누르거나 행동 단축바의 두 번째 버튼을 클릭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterTouch':
+    '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 두 번째 버튼을 탭해 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyCasterPad':
+    '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 두 번째 행동 버튼을 눌러 주문을 시전하세요. 하나가 무너질 때까지 계속 시전하세요.',
+  'hudChrome.bootcamp.taskShellBodyCaster':
+    '종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyCasterTouch':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyCasterPad':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르며 거리를 둔 채 계속 시전하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.voiceGraduate': '자네를 위해 종이 울렸네. 바다 건너 이스트브룩이 기다리고 있고, 자네는 준비가 되었네.',
+  'hudChrome.bootcamp.voiceVeerOff': '잠깐, 친구. 그쪽이 아닐세. 황금 길은 뒤에 있네.',
+  'hudChrome.bootcamp.voiceStationDoneB': '제법 손에 익어 가는군, 틀림없네.',
+  'hudChrome.bootcamp.voiceStationDoneA': '잘했네. 다음으로 가게, 길은 이미 밝혀 두었으니.',
+  'hudChrome.bootcamp.voiceRunDone': '깔끔한 질주였네. 보상은 감독관 펠이 갖고 있으니 가서 받게.',
+  'hudChrome.bootcamp.voiceFirstFlag': '깃발 하나를 지났군. 다리를 멈추지 말게, 이제 둘 남았네.',
+  'hudChrome.bootcamp.voiceArrival': '무사히 뭍에 올랐군. 발밑의 황금 길이 보이나? 나보다 길을 잘 아니 그대로 따라가게.',
   'hudChrome.lastkeepMap.title': '{keep}: {story}',
   'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.classPage.formName.form_cat': '늑대 변신',
@@ -65,6 +118,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '자리비움',
   'hudChrome.nameplate.cheaterTag': '< 부정행위자 >',
+  'hudChrome.nameplate.pledgeTag': '{guild} 서약자',
+  'hudChrome.pledge.open': '서약 받는 중',
+  'hudChrome.pledge.closed': '서약 받지 않음',
+  'hudChrome.pledge.minLevel': '레벨 {level} 이상',
+  'hudChrome.pledge.action': '서약',
+  'hudChrome.pledge.actionTitle': '{guild}에 서약하기',
+  'hudChrome.pledge.pledged': '서약함',
+  'hudChrome.pledge.yourGuild': '내 길드',
+  'hudChrome.pledge.tab': '서약',
+  'hudChrome.pledge.tabWithCount': '서약 ({count})',
+  'hudChrome.pledge.empty': '아직 길드에 서약한 사람이 없습니다.',
+  'hudChrome.pledge.accept': '수락',
+  'hudChrome.pledge.acceptTitle': '{name}의 서약 수락',
+  'hudChrome.pledge.reject': '거절',
+  'hudChrome.pledge.rejectTitle': '{name}의 서약 거절',
+  'hudChrome.pledge.settings': '모집 설정',
+  'hudChrome.pledge.acceptingLabel': '서약 받기',
+  'hudChrome.pledge.minLevelLabel': '최소 레벨',
+  'hudChrome.pledge.noteLabel': '게시판 메모',
+  'hudChrome.pledge.notePlaceholder': '길드가 어떤 동료를 찾는지 알려 주세요',
+  'hudChrome.pledge.save': '저장',
+  'hudChrome.pledge.yourPledge': '내 서약: {guild}',
+  'hudChrome.pledge.since': '{date}에 서약',
+  'hudChrome.pledge.withdraw': '서약 철회',
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
@@ -528,8 +605,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auth.appleChoiceIntro': '새 계정을 만들거나 Apple을 기존 계정에 연결하세요.',
   'hudChrome.auth.appleChoiceExpired':
     'Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.',
-  'hudChrome.vcup.guildBoardWl': '{wins}승 {losses}패',
-  'hudChrome.vcup.shootPower': '파워',
   'hudChrome.discord.roleTag.coredevs': '핵심 개발자',
   'hudChrome.options.version': 'v{version} ({build})',
   'auth.emailPlaceholder': 'you@example.com',
@@ -4547,6 +4622,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.farshore_isle.pois.3.label': '찢겨진 절벽',
   'entities.zones.farshore_isle.pois.4.label': '균열의 들판',
   'entities.zones.eastbrook_vale.pois.11.label': '먼바다 해안 모래톱 둑길',
+  'entities.zones.eastbrook_vale.pois.12.label': '이스트브룩 부두',
   'entities.mobs.moor_ram.name': '황무지 숫양',
   'entities.mobs.gale_wisp.name': '돌풍 정령',
   'entities.mobs.shoal_scuttler.name': '여울 게',
@@ -5803,6 +5879,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.other':
     '검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.',
   'hudChrome.controller.title': '컨트롤러',
+  'hudChrome.controller.glyphStyle': '버튼 표시',
+  'hudChrome.controller.glyphStyleAuto': '자동',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': '플레이스테이션',
+  'hudChrome.controller.glyphStyleNintendo': '닌텐도',
   'hudChrome.controller.enable': '컨트롤러 사용',
   'hudChrome.controller.invertY': '카메라 반전(Y축)',
   'hudChrome.controller.deadzone': '스틱 데드존',
@@ -6259,7 +6340,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.reliquary': '성물고',
   'guide.controls.sheathe': '무기 넣기/빼기',
   'guide.controls.crafting': '제작',
-  'guide.controls.valeCup': '베일 컵',
   'guide.controls.mount': '탑승 / 하차',
   'guide.controls.calendar': '이벤트 달력',
   'guide.controls.dungeonFinder': '던전 찾기',
@@ -8458,7 +8538,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_arcane.name': '집정관 닉사리스',
   'entities.mobs.rift_boss_storm.name': '폭풍 바로크',
   'entities.mobs.rift_boss_tide.name': '심연의 아가리',
-  'entities.mobs.vale_cup_ball.name': '멧돼지 가죽 공',
   'entities.npcs.brother_halven_marsh.name': '브라더 할벤',
   'entities.npcs.brother_halven_marsh.title': '성물실 관리인',
   'entities.npcs.brother_halven_marsh.greeting':
@@ -8495,6 +8574,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.body.too_large': '요청이 너무 큽니다. 데이터를 줄여 다시 시도하세요.',
   'apiError.body.unsupported_media_type': '지원되지 않는 요청 형식입니다.',
   'apiError.deeds.invalid_input': '입력이 올바르지 않습니다.',
+  'apiError.guilds.invalid_roster_name': '길드 이름이 유효하지 않습니다.',
+  'apiError.guilds.unknown': '그런 이름의 길드가 없습니다.',
   'apiError.ota_updates.invalid_input': '입력이 올바르지 않습니다.',
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
@@ -8586,6 +8667,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_points': '포인트가 부족합니다.',
   'hudChrome.mailbox.title': '우편함',
   'hudChrome.noticeboard.empty': '게시된 내용이 없는 것 같습니다.',
+  'hudChrome.noticeboard.subtitle': '월드의 길드',
+  'hudChrome.noticeboard.rosterTitle': '{guild}의 명단 보기',
+  'hudChrome.noticeboard.back': '뒤로',
+  'hudChrome.noticeboard.popupTitle': '길드 게시 기둥',
+  'hudChrome.noticeboard.close': '닫기',
   'hudChrome.mailbox.subtitle': '레이븐포스트',
   'hudChrome.mailbox.close': '우편함 닫기',
   'hudChrome.mailbox.tabInbox': '받은 편지함',
@@ -9281,7 +9367,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.questStripAriaSingle': '추적 중인 퀘스트: {title}',
   'hudChrome.mobile.questStripMore': '외 {count}개',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
-  'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.keybinds.categoryPet': '펫',
   'hudChrome.keybinds.petAttack': '펫: 공격',
   'hudChrome.keybinds.petStop': '펫: 정지',
@@ -9289,179 +9374,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petTaunt': '펫: 도발',
   'hudChrome.keybinds.petDefensive': '펫: 방어',
   'hudChrome.keybinds.petAggressive': '펫: 공격적',
-  'hudChrome.vcup.title': '베일 컵',
-  'hudChrome.vcup.close': '베일 컵 창 닫기',
-  'hudChrome.vcup.offlineNote': '대진표가 닫혀 있습니다. 지금은 베일 컵을 이용할 수 없습니다.',
-  'hudChrome.vcup.recordLine': '전적: {wins}승 {losses}패 {draws}무.',
-  'hudChrome.vcup.bracketsAria': '경기 등급',
-  'hudChrome.vcup.bracketLabel': '{n}대{n}',
-  'hudChrome.vcup.waitingCount': '{count}명 대기 중',
-  'hudChrome.vcup.nationsHeading': '깃발 국가',
-  'hudChrome.vcup.nation.vale': '이스트브룩 골짜기',
-  'hudChrome.vcup.nation.mirefen': '마이어펜',
-  'hudChrome.vcup.nation.thornpeak': '쏜피크',
-  'hudChrome.vcup.nation.coliseum': '잿빛 원형경기장',
-  'hudChrome.vcup.nation.choir': '창백한 성가대',
-  'hudChrome.vcup.nation.ogre': '오우거 부족',
-  'hudChrome.vcup.nation.moon': '창백한 달',
-  'hudChrome.vcup.nation.copperdig': '구리 광산',
-  'hudChrome.vcup.awayNote': '양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.',
-  'hudChrome.vcup.rolesHeading': '포지션',
-  'hudChrome.vcup.rolesSmallBracketNote':
-    '1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 3대3 이상 등급이 필요한 업적은 여기서 달성할 수 없습니다.',
-  'hudChrome.vcup.role.allrounder.name': '올라운더',
-  'hudChrome.vcup.role.allrounder.desc': '조금씩 다 합니다: 킥, 롱킥, 그리고 정당한 어깨싸움.',
-  'hudChrome.vcup.role.striker.name': '스트라이커',
-  'hudChrome.vcup.role.striker.desc': '롱킥과 재빠른 사이드스텝에 사는 포지션.',
-  'hudChrome.vcup.role.sweeper.name': '스위퍼',
-  'hudChrome.vcup.role.sweeper.desc': '공을 가진 상대를 밀쳐내고 멀리 걷어냅니다.',
-  'hudChrome.vcup.role.keeper.name': '키퍼',
-  'hudChrome.vcup.role.keeper.desc': '캐치, 다이빙, 펀트로 골 지역을 지킵니다.',
-  'hudChrome.vcup.queue': '대기열 참가',
-  'hudChrome.vcup.leaveQueue': '대기열 떠나기',
-  'hudChrome.vcup.queueNote': '어디서든 줄을 설 수 있습니다. 휘슬이 울리면 소우필드로 부릅니다.',
-  'hudChrome.vcup.queuedStatus': '{bracket} 대기 중: {count}명 중 {position}번째.',
-  'hudChrome.vcup.blockNation': '먼저 깃발 국가를 선택하세요.',
-  'hudChrome.vcup.blockPartySize': '해당 등급에는 더 작은 파티가 필요합니다.',
-  'hudChrome.vcup.blockNotLeader': '파티장만 팀을 대기열에 올릴 수 있습니다.',
-  'hudChrome.vcup.inMatchNote': '당신의 팀이 경기장에 있습니다. 계속 뛰세요!',
-  'hudChrome.vcup.deserterNote':
-    '경기장 관리인은 기억하고 있습니다. {seconds}초 후에 다시 줄을 설 수 있습니다.',
-  'hudChrome.vcup.liveHeading': '지금 소우필드에서는',
-  'hudChrome.vcup.liveAria': '베일 컵: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.walkUp': '소우필드로 걸어가 관중석에서 관전하세요.',
-  'hudChrome.vcup.noLive': '경기장이 조용합니다. 진행 중인 경기가 없습니다.',
-  'hudChrome.vcup.boardHeading': '우승자 명판',
-  'hudChrome.vcup.boardEmpty': '아직 기록된 우승자가 없습니다. 구리 들통이 기다립니다.',
-  'hudChrome.vcup.enterAsGuild': '{guild} 깃발 아래 출전',
-  'hudChrome.vcup.guildRecordLine': '길드 전적: {wins}승 {losses}패.',
-  'hudChrome.vcup.guildBoardHeading': '길드 깃발',
-  'hudChrome.vcup.guildBoardEmpty': '아직 출전한 길드가 없습니다. 깃발을 올리세요!',
-  'hudChrome.vcup.practicingNow': '연습 중 ({count}):',
-  'hudChrome.vcup.boardWins': '{count}승',
-  'hudChrome.vcup.practice': '봇 연습 경기',
-  'hudChrome.vcup.practiceNote': '소우필드에서 봇과의 정식 경기를 즉시 시작합니다.',
-  'hudChrome.vcup.practiceUnratedNote':
-    '연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.',
-  'hudChrome.vcup.clock': '{minutes}:{seconds}',
-  'hudChrome.vcup.indicatorQueued': '베일 컵 대기열: {bracket}, {count}명 중 {position}번째',
-  'hudChrome.vcup.indicatorLive': '베일 컵',
-  'hudChrome.vcup.indicatorOpen': '베일 컵 창 열기',
-  'hudChrome.vcup.phaseCountdown': '킥오프까지 {seconds}',
-  'hudChrome.vcup.phaseGoal': '골!',
-  'hudChrome.vcup.phaseGolden': '골든골',
-  'hudChrome.vcup.phaseOver': '경기 종료',
-  'hudChrome.vcup.bannerFound': '베일 컵이 부릅니다: {nationA} 대 {nationB}!',
-  'hudChrome.vcup.bannerCountdown': '킥오프까지 {seconds}초...',
-  'hudChrome.vcup.bannerKickoff': '킥오프!',
-  'hudChrome.vcup.bannerGoal': '골! {nation}의 득점!',
-  'hudChrome.vcup.bannerSave': '{name}의 선방!',
-  'hudChrome.vcup.bannerGolden': '골든골: 다음 득점이 승부를 가릅니다!',
-  'hudChrome.vcup.bannerEnd': '경기 종료: {nationA} {scoreA}, {nationB} {scoreB}',
-  'hudChrome.vcup.bannerWin': '소우필드의 승리!',
-  'hudChrome.vcup.bannerDraw': '소우필드의 한판이 무승부로 끝났습니다.',
-  'hudChrome.vcup.bannerLoss': '소우필드에서의 패배.',
-  'hudChrome.vcup.logQueued': '{bracket} 베일 컵 대기열에 참가했습니다({position}번째).',
-  'hudChrome.vcup.logUnqueued': '베일 컵 대기열에서 나왔습니다.',
-  'hudChrome.vcup.logFound': '베일 컵 경기가 준비되었습니다: {nationA} 대 {nationB}.',
-  'hudChrome.vcup.logRoster': '아군: {allies}. 상대: {enemies}.',
-  'hudChrome.vcup.logGoal':
-    '{name}, {nation}을(를) 위한 득점! {nationA} {scoreA}, {nationB} {scoreB}.',
-  'hudChrome.vcup.logSave': '{name}의 선방!',
-  'hudChrome.vcup.logWin': '소우필드의 한판에서 승리했습니다.',
-  'hudChrome.vcup.logDraw': '소우필드의 한판이 무승부로 끝났습니다.',
-  'hudChrome.vcup.logLoss': '소우필드의 한판에서 패배했습니다.',
-  'hudChrome.vcup.gossipOpen': '대진표',
-  'hudChrome.vcup.gossipOpenAria': '베일 컵 창 열기',
-  'hudChrome.vcup.mobileLabel': '컵',
-  'hudChrome.vcup.briefing.subtitle': '경기 전 브리핑',
-  'hudChrome.vcup.briefing.vs': '대',
-  'hudChrome.vcup.briefing.rulesHeading': '플레이 방법',
-  'hudChrome.vcup.briefing.rule1': '공을 상대 골대에 차거나 패스해 득점하세요.',
-  'hudChrome.vcup.briefing.rule2': '먼저 5골을 넣으면 승리, 종료 시 더 많이 넣은 쪽이 승리.',
-  'hudChrome.vcup.briefing.rule3': '종료 시 동점이면 골든골, 다음 득점자가 승리합니다.',
-  'hudChrome.vcup.briefing.rule4': '태클은 넘어뜨릴 뿐, 추수 휴전으로 아무도 다치지 않습니다.',
-  'hudChrome.vcup.briefing.rule5': '누구나 다가와 관중석에서 응원할 수 있습니다.',
-  'hudChrome.vcup.briefing.kitHeading': '내 기술',
-  'hudChrome.vcup.briefing.kitNote': '경기 동안 이 동작들이 직업 능력을 대신합니다.',
-  'hudChrome.vcup.briefing.unratedNote':
-    '봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.',
-  'hudChrome.vcup.briefing.practiceUnratedNote':
-    '이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.',
-  'hudChrome.vcup.briefing.rosterHeading': '출전 명단',
-  'hudChrome.vcup.briefing.you': '나',
-  'hudChrome.vcup.briefing.bot': '봇',
-  'hudChrome.vcup.briefing.ready': '준비 완료',
-  'hudChrome.vcup.briefing.readyDone': '준비됨',
-  'hudChrome.vcup.briefing.readyAria': '킥오프 준비',
-  'hudChrome.vcup.briefing.waiting': '상대편의 준비를 기다리는 중...',
-  'hudChrome.vcup.briefing.whistle': '{seconds}초 후 휘슬이 울립니다.',
-  'hudChrome.vcup.briefing.readyCount': '준비 완료 {ready}/{total}',
-  'hudChrome.vcup.bet.title': '경기 베팅',
-  'hudChrome.vcup.bet.aria': '베일 컵 경기 베팅',
-  'hudChrome.vcup.bet.closesIn': '{seconds}초 후 베팅 마감',
-  'hudChrome.vcup.bet.closed': '베팅 마감',
-  'hudChrome.vcup.bet.prize': '상금 풀 {amount}',
-  'hudChrome.vcup.bet.splitAria': '양 팀 베팅 풀 비율',
-  'hudChrome.vcup.bet.expand': '베팅 보기 및 걸기',
-  'hudChrome.vcup.bet.collapse': '베팅 숨기기',
-  'hudChrome.vcup.bet.oddsLabel': '배당',
-  'hudChrome.vcup.bet.back': '{team} 베팅',
-  'hudChrome.vcup.bet.form': '{wins}승-{losses}패',
-  'hudChrome.vcup.bet.mine': '내 베팅: {amount}, {team}',
-  'hudChrome.vcup.bet.none': '아직 이 경기에 베팅하지 않았습니다.',
-  'hudChrome.vcup.bet.record': '베팅 전적: {wins}승-{losses}패, {sign}{net}',
-  'hudChrome.vcup.bet.wonBanner': '베팅 적중!',
-  'hudChrome.vcup.bet.wonLog': '베일 컵 베팅 적중: {amount} 반환.',
-  'hudChrome.vcup.bet.lostLog': '베일 컵 베팅 실패: {amount}.',
-  'hudChrome.vcup.bet.refundLog': '베팅 무효, 베팅금 {amount} 반환.',
-  'guide.nav.valeCup': '베일 컵',
-  'guide.valeCupPage.heading': '베일 컵',
-  'guide.valeCupPage.intro':
-    '소우필드의 보어볼: 깃발을 고르고 포지션을 골라, 짚을 채운 멧돼지 가죽 공을 키퍼 너머로 차 넣고 구리 들통을 노리세요. 피도 전리품도 없이, 오직 관중석의 함성뿐.',
-  'guide.valeCupPage.loreHeading': '보어볼과 수확 휴전',
-  'guide.valeCupPage.loreOldSow':
-    '망자들이 깨어나기 훨씬 전, 이스트브룩의 농부들은 수확이 끝난 그루터기 밭에서 보어볼을 즐겼습니다. 두 무리, 짚을 채운 멧돼지 가죽 하나, 그리고 풀밭 양 끝으로 끌어다 놓은 짐마차 문 두 짝. 첫 번째 공 "올드 소우"는 청동을 입고 선술집 벽난로 위에 걸려 있습니다.',
-  'guide.valeCupPage.loreTruce':
-    '잿빛 원형경기장이 전쟁 경기를 공인하기 시작하자 레드브룩 원수는 더 온화한 것으로 답했습니다. 옛 풀밭에 상시 수확 휴전을 선포한 것입니다. 짐마차 문은 골대가 되었고, 풀밭에는 담장과 관중석, 그리고 "소우필드"라는 이름이 생겼습니다. 상품은 언제나 같았습니다. 우승자들이 돌려 마시던 찌그러진 우유통, 구리 들통입니다.',
-  'guide.valeCupPage.howHeading': '경기 방법',
-  'guide.valeCupPage.howQueue':
-    '베일 컵 창으로 어디서든 줄을 서거나, 소우필드 정문의 경기장 관리인 브람에게 말을 거세요. 1대1부터 5대5까지의 등급과 깃발 국가, 포지션을 고르고, 혼자든 파티든 참가할 수 있습니다.',
-  'guide.valeCupPage.howMatch':
-    '킥오프와 함께 직업 기술이 스포츠 키트로 바뀌고 경기 후 정확히 복원됩니다. 킥은 지면 조준점으로 겨냥하고, 공은 펜스에 튕기며, 드리블은 공과 함께 달리는 것뿐입니다. 종료 전까지 상대보다 많이 득점하세요. 무승부면 골든골로 이어집니다.',
-  'guide.valeCupPage.howTruce':
-    '소우필드에서는 아무도 피 흘리지 않습니다. 태클은 구르게 할 뿐 아무것도 다치게 하지 않고, 펫은 경기 동안 쉬어 갑니다.',
-  'guide.valeCupPage.spectateBody':
-    '경기장에서는 한 번에 한 경기만 열리며, 누구나 걸어와 관중석에서 관전할 수 있습니다.',
-  'guide.valeCupPage.nationsHeading': '여덟 깃발 국가',
-  'guide.valeCupPage.nationsBody':
-    '모든 팀은 깃발 아래에서 경기합니다. 주장이 국가를 고르며, 양측이 같은 깃발을 들면 원정 팀이 반전 배색으로 뜁니다.',
-  'guide.valeCupPage.nationVale': '초록과 금, 밀단 깃발: 뼛속까지 농사꾼인 홈 팀.',
-  'guide.valeCupPage.nationMirefen':
-    '청록과 회색, 왜가리 아래: 참을성 있고, 다리 길고, 서두르지 않는다.',
-  'guide.valeCupPage.nationThornpeak':
-    '얼음빛 파랑과 하양, 산봉우리 아래: 발걸음이 굳세고 고집이 세다.',
-  'guide.valeCupPage.nationColiseum': '빨강과 검정, 교차한 검: 아직도 전쟁 경기인 줄 알고 뛴다.',
-  'guide.valeCupPage.nationChoir': '옅은 파랑과 은빛, 종 아래: 으스스하고 정밀하며 아주 조용하다.',
-  'guide.valeCupPage.nationOgre': '주황과 암갈색, 주먹을 앞세워: 어깨부터 들이밀고 그걸 자랑한다.',
-  'guide.valeCupPage.nationMoon': '보라와 은빛, 초승달 아래: 밤의 선수들, 발놀림이 가볍다.',
-  'guide.valeCupPage.nationCopperdig': '구리빛과 갈색, 곡괭이와 함께: 쉬지 않고 달리는 광부들.',
-  'guide.valeCupPage.rolesHeading': '포지션',
-  'guide.valeCupPage.rolesBody':
-    '포지션이 경기장에 들고 갈 키트를 정합니다. 누구나 공을 찹니다. 나머지는 기질의 문제입니다. 1인전과 2인전 구간에서는 모두가 만능 키트로 뛰므로, 포지션 선택은 3인전부터 비로소 제 몫을 합니다.',
-  'guide.valeCupPage.rewardsHeading': '휴전 규칙',
-  'guide.valeCupPage.rewardsBody':
-    '휴전 규칙이란 경험치도 전리품도 없다는 뜻입니다. 승부가 난 경기는 전적과 우승자 명판에 기록되고, 승리는 그날의 보상 과제에도 포함됩니다. 경기를 버리면 자리가 비고, 경기장 관리인은 그것을 기억합니다.',
-  'guide.valeCupPage.bettingHeading': '난간에서 거는 가벼운 내기',
-  'guide.valeCupPage.bettingBody':
-    '경기가 꾸려지는 동안 소우필드의 관중은 한쪽 편에 돈을 걸 수 있습니다. 베팅금은 하나로 모이고, 종료 휘슬이 울리면 이긴 쪽이 진 쪽의 풀을 저마다 건 만큼에 비례해 나눠 가집니다. 무승부로 끝나거나 아무도 걸지 않은 이변이 일어나면 모든 동전이 반환됩니다. 경기에 나선 선수는 자기 경기에 베팅할 수 없으며, 난간은 당신의 통산 승패와 순수익을 기록해 둡니다.',
-  'guide.valeCupPage.practiceHeading': '연습 경기와 한가한 경기장',
-  'guide.valeCupPage.practiceBody':
-    '베일 컵 창에서는 연습도 할 수 있습니다. 봇이 양 팀을 채우고 무엇도 전적에 남지 않는, 경기장의 개인 사본입니다. 정식 경기에 한두 명이 모자란가요? 잠시 기다리면 봇이 팀을 채워 주며, 봇이 뛰는 경기는 언제나 친선전이고 결코 등급전으로 기록되지 않습니다. 그리고 소우필드가 한가할 때면 봇들이 시범 경기를 펼치는데, 관중석에서 구경하고 돈도 걸 수 있습니다. 진짜 플레이어들이 준비를 마치는 순간 시범 경기는 자리를 내주고, 걸린 돈은 모두 반환됩니다.',
-  'entities.npcs.groundskeeper_bram.name': '경기장 관리인 브람',
-  'entities.npcs.groundskeeper_bram.title': '소우필드의 관리인',
-  'entities.npcs.groundskeeper_bram.greeting':
-    '소우필드에서는 휴전이 지켜지고 있소, {className}. 발과 어깨만 쓸 수 있소. 구리 들통을 걸고 한판 하겠소?',
   'entities.npcs.chronicler_saul.name': '연대기 기록관 사울',
   'entities.npcs.chronicler_saul.title': '이스트브룩 골짜기 연대기',
   'entities.npcs.chronicler_saul.greeting':
@@ -13437,6 +13349,277 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.notAvailable': '사용할 수 없음',
   'hudChrome.perf.diagnostics.report.status.critical': '심각',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '주의 필요',
+  // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.bodyFirst':
+    '처음 보는 얼굴이군요, 친구. 이 땅에서는 모험을 시작하는 이들이 수련의 해안을 찾는 것이 전통이에요. 해협 너머의 조용한 섬이죠. 그곳에서 세상의 시련에 맞서기 전에 실력을 갈고닦고 이곳에 익숙해질 수 있어요. 나룻배는 양방향으로 다니고, 가든 안 가든 누구도 당신을 얕보지 않을 거예요.',
+  'hudChrome.tutorialGreeting.bodyRefresher':
+    '새 얼굴로 또 오셨군요? 그럼 어떻게 돌아가는지 아시겠네요. 그래도 떠나기 전에 복습을 원하신다면, 수련의 해안은 돌아온 학생을 내치는 법이 없답니다. 나룻배는 언제든 준비되어 있어요.',
+  'hudChrome.tutorialGreeting.play': '튜토리얼 진행하기',
+  'hudChrome.tutorialGreeting.declineNote':
+    '뜻대로 하세요, 친구. 언제든 마음이 바뀌면, 레이븐포스트 우편함 옆의 나룻배 종이 밤낮없이 수련의 해안으로 데려다줍니다. 늑대는 기다려 주지 않지만, 그 종은 기다려 준답니다.',
+  'hudChrome.tutorialGreeting.bellHomeNote':
+    '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
+  'hudChrome.tutorialGreeting.islandArrivalNote':
+    '방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.',
+  'hudChrome.tutorialGreeting.noteClose': '알겠어요',
+  'hudChrome.tutorialGreeting.skip': '튜토리얼 건너뛰기',
+  'hudChrome.bootcamp.title': '첫걸음',
+  'hudChrome.bootcamp.talkTitle': '워든 탐에게 말 걸기',
+  'hudChrome.bootcamp.talkBody':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.talkBodyTouch':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 그를 탭하거나 사용 버튼을 탭해 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.talkBodyPad':
+    '워든 탐이 바로 앞에서 건틀릿 문을 지키고 있습니다. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 말을 거세요. 그가 달리기 과제를 내줄 겁니다.',
+  'hudChrome.bootcamp.forwardTitle': '첫 번째 길 걷기',
+  'hudChrome.bootcamp.forwardBody':
+    '탐 옆의 길에 들어서서 {forwardKey}를 누른 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.forwardBodyTouch':
+    '탐 옆의 길에 들어서서 이동 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.forwardBodyPad':
+    '탐 옆의 길에 들어서서 왼쪽 스틱을 위로 민 채 서쪽 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkTitle': '돌아선 다음 걷기',
+  'hudChrome.bootcamp.turnwalkBody':
+    '깃발 하나 통과. {turnKey}를 누른 채 제자리에서 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 다시 {forwardKey}를 누른 채 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkBodyTouch':
+    '깃발 하나 통과. (이동 스틱이 아니라) 세상 화면을 손가락으로 드래그해 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.turnwalkBodyPad':
+    '깃발 하나 통과. 오른쪽 스틱을 밀어 돌아 남쪽으로 뻗은 울타리 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 두 번째 깃발까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeTitle':
+    '돌아서 걷기',
+  'hudChrome.bootcamp.strafeBody':
+    '모퉁이 하나 남았습니다. {turnLeftKey}를 누른 채 제자리에서 돌아 마지막 길을 정면에 두고, 다시 {forwardKey}를 누른 채 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeBodyTouch':
+    '모퉁이 하나 남았습니다. (이동 스틱이 아니라) 화면을 손가락으로 쓸어 방향을 돌려 마지막 길을 정면에 두고, 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
+  'hudChrome.bootcamp.strafeBodyPad':
+    '모퉁이 하나 남았습니다. 오른쪽 스틱을 밀어 방향을 돌려 마지막 길을 정면에 두고, 왼쪽 스틱을 위로 밀어 붉은 깃발이 등 뒤로 갈 때까지 걸어가세요.',
+  'hudChrome.bootcamp.cameraTitle': '시점 돌리기',
+  'hudChrome.bootcamp.cameraBody':
+    '완주를 보고하기 전 마지막 가르침입니다. 마우스 오른쪽 버튼을 누른 채 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
+  'hudChrome.bootcamp.cameraBodyTouch':
+    '완주를 보고하기 전 마지막 가르침입니다. 세상 화면을 손가락으로 드래그해 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
+  'hudChrome.bootcamp.cameraBodyPad':
+    '완주를 보고하기 전 마지막 가르침입니다. 오른쪽 스틱을 밀어 시점을 몸 주위로 한 바퀴 빙 돌려 보세요. 등 뒤에 무엇이 서 있는지 아는 쪽이 싸움에서 이깁니다.',
+  'hudChrome.bootcamp.courseProgress': '깃발 {current} / {total}',
+  'hudChrome.bootcamp.doneTitle': '완주',
+  'hudChrome.bootcamp.doneBody':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그에게 {interactKey}를 누르거나 왼쪽 클릭해 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.doneBodyTouch':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 그를 탭해 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.doneBodyPad':
+    '몸 쓰는 법은 이걸로 전부입니다. 감독관 펠이 붉은 깃발 옆에 서 있습니다. 상호작용 버튼을 눌러 완주를 보고하고 첫 보상을 받으세요.',
+  'hudChrome.bootcamp.coachNextTitle': '다음: {npc}',
+  'hudChrome.bootcamp.coachNextBody':
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 {interactKey}를 누르거나 왼쪽 클릭해 다음 임무를 받으세요.',
+  'hudChrome.bootcamp.coachNextBodyTouch':
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상대를 탭하거나 사용 버튼을 탭해 다음 임무를 받으세요.',
+  'hudChrome.bootcamp.coachNextBodyPad':
+    '황금 길을 따라 {npc}에게 가세요. 이름이 보일 때까지 다가가 상호작용 버튼을 눌러 다음 임무를 받으세요.',
+  'hudChrome.bootcamp.coachTaskBody':
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 {mapKey}로 지도를 열 수 있습니다.',
+  'hudChrome.bootcamp.coachTaskBodyTouch':
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
+  'hudChrome.bootcamp.coachTaskBodyPad':
+    '황금 길을 따라 임무 장소로 가세요. 오른쪽 추적창이 진행을 세어 주고, 길을 잃으면 지도 버튼이 길을 보여 줍니다.',
+  'hudChrome.bootcamp.coachReadyTitle': '임무 완료',
+  'hudChrome.bootcamp.coachReadyBody':
+    '{npc}에게 가서 {interactKey}를 누르거나 왼쪽 클릭해 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.coachReadyBodyTouch':
+    '{npc}에게 가서 상대를 탭해 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.coachReadyBodyPad':
+    '{npc}에게 가서 상호작용 버튼을 눌러 임무를 보고하고 보상을 받으세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBody':
+    '짚 허수아비에게 다가가 왼쪽 클릭해 대상으로 잡으세요. 화면 위쪽에 이름이 나타납니다. 그런 다음 {attackKey}를 누르거나 행동 단축바의 첫 번째 버튼을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskStrikeTrueBodyTouch':
+    '짚 허수아비에게 다가가 탭해 대상으로 잡으세요. 그런 다음 행동 단축바의 첫 번째 버튼을 탭해 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.promptTurnIn':
+    '퀘스트 완료',
+  'hudChrome.bootcamp.promptSelect':
+    '대상 지정',
+  'hudChrome.bootcamp.promptUseAbility':
+    '기술 사용',
+  'hudChrome.bootcamp.taskHoneBody':
+    '허수아비를 왼쪽 클릭해 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
+  'hudChrome.bootcamp.taskHoneBodyTouch':
+    '허수아비를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
+  'hudChrome.bootcamp.taskHoneBodyPad':
+    '허수아비를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
+  'hudChrome.bootcamp.promptOpenBags': '가방 열기',
+  'hudChrome.bootcamp.promptCharacterSheet': '캐릭터 창 열기',
+  'hudChrome.bootcamp.promptLookAround': '오른쪽 버튼을 누른 채 끌어서 둘러보기',
+  'hudChrome.bootcamp.promptKneel':
+    '무릎 꿇기',
+  'hudChrome.bootcamp.taskLongWalkBody':
+    '{bagsKey}를 눌러 가방을 열고 안식의 돌을 왼쪽 클릭하세요. 그 자리에서 당신을 눕혀 줍니다. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+  'hudChrome.bootcamp.taskLongWalkBodyTouch':
+    '해안 길을 따라 남쪽으로 걸어가 안식의 돌을 탭해 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+  'hudChrome.bootcamp.taskLongWalkBodyPad':
+    '해안 길을 따라 남쪽으로 걸어가 안식의 돌 앞에서 상호작용 버튼을 눌러 무릎을 꿇으세요. 여기서는 아무것도 당신을 해치지 않고, 잃는 것도 없습니다.',
+  'hudChrome.bootcamp.taskLongWalkDeadBody':
+    '당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 누르면 야영지 뒤 묘지에서 영혼으로 일어납니다.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyTouch':
+    '당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 탭하면 야영지 뒤 묘지에서 영혼으로 일어납니다.',
+  'hudChrome.bootcamp.taskLongWalkDeadBodyPad':
+    '당신은 죽었습니다. 잃은 것은 없습니다. 영혼 해방을 고르면 야영지 뒤 묘지에서 영혼으로 일어납니다.',
+  'hudChrome.bootcamp.taskLongWalkGhostBody':
+    '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 누르면 아무런 대가 없이 온전해집니다.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyTouch':
+    '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 탭하면 아무런 대가 없이 온전해집니다.',
+  'hudChrome.bootcamp.taskLongWalkGhostBodyPad':
+    '이제 당신은 영혼이며 아무것도 당신을 건드릴 수 없습니다. 시신은 지도에 표시되어 있습니다. 걸어서 돌아가면 가까워졌을 때 시신에서 부활 버튼이 나타납니다. 그것을 고르면 아무런 대가 없이 온전해집니다.',
+  'hudChrome.bootcamp.promptLootPearl':
+    '진주 획득',
+  'hudChrome.bootcamp.taskStrikeTrueBodyPad':
+    '짚 허수아비에게 다가가 대상 버튼을 눌러 대상으로 잡으세요. 그런 다음 첫 번째 행동 버튼을 눌러 내리치세요. 하나가 무너질 때까지 계속 치세요.',
+  'hudChrome.bootcamp.taskShellBody':
+    '종종게는 마주 집게를 휘두릅니다. 왼쪽 클릭해 한 마리를 대상으로 잡고, {abilityKey}를 눌러 {ability} 기술을 쓰며 계속 공격하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyTouch':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskShellBodyPad':
+    '종종게는 마주 집게를 휘두릅니다. 한 마리를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 한꺼번에 너무 많이 달려들면 길을 따라 뒤로 물러나세요. 녀석들은 금세 추격을 포기하고, 쉬는 동안 생명력도 돌아옵니다.',
+  'hudChrome.bootcamp.taskWreckLineBody':
+    '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 {interactKey}를 누르거나 상자를 왼쪽 클릭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskWreckLineBodyTouch':
+    '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 상자를 탭하거나 사용 버튼을 탭해 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskWreckLineBodyPad':
+    '표류 상자들이 새벽쉼터 야영지로 가는 길을 따라 늘어서 있습니다. 이름이 보일 때까지 표류 상자에 다가가 상호작용 버튼을 눌러 집어 드세요. 여섯이면 짐이 다 찹니다.',
+  'hudChrome.bootcamp.taskPouchBody':
+    '{npc}에게 {interactKey}를 누르거나 상대를 왼쪽 클릭해 좌판을 열고, 아마천 주머니를 왼쪽 클릭해 구입하세요.',
+  'hudChrome.bootcamp.taskPouchBodyTouch':
+    '{npc}를 탭해 좌판을 열고, 아마천 주머니를 탭해 구입하세요.',
+  'hudChrome.bootcamp.taskPouchBodyPad':
+    '{npc}에게 상호작용 버튼을 눌러 좌판을 열고, 아마천 주머니를 골라 구입하세요.',
+  'hudChrome.bootcamp.readyPouchBody':
+    '주머니를 샀습니다. {bagsKey}를 눌러 가방을 열고 아마천 주머니를 왼쪽 클릭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 {interactKey}를 눌러 보여 주세요.',
+  'hudChrome.bootcamp.readyPouchBodyTouch':
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 탭해 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상대를 탭해 보여 주세요.',
+  'hudChrome.bootcamp.readyPouchBodyPad':
+    '주머니를 샀습니다. 가방을 열고 아마천 주머니를 골라 빈 가방 고리에 채우세요. 그런 다음 {npc}에게 가서 상호작용 버튼을 눌러 보여 주세요.',
+  'hudChrome.bootcamp.bellTitle': '종 울리기',
+  'hudChrome.bootcamp.bellBody':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 {interactKey}를 누르거나 왼쪽 클릭해 이스트브룩으로 출항하세요.',
+  'hudChrome.bootcamp.bellBodyTouch':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 종을 탭해 이스트브룩으로 출항하세요.',
+  'hudChrome.bootcamp.bellBodyPad':
+    '건널 자격은 얻었습니다. 부두 옆 나룻배 종으로 걸어가 상호작용 버튼을 눌러 이스트브룩으로 출항하세요.',
+  'entities.zones.proving_shore.pois.4.label': '건틀릿',
+  'entities.items.ps_castaway_crate.name': '표류 상자',
+  'entities.items.ps_ferry_bell.name': '나룻배 종',
+  'entities.mobs.training_effigy.name': '훈련용 허수아비',
+  'entities.mobs.shore_scuttler.name': '해변 종종게',
+  'entities.npcs.wayfarer_bryn.name': '방랑자 브린',
+  'entities.npcs.wayfarer_bryn.title': '항구 안내인',
+  'entities.npcs.wayfarer_bryn.greeting':
+    '이스트브룩 골짜기는 오는 사람을 가리지 않아요, 친구. 그리고 아직 발걸음이 불안한 이들에게는 언제나 수련의 해안이 있죠. 레이븐포스트 우편함 옆의 나룻배 종이 일 년 내내 언제든 건너다 주고, 섬의 쌍둥이 종이 다시 집으로 울려 보내 준답니다.',
+  'entities.npcs.instructor_maren.name': '교관 마렌',
+  'entities.npcs.instructor_maren.title': '수련 사범',
+  'entities.npcs.instructor_maren.greeting':
+    '골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요, {className}. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠. 이 해안은 그러라고 있는 곳이에요. 묻고, 연습하고, 실패해도 되는 곳에서 마음껏 실패하세요.',
+  'entities.npcs.quartermaster_finch.name': '보급관 핀치',
+  'entities.npcs.quartermaster_finch.title': '야영지 물자상',
+  'entities.npcs.quartermaster_finch.greeting':
+    '내 좌판에 파는 물건은 딱 하나예요, {playerName}. 길에서 주운 것들을 담을 여분의 주머니, 그것도 수업이 필요로 할 때만요. 그 밖의 것들은 전부 골짜기로 보낼 인양품이죠. 동전이 주머니를 사고, 일이 동전을 벌어요. 그게 경제의 전부예요. 더 복잡해지는 일은 없어요. 더 커질 뿐이지.',
+  'entities.npcs.ferryman_odo.name': '뱃사공 오도',
+  'entities.npcs.ferryman_odo.title': '나루터지기',
+  'entities.npcs.ferryman_odo.greeting':
+    '방금 건너오셨나요, {playerName}? 워든 탐이 부두 바로 남쪽 바닷가에서 건틀릿을 지키고 있습니다. 먼저 그의 길을 달려 보세요. 다리가 고마워할 겁니다. 이 해안의 지기들은 맡은 일이 끝날 때마다 당신을 다음 사람에게 넘겨주고, 화면 위쪽의 카드는 언제나 다음 길을 알고 있죠. 골짜기가 다시 부르거든 내 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩 마을에 내려 줄 겁니다.',
+  'entities.npcs.warden_tam.name': '워든 탐',
+  'entities.npcs.warden_tam.title': '건틀릿의 파수꾼',
+  'entities.npcs.warden_tam.greeting':
+    '이 길들이 건틀릿입니다, {playerName}. 골짜기가 인정하는 모험가는 모두 여길 달렸죠. 울타리의 등불은 밤새 꺼지지 않으니, 길이 닫히는 일은 없습니다.',
+  'entities.npcs.overseer_pell.name': '감독관 펠',
+  'entities.npcs.overseer_pell.title': '건틀릿 감독관',
+  'entities.npcs.overseer_pell.greeting':
+    '이 길을 내려오는 완주는 전부 내가 잽니다, {playerName}. 그리고 훨씬 형편없는 발놀림도 숱하게 봤죠. 내 뒤의 길은 수련장으로 오릅니다. 발놀림이 칼놀림으로 바뀌는 곳이 바로 거기죠.',
+  'entities.npcs.drillmaster_rook.name': '교련관 루크',
+  'entities.npcs.drillmaster_rook.title': '수련장의 주인',
+  'entities.npcs.drillmaster_rook.greeting':
+    '짚이 먼저, 껍데기는 그다음입니다, {playerName}. 허수아비는 팔에 휘두르는 법을 가르치고, 바닷가의 종종게들은 싫어하는 상대에게 맞히는 법을 가르치죠.',
+  'entities.npcs.tidewarden_nel.name': '조수지기 넬',
+  'entities.npcs.tidewarden_nel.title': '바닷가의 파수꾼',
+  'entities.npcs.tidewarden_nel.greeting':
+    '조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요.',
+  'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
+  'entities.quests.q_ps_the_gauntlet.text':
+    '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.',
+  'entities.quests.q_ps_the_gauntlet.completion':
+    '방금 그 완주, 제대로 쟀습니다, {playerName}. 더 빠른 발도 떨어뜨려 본 적이 있죠. 건틀릿은 이제 당신 것입니다. 내 뒤의 길은 수련장으로 오릅니다. 거기서 교련관 루크가 발놀림을 칼놀림으로 바꿔 주죠. 다음 임무는 그가 갖고 있습니다.',
+  'entities.quests.q_ps_the_gauntlet.objectives.0.label': '건틀릿 깃발 통과',
+  'entities.npcs.bursar_wick.name': '경리관 윅',
+  'entities.npcs.bursar_wick.title': '도금 금고',
+  'entities.npcs.bursar_wick.greeting':
+    '도금 금고는 이런 곳에도 책상 하나를 두고 있답니다, {playerName}. 내게 맡긴 것은 모든 마을 모든 경리관 뒤에 있는 같은 금고에서 기다립니다. 늑대도, 바닷물도, 당신 자신의 섣부른 판단도 손대지 못하죠.',
+  'entities.quests.q_ps_strike_true.title': '정확한 일격',
+  'entities.quests.q_ps_strike_true.text':
+    '발 다음은 팔입니다, {playerName}. 수련장은 내 뒤 길을 오른 곳에 있고, 그곳의 짚 허수아비들은 맞으라고 만든 것들이죠. 길을 잃겠거든 M을 눌러 지도를 여세요. 맡은 임무는 모두 지도에 표시됩니다. 허수아비에게 다가가 Tab을 누르거나 왼쪽 클릭해 대상으로 잡고, 그런 다음 1을 누르거나 화면 아래쪽 행동 단축바의 첫 번째 아이콘을 클릭해 내리치세요. 하나가 무너질 때까지 계속 치세요. 반격은 없습니다. 허수아비란 원래 그런 법이니까요. 교련관 루크가 바닷가 길이 시작되는 수련장 서쪽 끝에서 지켜보고 있습니다. 그에게 F를 눌러 결과를 보고하세요.',
+  'entities.quests.q_ps_strike_true.completion':
+    '깔끔하게 하나 쓰러뜨렸고, 손아귀도 벌써 단단해졌군요. 그 감각을 기억하세요, {playerName}. 대상을 잡고, 내리치고, 계속 내리치기. 짚은 아무래도 상관하지 않지만, 다음에 당신이 칼을 휘두를 상대는 그렇지 않을 겁니다.',
+  'entities.quests.q_ps_strike_true.objectives.0.label': '훈련용 허수아비 쓰러뜨리기',
+  'entities.quests.q_ps_shell_and_claw.title': '껍데기와 집게발',
+  'entities.quests.q_ps_shell_and_claw.text':
+    '짚은 상관하지 않죠, {playerName}. 그러니 이번엔 상관하는 놈들입니다. 해변 종종게들이 먼 바닷가의 난파선 해안에서 잔해를 뒤지고 있어요. 내 수련장에서 서쪽으로 길을 따라가면 곧장 놈들에게 닿습니다. 놈들은 되꼬집으니 체력 막대를 살피며 계속 휘두르세요. 왼쪽 클릭으로 한 마리를 대상으로 잡고, 수련장에서 배운 기술을 쓰며, 껍데기가 갈라질 때까지 멈추지 마세요. 셋이면 충분합니다. 그런 다음 북쪽 언덕길을 오르세요. 조수지기 넬이 바닷가 장부를 맡고 있고, 당신의 껍데기도 세어 줄 겁니다.',
+  'entities.quests.q_ps_shell_and_claw.completion':
+    '껍데기 셋을 깨고도 손가락은 하나도 잃지 않았군요. 첫 싸움치고는 훌륭해요, {playerName}. 저 게들은 조수가 표류물을 실어 오는 것보다 빨리 난파선을 털어 가니, 당신이 한 마리 솎아 낼 때마다 누군가의 동전이 지켜진답니다.',
+  'entities.quests.q_ps_shell_and_claw.objectives.0.label': '해변 종종게 솎아내기',
+  'entities.quests.q_ps_the_wreck_line.title': '난파선 해안',
+  'entities.quests.q_ps_the_wreck_line.text':
+    '내 짐꾼들이 옛 난파선에서 표류물을 내려 새벽쉼터 야영지로 오르는 언덕길로 나릅니다, {playerName}. 그런데 상자 절반은 끝내 언덕을 다 오르지 못해요. 길가에 내려놓인 채 잊히고 말죠. 내 길을 따라 야영지 쪽으로 가면 그 낙오한 상자들 곁을 바로 지나게 됩니다. 여는 건 간단해요. 이름이 보일 때까지 상자에 다가가 F를 누르거나 상자를 왼쪽 클릭하면, 품고 있던 것을 내어 줍니다. 여섯이면 이 길이 말끔해지고, 앞으로 만날 모든 상자와 채집물과 문도 전부 같은 F 하나로 연다는 걸 기억하세요. 보급관 핀치가 야영지 좌판을 지키며 표류물이라면 나뭇가지 하나까지 사들입니다. 거둔 것을 그녀에게 넘기세요.',
+  'entities.quests.q_ps_the_wreck_line.completion':
+    '밧줄과 타르, 그리고 바다가 어쩐 일로 남겨 준 치즈 반 덩이. 전부 사죠, {playerName}. 주운 것을 지고 나를 줄 아는 등은 이 야영지에 어떤 칼보다 값진데, 당신의 등은 방금 한 번의 오르막으로 이 길을 통째로 치워 냈군요.',
+  'entities.quests.q_ps_the_wreck_line.objectives.0.label': '표류 상자 열기',
+  'entities.quests.q_ps_pouch_and_purse.title': '주머니와 돈주머니',
+  'entities.quests.q_ps_pouch_and_purse.text':
+    '골짜기로 떠나기 전 마지막 가르침이에요, {playerName}. 모험가의 목숨을 지켜 주는 가르침이죠. 바로 당신이 지고 다니는 짐 얘기입니다. 배낭에는 열여섯 칸이 있고, 그 옆에 빈 가방 고리 넷이 기다립니다. 가방을 하나 채울 때마다 그 공간이 전체 용량에 더해져요. 그러니 내게 다시 F를 눌러 좌판을 열고, 물건 중에서 아마천 주머니를 왼쪽 클릭해 사세요. 그런 다음 B를 눌러 가방을 열고, 거기 있는 주머니를 왼쪽 클릭해 빈 고리에 채우세요. 교관 마렌이 몇 걸음 동쪽 집합 모닥불 곁에서 훈련을 이끌고 있습니다. 허리에 걸린 주머니를 보여 드리세요.',
+  'entities.quests.q_ps_pouch_and_purse.completion':
+    '좋은 주머니군요. 아직 차지 않았다면 지금 차세요. B를 눌러 가방을 열고, 주머니를 왼쪽 클릭해 빈 가방 고리에 채우면, 말썽거리를 담을 칸이 여섯 늘어납니다. 이제 어떤 가방에도 담기지 않는 나머지 절반의 가르침입니다, {playerName}. 들고 다닐 수 없는 것은 도금 금고가 맡습니다. 경리관 윅이 서쪽 길을 오른 곳에 금고 책상을 두고 있는데, 그가 열어 주는 금고는 어느 마을의 어느 경리관과도 같은 금고이고, 돈주머니가 두둑해지면 금고 칸도 더 살 수 있죠. 값진 것은 금고에, 가방에는 여유를. 어떤 늑대보다도 꽉 찬 배낭이 끝장낸 모험이 더 많답니다.',
+  'entities.quests.q_ps_pouch_and_purse.objectives.0.label': '아마천 주머니 구입하기',
+  'entities.quests.q_ps_hone_the_edge.title':
+    '날을 세우다',
+  'entities.quests.q_ps_hone_the_edge.text':
+    '휘두르는 건 휘두르는 것일 뿐입니다, {playerName}. 짚은 하루 종일이라도 받아 주지만, 그걸로는 아무것도 얻지 못합니다. 화면 아래에 늘어선 버튼들을 보세요. 그 줄이 당신의 기술이고, 하나하나가 팔만으로는 할 수 없는 일을 해냅니다. 이미 하나 가지고 있습니다. 허수아비로 돌아가 그것을 쓰세요. 대상을 잡고, 이 훈련장이 알려 주는 버튼을 누르는 겁니다. 세 번. 짚을 그냥 두들기지 말고, 당신이 아는 그 기술을 실제로 일으키세요. 그런 다음 제게 오세요.',
+  'entities.quests.q_ps_hone_the_edge.completion':
+    '이제야 허우적대는 대신 싸우고 있군요. 그 줄은 레벨을 올릴 때마다 길어집니다, {playerName}. 가장 오래 살아남는 이들은 그 줄을 읽는 사람들입니다. 짚은 당신이 어떤 버튼을 썼든 신경 쓰지 않습니다. 골짜기는 신경 씁니다.',
+  'entities.quests.q_ps_hone_the_edge.objectives.0.label':
+    '허수아비에 기술 명중',
+  'entities.quests.q_ps_the_long_walk.title':
+    '먼 귀로',
+  'entities.quests.q_ps_the_long_walk.text':
+    '남은 가르침은 하나입니다, {playerName}. 그리고 이건 말로 전할 수 없어요. 한 번은 겪어 봐야 합니다. 당신은 바깥에서 죽게 됩니다. 누구나 그렇고, 그게 무엇의 끝도 아닙니다. 이 안식의 돌을 가져가세요. B를 눌러 가방을 열고 왼쪽 클릭하면, 선 자리에서 당신을 눕혀 줍니다. 그다음에는 화면에 뜨는 안내를 따르세요. 영혼을 해방하고, 당신의 시신까지 걸어가서, 그 안으로 들어가는 겁니다. 시신은 기다립니다. 그 길은 공짜이고, 걸어도 잃는 것은 없습니다.',
+  'entities.quests.q_ps_the_long_walk.completion':
+    '그리고 이렇게 돌아왔군요, 아무 탈 없이. 그 느낌을 기억하세요, {playerName}. 다음번에는 이빨이 끼어 있을 테고, 옆에서 설명해 줄 사람도 없을 테니까요. 시신은 기다립니다. 길은 공짜이고, 죽음이 정말로 앗아가는 건 돌아오는 데 걸리는 시간뿐입니다.',
+  'entities.quests.q_ps_the_long_walk.objectives.0.label':
+    '죽음에서 걸어 돌아옴',
+  'entities.items.ps_passing_stone.name':
+    '안식의 돌',
+  'entities.quests.q_ps_the_signpost.title': '바람결 소식',
+  'entities.quests.q_ps_the_signpost.text':
+    '배울 습관이 하나 남았어요, {playerName}. 칼은 필요 없죠. 게시판 읽기입니다. 길드 게시 기둥이 내 모닥불에서 남서쪽으로 몇 걸음, 야영지 정문에 서 있고, 길드와 떠도는 무리들이 거기에 부름의 글을 붙입니다. 기둥 앞까지 다가가 F를 누르거나 왼쪽 클릭해 붙은 글을 읽고, 돌아와 바람이 무엇을 실어 왔는지 들려주세요. 앞으로 당신이 걸어 들어갈 모든 마을에 똑같은 게시판이 서 있답니다.',
+  'entities.quests.q_ps_the_signpost.completion':
+    '이제 골짜기에서 소식이 어떻게 도는지 알겠죠, {playerName}. 파발꾼이 아니라 게시판으로 돕니다. 지나는 마을마다 들여다보세요. 모험의 절반은 게시판 위 세 줄 먹글에서 시작된답니다.',
+  'entities.quests.q_ps_the_signpost.objectives.0.label': '길드 게시 기둥 읽기',
+  'entities.quests.q_ps_set_sail.title': '출항',
+  'entities.quests.q_ps_set_sail.text':
+    '이 해안에는 당신이 이미 달리지 않았거나, 쓰러뜨리지 않았거나, 열지 않았거나, 사지 않은 것이 하나도 남지 않았어요, {playerName}. 준비는 끝났고, 이스트브룩에는 진짜 일이 기다립니다. 해안길을 따라 부두로 되돌아 내려가 뱃사공 오도에게 F를 누르고, 내가 당신이 건너갈 자격을 얻었다 했다고 전하세요. 누구에게 무엇을 빚졌는지 헷갈릴 때는 언제든 L을 누르세요. 그것이 당신의 퀘스트 일지입니다.',
+  'entities.quests.q_ps_set_sail.completion':
+    '마렌이 그렇게 말했다고요? 내게 일주일 내내 밧줄 매듭 연습을 시킨 사람의 입에서 나온 말치고는 대단한 칭찬이군요. 준비가 되면 내 부두 옆에 선 종을 울리세요, {playerName}. 건너기가 이스트브룩 마을 한복판에 내려 줄 겁니다. 늑대를 조심하세요.',
+  'entities.quests.q_ps_set_sail.objectives.0.label': '뱃사공 오도에게 보고',
+  'entities.zones.proving_shore.name': '수련의 해안',
+  'entities.zones.proving_shore.welcome':
+    '수련의 해안이 당신에게 바라는 것은 시간뿐입니다. 야영지를 익히고, 허수아비를 치고, 난파선 해안을 걸어 보세요. 준비가 되면 뱃사공 오도가 골짜기까지 건네줄 겁니다.',
+  'entities.zones.proving_shore.pois.0.label': '새벽쉼터 야영지',
+  'entities.zones.proving_shore.pois.1.label': '낡은 부두',
+  'entities.zones.proving_shore.pois.2.label': '수련장',
+  'entities.zones.proving_shore.pois.3.label': '난파선 해안',
+  'guide.home.world.provingName': '수련의 해안',
+  'guide.home.world.provingBlurb':
+    '해협 건너의 조용한 훈련 섬. 골짜기가 무언가를 요구하기 전에, 새내기 모험가들이 이곳에서 첫걸음을 다집니다.',
+  'guide.worldPage.provingBlurb':
+    '골짜기에서 해협을 건넌 곳에 있는 조용한 섬으로, 훈련장으로 쓰입니다. 야영지 하나, 수련장 하나, 잔해가 널린 바닷가, 그리고 양방향으로 다니는 나룻배가 있습니다.',
+  'guide.worldPage.provingGreeting':
+    '골짜기가 고마워했던 영웅은 모두 지금 당신이 선 자리에 서 있었어요. 그리고 그때는 하나같이 칼의 어느 쪽을 쥐어야 하는지도 몰랐죠.',
+  'guide.worldPage.provingGreeter': '교관 마렌, 새벽쉼터 야영지',
+  'guide.worldPage.provingPlaceNotes':
+    '새벽쉼터 야영지가 섬의 유일한 정착지로, 천막 몇 동과 좌판 하나, 모임 모닥불이 전부입니다. 낡은 부두는 골짜기를 마주하며 건너기 마법진이 졸업생을 해협 너머로 실어 나르고, 야영지 남쪽 수련장에는 필요한 이를 위해 짚 허수아비가 서 있으며, 난파선 해안은 조수가 표류 상자로 섬에 값을 치르는 잔해투성이 바닷가입니다.',
   'hudChrome.perf.diagnostics.report.status.healthy': '정상',
   'hudChrome.reliquary.progressText': '{owned}/{total}',
   'guide.talentsPage.loadoutGearNote':
