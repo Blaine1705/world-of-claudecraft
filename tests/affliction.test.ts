@@ -1765,6 +1765,10 @@ describe('Affliction Warlock', () => {
     const bossHp = boss.hp;
     const bossNearby = addTarget(bossSim, 12);
     const bossNearbyHp = bossNearby.hp;
+    // The pinned tier math is the subject here, not resist luck: hit-cap the
+    // cast so the impact draw (still taken, same stream position) cannot land
+    // in the resist band when unrelated mob changes reshuffle the seed.
+    bossSim.player.hitBonus = 1;
     const bossEvents = finishCast(bossSim, 'sentence', boss);
     expect(
       bossEvents
