@@ -397,9 +397,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
-    // rework); exact merged count.
-    ceiling: 2621,
+    // Lowered from 2630 after the decorProps collider builder moved out to
+    // decor_prop_colliders.ts (the ratchet rule: extraction lowers the ceiling).
+    // Re-pinned again merging into release/v0.41.0: that branch's own re-pin to
+    // 2621 (the v0.40.0 touch UI rework) combines with this extraction, landing
+    // the merged file at 2597 lines; exact merged count.
+    ceiling: 2597,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
