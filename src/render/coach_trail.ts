@@ -22,11 +22,14 @@ import * as THREE from 'three';
 import type { CoachTrailPlan } from './coach_trail_core';
 import {
   COACH_BEAM_HEIGHT,
+  COACH_STRIP_INDEX,
   type CoachTrailMaterials,
   coachAreaRingGeometry,
   coachBeamGeometry,
   coachRibbonGeometry,
   coachRingGeometry,
+  coachStripPositions,
+  coachStripUvs,
   coachTrailMaterials,
 } from './coach_trail_materials';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -48,12 +51,6 @@ const AURA_LIFT = 1.15;
 /** The host's compile step for the trail's root: link its programs off the
  *  frame before it shows (the renderer's compile gate). */
 export type CoachTrailCompileGate = (target: THREE.Object3D) => Promise<unknown>;
-
-/** A two-triangle strip: the ribbon's and area ring's geometry before any
- *  route exists, so their meshes carry the right attribute sets from birth. */
-const STRIP_POSITIONS = () => new Float32Array([0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1]);
-const STRIP_UVS = () => new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
-const STRIP_INDEX = [0, 1, 2, 1, 3, 2];
 
 export class CoachTrail {
   private readonly mats: CoachTrailMaterials = coachTrailMaterials();
@@ -77,7 +74,7 @@ export class CoachTrail {
     this.group.name = 'coach-trail';
     this.ribbon = this.guidance(
       new THREE.Mesh(
-        coachRibbonGeometry(STRIP_POSITIONS(), STRIP_UVS(), STRIP_INDEX),
+        coachRibbonGeometry(coachStripPositions(), coachStripUvs(), COACH_STRIP_INDEX),
         this.mats.ribbon,
       ),
     );
@@ -85,10 +82,18 @@ export class CoachTrail {
     this.aura = this.guidance(new THREE.Sprite(this.mats.aura));
     this.beam = this.guidance(new THREE.Mesh(coachBeamGeometry(), this.mats.beam));
     this.areaRing = this.guidance(
-      new THREE.Mesh(coachAreaRingGeometry(STRIP_POSITIONS(), STRIP_INDEX), this.mats.areaRing),
+      new THREE.Mesh(
+        coachAreaRingGeometry(coachStripPositions(), COACH_STRIP_INDEX),
+        this.mats.areaRing,
+      ),
     );
     // Hidden until the gate links the programs, then revealed; the objects
-    // above keep their own visibility for the per-frame drive below.
+    // above keep their own visibility for the per-frame drive below. This
+    // runs at renderer construction, before any live frame: without async
+    // compile the gate links synchronously under the boot window (the
+    // sibling attach sites guard on it because they attach mid-session), and
+    // its unit runs ahead of the boot manifest, whose coach stand-in then
+    // finds the programs cached.
     void attachSceneGroupGated(scene, this.group, compileGate);
   }
 
@@ -99,7 +104,6 @@ export class CoachTrail {
     object.renderOrder = 3;
     object.userData.renderCategory = 'ui3d';
     object.visible = false;
-    object.frustumCulled = false;
     this.group.add(object);
     return object;
   }

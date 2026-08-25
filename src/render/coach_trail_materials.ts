@@ -176,27 +176,39 @@ export function coachBeamGeometry(): THREE.BufferGeometry {
   );
 }
 
+/** A two-triangle strip: the ribbon's and the area ring's geometry before any
+ *  route exists, and the stand-in's, so every mesh carries the attribute set
+ *  three keys the program on from birth. Fresh arrays per call: a geometry
+ *  owns its buffers. */
+export const COACH_STRIP_INDEX: readonly number[] = [0, 1, 2, 1, 3, 2];
+export function coachStripPositions(): Float32Array {
+  return new Float32Array([0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1]);
+}
+export function coachStripUvs(): Float32Array {
+  return new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]);
+}
+
 /** A draped strip with the ribbon's attribute set (position + uv, indexed). */
 export function coachRibbonGeometry(
   positions: Float32Array,
   uvs: Float32Array,
-  index: number[],
+  index: readonly number[],
 ): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-  geo.setIndex(index);
+  geo.setIndex([...index]);
   return geo;
 }
 
 /** An annulus strip with the area ring's attribute set (position only, indexed). */
 export function coachAreaRingGeometry(
   positions: Float32Array,
-  index: number[],
+  index: readonly number[],
 ): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geo.setIndex(index);
+  geo.setIndex([...index]);
   return geo;
 }
 
@@ -213,21 +225,14 @@ export function buildCoachTrailStandIn(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'coach-trail-stand-in';
   const ribbon = new THREE.Mesh(
-    coachRibbonGeometry(
-      new Float32Array([0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1]),
-      new Float32Array([0, 0, 0, 1, 1, 0, 1, 1]),
-      [0, 1, 2, 1, 3, 2],
-    ),
+    coachRibbonGeometry(coachStripPositions(), coachStripUvs(), COACH_STRIP_INDEX),
     mats.ribbon,
   );
   const ring = new THREE.Mesh(coachRingGeometry(), mats.ring);
   const aura = new THREE.Sprite(mats.aura);
   const beam = new THREE.Mesh(coachBeamGeometry(), mats.beam);
   const areaRing = new THREE.Mesh(
-    coachAreaRingGeometry(
-      new Float32Array([0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1]),
-      [0, 1, 2, 1, 3, 2],
-    ),
+    coachAreaRingGeometry(coachStripPositions(), COACH_STRIP_INDEX),
     mats.areaRing,
   );
   for (const object of [ribbon, ring, aura, beam, areaRing]) {

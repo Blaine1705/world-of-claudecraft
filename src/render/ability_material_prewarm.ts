@@ -1,22 +1,26 @@
 // Boot prewarm for the ability visuals whose materials are minted LAZILY, on
 // the first cast of the session.
 //
-// These four modules share one idiom: a module-level `let x: XMaterials | null`
+// The sources below share one idiom: a module-level `let x: XMaterials | null`
 // filled by a private builder the first time the visual is constructed, which
-// happens when the aura or cast goes live on an entity in view. Nothing warms
-// them, so the first Frost Nova root, the first Ice Block, the first Temporal
-// Hourglass and the first fireball travel form each link their programs inside
-// a combat frame. The pooled ability-VFX primitives next to them do NOT have
-// this problem: their engines build every material eagerly in the constructor
-// (ability_vfx/), which is why the boot entry only has to SPAWN them.
+// happens when the aura or cast goes live on an entity in view (or, for the
+// Proving Shore coach's guidance, when its route or target first changes).
+// Nothing warmed them, so the first Frost Nova root, Ice Block, Temporal
+// Hourglass, fireball travel form and coach ribbon each linked their programs
+// inside a live frame. The pooled ability-VFX primitives next to them do NOT
+// have this problem: their engines build every material eagerly in the
+// constructor (ability_vfx/), which is why the boot entry only has to SPAWN
+// them.
 //
-// The stand-in is the REAL visual, one hidden instance of each (two for the
-// hourglass, one per energy mode): the program a
-// material links depends on the mesh wearing it (three keys `instancing` and
-// the geometry's attributes into the cache key), and these visuals draw plain
-// Meshes, InstancedMeshes and a Sprite. Building the live class is the only
-// stand-in that provably carries all three, and it costs one shared geometry
-// set and the module-cached materials, which the first cast would build anyway.
+// The stand-in is the REAL visual where one exists, one hidden instance each
+// (two for the hourglass, one per energy mode), or the mesh kinds the live
+// draw uses (the coach's synthetic strip, ring, sprite and beam): the program
+// a material links depends on the mesh wearing it (three keys `instancing`
+// and the geometry's attributes into the cache key), and these visuals draw
+// plain Meshes, InstancedMeshes and Sprites. Building the live class is the
+// only stand-in that provably carries all of them, and it costs one shared
+// geometry set and the module-cached materials, which the first cast would
+// build anyway.
 //
 // The group is staged into the scene HIDDEN and never disposed: disposing a
 // material releases the program this entry exists to keep, and every material
