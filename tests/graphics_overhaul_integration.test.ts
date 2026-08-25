@@ -31,17 +31,17 @@ describe('graphics-overhaul integration', () => {
     }
     const removedModule = ['camera', 'collision.ts'].join('_');
     expect(existsSync(path.join(__dirname, '..', 'src/render', removedModule))).toBe(false);
-    expect(renderer).toContain(
-      'const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
-    );
+    expect(renderer).toContain('rigidCameraPivotInto(\n      this.cameraPivot,');
+    expect(renderer).toContain('      pose.dist,\n      underwaterCeilingY,\n    );');
     expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
     const chaseCamera = renderer.slice(
-      renderer.indexOf('const cx = px - Math.sin(pose.yaw)'),
+      renderer.indexOf('rigidCameraPivotInto('),
       renderer.indexOf('// Spatial-audio listener'),
     );
-    expect(chaseCamera.match(/\bcx\s*=/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(1);
+    expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
+    expect(chaseCamera.match(/\bcameraX:\s*cx/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bcameraY:\s*cy/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bcameraZ:\s*cz/g)).toHaveLength(1);
     expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
   });
 
