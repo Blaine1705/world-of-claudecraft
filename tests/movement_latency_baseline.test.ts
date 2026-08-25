@@ -26,8 +26,9 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { HANDOFF_DONE_EPS } from '../src/game/keyboard_turn_facing';
 import { MAX_SELF_REWIND_YD_PER_SEC } from '../src/render/self_render_position_core';
-import { DT, emptyMoveInput, type MoveInput, RUN_SPEED } from '../src/sim/types';
+import { DT, emptyMoveInput, type MoveInput, RUN_SPEED, TURN_SPEED } from '../src/sim/types';
 import type { LatencyLinkConfig } from './helpers/latency_link';
 import {
   COLLIDER_FREE_LANE,
@@ -77,10 +78,19 @@ const STRICT = process.env.STRICT_MOVEMENT_TARGETS !== '0';
 const UPDATE_TABLE = process.env.UPDATE_MOVEMENT_BASELINE_DOC === '1';
 const BASELINE_DOC = join(import.meta.dirname, 'movement_latency_baseline.md');
 const MAIN_TS = join(import.meta.dirname, '..', 'src', 'main.ts');
+const ONLINE_MOVEMENT_FRAME_TS = join(
+  import.meta.dirname,
+  '..',
+  'src',
+  'game',
+  'online_movement_frame.ts',
+);
 /** A stretch of the straight run with the key long since down and not yet
  *  released: what "steady" means for the lane-sanity check. */
 const STEADY_FIRST_TICK = 20;
 const STEADY_LAST_TICK = 40;
+const ROUND2_FACING_QUANTUM = 0.01;
+const FACING_ERROR_BOUND = HANDOFF_DONE_EPS + ROUND2_FACING_QUANTUM;
 
 /** Per-direction delay envelope; a profile's RTT splits evenly across the two. */
 function link(rttMs: number, jitterMs: number): LatencyLinkConfig {
@@ -193,6 +203,48 @@ const SCENARIOS: readonly Scenario[] = [
   },
 ];
 
+const turnTapIdle: RunScriptOptions = {
+  durationMs: 1500,
+  script: [
+    { atMs: 300, mi: { turnLeft: true } },
+    { atMs: 500, mi: { turnLeft: false } },
+  ],
+};
+
+const turnTapWalking: RunScriptOptions = {
+  durationMs: 1800,
+  script: [
+    { atMs: 0, mi: { forward: true } },
+    { atMs: 500, mi: { turnLeft: true } },
+    { atMs: 700, mi: { turnLeft: false } },
+    { atMs: 1000, mi: { forward: false } },
+  ],
+};
+
+const mouselookDragRelease: RunScriptOptions = {
+  durationMs: 1600,
+  script: [
+    { atMs: 100, facing: 0 },
+    { atMs: 200, facing: 0.2 },
+    { atMs: 300, facing: 0.4 },
+    { atMs: 400, facing: 0.6 },
+    { atMs: 560, facing: 0.8 },
+    { atMs: 570, facing: null },
+  ],
+};
+
+const FACING_SCENARIOS: readonly Scenario[] = [
+  { key: 'turn-idle', label: 'turn tap while idle', options: turnTapIdle },
+  { key: 'turn-walking', label: 'turn tap while walking', options: turnTapWalking },
+  { key: 'mouselook-release', label: 'mouselook drag + release', options: mouselookDragRelease },
+];
+const FACING_PROFILES = PROFILES.filter(
+  (profile) => profile.key === 'rtt0' || profile.key === 'rtt150j20',
+);
+const FACING_KEYS = FACING_SCENARIOS.flatMap((scenario) =>
+  FACING_PROFILES.map((profile) => `${scenario.key}/${profile.key}`),
+);
+
 /** The pinned numbers, one row per measured cell. */
 interface BaselineRow {
   backwardCount: number;
@@ -206,6 +258,17 @@ interface BaselineRow {
   correctionEvents: number;
   inputToAuthorityMaxMs: number;
   inputToAuthorityMeanMs: number;
+  replayEvents?: number;
+}
+
+interface FacingBaselineRow {
+  maxPostReleaseYawRate: number;
+  reversals: number;
+  continuitySamples: number;
+  maxCameraSplitRad: number;
+  cameraSplitSamples: number;
+  terminalSettleRad: number;
+  settleSamples: number;
 }
 
 function rowOf(metrics: MovementMetrics): BaselineRow {
@@ -221,6 +284,19 @@ function rowOf(metrics: MovementMetrics): BaselineRow {
     correctionEvents: metrics.correctionEvents.count,
     inputToAuthorityMaxMs: metrics.inputToAuthorityMs.maxMs,
     inputToAuthorityMeanMs: metrics.inputToAuthorityMs.meanMs,
+    replayEvents: metrics.replayEvents.count,
+  };
+}
+
+function facingRowOf(metrics: MovementMetrics): FacingBaselineRow {
+  return {
+    maxPostReleaseYawRate: metrics.facingContinuity.maxPostReleaseYawRate,
+    reversals: metrics.facingContinuity.reversals,
+    continuitySamples: metrics.facingContinuity.samples,
+    maxCameraSplitRad: metrics.facingCameraSplit.maxRad,
+    cameraSplitSamples: metrics.facingCameraSplit.samples,
+    terminalSettleRad: metrics.facingSettleError.terminalRad,
+    settleSamples: metrics.facingSettleError.samples,
   };
 }
 
@@ -280,8 +356,9 @@ function measure(
   reference: Reference = 'zeroLatency',
   withHarness?: (harness: OnlineHarness, options: RunScriptOptions) => RunScriptOptions,
   metricOptions: MovementMetricsOptions = {},
+  keyTimeline = false,
 ): CellResult {
-  const harness = createOnlineHarness({ latency });
+  const harness = createOnlineHarness({ latency, keyTimeline });
   try {
     const resolved = withHarness ? withHarness(harness, options) : options;
     const timeline = harness.session.movementTimeline;
@@ -301,7 +378,18 @@ function measure(
         : null;
     const truth = twinPoses ? zeroLatencyTruth(twinPoses, run.commands) : authoritativeTruth(run);
     const metrics = computeMovementMetrics(
-      run.frames.map((frame) => ({ tMs: frame.tMs, x: frame.x, z: frame.z })),
+      run.frames.map((frame) => ({
+        tMs: frame.tMs,
+        x: frame.x,
+        z: frame.z,
+        drawnYaw: frame.drawnYaw,
+        cameraFacing: frame.cameraFacing,
+        authoritativeFacing: frame.authoritativeFacing,
+        turnInputActive: frame.turnInputActive,
+        mi: frame.mi,
+        reconcileMode: frame.reconcileMode,
+        residualYd: frame.residualYd,
+      })),
       truth,
       run.commands,
       // The tick phase is stated rather than defaulted: a ground-truth sample
@@ -433,6 +521,14 @@ beforeAll(() => {
       );
     }
   }
+  for (const scenario of FACING_SCENARIOS) {
+    for (const profile of FACING_PROFILES) {
+      cells.set(
+        cellKey(scenario.key, profile.key),
+        measure(profile.latency, scenario.options, 'zeroLatency', undefined, {}, true),
+      );
+    }
+  }
   cells.set(
     'adv-stall/rtt150j20',
     measure(ADVERSARIAL_PROFILE, stallRun, 'zeroLatency', withStall),
@@ -476,6 +572,7 @@ function expectPinned(key: string, pinned: BaselineRow): void {
   expect(measured.speedDeltaYdPerSec).toBeCloseTo(pinned.speedDeltaYdPerSec, YD_DIGITS);
   expect(measured.inputToAuthorityMaxMs).toBeCloseTo(pinned.inputToAuthorityMaxMs, YD_DIGITS);
   expect(measured.inputToAuthorityMeanMs).toBeCloseTo(pinned.inputToAuthorityMeanMs, YD_DIGITS);
+  expect(measured.replayEvents).toBe(pinned.replayEvents ?? 0);
 }
 
 /** The cells scored against the crowd-control bar: the server is overriding the
@@ -498,6 +595,7 @@ function expectTargets(key: string): void {
     );
     return;
   }
+  expect(metrics.replayEvents.count).toBe(MOVEMENT_FEEL_TARGETS.replayEvents);
   expect(metrics.correctionEvents.count).toBe(MOVEMENT_FEEL_TARGETS.correctionEvents);
   // Worst magnitude AND count: a run that snaps back a hair on every single
   // frame is exactly the artifact this bar exists for, and a magnitude-only
@@ -805,6 +903,7 @@ const BASELINE: Record<string, BaselineRow> = {
     correctionEvents: 14,
     inputToAuthorityMaxMs: 100,
     inputToAuthorityMeanMs: 100,
+    replayEvents: 1,
   },
   'adv-snare/rtt150j20': {
     backwardCount: 9,
@@ -818,6 +917,7 @@ const BASELINE: Record<string, BaselineRow> = {
     correctionEvents: 9,
     inputToAuthorityMaxMs: 100,
     inputToAuthorityMeanMs: 100,
+    replayEvents: 2,
   },
   'adv-override-churn/rtt150j20': {
     backwardCount: 42,
@@ -831,6 +931,7 @@ const BASELINE: Record<string, BaselineRow> = {
     correctionEvents: 30,
     inputToAuthorityMaxMs: 100,
     inputToAuthorityMeanMs: 100,
+    replayEvents: 2,
   },
   'starvation-straight/rtt300j20': {
     backwardCount: 0,
@@ -844,6 +945,63 @@ const BASELINE: Record<string, BaselineRow> = {
     correctionEvents: 0,
     inputToAuthorityMaxMs: 183.333333,
     inputToAuthorityMeanMs: 183.333333,
+  },
+};
+
+const FACING_BASELINE: Record<string, FacingBaselineRow> = {
+  'turn-idle/rtt0': {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    continuitySamples: 61,
+    maxCameraSplitRad: 0,
+    cameraSplitSamples: 90,
+    terminalSettleRad: 0,
+    settleSamples: 1,
+  },
+  'turn-idle/rtt150j20': {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    continuitySamples: 61,
+    maxCameraSplitRad: 0,
+    cameraSplitSamples: 90,
+    terminalSettleRad: 0,
+    settleSamples: 1,
+  },
+  'turn-walking/rtt0': {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    continuitySamples: 67,
+    maxCameraSplitRad: 0,
+    cameraSplitSamples: 108,
+    terminalSettleRad: 0,
+    settleSamples: 1,
+  },
+  'turn-walking/rtt150j20': {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    continuitySamples: 67,
+    maxCameraSplitRad: 0,
+    cameraSplitSamples: 108,
+    terminalSettleRad: 0,
+    settleSamples: 1,
+  },
+  'mouselook-release/rtt0': {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    continuitySamples: 62,
+    maxCameraSplitRad: 0,
+    cameraSplitSamples: 96,
+    terminalSettleRad: 0,
+    settleSamples: 1,
+  },
+  'mouselook-release/rtt150j20': {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    continuitySamples: 62,
+    maxCameraSplitRad: 0,
+    cameraSplitSamples: 96,
+    terminalSettleRad: 0,
+    settleSamples: 1,
   },
 };
 
@@ -876,8 +1034,16 @@ function formatRow(key: string, row: BaselineRow): string {
     row.correctionEvents.toString(),
     row.inputToAuthorityMaxMs.toFixed(1),
     row.inputToAuthorityMeanMs.toFixed(1),
+    (row.replayEvents ?? 0).toString(),
   ];
   return `| ${label} | ${cells3.join(' | ')} |`;
+}
+
+function formatFacingRow(key: string, row: FacingBaselineRow): string {
+  const [scenario, profile] = key.split('/');
+  const scenarioLabel = FACING_SCENARIOS.find((entry) => entry.key === scenario)?.label ?? scenario;
+  const profileLabel = PROFILES.find((entry) => entry.key === profile)?.label ?? profile;
+  return `| ${scenarioLabel} @ ${profileLabel} | ${row.maxPostReleaseYawRate.toFixed(4)} | ${row.reversals} | ${row.continuitySamples} | ${row.maxCameraSplitRad.toFixed(4)} | ${row.cameraSplitSamples} | ${row.terminalSettleRad.toFixed(4)} | ${row.settleSamples} |`;
 }
 
 function renderBaselineDoc(): string {
@@ -896,12 +1062,22 @@ function renderBaselineDoc(): string {
     "The three crowd-control rows are scored against the harness server's OWN",
     'ticks instead: the zero-latency twin never receives the aura, so its',
     'trajectory would be a fiction to compare against.',
+    'Their measured replay counts pin designed override absorption; all other',
+    'cells retain the strict zero-replay target.',
     '',
-    '| cell | back n | back worst | dev max | dev mean | prog max | prog settle | speed err | speed delta | corr | input-authority max ms | input-authority mean ms |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| cell | back n | back worst | dev max | dev mean | prog max | prog settle | speed err | speed delta | corr | input-authority max ms | input-authority mean ms | replay events |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
   ];
   const rows = Object.entries(BASELINE).map(([key, row]) => formatRow(key, row));
-  return `${[...header, ...rows].join('\n')}\n`;
+  const facingRows = Object.entries(FACING_BASELINE).map(([key, row]) => formatFacingRow(key, row));
+  const facingHeader = [
+    '',
+    '## Facing baseline',
+    '',
+    '| cell | post-release max rad/s | reversals | continuity samples | camera split rad | camera samples | terminal rad | settle samples |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
+  ];
+  return `${[...header, ...rows, ...facingHeader, ...facingRows].join('\n')}\n`;
 }
 
 describe('zero-latency ground-truth script conversion', () => {
@@ -993,6 +1169,7 @@ describe('movement latency baseline', () => {
     // resequencing those calls, and the harness would keep measuring a
     // pipeline the client no longer runs.
     const source = stripComments(readFileSync(MAIN_TS, 'utf8'));
+    const movementFrameSource = stripComments(readFileSync(ONLINE_MOVEMENT_FRAME_TS, 'utf8'));
     const at = (marker: string): number => {
       const first = source.indexOf(marker);
       expect(first, `src/main.ts has no ${marker}`).toBeGreaterThanOrEqual(0);
@@ -1000,15 +1177,24 @@ describe('movement latency baseline', () => {
       return first;
     };
     const alpha = at('snapshotAlpha(');
-    const flush = at('net.flushInput()');
+    const movementFrame = at('sendOnlineMovementFrame(');
     const consumeEcho = at('net.consumeInputEchoSamples()');
     const fold = at('inputEcho.fold(');
     const drain = at('net.drainEvents()');
     const discontinuity = at('hasAuthoritativeSelfPositionDiscontinuity(');
     const frameBuild = at('selfMotionFrameBuffer.write(');
     const predictionPrepare = at('movementPrediction.prepare(');
-    const predictionAdvance = at('movementPrediction.advance(');
     const predictionDisplay = at('movementPrediction.display(');
+    const keyboardFacing = at('stepKeyboardTurnFacing(');
+    const visualFacing = at('const onlineRenderFacing =');
+    const helperAt = (marker: string): number => {
+      const found = movementFrameSource.indexOf(marker);
+      expect(found, `online_movement_frame.ts has no ${marker}`).toBeGreaterThanOrEqual(0);
+      return found;
+    };
+    const setFacing = helperAt('client.setMouselookFacing(');
+    const legacyFlush = helperAt('client.flushInput(');
+    const sampledAdvance = helperAt('sampler.advance(');
     // updateSelfRenderPosition itself lives in the renderer (src/render/
     // self_render_position_core.ts, called from renderer.sync); main.ts's half
     // of the contract is that the drawn pose is produced AFTER the frame the
@@ -1023,12 +1209,23 @@ describe('movement latency baseline', () => {
       `src/main.ts has two renderer.sync calls after the frame build: ${note}`,
     ).toBe(-1);
     expect(alpha, `alpha must be read before the echo fold: ${note}`).toBeLessThan(consumeEcho);
-    expect(flush, `the wire write must precede the echo read: ${note}`).toBeLessThan(consumeEcho);
-    expect(predictionPrepare, `prediction context precedes sampling: ${note}`).toBeLessThan(
-      predictionAdvance,
-    );
-    expect(predictionAdvance, `sampled prediction precedes the echo read: ${note}`).toBeLessThan(
+    expect(movementFrame, `the wire write must precede the echo read: ${note}`).toBeLessThan(
       consumeEcho,
+    );
+    expect(predictionPrepare, `prediction context precedes sampling: ${note}`).toBeLessThan(
+      movementFrame,
+    );
+    expect(keyboardFacing, `keyboard facing precedes the wire write: ${note}`).toBeLessThan(
+      movementFrame,
+    );
+    expect(visualFacing, `visual facing precedes the wire write: ${note}`).toBeLessThan(
+      movementFrame,
+    );
+    expect(setFacing, `facing must be stored before either wire lane: ${note}`).toBeLessThan(
+      legacyFlush,
+    );
+    expect(legacyFlush, `the legacy lane precedes sampled v2 advance: ${note}`).toBeLessThan(
+      sampledAdvance,
     );
     expect(consumeEcho, `samples are consumed then folded: ${note}`).toBeLessThan(fold);
     expect(fold, `the fold must precede the frame build: ${note}`).toBeLessThan(frameBuild);
@@ -1053,6 +1250,7 @@ describe('movement latency baseline', () => {
     expect(MOVEMENT_FEEL_TARGETS).toEqual({
       backwardStepYd: 0.001,
       correctionEvents: 0,
+      replayEvents: 0,
       pathDeviationYd: 0.05,
       progressMaxYd: 0.15,
       speedErrYdPerSec: 0.5,
@@ -1068,6 +1266,13 @@ describe('movement latency baseline', () => {
 
   it('drives the whole real pipeline in every cell', () => {
     for (const [key, result] of cells) {
+      if (FACING_KEYS.includes(key)) {
+        expect(result.run.frames.length, key).toBeGreaterThan(80);
+        expect(result.run.ticks.length, key).toBeGreaterThan(20);
+        expect(result.metrics.facingContinuity.samples, key).toBeGreaterThan(50);
+        expect(result.metrics.facingCameraSplit.samples, key).toBeGreaterThan(80);
+        continue;
+      }
       // A cell that silently stopped predicting, stopped drawing, or stopped
       // moving would score beautifully; assert it did none of those.
       expect(result.run.frames.length, key).toBeGreaterThan(100);
@@ -1154,11 +1359,53 @@ describe('movement latency baseline', () => {
     // with no row) would never be asserted at all.
     expect(keys).toHaveLength(25);
     expect(Object.keys(BASELINE).sort()).toEqual([...keys].sort());
-    expect(cells.size).toBe(keys.length);
+    expect(FACING_KEYS).toHaveLength(6);
+    expect(Object.keys(FACING_BASELINE).sort()).toEqual([...FACING_KEYS].sort());
+    expect(cells.size).toBe(keys.length + FACING_KEYS.length);
   });
 
   it.each(keys)('pins the measured baseline for %s', (key) => {
     expectPinned(key, BASELINE[key]);
     if (STRICT) expectTargets(key);
   });
+
+  it.each(FACING_KEYS)('keeps facing continuous and aligned for %s', (key) => {
+    const metrics = cell(key).metrics;
+    const note = `${key}: ${JSON.stringify({
+      continuity: metrics.facingContinuity,
+      cameraSplit: metrics.facingCameraSplit,
+      settle: metrics.facingSettleError,
+    })}`;
+    expect(facingRowOf(metrics), note).toEqual(FACING_BASELINE[key]);
+    expect(metrics.facingContinuity.reversals, note).toBe(0);
+    expect(metrics.facingContinuity.maxPostReleaseYawRate, key).toBeLessThanOrEqual(TURN_SPEED);
+    expect(metrics.facingCameraSplit.maxRad, key).toBeLessThanOrEqual(FACING_ERROR_BOUND);
+    expect(metrics.facingSettleError.terminalRad, key).toBeLessThanOrEqual(FACING_ERROR_BOUND);
+  });
+
+  it.each(FACING_PROFILES.map((profile) => profile.key))(
+    'puts one facing-less turn engage edge on the sampled wire at %s',
+    (profileKey) => {
+      const commands = cell(cellKey('turn-idle', profileKey)).run.commands.filter(
+        (command) => command.ct !== undefined && (command.mi.turnLeft || command.mi.turnRight),
+      );
+      expect(commands, profileKey).toHaveLength(1);
+      expect(commands[0]?.sampledFacing, profileKey).toBeNull();
+      const following = cell(cellKey('turn-idle', profileKey)).run.commands.find(
+        (command) => command.ct === (commands[0]?.ct ?? -2) + 1,
+      );
+      expect(following?.mi.turnLeft, profileKey).toBe(false);
+      expect(following?.sampledFacing, profileKey).toBeTypeOf('number');
+    },
+  );
+
+  it.each(FACING_PROFILES.map((profile) => profile.key))(
+    'carries the non-tick mouselook release latch onto the sampled wire at %s',
+    (profileKey) => {
+      const commands = cell(cellKey('mouselook-release', profileKey)).run.commands.filter(
+        (command) => command.sampledFacing !== undefined && command.sampledFacing !== null,
+      );
+      expect(commands.at(-1)?.sampledFacing, profileKey).toBeCloseTo(0.8, 9);
+    },
+  );
 });

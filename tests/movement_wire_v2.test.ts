@@ -141,6 +141,26 @@ describe('movement wire v2', () => {
     expect(predictedFrame).toBe(sentFrame);
   });
 
+  it('reports whether a non-tick advance emitted an accepted frame', () => {
+    const sent: number[] = [];
+    const client: MovementWireClient = {
+      movementWireVersion: 2,
+      onMovementWireNegotiated: null,
+      onMovementWireNeutral: null,
+      movementWireIsOpen: () => true,
+      sendMovementFrame: (frame) => {
+        sent.push(frame.ct);
+        return true;
+      },
+    };
+    const glue = new MovementWireGlue();
+    glue.connect(client, 0);
+
+    expect(glue.advance(client, 0.016, emptyMoveInput(), 0.8, 16)).toBe(false);
+    expect(glue.advance(client, 0.034, emptyMoveInput(), 0.8, 50)).toBe(true);
+    expect(sent).toEqual([0]);
+  });
+
   it('forces neutral v2 input into the next server consumption before pausing', () => {
     const { server, session } = joinGroundTruthCharacter(2, 'warrior', 2);
     const client = bareClient(session.pid, { movementWireVersion: 2 });

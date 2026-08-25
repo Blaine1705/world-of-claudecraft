@@ -121,8 +121,9 @@ export class MovementPredictionPipeline {
     mi: MoveInput,
     facing: number | null,
     now: number,
-  ): void {
-    this.wireGlue.advance(client, frameDtSec, mi, facing, now);
+    turnEngageEdge = false,
+  ): boolean {
+    return this.wireGlue.advance(client, frameDtSec, mi, facing, now, turnEngageEdge);
   }
 
   display(): ReconciledSelfPrediction | null {

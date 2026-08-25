@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type KeyboardTurnArgs,
   newKeyboardTurnState,
+  seedKeyboardTurnRelease,
   stepKeyboardTurnFacing,
 } from '../src/game/keyboard_turn_facing';
 import { TURN_SPEED } from '../src/sim/types';
@@ -15,6 +16,8 @@ const args = (over: Partial<KeyboardTurnArgs> = {}): KeyboardTurnArgs => ({
   sentFacing: null,
   serverFacing: 0,
   echoMs: 0,
+  snapshotIntervalMs: 50,
+  movementWireVersion: 1,
   frameDt: FRAME_60,
   ...over,
 });
@@ -53,6 +56,44 @@ describe('stepKeyboardTurnFacing', () => {
     const f = stepKeyboardTurnFacing(st, args({ turnLeft: true, sentFacing: 1.2 }));
     expect(f).toBeNull();
     expect(st.facing).toBeNull();
+  });
+
+  it('holds an already-streamed mouselook release without writing it again', () => {
+    const st = newKeyboardTurnState();
+    seedKeyboardTurnRelease(st, 0.8);
+
+    expect(stepKeyboardTurnFacing(st, args({ serverFacing: 0.4 }))).toBeCloseTo(0.8, 12);
+    expect(st.wireFacing).toBeNull();
+    expect(stepKeyboardTurnFacing(st, args({ serverFacing: 0.8, frameDt: 0.025 }))).toBeCloseTo(
+      0.8,
+      12,
+    );
+    expect(st.facing).toBe(0.8);
+    expect(stepKeyboardTurnFacing(st, args({ serverFacing: 0.8, frameDt: 0.025 }))).toBeCloseTo(
+      0.8,
+      12,
+    );
+    expect(st.facing).toBeNull();
+  });
+
+  it('requires a full snapshot interval of interpolated convergence before handoff', () => {
+    const st = newKeyboardTurnState();
+    seedKeyboardTurnRelease(st, 0.8);
+
+    const v2 = { movementWireVersion: 2 as const, frameDt: 0.025 };
+    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.801 }))).toBe(0.8);
+    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.79 }))).toBe(0.8);
+    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.801 }))).toBe(0.8);
+    expect(st.facing).not.toBeNull();
+    expect(stepKeyboardTurnFacing(st, args({ ...v2, serverFacing: 0.801 }))).toBeCloseTo(0.801, 12);
+    expect(st.facing).toBeNull();
+  });
+
+  it('keeps the legacy v1 seam glide', () => {
+    const st = newKeyboardTurnState();
+    seedKeyboardTurnRelease(st, 0.8);
+
+    expect(stepKeyboardTurnFacing(st, args({ serverFacing: 0.79 }))).toBeLessThan(0.8);
   });
 
   it('NEVER rewinds toward the lagging server facing on release (the nausea bug)', () => {
@@ -96,9 +137,12 @@ describe('stepKeyboardTurnFacing', () => {
       const f = stepKeyboardTurnFacing(st, args({ serverFacing: held + off }));
       expect(f).toBeCloseTo(held, 9); // held perfectly still, no ride-along
     }
-    const f = stepKeyboardTurnFacing(st, args({ serverFacing: held }));
-    expect(f).toBeCloseTo(held, 6); // bridged onto the settled server facing
-    expect(st.facing).toBeNull(); // handed off at eps-arrival
+    const firstStable = stepKeyboardTurnFacing(st, args({ serverFacing: held, frameDt: 0.025 }));
+    expect(firstStable).toBeCloseTo(held, 6);
+    expect(st.facing).not.toBeNull();
+    const handedOff = stepKeyboardTurnFacing(st, args({ serverFacing: held, frameDt: 0.025 }));
+    expect(handedOff).toBeCloseTo(held, 6);
+    expect(st.facing).toBeNull();
   });
 
   it('holds a persistent residual through the grace window, then glides it out gently', () => {
@@ -241,6 +285,24 @@ describe('stepKeyboardTurnFacing', () => {
       stepKeyboardTurnFacing(st, args({ serverFacing, echoMs: 400 }));
     }
     expect(st.facing).toBeCloseTo(held, 9);
+  });
+
+  it('never streams a mirror-derived heading if echo rises again mid-glide', () => {
+    const st = newKeyboardTurnState();
+    for (let i = 0; i < 30; i++) {
+      stepKeyboardTurnFacing(st, args({ turnLeft: true, serverFacing: 0 }));
+    }
+    const held = st.facing as number;
+    const stalledMirror = held - 0.4;
+    for (let i = 0; i < 29; i++) {
+      stepKeyboardTurnFacing(st, args({ serverFacing: stalledMirror }));
+    }
+    const giveback = Math.abs(held - (st.facing as number));
+    expect(giveback).toBeCloseTo(0.225, 12);
+
+    stepKeyboardTurnFacing(st, args({ serverFacing: stalledMirror, echoMs: 400 }));
+
+    expect(st.wireFacing, `mirror-derived giveback was ${giveback} rad`).toBeNull();
   });
 
   it('returns null and stays inactive when idle', () => {

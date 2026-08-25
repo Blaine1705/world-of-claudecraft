@@ -14,6 +14,7 @@ export class MovementWireGlue {
   onNegotiated: ((version: 1 | 2) => void) | null = null;
   private readonly sampler = new InputTickSampler();
   private paused = false;
+  private pendingTurnEngage: { turnLeft: boolean; turnRight: boolean } | null = null;
 
   get interpolationAlpha(): number {
     return this.sampler.interpolationAlpha;
@@ -31,6 +32,7 @@ export class MovementWireGlue {
     if (version !== 2) return;
     this.sampler.reset(now);
     this.paused = false;
+    this.pendingTurnEngage = null;
   }
 
   resume(): void {
@@ -40,6 +42,7 @@ export class MovementWireGlue {
   emitNeutralFrame(client: MovementWireClient, now: number): boolean {
     if (client.movementWireVersion !== 2 || !client.movementWireIsOpen()) return false;
     const frame = this.sampler.emitNeutralFrame(now);
+    this.pendingTurnEngage = null;
     try {
       const sent = client.sendMovementFrame(frame, now, true);
       if (sent) this.onFrame?.(frame);
@@ -55,10 +58,37 @@ export class MovementWireGlue {
     mi: MoveInput,
     facing: number | null,
     now: number,
-  ): void {
-    if (client.movementWireVersion !== 2 || this.paused || !client.movementWireIsOpen()) return;
-    for (const frame of this.sampler.advance(now, () => ({ mi, facing }))) {
-      if (client.sendMovementFrame(frame, now)) this.onFrame?.(frame);
+    turnEngageEdge = false,
+  ): boolean {
+    if (client.movementWireVersion !== 2 || this.paused || !client.movementWireIsOpen()) {
+      return false;
     }
+    if (turnEngageEdge) {
+      this.pendingTurnEngage = { turnLeft: mi.turnLeft, turnRight: mi.turnRight };
+    }
+    const steadyMi = turnEngageEdge ? { ...mi, turnLeft: false, turnRight: false } : mi;
+    let sampledEngage = false;
+    const frames = this.sampler.advance(now, () => {
+      if (this.pendingTurnEngage && !sampledEngage) {
+        sampledEngage = true;
+        return {
+          mi: {
+            ...steadyMi,
+            turnLeft: this.pendingTurnEngage.turnLeft,
+            turnRight: this.pendingTurnEngage.turnRight,
+          },
+          facing: null,
+        };
+      }
+      return { mi: steadyMi, facing };
+    });
+    let emitted = false;
+    for (const frame of frames) {
+      if (!client.sendMovementFrame(frame, now)) continue;
+      emitted = true;
+      if (frame.mi.turnLeft || frame.mi.turnRight) this.pendingTurnEngage = null;
+      this.onFrame?.(frame);
+    }
+    return emitted;
   }
 }

@@ -9,8 +9,13 @@ import {
   type CommandSample,
   commandedDirection,
   commandedSpeed,
+  computeFacingCameraSplit,
+  computeFacingContinuity,
+  computeFacingSettleError,
   computeMovementMetrics,
+  computeReplayEvents,
   type DrawnSample,
+  FACING_REVERSAL_DEADBAND_RAD,
   type GroundTruthSample,
   MOVEMENT_METRICS_DEFAULTS,
 } from './helpers/movement_metrics';
@@ -75,6 +80,7 @@ describe('metric conventions', () => {
       correctionAngleDeg: 30,
       minStepYd: 0.01,
     });
+    expect(FACING_REVERSAL_DEADBAND_RAD).toBe(0.005);
   });
 
   it('scores nothing, rather than throwing, on empty input', () => {
@@ -90,6 +96,14 @@ describe('metric conventions', () => {
       speedContinuity: { maxSpeedErr: 0, maxSpeedDelta: 0, samples: 0 },
       correctionEvents: { count: 0, worstDeg: 0, samples: 0 },
       inputToAuthorityMs: { maxMs: 0, meanMs: 0, samples: 0 },
+      facingContinuity: { maxPostReleaseYawRate: 0, reversals: 0, samples: 0 },
+      facingCameraSplit: { maxRad: 0, samples: 0 },
+      facingSettleError: { terminalRad: 0, samples: 0 },
+      replayEvents: {
+        count: 0,
+        byMode: { match: 0, replayed: 0, ignore: 0, stale: 0, suspend: 0 },
+        worstResidualYd: 0,
+      },
     });
   });
 
@@ -195,6 +209,92 @@ describe('metric conventions', () => {
     expect(stepYd).toBeCloseTo(commandedSpeed(input) * DT, 9);
     expect(dx / stepYd).toBeCloseTo(direction.x, 9);
     expect(dz / stepYd).toBeCloseTo(direction.z, 9);
+  });
+});
+
+describe('facing and replay metrics on hand-built traces', () => {
+  it('measures the post-release yaw rate and direction reversals outside steady gating', () => {
+    const frames: DrawnSample[] = [
+      { tMs: 0, x: 0, z: 0, drawnYaw: 0, turnInputActive: true },
+      { tMs: 100, x: 0, z: 0, drawnYaw: 0.3, turnInputActive: true },
+      { tMs: 200, x: 0, z: 0, drawnYaw: 0.4, turnInputActive: false },
+      { tMs: 300, x: 0, z: 0, drawnYaw: 0.35, turnInputActive: false },
+      { tMs: 400, x: 0, z: 0, drawnYaw: 0.37, turnInputActive: false },
+    ];
+
+    const metric = computeFacingContinuity(frames);
+    expect(metric.maxPostReleaseYawRate).toBeCloseTo(1, 12);
+    expect(metric.reversals).toBe(2);
+    expect(metric.samples).toBe(3);
+  });
+
+  it('ignores sub-deadband yaw changes when counting perceptual reversals', () => {
+    const frames: DrawnSample[] = [
+      { tMs: 0, x: 0, z: 0, drawnYaw: 0, turnInputActive: true },
+      { tMs: 100, x: 0, z: 0, drawnYaw: 0.3, turnInputActive: false },
+      { tMs: 200, x: 0, z: 0, drawnYaw: 0.2983, turnInputActive: false },
+      { tMs: 300, x: 0, z: 0, drawnYaw: 0.31, turnInputActive: false },
+    ];
+
+    expect(computeFacingContinuity(frames).reversals).toBe(0);
+  });
+
+  it('starts the post-release window after an explicit fast mouselook sweep', () => {
+    const frames: DrawnSample[] = [
+      { tMs: 0, x: 0, z: 0, drawnYaw: 0, turnInputActive: true },
+      { tMs: 20, x: 0, z: 0, drawnYaw: 0.4, turnInputActive: true },
+      { tMs: 40, x: 0, z: 0, drawnYaw: 0.8, turnInputActive: true },
+      { tMs: 60, x: 0, z: 0, drawnYaw: 0.8, turnInputActive: false },
+      { tMs: 80, x: 0, z: 0, drawnYaw: 0.8, turnInputActive: false },
+    ];
+
+    expect(computeFacingContinuity(frames)).toEqual({
+      maxPostReleaseYawRate: 0,
+      reversals: 0,
+      samples: 2,
+    });
+  });
+
+  it('takes the shortest wrapped angle for camera split and terminal settle error', () => {
+    const frames: DrawnSample[] = [
+      {
+        tMs: 0,
+        x: 0,
+        z: 0,
+        drawnYaw: Math.PI - 0.02,
+        cameraFacing: -Math.PI + 0.03,
+        authoritativeFacing: -Math.PI + 0.08,
+      },
+      {
+        tMs: 50,
+        x: 0,
+        z: 0,
+        drawnYaw: 1.2,
+        cameraFacing: 1.1,
+        authoritativeFacing: 1.15,
+      },
+    ];
+
+    const split = computeFacingCameraSplit(frames);
+    expect(split.maxRad).toBeCloseTo(0.1, 12);
+    expect(split.samples).toBe(2);
+    expect(computeFacingSettleError(frames).terminalRad).toBeCloseTo(0.05, 12);
+  });
+
+  it('counts non-match reconciliation modes and the worst horizontal residual', () => {
+    const frames: DrawnSample[] = [
+      { tMs: 0, x: 0, z: 0, reconcileMode: 'match', residualYd: 0 },
+      { tMs: 50, x: 0, z: 0, reconcileMode: 'replayed', residualYd: 0.3 },
+      { tMs: 100, x: 0, z: 0, reconcileMode: 'ignore', residualYd: 0.1 },
+      { tMs: 150, x: 0, z: 0, reconcileMode: 'stale' },
+      { tMs: 200, x: 0, z: 0, reconcileMode: 'suspend', residualYd: 0.2 },
+    ];
+
+    expect(computeReplayEvents(frames)).toEqual({
+      count: 4,
+      byMode: { match: 1, replayed: 1, ignore: 1, stale: 1, suspend: 1 },
+      worstResidualYd: 0.3,
+    });
   });
 });
 

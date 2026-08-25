@@ -31,7 +31,7 @@ import { wrapAngle } from './camera_follow';
 const HANDOFF_EPS = 0.02; // rad (~1.1 degrees)
 const SEAM_RATE = 0.35; // rad/s
 // Fully handed off once within this (sub-pixel at any camera distance).
-const HANDOFF_DONE_EPS = 0.002; // rad (~0.1 degrees)
+export const HANDOFF_DONE_EPS = 0.002; // rad (~0.1 degrees)
 // How long a release-time disagreement may stand before we start correcting.
 // Sized to cover a generous input echo plus a couple of snapshots, so the
 // normal catch-up always wins the race and no correction ever shows.
@@ -49,6 +49,7 @@ const MAX_FRAME_DT = 0.25;
 export interface KeyboardTurnState {
   facing: number | null; // null = inactive (the server facing owns the display)
   releaseMs: number; // time spent in the release phase
+  handoffStableMs: number;
   /**
    * The heading the caller may put on the wire this frame, or null. Only ever
    * carries values DERIVED FROM INPUT (the live turn integration, the constant
@@ -59,6 +60,8 @@ export interface KeyboardTurnState {
    * spins on its own at the glide rate until the player intervenes).
    */
   wireFacing: number | null;
+  /** True once release correction has incorporated mirrored server state. */
+  mirrorDerived: boolean;
   /**
    * True when the caller must ZERO the turn flags on the wire this frame
    * (the streamed heading owns the channel; letting the server integrate
@@ -80,10 +83,27 @@ export function newKeyboardTurnState(): KeyboardTurnState {
   return {
     facing: null,
     releaseMs: 0,
+    handoffStableMs: 0,
     wireFacing: null,
+    mirrorDerived: false,
     suppressTurnFlags: false,
     wasTurning: false,
   };
+}
+
+/**
+ * Keep an already-streamed mouselook release heading on the display until the
+ * mirrored server facing reaches it. The wire latch owns the one required send,
+ * so this seeded release state stays display-only.
+ */
+export function seedKeyboardTurnRelease(state: KeyboardTurnState, facing: number): void {
+  state.facing = facing;
+  state.releaseMs = 0;
+  state.handoffStableMs = 0;
+  state.wireFacing = null;
+  state.mirrorDerived = true;
+  state.suppressTurnFlags = false;
+  state.wasTurning = false;
 }
 
 function approachAngle(current: number, target: number, maxStep: number): number {
@@ -109,6 +129,9 @@ export interface KeyboardTurnArgs {
   /** Measured input echo (ms); scales the release grace so a high-RTT link
    *  gets its full round trip of holding before any correction starts. */
   echoMs: number;
+  /** Current measured interval between authoritative snapshots. */
+  snapshotIntervalMs: number;
+  movementWireVersion: 1 | 2;
   frameDt: number;
 }
 
@@ -135,7 +158,9 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     // A foreign path (mouselook, click-move) owns the heading and streams it
     // itself; yield.
     state.facing = null;
+    state.handoffStableMs = 0;
     state.wireFacing = null;
+    state.mirrorDerived = false;
     return null;
   }
   const dt = Math.min(Math.max(0, args.frameDt), MAX_FRAME_DT);
@@ -145,11 +170,15 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     const base = state.facing ?? args.serverFacing;
     state.facing = wrapAngle(base + dir * TURN_SPEED * dt);
     state.releaseMs = 0;
+    state.handoffStableMs = 0;
     state.wireFacing = state.facing; // input-derived: safe to stream
+    state.mirrorDerived = false;
     return state.facing;
   }
   if (state.facing === null) {
+    state.handoffStableMs = 0;
     state.wireFacing = null;
+    state.mirrorDerived = false;
     return null;
   }
 
@@ -159,9 +188,18 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
   // Eps-arrival only, from either side: no crossing shortcuts, no rewinds.
   const gap = wrapAngle(args.serverFacing - state.facing);
   if (Math.abs(gap) <= HANDOFF_DONE_EPS) {
+    state.handoffStableMs += dt * 1000;
+    state.wireFacing = state.mirrorDerived ? null : state.facing;
+    if (state.handoffStableMs < Math.max(0, args.snapshotIntervalMs)) return state.facing;
     state.facing = null;
     state.wireFacing = null;
+    state.mirrorDerived = false;
     return args.serverFacing;
+  }
+  state.handoffStableMs = 0;
+  if (args.movementWireVersion === 2) {
+    state.wireFacing = state.mirrorDerived ? null : state.facing;
+    return state.facing;
   }
   if (Math.abs(gap) <= HANDOFF_EPS) {
     // Seam band: ease the last fraction of a degree (mostly wire rounding)
@@ -169,6 +207,7 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     // motion: never streamed (see wireFacing).
     state.facing = approachAngle(state.facing, args.serverFacing, SEAM_RATE * dt);
     state.wireFacing = null;
+    state.mirrorDerived = true;
     return state.facing;
   }
   state.releaseMs += dt * 1000;
@@ -182,8 +221,9 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     // derived motion: never streamed.
     state.facing = approachAngle(state.facing, args.serverFacing, RELEASE_CORRECT_RATE * dt);
     state.wireFacing = null;
+    state.mirrorDerived = true;
   } else {
-    state.wireFacing = state.facing; // the constant held heading: input-derived
+    state.wireFacing = state.mirrorDerived ? null : state.facing;
   }
   return state.facing;
 }

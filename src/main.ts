@@ -119,6 +119,7 @@ import { Keybinds } from './game/keybinds';
 import {
   type KeyboardTurnArgs,
   newKeyboardTurnState,
+  seedKeyboardTurnRelease,
   stepKeyboardTurnFacing,
 } from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
@@ -149,6 +150,8 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { interpolatedOnlineSelfFacing } from './game/online_facing_mirror';
+import { sendOnlineMovementFrame } from './game/online_movement_frame';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -4004,16 +4007,9 @@ async function startGame(
   // commit the final camera yaw to the player facing (see mouselook_release.ts
   // and camera_driven_facing.ts).
   let prevCameraDrivenFacing = false;
-  // The release yaw, latched until a sim tick actually commits it. Offline a tick
-  // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
-  // the release frame would drop the one-shot when release lands on a zero-tick
-  // frame. Held here until consumed, then cleared.
+  // The release yaw is held until a sim tick consumes it because release can
+  // land on an offline frame with no tick.
   let pendingReleaseFacing: number | null = null;
-  // Local integration of keyboard turns online, streamed on the facing channel
-  // (see the module docs). The module also decides the per-frame wire turn-flag
-  // gating (suppressTurnFlags): zeroed while the streamed heading owns the
-  // channel, passed through on the one engage-edge frame so the server still
-  // sees a manual turn (breaks /follow, marks anti-AFK activity).
   const kbTurn = newKeyboardTurnState();
   const kbTurnArgs: KeyboardTurnArgs = {
     turnLeft: false,
@@ -4022,6 +4018,8 @@ async function startGame(
     sentFacing: null,
     serverFacing: 0,
     echoMs: 0,
+    snapshotIntervalMs: 50,
+    movementWireVersion: 1,
     frameDt: 0,
   };
   const selfMotionGateArgs: SelfMotionGateArgs = {
@@ -4661,32 +4659,28 @@ async function startGame(
     const pe = world.player;
     const alpha = snapshotAlpha(performance.now(), net.lastSnapAt, net.snapInterval);
     // facing interp capped at 1 - extrapolating angles past the snapshot oscillates
-    const interpServerFacing =
-      pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
+    const interpServerFacing = interpolatedOnlineSelfFacing(net, pe, alpha);
     const foreignFacing = movementFacing ?? resolved.facing;
-    // Keyboard turns integrate the same TURN_SPEED locally and STREAM the
-    // resulting heading on the facing channel, exactly like mouselook: the
-    // server applies it outright instead of integrating the turn flags one
-    // echo late in 50ms quanta, so there is never a client/server heading
-    // disagreement to reconcile after a turn (the source of every release
-    // stutter this feature has chased). The turn flags are zeroed on the wire
-    // while the local heading owns the channel, or the server would integrate
-    // the turn a second time on top of the streamed facing.
+    if (edgeReleaseFacing !== null) seedKeyboardTurnRelease(kbTurn, edgeReleaseFacing);
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
-    kbTurnArgs.sentFacing = foreignFacing;
+    kbTurnArgs.sentFacing =
+      (!movementFrozen() ? (renderFacing ?? controllerFacing) : null) ?? resolved.facing;
     kbTurnArgs.serverFacing = interpServerFacing;
     kbTurnArgs.echoMs = inputEcho.echoMs;
+    kbTurnArgs.snapshotIntervalMs = net.snapInterval;
+    kbTurnArgs.movementWireVersion = net.movementWireVersion;
     kbTurnArgs.frameDt = frameDt;
     const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
-    // wireFacing, not kbFacing: only input-derived headings go on the wire.
-    // Streaming the seam/glide corrections (which chase the mirror) would
-    // close a feedback loop through the server that at high RTT never
-    // converges (the observed self-spinning resonance under netem).
     const netFacing = foreignFacing ?? kbTurn.wireFacing;
+    const localFacing = netFacing ?? kbFacing;
     const onlineRenderFacing =
-      visualFacingFor(resolved.mi, netFacing ?? kbFacing ?? interpServerFacing) ?? netFacing;
+      visualFacingFor(resolved.mi, localFacing ?? interpServerFacing) ?? localFacing;
+    const turnEngageEdge =
+      kbFacing !== null &&
+      (resolved.mi.turnLeft || resolved.mi.turnRight) &&
+      !kbTurn.suppressTurnFlags;
     Object.assign(net.moveInput, resolved.mi);
     if (kbTurn.suppressTurnFlags) {
       net.moveInput.turnLeft = false;
@@ -4700,12 +4694,18 @@ async function startGame(
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(net, pe, selfPredictionEnabled);
-    net.setMouselookFacing(netFacing);
-    // Online streams facing every frame, so the mouselook release yaw is
-    // consumed here; drop it so it is not re-applied next frame.
-    pendingReleaseFacing = null;
-    if (net.movementWireVersion !== 2 && net.flushInput()) perf.markInputSent(performance.now());
-    movementPrediction.advance(net, frameDt, net.moveInput, netFacing, performance.now());
+    const movementFrameEmitted = sendOnlineMovementFrame(
+      net,
+      movementPrediction,
+      frameDt,
+      net.moveInput,
+      netFacing,
+      performance.now(),
+      turnEngageEdge,
+    );
+    if (net.movementWireVersion !== 2 && movementFrameEmitted)
+      perf.markInputSent(performance.now());
+    if (movementFrameEmitted) pendingReleaseFacing = null;
     const echoSamples = net.consumeInputEchoSamples();
     inputEcho.fold(echoSamples);
     for (const sample of echoSamples) perf.markInputEcho(sample);

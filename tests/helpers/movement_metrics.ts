@@ -30,12 +30,24 @@ import { DT, type MoveInput, RUN_SPEED } from '../../src/sim/types';
 
 const DT_MS = DT * 1000;
 
+/** Drawn-yaw direction changes at or below this are not perceptual reversals. */
+export const FACING_REVERSAL_DEADBAND_RAD = 0.005;
+
 /** One drawn frame: when it was drawn and where the avatar was put. */
 export interface DrawnSample {
   tMs: number;
   x: number;
   z: number;
+  drawnYaw?: number;
+  cameraFacing?: number;
+  authoritativeFacing?: number;
+  turnInputActive?: boolean;
+  mi?: MoveInput;
+  reconcileMode?: ReconcileMode | null;
+  residualYd?: number;
 }
+
+export type ReconcileMode = 'match' | 'replayed' | 'ignore' | 'stale' | 'suspend';
 
 /** One authoritative pose, indexed by the server tick that produced it. */
 export interface GroundTruthSample {
@@ -52,6 +64,7 @@ export interface CommandSample {
   facing: number;
   ct?: number;
   samplerInterpolationAlpha?: number;
+  sampledFacing?: number | null;
 }
 
 export interface AuthorityTickSample {
@@ -126,6 +139,28 @@ export interface InputToAuthorityMetric {
   samples: number;
 }
 
+export interface FacingContinuityMetric {
+  maxPostReleaseYawRate: number;
+  reversals: number;
+  samples: number;
+}
+
+export interface FacingCameraSplitMetric {
+  maxRad: number;
+  samples: number;
+}
+
+export interface FacingSettleErrorMetric {
+  terminalRad: number;
+  samples: number;
+}
+
+export interface ReplayEventsMetric {
+  count: number;
+  byMode: Record<ReconcileMode, number>;
+  worstResidualYd: number;
+}
+
 export interface MovementMetrics {
   backwardSteps: BackwardStepsMetric;
   pathDeviation: PathDeviationMetric;
@@ -133,6 +168,10 @@ export interface MovementMetrics {
   speedContinuity: SpeedContinuityMetric;
   correctionEvents: CorrectionEventsMetric;
   inputToAuthorityMs: InputToAuthorityMetric;
+  facingContinuity: FacingContinuityMetric;
+  facingCameraSplit: FacingCameraSplitMetric;
+  facingSettleError: FacingSettleErrorMetric;
+  replayEvents: ReplayEventsMetric;
 }
 
 export const MOVEMENT_METRICS_DEFAULTS = {
@@ -157,6 +196,8 @@ export const MOVEMENT_FEEL_TARGETS = {
   backwardStepYd: MOVEMENT_METRICS_DEFAULTS.backwardDeadbandYd,
   /** No visible correction: the drawn step always points where input does. */
   correctionEvents: 0,
+  /** Legitimate play never needs to replay or discard prediction history. */
+  replayEvents: 0,
   /** The display never drags off the steered line past this (yards). */
   pathDeviationYd: 0.05,
   /** Mid-run lead or lag against the authority along the steered line (yd):
@@ -186,7 +227,9 @@ export const MOVEMENT_FEEL_TARGETS = {
  *
  * What still has to hold is that the override is absorbed cleanly: the visible
  * snap-back it costs stays bounded, and once motion stops the display sits on
- * the authority.
+ * the authority. Reconciliation during an override transition is designed
+ * absorption, so replay counts are measured and pinned per CC cell rather than
+ * asserted against the legitimate-play zero target.
  *
  * Authoritative scoring carries about a +0.45 yard mid-motion lead at 150 ms:
  * a healthy predictor leads the concurrent server tick. Per-sample client-clock
@@ -246,6 +289,94 @@ export function commandedSpeed(mi: MoveInput): number {
 
 function translationalHeld(mi: MoveInput): boolean {
   return mi.forward || mi.back || mi.strafeLeft || mi.strafeRight;
+}
+
+function angularDistance(a: number, b: number): number {
+  return Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+}
+
+function signedAngularStep(from: number, to: number): number {
+  return Math.atan2(Math.sin(to - from), Math.cos(to - from));
+}
+
+export function computeFacingContinuity(drawn: readonly DrawnSample[]): FacingContinuityMetric {
+  const metric: FacingContinuityMetric = {
+    maxPostReleaseYawRate: 0,
+    reversals: 0,
+    samples: 0,
+  };
+  let lastActiveIndex = -1;
+  for (let i = 0; i < drawn.length; i++) {
+    if (drawn[i].turnInputActive === true) lastActiveIndex = i;
+  }
+  let previousDirection = 0;
+  for (let i = 1; i < drawn.length; i++) {
+    const previous = drawn[i - 1];
+    const current = drawn[i];
+    if (previous.drawnYaw === undefined || current.drawnYaw === undefined) continue;
+    const dtSec = (current.tMs - previous.tMs) / 1000;
+    if (!(dtSec > 0)) continue;
+    const step = signedAngularStep(previous.drawnYaw, current.drawnYaw);
+    if (i > lastActiveIndex) {
+      metric.samples++;
+      metric.maxPostReleaseYawRate = Math.max(metric.maxPostReleaseYawRate, Math.abs(step) / dtSec);
+    }
+    if (current.turnInputActive === true) {
+      previousDirection = 0;
+      continue;
+    }
+    const direction = Math.abs(step) > FACING_REVERSAL_DEADBAND_RAD ? Math.sign(step) : 0;
+    if (direction === 0) continue;
+    if (previousDirection !== 0 && direction !== previousDirection) metric.reversals++;
+    previousDirection = direction;
+  }
+  return metric;
+}
+
+export function computeFacingCameraSplit(drawn: readonly DrawnSample[]): FacingCameraSplitMetric {
+  const metric: FacingCameraSplitMetric = { maxRad: 0, samples: 0 };
+  for (const frame of drawn) {
+    if (frame.drawnYaw === undefined || frame.cameraFacing === undefined) continue;
+    metric.samples++;
+    metric.maxRad = Math.max(metric.maxRad, angularDistance(frame.drawnYaw, frame.cameraFacing));
+  }
+  return metric;
+}
+
+export function computeFacingSettleError(drawn: readonly DrawnSample[]): FacingSettleErrorMetric {
+  for (let i = drawn.length - 1; i >= 0; i--) {
+    const frame = drawn[i];
+    if (frame.drawnYaw === undefined || frame.authoritativeFacing === undefined) continue;
+    return {
+      terminalRad: angularDistance(frame.drawnYaw, frame.authoritativeFacing),
+      samples: 1,
+    };
+  }
+  return { terminalRad: 0, samples: 0 };
+}
+
+export function computeReplayEvents(drawn: readonly DrawnSample[]): ReplayEventsMetric {
+  const byMode: Record<ReconcileMode, number> = {
+    match: 0,
+    replayed: 0,
+    ignore: 0,
+    stale: 0,
+    suspend: 0,
+  };
+  let worstResidualYd = 0;
+  for (const frame of drawn) {
+    if (frame.reconcileMode !== undefined && frame.reconcileMode !== null) {
+      byMode[frame.reconcileMode]++;
+    }
+    if (frame.residualYd !== undefined) {
+      worstResidualYd = Math.max(worstResidualYd, frame.residualYd);
+    }
+  }
+  return {
+    count: byMode.replayed + byMode.ignore + byMode.stale + byMode.suspend,
+    byMode,
+    worstResidualYd,
+  };
 }
 
 function sameHeldInput(a: MoveInput, b: MoveInput): boolean {
@@ -437,6 +568,10 @@ export function computeMovementMetrics(
   const speed: SpeedContinuityMetric = { maxSpeedErr: 0, maxSpeedDelta: 0, samples: 0 };
   const corrections: CorrectionEventsMetric = { count: 0, worstDeg: 0, samples: 0 };
   const inputToAuthority: InputToAuthorityMetric = { maxMs: 0, meanMs: 0, samples: 0 };
+  const facingContinuity = computeFacingContinuity(drawn);
+  const facingCameraSplit = computeFacingCameraSplit(drawn);
+  const facingSettleError = computeFacingSettleError(drawn);
+  const replayEvents = computeReplayEvents(drawn);
 
   let deviationSum = 0;
   let progressSum = 0;
@@ -538,5 +673,9 @@ export function computeMovementMetrics(
     speedContinuity: speed,
     correctionEvents: corrections,
     inputToAuthorityMs: inputToAuthority,
+    facingContinuity,
+    facingCameraSplit,
+    facingSettleError,
+    replayEvents,
   };
 }

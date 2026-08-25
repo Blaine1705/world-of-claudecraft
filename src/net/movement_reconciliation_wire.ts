@@ -2,6 +2,7 @@ export class ReconWireState {
   reconAuthoritativeX: number | null = null;
   reconAuthoritativeY: number | null = null;
   reconAuthoritativeZ: number | null = null;
+  reconPreviousAuthoritativeFacing: number | null = null;
   reconAuthoritativeFacing: number | null = null;
   reconAckClientTick = -1;
   reconOverrideEpoch = 0;
@@ -46,6 +47,7 @@ export function applyReconSelfWire(
   target.reconAuthoritativeX = self.px;
   target.reconAuthoritativeY = self.py;
   target.reconAuthoritativeZ = self.pz;
+  target.reconPreviousAuthoritativeFacing = target.reconAuthoritativeFacing ?? self.pf;
   target.reconAuthoritativeFacing = self.pf;
   target.reconAckClientTick = self.ackCt as number;
   target.reconOverrideEpoch = self.ovE as number;

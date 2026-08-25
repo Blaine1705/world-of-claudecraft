@@ -74,6 +74,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.reconAuthoritativeX = null;
   c.reconAuthoritativeY = null;
   c.reconAuthoritativeZ = null;
+  c.reconPreviousAuthoritativeFacing = null;
   c.reconAuthoritativeFacing = null;
   c.reconAckClientTick = -1;
   c.reconOverrideEpoch = 0;

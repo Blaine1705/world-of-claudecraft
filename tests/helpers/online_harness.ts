@@ -30,13 +30,9 @@
 // server's own parser (parseMoveInputFrame), so the fidelity is exact rather
 // than re-derived.
 //
-// What is NOT covered (v1 scope, deliberately): everything DOM-bound upstream
-// of the intent. `Input.readMoveInput`, `resolveMove` (click-move folding),
-// `stepKeyboardTurnFacing`, the mouselook release latch and `visualFacingFor`
-// are not exercised; a script supplies the resolved `mi` plus the wire facing
-// directly. So this rig measures what the network and the display layers do
-// with an intent, never how the intent was produced. The HUD, the renderer's
-// scene graph, and the camera are likewise absent.
+// Direct mode keeps the original resolved-intent seam. Optional key-timeline
+// mode composes the real keyboard turn, mouselook release, movement visual,
+// renderer self-yaw, and camera-facing producers in main.ts order.
 //
 // A suite using this helper must mock Postgres itself, hoisted above its own
 // import of this module (it pulls in server/game); copy the superset factory at
@@ -45,6 +41,15 @@
 import type { ClientSession, GameServer } from '../../server/game';
 import { consumeMovementFramesV2 } from '../../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../../server/movement_override_epoch';
+import {
+  type KeyboardTurnArgs,
+  newKeyboardTurnState,
+  seedKeyboardTurnRelease,
+  stepKeyboardTurnFacing,
+} from '../../src/game/keyboard_turn_facing';
+import { mouselookReleaseFacing } from '../../src/game/mouselook_release';
+import { diagonalMovementVisualFacing } from '../../src/game/movement_visual';
+import { interpolatedOnlineSelfFacing } from '../../src/game/online_facing_mirror';
 import { adaptiveSelfAlphaLead } from '../../src/game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from '../../src/game/self_motion_frame_buffer';
 import {
@@ -56,7 +61,7 @@ import {
 import { InputEchoTracker } from '../../src/net/input_echo_tracker';
 import { ClientWorld } from '../../src/net/online';
 import { snapshotAlpha } from '../../src/net/snapshot_alpha';
-import { wrapAngle } from '../../src/render/facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing } from '../../src/render/facing_smooth';
 import { hasAuthoritativeSelfPositionDiscontinuity } from '../../src/render/self_motion';
 import { MovementPredictionPipeline } from '../../src/render/self_prediction';
 import {
@@ -76,7 +81,7 @@ import {
   type MoveScriptEntry,
   teleportEntity,
 } from './movement_ground_truth';
-import type { CommandSample } from './movement_metrics';
+import type { CommandSample, ReconcileMode } from './movement_metrics';
 import { VirtualClock } from './virtual_clock';
 
 /** The authoritative world loop period; the sim tick is 20 Hz. */
@@ -92,7 +97,7 @@ export interface FrameScriptEntry {
   /** Merged into the held intent (held until the next entry changes it). */
   mi?: Partial<MoveInput>;
   /** The wire facing from this moment on (radians). */
-  facing?: number;
+  facing?: number | null;
 }
 
 export type FrameScript = readonly FrameScriptEntry[];
@@ -108,7 +113,7 @@ export interface RunScriptOptions {
   script?: FrameScript;
   /** Continuous heading, sampled every frame (the mouselook steering case).
    *  Overrides a script entry's `facing` on any frame it is supplied for. */
-  facingAt?: (tMs: number) => number;
+  facingAt?: (tMs: number) => number | null;
   actions?: readonly ScriptedAction[];
 }
 
@@ -135,10 +140,16 @@ export interface FrameRecord {
   predictorActive: boolean;
   /** Whether the gate allowed prediction (false: CC, delve, spectate...). */
   predictionEnabled: boolean;
+  turnInputActive: boolean;
   mi: MoveInput;
-  facing: number;
+  netFacing: number | null;
   /** The interpolated authoritative heading this frame (see stepFrame). */
   serverFacing: number;
+  authoritativeFacing: number;
+  drawnYaw: number;
+  cameraFacing: number;
+  reconcileMode: ReconcileMode | null;
+  residualYd: number;
 }
 
 /** The authoritative pose after one server tick. */
@@ -181,6 +192,8 @@ export interface OnlineHarnessOptions {
   warmupMs?: number;
   start?: { x: number; z: number };
   facing?: number;
+  /** Compose the frame's facing from the same producers as main.ts. */
+  keyTimeline?: boolean;
 }
 
 export interface OnlineHarness {
@@ -314,6 +327,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       mi: frame.moveInput,
       facing: wireFacing,
       ct: (parsed as { ct: number }).ct,
+      sampledFacing: frame.facing,
     });
   }
 
@@ -386,8 +400,25 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     climbing: false,
   };
   const heldInput = emptyMoveInput();
-  let heldFacing = startFacing;
+  let heldFacing: number | null = opts.keyTimeline ? null : startFacing;
   let lastFrameAtMs = 0;
+  const kbTurn = newKeyboardTurnState();
+  const kbTurnArgs: KeyboardTurnArgs = {
+    turnLeft: false,
+    turnRight: false,
+    turnAllowed: true,
+    sentFacing: null,
+    serverFacing: startFacing,
+    echoMs: 0,
+    snapshotIntervalMs: SERVER_TICK_MS,
+    movementWireVersion,
+    frameDt: 0,
+  };
+  let pendingReleaseFacing: number | null = null;
+  let previousCameraDrivenFacing = false;
+  let cameraYaw = startFacing;
+  let selfFacingOverride: number | null = null;
+  let selfFacingLastTarget: number | null = null;
 
   function stepServer(): void {
     // biome-ignore lint/suspicious/noExplicitAny: the server-loop internals a manual step drives
@@ -426,12 +457,54 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     // The interpolated authoritative heading. main.ts falls back to it when no
     // input-derived heading exists; a script always supplies one (see the
     // header's scope note), so here it is recorded rather than consumed.
-    const interpServerFacing =
-      pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
+    const interpServerFacing = interpolatedOnlineSelfFacing(client, pe, alpha);
 
     // 2) the scripted intent for this frame, in place of the DOM input stack.
     const mi: MoveInput = { ...heldInput };
-    const netFacing = heldFacing;
+    let netFacing = heldFacing;
+    let onlineRenderFacing = netFacing;
+    let cameraFacing = netFacing ?? interpServerFacing;
+    let turnEngageEdge = false;
+    let turnInputActive = false;
+    const wireMi: MoveInput = { ...mi };
+    if (opts.keyTimeline) {
+      const cameraDrivenFacing = heldFacing !== null;
+      turnInputActive = mi.turnLeft || mi.turnRight || cameraDrivenFacing;
+      if (heldFacing !== null) cameraYaw = heldFacing;
+      const edgeReleaseFacing = mouselookReleaseFacing(
+        previousCameraDrivenFacing,
+        cameraDrivenFacing,
+        cameraYaw,
+      );
+      previousCameraDrivenFacing = cameraDrivenFacing;
+      if (edgeReleaseFacing !== null) {
+        pendingReleaseFacing = edgeReleaseFacing;
+        seedKeyboardTurnRelease(kbTurn, edgeReleaseFacing);
+      }
+      const foreignFacing = heldFacing ?? pendingReleaseFacing;
+      kbTurnArgs.turnLeft = mi.turnLeft;
+      kbTurnArgs.turnRight = mi.turnRight;
+      kbTurnArgs.turnAllowed =
+        client.spectating === null && !isMovementFrozen(pe) && !isPlayerImmobilized(pe.auras);
+      kbTurnArgs.sentFacing = heldFacing;
+      kbTurnArgs.serverFacing = interpServerFacing;
+      kbTurnArgs.echoMs = inputEcho.echoMs;
+      kbTurnArgs.snapshotIntervalMs = client.snapInterval;
+      kbTurnArgs.movementWireVersion = client.movementWireVersion;
+      kbTurnArgs.frameDt = frameDt;
+      const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
+      netFacing = foreignFacing ?? kbTurn.wireFacing;
+      const localFacing = netFacing ?? kbFacing;
+      onlineRenderFacing =
+        diagonalMovementVisualFacing(mi, localFacing ?? interpServerFacing) ?? localFacing;
+      cameraFacing = heldFacing ?? kbFacing ?? interpServerFacing;
+      turnEngageEdge =
+        kbFacing !== null && (mi.turnLeft || mi.turnRight) && !kbTurn.suppressTurnFlags;
+      if (kbTurn.suppressTurnFlags) {
+        wireMi.turnLeft = false;
+        wireMi.turnRight = false;
+      }
+    }
 
     // 3) the prediction gate, then the wire write exactly as main.ts does it.
     selfMotionGateArgs.spectating = client.spectating;
@@ -442,11 +515,20 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(client, pe, predictionEnabled);
     // The unconditional 50 ms lane runs beside this from ClientWorld's own timer.
-    Object.assign(client.moveInput, mi);
+    Object.assign(client.moveInput, wireMi);
     client.setMouselookFacing(netFacing);
-    if (client.movementWireVersion !== 2) client.flushInput(now);
+    let movementFrameEmitted = client.movementWireVersion !== 2 ? client.flushInput(now) : false;
     const firstSampledCommand = commands.length;
-    movementPrediction.advance(client, frameDt, client.moveInput, netFacing, now);
+    movementFrameEmitted =
+      movementPrediction.advance(
+        client,
+        frameDt,
+        client.moveInput,
+        netFacing,
+        now,
+        turnEngageEdge,
+      ) || movementFrameEmitted;
+    if (opts.keyTimeline && movementFrameEmitted) pendingReleaseFacing = null;
     const samplerInterpolationAlpha = movementPrediction.interpolationAlpha;
     for (let i = firstSampledCommand; i < commands.length; i++) {
       commands[i].samplerInterpolationAlpha = samplerInterpolationAlpha;
@@ -466,7 +548,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
         : selfMotionFrameBuffer.write(
             predictionEnabled,
             mi,
-            netFacing,
+            netFacing ?? interpServerFacing,
             inputEcho.echoMs,
             inputEcho.jitterMs,
             alpha,
@@ -474,6 +556,25 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
             Math.max(0, cameraLastSnapAge),
             client.snapInterval,
           );
+
+    let drawnYaw = interpServerFacing;
+    if (onlineRenderFacing !== null) {
+      const previousModel = selfFacingOverride ?? drawnYaw;
+      const lastTarget = selfFacingLastTarget ?? onlineRenderFacing;
+      drawnYaw = advanceSelfFacing(previousModel, onlineRenderFacing, lastTarget, frameDt);
+      selfFacingOverride = drawnYaw;
+      selfFacingLastTarget = onlineRenderFacing;
+    } else if (selfFacingOverride !== null) {
+      const released = releaseSelfFacing(selfFacingOverride, drawnYaw, frameDt);
+      drawnYaw = released.facing;
+      selfFacingOverride = released.done ? null : released.facing;
+      selfFacingLastTarget = released.lastTarget;
+    }
+    const reconciled =
+      selfMotion && 'kind' in selfMotion && selfMotion.residual !== null ? selfMotion : null;
+    const residualYd = reconciled
+      ? Math.hypot(reconciled.residual?.x ?? 0, reconciled.residual?.z ?? 0)
+      : 0;
 
     // 6) the drawn pose, through the same call renderer.sync makes.
     noteSelfIdentity(selfRender, pe.id);
@@ -512,9 +613,15 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       samplerInterpolationAlpha,
       predictorActive: selfRender.active,
       predictionEnabled,
+      turnInputActive,
       mi,
-      facing: netFacing,
+      netFacing,
       serverFacing: interpServerFacing,
+      authoritativeFacing: serverEntity.facing,
+      drawnYaw,
+      cameraFacing,
+      reconcileMode: reconciled ? 'replayed' : null,
+      residualYd,
     });
   }
 
