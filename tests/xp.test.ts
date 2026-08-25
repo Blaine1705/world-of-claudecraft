@@ -431,6 +431,9 @@ describe('xp-bar label states', () => {
     const v = xpBarView({ level: 5, xp: 1000, lifetimeXp: 0, showOverflow: true });
     expect(v.postCap).toBe(false);
     expect(v.label).toBe('1,000 / 2,800 XP (35%)');
+    // The always-visible percent (no hover needed) is the exact same figure
+    // the hover label states inline, never a second source of truth.
+    expect(v.percentText).toBe('35%');
   });
 
   it('at-cap with overflow shows the virtual-level bar starting at +0', () => {
@@ -444,6 +447,7 @@ describe('xp-bar label states', () => {
     expect(v.label).toBe(
       `Lv 20 (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`,
     );
+    expect(v.percentText).toBe('0%');
   });
 
   it('post-cap shows virtual level, total, and percent to next', () => {
@@ -451,6 +455,7 @@ describe('xp-bar label states', () => {
     const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: lifetime, showOverflow: true });
     expect(v.postCap).toBe(true);
     expect(v.label).toBe(`Lv 20 (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`);
+    expect(v.percentText).toBe('0%');
   });
 
   it('post-cap fill fraction advances within the virtual level', () => {
@@ -464,6 +469,9 @@ describe('xp-bar label states', () => {
     });
     expect(v.fillFrac).toBeCloseTo(0.5, 1);
     expect(v.label).toMatch(/Lv 20 \(\+7\) {2}· {2}.* total XP {2}· {2}\d+% to next/);
+    // Pinned as the exact whole percent the label's own "to next" clause
+    // states, so the two can never drift apart.
+    expect(v.label).toContain(`${v.percentText} to next`);
   });
 
   it('classic "MAX LEVEL" when overflow display is turned off', () => {
@@ -475,6 +483,9 @@ describe('xp-bar label states', () => {
     });
     expect(v.postCap).toBe(false);
     expect(v.label).toBe(`MAX LEVEL  ·  ${formatXp(xpToReachLevel(25))} total XP`);
+    // The bar itself is visually full here even though the label states no
+    // fraction at all, so the always-visible percent reads 100.
+    expect(v.percentText).toBe('100%');
   });
 });
 
