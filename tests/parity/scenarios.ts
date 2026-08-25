@@ -70,6 +70,7 @@ import type { Recorder, Scenario } from './record';
 // ----- shared helpers ---------------------------------------------------------
 
 type AnyEntity = Entity & { nythraxis?: NythraxisEncounterState };
+const FRESH_CORPSE_TIMER = 60;
 
 interface SimPrivateHarness {
   completeTame(player: Entity, target: Entity): void;
@@ -1513,6 +1514,7 @@ function partyLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1572,6 +1574,7 @@ function l1LootDistribution(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c];
@@ -1705,6 +1708,7 @@ function masterLoot(): Scenario {
         z: 22,
       }) as AnyEntity;
       mob.dead = true;
+      mob.corpseTimer = FRESH_CORPSE_TIMER;
       mob.lootable = true;
       mob.tappedById = a;
       mob.lootRecipientIds = [a, b, c, d];
@@ -4920,7 +4924,7 @@ function professionsGather(seed = 1): Scenario {
       // at cast completion on the tick path) plus a post-completion second
       // attempt denied by the player's own cooldown, which must add ZERO
       // draws to the digest.
-      teleport(sim, p, -70, -53); // ore_eastbrook_1
+      standOnNode(sim, p, 'ore_eastbrook_1'); // position derived, not a literal (see standOnNode)
       sim.harvestNode('ore_eastbrook_1', undefined, pid);
       rec.tick(castTicks); // the cast completes inside this window
       sim.harvestNode('ore_eastbrook_1', undefined, pid); // denied: own timer, no draw

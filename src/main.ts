@@ -9,6 +9,13 @@ import {
   syncAppViewport as syncAppViewportShared,
   syncSettledAppViewport,
 } from './game/app_viewport';
+import {
+  arrivalCinematicActive,
+  cancelArrivalCinematic,
+  createArrivalCinematic,
+  startArrivalCinematic,
+  stepArrivalCinematic,
+} from './game/arrival_cinematic';
 import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
@@ -71,11 +78,13 @@ import {
   stopActiveEntryDiagnostics,
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
+import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
+import { createGamepadSettingApplier } from './game/gamepad_settings';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
@@ -167,8 +176,9 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
+import { isIslandFerryTeleport, islandTeleportCameraYaw } from './game/teleport_camera';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
-import { currentResetDay, currentUtcDay } from './game/utc_day';
+import { feedSimCalendar } from './game/utc_day';
 import { voice } from './game/voice';
 import { attachWocMarketExchange } from './game/woc_market_wiring';
 import { telemetryZoneId } from './game/world_telemetry';
@@ -189,6 +199,7 @@ import {
 } from './net/desktop_wallet_manager';
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+import { watchWorldEntry } from './net/entry_watch';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -346,8 +357,15 @@ import {
   accountPortalModel,
   deactivateConfirmReady,
   validateEmailShape,
+  validateInitialPassword,
   validatePasswordChange,
 } from './ui/account_portal';
+import {
+  paintAccountPortal,
+  paintPasswordSetStatus,
+  paintTwoFactorStatus,
+  setAccountFieldMsg,
+} from './ui/account_portal_dom';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
 import { formatFooterVersion } from './ui/app_version';
 import { type AppearanceCustomizer, mountAppearanceCustomizer } from './ui/appearance_customizer';
@@ -367,11 +385,7 @@ import {
 } from './ui/auth_utils';
 import { BreathBar } from './ui/breath_bar';
 import { assembleBugReportMeta } from './ui/bug_report';
-import {
-  cameraPromptOpen,
-  dismissCameraPrompt,
-  maybeShowFirstRunCameraPrompt,
-} from './ui/camera_prompt';
+import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
 import { loadCharselectNews } from './ui/charselect_news';
@@ -421,7 +435,6 @@ import {
 } from './ui/hud/player_card/player_card_share';
 import {
   ensureLocaleLoaded,
-  formatDateTime,
   formatNumber,
   getLanguage,
   isLocaleResident,
@@ -1615,11 +1628,6 @@ async function startGame(
     entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
-  // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
-  // through IWorld). Private instanced practice works online AND offline, so the
-  // button is always available.
-  hud.setVcupPracticeAvailable(true);
-
   const chatInput = $('#chat-input') as unknown as HTMLTextAreaElement;
   const clickMoveMarker = $('#click-move-marker') as HTMLDivElement;
   // Grow the chat bar to fit what it is displaying (typed text, or the
@@ -1958,9 +1966,6 @@ async function startGame(
           case 'dungeonFinder':
             hud.toggleDungeonFinder();
             break;
-          case 'valecup':
-            hud.toggleValeCup();
-            break;
           case 'bgFlag':
             bgFlagKey();
             break;
@@ -2028,6 +2033,25 @@ async function startGame(
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
   hud.onMobileAttackNearest = () => attackNearest();
+  // The first island landing's camera fall (game/arrival_cinematic.ts): the
+  // HUD signals the sim's per-character first visit; the frame loop below
+  // steps the fall and any camera input from the player cancels it.
+  const arrivalCinematic = createArrivalCinematic();
+  // The camDist the cinematic last applied: a differing value next frame
+  // means the player zoomed (the wheel writes camDist directly), which
+  // cancels the fall alongside isMouselookActive in the frame loop.
+  let cineAppliedDist: number | null = null;
+  hud.onIslandFirstArrival = () => {
+    // Reduce motion is the EFFECTIVE flag (OS query OR in-game switch, the
+    // spawn intro's contract below): a 4.5 s sweeping camera fall is exactly
+    // what that contract exists for, so it never starts and the arrival lands
+    // at the ordinary chase framing.
+    const osReduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (settings.get('reduceMotion') || osReduced) return;
+    startArrivalCinematic(arrivalCinematic, input.camDist, input.camPitch);
+  };
 
   let lastOptionsOpen = hud.optionsOpen;
   let lastCharacterOpen = hud.characterOpen;
@@ -2072,7 +2096,6 @@ async function startGame(
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onDungeonFinder: () => hud.toggleDungeonFinder(),
-    onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
     onCharacter: () => {
       hud.toggleChar();
@@ -2188,7 +2211,6 @@ async function startGame(
       return;
     }
     if (id === 'escape') {
-      if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
@@ -2282,9 +2304,6 @@ async function startGame(
       case 'arena':
         hud.toggleArena();
         break;
-      case 'valecup':
-        hud.toggleValeCup();
-        break;
       case 'bgFlag':
         bgFlagKey();
         break;
@@ -2375,6 +2394,9 @@ async function startGame(
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
   crossHotbar.attach(gamepad);
+  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, () =>
+    crossHotbar.syncPadMode(gamepad),
+  );
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
@@ -2659,20 +2681,7 @@ async function startGame(
       input.setInvertLookY(settings.set('invertLookY', !!value));
       return;
     }
-    if (key === 'gamepadEnabled') {
-      const v = settings.set('gamepadEnabled', !!value);
-      if (v) gamepad.start();
-      else gamepad.stop();
-      // stop() releases the pad without an onConnectionChange, so pad mode has to
-      // be re-read here or the player who just turned the controller off is left
-      // with the desktop rows hidden behind a dead cross hotbar.
-      crossHotbar.syncPadMode(gamepad);
-      return;
-    }
-    if (key === 'gamepadInvertY') {
-      gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
-      return;
-    }
+    if (applyPadSetting(key, value)) return;
     if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
@@ -2763,15 +2772,6 @@ async function startGame(
         syncPhoneTouchClass();
         mobileControls.refreshInterfaceMode();
         syncSettledAppViewport(syncAppViewport);
-        break;
-      case 'gamepadStickDeadzone':
-        gamepad.setDeadzone(v);
-        break;
-      case 'gamepadCameraSpeed':
-        gamepad.setCameraSpeed(v);
-        break;
-      case 'gamepadVibration':
-        gamepad.setVibration(v);
         break;
       // Interface & Comfort sliders: each drives one CSS custom property that
       // index.html consumes. Setting them on :root keeps the HUD authoritative.
@@ -2941,7 +2941,7 @@ async function startGame(
     activateProfile: (target) =>
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
-    buildRenderer: (target, recycled) => {
+    buildRenderer: (_target, recycled) => {
       const next = new Renderer(world, recycled.canvas, nameplates, {
         context: recycled.context,
         initializeGfx: false,
@@ -3131,6 +3131,7 @@ async function startGame(
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),
+      crossHotbarSet: () => gamepad.getCrossHotbarSet(),
     },
   });
   // Desktop discoverability for the Discord link/panel: the micro-menu button
@@ -3852,6 +3853,38 @@ async function startGame(
   // covers that ordinary case).
   const warmTracker = createZoneWarmTracker(isRiftPos);
   const RIFT_EXIT_STREAM_RADIUS = 240;
+  // Last-evaluated position for the ferry camera-snap scoping: the snap needs
+  // the displacement's ORIGIN (the town bell ride lands off-island, so the
+  // landed point alone cannot tell a ferry ride from a hearthstone). Updated
+  // only when the tracker evaluates, so a hidden desktop span keeps its
+  // pre-hidden origin exactly like the tracker's own displacement.
+  let camSnapPrevX = world.player.pos.x;
+  let camSnapPrevZ = world.player.pos.z;
+  // Ferry crossings are a CLICK, not a walk, so the far shore has to be
+  // resident BEFORE the bell is rung or the arrival takes the blocking loading
+  // screen. Warm it while the player is still walking up to the bell; the
+  // latch keeps it to one stream per destination per session, and a failure
+  // simply leaves the classic screen in place.
+  const ferryPrewarmed = new Set<string>();
+  const maybeWarmFerryDestination = (): void => {
+    // The hidden desktop shell rule (maybeWarmCurrentZone below) applies to
+    // this lane too: no zone-warm GPU work for a view nobody sees.
+    if (desktopPresentationHidden()) return;
+    const target = ferryPrewarmTargetFor(world.player.pos.x, world.player.pos.z);
+    if (!target || ferryPrewarmed.has(target.id)) return;
+    ferryPrewarmed.add(target.id);
+    // The visible-zone streaming lane's idiom (renderer.ts, processZoneQueue):
+    // prepare at IDLE pace beside a background prewarm. This warm fires in
+    // live play with no loading curtain, so the gating arm (synchronous sky
+    // PMREM, fast terrain batches) would cost visible frames; idle pace
+    // spends spare slots instead and simply finishes a little later.
+    const prepare = renderer.prepareZoneAt(target.x, target.z, undefined, { pace: 'idle' });
+    const prewarm = renderer.prewarmZoneAt(target.x, target.z, { background: true });
+    void Promise.all([prepare, prewarm]).catch(() => {
+      // Let a failed stream be retried the next time the player walks up.
+      ferryPrewarmed.delete(target.id);
+    });
+  };
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
     // A hidden desktop shell must not pay zone-warm GPU work for a view
@@ -3865,11 +3898,39 @@ async function startGame(
     const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());
     if (!warm) return;
     const { displacement, riftExit } = warm;
+    // A teleport-scale jump snaps the chase camera behind the landed facing,
+    // so the player sees what the landing authored, SCOPED to the island's
+    // ferry crossings: a snap on every portal, dungeon door and hearthstone
+    // would be a global feel change riding in a tutorial change
+    // (game/teleport_camera.ts owns the pure decision and the scoping).
+    // The same predicate forces the blocking loading screen below: the town
+    // side of the crossing is the whole harbor kit, and even a prewarmed
+    // arrival links its building programs across the first live frames, so
+    // the crossing always rides the curtain and lets the reveal settle behind
+    // it instead of hitching in front of the player.
+    const ferryRide = isIslandFerryTeleport(
+      camSnapPrevX,
+      camSnapPrevZ,
+      player.pos.x,
+      player.pos.z,
+      displacement,
+    );
+    input.camYaw = islandTeleportCameraYaw(
+      camSnapPrevX,
+      camSnapPrevZ,
+      player.pos.x,
+      player.pos.z,
+      displacement,
+      player.facing,
+      input.camYaw,
+    );
+    camSnapPrevX = player.pos.x;
+    camSnapPrevZ = player.pos.z;
     if (zoneWarmup) return;
-    if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
+    if (!riftExit && !ferryRide && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
-    if (!riftExit && zoneWarmupMode(displacement) === 'background') {
+    if (!riftExit && !ferryRide && zoneWarmupMode(displacement) === 'background') {
       // A walked crossing: the visible-zone streaming lane normally has the
       // destination resident long before the boundary, so landing here means
       // the build is still catching up (or a prepare failed). Finish it in the
@@ -4321,9 +4382,33 @@ async function startGame(
       return;
     }
     maybeWarmCurrentZone();
+    maybeWarmFerryDestination();
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
+    // The first-visit island arrival fall (game/arrival_cinematic.ts), stepped
+    // ONCE per frame with the real frame dt: a fixed 1/60 ran the 4.5 s fall
+    // in 1.9 s at 144 Hz and 9 s at 30 fps, and living inside
+    // maybeWarmCurrentZone (which the offline path deliberately calls twice a
+    // frame) doubled it again. Any camera look input (mouse drag, touch drag,
+    // pad look via isMouselookActive) or a zoom change since the last applied
+    // frame (the wheel writes camDist directly) cancels the remainder.
+    if (arrivalCinematicActive(arrivalCinematic)) {
+      const userZoomed = cineAppliedDist !== null && input.camDist !== cineAppliedDist;
+      if (input.isMouselookActive() || userZoomed) {
+        cancelArrivalCinematic(arrivalCinematic);
+        cineAppliedDist = null;
+      } else {
+        const cine = stepArrivalCinematic(arrivalCinematic, frameDt);
+        if (cine) {
+          input.camDist = cine.dist;
+          input.camPitch = cine.pitch;
+          cineAppliedDist = cine.dist;
+        }
+      }
+    } else {
+      cineAppliedDist = null;
+    }
     // Not sampling a renderless frame reproduces the web hidden-tab shape (rAF
     // pauses there, so hidden frames never reach the sampler, and the reporter
     // is gated on this same shell signal via its shellHidden option below): the
@@ -4422,10 +4507,9 @@ async function startGame(
 
     if (offlineSim) {
       acc += frameDt;
-      // Supply the UTC day for the delve daily reset (the sim never reads the wall
-      // clock itself, to stay deterministic).
-      offlineSim.utcDay = currentUtcDay();
-      offlineSim.resetDay = currentResetDay();
+      // Supply the host calendar keys (the sim never reads the wall clock
+      // itself, to stay deterministic).
+      feedSimCalendar(offlineSim);
       while (acc >= DT) {
         const { mi, facing } = resolveMove(
           mouselook,
@@ -5111,13 +5195,6 @@ async function startGame(
           // 4 GB-class tight profile still skips the secondary contexts
           // entirely and keeps their documented lazy first-open path.
           if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();
-          // First-run camera-mode prompt (issue #1727): show once per browser on a
-          // mouse-driven interface, after any spawn cinematic has finished. Applies
-          // the choice through the same applySetting path as the Key Bindings toggle.
-          maybeShowFirstRunCameraPrompt({
-            applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
-            isBlocked: () => intro !== null,
-          });
           (
             window as Window &
               typeof globalThis & {
@@ -5237,10 +5314,9 @@ async function startOffline(
         playerClass,
         playerName: name,
         devCommands: import.meta.env.DEV,
-        // The offline world runs the ranked rift portal scheduler like the live
-        // server (custom editor play-test maps keep it off: their zones differ).
+        // Live-world features (custom editor play-test maps keep both off).
         riftPortals: world === undefined,
-        valeCupShowcase: true, // idle Sowfield auto-runs a bot exhibition to watch/bet on
+        compulsoryTutorial: world === undefined,
         // Match the live server's proven-safe idle-AI interest throttle. Ordinary
         // entity rigs are gone by 96 yd and mob aggro caps at 20 yd, so this removes
         // full-world wilderness AI from the browser's 20 Hz tick without changing
@@ -6066,72 +6142,6 @@ function logoutAccount(): void {
   void api.logout().finally(finish);
 }
 
-function setAccountFieldMsg(sel: string, text: string, ok: boolean): void {
-  const el = $(sel);
-  el.textContent = text;
-  el.classList.toggle('is-error', !ok && text !== '');
-  el.classList.toggle('is-ok', ok && text !== '');
-}
-
-// Reflect the account's 2FA state: when enabled, only the password-gated disable
-// form shows; when disabled, only the "Set Up" entry point. The transient setup
-// and recovery panes always reset to hidden so re-opening the portal is clean.
-function paintTwoFactorStatus(enabled: boolean): void {
-  const setText = (sel: string, key: TranslationKey) => {
-    const el = document.querySelector(sel);
-    if (el) el.textContent = t(key);
-  };
-  setText(
-    '#account-2fa-status',
-    enabled ? 'hudChrome.account.twoFactorStatusOn' : 'hudChrome.account.twoFactorStatusOff',
-  );
-  const show = (sel: string, visible: boolean) => {
-    const el = document.querySelector(sel) as HTMLElement | null;
-    if (el) el.hidden = !visible;
-  };
-  show('#account-2fa-setup-btn', !enabled);
-  show('#account-2fa-begin-form', false);
-  show('#account-2fa-setup', false);
-  show('#account-2fa-recovery', false);
-  show('#account-2fa-disable-form', enabled);
-  const msg = document.getElementById('account-2fa-msg');
-  if (msg) {
-    msg.textContent = '';
-    msg.className = 'auth-field-msg';
-  }
-}
-
-function paintAccountPortal(
-  model: ReturnType<typeof accountPortalModel>,
-  // When the account fetch failed transiently we re-render the shell but must
-  // NOT clobber an already-populated email field: a blank value would otherwise
-  // be submitted as a null email update on the next save.
-  preserveEmailInput = false,
-  twoFactorEnabled = false,
-): void {
-  // The account portal lives only in index.html; focused entries such as
-  // play.html omit it, so there is nothing to paint (token revalidation and the
-  // nav chrome in loadAccountPortal still run).
-  const loggedOut = $('#account-logged-out') as HTMLElement | null;
-  if (!loggedOut) return;
-  loggedOut.hidden = model.loggedIn;
-  ($('#account-sections') as HTMLElement).hidden = !model.loggedIn;
-  if (model.loggedIn) paintTwoFactorStatus(twoFactorEnabled);
-  $('#account-username').textContent = model.header.username;
-  const since = $('#account-member-since');
-  since.textContent = model.header.memberSinceIso
-    ? t('hudChrome.account.memberSince', {
-        date: formatDateTime(new Date(model.header.memberSinceIso), {
-          dateStyle: 'medium',
-        }),
-      })
-    : '';
-  $('#account-char-count').textContent = t('hudChrome.account.charactersCount', {
-    count: formatNumber(model.header.characterCount),
-  });
-  if (!preserveEmailInput) ($('#account-email') as HTMLInputElement).value = model.email;
-}
-
 const loggedOutModel = () =>
   accountPortalModel({
     loggedIn: false,
@@ -6171,6 +6181,7 @@ async function loadAccountPortal(setChrome: boolean): Promise<void> {
       }),
       false,
       acct.twoFactorEnabled,
+      acct.passwordSet,
     );
   } catch (err) {
     if (isAuthError(err)) {
@@ -6294,6 +6305,39 @@ function setupAccountPortal(): void {
       ($('#account-confirm-pass') as HTMLInputElement).value = '';
     } catch (e2) {
       setAccountFieldMsg('#account-password-msg', userFacingApiError(e2), false);
+    }
+  });
+
+  // "Set a Password": shown instead of "Change Password" for an Apple- or
+  // Discord-provisioned account (passwordSet:false) that has no current
+  // password to re-verify, so this validates only length + confirmation match.
+  ($('#account-set-password-form') as HTMLFormElement).addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const next = ($('#account-set-new-pass') as HTMLInputElement).value;
+    const confirm = ($('#account-set-confirm-pass') as HTMLInputElement).value;
+    const err = validateInitialPassword(next, confirm);
+    if (err) {
+      const key =
+        err === 'too-short'
+          ? 'errPasswordShort'
+          : err === 'too-long'
+            ? 'errPasswordLong'
+            : 'errPasswordConfirm';
+      setAccountFieldMsg(
+        '#account-set-password-msg',
+        t(`hudChrome.account.${key}` as TranslationKey),
+        false,
+      );
+      return;
+    }
+    try {
+      await api.setInitialPassword(next);
+      setAccountFieldMsg('#account-set-password-msg', t('hudChrome.account.passwordSet'), true);
+      paintPasswordSetStatus(true);
+      ($('#account-set-new-pass') as HTMLInputElement).value = '';
+      ($('#account-set-confirm-pass') as HTMLInputElement).value = '';
+    } catch (e2) {
+      setAccountFieldMsg('#account-set-password-msg', userFacingApiError(e2), false);
     }
   });
 
@@ -7075,37 +7119,35 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   const proceedToGame = () => {
     if (started) return;
     started = true;
-    clearInterval(poll);
+    entryWatch.cancel();
     loadPhaseEnd('realm-connect');
     void startGame(world, null, world, `char:${c.id}`, true);
   };
   enterLoadingState(t('loading.connectingRealm'));
 
-  // wait for hello + first snapshot so the world starts populated
-  const waitStart = Date.now();
-  const poll = setInterval(() => {
-    if (world.connected && world.entities.has(world.playerId)) {
-      clearInterval(poll);
+  const entryWatch = watchWorldEntry(
+    world,
+    () => {
       // Remember the active session (character + realm) so a WebView reload
       // during play resumes straight back into the world instead of the
       // home/login screen. Also resets the resume-attempt budget: entry
       // completed, the session is known-good.
       if (api.realm) savePlayMarker(c.id, api.realm, Date.now());
       proceedToGame();
-    } else if (Date.now() - waitStart > 10000) {
-      clearInterval(poll);
+    },
+    () => {
       world.close();
       clearCardProviders();
       hideReconnectOverlay();
       // Entry never completed: fatalOverlay drops the resume marker so the next
       // boot does not loop straight back into a session that will not start.
       fatalOverlay(t('loading.enterTimeout'));
-    }
-  }, 50);
+    },
+  );
   // a rejected join must stop the poll too, or its timeout overlay would
   // mask the real reason (e.g. "character already in world")
   world.onDisconnect = (reason) => {
-    clearInterval(poll);
+    entryWatch.cancel();
     clearCardProviders();
     hideReconnectOverlay();
     checkpointActiveEntryDiagnostics('connection-lost', { fatal: true });
@@ -7133,6 +7175,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
   world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
+    entryWatch.noteActivity(nextRetryAtMs);
     checkpointActiveEntryDiagnostics('connection-lost', {
       attempt,
       maxAttempts,

@@ -428,7 +428,11 @@
     max-width: 420px;
     box-sizing: border-box;
     pointer-events: auto;
-    background: var(--panel-bg);
+    /* Pinned literals, deliberately NOT var(--panel-bg): the coach card must
+       read as the SAME box for every player, scene, and UI theme (playtests
+       flagged the themeable token rendering it dark in one shot and grey in
+       the next), and near-opaque so the backdrop cannot restyle it. */
+    background: linear-gradient(170deg, #15151ffa 0%, #0b0b12fa 60%, #08080dfa 100%);
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow:
@@ -475,6 +479,50 @@
     font-weight: 600;
     color: var(--gold-dim);
   }
+  /* Ferryman Odo's caption (bootcamp.ts showCaption): the on-screen half of a
+     guide voice line, up for a few seconds at a time. It used to be a row
+     inside the coach card; with the card gone it fell back to document flow
+     and landed in the top-left corner (CX: "why is the narrator's voice up in
+     the top left lol"). It is a subtitle, so it sits where subtitles sit:
+     low-center, above the movement bubble, clear of the unit frames. */
+  .tut-voice {
+    position: absolute;
+    left: 50%;
+    bottom: 33%;
+    transform: translateX(-50%);
+    max-width: min(46rem, 76vw);
+    text-align: center;
+    text-wrap: balance;
+    pointer-events: none;
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--gold-dim);
+    text-shadow:
+      0 2px 6px #000,
+      0 0 14px #000c;
+    z-index: 20;
+  }
+  /* The bootcamp card's on-screen keycap chips (bootcamp.ts): the physical
+     keys the current lesson asks for, drawn as caps under the body copy. */
+  .tut-keys {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .tut-keycap {
+    background: linear-gradient(180deg, #2c2c35, #15151c);
+    border: 1px solid #4a4a58;
+    border-bottom-width: 3px;
+    border-radius: 4px;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1;
+    padding: 5px 8px 4px;
+    min-width: 14px;
+    text-align: center;
+  }
   .tut-next-tips {
     margin: 0;
     padding: 0;
@@ -517,6 +565,52 @@
     outline: 2px solid var(--gold);
     outline-offset: 2px;
   }
+  /* While the island coach card is up (bootcamp.ts toggles bc-coach-up on
+     body), the quest dialog opens BELOW the card instead of at its default
+     10vh, so an NPC's dialogue never covers the lesson. Desktop only: the
+     mobile sheet layout owns its own quest-dialog pin. */
+  body.bc-coach-up:not(.mobile-touch) #quest-dialog {
+    /* 235px is the coach card family's tallest rendered height plus its top
+       margin (the three-line lesson card). Clamped against the JS-synced app
+       viewport (--app-vh, the tree's clamp idiom in layout.css), never raw
+       vh, and capped at 40% of it so a short landscape window can never push
+       the dialog's buttons below the fold. */
+    top: clamp(calc(var(--app-vh, 100vh) * 0.1), 235px, calc(var(--app-vh, 100vh) * 0.4));
+  }
+  /* The guild-signpost popup (noticeboard_popup.ts): the tutorial card
+     family's chrome, centered rather than top-pinned, one block per posted
+     notice. */
+  .tut-card.nb-popup {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 380px;
+    animation: none;
+  }
+  .nb-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(var(--app-vh, 100vh) * 0.5);
+    overflow-y: auto;
+  }
+  .nb-item {
+    border: 1px solid #ffffff14;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #00000022;
+  }
+  .nb-guild {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .nb-note {
+    margin-top: 3px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #d8d0bc;
+  }
   .tut-arrow {
     position: absolute;
     left: 0;
@@ -537,6 +631,182 @@
     width: 30px;
     height: 30px;
   }
+  /* The island coach's floating interact bubble (bootcamp.ts updatePrompt):
+     a keycap chip plus a one-word verb over the current target, visible only
+     inside interact reach. Sibling of .tut-arrow: absolute in #ui, painter
+     positioned, never interactive. */
+  .tut-prompt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    transform: translate(-50%, -100%);
+    pointer-events: none;
+    background: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 100%);
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    box-shadow:
+      0 0 12px #ffc86055,
+      0 4px 14px #000a;
+    padding: 6px 10px;
+    color: #e8e2d0;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 21;
+    animation: tut-pulse 1100ms ease-in-out infinite;
+  }
+  .tut-prompt .tut-keycap {
+    font-size: 13px;
+    padding: 4px 7px 3px;
+  }
+  /* The touch combat bubble's chip is the action-bar button's own picture,
+     not a word for a key a phone does not have. Sized to read at arm's
+     length beside the verb, and square so the icon art is never squashed. */
+  .tut-prompt .tut-keycap-icon {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background-size: cover;
+    background-position: center;
+  }
+  /* The touch bubble's cluster-button chip: the mobile button's own svg
+     glyph (ui_icons svgIcon, the same markup the button hydrates), gold on
+     the keycap plate so the picture in the bubble IS the button to press. */
+  .tut-prompt .tut-keycap-button {
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+  .tut-prompt .tut-keycap-button .ui-icon {
+    width: 100%;
+    height: 100%;
+  }
+  .tut-prompt-chips {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  /* The wrong-way cue (ui/objective_glow_view.ts): a golden bloom down the
+     edge the objective lies past, so a player who has turned away has
+     something to steer back by. Pointer-transparent, and its opacity is
+     driven from the plan's intensity, so turning toward the objective fades
+     it out on its own. */
+  .tut-objective-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 19;
+    transition: opacity 220ms ease-out;
+    background-repeat: no-repeat;
+    background-size: 28% 100%;
+  }
+  .tut-objective-glow.tut-glow-left {
+    background-position: left center;
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 208, 112, 0.98),
+      rgba(255, 184, 68, 0.42) 42%,
+      rgba(255, 184, 68, 0) 100%
+    );
+  }
+  .tut-objective-glow.tut-glow-right {
+    background-position: right center;
+    background-image: linear-gradient(
+      to left,
+      rgba(255, 208, 112, 0.98),
+      rgba(255, 184, 68, 0.42) 42%,
+      rgba(255, 184, 68, 0) 100%
+    );
+  }
+  /* Straight behind the camera: BOTH edges, which reads as "turn around".
+     A single edge here is a coin toss on a mirrored projection, and it tells
+     a player who is facing exactly backwards to turn one particular way when
+     either way is equally right (CX). */
+  .tut-objective-glow.tut-glow-behind {
+    background-position:
+      left center,
+      right center;
+    background-size:
+      22% 100%,
+      22% 100%;
+    background-image:
+      linear-gradient(
+        to right,
+        rgba(255, 208, 112, 0.98),
+        rgba(255, 184, 68, 0.42) 42%,
+        rgba(255, 184, 68, 0) 100%
+      ),
+      linear-gradient(
+        to left,
+        rgba(255, 208, 112, 0.98),
+        rgba(255, 184, 68, 0.42) 42%,
+        rgba(255, 184, 68, 0) 100%
+      );
+  }
+  /* The death lesson dims the Keeper's paid revive so the free corpse walk
+     it is teaching is the obvious one. Still clickable: a player who wants
+     to pay may, this only takes it out of the eye's path. */
+  .bc-dimmed {
+    opacity: 0.35;
+    filter: grayscale(0.8);
+  }
+  /* The interface lessons (bags, character sheet) have no world direction:
+     the answer is the row of buttons along the bottom, so the bloom sits
+     there instead of past a side edge. */
+  .tut-objective-glow.tut-glow-bottom {
+    background-position: center bottom;
+    background-size: 100% 24%;
+    background-image: linear-gradient(
+      to top,
+      rgba(255, 208, 112, 0.98),
+      rgba(255, 184, 68, 0.42) 42%,
+      rgba(255, 184, 68, 0) 100%
+    );
+  }
+  /* A player who has asked for less motion still gets the cue; it simply
+     appears rather than easing in. */
+  @media (prefers-reduced-motion: reduce) {
+    .tut-objective-glow {
+      transition: none;
+    }
+  }
+  /* The word between sequenced keycaps ("D then W"): quiet, lowercase, never
+     mistaken for a key itself. */
+  .tut-keycap-then {
+    font-size: 11px;
+    font-weight: 400;
+    color: #b8ad8e;
+    padding: 0 2px;
+    text-shadow: 0 1px 2px #000;
+  }
+  .tut-keys {
+    align-items: center;
+  }
+  .tut-prompt-verb {
+    text-shadow: 0 1px 2px #000;
+  }
+  /* The movement lessons' screen-anchored variant: no world target to stand
+     on, so the bubble sits low-center above the action bar where the hands
+     already look. Overrides the world-anchored transform. */
+  .tut-prompt.tut-prompt-center {
+    left: 50%;
+    top: auto;
+    bottom: 26%;
+    transform: translateX(-50%);
+    font-size: 15px;
+  }
+  .tut-prompt.tut-prompt-center .tut-keycap {
+    font-size: 16px;
+    padding: 6px 10px 5px;
+  }
   @keyframes tut-in {
     from {
       transform: translateX(-50%) translateY(-14px);
@@ -556,11 +826,23 @@
       opacity: 1;
     }
   }
+  /* Phones: the caption rides higher, clear of the touch sticks and the
+     movement bubble, and gives up a little width to the narrower screen. */
+  @media (max-width: 720px) {
+    .tut-voice {
+      bottom: 42%;
+      max-width: 86vw;
+      font-size: 13px;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .tut-card {
       animation: none;
     }
     .tut-arrow {
+      animation: none;
+    }
+    .tut-prompt {
       animation: none;
     }
   }
@@ -1194,15 +1476,10 @@
     display: block;
     border-radius: 50%;
   }
-  /* Book of Deeds border accent: the cosmetic ring around the portrait, keyed by
-     the unit's active border deed. The unit_frame painter writes the SLUG into
-     data-border (this rule gates on a non-empty value) and that slug's palette
-     into the three custom properties, so ONE treatment lives here and zero
-     per-slug colors do: src/ui/deed_border_view.ts stays the single source of
-     truth. The ring is identity, never actionable info, so it renders at every
-     graphics tier; only the decorative outer bloom scales with --fx-shadow, like
-     the portrait combat glow above. z-index 2 sits it over the portrait but UNDER
-     the level chip (3) and the combat flash (4), whose corners it crosses.
+  /* Deed Heraldry keeps the portrait circular and adds only a fine family edge.
+     The unit-frame painter writes the slug and shared palette tokens. Identity
+     lines render at every tier; only the decorative outer bloom scales.
+     z-index 2 stays below the level chip (3) and combat flash (4).
      The inset is ASYMMETRIC on purpose: the 60x60 .portrait disc sits at the
      top-left of the 64x64 wrap, so its center is (30,30) while the wrap's is
      (32,32). -6px top/left with -2px bottom/right keeps the same 72px ring but
@@ -1213,37 +1490,56 @@
     position: absolute;
     inset: -6px -2px -2px -6px;
     border-radius: 50%;
-    border: 2px solid var(--border-accent-frame, transparent);
+    border: 1.5px solid var(--border-accent-frame, transparent);
     outline: 1px solid var(--border-accent-edge, transparent);
-    outline-offset: -3px;
+    outline-offset: -2px;
     box-shadow:
-      0 0 calc(6px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
-      inset 0 0 4px var(--border-accent-edge, transparent);
+      0 0 calc(4px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent),
+      inset 0 0 2px var(--border-accent-edge, transparent);
     z-index: 2;
     pointer-events: none;
   }
-  /* The forced-colors arm the nameplate cartouche already had and the ring did
-     not (recorded at Phase 19 QA, completed here). The accent custom properties
-     are never missing here: paintPortraitBorder writes all three together with
-     the data-border slug this rule gates on, so the var() fallbacks cannot
-     engage. What the forced palette does instead is REPLACE the computed colors
-     with the system palette, and the value of this arm is that it chooses that
-     replacement rather than taking whatever the UA picks. Three things: frame ->
-     CanvasText and edge -> Canvas, the SAME pair drawBorderAccent uses in
-     src/render/nameplate_canvas.ts, so the two surfaces of one identity agree
-     under high contrast; the outline is remapped rather than left to be forced
-     onto the frame's color, which would flatten the two-tone contour into a
-     single line; and the decorative bloom is dropped explicitly, since
-     box-shadow is stripped in forced-colors regardless and a surviving
-     declaration would read load-bearing. Collapsing all four slugs onto one
-     system pair hides nothing: the accent is cosmetic identity and carries no
-     health, range, rank, or threat, unlike the quest marker tones that earn a
-     redundant non-color cue. */
+  /* The canonical forged seal replaces the old hollow 12-o'clock clasp. It sits
+     at the portrait/name joint, not over a bar, and remains below gameplay
+     overlays. Target mirrors the joint because its portrait is on the right. */
+  .portrait-wrap > .deed-heraldry-seal {
+    display: none;
+  }
+  .portrait-wrap[data-border]:not([data-border=""]) > .deed-heraldry-seal {
+    display: grid;
+    position: absolute;
+    top: 19px;
+    right: -7px;
+    width: 22px;
+    height: 22px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  #target-frame > .portrait-wrap[data-border]:not([data-border=""]) > .deed-heraldry-seal {
+    left: -7px;
+    right: auto;
+  }
+  /* Forced colors keeps the circular edge, seal silhouette, and header pattern.
+     Color is redundant identity; the shared motif remains the non-color cue. */
   @media (forced-colors: active) {
     .portrait-wrap[data-border]:not([data-border=""])::after {
       border-color: CanvasText;
-      outline-color: Canvas;
+      outline-color: CanvasText;
       box-shadow: none;
+    }
+    .portrait-wrap[data-border]:not([data-border=""]) > .deed-heraldry-seal {
+      border-color: CanvasText;
+      background-color: Canvas;
+      box-shadow: none;
+    }
+    .uf-name-header[data-border]:not([data-border=""]) {
+      background-color: CanvasText;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+      box-shadow: none;
+    }
+    .uf-name-header[data-border]:not([data-border=""]) .deed-heraldry-pattern {
+      stroke: CanvasText;
     }
   }
   .level-chip {
@@ -1375,7 +1671,55 @@
       transform: translateY(-2px);
     }
   }
+  .uf-name-header {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .uf-name-header[data-border]:not([data-border=""]) {
+    width: calc(100% - 2px);
+    min-width: 76px;
+    margin-left: 2px;
+    padding: 1px 14px 1px 6px;
+    background-color: var(--border-accent-frame, transparent);
+    --deed-heraldry-plaque-fill: color-mix(
+      in srgb,
+      var(--deed-heraldry-well, transparent) 88%,
+      var(--border-accent-edge, transparent)
+    );
+    box-shadow:
+      inset 0 1px var(--border-accent-frame, transparent),
+      inset 0 -1px var(--border-accent-edge, transparent),
+      0 0 calc(3px * var(--fx-shadow, 1)) var(--border-accent-glow, transparent);
+  }
+  .uf-name-header.deed-heraldry-plaque-mirror[data-border]:not([data-border=""]) {
+    margin-right: 2px;
+    margin-left: 0;
+    padding-right: 6px;
+    padding-left: 14px;
+  }
+  .uf-name-header[data-border]:not([data-border=""]) .uf-name {
+    text-align: center;
+  }
+  .uf-name-header .deed-heraldry-pattern {
+    display: none;
+  }
+  .uf-name-header[data-border]:not([data-border=""]) .deed-heraldry-pattern {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: block;
+    width: 34px;
+    height: 34px;
+    transform: translateY(-50%);
+    opacity: 0.1;
+    stroke: var(--border-accent-frame, transparent);
+    stroke-width: 1.5;
+    pointer-events: none;
+  }
   .uf-name {
+    position: relative;
+    z-index: 1;
     font-size: 13px;
     font-weight: bold;
     font-family: var(--title-font);
@@ -6589,6 +6933,29 @@
   }
   #ghost-prompt .btn {
     pointer-events: auto;
+  }
+  /* The death actions use the same live Confirm binding as the rest of pad UI.
+     Generated content leaves the localized button text intact while making the
+     exact Xbox/PS/Nintendo/remapped control visible at the point of action. */
+  body.pad-active #death-overlay .btn[data-gamepad-confirm-label]::before,
+  body.pad-active #ghost-prompt .btn[data-gamepad-confirm-label]::before {
+    content: attr(data-gamepad-confirm-label);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    margin-right: 8px;
+    border: 1px solid #d7ae55;
+    border-radius: 5px;
+    background: #17120d;
+    color: #ffd76a;
+    font: 700 12px / 1 var(--ui-font);
+    box-shadow:
+      inset 0 0 0 1px #000,
+      0 1px 3px #000a;
+    vertical-align: middle;
   }
   #death-overlay .btn[disabled],
   #ghost-prompt .btn[disabled] {

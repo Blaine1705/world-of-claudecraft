@@ -237,11 +237,21 @@
     <div id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark">
       <div class="portrait-wrap" id="tf-portrait-wrap">
         <div class="portrait"><canvas id="tf-portrait" width="54" height="54"></canvas></div>
+        <span class="deed-heraldry-seal" aria-hidden="true">
+          <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path id="tf-heraldry-seal-motif"></path>
+          </svg>
+        </span>
         <div class="level-chip" id="tf-level"></div>
         <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
       </div>
       <div class="uf-bars">
-        <div class="uf-name" id="tf-name"></div>
+        <div class="uf-name-header deed-heraldry-plaque deed-heraldry-plaque-mirror" id="tf-name-header">
+          <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path id="tf-heraldry-pattern-motif"></path>
+          </svg>
+          <div class="uf-name" id="tf-name"></div>
+        </div>
         <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
@@ -374,12 +384,22 @@
           <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
             <div class="portrait-wrap" id="pf-portrait-wrap">
               <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+              <span class="deed-heraldry-seal" aria-hidden="true">
+                <svg class="deed-heraldry-seal-art" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path id="pf-heraldry-seal-motif"></path>
+                </svg>
+              </span>
               <div class="level-chip" id="pf-level">1</div>
               <div class="combat-flash" id="pf-combat" role="status" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat"><img src="/ui/crests/status/combat.webp" data-crest-fallback-id="status_combat" data-crest-fallback-size="32" alt="" aria-hidden="true" /></div>
               <div class="rest-indicator" id="pf-rest" role="status" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
             </div>
             <div class="uf-bars">
-              <div class="uf-name" id="pf-name"></div>
+              <div class="uf-name-header deed-heraldry-plaque" id="pf-name-header">
+                <svg class="deed-heraldry-pattern" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path id="pf-heraldry-pattern-motif"></path>
+                </svg>
+                <div class="uf-name" id="pf-name"></div>
+              </div>
               <div class="combo-row" id="combo-row" role="meter" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
               <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
               <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
@@ -521,8 +541,8 @@
     <div id="dungeon-finder-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
     <div id="bg-proposal-popup" class="panel"></div>
-    <div id="valecup-window" class="window panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
+    <div id="guild-board-window" class="window panel"></div>
     <div id="daily-rewards-window" class="window panel"></div>
     <div id="claudium-window" class="window panel"></div>
     <div id="market-window" class="window panel"></div>
@@ -534,7 +554,6 @@
     <div id="professions-window" class="window panel"></div>
     <div id="calendar-window" class="window panel"></div>
     <div id="arena-status"></div>
-    <button type="button" id="vcup-indicator" data-i18n-title="hudChrome.vcup.indicatorOpen" data-i18n-aria="hudChrome.vcup.indicatorOpen" title="Open the Vale Cup window" aria-label="Open the Vale Cup window"></button>
     <div id="options-menu" class="window panel"></div>
     <div id="emote-editor" class="window panel"></div>
     <div id="social-window" class="window panel"></div>
@@ -557,7 +576,6 @@
         <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
         <button type="button" class="micro-btn" id="mm-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="keybind">g</span></button>
         <button type="button" class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
-        <button type="button" class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
         <button type="button" class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
         <button type="button" class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
         <button type="button" class="micro-btn" id="mm-wocmarket" hidden data-i18n-title="hudChrome.wocMarket.launcherLabel" data-i18n-aria="hudChrome.wocMarket.launcherLabel" title="$WOC Exchange" aria-label="$WOC Exchange" data-icon="market"></button>
@@ -577,13 +595,13 @@
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
 
-    <div id="death-overlay">
+    <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
       <button type="button" class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
     </div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
          only when in reach of the corpse or the Pale Keeper. -->
-    <div id="ghost-prompt">
+    <div id="ghost-prompt" data-pad-nav-root>
       <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
       <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
@@ -730,6 +748,15 @@
 
         <div class="header-actions">
           <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
+          <button
+            type="button"
+            class="desktop-login-exit"
+            id="desktop-login-exit"
+            data-i18n="desktop.titlebar.exitGame"
+            data-i18n-title="desktop.titlebar.exitGame"
+            title="Exit Game"
+            hidden
+          >Exit Game</button>
           <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
             <span data-i18n="nav.donate">Donate</span>
@@ -1330,19 +1357,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.39.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.39.0-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.39.0-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1382,6 +1409,23 @@
                 </div>
                 <div id="account-password-msg" class="auth-field-msg" aria-live="polite"></div>
                 <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.savePassword">Update Password</button>
+              </form>
+
+              <!-- Shown instead of Change Password for an Apple- or Discord-provisioned
+                   account (passwordSet:false): there is no current password to re-verify. -->
+              <form id="account-set-password-form" class="account-form" novalidate hidden>
+                <h4 class="account-form-title" data-i18n="hudChrome.account.setPasswordTitle">Set a Password</h4>
+                <p class="account-hint" data-i18n="hudChrome.account.setPasswordHint">This account was created with Sign in with Apple or Discord and has no password yet. Set one to sign in on other devices, such as the Mac and Windows desktop apps, or the web, and to link additional sign-in methods.</p>
+                <div class="auth-field">
+                  <label for="account-set-new-pass" class="auth-label" data-i18n="hudChrome.account.newPassword">New password</label>
+                  <input id="account-set-new-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div class="auth-field">
+                  <label for="account-set-confirm-pass" class="auth-label" data-i18n="hudChrome.account.confirmNewPassword">Confirm new password</label>
+                  <input id="account-set-confirm-pass" type="password" maxlength="128" autocomplete="new-password" />
+                </div>
+                <div id="account-set-password-msg" class="auth-field-msg" aria-live="polite"></div>
+                <button type="submit" class="btn btn-primary" data-i18n="hudChrome.account.setPasswordSubmit">Set Password</button>
               </form>
 
               <div class="account-form">
@@ -1551,7 +1595,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.39.0</div>
+      <div id="game-version">v0.40.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>
@@ -1746,7 +1790,6 @@
           <button type="button" class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
           <button type="button" class="mobile-btn" id="mobile-arena" data-i18n-title="hudChrome.pvp.launcherTitle" data-i18n-aria="hudChrome.pvp.launcherTitle" title="PvP: Thornhollow Fields and the Arenas" aria-label="PvP: Thornhollow Fields and the Arenas" data-icon="arena"><span class="mobile-label" data-i18n="hudChrome.pvp.mobileLabel">PvP</span></button>
           <button type="button" class="mobile-btn" id="mobile-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="mobile-label" data-i18n="hudChrome.finder.title">Dungeon Finder</span></button>
-          <button type="button" class="mobile-btn" id="mobile-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="mobile-label" data-i18n="hudChrome.vcup.mobileLabel">Cup</span></button>
           <button type="button" class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
           <button type="button" class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
           <button type="button" class="mobile-btn" id="mobile-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="mobile-label" data-i18n="hudChrome.crafting.title">Crafting</span></button>

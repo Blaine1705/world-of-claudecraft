@@ -25,7 +25,6 @@ import {
   type TalentAllocation,
   type TalentRowLevel,
 } from '../sim/content/talents';
-import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import {
@@ -85,10 +84,7 @@ import {
   type RiftTier,
   type RiteIntensity,
   type SimEvent,
-  type SportRole,
   TICK_RATE,
-  type VcBracket,
-  type VcNationId,
   type WeaponSkinType,
 } from '../sim/types';
 import type { VendorBuyOptions } from '../sim/vendor_buy_stack';
@@ -107,7 +103,6 @@ import {
   type ClientCommand,
   type CraftingIdentityView,
   type CraftResultView,
-  type CupInfo,
   type DailyRewardHistory,
   type DailyRewardLeaderboardPage,
   type DailyRewardSpinResult,
@@ -125,6 +120,7 @@ import {
   type GuildBankLogEntry,
   type GuildBankLogView,
   type GuildLeaderboardPage,
+  type GuildRosterInfo,
   type IWorld,
   isOverheadEmoteId,
   type LeaderboardEntry,
@@ -150,8 +146,6 @@ import {
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
-  type VcSharedCupInfo,
-  type VcViewerReadout,
 } from '../world_api';
 import {
   type ActionBarLayout,
@@ -345,6 +339,9 @@ export interface AccountInfo {
   createdAt: string;
   characterCount: number;
   twoFactorEnabled: boolean;
+  // False for an account provisioned by Apple or Discord sign-in that never got
+  // a real, owner-chosen password (see setInitialPassword below).
+  passwordSet: boolean;
 }
 
 // Carries the HTTP status alongside the server's error text so callers can
@@ -727,6 +724,14 @@ export class Api {
     await this.post('/api/account/password', { current, next });
   }
 
+  // Set a real password on an account that has none yet (an Apple- or
+  // Discord-provisioned account whose only credential is a random placeholder
+  // hash the owner never saw). Bearer-scoped; the server rejects it once a real
+  // password exists (use changePassword from there).
+  async setInitialPassword(next: string): Promise<void> {
+    await this.post('/api/account/password/set-initial', { next });
+  }
+
   // Request a password-reset email (for a locked-out user). Always resolves: the
   // server returns 200 whether or not the username exists, so the UI cannot be
   // used to enumerate accounts.
@@ -1087,9 +1092,9 @@ export class Api {
   // ONE request. In-flight only, keyed by the realm base: nothing is memoized
   // past settle, so every non-overlapping call still reads the server fresh,
   // and a realm switch mid-flight never serves the old realm's document.
-  private statusDocInFlight: { base: string; doc: Promise<any> } | null = null;
+  private statusDocInFlight: { base: string; doc: Promise<Record<string, unknown>> } | null = null;
 
-  private statusDoc(): Promise<any> {
+  private statusDoc(): Promise<Record<string, unknown>> {
     const hit = this.statusDocInFlight;
     if (hit !== null && hit.base === this.base) return hit.doc;
     const doc = this.get('/api/status').finally(() => {
@@ -1509,6 +1514,8 @@ function blankEntity(id: number): Entity {
     equippedItems: {},
     equippedInstances: {},
     guild: '',
+    pledgeGuild: '',
+    guildTier: 0,
     title: null,
     border: null,
   };
@@ -1596,21 +1603,6 @@ export class ClientWorld implements IWorld {
   // --- IWorldCardMinigame: Card Duel queue/match state, mirrored from the
   // snapshot self (`s.cardDuel`, delta-omitted). ---
   cardMinigameInfo: CardMinigameInfo = { queued: false, available: true, match: null };
-  // --- IWorldValeCup: Vale Cup queue/match state, recomposed from two
-  // delta-omitted self keys: `s.vcup` (the per-viewer remainder plus a wire-only
-  // liveHidden flag) and `s.vcupb` (the realm-wide fragment, serialized once
-  // server-side and shared across viewers). We keep the last of each mirror and
-  // rebuild cupInfo whenever either changes; a missing key keeps its prior mirror
-  // (never default to empty, that would wipe the other fragment). ---
-  private lastVcupRemainder: VcViewerReadout | null = null;
-  private lastVcupShared: VcSharedCupInfo | null = null;
-  cupInfo: CupInfo | null = null;
-  // My live sport role, mirrored from the wireRev-gated heavy self field
-  // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
-  // the per-snapshot known rebuild resolves the role kit via the ONE shared
-  // resolveSportKit instead of the class/level/talent derivation, so the
-  // ONLINE action bar shows the sport kit (docs/prd/vale-cup.md wire trap).
-  sportRole: SportRole | null = null;
   // --- IWorldSocialGraph: persistent friends/blocks/guild, set ONLY by the
   // `social`/`socialpos` frames (there is no `s.social` snapshot field). ---
   socialInfo: SocialInfo | null = null;
@@ -2576,24 +2568,25 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'error') {
       const wasConnected = this.connected;
       this.connected = false;
-      // Mid-reconnect, 'character already in world' is the transient window
-      // where the server has not yet noticed the old socket died (a
-      // black-holed drop sends no FIN/RST): keep backing off, the server's
-      // keepalive sweep flips the held session linkdead within a ping
-      // interval or two and the next retry resumes. Bounded, so a character
+      // 'character already in world' is the transient window where the
+      // server has not yet noticed the old socket died (a black-holed drop
+      // sends no FIN/RST): keep backing off, the server's keepalive sweep
+      // flips the held session linkdead within a ping interval or two and
+      // the next retry resumes. Applies on the very first join attempt too
+      // (a char-select "Enter World" click can land in this same window, see
+      // reconnect_policy.ts), not only mid-reconnect. Bounded, so a character
       // genuinely held by another device's live socket still ends fatal.
-      if (
-        isTransientReconnectRejection(msg.error, this.reconnectAttempts, this.conflictRejections)
-      ) {
+      if (isTransientReconnectRejection(msg.error, this.conflictRejections)) {
         this.conflictRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
-      // Mid-reconnect, 'authentication timed out' is the other transient
-      // window: a server event-loop stall kept the handshake from processing
-      // the first auth frame in time, or a database failure interrupted the
-      // handshake server-side. Keep backing off; the next retry lands after
-      // the stall clears or the database recovers. Bounded on its own counter.
-      if (isTransientTimeoutRejection(msg.error, this.reconnectAttempts, this.timeoutRejections)) {
+      // 'authentication timed out' is the other transient window: a server
+      // event-loop stall kept the handshake from processing the first auth
+      // frame in time, or a database failure interrupted the handshake
+      // server-side. Keep backing off; the next retry lands after the stall
+      // clears or the database recovers. Bounded on its own counter, and
+      // applies to a first join attempt exactly like a mid-reconnect one.
+      if (isTransientTimeoutRejection(msg.error, this.timeoutRejections)) {
         this.timeoutRejections++;
         return; // the server closes this socket; onclose schedules the retry
       }
@@ -2629,11 +2622,24 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'social') {
+      // The pledge-board fields are normalized with defaults so an older
+      // server's frame (no pledge board) still yields a fully-shaped mirror:
+      // settings read as accepting (the feature's default), no open pledges,
+      // tier 0, no standing pledge.
+      const guild = msg.guild
+        ? {
+            ...msg.guild,
+            pledgeSettings: msg.guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
+            pledges: msg.guild.pledges ?? [],
+            tier: msg.guild.tier ?? 0,
+          }
+        : null;
       this.socialInfo = {
         friends: msg.friends ?? [],
         blocks: msg.blocks ?? [],
         ignores: msg.ignores ?? [],
-        guild: msg.guild ?? null,
+        guild,
+        myPledge: msg.myPledge ?? null,
       };
       this.socialDirty = true;
       return;
@@ -3055,6 +3061,8 @@ export class ClientWorld implements IWorld {
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
+        e.pledgeGuild = w.pg ?? '';
+        e.guildTier = w.gt ?? 0;
         e.title = w.title ?? null; // Book of Deeds active title (a deed id)
         e.border = w.border ?? null; // Book of Deeds nameplate border (a deed id)
         if (e.kind === 'npc') {
@@ -3163,6 +3171,13 @@ export class ClientWorld implements IWorld {
       e.dead = nowDead;
       e.ghost = !!w.gh; // released spirit: rendered translucent, runs faster
       e.lootable = !!w.loot;
+      // Synthetic sentinel, not a real countdown (same idiom as the paladin
+      // `pasc` note above): 0 once the server's one-shot `cd` corpse-decay
+      // flag has fired, 1 while still inside the loot window.
+      // entity_view_policy_core's admission check only ever tests <= 0, so
+      // this coarse mirror is all it needs; offline Sim entities carry the
+      // real countdown. Same idea as the ffa/lootFfaTimer mirror below.
+      e.corpseTimer = w.cd ? 0 : 1;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
@@ -3661,16 +3676,7 @@ export class ClientWorld implements IWorld {
       const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
-      // IWorldValeCup sport-kit swap (the wire trap, docs/prd/vale-cup.md): a
-      // server-side meta.known swap is invisible to this derived rebuild, so
-      // the server flags the live role via the wireRev-gated heavy `sport`
-      // field. While the mirrored role is set, known is the role kit from the
-      // shared resolver (identical to the Sim's swap); otherwise the normal
-      // class/level/talent derivation below applies.
-      if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
-      this.known = this.sportRole
-        ? resolveSportKit(this.sportRole)
-        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
+      this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3688,9 +3694,6 @@ export class ClientWorld implements IWorld {
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.vcup !== undefined) this.lastVcupRemainder = s.vcup as VcViewerReadout | null;
-      if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
-      if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
@@ -3936,31 +3939,6 @@ export class ClientWorld implements IWorld {
     return v;
   }
 
-  // Rebuild the public cupInfo from the two mirrored wire fragments. A null
-  // remainder (the viewer has no readout, or an explicit vcup:null) clears it; a
-  // remainder with no shared fragment yet (should not happen, they ship together
-  // on every gate-open pass and every resync) keeps the prior value rather than
-  // emitting a half-built readout. liveHidden reapplies the per-viewer practice
-  // suppression the server derived and is never surfaced on CupInfo.
-  private recomputeCupInfo(): void {
-    const rem = this.lastVcupRemainder;
-    const shared = this.lastVcupShared;
-    if (rem === null) {
-      this.cupInfo = null;
-      return;
-    }
-    if (shared === null) return;
-    const { liveHidden, ...viewer } = rem;
-    this.cupInfo = {
-      ...viewer,
-      queueSizes: shared.queueSizes,
-      live: liveHidden ? null : shared.live,
-      board: shared.board,
-      guildBoard: shared.guildBoard,
-      practicing: shared.practicing,
-    };
-  }
-
   // Refuse a hostile-target cast at an already-dead target: near-monotonic +
   // locally authoritative state, so it only drops casts the server would reject
   // anyway. The exception is a same-id revive (graveyard release, Fiesta respawn)
@@ -4193,6 +4171,12 @@ export class ClientWorld implements IWorld {
     this.questLog.delete(questId);
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
+  }
+  startTutorial(): void {
+    if (!this.canSendCommand()) return;
+    // Command only, never predicted: the server validates and the >30 yd
+    // displacement in the next snapshot drives the client's arrival flow.
+    this.cmd({ cmd: 'tutorial_start' });
   }
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
@@ -4918,34 +4902,6 @@ export class ClientWorld implements IWorld {
   forfeitCardDuel(): void {
     this.cmd({ cmd: 'card_forfeit' });
   }
-  // --- IWorldValeCup: boarball queue sends (cupInfo is a snapshot read; the
-  // sport-kit swap rides the heavy `sport` self field decoded in applySnapshot). ---
-  vcupQueueJoin(
-    bracket: VcBracket,
-    nation: VcNationId,
-    role: SportRole,
-    enterAsGuild: boolean,
-  ): void {
-    this.cmd({ cmd: 'vcup_queue', bracket, nation, role, guild: enterAsGuild });
-  }
-  vcupQueueLeave(): void {
-    this.cmd({ cmd: 'vcup_leave' });
-  }
-  vcupSetRole(role: SportRole): void {
-    this.cmd({ cmd: 'vcup_role', role });
-  }
-  vcupReady(): void {
-    this.cmd({ cmd: 'vcup_ready' });
-  }
-  vcupBet(side: 'A' | 'B', amount: number): void {
-    this.cmd({ cmd: 'vcup_bet', side, amount });
-  }
-  // Private practice bout against bots: the server seats it on an instanced pitch
-  // copy far from the Sowfield, so it runs in parallel with the real match and
-  // every other practice. Same command online and off.
-  vcupPracticeStart(bracket: VcBracket): void {
-    this.cmd({ cmd: 'vcup_practice', bracket });
-  }
   // --- IWorldSocialGraph: persistent social command sends (resolved server-side by
   // character name) + the REST character typeahead. socialInfo arrives via the
   // social/socialpos frames; searchCharacters is a GET, not a cmd(). ---
@@ -4975,6 +4931,18 @@ export class ClientWorld implements IWorld {
   }
   guildAccept(): void {
     this.cmd({ cmd: 'guild_accept' });
+  }
+  guildPledge(name: string): void {
+    this.cmd({ cmd: 'guild_pledge', name });
+  }
+  guildPledgeWithdraw(): void {
+    this.cmd({ cmd: 'guild_pledge_withdraw' });
+  }
+  guildPledgeDecide(name: string, accept: boolean): void {
+    this.cmd({ cmd: 'guild_pledge_decide', name, accept });
+  }
+  setGuildPledgeSettings(enabled: boolean, minLevel: number, note: string): void {
+    this.cmd({ cmd: 'guild_pledge_settings', enabled, minLevel, note });
   }
   guildDecline(): void {
     this.cmd({ cmd: 'guild_decline' });
@@ -5676,6 +5644,35 @@ export class ClientWorld implements IWorld {
     } catch {
       return empty;
     }
+  }
+  // The signpost guild board's roster drill-in (REST GET, no wire command):
+  // the cached public read behind /api/guilds/roster. Null answers an
+  // UNKNOWN guild (the window's honest empty state); a transport failure or
+  // a malformed body REJECTS so the window can show its retry state instead
+  // of misreading a dead server as an empty board. Rows are re-validated at
+  // this trust boundary (numbers coerced, rank narrowed) before the view
+  // core consumes them.
+  async guildRoster(name: string): Promise<GuildRosterInfo | null> {
+    const res = await fetch(
+      apiUrl(`/api/guilds/roster?name=${encodeURIComponent(name)}`, this.base),
+    );
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`guild roster read failed (${res.status})`);
+    const data = await res.json();
+    if (typeof data?.guild !== 'string' || !Array.isArray(data?.members)) {
+      throw new Error('guild roster read returned a malformed body');
+    }
+    const members = (data.members as Record<string, unknown>[]).map((m) => ({
+      name: String(m.name ?? ''),
+      class: String(m.class ?? ''),
+      rank: (m.rank === 'leader' || m.rank === 'officer' ? m.rank : 'member') as
+        | 'leader'
+        | 'officer'
+        | 'member',
+      level: Number(m.level) || 0,
+      lifetimeXp: Number(m.lifetimeXp) || 0,
+    }));
+    return { guild: data.guild, members };
   }
   // Developer high-score board (REST GET, no wire command): ?board=devs ranks
   // contributors by landed commits. The same data for every realm, paged exactly
