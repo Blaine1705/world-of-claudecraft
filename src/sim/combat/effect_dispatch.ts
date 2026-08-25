@@ -730,6 +730,26 @@ export function runEffects(
         ) {
           break;
         }
+        // A physical direct hit can miss like any melee attack (Hit rating reduces
+        // it, via swingMissChance), the same roll the sunder effect takes; a miss
+        // deals no damage and causes no threat. Rolled before this hit's damage and
+        // crit draws, and ONLY when it can actually fail: a hit-capped attacker
+        // cannot miss, so drawing there would fork the shared stream for nothing.
+        const directMissChance = isSpell ? 0 : swingMissChance(p, target);
+        if (directMissChance > 0 && ctx.rng.chance(directMissChance)) {
+          ctx.emit({
+            type: 'damage',
+            sourceId: p.id,
+            targetId: target.id,
+            amount: 0,
+            crit: false,
+            school: 'physical',
+            ability: ability.name,
+            kind: 'miss',
+          });
+          ctx.enterCombat(p, target);
+          break;
+        }
         const rooted = isRootedOrChilled(target);
         const abilityMod = mods.abilities[ability.id];
         const critChance =

@@ -9,8 +9,8 @@
     "Old Blood landed-strike bank across Wolf and Bruin with both payoffs",
     "Verdance completed-HoT bank and Overbloom harvest"
   ],
-  "draws": 10635,
-  "drawDigest": "f8153de4",
+  "draws": 10631,
+  "drawDigest": "546b9e4b",
   "frames": [
     {
       "tick": 0,
@@ -1123,11 +1123,11 @@
       "tick": 1015,
       "time": 50.75,
       "nextId": 1001,
-      "state": "8fdb7ea0",
-      "events": "d1a52012",
+      "state": "a5d1b342",
+      "events": "970dbad5",
       "rng": {
-        "draws": 8824,
-        "digest": "db6efc89"
+        "draws": 8825,
+        "digest": "46e51d21"
       },
       "label": "wildfang-spend",
       "players": [
@@ -1250,12 +1250,12 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2564
+            "damageDealt": 2572
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 2564
+              "dummyDamage": 2572
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1634,7 +1634,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 996384,
+          "hp": 996376,
           "id": 1000,
           "inCombat": true,
           "kind": "mob",
@@ -1670,7 +1670,7 @@
             ],
             [
               998,
-              3673.1475
+              3707.4675
             ]
           ],
           "weapon": {
@@ -1683,29 +1683,29 @@
       "tick": 1020,
       "time": 51,
       "nextId": 1001,
-      "state": "a6ed23c8",
+      "state": "6e8e27fa",
       "events": "50e498ec",
       "rng": {
-        "draws": 8874,
-        "digest": "20611974"
+        "draws": 8876,
+        "digest": "6ccfe83a"
       }
     },
     {
       "tick": 1040,
       "time": 52,
       "nextId": 1001,
-      "state": "cc10b4e3",
+      "state": "32b60105",
       "events": "741638a5",
       "rng": {
-        "draws": 9050,
-        "digest": "889513c6"
+        "draws": 9047,
+        "digest": "724229bb"
       }
     },
     {
       "tick": 1060,
       "time": 53,
       "nextId": 1001,
-      "state": "e996db09",
+      "state": "6691ad6b",
       "events": "cb4f35a4",
       "rng": {
         "draws": 9233,
@@ -1716,99 +1716,99 @@
       "tick": 1080,
       "time": 54,
       "nextId": 1001,
-      "state": "af622a59",
+      "state": "0907f7bb",
       "events": "1f148f2e",
       "rng": {
-        "draws": 9385,
-        "digest": "cf942b36"
+        "draws": 9390,
+        "digest": "dd4a2d5b"
       }
     },
     {
       "tick": 1100,
       "time": 55,
       "nextId": 1001,
-      "state": "c94845af",
-      "events": "16c00167",
+      "state": "5b0a1d15",
+      "events": "d1c6b157",
       "rng": {
-        "draws": 9541,
-        "digest": "4efbebb5"
+        "draws": 9544,
+        "digest": "3686f3c4"
       }
     },
     {
       "tick": 1120,
       "time": 56,
       "nextId": 1001,
-      "state": "f552ce40",
+      "state": "b7b6cc4a",
       "events": "5bc2e031",
       "rng": {
-        "draws": 9710,
-        "digest": "22229265"
+        "draws": 9706,
+        "digest": "33ef5ea4"
       }
     },
     {
       "tick": 1140,
       "time": 57,
       "nextId": 1001,
-      "state": "14942761",
+      "state": "4257ba63",
       "events": "df34946b",
       "rng": {
-        "draws": 9895,
-        "digest": "f046712b"
+        "draws": 9885,
+        "digest": "71dc3438"
       }
     },
     {
       "tick": 1160,
       "time": 58,
       "nextId": 1001,
-      "state": "afc991f8",
+      "state": "bfec4f17",
       "events": "3d8299b7",
       "rng": {
-        "draws": 10087,
-        "digest": "b7002d69"
+        "draws": 10071,
+        "digest": "22f3c51d"
       }
     },
     {
       "tick": 1180,
       "time": 59,
       "nextId": 1001,
-      "state": "fcc48347",
-      "events": "e009c712",
+      "state": "9388694d",
+      "events": "c5a69b14",
       "rng": {
-        "draws": 10251,
-        "digest": "edd1f189"
+        "draws": 10250,
+        "digest": "d57e7bbc"
       }
     },
     {
       "tick": 1200,
       "time": 60,
       "nextId": 1001,
-      "state": "bdf1b8f6",
+      "state": "9c211623",
       "events": "31fe1643",
       "rng": {
-        "draws": 10421,
-        "digest": "b712fd8d"
+        "draws": 10406,
+        "digest": "362ee4ac"
       }
     },
     {
       "tick": 1220,
       "time": 61,
       "nextId": 1001,
-      "state": "d27bf8fa",
-      "events": "1fbea9a4",
+      "state": "5bee92e2",
+      "events": "79d7fc8c",
       "rng": {
-        "draws": 10601,
-        "digest": "f7ee4164"
+        "draws": 10591,
+        "digest": "61c54b5c"
       }
     },
     {
       "tick": 1225,
       "time": 61.25,
       "nextId": 1001,
-      "state": "02877869",
+      "state": "8a4c3f99",
       "events": "73d7612d",
       "rng": {
-        "draws": 10635,
-        "digest": "f8153de4"
+        "draws": 10631,
+        "digest": "546b9e4b"
       },
       "label": "groveheart-harvest",
       "players": [
@@ -1931,12 +1931,12 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2564
+            "damageDealt": 2572
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 2564
+              "dummyDamage": 2572
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2374,11 +2374,11 @@
       "tick": 1225,
       "time": 61.25,
       "nextId": 1001,
-      "state": "02877869",
+      "state": "8a4c3f99",
       "events": "741638a5",
       "rng": {
-        "draws": 10635,
-        "digest": "f8153de4"
+        "draws": 10631,
+        "digest": "546b9e4b"
       },
       "label": "final",
       "players": [
@@ -2501,12 +2501,12 @@
           "cls": "druid",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 2564
+            "damageDealt": 2572
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 2564
+              "dummyDamage": 2572
             },
             "dungeonClears": {},
             "itemsDiscovered": [

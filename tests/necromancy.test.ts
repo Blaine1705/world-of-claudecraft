@@ -788,6 +788,9 @@ describe('Necromancy Warlock', () => {
     sim.targetEntity(primary.id);
     drain(sim);
 
+    // Reaping Command is an instant hostile spell, so it takes a resist roll; a
+    // resisted command leaves the primary alive and nothing to commit against.
+    sim.player.hitBonus = 1;
     const events = finishCastEvents(sim, 'reaping_command');
     const cleaves = events.filter(
       (event): event is Extract<SimEvent, { type: 'damage' }> =>
