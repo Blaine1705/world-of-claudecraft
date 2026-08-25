@@ -2046,12 +2046,12 @@ async function startGame(
   hud.onIslandFirstArrival = () => {
     // Reduce motion is the EFFECTIVE flag (OS query OR in-game switch, the
     // spawn intro's contract below): a 4.5 s sweeping camera fall is exactly
-    // what that contract exists for, so it never starts and the arrival lands
-    // at the ordinary chase framing.
+    // what that contract exists for. A newborn's landing under the spawn intro
+    // yields too: introCameraTick overwrites this fall every frame.
     const osReduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (settings.get('reduceMotion') || osReduced) return;
+    if (intro !== null || settings.get('reduceMotion') || osReduced) return;
     startArrivalCinematic(arrivalCinematic, input.camDist, input.camPitch);
   };
 
