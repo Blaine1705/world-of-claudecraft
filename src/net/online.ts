@@ -1433,6 +1433,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    riftSliding: false,
     afk: false,
     weaponStowed: false,
     helmHidden: false,
@@ -5471,10 +5472,6 @@ export class ClientWorld implements IWorld {
         }
       : null;
     if (this.riftFloor) {
-      // riftFloorColliders takes no upgrade: an AI-service manifest only ever
-      // reskins theme/spawns/boss/name (src/sim/rift/upgrade.ts
-      // applyRiftUpgrade), never floor.layout, so the base (unupgraded) plan's
-      // colliders are already identical to the upgraded floor's walls.
       setRiftRegion(
         this.riftCollisionToken,
         this.riftFloor.origin.x,
@@ -5483,6 +5480,7 @@ export class ClientWorld implements IWorld {
           this.riftFloor.seed,
           this.riftFloor.baseLevel,
           this.riftFloor.floorIndex,
+          this.riftFloor.upgrade,
         ),
       );
     }

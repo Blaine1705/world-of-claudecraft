@@ -486,8 +486,12 @@ const MONOLITHS: MonolithRow[] = [
     // also clears riftFloor (a two-line comment plus the assignment), so a
     // riftState frame arriving after endSession but before the socket
     // actually closes cannot re-register a region under a token nothing
-    // will ever clear again. Maintainer decision, exact count, no slack.
-    ceiling: 5898,
+    // will ever clear again.
+    // Lowered 5898 -> 5896: the same review round's riftFloorColliders/
+    // riftSliding nits removed a now-stale explanatory comment (the call
+    // site passes the upgrade manifest through instead of documenting why
+    // it does not), netting the file back down. Exact count, zero slack.
+    ceiling: 5896,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

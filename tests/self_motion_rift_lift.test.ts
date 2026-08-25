@@ -8,8 +8,16 @@
 
 import { describe, expect, it } from 'vitest';
 import { resolvedRiftFloorPlan, riftLiftFor } from '../src/render/self_motion_rift_lift';
-import { RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z, riftInstanceOrigin } from '../src/sim/data';
+import {
+  isRiftPos,
+  RIFT_BAND_X_MIN,
+  RIFT_REGION_HALF_X,
+  RIFT_REGION_HALF_Z,
+  RIFT_X_MIN,
+  riftInstanceOrigin,
+} from '../src/sim/data';
 import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
+import type { RiftUpgradeManifest } from '../src/sim/rift/types';
 import type { RiftFloorView } from '../src/world_api/dungeons';
 
 // Same procedural fixture tests/self_motion.test.ts's ramp-walking test uses:
@@ -48,6 +56,43 @@ describe('resolvedRiftFloorPlan (issue #3479)', () => {
     const direct = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, view.upgrade);
     expect(plan).toBe(direct);
   });
+
+  // Every other case in this describe block leaves view.upgrade at its
+  // riftFloorView() default of null, so dropping the upgrade argument from
+  // resolvedRiftFloorPlan's generateRiftFloor call would be undetectable.
+  // This one carries a real manifest and asserts the resolved plan is the
+  // UPGRADED plan (name/themeName rewritten by applyRiftUpgrade), not the
+  // base procedural one, so the upgrade argument threading through is
+  // actually exercised.
+  it('resolves the UPGRADED plan, not the base one, when the descriptor carries an upgrade manifest', () => {
+    const upgrade: RiftUpgradeManifest = {
+      schemaVersion: 1,
+      title: 'Test Upgrade Directive',
+      synopsis: 'A test-authored directive.',
+      lore: [],
+      floors: [
+        {
+          floorIndex: 0,
+          themeId: 'frost',
+          pacing: 'pressure',
+          monsterIds: [],
+          specialEvent: 'none',
+          environmentalDetails: [],
+        },
+      ],
+      boss: { templateId: 'rift_boss_test', name: 'Test Boss', concept: 'test' },
+      rewards: { lootMultiplier: 1, craftingMaterialBias: 0 },
+      assetRequests: [],
+    };
+    const view = riftFloorView({ upgrade });
+    const plan = resolvedRiftFloorPlan(view);
+    expect(plan).not.toBeNull();
+    const upgraded = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, upgrade);
+    const base = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, null);
+    expect(plan).toBe(upgraded);
+    expect(plan?.name).not.toBe(base.name);
+    expect(plan?.name).toContain('Test Upgrade Directive');
+  });
 });
 
 describe('riftLiftFor (issue #3479)', () => {
@@ -56,7 +101,23 @@ describe('riftLiftFor (issue #3479)', () => {
     expect(riftLiftFor(null, origin, origin.x, origin.z)).toBe(0);
   });
 
-  it('is 0 at a non-rift x, even with a resolved plan', () => {
+  // RIFT_REGION_HALF_X is deliberately aligned to RIFT_BAND_X_MIN (the
+  // module header on src/sim/data.ts says so: "a position is never
+  // region-detected while isRiftPos() reads false"), so for THIS axis the
+  // separate containment check below always agrees with isRiftPos: there is
+  // no x for which containment passes but isRiftPos fails, and no input can
+  // isolate the `!isRiftPos(x)` branch in riftLiftFor from the containment
+  // branch that follows it. What actually keeps that branch honest is this
+  // alignment; pin it directly so a future change to either constant that
+  // breaks it fails here instead of silently opening a gap between the two
+  // guards.
+  it('the region half-width is exactly aligned to the isRiftPos band edge', () => {
+    expect(RIFT_X_MIN - RIFT_REGION_HALF_X).toBe(RIFT_BAND_X_MIN);
+    expect(isRiftPos(RIFT_X_MIN - RIFT_REGION_HALF_X)).toBe(true);
+    expect(isRiftPos(RIFT_X_MIN - RIFT_REGION_HALF_X - 1)).toBe(false);
+  });
+
+  it('is 0 at a non-rift x, even with a resolved plan (fails both isRiftPos and containment)', () => {
     const view = riftFloorView();
     const plan = resolvedRiftFloorPlan(view);
     expect(riftLiftFor(plan, view.origin, 0, 0)).toBe(0);
