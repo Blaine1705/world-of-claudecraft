@@ -18,6 +18,7 @@ import {
   MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
   MAIL_MAX_ATTACHMENTS,
+  MAIL_PERSIST_REFRESH_SECONDS,
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
 import type { MailSave } from '../src/sim/sim';
@@ -1056,6 +1057,28 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
     assertInSync(); // deletion drops Alice's now-plain welcome letter
   });
 
+  // Ticks one sim-second at a time (the periodic re-dirty arm's own per-second
+  // cadence) and drains after each, stopping the moment `recipientKey` shows
+  // up dirty: its own stagger slot has fired. Deliberately observes the real
+  // trigger rather than precomputing a target tick count from mailId %
+  // MAIL_PERSIST_REFRESH_SECONDS and hoping Math.floor(sim.time) lands on it
+  // exactly at that tick: repeated DT summation drifts sim.time by enough
+  // (confirmed empirically) that a precomputed count is off by one bucket at
+  // exactly the boundary. Bounded by one full refresh cadence, so a genuine
+  // regression (the recipient never gets re-dirtied) fails loudly instead of
+  // hanging.
+  function drainUntilRedirtied(
+    sim: Sim,
+    recipientKey: string,
+  ): { recipientKey: string; letters: MailSave['mail'] }[] {
+    for (let s = 0; s < MAIL_PERSIST_REFRESH_SECONDS + 1; s++) {
+      tickFor(sim, 1);
+      const dirty = sim.takeDirtyMailPartitions();
+      if (dirty.some((p) => p.recipientKey === recipientKey)) return dirty;
+    }
+    throw new Error(`${recipientKey} was never re-dirtied within one full refresh cadence`);
+  }
+
   it('an untouched escrow letter is periodically re-dirtied so its persisted secondsLeft never drifts unboundedly', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
@@ -1067,44 +1090,73 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
     sim.mailSend('Bob', 'Gift', 'For you.', 500, [], alice); // carries copper: an escrow
     const sentAtDirty = sim.takeDirtyMailPartitions();
     const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
-    const initialSecondsLeft = sentAtDirty
+    const gift = sentAtDirty
       .find((p) => p.recipientKey === bobKey)
-      ?.letters.find((m) => m.subject === 'Gift')?.secondsLeft;
-    expect(initialSecondsLeft).toBeGreaterThan(0);
+      ?.letters.find((m) => m.subject === 'Gift');
+    expect(gift?.secondsLeft).toBeGreaterThan(0);
+    const initialSecondsLeft = gift?.secondsLeft as number;
 
-    // No mutation touches Bob's mailbox for longer than the refresh cadence:
-    // without the periodic re-dirty, this quiet letter's on-disk copy would
-    // freeze at initialSecondsLeft forever (until something else about this
-    // mailbox changes), understating real elapsed time across a restart.
-    tickFor(sim, 40); // > MAIL_ESCROW_REFRESH_SECONDS (25)
-
-    const refreshedDirty = sim.takeDirtyMailPartitions();
-    const refreshedKeys = refreshedDirty.map((p) => p.recipientKey);
-    expect(refreshedKeys).toContain(bobKey);
+    // No mutation touches Bob's mailbox again: without the periodic
+    // re-dirty, this quiet letter's on-disk copy would freeze at
+    // initialSecondsLeft forever (until something else about this mailbox
+    // changes), understating real elapsed time across a restart.
+    const refreshedDirty = drainUntilRedirtied(sim, bobKey);
     const refreshedSecondsLeft = refreshedDirty
       .find((p) => p.recipientKey === bobKey)
       ?.letters.find((m) => m.subject === 'Gift')?.secondsLeft;
     // Strictly less than the send-time value: the countdown actually advanced
     // in the persisted snapshot, not just in the live in-memory letter.
-    expect(refreshedSecondsLeft).toBeLessThan(initialSecondsLeft as number);
+    expect(refreshedSecondsLeft).toBeLessThan(initialSecondsLeft);
   });
 
-  it('a plain (no-escrow) letter is NEVER swept by the periodic refresh, keeping the fix cheap', () => {
+  // Regression for the #3613 review finding: the periodic re-dirty arm was
+  // gated on `hasEscrow &&`, so a PLAIN (no coin, no items) letter's 14-day
+  // read/expiry clock was NEVER re-dirtied after send. secondsLeft was
+  // written once at send time; on load expiresAt = ctx.time + secondsLeft, so
+  // every server restart handed plain and already-read letters a fresh full
+  // 14-day expiry window. Since realms restart far more often than 14 days
+  // (every deploy), this meant plain letters effectively never expired, the
+  // reclaim sweep stopped working, and the mail book grew unbounded again:
+  // exactly the #3560 class this PR exists to prevent. Proven end to end: the
+  // persisted countdown advances after a quiet interval (the drain), AND a
+  // fresh Sim loaded from ONLY that drained partition (the restart) carries
+  // the advanced countdown forward, not a reset one.
+  it('a plain (no-escrow) letter is ALSO periodically re-dirtied, so its persisted expiry advances across a drain-then-restart cycle', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000; // postage only; the letter itself carries no coin
     moveToMailbox(sim, alice);
-    sim.mailSend('Bob', 'Chat', 'Hey there.', 0, [], alice); // no copper, no items
-    sim.takeDirtyMailPartitions();
+    sim.mailSend('Bob', 'Chat', 'Hey there.', 0, [], alice); // no copper, no items: plain
+    const sentAtDirty = sim.takeDirtyMailPartitions();
     const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
+    const chatBefore = sentAtDirty
+      .find((p) => p.recipientKey === bobKey)
+      ?.letters.find((m) => m.subject === 'Chat');
+    expect(chatBefore?.secondsLeft).toBeGreaterThan(0);
 
-    // Same elapsed time as the escrow test above, same recipient, but nothing
-    // ever touches this mailbox again: the periodic sweep must skip it
-    // (its finite 14-day plain-letter expiry would otherwise sweep almost
-    // the entire book every cycle, reopening the whole-book cost this design
-    // exists to cut).
-    tickFor(sim, 40);
-    expect(sim.takeDirtyMailPartitions().map((p) => p.recipientKey)).not.toContain(bobKey);
+    // Same quiet interval as the escrow test above, same recipient, but
+    // nothing ever touches this mailbox again: the periodic sweep must NOT
+    // skip it, unlike before the fix.
+    const refreshedDirty = drainUntilRedirtied(sim, bobKey);
+    const chatAfterDrain = refreshedDirty
+      .find((p) => p.recipientKey === bobKey)
+      ?.letters.find((m) => m.subject === 'Chat');
+    expect(chatAfterDrain).toBeDefined();
+    // The drain: the persisted snapshot's countdown actually advanced, not
+    // just the live in-memory letter's.
+    expect(chatAfterDrain?.secondsLeft).toBeLessThan(chatBefore?.secondsLeft as number);
+
+    // The restart: a fresh Sim loaded from EXACTLY what the drain produced
+    // (nothing more) must carry that same advanced countdown forward, not
+    // hand the letter a fresh 14-day window from a stale secondsLeft.
+    const sim2 = makeWorld();
+    sim2.loadMail({ mail: [chatAfterDrain!], nextMailId: chatAfterDrain!.id + 1 });
+    const reloaded = sim2.serializeMail().mail.find((m) => m.subject === 'Chat');
+    expect(reloaded?.secondsLeft).toBe(chatAfterDrain?.secondsLeft);
+    expect(reloaded?.secondsLeft).toBeLessThan(chatBefore?.secondsLeft as number);
   });
 
   it('a dirty write touches only the changed recipient, never the rest of a large book (the #3561 cost claim)', () => {

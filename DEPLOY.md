@@ -248,6 +248,28 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Mail partition backfill rollback**: the Ravenpost mail persistence migration
+  (`server/mail_partition_backfill.ts`, #3561) partitions a realm's legacy
+  `mail:<realm>` blob into one row per recipient (`mail:<realm>:r:<key>`) inside
+  `ensureSchema`, and retains the legacy row as a rollback artifact, mirroring the
+  market backfill. Its rollback is WEAKER than market's: market's legacy row was
+  already dormant by the time market added realm scoping, so reverting a binary
+  never lost live writes, but mail's `mail:<realm>` row was the LIVE,
+  actively-written key right up to the instant the migration ran. Reverting to a
+  pre-#3561 binary after ANY post-migration mail activity (a send, a take, a
+  delete, a rename) is a ONE-WAY trapdoor: the old binary reads and writes only
+  the frozen legacy blob, so every mutation since the migration becomes invisible
+  to it, and a later roll-forward never re-adopts that window's mail either (the
+  migration marker makes the backfill a permanent no-op). Recovery after any such
+  activity means a database restore, not a binary revert. A rolling deploy that
+  runs an old and a new binary against the SAME realm concurrently has the same
+  blind spot in miniature, so stop the old process before starting the new one
+  per realm rather than overlapping them. Never delete the migration's marker row
+  on a realm with live mail traffic to force a re-run: a re-run blind-upserts
+  only the recipients present in the legacy blob (unchanged since the original
+  migration) while leaving every partition row written since then in place, and
+  `loadMail` does not de-duplicate by letter id, so the next load can contain the
+  same letter, and its escrow, twice.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates

@@ -11324,7 +11324,9 @@ export class Sim {
     return this.market.marketInfoFor(pid);
   }
 
-  // Server-only (guildBankInfoForGuild shape): the cheap poll before a marketInfoFor rebuild.
+  // Server-only broadcast helper (never IWorld, the guildBankInfoForGuild
+  // precedent): the cheap change signal server/game.ts polls before paying for
+  // a marketInfoFor rebuild. Null while the player is not at a Merchant.
   marketBrowseRevFor(pid: number): number | null {
     return this.market.browseRevFor(pid);
   }
@@ -11389,7 +11391,9 @@ export class Sim {
     return this.postOffice.mailInfoFor(pid);
   }
 
-  // Server-only (marketBrowseRevFor shape): the cheap poll before a mailInfoFor rebuild.
+  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
+  // the cheap change signal server/game.ts polls before paying for a
+  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
   mailRevFor(pid: number): number | null {
     return this.postOffice.mailRevFor(pid);
   }
