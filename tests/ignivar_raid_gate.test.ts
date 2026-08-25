@@ -36,7 +36,11 @@ describe('Ignivar raid gate', () => {
     expect(gate.getObjectByName('transition-threshold')).toBeDefined();
   });
 
-  it('dispatches only the locked gate and its opened second-wing door', () => {
+  it('dispatches the locked gate and both opened raid-room doors', () => {
+    expect(ignivarRaidGatePlan('dungeon_door', 'ignivar_molten_assembly')).toEqual({
+      open: true,
+      height: 6.4,
+    });
     expect(ignivarRaidGatePlan('ignivar_raid_gate_locked', 'ignivar_inner_crucible')).toEqual({
       open: false,
       height: 6.4,

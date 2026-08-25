@@ -17033,6 +17033,11 @@ export const zh_TW: EnTranslations = {
         "enterText": "熱浪在熔爐封印的水源上方翻湧。",
         "leaveText": "你離開熔爐，終於再次暢快呼吸。"
       },
+      "ignivar_molten_assembly": {
+        "name": "熔火裝配間",
+        "enterText": "熔火裝配間內，新的自動機從鍛造線上列隊而出。",
+        "leaveText": "最後一具自動機在你身後歸於沉寂。"
+      },
       "ignivar_inner_crucible": {
         "name": "內環熔爐",
         "enterText": "已打開的大門通往熔爐更深處。",

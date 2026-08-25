@@ -8,8 +8,12 @@ import {
 } from '../src/sim/dungeon_layout';
 import {
   IGNIVAR_APPROACH_GUARDIAN_IDS,
+  IGNIVAR_CINDER_ARTIFICER_ID,
+  IGNIVAR_CRUCIBLE_WARDEN_ID,
+  IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
   IGNIVAR_SECOND_WING_ID,
@@ -27,7 +31,7 @@ function claimedRaid(difficulty: 'normal' | 'heroic' = 'normal') {
   const gate = [...sim.entities.values()].find(
     (entity) =>
       entity.templateId === IGNIVAR_GATE_LOCKED_TEMPLATE &&
-      entity.dungeonId === IGNIVAR_SECOND_WING_ID,
+      entity.dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID,
   );
   if (!boss || !gate) throw new Error('Ignivar raid progression fixtures did not spawn');
   return { sim, boss, gate };
@@ -54,16 +58,33 @@ function guardianMobs(sim: Sim) {
   );
 }
 
+function defeatAutomataIn(sim: Sim, dungeonId: string): void {
+  const instance = sim.instances.find(
+    (candidate) => candidate.dungeonId === dungeonId && candidate.partyKey !== null,
+  );
+  if (!instance) throw new Error(`Missing claimed raid room ${dungeonId}`);
+  for (const mobId of instance.mobIds) {
+    const mob = sim.entities.get(mobId);
+    if (!mob || !IGNIVAR_APPROACH_GUARDIAN_IDS.includes(mob.templateId as never)) continue;
+    mob.dead = true;
+    mob.hp = 0;
+  }
+  sim.tickCount = 20;
+  updateInstances(sim.ctx);
+}
+
 describe('Ignivar raid progression', () => {
-  it('authors an ordered, hidden three-room raid family', () => {
+  it('authors an ordered, hidden four-room raid family', () => {
     expect(IGNIVAR_RAID_ROOM_IDS).toEqual([
       IGNIVAR_FORGE_APPROACH_ID,
       IGNIVAR_RAID_ARENA_ID,
+      IGNIVAR_MOLTEN_ASSEMBLY_ID,
       IGNIVAR_SECOND_WING_ID,
     ]);
     expect(ignivarPreviousRaidRoom(IGNIVAR_FORGE_APPROACH_ID)).toBeNull();
     expect(ignivarPreviousRaidRoom(IGNIVAR_RAID_ARENA_ID)).toBe(IGNIVAR_FORGE_APPROACH_ID);
-    expect(ignivarPreviousRaidRoom(IGNIVAR_SECOND_WING_ID)).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(ignivarPreviousRaidRoom(IGNIVAR_MOLTEN_ASSEMBLY_ID)).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(ignivarPreviousRaidRoom(IGNIVAR_SECOND_WING_ID)).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
     expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID]).toMatchObject({
       id: IGNIVAR_FORGE_APPROACH_ID,
       overworldDoor: false,
@@ -75,6 +96,21 @@ describe('Ignivar raid progression', () => {
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.zMin).toBe(-58);
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.zMax).toBe(58);
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.pillars).toHaveLength(6);
+    expect(DUNGEONS[IGNIVAR_MOLTEN_ASSEMBLY_ID]).toMatchObject({
+      id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+      name: 'Molten Assembly',
+      index: 13,
+      overworldDoor: false,
+      guideVisible: false,
+      interior: 'ignivar_approach',
+      mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
+      suggestedPlayers: 10,
+    });
+    expect(DUNGEONS[IGNIVAR_MOLTEN_ASSEMBLY_ID].spawns).toHaveLength(9);
+    expect(DUNGEONS[IGNIVAR_MOLTEN_ASSEMBLY_ID].objects?.at(-1)).toMatchObject({
+      templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+      dungeonId: IGNIVAR_SECOND_WING_ID,
+    });
     expect(DUNGEONS[IGNIVAR_SECOND_WING_ID]).toMatchObject({
       id: IGNIVAR_SECOND_WING_ID,
       overworldDoor: false,
@@ -88,7 +124,7 @@ describe('Ignivar raid progression', () => {
     expect(IGNIVAR_SECOND_WING_LAYOUT.pillars).toEqual([]);
   });
 
-  it('spawns three distinct guardian packs and opens the Herald gate only after all die', () => {
+  it('ends the Approach trash with one Warden miniboss and opens the Herald gate only after all die', () => {
     const sim = new Sim({ seed: 3412, playerClass: 'warrior', devCommands: true });
     const allyPid = sim.addPlayer('paladin', 'Approach Ally');
     const raid = sim.ctx.formDungeonFinderGroup(
@@ -113,35 +149,35 @@ describe('Ignivar raid progression', () => {
     if (!gate) throw new Error('Forge approach gate did not spawn');
 
     const guardians = guardianMobs(sim);
-    expect(guardians).toHaveLength(6);
-    for (const templateId of IGNIVAR_APPROACH_GUARDIAN_IDS) {
-      expect(guardians.filter((guardian) => guardian.templateId === templateId)).toHaveLength(2);
-    }
+    expect(guardians).toHaveLength(7);
+    expect(
+      guardians.filter((guardian) => guardian.templateId === IGNIVAR_EMBER_SENTINEL_ID),
+    ).toHaveLength(6);
+    expect(
+      guardians.filter((guardian) => guardian.templateId === IGNIVAR_CRUCIBLE_WARDEN_ID),
+    ).toHaveLength(1);
+    expect(
+      claim.mobIds.some((id) => sim.entities.get(id)?.templateId === IGNIVAR_CINDER_ARTIFICER_ID),
+    ).toBe(false);
     expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[0]].arcCleave?.name).toBe('Tempered Sweep');
     expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[1]].bigCast?.castId).toBe('crucible_quake');
-    expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[2]].channelHeal?.name).toBe('Recalibrate');
-    expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[2]].ccImmune).toBe(false);
     expect(gate.templateId).toBe(IGNIVAR_GATE_LOCKED_TEMPLATE);
 
-    for (const templateId of IGNIVAR_APPROACH_GUARDIAN_IDS.slice(0, -1)) {
-      for (const guardian of guardians.filter((mob) => mob.templateId === templateId)) {
-        guardian.dead = true;
-        guardian.hp = 0;
-      }
+    for (const guardian of guardians.filter(
+      (mob) => mob.templateId === IGNIVAR_EMBER_SENTINEL_ID,
+    )) {
+      guardian.dead = true;
+      guardian.hp = 0;
     }
     sim.tickCount = 20;
     updateInstances(sim.ctx);
     expect(gate.templateId).toBe(IGNIVAR_GATE_LOCKED_TEMPLATE);
 
     const lastPack = guardians.filter(
-      (guardian) => guardian.templateId === IGNIVAR_APPROACH_GUARDIAN_IDS.at(-1),
+      (guardian) => guardian.templateId === IGNIVAR_CRUCIBLE_WARDEN_ID,
     );
     lastPack[0].dead = true;
     lastPack[0].hp = 0;
-    updateInstances(sim.ctx);
-    expect(gate.templateId).toBe(IGNIVAR_GATE_LOCKED_TEMPLATE);
-    lastPack[1].dead = true;
-    lastPack[1].hp = 0;
     updateInstances(sim.ctx);
     expect(gate.templateId).toBe('dungeon_door');
     teleport(sim, sim.player.id, gate.pos);
@@ -150,7 +186,7 @@ describe('Ignivar raid progression', () => {
   });
 
   it.each(['normal', 'heroic'] as const)(
-    'keeps the gate locked, then walks into the %s wing with source difficulty',
+    'walks through the %s assembly packs into Varkhul with source difficulty',
     (difficulty) => {
       const { sim, boss, gate } = claimedRaid(difficulty);
       const opposite = difficulty === 'normal' ? 'heroic' : 'normal';
@@ -172,6 +208,70 @@ describe('Ignivar raid progression', () => {
 
       expect(gate.templateId).toBe('dungeon_door');
       updateDoorTriggers(sim.ctx, sim.player);
+      expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
+      expect(
+        sim.instances.find(
+          (instance) =>
+            instance.dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID && instance.partyKey !== null,
+        )?.difficulty,
+      ).toBe(difficulty);
+
+      const assembly = sim.instances.find(
+        (instance) =>
+          instance.dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID && instance.partyKey !== null,
+      );
+      if (!assembly) throw new Error('Molten Assembly did not form a claim');
+      const automata = assembly.mobIds
+        .map((id) => sim.entities.get(id))
+        .filter((entity): entity is NonNullable<typeof entity> => entity !== undefined);
+      expect(automata).toHaveLength(9);
+      expect(automata.every((mob) => mob.level === (difficulty === 'heroic' ? 22 : 20))).toBe(true);
+      const wardens = automata.filter((mob) => mob.templateId === IGNIVAR_CRUCIBLE_WARDEN_ID);
+      expect(wardens).toHaveLength(2);
+      for (const warden of wardens) {
+        expect(warden).toMatchObject({
+          maxHp: difficulty === 'heroic' ? 9426 : 7539,
+          hp: difficulty === 'heroic' ? 9426 : 7539,
+          scale: 2.75,
+          ccImmune: true,
+          slowImmune: true,
+        });
+      }
+      if (difficulty === 'heroic') {
+        const byTemplate = Object.fromEntries(automata.map((mob) => [mob.templateId, mob]));
+        expect(byTemplate.ignivar_ember_sentinel).toMatchObject({
+          maxHp: 3312,
+          weapon: { min: 153, max: 239 },
+          stats: { armor: 806 },
+          mechanicDamageMult: 1.25,
+          mechanicBurnDamageMult: 1.25,
+        });
+        expect(byTemplate.ignivar_crucible_warden).toMatchObject({
+          maxHp: 9426,
+          weapon: { min: 138, max: 216 },
+          stats: { armor: 1058 },
+        });
+        expect(byTemplate.ignivar_crucible_warden?.mechanicDamageMult).toBeCloseTo(
+          (92.2 * 1.25) / 99.8,
+          8,
+        );
+      }
+      expect(automata.filter((mob) => mob.templateId === IGNIVAR_EMBER_SENTINEL_ID)).toHaveLength(
+        7,
+      );
+      expect(automata.some((mob) => mob.templateId === IGNIVAR_CINDER_ARTIFICER_ID)).toBe(false);
+      const finalGate = assembly.objectIds
+        .map((id) => sim.entities.get(id))
+        .find((entity) => entity?.dungeonId === IGNIVAR_SECOND_WING_ID);
+      if (!finalGate) throw new Error('Final Crucible gate did not spawn');
+      expect(finalGate.templateId).toBe(IGNIVAR_GATE_LOCKED_TEMPLATE);
+      teleport(sim, sim.player.id, finalGate.pos);
+      updateDoorTriggers(sim.ctx, sim.player);
+      expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
+
+      defeatAutomataIn(sim, IGNIVAR_MOLTEN_ASSEMBLY_ID);
+      expect(finalGate.templateId).toBe('dungeon_door');
+      updateDoorTriggers(sim.ctx, sim.player);
       expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_SECOND_WING_ID);
       expect(
         sim.instances.find(
@@ -181,7 +281,7 @@ describe('Ignivar raid progression', () => {
     },
   );
 
-  it('denies second-wing entry independently for a foreign claim and an outside player', () => {
+  it('denies assembly entry independently for a foreign claim and an outside player', () => {
     const { sim, boss } = claimedRaid();
     const source = sim.instances.find(
       (instance) => instance.dungeonId === IGNIVAR_RAID_ARENA_ID && instance.partyKey !== null,
@@ -193,11 +293,11 @@ describe('Ignivar raid progression', () => {
 
     const ownerKey = source.partyKey;
     source.partyKey = 'party:foreign';
-    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id)).toBe(false);
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id)).toBe(false);
     source.partyKey = ownerKey;
 
     teleport(sim, sim.player.id, { x: 0, z: 0 });
-    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id)).toBe(false);
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id)).toBe(false);
   });
 
   it('requires a raid group even after a solo dev tester defeats Ignivar', () => {
@@ -209,7 +309,7 @@ describe('Ignivar raid progression', () => {
     boss.hp = 0;
     sim.tick();
 
-    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id)).toBe(false);
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id)).toBe(false);
     expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
   });
 
@@ -224,6 +324,10 @@ describe('Ignivar raid progression', () => {
     if (!party) throw new Error('Practice raid did not form');
     for (const pid of party.members) {
       expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, pid, true)).toBe(true);
+      expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, pid, true)).toBe(true);
+    }
+    defeatAutomataIn(sim, IGNIVAR_MOLTEN_ASSEMBLY_ID);
+    for (const pid of party.members) {
       expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, pid)).toBe(true);
     }
 
@@ -265,6 +369,10 @@ describe('Ignivar raid progression', () => {
     if (!party) throw new Error('Practice raid did not form');
     for (const pid of party.members) {
       expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, pid, true)).toBe(true);
+      expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, pid, true)).toBe(true);
+    }
+    defeatAutomataIn(sim, IGNIVAR_MOLTEN_ASSEMBLY_ID);
+    for (const pid of party.members) {
       expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, pid)).toBe(true);
       teleport(sim, pid, { x: 0, z: 0 });
     }

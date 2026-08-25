@@ -9,11 +9,36 @@ import {
   IGNIVAR_LAST_INFERNO_AURA_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
 } from '../../sim/encounters/ignivar';
+import {
+  IGNIVAR_CINDER_LANCE_CAST_ID,
+  IGNIVAR_CRUCIBLE_STOMP_ABILITY_ID,
+} from '../../sim/mob/ignivar_trash_automata';
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from '../ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 
 const ENCOUNTER_VFX_SPECS: Readonly<Record<string, AbilityVfxSpec>> = {
+  [IGNIVAR_CINDER_LANCE_CAST_ID]: {
+    c: '#ff6a18',
+    p: 'fire',
+    pw: 1.15,
+    sp: 20,
+    rg: 0,
+    sm: 1,
+    li: 1.8,
+    a: 'burst',
+  },
+  [IGNIVAR_CRUCIBLE_STOMP_ABILITY_ID]: {
+    c: '#ff8a26',
+    p: 'fire',
+    pw: 1.35,
+    sp: 30,
+    rg: 1,
+    vr: 1,
+    sm: 1,
+    li: 2.2,
+    a: 'burst',
+  },
   [IGNIVAR_FRONTAL_CAST_ID]: {
     c: '#ff4a12',
     p: 'fire',

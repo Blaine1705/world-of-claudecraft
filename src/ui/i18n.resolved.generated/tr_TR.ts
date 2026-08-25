@@ -17033,6 +17033,11 @@ export const tr_TR: EnTranslations = {
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
       },
+      "ignivar_molten_assembly": {
+        "name": "Molten Assembly",
+        "enterText": "The Molten Assembly stirs as fresh automata march from the forge lines.",
+        "leaveText": "The last automaton falls silent behind you."
+      },
       "ignivar_inner_crucible": {
         "name": "The Inner Crucible",
         "enterText": "The opened gate leads deeper into the Crucible.",

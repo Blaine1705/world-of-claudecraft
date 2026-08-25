@@ -118,14 +118,15 @@ describe('instance music policy', () => {
     expect(waiting.sowfieldTrack).toBeNull();
   });
 
-  it('selects a distinct ambient cue for each Ignivar raid room', () => {
+  it('selects an authored forge cue for each Ignivar raid room', () => {
     const rooms = [
-      'ignivar_forge_approach',
-      'ignivar_raid_arena',
-      'ignivar_inner_crucible',
+      { room: 'ignivar_forge_approach', zone: 'ignivar_forge_approach' },
+      { room: 'ignivar_raid_arena', zone: 'ignivar_raid_arena' },
+      { room: 'ignivar_molten_assembly', zone: 'ignivar_forge_approach' },
+      { room: 'ignivar_inner_crucible', zone: 'ignivar_inner_crucible' },
     ] as const;
 
-    for (const room of rooms) {
+    for (const { room, zone } of rooms) {
       const origin = instanceOrigin(DUNGEONS[room].index, 0);
       const decision = instanceMusicDecision(
         input({
@@ -134,7 +135,7 @@ describe('instance music policy', () => {
         }),
       );
       expect(decision.instanceId, room).toBe(room);
-      expect(decision.zone, room).toBe(room);
+      expect(decision.zone, room).toBe(zone);
       expect(decision.musicCombat, room).toBe(false);
     }
   });

@@ -317,6 +317,7 @@ import {
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
+import { activeIgnivarTrashMeteorWarning } from './mob/ignivar_trash_automata';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
@@ -2243,8 +2244,11 @@ export class Sim {
   get activeIgnivarMeteors(): ActiveIgnivarMeteorWarning[] {
     const warnings: ActiveIgnivarMeteorWarning[] = [];
     for (const entity of this.entities.values()) {
-      if (entity.templateId !== IGNIVAR_BOSS_ID || !entity.ignivar) continue;
-      warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
+      if (entity.templateId === IGNIVAR_BOSS_ID && entity.ignivar) {
+        warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
+      }
+      const trashWarning = activeIgnivarTrashMeteorWarning(entity);
+      if (trashWarning) warnings.push(trashWarning);
     }
     return warnings;
   }

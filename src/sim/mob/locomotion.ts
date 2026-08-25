@@ -105,6 +105,7 @@ import {
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
 import { idleRng, wanderPause } from './idle_rng';
+import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -567,6 +568,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      if (updateIgnivarTrashAutomaton(ctx, mob)) break;
       // A heroic charge dash in flight owns the mob's movement for the tick
       // (mirrors the player's updateChargeMovement early return); it also ticks
       // the charge cooldown, so this runs before the combat-profile runner on
@@ -1439,6 +1441,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
+  resetIgnivarTrashAutomaton(mob);
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the pull like the timers around it.

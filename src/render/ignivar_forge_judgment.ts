@@ -11,7 +11,13 @@ import {
   ignivarForgeShelterOffsets,
 } from '../sim/ignivar_forge_judgment';
 import { sharedUniforms } from './gfx';
-import { buildIgnivarFireBeam } from './ignivar_fire_beams';
+import {
+  buildIgnivarFireBeam,
+  IGNIVAR_FIRE_BEAM_CORE_NAME,
+  IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME,
+  IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME,
+  IGNIVAR_FIRE_BEAM_OUTER_NAME,
+} from './ignivar_fire_beams';
 
 export const IGNIVAR_JUDGMENT_VISUAL_NAME = 'ignivarForgeJudgment';
 export const IGNIVAR_JUDGMENT_WARNINGS_NAME = 'ignivarForgeJudgmentWarnings';
@@ -321,12 +327,33 @@ function buildCue(index: number): THREE.Group {
   const cue = buildIgnivarFireBeam({
     innerRange: 2.8,
     range: CUE_BEAM_BASE_RANGE,
-    startHalfWidth: 0.62,
-    endHalfWidth: 1.55,
+    startHalfWidth: 0.95,
+    endHalfWidth: 2.35,
   });
   cue.name = `ignivarForgeJudgmentCue:${index}`;
   cue.userData.baseRange = CUE_BEAM_BASE_RANGE;
   forEachCueMaterial(cue, (material) => {
+    material.depthTest = false;
+    material.toneMapped = false;
+    material.userData.ignivarBaseOpacity = material.opacity;
+  });
+  cue.traverse((object) => {
+    if ((object as THREE.Mesh).material) object.renderOrder = 30;
+    const material = (object as THREE.Mesh).material as THREE.MeshBasicMaterial | undefined;
+    if (!material?.color) return;
+    if (object.name === IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME) {
+      material.color.setHex(0xb50000);
+      material.opacity = 0.34;
+    } else if (object.name === IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME) {
+      material.color.setHex(0xff1608);
+      material.opacity = 1;
+    } else if (object.name === IGNIVAR_FIRE_BEAM_OUTER_NAME) {
+      material.color.setHex(0xff2208);
+      material.opacity = 0.18;
+    } else if (object.name === IGNIVAR_FIRE_BEAM_CORE_NAME) {
+      material.color.setHex(0xff5a24);
+      material.opacity = 0.58;
+    }
     material.userData.ignivarBaseOpacity = material.opacity;
   });
   cue.visible = false;
@@ -544,7 +571,7 @@ function syncShelterIdentity(
   if (warningFill) (warningFill.material as THREE.MeshBasicMaterial).color.setHex(0xff1d08);
   if (warningRim) (warningRim.material as THREE.MeshBasicMaterial).color.setHex(0xff3b0a);
   const marker = group.getObjectByName(IGNIVAR_JUDGMENT_SAFE_MARKER_NAME);
-  if (marker) marker.visible = phase === 'active' && safe;
+  if (marker) marker.visible = safe && (phase === 'active' || cueRevealed);
   const dangerScar = group.getObjectByName(IGNIVAR_JUDGMENT_DANGER_SCAR_NAME);
   if (dangerScar) dangerScar.visible = phase === 'warning' && cueRevealed && !safe;
 }
@@ -557,11 +584,11 @@ function syncCue(
 ): void {
   const distance = Math.hypot(offset.x, offset.z);
   cue.rotation.y = Math.atan2(offset.x, offset.z);
-  cue.scale.set(1, 0.72 + intensity * 0.38, distance / CUE_BEAM_BASE_RANGE);
+  cue.scale.set(1, 1.2 + intensity * 0.48, distance / CUE_BEAM_BASE_RANGE);
   cue.visible = visible;
   forEachCueMaterial(cue, (material) => {
     const baseOpacity = Number(material.userData.ignivarBaseOpacity ?? material.opacity);
-    material.opacity = baseOpacity * (0.38 + intensity * 0.62);
+    material.opacity = baseOpacity * (0.82 + intensity * 0.18);
   });
 }
 
@@ -639,7 +666,7 @@ export function syncIgnivarForgeJudgmentVisual(
       syncCue(
         cue,
         offsets[index],
-        phase === 'warning' && index !== safeIndex && cueIntensity > 0.01,
+        phase === 'warning' && index !== safeIndex && cueRevealed,
         cueIntensity,
       );
   }

@@ -92,12 +92,12 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 
 describe('websocket authentication', () => {
   it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(19);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(20);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-19');
-    // The previous layout-gated server accepts only `auth-world-18`, so the new
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-20');
+    // The previous layout-gated server accepts only `auth-world-19`, so the new
     // client discriminator must remain necessarily unrecognizable to it.
-    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-18');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-19');
   });
 
   it('keeps bearer tokens out of the websocket URL', () => {

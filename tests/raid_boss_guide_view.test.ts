@@ -5,6 +5,7 @@ describe('raid boss guide view', () => {
   it('selects the boss from the current raid room and stays absent elsewhere', () => {
     expect(raidBossGuideBossForDungeon('ignivar_forge_approach')).toBe('ignivar');
     expect(raidBossGuideBossForDungeon('ignivar_raid_arena')).toBe('ignivar');
+    expect(raidBossGuideBossForDungeon('ignivar_molten_assembly')).toBe('varkhul');
     expect(raidBossGuideBossForDungeon('ignivar_inner_crucible')).toBe('varkhul');
     expect(raidBossGuideBossForDungeon('hollow_crypt')).toBeNull();
     expect(raidBossGuideBossForDungeon(null)).toBeNull();

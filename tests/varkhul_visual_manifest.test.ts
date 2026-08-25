@@ -25,8 +25,14 @@ describe('expanded Ignivar raid visual manifest', () => {
         walk: 'Walk',
         run: 'Run',
         attack: ['Attack'],
-        attackByAbility: { crucible_quake: 'JumpSlam' },
-        attackTimeScaleByAbility: { crucible_quake: 0.8 },
+        attackByAbility: {
+          crucible_quake: 'JumpSlam',
+          'Crucible Stomp': 'JumpSlam',
+        },
+        attackTimeScaleByAbility: {
+          crucible_quake: 0.8,
+          'Crucible Stomp': 1.35,
+        },
         hit: ['Hit'],
         death: 'Death',
       },

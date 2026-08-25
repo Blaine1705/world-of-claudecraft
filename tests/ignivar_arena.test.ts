@@ -20,6 +20,7 @@ import {
   ignivarConduitHitByFrontal,
   ignivarPointInRotatingRay,
 } from '../src/sim/ignivar_arena';
+import { IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 
@@ -183,9 +184,9 @@ describe('Ignivar raid arena', () => {
       })),
     );
     expect(dungeon.objects?.at(-1)).toMatchObject({
-      name: 'Sealed Inner Crucible Gate',
+      name: 'Sealed Assembly Gate',
       templateId: 'ignivar_raid_gate_locked',
-      dungeonId: 'ignivar_inner_crucible',
+      dungeonId: IGNIVAR_MOLTEN_ASSEMBLY_ID,
       lootable: false,
     });
   });

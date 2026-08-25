@@ -150,7 +150,9 @@ export type {
 // 19 = Shared Pyre moved from Ignivar to Varkhul with a different Normal and
 // Heroic split. Epoch 18 clients would receive the aura but omit its lethal
 // player-following soak warning.
-export const ONLINE_WORLD_LAYOUT_VERSION = 19 as const;
+// 20 = the Ignivar raid gained Molten Assembly as a compiled fourth room.
+// Epoch 19 clients do not know its dungeon index, interior, route, or warnings.
+export const ONLINE_WORLD_LAYOUT_VERSION = 20 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

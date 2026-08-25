@@ -1104,6 +1104,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // at zone expiry (type:'log', telegraph:true). These are the only player-facing
     // emits in this file; re-localized via the sim.rift.detonate* rules.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
+    // Ignivar corridor-only automata spells. Their cast/aura names localize
+    // through AURA_NAME_KEY; scanning keeps future player-facing emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/ignivar_trash_automata.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
     // biting.", "A rare catch! Something gleams on your line.", "You need to
@@ -1667,6 +1670,18 @@ describe('S3 meta-guard: quest_commands.ts stays on the simSrc scan list', () =>
       listBlock.includes(`'${entry}'`),
       `${entry} must stay in the S3 simSrc scan list (the PR 2039 blind-spot fix)`,
     ).toBe(true);
+  });
+});
+
+describe('Ignivar trash spell names stay wired to the sim mechanic matcher', () => {
+  it('localizes the cast and instant stomp names in Spanish', () => {
+    try {
+      setLanguage('es_ES');
+      expect(localizeSimAuraName('Cinder Lance')).toBe('Lanza de ascua');
+      expect(localizeSimAuraName('Crucible Stomp')).toBe('Pisotón del Crisol');
+    } finally {
+      setLanguage('en');
+    }
   });
 });
 

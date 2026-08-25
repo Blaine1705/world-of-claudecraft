@@ -164,6 +164,7 @@ import {
   varkhulWorldfireDamageMaxHp,
   varkhulWorldfireStage,
 } from '../varkhul_worldfire';
+import { walkEncounterActorTo } from './scripted_walk';
 
 export { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 export { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
@@ -367,6 +368,7 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       anvilTimer: VARKHUL_FIRST_ANVIL_SECONDS,
       anvilStrikeIndex: 0,
       anvilStrikeRemaining: 0,
+      anvilWalking: false,
       anvilMeteorCastKey: 0,
       anvilMeteorBatches: [],
       interceptBeamTimer: VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS,
@@ -509,6 +511,7 @@ function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterS
   st.sharedPyreRemaining = 0;
   st.anvilStrikeIndex = 0;
   st.anvilStrikeRemaining = 0;
+  st.anvilWalking = false;
   st.anvilMeteorBatches = [];
   st.interceptBeamCastRemaining = 0;
   st.interceptBeamTargetId = null;
@@ -1155,14 +1158,6 @@ function varkhulWorkWorldPosition(ctx: SimContext, boss: Entity): Vec3 {
   return ctx.groundPos(origin.x + VARKHUL_WORK_LOCAL_POS.x, origin.z + VARKHUL_WORK_LOCAL_POS.z);
 }
 
-function placeVarkhulAtAnvil(ctx: SimContext, boss: Entity): void {
-  const work = varkhulWorkWorldPosition(ctx, boss);
-  boss.pos = { ...work };
-  boss.prevPos = { ...work };
-  boss.facing = VARKHUL_WORK_FACING;
-  boss.prevFacing = VARKHUL_WORK_FACING;
-}
-
 function updateAssemblyForging(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
   st.assemblyForgeHammerTimer -= DT;
   if (st.assemblyForgeHammerTimer > CAST_COMPLETE_EPS) return;
@@ -1183,20 +1178,31 @@ function updateAssemblyForging(ctx: SimContext, boss: Entity, st: VarkhulEncount
   });
 }
 
-function startAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
-  st.majorAbility = 'anvil';
-  st.anvilTimer = VARKHUL_ANVIL_EVERY;
-  st.anvilStrikeIndex = 0;
-  st.anvilMeteorCastKey++;
+function beginAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  st.anvilWalking = false;
   st.anvilStrikeRemaining = VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
   const forge = anvilWorldPosition(ctx, boss);
-  placeVarkhulAtAnvil(ctx, boss);
+  boss.aiState = 'attack';
+  boss.facing = VARKHUL_WORK_FACING;
   boss.castingAbility = VARKHUL_ANVILS_DECREE_CAST_ID;
   boss.castTotal = VARKHUL_ANVILS_DECREE_STRIKES * VARKHUL_ANVILS_DECREE_STRIKE_SECONDS;
   boss.castRemaining = boss.castTotal;
   boss.castTargetId = null;
   boss.castAim = { ...forge };
   boss.channeling = true;
+}
+
+function startAnvilsDecree(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  st.majorAbility = 'anvil';
+  st.anvilTimer = VARKHUL_ANVIL_EVERY;
+  st.anvilStrikeIndex = 0;
+  st.anvilMeteorCastKey++;
+  st.anvilStrikeRemaining = 0;
+  st.anvilWalking = true;
+  clearBossCast(boss);
+  if (walkEncounterActorTo(ctx, boss, varkhulWorkWorldPosition(ctx, boss))) {
+    beginAnvilsDecree(ctx, boss, st);
+  }
 }
 
 function startAnvilMeteors(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
@@ -1297,6 +1303,13 @@ function updateAnvilsDecree(
   players: readonly Entity[],
   speed: number,
 ): void {
+  if (st.anvilWalking) {
+    clearBossCast(boss);
+    if (walkEncounterActorTo(ctx, boss, varkhulWorkWorldPosition(ctx, boss))) {
+      beginAnvilsDecree(ctx, boss, st);
+    }
+    return;
+  }
   st.anvilStrikeRemaining = Math.max(0, st.anvilStrikeRemaining - DT * speed);
   boss.castingAbility = VARKHUL_ANVILS_DECREE_CAST_ID;
   boss.castRemaining =
@@ -1578,7 +1591,7 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   cancelMajorAbility(ctx, boss, st);
   st.assemblyTriggered = true;
   st.assemblyRuneDifficulty = difficulty;
-  st.assemblyPhase = 'adds';
+  st.assemblyPhase = 'idle';
   st.assemblyRemaining = varkhulForgeIntermissionSeconds(difficulty);
   st.assemblyWipeResolved = false;
   st.assemblyDroppedAddIds = [];
@@ -1629,7 +1642,6 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyStunRemaining = 0;
   boss.damageImmune = true;
   boss.knockbackResistance = 1;
-  placeVarkhulAtAnvil(ctx, boss);
   st.assemblyAddIds = [];
   ctx.applyAura(boss, {
     id: VARKHUL_MASTERS_ASSEMBLY_AURA_ID,
@@ -1642,6 +1654,12 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
     school: 'fire',
     encounterOwned: true,
   });
+}
+
+function beginMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
+  st.assemblyPhase = 'adds';
+  boss.aiState = 'idle';
+  boss.facing = VARKHUL_WORK_FACING;
   emitVarkhulCallout(ctx, boss, 'bothPillarsCharging');
   emitVarkhulCallout(ctx, boss, 'portalsOpening');
   queueForgeAddWave(ctx, boss, st, 0);
@@ -1972,8 +1990,11 @@ function updateMastersAssembly(
   players: readonly Entity[],
 ): boolean {
   if (!st.assemblyTriggered || st.assemblyPhase === 'done') return false;
+  if (st.assemblyPhase === 'idle') {
+    if (!walkEncounterActorTo(ctx, boss, varkhulWorkWorldPosition(ctx, boss))) return true;
+    beginMastersAssembly(ctx, boss, st);
+  }
   const forge = anvilWorldPosition(ctx, boss);
-  placeVarkhulAtAnvil(ctx, boss);
   if (st.assemblyPhase === 'stunned') {
     updateAssemblyForgeBeams(ctx, boss, st, players, forge);
     st.assemblyStunRemaining = Math.max(0, st.assemblyStunRemaining - DT);

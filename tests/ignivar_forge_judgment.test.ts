@@ -6,7 +6,10 @@ import {
 } from '../src/render/ability_vfx/encounter_specs';
 import { sharedUniforms } from '../src/render/gfx';
 import { ignivarEncounterVisualPlan } from '../src/render/ignivar_encounter_core';
-import { IGNIVAR_FIRE_BEAM_CORE_NAME } from '../src/render/ignivar_fire_beams';
+import {
+  IGNIVAR_FIRE_BEAM_CORE_NAME,
+  IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME,
+} from '../src/render/ignivar_fire_beams';
 import {
   buildIgnivarForgeJudgmentVisual,
   IGNIVAR_JUDGMENT_FIRE_NAME,
@@ -266,6 +269,44 @@ describe('Ignivar Forge Judgment', () => {
         z: origin.z,
       }),
     ).toBe(false);
+  });
+
+  it('walks to the forge center before Judgment instead of teleporting there', () => {
+    const { sim, boss } = claimedEncounter(7300);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    const origin = instanceOrigin(DUNGEONS.ignivar_raid_arena.index, 0);
+    boss.pos = sim.ctx.groundPos(origin.x + 12, origin.z);
+    boss.prevPos = { ...boss.pos };
+    const distanceBefore = Math.hypot(boss.pos.x - origin.x, boss.pos.z - origin.z);
+    boss.hp = Math.floor(boss.maxHp * IGNIVAR_JUDGMENT_HP_THRESHOLD);
+    let judgmentDraws = 0;
+    sim.rng.setObserver(() => {
+      judgmentDraws += 1;
+    });
+
+    sim.tick();
+
+    const distanceAfterFirstStep = Math.hypot(boss.pos.x - origin.x, boss.pos.z - origin.z);
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('moving');
+    expect(distanceAfterFirstStep).toBeLessThan(distanceBefore);
+    expect(distanceAfterFirstStep).toBeGreaterThan(0.3);
+    expect(boss.castingAbility).toBeNull();
+    expect(judgmentDraws).toBe(2);
+
+    judgmentDraws = 0;
+    for (let tick = 0; tick < 100 && boss.ignivar.forgeJudgmentPhase === 'moving'; tick++) {
+      const before = { ...boss.pos };
+      sim.tick();
+      expect(Math.hypot(boss.pos.x - before.x, boss.pos.z - before.z)).toBeLessThanOrEqual(
+        boss.moveSpeed * DT + 1e-6,
+      );
+    }
+    sim.rng.setObserver(null);
+
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('warning');
+    expect(Math.hypot(boss.pos.x - origin.x, boss.pos.z - origin.z)).toBeLessThanOrEqual(0.3);
+    expect(boss.castingAbility).toBe(IGNIVAR_JUDGMENT_CAST_ID);
+    expect(judgmentDraws).toBe(0);
   });
 
   it('creates three random refuges, marks one safe, burns everywhere else and runs no rays', () => {
@@ -923,7 +964,7 @@ describe('Ignivar Forge Judgment', () => {
       warningGroups.map(
         (group) => group.getObjectByName(IGNIVAR_JUDGMENT_SAFE_MARKER_NAME)?.visible,
       ),
-    ).toEqual([false, false, false]);
+    ).toEqual([false, false, true]);
     expect(
       visual.getObjectByName('ignivarForgeJudgmentCues')?.children.map((cue) => cue.visible),
     ).toEqual([true, true, false]);
@@ -934,10 +975,35 @@ describe('Ignivar Forge Judgment', () => {
       if (index === safeIndex) continue;
       const core = cues[index].getObjectByName(IGNIVAR_FIRE_BEAM_CORE_NAME) as THREE.Mesh;
       const positions = core.geometry.getAttribute('position');
+      let maxAbsX = 0;
       let beamEnd = 0;
       for (let vertex = 0; vertex < positions.count; vertex++) {
+        maxAbsX = Math.max(maxAbsX, Math.abs(positions.getX(vertex)));
         beamEnd = Math.max(beamEnd, positions.getZ(vertex));
       }
+      expect(cues[index].userData.endHalfWidth).toBe(2.35);
+      expect(maxAbsX).toBeCloseTo(2.35 * 0.14, 5);
+      expect(cues[index].scale.y).toBeGreaterThan(1.55);
+      const boundary = cues[index].getObjectByName(
+        IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME,
+      ) as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+      expect(boundary.material.color.getHex()).toBe(0xff1608);
+      expect(boundary.material.opacity).toBeGreaterThanOrEqual(0.82);
+      expect((core.material as THREE.MeshBasicMaterial).color.getHex()).toBe(0xff5a24);
+      expect((core.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.475);
+      const cueMaterials: THREE.Material[] = [];
+      cues[index].traverse((object) => {
+        const renderable = object as THREE.Object3D & {
+          material?: THREE.Material | THREE.Material[];
+        };
+        if (!renderable.material) return;
+        cueMaterials.push(
+          ...(Array.isArray(renderable.material) ? renderable.material : [renderable.material]),
+        );
+        expect(object.renderOrder).toBeGreaterThanOrEqual(30);
+      });
+      expect(cueMaterials.length).toBeGreaterThan(0);
+      expect(cueMaterials.every((material) => material.depthTest === false)).toBe(true);
       const endpoint = cues[index].localToWorld(new THREE.Vector3(0, 0, beamEnd));
       expect(endpoint.x).toBeCloseTo(offsets[index].x, 5);
       expect(endpoint.z).toBeCloseTo(offsets[index].z, 5);
@@ -954,7 +1020,19 @@ describe('Ignivar Forge Judgment', () => {
     );
     expect(
       visual.getObjectByName('ignivarForgeJudgmentCues')?.children.map((cue) => cue.visible),
-    ).toEqual([false, false, false]);
+    ).toEqual([true, true, false]);
+    for (let index = 0; index < cues.length; index++) {
+      if (index === safeIndex) continue;
+      const boundary = cues[index].getObjectByName(
+        IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME,
+      ) as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+      const core = cues[index].getObjectByName(IGNIVAR_FIRE_BEAM_CORE_NAME) as THREE.Mesh<
+        THREE.BufferGeometry,
+        THREE.MeshBasicMaterial
+      >;
+      expect(boundary.material.opacity).toBeCloseTo(0.82, 5);
+      expect(core.material.opacity).toBeCloseTo(0.58 * 0.82, 5);
+    }
     expect(
       warningGroups.map(
         (group) => group.getObjectByName('ignivarForgeJudgmentDangerScar')?.visible,

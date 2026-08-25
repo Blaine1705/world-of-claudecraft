@@ -94,6 +94,7 @@ describe('Ignivar ten-player Normal mechanics smoke', () => {
       .map((raider) => raider.entity)
       .filter((entity) => entity.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID));
     expect(branded).toHaveLength(3);
+    expect(branded.some((player) => tanks.some((tank) => tank.id === player.id))).toBe(false);
 
     for (let i = 0; i < 40; i++) sim.tick();
     for (const player of branded) {

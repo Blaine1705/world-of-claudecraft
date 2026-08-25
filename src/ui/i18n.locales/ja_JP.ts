@@ -13182,6 +13182,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_forge_approach.name': '最初の鍛造の大広間',
   'entities.dungeons.ignivar_forge_approach.enterText': '槌音が最初の鍛造の大広間に響き渡る。',
   'entities.dungeons.ignivar_forge_approach.leaveText': '最初の炉から離れ、再び自由に息をつく。',
+  'entities.dungeons.ignivar_molten_assembly.name': '溶鉄組立場',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    '溶鉄組立場で、新たな自動機が鍛造ラインから行進してくる。',
+  'entities.dungeons.ignivar_molten_assembly.leaveText': '最後の自動機が背後で静まり返る。',
   'entities.dungeons.ignivar_inner_crucible.name': '内部るつぼ',
   'entities.dungeons.ignivar_inner_crucible.enterText': '開かれた門はるつぼのさらなる深部へ続いている。',
   'entities.dungeons.ignivar_inner_crucible.leaveText': 'るつぼの静まり返った深部を後にする。',

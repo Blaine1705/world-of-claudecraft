@@ -17033,6 +17033,11 @@ export const ja_JP: EnTranslations = {
         "enterText": "るつぼの封じられた水面に熱気が揺らめいています。",
         "leaveText": "るつぼを離れ、再び自由に息をつきます。"
       },
+      "ignivar_molten_assembly": {
+        "name": "溶鉄組立場",
+        "enterText": "溶鉄組立場で、新たな自動機が鍛造ラインから行進してくる。",
+        "leaveText": "最後の自動機が背後で静まり返る。"
+      },
       "ignivar_inner_crucible": {
         "name": "内部るつぼ",
         "enterText": "開かれた門はるつぼのさらなる深部へ続いている。",

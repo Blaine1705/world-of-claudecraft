@@ -12,6 +12,7 @@ import {
   IGNIVAR_EMBER_SENTINEL_ID,
 } from '../../sim/ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
+import { IGNIVAR_CRUCIBLE_STOMP_ABILITY_ID } from '../../sim/mob/ignivar_trash_automata';
 import {
   ALL_CLASSES,
   type Entity,
@@ -740,8 +741,14 @@ const IGNIVAR_CRUCIBLE_WARDEN: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
-  attackByAbility: { [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 'JumpSlam' },
-  attackTimeScaleByAbility: { [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 0.8 },
+  attackByAbility: {
+    [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 'JumpSlam',
+    [IGNIVAR_CRUCIBLE_STOMP_ABILITY_ID]: 'JumpSlam',
+  },
+  attackTimeScaleByAbility: {
+    [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 0.8,
+    [IGNIVAR_CRUCIBLE_STOMP_ABILITY_ID]: 1.35,
+  },
   hit: ['Hit'],
   death: 'Death',
 };

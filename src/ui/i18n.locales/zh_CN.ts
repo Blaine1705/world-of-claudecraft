@@ -12951,6 +12951,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_forge_approach.name': '首锻大厅',
   'entities.dungeons.ignivar_forge_approach.enterText': '锻锤的轰鸣在首锻大厅中回荡。',
   'entities.dungeons.ignivar_forge_approach.leaveText': '你离开第一座锻炉，终于又能自由呼吸。',
+  'entities.dungeons.ignivar_molten_assembly.name': '熔火装配间',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    '熔火装配间内，新的自动机从锻造线上列队而出。',
+  'entities.dungeons.ignivar_molten_assembly.leaveText': '最后一具自动机在你身后归于沉寂。',
   'entities.dungeons.ignivar_inner_crucible.name': '内环熔炉',
   'entities.dungeons.ignivar_inner_crucible.enterText': '已打开的大门通往熔炉更深处。',
   'entities.dungeons.ignivar_inner_crucible.leaveText': '你离开熔炉寂静的深处。',

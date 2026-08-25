@@ -720,8 +720,8 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_STRIKE_EVERY).toBe(14);
     expect(IGNIVAR_FORGE_STRIKE_MAX_HP).toBe(0.35);
     expect(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS).toBe(6);
-    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(44);
-    expect(IGNIVAR_FORGE_WAVE_EVERY).toBe(46);
+    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(50);
+    expect(IGNIVAR_FORGE_WAVE_EVERY).toBe(60);
     expect(IGNIVAR_FORGE_WAVE_WINDUP_SECONDS).toBe(2.5);
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
     expect(IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP).toBe(0.35);
@@ -912,16 +912,16 @@ describe('Ignivar encounter', () => {
     expect(forgeWaveCadenceTrace(418)).toEqual(first);
     expect(first).toEqual([
       {
-        startTick: 919,
-        endTick: 1029,
-        facingSlot: 3,
+        startTick: 1101,
+        endTick: 1211,
+        facingSlot: 0,
         windupFrames: 50,
         activeFrames: 60,
       },
       {
-        startTick: 2016,
-        endTick: 2126,
-        facingSlot: 3,
+        startTick: 2380,
+        endTick: 2490,
+        facingSlot: 4,
         windupFrames: 50,
         activeFrames: 60,
       },
@@ -1525,15 +1525,27 @@ describe('Ignivar encounter', () => {
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
   });
 
-  it('marks every available player when fewer than three are present', () => {
+  it('marks every available non-tank and excludes both the active and off tank', () => {
     const { sim, boss } = claimedEncounter();
+    const activeTankMeta = sim.players.get(sim.player.id);
+    if (!activeTankMeta) throw new Error('Active tank metadata is missing');
+    activeTankMeta.talentMods.role = 'tank';
+    const offTank = addEncounterPlayer(sim, boss, 'Off Tank', 'paladin');
+    const offTankMeta = sim.players.get(offTank.id);
+    if (!offTankMeta) throw new Error('Off tank metadata is missing');
+    offTankMeta.talentMods.role = 'tank';
+    const firstNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate One');
+    const secondNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate Two', 'mage');
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
 
     updateIgnivarEncounter(sim.ctx, boss);
 
-    const brand = sim.player.auras.find((a) => a.id === IGNIVAR_BRAND_AURA_ID);
+    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(offTank.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(firstNonTank.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+    const brand = secondNonTank.auras.find((a) => a.id === IGNIVAR_BRAND_AURA_ID);
     expect(brand).toMatchObject({
       kind: 'dot',
       tickInterval: 2,
@@ -1542,14 +1554,49 @@ describe('Ignivar encounter', () => {
     });
     if (!brand) throw new Error('Ignivar brand was not applied');
     expect(isDispellableAura(brand, false)).toBe(false);
-    const hpBeforeTick = sim.player.hp;
+    const hpBeforeTick = secondNonTank.hp;
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 999;
     boss.ignivar.frontalTimer = 999;
+    boss.ignivar.overlapTimer = 999;
     boss.swingTimer = 999;
     for (let i = 0; i < 40; i++) sim.tick();
-    expect(sim.player.hp).toBe(hpBeforeTick - Math.ceil(sim.player.maxHp * 0.05));
+    expect(secondNonTank.hp).toBe(hpBeforeTick - Math.ceil(secondNonTank.maxHp * 0.05));
   });
+
+  it.each([0, 1, 2])(
+    'preserves historical Brand RNG slots with %i eligible non-tanks',
+    (nonTankCount) => {
+      const { sim, boss } = claimedEncounter(8110 + nonTankCount);
+      const activeTankMeta = sim.players.get(sim.player.id);
+      if (!activeTankMeta) throw new Error('Active tank metadata is missing');
+      activeTankMeta.talentMods.role = 'tank';
+      const eligible = Array.from({ length: nonTankCount }, (_, index) =>
+        addEncounterPlayer(sim, boss, `Brand RNG Candidate ${index}`, 'mage'),
+      );
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      boss.ignivar.brandTimer = 0;
+      boss.ignivar.frontalTimer = 999;
+      boss.ignivar.skyfireTimer = 999;
+      boss.ignivar.rotatingRaysTimer = 999;
+      boss.ignivar.forgeWaveTimer = 999;
+      boss.ignivar.forgeStrikeTimer = 999;
+      boss.ignivar.overlapTimer = 999;
+      boss.ignivar.meteorTimer = 999;
+      boss.swingTimer = 999;
+      let draws = 0;
+      sim.rng.setObserver(() => draws++);
+
+      updateIgnivarEncounter(sim.ctx, boss);
+      sim.rng.setObserver(null);
+
+      expect(draws).toBe(Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, 1 + nonTankCount));
+      expect(
+        eligible.filter((player) => player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)),
+      ).toHaveLength(nonTankCount);
+    },
+  );
 
   it('ramps each uncleansed Brand tick from one to three stacks without exceeding the cap', () => {
     const { sim, boss } = claimedEncounter();
@@ -1636,6 +1683,7 @@ describe('Ignivar encounter', () => {
     );
     expect(sim.player.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID)).toMatchObject(
       {
+        kind: 'vuln_source',
         stacks: 1,
         value: IGNIVAR_MOLTEN_ARMOR_PER_STACK,
         remaining: IGNIVAR_MOLTEN_ARMOR_DURATION,
@@ -1757,6 +1805,59 @@ describe('Ignivar encounter', () => {
 
     expect(normalDamage).toBeGreaterThan(0);
     expect(moltenDamage / normalDamage).toBeCloseTo(1.7, 1);
+  });
+
+  it('limits Molten Armor amplification to damage dealt by Ignivar', () => {
+    const moltenEncounter = (seed: number) => {
+      const encounter = claimedEncounter(seed);
+      const { sim, boss } = encounter;
+      sim.player.maxHp = 1_000_000;
+      sim.player.hp = sim.player.maxHp;
+      sim.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 2 };
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      boss.ignivar.brandTimer = 999;
+      boss.ignivar.frontalTimer = 999;
+      boss.ignivar.overlapTimer = 999;
+      boss.swingTimer = 999;
+      boss.ignivar.forgeStrikeTimer = 0;
+      updateIgnivarEncounter(sim.ctx, boss);
+      boss.ignivar.forgeStrikeTimer = 0;
+      updateIgnivarEncounter(sim.ctx, boss);
+      expect(
+        sim.player.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID),
+      ).toMatchObject({ kind: 'vuln_source', sourceId: boss.id, stacks: 2, value: 0.7 });
+      sim.player.hp = sim.player.maxHp;
+      return encounter;
+    };
+
+    const ignivar = moltenEncounter(7442);
+    expect(
+      ignivar.sim.ctx.dealDamage(
+        ignivar.boss,
+        ignivar.sim.player,
+        100,
+        false,
+        'fire',
+        'Ignivar Flame',
+        'hit',
+        true,
+      ),
+    ).toBe(170);
+
+    const foreign = moltenEncounter(7443);
+    expect(
+      foreign.sim.ctx.dealDamage(
+        foreign.conduit,
+        foreign.sim.player,
+        100,
+        false,
+        'fire',
+        'Foreign Flame',
+        'hit',
+        true,
+      ),
+    ).toBe(100);
   });
 
   it('holds a due Forge Strike out of melee, then repeats exactly fourteen seconds after landing', () => {
@@ -1946,7 +2047,7 @@ describe('Ignivar encounter', () => {
     sim.player.auras.push({
       id: IGNIVAR_SOAK_AURA_ID,
       name: 'Shared Pyre',
-      kind: 'vulnerability',
+      kind: 'vuln_source',
       remaining: IGNIVAR_SOAK_CAST_SECONDS,
       duration: IGNIVAR_SOAK_CAST_SECONDS,
       value: 0,

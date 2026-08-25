@@ -585,6 +585,7 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
   'ignivar_forge_approach',
   'ignivar_raid_arena',
+  'ignivar_molten_assembly',
   'ignivar_inner_crucible',
   'wildheart_basin',
   'the_last_keep',

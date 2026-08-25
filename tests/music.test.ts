@@ -602,18 +602,19 @@ describe('world music zone selection', () => {
     );
   });
 
-  it('gives every Ignivar raid room its own ambient composition', () => {
+  it('gives every Ignivar raid room an explicit ambient composition', () => {
     const rooms = [
-      'ignivar_forge_approach',
-      'ignivar_raid_arena',
-      'ignivar_inner_crucible',
+      { room: 'ignivar_forge_approach', zone: 'ignivar_forge_approach' },
+      { room: 'ignivar_raid_arena', zone: 'ignivar_raid_arena' },
+      { room: 'ignivar_molten_assembly', zone: 'ignivar_forge_approach' },
+      { room: 'ignivar_inner_crucible', zone: 'ignivar_inner_crucible' },
     ] as const;
     const themes = buildMusicThemes();
 
-    for (const room of rooms) {
-      expect(dungeonMusicZoneForDungeon(room)).toBe(room);
-      expect(musicZoneForLocation('custom', 'ember', false, true, room)).toBe(room);
-      expect(themes[room]).toBeDefined();
+    for (const { room, zone } of rooms) {
+      expect(dungeonMusicZoneForDungeon(room)).toBe(zone);
+      expect(musicZoneForLocation('custom', 'ember', false, true, room)).toBe(zone);
+      expect(themes[zone]).toBeDefined();
     }
   });
 });

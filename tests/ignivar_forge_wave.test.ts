@@ -1,4 +1,9 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import {
+  buildIgnivarForgeWaveVisual,
+  IGNIVAR_FORGE_WAVE_SAFE_LANES_NAME,
+} from '../src/render/ignivar_forge_wave';
 import {
   IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS,
   IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE,
@@ -64,5 +69,24 @@ describe('Ignivar Forge Wave geometry', () => {
     expect(
       ignivarPointSweptByForgeWave(origin, facing, 9, 10, pointAt(facing + Math.PI / 2, 10.751)),
     ).toBe(false);
+  });
+
+  it('draws both safe-lane wedges with unmistakable green guidance', () => {
+    const visual = buildIgnivarForgeWaveVisual();
+    const lanes = visual.getObjectByName(IGNIVAR_FORGE_WAVE_SAFE_LANES_NAME);
+    expect(lanes?.children).toHaveLength(2);
+    for (const lane of lanes?.children ?? []) {
+      const fill = lane.children[0] as THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+      const edges = lane.children[1] as THREE.LineSegments<
+        THREE.BufferGeometry,
+        THREE.LineBasicMaterial
+      >;
+      expect(fill.material.color.getHex()).toBe(0x66ffb3);
+      expect(fill.material.opacity).toBe(0.32);
+      expect(fill.material.blending).toBe(THREE.NormalBlending);
+      expect(fill.material.depthWrite).toBe(false);
+      expect(edges.material.color.getHex()).toBe(0xc8ffe3);
+      expect(edges.material.opacity).toBe(1);
+    }
   });
 });

@@ -75,6 +75,7 @@ import {
   type IgnivarEncounterState,
   steadyAngleTo,
 } from '../types';
+import { walkEncounterActorTo } from './scripted_walk';
 
 export const IGNIVAR_BRAND_AURA_ID = 'ignivar_brand_of_the_pyre';
 export const IGNIVAR_FRONTAL_CAST_ID = 'Searing Torrent';
@@ -169,6 +170,14 @@ function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false):
   }
   players.sort((a, b) => a.id - b.id);
   return players;
+}
+
+function tankIds(ctx: SimContext): Set<number> {
+  const result = new Set<number>();
+  for (const meta of ctx.players.values()) {
+    if (meta.talentMods.role === 'tank') result.add(meta.entityId);
+  }
+  return result;
 }
 
 function resolveLivingTarget(boss: Entity, players: readonly Entity[]): Entity | null {
@@ -442,13 +451,9 @@ function forgeJudgmentOrigin(ctx: SimContext, boss: Entity): { x: number; z: num
   return instance ? ctx.instanceOriginOf(instance) : boss.pos;
 }
 
-function holdIgnivarAtJudgmentOrigin(ctx: SimContext, boss: Entity): { x: number; z: number } {
-  const origin = forgeJudgmentOrigin(ctx, boss);
-  boss.pos = ctx.groundPos(origin.x, origin.z);
-  boss.prevPos = { ...boss.pos };
+function settleIgnivarForJudgment(boss: Entity): void {
   boss.vx = 0;
   boss.vz = 0;
-  return origin;
 }
 
 function startForgeJudgment(
@@ -458,10 +463,9 @@ function startForgeJudgment(
   players: readonly Entity[],
   heroic: boolean,
 ): void {
-  holdIgnivarAtJudgmentOrigin(ctx, boss);
-  const layoutSlot = ctx.rng.int(0, IGNIVAR_JUDGMENT_LAYOUT_SLOTS - 1);
-  st.forgeJudgmentRotation = (layoutSlot * Math.PI * 2) / IGNIVAR_JUDGMENT_LAYOUT_SLOTS;
-  st.forgeJudgmentSafeIndex = ctx.rng.int(0, 2) as IgnivarJudgmentShelterIndex;
+  const layoutSlot = Math.round(
+    (st.forgeJudgmentRotation * IGNIVAR_JUDGMENT_LAYOUT_SLOTS) / (Math.PI * 2),
+  );
   st.forgeJudgmentPhase = 'warning';
   st.forgeJudgmentRemaining = IGNIVAR_JUDGMENT_DURATION_SECONDS;
   st.forgeJudgmentPulseTimer = IGNIVAR_JUDGMENT_PULSE_SECONDS;
@@ -536,6 +540,7 @@ function finishForgeJudgment(
   st.rotatingRaysTimer = Math.max(st.rotatingRaysTimer, 16);
   st.forgeWaveTimer = Math.max(st.forgeWaveTimer, 20);
   st.soakTimer = Math.max(st.soakTimer, 12);
+  boss.knockbackResistance = 0;
   finishIgnivarCast(boss);
 }
 
@@ -547,7 +552,20 @@ function updateForgeJudgment(
   heroic: boolean,
 ): boolean {
   if (ignivarCanStartForgeJudgment(boss, st)) {
-    startForgeJudgment(ctx, boss, st, players, heroic);
+    const layoutSlot = ctx.rng.int(0, IGNIVAR_JUDGMENT_LAYOUT_SLOTS - 1);
+    st.forgeJudgmentRotation = (layoutSlot * Math.PI * 2) / IGNIVAR_JUDGMENT_LAYOUT_SLOTS;
+    st.forgeJudgmentSafeIndex = ctx.rng.int(0, 2) as IgnivarJudgmentShelterIndex;
+    st.forgeJudgmentPhase = 'moving';
+    boss.knockbackResistance = 1;
+    finishIgnivarCast(boss);
+  }
+  if (st.forgeJudgmentPhase === 'moving') {
+    const origin = forgeJudgmentOrigin(ctx, boss);
+    const destination = ctx.groundPos(origin.x, origin.z);
+    if (walkEncounterActorTo(ctx, boss, destination)) {
+      settleIgnivarForJudgment(boss);
+      startForgeJudgment(ctx, boss, st, players, heroic);
+    }
     return true;
   }
   if (st.forgeJudgmentPhase !== 'warning' && st.forgeJudgmentPhase !== 'active') return false;
@@ -563,7 +581,9 @@ function updateForgeJudgment(
     }
   }
 
-  const origin = holdIgnivarAtJudgmentOrigin(ctx, boss);
+  const origin = forgeJudgmentOrigin(ctx, boss);
+  settleIgnivarForJudgment(boss);
+  boss.aiState = 'idle';
   st.forgeJudgmentRemaining = Math.max(0, st.forgeJudgmentRemaining - DT);
   boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
   boss.castTotal = IGNIVAR_JUDGMENT_DURATION_SECONDS;
@@ -621,10 +641,16 @@ function updateForgeJudgment(
 }
 
 function castBrandOfThePyre(ctx: SimContext, boss: Entity, players: readonly Entity[]): void {
-  const candidates = players.filter((player) => !player.dead);
-  const count = Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, candidates.length);
-  for (let i = 0; i < count; i++) {
-    const picked = ctx.rng.int(0, candidates.length - 1);
+  const tanks = tankIds(ctx);
+  const livingCount = players.filter((player) => !player.dead).length;
+  const candidates = players.filter((player) => !player.dead && !tanks.has(player.id));
+  const drawSlots = Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, livingCount);
+  for (let i = 0; i < drawSlots; i++) {
+    // Brand historically paid one draw for each living target slot. Keep that
+    // stream cost even when tank exclusion leaves a slot with nobody eligible.
+    const roll = ctx.rng.next();
+    if (candidates.length === 0) continue;
+    const picked = Math.floor(roll * candidates.length);
     const player = candidates.splice(picked, 1)[0];
     const existing = player.auras.find(
       (aura) => aura.id === IGNIVAR_BRAND_AURA_ID && aura.sourceId === boss.id,
@@ -709,7 +735,7 @@ function castForgeStrike(ctx: SimContext, boss: Entity, target: Entity): boolean
       ctx.applyAura(target, {
         id: IGNIVAR_MOLTEN_ARMOR_AURA_ID,
         name: 'Molten Armor',
-        kind: 'vulnerability',
+        kind: 'vuln_source',
         remaining: IGNIVAR_MOLTEN_ARMOR_DURATION,
         duration: IGNIVAR_MOLTEN_ARMOR_DURATION,
         value: IGNIVAR_MOLTEN_ARMOR_PER_STACK,
@@ -1442,6 +1468,7 @@ export function resetIgnivarEncounter(ctx: SimContext, boss: Entity): void {
   boss.ignivar = undefined;
   if (rotatingRaysBossFacing !== null) boss.facing = rotatingRaysBossFacing;
   boss.enraged = false;
+  boss.knockbackResistance = 0;
   boss.auras = boss.auras.filter((aura) => aura.id !== IGNIVAR_LAST_INFERNO_AURA_ID);
   boss.castingAbility = null;
   boss.castTotal = 0;

@@ -3432,11 +3432,21 @@ export interface GatherNodeDef {
   tier: number;
 }
 
+export interface DungeonSpawnMinibossTuning {
+  healthMultiplier: number;
+  scale: number;
+  ccImmune?: boolean;
+  slowImmune?: boolean;
+}
+
 export interface DungeonSpawn {
   mobId: string;
   x: number; // relative to instance origin
   z: number;
   facing?: number;
+  /** Per-placement promotion for a recurring trash template. The base template
+   * remains unchanged for ordinary encounter waves that reuse the same mob. */
+  miniboss?: DungeonSpawnMinibossTuning;
 }
 
 export interface DungeonNpcSpawn {
@@ -3490,6 +3500,9 @@ export interface DungeonDef {
   // corridor back; absent = no boss portal (every corridor dungeon).
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
+  /** Optional dungeon id whose mob difficulty tuning applies to this room's
+   *  static spawn list. Rewards and lockouts still use this dungeon's own id. */
+  mobDifficultyTuningId?: string;
   npcs?: DungeonNpcSpawn[];
   objects?: DungeonObjectSpawn[];
   // renderer + collider interior builder key
@@ -4636,6 +4649,11 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTimeLeft?: number; // seconds left in the in-flight dash (undefined/0 = not dashing)
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
+  // Room-gated casts for the Sentinel/Warden packs around Ignivar. Optional so
+  // every unrelated entity and wire snapshot remains shape-identical.
+  ignivarTrashSpellTimer?: number;
+  ignivarTrashSpell?: 'cinderLance';
+  ignivarTrashCastKey?: number;
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
   varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
@@ -5028,7 +5046,7 @@ export interface IgnivarEncounterState {
   apocalypseAddId: number | null;
   apocalypseCastRemaining: number;
   apocalypseResolved: boolean;
-  forgeJudgmentPhase: 'idle' | 'warning' | 'active' | 'done';
+  forgeJudgmentPhase: 'idle' | 'moving' | 'warning' | 'active' | 'done';
   forgeJudgmentRemaining: number;
   forgeJudgmentPulseTimer: number;
   forgeJudgmentRotation: number;
@@ -5076,6 +5094,7 @@ export interface VarkhulEncounterState {
   anvilTimer: number;
   anvilStrikeIndex: number;
   anvilStrikeRemaining: number;
+  anvilWalking: boolean;
   anvilMeteorCastKey: number;
   anvilMeteorBatches: Array<{
     castKey: number;

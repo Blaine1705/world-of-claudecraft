@@ -4,6 +4,7 @@ import {
   resetVarkhulEncounter,
   updateVarkhulAssemblyAutomaton,
   updateVarkhulEncounter,
+  VARKHUL_ANVILS_DECREE_CAST_ID,
   VARKHUL_BOSS_ID,
   VARKHUL_CINDER_ARTIFICER_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
@@ -196,6 +197,84 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(boss.pos.z).toBeCloseTo(origin.z + VARKHUL_WORK_LOCAL_POS.z, 5);
     expect(boss.facing).toBe(VARKHUL_WORK_FACING);
     expect(boss.prevFacing).toBe(VARKHUL_WORK_FACING);
+  });
+
+  it("walks back to the anvil before beginning Anvil's Decree", () => {
+    const { sim, boss } = claimedEncounter(703);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
+    if (!state || !instance) throw new Error('Varkhul fixture missing');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const work = { x: origin.x + VARKHUL_WORK_LOCAL_POS.x, z: origin.z + VARKHUL_WORK_LOCAL_POS.z };
+    boss.pos = sim.ctx.groundPos(work.x + 12, work.z);
+    boss.prevPos = { ...boss.pos };
+    sim.player.pos = sim.ctx.groundPos(boss.pos.x, boss.pos.z - 2);
+    sim.player.prevPos = { ...sim.player.pos };
+    state.frontalTimer = 999;
+    state.cinderOrbsTimer = 999;
+    state.sharedPyreTimer = 999;
+    state.interceptBeamTimer = 999;
+    state.anvilTimer = DT;
+    const distanceBefore = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const distanceAfterFirstStep = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+    expect(state.majorAbility).toBe('anvil');
+    expect(state.anvilWalking).toBe(true);
+    expect(distanceAfterFirstStep).toBeLessThan(distanceBefore);
+    expect(distanceAfterFirstStep).toBeGreaterThan(0.3);
+    expect(boss.castingAbility).toBeNull();
+
+    for (let tick = 0; tick < 100 && state.anvilWalking; tick++) {
+      const before = { ...boss.pos };
+      updateVarkhulEncounter(sim.ctx, boss);
+      expect(Math.hypot(boss.pos.x - before.x, boss.pos.z - before.z)).toBeLessThanOrEqual(
+        boss.moveSpeed * DT + 1e-6,
+      );
+    }
+
+    expect(state.anvilWalking).toBe(false);
+    expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThanOrEqual(0.3);
+    expect(boss.castingAbility).toBe(VARKHUL_ANVILS_DECREE_CAST_ID);
+  });
+
+  it("walks to the forge before opening the Master's Assembly portals", () => {
+    const { sim, boss } = claimedEncounter(704);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
+    if (!state || !instance) throw new Error('Varkhul fixture missing');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const work = { x: origin.x + VARKHUL_WORK_LOCAL_POS.x, z: origin.z + VARKHUL_WORK_LOCAL_POS.z };
+    boss.pos = sim.ctx.groundPos(work.x - 12, work.z);
+    boss.prevPos = { ...boss.pos };
+    sim.player.pos = sim.ctx.groundPos(boss.pos.x, boss.pos.z - 2);
+    sim.player.prevPos = { ...sim.player.pos };
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    const distanceBefore = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const distanceAfterFirstStep = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+    expect(state.assemblyTriggered).toBe(true);
+    expect(state.assemblyPhase).toBe('idle');
+    expect(distanceAfterFirstStep).toBeLessThan(distanceBefore);
+    expect(distanceAfterFirstStep).toBeGreaterThan(0.3);
+    expect(state.assemblyPortalSpawns).toHaveLength(0);
+
+    for (let tick = 0; tick < 100 && state.assemblyPhase === 'idle'; tick++) {
+      const before = { ...boss.pos };
+      updateVarkhulEncounter(sim.ctx, boss);
+      expect(Math.hypot(boss.pos.x - before.x, boss.pos.z - before.z)).toBeLessThanOrEqual(
+        boss.moveSpeed * DT + 1e-6,
+      );
+    }
+
+    expect(state.assemblyPhase).toBe('adds');
+    expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThanOrEqual(0.3);
+    expect(state.assemblyPortalSpawns.length).toBeGreaterThan(0);
   });
 
   it('swings and strikes the anvil with a bounded metal-impact cue throughout the intermission', () => {
@@ -2631,6 +2710,68 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS).toBe(1);
   });
 
+  it('lets Ice Block intercept a forge-pillar beam without passing damage through', () => {
+    const { sim, boss } = claimedEncounter(717);
+    const magePid = sim.addPlayer('mage', 'Ice Block Soaker');
+    sim.setPlayerLevel(20, magePid);
+    const mageMeta = sim.players.get(magePid);
+    const mage = mageMeta ? sim.entities.get(mageMeta.entityId) : undefined;
+    if (!mageMeta || !mage) throw new Error('Ice Block soaker did not spawn');
+    mageMeta.talentMods.role = 'dps';
+    mage.damageImmune = false;
+    mage.resource = mage.maxResource;
+    mage.gcdRemaining = 0;
+    const playerBehind = addEncounterPlayer(sim, boss, 'Player Behind Beam', 'dps');
+    playerBehind.damageImmune = false;
+
+    boss.hp = Math.floor(boss.maxHp * 0.79);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
+    if (!instance) throw new Error('Varkhul instance missing');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const forgeX = origin.x + VARKHUL_FORGE_LOCAL_POS.x;
+    const forgeZ = origin.z + VARKHUL_FORGE_LOCAL_POS.z;
+    mage.pos = sim.ctx.groundPos(forgeX - 14, forgeZ);
+    mage.prevPos = { ...mage.pos };
+    playerBehind.pos = sim.ctx.groundPos(forgeX - 8, forgeZ);
+    playerBehind.prevPos = { ...playerBehind.pos };
+    state.assemblyForgeBeamWarmupRemaining = 0;
+    state.assemblyForgeOverheat = 0.4;
+
+    sim.castAbility('ice_block', magePid);
+    expect(mage.auras.some((aura) => aura.kind === 'stasis')).toBe(true);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyForgeBeamBlockerIds[0]).toBe(mage.id);
+    state.assemblyForgeBeamDamageTimers[0] = DT;
+    const mageHp = mage.hp;
+    const playerBehindHp = playerBehind.hp;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(mage.hp).toBe(mageHp);
+    expect(
+      mage.auras.find((aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID),
+    ).toMatchObject({ stacks: 1, encounterOwned: true });
+    expect(playerBehind.hp).toBe(playerBehindHp);
+    expect(playerBehind.auras.some((aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID)).toBe(
+      false,
+    );
+    expect(state.assemblyForgeBeamBlockerIds[0]).toBe(mage.id);
+    expect(state.assemblyForgeOverheat).toBeLessThan(0.4);
+
+    sim.castAbility('ice_block', magePid);
+    expect(mage.auras.some((aura) => aura.kind === 'stasis')).toBe(false);
+    state.assemblyForgeBeamDamageTimers[0] = DT;
+    const hpAfterCancel = mage.hp;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(hpAfterCancel - mage.hp).toBe(Math.ceil(mage.maxHp * 0.08));
+    expect(
+      mage.auras.find((aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID),
+    ).toMatchObject({ stacks: 2 });
+  });
+
   it.each([
     { heroic: false, resetSeconds: 10 },
     { heroic: true, resetSeconds: 60 },
@@ -2788,6 +2929,9 @@ describe('Varkhul forge pillars and add intermission', () => {
       .map((id) => sim.entities.get(id))
       .find((add) => add?.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
     if (!warden) throw new Error('Crucible Warden did not emerge');
+    expect(warden).toMatchObject({ maxHp: 4011, hp: 4011, scale: 1.7 });
+    expect(warden.ccImmune).toBeUndefined();
+    expect(warden.slowImmune).toBeUndefined();
     state.assemblyForgeBeamWarmupRemaining = 999;
 
     const challenger = addTank(sim, boss, 'WardenChallenger');

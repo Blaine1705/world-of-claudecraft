@@ -5,6 +5,7 @@
 
 import {
   IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
@@ -46,7 +47,9 @@ export function raidBossGuideBossForDungeon(dungeonId: string | null): RaidBossG
   if (dungeonId === IGNIVAR_FORGE_APPROACH_ID || dungeonId === IGNIVAR_RAID_ARENA_ID) {
     return 'ignivar';
   }
-  if (dungeonId === IGNIVAR_SECOND_WING_ID) return 'varkhul';
+  if (dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID || dungeonId === IGNIVAR_SECOND_WING_ID) {
+    return 'varkhul';
+  }
   return null;
 }
 

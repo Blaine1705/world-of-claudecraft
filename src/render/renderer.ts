@@ -45,6 +45,7 @@ import {
   IGNIVAR_ROTATING_RAYS_CAST_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
 } from '../sim/encounters/ignivar';
+import { IGNIVAR_CINDER_LANCE_CAST_ID } from '../sim/mob/ignivar_trash_automata';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import {
@@ -12075,7 +12076,9 @@ export class Renderer {
               ? 'frost'
               : e.castingAbility === 'demon_heal'
                 ? 'shadow'
-                : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
+                : e.castingAbility === IGNIVAR_CINDER_LANCE_CAST_ID
+                  ? 'fire'
+                  : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
             dt,
             // per-ability spec color when the casting ability has one
             this.abilityVfx.sparkleColorFor(e.castingAbility),

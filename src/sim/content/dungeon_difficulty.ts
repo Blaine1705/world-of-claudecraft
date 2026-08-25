@@ -373,7 +373,8 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     healthMultiplier: 5 / 3,
     // Boss: 120k -> 200k. Add overrides pin the requested per-role Heroic
     // progression after the shared level transform: Sentinel +20%, Warden
-    // +25%, Artificer +30%.
+    // +25%, Artificer +30%. Placement-local Warden miniboss health is applied
+    // after this transform, preserving the same Heroic delta.
     healthMultiplierByMob: {
       ignivar_ember_sentinel: (1200 * 1.2) / 1300,
       ignivar_crucible_warden: (1395 * 1.25) / 1505,

@@ -13365,6 +13365,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_forge_approach.name': 'Чертоги Первой Закалки',
   'entities.dungeons.ignivar_forge_approach.enterText': 'Грохот молотов эхом разносится по Чертогам Первой Закалки.',
   'entities.dungeons.ignivar_forge_approach.leaveText': 'Вы отходите от первого горна и снова дышите свободно.',
+  'entities.dungeons.ignivar_molten_assembly.name': 'Раскалённый сборочный цех',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    'В раскалённом цехе новые автоматоны сходят с кузнечных линий.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText': 'Последний автоматон за вами затихает.',
   'entities.dungeons.ignivar_inner_crucible.name': 'Внутреннее Горнило',
   'entities.dungeons.ignivar_inner_crucible.enterText': 'Открытые врата ведут глубже в горнило.',
   'entities.dungeons.ignivar_inner_crucible.leaveText': 'Вы покидаете безмолвные глубины горнила.',

@@ -4,6 +4,7 @@
 
 export const IGNIVAR_FORGE_APPROACH_ID = 'ignivar_forge_approach';
 export const IGNIVAR_RAID_ARENA_ID = 'ignivar_raid_arena';
+export const IGNIVAR_MOLTEN_ASSEMBLY_ID = 'ignivar_molten_assembly';
 export const IGNIVAR_SECOND_WING_ID = 'ignivar_inner_crucible';
 export const IGNIVAR_GATE_LOCKED_TEMPLATE = 'ignivar_raid_gate_locked';
 
@@ -15,12 +16,14 @@ export const VARKHUL_BOSS_ID = 'varkhul_forgefather_of_the_last_flame';
 export const IGNIVAR_APPROACH_GUARDIAN_IDS = [
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
-  IGNIVAR_CINDER_ARTIFICER_ID,
 ] as const;
+
+export const IGNIVAR_TRASH_AUTOMATON_IDS = IGNIVAR_APPROACH_GUARDIAN_IDS;
 
 export const IGNIVAR_RAID_ROOM_IDS = [
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_SECOND_WING_ID,
 ] as const;
 

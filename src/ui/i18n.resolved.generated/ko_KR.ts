@@ -17033,6 +17033,11 @@ export const ko_KR: EnTranslations = {
         "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
         "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
       },
+      "ignivar_molten_assembly": {
+        "name": "용융 조립실",
+        "enterText": "용융 조립실에서 새로운 자동인형들이 단조 라인을 따라 행진합니다.",
+        "leaveText": "마지막 자동인형이 뒤에서 조용히 멈춥니다."
+      },
       "ignivar_inner_crucible": {
         "name": "내부 용광로",
         "enterText": "열린 문이 용광로의 더 깊은 곳으로 이어집니다.",

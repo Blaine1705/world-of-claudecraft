@@ -8,12 +8,19 @@ import {
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
-import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import type {
+  DungeonDef,
+  DungeonSpawn,
+  DungeonSpawnMinibossTuning,
+  ItemDef,
+  MobTemplate,
+} from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 import {
   IGNIVAR_HERALD_CORE_OBJECT_ID,
@@ -1015,13 +1022,48 @@ const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
 ];
 
+const IGNIVAR_WARDEN_MINIBOSS: DungeonSpawnMinibossTuning = {
+  healthMultiplier: 2.35,
+  scale: 2.75,
+  ccImmune: true,
+  slowImmune: true,
+};
+
 const IGNIVAR_FORGE_APPROACH_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -4, z: -22 },
   { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 4, z: -21 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: -4, z: 5 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 4, z: 6 },
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -4, z: 31 },
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: 4, z: 32 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -4, z: 5 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 4, z: 6 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: 31 },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 0,
+    z: 32,
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: 31 },
+];
+
+const IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: -24 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: -22 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: -24 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: 4 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 6 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: 4 },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -5,
+    z: 31,
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 33 },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 5,
+    z: 31,
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
 ];
 
 const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
@@ -1293,11 +1335,11 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       },
       {
         itemId: '',
-        name: 'Sealed Inner Crucible Gate',
+        name: 'Sealed Assembly Gate',
         x: 0,
         z: 31.5,
         templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
-        dungeonId: IGNIVAR_SECOND_WING_ID,
+        dungeonId: IGNIVAR_MOLTEN_ASSEMBLY_ID,
         lootable: false,
       },
     ],
@@ -1306,11 +1348,39 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     enterText: 'Heat shimmers above the sealed waters of the Crucible.',
     leaveText: 'You step away from the Crucible and breathe freely again.',
   },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    name: 'Molten Assembly',
+    index: 13,
+    doorPos: { x: 0, z: 0 },
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -50 },
+    exitOffset: { x: 0, z: -54 },
+    spawns: IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST,
+    mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
+    npcs: [{ npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 }],
+    objects: [
+      {
+        itemId: '',
+        name: 'Sealed Inner Crucible Gate',
+        x: 0,
+        z: 53,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_SECOND_WING_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar_approach',
+    suggestedPlayers: 10,
+    enterText: 'The Molten Assembly stirs as fresh automata march from the forge lines.',
+    leaveText: 'The last automaton falls silent behind you.',
+  },
   [IGNIVAR_SECOND_WING_ID]: {
     id: IGNIVAR_SECOND_WING_ID,
     name: 'The Inner Crucible',
     index: 12,
-    // Internal raid wing reached only through the gate behind Ignivar.
+    // Final raid room reached after the Molten Assembly is cleared.
     doorPos: { x: 0, z: 0 },
     overworldDoor: false,
     guideVisible: false,

@@ -13193,6 +13193,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_forge_approach.name': '첫 단련의 회랑',
   'entities.dungeons.ignivar_forge_approach.enterText': '첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.',
   'entities.dungeons.ignivar_forge_approach.leaveText': '첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다.',
+  'entities.dungeons.ignivar_molten_assembly.name': '용융 조립실',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    '용융 조립실에서 새로운 자동인형들이 단조 라인을 따라 행진합니다.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText': '마지막 자동인형이 뒤에서 조용히 멈춥니다.',
   'entities.dungeons.ignivar_inner_crucible.name': '내부 용광로',
   'entities.dungeons.ignivar_inner_crucible.enterText': '열린 문이 용광로의 더 깊은 곳으로 이어집니다.',
   'entities.dungeons.ignivar_inner_crucible.leaveText': '용광로의 고요한 깊은 곳을 떠납니다.',

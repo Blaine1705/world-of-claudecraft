@@ -3,16 +3,18 @@
 ## Status
 
 Living design for a level-cap, ten-player raid with two boss encounters across
-three linked maps. The complete Normal route remains hidden behind development
+four linked maps. The complete Normal route remains hidden behind development
 access while its tuning, generated character models, and group-play validation
 are unfinished. Public Guide, Finder, loot, deeds, Reliquary pages, and a shared
 raid lockout remain out of scope until that launch pass.
 
 The route is ordered and shares one instance family:
 
-1. Forge Approach: six automata guard three records and the sealed arena gate.
+1. Forge Approach: seven automata guard three records and the sealed arena gate,
+   ending with one enlarged Crucible Warden miniboss and two Ember Sentinels.
 2. Crucible of the Last Spring: Ignivar, Herald of the Last Flame.
-3. Inner Crucible: Varkhul, Forgefather of the Last Flame.
+3. Molten Assembly: three more packs of automata guard the final gate.
+4. Inner Crucible: Varkhul, Forgefather of the Last Flame.
 
 Normal Ignivar's fire, tank swap, frontal, conduit, movement cones, priority add,
 and final burn loops are playable. Varkhul adds a second tank swap, deterministic
@@ -23,8 +25,8 @@ balance remains gated on group playtesting and parse review.
 ## Story
 
 Varkhul tried to preserve the dying Last Spring by binding its memory into
-living metal. The Ember Sentinels, Crucible Wardens, and Cinder Artificers in
-the approach are failed temperings from that work. Ignivar was the first design
+living metal. The Ember Sentinels and Crucible Wardens in the approach are
+failed temperings from that work. Ignivar was the first design
 to endure, forged as Varkhul's herald, seal, and key to the Inner Crucible.
 
 Archivist Maelin Emberward tells this story through the development-only quest
@@ -34,16 +36,33 @@ only after his death and reveals the path to his maker.
 
 ## Forge Approach
 
-The approach is a separate forge-themed map entered before Ignivar's arena. It
-contains three packs, with two automata in each pack and all three automaton
-roles represented. Its north gate opens only after the last required guardian
-dies. The gate state is derived from living instance mobs and survives normal
-player movement between the linked rooms without creating a separate raid save.
+The approach is a separate forge-themed map entered before Ignivar's arena. Its
+first two packs each contain two Ember Sentinels. The final pack contains two
+more Sentinels beside one enlarged, control-immune Crucible Warden miniboss.
+That placed Warden uses an instant Crucible Stomp every twelve seconds when a
+player is within nine yards. The stomp plays the authored `JumpSlam` body
+animation and immediately deals 18% maximum-health Fire damage in its radius;
+it has no cast bar and cannot be interrupted. Unlike the ordinary Wardens
+summoned by Varkhul, these minibosses do not cast Crucible Quake.
+Its north gate opens only after the last required guardian dies. The gate state
+is derived from living instance mobs and survives normal player movement between
+the linked rooms without creating a separate raid save.
 
-The three-room family shares party ownership, difficulty, occupancy, timeout,
+The four-room family shares party ownership, difficulty, occupancy, timeout,
 and atomic release. A player remaining in any linked room keeps the complete
 family alive. Development entry begins in the approach instead of placing the
 player directly beside Ignivar.
+
+## Molten Assembly
+
+Ignivar's death opens the north arena gate into a second automata room. The
+Molten Assembly begins with two packs of three Ember Sentinels. Its final pack
+contains one more Sentinel beside two enlarged, control-immune Crucible Warden
+minibosses. They use the same instant Crucible Stomp behavior as the Approach
+miniboss. Its final gate remains sealed until all nine automata are dead, then
+opens into Varkhul's Inner Crucible. The room inherits the raid family's selected
+difficulty and reuses Varkhul's static mob tuning without creating a separate
+reward or lockout identity.
 
 ## Group and encounter goals
 
@@ -67,7 +86,8 @@ positions, and frontal geometry derive from `src/sim/ignivar_arena.ts`.
 
 ## Normal mechanic outline
 
-1. Ignivar applies the fire mark to three players.
+1. Ignivar applies the fire mark to three non-tank players. Authored active and
+   off-tank roles are excluded and never used as fallback targets.
 2. Each mark starts at one stack, deals 5% maximum health every two seconds, and
    gains a stack after each tick. Damage rises to 10% and then caps at 15% at
    three stacks. The red personal radius intensifies with its stacks.
@@ -137,16 +157,17 @@ recoverable while repeated contact remains lethal.
 
 ## Forge Wave
 
-After a 44-second opening delay, Forge Wave begins a 46-second recharge. Ignivar
+After a 50-second opening delay, Forge Wave begins a 60-second recharge. Ignivar
 locks to one of eight deterministic arena facings and casts for 2.5 seconds. Two
-opposite 30-degree safe lanes remain fixed for the complete cast. On release, a
+opposite 30-degree safe lanes remain fixed for the complete cast and are drawn
+with bright green fills and edges. On release, a
 thin circular fire wall expands across the complete room over three seconds,
 including when Ignivar is tanked against a wall. Crossing the wall outside either
 gap deals 35% maximum health as fire damage and knocks the player directly away
 from Ignivar until arena collision seats them at the wall. Each player can be hit
 only once per wave.
 
-The windup draws both safe lanes at every graphics tier. The release combines a
+The windup draws both green safe lanes at every graphics tier. The release combines a
 white-hot inner flame, a tall orange-red wall, airborne embers, ground glow,
 smoke, flame pillars, impact light, and restrained screen feedback. The wall
 geometry omits both gaps instead of covering them with decorative fire. No
@@ -157,8 +178,9 @@ remove the safe lanes.
 
 Ignivar uses Forge Strike every 14 seconds while its target is in melee range.
 The strike deals 35% maximum health as fire damage, then applies one stack of
-Molten Armor for 26 seconds. Each stack increases all damage received by 35%,
-including the next Forge Strike and Ignivar's melee swings. The intended Normal
+Molten Armor for 26 seconds. Each stack increases damage received from Ignivar
+by 35%, including the next Forge Strike and Ignivar's melee swings, but does not
+amplify damage from other sources. The intended Normal
 response is to swap tanks at two stacks. With a 14-second strike cadence, the
 first tank's mark expires before the complete two-strike rotation returns to
 them. Conduit water only removes Brand of the Pyre and never removes Molten
@@ -189,6 +211,11 @@ the arena center and chooses a random rotation and one safe result through the
 encounter RNG. Three marked meteors fall for four seconds at three well-separated,
 randomized positions. One warning is unmistakably different from the two decoys
 and identifies the refuge the entire raid must share.
+
+The two unsafe results keep wide, bright red floor guides visible throughout the
+warning and memory window. Their cores, boundaries, and floor glow render above
+ordinary arena geometry at every graphics tier. The real refuge remains visibly
+green during the warning so the red route information cannot hide the solution.
 
 The impacts deal no damage because players are expected to enter the marked safe
 refuge during the warning. For the remaining eight seconds, fire covers the whole
@@ -444,13 +471,15 @@ resets.
 
 ## Music
 
-Each map has its own authored ambient composition and versioned MP3 stream:
+The four maps are explicitly routed across three authored ambient compositions
+and versioned MP3 streams:
 
 - Forge Approach uses `ignivar_forge_approach`.
 - Ignivar's arena uses `ignivar_raid_arena`.
+- Molten Assembly reuses `ignivar_forge_approach`.
 - Inner Crucible uses `ignivar_inner_crucible`.
 
-The three cues share a forge leitmotif but restart independently when the player
+The three cues share a forge leitmotif and restart when the player
 crosses into the next map. Ordinary combat continues to use the global combat
 layer rather than adding unrequested boss-specific tracks.
 
@@ -487,15 +516,15 @@ the media manifest. Concept art is not a substitute for the six shipping GLBs.
    visual validation and human group tuning remain.
 9. Judgment of the Forge intermission and the accelerated, alternating Last
    Inferno finale. Done for Normal. Human tuning remains.
-10. Forge Approach layout, three guardian roles, ordered gate, and linked-room
-    instance lifetime. Done for Normal.
+10. Forge Approach and Molten Assembly layouts, two trash automaton roles, ordered
+    gates, and four-room instance lifetime. Done for Normal.
 11. Maelin's three-quest lore chain, three records, and Ignivar core reveal.
     Done for the hidden development route.
 12. Varkhul's Maker's Brand, Cinder Orbs, Red-hot Metal, Shared Pyre, Anvil's Decree,
     Master's Assembly, and Masterpiece Unbound. Done for Normal; human tuning and
     final visual proof remain.
-13. Three authored ambient themes with per-room routing and versioned streams.
-    Done.
+13. Three authored ambient themes with explicit four-room routing and versioned
+    streams. Done.
 14. Tripo model wave for the three automata, Varkhul, his warhammer, and grand
     forge. Concepts and a resumable production recipe are ready; final GLBs and
     in-game previews remain.

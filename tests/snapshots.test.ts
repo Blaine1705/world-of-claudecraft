@@ -40,6 +40,7 @@ import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
+import { IGNIVAR_CINDER_LANCE_CAST_ID } from '../src/sim/mob/ignivar_trash_automata';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
@@ -6243,6 +6244,40 @@ describe('Ignivar meteor snapshot parity', () => {
 
     expect(lastSnap(fc.sent).ignivarMeteors).toEqual([
       expect.objectContaining({ id: `${boss.id}:912:0`, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }),
+    ]);
+  });
+
+  it('rebuilds an in-flight trash Cinder Lance warning through the same snapshot channel', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Trashwire', 'mage');
+    const player = server.sim.entities.get(session.pid)!;
+    const sentinel = createMob(
+      9902,
+      MOBS.ignivar_ember_sentinel,
+      MOBS.ignivar_ember_sentinel.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    sentinel.ignivarTrashSpell = 'cinderLance';
+    sentinel.ignivarTrashCastKey = 404;
+    sentinel.castingAbility = IGNIVAR_CINDER_LANCE_CAST_ID;
+    sentinel.castTotal = 2;
+    sentinel.castRemaining = 1.2;
+    sentinel.castAim = { x: player.pos.x + 6, y: player.pos.y, z: player.pos.z };
+    server.sim.entities.set(sentinel.id, sentinel);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).ignivarMeteors).toEqual([
+      expect.objectContaining({
+        id: `ignivar-trash:${sentinel.id}:404`,
+        x: sentinel.castAim.x,
+        z: sentinel.castAim.z,
+        r: 4,
+        dur: 2,
+        rem: 1.2,
+        lead: 0,
+      }),
     ]);
   });
 });
