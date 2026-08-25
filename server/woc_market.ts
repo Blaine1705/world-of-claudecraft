@@ -35,6 +35,11 @@ import type { WocStuckCustodyClasses } from './woc_market_monitor_types';
 import type { WocMarketReadCache } from './woc_market_read_cache';
 import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
 import {
+  resolveReviewSettlement,
+  type WocReviewResolution,
+  type WocReviewVerdict,
+} from './woc_market_review_resolution';
+import {
   adoptableBondCents,
   antiSnipeExtendedEndMs,
   bondCents,
@@ -3097,6 +3102,20 @@ export class WocMarketService {
     if (!this.cfg.enabled) return refuse('disabled');
     await this.deps.db.clearStrikes(account);
     return { ok: true };
+  }
+
+  async adminResolveReviewSettlement(
+    id: number,
+    verdict: WocReviewVerdict,
+  ): Promise<WocReviewResolution | Refused> {
+    // The kill switch freezes this write like its three siblings: a paid
+    // ruling resumes delivery, exactly the custody movement
+    // WOC_MARKET_ENABLED=0 is pulled to stop. Incident work under a trading
+    // pause stays possible: the pause lever is not the kill switch. The
+    // resolution semantics live in woc_market_review_resolution.ts (the
+    // sibling pattern); this method is only the gate.
+    if (!this.cfg.enabled) return refuse('disabled');
+    return resolveReviewSettlement(this.deps.db, id, verdict);
   }
 
   // -------------------------------------------------------------------------

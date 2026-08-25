@@ -2769,6 +2769,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: null,
   },
   {
+    // The parked-review operator arm: the one WRITE on the dashboard-secret
+    // surface, ruling a review-parked settlement through the transition CAS.
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
+    path: '/internal/woc-market/settlements/:id/resolve',
+    handler: 'internal.ts RouteDef: /internal/woc-market/settlements/:id/resolve',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDashboard,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
     dispatcher: DISPATCH.internal,
     method: 'GET',
     path: '/internal/discord/flex',

@@ -114,7 +114,7 @@ import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
 import {
   configureInternalRuntime,
-  configureInternalWocMarketReads,
+  configureInternalWocMarketOps,
   configureInternalWocMarketStuckRead,
   handleInternalApi,
   type InternalRuntime,
@@ -154,6 +154,9 @@ const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['GET', '/internal/woc-market/p2p-trades'],
   // The stuck-custody monitor readout (woc_market_monitor.ts), same gate.
   ['GET', '/internal/woc-market/stuck'],
+  // The parked-review operator arm: the ONE write on this surface, ruling a
+  // review-parked settlement paid or unpaid through the transition CAS.
+  ['POST', '/internal/woc-market/settlements/:id/resolve'],
 ];
 
 /** Read status/body/content-type/headers off the fakeCtx's FakeRes. */
@@ -197,6 +200,7 @@ async function runRoute(
     body?: unknown;
     headers?: Record<string, string>;
     query?: Record<string, string | string[]>;
+    params?: Record<string, string>;
   } = {},
 ) {
   const route = routeFor(method, path);
@@ -211,6 +215,7 @@ async function runRoute(
     headers: opts.headers,
     body: opts.body,
     query: opts.query,
+    params: opts.params,
   });
   const stack: Middleware[] = [
     withErrors({ surface: route.meta?.envelope }),
@@ -300,8 +305,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 14 routes: the legacy ladder, the RouteDef-only pair, and the dashboard reads', () => {
-    expect(routes).toHaveLength(14);
+  it('registers exactly 15 routes: the legacy ladder, the RouteDef-only pair, and the dashboard ops', () => {
+    expect(routes).toHaveLength(15);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);
@@ -2275,7 +2280,7 @@ describe('the dashboard ops reads: filters and the default window', () => {
   beforeEach(() => {
     seen = [];
     process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
-    configureInternalWocMarketReads({
+    configureInternalWocMarketOps({
       opsListings: async (q) => {
         seen.push(q);
         return { rows: [], hasMore: false };
@@ -2284,6 +2289,7 @@ describe('the dashboard ops reads: filters and the default window', () => {
         seen.push(q);
         return { rows: [], hasMore: false };
       },
+      adminResolveReviewSettlement: async () => ({ ok: true, to: 'confirmed' }),
     });
   });
 
@@ -2427,5 +2433,116 @@ describe('the stuck-custody readout: GET /internal/woc-market/stuck', () => {
     const res = await hit();
     expect(res.status).toBe(404);
     expect(reads).toBe(0);
+  });
+});
+
+describe('the parked-review resolve arm: POST /internal/woc-market/settlements/:id/resolve', () => {
+  const SECRET = 'dashboard-secret';
+  const PATH = '/internal/woc-market/settlements/:id/resolve';
+  let calls: { id: number; verdict: string }[] = [];
+  let outcome:
+    | { ok: true; to: 'confirmed' | 'failed' }
+    | { ok: false; reason: 'disabled' | 'not_found' | 'contended' } = {
+    ok: true,
+    to: 'confirmed',
+  };
+
+  beforeEach(() => {
+    calls = [];
+    outcome = { ok: true, to: 'confirmed' };
+    process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
+    configureInternalWocMarketOps({
+      opsListings: async () => ({ rows: [], hasMore: false }),
+      opsP2pTrades: async () => ({ rows: [], hasMore: false }),
+      adminResolveReviewSettlement: async (id, verdict) => {
+        calls.push({ id, verdict });
+        return outcome;
+      },
+    });
+  });
+
+  afterEach(() => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    resetInternalRuntimeForTests();
+  });
+
+  const resolve = (opts: { id?: string; body?: unknown; secret?: string } = {}) =>
+    runRoute('POST', PATH, {
+      headers: { 'x-woc-dashboard-secret': opts.secret ?? SECRET },
+      params: { id: opts.id ?? '41' },
+      body: opts.body ?? { verdict: 'paid' },
+    });
+
+  it('rules paid through the service and answers the new state', async () => {
+    const res = await resolve();
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      success: true,
+      data: { resolved: 'paid', state: 'confirmed' },
+      error: null,
+    });
+    expect(calls).toEqual([{ id: 41, verdict: 'paid' }]);
+  });
+
+  it('rules unpaid and reports the failed state back', async () => {
+    outcome = { ok: true, to: 'failed' };
+    const res = await resolve({ body: { verdict: 'unpaid' } });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      success: true,
+      data: { resolved: 'unpaid', state: 'failed' },
+      error: null,
+    });
+    expect(calls).toEqual([{ id: 41, verdict: 'unpaid' }]);
+  });
+
+  it('answers 401 on a wrong dashboard secret without touching the service', async () => {
+    const res = await resolve({ secret: 'wrong' });
+    expect(res.status).toBe(401);
+    expect(calls).toEqual([]);
+  });
+
+  it('answers 404 when the secret is unset, hiding the surface', async () => {
+    delete process.env.DASHBOARD_INTERNAL_SECRET;
+    const res = await resolve();
+    expect(res.status).toBe(404);
+    expect(calls).toEqual([]);
+  });
+
+  it('answers 404 when the market is not wired, the same as an unset secret', async () => {
+    resetInternalRuntimeForTests();
+    process.env.DASHBOARD_INTERNAL_SECRET = SECRET;
+    const res = await resolve();
+    expect(res.status).toBe(404);
+  });
+
+  it('refuses a non-integer settlement id before reaching the service', async () => {
+    const res = await resolve({ id: 'abc' });
+    expect(res.status).toBe(400);
+    expect(calls).toEqual([]);
+  });
+
+  it('refuses a verdict outside paid/unpaid before reaching the service', async () => {
+    const res = await resolve({ body: { verdict: 'maybe' } });
+    expect(res.status).toBe(400);
+    expect(calls).toEqual([]);
+  });
+
+  it('maps the kill-switch refusal to 409, matching the operator-write family', async () => {
+    outcome = { ok: false, reason: 'disabled' };
+    const res = await resolve();
+    expect(res.status).toBe(409);
+  });
+
+  it('maps a lost operator race to 409, so the caller re-reads instead of retrying blind', async () => {
+    outcome = { ok: false, reason: 'contended' };
+    const res = await resolve();
+    expect(res.status).toBe(409);
+  });
+
+  it('maps a missing settlement to 404', async () => {
+    outcome = { ok: false, reason: 'not_found' };
+    const res = await resolve();
+    expect(res.status).toBe(404);
   });
 });

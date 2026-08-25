@@ -278,7 +278,7 @@ import {
 } from './http_util';
 import {
   configureInternalRuntime,
-  configureInternalWocMarketReads,
+  configureInternalWocMarketOps,
   configureInternalWocMarketStuckRead,
   handleInternalApi,
 } from './internal';
@@ -2955,7 +2955,7 @@ configureWocMarketRuntime({
 });
 // The dashboard's read-only ops views. Injected here so internal.ts never
 // imports the market route module (and admin/account behind it).
-configureInternalWocMarketReads(wocMarketService);
+configureInternalWocMarketOps(wocMarketService);
 // The sweep duration watchdog: mid-flight visibility for a camping pass
 // (constructed here so the ops readout below can serve it; the sweep shell
 // stamps it once constructed after listen).

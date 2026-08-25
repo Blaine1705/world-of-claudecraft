@@ -150,7 +150,7 @@ function opsQuery(ctx: Ctx): { query: Ctx['query']; page: number; pageSize: numb
 }
 
 async function opsListingsHandler(ctx: Ctx): Promise<void> {
-  const service = wocMarketOpsReads;
+  const service = wocMarketOps;
   // An unwired market is a 404, matching how an unset secret reads: the
   // dashboard learns the surface is unavailable, not that it guessed wrong.
   if (!service) return fail(ctx.res, 404, 'unknown endpoint');
@@ -160,7 +160,7 @@ async function opsListingsHandler(ctx: Ctx): Promise<void> {
 }
 
 async function opsP2pTradesHandler(ctx: Ctx): Promise<void> {
-  const service = wocMarketOpsReads;
+  const service = wocMarketOps;
   if (!service) return fail(ctx.res, 404, 'unknown endpoint');
   const { query, page, pageSize } = opsQuery(ctx);
   const status = readEnum(param(query, 'status'), OFFER_STATUSES, 'all');
@@ -174,6 +174,34 @@ async function opsStuckHandler(ctx: Ctx): Promise<void> {
   // Deliberately parameter-free: every caller gets the same bounded readout,
   // which is what lets the monitor's cached read serve all of them.
   ok(ctx.res, await read());
+}
+
+async function opsResolveSettlementHandler(ctx: Ctx): Promise<void> {
+  const service = wocMarketOps;
+  // An unwired market is a 404, matching the sibling reads above.
+  if (!service) return fail(ctx.res, 404, 'unknown endpoint');
+  const id = Number(ctx.params.id);
+  if (!Number.isInteger(id) || id <= 0 || id > Number.MAX_SAFE_INTEGER) {
+    return fail(ctx.res, 400, 'invalid settlement id');
+  }
+  const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+  const verdict = body.verdict;
+  if (verdict !== 'paid' && verdict !== 'unpaid') {
+    return fail(ctx.res, 400, "verdict must be 'paid' or 'unpaid'");
+  }
+  const out = await service.adminResolveReviewSettlement(id, verdict);
+  if (!out.ok) {
+    // The kill switch freezes this write (the service's own gate); the two
+    // CAS answers are operator truths, not errors in the request.
+    if (out.reason === 'disabled') return fail(ctx.res, 409, 'market disabled');
+    if (out.reason === 'contended') return fail(ctx.res, 409, 'settlement already resolved');
+    return fail(ctx.res, 404, 'settlement not found');
+  }
+  // Dev-channel breadcrumb (no player surface): the ruling is the one manual
+  // state transition in the market, so the log line is the audit trail's
+  // anchor alongside the row's own fail_reason provenance.
+  console.log(`[woc_market] review settlement ${id} resolved ${verdict} -> ${out.to}`);
+  ok(ctx.res, { resolved: verdict, state: out.to });
 }
 
 // Secret-gated server<->bot channel. The Discord bot (a separate process) reads
@@ -730,24 +758,29 @@ export function configureInternalRuntime(runtime: InternalRuntime): void {
 /** Clear the injected runtime so a unit test can install its own fake. */
 export function resetInternalRuntimeForTests(): void {
   internalRuntime = null;
-  wocMarketOpsReads = null;
+  wocMarketOps = null;
   wocMarketStuckRead = null;
 }
 
 /**
- * The market's operator reads, injected at boot like the runtime above.
+ * The market's operator surface, injected at boot like the runtime above:
+ * the two ops reads plus the parked-review resolution arm (the one operator
+ * WRITE this surface carries; it rides the service's own kill-switch gate).
  *
  * Injected rather than imported: reaching woc_market_routes from here drags
  * admin.ts and account.ts in behind it, and this module is loaded by tests that
  * mock server/db down to a bare pool token. A type-only import costs nothing at
  * runtime and keeps that graph flat.
  */
-type WocMarketOpsReads = Pick<WocMarketService, 'opsListings' | 'opsP2pTrades'>;
+type WocMarketOps = Pick<
+  WocMarketService,
+  'opsListings' | 'opsP2pTrades' | 'adminResolveReviewSettlement'
+>;
 
-let wocMarketOpsReads: WocMarketOpsReads | null = null;
+let wocMarketOps: WocMarketOps | null = null;
 
-export function configureInternalWocMarketReads(reads: WocMarketOpsReads): void {
-  wocMarketOpsReads = reads;
+export function configureInternalWocMarketOps(ops: WocMarketOps): void {
+  wocMarketOps = ops;
 }
 
 /** The stuck-custody readout behind GET /internal/woc-market/stuck, injected
@@ -812,13 +845,11 @@ export const routes: RouteDef[] = [
     // claim row; confirm what the buyer holds before hand-delivering).
     // reviewSettlements are over-aged 'confirming' rows the sweep parked
     // (fail_reason confirming_overdue): verify the payment reference on chain
-    // with the service release tooling, then drive the resolution
-    // transitions, review -> confirmed (paid: delivery resumes) or
-    // review -> failed (unpaid: the overdue default pass takes over). NO
-    // in-repo route drives them yet: the operator arms ARRIVE with the
-    // service-side release tooling (phases 09/19 of the hardening program);
-    // until then a review row waits, visibly, and hand SQL is FORBIDDEN
-    // (it bypasses the transition CAS). stuckBonds are
+    // with the service release tooling, then drive the resolution through
+    // POST /internal/woc-market/settlements/:id/resolve below, review ->
+    // confirmed (paid: delivery resumes) or review -> failed (unpaid: the
+    // overdue default pass takes over). Hand SQL stays FORBIDDEN (it
+    // bypasses the transition CAS the resolve route rides). stuckBonds are
     // paid-but-undecided bid bonds past the same bound: still polled, no
     // automatic void (the money may have landed); verify the signature by
     // hand and resolve through the same tooling.
@@ -828,6 +859,19 @@ export const routes: RouteDef[] = [
     meta: INTERNAL_META,
     middleware: [dashboardGate],
     handler: opsStuckHandler,
+  },
+  {
+    // The parked-review operator arm (the runbook's pre-enable gate): rules a
+    // settlement the sweep parked in 'review' as paid or unpaid, through the
+    // same transition CAS every other state move rides. Dashboard-secret
+    // gated beside the stuck readout it acts on; the service's kill switch
+    // freezes it with the other operator writes.
+    method: 'POST',
+    path: '/internal/woc-market/settlements/:id/resolve',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsResolveSettlementHandler,
   },
   {
     method: 'POST',
