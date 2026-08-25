@@ -135,6 +135,12 @@ export interface VisualDef {
   runRef?: number;
   attackTimeScale?: number;
   deathTimeScale?: number;
+  /** Hold the idle base state frozen on the FIRST frame of its clip instead of
+   *  looping it: a downed/dormant look (the forge mech lies still on the ground
+   *  on crawl frame 0 until it moves). Walk/run still play the clip normally, so
+   *  a rig whose idle and walk share one clip animates the moment it starts
+   *  moving. Pairs with the sim's MobTemplate.idleStationary. */
+  idleFrozen?: boolean;
   /** Skip the boot preload sweep (manifestUrls); the asset is fetched on demand
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
@@ -2472,6 +2478,28 @@ export const VISUALS: Record<string, VisualDef> = {
       attackByAbility: { emberkin_felbolt: 'Cast' },
     },
   },
+  // WIP forge mech (mech.glb, Tripo auto-rig on a mixamorig core). It ships only
+  // a CRAWL -> STAND UP -> DIE clip set (no idle/walk/attack yet), so idle/walk/
+  // run all read as the crawl, StandUp doubles as the attack lunge and the spawn
+  // flourish, and Death is the death. yaw/height are first-pass guesses; tune
+  // against the live model.
+  mob_mech: {
+    url: `${CREATURES}/mech.glb`,
+    height: 2.0,
+    // Mixamo/Tripo rig faces +Z natively (unlike the KayKit creatures that need
+    // -PI/2), so no yaw offset: without this the body sat 90 degrees off its
+    // travel direction and read as sideways gliding while crawling.
+    yaw: 0,
+    idleFrozen: true,
+    clips: {
+      idle: 'Crawl',
+      walk: 'Crawl',
+      run: 'Crawl',
+      attack: ['StandUp'],
+      death: 'Death',
+      flourish: 'StandUp',
+    },
+  },
   mob_gloomshade: {
     url: `${CREATURES}/gloomshade_abyssal_guardian.glb`,
     height: 2.6,
@@ -3099,6 +3127,8 @@ for (const propSet of NPC_PROP_SET_IDS) {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // WIP forge mech enemy (crawl/standup/die placeholder rig).
+  derelict_mech: 'mob_mech',
   [IGNIVAR_BOSS_ID]: 'mob_ignivar',
   ignivar_heart_of_the_end: 'mob_ignivar_heart_of_the_end',
   [IGNIVAR_CRUCIBLE_WARDEN_ID]: 'mob_ignivar_crucible_warden',

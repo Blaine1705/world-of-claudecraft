@@ -118,10 +118,16 @@ describe('Ignivar raid progression', () => {
     if (!gate) throw new Error('Forge approach gate did not spawn');
 
     const guardians = guardianMobs(sim);
-    expect(guardians).toHaveLength(6);
-    for (const templateId of IGNIVAR_APPROACH_GUARDIAN_IDS) {
-      expect(guardians.filter((guardian) => guardian.templateId === templateId)).toHaveLength(2);
-    }
+    // Redesigned first-room packs carry 3 Ember Sentinels, 3 Crucible Wardens, and
+    // 2 Cinder Artificers (the derelict-mech crawlers alongside them are not gate
+    // guardians and are excluded by guardianMobs).
+    expect(guardians).toHaveLength(8);
+    const expectedGuardianCounts = [3, 3, 2];
+    IGNIVAR_APPROACH_GUARDIAN_IDS.forEach((templateId, index) => {
+      expect(guardians.filter((guardian) => guardian.templateId === templateId)).toHaveLength(
+        expectedGuardianCounts[index],
+      );
+    });
     expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[0]].arcCleave?.name).toBe('Tempered Sweep');
     expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[1]].bigCast?.castId).toBe('crucible_quake');
     expect(MOBS[IGNIVAR_APPROACH_GUARDIAN_IDS[2]].channelHeal?.name).toBe('Recalibrate');

@@ -12,6 +12,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
+import { updateDerelictBomber } from './derelict_bomber';
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { chaseStalledUnreachable } from './reachability';
@@ -118,6 +119,13 @@ export function updateMobCombatProfile(
       startEvadeHome(mob);
       return 'done';
     }
+  }
+
+  // Suicide-bomber mechs own their whole engaged tick (face-before-move approach,
+  // arming windup, detonation) in place of the normal pursuit + melee swing.
+  if (MOBS[mob.templateId]?.meleeBomb) {
+    updateDerelictBomber(ctx, mob, target, profile);
+    return 'done';
   }
 
   onEngagedTick?.();

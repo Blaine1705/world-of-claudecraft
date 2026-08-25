@@ -807,6 +807,7 @@ function claimInstance(
     applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
+    if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }

@@ -7959,6 +7959,10 @@ export class Sim {
       mob.aiState === 'flee'
     )
       return false;
+    // [dev] /dev noaggro: a designer positioning mobs is invisible to autonomous
+    // pulls, so the pack stays exactly where it spawned. The single aggro choke
+    // point, so this covers proximity, social, and retaliation pulls alike.
+    if (target.kind === 'player' && target.devNoAggro) return false;
     // A quest-gated destructible (e.g. a Broodmother egg) never autonomously pulls a
     // player its own damage gate would refuse: see mob/quest_gated_aggro.ts.
     if (questGateBlocksAggro(this.players, mob, target)) return false;

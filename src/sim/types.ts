@@ -1584,6 +1584,24 @@ export interface MobTemplate {
   // draw count, order, and drawn values are identical for every template, so the
   // parity draw digest never moves.
   wanderHaste?: number;
+  // Dormant-until-pulled: the mob never idle-wanders, so a hand-placed pack holds
+  // its exact spawn position and facing until something aggros it (then it chases
+  // and fights normally). Used by the downed forge mechs, which pair this with the
+  // render-side frozen idle pose (VisualDef.idleFrozen). Skips the idle wander draw
+  // entirely, so it stays put with zero movement.
+  idleStationary?: boolean;
+  // Suicide bomber (the derelict forge mech): the mob crawls to its target,
+  // turning in place to FACE it before it translates (no sideways gliding), and on
+  // reaching melee range it stands up over `windup` seconds (flashing red) before
+  // detonating an AoE blast and dying. Owned by mob/derelict_bomber.ts.
+  meleeBomb?: {
+    windup: number; // seconds standing/arming before the blast (match the StandUp clip)
+    min: number;
+    max: number;
+    radius: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Purely-ambient decoration (the Highwatch stable horses): never hostile,
   // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
   // patch. Spawned RNG-free (like the dummy) so it never perturbs the shared
@@ -3437,6 +3455,10 @@ export interface DungeonSpawn {
   x: number; // relative to instance origin
   z: number;
   facing?: number;
+  // Per-spawn dormancy: this placed mob never idle-wanders, so a hand-authored
+  // pack holds its formation until pulled (see MobTemplate.idleStationary for the
+  // template-level equivalent). Stored on the spawned Entity.idleStationary.
+  idleStationary?: boolean;
 }
 
 export interface DungeonNpcSpawn {
@@ -4658,6 +4680,17 @@ export interface Entity extends ClientMirroredEntityFields {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
+  /** Dev "no-aggro" mode: mobs never autonomously pull this player, so a designer
+   *  can walk among freshly spawned mobs to verify placement without scattering
+   *  them. Toggled by /dev noaggro (gated by ALLOW_DEV_COMMANDS); never persisted. */
+  devNoAggro?: boolean;
+  /** Per-spawn dormancy override (DungeonSpawn.idleStationary): this mob never
+   *  idle-wanders even if its template would. Set at spawn; see mob/locomotion.ts. */
+  idleStationary?: boolean;
+  /** Suicide-bomber fuse (MobTemplate.meleeBomb): seconds remaining in the arming
+   *  windup after the mech reached melee range. >0 means it is standing up and
+   *  about to detonate; owned by mob/derelict_bomber.ts. */
+  bombWindup?: number;
   /** Dev-only invulnerability used by /dev immortal and profiler tooling so
    *  combat presentation remains active without /dev god's outgoing damage
    *  multiplier. Server-private and never persisted. */

@@ -973,6 +973,21 @@ export class CharacterVisual {
         }
         if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
       }
+      // Frozen idle pose (the downed forge mech): hold the idle clip on its first
+      // frame while standing still, and release it the moment we leave idle. Done
+      // here, not via fadeTo, because a rig whose idle and walk share one clip
+      // (mech.glb's Crawl) never edges the action, so fadeTo would no-op: the same
+      // action must be paused in idle and un-paused (locomotionTimeScale drives it)
+      // once moving. One-shots (StandUp attack, Death) own the rig via
+      // currentIsOneShot and are left untouched.
+      if (this.def.idleFrozen && !this.currentIsOneShot && this.current) {
+        if (this.baseState === 'idle') {
+          this.current.paused = true;
+          this.current.time = 0;
+        } else if (this.current.paused) {
+          this.current.paused = false;
+        }
+      }
     }
 
     // Zero-weight watchdog. The fades above only run on a base-state EDGE, so

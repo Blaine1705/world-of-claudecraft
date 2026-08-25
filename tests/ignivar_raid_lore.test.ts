@@ -210,19 +210,25 @@ describe('Ignivar raid lore content', () => {
       const mobs = instance.mobIds
         .map((id) => sim.entities.get(id))
         .filter((entity): entity is Entity => entity?.templateId === templateId);
-      expect(mobs).toHaveLength(2);
+      // The redesigned first-room packs carry 3 Sentinels, 3 Wardens, 2 Artificers.
+      // The memory reveal is keyed on the LAST construct of a type dying, so drive
+      // it off the actual pack count rather than a fixed pair.
+      expect(mobs.length).toBeGreaterThanOrEqual(2);
       sim.events = [];
 
-      sim.ctx.handleDeath(mobs[0], sim.player);
-      expect(
-        sim.events.some(
-          (event: { type: string; text?: string }) =>
-            event.type === 'log' &&
-            event.text === IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE[templateId],
-        ),
-      ).toBe(false);
+      // Every kill before the last of its type is silent.
+      for (let index = 0; index < mobs.length - 1; index++) {
+        sim.ctx.handleDeath(mobs[index], sim.player);
+        expect(
+          sim.events.some(
+            (event: { type: string; text?: string }) =>
+              event.type === 'log' &&
+              event.text === IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE[templateId],
+          ),
+        ).toBe(false);
+      }
 
-      sim.ctx.handleDeath(mobs[1], sim.player);
+      sim.ctx.handleDeath(mobs[mobs.length - 1], sim.player);
       expect(
         sim.events.filter(
           (event: { type: string; text?: string }) =>

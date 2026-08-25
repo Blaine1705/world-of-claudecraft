@@ -39,6 +39,36 @@ export const DUNGEON_KEEPSAKE_ITEMS: Record<string, ItemDef> = {
 };
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
+  // WIP forge mech enemy: a downed automaton that lies still on the ground until
+  // pulled, then crawls, lurches up to strike, and dies (visual mob_mech /
+  // mech.glb). idleStationary keeps it motionless in its pack formation; the
+  // render side freezes it on the first crawl frame (VisualDef.idleFrozen).
+  // Placeholder stats, tune per role.
+  derelict_mech: {
+    id: 'derelict_mech',
+    name: 'Derelict Mech',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 400,
+    hpPerLevel: 60,
+    dmgBase: 24,
+    dmgPerLevel: 4.5,
+    attackSpeed: 2.6,
+    armorPerLevel: 40,
+    moveSpeed: 6.5,
+    aggroRadius: 14,
+    hardLeashRadius: 18,
+    idleStationary: true,
+    // Suicide bomber: crawl to the target, stand up over ~the StandUp clip length
+    // (2.8s) flashing red, then detonate an AoE fire blast and die. Placeholder
+    // blast numbers, tune per role.
+    meleeBomb: { windup: 2.8, min: 1100, max: 1400, radius: 8, name: 'Meltdown', school: 'fire' },
+    loot: [],
+    scale: 0.8,
+    color: 0x8a8f96,
+  },
   [VARKHUL_BOSS_ID]: {
     id: VARKHUL_BOSS_ID,
     name: 'Varkhul, Forgefather of the Last Flame',
@@ -1015,13 +1045,36 @@ const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
 ];
 
+// First-room packs: five tight, inward-facing huddles up the Halls of the First
+// Tempering, hand-placed from live in-world coordinates (instance origin
+// (116200, -1250) subtracted to local). "crawler" = derelict_mech. Each pack is
+// a rough circle ~3 to 4 yards across, every mob facing the pack centre. Every
+// mob is idleStationary so the whole formation holds until pulled (the mechs
+// already are via their template; the guardians take the per-spawn flag).
 const IGNIVAR_FORGE_APPROACH_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -4, z: -22 },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 4, z: -21 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: -4, z: 5 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 4, z: 6 },
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -4, z: 31 },
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: 4, z: 32 },
+  // Pack 1 (2 crawlers + 1 Ember Sentinel), center local (-16, -15)
+  { mobId: 'derelict_mech', x: -16, z: -17, facing: 0 },
+  { mobId: 'derelict_mech', x: -14.3, z: -14, facing: -2.09 },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -17.7, z: -14, facing: 2.09, idleStationary: true },
+  // Pack 2 (2 crawlers + 1 Crucible Warden), center local (13, 4)
+  { mobId: 'derelict_mech', x: 13, z: 2, facing: 0 },
+  { mobId: 'derelict_mech', x: 14.7, z: 5, facing: -2.09 },
+  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 11.3, z: 5, facing: 2.09, idleStationary: true },
+  // Pack 3 (1 Cinder Artificer + 2 crawlers), center local (-21, 9)
+  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -21, z: 7, facing: 0, idleStationary: true },
+  { mobId: 'derelict_mech', x: -19.3, z: 10, facing: -2.09 },
+  { mobId: 'derelict_mech', x: -22.7, z: 10, facing: 2.09 },
+  // Pack 4 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel), center local (19, 42)
+  { mobId: 'derelict_mech', x: 19, z: 39.7, facing: 0 },
+  { mobId: 'derelict_mech', x: 21.3, z: 42, facing: -1.57 },
+  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 19, z: 44.3, facing: -3.14, idleStationary: true },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 16.7, z: 42, facing: 1.57, idleStationary: true },
+  // Pack 5 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel + 1 Cinder Artificer), center local (-22, 42)
+  { mobId: 'derelict_mech', x: -22, z: 39.4, facing: 0 },
+  { mobId: 'derelict_mech', x: -19.5, z: 41.2, facing: -1.26 },
+  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: -20.5, z: 44.1, facing: -2.51, idleStationary: true },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -23.5, z: 44.1, facing: 2.51, idleStationary: true },
+  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -24.5, z: 41.2, facing: 1.26, idleStationary: true },
 ];
 
 const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
