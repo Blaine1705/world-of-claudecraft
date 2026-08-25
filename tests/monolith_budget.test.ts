@@ -227,7 +227,10 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 7 for the guildRoster IWorld stub (guilds are online-only, so the
     // offline arm resolves null; the sanctioned both-worlds seam). Exact
     // count, zero slack.
-    ceiling: 12531,
+    // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
+    // sim arm on main while the release pin sat at zero slack (the known
+    // both-arms compound). Exact merged count, zero slack.
+    ceiling: 12538,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -245,7 +248,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count after the controller-tutorial
     // merge (its controller-setting dispatch extraction shrinks main.ts;
     // the ratchet follows the merged file down). Exact count, zero slack.
-    ceiling: 11567,
+    // Re-pinned to the exact merged count of the v0.39.3 main back-merge
+    // (the utc_day import consolidation shed one line).
+    ceiling: 11566,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
