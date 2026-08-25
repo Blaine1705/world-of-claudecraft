@@ -139,14 +139,56 @@ const ALLOW_V07_SLASH: ReadonlySet<string> = new Set<string>(
 // locale to pass the PR gate.
 const RELEASE_TIER = process.env.I18N_RELEASE_TIER === '1';
 
+// The three client-side matchers that re-localize the English src/sim and server
+// emit. They no longer share one file: localizeErrorText was extracted to its own
+// registered pure core (src/ui/error_text_i18n_core.ts) when hud.ts hit its
+// monolith ceiling, while localizeSystemText and localizeLootText are still Hud
+// methods. Every source-text guard below anchors on this table rather than
+// assuming hud.ts, so the next extraction is a one-line move here.
+const MATCHER_ARMS = [
+  {
+    fn: 'localizeErrorText',
+    file: 'src/ui/error_text_i18n_core.ts',
+    signature: 'export function localizeErrorText(',
+  },
+  {
+    fn: 'localizeSystemText',
+    file: 'src/ui/hud.ts',
+    signature: 'private localizeSystemText(text: string): string {',
+  },
+  {
+    fn: 'localizeLootText',
+    file: 'src/ui/hud.ts',
+    signature: 'private localizeLootText(text: string): string {',
+  },
+] as const;
+
+// The arm's source body, brace-matched from its signature so a class method and a
+// module-level function read identically.
+const matcherArmBody = (arm: (typeof MATCHER_ARMS)[number]): string => {
+  const src = fs.readFileSync(path.resolve(process.cwd(), arm.file), 'utf8');
+  const start = src.indexOf(arm.signature);
+  if (start < 0) throw new Error(`arm ${arm.fn} not found in ${arm.file}`);
+  let depth = 0,
+    i = src.indexOf('{', start);
+  for (; i < src.length; i++) {
+    if (src[i] === '{') depth++;
+    else if (src[i] === '}') {
+      depth--;
+      if (depth === 0) break;
+    }
+  }
+  return src.slice(start, i + 1);
+};
+
 // --- B1: the log-event path must localize server-sent friends/guild/who/world messages ---
 describe('B1: server log-type messages localize through the log path', () => {
   it('all three hud matchers call AND return the localizeServerText fallback', () => {
-    const src = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
-    for (const fn of ['localizeSystemText', 'localizeErrorText', 'localizeLootText']) {
-      const start = src.indexOf(`private ${fn}(`);
-      expect(start, `${fn} not found`).toBeGreaterThan(0);
-      const body = src.slice(start, src.indexOf('\n  private ', start + 1));
+    for (const arm of MATCHER_ARMS) {
+      const fn = arm.fn;
+      // matcherArmBody throws (loudly, naming the arm) when the signature is
+      // missing, so the slice below is non-empty by construction.
+      const body = matcherArmBody(arm);
       // Must both compute the fallback and return it (not just mention the symbol).
       expect(body, `${fn} must call localizeServerText`).toContain('localizeServerText(text)');
       expect(
@@ -569,6 +611,30 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('matches every tide-pool summon emit (crab_summon + the Mister Crabs yell)', () => {
+    // The four emits added with the island miniboss: the three REASON_MESSAGE
+    // toasts (src/sim/interactions/crab_summon.ts) and the summon yell
+    // (src/sim/encounters/quest_summon.ts). Each must round-trip through the
+    // matcher, or every non-English locale ships raw English.
+    setLanguage('de_DE');
+    // The toasts route through EXACT rows (English until the release fill,
+    // so only non-null is asserted); the yell has real per-locale rows in
+    // QUEST_EXTRA and must come back re-localized.
+    const toasts = [
+      'You have what you came for. Tidewarden Nel waits on your prize.',
+      'Carry the lure to the tide pool west of the wreck line.',
+      'Mister Crabs already prowls the pool!',
+    ];
+    for (const text of toasts) {
+      expect(localizeSimText(text), text).not.toBeNull();
+    }
+    const yell = 'Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"';
+    const out = localizeSimText(yell);
+    expect(out).not.toBeNull();
+    expect(out).not.toBe(yell);
+    setLanguage('en');
+  });
+
   it('localizes the flavor aura name Tamed and reuses talent/ability titles', () => {
     setLanguage('de_DE');
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
@@ -932,10 +998,10 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
 // --- S3: DRIFT GUARD — enumerate EVERY player-facing emit in src/sim/sim.ts and prove
 // each is recognized by the real client matcher for its event type. Unlike S1 (a curated
 // sample), this parses sim.ts at test time, so a NEW unhandled `text:`/this.error string
-// fails CI automatically. Routes through the real hud arm matchers (extracted from
-// hud.ts source) + the real localizeServerText/localizeSimText fallbacks. ---
+// fails CI automatically. Routes through the real client arm matchers (each read from
+// the file MATCHER_ARMS names, hud.ts or the extracted error-text core) + the real
+// localizeServerText/localizeSimText fallbacks. ---
 describe('S3: every sim.ts emit is recognized (drift guard)', () => {
-  const hudSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
   // Extraction sessions moved player-facing emits out of sim.ts into sibling sim
   // modules: C1 -> src/sim/combat/damage.ts (the frenzy proc + pet "<name> dies."
   // line), C4a -> src/sim/combat/casting_lifecycle.ts (the cast guards in castAbility/
@@ -1008,6 +1074,23 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
     // keeps any FUTURE literal emit added here under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/portals.ts'), 'utf8'),
+    // The tutorial greeting (spawn greeting event + the startTutorial ferry):
+    // the ferry log line and the two gate denials are matched by the sim_i18n
+    // EXACT map (log.provingFerry, error.tutorialFromHere,
+    // error.tutorialOutleveled); scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/greeting.ts'), 'utf8'),
+    // The clicked ferry bells (tutorial island): the two crossing lines and
+    // the combat denial are matched by the sim_i18n EXACT map
+    // (log.provingEnter, log.provingLeave, error.tutorialFromHere).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/ferry_bell.ts'), 'utf8'),
+    // The death lesson (tutorial island): the rite's kneel line and refusal,
+    // and the two resurrection notes, matched by the sim_i18n EXACT map
+    // (log.passingStoneKneel, error.passingStoneCold, log.longWalkCorpse,
+    // log.longWalkHealer). Scanning keeps future literal emits guarded.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/death_lesson.ts'), 'utf8'),
+    // The ability drill (tutorial island): it emits no literals of its own
+    // (credit rides emitQuestProgress), and scanning keeps that true.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/tutorial/ability_drill.ts'), 'utf8'),
     // Swim fatigue (the Hollow's open-sea turn-back): the warning literal is
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
@@ -1042,6 +1125,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // the "<name> awakens!" summon log; the boss yells are variable-routed chat, not
     // scanned). Literals are byte-identical after the move so their matchers are unchanged.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/nythraxis.ts'), 'utf8'),
+    // N2: the shared quest-mob summon, moved verbatim OUT of nythraxis.ts (the
+    // "<name> awakens!" log and the four boss yells live here now, so the guard
+    // follows the emits to their new home instead of going quietly blind).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/encounters/quest_summon.ts'), 'utf8'),
+    // N3: the tide-pool summon's refusal toasts (crab_summon.ts REASON_MESSAGE)
+    // plus any future island summon emits.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/interactions/crab_summon.ts'), 'utf8'),
     // H1 (#1141): the interaction command bodies (corpse harvest + loot/pickup). The two
     // corpse-harvest deny strings ("That corpse has nothing to harvest." / "This corpse
     // has already been harvested.") have their ONLY emitter occurrences here; the file's
@@ -1222,20 +1312,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   // fallback in recognized() below.
   const serverSrc = fs.readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
 
-  const armBody = (name: string): string => {
-    const start = hudSrc.indexOf(`private ${name}(text: string): string {`);
-    if (start < 0) throw new Error(`arm ${name} not found`);
-    let depth = 0,
-      i = hudSrc.indexOf('{', start);
-    for (; i < hudSrc.length; i++) {
-      if (hudSrc[i] === '{') depth++;
-      else if (hudSrc[i] === '}') {
-        depth--;
-        if (depth === 0) break;
-      }
-    }
-    return hudSrc.slice(start, i + 1);
-  };
   const armRegexes = (body: string): RegExp[] => {
     const out: RegExp[] = [];
     const re = /\/((?:\\.|[^/\\\n])+)\/([gimsuy]*)\.exec\(text\)/g;
@@ -1267,9 +1343,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     return keys;
   };
   const arms: Record<string, { exact: Set<string>; regs: RegExp[] }> = {};
-  for (const n of ['localizeErrorText', 'localizeSystemText', 'localizeLootText']) {
-    const b = armBody(n);
-    arms[n] = { exact: armExactKeys(b), regs: armRegexes(b) };
+  for (const arm of MATCHER_ARMS) {
+    const b = matcherArmBody(arm);
+    arms[arm.fn] = { exact: armExactKeys(b), regs: armRegexes(b) };
   }
 
   const sub = (expr: string): string => {
@@ -1430,8 +1506,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'party.ts',
       'ready_check.ts',
       'trade.ts',
-      'vale_cup.ts',
-      'vale_cup_bots.ts',
       'yumi.ts',
     ]);
     expect(

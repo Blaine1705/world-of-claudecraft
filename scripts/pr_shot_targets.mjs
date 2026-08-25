@@ -411,11 +411,36 @@ async function clearReliquaryPins(page) {
  *  every rig shoots the lowest preset so shots stay comparable across
  *  machines; only deliberate gfx-comparison shots keep their own preset).
  *  Merges over any existing woc_settings so unrelated persisted options
- *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. */
+ *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. The applied
+ *  marker makes this an explicit choice, so first-run detection cannot replace
+ *  the capture tier after boot. */
 async function seedLowGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
-    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
   );
+}
+
+/** Deliberate HIGH comparison leg for identity-versus-bloom evidence. */
+async function seedHighGraphicsPreset(page) {
+  await page.evaluateOnNewDocument(
+    `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 3; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
+async function seedClassicOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await themeSeed('classic')(page);
+}
+
+async function seedClassicOnHighPreset(page) {
+  await seedHighGraphicsPreset(page);
+  await themeSeed('classic')(page);
+}
+
+/** Parchment on the low preset: the light-panel acid test for inspect and picker metal. */
+async function seedParchmentOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await themeSeed('parchment')(page);
 }
 
 /** The tracker variants need BOTH pre-load seeds: the pin-store wipe and the
@@ -574,6 +599,33 @@ const fakePadSeed = async (page) => {
   );
 };
 
+// Pin the page's clock to a LOCAL Saturday noon before the app boots, so the
+// weekly Double Honor surfaces render their active state through the real code
+// path (currentResetDay reads the local clock; src/sim/pvp/honor_event.ts turns
+// Saturday reset days into the event). A Date subclass shim rather than a sim
+// poke: main.ts re-supplies resetDay every frame, so a staged write would be
+// overwritten one frame later. String form for the usual tsx keepNames reason.
+const saturdayClockSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `(() => {
+      const RealDate = Date;
+      const offset = new RealDate(2026, 7, 22, 12, 0, 0).getTime() - RealDate.now();
+      class SaturdayDate extends RealDate {
+        constructor(...args) {
+          if (args.length === 0) super(RealDate.now() + offset);
+          else super(...args);
+        }
+        static now() {
+          return RealDate.now() + offset;
+        }
+      }
+      SaturdayDate.UTC = RealDate.UTC;
+      SaturdayDate.parse = RealDate.parse;
+      window.Date = SaturdayDate;
+    })();`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -590,6 +642,9 @@ export const TARGETS = [
     ],
     variants: [
       { key: 'queue-window', scene: 'queue' },
+      // The same queue window under a Saturday clock: the weekly Double Honor
+      // chip is only honest evidence when the event decision itself ran.
+      { key: 'queue-window-double-honor', scene: 'queue', beforeLoad: saturdayClockSeed },
       // First staged scene on purpose: the match seating just placed the
       // player on their real spawn point, and the DEFAULT chase camera is the
       // honest witness for the spawn-clearance contract (no camDist override).
@@ -800,6 +855,26 @@ export const TARGETS = [
       }
       await wait(2600); // let the field build + banners settle
       return {};
+    },
+  },
+  {
+    key: 'event-calendar',
+    label: 'Event Calendar window: recurring system-event rows',
+    when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],
+    // Saturday clock on purpose: the month grid rings "today" on a Saturday,
+    // the day both weekly PvP rows (Arena Clash, Double Honor Day) land on.
+    variants: [{ key: 'calendar-window', beforeLoad: saturdayClockSeed }],
+    async capture(page) {
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        game.hud.toggleCalendar();
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#calendar-window');
+      if (!ready) return { skip: 'the calendar window never became visible' };
+      return { clip: '#calendar-window' };
     },
   },
   {
@@ -1374,6 +1449,7 @@ export const TARGETS = [
         const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
         const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
         await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
           path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/weapon-vfx-shed-${variant.key}-closeup.png`,
           clip: { x, y, width, height },
         });
@@ -1481,6 +1557,7 @@ export const TARGETS = [
       const panelExists = await page.evaluate(
         () => !!document.querySelector('#target-auras-window'),
       );
+      // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
       const allowMissingPanel = process.env.PR_SHOTS_ALLOW_MISSING_TARGET_AURAS === '1';
       if (!panelExists && !allowMissingPanel) {
         throw new Error('target aura window is unavailable');
@@ -1847,6 +1924,71 @@ export const TARGETS = [
       // Past the settle ripple (160ms + capped stagger) so the shot is stable.
       await wait(900);
       return { clip: '#bags' };
+    },
+  },
+  {
+    key: 'vendor-sell-confirm',
+    label:
+      'Vendor: a plain click on a valuable item confirms before selling; junk still sells instantly',
+    when: ['ui/bags_view', 'ui/bags_window'],
+    // On a base checkout the click sells the sword outright (no dialog exists yet),
+    // so the SAME recipe shoots the honest BEFORE state (the bag empties on the
+    // spot). On the fix, the same click opens the confirm prompt instead and the
+    // sword stays put until the player actually confirms.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'quartermaster_bree',
+        );
+        if (!vendor) return { ok: false, reason: 'no vendor entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        // A common-quality sword (needs confirm) beside a poor-quality junk stack
+        // (still sells on the spot): the same click, two different outcomes.
+        try {
+          sim.addItem('eastbrook_arming_sword', 1);
+        } catch {}
+        try {
+          sim.addItem('tangled_weed', 1);
+        } catch {}
+        // Force hidden first so the poll below cannot pass on a window left up
+        // by an earlier target in the same run (the vendor-tool-gate precedent).
+        // openVendor opens its bags companion itself (hud.ts: renderBags plus
+        // an explicit display:flex), so no separate toggleBags call is needed
+        // or wanted here (that would TOGGLE an already-open companion closed).
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-sell-confirm setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(300);
+      await page.evaluate(() => {
+        const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+          b.getAttribute('aria-label')?.includes('Eastbrook Arming Sword'),
+        );
+        cell?.click();
+      });
+      await wait(400);
+      return {};
     },
   },
   {
@@ -2757,8 +2899,8 @@ export const TARGETS = [
         sim.acceptQuest?.('q_prof_intro');
         if (sim.questState?.('q_prof_intro') !== 'active')
           return { ok: false, reason: `quest state ${sim.questState?.('q_prof_intro')}` };
-        p.pos.x = -84; // Copper Dig, Eastbrook Vale
-        p.pos.z = -64;
+        p.pos.x = -144; // Copper Dig, Eastbrook Vale (the dig headland)
+        p.pos.z = -88;
         const el = document.querySelector('#map-window');
         // Force hidden first so pollForSize cannot pass on a window that was already
         // up from an earlier target in the same run (the market recipe's precedent).
@@ -2835,6 +2977,7 @@ export const TARGETS = [
       // harness), where the base tree legitimately shows gold or nothing, so
       // only the settle wait applies there.
       const expected = variant.stage === 'cooldown' ? 'cooldown' : 'repeat';
+      // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
       if (process.env.SHOT_BASELINE === '1') {
         await wait(1200);
       } else {
@@ -3250,7 +3393,7 @@ export const TARGETS = [
         try {
           // The vein sits inside the Copper Dig mob camp: silence the camp
           // FIRST (the test-suite despawnMobs idiom) or the level-1 subject
-          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-70,-53).
+          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-130,-77).
           for (const e of sim?.entities?.values?.() ?? []) {
             if (e.kind !== 'mob') continue;
             e.dead = true;
@@ -3260,7 +3403,7 @@ export const TARGETS = [
             e.corpseTimer = 9999;
             e.inCombat = false;
           }
-          sim?.chat?.('/dev tp -70 -52');
+          sim?.chat?.('/dev tp -130 -76');
           if (mode === 'tooled') sim?.addItem?.('copper_mining_pick', 1);
           // A tier-2 pick at mining 0: covering but unwieldable, the state
           // R22 added. The tooltip must show the wield line, not a downgrade.
@@ -4120,6 +4263,7 @@ export const TARGETS = [
     variants: [
       { key: 'live', charClass: 'warlock', charName: 'Nyxaris', scene: 'live' },
       { key: 'fallback', charClass: 'warlock', charName: 'Nyxaris', scene: 'fallback' },
+      { key: 'frozen', charClass: 'warlock', charName: 'Nyxaris', scene: 'frozen' },
     ],
     // A warlock with a real summoned Emberkin, because the pet is the whole
     // point: its hate is its own hate-table entry and the mob is swinging at it.
@@ -4154,6 +4298,11 @@ export const TARGETS = [
         meters.dock?.('heal');
         meters.dock?.('threat');
         meters.resetFrames?.();
+        // A world mob can carry incidental hate from something offscreen
+        // before this scene ever touches it; start every scene from a known
+        // empty table so none of them freeze on a snapshot the scene itself
+        // never intended.
+        mob.threat.clear();
         const hit = (sourceId, amount, ability) =>
           meters.onEvent({
             type: 'damage',
@@ -4165,20 +4314,40 @@ export const TARGETS = [
             ability,
             kind: 'hit',
           });
+
+        if (scene === 'frozen') {
+          // Seed the real hate table BEFORE the hits land: the panel's own
+          // freeze latch only ever reads mob.threat live, through
+          // Meters.onEvent, so it needs real numbers on the table while at
+          // least one hit is processed to have anything to freeze once the
+          // mob dies below.
+          mob.threat.set(player.id, 3200);
+          if (pet) mob.threat.set(pet.id, 4100);
+        }
         hit(player.id, 2400, 'Shadow Bolt');
         hit(player.id, 800, 'Corruption');
         if (pet) hit(pet.id, 2600, 'Ashbolt');
 
-        // The hate table the mob really compares: the Emberkin is ahead of its
-        // owner and is the one the mob is swinging at.
-        mob.threat.clear();
-        mob.threat.set(player.id, 3200);
-        if (pet) mob.threat.set(pet.id, 4100);
+        if (scene !== 'frozen') {
+          // The hate table the mob really compares: the Emberkin is ahead of
+          // its owner and is the one the mob is swinging at.
+          mob.threat.clear();
+          mob.threat.set(player.id, 3200);
+          if (pet) mob.threat.set(pet.id, 4100);
+        }
         mob.aggroTargetId = pet ? pet.id : player.id;
 
         if (scene === 'fallback') {
-          // Nothing live left: the tab has only the latched mob's damage to
-          // show, and must say so rather than pass it off as hate.
+          // Nothing live left, and no live table was ever seen: the tab has
+          // only the latched mob's damage to show, and must say so rather
+          // than pass it off as hate.
+          mob.dead = true;
+          mob.threat.clear();
+        } else if (scene === 'frozen') {
+          // The kill: the server clears the hate table before the client
+          // ever reads it again, exactly like the real death sequence. The
+          // tab must keep the fight's real numbers on screen, not
+          // recalculate down to the raw damage that landed the killing blow.
           mob.dead = true;
           mob.threat.clear();
         }
@@ -4196,6 +4365,100 @@ export const TARGETS = [
         if (el) el.click();
       });
       await wait(800);
+      return { clip: '#meters-window' };
+    },
+  },
+  {
+    key: 'meters-hot-cooldown-reset',
+    label:
+      "Damage meters: the Current segment resets between pulls instead of being held open by a healer's lingering HoT",
+    // The encounter-close clock lives in MeterData.onEvent/update (ui/meters.ts): a
+    // HoT's periodic tick must not keep refreshing it, or a second pull silently
+    // merges into the first's totals. Drives MeterData directly with synthetic
+    // timestamps (the same deterministic-injection approach the threat-meter
+    // target above uses) instead of waiting out the real 5s+ window: this is a
+    // TIMING bug, so the same script run against the base commit and this
+    // branch is what actually shows the fix, per the before/after protocol.
+    when: ['ui/meters.ts'],
+    variants: [{ key: 'desktop', charClass: 'warrior', charName: 'Rurik' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        let mob = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId == null && !e.dead) {
+            mob = e;
+            break;
+          }
+        }
+        const meters = game?.hud?.meters;
+        if (!meters || !mob) return;
+        meters.resetFrames?.();
+        const world = sim;
+        const party = new Set([player.id]);
+        const dmg = (amount, ability, t) =>
+          meters.data.onEvent(
+            {
+              type: 'damage',
+              sourceId: player.id,
+              targetId: mob.id,
+              amount,
+              crit: false,
+              school: 'physical',
+              ability,
+              kind: 'hit',
+            },
+            world,
+            party,
+            t,
+          );
+        const hotTick = (t) =>
+          meters.data.onEvent(
+            {
+              type: 'heal2',
+              sourceId: player.id,
+              targetId: player.id,
+              amount: 60,
+              crit: false,
+              ability: 'Renew',
+              hot: true,
+            },
+            world,
+            party,
+            t,
+          );
+        // Pull 1: the kill.
+        dmg(240, 'Mortal Strike', 1000);
+        mob.dead = true;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.aggroTargetId === player.id) e.aggroTargetId = null;
+        }
+        // The healer keeps a Renew rolling on the tank well past the kill.
+        hotTick(3000);
+        hotTick(5000);
+        // 5s past the LAST REAL activity (the kill at 1000): the segment must
+        // already be closed here, regardless of the ticks at 3000/5000.
+        meters.data.update(world, party, 6001);
+        // Pull 2 starts, well after the close.
+        mob.dead = false;
+        mob.aggroTargetId = player.id;
+        dmg(95, 'Whirlwind', 10_000);
+        meters.data.update(world, party, 10_001);
+        meters.render(true);
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      });
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      await wait(600);
       return { clip: '#meters-window' };
     },
   },
@@ -5031,11 +5294,17 @@ export const TARGETS = [
   },
   {
     key: 'nameplate-border',
-    label: 'Rank-5 Curator border on the own nameplate and portrait ring, in world',
-    when: ['ui/deed_border_view', 'render/nameplate_view', 'reliquary_phase22_closeout'],
+    label: 'Rank-5 Curator Deed Heraldry seal and name ribbon, in world',
+    when: [
+      'ui/deed_border_view',
+      'render/nameplate_view',
+      'render/nameplate_canvas',
+      'render/nameplate_heraldry_core',
+      'reliquary_phase22_closeout',
+    ],
     // Desktop only: the plate paints identically on the compact tier and the
     // full frame is the evidence (a canvas plate cannot be DOM-clipped).
-    variants: [{ key: 'desktop', beforeLoad: seedLowGraphicsPreset }],
+    variants: [{ key: 'desktop', beforeLoad: seedClassicOnLowPreset }],
     async capture(page) {
       const seeded = await page.evaluate(`(async () => {
         document.querySelector('#gpu-notice')?.remove();
@@ -5064,6 +5333,209 @@ export const TARGETS = [
       // repaint with the border before the frame is taken.
       await wait(1200);
       return {};
+    },
+  },
+  {
+    key: 'deed-heraldry-unit-frames',
+    label: 'Deed Heraldry on the player frame and a valid player target',
+    when: [
+      'ui/deed_border_view',
+      'ui/unit_frame',
+      'ui/unit_frame_painter',
+      'ui/hud.ts',
+      'styles/hud.css',
+      'index.html',
+      'play.html',
+    ],
+    variants: [
+      { key: 'desktop-low', beforeLoad: seedClassicOnLowPreset },
+      { key: 'desktop-high', beforeLoad: seedClassicOnHighPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page, variant) {
+      if (variant.key === 'desktop-low' || variant.key === 'desktop-high') {
+        await page.evaluate(() => {
+          const chat = document.querySelector('#chat-input');
+          if (!(chat instanceof HTMLTextAreaElement)) {
+            throw new Error('chat composer is unavailable for daylight staging');
+          }
+          chat.value = '/daynight day';
+          chat.dispatchEvent(new Event('input', { bubbles: true }));
+          chat.dispatchEvent(
+            new KeyboardEvent('keydown', { code: 'Enter', key: 'Enter', bubbles: true }),
+          );
+        });
+        await wait(8000);
+      }
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        const deedId = 'col_discovery_250';
+        sim.deedsEarned.set(deedId, '2026-08-01');
+        sim.setActiveBorder(deedId);
+        const peerId = sim.addPlayer('mage', 'Aldwin');
+        const peer = sim.entities.get(peerId);
+        const peerMeta = sim.meta(peerId);
+        if (!peer || !peerMeta) return { ok: false, reason: 'peer spawn failed' };
+        peerMeta.deedsEarned.set(deedId, '2026-08-01');
+        sim.setActiveBorder(deedId, peerId);
+        peer.level = 18;
+        peer.pos.x = player.pos.x + Math.sin(game.input.camYaw) * 4;
+        peer.pos.z = player.pos.z + Math.cos(game.input.camYaw) * 4;
+        sim.targetEntity(peerId);
+        const root = document.documentElement;
+        const settings = JSON.parse(localStorage.getItem('woc_settings') ?? '{}');
+        return {
+          ok: true,
+          selfBorder: sim.activeBorder,
+          peerBorder: peer.border,
+          targeted: player.targetId === peerId,
+          graphicsPreset: settings.graphicsPreset,
+          graphicsDefaultApplied: settings.graphicsDefaultApplied === true,
+          fxLevel: root.dataset.fxLevel ?? '',
+          fxShadow: getComputedStyle(root).getPropertyValue('--fx-shadow').trim(),
+        };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      const expectedGraphicsPreset = variant.key === 'desktop-high' ? 3 : 1;
+      const expectedFxLevel = variant.key === 'desktop-high' ? 'high' : 'low';
+      const expectedFxShadow = variant.key === 'desktop-high' ? '1' : '0';
+      if (
+        staged.selfBorder !== 'col_discovery_250' ||
+        staged.peerBorder !== 'col_discovery_250' ||
+        !staged.targeted ||
+        staged.graphicsPreset !== expectedGraphicsPreset ||
+        !staged.graphicsDefaultApplied ||
+        staged.fxLevel !== expectedFxLevel ||
+        staged.fxShadow !== expectedFxShadow
+      ) {
+        throw new Error(`Deed Heraldry unit-frame staging failed: ${JSON.stringify(staged)}`);
+      }
+      await wait(1200);
+      await page.evaluate(() => {
+        const menu = document.querySelector('#options-menu');
+        if (menu instanceof HTMLElement && getComputedStyle(menu).display !== 'none') {
+          window.__game?.hud?.toggleOptionsMenu?.();
+        }
+      });
+      return {};
+    },
+  },
+  {
+    key: 'deed-border-picker',
+    label: 'Book of Deeds Deed Heraldry seals, materials, and interaction preview',
+    when: ['ui/deed_border_view', 'ui/deeds_window'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedClassicOnLowPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        sim.deedsEarned.set('prog_prestige_10', '2026-08-01');
+        sim.deedsEarned.set('dgn_deepward', '2026-08-02');
+        sim.deedsEarned.set('col_discovery_250', '2026-08-03');
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-04');
+        sim.setActiveBorder('col_discovery_250');
+        window.__game?.hud?.openDeeds?.('titles');
+        return { ok: true };
+      });
+      if (!seeded.ok) throw new Error(`deed border picker seeding failed: ${seeded.reason}`);
+      const opened = await pollForSize(page, '#deeds-window');
+      if (!opened) throw new Error('deeds window did not open');
+      await page.evaluate(() => {
+        document.querySelector('#deeds-window .deeds-borders')?.scrollIntoView({
+          block: 'center',
+        });
+      });
+      const previewed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const option = document.querySelector(
+          '#deeds-window [data-border-pick="col_reliquary_rank_5"]',
+        );
+        if (!sim || !(option instanceof HTMLElement)) {
+          return { ok: false, reason: 'heraldry preview option is unavailable' };
+        }
+        const before = sim.activeBorder;
+        option.focus();
+        const preview = document.querySelector('#deeds-window .deed-heraldry-preview');
+        return {
+          ok: true,
+          before,
+          after: sim.activeBorder,
+          previewDeed: preview?.getAttribute('data-preview-deed') ?? null,
+          previewBorder: preview?.getAttribute('data-border') ?? null,
+        };
+      });
+      if (!previewed.ok) throw new Error(previewed.reason);
+      if (
+        previewed.before !== 'col_discovery_250' ||
+        previewed.after !== previewed.before ||
+        previewed.previewDeed !== 'col_reliquary_rank_5' ||
+        previewed.previewBorder !== 'reliquary_gilt'
+      ) {
+        throw new Error(`Deed Heraldry preview staging failed: ${JSON.stringify(previewed)}`);
+      }
+      await wait(200);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
+    key: 'inspect-border-cartouche',
+    label: 'Inspect Deed Heraldry banner: seal, motif pattern, title, and granting deed',
+    when: ['ui/deed_border_view', 'ui/inspect_window', 'ui/inspect_view', 'styles/shell.css'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedClassicOnLowPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
+    ],
+    async capture(page) {
+      const seeded = await page.evaluate(`(async () => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const mod = await import('/src/sim/content/reliquary.ts');
+        for (const pageDef of mod.RELIQUARY_PAGES) {
+          for (const relic of pageDef.relics) {
+            if (relic.kind === 'item') sim.primary.deedStats.itemsDiscovered.add(relic.itemId);
+          }
+        }
+        sim.deedsEarned.set('col_reliquary_rank_5', '2026-08-01');
+        sim.setActiveBorder('col_reliquary_rank_5');
+        sim.deedsEarned.set('prog_grandmaster_armorcrafting', '2026-08-02');
+        sim.setActiveTitle('prog_grandmaster_armorcrafting');
+        window.__game.hud.openInspect(sim.playerId);
+        const meta = sim.players?.get?.(sim.playerId);
+        return {
+          ok: true,
+          border: meta?.activeBorder ?? null,
+          title: meta?.activeTitle ?? null,
+        };
+      })()`);
+      if (!seeded.ok) throw new Error(`inspect cartouche seeding failed: ${seeded.reason}`);
+      if (
+        seeded.border !== 'col_reliquary_rank_5' ||
+        seeded.title !== 'prog_grandmaster_armorcrafting'
+      ) {
+        throw new Error(`inspect Deed Heraldry staging failed: ${JSON.stringify(seeded)}`);
+      }
+      const opened = await pollForSize(page, '#inspect-window');
+      if (!opened) throw new Error('inspect window did not open');
+      return { clip: '#inspect-window' };
     },
   },
   {
@@ -5986,6 +6458,115 @@ export const TARGETS = [
       });
       await wait(200);
       return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'ability-tooltip',
+    label: 'Ability tooltip + spellbook row (what a kit change actually reads as)',
+    // An ability's COPY is its whole player-facing surface: what the spellbook row
+    // and the hovered #tooltip say. No in-world HUD frame shows it, so a kit change
+    // (a reworded tooltip, a new requirement line, a newly learned ability) has no
+    // reviewable evidence without this target. Keyed to the modules that decide that
+    // copy rather than to a class table, so it fires for the change that owns the
+    // wording and not for every content edit.
+    when: [
+      'ui/hud/action_bar/ability_requirement_keys',
+      'sim/incapacitate_dr',
+      'sim/combat/stealth_focus',
+    ],
+    variants: [
+      // Every variant enters as the class that OWNS the ability: the standalone
+      // page enters with variant.charClass, and the default (warrior) knows none
+      // of these, which reads as "not known at level 20".
+      // The two utility poisons: new rows, so their BEFORE is "not in the book".
+      {
+        key: 'melting-acid',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'melting_acid',
+      },
+      {
+        key: 'nightshade-coating',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'nightshade_coating',
+      },
+      // Reworded copy: Sap gained its no-fight clause.
+      { key: 'sap', charClass: 'rogue', charName: 'Nightsliver', abilityId: 'sap' },
+      // Shadeslip is a row-5 talent grant, so the recipe allocates before it
+      // resolves. It carries the new "Enemy or friendly target" requirement line.
+      {
+        key: 'shadeslip',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'shadowstep',
+        talentRow: { 5: 'rog_r5_shadeslip' },
+      },
+      {
+        key: 'shadeslip-mobile',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'shadowstep',
+        talentRow: { 5: 'rog_r5_shadeslip' },
+        mobile: true,
+      },
+    ],
+    async capture(page, variant) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // The Escape above dismisses the entry overlays but also opens the game
+        // menu, which then sits behind the spellbook in frame. Close it through
+        // its own control so the shot is only the surface under review.
+        document.querySelector('#options-menu [data-close]')?.click();
+      });
+      await wait(300);
+      const setup = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { known: false };
+        sim.setPlayerLevel?.(20, player.id);
+        if (shot.talentRow) sim.applyTalents?.({ spec: null, rows: shot.talentRow }, player.id);
+        const resolved = sim.resolvedAbility?.(shot.abilityId);
+        game.hud.toggleSpellbook?.();
+        return { known: !!resolved, abilityName: resolved?.def.name ?? shot.abilityId };
+      }, variant);
+      if (!setup.known) throw new Error(`${variant.abilityId} is not known at level 20`);
+      if (!(await pollForSize(page, '#spellbook', 20, 250))) {
+        throw new Error('spellbook did not open');
+      }
+      // Hover the row through the real listeners so the SHARED #tooltip paints the
+      // copy under test, rather than asserting on the row markup alone.
+      await page.evaluate((shot) => {
+        const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+        row?.scrollIntoView({ block: 'center' });
+        row?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        row?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      }, variant);
+      await wait(500);
+      const shown = await page.evaluate((shot) => {
+        const row = document.querySelector(`.spell-row[data-ability-id="${shot.abilityId}"]`);
+        const tip = document.querySelector('#tooltip');
+        return {
+          row: !!row && getComputedStyle(row).display !== 'none',
+          tooltip: !!tip && getComputedStyle(tip).display !== 'none' && !!tip.textContent?.trim(),
+        };
+      }, variant);
+      if (!shown.row) throw new Error(`no spellbook row for ${variant.abilityId}`);
+      // The hovered tooltip is a POINTER surface: a touch viewport has no hover,
+      // so the mobile variant is about the spellbook ROW reading correctly at
+      // phone width and deliberately makes no tooltip claim. Asserting one there
+      // would fail on a platform difference rather than on a regression.
+      if (!variant.mobile && !shown.tooltip) {
+        throw new Error(`tooltip did not paint for ${variant.abilityId}`);
+      }
+      // Full frame on purpose: the shared #tooltip renders OUTSIDE #spellbook, so
+      // clipping to the window would cut off the copy this target exists to show.
+      return {};
     },
   },
   {
@@ -8909,101 +9490,48 @@ export const TARGETS = [
     },
   },
   {
-    key: 'vale-cup-skill-deed-copy',
-    label: 'Book of Deeds: Vale Cup skill deeds spell out rated 3v3+ and the save floor (#2767)',
-    when: ['sim/content/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/deed_i18n'],
-    // Open the Book of Deeds on the pvp category and search the exact clause every
-    // silently-gated Vale Cup skill deed now shares, so the frame shows Hat Trick
-    // Hero, Safe Hands, and Nothing Gets Past Me together with their spelled-out
-    // rated/3v3+/save-floor conditions, not the whole (much longer) pvp category.
+    key: 'deed-missing-poi-places',
+    label:
+      'Book of Deeds: an unearned wayfarer deed names which places are still missing, not just a bare count',
+    when: ['sim/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/entity_i18n'],
+    // Nine of Thornpeak Heights' ten named places already visited, one held
+    // back deliberately (Gravewyrm Sanctum), so the card's new missing-places
+    // line has exactly one name to show instead of an empty or ten-item list.
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
-      // openDeeds occasionally does not stick on the very first call (seen on both
-      // a loaded shared sandbox and a clean CI runner): retry the open a few times
-      // rather than a single fire-and-poll, mirroring the p14-bag-glyphs target's
-      // check-before-toggle defensiveness above.
       let opened = false;
       for (let attempt = 0; attempt < 3 && !opened; attempt++) {
         await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (sim?.primary?.deedStats?.visited) {
+            const visited = [
+              'poi:thornpeak_heights:highwatch',
+              'poi:thornpeak_heights:stalker_ridge',
+              'poi:thornpeak_heights:deeprock_burrows',
+              'poi:thornpeak_heights:ogre_foothills',
+              'poi:thornpeak_heights:drogmars_war_camp',
+              'poi:thornpeak_heights:stormcrag',
+              'poi:thornpeak_heights:the_glimmermere',
+              'poi:thornpeak_heights:wyrmcult_tents',
+              'poi:thornpeak_heights:revenant_fields',
+            ];
+            for (const id of visited) sim.primary.deedStats.visited.add(id);
+          }
           const el = document.querySelector('#deeds-window');
           if (el) el.style.display = 'none';
-          window.__game?.hud?.openDeeds?.('pvp');
+          window.__game?.hud?.openDeeds?.('exploration');
         });
         opened = await pollForSize(page, '#deeds-window', 10, 500);
       }
-      if (!opened) {
-        throw new Error('deeds window did not open');
-      }
+      if (!opened) throw new Error('deeds window did not open');
       await page.evaluate(() => {
         const input = document.querySelector('#deeds-window .deed-search');
         if (!(input instanceof HTMLInputElement)) return;
-        input.value = '3v3 bracket or larger';
+        input.value = 'Thornpeak Heights';
         input.dispatchEvent(new Event('input', { bubbles: true }));
       });
       await wait(400);
       return { clip: '#deeds-window' };
-    },
-  },
-  {
-    key: 'vale-cup-unrated-notes',
-    label: 'Vale Cup window: 1v1/2v2 all-rounder note and practice unrated note (#2767)',
-    when: ['ui/vale_cup_window'],
-    // The window opens on the 1v1 bracket by default, so the small-bracket
-    // role note shows; offline enables the practice button, so the practice
-    // unrated note shows beneath it in the same frame.
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
-    async capture(page) {
-      let opened = false;
-      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
-        await page.evaluate(() => {
-          const el = document.querySelector('#valecup-window');
-          if (el) el.style.display = 'none';
-          window.__game?.hud?.toggleValeCup?.();
-        });
-        opened = await pollForSize(page, '#valecup-window', 10, 500);
-      }
-      if (!opened) throw new Error('vale cup window did not open');
-      // The two notes sit below the fold on the mobile-landscape viewport:
-      // scroll the last one into view (a no-op on desktop, where all fit).
-      await page.evaluate(() => {
-        document.getElementById('vcup-practice-unrated-note')?.scrollIntoView({ block: 'nearest' });
-      });
-      await wait(400);
-      return { clip: '#valecup-window' };
-    },
-  },
-  {
-    key: 'vale-cup-briefing-unrated',
-    label: 'Vale Cup briefing: unrated-bout note (practice / bot-backfill) (#2767)',
-    when: ['ui/vale_cup_briefing'],
-    // A private practice bout is the offline-reachable unrated bout: starting
-    // one brings up the pre-match briefing overlay, whose rules panel now ends
-    // with the unrated note (no standings, no Book of Deeds progress).
-    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
-    async capture(page) {
-      // Retried: startValeCupPractice no-ops with a chat error once seated, so a
-      // repeat call after a swallowed first attempt (CI flake) is safe.
-      let up = false;
-      for (let attempt = 0; attempt < 3 && !up; attempt++) {
-        await page.evaluate(() => {
-          window.__game?.sim?.vcupPracticeStart?.(1);
-        });
-        up = await pollForSize(page, '#vcup-briefing', 10, 500);
-      }
-      if (!up) {
-        const state = await page.evaluate(() => {
-          const sim = window.__game?.sim;
-          const match = sim?.cupInfoFor?.(sim.primaryId)?.match;
-          return JSON.stringify({
-            game: Boolean(window.__game),
-            phase: match ? match.phase : null,
-            dead: Boolean(sim?.player?.dead),
-          });
-        });
-        throw new Error(`briefing overlay did not appear (${state})`);
-      }
-      await wait(400);
-      return { clip: '#vcup-briefing .vcupb-card' };
     },
   },
   {
@@ -9140,6 +9668,7 @@ export const TARGETS = [
         const p = window.__game?.sim?.player;
         return { casting: !!p?.castingAbility, ability: p?.castingAbility ?? null };
       });
+      // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
       if (!cast.casting && process.env.SHOT_BASELINE !== '1') {
         throw new Error(`the cast never started: ${JSON.stringify(cast)}`);
       }
@@ -9747,6 +10276,7 @@ export const TARGETS = [
         });
         if (!r) continue;
         await page.screenshot({
+          // biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
           path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/swing-timer-${variant.key}-t${String(shotIndex).padStart(2, '0')}.png`,
           clip: {
             x: Math.max(0, r.x - pad),

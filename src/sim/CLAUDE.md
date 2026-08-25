@@ -94,7 +94,8 @@ plausibly covers means the table needs a new row in the same change.
 | `pet/` | the pet system: `pet_ai.ts` (`updatePet`, follow, ranged attack, target pick), `pet_commands.ts` (the command surface + `petOf`/`summonPet`/tame/despawn/`syncPetLevel`/`serializePet`/`restorePet` and the delve pet-park round-trip), `pet_scaling.ts` (owner-to-pet stat inheritance for hunter beasts + the heel-speed floor), `pet_selection.ts` (pure owner/pet identity shared with the HUD mirrors), `pet_taunt_gate.ts` (the shared force-taunt eligibility gate), `warlock_pet_skills.ts` + `warlock_pet_growth.ts` (signature warlock-pet utility; authored per-level visual scale) |
 | `pet/pet_return.ts` + `pet_match_return.ts` + `pet_owner_revive.ts` | THE shared pet round trip (snapshot / unravel-note / restore) and its two consumers: arena-shaped matches and the owner's own death. Keying doctrine: snapshot LIVING pets only (nothing is owed a pet it did not lose); a hunter beast / mage elemental keeps its corpse and revives IN PLACE by entity id, a warlock demon unravels and is REBUILT keyed on the UNRAVEL, never the death, so a deliberate dismissal or re-summon is never overwritten; return hp is the carried hp, or a FRACTION of the pool it returns to. The match half lives on the `ArenaMatch` beside `preMatchPools` (issue #1600); the owner half on `PlayerMeta.deathPet` (session-only, rewritten on EVERY death, restored at the end of `spirit.ts` `reviveAt` at `PET_REVIVE_HP_FRACTION`). All three draw NO rng |
 | `items.ts` | equip/use/discard + vendor buy/sell/buyback command bodies (W2 move out of `sim.ts`) |
-| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate, the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
+| `item_instance_transfer.ts` | shared instanced-transfer rules for the anonymous exchange pipes (market listings + mail parcels, issue 1165): the transfer-lock predicate (its body is the dependency-free `transfer_lock.ts` leaf, re-exported here; `exchange_eligibility.ts` imports the leaf directly), the public display trim, payload-matching escrow removal, escrow-slot sanitizing; consumed by `market.ts`, `mail/post_office.ts`, and the ui staging gates (the `removePreferFungible` cross-import precedent) |
+| `broker_custody.ts` | the broker-side custody moves for the server's marketplace, both kept as thin `Sim` delegates the server resolves on the facade: `extractTradableCopyImpl` (one exact copy into escrow through the `inventory_extract.ts` leaf, plus the dismount when a seller escrows the mount they are riding) and `grantTradableCopyImpl` (the copy back into the bags through the shared `canGrantCopies` / `grantCopies` pair, in one call); draws NO rng |
 | `interaction.ts` | `lootCorpse`/`pickUpObject`/`interact` + corpse harvest and party auto-loot (W3); `corpse_interaction.ts` is its shared availability predicate (`corpseInteractionAvailability`: loot rights vs harvestability on a dead lootable mob) |
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness; siblings `quests/interact_object_credit.ts` (the per-object credit ledger for multi-count interact objectives, since interact deliberately does not consume the object) and `quests/profession_quest_effects.ts` (the profession-quest effect arms over `professions/archetype.ts`) |
@@ -115,7 +116,6 @@ plausibly covers means the table needs a new row in the same change.
 | `social/dungeon_finder.ts` | the Dungeon Finder (`docs/prd/dungeon-finder.md`): the automatic role queue plus the leader-run premade board; only FORMS groups (via `PartyMachine.formDungeonFinderGroup`), draws no rng; pinned by `tests/dungeon_finder.test.ts` |
 | `social/duel.ts` + `social/arena.ts` | duels + ranked arena (Elo, matchmaking) |
 | `social/fiesta.ts` + `social/fiesta_bots.ts` | fiesta match logic + offline bots |
-| `social/vale_cup.ts` + `social/vale_cup_bots.ts` | Vale Cup boarball: brackets, the one match slot, the `vcup*` seam arms (pure ball math in the `vale_cup_ball.ts`/`vale_cup_layout.ts` leaves); its tick phase draws ZERO shared rng |
 | `social/yumi.ts` | Protect Yumi 3v3/5v5 maze mode (layout leaf `yumi_maze_layout.ts`) |
 | `social/battleground.ts` | Thornhollow Fields 5v5 capture-the-flag (layout leaf `battleground_layout.ts`; resolved-match records in the `battleground_outcomes.ts` leaf) and its siblings: `battleground_proposal.ts` (the timed queue-pop Accept/Decline between the matchmaker's pick and the seating, so a walked-away player never gets seated), `battleground_party.ts` (each team of five fights as ONE party, formed through the same dungeon-finder formation seam manual groups use and unwound at match end or desertion), `battleground_backfill.ts` (the pure half of "a fighter left, can a queued player take the seat") |
 | `social/ready_check.ts` | `/ready`: the `readyChecks` primitive + the `updateReadyChecks` phase |
@@ -183,6 +183,10 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   SYSTEM logic stays on `Sim`.
 - `professions/proficiency_display_heal.ts`: the one-time gathering-proficiency
   display-band heal applied at character load.
+- `daily_rewards_stub.ts`: the offline daily-rewards readout constant, and the
+  ONE file on the $WOC token-firewall allowlist (`tests/architecture.test.ts`
+  pins its read-only-projection shape: one exported function, no control flow,
+  type-only imports).
 
 ## The SimContext seam (final shape)
 `sim_context.ts` defines `SimContext` = `SimContextPrimitives` (live getters onto the
@@ -236,7 +240,8 @@ re-bucketing LAST, then drain + return the `SimEvent[]`. The authoritative phase
 `tick()` itself: most phases carry a self-naming `lap?('...')` marker (a few adjacent
 calls share one, e.g. trades + ready checks), so read those,
 not a doc copy. Phase ORDER is rng-draw-order load-bearing (see Determinism); a
-zero-rng phase (Vale Cup) may append, anything else must not reorder.
+zero-rng phase (the retired Vale Cup was the precedent) may append, anything
+else must not reorder.
 
 Beyond `tick()`, `sim.ts` legitimately keeps: the `IWorld` facade delegates, the
 back-compat accessors (`player`/`inventory`/`xp`/`equipment`/`questLog`/`talents`/... that

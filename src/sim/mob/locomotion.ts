@@ -32,7 +32,6 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
-import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -42,6 +41,7 @@ import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
+import { corpseHasDecayed } from '../respawn_policy';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -131,6 +131,16 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_rogue_add',
 ]);
 
+function expireDecayedCorpseInteractions(ctx: SimContext, mob: Entity): void {
+  if (!corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
+  if (!mob.lootable) return;
+  mob.lootable = false;
+  for (const meta of ctx.players.values()) {
+    const player = ctx.entities.get(meta.entityId);
+    if (player?.targetId === mob.id) player.targetId = null;
+  }
+}
+
 /**
  * Is this dead mob an INSTANCE corpse whose per-tick dead-branch has become a
  * provable no-op? Instance mobs (dungeon/rift/delve bands) never corpse-decay
@@ -183,6 +193,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
+    expireDecayedCorpseInteractions(ctx, mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;
@@ -286,19 +297,6 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // by the boss driver: no aggro, no wander, no evade-home, and the hostility
   // safety net below must not re-hostile them.
   if (mob.templateId === TOLLING_BELL_TEMPLATE_ID) {
-    mob.hostile = false;
-    mob.aiState = 'idle';
-    mob.inCombat = false;
-    mob.aggroTargetId = null;
-    clearThreat(mob);
-    return;
-  }
-
-  // The Vale Cup boarball is moved exclusively by the match driver
-  // (social/vale_cup.ts): no aggro, no wander (an idle wander would also draw
-  // rng inside golden-scenario ticks), no evade-home, and the hostility safety
-  // net below must not re-hostile it. Bell pattern, verbatim.
-  if (mob.templateId === VALE_CUP_BALL_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
