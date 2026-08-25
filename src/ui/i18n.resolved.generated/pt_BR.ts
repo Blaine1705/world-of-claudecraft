@@ -8182,6 +8182,8 @@ export const pt_BR: EnTranslations = {
         "riftEntrance": "Entrada da fenda: {name}",
         "hostileEnemy": "Inimigo hostil",
         "aggressiveEnemy": "Inimigo atacando você",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Inimigo saqueável",
         "corpse": "Seu cadáver",
         "deathZone": "Zona de perigo",

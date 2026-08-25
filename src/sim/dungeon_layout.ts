@@ -271,40 +271,232 @@ export const NYTHRAXIS_LAYOUT: DungeonLayout = (() => {
 // the moon-sanctum with Ysolei's great altar dais. Side walls at |x|=23 like
 // the crypt so the KayKit wall modules fit unchanged; wall-side slots carry
 // drowned reliquary altars instead of sarcophagi.
-// The Halls of the First Tempering: a long, clipped forge nave broken into
-// three readable workshops by pillar pairs. The open centre aisle keeps each
-// guardian pull and the final gate visible from the preceding chamber.
+const IGNIVAR_R_BRAZIER = 0.85;
+const IGNIVAR_R_STATUE = 0.98;
+const IGNIVAR_R_FORGE = 2.34;
+const IGNIVAR_R_CAULDRON = 0.98;
+const IGNIVAR_R_CAGE = 1;
+const IGNIVAR_R_FANG = 0.85;
+
+// The Halls of the First Tempering: an entrance hall feeds a smelter hub with
+// two broad side workshops. The central forge breaks sightlines, each wing can
+// be cleared in either order, and the paths rejoin in the Herald antechamber.
+// Authored rooms and doors are the one source for rendered walls and collision.
 export const IGNIVAR_FORGE_APPROACH_LAYOUT: DungeonLayout = {
-  zMin: -58,
-  zMax: 58,
-  sideWallZ: 0,
-  sideWallHd: 58,
-  wallX: 28,
-  endWallHw: 28,
-  floorHalfX: 28,
-  doorZ: -58,
-  pillars: [
-    { x: -18, z: -31 },
-    { x: 18, z: -31 },
-    { x: -18, z: -4 },
-    { x: 18, z: -4 },
-    { x: -18, z: 23 },
-    { x: 18, z: 23 },
-  ],
+  zMin: -66,
+  zMax: 76,
+  sideWallZ: 5,
+  sideWallHd: 71,
+  wallX: 64,
+  endWallHw: 64,
+  floorHalfX: 64,
+  doorZ: -66,
+  pillars: [],
   tombs: [],
   stubs: [],
-  dais: { x: 0, z: 49, r: 7 },
-  shellPolygon: [
-    { x: -16, z: -58 },
-    { x: 16, z: -58 },
-    { x: 28, z: -46 },
-    { x: 28, z: 46 },
-    { x: 16, z: 58 },
-    { x: -16, z: 58 },
-    { x: -28, z: 46 },
-    { x: -28, z: -46 },
+  dais: { x: 0, z: 59, r: 8 },
+  rooms: [
+    { id: 'entry', x0: -16, x1: 16, z0: -66, z1: -42 },
+    { id: 'smelter_hub', x0: -24, x1: 24, z0: -42, z1: 32 },
+    { id: 'west_workshop', x0: -60, x1: -24, z0: -30, z1: 36 },
+    { id: 'east_store', x0: 24, x1: 60, z0: -12, z1: 36 },
+    { id: 'herald_antechamber', x0: -52, x1: 52, z0: 36, z1: 76 },
   ],
-  shellPole: { x: 0, z: 0 },
+  doors: [
+    { x: 0, z: -42, hw: 5, hd: 1 },
+    { x: -24, z: -8, hw: 1, hd: 5 },
+    { x: 24, z: 10, hw: 1, hd: 5 },
+    { x: -40, z: 36, hw: 5, hd: 1 },
+    { x: 40, z: 36, hw: 5, hd: 1 },
+  ],
+  decor: [
+    {
+      key: 'ignivar_forge_station',
+      x: 0,
+      z: -8,
+      yaw: 0,
+      scale: 1,
+      r: IGNIVAR_R_FORGE,
+    },
+    {
+      key: 'slag_cauldron',
+      x: -55,
+      z: 6,
+      yaw: Math.PI / 2,
+      scale: 1.4,
+      r: IGNIVAR_R_CAULDRON,
+    },
+    {
+      key: 'slag_cauldron',
+      x: 55,
+      z: 6,
+      yaw: -Math.PI / 2,
+      scale: 1.4,
+      r: IGNIVAR_R_CAULDRON,
+    },
+    { key: 'infernal_brazier', x: -20, z: -36, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 20, z: -36, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: -56, z: -26, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: -56, z: 30, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 56, z: -8, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 56, z: 30, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: -17, z: 70, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 17, z: 70, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    {
+      key: 'infernal_statue',
+      x: -17,
+      z: 43,
+      yaw: Math.PI / 2,
+      scale: 1.3,
+      r: IGNIVAR_R_STATUE,
+    },
+    {
+      key: 'infernal_statue',
+      x: 17,
+      z: 43,
+      yaw: -Math.PI / 2,
+      scale: 1.3,
+      r: IGNIVAR_R_STATUE,
+    },
+    { key: 'hanging_cage', x: -29, z: 26, yaw: 0.4, r: IGNIVAR_R_CAGE },
+    { key: 'hanging_cage', x: 29, z: 26, yaw: -0.4, r: IGNIVAR_R_CAGE },
+    { key: 'obsidian_fang', x: -52, z: 34, yaw: 1.1, r: IGNIVAR_R_FANG },
+    { key: 'obsidian_fang', x: 52, z: 34, yaw: -1.1, r: IGNIVAR_R_FANG },
+    { key: 'obsidian_fang', x: -27, z: -23, yaw: 0.6, r: IGNIVAR_R_FANG },
+    { key: 'obsidian_fang', x: 27, z: -5, yaw: -0.6, r: IGNIVAR_R_FANG },
+    { key: 'ignivar_firepit', x: -12, z: -46, yaw: 0, r: 1.1 },
+    { key: 'ignivar_firepit', x: 12, z: -46, yaw: 0, r: 1.1 },
+    { key: 'ignivar_wall_gear_relief', x: -15.5, z: -55, yaw: Math.PI / 2 },
+    { key: 'ignivar_chain', x: -15, z: -63, yaw: 0 },
+    { key: 'ignivar_chain', x: 15, z: -63, yaw: 0 },
+    { key: 'ignivar_gear_small', x: -23.2, z: -31, yaw: Math.PI / 2 },
+    { key: 'ignivar_gear_heavy', x: 23.2, z: -30, yaw: -Math.PI / 2 },
+    { key: 'ignivar_furnace_pillar', x: -23.1, z: 24, yaw: Math.PI / 2 },
+    { key: 'ignivar_workbench', x: -28, z: -26, yaw: Math.PI / 2, r: 1.3 },
+    { key: 'ignivar_gear_machine', x: -57, z: -5, yaw: Math.PI / 2, r: 2 },
+    { key: 'ignivar_fallen_automa', x: -29, z: 8, yaw: -1.2, r: 1.25 },
+    { key: 'ignivar_reactor', x: 29, z: -7, yaw: -Math.PI / 2, r: 1.65 },
+    { key: 'ignivar_gear_broad', x: 59, z: 31, yaw: -Math.PI / 2 },
+    { key: 'ignivar_gear_wall_cluster', x: -51, z: 52, yaw: 0 },
+    { key: 'ignivar_fallen_automa', x: -38, z: 65, yaw: 0.7, r: 1.25 },
+    { key: 'ignivar_fallen_automa', x: 38, z: 65, yaw: -0.7, r: 1.25 },
+  ],
+};
+
+// Molten Assembly: a wide intake floor branches into west tempering and east
+// hammering bays. Raiders can clear either bay first, cross between them, then
+// rejoin through the north gallery before the two-Warden final platform.
+export const IGNIVAR_MOLTEN_ASSEMBLY_LAYOUT: DungeonLayout = {
+  zMin: -66,
+  zMax: 84,
+  sideWallZ: 9,
+  sideWallHd: 75,
+  wallX: 56,
+  endWallHw: 56,
+  floorHalfX: 56,
+  doorZ: -66,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 70, r: 9 },
+  rooms: [
+    { id: 'entry', x0: -16, x1: 16, z0: -66, z1: -44 },
+    { id: 'intake_floor', x0: -52, x1: 52, z0: -44, z1: -12 },
+    { id: 'west_tempering', x0: -52, x1: 0, z0: -12, z1: 38 },
+    { id: 'east_hammering', x0: 0, x1: 52, z0: -12, z1: 38 },
+    { id: 'north_gallery', x0: -52, x1: 52, z0: 38, z1: 54 },
+    { id: 'varkhul_antechamber', x0: -28, x1: 28, z0: 54, z1: 84 },
+  ],
+  doors: [
+    { x: 0, z: -44, hw: 5, hd: 1 },
+    { x: -26, z: -12, hw: 5, hd: 1 },
+    { x: 26, z: -12, hw: 5, hd: 1 },
+    { x: 0, z: 13, hw: 1, hd: 5 },
+    { x: -26, z: 38, hw: 5, hd: 1 },
+    { x: 26, z: 38, hw: 5, hd: 1 },
+    { x: 0, z: 54, hw: 6, hd: 1 },
+  ],
+  decor: [
+    {
+      key: 'ignivar_forge_station',
+      x: -36,
+      z: 0,
+      yaw: Math.PI / 2,
+      scale: 1,
+      r: IGNIVAR_R_FORGE,
+    },
+    {
+      key: 'ignivar_forge_station',
+      x: 36,
+      z: 0,
+      yaw: -Math.PI / 2,
+      scale: 1,
+      r: IGNIVAR_R_FORGE,
+    },
+    {
+      key: 'slag_cauldron',
+      x: -18,
+      z: -32,
+      yaw: 0,
+      scale: 1.4,
+      r: IGNIVAR_R_CAULDRON,
+    },
+    {
+      key: 'slag_cauldron',
+      x: 18,
+      z: -32,
+      yaw: 0,
+      scale: 1.4,
+      r: IGNIVAR_R_CAULDRON,
+    },
+    { key: 'infernal_brazier', x: -47, z: -39, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 47, z: -39, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: -48, z: 34, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 48, z: 34, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: -23, z: 79, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    { key: 'infernal_brazier', x: 23, z: 79, yaw: 0, r: IGNIVAR_R_BRAZIER },
+    {
+      key: 'infernal_statue',
+      x: -21,
+      z: 60,
+      yaw: Math.PI / 2,
+      scale: 1.3,
+      r: IGNIVAR_R_STATUE,
+    },
+    {
+      key: 'infernal_statue',
+      x: 21,
+      z: 60,
+      yaw: -Math.PI / 2,
+      scale: 1.3,
+      r: IGNIVAR_R_STATUE,
+    },
+    { key: 'infernal_altar', x: 0, z: 59, yaw: Math.PI, scale: 1.25, r: 1.25 },
+    { key: 'hanging_cage', x: -47, z: 17, yaw: 0.3, r: IGNIVAR_R_CAGE },
+    { key: 'hanging_cage', x: 47, z: 17, yaw: -0.3, r: IGNIVAR_R_CAGE },
+    { key: 'obsidian_fang', x: -46, z: 45, yaw: 1.1, r: IGNIVAR_R_FANG },
+    { key: 'obsidian_fang', x: 46, z: 45, yaw: -1.1, r: IGNIVAR_R_FANG },
+    { key: 'obsidian_fang', x: -20, z: 50, yaw: 0.5, r: IGNIVAR_R_FANG },
+    { key: 'obsidian_fang', x: 20, z: 50, yaw: -0.5, r: IGNIVAR_R_FANG },
+    { key: 'ignivar_firepit', x: -35, z: -39, yaw: 0, r: 1.1 },
+    { key: 'ignivar_firepit', x: 35, z: -39, yaw: 0, r: 1.1 },
+    { key: 'ignivar_wall_gear_relief', x: -51, z: -28, yaw: Math.PI / 2 },
+    { key: 'ignivar_chain', x: -15, z: -63, yaw: 0 },
+    { key: 'ignivar_chain', x: 15, z: -63, yaw: 0 },
+    { key: 'ignivar_fallen_automa', x: -36, z: -18, yaw: 0.9, r: 1.25 },
+    { key: 'ignivar_fallen_automa', x: 36, z: -18, yaw: -0.9, r: 1.25 },
+    { key: 'ignivar_gear_machine', x: -48, z: -4, yaw: Math.PI / 2, r: 2 },
+    { key: 'ignivar_workbench', x: -47, z: 10, yaw: Math.PI / 2, r: 1.3 },
+    { key: 'ignivar_reactor', x: 48, z: -4, yaw: -Math.PI / 2, r: 1.65 },
+    { key: 'ignivar_forge_anvil', x: 47, z: 10, yaw: -Math.PI / 2, r: 1.5 },
+    { key: 'ignivar_gear_small', x: -51, z: 28, yaw: Math.PI / 2 },
+    { key: 'ignivar_gear_heavy', x: 51, z: 28, yaw: -Math.PI / 2 },
+    { key: 'ignivar_gear_broad', x: 51, z: 18, yaw: -Math.PI / 2 },
+    { key: 'ignivar_gear_wall_cluster', x: -51, z: 17, yaw: 0 },
+    { key: 'ignivar_furnace_pillar', x: -51, z: 46, yaw: Math.PI / 2 },
+    { key: 'ignivar_fallen_automa', x: -24, z: 70, yaw: 0.6, r: 1.25 },
+    { key: 'ignivar_fallen_automa', x: 24, z: 70, yaw: -0.6, r: 1.25 },
+  ],
 };
 
 // Ignivar's Crucible: a flat octagonal raid room centered on the sealed heart.
@@ -457,46 +649,130 @@ const keepBrazier = (x: number, z: number): AuthoredDecor => ({
 
 export const LASTKEEP_ROOMS: readonly AuthoredRoom[] = [
   // STORY 1, the state floor (lift 3.0).
-  { id: 'hall_entrance', x0: -10, x1: 12, z0: -16, z1: 8, lift: KEEP_STORY1_LIFT },
+  {
+    id: 'hall_entrance',
+    x0: -10,
+    x1: 12,
+    z0: -16,
+    z1: 8,
+    lift: KEEP_STORY1_LIFT,
+  },
   // The garrison wing flanks the entrance: the guard room watches the door,
   // the armory behind it opens onto the ballroom's service side.
-  { id: 'guard_room', x0: -24, x1: -10, z0: -14, z1: 4, lift: KEEP_STORY1_LIFT },
+  {
+    id: 'guard_room',
+    x0: -24,
+    x1: -10,
+    z0: -14,
+    z1: 4,
+    lift: KEEP_STORY1_LIFT,
+  },
   { id: 'armory', x0: -24, x1: -14, z0: 4, z1: 18, lift: KEEP_STORY1_LIFT },
   { id: 'great_hall', x0: -14, x1: 14, z0: 8, z1: 40, lift: KEEP_STORY1_LIFT }, // the feast hall
   // The walled throne room north of the feast hall, its dais raised +1.2
   // behind a wide ceremonial stair.
-  { id: 'throne_room', x0: -14, x1: 14, z0: 40, z1: 56, lift: KEEP_STORY1_LIFT },
-  { id: 'throne_dais', x0: -7, x1: 7, z0: 56, z1: 62, lift: KEEP_STORY1_LIFT + 1.2 },
+  {
+    id: 'throne_room',
+    x0: -14,
+    x1: 14,
+    z0: 40,
+    z1: 56,
+    lift: KEEP_STORY1_LIFT,
+  },
+  {
+    id: 'throne_dais',
+    x0: -7,
+    x1: 7,
+    z0: 56,
+    z1: 62,
+    lift: KEEP_STORY1_LIFT + 1.2,
+  },
   { id: 'ballroom', x0: -38, x1: -14, z0: 18, z1: 44, lift: KEEP_STORY1_LIFT },
   { id: 'kitchen', x0: -38, x1: -24, z0: 44, z1: 58, lift: KEEP_STORY1_LIFT },
   { id: 'pantry', x0: -24, x1: -14, z0: 46, z1: 56, lift: KEEP_STORY1_LIFT },
   // The east service rooms off the feast hall: the steward's office and the
   // crown's private dining parlor.
-  { id: 'steward_office', x0: 14, x1: 22, z0: 10, z1: 20, lift: KEEP_STORY1_LIFT },
-  { id: 'dining_parlor', x0: 14, x1: 22, z0: 22, z1: 36, lift: KEEP_STORY1_LIFT },
+  {
+    id: 'steward_office',
+    x0: 14,
+    x1: 22,
+    z0: 10,
+    z1: 20,
+    lift: KEEP_STORY1_LIFT,
+  },
+  {
+    id: 'dining_parlor',
+    x0: 14,
+    x1: 22,
+    z0: 22,
+    z1: 36,
+    lift: KEEP_STORY1_LIFT,
+  },
   { id: 'council', x0: 14, x1: 32, z0: 42, z1: 56, lift: KEEP_STORY1_LIFT },
   { id: 'treasury', x0: 32, x1: 42, z0: 44, z1: 54, lift: KEEP_STORY1_LIFT },
   // STORY 2, the residence floor (lift 6.0), reached by TWO stair rooms (the
   // grand stair off the council and the servants' stair off the kitchen), so
   // the residence loops back to the state floor on both wings.
   { id: 'stair_grand', x0: 14, x1: 24, z0: 56, z1: 66, lift: KEEP_STAIR_UP },
-  { id: 'stair_servants', x0: -34, x1: -24, z0: 58, z1: 68, lift: KEEP_STAIR_UP },
+  {
+    id: 'stair_servants',
+    x0: -34,
+    x1: -24,
+    z0: 58,
+    z1: 68,
+    lift: KEEP_STAIR_UP,
+  },
   { id: 'gallery', x0: -24, x1: 24, z0: 66, z1: 78, lift: KEEP_STORY2_LIFT }, // the long gallery
-  { id: 'royal_chamber', x0: -42, x1: -24, z0: 68, z1: 84, lift: KEEP_STORY2_LIFT },
+  {
+    id: 'royal_chamber',
+    x0: -42,
+    x1: -24,
+    z0: 68,
+    z1: 84,
+    lift: KEEP_STORY2_LIFT,
+  },
   // The bedrooms wing: three guest chambers off the gallery's north side, and
   // the servants' quarters tucked beside their stair.
-  { id: 'guest_west', x0: -24, x1: -17, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
+  {
+    id: 'guest_west',
+    x0: -24,
+    x1: -17,
+    z0: 78,
+    z1: 90,
+    lift: KEEP_STORY2_LIFT,
+  },
   { id: 'guest_mid', x0: -17, x1: -10, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
   { id: 'guest_east', x0: 8, x1: 24, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
-  { id: 'servants_quarters', x0: -42, x1: -34, z0: 58, z1: 68, lift: KEEP_STORY2_LIFT },
+  {
+    id: 'servants_quarters',
+    x0: -42,
+    x1: -34,
+    z0: 58,
+    z1: 68,
+    lift: KEEP_STORY2_LIFT,
+  },
   { id: 'solar', x0: -8, x1: 8, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
   // The keep's private chapel, north of the solar at the residence's far end.
   { id: 'chapel', x0: -8, x1: 8, z0: 90, z1: 100, lift: KEEP_STORY2_LIFT },
   { id: 'library', x0: 24, x1: 42, z0: 60, z1: 80, lift: KEEP_STORY2_LIFT },
   // The watch tower continues above the residence: stair turret, then the
   // open lookout at the keep's highest point.
-  { id: 'tower_mid', x0: 28, x1: 38, z0: 80, z1: 90, lift: KEEP_STORY2_LIFT + 1.5 },
-  { id: 'tower_lookout', x0: 28, x1: 38, z0: 90, z1: 100, lift: KEEP_STORY2_LIFT + 3.0 },
+  {
+    id: 'tower_mid',
+    x0: 28,
+    x1: 38,
+    z0: 80,
+    z1: 90,
+    lift: KEEP_STORY2_LIFT + 1.5,
+  },
+  {
+    id: 'tower_lookout',
+    x0: 28,
+    x1: 38,
+    z0: 90,
+    z1: 100,
+    lift: KEEP_STORY2_LIFT + 3.0,
+  },
   // STORY 0, the undercroft: a half landing steps down off the entrance hall,
   // then the gaol corridor at the keep's lowest level with three cell alcoves
   // off its east wall, and the vaulted stores north of the gaol.
@@ -593,7 +869,13 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   keepBrazier(-16.8, 23),
   keepBrazier(-35, 41),
   keepBrazier(-17, 41),
-  { key: 'infernal_statue', x: -36.5, z: 20.2, yaw: Math.PI / 2, r: KEEP_R_STATUE },
+  {
+    key: 'infernal_statue',
+    x: -36.5,
+    z: 20.2,
+    yaw: Math.PI / 2,
+    r: KEEP_R_STATUE,
+  },
   { key: 'infernal_statue', x: -26, z: 42, yaw: Math.PI, r: KEEP_R_STATUE },
   // Kitchen: the great hearth on the west wall, the cook's cauldron beside it.
   { key: 'hell_forge', x: -35.5, z: 51.5, yaw: Math.PI / 2, r: KEEP_R_FORGE },
@@ -751,9 +1033,23 @@ export const DAWNHOLD_ROOMS: readonly AuthoredRoom[] = [
   { id: 'chapel', x0: -13, x1: -3, z0: 24, z1: 34 },
   // THE UPPER STORY (lift 3.0) over one half-landing stair room: the
   // gallery landing, the bedroom suite, and the sunlit solar.
-  { id: 'stair_solar', x0: 3, x1: 13, z0: 24, z1: 34, lift: DAWNHOLD_STAIR_LIFT },
+  {
+    id: 'stair_solar',
+    x0: 3,
+    x1: 13,
+    z0: 24,
+    z1: 34,
+    lift: DAWNHOLD_STAIR_LIFT,
+  },
   { id: 'gallery', x0: -9, x1: 13, z0: 34, z1: 42, lift: DAWNHOLD_SOLAR_LIFT },
-  { id: 'bedroom_suite', x0: -25, x1: -9, z0: 34, z1: 48, lift: DAWNHOLD_SOLAR_LIFT },
+  {
+    id: 'bedroom_suite',
+    x0: -25,
+    x1: -9,
+    z0: 34,
+    z1: 48,
+    lift: DAWNHOLD_SOLAR_LIFT,
+  },
   { id: 'solar', x0: 13, x1: 27, z0: 34, z1: 46, lift: DAWNHOLD_SOLAR_LIFT },
   // THE WINGS. Appended, never inserted: the render dressing, the collider
   // set and the map plate all walk this array in order. Every door below
@@ -771,9 +1067,23 @@ export const DAWNHOLD_ROOMS: readonly AuthoredRoom[] = [
   // climbs to it and it climbs to the solar, so the upper story is a loop
   // (parlor, solar stair, gallery, solar, east stair, library, garden)
   // rather than one dead-end staircase.
-  { id: 'stair_east', x0: 13, x1: 27, z0: 30, z1: 34, lift: DAWNHOLD_STAIR_LIFT },
+  {
+    id: 'stair_east',
+    x0: 13,
+    x1: 27,
+    z0: 30,
+    z1: 34,
+    lift: DAWNHOLD_STAIR_LIFT,
+  },
   // The turret room off the bedroom suite, at the top of the house.
-  { id: 'north_turret', x0: -25, x1: -9, z0: 48, z1: 56, lift: DAWNHOLD_SOLAR_LIFT },
+  {
+    id: 'north_turret',
+    x0: -25,
+    x1: -9,
+    z0: 48,
+    z1: 56,
+    lift: DAWNHOLD_SOLAR_LIFT,
+  },
 ];
 
 export const DAWNHOLD_DOORS: readonly AuthoredDoor[] = [
@@ -803,29 +1113,65 @@ export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
   // parlor arch (clear of the arch opening at |x| <= 3).
   dawnholdBrazier(-6, -13.5),
   dawnholdBrazier(6, -13.5),
-  { key: 'infernal_statue', x: -5, z: -1.8, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  {
+    key: 'infernal_statue',
+    x: -5,
+    z: -1.8,
+    yaw: Math.PI,
+    r: DAWNHOLD_R_STATUE,
+  },
   { key: 'infernal_statue', x: 5, z: -1.8, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
   // Great parlor: the hearth on the east wall between its two doors, a broad
   // rug at the room's heart, firelight in the corners, and a statue pair on
   // the north wall between the chapel and stair doors.
-  { key: 'hell_forge', x: 11.6, z: 17, yaw: -Math.PI / 2, r: DAWNHOLD_R_HEARTH },
+  {
+    key: 'hell_forge',
+    x: 11.6,
+    z: 17,
+    yaw: -Math.PI / 2,
+    r: DAWNHOLD_R_HEARTH,
+  },
   { key: 'rug', x: 0, z: 12, yaw: 0 },
   dawnholdBrazier(-11, 3.2),
   dawnholdBrazier(-11, 21),
   dawnholdBrazier(11, 3.2),
-  { key: 'infernal_statue', x: -3.8, z: 22.9, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
-  { key: 'infernal_statue', x: 3.8, z: 22.9, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  {
+    key: 'infernal_statue',
+    x: -3.8,
+    z: 22.9,
+    yaw: Math.PI,
+    r: DAWNHOLD_R_STATUE,
+  },
+  {
+    key: 'infernal_statue',
+    x: 3.8,
+    z: 22.9,
+    yaw: Math.PI,
+    r: DAWNHOLD_R_STATUE,
+  },
   // Dining room: hearth-light in the corners off both door lanes.
   dawnholdBrazier(-25.3, -0.5),
   dawnholdBrazier(-14.7, 10.8),
   // Kitchen: the cook's hearth on the west wall, the stock cauldron beside it.
-  { key: 'hell_forge', x: -25.3, z: 20, yaw: Math.PI / 2, r: DAWNHOLD_R_HEARTH },
+  {
+    key: 'hell_forge',
+    x: -25.3,
+    z: 20,
+    yaw: Math.PI / 2,
+    r: DAWNHOLD_R_HEARTH,
+  },
   { key: 'slag_cauldron', x: -23.6, z: 17.2, yaw: 0.6, r: DAWNHOLD_R_CAULDRON },
   dawnholdBrazier(-14.8, 24.8),
   // Garden room: garden statues among the beds, a little warm firelight so
   // the conservatory still glows at dusk.
   { key: 'infernal_statue', x: 16.6, z: -2.3, yaw: 0, r: DAWNHOLD_R_STATUE },
-  { key: 'infernal_statue', x: 29.5, z: 18.4, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  {
+    key: 'infernal_statue',
+    x: 29.5,
+    z: 18.4,
+    yaw: Math.PI,
+    r: DAWNHOLD_R_STATUE,
+  },
   dawnholdBrazier(14.6, 8),
   dawnholdBrazier(31.3, 14.5),
   // Gallery: a runner rug between the two wings, firelight at both ends
@@ -838,7 +1184,13 @@ export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
   dawnholdBrazier(-10.4, 46.5),
   // Solar: one warm brazier by the stair-side wall; daylight does the rest.
   dawnholdBrazier(14.5, 35.3),
-  { key: 'infernal_statue', x: 25.5, z: 44.5, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
+  {
+    key: 'infernal_statue',
+    x: 25.5,
+    z: 44.5,
+    yaw: Math.PI,
+    r: DAWNHOLD_R_STATUE,
+  },
 ];
 
 /**
@@ -1136,8 +1488,22 @@ export function layoutColliders(
       });
     }
     // back wall, then front wall (entrance porch: chase cam fits inside)
-    out.push({ type: 'obb', x: 0, z: layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
-    out.push({ type: 'obb', x: 0, z: layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, rot: 0 });
+    out.push({
+      type: 'obb',
+      x: 0,
+      z: layout.zMax,
+      hw: endWallHw,
+      hd: DUNGEON_WALL_HW,
+      rot: 0,
+    });
+    out.push({
+      type: 'obb',
+      x: 0,
+      z: layout.zMin,
+      hw: endWallHw,
+      hd: DUNGEON_WALL_HW,
+      rot: 0,
+    });
   }
   // chamber waists
   for (const s of layout.stubs)
@@ -1209,7 +1575,14 @@ export function layoutColliders(
         standable: true,
       });
     } else {
-      out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
+      out.push({
+        type: 'obb',
+        x: t.x,
+        z: t.z,
+        hw: TOMB_HW,
+        hd: TOMB_HD,
+        rot: 0,
+      });
     }
   }
   // floor clutter props (small circle per scatter point; renderer places matching props)

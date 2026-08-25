@@ -224,8 +224,10 @@ describe('nythraxis hitch bench helpers', () => {
     expect(layout).toContain(
       `entry: { x: ${NYTHRAXIS_ARENA_ENTRY_LOCAL.x}, z: ${NYTHRAXIS_ARENA_ENTRY_LOCAL.z} }`,
     );
+    const sharedTypes = readFileSync(new URL('../src/sim/types.ts', import.meta.url), 'utf8');
+    expect(sharedTypes).toContain(`export const PLAYER_INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
     const server = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
-    expect(server).toContain(`const INTEREST_RADIUS = ${MOB_INTEREST_RADIUS}`);
+    expect(server).toContain('const INTEREST_RADIUS = PLAYER_INTEREST_RADIUS');
   });
 
   it('stands the observer on the live Aldric spawn and keeps that distance pinned to the encounter', () => {

@@ -1,0 +1,72 @@
+{
+  "defaults": {
+    "type": "static",
+    "maxTex": 512
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/820v1.glb",
+      "out": "models/props/ignivar_gear_small.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/big_gear.glb",
+      "out": "models/props/ignivar_gear_heavy.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/chain.glb",
+      "out": "models/props/ignivar_chain.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/curved_wall.glb",
+      "out": "models/props/ignivar_curved_gear_wall.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/fallen_automa.glb",
+      "out": "models/props/ignivar_fallen_automa.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/furnace_pillar.glb",
+      "out": "models/props/ignivar_furnace_pillar.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/gear_broad.glb",
+      "out": "models/props/ignivar_gear_broad.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/firepit.glb",
+      "out": "models/props/ignivar_firepit.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/forge_station.glb",
+      "out": "models/props/ignivar_forge_station.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/gear_machine.glb",
+      "out": "models/props/ignivar_gear_machine.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/gear_wall_cluster.glb",
+      "out": "models/props/ignivar_gear_wall_cluster.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/reactor.glb",
+      "out": "models/props/ignivar_reactor.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/forge_anvil.glb",
+      "out": "models/props/ignivar_forge_anvil.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/forge_house.glb",
+      "out": "models/props/ignivar_forge_house.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/wall_gear_relief.glb",
+      "out": "models/props/ignivar_wall_gear_relief.glb"
+    },
+    {
+      "src": "tmp/asset_src/ignivar_raid_props/workbench.glb",
+      "out": "models/props/ignivar_workbench.glb"
+    }
+  ]
+}

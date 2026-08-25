@@ -7,6 +7,49 @@ export interface AuthoredWallCell {
   length: number;
 }
 
+export interface AuthoredWallRun {
+  axis: 'x' | 'z';
+  fixed: number;
+  a: number;
+  b: number;
+}
+
+export interface AuthoredWallOccluderFootprint {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  topY: number;
+}
+
+/** Exact world-space footprint used by the camera fade for one collider-backed
+ * authored wall run. */
+export function authoredWallFootprint(
+  segment: AuthoredWallRun,
+  originX: number,
+  originZ: number,
+  wallHalfWidth: number,
+  topY: number,
+): AuthoredWallOccluderFootprint {
+  const center = (segment.a + segment.b) / 2;
+  const halfLength = (segment.b - segment.a) / 2;
+  return segment.axis === 'x'
+    ? {
+        x: originX + center,
+        z: originZ + segment.fixed,
+        hw: halfLength,
+        hd: wallHalfWidth,
+        topY,
+      }
+    : {
+        x: originX + segment.fixed,
+        z: originZ + center,
+        hw: wallHalfWidth,
+        hd: halfLength,
+        topY,
+      };
+}
+
 export function fitAuthoredWallSegment(
   a: number,
   b: number,

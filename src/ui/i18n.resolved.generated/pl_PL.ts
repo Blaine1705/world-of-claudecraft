@@ -8182,6 +8182,8 @@ export const pl_PL: EnTranslations = {
         "riftEntrance": "Wejście do Szczeliny: {name}",
         "hostileEnemy": "Wrogi przeciwnik",
         "aggressiveEnemy": "Atakujący cię wróg",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Wróg do ograbienia",
         "corpse": "Twoje zwłoki",
         "deathZone": "Strefa zagrożenia",

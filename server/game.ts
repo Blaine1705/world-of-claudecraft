@@ -103,7 +103,9 @@ import {
   MAX_LEVEL,
   type MobFamily,
   PLAYER_INTEREST_DROP_RADIUS,
+  PLAYER_INTEREST_RADIUS,
   RUN_SPEED,
+  NPC_INTEREST_RADIUS as SHARED_NPC_INTEREST_RADIUS,
   type SimEvent,
   type SportRole,
   type UnstuckBlockedReason,
@@ -351,13 +353,13 @@ const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 // Interest management: the client renders entities out to 80yd, so new
 // entities enter interest just past that, and known entities persist a
 // little farther so the boundary doesn't churn create/destroy cycles.
-const INTEREST_RADIUS = 90;
+const INTEREST_RADIUS = PLAYER_INTEREST_RADIUS;
 // Exported so the idle-mob-tick radius below (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
 export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;
 // Stationary quest/vendor npcs anchor map markers, so they keep the legacy
 // radius; once known they cost a handful of bytes per snapshot anyway.
-const NPC_INTEREST_RADIUS = 120;
+const NPC_INTEREST_RADIUS = SHARED_NPC_INTEREST_RADIUS;
 const NPC_DROP_RADIUS = 130;
 // the widest OPEN-WORLD radius any entity kind can be relevant at (the
 // battleground band widens past this: BG_MATCH_DROP_RADIUS below)

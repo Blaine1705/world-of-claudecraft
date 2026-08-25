@@ -8182,6 +8182,8 @@ export const tr_TR: EnTranslations = {
         "riftEntrance": "Yarık girişi: {name}",
         "hostileEnemy": "Düşman",
         "aggressiveEnemy": "Sana saldıran düşman",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Yağmalanabilir düşman",
         "corpse": "Cesedin",
         "deathZone": "Tehlikeli bölge",

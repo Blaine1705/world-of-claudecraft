@@ -8182,6 +8182,8 @@ export const cs_CZ: EnTranslations = {
         "riftEntrance": "Vstup do trhliny: {name}",
         "hostileEnemy": "Nepřátelská jednotka",
         "aggressiveEnemy": "Nepřítel, který na tebe útočí",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Nepřítel s dostupnou kořistí",
         "corpse": "Tvoje mrtvé tělo",
         "deathZone": "Nebezpečná zóna",

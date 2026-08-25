@@ -8182,6 +8182,8 @@ export const zh_CN: EnTranslations = {
         "riftEntrance": "裂隙入口：{name}",
         "hostileEnemy": "敌对目标",
         "aggressiveEnemy": "正在攻击你的敌人",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "可拾取战利品的敌人",
         "corpse": "你的尸体",
         "deathZone": "危险区域",

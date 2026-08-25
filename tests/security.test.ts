@@ -92,12 +92,12 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 
 describe('websocket authentication', () => {
   it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(20);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(23);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-20');
-    // The previous layout-gated server accepts only `auth-world-19`, so the new
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-23');
+    // The previous layout-gated server accepts only `auth-world-22`, so the new
     // client discriminator must remain necessarily unrecognizable to it.
-    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-19');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-22');
   });
 
   it('keeps bearer tokens out of the websocket URL', () => {
@@ -146,18 +146,27 @@ describe('desktop login handoff codes', () => {
 
   it('exchanges a code once for the same client IP', () => {
     const req = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '172.18.0.1');
-    const { code, expiresInMs } = createDesktopLoginCode(req, { id: 42, username: 'titoisking' });
+    const { code, expiresInMs } = createDesktopLoginCode(req, {
+      id: 42,
+      username: 'titoisking',
+    });
 
     expect(code).toMatch(/^[A-Za-z0-9_-]+$/);
     expect(expiresInMs).toBeGreaterThan(0);
-    expect(consumeDesktopLoginCode(req, code)).toEqual({ accountId: 42, username: 'titoisking' });
+    expect(consumeDesktopLoginCode(req, code)).toEqual({
+      accountId: 42,
+      username: 'titoisking',
+    });
     expect(consumeDesktopLoginCode(req, code)).toBeNull();
   });
 
   it('rejects a code exchange from a different client IP', () => {
     const issuer = fakeReq({ 'x-forwarded-for': '203.0.113.55' }, '172.18.0.1');
     const attacker = fakeReq({ 'x-forwarded-for': '198.51.100.77' }, '172.18.0.1');
-    const { code } = createDesktopLoginCode(issuer, { id: 42, username: 'titoisking' });
+    const { code } = createDesktopLoginCode(issuer, {
+      id: 42,
+      username: 'titoisking',
+    });
 
     expect(consumeDesktopLoginCode(attacker, code)).toBeNull();
   });
@@ -572,7 +581,11 @@ describe('gm privilege boundaries', () => {
   });
 
   it('does not restore gm privilege from client-controlled saved character state', () => {
-    const source = new Sim({ seed: 42, playerClass: 'warrior', world: GM_TEST_WORLD });
+    const source = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      world: GM_TEST_WORLD,
+    });
     const state = source.serializeCharacter(source.playerId) as any;
     state.gm = true;
     state.is_gm = true;
@@ -729,7 +742,10 @@ describe('desktop login handoff codes: expiry and code shape', () => {
     vi.useFakeTimers();
     try {
       const req = fakeReq({}, '203.0.113.55');
-      const { code, expiresInMs } = createDesktopLoginCode(req, { id: 7, username: 'tito' });
+      const { code, expiresInMs } = createDesktopLoginCode(req, {
+        id: 7,
+        username: 'tito',
+      });
       expect(desktopLoginCodeCountForTest()).toBe(1);
       vi.advanceTimersByTime(expiresInMs + 1);
       expect(consumeDesktopLoginCode(req, code)).toBeNull();
@@ -743,9 +759,15 @@ describe('desktop login handoff codes: expiry and code shape', () => {
     vi.useFakeTimers();
     try {
       const req = fakeReq({}, '203.0.113.55');
-      const { code, expiresInMs } = createDesktopLoginCode(req, { id: 7, username: 'tito' });
+      const { code, expiresInMs } = createDesktopLoginCode(req, {
+        id: 7,
+        username: 'tito',
+      });
       vi.advanceTimersByTime(expiresInMs - 1000);
-      expect(consumeDesktopLoginCode(req, code)).toEqual({ accountId: 7, username: 'tito' });
+      expect(consumeDesktopLoginCode(req, code)).toEqual({
+        accountId: 7,
+        username: 'tito',
+      });
     } finally {
       vi.useRealTimers();
     }
@@ -862,7 +884,10 @@ describe('desktop login route handlers', () => {
     expect(sent[0].body.username).toBe('tito');
     expect(sent[0].body.token).toMatch(/^[0-9a-f]{64}$/);
     expect(saveToken).toHaveBeenCalledWith(sent[0].body.token, 7);
-    expect(touchLogin).toHaveBeenCalledWith(7, { ip: '203.0.113.55', userAgent: 'test-agent' });
+    expect(touchLogin).toHaveBeenCalledWith(7, {
+      ip: '203.0.113.55',
+      userAgent: 'test-agent',
+    });
     const second = desktopRouteDeps({ readBody: async () => ({ code }) });
     await handleDesktopLoginExchange(req, {} as any, second.deps);
     expect(second.sent[0].status).toBe(401);

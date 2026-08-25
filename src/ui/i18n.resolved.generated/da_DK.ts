@@ -8182,6 +8182,8 @@ export const da_DK: EnTranslations = {
         "riftEntrance": "Rift-indgang: {name}",
         "hostileEnemy": "Fjendtligt mål",
         "aggressiveEnemy": "Fjende angriber dig",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Fjende med bytte",
         "corpse": "Dit lig",
         "deathZone": "Farezone",

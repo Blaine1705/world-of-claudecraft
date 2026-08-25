@@ -501,6 +501,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
+import { InteriorMapController } from './interior_map_controller';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -519,8 +520,6 @@ import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
-import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
-import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -2042,6 +2041,8 @@ export class Hud {
         station: stationNameText,
         poi: zonePoiLabel,
         rift: riftFloorLabel,
+        npc: npcDisplayName,
+        mob: mobDisplayName,
       },
       npc: (marker) => this.mapMarkerTooltipContent.npc(marker),
       navigation: (marker) =>
@@ -4148,16 +4149,7 @@ export class Hud {
     this.mapMarkerArt,
     this.mapMarkerProfile,
   );
-  // The Last Keep interior map (the castle floor plan): both surfaces routed
-  // by the lastKeepMapActive position guard, exactly like the delve branch.
-  private readonly lastKeepMapPainter = new LastKeepMapPainter(this.writerFacet, classCss);
-  // Dawnhold Castle rides the same parameterized painter with its own spec
-  // (plates, title keys, and pure-core builders), routed by dawnholdMapActive.
-  private readonly dawnholdMapPainter = new LastKeepMapPainter(
-    this.writerFacet,
-    classCss,
-    DAWNHOLD_MAP_PAINTER_SPEC,
-  );
+  private readonly interiorMaps = new InteriorMapController(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -10764,29 +10756,16 @@ export class Hud {
       );
       return;
     }
-    // Inside The Last Keep: the baked floor plan for the player's current
-    // story, with the '#zone-label' story title (the delve branch pattern).
-    if (lastKeepMapActive(this.sim)) {
-      this.lastKeepMapPainter.paintMinimap(
+    if (
+      this.interiorMaps.paintMinimap(
         ctx,
         this.sim,
         $('#zone-label'),
         MINIMAP_SIZE,
         this.minimapZoom,
-      );
+      )
+    )
       return;
-    }
-    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
-    if (dawnholdMapActive(this.sim)) {
-      this.dawnholdMapPainter.paintMinimap(
-        ctx,
-        this.sim,
-        $('#zone-label'),
-        MINIMAP_SIZE,
-        this.minimapZoom,
-      );
-      return;
-    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet. It blits the current zone's
@@ -11038,7 +11017,8 @@ export class Hud {
     const inRift = mapMode === 'rift';
     const inBattleground = mapMode === 'battleground';
     const inDelve = mapMode === 'delve';
-    const schematic = inRift || inDelve || inBattleground;
+    const inDungeon = mapMode === 'dungeon';
+    const schematic = inRift || inDelve || inBattleground || inDungeon;
     this.setDisplay($('#map-level-toggle'), schematic ? 'none' : 'block');
     this.setDisplay($('#map-zoom'), schematic || this.mapLevel === 'continent' ? 'none' : 'flex');
     if (inRift) {
@@ -11071,6 +11051,18 @@ export class Hud {
       return;
     }
 
+    if (inDungeon) {
+      this.clearMapHitState(canvas);
+      const result = this.interiorMaps.paintDungeonWorldMap(ctx, this.sim, S);
+      const title = result?.title ?? '';
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateDungeon(result?.model ?? null, title, S),
+      );
+      return;
+    }
+
     this.setText(
       $('#map-level-toggle'),
       t(
@@ -11097,23 +11089,14 @@ export class Hud {
     }
     this.continentRegions = [];
 
-    // Inside The Last Keep: the whole-plan floor plate for the player's
-    // current story (title drawn on-canvas, the delve branch pattern); the
-    // continent overview above still wins when the player toggles up to it.
-    if (lastKeepMapActive(this.sim)) {
+    const castleTitle = this.interiorMaps.paintCastleWorldMap(ctx, this.sim, S);
+    if (castleTitle !== null) {
       this.clearMapHitState(canvas);
-      const title = this.lastKeepMapPainter.paintWorldMap(ctx, this.sim, S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
-      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
-      return;
-    }
-
-    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
-    if (dawnholdMapActive(this.sim)) {
-      this.clearMapHitState(canvas);
-      const title = this.dawnholdMapPainter.paintWorldMap(ctx, this.sim, S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
-      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: castleTitle }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateSimple(castleTitle, S),
+      );
       return;
     }
 

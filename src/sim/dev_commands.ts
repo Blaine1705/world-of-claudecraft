@@ -742,7 +742,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering in a spread formation. Defeat all three automaton packs to open the Herald gate, then use /dev ignivarraid again in Ignivar's room to place the raid formation. Use /dev ignivarraid boss to skip there now.`,
+        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering in a spread formation. Defeat all six automaton packs to open the Herald gate, then use /dev ignivarraid again in Ignivar's room to place the raid formation. Use /dev ignivarraid boss to skip there now.`,
       );
       return null;
     }

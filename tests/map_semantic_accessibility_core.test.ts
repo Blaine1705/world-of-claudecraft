@@ -1,4 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { DungeonMapModel } from '../src/ui/dungeon_map_view';
 import {
   BG_MAP_FIELD_PAD_PX,
   type BgMapModel,
@@ -25,6 +26,8 @@ function core() {
     station: (type) => `Station ${type}`,
     poi: (zoneId, index) => `POI ${zoneId}/${index}`,
     rift: (name, rank) => `${name} (${rank ?? '?'})`,
+    npc: (id) => `NPC ${id}`,
+    mob: (id) => `Mob ${id}`,
   });
 }
 
@@ -118,7 +121,7 @@ const GATHER_ACCESSIBILITY_CASES = [
 ] as const;
 
 beforeAll(async () => {
-  await ensureLocaleLoaded('zh_CN');
+  await Promise.all([ensureLocaleLoaded('zh_CN'), ensureLocaleLoaded('es')]);
 });
 
 afterEach(() => {
@@ -329,6 +332,107 @@ describe('map semantic accessibility core', () => {
     expect(view.tooltipAt(260, 100, 20)).toBe('Open gate: north, medium distance.');
   });
 
+  it('describes every visible dungeon marker instead of announcing an empty map', () => {
+    const view = core();
+    const description = view.updateDungeon(
+      {
+        markers: [
+          { kind: 'player', cx: 280, cy: 280, angle: 0 },
+          { kind: 'exit', cx: 280, cy: 500 },
+          { kind: 'gate', cx: 280, cy: 60 },
+          { kind: 'loot', cx: 100, cy: 280, source: 'enemy' },
+          { kind: 'loot', cx: 460, cy: 280, source: 'object' },
+          { kind: 'npc', cx: 180, cy: 180, templateId: 'ignivar_maelin' },
+          {
+            kind: 'mob',
+            cx: 380,
+            cy: 180,
+            templateId: 'sentinel',
+            aggro: false,
+            boss: false,
+          },
+          {
+            kind: 'mob',
+            cx: 380,
+            cy: 380,
+            templateId: 'varkhul',
+            aggro: true,
+            boss: true,
+          },
+          {
+            kind: 'mob',
+            cx: 460,
+            cy: 380,
+            templateId: 'warden',
+            aggro: true,
+            boss: false,
+          },
+          { kind: 'party', cx: 180, cy: 380, cls: 'mage', dead: false },
+          { kind: 'party', cx: 180, cy: 460, cls: 'priest', dead: true },
+        ],
+      } as unknown as DungeonMapModel,
+      'Molten Assembly',
+      560,
+    );
+
+    for (const label of [
+      'You',
+      'Dungeon exit',
+      'Sealed gate',
+      'Lootable enemy',
+      'Treasure available',
+      'Point of interest: NPC ignivar_maelin',
+      'Hostile enemy',
+      'Enemy attacking you',
+      'Boss attacking you: Mob varkhul',
+      'Party member',
+      'Dead party member',
+    ]) {
+      expect(description).toContain(label);
+    }
+    expect(description).not.toContain('No relevant markers are visible.');
+  });
+
+  it('relocalizes dungeon boss and NPC narration from stable entity ids', () => {
+    const npc = vi.fn(() => 'Archivera Maelin');
+    const mob = vi.fn(() => 'Varkhul');
+    const view = new MapSemanticAccessibilityCore({
+      zone: (id) => id,
+      dungeon: (id) => id,
+      delve: (id) => id,
+      station: (type) => type,
+      poi: (zoneId, index) => `${zoneId}/${index}`,
+      rift: (name) => name,
+      npc,
+      mob,
+    });
+    const model = {
+      markers: [
+        { kind: 'player', cx: 280, cy: 280, angle: 0 },
+        { kind: 'npc', cx: 180, cy: 180, templateId: 'archivist_maelin_emberward' },
+        {
+          kind: 'mob',
+          cx: 380,
+          cy: 180,
+          templateId: 'varkhul_forgefather_of_the_last_flame',
+          aggro: false,
+          boss: true,
+        },
+      ],
+    } as unknown as DungeonMapModel;
+
+    setLanguage('en');
+    expect(view.updateDungeon(model, 'Molten Assembly', 560)).toContain('Boss: Varkhul');
+    const boss = model.markers.find((marker) => marker.kind === 'mob');
+    if (boss?.kind === 'mob') boss.aggro = true;
+    setLanguage('es');
+    const spanish = view.updateDungeon(model, 'Ensamblaje Fundido', 560);
+    expect(spanish).toContain('Jefe que te está atacando: Varkhul');
+    expect(spanish).toContain('Punto de interés: Archivera Maelin');
+    expect(npc).toHaveBeenCalledWith('archivist_maelin_emberward');
+    expect(mob).toHaveBeenCalledWith('varkhul_forgefather_of_the_last_flame');
+  });
+
   it('write-elides localization while raw motion stays in the same sector and range band', () => {
     const stationName = vi.fn((type: string) => `Station ${type}`);
     const view = new MapSemanticAccessibilityCore({
@@ -338,6 +442,8 @@ describe('map semantic accessibility core', () => {
       station: stationName,
       poi: (zoneId, index) => `${zoneId}/${index}`,
       rift: (name) => name,
+      npc: (id) => id,
+      mob: (id) => id,
     });
     const model = {
       view: {},
@@ -372,6 +478,8 @@ describe('map semantic accessibility core', () => {
       station: stationName,
       poi: (zoneId, index) => `${zoneId}/${index}`,
       rift: (name) => name,
+      npc: (id) => id,
+      mob: (id) => id,
     });
     const model = crowdedOverworldModel();
 

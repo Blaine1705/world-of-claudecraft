@@ -48,7 +48,7 @@ export const IGNIVAR_RAID_ENVIRONMENT: Readonly<
 export function ignivarRaidFogStateForInterior(
   interior: string | null,
 ): IgnivarRaidFogState | null {
-  if (interior === 'ignivar_approach') return 'ignivarApproach';
+  if (interior === 'ignivar_approach' || interior === 'ignivar_assembly') return 'ignivarApproach';
   if (interior === 'ignivar') return 'ignivar';
   if (interior === 'ignivar_depths') return 'varkhul';
   return null;

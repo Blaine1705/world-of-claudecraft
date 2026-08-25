@@ -39,7 +39,9 @@ export const YELL_RANGE = 100;
 // 96 yards, and the network keeps known entities through this slightly wider
 // hysteresis edge. Offline and server Sims may therefore skip only idle,
 // ownerless mob AI beyond this radius without freezing anything a player sees.
+export const PLAYER_INTEREST_RADIUS = 90;
 export const PLAYER_INTEREST_DROP_RADIUS = 100;
+export const NPC_INTEREST_RADIUS = 120;
 export const OBJECT_RESPAWN = 30;
 // How many of a party member's auras ride the party wire (PartyMemberInfo.auras,
 // the mini icon strip under each party frame row). A cap, not a filter: the first
@@ -3444,6 +3446,9 @@ export interface DungeonSpawn {
   x: number; // relative to instance origin
   z: number;
   facing?: number;
+  /** Placement-authored pull identity. Mobs sharing this id in one claimed room
+   * enter combat together even when the pack mixes templates. */
+  packId?: string;
   /** Per-placement promotion for a recurring trash template. The base template
    * remains unchanged for ordinary encounter waves that reuse the same mob. */
   miniboss?: DungeonSpawnMinibossTuning;
@@ -3513,6 +3518,7 @@ export interface DungeonDef {
     | 'nythraxis'
     | 'ignivar'
     | 'ignivar_approach'
+    | 'ignivar_assembly'
     | 'ignivar_depths'
     | 'wildheart'
     | 'lastkeep'
@@ -4758,6 +4764,9 @@ export interface Entity extends ClientMirroredEntityFields {
     wardedPlayerIds: number[];
   };
   dungeonId: string | null; // set on dungeon door/exit portals
+  /** Claim-local identity for authored dungeon packs. Sim authority only; the
+   * server resolves the pull and clients need no extra wire state. */
+  dungeonPackId?: string;
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;

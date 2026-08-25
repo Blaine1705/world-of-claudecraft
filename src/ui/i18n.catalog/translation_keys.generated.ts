@@ -6803,6 +6803,8 @@ export type TranslationKeyFlat =
   | 'hud.core.mapMarkerEmpty'
   | 'hud.core.mapMarkerLabels.aggressiveEnemy'
   | 'hud.core.mapMarkerLabels.availableQuest'
+  | 'hud.core.mapMarkerLabels.bossAggressiveEnemy'
+  | 'hud.core.mapMarkerLabels.bossEnemy'
   | 'hud.core.mapMarkerLabels.boulderMovable'
   | 'hud.core.mapMarkerLabels.boulderPad'
   | 'hud.core.mapMarkerLabels.boulderPlaced'

@@ -812,6 +812,9 @@ function claimInstance(
     );
     applyDungeonMobTuning(mob, mobDifficultyTuningId, difficulty);
     applyDungeonSpawnMinibossTuning(mob, spawn.miniboss);
+    if (spawn.packId) {
+      mob.dungeonPackId = `${inst.dungeonId}:${inst.slot}:${spawn.packId}`;
+    }
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     ctx.addEntity(mob);

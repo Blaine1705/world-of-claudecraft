@@ -8182,6 +8182,8 @@ export const vi_VN: EnTranslations = {
         "riftEntrance": "Lối vào Rạn Nứt: {name}",
         "hostileEnemy": "Kẻ địch",
         "aggressiveEnemy": "Kẻ địch đang tấn công bạn",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Kẻ địch có chiến lợi phẩm",
         "corpse": "Thi thể của bạn",
         "deathZone": "Vùng nguy hiểm",

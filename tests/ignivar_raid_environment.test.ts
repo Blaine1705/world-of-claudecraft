@@ -9,6 +9,7 @@ import {
 describe('Ignivar raid room environment', () => {
   it('maps the three interior variants to distinct forge grades', () => {
     expect(ignivarRaidFogStateForInterior('ignivar_approach')).toBe('ignivarApproach');
+    expect(ignivarRaidFogStateForInterior('ignivar_assembly')).toBe('ignivarApproach');
     expect(ignivarRaidFogStateForInterior('ignivar')).toBe('ignivar');
     expect(ignivarRaidFogStateForInterior('ignivar_depths')).toBe('varkhul');
     expect(ignivarRaidFogStateForInterior('crypt')).toBeNull();

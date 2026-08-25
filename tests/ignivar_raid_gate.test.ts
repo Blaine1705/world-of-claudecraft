@@ -68,5 +68,8 @@ describe('Ignivar raid gate', () => {
     expect(dungeonSource).toMatch(
       /interior === 'ignivar_approach'[\s\S]{0,120}\? IGNIVAR_FORGE_APPROACH_LAYOUT/,
     );
+    expect(dungeonSource).toMatch(
+      /interior === 'ignivar_assembly'[\s\S]{0,120}\? IGNIVAR_MOLTEN_ASSEMBLY_LAYOUT/,
+    );
   });
 });

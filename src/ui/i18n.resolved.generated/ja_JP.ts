@@ -8182,6 +8182,8 @@ export const ja_JP: EnTranslations = {
         "riftEntrance": "リフト入口：{name}",
         "hostileEnemy": "敵対対象",
         "aggressiveEnemy": "あなたを攻撃中の敵",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "戦利品を回収できる敵",
         "corpse": "自分の死体",
         "deathZone": "危険地帯",

@@ -315,6 +315,7 @@ import {
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
+import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import { activeIgnivarTrashMeteorWarning } from './mob/ignivar_trash_automata';
@@ -7996,6 +7997,10 @@ export class Sim {
     // leash on every mob they both claim.
     if (playerPull) chainPullInstanceOnBossAggro(this.ctx, mob, target);
     if (social) {
+      // Authored dungeon packs are explicit rather than inferred from template
+      // or spacing. That lets a miniboss Warden pull its Sentinel escorts and
+      // keeps a spread-out formation as one deliberate encounter.
+      aggroDungeonPackmates(this.entities.values(), mob, target);
       const family = MOBS[mob.templateId]?.family;
       const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
       this.grid.forEachInRadius(mob.pos.x, mob.pos.z, pullRadius, (m, d2) => {

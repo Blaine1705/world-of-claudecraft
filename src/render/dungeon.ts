@@ -31,6 +31,7 @@ import {
   type GridPoint,
   IGNIVAR_FORGE_APPROACH_LAYOUT,
   IGNIVAR_LAYOUT,
+  IGNIVAR_MOLTEN_ASSEMBLY_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
   type InteriorStyle,
   LASTKEEP_LAYOUT,
@@ -51,7 +52,7 @@ import {
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { fitAuthoredWallSegment } from './authored_walls_core';
+import { authoredWallFootprint, fitAuthoredWallSegment } from './authored_walls_core';
 import { DAIS_PLATFORM_HEIGHT } from './dais_lift';
 import { buildDawnholdDressing, ensureDawnholdDressing } from './dawnhold_dressing';
 import {
@@ -66,13 +67,33 @@ import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
-import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
+import {
+  buildIgnivarRaidDressing,
+  ensureIgnivarRaidDressingAssets,
+  ignivarRaidForgeLightPlacements,
+} from './ignivar_raid_dressing';
+import {
+  buildIgnivarRaidProps,
+  ensureIgnivarRaidPropAssets,
+  isIgnivarRaidPropAvailable,
+} from './ignivar_raid_props';
+import { buildIgnivarRaidStandIns, settleIgnivarRaidStandIns } from './ignivar_raid_stand_ins';
+import {
+  buildIgnivarRaidWallFacade,
+  IGNIVAR_RAID_FLOOR_TINT,
+  IGNIVAR_RAID_WALL_TINT,
+  type IgnivarRaidWallFacade,
+} from './ignivar_raid_wall_facade';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import type { FireLightSink } from './point_light_budget';
-import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
+import {
+  buildInfernalDecor,
+  ensureInfernalDecorAssets,
+  isInfernalDecorModelAvailable,
+} from './rift_decor';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
@@ -512,6 +533,8 @@ export interface ArenaWallFootprint {
 interface PendingArenaWall {
   placements: Placements;
   footprint: ArenaWallFootprint;
+  wallTint?: number;
+  facade?: IgnivarRaidWallFacade;
 }
 
 interface PendingArenaWalls {
@@ -842,11 +865,13 @@ export class DungeonInteriors {
                     DAWNHOLD_LAYOUT
                   : interior === 'ignivar_approach'
                     ? IGNIVAR_FORGE_APPROACH_LAYOUT
-                    : interior === 'ignivar'
-                      ? IGNIVAR_LAYOUT
-                      : interior === 'ignivar_depths'
-                        ? IGNIVAR_SECOND_WING_LAYOUT
-                        : CRYPT_LAYOUT);
+                    : interior === 'ignivar_assembly'
+                      ? IGNIVAR_MOLTEN_ASSEMBLY_LAYOUT
+                      : interior === 'ignivar'
+                        ? IGNIVAR_LAYOUT
+                        : interior === 'ignivar_depths'
+                          ? IGNIVAR_SECOND_WING_LAYOUT
+                          : CRYPT_LAYOUT);
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
@@ -861,6 +886,71 @@ export class DungeonInteriors {
     // replace the single-room shell entirely. Walls come from the SAME segment
     // helper the sim derives collision from, so they cannot drift apart.
     if (layout.rooms) {
+      // These two raid floors are guaranteed content rather than a rare rift
+      // roll. Put their structural shell through the reveal gate first, then
+      // stream only the decor models the authored table actually references.
+      // Online movement remains authoritative while cosmetics load, so making
+      // walls/floor visible first prevents invisible collision on a cold mobile
+      // cache. The decor child gets its own reveal gate before it becomes live.
+      if (interior === 'ignivar_approach' || interior === 'ignivar_assembly') {
+        this.placeAuthoredFloor(p, layout, variant);
+        this.placeAuthoredWalls(p, layout, variant, {
+          group,
+          ox,
+          oz,
+          wallTint: IGNIVAR_RAID_WALL_TINT,
+          buildFacade: (seg) => buildIgnivarRaidWallFacade(seg, this.lowGfx),
+        });
+        const standIns = buildIgnivarRaidStandIns(layout.decor ?? []);
+        if (standIns) group.add(standIns.group);
+        this.placeAuthoredRelief(group, layout);
+        this.placeAuthoredLedges(group, layout);
+        const liftAt = (x: number, z: number): number =>
+          authoredLiftAt(layout.rooms ?? [], layout.doors ?? [], x, z);
+        this.placeDais(group, p, layout, variant, torch, daisRaised);
+        if (opts?.hazards?.length) {
+          this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'lava', liftAt);
+        }
+        if (layout.illusionWalls?.length) {
+          this.placeIllusionWalls(group, layout.illusionWalls, variant);
+        }
+        this.emit(group, p, variant, {
+          wall: opts?.style?.wallTint ?? IGNIVAR_RAID_WALL_TINT,
+          floor: opts?.style?.floorTint ?? IGNIVAR_RAID_FLOOR_TINT,
+        });
+        group.position.set(ox, 0, oz);
+        group.userData.renderCategory = 'dungeon';
+        await attachSceneGroupGated(this.scene, group, this.compileGate);
+
+        await Promise.all([
+          ensureInfernalDecorAssets(layout.decor ?? []),
+          ensureIgnivarRaidPropAssets(layout.decor ?? [], this.lowGfx),
+        ]);
+        const decorGroup = new THREE.Group();
+        decorGroup.name = `${interior}Decor`;
+        decorGroup.userData.renderCategory = 'dungeon';
+        const light = (x: number, z: number, color: number, y?: number, scale?: number): void =>
+          this.addInfernalLight(decorGroup, x, z, color, y, scale);
+        for (const forgeLight of ignivarRaidForgeLightPlacements(layout)) {
+          light(forgeLight.x, forgeLight.z, torch.light, forgeLight.y, forgeLight.scale);
+        }
+        buildInfernalDecor(decorGroup, layout.decor ?? [], torch, light, liftAt);
+        const raidProps = buildIgnivarRaidProps(layout.decor ?? [], this.lowGfx);
+        if (raidProps) decorGroup.add(raidProps);
+        const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx);
+        if (raidDressing) decorGroup.add(raidDressing);
+        await attachSceneGroupGated(group, decorGroup, this.compileGate);
+        if (standIns) {
+          settleIgnivarRaidStandIns(
+            standIns,
+            (entry) =>
+              isInfernalDecorModelAvailable(entry.key) ||
+              isIgnivarRaidPropAvailable(entry.key, this.lowGfx),
+          );
+        }
+        return group;
+      }
+
       await ensureInfernalDecorAssets();
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
@@ -904,6 +994,8 @@ export class DungeonInteriors {
       } else {
         buildInfernalDecor(group, layout.decor ?? [], torch, light, liftAt);
       }
+      const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx);
+      if (raidDressing) group.add(raidDressing);
       this.placeDais(group, p, layout, variant, torch, daisRaised);
       if (opts?.hazards?.length) {
         this.placeBlackwaterPools(group, opts.hazards, opts?.hazardStyle ?? 'lava', liftAt);
@@ -1093,7 +1185,13 @@ export class DungeonInteriors {
   // rest of the interior.
   private placeBlackwaterPools(
     group: THREE.Group,
-    hazards: Array<{ x: number; z: number; r: number; rx?: number; rz?: number }>,
+    hazards: Array<{
+      x: number;
+      z: number;
+      r: number;
+      rx?: number;
+      rz?: number;
+    }>,
     style: 'blackwater' | 'lava' = 'blackwater',
     liftAt?: (x: number, z: number) => number,
   ): void {
@@ -1230,7 +1328,10 @@ export class DungeonInteriors {
     if (ledges.length === 0) return;
     const rooms = layout.rooms ?? [];
     const doors = layout.doors ?? [];
-    const mat = new THREE.MeshLambertMaterial({ color: 0x6a6270, emissive: 0x0c0a10 });
+    const mat = new THREE.MeshLambertMaterial({
+      color: 0x6a6270,
+      emissive: 0x0c0a10,
+    });
     const THICK = 0.5;
     for (const l of ledges) {
       const top = authoredLiftAt(rooms, doors, l.x, l.z) + l.top;
@@ -1252,7 +1353,10 @@ export class DungeonInteriors {
     const rooms = layout.rooms ?? [];
     const doors = layout.doors ?? [];
     if (!rooms.some((r) => (r.lift ?? 0) !== 0)) return;
-    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
+    const mat = new THREE.MeshLambertMaterial({
+      color: 0x4a4652,
+      emissive: 0x0a0a12,
+    });
     for (const r of rooms) {
       const lift = r.lift ?? 0;
       if (lift <= 0) continue;
@@ -1315,7 +1419,10 @@ export class DungeonInteriors {
   ): void {
     const { rampZ0, rampZ1, height } = platform;
     const halfW = Math.min((layout.wallX ?? 18) - 0.5, 22);
-    const mat = new THREE.MeshLambertMaterial({ color: 0x4a4652, emissive: 0x0a0a12 });
+    const mat = new THREE.MeshLambertMaterial({
+      color: 0x4a4652,
+      emissive: 0x0a0a12,
+    });
     // Raised rear deck: a solid riser from the floor up to the platform surface.
     const deckDepth = Math.max(2, layout.zMax - rampZ1);
     const deck = new THREE.Mesh(new THREE.BoxGeometry(halfW * 2, height, deckDepth), mat);
@@ -1425,7 +1532,12 @@ export class DungeonInteriors {
         : 'arena';
     }
     if (interior === 'nythraxis') return 'nythraxis';
-    if (interior === 'ignivar_approach' || interior === 'ignivar' || interior === 'ignivar_depths')
+    if (
+      interior === 'ignivar_approach' ||
+      interior === 'ignivar_assembly' ||
+      interior === 'ignivar' ||
+      interior === 'ignivar_depths'
+    )
       return 'ignivar';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
@@ -1453,7 +1565,10 @@ export class DungeonInteriors {
       std.roughness = Math.max(0.85, std.roughness);
       mat = std;
     } else {
-      mat = new THREE.MeshStandardMaterial({ color: 0x777788, roughness: 0.95 });
+      mat = new THREE.MeshStandardMaterial({
+        color: 0x777788,
+        roughness: 0.95,
+      });
     }
     // The dungeon packs are flat-palette GLBs (solid-color swatch textures),
     // so the walls read as untextured plastic under the interior lights. The
@@ -1562,8 +1677,20 @@ export class DungeonInteriors {
       hd: layout.sideWallHd,
       topY,
     });
-    const front = wall({ x: ox, z: oz + layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
-    const back = wall({ x: ox, z: oz + layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
+    const front = wall({
+      x: ox,
+      z: oz + layout.zMin,
+      hw: endWallHw,
+      hd: DUNGEON_WALL_HW,
+      topY,
+    });
+    const back = wall({
+      x: ox,
+      z: oz + layout.zMax,
+      hw: endWallHw,
+      hd: DUNGEON_WALL_HW,
+      topY,
+    });
     if (layout.shellPolygon) {
       const polygon = polygonWallSegments(layout.shellPolygon).map((segment) =>
         wall({
@@ -1603,7 +1730,9 @@ export class DungeonInteriors {
           ? this.marshMaterial(asset.pack, 'wall')
           : isMarsh && RECEIVER_KINDS.has(kind)
             ? this.marshMaterial(asset.pack, 'floor')
-            : this.material(asset.pack);
+            : pending.wallTint !== undefined && WALL_PILLAR_KINDS.has(kind)
+              ? this.tintedMaterial(asset.pack, pending.wallTint)
+              : this.material(asset.pack);
       // Program-preserving clone: the pack material carries the triplanar
       // stone surface-detail layer (see this.material), and a bare clone()
       // drops onBeforeCompile, so every hideable arena wall would draw as flat
@@ -1632,6 +1761,10 @@ export class DungeonInteriors {
         (CASTER_KINDS.has(kind) || (isArenaVariant(variant) && ARENA_WALL_CASTER_KINDS.has(kind)));
       mesh.receiveShadow = RECEIVER_KINDS.has(kind);
       wallGroup.add(mesh);
+    }
+    if (pending.facade) {
+      wallGroup.add(pending.facade.group);
+      for (const material of pending.facade.fadeMaterials) mats.push(occluderFadeMat(material));
     }
     if (!mats.length) return;
     group.add(wallGroup);
@@ -1920,7 +2053,18 @@ export class DungeonInteriors {
   // to face into the room it borders. The fitted wall ends frame each opening on
   // their own: placing a nominal "arched wall" in the gap visually sealed doors
   // even though the shared sim collider correctly left them open.
-  private placeAuthoredWalls(p: Placements, layout: DungeonLayout, variant: Variant): void {
+  private placeAuthoredWalls(
+    p: Placements,
+    layout: DungeonLayout,
+    variant: Variant,
+    hideable?: {
+      group: THREE.Group;
+      ox: number;
+      oz: number;
+      wallTint?: number;
+      buildFacade?: (segment: WallSeg) => IgnivarRaidWallFacade;
+    },
+  ): void {
     const rooms = layout.rooms ?? [];
     const doors = layout.doors ?? [];
     const bannerEvery = variant === 'crypt' ? 4 : 3;
@@ -1950,6 +2094,7 @@ export class DungeonInteriors {
     };
     let i = 0;
     for (const seg of authoredWallSegments(rooms, doors)) {
+      const wallPlacements = hideable ? new Placements() : p;
       const cells = fitAuthoredWallSegment(seg.a, seg.b, 8);
       // Face the wall detail into an adjacent room (either one, when it is shared).
       const ry = segRy(seg);
@@ -1963,14 +2108,32 @@ export class DungeonInteriors {
         const z = seg.axis === 'x' ? seg.fixed : t;
         const kind = this.wallKind(segVariant, hash2(x * 13.7, z));
         const scale: [number, number, number] = [cell.length / 4, MODULE_SCALE, MODULE_SCALE];
-        p.add(kind, x, 0, z, ry, scale);
+        wallPlacements.add(kind, x, 0, z, ry, scale);
         // The keep hangs its red kcas banners from the lastkeep dressing pass
         // instead of the kit's crypt hangings.
         if (!isKeep && i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
           const banner = hash2(z, x * 7.3) < 0.5 ? 'banner_red' : 'banner_triple_red';
-          p.add(banner, x, 0, z, ry, scale);
+          wallPlacements.add(banner, x, 0, z, ry, scale);
         }
         i++;
+      }
+      if (hideable) {
+        this.emitArenaHideable(
+          hideable.group,
+          {
+            placements: wallPlacements,
+            footprint: authoredWallFootprint(
+              seg,
+              hideable.ox,
+              hideable.oz,
+              DUNGEON_WALL_HW,
+              DUNGEON_WALL_HEIGHT,
+            ),
+            wallTint: hideable.wallTint,
+            facade: hideable.buildFacade?.(seg),
+          },
+          variant,
+        );
       }
     }
     if (!isKeep) return;

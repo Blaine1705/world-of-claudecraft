@@ -3974,6 +3974,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': 'Entrada a la brecha: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': 'Enemigo hostil',
   'hud.core.mapMarkerLabels.aggressiveEnemy': 'Enemigo que te está atacando',
+  'hud.core.mapMarkerLabels.bossEnemy': 'Jefe: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Jefe que te está atacando: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': 'Enemigo con botín',
   'hud.core.mapMarkerLabels.corpse': 'Tu cadáver',
   'hud.core.mapMarkerLabels.deathZone': 'Zona peligrosa',

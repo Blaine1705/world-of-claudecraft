@@ -7,7 +7,7 @@
 
 import { createHash } from 'node:crypto';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { fitAuthoredWallSegment } from '../src/render/authored_walls_core';
+import { authoredWallFootprint, fitAuthoredWallSegment } from '../src/render/authored_walls_core';
 import type { Collider } from '../src/sim/colliders';
 import {
   buildInfernalCitadelFloor,
@@ -240,6 +240,23 @@ describe('infernal citadel: authored geometry', () => {
       { center: 12, length: 8 },
     ]);
     expect(fitAuthoredWallSegment(0, 1.5, 8)).toEqual([{ center: 0.75, length: 1.5 }]);
+  });
+
+  it('turns authored wall runs into exact world-space camera occluder footprints', () => {
+    expect(authoredWallFootprint({ axis: 'x', fixed: 12, a: -8, b: 16 }, 100, 200, 1, 8)).toEqual({
+      x: 104,
+      z: 212,
+      hw: 12,
+      hd: 1,
+      topY: 8,
+    });
+    expect(authoredWallFootprint({ axis: 'z', fixed: -6, a: 4, b: 20 }, 100, 200, 1, 8)).toEqual({
+      x: 94,
+      z: 212,
+      hw: 1,
+      hd: 8,
+      topY: 8,
+    });
   });
 
   it('gives the entrance enough room for the player and chase camera', () => {

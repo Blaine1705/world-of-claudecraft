@@ -152,7 +152,15 @@ export type {
 // player-following soak warning.
 // 20 = the Ignivar raid gained Molten Assembly as a compiled fourth room.
 // Epoch 19 clients do not know its dungeon index, interior, route, or warnings.
-export const ONLINE_WORLD_LAYOUT_VERSION = 20 as const;
+// 21 = Forge Approach and Molten Assembly gained authored branching geometry,
+// plus a distinct Assembly interior identity. Epoch 20 clients would render
+// walls and floor that disagree with the authoritative collision and route.
+// 22 = both Ignivar trash rooms expanded their authored bounds, moved their
+// gates, and gained new static packs and decor. Epoch 21 clients would render
+// the old walls and props around server-authoritative movement and encounters.
+// 23 = both Ignivar trash rooms gained a compiled forge prop set with new
+// collidable floor footprints. Epoch 22 clients would omit those obstacles.
+export const ONLINE_WORLD_LAYOUT_VERSION = 23 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

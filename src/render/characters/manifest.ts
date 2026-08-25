@@ -724,16 +724,16 @@ const IGNIVAR: ClipMap = {
   flourish: 'FistSpin360',
 };
 
-// Heart of the End is stationary in the encounter. Its generated Hit clip stays
-// unmapped so raid damage cannot interrupt the sustained Apocalypse cast pose.
+// Heart of the End is stationary in the encounter. Ashcaller's dedicated
+// Channel loop holds the sustained Apocalypse pose, and no hit reaction is
+// mapped so incoming raid damage cannot interrupt that actionable read.
 const IGNIVAR_HEART: ClipMap = {
   idle: 'Idle',
-  walk: 'Walk',
-  run: 'Run',
-  attack: ['Attack'],
+  walk: 'Move',
+  run: 'Move',
+  attack: ['Cast'],
   death: 'Death',
-  cast: 'Cast',
-  jump: 'Jump',
+  cast: 'Channel',
 };
 
 const IGNIVAR_CRUCIBLE_WARDEN: ClipMap = {
@@ -2284,10 +2284,10 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1,
   },
   mob_ignivar_heart_of_the_end: {
-    url: `${CREATURES}/ignivar_heart_of_the_end.glb`,
+    url: `${CREATURES}/ignivar_ashcaller.glb`,
     height: 1.8,
-    // Tripo authored the rig facing +X; character visuals face +Z at world facing 0.
-    yaw: -Math.PI / 2,
+    // Ashcaller's authored forward axis is already +Z, matching character visuals.
+    yaw: 0,
     selfIllumination: 0.16,
     envMapIntensity: 1.3,
     clips: IGNIVAR_HEART,

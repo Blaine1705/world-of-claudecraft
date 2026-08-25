@@ -8182,6 +8182,8 @@ export const nl_NL: EnTranslations = {
         "riftEntrance": "Rift-ingang: {name}",
         "hostileEnemy": "Vijandig doelwit",
         "aggressiveEnemy": "Vijand valt je aan",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Plunderbare vijand",
         "corpse": "Je lichaam",
         "deathZone": "Gevarenzone",

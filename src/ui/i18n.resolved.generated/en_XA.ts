@@ -8182,6 +8182,8 @@ export const en_XA: EnTranslations = {
         "riftEntrance": "[Ŕíƒţ éñţŕáñçé: {name}]",
         "hostileEnemy": "[Ĥóšţíļé éñéɱý]",
         "aggressiveEnemy": "[Éñéɱý áţţáçķíñĝ ýóú]",
+        "bossEnemy": "[Ɓóšš: {name}]",
+        "bossAggressiveEnemy": "[Ɓóšš áţţáçķíñĝ ýóú: {name}]",
         "lootableEnemy": "[Ļóóţáƀļé éñéɱý]",
         "corpse": "[Ýóúŕ çóŕþšé]",
         "deathZone": "[Ðáñĝéŕ žóñé]",

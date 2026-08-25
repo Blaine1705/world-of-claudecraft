@@ -8182,6 +8182,8 @@ export const id_ID: EnTranslations = {
         "riftEntrance": "Pintu masuk Rift: {name}",
         "hostileEnemy": "Musuh yang siap menyerang",
         "aggressiveEnemy": "Musuh yang menyerangmu",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Musuh yang dapat dijarah",
         "corpse": "Mayatmu",
         "deathZone": "Zona bahaya",

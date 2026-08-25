@@ -10,10 +10,10 @@ raid lockout remain out of scope until that launch pass.
 
 The route is ordered and shares one instance family:
 
-1. Forge Approach: seven automata guard three records and the sealed arena gate,
+1. Forge Approach: thirteen automata guard three records and the sealed arena gate,
    ending with one enlarged Crucible Warden miniboss and two Ember Sentinels.
 2. Crucible of the Last Spring: Ignivar, Herald of the Last Flame.
-3. Molten Assembly: three more packs of automata guard the final gate.
+3. Molten Assembly: fourteen more automata guard the final gate.
 4. Inner Crucible: Varkhul, Forgefather of the Last Flame.
 
 Normal Ignivar's fire, tank swap, frontal, conduit, movement cones, priority add,
@@ -36,9 +36,15 @@ only after his death and reveals the path to his maker.
 
 ## Forge Approach
 
-The approach is a separate forge-themed map entered before Ignivar's arena. Its
-first two packs each contain two Ember Sentinels. The final pack contains two
-more Sentinels beside one enlarged, control-immune Crucible Warden miniboss.
+The approach is a separate forge-themed map entered before Ignivar's arena. A
+larger entrance hall opens into a broad smelter hub built around a central forge.
+The west workshop and east store branch from that hub and may be cleared in
+either order before both paths rejoin in the Herald antechamber. One pair of
+Ember Sentinels holds the hub, and each side wing has two further pairs spaced
+beyond normal pull range. All six groups carry authored pack identities, so a
+single proximity pull engages the complete group without chaining into the next
+one. The final pack contains two more Sentinels beside one
+enlarged, control-immune Crucible Warden miniboss, for thirteen automata total.
 That placed Warden uses an instant Crucible Stomp every twelve seconds when a
 player is within nine yards. The stomp plays the authored `JumpSlam` body
 animation and immediately deals 18% maximum-health Fire damage in its radius;
@@ -56,13 +62,25 @@ player directly beside Ignivar.
 ## Molten Assembly
 
 Ignivar's death opens the north arena gate into a second automata room. The
-Molten Assembly begins with two packs of three Ember Sentinels. Its final pack
-contains one more Sentinel beside two enlarged, control-immune Crucible Warden
-minibosses. They use the same instant Crucible Stomp behavior as the Approach
-miniboss. Its final gate remains sealed until all nine automata are dead, then
-opens into Varkhul's Inner Crucible. The room inherits the raid family's selected
-difficulty and reuses Varkhul's static mob tuning without creating a separate
-reward or lockout identity.
+Molten Assembly opens onto an enlarged intake floor with separate west tempering
+and east hammering bays. Raiders can choose either bay first, cross directly
+between them, and then regroup through the north gallery. The intake has one
+Sentinel pair; each bay has two further pairs spaced as separate pulls around
+its own working forge. These are likewise six explicit packs rather than a
+distance heuristic. The final platform contains two more Sentinels beside two
+enlarged, control-immune Crucible Warden minibosses, for fourteen automata total.
+They use the same instant Crucible Stomp behavior as the Approach miniboss. Its
+final gate remains sealed until all fourteen automata are dead, then opens into
+Varkhul's Inner Crucible. The room inherits the raid family's selected difficulty
+and reuses Varkhul's static mob tuning without creating a separate reward or
+lockout identity.
+
+Both trash maps use authored room graphs, so rendered walls, doors, props, floor,
+and collision derive from the same layout data. Existing forge, slag-cauldron,
+brazier, altar, statue, hanging-cage, and obsidian-fang assets dress the rooms.
+Animated flames, forge light, emissive molten feeds, and denser workshop
+silhouettes provide the visual hierarchy without introducing new asset files or
+actionable hazards.
 
 ## Group and encounter goals
 
@@ -516,8 +534,8 @@ the media manifest. Concept art is not a substitute for the six shipping GLBs.
    visual validation and human group tuning remain.
 9. Judgment of the Forge intermission and the accelerated, alternating Last
    Inferno finale. Done for Normal. Human tuning remains.
-10. Forge Approach and Molten Assembly layouts, two trash automaton roles, ordered
-    gates, and four-room instance lifetime. Done for Normal.
+10. Branching Forge Approach and Molten Assembly room graphs, two trash automaton
+    roles, ordered gates, and four-room instance lifetime. Done for Normal.
 11. Maelin's three-quest lore chain, three records, and Ignivar core reveal.
     Done for the hidden development route.
 12. Varkhul's Maker's Brand, Cinder Orbs, Red-hot Metal, Shared Pyre, Anvil's Decree,

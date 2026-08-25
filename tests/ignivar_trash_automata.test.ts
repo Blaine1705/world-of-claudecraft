@@ -103,19 +103,19 @@ describe('Ignivar trash automata', () => {
   );
 
   it.each([
-    [IGNIVAR_FORGE_APPROACH_ID, 1, 6, 2],
-    [IGNIVAR_MOLTEN_ASSEMBLY_ID, 2, 7, 1],
+    [IGNIVAR_FORGE_APPROACH_ID, 1, 12, 2, 36],
+    [IGNIVAR_MOLTEN_ASSEMBLY_ID, 2, 12, 2, 54],
   ] as const)(
     'places the Warden minibosses only in the final pack of %s',
-    (roomId, wardenCount, sentinelCount, finalSentinelCount) => {
+    (roomId, wardenCount, sentinelCount, finalSentinelCount, finalStartZ) => {
       const spawns = DUNGEONS[roomId].spawns;
       const wardens = spawns.filter((spawn) => spawn.mobId === IGNIVAR_CRUCIBLE_WARDEN_ID);
       const sentinels = spawns.filter((spawn) => spawn.mobId === IGNIVAR_EMBER_SENTINEL_ID);
-      const finalSentinels = sentinels.filter((spawn) => spawn.z >= 30);
+      const finalSentinels = sentinels.filter((spawn) => spawn.z >= finalStartZ);
       const promoted = spawns.filter((spawn) => spawn.miniboss !== undefined);
 
       expect(wardens).toHaveLength(wardenCount);
-      expect(wardens.every((spawn) => spawn.z >= 30)).toBe(true);
+      expect(wardens.every((spawn) => spawn.z >= finalStartZ)).toBe(true);
       expect(wardens.every((spawn) => spawn.miniboss !== undefined)).toBe(true);
       expect(promoted).toHaveLength(wardenCount);
       expect(promoted.every((spawn) => spawn.mobId === IGNIVAR_CRUCIBLE_WARDEN_ID)).toBe(true);
@@ -123,9 +123,142 @@ describe('Ignivar trash automata', () => {
       expect(finalSentinels).toHaveLength(finalSentinelCount);
       expect(
         spawns
-          .filter((spawn) => spawn.z < 30)
+          .filter((spawn) => spawn.z < finalStartZ)
           .every((spawn) => spawn.mobId === IGNIVAR_EMBER_SENTINEL_ID),
       ).toBe(true);
+    },
+  );
+
+  it.each([
+    [IGNIVAR_FORGE_APPROACH_ID, [2, 2, 2, 2, 2, 3]],
+    [IGNIVAR_MOLTEN_ASSEMBLY_ID, [2, 2, 2, 2, 2, 4]],
+  ] as const)(
+    'pulls the expanded %s roster as six authoritative packs through normal proximity aggro',
+    (roomId, expectedSizes) => {
+      const spawns = DUNGEONS[roomId].spawns;
+      const packIds = [...new Set(spawns.map((spawn) => spawn.packId))];
+      expect(packIds).toHaveLength(6);
+      expect(packIds).not.toContain(undefined);
+      expect(
+        packIds
+          .map((packId) => spawns.filter((spawn) => spawn.packId === packId).length)
+          .sort((a, b) => a - b),
+      ).toEqual([...expectedSizes]);
+
+      for (const packId of packIds) {
+        const { sim, mobs } = claimedRoom(roomId);
+        const packIndexes = spawns
+          .map((spawn, index) => (spawn.packId === packId ? index : -1))
+          .filter((index) => index >= 0);
+        const trigger = mobs[packIndexes[0]];
+        // A level-one fixture would be killed by a real raid pack before the
+        // post-tick assertion, which would correctly reset late-updating mobs.
+        // Keep it alive so this test observes the pack contract, not tuning.
+        sim.player.maxHp = 1_000_000_000;
+        sim.player.hp = sim.player.maxHp;
+        sim.player.pos = sim.ctx.groundPos(trigger.pos.x, trigger.pos.z - 3);
+        sim.player.prevPos = { ...sim.player.pos };
+        sim.rebucket(sim.player);
+
+        sim.tick();
+
+        for (let index = 0; index < mobs.length; index++) {
+          const member = packIndexes.includes(index);
+          const mob = mobs[index];
+          expect(mob.inCombat, `${roomId}:${String(packId)} spawn ${index}`).toBe(member);
+          if (member) {
+            expect(['chase', 'attack']).toContain(mob.aiState);
+            expect(mob.aggroTargetId).toBe(sim.player.id);
+            expect(mob.threat.get(sim.player.id)).toBeGreaterThan(0);
+          } else {
+            expect(mob.aiState).toBe('idle');
+            expect(mob.aggroTargetId).toBeNull();
+            expect(mob.threat.size).toBe(0);
+          }
+        }
+      }
+    },
+  );
+
+  it('isolates identical authored pack labels across rooms and simultaneous raid claims', () => {
+    const sim = new Sim({ seed: 8124, playerClass: 'warrior', devCommands: true });
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
+    const primaryClaim = sim.instances.find(
+      (instance) => instance.dungeonId === IGNIVAR_FORGE_APPROACH_ID && instance.partyKey !== null,
+    );
+    if (!primaryClaim) throw new Error('Primary Approach claim missing');
+
+    const siblingPid = sim.addPlayer('warrior', 'Sibling Claim');
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, siblingPid, true)).toBe(true);
+    const siblingClaim = sim.instances.find(
+      (instance) =>
+        instance.dungeonId === IGNIVAR_FORGE_APPROACH_ID &&
+        instance.partyKey !== null &&
+        instance !== primaryClaim,
+    );
+    if (!siblingClaim) throw new Error('Sibling Approach claim missing');
+
+    const assemblyPid = sim.addPlayer('warrior', 'Assembly Claim');
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, assemblyPid, true)).toBe(true);
+    const assemblyClaim = sim.instances.find(
+      (instance) => instance.dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID && instance.partyKey !== null,
+    );
+    if (!assemblyClaim) throw new Error('Assembly isolation claim missing');
+
+    const mobsIn = (ids: readonly number[]): Entity[] =>
+      ids.map((id) => sim.entities.get(id)).filter((mob): mob is Entity => mob !== undefined);
+    const primaryMobs = mobsIn(primaryClaim.mobIds);
+    const primaryPack = primaryMobs.filter((mob) => mob.dungeonPackId?.endsWith(':west_lower'));
+    if (primaryPack.length === 0) throw new Error('Primary west-lower pack missing');
+    expect(siblingClaim.slot).not.toBe(primaryClaim.slot);
+    expect(assemblyClaim.slot).toBe(primaryClaim.slot);
+    sim.player.maxHp = 1_000_000_000;
+    sim.player.hp = sim.player.maxHp;
+    sim.player.pos = sim.ctx.groundPos(primaryPack[0].pos.x, primaryPack[0].pos.z - 3);
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.rebucket(sim.player);
+
+    sim.tick();
+
+    for (const mob of primaryPack) {
+      expect(mob.inCombat).toBe(true);
+      expect(['chase', 'attack']).toContain(mob.aiState);
+      expect(mob.aggroTargetId).toBe(sim.player.id);
+      expect(mob.threat.get(sim.player.id)).toBeGreaterThan(0);
+    }
+    const outsiders = [
+      ...primaryMobs.filter((mob) => !primaryPack.includes(mob)),
+      ...mobsIn(siblingClaim.mobIds),
+      ...mobsIn(assemblyClaim.mobIds),
+    ];
+    for (const mob of outsiders) {
+      expect(mob.inCombat).toBe(false);
+      expect(mob.aiState).toBe('idle');
+      expect(mob.aggroTargetId).toBeNull();
+      expect(mob.threat.size).toBe(0);
+    }
+  });
+
+  it.each([IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_MOLTEN_ASSEMBLY_ID])(
+    'keeps %s claim RNG draw order stable across difficulty and same-seed replay',
+    (roomId) => {
+      const claimDraws = (difficulty: 'normal' | 'heroic'): number[] => {
+        const sim = new Sim({ seed: 8124, playerClass: 'warrior', devCommands: true });
+        sim.setDungeonDifficulty(difficulty);
+        const draws: number[] = [];
+        sim.rng.setObserver((value) => draws.push(value));
+        try {
+          expect(enterDungeon(sim.ctx, roomId, sim.player.id, true)).toBe(true);
+        } finally {
+          sim.rng.setObserver(null);
+        }
+        return draws;
+      };
+
+      const normal = claimDraws('normal');
+      expect(normal).toHaveLength(DUNGEONS[roomId].spawns.length);
+      expect(claimDraws('normal')).toEqual(normal);
+      expect(claimDraws('heroic')).toEqual(normal);
     },
   );
 

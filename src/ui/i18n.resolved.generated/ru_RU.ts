@@ -8182,6 +8182,8 @@ export const ru_RU: EnTranslations = {
         "riftEntrance": "Вход в разлом: {name}",
         "hostileEnemy": "Враждебный противник",
         "aggressiveEnemy": "Атакующий вас противник",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Противник с добычей",
         "corpse": "Ваше тело",
         "deathZone": "Опасная зона",

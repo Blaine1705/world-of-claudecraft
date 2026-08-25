@@ -59,13 +59,18 @@ describe('attachSceneGroupGated', () => {
       group.name = 'stuck-town';
       // A gate promise that never settles: without the watchdog the town
       // stays invisible forever with no diagnostic.
-      void attachSceneGroupGated(scene, group, () => new Promise(() => {}));
+      let settled = false;
+      const pending = attachSceneGroupGated(scene, group, () => new Promise(() => {})).then(() => {
+        settled = true;
+      });
       expect(group.visible).toBe(false);
 
       vi.advanceTimersByTime(GATED_ATTACH_WATCHDOG_MS - 1);
       expect(group.visible).toBe(false);
       vi.advanceTimersByTime(1);
+      await pending;
       expect(group.visible).toBe(true);
+      expect(settled).toBe(true);
       expect(warn).toHaveBeenCalledWith(
         `Gated scene attach never settled after ${GATED_ATTACH_WATCHDOG_MS}ms, revealed anyway`,
         'stuck-town',

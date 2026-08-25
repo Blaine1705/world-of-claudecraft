@@ -8182,6 +8182,8 @@ export const sv_SE: EnTranslations = {
         "riftEntrance": "Ingång till revan: {name}",
         "hostileEnemy": "Fientligt mål",
         "aggressiveEnemy": "Fiende angriper dig",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Plundringsbar fiende",
         "corpse": "Din kropp",
         "deathZone": "Farozon",

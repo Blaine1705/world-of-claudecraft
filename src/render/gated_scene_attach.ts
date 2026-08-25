@@ -29,21 +29,30 @@ export async function attachSceneGroupGated(
   group.visible = false;
   scene.add(group);
   const attachedAtMs = gpuPrepNow();
+  let releaseWatchdog!: () => void;
+  const watchdogRelease = new Promise<void>((resolve) => {
+    releaseWatchdog = resolve;
+  });
   const watchdog = setTimeout(() => {
-    if (group.visible) return;
-    group.visible = true;
-    console.warn(
-      `Gated scene attach never settled after ${GATED_ATTACH_WATCHDOG_MS}ms, revealed anyway`,
-      group.name || group.type,
-    );
-    recordGpuPrepEvent({
-      kind: 'attach-watchdog',
-      key: group.name || group.type,
-      ageMs: gpuPrepNow() - attachedAtMs,
-    });
+    if (!group.visible) {
+      group.visible = true;
+      console.warn(
+        `Gated scene attach never settled after ${GATED_ATTACH_WATCHDOG_MS}ms, revealed anyway`,
+        group.name || group.type,
+      );
+      recordGpuPrepEvent({
+        kind: 'attach-watchdog',
+        key: group.name || group.type,
+        ageMs: gpuPrepNow() - attachedAtMs,
+      });
+    }
+    // The watchdog is a control-flow escape as well as a visual escape. Without
+    // settling this await, callers that stream a second gated child after the
+    // shell (for example authored decor) would never reach that work.
+    releaseWatchdog();
   }, GATED_ATTACH_WATCHDOG_MS);
   try {
-    await compileGate(group);
+    await Promise.race([compileGate(group), watchdogRelease]);
   } catch {
     // Shutdown rejects queued GPU work on purpose; reveal happens either way.
   } finally {

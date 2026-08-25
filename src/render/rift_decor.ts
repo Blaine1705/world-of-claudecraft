@@ -33,7 +33,8 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
  * braziers and the pentagram's five candles. Zero new assets. */
 const FLAME_URL = '/models/props/rift_flame.glb';
 
-type Gltf = Awaited<ReturnType<typeof loadGltf>>;
+type Gltf = { scene: THREE.Object3D };
+type GltfLoader = (url: string) => Promise<Gltf>;
 const cache = new Map<string, Gltf | null>();
 
 function markShared(gltf: Gltf): void {
@@ -47,16 +48,30 @@ function markShared(gltf: Gltf): void {
   });
 }
 
-/** Load every model an authored floor's decor needs (once per process). A model
- * that fails to load resolves to null and its decor entry is simply skipped, so a
- * missing asset never breaks the floor. */
-export async function ensureInfernalDecorAssets(): Promise<void> {
-  const urls = [FLAME_URL, ...Object.values(DECOR_MODELS).map((m) => m.url)];
+/** Load the models an authored floor's decor needs (once per process). Callers
+ * that do not yet know the floor can omit `decor` to warm the full catalog. A
+ * model that fails to load resolves to null and its entry is simply skipped, so
+ * a missing cosmetic asset never breaks the structural room shell. */
+export async function ensureInfernalDecorAssets(
+  decor?: readonly AuthoredDecor[],
+  loader: GltfLoader = loadGltf,
+): Promise<void> {
+  const needsFlame = decor?.some((entry) => ['infernal_brazier', 'pentagram'].includes(entry.key));
+  const urls = decor
+    ? [
+        ...(needsFlame ? [FLAME_URL] : []),
+        ...new Set(
+          decor
+            .map((entry) => DECOR_MODELS[entry.key]?.url)
+            .filter((url): url is string => url !== undefined),
+        ),
+      ]
+    : [FLAME_URL, ...Object.values(DECOR_MODELS).map((model) => model.url)];
   await Promise.all(
     urls.map(async (url) => {
       if (cache.has(url)) return;
       try {
-        const gltf = await loadGltf(url);
+        const gltf = await loader(url);
         markShared(gltf);
         cache.set(url, gltf);
       } catch {
@@ -64,6 +79,16 @@ export async function ensureInfernalDecorAssets(): Promise<void> {
       }
     }),
   );
+}
+
+/** True only when a model-backed infernal decor key has loaded successfully. */
+export function isInfernalDecorModelAvailable(key: string): boolean {
+  const def = DECOR_MODELS[key];
+  return def !== undefined && cache.get(def.url) != null;
+}
+
+export function resetInfernalDecorAssetsForTest(): void {
+  cache.clear();
 }
 
 /** Clone a loaded prop, center it on xz, sit its base on y=0, and fit it to

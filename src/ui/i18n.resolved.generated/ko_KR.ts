@@ -8182,6 +8182,8 @@ export const ko_KR: EnTranslations = {
         "riftEntrance": "균열 입구: {name}",
         "hostileEnemy": "적대 대상",
         "aggressiveEnemy": "당신을 공격 중인 적",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "전리품을 획득할 수 있는 적",
         "corpse": "자신의 시체",
         "deathZone": "위험 지역",
