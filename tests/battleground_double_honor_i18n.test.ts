@@ -47,7 +47,11 @@ describe('Double Honor Weekend copy renders on a release build in every locale',
     expect(title, `${lang} doubleHonor.title must be localized, not the English source`).not.toBe(
       'Double Honor Weekend',
     );
-    expect(chip.length, `${lang} doubleHonorLine must resolve to non-empty text`).toBeGreaterThan(0);
-    expect(note.length, `${lang} doubleHonor.note must resolve to non-empty text`).toBeGreaterThan(0);
+    expect(chip.length, `${lang} doubleHonorLine must resolve to non-empty text`).toBeGreaterThan(
+      0,
+    );
+    expect(note.length, `${lang} doubleHonor.note must resolve to non-empty text`).toBeGreaterThan(
+      0,
+    );
   });
 });
