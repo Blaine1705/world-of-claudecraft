@@ -19,6 +19,8 @@
 import { Rng } from '../../src/sim/rng';
 import type { CancelHandle, VirtualClock } from './virtual_clock';
 
+const UTF8 = new TextEncoder();
+
 export type LinkDirection = 'toServer' | 'toClient';
 
 export interface DirectionConfig {
@@ -37,6 +39,7 @@ export interface LatencyLinkConfig {
 
 interface Queued {
   payload: string;
+  bytes: number;
   sentAt: number;
   deliverAt: number;
 }
@@ -141,6 +144,13 @@ export class LatencyLink {
     return this.dirs[direction].queue.length;
   }
 
+  /** UTF-8 payload bytes still in flight in one direction. */
+  pendingBytes(direction: LinkDirection): number {
+    let bytes = 0;
+    for (const message of this.dirs[direction].queue) bytes += message.bytes;
+    return bytes;
+  }
+
   /** When the message at the head of the queue is due (null when empty). */
   nextDeliveryAt(direction: LinkDirection): number | null {
     const head = this.dirs[direction].queue[0];
@@ -154,7 +164,12 @@ export class LatencyLink {
     const jitter = dir.jitterMs > 0 ? dir.rng.next() * dir.jitterMs : 0;
     const deliverAt = Math.max(sentAt + dir.baseMs + jitter, dir.lastDeliverAt, dir.stallUntil);
     dir.lastDeliverAt = deliverAt;
-    dir.queue.push({ payload, sentAt, deliverAt });
+    dir.queue.push({
+      payload,
+      bytes: UTF8.encode(payload).byteLength,
+      sentAt,
+      deliverAt,
+    });
     this.arm(direction);
   }
 

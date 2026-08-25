@@ -134,7 +134,9 @@ export class MovementPredictionPipeline {
     const self = this.self;
     if (!wire || !self) return null;
     if (!this.canPredict()) {
-      this.suspendAtCurrentWireState();
+      this.resetPrediction();
+      if (!hasAuthoritativePose(wire)) this.lastEpoch = null;
+      this.lastAckClientTick = wire.reconAckClientTick;
       return null;
     }
     if (this.lastEpoch === null) this.lastEpoch = wire.reconOverrideEpoch;

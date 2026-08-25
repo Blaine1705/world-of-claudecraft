@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   consumeMovementFramesV2,
   createMovementInputSessionState,
+  MOVEMENT_CT_SANITY_BOUND_TICKS,
   MOVEMENT_INPUT_TIMELINE_DEPTH,
   MovementInputTimeline,
   resetMovementInputSessionState,
@@ -17,6 +18,7 @@ describe('MovementInputTimeline', () => {
   it('pins the timeline depth and starvation resync threshold', () => {
     expect(MOVEMENT_INPUT_TIMELINE_DEPTH).toBe(6);
     expect(STARVE_RESYNC_TICKS).toBe(3);
+    expect(MOVEMENT_CT_SANITY_BOUND_TICKS).toBe(1200);
   });
 
   it('consumes exactly one frame in client tick order', () => {
@@ -33,7 +35,10 @@ describe('MovementInputTimeline', () => {
     const timeline = new MovementInputTimeline();
     for (let ct = 0; ct <= MOVEMENT_INPUT_TIMELINE_DEPTH; ct++) timeline.enqueue(frame(ct));
 
-    expect(timeline.dropped).toBe(1);
+    expect(timeline.droppedOldest).toBe(1);
+    expect(timeline.rejectedAnchoredWindow).toBe(0);
+    expect(timeline.rejectedSanityBound).toBe(0);
+    expect(timeline.discardedLate).toBe(0);
     expect(Array.from({ length: 6 }, () => timeline.consumeNext()?.ct)).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
@@ -73,15 +78,96 @@ describe('MovementInputTimeline', () => {
     expect(timeline.consumeNext()?.ct).toBe(0);
     expect(timeline.enqueue(frame(0))).toBe(false);
     expect(timeline.discardedLate).toBe(1);
+    expect(timeline.droppedOldest).toBe(0);
+    expect(timeline.rejectedAnchoredWindow).toBe(0);
+    expect(timeline.rejectedSanityBound).toBe(0);
   });
 
   it('rejects a far-future client tick without wedging the buffer', () => {
     const timeline = new MovementInputTimeline();
 
     expect(timeline.enqueue(frame(1e12))).toBe(false);
-    expect(timeline.dropped).toBe(1);
+    expect(timeline.rejectedSanityBound).toBe(1);
+    expect(timeline.droppedOldest).toBe(0);
+    expect(timeline.rejectedAnchoredWindow).toBe(0);
+    expect(timeline.discardedLate).toBe(0);
     expect(timeline.enqueue(frame(0, true))).toBe(true);
     expect(timeline.consumeNext()).toEqual(frame(0, true));
+  });
+
+  it('recovers after an empty-buffer shed hole wider than the timeline depth', () => {
+    const timeline = new MovementInputTimeline();
+    for (let ct = 0; ct < 10; ct++) {
+      expect(timeline.enqueue(frame(ct, true))).toBe(true);
+      expect(timeline.consumeNext()).not.toBeNull();
+    }
+    for (let tick = 0; tick < 30; tick++) timeline.consumeNext();
+    for (let ct = 32; ct < 40; ct++) timeline.enqueue(frame(ct, true));
+
+    let consumedAfterRecovery = 0;
+    for (let ct = 40; ct < 440; ct++) {
+      timeline.enqueue(frame(ct, true));
+      if (timeline.consumeNext()) consumedAfterRecovery++;
+    }
+
+    expect(consumedAfterRecovery).toBe(400);
+    expect(timeline.resyncs).toBeGreaterThan(0);
+  });
+
+  it('keeps the depth ceiling while a buffered frame anchors the timeline', () => {
+    const timeline = new MovementInputTimeline();
+
+    expect(timeline.enqueue(frame(0))).toBe(true);
+    expect(timeline.enqueue(frame(MOVEMENT_INPUT_TIMELINE_DEPTH + 1))).toBe(false);
+    expect(timeline.rejectedAnchoredWindow).toBe(1);
+    expect(timeline.rejectedSanityBound).toBe(0);
+    expect(timeline.droppedOldest).toBe(0);
+    expect(timeline.discardedLate).toBe(0);
+    expect(timeline.consumeNext()).toEqual(frame(0));
+  });
+
+  it('keeps the depth ceiling with an empty buffer before the starvation threshold', () => {
+    const timeline = new MovementInputTimeline();
+    for (let tick = 0; tick < STARVE_RESYNC_TICKS - 1; tick++) timeline.consumeNext();
+
+    expect(timeline.enqueue(frame(MOVEMENT_INPUT_TIMELINE_DEPTH + 1))).toBe(false);
+    expect(timeline.rejectedAnchoredWindow).toBe(1);
+    expect(timeline.rejectedSanityBound).toBe(0);
+    expect(timeline.droppedOldest).toBe(0);
+    expect(timeline.discardedLate).toBe(0);
+    expect(timeline.resyncs).toBe(0);
+  });
+
+  it('accepts the inclusive sanity boundary as an empty-buffer resync anchor', () => {
+    const timeline = new MovementInputTimeline();
+    for (let tick = 0; tick < STARVE_RESYNC_TICKS; tick++) timeline.consumeNext();
+
+    expect(timeline.enqueue(frame(MOVEMENT_CT_SANITY_BOUND_TICKS))).toBe(true);
+    expect(timeline.rejectedAnchoredWindow).toBe(0);
+    expect(timeline.rejectedSanityBound).toBe(0);
+    expect(timeline.resyncs).toBe(1);
+    expect(timeline.consumeNext()?.ct).toBe(MOVEMENT_CT_SANITY_BOUND_TICKS);
+  });
+
+  it('counts a frame at the cursor as the empty-buffer resync anchor', () => {
+    const timeline = new MovementInputTimeline();
+    for (let tick = 0; tick < STARVE_RESYNC_TICKS; tick++) timeline.consumeNext();
+
+    expect(timeline.enqueue(frame(0))).toBe(true);
+    expect(timeline.resyncs).toBe(1);
+    expect(timeline.consumeNext()).toEqual(frame(0));
+  });
+
+  it('rejects an absurd jump after empty-buffer starvation', () => {
+    const timeline = new MovementInputTimeline();
+    for (let tick = 0; tick < STARVE_RESYNC_TICKS; tick++) timeline.consumeNext();
+
+    expect(timeline.enqueue(frame(MOVEMENT_CT_SANITY_BOUND_TICKS + 1))).toBe(false);
+    expect(timeline.rejectedSanityBound).toBe(1);
+    expect(timeline.droppedOldest).toBe(0);
+    expect(timeline.rejectedAnchoredWindow).toBe(0);
+    expect(timeline.discardedLate).toBe(0);
+    expect(timeline.resyncs).toBe(0);
   });
 
   it('advances the ack with one held-input frame on a starved tick', () => {

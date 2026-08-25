@@ -867,7 +867,9 @@ export interface PerfCaptureResult {
   movementStarvedTotal: number;
   movementExtrapolatedTotal: number;
   movementDiscardedLateTotal: number;
-  movementDroppedTotal: number;
+  movementDroppedOldestTotal: number;
+  movementRejectedAnchoredWindowTotal: number;
+  movementRejectedSanityBoundTotal: number;
   movementResyncsTotal: number;
   profile: {
     samples: number;

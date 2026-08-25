@@ -111,6 +111,26 @@ describe('MovementPredictionPipeline', () => {
     expect(pipeline.display()?.position).toEqual(authoritative);
   });
 
+  it('adopts the first own epoch after a spectate-shaped pose gap without suspending', () => {
+    const { pipeline, wire } = predictionFixture();
+    drivePredictionFrame(pipeline, 10);
+    expect(pipeline.display()).not.toBeNull();
+
+    wire.reconAuthoritativeX = null;
+    wire.reconAuthoritativeY = null;
+    wire.reconAuthoritativeZ = null;
+    wire.reconAuthoritativeFacing = null;
+    wire.reconOverrideEpoch = 0;
+    expect(pipeline.display()).toBeNull();
+
+    setAuthoritativePose(wire, 20, 28, 1.25);
+    wire.reconOverrideEpoch = 5;
+    drivePredictionFrame(pipeline, 11);
+
+    expect(pipeline.display()).not.toBeNull();
+    expect(wire.reconcileOutcomes).toEqual([]);
+  });
+
   it('acknowledgement older than a fresh ring anchor is ignored', () => {
     const { pipeline, wire } = predictionFixture();
     drivePredictionFrame(pipeline, 71);

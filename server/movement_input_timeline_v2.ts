@@ -11,6 +11,9 @@ import {
 
 export const MOVEMENT_INPUT_TIMELINE_DEPTH = 6;
 export const STARVE_RESYNC_TICKS = 3;
+// Sixty seconds at 20 Hz is twice the 30 second keepalive window. A real gap
+// this long reaches session resume instead of timeline recovery.
+export const MOVEMENT_CT_SANITY_BOUND_TICKS = 1200;
 
 export interface MovementInputFrameV2 {
   ct: number;
@@ -96,7 +99,9 @@ export class MovementInputTimeline {
   starved = 0;
   extrapolated = 0;
   discardedLate = 0;
-  dropped = 0;
+  droppedOldest = 0;
+  rejectedAnchoredWindow = 0;
+  rejectedSanityBound = 0;
   resyncs = 0;
 
   private readonly frames = new Map<number, MovementInputFrameV2>();
@@ -112,8 +117,19 @@ export class MovementInputTimeline {
       this.discardedLate++;
       return false;
     }
+    if (frame.ct > this.expectedClientTick + MOVEMENT_CT_SANITY_BOUND_TICKS) {
+      this.rejectedSanityBound++;
+      return false;
+    }
+    if (this.frames.size === 0 && this.consecutiveStarvedTicks >= STARVE_RESYNC_TICKS) {
+      this.expectedClientTick = frame.ct;
+      this.consecutiveStarvedTicks = 0;
+      this.frames.set(frame.ct, frame);
+      this.resyncs++;
+      return true;
+    }
     if (frame.ct > this.expectedClientTick + MOVEMENT_INPUT_TIMELINE_DEPTH) {
-      this.dropped++;
+      this.rejectedAnchoredWindow++;
       return false;
     }
     this.frames.set(frame.ct, frame);
@@ -122,7 +138,7 @@ export class MovementInputTimeline {
       if (oldest === null) break;
       this.frames.delete(oldest);
       this.expectedClientTick = Math.max(this.expectedClientTick, oldest + 1);
-      this.dropped++;
+      this.droppedOldest++;
     }
     return true;
   }

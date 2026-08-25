@@ -126,6 +126,8 @@ export interface FrameRecord {
   x: number;
   y: number;
   z: number;
+  selfId: number;
+  spectating: string | null;
   /** The mirrored authoritative pose the frame interpolated from. */
   mirrorX: number;
   mirrorY: number;
@@ -180,6 +182,7 @@ export interface HarnessRun {
     discardedLate: number;
     resyncs: number;
   } | null;
+  movementOutboxDroppedOldest: number;
 }
 
 export interface OnlineHarnessOptions {
@@ -254,14 +257,16 @@ class HarnessSocket {
   onmessage: ((ev: { data: unknown }) => void) | null = null;
   onclose: (() => void) | null = null;
   readyState = HarnessSocket.OPEN;
-  /** ClientWorld sheds input above a browser-buffer threshold; the link owns
-   *  the queue here, so nothing is ever buffered locally. */
-  bufferedAmount = 0;
 
   constructor(
     readonly url: string,
     private readonly onSend: (payload: string) => void,
+    private readonly bufferedBytes: () => number,
   ) {}
+
+  get bufferedAmount(): number {
+    return this.bufferedBytes();
+  }
 
   send(payload: string): void {
     this.onSend(payload);
@@ -356,10 +361,14 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
   let socket: HarnessSocket | null = null;
   class HarnessWebSocket extends HarnessSocket {
     constructor(url: string) {
-      super(url, (payload) => {
-        noteClientFrame(payload);
-        link.clientSend(payload);
-      });
+      super(
+        url,
+        (payload) => {
+          noteClientFrame(payload);
+          link.clientSend(payload);
+        },
+        () => link.pendingBytes('toServer'),
+      );
       socket = this;
     }
   }
@@ -602,6 +611,8 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       x: drawn.x,
       y: drawn.y,
       z: drawn.z,
+      selfId: pe.id,
+      spectating: client.spectating,
       mirrorX: pe.pos.x,
       mirrorY: pe.pos.y,
       mirrorZ: pe.pos.z,
@@ -664,6 +675,9 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       recordingFromMs = origin;
       frames = [];
       ticks = [];
+      const outboxBefore =
+        (client as unknown as { movementFrameOutbox?: { droppedOldest: number } })
+          .movementFrameOutbox?.droppedOldest ?? 0;
       // Seed the timeline with the intent the WIRE was already carrying when
       // recording opened (the idle warmup): without it the run's very first
       // frame looks like the start of the timeline rather than what it is, a
@@ -709,6 +723,9 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
               resyncs: session.movementTimeline.resyncs,
             }
           : null,
+        movementOutboxDroppedOldest:
+          ((client as unknown as { movementFrameOutbox?: { droppedOldest: number } })
+            .movementFrameOutbox?.droppedOldest ?? 0) - outboxBefore,
       };
     },
     dispose: teardown,

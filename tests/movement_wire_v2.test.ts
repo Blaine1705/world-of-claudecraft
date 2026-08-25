@@ -199,7 +199,9 @@ describe('movement wire v2', () => {
       const before = {
         consumed: timeline.consumed,
         starved: timeline.starved,
-        dropped: timeline.dropped,
+        droppedOldest: timeline.droppedOldest,
+        rejectedAnchoredWindow: timeline.rejectedAnchoredWindow,
+        rejectedSanityBound: timeline.rejectedSanityBound,
         resyncs: timeline.resyncs,
       };
       const run = harness.runScript({
@@ -212,7 +214,9 @@ describe('movement wire v2', () => {
 
       expect(timeline.consumed - before.consumed).toBe(run.tickCount);
       expect(timeline.starved - before.starved).toBe(0);
-      expect(timeline.dropped - before.dropped).toBe(0);
+      expect(timeline.droppedOldest - before.droppedOldest).toBe(0);
+      expect(timeline.rejectedAnchoredWindow - before.rejectedAnchoredWindow).toBe(0);
+      expect(timeline.rejectedSanityBound - before.rejectedSanityBound).toBe(0);
       expect(timeline.resyncs - before.resyncs).toBe(0);
     } finally {
       harness.dispose();

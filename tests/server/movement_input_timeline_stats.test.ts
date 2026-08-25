@@ -27,7 +27,9 @@ describe('movement input timeline tick stats', () => {
     firstTimeline.extrapolated = 1;
     secondTimeline.consumed = 3;
     secondTimeline.discardedLate = 2;
-    secondTimeline.dropped = 1;
+    secondTimeline.droppedOldest = 1;
+    secondTimeline.rejectedAnchoredWindow = 3;
+    secondTimeline.rejectedSanityBound = 4;
     secondTimeline.resyncs = 1;
 
     stats.fold([first, second], true);
@@ -37,14 +39,18 @@ describe('movement input timeline tick stats', () => {
       starved: stats.lastStarved,
       extrapolated: stats.lastExtrapolated,
       discardedLate: stats.lastDiscardedLate,
-      dropped: stats.lastDropped,
+      droppedOldest: stats.lastDroppedOldest,
+      rejectedAnchoredWindow: stats.lastRejectedAnchoredWindow,
+      rejectedSanityBound: stats.lastRejectedSanityBound,
       resyncs: stats.lastResyncs,
     }).toEqual({
       consumed: 5,
       starved: 1,
       extrapolated: 1,
       discardedLate: 2,
-      dropped: 1,
+      droppedOldest: 1,
+      rejectedAnchoredWindow: 3,
+      rejectedSanityBound: 4,
       resyncs: 1,
     });
 
@@ -56,7 +62,9 @@ describe('movement input timeline tick stats', () => {
       movementStarvedTotal: 3,
       movementExtrapolatedTotal: 1,
       movementDiscardedLateTotal: 2,
-      movementDroppedTotal: 1,
+      movementDroppedOldestTotal: 1,
+      movementRejectedAnchoredWindowTotal: 3,
+      movementRejectedSanityBoundTotal: 4,
       movementResyncsTotal: 1,
     });
   });
@@ -69,7 +77,9 @@ describe('movement input timeline tick stats', () => {
     timeline.starved = 5;
     timeline.extrapolated = 3;
     timeline.discardedLate = 2;
-    timeline.dropped = 1;
+    timeline.droppedOldest = 1;
+    timeline.rejectedAnchoredWindow = 3;
+    timeline.rejectedSanityBound = 4;
     timeline.resyncs = 6;
     stats.fold([active], true);
     stats.fold([active], true);
@@ -79,7 +89,9 @@ describe('movement input timeline tick stats', () => {
       movementStarvedTotal: 5,
       movementExtrapolatedTotal: 3,
       movementDiscardedLateTotal: 2,
-      movementDroppedTotal: 1,
+      movementDroppedOldestTotal: 1,
+      movementRejectedAnchoredWindowTotal: 3,
+      movementRejectedSanityBoundTotal: 4,
       movementResyncsTotal: 6,
     });
 
@@ -89,7 +101,9 @@ describe('movement input timeline tick stats', () => {
       movementStarvedTotal: 0,
       movementExtrapolatedTotal: 0,
       movementDiscardedLateTotal: 0,
-      movementDroppedTotal: 0,
+      movementDroppedOldestTotal: 0,
+      movementRejectedAnchoredWindowTotal: 0,
+      movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
     });
     expect(stats.lastConsumed).toBe(0);

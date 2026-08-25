@@ -54,7 +54,9 @@ type MovementTimelineCaptureFields =
   | 'movementStarvedTotal'
   | 'movementExtrapolatedTotal'
   | 'movementDiscardedLateTotal'
-  | 'movementDroppedTotal'
+  | 'movementDroppedOldestTotal'
+  | 'movementRejectedAnchoredWindowTotal'
+  | 'movementRejectedSanityBoundTotal'
   | 'movementResyncsTotal';
 type _AdminMirrorCarriesMobScanFields = AssertTrue<
   Pick<ServerPerfCaptureResult, MobScanCaptureFields> extends Pick<
@@ -158,7 +160,9 @@ describe('tick perf capture lifecycle', () => {
       movementStarvedTotal: 0,
       movementExtrapolatedTotal: 0,
       movementDiscardedLateTotal: 0,
-      movementDroppedTotal: 0,
+      movementDroppedOldestTotal: 0,
+      movementRejectedAnchoredWindowTotal: 0,
+      movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
     });
     // The frozen profile reflects the window's samples (7 ms every tick -> mean 7).
@@ -627,7 +631,9 @@ describe('tick perf capture lifecycle', () => {
       movementStarvedTotal: 0,
       movementExtrapolatedTotal: 0,
       movementDiscardedLateTotal: 0,
-      movementDroppedTotal: 0,
+      movementDroppedOldestTotal: 0,
+      movementRejectedAnchoredWindowTotal: 0,
+      movementRejectedSanityBoundTotal: 0,
       movementResyncsTotal: 0,
     });
   });
@@ -654,7 +660,9 @@ describe('tick perf capture lifecycle', () => {
             lastStarved: number;
             lastExtrapolated: number;
             lastDiscardedLate: number;
-            lastDropped: number;
+            lastDroppedOldest: number;
+            lastRejectedAnchoredWindow: number;
+            lastRejectedSanityBound: number;
             lastResyncs: number;
           };
         }
@@ -663,8 +671,10 @@ describe('tick perf capture lifecycle', () => {
       movementStats.lastStarved = 2;
       movementStats.lastExtrapolated = 3;
       movementStats.lastDiscardedLate = 4;
-      movementStats.lastDropped = 5;
-      movementStats.lastResyncs = 6;
+      movementStats.lastDroppedOldest = 5;
+      movementStats.lastRejectedAnchoredWindow = 6;
+      movementStats.lastRejectedSanityBound = 7;
+      movementStats.lastResyncs = 8;
       // Force the heartbeat branch (tickCount 0 minus -100 clears the 100-tick gap).
       (server as unknown as { lastPerfLogTick: number }).lastPerfLogTick = -100;
       (server as unknown as { maybeLogTickPerf: (ms: number) => void }).maybeLogTickPerf(5);
@@ -676,8 +686,10 @@ describe('tick perf capture lifecycle', () => {
       expect(perfLine).toContain('moveStarved=2');
       expect(perfLine).toContain('moveExtrapolated=3');
       expect(perfLine).toContain('moveLate=4');
-      expect(perfLine).toContain('moveDropped=5');
-      expect(perfLine).toContain('moveResyncs=6');
+      expect(perfLine).toContain('moveDropOldest=5');
+      expect(perfLine).toContain('moveRejectWindow=6');
+      expect(perfLine).toContain('moveRejectSanity=7');
+      expect(perfLine).toContain('moveResyncs=8');
     } finally {
       log.mockRestore();
       vi.unstubAllEnvs();

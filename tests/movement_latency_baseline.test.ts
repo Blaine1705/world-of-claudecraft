@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { MOVEMENT_INPUT_TIMELINE_DEPTH } from '../server/movement_input_timeline_v2';
 import { HANDOFF_DONE_EPS } from '../src/game/keyboard_turn_facing';
 import { MAX_SELF_REWIND_YD_PER_SEC } from '../src/render/self_render_position_core';
 import { DT, emptyMoveInput, type MoveInput, RUN_SPEED, TURN_SPEED } from '../src/sim/types';
@@ -33,7 +34,9 @@ import type { LatencyLinkConfig } from './helpers/latency_link';
 import {
   COLLIDER_FREE_LANE,
   type Pose,
+  rawFakeWs,
   runTwinServerTrajectory,
+  teleportEntity,
 } from './helpers/movement_ground_truth';
 import {
   type CommandSample,
@@ -350,6 +353,38 @@ function authoritativeTruth(run: HarnessRun): GroundTruthSample[] {
   ];
 }
 
+function scoreHarnessRun(
+  run: HarnessRun,
+  movementTimelineBefore: HarnessRun['movementTimeline'],
+  reference: Reference,
+  metricOptions: MovementMetricsOptions,
+): CellResult {
+  const twinPoses =
+    reference === 'zeroLatency'
+      ? runTwinServerTrajectory({ script: run.tickScript, ticks: run.tickCount })
+      : null;
+  const truth = twinPoses ? zeroLatencyTruth(twinPoses, run.commands) : authoritativeTruth(run);
+  const metrics = computeMovementMetrics(
+    run.frames.map((frame) => ({
+      tMs: frame.tMs,
+      x: frame.x,
+      z: frame.z,
+      drawnYaw: frame.drawnYaw,
+      cameraFacing: frame.cameraFacing,
+      authoritativeFacing: frame.authoritativeFacing,
+      turnInputActive: frame.turnInputActive,
+      mi: frame.mi,
+      reconcileMode: frame.reconcileMode,
+      residualYd: frame.residualYd,
+    })),
+    truth,
+    run.commands,
+    { tickMs: SERVER_TICK_MS, tickPhaseMs: SERVER_TICK_MS, ...metricOptions },
+    run.ticks,
+  );
+  return { run, truth, metrics, movementTimelineBefore, twinPoses };
+}
+
 function measure(
   latency: LatencyLinkConfig,
   options: RunScriptOptions,
@@ -372,34 +407,7 @@ function measure(
         }
       : null;
     const run = harness.runScript(resolved);
-    const twinPoses =
-      reference === 'zeroLatency'
-        ? runTwinServerTrajectory({ script: run.tickScript, ticks: run.tickCount })
-        : null;
-    const truth = twinPoses ? zeroLatencyTruth(twinPoses, run.commands) : authoritativeTruth(run);
-    const metrics = computeMovementMetrics(
-      run.frames.map((frame) => ({
-        tMs: frame.tMs,
-        x: frame.x,
-        z: frame.z,
-        drawnYaw: frame.drawnYaw,
-        cameraFacing: frame.cameraFacing,
-        authoritativeFacing: frame.authoritativeFacing,
-        turnInputActive: frame.turnInputActive,
-        mi: frame.mi,
-        reconcileMode: frame.reconcileMode,
-        residualYd: frame.residualYd,
-      })),
-      truth,
-      run.commands,
-      // The tick phase is stated rather than defaulted: a ground-truth sample
-      // dates at the END of the tick that produced it, so the phase IS the
-      // period, and a silent default here would silently re-date every sample
-      // if the metric's default ever moved.
-      { tickMs: SERVER_TICK_MS, tickPhaseMs: SERVER_TICK_MS, ...metricOptions },
-      run.ticks,
-    );
-    return { run, truth, metrics, movementTimelineBefore, twinPoses };
+    return scoreHarnessRun(run, movementTimelineBefore, reference, metricOptions);
   } finally {
     harness.dispose();
   }
@@ -420,6 +428,12 @@ const STARVATION_PROFILE = link(300, 20);
 const STALL_AT_MS = 1500;
 const STALL_MS = 500;
 const CC_AT_MS = 1500;
+const BACKPRESSURE_STALL_AT_MS = 500;
+const BACKPRESSURE_STALL_MS = 60_000;
+const BACKPRESSURE_RECOVERY_WAIT_MS = 4000;
+const SPECTATE_AT_MS = 500;
+const SPECTATE_EXIT_AT_MS = 1500;
+const SPECTATE_TARGET = { x: 40, z: COLLIDER_FREE_LANE.z } as const;
 
 const stallRun: RunScriptOptions = {
   durationMs: RUN_MS,
@@ -461,6 +475,90 @@ function withStarvationStall(harness: OnlineHarness, options: RunScriptOptions):
     ],
   };
 }
+
+interface BackpressureRecoveryCell {
+  shedRun: HarnessRun;
+  recovery: CellResult;
+  timelineBeforeShed: NonNullable<HarnessRun['movementTimeline']>;
+}
+
+function measureBackpressureRecovery(): BackpressureRecoveryCell {
+  const harness = createOnlineHarness({ latency: ADVERSARIAL_PROFILE });
+  try {
+    const timeline = harness.session.movementTimeline;
+    if (!timeline) throw new Error('the backpressure cell has no movement timeline');
+    const timelineBeforeShed = {
+      consumed: timeline.consumed,
+      starved: timeline.starved,
+      extrapolated: timeline.extrapolated,
+      discardedLate: timeline.discardedLate,
+      resyncs: timeline.resyncs,
+    };
+    const shedRun = harness.runScript({
+      durationMs: BACKPRESSURE_STALL_AT_MS + BACKPRESSURE_STALL_MS + BACKPRESSURE_RECOVERY_WAIT_MS,
+      actions: [
+        {
+          atMs: BACKPRESSURE_STALL_AT_MS,
+          run: () => harness.link.stall('toServer', harness.clock.now() + BACKPRESSURE_STALL_MS),
+        },
+      ],
+    });
+    const recoveryBefore = shedRun.movementTimeline;
+    const recoveryRun = harness.runScript(straightRun);
+    return {
+      shedRun,
+      recovery: scoreHarnessRun(recoveryRun, recoveryBefore, 'zeroLatency', {}),
+      timelineBeforeShed,
+    };
+  } finally {
+    harness.dispose();
+  }
+}
+
+let backpressureRecovery: BackpressureRecoveryCell;
+
+interface SpectateCell {
+  run: HarnessRun;
+  targetPid: number;
+  targetName: string;
+}
+
+function measureSpectateTransition(): SpectateCell {
+  const harness = createOnlineHarness({ latency: ADVERSARIAL_PROFILE });
+  try {
+    const targetClient = rawFakeWs();
+    const joined = harness.server.join(targetClient.ws, 2, 2, 'Observed', 'rogue', null, false, {
+      movementWireVersion: 2,
+    });
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+    const target = harness.server.sim.entities.get(joined.pid);
+    if (!target) throw new Error('the spectate target is missing from the server sim');
+    teleportEntity(target, SPECTATE_TARGET.x, SPECTATE_TARGET.z, harness.server.sim.cfg.seed);
+    const spectateHost = harness.server as unknown as {
+      enterSpectate(moderator: typeof harness.session, target: typeof joined): void;
+      exitSpectate(moderator: typeof harness.session): void;
+    };
+    const run = harness.runScript({
+      durationMs: 3000,
+      actions: [
+        {
+          atMs: SPECTATE_AT_MS,
+          run: () => spectateHost.enterSpectate(harness.session, joined),
+        },
+        {
+          atMs: SPECTATE_EXIT_AT_MS,
+          run: () => spectateHost.exitSpectate(harness.session),
+        },
+      ],
+    });
+    return { run, targetPid: joined.pid, targetName: joined.name };
+  } finally {
+    harness.dispose();
+  }
+}
+
+let spectateTransition: SpectateCell;
 
 /** The aura shape effect_dispatch applies, pushed straight onto the authority. */
 function withServerAura(
@@ -549,6 +647,8 @@ beforeAll(() => {
     'starvation-straight/rtt300j20',
     measure(STARVATION_PROFILE, straightRun, 'zeroLatency', withStarvationStall),
   );
+  backpressureRecovery = measureBackpressureRecovery();
+  spectateTransition = measureSpectateTransition();
 }, 60_000);
 
 function cell(key: string): CellResult {
@@ -595,6 +695,10 @@ function expectTargets(key: string): void {
     );
     return;
   }
+  expectOrdinaryTargets(metrics);
+}
+
+function expectOrdinaryTargets(metrics: MovementMetrics): void {
   expect(metrics.replayEvents.count).toBe(MOVEMENT_FEEL_TARGETS.replayEvents);
   expect(metrics.correctionEvents.count).toBe(MOVEMENT_FEEL_TARGETS.correctionEvents);
   // Worst magnitude AND count: a run that snaps back a hair on every single
@@ -1338,6 +1442,74 @@ describe('movement latency baseline', () => {
     expect(after.extrapolated - before.extrapolated).toBeGreaterThan(0);
     expect(after.discardedLate - before.discardedLate).toBeGreaterThan(0);
     expect(after.resyncs - before.resyncs).toBe(0);
+  });
+
+  it('sheds a stalled uplink, resyncs, and returns to strict movement feel', () => {
+    const { shedRun, recovery, timelineBeforeShed } = backpressureRecovery;
+    const afterShed = shedRun.movementTimeline;
+    const afterRecovery = recovery.run.movementTimeline;
+    if (!afterShed || !afterRecovery || !recovery.movementTimelineBefore) {
+      throw new Error('the backpressure cell has no movement timeline');
+    }
+    const finalServer = recovery.run.ticks.at(-1);
+    const finalTwin = recovery.twinPoses?.at(-1);
+    if (!finalServer || !finalTwin) throw new Error('the backpressure cell has no final pose');
+
+    expect(shedRun.movementOutboxDroppedOldest).toBeGreaterThan(0);
+    const transmittedClientTicks = shedRun.commands.flatMap((command) =>
+      command.ct === undefined ? [] : [command.ct],
+    );
+    expect(
+      transmittedClientTicks.some(
+        (clientTick, index) => index > 0 && clientTick > transmittedClientTicks[index - 1] + 1,
+      ),
+    ).toBe(true);
+    expect(afterShed.resyncs - timelineBeforeShed.resyncs).toBeGreaterThan(0);
+    expect(afterRecovery.consumed - recovery.movementTimelineBefore.consumed).toBe(
+      recovery.run.tickCount,
+    );
+    const finalPoseErrorYd = Math.hypot(finalServer.x - finalTwin.x, finalServer.z - finalTwin.z);
+    const resyncWindowYd = MOVEMENT_INPUT_TIMELINE_DEPTH * RUN_SPEED * DT;
+    expect(finalPoseErrorYd).toBeLessThanOrEqual(resyncWindowYd);
+    if (STRICT) expectOrdinaryTargets(recovery.metrics);
+  });
+
+  it('streams a spectate anchor and returns to the own pose within one round trip', () => {
+    const { run, targetPid, targetName } = spectateTransition;
+    const spectatedFrames = run.frames.filter(
+      (frame) => frame.spectating === targetName && frame.selfId === targetPid,
+    );
+    expect(spectatedFrames.length).toBeGreaterThan(10);
+    expect(
+      spectatedFrames.some(
+        (frame) =>
+          Math.hypot(frame.mirrorX - SPECTATE_TARGET.x, frame.mirrorZ - SPECTATE_TARGET.z) < 0.01,
+      ),
+    ).toBe(true);
+
+    const ownFramesAfterExit = run.frames.filter(
+      (frame) => frame.tMs >= SPECTATE_EXIT_AT_MS && frame.spectating === null,
+    );
+    expect(ownFramesAfterExit.length).toBeGreaterThan(10);
+    const distanceBetweenPoses = Math.hypot(
+      SPECTATE_TARGET.x - COLLIDER_FREE_LANE.x,
+      SPECTATE_TARGET.z - COLLIDER_FREE_LANE.z,
+    );
+    const foreignPoseDistanceFloor = distanceBetweenPoses / 2;
+    expect(
+      ownFramesAfterExit.every(
+        (frame) =>
+          Math.hypot(frame.x - SPECTATE_TARGET.x, frame.z - SPECTATE_TARGET.z) >=
+          foreignPoseDistanceFloor,
+      ),
+    ).toBe(true);
+
+    const recovered = ownFramesAfterExit.find(
+      (frame) =>
+        frame.tMs <= SPECTATE_EXIT_AT_MS + 150 &&
+        Math.hypot(frame.x - frame.mirrorX, frame.z - frame.mirrorZ) <= 0.01,
+    );
+    expect(recovered).toBeDefined();
   });
 
   const keys = [

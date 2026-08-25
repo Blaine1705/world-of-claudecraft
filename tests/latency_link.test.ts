@@ -103,6 +103,18 @@ describe('LatencyLink delivery', () => {
     expect(got[2]).toEqual({ at: 450, payload: 'c' });
   });
 
+  it('reports queued UTF-8 payload bytes until delivery drains them', () => {
+    const clock = new VirtualClock();
+    const [link] = linkOf(clock, noJitter(50));
+
+    link.clientSend('abc');
+    link.clientSend('Å');
+    expect(link.pendingBytes('toServer')).toBe(5);
+
+    clock.advanceBy(50);
+    expect(link.pendingBytes('toServer')).toBe(0);
+  });
+
   it('stalls one direction only', () => {
     const clock = new VirtualClock();
     const [link, got] = linkOf(clock, noJitter(50));

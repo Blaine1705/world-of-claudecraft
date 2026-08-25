@@ -21,10 +21,13 @@ export interface MovementFrameV2SendResult {
 }
 
 export class MovementFrameV2Outbox {
+  droppedOldest = 0;
+
   private readonly pending: MovementFrameV2[] = [];
 
   reset(): void {
     this.pending.length = 0;
+    this.droppedOldest = 0;
   }
 
   send(
@@ -64,7 +67,10 @@ export class MovementFrameV2Outbox {
 
   private enqueue(frame: MovementFrameV2): void {
     this.pending.push({ ...frame, mi: { ...frame.mi } });
-    if (this.pending.length > MOVEMENT_FRAME_V2_PENDING_CAP) this.pending.shift();
+    if (this.pending.length > MOVEMENT_FRAME_V2_PENDING_CAP) {
+      this.pending.shift();
+      this.droppedOldest++;
+    }
   }
 }
 
