@@ -1655,8 +1655,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Karmínová',
   'hudChrome.bg.defeatBanner':
     'Porážka. Thornhollowská pole {crimson}:{azure}. Hodnocení {rating} ({delta})',
-  'hudChrome.bg.doubleHonorLine':
-    'Víkend dvojité cti: dnes se čest na Thornhollowských polích násobí {mult}krát, a dohraná prohra platí jako výhra',
   'hudChrome.bg.drawBanner':
     'Thornhollowská pole, remíza {crimson}:{azure}. Hodnocení {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Upustit vlajku',
@@ -6119,9 +6117,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bratr Halven značí mapy: skvělý den pro odvahu ve Zhrouceném relikviáři.',
   'hudChrome.calendar.events.delveDay.title': 'Den výprav',
-  'hudChrome.calendar.events.doubleHonor.note':
-    'Válečné tábory troubí ke shromáždění: celý víkend se čest na Thornhollowských polích násobí dvakrát, a dohraná prohra platí jako výhra.',
-  'hudChrome.calendar.events.doubleHonor.title': 'Víkend dvojité cti',
   'hudChrome.calendar.events.fishingDerby.note':
     'Rybáři lemují jezera. Přines prut a vyměň si rybářské historky.',
   'hudChrome.calendar.events.fishingDerby.title': 'Rybářské derby',
