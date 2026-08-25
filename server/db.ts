@@ -61,10 +61,10 @@ import {
   assertMailPartitionWriteGateOpen,
   openMailPartitionWriteGate,
   writeMailPartitions,
+  writeMailPartitionsInTransaction,
 } from './mail_db';
 import {
   mailPartitionMarkerKey,
-  mailRecipientKey,
   mailStateKey,
   runMailPartitionBackfill,
 } from './mail_partition_backfill';
@@ -98,14 +98,8 @@ import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
 
-// The mail partition write gate lives in server/mail_db.ts (split out purely
-// to stay under this file's monolith ceiling); re-export both gate toggles so
-// pre-existing test consumers keep importing them from ./db unchanged.
+// Re-export split mail helpers so existing callers keep the db.ts surface.
 export { closeMailPartitionWriteGateForTests, openMailPartitionWriteGate } from './mail_db';
-// Same discipline for the mail partition backfill: mailStateKey (the legacy
-// whole-book key) and mailRecipientKey (the partitioned key) live in
-// server/mail_partition_backfill.ts; re-export both so pre-existing consumers
-// keep importing from ./db unchanged.
 export { mailRecipientKey, mailStateKey } from './mail_partition_backfill';
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
@@ -4599,7 +4593,7 @@ export async function saveMailPartitions(
 ): Promise<void> {
   if (partitions.length === 0) return;
   assertMailPartitionWriteGateOpen();
-  await writeMailPartitions(pool, REALM, partitions);
+  await writeMailPartitionsInTransaction(pool, REALM, partitions);
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are

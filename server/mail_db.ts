@@ -38,6 +38,28 @@ export interface MailPartitionWriteClient {
   query(text: string, values?: unknown[]): Promise<unknown>;
 }
 
+export interface MailPartitionTransactionPool {
+  connect(): Promise<MailPartitionWriteClient & { release(): void }>;
+}
+
+export async function writeMailPartitionsInTransaction(
+  pool: MailPartitionTransactionPool,
+  realm: string,
+  partitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
+): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await writeMailPartitions(client, realm, partitions);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 // The incremental autosave write (#3561): persists ONLY the given recipient
 // partitions, split into at most one batched multi-row UPSERT (non-empty
 // buckets) and one batched DELETE (a mailbox that emptied out: retention,

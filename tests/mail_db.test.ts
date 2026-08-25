@@ -9,10 +9,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const dbMock = vi.hoisted(() => {
   process.env.DATABASE_URL ??= 'postgres://test/test';
   const clientQuery = vi.fn();
+  const release = vi.fn();
   return {
     query: vi.fn(),
     clientQuery,
-    connect: vi.fn(async () => ({ query: clientQuery, release: vi.fn() })),
+    release,
+    connect: vi.fn(async () => ({ query: clientQuery, release })),
   };
 });
 
@@ -35,6 +37,7 @@ import { REALM } from '../server/realm';
 beforeEach(() => {
   dbMock.query.mockReset();
   dbMock.clientQuery.mockReset();
+  dbMock.release.mockClear();
   dbMock.connect.mockClear();
   // Every test starts from the boot default: the mail partition write gate is
   // CLOSED until ensureSchema's backfill opens it. Tests that need to write
@@ -130,51 +133,64 @@ describe('saveMailPartitions (the incremental autosave write, #3561)', () => {
     openMailPartitionWriteGate();
     await saveMailPartitions([]);
     expect(dbMock.query).not.toHaveBeenCalled();
+    expect(dbMock.connect).not.toHaveBeenCalled();
   });
 
-  it('writes every non-empty dirty recipient in ONE batched multi-row UPSERT, never one query per recipient', async () => {
+  it('writes every non-empty dirty recipient in ONE transaction with one batched multi-row UPSERT', async () => {
     openMailPartitionWriteGate();
-    dbMock.query.mockResolvedValueOnce({ rows: [] });
+    dbMock.clientQuery.mockResolvedValue({ rows: [] });
 
     await saveMailPartitions([
       { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
       { recipientKey: 'carol', letters: [{ id: 2, recipientKey: 'carol' }] as never },
     ]);
 
-    expect(dbMock.query).toHaveBeenCalledTimes(1);
-    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(dbMock.connect).toHaveBeenCalledTimes(1);
+    expect(dbMock.query).not.toHaveBeenCalled();
+    const sqls = dbMock.clientQuery.mock.calls.map((c) => String(c[0]));
+    expect(sqls[0]).toBe('BEGIN');
+    expect(sqls.at(-1)).toBe('COMMIT');
+    expect(sqls.filter((s) => /^BEGIN$|^COMMIT$|^ROLLBACK$/.test(s))).toEqual(['BEGIN', 'COMMIT']);
+    const [sql, params] = dbMock.clientQuery.mock.calls[1];
     expect(String(sql)).toMatch(/UNNEST/i);
     expect(String(sql)).toMatch(/ON CONFLICT \(key\) DO UPDATE/i);
     const [keys, datas] = params as [string[], string[]];
     expect(keys).toEqual([`mail:${REALM}:r:alice`, `mail:${REALM}:r:carol`]);
     expect(JSON.parse(datas[0])).toEqual({ mail: [{ id: 1, recipientKey: 'alice' }] });
     expect(JSON.parse(datas[1])).toEqual({ mail: [{ id: 2, recipientKey: 'carol' }] });
+    expect(dbMock.release).toHaveBeenCalledTimes(1);
   });
 
   it('an emptied-out mailbox is DELETEd, never upserted as {"mail":[]} (retention, #3561)', async () => {
     openMailPartitionWriteGate();
-    dbMock.query.mockResolvedValueOnce({ rows: [] });
+    dbMock.clientQuery.mockResolvedValue({ rows: [] });
 
     await saveMailPartitions([{ recipientKey: 'bob', letters: [] as never }]);
 
-    expect(dbMock.query).toHaveBeenCalledTimes(1);
-    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(dbMock.query).not.toHaveBeenCalled();
+    const sqls = dbMock.clientQuery.mock.calls.map((c) => String(c[0]));
+    expect(sqls[0]).toBe('BEGIN');
+    expect(sqls.at(-1)).toBe('COMMIT');
+    const [sql, params] = dbMock.clientQuery.mock.calls[1];
     expect(String(sql)).toMatch(/DELETE FROM world_state WHERE key = ANY/i);
     expect(params).toEqual([[`mail:${REALM}:r:bob`]]);
   });
 
-  it('splits a mixed batch into one UPSERT for non-empty buckets and one DELETE for emptied ones', async () => {
+  it('splits a mixed batch into one UPSERT and one DELETE inside the same standalone transaction', async () => {
     openMailPartitionWriteGate();
-    dbMock.query.mockResolvedValue({ rows: [] });
+    dbMock.clientQuery.mockResolvedValue({ rows: [] });
 
     await saveMailPartitions([
       { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
       { recipientKey: 'bob', letters: [] as never },
     ]);
 
-    expect(dbMock.query).toHaveBeenCalledTimes(2);
-    const upsertCall = dbMock.query.mock.calls.find((c) => /UNNEST/i.test(String(c[0])));
-    const deleteCall = dbMock.query.mock.calls.find((c) =>
+    const sqls = dbMock.clientQuery.mock.calls.map((c) => String(c[0]));
+    expect(sqls[0]).toBe('BEGIN');
+    expect(sqls.at(-1)).toBe('COMMIT');
+    expect(sqls.filter((s) => /^BEGIN$|^COMMIT$|^ROLLBACK$/.test(s))).toEqual(['BEGIN', 'COMMIT']);
+    const upsertCall = dbMock.clientQuery.mock.calls.find((c) => /UNNEST/i.test(String(c[0])));
+    const deleteCall = dbMock.clientQuery.mock.calls.find((c) =>
       /DELETE FROM world_state/i.test(String(c[0])),
     );
     if (!upsertCall || !deleteCall) throw new Error('missing expected query');
@@ -185,7 +201,7 @@ describe('saveMailPartitions (the incremental autosave write, #3561)', () => {
 
   it('de-dupes a repeated recipientKey by last-write-wins, so no key ever reaches the SQL twice', async () => {
     openMailPartitionWriteGate();
-    dbMock.query.mockResolvedValueOnce({ rows: [] });
+    dbMock.clientQuery.mockResolvedValue({ rows: [] });
 
     await saveMailPartitions([
       { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
@@ -198,11 +214,33 @@ describe('saveMailPartitions (the incremental autosave write, #3561)', () => {
       },
     ]);
 
-    expect(dbMock.query).toHaveBeenCalledTimes(1);
-    const [, params] = dbMock.query.mock.calls[0];
+    const upsertCall = dbMock.clientQuery.mock.calls.find((c) => /UNNEST/i.test(String(c[0])));
+    if (!upsertCall) throw new Error('missing expected upsert');
+    const [, params] = upsertCall;
     const [keys, datas] = params as [string[], string[]];
     expect(keys).toEqual([`mail:${REALM}:r:alice`]); // one key, not two
     expect(JSON.parse(datas[0]).mail).toHaveLength(2); // the LATER (fuller) entry won
+  });
+
+  it('rolls back the standalone transaction if the second partition statement fails', async () => {
+    openMailPartitionWriteGate();
+    dbMock.clientQuery.mockImplementation((sql: string) => {
+      if (/DELETE FROM world_state/i.test(sql)) throw new Error('delete failed');
+      return Promise.resolve({ rows: [] });
+    });
+
+    await expect(
+      saveMailPartitions([
+        { recipientKey: 'alice', letters: [{ id: 1, recipientKey: 'alice' }] as never },
+        { recipientKey: 'bob', letters: [] as never },
+      ]),
+    ).rejects.toThrow('delete failed');
+
+    const sqls = dbMock.clientQuery.mock.calls.map((c) => String(c[0]));
+    expect(sqls[0]).toBe('BEGIN');
+    expect(sqls.at(-1)).toBe('ROLLBACK');
+    expect(sqls).not.toContain('COMMIT');
+    expect(dbMock.release).toHaveBeenCalledTimes(1);
   });
 
   it('blocks the write when the mail partition gate is closed (ensureSchema has not confirmed the marker yet)', async () => {
@@ -211,5 +249,6 @@ describe('saveMailPartitions (the incremental autosave write, #3561)', () => {
       saveMailPartitions([{ recipientKey: 'alice', letters: [] as never }]),
     ).rejects.toThrow(/mail partition write blocked/);
     expect(dbMock.query).not.toHaveBeenCalled();
+    expect(dbMock.connect).not.toHaveBeenCalled();
   });
 });

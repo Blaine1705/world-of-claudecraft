@@ -79,6 +79,8 @@ describe('saveCharacterAndMarketState', () => {
     // Single transaction: BEGIN first, COMMIT last, no ROLLBACK.
     expect(sqls[0]).toMatch(/^BEGIN/);
     expect(sqls[sqls.length - 1]).toMatch(/^COMMIT/);
+    expect(sqls.filter((s) => /^BEGIN$/.test(s))).toHaveLength(1);
+    expect(sqls.filter((s) => /^COMMIT$/.test(s))).toHaveLength(1);
     expect(sqls.some((s) => /ROLLBACK/.test(s))).toBe(false);
     // All three rows are written on the same client (so they commit or fail together).
     expect(sqls.some((s) => /UPDATE characters/i.test(s))).toBe(true);
