@@ -12,6 +12,8 @@
 // The decision lives here as a pure core (typed fakes in the tests); the
 // wallet route layer supplies the verifiers.
 
+import type { ErrorCode } from './http/error_codes';
+
 export interface WalletReauthBody {
   /** The CURRENT wallet's signature over the same challenge message the
    *  incoming wallet signed. Relink only: the unlink route never forwards
@@ -36,16 +38,22 @@ export interface WalletReauthDeps {
   hasPassword(): boolean;
 }
 
-/** Stable machine codes for the refusal arms, mirrored in the server catalog
- *  (server/http/error_codes.ts) and the client matcher (API_ERROR_KEYS in
- *  src/ui/api_error_i18n.ts): the wallet UI keys on the code, never the prose. */
-export type WalletReauthErrorCode =
+/** Stable machine codes for the refusal arms, mirrored in the client matcher
+ *  (API_ERROR_KEYS in src/ui/api_error_i18n.ts): the wallet UI keys on the
+ *  code, never the prose. Extract<> ties every member to the server catalog
+ *  (server/http/error_codes.ts) so a typo is a compile error, the
+ *  woc_market_routes REFUSAL_ERRORS pattern. auth.too_many_failed_attempts is
+ *  the shared login-lockout identity the throttled arm answers with. */
+export type WalletReauthErrorCode = Extract<
+  ErrorCode,
   | 'wallet.reauth_required'
   | 'wallet.reauth_two_factor'
   | 'wallet.reauth_no_password'
   | 'wallet.reauth_bad_signature'
   | 'wallet.reauth_bad_password'
-  | 'wallet.reauth_bad_two_factor';
+  | 'wallet.reauth_bad_two_factor'
+  | 'auth.too_many_failed_attempts'
+>;
 
 export type WalletReauthOutcome =
   | { ok: true; via: 'current_wallet' | 'password' }
@@ -57,7 +65,7 @@ export const WALLET_REAUTH_REQUIRED_ERROR =
 export const WALLET_REAUTH_TWO_FACTOR_ERROR =
   'confirm this wallet change: your account has two-factor enabled, send the code too';
 export const WALLET_REAUTH_NO_PASSWORD_ERROR =
-  'this account has no password: set one in account settings first, or sign with the currently linked wallet';
+  'this account has no password: set one in account settings first';
 
 export async function authorizeWalletChange(
   body: WalletReauthBody,

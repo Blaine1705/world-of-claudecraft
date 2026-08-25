@@ -755,7 +755,10 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     handler: 'handleApi arm: /api/wallet/link (DELETE)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.full,
-    limiter: null,
+    // The R11 rate-limit rider: the ladder arm gates with walletLinkRateLimited
+    // before handleWalletUnlink (the challenge/link POST rows keep limiter null
+    // because those two self-limit INSIDE their handlers, not in the ladder).
+    limiter: 'walletLinkRateLimited',
     requireOwnedExpected: null,
   },
   {

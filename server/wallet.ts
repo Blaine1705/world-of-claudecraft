@@ -40,7 +40,13 @@ import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, moderationErrorBody, readBody } from './http_util';
 import { cardUploadContentLengthTooLarge, handleCardUpload } from './player_card';
 import { recordUsageMetric } from './provider_usage';
-import { requestIp, walletLinkRateLimited } from './ratelimit';
+import {
+  authThrottled,
+  clearAuthFailures,
+  recordAuthFailure,
+  requestIp,
+  walletLinkRateLimited,
+} from './ratelimit';
 import { buildLinkMessage, isSolanaAddress, verifySolanaSignature } from './wallet_link';
 import { authorizeWalletChange, type WalletReauthOutcome } from './wallet_reauth';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
@@ -262,19 +268,40 @@ async function reauthorizeWalletChange(
     return { ok: false, status: 401, error: 'account not found', code: 'wallet.reauth_required' };
   }
   const row = await findAccount(acct.username);
-  if (!row) {
-    // The username row vanished between the two reads (rename race): refuse
-    // outright rather than silently downgrading a 2FA-enrolled account to
-    // password-only (a null row would make hasTwoFactor read false).
+  if (!row || row.id !== acct.id) {
+    // The username row vanished or answered a DIFFERENT account id (the
+    // delete-and-reregister race): refuse outright rather than silently
+    // downgrading a 2FA-enrolled account to password-only (a null or foreign
+    // row would make hasTwoFactor read false).
     return { ok: false, status: 401, error: 'account not found', code: 'wallet.reauth_required' };
   }
-  return authorizeWalletChange(body, message, {
+  // The password arm shares the account failed-credential budget (the
+  // handleAccount2faDisable template): guesses here must hit the same
+  // lockout, feed the same attack signal, and clear on success, or a stolen
+  // bearer gets a silent password oracle at the wallet limiter's higher rate.
+  if (!authThrottled(acct.username).allowed) {
+    return {
+      ok: false,
+      status: 429,
+      error: 'too many failed attempts, wait a few minutes and try again',
+      code: 'auth.too_many_failed_attempts',
+    };
+  }
+  const out = await authorizeWalletChange(body, message, {
     verifyCurrentSignature: (msg, sig) => verifySolanaSignature(msg, sig, currentPubkey),
     verifyPassword: (password) => verifyPassword(password, acct.password_hash),
     hasPassword: () => acct.password_set !== false,
     hasTwoFactor: () => Boolean(row.totp_secret),
     verifyTwoFactor: (code, recoveryCode) => verifyLoginTwoFactor(row, code, recoveryCode),
   });
+  if (
+    !out.ok &&
+    (out.code === 'wallet.reauth_bad_password' || out.code === 'wallet.reauth_bad_two_factor')
+  ) {
+    recordAuthFailure(acct.username);
+  }
+  if (out.ok && out.via === 'password') clearAuthFailures(acct.username);
+  return out;
 }
 
 async function walletLinkCore(
@@ -377,9 +404,11 @@ export async function handleWalletUnlink(
   const proof = { password: body.password, totp: body.totp, recoveryCode: body.recoveryCode };
   const authorized = await reauthorizeWalletChange(accountId, proof, '', current.pubkey);
   if (!authorized.ok) {
+    recordUsageMetric('wallet.unlink.failure');
     return json(res, authorized.status, { error: authorized.error, code: authorized.code });
   }
   await unlinkWallet(accountId);
+  recordUsageMetric('wallet.unlink.success');
   const target = await accountMailTarget(accountId);
   if (target) emailWalletChanged(target, 'removed', current.pubkey);
   return json(res, 200, { unlinked: true });

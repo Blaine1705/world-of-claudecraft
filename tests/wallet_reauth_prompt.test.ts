@@ -98,8 +98,8 @@ describe('walletChangeErrorText', () => {
       { code: 'wallet.reauth_bad_password', status: 401, message: 'password verification failed' },
       'FALLBACK',
     );
-    expect(text).not.toBe('FALLBACK');
-    expect(text.length).toBeGreaterThan(0);
+    // The resolved catalog string, not the server's English prose passthrough.
+    expect(text).toBe('Your password is incorrect.');
   });
 
   it('a non-reauth error keeps the fallback', () => {

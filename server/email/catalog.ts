@@ -98,7 +98,7 @@ const en: Record<EmailTemplateKey, EmailTemplate> = {
       'Reply to this email if you believe this was a mistake.',
   },
   wallet_changed: {
-    subject: `The wallet linked to your ${BRAND} account {{action}}`,
+    subject: `Your ${BRAND} account wallet was {{action}}`,
     text:
       'Hi {{username}},\n\n' +
       'The Solana wallet linked to your account was just {{action}}.\n' +

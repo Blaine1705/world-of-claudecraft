@@ -254,7 +254,10 @@ const MONOLITHS: MonolithRow[] = [
     // coercers moved into src/ui/discord_status.ts; the freed lines paid for
     // the R11 wallet-reauth wiring (src/ui/wallet_reauth_prompt.ts) including
     // the QA round's cancel-path adapter disconnect.
-    ceiling: 11557,
+    // Lowered again after the Discord login-choice persistence moved into
+    // src/game/discord_login_choice.ts (the review-round-2 payment for the
+    // stale-cache self-heal reads and the unlink re-entrancy guard).
+    ceiling: 11526,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

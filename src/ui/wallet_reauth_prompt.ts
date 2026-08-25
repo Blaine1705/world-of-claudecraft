@@ -11,18 +11,15 @@
 // a thin painter over the shared confirm-modal family (index.html exemplars:
 // the recovery-email and delete-character modals).
 
+import type { WalletReauthProof } from '../net/online';
 import { userFacingApiError } from './api_error_i18n';
 import type { FocusManager } from './focus_manager';
 import { t } from './i18n';
 import { classifyAuthCode } from './two_factor_setup';
 
-/** Mirror of the net-layer WalletReauthProof (structural: the src/ui -> net
- *  dependency ban keeps this module import-free of the Api client). */
-export interface WalletReauthProof {
-  password: string;
-  totp?: string;
-  recoveryCode?: string;
-}
+/** Re-exported so consumers and tests share the net-layer type (a UI_DOM_MODULES
+ *  entry may import net types; keeping one source of truth kills mirror drift). */
+export type { WalletReauthProof } from '../net/online';
 
 export interface WalletReauthAccountShape {
   twoFactorEnabled: boolean;
@@ -136,6 +133,9 @@ export function promptWalletReauth(
       close.addEventListener('click', () => finish(null));
       actions.appendChild(close);
       panel.appendChild(actions);
+      // Move focus INTO the dialog: without it the trap never engages and
+      // Escape never reaches the backdrop listener.
+      queueMicrotask(() => close.focus());
     } else {
       const passwordField = document.createElement('div');
       passwordField.className = 'auth-field';

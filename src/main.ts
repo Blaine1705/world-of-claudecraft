@@ -60,6 +60,11 @@ import { desktopNotifyOnSimEvents } from './game/desktop_notifications';
 import { desktopPresentationHidden } from './game/desktop_presentation';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
+import {
+  clearDiscordChoice,
+  type ExternalAuthLoginChoice,
+  readDiscordChoice,
+} from './game/discord_login_choice';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
 import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
@@ -9194,56 +9199,6 @@ async function maybePromptRecoveryEmail(): Promise<void> {
   await openRecoveryEmailModal();
 }
 
-// ── First-time Discord login chooser persistence (#discord-choice-panel) ─────
-// The OAuth bounce page parks a single-use link token + Discord name here when a
-// first-time login has no account yet; main.ts reads it on boot to show the
-// chooser. Stale/expired/garbled entries are cleared so they never trap a visitor.
-const DISCORD_CHOICE_KEY = 'woc_discord_choice';
-const DISCORD_CHOICE_TTL_MS = 15 * 60 * 1000;
-
-interface ExternalAuthLoginChoice {
-  provider: 'apple' | 'discord';
-  linkToken: string;
-  username: string;
-}
-
-function readDiscordChoice(): ExternalAuthLoginChoice | null {
-  let raw: string | null = null;
-  try {
-    raw = localStorage.getItem(DISCORD_CHOICE_KEY);
-  } catch {
-    return null;
-  }
-  if (!raw) return null;
-  try {
-    const d = JSON.parse(raw) as {
-      linkToken?: unknown;
-      username?: unknown;
-      ts?: unknown;
-    };
-    const fresh = typeof d.ts === 'number' && Date.now() - d.ts < DISCORD_CHOICE_TTL_MS;
-    if (typeof d.linkToken === 'string' && d.linkToken && fresh) {
-      return {
-        provider: 'discord',
-        linkToken: d.linkToken,
-        username: typeof d.username === 'string' ? d.username : '',
-      };
-    }
-  } catch {
-    /* fall through to clear a garbled entry */
-  }
-  clearDiscordChoice();
-  return null;
-}
-
-function clearDiscordChoice(): void {
-  try {
-    localStorage.removeItem(DISCORD_CHOICE_KEY);
-  } catch {
-    /* storage disabled */
-  }
-}
-
 async function refreshWalletLinkStatus(): Promise<void> {
   if (!(await walletCapabilityReady)) {
     seekerEntitlementSync.reset();
@@ -9317,7 +9272,13 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
   let verifyError: unknown;
   try {
     // R11: changing an existing link needs account proof, collected BEFORE the
-    // challenge (a refused attempt consumes the single-use nonce).
+    // challenge (a refused attempt consumes the single-use nonce). The cached
+    // linkedWalletPubkey can be stale (a blipped status read at login keeps
+    // the prior value), so re-read the authoritative link state first; on a
+    // failed read keep the cache and let the server be the judge.
+    try {
+      linkedWalletPubkey = (await api.linkedWallet())?.pubkey ?? null;
+    } catch {}
     const reauth = needsWalletReauth(linkedWalletPubkey, address)
       ? await acquireWalletReauth(() => api.getAccount(), 'relink', walletFocusManager)
       : undefined;
@@ -9370,6 +9331,9 @@ async function completeDesktopWalletVerifyFlow(): Promise<void> {
       kind: 'link',
     });
     if (authorization.kind !== 'link') throw new Error('invalid wallet link authorization');
+    try {
+      linkedWalletPubkey = (await api.linkedWallet())?.pubkey ?? null;
+    } catch {}
     const reauth = needsWalletReauth(linkedWalletPubkey, authorization.address)
       ? await acquireWalletReauth(() => api.getAccount(), 'relink', walletFocusManager)
       : undefined;
@@ -9504,11 +9468,14 @@ async function signOutWallet(): Promise<void> {
   }
 }
 
+let walletUnlinkInFlight = false;
+
 async function unlinkVerifiedWallet(): Promise<void> {
-  if (!api.token || !linkedWalletPubkey) return;
-  const reauth = await acquireWalletReauth(() => api.getAccount(), 'unlink', walletFocusManager);
-  if (reauth === null) return;
+  if (!api.token || !linkedWalletPubkey || walletUnlinkInFlight) return;
+  walletUnlinkInFlight = true;
   try {
+    const reauth = await acquireWalletReauth(() => api.getAccount(), 'unlink', walletFocusManager);
+    if (reauth === null) return;
     await api.unlinkWallet(reauth);
     linkedWalletPubkey = null;
     linkedWocBalance = null;
@@ -9517,6 +9484,8 @@ async function unlinkVerifiedWallet(): Promise<void> {
   } catch (err) {
     console.error('[wallet] unlink failed', err);
     flashWalletError(walletChangeErrorText(err, t('wallet.unlinkFailed')));
+  } finally {
+    walletUnlinkInFlight = false;
   }
 }
 

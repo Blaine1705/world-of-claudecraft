@@ -508,7 +508,11 @@ For off-box safety, sync the directory to S3 occasionally:
   used to sit beside it: changing an existing wallet link now demands the
   CURRENT wallet's co-signature or the account password plus its second
   factor, removing one demands the password arm, and every link change emails
-  the account. History: docs/woc-marketplace-hardening/state.md (R11).
+  the account. Client-version note: desktop/native bundles older than R11
+  ship the pre-R11 client, which never shows the password prompt, so on
+  those builds a relink/unlink answers the generic verify-failed flash
+  until the bundle updates (the web client updates with the deploy).
+  History: docs/woc-marketplace-hardening/state.md (R11).
 - **Ops dashboard market reads**: `DASHBOARD_INTERNAL_SECRET` gates the ops
   dashboard's `/internal/woc-market/*` reads; unset leaves them 404 (names
   only here, the values live in deployment secrets).

@@ -944,7 +944,8 @@ export class Api {
     nonce: string,
     reauth?: WalletReauthProof,
   ): Promise<{ pubkey: string }> {
-    return this.post('/api/wallet/link', { address, signature, nonce, ...(reauth ?? {}) });
+    // Proof spreads FIRST so the identity fields can never be shadowed.
+    return this.post('/api/wallet/link', { ...(reauth ?? {}), address, signature, nonce });
   }
 
   // Current account's linked wallet (null when none).

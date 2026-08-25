@@ -1760,7 +1760,28 @@ Still open (a phase that hits one asks at session start):
     `src/ui/wallet_reauth_prompt.ts` collects the password proof BEFORE the
     challenge (a refused attempt would consume the single-use nonce);
     `linkWallet`/`unlinkWallet` carry the proof. The step-up module header
-    was corrected from deferral to closed.
+    was corrected from deferral to closed. Review round 2 (Fernando +
+    Trev, 2026-08-26, applied in-branch): the password arm now shares the
+    account failed-credential budget (authThrottled pre-check answering
+    the shared auth.too_many_failed_attempts identity, recordAuthFailure
+    on the bad-password/bad-2FA arms, clear on success: the
+    handleAccount2faDisable template), the co-signature arm is pinned
+    against current.pubkey with REAL ed25519 keys, the client re-reads
+    link state inside the flow (stale-cache self-heal), and the prompt
+    got the FocusManager trap plus a DOM suite.
+  - R11 TRACKED FOLLOW-UPS (raised in review round 2, deferred loudly,
+    not silently): (1) the relink co-signature signs the standard LINK
+    message, whose text ends "authorizes no transaction" while what it
+    actually authorizes is redirecting future sale proceeds; a distinct
+    replace-wallet message naming both addresses and the real consequence
+    is the fix, and the signed text's domain line (the raw Host header,
+    server/wallet.ts requestDomain) should be allowlisted in the same
+    pass. (2) The signature arm has NO client: the prompt collects the
+    password only, so an Apple/Discord-provisioned account with a linked
+    wallet cannot change or remove it from any shipped client until it
+    sets a password (Set-a-Password is self-service; the 403 names it).
+    This is the recorded product stance per the owner's option-(a)
+    ruling: the currentSignature arm is bare-API-only surface today.
 
 ## Locked decisions
 

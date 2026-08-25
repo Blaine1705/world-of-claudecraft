@@ -42,6 +42,8 @@ import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Ctx, Method, Middleware } from '../../server/http/types';
 import {
+  authThrottled,
+  recordAuthFailure,
   resetRateLimitClock,
   resetWalletLinkRateLimits,
   setRateLimitClock,
@@ -58,6 +60,7 @@ import {
 import {
   WALLET_REAUTH_NO_PASSWORD_ERROR,
   WALLET_REAUTH_REQUIRED_ERROR,
+  WALLET_REAUTH_TWO_FACTOR_ERROR,
 } from '../../server/wallet_reauth';
 import { type FakeRes, fakeCtx, stableStringify } from './helpers';
 
@@ -684,7 +687,7 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     authedDb();
     vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
     vi.mocked(accountById).mockResolvedValue(ACCT as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     const r = await runRoute('DELETE', '/api/wallet/link', {
       headers: { authorization: BEARER },
       body: {},
@@ -698,7 +701,7 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     authedDb();
     vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
     vi.mocked(accountById).mockResolvedValue(ACCT as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     vi.mocked(verifyPassword).mockResolvedValue(true);
     const target = { id: 7, username: 'guard', email: 'g@x.nz', locale: null };
     const { accountMailTarget } = await import('../../server/db');
@@ -721,7 +724,7 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     authedDb();
     vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
     vi.mocked(accountById).mockResolvedValue({ ...ACCT, password_set: false } as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     const r = await runRoute('DELETE', '/api/wallet/link', {
       headers: { authorization: BEARER },
       body: { password: 'anything' },
@@ -742,7 +745,7 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     authedDb();
     vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
     vi.mocked(accountById).mockResolvedValue(ACCT as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     const { verifySolanaSignature } = await import('../../server/wallet_link');
     const r = await runRoute('DELETE', '/api/wallet/link', {
       headers: { authorization: BEARER },
@@ -760,7 +763,7 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     authedDb();
     vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
     vi.mocked(accountById).mockResolvedValue(ACCT as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     const r = await runRoute('DELETE', '/api/wallet/link', {
       headers: { authorization: BEARER },
       body: { signature: 'sig58', nonce: 'n1' },
@@ -771,6 +774,107 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
   });
 
+  it('an enrolled second factor is demanded at the ROUTE level (no silent downgrade)', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: 'SECRET' } as never);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'hunter2' },
+    });
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({
+      error: WALLET_REAUTH_TWO_FACTOR_ERROR,
+      code: 'wallet.reauth_two_factor',
+    });
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('a locked-out account answers 429 before any password check', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'locked1' } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
+    for (let i = 0; i < 10; i++) recordAuthFailure('locked1');
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'hunter2' },
+    });
+    expect(r.status).toBe(429);
+    expect(r.body).toEqual({
+      error: 'too many failed attempts, wait a few minutes and try again',
+      code: 'auth.too_many_failed_attempts',
+    });
+    expect(vi.mocked(verifyPassword)).not.toHaveBeenCalled();
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('a wrong password records into the SHARED failed-credential budget', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'budget1' } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
+    const before = authThrottled('budget1').remaining;
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'guess' },
+    });
+    expect(r.status).toBe(401);
+    expect(bodyRecord(r.body).code).toBe('wallet.reauth_bad_password');
+    expect(authThrottled('budget1').remaining).toBe(before - 1);
+  });
+
+  it('a successful password re-auth clears the failure budget', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'clear1' } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    recordAuthFailure('clear1');
+    recordAuthFailure('clear1');
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'hunter2' },
+    });
+    expect(r.status).toBe(200);
+    expect(authThrottled('clear1').remaining).toBe(10);
+  });
+
+  it('a findAccount row for a DIFFERENT account id refuses (no silent downgrade)', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 999, totp_secret: null } as never);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'hunter2' },
+    });
+    expect(r.status).toBe(401);
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('the RouteDef arm answers the coded 429 once the wallet-link window drains', async () => {
+    authedDb();
+    setRateLimitClock(() => FIXED_NOW_MS);
+    vi.mocked(walletForAccount).mockResolvedValue(null as never);
+    for (let i = 0; i < WALLET_LINK_MAX_PER_MINUTE; i++) {
+      const ok = await runRoute('DELETE', '/api/wallet/link', {
+        headers: { authorization: BEARER },
+        body: {},
+      });
+      expect(ok.status).toBe(200);
+    }
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: {},
+    });
+    expect(r.status).toBe(429);
+    expect(bodyRecord(r.body).code).toBe('rate_limit.exceeded');
+  });
+
   it('both dispatch arms carry the wallet-link rate limit in lockstep', () => {
     // The DELETE route exists twice (the legacy server/main.ts ladder under
     // API_DISPATCH rollback, and the RouteDef). A future edit must not drop
@@ -779,13 +883,19 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     expect(routeDef.middleware?.length, 'RouteDef arm: guard + rateLimit').toBeGreaterThanOrEqual(
       2,
     );
-    const ladder = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
-    const arm = ladder.slice(
-      ladder.indexOf("req.method === 'DELETE' && url === '/api/wallet/link'"),
+    // Comments are stripped so a comment mentioning the limiter can never
+    // satisfy the pin, and both anchors must actually be found before slicing.
+    const ladder = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8').replace(
+      /\/\/[^\n]*/g,
+      '',
     );
-    const guarded = arm.slice(0, arm.indexOf('handleWalletUnlink'));
-    expect(guarded, 'legacy arm: walletLinkRateLimited before handleWalletUnlink').toContain(
-      'walletLinkRateLimited',
+    const anchor = ladder.indexOf("req.method === 'DELETE' && url === '/api/wallet/link'");
+    expect(anchor).toBeGreaterThanOrEqual(0);
+    const arm = ladder.slice(anchor);
+    const handlerAt = arm.indexOf('handleWalletUnlink');
+    expect(handlerAt).toBeGreaterThanOrEqual(0);
+    expect(arm.slice(0, handlerAt), 'legacy arm: limiter CALL before handleWalletUnlink').toContain(
+      'walletLinkRateLimited(',
     );
   });
 });
@@ -825,12 +935,16 @@ describe('POST /api/wallet/link relink re-auth (R11)', () => {
     authedDb();
     armChallenge();
     vi.mocked(walletForAccount).mockResolvedValue(null as never);
+    const target = { id: 7, username: 'guard', email: 'g@x.nz', locale: null };
+    const { accountMailTarget } = await import('../../server/db');
+    vi.mocked(accountMailTarget).mockResolvedValue(target as never);
     const r = await runRoute('POST', '/api/wallet/link', {
       headers: { authorization: BEARER },
       body: LINK_BODY,
     });
     expect(r.status).toBe(200);
     expect(vi.mocked(linkWalletToAccount)).toHaveBeenCalledWith(7, NEW_ADDR);
+    expect(vi.mocked(emailWalletChanged)).toHaveBeenCalledWith(target, 'linked', NEW_ADDR);
   });
 
   it('relinking to a DIFFERENT wallet without proof 401s at the reauth marker', async () => {
@@ -838,7 +952,7 @@ describe('POST /api/wallet/link relink re-auth (R11)', () => {
     armChallenge();
     vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
     vi.mocked(accountById).mockResolvedValue(ACCT as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     const r = await runRoute('POST', '/api/wallet/link', {
       headers: { authorization: BEARER },
       body: LINK_BODY,
@@ -853,7 +967,7 @@ describe('POST /api/wallet/link relink re-auth (R11)', () => {
     armChallenge();
     vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
     vi.mocked(accountById).mockResolvedValue(ACCT as never);
-    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
     vi.mocked(verifyPassword).mockResolvedValue(true);
     const target = { id: 7, username: 'guard', email: 'g@x.nz', locale: null };
     const { accountMailTarget } = await import('../../server/db');
