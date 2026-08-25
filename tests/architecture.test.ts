@@ -616,6 +616,7 @@ const RENDER_PURE_CORES = [
   'src/render/rift_death_zone_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
+  'src/render/self_render_position_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/terrain_region_core.ts',

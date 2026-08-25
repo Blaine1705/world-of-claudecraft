@@ -160,6 +160,12 @@ import { newPresentationGateInput, presentationGate } from './game/presentation_
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
+  isMovementFrozen,
+  isPlayerImmobilized,
+  type SelfMotionGateArgs,
+  selfMotionPredictionEnabled,
+} from './game/self_motion_gate';
+import {
   type GameSettings,
   normalizeClickMoveButton,
   SETTING_RANGES,
@@ -200,6 +206,7 @@ import {
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
 import { watchWorldEntry } from './net/entry_watch';
+import { InputEchoTracker } from './net/input_echo_tracker';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -244,6 +251,7 @@ import {
   savePlayMarker,
 } from './net/resume_play';
 import { createSeekerEntitlementSync } from './net/seeker_entitlement_sync';
+import { snapshotAlpha } from './net/snapshot_alpha';
 import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
@@ -325,7 +333,6 @@ import { rowTreeFor } from './sim/content/talents';
 import {
   GATHER_NODES,
   ITEMS,
-  isDelvePos,
   isRiftPos,
   MOBS,
   QUESTS,
@@ -513,10 +520,6 @@ const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop p
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
 const ATTACK_MOVE_MELEE_STOP = 3.5; // yards; how close an attack-move approach stops from its target (inside melee)
 const ATTACK_MOVE_ACQUIRE_RANGE = 12; // yards; an attack-move toward open ground auto-targets a hostile this near
-// Aura kinds that stop the player from moving (mirrors the sim's isRooted/isStunned):
-// while one of these is up, click-to-move can't make progress, so the destination
-// marker shows a "held" state instead of looking like a stuck game.
-const IMMOBILE_AURA_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph']);
 // Live-ops escape hatch for the online display-only self extrapolation
 // (src/render/self_motion.ts): ?nopredict restores the pre-prediction behavior.
 const SELF_MOTION_DISABLED = new URLSearchParams(location.search).has('nopredict');
@@ -3743,16 +3746,11 @@ async function startGame(
     }
   }
 
-  // The player can't move toward a click-to-move destination while rooted/stunned
-  // surface that on the marker so the freeze reads as crowd control, not a bug.
   function playerImmobilized(): boolean {
-    return world.player.auras.some((a) => IMMOBILE_AURA_KINDS.has(a.kind));
+    return isPlayerImmobilized(world.player.auras);
   }
-  // A released spirit (ghost) moves, turns, and drives the camera like the living; only
-  // a corpse that has not yet released its spirit is frozen. Combat stays gated by
-  // `dead` (and re-validated server-side), so this only unlocks locomotion for ghosts.
   function movementFrozen(): boolean {
-    return world.player.dead && !world.player.ghost;
+    return isMovementFrozen(world.player);
   }
 
   // Pop a "Can't move!" note over the player when a movement command lands while
@@ -3830,12 +3828,11 @@ async function startGame(
 
   let last = performance.now();
   let acc = 0;
-  let onlineInputEchoMs = 0;
+  // Smoothed input-echo RTT plus its jitter (mean absolute deviation of the
+  // samples), feeding the latency compensation and the perf overlay's rows.
+  const inputEcho = new InputEchoTracker();
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
-  // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
-  // perf overlay's Jitter row.
-  let onlineJitterMs = 0;
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
@@ -4029,6 +4026,14 @@ async function startGame(
     serverFacing: 0,
     echoMs: 0,
     frameDt: 0,
+  };
+  const selfMotionGateArgs: SelfMotionGateArgs = {
+    disabled: SELF_MOTION_DISABLED,
+    spectating: null,
+    movementFrozen: false,
+    playerImmobilized: false,
+    posX: 0,
+    climbing: undefined,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
@@ -4343,8 +4348,8 @@ async function startGame(
     meter: perfMeter,
     getOnline: () => online,
     getEntityCount: () => world.entities.size,
-    getEchoMs: () => onlineInputEchoMs,
-    getJitterMs: () => onlineJitterMs,
+    getEchoMs: () => inputEcho.echoMs,
+    getJitterMs: () => inputEcho.jitterMs,
     getPredLeadMs: () => renderer.selfMotionLeadMs,
     getApm: () => inputMeter.apm(performance.now()),
   });
@@ -4655,13 +4660,10 @@ async function startGame(
       mouselook,
       world.player.pos,
       world.player.facing,
-      onlineInputEchoMs,
+      inputEcho.echoMs,
     );
     const pe = world.player;
-    const alpha =
-      net.lastSnapAt > 0
-        ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
-        : 1;
+    const alpha = snapshotAlpha(performance.now(), net.lastSnapAt, net.snapInterval);
     // facing interp capped at 1 - extrapolating angles past the snapshot oscillates
     const interpServerFacing =
       pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
@@ -4679,7 +4681,7 @@ async function startGame(
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
     kbTurnArgs.sentFacing = foreignFacing;
     kbTurnArgs.serverFacing = interpServerFacing;
-    kbTurnArgs.echoMs = onlineInputEchoMs;
+    kbTurnArgs.echoMs = inputEcho.echoMs;
     kbTurnArgs.frameDt = frameDt;
     const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
@@ -4700,17 +4702,8 @@ async function startGame(
     pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
-    for (const sample of echoSamples) {
-      if (Number.isFinite(sample) && sample >= 0) {
-        // Jitter is the mean absolute deviation against the PRIOR mean (measuring
-        // it after the EMA update would bias it low).
-        const prevMean = onlineInputEchoMs;
-        onlineInputEchoMs = prevMean === 0 ? sample : prevMean + 0.2 * (sample - prevMean);
-        const dev = prevMean === 0 ? 0 : Math.abs(sample - prevMean);
-        onlineJitterMs = onlineJitterMs === 0 ? dev : onlineJitterMs + 0.2 * (dev - onlineJitterMs);
-      }
-      perf.markInputEcho(sample);
-    }
+    inputEcho.fold(echoSamples);
+    for (const sample of echoSamples) perf.markInputEcho(sample);
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
     const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
@@ -4777,31 +4770,23 @@ async function startGame(
     const netPipeline = net.netPipeline();
     netPipeline.onAnimationFrame(now);
     perf.setNetPipelineSource(netPipeline);
-    // Display-only self extrapolation (src/render/self_motion.ts). Off while
-    // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
-    // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
-    // fear steer and the charge/follow modes run server-side only), and inside
-    // a delve (the portcullis door clamps are not mirrored client-side).
+    // Display-only self extrapolation (src/render/self_motion.ts); the gate
+    // itself lives in src/game/self_motion_gate.ts. The kill switch keeps its
+    // own arm here because a disabled frame is not the same as no frame: it
+    // would still build the predictor and feed it pose history.
+    selfMotionGateArgs.spectating = net.spectating;
+    selfMotionGateArgs.movementFrozen = movementFrozen();
+    selfMotionGateArgs.playerImmobilized = playerImmobilized();
+    selfMotionGateArgs.posX = pe.pos.x;
+    selfMotionGateArgs.climbing = pe.climbing;
     const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
       ? null
       : selfMotionFrameBuffer.write(
-          net.spectating === null &&
-            !movementFrozen() &&
-            !playerImmobilized() &&
-            !isDelvePos(pe.pos.x) &&
-            // Rifts (like delves) are server-authoritative instanced content, and
-            // their raised sanctum tiers lift the player's Y server-side. The local
-            // kernel predicts a flat floor, so keep prediction off here and render
-            // the authoritative interpolated Y (no vertical jitter on the stairs).
-            !isRiftPos(pe.pos.x) &&
-            // A ledge climb is a server-owned scripted move the client does
-            // not re-simulate: predicting a fall through it would fight the
-            // authoritative pull-up and show the correction as a stutter.
-            pe.climbing !== true,
+          selfMotionPredictionEnabled(selfMotionGateArgs),
           resolved.mi,
           netFacing ?? interpServerFacing,
-          onlineInputEchoMs,
-          onlineJitterMs,
+          inputEcho.echoMs,
+          inputEcho.jitterMs,
           alpha,
           frameDt,
           Math.max(0, cameraLastSnapAge),
@@ -4844,7 +4829,7 @@ async function startGame(
         // show it immediately; without it the click-move yaw would lag
         // the predicted position by a round trip and corners would slide.
         net.spectating === null ? onlineRenderFacing : null,
-        adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
+        adaptiveSelfAlphaLead(inputEcho.echoMs, inputEcho.jitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
         drawWorld,

@@ -173,6 +173,7 @@ import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_st
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
+import { snapshotAlpha } from './snapshot_alpha';
 import {
   type SnapshotTimerWireMode,
   STABLE_TIMER_WIRE_VERSION,
@@ -2843,10 +2844,7 @@ export class ClientWorld implements IWorld {
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
     // interpolation segment at the pose currently on screen
-    const contAlpha =
-      this.lastSnapAt > 0
-        ? Math.min(1.25, (now - this.lastSnapAt) / Math.max(20, this.snapInterval))
-        : 1;
+    const contAlpha = snapshotAlpha(now, this.lastSnapAt, this.snapInterval);
     if (this.lastSnapAt > 0) {
       const gap = now - this.lastSnapAt;
       if (gap > 5 && gap < 500) this.snapInterval = this.snapInterval * 0.9 + gap * 0.1;

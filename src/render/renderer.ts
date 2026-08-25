@@ -602,7 +602,12 @@ import {
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
+import type { SelfMotionFrame } from './self_motion';
+import {
+  createSelfRenderPositionState,
+  noteSelfIdentity,
+  updateSelfRenderPosition,
+} from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
@@ -926,9 +931,6 @@ const SPARKLE_BOOST = 1.5;
 // hideable crosses the eye-to-camera segment through the shared fade policy.
 // The requested chase-camera distance is never changed by scene geometry.
 const CAMERA_BASE_FOV = 60;
-// Decay rate of the one-time offset captured when the self-motion predictor
-// takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
-const SELF_MOTION_HANDOFF_RATE = 15;
 // lighting rig (high/ultra): IBL supplies ambient, sun carries the key.
 // The key keeps its golden color (full-strength white read as harsh midday
 // glare against the sunless realm skies); key up / fill down buys the
@@ -1062,10 +1064,6 @@ interface AoeRingSlot {
   mat: THREE.MeshBasicMaterial;
   radius: number; // blast radius in yards this flash represents
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
-}
-
-function selfSnapshotAlpha(alpha: number, lead: number): number {
-  return Math.min(1.25, alpha + Math.max(0, lead));
 }
 
 export interface EntityView {
@@ -1489,22 +1487,20 @@ export class Renderer {
     sitting: false,
   };
   private selfRenderPosition = new THREE.Vector3();
-  private selfRenderPositionReady = false;
-  // Online display-only self extrapolation (see src/render/self_motion.ts).
-  // Lazy: offline never passes a SelfMotionFrame, so it is never constructed.
-  private selfMotionPredictor: SelfMotionPredictor | null = null;
-  private selfMotionActive = false;
-  private selfMotionOffset = new THREE.Vector3();
+  // Display-pose state the pure core owns (predictor, handoff offset, ready /
+  // active / identity), writing straight into the Vector3 above. Online
+  // extrapolation itself lives in src/render/self_motion.ts, and its predictor
+  // is lazy: offline never passes a SelfMotionFrame, so it is never built.
+  private selfRender = createSelfRenderPositionState(this.selfRenderPosition);
 
   /** Perf-overlay telemetry: ms of latency the self-motion extrapolation is
    *  currently hiding, or null while the predictor is inactive. */
   get selfMotionLeadMs(): number | null {
-    return this.selfMotionActive && this.selfMotionPredictor
-      ? this.selfMotionPredictor.leadMs
+    return this.selfRender.active && this.selfRender.predictor
+      ? this.selfRender.predictor.leadMs
       : null;
   }
 
-  private lastSelfId: number | null = null;
   // Last yaw applied to the local player while the camera was driving its facing
   // (mouselook / mouse-camera). Null when the override is disengaged, so the next
   // engage re-seeds from the live interpolated facing instead of snapping. See
@@ -7498,7 +7494,7 @@ export class Renderer {
           // position so the body snaps to the authoritative destination. A
           // short pulse sells the pop.
           if (ev.sourceId === this.sim.player.id) {
-            this.selfRenderPositionReady = false;
+            this.selfRender.ready = false;
           }
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
@@ -10292,24 +10288,23 @@ export class Renderer {
     }
     const sim = this.sim;
     const p = sim.player;
-    if (this.lastSelfId !== p.id) {
-      this.lastSelfId = p.id;
-      this.selfRenderPositionReady = false;
+    if (noteSelfIdentity(this.selfRender, p.id)) {
       this.selfFacingOverride = null;
       this.selfFacingLastTarget = null;
-      // A still-decaying predictor-handoff offset belongs to the previous
-      // character; leaking it would displace the new one for a few frames.
-      this.selfMotionOffset.set(0, 0, 0);
     }
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
-    const selfPos = this.updateSelfRenderPosition(
+    updateSelfRenderPosition(
+      this.selfRender,
+      p,
+      sim.cfg.seed,
       alpha,
       dt,
       selfAlphaLead,
       selfMotion,
       selfAuthoritativeDiscontinuity,
     );
+    const selfPos = this.selfRenderPosition;
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
 
     // Dynamic worlds create nearby views lazily and drop views for leavers or
@@ -11086,7 +11081,7 @@ export class Renderer {
       // fallback path the plain interpolated sim motion is still sampled
       // instead (that path's smoothed selfPos stutters within a snapshot
       // interval). Offline, all of these are the same value.
-      const animFromDisplay = isSelf && this.selfMotionActive;
+      const animFromDisplay = isSelf && this.selfRender.active;
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;
@@ -11194,8 +11189,8 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfMotionPredictor && !inRift
-          ? !this.selfMotionPredictor.onGround
+        (animFromDisplay && this.selfRender.predictor && !inRift
+          ? !this.selfRender.predictor.onGround
           : !e.onGround || v.airborneHeurFrames >= 2);
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
@@ -12572,68 +12567,6 @@ export class Renderer {
       sp.material.opacity =
         facing * facing * facing * (0.3 - i * 0.05) * this.sunUp * this.godRayZoneScale;
     }
-  }
-
-  private updateSelfRenderPosition(
-    alpha: number,
-    dt: number,
-    selfAlphaLead: number,
-    selfMotion: SelfMotionFrame | null = null,
-    authoritativeDiscontinuity = false,
-  ): THREE.Vector3 {
-    const p = this.sim.player;
-    // Online intent-driven extrapolation: when active it owns the position and
-    // the lead-smoothing path below becomes the fallback (both write the same
-    // selfRenderPosition, so enable/disable hands off without a pop, absorbed
-    // by the snap/smooth rules on the next frame).
-    if (selfMotion) {
-      if (!this.selfMotionPredictor) {
-        this.selfMotionPredictor = new SelfMotionPredictor(this.sim.cfg.seed);
-      }
-      const predicted = this.selfMotionPredictor.step(p, selfMotion, authoritativeDiscontinuity);
-      if (predicted) {
-        // Follow the predictor output exactly (it is already continuous;
-        // smoothing it again would re-add the display lag this exists to
-        // remove). The only discontinuity is the handoff frame from the
-        // lead-smoothing path below: capture that gap once as an offset and
-        // decay it, so the camera glides instead of stepping.
-        if (authoritativeDiscontinuity) {
-          this.selfMotionOffset.set(0, 0, 0);
-        } else if (this.selfRenderPositionReady && !this.selfMotionActive) {
-          this.selfMotionOffset.set(
-            this.selfRenderPosition.x - predicted.x,
-            this.selfRenderPosition.y - predicted.y,
-            this.selfRenderPosition.z - predicted.z,
-          );
-        }
-        this.selfMotionOffset.multiplyScalar(Math.exp(-SELF_MOTION_HANDOFF_RATE * Math.max(0, dt)));
-        this.selfRenderPosition.set(
-          predicted.x + this.selfMotionOffset.x,
-          predicted.y + this.selfMotionOffset.y,
-          predicted.z + this.selfMotionOffset.z,
-        );
-        this.selfRenderPositionReady = true;
-        this.selfMotionActive = true;
-        return this.selfRenderPosition;
-      }
-    }
-    this.selfMotionActive = false;
-    const playerAlpha = selfSnapshotAlpha(alpha, selfAlphaLead);
-    const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
-    const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
-    const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-    updateSelfRenderFallback(
-      this.selfRenderPosition,
-      px,
-      py,
-      pz,
-      this.selfRenderPositionReady,
-      dt,
-      selfAlphaLead > 0,
-      authoritativeDiscontinuity,
-    );
-    this.selfRenderPositionReady = true;
-    return this.selfRenderPosition;
   }
 
   // ---- Map-editor 3D seams (editor-only) --------------------------------

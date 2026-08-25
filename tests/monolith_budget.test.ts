@@ -181,7 +181,10 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 13329,
+    // Lowered after the self display-pose math (predictor branch, handoff
+    // offset, lead-smoothed fallback and its snapshot alpha) moved to
+    // src/render/self_render_position_core.ts. Exact count, zero slack.
+    ceiling: 13260,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -250,7 +253,12 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Lowered after the movement-harness extractions: the snapshot alpha
+    // formula (src/net/snapshot_alpha.ts), the input-echo/jitter EMAs
+    // (src/net/input_echo_tracker.ts), and the self-prediction gate plus its
+    // immobile-aura table (src/game/self_motion_gate.ts) all left the loop.
+    // Exact count, zero slack.
+    ceiling: 11551,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -312,7 +320,9 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    ceiling: 5855,
+    // Lowered by the shared snapshot-alpha extraction
+    // (src/net/snapshot_alpha.ts). Exact count, zero slack.
+    ceiling: 5853,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
