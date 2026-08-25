@@ -1,32 +1,37 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { objectDisplayName } from '../src/render/entity_labels';
 import {
-  IGNIVAR_HERALD_CORE_OBJECT_ID,
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_LORE_QUEST_IDS,
   IGNIVAR_MAELIN_NPC_ID,
+  IGNIVAR_MAELIN_PROJECTION_NPC_ID,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
   IGNIVAR_RECORD_IDS,
 } from '../src/sim/content/ignivar_raid_lore';
-import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
-import { createGroundObject, createMob } from '../src/sim/entity';
-import { IGNIVAR_RAID_ARENA_ID } from '../src/sim/ignivar_raid_ids';
+import { DUNGEONS, ITEMS, NPCS, QUESTS } from '../src/sim/data';
+import { createGroundObject } from '../src/sim/entity';
 import {
-  IGNIVAR_CORE_SHIELDED_TEXT,
+  IGNIVAR_CINDER_ARTIFICER_ID,
+  IGNIVAR_CRUCIBLE_WARDEN_ID,
+  IGNIVAR_EMBER_SENTINEL_ID,
+  IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+  VARKHUL_BOSS_ID,
+} from '../src/sim/ignivar_raid_ids';
+import {
   IGNIVAR_LORE_TEXT_BY_OBJECT_ID,
-  interactIgnivarRaidLore,
+  IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE,
 } from '../src/sim/ignivar_raid_lore';
 import { enterDungeon } from '../src/sim/instances/dungeons';
-import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, IGNIVAR_BOSS_ID } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { localizeSimAuraName, localizeSimText } from '../src/ui/sim_i18n';
 import { worldEntityText } from '../src/ui/world_entity_i18n';
 
 describe('Ignivar raid lore content', () => {
-  it('pins the persistent quest and record identifiers literally', () => {
+  it('pins the persistent quest, record, and checkpoint identifiers literally', () => {
     expect(IGNIVAR_LORE_QUEST_IDS).toEqual({
       echoesInIron: 'q_ignivar_echoes_in_iron',
       heraldsHeart: 'q_ignivar_heralds_heart',
@@ -37,14 +42,20 @@ describe('Ignivar raid lore content', () => {
       livingMetal: 'ignivar_record_living_metal',
       heraldKey: 'ignivar_record_herald_key',
     });
-    expect(IGNIVAR_HERALD_CORE_OBJECT_ID).toBe('ignivar_herald_core');
+    expect(IGNIVAR_MAELIN_PROJECTION_NPC_ID).toBe('archivist_maelin_ember_projection');
   });
 
-  it('keeps the ordered chain on one dynamic, non-overworld archivist', () => {
-    const maelin = NPCS[IGNIVAR_MAELIN_NPC_ID];
-    expect(maelin).toMatchObject({
+  it('hands the ordered chain forward from Maelin to her ember projection', () => {
+    expect(NPCS[IGNIVAR_MAELIN_NPC_ID]).toMatchObject({
       id: IGNIVAR_MAELIN_NPC_ID,
       name: 'Archivist Maelin Emberward',
+      dynamic: true,
+      questIds: [IGNIVAR_LORE_QUEST_IDS.echoesInIron],
+    });
+    expect(NPCS[IGNIVAR_MAELIN_PROJECTION_NPC_ID]).toMatchObject({
+      id: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+      name: "Maelin's Ember Projection",
+      title: 'Ember Projection',
       dynamic: true,
       questIds: IGNIVAR_RAID_LORE_QUEST_ORDER,
     });
@@ -54,18 +65,23 @@ describe('Ignivar raid lore content', () => {
       IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
       IGNIVAR_LORE_QUEST_IDS.forgefather,
     ]);
-    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.echoesInIron].requiresQuest).toBeUndefined();
-    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart].requiresQuest).toBe(
-      IGNIVAR_LORE_QUEST_IDS.echoesInIron,
-    );
-    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.forgefather].requiresQuest).toBe(
-      IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
-    );
+    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.echoesInIron]).toMatchObject({
+      giverNpcId: IGNIVAR_MAELIN_NPC_ID,
+      turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    });
+    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart]).toMatchObject({
+      giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+      turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+      requiresQuest: IGNIVAR_LORE_QUEST_IDS.echoesInIron,
+    });
+    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.forgefather]).toMatchObject({
+      giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+      turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+      requiresQuest: IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
+    });
 
     for (const questId of IGNIVAR_RAID_LORE_QUEST_ORDER) {
       expect(QUESTS[questId]).toMatchObject({
-        giverNpcId: IGNIVAR_MAELIN_NPC_ID,
-        turnInNpcId: IGNIVAR_MAELIN_NPC_ID,
         shareable: false,
         minLevel: 20,
         suggestedPlayers: 10,
@@ -76,44 +92,42 @@ describe('Ignivar raid lore content', () => {
     }
   });
 
-  it('requires all three records, all three automata, Ignivar and Varkhul in order', () => {
-    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.echoesInIron].objectives).toEqual([
-      expect.objectContaining({
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_RECORD_IDS.firstTempering,
-      }),
-      expect.objectContaining({
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_RECORD_IDS.livingMetal,
-      }),
-      expect.objectContaining({
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_RECORD_IDS.heraldKey,
-      }),
-      expect.objectContaining({ type: 'kill', targetMobId: 'ignivar_ember_sentinel' }),
-      expect.objectContaining({ type: 'kill', targetMobId: 'ignivar_crucible_warden' }),
-      expect.objectContaining({ type: 'kill', targetMobId: 'ignivar_cinder_artificer' }),
-    ]);
-    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart].objectives).toEqual([
-      expect.objectContaining({ type: 'kill', targetMobId: IGNIVAR_BOSS_ID }),
-      expect.objectContaining({
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_HERALD_CORE_OBJECT_ID,
-      }),
-    ]);
+  it('uses three forward combat chapters with no required object interaction', () => {
+    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.echoesInIron]).toMatchObject({
+      rev: 1,
+      objectives: [
+        { type: 'kill', targetMobId: IGNIVAR_EMBER_SENTINEL_ID, count: 2 },
+        { type: 'kill', targetMobId: IGNIVAR_CRUCIBLE_WARDEN_ID, count: 2 },
+        { type: 'kill', targetMobId: IGNIVAR_CINDER_ARTIFICER_ID, count: 2 },
+      ],
+    });
+    expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart]).toMatchObject({
+      rev: 1,
+      objectives: [{ type: 'kill', targetMobId: IGNIVAR_BOSS_ID, count: 1 }],
+    });
     expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.forgefather].objectives).toEqual([
-      expect.objectContaining({
-        type: 'kill',
-        targetMobId: 'varkhul_forgefather_of_the_last_flame',
-      }),
+      expect.objectContaining({ type: 'kill', targetMobId: VARKHUL_BOSS_ID, count: 1 }),
     ]);
-    expect(Object.keys(IGNIVAR_LORE_OBJECTS)).toEqual([
-      ...Object.values(IGNIVAR_RECORD_IDS),
-      IGNIVAR_HERALD_CORE_OBJECT_ID,
+    for (const questId of IGNIVAR_RAID_LORE_QUEST_ORDER) {
+      expect(QUESTS[questId].objectives.every((objective) => objective.type === 'kill')).toBe(true);
+    }
+    expect(Object.keys(IGNIVAR_LORE_OBJECTS)).toEqual(Object.values(IGNIVAR_RECORD_IDS));
+  });
+
+  it('places one real archivist at the entrance and projections at every forward checkpoint', () => {
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].npcs).toEqual([
+      { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
+    ]);
+    expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].npcs).toEqual([
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 8, z: 27 },
+    ]);
+    expect(DUNGEONS[IGNIVAR_SECOND_WING_ID].npcs).toEqual([
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 14, z: 31 },
     ]);
   });
 
-  it('emits lore before the generic quest-object path grants record credit', () => {
+  it('keeps records readable as optional lore without granting quest credit', () => {
     const sim = new Sim({ seed: 91, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Archivist');
     const player = sim.entities.get(pid) as Entity;
@@ -126,6 +140,7 @@ describe('Ignivar raid lore content', () => {
       questId: quest.id,
       counts: quest.objectives.map(() => 0),
       state: 'active' as const,
+      rev: quest.rev,
     };
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('Test player was not registered');
@@ -140,23 +155,23 @@ describe('Ignivar raid lore content', () => {
     sim.events = [];
 
     expect(sim.pickUpObject(record.id, pid)).toBe(true);
-    expect(progress.counts[0]).toBe(1);
+    expect(progress.counts).toEqual([0, 0, 0]);
     expect(record.lootable).toBe(true);
-
-    const loreIndex = sim.events.findIndex(
-      (event: { type: string; text?: string }) =>
-        event.type === 'log' &&
-        event.text === IGNIVAR_LORE_TEXT_BY_OBJECT_ID[IGNIVAR_RECORD_IDS.firstTempering],
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'log',
+        text: IGNIVAR_LORE_TEXT_BY_OBJECT_ID[IGNIVAR_RECORD_IDS.firstTempering],
+      }),
     );
-    const creditIndex = sim.events.findIndex(
-      (event: { type: string; questId?: string }) =>
-        event.type === 'questProgress' && event.questId === quest.id,
-    );
-    expect(loreIndex).toBeGreaterThanOrEqual(0);
-    expect(creditIndex).toBeGreaterThan(loreIndex);
+    expect(
+      sim.events.some(
+        (event: { type: string; questId?: string }) =>
+          event.type === 'questProgress' && event.questId === quest.id,
+      ),
+    ).toBe(false);
   });
 
-  it('localizes all four lore nameplates without making the interactOnly props items', () => {
+  it('localizes all three optional lore nameplates without making them items', () => {
     const sim = new Sim({ seed: 92, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Reader');
     const player = sim.entities.get(pid) as Entity;
@@ -181,84 +196,131 @@ describe('Ignivar raid lore content', () => {
     }
   });
 
-  it("refuses the core and its quest credit while this claim's Ignivar is alive", () => {
-    const core = createGroundObject(10, IGNIVAR_HERALD_CORE_OBJECT_ID, 'Core', {
-      x: 100,
-      y: 0,
-      z: 10,
-    });
-    const boss = createMob(11, MOBS[IGNIVAR_BOSS_ID], 20, { x: 100, y: 0, z: 0 });
-    const emit = vi.fn();
-    const error = vi.fn();
-    const ctx = {
-      entities: new Map([
-        [core.id, core],
-        [boss.id, boss],
-      ]),
-      emit,
-      error,
-      instanceClaimIdAt: () => 7,
-    } as unknown as SimContext;
+  it('reveals each automaton memory only when the final construct of that type dies', () => {
+    const sim = new Sim({ seed: 93, playerClass: 'warrior', devCommands: true });
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_FORGE_APPROACH_ID);
+    if (!instance) throw new Error('Ignivar approach did not claim an instance');
 
-    expect(interactIgnivarRaidLore(ctx, core, { entityId: 5 } as PlayerMeta)).toEqual({
-      handled: true,
-      allowQuestCredit: false,
-    });
-    expect(error).toHaveBeenCalledWith(5, IGNIVAR_CORE_SHIELDED_TEXT);
-    expect(emit).not.toHaveBeenCalled();
+    for (const templateId of [
+      IGNIVAR_EMBER_SENTINEL_ID,
+      IGNIVAR_CRUCIBLE_WARDEN_ID,
+      IGNIVAR_CINDER_ARTIFICER_ID,
+    ] as const) {
+      const mobs = instance.mobIds
+        .map((id) => sim.entities.get(id))
+        .filter((entity): entity is Entity => entity?.templateId === templateId);
+      expect(mobs).toHaveLength(2);
+      sim.events = [];
 
-    boss.dead = true;
-    expect(interactIgnivarRaidLore(ctx, core, { entityId: 5 } as PlayerMeta)).toEqual({
-      handled: true,
-      allowQuestCredit: true,
-    });
-    expect(emit).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        type: 'log',
-        text: IGNIVAR_LORE_TEXT_BY_OBJECT_ID[IGNIVAR_HERALD_CORE_OBJECT_ID],
-        pid: 5,
-      }),
-    );
+      sim.ctx.handleDeath(mobs[0], sim.player);
+      expect(
+        sim.events.some(
+          (event: { type: string; text?: string }) =>
+            event.type === 'log' &&
+            event.text === IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE[templateId],
+        ),
+      ).toBe(false);
+
+      sim.ctx.handleDeath(mobs[1], sim.player);
+      expect(
+        sim.events.filter(
+          (event: { type: string; text?: string }) =>
+            event.type === 'log' &&
+            event.text === IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE[templateId],
+        ),
+      ).toHaveLength(1);
+    }
   });
 
-  it('gates Herald Core credit through the real dungeon interaction path', () => {
-    const sim = new Sim({ seed: 93, playerClass: 'warrior', devCommands: true });
+  it('completes the Herald chapter from Ignivar death with no core interaction', () => {
+    const sim = new Sim({ seed: 94, playerClass: 'warrior', devCommands: true });
     expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id, true)).toBe(true);
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_RAID_ARENA_ID);
     if (!instance) throw new Error('Ignivar arena did not claim an instance');
-    const core = instance.objectIds
-      .map((id) => sim.entities.get(id))
-      .find((entity) => entity?.objectItemId === IGNIVAR_HERALD_CORE_OBJECT_ID);
+    expect(
+      instance.objectIds
+        .map((id) => sim.entities.get(id))
+        .some((entity) => entity?.objectItemId === 'ignivar_herald_core'),
+    ).toBe(false);
     const boss = instance.mobIds
       .map((id) => sim.entities.get(id))
-      .find((entity) => entity?.templateId === IGNIVAR_BOSS_ID);
-    if (!core || !boss) throw new Error('Ignivar arena lore fixtures did not spawn');
+      .find((entity): entity is Entity => entity?.templateId === IGNIVAR_BOSS_ID);
+    if (!boss) throw new Error('Ignivar did not spawn');
+
     const quest = QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart];
     const progress = {
       questId: quest.id,
-      counts: quest.objectives.map(() => 0),
+      counts: [0],
       state: 'active' as const,
+      rev: quest.rev,
     };
     const meta = sim.players.get(sim.player.id);
     if (!meta) throw new Error('Test player was not registered');
     meta.questLog.set(quest.id, progress);
-    sim.player.pos = { ...core.pos };
-    sim.player.prevPos = { ...core.pos };
+    sim.player.pos = { ...boss.pos };
+    sim.player.prevPos = { ...boss.pos };
     sim.rebucket(sim.player);
+    boss.tappedById = sim.player.id;
+    sim.events = [];
 
-    expect(sim.pickUpObject(core.id, sim.player.id)).toBe(true);
-    expect(progress.counts[1]).toBe(0);
+    sim.ctx.handleDeath(boss, sim.player);
 
-    boss.dead = true;
-    expect(sim.pickUpObject(core.id, sim.player.id)).toBe(true);
-    expect(progress.counts[1]).toBe(1);
+    expect(progress.counts).toEqual([1]);
+    expect(progress.state).toBe('ready');
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'log',
+        text: IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE[IGNIVAR_BOSS_ID],
+      }),
+    );
+  });
+
+  it('completes the Forgefather chapter and closes the story when Varkhul dies', () => {
+    const sim = new Sim({ seed: 95, playerClass: 'warrior', devCommands: true });
+    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id, true)).toBe(true);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+    if (!instance) throw new Error('Inner Crucible did not claim an instance');
+    const boss = instance.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((entity): entity is Entity => entity?.templateId === VARKHUL_BOSS_ID);
+    if (!boss) throw new Error('Varkhul did not spawn');
+
+    const quest = QUESTS[IGNIVAR_LORE_QUEST_IDS.forgefather];
+    const progress = {
+      questId: quest.id,
+      counts: [0],
+      state: 'active' as const,
+      rev: quest.rev,
+    };
+    const meta = sim.players.get(sim.player.id);
+    if (!meta) throw new Error('Test player was not registered');
+    meta.questLog.set(quest.id, progress);
+    sim.player.pos = { ...boss.pos };
+    sim.player.prevPos = { ...boss.pos };
+    sim.rebucket(sim.player);
+    boss.tappedById = sim.player.id;
+    sim.events = [];
+
+    sim.ctx.handleDeath(boss, sim.player);
+
+    expect(progress.counts).toEqual([1]);
+    expect(progress.state).toBe('ready');
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'log',
+        text: IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE[VARKHUL_BOSS_ID],
+      }),
+    );
   });
 
   it('registers every lore line and new entity in the English localization sources', () => {
-    for (const text of Object.values(IGNIVAR_LORE_TEXT_BY_OBJECT_ID)) {
+    for (const text of [
+      ...Object.values(IGNIVAR_LORE_TEXT_BY_OBJECT_ID),
+      ...Object.values(IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE),
+    ]) {
       expect(localizeSimText(text), text).not.toBeNull();
     }
-    expect(localizeSimText(IGNIVAR_CORE_SHIELDED_TEXT)).not.toBeNull();
     expect(localizeSimText('The forge gate is sealed to you.')).not.toBeNull();
     for (const mechanic of [
       "Maker's Brand",
@@ -277,6 +339,9 @@ describe('Ignivar raid lore content', () => {
 
     expect(worldEntityText.en.entities.npcs[IGNIVAR_MAELIN_NPC_ID].name).toBe(
       'Archivist Maelin Emberward',
+    );
+    expect(worldEntityText.en.entities.npcs[IGNIVAR_MAELIN_PROJECTION_NPC_ID].name).toBe(
+      "Maelin's Ember Projection",
     );
     expect(worldEntityText.en.entities.quests[IGNIVAR_LORE_QUEST_IDS.echoesInIron].title).toBe(
       'Echoes in Iron',

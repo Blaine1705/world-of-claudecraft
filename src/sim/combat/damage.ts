@@ -29,6 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { grantAbilityDevotion } from '../paladin_devotion';
@@ -1376,6 +1377,7 @@ export function handleDeath(
   // idiom, admin sweeps) never detonates the clutch (mob/dragonkin_brood.ts).
   if (e.kind === 'mob' && MOBS[e.templateId]?.broodEgg) e.broodCracked = true;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
+  if (e.kind === 'mob') emitIgnivarRaidNarrativeOnDeath(ctx, e);
 
   // The `kill` set-proc trigger, dispatched here because this is the one place
   // every death resolves. After the death emit so the event order players and

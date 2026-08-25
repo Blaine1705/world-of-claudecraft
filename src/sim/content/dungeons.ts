@@ -16,9 +16,9 @@ import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 import {
-  IGNIVAR_HERALD_CORE_OBJECT_ID,
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_MAELIN_NPC_ID,
+  IGNIVAR_MAELIN_PROJECTION_NPC_ID,
   IGNIVAR_RECORD_IDS,
 } from './ignivar_raid_lore';
 
@@ -1225,7 +1225,10 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
     spawns: IGNIVAR_FORGE_APPROACH_SPAWN_LIST,
-    npcs: [{ npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 }],
+    npcs: [
+      { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
+    ],
     objects: [
       {
         itemId: IGNIVAR_RECORD_IDS.firstTempering,
@@ -1274,7 +1277,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -27 },
     exitOffset: { x: 0, z: -30 },
     spawns: IGNIVAR_RAID_SPAWN_LIST,
-    npcs: [{ npcId: IGNIVAR_MAELIN_NPC_ID, x: 8, z: 27 }],
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 8, z: 27 }],
     objects: [
       ...IGNIVAR_CONDUITS.map((conduit) => ({
         itemId: '',
@@ -1284,13 +1287,6 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
         templateId: IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
         lootable: false,
       })),
-      {
-        itemId: IGNIVAR_HERALD_CORE_OBJECT_ID,
-        name: IGNIVAR_LORE_OBJECTS[IGNIVAR_HERALD_CORE_OBJECT_ID].name,
-        x: 0,
-        z: 9,
-        interactOnly: true,
-      },
       {
         itemId: '',
         name: 'Sealed Inner Crucible Gate',
@@ -1317,7 +1313,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -34 },
     exitOffset: { x: 0, z: -38 },
     spawns: IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST,
-    npcs: [{ npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -30 }],
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 14, z: 31 }],
     interior: 'ignivar_depths',
     suggestedPlayers: 10,
     enterText: 'The opened gate leads deeper into the Crucible.',

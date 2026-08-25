@@ -13305,24 +13305,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.archivist_maelin_emberward.title': 'Архивариус горнила',
   'entities.npcs.archivist_maelin_emberward.greeting':
     'Каждый след молота здесь — это фраза. Помогите мне прочесть то, что Варкхул пытался скрыть.',
+  'entities.npcs.archivist_maelin_ember_projection.name': 'Углевая проекция Мэйлин',
+  'entities.npcs.archivist_maelin_ember_projection.title': 'Углевая проекция',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    'Угли несут голос Мэйлин всё дальше в глубины кузни.',
   'entities.quests.q_ignivar_echoes_in_iron.title': 'Эхо в железе',
   'entities.quests.q_ignivar_echoes_in_iron.text':
-    'Эти автоматоны — не солдаты, а черновики. Варкхул закалял один корпус за другим, пока вокруг него угасал Последний Источник. Прочтите три записи и уничтожьте охраняющие их механизмы. Каждое неудачное тело может хранить часть ответа.',
+    'Эти автоматоны не солдаты, а черновики. Уничтожьте каждую сборочную линию и прислушайтесь, когда падёт последний корпус. Кузня помнит то, что Варкхул пытался стереть.',
   'entities.quests.q_ignivar_echoes_in_iron.completion':
-    'Записи сходятся. Варкхул сковал воду умирающего Последнего Источника с живым металлом. Эти автоматоны были его неудачными закалками. Выдержал лишь один замысел.',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': 'Прочесть запись о первой закалке',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'Прочесть запись о живом металле',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': 'Прочесть запись о ключе Предвестника',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': 'Пепельный часовой повержен',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': 'Страж горнила повержен',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': 'Искровой механик повержен',
+    'Отголоски сходятся. Варкхул сковал воду умирающего Последнего Источника с живым металлом. Эти автоматоны были неудачными закалками. Выдержал лишь Игнивар.',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': 'Уничтожить Пепельных часовых',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'Уничтожить Стражей горнила',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': 'Уничтожить Искровых механиков',
   'entities.quests.q_ignivar_heralds_heart.title': 'Сердце Предвестника',
   'entities.quests.q_ignivar_heralds_heart.text':
-    'Выжившего, упомянутого в каждой записи, звали Игнивар. Варкхул называл его предвестником, печатью и ключом. Победите Игнивара, а затем изучите оставшееся ядро. Оно должно рассказать, что был создан охранять Предвестник.',
+    'Каждый отголосок указывает на единственного выжившего, Игнивара. Варкхул называл его предвестником, печатью и ключом. Победите его. Если записи верны, его смерть откроет, что он был выкован охранять.',
   'entities.quests.q_ignivar_heralds_heart.completion':
-    'Игнивар никогда не был просто стражем. Его сердце — это ключ, а последние пластины указывают на запечатанное горнило внизу.',
+    'Игнивар никогда не был просто стражем. Его сердце было ключом, а последние пластины открыли запечатанное горнило внизу.',
   'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'Игнивар повержен',
-  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': 'Ядро Игнивара изучено',
   'entities.quests.q_ignivar_the_forgefather.title': 'Отец ковки',
   'entities.quests.q_ignivar_the_forgefather.text':
     'Путь вниз ведёт к Варкхулу, отцу ковки Последнего Пламени. Он заточил Последний Источник, чтобы оживить металл, а затем выковал Игнивара, чтобы сохранить преступление в тайне. Войдите во Внутреннее Горнило и положите конец его трудам.',

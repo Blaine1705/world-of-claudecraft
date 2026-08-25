@@ -12892,24 +12892,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.archivist_maelin_emberward.title': '熔炉档案员',
   'entities.npcs.archivist_maelin_emberward.greeting':
     '这里的每一道锤印都是一句话。帮我读懂瓦尔库尔想隐藏的真相。',
+  'entities.npcs.archivist_maelin_ember_projection.name': '梅琳的余烬投影',
+  'entities.npcs.archivist_maelin_ember_projection.title': '余烬投影',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    '余烬将梅琳的声音传向锻炉深处。',
   'entities.quests.q_ignivar_echoes_in_iron.title': '铁中回响',
   'entities.quests.q_ignivar_echoes_in_iron.text':
-    '这些自动机械不是士兵，而是草稿。当末泉在瓦尔库尔身边衰竭时，他一具又一具地淬炼外壳。阅读三份记录，并摧毁守卫它们的构造体。每一具失败的躯壳都可能藏着部分答案。',
+    '这些自动机械不是士兵，而是草稿。摧毁每条装配线，在最后一具躯壳倒下时仔细聆听。锻炉记得瓦尔库尔试图抹去的一切。',
   'entities.quests.q_ignivar_echoes_in_iron.completion':
-    '记录彼此吻合。瓦尔库尔将垂死末泉的水束缚进活体金属。这些自动机械是他失败的淬炼品，只有一种设计撑了下来。',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '阅读“首次淬炼”记录',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '阅读“活体金属”记录',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '阅读“先驱之钥”记录',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': '击败余烬哨兵',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': '击败熔炉守卫',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': '击败烬火工匠',
+    '回响彼此吻合。瓦尔库尔将垂死末泉的水束缚进活体金属。这些自动机械都是失败的淬炼品，只有伊格尼瓦尔撑了下来。',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '摧毁余烬哨兵',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '摧毁熔炉守卫',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '摧毁烬火工匠',
   'entities.quests.q_ignivar_heralds_heart.title': '先驱之心',
   'entities.quests.q_ignivar_heralds_heart.text':
-    '每份记录都提到了唯一的幸存者——伊格尼瓦尔。瓦尔库尔称他为先驱、封印和钥匙。击败伊格尼瓦尔，然后检查留下的核心。它应该能告诉我们，先驱原本要守护什么。',
+    '每一道回响都指向唯一的幸存者：伊格尼瓦尔。瓦尔库尔称他为先驱、封印和钥匙。击败他。如果记录属实，他的死亡会揭示他被锻造来守护什么。',
   'entities.quests.q_ignivar_heralds_heart.completion':
-    '伊格尼瓦尔从来不只是守护者。他的心脏是一把钥匙，最后的甲片指向下方封闭的熔炉。',
+    '伊格尼瓦尔从来不只是守护者。他的心脏就是钥匙，最后的甲片打开了下方封闭的熔炉。',
   'entities.quests.q_ignivar_heralds_heart.objectives.0.label': '击败伊格尼瓦尔',
-  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': '检查伊格尼瓦尔的核心',
   'entities.quests.q_ignivar_the_forgefather.title': '锻父',
   'entities.quests.q_ignivar_the_forgefather.text':
     '下方的道路通向末焰锻父瓦尔库尔。他囚禁末泉以赋予金属生命，又锻造伊格尼瓦尔来封存这罪行。进入内环熔炉，结束他的工作。',

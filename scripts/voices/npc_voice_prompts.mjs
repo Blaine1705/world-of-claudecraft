@@ -1049,6 +1049,7 @@ export const VOICE_ALIAS = {
   // Maelin is a development-only raid archivist and reuses the established
   // measured scholar register until the hidden raid receives bespoke voice art.
   archivist_maelin_emberward: 'archivist_tullo',
+  archivist_maelin_ember_projection: 'archivist_tullo',
   // Warmarshal Draven Kole, the Highwatch Master of the Warfare Stores, sells the
   // identical WARFARE stock FURY sells in Eastbrook and speaks in the same
   // parade-ground register, so he borrows FURY's designed voice for now. This is

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { IGNIVAR_MAELIN_NPC_ID } from '../src/sim/content/ignivar_raid_lore';
+import {
+  IGNIVAR_MAELIN_NPC_ID,
+  IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+} from '../src/sim/content/ignivar_raid_lore';
 import { DUNGEONS, MOBS } from '../src/sim/data';
 import { INTERIOR_LAYOUTS } from '../src/sim/dungeon_floor';
 import {
@@ -105,8 +108,10 @@ describe('Ignivar raid progression', () => {
       (instance) => instance.dungeonId === IGNIVAR_FORGE_APPROACH_ID && instance.partyKey !== null,
     );
     if (!claim) throw new Error('Forge approach did not form a claim');
-    expect(claim.npcIds).toHaveLength(1);
-    expect(sim.entities.get(claim.npcIds[0])?.templateId).toBe(IGNIVAR_MAELIN_NPC_ID);
+    expect(claim.npcIds.map((id) => sim.entities.get(id)?.templateId)).toEqual([
+      IGNIVAR_MAELIN_NPC_ID,
+      IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    ]);
     const gate = claim.objectIds
       .map((id) => sim.entities.get(id))
       .find((entity) => entity?.dungeonId === IGNIVAR_RAID_ARENA_ID);
@@ -237,9 +242,22 @@ describe('Ignivar raid progression', () => {
     expect(family.map((instance) => instance.dungeonId).sort()).toEqual(
       [...IGNIVAR_RAID_ROOM_IDS].sort(),
     );
-    expect(family.map((instance) => sim.entities.get(instance.npcIds[0])?.templateId)).toEqual(
-      IGNIVAR_RAID_ROOM_IDS.map(() => IGNIVAR_MAELIN_NPC_ID),
+    const npcTemplatesByRoom = new Map(
+      family.map((instance) => [
+        instance.dungeonId,
+        instance.npcIds.map((id) => sim.entities.get(id)?.templateId),
+      ]),
     );
+    expect(npcTemplatesByRoom.get(IGNIVAR_FORGE_APPROACH_ID)).toEqual([
+      IGNIVAR_MAELIN_NPC_ID,
+      IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    ]);
+    expect(npcTemplatesByRoom.get(IGNIVAR_RAID_ARENA_ID)).toEqual([
+      IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    ]);
+    expect(npcTemplatesByRoom.get(IGNIVAR_SECOND_WING_ID)).toEqual([
+      IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    ]);
     expect(sim.entities.get(boss.id)?.dead).toBe(true);
 
     for (const pid of party.members) {

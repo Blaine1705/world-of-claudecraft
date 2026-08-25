@@ -3,9 +3,17 @@
 // owns the explicit spawn inside the hidden raid. Quests are also non-shareable, so a
 // player outside that room cannot receive this development chain from a groupmate.
 
+import {
+  IGNIVAR_CINDER_ARTIFICER_ID,
+  IGNIVAR_CRUCIBLE_WARDEN_ID,
+  IGNIVAR_EMBER_SENTINEL_ID,
+  VARKHUL_BOSS_ID,
+} from '../ignivar_raid_ids';
 import type { NpcDef, QuestDef } from '../types';
+import { IGNIVAR_BOSS_ID } from '../types';
 
 export const IGNIVAR_MAELIN_NPC_ID = 'archivist_maelin_emberward';
+export const IGNIVAR_MAELIN_PROJECTION_NPC_ID = 'archivist_maelin_ember_projection';
 
 export const IGNIVAR_RECORD_IDS = {
   firstTempering: 'ignivar_record_first_tempering',
@@ -13,13 +21,10 @@ export const IGNIVAR_RECORD_IDS = {
   heraldKey: 'ignivar_record_herald_key',
 } as const;
 
-export const IGNIVAR_HERALD_CORE_OBJECT_ID = 'ignivar_herald_core';
-
 export const IGNIVAR_LORE_OBJECTS = {
   [IGNIVAR_RECORD_IDS.firstTempering]: { name: 'First Tempering Record' },
   [IGNIVAR_RECORD_IDS.livingMetal]: { name: 'Living Metal Record' },
   [IGNIVAR_RECORD_IDS.heraldKey]: { name: 'Herald-Key Record' },
-  [IGNIVAR_HERALD_CORE_OBJECT_ID]: { name: "Ignivar's Shattered Core" },
 } as const;
 
 export const IGNIVAR_LORE_QUEST_IDS = {
@@ -38,16 +43,25 @@ export const IGNIVAR_RAID_LORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 0, z: 0 },
     facing: 0,
     color: 0xd9a35f,
-    questIds: Object.values(IGNIVAR_LORE_QUEST_IDS),
+    questIds: [IGNIVAR_LORE_QUEST_IDS.echoesInIron],
     greeting:
       'Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide.',
+    dynamic: true,
+  },
+  [IGNIVAR_MAELIN_PROJECTION_NPC_ID]: {
+    id: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    name: "Maelin's Ember Projection",
+    title: 'Ember Projection',
+    pos: { x: 0, z: 0 },
+    facing: 0,
+    color: 0xff6a2a,
+    questIds: Object.values(IGNIVAR_LORE_QUEST_IDS),
+    greeting: "The embers carry Maelin's voice forward through the forge.",
     dynamic: true,
   },
 };
 
 const DEV_RAID_QUEST = {
-  giverNpcId: IGNIVAR_MAELIN_NPC_ID,
-  turnInNpcId: IGNIVAR_MAELIN_NPC_ID,
   xpReward: 0,
   copperReward: 0,
   itemRewards: {},
@@ -60,68 +74,50 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
   [IGNIVAR_LORE_QUEST_IDS.echoesInIron]: {
     ...DEV_RAID_QUEST,
     id: IGNIVAR_LORE_QUEST_IDS.echoesInIron,
+    giverNpcId: IGNIVAR_MAELIN_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     name: 'Echoes in Iron',
-    text: 'These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.',
+    text: 'These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.',
     completionText:
-      'The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.',
+      'The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.',
+    rev: 1,
     objectives: [
       {
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_RECORD_IDS.firstTempering,
-        count: 1,
-        label: 'Read the First Tempering record',
-      },
-      {
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_RECORD_IDS.livingMetal,
-        count: 1,
-        label: 'Read the Living Metal record',
-      },
-      {
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_RECORD_IDS.heraldKey,
-        count: 1,
-        label: 'Read the Herald-Key record',
+        type: 'kill',
+        targetMobId: IGNIVAR_EMBER_SENTINEL_ID,
+        count: 2,
+        label: 'Ember Sentinels destroyed',
       },
       {
         type: 'kill',
-        targetMobId: 'ignivar_ember_sentinel',
-        count: 1,
-        label: 'Ember Sentinel defeated',
+        targetMobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+        count: 2,
+        label: 'Crucible Wardens destroyed',
       },
       {
         type: 'kill',
-        targetMobId: 'ignivar_crucible_warden',
-        count: 1,
-        label: 'Crucible Warden defeated',
-      },
-      {
-        type: 'kill',
-        targetMobId: 'ignivar_cinder_artificer',
-        count: 1,
-        label: 'Cinder Artificer defeated',
+        targetMobId: IGNIVAR_CINDER_ARTIFICER_ID,
+        count: 2,
+        label: 'Cinder Artificers destroyed',
       },
     ],
   },
   [IGNIVAR_LORE_QUEST_IDS.heraldsHeart]: {
     ...DEV_RAID_QUEST,
     id: IGNIVAR_LORE_QUEST_IDS.heraldsHeart,
+    giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     name: "The Herald's Heart",
-    text: 'The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.',
+    text: 'The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.',
     completionText:
-      'Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.',
+      'Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.',
+    rev: 1,
     objectives: [
       {
         type: 'kill',
-        targetMobId: 'ignivar_herald_of_the_last_flame',
+        targetMobId: IGNIVAR_BOSS_ID,
         count: 1,
         label: 'Ignivar defeated',
-      },
-      {
-        type: 'interact',
-        targetObjectItemId: IGNIVAR_HERALD_CORE_OBJECT_ID,
-        count: 1,
-        label: "Ignivar's core inspected",
       },
     ],
     requiresQuest: IGNIVAR_LORE_QUEST_IDS.echoesInIron,
@@ -129,6 +125,8 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
   [IGNIVAR_LORE_QUEST_IDS.forgefather]: {
     ...DEV_RAID_QUEST,
     id: IGNIVAR_LORE_QUEST_IDS.forgefather,
+    giverNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+    turnInNpcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID,
     name: 'The Forgefather',
     text: 'The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.',
     completionText:
@@ -136,7 +134,7 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
     objectives: [
       {
         type: 'kill',
-        targetMobId: 'varkhul_forgefather_of_the_last_flame',
+        targetMobId: VARKHUL_BOSS_ID,
         count: 1,
         label: 'Varkhul defeated',
       },

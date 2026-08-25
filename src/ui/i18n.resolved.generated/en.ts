@@ -14092,6 +14092,11 @@ export const en: EnTranslations = {
         "title": "Crucible Archivist",
         "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
       },
+      "archivist_maelin_ember_projection": {
+        "name": "Maelin's Ember Projection",
+        "title": "Ember Projection",
+        "greeting": "The embers carry Maelin's voice forward through the forge."
+      },
       "brother_halven": {
         "name": "Brother Halven",
         "title": "Reliquary Keeper",
@@ -15202,39 +15207,27 @@ export const en: EnTranslations = {
       },
       "q_ignivar_echoes_in_iron": {
         "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
-        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
+        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
         "objectives": {
           "0": {
-            "label": "Read the First Tempering record"
+            "label": "Ember Sentinels destroyed"
           },
           "1": {
-            "label": "Read the Living Metal record"
+            "label": "Crucible Wardens destroyed"
           },
           "2": {
-            "label": "Read the Herald-Key record"
-          },
-          "3": {
-            "label": "Ember Sentinel defeated"
-          },
-          "4": {
-            "label": "Crucible Warden defeated"
-          },
-          "5": {
-            "label": "Cinder Artificer defeated"
+            "label": "Cinder Artificers destroyed"
           }
         }
       },
       "q_ignivar_heralds_heart": {
         "title": "The Herald's Heart",
-        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
         "objectives": {
           "0": {
             "label": "Ignivar defeated"
-          },
-          "1": {
-            "label": "Ignivar's core inspected"
           }
         }
       },

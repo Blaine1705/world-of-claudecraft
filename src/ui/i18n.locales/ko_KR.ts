@@ -13134,24 +13134,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.archivist_maelin_emberward.title': '용광로 기록관',
   'entities.npcs.archivist_maelin_emberward.greeting':
     '이곳의 망치 자국 하나하나가 하나의 문장이야. 발쿨이 숨기려 한 내용을 읽어 내는 것을 도와줘.',
+  'entities.npcs.archivist_maelin_ember_projection.name': '마엘린의 잔불 투영체',
+  'entities.npcs.archivist_maelin_ember_projection.title': '잔불 투영체',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    '잔불이 마엘린의 목소리를 대장간 깊숙이 전합니다.',
   'entities.quests.q_ignivar_echoes_in_iron.title': '철 속의 메아리',
   'entities.quests.q_ignivar_echoes_in_iron.text':
-    '이 자동 기계들은 병사가 아니라 시작품이야. 마지막 샘이 그의 겨화에서 메말라 갈 동안 발쿨은 껍질을 하나씩 단련했지. 세 개의 기록을 읽고 그것을 지키는 구조물을 파괴해. 실패한 몸체마다 답의 조각을 품고 있을지도 몰라.',
+    '이 자동 기계들은 병사가 아니라 시작품이야. 각 조립 라인을 부수고 마지막 껍질이 쓰러질 때 귀를 기울여. 대장간은 발쿨이 지우려 한 것을 기억하고 있어.',
   'entities.quests.q_ignivar_echoes_in_iron.completion':
-    '기록은 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 그의 실패한 단련작이야. 견돌 수 있었던 설계는 하나뿐이었지.',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '첫 단련 기록 읽기',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '살아 있는 금속 기록 읽기',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '선구자의 열쇠 기록 읽기',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': '잔불 감시자 처치',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': '용광로 수호자 처치',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': '불씨 기계공 처치',
+    '메아리는 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 실패한 단련작이었지. 오직 이그니바르만 견뎌 냈어.',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '잔불 감시자 파괴',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '용광로 수호자 파괴',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '불씨 기계공 파괴',
   'entities.quests.q_ignivar_heralds_heart.title': '선구자의 심장',
   'entities.quests.q_ignivar_heralds_heart.text':
-    '모든 기록에서 살아남은 자로 적힌 이름은 이그니바르야. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 이그니바르를 쓰러뜨리고 남은 핵을 조사해. 선구자가 무엇을 지키도록 만들어졌는지 알려 줄 거야.',
+    '모든 메아리가 유일한 생존자 이그니바르를 가리켜. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 그를 쓰러뜨려. 기록이 사실이라면 그의 죽음이 무엇을 지키도록 벼려졌는지 밝혀 줄 거야.',
   'entities.quests.q_ignivar_heralds_heart.completion':
-    '이그니바르는 단순한 수호자가 아니었어. 그의 심장은 열쇠이고, 마지막 갑주 판은 아래에 봉인된 용광로를 가리키고 있어.',
+    '이그니바르는 단순한 수호자가 아니었어. 그의 심장이 바로 열쇠였고, 마지막 갑주 판이 아래에 봉인된 용광로를 열었어.',
   'entities.quests.q_ignivar_heralds_heart.objectives.0.label': '이그니바르 처치',
-  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': '이그니바르의 핵 조사',
   'entities.quests.q_ignivar_the_forgefather.title': '대장장이',
   'entities.quests.q_ignivar_the_forgefather.text':
     '아래로 이어진 길은 마지막 불꽃의 대장장이 발쿨에게 이어져. 그는 금속에 생명을 불어넣으려 마지막 샘을 가두고, 그 죄를 봉인하려 이그니바르를 단조했어. 내부 용광로에 들어가 그의 일을 끝내.',

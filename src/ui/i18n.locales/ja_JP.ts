@@ -13123,24 +13123,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.archivist_maelin_emberward.title': 'るつぼの記録官',
   'entities.npcs.archivist_maelin_emberward.greeting':
     'ここに残る槌の跡は、どれも一つの文だ。ヴァルクルが隠そうとしたことを読み解くのを手伝ってくれ。',
+  'entities.npcs.archivist_maelin_ember_projection.name': 'メイリンの残り火の投影',
+  'entities.npcs.archivist_maelin_ember_projection.title': '残り火の投影',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    '残り火がメイリンの声を鍛冶場の奥へと届ける。',
   'entities.quests.q_ignivar_echoes_in_iron.title': '鉄に響く記憶',
   'entities.quests.q_ignivar_echoes_in_iron.text':
-    'この自動人形たちは兵士ではない。試作品だ。最後の泉が彼の周りで枯れていく中、ヴァルクルは殻を何度も鍛え直した。三つの記録を読み、それらを守る造られし者を破壊せよ。失敗した身体の一つ一つに、答えの断片が残っているかもしれない。',
+    'この自動人形たちは兵士ではない。試作品だ。各組立ラインを破壊し、最後の殻が倒れた時に耳を澄ませ。ヴァルクルが消そうとした記憶を、鍛冶場は覚えている。',
   'entities.quests.q_ignivar_echoes_in_iron.completion':
-    '記録はすべて一致している。ヴァルクルは死にかけた最後の泉の水を生ける金属に縛りつけた。この自動人形たちは鍛造に失敗したものだ。耐え抜いた設計はただ一つだけだった。',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '「最初の鍛造」の記録を読む',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '「生ける金属」の記録を読む',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '「先触れの鍵」の記録を読む',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.3.label': '残り火の番兵を倒す',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.4.label': 'るつぼの守護者を倒す',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.5.label': '火の粉の技工士を倒す',
+    '響きはすべて一致している。ヴァルクルは枯れゆく最後の泉の水を生ける金属に縛りつけた。この自動人形たちは失敗作だった。耐え抜いたのはイグニヴァルだけだ。',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '残り火の番兵を破壊',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'るつぼの守護者を破壊',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '火の粉の技工士を破壊',
   'entities.quests.q_ignivar_heralds_heart.title': '先触れの心臓',
   'entities.quests.q_ignivar_heralds_heart.text':
-    'すべての記録に残った者の名はイグニヴァルだ。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。イグニヴァルを倒し、残されたコアを調べよ。先触れが何を守るために造られたのかわかるはずだ。',
+    'すべての響きが唯一の生存者、イグニヴァルを指している。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。彼を倒せ。記録が正しければ、その死が彼の守るために鍛えられたものを明らかにする。',
   'entities.quests.q_ignivar_heralds_heart.completion':
-    'イグニヴァルは単なる守護者ではなかった。彼の心臓は鍵であり、最後の装甲板は下に封じられたるつぼを指し示している。',
+    'イグニヴァルは単なる守護者ではなかった。彼の心臓こそが鍵であり、最後の装甲板が下の封じられたるつぼを開いた。',
   'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'イグニヴァルを倒す',
-  'entities.quests.q_ignivar_heralds_heart.objectives.1.label': 'イグニヴァルのコアを調べる',
   'entities.quests.q_ignivar_the_forgefather.title': '鍛造父',
   'entities.quests.q_ignivar_the_forgefather.text':
     '下へ続く道の先には、最後の炎の鍛造父ヴァルクルがいる。彼は金属に命を与えるため最後の泉を幽閉し、その罪を封じるためイグニヴァルを鍛えた。内部るつぼに入り、彼の所業に終止符を打て。',
