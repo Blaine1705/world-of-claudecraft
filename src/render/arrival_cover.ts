@@ -37,6 +37,15 @@ export interface ArrivalRevealGate {
  *  costs at most one poll of curtain time, coarse enough to be free. */
 export const ARRIVAL_REVEAL_POLL_MS = 50;
 
+/** The `arrival` event keys the wait's outcome rides under (gpu_prep_events):
+ *  `ageMs` is the time actually waited, `units` the bound it was given,
+ *  `totalRoots` the imminent keys still held when the curtain lifted. A
+ *  zero-budget wait records nothing. The perf beacon summarizes them beside
+ *  the reveal counters (src/game/perf_entry_reveal_core.ts), so the fleet can
+ *  read how long the establishing-shot curtain really holds. */
+export const ENTRY_WAIT_EVENT_KEY = 'entry-wait';
+export const ENTRY_WAIT_ESTABLISHING_EVENT_KEY = 'entry-wait:establishing-shot';
+
 export interface ArrivalRevealWaitOptions {
   /** Clock, defaulting to the shared GPU-prep clock the gates measure on. */
   now?: () => number;
@@ -141,11 +150,26 @@ export function awaitArrivalReveals(
       setTimeout(poll, ms);
     });
   const pollMs = options.pollMs ?? ARRIVAL_REVEAL_POLL_MS;
-  const deadline = now() + (Number.isFinite(maxMs) && maxMs > 0 ? maxMs : 0);
+  const boundMs = Number.isFinite(maxMs) && maxMs > 0 ? maxMs : 0;
+  const startedAt = now();
+  const deadline = startedAt + boundMs;
+  const establishing = arrivalEstablishingShotActive();
   return new Promise<void>((resolve) => {
+    const finish = (): void => {
+      if (boundMs > 0) {
+        recordGpuPrepEvent({
+          kind: 'arrival',
+          key: establishing ? ENTRY_WAIT_ESTABLISHING_EVENT_KEY : ENTRY_WAIT_EVENT_KEY,
+          ageMs: now() - startedAt,
+          units: Math.round(boundMs),
+          totalRoots: arrivalHeldImminentKeys(),
+        });
+      }
+      resolve();
+    };
     const poll = (): void => {
       if (arrivalHeldImminentKeys() === 0 || now() >= deadline) {
-        resolve();
+        finish();
         return;
       }
       schedule(poll, pollMs);

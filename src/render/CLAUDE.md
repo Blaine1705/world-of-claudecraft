@@ -380,7 +380,11 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   `arrival_cover.ts` `arrivalEstablishingShotActive` read by `reveal_gate.ts`,
   because the wide opening view of the village is what a new player sees
   first and the chase camera's imminence radius does not describe it)
-  so an arrival lifts with its decor linked the way boot does. Its first check
+  so an arrival lifts with its decor linked the way boot does. The wait's outcome
+  is an `arrival` event keyed `entry-wait` or `entry-wait:establishing-shot`
+  (waited ms, the bound, the imminent keys still held at the lift), which the
+  perf beacon summarizes with the reveal counters as `rawSummary.entryReveal`
+  (`src/game/perf_entry_reveal_core.ts`): the fleet-side watch for the bound. Its first check
   happens after ONE poll interval, never synchronously: the wait starts before
   any cull has consulted a gate at the new position, so a synchronous check read
   "nothing held" because nothing had been asked yet. At world entry that wait

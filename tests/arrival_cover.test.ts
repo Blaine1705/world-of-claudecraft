@@ -10,6 +10,8 @@ import {
   arrivalEstablishingShotActive,
   arrivalHeldImminentKeys,
   awaitArrivalReveals,
+  ENTRY_WAIT_ESTABLISHING_EVENT_KEY,
+  ENTRY_WAIT_EVENT_KEY,
   noteArrivalEvent,
   noteArrivalIfTeleported,
   registerRevealGateForArrival,
@@ -183,6 +185,67 @@ describe('awaitArrivalReveals', () => {
     timer.flush();
     await wait;
     expect(settled).toBe(true);
+  });
+
+  it('records how long it waited, the bound and the keys still held, under the shot key when the establishing shot is up', async () => {
+    let t = 0;
+    const timer = fakeTimer();
+    const gate = fakeGate(2);
+    registerRevealGateForArrival(gate);
+    setArrivalCover(true);
+    setArrivalEstablishingShot(true);
+    const wait = awaitArrivalReveals(6_000, { now: () => t, schedule: timer.schedule });
+    t = 50;
+    timer.flush();
+    await Promise.resolve();
+    gate.held = 1;
+    t = 3_700;
+    timer.flush();
+    await Promise.resolve();
+    gate.held = 0;
+    t = 3_750;
+    timer.flush();
+    await wait;
+    setArrivalEstablishingShot(false);
+    setArrivalCover(false);
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      kind: 'arrival',
+      key: ENTRY_WAIT_ESTABLISHING_EVENT_KEY,
+      ageMs: 3_750,
+      units: 6_000,
+      totalRoots: 0,
+    });
+  });
+
+  it('records a wait that ran out of its bound with the keys it lifted on, under the plain key', async () => {
+    let t = 0;
+    const timer = fakeTimer();
+    registerRevealGateForArrival(fakeGate(5));
+    const wait = awaitArrivalReveals(3_000, { now: () => t, schedule: timer.schedule });
+    while (timer.pending() > 0) {
+      t += 50;
+      timer.flush();
+      await Promise.resolve();
+    }
+    await wait;
+    const events = gpuPrepEventsSnapshot().events;
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      kind: 'arrival',
+      key: ENTRY_WAIT_EVENT_KEY,
+      ageMs: 3_000,
+      units: 3_000,
+      totalRoots: 5,
+    });
+  });
+
+  it('records nothing for a zero-budget wait', async () => {
+    const timer = fakeTimer();
+    registerRevealGateForArrival(fakeGate(4));
+    await awaitArrivalReveals(0, { now: () => 0, schedule: timer.schedule });
+    expect(gpuPrepEventsSnapshot().events).toHaveLength(0);
   });
 
   it('keeps the floor inside maxMs, so a zero-budget wait still costs nothing', async () => {

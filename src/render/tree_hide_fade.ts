@@ -24,6 +24,8 @@ export interface TreeHideable {
   z: number;
   r: number;
   topY: number;
+  /** Ghosted (the fade applied), NOT "occluding": a tree that occludes the
+   *  camera while its fade program is still gate-held reads false. */
   hidden: boolean;
   /** Animated fade level (1 = opaque instance, 0.2 = occluding ghost). */
   alpha: number;

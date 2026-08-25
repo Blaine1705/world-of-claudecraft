@@ -98,6 +98,8 @@ interface MazeWallHideable {
   index: number;
   visibleMatrix: THREE.Matrix4;
   hiddenMatrix: THREE.Matrix4;
+  /** Ghosted (the fade applied), NOT "occluding": a wall that occludes the
+   *  camera while its fade program is still gate-held reads false. */
   hidden: boolean;
   alpha: number;
   ghost: InstancedGhostHandle | null;
