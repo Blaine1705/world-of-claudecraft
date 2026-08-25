@@ -2926,7 +2926,10 @@ export const ru_RU: EnTranslations = {
       "unlink": "Отвязать Steam",
       "linked": "Привязан аккаунт Steam {id}",
       "benefits": "Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.",
-      "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку."
+      "noTicket": "Steam не выдал билет для привязки. Запустите Steam и повторите попытку.",
+      "wishlist": "Добавить в желаемое в Steam",
+      "wishlistAria": "Добавить в желаемое в Steam: открыть страницу World of ClaudeCraft в магазине",
+      "wishlistShort": "В желаемое"
     },
     "epic": {
       "title": "Epic",

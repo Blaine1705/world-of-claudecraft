@@ -2926,7 +2926,10 @@ export const es_ES: EnTranslations = {
       "unlink": "Desvincular Steam",
       "linked": "Vinculado a la cuenta de Steam {id}",
       "benefits": "Vincula tu cuenta de Steam desde la aplicación de escritorio para reflejar las gestas que consigas como logros de Steam.",
-      "noTicket": "Steam no proporcionó un ticket de vinculación. Inicia Steam y vuelve a intentarlo."
+      "noTicket": "Steam no proporcionó un ticket de vinculación. Inicia Steam y vuelve a intentarlo.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

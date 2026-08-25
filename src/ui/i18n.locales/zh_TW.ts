@@ -9343,6 +9343,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.benefits':
     '在桌面應用程式中連結你的 Steam 帳號，將你獲得的功績同步為 Steam 成就。',
   'hudChrome.steam.noTicket': 'Steam 未提供連結憑證。請先啟動 Steam，然後重試。',
+  'hudChrome.steam.wishlist': '在 Steam 上加入願望清單',
+  'hudChrome.steam.wishlistAria': '在 Steam 上加入願望清單：開啟 World of ClaudeCraft 商店頁面',
+  'hudChrome.steam.wishlistShort': '加入願望清單',
   'hudChrome.epic.link': '連結 Epic',
   'hudChrome.epic.unlink': '取消連結 Epic',
   'hudChrome.epic.linked': '已連結 Epic 帳號 {id}',

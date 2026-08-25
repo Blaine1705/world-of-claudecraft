@@ -2926,7 +2926,10 @@ export const fr_FR: EnTranslations = {
       "unlink": "Délier Steam",
       "linked": "Lié au compte Steam {id}",
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
-      "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez."
+      "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

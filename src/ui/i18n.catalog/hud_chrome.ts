@@ -3778,6 +3778,17 @@ export const hudChromeStrings = {
     benefits:
       'Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.',
     noTicket: 'Steam did not provide a link ticket. Start Steam, then try again.',
+    // The always-on wishlist reminder (src/ui/steam_wishlist.ts), a plain
+    // outbound store link with none of the account-link plumbing above it.
+    // `wishlist` is the chip label; `wishlistAria` is its accessible name and
+    // tooltip. It OPENS WITH the visible label on purpose: an accessible name
+    // that does not contain the visible text fails WCAG 2.5.3 (Label in Name)
+    // for speech input, and the mobile pill's short caption is inside it too.
+    wishlist: 'Wishlist on Steam',
+    wishlistAria: 'Wishlist on Steam: open the World of ClaudeCraft store page',
+    // The mobile More-tray caption: a 4-column 40px pill cannot hold the full
+    // label, so the pill shows this and carries `wishlistAria` as its name.
+    wishlistShort: 'Wishlist',
   },
   // Epic account link (the deeds achievement mirror), the stacked card beside
   // the Steam one on character select. Renders only when the server's

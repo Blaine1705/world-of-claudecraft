@@ -5486,6 +5486,91 @@
     display: none !important;
   }
 
+  /* ---------- Steam wishlist reminder ---------- */
+  /* One permanently visible ask, never a takeover. src/ui/steam_wishlist.ts owns
+     the store URL and the policy for who must never see it; the reminder repeats
+     on every surface that already carries Donate (homepage header and footer in
+     shell.css, this in-game rail, and the mobile More tray).
+     What keeps it quiet, and what to preserve if this is ever restyled:
+       - it wears the chrome of the rail it sits in, never Steam's blue as a fill,
+         and never the gold call-to-action fill this HUD reserves for rewards;
+       - it takes quiet silver ink, so the fixed dark plate stays AA-readable
+         even when the surrounding theme switches to light Parchment;
+       - its only motion is a single slow sheen that crosses the plate about once
+         every 14 seconds and spends the rest of the cycle parked off the left
+         edge, so it registers peripherally and never asks to be looked at.
+     Steam's own #66c0f4 arrives on hover and keyboard focus only, identifying the
+     destination the way each sibling link's brand colour already does. */
+  .community-link.steam-wishlist-chip {
+    position: relative;
+    width: auto;
+    gap: 7px;
+    padding: 0 11px;
+    overflow: hidden;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    /* The plate itself is fixed dark across themes, so the ink is fixed too.
+       Parchment's repaired themed token is dark brown for light panels and
+       fails here; this muted silver holds above 7:1 on both gradient stops. */
+    color: #b8bcc8;
+  }
+  .community-link.steam-wishlist-chip span {
+    display: inline;
+    line-height: 1;
+  }
+  .community-link.steam-wishlist-chip .ui-icon {
+    width: 17px;
+    height: 17px;
+  }
+  /* The sheen: a narrow warm highlight swept across the plate once per cycle.
+     Ambient by definition, so it pauses at the low effects tier and under
+     reduced motion, and its duration rides --motion-scale like every other
+     ambient loop in this sheet. */
+  .community-link.steam-wishlist-chip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 36%,
+      rgb(255 238 190 / 22%) 50%,
+      transparent 64%
+    );
+    transform: translateX(-140%);
+    animation: steam-wishlist-sheen 14s linear infinite;
+    animation-duration: calc(14s * var(--motion-scale, 1));
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  @keyframes steam-wishlist-sheen {
+    0%,
+    88% {
+      transform: translateX(-140%);
+    }
+    100% {
+      transform: translateX(140%);
+    }
+  }
+  .community-link.steam-wishlist-chip:hover,
+  .community-link.steam-wishlist-chip:focus-visible {
+    color: #fff;
+    border-color: #66c0f4;
+  }
+  /* Two audiences never see the reminder: a player already inside the Steam
+     build of the desktop app (body.steam-build, stamped from the shell's own
+     answer by syncSteamWishlistVisibility), and the native store shells, which
+     drop outbound store links exactly as they already drop Donate above. This
+     lives in @layer components with !important so it also reaches the shell
+     surfaces in the later @layer shell (important declarations reverse layer
+     order), which is the same mechanism the body.native-app block above uses. */
+  body.steam-wishlist-pending .steam-wishlist,
+  body.native-app .steam-wishlist,
+  body.steam-build .steam-wishlist {
+    display: none !important;
+  }
+
   /* ---------- tooltip ---------- */
   #tooltip {
     position: absolute;
