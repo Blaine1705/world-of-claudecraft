@@ -38,7 +38,7 @@ const ACCEPTED_ART_SHA256 = '3d8cb36726050e3a708720b650744005f4ce23d3ac49c032376
 const SECOND_PASS_RECORD =
   'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json';
 const SECOND_PASS_RECORD_SHA256 =
-  'e14c211fae42369b661a1808415f98bf17ee65f35a516a987071380efac8c72b';
+  '561cff75c06918e37160af2e8e0e55e408fc78e5473625b24b0ae0b670af492e';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -328,7 +328,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         retriedAssets: ['dismiss_pet'],
       },
       runtimeClosure: {
-        abilities: { live: 410, painted: 410 },
+        abilities: { live: 412, painted: 412 },
         hotbarItems: { live: 73, painted: 73 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
@@ -412,7 +412,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
       liveAbilityIds.length,
     );
-    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(410);
+    expect(liveAbilityIds, 'live production ability inventory').toHaveLength(412);
     expect(
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',

@@ -1045,6 +1045,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Festering Venom"
       },
       {
+        "id": "melting_acid",
+        "name": "Melting Acid"
+      },
+      {
+        "id": "nightshade_coating",
+        "name": "Nightshade Coating"
+      },
+      {
         "id": "blind",
         "name": "Dirt Toss"
       },
@@ -8592,8 +8600,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       {
         "id": "recipe_duskhide_wraps",
         "name": "Duskhide Wraps",
-        "skillReq": 75,
-        "tier": 3,
+        "skillReq": 50,
+        "tier": 2,
         "station": "tannery",
         "acquisition": "known",
         "feeCopper": 0,
@@ -8622,9 +8630,9 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         },
         "combo": null,
         "gain": {
-          "reducedAt": 100,
-          "minimalAt": 125,
-          "zeroAt": 150
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
         }
       },
       {
