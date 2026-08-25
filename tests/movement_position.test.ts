@@ -588,14 +588,10 @@ describe('authoritative client movement positions', () => {
   });
 
   it('reacquires an in-sync airborne collision slide on landing', () => {
-    setActiveWorldContent({
-      ...BUILTIN_WORLD,
-      props: { ...BUILTIN_WORLD.props, crates: [[-120, -76]] },
-    });
     const server = setup();
     const client = setup();
-    const heading = 0.4;
-    const start = { x: -120, z: -77.3 };
+    const heading = Math.PI;
+    const start = { x: -180, z: 156 };
     for (const sim of [server.sim, client.sim]) {
       sim.player.pos = {
         x: start.x,
@@ -739,11 +735,11 @@ describe('authoritative client movement positions', () => {
   it('accepts the extra horizontal commit from a shared-controller step-up', () => {
     const { sim, session } = setup();
     const entity = sim.player;
-    entity.pos.x = -26.5;
-    entity.pos.z = -6;
+    entity.pos.x = -146.5;
+    entity.pos.z = 183.5;
     entity.pos.y = terrainHeight(entity.pos.x, entity.pos.z, sim.cfg.seed);
     entity.prevPos = { ...entity.pos };
-    entity.facing = -Math.PI / 2;
+    entity.facing = (3 * Math.PI) / 8;
     const start = { x: entity.pos.x, z: entity.pos.z };
     const endpoint = { x: 0, y: 0, z: 0, blocked: false, stepped: 0 };
     moveCharacter(
@@ -759,8 +755,8 @@ describe('authoritative client movement positions', () => {
       entity.pos.x,
       entity.pos.y,
       entity.pos.z,
-      -0.35,
-      0,
+      Math.sin(entity.facing) * 0.35,
+      Math.cos(entity.facing) * 0.35,
       endpoint,
     );
     expect(endpoint.stepped).toBeGreaterThan(0);
@@ -784,14 +780,20 @@ describe('authoritative client movement positions', () => {
     if (!meta) throw new Error('player metadata missing');
     Object.assign(meta.moveInput, forward);
     sim.tick();
-    expect(entity.pos.x - beforeTick.x).toBeLessThan(-0.3);
-    expect(Math.abs(entity.pos.z - beforeTick.z)).toBeLessThan(0.01);
+    const tickDx = entity.pos.x - beforeTick.x;
+    const tickDz = entity.pos.z - beforeTick.z;
+    expect(tickDx * Math.sin(entity.facing) + tickDz * Math.cos(entity.facing)).toBeGreaterThan(
+      0.3,
+    );
+    expect(
+      Math.abs(tickDx * Math.cos(entity.facing) - tickDz * Math.sin(entity.facing)),
+    ).toBeLessThan(0.01);
   });
 
   it('tracks shared-controller height across inclines and declines', () => {
     for (const route of [
-      { x: -100, z: -34, heading: 0, climbs: false },
-      { x: -100, z: -31.2, heading: Math.PI, climbs: true },
+      { x: 177, z: 159, heading: Math.PI / 2, climbs: false },
+      { x: -117, z: -54, heading: Math.PI / 2, climbs: true },
     ]) {
       const { sim, session } = setup();
       const entity = sim.player;
@@ -854,20 +856,20 @@ describe('authoritative client movement positions', () => {
   it('keeps the real movement kernel height while crossing a prop rim', () => {
     setActiveWorldContent({
       ...BUILTIN_WORLD,
-      props: { ...BUILTIN_WORLD.props, crates: [[-120, -76]] },
+      props: { ...BUILTIN_WORLD.props, crates: [[0, 0]] },
     });
     const server = setup();
     const client = setup();
     const start = {
-      x: -120,
-      y: floorHeightAt(42, -120, -76, PLAYER_BODY_RADIUS, Number.POSITIVE_INFINITY),
-      z: -76,
+      x: -0.8,
+      y: floorHeightAt(42, -0.8, -0.2, PLAYER_BODY_RADIUS, Number.POSITIVE_INFINITY),
+      z: -0.2,
     };
     expect(start.y).toBeGreaterThan(terrainHeight(start.x, start.z, 42) + 0.5);
     for (const sim of [server.sim, client.sim]) {
       sim.player.pos = { ...start };
       sim.player.prevPos = { ...start };
-      sim.player.facing = 0;
+      sim.player.facing = Math.PI / 2;
       sim.player.onGround = true;
     }
     const clientMeta = client.sim.meta(client.sim.player.id);
@@ -978,7 +980,7 @@ describe('authoritative client movement positions', () => {
     const entity = sim.player;
     entity.mountKey = 'valorsteed';
     entity.pos.x = -180;
-    entity.pos.z = 142;
+    entity.pos.z = 145.01;
     entity.pos.y = terrainHeight(entity.pos.x, entity.pos.z, sim.cfg.seed);
     entity.prevPos = { ...entity.pos };
     entity.facing = Math.PI;
@@ -1007,8 +1009,8 @@ describe('authoritative client movement positions', () => {
   it('accepts an endpoint produced by the shared collision solver', () => {
     const { sim, session } = setup();
     const entity = sim.player;
-    entity.pos.x = -21.668;
-    entity.pos.z = 17.88;
+    entity.pos.x = -11;
+    entity.pos.z = 22.3;
     entity.pos.y = terrainHeight(entity.pos.x, entity.pos.z, sim.cfg.seed);
     entity.prevPos = { ...entity.pos };
     const start = { x: entity.pos.x, z: entity.pos.z };
