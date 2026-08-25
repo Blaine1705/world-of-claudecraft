@@ -35,11 +35,11 @@ function makeSim(cls: PlayerClass, level: number): { sim: AnySim; p: AnyEntity; 
   return { sim, p, meta: sim.players.get(p.id) };
 }
 
-function spawnTarget(sim: AnySim, p: AnyEntity, level: number): AnyEntity {
+function spawnTarget(sim: AnySim, p: AnyEntity, level: number, distance = 3): AnyEntity {
   const mob = createMob(sim.nextId++, MOBS.forest_wolf, level, {
     x: p.pos.x,
     y: p.pos.y,
-    z: p.pos.z + 3,
+    z: p.pos.z + distance,
   }) as AnyEntity;
   mob.maxHp = 5000;
   mob.hp = 5000;
@@ -64,6 +64,11 @@ function finishCast(sim: AnySim, p: AnyEntity, meta: any): void {
 
 function damageOn(events: any[], target: AnyEntity): any[] {
   return events.filter((e) => e.type === 'damage').filter((e) => e.targetId === target.id);
+}
+
+function advanceProjectiles(sim: AnySim): void {
+  let n = 0;
+  while (sim.ctx.pendingProjectiles.length > 0 && n++ < 1000) sim.tick();
 }
 
 describe('instant hostile spells roll spell resist', () => {
@@ -150,6 +155,35 @@ describe('physical directDamage rolls a swing miss', () => {
     expect(mob.hp).toBe(hpBefore);
     // Pulling the mob seeds AGGRO_SEED_THREAT; a miss adds no damage threat on top.
     expect(mob.threat.get(p.id) ?? 0).toBe(AGGRO_SEED_THREAT);
+  });
+
+  it('a missed physical direct hit skips later target effects in the same payload', () => {
+    const { sim, p, meta } = makeSim('warrior', 12);
+    const mob = spawnTarget(sim, p, 15);
+    sim.rng.next = () => ALWAYS;
+
+    const events = capture(sim);
+    castAbility(sim.ctx, 'hamstring', p.id);
+    finishCast(sim, p, meta);
+
+    expect(damageOn(events, mob).some((e) => e.kind === 'miss')).toBe(true);
+    expect(mob.auras.some((a) => a.id === 'hamstring_slow')).toBe(false);
+  });
+
+  it('a missed physical projectile direct hit skips hit-gated resource returns', () => {
+    const { sim, p, meta } = makeSim('hunter', 12);
+    expect(sim.setSpec('marksmanship', p.id)).toBe(true);
+    const mob = spawnTarget(sim, p, 15, 10);
+    p.resource = 0;
+    sim.rng.next = () => ALWAYS;
+
+    const events = capture(sim);
+    castAbility(sim.ctx, 'measured_shot', p.id);
+    finishCast(sim, p, meta);
+    advanceProjectiles(sim);
+
+    expect(damageOn(events, mob).some((e) => e.kind === 'miss')).toBe(true);
+    expect(p.resource).toBe(0);
   });
 
   it('enough Hit rating removes the miss entirely for the same physical special', () => {

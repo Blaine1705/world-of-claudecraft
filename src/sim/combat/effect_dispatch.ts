@@ -562,7 +562,7 @@ export function runEffects(
   // consuming its Doom pool after the cast is committed.
 
   let targetBuffIndex = 0;
-  for (const eff of res.effects) {
+  effects: for (const eff of res.effects) {
     switch (eff.type) {
       case 'destructionConflagrate': {
         if (target) advanceBurningPactTick(ctx, p, target);
@@ -748,7 +748,7 @@ export function runEffects(
             kind: 'miss',
           });
           ctx.enterCombat(p, target);
-          break;
+          break effects;
         }
         const rooted = isRootedOrChilled(target);
         const abilityMod = mods.abilities[ability.id];
