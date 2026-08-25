@@ -11324,9 +11324,7 @@ export class Sim {
     return this.market.marketInfoFor(pid);
   }
 
-  // Server-only broadcast helper (never IWorld, the guildBankInfoForGuild
-  // precedent): the cheap change signal server/game.ts polls before paying for
-  // a marketInfoFor rebuild. Null while the player is not at a Merchant.
+  // Server-only (guildBankInfoForGuild shape): the cheap poll before a marketInfoFor rebuild.
   marketBrowseRevFor(pid: number): number | null {
     return this.market.browseRevFor(pid);
   }
@@ -11349,10 +11347,8 @@ export class Sim {
   // The Ravenpost: in-game mail
   // -------------------------------------------------------------------------
 
-  // Thin delegates to the PostOffice instance (this.postOffice), which owns the
-  // mail book / id counter / mailbox entity ids (mail/post_office.ts, the
-  // market.ts shape). server/game.ts and the IWorld surface call these
-  // unchanged; the inventory hub stays on Sim, reached via the SimContext.
+  // Thin delegates to PostOffice (this.postOffice), the mail book/id-counter/
+  // mailbox-ids owner (mail/post_office.ts, the market.ts shape).
 
   mailSend(
     to: string,
@@ -11393,16 +11389,12 @@ export class Sim {
     return this.postOffice.mailInfoFor(pid);
   }
 
-  // Server-only broadcast helper (never IWorld, the marketBrowseRevFor shape):
-  // the cheap change signal server/game.ts polls before paying for a
-  // mailInfoFor rebuild. Null while the player is not at a raven pillar.
+  // Server-only (marketBrowseRevFor shape): the cheap poll before a mailInfoFor rebuild.
   mailRevFor(pid: number): number | null {
     return this.postOffice.mailRevFor(pid);
   }
 
-  // Custody mail (the server's $WOC Exchange escrow returns and deliveries):
-  // thin delegates so a foreign caller resolves these on the Sim facade like
-  // every other mail entry, instead of reaching into sim.postOffice directly.
+  // Custody mail ($WOC Exchange escrow returns and deliveries).
   mailSystemParcel(
     recipient: { key: string; name: string },
     letter: import('./content/letters').LetterDef,
@@ -11431,6 +11423,14 @@ export class Sim {
 
   serializeMail(): MailSave {
     return this.postOffice.serializeMail();
+  }
+
+  takeDirtyMailPartitions(): { recipientKey: string; letters: MailSave['mail'] }[] {
+    return this.postOffice.takeDirtyMailPartitions();
+  }
+
+  markMailPartitionsDirty(recipientKeys: readonly string[]): void {
+    this.postOffice.markPartitionsDirty(recipientKeys);
   }
 
   loadMail(save: MailSave | null | undefined): void {

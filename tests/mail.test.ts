@@ -5,7 +5,12 @@
 
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
+import {
+  HEROIC_MARK_LETTER,
+  QUEST_LETTERS,
+  WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+} from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
@@ -14,6 +19,7 @@ import {
   MAIL_MAX_ATTACHMENTS,
   MAIL_POSTAGE,
 } from '../src/sim/mail/post_office';
+import type { MailSave } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent, WorldContent } from '../src/sim/types';
 
@@ -728,6 +734,428 @@ describe('persistence and rename', () => {
     const row = save.mail.find((m) => m.subject === 'Hi');
     expect(row?.recipientKey).toBe('777');
     expect(row?.recipientName).toBe('Newname');
+  });
+});
+
+// #3561: the incremental autosave seam. A missed dirty mark here is a
+// production data-loss bug (a mailbox mutation that never reaches durable
+// storage), so these prove EXACT dirty sets, and one end-to-end scenario
+// proves the whole partitioned-save/load round trip lands the same book a
+// full serializeMail/loadMail cycle would.
+describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
+  it('a fresh player dirties exactly their own welcome-letter partition; the next call is quiet', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const dirty = sim.takeDirtyMailPartitions();
+    expect(dirty).toHaveLength(1);
+    expect(dirty[0].letters.some((m) => m.subject === WELCOME_LETTER.subject)).toBe(true);
+    expect(sim.mailUnreadFor(alice)).toBeGreaterThan(0); // sanity: the welcome letter is real
+
+    // A quiet interval with no further mail activity reports nothing.
+    expect(sim.takeDirtyMailPartitions()).toEqual([]);
+  });
+
+  it('sending a letter dirties only the actual recipient, not the sender or any bystander', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const carol = sim.addPlayer('rogue', 'Carol');
+    sim.takeDirtyMailPartitions(); // drain the three welcome letters
+
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Ping', 'Pong.', 500, [], alice);
+
+    const dirty = sim.takeDirtyMailPartitions();
+    const dirtyKeys = dirty.map((p) => p.recipientKey);
+    expect(dirtyKeys).toHaveLength(1);
+    const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
+    const carolKey = sim.postOffice.mailKeyFor(sim.meta(carol)!);
+    expect(dirtyKeys).toEqual([bobKey]);
+    expect(dirtyKeys).not.toContain(carolKey);
+    expect(dirty[0].letters.some((m) => m.subject === 'Ping')).toBe(true);
+    void bob;
+  });
+
+  it('rekeyMailOwner dirties a letter whose ONLY change is its outgoing sender stamp (recipientKey untouched)', () => {
+    const sim = makeWorld();
+    // A pre-senderKey legacy letter (no senderKey field): the renaming
+    // character sent it to a THIRD party before senderKey existed. Its
+    // recipientKey never moves, so index.rekey/track/untrack never sees it;
+    // only the explicit markDirty in the sender-stamp branch covers it.
+    sim.loadMail({
+      mail: [
+        {
+          recipientKey: 'thirdparty',
+          recipientName: 'ThirdParty',
+          senderName: 'Ghost',
+          kind: 'player',
+          subject: 'Old outgoing letter',
+          body: 'x',
+          copper: 0,
+          delaySeconds: 0,
+          items: [],
+        },
+      ],
+    } as never);
+    expect(sim.takeDirtyMailPartitions()).toEqual([]); // load reconstructs, dirties nothing
+
+    expect(sim.rekeyMailOwner(999, 'Ghost', 'Renamed')).toBe(true);
+
+    const dirty = sim.takeDirtyMailPartitions();
+    expect(dirty.map((p) => p.recipientKey)).toEqual(['thirdparty']);
+    const letter = dirty[0].letters.find((m) => m.subject === 'Old outgoing letter');
+    // Prove the dirty mark was actually necessary: real content changed.
+    expect(letter?.senderKey).toBe('999');
+    expect(letter?.senderName).toBe('Renamed');
+  });
+
+  it('purgeMailOwner dirties a letter whose ONLY change is its outgoing sender stamp', () => {
+    const sim = makeWorld();
+    sim.loadMail({
+      mail: [
+        {
+          recipientKey: 'thirdparty',
+          recipientName: 'ThirdParty',
+          senderName: 'Doomed',
+          kind: 'player',
+          subject: 'Old outgoing letter',
+          body: 'x',
+          copper: 0,
+          delaySeconds: 0,
+          items: [],
+        },
+      ],
+    } as never);
+    sim.takeDirtyMailPartitions();
+
+    expect(sim.purgeMailOwner(4242, 'Doomed')).toBe(true);
+
+    const dirty = sim.takeDirtyMailPartitions();
+    expect(dirty.map((p) => p.recipientKey)).toEqual(['thirdparty']);
+    expect(dirty[0].letters[0].senderKey).toBe('4242');
+  });
+
+  it('a repeated rename that leaves recipientKey unchanged still dirties the row (the recipientName restamp)', () => {
+    const sim = makeWorld();
+    // Already id-keyed: a rename already happened in a prior session.
+    sim.loadMail({
+      mail: [
+        {
+          recipientKey: '555',
+          recipientName: 'OldDisplay',
+          senderName: 'System',
+          kind: 'system',
+          subject: 'Already id-keyed',
+          body: 'x',
+          copper: 0,
+          delaySeconds: 0,
+          items: [],
+        },
+      ],
+    } as never);
+    expect(sim.takeDirtyMailPartitions()).toEqual([]);
+
+    // index.rekey('555' -> '555') is a documented no-op and marks nothing by
+    // itself; only the explicit markDirty after it catches this restamp.
+    expect(sim.rekeyMailOwner(555, 'OldDisplay', 'NewDisplay')).toBe(true);
+
+    const dirty = sim.takeDirtyMailPartitions();
+    expect(dirty.map((p) => p.recipientKey)).toEqual(['555']);
+    expect(dirty[0].letters[0].recipientName).toBe('NewDisplay');
+  });
+
+  it('mailTake on an ALREADY-READ letter still dirties the partition (regression: gold/item duplication across a restart)', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Gift', 'For you.', 500, [], alice);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    sim.takeDirtyMailPartitions(); // drain the send + delivery
+
+    moveToMailbox(sim, bob);
+    // biome-ignore lint/suspicious/noExplicitAny: read the live book to find the id.
+    const giftId = (sim.postOffice as any).mail.find(
+      (m: { subject: string }) => m.subject === 'Gift',
+    ).id as number;
+
+    // The ordinary UI flow: opening a letter (mailbox_window.ts) reads it
+    // FIRST, as its own separate action; Take is a second, later click.
+    sim.mailMarkRead(giftId, bob);
+    sim.takeDirtyMailPartitions(); // drain the read flip; Take starts from a clean dirty set
+
+    sim.mailTake(giftId, bob);
+    const dirty = sim.takeDirtyMailPartitions();
+    const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
+    expect(dirty.map((p) => p.recipientKey)).toEqual([bobKey]);
+    const persisted = dirty[0].letters.find((m) => m.id === giftId);
+    // The persisted snapshot must actually reflect the take (copper gone),
+    // not the stale pre-take state a missed dirty mark would leave behind.
+    expect(persisted?.copper).toBe(0);
+  });
+
+  it("loadMail's soulbound-return migration keeps BOTH halves dirty (regression: re-runs forever / duplicates the item)", () => {
+    const sim = makeWorld();
+    // A legacy player parcel carrying a soulbound item: loadMail auto-splits
+    // it into a return-to-sender parcel (the item can never stay with a
+    // recipient it was mailed to under the modern soulbound rule).
+    sim.loadMail({
+      mail: [
+        {
+          recipientKey: '100',
+          recipientName: 'Later',
+          senderName: 'Ghost',
+          senderKey: '200',
+          kind: 'player',
+          subject: 'Old parcel',
+          body: 'x',
+          copper: 0,
+          delaySeconds: 0,
+          items: [{ itemId: 'reins_terrorspark_groundshaker', count: 1 }],
+        },
+      ],
+    } as never);
+
+    const dirty = sim.takeDirtyMailPartitions();
+    // '100' (the item stripped off) and '200' (the new return parcel) must
+    // BOTH be dirty: neither half of this migration is durable state yet.
+    // A missed mark here means it silently re-runs (minting a fresh return
+    // parcel with a new id) on every future boot, and can duplicate the item
+    // once the other half is later dirtied by something unrelated.
+    expect(dirty.map((p) => p.recipientKey).sort()).toEqual(['100', '200']);
+    const stripped = dirty
+      .find((p) => p.recipientKey === '100')
+      ?.letters.find((m) => m.subject === 'Old parcel');
+    expect(stripped?.items).toEqual([]);
+    const returned = dirty.find((p) => p.recipientKey === '200')?.letters[0];
+    expect(returned?.items).toEqual([{ itemId: 'reins_terrorspark_groundshaker', count: 1 }]);
+  });
+
+  it('round-trips to the EXACT same book as a full serializeMail, across a realistic mutation sequence', () => {
+    // A tiny fake per-recipient store mirroring server/db.ts's
+    // saveMailPartitions (write only what's dirty) + loadMailState (union
+    // every row back into one book).
+    const store = new Map<string, MailSave['mail']>();
+    const applyDirty = (): void => {
+      for (const { recipientKey, letters } of sim.takeDirtyMailPartitions()) {
+        store.set(recipientKey, letters);
+      }
+    };
+    const reconstructed = (): MailSave['mail'] =>
+      [...store.values()].flat().sort((a, b) => a.id - b.id);
+    const fullBook = (): MailSave['mail'] =>
+      [...sim.serializeMail().mail].sort((a, b) => a.id - b.id);
+    const assertInSync = (): void => expect(reconstructed()).toEqual(fullBook());
+
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    applyDirty();
+    assertInSync(); // two welcome letters, two partitions
+
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Ping', 'Pong.', 500, [], alice);
+    applyDirty();
+    assertInSync(); // a fresh send
+
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    applyDirty(); // delivery landing touches nothing persisted (deliverAt was already stored)
+    assertInSync();
+
+    moveToMailbox(sim, bob);
+    // biome-ignore lint/suspicious/noExplicitAny: read the live book to find the id, same idiom as the marker-load test above.
+    const pingId = (sim.postOffice as any).mail.find(
+      (m: { subject: string }) => m.subject === 'Ping',
+    ).id as number;
+    sim.mailTake(pingId, bob);
+    applyDirty();
+    assertInSync(); // take drops the attachment and flips read
+
+    expect(sim.rekeyMailOwner(bob, 'Bob', 'Robert')).toBe(true);
+    applyDirty();
+    assertInSync(); // rename re-keys Bob's own bucket
+
+    expect(sim.purgeMailOwner(alice, 'Alice')).toBe(true);
+    applyDirty();
+    assertInSync(); // deletion drops Alice's now-plain welcome letter
+  });
+
+  it('an untouched escrow letter is periodically re-dirtied so its persisted secondsLeft never drifts unboundedly', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Gift', 'For you.', 500, [], alice); // carries copper: an escrow
+    const sentAtDirty = sim.takeDirtyMailPartitions();
+    const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
+    const initialSecondsLeft = sentAtDirty
+      .find((p) => p.recipientKey === bobKey)
+      ?.letters.find((m) => m.subject === 'Gift')?.secondsLeft;
+    expect(initialSecondsLeft).toBeGreaterThan(0);
+
+    // No mutation touches Bob's mailbox for longer than the refresh cadence:
+    // without the periodic re-dirty, this quiet letter's on-disk copy would
+    // freeze at initialSecondsLeft forever (until something else about this
+    // mailbox changes), understating real elapsed time across a restart.
+    tickFor(sim, 40); // > MAIL_ESCROW_REFRESH_SECONDS (25)
+
+    const refreshedDirty = sim.takeDirtyMailPartitions();
+    const refreshedKeys = refreshedDirty.map((p) => p.recipientKey);
+    expect(refreshedKeys).toContain(bobKey);
+    const refreshedSecondsLeft = refreshedDirty
+      .find((p) => p.recipientKey === bobKey)
+      ?.letters.find((m) => m.subject === 'Gift')?.secondsLeft;
+    // Strictly less than the send-time value: the countdown actually advanced
+    // in the persisted snapshot, not just in the live in-memory letter.
+    expect(refreshedSecondsLeft).toBeLessThan(initialSecondsLeft as number);
+  });
+
+  it('a plain (no-escrow) letter is NEVER swept by the periodic refresh, keeping the fix cheap', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    moveToMailbox(sim, alice);
+    sim.mailSend('Bob', 'Chat', 'Hey there.', 0, [], alice); // no copper, no items
+    sim.takeDirtyMailPartitions();
+    const bobKey = sim.postOffice.mailKeyFor(sim.meta(bob)!);
+
+    // Same elapsed time as the escrow test above, same recipient, but nothing
+    // ever touches this mailbox again: the periodic sweep must skip it
+    // (its finite 14-day plain-letter expiry would otherwise sweep almost
+    // the entire book every cycle, reopening the whole-book cost this design
+    // exists to cut).
+    tickFor(sim, 40);
+    expect(sim.takeDirtyMailPartitions().map((p) => p.recipientKey)).not.toContain(bobKey);
+  });
+
+  it('a dirty write touches only the changed recipient, never the rest of a large book (the #3561 cost claim)', () => {
+    const sim = makeWorld();
+    // A wide but shallow book: many recipients, one letter each, none of them
+    // dirtied by the mutation under test.
+    const bystanders = Array.from({ length: 500 }, (_, i) => ({
+      recipientKey: `bystander-${i}`,
+      recipientName: `Bystander${i}`,
+      senderName: 'System',
+      kind: 'system' as const,
+      subject: 'Filler',
+      body: '',
+      copper: 0,
+      delaySeconds: 0,
+      items: [],
+    }));
+    sim.loadMail({ mail: bystanders } as never);
+    sim.takeDirtyMailPartitions();
+
+    const alice = sim.addPlayer('warrior', 'Alice'); // dirties exactly Alice's own welcome letter
+    const dirty = sim.takeDirtyMailPartitions();
+    expect(dirty).toHaveLength(1); // not 501: cost is proportional to what changed
+    void alice;
+  });
+
+  it('at 150k-letter production scale, a dirty write is well under the old whole-book serialize cost (#3561 acceptance criterion)', () => {
+    // Mirrors the scale issue #3561 measured on prod (134,431 letters, ~250ms
+    // JSON.stringify alone) and its own acceptance criterion: "With a
+    // synthetic 150k-letter book, the per-cycle main-thread block is under
+    // 10ms". Shape: 15,000 recipients x 10 letters each, plain system mail
+    // (no escrow), the same "static junk" shape the bot-welcome-letter
+    // problem (#3560) actually produced.
+    const RECIPIENTS = 15_000;
+    const LETTERS_PER_RECIPIENT = 10;
+    const bulk: {
+      recipientKey: string;
+      recipientName: string;
+      senderName: string;
+      kind: 'system';
+      subject: string;
+      body: string;
+      copper: number;
+      delaySeconds: number;
+      items: never[];
+    }[] = [];
+    for (let r = 0; r < RECIPIENTS; r++) {
+      for (let n = 0; n < LETTERS_PER_RECIPIENT; n++) {
+        bulk.push({
+          recipientKey: `bot-${r}`,
+          recipientName: `Bot${r}`,
+          senderName: 'Ravenpost',
+          kind: 'system',
+          subject: 'The ravens now fly for you',
+          body: 'Welcome to ClaudeCraft. Visit any Raven Pillar to check your mail.',
+          copper: 0,
+          delaySeconds: 0,
+          items: [],
+        });
+      }
+    }
+    const sim = makeWorld();
+    sim.loadMail({ mail: bulk } as never);
+    expect(sim.serializeMail().mail.length).toBe(RECIPIENTS * LETTERS_PER_RECIPIENT);
+
+    // The OLD design's per-cycle cost: re-serialize the ENTIRE book every
+    // autosave regardless of what changed.
+    const fullStart = performance.now();
+    const fullJson = JSON.stringify(sim.serializeMail());
+    const fullMs = performance.now() - fullStart;
+
+    // A single real player mutates their OWN mailbox (a plain send): the
+    // ONLY thing a real 30s window would actually need to persist. Resolved
+    // send (mailSendResolved), not name lookup: 'bot-0' exists only as raw
+    // loaded mail data here, not a real Sim character to resolve by name.
+    const alice = sim.addPlayer('warrior', 'Alice');
+    moveToMailbox(sim, alice);
+    sim.meta(alice)!.copper = 100;
+    sim.mailSendResolved({ key: 'bot-0', name: 'Bot0' }, 'Hi', 'A note.', 50, [], alice);
+
+    // The NEW design's per-cycle cost: only the dirty partitions.
+    const dirtyStart = performance.now();
+    const dirty = sim.takeDirtyMailPartitions();
+    const dirtyJson = JSON.stringify(dirty);
+    const dirtyMs = performance.now() - dirtyStart;
+
+    // Exactly the two recipients this send actually touched (Alice's welcome
+    // letter's box, and Bot0's box receiving the new letter), never the
+    // other 14,998 untouched mailboxes.
+    expect(dirty.map((p) => p.recipientKey).sort()).toEqual([String(alice), 'bot-0'].sort());
+    expect(dirtyJson.length).toBeLessThan(fullJson.length / 100); // >100x smaller payload
+    expect(dirtyMs).toBeLessThan(10); // the #3561 acceptance bound
+    expect(dirtyMs).toBeLessThan(fullMs); // and strictly cheaper than the old approach it replaces
+  });
+
+  it('a custody parcel keeps its book-once custodyRef through the incremental partition write', () => {
+    // Regression: the extracted serializeLetter() helper this partition write
+    // rides (PostOffice.takeDirtyMailPartitions) originally dropped
+    // custodyRef, which would have silently un-booked every $WOC Exchange
+    // parcel on the next restart and let a retry double-deliver it.
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    sim.takeDirtyMailPartitions(); // drain the welcome letter
+
+    const meta = sim.meta(alice);
+    if (!meta) throw new Error('no meta');
+    sim.postOffice.mailSystemParcel(
+      { key: sim.postOffice.mailKeyFor(meta), name: meta.name },
+      WOC_MARKET_DELIVERY_LETTER,
+      [{ itemId: 'rusty_hatchet', count: 1, slot: 3 }],
+      'woc_ref_test_1',
+    );
+
+    const dirty = sim.takeDirtyMailPartitions();
+    const letter = dirty
+      .flatMap((p) => p.letters)
+      .find((m) => m.subject === WOC_MARKET_DELIVERY_LETTER.subject);
+    expect(letter?.custodyRef).toBe('woc_ref_test_1');
   });
 });
 

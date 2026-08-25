@@ -75,7 +75,7 @@ import {
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
+import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -190,7 +190,6 @@ import {
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
-  saveMailState,
   saveMarketState,
   saveRiftState,
   setAccountWeaponSkinLoadout,
@@ -277,6 +276,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   applyMobScanTick,
@@ -4394,6 +4394,7 @@ export class GameServer {
         // attributable even though carriedGuildBankSeqs is filled only once
         // the queued closure actually runs.
         const carriesGuildBooks = session.dirtyGuildBanks.size > 0;
+        let mailPartitionsForRearm: { recipientKey: string; letters: MailSave['mail'] }[] = []; // outer scope: catch arm re-arms on failure
         if (opts.withMarket || carriesGuildBooks) {
           // Atomic on the leave path so a logout bag-flush can never tear away
           // from the global Market escrow (see saveCharacterAndMarketState),
@@ -4419,13 +4420,14 @@ export class GameServer {
               const fresh = this.sim.serializeCharacter(session.pid);
               const snap = fresh ? applyFixups(fresh) : state;
               persistedLevel = snap.level;
+              if (opts.withMarket) mailPartitionsForRearm = this.sim.takeDirtyMailPartitions();
               return opts.withMarket
                 ? saveCharacterAndMarketState(
                     session.characterId,
                     snap.level,
                     snap,
                     this.sim.serializeMarket(),
-                    this.sim.serializeMail(),
+                    mailPartitionsForRearm,
                     session.leaseNonce,
                     collectDeltas(),
                     guildBankResults,
@@ -4440,8 +4442,8 @@ export class GameServer {
                   );
             });
           } catch (err) {
-            // The whole escrow rolled back: the character half AND every book
-            // half. The live sim is now ahead of durable truth for those books
+            rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // mail half of the rollback
+            // The live sim is now ahead of durable truth for those books
             // until a later save or a reconcile lands, which is exactly the
             // window the dupe guards live in, so it must be visible in
             // production, not only in a log line. The counter observes, it
@@ -4495,6 +4497,7 @@ export class GameServer {
         // saves. Only an explicit false is a fence-out: the no-nonce legacy path
         // returns true, so a strict comparison never mistakes an ordinary save for one.
         if (saved === false) {
+          rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // false, not a throw: catch's rearm never ran
           // Same dupe-sensitive shape as the throw above, reached the other
           // way: the write matched no row, so nothing persisted. Counted only
           // when this save actually carried books (an ordinary fenced-out
@@ -4678,9 +4681,6 @@ export class GameServer {
     }
   }
 
-  // The Ravenpost mail book: shared global state like the market, persisted as
-  // a single per-realm JSONB blob. Writes ride the market queue so a mail
-  // snapshot can never interleave with the atomic leave-path write.
   async loadMail(): Promise<void> {
     try {
       this.sim.loadMail(await loadMailState());
@@ -4690,11 +4690,7 @@ export class GameServer {
   }
 
   async saveMail(): Promise<void> {
-    try {
-      await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
-    } catch (err) {
-      console.error('failed to save mail:', err);
-    }
+    await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, false);
   }
 
   // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book
@@ -6025,8 +6021,10 @@ export class GameServer {
     await this.saveCharacter(session);
   }
 
+  // The WocCustodyGameHost durability caller (server/woc_market_custody.ts):
+  // unlike saveMail(), a write failure must propagate.
   async persistMailBlob(): Promise<void> {
-    await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+    await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, true);
   }
 
   // Force-close every live session for the account. A bearer token is a reusable

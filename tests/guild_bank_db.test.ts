@@ -20,6 +20,7 @@ import {
   GUILD_BANK_ROW_MAX_BYTES,
   type GuildBankWriteResult,
   loadGuildBankRows,
+  openMailPartitionWriteGate,
   openMarketWriteGate,
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
@@ -33,6 +34,7 @@ beforeEach(() => {
   dbMock.connect.mockReset();
   dbMock.query.mockResolvedValue({ rows: [], rowCount: 0 } as never);
   openMarketWriteGate();
+  openMailPartitionWriteGate();
 });
 
 function clientStub(rowCounts?: (sql: string) => number) {
@@ -50,7 +52,10 @@ const STATE = {
   inventory: [],
 } as unknown as CharacterState;
 const MARKET = { listings: [] } as unknown as MarketSave;
-const MAIL = { mail: [] } as unknown as MailSave;
+// These tests exercise the guild-bank-carrying transaction shape, not mail
+// content, so an empty partitions array (no dirty mailbox this session) is
+// the right fixture: it issues no mail SQL, matching every assertion below.
+const MAIL_PARTITIONS: { recipientKey: string; letters: MailSave['mail'] }[] = [];
 const BOOK = {
   treasury: 1500,
   inventory: [{ itemId: 'wolf_fang', count: 2 }],
@@ -218,11 +223,11 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
 });
 
 describe('saveCharacterAndMarketState carrying guild books (the leave flush)', () => {
-  it('the books land inside the SAME transaction as character + market + mail', async () => {
+  it('the books land inside the SAME transaction as character + market (no dirty mail this session)', async () => {
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
 
-    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, undefined, [SAVE_7]);
+    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS, undefined, [SAVE_7]);
 
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls[0]).toMatch(/^BEGIN/);
@@ -234,7 +239,7 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
   it('omitting the parameter keeps the pre-guild-bank write set (back-compat)', async () => {
     const client = clientStub(() => 1);
     dbMock.connect.mockResolvedValueOnce(client as never);
-    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL);
+    await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS);
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /guild_banks/i.test(s))).toBe(false);
   });
@@ -242,7 +247,9 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
   it('a fence miss on the leave flush writes no book row either', async () => {
     const client = clientStub((sql) => (/UPDATE characters/i.test(sql) ? 0 : 1));
     dbMock.connect.mockResolvedValueOnce(client as never);
-    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'stale', [SAVE_7]);
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS, 'stale', [
+      SAVE_7,
+    ]);
     expect(ok).toBe(false);
     const sqls = client.query.mock.calls.map((c) => String(c[0]));
     expect(sqls.some((s) => /guild_banks/i.test(s))).toBe(false);
