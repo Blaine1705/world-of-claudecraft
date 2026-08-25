@@ -126,6 +126,7 @@ export interface FrameRecord {
   mirrorY: number;
   mirrorZ: number;
   alpha: number;
+  lastSnapAt: number;
   echoMs: number;
   jitterMs: number;
   selfAlphaLead: number;
@@ -504,6 +505,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       mirrorY: pe.pos.y,
       mirrorZ: pe.pos.z,
       alpha,
+      lastSnapAt: client.lastSnapAt,
       echoMs: inputEcho.echoMs,
       jitterMs: inputEcho.jitterMs,
       selfAlphaLead,

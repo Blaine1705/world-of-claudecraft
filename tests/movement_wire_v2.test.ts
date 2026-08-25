@@ -30,6 +30,7 @@ import { bareClient } from './helpers/bare_client';
 import type { LatencyLinkConfig } from './helpers/latency_link';
 import { joinGroundTruthCharacter } from './helpers/movement_ground_truth';
 import { createOnlineHarness } from './helpers/online_harness';
+import { stripComments } from './helpers/strip_comments';
 
 function link(rttMs: number, jitterMs: number): LatencyLinkConfig {
   return {
@@ -40,7 +41,9 @@ function link(rttMs: number, jitterMs: number): LatencyLinkConfig {
 
 describe('movement wire v2', () => {
   it('pins production consumption immediately before the simulation tick', () => {
-    const source = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const source = stripComments(
+      readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8'),
+    );
     const call = 'consumeMovementFramesV2(this.sim, this.clients.values());';
     const loopStart = source.indexOf('this.interval = setInterval');
     const consumeAt = source.indexOf(call, loopStart);
@@ -51,15 +54,28 @@ describe('movement wire v2', () => {
     expect(consumeAt).toBeLessThan(tickAt);
   });
 
+  it('registers the movement profiler bucket', () => {
+    const source = stripComments(
+      readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8'),
+    );
+    const registrationStart = source.indexOf('new TickProfiler([');
+    expect(registrationStart).toBeGreaterThanOrEqual(0);
+    const registrationEnd = source.indexOf(']);', registrationStart);
+    expect(registrationEnd).toBeGreaterThan(registrationStart);
+
+    expect(source.slice(registrationStart, registrationEnd)).toContain("'movementV2'");
+  });
+
   it('attributes v2 timeline and override work to the movement profiler bucket', () => {
-    const source = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const source = stripComments(
+      readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8'),
+    );
     const consumeAt = source.indexOf('consumeMovementFramesV2(this.sim, this.clients.values());');
     const tickAt = source.indexOf('const events = this.sim.tick();', consumeAt);
     const overrideAt = source.indexOf('updateOverrideEpochs(this.sim, this.clients.values());');
     const firstMovementLap = source.indexOf("lap('movementV2');", consumeAt);
     const secondMovementLap = source.indexOf("lap('movementV2');", firstMovementLap + 1);
 
-    expect(source).toContain("'movementV2'");
     expect(firstMovementLap).toBeGreaterThan(consumeAt);
     expect(firstMovementLap).toBeLessThan(tickAt);
     expect(secondMovementLap).toBeGreaterThan(overrideAt);
@@ -201,7 +217,7 @@ describe('movement wire v2', () => {
         ],
       });
 
-      expect(receivedInputs.length).toBeGreaterThan(0);
+      expect(receivedInputs.length).toBeGreaterThanOrEqual(15);
       expect(receivedInputs.every((frame) => Number.isSafeInteger(frame.ct))).toBe(true);
     } finally {
       harness.dispose();

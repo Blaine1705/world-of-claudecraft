@@ -65,13 +65,13 @@ import { stripComments } from './helpers/strip_comments';
 // UPDATE_MOVEMENT_BASELINE_DOC only regenerates the committed MARKDOWN from
 // BASELINE; the numbers themselves are always a human transcribing a run.
 //
-// STRICT (the default since the reconciliation rework landed) asserts every
-// cell against MOVEMENT_FEEL_TARGETS (and MOVEMENT_FEEL_TARGETS_CC where the
-// server legitimately overrides the client) ON TOP of the baseline pins: the
-// pins catch any silent change in either direction, the targets are the feel
-// bar itself. STRICT_MOVEMENT_TARGETS=0 drops back to pins-only while
-// iterating on a movement change that has not yet re-met the bar; the merge
-// gate always runs with the default.
+// Every cell always runs its baseline pin. STRICT (the default since the
+// reconciliation rework landed) additionally asserts MOVEMENT_FEEL_TARGETS
+// (and MOVEMENT_FEEL_TARGETS_CC where the server legitimately overrides the
+// client). The pins catch any silent change in either direction, and the
+// targets are the feel bar itself. STRICT_MOVEMENT_TARGETS=0 runs pins only
+// while iterating on a movement change that has not yet re-met the bar; the
+// merge gate always runs with the default.
 
 const STRICT = process.env.STRICT_MOVEMENT_TARGETS !== '0';
 const UPDATE_TABLE = process.env.UPDATE_MOVEMENT_BASELINE_DOC === '1';
@@ -228,6 +228,7 @@ interface CellResult {
   run: HarnessRun;
   truth: GroundTruthSample[];
   metrics: MovementMetrics;
+  movementTimelineBefore: HarnessRun['movementTimeline'];
   /** The zero-latency twin's full per-tick poses, kept for the honesty check
    *  (which compares facing too). Null for an authoritative-reference cell. */
   twinPoses: Pose[] | null;
@@ -283,6 +284,16 @@ function measure(
   const harness = createOnlineHarness({ latency });
   try {
     const resolved = withHarness ? withHarness(harness, options) : options;
+    const timeline = harness.session.movementTimeline;
+    const movementTimelineBefore = timeline
+      ? {
+          consumed: timeline.consumed,
+          starved: timeline.starved,
+          extrapolated: timeline.extrapolated,
+          discardedLate: timeline.discardedLate,
+          resyncs: timeline.resyncs,
+        }
+      : null;
     const run = harness.runScript(resolved);
     const twinPoses =
       reference === 'zeroLatency'
@@ -300,7 +311,7 @@ function measure(
       { tickMs: SERVER_TICK_MS, tickPhaseMs: SERVER_TICK_MS, ...metricOptions },
       run.ticks,
     );
-    return { run, truth, metrics, twinPoses };
+    return { run, truth, metrics, movementTimelineBefore, twinPoses };
   } finally {
     harness.dispose();
   }
@@ -1007,6 +1018,10 @@ describe('movement latency baseline', () => {
     expect(draw, `src/main.ts has no renderer.sync after the frame build: ${note}`).toBeGreaterThan(
       -1,
     );
+    expect(
+      source.indexOf('renderer.sync(', draw + 1),
+      `src/main.ts has two renderer.sync calls after the frame build: ${note}`,
+    ).toBe(-1);
     expect(alpha, `alpha must be read before the echo fold: ${note}`).toBeLessThan(consumeEcho);
     expect(flush, `the wire write must precede the echo read: ${note}`).toBeLessThan(consumeEcho);
     expect(predictionPrepare, `prediction context precedes sampling: ${note}`).toBeLessThan(
@@ -1044,6 +1059,7 @@ describe('movement latency baseline', () => {
       speedDeltaYdPerSec: 1.5,
       settleYd: 0.05,
     });
+    expect(MAX_SELF_REWIND_YD_PER_SEC).toBe(12);
     expect(MOVEMENT_FEEL_TARGETS_CC).toEqual({
       backwardStepYd: MAX_SELF_REWIND_YD_PER_SEC * (1 / 60) + 0.000001,
       settleYd: 0.05,
@@ -1089,17 +1105,34 @@ describe('movement latency baseline', () => {
     expectRecovered('adv-override-churn/rtt150j20', 1800 + 350 + 150);
   });
 
+  it('records the downstream snapshot stall in the adv-stall frames', () => {
+    const frames = cell('adv-stall/rtt150j20').run.frames;
+    const snapAdvances = frames
+      .map((frame) => frame.lastSnapAt)
+      .filter((lastSnapAt, index, values) => index === 0 || lastSnapAt !== values[index - 1]);
+    expect(snapAdvances.length).toBeGreaterThan(1);
+
+    let maxGapMs = 0;
+    for (let i = 1; i < snapAdvances.length; i++) {
+      maxGapMs = Math.max(maxGapMs, snapAdvances[i] - snapAdvances[i - 1]);
+    }
+    expect(maxGapMs).toBeGreaterThanOrEqual(STALL_MS);
+  });
+
   it('does not over-travel the twin when the jitter buffer starves', () => {
     const result = cell('starvation-straight/rtt300j20');
     const expected = result.twinPoses?.at(-1);
     if (!expected) throw new Error('the starvation cell has no final twin pose');
     const actual = result.run.ticks.at(-1);
     if (!actual) throw new Error('the starvation cell has no final server pose');
+    const before = result.movementTimelineBefore;
+    const after = result.run.movementTimeline;
+    if (!before || !after) throw new Error('the starvation cell has no movement timeline');
 
     expect({ x: actual.x, y: actual.y, z: actual.z, facing: actual.facing }).toEqual(expected);
-    expect(result.run.movementTimeline?.extrapolated).toBeGreaterThan(0);
-    expect(result.run.movementTimeline?.discardedLate).toBeGreaterThan(0);
-    expect(result.run.movementTimeline?.resyncs).toBe(0);
+    expect(after.extrapolated - before.extrapolated).toBeGreaterThan(0);
+    expect(after.discardedLate - before.discardedLate).toBeGreaterThan(0);
+    expect(after.resyncs - before.resyncs).toBe(0);
   });
 
   const keys = [
@@ -1125,7 +1158,7 @@ describe('movement latency baseline', () => {
   });
 
   it.each(keys)('pins the measured baseline for %s', (key) => {
+    expectPinned(key, BASELINE[key]);
     if (STRICT) expectTargets(key);
-    else expectPinned(key, BASELINE[key]);
   });
 });
