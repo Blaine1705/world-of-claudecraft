@@ -28,6 +28,7 @@ vi.mock('../server/db', () => ({
 
 import { MOVEMENT_INPUT_TIMELINE_DEPTH } from '../server/movement_input_timeline_v2';
 import { HANDOFF_DONE_EPS } from '../src/game/keyboard_turn_facing';
+import { MOVEMENT_FRAME_V2_PENDING_CAP } from '../src/net/movement_frame_v2_wire';
 import { MAX_SELF_REWIND_YD_PER_SEC } from '../src/render/self_render_position_core';
 import { DT, emptyMoveInput, type MoveInput, RUN_SPEED, TURN_SPEED } from '../src/sim/types';
 import type { LatencyLinkConfig } from './helpers/latency_link';
@@ -428,9 +429,13 @@ const STARVATION_PROFILE = link(300, 20);
 const STALL_AT_MS = 1500;
 const STALL_MS = 500;
 const CC_AT_MS = 1500;
-const BACKPRESSURE_STALL_AT_MS = 500;
-const BACKPRESSURE_STALL_MS = 60_000;
-const BACKPRESSURE_RECOVERY_WAIT_MS = 4000;
+const BACKPRESSURE_BASE_DELAY_MS = 24_500;
+const BACKPRESSURE_LATENCY_STEP_INTERVAL_MS = 500;
+const BACKPRESSURE_LATENCY_STEP_MS = 800;
+const BACKPRESSURE_LATENCY_RAMP_END_MS = 2000;
+const BACKPRESSURE_DRAIN_DELAY_MS = 600;
+const BACKPRESSURE_LATENCY_RESTORE_AT_MS = 29_100;
+const BACKPRESSURE_EPISODE_MS = 29_900;
 const SPECTATE_AT_MS = 500;
 const SPECTATE_EXIT_AT_MS = 1500;
 const SPECTATE_TARGET = { x: 40, z: COLLIDER_FREE_LANE.z } as const;
@@ -494,12 +499,35 @@ function measureBackpressureRecovery(): BackpressureRecoveryCell {
       discardedLate: timeline.discardedLate,
       resyncs: timeline.resyncs,
     };
+    const slowDrainActions = Array.from(
+      { length: BACKPRESSURE_LATENCY_RAMP_END_MS / BACKPRESSURE_LATENCY_STEP_INTERVAL_MS },
+      (_, step) => ({
+        atMs: step * BACKPRESSURE_LATENCY_STEP_INTERVAL_MS,
+        run: () =>
+          harness.link.setLatency(
+            'toServer',
+            BACKPRESSURE_BASE_DELAY_MS + step * BACKPRESSURE_LATENCY_STEP_MS,
+            0,
+          ),
+      }),
+    );
     const shedRun = harness.runScript({
-      durationMs: BACKPRESSURE_STALL_AT_MS + BACKPRESSURE_STALL_MS + BACKPRESSURE_RECOVERY_WAIT_MS,
+      durationMs: BACKPRESSURE_EPISODE_MS,
+      facingAt: (tMs) => Math.sin(tMs / 1000),
       actions: [
+        ...slowDrainActions,
         {
-          atMs: BACKPRESSURE_STALL_AT_MS,
-          run: () => harness.link.stall('toServer', harness.clock.now() + BACKPRESSURE_STALL_MS),
+          atMs: BACKPRESSURE_LATENCY_RAMP_END_MS,
+          run: () => harness.link.setLatency('toServer', BACKPRESSURE_DRAIN_DELAY_MS, 0),
+        },
+        {
+          atMs: BACKPRESSURE_LATENCY_RESTORE_AT_MS,
+          run: () =>
+            harness.link.setLatency(
+              'toServer',
+              ADVERSARIAL_PROFILE.toServer.baseMs,
+              ADVERSARIAL_PROFILE.toServer.jitterMs,
+            ),
         },
       ],
     });
@@ -1444,7 +1472,7 @@ describe('movement latency baseline', () => {
     expect(after.resyncs - before.resyncs).toBe(0);
   });
 
-  it('sheds a stalled uplink, resyncs, and returns to strict movement feel', () => {
+  it('sheds a slow uplink, resyncs, and returns to strict movement feel', () => {
     const { shedRun, recovery, timelineBeforeShed } = backpressureRecovery;
     const afterShed = shedRun.movementTimeline;
     const afterRecovery = recovery.run.movementTimeline;
@@ -1455,9 +1483,16 @@ describe('movement latency baseline', () => {
     const finalTwin = recovery.twinPoses?.at(-1);
     if (!finalServer || !finalTwin) throw new Error('the backpressure cell has no final pose');
 
+    expect(BACKPRESSURE_EPISODE_MS).toBeLessThan(30_000);
     expect(shedRun.movementOutboxDroppedOldest).toBeGreaterThan(0);
+    expect(shedRun.movementOutboxDroppedOldest).toBeGreaterThan(MOVEMENT_FRAME_V2_PENDING_CAP);
     const transmittedClientTicks = shedRun.commands.flatMap((command) =>
       command.ct === undefined ? [] : [command.ct],
+    );
+    const maxClientTickGap = transmittedClientTicks.reduce(
+      (maxGap, clientTick, index) =>
+        index === 0 ? maxGap : Math.max(maxGap, clientTick - transmittedClientTicks[index - 1]),
+      0,
     );
     expect(
       transmittedClientTicks.some(
@@ -1471,6 +1506,19 @@ describe('movement latency baseline', () => {
     const finalPoseErrorYd = Math.hypot(finalServer.x - finalTwin.x, finalServer.z - finalTwin.z);
     const resyncWindowYd = MOVEMENT_INPUT_TIMELINE_DEPTH * RUN_SPEED * DT;
     expect(finalPoseErrorYd).toBeLessThanOrEqual(resyncWindowYd);
+    expect({
+      droppedOldest: shedRun.movementOutboxDroppedOldest,
+      maxClientTickGap,
+      resyncs: afterShed.resyncs - timelineBeforeShed.resyncs,
+      recoveryConsumed: afterRecovery.consumed - recovery.movementTimelineBefore.consumed,
+      finalPoseErrorMicroYd: Math.round(finalPoseErrorYd * 1_000_000),
+    }).toEqual({
+      droppedOldest: 15,
+      maxClientTickGap: 16,
+      resyncs: 1,
+      recoveryConsumed: 80,
+      finalPoseErrorMicroYd: 0,
+    });
     if (STRICT) expectOrdinaryTargets(recovery.metrics);
   });
 

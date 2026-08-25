@@ -149,12 +149,12 @@ describe('MovementInputTimeline', () => {
     expect(timeline.consumeNext()?.ct).toBe(MOVEMENT_CT_SANITY_BOUND_TICKS);
   });
 
-  it('counts a frame at the cursor as the empty-buffer resync anchor', () => {
+  it('does not count a contiguous frame as an empty-buffer resync', () => {
     const timeline = new MovementInputTimeline();
     for (let tick = 0; tick < STARVE_RESYNC_TICKS; tick++) timeline.consumeNext();
 
     expect(timeline.enqueue(frame(0))).toBe(true);
-    expect(timeline.resyncs).toBe(1);
+    expect(timeline.resyncs).toBe(0);
     expect(timeline.consumeNext()).toEqual(frame(0));
   });
 

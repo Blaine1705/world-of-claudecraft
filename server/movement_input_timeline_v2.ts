@@ -122,10 +122,11 @@ export class MovementInputTimeline {
       return false;
     }
     if (this.frames.size === 0 && this.consecutiveStarvedTicks >= STARVE_RESYNC_TICKS) {
+      const cursorMoved = frame.ct !== this.expectedClientTick;
       this.expectedClientTick = frame.ct;
       this.consecutiveStarvedTicks = 0;
       this.frames.set(frame.ct, frame);
-      this.resyncs++;
+      if (cursorMoved) this.resyncs++;
       return true;
     }
     if (frame.ct > this.expectedClientTick + MOVEMENT_INPUT_TIMELINE_DEPTH) {

@@ -81,9 +81,16 @@ struct. Each server tick consumes EXACTLY ONE frame, the next `ct` in sequence:
   a starved tick re-applies the held input while the cursor waits, minting free
   distance from lag. If the late frame differed (a release during the starve),
   the client absorbs the one-tick divergence as a bounded replay correction.
-  Extrapolation runs for at most the resync threshold; a genuinely gapped
-  stream then resynchronizes to the newest contiguous run, and the stale-input
-  rule stays the runaway bound.
+  Extrapolation runs for at most the resync threshold, and the stale-input rule
+  stays the runaway bound.
+- Empty-buffer anchoring is load-bearing recovery behavior. Once starvation
+  reaches the resync threshold with no buffered frames, the next valid frame
+  is the anchor whatever its `ct`; the ordinary depth window does not reject
+  it. An anchor ahead of the cursor moves the cursor and counts a resync. An
+  anchor at the cursor buffers normally without counting a resync.
+- The anchor rule retains an absolute sanity bound of 1,200 ticks ahead of the
+  cursor. That is 60 seconds at 20 Hz, above the 30-second keepalive window, so
+  a real gap that large reaches session resume rather than timeline recovery.
 - Overflow (client burst or clock skew): consume forward, dropping the oldest
   frames past the depth cap, and count it.
 - The anti-cheat posture is unchanged: the server accepts only intent and
