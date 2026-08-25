@@ -268,6 +268,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     runDefault: () => void,
     instance?: ItemInstancePayload,
     vendorSellCount?: number,
+    runSellAll?: () => void,
   ): void;
 }
 
@@ -1775,6 +1776,9 @@ export class BagsWindow {
       () => this.runBagAction(item, s, ev),
       s.instance,
       vendorSellCount,
+      vendorSellCount === undefined
+        ? undefined
+        : () => this.sellAllBagItem(item, s, vendorSellCount),
     );
   }
 
@@ -1840,6 +1844,25 @@ export class BagsWindow {
     } else {
       this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
     }
+  }
+
+  private sellAllBagItem(item: ItemDef, slot: InvSlot, count: number): void {
+    const heldTotal = Math.max(1, Math.floor(count));
+    if (this.everyHeldCopyVendorSellIsInstant(item, slot.itemId)) {
+      this.deps.world().sellItem(slot.itemId, heldTotal);
+      return;
+    }
+    this.showSellQuantityPrompt(slot.itemId, heldTotal, heldTotal);
+  }
+
+  private everyHeldCopyVendorSellIsInstant(item: ItemDef, itemId: string): boolean {
+    let matched = false;
+    for (const slot of this.deps.world().inventory) {
+      if (slot.itemId !== itemId) continue;
+      matched = true;
+      if (!vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId)) return false;
+    }
+    return matched;
   }
 
   // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
@@ -1927,7 +1950,7 @@ export class BagsWindow {
     }, 0);
   }
 
-  private showSellQuantityPrompt(itemId: string, maxCount: number): void {
+  private showSellQuantityPrompt(itemId: string, maxCount: number, initialCount = 1): void {
     document.querySelectorAll('.sell-quantity-prompt').forEach((el) => {
       el.remove();
     });
@@ -1946,7 +1969,7 @@ export class BagsWindow {
     input.min = '1';
     input.max = String(maxCount);
     input.step = '1';
-    input.value = '1';
+    input.value = String(Math.max(1, Math.min(maxCount, Math.floor(initialCount))));
     const confirm = document.createElement('button');
     confirm.className = 'btn';
     confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');

@@ -4,9 +4,8 @@
 // supplied (bag_item_action_menu_paint.test.ts covers the professions-menu
 // paint/dispatch flows; this covers the sibling vendor row set the same
 // painter now offers). Pins that the row only PAINTS above one held copy, and
-// that activating it sends the full held count through world.sellItem and
-// repaints via afterAction, exactly like every other destructive row in this
-// menu.
+// that activating it delegates back to BagsWindow's vendor sale policy instead
+// of selling directly from this menu painter.
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
@@ -18,13 +17,13 @@ const BREAD = 'baked_bread';
 function harness() {
   const el = document.createElement('div');
   document.body.append(el);
-  const sold: Array<{ itemId: string; count: number | undefined }> = [];
+  let sellAllRuns = 0;
   let afterActions = 0;
   let activate: ((act: string) => void) | null = null;
   const world = {
     inventory: [{ itemId: BREAD, count: 8 }],
-    sellItem: (itemId: string, count?: number) => {
-      sold.push({ itemId, count });
+    sellItem: () => {
+      throw new Error('Sell all must route through the bag-window vendor safety policy');
     },
   };
   const menu = new BagItemActionMenu({
@@ -46,14 +45,26 @@ function harness() {
     },
   });
   const open = (vendorSellCount?: number) =>
-    menu.open(ITEMS[BREAD], BREAD, 0, 10, 10, () => {}, undefined, vendorSellCount);
+    menu.open(
+      ITEMS[BREAD],
+      BREAD,
+      0,
+      10,
+      10,
+      () => {},
+      undefined,
+      vendorSellCount,
+      () => {
+        sellAllRuns += 1;
+      },
+    );
   const rowActs = () =>
     [...el.querySelectorAll('.ctx-item')].map((row) => row.getAttribute('data-act'));
   const click = (act: string) => {
     if (!activate) throw new Error('bind never called');
     activate(act);
   };
-  return { open, rowActs, click, sold, afterActions: () => afterActions };
+  return { open, rowActs, click, sellAllRuns: () => sellAllRuns, afterActions: () => afterActions };
 }
 
 describe('BagItemActionMenu vendor Sell all dispatch', () => {
@@ -71,12 +82,12 @@ describe('BagItemActionMenu vendor Sell all dispatch', () => {
     expect(sellAllRow?.textContent).toBe('Sell all (8)');
   });
 
-  it('activating Sell all sends the full held count and repaints, with no confirm dialog', () => {
+  it('activating Sell all delegates to the bag-window vendor safety policy', () => {
     const h = harness();
     h.open(8);
     h.click('sellAll');
-    expect(h.sold).toEqual([{ itemId: BREAD, count: 8 }]);
-    expect(h.afterActions()).toBe(1);
+    expect(h.sellAllRuns()).toBe(1);
+    expect(h.afterActions()).toBe(0);
   });
 
   it('the professions row set is untouched when no vendorSellCount is supplied', () => {

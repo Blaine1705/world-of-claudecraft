@@ -16,12 +16,14 @@ import type { IWorld } from '../src/world_api';
 interface MenuCall {
   itemId: string;
   vendorSellCount: number | undefined;
+  runSellAll: (() => void) | undefined;
 }
 
 function harness(
   inventory: InvSlot[],
   sellItem: (itemId: string, count?: number) => void = () => {},
 ): { root: HTMLElement; menuCalls: MenuCall[] } {
+  document.body.innerHTML = '<div id="prompt-stack"></div>';
   const menuCalls: MenuCall[] = [];
   const world = {
     inventory,
@@ -87,8 +89,9 @@ function harness(
       _runDefault,
       _instance,
       vendorSellCount,
+      runSellAll,
     ) => {
-      menuCalls.push({ itemId, vendorSellCount });
+      menuCalls.push({ itemId, vendorSellCount, runSellAll });
     },
   };
   new BagsWindow(deps).render();
@@ -103,6 +106,16 @@ function rightClickFirstCell(root: HTMLElement, modifiers: { ctrlKey?: boolean }
   );
 }
 
+function quantityPrompt(): HTMLElement | null {
+  return document.querySelector('.sell-quantity-prompt');
+}
+
+function confirmQuantityPrompt(): void {
+  const button = quantityPrompt()?.querySelector('button.btn');
+  expect(button, 'no quantity prompt confirm button').toBeTruthy();
+  (button as HTMLElement).click();
+}
+
 describe('bags_window vendor right-click menu (Sell all)', () => {
   it('plain right-click opens the item menu with every copy of the item held across the bags', () => {
     const { root, menuCalls } = harness([
@@ -110,19 +123,89 @@ describe('bags_window vendor right-click menu (Sell all)', () => {
       { itemId: 'baked_bread', count: 3 },
     ]);
     rightClickFirstCell(root);
-    expect(menuCalls).toEqual([{ itemId: 'baked_bread', vendorSellCount: 8 }]);
+    expect(menuCalls).toHaveLength(1);
+    expect(menuCalls[0].itemId).toBe('baked_bread');
+    expect(menuCalls[0].vendorSellCount).toBe(8);
+    expect(menuCalls[0].runSellAll).toEqual(expect.any(Function));
   });
 
   it('a single held copy still opens the menu (Sell all only appears above 1, in the pure core)', () => {
     const { root, menuCalls } = harness([{ itemId: 'baked_bread', count: 1 }]);
     rightClickFirstCell(root);
-    expect(menuCalls).toEqual([{ itemId: 'baked_bread', vendorSellCount: 1 }]);
+    expect(menuCalls).toHaveLength(1);
+    expect(menuCalls[0].itemId).toBe('baked_bread');
+    expect(menuCalls[0].vendorSellCount).toBe(1);
+    expect(menuCalls[0].runSellAll).toEqual(expect.any(Function));
   });
 
   it('an item the vendor refuses (noVendorSell) never opens the menu on a plain right-click', () => {
     const { root, menuCalls } = harness([{ itemId: 'reins_valorsteed', count: 1 }]);
     rightClickFirstCell(root);
     expect(menuCalls).toEqual([]);
+  });
+
+  it('Sell all on common+ stacks opens the existing quantity prompt before selling', () => {
+    const sold: Array<[string, number | undefined]> = [];
+    const { root, menuCalls } = harness(
+      [
+        { itemId: 'baked_bread', count: 5 },
+        { itemId: 'baked_bread', count: 3 },
+      ],
+      (itemId, count) => sold.push([itemId, count]),
+    );
+    rightClickFirstCell(root);
+    menuCalls[0].runSellAll?.();
+    expect(sold).toEqual([]);
+    const prompt = quantityPrompt();
+    expect(prompt).not.toBeNull();
+    expect(prompt?.querySelector<HTMLInputElement>('input.prompt-number')?.value).toBe('8');
+    confirmQuantityPrompt();
+    expect(sold).toEqual([['baked_bread', 8]]);
+  });
+
+  it('Sell all on a poor stack with an instanced copy opens the quantity prompt first', () => {
+    const sold: Array<[string, number | undefined]> = [];
+    const { root, menuCalls } = harness(
+      [
+        { itemId: 'tangled_weed', count: 1 },
+        { itemId: 'tangled_weed', count: 1, instance: { signer: 'Ayla' } },
+      ],
+      (itemId, count) => sold.push([itemId, count]),
+    );
+    rightClickFirstCell(root);
+    menuCalls[0].runSellAll?.();
+    expect(sold).toEqual([]);
+    expect(quantityPrompt()).not.toBeNull();
+  });
+
+  it('Sell all on a poor stack with a crafted marker opens the quantity prompt first', () => {
+    const sold: Array<[string, number | undefined]> = [];
+    const { root, menuCalls } = harness(
+      [
+        { itemId: 'tangled_weed', count: 1 },
+        { itemId: 'tangled_weed', count: 1, craftedRecipeId: 'recipe_tangled_weed' },
+      ],
+      (itemId, count) => sold.push([itemId, count]),
+    );
+    rightClickFirstCell(root);
+    menuCalls[0].runSellAll?.();
+    expect(sold).toEqual([]);
+    expect(quantityPrompt()).not.toBeNull();
+  });
+
+  it('Sell all still directly sells when every held copy is true vendor junk', () => {
+    const sold: Array<[string, number | undefined]> = [];
+    const { root, menuCalls } = harness(
+      [
+        { itemId: 'tangled_weed', count: 3 },
+        { itemId: 'tangled_weed', count: 2 },
+      ],
+      (itemId, count) => sold.push([itemId, count]),
+    );
+    rightClickFirstCell(root);
+    menuCalls[0].runSellAll?.();
+    expect(quantityPrompt()).toBeNull();
+    expect(sold).toEqual([['tangled_weed', 5]]);
   });
 
   it('Ctrl+right-click keeps its direct split-stack sell shortcut, not the menu', () => {

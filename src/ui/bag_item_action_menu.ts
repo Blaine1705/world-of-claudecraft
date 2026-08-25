@@ -132,6 +132,7 @@ export class BagItemActionMenu {
     runDefault: () => void,
     instance?: ItemInstancePayload,
     vendorSellCount?: number,
+    runSellAll?: () => void,
   ): void {
     const actions =
       vendorSellCount === undefined
@@ -150,8 +151,7 @@ export class BagItemActionMenu {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
       else if (id === 'sellAll' && vendorSellCount !== undefined) {
-        this.deps.world().sellItem(itemId, vendorSellCount);
-        this.deps.afterAction();
+        runSellAll?.();
       } else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId, slotIndex);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
