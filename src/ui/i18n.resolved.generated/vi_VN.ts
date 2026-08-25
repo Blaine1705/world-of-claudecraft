@@ -1455,7 +1455,7 @@ export const vi_VN: EnTranslations = {
       "endedForfeitLog": "Trận đấu đã bị bỏ cuộc.",
       "firstWinBonusLine": "Chiến thắng đầu tiên trong ngày: +{honor} Danh dự",
       "firstWinBonusLog": "Chiến thắng đầu tiên trong ngày: bạn nhận thêm {honor} Danh dự thưởng.",
-      "doubleHonorLine": "Cuối Tuần Danh Dự Nhân Đôi: hôm nay Danh Dự tại Cánh Đồng Trũng Gai được nhân {mult} lần, và một trận thua đấu đến cùng được tính như một chiến thắng",
+      "doubleHonorLine": "Cuối Tuần Danh Dự Nhân Đôi: Danh Dự tại Cánh Đồng Trũng Gai hôm nay trả gấp {mult} lần, và một trận thua đã đấu trọn vẹn vẫn được trả như một chiến thắng",
       "timeWarningMinutes": "Còn lại {minutes} phút",
       "timeWarningOneMinute": "Còn lại một phút",
       "timeWarningMinutesLog": "Còn lại {minutes} phút trong trận đấu.",
@@ -3136,7 +3136,7 @@ export const vi_VN: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Cuối Tuần Danh Dự Nhân Đôi",
-          "note": "Các doanh trại chiến tranh vang lên tiếng gọi tập hợp: suốt cuối tuần, Danh Dự tại Cánh Đồng Trũng Gai được nhân đôi, và một trận thua đấu đến cùng được tính như một chiến thắng."
+          "note": "Các trại chiến tranh vang lên hồi kèn tập hợp: suốt cả cuối tuần, Danh Dự tại Cánh Đồng Trũng Gai được trả gấp đôi và một trận thua đã đấu trọn vẹn vẫn được trả như một chiến thắng."
         },
         "fishingDerby": {
           "title": "Hội Thi Câu Cá",

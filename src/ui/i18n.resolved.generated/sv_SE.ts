@@ -1455,7 +1455,7 @@ export const sv_SE: EnTranslations = {
       "endedForfeitLog": "Matchen gavs förlorad.",
       "firstWinBonusLine": "Dagens första seger: +{honor} heder",
       "firstWinBonusLog": "Dagens första seger: du får {honor} extra heder.",
-      "doubleHonorLine": "Helg med dubbel heder: idag betalas heder på Törnhålefälten ut {mult} gånger, och ett utspelat nederlag räknas som en vinst",
+      "doubleHonorLine": "Dubbel Heder-helg: Heder på Törnhålefälten betalar {mult}x idag, och en utspelad förlust betalar som en vinst",
       "timeWarningMinutes": "{minutes} minuter kvar",
       "timeWarningOneMinute": "En minut kvar",
       "timeWarningMinutesLog": "{minutes} minuter återstår av striden.",
@@ -3135,8 +3135,8 @@ export const sv_SE: EnTranslations = {
           "note": "Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen."
         },
         "doubleHonor": {
-          "title": "Helg med dubbel heder",
-          "note": "Krigslägren blåser till samling: hela helgen betalas heder på Törnhålefälten ut dubbelt, och ett utspelat nederlag räknas som en vinst."
+          "title": "Dubbel Heder-helg",
+          "note": "Krigslägren blåser till samling: hela helgen betalar Heder på Törnhålefälten dubbelt, och en utspelad förlust betalar som en vinst."
         },
         "fishingDerby": {
           "title": "Fisketävling",

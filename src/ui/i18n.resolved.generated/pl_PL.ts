@@ -1455,7 +1455,7 @@ export const pl_PL: EnTranslations = {
       "endedForfeitLog": "Mecz zakończył się walkowerem.",
       "firstWinBonusLine": "Pierwsze zwycięstwo dnia: +{honor} Honor",
       "firstWinBonusLog": "Pierwsze zwycięstwo dnia: otrzymujesz {honor} dodatkowego Honoru.",
-      "doubleHonorLine": "Weekend Podwójnego Honoru: dziś Honor na Polach Ciernistej Kotliny wypłaca się {mult} razy, a rozegrana do końca porażka liczy się jak zwycięstwo",
+      "doubleHonorLine": "Weekend Podwójnego Honoru: dziś Honor z Pól Ciernistej Kotliny wypłaca się {mult}x, a rozegrana do końca porażka płaci jak zwycięstwo",
       "timeWarningMinutes": "Pozostało {minutes} min",
       "timeWarningOneMinute": "Pozostała jedna minuta",
       "timeWarningMinutesLog": "W bitwie pozostało {minutes} min.",
@@ -3136,7 +3136,7 @@ export const pl_PL: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Weekend Podwójnego Honoru",
-          "note": "Obozy wojenne trąbią na zbiórkę: przez cały weekend Honor na Polach Ciernistej Kotliny wypłaca się podwójnie, a rozegrana do końca porażka liczy się jak zwycięstwo."
+          "note": "Obozy wojenne trąbią na zbiórkę: przez cały weekend Honor z Pól Ciernistej Kotliny wypłaca się podwójnie, a rozegrana do końca porażka płaci jak zwycięstwo."
         },
         "fishingDerby": {
           "title": "Zawody Wędkarskie",

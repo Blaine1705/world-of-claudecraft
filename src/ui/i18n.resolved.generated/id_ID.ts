@@ -1455,7 +1455,7 @@ export const id_ID: EnTranslations = {
       "endedForfeitLog": "Pertandingan diserahkan.",
       "firstWinBonusLine": "Kemenangan pertama hari ini: +{honor} Kehormatan",
       "firstWinBonusLog": "Kemenangan pertama hari ini: kamu mendapatkan {honor} bonus Kehormatan.",
-      "doubleHonorLine": "Akhir Pekan Kehormatan Ganda: hari ini Kehormatan Medan Thornhollow dibayarkan {mult} kali lipat, dan kekalahan yang dimainkan sampai akhir dibayar seperti kemenangan",
+      "doubleHonorLine": "Akhir Pekan Kehormatan Ganda: Kehormatan Medan Thornhollow dibayar {mult}x hari ini, dan kekalahan yang dimainkan hingga usai dibayar seperti kemenangan",
       "timeWarningMinutes": "{minutes} menit tersisa",
       "timeWarningOneMinute": "Satu menit tersisa",
       "timeWarningMinutesLog": "{minutes} menit tersisa dalam pertempuran.",
@@ -3136,7 +3136,7 @@ export const id_ID: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Akhir Pekan Kehormatan Ganda",
-          "note": "Kemah-kemah perang membunyikan panggilan berkumpul: sepanjang akhir pekan, Kehormatan Medan Thornhollow dibayarkan dua kali lipat, dan kekalahan yang dimainkan sampai akhir dibayar seperti kemenangan."
+          "note": "Perkemahan perang membunyikan panggilan kumpul: sepanjang akhir pekan, Kehormatan Medan Thornhollow dibayar dua kali lipat, dan kekalahan yang dimainkan hingga usai dibayar seperti kemenangan."
         },
         "fishingDerby": {
           "title": "Lomba Memancing",
