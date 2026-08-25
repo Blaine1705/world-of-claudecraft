@@ -14898,7 +14898,7 @@ export const en: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sableweb Menace",
-        "text": "The lurkers in the northeastern woods spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
+        "text": "The lurkers in the northeastern woods spin a silk I need for my poultices, and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
         "completion": "Ugh, still twitching. Perfect. Here, you've earned this.",
         "objectives": {
           "0": {
@@ -15034,7 +15034,7 @@ export const en: EnTranslations = {
       },
       "q_bandits": {
         "title": "Bandits of the Vale",
-        "text": "A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.",
+        "text": "A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out: slay 10 Vale Bandits.",
         "completion": "Ten fewer knives in the dark. Take this - you have earned it.",
         "objectives": {
           "0": {
