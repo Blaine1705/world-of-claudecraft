@@ -42,14 +42,23 @@ import { worldEntryGpuSettleCoverMs } from './ui_effects_profile';
  * cinematic's ESTABLISHING SHOT (arrival_cover.ts): a level-1 character's
  * first seconds are that wide view of the village, nothing is actionable
  * while the cinematic runs, and the curtain lifting on a village still
- * revealing piecewise is the only thing that shot can show. It gets the same
- * bounded wait as offline, and the bound is still a bound on the WAIT: what is
- * held past it lifts with the curtain and reveals as its own compile lands.
+ * revealing piecewise is the only thing that shot can show. That entry waits
+ * longer, online and offline alike: the town-kit bound below was sized for
+ * the decor a chase camera lands among, while the opening view marks the
+ * whole village imminent, and the offline probe still showed the village
+ * linking after a 3 s wait. Six seconds is the maintainer's call on the
+ * trade (a longer first loading screen on a slow machine, once per new
+ * character, against a cinematic that pops), between the town-kit bound and
+ * the reveal watchdog past which nothing can still be held. Both are bounds
+ * on the WAIT: what is held past them lifts with the curtain and reveals as
+ * its own compile lands.
  */
 export const ARRIVAL_REVEAL_SETTLE_MAX_MS = 3_000;
+export const ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS = 6_000;
 
 export function arrivalRevealSettleMaxMs(online: boolean, establishingShot = false): number {
-  return online && !establishingShot ? 0 : ARRIVAL_REVEAL_SETTLE_MAX_MS;
+  if (establishingShot) return ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS;
+  return online ? 0 : ARRIVAL_REVEAL_SETTLE_MAX_MS;
 }
 
 /** The loading-screen strings this chain renders. */

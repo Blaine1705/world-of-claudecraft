@@ -9,6 +9,7 @@ import {
   ARRIVAL_REVEAL_SETTLE_MAX_MS,
   arrivalRevealSettleMaxMs,
   type BlockingArrivalWarmupDeps,
+  ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS,
   runBlockingArrivalWarmup,
   settleWorldEntryCover,
 } from '../src/game/arrival_warmup';
@@ -19,6 +20,7 @@ import {
   resetArrivalCoverForTest,
   setArrivalCover,
 } from '../src/render/arrival_cover';
+import { REVEAL_GATE_WATCHDOG_MS } from '../src/render/reveal_gate';
 
 interface Rig {
   calls: string[];
@@ -408,10 +410,17 @@ describe('the entry cover on the establishing shot', () => {
   afterEach(() => resetArrivalCoverForTest());
 
   it('is the one online entry that waits, bounded, for the held reveals', () => {
-    expect(arrivalRevealSettleMaxMs(true, true)).toBe(ARRIVAL_REVEAL_SETTLE_MAX_MS);
+    expect(arrivalRevealSettleMaxMs(true, true)).toBe(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS);
     expect(arrivalRevealSettleMaxMs(true, false)).toBe(0);
     expect(arrivalRevealSettleMaxMs(true)).toBe(0);
-    expect(arrivalRevealSettleMaxMs(false, true)).toBe(ARRIVAL_REVEAL_SETTLE_MAX_MS);
+    expect(arrivalRevealSettleMaxMs(false, true)).toBe(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS);
+    expect(arrivalRevealSettleMaxMs(false, false)).toBe(ARRIVAL_REVEAL_SETTLE_MAX_MS);
+  });
+
+  it('pins the establishing-shot bound between the town-kit bound and the reveal watchdog', () => {
+    expect(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS).toBe(6_000);
+    expect(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS).toBeGreaterThan(ARRIVAL_REVEAL_SETTLE_MAX_MS);
+    expect(ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS).toBeLessThan(REVEAL_GATE_WATCHDOG_MS);
   });
 
   function shotRig(online: boolean, establishingShot: boolean | undefined) {
@@ -442,7 +451,7 @@ describe('the entry cover on the establishing shot', () => {
     r.flush();
     await Promise.resolve();
     await Promise.resolve();
-    expect(r.waited).toEqual([ARRIVAL_REVEAL_SETTLE_MAX_MS]);
+    expect(r.waited).toEqual([ESTABLISHING_SHOT_REVEAL_SETTLE_MAX_MS]);
     // The flag stands through the wait and the reveal, and drops with the cover.
     expect(r.calls).toEqual(['awaitReveals:shot=true', 'revealWorld:shot=true']);
     expect(arrivalCoverActive()).toBe(false);
