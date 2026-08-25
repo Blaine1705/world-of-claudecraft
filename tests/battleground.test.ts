@@ -1630,6 +1630,29 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     expect(match.flags[1].carrier).toBe(raider);
   });
 
+  it('a flag entity never becomes generically pickable, however long the match runs', () => {
+    // Regression: the flag ships lootable=false (spawnFlagEntity), but its
+    // respawnTimer defaulted to 0 like every ground object, and the generic
+    // per-tick object sweep (sim.ts) flips lootable back true once that timer
+    // crosses zero, one tick after spawn. Fully dormant while the general
+    // Interact key always short-circuited to bgFlagAction during a live
+    // match (see bg_flag_interact.ts), but the flag then silently outranked
+    // a real interactable standing farther away in tryNearbyInteraction's
+    // object scan (a Warlock's Soulwell, say), because it is CLOSER and
+    // reads lootable=true, and picking it up is a harmless no-op
+    // (objectItemId is null) that swallows the press with zero feedback.
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    for (let i = 0; i < 200; i++) sim.tick();
+    const flagEntity = must(sim.entities.get(match.flags[0].entityId), 'flag entity');
+    // The load-bearing assertion: pickUpObject itself would return false here
+    // either way (its objectItemId===null guard fires regardless of
+    // lootable), so it cannot distinguish fixed from unfixed. lootable is
+    // what tryNearbyInteraction's object scan actually keys its priority on.
+    expect(flagEntity.lootable).toBe(false);
+  });
+
   it('the flag action errors politely with no flag in reach and never grabs the OWN flag', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');

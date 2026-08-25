@@ -333,8 +333,12 @@ interface AttributionTargetFixture {
 // Re-minted for the OSSBrain release merge of the FOV slider fix and rift
 // self-motion prediction: renderer.ts now combines both release PR inputs in
 // one tree. No capture was retaken.
+// Re-minted for resolving PR #3644 on top of PR #3641's Drowned Litany
+// drop-rate and artifact-evidence tree: the composite now seals both the
+// prior Litany evidence inputs and the battleground flag/rune
+// entity_view_policy_core.ts bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '65cc6be2693767c263bc976d3478461b5291b83df1ffdd7ce06c548ddade9466';
+  '7aa6993676c327765384181307142ba6865a3aa0cd2389fdf63ed01afa1ee804';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
