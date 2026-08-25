@@ -1433,6 +1433,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    riftSliding: false,
     afk: false,
     weaponStowed: false,
     helmHidden: false,
@@ -2181,6 +2182,8 @@ export class ClientWorld implements IWorld {
     if (this.riftFloor) {
       clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
     }
+    // Clear the descriptor too; late riftState frames after teardown are ignored below.
+    this.riftFloor = null;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
@@ -5442,6 +5445,7 @@ export class ClientWorld implements IWorld {
   // The event still flows to the HUD (drainEvents) for a toast/log line.
   private applyRiftStateEvent(ev: SimEvent): void {
     if (ev.type !== 'riftState') return;
+    if (this.sessionEnded) return;
     // Mirror the server's floor collision lifecycle (spawnRiftFloor /
     // freeRiftFloorEntities in src/sim/rift/runs.ts): the previously mirrored
     // floor's region is always cleared before a new one is registered, whether
@@ -5468,10 +5472,6 @@ export class ClientWorld implements IWorld {
         }
       : null;
     if (this.riftFloor) {
-      // riftFloorColliders takes no upgrade: an AI-service manifest only ever
-      // reskins theme/spawns/boss/name (src/sim/rift/upgrade.ts
-      // applyRiftUpgrade), never floor.layout, so the base (unupgraded) plan's
-      // colliders are already identical to the upgraded floor's walls.
       setRiftRegion(
         this.riftCollisionToken,
         this.riftFloor.origin.x,
@@ -5480,6 +5480,7 @@ export class ClientWorld implements IWorld {
           this.riftFloor.seed,
           this.riftFloor.baseLevel,
           this.riftFloor.floorIndex,
+          this.riftFloor.upgrade,
         ),
       );
     }

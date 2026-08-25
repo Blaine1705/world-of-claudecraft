@@ -33,7 +33,7 @@ import { RIFT_MECHANIC_SPACING_SEC } from '../mob/mechanic_spacing';
 import { retargetMob } from '../mob/targeting';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
-import { DT, dist2d, type Entity, type Vec3 } from '../types';
+import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
 import {
@@ -220,7 +220,14 @@ export function riftRecoveryPointSafe(ctx: SimContext, p: Entity, pos: Vec3): bo
   return true;
 }
 
-function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active: boolean): void {
+type RiftStateEvent = Extract<SimEvent, { type: 'riftState' }>;
+
+function buildRiftStateEvent(
+  ctx: SimContext,
+  pid: number,
+  inst: RiftInstance,
+  active: boolean,
+): RiftStateEvent {
   const floor = floorForInstance(inst);
   const event =
     inst.eventId === null
@@ -235,7 +242,7 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
   // are "deliberately outside the global race").
   const expiresAtMs =
     event === null ? null : Math.round(ctx.lockoutNowMs() + (event.expiresAt - ctx.time) * 1000);
-  ctx.emit({
+  return {
     type: 'riftState',
     pid,
     active,
@@ -253,7 +260,27 @@ function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active:
     themeName: floor.themeName,
     tier: inst.tier,
     expiresAtMs,
-  });
+  };
+}
+
+function emitRiftState(ctx: SimContext, pid: number, inst: RiftInstance, active: boolean): void {
+  ctx.emit(buildRiftStateEvent(ctx, pid, inst, active));
+}
+
+/** The riftState descriptor for a player already living inside a rift instance
+ * (never a transition), or null if they are not currently in one. `enterRift`/
+ * `descendRift`/`leaveRift` are the only ordinary emit sites, and a resumed
+ * session (server/game.ts resumeSession) replays none of them: its fresh
+ * ClientWorld starts with riftFloor null, so without this the resumed client
+ * is blind to the floor geometry AND (since #3479) predicts movement with no
+ * lift/wall data until the next enter/descend/exit. Read-only: never mutates
+ * instance state, only re-describes it. */
+export function riftStateEventFor(ctx: SimContext, pid: number): RiftStateEvent | null {
+  const p = ctx.entities.get(pid);
+  if (!p || !isRiftPos(p.pos.x)) return null;
+  const inst = riftInstanceAtPos(ctx, p.pos);
+  if (!inst || !inst.memberIds.has(pid)) return null;
+  return buildRiftStateEvent(ctx, pid, inst, true);
 }
 
 // ---- Floor spawn / teardown -------------------------------------------------

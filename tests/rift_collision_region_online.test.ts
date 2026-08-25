@@ -155,4 +155,37 @@ describe('ClientWorld rift collision region lifecycle (issue #3479)', () => {
       'a session that ends inside a rift does not strand its region',
     ).toBe(false);
   });
+
+  it('ignores a late riftState(active:true) after endSession()', () => {
+    const client = riftReadyClient();
+    const origin = riftInstanceOrigin(0, 0);
+    (client as any).applyRiftStateEvent(riftStateEvent({}));
+    expect(wallCellBlocked(client, origin), 'registered before session end').toBe(true);
+
+    (client as any).endSession();
+    (client as any).applyRiftStateEvent(riftStateEvent({}));
+
+    expect(client.riftFloor).toBeNull();
+    expect(
+      wallCellBlocked(client, origin),
+      'a late riftState after teardown cannot re-register the region',
+    ).toBe(false);
+  });
+});
+
+// riftReadyClient() above seeds riftCollisionToken via allocRiftCollisionToken()
+// directly, the same as `new ClientWorld(...)`'s own readonly field initializer
+// does, rather than running that real constructor (Object.create bypasses it,
+// per bare_client.ts's own doc comment, since a real construction needs a live
+// WebSocket/window/document this suite never stands up). That substitution is
+// sound only if the allocator itself can never hand back 0, the reserved
+// "no token" sentinel RIFT_REGIONS treats specially (setRiftRegion(0, ...)
+// would publish under the same key every never-constructed fixture reads as
+// "no region"). Pin that directly, since nothing else in this file exercises
+// the real constructor to prove it.
+describe('allocRiftCollisionToken never hands back the reserved sentinel', () => {
+  it('is always non-zero', () => {
+    expect(allocRiftCollisionToken()).not.toBe(0);
+    expect(allocRiftCollisionToken()).not.toBe(0);
+  });
 });

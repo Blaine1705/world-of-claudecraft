@@ -1433,9 +1433,15 @@ describe('rift prediction (issue #3479)', () => {
     for (let i = 0; i < 10; i++) lab.frame(); // settle the mirror
 
     lab.setInput(mi({ forward: true }));
-    // 4s comfortably crosses flat (z 70-84) + ramp (84-94) + well onto the
-    // plateau (94-110+) even leash-bounded well under full run speed.
+    // 4s comfortably crosses the flat lead-in (z 70-84) and carries well into
+    // the ramp itself (84-94), leash-bounded well under full run speed; it
+    // does not reach the plateau (94+) at this lag budget, which the
+    // maxLocalZ/liftedSamples assertions below pin directly rather than
+    // leaving to a comment a future speed or leash change could silently
+    // outdate.
     let sampled = 0;
+    let maxLocalZ = Number.NEGATIVE_INFINITY;
+    let liftedSamples = 0;
     for (let i = 0; i < 240; i++) {
       const r = lab.frame();
       if (!r.pose) continue;
@@ -1456,8 +1462,20 @@ describe('rift prediction (issue #3479)', () => {
         `frame ${i} at local z=${localZ.toFixed(2)}: expected ~${expected.toFixed(4)}, got ${r.pose.y.toFixed(4)}`,
       ).toBeLessThan(0.02);
       sampled++;
+      maxLocalZ = Math.max(maxLocalZ, localZ);
+      if (expected > 0) liftedSamples++;
     }
     expect(sampled).toBeGreaterThan(200);
+    // Decisive traversal pins: the run must actually carry well onto the
+    // ramp's rising slope (not just brush its start) while staying short of
+    // the plateau, and a solid share of the 4s window must land on the
+    // lifted (z > 84) part. A future speed or leash change that quietly
+    // shrank the ramp portion toward zero would still pass `sampled > 200`
+    // (a pose is produced on flat ground too), so these two are what
+    // actually hold the traversal this test claims to exercise.
+    expect(maxLocalZ).toBeGreaterThan(85);
+    expect(maxLocalZ).toBeLessThan(94);
+    expect(liftedSamples).toBeGreaterThan(80);
   });
 
   it('the predicted pose stops at a rift wall, never crossing it while running into it', () => {
@@ -1495,14 +1513,37 @@ describe('rift prediction (issue #3479)', () => {
 
     lab.setInput(mi({ forward: true }));
     let maxLocalX = Number.NEGATIVE_INFINITY;
+    let sampled = 0;
+    const localXs: number[] = [];
     // The wall must hold the predicted pose at its real block face
     // (server-verified 33.5) the whole way, not just at the end.
     for (let i = 0; i < 120; i++) {
       const r = lab.frame();
       if (!r.pose) continue;
-      maxLocalX = Math.max(maxLocalX, r.pose.x - origin.x);
+      const localX = r.pose.x - origin.x;
+      maxLocalX = Math.max(maxLocalX, localX);
+      localXs.push(localX);
+      sampled++;
     }
+    // A pose must actually be produced across most of the run, or the bound
+    // below is satisfied vacuously by prediction being off the whole time
+    // (exactly the failure mode: a rift floor riftFloor never populated for,
+    // e.g. a resumed session, suspends prediction entirely and this loop
+    // would otherwise pass on zero samples).
+    expect(sampled).toBeGreaterThan(100);
     expect(maxLocalX).toBeLessThan(34.5);
+    // A full yard of slack against the real block face (33.5) would also let
+    // the local wall resolution silently do nothing (leaving the leash alone
+    // to hold the pose near the server anchor) and still pass; pin the lower
+    // bound too, so a regression that stops resolving the wall locally shows
+    // up here even while the leash still masks it from the naive test.
+    expect(maxLocalX).toBeGreaterThan(33.4);
+    // No backward step once the run reaches the wall: the issue's own
+    // acceptance criterion ("no backward step when the authoritative anchor
+    // catches up"), which nothing above asserts on its own.
+    for (let i = 1; i < localXs.length; i++) {
+      expect(localXs[i]).toBeGreaterThanOrEqual(localXs[i - 1] - 1e-6);
+    }
   });
 
   it('suspends prediction while riftSliding is true and resumes once it clears', () => {

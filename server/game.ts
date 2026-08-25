@@ -75,6 +75,7 @@ import {
 } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
+import { riftStateEventFor } from '../src/sim/rift/runs';
 import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
@@ -4053,6 +4054,10 @@ export class GameServer {
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
     // flap), so the fresh join notice would read as a glitch.
+    // A resumed session's fresh ClientWorld starts with riftFloor null (only
+    // enter/descend/exit emit riftState); re-send it so a resume is not blind.
+    const riftState = riftStateEventFor(this.sim.ctx, session.pid);
+    if (riftState) this.send(session, { t: 'events', list: [riftState] });
     if (session.jailed) this.teleportJailedSession(session);
     void this.sendSocialSnapshot(session.characterId);
     return session;
