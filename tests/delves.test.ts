@@ -79,6 +79,21 @@ function enterReliquary(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
   sim.enterDelve('collapsed_reliquary', tier);
 }
 
+function enterReliquaryAs(sim: Sim, pid: number, tier: 'normal' | 'heroic' = 'normal') {
+  const heroicTier = DELVES.collapsed_reliquary.tiers.find((t) => t.id === 'heroic');
+  const level =
+    tier === 'heroic'
+      ? (heroicTier?.minPlayerLevel ?? DELVES.collapsed_reliquary.minLevel)
+      : DELVES.collapsed_reliquary.minLevel;
+  sim.setPlayerLevel(level, pid);
+  const door = DELVES.collapsed_reliquary.doorPos;
+  const e = sim.entities.get(pid)!;
+  e.pos = { x: door.x, y: terrainHeight(door.x, door.z, sim.cfg.seed), z: door.z };
+  e.prevPos = { ...e.pos };
+  (sim as any).rebucket(e);
+  sim.enterDelve('collapsed_reliquary', tier, pid);
+}
+
 function enterLitany(sim: Sim, tier: 'normal' | 'heroic' = 'normal') {
   const heroicTier = DELVES.drowned_litany.tiers.find((t) => t.id === 'heroic');
   const level =
@@ -927,6 +942,27 @@ describe('delve interactables and affixes', () => {
     run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
     for (let i = 0; i < 21; i++) sim.tick();
     expect(run.partyKey).toBe(null);
+  });
+
+  it('ejects and recycles a stale occupied run when rebind would collide with another run', () => {
+    const sim = makeSim();
+    const b = sim.addPlayer('warrior', 'SoloB');
+    enterReliquary(sim);
+    enterReliquaryAs(sim, b);
+    const primaryRun = sim.delveRunForPlayer(sim.playerId)!;
+    const staleRun = sim.delveRunForPlayer(b)!;
+    expect(staleRun).not.toBe(primaryRun);
+
+    sim.partyInvite(sim.playerId, b);
+    sim.partyAccept(sim.playerId);
+    for (let i = 0; i < 21; i++) sim.tick();
+
+    expect(staleRun.partyKey).toBeNull();
+    expect(sim.delveRunForPlayer(sim.playerId)).toBe(primaryRun);
+    expect(sim.delveRunForPlayer(b)).toBeNull();
+    const e = sim.entities.get(b)!;
+    expect(isDelvePos(e.pos.x)).toBe(false);
+    expect(e.pos.x).toBeCloseTo(DELVES.collapsed_reliquary.doorPos.x, 5);
   });
 
   it('bad_air affix applies a periodic Bad Air DoT to the party (PRD §6.7)', () => {

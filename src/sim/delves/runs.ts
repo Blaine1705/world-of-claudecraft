@@ -201,6 +201,14 @@ function rebindDelveRunToOccupant(ctx: SimContext, e: Entity, key: string): Delv
   return null;
 }
 
+function ejectStaleDelveOccupants(ctx: SimContext, run: DelveRun, pids: readonly number[]): void {
+  const delve = DELVES[run.delveId];
+  pids.forEach((pid, i) => {
+    restorePetFromDelveStash(ctx, pid);
+    ejectToDelveDoor(ctx, pid, delve, i);
+  });
+}
+
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   const byPlayer = delveRunForPlayer(ctx, e.id);
   if (byPlayer) return byPlayer;
@@ -665,7 +673,8 @@ export function updateDelveRuns(ctx: SimContext): void {
   for (const run of ctx.delveRuns) {
     if (run.partyKey === null) continue;
     let occupied = false;
-    let strandedKey: string | null = null;
+    let ownerOccupied = false;
+    const staleOccupants = new Map<string, number[]>();
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
       // insideDelveRunBand is the asymmetric band: the old symmetric +-radius check
@@ -676,14 +685,35 @@ export function updateDelveRuns(ctx: SimContext): void {
       occupied = true;
       const key = ctx.instanceKeyFor(meta.entityId);
       if (key === run.partyKey) {
-        strandedKey = null;
-        break;
+        ownerOccupied = true;
+        continue;
       }
-      strandedKey ??= key;
+      const occupants = staleOccupants.get(key);
+      if (occupants) occupants.push(meta.entityId);
+      else staleOccupants.set(key, [meta.entityId]);
     }
     // Catches an occupant who changed party and then never moved or acted, so the
-    // on-demand re-bind in delveRunForPlayer never ran for them.
-    if (strandedKey !== null) rebindDelveRun(ctx, run, strandedKey);
+    // on-demand re-bind in delveRunForPlayer never ran for them. If the stale
+    // occupant split from a still-owned run, or their new key already owns a
+    // different slot, send them back to the door instead of leaving a claimed run
+    // pinned under a key no current player can resolve.
+    if (staleOccupants.size > 0) {
+      const stalePids = [...staleOccupants.values()].flat();
+      if (ownerOccupied) {
+        ejectStaleDelveOccupants(ctx, run, stalePids);
+      } else if (staleOccupants.size === 1) {
+        const [[strandedKey, strandedPids]] = [...staleOccupants];
+        if (!rebindDelveRun(ctx, run, strandedKey)) {
+          ejectStaleDelveOccupants(ctx, run, strandedPids);
+          freeDelveRun(ctx, run);
+          continue;
+        }
+      } else {
+        ejectStaleDelveOccupants(ctx, run, stalePids);
+        freeDelveRun(ctx, run);
+        continue;
+      }
+    }
     if (occupied) run.emptyFor = 0;
     else {
       run.emptyFor += 1;

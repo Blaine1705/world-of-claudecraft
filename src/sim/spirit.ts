@@ -32,6 +32,7 @@ import { BG_GRAVEYARDS } from './battleground_layout';
 import {
   battlegroundOrigin,
   DELVES,
+  delveAt,
   dungeonAt,
   isDelvePos,
   isRiftPos,
@@ -133,6 +134,15 @@ function ghostGraveyard(
   if (delve && isDelvePos(p.pos.x)) {
     const door = DELVES[delve.delveId]?.doorPos;
     if (door) return nearestOverworldGraveyard(door.x, door.z, graveyards, fallback);
+  }
+  const unclaimedDelve = isDelvePos(p.pos.x) ? delveAt(p.pos.x) : null;
+  if (unclaimedDelve) {
+    return nearestOverworldGraveyard(
+      unclaimedDelve.doorPos.x,
+      unclaimedDelve.doorPos.z,
+      graveyards,
+      fallback,
+    );
   }
   // A rift death returns the spirit to the overworld graveyard nearest where the
   // player STEPPED THROUGH the portal (the instance's returnPos), not the far-off
