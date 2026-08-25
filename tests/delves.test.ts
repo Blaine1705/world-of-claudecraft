@@ -3775,6 +3775,21 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     (sim as Sim).delveRiteChoose(intensity);
   }
 
+  it('rolls Bountiful at the raised rate (Heroic 5%→20%, Normal 2%→8%)', () => {
+    const rollFor = (seed: number, tier: 'normal' | 'heroic') => {
+      const s = makeSim('warrior', seed);
+      enterLitany(s, tier);
+      return s.delveRunForPlayer(s.playerId)?.bountiful;
+    };
+    // Both seeds were found by brute-force search over the real formula in
+    // claimDelveRun: each is a MISS under the retired 5%/2% odds and a HIT
+    // under the live 20%/8% ones, so this proves the roll rate itself moved
+    // (the chase epics were landing near 1-in-700 per heroic clear before
+    // this bump, see the epic-in-bountiful roll in drowned_litany_loot.ts).
+    expect(rollFor(1, 'heroic')).toBe(true);
+    expect(rollFor(53, 'normal')).toBe(true);
+  });
+
   it('rejects a rite difficulty commit from a player away from the reliquary', () => {
     const sim = makeSim();
     const run = enterLitanyApse(sim);

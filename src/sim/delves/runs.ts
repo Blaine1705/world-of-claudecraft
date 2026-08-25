@@ -462,10 +462,13 @@ export function claimDelveRun(
   run.partyKey = key;
   run.seed = ctx.rng.int(1, 0x7fffffff);
   run.tierId = tierId;
-  // §7.6, roll Bountiful once at run start (Heroic 5% / Normal 2%). Derived from
-  // run.seed in its own stream (like affixes/modules) so it is deterministic
-  // without perturbing the global rng draw order that the chest loot depends on.
-  run.bountiful = new Rng((run.seed ^ 0x600dc0ff) >>> 0).chance(tierId === 'heroic' ? 0.05 : 0.02);
+  // §7.6, roll Bountiful once at run start (Heroic 20% / Normal 8%; raised 4x
+  // from the original 5%/2% launch tuning, issue: chase epics were landing
+  // near 1-in-700 per heroic clear once compounded with the epic roll below,
+  // see drownedLitanyChestItemsForTier). Derived from run.seed in its own
+  // stream (like affixes/modules) so it is deterministic without perturbing
+  // the global rng draw order that the chest loot depends on.
+  run.bountiful = new Rng((run.seed ^ 0x600dc0ff) >>> 0).chance(tierId === 'heroic' ? 0.2 : 0.08);
   run.affixes = rollDelveAffixes(delve, tierId, run.seed);
   run.modules = pickDelveModules(delve, run.seed, tierId);
   run.moduleIndex = 0;
