@@ -1,3 +1,4 @@
+import { EXTENDED_DAWN_ASCENSION_CHARGE_BONUS } from '../paladin_devotion';
 import type { ClassChoiceRows } from './talent_rows';
 
 const rogueBuilderAbilityIds = [
@@ -396,7 +397,7 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Extended Dawn',
           description: 'Divine Ascension empowers 2 additional abilities.',
           icon: 'pal_r17_extended_dawn',
-          effect: { global: { ascensionChargeBonus: 2 } },
+          effect: { global: { ascensionChargeBonus: EXTENDED_DAWN_ASCENSION_CHARGE_BONUS } },
         },
         {
           id: 'pal_r17_radiant_wrath',
