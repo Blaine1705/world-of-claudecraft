@@ -286,7 +286,7 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // the document-level native-menu suppress set), and fails safe to inspect
     // when a mobile-touch browser reports no pointerType (Firefox Android).
     expect(painter).toMatch(
-      /row\.addEventListener\('contextmenu', \(ev\) => \{[\s\S]{0,700}?pointerType === 'touch'[\s\S]{0,200}?ev\.preventDefault\(\);\s*return;\s*\}\s*\/\/ At a vendor/,
+      /row\.addEventListener\('contextmenu', \(ev\) => \{[\s\S]{0,700}?pointerType === 'touch'[\s\S]{0,200}?ev\.preventDefault\(\);\s*return;\s*\}\s*if \(this\.deps\.vendorOpen\(\)\)/,
     );
     expect(painter).toContain(
       "(document.body.classList.contains('mobile-touch') && pointerType !== 'mouse')",

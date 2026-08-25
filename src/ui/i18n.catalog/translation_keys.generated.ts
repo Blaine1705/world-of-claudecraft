@@ -9052,6 +9052,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.itemMenu.disenchant'
   | 'hudChrome.itemMenu.equip'
   | 'hudChrome.itemMenu.salvage'
+  | 'hudChrome.itemMenu.sell'
+  | 'hudChrome.itemMenu.sellAll'
   | 'hudChrome.itemMenu.use'
   | 'hudChrome.itemProc.attackSlow'
   | 'hudChrome.itemProc.chainArc'

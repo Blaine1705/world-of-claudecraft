@@ -10,82 +10,127 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "es_ES": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "fr_FR": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "fr_CA": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "de_DE": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll"
+  ],
+  "zh_TW": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll"
+  ],
+  "ko_KR": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll"
+  ],
+  "ja_JP": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll"
+  ],
   "pt_BR": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll"
+  ],
   "cs_CZ": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "nl_NL": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "pl_PL": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "id_ID": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "tr_TR": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "sv_SE": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "vi_VN": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "da_DK": [
+    "hudChrome.itemMenu.sell",
+    "hudChrome.itemMenu.sellAll",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"

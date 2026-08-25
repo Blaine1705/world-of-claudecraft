@@ -3545,7 +3545,9 @@ export const pt_BR: EnTranslations = {
       "equip": "Equipar",
       "disenchant": "Desencantar",
       "salvage": "Recuperar",
-      "applyEnchant": "Aplicar Encantamento"
+      "applyEnchant": "Aplicar Encantamento",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
