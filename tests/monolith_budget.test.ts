@@ -383,7 +383,11 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/nameplate_canvas.ts',
-    ceiling: 852,
+    // Re-pinned at the deed-cartouche base merge: the release arm's heraldry
+    // (+70, one line under the old pin on its own tree) and this branch's
+    // pledge nameplate line (+13) compound in the merged file. Exact count,
+    // zero slack.
+    ceiling: 864,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
