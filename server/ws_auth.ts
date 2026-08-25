@@ -31,6 +31,7 @@ import type {
   TokenScope,
 } from './db';
 import type { GameServer } from './game';
+import { negotiateMovementWireVersion } from './movement_wire_version';
 import type { HandshakeFlushMode } from './ws_buffer';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
@@ -282,6 +283,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
     const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
       msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
+    const movementWireVersion = negotiateMovementWireVersion(msg.movementWire);
     const account = await accountAndScopeForToken(token);
     if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
@@ -355,6 +357,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         clientSeed,
         timerWireVersion,
         petSpecialWireVersion,
+        movementWireVersion,
         // The character's stored action-bar layout, sent once to the owning client
         // so it restores at login on any device (game.join re-validates it).
         hotbarLayout: character.hotbar_layout ?? null,

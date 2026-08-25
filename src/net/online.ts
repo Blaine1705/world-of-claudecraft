@@ -129,7 +129,6 @@ import {
   type MailInfo,
   type MarketInfo,
   type MountRaceView,
-  ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
@@ -168,6 +167,13 @@ import {
 } from './civic_service_placements';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { inputSignature } from './input_signature';
+import {
+  type MovementFrameV2,
+  MovementFrameV2Outbox,
+  trackPendingInputSequence,
+  trackPendingInputSequenceRange,
+} from './movement_frame_v2_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
@@ -176,12 +182,14 @@ import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
 import {
   type SnapshotTimerWireMode,
-  STABLE_TIMER_WIRE_VERSION,
   type StableCooldownWire,
   snapshotTimerWireMode,
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { buildWebSocketAuthMessage } from './world_auth_message';
+
+export { buildWebSocketAuthMessage } from './world_auth_message';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -283,28 +291,6 @@ export {
   NATIVE_API_ORIGIN,
   NATIVE_APP,
 } from '../client_origin';
-
-export function buildWebSocketAuthMessage(
-  token: string,
-  characterId: number,
-  clientSeed = '',
-): {
-  t: typeof ONLINE_WORLD_AUTH_TYPE;
-  token: string;
-  character: number;
-  clientSeed: string;
-  timerWire: typeof STABLE_TIMER_WIRE_VERSION;
-  petSpecialWire: typeof PET_SPECIAL_WIRE_VERSION;
-} {
-  return {
-    t: ONLINE_WORLD_AUTH_TYPE,
-    token,
-    character: characterId,
-    clientSeed,
-    timerWire: STABLE_TIMER_WIRE_VERSION,
-    petSpecialWire: PET_SPECIAL_WIRE_VERSION,
-  };
-}
 
 export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
 
@@ -1862,6 +1848,7 @@ export class ClientWorld implements IWorld {
   // False until a negotiated server snapshot advertises support. This keeps a
   // new client from showing inert buttons while connected to an older server.
   petSpecialCommandsSupported = false;
+  movementWireVersion: 1 | 2 = 1;
   // Stable timer-wire decode state. These stay separate from the public
   // remaining-time mirrors so an omitted v2 field can be re-derived from the
   // server simulation clock without accumulating client-frame drift.
@@ -1968,6 +1955,9 @@ export class ClientWorld implements IWorld {
   private lastInputSig = '';
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
+  private movementFrameOutbox: MovementFrameV2Outbox | undefined;
+  onMovementWireNegotiated: ((version: 1 | 2) => void) | null = null;
+  onMovementWireNeutral: ((now: number) => boolean) | null = null;
   // No initializer on purpose: bare ClientWorld test fixtures skip field
   // initializers, and the lazy accessor below keeps that construction idiom
   // equivalent to a real instance.
@@ -1989,7 +1979,10 @@ export class ClientWorld implements IWorld {
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)
-    this.sendTimer = window.setInterval(() => this.sendInput(), INPUT_SEND_TIMER_INTERVAL_MS);
+    this.sendTimer = window.setInterval(
+      () => this.sendMovementTimerTick(),
+      INPUT_SEND_TIMER_INTERVAL_MS,
+    );
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -2221,19 +2214,50 @@ export class ClientWorld implements IWorld {
   flushInput(now = performance.now()): boolean {
     return this.sendInput(now, 'changed');
   }
+  movementWireIsOpen(): boolean {
+    return (
+      typeof this.spectating !== 'string' && this.connected && this.ws.readyState === WebSocket.OPEN
+    );
+  }
+  sendMovementFrame(
+    frame: MovementFrameV2,
+    now = performance.now(),
+    bypassBackpressure = false,
+  ): boolean {
+    const firstSeq = this.inputSeq + 1;
+    this.movementFrameOutbox ??= new MovementFrameV2Outbox();
+    const result = this.movementFrameOutbox.send(
+      this.ws,
+      this.movementWireIsOpen(),
+      frame,
+      this.inputSeq,
+      bypassBackpressure,
+    );
+    this.inputSeq = result.lastSeq;
+    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
+    return result.accepted;
+  }
 
-  /**
-   * Drop every mirrored movement bit and send an unconditional neutral packet
-   * before the client pauses for an in-place renderer transition. This bypasses
-   * the changed-only cadence gate so a matching signature or a just-sent input
-   * can never leave the authoritative player moving during the pause.
-   */
+  private sendMovementTimerTick(now = performance.now()): void {
+    if (this.movementWireVersion !== 2) return void this.sendInput(now);
+    const firstSeq = this.inputSeq + 1;
+    const result = this.movementFrameOutbox?.flush(
+      this.ws,
+      this.movementWireIsOpen(),
+      this.inputSeq,
+    );
+    if (!result) return;
+    this.inputSeq = result.lastSeq;
+    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
+  }
+
+  /** Send unconditional neutral input before an in-place renderer transition. */
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
-    // On an open socket the forced path admits exactly one neutral frame
-    // despite a saturated browser buffer. The accepted neutral frame consumes
-    // any pre-pause engagement intent without putting it on the wire.
+    if (this.movementWireVersion === 2) {
+      return this.onMovementWireNeutral?.(now) ?? false;
+    }
     return this.sendInput(now, 'forced-neutral');
   }
 
@@ -2252,28 +2276,6 @@ export class ClientWorld implements IWorld {
   // -----------------------------------------------------------------------
   // Socket
   // -----------------------------------------------------------------------
-
-  private inputSignature(): string {
-    const mi = this.moveInput;
-    const facing =
-      this.mouselookFacing === null ? '' : Math.round(this.mouselookFacing * 10000).toString();
-    return [
-      mi.forward ? 1 : 0,
-      mi.back ? 1 : 0,
-      mi.turnLeft ? 1 : 0,
-      mi.turnRight ? 1 : 0,
-      mi.strafeLeft ? 1 : 0,
-      mi.strafeRight ? 1 : 0,
-      mi.jump ? 1 : 0,
-      mi.dive ? 1 : 0,
-      mi.surface ? 1 : 0,
-      // Quantised upstream (input.ts SWIM_STEER_STEPS) precisely so that it can
-      // sit in the change-detection signature without a mouse-move resending
-      // the frame every time the camera twitches.
-      mi.swimSteer ?? 1,
-      facing,
-    ].join(',');
-  }
 
   private pendingTransientInputState(): PendingTransientInput {
     this.pendingTransientInput ??= { jump: false, turnLeft: false, turnRight: false };
@@ -2313,7 +2315,7 @@ export class ClientWorld implements IWorld {
       this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
       return false;
     }
-    const sig = this.inputSignature();
+    const sig = inputSignature(this.moveInput, this.mouselookFacing);
     const hasPendingTransientInput = this.hasPendingTransientInput();
     if (mode === 'changed') {
       if (!hasPendingTransientInput && sig === this.lastInputSig) return false;
@@ -2363,13 +2365,7 @@ export class ClientWorld implements IWorld {
     this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
-    this.pendingInputSeqSentAt.set(this.inputSeq, now);
-    if (this.pendingInputSeqSentAt.size > 120) {
-      const stale = this.inputSeq - 120;
-      for (const seq of this.pendingInputSeqSentAt.keys()) {
-        if (seq <= stale) this.pendingInputSeqSentAt.delete(seq);
-      }
-    }
+    trackPendingInputSequence(this.pendingInputSeqSentAt, this.inputSeq, now);
     return true;
   }
 
@@ -2466,6 +2462,9 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'hello') {
+      this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
+      this.movementFrameOutbox?.reset();
+      this.onMovementWireNegotiated?.(this.movementWireVersion);
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;

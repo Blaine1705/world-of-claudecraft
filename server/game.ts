@@ -9,7 +9,6 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
-import { isStunned } from '../src/sim/combat/cc';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
@@ -54,7 +53,6 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
-import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -295,6 +293,13 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import {
+  applyMovementInputFrame,
+  consumeMovementFramesV2,
+  createMovementInputSessionState,
+  type MovementInputSessionState,
+  resetMovementInputSessionState,
+} from './movement_input_timeline_v2';
 import {
   classifyMsgLane,
   consumeLaneToken,
@@ -922,7 +927,7 @@ const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
-export interface ClientSession {
+export interface ClientSession extends MovementInputSessionState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -2738,6 +2743,7 @@ export class GameServer {
             lap('stale');
             this.riftUpgrader.drain(this.sim.ctx);
             this.riftAssets.drain(this.sim.ctx);
+            consumeMovementFramesV2(this.sim, this.clients.values());
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
             this.riftUpgrader.observe(this.sim.ctx);
@@ -3607,6 +3613,7 @@ export class GameServer {
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
+        movementWireVersion?: 1 | 2;
         generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
@@ -3769,6 +3776,7 @@ export class GameServer {
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
       lastInputAt: this.sim.time,
+      ...createMovementInputSessionState(meta.movementWireVersion),
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
@@ -3892,6 +3900,7 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: session.movementWireVersion,
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -4010,6 +4019,7 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
+    resetMovementInputSessionState(session, meta.movementWireVersion);
     // Load-bearing for every rev + cadence gate (market, mail, corder):
     // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
     // each gate's `sent.X === undefined` arm forces both dueness and a
@@ -4049,6 +4059,7 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: session.movementWireVersion,
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
@@ -6482,9 +6493,7 @@ export class GameServer {
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
-      const frame = parseMoveInputFrame(msg);
-      Object.assign(meta.moveInput, frame.moveInput);
-      session.lastInputAt = sim.time;
+      const frame = applyMovementInputFrame(session, meta, e, msg, sim.time);
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
         // R9: the client seq is a per-send increment on an ordered socket, so
@@ -6499,16 +6508,6 @@ export class GameServer {
           );
         }
         session.lastInputSeq = Math.max(session.lastInputSeq, seq);
-      }
-      // A released spirit turns with the camera like the living; only a corpse that
-      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
-      // this the server drops the ghost's mouselook facing and its run feels inverted.
-      // A stun locks facing too (issue #2426): the offline kernel already blocks its
-      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
-      // this out-of-band channel and must be rejected here, the authoritative side,
-      // not trusted to a client that could simply keep sending it.
-      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
-        e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
@@ -8835,6 +8834,7 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
+      ...(session.movementWireVersion === 2 ? { ackCt: session.lastConsumedCt } : {}),
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default

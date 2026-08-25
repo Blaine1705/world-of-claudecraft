@@ -145,6 +145,7 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
+import { MovementWireGlue } from './game/movement_wire_glue';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
@@ -2843,7 +2844,6 @@ async function startGame(
   // apply persisted settings to the freshly-built subsystems
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
-
   const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
     normalizeGraphicsSettingsSnapshot({
       graphicsPreset: settings.get('graphicsPreset'),
@@ -2855,7 +2855,6 @@ async function startGame(
     });
   let appliedGraphicsSettings = captureGraphicsSettings();
   const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
-
   const configureRebuiltRenderer = (next: Renderer): void => {
     next.showNameplates = renderer.showNameplates;
     next.showDevBadges = settings.get('showDevBadges');
@@ -2874,7 +2873,6 @@ async function startGame(
       next.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
   };
-
   const graphicsRebuild = new GraphicsRebuildCoordinator<
     GraphicsSettingsSnapshot,
     Renderer,
@@ -2887,6 +2885,7 @@ async function startGame(
     setClientPaused: (paused) => {
       graphicsRebuildPaused = paused;
       if (!paused) {
+        movementWireGlue.resume();
         last = performance.now();
         acc = 0;
       }
@@ -2900,6 +2899,7 @@ async function startGame(
       mobileControls.syncAutorun(false);
     },
     neutralizeOnlineInput: () => {
+      // V2 consumes this frame, then starvation holds neutral throughout the pause.
       online?.neutralizeInputForClientPause();
     },
     showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
@@ -4353,14 +4353,12 @@ async function startGame(
     getPredLeadMs: () => renderer.selfMotionLeadMs,
     getApm: () => inputMeter.apm(performance.now()),
   });
-
   function visualFacingFor(
     mi: ReturnType<typeof input.readMoveInput>,
     baseFacing: number,
   ): number | null {
     return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
   }
-
   const perfNetworkStats = {
     connected: false,
     snapInterval: 0,
@@ -4368,7 +4366,8 @@ async function startGame(
     alpha: 0,
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
-
+  const movementWireGlue = new MovementWireGlue();
+  if (online) movementWireGlue.connect(online);
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
@@ -4701,6 +4700,7 @@ async function startGame(
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
+    movementWireGlue.advance(net, frameDt, net.moveInput, netFacing, performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     inputEcho.fold(echoSamples);
     for (const sample of echoSamples) perf.markInputEcho(sample);

@@ -1,0 +1,54 @@
+import type { MoveInput } from '../sim/types';
+import { type InputTickFrame, InputTickSampler } from './input_tick_sampler';
+
+export interface MovementWireClient {
+  movementWireVersion: 1 | 2;
+  onMovementWireNegotiated: ((version: 1 | 2) => void) | null;
+  onMovementWireNeutral: ((now: number) => boolean) | null;
+  movementWireIsOpen(): boolean;
+  sendMovementFrame(frame: InputTickFrame, now: number, bypassBackpressure?: boolean): boolean;
+}
+
+export class MovementWireGlue {
+  private readonly sampler = new InputTickSampler();
+  private paused = false;
+
+  connect(client: MovementWireClient): void {
+    client.onMovementWireNegotiated = (version) => this.negotiated(version);
+    client.onMovementWireNeutral = (now) => this.emitNeutralFrame(client, now);
+    this.negotiated(client.movementWireVersion);
+  }
+
+  negotiated(version: 1 | 2): void {
+    if (version !== 2) return;
+    this.sampler.reset();
+    this.paused = false;
+  }
+
+  resume(): void {
+    this.paused = false;
+  }
+
+  emitNeutralFrame(client: MovementWireClient, now: number): boolean {
+    if (client.movementWireVersion !== 2 || !client.movementWireIsOpen()) return false;
+    const frame = this.sampler.emitNeutralFrame();
+    try {
+      return client.sendMovementFrame(frame, now, true);
+    } finally {
+      this.paused = true;
+    }
+  }
+
+  advance(
+    client: MovementWireClient,
+    frameDtSec: number,
+    mi: MoveInput,
+    facing: number | null,
+    now: number,
+  ): void {
+    if (client.movementWireVersion !== 2 || this.paused || !client.movementWireIsOpen()) return;
+    for (const frame of this.sampler.advance(frameDtSec, () => ({ mi, facing }))) {
+      client.sendMovementFrame(frame, now);
+    }
+  }
+}

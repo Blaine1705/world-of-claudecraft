@@ -28,6 +28,7 @@ import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosm
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -1275,13 +1276,95 @@ describe('delta snapshots', () => {
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
     broadcast(server);
     const snap = lastSnap(fc.sent);
-    expect(snap.self.ack).toBe(7);
+    expect({
+      ack: snap.self.ack,
+      ...('ackCt' in snap.self ? { ackCt: snap.self.ackCt } : {}),
+    }).toEqual({ ack: 7 });
 
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 6, mi: { f: 0 } }));
     fc.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fc.sent).self.ack).toBe(7);
   });
+
+  it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
+    const v2Server = new GameServer();
+    const v2Client = fakeWs();
+    const v2Session = joinServer(v2Server, v2Client, 2, 'Ticked', 'warrior', {
+      movementWireVersion: 2,
+    });
+    const meta = v2Server.sim.meta(v2Session.pid)!;
+    const entity = v2Server.sim.entities.get(v2Session.pid)!;
+    const facingBeforeArrival = entity.facing;
+    const lastInputAtBeforeArrival = v2Session.lastInputAt;
+    v2Server.handleMessage(
+      v2Session,
+      JSON.stringify({ t: 'input', seq: 4, ct: 0, mi: { f: 1 }, facing: 0.25 }),
+    );
+
+    expect(meta.moveInput.forward).toBe(false);
+    expect(entity.facing).toBe(facingBeforeArrival);
+    expect(v2Session.lastInputAt).toBe(lastInputAtBeforeArrival);
+    consumeMovementFramesV2(v2Server.sim, [v2Session]);
+    expect(meta.moveInput.forward).toBe(true);
+    expect(entity.facing).toBe(0.25);
+    expect(v2Session.lastConsumedCt).toBe(0);
+    expect(v2Session.lastInputAt).toBe(v2Server.sim.time);
+    v2Server.sim.tick();
+    broadcast(v2Server);
+    const self = lastSnap(v2Client.sent).self;
+
+    expect({ ack: self.ack, ...('ackCt' in self ? { ackCt: self.ackCt } : {}) }).toEqual({
+      ack: 4,
+      ackCt: 0,
+    });
+  });
+
+  it.each([
+    ['unreleased corpse', true, false, false, false],
+    ['released ghost', true, true, false, true],
+    ['stunned player', false, false, true, false],
+  ] as const)(
+    'applies v2 facing guards at consumption for a %s',
+    (_name, dead, ghost, stunned, appliesFacing) => {
+      const facingServer = new GameServer();
+      const facingClient = fakeWs();
+      const facingSession = joinServer(
+        facingServer,
+        facingClient,
+        3,
+        `Facing ${_name}`,
+        'warrior',
+        {
+          movementWireVersion: 2,
+        },
+      );
+      const entity = facingServer.sim.entities.get(facingSession.pid)!;
+      entity.facing = 0.25;
+      entity.dead = dead;
+      entity.ghost = ghost;
+      if (stunned) {
+        entity.auras.push({
+          id: 'test_stun',
+          name: 'Test Stun',
+          kind: 'stun',
+          remaining: 5,
+          duration: 5,
+          value: 0,
+          sourceId: entity.id,
+          school: 'physical',
+        } satisfies Aura);
+      }
+
+      facingServer.handleMessage(
+        facingSession,
+        JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: {}, facing: 1.25 }),
+      );
+      consumeMovementFramesV2(facingServer.sim, [facingSession]);
+
+      expect(entity.facing).toBe(appliesFacing ? 1.25 : 0.25);
+    },
+  );
 
   it('turns echoed input acks into client latency samples', () => {
     const client = bareClient(1);
@@ -2250,6 +2333,69 @@ describe('client-side delta merge', () => {
         seq: 2,
         mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
       });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('sends movement v2 frames with client ticks and nullable facing', () => {
+    const client = bareClient(1, { movementWireVersion: 2 });
+    const sent: any[] = [];
+    (client as any).ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      expect(
+        client.sendMovementFrame(
+          { ct: 5, mi: { ...client.moveInput, forward: true }, facing: null },
+          100,
+        ),
+      ).toBe(true);
+      expect(
+        client.sendMovementFrame(
+          { ct: 6, mi: { ...client.moveInput, strafeLeft: true }, facing: 0.25 },
+          150,
+        ),
+      ).toBe(true);
+      expect(sent).toEqual([
+        {
+          t: 'input',
+          seq: 1,
+          ct: 5,
+          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
+        },
+        {
+          t: 'input',
+          seq: 2,
+          ct: 6,
+          mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 1, sr: 0, j: 0, dv: 0, sf: 0 },
+          facing: 0.25,
+        },
+      ]);
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('bounds movement v2 input echo telemetry to the legacy window', () => {
+    const client = bareClient(1, { movementWireVersion: 2 });
+    (client as any).ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: () => {},
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      for (let ct = 0; ct < 121; ct++) {
+        expect(client.sendMovementFrame({ ct, mi: client.moveInput, facing: null }, ct)).toBe(true);
+      }
+      expect((client as any).pendingInputSeqSentAt.size).toBe(120);
+      expect([...(client as any).pendingInputSeqSentAt.keys()].slice(0, 2)).toEqual([2, 3]);
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }

@@ -44,6 +44,8 @@
 // the top of tests/unstuck_online.test.ts.
 
 import type { ClientSession, GameServer } from '../../server/game';
+import { consumeMovementFramesV2 } from '../../server/movement_input_timeline_v2';
+import { MovementWireGlue } from '../../src/game/movement_wire_glue';
 import { adaptiveSelfAlphaLead } from '../../src/game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from '../../src/game/self_motion_frame_buffer';
 import {
@@ -161,6 +163,7 @@ export interface HarnessRun {
 
 export interface OnlineHarnessOptions {
   latency: LatencyLinkConfig;
+  movementWire?: 1 | 2;
   frameMs?: number;
   playerClass?: PlayerClass;
   /** Virtual ms of idle world before a scenario starts, so the mirror is
@@ -292,7 +295,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     commands.push({ tMs: clock.now() - recordingFromMs, mi: frame.moveInput, facing: wireFacing });
   }
 
-  const joined = joinGroundTruthCharacter(1, opts.playerClass ?? 'warrior');
+  const joined = joinGroundTruthCharacter(1, opts.playerClass ?? 'warrior', opts.movementWire ?? 1);
   const { server, session, pid } = joined;
   // The frames join() already wrote (hello, the entry notice, the social
   // snapshot) were captured raw by rawFakeWs. Virtual time has not moved since,
@@ -349,6 +352,8 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
   // per session.
   const inputEcho = new InputEchoTracker();
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
+  const movementWireGlue = new MovementWireGlue();
+  movementWireGlue.connect(client);
   const selfRender = createSelfRenderPositionState({ x: 0, y: 0, z: 0 });
   const selfMotionGateArgs: SelfMotionGateArgs = {
     disabled: false,
@@ -366,6 +371,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     // biome-ignore lint/suspicious/noExplicitAny: the server-loop internals a manual step drives
     const internals = server as any;
     internals.clearStaleInputs();
+    consumeMovementFramesV2(server.sim, [session]);
     const events = server.sim.tick();
     internals.routeEvents(events);
     internals.broadcastSnapshots();
@@ -408,6 +414,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     Object.assign(client.moveInput, mi);
     client.setMouselookFacing(netFacing);
     client.flushInput(now);
+    movementWireGlue.advance(client, frameDt, client.moveInput, netFacing, now);
 
     // 4) fold the echo samples, then drain the events the discontinuity flag
     // is read from.
