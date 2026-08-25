@@ -83,6 +83,7 @@ const REGISTERED_MODULES = [
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
   'fireball_travel_visual.ts',
+  'coach_trail_materials.ts',
 ];
 
 /** A module-scope lazy cache, however the formatter wrapped it. The type
@@ -229,10 +230,11 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the four registered
-    // bundles, the two excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(7);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(6);
+    // Vacuity floor, kept just under the real count: the five registered
+    // bundles (the coach trail's guidance set among the four spell visuals),
+    // the two excluded scenery bakes, and the battleground caches.
+    expect(hits.length).toBeGreaterThanOrEqual(8);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(7);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

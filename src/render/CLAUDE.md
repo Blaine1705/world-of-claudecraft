@@ -446,6 +446,23 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the Yumi maze walls, the battleground placements) decides through
   `occluderKeepsInstances` before `acquire`. Pinned by
   `tests/occluder_fade_gate.test.ts` and `tests/occluder_fade_core.test.ts`.
+- **The Proving Shore coach's guidance is prewarmed AND gated.** The golden
+  ribbon, target ring, body aura, objective beam and camp ring
+  (`coach_trail.ts`) used to mint their materials and canvas textures on the
+  frame the coach's route or target first changed, by bare `scene.add`, and
+  to dispose the ribbon material on every station change: the island's first
+  accepted quest linked three programs inside a live frame. The materials are
+  now the page-wide set in `coach_trail_materials.ts`, staged by the boot
+  manifest on the ability-material lane (`ABILITY_MATERIAL_SOURCES`, the
+  lazy-cache sweep enforces the registration), and every guidance object is
+  built at construction under one root the trail attaches through
+  `attachSceneGroupGated` with the renderer's compile gate, so the root stays
+  hidden until the programs link whatever the boot kept; rebuilds only swap
+  geometry. The zone archetype prewarm also takes the kill targets of the
+  zone's quests (`zone_prewarm_templates_core.ts`), so a summon-only quest
+  mob (the island's Mister Crabs) is staged with the camps. Pinned by
+  `tests/coach_trail_materials.test.ts` and
+  `tests/zone_prewarm_templates_core.test.ts`.
 - **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
   A gate hides a still-linking object so its reveal draw cannot stall the frame;
   the link is not cancellable and the gate timeout is diagnostic only, so the

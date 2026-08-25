@@ -23,6 +23,7 @@
 // here is the one the live cast will draw with.
 
 import * as THREE from 'three';
+import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
@@ -87,6 +88,16 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'fireball_travel_visual.ts',
     materials: () => Object.values(fireballMaterials()),
     build: () => new FireballTravelVisual().group,
+  },
+  {
+    // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,
+    // beam, area ring), the same lazy-cache idiom on the same manifest lane.
+    // Its first quest accepted on the island used to link three programs
+    // inside a live frame.
+    id: 'coach-trail',
+    module: 'coach_trail_materials.ts',
+    materials: () => Object.values(coachTrailMaterials()),
+    build: () => buildCoachTrailStandIn(),
   },
 ];
 

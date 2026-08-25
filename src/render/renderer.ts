@@ -3095,7 +3095,7 @@ export class Renderer {
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
     // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample);
+    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t));
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
