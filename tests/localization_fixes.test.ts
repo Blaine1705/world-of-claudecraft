@@ -1255,6 +1255,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Materials Vault: the deposit/withdraw/buy-upgrade command bodies emit the
+    // only-materials/locked/material-full/afford/max-upgrades refusals plus the
+    // unlock/upgrade notices (sim_i18n error.vault* / log.vault* rows); the
+    // too-far and bags-full refusals reuse literals matched from bank.ts and
+    // bags.ts, but the ONLY emitter occurrences of the vault strings live here.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/materials_vault.ts'), 'utf8'),
+    // Text-free today (a pure derivation leaf with no SimContext), scanned so
+    // any future inline emit lands under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/material_derivation.ts'), 'utf8'),
     // Guild Bank: the officer-plus shared treasury + item store op bodies emit
     // the rank/full/treasury-cap/short/carry-cap/afford/max-slots refusals plus
     // the four money/item success notices (sim_i18n error.guildBank* /
@@ -1303,6 +1312,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // treatment src/sim/social and src/sim/professions get above, so a new
     // emit there sits under the drift guard from day one.
     socialSourceUnder(path.resolve(process.cwd(), 'src/sim/interactions')),
+    // server/bank_wire.ts (Bank Storage phase 11): the FIRST server module
+    // outside game.ts to emit player text, via sim.ctx.error (the storage
+    // purchase-mutex refusal of a gold rung buy). It rides the ordinary sim
+    // error stream and localizes through the sim matcher, so it belongs in
+    // THIS corpus (the ctx.error scan below catches sim.ctx.error), keeping
+    // a reword of the emit or the matcher from drifting apart silently.
+    fs.readFileSync(path.resolve(process.cwd(), 'server/bank_wire.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

@@ -425,6 +425,11 @@ describe('no src/sim importer (the module-evaluation hard rule)', () => {
   // its header defers enforcement here). One walk guards both.
   // liveImporter is the known consumer outside src/sim that keeps the regex
   // honest as a positive control.
+  // Related guard, same hazard family, different property: the runtime-import-
+  // free scan of src/sim/material_derivation.ts (the shared derivation leaf the
+  // sim consumes lazily) lives in tests/materials_vault.test.ts. A module that
+  // derives EAGERLY from the content tables joins THIS list; a leaf the sim may
+  // import must instead stay runtime-import-free under that scan.
   const GUARDED_MODULES = [
     { name: 'material_taxonomy', liveImporter: '../src/ui/bag_filter.ts' },
     {

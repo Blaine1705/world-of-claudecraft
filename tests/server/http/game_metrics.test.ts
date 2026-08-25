@@ -56,6 +56,7 @@ import {
   WOC_SIM_TICK_HZ,
   WOC_SIM_TICK_PHASE_SECONDS,
   WOC_TICK_PHASES,
+  WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
   WOC_WS_CONNECTIONS,
   WOC_WS_MESSAGES_DROPPED_TOTAL,
   WOC_WS_MESSAGES_TOTAL,
@@ -64,6 +65,7 @@ import {
 import {
   GENERAL_CHAT_QUOTA_DB_OUTCOMES,
   GUILD_BANK_INCIDENTS,
+  VAULT_LEDGER_INCIDENTS,
   WOC_ESCROW_QUEUE_OUTCOMES,
   WS_DROP_CAUSES,
 } from '../../../server/http/game_signals';
@@ -512,6 +514,51 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     );
   });
 
+  it('pre-registers every vault ledger incident kind at zero and increments by kind', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    expect(WOC_VAULT_LEDGER_INCIDENTS_TOTAL).toBe('woc_vault_ledger_incidents_total');
+    // Its own metric, never a kind on the guild series: the vault is a personal
+    // per-character store, so a guild-bank alert rule must not fire on it.
+    expect(WOC_VAULT_LEDGER_INCIDENTS_TOTAL).not.toBe(WOC_GUILD_BANK_INCIDENTS_TOTAL);
+    // The whole vocabulary, pinned as literals, for the guild set's reason: a
+    // rename must fail here rather than silently retire an alert rule.
+    expect(VAULT_LEDGER_INCIDENTS).toEqual(['ledger_write_failed']);
+
+    // Scrape BEFORE any increment: an alert rule cannot fire on a series that
+    // does not exist yet, so every kind must expose an explicit 0 from boot.
+    const zeroed = await registry.metrics();
+    expect(zeroed).toContain(`# TYPE ${WOC_VAULT_LEDGER_INCIDENTS_TOTAL} counter`);
+    for (const kind of VAULT_LEDGER_INCIDENTS) {
+      expect(
+        sampleValue(
+          zeroed,
+          new RegExp(`^woc_vault_ledger_incidents_total\\{kind="${kind}"\\} (\\d+)$`, 'm'),
+        ),
+        kind,
+      ).toBe('0');
+    }
+
+    counters.vaultLedgerIncident('ledger_write_failed');
+    counters.vaultLedgerIncident('ledger_write_failed');
+
+    const text = await registry.metrics();
+    expect(
+      sampleValue(text, /^woc_vault_ledger_incidents_total\{kind="ledger_write_failed"\} (\d+)$/m),
+    ).toBe('2');
+    // The kind label's vocabulary is exactly the closed set: no character id,
+    // nothing per-player ever reaches a label.
+    expect(labelValues(text, 'kind', WOC_VAULT_LEDGER_INCIDENTS_TOTAL)).toEqual(
+      new Set(VAULT_LEDGER_INCIDENTS),
+    );
+    // The vault sink never touches the guild series (and vice versa): the two
+    // containers are alerted on independently.
+    expect(
+      sampleValue(text, /^woc_guild_bank_incidents_total\{kind="ledger_write_failed"\} (\d+)$/m),
+    ).toBe('0');
+  });
+
   it('pre-registers every escrow-queue outcome at zero and increments by kind', async () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
@@ -620,6 +667,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_FISHING_EMPTY_HOOKS_TOTAL,
       WOC_ROD_FEE_PAYMENTS_TOTAL,
       WOC_GUILD_BANK_INCIDENTS_TOTAL,
+      WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
       WOC_ESCROW_QUEUE_TOTAL,
       WOC_BATTLEGROUND_MATCHES_TOTAL,
       WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
@@ -661,6 +709,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.fishingEmptyHook('mirefen_marsh', '1')).not.toThrow();
     expect(() => counters.rodFeePaid(ROD_FEE_RECIPE_IDS[0])).not.toThrow();
     expect(() => counters.guildBankIncident('reconcile')).not.toThrow();
+    expect(() => counters.vaultLedgerIncident('ledger_write_failed')).not.toThrow();
     // The escrow-queue counter sits on the listing request path: a prom failure
     // there must never turn an observable refusal into a thrown 500.
     expect(() => counters.wocEscrowQueue('started')).not.toThrow();

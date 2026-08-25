@@ -47,6 +47,11 @@ const dbMock = vi.hoisted(() => ({
       counterparty_count: row.counterpartyCount,
     });
   }),
+  // The batched sibling records through the same recorder so vault deposit-all
+  // rows land in dbMock.rows with the same id sequence and snake_case shape.
+  insertBankLedgerRows: vi.fn(async (rows: Record<string, unknown>[]) => {
+    for (const row of rows) await dbMock.insertBankLedgerRow(row);
+  }),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
 }));
 
@@ -69,6 +74,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
+  insertBankLedgerRows: dbMock.insertBankLedgerRows,
   loadGuildBankRows: dbMock.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),

@@ -314,6 +314,107 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
   });
 
   // -------------------------------------------------------------------------
+  // 1b. The batched ledger writer (Bank Storage Phase 03).
+  // -------------------------------------------------------------------------
+  describe('the batched ledger writer (REAL Postgres, Bank Storage Phase 03)', () => {
+    // insertBankLedgerRows is the vault sweep's write path and, until this
+    // arm, the phase's only NEW SQL never executed against a real engine:
+    // the mocked suite pins statement text and binds, but a cast the engine
+    // rejects (or a jsonb[] element node-pg escapes into a form jsonb input
+    // refuses) would throw only in production, where recordVaultOp's catch
+    // converts it into silent incident counts. This drives the REAL function
+    // through the REAL unnest against the REAL boot schema.
+    it('lands a mixed batch atomically, in array order, with NULL semantics intact', async () => {
+      const acct = await makeAccount();
+      const charId = await makeCharacter(acct);
+      const mk = (over: Record<string, unknown>) => ({
+        realm,
+        characterId: charId,
+        accountId: acct,
+        op: 'deposit',
+        itemId: 'copper_ore',
+        count: 1,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+        container: 'vault',
+        containerId: null,
+        ...over,
+      });
+      await db.insertBankLedgerRows([
+        mk({ itemId: 'copper_ore', count: 6 }),
+        // A buy row: NULL item and count beside real values in the same
+        // arrays (the pg array-serialization NULL-vs-'NULL' trap).
+        mk({ op: 'buy_slots', itemId: null, count: null, copperDelta: -20000 }),
+        // A quoted jsonb payload element riding beside the nulls above.
+        mk({
+          itemId: 'iron_ore',
+          count: 2,
+          instance: { signer: 'Ana "q" \\ n', rolled: { quality: 'rare' } },
+        }),
+      ] as never);
+      const got = await pool.query(
+        `SELECT op, item_id, count, instance, copper_delta::int AS copper_delta
+           FROM bank_ledger WHERE character_id = $1 AND container = 'vault' ORDER BY id`,
+        [charId],
+      );
+      expect(got.rows).toEqual([
+        { op: 'deposit', item_id: 'copper_ore', count: 6, instance: null, copper_delta: 0 },
+        { op: 'buy_slots', item_id: null, count: null, instance: null, copper_delta: -20000 },
+        {
+          op: 'deposit',
+          item_id: 'iron_ore',
+          count: 2,
+          instance: { signer: 'Ana "q" \\ n', rolled: { quality: 'rare' } },
+          copper_delta: 0,
+        },
+      ]);
+    });
+
+    it('rejects a bad batch as a UNIT: no partial rows land', async () => {
+      const acct = await makeAccount();
+      const charId = await makeCharacter(acct);
+      await expect(
+        db.insertBankLedgerRows([
+          {
+            realm,
+            characterId: charId,
+            accountId: acct,
+            op: 'deposit',
+            itemId: 'copper_ore',
+            count: 3,
+            instance: null,
+            copperDelta: 0,
+            purchasedSlotsAfter: 1,
+            container: 'vault',
+            containerId: null,
+          },
+          {
+            // A realm NULL violates the column's NOT NULL: the WHOLE batch
+            // must fail, leaving row one unwritten (one statement, one unit).
+            realm: null as never,
+            characterId: charId,
+            accountId: acct,
+            op: 'deposit',
+            itemId: 'iron_ore',
+            count: 1,
+            instance: null,
+            copperDelta: 0,
+            purchasedSlotsAfter: 1,
+            container: 'vault',
+            containerId: null,
+          },
+        ] as never),
+      ).rejects.toThrow();
+      const got = await pool.query(
+        `SELECT 1 FROM bank_ledger WHERE character_id = $1 AND container = 'vault'`,
+        [charId],
+      );
+      expect(got.rowCount).toBe(0);
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // 2. The FK cascade and the two guards that stand in front of it.
   // -------------------------------------------------------------------------
   describe('the guilds DELETE cascade and its guards', () => {

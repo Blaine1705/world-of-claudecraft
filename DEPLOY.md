@@ -248,6 +248,24 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Bank Storage rollback caveats**: same governing rule as the professions bullet
+  above, and here it is ITEM-DESTRUCTIVE rather than capacity-lossy, so treat a
+  rollback past this release as destructive and plan a restore from backup.
+  `characters.state` is written whole and a binary from before this release emits
+  no `vault` key and no `socketBags`, so its first autosave of a character
+  DELETES that character's entire Materials Vault stock, the vault upgrade ladder
+  it paid for, and up to four socketed BAG ITEMS, which exist only as their
+  `socketBags` id, along with the non-refundable socket unlock copper. A mixed
+  binary fleet does the same thing without any rollback: during a rolling restart
+  across this boundary, any character that lands on an old process loses that
+  state on its next autosave, so cut over cleanly rather than rolling. Claudium
+  granted slots are NOT in this class: they land in `purchasedSlots`, which an old
+  binary understands and preserves; only `appliedStorageKeys` is stripped, and the
+  retained `applied` row plus the `STORAGE_PURCHASE_RETENTION_DAYS=0` instruction
+  below is what backstops that. Any FUTURE release that LENGTHENS the bank
+  expansion or vault upgrade table joins the professions cap-raise class: the old
+  binary clamps the raised value on load and persists the loss, so that release
+  owes its own caveat here.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
@@ -762,6 +780,21 @@ For off-box safety, sync the directory to S3 occasionally:
   takes one boot client, so realms x pool + realms must stay at or under the 97 usable
   connections on stock `postgres:16` (`max_connections` 100, 3 superuser-reserved).
   The boot log warns when the configured multiplication breaks that budget.
+- **`STORAGE_PRICES`: the storage price override (server/storage_prices.ts).** One
+  JSON object of copper price lists on ONE line, any subset of
+  `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}`
+  (vault rung 0 is the vault unlock). Boot-time only: the sim resolves it once at
+  world construction, so a change needs a process restart. Each list is accepted
+  only at its exact compiled length with entries that are safe integers of at
+  least 0 (zero is a legal price); a bad dimension falls back to the compiled
+  default BY ITSELF and is reported on the console at boot, the boot does not
+  fail, and an applied override logs which dimensions it covers, so check the
+  boot log after any change: silence means unset, and a rejection can never look
+  like unset. Clients always render the server-sent prices (the walked guard
+  test keeps them price-free), so no client release is needed for a retune.
+  Caveat before a production SOCKET retune: `scripts/bank_audit.mjs` mirrors the
+  compiled socket ladder and would flag legitimate unlocks as `bad_socket_price`
+  under an override.
 - **Nightly retention sweep.** The batched retention prunes run once per UTC day
   at `RETENTION_SWEEP_UTC_HOUR` (default 05:00 UTC) behind a database advisory
   lock, so with several processes on one database exactly one of them sweeps.
@@ -795,6 +828,24 @@ For off-box safety, sync the directory to S3 occasionally:
   also performs the largest fold it will ever do (the whole backlog, budget-
   capped per night), so the deploy-time catch-up guidance above applies with
   extra weight.
+  `STORAGE_PURCHASE_RETENTION_DAYS=` (empty means the default 90; 0 keeps
+  forever) bounds how long REFUSED Claudium storage purchase rows are kept
+  (`storage_purchases`). Nothing else sweeps: pending rows are recoverable
+  work, unresolved rows are open operator cases, and applied rows are the
+  rollback dedupe backstop (a pre-phase-11 binary strips the in-blob purchase
+  dedupe keys on its first save of a character, after which the applied row
+  here is the only replay refusal). Keeping them needs no special setting from
+  this release forward, and applied rows are bounded by the catalog itself, at
+  most about sixteen per character ever. ROLLBACK STILL NEEDS THE OLD
+  INSTRUCTION: a binary from before this release sweeps applied rows on the old
+  terms, and whichever binary wins the nightly sweep is the one that runs, so
+  if you roll the fleet back past this release set
+  `STORAGE_PURCHASE_RETENTION_DAYS=0` for the duration. Refused retries are the
+  only status a player accumulates freely, so the window's real cost is the
+  fleet refusal rate across it.
+  Details in server/storage_purchase_db.ts. To find purchases that got stuck,
+  run `node scripts/bank_audit.mjs`, which reports unresolved and stranded
+  pending rows.
 - **`/api/discord` status cache** (game service). The account-scoped part of the
   `GET /api/discord` payload is served from a per-account in-memory cache; every
   in-process write (link, unlink, grants, swag claims, password set, guild-member

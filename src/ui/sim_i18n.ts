@@ -46,7 +46,35 @@ const baseEnTable = {
   'error.bankCannotAfford': 'You cannot afford that bank expansion.',
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
+  // The gold-buy refusal while a Claudium storage purchase holds the
+  // per-character mutex (server/bank_wire.ts, Bank Storage phase 11).
+  'error.bankPurchaseInProgress': 'Your bank has a purchase in progress.',
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
+  // Bank bag sockets (src/sim/bank_sockets.ts, Bank Storage phase 06). The
+  // too-far, no-such-item, and bags-full refusals deliberately REUSE the rows
+  // above and below, same banker, same bags. The two {item} lines are matched
+  // by RULES entries; the rest register in the EXACT matcher.
+  'error.bankSocketMax': 'Your bank has no more bag sockets to unlock.',
+  'error.bankSocketCannotAfford': 'You cannot afford that bag socket.',
+  'error.bankSocketNoneOpen': 'You have no open bank bag socket.',
+  'error.bankSocketSpecialProperty':
+    'That bag cannot be socketed while it carries a special property.',
+  'log.bankSocketUnlocked': 'You unlock a bank bag socket.',
+  'log.bankBagSocketed': 'Socketed {item} into your bank.',
+  'log.bankBagUnsocketed': 'Unsocketed {item} from your bank.',
+  // Materials Vault (src/sim/materials_vault.ts): the per-material stockpile
+  // beside the bank. The error.* lines are the refusal toasts; the log.* lines
+  // are the unlock/upgrade notices. The too-far refusal and the bags-full
+  // refusal deliberately REUSE the bank/bags rows above, since the vault is
+  // gated by the same banker and fills the same bags.
+  'error.vaultOnlyMaterials': 'Only materials can be stored in the Materials Vault.',
+  'error.vaultCannotStore': 'That item cannot be stored in the Materials Vault.',
+  'error.vaultLocked': 'You have not unlocked the Materials Vault.',
+  'error.vaultMaterialFull': 'Your vault cannot hold any more of that material.',
+  'error.vaultCannotAfford': 'You cannot afford that vault upgrade.',
+  'error.vaultMaxUpgrades': 'Your vault cannot be upgraded further.',
+  'log.vaultUnlocked': 'You unlock the Materials Vault.',
+  'log.vaultUpgraded': 'You upgrade the Materials Vault.',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
   // and "Not enough money." reuse the existing rows above / the hud arm); the
@@ -4274,6 +4302,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': '你的银行已满。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
+    'error.bankPurchaseInProgress': '你的银行有一笔购买正在处理中。',
     'error.bankTooFar': '你距离银行家太远。',
     'log.bankSlotsPurchased': '你购买了额外的银行栏位。',
     'error.bagSocketsFull': '你的所有背包栏位都已占用。',
@@ -4720,6 +4749,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': '你的銀行已滿。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
+    'error.bankPurchaseInProgress': '你的銀行有一筆購買正在處理中。',
     'error.bankTooFar': '你距離銀行家太遠。',
     'log.bankSlotsPurchased': '你購買了額外的銀行欄位。',
     'error.bagSocketsFull': '你的所有背包欄位都已佔用。',
@@ -5173,6 +5203,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
+    'error.bankPurchaseInProgress': '은행에 처리 중인 구매가 있습니다.',
     'error.bankTooFar': '은행원과 너무 멀리 떨어져 있습니다.',
     'log.bankSlotsPurchased': '추가 은행 칸을 구매했습니다.',
     'error.bagSocketsFull': '모든 가방 칸이 사용 중입니다.',
@@ -5637,6 +5668,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
+    'error.bankPurchaseInProgress': '銀行で処理中の購入があります。',
     'error.bankTooFar': '銀行員から遠すぎます。',
     'log.bankSlotsPurchased': '追加の銀行スロットを購入しました。',
     'error.bagSocketsFull': 'バッグスロットはすべて使用中です。',
@@ -6559,6 +6591,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Ваш банк полон.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
+    'error.bankPurchaseInProgress': 'В вашем банке уже выполняется покупка.',
     'error.bankTooFar': 'Вы слишком далеко от банкира.',
     'log.bankSlotsPurchased': 'Вы покупаете дополнительные ячейки банка.',
     'error.bagSocketsFull': 'Все ячейки для сумок заняты.',
@@ -11307,6 +11340,16 @@ const RULES: Rule[] = [
   { re: /^You have already recovered this relic\.$/, build: () => tItemExtra('relicRecovered') },
   { re: /^Equipped (?!\()(.+)\.$/, build: (m) => tSim('log.equipped', { item: locItem(m[1]) }) },
   { re: /^Unequipped (.+)\.$/, build: (m) => tSim('log.unequipped', { item: locItem(m[1]) }) },
+  // Bank bag sockets (src/sim/bank_sockets.ts). Anchored on the full phrase so
+  // neither rule can swallow a future bare Socketed/Unsocketed line.
+  {
+    re: /^Socketed (.+) into your bank\.$/,
+    build: (m) => tSim('log.bankBagSocketed', { item: locItem(m[1]) }),
+  },
+  {
+    re: /^Unsocketed (.+) from your bank\.$/,
+    build: (m) => tSim('log.bankBagUnsocketed', { item: locItem(m[1]) }),
+  },
   { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
   {
     re: /^(Need|Greed) Roll - (\d+) for (.+) by (.+)$/,

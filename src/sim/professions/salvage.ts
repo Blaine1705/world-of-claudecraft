@@ -14,7 +14,7 @@
 // Math.random/Date.now, host-agnostic so it runs offline, on the server, and
 // in the headless RL env unchanged.
 
-import { bagCapacity, canAddItem, consumeOneScratch } from '../bags';
+import { bagPools, canAddItem, consumeOneScratch } from '../bags';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
@@ -163,7 +163,7 @@ export function resolveSalvage(
     if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
     const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
     const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
-    if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
+    if (!canAddItem(scratch, bagPools(meta.bags), fitItemId, fitCount)) {
       return { ok: false, itemId, reason: 'no_bag_space' };
     }
   }
@@ -240,7 +240,7 @@ export function evaluateSalvageAdmission(
   if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
   const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
   const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
-  if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
+  if (!canAddItem(scratch, bagPools(meta.bags), fitItemId, fitCount)) {
     return { ok: false, itemId, reason: 'no_bag_space' };
   }
   return null;

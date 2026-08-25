@@ -7,10 +7,12 @@
 // holds now, and no withdraw may ever remove an item that was never deposited.
 //
 // Everything is grouped and REPORTED BY CONTAINER: 'personal' rows group per
-// character and reconcile against characters.state.bank; 'guild' rows (Guild
-// Bank Phase 3) group per GUILD (container_id), because the guild bank is an
-// anonymous exchange pipe (officer A deposits, officer B withdraws), so item
-// conservation only holds across the whole guild, never per character. Guild
+// character and reconcile against characters.state.bank; 'vault' rows (the
+// Materials Vault, Bank Storage Phase 2) group per character too and reconcile
+// against characters.state.vault; 'guild' rows (Guild Bank Phase 3) group per
+// GUILD (container_id), because the guild bank is an anonymous exchange pipe
+// (officer A deposits, officer B withdraws), so item conservation only holds
+// across the whole guild, never per character. Guild
 // groups additionally replay the treasury (deposit_gold + withdraw_gold +
 // buy_slots copper deltas; create_fee and open_bank are PERSONAL purse copper
 // and are excluded) and reconcile against the guild_banks book when it is provided.
@@ -20,6 +22,45 @@
 // guild with ledger rows but no book row reconciles items and treasury against
 // an EMPTY book (a disbanded guild: the disband guard proves both were zero)
 // but skips the purchased reconciliation (expansions survive to the last row).
+//
+// THE PERSONAL CONTAINER additionally carries the bank SOCKET STORE (Bank
+// Storage phase 07): 'unlock_socket' rows replay the copper ladder (the Nth
+// unlock per character costs exactly the Nth BANK_SOCKET_PRICES entry, at most
+// four ever) against state.bank.unlockedSockets, and 'socket_bag' /
+// 'unsocket_bag' rows replay the socketed-bag multiset against
+// state.bank.socketBags, in maps SEPARATE from the slot replay's (a bag can
+// legitimately sit in a slot AS an item or in a socket AS capacity, so a
+// merged replay would paper one store's shortfall over with the other's
+// surplus). The carried inventory these bags move through remains outside
+// every container this audit enumerates, as it always has been.
+// KNOWN FINDING CLASS with no ledger counterpart: sanitizeBankState nulls a
+// tampered/corrupt socket entry at load (the one destructive load arm,
+// reported through the per-load drop sink as bank.socket<i>.<id>) without
+// writing a compensating unsocket_bag row, so a character whose save was
+// repaired that way reports socket_ledger_state_mismatch on every later
+// audit. Correlate such findings against the drop-sink diagnostics before
+// treating them as a dupe.
+// A SECOND known class, the lost-unlock cascade: a swallowed unlock_socket
+// row (the tolerated transient write-failure/shutdown-drain hole) shifts
+// every LATER unlock row one rung down the price ladder, so the honest
+// socket_unlock_mismatch arrives beside up to three cascading
+// bad_socket_price findings whose copper each matches a LATER rung. That
+// signature is a missing row, not price tampering: reconcile the unlock
+// count first before reading the price findings.
+//
+// THE VAULT CONTAINER reuses the personal op vocabulary ('deposit', 'withdraw',
+// 'buy_slots'), so every shape and replay rule above applies to it unchanged.
+// Two container-specific facts it reconciles against: vault storage is
+// COUNT-ONLY (a number per material id, no slots and no per-instance payload,
+// so every key is [itemId, null]), and its purchased_slots_after column carries
+// the upgrade RUNG (state.vault.upgrades), the monotonic ladder analogue of the
+// bank's purchasedSlots. A character with vault rows but no persisted
+// state.vault reconciles against an EMPTY vault, the same corruption signature
+// the personal container treats that way. Vault rows are birth-complete (every
+// vault starts empty) ONLY because Bank Storage phases 01 and 02 ship in the
+// SAME release: a character who had deposited under a phase-01-only binary
+// would hold stock no vault row explains and would reconcile as a permanent
+// ledger_state_mismatch, one this tool could never clear.
 //
 // THE COUNTERPARTY CHECK. Every replay described above reads the CONTAINER
 // side of each row and reconciles it against the container, which is
@@ -90,6 +131,49 @@ const ANOMALY_OPS = new Set([ESCROW_DEFICIT_OP, COUNTERPARTY_ORPHAN_OP]);
 
 export const GUILD_BUY_POSITIONS = [30, 36, 42, 48, 54, 60];
 const GUILD_BUY_POSITION_SET = new Set(GUILD_BUY_POSITIONS);
+
+// The vault ladder's top rung (VAULT_UPGRADE_PRICES.length in
+// src/sim/materials_vault.ts): a vault buy_slots row's purchased_slots_after
+// carries the rung REACHED, so the integers 1 through this are the only honest
+// values a writer can emit. Lockstep-pinned against the sim ladder by
+// tests/bank_audit.test.ts, the KNOWN_CONTAINERS discipline.
+export const VAULT_MAX_RUNG = 5;
+
+// The bank bag-socket ladder (BANK_SOCKET_PRICES in src/sim/bank.ts),
+// mirrored dependency-free like the guild ladder and the vault rung above and
+// lockstep-pinned by tests/bank_audit.test.ts. A legitimate unlock history is
+// a PREFIX of this list: the Nth unlock_socket row per character costs exactly
+// the Nth price, and a fifth row has no honest price at all.
+export const BANK_SOCKET_PRICES = [1000000, 2000000, 3500000, 5000000];
+
+// The op vocabulary this audit's shape chain handles (checkRowShape): the
+// dependency-free mirror of server/db.ts BankLedgerRow.op, the same
+// KNOWN_CONTAINERS discipline. The chain's else-arm stays the runtime
+// decision (an op outside the chain dedupes into unknown_op); this set exists
+// so tests/bank_audit.test.ts can hold the two declarations in lockstep BOTH
+// ways: it is scraped against the db.ts union (a NEW union member reds
+// without an entry here) and it generates the known-op guard's row table (an
+// entry here without a real chain arm reds as an unexpected unknown_op).
+export const KNOWN_OPS = new Set([
+  'deposit',
+  'withdraw',
+  'buy_slots',
+  'deposit_gold',
+  'withdraw_gold',
+  'create_fee',
+  'open_bank',
+  ESCROW_DEFICIT_OP,
+  'admin_purge',
+  COUNTERPARTY_ORPHAN_OP,
+  'craft_consume',
+  // Bank bag sockets (Bank Storage phase 07), personal-only: the copper-only
+  // socket unlock plus the two single-bag moves into and out of the bank's
+  // socket store (a container the slot replay cannot see; it gets its own
+  // replay below, reconciled against state.bank.socketBags).
+  'unlock_socket',
+  'socket_bag',
+  'unsocket_bag',
+]);
 
 // ---------------------------------------------------------------------------
 // The COUNTERPARTY (payer/payee) balance. THE CHECK THIS SCRIPT WAS MISSING.
@@ -265,6 +349,67 @@ function stateBankOf(character) {
   return bank;
 }
 
+// The persisted Materials Vault object for a character row, or null when the
+// character has no vault state yet. Same tolerant parse as stateBankOf (JSONB
+// from Postgres, a JSON string from a fixture).
+function stateVaultOf(character) {
+  if (!character) return null;
+  let state = character.state;
+  if (typeof state === 'string') {
+    try {
+      state = JSON.parse(state);
+    } catch {
+      return null;
+    }
+  }
+  if (!state || typeof state !== 'object') return null;
+  const vault = state.vault;
+  if (!vault || typeof vault !== 'object') return null;
+  return vault;
+}
+
+// The `stock` record of a vault object: a plain id-to-count map. A missing or
+// wrong-shaped stock (an array is the likely wrong guess, the bank's slot-list
+// shape) reads as empty here rather than throwing, so the reconciliation below
+// still runs and reports the resulting mismatch.
+function vaultStockOf(vault) {
+  const stock = vault?.stock;
+  if (!stock || typeof stock !== 'object' || Array.isArray(stock)) return {};
+  return stock;
+}
+
+// The item multiset a vault currently holds. Count-only storage means there is
+// no per-instance dimension, so every key is [itemId, null], exactly the key a
+// vault ledger row produces. Keys are walked SORTED: the stock arrives from
+// JSONB, whose key order Postgres does not preserve, so an insertion-ordered
+// walk would make finding order depend on how the row happened to be stored.
+function vaultStateMultiset(vault) {
+  const m = new Map();
+  const stock = vaultStockOf(vault);
+  for (const itemId of Object.keys(stock).sort()) {
+    const key = multisetKey(itemId, null);
+    m.set(key, (m.get(key) ?? 0) + Number(stock[itemId] ?? 0));
+  }
+  return m;
+}
+
+// The bag multiset a bank's SOCKET STORE currently holds. Sockets store bare
+// ids (never an instance payload; the sim's #2837 peek refuses one before it
+// can enter), so every key is [itemId, null], exactly the key a socket ledger
+// row produces. Tolerant like every state read here: a missing or wrong-shaped
+// socketBags reads as empty, and only string entries count (null is an empty
+// socket; anything else is junk the mismatch below surfaces by its absence).
+function socketStateMultiset(bank) {
+  const bags = Array.isArray(bank?.socketBags) ? bank.socketBags : [];
+  const m = new Map();
+  for (const id of bags) {
+    if (typeof id !== 'string' || id === '') continue;
+    const key = multisetKey(id, null);
+    m.set(key, (m.get(key) ?? 0) + 1);
+  }
+  return m;
+}
+
 // The item multiset a bank currently holds (summed by key over its inventory).
 function stateMultiset(bank) {
   const m = new Map();
@@ -277,8 +422,19 @@ function stateMultiset(bank) {
   return m;
 }
 
+// Every container the reconciliation passes below actually replay. Anything
+// else is reported per row rather than grouped and forgotten (see the
+// unknown_container check at the end of checkRowShape). Exported so
+// tests/bank_audit.test.ts can pin this vocabulary in lockstep with the
+// BankLedgerRow.container union in server/db.ts: widening one side alone would
+// let a container the writer emits reach an audit that reconciles nothing.
+export const KNOWN_CONTAINERS = new Set(['personal', 'vault', 'guild']);
+
 // Per-row shape anomalies (independent of any replay).
 function checkRowShape(row, findings) {
+  // Set when the op matches no arm of the vocabulary chain below; returned so
+  // auditBank can dedupe unknown-op findings per op VALUE rather than per row.
+  let unknownOp = null;
   const base = {
     container: row.container ?? 'personal',
     realm: row.realm,
@@ -289,7 +445,15 @@ function checkRowShape(row, findings) {
       ? { guildId: row.container_id == null ? null : Number(row.container_id) }
       : {}),
   };
-  if (row.op === 'deposit' || row.op === 'withdraw' || row.op === 'admin_purge') {
+  // craft_consume (Bank Storage Phase 04) is an item op with exactly the
+  // deposit/withdraw row shape: vault stock consumed in place by a completed
+  // craft, one row per material id, positive count, no copper.
+  if (
+    row.op === 'deposit' ||
+    row.op === 'withdraw' ||
+    row.op === 'admin_purge' ||
+    row.op === 'craft_consume'
+  ) {
     if (row.count == null || Number(row.count) <= 0) {
       findings.push({
         ...base,
@@ -319,7 +483,37 @@ function checkRowShape(row, findings) {
         detail: `buy_slots row ${row.id} carries a count ${String(row.count)}`,
       });
     }
-    if (Number(row.copper_delta) >= 0) {
+    // Bank Storage phase 11: a personal buy_slots row carries its payment
+    // rail in instance->>'paidWith' (server-derived, never the request). A
+    // Claudium purchase moves NO copper (its debit is the service-side
+    // claudium_ledger; this row is the character-side slot audit), so its
+    // copper_delta must be EXACTLY 0; every other rail (gold, or a
+    // pre-phase-11 unstamped row) keeps the negated-price shape.
+    const buyRail =
+      row.instance && typeof row.instance === 'object' ? row.instance.paidWith : undefined;
+    const buyContainer = row.container ?? 'personal';
+    // The exemption is PERSONAL-only. Guild and vault buy_slots rows are
+    // single-rail by design and stay unstamped, so a claudium stamp on one is
+    // itself the anomaly: without this scope a forged guild row carrying
+    // {"paidWith":"claudium"} would inherit the zero-copper exemption and walk
+    // straight past nonnegative_buy_cost, which is the only thing standing
+    // between the audit and a free guild expansion.
+    if (buyRail === 'claudium' && buyContainer !== 'personal') {
+      findings.push({
+        ...base,
+        kind: 'claudium_rail_off_personal',
+        detail: `${buyContainer} buy_slots row ${row.id} is stamped paidWith claudium`,
+      });
+    }
+    if (buyRail === 'claudium' && buyContainer === 'personal') {
+      if (Number(row.copper_delta) !== 0) {
+        findings.push({
+          ...base,
+          kind: 'copper_on_claudium_buy',
+          detail: `claudium buy_slots row ${row.id} has copper_delta ${String(row.copper_delta)}`,
+        });
+      }
+    } else if (Number(row.copper_delta) >= 0) {
       findings.push({
         ...base,
         kind: 'nonnegative_buy_cost',
@@ -338,6 +532,21 @@ function checkRowShape(row, findings) {
         kind: 'bad_buy_position',
         detail: `guild buy_slots row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
       });
+    }
+    // A VAULT purchase (Bank Storage Phase 2) always lands ON the ladder:
+    // purchased_slots_after carries the rung reached, and the sim refuses a
+    // climb past the top, so any non-integer or out-of-ladder value is a
+    // tampered row or a mis-named op, the same tripwire the guild arm above
+    // gives its positions.
+    if ((row.container ?? 'personal') === 'vault') {
+      const rung = Number(row.purchased_slots_after);
+      if (!(Number.isInteger(rung) && rung >= 1 && rung <= VAULT_MAX_RUNG)) {
+        findings.push({
+          ...base,
+          kind: 'bad_buy_position',
+          detail: `vault buy_slots row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
+        });
+      }
     }
   } else if (row.op === 'deposit_gold' || row.op === 'withdraw_gold') {
     // Guild treasury moves: copper-only rows with a direction-checked delta.
@@ -428,6 +637,67 @@ function checkRowShape(row, findings) {
         }). Value crossed the purse/book boundary in ONE direction, which no legitimate op ` +
         'can do. The evidence payload names the attempted op and the whole movement.',
     });
+  } else if (row.op === 'socket_bag' || row.op === 'unsocket_bag') {
+    // A socket move is always EXACTLY ONE bag (the sim stores a bare id per
+    // socket; there is no stacked-socket state a bigger count could describe),
+    // so this arm is stricter than the generic item-op shape above.
+    if (Number(row.count) !== 1) {
+      findings.push({
+        ...base,
+        kind: 'bad_count',
+        detail: `${row.op} row ${row.id} has count ${String(row.count)} (a socket move is exactly one bag)`,
+      });
+    }
+    if (row.item_id == null || row.item_id === '') {
+      findings.push({
+        ...base,
+        kind: 'missing_item_id',
+        detail: `${row.op} row ${row.id} has no item_id`,
+      });
+    }
+    if (Number(row.copper_delta) !== 0) {
+      findings.push({
+        ...base,
+        kind: 'copper_on_item_op',
+        detail: `${row.op} row ${row.id} carries copper_delta ${String(row.copper_delta)}`,
+      });
+    }
+    // Sockets store BARE ids (the sim refuses a payload-bearing bag before it
+    // can enter), and the replay keys socket rows as [itemId, null]; a row
+    // carrying an instance payload is a mint signature the count reconcile
+    // would otherwise silently absorb.
+    if (row.instance != null) {
+      findings.push({
+        ...base,
+        kind: 'unexpected_instance',
+        detail: `${row.op} row ${row.id} carries an instance payload (sockets store bare ids)`,
+      });
+    }
+  } else if (row.op === 'unlock_socket') {
+    // The buy_slots shape: copper-only, no item fields. The exact ladder price
+    // is checked in the per-character replay below (it depends on the row's
+    // POSITION in that character's unlock sequence, which one row cannot know).
+    if (row.count != null) {
+      findings.push({
+        ...base,
+        kind: 'count_on_buy',
+        detail: `unlock_socket row ${row.id} carries a count ${String(row.count)}`,
+      });
+    }
+    if (row.item_id != null) {
+      findings.push({
+        ...base,
+        kind: 'item_on_gold_op',
+        detail: `unlock_socket row ${row.id} carries item fields`,
+      });
+    }
+    if (Number(row.copper_delta) >= 0) {
+      findings.push({
+        ...base,
+        kind: 'nonnegative_buy_cost',
+        detail: `unlock_socket row ${row.id} has copper_delta ${String(row.copper_delta)}`,
+      });
+    }
   } else if (row.op === 'create_fee') {
     // The founder's purse paid the (positive) creation fee; a newborn guild
     // has no expansions yet.
@@ -445,6 +715,22 @@ function checkRowShape(row, findings) {
         detail: `create_fee row ${row.id} has purchased_slots_after ${String(row.purchased_slots_after)}`,
       });
     }
+  } else {
+    // The op-side twin of unknown_container below, added when craft_consume
+    // widened the vocabulary: an op this chain does not know gets NO shape
+    // checks and is skipped by the item replay, while its purchased_slots_after
+    // still feeds the monotonicity scan, so a typo'd writer would quietly
+    // poison a group's replay while every one of its rows passed shape.
+    // Flagging it is what makes widening the vocabulary a reviewed act.
+    // DEDUPED per op value by the caller (the flaggedNegative discipline):
+    // an unknown op is uniquely likely to be SYSTEMATIC (a typo'd writer, or
+    // an old audit running against a newer server), and per-row emission on
+    // a keep-forever table would build millions of finding objects exactly
+    // when an operator most needs the report to open. The op value is
+    // RETURNED (at the end, so the container checks below still run on the
+    // row) and auditBank's tracker emits one finding per op value with the
+    // first row and the total count.
+    unknownOp = String(row.op);
   }
   // The gold, fee, open, and admin-purge ops exist only for the guild
   // container, and every guild row must name its guild (container_id is the
@@ -465,6 +751,31 @@ function checkRowShape(row, findings) {
       detail: `${row.op} row ${row.id} has container '${container}'`,
     });
   }
+  // The vault-only mirror of that guard: craft_consume records stock consumed
+  // in place from the Materials Vault, the one container crafting can draw
+  // from, so on any other container it is a mis-labeled writer whose row
+  // would replay against a store that never moved.
+  if (row.op === 'craft_consume' && container !== 'vault') {
+    findings.push({
+      ...base,
+      kind: 'vault_op_outside_vault',
+      detail: `${row.op} row ${row.id} has container '${container}'`,
+    });
+  }
+  // The personal-only mirror of that guard: the socket store hangs off
+  // state.bank (unlockedSockets / socketBags), a per-character structure, so a
+  // socket op on any other container is a mis-labeled writer whose row would
+  // replay against a store that never moved.
+  if (
+    (row.op === 'unlock_socket' || row.op === 'socket_bag' || row.op === 'unsocket_bag') &&
+    container !== 'personal'
+  ) {
+    findings.push({
+      ...base,
+      kind: 'socket_op_outside_personal',
+      detail: `${row.op} row ${row.id} has container '${container}'`,
+    });
+  }
   if (container === 'guild' && row.container_id == null) {
     findings.push({
       ...base,
@@ -472,6 +783,49 @@ function checkRowShape(row, findings) {
       detail: `guild row ${row.id} has no container_id`,
     });
   }
+  // The mirror of that check: only a GUILD row may carry a container_id.
+  // server/db.ts states the contract on BankLedgerRow ('personal' and 'vault'
+  // are per-character stores, container_id NULL; only 'guild' keys by id), and
+  // both writers hardcode null, so there is no legitimate non-guild population
+  // to false-positive on. The hazard is identical whichever non-guild container
+  // it is: the character IS the group key, so a second key the grouping below
+  // ignores means a writer invented a store no pass reads. An unknown container
+  // carrying one reports here AND as unknown_container, which is the honest
+  // read: both facts are separately wrong.
+  if (container !== 'guild' && row.container_id != null) {
+    findings.push({
+      ...base,
+      kind: 'unexpected_container_id',
+      detail: `${container} row ${row.id} has container_id ${String(row.container_id)}`,
+    });
+  }
+  // The same mirror for `instance`: vault storage is COUNT-ONLY. Its stock is a
+  // plain itemId -> count record, so src/sim/materials_vault.ts can hold no
+  // per-instance payload and server/bank_ledger.ts diffVaultOp stamps
+  // instance: null on every element it emits. A non-null one means a writer
+  // recorded a distinction the vault cannot represent, so the replay would net
+  // counts that the state can never reproduce. Guild and personal rows are
+  // exempt by design (both carry real per-instance payloads).
+  if (container === 'vault' && row.instance != null) {
+    findings.push({
+      ...base,
+      kind: 'unexpected_instance',
+      detail: `vault row ${row.id} carries an instance payload`,
+    });
+  }
+  // A container this script does not know is replayed by NOTHING: the grouping
+  // pass builds it a group and nets its items, but the reconciliation passes
+  // each match on their own literal container, so a future writer with a
+  // typo'd container would move real value into a store no pass reads and no
+  // finding names. Flagging the row here is what stops it vanishing.
+  if (!KNOWN_CONTAINERS.has(container)) {
+    findings.push({
+      ...base,
+      kind: 'unknown_container',
+      detail: `row ${row.id} has an unrecognized container '${container}'`,
+    });
+  }
+  return unknownOp;
 }
 
 // The pure checker. `ledgerRows` are bank_ledger rows (snake_case, id-ascending
@@ -483,8 +837,40 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
 
   // A) Per-row shape checks, plus the per-op counterparty balance (the one
   // check that can see across the purse/book boundary).
+  // Unknown-op tracker (the F4 dedupe): one finding per unrecognized op
+  // VALUE, carrying the first row seen and the total row count, never one
+  // per row (a systematic unknown op on a keep-forever table would other-
+  // wise flood the report exactly when an operator most needs it).
+  const unknownOps = new Map();
   for (const row of rows) {
-    checkRowShape(row, findings);
+    const unknownOp = checkRowShape(row, findings);
+    if (unknownOp !== null) {
+      // Group key mirrors the replay grouping below: guild rows spread per
+      // GUILD, everything else per character, so the finding can say how far
+      // a systematic unknown op reaches while staying one finding per value
+      // (the base still names the first row's group for attribution).
+      const rowContainer = row.container ?? 'personal';
+      const groupKey =
+        rowContainer === 'guild'
+          ? `guild::${row.container_id}`
+          : `${rowContainer}::${row.character_id}`;
+      const seen = unknownOps.get(unknownOp);
+      if (seen) {
+        seen.count += 1;
+        seen.groups.add(groupKey);
+      } else {
+        unknownOps.set(unknownOp, {
+          count: 1,
+          firstRowId: row.id,
+          groups: new Set([groupKey]),
+          base: {
+            container: rowContainer,
+            realm: row.realm,
+            characterId: row.character_id,
+          },
+        });
+      }
+    }
     checkCounterpartyBalance(
       row,
       {
@@ -497,6 +883,16 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
       },
       findings,
     );
+  }
+  for (const [op, seen] of unknownOps) {
+    findings.push({
+      ...seen.base,
+      kind: 'unknown_op',
+      detail:
+        `${seen.count} row(s) carry an unrecognized op '${op}' ` +
+        `across ${seen.groups.size} container/character group(s) ` +
+        `(first at row ${seen.firstRowId}); none were shape-checked or replayed`,
+    });
   }
 
   // Group id-ascending rows: personal per character, guild per GUILD
@@ -527,6 +923,21 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
   // Personal-container replay results, keyed by character id, for reconciliation.
   const personalNet = new Map();
   const personalFinalPurchased = new Map();
+
+  // Bank socket-store replay results (Bank Storage phase 07), keyed by
+  // character id. Kept in their OWN maps on the vault rule above: the socket
+  // store and the slot bank hold the same item ids (a bag can sit in a slot AS
+  // an item or in a socket AS capacity), so a merged replay would let a
+  // shortfall in one be papered over by a surplus in the other.
+  const personalSocketNet = new Map();
+  const personalUnlockCount = new Map();
+
+  // Materials Vault replay results, also keyed by character id. Kept in their
+  // OWN maps rather than merged into the personal ones: the two containers are
+  // separate stores holding the same item ids, so a merged replay would let a
+  // shortfall in one be papered over by a surplus in the other.
+  const vaultNet = new Map();
+  const vaultFinalPurchased = new Map();
 
   // Guild-container replay results, keyed by guild id.
   const guildNet = new Map();
@@ -576,7 +987,17 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
       // admin_purge removes a dormant copy from a guild book, so it replays as
       // a REMOVAL exactly like a withdraw: without it the purged copy would
       // read as an unexplained shortfall against the live book forever.
-      if (row.op !== 'deposit' && row.op !== 'withdraw' && row.op !== 'admin_purge') continue;
+      // craft_consume (Phase 04) replays as a removal on the same argument:
+      // vault stock a completed craft consumed in place would otherwise read
+      // as an unexplained shortfall against state.vault.stock forever.
+      if (
+        row.op !== 'deposit' &&
+        row.op !== 'withdraw' &&
+        row.op !== 'admin_purge' &&
+        row.op !== 'craft_consume'
+      ) {
+        continue;
+      }
       const key = multisetKey(row.item_id, row.instance);
       const delta = row.op === 'deposit' ? Number(row.count) : -Number(row.count);
       const next = (net.get(key) ?? 0) + delta;
@@ -594,6 +1015,55 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
     if (group.container === 'personal') {
       personalNet.set(group.characterId, net);
       personalFinalPurchased.set(group.characterId, finalPurchased);
+
+      // The socket-store replay: socket_bag adds a bag to the store,
+      // unsocket_bag removes one, and the running net per bag id must never
+      // fall below zero (unsocketing a bag that was never socketed is the
+      // same mint signature as the slot replay's negative_net). The unlock
+      // ladder replays beside it: the Nth unlock row costs exactly the Nth
+      // mirrored price, and rows past the ladder's end have no honest price.
+      const socketNet = new Map();
+      const flaggedSocketNegative = new Set();
+      let unlockRows = 0;
+      for (const row of group.rows) {
+        if (row.op === 'socket_bag' || row.op === 'unsocket_bag') {
+          const key = multisetKey(row.item_id, null);
+          const delta = row.op === 'socket_bag' ? Number(row.count) : -Number(row.count);
+          const next = (socketNet.get(key) ?? 0) + delta;
+          socketNet.set(key, next);
+          if (next < 0 && !flaggedSocketNegative.has(key)) {
+            flaggedSocketNegative.add(key);
+            findings.push({
+              ...base,
+              kind: 'negative_socket_net',
+              detail: `bag ${row.item_id} socket net fell to ${next} at row ${row.id}: unsocketed more than was ever socketed`,
+            });
+          }
+        } else if (row.op === 'unlock_socket') {
+          const expected = BANK_SOCKET_PRICES[unlockRows];
+          if (expected === undefined) {
+            findings.push({
+              ...base,
+              kind: 'socket_unlock_past_ladder',
+              detail: `unlock_socket row ${row.id} is unlock ${unlockRows + 1} but the ladder has ${BANK_SOCKET_PRICES.length} rungs`,
+            });
+          } else if (Number(row.copper_delta) !== -expected) {
+            findings.push({
+              ...base,
+              kind: 'bad_socket_price',
+              detail: `unlock_socket row ${row.id} (unlock ${unlockRows + 1}) has copper_delta ${String(row.copper_delta)}, expected ${-expected}`,
+            });
+          }
+          unlockRows += 1;
+        }
+      }
+      personalSocketNet.set(group.characterId, socketNet);
+      personalUnlockCount.set(group.characterId, unlockRows);
+    }
+
+    if (group.container === 'vault') {
+      vaultNet.set(group.characterId, net);
+      vaultFinalPurchased.set(group.characterId, finalPurchased);
     }
 
     if (group.container === 'guild') {
@@ -695,6 +1165,94 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
         });
       }
     }
+
+    // Socket-store reconciliation (Bank Storage phase 07): replaying every
+    // socket_bag/unsocket_bag must reconstruct exactly the bags the sockets
+    // hold now, and the unlock rung must equal the unlock rows written. The
+    // store is birth-complete on the vault's terms (phases 06 and 07 ship in
+    // the same release; no online save can hold a socket a row does not
+    // explain), so state sockets with no ledger explanation flag here too.
+    const socketNet = personalSocketNet.get(character.id) ?? new Map();
+    const socketStateM = socketStateMultiset(effectiveBank);
+    const socketKeys = new Set([...socketNet.keys(), ...socketStateM.keys()]);
+    for (const key of socketKeys) {
+      const ledgerCount = socketNet.get(key) ?? 0;
+      const stateCount = socketStateM.get(key) ?? 0;
+      if (ledgerCount !== stateCount) {
+        findings.push({
+          ...base,
+          kind: 'socket_ledger_state_mismatch',
+          detail: `bag ${itemIdFromKey(key)}: socket ledger net ${ledgerCount} does not match state socketBags ${stateCount}`,
+        });
+      }
+    }
+    const ledgerUnlocks = personalUnlockCount.get(character.id) ?? 0;
+    const stateUnlocks = Number(effectiveBank.unlockedSockets ?? 0);
+    if (ledgerUnlocks !== stateUnlocks) {
+      findings.push({
+        ...base,
+        kind: 'socket_unlock_mismatch',
+        detail: `unlock_socket rows ${ledgerUnlocks} do not match state unlockedSockets ${stateUnlocks}`,
+      });
+    }
+  }
+
+  // C2) State reconciliation for the vault container. The Materials Vault is a
+  // per-character store like the personal bank, so it reconciles on the same
+  // terms: replaying every vault deposit/withdraw must reconstruct exactly the
+  // counts state.vault.stock holds now, and the final purchased_slots_after
+  // (this container's upgrade RUNG) must match state.vault.upgrades. It is a
+  // SEPARATE pass over the same characters rather than an arm of the personal
+  // one, because the two containers hold the same item ids independently.
+  for (const character of characters) {
+    const vault = stateVaultOf(character);
+    // Ledger activity WITHOUT persisted vault state is the corruption signature
+    // the personal pass treats the same way: the rows claim materials or rungs
+    // the state does not show, so reconcile against an EMPTY vault instead of
+    // skipping the character. A character with neither is a pre-vault save.
+    const hasLedgerActivity =
+      vaultNet.has(character.id) || vaultFinalPurchased.get(character.id) != null;
+    if (!vault && !hasLedgerActivity) continue;
+    const effectiveVault = vault ?? { stock: {}, upgrades: 0 };
+    const base = { container: 'vault', realm: character.realm, characterId: character.id };
+
+    const stock = vaultStockOf(effectiveVault);
+    for (const itemId of Object.keys(stock).sort()) {
+      if (Number(stock[itemId]) < 0) {
+        findings.push({
+          ...base,
+          kind: 'negative_state_count',
+          detail: `state vault holds ${itemId} with a negative count ${Number(stock[itemId])}`,
+        });
+      }
+    }
+
+    const net = vaultNet.get(character.id) ?? new Map();
+    const stateM = vaultStateMultiset(effectiveVault);
+    const keys = [...new Set([...net.keys(), ...stateM.keys()])].sort();
+    for (const key of keys) {
+      const ledgerCount = net.get(key) ?? 0;
+      const stateCount = stateM.get(key) ?? 0;
+      if (ledgerCount !== stateCount) {
+        findings.push({
+          ...base,
+          kind: 'ledger_state_mismatch',
+          detail: `item ${itemIdFromKey(key)}: ledger net ${ledgerCount} does not match state vault ${stateCount}`,
+        });
+      }
+    }
+
+    const finalUpgrades = vaultFinalPurchased.get(character.id);
+    if (finalUpgrades != null) {
+      const stateUpgrades = Number(effectiveVault.upgrades ?? 0);
+      if (stateUpgrades !== finalUpgrades) {
+        findings.push({
+          ...base,
+          kind: 'purchased_mismatch',
+          detail: `final ledger purchased_slots_after ${finalUpgrades} does not match state vault upgrades ${stateUpgrades}`,
+        });
+      }
+    }
   }
 
   // D) State reconciliation for the guild container, when the guild_banks
@@ -773,6 +1331,166 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
   return findings;
 }
 
+// THE STORAGE PURCHASE ARM (Bank Storage phase 14, closing the ruling that
+// unresolved rows had no operator surface at all: no admin route, no metric, and
+// nothing here read status). storage_purchases is the ONLY durable game-side
+// record of a paid-but-unapplied Claudium grant, and two of its statuses are
+// things a person has to look at:
+//
+//   unresolved  the spend was accepted and the apply-time re-check refused.
+//               Impossible-state territory: the player was charged and holds no
+//               slots. Never swept, never regressed, and nothing else in the
+//               system will ever revisit it.
+//   pending     recoverable work. Normally transient (its own request drives it,
+//               and a fresh login re-drives it), so only an OLD one is a signal:
+//               past the threshold below, either the character has not come back
+//               or nothing is driving the row at all.
+//
+// applied and refused rows are deliberately not reported: they are the terminal
+// happy paths, and applied rows are kept forever as the rollback dedupe backstop
+// rather than because anyone needs to read them.
+//
+// This arm is DE-COUPLED from the ledger replay above: it reconciles nothing
+// against character state, so it takes no part in the container grouping and
+// prints its own section.
+
+/** A pending row younger than this is ordinary in-flight work, not an
+ *  incident: a character who bought and logged straight out leaves one until
+ *  the next login recovery, and an ambiguous purchase retries on a backoff.
+ *  A day is comfortably past every one of those, so what survives it is either
+ *  a character who has not returned (benign, and the report says so) or a row
+ *  nothing is going to drive. */
+export const STORAGE_PURCHASE_STRANDED_HOURS = 24;
+
+/** How many open rows one report will list. Open rows are bounded in ordinary
+ *  operation (a pending row is driven to a terminal status by its own request
+ *  or the character's next login, and unresolved rows cost a real debit each),
+ *  so reaching this is itself the finding. The report says so rather than
+ *  quietly printing a prefix. */
+export const STORAGE_PURCHASE_REPORT_LIMIT = 500;
+
+/** The status vocabulary, mirrored from StoragePurchaseStatus in
+ *  server/storage_purchase_db.ts (this script stays dependency-free of the TS
+ *  server; tests/bank_audit.test.ts pins the two in lockstep). A row outside it
+ *  is reported rather than ignored: the column is free text with no CHECK, so a
+ *  bad value is either corruption or a writer nobody knows about. */
+export const STORAGE_PURCHASE_STATUSES = new Set(['pending', 'applied', 'refused', 'unresolved']);
+
+// pg returns TIMESTAMPTZ as a Date and a fixture as a string; both parse, and
+// anything unreadable answers null so the caller reports rather than inventing
+// an age.
+function timestampMs(value) {
+  if (value instanceof Date) {
+    const ms = value.getTime();
+    return Number.isFinite(ms) ? ms : null;
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    const ms = Date.parse(String(value));
+    return Number.isFinite(ms) ? ms : null;
+  }
+  return null;
+}
+
+function hoursSince(startMs, nowMs) {
+  if (startMs === null) return null;
+  return Math.floor((nowMs - startMs) / 3_600_000);
+}
+
+function ageText(hours) {
+  return hours === null ? 'an unreadable age' : `${hours}h`;
+}
+
+/** Every storage_purchases row an operator should look at. Pure and DB-free,
+ *  like auditBank. `nowMs` is injected so the threshold is testable. */
+export function auditStoragePurchases({ rows, nowMs }) {
+  const findings = [];
+  for (const row of rows) {
+    const status = String(row.status ?? '');
+    const base = {
+      realm: String(row.realm ?? ''),
+      characterId: row.character_id === null ? null : Number(row.character_id),
+      accountId: row.account_id === null ? null : Number(row.account_id),
+      key: String(row.idempotency_key ?? ''),
+      status,
+    };
+    const what = `purchase ${base.key} (${String(row.item_id ?? '')}, declared ${String(
+      row.expected_cost_claudium ?? '',
+    )} Claudium)`;
+    if (!STORAGE_PURCHASE_STATUSES.has(status)) {
+      findings.push({
+        ...base,
+        kind: 'storage_purchase_bad_status',
+        detail: `${what} carries status ${JSON.stringify(status)}, which is outside the vocabulary: treat as corruption or an unknown writer, and do not resolve it by hand until you know which`,
+      });
+      continue;
+    }
+    if (status === 'unresolved') {
+      const hours = hoursSince(timestampMs(row.resolved_at ?? row.created_at), nowMs);
+      findings.push({
+        ...base,
+        kind: 'storage_purchase_unresolved',
+        detail: `${what} is UNRESOLVED after ${ageText(hours)}: the service accepted the spend and the apply-time re-check refused, so the player was charged and holds no slots. Nothing will revisit it. CHECK THIS CHARACTER'S bank_ledger buy_slots ROWS FIRST: the expected cause is that they bought that same rung with GOLD while the purchase was still open, in which case the ladder already moved and granting by hand would over-grant it. Refund at the service if so; otherwise grant the slots by hand, then settle the row`,
+      });
+      continue;
+    }
+    if (status === 'pending') {
+      const hours = hoursSince(timestampMs(row.created_at), nowMs);
+      if (hours !== null && hours < STORAGE_PURCHASE_STRANDED_HOURS) continue;
+      findings.push({
+        ...base,
+        kind: 'storage_purchase_stranded',
+        detail: `${what} has been PENDING for ${ageText(hours)}: a pending row is driven by its own request and re-driven at the character's next login, so at this age either the character has not come back (benign) or nothing is driving it and a debit may be sitting at the service with no game-side apply. Check the character's last login before acting`,
+      });
+    }
+  }
+  return findings;
+}
+
+/** The storage-purchase section, printed under the ledger report. Says what was
+ *  READ as well as what was found: a silent section over a table nobody
+ *  queried would read as an all-clear it has not earned. */
+export function formatStoragePurchaseReport(rows, findings, truncated = false, totals = null) {
+  const lines = [];
+  // Said FIRST, because a truncated report that looks complete is worse than no
+  // report: an operator reading a tidy list has to know more rows exist.
+  if (truncated) {
+    lines.push(
+      `storage purchases: TRUNCATED at ${STORAGE_PURCHASE_REPORT_LIMIT} open rows: more exist and are NOT listed below. UNRESOLVED rows are read first, so every charged-player row is listed; the rows omitted are PENDING. Query storage_purchases directly for the full picture.`,
+    );
+  }
+  // Prefer the whole-table totals when the caller has them: over a truncated
+  // read the slice's own tally describes the slice, not the incident.
+  const byStatus = new Map();
+  if (Array.isArray(totals) && totals.length > 0) {
+    for (const row of totals) byStatus.set(String(row.status ?? ''), Number(row.n ?? 0));
+  } else {
+    for (const row of rows) {
+      const status = String(row.status ?? '');
+      byStatus.set(status, (byStatus.get(status) ?? 0) + 1);
+    }
+  }
+  const counts = [...byStatus.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([status, n]) => `${status} ${n}`)
+    .join(', ');
+  const openTotal =
+    Array.isArray(totals) && totals.length > 0
+      ? [...byStatus.values()].reduce((a, b) => a + b, 0)
+      : rows.length;
+  lines.push(
+    `storage purchases: open rows read ${rows.length} of ${openTotal}${counts === '' ? '' : ` (${counts})`}: findings ${findings.length}`,
+  );
+  for (const finding of findings) {
+    lines.push(
+      `FINDING: storage purchase: realm ${finding.realm}: character ${finding.characterId}: ${finding.kind}: ${finding.detail}`,
+    );
+  }
+  if (findings.length === 0) {
+    lines.push('OK: no unresolved or stranded storage purchases.');
+  }
+  return lines.join('\n');
+}
+
 // A one-line-per-item report grouped by container, plus a per-container summary.
 export function formatReport(ledgerRows, findings) {
   const lines = [];
@@ -823,6 +1541,28 @@ export function formatReport(ledgerRows, findings) {
   if (findings.length === 0) lines.push('OK: no shape or conservation anomalies found.');
   return lines.join('\n');
 }
+
+// The characters read. Only the bank and vault slices of each character blob:
+// the audit reads nothing else, and buffering every full state blob is the
+// expensive part. A save that predates either feature yields a JSON null for
+// that key, which stateBankOf / stateVaultOf already read as "no state".
+// Hoisted out of main() so tests/bank_audit.test.ts can pin the projection by
+// source text. Dropping either extraction is not a quiet degradation: that
+// container would reconcile against an empty one, so every character WITH
+// activity in it starts emitting false ledger_state_mismatch findings, loudly
+// and at scale. Only a character with no activity there goes quiet (nothing to
+// contradict), which is why the loud noise is the tell and the pin exists.
+//
+// A recorded scale deferral, the characters-side twin of the ledger read's:
+// each jsonb extraction decompresses the WHOLE state blob and Postgres shares
+// no work between the two, so reading both slices roughly doubles the scan
+// against reading one; the read is fully buffered with no cursor besides, so
+// the whole projection lands in this process at once. Revisit with a keyset
+// cursor and streaming once characters reaches the low hundreds of thousands
+// of rows.
+export const CHARACTERS_SQL = `SELECT id, realm,
+        jsonb_build_object('bank', state->'bank', 'vault', state->'vault') AS state
+   FROM characters`;
 
 async function main() {
   try {
@@ -889,17 +1629,64 @@ async function main() {
          FROM bank_ledger
         ORDER BY id`,
     );
-    // Only the bank slice of each character blob: the audit reads nothing
-    // else, and buffering every full state blob is the expensive part.
-    const chars = await pool.query(
-      `SELECT id, realm, jsonb_build_object('bank', state->'bank') AS state FROM characters`,
-    );
+    const chars = await pool.query(CHARACTERS_SQL);
     const characters = chars.rows.map((r) => ({ id: r.id, realm: r.realm, state: r.state }));
     // Guild books for the guild-container reconciliation (Guild Bank Phase 3).
     const banks = await pool.query('SELECT guild_id, realm, data FROM guild_banks');
     const findings = auditBank({ ledgerRows: ledger.rows, characters, guildBanks: banks.rows });
     console.log(formatReport(ledger.rows, findings));
-    process.exitCode = findings.length > 0 ? 1 : 0;
+
+    // The storage-purchase arm. DEGRADE, never die, on the same terms as the
+    // counterparty columns above: this table arrived with Bank Storage phase
+    // 11, and the tool is documented as the thing you run after a restore, so
+    // a database that predates it (or a replica that has not booted the new
+    // schema) must still get its ledger audit. to_regclass honours the
+    // search_path, so the probe names the same relation the read would.
+    //
+    // Only the OPEN statuses are read. Be precise about what that buys: the
+    // RESULT is small, the SCAN is not. `status` carries no index and applied
+    // rows are now kept forever, so this reads the whole table and filters. That
+    // is acceptable here and nowhere else: an offline operator tool, under a
+    // statement timeout, in a run that already scans the whole bank_ledger. It
+    // is also LIMITED, because the incident that makes this report interesting
+    // is exactly the one that could make it enormous, and a tool that balloons
+    // in memory during an incident is no use during an incident.
+    const storagePresent = await pool.query(
+      `SELECT to_regclass('storage_purchases') IS NOT NULL AS present`,
+    );
+    let storageFindings = [];
+    if (storagePresent.rows[0]?.present) {
+      const purchases = await pool.query(
+        `SELECT id, realm, account_id, character_id, item_id, expected_cost_claudium,
+                idempotency_key, status, created_at, resolved_at
+           FROM storage_purchases
+          WHERE status <> 'applied' AND status <> 'refused'
+          ORDER BY (status = 'unresolved') DESC, id
+          LIMIT $1`,
+        [STORAGE_PURCHASE_REPORT_LIMIT + 1],
+      );
+      const truncated = purchases.rows.length > STORAGE_PURCHASE_REPORT_LIMIT;
+      const rows = purchases.rows.slice(0, STORAGE_PURCHASE_REPORT_LIMIT);
+      // The per-status totals come from the WHOLE table, not from the slice the
+      // limit returned: counts computed over a truncated read under-report the
+      // exact incident that caused the truncation, and an operator reading
+      // "unresolved 3" during a mass-pending event would act on a number that
+      // means "3 of the first 500 rows".
+      const totals = await pool.query(
+        `SELECT status, count(*)::int AS n
+           FROM storage_purchases
+          WHERE status <> 'applied' AND status <> 'refused'
+          GROUP BY status`,
+      );
+      storageFindings = auditStoragePurchases({ rows, nowMs: Date.now() });
+      console.log(formatStoragePurchaseReport(rows, storageFindings, truncated, totals.rows));
+    } else {
+      console.warn(
+        'storage_purchases does not exist on this database: Claudium storage purchases ' +
+          'cannot be audited. Boot a realm process against it to apply the schema.',
+      );
+    }
+    process.exitCode = findings.length + storageFindings.length > 0 ? 1 : 0;
   } finally {
     await pool.end();
   }

@@ -34,7 +34,6 @@
 
 import {
   GUILD_BANK_EXPANSION_SLOTS,
-  GUILD_BANK_RUNG_PRICES,
   GUILD_BANK_TREASURY_CAP,
   guildBankRungsBought,
 } from '../sim/guild_bank';
@@ -148,7 +147,10 @@ export type GuildBankViewModel =
       // Null for a read-only viewer: the open-the-bank row is an officer
       // action, and modeling its absence here (rather than a painter branch
       // on readOnly) keeps the purse out of the member pane's model entirely,
-      // so the window's refresh signature stays purse-free for them.
+      // so the window's refresh signature stays purse-free for them. Also
+      // null when the snapshot quotes no price (nextExpansionPrice null,
+      // unreachable off a real sim while unopened): the client never invents
+      // a price the server did not send.
       open: GuildBankOpenModel | null;
       readOnly: boolean;
     }
@@ -191,13 +193,19 @@ export function buildGuildBankView(
   };
   if (guildBankRungsBought(info.purchasedSlots) === 0) {
     // No rung bought yet: the bank is unopened (0 item slots). Rung 0's price
-    // rides the same nextExpansionPrice field (defensively falling back to
-    // the table literal, unreachable off a real snapshot).
-    const price = info.nextExpansionPrice ?? GUILD_BANK_RUNG_PRICES[0];
+    // rides the same nextExpansionPrice field, and the SERVER is the only
+    // price authority: a snapshot without one (unreachable off a real sim,
+    // which always quotes rung 0 while unopened) renders NO open row, the
+    // same shape a read-only viewer gets, never a client-invented price.
+    // (Guild rung prices are NOT host-tunable today: the phase 09 override
+    // covers only the personal bank and vault tables. Wire-only rendering
+    // here is guard hygiene, so a future guild retune needs no client work.)
+    const price = info.nextExpansionPrice;
     return {
       kind: 'unopened',
       treasury,
-      open: readOnly ? null : { price, affordable: Math.floor(purseCopper) >= price },
+      open:
+        readOnly || price === null ? null : { price, affordable: Math.floor(purseCopper) >= price },
       readOnly,
     };
   }

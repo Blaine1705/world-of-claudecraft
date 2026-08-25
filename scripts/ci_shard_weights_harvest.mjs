@@ -22,7 +22,7 @@
 // is kept: the partition should plan for the expensive occurrence.
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseWeightLines } from './lib/ci_shard_weight_parse.mjs';
 
@@ -75,5 +75,18 @@ const out = {
   ...sorted,
 };
 const target = resolve(import.meta.dirname, 'ci_shard_weights.generated.json');
+// A wholesale re-harvest replaces any locally-measured rows a release-sync
+// session merged in (the __provenance.localMerge block); say so, or that
+// substitution vanishes from the log without a trace.
+try {
+  const prior = JSON.parse(readFileSync(target, 'utf8')).__provenance?.localMerge;
+  if (prior) {
+    console.log(
+      `[harvest] replacing a prior localMerge block (${prior.files} locally measured rows from ${prior.measured}) with CI-harvested weights`,
+    );
+  }
+} catch {
+  // No prior table (or unreadable): nothing to report.
+}
 writeFileSync(target, `${JSON.stringify(out, null, 2)}\n`);
 console.log(`[harvest] wrote ${Object.keys(sorted).length} weights to ${target}`);

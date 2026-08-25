@@ -24,13 +24,22 @@ import {
   addStacked,
   BAG_SOCKETS,
   bagCapacity,
+  bagPools,
   canAddItem,
   instancedCountCap,
   migrationBagsFor,
   stackSizeOf,
 } from './bags';
 import * as bankMod from './bank';
-import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import {
+  applyBankBonusStamp,
+  type BankState,
+  emptyBankState,
+  type SavedBankState,
+  sanitizeBankState,
+  savedBankState,
+} from './bank';
+import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import { buildCivicServicePlacements } from './civic_service_placements';
@@ -311,6 +320,8 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import type { MaterialsVaultState } from './materials_vault';
+import * as vaultMod from './materials_vault';
 import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   mobCombatProfile as mobCombatProfileFn,
@@ -542,6 +553,7 @@ import {
   serializeReliquaryState,
 } from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
@@ -564,6 +576,7 @@ import {
   spawnOverworldSpiritHealers,
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
+import { resolveStoragePrices, type StoragePrices } from './storage_prices';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -1216,18 +1229,6 @@ export interface ResolvedAbility {
   hunterRhythm?: boolean;
 }
 
-export interface RewardCounters {
-  damageDealt: number;
-  damageTaken: number;
-  kills: number;
-  deaths: number;
-  xpGained: number;
-  questsCompleted: number;
-  questProgress: number;
-  lootCopper: number;
-  levelUps: number;
-}
-
 export interface SentChat {
   channel: 'say' | 'yell' | 'whisper' | 'general' | 'party' | 'battleground' | 'world' | 'lfg';
   message: string;
@@ -1335,6 +1336,10 @@ export interface PlayerMeta {
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
   bankBonusSources: BankBonusSource[];
+  // The per-character Materials Vault: a count per material id with a gold-bought
+  // per-material ceiling. Capacity and move math live in materials_vault.ts.
+  // Persisted (inside the character save, exactly like inventory/bags/bank).
+  vault: MaterialsVaultState;
   // Server-stamped guild membership (guild id + rank), the authorization input
   // the Guild Bank's officer-plus gate reads; written only through
   // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
@@ -1747,8 +1752,14 @@ export interface CharacterState {
   bags?: (string | null)[];
   // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
   // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
-  // load path (never destroys items; tolerates an over-capacity inventory).
-  bank?: BankState;
+  // load path (never destroys items; tolerates an over-capacity inventory). The
+  // SavedBankState socket fields are optional and written only once a socket is
+  // unlocked, so pre-socket and zero-socket saves stay byte-equal.
+  bank?: SavedBankState;
+  // Per-character Materials Vault (JSONB; optional so pre-vault saves load cleanly,
+  // defaulting to the empty locked vault). sanitizeVaultState is the one load path
+  // (never destroys stock; tolerates an over-capacity count).
+  vault?: MaterialsVaultState;
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];
@@ -1967,19 +1978,10 @@ export interface PendingMobRespawn {
 
 // copyPos moved to entity_roster.ts (used only by the despawn prologue).
 
-function freshCounters(): RewardCounters {
-  return {
-    damageDealt: 0,
-    damageTaken: 0,
-    kills: 0,
-    deaths: 0,
-    xpGained: 0,
-    questsCompleted: 0,
-    questProgress: 0,
-    lootCopper: 0,
-    levelUps: 0,
-  };
-}
+// RewardCounters and its zero value moved to reward_counters.ts: one module owns
+// the shape, so a counter added without a matching zero cannot ship. Re-exported
+// here so headless/env_server.ts's import stays byte-identical.
+export type { RewardCounters };
 
 // The offline guild bank log answer: a FROZEN empty ready view. Offline play
 // never has a guild (guilds live in the server social DB) and there is no
@@ -2000,8 +2002,15 @@ export class Sim {
   readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+  // `storagePrices` is consumed at construction like `noPlayer`, never carried
+  // here: the resolved table below is the single truth.
+  cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'storagePrices'>
+  > &
     Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  // The resolved storage price table (storage_prices.ts): frozen once in the
+  // ctor from cfg.storagePrices; every bank/vault price read charges from it.
+  readonly storagePrices: StoragePrices;
   /**
    * The authored world this simulation owns. The active registry is a host/render
    * seam and may be swapped by an editor after construction; gameplay services,
@@ -2342,6 +2351,8 @@ export class Sim {
     // has its boss up. Draws no rng here; the spawn itself fires on the first
     // tick through the normal updateWorldBosses path.
     if (cfg.worldBossAtBoot) this.worldBossNextAt = WORLD_BOSSES.map(() => 0);
+    // Resolved before the seam is built so ctx.storagePrices reads it; pure, no rng.
+    this.storagePrices = resolveStoragePrices(cfg.storagePrices);
     // S0b seam: the shared SimContext every extracted slice routes through. Built
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
@@ -2981,8 +2992,9 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
-      bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
+      bank: emptyBankState(),
       bankBonusSources: [],
+      vault: { stock: {}, upgrades: 0 },
       guildMembership: null,
       vendorBuyback: [],
       copper: 0,
@@ -3177,8 +3189,11 @@ export class Sim {
       // ONE aggregated dev-channel line per character load, not one per row: a
       // systematically corrupt blob (a bad migration) would otherwise log once
       // per affected stack, and over-capacity inventories are tolerated rather
-      // than truncated, so that count is unbounded. Every container below
-      // pushes its drops here; the single warn sits after the bank load.
+      // than truncated, so that count is unbounded. Every instance-carrying
+      // container below pushes its drops here; the single warn sits after the
+      // bank load. The Materials Vault deliberately opts OUT: its one drop case
+      // is a wrong-shaped stock, not instance junk, so it warns on its own
+      // accurately-labeled line (a single if, at most one line per load).
       const droppedInstanceJunk: string[] = [];
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
@@ -3322,6 +3337,12 @@ export class Sim {
       // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
+      // The Materials Vault sanitizes on load too (never destroys stock; a pre-vault
+      // save has no `vault` field and sanitizes to the empty locked vault). See
+      // materials_vault.ts sanitizeVaultState. Passing the owner (and no sink) makes
+      // a wholesale-dropped wrong-shaped stock (the one shape tolerance cannot keep)
+      // warn on its own accurately-labeled line, not the item-instance one.
+      meta.vault = vaultMod.sanitizeVaultState(s.vault, meta.name);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
       for (const q of s.questLog) {
@@ -3550,14 +3571,9 @@ export class Sim {
       if (s.helmHidden) player.helmHidden = true;
     }
 
-    // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
-    // saved-state and brand-new-character arms: a first-ever join can already have
-    // earned account bonuses. Values are host-trusted but clamped to the registry
-    // ceiling anyway; the breakdown rows are cloned at this write boundary.
-    if (opts?.bankBonus) {
-      meta.bank.bonusSlots = clampBonusSlots(opts.bankBonus.bonusSlots);
-      meta.bankBonusSources = opts.bankBonus.sources.map((s) => ({ ...s }));
-    }
+    // Host-stamped bank bonus slots (see the opt doc above); applyBankBonusStamp
+    // owns the clamp and the row clone, so bank.ts stays the one writer.
+    if (opts?.bankBonus) applyBankBonusStamp(meta, opts.bankBonus);
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
@@ -4170,11 +4186,10 @@ export class Sim {
       ),
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
-      bank: {
-        inventory: meta.bank.inventory.map(cloneInvSlot),
-        purchasedSlots: meta.bank.purchasedSlots,
-        bonusSlots: meta.bank.bonusSlots,
-      },
+      bank: savedBankState(meta.bank),
+      // Hand-enumerated clone: tsc forces a new REQUIRED MaterialsVaultState field
+      // to appear here, but an optional one would compile unpersisted; add it by hand.
+      vault: { stock: { ...meta.vault.stock }, upgrades: meta.vault.upgrades },
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -5234,6 +5249,9 @@ export class Sim {
       },
       get cfg() {
         return sim.cfg;
+      },
+      get storagePrices() {
+        return sim.storagePrices;
       },
       // A2: duel + arena state stays on Sim, exposed as live views (backing fields
       // mutated in place / the queues reassigned by the matchmaker filter).
@@ -9134,7 +9152,7 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const { meta } = r;
-    return canAddItem(meta.inventory, bagCapacity(meta.bags), itemId, count);
+    return canAddItem(meta.inventory, bagPools(meta.bags), itemId, count);
   }
 
   equipBag(
@@ -10524,6 +10542,8 @@ export class Sim {
   realm = '';
   // Offline the player owns the world, so admin-gated dev surfaces are open.
   accountAdmin = true;
+  // Offline play never spectates: this session is always its own viewer.
+  readonly spectating: string | null = null;
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}
@@ -11165,6 +11185,69 @@ export class Sim {
     return bankMod.bankInfoFor(this.ctx, pid);
   }
 
+  // Thin delegates to the socket free functions (bank_sockets.ts); state rides
+  // the same PlayerMeta.bank. bankSocketBag folds the facet's named-slot
+  // target into the trailing pid/slotIndex pair, the equipBag idiom.
+
+  bankUnlockSocket(pid?: number): void {
+    bankSocketsMod.bankUnlockSocket(this.ctx, pid);
+  }
+
+  bankSocketBag(
+    itemId: string,
+    socket?: number,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    // Null-guarded unlike the equipBag fold it copies: this delegate sits on
+    // the shared entry point both hosts call, and `typeof null === 'object'`
+    // would throw here if any caller ever passed a null target (the shipped
+    // phase 07 dispatch parses `msg.slot` into the trailing slotIndex arm, so
+    // today this is defense in depth, not a live wire path).
+    const named =
+      pidOrTarget !== null && typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    bankSocketsMod.bankSocketBag(this.ctx, itemId, socket, pid, named);
+  }
+
+  bankUnsocketBag(socket: number, pid?: number): void {
+    bankSocketsMod.bankUnsocketBag(this.ctx, socket, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Materials Vault: the per-character material stockpile
+  // -------------------------------------------------------------------------
+
+  // Thin delegates to the vault free functions (materials_vault.ts). The vault
+  // state lives on PlayerMeta.vault and serializes inside the character save;
+  // like the bank ops, each has one entry point gated on banker proximity.
+
+  vaultDeposit(slotIndex: number, count?: number, pid?: number): void {
+    vaultMod.vaultDeposit(this.ctx, slotIndex, count, pid);
+  }
+
+  vaultDepositAll(pid?: number): void {
+    vaultMod.vaultDepositAll(this.ctx, pid);
+  }
+
+  vaultWithdraw(itemId: string, count?: number, pid?: number): void {
+    vaultMod.vaultWithdraw(this.ctx, itemId, count, pid);
+  }
+
+  vaultBuyUpgrade(pid?: number): void {
+    vaultMod.vaultBuyUpgrade(this.ctx, pid);
+  }
+
+  vaultInfoFor(pid: number): import('../world_api').VaultInfo | null {
+    return vaultMod.vaultInfoFor(this.ctx, pid);
+  }
+
+  // NOT banker-gated, unlike every read above: gated instead on the
+  // craft-from-vault context predicate (src/sim/vault_craft_gate.ts).
+  craftVaultStockFor(pid: number): Record<string, number> | null {
+    return vaultMod.craftVaultStockFor(this.ctx, pid);
+  }
+
   // -------------------------------------------------------------------------
   // The Guild Bank: the shared guild treasury + item store (Phase 1 foundation)
   // -------------------------------------------------------------------------
@@ -11700,6 +11783,18 @@ export class Sim {
 
   get bankInfo(): import('../world_api').BankInfo | null {
     return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
+  }
+
+  get vaultInfo(): import('../world_api').VaultInfo | null {
+    return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);
+  }
+
+  get craftVaultStock(): Record<string, number> | null {
+    return this.primaryId === -1 ? null : this.craftVaultStockFor(this.primaryId);
+  }
+
+  get bankPurchasedSlots(): number | null {
+    return this.primaryId === -1 ? null : bankMod.bankPurchasedSlotsFor(this.ctx, this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {

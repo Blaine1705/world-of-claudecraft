@@ -65,6 +65,12 @@ services:
       # Empty (unset) yields the built-in default of 10; accepted range is 1 to
       # 97 and anything else falls back to the default with an error at boot.
       DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
+      # Runtime: storage price override (server/storage_prices.ts), one JSON object
+      # of copper price lists, e.g. {"bankSockets":[4 ints]} (bankExpansions and
+      # vaultUpgrades too), kept on ONE line in a .env file. Empty (unset) keeps the
+      # compiled defaults; a rejected dimension falls back by itself and is reported
+      # on the console at boot.
+      STORAGE_PRICES: ${STORAGE_PRICES:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}

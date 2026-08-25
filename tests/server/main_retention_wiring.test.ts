@@ -9,7 +9,13 @@ import { describe, expect, it } from 'vitest';
 import { stripComments } from '../helpers/strip_comments';
 
 // Comment-stripped so a commented-out call can never satisfy an order pin.
-const MAIN = stripComments(readFileSync(join(__dirname, '..', '..', 'server', 'main.ts'), 'utf8'));
+const MAIN_PATH = join(__dirname, '..', '..', 'server', 'main.ts');
+const MAIN = stripComments(readFileSync(MAIN_PATH, 'utf8'));
+// The RAW read, for the ONE pin whose subject IS a comment: the bank_ledger
+// no-sweep asymmetry is a decision that lives beside the table list, and reading
+// it out of MAIN would ask a comment-stripped source for a comment. Everything
+// else keeps MAIN, so a commented-out call still cannot satisfy an order pin.
+const MAIN_RAW = readFileSync(MAIN_PATH, 'utf8');
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
 
 describe('retention sweep wiring in server/main.ts', () => {
@@ -166,6 +172,9 @@ describe('retention sweep wiring in server/main.ts', () => {
     );
     expect(MAIN).toContain('pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)');
     expect(MAIN).toContain(
+      'pruneRefusedStoragePurchasesBatch(pool, config.storagePurchaseRetentionDays, n)',
+    );
+    expect(MAIN).toContain(
       'prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n)',
     );
     expect(MAIN).toContain(
@@ -223,6 +232,10 @@ describe('retention sweep wiring in server/main.ts', () => {
       'admin_site_presence_samples',
       'site_presence_sessions',
       'play_sessions',
+      // The branch's Claudium pending-purchase table, seated between the
+      // play-session feeder and its ager at the v0.40.0 sync: both arms of that
+      // merge grew this array, and only the union is the real order.
+      'storage_purchases',
       'account_ip_associations',
       'unstuck_reports',
       'password_reset_requests',
@@ -297,5 +310,105 @@ describe('retention sweep wiring in server/main.ts', () => {
     ]) {
       expect(interval).toContain(call);
     }
+  });
+
+  it('the deliberate bank_ledger no-sweep asymmetry is pinned, not just commented', () => {
+    // Bank Storage phase 11 added storage_purchases to the sweep while
+    // bank_ledger stays FOREVER, and that asymmetry is the packet's most
+    // load-bearing retention decision: bank_ledger is the anti-dupe trail every
+    // conservation replay reads end to end. It lived only in a comment, so a
+    // future "sweep the big table too" edit would have gone in green.
+    const listStart = MAIN.indexOf('saveLastSweepDay:');
+    expect(listStart).toBeGreaterThan(-1);
+    // The sweep's own table list: storage_purchases IS swept via its batch
+    // prune, and no bank_ledger prune exists anywhere in the file.
+    expect(MAIN).toContain(
+      'pruneRefusedStoragePurchasesBatch(pool, config.storagePurchaseRetentionDays, n)',
+    );
+    expect(MAIN).not.toContain('pruneBankLedger');
+    expect(MAIN).not.toContain('DELETE FROM bank_ledger');
+    // And the reason survives next to the list, so the asymmetry reads as a
+    // decision rather than an omission.
+    expect(MAIN_RAW).toContain('bank_ledger is deliberately ABSENT from this table list');
+  });
+
+  it('the login recovery kick is armed BEFORE the socket can deliver a command', () => {
+    // server/ws_auth.ts arms the provisional gold-rail hold synchronously on a
+    // fresh join, and the whole point is that it happens before the message
+    // handler exists: a gold rung buy arriving first would race the
+    // pending-row scan after a restart. This pin is STRUCTURAL and that is all
+    // it is: it compares the index of two literals in a file it never loads, so
+    // it catches deletion and a straight relocation and nothing else. The
+    // EXECUTED covenant, which catches a deferred, conditional or arm-scoped
+    // kick, lives in tests/server/ws_auth_login_covenant.test.ts (ws_auth IS
+    // importable, unlike main.ts; an earlier version of this comment said
+    // otherwise and that is why the behaviour went undriven for nineteen
+    // phases). Both are kept: this one is free and guards the call site's
+    // existence next to the rest of the retention wiring.
+    // Comment-stripped, like MAIN above: read RAW, a commented-out
+    // `// kickStoragePurchaseRecovery(session.characterId);` sitting anywhere
+    // above the handler satisfied both halves of this pin while the real call
+    // was gone.
+    const WS_AUTH = stripComments(
+      readFileSync(join(__dirname, '..', '..', 'server', 'ws_auth.ts'), 'utf8'),
+    );
+    const kick = WS_AUTH.indexOf('kickStoragePurchaseRecovery(session.characterId)');
+    expect(kick).toBeGreaterThan(-1);
+    const handler = WS_AUTH.indexOf("ws.on('message'", kick - 4000 > 0 ? kick - 4000 : 0);
+    expect(handler).toBeGreaterThan(-1);
+    expect(kick).toBeLessThan(handler);
+  });
+
+  it('the storage purchase host treats a QUARANTINED session as absent', () => {
+    // server/main.ts builds the two session lookups the purchase flow resolves
+    // a character through. A quarantined session's live state is abandoned and
+    // game.ts saveCharacter refuses its saves outright, so admitting one here
+    // would debit real Claudium against a session that can never persist the
+    // grant. Every other custody wrapper in game.ts already reads
+    // `session.left || session.escrowQuarantined`; these two are the closures
+    // that have to agree with it, and neither is reachable from a unit test
+    // because main.ts boots a server on import.
+    //
+    // Sliced to each closure's OWN body rather than searched file-wide (the
+    // token appears in game.ts too, and a file-wide contains() would pass on
+    // somebody else's guard) and rather than by a fixed character window, which
+    // overruns into the sibling closures below it: if one of those ever grew the
+    // same guard, deleting this one would leave the pin green.
+    const bodyOf = (needle: string): string => {
+      const at = MAIN.indexOf(needle);
+      expect(at, `${needle} is missing from server/main.ts`).toBeGreaterThan(-1);
+      const end = MAIN.indexOf('\n    },', at);
+      expect(end, `${needle} has no closing brace`).toBeGreaterThan(at);
+      return MAIN.slice(at, end);
+    };
+    expect(bodyOf('resolveLiveCharacter: (accountId) => {')).toContain(
+      's.left || s.escrowQuarantined',
+    );
+    expect(bodyOf('saveCharacter: (characterId) => {')).toContain(
+      '!s.left && !s.escrowQuarantined',
+    );
+
+    // Exactly one of each, so a second host wiring cannot ship unguarded.
+    expect(count(MAIN, 'resolveLiveCharacter: (accountId) => {')).toBe(1);
+    expect(count(MAIN, 'saveCharacter: (characterId) => {')).toBe(1);
+  });
+
+  it('the claudium ledger rail is stamped at the production wiring site', () => {
+    // server/main.ts builds the recordGrantLedger closure the purchase flow
+    // calls. The unit tests drive recordBankOp directly with hand-copied
+    // arguments, so the closure itself was unexecuted and unpinned: dropping
+    // the paidWith stamp or the SKU id there would leave every test green while
+    // shipping unattributable audit rows.
+    expect(MAIN).toContain("{ paidWith: 'claudium', itemId: skuId }");
+    const factory = MAIN.indexOf('recordGrantLedger:');
+    expect(factory).toBeGreaterThan(-1);
+    const body = MAIN.slice(factory, factory + 600);
+    expect(body).toContain('recordBankOp(');
+    expect(body).toContain("'buy_slots'");
+    // The claudium rail moves no copper, so both snapshots carry the ladder
+    // counter and nothing else that could imply a price.
+    expect(body).toContain('purchasedSlots: purchasedSlotsBefore');
+    expect(body).toContain('purchasedSlots: purchasedSlotsAfter');
+    expect(body).toContain('nextExpansionCost: null');
   });
 });

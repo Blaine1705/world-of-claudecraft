@@ -16,6 +16,7 @@ import {
 } from '../src/sim/content/professions';
 import {
   ALL_RECIPES,
+  BAG_RECIPES,
   COMBO_RECIPES,
   LADDER_RECIPES,
   ROD_RECIPES,
@@ -279,12 +280,17 @@ describe('REFERENTIAL INTEGRITY', () => {
     // The 54 ladder recipes plus the 3 grandfathered combos all carry
     // 'trainer', and so do the two crafted rods and the two tool-effect
     // charms: the pre-training id list is frozen, so anything authored after
-    // that switch has to be learned.
+    // that switch has to be learned. Phase 05 of the bank-storage packet added
+    // BAG_RECIPES, a fifth trainer-acquired array (the crafted bag catalog,
+    // held outside LADDER_RECIPES because an epic result has no legal rung
+    // there), so it joins the sum on the same "authored after the switch, so
+    // it has to be learned" reasoning.
     expect(trainerRecipes).toBe(
       LADDER_RECIPES.length +
         COMBO_RECIPES.length +
         ROD_RECIPES.length +
-        TOOL_EFFECT_RECIPES.length,
+        TOOL_EFFECT_RECIPES.length +
+        BAG_RECIPES.length,
     );
     expect(ROD_RECIPES).toHaveLength(2);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);

@@ -40,56 +40,22 @@
 // over-guarding (content modules are the plausible future importers, and a
 // static scan cannot track the closure), and that order-dependence is exactly
 // what a static import scan catches and no runtime test reliably can.
+//
+// The derivation itself now lives in material_derivation.ts, a runtime-import-free
+// leaf this module and the sim-side Materials Vault share so the two sets cannot
+// drift; the eager derive below, and this module's public surface, are unchanged.
 
 import { ENCHANTS } from './content/enchants';
 import { HARVEST_COMPONENT_ITEMS, HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ALL_RECIPES, ITEMS } from './data';
+import { deriveMaterialItemIds } from './material_derivation';
 import { NODE_MATERIAL_TABLE } from './professions/gathering';
 import { MATERIAL_GRADES } from './professions/material_grades';
 import { SALVAGE_MATERIAL_BY_QUALITY } from './professions/salvage';
 import type { ItemDef } from './types';
 
-/** The content tables the material set derives from. Injectable so the
- *  per-source pins in tests/material_taxonomy.test.ts can prove each table is
- *  actually consulted (several sources fully overlap the reagent union today,
- *  so only injection can distinguish a live loop from a dead one). */
-export interface MaterialSourceTables {
-  nodeMaterialTable: typeof NODE_MATERIAL_TABLE;
-  materialGrades: typeof MATERIAL_GRADES;
-  harvestComponentItems: typeof HARVEST_COMPONENT_ITEMS;
-  harvestComponentSpecimens: typeof HARVEST_COMPONENT_SPECIMENS;
-  salvageMaterialByQuality: typeof SALVAGE_MATERIAL_BY_QUALITY;
-  recipes: typeof ALL_RECIPES;
-  enchants: typeof ENCHANTS;
-  items: typeof ITEMS;
-}
-
-export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet<string> {
-  const sources = new Set<string>();
-  // Node yields: every zone x node-type harvest grant.
-  for (const byZone of Object.values(tables.nodeMaterialTable)) {
-    for (const row of Object.values(byZone)) sources.add(row.itemId);
-  }
-  // Fine grades of the node yields (D8: the tool-outclassed harvest grant).
-  for (const row of Object.values(tables.materialGrades)) sources.add(row.fineItemId);
-  // Corpse-harvest components and their pristine-specimen jackpots.
-  for (const id of Object.values(tables.harvestComponentItems)) sources.add(id);
-  for (const id of Object.values(tables.harvestComponentSpecimens)) sources.add(id);
-  // Salvage returns (the disenchant arm's outputs, arcane dusts and resonant
-  // secondaries, arrive through the reagent union below: every one is consumed
-  // by an enchant, the no-dead-end rule disenchant_reagents.ts records).
-  for (const id of Object.values(tables.salvageMaterialByQuality)) sources.add(id);
-  // Everything a crafting recipe or an enchant consumes. The kind filter below
-  // drops tool/rod reagents (kind tool); raw fishing catches are kind junk and
-  // stay IN as honest cooking reagents. Only junk-kind reagents are materials.
-  for (const recipe of tables.recipes) {
-    for (const reagent of recipe.reagents) sources.add(reagent.itemId);
-  }
-  for (const enchant of Object.values(tables.enchants)) {
-    for (const reagent of enchant.reagents) sources.add(reagent.itemId);
-  }
-  return new Set([...sources].filter((id) => tables.items[id]?.kind === 'junk'));
-}
+export type { MaterialSourceTables } from './material_derivation';
+export { deriveMaterialItemIds } from './material_derivation';
 
 /** Every item id that counts as a depositable/browsable material: the
  *  junk-kind members of the source-or-reagent union above. Pinned by exact-set

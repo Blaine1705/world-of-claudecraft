@@ -291,6 +291,7 @@ describe('loadConfig', () => {
       },
       { key: 'PLAYER_ACTIVITY_RETENTION_DAYS', field: 'playerActivityRetentionDays', dflt: 400 },
       { key: 'UNSTUCK_REPORT_RETENTION_DAYS', field: 'unstuckReportRetentionDays', dflt: 90 },
+      { key: 'STORAGE_PURCHASE_RETENTION_DAYS', field: 'storagePurchaseRetentionDays', dflt: 90 },
       {
         key: 'PASSWORD_RESET_REQUEST_RETENTION_DAYS',
         field: 'passwordResetRequestRetentionDays',

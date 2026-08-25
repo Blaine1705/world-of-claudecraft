@@ -1,0 +1,541 @@
+// The Materials Vault tab of the bank window: the third pane BankWindow
+// composes, the GuildBankTab shape (a pane class with model() + renderInto(),
+// never mounted on its own and never owning a repaint decision: BankWindow's
+// refreshIfChanged signature drives every rebuild, and this pane asks for one
+// with deps.requestRender()). Renders the VaultViewModel the pure core
+// (vault_view.ts) builds: the locked unlock offer, the stocked per-material
+// rows with withdraw actions, the batched deposit-all button, and the
+// gold-only ceiling upgrade with its confirm in the prompt stack.
+//
+// Cold contract (the *_window perf bucket): rebuilt via renderInto on open,
+// real data change, and language switch; no forced-reflow layout read (the
+// .bank-scroll offset capture stays in BankWindow, the guild precedent) and no
+// repeating driver of its own (the two summary timers are one-shot
+// setTimeouts). Registered in UI_DOM_MODULES (tests/architecture.test.ts).
+//
+// Every displayed price and capacity comes from the WIRE model
+// (nextUpgradeCost, perMaterialCap): no client price table, no client cap
+// constant beyond the ladder-geometry nextCap the pure core derives. The
+// prompts reuse the bank family's classes (bank-buy-prompt /
+// bank-quantity-prompt) so dismissBankPrompts and the force-close teardown
+// reach them.
+
+import { audio } from '../game/audio';
+import { ITEMS } from '../sim/data';
+import { vaultMaterialIds } from '../sim/materials_vault';
+import type { ItemDef, ItemInstancePayload } from '../sim/types';
+import type { IWorld } from '../world_api';
+import { bagRimClasses } from './bag_corner_mark_view';
+import { showBuyConfirmPrompt } from './bank_buy_prompt';
+import { showQuantityPrompt } from './bank_quantity_prompt';
+import { formatCount } from './count_format';
+import { itemDisplayName } from './entity_i18n';
+import { esc } from './esc';
+import { formatMoney, type TranslationKey, t } from './i18n';
+import { QUALITY_COLOR } from './icons';
+import { fineSealMarkHtml } from './item_instance_glyph_mark';
+import { knownItemDef } from './known_item';
+import { unknownItemIconHtml } from './unknown_item_icon';
+import {
+  buildVaultView,
+  hasVaultDepositable,
+  predictVaultDepositAll,
+  type VaultRowModel,
+  type VaultViewModel,
+  vaultDepositAllSummaryKey,
+  vaultRowAction,
+  vaultWithdrawFit,
+  vaultWithdrawNotice,
+} from './vault_view';
+
+// The unranked quality fallback, the bank/bags token (no raw hex in painters).
+const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
+
+// How long the transient deposit-all / shortfall summary stays on screen (the
+// bank's DEPOSIT_STATUS_MS twin, kept module-local so the two panes stay
+// independently tunable).
+const VAULT_STATUS_MS = 4_000;
+
+/** Stable ids so BankWindow can stamp aria-controls on the strip tab and the
+ *  panel can point aria-labelledby back at it (the guild pane precedent). */
+export const VAULT_PANEL_ID = 'bank-panel-vault';
+export const VAULT_TAB_ID = 'bank-tab-vault';
+// The deposit-all button's visually-hidden description (aria-describedby):
+// a module constant like the two ids above, so the pair cannot drift.
+const VAULT_DEPOSIT_ALL_DESC_ID = 'vault-deposit-all-desc';
+
+/** BankWindow-supplied glue, the GuildBankTabDeps shape: the shared
+ *  presentation painters plus the window's prompt-dialog chrome. */
+export interface VaultTabDeps {
+  root(): HTMLElement;
+  world(): IWorld;
+  itemIcon(item: ItemDef): string;
+  moneyHtml(copper: number): string;
+  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
+  attachTooltip(el: HTMLElement, html: () => string): void;
+  hideTooltip(): void;
+  /** True when this click released a long-press tooltip peek (suppress the
+   *  withdraw, the bank grid rule). */
+  consumePeek(): boolean;
+  onInventoryChanged(): void;
+  installPromptDialog(
+    prompt: HTMLElement,
+    opener: HTMLElement | null,
+    close: () => void,
+  ): { dismiss: () => void; dismissAndReturn: () => void };
+  dismissPrompts(): void;
+  requestRender(): void;
+}
+
+export class VaultTab {
+  // The transient status line (deposit-all summary or withdraw shortfall) and
+  // its self-expire timer: a polite aria-live line inside the pane, the bank's
+  // depositStatus idiom. Stored as KEY plus params, resolved at build time, so
+  // a language switch inside the 4-second window relocalizes the line with the
+  // rest of the pane (the bank stores the resolved string; recorded family
+  // follow-up).
+  private status: { key: TranslationKey; params?: Record<string, string>; at: number } | null =
+    null;
+  private statusTimer: number | null = null;
+
+  // In-flight guard for deposit-all: ONE command, but the online mirror still
+  // lags its echo by about a tick, so a rapid second click would re-predict
+  // from the stale mirror and show a summary for materials already stocked.
+  // Held until BankWindow's signature moves (clearDepositAllPending) or the
+  // fallback timer clears a lost echo.
+  private depositAllPending = false;
+  private depositAllTimer: number | null = null;
+
+  constructor(private readonly deps: VaultTabDeps) {}
+
+  /** The render model off the live mirror. 'away' collapses the tab
+   *  (BankWindow's strip rule); the window never calls renderInto with it. */
+  model(): VaultViewModel {
+    return buildVaultView(this.deps.world().vaultInfo, (id) => knownItemDef(ITEMS, id));
+  }
+
+  /** True while the pane shows a stocked, UNLOCKED vault: the bags companion
+   *  routes a bag click to vaultDeposit only then (the locked offer is a
+   *  purchase surface, not a deposit target; BankWindow composes this into
+   *  vaultTabActive). */
+  get unlocked(): boolean {
+    return (this.deps.world().vaultInfo?.upgrades ?? 0) > 0;
+  }
+
+  /** Close/teardown: drop the transient status and the pending guard so a
+   *  reopened bank never flashes a stale line (BankWindow.close calls this). */
+  reset(): void {
+    this.clearStatus();
+    this.clearDepositAllPending();
+  }
+
+  /** The bank data signature moved: any in-flight deposit-all has echoed, so
+   *  the button may re-enable on this repaint (BankWindow.refreshIfChanged). */
+  clearDepositAllPending(): void {
+    if (this.depositAllTimer !== null) {
+      window.clearTimeout(this.depositAllTimer);
+      this.depositAllTimer = null;
+    }
+    this.depositAllPending = false;
+  }
+
+  private clearStatus(): void {
+    if (this.statusTimer !== null) {
+      window.clearTimeout(this.statusTimer);
+      this.statusTimer = null;
+    }
+    this.status = null;
+  }
+
+  /** The pane stopped rendering (a tab switch): stop the STATUS self-expire
+   *  timer so it cannot fire a whole-window rebuild for a line nobody can
+   *  see. The status itself is kept: switching back inside the window
+   *  re-shows it and buildStatusLine's age check still owns expiry. The
+   *  depositAllTimer deliberately keeps running: its fallback re-enables the
+   *  button after a lost echo, which must happen wherever the player is, or
+   *  switching back would find it wedged shut. */
+  pauseStatusTimer(): void {
+    if (this.statusTimer !== null) {
+      window.clearTimeout(this.statusTimer);
+      this.statusTimer = null;
+    }
+  }
+
+  /** Build the pane into the freshly wiped window root (BankWindow.render owns
+   *  the wipe, the strip, and the scroll-offset restore). */
+  renderInto(root: HTMLElement, model: VaultViewModel): void {
+    if (model.kind === 'away') return; // the tab is collapsing on this paint
+    const panel = document.createElement('div');
+    panel.className = 'vault-pane';
+    panel.id = VAULT_PANEL_ID;
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', VAULT_TAB_ID);
+    if (model.kind === 'locked') {
+      this.buildLockedPane(panel, model.unlockCost, model.unlockCap);
+      root.appendChild(panel);
+      return;
+    }
+    const note = document.createElement('div');
+    note.className = 'bank-capacity vault-cap-note';
+    note.textContent = t('hudChrome.bank.vaultCapacityNote', {
+      cap: formatCount(model.perMaterialCap),
+    });
+    panel.appendChild(note);
+    const status = this.buildStatusLine();
+    if (status) panel.appendChild(status);
+    const scroll = document.createElement('div');
+    scroll.className = 'bank-scroll';
+    if (model.empty) {
+      const empty = document.createElement('div');
+      empty.className = 'bank-empty';
+      empty.textContent = t('hudChrome.bank.vaultEmpty');
+      scroll.appendChild(empty);
+    } else {
+      const list = document.createElement('div');
+      list.className = 'vault-list';
+      for (const row of model.rows) this.appendRow(list, row);
+      scroll.appendChild(list);
+    }
+    panel.appendChild(scroll);
+    panel.appendChild(this.buildFooter(model.upgrade.nextCost, model.upgrade.nextCap));
+    root.appendChild(panel);
+  }
+
+  // The locked pane: the unlock offer, rendered ENTIRELY from the wire shape
+  // ({ stock: {}, upgrades: 0, perMaterialCap: 0, nextUpgradeCost: <price> },
+  // pinned by tests/vault_wire.test.ts). A null price (impossible from a sane
+  // snapshot) renders the pitch without a buy row rather than a 0-price offer.
+  private buildLockedPane(panel: HTMLElement, unlockCost: number | null, unlockCap: number): void {
+    const intro = document.createElement('div');
+    intro.className = 'vault-locked-intro';
+    intro.textContent = t('hudChrome.bank.vaultLockedIntro', {
+      cap: formatCount(unlockCap),
+    });
+    panel.appendChild(intro);
+    if (unlockCost === null) return;
+    const row = document.createElement('div');
+    row.className = 'bank-buy-row';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    // Never DISABLED on affordability (the sim is authoritative and refuses
+    // with its own line); an unaffordable price carries the guild open-row's
+    // visible shortfall marker instead, which is what the purse term in
+    // BankWindow's repaint signature repaints.
+    const affordable = this.deps.world().copper >= unlockCost;
+    btn.className = `bank-buy-btn vault-unlock-btn${affordable ? '' : ' bank-buy-short'}`;
+    btn.innerHTML =
+      `<span class="bank-buy-label">${esc(t('hudChrome.bank.vaultUnlockButton'))}</span>` +
+      this.deps.moneyHtml(unlockCost) +
+      (affordable
+        ? ''
+        : `<span class="bank-buy-short-label">${esc(t('hudChrome.bank.guildPurseShort'))}</span>`);
+    btn.addEventListener('click', () =>
+      this.showBuyPrompt(
+        t('hudChrome.bank.vaultUnlockConfirm', { price: formatMoney(unlockCost) }),
+      ),
+    );
+    row.appendChild(btn);
+    panel.appendChild(row);
+  }
+
+  // The thin consumer of one VaultRowModel: every presentation DECISION
+  // (known, qualityKey, atCap, overCap) comes from the core; the painter
+  // resolves the ItemDef only for the icon/name/tooltip PAINTERS, which need
+  // the def itself rather than a decision about it.
+  private appendRow(list: HTMLElement, model: VaultRowModel): void {
+    const { itemId, count, cap } = model;
+    const item = model.known ? knownItemDef(ITEMS, itemId) : undefined;
+    const row = document.createElement('button');
+    row.type = 'button';
+    // over-cap (a tolerated legacy over-stock) composes ON TOP of at-cap: the
+    // count text carries the fact either way; the classes are styling hooks.
+    // The fine rim (bag-rim-fine) joins per the release's all-surfaces
+    // mark-family rule: a fine grade is marked in bags, bank, and guild bank,
+    // so the vault row beside them marks it the same way.
+    row.className = `vault-row${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;
+    row.dataset.itemId = itemId;
+    row.style.setProperty(
+      '--bank-slot-quality',
+      QUALITY_COLOR[model.qualityKey] ?? QUALITY_DEFAULT_COLOR,
+    );
+    // Stale-client guard (R34): a dormant id this bundle predates still holds
+    // real recoverable stock, so it renders (fallback icon, raw id label) and
+    // its withdraw stays live (the server resolves by itemId, no def needed).
+    const name = item ? itemDisplayName(item) : itemId;
+    const countLabel = formatCount(count);
+    const capLabel = formatCount(cap);
+    row.setAttribute(
+      'aria-label',
+      t('hudChrome.bank.vaultRowAria', { item: name, count: countLabel, cap: capLabel }),
+    );
+    row.innerHTML =
+      `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(itemId)}` +
+      `${model.fine ? fineSealMarkHtml() : ''}` +
+      `<span class="vault-row-name">${esc(name)}</span>` +
+      `<span class="vault-row-count">${esc(t('hudChrome.bank.capacity', { used: countLabel, total: capLabel }))}</span>`;
+    row.addEventListener('click', (ev) => {
+      if (this.deps.consumePeek()) {
+        this.deps.hideTooltip();
+        return;
+      }
+      this.onRowClick(itemId, ev.shiftKey);
+    });
+    this.deps.attachTooltip(row, () => {
+      const body = item
+        ? this.deps.itemTooltip(item)
+        : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
+      const partial =
+        count > 1
+          ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
+          : '';
+      return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
+    });
+    list.appendChild(row);
+  }
+
+  // Plain click withdraws the whole pooled count; shift-click on a multi-count
+  // row opens the shared quantity prompt. Both explain a partial fit from the
+  // CLICK-TIME snapshot: the sim resolves a bags-can-only-hold-part withdraw
+  // silently (the phase 01 recorded open call, resolved UI-side here), while a
+  // zero-fit click stays quiet because the sim emits its own bags-full line.
+  private onRowClick(itemId: string, shift: boolean): void {
+    const world = this.deps.world();
+    const count = this.stockCount(itemId);
+    const action = vaultRowAction(count, shift);
+    if (action.kind === 'none') return;
+    if (action.kind === 'withdraw') {
+      this.noteShortfall(itemId, count);
+      world.vaultWithdraw(itemId);
+      audio.click();
+      this.deps.onInventoryChanged();
+      this.deps.requestRender();
+      return;
+    }
+    this.showWithdrawQuantityPrompt(itemId, action.max);
+  }
+
+  // hasOwn, not a plain index: a tolerated save can stock a dormant
+  // prototype-named id ('constructor'), and this read must not resolve it to
+  // an inherited function (the vault_view core and the sim make the same call).
+  private stockCount(itemId: string): number {
+    const stock = this.deps.world().vaultInfo?.stock;
+    if (!stock || !Object.hasOwn(stock, itemId)) return 0;
+    return stock[itemId];
+  }
+
+  // Predict the withdraw's bag fit from the click-time snapshot and stage the
+  // shortfall line when only part will move (fit 0 stays silent: the sim's own
+  // bags-full error covers it, and a second line would double-speak).
+  private noteShortfall(itemId: string, want: number): void {
+    const world = this.deps.world();
+    // While dead every vault op is a silent sim no-op (the town-service
+    // idiom), so predicting a shortfall would explain a withdraw that never
+    // happens: send and stay quiet, like the sim.
+    if (world.player.dead) return;
+    const fit = vaultWithdrawFit(world.inventory, world.bags, itemId, want);
+    const notice = vaultWithdrawNotice(fit, want);
+    if (notice.kind !== 'short') return;
+    this.setStatus('hudChrome.bank.vaultWithdrawShort', {
+      fit: formatCount(notice.fit),
+      count: formatCount(want),
+    });
+  }
+
+  private showWithdrawQuantityPrompt(itemId: string, maxCount: number): void {
+    const item = knownItemDef(ITEMS, itemId);
+    const itemName = item ? itemDisplayName(item) : itemId;
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.deps.installPromptDialog(prompt, opener, close),
+        dismissSiblings: () => this.deps.dismissPrompts(),
+      },
+      {
+        // The bank family's teardown selector reaches this via the first class.
+        className: 'bank-quantity-prompt vault-quantity-prompt',
+        titleText: t('hudChrome.bank.withdrawQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.bank.withdrawQuantityInput'),
+        confirmText: t('hudChrome.bank.withdrawQuantityConfirm'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) => {
+          // Re-resolve the LIVE stock at submit (the mirror can move under an
+          // open prompt) and clamp to it; a row that emptied refuses. The
+          // shared prompt owns the number parsing, so no raw parsed value ever
+          // reaches vaultWithdraw (the recorded non-number count ruling).
+          const live = this.stockCount(itemId);
+          if (live <= 0) return null;
+          return Math.max(1, Math.min(maxCount, live, requested));
+        },
+        send: (count) => {
+          this.noteShortfall(itemId, count);
+          this.deps.world().vaultWithdraw(itemId, count);
+          audio.click();
+          this.deps.onInventoryChanged();
+        },
+        afterClose: () => {
+          this.deps.requestRender();
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
+  }
+
+  // The footer: the batched deposit-all button beside the ceiling upgrade row.
+  private buildFooter(nextCost: number | null, nextCap: number | null): HTMLElement {
+    const row = document.createElement('div');
+    row.className = 'bank-buy-row vault-footer';
+
+    const deposit = document.createElement('button');
+    deposit.type = 'button';
+    deposit.className = 'bank-deposit-all vault-deposit-all';
+    deposit.textContent = t('hudChrome.bank.vaultDepositAll');
+    const tooltip = t('hudChrome.bank.vaultDepositAllTooltip');
+    deposit.title = tooltip;
+    deposit.setAttribute('aria-describedby', VAULT_DEPOSIT_ALL_DESC_ID);
+    deposit.disabled =
+      this.depositAllPending ||
+      !hasVaultDepositable(this.deps.world().inventory, vaultMaterialIds());
+    deposit.addEventListener('click', () => this.onDepositAll());
+    row.appendChild(deposit);
+    const desc = document.createElement('span');
+    desc.id = VAULT_DEPOSIT_ALL_DESC_ID;
+    desc.className = 'visually-hidden';
+    desc.textContent = tooltip;
+    row.appendChild(desc);
+
+    if (nextCost === null || nextCap === null) {
+      const maxed = document.createElement('span');
+      maxed.className = 'bank-buy-maxed';
+      maxed.textContent = t('hudChrome.bank.buySlotsMaxed');
+      row.appendChild(maxed);
+      return row;
+    }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    // The unlock button's rule: enabled always, marked when the purse is short
+    // (the wording reuses the guild key; the English is target-neutral).
+    const affordable = this.deps.world().copper >= nextCost;
+    btn.className = `bank-buy-btn vault-upgrade-btn${affordable ? '' : ' bank-buy-short'}`;
+    btn.innerHTML =
+      `<span class="bank-buy-label">${esc(t('hudChrome.bank.vaultUpgrade', { cap: formatCount(nextCap) }))}</span>` +
+      this.deps.moneyHtml(nextCost) +
+      (affordable
+        ? ''
+        : `<span class="bank-buy-short-label">${esc(t('hudChrome.bank.guildPurseShort'))}</span>`);
+    btn.addEventListener('click', () =>
+      this.showBuyPrompt(
+        t('hudChrome.bank.vaultUpgradeConfirm', {
+          cap: formatCount(nextCap),
+          price: formatMoney(nextCost),
+        }),
+      ),
+    );
+    row.appendChild(btn);
+    return row;
+  }
+
+  // ONE wire command; the summary is the pure core's click-time replay (the
+  // server's sweep is authoritative and follows the same rules, so at command
+  // cadence the two agree; the bank's plan-derived summary has the same
+  // mirror-lag tolerance). Never disabled by a full vault: the click reports
+  // the outcome, the bank button's rule.
+  private onDepositAll(): void {
+    const world = this.deps.world();
+    const info = world.vaultInfo;
+    if (!info || info.upgrades <= 0) return; // walked away or locked between paint and click
+    // Predict BEFORE the send, without exception: offline, world.inventory is
+    // the LIVE sim array and vaultDepositAll mutates it SYNCHRONOUSLY, so a
+    // post-send replay would find the bags already swept and report "nothing
+    // deposited" after a fully successful sweep (and skip the coin, the
+    // pending guard, and the bags repaint with it). Online the mirror lags a
+    // tick either way. The dead flag is captured on the same snapshot.
+    const dead = world.player.dead;
+    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds());
+    world.vaultDepositAll();
+    // While dead the sim silently no-ops the sweep (the town-service idiom):
+    // the command still goes (server decides), but the predicted "Materials
+    // deposited: N." would be a false claim, so the summary stays quiet (the
+    // personal bank's deposit-all makes the same false claim today; recorded
+    // family follow-up).
+    if (dead) return;
+    if (prediction.items > 0) {
+      audio.coin();
+      this.depositAllPending = true;
+      if (this.depositAllTimer !== null) window.clearTimeout(this.depositAllTimer);
+      this.depositAllTimer = window.setTimeout(() => {
+        this.depositAllTimer = null;
+        if (!this.depositAllPending) return;
+        this.depositAllPending = false;
+        this.deps.requestRender();
+      }, VAULT_STATUS_MS);
+      this.deps.onInventoryChanged();
+    }
+    const key = vaultDepositAllSummaryKey(prediction);
+    this.setStatus(
+      key,
+      prediction.items === 0 ? undefined : { count: formatCount(prediction.items) },
+    );
+    this.deps.requestRender();
+  }
+
+  private setStatus(key: TranslationKey, params?: Record<string, string>): void {
+    this.status = { key, params, at: performance.now() };
+  }
+
+  // The polite aria-live line while fresh, with a single self-expire timer
+  // (the bank's buildDepositStatus idiom).
+  private buildStatusLine(): HTMLElement | null {
+    const s = this.status;
+    if (!s) return null;
+    const age = performance.now() - s.at;
+    if (age >= VAULT_STATUS_MS) {
+      this.clearStatus();
+      return null;
+    }
+    const status = document.createElement('div');
+    status.className = 'bank-status vault-status';
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    status.textContent = t(s.key, s.params);
+    if (this.statusTimer !== null) window.clearTimeout(this.statusTimer);
+    this.statusTimer = window.setTimeout(() => {
+      this.statusTimer = null;
+      this.status = null;
+      this.deps.requestRender();
+    }, VAULT_STATUS_MS - age);
+    return status;
+  }
+
+  // The unlock / upgrade confirm in the prompt stack (the shared family
+  // builder; both purchases send the same next-rung command, so one call
+  // serves both with its caller-localized body).
+  private showBuyPrompt(body: string): void {
+    showBuyConfirmPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.deps.installPromptDialog(prompt, opener, close),
+        dismissSiblings: () => this.deps.dismissPrompts(),
+      },
+      {
+        className: 'vault-buy-prompt',
+        text: body,
+        // The economy disclaimer rides every tunable-price commit (the
+        // buy-slots rule): since phase 09 the vault ladder is server-tunable
+        // (SimConfig.storagePrices), so the price on this confirm is live wire
+        // data the operator can retune between sessions.
+        secondaryText: t('hudChrome.bank.priceDisclaimer'),
+        confirmLabel: t('hudChrome.bank.buyConfirmAccept'),
+        cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
+        onConfirm: (dismiss) => {
+          this.deps.world().vaultBuyUpgrade();
+          audio.coin();
+          this.deps.onInventoryChanged();
+          dismiss();
+          this.deps.requestRender();
+          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
+  }
+}

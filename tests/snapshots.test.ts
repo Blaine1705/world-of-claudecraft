@@ -4206,6 +4206,7 @@ const ALL_DELTA_KEYS = [
   'bank',
   'bg',
   'blk',
+  'bpsl',
   'buyback',
   'bval',
   'cardDuel',
@@ -4217,6 +4218,7 @@ const ALL_DELTA_KEYS = [
   'cprof',
   'crat',
   'crit',
+  'cvault',
   'dclears',
   'dcomp',
   'dcompanion',
@@ -4276,6 +4278,7 @@ const ALL_DELTA_KEYS = [
   'tfocus',
   'trade',
   'tslot',
+  'vault',
   'weapon',
   'xp',
 ] as const;
@@ -4312,6 +4315,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
+  cvault: 'craftVaultStock',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
@@ -4365,6 +4369,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   sp: 'spellPower',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
+  vault: 'vaultInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -4442,6 +4447,19 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `vault`: vaultInfoFor shares the bank's proximity gate (the bursar relocated
+  // above covers it), so only the contents need dirtying. Stocked AND upgraded,
+  // because a locked empty vault still encodes as a non-null all-zero object:
+  // without a rung the mirrored numbers would be indistinguishable from the
+  // default and the decode-target assertion could not tell them apart.
+  meta.vault.stock = { copper_ore: 7 };
+  meta.vault.upgrades = 2;
+  // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
+  // not the banker. This harness player carries a live DELVE RUN (the drun
+  // key's seeding below), which the gate refuses by design, so cvault's
+  // dirtied value is the EXPLICIT NULL arrival: presence still pinned by the
+  // all-keys sweep, and the non-null arrival is pinned in
+  // tests/vault_wire.test.ts where no delve run competes for the player.
   // `guildBank`: guildBankInfoFor additionally needs a guild membership stamp
   // (any rank; officer-plus here also exercises canEdit true over the wire)
   // and a loaded guild book (the banker relocated above covers proximity);
@@ -4778,6 +4796,16 @@ describe('full self-state snapshot delta fixture', () => {
     for (const key of ALL_DELTA_KEYS) {
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
       // each was dirtied to a non-default value, so none rides the wire as null
+      // EXCEPT cvault: this harness player carries a live delve run (the drun
+      // key's own seeding), and the craft-draw gate refuses vault draw inside
+      // a delve, so cvault's dirtied first-snapshot value IS the explicit
+      // gated null: the two keys are mutually exclusive on one player by
+      // design. Its non-null arrival (and the by-reference mirror) is pinned
+      // in tests/vault_wire.test.ts instead.
+      if (key === 'cvault') {
+        expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
+        continue;
+      }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
     }
   });
@@ -4862,6 +4890,22 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
+    // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
+    // from the rung-2 literal in src/sim/materials_vault.ts).
+    expect(client.vaultInfo).toEqual({
+      stock: { copper_ore: 7 },
+      upgrades: 2,
+      perMaterialCap: 80,
+      nextUpgradeCost: 100000,
+    });
+    // cvault -> craftVaultStock: this harness player is inside a delve run
+    // (see the seeding comment), so the gated null is all that can arrive
+    // here, and null is ALSO the mirror default: this line alone cannot prove
+    // the decode. The decisive decode pins (stocked non-null arrival, the
+    // by-reference adoption, the gate-flip explicit null) live in
+    // tests/vault_wire.test.ts.
+    expect(client.craftVaultStock).toBeNull();
     expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
     // guild bank mirror: the membership-gated boundary clone survives the wire
     // whole, canEdit included (the client renders read-only panes from it)
@@ -5104,6 +5148,7 @@ describe('full self-state snapshot delta fixture', () => {
     const weaponRef = client.player.weapon;
     const partyRef = client.partyInfo;
     const delveRunRef = client.delveRun;
+    const vaultRef = client.vaultInfo;
 
     // a second broadcast with NO intervening sim.tick() and no state mutation: the
     // maybe() closure sees byte-identical JSON for every registered key and omits every one
@@ -5123,6 +5168,9 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.weapon).toBe(weaponRef); // s.weapon ?? e.weapon (inline, player entity)
     expect(client.partyInfo).toBe(partyRef);
     expect(client.delveRun).toBe(delveRunRef);
+    // an omitted `vault` must leave an open vault window's mirror alone, not
+    // reset it to null (the omission-is-unchanged half of the delta contract)
+    expect(client.vaultInfo).toBe(vaultRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
     expect(client.honor).toBe(321);
@@ -5187,7 +5235,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 83 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 86 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5199,31 +5247,71 @@ describe('delta-key contract pins (anti-drift)', () => {
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
-    // for 86. Every v0.36.0 sync conflicts here because each side pins its own
-    // additions alone; the merged tree carries all of them, and this number
-    // came from a run on the merged tree. The New Eastbrook program's Vale Cup
-    // retirement then removes sport/vcup/vcupb, for 83.
-    expect(ALL_DELTA_KEYS).toHaveLength(83);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(83);
+    // for 86, then +1: the Materials Vault's owner-only vault key
+    // (bank-storage phase 02), +1: the craft-from-vault cvault key
+    // (bank-storage phase 04, context-gated), and +1: the always-available
+    // owner-only ladder key bpsl (bank-storage phase 15, the one bank-family
+    // key with NO proximity gate, emitted for the VIEWING session rather than
+    // the spectate anchor). The release arm's Vale Cup retirement then removes
+    // sport/vcup/vcupb. Every release sync conflicts here because each side
+    // pins its own additions alone; this number is MEASURED on the merged tree.
+    expect(ALL_DELTA_KEYS).toHaveLength(86);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(86);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
-  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
-    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from the self-block emitters (multi-line lockouts incl.)', () => {
+    // EVERY file that emits a self-block delta key, not just game.ts. Bank
+    // Storage phase 15 moved the bank family's emission into
+    // server/bank_wire.ts (game.ts sits at a zero-margin monolith ceiling, so
+    // new wire surface lands in a sibling), and that silently took `bank` and
+    // `bpsl` out of this guard's reach: the scrape came back 87 while the
+    // registry said 88, which is the only reason the move was noticed. A
+    // future extraction of another key group MUST add its file here, or this
+    // anti-drift pin quietly stops covering it.
+    const EMITTER_FILES = ['server/game.ts', 'server/bank_wire.ts'];
+    const raw = EMITTER_FILES.map((f) => readFileSync(resolve(process.cwd(), f), 'utf8')).join(
+      '\n',
+    );
     // Strip comments before scraping so a commented-out call cannot keep its key
     // in the scraped set (the `(^|[^:])` guard keeps protocol `://` intact).
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     // tolerate whitespace/newline between `(` and the quote so the multi-line
     // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted;
-    // the optional `(?:Raw)?` also captures the maybeRaw calls
-    // ('app' and the multi-line 'dfb')
-    const re = /\bmaybe(?:Raw)?\(\s*['"](\w+)['"]/g;
+    // the optional `(?:Raw)?` also captures the maybeRaw realm-wide calls
+    // ('vcupb' and the multi-line 'dfb')
+    // `emit(...)` is the same call under the name the extracted emitter gives
+    // the delta-eliding closure its caller hands it; without this arm the two
+    // relocated bank keys stay invisible even with the file in the list.
+    // The lookbehind keeps `emit` to that BARE parameter form: `\b` would also
+    // match a member call (`this.emit('spikeReport', ...)`, `bus.emit(...)`),
+    // whose key is not a delta key at all, and the obvious repair for the red
+    // that would cause is to add it to ALL_DELTA_KEYS, permanently weakening the
+    // registry this pin exists to police.
+    const DELTA_CALL = /(?<![.\w$])(?:maybe(?:Raw)?|emit)\(\s*['"](\w+)['"]/g;
+    const re = new RegExp(DELTA_CALL.source, 'g');
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
     expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
+    // Both relocated bank keys, BY NAME: the extraction that moved them out of
+    // game.ts left this scrape one short and only the count said so.
+    expect(scraped.has('bank')).toBe(true);
+    expect(scraped.has('bpsl')).toBe(true);
+    // ...and the narrowing really narrows. A member `emit` is not a delta call,
+    // and asserting it on a synthetic source keeps the claim honest even while
+    // neither emitter file happens to contain one.
+    // THROUGH the same pattern the scrape above uses, not a copy of it: a second
+    // literal here would keep passing while the real one was widened back.
+    const memberEmit = new Set<string>();
+    const narrowed = new RegExp(DELTA_CALL.source, 'g');
+    const sample = "this.emit('spikeReport', x); bus.emit('tick', y); emit('bpsl', z);";
+    for (let m = narrowed.exec(sample); m !== null; m = narrowed.exec(sample)) {
+      memberEmit.add(m[1]);
+    }
+    expect([...memberEmit]).toEqual(['bpsl']);
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
@@ -5234,9 +5322,16 @@ describe('delta-key contract pins (anti-drift)', () => {
     // key ptime for 67, then the 16 static combat-rating/progression scalars
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
-    // border echo aborder for 85, and the authored modular look `app` for 86.
-    // The Vale Cup retirement then removes sport/vcup/vcupb, for 83.
-    expect(scraped.size).toBe(83);
+    // border echo aborder for 85, and the authored modular look `app` for 86,
+    // then the Materials Vault's vault key for 87, the craft-from-vault cvault
+    // key for 88 and the always-available ladder key bpsl for 89, less the three
+    // the Vale Cup retirement removes (sport/vcup/vcupb), for 86.
+    expect(scraped.size).toBe(86);
+    // Both halves of the relocated bank family are still in reach. These two
+    // are what the phase 15 extraction broke, so they are named rather than
+    // left to the set compare.
+    expect(scraped.has('bank')).toBe(true);
+    expect(scraped.has('bpsl')).toBe(true);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

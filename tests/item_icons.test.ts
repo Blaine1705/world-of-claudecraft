@@ -48,15 +48,24 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// The 6 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
+// The 13 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
 // override), so a renamed bag or a drifted `kind` fails loudly instead of dropping out of
-// the coverage.
+// the coverage. Grew from 6 when phase 05 of the bank-storage packet shipped the bag
+// catalog and its materials-only satchels; those seven carry woc_original_svg placeholder
+// art, so they ride the same project-owned license override as the legacy family.
 const BAG_IDS = [
+  'burlap_reagent_pouch',
+  'duskweave_bag',
+  'foragers_haversack',
   'gravewoven_bag',
   'linen_pouch',
+  'loombound_reagent_satchel',
   'mistcallers_duffel',
+  'necromancers_reagent_satchel',
+  'resonant_weave_bag',
   'silkspun_satchel',
   'travelers_knapsack',
+  'wayfarers_backpack',
   'wolfhide_satchel',
 ];
 
@@ -377,12 +386,21 @@ describe('item webp icons', () => {
     // Pinned to the literal set, not just a count: a renamed bag (or one whose kind drifts off
     // 'bag') would otherwise drop silently out of the loop below and take its coverage with it.
     // A NEW bag belongs here AND in ITEM_IMAGE_IDS: adding it without art fails this test.
+    // Acknowledged for phase 05 of the bank-storage packet, which added the seven-bag catalog
+    // (three materials-only satchels among them) with woc_original_svg placeholder art.
     expect(bagIds).toEqual([
+      'burlap_reagent_pouch',
+      'duskweave_bag',
+      'foragers_haversack',
       'gravewoven_bag',
       'linen_pouch',
+      'loombound_reagent_satchel',
       'mistcallers_duffel',
+      'necromancers_reagent_satchel',
+      'resonant_weave_bag',
       'silkspun_satchel',
       'travelers_knapsack',
+      'wayfarers_backpack',
       'wolfhide_satchel',
     ]);
     // The backpack is the bag bar's first socket and has no ITEMS record, so it is wired as a

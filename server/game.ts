@@ -103,7 +103,6 @@ import {
   type SimEvent,
   type UnstuckBlockedReason,
 } from '../src/sim/types';
-import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
   type BgLadderEntry,
@@ -125,11 +124,11 @@ import {
   diffGuildBankOp,
   type GuildBankLedgerOp,
   guildCreateFeeDelta,
-  recordBankOp,
   recordGuildBankCounterpartyOrphan,
   recordGuildBankDeltas,
   recordGuildBankEscrowRollback,
 } from './bank_ledger';
+import { dispatchBankCommand, emitBankSelfKeys } from './bank_wire';
 import { reportBgOutcomes } from './battleground_telemetry';
 import type {
   BotDetector,
@@ -319,7 +318,7 @@ import {
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
-import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
+import { eventLeadDayKey, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -330,6 +329,7 @@ import {
   createKeyedSerialWriter,
   createSerialWriter,
 } from './serial_writer';
+import { buildRealmSimConfig } from './sim_boot_config';
 import {
   jsonWithField,
   StableAuraWireCache,
@@ -345,6 +345,12 @@ import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
+import {
+  CVAULT_WIRE_INTERVAL_TICKS,
+  dispatchVaultCommand,
+  takeCvaultWireTurn,
+  VaultCraftConsumeBatch,
+} from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -549,7 +555,7 @@ export const SELF_WIRE_PHASES = [
   'df',
   'market',
   'mail',
-  'bank', // bank + guildBank
+  'bank', // bank + bpsl + vault + cvault + guildBank (mixed postures: bisect a spike)
   'loot', // lroll, lrollg, mloot
   'delve',
   'prof', // prof, cprof, mst
@@ -838,6 +844,26 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
+  // Bank bag sockets: the two ITEM MOVERS rewrite the carried inventory
+  // (socketing consumes the carried bag copy, unsocketing addStacks it back,
+  // and a swap does both), the heavy-gated `inv` key. bank_unlock_socket is
+  // deliberately absent on vault_buy_upgrade's exact terms: copper rides the
+  // ALWAYS-SENT base self object and the socket readouts ride the ungated
+  // proximity `bank` key, so listing it would only buy a redundant heavy
+  // re-serialize.
+  'bank_socket_bag',
+  'bank_unsocket_bag',
+  // Materials Vault item moves: both rewrite the carried inventory (deposit
+  // splices/decrements a slot, withdraw addStacks into it), the heavy-gated
+  // `inv` key. vault_buy_upgrade is deliberately absent: copper rides the
+  // ALWAYS-SENT base self object, and the vault view rides the ungated
+  // proximity section beside 'bank', so listing it would only buy a redundant
+  // heavy re-serialize (the guild bank's gold ops sit out for the same reason).
+  'vault_deposit',
+  'vault_withdraw',
+  // The batched sweep rewrites the carried inventory like the two above, only
+  // more so (up to every slot in one command).
+  'vault_deposit_all',
   // Guild bank ops that touch a HEAVY self field: the two item moves rewrite
   // the carried inventory (heavy-gated `inv`). The gold ops and buy_slots are
   // deliberately absent: copper rides the ALWAYS-SENT base self object (not
@@ -1065,6 +1091,8 @@ export interface ClientSession {
   lastMailWireTick: number;
   lastMailRev: number | null;
   lastMailRebuildTick: number;
+  // Craft-from-vault stock view, same idea at its own cadence (CVAULT_WIRE_HZ)
+  lastCvaultWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -1939,57 +1967,33 @@ export class GameServer {
       observeDbCall: (outcome, durationSeconds) =>
         gameMetricsCounters().generalChatQuotaDbCall(outcome, durationSeconds),
     });
-    this.sim = new Sim({
-      seed: WORLD_SEED,
-      playerClass: 'warrior',
-      noPlayer: true,
-      devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
-      compulsoryTutorial: true, // live realm: legacy fresh mainland rows get ferried too
-      // Thunzharr is up as soon as the realm boots; subsequent rises keep the
-      // normal interval cadence (see src/sim/world_boss.ts).
-      worldBossAtBoot: true,
-      // Ranked rift portals spawn on the live realm (dev/test worlds opt in).
-      riftPortals: true,
-      // Distance-cull idle-mob AI (issue #2703): shouldSkipIdleMobTick skips a
-      // wild, unbuffed, out-of-combat mob's per-tick aggro scan and wander
-      // movement while it sits farther than this from EVERY connected player,
-      // and it plainly never fires when nobody is connected at all. The world
-      // grew from 3 zones to 11 (vite.config.ts) with it, so a realm's total mob
-      // count and its per-mob terrain-height cost both grew well past what this
-      // knob was originally sized against, and this Sim never opted in: every
-      // mob everywhere paid full AI cost on every 50 ms tick regardless of
-      // player proximity, which is what turned "nobody online" into a
-      // multiples-of-idle CPU baseline as the world grew. INTEREST_DROP_RADIUS
-      // is the exact distance a mob remains rendered to a viewer, so a culled
-      // mob can never be one a player can actually see sit still, and it is
-      // well past MAX_AGGRO_RADIUS (20 yd, mob/aggro_ranges.ts), so culling
-      // never skips a scan that could have pulled someone.
-      idleMobTickRadius: INTEREST_DROP_RADIUS,
-      lockoutNowMs: () => Date.now(),
-      // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
-      // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
-      raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
-      // Per-phase timing inside sim.tick(). The clock stays host-side (sim purity);
-      // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
-      // probe is always passed but early-returns unless a detailed capture is active,
-      // so the steady-state loop pays only a branch per phase.
-      perfLap: (phase, entity) => {
-        if (!this.perfDetailActive) return;
-        const t = process.hrtime.bigint();
-        const dt = Number(t - this.simLapMark) / 1e6;
-        this.tickProfiler.add(`sim.${phase}`, dt);
-        // The mob loop tags each mob.update lap with its entity, so the SAME measured
-        // slice also lands in that mob's family bucket (via its templateId) AND its
-        // per-zone bucket. One clock read, no extra wall-clock, no sim-side work: a
-        // mob.update blowup now localizes to a family and a zone in the same
-        // [perf.sim] report instead of only the phase total.
-        if (entity !== undefined) {
-          this.tickProfiler.add(this.mobUpdateBucketName(entity.templateId), dt);
-          this.tickProfiler.add(mobZonePhase(entity), dt);
-        }
-        this.simLapMark = t;
-      },
-    });
+    // The boot SimConfig (the STORAGE_PRICES construction input included) is
+    // assembled in server/sim_boot_config.ts; only the perfLap hook is built
+    // here because it closes over the live tick-profiler state.
+    this.sim = new Sim(
+      buildRealmSimConfig(
+        // Per-phase timing inside sim.tick(). The clock stays host-side (sim purity);
+        // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
+        // probe is always passed but early-returns unless a detailed capture is active,
+        // so the steady-state loop pays only a branch per phase.
+        (phase, entity) => {
+          if (!this.perfDetailActive) return;
+          const t = process.hrtime.bigint();
+          const dt = Number(t - this.simLapMark) / 1e6;
+          this.tickProfiler.add(`sim.${phase}`, dt);
+          // The mob loop tags each mob.update lap with its entity, so the SAME measured
+          // slice also lands in that mob's family bucket (via its templateId) AND its
+          // per-zone bucket. One clock read, no extra wall-clock, no sim-side work: a
+          // mob.update blowup now localizes to a family and a zone in the same
+          // [perf.sim] report instead of only the phase total.
+          if (entity !== undefined) {
+            this.tickProfiler.add(this.mobUpdateBucketName(entity.templateId), dt);
+            this.tickProfiler.add(mobZonePhase(entity), dt);
+          }
+          this.simLapMark = t;
+        },
+      ),
+    );
     this.riftUpgrader = new RiftUpgradeCoordinator(riftUpgraderConfigFromEnv());
     this.riftAssets = new RiftAssetCoordinator(riftAssetConfigFromEnv());
     this.social = new SocialService(
@@ -2179,6 +2183,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    moderator.lastCvaultWireTick = -CVAULT_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastSellPriceItemIdRef = null;
@@ -2220,6 +2225,7 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
+    moderator.lastCvaultWireTick = -CVAULT_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastSellPriceItemIdRef = null;
@@ -3444,23 +3450,6 @@ export class GameServer {
     }
   }
 
-  private replaceLiveAccountCosmetics(accountId: number, cosmetics: AccountCosmetics): void {
-    const exact = {
-      completedQuestIds: [...new Set(cosmetics.completedQuestIds)],
-      mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
-      weaponSkinIds: [...new Set(cosmetics.weaponSkinIds ?? [])],
-      weaponSkinLoadout: { ...(cosmetics.weaponSkinLoadout ?? {}) },
-    };
-    this.accountCosmeticsByAccount.set(accountId, exact);
-    for (const live of this.clients.values()) {
-      if (live.accountId !== accountId) continue;
-      live.accountCosmetics = exact;
-      this.applyAccountQuestLockouts(live.pid, exact);
-      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(exact));
-      this.resyncQuests(live);
-    }
-  }
-
   private noteAccountQuestComplete(session: ClientSession, questId: string): void {
     const current = session.accountCosmetics;
     const completedQuestIds = current.completedQuestIds.includes(questId)
@@ -3789,6 +3778,7 @@ export class GameServer {
       lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
       lastMailRev: null,
       lastMailRebuildTick: 0,
+      lastCvaultWireTick: -CVAULT_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -4018,7 +4008,11 @@ export class GameServer {
     // tests/commission_wire_cadence.test.ts). A future resume that PRESERVES
     // lastSent (a reconnect-bandwidth optimization) must reset those
     // trackers instead, or the gates serve a stale view until their
-    // staleness backstops.
+    // staleness backstops. cvault is the fourth gate and needs NOTHING here
+    // under either design: it is cadence-only (no rev tracker, no
+    // sent-undefined arm) and rebuilds unconditionally at dueness, so a
+    // rebuilt mirror is fresh within one CVAULT_WIRE_INTERVAL_TICKS window
+    // (250 ms), the key's documented staleness envelope.
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
@@ -8041,36 +8035,31 @@ export class GameServer {
       case 'mail_read':
         if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
         break;
-      // Bank: the per-character deposit box. `slot` is a container index (the
-      // castAbilityBySlot wire idiom); `count` is optional (omit = whole stack).
-      // The Sim owns every gameplay rule (banker proximity, capacity, quest-bind,
-      // alive-state, exact-copper cost + purchase cap); `bonusSlots` is never
-      // client-supplied. bank_buy_slots is an economy action bounded by the
-      // blanket per-frame message limiter plus the Sim's escalating-price cap.
-      // The bank_ledger write is OBSERVATIONAL and fire-and-forget: the sim methods
-      // return void and emit no success event, so recordBankOp derives success by
-      // diffing the bankInfoFor snapshot before and after each call. It is never
-      // awaited and never a gameplay dependency; a refused/no-op call diffs empty.
+      // Bank: the per-character deposit box plus its bag sockets. The six case
+      // bodies (shape checks + the recordBankOp / recordBankSocketOp observer
+      // discipline) live in server/bank_wire.ts (the vault_wire.ts seam).
+      // `command` narrows to the BankCommandName union inside this case group,
+      // so a seventh label added here without extending the module is a
+      // compile error, never a silently dropped command.
       case 'bank_deposit':
-        if (typeof msg.slot === 'number') {
-          const before = sim.bankInfoFor(pid);
-          sim.bankDeposit(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
-          recordBankOp('deposit', session, before, sim.bankInfoFor(pid));
-        }
-        break;
       case 'bank_withdraw':
-        if (typeof msg.slot === 'number') {
-          const before = sim.bankInfoFor(pid);
-          sim.bankWithdraw(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
-          recordBankOp('withdraw', session, before, sim.bankInfoFor(pid));
-        }
+      case 'bank_buy_slots':
+      case 'bank_unlock_socket':
+      case 'bank_socket_bag':
+      case 'bank_unsocket_bag':
+        dispatchBankCommand(sim, session, command, msg, pid);
         break;
-      case 'bank_buy_slots': {
-        const before = sim.bankInfoFor(pid);
-        sim.bankBuySlots(pid);
-        recordBankOp('buy_slots', session, before, sim.bankInfoFor(pid));
+      // Materials Vault: the four case bodies (shape checks + the recordVaultOp
+      // observer discipline) live in server/vault_wire.ts. `command` narrows to
+      // the VaultCommandName union inside this case group, so a fifth label
+      // added here without extending the module is a compile error, never a
+      // silently dropped command.
+      case 'vault_deposit':
+      case 'vault_withdraw':
+      case 'vault_deposit_all':
+      case 'vault_buy_upgrade':
+        dispatchVaultCommand(sim, session, command, msg, pid);
         break;
-      }
       // Guild Bank: the officer-plus shared treasury + item store. Shape-only
       // checks here (the bank_* idiom): the Sim owns every gameplay rule
       // (banker proximity, officer-plus rank via the session membership stamp,
@@ -9138,11 +9127,17 @@ export class GameServer {
     }
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     selfLap?.('self.mail');
-    // bank info is null unless the player is standing at a banker, so it only
-    // rides the wire for players actually browsing their deposit box (the mail
-    // pattern). Not heavy-gated: it appears from proximity, not this session's
-    // own dirty-marking commands.
-    maybe('bank', this.sim.bankInfoFor(anchorSession.pid));
+    // The bank family's two owner-only self keys (`bank`, `bpsl`): the proximity
+    // gate, the always-available ladder counter and why the two are keyed on
+    // DIFFERENT sessions are all documented at the emission in bank_wire.ts.
+    emitBankSelfKeys(maybe, this.sim, session, anchorSession);
+    // The Materials Vault + craft-from-vault stock view: bank's proximity
+    // posture and the cvault cadence inversion are documented in
+    // server/vault_wire.ts, which owns the dueness rule.
+    maybe('vault', this.sim.vaultInfoFor(anchorSession.pid));
+    if (takeCvaultWireTurn(session, this.sim.tickCount)) {
+      maybe('cvault', this.sim.craftVaultStockFor(anchorSession.pid));
+    }
     // guild bank info follows the same pattern with a stricter gate: null
     // unless the player is alive, at a banker, AND stamped into a guild whose
     // book is loaded (sim guildBankInfoFor; ANY rank sees it, the snapshot's
@@ -9476,6 +9471,9 @@ export class GameServer {
     // durable character save (see below); only the cosmetic broadcast stays
     // inline.
     const deedUnlocks = new Map<ClientSession, string[]>();
+    // Vault craft consumptions accumulate the same way and flush as ONE
+    // batched ledger insert after the loop (server/vault_wire.ts).
+    const vaultConsumes = new VaultCraftConsumeBatch(this.clients);
     for (const ev of events) {
       if (ev.type === 'unstuck' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);
@@ -9490,6 +9488,7 @@ export class GameServer {
           );
         }
       }
+      vaultConsumes.offer(ev);
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {
@@ -9798,6 +9797,8 @@ export class GameServer {
         console.error(`deed-unlock save failed for ${session.name}:`, err),
       );
     }
+    // The tick's vault craft consumptions, as ONE batched ledger insert.
+    vaultConsumes.flush();
   }
 
   // Every pid whose throttled `bg` readout a respawn in this batch invalidated:

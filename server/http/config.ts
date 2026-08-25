@@ -120,6 +120,11 @@ export interface Config {
   // again: the privacy bound on stored IP links and the ban-evasion lookback
   // horizon. 0 keeps them forever.
   readonly accountIpAssociationRetentionDays: number;
+  // How many days a RESOLVED (applied / refused) Claudium storage purchase
+  // row is kept before the retention sweep deletes it; 0 keeps them forever.
+  // Pending and unresolved rows are never swept regardless (recoverable work
+  // and open operator cases; see server/storage_purchase_db.ts).
+  readonly storagePurchaseRetentionDays: number;
   // How many days of per-account daily activity rows (player_activity_daily,
   // the business-metrics fact table) to keep. The snapshot reads touch only
   // today and yesterday, so any positive window is read-invisible to them.
@@ -223,6 +228,10 @@ const DEFAULT_DAILY_REWARD_EVENTS_RETENTION_DAYS = 400;
 const DEFAULT_ONLINE_SAMPLES_RETENTION_DAYS = 90;
 const DEFAULT_SITE_PRESENCE_RETENTION_DAYS = 90;
 const DEFAULT_PLAY_SESSION_RETENTION_DAYS = 180;
+// Resolved storage purchases outlive any plausible payment dispute window
+// (90 days covers card chargeback horizons) before the sweep takes them;
+// the character-side audit survives forever in bank_ledger either way.
+const DEFAULT_STORAGE_PURCHASE_RETENTION_DAYS = 90;
 const DEFAULT_ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS = 730;
 const DEFAULT_PLAYER_ACTIVITY_RETENTION_DAYS = 400;
 const DEFAULT_PASSWORD_RESET_REQUEST_RETENTION_DAYS = 30;
@@ -444,6 +453,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     accountIpAssociationRetentionDays: numberOr(
       env.ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS,
       DEFAULT_ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS,
+    ),
+    storagePurchaseRetentionDays: numberOr(
+      env.STORAGE_PURCHASE_RETENTION_DAYS,
+      DEFAULT_STORAGE_PURCHASE_RETENTION_DAYS,
     ),
     playerActivityRetentionDays: numberOr(
       env.PLAYER_ACTIVITY_RETENTION_DAYS,

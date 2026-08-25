@@ -40,6 +40,13 @@ function personalInfo(): BankInfo {
     bonusSlots: 0,
     nextExpansionCost: 500,
     bonusSources: [],
+    socketsUnlocked: 0,
+    socketBags: [null, null, null, null],
+    nextSocketCost: 1000000,
+    generalCapacity: 24,
+    materialsCapacity: 0,
+    generalUsed: 0,
+    materialsUsed: 0,
   };
 }
 
@@ -82,6 +89,10 @@ function harness(guild: GuildBankInfo | null): Harness {
   const world = {
     bankInfo: personalInfo(),
     guildBankInfo: guild,
+    // Explicitly vault-less: this suite asserts strip ABSENCE, so the fixture
+    // states the intent rather than relying on the undefined-reads-unavailable
+    // coercion (the loose-null regression this line documents).
+    vaultInfo: null,
     inventory: [] as InvSlot[],
     copper: 5_000,
     // The activity log's on-demand read. Every call is recorded, so a test can
@@ -125,6 +136,10 @@ function harness(guild: GuildBankInfo | null): Harness {
 
 function clickGuildTab(h: Harness): void {
   (h.root.querySelector('.bank-tab[data-tab="guild"]') as HTMLElement).click();
+}
+
+function clickPersonalTab(h: Harness): void {
+  (h.root.querySelector('.bank-tab[data-tab="personal"]') as HTMLElement).click();
 }
 
 function clickLogTab(h: Harness): void {
@@ -202,8 +217,9 @@ describe('guild tab visibility', () => {
     h.window.open();
     expect(h.root.querySelector('.bank-tabs')).toBeNull();
     expect(h.root.querySelector('.bank-tab')).toBeNull();
-    // The personal pane still renders normally.
-    expect(h.root.querySelector('.bank-capacity')).not.toBeNull();
+    // The personal pane still renders normally (its footer meter, phase 08,
+    // is unique to it).
+    expect(h.root.querySelector('.bank-meter')).not.toBeNull();
   });
 
   it('renders the WAI-ARIA Personal/Guild strip while guildBankInfo is non-null', () => {
@@ -244,7 +260,7 @@ describe('guild tab visibility', () => {
     expect(h.window.guildTabActive).toBe(false);
     expect(h.root.querySelector('.bank-tabs')).toBeNull();
     expect(h.root.querySelector('.gbank-treasury')).toBeNull();
-    expect(h.root.querySelector('.bank-capacity')).not.toBeNull(); // personal pane back
+    expect(h.root.querySelector('.bank-meter')).not.toBeNull(); // personal pane back
   });
 
   it('guildTabActive goes false the INSTANT the mirror nulls, BEFORE any repaint', () => {
@@ -642,6 +658,23 @@ describe('the UNOPENED pane (rung 0: open the guild bank from the officer purse)
     );
   });
 
+  it('an OFFICER pane with a priceless snapshot renders the unopened note, never an invented price (phase 09)', () => {
+    // nextExpansionPrice null is unreachable off a real sim while unopened,
+    // but since phase 09 the core models it as open null for an officer too
+    // (the client never invents a price): the pane must still name the
+    // unopened state rather than read as empty, while the read-only
+    // explanation stays absent (this viewer can edit).
+    const h = harness(unopened({ nextExpansionPrice: null }));
+    h.window.open();
+    clickGuildTab(h);
+    expect(h.root.querySelector('.gbank-treasury')).not.toBeNull();
+    expect(h.root.querySelector('.gbank-open-row')).toBeNull();
+    const notes = Array.from(h.root.querySelectorAll('.gbank-readonly-note')).map(
+      (n) => n.textContent,
+    );
+    expect(notes).toEqual(['The guild bank has not been opened yet.']);
+  });
+
   it('marks a purse-poor officer with visible text and keeps the button enabled (sim-authoritative refusal)', () => {
     const h = harness(unopened({ treasury: 10_000_000 })); // treasury wealth must NOT count
     h.world.copper = 89_999; // one copper short of 9g
@@ -713,6 +746,65 @@ describe('the UNOPENED pane (rung 0: open the guild bank from the officer purse)
     h.world.guildBankInfo = guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 999 });
     h.window.refreshIfChanged();
     expect(h.root.querySelector('.bank-grid .bank-item')).not.toBe(cell);
+  });
+
+  it('the unopened purse term is scoped: priceless, off-tab, and same-side churn stay quiet (phase 09 QA)', () => {
+    // The signature's one guild purse read is scoped exactly like the vault
+    // purse term: guild pane showing, unopened, editable, AND a rung-0 price
+    // quoted, coarsened to the affordability boolean the open row renders.
+    // Priceless: the pane renders NO open row (the client never invents a
+    // price), so copper churn must not repaint it.
+    const h = harness(unopened({ nextExpansionPrice: null }));
+    h.window.open();
+    clickGuildTab(h);
+    h.window.refreshIfChanged(); // settle lastSig
+    const note = h.root.querySelector('.gbank-readonly-note');
+    expect(note).not.toBeNull(); // the unopened note, not an empty pane
+    h.world.copper += 12_345;
+    h.window.refreshIfChanged();
+    expect(h.root.querySelector('.gbank-readonly-note')).toBe(note); // no rebuild
+    // The price arriving IS a snapshot change (repaint), and the pane now
+    // shows the open row with the shortfall marker (copper 17345 < 90000).
+    h.world.guildBankInfo = unopened({ nextExpansionPrice: 90_000 });
+    h.window.refreshIfChanged();
+    const row = h.root.querySelector('.gbank-open-row');
+    expect(row).not.toBeNull();
+    // Same-side copper churn (still short) leaves the boolean unchanged: no
+    // repaint, the coarsening's whole point.
+    h.world.copper += 10_000;
+    h.window.refreshIfChanged();
+    expect(h.root.querySelector('.gbank-open-row')).toBe(row);
+    // Crossing the price flips affordability: repaint.
+    h.world.copper = 90_000;
+    h.window.refreshIfChanged();
+    const afterFlip = h.root.querySelector('.gbank-open-row');
+    expect(afterFlip).not.toBe(row);
+    // Off-tab: back on Personal the marker is not rendered at all, so even a
+    // flip back below the price must not rebuild the window.
+    clickPersonalTab(h);
+    h.window.refreshIfChanged(); // settle the Personal-tab signature
+    const meter = h.root.querySelector('.bank-meter');
+    expect(meter).not.toBeNull();
+    h.world.copper = 1_000; // affordability would flip, but the term is off-tab
+    h.window.refreshIfChanged();
+    expect(h.root.querySelector('.bank-meter')).toBe(meter);
+  });
+
+  it('the guild open confirm carries NO price disclaimer (the ladder is not tunable)', () => {
+    // The negative arm that replaced the flipped phase 08 socket pin: the
+    // disclaimer follows exactly the three STORAGE_PRICES dimensions
+    // (server/storage_prices.ts), and the guild rung ladder is deliberately
+    // outside that seam (the packet ledger's OPEN call), so its confirm must
+    // not grow the line by copy-paste.
+    const h = harness(unopened({ nextExpansionPrice: 90_000 }));
+    h.world.copper = 200_000;
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.gbank-open-row .bank-buy-btn') as HTMLElement).click();
+    const prompt = document.querySelector('.bank-buy-prompt');
+    expect(prompt).not.toBeNull();
+    expect(prompt?.querySelector('.bank-buy-disclaimer')).toBeNull();
+    expect(prompt?.getAttribute('aria-describedby')).toBeNull();
   });
 
   it('after opening (the echo flips purchasedSlots to 24) the normal pane renders', () => {
@@ -1064,6 +1156,48 @@ describe('guild_bank_window: the activity log view', () => {
     expect(logRows(h).length).toBe(1);
   });
 
+  it('a sub-view switch starts at the top, and a repaint in place does not', () => {
+    // THE SECOND TERM OF THE PANE KEY, which nothing drove. planBankScrollRestore
+    // is keyed on { tab, guildView }, and every arm that reaches it through the
+    // real window only ever varies the TAB: the pure arms pass the guildView
+    // literals directly, and the one wiring arm clicks the VAULT tab. Tying
+    // prevPane's guildView to the incoming view left 222 tests green.
+    //
+    // What that costs a player: the contents grid and the activity log are both
+    // .bank-scroll regions, so with the terms tied the offset the player left in
+    // the contents grid is pasted onto the log and it opens mid-list. Switching
+    // sub-view is a pane change and starts at the top, which is the same rule a
+    // tab switch follows.
+    const h = harness(guildInfo());
+    h.world.logView = { state: 'ready', entries: [logEntry({ id: 3 })] };
+    h.window.open();
+    clickGuildTab(h);
+
+    const contents = h.root.querySelector('.bank-scroll') as HTMLElement | null;
+    expect(contents, 'the contents view must mount a scroll region').not.toBeNull();
+    contents!.scrollTop = 60;
+
+    // POSITIVE CONTROL FIRST: a repaint that does NOT change the sub-view must
+    // KEEP the offset. Without this the arm below is satisfied by a restore that
+    // never happens at all, which is the same thing as the feature being absent.
+    h.window.refreshIfChanged();
+    expect(
+      (h.root.querySelector('.bank-scroll') as HTMLElement).scrollTop,
+      'a repaint inside one sub-view must keep the offset',
+    ).toBe(60);
+
+    // THE CLAIM: crossing into the log is a pane change, so it starts at the top.
+    clickLogTab(h);
+    expect(
+      h.root.querySelector('.gbank-log-row'),
+      'the log view must really have mounted, or this asserts nothing',
+    ).not.toBeNull();
+    expect(
+      (h.root.querySelector('.bank-scroll') as HTMLElement | null)?.scrollTop ?? 0,
+      'the contents offset was pasted onto the activity log',
+    ).toBe(0);
+  });
+
   it('keyboard focus survives a repaint driven by another officer op', () => {
     const h = harness(guildInfo());
     h.world.logView = { state: 'ready', entries: [logEntry({ id: 3 })] };
@@ -1218,5 +1352,17 @@ describe('the READ-ONLY member pane (canEdit false)', () => {
     h.window.refreshIfChanged();
     expect(h.window.guildTabActive).toBe(false);
     expect(h.root.querySelector('.gbank-readonly-note')).not.toBeNull();
+  });
+});
+
+describe('the personal footer meter and the guild tab (phase 08 QA)', () => {
+  it('the footer does not render while the guild tab is active', () => {
+    // The meter is personal-pane chrome; the guild pane carries its own
+    // capacity line (the retained hudChrome.bank.capacity consumer).
+    const h = harness(guildInfo());
+    h.window.open();
+    expect(h.root.querySelector('.bank-footer')).not.toBeNull();
+    (h.root.querySelector('.bank-tab[data-tab="guild"]') as HTMLElement).click();
+    expect(h.root.querySelector('.bank-footer')).toBeNull();
   });
 });

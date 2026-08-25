@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { pipeline } from 'node:stream';
 import { WebSocketServer } from 'ws';
+import { bankGrantStorageSlots } from '../src/sim/bank';
 import { DEEDS } from '../src/sim/content/deeds';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
 import {
@@ -96,7 +97,7 @@ import {
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
-import { bankLedgerIdle } from './bank_ledger';
+import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle, recordBankOp } from './bank_ledger';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import {
   BUG_DESCRIPTION_MAX,
@@ -123,6 +124,7 @@ import {
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
 } from './claudium';
+import { claudiumSpendDetailed } from './claudium_proxy';
 import { configureCommunityTestAccounts } from './community_test_accounts';
 import {
   bustDailyRewardBoardCache,
@@ -371,6 +373,19 @@ import {
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
+import {
+  beginStoragePurchase,
+  pendingStoragePurchasesForCharacter,
+  pruneRefusedStoragePurchasesBatch,
+  reopenStoragePurchase,
+  settleStoragePurchase,
+  storagePurchaseByKey,
+} from './storage_purchase_db';
+import {
+  configureStoragePurchaseRuntime,
+  executeStoragePurchase,
+  type StoragePurchaseHost,
+} from './storage_purchases';
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
@@ -3106,11 +3121,101 @@ configureDiscordRuntime({
   grantCosmetic: (accountId, chromaId) => liveGame().grantMechChromaToAccount(accountId, chromaId),
 });
 
+// The live-game host behind the Claudium storage purchase flow (Bank
+// Storage phase 11; server/storage_purchases.ts owns the ordering). Built
+// per call off liveGame() so every read is against the current session
+// table; only PUBLIC GameServer surface is touched (clients, sim.ctx,
+// saveCharacter), so this stays a closure bundle instead of new game.ts
+// methods.
+function storagePurchaseHost(): StoragePurchaseHost {
+  const game = liveGame();
+  return {
+    // The account's ONE live character session. More than one live session
+    // (only GM supervision can create that) is ambiguous and refuses: a
+    // purchase must map to exactly one character at initiation time.
+    //
+    // A QUARANTINED session counts as ABSENT, the same predicate every other
+    // custody wrapper uses (game.ts wocCustodySession and
+    // serializeCharacterForPersist both read `session.left ||
+    // session.escrowQuarantined`). Its live state was abandoned when its escrow
+    // was rolled back and game.ts saveCharacter refuses its saves outright, so
+    // admitting one here would let real Claudium be debited against a session
+    // that can never persist the grant: the apply would mutate an abandoned
+    // blob, the save would return false, and the bounded audit gap the flow
+    // documents would become a certainty for every purchase taken in that
+    // window. Refusing before any money moves is the same answer the market
+    // side gives (`character_invalid`); the ladder still converges at the next
+    // login, which is when a durable blob exists to apply against.
+    //
+    // IT ALSO LOOSENS THE AMBIGUITY REFUSAL, in the one direction that lets a
+    // purchase through where it used to refuse, and that is deliberate rather
+    // than a side effect nobody noticed. An account holding one live session
+    // AND one quarantined session used to answer null (two matches, ambiguous)
+    // and now answers the live one, because a quarantined session is abandoned
+    // and should no more count toward the census than it should be returned
+    // from it. Refusing a purchase because an abandoned session exists is a
+    // false refusal, not a safety property.
+    resolveLiveCharacter: (accountId) => {
+      let found: { characterId: number; pid: number } | null = null;
+      for (const s of game.clients.values()) {
+        if (s.accountId !== accountId || s.left || s.escrowQuarantined) continue;
+        if (found) return null;
+        found = { characterId: s.characterId, pid: s.pid };
+      }
+      return found;
+    },
+    grant: (pid, skuId, purchaseKey, dryRun) =>
+      bankGrantStorageSlots(game.sim.ctx, pid, skuId, purchaseKey, { dryRun }),
+    // The character-side audit row for an applied Claudium grant: the
+    // claudium rail, copper delta 0, the SKU id for attribution. Snapshots
+    // are minimal BankOpSnapshot pairs (the apply can land away from any
+    // banker, where bankInfoFor is null by design).
+    recordGrantLedger: (who, skuId, purchasedSlotsBefore, purchasedSlotsAfter) =>
+      recordBankOp(
+        'buy_slots',
+        who,
+        { slots: [], purchasedSlots: purchasedSlotsBefore, nextExpansionCost: null },
+        { slots: [], purchasedSlots: purchasedSlotsAfter, nextExpansionCost: null },
+        { paidWith: 'claudium', itemId: skuId },
+      ),
+    // Same absence rule as the resolver above. game.saveCharacter already
+    // answers false for a quarantined session, so this changes no outcome for a
+    // single session; it matters when a quarantined session and a live one
+    // share a character id, where taking the first match would answer false for
+    // a character that can in fact save.
+    saveCharacter: (characterId) => {
+      for (const s of game.clients.values()) {
+        if (s.characterId === characterId && !s.left && !s.escrowQuarantined) {
+          return game.saveCharacter(s);
+        }
+      }
+      return Promise.resolve(false);
+    },
+    // The DETAILED variant: the flow needs the transport fact behind an
+    // ambiguous answer, which is what lets an outage press settle without
+    // reserving the character's ladder against a gold buy.
+    spend: claudiumSpendDetailed,
+    db: {
+      begin: (row) => beginStoragePurchase(pool, row),
+      byKey: (key) => storagePurchaseByKey(pool, key),
+      settle: (key, status) => settleStoragePurchase(pool, key, status),
+      reopen: (key) => reopenStoragePurchase(pool, key),
+      pendingFor: (characterId) => pendingStoragePurchasesForCharacter(pool, characterId),
+    },
+    realm: REALM,
+    delay: (ms) => new Promise((resolve) => setTimeout(resolve, ms).unref()),
+    warn: (message) => console.warn(`[storage-purchase] ${message}`),
+  };
+}
+configureStoragePurchaseRuntime(storagePurchaseHost);
+
 // Claudium routes mirror weapon-skin purchases into account cosmetics live (the
-// same deferred liveGame() closure pattern as the Discord hooks above).
+// same deferred liveGame() closure pattern as the Discord hooks above). The
+// storage arm runs the whole phase 11 purchase flow against the live game.
 configureClaudiumRuntime({
   grantWeaponSkins: (accountId, skinIds) =>
     liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
+  storagePurchase: (input) => executeStoragePurchase(storagePurchaseHost(), input),
 });
 
 // configureAdminRuntime(game) and configureInternalRuntime(game) pass the live
@@ -3664,13 +3769,26 @@ export async function startServer(): Promise<http.Server> {
       await saveWorldState('retention_sweep:last_run', { day });
     },
     // bank_ledger is deliberately ABSENT from this table list: it is kept
-    // FOREVER. It is the anti-dupe audit trail for both containers, and the
+    // FOREVER. It is the anti-dupe audit trail for every container, and the
     // guild container (Guild Bank Phase 3) makes that non-negotiable: guild
     // conservation replays the WHOLE per-guild history (items in-vs-out across
     // officers, the treasury balance), so pruning any prefix would turn every
     // later legitimate withdraw into a false negative_net/negative_treasury
     // finding and erase the evidence trail a real dupe investigation needs.
-    // Growth is accepted: one row per successful op, insert-only. It carries
+    // The Materials Vault (container 'vault', Bank Storage Phase 2) joins the
+    // SAME posture rather than getting one of its own: same table, same
+    // never-delete rule, and the same conservation replay, which reads a
+    // character's whole vault history for exactly the reason the two containers
+    // above do. Its rows are per-character (container_id null), so they are
+    // served by bank_ledger_character and add nothing to the guild-only partial
+    // index below.
+    // Growth is accepted: one row per successful op, insert-only, EXCEPT the
+    // vault sweep (vault_deposit_all), which writes one row per material
+    // moved, at most 55, the size of the material set. Accepted is
+    // not open-ended: the named REVISIT threshold for all three containers is
+    // 10,000,000 rows, at which point the audit's single ordered full scan is
+    // what breaks first (its own recorded deferral is a keyset cursor) and the
+    // posture should be re-decided rather than discovered. It carries
     // three append-only indexes (bank_ledger_character, bank_ledger_created,
     // and bank_ledger_container_recent), and as of the in-game guild bank
     // ACTIVITY LOG it has one player-triggerable hot read: the officer-visible
@@ -3716,6 +3834,21 @@ export async function startServer(): Promise<http.Server> {
       {
         name: 'play_sessions',
         pruneBatch: (n) => prunePlaySessionsBatch(pool, config.playSessionRetentionDays, n),
+      },
+      {
+        // The Claudium storage pending-purchase table (Bank Storage phase
+        // 11): an OPERATIONAL table, so REFUSED rows sweep after the window
+        // while every other status is never touched (pending is recoverable
+        // work, unresolved is an open operator case, and applied is the
+        // rollback dedupe backstop, kept forever since phase 14). The
+        // deliberate OPPOSITE of bank_ledger above: that is the append-only
+        // audit ledger of the same purchases (now also fed by the Claudium
+        // rail's buy_slots rows) and stays out of this list by ruling (see
+        // the server/bank_ledger.ts header and its 10,000,000-row revisit
+        // threshold); do not unify the two rules.
+        name: 'storage_purchases',
+        pruneBatch: (n) =>
+          pruneRefusedStoragePurchasesBatch(pool, config.storagePurchaseRetentionDays, n),
       },
       {
         name: 'account_ip_associations',
@@ -3928,7 +4061,16 @@ export async function startServer(): Promise<http.Server> {
     // audit rows this way (a crash still can; the audit tolerates that as a
     // transient mismatch). Rejections log inside the writer, so the drain never
     // throws.
-    await bankLedgerIdle();
+    //
+    // Bounded like every other drain here: the tail is only as fast as the
+    // database, and one that accepts the connection and never answers would
+    // otherwise hold the process past the supervisor's kill grace, losing the
+    // character saves already flushed above to SIGKILL. Rows the deadline
+    // abandons leave the same transient hole a crash does. The deadline race
+    // lives inside bankLedgerIdle (the queue owns its drain policy, as
+    // stopUnstuckRecords below does); this call site only picks the budget.
+    const bankLedgerDrained = await bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS);
+    if (!bankLedgerDrained) console.warn('bank ledger drain deadline reached');
     // Drain queued suspicion-flag writes for the same reason: a detector
     // confirmation or burst flag still on the FIFO tail would be rejected by
     // pool.end(). Rejections log inside the writer, so the drain never throws.

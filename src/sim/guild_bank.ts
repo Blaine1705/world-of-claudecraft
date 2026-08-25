@@ -23,7 +23,8 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { GuildBankInfo } from '../world_api';
-import { addStacked, bagCapacity, bagsFullError, instancedCountCap } from './bags';
+import { generalOnlyPools } from './bag_pools';
+import { addStacked, bagPools, bagsFullError, instancedCountCap } from './bags';
 import { moveBetweenContainers, nearBanker } from './bank';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
@@ -976,7 +977,7 @@ export function guildBankDeposit(
     slotIndex,
     count,
     book.inventory,
-    guildBankCapacity(book),
+    generalOnlyPools(guildBankCapacity(book)),
   );
   if (result.refusal === 'no_fit') {
     ctx.error(meta.entityId, 'The guild bank is full.');
@@ -1029,7 +1030,7 @@ export function guildBankWithdraw(
     slotIndex,
     count,
     meta.inventory,
-    bagCapacity(meta.bags),
+    bagPools(meta.bags),
   );
   if (result.refusal === 'no_fit') {
     bagsFullError(ctx, meta.entityId);

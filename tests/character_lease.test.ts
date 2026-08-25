@@ -149,9 +149,12 @@ describe('shutdown wiring (source pin)', () => {
   it('main.ts drains queued records, then sweeps leases, then closes the pool', () => {
     // The shutdown closure in server/main.ts is not unit-drivable, so pin its
     // ordering by source. The load-bearing order is: endAllPlaySessions() (close
-    // the play-session rows), then bankLedgerIdle() (flush every queued audit row
-    // WHILE this process still holds the leases), then releaseAllCharacterLeases(),
-    // then pool.end() (both drain and sweep need a live pool). Draining BEFORE the
+    // the play-session rows), then the bank-ledger drain (flush every queued
+    // audit row WHILE this process still holds the leases, to a FINITE deadline:
+    // bankLedgerIdle takes the budget and races it internally, so a database
+    // that accepts the connection and never answers cannot hold the process past
+    // the supervisor's kill grace), then releaseAllCharacterLeases(), then
+    // pool.end() (both drain and sweep need a live pool). Draining BEFORE the
     // sweep matters: once the leases drop, a replacement process can load the same
     // character and write new bank_ledger rows, and any rows still queued here would
     // flush AFTER them with higher insertion ids, inverting the id order the offline
@@ -160,12 +163,16 @@ describe('shutdown wiring (source pin)', () => {
     // rejected by pool.end() would go missing until that character's next login
     // (the join reconcile is the only heal). Unstuck telemetry stops intake and
     // drains to its finite deadline in that window. Match the awaited CALL forms
-    // so a prose mention in a comment never shifts an index.
-    const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8');
+    // on COMMENT-STRIPPED source (the tunables codeOnly idiom): a prose mention
+    // must never shift an index, and a commented-out call form must not keep
+    // its position pin green.
+    const src = readFileSync(new URL('../server/main.ts', import.meta.url), 'utf8')
+      .replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
     const saveAll = src.indexOf("await game.saveAll('shutdown')");
     const endSessions = src.indexOf('await game.endAllPlaySessions(');
     const sweep = src.indexOf('await releaseAllCharacterLeases(');
-    const ledgerDrain = src.indexOf('await bankLedgerIdle()');
+    const ledgerDrain = src.indexOf('await bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS)');
     const deedsDrain = src.indexOf('await deedRecordsIdle()');
     const unstuckDrain = src.indexOf('await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS)');
     const poolEnd = src.indexOf('await pool.end()');

@@ -150,6 +150,17 @@ export function consumeNewestInventoryUnit(inventory: InvSlot[], itemId: string)
  * refusal, bags.ts, #2837): peeking through this function rather than a
  * bespoke walk is what keeps it locked to the real selection `ctx.removeItem`
  * (`Sim.removeItem`) makes, instead of drifting into its own guess.
+ *
+ * THE ONE PRECONDITION, stated because a caller that misses it destroys items.
+ * This agrees with `Sim.removeItem` only when the newest matching slot holds
+ * `count >= 1`. `removeItem` takes `Math.min(s.count, count)` per slot, so a
+ * non-positive count yields nothing, splices the slot and CONTINUES to the next
+ * match, while this walk stops at it; a caller that peeks here and consumes
+ * through `removeItem` would then inspect one copy and destroy another. The
+ * consuming twin above has no such gap (it decrements the first match
+ * unconditionally), and `selectedInventorySlot` below refuses `count < 1`
+ * outright. A caller pairing this peek with `removeItem` must apply that same
+ * `count >= 1` refusal itself; `bank_sockets.ts` bankSocketBag does.
  */
 export function newestMatchingSlot(inventory: InvSlot[], itemId: string): InvSlot | undefined {
   for (let i = inventory.length - 1; i >= 0; i--) {

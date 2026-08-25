@@ -36,7 +36,9 @@ import type { IWorld } from '../world_api';
 import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { formatCount } from './count_format';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { buildGuildBankLogView, guildBankLogSignature } from './guild_bank_log_view';
@@ -54,7 +56,7 @@ import {
   guildBankGoldWithdrawMax,
   guildBankSlotAction,
 } from './guild_bank_view';
-import { formatMoney, formatNumber, t } from './i18n';
+import { formatMoney, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS, lockMarkHtml } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
@@ -223,7 +225,13 @@ export class GuildBankTab {
         el.appendChild(this.buildNote('hudChrome.bank.guildReadOnlyNote', announceReadOnly));
       }
       el.appendChild(this.buildTreasuryRow(model.treasury));
-      if (model.readOnly) el.appendChild(this.buildNote('hudChrome.bank.guildUnopenedNote'));
+      // The unopened note rides EVERY pane without an open row, not only the
+      // read-only one: since phase 09 the core also models open null for an
+      // editing officer whose snapshot quotes no price (unreachable off a real
+      // sim, but the pane must never read as empty rather than not-yet-opened).
+      if (model.readOnly || !model.open) {
+        el.appendChild(this.buildNote('hudChrome.bank.guildUnopenedNote'));
+      }
       if (model.open) el.appendChild(this.buildOpenRow(model.open));
       return;
     }
@@ -315,7 +323,7 @@ export class GuildBankTab {
   }
 
   private fmt(n: number): string {
-    return formatNumber(n, { maximumFractionDigits: 0 });
+    return formatCount(n);
   }
 
   // The treasury header row: label + coin readout + the two gold actions.
@@ -389,52 +397,44 @@ export class GuildBankTab {
   // shared bank-buy-prompt classes carry the styling): it distinguishes the
   // open confirm in tests and DOM tooling.
   private showOpenBankPrompt(price: number): void {
-    this.showBuyConfirmPrompt({
+    this.showGuildBuyConfirm({
       className: 'gbank-open-prompt',
       text: t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(price) }),
       confirmLabel: t('hudChrome.bank.guildOpenAccept'),
     });
   }
 
-  // The ONE confirm-prompt builder behind the expansion and open-the-bank
-  // confirms (the rule of three landed with the open prompt: the personal
-  // pane's buy confirm in bank_window.ts is the third sibling; fold it in if
-  // it ever grows guild-shaped needs). Both actions send the same
-  // guildBankBuySlots token; the sim decides the rung and the payer.
-  private showBuyConfirmPrompt(opts: {
+  // The guild-flavoured wrapper over the FAMILY builder (bank_buy_prompt.ts,
+  // where the fold-in the older version of this comment promised has landed:
+  // the personal, guild, and vault confirms all mount through that one leaf
+  // now). This wrapper owns only the guild marker class and the confirm side
+  // effects. Both callers send the same guildBankBuySlots token; the sim
+  // decides the rung and the payer.
+  private showGuildBuyConfirm(opts: {
     className?: string;
     text: string;
     confirmLabel: string;
   }): void {
-    this.deps.dismissPrompts();
-    const opener = document.activeElement as HTMLElement | null;
-    const stack = document.getElementById('prompt-stack');
-    if (!stack) return;
-    const prompt = document.createElement('div');
-    prompt.className = ['prompt panel bank-buy-prompt gbank-buy-prompt', opts.className]
-      .filter(Boolean)
-      .join(' ');
-    prompt.innerHTML = `<div class="prompt-text">${esc(opts.text)}</div>`;
-    const confirm = document.createElement('button');
-    confirm.className = 'btn';
-    confirm.textContent = opts.confirmLabel;
-    const cancel = document.createElement('button');
-    cancel.className = 'btn';
-    cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
-    prompt.append(confirm, cancel);
-    const { dismiss, dismissAndReturn } = this.deps.installPromptDialog(prompt, opener, () =>
-      prompt.remove(),
+    showBuyConfirmPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.deps.installPromptDialog(prompt, opener, close),
+        dismissSiblings: () => this.deps.dismissPrompts(),
+      },
+      {
+        className: ['gbank-buy-prompt', opts.className].filter(Boolean).join(' '),
+        text: opts.text,
+        confirmLabel: opts.confirmLabel,
+        cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
+        onConfirm: (dismiss) => {
+          this.deps.world().guildBankBuySlots();
+          audio.coin();
+          dismiss();
+          this.deps.requestRender();
+          this.focusClose();
+        },
+      },
     );
-    confirm.addEventListener('click', () => {
-      this.deps.world().guildBankBuySlots();
-      audio.coin();
-      dismiss();
-      this.deps.requestRender();
-      this.focusClose();
-    });
-    cancel.addEventListener('click', dismissAndReturn);
-    stack.appendChild(prompt);
-    window.setTimeout(() => confirm.focus(), 0);
   }
 
   private fillGrid(grid: HTMLElement, model: GuildBankViewModel & { kind: 'guild' }): void {
@@ -814,7 +814,7 @@ export class GuildBankTab {
   }
 
   private showBuySlotsPrompt(price: number, blockSlots: number): void {
-    this.showBuyConfirmPrompt({
+    this.showGuildBuyConfirm({
       text: t('hudChrome.bank.guildBuyConfirm', {
         count: this.fmt(blockSlots),
         price: formatMoney(price),

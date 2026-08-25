@@ -80,6 +80,7 @@ import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
+import { STORAGE_PURCHASE_SCHEMA } from './storage_purchase_db';
 import { SUSPICION_FLAGS_SCHEMA } from './suspicion_flags_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
@@ -1284,6 +1285,10 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id) and characters(id), so they run after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(PROGRESS_EVENTS_SCHEMA);
+    // The Claudium storage pending-purchase table (Bank Storage phase 11).
+    // FK-references accounts(id) and characters(id), so it runs after SCHEMA.
+    // Applied unconditionally (idempotent), like the other schema modules.
+    await client.query(STORAGE_PURCHASE_SCHEMA);
     // First-touch signup attribution (one row per account, written at
     // registration). FK-references accounts(id), so it runs after SCHEMA.
     await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
@@ -4722,13 +4727,34 @@ export interface BankLedgerRow {
     // move at all, which is the mint signature the counterparty columns exist
     // to make visible: without this row the op writes nothing and the audit
     // sees a clean, self-consistent book.
-    | 'counterparty_orphan';
+    | 'counterparty_orphan'
+    // Materials Vault stock consumed IN PLACE by a completed craft or enchant
+    // (Bank Storage Phase 04, server/bank_ledger.ts recordVaultCraftConsume).
+    // Vault-only: it replays as a removal like a withdraw, but the materials
+    // went into the craft, never through the bags, so it is a distinct op on
+    // purpose (a dupe investigation must tell the two apart). Like the
+    // container union below, widening this vocabulary needed no DDL change.
+    | 'craft_consume'
+    // Bank bag sockets (Bank Storage phase 07), personal-only. unlock_socket
+    // is the copper-only purchase of the next socket rung (the buy_slots
+    // shape); socket_bag / unsocket_bag are single-bag item moves into and out
+    // of the bank's socket store, which the slot replay cannot see (a socketed
+    // bag exists only as its socketBags id). scripts/bank_audit.mjs replays
+    // the socket store from these rows; a swap writes one of each. Widening
+    // this vocabulary needed no DDL change, like craft_consume above.
+    | 'unlock_socket'
+    | 'socket_bag'
+    | 'unsocket_bag';
   itemId: string | null;
   count: number | null;
   instance: unknown;
   copperDelta: number;
   purchasedSlotsAfter: number;
-  container: 'personal' | 'guild';
+  // 'vault' is the Materials Vault (Bank Storage Phase 2): a per-character
+  // container like 'personal', so it carries no container_id. The column is a
+  // plain TEXT with no CHECK constraint, so this union is the only place the
+  // vocabulary is fixed; widening it needed no DDL change.
+  container: 'personal' | 'guild' | 'vault';
   containerId: number | null;
   /** Signed copper the ACTING CHARACTER'S PURSE gained under this op (negative
    *  means it paid). Omitted / null means NOT RECORDED, which is what every
@@ -4836,6 +4862,40 @@ export async function loadGuildBankLogRows(
     // treasury cap alone is 1e9).
     copperDelta: Number(r.copper_delta) || 0,
   }));
+}
+
+/** The multi-row sibling of insertBankLedgerRow (the insertChatLogs UNNEST
+ *  idiom): ONE statement for the whole batch, so a vault deposit-all's N
+ *  material rows cost one round trip and land atomically (all rows or none,
+ *  which is what the audit's replay wants from one logical op). Row order
+ *  within the batch is preserved: unnest emits elements in array order and
+ *  the id sequence assigns in insert order. */
+export async function insertBankLedgerRows(rows: readonly BankLedgerRow[]): Promise<void> {
+  if (rows.length === 0) return;
+  await pool.query(
+    `INSERT INTO bank_ledger
+       (realm, character_id, account_id, op, item_id, count, instance,
+        copper_delta, purchased_slots_after, container, container_id,
+        counterparty_copper_delta, counterparty_count)
+     SELECT * FROM unnest(
+       $1::text[], $2::int[], $3::int[], $4::text[], $5::text[], $6::int[], $7::jsonb[],
+       $8::bigint[], $9::int[], $10::text[], $11::bigint[], $12::bigint[], $13::int[])`,
+    [
+      rows.map((r) => r.realm),
+      rows.map((r) => r.characterId),
+      rows.map((r) => r.accountId),
+      rows.map((r) => r.op),
+      rows.map((r) => r.itemId),
+      rows.map((r) => r.count),
+      rows.map((r) => (r.instance == null ? null : JSON.stringify(r.instance))),
+      rows.map((r) => r.copperDelta),
+      rows.map((r) => r.purchasedSlotsAfter),
+      rows.map((r) => r.container),
+      rows.map((r) => r.containerId),
+      rows.map((r) => r.counterpartyCopperDelta ?? null),
+      rows.map((r) => r.counterpartyCount ?? null),
+    ],
+  );
 }
 
 export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {

@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: vi.fn(async () => true),
   saveCharacterAndMarketState: vi.fn(async () => true),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),

@@ -22,16 +22,27 @@
 // the primary key is the tiebreak-free monotonic order the reader actually
 // pages by (two rows can share a created_at; a BIGSERIAL id cannot collide).
 //
-// WHY IT IS PARTIAL. `container` is a two-value discriminator and this reader
+// WHY IT IS PARTIAL. `container` is a closed discriminator and this reader
 // only ever passes the literal 'guild', so a full index would carry an entry
-// for every PERSONAL bank row as well: on a shipped game that is the large
-// majority of a table nothing prunes, and it buys nothing, because personal
-// reads are served by bank_ledger_character and no other statement in server/
-// or scripts/ filters on `container` at all. Those entries would be pure index
-// size, pure extra WAL, and pure buffer-cache pressure on EVERY personal bank
-// insert, forever. `WHERE container = 'guild'` is provably matched by the
-// reader (the value is a literal in the SQL, never a parameter), and it leaves
-// the index roughly the size of the guild subset the reader actually walks.
+// for every PERSONAL bank row and every 'vault' row (the Materials Vault, Bank
+// Storage Phase 2) as well: on a shipped game that is the large majority of a
+// table nothing prunes, and the vault rows only enlarge the excluded majority,
+// strengthening the case rather than weakening it. It buys nothing, because
+// personal and vault reads are served by bank_ledger_character and no other
+// statement in server/ or scripts/ filters on `container` at all. Those
+// entries would be pure index size, pure extra WAL, and pure buffer-cache
+// pressure on EVERY personal bank insert, forever. `WHERE container = 'guild'`
+// is provably matched by the reader (the value is a literal in the SQL, never
+// a parameter), and it leaves the index roughly the size of the guild subset
+// the reader actually walks.
+//
+// THE NEXT INDEX TRIGGER, recorded the way the guild reader's deferral was. A
+// future per-character vault HISTORY reader
+// (`WHERE character_id = $1 AND container = 'vault' ORDER BY id DESC LIMIT n`)
+// is NOT served by bank_ledger_character: that index's trailing column is
+// created_at, not id, so the reader would still sort a character's whole
+// history to find its newest n. It earns an index of its own when such a
+// reader lands, and not before.
 //
 // WHY `op` STAYS OUT of it, even though the reader filters on it. The op
 // predicate is `= ANY($2::text[])`, and a ScalarArrayOpExpr on a MIDDLE column

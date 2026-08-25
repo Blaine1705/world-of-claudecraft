@@ -433,6 +433,25 @@ describe('the UNOPENED pane model (rung 0: purse-paid opening)', () => {
     expect(view.open?.price).toBe(90_000); // 9g, the rung-0 literal
   });
 
+  it('renders the WIRE price verbatim, never a table constant', () => {
+    // 777777 is in no price table: a revert to any client-side constant
+    // fallback (the removed GUILD_BANK_RUNG_PRICES[0] read) fails this arm.
+    const view = buildGuildBankView(unopened({ nextExpansionPrice: 777_777 }), lookup, 777_777);
+    if (view.kind !== 'unopened') throw new Error('expected unopened');
+    expect(view.open?.price).toBe(777_777);
+    expect(view.open?.affordable).toBe(true);
+  });
+
+  it('a priceless snapshot (nextExpansionPrice null) renders NO open row, even for an officer', () => {
+    // Unreachable off a real sim (unopened always quotes rung 0), but the
+    // client handles it honestly: no row (the read-only shape the painter
+    // already renders), never a client-invented price.
+    const view = buildGuildBankView(unopened({ nextExpansionPrice: null }), lookup, 10_000_000);
+    if (view.kind !== 'unopened') throw new Error('expected unopened');
+    expect(view.readOnly).toBe(false);
+    expect(view.open).toBeNull();
+  });
+
   it('treasury gold enablement works from day one, exactly like the opened pane', () => {
     const rich = buildGuildBankView(unopened({ treasury: 5_000 }), lookup, 0);
     if (rich.kind !== 'unopened') throw new Error('expected unopened');

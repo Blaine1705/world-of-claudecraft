@@ -1,32 +1,85 @@
+import { STORAGE_SKU_LIST } from '../sim/content/storage_charters';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
+import { armorySectionHtml } from './armory_card_view';
 import { ArmoryInspect } from './armory_inspect';
+import { localizeWeaponSkin } from './armory_labels';
 import {
-  badgeLabel,
-  localizeWeaponSkin,
-  rarityLabel,
-  weaponSkinCollectionLabel,
-  weaponTypeLabel,
-} from './armory_labels';
+  charterGrantedText,
+  charterName,
+  charterRefusalText,
+  charterSectionHtml,
+} from './charter_card_view';
+import { CharterFitMemory } from './charter_fit_memory';
+import type { StoreSpendResult } from './claudium_purchase_bridge';
+import { dailyRewardsHistoryHtml, dailyRewardsLeaderboardHtml } from './daily_rewards_ranks_view';
+import { SpinOverlay } from './daily_rewards_spin_controller';
+import { spinSectionHtml } from './daily_rewards_spin_view';
 import {
   buildDailyRewardsView,
   type DailyRewardsView,
   dailyRewardTaskDescription,
 } from './daily_rewards_view';
+import { dailyRewardsWalletCardHtml } from './daily_rewards_wallet_card_view';
 import { markDialogRoot } from './dialog_root';
-import { tEntity } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
 import { formatDateTime, formatNumber, t } from './i18n';
-import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { hydratePortraits } from './portrait_chip';
+import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
+import { mintIntentKey } from './purchase_intent_key';
 import { rovingTarget } from './roving_index';
+import {
+  planStoreFocus,
+  restoreStoreErrorFocus,
+  restoreStoreFocus,
+  StoreFocusStash,
+} from './store_focus_policy';
 import { svgIcon } from './ui_icons';
 import { usdDollarsText } from './usd_text';
 import {
   type ArmorySection,
   type ArmorySkinRow,
   buildArmorySections,
+  buildCharterSection,
+  type CharterDef,
+  type CharterRow,
+  type CharterSection,
   type WocStoreItemInput,
 } from './woc_store_view';
+
+// ── Strongbox Charters ──────────────────────────────────────────────────────
+// The store's charter catalog: the four Strongbox bundles, ascending by grant.
+// The twelve strongbox_rung_* SKUs carry a ladderIndex and are the BANKER's
+// next-rung surface, never a store row, so the absence of a ladderIndex is the
+// filter that keeps them out of this grid.
+const STORE_CHARTERS: readonly CharterDef[] = STORAGE_SKU_LIST.filter(
+  (sku) => sku.ladderIndex === undefined,
+)
+  .map((sku) => ({ id: sku.id, grantSlots: sku.grantSlots }))
+  .sort((a, b) => a.grantSlots - b.grantSlots);
+
+// The purchasable ladder ceiling, DERIVED rather than imported: the "complete"
+// charter grants the whole ladder by construction, so the largest charter grant
+// IS the ceiling. Deriving it keeps every slot literal and the gold price table
+// (BANK_EXPANSION_PRICES) out of src/ui.
+const CHARTER_CEILING_SLOTS = STORE_CHARTERS.reduce(
+  (max, charter) => Math.max(max, charter.grantSlots),
+  0,
+);
+
+// The minter moved to src/ui/purchase_intent_key.ts when the banker became the
+// second Claudium spender: reaching it from there would have meant one window
+// module importing another. Re-exported so existing importers, and the tests
+// that pin both of its arms against the server charset, keep working unchanged.
+export { mintIntentKey };
+
+/** A purchase-result band painted into the store markup, so the state survives
+ *  the markup-identity check that skips an unchanged repaint. */
+interface CharterNotice {
+  tone: 'success' | 'failure';
+  text: string;
+}
 
 function remainingBanText(expiresAt: string, nowMs: number): string {
   const totalMinutes = Math.max(0, Math.ceil((Date.parse(expiresAt) - nowMs) / 60_000));
@@ -84,6 +137,13 @@ export function dailyRewardReasonText(
   }
 }
 
+/** The authoritative outcome of one store spend, as the service answered it.
+ *  Shared with the HUD's ClaudiumHooks so both ends of the wiring name one shape. */
+// The canonical declaration moved to src/ui/claudium_purchase_bridge.ts, the
+// module that owns the spend seam both spending windows share. Re-exported
+// here so every existing importer keeps working unchanged.
+export type { StoreSpendResult };
+
 export interface DailyRewardsWindowDeps {
   root(): HTMLElement;
   world(): IWorld;
@@ -103,21 +163,24 @@ export interface DailyRewardsWindowDeps {
   }>;
   spendStoreItem?(
     itemId: string,
-    kind: 'cosmetic' | 'skin' | 'item',
+    kind: 'cosmetic' | 'skin' | 'item' | 'storage',
     expectedCostClaudium: number,
-  ): Promise<{
-    granted: boolean;
-    balance: number | null;
-    costClaudium: number | null;
-    reason: string | null;
-  }>;
-  openClaudium?(): void;
+    /** ONE key per purchase INTENT, reused for every retry of that intent.
+     *  Omitted by the weapon-skin path (a skin writes a grant row, so a fresh
+     *  key per call still replays); REQUIRED by the repeatable charter path,
+     *  where a fresh key on a retry is a SECOND REAL CHARGE. */
+    idempotencyKey?: string,
+  ): Promise<StoreSpendResult>;
+  /** Open the Claudium window. `onClosed` is the top-up return path: fired at
+   *  most once, when that window closes, so the store can come back. */
+  openClaudium?(onClosed?: () => void): void;
   confirmDialog?(
     title: string,
     body: string,
     okText: string,
     cancelText: string,
     onOk: () => void,
+    onCancel?: () => void,
   ): void;
 }
 
@@ -127,7 +190,9 @@ export class DailyRewardsWindow {
   private countdownPoll: number | null = null;
   private renderSeq = 0;
   private lastHistory: DailyRewardHistory = { payouts: [] };
-  private spinOverlay: HTMLElement | null = null;
+  // The spin celebration's element, owned by its own painter
+  // (src/ui/daily_rewards_spin_controller.ts) beside the pure wheel core.
+  private readonly spinOverlay = new SpinOverlay();
   private tab: 'store' | 'rewards' = 'store';
   private storeBalance: number | null = null;
   private storeItems: WocStoreItemInput[] = [];
@@ -140,8 +205,30 @@ export class DailyRewardsWindow {
   private storePriceChanged = false;
   private paintedStoreBody: HTMLElement | null = null;
   private paintedStoreMarkup: string | null = null;
-
-  private readonly wheelValues = [20, 30, 40, 50, 75, 100, 150, 250];
+  private charterSection: CharterSection = { rows: [], ladderFull: false, fitUnknown: true };
+  private charterNotice: CharterNotice | null = null;
+  private charterAnnounceSeq = 0;
+  // ONE idempotency key per charter purchase INTENT, held across retries with
+  // the cost it declared. A storage SKU is REPEATABLE and writes no grant row,
+  // so the service dedupes only on this key: a retry under a fresh key, or under
+  // the same key with a moved cost, is a second real charge.
+  private readonly charterIntents: PurchaseIntentLedger = durableIntents(() => this.deps.world());
+  // Charter ids whose open intent has actually reached the service. It gates
+  // the cancel path: see abandonCharterIntent.
+  private readonly charterSent = new Set<string>();
+  // Charter ids with a spend in flight RIGHT NOW. It is money-safe to send a
+  // second one (same key, the server answers purchase_in_progress), but the
+  // player would be shown "another purchase is being completed" for their own
+  // double-click, so the button goes disabled + aria-busy and both entry points
+  // refuse while it is held.
+  private readonly charterInFlight = new Set<string>();
+  // The one-attempt focus stash; store_focus_policy.ts owns its lifetime rule.
+  private readonly charterFocus = new StoreFocusStash();
+  // What this store visit remembers about charter fit: the server's refusals and
+  // the ladder count last painted against, plus the rule by which a count that
+  // moves DOWN invalidates the refusals. src/ui/charter_fit_memory.ts owns all
+  // three and says why they cannot live apart.
+  private readonly charterFit = new CharterFitMemory();
 
   constructor(private readonly deps: DailyRewardsWindowDeps) {}
 
@@ -189,8 +276,13 @@ export class DailyRewardsWindow {
     this.deps.onVisibilityChange?.();
     this.ensureShell();
     void this.renderCurrent('open');
+    // The service refresh is a paint the PLAYER DID NOT ASK FOR, so it carries
+    // the background flag for the same reason the ladder refresh does: a poll
+    // that lands between a purchase arming its focus stash and the outcome
+    // spending it must not consume the stash, and must not pull focus out of
+    // <body> into the grid mid-spend.
     this.poll = window.setInterval(() => {
-      if (this.isOpen) void this.renderCurrent(null);
+      if (this.isOpen) void this.renderCurrent(null, { background: true });
     }, 15_000);
     this.countdownPoll = window.setInterval(() => {
       if (this.isOpen) this.paintCountdowns();
@@ -212,7 +304,16 @@ export class DailyRewardsWindow {
       this.countdownPoll = null;
     }
     root.style.display = 'none';
-    this.closeSpinOverlay();
+    // A purchase-result band is about the attempt the player just made, not a
+    // standing store state: a reopen must not show a stale one. The intent
+    // ledger deliberately survives, so a retry still replays its key.
+    this.charterNotice = null;
+    // Server fit verdicts are scoped to the acting character and nothing here
+    // observes a character change, so the belief is bounded to one store visit.
+    this.charterFit.forgetRefusals();
+    // Same bounding, one visit: a stash is about an attempt inside this visit.
+    this.charterFocus.clear();
+    this.spinOverlay.close();
     this.armoryInspect?.close();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -295,11 +396,14 @@ export class DailyRewardsWindow {
     });
   }
 
-  private async renderCurrent(focus: 'open' | null): Promise<void> {
+  private async renderCurrent(
+    focus: 'open' | null,
+    opts: { background?: boolean } = {},
+  ): Promise<void> {
     if (!this.storeEnabled()) this.tab = 'rewards';
     this.syncTabs();
     if (this.tab === 'store') {
-      await this.renderStore(focus);
+      await this.renderStore(focus, opts);
       return;
     }
     await this.render(focus);
@@ -328,7 +432,10 @@ export class DailyRewardsWindow {
       });
   }
 
-  private async renderStore(focus: 'open' | null): Promise<void> {
+  private async renderStore(
+    focus: 'open' | null,
+    opts: { background?: boolean } = {},
+  ): Promise<void> {
     const root = this.deps.root();
     const body = root.querySelector<HTMLElement>('.dr-body');
     if (!body) return;
@@ -357,7 +464,7 @@ export class DailyRewardsWindow {
       this.storeLoading = false;
       this.syncStoreLoading();
     }
-    if (this.isOpen && this.tab === 'store') this.paintStore(body);
+    if (this.isOpen && this.tab === 'store') this.paintStore(body, opts);
   }
 
   /** Re-project the Season 1 Armory sections from the last service snapshot plus
@@ -376,12 +483,18 @@ export class DailyRewardsWindow {
 
   /** Live account-cosmetics change (another session's grant/apply, or a server
    *  correction of an optimistic apply): re-project the armory from the world's
-   *  cosmetics and repaint the open store grid + inspect actions. */
+   *  cosmetics and repaint the open store grid + inspect actions.
+   *
+   *  BACKGROUND for the same reason the slow-band poll is: the trigger is
+   *  another session, not this player, so the repaint must not spend a focus
+   *  stash a purchase here is still holding. The exposure is identical too (mid
+   *  charter spend the confirm dialog is gone, focus is on <body>, and the stash
+   *  is armed), so exempting only the poll would have left this door open. */
   onCosmeticsChanged(): void {
     if (!this.isOpen || this.tab !== 'store' || !this.storeReady) return;
     this.rebuildArmorySections();
     const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
-    if (body) this.paintStore(body);
+    if (body) this.paintStore(body, { background: true });
     const open = this.armoryInspect?.openSkinId;
     if (open) {
       const row = this.armoryRowById(open);
@@ -397,25 +510,47 @@ export class DailyRewardsWindow {
     return null;
   }
 
-  private paintStore(body: HTMLElement): void {
+  /** `background` marks a paint the PLAYER DID NOT ASK FOR (the slow-band poll).
+   *  It changes nothing about the markup and only two things about focus, both
+   *  below. */
+  private paintStore(body: HTMLElement, opts: { background?: boolean } = {}): void {
     if (this.storeError || this.storeBalance === null) {
-      this.replaceStoreBody(
-        body,
-        `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>`,
-      );
+      this.paintStoreError(body, opts);
       return;
     }
     const balance = formatNumber(this.storeBalance, { maximumFractionDigits: 0 });
-    const armory = this.armorySections.map((section) => this.armorySectionHtml(section)).join('');
+    const armory = this.armorySections.map((section) => armorySectionHtml(section)).join('');
+    // Re-project the charters at PAINT time: unlike the armory they also depend
+    // on live bank state, and every input has to reach the markup string below
+    // or the identity check silently skips the repaint.
+    this.rebuildCharterSection();
+    const charters = charterSectionHtml(this.charterSection, this.charterInFlight);
     const notice = this.storePriceChanged
       ? `<div class="woc-store-notice" role="status">${esc(t('hudChrome.wocStore.priceChanged'))}</div>`
       : '';
     const markup =
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
-      `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
+      `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium${focusKeyAttr('topup')}>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
       notice +
-      armory;
+      this.charterNoticeHtml() +
+      armory +
+      charters;
+    // Carry keyboard focus across the wipe. replaceStoreBody assigns innerHTML,
+    // which destroys the control the player is standing on, and this painter
+    // fires on EVERY purchase outcome: without this a keyboard buyer who pressed
+    // Enter on Purchase Charter lands on <body> and has to Tab from the top of
+    // the window to retry. src/ui/store_focus_policy.ts owns the whole decision
+    // (the stash, the background exemption, the degrade ladder) and says why.
+    const plan = planStoreFocus({
+      background: opts.background === true,
+      focusInBody: captureFocusKey(body),
+      focusWentNowhere: focusedWithin(document) === null,
+      stashed: this.charterFocus.peek(),
+    });
+    // The stash is spent by a paint that HAPPENED: an elided paint destroyed no
+    // control, so its target is still mounted and still the right return place.
     if (!this.replaceStoreBody(body, markup)) return;
+    if (!opts.background) this.charterFocus.clear();
     // Dense armory compatibility chips defer their repeated portrait data URLs
     // so this markup stays kilobytes rather than megabytes. Hydration assigns
     // the already-cached nine class portraits by DOM property after mounting.
@@ -429,6 +564,83 @@ export class DailyRewardsWindow {
         if (row) this.openArmoryInspect(row);
       });
     });
+    body.querySelectorAll<HTMLButtonElement>('[data-charter-buy]').forEach((button) => {
+      button.addEventListener('click', () => {
+        this.requestCharterPurchase(button.dataset.charterBuy ?? '');
+      });
+    });
+    restoreStoreFocus(body, plan, body.querySelector<HTMLElement>('[data-buy-claudium]'));
+  }
+
+  private charterButton(itemId: string): HTMLButtonElement | null {
+    const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
+    if (!body) return null;
+    return (
+      [...body.querySelectorAll<HTMLButtonElement>('[data-charter-buy]')].find(
+        (button) => button.dataset.charterBuy === itemId,
+      ) ?? null
+    );
+  }
+
+  /** The ERROR body, which is a WIPE like any other and must carry focus like one.
+   *
+   *  It used to return above the whole focus contract, so a keyboard buyer whose
+   *  store errored mid-visit landed on `<body>` and had to Tab from the top of the
+   *  DOCUMENT, and an armed charter stash survived to be spent by some later
+   *  unrelated repaint that then dragged focus and the scroller into the charter
+   *  grid for no reason the player could see.
+   *
+   *  WHICH PATH TAKES SOMETHING FROM THE PLAYER, corrected in the review round,
+   *  because a wrong answer here is what makes a focus fix inert. Only the
+   *  armory-skin outage repaint sets `storeError` mid-visit (`storeReady` latches
+   *  the fetch path and `storeBalance` never returns to null), and on that path
+   *  the player stands in the armory INSPECT overlay, which mounts on
+   *  document.body and survives this wipe: nothing is taken, so the plan
+   *  correctly answers "focus nothing". The reachable harm is the OVERLAP, a
+   *  charter purchase in flight whose busy disable already dropped focus to
+   *  `<body>` and parked its return key in the stash.
+   *
+   *  Lives here rather than inline in paintStore because
+   *  tests/woc_store_window_contract.test.ts pins paintStore's focus ORDER by the
+   *  FIRST occurrence of three literals, and a second copy of them above the
+   *  markup replace would read as the order being wrong. Same rules, own slice,
+   *  own pin. */
+  private paintStoreError(body: HTMLElement, opts: { background?: boolean }): void {
+    const plan = planStoreFocus({
+      background: opts.background === true,
+      focusInBody: captureFocusKey(body),
+      focusWentNowhere: focusedWithin(document) === null,
+      stashed: this.charterFocus.peek(),
+    });
+    const wiped = this.replaceStoreBody(
+      body,
+      `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>`,
+    );
+    // An ELIDED repaint destroyed no control, so its target is still mounted and
+    // the stash is still the right return place: same rule as the normal path.
+    if (!wiped) return;
+    if (!opts.background) this.charterFocus.clear();
+    restoreStoreErrorFocus(plan, this.deps.root());
+  }
+
+  /** Hold the buy button for the duration of the await. The concurrent spend a
+   *  double-click would start is money-SAFE (same key, the server answers
+   *  purchase_in_progress), but showing a buyer "another purchase is being
+   *  completed" for their own second click is a bug in the copy's eyes. */
+  private setCharterBusy(itemId: string, busy: boolean): void {
+    const button = this.charterButton(itemId);
+    if (!button) return;
+    if (busy) {
+      // No focus capture here: this runs inside the confirm dialog's onOk, by
+      // which point the dialog element is gone and focus is already on <body>,
+      // so the read would always be null. requestCharterPurchase stashes the key
+      // while the buy button still holds focus, before the dialog opens.
+      button.setAttribute('aria-busy', 'true');
+      button.disabled = true;
+      return;
+    }
+    button.removeAttribute('aria-busy');
+    button.disabled = false;
   }
 
   /** Keep background polling data-fresh without rebuilding an identical store
@@ -438,62 +650,16 @@ export class DailyRewardsWindow {
    *  produces different markup and repaints normally. */
   private replaceStoreBody(body: HTMLElement, markup: string): boolean {
     if (this.paintedStoreBody === body && this.paintedStoreMarkup === markup) return false;
+    // The wipe resets scrollTop, and the charter grid is the LAST section, below
+    // the whole armory: a forced repaint (every purchase outcome is one) would
+    // otherwise throw the player back to the top of a long scroller, away from
+    // the card they just used. Same idiom as the bank window's grid repaint.
+    const scrollTop = body.scrollTop;
     body.innerHTML = markup;
+    body.scrollTop = scrollTop;
     this.paintedStoreBody = body;
     this.paintedStoreMarkup = markup;
     return true;
-  }
-
-  private armorySectionHtml(section: ArmorySection): string {
-    const servicePrice =
-      section.rows.find((row) => row.costClaudium !== null)?.costClaudium ?? null;
-    const price =
-      servicePrice === null
-        ? `<span class="armory-section-price unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
-        : `<span class="armory-section-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">${formatNumber(servicePrice, { maximumFractionDigits: 0 })}</span>`;
-    const cards = section.rows.map((row) => this.armoryCardHtml(row)).join('');
-    return (
-      `<section class="armory-section rarity-${esc(section.rarity)}">` +
-      `<header><div><span>${esc(rarityLabel(section.rarity))}</span><h3>${esc(t('hudChrome.wocStore.collectionLine', { collection: weaponSkinCollectionLabel(section.collection) }))}</h3></div>` +
-      `${price}</header>` +
-      `<div class="armory-grid">${cards}</div></section>`
-    );
-  }
-
-  private armoryCardHtml(row: ArmorySkinRow): string {
-    const copy = localizeWeaponSkin(row.skin);
-    const state = row.applied
-      ? `<span class="armory-state applied">${esc(t('hudChrome.wocStore.applied'))}</span>`
-      : row.owned
-        ? `<span class="armory-state">${esc(t('hudChrome.wocStore.owned'))}</span>`
-        : row.costClaudium === null
-          ? `<span class="armory-state unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
-          : `<span class="armory-cost"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><strong>${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</strong></span>`;
-    const badge = row.skin.badge
-      ? `<span class="armory-badge">${esc(badgeLabel(row.skin.badge))}</span>`
-      : '';
-    return (
-      `<article class="armory-card rarity-${esc(row.skin.rarity)}${row.owned ? ' owned' : ''}${row.applied ? ' applied' : ''}">` +
-      `<button type="button" data-armory-skin="${esc(row.skin.id)}" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: copy.name }))}">` +
-      `<span class="armory-card-art"><img src="${esc(row.art)}" alt="" loading="lazy" decoding="async">${badge}${this.armoryClassChipsHtml(row)}</span>` +
-      `<span class="armory-card-copy"><span class="armory-card-type">${esc(weaponTypeLabel(row.skin.weaponType))}</span>` +
-      `<h4>${esc(copy.name)}</h4>${state}</span>` +
-      `</button></article>`
-    );
-  }
-
-  /** Top-right face chips: the classes that can ever apply this skin. Class
-   *  names come from the entity matcher (already localized in every locale).
-   *  The shared portrait chip shows the class crest while the character GLBs
-   *  are still preloading and upgrades itself via the global ready hook. */
-  private armoryClassChipsHtml(row: ArmorySkinRow): string {
-    const chips = row.eligibleClasses
-      .map((cls) => {
-        const name = tEntity({ kind: 'class', id: cls, field: 'name' });
-        return `<span class="armory-class-chip" title="${esc(name)}">${portraitChipHtml({ cls, name, badge: false, deferSource: true })}</span>`;
-      })
-      .join('');
-    return chips ? `<span class="armory-classes">${chips}</span>` : '';
   }
 
   private openArmoryInspect(row: ArmorySkinRow): void {
@@ -542,7 +708,7 @@ export class DailyRewardsWindow {
     const copy = localizeWeaponSkin(row.skin);
     const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
     if (!row.affordable) {
-      this.openNeedMoreDialog(row, row.costClaudium, this.storeBalance);
+      this.openNeedMoreDialog(copy.name, row.costClaudium, this.storeBalance);
       return;
     }
     this.deps.confirmDialog?.(
@@ -587,7 +753,11 @@ export class DailyRewardsWindow {
           ? result.costClaudium
           : row.costClaudium;
       if (authoritativeCost !== null) {
-        this.openNeedMoreDialog(row, authoritativeCost, result.balance);
+        this.openNeedMoreDialog(
+          localizeWeaponSkin(row.skin).name,
+          authoritativeCost,
+          result.balance,
+        );
       }
       return;
     }
@@ -609,19 +779,306 @@ export class DailyRewardsWindow {
     if (fresh) this.armoryInspect?.refresh(fresh);
   }
 
-  private openNeedMoreDialog(
-    row: ArmorySkinRow,
-    costClaudium: number,
-    balance: number | null,
-  ): void {
+  // ── Strongbox Charters ───────────────────────────────────────────────────
+
+  /** Re-project the charter rows from the last service snapshot plus live bank
+   *  state. */
+  private rebuildCharterSection(): void {
+    // The ALWAYS-available ladder read (src/world_api/bank.ts bankPurchasedSlots),
+    // never bankInfo: that snapshot is null away from a bursar and the store opens
+    // anywhere, which is the blindness this read exists to close. It stays
+    // nullable (nothing has arrived yet), and the pure core reads null as "the fit
+    // gate could not run" and lists every charter. The server remains the one
+    // authority on fit and answers does_not_fit; this gate only decides what to
+    // SHOW.
+    const purchasedSlots = this.deps.world().bankPurchasedSlots;
+    // Records the signature the slow-band poll compares against, and drops the
+    // server's refusals if the count moved DOWN (charter_fit_memory.ts owns why).
+    this.charterFit.observe(purchasedSlots);
+    this.charterSection = buildCharterSection(this.storeBalance, this.storeItems, {
+      purchasedSlots,
+      ceilingSlots: CHARTER_CEILING_SLOTS,
+      charters: STORE_CHARTERS,
+      // Fit knowledge the SERVER already gave us, kept alongside the count gate
+      // rather than replaced by it: a does_not_fit on grant G proves purchased +
+      // G overshoots the ceiling for this character, and without it the refused
+      // card comes straight back enabled forever. The verdict stays sound only
+      // while the count it came from holds, which is the observe() above.
+      refusedGrantSlots: this.charterFit.refusedGrants,
+    });
+  }
+
+  /** The VISIBLE band. It carries no aria role on purpose: it is created inside
+   *  the same innerHTML write as its own text, which is the shape that fails to
+   *  announce. The persistent region in the shell does the announcing. */
+  private charterNoticeHtml(): string {
+    const notice = this.charterNotice;
+    if (!notice) return '';
+    return `<div class="woc-store-notice charter-notice ${notice.tone}">${esc(notice.text)}</div>`;
+  }
+
+  /** Set the result band AND announce it. One entry point so a future arm cannot
+   *  paint a result that a screen reader never hears. */
+  private setCharterNotice(tone: 'success' | 'failure', text: string): void {
+    // A spend outcome can land after the player closed the store. close() has
+    // already cleared the band, so re-arming it here would paint a stale result
+    // on the NEXT open, attached to nothing the player just did.
+    if (!this.isOpen) return;
+    this.charterNotice = { tone, text };
+    const live = this.deps.root().querySelector<HTMLElement>('[data-charter-live]');
+    if (!live) return;
+    // Clear first, then write in a microtask: an identical repeated message
+    // (two failed retries) is otherwise a no-op mutation and is not re-announced.
+    const seq = ++this.charterAnnounceSeq;
+    live.textContent = '';
+    queueMicrotask(() => {
+      if (seq === this.charterAnnounceSeq) live.textContent = text;
+    });
+  }
+
+  private charterRowById(itemId: string): CharterRow | null {
+    return this.charterSection.rows.find((row) => row.itemId === itemId) ?? null;
+  }
+
+  private requestCharterPurchase(itemId: string): void {
+    if (this.charterInFlight.has(itemId)) return;
+    const row = this.charterRowById(itemId);
+    if (!row || !row.purchasable || row.costClaudium === null) return;
+    const name = charterName(itemId);
+    // Mint the intent HERE, before the dialog, so the number the player confirms
+    // is the number that will go on the wire. intentFor returns an already-open
+    // intent unchanged, and its cost is FROZEN at mint time, so on a retry after
+    // an ambiguous outcome the catalog price may have moved while the wire must
+    // still carry the frozen one; quoting the row's refreshed price would show a
+    // figure that cannot be the outcome of this click.
+    const intent = this.charterIntents.intentFor(itemId, row.costClaudium);
+    // AND THE AFFORDABILITY GATE READS THE SAME NUMBER, which is why the mint
+    // moved above it (Bank Storage phase 17). `row.affordable` is computed from
+    // the LIVE catalog price, and after a restore that is not what the wire
+    // carries: with an intent frozen at 200, a catalog since moved to 250 and a
+    // balance of 220, the old order told the player they needed more Claudium
+    // and handed them to the top-up window for a purchase they could already
+    // afford. Asking a player to spend real money they do not need to spend is
+    // not the recorded cost of durability, which is one extra click and a
+    // price_changed notice. One number, one place it comes from, which is the
+    // rule the spend call site already states.
+    //
+    // The reorder mints on a first UNAFFORDABLE click, where nothing was minted
+    // before. That is the already-argued "the save rides the mint" residual
+    // (src/ui/purchase_intent_durability.ts): a never-sent key has no prior row
+    // anywhere, so re-using it is an ordinary fresh attempt. It also makes the
+    // top-up round trip carry ONE key instead of minting a fresh one per
+    // attempt, which is the safer direction on a repeatable SKU.
+    //
+    // BOTH costs, not just the frozen one, and the review round is why. Judging
+    // the frozen cost ALONE fixes the upward move and breaks the downward one:
+    // frozen 250, catalog since retuned DOWN to 200, balance 220, and the player
+    // is sent to buy real money for a product their balance already covers. The
+    // honest rule is that a local refusal is only correct when the purchase is
+    // unreachable BY EITHER ROUTE. The frozen cost goes out directly; the live
+    // one is reachable in one round trip, because a frozen cost the catalog has
+    // moved past comes back as a definitive price_changed that mints afresh at
+    // the new price. So refuse only below the LOWER of the two, and quote that
+    // one, which is the least real money the player would have to add.
+    const reachableCost = Math.min(row.costClaudium, intent.costClaudium);
+    if ((this.storeBalance ?? 0) < reachableCost) {
+      this.openNeedMoreDialog(name, reachableCost, this.storeBalance);
+      return;
+    }
+    // The buy button is still focused right now. The confirm dialog's own trap
+    // restores focus on a DEFERRED task, so by the time onOk runs the dialog is
+    // already removed and document.activeElement is <body>: capturing there
+    // always yields null and the post-result repaint has nothing to hand focus
+    // back to. This is the last moment the key is observable.
+    const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
+    this.charterFocus.arm(body ? captureFocusKey(body) : null);
+    this.deps.confirmDialog?.(
+      t('hudChrome.wocStore.charter.confirmTitle'),
+      t('hudChrome.wocStore.charter.confirmBody', {
+        item: name,
+        cost: formatNumber(intent.costClaudium, { maximumFractionDigits: 0 }),
+      }),
+      t('hudChrome.wocStore.confirmPurchase'),
+      t('hudChrome.wocStore.cancel'),
+      () => void this.purchaseCharter(itemId),
+      () => this.abandonCharterIntent(itemId),
+    );
+  }
+
+  /** Drop an intent the player walked away from, but ONLY while it has never
+   *  reached the service. Once a spend HAS been sent under the key, an ambiguous
+   *  outcome may be hiding a live debit, so the key must outlive the cancel: the
+   *  next attempt replays under it instead of minting a second key over that
+   *  debit. Minting at confirm time is what gives this method something to drop:
+   *  while the mint happened at SEND time, charterSent was added on the very
+   *  next line, so an open intent always implied a sent one and this guard could
+   *  never pass with anything to abandon. */
+  private abandonCharterIntent(itemId: string): void {
+    // The attempt ended with no paint, so nothing will spend the stash: drop it
+    // here or some later unrelated repaint does, and moves focus for no reason.
+    this.charterFocus.clear();
+    if (this.charterSent.has(itemId)) return;
+    this.charterIntents.abandon(itemId);
+  }
+
+  private async purchaseCharter(itemId: string): Promise<void> {
+    // ONE intent per purchase, minted and cost-FROZEN by requestCharterPurchase
+    // before the confirm dialog opened. The FROZEN cost is what goes on the
+    // wire, never a re-read catalog price. The server's prior-row identity check
+    // includes expectedCostClaudium and answers a mismatch with a
+    // definitive-looking already_granted WITHOUT first testing the row's status,
+    // so a retry carrying a price the background refresh moved would close this
+    // intent while the original row may still be PENDING behind a live debit,
+    // and the next click would mint a second key over it. A genuine catalog move
+    // instead comes back as a real price_changed (definitive, no debit) and
+    // mints a fresh intent at the new price.
+    if (this.charterInFlight.has(itemId)) return;
+    const row = this.charterRowById(itemId);
+    const intent = this.charterIntents.intentFor(itemId, row?.costClaudium ?? 0);
+    // Only NOW has the key reached the service, so only now must a cancel stop
+    // dropping it.
+    this.charterSent.add(itemId);
+    this.charterNotice = null;
+    this.storePriceChanged = false;
+    this.charterInFlight.add(itemId);
+    this.setCharterBusy(itemId, true);
+    let result: StoreSpendResult | undefined;
+    try {
+      result = await this.deps.spendStoreItem?.(itemId, 'storage', intent.costClaudium, intent.key);
+    } finally {
+      // Released before anything repaints, so the rebuilt button comes back
+      // enabled rather than inheriting a stale busy state from the markup.
+      this.charterInFlight.delete(itemId);
+      this.setCharterBusy(itemId, false);
+    }
+    if (!result) {
+      // No hook at all is indistinguishable from a lost reply: leave the intent
+      // OPEN so the next attempt replays under the same key.
+      this.setCharterNotice('failure', t('hudChrome.wocStore.charter.outage'));
+      this.repaintStore();
+      return;
+    }
+    // EVERY authoritative result goes to the ledger unclassified: which refusals
+    // close an intent and which retain the key is store_purchase_intent.ts's
+    // decision alone. Special-casing a token here would be a second classifier
+    // that silently drifts from it (purchase_in_progress and no_live_character
+    // both LOOK definitive and are not).
+    this.charterIntents.settle(itemId, { granted: result.granted, reason: result.reason });
+    if (!this.charterIntents.isOpen(itemId)) this.charterSent.delete(itemId);
+    if (result.balance !== null) this.storeBalance = result.balance;
+    // granted FIRST, then reason: 'already_granted' means OPPOSITE things on the
+    // two arms, and every granted-true arm is a real purchase.
+    if (result.granted) {
+      this.setCharterNotice('success', charterGrantedText(result.reason));
+      await this.renderStore(null);
+      return;
+    }
+    await this.refuseCharterPurchase(itemId, intent.costClaudium, result);
+  }
+
+  /** The granted-false half of the result contract. No debit happened on any of
+   *  these except the ambiguous default, which the ledger has already kept the
+   *  key for. */
+  private async refuseCharterPurchase(
+    itemId: string,
+    /** The cost actually SENT (the intent's frozen one), which is what the
+     *  service judged and therefore what a refreshed price must be compared
+     *  against. */
+    sentCostClaudium: number,
+    result: StoreSpendResult,
+  ): Promise<void> {
+    if (result.reason === 'price_changed') {
+      // A new price is a NEW intent. price_changed is a definitive refusal, so
+      // the ledger already closed this one and the re-confirm mints a fresh key.
+      this.storePriceChanged = true;
+      // The shared banner alone is not enough: it is written into the same
+      // innerHTML as its own text, the shape this file already documents as the
+      // one that never announces, so a screen-reader user whose purchase was
+      // refused would hear nothing at all. Route it through the charter band,
+      // which owns the persistent live region.
+      this.setCharterNotice('failure', t('hudChrome.wocStore.priceChanged'));
+      await this.renderStore(null);
+      const current = this.charterRowById(itemId);
+      // The false arm is load-bearing: re-confirming when the refreshed price
+      // still equals the one just refused would loop the dialog forever.
+      if (current && current.costClaudium !== null && current.costClaudium !== sentCostClaudium) {
+        this.requestCharterPurchase(itemId);
+      }
+      return;
+    }
+    if (result.reason === 'does_not_fit') {
+      // Remember the verdict: away from a banker the fit gate cannot run, so
+      // without this the same guaranteed-to-fail card repaints enabled and the
+      // player can loop the identical refusal forever.
+      this.charterFit.noteRefused(this.charterRowById(itemId)?.grantSlots ?? 0);
+    }
+    if (result.reason === 'insufficient_balance') {
+      // Prefer the service's own cost over the row's, exactly as the skin path does.
+      const authoritativeCost =
+        result.costClaudium !== null &&
+        Number.isFinite(result.costClaudium) &&
+        result.costClaudium > 0
+          ? result.costClaudium
+          : sentCostClaudium;
+      this.repaintStore();
+      this.openNeedMoreDialog(charterName(itemId), authoritativeCost, result.balance);
+      return;
+    }
+    this.setCharterNotice('failure', charterRefusalText(result.reason));
+    this.repaintStore();
+  }
+
+  /** Slow-band poll from hud.update(), the band the bank, bags and market windows
+   *  already ride. The charter fit is re-projected at PAINT time and paints are
+   *  event-driven (open, store fetch, cosmetics, purchase outcome), so nothing
+   *  otherwise observes the ladder moving BEHIND an open store: the reachable case
+   *  is the store and the bank open together at a bursar while a copper rung is
+   *  bought in the bank (ruling 21). Signature-gated rather than repainting every
+   *  tick, because a repaint rebuilds the whole armory grid's markup. */
+  refreshIfChanged(): void {
+    if (!this.isOpen || this.tab !== 'store' || !this.storeReady) return;
+    // An error body carries no charter grid, and paintStore returns on that
+    // branch BEFORE rebuildCharterSection, the only writer of the signature, so
+    // without this the signature could never converge and the poll would rebuild
+    // the error markup every slow tick until a refetch cleared the flag.
+    // paintStore's branch also covers a null balance; storeReady above already
+    // implies a non-null one, so repeating it here would add an unreachable arm.
+    if (this.storeError) return;
+    if (!this.charterFit.changedFrom(this.deps.world().bankPurchasedSlots)) return;
+    // Deliberately NOT through repaintStore(): that path DROPS a stashed focus
+    // key when it finds nothing to paint, which is right after a purchase
+    // outcome and wrong here, where it would throw away the return target of a
+    // purchase the player is still in the middle of. The `background` flag is
+    // the other half of the same rule, and covers the paint that DOES happen.
+    const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
+    if (body) this.paintStore(body, { background: true });
+  }
+
+  /** Repaint the open store body in place, with no service round trip. */
+  private repaintStore(): void {
+    const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
+    if (body && this.isOpen && this.tab === 'store') {
+      this.paintStore(body);
+      return;
+    }
+    // Nothing painted, so nothing consumed the stash: drop it (same rule as the
+    // cancel and the close, and store_focus_policy.ts states it once).
+    this.charterFocus.clear();
+  }
+
+  private openNeedMoreDialog(itemName: string, costClaudium: number, balance: number | null): void {
+    // Reached after an await on the refusal path, so the store may be gone by
+    // now; hud.confirmDialog appends an aria-modal focus trap to document.body
+    // unconditionally, which over a bare game world is a prompt about a window
+    // the player already dismissed.
+    if (!this.isOpen) return;
     const knownBalance = balance ?? this.storeBalance;
-    const copy = localizeWeaponSkin(row.skin);
     const shortfall = formatNumber(Math.max(0, costClaudium - (knownBalance ?? 0)), {
       maximumFractionDigits: 0,
     });
     this.deps.confirmDialog?.(
       t('hudChrome.wocStore.needMoreTitle'),
-      t('hudChrome.wocStore.needMoreBody', { item: copy.name, shortfall }),
+      t('hudChrome.wocStore.needMoreBody', { item: itemName, shortfall }),
       t('hudChrome.wocStore.buyClaudium'),
       t('hudChrome.wocStore.cancel'),
       () => this.openClaudiumFromStore(),
@@ -630,7 +1087,11 @@ export class DailyRewardsWindow {
 
   private openClaudiumFromStore(): void {
     this.armoryInspect?.close();
-    this.deps.openClaudium?.();
+    // The one return path out of the top-up handoff: the Claudium window fires
+    // this exactly once, when it closes, and the store comes back on its Store
+    // tab with a refreshed balance. No module global, and no timer guessing
+    // when the player is done.
+    this.deps.openClaudium?.(() => this.openStore());
   }
 
   private paint(view: DailyRewardsView): void {
@@ -653,11 +1114,11 @@ export class DailyRewardsWindow {
     }
     body.innerHTML =
       this.summaryHtml(view) +
-      this.walletHtml(view) +
-      this.spinHtml(view) +
+      dailyRewardsWalletCardHtml(view) +
+      spinSectionHtml(view) +
       this.tasksHtml(view) +
-      this.leaderboardHtml(view.status) +
-      this.historyHtml(view.history);
+      dailyRewardsLeaderboardHtml(view.status) +
+      dailyRewardsHistoryHtml(view.history);
     body.querySelector<HTMLButtonElement>('[data-spin]')?.addEventListener('click', () => {
       void this.spin();
     });
@@ -674,7 +1135,7 @@ export class DailyRewardsWindow {
     if (button) button.disabled = true;
     try {
       const result = await this.deps.world().spinDailyReward();
-      this.openSpinOverlay(result.awardedPoints);
+      this.spinOverlay.open(result.awardedPoints);
       this.deps.onStatus?.(result);
       this.paint(
         buildDailyRewardsView({ kind: 'status', status: result, history: this.lastHistory }),
@@ -699,7 +1160,13 @@ export class DailyRewardsWindow {
       `<div class="woc-store-tabs" role="tablist" aria-label="${esc(t('hudChrome.wocStore.tabsLabel'))}">` +
       `<button id="woc-store-tab-store" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="store">${esc(t('hudChrome.wocStore.storeTab'))}</button>` +
       `<button id="woc-store-tab-rewards" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="rewards">${esc(t('hudChrome.wocStore.rewardsTab'))}</button>` +
-      `<span class="woc-store-loading" data-woc-store-loading role="status" aria-live="polite" aria-label="${esc(t('hudChrome.wocStore.loading'))}" aria-busy="false"><i aria-hidden="true"></i></span></div>`
+      `<span class="woc-store-loading" data-woc-store-loading role="status" aria-live="polite" aria-label="${esc(t('hudChrome.wocStore.loading'))}" aria-busy="false"><i aria-hidden="true"></i></span>` +
+      // A PERSISTENT live region, in the shell rather than the rebuilt body. A
+      // role="status" node created in the same innerHTML write as its text is
+      // commonly not announced at all, and the success case (real money moved)
+      // is exactly the status one. Same idiom as the spinner beside it and as
+      // claudium_window's announce(): keep the node, write only its text.
+      `<span class="visually-hidden" data-charter-live role="status" aria-live="polite" aria-atomic="true"></span></div>`
     );
   }
 
@@ -790,96 +1257,6 @@ export class DailyRewardsWindow {
     });
   }
 
-  private spinHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
-    const spin = view.status.spin;
-    const text = spin.claimed
-      ? t('hudChrome.dailyRewards.spinClaimed', {
-          points: formatNumber(spin.points ?? 0, { maximumFractionDigits: 0 }),
-        })
-      : t('hudChrome.dailyRewards.spinReady');
-    return (
-      `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.spinTitle'))}</h3>` +
-      `<div class="dr-spin"><div class="dr-wheel">${esc(spin.claimed ? `+${formatNumber(spin.points ?? 0, { maximumFractionDigits: 0 })}` : '?')}</div>` +
-      `<div><p>${esc(text)}</p><button type="button" class="lb-page-btn" data-spin ${view.locked || spin.claimed ? 'disabled' : ''}>${esc(t('hudChrome.dailyRewards.spinButton'))}</button></div></div></section>`
-    );
-  }
-
-  private walletHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
-    if (!view.locked) return '';
-    const reason = view.lockReason;
-    if (reason === 'banned') return '';
-    const title =
-      reason === 'no_wallet'
-        ? t('hudChrome.dailyRewards.walletConnectTitle')
-        : t('hudChrome.dailyRewards.walletHoldTitle');
-    const body =
-      reason === 'no_wallet'
-        ? t('hudChrome.dailyRewards.walletConnectBody')
-        : reason === 'under_minimum'
-          ? t('hudChrome.dailyRewards.walletHoldBody', {
-              amount: formatNumber(view.status.eligibility.minUsd, { maximumFractionDigits: 0 }),
-            })
-          : t('hudChrome.dailyRewards.walletPriceBody');
-    const button =
-      reason === 'no_wallet'
-        ? `<button type="button" class="lb-page-btn" data-wallet-connect>${esc(t('hudChrome.dailyRewards.walletConnectButton'))}</button>`
-        : '';
-    return (
-      `<section class="dr-wallet-card">` +
-      `<h3>${esc(title)}</h3>` +
-      `<p>${esc(body)}</p>` +
-      button +
-      `</section>`
-    );
-  }
-
-  private wheelLandingAngle(points: number): number {
-    const index = Math.max(0, this.wheelValues.indexOf(points));
-    const segment = 360 / this.wheelValues.length;
-    const center = index * segment + segment / 2;
-    return -center;
-  }
-
-  private openSpinOverlay(points: number): void {
-    this.closeSpinOverlay();
-    const overlay = document.createElement('div');
-    overlay.className = 'dr-spin-overlay open';
-    overlay.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') this.closeSpinOverlay();
-    });
-    overlay.addEventListener('mousedown', (event) => {
-      if (event.target === overlay) this.closeSpinOverlay();
-    });
-    const labels = this.wheelValues
-      .map(
-        (value, index) =>
-          `<span style="--i:${index}">+${formatNumber(value, { maximumFractionDigits: 0 })}</span>`,
-      )
-      .join('');
-    overlay.innerHTML =
-      `<div class="dr-spin-stage" role="dialog" aria-modal="true" aria-label="${esc(t('hudChrome.dailyRewards.spinDialogTitle'))}">` +
-      `<button type="button" class="x-btn dr-spin-close" data-spin-close aria-label="${esc(t('hudChrome.dailyRewards.spinClose'))}">${svgIcon('close')}</button>` +
-      `<div class="dr-spin-pointer" aria-hidden="true"></div>` +
-      `<div class="dr-spin-wheel-big" style="--land-angle:${this.wheelLandingAngle(points)}deg" aria-hidden="true">${labels}</div>` +
-      `<div class="dr-spin-result" style="--tier-color:#ffe27a">` +
-      `<span>${esc(t('hudChrome.dailyRewards.spinResult', { points: formatNumber(points, { maximumFractionDigits: 0 }) }))}</span>` +
-      `<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>` +
-      `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>` +
-      `</div></div>`;
-    overlay
-      .querySelector('[data-spin-close]')
-      ?.addEventListener('click', () => this.closeSpinOverlay());
-    document.body.appendChild(overlay);
-    this.spinOverlay = overlay;
-    (overlay.querySelector('[data-spin-close]') as HTMLElement | null)?.focus();
-  }
-
-  private closeSpinOverlay(): void {
-    if (!this.spinOverlay) return;
-    this.spinOverlay.remove();
-    this.spinOverlay = null;
-  }
-
   private tasksHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
     const rows = view.status.tasks
       .map((task) => {
@@ -900,39 +1277,5 @@ export class DailyRewardsWindow {
       `<ul class="dr-tasks">${rows}</ul>` +
       `</section>`
     );
-  }
-
-  private leaderboardHtml(status: DailyRewardStatus): string {
-    const totalKey =
-      status.leaderboardTotal === 1
-        ? 'hudChrome.dailyRewards.totalPlayer'
-        : 'hudChrome.dailyRewards.totalPlayers';
-    const total = `<div class="dr-leaderboard-total">${esc(t(totalKey, { count: formatNumber(status.leaderboardTotal, { maximumFractionDigits: 0 }) }))}</div>`;
-    const rows =
-      status.leaderboard.length === 0
-        ? `<div class="dr-empty">${esc(t('hudChrome.dailyRewards.noLeaders'))}</div>`
-        : status.leaderboard
-            .map(
-              (row) =>
-                `<div class="dr-rank${row.me ? ' mine' : ''}"><span>${row.rank}</span><b>${esc(row.name)}</b><strong>${formatNumber(row.points, { maximumFractionDigits: 0 })}</strong></div>`,
-            )
-            .join('');
-    return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.leaderboard'))}</h3>${total}<div class="dr-ranks dr-leaderboard-ranks">${rows}</div></section>`;
-  }
-
-  private historyHtml(history: DailyRewardHistory): string {
-    const rows =
-      history.payouts.length === 0
-        ? `<div class="dr-empty">${esc(t('hudChrome.dailyRewards.noHistory'))}</div>`
-        : history.payouts
-            .slice(0, 10)
-            .map((row) => {
-              const prize = t('hudChrome.dailyRewards.usd', {
-                amount: usdDollarsText(row.prizeUsd),
-              });
-              return `<div class="dr-rank"><span>${esc(row.day)} #${row.rank}</span><b>${esc(row.name)}</b><strong>${esc(prize)}</strong></div>`;
-            })
-            .join('');
-    return `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.history'))}</h3><div class="dr-ranks">${rows}</div></section>`;
   }
 }

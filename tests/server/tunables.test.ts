@@ -25,6 +25,9 @@ import { describe, expect, it, vi } from 'vitest';
 // capture recipe passes the knob on the command line for exactly that
 // reason.
 delete process.env.DB_POOL_MAX_CLIENTS;
+// Same protection for the storage-price knob (server/storage_prices.ts), which
+// is likewise reached EXCLUSIVELY through dynamic imports inside its tests.
+delete process.env.STORAGE_PRICES;
 
 import { DESKTOP_LOGIN_TTL_MS } from '../../server/desktop_login';
 import {
@@ -109,9 +112,12 @@ const count = (haystack: string, needle: string): number => haystack.split(needl
 // A raw-source .toContain() is comment-gameable: commenting the pinned line out
 // leaves its text sitting in the comment, so the pin stays falsely green while
 // the wiring is dead (confirmed by experiment against the env-wiring pin
-// below). Strip // line comments before any structural match, keeping ://
-// protocol slashes.
-const codeOnly = (src: string): string => src.replace(/(^|[^:])\/\/.*$/gm, '$1');
+// below). Strip whole-line /* */ blocks first (anchored to line starts: an
+// UNANCHORED match lets a '/*' inside a // comment open a false block that
+// swallows hundreds of live lines), then // line comments, keeping ://
+// protocol slashes: either comment form around a pinned line must red it.
+const codeOnly = (src: string): string =>
+  src.replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 describe('server timeouts (server/http/server_timeouts.ts)', () => {
   it('the four constants equal the installed Node http defaults', () => {
@@ -765,6 +771,7 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   const unstuckDbSrc = read('server/unstuck_db.ts');
   const unstuckRecordsSrc = read('server/unstuck_records.ts');
   const retentionSrc = read('server/play_session_retention_db.ts');
+  const bankLedgerSrc = read('server/bank_ledger.ts');
 
   // Slice a function BODY: from its declaration to the next top-level export,
   // so a neighbor's match can never satisfy a body that lost its own.
@@ -847,6 +854,31 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
       'const unstuckReportsDrained = await stopUnstuckRecords(UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS);',
     );
     expect(mainSrc).not.toContain('await unstuckRecordsIdle();');
+  });
+
+  it('bounds the bank-ledger shutdown drain with a named timeout the queue owns', () => {
+    // Same shape as the unstuck drain above, and for the same reason: the FIFO
+    // tail is only as fast as the database, so the shutdown path must not await
+    // it unbounded. The deadline race lives INSIDE bankLedgerIdle (the queue
+    // owns its drain policy), so main.ts only picks the budget. Comment
+    // stripped on the positive pins, like the pool pins below: a commented-out
+    // drain line must not keep this green.
+    const mainCode = codeOnly(mainSrc);
+    const bankLedgerCode = codeOnly(bankLedgerSrc);
+    expect(bankLedgerCode).toContain('export const BANK_LEDGER_SHUTDOWN_DRAIN_MS = 10_000;');
+    expect(mainCode).toContain(
+      'const bankLedgerDrained = await bankLedgerIdle(BANK_LEDGER_SHUTDOWN_DRAIN_MS);',
+    );
+    // The deadline-expired warn is the only operator-visible sign the drain
+    // abandoned rows (the metric counts insert failures, not abandonment), so
+    // its deletion must red here too.
+    expect(mainCode).toContain(
+      "if (!bankLedgerDrained) console.warn('bank ledger drain deadline reached');",
+    );
+    // The retired UNBOUNDED call form at zero occurrences: re-inlining a bare
+    // drain (or a hand-rolled Promise.race beside it) reds here.
+    expect(mainSrc).not.toContain('await bankLedgerIdle();');
+    expect(mainSrc).not.toContain('Promise.race([bankLedgerIdle(');
   });
 
   it('bounds unstuck recorder memory and rate-limits overflow warnings', () => {
@@ -1217,5 +1249,319 @@ describe('the DB pool knob reaches the shipped container', () => {
     expect(gameService).toContain('DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}');
     // Documented for operators, commented out so the built-in default applies.
     expect(read('.env.example')).toContain('#DB_POOL_MAX_CLIENTS=10');
+  });
+
+  it('passes STORAGE_PRICES through to the game service, and documents it', () => {
+    const compose = read('docker-compose.yml');
+    // Same game-service slicing as the pool-knob arm above: bounded at the
+    // NEXT top-level service key so the row cannot sit on the wrong service.
+    const gameStart = compose.indexOf('\n  game:');
+    expect(gameStart).toBeGreaterThanOrEqual(0);
+    const rest = compose.slice(gameStart + '\n  game:'.length);
+    const next = rest.match(/\n {2}[a-z][a-z-]*:/);
+    expect(next).toBeTruthy();
+    const gameService = rest.slice(0, next?.index);
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins compose's own substitution syntax
+    expect(gameService).toContain('STORAGE_PRICES: ${STORAGE_PRICES:-}');
+    // Documented for operators, commented out so the compiled defaults apply.
+    // Pinned on the bare commented name only, so the example JSON payload can
+    // change without touching this arm.
+    expect(read('.env.example')).toContain('#STORAGE_PRICES=');
+  });
+});
+
+// The storage-price knob (server/storage_prices.ts): one JSON env var handing a
+// validated StoragePricesOverride to the realm Sim at construction (through
+// server/sim_boot_config.ts). Same contract family as DB_POOL_MAX_CLIENTS:
+// strict and fail-safe per dimension, and a rejected value can never come back
+// looking identical to unset (rejections always say why). The compiled
+// dimension lengths (12 bank expansions, 4 bank sockets, 5 vault rungs) are
+// pinned implicitly by the accepted-full arm: a length change reds it.
+describe('STORAGE_PRICES env parsing (server/storage_prices.ts)', () => {
+  it('unset / blank / whitespace are the silent defaults: no override, NO rejections', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // The AUTHORITATIVE default pins: pure parser calls no shell export or
+    // local .env can perturb. Number('') is 0, so the blank arms also pin that
+    // an empty string never half-parses into anything (the empty-numeric trap).
+    expect(parseStoragePrices(undefined)).toStrictEqual({ override: undefined, rejections: [] });
+    expect(parseStoragePrices('')).toStrictEqual({ override: undefined, rejections: [] });
+    expect(parseStoragePrices('   ')).toStrictEqual({ override: undefined, rejections: [] });
+  });
+
+  it('the module constant is the parser result in a clean environment', async () => {
+    // The env-dependent readout of the default, like the DB_POOL_MAX_CLIENTS
+    // note above: it only adds that the exported constant is the parser's
+    // result under the delete at the top of this file; the pure arms above
+    // stay the authoritative default pins.
+    const { STORAGE_PRICES } = await import('../../server/storage_prices');
+    expect(STORAGE_PRICES).toBeUndefined();
+  });
+
+  it('malformed JSON is rejected LOUDLY, never treated as unset', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    for (const raw of ['not json', '{bad']) {
+      const { override, rejections } = parseStoragePrices(raw);
+      expect(override).toBeUndefined();
+      expect(rejections).toHaveLength(1);
+    }
+  });
+
+  it('JSON that is not a plain object is rejected LOUDLY', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    for (const raw of ['7', '"cheap"', 'true', 'null', '[1,2,3]']) {
+      const { override, rejections } = parseStoragePrices(raw);
+      expect(override).toBeUndefined();
+      expect(rejections).toHaveLength(1);
+    }
+  });
+
+  it('a too-short dimension is dropped whole, with a rejection naming it', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1,2,3]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+  });
+
+  it('a too-long dimension is dropped whole, with a rejection naming it', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1,2,3,4,5]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+  });
+
+  it('a non-integer entry drops its whole dimension', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[500.5,1000,2000,3000]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+    // The category is operator-debuggable boot text: pin it (QA 09).
+    expect(rejections[0]).toContain('a non-integer entry');
+  });
+
+  it('a negative entry drops its whole dimension', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"vaultUpgrades":[20000,50000,-1,200000,400000]}',
+    );
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('vaultUpgrades');
+    // The category is operator-debuggable boot text: pin it (QA 09).
+    expect(rejections[0]).toContain('a negative entry');
+  });
+
+  it('a string entry drops its whole dimension (numeric-looking strings included)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"bankExpansions":["500",1000,2500,5000,10000,20000,40000,80000,150000,300000,600000,1200000]}',
+    );
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankExpansions');
+    // The category is operator-debuggable boot text: pin it (QA 09).
+    expect(rejections[0]).toContain('a non-number entry');
+  });
+
+  it('a non-array dimension is dropped whole, with a rejection naming it', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":1000000}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankSockets');
+  });
+
+  it('one bad entry drops ONLY its dimension; a good sibling still applies', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"bankSockets":[9,8,7,6],"vaultUpgrades":[1,2,3,4,-5]}',
+    );
+    expect(override).toStrictEqual({ bankSockets: [9, 8, 7, 6] });
+    expect(override).not.toHaveProperty('vaultUpgrades');
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('vaultUpgrades');
+  });
+
+  it('an unknown key is rejected BY NAME while known siblings still apply', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // The typo case: bankExpansion (no s) must never silently look like unset.
+    const { override, rejections } = parseStoragePrices(
+      '{"bankExpansion":[1],"bankSockets":[1,2,3,4]}',
+    );
+    expect(override).toStrictEqual({ bankSockets: [1, 2, 3, 4] });
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('bankExpansion');
+  });
+
+  it('a full valid override round-trips (fresh literal expectations)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices(
+      '{"bankExpansions":[1,2,3,4,5,6,7,8,9,10,11,12],"bankSockets":[13,14,15,16],"vaultUpgrades":[17,18,19,20,21]}',
+    );
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({
+      bankExpansions: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      bankSockets: [13, 14, 15, 16],
+      vaultUpgrades: [17, 18, 19, 20, 21],
+    });
+  });
+
+  it('a partial override applies its one dimension and nothing else', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1,2,3,4]}');
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({ bankSockets: [1, 2, 3, 4] });
+  });
+
+  it('zero is a LEGAL price (free sockets are an operator choice, not a typo)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[0,0,0,0]}');
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({ bankSockets: [0, 0, 0, 0] });
+  });
+
+  it('an unsafely large entry (past Number.MAX_SAFE_INTEGER) drops its whole dimension', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // 1e300 IS an integer to Number.isInteger; only the safe-integer bound
+    // refuses it, so a mistyped exponent rejects loudly instead of applying
+    // as an unpayable price.
+    const { override, rejections } = parseStoragePrices('{"bankSockets":[1e300,2,3,4]}');
+    expect(override).toBeUndefined();
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('unsafely large');
+  });
+
+  it('a JSON __proto__ key is rejected as unknown and never pollutes (prototype-pollution pin)', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // JSON.parse creates __proto__ as an OWN property; the Object.entries plus
+    // allowlist shape routes it into the unknown-key rejection. Pinned so a
+    // refactor to Object.assign or for...in cannot regress silently.
+    const { override, rejections } = parseStoragePrices(
+      '{"__proto__":{"polluted":1},"bankSockets":[1,2,3,4]}',
+    );
+    expect(override).toStrictEqual({ bankSockets: [1, 2, 3, 4] });
+    expect(rejections).toHaveLength(1);
+    expect(rejections[0]).toContain('__proto__');
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it('the unknown-key boot echo is sanitized and bounded', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    // A control character in a key cannot forge a second boot line, and a
+    // pathologically long key truncates at 40 printable characters.
+    const forged = parseStoragePrices('{"x\\nSTORAGE_PRICES: overrides bankSockets":1}');
+    expect(forged.rejections).toHaveLength(1);
+    expect(forged.rejections[0]).not.toContain('\n');
+    expect(forged.rejections[0]).toContain('x?STORAGE_PRICES');
+    const long = parseStoragePrices(`{"${'k'.repeat(80)}":1}`);
+    expect(long.rejections[0]).toContain(`${'k'.repeat(40)}...`);
+    expect(long.rejections[0]).not.toContain('k'.repeat(41));
+  });
+
+  it('a flood of junk keys is capped at 8 rejections plus an honest summary line', async () => {
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const junk = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`junk${i}`, 1]));
+    const { rejections } = parseStoragePrices(JSON.stringify(junk));
+    expect(rejections).toHaveLength(9);
+    expect(rejections[8]).toBe('...and 4 more rejections');
+  });
+
+  it('the cap boundary is exact: 8 rejections stay uncapped, 9 cap with a summary (QA 09)', async () => {
+    // The off-by-one arms: a '>' to '>=' mutant would emit '...and 0 more
+    // rejections' at exactly 8; a '>=' to '>' one would leak a 9th line.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const junkOf = (n: number) =>
+      JSON.stringify(Object.fromEntries(Array.from({ length: n }, (_, i) => [`junk${i}`, 1])));
+    const eight = parseStoragePrices(junkOf(8)).rejections;
+    expect(eight).toHaveLength(8);
+    for (const r of eight) expect(r.startsWith('...')).toBe(false);
+    const nine = parseStoragePrices(junkOf(9)).rejections;
+    expect(nine).toHaveLength(9);
+    expect(nine[8]).toBe('...and 1 more rejection'); // singular at exactly one
+  });
+
+  it('the key echo truncates at EXACTLY 40 printable characters (QA 09)', async () => {
+    // Boundary arms for describeKey: a 40-char key echoes verbatim with no
+    // ellipsis (a '>' to '>=' mutant reds here), 41 truncates to 40 + '...'.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const at = parseStoragePrices(`{"${'k'.repeat(40)}":1}`);
+    expect(at.rejections[0]).toContain(`"${'k'.repeat(40)}"`);
+    expect(at.rejections[0]).not.toContain('...');
+    const over = parseStoragePrices(`{"${'k'.repeat(41)}":1}`);
+    expect(over.rejections[0]).toContain(`${'k'.repeat(40)}...`);
+    expect(over.rejections[0]).not.toContain('k'.repeat(41));
+  });
+
+  it('the parser safe-integer bound is exact at Number.MAX_SAFE_INTEGER (QA 09)', async () => {
+    // The resolver suite pins this edge sim-side; these arms pin the SERVER
+    // parser to the same boundary so the two validators cannot drift apart at
+    // it: 9007199254740991 is the last accepted price, 9007199254740992 (2^53,
+    // exactly representable, so JSON.parse hands it over intact) rejects.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const edge = parseStoragePrices('{"bankSockets":[9007199254740991,2,3,4]}');
+    expect(edge.rejections).toStrictEqual([]);
+    expect(edge.override).toStrictEqual({ bankSockets: [9007199254740991, 2, 3, 4] });
+    const past = parseStoragePrices('{"bankSockets":[9007199254740992,2,3,4]}');
+    expect(past.override).toBeUndefined();
+    expect(past.rejections[0]).toContain('unsafely large');
+  });
+
+  it('an EMPTY object is loud, never a second silent path beside unset (QA 09)', async () => {
+    // STORAGE_PRICES='{}' is a set-but-inert knob; silence is the unset
+    // signal, so the empty object reports like every other refusal.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const { override, rejections } = parseStoragePrices('{}');
+    expect(override).toBeUndefined();
+    expect(rejections).toStrictEqual(['the object names no price dimensions']);
+  });
+
+  it('the .env.example example payload actually parses clean to the compiled defaults (QA 09)', async () => {
+    // The documented operator example is EXECUTED through the real parser
+    // (an unexecuted embedded probe string can rot silently): it must apply
+    // all three dimensions with zero rejections, and its values must be the
+    // compiled defaults restated, so a table retune that forgets the doc row
+    // reds here instead of shipping a stale example.
+    const { parseStoragePrices } = await import('../../server/storage_prices');
+    const row = read('.env.example')
+      .split('\n')
+      .find((l) => l.startsWith('#STORAGE_PRICES='));
+    expect(row).toBeDefined();
+    const { override, rejections } = parseStoragePrices(
+      (row as string).slice('#STORAGE_PRICES='.length),
+    );
+    expect(rejections).toStrictEqual([]);
+    expect(override).toStrictEqual({
+      bankExpansions: [
+        500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1200000,
+      ],
+      bankSockets: [1000000, 2000000, 3500000, 5000000],
+      vaultUpgrades: [20000, 50000, 100000, 200000, 400000],
+    });
+  });
+
+  it('the override constant is genuinely FED by the env (the tunability claim itself)', () => {
+    // The DB_POOL_MAX_CLIENTS scrape idiom: comment-stripped first, so
+    // commenting the wiring out and re-exporting a hardcoded constant reds.
+    expect(codeOnly(read('server/storage_prices.ts'))).toContain(
+      'parseStoragePrices(process.env.STORAGE_PRICES)',
+    );
+  });
+
+  it('the boot SimConfig genuinely passes the constant into the Sim', () => {
+    // The assembly moved out of server/game.ts (monolith ratchet), so the
+    // owning file for this wiring pin is the boot-config builder.
+    expect(codeOnly(read('server/sim_boot_config.ts'))).toContain('storagePrices: STORAGE_PRICES');
+  });
+
+  it('the realm boot path genuinely consumes the boot-config builder', () => {
+    // Closes the chain the two pins above leave open: without this, game.ts
+    // could stop calling buildRealmSimConfig (re-inlining its own config) and
+    // both scrape pins would stay green while the knob went dead. The
+    // behavioral half rides tests/idle_mob_tick_radius.test.ts, which pins a
+    // BUILDER-set field on the constructed server sim's cfg.
+    // Whitespace-tolerant: biome wraps the call across lines.
+    expect(codeOnly(read('server/game.ts'))).toMatch(/new Sim\(\s*buildRealmSimConfig\(/);
   });
 });

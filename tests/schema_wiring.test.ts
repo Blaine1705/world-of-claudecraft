@@ -394,6 +394,20 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the storage pending-purchase schema under the advisory lock', async () => {
+    // STORAGE_PURCHASE_SCHEMA (server/storage_purchase_db.ts, Bank Storage
+    // phase 11): the whole Claudium storage purchase flow hard-depends on
+    // this table (the durable pending row IS the recovery story). Pin it by
+    // name so it can never regress to defined-but-unwired (the
+    // DISCORD_SCHEMA lesson).
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS storage_purchases');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_character');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_account');
+    expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_refused');
+  });
+
   it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
     // PROGRESS_EVENTS_SCHEMA (server/progress_events_db.ts),
     // ACCOUNT_ATTRIBUTION_SCHEMA (server/attribution_db.ts), and

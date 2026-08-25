@@ -3,7 +3,8 @@
 // sim entity count, achieved sim Hz, per-phase loop timing) plus the
 // throughput counters (ws frames handled, inbound frames dropped by cause,
 // flood kicks, input frames proven missed, chat messages, characters
-// created, guild-bank incidents by kind), all registered on the SAME prom-client
+// created, guild-bank incidents by kind, vault-ledger incidents by kind), all
+// registered on the SAME prom-client
 // registry the RED exporter builds
 // (server/http/metrics.ts). Prometheus attaches env / service=game / server_name at
 // scrape time, so nothing here emits those.
@@ -19,7 +20,8 @@
 // only label values are the fixed tick-phase names, the two per-phase stats
 // (p95, max), the two ws directions (in, out), the fixed inbound drop
 // causes (WS_DROP_CAUSES), the fixed guild-bank incident kinds
-// (GUILD_BANK_INCIDENTS), and the content-derived economy and fishing
+// (GUILD_BANK_INCIDENTS), the fixed vault-ledger incident kinds
+// (VAULT_LEDGER_INCIDENTS), and the content-derived economy and fishing
 // vocabularies (COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS, FISHING_BANDS,
 // ROD_FEE_RECIPE_IDS). Nothing per-player and nothing per-guild (account id,
 // character id, guild id, name, ip) is ever a label. The tick-phase series count is fixed at
@@ -71,6 +73,8 @@ import {
   type GeneralChatQuotaOutcome,
   GUILD_BANK_INCIDENTS,
   type GuildBankIncident,
+  VAULT_LEDGER_INCIDENTS,
+  type VaultLedgerIncident,
   WOC_ESCROW_QUEUE_OUTCOMES,
   type WocEscrowQueueOutcome,
   WS_DROP_CAUSES,
@@ -151,6 +155,11 @@ export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 
 /** Rift forge wire commands refused while the gate is closed (server/rift_forge_gate.ts). */
 export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
+
+/** Total Materials Vault ledger incidents, by kind. Its own metric rather than
+ *  a kind on the guild series: the vault is a personal per-character store, so
+ *  a guild-bank alert rule must never fire on it. */
+export const WOC_VAULT_LEDGER_INCIDENTS_TOTAL = 'woc_vault_ledger_incidents_total';
 
 /** Marketplace escrow-queue outcomes (the listing entry on the per-character
  *  save FIFO), by kind. */
@@ -549,6 +558,16 @@ export function registerGameStateMetrics(
   // operator alerts on, and an alert rule cannot fire on a series that does
   // not exist until its first incident.
   for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+
+  const vaultLedgerIncidents = new Counter({
+    name: WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
+    help: 'Total Materials Vault ledger incidents (a rejected bank_ledger insert leaves a hole the audit replay cannot see), by kind.',
+    labelNames: ['kind'],
+    registers: [registry],
+  });
+  // Same zero-backfill reasoning as the guild kinds above.
+  for (const kind of VAULT_LEDGER_INCIDENTS) vaultLedgerIncidents.inc({ kind }, 0);
+
   const wocEscrowQueue = new Counter({
     name: WOC_ESCROW_QUEUE_TOTAL,
     help: 'Marketplace escrow-queue outcomes on the per-character save FIFO custody entries (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed, realm_refused, settled, grant_busy), by kind.',
@@ -805,6 +824,14 @@ export function registerGameStateMetrics(
       } catch {
         // Drop the sample rather than propagate into the save / reconcile /
         // ledger path this measures (the whole point of measuring it).
+      }
+    },
+    vaultLedgerIncident(kind: VaultLedgerIncident): void {
+      try {
+        vaultLedgerIncidents.inc({ kind });
+      } catch {
+        // Drop the sample rather than propagate into the vault dispatch path
+        // this measures.
       }
     },
     copperCredited(source: CopperFlowSource, amount: number): void {

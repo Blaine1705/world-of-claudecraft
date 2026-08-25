@@ -24,6 +24,7 @@ import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import { createSimContext, type SimContextHost } from '../src/sim/sim_context';
 import { SpatialGrid } from '../src/sim/spatial';
+import { DEFAULT_STORAGE_PRICES } from '../src/sim/storage_prices';
 import type { Entity } from '../src/sim/types';
 
 type AnyEntity = Entity & Record<string, unknown>;
@@ -58,6 +59,7 @@ function makeCtx() {
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],
     nextRiftInstanceId: 1,

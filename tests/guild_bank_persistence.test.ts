@@ -18,6 +18,7 @@ const dbMock = vi.hoisted(() => ({
   // biome-ignore lint/suspicious/noExplicitAny: the hoisted double predates its typed impl
   saveCharacterAndMarketState: vi.fn(async (..._args: any[]) => true),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
 }));
 
@@ -43,6 +44,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
+  insertBankLedgerRows: dbMock.insertBankLedgerRows,
   loadGuildBankRows: dbMock.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),

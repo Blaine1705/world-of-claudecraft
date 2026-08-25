@@ -9,7 +9,7 @@
 // 20 Hz tick loop (sim.ts `tick()`, next to `updateRested`), so a grant only
 // ever takes effect on the deterministic tick path, never out of band.
 
-import { bagCapacity, bagsFullError, countFit } from '../bags';
+import { bagPools, bagsFullError, countFit } from '../bags';
 import { isActionLockingFormAuraKind } from '../combat/forms';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
@@ -921,8 +921,8 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     // unsigned top-up grant (the truncation contract wins over signing in
     // that self-inflicted edge; the crossing-case pin lives in
     // tests/gather_rare_events.test.ts).
-    const capacity = bagCapacity(meta.bags);
-    const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
+    const pools = bagPools(meta.bags);
+    const fit = countFit(meta.inventory, pools, itemId, qty, { signer: meta.name });
     if (fit > 0) {
       // One batched grant: a x5 windfall lands as ONE hub loot event
       // instead of five (the recorded loot-burst polish), which the gather

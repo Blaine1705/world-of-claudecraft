@@ -146,6 +146,7 @@ import {
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
+  type VaultInfo,
 } from '../world_api';
 import {
   type ActionBarLayout,
@@ -1625,6 +1626,32 @@ export class ClientWorld implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  // --- IWorldBank: Materials Vault contents view, the per-material store beside
+  // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
+  // The payload is OWNER-ONLY and never rides the interest-scoped entity
+  // broadcast: a vault is private character storage, so only the owning player's
+  // `self` block can ever carry it (and only while a banker gates it, like
+  // bankInfo above), which leaves this null away from a bursar. ---
+  vaultInfo: VaultInfo | null = null;
+  // --- IWorldBank: the craft-from-vault stock view (Bank Storage Phase 04),
+  // mirrored from the snapshot self (`s.cvault`, delta-omitted). Owner-only
+  // like vaultInfo, but gated on the craft-draw context predicate instead of
+  // banker proximity: null means vault reagent draw is unavailable HERE (an
+  // instanced or competitive context), {} means available but empty. ---
+  craftVaultStock: Record<string, number> | null = null;
+  // --- IWorldBank: this character's purchased ladder slots (Bank Storage phase
+  // 15), mirrored from the snapshot self (`bpsl`, delta-omitted). Owner-only
+  // like the three reads above, but gated on NOTHING: the Strongbox store opens
+  // anywhere and gates its charter list on this, so a proximity gate would
+  // reproduce the blindness it exists to close. The server emits it for the
+  // VIEWING session's own character rather than the spectate anchor, so this
+  // number always describes ONE character, and it only ever grows for as long as
+  // that character stays RESIDENT server-side (src/sim/bank.ts names the two
+  // reachable cases where a fresh join brings a LOWER count back into this same
+  // mirror, which is not reset on a reconnect). null until the first snapshot
+  // lands, which the fit gate reads as unknown (list everything), never as
+  // zero. ---
+  bankPurchasedSlots: number | null = null;
   // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
   // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
   // and outside a guild (proximity + membership gated by the server; ANY rank
@@ -3702,6 +3729,26 @@ export class ClientWorld implements IWorld {
       // "no bank"); away from a banker the server encodes it as null. Never default
       // to null/empty on omission, that would wipe an open bank window's mirror.
       if (s.bank !== undefined) this.bankInfo = s.bank;
+      // `vault` follows the same delta contract as `bank`: omitted means
+      // unchanged (never "no vault", so an omission must not wipe an open vault
+      // window's mirror), and away from a banker the server encodes it as an
+      // explicit null that clears it. The parsed object is adopted BY REFERENCE:
+      // a tolerated save can carry a dormant own '__proto__' key in `stock`, so
+      // this must never be rebuilt by keyed assignment or Object.assign.
+      if (s.vault !== undefined) this.vaultInfo = s.vault;
+      // `cvault` follows the same delta contract as `vault` (omitted means
+      // unchanged; the server encodes an explicit null when the craft-draw
+      // gate closes, e.g. entering a dungeon) and the same BY-REFERENCE
+      // adoption rule: the record can carry a dormant own '__proto__' key
+      // from a tolerated save, so it is never rebuilt by keyed assignment or
+      // Object.assign.
+      if (s.cvault !== undefined) this.craftVaultStock = s.cvault;
+      // `bpsl` follows the same delta contract as the three above: omitted means
+      // UNCHANGED, never "no ladder", so an omission must not reset the count a
+      // joined session already holds. The server always has an answer for a live
+      // session, so the `?? null` arm is the defensive one (a malformed frame),
+      // not a state the flow produces.
+      if (s.bpsl !== undefined) this.bankPurchasedSlots = s.bpsl ?? null;
       // `guildBank` follows the same delta contract; the server encodes null
       // away from a banker, on death, and outside a guild (the proximity +
       // membership gate lives in sim guildBankInfoFor; any rank sees it, the
@@ -5152,6 +5199,43 @@ export class ClientWorld implements IWorld {
   }
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
+  }
+  // --- IWorldBank: bank bag sockets (snake_case wire strings, Bank Storage
+  // phase 07: the command-schema triangle lands whole here, replacing the
+  // phase 06 no-op stubs). The server re-validates banker proximity, unlock
+  // order and exact copper, the payload-free bag rule, and the carried-side
+  // unsocket fit on every send; these are intent only. bankSocketBag mirrors
+  // equipBag's wire shape verbatim (`item` + optional `socket` + optional
+  // `slot` naming the exact carried copy). The socket READOUTS already ride
+  // bankInfo: the server serializes the sim's whole BankInfo, so the mirror
+  // above carries them with no per-field work. ---
+  bankUnlockSocket(): void {
+    this.cmd({ cmd: 'bank_unlock_socket' });
+  }
+  bankSocketBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket });
+    else this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket, slot: target.slotIndex });
+  }
+  bankUnsocketBag(socket: number): void {
+    this.cmd({ cmd: 'bank_unsocket_bag', socket });
+  }
+  // --- IWorldBank: Materials Vault deposit/withdraw/buy-upgrade (snake_case wire
+  // strings). vaultInfo is a snapshot read (the mirror field above); the server
+  // re-validates banker proximity, material scope, the per-material cap, and the
+  // exact upgrade copper on every send. Deposit rides the bank idiom (`slot` is a
+  // carried-inventory index, optional partial `count`); withdraw is keyed by
+  // `itemId` because vault stock has no slots to index. ---
+  vaultDeposit(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'vault_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  vaultWithdraw(itemId: string, count?: number): void {
+    this.cmd({ cmd: 'vault_withdraw', itemId, ...(count !== undefined ? { count } : {}) });
+  }
+  vaultDepositAll(): void {
+    this.cmd({ cmd: 'vault_deposit_all' });
+  }
+  vaultBuyUpgrade(): void {
+    this.cmd({ cmd: 'vault_buy_upgrade' });
   }
   // --- IWorldGuildBank: the officer-plus shared treasury + item store
   // (snake_case guild_bank_* wire strings, never a bank_* reuse). The server

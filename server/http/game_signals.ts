@@ -2,7 +2,8 @@
 // exporter (woc_ws_messages_total, woc_ws_messages_dropped_total,
 // woc_ws_rate_kicks_total, woc_input_frames_missed_total,
 // woc_chat_messages_total, woc_characters_created_total,
-// woc_guild_bank_incidents_total, woc_rift_forge_refused_total) reach the exporter
+// woc_guild_bank_incidents_total, woc_rift_forge_refused_total,
+// woc_vault_ledger_incidents_total) reach the exporter
 // through this one process-wide slot instead of each emission site (game.ts
 // message dispatch and inbound gate/lanes, chat routing, characters.ts create
 // path) threading a sink through its constructors. main.ts
@@ -18,7 +19,8 @@
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
 // inbound drop cause (the fixed eight-value WS_DROP_CAUSES set), the guild-bank
-// incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the copper-flow
+// incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the vault-ledger
+// incident kind (the fixed VAULT_LEDGER_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
 // server/economy_telemetry.ts), and the fishing band and rod recipe id (the
 // fixed sets in server/fishing_telemetry.ts, whose zone label reuses the same
@@ -198,6 +200,25 @@ export const WOC_ESCROW_QUEUE_OUTCOMES = [
 export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
 
 /**
+ * The Materials Vault ledger incident kinds (Bank Storage Phase 2). Its own
+ * closed set rather than a member of GUILD_BANK_INCIDENTS above: the vault is
+ * a PERSONAL, per-character store with no guild, no escrow, and no book, so
+ * folding its rows into the guild series would make every guild-bank alert
+ * rule fire on an unrelated container and make the guild numbers unreadable.
+ * - `ledger_write_failed`: a bank_ledger insert for a container='vault' row
+ *   rejected, so the audit trail (scripts/bank_audit.mjs) has a hole its
+ *   replay cannot see: that character's vault will reconcile as a permanent
+ *   ledger_state_mismatch and a real investigation would come up clean.
+ * This closed set IS the kind label's whole vocabulary; it never grows
+ * per-player (character id is NEVER a label; the log line beside each
+ * increment carries the identifying detail).
+ */
+export const VAULT_LEDGER_INCIDENTS = ['ledger_write_failed'] as const;
+
+/** One of the fixed vault-ledger incident kinds. */
+export type VaultLedgerIncident = (typeof VAULT_LEDGER_INCIDENTS)[number];
+
+/**
  * The game-state throughput emission hooks. Implementations must never
  * throw: an observability write can never be allowed to break the message,
  * chat, or character-create path it measures.
@@ -245,6 +266,14 @@ export interface GameMetricsCounters {
    *  production readout for the listing FIFO coupling, since a refused or
    *  slow queue is otherwise visible only as a throttled warn line. */
   wocEscrowQueue(outcome: WocEscrowQueueOutcome): void;
+  /**
+   * One Materials Vault ledger incident, by kind (see VAULT_LEDGER_INCIDENTS).
+   * The vault-container sibling of guildBankIncident above, emitted BESIDE the
+   * existing loud log and never instead of it. The personal-bank container has
+   * no counter of its own yet (a recorded follow-up), so a hole in a personal
+   * bank's trail is still log-only.
+   */
+  vaultLedgerIncident(kind: VaultLedgerIncident): void;
   /**
    * `amount` copper (always positive) credited to the acting player during a
    * command attributed to `source`. Sampled as the player's own copper delta
@@ -326,6 +355,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   characterCreated() {},
   guildBankIncident() {},
   wocEscrowQueue() {},
+  vaultLedgerIncident() {},
   copperCredited() {},
   copperSpent() {},
   harvest() {},

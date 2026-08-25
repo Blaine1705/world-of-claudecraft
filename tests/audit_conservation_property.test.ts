@@ -165,6 +165,11 @@ const store = vi.hoisted(() => {
         counterparty_count: row.counterpartyCount,
       });
     }),
+    // The batched sibling records through the same recorder so vault
+    // deposit-all rows land in the ledger with the same id sequence and shape.
+    insertBankLedgerRows: vi.fn(async (rows: Record<string, unknown>[]) => {
+      for (const row of rows) await store.insertBankLedgerRow(row);
+    }),
     loadGuildBankRows: vi.fn(async () =>
       [...bookRows.entries()].map(([guildId, data]) => ({
         guildId,
@@ -211,6 +216,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: store.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: store.saveCharacterAndMarketState,
   insertBankLedgerRow: store.insertBankLedgerRow,
+  insertBankLedgerRows: store.insertBankLedgerRows,
   loadGuildBankRows: store.loadGuildBankRows,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),

@@ -77,6 +77,13 @@ describe('gate cache inventory vs turbo.json', () => {
     const inputs = turboJson.tasks['i18n:gen'].inputs ?? [];
     expect(inputs.some((p) => p.includes('i18n.catalog'))).toBe(true);
     expect(inputs.some((p) => p.includes('i18n.locales'))).toBe(true);
+    // The sim/server matcher DICTs are i18n:gen inputs too: without these rows a
+    // warm turbo cache restores a stale i18n.status.json over freshly added sim
+    // rows (the exact bug the bank-storage phase 01 rider fixed; the sync pin
+    // above only proves turbo.json and gate_task_cache.mjs agree WITH EACH OTHER,
+    // so deleting the rows from both together would otherwise stay green).
+    expect(inputs.some((p) => p.includes('sim_i18n'))).toBe(true);
+    expect(inputs.some((p) => p.includes('server_i18n'))).toBe(true);
   });
 
   it('invalidates the server bundle when either Rift rollback migration source changes', () => {

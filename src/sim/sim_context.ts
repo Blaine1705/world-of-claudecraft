@@ -71,6 +71,7 @@ import type {
   SimEvent,
   SkinCatalog,
   StationDef,
+  StoragePrices,
   Vec3,
 } from './types';
 
@@ -181,7 +182,11 @@ export interface SimContextPrimitives {
   // temporary host-owned tick profiler probe), and `respawnSeconds` stays
   // possibly-undefined so respawn_policy.ts can tell an explicit host-pinned
   // global base from "fall through to the zone tier"; the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+  // `storagePrices` is consumed at construction like `noPlayer` (resolved once
+  // into the storagePrices view below), so it never rides cfg.
+  readonly cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'storagePrices'>
+  > &
     Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
@@ -1077,12 +1082,24 @@ export interface SimContextCallbacks {
 }
 
 // The seam consumed by extracted modules.
-export interface SimContext extends SimContextPrimitives, SimContextCallbacks {}
+export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
+  // The resolved storage price table (storage_prices.ts): bank expansions,
+  // bank bag sockets, vault rungs. Frozen at Sim construction from the
+  // cfg.storagePrices override; the ONE price truth every bank/vault charge
+  // and quote reads.
+  readonly storagePrices: StoragePrices;
+}
 
 // What `Sim` supplies to build a SimContext. Structurally identical to SimContext
 // today, but kept as its own name to make the data flow explicit (Sim -> host ->
 // context) and to let the consumed seam narrow independently of the provider later.
-export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {}
+// `storagePrices` is REQUIRED here, deliberately: a host that forgot to wire its
+// resolved table would otherwise silently charge compiled defaults under a live
+// override, so the compiler enforces the wiring (host fakes import
+// DEFAULT_STORAGE_PRICES for it).
+export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
+  readonly storagePrices: StoragePrices;
+}
 
 // Assemble the immutable SimContext from its host. The primitives stay LIVE (each
 // access reads through to the host, so `time`/`tickCount` reflect the current tick
@@ -1211,6 +1228,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get cfg() {
       return host.cfg;
+    },
+    get storagePrices() {
+      return host.storagePrices;
     },
     get riftCollisionToken() {
       return host.riftCollisionToken;

@@ -414,7 +414,26 @@ async function clearReliquaryPins(page) {
  *  survive; graphicsPreset 1 is PRESET_LOW in src/render/gfx.ts. The applied
  *  marker makes this an explicit choice, so first-run detection cannot replace
  *  the capture tier after boot. */
-async function seedLowGraphicsPreset(page) {
+/** The mobile frame a variant shoots at.
+ *
+ *  844x390 is the house frame. A variant may name a DIFFERENT short-phone size
+ *  when the change it documents is about the height budget itself: the Bank
+ *  Storage phase 18 footer overflow is 30px worse at 740x360 than at 844x390,
+ *  and one frame cannot show a range. Only width and height are overridable; the
+ *  touch flags, the scale factor and the UA stay the house frame's, or two legs
+ *  would differ in more than the thing being compared.
+ *
+ *  It lives HERE rather than in pr_screenshots.mjs, which launches a browser at
+ *  import time and can never be imported by a test. The target table declaring
+ *  a viewport proves nothing about whether the RUNNER applies it, and reading
+ *  the wrong property there would silently shoot two identical house frames in
+ *  the phase whose whole evidence is that the shorter one differs. */
+export function resolveMobileViewport(variant) {
+  const { width = 844, height = 390 } = variant?.viewport ?? {};
+  return { width, height };
+}
+
+export async function seedLowGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
     `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 1; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
   );
@@ -2064,6 +2083,161 @@ export const TARGETS = [
     },
   },
   {
+    key: 'bank-sockets',
+    label: 'Bank bag sockets: filled, empty, priced next-unlock, and later locked cells',
+    when: ['ui/bank_view', 'ui/bank_window', 'sim/bank_sockets', 'server/bank_wire'],
+    // Full frame like bank-chips: the bank docks the bags companion beside it,
+    // and the companion matters here (its bag cell is the socketing click).
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        try {
+          // Fund two unlocks (1000000 + 2000000 copper) and carry two bags, so
+          // the row shows every cell state at once after the staging below: a
+          // filled satchel, an empty unlocked socket, the priced next-unlock,
+          // and a later locked cell; the pouch stays in the bags companion as
+          // the visible socketing affordance.
+          const meta = sim.players.get(sim.playerId);
+          meta.copper += 3000000;
+          sim.addItem('linen_pouch', 1);
+          sim.addItem('burlap_reagent_pouch', 1);
+          // Stand beside the banker (the bank-chips idiom): every socket op
+          // and the proximity snapshot are nearBanker-gated.
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+          sim.bankUnlockSocket();
+          sim.bankUnlockSocket();
+          sim.bankSocketBag('burlap_reagent_pouch', undefined);
+        } catch {}
+        game?.hud?.openBank?.();
+      });
+      if (!(await pollForSize(page, '#bank-window .bank-sockets'))) {
+        throw new Error('bank socket row did not mount');
+      }
+      // Loud failure over a partial shot: the staging above is try/catch
+      // swallowed, so assert every cell state actually rendered.
+      const staged = await page.evaluate(() => {
+        const row = document.querySelector('#bank-window .bank-sockets');
+        if (!row) return false;
+        return (
+          !!row.querySelector('.bank-socket .item-icon') &&
+          !!row.querySelector('.bank-socket.empty') &&
+          row.querySelectorAll('.bank-socket.locked').length === 2 &&
+          !!row.querySelector('.bank-socket.locked:not([aria-disabled])')
+        );
+      });
+      if (!staged) throw new Error('socket row staging incomplete');
+      await wait(500);
+      return {};
+    },
+  },
+  {
+    key: 'bank-vault',
+    label: 'Materials Vault tab: the locked unlock offer and the stocked per-material rows',
+    // bank_buy_prompt is the shared confirm chrome all three bank panes
+    // mount; a change to it re-shoots this target so the vault confirms
+    // stay capture-verified.
+    when: ['ui/vault_view', 'ui/vault_window', 'ui/bank_buy_prompt', 'sim/materials_vault'],
+    // Full frame like bank-chips: the bank docks the bags companion beside it
+    // and a single-selector clip cannot union the two windows.
+    // locked-mobile exists because the locked pane is the ONE vault arm with
+    // no .bank-scroll (nothing scrolls if it overflows a short phone), so its
+    // phone rendering is verified by capture, not arithmetic (QA finding).
+    variants: [
+      { key: 'locked' },
+      { key: 'locked-mobile', mobile: true },
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+      // Phase 04 QA (the v0.36.0 merge-drift repair): the fine-grade pair.
+      // The base-only 'desktop'/'mobile' shots above double as the BEFORE
+      // images (a base-only stock renders byte-identically to the pre-repair
+      // pane); these stage a fine grade beside its base so the seal, the rim,
+      // and the base-adjacent sort are capture-verified on both form factors.
+      { key: 'fine', fine: true },
+      { key: 'fine-mobile', fine: true, mobile: true },
+    ],
+    async capture(page, variant) {
+      // A LATE swiftshader boot can outlive the shared flow's fallback; wait
+      // for the real player, then re-dismiss the overlays a late boot
+      // re-raises (the material-usedby recipe).
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      const locked = variant.key.startsWith('locked');
+      await page.evaluate(
+        (staging) => {
+          const isLocked = staging.locked;
+          const game = window.__game;
+          const sim = game?.sim;
+          try {
+            // Stand beside the banker FIRST: the vault ops and the proximity
+            // snapshot are both nearBanker-gated (the bank-chips idiom).
+            for (const e of sim.entities.values()) {
+              if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+                const p = sim.entities.get(sim.playerId);
+                p.pos = { ...e.pos };
+                p.prevPos = { ...p.pos };
+                sim.rebucket(p);
+                break;
+              }
+            }
+            const meta = sim.players.get(sim.playerId);
+            meta.copper = 200000;
+            // Honest materials in mixed states plus a consumable control that
+            // never crosses; the stocked variants sweep them in with the real
+            // batched command, then re-grant a couple so the bags stay busy.
+            sim.addItem('iron_ore', 12);
+            sim.addItem('rough_hide', 5);
+            sim.addItem('baked_bread', 3);
+            if (staging.fine) {
+              // The fine pair rides the same sweep: base and fine grades land
+              // as adjacent rows with the seal on the fine one.
+              sim.addItem('copper_ore', 6);
+              sim.addItem('fine_copper_ore', 2);
+            }
+            if (!isLocked) {
+              sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 40
+              sim.vaultDepositAll(); // the one batched sweep stocks the rows
+              sim.addItem('iron_ore', 4);
+            }
+          } catch {}
+          game?.hud?.openBank?.();
+        },
+        {
+          locked,
+          // NAMED HERE because this reduced object is the whole staging
+          // contract (the recorded first-capture gotcha: an unnamed variant
+          // flag is silently dropped).
+          fine: Boolean(variant?.fine),
+        },
+      );
+      if (!(await pollForSize(page, '#bank-window'))) {
+        throw new Error('bank window did not open');
+      }
+      // The strip renders because vaultInfo is live at the banker; a missing
+      // tab means the recipe (or the collapse rule) broke, so fail loudly.
+      const tabReady = await pollForSize(page, '#bank-window .bank-tab[data-tab="vault"]');
+      if (!tabReady) throw new Error('vault tab did not render');
+      await page.evaluate(() => {
+        const tab = document.querySelector('#bank-window .bank-tab[data-tab="vault"]');
+        if (tab) tab.click();
+      });
+      if (!(await pollForSize(page, '#bank-window .vault-pane'))) {
+        throw new Error('vault pane did not render after the tab click');
+      }
+      await wait(700);
+      return {};
+    },
+  },
+  {
     key: 'bank-instance-marks',
     label: 'Bank grid corner marks: masterwork seal, per-copy glyphs, and the fine-grade mark',
     when: [
@@ -2138,6 +2312,146 @@ export const TARGETS = [
       }
       await wait(700);
       return { clip: '#bank-window' };
+    },
+  },
+  {
+    key: 'bank-meter',
+    label: 'Bank capacity meter footer: both pool segments, staged in the gilded near-full state',
+    // No 'styles/components' entry: the shared stylesheet deliberately
+    // classifies to the generic HUD fallback (tests/pr_shot_targets.test.ts).
+    // A stylesheet-only meter retune therefore trades meter-specific evidence
+    // for the HUD frame BY POLICY (naming the shared sheet here would strip
+    // that fallback from every unrelated components.css diff).
+    //
+    // The two extracted siblings are here because the pixels went with them: a
+    // prefix list routes on the CHANGED path, so a diff confined to a module the
+    // painter now delegates to would capture no bank evidence and nothing would
+    // notice (Bank Storage phase 17's guard census; bank_rung_view.ts had been
+    // outside the route since phase 13, which is a gap that census surfaced
+    // rather than one phase 17 introduced).
+    when: [
+      'ui/bank_view',
+      'ui/bank_window',
+      'ui/bank_bonus_view',
+      'ui/bank_rung_view',
+      // The rung CONTROLLER paints nothing itself, and is here anyway: it decides
+      // WHICH result band the footer shows, whether the top-up handoff opens
+      // instead of a band, and whether a re-prompt reopens. Every one of those is
+      // a visible change to the strip beside the meter, and routing on the
+      // changed PATH is the only signal this list gets.
+      'ui/bank_rung_purchase_core',
+      // The short-phone chrome contract (Bank Storage phase 18). It decides
+      // whether the footer this target exists to photograph is inside the
+      // window at all, and it carries the pane's scroll offset, so a change
+      // confined to it is a change to these pixels.
+      'ui/bank_chrome_layout_core',
+      // The meter's own copy: its accessible name and tooltip body.
+      'ui/bank_meter_view',
+    ],
+    // TWO mobile frames, because this footer's defect was a HEIGHT budget and
+    // the shorter phone is 30px worse. The house 844x390 frame plus the
+    // 740x360 floor the live geometry check also drives.
+    // LOW preset on every leg (the standing capture rule): the mobile frames go
+    // FULL FRAME, so the world behind the pane is in the shot and the tier is
+    // not the no-op it is for a clipped, pure-DOM surface.
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+      {
+        key: 'mobile-short',
+        mobile: true,
+        viewport: { width: 740, height: 360 },
+        beforeLoad: seedLowGraphicsPreset,
+      },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        try {
+          // Stand beside the banker FIRST (the bank-sockets idiom): every
+          // bank op and the proximity snapshot are nearBanker-gated.
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'npc' && e.templateId === 'bursar_fernando') {
+              const p = sim.entities.get(sim.playerId);
+              p.pos = { ...e.pos };
+              p.prevPos = { ...p.pos };
+              sim.rebucket(p);
+              break;
+            }
+          }
+          // Fund the first socket unlock and socket the 8-slot materials
+          // pouch, so the meter honestly shows BOTH pool segments and the
+          // hairline divider, not a general-only bar.
+          const meta = sim.players.get(sim.playerId);
+          meta.copper += 1100000;
+          sim.addItem('burlap_reagent_pouch', 1);
+          sim.bankUnlockSocket();
+          sim.bankSocketBag('burlap_reagent_pouch', undefined);
+          // Partially stock the materials pool: 40 ore = 2 stacks = 2 of the
+          // pouch's 8 slots (materials-first allocation), a visible calm fill
+          // beside the near-full gold segment.
+          sim.addItem('iron_ore', 40);
+          for (let guard = 0; guard < 4; guard++) {
+            const at = sim.inventory.findIndex((s) => s?.itemId === 'iron_ore');
+            if (at < 0) break;
+            sim.bankDeposit(at);
+          }
+          // Drive the GENERAL pool to the gilded threshold (at or above 85
+          // percent) with unstackable tools (kind 'tool': one slot per copy),
+          // in add-then-deposit waves so the carried bags never overflow.
+          // Reading generalUsed/generalCapacity off the live bankInfo keeps
+          // the staging honest against future base-capacity retunes.
+          for (let wave = 0; wave < 8; wave++) {
+            const info = sim.bankInfo;
+            if (!info) break;
+            const target = Math.ceil(info.generalCapacity * 0.85);
+            if (info.generalUsed >= target) break;
+            const missing = Math.min(8, target - info.generalUsed);
+            for (let j = 0; j < missing; j++) sim.addItem('simple_fishing_pole', 1);
+            for (let guard = 0; guard < 12; guard++) {
+              const at = sim.inventory.findIndex((s) => s?.itemId === 'simple_fishing_pole');
+              if (at < 0) break;
+              sim.bankDeposit(at);
+            }
+          }
+        } catch {}
+        game?.hud?.openBank?.();
+      });
+      if (!(await pollForSize(page, '#bank-window'))) {
+        throw new Error('bank window did not open');
+      }
+      // Loud failure over a partial shot (the staging above is try/catch
+      // swallowed): the footer, both meter segments, the visible numbers, and
+      // the staged near-full class must all actually be up. Distinct messages
+      // so a drift names the broken half: staging (near-full missing) vs
+      // markup (footer/meter missing).
+      const staged = await page.evaluate(() => {
+        const footer = document.querySelector('#bank-window .bank-footer');
+        if (!footer) return 'no-footer';
+        const meter = footer.querySelector('.bank-meter');
+        if (
+          !meter?.querySelector('.bank-meter-seg-general .bank-meter-fill') ||
+          !meter.querySelector('.bank-meter-seg-materials .bank-meter-fill')
+        ) {
+          return 'no-meter';
+        }
+        if (!footer.querySelector('.bank-meter-text')?.textContent) return 'no-text';
+        if (!footer.classList.contains('near-full')) return 'not-near-full';
+        return 'ok';
+      });
+      if (staged === 'no-footer') throw new Error('bank footer did not mount');
+      if (staged === 'no-meter') throw new Error('meter did not render both pool segments');
+      if (staged === 'no-text') throw new Error('meter numbers line is empty');
+      if (staged === 'not-near-full') {
+        throw new Error('general pool staging missed the near-full threshold');
+      }
+      await wait(700);
+      // Desktop clips to the window; the mobile pairing goes full frame like
+      // bank-chips (the docked bags companion breaks a single-selector clip,
+      // and the full frame is what verifies the footer on the phone layout).
+      const mobile = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
+      return mobile ? {} : { clip: '#bank-window' };
     },
   },
   {
@@ -3084,6 +3398,39 @@ export const TARGETS = [
       // earlier variant left in the shared browser's localStorage (alchemy,
       // via the bag-freshness pair), and a solo re-shoot differed from a
       // full-run one.
+      // Bank Storage Phase 04 (craft-from-vault): the arming sword ONE
+      // wolf_fang short in the bags. The -before pair stages the identical
+      // scene with an EMPTY vault, which renders byte-identically to the
+      // pre-phase window (the null-vault byte-identity is test-pinned), so
+      // the pair is an honest before/after without a second checkout: before
+      // reads x1/2 disabled, after reads x2/2 with the "(draws 1 from your
+      // vault)" suffix and a live Craft button.
+      { key: 'desktop-vault-draw-before', vaultDraw: 'before', selectTab: 'weaponcrafting' },
+      { key: 'desktop-vault-draw', vaultDraw: 'after', selectTab: 'weaponcrafting' },
+      {
+        key: 'mobile-vault-draw-before',
+        vaultDraw: 'before',
+        mobile: true,
+        selectTab: 'weaponcrafting',
+      },
+      { key: 'mobile-vault-draw', vaultDraw: 'after', mobile: true, selectTab: 'weaponcrafting' },
+      // Phase 04 QA: the place-blocked vault note. The after arm stands the
+      // SAME one-fang-short scene (vault stocked) on the instance plane,
+      // where craftVaultStock is null and the window states the reason in
+      // words. The -before arm stages the shortfall in the open world with
+      // an empty vault, which renders byte-identically to the pre-fix
+      // blocked window (bare short row, no note; the null-default
+      // byte-identity is test-pinned), so the pair is honest without a
+      // second checkout.
+      { key: 'desktop-vault-note-before', vaultNote: 'before', selectTab: 'weaponcrafting' },
+      { key: 'desktop-vault-note', vaultNote: 'after', selectTab: 'weaponcrafting' },
+      {
+        key: 'mobile-vault-note-before',
+        vaultNote: 'before',
+        mobile: true,
+        selectTab: 'weaponcrafting',
+      },
+      { key: 'mobile-vault-note', vaultNote: 'after', mobile: true, selectTab: 'weaponcrafting' },
       { key: 'desktop-identity-attuned', identity: true, selectTab: 'alchemy' },
       { key: 'mobile-identity-attuned', identity: true, mobile: true, selectTab: 'alchemy' },
       {
@@ -3124,6 +3471,60 @@ export const TARGETS = [
             } catch {}
             const meta = sim?.players?.get(sim.primaryId);
             if (meta) meta.craftSkills = { ...meta.craftSkills, armorcrafting: 80 };
+          }
+          if (staging.vaultDraw) {
+            // Phase 04: one wolf_fang short in the bags; the after arm stocks
+            // the vault so the shortfall becomes a stated vault draw. One try
+            // per grant so a single bad id cannot silently starve the rest.
+            for (const [id, n] of [
+              ['wolf_fang', 1],
+              ['bone_fragments', 4],
+              ['smithing_flux', 6],
+            ]) {
+              try {
+                sim?.addItem(id, n);
+              } catch {}
+            }
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) {
+              meta.knownRecipes.add('recipe_eastbrook_arming_sword');
+              if (staging.vaultDraw === 'after') {
+                meta.vault.upgrades = 1;
+                meta.vault.stock = { wolf_fang: 4 };
+              }
+            }
+          }
+          if (staging.vaultNote) {
+            // Phase 04 QA: the same one-wolf_fang-short bag state as the
+            // vault-draw pair. The after arm ALSO stocks the vault (the
+            // narrative point: the vault that satisfies this craft in town
+            // cannot help here) and stands the body east of the dungeon
+            // threshold, where vaultDrawBlocked's geometry backstop refuses:
+            // the row reads short and the note renders. The before arm stays
+            // in the open world with the vault untouched.
+            for (const [id, n] of [
+              ['wolf_fang', 1],
+              ['bone_fragments', 4],
+              ['smithing_flux', 6],
+            ]) {
+              try {
+                sim?.addItem(id, n);
+              } catch {}
+            }
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) meta.knownRecipes.add('recipe_eastbrook_arming_sword');
+            if (staging.vaultNote === 'after' && meta) {
+              meta.vault.upgrades = 1;
+              meta.vault.stock = { wolf_fang: 4 };
+              try {
+                const p = sim?.entities?.get(sim.playerId);
+                if (p) {
+                  p.pos = { ...p.pos, x: 200000 };
+                  p.prevPos = { ...p.pos };
+                  sim.rebucket(p);
+                }
+              } catch {}
+            }
           }
           if (staging.identity) {
             // The identity-card framings (phase 22): stub the IWorld read with
@@ -3174,6 +3575,15 @@ export const TARGETS = [
           fourStates: Boolean(variant?.fourStates),
           discount: Boolean(variant?.discount),
           identity: Boolean(variant?.identity),
+          // 'before' | 'after' | null (Phase 04): a string, not a boolean,
+          // because the two arms stage the same scene with and without the
+          // stocked vault.
+          vaultDraw: variant?.vaultDraw ?? null,
+          // 'before' | 'after' | null (Phase 04 QA): the place-blocked note
+          // pair. NAMED HERE because this reduced object is the whole staging
+          // contract: an unnamed variant flag is silently dropped (the
+          // recorded first-capture gotcha).
+          vaultNote: variant?.vaultNote ?? null,
         },
       );
       // A first-open crafting window with several icon-bearing recipe rows takes

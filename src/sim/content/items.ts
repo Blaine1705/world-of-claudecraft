@@ -523,6 +523,47 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     bagSlots: 14,
     sellValue: 9000,
   },
+  // The one rare world-drop bag, and the joint-largest general bag at 16 slots
+  // (the crafted Resonantweave Bag is the deterministic route to the same
+  // ceiling). Drop-only, so no buyValue and no market seed row: it stays
+  // player-listed the way every other drop does.
+  wayfarers_backpack: {
+    id: 'wayfarers_backpack',
+    name: "Wayfarer's Backpack",
+    kind: 'bag',
+    quality: 'rare',
+    bagSlots: 16,
+    sellValue: 3800,
+  },
+  // --- materials-only satchels (materialsOnly: true). Their bagSlots feed the
+  // second, materials-only pool instead of the general one, so the capacity
+  // they add is usable only by items in the derived material taxonomy. The
+  // trade is the point: more total room, but the extra room is specialized.
+  // See src/sim/bag_pools.ts for the pool arithmetic. ---
+  // The entry rung, and the only materials satchel a vendor stocks. Priced
+  // under the general 8-slot Traveler's Knapsack (2000) because it carries
+  // strictly less: same slot count, restricted contents.
+  burlap_reagent_pouch: {
+    id: 'burlap_reagent_pouch',
+    name: 'Burlap Reagent Pouch',
+    kind: 'bag',
+    quality: 'common',
+    bagSlots: 8,
+    materialsOnly: true,
+    sellValue: 250,
+    buyValue: 1000,
+  },
+  // The dungeon rung: Grand Necromancer Velkhar's hoard in the Gravewyrm
+  // Sanctum. Same drop shape as the Gravewoven Bag on Morthen.
+  necromancers_reagent_satchel: {
+    id: 'necromancers_reagent_satchel',
+    name: "Necromancer's Reagent Satchel",
+    kind: 'bag',
+    quality: 'rare',
+    bagSlots: 20,
+    materialsOnly: true,
+    sellValue: 4200,
+  },
   // --- food & drink (vendor, fished, conjured; see also zone2.ts/zone3.ts and
   // profession_items.ts for the higher zone-bracket and crafted-cooking tiers).
   // #1608: eating now STACKS with natural hp regen instead of replacing it
