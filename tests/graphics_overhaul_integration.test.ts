@@ -48,7 +48,7 @@ describe('graphics-overhaul integration', () => {
   it('routes reduced motion through every occluder-fade consumer', () => {
     const consumers = [
       'src/render/props.ts',
-      'src/render/foliage.ts',
+      'src/render/tree_hide_fade.ts',
       'src/render/arena_wall_fade.ts',
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',

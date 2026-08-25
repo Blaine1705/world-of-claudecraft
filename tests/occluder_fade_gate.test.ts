@@ -472,7 +472,7 @@ describe('wiring (source pins)', () => {
   });
 
   it('the tree hides consult the pool for every part and prefetch within reach', () => {
-    const foliage = read('src/render/foliage.ts');
+    const foliage = read('src/render/tree_hide_fade.ts');
     // The decision itself is the pure occluderKeepsInstances (truth table in
     // tests/occluder_fade_core.test.ts); the painter only feeds it.
     expect(foliage).toContain('occluderKeepsInstances(hide, t.ghosts.length > 0, ghosts, t.parts)');
@@ -650,7 +650,7 @@ describe('second-pass contracts', () => {
     expect(read('src/render/battleground_placements.ts')).toContain(
       'occluderKeepsInstances(hide, o.parts[0].ghost !== null, ghosts, o.parts)',
     );
-    expect(read('src/render/foliage.ts')).toContain(
+    expect(read('src/render/tree_hide_fade.ts')).toContain(
       'occluderKeepsInstances(hide, t.ghosts.length > 0, ghosts, t.parts)',
     );
   });
