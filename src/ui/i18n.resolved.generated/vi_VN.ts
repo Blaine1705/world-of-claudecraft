@@ -441,7 +441,7 @@ export const vi_VN: EnTranslations = {
       "remainingDaysHours": "{days} ngày {hours} giờ",
       "score": "Điểm",
       "walletValue": "Giá Trị Ví (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Không rõ",
       "spinTitle": "Vòng Quay Hằng Ngày",
@@ -483,85 +483,85 @@ export const vi_VN: EnTranslations = {
       }
     },
     "trade": {
-      "windowClosed": "Trade window closed.",
+      "windowClosed": "Cửa sổ giao dịch đã đóng.",
       "woc": {
-        "tabGold": "Gold",
+        "tabGold": "Vàng",
         "tabWoc": "$WOC",
-        "modesLabel": "Payment currency",
-        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
-        "priceLabel": "Price in USD",
+        "modesLabel": "Loại tiền thanh toán",
+        "tabWocHint": "Thanh toán bằng $WOC chỉ khả dụng khi phía bàn giao dịch của bạn trống và không có vàng nào được đề nghị.",
+        "priceLabel": "Giá bằng USD",
         "pricePlaceholder": "0.00",
-        "equivalent": "About {tokens} $WOC at the current rate",
-        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
-        "feeLine": "Exchange fee {fee}, taken out of the price.",
-        "netLine": "You receive {net}",
-        "netLineBuyer": "The seller receives {net}",
-        "sendOffer": "Offer $WOC",
-        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
-        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
-        "incomingAccept": "{name} offers {price} for your items.",
-        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
-        "blockDisabled": "The $WOC Exchange is not available on this realm.",
-        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
-        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
-        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
-        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
-        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
-        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
-        "hintEnterPrice": "Enter a price in USD.",
-        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
-        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
-        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
-        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
-        "incomingTitle": "$WOC offer from {name}",
-        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "equivalent": "Khoảng {tokens} $WOC theo tỷ giá hiện tại",
+        "variableWarning": "Số lượng $WOC hiển thị chỉ là ước tính, không phải giá cố định. Con số chính xác được xác định bởi một báo giá mới khi bạn thanh toán.",
+        "feeLine": "Phí Sàn {fee}, được trừ vào giá bán.",
+        "netLine": "Bạn nhận được {net}",
+        "netLineBuyer": "Người bán nhận được {net}",
+        "sendOffer": "Đề nghị $WOC",
+        "offerSent": "Đã gửi lời đề nghị. Nó sẽ hết hạn sau 10 phút trừ khi {name} chấp nhận.",
+        "offerSentUntil": "Đã gửi lời đề nghị. Nó sẽ hết hạn lúc {time} trừ khi {name} chấp nhận.",
+        "incomingAccept": "{name} đề nghị {price} cho các vật phẩm của bạn.",
+        "notInstant": "Một giao dịch $WOC không diễn ra tức thì. Vật phẩm sẽ được đưa vào ký quỹ ngay khi cả hai bên chấp nhận, và đến tay người mua khi thanh toán được xác minh.",
+        "blockDisabled": "Sàn $WOC không khả dụng trên thế giới này.",
+        "blockNoWallet": "Liên kết và xác minh một ví để bán vật phẩm lấy $WOC.",
+        "blockPartnerUnknown": "Đang kiểm tra xem người chơi đó có thể nhận $WOC hay không...",
+        "blockRecipientNoWallet": "Người chơi đó phải kết nối một ví để nhận thanh toán $WOC.",
+        "hintClearYourItems": "Hãy gỡ vật phẩm của chính bạn ra: một lời đề nghị $WOC chỉ mua thứ họ đang bán.",
+        "hintAwaitTheirItems": "Đang chờ họ đề nghị thứ gì đó có thể bán lấy $WOC.",
+        "hintOneItem": "Một giao dịch $WOC chỉ áp dụng cho đúng một vật phẩm. Chỉ vật phẩm đang được bán mới được đặt lên bàn giao dịch.",
+        "hintEnterPrice": "Nhập một mức giá bằng USD.",
+        "hintAcceptNeedsItem": "Hãy thêm vật phẩm bạn đang bán trước khi chấp nhận.",
+        "hintAcceptLocked": "Vật phẩm đó đang bị khóa. Hãy mở khóa nó trong túi đồ, sau đó gỡ nó khỏi giao dịch và thêm lại.",
+        "hintGoldOffered": "Hãy gỡ đề nghị bằng vàng của bạn trước: một giao dịch chỉ có thể dùng vàng hoặc $WOC, không thể cả hai.",
+        "ineligibleReason": "Vật phẩm ràng buộc linh hồn, vật phẩm nhiệm vụ, vật phẩm bị khóa, và vật phẩm ngoài các danh mục của Sàn đều không thể bán lấy $WOC.",
+        "incomingTitle": "Lời đề nghị $WOC từ {name}",
+        "incomingBody": "{name} đề nghị bán cho bạn {item} với giá {price}.",
         "moneyUsd": "{usd}",
         "moneyLine": "{usd} (~ {tokens} $WOC)",
-        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
-        "payNow": "Pay {usd}",
-        "awaitingPayment": "Waiting for payment confirmation...",
-        "paying": "Confirm the payment in your wallet...",
-        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
-        "settledSeller": "Paid. The item was delivered to the buyer.",
-        "accept": "Accept offer",
-        "accepted": "Offer accepted. Your item is held until payment is verified.",
-        "decline": "Decline",
-        "withdraw": "Withdraw offer",
-        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
-        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
-        "statusPayingBuyer": "Confirming your payment on the network...",
-        "statusPayingSeller": "The buyer's payment is confirming on the network...",
-        "statusReviewBuyer": "Your payment is under review.",
-        "statusReviewSeller": "The buyer's payment is under review.",
-        "paidSeller": "You have received a payment of {price} for your {item}.",
-        "paidBuyer": "You have sent a payment of {price} for {item}.",
-        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
-        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
-        "cancelSale": "Cancel sale",
-        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
-        "youDeclined": "You declined the offer.",
-        "youWithdrew": "You withdrew your offer.",
-        "offerNotPending": "This offer is no longer pending.",
-        "offerDeclined": "The $WOC offer was declined.",
-        "offerWithdrawn": "The $WOC offer was withdrawn.",
-        "offerExpired": "The $WOC offer expired.",
-        "offerExpiresAt": "Offer expires at {time}.",
-        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
-        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
-        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
-        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
-        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
-        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
-        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
-        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
-        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
-        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
-        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
-        "hintBelowMin": "The Exchange minimum price is {usd}."
+        "waitingOther": "Đã chấp nhận lời đề nghị. Đang chờ người chơi còn lại chấp nhận.",
+        "payNow": "Thanh toán {usd}",
+        "awaitingPayment": "Đang chờ xác nhận thanh toán...",
+        "paying": "Hãy xác nhận thanh toán trong ví của bạn...",
+        "settled": "Đã thanh toán. Vật phẩm của bạn đang ở trong túi đồ, hoặc sẽ đến qua thư Bưu Quạ nếu túi đã đầy.",
+        "settledSeller": "Đã thanh toán. Vật phẩm đã được giao cho người mua.",
+        "accept": "Chấp nhận lời đề nghị",
+        "accepted": "Đã chấp nhận lời đề nghị. Vật phẩm của bạn được giữ lại cho đến khi thanh toán được xác minh.",
+        "decline": "Từ chối",
+        "withdraw": "Rút lời đề nghị",
+        "hintInsufficientBalance": "Số $WOC đó nhiều hơn số dư trong ví đã kết nối của bạn.",
+        "statusAwaitingBuyer": "Đang chờ người mua thanh toán.",
+        "statusPayingBuyer": "Đang xác nhận khoản thanh toán của bạn trên mạng lưới...",
+        "statusPayingSeller": "Khoản thanh toán của người mua đang được xác nhận trên mạng lưới...",
+        "statusReviewBuyer": "Khoản thanh toán của bạn đang được xem xét.",
+        "statusReviewSeller": "Khoản thanh toán của người mua đang được xem xét.",
+        "paidSeller": "Bạn đã nhận được khoản thanh toán {price} cho {item} của bạn.",
+        "paidBuyer": "Bạn đã gửi khoản thanh toán {price} cho {item}.",
+        "closedCancelled": "Giao dịch này đã bị hủy. Vật phẩm sẽ được trả về cho người bán qua thư Bưu Quạ.",
+        "closedSuspended": "Giao dịch này đã bị một Quản Trò tạm ngưng. Vật phẩm sẽ được trả về cho người bán qua thư Bưu Quạ.",
+        "closedUnpaid": "Giao dịch này đã kết thúc mà không có thanh toán. Vật phẩm sẽ được trả về cho người bán qua thư Bưu Quạ.",
+        "closedUnpaidBuyer": "Giao dịch này đã kết thúc vì bạn không thanh toán. Vật phẩm sẽ được trả về cho người bán qua thư Bưu Quạ; không thanh toán một thỏa thuận đã chấp nhận sẽ khiến bạn nhận một lần vi phạm trên Sàn.",
+        "cancelSale": "Hủy giao dịch",
+        "cancelPendingSeller": "Đã yêu cầu hủy. Giao dịch sẽ tự kết thúc trừ khi người mua thanh toán trước.",
+        "youDeclined": "Bạn đã từ chối lời đề nghị.",
+        "youWithdrew": "Bạn đã rút lời đề nghị của mình.",
+        "offerNotPending": "Lời đề nghị này không còn đang chờ xử lý nữa.",
+        "offerDeclined": "Lời đề nghị $WOC đã bị từ chối.",
+        "offerWithdrawn": "Lời đề nghị $WOC đã bị rút lại.",
+        "offerExpired": "Lời đề nghị $WOC đã hết hạn.",
+        "offerExpiresAt": "Lời đề nghị hết hạn lúc {time}.",
+        "offerStandsUntil": "Lời đề nghị $WOC của bạn vẫn còn hiệu lực đến {time}. Hãy giao dịch lại với người bán để hoàn tất thỏa thuận nếu họ chấp nhận.",
+        "dealAwaitsPayment": "Giao dịch mua $WOC của bạn vẫn chưa được thanh toán. Hãy giao dịch lại với người bán để thanh toán; thỏa thuận sẽ tự hết hạn nếu bạn không làm vậy, và việc không thanh toán sẽ khiến bạn nhận một lần vi phạm trên Sàn.",
+        "closeSellerHold": "Vật phẩm của bạn vẫn được giữ lại chờ thanh toán từ người mua. Hãy hủy giao dịch từ thẻ Hoạt Động của Sàn $WOC nếu bạn đổi ý.",
+        "closePaymentContinuesBuyer": "Khoản thanh toán của bạn vẫn đang được xác nhận. Việc giao hàng sẽ tự hoàn tất.",
+        "closePaymentContinuesSeller": "Khoản thanh toán của người mua vẫn đang được xác nhận. Giao dịch sẽ tự hoàn tất.",
+        "p2pBindingNote": "Khi cả hai bên đã chấp nhận, thanh toán phải được thực hiện trong vòng {duration}, hoặc trong khoảng thời gian ngắn hơn được mở ra khi bạn nhấn Thanh Toán. Không thanh toán sẽ khiến bạn nhận một lần vi phạm trên Sàn.",
+        "p2pBindingNoteUntimed": "Khi cả hai bên đã chấp nhận, thanh toán phải được thực hiện ngay sau đó, hoặc trong khoảng thời gian ngắn hơn được mở ra khi bạn nhấn Thanh Toán. Không thanh toán sẽ khiến bạn nhận một lần vi phạm trên Sàn.",
+        "p2pPaymentDueAt": "Thanh toán phải được thực hiện trước {time}. Không thanh toán sẽ khiến bạn nhận một lần vi phạm trên Sàn.",
+        "quoteExpiredTrade": "Báo giá đã hết hạn. Nhấn Không phải bây giờ, rồi nhấn Thanh Toán lại để lấy một báo giá mới.",
+        "quoteStaged": "Báo giá thanh toán đã sẵn sàng cho {usd}: {tokens} $WOC, có hiệu lực đến {time}.",
+        "paymentConfirmed": "Đã xác nhận thanh toán. Vật phẩm của bạn sẽ xuất hiện trong túi đồ, hoặc qua thư Bưu Quạ nếu túi đã đầy, khi việc giao hàng hoàn tất.",
+        "statusConfirmedBuyer": "Đã xác nhận thanh toán. Đang hoàn tất giao hàng...",
+        "statusConfirmedSeller": "Đã xác nhận thanh toán. Đang hoàn tất giao dịch...",
+        "hintBelowMin": "Giá tối thiểu trên Sàn là {usd}."
       }
     },
     "wocStore": {
@@ -938,7 +938,7 @@ export const vi_VN: EnTranslations = {
       "jump": "Nhảy",
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
-      "wocMarket": "Exchange",
+      "wocMarket": "Sàn Giao Dịch",
       "deeds": "Kỳ Công",
       "mounts": "Thú Cưỡi",
       "professions": "Nghề nghiệp",
@@ -952,62 +952,62 @@ export const vi_VN: EnTranslations = {
       "actionRing": "Hành động chiến đấu",
       "actionPageToggle": "Chuyển trang hành động",
       "actionPageIndicator": "Trang {page}",
-      "actionRadial": "Action directions",
-      "actionRadialCancel": "Cancel action",
-      "radialCenter": "Centre",
-      "radialUp": "Up",
-      "radialRight": "Right",
-      "radialDown": "Down",
-      "radialLeft": "Left",
-      "consumableSeat": "Consumables",
-      "menuControl": "Menus",
-      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
-      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "actionRadial": "Các hướng hành động",
+      "actionRadialCancel": "Hủy hành động",
+      "radialCenter": "Giữa",
+      "radialUp": "Lên",
+      "radialRight": "Phải",
+      "radialDown": "Xuống",
+      "radialLeft": "Trái",
+      "consumableSeat": "Vật Phẩm Tiêu Hao",
+      "menuControl": "Menu",
+      "menuControlAria": "Menu. Chạm để mở trò chuyện, hoặc giữ và vuốt sang phải để mở vật cưỡi, bản đồ, túi đồ và nhiều hơn nữa.",
+      "menuControlAriaTap": "Menu. Chạm để mở hàng menu: vật cưỡi, bản đồ, túi đồ và nhiều hơn nữa. Chạm lần nữa để mở trò chuyện.",
       "menuLabel": "Menu",
-      "quickActions": "Quick Actions",
-      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
-      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
-      "quickActionsLabel": "Actions",
-      "stanceRadial": "Stances",
-      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
-      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
-      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
-      "questStripAriaSingle": "Tracked quest: {title}",
+      "quickActions": "Hành Động Nhanh",
+      "quickActionsAria": "Hành Động Nhanh. Chạm để mở hàng vật cưỡi, trò chuyện, bản đồ, túi đồ và nhiều hơn nữa, hoặc giữ và vuốt sang phải để chọn một mục.",
+      "quickActionsAriaTap": "Hành Động Nhanh. Chạm để mở hàng vật cưỡi, trò chuyện, bản đồ, túi đồ và nhiều hơn nữa, rồi chạm vào một mục. Chạm lại vào nút điều khiển để đóng.",
+      "quickActionsLabel": "Hành Động",
+      "stanceRadial": "Thế Đứng",
+      "stanceAnchorAria": "Thế đứng: {stance}. Chạm để mở vòng thế đứng, rồi chọn một thế đứng khác.",
+      "stanceAnchorEmptyAria": "Chưa có thế đứng. Chạm để mở vòng thế đứng, rồi chọn một thế đứng.",
+      "questStripAria": "Nhiệm vụ đang theo dõi {position} trên {total}: {title}. Kích hoạt để xem nhiệm vụ tiếp theo.",
+      "questStripAriaSingle": "Nhiệm vụ đang theo dõi: {title}",
       "questStripCounter": "{position}/{total}",
-      "questStripMore": "+{count} more",
+      "questStripMore": "+{count} nữa",
       "targetCycle": "Hoán đổi mục tiêu",
       "targetCycleShort": "Mục tiêu",
       "spellbookPageLabel": "Trang {page}",
       "hideKeyboard": "Ẩn bàn phím",
       "chatPlaceholder": "Nói gì đó...",
-      "barEditor": "Edit Bars",
-      "barEditorAria": "Edit the action bar layout"
+      "barEditor": "Chỉnh Sửa Thanh",
+      "barEditorAria": "Chỉnh sửa bố cục thanh hành động"
     },
     "barEditor": {
-      "title": "Edit Action Bar",
-      "close": "Close bar editor",
-      "pages": "Action bar pages",
-      "pageTab": "Page {page}",
-      "buttonHeader": "Button {button}",
-      "cellAria": "Button {button}, {direction}: {action}",
-      "emptyCellAria": "Button {button}, {direction}: empty",
-      "hint": "Tap a slot, then another, to swap them.",
-      "armed": "Tap a slot to place {name}.",
-      "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options.",
-      "clear": "Clear",
-      "clearAria": "Clear a slot",
-      "clearArmed": "Tap a slot to clear it."
+      "title": "Chỉnh Sửa Thanh Hành Động",
+      "close": "Đóng trình chỉnh sửa thanh",
+      "pages": "Các trang thanh hành động",
+      "pageTab": "Trang {page}",
+      "buttonHeader": "Nút {button}",
+      "cellAria": "Nút {button}, {direction}: {action}",
+      "emptyCellAria": "Nút {button}, {direction}: trống",
+      "hint": "Chạm vào một ô, rồi chạm vào ô khác, để hoán đổi chúng.",
+      "armed": "Chạm vào một ô để đặt {name}.",
+      "picked": "Chạm vào một ô khác để hoán đổi với {name}.",
+      "locked": "Thanh hành động đang bị khóa trong phần tùy chọn Giao Diện.",
+      "clear": "Xóa",
+      "clearAria": "Xóa một ô",
+      "clearArmed": "Chạm vào một ô để xóa nó."
     },
     "tutorialGreeting": {
-      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
-      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
-      "play": "Take the tutorial",
-      "skip": "Skip the tutorial",
-      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
-      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
-      "noteClose": "Understood"
+      "bodyFirst": "Ta chưa từng thấy bạn quanh đây trước kia, bạn hỡi. Ở vùng đất này có một truyền thống: những ai mới bắt đầu cuộc phiêu lưu sẽ ghé thăm Bờ Biển Thử Thách, một hòn đảo yên tĩnh ngoài eo biển. Ở đó bạn có thể rèn giũa kỹ năng và làm quen với thế giới trước khi đối mặt với những thử thách của nó. Chuyến phà chạy cả hai chiều, và dù bạn chọn thế nào cũng chẳng ai nghĩ kém về bạn.",
+      "bodyRefresher": "Lại quay về với một gương mặt mới à? Vậy thì bạn đã biết cách này rồi. Nhưng nếu bạn muốn ôn lại đôi chút trước khi lên đường, Bờ Biển Thử Thách chẳng bao giờ từ chối một học trò trở lại, và chuyến phà luôn sẵn sàng khi bạn cần.",
+      "play": "Bắt đầu hướng dẫn",
+      "skip": "Bỏ qua hướng dẫn",
+      "declineNote": "Tùy ý bạn, bạn hỡi. Nếu có bao giờ bạn đổi ý, chiếc chuông phà cạnh hòm thư Bưu Quạ sẽ đưa bạn qua Bờ Biển Thử Thách bất kể ngày đêm. Nó vẫn sẽ ở đây, ngay cả khi lũ sói không còn.",
+      "bellHomeNote": "Đã quay lại từ bờ biển rồi sao? Đó là tiếng chuông phà bạn vừa rung đấy. Chiếc chuông song sinh của nó treo ngay cạnh hòm thư Bưu Quạ: rung nó bất cứ lúc nào và chuyến phà sẽ đưa bạn trở lại Bờ Biển Thử Thách. Dù chọn cách nào cũng chẳng hại gì.",
+      "islandArrivalNote": "Chào mừng đến với Bờ Biển Thử Thách. Vệ Quan Tam đang chờ ngay phía trên bãi biển: hãy đến gặp ông ấy.",
+      "noteClose": "Đã hiểu"
     },
     "tutorial": {
       "moveBodyTouch": "Dùng cần di chuyển để đi và kéo màn hình để nhìn quanh. Bước vài bước để bắt đầu.",
@@ -1022,115 +1022,115 @@ export const vi_VN: EnTranslations = {
       "nextTipSocial": "Mở Xã Hội ({key}) để tìm nhóm có những trận chiến khó khăn hơn."
     },
     "bootcamp": {
-      "title": "First Steps",
-      "talkTitle": "Speak to Warden Tam",
-      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
-      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
-      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
-      "forwardTitle": "Walk the first lane",
-      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
-      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
-      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
-      "turnwalkTitle": "Turn, then walk",
-      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
-      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
-      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
-      "strafeTitle": "Turn, then walk",
-      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
-      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
-      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
-      "cameraTitle": "Swing the camera",
-      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "courseProgress": "Flag {current} of {total}",
-      "doneTitle": "Run complete",
-      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
-      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
-      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
-      "coachNextTitle": "Next: {npc}",
-      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
-      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
-      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
-      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
-      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
-      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
-      "coachReadyTitle": "Task complete",
-      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
-      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
-      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
-      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
-      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
-      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
-      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
-      "promptTalk": "Talk",
-      "promptTurnIn": "Turn in quest",
-      "promptPickUp": "Pick up",
-      "promptLootPearl": "Loot the pearl",
-      "promptRead": "Read",
-      "promptRing": "Ring",
-      "promptHold": "Hold",
-      "promptSelect": "Select",
-      "promptAttack": "Attack",
-      "promptUseAbility": "Use ability",
-      "promptKneel": "Kneel",
-      "promptOpenBags": "Open your bags",
-      "promptCharacterSheet": "Open your character sheet",
-      "promptLookAround": "Hold right-click and drag to look around",
-      "promptJump": "Jump",
-      "promptSummon": "Summon",
-      "ringEquipTitle": "Wear your prize",
-      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
-      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
-      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
-      "ringAdmireTitle": "Look at you",
-      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "keycapThen": "then",
-      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
-      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
-      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
-      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
-      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
-      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
-      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "title": "Những Bước Đầu Tiên",
+      "talkTitle": "Nói chuyện với Vệ Quan Tam",
+      "talkBody": "Vệ Quan Tam trông coi cổng Vòng Khổ Luyện ngay phía trước. Hãy tiến lại gần cho đến khi tên ông ấy hiện ra, rồi nhấn {interactKey}, hoặc nhấp chuột trái vào ông ấy, để bắt chuyện: ông ấy sẽ giao cho bạn chặng chạy.",
+      "talkBodyTouch": "Vệ Quan Tam trông coi cổng Vòng Khổ Luyện ngay phía trước. Hãy tiến lại gần cho đến khi tên ông ấy hiện ra, rồi chạm vào ông ấy, hoặc chạm vào nút Dùng, để bắt chuyện: ông ấy sẽ giao cho bạn chặng chạy.",
+      "talkBodyPad": "Vệ Quan Tam trông coi cổng Vòng Khổ Luyện ngay phía trước. Hãy tiến lại gần cho đến khi tên ông ấy hiện ra, rồi nhấn nút tương tác của bạn để bắt chuyện: ông ấy sẽ giao cho bạn chặng chạy.",
+      "forwardTitle": "Đi hết làn đường đầu tiên",
+      "forwardBody": "Bước vào làn đường cạnh Tam và giữ {forwardKey} để đi về hướng tây đến lá cờ của nó.",
+      "forwardBodyTouch": "Bước vào làn đường cạnh Tam và đẩy cần di chuyển lên để đi về hướng tây đến lá cờ của nó.",
+      "forwardBodyPad": "Bước vào làn đường cạnh Tam và đẩy cần trái lên để đi về hướng tây đến lá cờ của nó.",
+      "turnwalkTitle": "Xoay người, rồi đi",
+      "turnwalkBody": "Cờ một đã xong. Giữ {turnKey} để xoay tại chỗ cho đến khi bạn hướng thẳng xuống làn đường có tường bao hướng nam, rồi giữ {forwardKey} lần nữa và đi hết nó đến lá cờ thứ hai.",
+      "turnwalkBodyTouch": "Cờ một đã xong. Kéo một ngón tay ngang qua thế giới (không phải cần di chuyển) để xoay cho đến khi bạn hướng thẳng xuống làn đường có tường bao hướng nam, rồi đẩy cần lên và đi hết nó đến lá cờ thứ hai.",
+      "turnwalkBodyPad": "Cờ một đã xong. Đẩy cần phải để xoay cho đến khi bạn hướng thẳng xuống làn đường có tường bao hướng nam, rồi đẩy cần trái lên và đi hết nó đến lá cờ thứ hai.",
+      "strafeTitle": "Xoay người, rồi đi",
+      "strafeBody": "Còn một góc cua nữa. Giữ {turnLeftKey} để xoay tại chỗ cho đến khi bạn hướng thẳng xuống làn đường cuối, rồi giữ {forwardKey} lần nữa và đi hết nó cho đến khi lá cờ đỏ nằm sau lưng bạn.",
+      "strafeBodyTouch": "Còn một góc cua nữa. Kéo một ngón tay ngang qua thế giới (không phải cần di chuyển) để xoay cho đến khi bạn hướng thẳng xuống làn đường cuối, rồi đẩy cần lên và đi hết nó cho đến khi lá cờ đỏ nằm sau lưng bạn.",
+      "strafeBodyPad": "Còn một góc cua nữa. Đẩy cần phải để xoay cho đến khi bạn hướng thẳng xuống làn đường cuối, rồi đẩy cần trái lên và đi hết nó cho đến khi lá cờ đỏ nằm sau lưng bạn.",
+      "cameraTitle": "Xoay camera",
+      "cameraBody": "Một bài học cuối trước khi bạn nộp lại chặng chạy này: giữ nút chuột phải và kéo để xoay camera vòng quanh bạn. Biết được điều gì đang đứng sau lưng bạn sẽ giúp bạn thắng trận.",
+      "cameraBodyTouch": "Một bài học cuối trước khi bạn nộp lại chặng chạy này: kéo một ngón tay ngang qua thế giới để xoay camera vòng quanh bạn. Biết được điều gì đang đứng sau lưng bạn sẽ giúp bạn thắng trận.",
+      "cameraBodyPad": "Một bài học cuối trước khi bạn nộp lại chặng chạy này: đẩy cần phải để xoay camera vòng quanh bạn. Biết được điều gì đang đứng sau lưng bạn sẽ giúp bạn thắng trận.",
+      "courseProgress": "Cờ {current} trên {total}",
+      "doneTitle": "Chặng chạy hoàn thành",
+      "doneBody": "Đó là mọi thứ đôi chân bạn cần biết. Giám Sát Pell đứng cạnh lá cờ đỏ: nhấn {interactKey} vào ông ấy, hoặc nhấp chuột trái vào ông ấy, để nộp lại chặng chạy và nhận phần thưởng đầu tiên của bạn.",
+      "doneBodyTouch": "Đó là mọi thứ đôi chân bạn cần biết. Giám Sát Pell đứng cạnh lá cờ đỏ: chạm vào ông ấy để nộp lại chặng chạy và nhận phần thưởng đầu tiên của bạn.",
+      "doneBodyPad": "Đó là mọi thứ đôi chân bạn cần biết. Giám Sát Pell đứng cạnh lá cờ đỏ: nhấn nút tương tác của bạn vào ông ấy để nộp lại chặng chạy và nhận phần thưởng đầu tiên của bạn.",
+      "coachNextTitle": "Tiếp theo: {npc}",
+      "coachNextBody": "Đi theo con đường vàng đến {npc}. Tiến lại gần cho đến khi tên hiện ra, rồi nhấn {interactKey}, hoặc nhấp chuột trái vào họ, để nhận nhiệm vụ tiếp theo.",
+      "coachNextBodyTouch": "Đi theo con đường vàng đến {npc}. Tiến lại gần cho đến khi tên hiện ra, rồi chạm vào họ, hoặc chạm vào nút Dùng, để nhận nhiệm vụ tiếp theo.",
+      "coachNextBodyPad": "Đi theo con đường vàng đến {npc}. Tiến lại gần cho đến khi tên hiện ra, rồi nhấn nút tương tác của bạn để nhận nhiệm vụ tiếp theo.",
+      "coachTaskBody": "Đi theo con đường vàng đến nhiệm vụ của bạn. Bộ theo dõi ở bên phải giữ số đếm, và {mapKey} sẽ mở bản đồ nếu bạn lạc đường.",
+      "coachTaskBodyTouch": "Đi theo con đường vàng đến nhiệm vụ của bạn. Bộ theo dõi ở bên phải giữ số đếm, và nút bản đồ sẽ chỉ đường nếu bạn lạc mất nó.",
+      "coachTaskBodyPad": "Đi theo con đường vàng đến nhiệm vụ của bạn. Bộ theo dõi ở bên phải giữ số đếm, và nút bản đồ của bạn sẽ chỉ đường nếu bạn lạc mất nó.",
+      "coachReadyTitle": "Nhiệm vụ hoàn thành",
+      "coachReadyBody": "Hãy đến chỗ {npc} và nhấn {interactKey}, hoặc nhấp chuột trái vào họ, để nộp lại và nhận phần thưởng của bạn.",
+      "coachReadyBodyTouch": "Hãy đến chỗ {npc} và chạm vào họ để nộp lại và nhận phần thưởng của bạn.",
+      "coachReadyBodyPad": "Hãy đến chỗ {npc} và nhấn nút tương tác của bạn để nộp lại và nhận phần thưởng của bạn.",
+      "taskStrikeTrueBody": "Tiến lại gần một hình nộm rơm và nhấp chuột trái vào nó để biến nó thành mục tiêu: tên nó sẽ hiện ra ở đầu màn hình. Sau đó nhấn {attackKey} để bắt đầu vung vũ khí. Nút đầu tiên đó là đòn tấn công thường của bạn, không phải một phép thuật. Tiếp tục ra đòn cho đến khi một con gục ngã.",
+      "taskStrikeTrueBodyTouch": "Tiến lại gần một hình nộm rơm và chạm vào nó để biến nó thành mục tiêu. Sau đó chạm vào nút đầu tiên trên thanh hành động để vung vũ khí. Tiếp tục ra đòn cho đến khi một con gục ngã.",
+      "taskStrikeTrueBodyPad": "Tiến lại gần một hình nộm rơm và nhấn nút nhắm mục tiêu của bạn để biến nó thành mục tiêu. Sau đó nhấn nút hành động đầu tiên của bạn để vung vũ khí. Tiếp tục ra đòn cho đến khi một con gục ngã.",
+      "taskHoneBody": "Nhấp chuột trái vào một hình nộm để nhắm vào nó, rồi nhấn {abilityKey} để dùng {ability}. Đó là kỹ năng riêng của bạn, không phải một đòn đánh thường. Trúng đòn đó ba lần.",
+      "taskHoneBodyTouch": "Chạm vào một hình nộm để nhắm vào nó, rồi chạm vào {ability} trên thanh hành động. Đó là kỹ năng riêng của bạn, không phải một đòn đánh thường. Trúng đòn đó ba lần.",
+      "taskHoneBodyPad": "Nhắm vào một hình nộm, rồi nhấn nút hành động mang {ability}. Đó là kỹ năng riêng của bạn, không phải một đòn đánh thường. Trúng đòn đó ba lần.",
+      "taskLongWalkBody": "Nhấn {bagsKey} để mở túi đồ, rồi nhấp chuột trái vào Đá Từ Trần. Nó sẽ khiến bạn nằm xuống ngay tại chỗ bạn đứng. Không có gì ở đây có thể làm hại bạn, và việc này chẳng tốn của bạn gì cả.",
+      "taskLongWalkBodyTouch": "Mở túi đồ của bạn và chạm vào Đá Từ Trần. Nó sẽ khiến bạn nằm xuống ngay tại chỗ bạn đứng. Không có gì ở đây có thể làm hại bạn, và việc này chẳng tốn của bạn gì cả.",
+      "taskLongWalkBodyPad": "Mở túi đồ của bạn và chọn Đá Từ Trần. Nó sẽ khiến bạn nằm xuống ngay tại chỗ bạn đứng. Không có gì ở đây có thể làm hại bạn, và việc này chẳng tốn của bạn gì cả.",
+      "taskLongWalkDeadBody": "Bạn đã chết, và bạn chẳng mất gì cả: không vật phẩm, không tiền, không kinh nghiệm. Bước 1 trên 2: nhấp vào nút Giải Phóng Linh Hồn ở giữa màn hình. Bạn sẽ trỗi dậy như một hồn ma tại nghĩa trang phía sau trại.",
+      "taskLongWalkDeadBodyTouch": "Bạn đã chết, và bạn chẳng mất gì cả: không vật phẩm, không tiền, không kinh nghiệm. Bước 1 trên 2: chạm vào nút Giải Phóng Linh Hồn ở giữa màn hình. Bạn sẽ trỗi dậy như một hồn ma tại nghĩa trang phía sau trại.",
+      "taskLongWalkDeadBodyPad": "Bạn đã chết, và bạn chẳng mất gì cả: không vật phẩm, không tiền, không kinh nghiệm. Bước 1 trên 2: chọn Giải Phóng Linh Hồn ở giữa màn hình. Bạn sẽ trỗi dậy như một hồn ma tại nghĩa trang phía sau trại.",
+      "taskLongWalkGhostBody": "Bước 2 trên 2: bạn giờ là một linh hồn, và không gì có thể chạm tới bạn. Thi thể của bạn là điểm đánh dấu trên bản đồ nhỏ. Hãy đi đến đó. Khi bạn đến gần, một nút Hồi Sinh Tại Xác Chết sẽ hiện ra: nhấp vào nó và bạn sẽ sống lại, không chịu bất kỳ hình phạt nào. Chuyến đi đó LUÔN LUÔN miễn phí, và đó là cách bạn trở lại mỗi khi bạn chết.",
+      "taskLongWalkGhostBodyTouch": "Bước 2 trên 2: bạn giờ là một linh hồn, và không gì có thể chạm tới bạn. Thi thể của bạn là điểm đánh dấu trên bản đồ nhỏ. Hãy đi đến đó. Khi bạn đến gần, một nút Hồi Sinh Tại Xác Chết sẽ hiện ra: chạm vào nó và bạn sẽ sống lại, không chịu bất kỳ hình phạt nào. Chuyến đi đó LUÔN LUÔN miễn phí, và đó là cách bạn trở lại mỗi khi bạn chết.",
+      "taskLongWalkGhostBodyPad": "Bước 2 trên 2: bạn giờ là một linh hồn, và không gì có thể chạm tới bạn. Thi thể của bạn là điểm đánh dấu trên bản đồ nhỏ. Hãy đi đến đó. Khi bạn đến gần, một nút Hồi Sinh Tại Xác Chết sẽ hiện ra: chọn nó và bạn sẽ sống lại, không chịu bất kỳ hình phạt nào. Chuyến đi đó LUÔN LUÔN miễn phí, và đó là cách bạn trở lại mỗi khi bạn chết.",
+      "taskShellBody": "Lũ kẻ bò sẽ kẹp lại. Nhấp chuột trái vào một con để biến nó thành mục tiêu, rồi nhấn {abilityKey} để dùng {ability}, và tiếp tục tấn công. Nếu có quá nhiều con cùng tấn công bạn một lúc, hãy rút lui ngược lại con đường: chúng sẽ nhanh chóng từ bỏ việc đuổi theo, và sinh lực của bạn sẽ hồi phục trong lúc bạn nghỉ.",
+      "taskShellBodyTouch": "Lũ kẻ bò sẽ kẹp lại. Chạm vào một con để nhắm vào nó, rồi chạm vào {ability} trên thanh hành động. Nếu có quá nhiều con cùng tấn công bạn một lúc, hãy rút lui ngược lại con đường: chúng sẽ nhanh chóng từ bỏ việc đuổi theo, và sinh lực của bạn sẽ hồi phục trong lúc bạn nghỉ.",
+      "taskShellBodyPad": "Lũ kẻ bò sẽ kẹp lại. Nhắm vào một con, rồi nhấn nút hành động mang {ability}. Nếu có quá nhiều con cùng tấn công bạn một lúc, hãy rút lui ngược lại con đường: chúng sẽ nhanh chóng từ bỏ việc đuổi theo, và sinh lực của bạn sẽ hồi phục trong lúc bạn nghỉ.",
+      "taskStrikeTrueBodyCaster": "Tiến lại gần một hình nộm rơm và nhấp chuột trái vào nó để biến nó thành mục tiêu: tên nó sẽ hiện ra ở đầu màn hình. Sau đó nhấn {attackKey}, hoặc nhấp vào nút thứ hai trên thanh hành động, để niệm phép của bạn. Tiếp tục niệm chú cho đến khi một con gục ngã.",
+      "taskStrikeTrueBodyCasterTouch": "Tiến lại gần một hình nộm rơm và chạm vào nó để biến nó thành mục tiêu. Sau đó chạm vào nút thứ hai trên thanh hành động để niệm phép của bạn. Tiếp tục niệm chú cho đến khi một con gục ngã.",
+      "taskStrikeTrueBodyCasterPad": "Tiến lại gần một hình nộm rơm và nhấn nút nhắm mục tiêu của bạn để biến nó thành mục tiêu. Sau đó nhấn nút hành động thứ hai của bạn để niệm phép của bạn. Tiếp tục niệm chú cho đến khi một con gục ngã.",
+      "taskShellBodyCaster": "Lũ kẻ bò sẽ kẹp lại. Nhấp chuột trái vào một con để biến nó thành mục tiêu, rồi nhấn {abilityKey} để dùng {ability}, và tiếp tục niệm chú từ xa. Nếu có quá nhiều con cùng tấn công bạn một lúc, hãy rút lui ngược lại con đường: chúng sẽ nhanh chóng từ bỏ việc đuổi theo, và sinh lực của bạn sẽ hồi phục trong lúc bạn nghỉ.",
+      "taskShellBodyCasterTouch": "Lũ kẻ bò sẽ kẹp lại. Chạm vào một con để nhắm vào nó, rồi chạm vào {ability} trên thanh hành động, và tiếp tục niệm chú từ xa. Nếu có quá nhiều con cùng tấn công bạn một lúc, hãy rút lui ngược lại con đường: chúng sẽ nhanh chóng từ bỏ việc đuổi theo, và sinh lực của bạn sẽ hồi phục trong lúc bạn nghỉ.",
+      "taskShellBodyCasterPad": "Lũ kẻ bò sẽ kẹp lại. Nhắm vào một con, rồi nhấn nút hành động mang {ability}, và tiếp tục niệm chú từ xa. Nếu có quá nhiều con cùng tấn công bạn một lúc, hãy rút lui ngược lại con đường: chúng sẽ nhanh chóng từ bỏ việc đuổi theo, và sinh lực của bạn sẽ hồi phục trong lúc bạn nghỉ.",
+      "taskPearlBody": "Đi theo con đường vàng đến vũng nước triều ở đầu phía tây của bãi biển. Đứng ở mép nước, nhấn {bagsKey} để mở túi đồ và nhấp chuột trái vào Mồi Câu Mặn để gọi hắn lên. Chiến đấu với hắn như bạn đã chiến đấu với lũ kẻ bò, và khi hắn ngã xuống, nhấn {interactKey} vào mai hắn để nhận lấy Ngọc Trai Lấp Lánh.",
+      "taskPearlBodyTouch": "Đi theo con đường vàng đến vũng nước triều ở đầu phía tây của bãi biển. Đứng ở mép nước, mở túi đồ của bạn và chạm vào Mồi Câu Mặn để gọi hắn lên. Chiến đấu với hắn như bạn đã chiến đấu với lũ kẻ bò, và khi hắn ngã xuống, chạm vào mai hắn để nhận lấy Ngọc Trai Lấp Lánh.",
+      "taskPearlBodyPad": "Đi theo con đường vàng đến vũng nước triều ở đầu phía tây của bãi biển. Đứng ở mép nước, mở túi đồ của bạn và chọn Mồi Câu Mặn để gọi hắn lên. Chiến đấu với hắn như bạn đã chiến đấu với lũ kẻ bò, và khi hắn ngã xuống, nhấn nút tương tác của bạn vào mai hắn để nhận lấy Ngọc Trai Lấp Lánh.",
+      "taskWreckLineBody": "Những thùng hàng trôi dạt xếp dọc con đường hướng về Trại Dawnrest. Tiến lại gần một thùng cho đến khi tên nó hiện ra, rồi nhấn {interactKey}, hoặc nhấp chuột trái vào thùng hàng, để nhặt nó lên. Sáu thùng là đủ cho chuyến hàng.",
+      "taskWreckLineBodyTouch": "Những thùng hàng trôi dạt xếp dọc con đường hướng về Trại Dawnrest. Tiến lại gần một thùng cho đến khi tên nó hiện ra, rồi chạm vào thùng hàng, hoặc chạm vào nút Dùng, để nhặt nó lên. Sáu thùng là đủ cho chuyến hàng.",
+      "taskWreckLineBodyPad": "Những thùng hàng trôi dạt xếp dọc con đường hướng về Trại Dawnrest. Tiến lại gần một thùng cho đến khi tên nó hiện ra, rồi nhấn nút tương tác của bạn để nhặt nó lên. Sáu thùng là đủ cho chuyến hàng.",
+      "taskPouchBody": "Nhấn {interactKey} vào {npc}, hoặc nhấp chuột trái vào họ, để mở quầy hàng, rồi nhấp chuột trái vào Túi vải lanh để mua nó.",
+      "taskPouchBodyTouch": "Chạm vào {npc} để mở quầy hàng, rồi chạm vào Túi vải lanh để mua nó.",
+      "taskPouchBodyPad": "Nhấn nút tương tác của bạn vào {npc} để mở quầy hàng, rồi chọn Túi vải lanh để mua nó.",
+      "readyPouchBody": "Đã mua túi. Nhấn {bagsKey} để mở túi đồ và nhấp chuột trái vào Túi vải lanh để cài nó vào một dây đeo túi còn trống. Sau đó hãy đến chỗ {npc} và nhấn {interactKey} để khoe nó.",
+      "readyPouchBodyTouch": "Đã mua túi. Mở túi đồ của bạn và chạm vào Túi vải lanh để cài nó vào một dây đeo túi còn trống. Sau đó hãy đến chỗ {npc} và chạm vào họ để khoe nó.",
+      "readyPouchBodyPad": "Đã mua túi. Mở túi đồ của bạn và chọn Túi vải lanh để cài nó vào một dây đeo túi còn trống. Sau đó hãy đến chỗ {npc} và nhấn nút tương tác của bạn để khoe nó.",
+      "promptTalk": "Nói Chuyện",
+      "promptTurnIn": "Nộp Nhiệm Vụ",
+      "promptPickUp": "Nhặt lên",
+      "promptLootPearl": "Nhặt viên ngọc trai",
+      "promptRead": "Đọc",
+      "promptRing": "Rung Chuông",
+      "promptHold": "Giữ",
+      "promptSelect": "Chọn",
+      "promptAttack": "Tấn Công",
+      "promptUseAbility": "Dùng Kỹ Năng",
+      "promptKneel": "Quỳ Xuống",
+      "promptOpenBags": "Mở túi đồ của bạn",
+      "promptCharacterSheet": "Mở bảng nhân vật của bạn",
+      "promptLookAround": "Giữ chuột phải và kéo để nhìn quanh",
+      "promptJump": "Nhảy",
+      "promptSummon": "Triệu Hồi",
+      "ringEquipTitle": "Đeo phần thưởng của bạn",
+      "ringEquipBody": "Bạn đã được trao chiếc nhẫn Xà Cừ, và một phần thưởng chẳng có ý nghĩa gì khi nằm im trong túi. Bước 1 trên 2: nhấn {bagsKey} để mở túi đồ, rồi nhấp chuột trái vào chiếc nhẫn để đeo nó vào.",
+      "ringEquipBodyTouch": "Bạn đã được trao chiếc nhẫn Xà Cừ, và một phần thưởng chẳng có ý nghĩa gì khi nằm im trong túi. Bước 1 trên 2: mở túi đồ của bạn và chạm vào chiếc nhẫn để đeo nó vào.",
+      "ringEquipBodyPad": "Bạn đã được trao chiếc nhẫn Xà Cừ, và một phần thưởng chẳng có ý nghĩa gì khi nằm im trong túi. Bước 1 trên 2: mở túi đồ của bạn và chọn chiếc nhẫn để đeo nó vào.",
+      "ringAdmireTitle": "Nhìn bạn kìa",
+      "ringAdmireBody": "Bước 2 trên 2: nhấn {charKey} để mở bảng nhân vật của bạn. Màn hình đó hiển thị mọi thứ bạn đang mặc và chỉ số nó mang lại, và chiếc nhẫn giờ đã nằm trên tay bạn. Hãy kiểm tra nó mỗi khi bạn nhặt được trang bị mới.",
+      "ringAdmireBodyTouch": "Bước 2 trên 2: mở bảng nhân vật của bạn từ menu. Màn hình đó hiển thị mọi thứ bạn đang mặc và chỉ số nó mang lại, và chiếc nhẫn giờ đã nằm trên tay bạn. Hãy kiểm tra nó mỗi khi bạn nhặt được trang bị mới.",
+      "ringAdmireBodyPad": "Bước 2 trên 2: mở bảng nhân vật của bạn từ menu. Màn hình đó hiển thị mọi thứ bạn đang mặc và chỉ số nó mang lại, và chiếc nhẫn giờ đã nằm trên tay bạn. Hãy kiểm tra nó mỗi khi bạn nhặt được trang bị mới.",
+      "keycapThen": "rồi",
+      "voiceArrival": "Từ từ lên bờ thôi, bạn hiền. Thấy con đường vàng dưới chân bạn không? Nó biết đường rành hơn ta đấy. Cứ đi theo nó.",
+      "voiceFirstFlag": "Vậy là xong một lá cờ. Cứ giữ đôi chân đó chuyển động, chỉ còn hai lá nữa thôi.",
+      "voiceRunDone": "Một chặng chạy sạch sẽ đấy. Giám Sát Pell đang giữ phần thưởng của bạn, đi mà nhận lấy.",
+      "voiceStationDoneA": "Làm tốt lắm. Đến trạm tiếp theo thôi, con đường đã được thắp sáng sẵn cho bạn.",
+      "voiceStationDoneB": "Bạn đang nắm được cách rồi đấy, chắc chắn luôn.",
+      "voiceVeerOff": "Khoan đã, bạn hiền, đó là hướng sai rồi. Con đường vàng nằm phía sau lưng bạn kìa.",
+      "voiceGraduate": "Chuông đã rung cho bạn rồi. Eastbrook đang chờ bên kia mặt nước, và bạn đã sẵn sàng cho nó.",
+      "bellTitle": "Rung chuông",
+      "bellBody": "Chuyến đò của bạn đã được xứng đáng. Hãy đi đến chuông đò cạnh bến tàu và nhấn {interactKey}, hoặc nhấp chuột trái vào nó, để lên đường đến Eastbrook.",
+      "bellBodyTouch": "Chuyến đò của bạn đã được xứng đáng. Hãy đi đến chuông đò cạnh bến tàu và chạm vào nó để lên đường đến Eastbrook.",
+      "bellBodyPad": "Chuyến đò của bạn đã được xứng đáng. Hãy đi đến chuông đò cạnh bến tàu và nhấn nút tương tác của bạn vào nó để lên đường đến Eastbrook."
     },
     "widgets": {
       "clockTitle": "Giờ địa phương - nhấp để chuyển 12/24 giờ",
@@ -1184,29 +1184,29 @@ export const vi_VN: EnTranslations = {
       "devEmpty": "Chưa có người đóng góp nào được xếp hạng."
     },
     "pledge": {
-      "open": "Accepting pledges",
-      "closed": "Not accepting pledges",
-      "minLevel": "Level {level}+",
-      "action": "Pledge",
-      "actionTitle": "Pledge to {guild}",
-      "pledged": "Pledged",
-      "yourGuild": "Your guild",
-      "tab": "Pledges",
-      "tabWithCount": "Pledges ({count})",
-      "empty": "No one has pledged to your guild yet.",
-      "accept": "Accept",
-      "acceptTitle": "Accept {name}'s pledge",
-      "reject": "Decline",
-      "rejectTitle": "Decline {name}'s pledge",
-      "settings": "Recruitment",
-      "acceptingLabel": "Accept pledges",
-      "minLevelLabel": "Minimum level",
-      "noteLabel": "Board note",
-      "notePlaceholder": "Tell aspiring members what your guild is looking for",
-      "save": "Save",
-      "yourPledge": "Your pledge: {guild}",
-      "since": "Pledged {date}",
-      "withdraw": "Withdraw pledge"
+      "open": "Đang Nhận Cam Kết",
+      "closed": "Không Nhận Cam Kết",
+      "minLevel": "Cấp {level} trở lên",
+      "action": "Cam kết",
+      "actionTitle": "Cam kết gia nhập {guild}",
+      "pledged": "Đã Cam Kết",
+      "yourGuild": "Bang hội của bạn",
+      "tab": "Cam Kết",
+      "tabWithCount": "Cam Kết ({count})",
+      "empty": "Chưa có ai cam kết gia nhập bang hội của bạn.",
+      "accept": "Chấp nhận",
+      "acceptTitle": "Chấp nhận lời cam kết của {name}",
+      "reject": "Từ chối",
+      "rejectTitle": "Từ chối lời cam kết của {name}",
+      "settings": "Tuyển Mộ",
+      "acceptingLabel": "Nhận cam kết",
+      "minLevelLabel": "Cấp tối thiểu",
+      "noteLabel": "Ghi chú bảng tin",
+      "notePlaceholder": "Cho các thành viên tương lai biết bang hội của bạn đang tìm kiếm điều gì",
+      "save": "Lưu",
+      "yourPledge": "Cam kết của bạn: {guild}",
+      "since": "Đã cam kết {date}",
+      "withdraw": "Rút cam kết"
     },
     "raidLockout": {
       "title": "Khóa Raid",
@@ -1455,7 +1455,7 @@ export const vi_VN: EnTranslations = {
       "endedForfeitLog": "Trận đấu đã bị bỏ cuộc.",
       "firstWinBonusLine": "Chiến thắng đầu tiên trong ngày: +{honor} Danh dự",
       "firstWinBonusLog": "Chiến thắng đầu tiên trong ngày: bạn nhận thêm {honor} Danh dự thưởng.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Cuối Tuần Danh Dự Nhân Đôi: Danh Dự tại Cánh Đồng Trũng Gai hôm nay trả gấp {mult} lần, và một trận thua đã đấu trọn vẹn vẫn được trả như một chiến thắng",
       "timeWarningMinutes": "Còn lại {minutes} phút",
       "timeWarningOneMinute": "Còn lại một phút",
       "timeWarningMinutesLog": "Còn lại {minutes} phút trong trận đấu.",
@@ -1550,8 +1550,8 @@ export const vi_VN: EnTranslations = {
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
       "mobileLeftHanded": "Bố cục thuận tay trái",
-      "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenus": "Chạm để mở menu",
+      "touchTapMenusNote": "Mở các nút điều khiển hành động, vật phẩm tiêu hao và menu bằng một cú chạm thay vì vuốt. Chạm vào một mục để dùng nó, chạm lại vào nút điều khiển để thực hiện hành động thông thường của nó, hoặc chạm ra ngoài để đóng lại."
     },
     "talentRows": {
       "tab": "Lựa chọn",
@@ -1576,8 +1576,8 @@ export const vi_VN: EnTranslations = {
     },
     "controller": {
       "title": "Tay Cầm",
-      "glyphStyle": "Button Labels",
-      "glyphStyleAuto": "Auto",
+      "glyphStyle": "Nhãn Nút",
+      "glyphStyleAuto": "Tự Động",
       "glyphStyleXbox": "Xbox",
       "glyphStylePlayStation": "PlayStation",
       "glyphStyleNintendo": "Nintendo",
@@ -2071,16 +2071,16 @@ export const vi_VN: EnTranslations = {
         "other": "bạn là {rank}, {count} thành viên"
       },
       "wocMarketSellChoose": {
-        "one": "Choose from {count} item",
-        "few": "Choose from {count} items",
-        "many": "Choose from {count} items",
-        "other": "Choose from {count} items"
+        "one": "Chọn từ {count} vật phẩm",
+        "few": "Chọn từ {count} vật phẩm",
+        "many": "Chọn từ {count} vật phẩm",
+        "other": "Chọn từ {count} vật phẩm"
       },
       "wocTradeIneligible": {
-        "one": "{count} staged item cannot be sold for $WOC.",
-        "few": "{count} staged items cannot be sold for $WOC.",
-        "many": "{count} staged items cannot be sold for $WOC.",
-        "other": "{count} staged items cannot be sold for $WOC."
+        "one": "{count} vật phẩm đã đặt lên bàn giao dịch không thể bán để lấy $WOC.",
+        "few": "{count} vật phẩm đã đặt lên bàn giao dịch không thể bán để lấy $WOC.",
+        "many": "{count} vật phẩm đã đặt lên bàn giao dịch không thể bán để lấy $WOC.",
+        "other": "{count} vật phẩm đã đặt lên bàn giao dịch không thể bán để lấy $WOC."
       },
       "finderPartySize": {
         "one": "{count} người chơi",
@@ -2662,14 +2662,14 @@ export const vi_VN: EnTranslations = {
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",
       "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng",
-      "assignAria": "Choose a slot for {name}"
+      "assignAria": "Chọn một ô cho {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
       "cheaterTag": "< Kẻ Gian Lận >",
-      "pledgeTag": "Pledge of {guild}"
+      "pledgeTag": "Trung Thành Với {guild}"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -2994,11 +2994,11 @@ export const vi_VN: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Có vẻ như chưa có gì được dán lên.",
-      "subtitle": "Guilds of the realm",
-      "rosterTitle": "View the roster of {guild}",
-      "back": "Back",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "subtitle": "Các bang hội trong vương quốc",
+      "rosterTitle": "Xem danh sách thành viên của {guild}",
+      "back": "Quay Lại",
+      "popupTitle": "Bảng Thông Báo Bang Hội",
+      "close": "Đóng"
     },
     "bank": {
       "title": "Ngân Hàng",
@@ -3132,8 +3132,8 @@ export const vi_VN: EnTranslations = {
           "note": "Các đấu sĩ đổ về Đấu Trường Tro Tàn. Hãy xếp hàng và leo bảng xếp hạng."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Cuối Tuần Danh Dự Nhân Đôi",
+          "note": "Các trại chiến tranh vang lên hồi kèn tập hợp: suốt cả cuối tuần, Danh Dự tại Cánh Đồng Trũng Gai được trả gấp đôi và một trận thua đã đấu trọn vẹn vẫn được trả như một chiến thắng."
         },
         "fishingDerby": {
           "title": "Hội Thi Câu Cá",
@@ -3444,7 +3444,7 @@ export const vi_VN: EnTranslations = {
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(tiêu tốn {count} hảo hạng)",
-      "craftFeeLine": "Craft fee: {fee} each",
+      "craftFeeLine": "Phí chế tạo: {fee} mỗi món",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
@@ -3996,7 +3996,7 @@ export const vi_VN: EnTranslations = {
       "unlockedBorderHint": "Đã nhận viền mới: {name}. Hãy đeo nó từ Sách Kỳ Công.",
       "broadcastLine": "{name} vừa lập một kỳ công: {deed}",
       "rarityLine": "Đã có {percent} nhà phiêu lưu lập được",
-      "stillToVisit": "Still to visit: {places}",
+      "stillToVisit": "Còn phải ghé thăm: {places}",
       "trackerLabel": "Kỳ Công",
       "collapseHint": "Thu gọn bảng theo dõi kỳ công",
       "expandHint": "Mở rộng bảng theo dõi kỳ công",
@@ -4026,218 +4026,218 @@ export const vi_VN: EnTranslations = {
       "minLevelNote": "Yêu cầu Cấp {level}"
     },
     "walletBridge": {
-      "cancelled": "The wallet request was cancelled. Nothing was sent.",
-      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
-      "notConnected": "Connect and verify a wallet, then try again.",
-      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
-      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
-      "badResponse": "Your wallet returned an unusable answer. Try again."
+      "cancelled": "Yêu cầu ví đã bị hủy. Không có gì được gửi đi.",
+      "timeout": "Ví của bạn không phản hồi kịp thời gian. Hãy mở ví và thử lại.",
+      "notConnected": "Kết nối và xác minh một ví, rồi thử lại.",
+      "unsupported": "Ví này không thể hoàn tất thao tác đó. Hãy kết nối một ví khác.",
+      "unavailable": "Không có kết nối ví nào khả dụng ở đây. Hãy kết nối lại ví và thử lại.",
+      "badResponse": "Ví của bạn trả về một phản hồi không thể sử dụng được. Hãy thử lại."
     },
     "wocMarket": {
-      "title": "$WOC Exchange",
-      "close": "Close the Exchange",
-      "launcherLabel": "$WOC Exchange",
-      "tabBrowse": "Browse",
-      "tabSell": "Sell",
-      "tabActivity": "My Activities",
-      "tabsLabel": "$WOC Exchange sections",
-      "loading": "Loading the Exchange...",
-      "loadFailed": "The Exchange could not be reached. Try again shortly.",
-      "disabledRealm": "The $WOC Exchange is not available on this realm.",
-      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
-      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
-      "walletBannerCta": "Connect wallet",
-      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
-      "browseEmpty": "No listings right now. Check back soon.",
-      "browseError": "Listings could not be loaded.",
-      "colItem": "Item",
-      "colSeller": "Seller",
-      "colCurrentBid": "Current bid",
-      "colBuyNow": "Buy now",
-      "colTimeLeft": "Time left",
-      "reserveMet": "Reserve met",
-      "reserveNotMet": "Reserve not met",
-      "yourListing": "Your listing",
-      "buyNowLockedBadge": "Purchase in progress",
-      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
-      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
-      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
-      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
-      "pagePrev": "Previous page",
-      "pageNext": "Next page",
-      "pageNumber": "Page {current}",
-      "sortLabel": "Sort",
-      "sortEnding": "Ending soonest",
-      "sortNewest": "Newest",
-      "sortPriceAsc": "Price: low to high",
-      "sortPriceDesc": "Price: high to low",
-      "filterQuality": "Quality",
-      "filterFormat": "Format",
-      "filterAny": "Any",
-      "filterFormatAuction": "Auction",
-      "filterFormatBuyNow": "Buy now",
-      "filterItemLabel": "Item",
-      "filterItemPlaceholder": "Search by item name",
-      "filterCategory": "Category",
-      "filterCategoryWeapon": "Weapons",
-      "filterCategoryArmor": "Armor",
-      "filterCategoryMount": "Mounts",
-      "filterSubcategory": "Type",
-      "sellerLinkAria": "View recent trades by {name}",
-      "sellerTitle": "Recent trades by {name}",
-      "sellerBack": "Back to Browse",
-      "sellerEmpty": "No completed trades yet.",
-      "sellerError": "Recent trades could not be loaded.",
-      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
-      "detailTitle": "Listing",
-      "detailSeller": "Sold by {name}",
-      "detailEndsAt": "Ends {utc} UTC ({local} local)",
-      "detailStartingBid": "Starting bid: {usd}",
-      "detailCurrentBid": "Current bid: {usd}",
-      "detailNoBids": "No bids yet",
-      "detailMinNext": "Minimum next bid: {usd}",
-      "detailBuyNow": "Buy now: {usd}",
-      "detailSales": "Recent sales",
-      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
-      "detailNoSales": "No recorded sales for this item yet.",
-      "detailSalesLoading": "Loading recent sales...",
-      "bidLabel": "Your bid (USD)",
-      "bidPlaceholder": "Enter a USD amount",
-      "bidButton": "Place bid",
-      "bidAria": "Place a bid on {item}",
-      "bidTermsToggle": "Bid terms",
-      "rowOpenAria": "View the listing for {item}",
-      "buyNowButton": "Buy now for {usd}",
-      "buyNowAria": "Buy {item} now for {usd}",
-      "cancelButton": "Cancel listing",
-      "cancelAria": "Cancel your listing of {item}",
-      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
-      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
-      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
-      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
-      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
-      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
-      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
-      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
-      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
-      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
-      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
-      "termsLabel": "I accept the Marketplace terms.",
-      "termsLink": "View the Marketplace terms (opens in a new tab)",
-      "quoteTitle": "Confirm payment",
-      "quoteTotal": "Total: {tokens} $WOC",
-      "quoteSeller": "Seller receives: {tokens} $WOC",
-      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
-      "quoteTreasury": "To the game treasury: {tokens} $WOC",
-      "quoteExpires": "Quote expires in {duration}",
-      "quoteExpiresAt": "Quote expires at {time}.",
-      "quoteExpired": "The quote expired. Request a fresh one.",
-      "quoteSign": "Sign and pay",
-      "quoteRefresh": "New quote",
-      "quoteCancel": "Not now",
-      "quoteBondFor": "Refundable bid bond: {usd}",
-      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
-      "quoteSettlementFor": "Settlement for {item}: {usd}",
-      "paymentDueAt": "Payment is due by {time}.",
-      "signing": "Waiting for your wallet...",
-      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
-      "confirming": "Confirming on chain...",
-      "listing": "Listing your item...",
-      "activityCancelPending": "Cancel pending",
-      "activityDirected": "Directed sale",
-      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
-      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
-      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
-      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
-      "listingCreated": "Your listing is live.",
-      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
-      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
-      "sellTitle": "Create a listing",
-      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
-      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
-      "sellCollectiblesMounts": "Mounts can also be listed.",
-      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
-      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
-      "sellSearchPlaceholder": "Type to filter your bags",
-      "sellClear": "Clear {item} and choose another",
-      "sellChoose": "Item to list",
-      "sellNoMatches": "No items match that search",
-      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
-      "sellFormat": "Format",
-      "sellFormatAuction": "Auction",
-      "sellFormatBuyNow": "Buy now only",
-      "sellFormatAuctionBuyNow": "Auction with buy now",
-      "sellStart": "Starting bid (USD)",
-      "sellReserve": "Reserve (USD, optional)",
-      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
-      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
-      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
-      "sellBuyNowPrice": "Buy-now price (USD)",
-      "sellDuration": "Duration",
-      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
-      "sellSubmit": "List item",
-      "sellSubmitAria": "List {item} on the Exchange",
-      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
-      "activityListings": "My listings",
-      "activityBids": "My bids",
-      "activitySettlements": "My settlements",
-      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
-      "activityNoListings": "You have no listings.",
-      "activityNoBids": "You have no bids.",
-      "activityNoSettlements": "You have no settlements.",
-      "activityPayNow": "Pay now",
-      "activityPayNowAria": "Pay for settlement {id} now",
-      "activityPayNowItemAria": "Pay {usd} for {item} now",
-      "activityDeadline": "Payment due in {duration}",
-      "dueAt": "Due {utc} UTC ({local} local)",
-      "activityStrikes": "Marketplace strikes: {count}",
-      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
-      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
-      "bidStatusPending": "Awaiting bond",
-      "bidStatusActive": "High bidder",
-      "bidStatusOutbid": "Outbid",
-      "bidStatusLapsed": "Lapsed",
-      "bidStatusWon": "Won",
-      "bidStatusDefaulted": "Defaulted",
-      "bidStatusCancelled": "Cancelled",
-      "bidBondPay": "Pay bond",
-      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
-      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
-      "settlementOffered": "Payment due",
-      "settlementConfirming": "Confirming",
-      "settlementConfirmedDelivering": "Payment confirmed, delivering",
-      "settlementReview": "Payment under review",
-      "settlementDelivered": "Delivered",
-      "settlementExpired": "Expired unpaid",
-      "settlementFailed": "Payment failed",
-      "settlementFailBurnMissing": "The payment did not include the required token burn.",
-      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
-      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
-      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
-      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
-      "settlementFailRefunded": "This payment was returned to your wallet.",
-      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
-      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
-      "settlementFailGeneric": "This payment could not be completed.",
-      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
-      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
-      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
-      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
-      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
-      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
-      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
-      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
-      "listingStatusActive": "Active",
-      "listingStatusSettling": "Awaiting payment",
-      "listingStatusSold": "Sold",
-      "listingStatusReturned": "Returned",
-      "listingStatusCancelled": "Cancelled",
-      "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "title": "Sàn Giao Dịch $WOC",
+      "close": "Đóng Sàn Giao Dịch",
+      "launcherLabel": "Sàn Giao Dịch $WOC",
+      "tabBrowse": "Duyệt",
+      "tabSell": "Bán",
+      "tabActivity": "Hoạt Động Của Tôi",
+      "tabsLabel": "Các mục của Sàn Giao Dịch $WOC",
+      "loading": "Đang tải Sàn Giao Dịch...",
+      "loadFailed": "Không thể kết nối tới Sàn Giao Dịch. Hãy thử lại sau ít phút.",
+      "disabledRealm": "Sàn Giao Dịch $WOC không khả dụng trên thế giới này.",
+      "pausedBanner": "Giao dịch đang tạm dừng. Các phiên đấu giá vẫn tiếp tục đếm ngược, tin rao mới, giá thầu, đề nghị mua và thanh toán sẽ chờ đến khi giao dịch được nối lại, còn khoản thanh toán đã gửi thì vẫn được xử lý xong.",
+      "walletBanner": "Liên kết và xác minh một ví để đặt giá thầu, mua hoặc bán trên Sàn Giao Dịch.",
+      "walletBannerCta": "Kết nối ví",
+      "rateNote": "Tỷ giá: khoảng {tokens} $WOC cho 1,00 USD, tính đến {time}.",
+      "rateNotePaused": "Tỷ giá được biết lần cuối: khoảng {tokens} $WOC cho 1,00 USD, tính đến {time}.",
+      "estimateNote": "Khoảng {tokens} $WOC cho {usd} theo tỷ giá hiện tại.",
+      "browseEmpty": "Hiện chưa có tin đăng nào. Hãy quay lại sau.",
+      "browseError": "Không thể tải danh sách tin đăng.",
+      "colItem": "Vật Phẩm",
+      "colSeller": "Người Bán",
+      "colCurrentBid": "Giá Thầu Hiện Tại",
+      "colBuyNow": "Mua Ngay",
+      "colTimeLeft": "Thời Gian Còn Lại",
+      "reserveMet": "Đã đạt giá dự trữ",
+      "reserveNotMet": "Chưa đạt giá dự trữ",
+      "yourListing": "Tin rao của bạn",
+      "buyNowLockedBadge": "Đang xử lý giao dịch mua",
+      "reserveMetTip": "Người bán đã đặt một mức giá tối thiểu ẩn, và giá thầu hiện tại đã đạt mức đó.",
+      "reserveNotMetTip": "Người bán đã đặt một mức giá tối thiểu ẩn. Nếu giá thầu cao nhất khi kết thúc thấp hơn mức đó, vật phẩm sẽ không được bán và mọi khoản đặt cọc sẽ được hoàn lại.",
+      "yourListingTip": "Bạn đã rao bán vật phẩm này. Bạn không thể đặt giá thầu trên tin rao của chính mình; khi tin rao chưa có giá thầu nào, bạn có thể hủy nó tại đây hoặc từ mục Hoạt Động.",
+      "buyNowLockedTip": "Một người mua khác đang giữ tin rao này trong khi họ thanh toán. Nếu họ không thanh toán kịp thời, tin rao sẽ mở lại.",
+      "pagePrev": "Trang trước",
+      "pageNext": "Trang sau",
+      "pageNumber": "Trang {current}",
+      "sortLabel": "Sắp xếp",
+      "sortEnding": "Sắp Kết Thúc Nhất",
+      "sortNewest": "Mới Nhất",
+      "sortPriceAsc": "Giá: thấp đến cao",
+      "sortPriceDesc": "Giá: cao đến thấp",
+      "filterQuality": "Chất lượng",
+      "filterFormat": "Hình thức",
+      "filterAny": "Bất kỳ",
+      "filterFormatAuction": "Đấu Giá",
+      "filterFormatBuyNow": "Mua Ngay",
+      "filterItemLabel": "Vật phẩm",
+      "filterItemPlaceholder": "Tìm theo tên vật phẩm",
+      "filterCategory": "Danh mục",
+      "filterCategoryWeapon": "Vũ Khí",
+      "filterCategoryArmor": "Giáp",
+      "filterCategoryMount": "Thú Cưỡi",
+      "filterSubcategory": "Loại",
+      "sellerLinkAria": "Xem các giao dịch gần đây của {name}",
+      "sellerTitle": "Giao dịch gần đây của {name}",
+      "sellerBack": "Quay lại Duyệt",
+      "sellerEmpty": "Chưa có giao dịch nào hoàn tất.",
+      "sellerError": "Không thể tải các giao dịch gần đây.",
+      "sellerSaleRow": "{time}: {item} bán cho {buyer} với giá {usd}",
+      "detailTitle": "Tin Rao",
+      "detailSeller": "Bán bởi {name}",
+      "detailEndsAt": "Kết thúc lúc {utc} UTC ({local} giờ địa phương)",
+      "detailStartingBid": "Giá thầu khởi điểm: {usd}",
+      "detailCurrentBid": "Giá thầu hiện tại: {usd}",
+      "detailNoBids": "Chưa có giá thầu nào",
+      "detailMinNext": "Giá thầu tiếp theo tối thiểu: {usd}",
+      "detailBuyNow": "Mua ngay: {usd}",
+      "detailSales": "Giao dịch bán gần đây",
+      "detailSaleRow": "{time}: {seller} đã bán cho {buyer} với giá {usd}",
+      "detailNoSales": "Chưa có giao dịch bán nào được ghi nhận cho vật phẩm này.",
+      "detailSalesLoading": "Đang tải giao dịch bán gần đây...",
+      "bidLabel": "Giá thầu của bạn (USD)",
+      "bidPlaceholder": "Nhập số tiền USD",
+      "bidButton": "Đặt giá thầu",
+      "bidAria": "Đặt giá thầu cho {item}",
+      "bidTermsToggle": "Điều khoản đặt giá",
+      "rowOpenAria": "Xem tin rao cho {item}",
+      "buyNowButton": "Mua ngay với giá {usd}",
+      "buyNowAria": "Mua ngay {item} với giá {usd}",
+      "cancelButton": "Hủy tin rao",
+      "cancelAria": "Hủy tin rao {item} của bạn",
+      "bidBondNote": "Đặt giá thầu sẽ giữ lại một khoản tiền cọc có thể hoàn lại bằng $WOC, cộng thêm vào giá thầu: {bond} cho một giá thầu {bid}, giá thầu càng cao thì cọc càng lớn. Khoản cọc được hoàn lại khi bạn bị trả giá cao hơn hoặc thua cuộc, hoặc sau khi bạn thanh toán nếu thắng; một lời đề nghị cơ hội thứ hai sẽ giữ lại cọc một lần nữa.",
+      "bidBondSchedule": "Tiền cọc bằng {rate} phần trăm giá thầu của bạn, tối thiểu {min} và tối đa {max}.",
+      "bidBondPayWindow": "Thanh toán tiền cọc trong vòng {duration} kể từ khi đặt giá thầu, nếu không giá thầu sẽ hết hiệu lực.",
+      "bidBindingNote": "Một giá thầu sẽ ràng buộc ngay khi bạn ký giao dịch tiền cọc của nó: giá thầu không thể rút lại, và nếu bạn thắng nhưng không thanh toán, tiền cọc sẽ bị tịch thu và tài khoản của bạn nhận một lần vi phạm trên Sàn.",
+      "bidCloseNote": "Một giá thầu có tiền cọc được xác nhận trong 2 phút cuối sẽ kéo dài phiên đấu giá thêm 2 phút sau giá thầu đó, tối đa 30 phút sau thời điểm kết thúc đã niêm yết. Một khoản cọc được xác nhận sau khi phiên đấu giá đã đóng sẽ không được tính và sẽ được hoàn lại.",
+      "offerNextNote": "Nếu người thắng không thanh toán, bạn có thể trở thành người mua theo đúng giá thầu của mình: khoản đặt cọc của bạn được giữ lại lần nữa (hoặc được yêu cầu lại nếu đã hoàn trả), và bạn phải thanh toán trong vòng {duration}.",
+      "buyNowNote": "Mua ngay sẽ giữ tin rao này cho bạn trong khoảng bốn phút rưỡi để bạn thanh toán. Nếu bạn không thanh toán kịp thời, bạn không thể thử lại tin rao này trong 30 phút, và ba lượt Mua ngay chưa thanh toán trong vòng một giờ sẽ tạm khóa Mua ngay của bạn cho đến khi lượt cũ nhất đã qua một giờ.",
+      "variableTokenWarning": "Bạn đang cam kết thanh toán một giá trị USD bằng $WOC. Số lượng token chính xác được ấn định bởi một báo giá mới khi thanh toán được yêu cầu, và có thể khác với ước tính.",
+      "quoteFixedNote": "Báo giá này cố định số $WOC cho đến khi hết hạn. Một báo giá mới có thể khác đi.",
+      "settlementDeadlineNote": "Nếu bạn thắng, bạn phải thanh toán trong vòng {duration} kể từ khi phiên đấu giá kết thúc.",
+      "claimCooldownRetry": "Bạn vừa rời khỏi một lượt Mua ngay. Hãy thử lại sau {duration}.",
+      "termsLabel": "Tôi chấp nhận điều khoản của Sàn Giao Dịch.",
+      "termsLink": "Xem điều khoản của Sàn Giao Dịch (mở trong tab mới)",
+      "quoteTitle": "Xác Nhận Thanh Toán",
+      "quoteTotal": "Tổng cộng: {tokens} $WOC",
+      "quoteSeller": "Người bán nhận được: {tokens} $WOC",
+      "quoteBurn": "Đã đốt (loại khỏi nguồn cung): {tokens} $WOC",
+      "quoteTreasury": "Đến ngân khố trò chơi: {tokens} $WOC",
+      "quoteExpires": "Báo giá hết hạn sau {duration}",
+      "quoteExpiresAt": "Báo giá hết hạn lúc {time}.",
+      "quoteExpired": "Báo giá đã hết hạn. Hãy yêu cầu một báo giá mới.",
+      "quoteSign": "Ký và thanh toán",
+      "quoteRefresh": "Báo giá mới",
+      "quoteCancel": "Để sau",
+      "quoteBondFor": "Tiền cọc giá thầu có thể hoàn lại: {usd}",
+      "quoteBondForItem": "Tiền cọc giá thầu có thể hoàn lại cho {item}: {usd}",
+      "quoteSettlementFor": "Thanh toán cho {item}: {usd}",
+      "paymentDueAt": "Hạn thanh toán là {time}.",
+      "signing": "Đang chờ ví của bạn...",
+      "signFailed": "Ví của bạn chưa hoàn tất khoản thanh toán. Hãy kiểm tra ví rồi thử lại.",
+      "signFailedConfirm": "Ví của bạn chưa ký xác nhận. Hãy kiểm tra ví rồi thử lại.",
+      "confirming": "Đang xác nhận trên chuỗi...",
+      "listing": "Đang đăng tin rao vật phẩm của bạn...",
+      "activityCancelPending": "Đang chờ hủy",
+      "activityDirected": "Giao dịch chỉ định",
+      "bidPlacedStanding": "Giá thầu của bạn vẫn đứng vững. Bạn đang là người trả giá cao nhất.",
+      "bidPlacedOutbid": "Tiền cọc của bạn đã được xác nhận, nhưng đã có một giá thầu cao hơn đến trước.",
+      "purchaseComplete": "Đã hoàn tất mua hàng. Vật phẩm của bạn sẽ đến qua thư Bưu Quạ.",
+      "paymentConfirmedDelivering": "Đã xác nhận thanh toán. Vật phẩm của bạn sẽ đến qua thư Bưu Quạ khi giao hàng hoàn tất.",
+      "listingCreated": "Tin rao của bạn đã lên sàn.",
+      "listingCancelled": "Tin rao đã bị hủy. Vật phẩm của bạn sẽ được trả về qua thư Bưu Quạ.",
+      "listingCancelPending": "Đang chờ hủy: một người mua đang giữ khung thời gian mua. Trừ khi họ thanh toán, tin rao sẽ đóng lại và vật phẩm của bạn sẽ được trả về qua thư Bưu Quạ.",
+      "sellTitle": "Tạo Tin Rao",
+      "sellEmptyFloor": "Không có vật phẩm hợp lệ trong túi đồ của bạn. Thế giới này chỉ chấp nhận trang bị chưa ràng buộc có chất lượng {floor} trở lên.",
+      "sellCollectiblesBoth": "Thú cưỡi và tấm màu Mech cũng có thể được rao bán.",
+      "sellCollectiblesMounts": "Thú cưỡi cũng có thể được rao bán.",
+      "sellCollectiblesChromas": "Tấm màu Mech cũng có thể được rao bán.",
+      "sellLockedHidden": "Vật phẩm bị khóa không được hiển thị ở đây. Hãy mở khóa chúng trong túi đồ để rao bán.",
+      "sellSearchPlaceholder": "Gõ để lọc túi đồ của bạn",
+      "sellClear": "Bỏ {item} và chọn vật phẩm khác",
+      "sellChoose": "Vật phẩm cần rao bán",
+      "sellNoMatches": "Không có vật phẩm nào khớp với tìm kiếm đó",
+      "sellBuyNowAboveStart": "Giá mua ngay phải cao hơn giá thầu khởi điểm.",
+      "sellFormat": "Hình thức",
+      "sellFormatAuction": "Đấu Giá",
+      "sellFormatBuyNow": "Chỉ Mua Ngay",
+      "sellFormatAuctionBuyNow": "Đấu Giá Kèm Mua Ngay",
+      "sellStart": "Giá thầu khởi điểm (USD)",
+      "sellReserve": "Giá dự trữ (USD, tùy chọn)",
+      "sellReserveNote": "Tùy chọn, tối thiểu bằng giá thầu khởi điểm. Người đặt giá chỉ thấy được liệu mức đó có đạt hay không; nếu giá thầu cao nhất khi kết thúc thấp hơn mức đó, vật phẩm sẽ trở lại với bạn mà không bán được, và mọi khoản đặt cọc sẽ được hoàn lại.",
+      "sellBuyNowNote": "Bắt buộc. Một tin rao mua ngay sẽ được bán theo đúng mức giá này, không qua đấu giá.",
+      "sellBuyNowAuctionNote": "Tùy chọn. Đặt một mức giá mà người mua có thể trả để kết thúc phiên đấu giá sớm; mức giá này phải cao hơn giá thầu khởi điểm và giá dự trữ.",
+      "sellBuyNowPrice": "Giá mua ngay (USD)",
+      "sellDuration": "Thời lượng",
+      "sellOfferNext": "Nếu người thắng không thanh toán, hãy bán cho người trả giá cao thứ nhì có giá thầu đạt giá dự trữ, theo đúng giá thầu của họ, thay vì kết thúc mà không bán được.",
+      "sellSubmit": "Rao bán vật phẩm",
+      "sellSubmitAria": "Rao bán {item} trên Sàn Giao Dịch",
+      "sellFeeNote": "Một giao dịch bán hoàn tất sẽ trả phí Sàn Giao Dịch trích từ giá bán: một phần bị đốt và một phần vào ngân khố, phần còn lại bạn nhận được tại ví đã liên kết trong giao dịch thanh toán. Phí cho mức giá bạn nhập được hiển thị ở đây; với đấu giá, phí tính theo giá cuối cùng.",
+      "activityListings": "Tin đăng của tôi",
+      "activityBids": "Giá thầu của tôi",
+      "activitySettlements": "Giao dịch đã hoàn tất của tôi",
+      "activityEmpty": "Bạn chưa có giá thầu, tin đăng hay giao dịch nào. Hoạt động trên Sàn $WOC của bạn sẽ hiện ở đây.",
+      "activityNoListings": "Bạn chưa có tin đăng nào.",
+      "activityNoBids": "Bạn chưa có giá thầu nào.",
+      "activityNoSettlements": "Bạn chưa có giao dịch đã hoàn tất nào.",
+      "activityPayNow": "Thanh toán ngay",
+      "activityPayNowAria": "Thanh toán ngay cho giao dịch {id}",
+      "activityPayNowItemAria": "Thanh toán ngay {usd} cho {item}",
+      "activityDeadline": "Cần thanh toán trong {duration}",
+      "dueAt": "Đến hạn lúc {utc} UTC ({local} giờ địa phương)",
+      "activityStrikes": "Vi phạm trên Sàn: {count}",
+      "activitySuspended": "Sàn $WOC bị tạm ngưng trong {duration} do các giao dịch chưa thanh toán: không thể đặt giá thầu, mua, đăng tin, hay giao dịch $WOC cho đến khi đó.",
+      "strikesTip": "Bạn nhận một lần vi phạm mỗi khi không thanh toán cho một giao dịch bạn đã cam kết. Sau lần đầu, mỗi lần vi phạm sẽ tạm khóa bạn khỏi Sàn Giao Dịch lâu hơn: 3 ngày, rồi 14 ngày, rồi 90 ngày, rồi một năm.",
+      "bidStatusPending": "Chờ Tiền Cọc",
+      "bidStatusActive": "Người Trả Giá Cao Nhất",
+      "bidStatusOutbid": "Bị Vượt Giá",
+      "bidStatusLapsed": "Hết Hạn",
+      "bidStatusWon": "Đã Thắng",
+      "bidStatusDefaulted": "Bỏ Cọc",
+      "bidStatusCancelled": "Đã Hủy",
+      "bidBondPay": "Thanh toán tiền cọc",
+      "bidBondPayAria": "Thanh toán tiền cọc cho giá thầu của bạn trên tin đăng {id}",
+      "bidBondPayItemAria": "Thanh toán khoản cọc {bond} cho giá thầu của bạn trên {item}",
+      "settlementOffered": "Cần Thanh Toán",
+      "settlementConfirming": "Đang Xác Nhận",
+      "settlementConfirmedDelivering": "Đã Xác Nhận Thanh Toán, Đang Giao Hàng",
+      "settlementReview": "Thanh Toán Đang Được Xem Xét",
+      "settlementDelivered": "Đã Giao",
+      "settlementExpired": "Đã Hết Hạn, Chưa Thanh Toán",
+      "settlementFailed": "Thanh Toán Thất Bại",
+      "settlementFailBurnMissing": "Khoản thanh toán thiếu lượt đốt token bắt buộc.",
+      "settlementFailBurnMismatch": "Khoản thanh toán đã đốt sai số lượng token.",
+      "settlementFailBurnAuthority": "Lượt đốt token đến từ một ví không được nêu tên trong giao dịch mua này.",
+      "settlementFailUnexpectedCredit": "Giao dịch đã trả tiền cho một ví nằm ngoài lượt mua này.",
+      "settlementFailQuoteExpired": "Báo giá thanh toán đã hết hạn trước khi được sử dụng. Hãy yêu cầu một báo giá mới và thanh toán lại.",
+      "settlementFailTransaction": "Giao dịch thanh toán đã thất bại trên mạng lưới. Hãy yêu cầu một báo giá mới và thử lại.",
+      "settlementFailRefunded": "Khoản thanh toán này đã được hoàn trả về ví của bạn.",
+      "settlementFailSuperseded": "Lượt thanh toán này đã bị thay thế bởi một lượt mới hơn.",
+      "settlementFailConfirmingOverdue": "Khoản thanh toán này mất quá lâu để xác nhận và không thể xác minh được.",
+      "settlementFailGeneric": "Không thể hoàn tất khoản thanh toán này.",
+      "paymentSeenAwaitingFinality": "Đã thấy khoản thanh toán trên sổ cái. Đang chờ xác nhận cuối cùng.",
+      "paymentNotYetVisible": "Chưa thấy khoản thanh toán nào trên sổ cái. Có thể mất một lúc để hiện ra.",
+      "paymentServiceUnreachable": "Không thể kết nối tới dịch vụ thanh toán. Khoản thanh toán của bạn vẫn được ghi nhận và sẽ được kiểm tra lại.",
+      "paymentPendingGeneric": "Khoản thanh toán của bạn đã được gửi và đang chờ xác nhận.",
+      "bondSeenAwaitingFinality": "Đã thấy khoản thanh toán tiền cọc trên sổ cái. Đang chờ xác nhận cuối cùng.",
+      "bondNotYetVisible": "Chưa thấy khoản thanh toán tiền cọc nào trên sổ cái. Có thể mất một chút thời gian để hiện ra.",
+      "bondServiceUnreachable": "Không thể kết nối tới dịch vụ thanh toán. Khoản thanh toán tiền cọc của bạn vẫn được ghi nhận và sẽ được kiểm tra lại.",
+      "bondPendingGeneric": "Khoản thanh toán tiền cọc của bạn đã được gửi và đang chờ xác nhận.",
+      "listingStatusActive": "Đang Hoạt Động",
+      "listingStatusSettling": "Đang Chờ Thanh Toán",
+      "listingStatusSold": "Đã Bán",
+      "listingStatusReturned": "Đã Trả Về",
+      "listingStatusCancelled": "Đã Hủy",
+      "listingStatusSuspended": "Đã Tạm Khóa",
+      "listingStatusUnsold": "Chưa Bán Được"
     }
   },
   "gatherEvent": {
@@ -4340,8 +4340,8 @@ export const vi_VN: EnTranslations = {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
     },
     "guilds": {
-      "invalid_roster_name": "Invalid guild name.",
-      "unknown": "No guild by that name."
+      "invalid_roster_name": "Tên bang hội không hợp lệ.",
+      "unknown": "Không có bang hội nào mang tên đó."
     },
     "steam": {
       "disabled": "Hiện không thể liên kết Steam.",
@@ -4382,53 +4382,53 @@ export const vi_VN: EnTranslations = {
       "not_marked": "Tài khoản đó chưa bị đánh dấu."
     },
     "woc_market": {
-      "invalid_input": "Invalid input.",
-      "disabled": "The $WOC Exchange is not available on this realm.",
-      "paused": "Exchange trading is paused. Auctions keep counting down.",
-      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
-      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
-      "self_offer": "You cannot send a $WOC offer to yourself.",
-      "offer_expired": "That $WOC offer expired. Ask for a new one.",
-      "terms_required": "Accept the Marketplace terms to continue.",
-      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
-      "totp_invalid": "That two-factor code did not verify. Try again.",
-      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
-      "character_invalid": "Play the character you are listing from, and try again.",
-      "not_found": "That Exchange entry no longer exists.",
-      "not_yours": "That Exchange entry no longer exists.",
-      "not_active": "That listing is no longer open for this action.",
-      "own_listing": "You cannot bid on or buy your own listing.",
-      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
-      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
-      "already_pending": "Confirm or abandon your pending bid on this listing first.",
-      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
-      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
-      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
-      "not_pending": "That bid is no longer awaiting its bond.",
-      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
-      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
-      "cancel_pending": "The seller is cancelling this listing.",
-      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
-      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
-      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
-      "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
-      "no_buy_now": "This listing has no buy-now price.",
-      "cap_reached": "You have reached your Exchange listing limit.",
-      "stale_item": "That item changed or moved. Re-select it and try again.",
-      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
-      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
-      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
-      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted.",
-      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
-      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
-      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
-      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
-      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
-      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
-      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
+      "invalid_input": "Dữ liệu nhập không hợp lệ.",
+      "disabled": "Sàn Giao Dịch $WOC không khả dụng trên thế giới này.",
+      "paused": "Giao dịch đang tạm dừng. Các phiên đấu giá vẫn tiếp tục đếm ngược.",
+      "wallet_required": "Hãy liên kết và xác minh một ví trước khi giao dịch trên Sàn Giao Dịch.",
+      "recipient_wallet_required": "Người chơi đó phải kết nối một ví trước khi có thể nhận thanh toán bằng $WOC.",
+      "self_offer": "Bạn không thể gửi đề nghị $WOC cho chính mình.",
+      "offer_expired": "Đề nghị $WOC đó đã hết hạn. Hãy yêu cầu một đề nghị mới.",
+      "terms_required": "Hãy chấp nhận điều khoản của Sàn Giao Dịch để tiếp tục.",
+      "totp_required": "Số tiền này cần xác thực hai yếu tố. Hãy bật tính năng đó trong cài đặt tài khoản, rồi nhập mã của bạn.",
+      "totp_invalid": "Mã xác thực hai yếu tố đó không xác minh được. Hãy thử lại.",
+      "suspended": "Quyền truy cập Sàn Giao Dịch của bạn đã bị tạm khóa sau các giao dịch không thanh toán: không thể đặt giá thầu, mua, rao bán, hay giao dịch $WOC.",
+      "character_invalid": "Hãy chơi đúng nhân vật mà bạn đang rao bán từ đó, rồi thử lại.",
+      "not_found": "Mục đó trên Sàn Giao Dịch không còn tồn tại.",
+      "not_yours": "Mục đó trên Sàn Giao Dịch không còn tồn tại.",
+      "not_active": "Tin rao đó không còn mở cho thao tác này nữa.",
+      "own_listing": "Bạn không thể đặt giá thầu hoặc mua chính tin rao của mình.",
+      "has_bids": "Không thể hủy tin rao đã có giá thầu. Hãy liên hệ hỗ trợ nếu bạn thực sự cần hủy.",
+      "bid_too_low": "Giá thầu của bạn chưa vượt qua giá thầu hiện tại cộng với mức tăng tối thiểu.",
+      "already_pending": "Hãy xác nhận hoặc hủy giá thầu đang chờ của bạn trên tin rao này trước.",
+      "insufficient_balance": "Ví của bạn không có đủ $WOC cho giá thầu này và khoản tiền cọc kèm theo.",
+      "quote_unavailable": "Hiện chưa thể đưa ra báo giá. Hãy thử lại sau ít phút.",
+      "quote_expired": "Báo giá đó đã hết hạn. Hãy yêu cầu một báo giá mới; nếu không có báo giá nào được đưa ra, khung thời gian đó đã đóng lại.",
+      "not_pending": "Giá thầu đó không còn chờ tiền cọc nữa.",
+      "confirm_failed": "Không thể xác nhận giao dịch. Hãy yêu cầu một báo giá mới và thử lại.",
+      "confirm_in_flight": "Khoản thanh toán của bạn vẫn đang được xác nhận. Hãy thử lại khi nó hoàn tất.",
+      "buy_now_locked": "Một người mua khác đang hoàn tất giao dịch mua này. Hãy thử lại sau ít phút.",
+      "cancel_pending": "Người bán đang hủy tin rao này.",
+      "claim_cooldown": "Bạn vừa rời khỏi một lượt Mua ngay. Hãy thử lại sau.",
+      "bond_window_closed": "Giá thầu này không còn thể thanh toán: khung thời gian thanh toán của nó đã đóng. Hãy đặt giá thầu lại để có một khung mới.",
+      "settlement_in_flight": "Có người mua đang thanh toán cho tin rao này. Hãy thử lại khi khoản thanh toán hoàn tất.",
+      "contended": "Sàn Giao Dịch đang bận xử lý tin rao này. Hãy thử lại sau ít phút.",
+      "sale_conflict": "Đã có một bản ghi giao dịch bán khác đang hoạt động cho tin rao này. Hãy loại trừ nó trước đã.",
+      "no_buy_now": "Tin rao này không có giá mua ngay.",
+      "cap_reached": "Bạn đã đạt giới hạn số tin rao trên Sàn Giao Dịch.",
+      "stale_item": "Vật phẩm đó đã thay đổi hoặc bị di chuyển. Hãy chọn lại nó và thử lại.",
+      "item_mismatch": "Đó không phải chính xác bản mà người mua đã đồng ý, hoặc trạng thái của nó đã thay đổi (bị khóa cũng tính). Hãy bắt đầu một giao dịch mới cho nó.",
+      "offer_pending": "Bạn đã có một giao dịch đang chờ với người chơi này. Hãy giải quyết nó trước đã.",
+      "not_eligible": "Vật phẩm đó không thể rao bán trên Sàn Giao Dịch $WOC.",
+      "invalid_params": "Hãy kiểm tra lại giá thầu khởi điểm, giá dự trữ, giá mua ngay, và thời lượng.",
+      "signature_reused": "Giao dịch đó đã được gửi đi rồi.",
+      "item_locked": "Vật phẩm đó đang bị khóa. Hãy mở khóa nó trong túi đồ trước khi bán.",
+      "stepup_required": "Bán hàng trên Sàn Giao Dịch cần một chữ ký từ ví đã liên kết của bạn.",
+      "stepup_challenge_invalid": "Xác nhận ví đó không còn hợp lệ. Hãy bắt đầu lại việc bán.",
+      "stepup_challenge_expired": "Xác nhận ví đã hết hạn. Hãy bắt đầu lại việc bán.",
+      "stepup_wallet_mismatch": "Ví đã liên kết của bạn đã thay đổi kể từ khi xác nhận này được cấp. Hãy bắt đầu lại việc bán.",
+      "stepup_binding_mismatch": "Xác nhận ví đó không khớp với giao dịch bán này. Hãy bắt đầu lại việc bán.",
+      "stepup_signature_invalid": "Chữ ký ví không xác minh được. Hãy bắt đầu lại việc bán."
     }
   },
   "guide": {
@@ -4575,8 +4575,8 @@ export const vi_VN: EnTranslations = {
         "fenBlurb": "Qua khỏi vương miện mùa thu, là một đầm lầy tươi sáng với liễu rủ và mặt nước lặng yên, cùng một thị trấn nép sau con hào.",
         "farshoreName": "Bờ Biển Xa Xôi",
         "farshoreBlurb": "Một hòn đảo bên kia doi cát, nơi bầu trời xé toạc trên Riftfields và Gullhaven rung chuông báo mỗi khi có một vết rạn xuất hiện.",
-        "provingName": "The Proving Shore",
-        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
+        "provingName": "Bờ Biển Thử Thách",
+        "provingBlurb": "Một hòn đảo huấn luyện yên tĩnh bên kia eo biển, nơi những nhà phiêu lưu mới vững vàng đôi chân trước khi thung lũng đòi hỏi bất cứ điều gì ở họ.",
         "nightName": "Cánh Đồng Dạ Hoa",
         "nightBlurb": "Một xứ sở của đêm khuya lấp lánh sao trời, nơi hoa lá thắp sáng những lối đi và Moonrest lặng lẽ canh giữ.",
         "hauntName": "Rừng Oan Hồn",
@@ -5538,10 +5538,10 @@ export const vi_VN: EnTranslations = {
       "farshoreGreeting": "Bạn đã đi qua Ferrywalk sao? Vậy bạn là người đầu tiên trong tuần này, và Vệ Quan sẽ muốn xem xét bạn.",
       "farshoreGreeter": "Người Giữ Chuông Tam, Bến Tàu",
       "farshorePlaceNotes": "Gullhaven là thị trấn duy nhất của hòn đảo này, cũng là đồn lũy của nó. Bến Tàu là nơi Ferrywalk cập bờ, có một chiếc chuông canh đứng sừng sững trên mũi đất; Đồng Cỏ Canh Gác giữ vùng cao phía đông nam thị trấn, nơi một người canh rạn lắng nghe vết rạn tiếp theo; Vách Đá Vỡ Nát nứt toác ở cực nam hòn đảo; còn Riftfields là những hàng lúa đã bị tàn phá ở phía đông Gullhaven, vẫn còn ngập tràn những kẻ đã tràn qua vết rạn tại đó.",
-      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
-      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
-      "provingGreeter": "Instructor Maren, Dawnrest Camp",
-      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
+      "provingBlurb": "Một hòn đảo yên tĩnh bên kia eo biển tính từ thung lũng, được giữ làm bãi huấn luyện: một khu trại, một sân tập, một bờ biển rải rác xác tàu, và một chuyến phà chạy cả hai chiều.",
+      "provingGreeting": "Mọi anh hùng mà thung lũng từng biết ơn đều đã đứng nơi bạn đang đứng bây giờ, và không một ai trong số họ biết cầm lưỡi kiếm ở đầu nào.",
+      "provingGreeter": "Giáo Quan Maren, Trại Dawnrest",
+      "provingPlaceNotes": "Trại Dawnrest là toàn bộ khu định cư của hòn đảo: vài chiếc lều, một quầy hàng, và một đống lửa tập hợp. Bến Tàu Cũ hướng về thung lũng, nơi vòng tròn vượt biển đưa những người tốt nghiệp qua eo biển; Sân Tập ở phía nam khu trại giữ những hình nộm rơm của nó luôn đứng vững cho bất cứ ai cần đến; và Tuyến Xác Tàu là bờ biển rải rác phế liệu, nơi thủy triều trả công cho hòn đảo bằng những thùng trôi dạt.",
       "travelTitle": "Di chuyển khắp thế giới",
       "travelBody": "Mọi con đường trong vương quốc đều được đi bộ hoặc cưỡi ngựa qua. Không có lộ trình bay, không xe taxi, và không có mạng lưới dịch chuyển tức thời: bản đồ là một vùng đất liền mạch duy nhất, và mọi điểm nối đều là nơi bạn có thể đặt chân lên. Các rặng núi chia vùng đất này với vùng đất kia, và nơi hai vùng đất chung một rặng núi, con đường sẽ leo qua một đèo núi. Nhưng không phải biên giới nào cũng vận hành theo cách đó. Ở phía bắc, một con đê dài đưa con đường vượt qua mặt nước từ Thung Lũng Sương Phủ vào vùng đất tuyết giá xa hơn nữa, còn ở phía nam, một doi cát tự nhiên mỏng manh mang tên Ferrywalk chạy về phía đông từ bờ biển của Vale tới Bến Tàu trên hòn đảo Farshore, hòn đảo hoàn toàn không có biên giới đất liền nào. Và có đúng một cánh cửa thật sự duy nhất trong toàn bộ thế giới mở: một tấm màn hoàng hôn cao trên Đỉnh Gai mở vào Thung Lũng Sương Phủ. Rặng núi phía nam của Thung Lũng bị phong kín không lối nào xuyên qua, nên tấm màn ấy là cách duy nhất để bạn vào lần đầu, và nó khép lại sau lưng bạn trên đường trở về.\n\nDù bạn ngã xuống ở đâu, đường trở về cũng ngắn thôi. Mỗi vùng đất đều giữ ít nhất một nghĩa địa có một Người Canh Giữ Nhợt Nhạt lơ lửng trên những bia đá, và một linh hồn được giải thoát sẽ trỗi dậy tại nghĩa địa gần nhất trong số đó.\n\nBản đồ không kết thúc bằng một bức tường vô hình. Đất liền chạy dài ra thành bãi biển và mũi đất, rồi đến vùng biển khơi. Những đoạn nước mà thế giới muốn bạn bơi qua, các eo biển và đầm nước nằm giữa vùng đất này với vùng đất kia, đều êm ả và an toàn để vượt qua. Nhưng nếu bạn cố bơi ra biển khơi, chính khoảng cách sẽ đẩy bạn quay lại: bạn sẽ được cảnh báo, rồi cảnh báo thêm lần nữa, và nếu bạn vẫn tiếp tục bơi, biển cả sẽ bào mòn sức bạn cho đến khi giết chết bạn. Lặn xuống nước cũng có giới hạn riêng của nó, vì hơi thở của bạn sẽ cạn dần dưới mặt nước, nên hãy trồi lên lấy hơi và quay lại khi nước ra dấu cho bạn.",
       "mountsTitle": "Thú Cưỡi",
@@ -5988,7 +5988,7 @@ export const vi_VN: EnTranslations = {
       "deedsHeading": "Thành tích ghi nhớ hành trình",
       "deedsBody": "Sách Kỳ Công đồng hành với từng bước của hành trình này. Lần gắn kết đầu tiên của bạn đạt được thành tích Thề Nguyện Thủ Công và kiệt tác đầu tiên của bạn đạt được thành tích Thợ Đại Tài, cả hai đều có thể đeo như danh hiệu. Mỗi trong tám nghề thủ công có thể kiếm được đánh dấu một thành tích cột mốc ở kỹ năng 50 và đăng quang giới hạn của nó bằng danh hiệu Đại Sư, trong khi Câu Cá nhận được Lão Muối ở 100 thành thạo và danh hiệu Ngư Sư Thành Thạo ở 200.\n\nCó những trang lặng lẽ hơn: thành tích cho lần thu hoạch và chế tạo đầu tiên của bạn, cho những phát hiện hiếm may mắn tìm thấy ở thực địa, và cho việc bắt đầu tháo dỡ. Tất cả là trang trí, danh hiệu và Danh Vọng mà thôi. Thành tích không bao giờ ban sức mạnh; nó chỉ chứng minh bạn đã ở đó.",
       "startHeading": "Bắt đầu từ đâu",
-      "startBody": "Vừa đặt chân tới Eastbrook sau chặng đường dài? Hãy tìm Quản Đốc Odell và nhận Nghề Cho Mọi Đôi Tay: ông sẽ chỉ bạn tới những mạch quặng quanh Mỏ Đồng phía đông nam thị trấn và trao cho bạn những vết chai tay đầu tiên. Nhưng hãy dè chừng chính khu mỏ ấy: bọn Thợ Đào Deeprock đóng trại trên đó cao hơn một người mới đến vài cấp, nên hãy khai thác các mạch ngoài rìa trước và để dành lõi của khu trại cho lúc bạn đã lên được vài cấp. Từ đó trở đi, hãy thu hoạch mọi mạch quặng, cụm cây gỗ, và khóm thảo dược bạn đi ngang qua khi làm nhiệm vụ; thành thạo đến với lữ khách một cách tự nhiên.\n\nVề lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức phổ thông mà mọi nhân vật đều biết từ đầu. Hãy ghé các bậc thầy ở lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn hàng của họ để có nguồn tiền đều đặn. Đến lúc lá thư của Hội tìm tới bạn, bạn sẽ đã biết cặp nào cho mình cảm giác như nhà.",
+      "startBody": "Vừa đặt chân tới Eastbrook sau chặng đường dài? Hãy tìm Quản Đốc Odell và nhận Nghề Cho Mọi Đôi Tay: ông sẽ chỉ bạn tới những mạch quặng quanh Mỏ Đồng phía đông bắc thị trấn và trao cho bạn những vết chai tay đầu tiên. Nhưng hãy dè chừng chính khu mỏ ấy: bọn Thợ Đào Deeprock đóng trại trên đó cao hơn một người mới đến vài cấp, nên hãy khai thác các mạch ngoài rìa trước và để dành lõi của khu trại cho lúc bạn đã lên được vài cấp. Từ đó trở đi, hãy thu hoạch mọi mạch quặng, cụm cây gỗ, và khóm thảo dược bạn đi ngang qua khi làm nhiệm vụ; thành thạo đến với lữ khách một cách tự nhiên.\n\nVề lại thị trấn, nhấn T để mở cửa sổ chế tác và làm các công thức phổ thông mà mọi nhân vật đều biết từ đầu. Hãy ghé các bậc thầy ở lò rèn, bếp, khung cửi, và xưởng dụng cụ để xem họ dạy gì, và nhận đơn hàng của họ để có nguồn tiền đều đặn. Đến lúc lá thư của Hội tìm tới bạn, bạn sẽ đã biết cặp nào cho mình cảm giác như nhà.",
       "colStation": "Trạm",
       "colHub": "Thị trấn",
       "colMaster": "Bậc thầy",
@@ -6073,13 +6073,13 @@ export const vi_VN: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Da cho những người nhanh nhẹn",
-          "identityBody": "Thang leo từ hộ chân da, ủng và đai Fenbridge đơn giản qua áo giáp da marshstalker, mũ và hộ vai không phổ biến đến bộ mirewarden hiếm, loại da tốt nhất người thủ công có thể cắt. Hai mảnh phép thuật bổ sung cho đủ: đồ phổ thông dã chiến Da Druid Eastbrook và Băng Duskhide ở kỹ năng 75.\n\nTrên vòng nó ngồi giữa Nấu Ăn và May Vá. Đôi đang hoạt động của nó là Thợ Trang Phục, Thuộc Da và May Vá, thề trước Thợ Dệt Ottilie ở Eastbrook; đôi Thợ Bẫy với Nấu Ăn được đặt tên trên vòng nhưng chưa có nhiệm vụ thề.",
+          "identityBody": "Thang leo từ hộ chân da, ủng và đai Fenbridge đơn giản qua áo giáp da marshstalker, mũ và hộ vai không phổ biến đến bộ mirewarden hiếm, loại da tốt nhất người thủ công có thể cắt. Hai mảnh phép thuật bổ sung cho đủ: đồ phổ thông dã chiến Da Druid Eastbrook và Băng Duskhide ở kỹ năng 50.\n\nTrên vòng nó ngồi giữa Nấu Ăn và May Vá. Đôi đang hoạt động của nó là Thợ Trang Phục, Thuộc Da và May Vá, thề trước Thợ Dệt Ottilie ở Eastbrook; đôi Thợ Bẫy với Nấu Ăn được đặt tên trên vòng nhưng chưa có nhiệm vụ thề.",
           "materialsHeading": "Cuộc săn chính là thu hoạch",
-          "materialsBody": "Thuộc Da là nghề mà lộ trình lên cấp và đường tiếp tế của bạn là một: da thô được thu hoạch thẳng từ những cái xác có da, nhất là sói và lợn rừng, và mỗi cái xác chỉ phục vụ một người thu hoạch, ai đến trước được trước. Một lần tung thu hoạch ra hiếm trở lên còn cho thêm một Da Nguyên Vẹn, mẫu vật có dấu thợ mà Áo Giáp Da Mirewarden đòi hỏi, nên hãy gửi ngân hàng mọi cái bạn tìm được.\n\nDàn phụ trợ thì nhỏ: chân nhện và tơ nhện, vải homespun từ đám hình người, một quặng osmium duy nhất trong mỗi mảnh mirewarden hiếm (sáu trong món đỉnh điểm Băng Duskhide), và một Chất Thuộc Da giá 16 đồng từ quầy xưởng thuộc da. Bản thân osmium thì không bao giờ mua được ở quầy: hãy tự khai thác, ở Thornpeak hoặc tại các mạch khởi đầu của gần như mọi vùng đất trẻ hơn (riêng Farshore đào ra sắt), hoặc mua lại từ một người chơi khác.",
+          "materialsBody": "Thuộc Da là nghề mà lộ trình lên cấp và đường tiếp tế của bạn là một: da thô được thu hoạch thẳng từ những cái xác có da, nhất là sói và lợn rừng, và mỗi cái xác chỉ phục vụ một người thu hoạch, ai đến trước được trước. Một lần tung thu hoạch ra hiếm trở lên còn cho thêm một Da Nguyên Vẹn, mẫu vật có dấu thợ mà Áo Giáp Da Mirewarden đòi hỏi, nên hãy gửi ngân hàng mọi cái bạn tìm được.\n\nDàn phụ trợ thì nhỏ: chân nhện và tơ nhện, vải homespun từ đám hình người, một quặng osmium duy nhất trong mỗi mảnh mirewarden hiếm (sáu trong Băng Duskhide), và một Chất Thuộc Da giá 16 đồng từ quầy xưởng thuộc da. Bản thân osmium thì không bao giờ mua được ở quầy: hãy tự khai thác, ở Thornpeak hoặc tại các mạch khởi đầu của gần như mọi vùng đất trẻ hơn (riêng Farshore đào ra sắt), hoặc mua lại từ một người chơi khác.",
           "ladderHeading": "Được đào tạo ở Fenbridge",
-          "ladderBody": "Đây là chỗ éo le: xưởng thuộc da nằm ở Fenbridge, trên con đường vào Mirefen Marsh, khiến Thuộc Da thành nghề sâu duy nhất được đào tạo ngoài đầm lầy. Thợ thuộc da Hesk dạy thang tại những thùng ngâm của ông: bậc da Fenbridge miễn phí ở kỹ năng 0, bậc marshstalker với 25 bạc mỗi công thức từ kỹ năng 25, và bậc mirewarden với 1 vàng mỗi cái từ kỹ năng 50, mỗi bậc mở ra khi bậc của bạn chạm tới nó.\n\nBa công thức bỏ qua huấn luyện viên: hai món phổ thông dã chiến (Áo Giáp Da Thuộc và Da Druid Eastbrook) chế tạo được ở bất cứ đâu ngay từ đầu, còn Băng Duskhide thì ai cũng biết nhưng nằm ở kỹ năng 75 và gắn với xưởng thuộc da. Lưu ý rằng bản thân lời thề Thợ Trang Phục vẫn được thề ở Eastbrook với Ottilie; chỉ có việc dạy nghề là diễn ra trong đầm lầy.",
+          "ladderBody": "Đây là chỗ éo le: xưởng thuộc da nằm ở Fenbridge, trên con đường vào Mirefen Marsh, khiến Thuộc Da thành nghề sâu duy nhất được đào tạo ngoài đầm lầy. Thợ thuộc da Hesk dạy thang tại những thùng ngâm của ông: bậc da Fenbridge miễn phí ở kỹ năng 0, bậc marshstalker với 25 bạc mỗi công thức từ kỹ năng 25, và bậc mirewarden với 1 vàng mỗi cái từ kỹ năng 50, mỗi bậc mở ra khi bậc của bạn chạm tới nó.\n\nBa công thức bỏ qua huấn luyện viên: hai món phổ thông dã chiến (Áo Giáp Da Thuộc và Da Druid Eastbrook) chế tạo được ở bất cứ đâu ngay từ đầu, còn Băng Duskhide thì ai cũng biết ở kỹ năng 50 và gắn với xưởng thuộc da. Lưu ý rằng bản thân lời thề Thợ Trang Phục vẫn được thề ở Eastbrook với Ottilie; chỉ có việc dạy nghề là diễn ra trong đầm lầy.",
           "routeHeading": "Kiệt tác, và con đường thực tế lên 125",
-          "routeBody": "Mọi mảnh có chỉ số thực thụ đều tung cơ hội kiệt tác, miễn là phẩm chất cao hơn đó vẫn lọt vào trần bậc của bạn, kể cả Da Druid Eastbrook có chỉ số, và một Da Nguyên Vẹn có dấu thợ nằm trong một Áo Giáp Da Mirewarden tự động cung cấp phần thưởng nguyên liệu có dấu thợ; osmium tính là nguyên liệu bậc 1 cho cơ chế này. Những món da phổ thông không có chỉ số thì không thể tạo kiệt tác.\n\nHãy lên cấp nó theo cách tự nhiên: thu hoạch mọi con sói và lợn rừng bạn hạ từ cấp một, để hai món phổ thông dã chiến đưa bạn tới 25 dù bạn đang đứng ở đâu, rồi học bậc da tại những thùng ngâm khi các nhiệm vụ dẫn bạn vào đầm lầy dù sao đi nữa. Marshstalker đưa bạn tới 50 và mirewarden tới 75; sau đó Băng Duskhide, một công thức bậc 3 tốn sáu quặng osmium, ba Da Nguyên Vẹn, hai da thô, và một Chất Thuộc Da, trả cho một Thợ Trang Phục đã thụ ngộ điểm đầy đủ đến 99 và một nửa sau đó, khoảng 75 lần chế tác cho năm mươi điểm cuối lên tới giới hạn 125; dưới trần của một nghề chuyên ngành, công thức bậc 3 không dạy gì cả.\n\nXưởng thuộc da di động quan trọng với nghề này hơn bất kỳ nghề nào khác: hãy chuyên hóa ở 75 và một túi yên đầy da sẽ thành trang bị hoàn thiện ngay bên đống lửa trại thay vì phải cuốc bộ về Fenbridge. Đơn hàng xưởng thuộc da của Hesk mua tám tấm da thô mỗi 30 phút, một khoản lời gọn gàng từ đám da bạn vốn dĩ vẫn nhặt, và Sách Kỳ Công đánh dấu Nghề Thuộc Da ở kỹ năng 50 cùng Đại Sư Thuộc Da ở giới hạn."
+          "routeBody": "Mọi mảnh có chỉ số thực thụ đều tung cơ hội kiệt tác, miễn là phẩm chất cao hơn đó vẫn lọt vào trần bậc của bạn, kể cả Da Druid Eastbrook có chỉ số, và một Da Nguyên Vẹn có dấu thợ nằm trong một Áo Giáp Da Mirewarden tự động cung cấp phần thưởng nguyên liệu có dấu thợ; osmium tính là nguyên liệu bậc 1 cho cơ chế này. Những món da phổ thông không có chỉ số thì không thể tạo kiệt tác.\n\nHãy lên cấp nó theo cách tự nhiên: thu hoạch mọi con sói và lợn rừng bạn hạ từ cấp một, để hai món phổ thông dã chiến đưa bạn tới 25 dù bạn đang đứng ở đâu, rồi học bậc da tại những thùng ngâm khi các nhiệm vụ dẫn bạn vào đầm lầy dù sao đi nữa. Marshstalker đưa bạn tới 50, còn các mảnh mirewarden và Băng Duskhide đưa bậc hiếm từ 50 lên 75. Qua khỏi 75, những công thức bậc 2 đó giảm còn một nửa rồi một phần tư điểm nhận được, khoảng 150 lần chế tác cho năm mươi điểm cuối lên tới giới hạn 125; dưới trần của một nghề chuyên ngành, chúng vẫn khớp với trần chế tác phẩm chất hiếm thay vì bị triệt tiêu hoàn toàn.\n\nXưởng thuộc da di động quan trọng với nghề này hơn bất kỳ nghề nào khác: hãy chuyên hóa ở 75 và một túi yên đầy da sẽ thành trang bị hoàn thiện ngay bên đống lửa trại thay vì phải cuốc bộ về Fenbridge. Đơn hàng xưởng thuộc da của Hesk mua tám tấm da thô mỗi 30 phút, một khoản lời gọn gàng từ đám da bạn vốn dĩ vẫn nhặt, và Sách Kỳ Công đánh dấu Nghề Thuộc Da ở kỹ năng 50 cùng Đại Sư Thuộc Da ở giới hạn."
         },
         "cooking": {
           "identityHeading": "Nồi nuôi sống cả đội",
@@ -6279,7 +6279,7 @@ export const vi_VN: EnTranslations = {
         "q5": "Làm thế nào để tháo giao kèo đồ ủy thác, và tốn bao nhiêu?",
         "a5": "Đến bất kỳ bàn chế tác nào với món đồ trong túi và trả tiền cho chủ bàn. Phí theo phẩm chất vật phẩm: 25 bạc cho đồ khác thường, 1 vàng cho đồ hiếm, 4 vàng cho đồ sử thi; huyền thoại trả theo giá sử thi, và đồ phổ thông ủy thác trả theo giá khác thường. Phải là bàn thật: bàn di động không bao giờ cung cấp dịch vụ này.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo. Nếu nhiều bản đã ràng buộc chia sẻ một ngăn xếp, một bản được bóc ra và tháo giao kèo mỗi lần trả phí.",
         "q6": "Học công thức ở đâu, và tốn bao nhiêu?",
-        "a6": "Chín công thức dã chiến phổ thông và sáu công thức công cụ trên cạn chế tạo được thì ai cũng biết từ đầu, và ba đỉnh điểm gắn trạm cũng vậy (Áo Choàng Vai Vảy Lò, Mũ Trùm Dệt Hộ Mệnh, và Băng Cuốn Da Hoàng Hôn), chúng không cần huấn luyện viên, chỉ cần đúng trạm của mình. Mọi thứ khác đều do các bậc thầy thường trú dạy tại trạm của họ khắp ba thị trấn trung tâm: phần lớn đứng ở Eastbrook, thợ thuộc da giữ xưởng thuộc da ở Fenbridge, và nhà giả kim giữ nhà bào chế ở Highwatch.\n\nCông thức từ huấn luyện viên chạy theo nấc: kỹ năng 0, 25, và 50 cho các nghề trang bị và đồ tiêu hao, giá lần lượt là miễn phí, 25 bạc, và 1 vàng dưới dạng phí một lần; hai công thức bùa của Pháp Khắc nằm ở nấc 25, còn người chế tạo công cụ dạy hai cần câu chế tạo được ở 75 và 125 với giá 4 và 16 vàng. Một bậc thầy dạy công thức ngay khi dải của bạn trong nghề đó đạt tới dải của chính công thức, và bạn phải đứng tại trạm của họ mới học được: trạm di động không tính.",
+        "a6": "Chín công thức dã chiến phổ thông và sáu công thức công cụ trên cạn chế tạo được thì ai cũng biết từ đầu, và ba công thức gắn trạm cũng vậy (Áo Choàng Vai Vảy Lò, Mũ Trùm Dệt Hộ Mệnh, và Băng Cuốn Da Hoàng Hôn), chúng không cần huấn luyện viên, chỉ cần đúng trạm của mình. Mọi thứ khác đều do các bậc thầy thường trú dạy tại trạm của họ khắp ba thị trấn trung tâm: phần lớn đứng ở Eastbrook, thợ thuộc da giữ xưởng thuộc da ở Fenbridge, và nhà giả kim giữ nhà bào chế ở Highwatch.\n\nCông thức từ huấn luyện viên chạy theo nấc: kỹ năng 0, 25, và 50 cho các nghề trang bị và đồ tiêu hao, giá lần lượt là miễn phí, 25 bạc, và 1 vàng dưới dạng phí một lần; hai công thức bùa của Pháp Khắc nằm ở nấc 25, còn người chế tạo công cụ dạy hai cần câu chế tạo được ở 75 và 125 với giá 4 và 16 vàng. Một bậc thầy dạy công thức ngay khi dải của bạn trong nghề đó đạt tới dải của chính công thức, và bạn phải đứng tại trạm của họ mới học được: trạm di động không tính.",
         "q7": "Tại sao việc thu hoạch của tôi đột nhiên chậm lại?",
         "a7": "Thao tác niệm thu thập bắt đầu ở 2,5 giây và được gọt xuống theo hai cách: 0,4 giây cho mỗi bậc công cụ bạn mang theo và đủ sức sử dụng cao hơn bậc của chính điểm tài nguyên, và 0,15 giây một khi bộ đếm của nghề đó vượt qua dải 100 của nó, với sàn là 1,5 giây. Chuyển từ điểm tài nguyên bậc 1 lên điểm tài nguyên bậc 3 thì phần dôi ra của bạn biến mất, nên cùng cây cuốc ấy lại vung chậm đi. Cầm đúng bậc yêu cầu không mua được tốc độ; nó chỉ mở điểm tài nguyên mà thôi.\n\nTích lũy kỹ năng mờ dần y như bên chế tác: một điểm tài nguyên chuyển xám khi thành thạo của bạn leo vượt bậc của nó (điểm tài nguyên bậc 1 không dạy gì nữa từ thành thạo 75 trở đi), nên câu trả lời cho việc tích lũy chậm là những điểm tài nguyên bậc cao hơn. Những điểm đó cần một công cụ ít nhất bằng bậc của chúng nằm trong túi bạn (không điểm tài nguyên nào làm được bằng tay không, kể cả bậc 1), và một công cụ trên cạn cao hơn bậc 1 còn đòi mốc sử dụng của nó trước, 40/70/85/100 trong chính nghề của nó cho các bậc 2 đến 5. Câu Cá theo đường thoải riêng: tích lũy đầy đủ dưới 50 thành thạo, một nửa dưới 100, rỉ giọt 0,1 dưới 150 và 0,02 dưới 200, cá rác không dạy gì cả từ 100 trở lên, và bản thân vùng nước cũng chặn trần bài học (vùng nước bậc 1 ngừng dạy ở 100, đầm lầy ở 150), nên một bộ đếm đứng yên cũng có thể có nghĩa là bạn đã lớn hơn vùng nước ấy.",
         "q8": "Tôi có thể chế tác khi không ở trong thị trấn không?",
@@ -7530,7 +7530,7 @@ export const vi_VN: EnTranslations = {
       "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
       "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
       "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",
-      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+      "lootRecoveryNotice": "Cổng vào vết rạn sẽ còn giữ mở thêm một lúc nữa: nếu tổ đội của bạn gục ngã, bạn vẫn có thể đi bộ trở lại để lấy những gì mình đã kiếm được.",
       "levelGate": "Chỉ những nhà thám hiểm cấp độ {level} trở lên mới có thể vào Rạn Nứt này.",
       "deadEntry": "Bạn không thể vào Rạn Nứt khi đang chết.",
       "deadEntryCombat": "Nhóm của bạn vẫn đang trong giao tranh. Người đã chết có thể vào lại khi trận chiến kết thúc.",
@@ -9822,7 +9822,7 @@ export const vi_VN: EnTranslations = {
       },
       "ignition": {
         "name": "Bốc Cháy",
-        "description": "Nội tại: đòn chí mạng từ phép của bạn đốt mục tiêu với 40% sát thương đã gây ra trong 6 giây và có thể cộng dồn. (tinh thông Lửa)"
+        "description": "Nội tại: đòn chí mạng từ phép của bạn đốt mục tiêu với 30% sát thương đã gây ra trong 6 giây và có thể cộng dồn. (tinh thông Lửa)"
       },
       "mass_barrier": {
         "name": "Lá Chắn Hàng Loạt",
@@ -9992,7 +9992,7 @@ export const vi_VN: EnTranslations = {
       },
       "sap": {
         "name": "Đánh Lén Mê",
-        "description": "Vô hiệu hóa mục tiêu trong 8 giây. Phải đang Ẩn Thân và ngoài chiến đấu. Bất kỳ sát thương nào cũng phá vỡ hiệu ứng."
+        "description": "Vô hiệu hóa mục tiêu trong 8 giây mà không phá vỡ Duskveil hay bắt đầu giao chiến. Phải đang Ẩn Thân và ngoài chiến đấu. Bất kỳ sát thương nào cũng phá vỡ hiệu ứng."
       },
       "crippling_poison": {
         "name": "Nọc Độc Chì",
@@ -10264,7 +10264,7 @@ export const vi_VN: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Lốt Tuấn Mã",
-        "description": "Khoác lên lốt tuấn mã, tăng tốc độ di chuyển của bạn thêm 30% trong 30 phút."
+        "description": "Khoác lên lốt tuấn mã, tăng tốc độ di chuyển của bạn thêm 30% trong 30 phút. Trong khi hiệu ứng còn hoạt động, nhận sát thương sẽ khiến bạn choáng váng, giảm một nửa tốc độ di chuyển trong 4 giây (mỗi đòn trúng làm mới hiệu ứng choáng váng này)."
       },
       "aimed_shot": {
         "name": "Kéo Cung Dài",
@@ -10428,7 +10428,7 @@ export const vi_VN: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Lời Nguyền Bạo Lực",
-        "description": "Bỏ bùa kẻ địch trong 8 giây. 3 hành động gây sát thương tiếp theo của nó sẽ mỗi lần tạo ra 7 Kết Án và quất nó 16 sát thương Bóng Tối."
+        "description": "Bỏ bùa kẻ địch trong 8 giây. 3 hành động gây sát thương tiếp theo của nó sẽ mỗi lần tạo ra 7 Kết Án và quất nó 17 sát thương Bóng Tối."
       },
       "cruel_pact": {
         "name": "Khế Ước Tàn Nhẫn",
@@ -10634,7 +10634,7 @@ export const vi_VN: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Nhịp Chiến Hồn",
-        "description": "Bị động: cứ mỗi đòn vũ khí trúng thứ 3 sẽ kích hoạt 2 Tiếng Vọng Tâm Phong gây 50% sát thương Tự Nhiên và ban Điềm Bão trong 12 giây. Điềm Bão khiến Tia Hồ Quang, Địa Chấn hoặc Nước Chữa Lành kế tiếp của bạn thành tức thời và giảm 50% chi phí mana. Đòn Tổ Tiên tính là 2 đòn tấn công. (Chiến Hồn)"
+        "description": "Bị động: Cầm vũ khí ở mỗi tay không phải chịu thêm tỷ lệ trượt nào. Cứ mỗi đòn vũ khí trúng thứ 3 sẽ kích hoạt 2 Tiếng Vọng Tâm Phong gây 25% sát thương Tự Nhiên và ban Điềm Bão trong 12 giây. Điềm Bão khiến Tia Hồ Quang, Địa Chấn hoặc Nước Chữa Lành kế tiếp của bạn thành tức thời và giảm 50% chi phí mana. Đòn Tổ Tiên tính là 2 đòn tấn công. (Chiến Hồn)"
       },
       "stormsurge": {
         "name": "Sóng Bão",
@@ -10846,7 +10846,7 @@ export const vi_VN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Triệu Hồi Pyre Colossus",
-        "description": "Gọi một Pyre Colossus rơi xuống khu vực mục tiêu, gây 58-72 sát thương Lửa khi tiếp đất. Nó chiến đấu trong 30 giây mà không thay thế quỷ của bạn, thiêu đốt kẻ địch gần đó mỗi 2 giây và tạo 1 Wrack mỗi giây."
+        "description": "Gọi một Pyre Colossus rơi xuống khu vực mục tiêu, gây 64-79 sát thương Lửa khi tiếp đất. Nó chiến đấu trong 30 giây mà không thay thế quỷ của bạn, thiêu đốt kẻ địch gần đó mỗi 2 giây và tạo 1 Wrack mỗi giây."
       },
       "summon_doomguard": {
         "name": "Triệu Hồi Wraithborn",
@@ -11194,7 +11194,7 @@ export const vi_VN: EnTranslations = {
       },
       "shadowstep": {
         "name": "Trượt Bóng",
-        "description": "Bước xuyên bóng tối về phía mục tiêu. (thiên phú Đạo tặc)"
+        "description": "Bước xuyên bóng tối đến mục tiêu của bạn, dù là đồng minh hay kẻ địch, mà không phá vỡ Duskveil. (thiên phú Đạo tặc)"
       },
       "silence": {
         "name": "Câm Lặng",
@@ -12851,25 +12851,25 @@ export const vi_VN: EnTranslations = {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
       "ps_castaway_crate": {
-        "name": "Castaway Crate"
+        "name": "Thùng Trôi Dạt"
       },
       "ps_ferry_bell": {
-        "name": "Ferry Bell"
+        "name": "Chuông Phà"
       },
       "dawnhold_posy": {
         "name": "Bó Hoa Vườn Dawnhold"
       },
       "ps_briny_lure": {
-        "name": "Briny Lure"
+        "name": "Mồi Câu Mặn"
       },
       "ps_lustrous_pearl": {
-        "name": "Lustrous Pearl"
+        "name": "Ngọc Trai Lấp Lánh"
       },
       "mother_of_pearl": {
-        "name": "Mother of Pearl"
+        "name": "Xà Cừ"
       },
       "ps_passing_stone": {
-        "name": "Passing Stone"
+        "name": "Đá Từ Trần"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -14209,13 +14209,13 @@ export const vi_VN: EnTranslations = {
         "name": "Ngư Dân Bram"
       },
       "training_effigy": {
-        "name": "Training Effigy"
+        "name": "Hình Nộm Tập Luyện"
       },
       "shore_scuttler": {
-        "name": "Shore Scuttler"
+        "name": "Kẻ Bò Bờ Biển"
       },
       "mister_crabs": {
-        "name": "Mister Crabs"
+        "name": "Ngài Cua"
       },
       "rift_hellguard": {
         "name": "Vệ Binh Địa Ngục"
@@ -14375,7 +14375,7 @@ export const vi_VN: EnTranslations = {
       "apothecary_lin": {
         "name": "Dược Sĩ Lin",
         "title": "Nhà Thảo Dược",
-        "greeting": "Cẩn thận từng bước trong khu rừng phía đông nhé, bạn của ta."
+        "greeting": "Cẩn thận từng bước trong khu rừng phía đông bắc nhé, bạn của ta."
       },
       "brother_aldric": {
         "name": "Tu Huynh Aldric",
@@ -14803,49 +14803,49 @@ export const vi_VN: EnTranslations = {
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
       },
       "wayfarer_bryn": {
-        "name": "Wayfarer Bryn",
-        "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+        "name": "Lữ Khách Bryn",
+        "title": "Người Dẫn Đường Bến Cảng",
+        "greeting": "Đông Khê chào đón mọi lữ khách, bạn hỡi. Còn với những ai chưa vững vàng, luôn có Bờ Biển Thử Thách: chiếc chuông phà cạnh hòm thư Bưu Quạ sẽ đưa bạn vượt biển bất cứ ngày nào trong năm, và người anh em song sinh của nó trên đảo sẽ đưa bạn về nhà."
       },
       "instructor_maren": {
-        "name": "Instructor Maren",
-        "title": "Proving Master",
-        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+        "name": "Giáo Quan Maren",
+        "title": "Giáo Quan Thử Thách",
+        "greeting": "Mọi anh hùng mà thung lũng từng biết ơn đều đã đứng nơi bạn đang đứng bây giờ, {className}, và không một ai trong số họ biết cầm lưỡi kiếm ở đầu nào. Đó chính là lý do bờ biển này tồn tại. Hãy hỏi, hãy luyện tập, và hãy thất bại ở nơi thất bại không mất gì cả."
       },
       "quartermaster_finch": {
-        "name": "Quartermaster Finch",
-        "title": "Camp Outfitter",
-        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+        "name": "Quân Nhu Trưởng Finch",
+        "title": "Người Trang Bị Trại",
+        "greeting": "Quầy hàng của ta chỉ bán đúng một thứ, {playerName}: một chiếc túi phụ để đựng những gì bạn nhặt được dọc đường, khi bài học của bạn cần đến nó. Mọi thứ khác ở đây đều là đồ phế liệu dành cho thung lũng. Tiền mua túi, và công việc kiếm ra tiền. Đó là toàn bộ nền kinh tế, và nó không bao giờ phức tạp hơn. Chỉ là lớn hơn thôi."
       },
       "ferryman_odo": {
-        "name": "Ferryman Odo",
-        "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+        "name": "Người Lái Phà Odo",
+        "title": "Người Giữ Chuyến Phà",
+        "greeting": "Vừa mới vượt biển xong à, {playerName}? Vệ Quan Tam giữ Vòng Khổ Luyện trên bờ biển ngay phía nam bến tàu của ta: hãy chạy qua các đường chạy của ông ấy trước, đôi chân bạn sẽ biết ơn vì điều đó. Mọi người giữ trên bờ biển này sẽ trao bạn cho người tiếp theo khi công việc của bạn xong xuôi, và tấm thẻ nhiệm vụ ở đầu màn hình của bạn luôn biết đường đi. Khi thung lũng gọi bạn trở về, hãy rung chiếc chuông đứng cạnh bến tàu của ta, và chuyến phà sẽ đưa bạn xuống thị trấn Đông Khê."
       },
       "bursar_wick": {
-        "name": "Bursar Wick",
-        "title": "The Gilded Strongbox",
-        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+        "name": "Thủ Quỹ Wick",
+        "title": "Két Sắt Mạ Vàng",
+        "greeting": "Két Sắt Mạ Vàng vẫn có một chiếc bàn ngay cả ở đây, {playerName}. Bất cứ thứ gì bạn gửi cho ta đều nằm chờ trong cùng một kho két đứng sau lưng mọi thủ quỹ ở mọi thị trấn, an toàn khỏi sói, nước, và cả sự phán đoán tồi tệ hơn của chính bạn."
       },
       "warden_tam": {
-        "name": "Warden Tam",
-        "title": "Keeper of the Gauntlet",
-        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+        "name": "Vệ Quan Tam",
+        "title": "Người Giữ Vòng Khổ Luyện",
+        "greeting": "Những đường chạy này chính là Vòng Khổ Luyện, {playerName}, và mọi nhà phiêu lưu được thung lũng nể trọng đều đã chạy qua chúng. Những cột đèn lồng luôn sáng suốt đêm, nên các đường chạy không bao giờ đóng cửa."
       },
       "overseer_pell": {
-        "name": "Overseer Pell",
-        "title": "Gauntlet Overseer",
-        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+        "name": "Giám Sát Pell",
+        "title": "Giám Sát Vòng Khổ Luyện",
+        "greeting": "Ta bấm giờ mọi lượt chạy qua những đường chạy này, {playerName}, và ta đã thấy những bước chân tệ hơn nhiều. Con đường phía sau ta leo lên sân tập: đó là nơi bước chân biến thành đường kiếm."
       },
       "drillmaster_rook": {
-        "name": "Drillmaster Rook",
-        "title": "Yard Master",
-        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+        "name": "Giáo Đầu Rook",
+        "title": "Sân Trưởng",
+        "greeting": "Rơm trước, mai cua sau, {playerName}. Một hình nộm dạy cánh tay bạn cách vung; còn lũ kẻ bò dưới bờ biển dạy nó cách đánh trúng thứ biết đau."
       },
       "tidewarden_nel": {
-        "name": "Tidewarden Nel",
-        "title": "Keeper of the Strand",
-        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
+        "name": "Vệ Triều Nel",
+        "title": "Người Giữ Bờ Cát",
+        "greeting": "Thủy triều lấy đi và thủy triều trả lại, {playerName}. Ta ghi sổ cả hai: những gì lũ kẻ bò cắp đi từ xác tàu, và những gì đôi tay lương thiện mang trở lên theo con đường này."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -14856,7 +14856,7 @@ export const vi_VN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Nghề Cho Mọi Đôi Tay",
-        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía đông nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
+        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía đông bắc thị trấn, qua khỏi khu vực sói chạy. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
         "completion": "Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.",
         "objectives": {
           "0": {
@@ -14886,7 +14886,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_boars": {
         "title": "Da Lợn Rừng Lông Cứng",
-        "text": "Da lợn lòi làm ra những chiếc túi du hành tốt nhất, và những đồng cỏ phía tây thị trấn nhung nhúc lũ thú đó. Hãy mang cho ta 5 tấm Da Lợn Lòi Lông Cứng và ta sẽ không để ngươi phí công.",
+        "text": "Da lợn lòi làm ra những chiếc túi du hành tốt nhất, và những đồng cỏ phía tây bắc thị trấn nhung nhúc lũ thú đó. Hãy mang cho ta 5 tấm Da Lợn Lòi Lông Cứng và ta sẽ không để ngươi phí công.",
         "completion": "À, những tấm da lông cứng tuyệt hảo! Chúng sẽ bán được giá hời.",
         "objectives": {
           "0": {
@@ -14896,7 +14896,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_spiders": {
         "title": "Hiểm Họa Sableweb",
-        "text": "Bọn rình rập trong khu rừng phía đông nhả ra một loại tơ ta cần cho thuốc đắp, mà chúng cũng đã sinh sôi quá đông. Hãy tỉa bớt 6 con Kẻ Rình Sableweb và cắt 4 tuyến tơ từ bụng chúng.",
+        "text": "Bọn rình rập trong khu rừng phía đông bắc nhả ra một loại tơ ta cần cho thuốc đắp, mà chúng cũng đã sinh sôi quá đông. Hãy tỉa bớt 6 con Kẻ Rình Sableweb và cắt 4 tuyến tơ từ bụng chúng.",
         "completion": "Ặc, vẫn còn giật giật. Hoàn hảo. Đây, ngươi đã xứng đáng với thứ này.",
         "objectives": {
           "0": {
@@ -14939,7 +14939,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_supplies": {
         "title": "Hàng Tiếp Tế Bị Đánh Cắp",
-        "text": "Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi tây nam. Lấy cắp chúng về cho ta, được chứ?",
+        "text": "Bọn cướp ấy đã đột kích chiếc xe ngựa cuối cùng của ta và cuỗm đi bốn thùng hàng - dụng cụ, muối, vải lanh Eastbrook hảo hạng. Những thùng hàng được chất đống quanh trại của chúng nơi vùng đồi tây bắc. Lấy cắp chúng về cho ta, được chứ?",
         "completion": "Những thùng hàng của ta! Gần như chẳng có lấy một vết xước. Ngươi thật phi thường.",
         "objectives": {
           "0": {
@@ -15032,7 +15032,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_bandits": {
         "title": "Lũ Cướp Thung Lũng",
-        "text": "Một bầy sát nhân đã dựng trại trên những ngọn đồi tây nam. Chúng đã cướp ba cỗ xe trong tuần này. Hãy đuổi chúng đi, tiêu diệt 10 tên Cướp Thung Lũng.",
+        "text": "Một bầy sát nhân đã dựng trại trên những ngọn đồi tây bắc. Chúng đã cướp ba cỗ xe trong tuần này. Hãy đuổi chúng đi, tiêu diệt 10 tên Cướp Thung Lũng.",
         "completion": "Bớt đi mười lưỡi dao trong bóng tối. Hãy cầm lấy thứ này, ngươi xứng đáng với nó.",
         "objectives": {
           "0": {
@@ -15712,7 +15712,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Sợi Chỉ Nối Lại",
-        "text": "Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía đông, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.",
+        "text": "Trở lại khung cửi của tôi rốt cuộc rồi. Tôi không giữ oán giận, {playerName}, nhưng sợi chỉ nhớ một bàn tay đã buông nó, và cái giá để lấy lại ngày càng dài hơn mỗi lần. Hãy tỉa đàn nhện gỗ lưới đang chen chúc ở khu rừng phía đông bắc, và lao động sẽ ổn định đôi tay bạn trước khi chúng chạm lại vào tơ tốt.",
         "completion": "Vững tay lại rồi. Thuộc Da và May Vá trở lại tay bạn là chuyên ngành. Hãy đo hai lần trước khi lang thang lần này.",
         "objectives": {
           "0": {
@@ -15722,7 +15722,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Trở Lại Nồi",
-        "text": "Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía tây, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.",
+        "text": "Ồ, nhìn xem ai trở lại nồi của tôi. Không có gì khó chịu đâu, {playerName}, nhà bếp luôn có chỗ, nhưng bạn biết cái hóa đơn cứ dài thêm mỗi lần bạn bước ra ngoài. Hãy đi tỉa đàn lợn rừng hoang ở đồng cỏ phía tây bắc, vì mồ hôi lao động trung thực là thành phần đầu tiên, và nó sẽ nhắc nhở đôi bàn tay bạn về công việc.",
         "completion": "Đây rồi, hương vị quen thuộc. Giả Kim và Nấu Ăn trở lại là chuyên ngành của bạn. Ở lại lâu hơn lần này.",
         "objectives": {
           "0": {
@@ -16814,105 +16814,105 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_ps_the_gauntlet": {
-        "title": "Run the Gauntlet",
-        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
-        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "title": "Chạy Vòng Khổ Luyện",
+        "text": "Mọi đôi chân được thung lũng nể trọng đều đã chạy qua những đường chạy này trước tiên, {playerName}. Đi theo đường chạy đầu tiên về phía tây đến lá cờ của nó, xoay người lại, đi theo đường chạy phía nam đến lá cờ thứ hai, rồi bước ngang qua đường chạy cuối cùng đến lá cờ đỏ. Hãy qua các lá cờ theo đúng thứ tự, và tấm thẻ nhiệm vụ ở đầu màn hình của bạn sẽ chỉ cho bạn từng nút bấm khi bạn đi. Giám Sát Pell bấm giờ mọi lượt chạy từ đầu kia: khi lá cờ đỏ đã ở sau lưng bạn, ông ấy đứng ngay đó để ghi nhận.",
+        "completion": "Ta đã bấm giờ lượt chạy đó, {playerName}, và ta từng đánh trượt những đôi chân nhanh hơn thế. Vòng Khổ Luyện giờ là của bạn. Con đường phía sau ta leo lên sân tập, nơi Giáo Đầu Rook biến bước chân thành đường kiếm: ông ấy có nhiệm vụ tiếp theo cho bạn.",
         "objectives": {
           "0": {
-            "label": "Gauntlet flag passed"
+            "label": "Cờ Vòng Khổ Luyện đã qua"
           }
         }
       },
       "q_ps_strike_true": {
-        "title": "Strike True",
-        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
-        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "title": "Đánh Trúng Đích",
+        "text": "Bước chân trước, giờ đến cánh tay, {playerName}. Sân tập nằm trên con đường phía sau ta, và những hình nộm rơm của nó được dựng lên để chịu đòn. Nếu bạn lạc đường, hãy nhấn M để mở bản đồ: mọi nhiệm vụ bạn đang mang theo đều được đánh dấu trên đó. Đi tới một hình nộm và nhấp chuột trái vào nó: điều đó biến nó thành mục tiêu của bạn, và tên nó sẽ hiện lên ở đầu màn hình. Chỉ khi đó hãy nhấn 1, hoặc nhấp vào biểu tượng đầu tiên trên thanh hành động dọc theo đáy màn hình, để vung vũ khí. Tiếp tục tấn công cho đến khi nó gục; nó sẽ không đánh trả, hình nộm chẳng bao giờ làm vậy. Giáo Đầu Rook trông coi sân tập từ vai phía tây của nó, nơi con đường ra bờ biển bắt đầu: nhấn F vào ông ấy để nộp lại kết quả hạ gục.",
+        "completion": "Một cú hạ gọn gàng, và cái nắm tay của bạn đã vững hơn rồi. Hãy nhớ lấy cảm giác đó, {playerName}: nhắm mục tiêu, tấn công, và tiếp tục tấn công. Rơm chẳng bao giờ biết đau. Thứ tiếp theo bạn vung vũ khí vào thì có đấy.",
         "objectives": {
           "0": {
-            "label": "Training Effigy felled"
+            "label": "Hình Nộm Tập Luyện đã bị hạ"
           }
         }
       },
       "q_ps_hone_the_edge": {
-        "title": "Hone the Edge",
-        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
-        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "title": "Mài Sắc Lưỡi Kiếm",
+        "text": "Một nhát chém chỉ là một nhát chém, {playerName}, và rơm sẽ chịu được cả ngày. Đó không phải thứ giúp bạn thắng được gì cả. Hãy nhìn vào hàng nút dọc theo đáy màn hình của bạn: hàng nút đó chính là kỹ năng của bạn, và mỗi nút trong số chúng làm được điều mà chỉ riêng cánh tay bạn không thể. Bạn đã có một cái rồi. Quay lại chỗ những hình nộm và dùng nó: chọn mục tiêu, rồi nhấn nút mà sân tập đánh dấu cho bạn, ba lần liên tiếp. Đừng chỉ chém bừa vào rơm; hãy khiến thứ bạn biết cách làm thực sự xảy ra. Rồi quay lại gặp ta.",
+        "completion": "Giờ thì bạn đang chiến đấu thay vì quơ tay loạn xạ. Hàng nút đó lớn dần theo mỗi cấp bạn đạt được, {playerName}, và những người sống lâu nhất là những người biết đọc nó. Rơm không quan tâm bạn dùng nút nào. Thung lũng thì có.",
         "objectives": {
           "0": {
-            "label": "Ability landed on an effigy"
+            "label": "Kỹ năng đã đánh trúng một hình nộm"
           }
         }
       },
       "q_ps_shell_and_claw": {
-        "title": "Shell and Claw",
-        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
-        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "title": "Mai và Càng",
+        "text": "Rơm chẳng bao giờ biết đau, {playerName}, vậy nên đây là thứ biết đau. Lũ kẻ bò bờ biển bới lục dọc tuyến xác tàu ở bờ xa: theo con đường phía tây từ sân tập của ta, nó sẽ dẫn bạn thẳng tới chỗ chúng. Chúng kẹp lại, nên hãy theo dõi thanh máu và tiếp tục vung vũ khí: nhấp chuột trái vào một con để biến nó thành mục tiêu, rồi dùng kỹ năng mà sân tập đã dạy bạn (huấn luyện viên sẽ gọi tên nút của bạn), và đừng dừng lại cho đến khi mai nó vỡ. Ba con là đủ. Rồi leo lên con đường ở gò đất phía bắc: Vệ Triều Nel giữ sổ đếm của bờ biển, và bà ấy sẽ đếm số mai bạn mang tới.",
+        "completion": "Ba chiếc mai đã vỡ và mọi ngón tay của bạn vẫn còn nguyên: một trận chiến đầu tay công bằng, {playerName}. Lũ kẻ bò cắp mất đồ từ những xác tàu nhanh hơn cả thủy triều mang phế liệu vào, nên mỗi con bạn tỉa bớt là một đồng tiền ai đó giữ lại được.",
         "objectives": {
           "0": {
-            "label": "Shore Scuttler culled"
+            "label": "Kẻ Bò Bờ Biển bị tỉa bớt"
           }
         }
       },
       "q_ps_mother_of_pearl": {
-        "title": "Mother of Pearl",
-        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
-        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "title": "Xà Cừ",
+        "text": "Ba chiếc mai đã vỡ, {playerName}, nhưng tuyến xác tàu còn giữ một vị vua, và hắn ngồi trên một chiến lợi phẩm đáng giá hơn mọi thùng hàng trên bờ biển này. Hãy mang Mồi Câu Mặn này đến vũng nước triều ở đầu cực tây của bờ biển, qua khỏi những xác tàu. Đứng ở mép nước, nhấn B để mở túi đồ, và nhấp chuột trái vào mồi câu để đánh thức hắn. Ngài Cua kẹp mạnh hơn nhiều so với những người anh em họ nhỏ bé của hắn, vậy nên hãy theo dõi thanh máu, tiếp tục tấn công, và lùi lên bãi cát nếu cần lấy lại hơi thở. Khi hắn ngã xuống, hãy đi thẳng đến chỗ mai của hắn và nhấn F để nhặt Ngọc Trai Lấp Lánh từ hắn. Mang viên ngọc đó về cho ta.",
+        "completion": "Ngọc Trai Lấp Lánh, được cạy ra từ chính con vua của vùng nước cạn. Cha ta từng ngả mũ chào con cua đó mỗi sáng suốt cả đời làm việc của ông; có chút kính trọng ở đây là phải đạo. Giữ yên nào... đó. Xâu xong, gắn xong, và giờ là của bạn, {playerName}: Xà Cừ. Nhấn B để mở túi đồ và nhấp chuột trái vào chiếc nhẫn để đeo nó lên, rồi nhấn C để mở bảng nhân vật và xem nó nằm trên tay bạn. Một thứ nhỏ bé thôi, nhưng mọi phần trong con người bạn đều tốt hơn khi mang nó.",
         "objectives": {
           "0": {
-            "label": "Mister Crabs slain"
+            "label": "Ngài Cua đã bị hạ"
           },
           "1": {
-            "label": "Lustrous Pearl claimed"
+            "label": "Ngọc Trai Lấp Lánh đã thu được"
           }
         }
       },
       "q_ps_the_wreck_line": {
-        "title": "The Wreck Line",
-        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "title": "Tuyến Xác Tàu",
+        "text": "Những người khuân vác của ta lôi phế liệu ra khỏi những xác tàu cũ và mang nó lên dốc về phía Trại Dawnrest, {playerName}, và phân nửa số thùng chẳng bao giờ leo hết đường: chúng bị đặt xuống dọc đường và bị bỏ quên. Đi theo con đường của ta về phía trại và bạn sẽ đi ngang qua đúng những thùng lạc lối đó. Mở một thùng thì đơn giản thôi: đi tới gần một thùng cho đến khi tên nó hiện ra, rồi nhấn F, hoặc nhấp chuột trái vào chính chiếc thùng, và nó sẽ nhả ra những gì nó chứa. Sáu thùng sẽ dọn sạch cả tuyến đường, và nhớ rằng F là cùng một phím cho mọi rương, mọi điểm khai thác và mọi cánh cửa bạn sẽ gặp sau này. Quân Nhu Trưởng Finch giữ quầy hàng của trại và mua mọi mẩu phế liệu: hãy giao số hàng thu được cho cô ấy.",
+        "completion": "Dây thừng, nhựa đường, và nửa bánh phô mai mà biển cả không hiểu sao lại tha cho: ta sẽ nhận hết, {playerName}. Một tấm lưng biết mang những gì nó tìm thấy còn giá trị với trại này hơn bất kỳ lưỡi kiếm nào, và tấm lưng của bạn vừa dọn sạch cả tuyến đường chỉ trong một lượt leo.",
         "objectives": {
           "0": {
-            "label": "Castaway Crate opened"
+            "label": "Thùng Trôi Dạt đã mở"
           }
         }
       },
       "q_ps_pouch_and_purse": {
-        "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
-        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "title": "Túi Và Hầu Bao",
+        "text": "Còn một bài học nữa trước khi tới thung lũng, {playerName}, và đó là bài học giữ cho nhà phiêu lưu sống sót: những gì bạn mang theo. Ba lô của bạn có mười sáu ô, và bên cạnh nó có bốn vòng túi trống đang chờ; mỗi chiếc túi bạn buộc vào sẽ thêm không gian riêng của nó vào tổng số. Vậy nên: nhấn F vào ta lần nữa để mở quầy hàng của ta, nhấp chuột trái vào Túi vải lanh trong hàng hóa của ta để mua nó, rồi nhấn B để mở túi đồ và nhấp chuột trái vào chiếc túi ở đó để buộc nó vào một vòng còn trống. Giáo Quan Maren huấn luyện bên đống lửa tập hợp cách đây vài bước về phía đông: hãy cho bà ấy xem chiếc túi trên thắt lưng của bạn.",
+        "completion": "Một chiếc túi tốt. Hãy buộc nó vào nếu bạn chưa làm vậy: nhấn B để mở túi đồ, rồi nhấp chuột trái vào chiếc túi để gắn nó vào một vòng túi còn trống, và sáu ô nữa sẽ là của bạn để chứa đầy rắc rối. Giờ đến nửa còn lại của bài học mà không túi nào chứa nổi, {playerName}: những gì bạn không thể mang theo, Két Sắt Mạ Vàng sẽ giữ giúp. Thủ Quỹ Wick giữ bàn két sắt của mình trên con đường phía tây, và ông mở cùng một kho két mà mọi thủ quỹ ở mọi thị trấn đều chia sẻ; càng nhiều chỗ trong kho két có thể được mua thêm một khi túi tiền của bạn lớn đủ để cần đến nó. Hãy giữ đồ quý giá trong ngân hàng và túi đồ luôn rộng rãi. Một túi đồ đầy ắp đã kết thúc nhiều cuộc phiêu lưu hơn bất kỳ con sói nào từng làm được.",
         "objectives": {
           "0": {
-            "label": "Linen Pouch bought"
+            "label": "Túi vải lanh đã mua"
           }
         }
       },
       "q_ps_the_signpost": {
-        "title": "Word on the Wind",
-        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
-        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "title": "Tin Theo Gió",
+        "text": "Còn một thói quen nữa cần học, {playerName}, và nó chẳng cần đến lưỡi kiếm nào: đọc những tấm bảng. Bảng thông báo bang hội đứng ở cổng trại cách đống lửa của ta vài bước về phía tây nam, và các bang hội cùng những đoàn lữ hành dán lời kêu gọi của họ lên đó. Hãy đi tới trước mặt nó và nhấn F, hoặc nhấp chuột trái vào nó, để đọc những gì được dán lên, rồi quay lại và kể cho ta nghe cơn gió đã mang tin gì tới. Một tấm bảng như vậy đứng ở mọi thị trấn mà bạn sẽ từng bước chân vào.",
+        "completion": "Vậy là giờ bạn đã biết tin tức lan truyền thế nào trong thung lũng, {playerName}: không phải qua người đưa tin, mà qua những tấm bảng. Hãy kiểm tra chúng ở mọi thị trấn bạn đi qua; phân nửa các cuộc phiêu lưu bắt đầu chỉ bằng ba dòng mực trên một tấm bảng như vậy.",
         "objectives": {
           "0": {
-            "label": "Guild signpost read"
+            "label": "Bảng thông báo bang hội đã đọc"
           }
         }
       },
       "q_ps_the_long_walk": {
-        "title": "The Long Walk",
-        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
-        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "title": "Chuyến Đi Bộ Dài",
+        "text": "Còn một bài học nữa, {playerName}, và đó là bài học ta không thể kể cho bạn: bạn phải tự mình trải qua nó một lần. Bạn sẽ chết ở ngoài kia. Ai cũng vậy cả, và đó không phải là kết thúc của bất cứ điều gì. Hãy cầm lấy Đá Từ Trần này. Nhấn B để mở túi đồ và nhấp chuột trái vào nó, nó sẽ đặt bạn nằm xuống ngay tại chỗ bạn đứng. Rồi làm theo hướng dẫn trên màn hình: giải phóng linh hồn bạn, đi bộ trở về cơ thể của chính mình, và bước vào đó. Cơ thể bạn đang chờ, chuyến đi bộ ấy miễn phí, và bạn chẳng mất gì khi thực hiện nó.",
+        "completion": "Và bạn đã trở lại, không hề hấn gì. Hãy nhớ lấy cảm giác đó, {playerName}, bởi vì lần tới khi điều này xảy ra sẽ có răng nanh dính vào, và chẳng có ai đứng bên cạnh để giải thích cả. Cơ thể bạn đang chờ, chuyến đi bộ ấy miễn phí, và thứ duy nhất cái chết thực sự lấy đi của bạn là thời gian để quay trở lại.",
         "objectives": {
           "0": {
-            "label": "Walked back from the dead"
+            "label": "Đã đi bộ trở về từ cõi chết"
           }
         }
       },
       "q_ps_set_sail": {
-        "title": "Set Sail",
-        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
-        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "title": "Ra Khơi",
+        "text": "Không còn gì trên bờ biển này mà bạn chưa từng chạy qua, đánh bại, mở ra, hay mua, {playerName}. Bạn đã sẵn sàng, và Đông Khê có công việc thực sự đang chờ. Hãy đi ngược con đường ven biển xuống bến tàu, nhấn F vào Người Lái Phà Odo, và nói với ông ấy rằng ta bảo bạn đã xứng đáng có được chuyến phà của mình. Nhấn L bất cứ khi nào bạn quên mất mình còn nợ ai điều gì: đó là nhật ký nhiệm vụ của bạn.",
+        "completion": "Maren nói vậy à? Lời khen cao quý đấy, từ một người phụ nữ từng bắt ta luyện thắt nút neo thuyền suốt cả tuần. Hãy rung chiếc chuông đứng cạnh bến tàu của ta bất cứ khi nào bạn sẵn sàng, {playerName}, và chuyến phà sẽ đưa bạn xuống ngay giữa thị trấn Đông Khê. Coi chừng lũ sói.",
         "objectives": {
           "0": {
-            "label": "Report to Ferryman Odo"
+            "label": "Báo cáo với Người Lái Phà Odo"
           }
         }
       },
@@ -17115,7 +17115,7 @@ export const vi_VN: EnTranslations = {
             "label": "Đường Đê Farshore"
           },
           "12": {
-            "label": "Eastbrook Docks"
+            "label": "Bến Cảng Đông Khê"
           }
         }
       },
@@ -17480,23 +17480,23 @@ export const vi_VN: EnTranslations = {
         }
       },
       "proving_shore": {
-        "name": "The Proving Shore",
-        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "name": "Bờ Biển Thử Thách",
+        "welcome": "Bờ Biển Thử Thách chẳng đòi hỏi gì ở bạn ngoài thời gian. Hãy tìm hiểu khu trại, đánh những hình nộm, đi dọc tuyến xác tàu, và khi bạn đã sẵn sàng, Người Lái Phà Odo sẽ đưa bạn vượt biển đến thung lũng.",
         "pois": {
           "0": {
-            "label": "Dawnrest Camp"
+            "label": "Trại Dawnrest"
           },
           "1": {
-            "label": "The Old Pier"
+            "label": "Bến Tàu Cũ"
           },
           "2": {
-            "label": "The Practice Yard"
+            "label": "Sân Tập"
           },
           "3": {
-            "label": "The Wreck Line"
+            "label": "Tuyến Xác Tàu"
           },
           "4": {
-            "label": "The Gauntlet"
+            "label": "Vòng Khổ Luyện"
           }
         }
       }
@@ -17742,19 +17742,19 @@ export const vi_VN: EnTranslations = {
         "body": "Một chuyên ngành của bạn đạt thành thạo, chính ĐỈNH, kaboom, cả thang, xong. Tôi không tặng lời khen, tôi tặng ngòi nổ, nhưng đây, hãy lấy cả hai: bạn thực sự xuất chúng và hơi đáng sợ một chút. Hãy đi làm những ngọn núi lo lắng đi."
       },
       "woc_market_delivery": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange purchase",
-        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "sender": "Nhà Môi Giới Sàn Giao Dịch",
+        "subject": "Món hàng bạn mua trên Sàn Giao Dịch",
+        "body": "Giao dịch đã hoàn tất và món hàng giờ thuộc về bạn. Kiện hàng đính kèm chứa đúng vật phẩm bạn đã trả tiền, được ký quỹ giữ an toàn kể từ thời điểm được rao bán cho đến khi khoản thanh toán của bạn được xác nhận.\n\nBản ghi giao dịch này được lưu trong sổ cái của Sàn Giao Dịch.\n\n- Nhà Môi Giới Sàn Giao Dịch"
       },
       "woc_market_return": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing has ended",
-        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+        "sender": "Nhà Môi Giới Sàn Giao Dịch",
+        "subject": "Tin rao của bạn trên Sàn Giao Dịch đã kết thúc",
+        "body": "Tin rao của bạn đã kết thúc mà không có giao dịch nào hoàn tất: phiên đấu giá không tìm được người mua, chưa đạt giá dự trữ, tin rao đã bị rút lại, hoặc người thắng không thanh toán được. Món hàng của bạn được trả lại nguyên vẹn cùng lá thư này, đúng như khi được ký quỹ.\n\n- Nhà Môi Giới Sàn Giao Dịch"
       },
       "woc_market_sold": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+        "sender": "Nhà Môi Giới Sàn Giao Dịch",
+        "subject": "Tin rao của bạn trên Sàn Giao Dịch đã bán được",
+        "body": "Tin rao của bạn đã bán được và người mua đã thanh toán đầy đủ. Sổ cái của Sàn Giao Dịch lưu lại bản ghi giao dịch, và mục hoạt động Sàn Giao Dịch của bạn hiển thị số tiền đã thanh toán cùng phần chi tiết của nó.\n\n- Nhà Môi Giới Sàn Giao Dịch"
       }
     },
     "itemSets": {

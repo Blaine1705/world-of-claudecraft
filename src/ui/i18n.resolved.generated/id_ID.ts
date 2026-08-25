@@ -441,7 +441,7 @@ export const id_ID: EnTranslations = {
       "remainingDaysHours": "{days} hari {hours} jam",
       "score": "Skor",
       "walletValue": "Nilai Dompet (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Tidak diketahui",
       "spinTitle": "Putaran Harian",
@@ -483,85 +483,85 @@ export const id_ID: EnTranslations = {
       }
     },
     "trade": {
-      "windowClosed": "Trade window closed.",
+      "windowClosed": "Jendela perdagangan ditutup.",
       "woc": {
-        "tabGold": "Gold",
+        "tabGold": "Emas",
         "tabWoc": "$WOC",
-        "modesLabel": "Payment currency",
-        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
-        "priceLabel": "Price in USD",
+        "modesLabel": "Mata uang pembayaran",
+        "tabWocHint": "Pembayaran dengan $WOC tersedia saat sisi mejamu kosong dan tidak ada emas yang ditawarkan.",
+        "priceLabel": "Harga dalam USD",
         "pricePlaceholder": "0.00",
-        "equivalent": "About {tokens} $WOC at the current rate",
-        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
-        "feeLine": "Exchange fee {fee}, taken out of the price.",
-        "netLine": "You receive {net}",
-        "netLineBuyer": "The seller receives {net}",
-        "sendOffer": "Offer $WOC",
-        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
-        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
-        "incomingAccept": "{name} offers {price} for your items.",
-        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
-        "blockDisabled": "The $WOC Exchange is not available on this realm.",
-        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
-        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
-        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
-        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
-        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
-        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
-        "hintEnterPrice": "Enter a price in USD.",
-        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
-        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
-        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
-        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
-        "incomingTitle": "$WOC offer from {name}",
-        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "equivalent": "Sekitar {tokens} $WOC pada kurs saat ini",
+        "variableWarning": "Jumlah $WOC ini hanyalah pratinjau, bukan harga tetap. Angka pastinya ditentukan oleh kuotasi baru saat kamu membayar.",
+        "feeLine": "Biaya Bursa {fee}, dipotong dari harga.",
+        "netLine": "Kamu menerima {net}",
+        "netLineBuyer": "Penjual menerima {net}",
+        "sendOffer": "Tawarkan $WOC",
+        "offerSent": "Tawaran terkirim. Tawaran akan berakhir dalam 10 menit kecuali {name} menerimanya.",
+        "offerSentUntil": "Tawaran terkirim. Tawaran akan berakhir pada {time} kecuali {name} menerimanya.",
+        "incomingAccept": "{name} menawarkan {price} untuk barang-barangmu.",
+        "notInstant": "Penjualan $WOC tidak instan. Barang akan ditahan begitu kedua pihak menyetujui, dan sampai ke pembeli setelah pembayaran terverifikasi.",
+        "blockDisabled": "Bursa $WOC tidak tersedia di realm ini.",
+        "blockNoWallet": "Tautkan dan verifikasi dompet untuk menjual barang seharga $WOC.",
+        "blockPartnerUnknown": "Memeriksa apakah pemain itu dapat menerima $WOC...",
+        "blockRecipientNoWallet": "Pemain itu harus menghubungkan dompet untuk menerima pembayaran $WOC.",
+        "hintClearYourItems": "Hapus barang milikmu sendiri: tawaran $WOC membeli apa yang mereka jual.",
+        "hintAwaitTheirItems": "Menunggu mereka menawarkan sesuatu yang bisa dijual untuk $WOC.",
+        "hintOneItem": "Sebuah kesepakatan $WOC mencakup tepat satu barang. Hanya barang yang dijual yang boleh ada di meja perdagangan.",
+        "hintEnterPrice": "Masukkan harga dalam USD.",
+        "hintAcceptNeedsItem": "Tambahkan barang yang kamu jual sebelum menerima.",
+        "hintAcceptLocked": "Barang itu terkunci. Buka kuncinya di dalam tasmu, lalu hapus dari perdagangan dan tambahkan kembali.",
+        "hintGoldOffered": "Hapus tawaran emasmu dulu: sebuah perdagangan memakai emas atau $WOC, bukan keduanya.",
+        "ineligibleReason": "Barang Terikat Jiwa, barang quest, dan barang terkunci, serta barang di luar kategori Bursa, tidak dapat dijual untuk $WOC.",
+        "incomingTitle": "Tawaran $WOC dari {name}",
+        "incomingBody": "{name} menawarkan untuk menjual {item} kepadamu seharga {price}.",
         "moneyUsd": "{usd}",
         "moneyLine": "{usd} (~ {tokens} $WOC)",
-        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
-        "payNow": "Pay {usd}",
-        "awaitingPayment": "Waiting for payment confirmation...",
-        "paying": "Confirm the payment in your wallet...",
-        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
-        "settledSeller": "Paid. The item was delivered to the buyer.",
-        "accept": "Accept offer",
-        "accepted": "Offer accepted. Your item is held until payment is verified.",
-        "decline": "Decline",
-        "withdraw": "Withdraw offer",
-        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
-        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
-        "statusPayingBuyer": "Confirming your payment on the network...",
-        "statusPayingSeller": "The buyer's payment is confirming on the network...",
-        "statusReviewBuyer": "Your payment is under review.",
-        "statusReviewSeller": "The buyer's payment is under review.",
-        "paidSeller": "You have received a payment of {price} for your {item}.",
-        "paidBuyer": "You have sent a payment of {price} for {item}.",
-        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
-        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
-        "cancelSale": "Cancel sale",
-        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
-        "youDeclined": "You declined the offer.",
-        "youWithdrew": "You withdrew your offer.",
-        "offerNotPending": "This offer is no longer pending.",
-        "offerDeclined": "The $WOC offer was declined.",
-        "offerWithdrawn": "The $WOC offer was withdrawn.",
-        "offerExpired": "The $WOC offer expired.",
-        "offerExpiresAt": "Offer expires at {time}.",
-        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
-        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
-        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
-        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
-        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
-        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
-        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
-        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
-        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
-        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
-        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
-        "hintBelowMin": "The Exchange minimum price is {usd}."
+        "waitingOther": "Tawaran diterima. Menunggu pemain lain menerima.",
+        "payNow": "Bayar {usd}",
+        "awaitingPayment": "Menunggu konfirmasi pembayaran...",
+        "paying": "Konfirmasikan pembayaran di dompetmu...",
+        "settled": "Sudah dibayar. Barangmu ada di tasmu, atau tiba lewat Pos Gagak jika tasmu penuh.",
+        "settledSeller": "Sudah dibayar. Barang telah dikirim ke pembeli.",
+        "accept": "Terima tawaran",
+        "accepted": "Tawaran diterima. Barangmu ditahan hingga pembayaran terverifikasi.",
+        "decline": "Tolak",
+        "withdraw": "Tarik tawaran",
+        "hintInsufficientBalance": "Itu lebih banyak $WOC daripada yang dimiliki dompet yang terhubung.",
+        "statusAwaitingBuyer": "Menunggu pembeli membayar.",
+        "statusPayingBuyer": "Mengonfirmasi pembayaranmu di jaringan...",
+        "statusPayingSeller": "Pembayaran pembeli sedang dikonfirmasi di jaringan...",
+        "statusReviewBuyer": "Pembayaranmu sedang ditinjau.",
+        "statusReviewSeller": "Pembayaran pembeli sedang ditinjau.",
+        "paidSeller": "Kamu telah menerima pembayaran sebesar {price} untuk {item}mu.",
+        "paidBuyer": "Kamu telah mengirim pembayaran sebesar {price} untuk {item}.",
+        "closedCancelled": "Penjualan ini dibatalkan. Barang akan dikembalikan ke penjual lewat Pos Gagak.",
+        "closedSuspended": "Penjualan ini ditangguhkan oleh seorang moderator. Barang akan dikembalikan ke penjual lewat Pos Gagak.",
+        "closedUnpaid": "Penjualan ini berakhir tanpa pembayaran. Barang akan dikembalikan ke penjual lewat Pos Gagak.",
+        "closedUnpaidBuyer": "Penjualan ini berakhir tanpa pembayaranmu. Barang akan dikembalikan ke penjual lewat Pos Gagak; tidak membayar kesepakatan yang sudah disetujui akan mendapat pelanggaran Pasar.",
+        "cancelSale": "Batalkan penjualan",
+        "cancelPendingSeller": "Pembatalan diminta. Penjualan akan berakhir dengan sendirinya kecuali pembeli membayar lebih dulu.",
+        "youDeclined": "Kamu menolak tawaran itu.",
+        "youWithdrew": "Kamu menarik tawaranmu.",
+        "offerNotPending": "Tawaran ini sudah tidak tertunda lagi.",
+        "offerDeclined": "Tawaran $WOC ditolak.",
+        "offerWithdrawn": "Tawaran $WOC ditarik.",
+        "offerExpired": "Tawaran $WOC kedaluwarsa.",
+        "offerExpiresAt": "Tawaran berakhir pada {time}.",
+        "offerStandsUntil": "Tawaran $WOC-mu masih berlaku hingga {time}. Berdaganglah lagi dengan penjual untuk menyelesaikan kesepakatan jika mereka menerima.",
+        "dealAwaitsPayment": "Pembelian $WOC-mu masih belum dibayar. Berdaganglah lagi dengan penjual untuk membayar; kesepakatan ini akan berakhir dengan sendirinya jika tidak, dan tidak membayar akan mendapat pelanggaran Pasar.",
+        "closeSellerHold": "Barangmu tetap ditahan menunggu pembayaran pembeli. Batalkan penjualan dari tab Aktivitas Bursa jika kamu berubah pikiran.",
+        "closePaymentContinuesBuyer": "Pembayaranmu masih dikonfirmasi. Pengiriman akan selesai dengan sendirinya.",
+        "closePaymentContinuesSeller": "Pembayaran pembeli masih dikonfirmasi. Penjualan akan selesai dengan sendirinya.",
+        "p2pBindingNote": "Begitu kedua pihak menyetujui, pembayaran jatuh tempo dalam {duration}, atau dalam jangka waktu yang lebih singkat yang terbuka saat kamu menekan Bayar. Tidak membayar akan mendapat pelanggaran Pasar.",
+        "p2pBindingNoteUntimed": "Begitu kedua pihak menyetujui, pembayaran jatuh tempo segera setelahnya, atau dalam jangka waktu yang lebih singkat yang terbuka saat kamu menekan Bayar. Tidak membayar akan mendapat pelanggaran Pasar.",
+        "p2pPaymentDueAt": "Pembayaran jatuh tempo pada {time}. Tidak membayar akan mendapat pelanggaran Pasar.",
+        "quoteExpiredTrade": "Kuotasi kedaluwarsa. Tekan Jangan sekarang, lalu tekan Bayar lagi untuk kuotasi yang baru.",
+        "quoteStaged": "Kuotasi pembayaran siap untuk {usd}: {tokens} $WOC, berlaku hingga {time}.",
+        "paymentConfirmed": "Pembayaran terkonfirmasi. Barangmu akan sampai di tasmu, atau lewat Pos Gagak jika tasmu penuh, setelah pengiriman selesai.",
+        "statusConfirmedBuyer": "Pembayaran terkonfirmasi. Pengiriman sedang diselesaikan...",
+        "statusConfirmedSeller": "Pembayaran terkonfirmasi. Penjualan sedang diselesaikan...",
+        "hintBelowMin": "Harga minimum Bursa adalah {usd}."
       }
     },
     "wocStore": {
@@ -938,7 +938,7 @@ export const id_ID: EnTranslations = {
       "jump": "Lompat",
       "leaderboard": "Peringkat",
       "dailyRewards": "Toko",
-      "wocMarket": "Exchange",
+      "wocMarket": "Bursa",
       "deeds": "Jasa",
       "mounts": "Tunggangan",
       "professions": "Profesi",
@@ -952,62 +952,62 @@ export const id_ID: EnTranslations = {
       "actionRing": "Aksi tempur",
       "actionPageToggle": "Ganti halaman tindakan",
       "actionPageIndicator": "Hal. {page}",
-      "actionRadial": "Action directions",
-      "actionRadialCancel": "Cancel action",
-      "radialCenter": "Centre",
-      "radialUp": "Up",
-      "radialRight": "Right",
-      "radialDown": "Down",
-      "radialLeft": "Left",
-      "consumableSeat": "Consumables",
-      "menuControl": "Menus",
-      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
-      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "actionRadial": "Arah aksi",
+      "actionRadialCancel": "Batalkan aksi",
+      "radialCenter": "Tengah",
+      "radialUp": "Atas",
+      "radialRight": "Kanan",
+      "radialDown": "Bawah",
+      "radialLeft": "Kiri",
+      "consumableSeat": "Barang Habis Pakai",
+      "menuControl": "Menu",
+      "menuControlAria": "Menu. Ketuk untuk membuka obrolan, atau tahan dan geser ke kanan untuk tunggangan, peta, tas, dan lainnya.",
+      "menuControlAriaTap": "Menu. Ketuk untuk membuka baris menu: tunggangan, peta, tas, dan lainnya. Ketuk lagi untuk obrolan.",
       "menuLabel": "Menu",
-      "quickActions": "Quick Actions",
-      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
-      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
-      "quickActionsLabel": "Actions",
-      "stanceRadial": "Stances",
-      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
-      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
-      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
-      "questStripAriaSingle": "Tracked quest: {title}",
+      "quickActions": "Aksi Cepat",
+      "quickActionsAria": "Aksi Cepat. Ketuk untuk membuka baris tunggangan, obrolan, peta, tas, dan lainnya, atau tahan dan geser ke kanan untuk memilih salah satunya.",
+      "quickActionsAriaTap": "Aksi Cepat. Ketuk untuk membuka baris tunggangan, obrolan, peta, tas, dan lainnya, lalu ketuk salah satu item. Ketuk kontrolnya lagi untuk menutup.",
+      "quickActionsLabel": "Aksi",
+      "stanceRadial": "Kuda-kuda",
+      "stanceAnchorAria": "Kuda-kuda: {stance}. Ketuk untuk membuka cincin kuda-kuda, lalu pilih kuda-kuda lain.",
+      "stanceAnchorEmptyAria": "Tidak ada kuda-kuda. Ketuk untuk membuka cincin kuda-kuda, lalu pilih sebuah kuda-kuda.",
+      "questStripAria": "Misi terlacak {position} dari {total}: {title}. Aktifkan untuk misi berikutnya.",
+      "questStripAriaSingle": "Misi terlacak: {title}",
       "questStripCounter": "{position}/{total}",
-      "questStripMore": "+{count} more",
+      "questStripMore": "+{count} lagi",
       "targetCycle": "Tukar sasaran",
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Halaman {page}",
       "hideKeyboard": "Sembunyikan papan ketik",
       "chatPlaceholder": "Katakan sesuatu...",
-      "barEditor": "Edit Bars",
-      "barEditorAria": "Edit the action bar layout"
+      "barEditor": "Edit Bilah",
+      "barEditorAria": "Edit tata letak bilah aksi"
     },
     "barEditor": {
-      "title": "Edit Action Bar",
-      "close": "Close bar editor",
-      "pages": "Action bar pages",
-      "pageTab": "Page {page}",
-      "buttonHeader": "Button {button}",
-      "cellAria": "Button {button}, {direction}: {action}",
-      "emptyCellAria": "Button {button}, {direction}: empty",
-      "hint": "Tap a slot, then another, to swap them.",
-      "armed": "Tap a slot to place {name}.",
-      "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options.",
-      "clear": "Clear",
-      "clearAria": "Clear a slot",
-      "clearArmed": "Tap a slot to clear it."
+      "title": "Edit Bilah Aksi",
+      "close": "Tutup editor bilah",
+      "pages": "Halaman bilah aksi",
+      "pageTab": "Halaman {page}",
+      "buttonHeader": "Tombol {button}",
+      "cellAria": "Tombol {button}, {direction}: {action}",
+      "emptyCellAria": "Tombol {button}, {direction}: kosong",
+      "hint": "Ketuk satu slot, lalu slot lainnya, untuk menukarnya.",
+      "armed": "Ketuk slot untuk menempatkan {name}.",
+      "picked": "Ketuk slot lain untuk menukarnya dengan {name}.",
+      "locked": "Bilah Aksi terkunci di opsi Antarmuka.",
+      "clear": "Kosongkan",
+      "clearAria": "Kosongkan slot",
+      "clearArmed": "Ketuk slot untuk mengosongkannya."
     },
     "tutorialGreeting": {
-      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
-      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
-      "play": "Take the tutorial",
-      "skip": "Skip the tutorial",
-      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
-      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
-      "noteClose": "Understood"
+      "bodyFirst": "Aku belum pernah melihatmu di sekitar sini sebelumnya, kawan. Sudah jadi tradisi di tanah ini bagi mereka yang memulai petualangan untuk mengunjungi Pesisir Pembuktian, sebuah pulau tenang di seberang selat. Di sana kamu bisa mengasah kemampuanmu dan membiasakan diri dengan dunia ini sebelum menghadapi tantangannya. Feri berlayar dua arah, dan tak seorang pun akan memandang rendah dirimu, apa pun pilihanmu.",
+      "bodyRefresher": "Kembali lagi dengan wajah baru, ya? Kalau begitu kamu sudah tahu cara kerjanya. Tapi, kalau kamu ingin mengingat-ingat dulu sebelum berangkat, Pesisir Pembuktian tak pernah menolak murid yang kembali, dan feri sudah siap kapan pun kamu mau.",
+      "play": "Ikuti Tutorial",
+      "skip": "Lewati Tutorial",
+      "declineNote": "Terserah kamu, kawan. Jika suatu saat kamu berubah pikiran, lonceng feri di dekat kotak surat Pos Gagak akan menyeberangkanmu ke Pesisir Pembuktian kapan saja, siang maupun malam. Ia akan tetap ada di sana, entah para serigala sedang berkeliaran atau tidak.",
+      "bellHomeNote": "Sudah kembali dari pesisir? Itu tadi lonceng feri yang kamu bunyikan. Kembarnya tergantung persis di sana, dekat kotak surat Pos Gagak: bunyikan kapan saja dan penyeberangan itu akan membawamu kembali ke Pesisir Pembuktian. Tak ada ruginya, bagaimanapun jadinya.",
+      "islandArrivalNote": "Selamat datang di Pesisir Pembuktian. Penjaga Tam sedang menunggu tak jauh di sepanjang pantai: temuilah dia.",
+      "noteClose": "Mengerti"
     },
     "tutorial": {
       "moveBodyTouch": "Gunakan tuas gerak untuk berpindah dan seret layar untuk melihat sekeliling. Ambil beberapa langkah untuk memulai.",
@@ -1022,115 +1022,115 @@ export const id_ID: EnTranslations = {
       "nextTipSocial": "Buka Sosial ({key}) untuk menemukan grup untuk pertarungan yang lebih sulit."
     },
     "bootcamp": {
-      "title": "First Steps",
-      "talkTitle": "Speak to Warden Tam",
-      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
-      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
-      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
-      "forwardTitle": "Walk the first lane",
-      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
-      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
-      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
-      "turnwalkTitle": "Turn, then walk",
-      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
-      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
-      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
-      "strafeTitle": "Turn, then walk",
-      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
-      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
-      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
-      "cameraTitle": "Swing the camera",
-      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "courseProgress": "Flag {current} of {total}",
-      "doneTitle": "Run complete",
-      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
-      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
-      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
-      "coachNextTitle": "Next: {npc}",
-      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
-      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
-      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
-      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
-      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
-      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
-      "coachReadyTitle": "Task complete",
-      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
-      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
-      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
-      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
-      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
-      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
-      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
-      "promptTalk": "Talk",
-      "promptTurnIn": "Turn in quest",
-      "promptPickUp": "Pick up",
-      "promptLootPearl": "Loot the pearl",
-      "promptRead": "Read",
-      "promptRing": "Ring",
-      "promptHold": "Hold",
-      "promptSelect": "Select",
-      "promptAttack": "Attack",
-      "promptUseAbility": "Use ability",
-      "promptKneel": "Kneel",
-      "promptOpenBags": "Open your bags",
-      "promptCharacterSheet": "Open your character sheet",
-      "promptLookAround": "Hold right-click and drag to look around",
-      "promptJump": "Jump",
-      "promptSummon": "Summon",
-      "ringEquipTitle": "Wear your prize",
-      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
-      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
-      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
-      "ringAdmireTitle": "Look at you",
-      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "keycapThen": "then",
-      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
-      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
-      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
-      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
-      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
-      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
-      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "title": "Langkah Pertama",
+      "talkTitle": "Bicaralah dengan Penjaga Tam",
+      "talkBody": "Penjaga Tam menjaga gerbang Jalur Rintangan tepat di depan. Dekati dia sampai namanya muncul, lalu tekan {interactKey}, atau klik kiri padanya, untuk berbicara: dia akan memberimu larinya.",
+      "talkBodyTouch": "Penjaga Tam menjaga gerbang Jalur Rintangan tepat di depan. Dekati dia sampai namanya muncul, lalu ketuk dia, atau ketuk tombol Use, untuk berbicara: dia akan memberimu larinya.",
+      "talkBodyPad": "Penjaga Tam menjaga gerbang Jalur Rintangan tepat di depan. Dekati dia sampai namanya muncul, lalu tekan tombol interaksimu untuk berbicara: dia akan memberimu larinya.",
+      "forwardTitle": "Jalani Jalur Pertama",
+      "forwardBody": "Masuklah ke jalur di samping Tam dan tahan {forwardKey} untuk berjalan ke barat menuju benderanya.",
+      "forwardBodyTouch": "Masuklah ke jalur di samping Tam dan dorong tuas gerak ke atas untuk berjalan ke barat menuju benderanya.",
+      "forwardBodyPad": "Masuklah ke jalur di samping Tam dan dorong tuas kiri ke atas untuk berjalan ke barat menuju benderanya.",
+      "turnwalkTitle": "Berputar, Lalu Berjalan",
+      "turnwalkBody": "Bendera pertama sudah didapat. Tahan {turnKey} untuk berputar di tempat sampai kamu menghadap jalur berdinding menuju selatan, lalu tahan {forwardKey} lagi dan berjalanlah menuju bendera kedua.",
+      "turnwalkBodyTouch": "Bendera pertama sudah didapat. Seret jarimu melintasi dunia (bukan tuas gerak) untuk berputar sampai kamu menghadap jalur berdinding menuju selatan, lalu dorong tuasnya ke atas dan berjalanlah menuju bendera kedua.",
+      "turnwalkBodyPad": "Bendera pertama sudah didapat. Dorong tuas kanan untuk berputar sampai kamu menghadap jalur berdinding menuju selatan, lalu dorong tuas kiri ke atas dan berjalanlah menuju bendera kedua.",
+      "strafeTitle": "Berputar, Lalu Berjalan",
+      "strafeBody": "Tinggal satu tikungan lagi. Tahan {turnLeftKey} untuk berputar di tempat sampai kamu menghadap jalur terakhir, lalu tahan {forwardKey} lagi dan berjalanlah sampai bendera merah ada di belakangmu.",
+      "strafeBodyTouch": "Tinggal satu tikungan lagi. Seret jarimu melintasi dunia (bukan tuas gerak) untuk berputar sampai kamu menghadap jalur terakhir, lalu dorong tuasnya ke atas dan berjalanlah sampai bendera merah ada di belakangmu.",
+      "strafeBodyPad": "Tinggal satu tikungan lagi. Dorong tuas kanan untuk berputar sampai kamu menghadap jalur terakhir, lalu dorong tuas kiri ke atas dan berjalanlah sampai bendera merah ada di belakangmu.",
+      "cameraTitle": "Putar Kamera",
+      "cameraBody": "Satu pelajaran terakhir sebelum kamu menyerahkan larimu: tahan tombol kanan mouse dan seret untuk memutar kamera mengelilingimu sepenuhnya. Mengetahui apa yang berdiri di belakangmu memenangkan pertarungan.",
+      "cameraBodyTouch": "Satu pelajaran terakhir sebelum kamu menyerahkan larimu: seret jarimu melintasi dunia untuk memutar kamera mengelilingimu sepenuhnya. Mengetahui apa yang berdiri di belakangmu memenangkan pertarungan.",
+      "cameraBodyPad": "Satu pelajaran terakhir sebelum kamu menyerahkan larimu: dorong tuas kanan untuk memutar kamera mengelilingimu sepenuhnya. Mengetahui apa yang berdiri di belakangmu memenangkan pertarungan.",
+      "courseProgress": "Bendera {current} dari {total}",
+      "doneTitle": "Lari Selesai",
+      "doneBody": "Itulah semua yang perlu diketahui kakimu. Pengawas Pell berdiri di samping bendera merah: tekan {interactKey} padanya, atau klik kiri padanya, untuk menyerahkan larimu dan mengambil hadiah pertamamu.",
+      "doneBodyTouch": "Itulah semua yang perlu diketahui kakimu. Pengawas Pell berdiri di samping bendera merah: ketuk dia untuk menyerahkan larimu dan mengambil hadiah pertamamu.",
+      "doneBodyPad": "Itulah semua yang perlu diketahui kakimu. Pengawas Pell berdiri di samping bendera merah: tekan tombol interaksimu padanya untuk menyerahkan larimu dan mengambil hadiah pertamamu.",
+      "coachNextTitle": "Berikutnya: {npc}",
+      "coachNextBody": "Ikuti jejak emas menuju {npc}. Dekati sampai namanya muncul, lalu tekan {interactKey}, atau klik kiri padanya, untuk mengambil tugas berikutnya.",
+      "coachNextBodyTouch": "Ikuti jejak emas menuju {npc}. Dekati sampai namanya muncul, lalu ketuk dia, atau ketuk tombol Use, untuk mengambil tugas berikutnya.",
+      "coachNextBodyPad": "Ikuti jejak emas menuju {npc}. Dekati sampai namanya muncul, lalu tekan tombol interaksimu untuk mengambil tugas berikutnya.",
+      "coachTaskBody": "Ikuti jejak emas menuju tugasmu. Pelacak di sebelah kanan mencatat hitungannya, dan {mapKey} membuka peta jika kamu kehilangan arah.",
+      "coachTaskBodyTouch": "Ikuti jejak emas menuju tugasmu. Pelacak di sebelah kanan mencatat hitungannya, dan tombol peta menunjukkan arah jika kamu tersesat.",
+      "coachTaskBodyPad": "Ikuti jejak emas menuju tugasmu. Pelacak di sebelah kanan mencatat hitungannya, dan tombol petamu menunjukkan arah jika kamu tersesat.",
+      "coachReadyTitle": "Tugas Selesai",
+      "coachReadyBody": "Pergi ke {npc} dan tekan {interactKey}, atau klik kiri padanya, untuk menyerahkannya dan mengambil hadiahmu.",
+      "coachReadyBodyTouch": "Pergi ke {npc} dan ketuk dia untuk menyerahkannya dan mengambil hadiahmu.",
+      "coachReadyBodyPad": "Pergi ke {npc} dan tekan tombol interaksimu untuk menyerahkannya dan mengambil hadiahmu.",
+      "taskStrikeTrueBody": "Dekati sebuah boneka jerami dan klik kiri untuk menjadikannya targetmu: namanya muncul di atas layarmu. Lalu tekan {attackKey} untuk mulai mengayun. Tombol pertama itu adalah seranganmu biasa, bukan sihir. Teruslah menyerang sampai satu boneka roboh.",
+      "taskStrikeTrueBodyTouch": "Dekati sebuah boneka jerami dan ketuk untuk menjadikannya targetmu. Lalu ketuk tombol pertama di bilah aksi untuk mengayun. Teruslah menyerang sampai satu boneka roboh.",
+      "taskStrikeTrueBodyPad": "Dekati sebuah boneka jerami dan tekan tombol targetmu untuk menjadikannya targetmu. Lalu tekan tombol aksi pertamamu untuk mengayun. Teruslah menyerang sampai satu boneka roboh.",
+      "taskHoneBody": "Klik kiri sebuah boneka untuk menargetkannya, lalu tekan {abilityKey} untuk memakai {ability}. Itu kemampuanmu sendiri, bukan sekadar ayunan biasa. Kenai tiga kali.",
+      "taskHoneBodyTouch": "Ketuk sebuah boneka untuk menargetkannya, lalu ketuk {ability} di bilah aksi. Itu kemampuanmu sendiri, bukan sekadar ayunan biasa. Kenai tiga kali.",
+      "taskHoneBodyPad": "Targetkan sebuah boneka, lalu tekan tombol aksi yang memuat {ability}. Itu kemampuanmu sendiri, bukan sekadar ayunan biasa. Kenai tiga kali.",
+      "taskLongWalkBody": "Tekan {bagsKey} untuk membuka tasmu, lalu klik kiri Batu Pelepasan. Batu itu merebahkanmu di tempat kamu berdiri. Tidak ada apa pun di sini yang bisa melukaimu, dan ini tidak memakan biaya apa pun.",
+      "taskLongWalkBodyTouch": "Buka tasmu dan ketuk Batu Pelepasan. Batu itu merebahkanmu di tempat kamu berdiri. Tidak ada apa pun di sini yang bisa melukaimu, dan ini tidak memakan biaya apa pun.",
+      "taskLongWalkBodyPad": "Buka tasmu dan pilih Batu Pelepasan. Batu itu merebahkanmu di tempat kamu berdiri. Tidak ada apa pun di sini yang bisa melukaimu, dan ini tidak memakan biaya apa pun.",
+      "taskLongWalkDeadBody": "Kamu telah mati, dan kamu tidak kehilangan apa pun: tidak ada barang, tidak ada koin, tidak ada pengalaman. Langkah 1 dari 2: klik tombol Lepaskan Roh di tengah layarmu. Kamu akan bangkit sebagai hantu di kuburan di belakang perkemahan.",
+      "taskLongWalkDeadBodyTouch": "Kamu telah mati, dan kamu tidak kehilangan apa pun: tidak ada barang, tidak ada koin, tidak ada pengalaman. Langkah 1 dari 2: ketuk tombol Lepaskan Roh di tengah layarmu. Kamu akan bangkit sebagai hantu di kuburan di belakang perkemahan.",
+      "taskLongWalkDeadBodyPad": "Kamu telah mati, dan kamu tidak kehilangan apa pun: tidak ada barang, tidak ada koin, tidak ada pengalaman. Langkah 1 dari 2: pilih Lepaskan Roh di tengah layarmu. Kamu akan bangkit sebagai hantu di kuburan di belakang perkemahan.",
+      "taskLongWalkGhostBody": "Langkah 2 dari 2: kamu adalah roh, dan tidak ada yang bisa menyentuhmu. Tubuhmu adalah penanda di peta minimu. Berjalanlah ke sana. Saat kamu mendekat, tombol Bangkit di Jasad akan muncul: klik tombol itu dan kamu hidup kembali, tanpa penalti sama sekali. Perjalanan itu SELALU gratis, dan begitulah caramu kembali setiap kali kamu mati.",
+      "taskLongWalkGhostBodyTouch": "Langkah 2 dari 2: kamu adalah roh, dan tidak ada yang bisa menyentuhmu. Tubuhmu adalah penanda di peta minimu. Berjalanlah ke sana. Saat kamu mendekat, tombol Bangkit di Jasad akan muncul: ketuk tombol itu dan kamu hidup kembali, tanpa penalti sama sekali. Perjalanan itu SELALU gratis, dan begitulah caramu kembali setiap kali kamu mati.",
+      "taskLongWalkGhostBodyPad": "Langkah 2 dari 2: kamu adalah roh, dan tidak ada yang bisa menyentuhmu. Tubuhmu adalah penanda di peta minimu. Berjalanlah ke sana. Saat kamu mendekat, tombol Bangkit di Jasad akan muncul: pilih tombol itu dan kamu hidup kembali, tanpa penalti sama sekali. Perjalanan itu SELALU gratis, dan begitulah caramu kembali setiap kali kamu mati.",
+      "taskShellBody": "Para kepiting menjepit balik. Klik kiri salah satunya untuk menjadikannya targetmu, lalu tekan {abilityKey} untuk {ability}, dan teruslah menyerang. Jika terlalu banyak menyerangmu sekaligus, mundurlah ke jalan tadi: mereka cepat menyerah mengejar, dan nyawamu pulih selagi kamu beristirahat.",
+      "taskShellBodyTouch": "Para kepiting menjepit balik. Ketuk salah satunya untuk menargetkannya, lalu ketuk {ability} di bilah aksi. Jika terlalu banyak menyerangmu sekaligus, mundurlah ke jalan tadi: mereka cepat menyerah mengejar, dan nyawamu pulih selagi kamu beristirahat.",
+      "taskShellBodyPad": "Para kepiting menjepit balik. Targetkan salah satunya, lalu tekan tombol aksi yang memuat {ability}. Jika terlalu banyak menyerangmu sekaligus, mundurlah ke jalan tadi: mereka cepat menyerah mengejar, dan nyawamu pulih selagi kamu beristirahat.",
+      "taskStrikeTrueBodyCaster": "Dekati sebuah boneka jerami dan klik kiri untuk menjadikannya targetmu: namanya muncul di atas layarmu. Lalu tekan {attackKey}, atau klik tombol kedua di bilah aksi, untuk merapal sihirmu. Teruslah merapal sampai satu boneka roboh.",
+      "taskStrikeTrueBodyCasterTouch": "Dekati sebuah boneka jerami dan ketuk untuk menjadikannya targetmu. Lalu ketuk tombol kedua di bilah aksi untuk merapal sihirmu. Teruslah merapal sampai satu boneka roboh.",
+      "taskStrikeTrueBodyCasterPad": "Dekati sebuah boneka jerami dan tekan tombol targetmu untuk menjadikannya targetmu. Lalu tekan tombol aksi keduamu untuk merapal sihirmu. Teruslah merapal sampai satu boneka roboh.",
+      "taskShellBodyCaster": "Para kepiting menjepit balik. Klik kiri salah satunya untuk menjadikannya targetmu, lalu tekan {abilityKey} untuk {ability}, dan teruslah merapal dari jarak jauh. Jika terlalu banyak menyerangmu sekaligus, mundurlah ke jalan tadi: mereka cepat menyerah mengejar, dan nyawamu pulih selagi kamu beristirahat.",
+      "taskShellBodyCasterTouch": "Para kepiting menjepit balik. Ketuk salah satunya untuk menargetkannya, lalu ketuk {ability} di bilah aksi, dan teruslah merapal dari jarak jauh. Jika terlalu banyak menyerangmu sekaligus, mundurlah ke jalan tadi: mereka cepat menyerah mengejar, dan nyawamu pulih selagi kamu beristirahat.",
+      "taskShellBodyCasterPad": "Para kepiting menjepit balik. Targetkan salah satunya, lalu tekan tombol aksi yang memuat {ability}, dan teruslah merapal dari jarak jauh. Jika terlalu banyak menyerangmu sekaligus, mundurlah ke jalan tadi: mereka cepat menyerah mengejar, dan nyawamu pulih selagi kamu beristirahat.",
+      "taskPearlBody": "Ikuti jejak emas menuju kolam pasang surut di ujung barat pantai. Berdiri di tepi air, tekan {bagsKey} untuk membuka tasmu dan klik kiri Umpan Asin untuk memanggilnya keluar. Lawan dia seperti kamu melawan para kepiting, dan saat dia tumbang, tekan {interactKey} pada cangkangnya untuk mengklaim Mutiara Berkilau.",
+      "taskPearlBodyTouch": "Ikuti jejak emas menuju kolam pasang surut di ujung barat pantai. Berdiri di tepi air, buka tasmu dan ketuk Umpan Asin untuk memanggilnya keluar. Lawan dia seperti kamu melawan para kepiting, dan saat dia tumbang, ketuk cangkangnya untuk mengklaim Mutiara Berkilau.",
+      "taskPearlBodyPad": "Ikuti jejak emas menuju kolam pasang surut di ujung barat pantai. Berdiri di tepi air, buka tasmu dan pilih Umpan Asin untuk memanggilnya keluar. Lawan dia seperti kamu melawan para kepiting, dan saat dia tumbang, tekan tombol interaksimu pada cangkangnya untuk mengklaim Mutiara Berkilau.",
+      "taskWreckLineBody": "Peti-peti terdampar berjajar di sepanjang jalan menuju Perkemahan Dawnrest. Dekati salah satunya sampai namanya muncul, lalu tekan {interactKey}, atau klik kiri peti itu, untuk memungutnya. Enam peti melengkapi muatannya.",
+      "taskWreckLineBodyTouch": "Peti-peti terdampar berjajar di sepanjang jalan menuju Perkemahan Dawnrest. Dekati salah satunya sampai namanya muncul, lalu ketuk peti itu, atau ketuk tombol Use, untuk memungutnya. Enam peti melengkapi muatannya.",
+      "taskWreckLineBodyPad": "Peti-peti terdampar berjajar di sepanjang jalan menuju Perkemahan Dawnrest. Dekati salah satunya sampai namanya muncul, lalu tekan tombol interaksimu untuk memungutnya. Enam peti melengkapi muatannya.",
+      "taskPouchBody": "Tekan {interactKey} pada {npc}, atau klik kiri padanya, untuk membuka kiosnya, lalu klik kiri Kantong Linen untuk membelinya.",
+      "taskPouchBodyTouch": "Ketuk {npc} untuk membuka kiosnya, lalu ketuk Kantong Linen untuk membelinya.",
+      "taskPouchBodyPad": "Tekan tombol interaksimu pada {npc} untuk membuka kiosnya, lalu pilih Kantong Linen untuk membelinya.",
+      "readyPouchBody": "Kantong sudah dibeli. Tekan {bagsKey} untuk membuka tasmu dan klik kiri Kantong Linen untuk mengaitkannya ke tempat tas yang kosong. Lalu pergi ke {npc} dan tekan {interactKey} untuk memamerkannya.",
+      "readyPouchBodyTouch": "Kantong sudah dibeli. Buka tasmu dan ketuk Kantong Linen untuk mengaitkannya ke tempat tas yang kosong. Lalu pergi ke {npc} dan ketuk dia untuk memamerkannya.",
+      "readyPouchBodyPad": "Kantong sudah dibeli. Buka tasmu dan pilih Kantong Linen untuk mengaitkannya ke tempat tas yang kosong. Lalu pergi ke {npc} dan tekan tombol interaksimu untuk memamerkannya.",
+      "promptTalk": "Bicara",
+      "promptTurnIn": "Serahkan misi",
+      "promptPickUp": "Ambil",
+      "promptLootPearl": "Jarah mutiaranya",
+      "promptRead": "Baca",
+      "promptRing": "Bunyikan",
+      "promptHold": "Tahan",
+      "promptSelect": "Pilih",
+      "promptAttack": "Serang",
+      "promptUseAbility": "Gunakan kemampuan",
+      "promptKneel": "Berlutut",
+      "promptOpenBags": "Buka tasmu",
+      "promptCharacterSheet": "Buka lembar karaktermu",
+      "promptLookAround": "Tahan klik kanan dan seret untuk melihat sekeliling",
+      "promptJump": "Lompat",
+      "promptSummon": "Panggil",
+      "ringEquipTitle": "Kenakan Hadiahmu",
+      "ringEquipBody": "Kamu telah diberi Induk Mutiara, dan sebuah hadiah tak berguna kalau hanya mengendap di tas. Langkah 1 dari 2: tekan {bagsKey} untuk membuka tasmu, lalu klik kiri cincinnya untuk memakainya.",
+      "ringEquipBodyTouch": "Kamu telah diberi Induk Mutiara, dan sebuah hadiah tak berguna kalau hanya mengendap di tas. Langkah 1 dari 2: buka tasmu dan ketuk cincinnya untuk memakainya.",
+      "ringEquipBodyPad": "Kamu telah diberi Induk Mutiara, dan sebuah hadiah tak berguna kalau hanya mengendap di tas. Langkah 1 dari 2: buka tasmu dan pilih cincinnya untuk memakainya.",
+      "ringAdmireTitle": "Lihat Dirimu",
+      "ringAdmireBody": "Langkah 2 dari 2: tekan {charKey} untuk membuka lembar karaktermu. Layar itu menampilkan semua yang kamu kenakan dan statistik yang diberikannya, dan cincinnya kini ada di tanganmu. Periksa kapan pun kamu mendapat perlengkapan baru.",
+      "ringAdmireBodyTouch": "Langkah 2 dari 2: buka lembar karaktermu dari menu. Layar itu menampilkan semua yang kamu kenakan dan statistik yang diberikannya, dan cincinnya kini ada di tanganmu. Periksa kapan pun kamu mendapat perlengkapan baru.",
+      "ringAdmireBodyPad": "Langkah 2 dari 2: buka lembar karaktermu dari menu. Layar itu menampilkan semua yang kamu kenakan dan statistik yang diberikannya, dan cincinnya kini ada di tanganmu. Periksa kapan pun kamu mendapat perlengkapan baru.",
+      "keycapThen": "lalu",
+      "voiceArrival": "Pelan-pelan naik ke darat, kawan. Lihat jalan emas di kakimu? Ia lebih tahu arah daripada aku. Ikuti saja.",
+      "voiceFirstFlag": "Satu bendera sudah didapat. Terus gerakkan kakimu, tinggal dua lagi.",
+      "voiceRunDone": "Lari yang bersih, itu. Pengawas Pell memegang hadiahmu, pergilah ambil.",
+      "voiceStationDoneA": "Kerja bagus. Lanjut ke yang berikutnya, jalannya sudah menyala untukmu.",
+      "voiceStationDoneB": "Kamu mulai terbiasa dengan ini, tak salah lagi.",
+      "voiceVeerOff": "Tunggu dulu, kawan, itu jalan yang salah. Jalan emasnya ada di belakangmu.",
+      "voiceGraduate": "Loncengnya sudah dibunyikan untukmu. Eastbrook menanti di seberang air, dan kamu sudah siap untuknya.",
+      "bellTitle": "Bunyikan Lonceng",
+      "bellBody": "Penyeberanganmu telah kau peroleh dengan pantas. Berjalanlah ke lonceng feri di sisi dermaga, lalu tekan {interactKey}, atau klik kiri padanya, untuk berlayar menuju Eastbrook.",
+      "bellBodyTouch": "Penyeberanganmu telah kau peroleh dengan pantas. Berjalanlah ke lonceng feri di sisi dermaga dan ketuk lonceng itu untuk berlayar menuju Eastbrook.",
+      "bellBodyPad": "Penyeberanganmu telah kau peroleh dengan pantas. Berjalanlah ke lonceng feri di sisi dermaga dan tekan tombol interaksimu padanya untuk berlayar menuju Eastbrook."
     },
     "widgets": {
       "clockTitle": "Waktu lokal - klik untuk beralih 12/24 jam",
@@ -1184,29 +1184,29 @@ export const id_ID: EnTranslations = {
       "devEmpty": "Belum ada kontributor berperingkat."
     },
     "pledge": {
-      "open": "Accepting pledges",
-      "closed": "Not accepting pledges",
+      "open": "Menerima lamaran",
+      "closed": "Tidak menerima lamaran",
       "minLevel": "Level {level}+",
-      "action": "Pledge",
-      "actionTitle": "Pledge to {guild}",
-      "pledged": "Pledged",
-      "yourGuild": "Your guild",
-      "tab": "Pledges",
-      "tabWithCount": "Pledges ({count})",
-      "empty": "No one has pledged to your guild yet.",
-      "accept": "Accept",
-      "acceptTitle": "Accept {name}'s pledge",
-      "reject": "Decline",
-      "rejectTitle": "Decline {name}'s pledge",
-      "settings": "Recruitment",
-      "acceptingLabel": "Accept pledges",
-      "minLevelLabel": "Minimum level",
-      "noteLabel": "Board note",
-      "notePlaceholder": "Tell aspiring members what your guild is looking for",
-      "save": "Save",
-      "yourPledge": "Your pledge: {guild}",
-      "since": "Pledged {date}",
-      "withdraw": "Withdraw pledge"
+      "action": "Lamar",
+      "actionTitle": "Melamar ke {guild}",
+      "pledged": "Sudah melamar",
+      "yourGuild": "Guildmu",
+      "tab": "Lamaran",
+      "tabWithCount": "Lamaran ({count})",
+      "empty": "Belum ada yang melamar ke guildmu.",
+      "accept": "Terima",
+      "acceptTitle": "Terima lamaran {name}",
+      "reject": "Tolak",
+      "rejectTitle": "Tolak lamaran {name}",
+      "settings": "Rekrutmen",
+      "acceptingLabel": "Terima lamaran",
+      "minLevelLabel": "Level minimum",
+      "noteLabel": "Catatan papan",
+      "notePlaceholder": "Ceritakan apa yang dicari guildmu kepada calon anggota",
+      "save": "Simpan",
+      "yourPledge": "Lamaranmu: {guild}",
+      "since": "Melamar {date}",
+      "withdraw": "Tarik lamaran"
     },
     "raidLockout": {
       "title": "Penguncian Raid",
@@ -1455,7 +1455,7 @@ export const id_ID: EnTranslations = {
       "endedForfeitLog": "Pertandingan diserahkan.",
       "firstWinBonusLine": "Kemenangan pertama hari ini: +{honor} Kehormatan",
       "firstWinBonusLog": "Kemenangan pertama hari ini: kamu mendapatkan {honor} bonus Kehormatan.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Akhir Pekan Kehormatan Ganda: Kehormatan Medan Thornhollow dibayar {mult}x hari ini, dan kekalahan yang dimainkan hingga usai dibayar seperti kemenangan",
       "timeWarningMinutes": "{minutes} menit tersisa",
       "timeWarningOneMinute": "Satu menit tersisa",
       "timeWarningMinutesLog": "{minutes} menit tersisa dalam pertempuran.",
@@ -1550,8 +1550,8 @@ export const id_ID: EnTranslations = {
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
       "mobileLeftHanded": "Tata letak kidal",
-      "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenus": "Ketuk untuk Menu",
+      "touchTapMenusNote": "Buka kontrol aksi, barang habis pakai, dan menu dengan ketukan, bukan geseran. Ketuk sebuah item untuk memakainya, ketuk kontrolnya lagi untuk aksi biasanya, atau ketuk di luar untuk menutup."
     },
     "talentRows": {
       "tab": "Pilihan",
@@ -1576,8 +1576,8 @@ export const id_ID: EnTranslations = {
     },
     "controller": {
       "title": "Kontroler",
-      "glyphStyle": "Button Labels",
-      "glyphStyleAuto": "Auto",
+      "glyphStyle": "Label Tombol",
+      "glyphStyleAuto": "Otomatis",
       "glyphStyleXbox": "Xbox",
       "glyphStylePlayStation": "PlayStation",
       "glyphStyleNintendo": "Nintendo",
@@ -2071,16 +2071,16 @@ export const id_ID: EnTranslations = {
         "other": "Anda adalah {rank}, {count} anggota"
       },
       "wocMarketSellChoose": {
-        "one": "Choose from {count} item",
-        "few": "Choose from {count} items",
-        "many": "Choose from {count} items",
-        "other": "Choose from {count} items"
+        "one": "Pilih dari {count} barang",
+        "few": "Pilih dari {count} barang",
+        "many": "Pilih dari {count} barang",
+        "other": "Pilih dari {count} barang"
       },
       "wocTradeIneligible": {
-        "one": "{count} staged item cannot be sold for $WOC.",
-        "few": "{count} staged items cannot be sold for $WOC.",
-        "many": "{count} staged items cannot be sold for $WOC.",
-        "other": "{count} staged items cannot be sold for $WOC."
+        "one": "{count} barang yang disiapkan tidak dapat dijual untuk $WOC.",
+        "few": "{count} barang yang disiapkan tidak dapat dijual untuk $WOC.",
+        "many": "{count} barang yang disiapkan tidak dapat dijual untuk $WOC.",
+        "other": "{count} barang yang disiapkan tidak dapat dijual untuk $WOC."
       },
       "finderPartySize": {
         "one": "{count} pemain",
@@ -2662,14 +2662,14 @@ export const id_ID: EnTranslations = {
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
       "removeFromBarAria": "Hapus {name} dari bilah aksi",
-      "assignAria": "Choose a slot for {name}"
+      "assignAria": "Pilih slot untuk {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Pemain Curang >",
-      "pledgeTag": "Pledge of {guild}"
+      "pledgeTag": "Ikrar {guild}"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -2994,11 +2994,11 @@ export const id_ID: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel.",
-      "subtitle": "Guilds of the realm",
-      "rosterTitle": "View the roster of {guild}",
-      "back": "Back",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "subtitle": "Guild-guild di realm",
+      "rosterTitle": "Lihat daftar anggota {guild}",
+      "back": "Kembali",
+      "popupTitle": "Papan Petunjuk Guild",
+      "close": "Tutup"
     },
     "bank": {
       "title": "Bank",
@@ -3132,8 +3132,8 @@ export const id_ID: EnTranslations = {
           "note": "Para duelis berbondong-bondong ke Koloseum Abu. Masuklah antrean dan panjat tangga peringkat."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Akhir Pekan Kehormatan Ganda",
+          "note": "Perkemahan perang membunyikan panggilan kumpul: sepanjang akhir pekan, Kehormatan Medan Thornhollow dibayar dua kali lipat, dan kekalahan yang dimainkan hingga usai dibayar seperti kemenangan."
         },
         "fishingDerby": {
           "title": "Lomba Memancing",
@@ -3444,7 +3444,7 @@ export const id_ID: EnTranslations = {
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(menghabiskan {count} bahan halus)",
-      "craftFeeLine": "Craft fee: {fee} each",
+      "craftFeeLine": "Biaya kerajinan: {fee} per buah",
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
@@ -3996,7 +3996,7 @@ export const id_ID: EnTranslations = {
       "unlockedBorderHint": "Bingkai baru diraih: {name}. Kenakan lewat Kitab Jasa.",
       "broadcastLine": "{name} telah mengukir jasa: {deed}",
       "rarityLine": "Diraih oleh {percent} petualang",
-      "stillToVisit": "Still to visit: {places}",
+      "stillToVisit": "Masih perlu dikunjungi: {places}",
       "trackerLabel": "Jasa",
       "collapseHint": "Ciutkan pelacak jasa",
       "expandHint": "Bentangkan pelacak jasa",
@@ -4026,218 +4026,218 @@ export const id_ID: EnTranslations = {
       "minLevelNote": "Membutuhkan Level {level}"
     },
     "walletBridge": {
-      "cancelled": "The wallet request was cancelled. Nothing was sent.",
-      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
-      "notConnected": "Connect and verify a wallet, then try again.",
-      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
-      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
-      "badResponse": "Your wallet returned an unusable answer. Try again."
+      "cancelled": "Permintaan dompet dibatalkan. Tidak ada yang terkirim.",
+      "timeout": "Dompetmu tidak merespons tepat waktu. Buka dompet dan coba lagi.",
+      "notConnected": "Hubungkan dan verifikasi dompet, lalu coba lagi.",
+      "unsupported": "Dompet ini tidak dapat menyelesaikan tindakan itu. Hubungkan dompet lain.",
+      "unavailable": "Tidak ada koneksi dompet yang tersedia di sini. Hubungkan kembali dompetmu dan coba lagi.",
+      "badResponse": "Dompetmu memberikan jawaban yang tidak dapat digunakan. Coba lagi."
     },
     "wocMarket": {
-      "title": "$WOC Exchange",
-      "close": "Close the Exchange",
-      "launcherLabel": "$WOC Exchange",
-      "tabBrowse": "Browse",
-      "tabSell": "Sell",
-      "tabActivity": "My Activities",
-      "tabsLabel": "$WOC Exchange sections",
-      "loading": "Loading the Exchange...",
-      "loadFailed": "The Exchange could not be reached. Try again shortly.",
-      "disabledRealm": "The $WOC Exchange is not available on this realm.",
-      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
-      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
-      "walletBannerCta": "Connect wallet",
-      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
-      "browseEmpty": "No listings right now. Check back soon.",
-      "browseError": "Listings could not be loaded.",
-      "colItem": "Item",
-      "colSeller": "Seller",
-      "colCurrentBid": "Current bid",
-      "colBuyNow": "Buy now",
-      "colTimeLeft": "Time left",
-      "reserveMet": "Reserve met",
-      "reserveNotMet": "Reserve not met",
-      "yourListing": "Your listing",
-      "buyNowLockedBadge": "Purchase in progress",
-      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
-      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
-      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
-      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
-      "pagePrev": "Previous page",
-      "pageNext": "Next page",
-      "pageNumber": "Page {current}",
-      "sortLabel": "Sort",
-      "sortEnding": "Ending soonest",
-      "sortNewest": "Newest",
-      "sortPriceAsc": "Price: low to high",
-      "sortPriceDesc": "Price: high to low",
-      "filterQuality": "Quality",
+      "title": "Bursa $WOC",
+      "close": "Tutup Bursa",
+      "launcherLabel": "Bursa $WOC",
+      "tabBrowse": "Jelajahi",
+      "tabSell": "Jual",
+      "tabActivity": "Aktivitasku",
+      "tabsLabel": "Bagian Bursa $WOC",
+      "loading": "Memuat Bursa...",
+      "loadFailed": "Bursa tidak dapat dihubungi. Coba lagi sebentar lagi.",
+      "disabledRealm": "Bursa $WOC tidak tersedia di realm ini.",
+      "pausedBanner": "Perdagangan sedang dijeda. Lelang tetap menghitung mundur; daftar baru, penawaran, tawaran, dan pembayaran menunggu sampai perdagangan berlanjut kembali, dan pembayaran yang sudah dikirim tetap dilunasi.",
+      "walletBanner": "Tautkan dan verifikasi dompet untuk menawar, membeli, atau menjual di Bursa.",
+      "walletBannerCta": "Hubungkan dompet",
+      "rateNote": "Kurs: sekitar {tokens} $WOC per $1,00 USD per {time}.",
+      "rateNotePaused": "Kurs terakhir yang diketahui: sekitar {tokens} $WOC per $1,00 USD per {time}.",
+      "estimateNote": "Sekitar {tokens} $WOC untuk {usd} pada kurs saat ini.",
+      "browseEmpty": "Belum ada daftar saat ini. Periksa lagi nanti.",
+      "browseError": "Daftar tidak dapat dimuat.",
+      "colItem": "Barang",
+      "colSeller": "Penjual",
+      "colCurrentBid": "Penawaran saat ini",
+      "colBuyNow": "Beli sekarang",
+      "colTimeLeft": "Waktu tersisa",
+      "reserveMet": "Cadangan terpenuhi",
+      "reserveNotMet": "Cadangan belum terpenuhi",
+      "yourListing": "Daftarmu",
+      "buyNowLockedBadge": "Pembelian sedang berlangsung",
+      "reserveMetTip": "Penjual menetapkan harga minimum tersembunyi, dan penawaran saat ini memenuhinya.",
+      "reserveNotMetTip": "Penjual menetapkan harga minimum tersembunyi. Jika penawaran tertinggi saat lelang ditutup berada di bawahnya, barang tidak terjual dan setiap jaminan dikembalikan.",
+      "yourListingTip": "Kamu mendaftarkan barang ini. Kamu tidak bisa menawar pada daftar milikmu sendiri; selama belum ada penawaran, kamu bisa membatalkannya di sini atau dari Aktivitasku.",
+      "buyNowLockedTip": "Pembeli lain sedang menahan daftar ini selagi mereka membayar. Jika mereka tidak membayar tepat waktu, daftar ini akan terbuka kembali.",
+      "pagePrev": "Halaman sebelumnya",
+      "pageNext": "Halaman berikutnya",
+      "pageNumber": "Halaman {current}",
+      "sortLabel": "Urutkan",
+      "sortEnding": "Segera berakhir",
+      "sortNewest": "Terbaru",
+      "sortPriceAsc": "Harga: rendah ke tinggi",
+      "sortPriceDesc": "Harga: tinggi ke rendah",
+      "filterQuality": "Kualitas",
       "filterFormat": "Format",
-      "filterAny": "Any",
-      "filterFormatAuction": "Auction",
-      "filterFormatBuyNow": "Buy now",
-      "filterItemLabel": "Item",
-      "filterItemPlaceholder": "Search by item name",
-      "filterCategory": "Category",
-      "filterCategoryWeapon": "Weapons",
-      "filterCategoryArmor": "Armor",
-      "filterCategoryMount": "Mounts",
-      "filterSubcategory": "Type",
-      "sellerLinkAria": "View recent trades by {name}",
-      "sellerTitle": "Recent trades by {name}",
-      "sellerBack": "Back to Browse",
-      "sellerEmpty": "No completed trades yet.",
-      "sellerError": "Recent trades could not be loaded.",
-      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
-      "detailTitle": "Listing",
-      "detailSeller": "Sold by {name}",
-      "detailEndsAt": "Ends {utc} UTC ({local} local)",
-      "detailStartingBid": "Starting bid: {usd}",
-      "detailCurrentBid": "Current bid: {usd}",
-      "detailNoBids": "No bids yet",
-      "detailMinNext": "Minimum next bid: {usd}",
-      "detailBuyNow": "Buy now: {usd}",
-      "detailSales": "Recent sales",
-      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
-      "detailNoSales": "No recorded sales for this item yet.",
-      "detailSalesLoading": "Loading recent sales...",
-      "bidLabel": "Your bid (USD)",
-      "bidPlaceholder": "Enter a USD amount",
-      "bidButton": "Place bid",
-      "bidAria": "Place a bid on {item}",
-      "bidTermsToggle": "Bid terms",
-      "rowOpenAria": "View the listing for {item}",
-      "buyNowButton": "Buy now for {usd}",
-      "buyNowAria": "Buy {item} now for {usd}",
-      "cancelButton": "Cancel listing",
-      "cancelAria": "Cancel your listing of {item}",
-      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
-      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
-      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
-      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
-      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
-      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
-      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
-      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
-      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
-      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
-      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
-      "termsLabel": "I accept the Marketplace terms.",
-      "termsLink": "View the Marketplace terms (opens in a new tab)",
-      "quoteTitle": "Confirm payment",
+      "filterAny": "Semua",
+      "filterFormatAuction": "Lelang",
+      "filterFormatBuyNow": "Beli sekarang",
+      "filterItemLabel": "Barang",
+      "filterItemPlaceholder": "Cari berdasarkan nama barang",
+      "filterCategory": "Kategori",
+      "filterCategoryWeapon": "Senjata",
+      "filterCategoryArmor": "Zirah",
+      "filterCategoryMount": "Tunggangan",
+      "filterSubcategory": "Jenis",
+      "sellerLinkAria": "Lihat perdagangan terbaru oleh {name}",
+      "sellerTitle": "Perdagangan terbaru oleh {name}",
+      "sellerBack": "Kembali ke Jelajahi",
+      "sellerEmpty": "Belum ada perdagangan yang tuntas.",
+      "sellerError": "Perdagangan terbaru tidak dapat dimuat.",
+      "sellerSaleRow": "{time}: {item} kepada {buyer} seharga {usd}",
+      "detailTitle": "Daftar",
+      "detailSeller": "Dijual oleh {name}",
+      "detailEndsAt": "Berakhir {utc} UTC ({local} waktu setempat)",
+      "detailStartingBid": "Penawaran awal: {usd}",
+      "detailCurrentBid": "Penawaran saat ini: {usd}",
+      "detailNoBids": "Belum ada penawaran",
+      "detailMinNext": "Penawaran minimum berikutnya: {usd}",
+      "detailBuyNow": "Beli sekarang: {usd}",
+      "detailSales": "Penjualan terbaru",
+      "detailSaleRow": "{time}: {seller} menjual kepada {buyer} seharga {usd}",
+      "detailNoSales": "Belum ada penjualan tercatat untuk barang ini.",
+      "detailSalesLoading": "Memuat penjualan terbaru...",
+      "bidLabel": "Penawaranmu (USD)",
+      "bidPlaceholder": "Masukkan jumlah USD",
+      "bidButton": "Ajukan penawaran",
+      "bidAria": "Ajukan penawaran untuk {item}",
+      "bidTermsToggle": "Ketentuan penawaran",
+      "rowOpenAria": "Lihat daftar untuk {item}",
+      "buyNowButton": "Beli sekarang seharga {usd}",
+      "buyNowAria": "Beli {item} sekarang seharga {usd}",
+      "cancelButton": "Batalkan daftar",
+      "cancelAria": "Batalkan daftarmu untuk {item}",
+      "bidBondNote": "Memasang penawaran menahan jaminan $WOC yang dapat dikembalikan di atas nilai penawaran: {bond} untuk penawaran sebesar {bid}, lebih besar untuk penawaran yang lebih tinggi. Jaminan dikembalikan saat kamu kalah tawar atau kalah, atau setelah kamu membayar jika menang; tawaran kesempatan kedua akan menahannya lagi.",
+      "bidBondSchedule": "Jaminan sebesar {rate} persen dari penawaranmu, minimal {min} dan maksimal {max}.",
+      "bidBondPayWindow": "Bayar jaminan dalam waktu {duration} setelah memasang penawaran, atau penawaran akan kedaluwarsa.",
+      "bidBindingNote": "Penawaran bersifat mengikat begitu kamu menandatangani transaksi jaminannya: penawaran tidak dapat ditarik, dan jika kamu menang tetapi tidak membayar, jaminan akan hangus dan akunmu mendapat pelanggaran Pasar.",
+      "bidCloseNote": "Penawaran yang jaminannya terkonfirmasi dalam 2 menit terakhir memperpanjang lelang hingga 2 menit setelah penawaran itu, hingga maksimal 30 menit melewati waktu akhir yang tercantum. Jaminan yang terkonfirmasi setelah lelang ditutup tidak dihitung dan akan dikembalikan.",
+      "offerNextNote": "Jika pemenangnya tidak membayar, kamu bisa menjadi pembeli pada penawaranmu sendiri: jaminanmu akan ditahan lagi (atau diminta lagi jika sudah dikembalikan) dan pembayaran jatuh tempo dalam {duration}.",
+      "buyNowNote": "Beli sekarang menahan daftar ini untukmu selama kurang lebih empat setengah menit selagi kamu membayar. Jika kamu tidak membayar tepat waktu, kamu tidak bisa mencoba daftar ini lagi selama 30 menit, dan tiga kali Beli Sekarang yang tidak dibayar dalam satu jam akan menjeda Beli Sekarang untukmu sampai yang tertua berusia satu jam.",
+      "variableTokenWarning": "Kamu berkomitmen membayar nilai USD dalam $WOC. Jumlah token yang pasti ditetapkan oleh kuotasi baru saat pembayaran diminta dan bisa berbeda dari perkiraan.",
+      "quoteFixedNote": "Kuotasi ini mengunci jumlah $WOC hingga kedaluwarsa. Kuotasi baru mungkin berbeda.",
+      "settlementDeadlineNote": "Jika kamu menang, pembayaran jatuh tempo dalam {duration} setelah lelang ditutup.",
+      "claimCooldownRetry": "Kamu baru saja meninggalkan sebuah Beli Sekarang. Coba lagi dalam {duration}.",
+      "termsLabel": "Saya menerima Ketentuan Bursa.",
+      "termsLink": "Lihat Ketentuan Bursa (terbuka di tab baru)",
+      "quoteTitle": "Konfirmasi pembayaran",
       "quoteTotal": "Total: {tokens} $WOC",
-      "quoteSeller": "Seller receives: {tokens} $WOC",
-      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
-      "quoteTreasury": "To the game treasury: {tokens} $WOC",
-      "quoteExpires": "Quote expires in {duration}",
-      "quoteExpiresAt": "Quote expires at {time}.",
-      "quoteExpired": "The quote expired. Request a fresh one.",
-      "quoteSign": "Sign and pay",
-      "quoteRefresh": "New quote",
-      "quoteCancel": "Not now",
-      "quoteBondFor": "Refundable bid bond: {usd}",
-      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
-      "quoteSettlementFor": "Settlement for {item}: {usd}",
-      "paymentDueAt": "Payment is due by {time}.",
-      "signing": "Waiting for your wallet...",
-      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
-      "confirming": "Confirming on chain...",
-      "listing": "Listing your item...",
-      "activityCancelPending": "Cancel pending",
-      "activityDirected": "Directed sale",
-      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
-      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
-      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
-      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
-      "listingCreated": "Your listing is live.",
-      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
-      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
-      "sellTitle": "Create a listing",
-      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
-      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
-      "sellCollectiblesMounts": "Mounts can also be listed.",
-      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
-      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
-      "sellSearchPlaceholder": "Type to filter your bags",
-      "sellClear": "Clear {item} and choose another",
-      "sellChoose": "Item to list",
-      "sellNoMatches": "No items match that search",
-      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
+      "quoteSeller": "Penjual menerima: {tokens} $WOC",
+      "quoteBurn": "Dibakar (dihapus dari pasokan): {tokens} $WOC",
+      "quoteTreasury": "Ke kas permainan: {tokens} $WOC",
+      "quoteExpires": "Kuotasi kedaluwarsa dalam {duration}",
+      "quoteExpiresAt": "Kuotasi kedaluwarsa pada {time}.",
+      "quoteExpired": "Kuotasi telah kedaluwarsa. Minta yang baru.",
+      "quoteSign": "Tanda tangani dan bayar",
+      "quoteRefresh": "Kuotasi baru",
+      "quoteCancel": "Tidak sekarang",
+      "quoteBondFor": "Jaminan penawaran yang dapat dikembalikan: {usd}",
+      "quoteBondForItem": "Jaminan penawaran yang dapat dikembalikan untuk {item}: {usd}",
+      "quoteSettlementFor": "Pelunasan untuk {item}: {usd}",
+      "paymentDueAt": "Pembayaran jatuh tempo pada {time}.",
+      "signing": "Menunggu dompetmu...",
+      "signFailed": "Dompetmu tidak menyelesaikan pembayaran. Periksa dompetmu dan coba lagi.",
+      "signFailedConfirm": "Dompetmu tidak menandatangani konfirmasi. Periksa dompetmu dan coba lagi.",
+      "confirming": "Mengonfirmasi di blockchain...",
+      "listing": "Mendaftarkan barangmu...",
+      "activityCancelPending": "Pembatalan tertunda",
+      "activityDirected": "Penjualan langsung",
+      "bidPlacedStanding": "Penawaranmu masih berlaku. Kamu adalah penawar tertinggi.",
+      "bidPlacedOutbid": "Jaminanmu terkonfirmasi, tetapi penawaran yang lebih tinggi masuk lebih dulu.",
+      "purchaseComplete": "Pembelian selesai. Barangmu akan tiba lewat surat Pos Gagak.",
+      "paymentConfirmedDelivering": "Pembayaran dikonfirmasi. Barangmu akan tiba lewat surat Pos Gagak begitu pengiriman selesai.",
+      "listingCreated": "Daftarmu sudah aktif.",
+      "listingCancelled": "Daftar dibatalkan. Barangmu kembali lewat surat Pos Gagak.",
+      "listingCancelPending": "Pembatalan tertunda: seorang pembeli sedang menahan jendela pembelian. Kecuali mereka membayar, daftar ini akan ditutup dan barangmu kembali lewat surat Pos Gagak.",
+      "sellTitle": "Buat daftar",
+      "sellEmptyFloor": "Tidak ada barang yang memenuhi syarat di dalam tasmu. Realm ini hanya menerima perlengkapan tak terikat bermutu {floor} atau lebih baik.",
+      "sellCollectiblesBoth": "Tunggangan dan pelat Kroma Mech juga bisa didaftarkan.",
+      "sellCollectiblesMounts": "Tunggangan juga bisa didaftarkan.",
+      "sellCollectiblesChromas": "Pelat Kroma Mech juga bisa didaftarkan.",
+      "sellLockedHidden": "Barang yang terkunci tidak ditampilkan di sini. Buka kuncinya di dalam tasmu untuk menjualnya.",
+      "sellSearchPlaceholder": "Ketik untuk menyaring tasmu",
+      "sellClear": "Hapus {item} dan pilih yang lain",
+      "sellChoose": "Barang yang akan didaftarkan",
+      "sellNoMatches": "Tidak ada barang yang cocok dengan pencarian itu",
+      "sellBuyNowAboveStart": "Harga beli sekarang harus lebih tinggi daripada penawaran awal.",
       "sellFormat": "Format",
-      "sellFormatAuction": "Auction",
-      "sellFormatBuyNow": "Buy now only",
-      "sellFormatAuctionBuyNow": "Auction with buy now",
-      "sellStart": "Starting bid (USD)",
-      "sellReserve": "Reserve (USD, optional)",
-      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
-      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
-      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
-      "sellBuyNowPrice": "Buy-now price (USD)",
-      "sellDuration": "Duration",
-      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
-      "sellSubmit": "List item",
-      "sellSubmitAria": "List {item} on the Exchange",
-      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
-      "activityListings": "My listings",
-      "activityBids": "My bids",
-      "activitySettlements": "My settlements",
-      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
-      "activityNoListings": "You have no listings.",
-      "activityNoBids": "You have no bids.",
-      "activityNoSettlements": "You have no settlements.",
-      "activityPayNow": "Pay now",
-      "activityPayNowAria": "Pay for settlement {id} now",
-      "activityPayNowItemAria": "Pay {usd} for {item} now",
-      "activityDeadline": "Payment due in {duration}",
-      "dueAt": "Due {utc} UTC ({local} local)",
-      "activityStrikes": "Marketplace strikes: {count}",
-      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
-      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
-      "bidStatusPending": "Awaiting bond",
-      "bidStatusActive": "High bidder",
-      "bidStatusOutbid": "Outbid",
-      "bidStatusLapsed": "Lapsed",
-      "bidStatusWon": "Won",
-      "bidStatusDefaulted": "Defaulted",
-      "bidStatusCancelled": "Cancelled",
-      "bidBondPay": "Pay bond",
-      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
-      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
-      "settlementOffered": "Payment due",
-      "settlementConfirming": "Confirming",
-      "settlementConfirmedDelivering": "Payment confirmed, delivering",
-      "settlementReview": "Payment under review",
-      "settlementDelivered": "Delivered",
-      "settlementExpired": "Expired unpaid",
-      "settlementFailed": "Payment failed",
-      "settlementFailBurnMissing": "The payment did not include the required token burn.",
-      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
-      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
-      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
-      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
-      "settlementFailRefunded": "This payment was returned to your wallet.",
-      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
-      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
-      "settlementFailGeneric": "This payment could not be completed.",
-      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
-      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
-      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
-      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
-      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
-      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
-      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
-      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
-      "listingStatusActive": "Active",
-      "listingStatusSettling": "Awaiting payment",
-      "listingStatusSold": "Sold",
-      "listingStatusReturned": "Returned",
-      "listingStatusCancelled": "Cancelled",
-      "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "sellFormatAuction": "Lelang",
+      "sellFormatBuyNow": "Hanya beli sekarang",
+      "sellFormatAuctionBuyNow": "Lelang dengan beli sekarang",
+      "sellStart": "Penawaran awal (USD)",
+      "sellReserve": "Cadangan (USD, opsional)",
+      "sellReserveNote": "Opsional, minimal sebesar penawaran awal. Penawar hanya melihat apakah cadangan itu terpenuhi atau tidak; jika penawaran tertinggi saat lelang ditutup berada di bawahnya, barang kembali kepadamu tanpa terjual dan setiap jaminan dikembalikan.",
+      "sellBuyNowNote": "Wajib. Daftar beli sekarang terjual pada harga ini tanpa penawaran.",
+      "sellBuyNowAuctionNote": "Opsional. Tetapkan harga yang bisa dibayar pembeli untuk mengakhiri lelang lebih awal; harga itu harus di atas penawaran awal dan cadangan.",
+      "sellBuyNowPrice": "Harga beli sekarang (USD)",
+      "sellDuration": "Durasi",
+      "sellOfferNext": "Jika pemenangnya tidak membayar, jual kepada penawar tertinggi berikutnya yang penawarannya memenuhi cadangan, pada harga penawarannya, alih-alih berakhir tidak terjual.",
+      "sellSubmit": "Daftarkan barang",
+      "sellSubmitAria": "Daftarkan {item} di Bursa",
+      "sellFeeNote": "Penjualan yang tuntas membayar biaya Bursa dari harganya: sebagian dibakar dan sebagian masuk ke kas, dan kamu menerima sisanya di dompet tertautmu dalam transaksi pelunasan. Biaya untuk harga yang kamu masukkan ditampilkan di sini; pada lelang, biaya mengikuti harga akhir.",
+      "activityListings": "Daftarku",
+      "activityBids": "Penawaranku",
+      "activitySettlements": "Transaksiku",
+      "activityEmpty": "Kamu belum memiliki penawaran, daftar, atau transaksi selesai. Aktivitas Bursamu akan muncul di sini.",
+      "activityNoListings": "Kamu belum memiliki daftar.",
+      "activityNoBids": "Kamu belum memiliki penawaran.",
+      "activityNoSettlements": "Kamu belum memiliki transaksi selesai.",
+      "activityPayNow": "Bayar sekarang",
+      "activityPayNowAria": "Bayar transaksi {id} sekarang",
+      "activityPayNowItemAria": "Bayar {usd} untuk {item} sekarang",
+      "activityDeadline": "Pembayaran jatuh tempo dalam {duration}",
+      "dueAt": "Jatuh tempo {utc} UTC ({local} waktu setempat)",
+      "activityStrikes": "Pelanggaran Pasar: {count}",
+      "activitySuspended": "Bursa ditangguhkan selama {duration} akibat kesepakatan yang tidak dibayar: tidak ada penawaran, pembelian, daftar, atau perdagangan $WOC hingga saat itu.",
+      "strikesTip": "Sebuah pelanggaran diberikan setiap kali kamu tidak membayar kesepakatan yang sudah kamu buat. Setelah yang pertama, setiap pelanggaran menangguhkanmu dari Bursa lebih lama lagi: 3 hari, lalu 14, lalu 90, lalu satu tahun.",
+      "bidStatusPending": "Menunggu jaminan",
+      "bidStatusActive": "Penawar tertinggi",
+      "bidStatusOutbid": "Kalah tawar",
+      "bidStatusLapsed": "Kedaluwarsa",
+      "bidStatusWon": "Menang",
+      "bidStatusDefaulted": "Gagal bayar",
+      "bidStatusCancelled": "Dibatalkan",
+      "bidBondPay": "Bayar jaminan",
+      "bidBondPayAria": "Bayar jaminan untuk penawaranmu pada daftar {id}",
+      "bidBondPayItemAria": "Bayar jaminan {bond} untuk penawaranmu pada {item}",
+      "settlementOffered": "Pembayaran jatuh tempo",
+      "settlementConfirming": "Mengonfirmasi",
+      "settlementConfirmedDelivering": "Pembayaran dikonfirmasi, sedang dikirim",
+      "settlementReview": "Pembayaran sedang ditinjau",
+      "settlementDelivered": "Terkirim",
+      "settlementExpired": "Kedaluwarsa, belum dibayar",
+      "settlementFailed": "Pembayaran gagal",
+      "settlementFailBurnMissing": "Pembayaran tidak menyertakan pembakaran token yang disyaratkan.",
+      "settlementFailBurnMismatch": "Pembayaran membakar jumlah token yang salah.",
+      "settlementFailBurnAuthority": "Pembakaran token berasal dari dompet yang tidak disebutkan dalam pembelian ini.",
+      "settlementFailUnexpectedCredit": "Transaksi ini membayar dompet di luar pembelian ini.",
+      "settlementFailQuoteExpired": "Kuotasi pembayaran kedaluwarsa sebelum digunakan. Minta kuotasi baru dan bayar lagi.",
+      "settlementFailTransaction": "Transaksi pembayaran gagal di jaringan. Minta kuotasi baru dan coba lagi.",
+      "settlementFailRefunded": "Pembayaran ini dikembalikan ke dompetmu.",
+      "settlementFailSuperseded": "Upaya pembayaran ini digantikan oleh upaya yang lebih baru.",
+      "settlementFailConfirmingOverdue": "Pembayaran ini memakan waktu terlalu lama untuk dikonfirmasi dan tidak dapat diverifikasi.",
+      "settlementFailGeneric": "Pembayaran ini tidak dapat diselesaikan.",
+      "paymentSeenAwaitingFinality": "Pembayaran terlihat di buku besar. Menunggu konfirmasi akhir.",
+      "paymentNotYetVisible": "Belum ada pembayaran yang terlihat di buku besar. Butuh waktu sesaat untuk muncul.",
+      "paymentServiceUnreachable": "Layanan pembayaran tidak dapat dihubungi. Pembayaranmu tetap tercatat dan akan diperiksa ulang.",
+      "paymentPendingGeneric": "Pembayaranmu telah dikirim dan menunggu konfirmasi.",
+      "bondSeenAwaitingFinality": "Pembayaran jaminan terlihat di buku besar. Menunggu konfirmasi akhir.",
+      "bondNotYetVisible": "Belum ada pembayaran jaminan yang terlihat di buku besar. Butuh waktu sebentar untuk muncul.",
+      "bondServiceUnreachable": "Layanan pembayaran tidak dapat dijangkau. Pembayaran jaminanmu tetap tercatat dan akan diperiksa ulang.",
+      "bondPendingGeneric": "Pembayaran jaminanmu telah dikirim dan menunggu konfirmasi.",
+      "listingStatusActive": "Aktif",
+      "listingStatusSettling": "Menunggu pembayaran",
+      "listingStatusSold": "Terjual",
+      "listingStatusReturned": "Dikembalikan",
+      "listingStatusCancelled": "Dibatalkan",
+      "listingStatusSuspended": "Ditangguhkan",
+      "listingStatusUnsold": "Tidak Terjual"
     }
   },
   "gatherEvent": {
@@ -4340,8 +4340,8 @@ export const id_ID: EnTranslations = {
       "invalid_input": "Masukan tidak valid."
     },
     "guilds": {
-      "invalid_roster_name": "Invalid guild name.",
-      "unknown": "No guild by that name."
+      "invalid_roster_name": "Nama guild tidak valid.",
+      "unknown": "Tidak ada guild dengan nama itu."
     },
     "steam": {
       "disabled": "Penautan Steam sedang tidak tersedia.",
@@ -4382,53 +4382,53 @@ export const id_ID: EnTranslations = {
       "not_marked": "Akun tersebut tidak diberi tanda."
     },
     "woc_market": {
-      "invalid_input": "Invalid input.",
-      "disabled": "The $WOC Exchange is not available on this realm.",
-      "paused": "Exchange trading is paused. Auctions keep counting down.",
-      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
-      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
-      "self_offer": "You cannot send a $WOC offer to yourself.",
-      "offer_expired": "That $WOC offer expired. Ask for a new one.",
-      "terms_required": "Accept the Marketplace terms to continue.",
-      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
-      "totp_invalid": "That two-factor code did not verify. Try again.",
-      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
-      "character_invalid": "Play the character you are listing from, and try again.",
-      "not_found": "That Exchange entry no longer exists.",
-      "not_yours": "That Exchange entry no longer exists.",
-      "not_active": "That listing is no longer open for this action.",
-      "own_listing": "You cannot bid on or buy your own listing.",
-      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
-      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
-      "already_pending": "Confirm or abandon your pending bid on this listing first.",
-      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
-      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
-      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
-      "not_pending": "That bid is no longer awaiting its bond.",
-      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
-      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
-      "cancel_pending": "The seller is cancelling this listing.",
-      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
-      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
-      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
-      "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
-      "no_buy_now": "This listing has no buy-now price.",
-      "cap_reached": "You have reached your Exchange listing limit.",
-      "stale_item": "That item changed or moved. Re-select it and try again.",
-      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
-      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
-      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
-      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted.",
-      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
-      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
-      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
-      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
-      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
-      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
-      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
+      "invalid_input": "Masukan tidak valid.",
+      "disabled": "Bursa $WOC tidak tersedia di realm ini.",
+      "paused": "Perdagangan Bursa sedang dihentikan sementara. Lelang tetap terus menghitung mundur.",
+      "wallet_required": "Tautkan dan verifikasi dompet sebelum berdagang di Bursa.",
+      "recipient_wallet_required": "Pemain itu harus menghubungkan dompet sebelum dapat menerima pembayaran $WOC.",
+      "self_offer": "Anda tidak dapat mengirim penawaran $WOC kepada diri sendiri.",
+      "offer_expired": "Penawaran $WOC itu sudah kedaluwarsa. Minta yang baru.",
+      "terms_required": "Terima ketentuan pasar untuk melanjutkan.",
+      "totp_required": "Jumlah ini membutuhkan autentikasi dua-faktor. Aktifkan di pengaturan akun, lalu masukkan kode Anda.",
+      "totp_invalid": "Kode dua-faktor itu tidak terverifikasi. Coba lagi.",
+      "suspended": "Akses Bursa Anda ditangguhkan akibat transaksi yang tidak dibayar: tidak ada tawaran, pembelian, daftar, atau perdagangan $WOC.",
+      "character_invalid": "Mainkan karakter tempat kamu mendaftarkan barang ini, lalu coba lagi.",
+      "not_found": "Entri Bursa itu sudah tidak ada.",
+      "not_yours": "Entri Bursa itu sudah tidak ada.",
+      "not_active": "Daftar itu sudah tidak terbuka untuk tindakan ini.",
+      "own_listing": "Anda tidak dapat menawar atau membeli daftar milik Anda sendiri.",
+      "has_bids": "Daftar yang sudah menerima tawaran tidak dapat ditarik. Hubungi dukungan jika Anda harus membatalkannya.",
+      "bid_too_low": "Penawaranmu tidak melampaui penawaran saat ini ditambah kenaikannya.",
+      "already_pending": "Konfirmasi atau batalkan dulu penawaranmu yang tertunda pada daftar ini.",
+      "insufficient_balance": "Dompet Anda tidak memiliki cukup $WOC untuk tawaran ini beserta jaminannya.",
+      "quote_unavailable": "Kuotasi harga tidak dapat diterbitkan saat ini. Coba lagi sebentar lagi.",
+      "quote_expired": "Kuotasi itu sudah kedaluwarsa. Minta yang baru; jika tidak ada yang ditawarkan, jendela waktu itu sudah tertutup.",
+      "not_pending": "Tawaran itu sudah tidak menunggu jaminannya.",
+      "confirm_failed": "Transaksi tidak dapat dikonfirmasi. Minta kuotasi baru dan coba lagi.",
+      "confirm_in_flight": "Pembayaran Anda masih dalam proses konfirmasi. Coba lagi setelah selesai.",
+      "buy_now_locked": "Pembeli lain sedang menyelesaikan pembelian ini. Coba lagi sesaat lagi.",
+      "cancel_pending": "Penjual sedang membatalkan daftar ini.",
+      "claim_cooldown": "Kamu baru saja meninggalkan sebuah Beli Sekarang. Coba lagi nanti.",
+      "bond_window_closed": "Penawaran ini tidak bisa lagi dibayar: jendela pembayarannya sudah ditutup. Tawar lagi untuk mendapatkan yang baru.",
+      "settlement_in_flight": "Seorang pembeli sedang membayar daftar ini. Coba lagi setelah pembayarannya selesai.",
+      "contended": "Bursa sedang sibuk memproses daftar ini. Coba lagi sesaat lagi.",
+      "sale_conflict": "Catatan penjualan aktif lain masih berlaku untuk daftar ini. Kecualikan itu terlebih dahulu.",
+      "no_buy_now": "Daftar ini tidak memiliki harga beli langsung.",
+      "cap_reached": "Kamu telah mencapai batas daftar Bursa milikmu.",
+      "stale_item": "Barang itu sudah berubah atau berpindah. Pilih ulang lalu coba lagi.",
+      "item_mismatch": "Itu bukan salinan persis yang disetujui pembeli, atau kondisinya sudah berubah (termasuk terkunci). Mulai transaksi baru untuknya.",
+      "offer_pending": "Anda sudah memiliki transaksi yang berlaku dengan pemain ini. Selesaikan itu terlebih dahulu.",
+      "not_eligible": "Barang itu tidak dapat didaftarkan di Bursa $WOC.",
+      "invalid_params": "Periksa tawaran awal, harga cadangan, harga beli langsung, dan durasinya.",
+      "signature_reused": "Transaksi itu sudah pernah dikirimkan.",
+      "item_locked": "Barang itu terkunci. Buka kuncinya di tasmu sebelum menjualnya.",
+      "stepup_required": "Menjual di Bursa membutuhkan tanda tangan dari dompet tertaut Anda.",
+      "stepup_challenge_invalid": "Konfirmasi dompet itu sudah tidak valid. Mulai penjualan lagi dari awal.",
+      "stepup_challenge_expired": "Konfirmasi dompet itu sudah kedaluwarsa. Mulai penjualan lagi dari awal.",
+      "stepup_wallet_mismatch": "Dompet tertaut Anda berubah sejak konfirmasi ini diterbitkan. Mulai penjualan lagi dari awal.",
+      "stepup_binding_mismatch": "Konfirmasi dompet itu tidak cocok dengan penjualan ini. Mulai penjualan lagi dari awal.",
+      "stepup_signature_invalid": "Tanda tangan dompet itu tidak terverifikasi. Mulai penjualan lagi dari awal."
     }
   },
   "guide": {
@@ -4575,8 +4575,8 @@ export const id_ID: EnTranslations = {
         "fenBlurb": "Melewati mahkota musim gugur, sebuah rawa cerah berisi pohon willow dan air yang tenang, serta sebuah kota di balik parit.",
         "farshoreName": "Pesisir Jauh",
         "farshoreBlurb": "Sebuah pulau di seberang gosong pasir, tempat langit terkoyak di atas Riftfields dan Gullhaven membunyikan loncengnya setiap kali sebuah celah terbuka.",
-        "provingName": "The Proving Shore",
-        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
+        "provingName": "Pesisir Pembuktian",
+        "provingBlurb": "Sebuah pulau latihan yang tenang di seberang selat, tempat para petualang baru menemukan pijakan mereka sebelum lembah meminta apa pun dari mereka.",
         "nightName": "Kuntum Malam",
         "nightBlurb": "Sebuah negeri tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesiagaannya.",
         "hauntName": "Hutan Arwah",
@@ -5538,10 +5538,10 @@ export const id_ID: EnTranslations = {
       "farshoreGreeting": "Kau datang lewat Ferrywalk? Berarti kau yang pertama dalam seminggu, dan Sang Penjaga akan ingin memeriksamu.",
       "farshoreGreeter": "Penjaga Lonceng Tam, Dermaga",
       "farshorePlaceNotes": "Gullhaven adalah satu-satunya kota sekaligus benteng pertahanan pulau ini. Dermaga adalah tempat Ferrywalk mencapai daratan, dengan sebuah lonceng waspada berdiri di atas tanjungnya; Padang Rumput Jaga menguasai dataran tinggi di tenggara kota, tempat seorang pengawas rift mendengarkan celah berikutnya; Tebing Terbelah retak terbuka di ujung selatan pulau; dan Ladang Rift adalah barisan gandum yang porak-poranda di timur Gullhaven, masih dipenuhi makhluk yang datang lewat celah di sana.",
-      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
-      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
-      "provingGreeter": "Instructor Maren, Dawnrest Camp",
-      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
+      "provingBlurb": "Sebuah pulau tenang di seberang selat dari lembah, dipelihara sebagai tempat latihan: sebuah perkemahan, sebuah pekarangan latihan, sebuah pesisir yang dipenuhi bangkai kapal, dan sebuah feri yang berlayar dua arah.",
+      "provingGreeting": "Setiap pahlawan yang pernah lembah ini syukuri pernah berdiri di tempatmu berdiri sekarang, dan tak satu pun dari mereka tahu ujung mana dari sebilah pedang yang harus dipegang.",
+      "provingGreeter": "Instruktur Maren, Perkemahan Dawnrest",
+      "provingPlaceNotes": "Perkemahan Dawnrest adalah seluruh permukiman di pulau ini: beberapa tenda, sebuah kios, dan sebuah api unggun kumpul. Dermaga Tua menghadap ke lembah, tempat lingkaran penyeberangan membawa para lulusan melintasi selat; Pekarangan Latihan di selatan perkemahan menjaga patung-patung jeraminya tetap berdiri bagi siapa pun yang membutuhkannya; dan Deretan Bangkai Kapal adalah pesisir penuh barang rongsokan tempat pasang membayar pulau ini dengan peti-peti terdampar.",
       "travelTitle": "Berkeliling",
       "travelBody": "Setiap jalan di realm ini ditempuh dengan berjalan kaki atau berkuda. Tidak ada jalur terbang, tidak ada taksi, dan tidak ada jaringan teleportasi: peta ini adalah satu daratan menyambung, dan setiap sambungannya adalah sesuatu yang bisa kamu injak. Punggung bukit memisahkan satu realm dari yang berikutnya, dan di tempat dua realm berbagi sebuah punggung bukit, jalan itu mendaki lewat sebuah celah gunung. Namun tidak setiap perbatasan bekerja seperti itu. Di utara, sebuah jalan layang panjang membawa jalan itu keluar melintasi air dari Ceruk Terselubung menuju negeri bersalju di seberangnya, dan di selatan sana sebuah gosong pasir alami yang tipis bernama Ferrywalk membentang ke timur dari pesisir Lembah menuju Dermaga di pulau Pesisir Jauh, yang sama sekali tak memiliki perbatasan darat. Dan hanya ada satu pintu sejati di seluruh dunia luar: sebuah selubung senja tinggi di Thornpeak yang terbuka menuju Ceruk Terselubung. Punggung bukit selatan sang Ceruk tertutup rapat tanpa celah yang menembusnya, sehingga selubung itulah caramu pertama kali masuk, dan ia menutup di belakangmu dalam perjalanan kembali.\n\nKe mana pun kamu tumbang, perjalanan kembali selalu singkat. Setiap zona menyimpan setidaknya satu kuburan dengan Sang Penjaga Pucat melayang di atas bebatuannya, dan roh yang dilepaskan bangkit di kuburan terdekat.\n\nPeta ini tidak berakhir pada dinding tak kasatmata. Daratan berakhir menjadi pantai dan tanjung, lalu menjadi laut lepas. Penyeberangan yang memang dimaksudkan dunia ini untuk kamu renangi, selat dan rawa di antara satu realm dengan yang berikutnya, tenang dan aman untuk diseberangi. Namun berenanglah menuju laut lepas dan jarak itu sendiri akan mendorongmu kembali: kamu diperingatkan, dan diperingatkan lagi, dan jika kamu terus berenang, laut akan menguras tenagamu hingga membunuhmu. Menyelam memiliki batasnya sendiri, karena napasmu habis di bawah permukaan, jadi naiklah untuk bernapas dan berbaliklah saat air itu menyuruhmu.",
       "mountsTitle": "Tunggangan",
@@ -5988,7 +5988,7 @@ export const id_ID: EnTranslations = {
       "deedsHeading": "Jasa yang mengingat perjalanan",
       "deedsBody": "Kitab Jasa berjalan bersama setiap langkah ini. Penyelarasan pertamamu meraih jasa Tersumpah Karya dan karya master pertamamu meraih jasa Pandai Karya, keduanya bisa dipakai sebagai gelar. Setiap delapan kerajinan yang bisa diraih menandai jasa tonggak pada keahlian 50 dan memahkotai capnya dengan gelar Grandmaster, sementara Memancing mendapat jasa Garam Tua pada keahlian 100 dan gelar Pemancing Mahir pada keahlian 200.\n\nAda halaman yang lebih tenang juga: jasa untuk panen pertama dan pembuatan pertamamu, untuk temuan langka yang muncul di lapangan, dan untuk mengambil salvasi. Semua itu bersifat kosmetik, hanya gelar dan Kemasyhuran. Jasa tidak pernah memberikan kekuatan; ia hanya membuktikan bahwa kamu pernah ada di sana.",
       "startHeading": "Dari mana memulai",
-      "startBody": "Baru turun dari jalan di Eastbrook? Temui Mandor Odell dan ambil Pekerjaan untuk Setiap Tangan: ia akan menunjukkanmu urat bijih di sekitar Galian Tembaga di tenggara kota dan memberimu kapalan pertama di tanganmu. Waspadai galiannya sendiri: para Penggali Deeprock yang berkemah di sana berdiri beberapa level di atas pendatang baru, jadi kerjakan urat-urat di pinggirannya dulu dan simpan jantung perkemahan itu untuk saat levelmu sudah naik sedikit. Sejak saat itu, panenlah setiap urat bijih, rumpun kayu, dan petak herba yang kamu lewati sambil mengerjakan misi; kecakapan datang secara alami kepada para pengelana.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep biasa yang diketahui setiap karakter sejak awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka demi koin yang stabil. Pada saat surat Serikat menemukanmu, kamu sudah akan tahu pasangan mana yang terasa seperti rumah.",
+      "startBody": "Baru turun dari jalan di Eastbrook? Temui Mandor Odell dan ambil Pekerjaan untuk Setiap Tangan: ia akan menunjukkanmu urat bijih di sekitar Galian Tembaga di timur laut kota dan memberimu kapalan pertama di tanganmu. Waspadai galiannya sendiri: para Penggali Deeprock yang berkemah di sana berdiri beberapa level di atas pendatang baru, jadi kerjakan urat-urat di pinggirannya dulu dan simpan jantung perkemahan itu untuk saat levelmu sudah naik sedikit. Sejak saat itu, panenlah setiap urat bijih, rumpun kayu, dan petak herba yang kamu lewati sambil mengerjakan misi; kecakapan datang secara alami kepada para pengelana.\n\nKembali di kota, tekan T untuk membuka jendela kerajinan dan kerjakan resep biasa yang diketahui setiap karakter sejak awal. Kunjungi para master di tempa, dapur, alat tenun, dan bengkel alat untuk melihat apa yang mereka ajarkan, dan ambil pesanan kerja mereka demi koin yang stabil. Pada saat surat Serikat menemukanmu, kamu sudah akan tahu pasangan mana yang terasa seperti rumah.",
       "colStation": "Stasiun",
       "colHub": "Hub",
       "colMaster": "Master",
@@ -6073,13 +6073,13 @@ export const id_ID: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Kulit untuk yang gesit",
-          "identityBody": "Tangga naik dari celana, sepatu bot, dan ikat pinggang kulit Fenbridge polos melalui jaket, tudung, dan spaulder marshstalker tidak umum hingga ke set mirewarden langka, kulit terbaik yang bisa dipotong seorang perajin. Dua potongan caster melengkapinya: field common Eastbrook Druid's Hide dan Duskhide Wraps pada keahlian 75.\n\nPada roda ia berada di antara Memasak dan Menjahit. Pasangan hidupnya adalah Perajut Busana, Pengolahan Kulit dan Menjahit, disumpah di hadapan Penenun Ottilie di Eastbrook; pasangan Pemburu Jebak dengan Memasak dinamai pada roda tetapi belum memiliki misi sumpah.",
+          "identityBody": "Tangga naik dari celana, sepatu bot, dan ikat pinggang kulit Fenbridge polos melalui jaket, tudung, dan spaulder marshstalker tidak umum hingga ke set mirewarden langka, kulit terbaik yang bisa dipotong seorang perajin. Dua potongan caster melengkapinya: field common Eastbrook Druid's Hide dan Duskhide Wraps pada keahlian 50.\n\nPada roda ia berada di antara Memasak dan Menjahit. Pasangan hidupnya adalah Perajut Busana, Pengolahan Kulit dan Menjahit, disumpah di hadapan Penenun Ottilie di Eastbrook; pasangan Pemburu Jebak dengan Memasak dinamai pada roda tetapi belum memiliki misi sumpah.",
           "materialsHeading": "Perburuan adalah panen",
-          "materialsBody": "Pengolahan Kulit adalah kerajinan tempat rute naik levelmu dan jalur pasokanmu adalah hal yang sama: kulit kasar dipanen langsung dari bangkai yang berkulit, terutama serigala dan babi hutan, dan setiap bangkai hanya melayani satu pemanen, siapa cepat dia dapat. Lemparan panen langka atau lebih baik juga memberikan Kulit Murni, spesimen bertanda tangan yang dituntut Rompi Penjaga Rawa, jadi simpanlah di bank setiap satu yang kamu temukan.\n\nPemeran pendukungnya sedikit: kaki laba-laba dan sutra, kain tenunan sendiri dari makhluk humanoid, satu bijih osmium dalam setiap potongan langka mirewarden (enam dalam capstone Balutan Kulit Senja), dan satu Agen Penyamakan seharga 16 tembaga dari konter penyamakan. Osmium sendiri tidak pernah dibeli di konter: tambanglah sendiri, di Thornpeak atau di urat pemula hampir semua zona yang lebih muda (hanya Pesisir Jauh yang menggali besi), atau belilah dari pemain lain.",
+          "materialsBody": "Pengolahan Kulit adalah kerajinan tempat rute naik levelmu dan jalur pasokanmu adalah hal yang sama: kulit kasar dipanen langsung dari bangkai yang berkulit, terutama serigala dan babi hutan, dan setiap bangkai hanya melayani satu pemanen, siapa cepat dia dapat. Lemparan panen langka atau lebih baik juga memberikan Kulit Murni, spesimen bertanda tangan yang dituntut Rompi Penjaga Rawa, jadi simpanlah di bank setiap satu yang kamu temukan.\n\nPemeran pendukungnya sedikit: kaki laba-laba dan sutra, kain tenunan sendiri dari makhluk humanoid, satu bijih osmium dalam setiap potongan langka mirewarden (enam dalam Balutan Kulit Senja), dan satu Agen Penyamakan seharga 16 tembaga dari konter penyamakan. Osmium sendiri tidak pernah dibeli di konter: tambanglah sendiri, di Thornpeak atau di urat pemula hampir semua zona yang lebih muda (hanya Pesisir Jauh yang menggali besi), atau belilah dari pemain lain.",
           "ladderHeading": "Dilatih di Fenbridge",
-          "ladderBody": "Inilah kerutannya: penyamakan berdiri di Fenbridge, di jalan Rawa Mirefen, menjadikan Pengolahan Kulit satu-satunya kerajinan mendalam yang dilatih jauh di rawa. Penyamak Hesk mengajarkan tangganya di bak-baknya: anak tangga kulit Fenbridge gratis pada keahlian 0, anak tangga marshstalker seharga 25 perak per resep dari keahlian 25, dan anak tangga mirewarden seharga 1 emas masing-masing dari keahlian 50, setiap anak tangga terbuka begitu tingkatmu mencapainya.\n\nTiga resep melewati pelatih: dua field common (Rompi Kulit Samak dan Kulit Druid Eastbrook) dibuat di mana saja sejak awal, dan Balutan Kulit Senja diketahui semua orang tetapi berada pada keahlian 75, terikat pada penyamakan. Perhatikan bahwa sumpah Perajut Busana sendiri diucapkan kembali di Eastbrook bersama Ottilie; hanya pengajarannya yang terjadi di rawa.",
+          "ladderBody": "Inilah kerutannya: penyamakan berdiri di Fenbridge, di jalan Rawa Mirefen, menjadikan Pengolahan Kulit satu-satunya kerajinan mendalam yang dilatih jauh di rawa. Penyamak Hesk mengajarkan tangganya di bak-baknya: anak tangga kulit Fenbridge gratis pada keahlian 0, anak tangga marshstalker seharga 25 perak per resep dari keahlian 25, dan anak tangga mirewarden seharga 1 emas masing-masing dari keahlian 50, setiap anak tangga terbuka begitu tingkatmu mencapainya.\n\nTiga resep melewati pelatih: dua field common (Rompi Kulit Samak dan Kulit Druid Eastbrook) dibuat di mana saja sejak awal, dan Balutan Kulit Senja diketahui semua orang pada keahlian 50, terikat pada penyamakan. Perhatikan bahwa sumpah Perajut Busana sendiri diucapkan kembali di Eastbrook bersama Ottilie; hanya pengajarannya yang terjadi di rawa.",
           "routeHeading": "Karya besar, dan rute kerja menuju 125",
-          "routeBody": "Setiap potongan berstatistik nyata melempar peluang karya besar selama mutu yang lebih halus muat di dalam langit-langit tingkatmu, termasuk Kulit Druid Eastbrook yang berstatistik, dan Kulit Murni bertanda tangan di dalam Rompi Penjaga Rawa memberikan bonus reagen bertanda tangan secara otomatis; osmium dihitung sebagai material tingkat 1 untuk proc itu. Field common kulit yang tanpa statistik tidak bisa proc.\n\nNaikkan levelnya dengan cara alami: panen setiap serigala dan babi hutan yang kamu bunuh sejak level satu, biarkan dua field common membawamu ke 25 di mana pun kamu berdiri, lalu latih anak tangga kulit di bak-bak itu saat misi toh menyeretmu ke rawa. Marshstalker membawamu ke 50 dan mirewarden ke 75; setelah itu Balutan Kulit Senja, resep tingkat 3 seharga enam bijih osmium, tiga Kulit Murni, dua kulit kasar, dan satu Agen Penyamakan, membayar Perajut Busana yang selaras dengan perolehan penuh hingga 99 dan setengah sesudahnya, sekitar 75 pembuatan untuk lima puluh poin terakhir menuju batas 125; di bawah langit-langit kerajinan utama, resep tingkat 3 tidak mengajarkan apa pun.\n\nPenyamakan bergerak lebih berarti bagi kerajinan ini daripada bagi kerajinan mana pun: berspesialisasilah pada 75 dan sekantong pelana penuh kulit menjadi perlengkapan jadi di api unggun alih-alih perjalanan pulang ke Fenbridge. Pesanan kerja penyamakan Hesk membeli delapan kulit kasar setiap 30 menit, imbalan yang rapi atas kulit yang toh sudah kamu kumpulkan, dan Kitab Jasa menandai Kerja Sang Penyamak pada keahlian 50 dengan Pengolahan Kulit Mahaguru di batasnya."
+          "routeBody": "Setiap potongan berstatistik nyata melempar peluang karya besar selama mutu yang lebih halus muat di dalam langit-langit tingkatmu, termasuk Kulit Druid Eastbrook yang berstatistik, dan Kulit Murni bertanda tangan di dalam Rompi Penjaga Rawa memberikan bonus reagen bertanda tangan secara otomatis; osmium dihitung sebagai material tingkat 1 untuk proc itu. Field common kulit yang tanpa statistik tidak bisa proc.\n\nNaikkan levelnya dengan cara alami: panen setiap serigala dan babi hutan yang kamu bunuh sejak level satu, biarkan dua field common membawamu ke 25 di mana pun kamu berdiri, lalu latih anak tangga kulit di bak-bak itu saat misi toh menyeretmu ke rawa. Marshstalker membawamu ke 50, dan potongan-potongan mirewarden serta Balutan Kulit Senja membawa tingkat langka itu dari 50 ke 75. Setelah 75, resep-resep tingkat 2 itu menyusut menjadi setengah lalu seperempat perolehan, sekitar 150 pembuatan untuk lima puluh poin terakhir menuju batas 125; di bawah langit-langit kerajinan utama, resep-resep itu tetap menyamai langit-langit karya kualitas langka alih-alih langsung nol.\n\nPenyamakan bergerak lebih berarti bagi kerajinan ini daripada bagi kerajinan mana pun: berspesialisasilah pada 75 dan sekantong pelana penuh kulit menjadi perlengkapan jadi di api unggun alih-alih perjalanan pulang ke Fenbridge. Pesanan kerja penyamakan Hesk membeli delapan kulit kasar setiap 30 menit, imbalan yang rapi atas kulit yang toh sudah kamu kumpulkan, dan Kitab Jasa menandai Kerja Sang Penyamak pada keahlian 50 dengan Pengolahan Kulit Mahaguru di batasnya."
         },
         "cooking": {
           "identityHeading": "Periuk yang memberi makan kelompok",
@@ -6279,7 +6279,7 @@ export const id_ID: EnTranslations = {
         "q5": "Bagaimana cara melepas ikatan karya pesanan, dan berapa biayanya?",
         "a5": "Pergi ke stasiun kerajinan mana pun dengan item di tasmu dan bayar masternya. Biaya mengikuti kualitas item: 25 perak untuk item tidak umum, 1 emas untuk langka, 4 emas untuk epik; legendaris membayar tarif epik, dan karya pesanan biasa membayar tarif tidak umum. Harus berupa stasiun sungguhan: stasiun bergerak tidak pernah menawarkan layanan ini.\n\nBiaya tersebut membeli lembar bersih, bukan penyembuhan: item tetap merupakan karya pesanan, sehingga ia terikat kembali pada siapapun yang menerimanya dalam perdagangan berikutnya. Jika beberapa salinan terikat berbagi tumpukan, satu salinan diambil dan dilepas ikatannya per pembayaran.",
         "q6": "Di mana saya belajar resep, dan berapa biayanya?",
-        "a6": "Sembilan resep lapangan biasa dan enam resep alat darat buatan diketahui semua orang sejak awal, begitu pula tiga capstone yang terikat stasiun (Kilnscale Mantle, Tudung Tenun Pelindung, dan Balutan Kulit Senja), yang tidak membutuhkan pelatih, hanya stasiunnya. Selebihnya diajarkan oleh para master yang menetap di stasiun mereka di tiga kota hub: sebagian besar berdiri di Eastbrook, sang penyamak menjaga penyamakan di Fenbridge, dan sang alkemis menjaga apoteker di Highwatch.\n\nResep pelatih berjalan dalam anak tangga: keahlian 0, 25, dan 50 untuk kerajinan perlengkapan dan konsumabel, dengan harga gratis, 25 perak, dan 1 emas sebagai biaya sekali bayar; dua resep jimat Pemantraan duduk di anak tangga 25, dan sang pembuat alat mengajarkan dua joran pancing buatan pada 75 dan 125 seharga 4 dan 16 emas. Seorang master mengajarkan resep begitu braketmu dalam kerajinan itu mencapai braket resepnya sendiri, dan kamu harus berdiri di stasiunnya untuk belajar: stasiun bergerak tidak dihitung.",
+        "a6": "Sembilan resep lapangan biasa dan enam resep alat darat buatan diketahui semua orang sejak awal, begitu pula tiga resep yang terikat stasiun (Kilnscale Mantle, Tudung Tenun Pelindung, dan Balutan Kulit Senja), yang tidak membutuhkan pelatih, hanya stasiunnya. Selebihnya diajarkan oleh para master yang menetap di stasiun mereka di tiga kota hub: sebagian besar berdiri di Eastbrook, sang penyamak menjaga penyamakan di Fenbridge, dan sang alkemis menjaga apoteker di Highwatch.\n\nResep pelatih berjalan dalam anak tangga: keahlian 0, 25, dan 50 untuk kerajinan perlengkapan dan konsumabel, dengan harga gratis, 25 perak, dan 1 emas sebagai biaya sekali bayar; dua resep jimat Pemantraan duduk di anak tangga 25, dan sang pembuat alat mengajarkan dua joran pancing buatan pada 75 dan 125 seharga 4 dan 16 emas. Seorang master mengajarkan resep begitu braketmu dalam kerajinan itu mencapai braket resepnya sendiri, dan kamu harus berdiri di stasiunnya untuk belajar: stasiun bergerak tidak dihitung.",
         "q7": "Mengapa pengumpulan saya tiba-tiba melambat?",
         "a7": "Rapal panen dimulai pada 2,5 detik dan dipangkas dengan dua cara: 0,4 detik untuk setiap tingkat alat yang kamu bawa dan bisa kamu gunakan di atas tingkat simpul itu sendiri, dan 0,15 detik begitu penghitung perdaganganmu melewati band 100-nya, dengan lantai 1,5 detik. Berpindah dari simpul tingkat 1 ke simpul tingkat 3 dan kelebihanmu lenyap, sehingga beliung yang sama mengayun lebih lambat lagi. Memegang tepat tingkat yang disyaratkan tidak membeli kecepatan; itu hanya membuka simpulnya.\n\nPerolehan keahlian memudar dengan cara yang sama seperti pembuatan: sebuah simpul berubah abu-abu saat kecakapanmu naik melewati tingkatnya (simpul tingkat 1 tidak mengajarkan apa pun mulai dari kecakapan 75), jadi jawaban untuk perolehan yang lambat adalah simpul bertingkat lebih tinggi. Simpul itu membutuhkan alat setidaknya setingkat dengannya di tasmu (tidak ada simpul yang pernah dikerjakan dengan tangan kosong, tingkat 1 sekalipun), dan alat darat di atas tingkat 1 juga menuntut tanda penggunaannya lebih dulu, 40/70/85/100 dalam perdagangannya sendiri untuk tingkat 2 sampai 5. Memancing mengikuti penirusannya sendiri: perolehan penuh di bawah kecakapan 50, setengah di bawah 100, tetesan 0,1 di bawah 150 dan 0,02 di bawah 200, tangkapan rongsokan tidak mengajarkan apa pun sama sekali mulai dari 100, dan airnya sendiri membatasi pelajaran (perairan tingkat 1 berhenti mengajar pada 100, rawa pada 150), sehingga penghitung yang mandek juga bisa berarti kamu sudah melampaui airnya.",
         "q8": "Bisakah saya membuat di luar kota?",
@@ -7530,7 +7530,7 @@ export const id_ID: EnTranslations = {
       "portalOpens": "Sebuah rift peringkat {tier} terkoyak terbuka di {zone}!",
       "portalSealed": "Rift peringkat {tier} di {zone} telah tersegel.",
       "portalCollapses": "Rift peringkat {tier} di {zone} runtuh.",
-      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+      "lootRecoveryNotice": "Pintu masuk rift itu akan tetap terbuka sebentar lagi: jika party-mu tumbang, kamu masih bisa berjalan kembali untuk mengambil apa yang sudah kamu peroleh.",
       "levelGate": "Hanya petualang level {level} ke atas yang boleh memasuki rift ini.",
       "deadEntry": "Kamu tidak dapat memasuki rift saat tewas.",
       "deadEntryCombat": "Party-mu masih dalam pertempuran. Yang tewas dapat masuk kembali begitu pertarungan berhenti.",
@@ -9822,7 +9822,7 @@ export const id_ID: EnTranslations = {
       },
       "ignition": {
         "name": "Penyalaan",
-        "description": "Pasif: serangan kritis mantramu membakar target sebesar 40% kerusakan yang ditimbulkan selama 6 dtk. dan dapat bertumpuk. (penguasaan Api)"
+        "description": "Pasif: serangan kritis mantramu membakar target sebesar 30% kerusakan yang ditimbulkan selama 6 dtk. dan dapat bertumpuk. (penguasaan Api)"
       },
       "mass_barrier": {
         "name": "Penghalang Massal",
@@ -9992,7 +9992,7 @@ export const id_ID: EnTranslations = {
       },
       "sap": {
         "name": "Bius",
-        "description": "Melumpuhkan target selama 8 detik. Harus dalam siluman dan di luar pertempuran. Kerusakan apa pun mematahkan efeknya."
+        "description": "Melumpuhkan target selama 8 detik tanpa mematahkan Duskveil atau memulai pertarungan. Harus dalam siluman dan di luar pertempuran. Kerusakan apa pun mematahkan efeknya."
       },
       "crippling_poison": {
         "name": "Bisa Timah",
@@ -10264,7 +10264,7 @@ export const id_ID: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Wujud Kuda Pacu",
-        "description": "Mengambil wujud kuda pacu, meningkatkan kecepatan gerakmu sebesar 30% selama 30 menit."
+        "description": "Mengambil wujud kuda pacu, meningkatkan kecepatan gerakmu sebesar 30% selama 30 menit. Selagi aktif, menerima kerusakan akan membuatmu limbung, mengurangi kecepatan gerakmu hingga separuh selama 4 dtk (setiap pukulan menyegarkan efek limbungnya)."
       },
       "aimed_shot": {
         "name": "Tarikan Panjang",
@@ -10428,7 +10428,7 @@ export const id_ID: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Mengutuk musuh selama 8 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 16 kerusakan Bayangan."
+        "description": "Mengutuk musuh selama 8 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 17 kerusakan Bayangan."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10634,7 +10634,7 @@ export const id_ID: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Irama Roh Perang",
-        "description": "Pasif: setiap serangan senjata ke-3 yang mengenai memicu 2 Gema Hati Badai sebesar 50% kerusakan Alam dan memberi Pertanda Badai selama 12 dtk. Pertanda Badai membuat Sambaran Busur, Sentakan, atau Air Pemulih berikutnya seketika dan memangkas biaya mananya 50%. Serangan Leluhur dihitung sebagai 2 serangan. (Roh Perang)"
+        "description": "Pasif: serangan dengan kedua senjata tidak memiliki peluang meleset tambahan. Setiap serangan senjata ke-3 yang mengenai memicu 2 Gema Hati Badai sebesar 25% kerusakan Alam dan memberi Pertanda Badai selama 12 dtk. Pertanda Badai membuat Sambaran Busur, Sentakan, atau Air Pemulih berikutnya seketika dan memangkas biaya mananya 50%. Serangan Leluhur dihitung sebagai 2 serangan. (Roh Perang)"
       },
       "stormsurge": {
         "name": "Gelombang Badai",
@@ -10846,7 +10846,7 @@ export const id_ID: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Panggil Raksasa Pyre",
-        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Wrack setiap detik."
+        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 64-79 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Wrack setiap detik."
       },
       "summon_doomguard": {
         "name": "Panggil Wraithborn",
@@ -11194,7 +11194,7 @@ export const id_ID: EnTranslations = {
       },
       "shadowstep": {
         "name": "Selip Bayang",
-        "description": "Melangkah menembus bayangan menuju targetmu. (talenta Rogue)"
+        "description": "Melangkah menembus bayangan menuju targetmu, kawan maupun lawan, tanpa mematahkan Duskveil. (talenta Rogue)"
       },
       "silence": {
         "name": "Senyap",
@@ -12851,25 +12851,25 @@ export const id_ID: EnTranslations = {
         "name": "Cakar Murni"
       },
       "ps_castaway_crate": {
-        "name": "Castaway Crate"
+        "name": "Peti Terdampar"
       },
       "ps_ferry_bell": {
-        "name": "Ferry Bell"
+        "name": "Lonceng Feri"
       },
       "dawnhold_posy": {
         "name": "Buket Taman Dawnhold"
       },
       "ps_briny_lure": {
-        "name": "Briny Lure"
+        "name": "Umpan Asin"
       },
       "ps_lustrous_pearl": {
-        "name": "Lustrous Pearl"
+        "name": "Mutiara Berkilau"
       },
       "mother_of_pearl": {
-        "name": "Mother of Pearl"
+        "name": "Induk Mutiara"
       },
       "ps_passing_stone": {
-        "name": "Passing Stone"
+        "name": "Batu Pelepasan"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
@@ -14209,13 +14209,13 @@ export const id_ID: EnTranslations = {
         "name": "Nelayan Bram"
       },
       "training_effigy": {
-        "name": "Training Effigy"
+        "name": "Patung Latihan"
       },
       "shore_scuttler": {
-        "name": "Shore Scuttler"
+        "name": "Perayap Pesisir"
       },
       "mister_crabs": {
-        "name": "Mister Crabs"
+        "name": "Tuan Kepiting"
       },
       "rift_hellguard": {
         "name": "Penjaga Neraka"
@@ -14375,7 +14375,7 @@ export const id_ID: EnTranslations = {
       "apothecary_lin": {
         "name": "Apoteker Lin",
         "title": "Ahli Herbal",
-        "greeting": "Hati-hati melangkah di hutan timur, kawan."
+        "greeting": "Hati-hati melangkah di hutan timur laut, kawan."
       },
       "brother_aldric": {
         "name": "Bruder Aldric",
@@ -14803,49 +14803,49 @@ export const id_ID: EnTranslations = {
         "greeting": "Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah."
       },
       "wayfarer_bryn": {
-        "name": "Wayfarer Bryn",
-        "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+        "name": "Pengelana Bryn",
+        "title": "Pemandu Pelabuhan",
+        "greeting": "Eastbrook menerima siapa saja yang datang, kawan. Dan bagi yang belum mantap, selalu ada Pesisir Pembuktian: lonceng feri di samping kotak surat Pos Gagak akan menyeberangkanmu kapan saja sepanjang tahun, dan kembarannya di pulau itu akan membawamu pulang."
       },
       "instructor_maren": {
-        "name": "Instructor Maren",
-        "title": "Proving Master",
-        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+        "name": "Instruktur Maren",
+        "title": "Master Pembuktian",
+        "greeting": "Setiap pahlawan yang pernah lembah ini syukuri pernah berdiri di tempatmu berdiri sekarang, {className}, dan tak satu pun dari mereka tahu ujung mana dari sebilah pedang yang harus dipegang. Untuk itulah pesisir ini ada. Bertanyalah, berlatihlah, dan gagallah di tempat kegagalan tak memakan biaya apa pun."
       },
       "quartermaster_finch": {
-        "name": "Quartermaster Finch",
-        "title": "Camp Outfitter",
-        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+        "name": "Kepala Perbekalan Finch",
+        "title": "Pemasok Perkemahan",
+        "greeting": "Konterku hanya menyimpan satu barang untuk dijual, {playerName}: sebuah kantong cadangan untuk apa pun yang kamu pungut di sepanjang jalan, saat pelajaranmu membutuhkannya. Semua yang lain di sini adalah barang rongsokan yang terikat menuju lembah. Koin membeli kantong itu, dan kerja menghasilkan koin. Itulah seluruh perekonomiannya, dan itu tidak pernah menjadi lebih rumit. Hanya menjadi lebih besar."
       },
       "ferryman_odo": {
-        "name": "Ferryman Odo",
-        "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+        "name": "Juru Feri Odo",
+        "title": "Penjaga Penyeberangan",
+        "greeting": "Baru saja tiba dari penyeberangan, {playerName}? Penjaga Tam menjaga Jalur Rintangan di pesisir tepat selatan dermagaku: tempuh dulu lintasannya dan kakimu akan berterima kasih. Setiap penjaga di pesisir ini akan mengarahkanmu ke penjaga berikutnya begitu tugasmu selesai, dan pelacak misi di bagian atas layarmu selalu tahu arahnya. Saat lembah memanggilmu kembali, bunyikan lonceng yang berdiri di samping dermagaku dan penyeberangan itu akan menurunkanmu di kota Eastbrook."
       },
       "bursar_wick": {
-        "name": "Bursar Wick",
-        "title": "The Gilded Strongbox",
-        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+        "name": "Bendahara Wick",
+        "title": "Brankas Bersepuh Emas",
+        "greeting": "Brankas Bersepuh Emas menjaga meja bahkan di sini, {playerName}. Apa pun yang kamu titipkan padaku menunggu di lemari besi yang sama di balik setiap bendahara di setiap kota, aman dari serigala, air, dan keputusanmu sendiri yang kurang bijaksana."
       },
       "warden_tam": {
-        "name": "Warden Tam",
-        "title": "Keeper of the Gauntlet",
-        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+        "name": "Penjaga Tam",
+        "title": "Penjaga Jalur Rintangan",
+        "greeting": "Lintasan-lintasan ini adalah Jalur Rintangan, {playerName}, dan setiap petualang yang dihormati lembah ini pernah menempuhnya. Tiang-tiang lentera tetap menyala sepanjang malam, jadi lintasannya tidak pernah tutup."
       },
       "overseer_pell": {
-        "name": "Overseer Pell",
-        "title": "Gauntlet Overseer",
-        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+        "name": "Pengawas Pell",
+        "title": "Pengawas Jalur Rintangan",
+        "greeting": "Aku mencatat waktu setiap larian yang melewati lintasan ini, {playerName}, dan aku pernah melihat gerak kaki yang jauh lebih buruk. Jalan setapak di belakangku menanjak ke pekarangan latihan: di sanalah gerak kaki berubah menjadi gerak pedang."
       },
       "drillmaster_rook": {
-        "name": "Drillmaster Rook",
-        "title": "Yard Master",
-        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+        "name": "Komandan Latihan Rook",
+        "title": "Master Pekarangan",
+        "greeting": "Jerami dulu, cangkang kemudian, {playerName}. Sebuah patung mengajarkan lenganmu cara mengayun; para perayap di pesisir sana mengajarkannya mendarat pada sesuatu yang peduli."
       },
       "tidewarden_nel": {
-        "name": "Tidewarden Nel",
-        "title": "Keeper of the Strand",
-        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
+        "name": "Penjaga Pasang Nel",
+        "title": "Penjaga Pesisir",
+        "greeting": "Pasang mengambil dan pasang membayar, {playerName}. Aku menyimpan catatan keduanya: apa yang dicubit para perayap dari bangkai-bangkai kapal, dan apa yang dibawa naik oleh tangan-tangan jujur di jalan setapak ini."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -14856,7 +14856,7 @@ export const id_ID: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Pekerjaan untuk Setiap Tangan",
-        "text": "Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, tenggara kota. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.",
+        "text": "Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, timur laut kota, melewati Lintasan Serigala. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.",
         "completion": "Sudah, kan? Bijih terkumpul dan tanganmu sudah kapalan. Terus galilah, tebang, dan petik herba saat kamu menjelajah jalan-jalan, dan ketika kamu kembali ke kota, perhatikan papan Fokus Kota di dekat pasar dan bangku kerajinan di sana. Ada perdagangan adil yang menanti di semuanya, jika kamu mau.",
         "objectives": {
           "0": {
@@ -14886,7 +14886,7 @@ export const id_ID: EnTranslations = {
       },
       "q_boars": {
         "title": "Kulit Babi Hutan Berbulu Kasar",
-        "text": "Kulit babi hutan membuat ransel perjalanan terbaik, dan padang rumput di barat kota dipenuhi binatang itu. Bawakan padaku 5 Kulit Babi Hutan Berbulu Kasar dan akan kubuat waktumu sepadan.",
+        "text": "Kulit babi hutan membuat ransel perjalanan terbaik, dan padang rumput di barat laut kota dipenuhi binatang itu. Bawakan padaku 5 Kulit Babi Hutan Berbulu Kasar dan akan kubuat waktumu sepadan.",
         "completion": "Ah, kulit berbulu kasar yang bagus! Ini akan laku dengan harga tinggi.",
         "objectives": {
           "0": {
@@ -14896,7 +14896,7 @@ export const id_ID: EnTranslations = {
       },
       "q_spiders": {
         "title": "Ancaman Sableweb",
-        "text": "Para penyergap di hutan timur memintal sutra yang kubutuhkan untuk tapalku - dan mereka juga sudah terlalu banyak jumlahnya. Habisi 6 Penyergap Sableweb dan potong 4 kelenjar sutra dari perut mereka.",
+        "text": "Para penyergap di hutan timur laut memintal sutra yang kubutuhkan untuk tapalku - dan mereka juga sudah terlalu banyak jumlahnya. Habisi 6 Penyergap Sableweb dan potong 4 kelenjar sutra dari perut mereka.",
         "completion": "Ugh, masih bergerak-gerak. Sempurna. Ini, kau pantas mendapatkan ini.",
         "objectives": {
           "0": {
@@ -14939,7 +14939,7 @@ export const id_ID: EnTranslations = {
       },
       "q_supplies": {
         "title": "Perbekalan Curian",
-        "text": "Para bandit itu menyergap gerobak terakhirku dan melarikan empat peti barang - peralatan, garam, linen Eastbrook yang bagus. Peti-peti itu ditumpuk di sekitar kemah mereka di perbukitan barat daya. Curi kembali untukku, maukah?",
+        "text": "Para bandit itu menyergap gerobak terakhirku dan melarikan empat peti barang - peralatan, garam, linen Eastbrook yang bagus. Peti-peti itu ditumpuk di sekitar kemah mereka di perbukitan barat laut. Curi kembali untukku, maukah?",
         "completion": "Peti-petiku! Nyaris tanpa goresan. Kau sungguh menakjubkan.",
         "objectives": {
           "0": {
@@ -15032,7 +15032,7 @@ export const id_ID: EnTranslations = {
       },
       "q_bandits": {
         "title": "Bandit Lembah",
-        "text": "Segerombolan penyamun telah berkemah di perbukitan barat daya. Mereka merampok tiga gerobak pekan ini. Usir mereka, bunuh 10 Bandit Lembah.",
+        "text": "Segerombolan penyamun telah berkemah di perbukitan barat laut. Mereka merampok tiga gerobak pekan ini. Usir mereka, bunuh 10 Bandit Lembah.",
         "completion": "Berkurang sepuluh belati dalam kegelapan. Ambil ini, kau pantas mendapatkannya.",
         "objectives": {
           "0": {
@@ -15712,7 +15712,7 @@ export const id_ID: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Benang Disambung Kembali",
-        "text": "Kembali ke alat tenunku setelah semua. Aku tidak dendam, {playerName}, tetapi benang itu mengingat tangan yang melepaskannya, dan biaya mengambilnya kembali diukur lebih panjang setiap kalinya. Basmi laba-laba webwood yang berkerumun di hutan timur, dan pekerjaan itu akan menenangkan tanganmu sebelum menyentuh sutra yang baik lagi.",
+        "text": "Kembali ke alat tenunku setelah semua. Aku tidak dendam, {playerName}, tetapi benang itu mengingat tangan yang melepaskannya, dan biaya mengambilnya kembali diukur lebih panjang setiap kalinya. Basmi Penyergap Sableweb yang berkerumun di hutan timur laut, dan pekerjaan itu akan menenangkan tanganmu sebelum menyentuh sutra yang baik lagi.",
         "completion": "Stabil kembali. Pengolahan Kulit dan Menjahit kembali ke tanganmu sebagai bidang utama. Ukur dua kali kali ini sebelum mengembara.",
         "objectives": {
           "0": {
@@ -15722,7 +15722,7 @@ export const id_ID: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Kembali ke Dapur",
-        "text": "Nah, lihat siapa yang kembali ke periukku. Tidak ada dendam, {playerName}, dapur selalu punya tempat, tetapi kamu tahu tagihan makin panjang setiap kali kamu pergi. Pergi kurangi kawanan babi hutan liar di padang barat, karena keringat jujur adalah bahan pertama, dan itu akan mengingatkan tanganmu akan pekerjaan ini.",
+        "text": "Nah, lihat siapa yang kembali ke periukku. Tidak ada dendam, {playerName}, dapur selalu punya tempat, tetapi kamu tahu tagihan makin panjang setiap kali kamu pergi. Pergi kurangi kawanan babi hutan liar di padang barat laut, karena keringat jujur adalah bahan pertama, dan itu akan mengingatkan tanganmu akan pekerjaan ini.",
         "completion": "Itulah cita rasa lama. Alkimia dan Memasak kembali ke dapur sebagai bidang utamamu. Tinggallah lebih lama kali ini.",
         "objectives": {
           "0": {
@@ -16814,105 +16814,105 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_ps_the_gauntlet": {
-        "title": "Run the Gauntlet",
-        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
-        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "title": "Tempuh Jalur Rintangan",
+        "text": "Setiap sepasang kaki yang dihormati lembah ini pernah menempuh lintasan ini lebih dulu, {playerName}. Berjalanlah di lintasan pertama ke barat menuju benderanya, putar tubuhmu, berjalanlah di lintasan selatan menuju bendera kedua, lalu bergeser ke lintasan terakhir menuju bendera merah. Lewati bendera-bendera itu sesuai urutan, dan pelacak misi di bagian atas layarmu akan menunjukkan setiap tombol saat kamu berjalan. Pengawas Pell mencatat waktu setiap larian dari ujung sana: begitu bendera merah ada di belakangmu, ia berdiri tepat di sana untuk mencatatnya.",
+        "completion": "Aku mencatat waktu larian itu, {playerName}, dan aku sudah pernah menggagalkan langkah yang lebih cepat daripada milikmu. Jalur Rintangan ini milikmu. Jalan setapak di belakangku menanjak ke pekarangan latihan, tempat Komandan Latihan Rook mengubah gerak kaki menjadi gerak pedang: ia punya tugas berikutnya untukmu.",
         "objectives": {
           "0": {
-            "label": "Gauntlet flag passed"
+            "label": "Bendera Jalur Rintangan dilewati"
           }
         }
       },
       "q_ps_strike_true": {
-        "title": "Strike True",
-        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
-        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "title": "Pukulan Tepat",
+        "text": "Gerak kaki dulu, sekarang lengan, {playerName}. Pekarangan latihan terletak di jalan setapak menanjak di belakangku, dan patung-patung jeraminya dibangun untuk dipukul. Jika kamu kehilangan arah, tekan M untuk membuka peta: setiap tugas yang kamu bawa ditandai di sana. Berjalanlah mendekati sebuah patung dan klik kiri: itu menjadikannya targetmu, dan namanya akan muncul di bagian atas layarmu. Baru setelah itu tekan 1, atau klik ikon pertama di bilah aksi di bagian bawah, untuk mengayun. Teruslah menyerang sampai salah satunya jatuh; ia tidak akan membalas mengayun, patung latihan tidak pernah begitu. Komandan Latihan Rook mengawasi pekarangan dari sisi baratnya, tempat jalan setapak pesisir bermula: tekan F padanya untuk menyerahkan bukti tumbangannya.",
+        "completion": "Satu tumbangan yang bersih, dan genggamanmu sudah lebih mantap. Ingat rasanya, {playerName}: bidik, serang, dan teruslah menyerang. Jerami tidak pernah keberatan. Hal berikutnya yang kamu ayunkan akan keberatan.",
         "objectives": {
           "0": {
-            "label": "Training Effigy felled"
+            "label": "Patung Latihan ditumbangkan"
           }
         }
       },
       "q_ps_hone_the_edge": {
-        "title": "Hone the Edge",
-        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
-        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "title": "Asah Mata Pedang",
+        "text": "Ayunan hanyalah ayunan, {playerName}, dan jerami akan menerimanya sepanjang hari. Itu bukan yang akan memenangkanmu apa pun. Lihat deretan tombol di sepanjang bagian bawah layarmu: deretan itu adalah kecakapanmu, dan masing-masing melakukan sesuatu yang tak bisa dilakukan lenganmu sendirian. Kamu sudah punya satu. Kembalilah ke patung-patung latihan dan pakai itu: pilih targetmu, lalu tekan tombol yang ditandai pekarangan ini untukmu, tiga kali berturut-turut. Jangan sekadar membacok jerami; buat hal yang kamu tahu caranya benar-benar terjadi. Lalu kembalilah padaku.",
+        "completion": "Sekarang kamu bertarung, bukan sekadar mengayun sembarangan. Deretan itu bertambah panjang setiap level yang kamu ambil, {playerName}, dan mereka yang bertahan paling lama adalah mereka yang membacanya. Jerami tidak peduli tombol mana yang kamu pakai. Lembah, iya.",
         "objectives": {
           "0": {
-            "label": "Ability landed on an effigy"
+            "label": "Kemampuan mengenai patung latihan"
           }
         }
       },
       "q_ps_shell_and_claw": {
-        "title": "Shell and Claw",
-        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
-        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "title": "Cangkang dan Cakar",
+        "text": "Jerami tidak pernah keberatan, {playerName}, jadi inilah sesuatu yang keberatan. Para perayap pesisir memunguti deretan bangkai kapal di pesisir jauh sana: ikuti jalan setapak ke barat dari pekaranganku dan itu akan membawamu langsung pada mereka. Mereka membalas mencubit, jadi awasi bilah nyawamu dan teruslah mengayun: klik kiri salah satunya untuk menjadikannya targetmu, lalu pakai kemampuan yang diajarkan pekarangan ini padamu (sang pelatih menamai tombolmu), dan jangan berhenti sampai cangkangnya retak. Tiga sudah cukup. Lalu daki jalan setapak menuju tanjakan utara: Penjaga Pasang Nel menyimpan catatan pesisir, dan ia menghitung cangkangmu.",
+        "completion": "Tiga cangkang retak dan semua jarimu masih utuh: pertarungan pertama yang layak, {playerName}. Para perayap mencubiti bangkai-bangkai kapal lebih cepat daripada pasang membawa masuk barang rongsokan, jadi setiap satu yang kamu basmi adalah koin yang tetap dimiliki seseorang.",
         "objectives": {
           "0": {
-            "label": "Shore Scuttler culled"
+            "label": "Perayap Pesisir dibasmi"
           }
         }
       },
       "q_ps_mother_of_pearl": {
-        "title": "Mother of Pearl",
-        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
-        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "title": "Induk Mutiara",
+        "text": "Tiga cangkang sudah retak, {playerName}, tapi deretan bangkai kapal ini menyimpan seorang raja, dan ia duduk di atas harta yang nilainya melebihi semua peti di pesisir ini. Bawa Umpan Asin ini ke kolam pasang surut di ujung barat jauh pesisir, melewati bangkai-bangkai kapal. Berdirilah di tepi air, tekan B untuk membuka tasmu, dan klik kiri umpan itu untuk membangunkannya. Tuan Kepiting mencubit jauh lebih keras daripada sepupu-sepupu kecilnya, jadi awasi bilah nyawamu, teruslah menyerang, dan mundurlah ke pasir jika kamu perlu mengatur napas. Saat ia tumbang, jalanlah langsung ke cangkangnya dan tekan F untuk menjarah Mutiara Berkilau darinya. Bawa mutiara itu kembali padaku.",
+        "completion": "Mutiara Berkilau, dicungkil dari sang raja perairan dangkal itu sendiri. Ayahku mengangkat topinya untuk kepiting itu setiap pagi sepanjang hidup kerjanya; ada penghormatan yang mesti dibayar. Diam sebentar... nah. Dirangkai, dipasang, dan menjadi milikmu, {playerName}: Induk Mutiara. Tekan B untuk membuka tasmu dan klik kiri cincin itu untuk memakainya, lalu tekan C untuk membuka lembar karaktermu dan melihatnya terpasang di tanganmu. Hal kecil, tapi seluruh dirimu jadi lebih baik dengan memakainya.",
         "objectives": {
           "0": {
-            "label": "Mister Crabs slain"
+            "label": "Tuan Kepiting dikalahkan"
           },
           "1": {
-            "label": "Lustrous Pearl claimed"
+            "label": "Mutiara Berkilau didapatkan"
           }
         }
       },
       "q_ps_the_wreck_line": {
-        "title": "The Wreck Line",
-        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "title": "Deretan Bangkai Kapal",
+        "text": "Para pengangkutku menyeret barang rongsokan dari bangkai-bangkai kapal tua dan membawanya naik menuju Perkemahan Dawnrest, {playerName}, dan separuh peti itu tak pernah menyelesaikan pendakiannya: peti-peti itu diletakkan di sepanjang jalan dan terlupakan. Ikuti jalanku menuju perkemahan dan kamu akan melewati peti-peti yang tersesat itu. Membuka satu itu mudah: berjalanlah mendekati sebuah peti sampai namanya muncul, lalu tekan F, atau klik kiri peti itu sendiri, dan ia akan menyerahkan isinya. Enam buah akan membersihkan deretan itu, dan ingat F adalah tombol yang sama untuk setiap peti harta, titik sumber daya, dan pintu yang akan pernah kamu temui. Kepala Perbekalan Finch menjaga kios perkemahan dan membeli setiap kepingan barang rongsokan: serahkan hasil temuanmu padanya.",
+        "completion": "Tali, tar, dan separuh roda keju yang entah bagaimana diselamatkan laut: aku akan menerima semuanya, {playerName}. Sebuah punggung yang membawa pulang apa yang ditemukannya bernilai lebih bagi perkemahan ini daripada bilah pedang mana pun, dan punggungmu baru saja membersihkan seluruh deretan itu dalam sekali jalan.",
         "objectives": {
           "0": {
-            "label": "Castaway Crate opened"
+            "label": "Peti Terdampar dibuka"
           }
         }
       },
       "q_ps_pouch_and_purse": {
-        "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
-        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "title": "Kantong dan Pundi",
+        "text": "Satu pelajaran lagi sebelum lembah, {playerName}, dan inilah yang menjaga para petualang tetap hidup: apa yang kamu bawa. Ranselmu menampung enam belas slot, dan di sampingnya menunggu empat gelang tas kosong; setiap tas yang kamu pasang menambahkan ruangnya sendiri ke kumpulan itu. Jadi: tekan F padaku lagi untuk membuka kiosku, klik kiri Kantong Linen di daganganku untuk membelinya, lalu tekan B untuk membuka tasmu dan klik kiri kantong itu di sana untuk memasangnya ke gelang kosong. Instruktur Maren berlatih di dekat api unggun kumpul beberapa langkah ke timur: tunjukkan padanya kantong di ikat pinggangmu.",
+        "completion": "Kantong yang bagus. Pasang jika belum kamu lakukan: tekan B untuk membuka tasmu, lalu klik kiri kantong itu untuk memasangnya di gelang tas kosong, dan enam slot lagi menjadi milikmu untuk diisi dengan masalah. Sekarang separuh pelajaran yang tak bisa ditampung tas mana pun, {playerName}: apa yang tak bisa kamu bawa, Brankas Bersepuh Emas yang menyimpannya. Bendahara Wick menjaga mejanya di jalan barat sana, dan ia membuka lemari besi yang sama yang dibagikan setiap bendahara di setiap kota; ruang lemari besi tambahan bisa dibeli begitu pundi-pundimu tumbuh untuk membutuhkannya. Jaga barang berhargamu tersimpan di bank dan tasmu tetap lapang. Tas penuh telah mengakhiri lebih banyak petualangan daripada serigala mana pun.",
         "objectives": {
           "0": {
-            "label": "Linen Pouch bought"
+            "label": "Kantong Linen dibeli"
           }
         }
       },
       "q_ps_the_signpost": {
-        "title": "Word on the Wind",
-        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
-        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "title": "Kabar di Angin",
+        "text": "Satu kebiasaan lagi yang perlu dipelajari, {playerName}, dan tak butuh bilah pedang: baca papan-papan itu. Papan penunjuk serikat berdiri di gerbang perkemahan beberapa langkah barat daya dari api unggunku, dan para serikat serta kelompok pengembara memasang panggilan mereka di sana. Berjalanlah ke depannya dan tekan F, atau klik kiri, untuk membaca apa yang terpasang, lalu kembalilah dan ceritakan padaku apa yang dibawa angin. Papan serupa berdiri di setiap kota yang akan pernah kamu masuki.",
+        "completion": "Jadi sekarang kamu tahu bagaimana kabar bergerak di lembah ini, {playerName}: bukan lewat kurir, lewat papan pengumuman. Periksalah papan itu di setiap kota yang kamu lewati; separuh petualangan dimulai sebagai tiga baris tinta di atasnya.",
         "objectives": {
           "0": {
-            "label": "Guild signpost read"
+            "label": "Papan penunjuk serikat dibaca"
           }
         }
       },
       "q_ps_the_long_walk": {
-        "title": "The Long Walk",
-        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
-        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "title": "Perjalanan Panjang",
+        "text": "Satu pelajaran tersisa, {playerName}, dan ini yang tak bisa kuceritakan padamu: kamu harus pernah mengalaminya sendiri. Kamu akan mati di luar sana. Semua orang begitu, dan itu bukan akhir dari apa pun. Ambil Batu Pelepasan ini. Tekan B untuk membuka tasmu dan klik kiri, dan itu akan merebahkanmu tepat di tempatmu berdiri. Lalu ikuti petunjuk di layarmu: lepaskan rohmu, berjalanlah kembali ke tubuhmu sendiri, dan masuklah ke dalamnya. Tubuhmu menunggu, perjalanannya gratis, dan kamu tak kehilangan apa pun dengan melakukannya.",
+        "completion": "Dan kamu kembali, tak ada yang lebih buruk karenanya. Ingat bagaimana rasanya itu, {playerName}, karena lain kali itu terjadi akan ada taring yang terlibat dan tak seorang pun berdiri di sampingmu untuk menjelaskan. Tubuhmu menunggu, perjalanannya gratis, dan satu-satunya hal yang benar-benar direnggut kematian darimu adalah waktu yang dibutuhkan untuk kembali.",
         "objectives": {
           "0": {
-            "label": "Walked back from the dead"
+            "label": "Berjalan kembali dari kematian"
           }
         }
       },
       "q_ps_set_sail": {
-        "title": "Set Sail",
-        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
-        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "title": "Berlayar",
+        "text": "Tak ada lagi yang tersisa di pesisir ini yang belum kamu tempuh, kalahkan, buka, atau beli, {playerName}. Kamu sudah siap, dan Eastbrook punya pekerjaan sungguhan yang menunggu. Berjalanlah kembali menyusuri jalan pesisir menuju dermaga, tekan F pada Juru Feri Odo, dan katakan padanya bahwa aku bilang kamu sudah pantas menyeberang. Tekan L kapan pun kamu kehilangan jejak siapa berutang apa padamu: itulah catatan misimu.",
+        "completion": "Maren bilang begitu? Pujian tinggi dari seorang wanita yang pernah membuatku berlatih simpul tambatan kapal selama seminggu penuh. Bunyikan lonceng yang berdiri di samping dermagaku kapan pun kamu siap, {playerName}, dan penyeberangan itu akan menurunkanmu di tengah kota Eastbrook. Waspadai serigala-serigala.",
         "objectives": {
           "0": {
-            "label": "Report to Ferryman Odo"
+            "label": "Lapor kepada Juru Feri Odo"
           }
         }
       },
@@ -17115,7 +17115,7 @@ export const id_ID: EnTranslations = {
             "label": "Jalan Lintas Farshore"
           },
           "12": {
-            "label": "Eastbrook Docks"
+            "label": "Dermaga Eastbrook"
           }
         }
       },
@@ -17480,23 +17480,23 @@ export const id_ID: EnTranslations = {
         }
       },
       "proving_shore": {
-        "name": "The Proving Shore",
-        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "name": "Pesisir Pembuktian",
+        "welcome": "Pesisir Pembuktian tidak meminta apa pun darimu selain waktu. Pelajari perkemahan ini, serang patung-patung latihan, telusuri deretan bangkai kapal, dan ketika kamu sudah siap, Juru Feri Odo akan menyeberangkanmu ke lembah.",
         "pois": {
           "0": {
-            "label": "Dawnrest Camp"
+            "label": "Perkemahan Dawnrest"
           },
           "1": {
-            "label": "The Old Pier"
+            "label": "Dermaga Tua"
           },
           "2": {
-            "label": "The Practice Yard"
+            "label": "Pekarangan Latihan"
           },
           "3": {
-            "label": "The Wreck Line"
+            "label": "Deretan Bangkai Kapal"
           },
           "4": {
-            "label": "The Gauntlet"
+            "label": "Jalur Rintangan"
           }
         }
       }
@@ -17742,19 +17742,19 @@ export const id_ID: EnTranslations = {
         "body": "Salah satu bidang utamamu mencapai keahlian penuh, puncak TERTINGGI, kaboom, seluruh tangga, selesai. Aku tidak membagi-bagikan pujian, aku membagi-bagikan sekering, tetapi ini, terimalah keduanya: kamu luar biasa dan sedikit menakutkan. Pergi buat gunung-gunung itu gugup."
       },
       "woc_market_delivery": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange purchase",
-        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "sender": "Perantara Bursa",
+        "subject": "Pembelian Bursa Anda",
+        "body": "Penjualan telah diselesaikan dan barangnya kini milik Anda. Paket yang terlampir membawa barang persis yang Anda bayar, ditahan dalam escrow sejak saat didaftarkan hingga pembayaran Anda dikonfirmasi.\n\nCatatan penjualan ini tersimpan dalam buku besar Bursa.\n\n- Perantara Bursa"
       },
       "woc_market_return": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing has ended",
-        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+        "sender": "Perantara Bursa",
+        "subject": "Daftar Bursa Anda telah berakhir",
+        "body": "Daftar Anda berakhir tanpa penjualan yang selesai: lelang tidak menemukan pembeli, harga cadangan tidak tercapai, daftarnya ditarik, atau pemenang tawaran gagal melunasi. Barang Anda kembali kepada Anda tanpa kerusakan bersama surat ini, persis seperti saat ditahan dalam escrow.\n\n- Perantara Bursa"
       },
       "woc_market_sold": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+        "sender": "Perantara Bursa",
+        "subject": "Daftar Bursa Anda terjual",
+        "body": "Daftar Anda terjual dan pembeli telah melunasi seluruhnya. Buku besar Bursa menyimpan catatan penjualan ini, dan aktivitas Bursa Anda menampilkan jumlah yang dilunasi beserta rinciannya.\n\n- Perantara Bursa"
       }
     },
     "itemSets": {

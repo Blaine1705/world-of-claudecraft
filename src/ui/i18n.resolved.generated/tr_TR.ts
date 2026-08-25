@@ -441,7 +441,7 @@ export const tr_TR: EnTranslations = {
       "remainingDaysHours": "{days} gün {hours} saat",
       "score": "Skor",
       "walletValue": "Cüzdan Değeri (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Bilinmiyor",
       "spinTitle": "Günlük Çevirme",
@@ -483,85 +483,85 @@ export const tr_TR: EnTranslations = {
       }
     },
     "trade": {
-      "windowClosed": "Trade window closed.",
+      "windowClosed": "Takas penceresi kapandı.",
       "woc": {
-        "tabGold": "Gold",
+        "tabGold": "Altın",
         "tabWoc": "$WOC",
-        "modesLabel": "Payment currency",
-        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
-        "priceLabel": "Price in USD",
+        "modesLabel": "Ödeme birimi",
+        "tabWocHint": "$WOC ile ödeme, masanın senin tarafın boşken ve altın teklif edilmemişken kullanılabilir.",
+        "priceLabel": "USD cinsinden fiyat",
         "pricePlaceholder": "0.00",
-        "equivalent": "About {tokens} $WOC at the current rate",
-        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
-        "feeLine": "Exchange fee {fee}, taken out of the price.",
-        "netLine": "You receive {net}",
-        "netLineBuyer": "The seller receives {net}",
-        "sendOffer": "Offer $WOC",
-        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
-        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
-        "incomingAccept": "{name} offers {price} for your items.",
-        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
-        "blockDisabled": "The $WOC Exchange is not available on this realm.",
-        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
-        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
-        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
-        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
-        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
-        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
-        "hintEnterPrice": "Enter a price in USD.",
-        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
-        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
-        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
-        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
-        "incomingTitle": "$WOC offer from {name}",
-        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "equivalent": "Güncel kurla yaklaşık {tokens} $WOC",
+        "variableWarning": "$WOC miktarı bir önizlemedir, sabit bir fiyat değildir. Kesin miktar, ödeme yaptığında alınan yeni bir fiyat teklifiyle belirlenir.",
+        "feeLine": "Borsa ücreti {fee}, fiyattan düşülür.",
+        "netLine": "{net} alırsın",
+        "netLineBuyer": "Satıcı {net} alır",
+        "sendOffer": "$WOC Teklif Et",
+        "offerSent": "Teklif gönderildi. {name} kabul etmezse 10 dakika içinde süresi dolar.",
+        "offerSentUntil": "Teklif gönderildi. {name} kabul etmezse {time} itibarıyla süresi dolar.",
+        "incomingAccept": "{name}, eşyaların için {price} teklif ediyor.",
+        "notInstant": "Bir $WOC satışı anında gerçekleşmez. İki taraf da kabul ettiğinde eşya emanete alınır ve ödeme doğrulandığında alıcıya ulaşır.",
+        "blockDisabled": "$WOC Borsası bu sunucuda kullanılamıyor.",
+        "blockNoWallet": "Eşyalarını $WOC karşılığında satmak için bir cüzdan bağlayıp doğrula.",
+        "blockPartnerUnknown": "O oyuncunun $WOC kabul edip edemeyeceği kontrol ediliyor...",
+        "blockRecipientNoWallet": "O oyuncunun $WOC ödemelerini kabul edebilmesi için bir cüzdan bağlaması gerekir.",
+        "hintClearYourItems": "Kendi eşyalarını kaldır: bir $WOC teklifi, karşı tarafın sattığı şeyi satın alır.",
+        "hintAwaitTheirItems": "Karşı tarafın $WOC karşılığında satılabilecek bir şey teklif etmesi bekleniyor.",
+        "hintOneItem": "$WOC anlaşması tam olarak bir eşyayı kapsar. Masada yalnızca satılan eşya bulunabilir.",
+        "hintEnterPrice": "USD cinsinden bir fiyat gir.",
+        "hintAcceptNeedsItem": "Kabul etmeden önce sattığın eşyayı ekle.",
+        "hintAcceptLocked": "O eşya kilitli. Çantalarında kilidini aç, ardından takastan çıkarıp tekrar ekle.",
+        "hintGoldOffered": "Önce altın teklifini kaldır: bir takas ya altınla ya da $WOC ile yapılır, ikisi birden olmaz.",
+        "ineligibleReason": "Ruha bağlı, görev ve kilitli eşyalar ile Borsa kategorileri dışındaki eşyalar $WOC karşılığında satılamaz.",
+        "incomingTitle": "{name} oyuncusundan $WOC teklifi",
+        "incomingBody": "{name}, sana {item} eşyasını {price} karşılığında satmayı teklif ediyor.",
         "moneyUsd": "{usd}",
         "moneyLine": "{usd} (~ {tokens} $WOC)",
-        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
-        "payNow": "Pay {usd}",
-        "awaitingPayment": "Waiting for payment confirmation...",
-        "paying": "Confirm the payment in your wallet...",
-        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
-        "settledSeller": "Paid. The item was delivered to the buyer.",
-        "accept": "Accept offer",
-        "accepted": "Offer accepted. Your item is held until payment is verified.",
-        "decline": "Decline",
-        "withdraw": "Withdraw offer",
-        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
-        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
-        "statusPayingBuyer": "Confirming your payment on the network...",
-        "statusPayingSeller": "The buyer's payment is confirming on the network...",
-        "statusReviewBuyer": "Your payment is under review.",
-        "statusReviewSeller": "The buyer's payment is under review.",
-        "paidSeller": "You have received a payment of {price} for your {item}.",
-        "paidBuyer": "You have sent a payment of {price} for {item}.",
-        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
-        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
-        "cancelSale": "Cancel sale",
-        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
-        "youDeclined": "You declined the offer.",
-        "youWithdrew": "You withdrew your offer.",
-        "offerNotPending": "This offer is no longer pending.",
-        "offerDeclined": "The $WOC offer was declined.",
-        "offerWithdrawn": "The $WOC offer was withdrawn.",
-        "offerExpired": "The $WOC offer expired.",
-        "offerExpiresAt": "Offer expires at {time}.",
-        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
-        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
-        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
-        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
-        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
-        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
-        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
-        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
-        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
-        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
-        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
-        "hintBelowMin": "The Exchange minimum price is {usd}."
+        "waitingOther": "Teklif kabul edildi. Diğer oyuncunun kabul etmesi bekleniyor.",
+        "payNow": "{usd} Öde",
+        "awaitingPayment": "Ödeme onayı bekleniyor...",
+        "paying": "Ödemeyi cüzdanında onayla...",
+        "settled": "Ödendi. Eşyan çantalarında, doluysa Kuzgun Postası ile ulaşır.",
+        "settledSeller": "Ödendi. Eşya alıcıya teslim edildi.",
+        "accept": "Teklifi kabul et",
+        "accepted": "Teklif kabul edildi. Ödeme doğrulanana kadar eşyan emanette tutulur.",
+        "decline": "Reddet",
+        "withdraw": "Teklifi geri çek",
+        "hintInsufficientBalance": "Bu, bağlı cüzdanının bulundurduğundan daha fazla $WOC.",
+        "statusAwaitingBuyer": "Alıcının ödeme yapması bekleniyor.",
+        "statusPayingBuyer": "Ödemen ağ üzerinde onaylanıyor...",
+        "statusPayingSeller": "Alıcının ödemesi ağ üzerinde onaylanıyor...",
+        "statusReviewBuyer": "Ödemen inceleniyor.",
+        "statusReviewSeller": "Alıcının ödemesi inceleniyor.",
+        "paidSeller": "{item} eşyan için {price} tutarında bir ödeme aldın.",
+        "paidBuyer": "{item} için {price} tutarında bir ödeme gönderdin.",
+        "closedCancelled": "Bu satış iptal edildi. Eşya, Kuzgun Postası ile satıcıya geri döner.",
+        "closedSuspended": "Bu satış bir Oyun Yöneticisi tarafından askıya alındı. Eşya, Kuzgun Postası ile satıcıya geri döner.",
+        "closedUnpaid": "Bu satış ödeme yapılmadan sona erdi. Eşya, Kuzgun Postası ile satıcıya geri döner.",
+        "closedUnpaidBuyer": "Bu satış ödemen yapılmadan sona erdi. Eşya, Kuzgun Postası ile satıcıya geri döner; kabul edilen bir anlaşmayı ödememek Borsa ceza puanı kazandırır.",
+        "cancelSale": "Satışı iptal et",
+        "cancelPendingSeller": "İptal istendi. Alıcı önce ödeme yapmazsa satış kendiliğinden sona erer.",
+        "youDeclined": "Teklifi reddettin.",
+        "youWithdrew": "Teklifini geri çektin.",
+        "offerNotPending": "Bu teklif artık beklemede değil.",
+        "offerDeclined": "$WOC teklifi reddedildi.",
+        "offerWithdrawn": "$WOC teklifi geri çekildi.",
+        "offerExpired": "$WOC teklifinin süresi doldu.",
+        "offerExpiresAt": "Teklifin süresi {time} itibarıyla dolar.",
+        "offerStandsUntil": "$WOC teklifin {time} tarihine kadar geçerliliğini korur. Kabul ederlerse anlaşmayı tamamlamak için satıcıyla tekrar takas yap.",
+        "dealAwaitsPayment": "$WOC satın alman hâlâ ödenmedi. Ödemek için satıcıyla tekrar takas yap; ödemezsen anlaşma kendiliğinden sona erer ve ödememek Borsa ceza puanı kazandırır.",
+        "closeSellerHold": "Eşyan, alıcının ödemesi için emanette tutulmaya devam eder. Fikrini değiştirirsen satışı Borsa'nın Etkinlik sekmesinden iptal edebilirsin.",
+        "closePaymentContinuesBuyer": "Ödemen hâlâ onaylanıyor. Teslimat kendiliğinden tamamlanır.",
+        "closePaymentContinuesSeller": "Alıcının ödemesi hâlâ onaylanıyor. Satış kendiliğinden tamamlanır.",
+        "p2pBindingNote": "İki taraf da kabul ettiğinde ödeme {duration} içinde yapılmalıdır, ya da Öde'ye bastığında açılan daha kısa süre içinde. Ödememek Borsa ceza puanı kazandırır.",
+        "p2pBindingNoteUntimed": "İki taraf da kabul ettiğinde ödeme kısa süre içinde yapılmalıdır, ya da Öde'ye bastığında açılan daha kısa süre içinde. Ödememek Borsa ceza puanı kazandırır.",
+        "p2pPaymentDueAt": "Ödeme {time} tarihine kadar yapılmalıdır. Ödememek Borsa ceza puanı kazandırır.",
+        "quoteExpiredTrade": "Fiyat teklifinin süresi doldu. Yeni bir teklif almak için Şimdi Değil'e, ardından tekrar Öde'ye bas.",
+        "quoteStaged": "{usd} için ödeme fiyat teklifi hazır: {tokens} $WOC, {time} tarihine kadar geçerli.",
+        "paymentConfirmed": "Ödeme onaylandı. Teslimat tamamlandığında eşyan çantalarına, doluysa Kuzgun Postası ile ulaşır.",
+        "statusConfirmedBuyer": "Ödeme onaylandı. Teslimat tamamlanıyor...",
+        "statusConfirmedSeller": "Ödeme onaylandı. Satış tamamlanıyor...",
+        "hintBelowMin": "Borsa'da asgari fiyat {usd}."
       }
     },
     "wocStore": {
@@ -938,7 +938,7 @@ export const tr_TR: EnTranslations = {
       "jump": "Zıpla",
       "leaderboard": "Sıralama",
       "dailyRewards": "Mağaza",
-      "wocMarket": "Exchange",
+      "wocMarket": "Borsa",
       "deeds": "Yiğitlikler",
       "mounts": "Binekler",
       "professions": "Meslekler",
@@ -952,62 +952,62 @@ export const tr_TR: EnTranslations = {
       "actionRing": "Savaş eylemleri",
       "actionPageToggle": "İşlem sayfasını değiştir",
       "actionPageIndicator": "Sayfa {page}",
-      "actionRadial": "Action directions",
-      "actionRadialCancel": "Cancel action",
-      "radialCenter": "Centre",
-      "radialUp": "Up",
-      "radialRight": "Right",
-      "radialDown": "Down",
-      "radialLeft": "Left",
-      "consumableSeat": "Consumables",
-      "menuControl": "Menus",
-      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
-      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
-      "menuLabel": "Menu",
-      "quickActions": "Quick Actions",
-      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
-      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
-      "quickActionsLabel": "Actions",
-      "stanceRadial": "Stances",
-      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
-      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
-      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
-      "questStripAriaSingle": "Tracked quest: {title}",
+      "actionRadial": "Eylem yönleri",
+      "actionRadialCancel": "Eylemi iptal et",
+      "radialCenter": "Merkez",
+      "radialUp": "Yukarı",
+      "radialRight": "Sağ",
+      "radialDown": "Aşağı",
+      "radialLeft": "Sol",
+      "consumableSeat": "Sarf Malzemeleri",
+      "menuControl": "Menüler",
+      "menuControlAria": "Menüler. Sohbeti açmak için dokun, ya da binekler, harita, çantalar ve dahası için basılı tutup sağa kaydır.",
+      "menuControlAriaTap": "Menüler. Menü satırını açmak için dokun: binekler, harita, çantalar ve dahası. Sohbet için tekrar dokun.",
+      "menuLabel": "Menü",
+      "quickActions": "Hızlı Eylemler",
+      "quickActionsAria": "Hızlı Eylemler. Binek, sohbet, harita, çantalar ve dahasının satırını açmak için dokun, ya da birini seçmek için basılı tutup sağa kaydır.",
+      "quickActionsAriaTap": "Hızlı Eylemler. Binek, sohbet, harita, çantalar ve dahasının satırını açmak için dokun, sonra bir ögeye dokun. Kapatmak için denetime tekrar dokun.",
+      "quickActionsLabel": "Eylemler",
+      "stanceRadial": "Duruşlar",
+      "stanceAnchorAria": "Duruş: {stance}. Duruş çemberini açmak için dokun, ardından başka bir duruş seç.",
+      "stanceAnchorEmptyAria": "Duruş yok. Duruş çemberini açmak için dokun, ardından bir duruş seç.",
+      "questStripAria": "Takip edilen görev {total} üzerinden {position}: {title}. Sonraki görev için etkinleştir.",
+      "questStripAriaSingle": "Takip edilen görev: {title}",
       "questStripCounter": "{position}/{total}",
-      "questStripMore": "+{count} more",
+      "questStripMore": "+{count} daha",
       "targetCycle": "Hedefi değiştir",
       "targetCycleShort": "Hedef",
       "spellbookPageLabel": "Sayfa {page}",
       "hideKeyboard": "Klavyeyi gizle",
       "chatPlaceholder": "Bir şey söyle...",
-      "barEditor": "Edit Bars",
-      "barEditorAria": "Edit the action bar layout"
+      "barEditor": "Çubukları Düzenle",
+      "barEditorAria": "Eylem çubuğu düzenini düzenle"
     },
     "barEditor": {
-      "title": "Edit Action Bar",
-      "close": "Close bar editor",
-      "pages": "Action bar pages",
-      "pageTab": "Page {page}",
-      "buttonHeader": "Button {button}",
-      "cellAria": "Button {button}, {direction}: {action}",
-      "emptyCellAria": "Button {button}, {direction}: empty",
-      "hint": "Tap a slot, then another, to swap them.",
-      "armed": "Tap a slot to place {name}.",
-      "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options.",
-      "clear": "Clear",
-      "clearAria": "Clear a slot",
-      "clearArmed": "Tap a slot to clear it."
+      "title": "Eylem Çubuğunu Düzenle",
+      "close": "Çubuk düzenleyiciyi kapat",
+      "pages": "Eylem çubuğu sayfaları",
+      "pageTab": "Sayfa {page}",
+      "buttonHeader": "Düğme {button}",
+      "cellAria": "Düğme {button}, {direction}: {action}",
+      "emptyCellAria": "Düğme {button}, {direction}: boş",
+      "hint": "Değiştirmek için bir yuvaya, sonra bir diğerine dokun.",
+      "armed": "{name}'i yerleştirmek için bir yuvaya dokun.",
+      "picked": "{name} ile değiştirmek için başka bir yuvaya dokun.",
+      "locked": "Eylem çubukları, Arayüz seçeneklerinde kilitli.",
+      "clear": "Temizle",
+      "clearAria": "Bir yuvayı temizle",
+      "clearArmed": "Temizlemek için bir yuvaya dokun."
     },
     "tutorialGreeting": {
-      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
-      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
-      "play": "Take the tutorial",
-      "skip": "Skip the tutorial",
-      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
-      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
-      "noteClose": "Understood"
+      "bodyFirst": "Seni buralarda daha önce görmedim, dostum. Bu topraklarda macerasına yeni başlayanların, boğazın açığındaki sakin bir ada olan Sınav Kıyısı'nı ziyaret etmesi bir gelenektir. Orada, dünyanın zorluklarını göğüslemeden önce becerilerini geliştirip ona alışabilirsin. Feribot iki yöne de çalışır ve ne yaparsan yap kimse seni küçük görmez.",
+      "bodyRefresher": "Yeni bir yüzle yine mi geldin? O zaman bunun nasıl işlediğini biliyorsundur. Yine de yola çıkmadan önce belleğini tazelemek istersen, Sınav Kıyısı geri dönen bir öğrenciyi hiç geri çevirmez ve feribot sen hazır olduğunda hazırdır.",
+      "play": "Eğitime başla",
+      "skip": "Eğitimi atla",
+      "declineNote": "Nasıl istersen, dostum. Fikrini değiştirirsen, Kuzgun Postası kutusunun yanındaki feribot çanı seni gece gündüz istediğin an Sınav Kıyısı'na geçirir. Kurtlar olmadığında da o hâlâ burada olacak.",
+      "bellHomeNote": "Kıyıdan bu kadar çabuk mu döndün? Çaldığın o feribot çanıydı. Onun eşi tam şurada, Kuzgun Postası kutusunun yanında asılı: istediğin an çal, geçiş seni yeniden Sınav Kıyısı'na taşır. Hangi yöne gidersen git, bir sakıncası yok.",
+      "islandArrivalNote": "Sınav Kıyısı'na hoş geldin. Muhafız Tam kıyı boyunca az ileride seni bekliyor: git ve onunla görüş.",
+      "noteClose": "Anladım"
     },
     "tutorial": {
       "moveBodyTouch": "Hareket etmek için hareket çubuğunu kullan ve etrafa bakmak için ekranı sürükle. Başlamak için birkaç adım at.",
@@ -1022,115 +1022,115 @@ export const tr_TR: EnTranslations = {
       "nextTipSocial": "Daha zorlu dövüşler için bir grup bulmak üzere Sosyal ({key}) dosyasını açın."
     },
     "bootcamp": {
-      "title": "First Steps",
-      "talkTitle": "Speak to Warden Tam",
-      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
-      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
-      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
-      "forwardTitle": "Walk the first lane",
-      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
-      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
-      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
-      "turnwalkTitle": "Turn, then walk",
-      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
-      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
-      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
-      "strafeTitle": "Turn, then walk",
-      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
-      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
-      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
-      "cameraTitle": "Swing the camera",
-      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "courseProgress": "Flag {current} of {total}",
-      "doneTitle": "Run complete",
-      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
-      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
-      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
-      "coachNextTitle": "Next: {npc}",
-      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
-      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
-      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
-      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
-      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
-      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
-      "coachReadyTitle": "Task complete",
-      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
-      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
-      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
-      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
-      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
-      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
-      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
-      "promptTalk": "Talk",
-      "promptTurnIn": "Turn in quest",
-      "promptPickUp": "Pick up",
-      "promptLootPearl": "Loot the pearl",
-      "promptRead": "Read",
-      "promptRing": "Ring",
-      "promptHold": "Hold",
-      "promptSelect": "Select",
-      "promptAttack": "Attack",
-      "promptUseAbility": "Use ability",
-      "promptKneel": "Kneel",
-      "promptOpenBags": "Open your bags",
-      "promptCharacterSheet": "Open your character sheet",
-      "promptLookAround": "Hold right-click and drag to look around",
-      "promptJump": "Jump",
-      "promptSummon": "Summon",
-      "ringEquipTitle": "Wear your prize",
-      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
-      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
-      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
-      "ringAdmireTitle": "Look at you",
-      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "keycapThen": "then",
-      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
-      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
-      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
-      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
-      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
-      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
-      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "title": "İlk Adımlar",
+      "talkTitle": "Muhafız Tam'la konuş",
+      "talkBody": "Muhafız Tam, hemen ilerideki Parkur kapısını tutuyor. İsmi görünene kadar ona yaklaş, sonra konuşmak için {interactKey} tuşuna bas ya da sol tıkla: sana koşuyu verecek.",
+      "talkBodyTouch": "Muhafız Tam, hemen ilerideki Parkur kapısını tutuyor. İsmi görünene kadar ona yaklaş, sonra konuşmak için ona dokun ya da Kullan düğmesine dokun: sana koşuyu verecek.",
+      "talkBodyPad": "Muhafız Tam, hemen ilerideki Parkur kapısını tutuyor. İsmi görünene kadar ona yaklaş, sonra konuşmak için etkileşim düğmene bas: sana koşuyu verecek.",
+      "forwardTitle": "İlk şeridi yürü",
+      "forwardBody": "Tam'ın yanındaki şeride gir ve bayrağına kadar batıya yürümek için {forwardKey} tuşunu basılı tut.",
+      "forwardBodyTouch": "Tam'ın yanındaki şeride gir ve bayrağına kadar batıya yürümek için hareket çubuğunu yukarı it.",
+      "forwardBodyPad": "Tam'ın yanındaki şeride gir ve bayrağına kadar batıya yürümek için sol çubuğu yukarı it.",
+      "turnwalkTitle": "Dön, sonra yürü",
+      "turnwalkBody": "Bir bayrak indi. Güneye giden duvarlı şeride bakana kadar olduğun yerde dönmek için {turnKey} tuşunu basılı tut, sonra ikinci bayrağa kadar yürümek için {forwardKey} tuşunu tekrar basılı tut.",
+      "turnwalkBodyTouch": "Bir bayrak indi. Güneye giden duvarlı şeride bakana kadar dönmek için parmağını dünyanın üzerinde sürükle (hareket çubuğunu değil), sonra ikinci bayrağa kadar yürümek için çubuğu yukarı it.",
+      "turnwalkBodyPad": "Bir bayrak indi. Güneye giden duvarlı şeride bakana kadar dönmek için sağ çubuğu it, sonra ikinci bayrağa kadar yürümek için sol çubuğu yukarı it.",
+      "strafeTitle": "Dön, sonra yürü",
+      "strafeBody": "Bir köşe kaldı. Son şeride bakana kadar olduğun yerde dönmek için {turnLeftKey} tuşunu basılı tut, sonra kırmızı bayrak arkanda kalana kadar {forwardKey} tuşunu tekrar basılı tutup yürü.",
+      "strafeBodyTouch": "Bir köşe kaldı. Son şeride bakana kadar dönmek için parmağını dünyanın üzerinde sürükle (hareket çubuğunu değil), sonra kırmızı bayrak arkanda kalana kadar çubuğu yukarı itip yürü.",
+      "strafeBodyPad": "Bir köşe kaldı. Son şeride bakana kadar dönmek için sağ çubuğu it, sonra kırmızı bayrak arkanda kalana kadar sol çubuğu yukarı itip yürü.",
+      "cameraTitle": "Kamerayı döndür",
+      "cameraBody": "Koşuyu teslim etmeden önce son bir ders: sağ fare düğmesini basılı tut ve sürükleyerek kamerayı etrafında tamamen döndür. Arkanda ne durduğunu bilmek dövüşleri kazandırır.",
+      "cameraBodyTouch": "Koşuyu teslim etmeden önce son bir ders: kamerayı etrafında tamamen döndürmek için parmağını dünyanın üzerinde sürükle. Arkanda ne durduğunu bilmek dövüşleri kazandırır.",
+      "cameraBodyPad": "Koşuyu teslim etmeden önce son bir ders: kamerayı etrafında tamamen döndürmek için sağ çubuğu it. Arkanda ne durduğunu bilmek dövüşleri kazandırır.",
+      "courseProgress": "Bayrak {current}/{total}",
+      "doneTitle": "Koşu tamamlandı",
+      "doneBody": "Bacaklarının bilmesi gereken her şey bu kadar. Gözetmen Pell kırmızı bayrağın yanında duruyor: koşunu teslim edip ilk ödülünü almak için ona {interactKey} tuşuna bas ya da sol tıkla.",
+      "doneBodyTouch": "Bacaklarının bilmesi gereken her şey bu kadar. Gözetmen Pell kırmızı bayrağın yanında duruyor: koşunu teslim edip ilk ödülünü almak için ona dokun.",
+      "doneBodyPad": "Bacaklarının bilmesi gereken her şey bu kadar. Gözetmen Pell kırmızı bayrağın yanında duruyor: koşunu teslim edip ilk ödülünü almak için ona etkileşim düğmene bas.",
+      "coachNextTitle": "Sıradaki: {npc}",
+      "coachNextBody": "Altın izi takip ederek {npc}'ye git. İsmi görünene kadar yaklaş, sonra bir sonraki görevini almak için {interactKey} tuşuna bas ya da onlara sol tıkla.",
+      "coachNextBodyTouch": "Altın izi takip ederek {npc}'ye git. İsmi görünene kadar yaklaş, sonra bir sonraki görevini almak için onlara dokun ya da Kullan düğmesine dokun.",
+      "coachNextBodyPad": "Altın izi takip ederek {npc}'ye git. İsmi görünene kadar yaklaş, sonra bir sonraki görevini almak için etkileşim düğmene bas.",
+      "coachTaskBody": "Altın izi takip ederek görevine git. Sağdaki takipçi sayacı tutar, yolunu kaybedersen {mapKey} haritayı açar.",
+      "coachTaskBodyTouch": "Altın izi takip ederek görevine git. Sağdaki takipçi sayacı tutar, yolunu kaybedersen harita düğmesi sana yolu gösterir.",
+      "coachTaskBodyPad": "Altın izi takip ederek görevine git. Sağdaki takipçi sayacı tutar, yolunu kaybedersen harita düğmen sana yolu gösterir.",
+      "coachReadyTitle": "Görev tamamlandı",
+      "coachReadyBody": "{npc}'ye git ve teslim edip ödülünü almak için {interactKey} tuşuna bas ya da onlara sol tıkla.",
+      "coachReadyBodyTouch": "{npc}'ye git ve teslim edip ödülünü almak için onlara dokun.",
+      "coachReadyBodyPad": "{npc}'ye git ve teslim edip ödülünü almak için etkileşim düğmene bas.",
+      "taskStrikeTrueBody": "Bir saman kuklaya yaklaş ve hedeflemek için sol tıkla: ismi ekranının üstünde belirir. Sonra vurmaya başlamak için {attackKey} tuşuna bas. O ilk düğme senin düz saldırındır, bir büyü değil. Biri pes edene kadar vurmaya devam et.",
+      "taskStrikeTrueBodyTouch": "Bir saman kuklaya yaklaş ve hedeflemek için ona dokun. Sonra vurmak için eylem çubuğundaki ilk düğmeye dokun. Biri pes edene kadar vurmaya devam et.",
+      "taskStrikeTrueBodyPad": "Bir saman kuklaya yaklaş ve hedeflemek için hedef düğmene bas. Sonra vurmak için ilk eylem düğmene bas. Biri pes edene kadar vurmaya devam et.",
+      "taskHoneBody": "Bir kuklayı hedeflemek için sol tıkla, sonra {ability} kullanmak için {abilityKey} tuşuna bas. Bu senin kendi yeteneğin, düz bir vuruş değil. Üç kez isabet ettir.",
+      "taskHoneBodyTouch": "Bir kuklayı hedeflemek için ona dokun, sonra eylem çubuğunda {ability}'e dokun. Bu senin kendi yeteneğin, düz bir vuruş değil. Üç kez isabet ettir.",
+      "taskHoneBodyPad": "Bir kuklayı hedefle, sonra {ability} yeteneğini taşıyan eylem düğmesine bas. Bu senin kendi yeteneğin, düz bir vuruş değil. Üç kez isabet ettir.",
+      "taskLongWalkBody": "Çantalarını açmak için {bagsKey} tuşuna bas, sonra Geçiş Taşı'na sol tıkla. Seni durduğun yerde yere yatırır. Burada hiçbir şey sana zarar veremez ve bunun hiçbir bedeli yok.",
+      "taskLongWalkBodyTouch": "Çantalarını aç ve Geçiş Taşı'na dokun. Seni durduğun yerde yere yatırır. Burada hiçbir şey sana zarar veremez ve bunun hiçbir bedeli yok.",
+      "taskLongWalkBodyPad": "Çantalarını aç ve Geçiş Taşı'nı seç. Seni durduğun yerde yere yatırır. Burada hiçbir şey sana zarar veremez ve bunun hiçbir bedeli yok.",
+      "taskLongWalkDeadBody": "Öldün, ama hiçbir şey kaybetmedin: ne eşya, ne para, ne de tecrübe. 2 adımdan 1.si: ekranının ortasındaki Ruhu Serbest Bırak düğmesine tıkla. Kampın arkasındaki mezarlıkta hayalet olarak dirileceksin.",
+      "taskLongWalkDeadBodyTouch": "Öldün, ama hiçbir şey kaybetmedin: ne eşya, ne para, ne de tecrübe. 2 adımdan 1.si: ekranının ortasındaki Ruhu Serbest Bırak düğmesine dokun. Kampın arkasındaki mezarlıkta hayalet olarak dirileceksin.",
+      "taskLongWalkDeadBodyPad": "Öldün, ama hiçbir şey kaybetmedin: ne eşya, ne para, ne de tecrübe. 2 adımdan 1.si: ekranının ortasında Ruhu Serbest Bırak'ı seç. Kampın arkasındaki mezarlıkta hayalet olarak dirileceksin.",
+      "taskLongWalkGhostBody": "2 adımdan 2.si: sen artık bir ruhsun ve hiçbir şey sana dokunamaz. Bedenin, küçük haritandaki işarettir. Ona doğru yürü. Yaklaştığında bir Cesedinin Başında Diril düğmesi belirir: ona tıkla ve hiçbir ceza almadan yeniden hayata dön. O yürüyüş HER ZAMAN ücretsizdir ve her öldüğünde geri dönme yolun budur.",
+      "taskLongWalkGhostBodyTouch": "2 adımdan 2.si: sen artık bir ruhsun ve hiçbir şey sana dokunamaz. Bedenin, küçük haritandaki işarettir. Ona doğru yürü. Yaklaştığında bir Cesedinin Başında Diril düğmesi belirir: ona dokun ve hiçbir ceza almadan yeniden hayata dön. O yürüyüş HER ZAMAN ücretsizdir ve her öldüğünde geri dönme yolun budur.",
+      "taskLongWalkGhostBodyPad": "2 adımdan 2.si: sen artık bir ruhsun ve hiçbir şey sana dokunamaz. Bedenin, küçük haritandaki işarettir. Ona doğru yürü. Yaklaştığında bir Cesedinin Başında Diril düğmesi belirir: onu seç ve hiçbir ceza almadan yeniden hayata dön. O yürüyüş HER ZAMAN ücretsizdir ve her öldüğünde geri dönme yolun budur.",
+      "taskShellBody": "Yengeçler geri kıskaçlıyor. Birini hedeflemek için sol tıkla, sonra {ability} için {abilityKey} tuşuna bas ve saldırmaya devam et. Aynı anda çok fazlası sana saldırırsa yolun yukarısına geri çekil: kovalamaktan çabucak vazgeçerler ve dinlenirken sağlığın geri gelir.",
+      "taskShellBodyTouch": "Birini hedeflemek için ona dokun, sonra eylem çubuğunda {ability}'e dokun. Aynı anda çok fazlası sana saldırırsa yolun yukarısına geri çekil: kovalamaktan çabucak vazgeçerler ve dinlenirken sağlığın geri gelir.",
+      "taskShellBodyPad": "Birini hedefle, sonra {ability} yeteneğini taşıyan eylem düğmesine bas. Aynı anda çok fazlası sana saldırırsa yolun yukarısına geri çekil: kovalamaktan çabucak vazgeçerler ve dinlenirken sağlığın geri gelir.",
+      "taskStrikeTrueBodyCaster": "Bir saman kuklaya yaklaş ve hedeflemek için sol tıkla: ismi ekranının üstünde belirir. Sonra büyünü okumak için {attackKey} tuşuna bas ya da eylem çubuğundaki ikinci düğmeye tıkla. Biri pes edene kadar büyü okumaya devam et.",
+      "taskStrikeTrueBodyCasterTouch": "Bir saman kuklaya yaklaş ve hedeflemek için ona dokun. Sonra büyünü okumak için eylem çubuğundaki ikinci düğmeye dokun. Biri pes edene kadar büyü okumaya devam et.",
+      "taskStrikeTrueBodyCasterPad": "Bir saman kuklaya yaklaş ve hedeflemek için hedef düğmene bas. Sonra büyünü okumak için ikinci eylem düğmene bas. Biri pes edene kadar büyü okumaya devam et.",
+      "taskShellBodyCaster": "Yengeçler geri kıskaçlıyor. Birini hedeflemek için sol tıkla, sonra {ability} için {abilityKey} tuşuna bas ve menzilden büyü yapmaya devam et. Aynı anda çok fazlası sana saldırırsa yolun yukarısına geri çekil: kovalamaktan çabucak vazgeçerler ve dinlenirken sağlığın geri gelir.",
+      "taskShellBodyCasterTouch": "Birini hedeflemek için ona dokun, sonra eylem çubuğunda {ability}'e dokun ve menzilden büyü yapmaya devam et. Aynı anda çok fazlası sana saldırırsa yolun yukarısına geri çekil: kovalamaktan çabucak vazgeçerler ve dinlenirken sağlığın geri gelir.",
+      "taskShellBodyCasterPad": "Birini hedefle, sonra {ability} yeteneğini taşıyan eylem düğmesine bas ve menzilden büyü yapmaya devam et. Aynı anda çok fazlası sana saldırırsa yolun yukarısına geri çekil: kovalamaktan çabucak vazgeçerler ve dinlenirken sağlığın geri gelir.",
+      "taskPearlBody": "Altın izi takip ederek kıyının batı ucundaki gelgit havuzuna git. Suyun kenarında dururken çantalarını açmak için {bagsKey} tuşuna bas ve onu çağırmak için Tuzlu Yem'e sol tıkla. Onunla, yengeçlerle dövüştüğün gibi dövüş, düştüğünde ise Parlak İnci'yi almak için kabuğuna {interactKey} tuşuna bas.",
+      "taskPearlBodyTouch": "Altın izi takip ederek kıyının batı ucundaki gelgit havuzuna git. Suyun kenarında dururken çantalarını aç ve onu çağırmak için Tuzlu Yem'e dokun. Onunla, yengeçlerle dövüştüğün gibi dövüş, düştüğünde ise Parlak İnci'yi almak için kabuğuna dokun.",
+      "taskPearlBodyPad": "Altın izi takip ederek kıyının batı ucundaki gelgit havuzuna git. Suyun kenarında dururken çantalarını aç ve onu çağırmak için Tuzlu Yem'i seç. Onunla, yengeçlerle dövüştüğün gibi dövüş, düştüğünde ise Parlak İnci'yi almak için kabuğuna etkileşim düğmene bas.",
+      "taskWreckLineBody": "Kazazede sandıkları Şafak Dinlenme Kampı'na doğru yol boyunca sıralanmış. İsmi görünene kadar birine yaklaş, sonra almak için {interactKey} tuşuna bas ya da sandığa sol tıkla. Altı tanesi yükü doldurur.",
+      "taskWreckLineBodyTouch": "Kazazede sandıkları Şafak Dinlenme Kampı'na doğru yol boyunca sıralanmış. İsmi görünene kadar birine yaklaş, sonra almak için sandığa dokun ya da Kullan düğmesine dokun. Altı tanesi yükü doldurur.",
+      "taskWreckLineBodyPad": "Kazazede sandıkları Şafak Dinlenme Kampı'na doğru yol boyunca sıralanmış. İsmi görünene kadar birine yaklaş, sonra almak için etkileşim düğmene bas. Altı tanesi yükü doldurur.",
+      "taskPouchBody": "Tezgahı açmak için {npc}'ye {interactKey} tuşuna bas ya da sol tıkla, sonra satın almak için Keten Kese'ye sol tıkla.",
+      "taskPouchBodyTouch": "Tezgahı açmak için {npc}'ye dokun, sonra satın almak için Keten Kese'ye dokun.",
+      "taskPouchBodyPad": "Tezgahı açmak için {npc}'ye etkileşim düğmene bas, sonra satın almak için Keten Kese'yi seç.",
+      "readyPouchBody": "Kese satın alındı. Çantalarını açmak için {bagsKey} tuşuna bas ve boş bir çanta ilmeğine takmak için Keten Kese'ye sol tıkla. Sonra {npc}'ye git ve onu göstermek için {interactKey} tuşuna bas.",
+      "readyPouchBodyTouch": "Kese satın alındı. Çantalarını aç ve boş bir çanta ilmeğine takmak için Keten Kese'ye dokun. Sonra {npc}'ye git ve onu göstermek için onlara dokun.",
+      "readyPouchBodyPad": "Kese satın alındı. Çantalarını aç ve boş bir çanta ilmeğine takmak için Keten Kese'yi seç. Sonra {npc}'ye git ve onu göstermek için etkileşim düğmene bas.",
+      "promptTalk": "Konuş",
+      "promptTurnIn": "Görevi teslim et",
+      "promptPickUp": "Al",
+      "promptLootPearl": "İnciyi yağmala",
+      "promptRead": "Oku",
+      "promptRing": "Çal",
+      "promptHold": "Basılı Tut",
+      "promptSelect": "Seç",
+      "promptAttack": "Saldır",
+      "promptUseAbility": "Yetenek kullan",
+      "promptKneel": "Diz Çök",
+      "promptOpenBags": "Çantalarını aç",
+      "promptCharacterSheet": "Karakter sayfanı aç",
+      "promptLookAround": "Etrafına bakmak için sağ tıklayıp sürükle",
+      "promptJump": "Zıpla",
+      "promptSummon": "Çağır",
+      "ringEquipTitle": "Ödülünü tak",
+      "ringEquipBody": "Sana İnci Anası verildi ve bir ödül çantada dururken hiçbir işe yaramaz. 2 adımdan 1.si: çantalarını açmak için {bagsKey} tuşuna bas, sonra yüzüğü takmak için sol tıkla.",
+      "ringEquipBodyTouch": "Sana İnci Anası verildi ve bir ödül çantada dururken hiçbir işe yaramaz. 2 adımdan 1.si: çantalarını aç ve takmak için yüzüğe dokun.",
+      "ringEquipBodyPad": "Sana İnci Anası verildi ve bir ödül çantada dururken hiçbir işe yaramaz. 2 adımdan 1.si: çantalarını aç ve takmak için yüzüğü seç.",
+      "ringAdmireTitle": "Kendine Bir Bak",
+      "ringAdmireBody": "2. adımdan 2.si: karakter sayfanı açmak için {charKey} tuşuna bas. Bu ekran üzerinde ne giydiğini ve sana verdiği istatistikleri gösterir, yüzük artık elinde. Yeni bir teçhizat aldığında ona her zaman bakabilirsin.",
+      "ringAdmireBodyTouch": "2. adımdan 2.si: karakter sayfanı menüden aç. Bu ekran üzerinde ne giydiğini ve sana verdiği istatistikleri gösterir, yüzük artık elinde. Yeni bir teçhizat aldığında ona her zaman bakabilirsin.",
+      "ringAdmireBodyPad": "2. adımdan 2.si: karakter sayfanı menüden aç. Bu ekran üzerinde ne giydiğini ve sana verdiği istatistikleri gösterir, yüzük artık elinde. Yeni bir teçhizat aldığında ona her zaman bakabilirsin.",
+      "keycapThen": "sonra",
+      "voiceArrival": "Sakin ol dostum, karadasın. Ayaklarının dibindeki altın yolu görüyor musun? Yolu benden daha iyi bilir. Onu takip et.",
+      "voiceFirstFlag": "Bir bayrak indi. O bacakları oynatmaya devam et, yalnızca iki tane kaldı.",
+      "voiceRunDone": "İşte temiz bir koşu. Gözetmen Pell ödülünü tutuyor, git ve al.",
+      "voiceStationDoneA": "Güzel iş. Sıradakine geç, yol senin için çoktan aydınlatıldı.",
+      "voiceStationDoneB": "Bunun mantığını kavrıyorsun, hiç şüphe yok.",
+      "voiceVeerOff": "Dur bakalım dostum, o yön yanlış. Altın yol arkanda kaldı.",
+      "voiceGraduate": "Çan senin için çalındı. Eastbrook suyun karşısında bekliyor ve sen ona hazırsın.",
+      "bellTitle": "Çanı çal",
+      "bellBody": "Geçişini hak ettin. İskelenin yanındaki feribot çanına yürü ve Eastbrook'a yelken açmak için {interactKey} tuşuna bas ya da sol tıkla.",
+      "bellBodyTouch": "Geçişini hak ettin. İskelenin yanındaki feribot çanına yürü ve Eastbrook'a yelken açmak için ona dokun.",
+      "bellBodyPad": "Geçişini hak ettin. İskelenin yanındaki feribot çanına yürü ve Eastbrook'a yelken açmak için üzerinde etkileşim düğmene bas."
     },
     "widgets": {
       "clockTitle": "Yerel saat - 12/24 saat biçimi arasında geçiş için tıkla",
@@ -1184,29 +1184,29 @@ export const tr_TR: EnTranslations = {
       "devEmpty": "Henüz sıralı katkıcı yok."
     },
     "pledge": {
-      "open": "Accepting pledges",
-      "closed": "Not accepting pledges",
-      "minLevel": "Level {level}+",
-      "action": "Pledge",
-      "actionTitle": "Pledge to {guild}",
-      "pledged": "Pledged",
-      "yourGuild": "Your guild",
-      "tab": "Pledges",
-      "tabWithCount": "Pledges ({count})",
-      "empty": "No one has pledged to your guild yet.",
-      "accept": "Accept",
-      "acceptTitle": "Accept {name}'s pledge",
-      "reject": "Decline",
-      "rejectTitle": "Decline {name}'s pledge",
-      "settings": "Recruitment",
-      "acceptingLabel": "Accept pledges",
-      "minLevelLabel": "Minimum level",
-      "noteLabel": "Board note",
-      "notePlaceholder": "Tell aspiring members what your guild is looking for",
-      "save": "Save",
-      "yourPledge": "Your pledge: {guild}",
-      "since": "Pledged {date}",
-      "withdraw": "Withdraw pledge"
+      "open": "Başvuru kabul ediliyor",
+      "closed": "Başvuru kabul edilmiyor",
+      "minLevel": "Seviye {level}+",
+      "action": "Başvur",
+      "actionTitle": "{guild} loncasına başvur",
+      "pledged": "Başvuruldu",
+      "yourGuild": "Loncan",
+      "tab": "Başvurular",
+      "tabWithCount": "Başvurular ({count})",
+      "empty": "Loncana henüz kimse başvurmadı.",
+      "accept": "Kabul Et",
+      "acceptTitle": "{name} oyuncusunun başvurusunu kabul et",
+      "reject": "Reddet",
+      "rejectTitle": "{name} oyuncusunun başvurusunu reddet",
+      "settings": "Üye Alımı",
+      "acceptingLabel": "Başvuruları kabul et",
+      "minLevelLabel": "Minimum seviye",
+      "noteLabel": "Pano notu",
+      "notePlaceholder": "Adaylara loncanın ne aradığını anlat",
+      "save": "Kaydet",
+      "yourPledge": "Başvurun: {guild}",
+      "since": "{date} tarihinde başvurdu",
+      "withdraw": "Başvuruyu geri çek"
     },
     "raidLockout": {
       "title": "Akın Kilitleri",
@@ -1455,7 +1455,7 @@ export const tr_TR: EnTranslations = {
       "endedForfeitLog": "Maç hükmen sona erdi.",
       "firstWinBonusLine": "Günün ilk galibiyeti: +{honor} Onur",
       "firstWinBonusLog": "Günün ilk galibiyeti: {honor} bonus Onur kazanırsın.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Çifte Onur Hafta Sonu: Bugün Dikenvadi Ovası Onuru {mult}x öder, sonuna kadar oynanan bir mağlubiyet ise bir galibiyet gibi öder",
       "timeWarningMinutes": "{minutes} dakika kaldı",
       "timeWarningOneMinute": "Bir dakika kaldı",
       "timeWarningMinutesLog": "Savaşta {minutes} dakika kaldı.",
@@ -1550,8 +1550,8 @@ export const tr_TR: EnTranslations = {
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
       "mobileLeftHanded": "Solak düzen",
-      "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenus": "Dokunmatik menüler",
+      "touchTapMenusNote": "Eylem, sarf malzemesi ve menü denetimlerini kaydırma yerine dokunarak aç. Kullanmak için bir ögeye dokun, olağan eylemi için denetime tekrar dokun, ya da kapatmak için dışarıya dokun."
     },
     "talentRows": {
       "tab": "Seçimler",
@@ -1576,8 +1576,8 @@ export const tr_TR: EnTranslations = {
     },
     "controller": {
       "title": "Oyun Kolu",
-      "glyphStyle": "Button Labels",
-      "glyphStyleAuto": "Auto",
+      "glyphStyle": "Düğme Etiketleri",
+      "glyphStyleAuto": "Otomatik",
       "glyphStyleXbox": "Xbox",
       "glyphStylePlayStation": "PlayStation",
       "glyphStyleNintendo": "Nintendo",
@@ -2071,16 +2071,16 @@ export const tr_TR: EnTranslations = {
         "other": "rütben {rank}, {count} üye"
       },
       "wocMarketSellChoose": {
-        "one": "Choose from {count} item",
-        "few": "Choose from {count} items",
-        "many": "Choose from {count} items",
-        "other": "Choose from {count} items"
+        "one": "{count} eşya arasından seç",
+        "few": "{count} eşya arasından seç",
+        "many": "{count} eşya arasından seç",
+        "other": "{count} eşya arasından seç"
       },
       "wocTradeIneligible": {
-        "one": "{count} staged item cannot be sold for $WOC.",
-        "few": "{count} staged items cannot be sold for $WOC.",
-        "many": "{count} staged items cannot be sold for $WOC.",
-        "other": "{count} staged items cannot be sold for $WOC."
+        "one": "Masadaki {count} eşya $WOC karşılığında satılamaz.",
+        "few": "Masadaki {count} eşya $WOC karşılığında satılamaz.",
+        "many": "Masadaki {count} eşya $WOC karşılığında satılamaz.",
+        "other": "Masadaki {count} eşya $WOC karşılığında satılamaz."
       },
       "finderPartySize": {
         "one": "{count} oyuncu",
@@ -2662,14 +2662,14 @@ export const tr_TR: EnTranslations = {
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
       "removeFromBarAria": "{name} yeteneğini eylem çubuğundan kaldır",
-      "assignAria": "Choose a slot for {name}"
+      "assignAria": "{name} için bir yuva seç"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "UZAKTA",
       "cheaterTag": "< Hileci >",
-      "pledgeTag": "Pledge of {guild}"
+      "pledgeTag": "{guild} Yeminlisi"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -2994,11 +2994,11 @@ export const tr_TR: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Görünüşe göre hiçbir şey asılmamış.",
-      "subtitle": "Guilds of the realm",
-      "rosterTitle": "View the roster of {guild}",
-      "back": "Back",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "subtitle": "Diyarın loncaları",
+      "rosterTitle": "{guild} loncasının üye listesini gör",
+      "back": "Geri",
+      "popupTitle": "Lonca Tabelası",
+      "close": "Kapat"
     },
     "bank": {
       "title": "Banka",
@@ -3132,8 +3132,8 @@ export const tr_TR: EnTranslations = {
           "note": "Düellocular Kül Kolezyumu'na akın ediyor. Sıraya gir ve merdiveni tırman."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Çifte Onur Hafta Sonu",
+          "note": "Savaş kampları toplanma borusunu çalıyor: tüm hafta sonu boyunca Dikenvadi Ovası Onuru iki katına çıkıyor ve sonuna kadar oynanan bir mağlubiyet bir galibiyet gibi ödüyor."
         },
         "fishingDerby": {
           "title": "Balık Tutma Yarışması",
@@ -3444,7 +3444,7 @@ export const tr_TR: EnTranslations = {
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "({count} adet kaliteli harcar)",
-      "craftFeeLine": "Craft fee: {fee} each",
+      "craftFeeLine": "Üretim ücreti: her biri {fee}",
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
@@ -3996,7 +3996,7 @@ export const tr_TR: EnTranslations = {
       "unlockedBorderHint": "Yeni çerçeve kazanıldı: {name}. Yiğitlikler Kitabı'ndan tak.",
       "broadcastLine": "{name} bir yiğitliğe imza attı: {deed}",
       "rarityLine": "Maceracıların {percent} kadarı kazandı",
-      "stillToVisit": "Still to visit: {places}",
+      "stillToVisit": "Hâlâ ziyaret edilecekler: {places}",
       "trackerLabel": "Yiğitlikler",
       "collapseHint": "Yiğitlik takipçisini daralt",
       "expandHint": "Yiğitlik takipçisini genişlet",
@@ -4026,218 +4026,218 @@ export const tr_TR: EnTranslations = {
       "minLevelNote": "Seviye {level} gerektirir"
     },
     "walletBridge": {
-      "cancelled": "The wallet request was cancelled. Nothing was sent.",
-      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
-      "notConnected": "Connect and verify a wallet, then try again.",
-      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
-      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
-      "badResponse": "Your wallet returned an unusable answer. Try again."
+      "cancelled": "Cüzdan isteği iptal edildi. Hiçbir şey gönderilmedi.",
+      "timeout": "Cüzdanın zamanında yanıt vermedi. Cüzdanı aç ve tekrar dene.",
+      "notConnected": "Bir cüzdan bağlayıp doğrula, ardından tekrar dene.",
+      "unsupported": "Bu cüzdan o işlemi tamamlayamaz. Farklı bir cüzdan bağla.",
+      "unavailable": "Burada kullanılabilir bir cüzdan bağlantısı yok. Cüzdanını yeniden bağla ve tekrar dene.",
+      "badResponse": "Cüzdanın kullanılamaz bir yanıt döndürdü. Tekrar dene."
     },
     "wocMarket": {
-      "title": "$WOC Exchange",
-      "close": "Close the Exchange",
-      "launcherLabel": "$WOC Exchange",
-      "tabBrowse": "Browse",
-      "tabSell": "Sell",
-      "tabActivity": "My Activities",
-      "tabsLabel": "$WOC Exchange sections",
-      "loading": "Loading the Exchange...",
-      "loadFailed": "The Exchange could not be reached. Try again shortly.",
-      "disabledRealm": "The $WOC Exchange is not available on this realm.",
-      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
-      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
-      "walletBannerCta": "Connect wallet",
-      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
-      "browseEmpty": "No listings right now. Check back soon.",
-      "browseError": "Listings could not be loaded.",
-      "colItem": "Item",
-      "colSeller": "Seller",
-      "colCurrentBid": "Current bid",
-      "colBuyNow": "Buy now",
-      "colTimeLeft": "Time left",
-      "reserveMet": "Reserve met",
-      "reserveNotMet": "Reserve not met",
-      "yourListing": "Your listing",
-      "buyNowLockedBadge": "Purchase in progress",
-      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
-      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
-      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
-      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
-      "pagePrev": "Previous page",
-      "pageNext": "Next page",
-      "pageNumber": "Page {current}",
-      "sortLabel": "Sort",
-      "sortEnding": "Ending soonest",
-      "sortNewest": "Newest",
-      "sortPriceAsc": "Price: low to high",
-      "sortPriceDesc": "Price: high to low",
-      "filterQuality": "Quality",
-      "filterFormat": "Format",
-      "filterAny": "Any",
-      "filterFormatAuction": "Auction",
-      "filterFormatBuyNow": "Buy now",
-      "filterItemLabel": "Item",
-      "filterItemPlaceholder": "Search by item name",
-      "filterCategory": "Category",
-      "filterCategoryWeapon": "Weapons",
-      "filterCategoryArmor": "Armor",
-      "filterCategoryMount": "Mounts",
-      "filterSubcategory": "Type",
-      "sellerLinkAria": "View recent trades by {name}",
-      "sellerTitle": "Recent trades by {name}",
-      "sellerBack": "Back to Browse",
-      "sellerEmpty": "No completed trades yet.",
-      "sellerError": "Recent trades could not be loaded.",
-      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
-      "detailTitle": "Listing",
-      "detailSeller": "Sold by {name}",
-      "detailEndsAt": "Ends {utc} UTC ({local} local)",
-      "detailStartingBid": "Starting bid: {usd}",
-      "detailCurrentBid": "Current bid: {usd}",
-      "detailNoBids": "No bids yet",
-      "detailMinNext": "Minimum next bid: {usd}",
-      "detailBuyNow": "Buy now: {usd}",
-      "detailSales": "Recent sales",
-      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
-      "detailNoSales": "No recorded sales for this item yet.",
-      "detailSalesLoading": "Loading recent sales...",
-      "bidLabel": "Your bid (USD)",
-      "bidPlaceholder": "Enter a USD amount",
-      "bidButton": "Place bid",
-      "bidAria": "Place a bid on {item}",
-      "bidTermsToggle": "Bid terms",
-      "rowOpenAria": "View the listing for {item}",
-      "buyNowButton": "Buy now for {usd}",
-      "buyNowAria": "Buy {item} now for {usd}",
-      "cancelButton": "Cancel listing",
-      "cancelAria": "Cancel your listing of {item}",
-      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
-      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
-      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
-      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
-      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
-      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
-      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
-      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
-      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
-      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
-      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
-      "termsLabel": "I accept the Marketplace terms.",
-      "termsLink": "View the Marketplace terms (opens in a new tab)",
-      "quoteTitle": "Confirm payment",
-      "quoteTotal": "Total: {tokens} $WOC",
-      "quoteSeller": "Seller receives: {tokens} $WOC",
-      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
-      "quoteTreasury": "To the game treasury: {tokens} $WOC",
-      "quoteExpires": "Quote expires in {duration}",
-      "quoteExpiresAt": "Quote expires at {time}.",
-      "quoteExpired": "The quote expired. Request a fresh one.",
-      "quoteSign": "Sign and pay",
-      "quoteRefresh": "New quote",
-      "quoteCancel": "Not now",
-      "quoteBondFor": "Refundable bid bond: {usd}",
-      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
-      "quoteSettlementFor": "Settlement for {item}: {usd}",
-      "paymentDueAt": "Payment is due by {time}.",
-      "signing": "Waiting for your wallet...",
-      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
-      "confirming": "Confirming on chain...",
-      "listing": "Listing your item...",
-      "activityCancelPending": "Cancel pending",
-      "activityDirected": "Directed sale",
-      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
-      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
-      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
-      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
-      "listingCreated": "Your listing is live.",
-      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
-      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
-      "sellTitle": "Create a listing",
-      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
-      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
-      "sellCollectiblesMounts": "Mounts can also be listed.",
-      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
-      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
-      "sellSearchPlaceholder": "Type to filter your bags",
-      "sellClear": "Clear {item} and choose another",
-      "sellChoose": "Item to list",
-      "sellNoMatches": "No items match that search",
-      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
-      "sellFormat": "Format",
-      "sellFormatAuction": "Auction",
-      "sellFormatBuyNow": "Buy now only",
-      "sellFormatAuctionBuyNow": "Auction with buy now",
-      "sellStart": "Starting bid (USD)",
-      "sellReserve": "Reserve (USD, optional)",
-      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
-      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
-      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
-      "sellBuyNowPrice": "Buy-now price (USD)",
-      "sellDuration": "Duration",
-      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
-      "sellSubmit": "List item",
-      "sellSubmitAria": "List {item} on the Exchange",
-      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
-      "activityListings": "My listings",
-      "activityBids": "My bids",
-      "activitySettlements": "My settlements",
-      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
-      "activityNoListings": "You have no listings.",
-      "activityNoBids": "You have no bids.",
-      "activityNoSettlements": "You have no settlements.",
-      "activityPayNow": "Pay now",
-      "activityPayNowAria": "Pay for settlement {id} now",
-      "activityPayNowItemAria": "Pay {usd} for {item} now",
-      "activityDeadline": "Payment due in {duration}",
-      "dueAt": "Due {utc} UTC ({local} local)",
-      "activityStrikes": "Marketplace strikes: {count}",
-      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
-      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
-      "bidStatusPending": "Awaiting bond",
-      "bidStatusActive": "High bidder",
-      "bidStatusOutbid": "Outbid",
-      "bidStatusLapsed": "Lapsed",
-      "bidStatusWon": "Won",
-      "bidStatusDefaulted": "Defaulted",
-      "bidStatusCancelled": "Cancelled",
-      "bidBondPay": "Pay bond",
-      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
-      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
-      "settlementOffered": "Payment due",
-      "settlementConfirming": "Confirming",
-      "settlementConfirmedDelivering": "Payment confirmed, delivering",
-      "settlementReview": "Payment under review",
-      "settlementDelivered": "Delivered",
-      "settlementExpired": "Expired unpaid",
-      "settlementFailed": "Payment failed",
-      "settlementFailBurnMissing": "The payment did not include the required token burn.",
-      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
-      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
-      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
-      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
-      "settlementFailRefunded": "This payment was returned to your wallet.",
-      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
-      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
-      "settlementFailGeneric": "This payment could not be completed.",
-      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
-      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
-      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
-      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
-      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
-      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
-      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
-      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
-      "listingStatusActive": "Active",
-      "listingStatusSettling": "Awaiting payment",
-      "listingStatusSold": "Sold",
-      "listingStatusReturned": "Returned",
-      "listingStatusCancelled": "Cancelled",
-      "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "title": "$WOC Borsası",
+      "close": "Borsa'yı kapat",
+      "launcherLabel": "$WOC Borsası",
+      "tabBrowse": "Göz At",
+      "tabSell": "Sat",
+      "tabActivity": "Hareketlerim",
+      "tabsLabel": "$WOC Borsası bölümleri",
+      "loading": "Borsa yükleniyor...",
+      "loadFailed": "Borsa'ya ulaşılamadı. Kısa süre sonra tekrar dene.",
+      "disabledRealm": "$WOC Borsası bu sunucuda kullanılamıyor.",
+      "pausedBanner": "Alım satım duraklatıldı. Açık artırmaların geri sayımı sürüyor; yeni ilanlar, teklifler, öneriler ve ödemeler alım satım devam edene kadar bekler, ve gönderilmiş bir ödeme yine de sonuçlanır.",
+      "walletBanner": "Borsa'da teklif vermek, satın almak veya satmak için bir cüzdan bağla ve doğrula.",
+      "walletBannerCta": "Cüzdanı bağla",
+      "rateNote": "Kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
+      "rateNotePaused": "Son bilinen kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
+      "estimateNote": "Güncel kura göre {usd} karşılığında yaklaşık {tokens} $WOC.",
+      "browseEmpty": "Şu anda ilan yok. Yakında tekrar bak.",
+      "browseError": "İlanlar yüklenemedi.",
+      "colItem": "Eşya",
+      "colSeller": "Satıcı",
+      "colCurrentBid": "Güncel teklif",
+      "colBuyNow": "Hemen satın al",
+      "colTimeLeft": "Kalan süre",
+      "reserveMet": "Rezerv karşılandı",
+      "reserveNotMet": "Rezerv karşılanmadı",
+      "yourListing": "İlanın",
+      "buyNowLockedBadge": "Satın alma sürüyor",
+      "reserveMetTip": "Satıcı gizli bir asgari fiyat belirledi ve güncel teklif bunu karşılıyor.",
+      "reserveNotMetTip": "Satıcı gizli bir asgari fiyat belirledi. Kapanışta en yüksek teklif bunun altında kalırsa eşya satılmaz ve tüm teminatlar iade edilir.",
+      "yourListingTip": "Bu eşyayı sen ilan ettin. Kendi ilanına teklif veremezsin; henüz teklif almadığı sürece burada veya Hareketlerim'den iptal edebilirsin.",
+      "buyNowLockedTip": "Başka bir alıcı öderken bu ilanı tutuyor. Zamanında ödemezse ilan yeniden açılır.",
+      "pagePrev": "Önceki sayfa",
+      "pageNext": "Sonraki sayfa",
+      "pageNumber": "Sayfa {current}",
+      "sortLabel": "Sırala",
+      "sortEnding": "En yakında bitenler",
+      "sortNewest": "En yeni",
+      "sortPriceAsc": "Fiyat: düşükten yükseğe",
+      "sortPriceDesc": "Fiyat: yüksekten düşüğe",
+      "filterQuality": "Kalite",
+      "filterFormat": "Biçim",
+      "filterAny": "Herhangi",
+      "filterFormatAuction": "Açık artırma",
+      "filterFormatBuyNow": "Hemen satın al",
+      "filterItemLabel": "Eşya",
+      "filterItemPlaceholder": "Eşya adına göre ara",
+      "filterCategory": "Kategori",
+      "filterCategoryWeapon": "Silahlar",
+      "filterCategoryArmor": "Zırh",
+      "filterCategoryMount": "Binekler",
+      "filterSubcategory": "Tür",
+      "sellerLinkAria": "{name} adlı kullanıcının son işlemlerini görüntüle",
+      "sellerTitle": "{name} adlı kullanıcının son işlemleri",
+      "sellerBack": "Göz atmaya dön",
+      "sellerEmpty": "Henüz tamamlanmış işlem yok.",
+      "sellerError": "Son işlemler yüklenemedi.",
+      "sellerSaleRow": "{time}: {item}, {buyer} adlı alıcıya {usd} karşılığında",
+      "detailTitle": "İlan",
+      "detailSeller": "{name} tarafından satıldı",
+      "detailEndsAt": "Bitiş {utc} UTC ({local} yerel)",
+      "detailStartingBid": "Başlangıç teklifi: {usd}",
+      "detailCurrentBid": "Güncel teklif: {usd}",
+      "detailNoBids": "Henüz teklif yok",
+      "detailMinNext": "Sonraki asgari teklif: {usd}",
+      "detailBuyNow": "Hemen satın al: {usd}",
+      "detailSales": "Son satışlar",
+      "detailSaleRow": "{time}: {seller}, {buyer} adlı alıcıya {usd} karşılığında sattı",
+      "detailNoSales": "Bu eşya için henüz kayıtlı satış yok.",
+      "detailSalesLoading": "Son satışlar yükleniyor...",
+      "bidLabel": "Teklifin (USD)",
+      "bidPlaceholder": "Bir USD tutarı gir",
+      "bidButton": "Teklif ver",
+      "bidAria": "{item} için teklif ver",
+      "bidTermsToggle": "Teklif koşulları",
+      "rowOpenAria": "{item} ilanını görüntüle",
+      "buyNowButton": "{usd} karşılığında şimdi satın al",
+      "buyNowAria": "{item} eşyasını şimdi {usd} karşılığında satın al",
+      "cancelButton": "İlanı iptal et",
+      "cancelAria": "{item} ilanını iptal et",
+      "bidBondNote": "Teklif vermek, teklifin üzerine $WOC cinsinden iade edilebilir bir teminat tutar: {bid} tutarındaki bir teklif için {bond}, daha yüksek bir teklif için daha fazlası. Geçildiğinde ya da kaybettiğinde, ya da kazanıp ödedikten sonra iade edilir; bir ikinci şans teklifi onu yeniden tutar.",
+      "bidBondSchedule": "Teminat, teklifinin yüzde {rate}'idir; en az {min}, en fazla {max}.",
+      "bidBondPayWindow": "Teklifini verdikten sonra {duration} içinde teminatı öde, yoksa teklifin geçersiz olur.",
+      "bidBindingNote": "Bir teklif, teminat işlemini imzaladığın anda bağlayıcı hale gelir: geri çekilemez, kazanır da ödemezsen teminat yanar ve hesabın bir Borsa ceza puanı kazanır.",
+      "bidCloseNote": "Teminatı son 2 dakika içinde onaylanan bir teklif, ilanı o teklifin 2 dakika sonrasına kadar uzatır; bu uzama, ilanın listelenen bitişinden en fazla 30 dakika sonrasına kadar sürebilir. İlan kapandıktan sonra onaylanan bir teminat sayılmaz ve iade edilir.",
+      "offerNextNote": "Kazanan ödemezse kendi teklifin üzerinden alıcı olabilirsin: teminatın yeniden tutulur (zaten iade edildiyse tekrar istenir) ve ödeme {duration} içinde yapılmalıdır.",
+      "buyNowNote": "Hemen Satın Al, öderken bu ilanı yaklaşık dört buçuk dakika boyunca senin için tutar. Zamanında ödemezsen bu ilanı 30 dakika boyunca tekrar deneyemezsin, ve bir saat içinde ödenmemiş üç Hemen Satın Al, en eskisi bir saatlik olana kadar Hemen Satın Al'ı senin için durdurur.",
+      "variableTokenWarning": "$WOC cinsinden bir USD değeri ödemeyi taahhüt ediyorsun. Kesin token miktarı, ödeme istendiğinde yeni bir fiyat teklifiyle belirlenir ve tahminden farklı olabilir.",
+      "quoteFixedNote": "Bu fiyat teklifi, süresi dolana kadar $WOC tutarını sabitler. Yeni bir fiyat teklifi farklı olabilir.",
+      "settlementDeadlineNote": "Kazanırsan, ödeme açık artırmanın kapanmasından itibaren {duration} içinde yapılmalıdır.",
+      "claimCooldownRetry": "Kısa süre önce bir Hemen Satın Al işleminden vazgeçtin. {duration} içinde tekrar dene.",
+      "termsLabel": "Borsa koşullarını kabul ediyorum.",
+      "termsLink": "Borsa koşullarını görüntüle (yeni sekmede açılır)",
+      "quoteTitle": "Ödemeyi onayla",
+      "quoteTotal": "Toplam: {tokens} $WOC",
+      "quoteSeller": "Satıcının alacağı: {tokens} $WOC",
+      "quoteBurn": "Yakıldı (arzdan çıkarıldı): {tokens} $WOC",
+      "quoteTreasury": "Oyun hazinesine: {tokens} $WOC",
+      "quoteExpires": "Fiyat teklifinin süresi {duration} içinde doluyor",
+      "quoteExpiresAt": "Fiyat teklifinin süresi {time} itibarıyla doluyor.",
+      "quoteExpired": "Fiyat teklifinin süresi doldu. Yeni bir tane iste.",
+      "quoteSign": "İmzala ve öde",
+      "quoteRefresh": "Yeni fiyat teklifi",
+      "quoteCancel": "Şimdi değil",
+      "quoteBondFor": "İade edilebilir teklif teminatı: {usd}",
+      "quoteBondForItem": "{item} için iade edilebilir teklif teminatı: {usd}",
+      "quoteSettlementFor": "{item} için ödeme: {usd}",
+      "paymentDueAt": "Ödemenin son tarihi {time}.",
+      "signing": "Cüzdanın bekleniyor...",
+      "signFailed": "Cüzdanın ödemeyi tamamlamadı. Cüzdanını kontrol et ve tekrar dene.",
+      "signFailedConfirm": "Cüzdanın onayı imzalamadı. Cüzdanını kontrol et ve tekrar dene.",
+      "confirming": "Zincir üzerinde onaylanıyor...",
+      "listing": "Eşyan ilan ediliyor...",
+      "activityCancelPending": "İptal bekleniyor",
+      "activityDirected": "Doğrudan satış",
+      "bidPlacedStanding": "Teklifin geçerli. En yüksek teklifi sen veriyorsun.",
+      "bidPlacedOutbid": "Teminatın onaylandı, ama senden önce daha yüksek bir teklif geldi.",
+      "purchaseComplete": "Satın alma tamamlandı. Eşyan Kuzgun Postası ile ulaşır.",
+      "paymentConfirmedDelivering": "Ödeme onaylandı. Teslimat tamamlanınca eşyan Kuzgun Postası ile ulaşır.",
+      "listingCreated": "İlanın artık yayında.",
+      "listingCancelled": "İlan iptal edildi. Eşyan Kuzgun Postası ile geri döner.",
+      "listingCancelPending": "İptal bekliyor: bir alıcı satın alma penceresini tutuyor. Ödemezse ilan kapanır ve eşyan Kuzgun Postası ile geri döner.",
+      "sellTitle": "İlan oluştur",
+      "sellEmptyFloor": "Çantalarında uygun eşya yok. Bu sunucu, {floor} kalitesinde veya daha iyi bağlanmamış teçhizatı kabul eder.",
+      "sellCollectiblesBoth": "Binekler ve Mech renk kaplamaları da ilan edilebilir.",
+      "sellCollectiblesMounts": "Binekler de ilan edilebilir.",
+      "sellCollectiblesChromas": "Mech renk kaplamaları da ilan edilebilir.",
+      "sellLockedHidden": "Kilitli eşyalar burada listelenmez. Satmak için çantalarında kilitlerini aç.",
+      "sellSearchPlaceholder": "Çantalarını filtrelemek için yaz",
+      "sellClear": "{item} seçimini kaldır ve başka birini seç",
+      "sellChoose": "İlan edilecek eşya",
+      "sellNoMatches": "Bu aramayla eşleşen eşya yok",
+      "sellBuyNowAboveStart": "Hemen satın al fiyatı, başlangıç teklifinden yüksek olmalıdır.",
+      "sellFormat": "Biçim",
+      "sellFormatAuction": "Açık artırma",
+      "sellFormatBuyNow": "Yalnızca hemen satın al",
+      "sellFormatAuctionBuyNow": "Hemen satın al seçenekli açık artırma",
+      "sellStart": "Başlangıç teklifi (USD)",
+      "sellReserve": "Rezerv (USD, isteğe bağlı)",
+      "sellReserveNote": "İsteğe bağlı, en az başlangıç teklifi kadar olmalıdır. Teklif verenler yalnızca karşılanıp karşılanmadığını görür; kapanışta en yüksek teklif bunun altında kalırsa eşya sana satılmadan geri döner ve tüm teminatlar iade edilir.",
+      "sellBuyNowNote": "Zorunlu. Bir hemen satın al ilanı, teklif alınmadan bu fiyattan satılır.",
+      "sellBuyNowAuctionNote": "İsteğe bağlı. Bir alıcının açık artırmayı erken bitirmek için ödeyebileceği bir fiyat belirle; başlangıç teklifinin ve rezervin üzerinde olmalıdır.",
+      "sellBuyNowPrice": "Hemen satın al fiyatı (USD)",
+      "sellDuration": "Süre",
+      "sellOfferNext": "Kazanan ödemezse, satılmadan sona erdirmek yerine, teklifi rezervi karşılayan bir sonraki en yüksek teklif sahibine, onun teklifi üzerinden sat.",
+      "sellSubmit": "Eşyayı ilan et",
+      "sellSubmitAria": "{item} eşyasını Borsa'da ilan et",
+      "sellFeeNote": "Tamamlanan bir satış, fiyattan bir Borsa ücreti öder: bir kısmı yakılır, bir kısmı hazineye gider ve kalanı ödeme işleminde bağlı cüzdanına ulaşır. Girdiğin fiyata ait ücret burada gösterilir; bir açık artırmada ise ücret son fiyata göre belirlenir.",
+      "activityListings": "İlanlarım",
+      "activityBids": "Tekliflerim",
+      "activitySettlements": "Tamamlanan İşlemlerim",
+      "activityEmpty": "Henüz teklifin, ilanın ya da tamamlanan işlemin yok. Borsa etkinliğin burada görünür.",
+      "activityNoListings": "Hiç ilanın yok.",
+      "activityNoBids": "Hiç teklifin yok.",
+      "activityNoSettlements": "Hiç tamamlanan işlemin yok.",
+      "activityPayNow": "Şimdi öde",
+      "activityPayNowAria": "{id} numaralı işlemi şimdi öde",
+      "activityPayNowItemAria": "{item} için {usd} tutarını şimdi öde",
+      "activityDeadline": "Ödeme son tarihi: {duration}",
+      "dueAt": "Son tarih {utc} UTC ({local} yerel)",
+      "activityStrikes": "Borsa ceza puanı: {count}",
+      "activitySuspended": "Ödenmeyen anlaşmalar nedeniyle Borsa {duration} boyunca askıya alındı: o zamana kadar teklif verilemez, satın alma yapılamaz, ilan verilemez ya da $WOC takası yapılamaz.",
+      "strikesTip": "Taahhüt ettiğin bir anlaşmayı ödemediğin her sefer bir ceza puanı kazanırsın. İlkinden sonra her ceza puanı seni Borsa'dan daha uzun süre uzaklaştırır: önce 3 gün, sonra 14, sonra 90, sonra bir yıl.",
+      "bidStatusPending": "Teminat Bekleniyor",
+      "bidStatusActive": "En yüksek teklif",
+      "bidStatusOutbid": "Geçildi",
+      "bidStatusLapsed": "Süresi Doldu",
+      "bidStatusWon": "Kazanıldı",
+      "bidStatusDefaulted": "Temerrüt",
+      "bidStatusCancelled": "İptal Edildi",
+      "bidBondPay": "Teminatı öde",
+      "bidBondPayAria": "{id} numaralı ilandaki teklifin için teminatı öde",
+      "bidBondPayItemAria": "{item} için verdiğin teklifin {bond} teminatını öde",
+      "settlementOffered": "Ödeme bekleniyor",
+      "settlementConfirming": "Onaylanıyor",
+      "settlementConfirmedDelivering": "Ödeme onaylandı, teslim ediliyor",
+      "settlementReview": "Ödeme inceleniyor",
+      "settlementDelivered": "Teslim edildi",
+      "settlementExpired": "Ödenmeden süresi doldu",
+      "settlementFailed": "Ödeme başarısız oldu",
+      "settlementFailBurnMissing": "Ödeme, gerekli token yakımını içermiyordu.",
+      "settlementFailBurnMismatch": "Ödeme yanlış miktarda token yaktı.",
+      "settlementFailBurnAuthority": "Token yakımı, bu satın almanın belirtmediği bir cüzdandan geldi.",
+      "settlementFailUnexpectedCredit": "İşlem, bu satın almanın dışında bir cüzdana ödeme yaptı.",
+      "settlementFailQuoteExpired": "Ödeme fiyat teklifinin süresi kullanılmadan doldu. Yeni bir tane iste ve tekrar öde.",
+      "settlementFailTransaction": "Ödeme işlemi ağda başarısız oldu. Yeni bir fiyat teklifi iste ve tekrar dene.",
+      "settlementFailRefunded": "Bu ödeme cüzdanına iade edildi.",
+      "settlementFailSuperseded": "Bu ödeme denemesinin yerini daha yeni bir tanesi aldı.",
+      "settlementFailConfirmingOverdue": "Bu ödemenin onaylanması çok uzun sürdü ve doğrulanamadı.",
+      "settlementFailGeneric": "Bu ödeme tamamlanamadı.",
+      "paymentSeenAwaitingFinality": "Ödeme defterde görüldü. Kesin onay bekleniyor.",
+      "paymentNotYetVisible": "Defterde henüz görünen bir ödeme yok. Görünmesi biraz zaman alabilir.",
+      "paymentServiceUnreachable": "Ödeme hizmetine ulaşılamıyor. Ödemen kayıtlı kalır ve yeniden kontrol edilecek.",
+      "paymentPendingGeneric": "Ödemen gönderildi ve onay bekliyor.",
+      "bondSeenAwaitingFinality": "Teminat ödemesi kayıt defterinde görüldü. Kesin onay bekleniyor.",
+      "bondNotYetVisible": "Kayıt defterinde henüz görünen bir teminat ödemesi yok. Görünmesi biraz zaman alabilir.",
+      "bondServiceUnreachable": "Ödeme hizmetine ulaşılamıyor. Teminat ödemen kayıtlı kalır ve yeniden kontrol edilecek.",
+      "bondPendingGeneric": "Teminat ödemen gönderildi ve onay bekliyor.",
+      "listingStatusActive": "Aktif",
+      "listingStatusSettling": "Ödeme bekleniyor",
+      "listingStatusSold": "Satıldı",
+      "listingStatusReturned": "İade edildi",
+      "listingStatusCancelled": "İptal edildi",
+      "listingStatusSuspended": "Askıya alındı",
+      "listingStatusUnsold": "Satılmadı"
     }
   },
   "gatherEvent": {
@@ -4340,8 +4340,8 @@ export const tr_TR: EnTranslations = {
       "invalid_input": "Geçersiz girdi."
     },
     "guilds": {
-      "invalid_roster_name": "Invalid guild name.",
-      "unknown": "No guild by that name."
+      "invalid_roster_name": "Geçersiz lonca adı.",
+      "unknown": "Bu adda bir lonca yok."
     },
     "steam": {
       "disabled": "Steam bağlama şu anda kullanılamıyor.",
@@ -4382,53 +4382,53 @@ export const tr_TR: EnTranslations = {
       "not_marked": "Bu hesap işaretli değil."
     },
     "woc_market": {
-      "invalid_input": "Invalid input.",
-      "disabled": "The $WOC Exchange is not available on this realm.",
-      "paused": "Exchange trading is paused. Auctions keep counting down.",
-      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
-      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
-      "self_offer": "You cannot send a $WOC offer to yourself.",
-      "offer_expired": "That $WOC offer expired. Ask for a new one.",
-      "terms_required": "Accept the Marketplace terms to continue.",
-      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
-      "totp_invalid": "That two-factor code did not verify. Try again.",
-      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
-      "character_invalid": "Play the character you are listing from, and try again.",
-      "not_found": "That Exchange entry no longer exists.",
-      "not_yours": "That Exchange entry no longer exists.",
-      "not_active": "That listing is no longer open for this action.",
-      "own_listing": "You cannot bid on or buy your own listing.",
-      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
-      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
-      "already_pending": "Confirm or abandon your pending bid on this listing first.",
-      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
-      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
-      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
-      "not_pending": "That bid is no longer awaiting its bond.",
-      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
-      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
-      "cancel_pending": "The seller is cancelling this listing.",
-      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
-      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
-      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
-      "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
-      "no_buy_now": "This listing has no buy-now price.",
-      "cap_reached": "You have reached your Exchange listing limit.",
-      "stale_item": "That item changed or moved. Re-select it and try again.",
-      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
-      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
-      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
-      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted.",
-      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
-      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
-      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
-      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
-      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
-      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
-      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
+      "invalid_input": "Geçersiz girdi.",
+      "disabled": "$WOC Borsası bu dünyada kullanılamıyor.",
+      "paused": "Borsa alışverişi duraklatıldı. Açık artırmalar geri saymaya devam ediyor.",
+      "wallet_required": "Borsada alışveriş yapmadan önce bir cüzdan bağlayıp doğrulayın.",
+      "recipient_wallet_required": "O oyuncunun $WOC ödemelerini kabul edebilmesi için önce bir cüzdan bağlaması gerekir.",
+      "self_offer": "Kendinize $WOC teklifi gönderemezsiniz.",
+      "offer_expired": "O $WOC teklifinin süresi doldu. Yenisini isteyin.",
+      "terms_required": "Devam etmek için Borsa koşullarını kabul edin.",
+      "totp_required": "Bu tutar iki adımlı kimlik doğrulaması gerektiriyor. Hesap ayarlarından etkinleştirip kodunuzu girin.",
+      "totp_invalid": "O iki adımlı doğrulama kodu doğrulanamadı. Tekrar deneyin.",
+      "suspended": "Ödenmemiş anlaşmalar nedeniyle Borsa erişiminiz askıya alındı: teklif veremez, satın alamaz, ilan veremez ve $WOC alışverişi yapamazsınız.",
+      "character_invalid": "İlan ettiğin karakterle oyuna gir ve tekrar dene.",
+      "not_found": "O Borsa kaydı artık mevcut değil.",
+      "not_yours": "O Borsa kaydı artık mevcut değil.",
+      "not_active": "O ilan bu işlem için artık açık değil.",
+      "own_listing": "Kendi ilanınıza teklif veremez veya onu satın alamazsınız.",
+      "has_bids": "Teklif almış bir ilan geri çekilemez. İptal etmeniz gerekiyorsa destek ekibiyle iletişime geçin.",
+      "bid_too_low": "Teklifin, güncel teklif artı artış miktarını aşmıyor.",
+      "already_pending": "Önce bu ilandaki bekleyen teklifini onayla ya da vazgeç.",
+      "insufficient_balance": "Cüzdanınızda bu teklif ve teminatı için yeterli $WOC yok.",
+      "quote_unavailable": "Şu anda bir fiyat teklifi verilemedi. Kısa süre sonra tekrar deneyin.",
+      "quote_expired": "O fiyat teklifinin süresi doldu. Yeni bir tane isteyin; hiçbiri sunulmuyorsa o pencere kapanmış demektir.",
+      "not_pending": "O teklif artık teminatını beklemiyor.",
+      "confirm_failed": "İşlem onaylanamadı. Yeni bir fiyat teklifi isteyip tekrar deneyin.",
+      "confirm_in_flight": "Ödemeniz hâlâ onaylanıyor. Sonuçlandığında tekrar deneyin.",
+      "buy_now_locked": "Başka bir alıcı bu satın almayı tamamlıyor. Birazdan tekrar dene.",
+      "cancel_pending": "Satıcı bu ilanı iptal ediyor.",
+      "claim_cooldown": "Kısa süre önce bir Hemen Satın Al işleminden vazgeçtin. Daha sonra tekrar dene.",
+      "bond_window_closed": "Bu teklif artık ödenemez: ödeme penceresi kapandı. Yeni bir tane için tekrar teklif ver.",
+      "settlement_in_flight": "Bir alıcı bu ilan için ödeme yapıyor. Ödeme tamamlandığında tekrar deneyin.",
+      "contended": "Borsa şu anda bu ilanla meşgul. Birazdan tekrar deneyin.",
+      "sale_conflict": "Bu ilan için hâlâ geçerli başka bir satış kaydı var. Önce onu hariç tutun.",
+      "no_buy_now": "Bu ilanın hemen satın alma fiyatı yok.",
+      "cap_reached": "Borsa ilan sınırına ulaştın.",
+      "stale_item": "O eşya değişti veya yer değiştirdi. Yeniden seçip tekrar deneyin.",
+      "item_mismatch": "Bu, alıcının kabul ettiği tam kopya değil ya da durumu değişti (kilitlenmesi de sayılır). Bunun için yeni bir anlaşma başlatın.",
+      "offer_pending": "Bu oyuncuyla zaten süregelen bir anlaşmanız var. Önce onu sonuçlandırın.",
+      "not_eligible": "O eşya $WOC Borsası'na ilan edilemez.",
+      "invalid_params": "Başlangıç teklifini, rezerv fiyatını, hemen satın alma fiyatını ve süreyi kontrol edin.",
+      "signature_reused": "O işlem zaten gönderildi.",
+      "item_locked": "O eşya kilitli. Satmadan önce çantalarınızda kilidini açın.",
+      "stepup_required": "Borsada satış yapmak, bağlı cüzdanınızdan bir imza gerektirir.",
+      "stepup_challenge_invalid": "O cüzdan onayı artık geçerli değil. Satışı yeniden başlatın.",
+      "stepup_challenge_expired": "Cüzdan onayının süresi doldu. Satışı yeniden başlatın.",
+      "stepup_wallet_mismatch": "Bu onay verildiğinden beri bağlı cüzdanınız değişti. Satışı yeniden başlatın.",
+      "stepup_binding_mismatch": "O cüzdan onayı bu satışla eşleşmiyor. Satışı yeniden başlatın.",
+      "stepup_signature_invalid": "Cüzdan imzası doğrulanamadı. Satışı yeniden başlatın."
     }
   },
   "guide": {
@@ -4575,8 +4575,8 @@ export const tr_TR: EnTranslations = {
         "fenBlurb": "Sonbahar tacının ötesinde, söğütlerle ve durgun suyla dolu aydınlık bir bataklık ve bir hendeğin ardında bir kasaba var.",
         "farshoreName": "Uzak Kıyı",
         "farshoreBlurb": "Kum setinin ötesindeki bir ada; gökyüzü Yarık Tarlaları'nın üzerinde yırtılır ve Gullhaven her gedik için çanını çalar.",
-        "provingName": "The Proving Shore",
-        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
+        "provingName": "Sınav Kıyısı",
+        "provingBlurb": "Boğazın karşısında sessiz bir eğitim adası; yeni maceracılar, Vadi onlardan bir şey istemeden önce burada ayaklarını bulur.",
         "nightName": "Gece Çiçeği",
         "nightBlurb": "Çiçeklerin patikaları aydınlattığı ve Moonrest'in nöbetini tuttuğu, yıldızlı gece yarısı ülkesi.",
         "hauntName": "Hayalet Ormanı",
@@ -5538,10 +5538,10 @@ export const tr_TR: EnTranslations = {
       "farshoreGreeting": "Feribot Yolu'ndan mı geçtin? O zaman bir haftadır ilk gelensin, ve Bekçi seni incelemek isteyecektir.",
       "farshoreGreeter": "Çan Bekçisi Tam, İskele",
       "farshorePlaceNotes": "Gullhaven, adanın tek kasabası ve tabyasıdır. İskele, üzerinde bir nöbet çanının dikildiği, Feribot Yolu'nun karaya vurduğu yerdir; Nöbet Çayırı, bir yarık nöbetçisinin bir sonraki gediği dinlediği, kasabanın güneydoğusundaki yüksek zemini tutar; Yarılmış Kayalıklar adanın güney ucunda açılır; ve Yarık Tarlaları, Gullhaven'ın doğusundaki harap tahıl sıralarıdır, hâlâ oradaki gedikten geçenlerle kaynamaktadır.",
-      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
-      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
-      "provingGreeter": "Instructor Maren, Dawnrest Camp",
-      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
+      "provingBlurb": "Vadi'nin karşısında, boğazın öte yakasında, eğitim alanı olarak tutulan sessiz bir ada: bir kamp, bir talim alanı, enkazlarla dolu bir kumsal, ve iki yönde de işleyen bir feribot.",
+      "provingGreeting": "Vadi'nin şimdiye dek teşekkür ettiği her kahraman, şu an senin durduğun yerde durdu, ve hiçbiri bir kılıcın hangi ucundan tutulacağını bilmiyordu.",
+      "provingGreeter": "Eğitmen Maren, Dawnrest Kampı",
+      "provingPlaceNotes": "Dawnrest Kampı, adanın tüm yerleşimidir: birkaç çadır, bir tezgah, ve bir toplanma ateşi. Eski İskele Vadi'ye bakar, geçiş çemberinin mezunları boğazın üzerinden taşıdığı yerdir; kampın güneyindeki Talim Alanı, ihtiyacı olan herkes için saman kuklalarını ayakta tutar; ve Enkaz Hattı, gelgidin adaya enkaz sandıklarıyla ödeme yaptığı, ganimetle dolu kumsaldır.",
       "travelTitle": "Etrafta gezinme",
       "travelBody": "Diyardaki her yol, yürünerek ya da atla kat edilir. Uçuş rotası, taksi ya da ışınlanma ağı yoktur: harita tek parça, bağlantılı bir kara parçasıdır ve her bağlantı üzerinde durabileceğiniz bir şeydir. Sırtlar bir bölgeyi bir sonrakinden ayırır ve iki bölgenin bir sırtı paylaştığı yerde yol bir geçitten tırmanır. Ancak her sınır böyle işlemez. Kuzeyde uzun bir geçit yolu, Örtülü Vadi'den suyun üzerinden ötesindeki karlı ülkeye kadar yolu taşır; güneyde ise Feribot Yolu adında ince, doğal bir kum seti, Doğudere Vadisi'nin kıyısından doğuya, hiç kara sınırı olmayan Uzak Kıyı adasındaki İskele'ye kadar uzanır. Ve bütün açık dünyada tam olarak bir gerçek kapı vardır: Dikenzirve'nin yükseklerinde, Örtülü Vadi'ye açılan bir alacakaranlık örtüsü. Örtülü Vadi'nin güney sırtı mühürlüdür ve içinden geçit yoktur, bu yüzden içeri ilk kez o örtüden girersiniz ve dönüş yolunda arkanızdan kapanır.\n\nNerede düşerseniz düşün, geri dönüş kısa bir yürüyüştür. Her bölge, mezar taşlarının üzerinde süzülen bir Solgun Bekçi'nin beklediği en az bir mezarlık barındırır ve serbest bırakılan ruh, en yakınındakinde yükselir.\n\nHarita görünmez bir duvarda bitmez. Kara, plajlara ve burunlara, ardından açık suya çıkar. Dünyanın yüzmenizi istediği geçişler, bir bölgeyle bir sonraki arasındaki boğazlar ve göller, sakin ve geçmesi güvenlidir. Bunun yerine açık denize doğru yol alırsanız mesafenin kendisi sizi geri çevirir: uyarılırsınız, tekrar uyarılırsınız ve yüzmeye devam ederseniz deniz sizi öldürene dek yıpratır. Dalışın kendi sınırı vardır, çünkü nefesiniz yüzeyin altında tükenir, bu yüzden su size söylediğinde hava almak için yüzeye çıkın ve geri dönün.",
       "mountsTitle": "Binekler",
@@ -5988,7 +5988,7 @@ export const tr_TR: EnTranslations = {
       "deedsHeading": "Yolculuğu hatırlayan yiğitlikler",
       "deedsBody": "Yiğitlikler Kitabı her adımda yanındadır. İlk bağlanman Zanaat Yeminlisi'ni ve ilk şaheser Şaheser Ustası'nı kazandırır; her ikisi de unvan olarak takılabilir. Sekiz kazanılabilir zanaatın her biri 50 beceri için bir dönüm noktası yiğitliği işaretler ve tavanını Büyük Usta unvanıyla taçlandırır; Balık Tutma ise 100 yetkinlikte Eski Denizci'yi ve 200'de Usta Olta Ustası unvanını alır.\n\nDaha sakin sayfalar da vardır: ilk hasat ve ilk üretim, sahada şansın ortaya çıkardığı nadir bulgular ve hurda işleme için yiğitlikler. Hepsi kozmetiktir, yalnızca unvanlar ve Ün. Bir yiğitlik hiçbir zaman güç vermez; yalnızca orada olduğunu kanıtlar.",
       "startHeading": "Nereden başlanır",
-      "startBody": "Doğudere'ye yoldan yeni mi indiniz? Ustabaşı Odell'i bulun ve Her Ele Bir Zanaat'ı alın: sizi kasabanın güneydoğusundaki Bakır Kazısı çevresindeki maden damarlarına yönlendirecek ve ilk nasırlarınızı elinize verecek. Kazının kendisine dikkat edin: üzerine kamp kurmuş Deeprock Kazıcıları yeni gelen birinin birkaç seviye üstündedir, o yüzden önce dış damarları işleyin ve kampın göbeğini biraz seviye atladığınız zamana saklayın. Ondan sonra, görev yaparken geçtiğiniz her damarı, ağaç kümesini ve ot öbeğini hasat edin; yetkinlik gezginlere kendiliğinden gelir.\n\nKasabaya döndüğünüzde, üretim penceresini açmak için T'ye basın ve her karakterin başından beri bildiği sıradan tarifleri işleyin. Demirhanedeki, mutfaklardaki, dokuma tezgahındaki ve alet atölyesindeki ustaları ziyaret edip ne öğrettiklerine bakın, istikrarlı bir sikke için de iş emirlerini alın. Lonca'nın mektubu sizi bulduğunda, hangi çiftin ev gibi geldiğini çoktan biliyor olacaksınız.",
+      "startBody": "Doğudere'ye yoldan yeni mi indiniz? Ustabaşı Odell'i bulun ve Her Ele Bir Zanaat'ı alın: sizi kasabanın kuzeydoğusundaki Bakır Kazısı çevresindeki maden damarlarına yönlendirecek ve ilk nasırlarınızı elinize verecek. Kazının kendisine dikkat edin: üzerine kamp kurmuş Deeprock Kazıcıları yeni gelen birinin birkaç seviye üstündedir, o yüzden önce dış damarları işleyin ve kampın göbeğini biraz seviye atladığınız zamana saklayın. Ondan sonra, görev yaparken geçtiğiniz her damarı, ağaç kümesini ve ot öbeğini hasat edin; yetkinlik gezginlere kendiliğinden gelir.\n\nKasabaya döndüğünüzde, üretim penceresini açmak için T'ye basın ve her karakterin başından beri bildiği sıradan tarifleri işleyin. Demirhanedeki, mutfaklardaki, dokuma tezgahındaki ve alet atölyesindeki ustaları ziyaret edip ne öğrettiklerine bakın, istikrarlı bir sikke için de iş emirlerini alın. Lonca'nın mektubu sizi bulduğunda, hangi çiftin ev gibi geldiğini çoktan biliyor olacaksınız.",
       "colStation": "İstasyon",
       "colHub": "Merkez",
       "colMaster": "Usta",
@@ -6073,13 +6073,13 @@ export const tr_TR: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Hızlılar için deri",
-          "identityBody": "Merdiven, sade Fenbridge post pantolon, çizme ve kemerden, ilk gerçek istatistik çizgilerine sahip sıradan dışı bataklık avcısı ceketi, başlığı ve omuzluğuna ve ardından bir ustanın kesebileceği en iyi deri olan nadir bataklık bekçisi setine yükselir. İki büyücü parçası onu tamamlar: Doğudere Druid'in Posta Yaygını ve beceri 75'teki Alacakaranlık Sarmalı.\n\nTekerekte Aşçılık ile Terzilik arasında durur. Yaşayan çifti Teçhizatçı'dır: Deri İşleme ve Terzilik birlikte, Doğudere'deki Dokumacı Ottilie'nin önünde yemin edilir; Aşçılık ile Avcı Ustası çifti tekerekte adlandırılmış ama henüz yemin görevi yoktur.",
+          "identityBody": "Merdiven, sade Fenbridge post pantolon, çizme ve kemerden, ilk gerçek istatistik çizgilerine sahip sıradan dışı bataklık avcısı ceketi, başlığı ve omuzluğuna ve ardından bir ustanın kesebileceği en iyi deri olan nadir bataklık bekçisi setine yükselir. İki büyücü parçası onu tamamlar: Doğudere Druid'in Posta Yaygını ve beceri 50'deki Alacakaranlık Postu Sargıları.\n\nTekerekte Aşçılık ile Terzilik arasında durur. Yaşayan çifti Teçhizatçı'dır: Deri İşleme ve Terzilik birlikte, Doğudere'deki Dokumacı Ottilie'nin önünde yemin edilir; Aşçılık ile Avcı Ustası çifti tekerekte adlandırılmış ama henüz yemin görevi yoktur.",
           "materialsHeading": "Avlanma hayin kendisi",
-          "materialsBody": "Deri İşleme, seviye rotanızla tedarik hattınızın aynı şey olduğu zanaattır: Kaba Post doğrudan post taşıyan cesetlerden, hepsinden çok da kurtlarla yaban domuzlarından hasat edilir ve her ceset yalnızca tek bir hasatçıya hizmet eder, önce gelen alır. Nadir ya da daha iyi bir hasat atışı ayrıca Bozulmamış Post verir; bu, Bataklık Muhafızı Yeleği'nin istediği imzalı örnektir, bu yüzden bulduğunuz her birini bankaya koyun.\n\nYardımcı kadro küçüktür: örümcek bacağı ve ipeği, insansılardan düşen ev dokuması kumaş, her nadir bataklık bekçisi parçasında tek bir osmiyum cevheri (Alacakaranlık Postu Sargıları baş tarifinde altı tane) ve tabakhane tezgahından 16 bakıra bir Tabaklama Maddesi. Osmiyumun kendisi asla tezgahtan satın alınmaz: ya kendiniz kazın, Dikenzirve'de ya da neredeyse her genç bölgenin başlangıç damarlarında (yalnızca Uzak Kıyı demir çıkarır), ya da başka bir oyuncudan satın alın.",
+          "materialsBody": "Deri İşleme, seviye rotanızla tedarik hattınızın aynı şey olduğu zanaattır: Kaba Post doğrudan post taşıyan cesetlerden, hepsinden çok da kurtlarla yaban domuzlarından hasat edilir ve her ceset yalnızca tek bir hasatçıya hizmet eder, önce gelen alır. Nadir ya da daha iyi bir hasat atışı ayrıca Bozulmamış Post verir; bu, Bataklık Muhafızı Yeleği'nin istediği imzalı örnektir, bu yüzden bulduğunuz her birini bankaya koyun.\n\nYardımcı kadro küçüktür: örümcek bacağı ve ipeği, insansılardan düşen ev dokuması kumaş, her nadir bataklık bekçisi parçasında tek bir osmiyum cevheri (Alacakaranlık Postu Sargıları'nda altı tane) ve tabakhane tezgahından 16 bakıra bir Tabaklama Maddesi. Osmiyumun kendisi asla tezgahtan satın alınmaz: ya kendiniz kazın, Dikenzirve'de ya da neredeyse her genç bölgenin başlangıç damarlarında (yalnızca Uzak Kıyı demir çıkarır), ya da başka bir oyuncudan satın alın.",
           "ladderHeading": "Fenbridge'de öğrenilir",
-          "ladderBody": "İşin cilvesi şu: tabakhane, Mirefen Bataklığı yolu üzerindeki Fenbridge'de durur ve bu da Deri İşleme'yi bataklıkta öğretilen tek derin zanaat yapar. Sepici Hesk merdiveni kendi teknelerinin başında öğretir: Fenbridge post kademesi beceri 0'da ücretsiz, bataklık avcısı kademesi beceri 25'ten itibaren tarif başına 25 gümüş, bataklık bekçisi kademesi ise beceri 50'den itibaren her biri 1 altın; her kademe, kademeniz ona ulaştıkça açılır.\n\nÜç tarif eğitmeni atlar: alan yaygınları (Tabaklanmış Deri Ceket ve Doğudere Druidinin Postu) başından beri her yerde üretilir, Alacakaranlık Postu Sargıları ise herkesçe bilinir ama beceri 75'te durur ve tabakhaneye bağlıdır. Şunu unutmayın: Teçhizatçı yemininin kendisi Doğudere'de Ottilie'nin yanında edilir; bataklıkta yalnızca öğretim yapılır.",
+          "ladderBody": "İşin cilvesi şu: tabakhane, Mirefen Bataklığı yolu üzerindeki Fenbridge'de durur ve bu da Deri İşleme'yi bataklıkta öğretilen tek derin zanaat yapar. Sepici Hesk merdiveni kendi teknelerinin başında öğretir: Fenbridge post kademesi beceri 0'da ücretsiz, bataklık avcısı kademesi beceri 25'ten itibaren tarif başına 25 gümüş, bataklık bekçisi kademesi ise beceri 50'den itibaren her biri 1 altın; her kademe, kademeniz ona ulaştıkça açılır.\n\nÜç tarif eğitmeni atlar: alan yaygınları (Tabaklanmış Deri Ceket ve Doğudere Druidinin Postu) başından beri her yerde üretilir, Alacakaranlık Postu Sargıları ise beceri 50'de herkesçe bilinir ve tabakhaneye bağlıdır. Şunu unutmayın: Teçhizatçı yemininin kendisi Doğudere'de Ottilie'nin yanında edilir; bataklıkta yalnızca öğretim yapılır.",
           "routeHeading": "Şaheserler ve 125'e giden işleyen bir yol",
-          "routeBody": "Gerçek istatistiği olan her parça, daha iyi kalite kademe tavanınızın içine sığdığı sürece şaheser şansını atar; istatistikli Doğudere Druidinin Postu da buna dahildir. Bataklık Muhafızı Yeleği'ndeki imzalı bir Bozulmamış Post, imzalı bileşen bonusunu kendiliğinden sağlar; tetikleme açısından osmiyum kademe 1 malzeme sayılır. İstatistiksiz post yaygınları hiç tetikleyemez.\n\nDoğal yoldan yükseltin: birinci seviyeden itibaren öldürdüğünüz her kurdu ve yaban domuzunu hasat edin, iki alan yaygınının sizi nerede durursanız durun 25'e taşımasına izin verin, sonra görevler sizi zaten bataklığa çekince teknelerin başında post kademesini eğitin. Bataklık avcısı sizi 50'ye, bataklık bekçisi 75'e taşır; ondan sonrası için Alacakaranlık Postu Sargıları devreye girer: altı osmiyum cevheri, üç Bozulmamış Post, iki Kaba Post ve bir Tabaklama Maddesi isteyen kademe 3 tarif, uyumlu bir Teçhizatçıya 99'a kadar tam, sonrasında yarım kazanım öder; 125 tavanına kalan son elli puan için yaklaşık 75 üretim demektir bu. Ana dalın tavanının altında kademe 3 tarif hiçbir şey öğretmez.\n\nSeyyar tabakhane bu zanaat için diğer hepsinden daha çok önem taşır: 75'te uzmanlaşın, bir heybe dolusu post Fenbridge'e geri yürümek yerine kamp ateşinin başında bitmiş teçhizata dönüşsün. Hesk'in tabakhane iş emri her 30 dakikada bir sekiz Kaba Post satın alır; zaten topladığınız derilerden derli toplu bir kazanç. Yiğitlikler Kitabı da beceri 50'de Sepicinin Zanaatı'nı, tavanda ise Şaheser Deri İşleme'yi işaretler."
+          "routeBody": "Gerçek istatistiği olan her parça, daha iyi kalite kademe tavanınızın içine sığdığı sürece şaheser şansını atar; istatistikli Doğudere Druidinin Postu da buna dahildir. Bataklık Muhafızı Yeleği'ndeki imzalı bir Bozulmamış Post, imzalı bileşen bonusunu kendiliğinden sağlar; tetikleme açısından osmiyum kademe 1 malzeme sayılır. İstatistiksiz post yaygınları hiç tetikleyemez.\n\nDoğal yoldan yükseltin: birinci seviyeden itibaren öldürdüğünüz her kurdu ve yaban domuzunu hasat edin, iki alan yaygınının sizi nerede durursanız durun 25'e taşımasına izin verin, sonra görevler sizi zaten bataklığa çekince teknelerin başında post kademesini eğitin. Bataklık avcısı sizi 50'ye taşır; bataklık bekçisi parçaları ve Alacakaranlık Postu Sargıları ise nadir kademeyi 50'den 75'e taşır. 75'in ötesinde bu kademe 2 tarifler önce yarım, ardından çeyrek kazanıma düşer; 125 tavanına kalan son elli puan için yaklaşık 150 üretim gerekir. Ana dalın tavanının altında ise bu tarifler tamamen sıfıra inmek yerine nadir kaliteli üretim tavanıyla eşleşmeyi sürdürür.\n\nSeyyar tabakhane bu zanaat için diğer hepsinden daha çok önem taşır: 75'te uzmanlaşın, bir heybe dolusu post Fenbridge'e geri yürümek yerine kamp ateşinin başında bitmiş teçhizata dönüşsün. Hesk'in tabakhane iş emri her 30 dakikada bir sekiz Kaba Post satın alır; zaten topladığınız derilerden derli toplu bir kazanç. Yiğitlikler Kitabı da beceri 50'de Sepicinin Zanaatı'nı, tavanda ise Şaheser Deri İşleme'yi işaretler."
         },
         "cooking": {
           "identityHeading": "Grubu besleyen kazan",
@@ -6279,7 +6279,7 @@ export const tr_TR: EnTranslations = {
         "q5": "Komisyonlu bir parçayı nasıl bağdan kurtarırım ve maliyeti nedir?",
         "a5": "Parçayı çantanızda taşıyarak herhangi bir zanaat tezgahına gidin ve ustaya ödeme yapın. Ücret eşyanın kalitesini izler: sıradan dışı parça için 25 gümüş, nadir için 1 altın, destansı için 4 altın; efsanevi destansı oranını öder ve komisyonlu sıradan parça sıradan dışı oranını öder. Gerçek bir tezgah olmalıdır: taşınabilir bir tezgah bu hizmeti asla sunmaz.\n\nÜcret temiz bir sayfa satın alır, çözüm değil: parça komisyon olmaya devam eder, bu nedenle bir sonraki ticarette kimin aldığına yeniden bağlanır. Birden fazla bağlı kopya bir yığını paylaşıyorsa, ödeme başına bir kopya soyulup bağdan kurtarılır.",
         "q6": "Tarifleri nereden öğrenirim ve maliyetleri nedir?",
-        "a6": "Dokuz sıradan alan tarifi ile altı üretilebilir kara aleti tarifi herkes tarafından başından beri bilinir; istasyona bağlı üç zirve tarifi de öyle (Ocakpul Manto, Koruma Dokumalı Başlık ve Alacakaranlık Postu Sargıları), bunlar eğitmen değil yalnızca kendi istasyonlarını ister. Geri kalan her şey, üç merkez kasabaya dağılmış istasyonlarında yerleşik ustalar tarafından öğretilir: çoğu Doğudere'de durur, tabakçı Fenbridge'de tabakhaneyi tutar, simyacı da Highwatch'ta eczaneyi tutar.\n\nEğitmen tarifleri basamaklar halinde ilerler: teçhizat ve tüketim zanaatları için beceri 0, 25 ve 50; tek seferlik ücretleri sırasıyla ücretsiz, 25 gümüş ve 1 altındır; Büyüleme'nin iki tılsım tarifi 25 basamağında oturur ve alet yapımcısı iki üretilebilir oltayı 75 ve 125'te, 4 ve 16 altına öğretir. Bir usta, o zanaattaki kademeniz tarifin kendi kademe bandına ulaştığı anda tarifi öğretir ve öğrenmek için onun istasyonunda duruyor olmanız gerekir: mobil istasyon sayılmaz.",
+        "a6": "Dokuz sıradan alan tarifi ile altı üretilebilir kara aleti tarifi herkes tarafından başından beri bilinir; istasyona bağlı üç tarif de öyle (Ocakpul Manto, Koruma Dokumalı Başlık ve Alacakaranlık Postu Sargıları), bunlar eğitmen değil yalnızca kendi istasyonlarını ister. Geri kalan her şey, üç merkez kasabaya dağılmış istasyonlarında yerleşik ustalar tarafından öğretilir: çoğu Doğudere'de durur, tabakçı Fenbridge'de tabakhaneyi tutar, simyacı da Highwatch'ta eczaneyi tutar.\n\nEğitmen tarifleri basamaklar halinde ilerler: teçhizat ve tüketim zanaatları için beceri 0, 25 ve 50; tek seferlik ücretleri sırasıyla ücretsiz, 25 gümüş ve 1 altındır; Büyüleme'nin iki tılsım tarifi 25 basamağında oturur ve alet yapımcısı iki üretilebilir oltayı 75 ve 125'te, 4 ve 16 altına öğretir. Bir usta, o zanaattaki kademeniz tarifin kendi kademe bandına ulaştığı anda tarifi öğretir ve öğrenmek için onun istasyonunda duruyor olmanız gerekir: mobil istasyon sayılmaz.",
         "q7": "Toplamam neden aniden yavaşladı?",
         "a7": "Toplama yayı 2,5 saniyeden başlar ve iki şekilde kısalır: taşıdığınız ve kullanabildiğiniz, düğümün kendi kademesinin üzerindeki her alet kademesi için 0,4 saniye ve mesleğinizin sayacı 100 bandını geçtiğinde 0,15 saniye; 1,5 saniyelik bir taban vardır. Kademe 1 düğümlerden kademe 3 düğümlere geçin, fazlanız buharlaşır ve aynı kazma yeniden daha yavaş sallanır. Tam olarak gereken kademeyi elde tutmak hız satın almaz; yalnızca düğümü açar.\n\nBeceri kazanımı, üretimde olduğu gibi solar: yetkinliğiniz bir düğümün kademesini aştıkça o düğüm grileşir (kademe 1 düğümler yetkinlik 75'ten itibaren hiçbir şey öğretmez), dolayısıyla yavaş kazanımın cevabı daha yüksek kademeli düğümlerdir. Bunlar çantanızda en az kendi kademelerinde bir alet ister (hiçbir düğüm çıplak elle işlenmez, kademe 1 dahil) ve kademe 1'in üzerindeki bir kara aleti önce kendi kullanım işaretini de ister: kademe 2'den 5'e kadar kendi mesleğinde 40/70/85/100. Balıkçılık kendi azalma çizelgesini izler: yetkinlik 50'nin altında tam kazanım, 100'ün altında yarım, 150'nin altında 0,1'lik bir sızıntı ve 200'ün altında 0,02; döküntü avlar 100'den itibaren hiçbir şey öğretmez ve suyun kendisi de dersi sınırlar (kademe 1 suları 100'de, bataklık 150'de öğretmeyi bırakır), yani duran bir sayaç, suyu aştığınız anlamına da gelebilir.",
         "q8": "Kasabadan uzakta zanaat yapabilir miyim?",
@@ -7530,7 +7530,7 @@ export const tr_TR: EnTranslations = {
       "portalOpens": "{zone} bölgesinde {tier} dereceli bir Yarık açılıyor!",
       "portalSealed": "{zone} bölgesindeki {tier} dereceli Yarık mühürlendi.",
       "portalCollapses": "{zone} bölgesindeki {tier} dereceli Yarık çöküyor.",
-      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+      "lootRecoveryNotice": "Yarığın girişi bir süre daha açık kalacak: grubun düşerse bile, kazandığın için geri yürüyebilirsin.",
       "levelGate": "Bu Yarığa yalnızca {level} seviyesinde veya üzerindeki maceracılar girebilir.",
       "deadEntry": "Ölüyken bir Yarığa giremezsin.",
       "deadEntryCombat": "Grubun hala savaşta. Ölüler, dövüş bittiğinde tekrar girebilir.",
@@ -9822,7 +9822,7 @@ export const tr_TR: EnTranslations = {
       },
       "ignition": {
         "name": "Tutuşma",
-        "description": "Pasif: büyülerinin kritik vuruşları hedefi 6 sn. boyunca verilen hasarın %40 kadarı için yakar ve birikir. (Ateş ustalığı)"
+        "description": "Pasif: büyülerinin kritik vuruşları hedefi 6 sn. boyunca verilen hasarın %30 kadarı için yakar ve birikir. (Ateş ustalığı)"
       },
       "mass_barrier": {
         "name": "Toplu Bariyer",
@@ -9992,7 +9992,7 @@ export const tr_TR: EnTranslations = {
       },
       "sap": {
         "name": "Bayıltma",
-        "description": "Hedefi 8 saniye boyunca etkisiz hale getirir. Gizlenmiş ve dövüş dışı olman gerekir. Herhangi bir hasar etkiyi bozar."
+        "description": "Alaca Örtüsü'nü bozmadan veya dövüş başlatmadan hedefi 8 saniye boyunca etkisiz hale getirir. Gizlenmiş ve dövüş dışı olman gerekir. Herhangi bir hasar etkiyi bozar."
       },
       "crippling_poison": {
         "name": "Kurşuni Zehir",
@@ -10264,7 +10264,7 @@ export const tr_TR: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Küheylan Sureti",
-        "description": "Rahvan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın."
+        "description": "Küheylan suretine bürünerek hareket hızını 30 dakika boyunca %30 artırırsın. Etkin olduğu sürece, hasar almak seni sersemletir ve hareket hızını 4 saniyeliğine yarıya indirir (her isabet sersemlemeyi yeniler)."
       },
       "aimed_shot": {
         "name": "Uzun Çekiş",
@@ -10428,7 +10428,7 @@ export const tr_TR: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Şiddet Büyüsü",
-        "description": "Düşmanı 8 sn boyunca büyüler. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 16 Gölge hasarı vurur."
+        "description": "Düşmanı 8 sn boyunca büyüler. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 17 Gölge hasarı vurur."
       },
       "cruel_pact": {
         "name": "Zalim Ahit",
@@ -10634,7 +10634,7 @@ export const tr_TR: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Savaş Ruhu Ritmi",
-        "description": "Pasif: isabet eden her 3. silah saldırısı 50% Doğa hasarıyla 2 Fırtına Yüreği Yankısı tetikler ve 12 sn boyunca Fırtına Alameti verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anında yapar ve mana maliyetini 50% düşürür. Ata Vuruşu 2 saldırı sayılır. (Savaş Ruhu)"
+        "description": "Pasif: isabet eden her 3. silah saldırısı %25 Doğa hasarıyla 2 Fırtına Yüreği Yankısı tetikler ve 12 sn boyunca Fırtına Alameti verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anında yapar ve mana maliyetini %50 düşürür. Ata Vuruşu 2 saldırı sayılır. (Savaş Ruhu)"
       },
       "stormsurge": {
         "name": "Fırtına Kabarması",
@@ -10846,7 +10846,7 @@ export const tr_TR: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Pyre Colossus Çağırma",
-        "description": "Hedef alana bir Pyre Colossus indirerek çarpma anında 58-72 Ateş hasarı verir. İblisinin yerini almadan 30 sn. savaşır, yakındaki düşmanları 2 sn.'de bir yakar ve her saniye 1 Ruin üretir."
+        "description": "Hedef alana bir Pyre Colossus indirerek çarpma anında 64-79 Ateş hasarı verir. İblisinin yerini almadan 30 sn. savaşır, yakındaki düşmanları 2 sn.'de bir yakar ve her saniye 1 Ruin üretir."
       },
       "summon_doomguard": {
         "name": "Wraithborn Çağırma",
@@ -11194,7 +11194,7 @@ export const tr_TR: EnTranslations = {
       },
       "shadowstep": {
         "name": "Gölge Kayışı",
-        "description": "Gölgelerin içinden hedefine doğru adım atarsın. (Haydut yeteneği)"
+        "description": "Gölgelerin içinden, dost ya da düşman, hedefine Alaca Örtüsü'nü bozmadan adım atarsın. (Haydut yeteneği)"
       },
       "silence": {
         "name": "Sessizlik",
@@ -12851,25 +12851,25 @@ export const tr_TR: EnTranslations = {
         "name": "Kusursuz Pençe"
       },
       "ps_castaway_crate": {
-        "name": "Castaway Crate"
+        "name": "Enkaz Sandığı"
       },
       "ps_ferry_bell": {
-        "name": "Ferry Bell"
+        "name": "Feribot Çanı"
       },
       "dawnhold_posy": {
         "name": "Dawnhold Bahçesi Çiçek Demeti"
       },
       "ps_briny_lure": {
-        "name": "Briny Lure"
+        "name": "Tuzlu Yem"
       },
       "ps_lustrous_pearl": {
-        "name": "Lustrous Pearl"
+        "name": "Parlak İnci"
       },
       "mother_of_pearl": {
-        "name": "Mother of Pearl"
+        "name": "Sedef"
       },
       "ps_passing_stone": {
-        "name": "Passing Stone"
+        "name": "Geçiş Taşı"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
@@ -14209,13 +14209,13 @@ export const tr_TR: EnTranslations = {
         "name": "Balıkçı Bram"
       },
       "training_effigy": {
-        "name": "Training Effigy"
+        "name": "Saman Kukla"
       },
       "shore_scuttler": {
-        "name": "Shore Scuttler"
+        "name": "Kıyı Yürüyücüsü"
       },
       "mister_crabs": {
-        "name": "Mister Crabs"
+        "name": "Bay Yengeç"
       },
       "rift_hellguard": {
         "name": "Cehennem Muhafızı"
@@ -14375,7 +14375,7 @@ export const tr_TR: EnTranslations = {
       "apothecary_lin": {
         "name": "Eczacı Lin",
         "title": "Şifalı Otçu",
-        "greeting": "Doğu ormanlarında adımına dikkat et, dostum."
+        "greeting": "Kuzeydoğu ormanlarında adımına dikkat et, dostum."
       },
       "brother_aldric": {
         "name": "Birader Aldric",
@@ -14803,49 +14803,49 @@ export const tr_TR: EnTranslations = {
         "greeting": "İki kez ölçün ve bir kez dökün, {className}. Eczacının dökülen reaktiflere karşı sabrı yoktur."
       },
       "wayfarer_bryn": {
-        "name": "Wayfarer Bryn",
-        "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+        "name": "Yolcu Bryn",
+        "title": "Liman Rehberi",
+        "greeting": "Doğudere herkesi kabul eder, dostum. Ve kararsız olanlar için her zaman Sınav Kıyısı vardır: Kuzgun Postası kutusunun yanındaki feribot çanı, yılın her günü seni karşıya geçirir, ve adadaki ikizi seni eve geri çalar."
       },
       "instructor_maren": {
-        "name": "Instructor Maren",
-        "title": "Proving Master",
-        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+        "name": "Eğitmen Maren",
+        "title": "Sınav Ustası",
+        "greeting": "Vadi'nin şimdiye dek teşekkür ettiği her kahraman, şu an senin durduğun yerde durdu, {className}, ve hiçbiri bir kılıcın hangi ucundan tutulacağını bilmiyordu. Bu kıyı tam da bunun için var. Sor, alıştır, ve başarısızlığın bedavaya geldiği yerde başarısız ol."
       },
       "quartermaster_finch": {
-        "name": "Quartermaster Finch",
-        "title": "Camp Outfitter",
-        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+        "name": "Levazımcı Finch",
+        "title": "Kamp Teçhizatçısı",
+        "greeting": "Tezgahım tam olarak tek bir şeyi satışta tutar, {playerName}: yol boyunca topladıkların için, dersin gerektirdiğinde, yedek bir kese. Buradaki her şeyin geri kalanı Vadi'ye gidecek hurdadır. Kese sikkeyle alınır, sikke ise emekle kazanılır. Bütün ekonomi bundan ibarettir, ve asla daha karmaşık hale gelmez. Yalnızca büyür."
       },
       "ferryman_odo": {
-        "name": "Ferryman Odo",
-        "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+        "name": "Feribotçu Odo",
+        "title": "Geçişin Bekçisi",
+        "greeting": "Geçişten yeni mi indin, {playerName}? Bekçi Tam, iskelemin hemen güneyindeki kumsalda Parkur'u işletiyor: önce onun şeritlerini koş, bacakların sana teşekkür edecek. Bu kıyıdaki her bekçi, işin bittiğinde seni bir sonrakine devreder, ve ekranının üstündeki kart yolu her zaman bilir. Vadi seni geri çağırdığında, iskelemin yanında duran çanı çal; geçiş seni Doğudere kasabasına indirecek."
       },
       "bursar_wick": {
-        "name": "Bursar Wick",
-        "title": "The Gilded Strongbox",
-        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+        "name": "Veznedar Wick",
+        "title": "Yaldızlı Kasa",
+        "greeting": "Yaldızlı Kasa burada bile bir masa tutar, {playerName}. Bana bıraktığın her şey, her kasabadaki her veznedarın arkasındaki aynı kasada bekler; kurtlardan, sudan ve kendi kötü kararlarından uzak, güvende."
       },
       "warden_tam": {
-        "name": "Warden Tam",
-        "title": "Keeper of the Gauntlet",
-        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+        "name": "Bekçi Tam",
+        "title": "Parkurun Bekçisi",
+        "greeting": "Bu şeritler Parkur'dur, {playerName}, ve Vadi'nin saygı duyduğu her maceracı onları koşmuştur. Fener direkleri bütün gece yanık kalır, bu yüzden şeritler asla kapanmaz."
       },
       "overseer_pell": {
-        "name": "Overseer Pell",
-        "title": "Gauntlet Overseer",
-        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+        "name": "Gözetmen Pell",
+        "title": "Parkur Gözetmeni",
+        "greeting": "Bu şeritlerden geçen her koşuyu kronometreliyorum, {playerName}, ve çok daha kötü ayak işleri gördüm. Arkamdaki yol Talim Alanı'na tırmanıyor: ayak işlerinin kılıç işine dönüştüğü yer orası."
       },
       "drillmaster_rook": {
-        "name": "Drillmaster Rook",
-        "title": "Yard Master",
-        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+        "name": "Talim Ustası Rook",
+        "title": "Meydan Ustası",
+        "greeting": "Önce saman, sonra kabuk, {playerName}. Kukla koluna savurmayı öğretir; kumsaldaki Kıyı Yürüyücüleri ise bu savuruşu aldırış eden bir şeyin üstüne indirmeyi öğretir."
       },
       "tidewarden_nel": {
-        "name": "Tidewarden Nel",
-        "title": "Keeper of the Strand",
-        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
+        "name": "Gelgit Bekçisi Nel",
+        "title": "Kumsalın Bekçisi",
+        "greeting": "Gelgit alır, gelgit öder, {playerName}. İkisinin de hesabını tutarım: yürüyücülerin enkazlardan çaldığını, ve dürüst ellerin bu yoldan yukarı taşıdığını."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -14856,7 +14856,7 @@ export const tr_TR: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Her Ele Bir Zanaat",
-        "text": "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneydoğusundaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
+        "text": "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın kuzeydoğusundaki, Kurt Koşusu'nun ötesindeki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
         "completion": "Gördün mü? Cevher toplandı ve ellerin nasırlandı. Yollarda gezerken madenciliğe, odun kesimine ve ot toplamaya devam et; kasabaya döndüğünde çarşının yanındaki Kasaba Odak Panosuna ve yakınındaki zanaat tezgahına dikkat et. İstersen hepsinde adil bir kazanç var.",
         "objectives": {
           "0": {
@@ -14886,7 +14886,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_boars": {
         "title": "Kıllı Yabandomuzu Postları",
-        "text": "Yaban domuzu postundan en iyi seyahat çantaları yapılır ve kasabanın batısındaki çayırlar bu hayvanlarla kaynıyor. Bana 5 Kıllı Yaban Domuzu Postu getir, emeğinin karşılığını vereyim.",
+        "text": "Yaban domuzu postundan en iyi seyahat çantaları yapılır ve kasabanın kuzeybatısındaki çayırlar bu hayvanlarla kaynıyor. Bana 5 Kıllı Yaban Domuzu Postu getir, emeğinin karşılığını vereyim.",
         "completion": "Ah, güzel kıllı postlar! Bunlar iyi para eder.",
         "objectives": {
           "0": {
@@ -14896,7 +14896,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sableweb Tehdidi",
-        "text": "Doğudaki ormandaki pusucular, lapalarım için ihtiyaç duyduğum bir ipek örüyor; üstelik aşırı çoğaldılar. 6 Sableweb Pusucusunu telef et ve karınlarından 4 ipek bezi kes.",
+        "text": "Kuzeydoğudaki ormandaki pusucular, lapalarım için ihtiyaç duyduğum bir ipek örüyor; üstelik aşırı çoğaldılar. 6 Sableweb Pusucusunu telef et ve karınlarından 4 ipek bezi kes.",
         "completion": "Öff, hâlâ seğiriyor. Mükemmel. Al, bunu hak ettin.",
         "objectives": {
           "0": {
@@ -14939,7 +14939,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_supplies": {
         "title": "Çalınan Erzak",
-        "text": "O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, güneybatıdaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?",
+        "text": "O haydutlar son arabamı bastı ve dört sandık malı alıp kaçtı; aletler, tuz, kaliteli Doğudere keteni. Sandıklar, kuzeybatıdaki tepelerde bulunan kamplarının çevresine yığılmış. Onları benim için geri çalar mısın?",
         "completion": "Sandıklarım! Üzerlerinde neredeyse tek çizik bile yok. Sen bir harikasın.",
         "objectives": {
           "0": {
@@ -15032,7 +15032,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_bandits": {
         "title": "Vadinin Haydutları",
-        "text": "Bir grup kesik boğaz güneybatı tepelerinde kamp kurmuş. Bu hafta üç vagon soydular. Onları sür çıkar, 10 Vadi Haydudu öldür.",
+        "text": "Bir grup kesik boğaz kuzeybatı tepelerinde kamp kurmuş. Bu hafta üç vagon soydular. Onları sür çıkar, 10 Vadi Haydudu öldür.",
         "completion": "Karanlıkta on bıçak eksildi. Bunu al, hak ettin.",
         "objectives": {
           "0": {
@@ -15712,7 +15712,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Yeniden Bağlanan İplikler",
-        "text": "Demek tezgahıma döndün sonunda. Kırgınlık beslemem, {playerName}, ama iplik bırakıp giden eli hatırlar ve onu yeniden almak her seferinde daha uzun ölçülür. Doğu ormanlarını sıkan ağ ağacı örümceklerini imha et; bu emek, ellerin iyi ipliğe değmeden önce onları yerli yerine oturtur.",
+        "text": "Demek tezgahıma döndün sonunda. Kırgınlık beslemem, {playerName}, ama iplik bırakıp giden eli hatırlar ve onu yeniden almak her seferinde daha uzun ölçülür. Kuzeydoğu ormanlarını sıkan ağ ağacı örümceklerini imha et; bu emek, ellerin iyi ipliğe değmeden önce onları yerli yerine oturtur.",
         "completion": "Yeniden sabit. Deri İşleme ve Terzilik yeniden ellerinde ana dal olarak. Başıboş dolaşmadan önce bu sefer iki kez düşün.",
         "objectives": {
           "0": {
@@ -15722,7 +15722,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Yeniden Ocakta",
-        "text": "Bak bak, kim geldi mutfağıma. Kırgınlık yok, {playerName}, bir mutfağın her zaman yeri vardır, ama bilirsin ki her defasında dışarı çıkıp geri dönersen hesap birikir. Git batı çayırındaki yaban domuzlarını azalt, çünkü dürüst ter ilk malzemedir ve bu, ellerini işe alıştırır.",
+        "text": "Bak bak, kim geldi mutfağıma. Kırgınlık yok, {playerName}, bir mutfağın her zaman yeri vardır, ama bilirsin ki her defasında dışarı çıkıp geri dönersen hesap birikir. Git kuzeybatı çayırındaki yaban domuzlarını azalt, çünkü dürüst ter ilk malzemedir ve bu, ellerini işe alıştırır.",
         "completion": "Eski lezzet geri geldi. Simya ve Aşçılık yeniden ana dalın olarak ocağında. Bu sefer kal bir süre.",
         "objectives": {
           "0": {
@@ -16814,105 +16814,105 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_ps_the_gauntlet": {
-        "title": "Run the Gauntlet",
-        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
-        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "title": "Parkuru Koş",
+        "text": "Vadi'nin saygı duyduğu her çift bacak önce bu şeritleri koşmuştur, {playerName}. İlk şeridi batıya, bayrağına kadar yürü, kendini etrafında döndür, güney şeridini ikinci bayrağa kadar yürü, sonra son şeridi kırmızı bayrağa doğru yana kayarak geç. Bayrakları sırayla geç, ve ekranının üstündeki kart, ilerledikçe sana her düğmeyi gösterecek. Gözetmen Pell, her koşuyu uzak uçtan kronometreliyor: kırmızı bayrak arkanda kaldığında, onu karşılamak için tam orada duruyor.",
+        "completion": "O koşuyu kronometreledim, {playerName}, ve daha hızlı ayaklara da not kırdım. Parkur senin oldu. Arkamdaki yol Talim Alanı'na tırmanıyor, Talim Ustası Rook'un ayak işini kılıç işine çevirdiği yere: bir sonraki görevin onda.",
         "objectives": {
           "0": {
-            "label": "Gauntlet flag passed"
+            "label": "Parkur bayrağı geçildi"
           }
         }
       },
       "q_ps_strike_true": {
-        "title": "Strike True",
-        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
-        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "title": "Doğru Vur",
+        "text": "Önce ayak işi, şimdi kol, {playerName}. Talim Alanı, arkamdaki yolun yukarısında duruyor, ve oradaki saman kuklalar vurulmak için yapıldı. Yolu kaybedersen, haritayı açmak için M'ye bas: taşıdığın her görev üzerinde işaretli. Bir kuklaya yürü ve ona sol tıkla: bu onu hedefin yapar, ve adı ekranının üstünde belirir. Ancak o zaman savurmak için 1'e bas, ya da alttaki eylem çubuğundaki ilk simgeye tıkla. Biri devrilene dek vurmaya devam et; geri vurmaz, kuklalar asla vurmaz. Talim Ustası Rook, kumsal yolunun başladığı batı omzundan alanı gözetler: düşeni teslim etmek için ona F'ye bas.",
+        "completion": "Temiz bir devriliş, ve kavrayışın şimdiden daha emin. Bu hissi unutma, {playerName}: hedefle, vur, ve vurmaya devam et. Saman hiçbir zaman aldırmaz. Bir sonraki savurduğun şey aldıracak.",
         "objectives": {
           "0": {
-            "label": "Training Effigy felled"
+            "label": "Devrilen Saman Kukla"
           }
         }
       },
       "q_ps_hone_the_edge": {
-        "title": "Hone the Edge",
-        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
-        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "title": "Bıçağı Bileme",
+        "text": "Bir savuru sadece bir savurudur, {playerName}, ve saman bunu bütün gün kaldırır. Sana hiçbir şey kazandırmaz bu. Ekranının altındaki düğme sırasına bak: o sıra senin zanaatın, ve her biri kolunun tek başına yapamayacağı bir şey yapar. Zaten bir tanesine sahipsin. Kuklalara dön ve onu kullan: hedefini seç, sonra Talim Alanı'nın senin için işaretlediği düğmeye üç kez bas. Samanı sadece yontma; yapmayı bildiğin şeyin gerçekten olmasını sağla. Sonra bana geri dön.",
+        "completion": "Artık çırpınmıyor, dövüşüyorsun. O sıra her seviye aldığında büyür, {playerName}, ve en uzun yaşayanlar onu okuyabilenlerdir. Saman hangi düğmeyi kullandığını umursamaz. Vadi umursayacak.",
         "objectives": {
           "0": {
-            "label": "Ability landed on an effigy"
+            "label": "Kuklaya indirilen yetenek"
           }
         }
       },
       "q_ps_shell_and_claw": {
-        "title": "Shell and Claw",
-        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
-        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "title": "Kabuk ve Pençe",
+        "text": "Saman hiçbir zaman aldırmaz, {playerName}, o yüzden işte aldıran bir şey. Kıyı Yürüyücüleri uzaktaki kumsalda Enkaz Hattı'nı didikliyor: alanımdan batıya giden yolu takip et, seni doğruca onlara götürür. Onlar geri kıstırır, o yüzden can çubuğunu izle ve savurmaya devam et: birini hedefin yapmak için sol tıkla, sonra Talim Alanı'nın sana öğrettiği yeteneği kullan (eğitmen düğmeni adlandırır), ve kabuğu çatlayana dek durma. Üç tanesi yeter. Sonra kuzeydeki yamaçtan yukarı tırman: Gelgit Bekçisi Nel kumsalın hesabını tutar, ve kabuklarını sayar.",
+        "completion": "Üç kabuk kırıldı ve bütün parmakların yerinde: iyi bir ilk dövüş, {playerName}. Yürüyücüler, gelgidin ganimeti getirmesinden daha hızlı enkazları kıstırıyor, o yüzden öldürdüğün her biri birinin cebinde kalan sikkedir.",
         "objectives": {
           "0": {
-            "label": "Shore Scuttler culled"
+            "label": "Öldürülen Kıyı Yürüyücüsü"
           }
         }
       },
       "q_ps_mother_of_pearl": {
-        "title": "Mother of Pearl",
-        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
-        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "title": "Sedef",
+        "text": "Üç kabuk kırıldı, {playerName}, ama Enkaz Hattı bir kral saklıyor, ve o, bu kumsaldaki her sandıktan daha değerli bir ödülün üzerinde oturuyor. Bu Tuzlu Yemi, enkazların ötesindeki, kumsalın en batı ucundaki gelgit havuzuna götür. Suyun kıyısında dur, çantalarını açmak için B'ye bas, ve onu uyandırmak için yeme sol tıkla. Bay Yengeç, küçük kuzenlerinden çok daha sert kıstırır, o yüzden can çubuğunu izle, vurmaya devam et, ve nefeslenmen gerekirse kumun yukarısına doğru geri çekil. Düştüğünde, doğruca kabuğunun yanına yürü ve Parlak İnci'yi ondan yağmalamak için F'ye bas. O inciyi bana geri getir.",
+        "completion": "Parlak İnci, sığlıkların yaşlı kralının ta kendisinden söküldü. Babam çalışma hayatı boyunca her sabah o yengece şapka çıkarırdı; biraz saygı borcumuz var. Sabit dur... işte. Dizildi, oturtuldu, ve senin oldu, {playerName}: Sedef. Çantalarını açmak için B'ye bas ve yüzüğü parmağına geçirmek için sol tıkla, sonra elinde dururken görmek için karakter sayfanı açmak üzere C'ye bas. Küçük bir şey, ama onu takınca her yanın biraz daha iyi.",
         "objectives": {
           "0": {
-            "label": "Mister Crabs slain"
+            "label": "Öldürülen Bay Yengeç"
           },
           "1": {
-            "label": "Lustrous Pearl claimed"
+            "label": "Alınan Parlak İnci"
           }
         }
       },
       "q_ps_the_wreck_line": {
-        "title": "The Wreck Line",
-        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "title": "Enkaz Hattı",
+        "text": "Hamallarım, eski enkazlardan ganimeti toplayıp yamaçtan Dawnrest Kampı'na doğru taşıyor, {playerName}, ve sandıkların yarısı tırmanışı hiç bitiremiyor: yol boyunca bırakılıp unutuluyorlar. Kampa doğru yolumu takip et, başıboş kalanların tam yanından geçeceksin. Birini açmak basit: adı görünene dek bir sandığa yürü, sonra F'ye bas, ya da sandığın kendisine sol tıkla, ve içindekini sana verecek. Altısı hattı temizler, ve unutma, F, karşına çıkacak her sandık, kaynak ve kapı için aynı tuştur. Levazımcı Finch kamp tezgahını tutar ve her parça ganimeti satın alır: toplananı ona ver.",
+        "completion": "Halat, katran, ve denizin nasılsa esirgediği yarım teker peynir: hepsini alırım, {playerName}. Bulduğunu taşıyan bir sırt, bu kamp için herhangi bir kılıçtan daha değerlidir, ve seninki bütün hattı tek tırmanışta temizledi.",
         "objectives": {
           "0": {
-            "label": "Castaway Crate opened"
+            "label": "Açılan Enkaz Sandığı"
           }
         }
       },
       "q_ps_pouch_and_purse": {
-        "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
-        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "title": "Kese ve Kasa",
+        "text": "Vadi'den önce bir ders daha, {playerName}, ve bu, maceracıları hayatta tutan ders: ne taşıdığın. Sırt çantan on altı yuva tutar, ve yanında dört boş çanta ilmiği bekler; taktığın her çanta kendi alanını havuza katar. O yüzden: tezgahımı açmak için bana tekrar F'ye bas, satın almak için mallarımdaki Keten Kese'ye sol tıkla, sonra çantalarını açmak için B'ye bas ve onu boş bir ilmiğe takmak için oradaki keseye sol tıkla. Eğitmen Maren birkaç adım doğudaki toplanma ateşinin yanında talim yaptırıyor: kemerindeki keseyi ona göster.",
+        "completion": "Güzel bir kese. Henüz takmadıysan tak: çantalarını açmak için B'ye bas, sonra onu boş bir çanta ilmiğine oturtmak için keseye sol tıkla, ve altı yuva daha bela ile doldurman için senin oldu. Şimdi hiçbir kesenin taşıyamayacağı dersin yarısı, {playerName}: taşıyamadığını, Yaldızlı Kasa saklar. Veznedar Wick, kasa masasını batı yolunun yukarısında tutar, ve her kasabadaki her veznedarın paylaştığı aynı kasayı açar; kesen büyüdükçe daha fazla kasa alanı satın alınabilir. Değerli eşyalarını kasada tut, çantalarını da ferah. Dolu bir sırt çantası, hiçbir kurdun bitiremediği kadar çok macerayı bitirmiştir.",
         "objectives": {
           "0": {
-            "label": "Linen Pouch bought"
+            "label": "Satın Alınan Keten Kese"
           }
         }
       },
       "q_ps_the_signpost": {
-        "title": "Word on the Wind",
-        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
-        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "title": "Rüzgârın Haberi",
+        "text": "Öğrenilecek bir alışkanlık kaldı, {playerName}, ve bıçak gerektirmiyor: tabelaları oku. Lonca tabelası, ateşimin birkaç adım güneybatısındaki kamp kapısında duruyor, ve loncalar ile gezici ekipler çağrılarını üzerine asıyor. Yüzüne yürü ve asılanı okumak için F'ye bas, ya da ona sol tıkla, sonra geri gel ve rüzgârın ne getirdiğini bana anlat. Böyle bir tabela, gireceğin her kasabada duruyor olacak.",
+        "completion": "Artık Vadi'de haberin nasıl yayıldığını biliyorsun, {playerName}: haberciler ile değil, tabelalarla. Geçtiğin her kasabada onları kontrol et; her maceranın yarısı bir tabelanın üzerindeki üç satır mürekkeple başlar.",
         "objectives": {
           "0": {
-            "label": "Guild signpost read"
+            "label": "Okunan Lonca Tabelası"
           }
         }
       },
       "q_ps_the_long_walk": {
-        "title": "The Long Walk",
-        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
-        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "title": "Uzun Yürüyüş",
+        "text": "Bir ders kaldı, {playerName}, ve bu, sana anlatamayacağım ders: bunu bir kez yaşamış olman gerekiyor. Orada öleceksin. Herkes ölür, ve bu hiçbir şeyin sonu değildir. Bu Geçiş Taşı'nı al. Çantalarını açmak için B'ye bas ve ona sol tıkla, tam durduğun yere seni yatıracak. Sonra ekranındaki talimatları izle: ruhunu serbest bırak, kendi bedenine geri yürü, ve içine gir. Beden seni bekler, yürüyüş bedavadır, ve onu yaparak hiçbir şey kaybetmezsin.",
+        "completion": "Ve geri geldin, hiçbir zararı olmadan. O hissi unutma, {playerName}, çünkü bir dahaki sefere işin içinde dişler olacak ve açıklayacak kimse yanında durmayacak. Beden seni bekler, yürüyüş bedavadır, ve ölümün senden gerçekten aldığı tek şey, geri dönmek için geçen zamandır.",
         "objectives": {
           "0": {
-            "label": "Walked back from the dead"
+            "label": "Ölümden geri dönüldü"
           }
         }
       },
       "q_ps_set_sail": {
-        "title": "Set Sail",
-        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
-        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "title": "Yelken Aç",
+        "text": "Bu kıyıda henüz koşmadığın, yenmediğin, açmadığın ya da satın almadığın hiçbir şey kalmadı, {playerName}. Hazırsın, ve Doğudere'de gerçek iş seni bekliyor. Kıyı yolundan aşağı iskeleye yürü, Feribotçu Odo'ya F'ye bas, ve ona geçişini hak ettiğini söylediğimi ilet. Kime ne borçlu olduğunu unuttuğunda istediğin an L'ye bas: o senin görev günlüğün.",
+        "completion": "Maren mi öyle dedi? Bir zamanlar bana bir hafta boyunca bağlama düğümü çalıştıran bir kadından yüksek övgü bu. Hazır olduğunda iskelemin yanında duran çanı çal, {playerName}, ve geçiş seni Doğudere kasabasının tam ortasına bırakacak. Kurtlara dikkat et.",
         "objectives": {
           "0": {
-            "label": "Report to Ferryman Odo"
+            "label": "Feribotçu Odo'ya bildirildi"
           }
         }
       },
@@ -17115,7 +17115,7 @@ export const tr_TR: EnTranslations = {
             "label": "Uzak Kıyı Geçidi"
           },
           "12": {
-            "label": "Eastbrook Docks"
+            "label": "Doğudere İskelesi"
           }
         }
       },
@@ -17480,23 +17480,23 @@ export const tr_TR: EnTranslations = {
         }
       },
       "proving_shore": {
-        "name": "The Proving Shore",
-        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "name": "Sınav Kıyısı",
+        "welcome": "Sınav Kıyısı senden zamandan başka hiçbir şey istemez. Kampı öğren, kuklalara vur, Enkaz Hattı'nı yürü, ve hazır olduğunda Feribotçu Odo seni Vadi'ye geçirecek.",
         "pois": {
           "0": {
-            "label": "Dawnrest Camp"
+            "label": "Dawnrest Kampı"
           },
           "1": {
-            "label": "The Old Pier"
+            "label": "Eski İskele"
           },
           "2": {
-            "label": "The Practice Yard"
+            "label": "Talim Alanı"
           },
           "3": {
-            "label": "The Wreck Line"
+            "label": "Enkaz Hattı"
           },
           "4": {
-            "label": "The Gauntlet"
+            "label": "Parkur"
           }
         }
       }
@@ -17742,19 +17742,19 @@ export const tr_TR: EnTranslations = {
         "body": "Ana dallarınızdan biri ustalığa ulaştı, en TEPE, kaboom, tüm merdiven, bitti. Övgü dağıtmam, fitil dağıtırım, ama işte alın ikisini de: dahisiniz ve hafifçe dehşet vericisiniz. Gidin dağları gerginleştirin."
       },
       "woc_market_delivery": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange purchase",
-        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "sender": "Borsa Komisyoncusu",
+        "subject": "Borsa alışverişiniz",
+        "body": "Satış tamamlandı ve mallar artık sizin. Ekli paket, ilana çıktığı andan ödemeniz onaylanana dek emanette tutulan, tam olarak ödediğiniz eşyayı taşıyor.\n\nSatışın kaydı Borsa defterinde tutulur.\n\n- Borsa Komisyoncusu"
       },
       "woc_market_return": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing has ended",
-        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+        "sender": "Borsa Komisyoncusu",
+        "subject": "Borsa ilanınız sona erdi",
+        "body": "İlanınız tamamlanmış bir satış olmadan sona erdi: açık artırma bir alıcı bulamadı, rezerv fiyata ulaşılamadı, ilan geri çekildi ya da kazanan teklif sahibi ödemeyi tamamlayamadı. Mallarınız, emanete alındıkları haliyle, bu mektupla birlikte size zarar görmeden geri döner.\n\n- Borsa Komisyoncusu"
       },
       "woc_market_sold": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+        "sender": "Borsa Komisyoncusu",
+        "subject": "Borsa ilanınız satıldı",
+        "body": "İlanınız satıldı ve alıcı ödemenin tamamını gerçekleştirdi. Satışın kaydı Borsa defterinde tutulur ve Borsa etkinliğiniz, ödenen tutarı ve dökümünü gösterir.\n\n- Borsa Komisyoncusu"
       }
     },
     "itemSets": {

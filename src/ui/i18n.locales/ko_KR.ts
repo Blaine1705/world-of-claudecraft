@@ -13,6 +13,19 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': '페이지 {page}',
+  'hudChrome.bootcamp.promptHold': '누르고 있기',
+  'hudChrome.bootcamp.promptJump': '점프',
+  'hudChrome.bootcamp.promptPickUp': '줍기',
+  'hudChrome.bootcamp.promptRead': '읽기',
+  'hudChrome.bootcamp.promptRing': '울리기',
+  'hudChrome.bootcamp.promptTalk': '대화',
+  'hudChrome.mobile.barEditor': '단축바 편집',
+  'hudChrome.mobile.menuLabel': '메뉴',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': '아래',
+  'hudChrome.mobile.radialLeft': '왼쪽',
+  'hudChrome.mobile.radialUp': '위',
   'hudChrome.bootcamp.promptAttack': '공격',
   'hudChrome.bootcamp.keycapThen': '다음',
   'hudChrome.bootcamp.promptSummon': '소환',
@@ -3113,7 +3126,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 연계 점수 2점을 얻습니다.',
   'entities.abilities.sap.name': '관자놀이 가격',
   'entities.abilities.sap.description':
-    '대상을 8초 동안 무력화합니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다.',
+    '대상을 8초 동안 무력화하며, 황혼장막을 해제하거나 전투를 시작하지 않습니다. 은신 상태이며 전투 중이 아니어야 합니다. 피해를 받으면 효과가 해제됩니다.',
   'entities.abilities.crippling_poison.name': '둔중한 독',
   'entities.abilities.crippling_poison.description':
     '둔중한 독으로 대상을 가격해 {damage}의 자연 피해를 입히고 12초 동안 이동 속도를 50%만큼 감소시킵니다.',
@@ -3187,7 +3200,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': '담비의 상',
   'entities.abilities.aspect_of_the_monkey.description': '담비의 모습을 취해 회피 확률을 30분 동안 8% 높입니다.',
   'entities.abilities.aspect_of_the_cheetah.name': '준마의 상',
-  'entities.abilities.aspect_of_the_cheetah.description': '준마의 모습을 취해 이동 속도를 30분 동안 30% 높입니다.',
+  'entities.abilities.aspect_of_the_cheetah.description': '준마의 모습을 취해 이동 속도를 30분 동안 30% 높입니다. 적용 중에는 피해를 받으면 둔화되어 4초 동안 이동 속도가 50% 감소합니다(적중할 때마다 둔화가 갱신됩니다).',
   'entities.abilities.aimed_shot.name': '긴 시위',
   'entities.abilities.aimed_shot.description': '대상을 쏘아 {damage}의 물리 피해를 입힙니다. 피해량은 원거리 전투력에 따라 증가합니다.',
   'entities.abilities.rapid_fire.name': '열광의 연사',
@@ -3376,7 +3389,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     '흑마법사의 명령을 따르는 전쟁마귀를 소환합니다. 전쟁마귀는 전장에 뛰어들어 굳건히 버티는 튼튼한 근접 악마입니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
   'entities.abilities.summon_infernal.name': '화염거상 소환',
-  'entities.abilities.summon_infernal.description': '대상 지역에 화염거상을 떨어뜨려 충돌 시 58-72의 화염 피해를 입힙니다. 당신의 악마를 대신하지 않은 채 30초 동안 싸우며, 2초마다 가까운 적을 태우고 1초마다 파괴력을 1 만듭니다.',
+  'entities.abilities.summon_infernal.description': '대상 지역에 화염거상을 떨어뜨려 충돌 시 64-79의 화염 피해를 입힙니다. 당신의 악마를 대신하지 않은 채 30초 동안 싸우며, 2초마다 가까운 적을 태우고 1초마다 파괴력을 1 만듭니다.',
   'entities.abilities.summon_doomguard.name': '망령태생 소환',
   'entities.abilities.summon_doomguard.description':
     '망령태생을 당신의 의지에 결속합니다. 망령태생은 멀리서 강력한 암흑 피해를 퍼붓는 정예 악마입니다. 긴 재사용 대기시간이 그 파괴적인 힘을 제한합니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
@@ -3857,7 +3870,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '갓 구운 빵, 맑은 물, 정직한 가격입니다. 무엇이 필요하십니까?',
   'entities.npcs.apothecary_lin.name': '약제사 린',
   'entities.npcs.apothecary_lin.title': '약초상',
-  'entities.npcs.apothecary_lin.greeting': '동쪽 숲에서 발 디딜 곳을 조심하십시오, 친구여.',
+  'entities.npcs.apothecary_lin.greeting': '북동쪽 숲에서 발 디딜 곳을 조심하십시오, 친구여.',
   'entities.npcs.brother_aldric.name': '알드릭 수사',
   'entities.npcs.brother_aldric.title': '계곡의 사제',
   'entities.npcs.brother_aldric.greeting':
@@ -3955,7 +3968,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 호수는 달빛을 마시고, {className}, 익사한 자들을 되돌려 보낸다네. 나는 서른 밤 동안 저 관문을 지켜보았지 — 그리고 오늘 밤, 마침내 그것이 열렸네.',
   'entities.quests.q_prof_intro.title': '검 말고도 할 수 있는 일',
   'entities.quests.q_prof_intro.text':
-    '이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 남동쪽 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.',
+    '이스트브룩 사람이라면 누구나 검술 말고도 생업 하나는 익히지, {playerName}. 마을 북동쪽, 늑대길을 지난 구리 광산 주변 바위에는 광맥이 있다네. 곡괭이를 들고 직접 광맥 5곳을 캐 오게. 속이려 해도 나는 차이를 안다네.',
   'entities.quests.q_prof_intro.completion':
     '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광맥 채굴',
@@ -3977,7 +3990,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_boars.objectives.0.label': '억센 멧돼지 가죽',
   'entities.quests.q_spiders.title': '흑거미줄의 위협',
   'entities.quests.q_spiders.text':
-    '동쪽 숲의 잠복자들은 제 찜질약에 필요한 비단을 자아냅니다. 게다가 그 수가 너무 많이 불어났습니다. 흑거미줄 잠복자 6마리를 솎아내고 그 배에서 비단샘 4개를 잘라 오십시오.',
+    '북동쪽 숲의 잠복자들은 제 찜질약에 필요한 비단을 자아냅니다. 게다가 그 수가 너무 많이 불어났습니다. 흑거미줄 잠복자 6마리를 솎아내고 그 배에서 비단샘 4개를 잘라 오십시오.',
   'entities.quests.q_spiders.completion': '윽, 아직 꿈틀거립니다. 완벽합니다. 보상을 받으십시오.',
   'entities.quests.q_spiders.objectives.0.label': '흑거미줄 잠복자 처치',
   'entities.quests.q_spiders.objectives.1.label': '흑거미줄 비단샘',
@@ -3998,7 +4011,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '불안한 뼈무더기 안식시킴',
   'entities.quests.q_supplies.title': '도난당한 보급품',
   'entities.quests.q_supplies.text':
-    '도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 남서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.',
+    '도적들이 내 마지막 마차를 털었습니다. 도구, 소금, 이스트브룩 아마가 들었습니다. 북서쪽 야영지에서 보급 상자 4개를 되찾아 주십시오.',
   'entities.quests.q_supplies.completion': '내 상자들입니다! 흠집도 거의 없군요. 대단합니다.',
   'entities.quests.q_supplies.objectives.0.label': '도난당한 보급 상자',
   'entities.quests.q_whispers.title': '아래의 속삭임',
@@ -4046,7 +4059,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': '모르덴의 마법서',
   'entities.quests.q_bandits.title': '계곡의 도적들',
   'entities.quests.q_bandits.text':
-    '남서쪽 언덕에 칼잡이들이 야영하고 있습니다. 이번 주에 마차 셋을 털었습니다. 계곡 도적 10명을 처치하십시오.',
+    '북서쪽 언덕에 칼잡이들이 야영하고 있습니다. 이번 주에 마차 셋을 털었습니다. 계곡 도적 10명을 처치하십시오.',
   'entities.quests.q_bandits.completion':
     '어둠 속 칼이 열 자루 줄었습니다. 받으십시오, 벌어낸 보상입니다.',
   'entities.quests.q_bandits.objectives.0.label': '계곡 도적 처치',
@@ -10115,7 +10128,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '시전 시간이 있는 다음 주문을 즉시 시전합니다. 60초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.psychic_scream.description': '8미터 안의 적을 최대 4초 동안 공포에 빠뜨립니다. 피해를 입으면 효과가 풀릴 수 있습니다.',
-  'entities.abilities.shadowstep.description': '그림자를 가로질러 대상에게 다가갑니다. (도적 특성)',
+  'entities.abilities.shadowstep.description': '그림자를 가로질러 아군이든 적이든 대상에게 다가가며, 황혼장막을 해제하지 않습니다. (도적 특성)',
   'entities.abilities.tranquility.description':
     '4초 동안 회복 에너지를 집중해 30미터 안의 아군을 매초 42에서 52만큼 치유합니다. (드루이드 특성)',
   'hudChrome.auraEffect.combustionCrit': '화염 주문이 항상 치명타로 적중합니다',
@@ -10218,7 +10231,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다음 시전 시간이 있는 주문 2개를 이동 중에 시전할 수 있습니다. 15초 동안 지속됩니다. (마법사 특성)',
   'entities.abilities.ignition.name': '점화',
   'entities.abilities.ignition.description':
-    '지속 효과: 주문이 치명타로 적중하면 대상을 불태워 6초에 걸쳐 입힌 피해의 40%만큼 피해를 줍니다. 효과는 중첩됩니다. (화염 특화)',
+    '지속 효과: 주문이 치명타로 적중하면 대상을 불태워 6초에 걸쳐 입힌 피해의 30%만큼 피해를 줍니다. 효과는 중첩됩니다. (화염 특화)',
   'entities.abilities.mass_barrier.name': '대규모 방벽',
   'entities.abilities.mass_barrier.description':
     '자신과 30미터 내에 있는 가까운 아군 최대 4명에게 각각 130의 피해를 흡수하는 보호막을 60초 동안 부여합니다. (마법사 특성)',
@@ -11134,13 +11147,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '숲늑대 처치',
   'entities.quests.q_prof_amends_outfitter.title': '다시 이은 실',
   'entities.quests.q_prof_amends_outfitter.text':
-    '결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.',
+    '결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 북동쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.',
   'entities.quests.q_prof_amends_outfitter.completion':
     '다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '흑거미줄 잠복자 처치',
   'entities.quests.q_prof_amends_apothecary.title': '다시 화덕 위로',
   'entities.quests.q_prof_amends_apothecary.text':
-    '이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.',
+    '이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 북서쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.',
   'entities.quests.q_prof_amends_apothecary.completion':
     '옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '야생 멧돼지 사냥',
@@ -11566,7 +11579,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 제작에는 품질이 한 단계 높게 완성될 작은 확률(3%부터 상한 15%)이 있으며, 공격대 하한을 넘는 일은 없다.',
   'guide.profPages.faq.q6': "'제작자:'는 무슨 뜻인가요?",
   'guide.profPages.faq.a6':
-    '아홉 가지 공용 야외 제작법과 도구 제작법은 처음부터 누구나 알고 있다. 작업장에 묶인 세 가지 상급 제작법(가마비늘 망토, 워드위브 두건, 더스크하이드 손목보호대)도 마찬가지여서 스승은 필요 없지만 그 작업장은 있어야 한다. 나머지는 모두 세 거점 마을의 각 작업장에 있는 스승이 가르친다. 대부분은 이스트브룩에 있고, 무두장이는 펜브릿지의 무두질 작업장에, 연금술사는 하이워치의 약방에 있다.\n\n스승의 제작법은 숙련 0, 25, 50 단계로 나뉘며 일회성 비용으로 각각 무료, 은 25, 금 1에 배운다. 스승은 그 제작 기술에서 당신의 등급이 제작법 자체의 등급에 이르면 가르쳐 주고, 배우려면 스승의 작업장에 서 있어야 한다. 이동식 작업장은 인정되지 않는다.',
+    '아홉 가지 공용 야외 제작법과 도구 제작법은 처음부터 누구나 알고 있다. 작업장에 묶인 세 가지 제작법(가마비늘 망토, 워드위브 두건, 더스크하이드 손목보호대)도 마찬가지여서 스승은 필요 없지만 그 작업장은 있어야 한다. 나머지는 모두 세 거점 마을의 각 작업장에 있는 스승이 가르친다. 대부분은 이스트브룩에 있고, 무두장이는 펜브릿지의 무두질 작업장에, 연금술사는 하이워치의 약방에 있다.\n\n스승의 제작법은 숙련 0, 25, 50 단계로 나뉘며 일회성 비용으로 각각 무료, 은 25, 금 1에 배운다. 마법부여의 부적 제조법 두 가지는 25 단계에 있고, 공작소 장인은 기술 75와 125에 제작 낚싯대 두 종을 각각 금 4와 16에 가르친다. 스승은 그 제작 기술에서 당신의 등급이 제작법 자체의 등급에 이르면 가르쳐 주고, 배우려면 스승의 작업장에 서 있어야 한다. 이동식 작업장은 인정되지 않는다.',
   'guide.profPages.faq.q7': '제작자의 서약이 무엇인가요?',
   'guide.profPages.faq.a7':
     '주문 제작품은 거래로 받는 이에게 귀속되고, 어느 작업대 장인이든 단계별 수수료로 풀어 줄 수 있다.',
@@ -11584,7 +11597,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '업적의 서가 모든 걸음에 함께한다. 첫 조율은 Craftsworn을, 첫 걸작은 Masterwright를 주며 둘 다 칭호로 착용할 수 있다. 여덟 제작 기술은 각각 기술 50에 이정표 업적을, 상한 125에 Grandmaster 칭호를 두고, 낚시는 숙련 100에 Old Salt를, 200에 Master Angler 칭호를 준다.\n\n첫 채집과 첫 제작, 야외의 희귀한 발견, 분해 회수의 조용한 페이지도 있다. 전부 장식일 뿐이다. 칭호와 명성만 있을 뿐, 업적은 결코 힘을 주지 않는다.',
   'guide.professions.startHeading': '어디서 시작할까',
   'guide.professions.startBody':
-    'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 남동쪽 Copper Dig 주변의 광맥을 알려 준다. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
+    'Eastbrook에 막 도착했다면 Foreman Odell을 찾아 A Trade for Every Hand를 받자. 마을 북동쪽 Copper Dig 주변의 광맥을 알려 준다. 다만 채굴장 자체는 조심하자. 그곳에 진을 친 깊은바위 채굴꾼들은 갓 도착한 캐릭터보다 레벨이 몇 단계 높으니, 우선 바깥쪽 광맥부터 캐고 야영지 중심부는 레벨이 좀 오른 뒤로 미루자. 그 뒤로는 여행 중 지나치는 광맥과 나무, 약초를 전부 캐면 된다. 마을에서는 T 키로 제작 창을 열어 누구나 아는 기본 제조법을 만들고, 대장간과 주방, 베틀, 공작소의 장인들을 찾아 무엇을 가르치는지 보고, 작업 주문으로 꾸준한 동전을 벌자. 길드의 편지가 도착할 즈음이면 어느 짝이 내 집인지 이미 알게 된다.',
   'guide.profPages.yieldsHeading': '채집의 수확물',
   'guide.profPages.yieldsBody':
     '채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.',
@@ -11650,16 +11663,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '로브 속 Pristine Silk 하나로 서명 재료 보너스가 채워지고, goldleaf와 sunpetal은 각각 재료 1, 2단계로 세니 희귀 단이 발동 확률의 정점이다. 가방처럼 능력치 없는 물건은 절대 발동하지 않는다. 경로는 homespun으로 25, 도금직조로 50, 희귀 단으로 75. 75부터는 Wardweave Cowl(3단 제조법, 99까지 전속, 이후 절반)이 이어받아 마지막 50점이 약 75회, 한 번에 Pristine Silk 2개, 거미줄 4가닥, sunpetal과 goldleaf 약초 각 2, 실 2다. 가방은 말 그대로 모두에게 팔리고, Ottilie의 주문은 30분마다 거미줄 6가닥을 사 준다. 기술 50에 A Fine Seam, 125에 Grandmaster Tailoring이 기다린다.',
   'guide.profPages.craftProse.leatherworking.identityHeading': '날랜 자들의 가죽',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "사다리는 소박한 Fenbridge 생가죽 다리 보호구, 장화, 허리띠에서 고급 marshstalker 셋을 거쳐 장인이 잘라 낼 수 있는 최고의 가죽인 희귀 mirewarden 세트로 오른다. 시전자용 두 벌, 야외 일반품 Eastbrook Druid's Hide와 기술 75의 Duskhide Wraps가 진용을 채운다. 요리와 재봉 사이에 있으며, 살아 있는 짝은 Eastbrook의 Weaver Ottilie 앞에서 맹세하는 의복 장인이고, 요리와 이루는 Trapper는 아직 서약 퀘스트가 없다.",
+    "사다리는 소박한 Fenbridge 생가죽 다리 보호구, 장화, 허리띠에서 고급 marshstalker 셋을 거쳐 장인이 잘라 낼 수 있는 최고의 가죽인 희귀 mirewarden 세트로 오른다. 시전자용 두 벌, 야외 일반품 Eastbrook Druid's Hide와 기술 50의 Duskhide Wraps가 진용을 채운다. 요리와 재봉 사이에 있으며, 살아 있는 짝은 Eastbrook의 Weaver Ottilie 앞에서 맹세하는 의복 장인이고, 요리와 이루는 Trapper는 아직 서약 퀘스트가 없다.",
   'guide.profPages.craftProse.leatherworking.materialsHeading': '사냥이 곧 수확',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    '가죽세공에서는 레벨링 경로와 보급선이 같은 길이다. 거친 가죽은 가죽 있는 사체, 특히 늑대와 멧돼지에서 직접 벗기고, 사체 하나는 선착순 한 사람만 쓸 수 있다. 희귀 이상 판정은 Pristine Hide도 주는데 Mirewarden Jerkin이 바로 그 서명 표본을 원하니 보이는 대로 모아 두자. 조연은 적다. 거미 다리와 거미줄, 인간형의 홈스펀 천, mirewarden 희귀 각 벌에 오스뮴 하나(Duskhide Wraps 정점품은 6개), 그리고 무두질 작업장 계산대의 Tanning Agent(16동). 캐기 싫다면 Tanner Hesk가 오스뮴도 판다.',
+    '가죽세공에서는 레벨링 경로와 보급선이 같은 길이다. 거친 가죽은 가죽 있는 사체, 특히 늑대와 멧돼지에서 직접 벗기고, 사체 하나는 선착순 한 사람만 쓸 수 있다. 희귀 이상 판정은 Pristine Hide도 주는데 Mirewarden Jerkin이 바로 그 서명 표본을 원하니 보이는 대로 모아 두자. 조연은 적다. 거미 다리와 거미줄, 인간형의 홈스펀 천, mirewarden 희귀 각 벌에 오스뮴 하나(Duskhide Wraps는 6개), 그리고 무두질 작업장 계산대의 Tanning Agent(16동). 오스뮴 자체는 결코 상점에서 팔지 않는다. Thornpeak이나 갓 시작하는 지역 대부분의 초보자용 광맥에서 직접 캐거나(Farshore만은 철을 캔다), 다른 플레이어에게서 사야 한다.',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Fenbridge에서 수련하기',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "한 가지 다른 점. 무두질 작업장은 Mirefen Marsh 길목의 Fenbridge에 있어, Eastbrook 밖에서 수련하는 유일한 본격 기술이다. Tanner Hesk가 무두질 통 곁에서 가르친다. 생가죽 단은 기술 0에 무료, marshstalker 단은 기술 25부터 각 25은, mirewarden 단은 기술 50부터 각 1금. 두 제조법은 스승을 건너뛴다. 야외 일반품(Tanned Leather Jerkin과 Druid's Hide)은 처음부터 어디서든, Duskhide Wraps는 모두가 알지만 기술 75에 작업장 전용이다. 의복 장인의 서약 자체는 Eastbrook의 Ottilie 앞에서 한다. 늪에서 하는 것은 수련뿐이다.",
+    "한 가지 다른 점. 무두질 작업장은 Mirefen Marsh 길목의 Fenbridge에 있어, Eastbrook 밖에서 수련하는 유일한 본격 기술이다. Tanner Hesk가 무두질 통 곁에서 가르친다. 생가죽 단은 기술 0에 무료, marshstalker 단은 기술 25부터 각 25은, mirewarden 단은 기술 50부터 각 1금. 두 제조법은 스승을 건너뛴다. 야외 일반품(Tanned Leather Jerkin과 Druid's Hide)은 처음부터 어디서든, Duskhide Wraps는 기술 50에 모두가 알며 작업장 전용이다. 의복 장인의 서약 자체는 Eastbrook의 Ottilie 앞에서 한다. 늪에서 하는 것은 수련뿐이다.",
   'guide.profPages.craftProse.leatherworking.routeHeading': '걸작, 그리고 125까지의 길',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden으로 75, 그 뒤는 Duskhide Wraps(3단 제조법, 오스뮴 6개, Pristine Hide 3장, 거친 가죽 2장, Tanning Agent 1)가 99까지 전속, 이후 절반으로 마지막 50점을 약 75회에 데려간다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다.",
+    "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden 부위와 Duskhide Wraps가 함께 희귀 단계를 75까지 데려간다. 75를 넘으면 이 2단 제조법들은 절반, 다시 4분의 1로 숙련도가 줄어 마지막 50점을 125 상한까지 약 150회에 데려간다. 주 전공이 아니어도 완전히 막히지 않고 희귀 단계 제작 천장과 같은 수준을 유지한다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다.",
   'guide.profPages.craftProse.cooking.identityHeading': '일행을 먹이는 솥',
   'guide.profPages.craftProse.cooking.identityBody':
     "요리를 먹으면 18초의 휴식 동안 회복한다. 전투 사이에는 가장 싼 치유다. 사다리는 회복 90의 Pan-Seared River Perch에서 현존 최대의 앉은 회복인 Marlow's Grand Roast(980)까지 이어진다. 연금술과 가죽세공 사이에 있으며, 살아 있는 짝은 약제사(연금술과 요리)로 Eastbrook 주방의 Cook Marlow 앞에서 멧돼지 네 마리를 사냥해 맹세한다. 가죽세공과 이루는 Trapper는 아직 서약 퀘스트가 없다.",
@@ -12211,7 +12224,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '20미터 안의 적에게 성스러운 망치를 즉시 던져 {damage}의 피해를 주고, 마나를 70 회복하며, 준 피해의 50%만큼 자신의 생명력을 회복하고, 피해를 주면 헌신을 1 생성합니다. 태양의 응보가 활성화되면 은총의 망치는 재사용 대기시간을 무시하고 준 피해의 100%만큼 생명력을 회복합니다.',
   'entities.abilities.hammer_of_grace.name': '은총의 망치',
   'entities.abilities.hex_of_violence.description':
-    '적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 22의 암흑 피해를 되돌려 받습니다.',
+    '적을 8초 동안 저주합니다. 대상의 다음 3회 공격 행동은 각각 단죄를 7 생성하고 17의 암흑 피해를 되돌려 받습니다.',
   'entities.abilities.hex_of_violence.name': '폭력의 주술',
   'entities.abilities.hour_of_judgment.description':
     '15초 동안 주 사안에 심판을 내려 단죄 40과 운명의 실 3개를 얻고 빙의를 활성화하며, 주 사안을 통해 생성되는 단죄를 두 배로 만들고 선고의 피해를 20% 증가시킵니다. 첫 번째 선고는 단죄 50을 돌려받습니다.',
@@ -12444,7 +12457,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '높은 위협 수준을 생성하는 공격을 가하고 헌신을 1 생성합니다. 적중하면 20% 확률로 8초 동안 태양의 응보를 얻고, 방패 막기에 성공할 때마다 25% 확률로 얻습니다. 태양의 응보는 다음 태양 수호 원반, 은총의 망치, 치유의 빛 중 하나를 강화합니다. 승천 중에는 작은 피해 흡수 보호막도 얻습니다.',
   'entities.abilities.vowkeeper_strike.name': '맹세수호자의 일격',
   'entities.abilities.warspirit_cadence.description':
-    '지속 효과: 무기 공격이 3번 적중할 때마다 50%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 비전 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)',
+    '지속 효과: 쌍수 무기 공격에는 추가 빗나갈 확률이 적용되지 않습니다. 무기 공격이 3번 적중할 때마다 25%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 전격 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)',
   'entities.abilities.warspirit_cadence.name': '전령의 박자',
   'entities.abilities.wildheart.description': '최대 생명력의 30%를 즉시 회복합니다.',
   'entities.abilities.wildheart.name': '야생의 심장',

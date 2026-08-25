@@ -955,15 +955,15 @@ export const zh_TW: EnTranslations = {
       "actionRadial": "技能方向",
       "actionRadialCancel": "取消動作",
       "radialCenter": "中心",
-      "radialUp": "Up",
+      "radialUp": "上",
       "radialRight": "右",
-      "radialDown": "Down",
-      "radialLeft": "Left",
+      "radialDown": "下",
+      "radialLeft": "左",
       "consumableSeat": "消耗品",
       "menuControl": "選單",
       "menuControlAria": "選單。點按開啟聊天，或按住並向右滑動以使用坐騎、地圖、背包等。",
       "menuControlAriaTap": "選單。點按開啟選單列：坐騎、地圖、背包等。再次點按可開啟聊天。",
-      "menuLabel": "Menu",
+      "menuLabel": "選單",
       "quickActions": "快捷操作",
       "quickActionsAria": "快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，或按住並向右滑動進行選擇。",
       "quickActionsAriaTap": "快捷操作。點按開啟坐騎、聊天、地圖、背包等操作列，然後點按其中一項。再次點按此控制項可關閉。",
@@ -980,14 +980,14 @@ export const zh_TW: EnTranslations = {
       "spellbookPageLabel": "頁{page}",
       "hideKeyboard": "隱藏鍵盤",
       "chatPlaceholder": "說點什麼...（! 顯示社群指令）",
-      "barEditor": "Edit Bars",
+      "barEditor": "編輯動作列",
       "barEditorAria": "編輯動作列配置"
     },
     "barEditor": {
       "title": "編輯動作列",
       "close": "關閉動作列編輯器",
       "pages": "動作列頁面",
-      "pageTab": "Page {page}",
+      "pageTab": "第 {page} 頁",
       "buttonHeader": "按鈕 {button}",
       "cellAria": "按鈕 {button}，{direction}：{action}",
       "emptyCellAria": "按鈕 {button}，{direction}：空",
@@ -1095,13 +1095,13 @@ export const zh_TW: EnTranslations = {
       "readyPouchBody": "小袋已買下。按 {bagsKey} 打開背包，用滑鼠左鍵點擊亞麻小袋，把它繫進一個空著的袋扣。然後前往{npc}身邊，按 {interactKey}，把小袋亮給對方看。",
       "readyPouchBodyTouch": "小袋已買下。打開背包，點按亞麻小袋，把它繫進一個空著的袋扣。然後前往{npc}身邊，點按對方，把小袋亮給對方看。",
       "readyPouchBodyPad": "小袋已買下。打開背包，選中亞麻小袋，把它繫進一個空著的袋扣。然後前往{npc}身邊，按下互動鍵，把小袋亮給對方看。",
-      "promptTalk": "Talk",
+      "promptTalk": "交談",
       "promptTurnIn": "交任務",
-      "promptPickUp": "Pick up",
+      "promptPickUp": "拾取",
       "promptLootPearl": "拾取珍珠",
-      "promptRead": "Read",
-      "promptRing": "Ring",
-      "promptHold": "Hold",
+      "promptRead": "閱讀",
+      "promptRing": "敲響",
+      "promptHold": "按住",
       "promptSelect": "選擇目標",
       "promptAttack": "攻擊",
       "promptUseAbility": "使用技能",
@@ -1109,7 +1109,7 @@ export const zh_TW: EnTranslations = {
       "promptOpenBags": "打開背包",
       "promptCharacterSheet": "打開角色面板",
       "promptLookAround": "按住右鍵拖曳來環視四周",
-      "promptJump": "Jump",
+      "promptJump": "跳躍",
       "promptSummon": "召喚",
       "ringEquipTitle": "戴上你的戰利品",
       "ringEquipBody": "珍珠之母就在你的背包裡。按 {bagsKey} 打開背包，然後用滑鼠左鍵點擊戒指，把它戴上手指。",
@@ -5988,7 +5988,7 @@ export const zh_TW: EnTranslations = {
       "deedsHeading": "銘記旅程的功業",
       "deedsBody": "功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。",
       "startHeading": "從哪裡開始",
-      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。",
+      "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東北Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。",
       "colStation": "工位",
       "colHub": "主城",
       "colMaster": "大師",
@@ -6073,13 +6073,13 @@ export const zh_TW: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "迅捷者的皮甲",
-          "identityBody": "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能75的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
+          "identityBody": "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能50的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
           "materialsHeading": "狩獵即收穫",
-          "materialsBody": "在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps頂階要六塊），以及製革坊櫃檯16銅的Tanning Agent。不想挖礦的話Tanner Hesk也賣鋨礦。",
+          "materialsBody": "在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps要六塊），以及製革坊櫃檯16銅的Tanning Agent。鋨礦本身絕不會在櫃檯出售：你得自行開採，無論是在Thornpeak，還是幾乎任何新手區的入門礦脈都行（唯獨Farshore只產鐵礦），不然就只能向其他玩家收購。",
           "ladderHeading": "在Fenbridge受訓",
-          "ladderBody": "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。兩件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會但要技能75且綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
+          "ladderBody": "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。三件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會，技能50即綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
           "routeHeading": "傑作與通往125之路",
-          "routeBody": "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，mirewarden到75，此後Duskhide Wraps（三層配方，六塊鋨礦、三塊Pristine Hide、兩塊粗皮、一份Tanning Agent）帶你走完最後五十點（約75次）。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。"
+          "routeBody": "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，而mirewarden系列與Duskhide Wraps（皆為二層配方）則帶你從50的精良階段練到75。過了75，這些二層配方的收益會先減半、再降至四分之一，約150次才能練完到125上限的最後五十點；未達主修上限時，它們仍與精良品質的製作上限持平，不會直接歸零。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。"
         },
         "cooking": {
           "identityHeading": "餵飽隊伍的鍋",
@@ -6279,7 +6279,7 @@ export const zh_TW: EnTranslations = {
         "q5": "什麼是傑作？",
         "a5": "每次製作都有一個小機率（3%起，上限15%）產出品質高一層的成品，但絕不會超過團隊副本的底線。",
         "q6": "「由某某製作」是什麼意思？",
-        "a6": "九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的上級配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。",
+        "a6": "九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。",
         "q7": "什麼是製作者之約？",
         "a7": "委託製品會綁定給交易中收到它的人，而任意工位大師都可按層級費用為其解綁。",
         "q8": "我能更換命途嗎？",
@@ -9822,7 +9822,7 @@ export const zh_TW: EnTranslations = {
       },
       "ignition": {
         "name": "點燃",
-        "description": "被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 40% 的傷害，可堆疊。（火焰精通）"
+        "description": "被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 30% 的傷害，可堆疊。（火焰精通）"
       },
       "mass_barrier": {
         "name": "群體屏障",
@@ -9992,7 +9992,7 @@ export const zh_TW: EnTranslations = {
       },
       "sap": {
         "name": "悶棍",
-        "description": "使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。"
+        "description": "使目標無法行動，持續 8 秒，且不會打破暮紗或引發戰鬥。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。"
       },
       "crippling_poison": {
         "name": "沉鉛之毒",
@@ -10264,7 +10264,7 @@ export const zh_TW: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "駿馬之姿",
-        "description": "化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。"
+        "description": "化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 4 秒（每次受擊都會重新觸發昏亂）。"
       },
       "aimed_shot": {
         "name": "長弓引射",
@@ -10428,7 +10428,7 @@ export const zh_TW: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "暴行咒",
-        "description": "詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。"
+        "description": "詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬17點暗影傷害。"
       },
       "cruel_pact": {
         "name": "殘酷契約",
@@ -10634,7 +10634,7 @@ export const zh_TW: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "戰魂節律",
-        "description": "被動：每第3次命中的武器攻擊會觸發2次裂風迴響，各造成50%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）"
+        "description": "被動：每第3次命中的武器攻擊會觸發2次風心回響，各造成25%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）"
       },
       "stormsurge": {
         "name": "風暴湧動",
@@ -10846,7 +10846,7 @@ export const zh_TW: EnTranslations = {
       },
       "summon_infernal": {
         "name": "召喚烈焰巨像",
-        "description": "將一尊烈焰巨像召至目標區域，落地時造成 58-72 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。"
+        "description": "將一尊烈焰巨像召至目標區域，落地時造成 64-79 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。"
       },
       "summon_doomguard": {
         "name": "召喚怨魂裔",
@@ -11194,7 +11194,7 @@ export const zh_TW: EnTranslations = {
       },
       "shadowstep": {
         "name": "影步",
-        "description": "穿過暗影，向你的目標邁進。（潛行者天賦）"
+        "description": "穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。（潛行者天賦）"
       },
       "silence": {
         "name": "沉默",
@@ -14375,7 +14375,7 @@ export const zh_TW: EnTranslations = {
       "apothecary_lin": {
         "name": "林藥劑師",
         "title": "草藥師",
-        "greeting": "在東邊林地裡落腳要小心，朋友。"
+        "greeting": "在東北邊林地裡落腳要小心，朋友。"
       },
       "brother_aldric": {
         "name": "奧德里克修士",
@@ -14856,7 +14856,7 @@ export const zh_TW: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之長",
-        "text": "東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。",
+        "text": "東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東北方、過了狼徑之後的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。",
         "completion": "看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。",
         "objectives": {
           "0": {
@@ -14886,7 +14886,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_boars": {
         "title": "粗鬃野豬皮",
-        "text": "野豬皮能做最好的行囊，鎮外草地到處都是野豬。帶回5張硬鬃野豬皮。",
+        "text": "野豬皮能做最好的行囊，鎮子西北的草地到處都是野豬。帶回5張硬鬃野豬皮。",
         "completion": "好結實的硬鬃皮！這些能賣個好價錢。",
         "objectives": {
           "0": {
@@ -14896,7 +14896,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_spiders": {
         "title": "玄網之患",
-        "text": "東方林地裡的潛伏者吐出的絲正是我藥敷所需，而牠們的數量也已多得過分。剷除 6 隻玄網潛伏者，並從牠們的腹部割下 4 枚絲腺。",
+        "text": "東北方林地裡的潛伏者吐出的絲正是我藥敷所需，而牠們的數量也已多得過分。剷除 6 隻玄網潛伏者，並從牠們的腹部割下 4 枚絲腺。",
         "completion": "呃，還在抽動。正合適。這是你應得的。",
         "objectives": {
           "0": {
@@ -14939,7 +14939,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_supplies": {
         "title": "被盜的補給",
-        "text": "強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西南山丘的營地奪回4個補給箱。",
+        "text": "強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西北山丘的營地奪回4個補給箱。",
         "completion": "我的箱子！幾乎沒有刮痕。你真讓人驚喜。",
         "objectives": {
           "0": {
@@ -15032,7 +15032,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_bandits": {
         "title": "谷地強盜",
-        "text": "一群割喉強盜在西南山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。",
+        "text": "一群割喉強盜在西北山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。",
         "completion": "黑夜裡少了十把刀。拿著吧，這是你掙來的。",
         "objectives": {
           "0": {
@@ -15712,7 +15712,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "重接的線",
-        "text": "終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。",
+        "text": "終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東北邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。",
         "completion": "又穩住了。製皮與裁縫作為主修重回你的手中。這一次，在你動念遊蕩之前，先量兩遍。",
         "objectives": {
           "0": {
@@ -15722,7 +15722,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "重回爐灶",
-        "text": "瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。",
+        "text": "瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西北邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。",
         "completion": "這才是熟悉的老味道。鍊金術與烹飪作為主修回到了你的爐灶上。這一回，多留一陣子吧。",
         "objectives": {
           "0": {

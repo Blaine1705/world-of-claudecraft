@@ -441,7 +441,7 @@ export const nl_NL: EnTranslations = {
       "remainingDaysHours": "{days} d {hours} u",
       "score": "Score",
       "walletValue": "Portemonneewaarde (WOC)",
-      "usd": "{amount} USD",
+      "usd": "{amount}",
       "sol": "{amount} SOL",
       "unknown": "Onbekend",
       "spinTitle": "Dagelijkse draai",
@@ -483,85 +483,85 @@ export const nl_NL: EnTranslations = {
       }
     },
     "trade": {
-      "windowClosed": "Trade window closed.",
+      "windowClosed": "Ruilvenster gesloten.",
       "woc": {
-        "tabGold": "Gold",
+        "tabGold": "Goud",
         "tabWoc": "$WOC",
-        "modesLabel": "Payment currency",
-        "tabWocHint": "Paying in $WOC is available when your side of the table is empty and no gold is offered.",
-        "priceLabel": "Price in USD",
+        "modesLabel": "Betaalvaluta",
+        "tabWocHint": "Betalen in $WOC is mogelijk wanneer jouw kant van de tafel leeg is en er geen goud wordt aangeboden.",
+        "priceLabel": "Prijs in USD",
         "pricePlaceholder": "0.00",
-        "equivalent": "About {tokens} $WOC at the current rate",
-        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when you pay.",
-        "feeLine": "Exchange fee {fee}, taken out of the price.",
-        "netLine": "You receive {net}",
-        "netLineBuyer": "The seller receives {net}",
-        "sendOffer": "Offer $WOC",
-        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
-        "offerSentUntil": "Offer sent. It expires at {time} unless {name} accepts.",
-        "incomingAccept": "{name} offers {price} for your items.",
-        "notInstant": "A $WOC sale is not instant. The item moves into escrow once both sides accept, and reaches the buyer once payment is verified.",
-        "blockDisabled": "The $WOC Exchange is not available on this realm.",
-        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
-        "blockPartnerUnknown": "Checking whether that player can accept $WOC...",
-        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
-        "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
-        "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
-        "hintOneItem": "A $WOC deal covers exactly one item. Only the item being sold can be on the table.",
-        "hintEnterPrice": "Enter a price in USD.",
-        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
-        "hintAcceptLocked": "That item is locked. Unlock it in your bags, then remove it from the trade and add it again.",
-        "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
-        "ineligibleReason": "Soulbound, quest, and locked items, and items outside the Exchange categories, cannot be sold for $WOC.",
-        "incomingTitle": "$WOC offer from {name}",
-        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "equivalent": "Ongeveer {tokens} $WOC tegen de huidige koers",
+        "variableWarning": "Het $WOC-bedrag is een voorbeeld, geen vaste prijs. Het exacte aantal wordt bepaald door een nieuwe prijsopgave op het moment van betalen.",
+        "feeLine": "Beursvergoeding {fee}, afgetrokken van de prijs.",
+        "netLine": "Je ontvangt {net}",
+        "netLineBuyer": "De verkoper ontvangt {net}",
+        "sendOffer": "$WOC aanbieden",
+        "offerSent": "Aanbod verstuurd. Het verloopt over 10 minuten, tenzij {name} accepteert.",
+        "offerSentUntil": "Aanbod verstuurd. Het verloopt om {time}, tenzij {name} accepteert.",
+        "incomingAccept": "{name} biedt {price} voor je voorwerpen.",
+        "notInstant": "Een $WOC-verkoop gaat niet direct. Het voorwerp gaat in bewaring zodra beide partijen accepteren, en bereikt de koper zodra de betaling is geverifieerd.",
+        "blockDisabled": "De $WOC-beurs is niet beschikbaar op deze wereld.",
+        "blockNoWallet": "Koppel en verifieer een portemonnee om voorwerpen voor $WOC te verkopen.",
+        "blockPartnerUnknown": "Controleren of die speler $WOC kan accepteren...",
+        "blockRecipientNoWallet": "Die speler moet een portemonnee koppelen om $WOC-betalingen te accepteren.",
+        "hintClearYourItems": "Verwijder je eigen voorwerpen: een $WOC-aanbod koopt wat zij verkopen.",
+        "hintAwaitTheirItems": "Wachten tot zij iets aanbieden dat voor $WOC kan worden verkocht.",
+        "hintOneItem": "Een $WOC-deal omvat precies één voorwerp. Alleen het verkochte voorwerp mag op tafel liggen.",
+        "hintEnterPrice": "Voer een prijs in USD in.",
+        "hintAcceptNeedsItem": "Voeg het voorwerp toe dat je verkoopt voordat je accepteert.",
+        "hintAcceptLocked": "Dat voorwerp is vergrendeld. Ontgrendel het in je tassen, verwijder het dan uit de ruil en voeg het opnieuw toe.",
+        "hintGoldOffered": "Verwijder eerst je goudaanbod: een ruil is goud of $WOC, niet beide.",
+        "ineligibleReason": "Zielgebonden voorwerpen, questvoorwerpen, vergrendelde voorwerpen en voorwerpen buiten de categorieën van de Beurs kunnen niet voor $WOC worden verkocht.",
+        "incomingTitle": "$WOC-aanbod van {name}",
+        "incomingBody": "{name} biedt aan om je {item} te verkopen voor {price}.",
         "moneyUsd": "{usd}",
         "moneyLine": "{usd} (~ {tokens} $WOC)",
-        "waitingOther": "Offer accepted. Waiting for the other player to accept.",
-        "payNow": "Pay {usd}",
-        "awaitingPayment": "Waiting for payment confirmation...",
-        "paying": "Confirm the payment in your wallet...",
-        "settled": "Paid. Your item is in your bags, or arrives by Ravenpost mail if they were full.",
-        "settledSeller": "Paid. The item was delivered to the buyer.",
-        "accept": "Accept offer",
-        "accepted": "Offer accepted. Your item is held until payment is verified.",
-        "decline": "Decline",
-        "withdraw": "Withdraw offer",
-        "hintInsufficientBalance": "That is more $WOC than your connected wallet holds.",
-        "statusAwaitingBuyer": "Waiting for the buyer to pay.",
-        "statusPayingBuyer": "Confirming your payment on the network...",
-        "statusPayingSeller": "The buyer's payment is confirming on the network...",
-        "statusReviewBuyer": "Your payment is under review.",
-        "statusReviewSeller": "The buyer's payment is under review.",
-        "paidSeller": "You have received a payment of {price} for your {item}.",
-        "paidBuyer": "You have sent a payment of {price} for {item}.",
-        "closedCancelled": "This sale was cancelled. The item returns to the seller by Ravenpost mail.",
-        "closedSuspended": "This sale was suspended by a Game Master. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaid": "This sale ended without payment. The item returns to the seller by Ravenpost mail.",
-        "closedUnpaidBuyer": "This sale ended without your payment. The item returns to the seller by Ravenpost mail; not paying an accepted deal earns a Marketplace strike.",
-        "cancelSale": "Cancel sale",
-        "cancelPendingSeller": "Cancel requested. The sale ends on its own unless the buyer pays first.",
-        "youDeclined": "You declined the offer.",
-        "youWithdrew": "You withdrew your offer.",
-        "offerNotPending": "This offer is no longer pending.",
-        "offerDeclined": "The $WOC offer was declined.",
-        "offerWithdrawn": "The $WOC offer was withdrawn.",
-        "offerExpired": "The $WOC offer expired.",
-        "offerExpiresAt": "Offer expires at {time}.",
-        "offerStandsUntil": "Your $WOC offer still stands until {time}. Trade with the seller again to finish the deal if they accept.",
-        "dealAwaitsPayment": "Your $WOC purchase is still unpaid. Trade with the seller again to pay; the deal expires on its own if you do not, and not paying earns a Marketplace strike.",
-        "closeSellerHold": "Your item stays held for the buyer's payment. Cancel the sale from the Exchange's Activity tab if you change your mind.",
-        "closePaymentContinuesBuyer": "Your payment is still being confirmed. Delivery completes on its own.",
-        "closePaymentContinuesSeller": "The buyer's payment is still being confirmed. The sale completes on its own.",
-        "p2pBindingNote": "Once both sides accept, payment is due within {duration}, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pBindingNoteUntimed": "Once both sides accept, payment is due shortly after, or within the shorter window that opens when you press Pay. Not paying earns a Marketplace strike.",
-        "p2pPaymentDueAt": "Payment is due by {time}. Not paying earns a Marketplace strike.",
-        "quoteExpiredTrade": "The quote expired. Press Not now, then Pay again for a fresh one.",
-        "quoteStaged": "Payment quote ready for {usd}: {tokens} $WOC, valid until {time}.",
-        "paymentConfirmed": "Payment confirmed. Your item arrives in your bags, or by Ravenpost mail if they are full, once delivery completes.",
-        "statusConfirmedBuyer": "Payment confirmed. Delivery is completing...",
-        "statusConfirmedSeller": "Payment confirmed. The sale is completing...",
-        "hintBelowMin": "The Exchange minimum price is {usd}."
+        "waitingOther": "Aanbod geaccepteerd. Wachten tot de andere speler accepteert.",
+        "payNow": "{usd} betalen",
+        "awaitingPayment": "Wachten op betalingsbevestiging...",
+        "paying": "Bevestig de betaling in je portemonnee...",
+        "settled": "Betaald. Je voorwerp zit in je tassen, of komt via de Ravenpost als die vol waren.",
+        "settledSeller": "Betaald. Het voorwerp is bij de koper afgeleverd.",
+        "accept": "Aanbod accepteren",
+        "accepted": "Aanbod geaccepteerd. Je voorwerp wordt vastgehouden tot de betaling is geverifieerd.",
+        "decline": "Weigeren",
+        "withdraw": "Aanbod intrekken",
+        "hintInsufficientBalance": "Dat is meer $WOC dan je gekoppelde portemonnee bevat.",
+        "statusAwaitingBuyer": "Wachten tot de koper betaalt.",
+        "statusPayingBuyer": "Je betaling wordt bevestigd op het netwerk...",
+        "statusPayingSeller": "De betaling van de koper wordt bevestigd op het netwerk...",
+        "statusReviewBuyer": "Je betaling wordt beoordeeld.",
+        "statusReviewSeller": "De betaling van de koper wordt beoordeeld.",
+        "paidSeller": "Je hebt een betaling van {price} ontvangen voor je {item}.",
+        "paidBuyer": "Je hebt een betaling van {price} verstuurd voor {item}.",
+        "closedCancelled": "Deze verkoop is geannuleerd. Het voorwerp gaat terug naar de verkoper via de Ravenpost.",
+        "closedSuspended": "Deze verkoop is opgeschort door een Spelmeester. Het voorwerp gaat terug naar de verkoper via de Ravenpost.",
+        "closedUnpaid": "Deze verkoop eindigde zonder betaling. Het voorwerp gaat terug naar de verkoper via de Ravenpost.",
+        "closedUnpaidBuyer": "Deze verkoop eindigde zonder jouw betaling. Het voorwerp gaat terug naar de verkoper via de Ravenpost; een geaccepteerde deal niet betalen levert een Beursovertreding op.",
+        "cancelSale": "Verkoop annuleren",
+        "cancelPendingSeller": "Annulering aangevraagd. De verkoop eindigt vanzelf, tenzij de koper eerst betaalt.",
+        "youDeclined": "Je hebt het aanbod geweigerd.",
+        "youWithdrew": "Je hebt je aanbod ingetrokken.",
+        "offerNotPending": "Dit aanbod staat niet langer in behandeling.",
+        "offerDeclined": "Het $WOC-aanbod is geweigerd.",
+        "offerWithdrawn": "Het $WOC-aanbod is ingetrokken.",
+        "offerExpired": "Het $WOC-aanbod is verlopen.",
+        "offerExpiresAt": "Aanbod verloopt om {time}.",
+        "offerStandsUntil": "Je $WOC-aanbod blijft geldig tot {time}. Ruil opnieuw met de verkoper om de deal af te ronden als die accepteert.",
+        "dealAwaitsPayment": "Je $WOC-aankoop is nog niet betaald. Ruil opnieuw met de verkoper om te betalen; de deal verloopt vanzelf als je dat niet doet, en niet betalen levert een Beursovertreding op.",
+        "closeSellerHold": "Je voorwerp blijft vastgehouden in afwachting van de betaling van de koper. Annuleer de verkoop via het tabblad Activiteit van de Beurs als je van gedachten verandert.",
+        "closePaymentContinuesBuyer": "Je betaling wordt nog bevestigd. De levering voltooit zichzelf.",
+        "closePaymentContinuesSeller": "De betaling van de koper wordt nog bevestigd. De verkoop voltooit zichzelf.",
+        "p2pBindingNote": "Zodra beide partijen accepteren, moet er binnen {duration} betaald worden, of binnen het kortere venster dat opent wanneer je op Betalen drukt. Niet betalen levert een Beursovertreding op.",
+        "p2pBindingNoteUntimed": "Zodra beide partijen accepteren, moet er kort daarna betaald worden, of binnen het kortere venster dat opent wanneer je op Betalen drukt. Niet betalen levert een Beursovertreding op.",
+        "p2pPaymentDueAt": "Betaling is verschuldigd voor {time}. Niet betalen levert een Beursovertreding op.",
+        "quoteExpiredTrade": "De prijsopgave is verlopen. Druk op Niet nu, en dan opnieuw op Betalen voor een nieuwe.",
+        "quoteStaged": "Betalingsprijsopgave klaar voor {usd}: {tokens} $WOC, geldig tot {time}.",
+        "paymentConfirmed": "Betaling bevestigd. Je voorwerp komt in je tassen, of via de Ravenpost als die vol zijn, zodra de levering voltooid is.",
+        "statusConfirmedBuyer": "Betaling bevestigd. De levering wordt voltooid...",
+        "statusConfirmedSeller": "Betaling bevestigd. De verkoop wordt voltooid...",
+        "hintBelowMin": "De minimumprijs van de Beurs is {usd}."
       }
     },
     "wocStore": {
@@ -938,7 +938,7 @@ export const nl_NL: EnTranslations = {
       "jump": "Springen",
       "leaderboard": "Ranglijst",
       "dailyRewards": "Winkel",
-      "wocMarket": "Exchange",
+      "wocMarket": "Beurs",
       "deeds": "Daden",
       "mounts": "Rijdieren",
       "professions": "Beroepen",
@@ -952,62 +952,62 @@ export const nl_NL: EnTranslations = {
       "actionRing": "Gevechtsacties",
       "actionPageToggle": "Actiepagina wisselen",
       "actionPageIndicator": "Pag. {page}",
-      "actionRadial": "Action directions",
-      "actionRadialCancel": "Cancel action",
-      "radialCenter": "Centre",
-      "radialUp": "Up",
-      "radialRight": "Right",
-      "radialDown": "Down",
-      "radialLeft": "Left",
-      "consumableSeat": "Consumables",
-      "menuControl": "Menus",
-      "menuControlAria": "Menus. Tap to open chat, or hold and swipe right for mounts, map, bags and more.",
-      "menuControlAriaTap": "Menus. Tap to open the menu row: mounts, map, bags and more. Tap again for chat.",
+      "actionRadial": "Actierichtingen",
+      "actionRadialCancel": "Actie annuleren",
+      "radialCenter": "Midden",
+      "radialUp": "Omhoog",
+      "radialRight": "Rechts",
+      "radialDown": "Omlaag",
+      "radialLeft": "Links",
+      "consumableSeat": "Verbruiksartikelen",
+      "menuControl": "Menu's",
+      "menuControlAria": "Menu's. Tik om chat te openen, of houd vast en veeg naar rechts voor rijdieren, kaart, tassen en meer.",
+      "menuControlAriaTap": "Menu's. Tik om de menurij te openen: rijdieren, kaart, tassen en meer. Tik nogmaals voor chat.",
       "menuLabel": "Menu",
-      "quickActions": "Quick Actions",
-      "quickActionsAria": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, or hold and swipe right to pick one.",
-      "quickActionsAriaTap": "Quick Actions. Tap to open the row of mount, chat, map, bags and more, then tap an item. Tap the control again to close.",
-      "quickActionsLabel": "Actions",
-      "stanceRadial": "Stances",
-      "stanceAnchorAria": "Stance: {stance}. Tap to open the stance ring, then pick another stance.",
-      "stanceAnchorEmptyAria": "No stance. Tap to open the stance ring, then pick a stance.",
-      "questStripAria": "Tracked quest {position} of {total}: {title}. Activate for the next quest.",
-      "questStripAriaSingle": "Tracked quest: {title}",
+      "quickActions": "Snelacties",
+      "quickActionsAria": "Snelacties. Tik om de rij met rijdier, chat, kaart, tassen en meer te openen, of houd vast en veeg naar rechts om er een te kiezen.",
+      "quickActionsAriaTap": "Snelacties. Tik om de rij met rijdier, chat, kaart, tassen en meer te openen, tik dan op een item. Tik nogmaals op de knop om te sluiten.",
+      "quickActionsLabel": "Acties",
+      "stanceRadial": "Houdingen",
+      "stanceAnchorAria": "Houding: {stance}. Tik om de houdingsring te openen en kies dan een andere houding.",
+      "stanceAnchorEmptyAria": "Geen houding. Tik om de houdingsring te openen en kies dan een houding.",
+      "questStripAria": "Gevolgde quest {position} van {total}: {title}. Activeer voor de volgende quest.",
+      "questStripAriaSingle": "Gevolgde quest: {title}",
       "questStripCounter": "{position}/{total}",
-      "questStripMore": "+{count} more",
+      "questStripMore": "+{count} meer",
       "targetCycle": "Wissel van doel",
       "targetCycleShort": "Doel",
       "spellbookPageLabel": "Pagina {page}",
       "hideKeyboard": "Toetsenbord verbergen",
       "chatPlaceholder": "Zeg iets...",
-      "barEditor": "Edit Bars",
-      "barEditorAria": "Edit the action bar layout"
+      "barEditor": "Balken Bewerken",
+      "barEditorAria": "Bewerk de actiebalkindeling"
     },
     "barEditor": {
-      "title": "Edit Action Bar",
-      "close": "Close bar editor",
-      "pages": "Action bar pages",
-      "pageTab": "Page {page}",
-      "buttonHeader": "Button {button}",
-      "cellAria": "Button {button}, {direction}: {action}",
-      "emptyCellAria": "Button {button}, {direction}: empty",
-      "hint": "Tap a slot, then another, to swap them.",
-      "armed": "Tap a slot to place {name}.",
-      "picked": "Tap another slot to swap with {name}.",
-      "locked": "Action bars are locked in Interface options.",
-      "clear": "Clear",
-      "clearAria": "Clear a slot",
-      "clearArmed": "Tap a slot to clear it."
+      "title": "Actiebalk Bewerken",
+      "close": "Balkbewerker sluiten",
+      "pages": "Actiebalkpagina's",
+      "pageTab": "Pagina {page}",
+      "buttonHeader": "Knop {button}",
+      "cellAria": "Knop {button}, {direction}: {action}",
+      "emptyCellAria": "Knop {button}, {direction}: leeg",
+      "hint": "Tik op een vak, dan op een ander, om ze te verwisselen.",
+      "armed": "Tik op een vak om {name} te plaatsen.",
+      "picked": "Tik op een ander vak om te verwisselen met {name}.",
+      "locked": "Actiebalken zijn vergrendeld in de interface-opties.",
+      "clear": "Wissen",
+      "clearAria": "Een vak wissen",
+      "clearArmed": "Tik op een vak om het te wissen."
     },
     "tutorialGreeting": {
-      "bodyFirst": "I have not seen you around before, friend. It is tradition in these lands for those starting their adventure to visit the Proving Shore, a quiet island off the strait. There you can hone your skills and get used to the world before you take on its challenges. The ferry runs both ways, and no one will think less of you either way.",
-      "bodyRefresher": "Back again with a fresh face, are you? You know how this goes, then. Still, if you would like a refresher before you set out, the Proving Shore never turns away a returning student, and the ferry is ready when you are.",
-      "play": "Take the tutorial",
-      "skip": "Skip the tutorial",
-      "declineNote": "As you like, friend. Should you ever change your mind, the ferry bell by the Ravenpost mailbox rings you across to the Proving Shore any time, day or night. It will still be here when the wolves are not.",
-      "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
-      "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him.",
-      "noteClose": "Understood"
+      "bodyFirst": "Ik heb je hier nog niet eerder gezien, vriend. Het is traditie in deze landen dat wie aan zijn avontuur begint, eerst de Beproevingskust bezoekt, een rustig eiland net buiten de zeestraat. Daar kun je je vaardigheden slijpen en aan de wereld wennen voordat je haar beproevingen aangaat. De veerboot vaart beide kanten op, en niemand zal minder over je denken, wat je ook kiest.",
+      "bodyRefresher": "Weer terug met een nieuw gezicht, hè? Dan weet je hoe dit werkt. Toch, als je liever nog wat oefent voordat je vertrekt: de Beproevingskust wijst nooit een terugkerende leerling af, en de veerboot ligt klaar wanneer jij dat bent.",
+      "play": "Volg de tutorial",
+      "skip": "Sla de tutorial over",
+      "declineNote": "Zoals je wilt, vriend. Mocht je ooit van gedachten veranderen: de veerbel bij de brievenbus van de Ravenpost brengt je op elk moment, dag of nacht, naar de Beproevingskust. Ze staat er nog wanneer de wolven dat niet meer doen.",
+      "bellHomeNote": "Alweer terug van de kust? Dat was de veerbel die je luidde. Zijn tweelingbroer hangt daar bij de brievenbus van de Ravenpost: luid hem wanneer je wilt en de overtocht brengt je terug naar de Beproevingskust. Geen kwaad geschied, hoe dan ook.",
+      "islandArrivalNote": "Welkom op de Beproevingskust. Warden Tam wacht verderop op het strand: ga naar hem toe.",
+      "noteClose": "Begrepen"
     },
     "tutorial": {
       "moveBodyTouch": "Gebruik de bewegingsstick om te bewegen en sleep over het scherm om rond te kijken. Zet een paar stappen om te beginnen.",
@@ -1022,115 +1022,115 @@ export const nl_NL: EnTranslations = {
       "nextTipSocial": "Open Sociaal ({key}) om een groep te vinden voor zwaardere gevechten."
     },
     "bootcamp": {
-      "title": "First Steps",
-      "talkTitle": "Speak to Warden Tam",
-      "talkBody": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press {interactKey}, or left-click him, to talk: he will set you the run.",
-      "talkBodyTouch": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then tap him, or tap the Use button, to talk: he will set you the run.",
-      "talkBodyPad": "Warden Tam keeps the Gauntlet gate just ahead. Walk up to him until his name shows, then press your interact button to talk: he will set you the run.",
-      "forwardTitle": "Walk the first lane",
-      "forwardBody": "Step into the lane beside Tam and hold {forwardKey} to walk it west to its flag.",
-      "forwardBodyTouch": "Step into the lane beside Tam and push the movement stick up to walk it west to its flag.",
-      "forwardBodyPad": "Step into the lane beside Tam and push the left stick up to walk it west to its flag.",
-      "turnwalkTitle": "Turn, then walk",
-      "turnwalkBody": "Flag one down. Hold {turnKey} to rotate on the spot until you face down the walled lane heading south, then hold {forwardKey} again and walk it to the second flag.",
-      "turnwalkBodyTouch": "Flag one down. Drag a finger across the world (not the movement stick) to turn until you face down the walled lane heading south, then push the stick up and walk it to the second flag.",
-      "turnwalkBodyPad": "Flag one down. Push the right stick to turn until you face down the walled lane heading south, then push the left stick up and walk it to the second flag.",
-      "strafeTitle": "Turn, then walk",
-      "strafeBody": "One corner left. Hold {turnLeftKey} to rotate on the spot until you face down the last lane, then hold {forwardKey} again and walk it until the red flag is behind you.",
-      "strafeBodyTouch": "One corner left. Drag a finger across the world (not the movement stick) to turn until you face down the last lane, then push the stick up and walk it until the red flag is behind you.",
-      "strafeBodyPad": "One corner left. Push the right stick to turn until you face down the last lane, then push the left stick up and walk it until the red flag is behind you.",
-      "cameraTitle": "Swing the camera",
-      "cameraBody": "One last lesson before you hand the run in: hold the right mouse button and drag to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyTouch": "One last lesson before you hand the run in: drag a finger across the world to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "cameraBodyPad": "One last lesson before you hand the run in: push the right stick to swing the camera all the way around you. Knowing what stands behind you wins fights.",
-      "courseProgress": "Flag {current} of {total}",
-      "doneTitle": "Run complete",
-      "doneBody": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press {interactKey} on him, or left-click him, to hand your run in and take your first reward.",
-      "doneBodyTouch": "That is everything your legs need to know. Overseer Pell stands beside the red flag: tap him to hand your run in and take your first reward.",
-      "doneBodyPad": "That is everything your legs need to know. Overseer Pell stands beside the red flag: press your interact button on him to hand your run in and take your first reward.",
-      "coachNextTitle": "Next: {npc}",
-      "coachNextBody": "Follow the golden trail to {npc}. Walk up until the name shows, then press {interactKey}, or left-click them, to take your next task.",
-      "coachNextBodyTouch": "Follow the golden trail to {npc}. Walk up until the name shows, then tap them, or tap the Use button, to take your next task.",
-      "coachNextBodyPad": "Follow the golden trail to {npc}. Walk up until the name shows, then press your interact button to take your next task.",
-      "coachTaskBody": "Follow the golden trail to your task. The tracker on the right keeps the tally, and {mapKey} opens the map if you lose the way.",
-      "coachTaskBodyTouch": "Follow the golden trail to your task. The tracker on the right keeps the tally, and the map button shows the way if you lose it.",
-      "coachTaskBodyPad": "Follow the golden trail to your task. The tracker on the right keeps the tally, and your map button shows the way if you lose it.",
-      "coachReadyTitle": "Task complete",
-      "coachReadyBody": "Head to {npc} and press {interactKey}, or left-click them, to hand it in and take your reward.",
-      "coachReadyBodyTouch": "Head to {npc} and tap them to hand it in and take your reward.",
-      "coachReadyBodyPad": "Head to {npc} and press your interact button to hand it in and take your reward.",
-      "taskStrikeTrueBody": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey} to start swinging. That first button is your plain attack, not a spell. Keep striking until one gives out.",
-      "taskStrikeTrueBodyTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the first button on the action bar to swing. Keep striking until one gives out.",
-      "taskStrikeTrueBodyPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your first action button to swing. Keep striking until one gives out.",
-      "taskHoneBody": "Left-click an effigy to target it, then press {abilityKey} to use {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyTouch": "Tap an effigy to target it, then tap {ability} on the action bar. That is your own, not a plain swing. Land it three times.",
-      "taskHoneBodyPad": "Target an effigy, then press the action button holding {ability}. That is your own, not a plain swing. Land it three times.",
-      "taskLongWalkBody": "Press {bagsKey} to open your bags, then left-click the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyTouch": "Open your bags and tap the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkBodyPad": "Open your bags and choose the Passing Stone. It lays you down where you stand. Nothing here can hurt you, and this costs you nothing.",
-      "taskLongWalkDeadBody": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: click the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyTouch": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: tap the Release Spirit button in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkDeadBodyPad": "You have died, and you have lost nothing: no items, no coin, no experience. Step 1 of 2: choose Release Spirit in the middle of your screen. You will rise as a ghost at the graveyard behind the camp.",
-      "taskLongWalkGhostBody": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: click it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyTouch": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: tap it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskLongWalkGhostBodyPad": "Step 2 of 2: you are a spirit, and nothing can touch you. Your body is the marker on your minimap. Walk to it. When you get close, a Resurrect at Corpse button appears: choose it and you are alive again, with no penalty at all. That walk is ALWAYS free, and it is how you come back every time you die.",
-      "taskShellBody": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep attacking. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskStrikeTrueBodyCaster": "Walk up to a straw effigy and left-click it to make it your target: its name appears at the top of your screen. Then press {attackKey}, or click the second button on the action bar, to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterTouch": "Walk up to a straw effigy and tap it to make it your target. Then tap the second button on the action bar to cast your spell. Keep casting until one gives out.",
-      "taskStrikeTrueBodyCasterPad": "Walk up to a straw effigy and press your target button to make it your target. Then press your second action button to cast your spell. Keep casting until one gives out.",
-      "taskShellBodyCaster": "The scuttlers pinch back. Left-click one to make it your target, then press {abilityKey} for {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterTouch": "The scuttlers pinch back. Tap one to target it, then tap {ability} on the action bar, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskShellBodyCasterPad": "The scuttlers pinch back. Target one, then press the action button holding {ability}, and keep casting from range. If too many attack you at once, retreat back up the path: they give up the chase quickly, and your health returns while you rest.",
-      "taskPearlBody": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, press {bagsKey} to open your bags and left-click the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press {interactKey} on his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyTouch": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and tap the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, tap his shell to claim the Lustrous Pearl.",
-      "taskPearlBodyPad": "Follow the golden trail to the tide pool at the strand's west end. Standing at the water's edge, open your bags and choose the Briny Lure to call him up. Fight him as you fought the scuttlers, and when he falls, press your interact button on his shell to claim the Lustrous Pearl.",
-      "taskWreckLineBody": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press {interactKey}, or left-click the crate, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyTouch": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then tap the crate, or tap the Use button, to pick it up. Six fill the haul.",
-      "taskWreckLineBodyPad": "The castaway crates line the path toward Dawnrest Camp. Walk up to one until its name shows, then press your interact button to pick it up. Six fill the haul.",
-      "taskPouchBody": "Press {interactKey} on {npc}, or left-click them, to open the stall, then left-click the Linen Pouch to buy it.",
-      "taskPouchBodyTouch": "Tap {npc} to open the stall, then tap the Linen Pouch to buy it.",
-      "taskPouchBodyPad": "Press your interact button on {npc} to open the stall, then choose the Linen Pouch to buy it.",
-      "readyPouchBody": "Pouch bought. Press {bagsKey} to open your bags and left-click the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press {interactKey} to show it off.",
-      "readyPouchBodyTouch": "Pouch bought. Open your bags and tap the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and tap them to show it off.",
-      "readyPouchBodyPad": "Pouch bought. Open your bags and choose the Linen Pouch to buckle it into a free bag loop. Then head to {npc} and press your interact button to show it off.",
-      "promptTalk": "Talk",
-      "promptTurnIn": "Turn in quest",
-      "promptPickUp": "Pick up",
-      "promptLootPearl": "Loot the pearl",
-      "promptRead": "Read",
-      "promptRing": "Ring",
-      "promptHold": "Hold",
-      "promptSelect": "Select",
-      "promptAttack": "Attack",
-      "promptUseAbility": "Use ability",
-      "promptKneel": "Kneel",
-      "promptOpenBags": "Open your bags",
-      "promptCharacterSheet": "Open your character sheet",
-      "promptLookAround": "Hold right-click and drag to look around",
-      "promptJump": "Jump",
-      "promptSummon": "Summon",
-      "ringEquipTitle": "Wear your prize",
-      "ringEquipBody": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: press {bagsKey} to open your bags, then left-click the ring to put it on.",
-      "ringEquipBodyTouch": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and tap the ring to put it on.",
-      "ringEquipBodyPad": "You have been given the Mother of Pearl, and a reward does nothing sitting in a bag. Step 1 of 2: open your bags and choose the ring to put it on.",
-      "ringAdmireTitle": "Look at you",
-      "ringAdmireBody": "Step 2 of 2: press {charKey} to open your character sheet. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyTouch": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "ringAdmireBodyPad": "Step 2 of 2: open your character sheet from the menu. That screen shows everything you are wearing and the stats it gives you, and the ring is now on your hand. Check it whenever you pick up new gear.",
-      "keycapThen": "then",
-      "voiceArrival": "Easy ashore, friend. See the golden path at your feet? It knows the way better than I do. Follow it.",
-      "voiceFirstFlag": "That is one flag down. Keep those legs moving, only two to go.",
-      "voiceRunDone": "A clean run, that. Overseer Pell holds your reward, go claim it.",
-      "voiceStationDoneA": "Fine work. On to the next, the path is already lit for you.",
-      "voiceStationDoneB": "You are getting the hang of this, no mistake.",
-      "voiceVeerOff": "Hold up, friend, that is the wrong way. The golden path is behind you.",
-      "voiceGraduate": "The bell is rung for you. Eastbrook waits across the water, and you are ready for it.",
-      "bellTitle": "Ring the bell",
-      "bellBody": "Your crossing is earned. Walk to the ferry bell beside the pier and press {interactKey}, or left-click it, to sail for Eastbrook.",
-      "bellBodyTouch": "Your crossing is earned. Walk to the ferry bell beside the pier and tap it to sail for Eastbrook.",
-      "bellBodyPad": "Your crossing is earned. Walk to the ferry bell beside the pier and press your interact button on it to sail for Eastbrook."
+      "title": "Eerste Stappen",
+      "talkTitle": "Spreek met Wachter Tam",
+      "talkBody": "Wachter Tam bewaakt de Beproevingspoort iets verderop. Loop naar hem toe tot zijn naam verschijnt, druk dan op {interactKey}, of klik met links op hem, om te praten: hij geeft je de run op.",
+      "talkBodyTouch": "Wachter Tam bewaakt de Beproevingspoort iets verderop. Loop naar hem toe tot zijn naam verschijnt, tik dan op hem, of tik op de Gebruik-knop, om te praten: hij geeft je de run op.",
+      "talkBodyPad": "Wachter Tam bewaakt de Beproevingspoort iets verderop. Loop naar hem toe tot zijn naam verschijnt, druk dan op je interactieknop om te praten: hij geeft je de run op.",
+      "forwardTitle": "Loop de eerste baan",
+      "forwardBody": "Stap in de baan naast Tam en houd {forwardKey} ingedrukt om hem westwaarts naar zijn vlag te lopen.",
+      "forwardBodyTouch": "Stap in de baan naast Tam en duw de bewegingsstick omhoog om hem westwaarts naar zijn vlag te lopen.",
+      "forwardBodyPad": "Stap in de baan naast Tam en duw de linkerstick omhoog om hem westwaarts naar zijn vlag te lopen.",
+      "turnwalkTitle": "Draai, loop dan",
+      "turnwalkBody": "Eén vlag binnen. Houd {turnKey} ingedrukt om ter plekke te draaien tot je de ommuurde baan naar het zuiden in kijkt, houd dan weer {forwardKey} ingedrukt en loop hem naar de tweede vlag.",
+      "turnwalkBodyTouch": "Eén vlag binnen. Sleep een vinger over de wereld (niet de bewegingsstick) om te draaien tot je de ommuurde baan naar het zuiden in kijkt, duw dan de stick omhoog en loop hem naar de tweede vlag.",
+      "turnwalkBodyPad": "Eén vlag binnen. Duw de rechterstick om te draaien tot je de ommuurde baan naar het zuiden in kijkt, duw dan de linkerstick omhoog en loop hem naar de tweede vlag.",
+      "strafeTitle": "Draai, loop dan",
+      "strafeBody": "Nog een hoek te gaan. Houd {turnLeftKey} ingedrukt om ter plekke te draaien tot je de laatste baan in kijkt, houd dan weer {forwardKey} ingedrukt en loop hem tot de rode vlag achter je ligt.",
+      "strafeBodyTouch": "Nog een hoek te gaan. Sleep een vinger over de wereld (niet de bewegingsstick) om te draaien tot je de laatste baan in kijkt, duw dan de stick omhoog en loop hem tot de rode vlag achter je ligt.",
+      "strafeBodyPad": "Nog een hoek te gaan. Duw de rechterstick om te draaien tot je de laatste baan in kijkt, duw dan de linkerstick omhoog en loop hem tot de rode vlag achter je ligt.",
+      "cameraTitle": "Draai de camera rond",
+      "cameraBody": "Nog een laatste les voordat je de run inlevert: houd de rechtermuisknop ingedrukt en sleep om de camera helemaal om je heen te laten draaien. Weten wat er achter je staat, wint gevechten.",
+      "cameraBodyTouch": "Nog een laatste les voordat je de run inlevert: sleep een vinger over de wereld om de camera helemaal om je heen te laten draaien. Weten wat er achter je staat, wint gevechten.",
+      "cameraBodyPad": "Nog een laatste les voordat je de run inlevert: duw de rechterstick om de camera helemaal om je heen te laten draaien. Weten wat er achter je staat, wint gevechten.",
+      "courseProgress": "Vlag {current} van {total}",
+      "doneTitle": "Run voltooid",
+      "doneBody": "Dat is alles wat je benen moeten weten. Opzichter Pell staat bij de rode vlag: druk op {interactKey} op hem, of klik met links op hem, om je run in te leveren en je eerste beloning op te halen.",
+      "doneBodyTouch": "Dat is alles wat je benen moeten weten. Opzichter Pell staat bij de rode vlag: tik op hem om je run in te leveren en je eerste beloning op te halen.",
+      "doneBodyPad": "Dat is alles wat je benen moeten weten. Opzichter Pell staat bij de rode vlag: druk je interactieknop op hem in om je run in te leveren en je eerste beloning op te halen.",
+      "coachNextTitle": "Volgende: {npc}",
+      "coachNextBody": "Volg het gouden pad naar {npc}. Loop naar hen toe tot de naam verschijnt, druk dan op {interactKey}, of klik met links op hen, om je volgende taak aan te nemen.",
+      "coachNextBodyTouch": "Volg het gouden pad naar {npc}. Loop naar hen toe tot de naam verschijnt, tik dan op hen, of tik op de Gebruik-knop, om je volgende taak aan te nemen.",
+      "coachNextBodyPad": "Volg het gouden pad naar {npc}. Loop naar hen toe tot de naam verschijnt, druk dan op je interactieknop om je volgende taak aan te nemen.",
+      "coachTaskBody": "Volg het gouden pad naar je taak. De tracker rechts houdt de tel bij, en {mapKey} opent de kaart als je de weg kwijtraakt.",
+      "coachTaskBodyTouch": "Volg het gouden pad naar je taak. De tracker rechts houdt de tel bij, en de kaartknop wijst je de weg als je hem kwijtraakt.",
+      "coachTaskBodyPad": "Volg het gouden pad naar je taak. De tracker rechts houdt de tel bij, en je kaartknop wijst je de weg als je hem kwijtraakt.",
+      "coachReadyTitle": "Taak voltooid",
+      "coachReadyBody": "Ga naar {npc} en druk op {interactKey}, of klik met links op hen, om het in te leveren en je beloning op te halen.",
+      "coachReadyBodyTouch": "Ga naar {npc} en tik op hen om het in te leveren en je beloning op te halen.",
+      "coachReadyBodyPad": "Ga naar {npc} en druk op je interactieknop om het in te leveren en je beloning op te halen.",
+      "taskStrikeTrueBody": "Loop naar een strooien oefenpop en klik er met links op om hem als doelwit te kiezen: zijn naam verschijnt boven in je scherm. Druk dan op {attackKey} om te beginnen met zwaaien. Die eerste knop is je gewone aanval, geen spreuk. Blijf raken tot er een het begeeft.",
+      "taskStrikeTrueBodyTouch": "Loop naar een strooien oefenpop en tik erop om hem als doelwit te kiezen. Tik dan op de eerste knop op de actiebalk om te zwaaien. Blijf raken tot er een het begeeft.",
+      "taskStrikeTrueBodyPad": "Loop naar een strooien oefenpop en druk op je doelknop om hem als doelwit te kiezen. Druk dan op je eerste actieknop om te zwaaien. Blijf raken tot er een het begeeft.",
+      "taskHoneBody": "Klik met links op een oefenpop om hem als doelwit te kiezen, druk dan op {abilityKey} om {ability} te gebruiken. Dat is jouw eigen vaardigheid, geen gewone zwaai. Land hem drie keer.",
+      "taskHoneBodyTouch": "Tik op een oefenpop om hem als doelwit te kiezen, tik dan op {ability} op de actiebalk. Dat is jouw eigen vaardigheid, geen gewone zwaai. Land hem drie keer.",
+      "taskHoneBodyPad": "Kies een oefenpop als doelwit, druk dan op de actieknop met {ability} erop. Dat is jouw eigen vaardigheid, geen gewone zwaai. Land hem drie keer.",
+      "taskLongWalkBody": "Druk op {bagsKey} om je tassen te openen, en klik dan met links op de Doorgangssteen. Hij legt je neer waar je staat. Niets hier kan je kwaad doen, en dit kost je niets.",
+      "taskLongWalkBodyTouch": "Open je tassen en tik op de Doorgangssteen. Hij legt je neer waar je staat. Niets hier kan je kwaad doen, en dit kost je niets.",
+      "taskLongWalkBodyPad": "Open je tassen en kies de Doorgangssteen. Hij legt je neer waar je staat. Niets hier kan je kwaad doen, en dit kost je niets.",
+      "taskLongWalkDeadBody": "Je bent gestorven, en je hebt niets verloren: geen voorwerpen, geen munten, geen ervaring. Stap 1 van 2: klik op de knop Geest Vrijlaten in het midden van je scherm. Je herrijst als geest op het kerkhof achter het kamp.",
+      "taskLongWalkDeadBodyTouch": "Je bent gestorven, en je hebt niets verloren: geen voorwerpen, geen munten, geen ervaring. Stap 1 van 2: tik op de knop Geest Vrijlaten in het midden van je scherm. Je herrijst als geest op het kerkhof achter het kamp.",
+      "taskLongWalkDeadBodyPad": "Je bent gestorven, en je hebt niets verloren: geen voorwerpen, geen munten, geen ervaring. Stap 1 van 2: kies Geest Vrijlaten in het midden van je scherm. Je herrijst als geest op het kerkhof achter het kamp.",
+      "taskLongWalkGhostBody": "Stap 2 van 2: je bent nu een geest, en niets kan je raken. Je lichaam is de markering op je minikaart. Loop ernaartoe. Zodra je dichtbij komt, verschijnt een knop Herrijs bij je lijk: klik erop en je bent weer levend, zonder enige straf. Die wandeling is ALTIJD gratis, en zo kom je elke keer terug wanneer je sterft.",
+      "taskLongWalkGhostBodyTouch": "Stap 2 van 2: je bent nu een geest, en niets kan je raken. Je lichaam is de markering op je minikaart. Loop ernaartoe. Zodra je dichtbij komt, verschijnt een knop Herrijs bij je lijk: tik erop en je bent weer levend, zonder enige straf. Die wandeling is ALTIJD gratis, en zo kom je elke keer terug wanneer je sterft.",
+      "taskLongWalkGhostBodyPad": "Stap 2 van 2: je bent nu een geest, en niets kan je raken. Je lichaam is de markering op je minikaart. Loop ernaartoe. Zodra je dichtbij komt, verschijnt een knop Herrijs bij je lijk: kies hem en je bent weer levend, zonder enige straf. Die wandeling is ALTIJD gratis, en zo kom je elke keer terug wanneer je sterft.",
+      "taskShellBody": "De scharrelaars knijpen terug. Klik met links op een van hen om hem als doelwit te kiezen, druk dan op {abilityKey} voor {ability}, en blijf aanvallen. Vallen er te veel tegelijk aan, trek je dan terug de weg op: ze geven de achtervolging snel op, en je gezondheid herstelt terwijl je rust.",
+      "taskShellBodyTouch": "De scharrelaars knijpen terug. Tik op een van hen om hem als doelwit te kiezen, tik dan op {ability} op de actiebalk. Vallen er te veel tegelijk aan, trek je dan terug de weg op: ze geven de achtervolging snel op, en je gezondheid herstelt terwijl je rust.",
+      "taskShellBodyPad": "De scharrelaars knijpen terug. Kies er een als doelwit, druk dan op de actieknop met {ability} erop. Vallen er te veel tegelijk aan, trek je dan terug de weg op: ze geven de achtervolging snel op, en je gezondheid herstelt terwijl je rust.",
+      "taskStrikeTrueBodyCaster": "Loop naar een strooien oefenpop en klik er met links op om hem als doelwit te kiezen: zijn naam verschijnt boven in je scherm. Druk dan op {attackKey}, of klik op de tweede knop op de actiebalk, om je spreuk te werpen. Blijf spreuken tot er een het begeeft.",
+      "taskStrikeTrueBodyCasterTouch": "Loop naar een strooien oefenpop en tik erop om hem als doelwit te kiezen. Tik dan op de tweede knop op de actiebalk om je spreuk te werpen. Blijf spreuken tot er een het begeeft.",
+      "taskStrikeTrueBodyCasterPad": "Loop naar een strooien oefenpop en druk op je doelknop om hem als doelwit te kiezen. Druk dan op je tweede actieknop om je spreuk te werpen. Blijf spreuken tot er een het begeeft.",
+      "taskShellBodyCaster": "De scharrelaars knijpen terug. Klik met links op een van hen om hem als doelwit te kiezen, druk dan op {abilityKey} voor {ability}, en blijf op afstand spreuken werpen. Vallen er te veel tegelijk aan, trek je dan terug de weg op: ze geven de achtervolging snel op, en je gezondheid herstelt terwijl je rust.",
+      "taskShellBodyCasterTouch": "De scharrelaars knijpen terug. Tik op een van hen om hem als doelwit te kiezen, tik dan op {ability} op de actiebalk, en blijf op afstand spreuken werpen. Vallen er te veel tegelijk aan, trek je dan terug de weg op: ze geven de achtervolging snel op, en je gezondheid herstelt terwijl je rust.",
+      "taskShellBodyCasterPad": "De scharrelaars knijpen terug. Kies er een als doelwit, druk dan op de actieknop met {ability} erop, en blijf op afstand spreuken werpen. Vallen er te veel tegelijk aan, trek je dan terug de weg op: ze geven de achtervolging snel op, en je gezondheid herstelt terwijl je rust.",
+      "taskPearlBody": "Volg het gouden pad naar de getijdenpoel aan de westkant van het strand. Druk, staand aan de waterrand, op {bagsKey} om je tassen te openen en klik met links op het Ziltig Lokaas om hem op te roepen. Bevecht hem zoals je de scharrelaars bevocht, en druk wanneer hij valt op {interactKey} op zijn schild om de Glanzende Parel te claimen.",
+      "taskPearlBodyTouch": "Volg het gouden pad naar de getijdenpoel aan de westkant van het strand. Open, staand aan de waterrand, je tassen en tik op het Ziltig Lokaas om hem op te roepen. Bevecht hem zoals je de scharrelaars bevocht, en tik wanneer hij valt op zijn schild om de Glanzende Parel te claimen.",
+      "taskPearlBodyPad": "Volg het gouden pad naar de getijdenpoel aan de westkant van het strand. Open, staand aan de waterrand, je tassen en kies het Ziltig Lokaas om hem op te roepen. Bevecht hem zoals je de scharrelaars bevocht, en druk wanneer hij valt je interactieknop op zijn schild in om de Glanzende Parel te claimen.",
+      "taskWreckLineBody": "De aangespoelde kratten liggen langs het pad naar Kamp Dawnrest. Loop naar een toe tot de naam verschijnt, druk dan op {interactKey}, of klik met links op de krat, om hem op te rapen. Zes maken de buit compleet.",
+      "taskWreckLineBodyTouch": "De aangespoelde kratten liggen langs het pad naar Kamp Dawnrest. Loop naar een toe tot de naam verschijnt, tik dan op de krat, of tik op de Gebruik-knop, om hem op te rapen. Zes maken de buit compleet.",
+      "taskWreckLineBodyPad": "De aangespoelde kratten liggen langs het pad naar Kamp Dawnrest. Loop naar een toe tot de naam verschijnt, druk dan op je interactieknop om hem op te rapen. Zes maken de buit compleet.",
+      "taskPouchBody": "Druk op {interactKey} op {npc}, of klik met links op hen, om de kraam te openen, en klik dan met links op de Linnen buidel om hem te kopen.",
+      "taskPouchBodyTouch": "Tik op {npc} om de kraam te openen, en tik dan op de Linnen buidel om hem te kopen.",
+      "taskPouchBodyPad": "Druk op je interactieknop op {npc} om de kraam te openen, en kies dan de Linnen buidel om hem te kopen.",
+      "readyPouchBody": "Buidel gekocht. Druk op {bagsKey} om je tassen te openen en klik met links op de Linnen buidel om hem in een vrije taslus te gespen. Ga dan naar {npc} en druk op {interactKey} om hem te showen.",
+      "readyPouchBodyTouch": "Buidel gekocht. Open je tassen en tik op de Linnen buidel om hem in een vrije taslus te gespen. Ga dan naar {npc} en tik op hen om hem te showen.",
+      "readyPouchBodyPad": "Buidel gekocht. Open je tassen en kies de Linnen buidel om hem in een vrije taslus te gespen. Ga dan naar {npc} en druk op je interactieknop om hem te showen.",
+      "promptTalk": "Praten",
+      "promptTurnIn": "Quest inleveren",
+      "promptPickUp": "Oprapen",
+      "promptLootPearl": "Plunder de parel",
+      "promptRead": "Lezen",
+      "promptRing": "Luiden",
+      "promptHold": "Vasthouden",
+      "promptSelect": "Selecteren",
+      "promptAttack": "Aanvallen",
+      "promptUseAbility": "Vaardigheid gebruiken",
+      "promptKneel": "Knielen",
+      "promptOpenBags": "Open je tassen",
+      "promptCharacterSheet": "Open je personageblad",
+      "promptLookAround": "Houd de rechtermuisknop ingedrukt en sleep om rond te kijken",
+      "promptJump": "Springen",
+      "promptSummon": "Oproepen",
+      "ringEquipTitle": "Draag je prijs",
+      "ringEquipBody": "Je hebt de Parelmoer gekregen, en een beloning doet niets terwijl hij in een tas zit. Stap 1 van 2: druk op {bagsKey} om je tassen te openen, en klik dan met links op de ring om hem aan te doen.",
+      "ringEquipBodyTouch": "Je hebt de Parelmoer gekregen, en een beloning doet niets terwijl hij in een tas zit. Stap 1 van 2: open je tassen en tik op de ring om hem aan te doen.",
+      "ringEquipBodyPad": "Je hebt de Parelmoer gekregen, en een beloning doet niets terwijl hij in een tas zit. Stap 1 van 2: open je tassen en kies de ring om hem aan te doen.",
+      "ringAdmireTitle": "Kijk jou nou",
+      "ringAdmireBody": "Stap 2 van 2: druk op {charKey} om je personageblad te openen. Dat scherm toont alles wat je draagt en de stats die het je geeft, en de ring zit nu aan je hand. Kijk het na wanneer je nieuwe uitrusting oppakt.",
+      "ringAdmireBodyTouch": "Stap 2 van 2: open je personageblad vanuit het menu. Dat scherm toont alles wat je draagt en de stats die het je geeft, en de ring zit nu aan je hand. Kijk het na wanneer je nieuwe uitrusting oppakt.",
+      "ringAdmireBodyPad": "Stap 2 van 2: open je personageblad vanuit het menu. Dat scherm toont alles wat je draagt en de stats die het je geeft, en de ring zit nu aan je hand. Kijk het na wanneer je nieuwe uitrusting oppakt.",
+      "keycapThen": "dan",
+      "voiceArrival": "Rustig aan de wal, vriend. Zie je het gouden pad onder je voeten? Dat kent de weg beter dan ik. Volg het.",
+      "voiceFirstFlag": "Dat is één vlag binnen. Blijf die benen bewegen, nog maar twee te gaan.",
+      "voiceRunDone": "Een schone run, dat. Opzichter Pell heeft je beloning, ga hem halen.",
+      "voiceStationDoneA": "Prima werk. Op naar de volgende, het pad brandt al voor je.",
+      "voiceStationDoneB": "Je krijgt hier de slag van te pakken, geen vergissing mogelijk.",
+      "voiceVeerOff": "Wacht even, vriend, dat is de verkeerde kant op. Het gouden pad ligt achter je.",
+      "voiceGraduate": "De bel is voor je geluid. Oostbeek wacht aan de overkant van het water, en jij bent er klaar voor.",
+      "bellTitle": "Luid de bel",
+      "bellBody": "Je oversteek is verdiend. Loop naar de veerbel bij de steiger en druk op {interactKey}, of klik er met links op, om naar Oostbeek te varen.",
+      "bellBodyTouch": "Je oversteek is verdiend. Loop naar de veerbel bij de steiger en tik erop om naar Oostbeek te varen.",
+      "bellBodyPad": "Je oversteek is verdiend. Loop naar de veerbel bij de steiger en druk je interactieknop erop in om naar Oostbeek te varen."
     },
     "widgets": {
       "clockTitle": "Lokale tijd - klik om te wisselen tussen 12/24-uurs",
@@ -1184,29 +1184,29 @@ export const nl_NL: EnTranslations = {
       "devEmpty": "Nog geen gerangschikte bijdragers."
     },
     "pledge": {
-      "open": "Accepting pledges",
-      "closed": "Not accepting pledges",
-      "minLevel": "Level {level}+",
-      "action": "Pledge",
-      "actionTitle": "Pledge to {guild}",
-      "pledged": "Pledged",
-      "yourGuild": "Your guild",
-      "tab": "Pledges",
-      "tabWithCount": "Pledges ({count})",
-      "empty": "No one has pledged to your guild yet.",
-      "accept": "Accept",
-      "acceptTitle": "Accept {name}'s pledge",
-      "reject": "Decline",
-      "rejectTitle": "Decline {name}'s pledge",
-      "settings": "Recruitment",
-      "acceptingLabel": "Accept pledges",
-      "minLevelLabel": "Minimum level",
-      "noteLabel": "Board note",
-      "notePlaceholder": "Tell aspiring members what your guild is looking for",
-      "save": "Save",
-      "yourPledge": "Your pledge: {guild}",
-      "since": "Pledged {date}",
-      "withdraw": "Withdraw pledge"
+      "open": "Accepteert geloften",
+      "closed": "Accepteert geen geloften",
+      "minLevel": "Niveau {level}+",
+      "action": "Zweren",
+      "actionTitle": "Trouw zweren aan {guild}",
+      "pledged": "Gezworen",
+      "yourGuild": "Je gilde",
+      "tab": "Geloften",
+      "tabWithCount": "Geloften ({count})",
+      "empty": "Nog niemand heeft trouw gezworen aan je gilde.",
+      "accept": "Accepteren",
+      "acceptTitle": "Gelofte van {name} accepteren",
+      "reject": "Weigeren",
+      "rejectTitle": "Gelofte van {name} weigeren",
+      "settings": "Rekrutering",
+      "acceptingLabel": "Geloften accepteren",
+      "minLevelLabel": "Minimumniveau",
+      "noteLabel": "Bordnotitie",
+      "notePlaceholder": "Vertel aspirant-leden waarnaar je gilde op zoek is",
+      "save": "Opslaan",
+      "yourPledge": "Je gelofte: {guild}",
+      "since": "Gezworen op {date}",
+      "withdraw": "Gelofte intrekken"
     },
     "raidLockout": {
       "title": "Raidvergrendelingen",
@@ -1455,7 +1455,7 @@ export const nl_NL: EnTranslations = {
       "endedForfeitLog": "De wedstrijd werd opgegeven.",
       "firstWinBonusLine": "Eerste overwinning van de dag: +{honor} Eer",
       "firstWinBonusLog": "Eerste overwinning van de dag: je krijgt {honor} bonus Eer.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Weekend van Dubbele Eer: Eer op de Doornholte-Velden betaalt vandaag {mult}x, en een uitgevochten nederlaag betaalt als een overwinning",
       "timeWarningMinutes": "Nog {minutes} minuten te gaan",
       "timeWarningOneMinute": "Nog een minuut te gaan",
       "timeWarningMinutesLog": "Nog {minutes} minuten te gaan in het gevecht.",
@@ -1550,8 +1550,8 @@ export const nl_NL: EnTranslations = {
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
       "mobileLeftHanded": "Linkshandige indeling",
-      "touchTapMenus": "Tap menus",
-      "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
+      "touchTapMenus": "Tik voor menu's",
+      "touchTapMenusNote": "Open de actie-, verbruiksartikelen- en menuknoppen met een tik in plaats van een veeg. Tik op een item om het te gebruiken, tik nogmaals op de knop voor de gebruikelijke actie, of tik buiten het venster om te sluiten."
     },
     "talentRows": {
       "tab": "Keuzes",
@@ -1576,8 +1576,8 @@ export const nl_NL: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
-      "glyphStyle": "Button Labels",
-      "glyphStyleAuto": "Auto",
+      "glyphStyle": "Knoplabels",
+      "glyphStyleAuto": "Automatisch",
       "glyphStyleXbox": "Xbox",
       "glyphStylePlayStation": "PlayStation",
       "glyphStyleNintendo": "Nintendo",
@@ -2071,16 +2071,16 @@ export const nl_NL: EnTranslations = {
         "other": "je bent {rank}, {count} leden"
       },
       "wocMarketSellChoose": {
-        "one": "Choose from {count} item",
-        "few": "Choose from {count} items",
-        "many": "Choose from {count} items",
-        "other": "Choose from {count} items"
+        "one": "Kies uit {count} voorwerp",
+        "few": "Kies uit {count} voorwerpen",
+        "many": "Kies uit {count} voorwerpen",
+        "other": "Kies uit {count} voorwerpen"
       },
       "wocTradeIneligible": {
-        "one": "{count} staged item cannot be sold for $WOC.",
-        "few": "{count} staged items cannot be sold for $WOC.",
-        "many": "{count} staged items cannot be sold for $WOC.",
-        "other": "{count} staged items cannot be sold for $WOC."
+        "one": "{count} klaargezet voorwerp kan niet voor $WOC worden verkocht.",
+        "few": "{count} klaargezette voorwerpen kunnen niet voor $WOC worden verkocht.",
+        "many": "{count} klaargezette voorwerpen kunnen niet voor $WOC worden verkocht.",
+        "other": "{count} klaargezette voorwerpen kunnen niet voor $WOC worden verkocht."
       },
       "finderPartySize": {
         "one": "{count} speler",
@@ -2662,14 +2662,14 @@ export const nl_NL: EnTranslations = {
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
       "removeFromBarAria": "{name} verwijderen van actiebalk",
-      "assignAria": "Choose a slot for {name}"
+      "assignAria": "Kies een actievak voor {name}"
     },
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Valsspeler >",
-      "pledgeTag": "Pledge of {guild}"
+      "pledgeTag": "Gelofte aan {guild}"
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -2994,11 +2994,11 @@ export const nl_NL: EnTranslations = {
     },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn.",
-      "subtitle": "Guilds of the realm",
-      "rosterTitle": "View the roster of {guild}",
-      "back": "Back",
-      "popupTitle": "Guild Signpost",
-      "close": "Close"
+      "subtitle": "Gildes van het rijk",
+      "rosterTitle": "Bekijk de ledenlijst van {guild}",
+      "back": "Terug",
+      "popupTitle": "Gildebord",
+      "close": "Sluiten"
     },
     "bank": {
       "title": "Bank",
@@ -3132,8 +3132,8 @@ export const nl_NL: EnTranslations = {
           "note": "Duellisten stromen naar het Asgrauwe Colosseum. Sluit aan in de wachtrij en klim de ladder op."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Weekend van Dubbele Eer",
+          "note": "De oorlogskampen blazen de verzamelroep: het hele weekend betaalt Eer op de Doornholte-Velden dubbel, en een uitgevochten nederlaag betaalt als een overwinning."
         },
         "fishingDerby": {
           "title": "Visderby",
@@ -3444,7 +3444,7 @@ export const nl_NL: EnTranslations = {
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbruikt {count} van fijne kwaliteit)",
-      "craftFeeLine": "Craft fee: {fee} each",
+      "craftFeeLine": "Ambachtskosten: {fee} per stuk",
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
@@ -3996,7 +3996,7 @@ export const nl_NL: EnTranslations = {
       "unlockedBorderHint": "Nieuwe rand verdiend: {name}. Draag hem via het Boek der Daden.",
       "broadcastLine": "{name} heeft een daad volbracht: {deed}",
       "rarityLine": "Behaald door {percent} van de avonturiers",
-      "stillToVisit": "Still to visit: {places}",
+      "stillToVisit": "Nog te bezoeken: {places}",
       "trackerLabel": "Daden",
       "collapseHint": "Klap de dadenvolglijst in",
       "expandHint": "Klap de dadenvolglijst uit",
@@ -4026,218 +4026,218 @@ export const nl_NL: EnTranslations = {
       "minLevelNote": "Vereist niveau {level}"
     },
     "walletBridge": {
-      "cancelled": "The wallet request was cancelled. Nothing was sent.",
-      "timeout": "Your wallet did not respond in time. Open the wallet and try again.",
-      "notConnected": "Connect and verify a wallet, then try again.",
-      "unsupported": "This wallet cannot complete that action. Connect a different wallet.",
-      "unavailable": "No wallet connection is available here. Reconnect your wallet and try again.",
-      "badResponse": "Your wallet returned an unusable answer. Try again."
+      "cancelled": "Het portemonneeverzoek is geannuleerd. Er is niets verstuurd.",
+      "timeout": "Je portemonnee reageerde niet op tijd. Open de portemonnee en probeer het opnieuw.",
+      "notConnected": "Koppel en verifieer een portemonnee, en probeer het opnieuw.",
+      "unsupported": "Deze portemonnee kan die actie niet voltooien. Koppel een andere portemonnee.",
+      "unavailable": "Hier is geen portemonneeverbinding beschikbaar. Koppel je portemonnee opnieuw en probeer het nogmaals.",
+      "badResponse": "Je portemonnee gaf een onbruikbaar antwoord terug. Probeer het opnieuw."
     },
     "wocMarket": {
-      "title": "$WOC Exchange",
-      "close": "Close the Exchange",
-      "launcherLabel": "$WOC Exchange",
-      "tabBrowse": "Browse",
-      "tabSell": "Sell",
-      "tabActivity": "My Activities",
-      "tabsLabel": "$WOC Exchange sections",
-      "loading": "Loading the Exchange...",
-      "loadFailed": "The Exchange could not be reached. Try again shortly.",
-      "disabledRealm": "The $WOC Exchange is not available on this realm.",
-      "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
-      "walletBanner": "Link and verify a wallet to bid, buy, or sell on the Exchange.",
-      "walletBannerCta": "Connect wallet",
-      "rateNote": "Rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "rateNotePaused": "Last known rate: about {tokens} $WOC per $1.00 USD as of {time}.",
-      "estimateNote": "About {tokens} $WOC for {usd} at the current rate.",
-      "browseEmpty": "No listings right now. Check back soon.",
-      "browseError": "Listings could not be loaded.",
-      "colItem": "Item",
-      "colSeller": "Seller",
-      "colCurrentBid": "Current bid",
-      "colBuyNow": "Buy now",
-      "colTimeLeft": "Time left",
-      "reserveMet": "Reserve met",
-      "reserveNotMet": "Reserve not met",
-      "yourListing": "Your listing",
-      "buyNowLockedBadge": "Purchase in progress",
-      "reserveMetTip": "The seller set a hidden minimum price, and the current bid meets it.",
-      "reserveNotMetTip": "The seller set a hidden minimum price. If the highest bid at close is below it, the item is not sold and every bond is returned.",
-      "yourListingTip": "You listed this item. You cannot bid on your own listing; while it has no bids you can cancel it here or from Activity.",
-      "buyNowLockedTip": "Another buyer holds this listing while they pay. If they do not pay in time, it reopens.",
-      "pagePrev": "Previous page",
-      "pageNext": "Next page",
-      "pageNumber": "Page {current}",
-      "sortLabel": "Sort",
-      "sortEnding": "Ending soonest",
-      "sortNewest": "Newest",
-      "sortPriceAsc": "Price: low to high",
-      "sortPriceDesc": "Price: high to low",
-      "filterQuality": "Quality",
-      "filterFormat": "Format",
-      "filterAny": "Any",
-      "filterFormatAuction": "Auction",
-      "filterFormatBuyNow": "Buy now",
-      "filterItemLabel": "Item",
-      "filterItemPlaceholder": "Search by item name",
-      "filterCategory": "Category",
-      "filterCategoryWeapon": "Weapons",
-      "filterCategoryArmor": "Armor",
-      "filterCategoryMount": "Mounts",
+      "title": "$WOC-beurs",
+      "close": "Beurs sluiten",
+      "launcherLabel": "$WOC-beurs",
+      "tabBrowse": "Bladeren",
+      "tabSell": "Verkopen",
+      "tabActivity": "Mijn Activiteiten",
+      "tabsLabel": "Onderdelen van de $WOC-beurs",
+      "loading": "De Beurs laden...",
+      "loadFailed": "De Beurs kon niet worden bereikt. Probeer het straks opnieuw.",
+      "disabledRealm": "De $WOC-beurs is niet beschikbaar op deze wereld.",
+      "pausedBanner": "Handel is gepauzeerd. Veilingen blijven aftellen; nieuwe aanbiedingen, biedingen, offertes en betalingen wachten tot de handel wordt hervat, en een betaling die al is verzonden, wordt nog steeds afgewikkeld.",
+      "walletBanner": "Koppel en verifieer een portemonnee om te bieden, kopen of verkopen op de Beurs.",
+      "walletBannerCta": "Portemonnee koppelen",
+      "rateNote": "Koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
+      "rateNotePaused": "Laatst bekende koers: ongeveer {tokens} $WOC per $1.00 USD, vanaf {time}.",
+      "estimateNote": "Ongeveer {tokens} $WOC voor {usd} tegen de huidige koers.",
+      "browseEmpty": "Nu geen aanbiedingen. Kom snel terug.",
+      "browseError": "Aanbiedingen konden niet worden geladen.",
+      "colItem": "Voorwerp",
+      "colSeller": "Verkoper",
+      "colCurrentBid": "Huidig bod",
+      "colBuyNow": "Nu kopen",
+      "colTimeLeft": "Resterende tijd",
+      "reserveMet": "Reserveprijs behaald",
+      "reserveNotMet": "Reserveprijs niet behaald",
+      "yourListing": "Jouw aanbieding",
+      "buyNowLockedBadge": "Aankoop bezig",
+      "reserveMetTip": "De verkoper heeft een verborgen minimumprijs ingesteld, en het huidige bod haalt die.",
+      "reserveNotMetTip": "De verkoper heeft een verborgen minimumprijs ingesteld. Als het hoogste bod bij sluiting daaronder blijft, wordt het voorwerp niet verkocht en wordt elke borg terugbetaald.",
+      "yourListingTip": "Je hebt dit voorwerp aangeboden. Je kunt niet bieden op je eigen aanbieding; zolang er geen biedingen op staan, kun je ze hier of via Activiteiten annuleren.",
+      "buyNowLockedTip": "Een andere koper houdt deze aanbieding vast tijdens het betalen. Als de betaling niet op tijd binnenkomt, gaat de aanbieding weer open.",
+      "pagePrev": "Vorige pagina",
+      "pageNext": "Volgende pagina",
+      "pageNumber": "Pagina {current}",
+      "sortLabel": "Sorteren",
+      "sortEnding": "Eindigt eerst",
+      "sortNewest": "Nieuwste",
+      "sortPriceAsc": "Prijs: laag naar hoog",
+      "sortPriceDesc": "Prijs: hoog naar laag",
+      "filterQuality": "Kwaliteit",
+      "filterFormat": "Soort",
+      "filterAny": "Alle",
+      "filterFormatAuction": "Veiling",
+      "filterFormatBuyNow": "Nu kopen",
+      "filterItemLabel": "Voorwerp",
+      "filterItemPlaceholder": "Zoek op voorwerpnaam",
+      "filterCategory": "Categorie",
+      "filterCategoryWeapon": "Wapens",
+      "filterCategoryArmor": "Pantser",
+      "filterCategoryMount": "Rijdieren",
       "filterSubcategory": "Type",
-      "sellerLinkAria": "View recent trades by {name}",
-      "sellerTitle": "Recent trades by {name}",
-      "sellerBack": "Back to Browse",
-      "sellerEmpty": "No completed trades yet.",
-      "sellerError": "Recent trades could not be loaded.",
-      "sellerSaleRow": "{time}: {item} to {buyer} for {usd}",
-      "detailTitle": "Listing",
-      "detailSeller": "Sold by {name}",
-      "detailEndsAt": "Ends {utc} UTC ({local} local)",
-      "detailStartingBid": "Starting bid: {usd}",
-      "detailCurrentBid": "Current bid: {usd}",
-      "detailNoBids": "No bids yet",
-      "detailMinNext": "Minimum next bid: {usd}",
-      "detailBuyNow": "Buy now: {usd}",
-      "detailSales": "Recent sales",
-      "detailSaleRow": "{time}: {seller} sold to {buyer} for {usd}",
-      "detailNoSales": "No recorded sales for this item yet.",
-      "detailSalesLoading": "Loading recent sales...",
-      "bidLabel": "Your bid (USD)",
-      "bidPlaceholder": "Enter a USD amount",
-      "bidButton": "Place bid",
-      "bidAria": "Place a bid on {item}",
-      "bidTermsToggle": "Bid terms",
-      "rowOpenAria": "View the listing for {item}",
-      "buyNowButton": "Buy now for {usd}",
-      "buyNowAria": "Buy {item} now for {usd}",
-      "cancelButton": "Cancel listing",
-      "cancelAria": "Cancel your listing of {item}",
-      "bidBondNote": "Placing a bid holds a refundable bond in $WOC on top of the bid: {bond} for a bid of {bid}, more for a higher bid. It is returned when you are outbid or lose, or after you pay if you win; a second-chance offer holds it again.",
-      "bidBondSchedule": "The bond is {rate} percent of your bid, at least {min} and at most {max}.",
-      "bidBondPayWindow": "Pay the bond within {duration} of placing your bid, or the bid lapses.",
-      "bidBindingNote": "A bid is binding once you sign its bond transaction: it cannot be withdrawn, and if you win and do not pay, the bond is forfeited and your account earns a Marketplace strike.",
-      "bidCloseNote": "A bid whose bond confirms in the last 2 minutes extends the auction to 2 minutes after that bid, up to 30 minutes past the listed end. A bond that confirms after the auction closes does not count and is refunded.",
-      "offerNextNote": "If the winner does not pay, you may become the buyer at your own bid: your bond is held again (or asked for again if it was already returned) and payment is due within {duration}.",
-      "buyNowNote": "Buy now holds this listing for you for about four and a half minutes while you pay. If you do not pay in time, you cannot try this listing again for 30 minutes, and three unpaid Buy Nows within an hour pause Buy Now for you until the oldest is an hour old.",
-      "variableTokenWarning": "You are committing to pay a USD value in $WOC. The exact token amount is set by a fresh quote when payment is requested and may differ from the estimate.",
-      "quoteFixedNote": "This quote fixes the $WOC amount until it expires. A new quote may differ.",
-      "settlementDeadlineNote": "If you win, payment is due within {duration} of the auction closing.",
-      "claimCooldownRetry": "You recently walked away from a Buy Now. Try again in {duration}.",
-      "termsLabel": "I accept the Marketplace terms.",
-      "termsLink": "View the Marketplace terms (opens in a new tab)",
-      "quoteTitle": "Confirm payment",
-      "quoteTotal": "Total: {tokens} $WOC",
-      "quoteSeller": "Seller receives: {tokens} $WOC",
-      "quoteBurn": "Burned (removed from supply): {tokens} $WOC",
-      "quoteTreasury": "To the game treasury: {tokens} $WOC",
-      "quoteExpires": "Quote expires in {duration}",
-      "quoteExpiresAt": "Quote expires at {time}.",
-      "quoteExpired": "The quote expired. Request a fresh one.",
-      "quoteSign": "Sign and pay",
-      "quoteRefresh": "New quote",
-      "quoteCancel": "Not now",
-      "quoteBondFor": "Refundable bid bond: {usd}",
-      "quoteBondForItem": "Refundable bid bond for {item}: {usd}",
-      "quoteSettlementFor": "Settlement for {item}: {usd}",
-      "paymentDueAt": "Payment is due by {time}.",
-      "signing": "Waiting for your wallet...",
-      "signFailed": "Your wallet did not complete the payment. Check the wallet and try again.",
-      "signFailedConfirm": "Your wallet did not sign the confirmation. Check the wallet and try again.",
-      "confirming": "Confirming on chain...",
-      "listing": "Listing your item...",
-      "activityCancelPending": "Cancel pending",
-      "activityDirected": "Directed sale",
-      "bidPlacedStanding": "Your bid stands. You are the high bidder.",
-      "bidPlacedOutbid": "Your bond confirmed, but a higher bid landed first.",
-      "purchaseComplete": "Purchase complete. Your item arrives by Ravenpost mail.",
-      "paymentConfirmedDelivering": "Payment confirmed. Your item arrives by Ravenpost mail once delivery completes.",
-      "listingCreated": "Your listing is live.",
-      "listingCancelled": "Listing cancelled. Your item returns by Ravenpost mail.",
-      "listingCancelPending": "Cancel pending: a buyer holds the purchase window. Unless they pay, the listing closes and your item returns by Ravenpost mail.",
-      "sellTitle": "Create a listing",
-      "sellEmptyFloor": "No eligible items in your bags. This realm takes unbound equipment of {floor} quality or better.",
-      "sellCollectiblesBoth": "Mounts and mech chroma plates can also be listed.",
-      "sellCollectiblesMounts": "Mounts can also be listed.",
-      "sellCollectiblesChromas": "Mech chroma plates can also be listed.",
-      "sellLockedHidden": "Locked items are not listed here. Unlock them in your bags to sell them.",
-      "sellSearchPlaceholder": "Type to filter your bags",
-      "sellClear": "Clear {item} and choose another",
-      "sellChoose": "Item to list",
-      "sellNoMatches": "No items match that search",
-      "sellBuyNowAboveStart": "The buy-now price must be higher than the starting bid.",
-      "sellFormat": "Format",
-      "sellFormatAuction": "Auction",
-      "sellFormatBuyNow": "Buy now only",
-      "sellFormatAuctionBuyNow": "Auction with buy now",
-      "sellStart": "Starting bid (USD)",
-      "sellReserve": "Reserve (USD, optional)",
-      "sellReserveNote": "Optional, at least the starting bid. Bidders see only whether it is met; if the highest bid at close is below it, the item comes back to you unsold and every bond is returned.",
-      "sellBuyNowNote": "Required. A buy-now listing sells at this price with no bidding.",
-      "sellBuyNowAuctionNote": "Optional. Set a price a buyer can pay to end the auction early; it must be above the starting bid and the reserve.",
-      "sellBuyNowPrice": "Buy-now price (USD)",
-      "sellDuration": "Duration",
-      "sellOfferNext": "If the winner does not pay, sell to the next-highest bidder whose bid meets the reserve, at their bid, instead of ending unsold.",
-      "sellSubmit": "List item",
-      "sellSubmitAria": "List {item} on the Exchange",
-      "sellFeeNote": "A completed sale pays an Exchange fee out of the price: part is burned and part goes to the treasury, and you receive the remainder at your linked wallet in the settlement transaction. The fee for the price you enter is shown here; on an auction it follows the final price.",
-      "activityListings": "My listings",
-      "activityBids": "My bids",
-      "activitySettlements": "My settlements",
-      "activityEmpty": "You have no bids, listings, or settlements yet. Your Exchange activity appears here.",
-      "activityNoListings": "You have no listings.",
-      "activityNoBids": "You have no bids.",
-      "activityNoSettlements": "You have no settlements.",
-      "activityPayNow": "Pay now",
-      "activityPayNowAria": "Pay for settlement {id} now",
-      "activityPayNowItemAria": "Pay {usd} for {item} now",
-      "activityDeadline": "Payment due in {duration}",
-      "dueAt": "Due {utc} UTC ({local} local)",
-      "activityStrikes": "Marketplace strikes: {count}",
-      "activitySuspended": "Exchange suspended for {duration} after unpaid deals: no bids, purchases, listings, or $WOC trades until then.",
-      "strikesTip": "A strike is earned each time you do not pay for a deal you committed to. After the first, each strike suspends you from the Exchange for longer: 3 days, then 14, then 90, then a year.",
-      "bidStatusPending": "Awaiting bond",
-      "bidStatusActive": "High bidder",
-      "bidStatusOutbid": "Outbid",
-      "bidStatusLapsed": "Lapsed",
-      "bidStatusWon": "Won",
-      "bidStatusDefaulted": "Defaulted",
-      "bidStatusCancelled": "Cancelled",
-      "bidBondPay": "Pay bond",
-      "bidBondPayAria": "Pay the bond for your bid on listing {id}",
-      "bidBondPayItemAria": "Pay the {bond} bond for your bid on {item}",
-      "settlementOffered": "Payment due",
-      "settlementConfirming": "Confirming",
-      "settlementConfirmedDelivering": "Payment confirmed, delivering",
-      "settlementReview": "Payment under review",
-      "settlementDelivered": "Delivered",
-      "settlementExpired": "Expired unpaid",
-      "settlementFailed": "Payment failed",
-      "settlementFailBurnMissing": "The payment did not include the required token burn.",
-      "settlementFailBurnMismatch": "The payment burned the wrong token amount.",
-      "settlementFailBurnAuthority": "The token burn came from a wallet this purchase did not name.",
-      "settlementFailUnexpectedCredit": "The transaction paid a wallet outside this purchase.",
-      "settlementFailQuoteExpired": "The payment quote expired before it was used. Request a fresh one and pay again.",
-      "settlementFailTransaction": "The payment transaction failed on the network. Request a fresh quote and try again.",
-      "settlementFailRefunded": "This payment was returned to your wallet.",
-      "settlementFailSuperseded": "This payment attempt was replaced by a newer one.",
-      "settlementFailConfirmingOverdue": "This payment took too long to confirm and could not be verified.",
-      "settlementFailGeneric": "This payment could not be completed.",
-      "paymentSeenAwaitingFinality": "Payment seen on the ledger. Waiting for final confirmation.",
-      "paymentNotYetVisible": "No payment is visible on the ledger yet. It can take a moment to appear.",
-      "paymentServiceUnreachable": "The payment service is unreachable. Your payment stays recorded and will be re-checked.",
-      "paymentPendingGeneric": "Your payment is submitted and awaiting confirmation.",
-      "bondSeenAwaitingFinality": "Bond payment seen on the ledger. Waiting for final confirmation.",
-      "bondNotYetVisible": "No bond payment is visible on the ledger yet. It can take a moment to appear.",
-      "bondServiceUnreachable": "The payment service is unreachable. Your bond payment stays recorded and will be re-checked.",
-      "bondPendingGeneric": "Your bond payment is submitted and awaiting confirmation.",
-      "listingStatusActive": "Active",
-      "listingStatusSettling": "Awaiting payment",
-      "listingStatusSold": "Sold",
-      "listingStatusReturned": "Returned",
-      "listingStatusCancelled": "Cancelled",
-      "listingStatusSuspended": "Suspended",
-      "listingStatusUnsold": "Unsold"
+      "sellerLinkAria": "Bekijk recente transacties van {name}",
+      "sellerTitle": "Recente transacties van {name}",
+      "sellerBack": "Terug naar Bladeren",
+      "sellerEmpty": "Nog geen voltooide transacties.",
+      "sellerError": "Recente transacties konden niet worden geladen.",
+      "sellerSaleRow": "{time}: {item} aan {buyer} voor {usd}",
+      "detailTitle": "Aanbieding",
+      "detailSeller": "Verkocht door {name}",
+      "detailEndsAt": "Eindigt om {utc} UTC ({local} lokale tijd)",
+      "detailStartingBid": "Startbod: {usd}",
+      "detailCurrentBid": "Huidig bod: {usd}",
+      "detailNoBids": "Nog geen biedingen",
+      "detailMinNext": "Minimaal volgend bod: {usd}",
+      "detailBuyNow": "Nu kopen: {usd}",
+      "detailSales": "Recente verkopen",
+      "detailSaleRow": "{time}: {seller} verkocht aan {buyer} voor {usd}",
+      "detailNoSales": "Nog geen geregistreerde verkopen voor dit voorwerp.",
+      "detailSalesLoading": "Recente verkopen laden...",
+      "bidLabel": "Je bod (USD)",
+      "bidPlaceholder": "Voer een bedrag in USD in",
+      "bidButton": "Bod plaatsen",
+      "bidAria": "Plaats een bod op {item}",
+      "bidTermsToggle": "Biedvoorwaarden",
+      "rowOpenAria": "Bekijk de aanbieding voor {item}",
+      "buyNowButton": "Nu kopen voor {usd}",
+      "buyNowAria": "Koop {item} nu voor {usd}",
+      "cancelButton": "Aanbieding annuleren",
+      "cancelAria": "Je aanbieding van {item} annuleren",
+      "bidBondNote": "Een bod plaatsen houdt een terugbetaalbare borg in $WOC vast, boven op het bod: {bond} voor een bod van {bid}, meer voor een hoger bod. Ze wordt teruggegeven wanneer je wordt overboden of verliest, of nadat je betaalt als je wint; een tweedekansaanbod houdt haar opnieuw vast.",
+      "bidBondSchedule": "De borg is {rate} procent van je bod, met een minimum van {min} en een maximum van {max}.",
+      "bidBondPayWindow": "Betaal de borg binnen {duration} na het plaatsen van je bod, anders vervalt het bod.",
+      "bidBindingNote": "Een bod is bindend zodra je de bijbehorende borgtransactie ondertekent: het kan niet worden ingetrokken, en als je wint en niet betaalt, vervalt de borg en krijgt je account een Beursovertreding.",
+      "bidCloseNote": "Een bod waarvan de borg in de laatste 2 minuten wordt bevestigd, verlengt de veiling tot 2 minuten na dat bod, tot maximaal 30 minuten na de vermelde eindtijd. Een borg die wordt bevestigd nadat de veiling is gesloten, telt niet mee en wordt terugbetaald.",
+      "offerNextNote": "Als de winnaar niet betaalt, kun jij de koper worden tegen je eigen bod: je borg wordt opnieuw vastgehouden (of opnieuw gevraagd als het al is teruggegeven), en de betaling is verschuldigd binnen {duration}.",
+      "buyNowNote": "Nu kopen houdt deze aanbieding ongeveer viereneenhalve minuut voor je vast terwijl je betaalt. Betaal je niet op tijd, dan kun je deze aanbieding 30 minuten lang niet opnieuw proberen, en na drie onbetaalde Nu kopen-pogingen binnen een uur wordt Nu kopen voor jou onderbroken totdat de oudste ervan een uur oud is.",
+      "variableTokenWarning": "Je verbindt je ertoe een USD-waarde in $WOC te betalen. Het exacte aantal tokens wordt bepaald door een nieuwe prijsopgave op het moment dat de betaling wordt aangevraagd, en kan afwijken van de schatting.",
+      "quoteFixedNote": "Deze prijsopgave legt het $WOC-bedrag vast tot de vervaldatum. Een nieuwe prijsopgave kan afwijken.",
+      "settlementDeadlineNote": "Als je wint, is de betaling verschuldigd binnen {duration} na het sluiten van de veiling.",
+      "claimCooldownRetry": "Je hebt onlangs een Nu kopen-aankoop laten schieten. Probeer het over {duration} opnieuw.",
+      "termsLabel": "Ik ga akkoord met de voorwaarden van de Beurs.",
+      "termsLink": "Bekijk de voorwaarden van de Beurs (opent in een nieuw tabblad)",
+      "quoteTitle": "Bevestig betaling",
+      "quoteTotal": "Totaal: {tokens} $WOC",
+      "quoteSeller": "Verkoper ontvangt: {tokens} $WOC",
+      "quoteBurn": "Verbrand (uit de voorraad verwijderd): {tokens} $WOC",
+      "quoteTreasury": "Naar de schatkist van het spel: {tokens} $WOC",
+      "quoteExpires": "Prijsopgave verloopt over {duration}",
+      "quoteExpiresAt": "Prijsopgave verloopt om {time}.",
+      "quoteExpired": "De prijsopgave is verlopen. Vraag een nieuwe aan.",
+      "quoteSign": "Ondertekenen en betalen",
+      "quoteRefresh": "Nieuwe prijsopgave",
+      "quoteCancel": "Niet nu",
+      "quoteBondFor": "Terugbetaalbare biedingsborg: {usd}",
+      "quoteBondForItem": "Terugbetaalbare biedingsborg voor {item}: {usd}",
+      "quoteSettlementFor": "Afwikkeling voor {item}: {usd}",
+      "paymentDueAt": "De betaling is verschuldigd voor {time}.",
+      "signing": "Wachten op je portemonnee...",
+      "signFailed": "Je portemonnee heeft de betaling niet voltooid. Controleer de portemonnee en probeer het opnieuw.",
+      "signFailedConfirm": "Je portemonnee heeft de bevestiging niet ondertekend. Controleer de portemonnee en probeer het opnieuw.",
+      "confirming": "Bevestigen op de blockchain...",
+      "listing": "Je voorwerp wordt aangeboden...",
+      "activityCancelPending": "Annulering in behandeling",
+      "activityDirected": "Gerichte verkoop",
+      "bidPlacedStanding": "Je bod staat. Je bent de hoogste bieder.",
+      "bidPlacedOutbid": "Je borg is bevestigd, maar een hoger bod kwam eerder binnen.",
+      "purchaseComplete": "Aankoop voltooid. Je voorwerp arriveert via De Ravenpost.",
+      "paymentConfirmedDelivering": "Betaling bevestigd. Je voorwerp arriveert via De Ravenpost zodra de levering is voltooid.",
+      "listingCreated": "Je aanbieding staat live.",
+      "listingCancelled": "Aanbieding geannuleerd. Je voorwerp komt terug via De Ravenpost.",
+      "listingCancelPending": "Annuleren in behandeling: een koper houdt het aankoopvenster vast. Betaalt deze niet, dan sluit de aanbieding en komt je voorwerp terug via De Ravenpost.",
+      "sellTitle": "Een aanbieding maken",
+      "sellEmptyFloor": "Geen geschikte voorwerpen in je tassen. Deze wereld accepteert ongebonden uitrusting van kwaliteit {floor} of hoger.",
+      "sellCollectiblesBoth": "Rijdieren en mech-chromaplaten kunnen ook worden aangeboden.",
+      "sellCollectiblesMounts": "Rijdieren kunnen ook worden aangeboden.",
+      "sellCollectiblesChromas": "Mech-chromaplaten kunnen ook worden aangeboden.",
+      "sellLockedHidden": "Vergrendelde voorwerpen worden hier niet aangeboden. Ontgrendel ze in je tassen om ze te verkopen.",
+      "sellSearchPlaceholder": "Typ om je tassen te filteren",
+      "sellClear": "{item} wissen en een ander kiezen",
+      "sellChoose": "Aan te bieden voorwerp",
+      "sellNoMatches": "Geen voorwerpen komen overeen met die zoekopdracht",
+      "sellBuyNowAboveStart": "De Nu kopen-prijs moet hoger zijn dan het startbod.",
+      "sellFormat": "Soort",
+      "sellFormatAuction": "Veiling",
+      "sellFormatBuyNow": "Alleen Nu kopen",
+      "sellFormatAuctionBuyNow": "Veiling met Nu kopen",
+      "sellStart": "Startbod (USD)",
+      "sellReserve": "Reserveprijs (USD, optioneel)",
+      "sellReserveNote": "Optioneel, minstens het startbod. Bieders zien alleen of de reserveprijs is behaald; als het hoogste bod bij sluiting daaronder blijft, komt het voorwerp onverkocht bij je terug en wordt elke borg terugbetaald.",
+      "sellBuyNowNote": "Verplicht. Een Nu kopen-aanbieding wordt tegen deze prijs verkocht, zonder bieden.",
+      "sellBuyNowAuctionNote": "Optioneel. Stel een prijs in die een koper kan betalen om de veiling vroegtijdig te beëindigen; deze moet boven het startbod en de reserveprijs liggen.",
+      "sellBuyNowPrice": "Nu kopen-prijs (USD)",
+      "sellDuration": "Duur",
+      "sellOfferNext": "Als de winnaar niet betaalt, verkoop dan aan de op één na hoogste bieder wiens bod de reserveprijs haalt, tegen dat bod, in plaats van onverkocht te eindigen.",
+      "sellSubmit": "Voorwerp aanbieden",
+      "sellSubmitAria": "{item} aanbieden op de Beurs",
+      "sellFeeNote": "Een voltooide verkoop betaalt een Beursvergoeding uit de prijs: een deel wordt verbrand en een deel gaat naar de schatkist, en je ontvangt de rest op je gekoppelde portemonnee in de afwikkelingstransactie. De vergoeding voor de prijs die je invoert, wordt hier getoond; bij een veiling volgt ze de uiteindelijke prijs.",
+      "activityListings": "Mijn aanbiedingen",
+      "activityBids": "Mijn biedingen",
+      "activitySettlements": "Mijn afwikkelingen",
+      "activityEmpty": "Je hebt nog geen biedingen, aanbiedingen of afwikkelingen. Je Beursactiviteit verschijnt hier.",
+      "activityNoListings": "Je hebt geen aanbiedingen.",
+      "activityNoBids": "Je hebt geen biedingen.",
+      "activityNoSettlements": "Je hebt geen afwikkelingen.",
+      "activityPayNow": "Nu betalen",
+      "activityPayNowAria": "Betaal nu voor afwikkeling {id}",
+      "activityPayNowItemAria": "Betaal nu {usd} voor {item}",
+      "activityDeadline": "Betaling verschuldigd over {duration}",
+      "dueAt": "Verschuldigd om {utc} UTC ({local} lokale tijd)",
+      "activityStrikes": "Beursovertredingen: {count}",
+      "activitySuspended": "Beurs geschorst voor {duration} na onbetaalde deals: geen biedingen, aankopen, aanbiedingen of $WOC-ruilen tot dan.",
+      "strikesTip": "Je krijgt een overtreding elke keer dat je niet betaalt voor een deal waar je je aan hebt verbonden. Vanaf de eerste schorst elke overtreding je langer van de Beurs: 3 dagen, dan 14, dan 90, dan een jaar.",
+      "bidStatusPending": "Wacht op borg",
+      "bidStatusActive": "Hoogste bieder",
+      "bidStatusOutbid": "Overboden",
+      "bidStatusLapsed": "Vervallen",
+      "bidStatusWon": "Gewonnen",
+      "bidStatusDefaulted": "In gebreke",
+      "bidStatusCancelled": "Geannuleerd",
+      "bidBondPay": "Borg betalen",
+      "bidBondPayAria": "Betaal de borg voor je bod op aanbieding {id}",
+      "bidBondPayItemAria": "Betaal de borg van {bond} voor je bod op {item}",
+      "settlementOffered": "Betaling verschuldigd",
+      "settlementConfirming": "Bevestigen",
+      "settlementConfirmedDelivering": "Betaling bevestigd, wordt geleverd",
+      "settlementReview": "Betaling wordt beoordeeld",
+      "settlementDelivered": "Afgeleverd",
+      "settlementExpired": "Verlopen, onbetaald",
+      "settlementFailed": "Betaling mislukt",
+      "settlementFailBurnMissing": "De betaling bevatte niet de vereiste tokenverbranding.",
+      "settlementFailBurnMismatch": "De betaling verbrandde het verkeerde aantal tokens.",
+      "settlementFailBurnAuthority": "De tokenverbranding kwam van een portemonnee die niet bij deze aankoop hoort.",
+      "settlementFailUnexpectedCredit": "De transactie betaalde een portemonnee die niet bij deze aankoop hoort.",
+      "settlementFailQuoteExpired": "De betalingsprijsopgave verliep voordat ze werd gebruikt. Vraag een nieuwe aan en betaal opnieuw.",
+      "settlementFailTransaction": "De betalingstransactie is mislukt op het netwerk. Vraag een nieuwe prijsopgave aan en probeer het opnieuw.",
+      "settlementFailRefunded": "Deze betaling is teruggestort naar je portemonnee.",
+      "settlementFailSuperseded": "Deze betalingspoging is vervangen door een nieuwere.",
+      "settlementFailConfirmingOverdue": "Deze betaling duurde te lang om te bevestigen en kon niet worden geverifieerd.",
+      "settlementFailGeneric": "Deze betaling kon niet worden voltooid.",
+      "paymentSeenAwaitingFinality": "Betaling gezien in het grootboek. Wachten op definitieve bevestiging.",
+      "paymentNotYetVisible": "Er is nog geen betaling zichtbaar in het grootboek. Het kan even duren voordat deze verschijnt.",
+      "paymentServiceUnreachable": "De betaaldienst is niet bereikbaar. Je betaling blijft geregistreerd en wordt opnieuw gecontroleerd.",
+      "paymentPendingGeneric": "Je betaling is ingediend en wacht op bevestiging.",
+      "bondSeenAwaitingFinality": "Borgbetaling gezien in het grootboek. Wachten op de definitieve bevestiging.",
+      "bondNotYetVisible": "Er is nog geen borgbetaling zichtbaar in het grootboek. Het kan even duren voordat die verschijnt.",
+      "bondServiceUnreachable": "De betalingsdienst is niet bereikbaar. Je borgbetaling blijft geregistreerd en wordt opnieuw gecontroleerd.",
+      "bondPendingGeneric": "Je borgbetaling is ingediend en wacht op bevestiging.",
+      "listingStatusActive": "Actief",
+      "listingStatusSettling": "Wacht op betaling",
+      "listingStatusSold": "Verkocht",
+      "listingStatusReturned": "Geretourneerd",
+      "listingStatusCancelled": "Geannuleerd",
+      "listingStatusSuspended": "Geschorst",
+      "listingStatusUnsold": "Onverkocht"
     }
   },
   "gatherEvent": {
@@ -4340,8 +4340,8 @@ export const nl_NL: EnTranslations = {
       "invalid_input": "Ongeldige invoer."
     },
     "guilds": {
-      "invalid_roster_name": "Invalid guild name.",
-      "unknown": "No guild by that name."
+      "invalid_roster_name": "Ongeldige gildenaam.",
+      "unknown": "Geen gilde met die naam."
     },
     "steam": {
       "disabled": "Koppelen met Steam is op dit moment niet beschikbaar.",
@@ -4382,53 +4382,53 @@ export const nl_NL: EnTranslations = {
       "not_marked": "Dat account is niet gemarkeerd."
     },
     "woc_market": {
-      "invalid_input": "Invalid input.",
-      "disabled": "The $WOC Exchange is not available on this realm.",
-      "paused": "Exchange trading is paused. Auctions keep counting down.",
-      "wallet_required": "Link and verify a wallet before trading on the Exchange.",
-      "recipient_wallet_required": "That player must connect a wallet before they can accept $WOC payments.",
-      "self_offer": "You cannot send a $WOC offer to yourself.",
-      "offer_expired": "That $WOC offer expired. Ask for a new one.",
-      "terms_required": "Accept the Marketplace terms to continue.",
-      "totp_required": "This amount requires two-factor authentication. Enable it in account settings, then enter your code.",
-      "totp_invalid": "That two-factor code did not verify. Try again.",
-      "suspended": "Your Exchange access is suspended after unpaid deals: no bids, purchases, listings, or $WOC trades.",
-      "character_invalid": "Play the character you are listing from, and try again.",
-      "not_found": "That Exchange entry no longer exists.",
-      "not_yours": "That Exchange entry no longer exists.",
-      "not_active": "That listing is no longer open for this action.",
-      "own_listing": "You cannot bid on or buy your own listing.",
-      "has_bids": "A listing with bids cannot be withdrawn. Contact support if you must cancel.",
-      "bid_too_low": "Your bid does not clear the current bid plus its increment.",
-      "already_pending": "Confirm or abandon your pending bid on this listing first.",
-      "insufficient_balance": "Your wallet does not hold enough $WOC for this bid and its bond.",
-      "quote_unavailable": "A price quote could not be issued right now. Try again shortly.",
-      "quote_expired": "That quote expired. Request a fresh one; if none is offered, that window has closed.",
-      "not_pending": "That bid is no longer awaiting its bond.",
-      "confirm_failed": "The transaction could not be confirmed. Request a fresh quote and try again.",
-      "confirm_in_flight": "Your payment is still confirming. Try again once it resolves.",
-      "buy_now_locked": "Another buyer is completing this purchase. Try again in a moment.",
-      "cancel_pending": "The seller is cancelling this listing.",
-      "claim_cooldown": "You recently walked away from a Buy Now. Try again later.",
-      "bond_window_closed": "This bid can no longer be paid: its payment window has closed. Bid again for a fresh one.",
-      "settlement_in_flight": "A buyer is paying for this listing. Try again once the payment settles.",
-      "contended": "The Exchange is busy with this listing. Try again in a moment.",
-      "sale_conflict": "Another live sale record stands for this listing. Exclude it first.",
-      "no_buy_now": "This listing has no buy-now price.",
-      "cap_reached": "You have reached your Exchange listing limit.",
-      "stale_item": "That item changed or moved. Re-select it and try again.",
-      "item_mismatch": "That is not the exact copy the buyer agreed to, or its state changed (a lock counts). Start a fresh deal for it.",
-      "offer_pending": "You already have a deal standing with this player. Resolve it first.",
-      "not_eligible": "That item cannot be listed on the $WOC Exchange.",
-      "invalid_params": "Check the starting bid, reserve, buy-now price, and duration.",
-      "signature_reused": "That transaction was already submitted.",
-      "item_locked": "That item is locked. Unlock it in your bags before selling it.",
-      "stepup_required": "Selling on the Exchange needs a signature from your linked wallet.",
-      "stepup_challenge_invalid": "That wallet confirmation is no longer valid. Start the sale again.",
-      "stepup_challenge_expired": "The wallet confirmation expired. Start the sale again.",
-      "stepup_wallet_mismatch": "Your linked wallet changed since this confirmation was issued. Start the sale again.",
-      "stepup_binding_mismatch": "That wallet confirmation does not match this sale. Start the sale again.",
-      "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
+      "invalid_input": "Ongeldige invoer.",
+      "disabled": "De $WOC-beurs is niet beschikbaar op deze wereld.",
+      "paused": "Handelen op de Beurs is gepauzeerd. Veilingen blijven wel aftellen.",
+      "wallet_required": "Koppel en verifieer een portemonnee voordat je handelt op de Beurs.",
+      "recipient_wallet_required": "Die speler moet eerst een portemonnee koppelen voordat deze $WOC-betalingen kan accepteren.",
+      "self_offer": "Je kunt geen $WOC-aanbod naar jezelf sturen.",
+      "offer_expired": "Dat $WOC-aanbod is verlopen. Vraag om een nieuw aanbod.",
+      "terms_required": "Accepteer de voorwaarden van de Beurs om door te gaan.",
+      "totp_required": "Dit bedrag vereist tweestapsverificatie. Schakel dit in bij je accountinstellingen en voer daarna je code in.",
+      "totp_invalid": "Die tweestapscode kon niet worden geverifieerd. Probeer het opnieuw.",
+      "suspended": "Je toegang tot de Beurs is geschorst na onbetaalde deals: geen biedingen, aankopen, aanbiedingen of $WOC-transacties meer.",
+      "character_invalid": "Speel het personage van waaruit je aanbiedt, en probeer het opnieuw.",
+      "not_found": "Die beursvermelding bestaat niet meer.",
+      "not_yours": "Die beursvermelding bestaat niet meer.",
+      "not_active": "Die aanbieding staat niet meer open voor deze actie.",
+      "own_listing": "Je kunt niet bieden op of kopen van je eigen aanbieding.",
+      "has_bids": "Een aanbieding met biedingen kan niet worden ingetrokken. Neem contact op met support als je toch moet annuleren.",
+      "bid_too_low": "Je bod is niet hoog genoeg: het moet het huidige bod plus de verhoging overschrijden.",
+      "already_pending": "Bevestig je openstaande bod op deze aanbieding eerst, of trek het in.",
+      "insufficient_balance": "Je portemonnee bevat niet genoeg $WOC voor dit bod en de bijbehorende borg.",
+      "quote_unavailable": "Er kon nu geen prijsopgave worden afgegeven. Probeer het straks opnieuw.",
+      "quote_expired": "Die prijsopgave is verlopen. Vraag een nieuwe aan; wordt er geen aangeboden, dan is dat venster gesloten.",
+      "not_pending": "Dat bod wacht niet langer op zijn borg.",
+      "confirm_failed": "De transactie kon niet worden bevestigd. Vraag een nieuwe prijsopgave aan en probeer het opnieuw.",
+      "confirm_in_flight": "Je betaling wordt nog bevestigd. Probeer het opnieuw zodra dit is afgerond.",
+      "buy_now_locked": "Een andere koper rondt deze aankoop momenteel af. Probeer het straks opnieuw.",
+      "cancel_pending": "De verkoper annuleert deze aanbieding.",
+      "claim_cooldown": "Je hebt onlangs een Nu kopen-aankoop laten schieten. Probeer het later opnieuw.",
+      "bond_window_closed": "Dit bod kan niet meer worden betaald: het betaalvenster is gesloten. Bied opnieuw voor een nieuw venster.",
+      "settlement_in_flight": "Een koper is deze aanbieding aan het afrekenen. Probeer het opnieuw zodra de betaling is verwerkt.",
+      "contended": "De Beurs is druk bezig met deze aanbieding. Probeer het straks opnieuw.",
+      "sale_conflict": "Er staat al een actieve verkoop open voor deze aanbieding. Sluit die eerst uit.",
+      "no_buy_now": "Deze aanbieding heeft geen directe koopprijs.",
+      "cap_reached": "Je hebt je limiet voor aanbiedingen op de Beurs bereikt.",
+      "stale_item": "Dat voorwerp is veranderd of verplaatst. Selecteer het opnieuw en probeer het nogmaals.",
+      "item_mismatch": "Dat is niet precies de kopie waarmee de koper akkoord ging, of de status ervan is veranderd (een vergrendeling telt mee). Start er een nieuwe deal voor.",
+      "offer_pending": "Je hebt al een openstaande deal met deze speler. Handel die eerst af.",
+      "not_eligible": "Dat voorwerp kan niet op de $WOC-beurs worden aangeboden.",
+      "invalid_params": "Controleer het startbod, de reserveprijs, de directe koopprijs en de duur.",
+      "signature_reused": "Die transactie is al ingediend.",
+      "item_locked": "Dat voorwerp is vergrendeld. Ontgrendel het in je tassen voordat je het verkoopt.",
+      "stepup_required": "Verkopen op de Beurs vereist een handtekening van je gekoppelde portemonnee.",
+      "stepup_challenge_invalid": "Die portemonneebevestiging is niet langer geldig. Start de verkoop opnieuw.",
+      "stepup_challenge_expired": "De portemonneebevestiging is verlopen. Start de verkoop opnieuw.",
+      "stepup_wallet_mismatch": "Je gekoppelde portemonnee is veranderd sinds deze bevestiging werd uitgegeven. Start de verkoop opnieuw.",
+      "stepup_binding_mismatch": "Die portemonneebevestiging komt niet overeen met deze verkoop. Start de verkoop opnieuw.",
+      "stepup_signature_invalid": "De portemonneehandtekening kon niet worden geverifieerd. Start de verkoop opnieuw."
     }
   },
   "guide": {
@@ -4575,8 +4575,8 @@ export const nl_NL: EnTranslations = {
         "fenBlurb": "Voorbij de herfstkroon, een helder veen van wilgen en stil water, en een stad achter een slotgracht.",
         "farshoreName": "De Verrekust",
         "farshoreBlurb": "Een eiland voorbij de zandbank, waar de lucht openscheurt boven de Riftvelden en Meeuwenhaven bij elke breuk haar klok luidt.",
-        "provingName": "The Proving Shore",
-        "provingBlurb": "A quiet training island across the strait, where new adventurers find their feet before the vale asks anything of them.",
+        "provingName": "De Beproevingskust",
+        "provingBlurb": "Een rustig trainingseiland aan de overkant van de zeeëngte, waar nieuwe avonturiers hun draai vinden voordat het dal iets van hen vraagt.",
         "nightName": "De Nachtbloesem",
         "nightBlurb": "Een land van sterrenheldere middernacht waar de bloemen de paden verlichten en Maanrust de wake houdt.",
         "hauntName": "Het Schimmenwoud",
@@ -5538,10 +5538,10 @@ export const nl_NL: EnTranslations = {
       "farshoreGreeting": "Je kwam over de Veerloop? Dan ben je de eerste in een week, en de Wachter zal je willen bekijken.",
       "farshoreGreeter": "Klokwachter Tam, De Aanlegplaats",
       "farshorePlaceNotes": "Meeuwenhaven is het enige stadje van het eiland en zijn bolwerk. De Aanlegplaats is waar de Veerloop aan land komt, met een wachtklok die over de punt uitkijkt; de Wachtweide bewaart de hoge grond ten zuidoosten van het stadje, waar een riftwaker naar de volgende breuk luistert; de Gespleten Kliffen barsten open aan de zuidpunt van het eiland; en de Riftvelden zijn de geteisterde graanrijen ten oosten van Meeuwenhaven, nog altijd krioelend van wat daar door de breuk kwam.",
-      "provingBlurb": "A quiet island across the strait from the vale, kept as a training ground: a camp, a practice yard, a wreck-strewn strand, and a ferry that runs both ways.",
-      "provingGreeting": "Every hero the vale has ever thanked stood where you stand now, and not one of them knew which end of a blade to hold.",
-      "provingGreeter": "Instructor Maren, Dawnrest Camp",
-      "provingPlaceNotes": "Dawnrest Camp is the island's whole settlement: a few tents, a stall, and a muster fire. The Old Pier faces the vale, where the crossing circle carries graduates over the strait; the Practice Yard south of camp keeps its straw effigies standing for whoever needs them; and the Wreck Line is the salvage-strewn strand where the tide pays the island in castaway crates.",
+      "provingBlurb": "Een rustig eiland aan de overkant van de zeeëngte, tegenover het dal, gehouden als trainingsterrein: een kamp, een oefenterrein, een met wrakken bezaaid strand, en een veerpont die beide kanten op vaart.",
+      "provingGreeting": "Elke held die het dal ooit heeft bedankt, stond waar jij nu staat, en geen van hen wist welk eind van een kling je vast moest houden.",
+      "provingGreeter": "Instructeur Maren, Kamp Dageraadrust",
+      "provingPlaceNotes": "Kamp Dageraadrust is de hele nederzetting van het eiland: een paar tenten, een kraam, en een verzamelvuur. De Oude Pier kijkt uit op het dal, waar de oversteekcirkel afgestudeerden over de zeeëngte draagt; het Oefenterrein ten zuiden van het kamp houdt zijn stropoppen overeind voor wie ze nodig heeft; en de Wraklijn is het met berging bezaaide strand waar het getij het eiland uitbetaalt in aangespoelde kisten.",
       "travelTitle": "Je verplaatsen",
       "travelBody": "Elke weg in het rijk leg je te voet of te paard af. Er zijn geen vliegroutes, geen taxi's en geen teleportnetwerk: de kaart is één aaneengesloten landmassa, en elke verbinding is iets waar je op kunt staan. Bergkammen scheiden het ene rijk van het volgende, en waar twee rijken een bergkam delen, klimt de weg door een pas. Niet elke grens werkt zo, overigens. In het noorden voert een lange dijk de weg over het water vanuit De Sluierholte naar het sneeuwland daarachter, en verder naar het zuiden loopt een dunne natuurlijke zandbank genaamd de Veerloop oostwaarts van de kust van het Dal naar De Aanlegplaats op het eiland van de Verrekust, dat helemaal geen landgrens heeft. En er is precies één echte doorgang in de hele bovenwereld: een sluier van schemering hoog op Doorntop die toegang geeft tot De Sluierholte. De zuidelijke bergkam van de Holte is verzegeld zonder pas erdoorheen, dus die sluier is hoe je er voor het eerst binnenkomt, en hij sluit zich achter je op de terugweg.\n\nWaar je ook valt, de terugweg is kort. Elke zone bewaart minstens één begraafplaats met een Bleke Hoeder die boven de stenen zweeft, en een losgelaten geest herrijst bij de dichtstbijzijnde daarvan.\n\nDe kaart eindigt niet in een onzichtbare muur. Het land loopt uit in stranden en landtongen, en dan in open water. De oversteekplaatsen die de wereld je laat zwemmen, de zeestraten en wateren tussen het ene rijk en het volgende, zijn kalm en veilig om over te steken. Zwem in plaats daarvan de open zee op en de afstand zelf stuurt je terug: je wordt gewaarschuwd, en nogmaals gewaarschuwd, en als je blijft zwemmen, put de zee je uit tot ze je doodt. Duiken heeft zijn eigen grens, want je adem raakt op onder het oppervlak, dus kom boven voor lucht en keer om zodra het water het je zegt.",
       "mountsTitle": "Rijdieren",
@@ -5988,7 +5988,7 @@ export const nl_NL: EnTranslations = {
       "deedsHeading": "Daden die de reis herinneren",
       "deedsBody": "Het Boek der Daden loopt naast elke stap hiervan mee. Je eerste afstemming verdient Ambachtsgetrouwe en je eerste meesterwerk verdient Meestersmaker, beide te dragen als titels. Elk van de acht te verdienen ambachten markeert een mijlpaaldaad bij vaardigheid 50 en kroont zijn grens met een Grootmeesters-titel, terwijl Vissen Oude Zout krijgt bij 100 vaardigheid en de titel Meesterhengelaar bij 200.\n\nEr zijn ook stillere pagina's: daden voor je eerste oogst en eerste vervaardiging, voor de zeldzame vondsten die geluk in het veld oplevert, en voor het oppakken van salvage. Dit alles is cosmetisch, alleen titels en Roem. Een daad schenkt nooit macht; het bewijst alleen dat je er was.",
       "startHeading": "Waar te beginnen",
-      "startBody": "Net van de weg gestapt in Oostbeek? Zoek Voorman Odell op en neem Een Vak voor Elke Hand aan: hij wijst je naar de ertsaders rond de Kopergroeve ten zuidoosten van de stad en bezorgt je je eerste eelt. Pas op met de groeve zelf: de Dieprots-Gravers die erop gekampeerd zijn staan een paar niveaus boven een verse aankomst, dus bewerk eerst de buitenste aders en bewaar het hart van het kamp tot je een beetje geleveld bent. Vanaf dan oogst je elke ader, elke houtopstand en elk kruidenveld dat je tijdens het questen passeert; vaardigheid komt reizigers vanzelf aanwaaien.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage vanaf het begin kent. Bezoek de meesters bij de smidse, de keukens, het weefgetouw en de gereedschapsmakerij om te zien wat zij onderwijzen, en neem hun werkopdrachten aan voor gestage munt. Tegen de tijd dat de brief van het Gilde je vindt, weet je al welk paar als thuis voelt.",
+      "startBody": "Net van de weg gestapt in Oostbeek? Zoek Voorman Odell op en neem Een Vak voor Elke Hand aan: hij wijst je naar de ertsaders rond de Kopergroeve ten noordoosten van de stad en bezorgt je je eerste eelt. Pas op met de groeve zelf: de Dieprots-Gravers die erop gekampeerd zijn staan een paar niveaus boven een verse aankomst, dus bewerk eerst de buitenste aders en bewaar het hart van het kamp tot je een beetje geleveld bent. Vanaf dan oogst je elke ader, elke houtopstand en elk kruidenveld dat je tijdens het questen passeert; vaardigheid komt reizigers vanzelf aanwaaien.\n\nTerug in de stad druk je op T om het vervaardigingsvenster te openen en werk je de gewone recepten die elk personage vanaf het begin kent. Bezoek de meesters bij de smidse, de keukens, het weefgetouw en de gereedschapsmakerij om te zien wat zij onderwijzen, en neem hun werkopdrachten aan voor gestage munt. Tegen de tijd dat de brief van het Gilde je vindt, weet je al welk paar als thuis voelt.",
       "colStation": "Station",
       "colHub": "Hub",
       "colMaster": "Meester",
@@ -6073,13 +6073,13 @@ export const nl_NL: EnTranslations = {
         },
         "leatherworking": {
           "identityHeading": "Leer voor de snellen",
-          "identityBody": "De ladder klimt van de gewone Fenbruggen-leren beenstukken, laarzen en riem door het ongewone moerasspeurder-wambuis, kap en schouderstukken tot de zeldzame moeraswachterset, het beste leer dat een vakman kan snijden. Twee tovenaarsstukken ronden het af: het Oostbeekse Druide-Leer als veldgewone en de Schemerleer-Wikkelaars op vaardigheid 75.\n\nOp de ring staat het tussen Koken en Kleermaken. Zijn levende paar is de Uitrusser, Leerbewerken en Kleermaken, gezworen voor Weefster Ottilie in Oostbeek; het Jager-paar met Koken staat op de ring als naam maar heeft nog geen eedquest.",
+          "identityBody": "De ladder klimt van de gewone Fenbruggen-leren beenstukken, laarzen en riem door het ongewone moerasspeurder-wambuis, kap en schouderstukken tot de zeldzame moeraswachterset, het beste leer dat een vakman kan snijden. Twee casterstukken ronden het af: de Druïdenhuid uit Oostbeek als veldgewone en de Schemerleer-Wikkelaars op vaardigheid 50.\n\nOp de ring staat het tussen Koken en Kleermaken. Zijn levende paar is de Uitrusser, Leerbewerken en Kleermaken, gezworen voor Weefster Ottilie in Oostbeek; het Jager-paar met Koken staat op de ring als naam maar heeft nog geen eedquest.",
           "materialsHeading": "De jacht is de oogst",
-          "materialsBody": "Leerbewerken is het ambacht waar je levelroute en je bevoorradingslijn hetzelfde zijn: ruwe huid oogst je rechtstreeks van lijken die huid dragen, wolven en everzwijnen bovenal, en elk lijk bedient maar één oogster, wie het eerst komt wie het eerst maalt. Een zeldzame of betere oogstrol geeft daarnaast een Ongeschonden Huid, een gesigneerd exemplaar waar het Moeraswachterwambuis om vraagt, dus zet elke huid die je vindt op de bank.\n\nDe bijrol is klein: spinnenpoten en spinnenzijde, huisgesponnen doek van humanoïden, één osmiumerts in elk zeldzaam moeraswachter-stuk (zes in het sluitstuk Schemerleer-Wikkelaars), en een Looimiddel voor 16 koper aan de balie van de looierij. Osmium zelf koop je nooit aan een balie: mijn het zelf, op Doorntop of in de beginaders van bijna elke jongere zone (alleen De Verrekust levert ijzer), of koop het van een andere speler.",
+          "materialsBody": "Leerbewerken is het ambacht waar je levelroute en je bevoorradingslijn hetzelfde zijn: ruwe huid oogst je rechtstreeks van lijken die huid dragen, wolven en everzwijnen bovenal, en elk lijk bedient maar één oogster, wie het eerst komt wie het eerst maalt. Een zeldzame of betere oogstrol geeft daarnaast een Ongeschonden Huid, een gesigneerd exemplaar waar het Moeraswachterwambuis om vraagt, dus zet elke huid die je vindt op de bank.\n\nDe bijrol is klein: spinnenpoten en spinnenzijde, huisgesponnen doek van humanoïden, één osmiumerts in elk zeldzaam moeraswachter-stuk (zes in de Schemerleer-Wikkelaars), en een Looimiddel voor 16 koper aan de balie van de looierij. Osmium zelf koop je nooit aan een balie: mijn het zelf, op Doorntop of in de beginaders van bijna elke jongere zone (alleen De Verrekust levert ijzer), of koop het van een andere speler.",
           "ladderHeading": "Geleerd in Fenbridge",
-          "ladderBody": "Hier zit de kronkel: de looierij staat in Fenbridge, aan de weg door Slijkveenmoeras, waardoor Leerbewerken het enige diepe ambacht is dat buiten de stad in het moeras wordt onderwezen. Leerlooier Hesk onderwijst de ladder bij zijn kuipen: de Fenbruggen-leren trede gratis op vaardigheid 0, de moerasspeurder-trede voor 25 zilver per recept vanaf vaardigheid 25, en de moeraswachter-trede voor 1 goud per stuk vanaf vaardigheid 50, waarbij elke trede opengaat zodra jouw rang die bereikt.\n\nDrie recepten slaan de leermeester over: de veldgewone stukken (het Gelooid Leren Wambuis en het Oostbeekse Druide-Leer) maak je vanaf het begin overal, en de Schemerleer-Wikkelaars kent iedereen, maar die staan op vaardigheid 75 en zijn gebonden aan de looierij. Let op: de Uitrusser-eed zelf wordt terug in Oostbeek bij Ottilie gezworen; alleen het onderricht gebeurt in het moeras.",
+          "ladderBody": "Hier zit de kronkel: de looierij staat in Fenbridge, aan de weg door Slijkveenmoeras, waardoor Leerbewerken het enige diepe ambacht is dat buiten de stad in het moeras wordt onderwezen. Leerlooier Hesk onderwijst de ladder bij zijn kuipen: de Fenbruggen-leren trede gratis op vaardigheid 0, de moerasspeurder-trede voor 25 zilver per recept vanaf vaardigheid 25, en de moeraswachter-trede voor 1 goud per stuk vanaf vaardigheid 50, waarbij elke trede opengaat zodra jouw rang die bereikt.\n\nDrie recepten slaan de leermeester over: de veldgewone stukken (het Gelooid Leren Wambuis en de Druïdenhuid uit Oostbeek) maak je vanaf het begin overal, en de Schemerleer-Wikkelaars kent iedereen op vaardigheid 50, gebonden aan de looierij. Let op: de Uitrusser-eed zelf wordt terug in Oostbeek bij Ottilie gezworen; alleen het onderricht gebeurt in het moeras.",
           "routeHeading": "Meesterwerken, en een werkbare weg naar 125",
-          "routeBody": "Elk stuk met echte statistieken gooit de meesterwerkkans, zolang de fijnere kwaliteit binnen je rangplafond past, het Oostbeekse Druide-Leer met zijn statistieken inbegrepen, en een gesigneerde Ongeschonden Huid in een Moeraswachterwambuis levert de gesigneerde-reagens-bonus vanzelf; osmium telt als rang 1-materiaal voor de proc. De statloze gewone lerenstukken kunnen niet procen.\n\nLevel het op de natuurlijke manier: oogst vanaf niveau één elke wolf en elk everzwijn dat je velt, laat de twee veldgewone stukken je overal naar 25 dragen, en train dan de lerentrede bij de kuipen wanneer de quests je toch al het moeras in trekken. Moerasspeurder brengt je naar 50 en moeraswachter naar 75; daarna leveren de Schemerleer-Wikkelaars, een rang 3-recept van zes osmiumerts, drie Ongeschonden Huid, twee ruwe huid en een Looimiddel, een afgestemde Uitrusser volle winst tot 99 en de helft daarna, ongeveer 75 vervaardigingen voor de laatste vijftig punten tot de limiet van 125; onder het plafond van een hoofdambacht leert het rang 3-recept niets.\n\nDe mobiele looierij telt voor dit ambacht zwaarder dan voor welk ander ook: specialiseer op 75 en een zadeltas vol huiden wordt bij het kampvuur afgewerkte uitrusting in plaats van een wandeling terug naar Fenbridge. Hesks looierijwerkopdracht koopt elke 30 minuten acht ruwe huiden, een nette opbrengst op vellen die je toch al verzamelde, en het Boek der Daden markeert Het Looiersvak op vaardigheid 50 met Grootmeester-Leerbewerken bij de limiet."
+          "routeBody": "Elk stuk met echte statistieken gooit de meesterwerkkans, zolang de fijnere kwaliteit binnen je rangplafond past, de Druïdenhuid uit Oostbeek met haar statistieken inbegrepen, en een gesigneerde Ongeschonden Huid in een Moeraswachterwambuis levert de gesigneerde-reagens-bonus vanzelf; osmium telt als rang 1-materiaal voor de proc. De statloze gewone lerenstukken kunnen niet procen.\n\nLevel het op de natuurlijke manier: oogst vanaf niveau één elke wolf en elk everzwijn dat je velt, laat de twee veldgewone stukken je overal naar 25 dragen, en train dan de lerentrede bij de kuipen wanneer de quests je toch al het moeras in trekken. Moerasspeurder brengt je naar 50, en de moeraswachterstukken en de Schemerleer-Wikkelaars dragen de zeldzame rang van 50 naar 75. Voorbij 75 vervalt de winst van die rang 2-recepten tot de helft en daarna een kwart, ongeveer 150 vervaardigingen voor de laatste vijftig punten tot de limiet van 125; onder het plafond van een hoofdambacht evenaren ze nog steeds het vervaardigingsplafond van zeldzame kwaliteit, in plaats van hard op nul te vallen.\n\nDe mobiele looierij telt voor dit ambacht zwaarder dan voor welk ander ook: specialiseer op 75 en een zadeltas vol huiden wordt bij het kampvuur afgewerkte uitrusting in plaats van een wandeling terug naar Fenbridge. Hesks looierijwerkopdracht koopt elke 30 minuten acht ruwe huiden, een nette opbrengst op vellen die je toch al verzamelde, en het Boek der Daden markeert Het Looiersvak op vaardigheid 50 met Grootmeester-Leerbewerken bij de limiet."
         },
         "cooking": {
           "identityHeading": "De pot die de groep voedt",
@@ -6279,7 +6279,7 @@ export const nl_NL: EnTranslations = {
         "q5": "Hoe maak ik een opdrachtsstuk los, en wat kost dat?",
         "a5": "Loop naar een willekeurig ambachtsstation met het stuk in je tassen en betaal de meester. De vergoeding volgt de kwaliteit van het voorwerp: 25 zilver voor een ongewoon stuk, 1 goud voor een zeldzaam, 4 goud voor een episch; een legendarisch betaalt het epische tarief, en een gewoon opdrachtsstuk betaalt het ongewone tarief. Het moet een echt station zijn: een mobiel station biedt de dienst nooit aan.\n\nDe vergoeding koopt een schone lei, geen genezing: het stuk blijft een opdracht, dus het bindt opnieuw aan wie het in de volgende ruil ontvangt. Als verschillende gebonden kopieën een stapel delen, wordt per betaling één kopie afgeschild en losgemaakt.",
         "q6": "Waar leer ik recepten, en wat kosten ze?",
-        "a6": "De negen gewone veldrecepten en de zes gemaakte landgereedschapsrecepten kent iedereen vanaf het begin, en dat geldt ook voor drie stationsgebonden sluitstukken (de Ovenschubben-Mantel, de Kap van beschermweefsel en de Schemerhuid-wikkels), die geen leermeester nodig hebben, alleen hun station. Al het overige wordt onderwezen door de vaste meesters bij hun stations in de drie stadshubs: de meesten staan in Oostbeek, de leerlooier houdt de leerlooierij in Fenbridge, en de alchemist houdt de apotheek in Highwatch.\n\nLeermeestersrecepten lopen in treden: vaardigheid 0, 25 en 50 voor de uitrustings- en verbruiksambachten, geprijsd als gratis, 25 zilver en 1 goud aan eenmalige vergoedingen; de twee amuletrecepten van Betovering staan op de trede van 25, en de gereedschapsmaker leert de twee gemaakte hengels op 75 en 125 voor 4 en 16 goud. Een meester leert je een recept zodra jouw band in dat ambacht de eigen band van het recept heeft bereikt, en je moet bij zijn station staan om te leren: een mobiel station telt niet.",
+        "a6": "De negen gewone veldrecepten en de zes gemaakte landgereedschapsrecepten kent iedereen vanaf het begin, en dat geldt ook voor drie stationsgebonden recepten (de Ovenschubben-Mantel, de Kap van beschermweefsel en de Schemerhuid-wikkels), die geen leermeester nodig hebben, alleen hun station. Al het overige wordt onderwezen door de vaste meesters bij hun stations in de drie stadshubs: de meesten staan in Oostbeek, de leerlooier houdt de leerlooierij in Fenbridge, en de alchemist houdt de apotheek in Highwatch.\n\nLeermeestersrecepten lopen in treden: vaardigheid 0, 25 en 50 voor de uitrustings- en verbruiksambachten, geprijsd als gratis, 25 zilver en 1 goud aan eenmalige vergoedingen; de twee amuletrecepten van Betovering staan op de trede van 25, en de gereedschapsmaker leert de twee gemaakte hengels op 75 en 125 voor 4 en 16 goud. Een meester leert je een recept zodra jouw band in dat ambacht de eigen band van het recept heeft bereikt, en je moet bij zijn station staan om te leren: een mobiel station telt niet.",
         "q7": "Waarom ging mijn verzamelen ineens langzamer?",
         "a7": "De verzamelworp begint op 2,5 seconde en wordt op twee manieren afgeknipt: 0,4 seconde voor elke gereedschapsrang die je draagt en kunt hanteren boven de eigen rang van het grondstoffenpunt, en 0,15 seconde zodra de teller van je vak zijn band van 100 passeert, met een ondergrens van 1,5 seconde. Ga van rang 1-grondstoffenpunten naar rang 3-grondstoffenpunten en je overschot verdwijnt, dus dezelfde houweel zwaait weer trager. Precies de vereiste rang in handen hebben koopt geen snelheid; het opent alleen het grondstoffenpunt.\n\nVaardigheidswinst vervaagt op dezelfde manier als bij vervaardigen: een grondstoffenpunt wordt grijs naarmate je vaardigheid zijn rang voorbijklimt (rang 1-grondstoffenpunten leren je vanaf vaardigheid 75 niets meer), dus het antwoord op trage winst zijn grondstoffenpunten van hogere rang. Die vragen minstens gereedschap van hun eigen rang in je tassen (geen enkel grondstoffenpunt wordt ooit met blote handen bewerkt, rang 1 inbegrepen), en landgereedschap boven rang 1 wil eerst ook zijn hanteringsmerk, 40/70/85/100 in zijn eigen vak voor de rangen 2 tot en met 5. Vissen volgt zijn eigen aflopende schema: volle winst onder vaardigheid 50, de helft onder 100, een druppel van 0,1 onder 150 en 0,02 onder 200, rommelvangsten leren vanaf 100 helemaal niets meer, en het water zelf begrenst de les (rang 1-wateren stoppen met leren bij 100, het moeras bij 150), dus een vastgelopen teller kan ook betekenen dat je het water ontgroeid bent.",
         "q8": "Kan ik buiten de stad ambachten maken?",
@@ -7530,7 +7530,7 @@ export const nl_NL: EnTranslations = {
       "portalOpens": "Een {tier}-rangs rift scheurt open in {zone}!",
       "portalSealed": "De {tier}-rangs rift in {zone} is verzegeld.",
       "portalCollapses": "De {tier}-rangs rift in {zone} stort in.",
-      "lootRecoveryNotice": "The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned.",
+      "lootRecoveryNotice": "De ingang van de rift blijft nog een tijdje toegankelijk: mocht je groep sneuvelen, dan kun je nog terug lopen voor wat je hebt verdiend.",
       "levelGate": "Alleen avonturiers van niveau {level} of hoger mogen deze rift betreden.",
       "deadEntry": "Je kunt geen rift betreden terwijl je dood bent.",
       "deadEntryCombat": "Je groep is nog in gevecht. De doden kunnen opnieuw binnengaan zodra het gevecht stopt.",
@@ -9822,7 +9822,7 @@ export const nl_NL: EnTranslations = {
       },
       "ignition": {
         "name": "Ontbranding",
-        "description": "Passief: kritieke treffers van je spreuken verbranden het doelwit voor 40% van de toegebrachte schade gedurende 6 sec. en stapelen. (Vuurmeesterschap)"
+        "description": "Passief: kritieke treffers van je spreuken verbranden het doelwit voor 30% van de toegebrachte schade gedurende 6 sec. en stapelen. (Vuurmeesterschap)"
       },
       "mass_barrier": {
         "name": "Massabarrière",
@@ -9992,7 +9992,7 @@ export const nl_NL: EnTranslations = {
       },
       "sap": {
         "name": "Verdoven",
-        "description": "Schakelt het doelwit 8 sec lang uit. Je moet gesluipt zijn en buiten gevecht. Elke schade verbreekt het effect."
+        "description": "Schakelt het doelwit 8 sec lang uit zonder Schemersluier te verbreken of een gevecht te starten. Je moet gesluipt zijn en buiten gevecht. Elke schade verbreekt het effect."
       },
       "crippling_poison": {
         "name": "Loodzwaar Gif",
@@ -10264,7 +10264,7 @@ export const nl_NL: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Gedaante van de Renner",
-        "description": "Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%."
+        "description": "Neem de gedaante van de renner aan en verhoog uw bewegingssnelheid 30 min lang met 30%. Zolang actief, verdooft opgelopen schade u, wat uw bewegingssnelheid 4 sec lang halveert (elke treffer vernieuwt de verdoving)."
       },
       "aimed_shot": {
         "name": "Lange Trek",
@@ -10428,7 +10428,7 @@ export const nl_NL: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Betovert de vijand gedurende 8 sec. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 16 Schaduwschade."
+        "description": "Betovert de vijand gedurende 8 sec. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -10634,7 +10634,7 @@ export const nl_NL: EnTranslations = {
       },
       "warspirit_cadence": {
         "name": "Krijgsgeestcadans",
-        "description": "Passief: elke 3e geraakte wapenaanval veroorzaakt 2 Stormhartecho's voor 50% Natuurschade en verleent 12 sec. lang een Stormteken. Het Stormteken maakt je volgende Boogbliksem, Schok of Helende Wateren direct en verlaagt de manakosten met 50%. De Voorouderslag telt als 2 aanvallen. (Krijgsgeest)"
+        "description": "Passief: elke 3e geraakte wapenaanval veroorzaakt 2 Stormhartecho's voor 25% Natuurschade en verleent 12 sec. lang een Stormteken. Het Stormteken maakt je volgende Boogbliksem, Schok of Helende Wateren direct en verlaagt de manakosten met 50%. De Voorouderslag telt als 2 aanvallen. (Krijgsgeest)"
       },
       "stormsurge": {
         "name": "Stormvloed",
@@ -10846,7 +10846,7 @@ export const nl_NL: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Pyre-Kolos Oproepen",
-        "description": "Laat een Pyre-Kolos neerkomen in het doelgebied en brengt bij de inslag 58-72 Vuurschade toe. Hij vecht 30 sec. zonder je demon te vervangen, verbrandt elke 2 sec. vijanden in de buurt en genereert elke seconde 1 Ruïne."
+        "description": "Laat een Pyre-Kolos neerkomen in het doelgebied en brengt bij de inslag 64-79 Vuurschade toe. Hij vecht 30 sec. zonder je demon te vervangen, verbrandt elke 2 sec. vijanden in de buurt en genereert elke seconde 1 Ruïne."
       },
       "summon_doomguard": {
         "name": "Wraithborn Oproepen",
@@ -11194,7 +11194,7 @@ export const nl_NL: EnTranslations = {
       },
       "shadowstep": {
         "name": "Schaduwglip",
-        "description": "Stapt door de schaduwen naar je doelwit. (schurkentalent)"
+        "description": "Stapt door de schaduwen naar je doelwit, vriend of vijand, zonder Schemersluier te verbreken. (schurkentalent)"
       },
       "silence": {
         "name": "Stilte",
@@ -12851,25 +12851,25 @@ export const nl_NL: EnTranslations = {
         "name": "Ongerepte Klauw"
       },
       "ps_castaway_crate": {
-        "name": "Castaway Crate"
+        "name": "Aangespoelde Kist"
       },
       "ps_ferry_bell": {
-        "name": "Ferry Bell"
+        "name": "Veerklok"
       },
       "dawnhold_posy": {
         "name": "Boeketje uit de tuin van Dawnhold"
       },
       "ps_briny_lure": {
-        "name": "Briny Lure"
+        "name": "Ziltig Lokaas"
       },
       "ps_lustrous_pearl": {
-        "name": "Lustrous Pearl"
+        "name": "Glanzende Parel"
       },
       "mother_of_pearl": {
-        "name": "Mother of Pearl"
+        "name": "Parelmoer"
       },
       "ps_passing_stone": {
-        "name": "Passing Stone"
+        "name": "Doorgangssteen"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -14209,13 +14209,13 @@ export const nl_NL: EnTranslations = {
         "name": "Visser Bram"
       },
       "training_effigy": {
-        "name": "Training Effigy"
+        "name": "Stropop"
       },
       "shore_scuttler": {
-        "name": "Shore Scuttler"
+        "name": "Strandscharrelaar"
       },
       "mister_crabs": {
-        "name": "Mister Crabs"
+        "name": "Meneer Krab"
       },
       "rift_hellguard": {
         "name": "Hellewacht"
@@ -14375,7 +14375,7 @@ export const nl_NL: EnTranslations = {
       "apothecary_lin": {
         "name": "Apotheker Lin",
         "title": "Kruidenkundige",
-        "greeting": "Wees voorzichtig waar je loopt in de oostelijke bossen, vriend."
+        "greeting": "Wees voorzichtig waar je loopt in de noordoostelijke bossen, vriend."
       },
       "brother_aldric": {
         "name": "Broeder Aldric",
@@ -14803,49 +14803,49 @@ export const nl_NL: EnTranslations = {
         "greeting": "Meet twee keer en giet één keer, {className}. De apotheker heeft geen geduld voor gemorste reagentia."
       },
       "wayfarer_bryn": {
-        "name": "Wayfarer Bryn",
-        "title": "Harbor Guide",
-        "greeting": "Eastbrook takes all comers, friend. And for the unsteady, there is always the Proving Shore: the ferry bell by the Ravenpost mailbox rings you across any day of the year, and its twin on the island rings you home."
+        "name": "Reiziger Bryn",
+        "title": "Havengids",
+        "greeting": "Oostbeek verwelkomt iedereen, vriend. En voor wie nog onvast ter been is, is er altijd de Beproevingskust: de veerklok bij de brievenbus van de Ravenpost brengt je elke dag van het jaar over, en zijn tweeling op het eiland brengt je weer thuis."
       },
       "instructor_maren": {
-        "name": "Instructor Maren",
-        "title": "Proving Master",
-        "greeting": "Every hero the vale has ever thanked stood where you stand now, {className}, and not one of them knew which end of a blade to hold. That is what this shore is for. Ask, practice, and fail where failing is free."
+        "name": "Instructeur Maren",
+        "title": "Meester van de Beproeving",
+        "greeting": "Elke held die het dal ooit heeft bedankt, stond waar jij nu staat, {className}, en geen van hen wist welk eind van een kling je vast moest houden. Daarvoor is deze kust er. Vraag, oefen, en faal waar falen niets kost."
       },
       "quartermaster_finch": {
-        "name": "Quartermaster Finch",
-        "title": "Camp Outfitter",
-        "greeting": "My counter keeps exactly one thing for sale, {playerName}: a spare pouch for what you pick up along the way, when your lesson calls for it. Everything else here is salvage bound for the vale. Coin buys the pouch, and work earns the coin. That is the whole economy, and it never gets more complicated. Only bigger."
+        "name": "Kwartiermeester Finch",
+        "title": "Kampuitrusser",
+        "greeting": "Mijn toonbank heeft precies één ding te koop, {playerName}: een extra buidel voor wat je onderweg oppikt, wanneer je les erom vraagt. Al het andere hier is berging op weg naar het dal. Munt koopt de buidel, en werk verdient de munt. Dat is de hele economie, en die wordt nooit ingewikkelder. Alleen groter."
       },
       "ferryman_odo": {
-        "name": "Ferryman Odo",
-        "title": "Keeper of the Crossing",
-        "greeting": "Fresh off the crossing, {playerName}? Warden Tam keeps the Gauntlet on the strand just south of my pier: run his lanes first and your legs will thank you. Every keeper on this shore hands you to the next when your work is done, and the card at the top of your screen always knows the way. When the vale calls you back, ring the bell standing beside my pier and the crossing will set you down in Eastbrook town."
+        "name": "Veerman Odo",
+        "title": "Hoeder van de Oversteek",
+        "greeting": "Net van de oversteek, {playerName}? Wachter Tam beheert de Hindernisbaan op het strand net ten zuiden van mijn pier: doorloop eerst zijn banen, je benen zullen je dankbaar zijn. Elke hoeder op deze kust stuurt je door naar de volgende zodra je werk gedaan is, en de kaart bovenaan je scherm kent altijd de weg. Wanneer het dal je terugroept, luid dan de bel naast mijn pier en de oversteek zet je af in de stad Oostbeek."
       },
       "bursar_wick": {
-        "name": "Bursar Wick",
-        "title": "The Gilded Strongbox",
-        "greeting": "The Gilded Strongbox keeps a desk even here, {playerName}. Whatever you deposit with me waits in the same vault behind every bursar in every town, safe from wolves, water, and your own worse judgment."
+        "name": "Thesaurier Wick",
+        "title": "De Vergulde Geldkist",
+        "greeting": "De Vergulde Geldkist houdt zelfs hier een balie open, {playerName}. Wat je bij mij stort wacht in dezelfde kluis achter elke thesaurier in elke stad, veilig voor wolven, water en je eigen slechtere ingevingen."
       },
       "warden_tam": {
-        "name": "Warden Tam",
-        "title": "Keeper of the Gauntlet",
-        "greeting": "These lanes are the Gauntlet, {playerName}, and every adventurer the vale respects has run them. The lantern posts stay lit all night, so the lanes never close."
+        "name": "Wachter Tam",
+        "title": "Hoeder van de Hindernisbaan",
+        "greeting": "Deze banen vormen de Hindernisbaan, {playerName}, en elke avonturier die het dal respecteert heeft ze gelopen. De lantaarnpalen blijven de hele nacht branden, dus de banen sluiten nooit."
       },
       "overseer_pell": {
-        "name": "Overseer Pell",
-        "title": "Gauntlet Overseer",
-        "greeting": "I clock every run that comes down these lanes, {playerName}, and I have seen far worse footwork. The path behind me climbs to the practice yard: that is where footwork turns into swordwork."
+        "name": "Opzichter Pell",
+        "title": "Opzichter van de Hindernisbaan",
+        "greeting": "Ik klok elke run die deze banen afkomt, {playerName}, en ik heb veel slechter voetenwerk gezien. Het pad achter me klimt naar het oefenterrein: daar wordt voetenwerk zwaardwerk."
       },
       "drillmaster_rook": {
-        "name": "Drillmaster Rook",
-        "title": "Yard Master",
-        "greeting": "Straw first, shells second, {playerName}. An effigy teaches your arm the swing; the scuttlers down the strand teach it to land on something that minds."
+        "name": "Drilmeester Rook",
+        "title": "Meester van het Oefenterrein",
+        "greeting": "Eerst stro, dan schelpen, {playerName}. Een stropop leert je arm de zwaai; de scharrelaars verderop het strand leren hem die te laten landen op iets dat er iets om geeft."
       },
       "tidewarden_nel": {
-        "name": "Tidewarden Nel",
-        "title": "Keeper of the Strand",
-        "greeting": "The tide takes and the tide pays, {playerName}. I keep the tally of both: what the scuttlers pinch off the wrecks, and what honest hands carry back up this path."
+        "name": "Getijwachter Nel",
+        "title": "Hoeder van het Strand",
+        "greeting": "Het getij neemt en het getij betaalt, {playerName}. Ik houd van beide de tel bij: wat de scharrelaars van de wrakken pikken, en wat eerlijke handen dit pad weer op dragen."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -14856,7 +14856,7 @@ export const nl_NL: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Een ambacht voor iedere hand",
-        "text": "Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidoosten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.",
+        "text": "Elke ziel in Oostbeek beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergroeve, ten noordoosten van de stad, voorbij de wolvenrennen. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.",
         "completion": "Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.",
         "objectives": {
           "0": {
@@ -14886,7 +14886,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_boars": {
         "title": "Borstelige Everzwijnhuiden",
-        "text": "Zwijnenhuid maakt de beste reistassen, en de weiden ten westen van de stad wemelen van de beesten. Breng me 5 Borstelige Zwijnenhuiden en ik zal het de moeite waard maken.",
+        "text": "Zwijnenhuid maakt de beste reistassen, en de weiden ten noordwesten van de stad wemelen van de beesten. Breng me 5 Borstelige Zwijnenhuiden en ik zal het de moeite waard maken.",
         "completion": "Ah, mooie borstelige huiden! Die zullen een goede prijs opbrengen.",
         "objectives": {
           "0": {
@@ -14896,7 +14896,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_spiders": {
         "title": "De Sableweb-Plaag",
-        "text": "De loerders in de oostelijke bossen spinnen een zijde die ik nodig heb voor mijn kompressen, en ze zijn bovendien veel te talrijk geworden. Vel 6 Sableweb-Loerders en snijd 4 zijdeklieren uit hun buiken.",
+        "text": "De loerders in de noordoostelijke bossen spinnen een zijde die ik nodig heb voor mijn kompressen, en ze zijn bovendien veel te talrijk geworden. Vel 6 Sableweb-Loerders en snijd 4 zijdeklieren uit hun buiken.",
         "completion": "Bah, beweegt nog. Perfect. Hier, dit heb je verdiend.",
         "objectives": {
           "0": {
@@ -14939,7 +14939,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_supplies": {
         "title": "Gestolen Voorraden",
-        "text": "Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen - gereedschap, zout, goed Eastbrook-linnen. De kratten staan opgestapeld rond hun kamp in de zuidwestelijke heuvels. Steel ze voor me terug, wil je?",
+        "text": "Die bandieten overvielen mijn laatste wagen en gingen ervandoor met vier kratten goederen: gereedschap, zout, goed Oostbeeks linnen. De kratten staan opgestapeld rond hun kamp in de noordwestelijke heuvels. Steel ze voor me terug, wil je?",
         "completion": "Mijn kratten! Amper een schram erop. Je bent een wonder.",
         "objectives": {
           "0": {
@@ -15032,7 +15032,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_bandits": {
         "title": "Dieven van het Dal",
-        "text": "Een bende moordenaars heeft een kamp opgeslagen in de zuidwestelijke heuvels. Ze hebben deze week drie wagens beroofd. Verdrijf ze, dood 10 Daldieven.",
+        "text": "Een bende moordenaars heeft een kamp opgeslagen in de noordwestelijke heuvels. Ze hebben deze week drie wagens beroofd. Verdrijf ze, dood 10 Daldieven.",
         "completion": "Tien messen minder in het donker. Neem dit aan, je hebt het verdiend.",
         "objectives": {
           "0": {
@@ -15712,7 +15712,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_prof_amends_outfitter": {
         "title": "Draden Hernomen",
-        "text": "Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de webhoutspin nen die het oostelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.",
+        "text": "Toch terug bij mijn weefgetouw. Ik koester geen wrok, {playerName}, maar de draad herinnert een hand die hem losliet, en de kosten om hem weer op te pakken worden elke keer gemeten aan een langere maat. Maai de Sableweb-Loerders die het noordoostelijke woud verdringen, en de inspanning zal je handen kalmeren voordat ze goede zijde aanraken.",
         "completion": "Stabiel weer. Leerbewerking en Kleermakerij keren terug naar je handen als hoofdvakken. Meet twee keer voordat je weer gaat dwalen.",
         "objectives": {
           "0": {
@@ -15722,7 +15722,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_prof_amends_apothecary": {
         "title": "Terug op het Fornuis",
-        "text": "Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in het westelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.",
+        "text": "Wel, kijk wie er terug is bij mijn pot. Geen wrok, {playerName}, een keuken heeft altijd ruimte, maar weet dat de rekening langer wordt elke keer dat je weggaat. Ga de wilde everzwijnen in de noordwestelijke weide uitdunnen, want eerlijk zweet is het eerste ingrediënt, en het zal je handen herinneren aan het werk.",
         "completion": "Dat is de oude smaak. Alchemie en Koken zijn weer als hoofdvakken op je fornuis. Blijf deze keer wat langer.",
         "objectives": {
           "0": {
@@ -16814,105 +16814,105 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_ps_the_gauntlet": {
-        "title": "Run the Gauntlet",
-        "text": "Every pair of legs the vale respects has run these lanes first, {playerName}. Walk the first lane west to its flag, swing yourself around, walk the south lane to the second, then sidestep the last lane to the red flag. Pass the flags in order, and the card at the top of your screen will show you every button as you go. Overseer Pell clocks every run from the far end: when the red flag is behind you, he is standing right there to take it in.",
-        "completion": "I clocked that run, {playerName}, and I have failed faster feet. The Gauntlet is yours. The path behind me climbs to the practice yard, where Drillmaster Rook turns footwork into swordwork: he has your next task.",
+        "title": "Loop de Hindernisbaan",
+        "text": "Elk paar benen dat het dal respecteert, heeft deze banen eerst gelopen, {playerName}. Loop de eerste baan naar het westen tot aan zijn vlag, zwaai jezelf om, loop de zuidelijke baan naar de tweede, en zijstap dan de laatste baan naar de rode vlag. Passeer de vlaggen in volgorde, en de kaart bovenaan je scherm toont je elke knop terwijl je gaat. Opzichter Pell klokt elke run vanaf het verre eind: zodra de rode vlag achter je ligt, staat hij daar klaar om het in ontvangst te nemen.",
+        "completion": "Ik heb die run geklokt, {playerName}, en ik heb sneller voeten laten zakken. De Hindernisbaan is van jou. Het pad achter me klimt naar het oefenterrein, waar Drilmeester Rook voetenwerk in zwaardwerk verandert: hij heeft je volgende taak.",
         "objectives": {
           "0": {
-            "label": "Gauntlet flag passed"
+            "label": "Vlag van de Hindernisbaan gepasseerd"
           }
         }
       },
       "q_ps_strike_true": {
-        "title": "Strike True",
-        "text": "Footwork first, now the arm, {playerName}. The practice yard sits up the path behind me, and its straw effigies were built to be hit. If you lose the way, press M to open the map: every task you carry is marked on it. Walk up to an effigy and left-click it: that makes it your target, and its name will appear at the top of your screen. Only then press 1, or click the first icon on the action bar along the bottom, to swing. Keep striking until one gives out; it will not swing back, effigies never do. Drillmaster Rook watches the yard from its west shoulder, where the strand path sets out: press F on him to hand the fell in.",
-        "completion": "One clean fell, and your grip already surer. Remember the feel of it, {playerName}: target, strike, and keep striking. Straw never minds. The next thing you swing at will.",
+        "title": "Sla Raak",
+        "text": "Eerst voetenwerk, nu de arm, {playerName}. Het oefenterrein ligt het pad op achter me, en zijn stropoppen zijn gebouwd om geraakt te worden. Als je de weg kwijtraakt, druk dan op M om de kaart te openen: elke taak die je draagt staat erop gemarkeerd. Loop naar een stropop toe en klik erop: dat maakt hem tot je doelwit, en zijn naam verschijnt bovenaan je scherm. Pas dan druk je op 1, of klik je op het eerste icoon op de actiebalk onderaan, om te zwaaien. Blijf toeslaan tot er een omvalt; hij slaat nooit terug, stropoppen doen dat nooit. Drilmeester Rook houdt het oefenterrein in de gaten vanaf de westflank, waar het strandpad begint: druk op F op hem om de val te melden.",
+        "completion": "Eén schone val, en je greep al vaster. Onthou hoe dat voelde, {playerName}: doelwit kiezen, toeslaan, en blijven toeslaan. Stro geeft nergens om. Het volgende waar je op zwaait wel.",
         "objectives": {
           "0": {
-            "label": "Training Effigy felled"
+            "label": "Stropop geveld"
           }
         }
       },
       "q_ps_hone_the_edge": {
-        "title": "Hone the Edge",
-        "text": "A swing is a swing, {playerName}, and straw will take it all day. That is not what wins you anything. Look at the row of buttons along the bottom of your screen: that row is your craft, and every one of them does something your arm alone cannot. You have one already. Turn back to the effigies and use it: pick your target, then press the button the yard marks for you, three times over. Do not simply hack at the straw; make the thing you know how to do actually happen. Then come back to me.",
-        "completion": "Now you are fighting instead of flailing. That row grows every level you take, {playerName}, and the ones who live longest are the ones who read it. Straw does not care which button you used. The vale will.",
+        "title": "Slijp de Snede",
+        "text": "Een zwaai is een zwaai, {playerName}, en stro incasseert die de hele dag. Daar win je niets mee. Kijk naar de rij knoppen onderaan je scherm: die rij is je vakmanschap, en elk ervan doet iets wat je arm alleen niet kan. Je hebt er al één. Ga terug naar de stropoppen en gebruik hem: kies je doelwit, druk dan drie keer op de knop die het oefenterrein je aanwijst. Hak niet zomaar op het stro in; laat het ding dat je kent daadwerkelijk gebeuren. Kom daarna terug naar mij.",
+        "completion": "Nu vecht je in plaats van maar wat te zwaaien. Die rij groeit met elk niveau dat je haalt, {playerName}, en wie het langst leeft, is wie hem leest. Stro maakt het niet uit welke knop je gebruikte. Het dal wel.",
         "objectives": {
           "0": {
-            "label": "Ability landed on an effigy"
+            "label": "Vaardigheid geraakt op een stropop"
           }
         }
       },
       "q_ps_shell_and_claw": {
-        "title": "Shell and Claw",
-        "text": "Straw never minds, {playerName}, so here is something that does. Shore scuttlers pick over the wreck line on the far strand: follow the path west from my yard and it walks you straight to them. They pinch back, so watch your health bar and keep swinging: left-click one to make it your target, then use the ability the yard taught you (the coach names your button), and do not stop until its shell cracks. Three will do. Then climb the path up the north rise: Tidewarden Nel keeps the strand tally, and she counts your shells.",
-        "completion": "Three shells cracked and all your fingers kept: a fair first fight, {playerName}. The scuttlers pinch off the wrecks faster than the tide brings salvage in, so every one you cull is coin someone keeps.",
+        "title": "Schelp en Klauw",
+        "text": "Stro geeft nergens om, {playerName}, dus hier is iets dat dat wel doet. Strandscharrelaars struinen de wraklijn af op het verre strand: volg het pad naar het westen vanaf mijn oefenterrein en het brengt je recht naar ze toe. Ze knijpen terug, dus houd je gezondheidsbalk in de gaten en blijf toeslaan: klik op een om hem tot doelwit te maken, gebruik dan de vaardigheid die het oefenterrein je leerde (de coach noemt je knop), en stop niet tot zijn schelp kraakt. Drie is genoeg. Beklim daarna het pad de noordelijke helling op: Getijwachter Nel houdt de strandtelling bij, en zij telt je schelpen.",
+        "completion": "Drie schelpen gekraakt en al je vingers nog heel: een eerlijk eerste gevecht, {playerName}. De scharrelaars knijpen sneller van de wrakken af dan het getij berging aanspoelt, dus elke die je velt is munt die iemand overhoudt.",
         "objectives": {
           "0": {
-            "label": "Shore Scuttler culled"
+            "label": "Strandscharrelaar geveld"
           }
         }
       },
       "q_ps_mother_of_pearl": {
-        "title": "Mother of Pearl",
-        "text": "Three shells cracked, {playerName}, but the wreck line keeps a king, and he sits on a prize worth more than every crate on this strand. Take this Briny Lure to the tide pool at the strand's far west end, past the wrecks. Stand at the water's edge, press B to open your bags, and left-click the lure to wake him. Mister Crabs pinches far harder than his little cousins, so watch your health bar, keep striking, and back away up the sand if you need your breath. When he falls, walk right up to his shell and press F to loot the Lustrous Pearl off him. Bring that pearl back to me.",
-        "completion": "The Lustrous Pearl, pried off the old king of the shallows himself. My father tipped his hat to that crab every morning of his working life; some respect is owed. Hold still... there. Strung, set, and yours, {playerName}: the Mother of Pearl. Press B to open your bags and left-click the ring to slide it on, then press C to open your character sheet and see it sitting on your hand. A slight thing, but every part of you the better for wearing it.",
+        "title": "Parelmoer",
+        "text": "Drie schelpen gekraakt, {playerName}, maar de wraklijn herbergt een koning, en hij zit op een prijs die meer waard is dan elke kist op dit strand. Neem dit Ziltig Lokaas mee naar de getijpoel aan het uiterste westen van het strand, voorbij de wrakken. Ga aan de waterrand staan, druk op B om je tassen te openen, en klik op het lokaas om hem te wekken. Meneer Krab knijpt veel harder dan zijn kleine neefjes, dus houd je gezondheidsbalk in de gaten, blijf toeslaan, en wijk terug het zand op als je op adem moet komen. Zodra hij valt, loop recht naar zijn schild en druk op F om de Glanzende Parel van hem te plunderen. Breng die parel terug naar mij.",
+        "completion": "De Glanzende Parel, losgewrikt van de oude koning van de ondiepten zelf. Mijn vader tikte elke ochtend van zijn werkende leven zijn hoed af voor die krab; er is respect verschuldigd. Hou even stil... zo. Geregen, gezet, en van jou, {playerName}: de Parelmoer. Druk op B om je tassen te openen en klik op de ring om hem aan te schuiven, druk dan op C om je personageblad te openen en hem aan je hand te zien zitten. Een klein ding, maar je bent er in elk opzicht beter van.",
         "objectives": {
           "0": {
-            "label": "Mister Crabs slain"
+            "label": "Meneer Krab verslagen"
           },
           "1": {
-            "label": "Lustrous Pearl claimed"
+            "label": "Glanzende Parel bemachtigd"
           }
         }
       },
       "q_ps_the_wreck_line": {
-        "title": "The Wreck Line",
-        "text": "My porters haul salvage off the old wrecks and carry it up the rise toward Dawnrest Camp, {playerName}, and half the crates never finish the climb: they get set down along the path and forgotten. Follow my path toward the camp and you will walk right past the strays. Opening one is simple: walk up to a crate until its name shows, then press F, or left-click the crate itself, and it will give up what it holds. Six of them will clear the line, and remember F is the same key for every chest, node and doorway you will ever meet. Quartermaster Finch keeps the camp stall and buys every stick of salvage: hand the haul to her.",
-        "completion": "Rope, tar, and half a wheel of cheese the sea somehow spared: I will take the lot, {playerName}. A back that carries what it finds is worth more to this camp than any blade, and yours just cleared the whole line in one climb.",
+        "title": "De Wraklijn",
+        "text": "Mijn dragers slepen berging van de oude wrakken en dragen het de helling op naar Kamp Dageraadrust, {playerName}, en de helft van de kisten haalt de klim nooit: ze worden langs het pad neergezet en vergeten. Volg mijn pad naar het kamp en je loopt recht langs de achtergeblevene. Er een openen is simpel: loop naar een kist toe tot zijn naam verschijnt, druk dan op F, of klik op de kist zelf, en hij geeft prijs wat hij bevat. Zes ervan ruimen de lijn op, en onthou dat F dezelfde toets is voor elke kist, knooppunt en doorgang die je ooit zult tegenkomen. Kwartiermeester Finch houdt de kampkraam bij en koopt elk stukje berging op: geef de buit aan haar.",
+        "completion": "Touw, teer, en een halve kaaswiel die de zee op een of andere manier heeft gespaard: ik neem het allemaal, {playerName}. Een rug die draagt wat hij vindt is meer waard voor dit kamp dan welke kling ook, en die van jou heeft net de hele lijn in één klim leeggehaald.",
         "objectives": {
           "0": {
-            "label": "Castaway Crate opened"
+            "label": "Aangespoelde Kist geopend"
           }
         }
       },
       "q_ps_pouch_and_purse": {
-        "title": "Pouch and Purse",
-        "text": "One more lesson before the vale, {playerName}, and it is the one that keeps adventurers alive: what you carry. Your backpack holds sixteen slots, and beside it wait four empty bag loops; every bag you buckle on adds its own space to the pool. So: press F on me again to open my stall, left-click the Linen Pouch in my wares to buy it, then press B to open your bags and left-click the pouch there to buckle it into a free loop. Instructor Maren drills by the muster fire a few steps east: show her the pouch on your belt.",
-        "completion": "A fine pouch. Buckle it on if you have not already: press B to open your bags, then left-click the pouch to seat it in a free bag loop, and six more slots are yours to fill with trouble. Now the half of the lesson no bag can hold, {playerName}: what you cannot carry, the Gilded Strongbox keeps. Bursar Wick keeps his strongbox desk up the west path, and he opens the same vault every bursar in every town shares; more vault space can be bought once your purse grows into it. Keep your valuables banked and your bags roomy. A full pack has ended more adventures than any wolf ever did.",
+        "title": "Buidel en Beurs",
+        "text": "Nog één les voor het dal, {playerName}, en het is degene die avonturiers in leven houdt: wat je meedraagt. Je rugzak heeft zestien vakken, en ernaast wachten vier lege taslussen; elke tas die je omgespt voegt zijn eigen ruimte toe aan de pool. Dus: druk nog eens op F op mij om mijn kraam te openen, klik op de Linnen buidel in mijn waren om hem te kopen, druk dan op B om je tassen te openen en klik op de buidel daar om hem in een vrije lus te gespen. Instructeur Maren oefent bij het verzamelvuur een paar stappen naar het oosten: laat haar de buidel aan je riem zien.",
+        "completion": "Een prima buidel. Gesp hem om als je dat nog niet hebt gedaan: druk op B om je tassen te openen, klik dan op de buidel om hem in een vrije taslus te zetten, en zes extra vakken zijn van jou om met problemen te vullen. Nu de helft van de les die geen tas kan bevatten, {playerName}: wat je niet kunt dragen, bewaart de Vergulde Geldkist. Thesaurier Wick houdt zijn geldkistbalie boven aan het westelijke pad, en hij opent dezelfde kluis die elke thesaurier in elke stad deelt; meer kluisruimte kun je kopen zodra je beurs ernaar groeit. Houd je kostbaarheden in de bank en je tassen ruim. Een volle rugzak heeft meer avonturen beëindigd dan welke wolf ook.",
         "objectives": {
           "0": {
-            "label": "Linen Pouch bought"
+            "label": "Linnen buidel gekocht"
           }
         }
       },
       "q_ps_the_signpost": {
-        "title": "Word on the Wind",
-        "text": "One habit left to learn, {playerName}, and it needs no blade: read the boards. The guild signpost stands at the camp gate a few steps south-west of my fire, and guilds and travelling crews post their calls on it. Walk up to its face and press F, or left-click it, to read what is posted, then come back and tell me what the wind carried in. A board like it stands in every town you will ever walk into.",
-        "completion": "So now you know how word moves in the vale, {playerName}: not by couriers, by boards. Check them in every town you pass; half an adventure starts as three lines of ink on one.",
+        "title": "Woord op de Wind",
+        "text": "Nog één gewoonte om te leren, {playerName}, en die heeft geen kling nodig: lees de borden. De gildewegwijzer staat bij de kamppoort een paar stappen ten zuidwesten van mijn vuur, en gilden en rondtrekkende ploegen plaatsen er hun oproepen op. Loop naar het bord toe en druk op F, of klik erop, om te lezen wat er geplaatst is, kom dan terug en vertel me wat de wind heeft binnengebracht. Zo'n bord staat in elke stad waar je ooit binnen zult lopen.",
+        "completion": "Dus nu weet je hoe nieuws zich verspreidt in het dal, {playerName}: niet via boodschappers, maar via borden. Controleer ze in elke stad die je passeert; de helft van elk avontuur begint als drie regels inkt op zo'n bord.",
         "objectives": {
           "0": {
-            "label": "Guild signpost read"
+            "label": "Gildewegwijzer gelezen"
           }
         }
       },
       "q_ps_the_long_walk": {
-        "title": "The Long Walk",
-        "text": "One lesson left, {playerName}, and it is the one I cannot tell you: you have to have done it once. You are going to die out there. Everyone does, and it is not the end of anything. Take this Passing Stone. Press B to open your bags and left-click it, and it will lay you down right where you stand. Then follow the instructions on your screen: release your spirit, walk back to your own body, and step into it. Your body waits, the walk is free, and you lose nothing by making it.",
-        "completion": "And back you come, no worse for it. Remember what that felt like, {playerName}, because the next time it happens there will be teeth involved and no one standing by to explain. Your body waits, the walk is free, and the only thing death really costs you is the time it takes to come back.",
+        "title": "De Lange Wandeling",
+        "text": "Nog één les over, {playerName}, en het is degene die ik je niet kan vertellen: je moet het één keer hebben meegemaakt. Je gaat daarbuiten sterven. Iedereen gaat dat, en het is nergens het einde van. Neem deze Doorgangssteen. Druk op B om je tassen te openen en klik erop, en hij legt je neer precies waar je staat. Volg dan de instructies op je scherm: laat je geest los, loop terug naar je eigen lichaam, en stap erin. Je lichaam wacht, de wandeling is gratis, en je verliest niets door hem te maken.",
+        "completion": "En daar ben je weer, geen haar slechter. Onthou hoe dat voelde, {playerName}, want de volgende keer dat het gebeurt, zijn er tanden bij betrokken en staat er niemand klaar om het uit te leggen. Je lichaam wacht, de wandeling is gratis, en het enige wat de dood je echt kost, is de tijd die het duurt om terug te komen.",
         "objectives": {
           "0": {
-            "label": "Walked back from the dead"
+            "label": "Teruggelopen uit de dood"
           }
         }
       },
       "q_ps_set_sail": {
-        "title": "Set Sail",
-        "text": "There is nothing left on this shore you have not already run, beaten, opened, or bought, {playerName}. You are ready, and Eastbrook has real work waiting. Walk back down the shore road to the pier, press F on Ferryman Odo, and tell him I said you have earned your crossing. Press L any time you lose track of what you owe whom: that is your quest log.",
-        "completion": "Maren said that, did she? High praise from a woman who once made me practice mooring knots for a week. Ring the bell standing beside my pier whenever you are ready, {playerName}, and the crossing will set you down in the middle of Eastbrook town. Mind the wolves.",
+        "title": "Vaar Uit",
+        "text": "Er is niets meer op dit strand dat je niet al hebt gelopen, verslagen, geopend of gekocht, {playerName}. Je bent klaar, en Oostbeek heeft echt werk klaarliggen. Loop de kustweg terug naar de pier, druk op F op Veerman Odo, en zeg hem dat ik zei dat je je oversteek hebt verdiend. Druk op L wanneer je de tel kwijtraakt van wie je nog iets verschuldigd bent: dat is je questlogboek.",
+        "completion": "Zei Maren dat? Groot compliment van een vrouw die mij ooit een week lang meerknopen liet oefenen. Luid de bel naast mijn pier zodra je klaar bent, {playerName}, en de oversteek zet je af midden in de stad Oostbeek. Pas op voor de wolven.",
         "objectives": {
           "0": {
-            "label": "Report to Ferryman Odo"
+            "label": "Meld je bij Veerman Odo"
           }
         }
       },
@@ -17115,7 +17115,7 @@ export const nl_NL: EnTranslations = {
             "label": "De Verrekust-Dam"
           },
           "12": {
-            "label": "Eastbrook Docks"
+            "label": "Oostbeekse Dokken"
           }
         }
       },
@@ -17480,23 +17480,23 @@ export const nl_NL: EnTranslations = {
         }
       },
       "proving_shore": {
-        "name": "The Proving Shore",
-        "welcome": "The Proving Shore asks nothing of you but time. Learn the camp, strike the effigies, walk the wreck line, and when you are ready, Ferryman Odo will see you across to the vale.",
+        "name": "De Beproevingskust",
+        "welcome": "De Beproevingskust vraagt niets van je dan tijd. Leer het kamp kennen, sla de stropoppen, loop de wraklijn af, en wanneer je klaar bent, brengt Veerman Odo je over naar het dal.",
         "pois": {
           "0": {
-            "label": "Dawnrest Camp"
+            "label": "Kamp Dageraadrust"
           },
           "1": {
-            "label": "The Old Pier"
+            "label": "De Oude Pier"
           },
           "2": {
-            "label": "The Practice Yard"
+            "label": "Het Oefenterrein"
           },
           "3": {
-            "label": "The Wreck Line"
+            "label": "De Wraklijn"
           },
           "4": {
-            "label": "The Gauntlet"
+            "label": "De Hindernisbaan"
           }
         }
       }
@@ -17742,19 +17742,19 @@ export const nl_NL: EnTranslations = {
         "body": "Een van je hoofdvakken heeft meesterschap bereikt, de allerHOOGSTE, kaboom, de hele ladder, klaar. Ik deel geen lof uit, ik deel lonten uit, maar hier, neem allebei: je bent briljant en enigszins angstaanjagend. Ga de bergen zenuwachtig maken."
       },
       "woc_market_delivery": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange purchase",
-        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "sender": "De Beursmakelaar",
+        "subject": "Je aankoop op de Beurs",
+        "body": "De verkoop is afgerond en de waar is van jou. Het bijgevoegde pakket bevat precies het voorwerp waarvoor je hebt betaald, veilig in bewaring gehouden vanaf het moment dat het werd aangeboden tot je betaling werd verwerkt.\n\nEen verslag van de verkoop staat vermeld in het beursregister.\n\n- De Beursmakelaar"
       },
       "woc_market_return": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing has ended",
-        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+        "sender": "De Beursmakelaar",
+        "subject": "Je aanbieding op de Beurs is beëindigd",
+        "body": "Je aanbieding is beëindigd zonder voltooide verkoop: de veiling vond geen koper, de reserveprijs werd niet gehaald, de aanbieding werd ingetrokken, of de winnende bieder heeft niet afgerekend. Je waar keert ongeschonden naar je terug met deze brief, precies zoals ze in bewaring was gehouden.\n\n- De Beursmakelaar"
       },
       "woc_market_sold": {
-        "sender": "The Exchange Broker",
-        "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+        "sender": "De Beursmakelaar",
+        "subject": "Je aanbieding op de Beurs is verkocht",
+        "body": "Je aanbieding is verkocht en de koper heeft volledig afgerekend. Het beursregister bevat het verslag van de verkoop, en je beursactiviteit toont het afgerekende bedrag met de bijbehorende uitsplitsing.\n\n- De Beursmakelaar"
       }
     },
     "itemSets": {

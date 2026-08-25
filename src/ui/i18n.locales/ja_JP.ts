@@ -13,6 +13,19 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': 'ページ{page}',
+  'hudChrome.bootcamp.promptHold': 'つかむ',
+  'hudChrome.bootcamp.promptJump': 'ジャンプ',
+  'hudChrome.bootcamp.promptPickUp': '拾う',
+  'hudChrome.bootcamp.promptRead': '読む',
+  'hudChrome.bootcamp.promptRing': '鳴らす',
+  'hudChrome.bootcamp.promptTalk': '話す',
+  'hudChrome.mobile.barEditor': 'バー編集',
+  'hudChrome.mobile.menuLabel': 'メニュー',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': '下',
+  'hudChrome.mobile.radialLeft': '左',
+  'hudChrome.mobile.radialUp': '上',
   'hudChrome.bootcamp.promptAttack': '攻撃',
   'hudChrome.bootcamp.keycapThen': 'つぎに',
   'hudChrome.bootcamp.promptSummon': '召喚',
@@ -3139,7 +3152,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を打って{damage}ダメージを与え、4秒間スタンさせます。コンボポイントを2獲得します。',
   'entities.abilities.sap.name': 'サップ',
   'entities.abilities.sap.description':
-    '対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',
+    'ダスクヴェールを解除せず、戦闘も始めずに、対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',
   'entities.abilities.crippling_poison.name': '鉛の毒',
   'entities.abilities.crippling_poison.description':
     '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。',
@@ -3213,7 +3226,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'テンの相',
   'entities.abilities.aspect_of_the_monkey.description': 'テンの姿をまとい、回避率を30分間8%高めます。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬の相',
-  'entities.abilities.aspect_of_the_cheetah.description': '駿馬の姿をまとい、移動速度を30分間30%高めます。',
+  'entities.abilities.aspect_of_the_cheetah.description': '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が4秒間半減します（被弾のたびによろめきが更新されます）。',
   'entities.abilities.aimed_shot.name': '引き絞り',
   'entities.abilities.aimed_shot.description': '対象を撃ち、{damage}の物理ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。',
   'entities.abilities.rapid_fire.name': '熱狂の速射',
@@ -3401,7 +3414,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     'ウォーロックの命令に従うウォーフィーンドを召喚します。ウォーフィーンドは戦場に踏み込んで持ちこたえる頑丈な近接悪魔です。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
   'entities.abilities.summon_infernal.name': 'パイアコロッサスの召喚',
-  'entities.abilities.summon_infernal.description': '対象範囲へパイアコロッサスを落とし、着弾時に58-72の火炎ダメージを与えます。デーモンを置き換えることなく30秒間戦い、2秒ごとに近くの敵を焼き、1秒ごとに破滅的猛攻を1生みます。',
+  'entities.abilities.summon_infernal.description': '対象範囲へパイアコロッサスを落とし、着弾時に64-79の火炎ダメージを与えます。デーモンを置き換えることなく30秒間戦い、2秒ごとに近くの敵を焼き、1秒ごとに破滅的猛攻を1生みます。',
   'entities.abilities.summon_doomguard.name': 'レイスボーンの召喚',
   'entities.abilities.summon_doomguard.description':
     'レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
@@ -3882,7 +3895,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '焼きたてのパン、澄んだ水、正直な値段です。何が必要ですか？',
   'entities.npcs.apothecary_lin.name': '薬師リン',
   'entities.npcs.apothecary_lin.title': '薬草師',
-  'entities.npcs.apothecary_lin.greeting': '東の森では足元に気をつけてください、友よ。',
+  'entities.npcs.apothecary_lin.greeting': '北東の森では足元に気をつけてください、友よ。',
   'entities.npcs.brother_aldric.name': 'アルドリック修道士',
   'entities.npcs.brother_aldric.title': '谷の司祭',
   'entities.npcs.brother_aldric.greeting':
@@ -3979,7 +3992,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
   'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
   'entities.quests.q_prof_intro.text':
-    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南東、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
+    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の北東、狼の道を過ぎたカッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
   'entities.quests.q_prof_intro.completion':
     'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
   'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
@@ -3996,12 +4009,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.objectives.0.label': '老グレイジョーの牙',
   'entities.quests.q_boars.title': '剛毛の猪の皮',
   'entities.quests.q_boars.text':
-    '猪の皮は旅袋に最適です。町外れの草地に獣が満ちています。剛毛猪の皮を5枚持ってきてください。',
+    '猪の皮は旅袋に最適です。町の北西の草地に獣が満ちています。剛毛猪の皮を5枚持ってきてくれれば、それに見合う礼をしましょう。',
   'entities.quests.q_boars.completion': 'いい剛毛の皮です。高く売れるでしょう。',
   'entities.quests.q_boars.objectives.0.label': '剛毛猪の皮',
   'entities.quests.q_spiders.title': 'セイブルウェブの脅威',
   'entities.quests.q_spiders.text':
-    '東の森の潜伏者は、私の湿布に必要な絹を紡ぎます。おまけに、あまりに数を増やしすぎました。セイブルウェブの潜伏者を6匹間引き、その腹から絹腺を4つ切り取ってください。',
+    '北東の森の潜伏者は、私の湿布に必要な絹を紡ぎます。おまけに、あまりに数を増やしすぎました。セイブルウェブの潜伏者を6匹間引き、その腹から絹腺を4つ切り取ってください。',
   'entities.quests.q_spiders.completion':
     'うう、まだ動いています。完璧です。これはあなたの取り分です。',
   'entities.quests.q_spiders.objectives.0.label': 'セイブルウェブの潜伏者を討伐',
@@ -4024,7 +4037,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '安らがぬ骨を安息させる',
   'entities.quests.q_supplies.title': '盗まれた物資',
   'entities.quests.q_supplies.text':
-    '盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。南西の野営地から箱を4つ取り戻してください。',
+    '盗賊が最後の荷車を奪いました。道具、塩、上等なイーストブルックの麻です。北西の野営地から箱を4つ取り戻してください。',
   'entities.quests.q_supplies.completion':
     '私の箱です！傷もほとんどありません。あなたは大した人です。',
   'entities.quests.q_supplies.objectives.0.label': '盗まれた補給箱',
@@ -4073,7 +4086,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': 'モーセンの魔導書',
   'entities.quests.q_bandits.title': '谷の盗賊',
   'entities.quests.q_bandits.text':
-    '南西の丘に盗賊団がいます。今週だけで荷車を三台襲いました。谷の盗賊を10人倒してください。',
+    '北西の丘に盗賊団がいます。今週だけで荷車を三台襲いました。谷の盗賊を10人倒してください。',
   'entities.quests.q_bandits.completion': '闇の中の刃が十本減りました。これはあなたのものです。',
   'entities.quests.q_bandits.objectives.0.label': '谷の盗賊を討伐',
   'entities.quests.q_ringleader.title': '首領',
@@ -10143,7 +10156,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
   'entities.abilities.psychic_scream.description': '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
-  'entities.abilities.shadowstep.description': '影を通り抜けて対象へ近づく。（ローグのタレント）',
+  'entities.abilities.shadowstep.description': '影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。（ローグのタレント）',
   'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
   'entities.abilities.tranquility.description':
     '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',
@@ -10245,7 +10258,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '次の詠唱時間のある呪文2回を移動しながら発動できます。15秒間持続します。（メイジタレント）',
   'entities.abilities.ignition.name': 'イグニッション',
   'entities.abilities.ignition.description':
-    'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの40%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
+    'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの30%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
   'entities.abilities.mass_barrier.name': 'マスバリア',
   'entities.abilities.mass_barrier.description':
     '自身と30メートル以内にいる近くの味方最大4人に、それぞれ130ダメージを吸収するシールドを60秒間付与します。（メイジタレント）',
@@ -11161,13 +11174,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '森の狼を討伐',
   'entities.quests.q_prof_amends_outfitter.title': '再びつなぐ糸',
   'entities.quests.q_prof_amends_outfitter.text':
-    '結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。東の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。',
+    '結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。北東の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。',
   'entities.quests.q_prof_amends_outfitter.completion':
     'また落ち着きましたね。皮革加工と裁縫は、主専攻としてあなたの手に戻ります。今度こそ、さまよう前に二度測りなさい。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'セイブルウェブの潜伏者を討伐',
   'entities.quests.q_prof_amends_apothecary.title': 'また竈の前へ',
   'entities.quests.q_prof_amends_apothecary.text':
-    'おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。西の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。',
+    'おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。北西の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。',
   'entities.quests.q_prof_amends_apothecary.completion':
     'ほら、昔なじみの味だ。錬金術と料理は、主専攻としてお前の竈に戻ってきた。今度はしばらくいてくれよ。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '野生の猪を狩る',
@@ -11592,7 +11605,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの製作にも品質が1段階高く仕上がる小さな確率（3%から上限15%）があり、レイドの下限を超えることはありません。',
   'guide.profPages.faq.q6': '「作り手：」とは何の意味ですか？',
   'guide.profPages.faq.a6':
-    '九つの共通の野外レシピと道具のレシピは、最初から誰もが習得しています。作業場に縛られる三つの上級レシピ（窯鱗のマント、ワードウィーヴのフード、ダスクハイドの手甲）も同様で、師匠は不要ですが、その作業場は必要です。それ以外はすべて、三つの拠点の町にある各作業場の師匠が教えます。多くはイーストブルックにおり、なめし職人はフェンブリッジのなめし場に、錬金術師はハイウォッチの薬房にいます。\n\nトレーナーのレシピはスキル0、25、50の段階に分かれ、一度きりの料金として無料、銀25、金1で習えます。師匠はその職のあなたの段階がレシピ自身の段階に達すると教えてくれ、習得には師匠の作業場に立っている必要があります。移動式の作業場は数に入りません。',
+    '九つの共通の野外レシピと道具のレシピは、最初から誰もが習得しています。作業場に縛られる三つのレシピ（窯鱗のマント、ワードウィーヴのフード、ダスクハイドの手甲）も同様で、師匠は不要ですが、その作業場は必要です。それ以外はすべて、三つの拠点の町にある各作業場の師匠が教えます。多くはイーストブルックにおり、なめし職人はフェンブリッジのなめし場に、錬金術師はハイウォッチの薬房にいます。\n\nトレーナーのレシピはスキル0、25、50の段階に分かれ、一度きりの料金として無料、銀25、金1で習えます。エンチャントの魔除けレシピ2つは25の段にあり、工作場の親方はスキル75と125で釣り竿2種を教え、それぞれ金4枚と16枚です。師匠はその職のあなたの段階がレシピ自身の段階に達すると教えてくれ、習得には師匠の作業場に立っている必要があります。移動式の作業場は数に入りません。',
   'guide.profPages.faq.q7': '作り手の絆とは何ですか？',
   'guide.profPages.faq.a7':
     '受注品は取引で受け取った相手にバインドされ、どの作業場の師匠でも段階料金で解除できます。',
@@ -11610,7 +11623,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '功績の書が歩みに寄り添います。初めての調律で技巧に誓いし者、初めての傑作でMasterwrightを獲得し、どちらも称号として身につけられます。八つの製作職はそれぞれスキル50で節目の功績、上限125でGrandmaster称号を戴き、釣りは熟練100でOld Salt、200でMaster Angler称号を得ます。初めての採集や製作、野外の幸運な発見、サルベージにも静かなページがあります。すべて装飾のみ。称号と名声だけで、功績が力を与えることはありません。',
   'guide.professions.startHeading': 'どこから始めるか',
   'guide.professions.startBody':
-    'Eastbrookに着いたばかりなら、Foreman Odellを訪ねてA Trade for Every Handを受けましょう。町の南東Copper Digの鉱脈を教えてくれます。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。町ではTキーで製作ウィンドウを開き、誰もが知る初期レシピを作り、鍛冶場、厨房、織機、工作場の師匠たちを訪ね、作業依頼で堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
+    'イーストブルックに着いたばかりなら、監督官オデルを訪ね、「剣以外にも稼ぎはある」を受けましょう。町の北東、銅鉱山周辺の鉱脈へ案内してくれ、最初のまめを授けてくれます。鉱山そのものには要注意です。そこに陣取るディープロックの掘削者たちは駆け出しより数段強いので、まずは外縁の鉱脈から手をつけ、野営地の中心は少しレベルを上げてから狙いましょう。以後は旅の途中で見かける鉱脈や木立、薬草をすべて採ること。習熟は旅を重ねる者に自然と身につきます。\n\n町ではTキーで製作ウィンドウを開き、誰もが最初から知っている初期レシピをこなしましょう。鍛冶場、厨房、織機、工作場の師匠たちを訪ねて何を教えてくれるか確かめ、作業依頼を受けて堅実に稼ぎましょう。ギルドの手紙が届く頃には、どの対が我が家か分かっているはずです。',
   'guide.profPages.yieldsHeading': '採集の実り',
   'guide.profPages.yieldsBody':
     '採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。',
@@ -11676,16 +11689,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'RaimentのPristine Silkはそれだけで署名素材ボーナスを満たし、goldleafとsunpetalは素材段階1と2に数えられるので、レア段が最も発動しやすい場所です。鞄のような無能力値の品は決して発動しません。道はhomespunで25、鍍金織りで50、レア段で75。75からはWardweave Cowl（第3段レシピ、99まで全速、以降半減）が引き継ぎ、最後の50ポイントはおよそ75回、1回にPristine Silk 2枚、蜘蛛の糸4本、sunpetalとgoldleafの薬草を各2、糸2。鞄は文字通り全員に売れ、Ottilieの依頼は30分ごとに蜘蛛の糸6本。スキル50でA Fine Seam、125でGrandmaster Tailoringです。',
   'guide.profPages.craftProse.leatherworking.identityHeading': '俊敏な者の革',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "梯子は素朴なFenbridgeの硬革の脚絆、靴、帯から、良質のmarshstalker一式を経て、職人が裁てる最高の革であるレアのmirewarden一式へ。術者向けの二着、野外コモンのEastbrook Druid's Hideとスキル75のDuskhide Wrapsが陣容を締めます。環では料理と裁縫の間。生きた対は装具師（皮革加工と裁縫）でEastbrookのWeaver Ottilieの前で誓い、料理との対Trapperには誓いのクエストがまだありません。",
+    '梯子は素朴なフェンブリッジ革の脚絆、ブーツ、ベルトから、アンコモンの沼追跡者一式（ジャーキン、フード、肩当て）を経て、職人が裁てる最高の革であるレアの泥沼の番人一式へ。術者向けの二着、野外コモンのイーストブルックのドルイドの皮とスキル50のダスクハイドの手甲が陣容を締めます。\n\n環では料理と裁縫の間。生きた対は装具師（皮革加工と裁縫）で、イーストブルックの織り手オッティリーの前で誓います。料理との対、罠師は環に名はあるものの、まだ誓いのクエストがありません。',
   'guide.profPages.craftProse.leatherworking.materialsHeading': '狩りこそが収穫',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    '皮革加工ではレベリングの道と補給線が同じ一本道です。粗皮は皮を持つ亡骸、とりわけ狼と猪から直接剥ぎ、亡骸一体につき早い者勝ちの一人だけ。レア以上の採集判定はPristine Hideも授け、Mirewarden Jerkinがまさにそれを求めるので、見つけたら必ず取っておくこと。脇役は少なめで、蜘蛛の脚と糸、人型の手織り布、mirewardenのレア各着にオスミウム1個（Duskhide Wrapsの上級品は6個）、そしてなめし場カウンターのTanning Agent（16銅）。掘りたくなければTanner Heskがオスミウムも売っています。',
+    '皮革加工では、レベリングの道と補給線がまったく同じものです。粗皮は皮を持つ亡骸、とりわけ狼と猪から直接剥ぎ取り、亡骸一体につき早い者勝ちの一人だけが手にできます。レア以上の採集判定は極上の獣皮も授け、泥沼の番人のジャーキンがまさにそれを求めるので、見つけたら必ず取っておくこと。\n\n脇役は少なめです。蜘蛛の脚と糸、人型の敵からの手織り布、泥沼の番人のレア各着に入るオスミウム鉱石1個（ダスクハイドの手甲は6個）、そしてなめし場カウンターのなめし剤（16銅）。オスミウムそのものは店売りされません。ソーンピークか、ほとんどの若いゾーンの初心者向け鉱脈で自分の手で掘るか（遠つ岸だけは鉄を掘ります）、他のプレイヤーから買うかです。',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Fenbridgeで修行',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "ひとつだけ違うところ。なめし場はMirefen Marsh街道のFenbridgeにあり、Eastbrookの外で修行する唯一の本格職です。Tanner Heskが桶のそばで教えます。硬革段はスキル0無料、marshstalker段はスキル25から各25銀、mirewarden段はスキル50から各1金。二つのレシピは師匠を飛ばします。野外コモン（Tanned Leather JerkinとDruid's Hide）は最初からどこでも、Duskhide Wrapsは全員が知っていますがスキル75かつなめし場限定。装具師の誓い自体はEastbrookのOttilieの前です。沼で行うのは修行だけ。",
+    '仕掛けが一つあります。なめし場はマイアフェン湿地街道のフェンブリッジにあり、皮革加工はイーストブルックの外、湿地で修行する唯一の本格職です。皮なめし職人ヘスクが桶のそばで梯子を教えます。フェンブリッジ革段はスキル0無料、沼追跡者段はスキル25から各25銀、泥沼の番人段はスキル50から各1金で、それぞれの段はあなたの階級が届き次第開きます。\n\n三つのレシピは師匠を飛ばします。野外コモン（なめし革のジャーキンとイーストブルックのドルイドの皮）は最初からどこでも作れ、ダスクハイドの手甲はスキル50で全員が知っており、なめし場限定です。装具師の誓い自体はイーストブルックのオッティリーの前で立てるもので、湿地で行うのは修行だけです。',
   'guide.profPages.craftProse.leatherworking.routeHeading': '傑作と、125への道のり',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "marshstalker段以上はすべて傑作の抽選があり、Mirewarden JerkinのPristine Hideが署名素材ボーナスを自動で満たします。オスミウムは素材段階1。無能力値の硬革コモンは発動しません。自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。marshstalkerで50、mirewardenで75、以降はDuskhide Wraps（第3段レシピ、オスミウム6個、Pristine Hide 3枚、粗皮2枚、Tanning Agent 1）が99まで全速、以降半減で、最後の50ポイントはおよそ75回。75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、Fenbridgeへの往復が消えます。Heskの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
+    "能力値を持つ品はどれも、より上位の品質があなたの段階の上限に収まっている限り傑作の抽選判定があり、能力値付きのイーストブルックのドルイドの皮も含まれます。泥沼の番人のジャーキンに収めた極上の獣皮は署名素材ボーナスを自動で満たし、オスミウムは素材段階1としてこの判定に数えられます。能力値を持たない硬革コモンは決して発動しません。\n\n自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。沼追跡者で50、そして泥沼の番人一式とダスクハイドの手甲がレア段階を50から75まで運びます。75を過ぎるとこの第2段のレシピ群は半減、その後4分の1まで薄れ、最後の50ポイントにおよそ150回。主専攻でない場合でも、この段はレア品質の製作上限と同じ扱いのままで、完全にゼロにはなりません。\n\n75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、フェンブリッジへの往復が消えます。ヘスクの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
   'guide.profPages.craftProse.cooking.identityHeading': '一行を養う鍋',
   'guide.profPages.craftProse.cooking.identityBody':
     "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、現存最大の座り回復であるMarlow's Grand Roast（980）まで。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
@@ -12240,7 +12253,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。',
   'entities.abilities.hammer_of_grace.name': '恩寵の槌',
   'entities.abilities.hex_of_violence.description':
-    '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。',
+    '敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、17の影ダメージで反撃します。',
   'entities.abilities.hex_of_violence.name': '暴虐の呪い',
   'entities.abilities.hour_of_judgment.description':
     '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
@@ -12469,7 +12482,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。',
   'entities.abilities.vowkeeper_strike.name': '誓守の一撃',
   'entities.abilities.warspirit_cadence.description':
-    'パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）',
+    'パッシブ：武器攻撃が3回命中するたび、25%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次の電弧の矢、ジョルト、または癒しの水流を即時発動かつ消費マナ半減にする。祖霊の一撃は2回分として数える。（ウォースピリット）',
   'entities.abilities.warspirit_cadence.name': '戦霊の律動',
   'entities.abilities.wildheart.description': '最大体力の30%を即座に回復します。',
   'entities.abilities.wildheart.name': '野生の心',

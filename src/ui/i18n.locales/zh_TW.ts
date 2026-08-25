@@ -13,6 +13,19 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.barEditor.pageTab': '第 {page} 頁',
+  'hudChrome.bootcamp.promptHold': '按住',
+  'hudChrome.bootcamp.promptJump': '跳躍',
+  'hudChrome.bootcamp.promptPickUp': '拾取',
+  'hudChrome.bootcamp.promptRead': '閱讀',
+  'hudChrome.bootcamp.promptRing': '敲響',
+  'hudChrome.bootcamp.promptTalk': '交談',
+  'hudChrome.mobile.barEditor': '編輯動作列',
+  'hudChrome.mobile.menuLabel': '選單',
+  'hudChrome.mobile.questStripCounter': '{position}/{total}',
+  'hudChrome.mobile.radialDown': '下',
+  'hudChrome.mobile.radialLeft': '左',
+  'hudChrome.mobile.radialUp': '上',
   'hudChrome.bootcamp.promptAttack': '攻擊',
   'hudChrome.bootcamp.keycapThen': '然後',
   'hudChrome.bootcamp.promptSummon': '召喚',
@@ -3013,7 +3026,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '攻擊目標，造成 {damage} 點傷害，使其昏迷 4 秒。獎勵 2 個連擊點。',
   'entities.abilities.sap.name': '悶棍',
   'entities.abilities.sap.description':
-    '使目標無法行動，持續 8 秒。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',
+    '使目標無法行動，持續 8 秒，且不會打破暮紗或引發戰鬥。必須處於潛行狀態且脫離戰鬥。任何傷害都會破除此效果。',
   'entities.abilities.crippling_poison.name': '沉鉛之毒',
   'entities.abilities.crippling_poison.description':
     '用沉鉛之毒攻擊目標，造成 {damage} 點自然傷害，並使其移動速度降低 50%，持續 12 秒。',
@@ -3088,7 +3101,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': '靈貂之姿',
   'entities.abilities.aspect_of_the_monkey.description': '化身為貂的形態，將你的閃避機率提高 8%，持續 30 分鐘。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬之姿',
-  'entities.abilities.aspect_of_the_cheetah.description': '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。',
+  'entities.abilities.aspect_of_the_cheetah.description': '化身為駿馬的形態，將你的移動速度提高 30%，持續 30 分鐘。生效期間，受到傷害會使你昏亂，移動速度降低 50%，持續 4 秒（每次受擊都會重新觸發昏亂）。',
   'entities.abilities.aimed_shot.name': '長弓引射',
   'entities.abilities.aimed_shot.description': '射擊目標，造成 {damage} 點物理傷害。傷害隨遠程攻擊強度提升。',
   'entities.abilities.rapid_fire.name': '狂熱連射',
@@ -3268,7 +3281,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.description':
     '召喚一隻聽從術士命令的戰魔。戰魔是一種堅韌的近戰惡魔，會衝入戰鬥並獨當一面。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
   'entities.abilities.summon_infernal.name': '召喚烈焰巨像',
-  'entities.abilities.summon_infernal.description': '將一尊烈焰巨像召至目標區域，落地時造成 58-72 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。',
+  'entities.abilities.summon_infernal.description': '將一尊烈焰巨像召至目標區域，落地時造成 64-79 點火焰傷害。它會戰鬥 30 秒且不會取代你的惡魔，每 2 秒灼燒附近的敵人，並每 1 秒產生 1 點摧殘。',
   'entities.abilities.summon_doomguard.name': '召喚怨魂裔',
   'entities.abilities.summon_doomguard.description':
     '將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -3748,7 +3761,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.trader_wilkes.greeting': '新鮮麵包，清水，公道價格。你需要什麼？',
   'entities.npcs.apothecary_lin.name': '林藥劑師',
   'entities.npcs.apothecary_lin.title': '草藥師',
-  'entities.npcs.apothecary_lin.greeting': '在東邊林地裡落腳要小心，朋友。',
+  'entities.npcs.apothecary_lin.greeting': '在東北邊林地裡落腳要小心，朋友。',
   'entities.npcs.brother_aldric.name': '奧德里克修士',
   'entities.npcs.brother_aldric.title': '山谷牧師',
   'entities.npcs.brother_aldric.greeting': '願聖光護佑你。如今連死者也無法在這裡安息。',
@@ -3838,7 +3851,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '湖水飲盡了月光，{className}，再將溺者吐還。我已守望那道門三十夜——而今夜，它開了。',
   'entities.quests.q_prof_intro.title': '人人都有一技之長',
   'entities.quests.q_prof_intro.text':
-    '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
+    '東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子東北方、過了狼徑之後的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。',
   'entities.quests.q_prof_intro.completion':
     '看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。',
   'entities.quests.q_prof_intro.objectives.0.label': '已開採礦脈',
@@ -3853,12 +3866,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_greyjaw.completion': '那頭老惡狼終於死了。馬廄裡的孩子能睡安穩些，我也是。',
   'entities.quests.q_greyjaw.objectives.0.label': '老灰顎的尖牙',
   'entities.quests.q_boars.title': '粗鬃野豬皮',
-  'entities.quests.q_boars.text': '野豬皮能做最好的行囊，鎮外草地到處都是野豬。帶回5張硬鬃野豬皮。',
+  'entities.quests.q_boars.text': '野豬皮能做最好的行囊，鎮子西北的草地到處都是野豬。帶回5張硬鬃野豬皮。',
   'entities.quests.q_boars.completion': '好結實的硬鬃皮！這些能賣個好價錢。',
   'entities.quests.q_boars.objectives.0.label': '硬鬃野豬皮',
   'entities.quests.q_spiders.title': '玄網之患',
   'entities.quests.q_spiders.text':
-    '東方林地裡的潛伏者吐出的絲正是我藥敷所需，而牠們的數量也已多得過分。剷除 6 隻玄網潛伏者，並從牠們的腹部割下 4 枚絲腺。',
+    '東北方林地裡的潛伏者吐出的絲正是我藥敷所需，而牠們的數量也已多得過分。剷除 6 隻玄網潛伏者，並從牠們的腹部割下 4 枚絲腺。',
   'entities.quests.q_spiders.completion': '呃，還在抽動。正合適。這是你應得的。',
   'entities.quests.q_spiders.objectives.0.label': '擊敗玄網潛伏者',
   'entities.quests.q_spiders.objectives.1.label': '玄網絲腺',
@@ -3879,7 +3892,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_bones.objectives.0.label': '讓不寧骸骨安息',
   'entities.quests.q_supplies.title': '被盜的補給',
   'entities.quests.q_supplies.text':
-    '強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西南山丘的營地奪回4個補給箱。',
+    '強盜搶走了我的最後一輛貨車，工具、鹽和東溪亞麻都在裡面。去西北山丘的營地奪回4個補給箱。',
   'entities.quests.q_supplies.completion': '我的箱子！幾乎沒有刮痕。你真讓人驚喜。',
   'entities.quests.q_supplies.objectives.0.label': '被盜補給箱',
   'entities.quests.q_whispers.title': '地下低語',
@@ -3925,7 +3938,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gravecallers_trail.objectives.0.label': '莫森的魔典',
   'entities.quests.q_bandits.title': '谷地強盜',
   'entities.quests.q_bandits.text':
-    '一群割喉強盜在西南山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。',
+    '一群割喉強盜在西北山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。',
   'entities.quests.q_bandits.completion': '黑夜裡少了十把刀。拿著吧，這是你掙來的。',
   'entities.quests.q_bandits.objectives.0.label': '擊敗谷地強盜',
   'entities.quests.q_ringleader.title': '匪首',
@@ -9669,7 +9682,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.presence_of_mind.description':
     '使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）',
   'entities.abilities.psychic_scream.description': '使 8 公尺內的敵人陷入恐懼，最多持續 4 秒。傷害可能打斷該效果。',
-  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進。（潛行者天賦）',
+  'entities.abilities.shadowstep.description': '穿過暗影，向你的目標邁進，無論敵友，且不會打破暮紗。（潛行者天賦）',
   'entities.abilities.silence.description': '使目標沉默4秒。（牧師天賦）',
   'entities.abilities.tranquility.description':
     '引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）',
@@ -9765,7 +9778,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '你接下來兩個有施法時間的法術可以在移動中施放。持續 15 秒。（法師天賦）',
   'entities.abilities.ignition.name': '點燃',
   'entities.abilities.ignition.description':
-    '被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 40% 的傷害，可堆疊。（火焰精通）',
+    '被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 30% 的傷害，可堆疊。（火焰精通）',
   'entities.abilities.mass_barrier.name': '群體屏障',
   'entities.abilities.mass_barrier.description':
     '為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 130 點傷害，持續 60 秒。（法師天賦）',
@@ -10640,13 +10653,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_amends_smith.objectives.0.label': '已擊殺森林狼',
   'entities.quests.q_prof_amends_outfitter.title': '重接的線',
   'entities.quests.q_prof_amends_outfitter.text':
-    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
+    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿東北邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
   'entities.quests.q_prof_amends_outfitter.completion':
     '又穩住了。製皮與裁縫作為主修重回你的手中。這一次，在你動念遊蕩之前，先量兩遍。',
   'entities.quests.q_prof_amends_outfitter.objectives.0.label': '已剿除玄網潛伏者',
   'entities.quests.q_prof_amends_apothecary.title': '重回爐灶',
   'entities.quests.q_prof_amends_apothecary.text':
-    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
+    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把西北邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
   'entities.quests.q_prof_amends_apothecary.completion':
     '這才是熟悉的老味道。鍊金術與烹飪作為主修回到了你的爐灶上。這一回，多留一陣子吧。',
   'entities.quests.q_prof_amends_apothecary.objectives.0.label': '已獵殺野豬',
@@ -11060,7 +11073,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '每次製作都有一個小機率（3%起，上限15%）產出品質高一層的成品，但絕不會超過團隊副本的底線。',
   'guide.profPages.faq.q6': '「由某某製作」是什麼意思？',
   'guide.profPages.faq.a6':
-    '九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的上級配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。',
+    '九種通用的野外配方與工具配方人人從一開始便已知曉，三種綁定作業台的配方（窯鱗披肩、織衛兜帽、暮影裹手）也是如此，它們無需訓練師，只需對應的作業台。其餘一切都由三座樞紐城鎮中各作業台旁的常駐師傅傳授：多數在東溪，製革師守著芬橋的製革場，煉金師守著高望的藥房。\n\n訓練師配方分為技能0、25、50三檔，作為一次性費用分別是免費、25銀和1金。當你在該行業的檔位達到配方自身的檔位時，師傅便會傳授，而且學習時你必須站在其作業台旁：移動作業台不算數。',
   'guide.profPages.faq.q7': '什麼是製作者之約？',
   'guide.profPages.faq.a7':
     '委託製品會綁定給交易中收到它的人，而任意工位大師都可按層級費用為其解綁。',
@@ -11078,7 +11091,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '功業之書伴隨這一切：首次調諧獲得Craftsworn，首次傑作獲得Masterwright，均可作為頭銜佩戴。八種可修行業各在技能50設有里程碑功業，並在上限125加冕Grandmaster頭銜；釣魚在100熟練獲得Old Salt，200獲得Master Angler頭銜。此外還有首次採集、首次製作、野外奇遇與拆解回收的功業。這一切皆為裝飾：只有頭銜與聲望，功業永不賦予力量。',
   'guide.professions.startHeading': '從哪裡開始',
   'guide.professions.startBody':
-    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東南Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
+    '初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他會指給你鎮東北Copper Dig一帶的礦脈。此後旅途中經過的每處礦脈、樹木與藥草都值得採集。回到鎮上按T打開製作視窗，先做人人都會的普通配方，再去鍛造坊、廚房、織布機與工坊拜訪諸位大師，順便接下他們的工作訂單換取穩定的銅板。等公會的信找到你時，你早已知道哪一對行業才是歸宿。',
   'guide.profPages.yieldsHeading': '一次採集的收穫',
   'guide.profPages.yieldsBody':
     '每次採集都會擲出品質，而熟練度決定一切：新手永遠採到普通品，熟練度越高，權重越向高品質移動，絕不倒退。到100上限時普通品完全消失：60%優秀、30%精良、8%史詩、2%傳說。品質也意味著數量：普通1個，優秀與精良2個，史詩3個，傳說4個。精良及以上的收穫都會以你的名字署名（Gathered by），封頂時十次採集有四次帶著你的名字。',
@@ -11144,16 +11157,16 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '長袍裡的Pristine Silk本身就補足署名材料加成，金葉與日瓣草分別算一、二級材料，精良檔因此觸發率最高；背包之類無屬性的成品永不觸發。路線：homespun到25，gildenweave到50，精良檔到75；75之後靠Wardweave Cowl（三層配方，到99全速、之後半速），最後五十點約75次，每次兩塊Pristine Silk、四束蛛絲、日瓣草與金葉各兩、兩份線。背包賣給所有人，Ottilie的訂單每30分鐘收六束蛛絲。技能50記下A Fine Seam，125等著Grandmaster Tailoring。',
   'guide.profPages.craftProse.leatherworking.identityHeading': '迅捷者的皮甲',
   'guide.profPages.craftProse.leatherworking.identityBody':
-    "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能75的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
+    "梯子從樸素的Fenbridge硬皮件經優秀的marshstalker件爬到精良的mirewarden套裝，工匠能裁出的最好皮甲。兩件法系皮件補全陣容：野外普通件Eastbrook Druid's Hide與技能50的Duskhide Wraps。製皮位於烹飪與裁縫之間；製裝師在Eastbrook的Weaver Ottilie處宣誓，與烹飪組成的Trapper暫無誓約任務。",
   'guide.profPages.craftProse.leatherworking.materialsHeading': '狩獵即收穫',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    '在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps頂階要六塊），以及製革坊櫃檯16銅的Tanning Agent。不想挖礦的話Tanner Hesk也賣鋨礦。',
+    '在製皮這裡，練級路線與供應線是同一條：粗皮直接從帶皮屍體上剝取（狼和野豬最多），每具屍體只服務先到的一人。精良及以上的採集還會給出Pristine Hide，Mirewarden Jerkin正需要這種署名標本，見一塊存一塊。配角不多：蛛腿與蛛絲、人形生物的家紡布、每件mirewarden精良品一塊鋨礦（Duskhide Wraps要六塊），以及製革坊櫃檯16銅的Tanning Agent。鋨礦本身絕不會在櫃檯出售：你得自行開採，無論是在Thornpeak，還是幾乎任何新手區的入門礦脈都行（唯獨Farshore只產鐵礦），不然就只能向其他玩家收購。',
   'guide.profPages.craftProse.leatherworking.ladderHeading': '在Fenbridge受訓',
   'guide.profPages.craftProse.leatherworking.ladderBody':
-    "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。兩件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會但要技能75且綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
+    "特別之處：製革坊在Mirefen Marsh路上的Fenbridge，這是唯一在Eastbrook之外受訓的深度行業。Tanner Hesk在他的鞣池邊授課：硬皮檔技能0免費，marshstalker檔技能25每個25銀，mirewarden檔技能50每個1金。三件配方跳過訓練師：野外普通件（Tanned Leather Jerkin與Druid's Hide）隨處可做，Duskhide Wraps人人都會，技能50即綁定製革坊。注意製裝師誓約本身在Eastbrook的Ottilie處宣誓，只有授課在沼澤。",
   'guide.profPages.craftProse.leatherworking.routeHeading': '傑作與通往125之路',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，mirewarden到75，此後Duskhide Wraps（三層配方，六塊鋨礦、三塊Pristine Hide、兩塊粗皮、一份Tanning Agent）帶你走完最後五十點（約75次）。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。",
+    "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，而mirewarden系列與Duskhide Wraps（皆為二層配方）則帶你從50的精良階段練到75。過了75，這些二層配方的收益會先減半、再降至四分之一，約150次才能練完到125上限的最後五十點；未達主修上限時，它們仍與精良品質的製作上限持平，不會直接歸零。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。",
   'guide.profPages.craftProse.cooking.identityHeading': '餵飽隊伍的鍋',
   'guide.profPages.craftProse.cooking.identityBody':
     "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch一路做到980點的Marlow's Grand Roast，現存最大的坐地回復。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
@@ -11696,7 +11709,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '立即向 20 公尺內的敵人擲出聖錘，造成 {damage} 點傷害，恢復 70 點法力，為自己恢復相當於傷害量 50% 的生命值，並在造成傷害時產生 1 點虔誠。烈陽反擊會使恩典之錘無視冷卻時間，並為你恢復相當於傷害量 100% 的生命值。',
   'entities.abilities.hammer_of_grace.name': '恩典之錘',
   'entities.abilities.hex_of_violence.description':
-    '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬22點暗影傷害。',
+    '詛咒敵人8秒。其接下來的3次傷害行動各產生7點譴罪，並反噬17點暗影傷害。',
   'entities.abilities.hex_of_violence.name': '暴行咒',
   'entities.abilities.hour_of_judgment.description':
     '對你的主要邪眼降下持續15秒的審判，獲得40點譴罪和3層命運絲線，啟動附身，使透過主要邪眼產生的譴罪加倍，並使裁決傷害提高20%。第一次裁決返還50點譴罪。',
@@ -11921,7 +11934,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '發動高仇恨攻擊並產生 1 點虔誠。成功命中有 20% 機率獲得持續 8 秒的烈陽反擊；每次成功格擋有 25% 機率觸發。烈陽反擊會強化你的下一次向陽飛盾、恩典之錘或治癒之光。昇華還會給予一個小型吸收護盾。',
   'entities.abilities.vowkeeper_strike.name': '守誓者打擊',
   'entities.abilities.warspirit_cadence.description':
-    '被動：每第3次命中的武器攻擊會觸發2次裂風迴響，各造成50%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）',
+    '被動：每第3次命中的武器攻擊會觸發2次風心回響，各造成25%自然傷害，並獲得持續12秒的風暴施法。風暴施法使下一個奧術閃電、震擊或治癒之水瞬發且法力消耗降低50%。先祖打擊視為2次攻擊。（戰魂）',
   'entities.abilities.warspirit_cadence.name': '戰魂節律',
   'entities.abilities.wildheart.description': '立即恢復最大生命值的 30%。',
   'entities.abilities.wildheart.name': '野性之心',
