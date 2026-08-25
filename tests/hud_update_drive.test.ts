@@ -793,6 +793,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'hides the ghost prompt while not a corpse-running ghost',
   },
   {
+    call: 'syncDeathControllerHints',
+    band: 'frame',
+    gate: 'p.dead',
+    surface: 'chrome',
+    why: 'keeps the release-spirit and corpse-resurrection controller hints synchronized while dead',
+  },
+  {
     call: 'this.showBanner',
     band: 'medium',
     gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
@@ -1631,7 +1638,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 81 -> 82: the Proving Shore tutorial's coach strip apply.
       // window 43 -> 44: the release arm's woc_market window row rides the
       // v0.40.0 sync merge back in.
-    ).toEqual({ window: 44, chrome: 82, none: 17 });
+      // chrome 82 -> 83: the controller-tutorial merge's gamepad control
+      // hint apply.
+    ).toEqual({ window: 44, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

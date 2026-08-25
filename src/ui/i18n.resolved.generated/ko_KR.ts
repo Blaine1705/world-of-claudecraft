@@ -1575,6 +1575,11 @@ export const ko_KR: EnTranslations = {
     },
     "controller": {
       "title": "컨트롤러",
+      "glyphStyle": "버튼 표시",
+      "glyphStyleAuto": "자동",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "플레이스테이션",
+      "glyphStyleNintendo": "닌텐도",
       "enable": "컨트롤러 사용",
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",

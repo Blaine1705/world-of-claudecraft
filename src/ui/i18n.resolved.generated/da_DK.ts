@@ -1575,6 +1575,11 @@ export const da_DK: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Aktivér controller",
       "invertY": "Vend kamera om (Y)",
       "deadzone": "Stikkets dødzone",

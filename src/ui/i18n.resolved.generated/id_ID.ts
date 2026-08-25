@@ -1575,6 +1575,11 @@ export const id_ID: EnTranslations = {
     },
     "controller": {
       "title": "Kontroler",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Aktifkan Kontroler",
       "invertY": "Balikkan Kamera (Y)",
       "deadzone": "Zona Mati Tuas",

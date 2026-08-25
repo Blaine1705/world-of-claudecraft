@@ -1575,6 +1575,11 @@ export const it_IT: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Attiva controller",
       "invertY": "Inverti telecamera (Y)",
       "deadzone": "Zona morta dello stick",

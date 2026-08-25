@@ -151,7 +151,9 @@ describe('coachPromptPlan: which target carries the bubble', () => {
       const scuttler = mob('shore_scuttler', 3, 0);
       const cull = { questId: 'q_ps_shell_and_claw', state: 'active' as const };
       expect(plan({ focus: cull, entities: [scuttler], targetId: null })!.kind).toBe('select');
-      expect(plan({ focus: cull, entities: [scuttler], targetId: scuttler.id })!.kind).toBe('kill');
+      const selected = plan({ focus: cull, entities: [scuttler], targetId: scuttler.id });
+      expect(selected!.kind).toBe('kill');
+      expect(selected!.verbKey).toBe('hudChrome.bootcamp.promptUseAbility');
     });
   });
 
@@ -399,14 +401,15 @@ describe('GUIDE_VOICE_LINES: the clip keys, the pipeline lines, the captions', (
 });
 
 describe('coachPromptChip: one chip per input family', () => {
-  it('shows the live bind on keyboard, the fixed B on pad, nothing on touch', () => {
-    expect(coachPromptChip('keyboard', 'F')).toEqual({ chip: 'F', chipIsKey: true });
-    expect(coachPromptChip('pad', 'F')).toEqual({ chip: 'B', chipIsKey: true });
-    expect(coachPromptChip('touch', 'F')).toEqual({ chip: null, chipIsKey: false });
+  it('shows the live keyboard or detected-pad bind, and nothing on touch', () => {
+    expect(coachPromptChip('keyboard', 'F', 'A')).toEqual({ chip: 'F', chipIsKey: true });
+    expect(coachPromptChip('pad', 'F', 'A')).toEqual({ chip: 'A', chipIsKey: true });
+    expect(coachPromptChip('touch', 'F', 'A')).toEqual({ chip: null, chipIsKey: false });
   });
 
-  it('hides the chip when the interact action is unbound', () => {
-    expect(coachPromptChip('keyboard', '')).toEqual({ chip: null, chipIsKey: true });
+  it('hides the chip when the active input family has no interact binding', () => {
+    expect(coachPromptChip('keyboard', '', 'A')).toEqual({ chip: null, chipIsKey: true });
+    expect(coachPromptChip('pad', 'F', '')).toEqual({ chip: null, chipIsKey: true });
   });
 });
 
@@ -496,18 +499,23 @@ describe('coachPromptChips + coachGlowButtonId (the touch button mapping)', () =
     jumpLabel: 'Space',
     bagsLabel: 'B',
     interactLabel: 'F',
+    padControlCaps: ['A'],
   };
 
   it('maps every desktop interact keycap to the Interact button on touch', () => {
     // Talk, Turn in quest, Pick up, Read, Ring: all kind interact.
     expect(coachPromptChips('interact', 'touch', inputs)).toEqual([{ buttonIcon: 'interact' }]);
     expect(coachPromptChips('interact', 'keyboard', inputs)).toEqual([{ cap: 'F' }]);
+    expect(coachPromptChips('interact', 'pad', inputs)).toEqual([{ cap: 'A' }]);
     expect(coachGlowButtonId('interact', 'touch', inputs)).toBe('mobile-interact');
     expect(coachGlowButtonId('interact', 'keyboard', inputs)).toBeNull();
   });
 
   it('maps the melee kill ask to the Attack button, and glows it', () => {
     expect(coachPromptChips('kill', 'touch', inputs)).toEqual([{ buttonIcon: 'attack' }]);
+    expect(
+      coachPromptChips('kill', 'pad', { ...inputs, padControlCaps: ['LT + D-pad →'] }),
+    ).toEqual([{ cap: 'LT + D-pad →' }]);
     expect(coachGlowButtonId('kill', 'touch', inputs)).toBe('mobile-action-attack');
   });
 
@@ -523,13 +531,24 @@ describe('coachPromptChips + coachGlowButtonId (the touch button mapping)', () =
   it('maps the parkour ask to the Jump button on touch, the bind elsewhere', () => {
     expect(coachPromptChips('jump', 'touch', inputs)).toEqual([{ buttonIcon: 'jump' }]);
     expect(coachPromptChips('jump', 'keyboard', inputs)).toEqual([{ cap: 'Space' }]);
-    expect(coachPromptChips('jump', 'pad', inputs)).toEqual([{ cap: 'A' }]);
+    expect(coachPromptChips('jump', 'pad', { ...inputs, padControlCaps: ['Y'] })).toEqual([
+      { cap: 'Y' },
+    ]);
     expect(coachGlowButtonId('jump', 'touch', inputs)).toBe('mobile-jump');
   });
 
-  it('keeps select chipless and glowless: the ask is the tap on the quarry', () => {
+  it('names the target-cycle control on pad while keeping pointer selection chipless', () => {
+    expect(coachPromptChips('select', 'pad', { ...inputs, padControlCaps: ['D-pad →'] })).toEqual([
+      { cap: 'D-pad →' },
+    ]);
     expect(coachPromptChips('select', 'touch', inputs)).toEqual([]);
+    expect(coachPromptChips('select', 'keyboard', inputs)).toEqual([]);
     expect(coachGlowButtonId('select', 'touch', inputs)).toBeNull();
     expect(coachGlowButtonId(null, 'touch', inputs)).toBeNull();
+  });
+
+  it('names the working controller route for bag-item lessons', () => {
+    const bags = { ...inputs, padControlCaps: ['View'] };
+    expect(coachPromptChips('use', 'pad', bags)).toEqual([{ cap: 'View' }]);
   });
 });

@@ -1575,6 +1575,11 @@ export const tr_TR: EnTranslations = {
     },
     "controller": {
       "title": "Oyun Kolu",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Oyun Kolunu Etkinleştir",
       "invertY": "Kamerayı Ters Çevir (Y)",
       "deadzone": "Çubuk Ölü Bölgesi",

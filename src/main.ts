@@ -84,6 +84,7 @@ import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
+import { createGamepadSettingApplier } from './game/gamepad_settings';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
@@ -2393,6 +2394,9 @@ async function startGame(
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
   crossHotbar.attach(gamepad);
+  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, () =>
+    crossHotbar.syncPadMode(gamepad),
+  );
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
@@ -2677,20 +2681,7 @@ async function startGame(
       input.setInvertLookY(settings.set('invertLookY', !!value));
       return;
     }
-    if (key === 'gamepadEnabled') {
-      const v = settings.set('gamepadEnabled', !!value);
-      if (v) gamepad.start();
-      else gamepad.stop();
-      // stop() releases the pad without an onConnectionChange, so pad mode has to
-      // be re-read here or the player who just turned the controller off is left
-      // with the desktop rows hidden behind a dead cross hotbar.
-      crossHotbar.syncPadMode(gamepad);
-      return;
-    }
-    if (key === 'gamepadInvertY') {
-      gamepad.setInvertY(settings.set('gamepadInvertY', !!value));
-      return;
-    }
+    if (applyPadSetting(key, value)) return;
     if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
@@ -2781,15 +2772,6 @@ async function startGame(
         syncPhoneTouchClass();
         mobileControls.refreshInterfaceMode();
         syncSettledAppViewport(syncAppViewport);
-        break;
-      case 'gamepadStickDeadzone':
-        gamepad.setDeadzone(v);
-        break;
-      case 'gamepadCameraSpeed':
-        gamepad.setCameraSpeed(v);
-        break;
-      case 'gamepadVibration':
-        gamepad.setVibration(v);
         break;
       // Interface & Comfort sliders: each drives one CSS custom property that
       // index.html consumes. Setting them on :root keeps the HUD authoritative.
@@ -3149,6 +3131,7 @@ async function startGame(
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
       kind: () => gamepad.getKind(),
+      crossHotbarSet: () => gamepad.getCrossHotbarSet(),
     },
   });
   // Desktop discoverability for the Discord link/panel: the micro-menu button

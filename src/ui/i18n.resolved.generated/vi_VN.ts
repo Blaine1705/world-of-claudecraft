@@ -1575,6 +1575,11 @@ export const vi_VN: EnTranslations = {
     },
     "controller": {
       "title": "Tay Cầm",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Bật Tay Cầm",
       "invertY": "Đảo Ngược Camera (Y)",
       "deadzone": "Vùng Chết Cần Điều Khiển",

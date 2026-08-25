@@ -5879,6 +5879,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.playersOnline.other':
     '검색: {realm} 서버에 {count}명의 플레이어가 접속 중입니다.',
   'hudChrome.controller.title': '컨트롤러',
+  'hudChrome.controller.glyphStyle': '버튼 표시',
+  'hudChrome.controller.glyphStyleAuto': '자동',
+  'hudChrome.controller.glyphStyleXbox': 'Xbox',
+  'hudChrome.controller.glyphStylePlayStation': '플레이스테이션',
+  'hudChrome.controller.glyphStyleNintendo': '닌텐도',
   'hudChrome.controller.enable': '컨트롤러 사용',
   'hudChrome.controller.invertY': '카메라 반전(Y축)',
   'hudChrome.controller.deadzone': '스틱 데드존',

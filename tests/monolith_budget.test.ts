@@ -123,8 +123,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the signpost guild board window: the construction bag,
     // the openGuildBoard seam, the noticeboard-event arm, and the close and
     // relocalize wiring (the window itself lives in
-    // src/ui/hud/guild_board/). Exact count, zero slack.
-    ceiling: 18489,
+    // src/ui/hud/guild_board/). Then down one at the controller-tutorial
+    // merge. Exact count, zero slack.
+    ceiling: 18488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -241,7 +242,10 @@ const MONOLITHS: MonolithRow[] = [
     // rework); exact merged count.
     // Re-pinned to the exact merged count of the v0.40.0 sync merge (the
     // OSSBrain v0.40 batch on the release arm). Exact count, zero slack.
-    ceiling: 11584,
+    // Re-pinned to the exact merged count after the controller-tutorial
+    // merge (its controller-setting dispatch extraction shrinks main.ts;
+    // the ratchet follows the merged file down). Exact count, zero slack.
+    ceiling: 11567,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -1575,6 +1575,11 @@ export const fr_CA: EnTranslations = {
     },
     "controller": {
       "title": "Manette",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Activer la manette",
       "invertY": "Inverser la caméra (Y)",
       "deadzone": "Zone morte du stick",

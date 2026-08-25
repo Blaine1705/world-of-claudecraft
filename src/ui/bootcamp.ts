@@ -25,6 +25,14 @@
 // the lesson. Reads world state, writes none, and runs identically against
 // the offline Sim and the online ClientWorld.
 
+import type { CrossHotbarLayout } from '../game/cross_hotbar';
+import type { GamepadBindingEntry } from '../game/gamepad_bindings';
+import {
+  type GamepadControlHintIntent,
+  type GamepadControlHintSource,
+  gamepadControlHint,
+} from '../game/gamepad_control_hint';
+import type { GamepadKind } from '../game/gamepad_map';
 import { currentInputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
 import { voice } from '../game/voice';
@@ -104,6 +112,14 @@ const GLOW_TARGET_LIFT = 2;
 /** The Attack toggle's icon id (hud.ts resolves ATTACK_ICON_KEY to it). */
 const AUTO_ATTACK_ICON_ID = 'attack';
 
+interface CoachGamepadBindings {
+  entries(): GamepadBindingEntry[];
+  kind(): GamepadKind;
+  crossHotbarEnabled?(): boolean;
+  crossHotbarSets?(): CrossHotbarLayout;
+  crossHotbarSet?(): number;
+}
+
 // The island rectangle: the card never shows off the Proving Shore. Both
 // axes matter; the x column alone also covers four mainland zones
 // (isOnProvingShore's contract).
@@ -161,7 +177,12 @@ export class BootcampOverlay {
   private glowPainted = '';
 
   // Called every HUD frame. Cheap no-op while no rail quest is moving.
-  update(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
+  update(
+    world: IWorld,
+    renderer: Renderer,
+    keybinds: Keybinds,
+    gamepadBindings: CoachGamepadBindings | null = null,
+  ): void {
     const p = world.player;
     if (!p) return;
     if (world.playerId < 0 || p.id !== world.playerId) return;
@@ -239,7 +260,8 @@ export class BootcampOverlay {
       nextRenderKey = `${focus!.questId}:${focus!.state}:${mode}`;
     }
 
-    this.updatePrompt(world, renderer, keybinds);
+    this.ensureDom();
+    this.updatePrompt(world, renderer, keybinds, gamepadBindings);
     this.paintObjectiveGlow(world, renderer);
     this.applyUiGlow(world);
     this.updateGuideVoice(world, focus);
@@ -645,16 +667,24 @@ export class BootcampOverlay {
    * what keeps them from teaching nothing now the card is gone.
    */
   private centeredAsk(
+    world: IWorld,
     keybinds: Keybinds,
     mode: ReturnType<typeof currentInputHintMode>,
+    gamepadBindings: CoachGamepadBindings | null,
   ): { caps: readonly string[]; verbKey: TranslationKey } | null {
     const key = (id: string): string[] =>
       mode === 'keyboard' ? [keybinds.primaryLabel(id) || ''].filter(Boolean) : [];
+    const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
+    const control = (id: string): readonly string[] =>
+      padSource ? gamepadControlHint(padSource, { type: 'action', action: id }) : key(id);
     if (this.ringPhase === 'equip') {
-      return { caps: key('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
     if (this.ringPhase === 'admire') {
-      return { caps: key('char'), verbKey: 'hudChrome.bootcamp.promptCharacterSheet' };
+      return { caps: control('char'), verbKey: 'hudChrome.bootcamp.promptCharacterSheet' };
+    }
+    if (pouchLessonActive(this.lastFocus, world.bags)) {
+      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
     // The death lesson's first beat: the stone is in the bags.
     if (
@@ -662,7 +692,7 @@ export class BootcampOverlay {
       this.lastFocus?.questId === DEATH_LESSON_QUEST_ID &&
       this.lastFocus.state === 'active'
     ) {
-      return { caps: key('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return { caps: control('bags'), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
     }
     // The Gauntlet's closing camera lesson teaches the VIEW itself, so it
     // has never had a world anchor and had only the card to carry it.
@@ -676,7 +706,12 @@ export class BootcampOverlay {
   // by hand (memoized ground sample, elided writes; this is a bare-named
   // overlay, not a *_painter on the PainterHost seam). Hidden out of
   // interact reach, so appearing IS the signal to press.
-  private updatePrompt(world: IWorld, renderer: Renderer, keybinds: Keybinds): void {
+  private updatePrompt(
+    world: IWorld,
+    renderer: Renderer,
+    keybinds: Keybinds,
+    gamepadBindings: CoachGamepadBindings | null,
+  ): void {
     if (!this.prompt || !this.promptChipEl || !this.promptVerbEl) return;
     // A scoped-popup modal (the spawn greeting, the profession explainer)
     // owns the screen while it is up: the only ask is its own button, and
@@ -710,7 +745,9 @@ export class BootcampOverlay {
     // world point to stand a bubble on, so they take the centred variant.
     // These used to live ONLY on the coach card, so with the card gone this
     // branch is what keeps them from teaching nothing at all.
-    const centered = jumpAskVisible ? null : this.centeredAsk(keybinds, mode);
+    const centered = jumpAskVisible
+      ? null
+      : this.centeredAsk(world, keybinds, mode, gamepadBindings);
     if (centered) {
       this.promptButtonGlow = null;
       const contentKey = `centered:${centered.verbKey}:${centered.caps.join(',')}`;
@@ -789,18 +826,26 @@ export class BootcampOverlay {
       return;
     }
 
-    // The kill lessons' first half asks for a CLICK, which needs no chip on
-    // any input family: the bubble sits on the quarry and the verb reads
-    // Select. Its second half names the button that hits: the keycap on a
-    // keyboard, and on touch the action-bar ICON itself, because a phone
-    // player has no key to be told about and is looking for the picture.
-    // The parkour asks chip the jump bind (Space, or the pad's literal
-    // bottom face button); everything else chips interact per input family.
+    // The kill lessons' first half asks for selection: pointer input needs no
+    // chip, while a controller names its live target-cycle control. Its second
+    // half names the button that hits: the keycap on a keyboard, and on touch
+    // the action-bar ICON itself, because a phone player has no key to be told
+    // about and is looking for the picture.
+    // The parkour asks chip the live jump bind; everything else chips the
+    // live interact/confirm bind. Pad labels already carry the detected
+    // controller brand, so the bubble matches both remaps and printed glyphs.
     // The ability drill asks for the class's OWN button, which is never
     // the Attack toggle: chipping slot0 there put a "1" under a bubble
     // reading "Use ability", which is exactly the wrong instruction. The
     // plan says which press it wants; the chip follows it.
     const abilityAsk = plan.verbKey === 'hudChrome.bootcamp.promptUseAbility';
+    const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
+    const padControlCaps = padSource
+      ? gamepadControlHint(
+          padSource,
+          coachGamepadIntent(plan.kind, abilityAsk, this.casterClass, this.taughtAbilityId),
+        )
+      : [];
     const chips = coachPromptChips(plan.kind, mode, {
       abilityAsk,
       caster: this.casterClass,
@@ -811,6 +856,7 @@ export class BootcampOverlay {
       jumpLabel: keybinds.primaryLabel('jump') || '',
       bagsLabel: keybinds.primaryLabel('bags') || '',
       interactLabel: keybinds.primaryLabel('interact'),
+      padControlCaps,
     });
     this.promptButtonGlow = coachGlowButtonId(plan.kind, mode, {
       abilityAsk,
@@ -941,6 +987,35 @@ export class BootcampOverlay {
 /** The quest objective's own flag tally (0 when the quest is not active). */
 function questCounts(world: IWorld): number {
   return world.questLog.get(GAUNTLET_QUEST_ID)?.counts?.[0] ?? 0;
+}
+
+function gamepadHintSource(gamepad: CoachGamepadBindings | null): GamepadControlHintSource | null {
+  if (!gamepad) return null;
+  return {
+    entries: gamepad.entries(),
+    kind: gamepad.kind(),
+    crossHotbarEnabled: gamepad.crossHotbarEnabled?.() ?? false,
+    crossHotbarSets: gamepad.crossHotbarSets?.() ?? [],
+    crossHotbarSet: gamepad.crossHotbarSet?.() ?? 0,
+  };
+}
+
+function coachGamepadIntent(
+  kind: CoachPromptPlan['kind'],
+  abilityAsk: boolean,
+  caster: boolean,
+  taughtAbilityId: string | null,
+): GamepadControlHintIntent {
+  if (kind === 'select') return { type: 'target' };
+  if (kind === 'jump') return { type: 'action', action: 'jump' };
+  if (kind === 'use') return { type: 'action', action: 'bags' };
+  if (kind !== 'kill') return { type: 'interact' };
+  const usesAbility = abilityAsk || caster;
+  return {
+    type: 'crossHotbar',
+    action: { type: 'ability', id: usesAbility && taughtAbilityId ? taughtAbilityId : 'attack' },
+    fallback: usesAbility ? 'slot1' : 'slot0',
+  };
 }
 
 /** One rail quest's coach state, or null when it is not moving (locked

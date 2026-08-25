@@ -1575,6 +1575,11 @@ export const nl_NL: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Controller inschakelen",
       "invertY": "Camera omkeren (Y)",
       "deadzone": "Stickdode zone",

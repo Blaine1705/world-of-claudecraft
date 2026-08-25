@@ -1,6 +1,7 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
+import { syncDeathControllerHints } from '../game/death_controller_hint';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
@@ -405,7 +406,6 @@ import {
   encodeHotbarAction,
   HOTBAR_ACTION_MIME,
   type HotbarAction,
-  handleMobileAttackTap,
   isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
   parseHotbarAction,
@@ -840,7 +840,7 @@ export interface GamepadBindingsHooks extends CrossHotbarPanelHooks {
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
-  // The cross hotbar layout: the action-bar slot each position casts, per set.
+  crossHotbarSet(): number;
 }
 
 export interface ReportHooks {
@@ -8439,7 +8439,7 @@ export class Hud {
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.bootcamp.update(sim, this.renderer, this.keybinds);
+    this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
@@ -9021,15 +9021,14 @@ export class Hud {
     // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
     // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
     // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // small non-blocking prompt appears only when in reach of its corpse or a Spirit
-    // Healer, carrying just the relevant button. The server re-checks both ranges.
+    // A small prompt appears only in corpse/Healer reach; the server re-checks both ranges.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
-    // A battleground corpse releases like the open world (the spirit rises in
-    // the keep graveyard and waits for the wave), so the Release modal shows;
+    // A battleground corpse releases like the open world, so the Release modal shows;
     // only the corpse-run / Spirit Healer prompts are suppressed in a match
     // (the wave is the one way back, enforced server-side too).
     const ghostInBgMatch = !!this.sim.bgInfo?.match;
+    if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
     if (!p.dead) this.closeResurrectionPrompt();
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');

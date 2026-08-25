@@ -1575,6 +1575,11 @@ export const en_XA: EnTranslations = {
     },
     "controller": {
       "title": "[Çóñţŕóļļéŕ]",
+      "glyphStyle": "[Ɓúţţóñ Ļáƀéļš]",
+      "glyphStyleAuto": "[Áúţó]",
+      "glyphStyleXbox": "[Ẋƀóẋ]",
+      "glyphStylePlayStation": "[ÞļáýŠţáţíóñ]",
+      "glyphStyleNintendo": "[Ñíñţéñðó]",
       "enable": "[Éñáƀļé Çóñţŕóļļéŕ]",
       "invertY": "[Íñʋéŕţ Çáɱéŕá (Ý)]",
       "deadzone": "[Šţíçķ Ðéáðžóñé]",

@@ -1575,6 +1575,11 @@ export const zh_CN: EnTranslations = {
     },
     "controller": {
       "title": "手柄",
+      "glyphStyle": "按键标签",
+      "glyphStyleAuto": "自动",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation（索尼）",
+      "glyphStyleNintendo": "任天堂",
       "enable": "启用手柄",
       "invertY": "反转镜头（Y轴）",
       "deadzone": "摇杆死区",

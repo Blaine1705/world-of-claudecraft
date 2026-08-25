@@ -1575,6 +1575,11 @@ export const ja_JP: EnTranslations = {
     },
     "controller": {
       "title": "コントローラー",
+      "glyphStyle": "ボタン表示",
+      "glyphStyleAuto": "自動",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "プレイステーション",
+      "glyphStyleNintendo": "ニンテンドー",
       "enable": "コントローラーを有効化",
       "invertY": "カメラ反転（Y軸）",
       "deadzone": "スティックの遊び",

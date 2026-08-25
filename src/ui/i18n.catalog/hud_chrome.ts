@@ -1117,9 +1117,8 @@ export const hudChromeStrings = {
     promptRead: 'Read',
     promptRing: 'Ring',
     promptHold: 'Hold',
-    // The kill lessons' first half: click or tap the quarry to make it your
-    // target. Deliberately carries no keycap, because the press it asks for
-    // is the one a new player already owns.
+    // The kill lessons' first half: click or tap the quarry, or use the pad's
+    // target cycle, to make it your target.
     promptSelect: 'Select',
     promptAttack: 'Attack',
     // The ability drill's second half: the press it wants is the class's own
@@ -1935,6 +1934,11 @@ export const hudChromeStrings = {
   // hardware glyphs in gamepad_map and need no translation.
   controller: {
     title: 'Controller',
+    glyphStyle: 'Button Labels',
+    glyphStyleAuto: 'Auto',
+    glyphStyleXbox: 'Xbox',
+    glyphStylePlayStation: 'PlayStation',
+    glyphStyleNintendo: 'Nintendo',
     enable: 'Enable Controller',
     invertY: 'Invert Camera (Y)',
     deadzone: 'Stick Deadzone',

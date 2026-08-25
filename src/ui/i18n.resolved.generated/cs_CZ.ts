@@ -1575,6 +1575,11 @@ export const cs_CZ: EnTranslations = {
     },
     "controller": {
       "title": "Ovladač",
+      "glyphStyle": "Button Labels",
+      "glyphStyleAuto": "Auto",
+      "glyphStyleXbox": "Xbox",
+      "glyphStylePlayStation": "PlayStation",
+      "glyphStyleNintendo": "Nintendo",
       "enable": "Zapnout ovladač",
       "invertY": "Invertovat kameru (Y)",
       "deadzone": "Mrtvá zóna páčky",

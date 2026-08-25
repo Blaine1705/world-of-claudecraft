@@ -530,13 +530,13 @@
     <div id="low-health-vignette"></div>
     <div id="subzone-banner"></div>
 
-    <div id="death-overlay">
+    <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
       <button class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
     </div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
          only when in reach of the corpse or the Pale Keeper. Mirrors index.html. -->
-    <div id="ghost-prompt">
+    <div id="ghost-prompt" data-pad-nav-root>
       <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
       <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
     </div>
