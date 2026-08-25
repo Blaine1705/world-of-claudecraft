@@ -26,9 +26,18 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase14_u
 import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { verifyPassword } from '../../server/auth';
 import type { AccountModerationStatus } from '../../server/db';
-import { unlinkWallet, walletForAccount } from '../../server/db';
+import {
+  accountById,
+  consumeWalletChallenge,
+  findAccount,
+  linkWalletToAccount,
+  unlinkWallet,
+  walletForAccount,
+} from '../../server/db';
 import { desktopWalletHandoffs } from '../../server/desktop_wallet_handoff';
+import { emailWalletChanged } from '../../server/email';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Ctx, Method, Middleware } from '../../server/http/types';
@@ -46,6 +55,10 @@ import {
   setWalletDbForTests,
   type WalletGameHooks,
 } from '../../server/wallet';
+import {
+  WALLET_REAUTH_NO_PASSWORD_ERROR,
+  WALLET_REAUTH_REQUIRED_ERROR,
+} from '../../server/wallet_reauth';
 import { type FakeRes, fakeCtx, stableStringify } from './helpers';
 
 // The GET /api/wallet + DELETE /api/wallet/link handlers self-read walletForAccount /
@@ -59,9 +72,34 @@ vi.mock('../../server/db', async (importActual) => {
     ...actual,
     createWalletChallenge: vi.fn(async () => {}),
     pruneWalletChallenges: vi.fn(async () => {}),
+    consumeWalletChallenge: vi.fn(async () => null),
+    linkWalletToAccount: vi.fn(async () => true),
     walletForAccount: vi.fn(),
     unlinkWallet: vi.fn(async () => {}),
+    // The R11 re-auth reads plus the wallet-changed mail target.
+    accountById: vi.fn(async () => null),
+    findAccount: vi.fn(async () => null),
+    accountMailTarget: vi.fn(async () => null),
   };
+});
+
+// The R11 password arm rides server/auth's scrypt verify; pin it as a switch.
+vi.mock('../../server/auth', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/auth')>();
+  return { ...actual, verifyPassword: vi.fn(async () => false) };
+});
+
+// The wallet-changed alert is fire-and-forget; capture instead of sending.
+vi.mock('../../server/email', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/email')>();
+  return { ...actual, emailWalletChanged: vi.fn() };
+});
+
+// Relink re-auth runs AFTER the incoming wallet's signature verifies; pin the
+// crypto as a switch so the route tests stay key-free.
+vi.mock('../../server/wallet_link', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/wallet_link')>();
+  return { ...actual, verifySolanaSignature: vi.fn(() => true) };
 });
 
 // A well-formed bearer header (64 lowercase-hex, matching wallet.ts BEARER_PATTERN).
@@ -186,6 +224,11 @@ function fixture(name: string): { status: number; body: string } {
 }
 
 beforeEach(() => {
+  // Per-test isolation for the module-factory mocks: restoreAllMocks (below)
+  // only touches vi.spyOn spies, so without this reset, call history and
+  // per-test mockResolvedValue arms leak between tests (mockReset returns each
+  // vi.fn to the implementation its factory declared).
+  vi.resetAllMocks();
   installRuntime();
 });
 
@@ -607,17 +650,236 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
   });
 
-  it('200 { unlinked: true } for a full bearer, unlinking the guard account', async () => {
+  it('200 no-op when no wallet is linked, never touching unlinkWallet', async () => {
     authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(null as never);
     const r = await runRoute('DELETE', '/api/wallet/link', {
       headers: { authorization: BEARER },
     });
     expect(r.reached).toBe(true);
     expect(r.status).toBe(200);
     expect(r.body).toEqual({ unlinked: true });
-    expect(r.contentType).toBe('application/json');
-    // ctx.account (account 7) threads through walletUnlinkHandler -> handleWalletUnlink.
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  // The R11 arms: with a wallet linked, a bare bearer can no longer remove it.
+  const LINKED = {
+    account_id: 7,
+    pubkey: 'CurrentWallet1111',
+    linked_at: '2026-07-01T00:00:00.000Z',
+  };
+  const ACCT = {
+    id: 7,
+    username: 'guard',
+    password_hash: 'scrypt:x',
+    password_set: true,
+    email: 'g@x.nz',
+    created_at: '2026-01-01',
+    deactivated_at: null,
+    locale: null,
+    marketing_opt_in: false,
+  };
+
+  it('401s a bare-bearer unlink with the reauth marker, unlink untouched', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: {},
+    });
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ error: WALLET_REAUTH_REQUIRED_ERROR, code: 'wallet.reauth_required' });
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('unlinks on the password arm and fires the removed alert', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    const target = { id: 7, username: 'guard', email: 'g@x.nz', locale: null };
+    const { accountMailTarget } = await import('../../server/db');
+    vi.mocked(accountMailTarget).mockResolvedValue(target as never);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'hunter2' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ unlinked: true });
     expect(vi.mocked(unlinkWallet)).toHaveBeenCalledWith(7);
+    expect(vi.mocked(emailWalletChanged)).toHaveBeenCalledWith(
+      target,
+      'removed',
+      'CurrentWallet1111',
+    );
+  });
+
+  it('403s the passwordless account at the set-a-password marker', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, password_set: false } as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'anything' },
+    });
+    expect(r.status).toBe(403);
+    expect(r.body).toEqual({
+      error: WALLET_REAUTH_NO_PASSWORD_ERROR,
+      code: 'wallet.reauth_no_password',
+    });
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('a caller-supplied currentSignature can never satisfy unlink (the empty-message bypass)', async () => {
+    // Regression pin for the QA-round finding: with no challenge on this path
+    // there is nothing sound to verify a signature against, so the route must
+    // strip the field entirely; even a verifier armed to accept everything
+    // (the module mock returns true) must never be consulted.
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    const { verifySolanaSignature } = await import('../../server/wallet_link');
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { currentSignature: 'signature-over-empty-string' },
+    });
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ error: WALLET_REAUTH_REQUIRED_ERROR, code: 'wallet.reauth_required' });
+    expect(vi.mocked(verifySolanaSignature)).not.toHaveBeenCalled();
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('the signature+nonce arm is retired on unlink: no challenge is consumed', async () => {
+    // A link challenge cannot be action-scoped to a removal, so a re-verify
+    // signature must not be spendable here; the arm is password-only now.
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { signature: 'sig58', nonce: 'n1' },
+    });
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ error: WALLET_REAUTH_REQUIRED_ERROR, code: 'wallet.reauth_required' });
+    expect(vi.mocked(consumeWalletChallenge)).not.toHaveBeenCalled();
+    expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms carry the wallet-link rate limit in lockstep', () => {
+    // The DELETE route exists twice (the legacy server/main.ts ladder under
+    // API_DISPATCH rollback, and the RouteDef). A future edit must not drop
+    // the limiter from either arm silently.
+    const routeDef = routeFor('DELETE', '/api/wallet/link');
+    expect(routeDef.middleware?.length, 'RouteDef arm: guard + rateLimit').toBeGreaterThanOrEqual(
+      2,
+    );
+    const ladder = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    const arm = ladder.slice(
+      ladder.indexOf("req.method === 'DELETE' && url === '/api/wallet/link'"),
+    );
+    const guarded = arm.slice(0, arm.indexOf('handleWalletUnlink'));
+    expect(guarded, 'legacy arm: walletLinkRateLimited before handleWalletUnlink').toContain(
+      'walletLinkRateLimited',
+    );
+  });
+});
+
+describe('POST /api/wallet/link relink re-auth (R11)', () => {
+  // Real 32-byte base58 keys: the link route runs the REAL isSolanaAddress
+  // (base58-decode, exactly 32 bytes), so placeholder strings 400 before the
+  // re-auth logic is ever reached.
+  const CURRENT_ADDR = 'US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx';
+  const NEW_ADDR = 'cGfHiC6Kgg3FpFZvgwGcswsCRtp4aBP2fzuXRQPizuN';
+  const CURRENT = {
+    account_id: 7,
+    pubkey: CURRENT_ADDR,
+    linked_at: '2026-07-01T00:00:00.000Z',
+  };
+  const ACCT = {
+    id: 7,
+    username: 'guard',
+    password_hash: 'scrypt:x',
+    password_set: true,
+    email: 'g@x.nz',
+    created_at: '2026-01-01',
+    deactivated_at: null,
+    locale: null,
+    marketing_opt_in: false,
+  };
+  const LINK_BODY = { address: NEW_ADDR, signature: 'sig58', nonce: 'n1' };
+
+  function armChallenge(): void {
+    vi.mocked(consumeWalletChallenge).mockResolvedValue({
+      address: NEW_ADDR,
+      message: 'LINK MSG',
+    } as never);
+  }
+
+  it('a first link needs no re-auth and fires the linked alert', async () => {
+    authedDb();
+    armChallenge();
+    vi.mocked(walletForAccount).mockResolvedValue(null as never);
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: LINK_BODY,
+    });
+    expect(r.status).toBe(200);
+    expect(vi.mocked(linkWalletToAccount)).toHaveBeenCalledWith(7, NEW_ADDR);
+  });
+
+  it('relinking to a DIFFERENT wallet without proof 401s at the reauth marker', async () => {
+    authedDb();
+    armChallenge();
+    vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: LINK_BODY,
+    });
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ error: WALLET_REAUTH_REQUIRED_ERROR, code: 'wallet.reauth_required' });
+    expect(vi.mocked(linkWalletToAccount)).not.toHaveBeenCalled();
+  });
+
+  it('relinking with the password arm links and fires the changed alert', async () => {
+    authedDb();
+    armChallenge();
+    vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
+    vi.mocked(accountById).mockResolvedValue(ACCT as never);
+    vi.mocked(findAccount).mockResolvedValue({ totp_secret: null } as never);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    const target = { id: 7, username: 'guard', email: 'g@x.nz', locale: null };
+    const { accountMailTarget } = await import('../../server/db');
+    vi.mocked(accountMailTarget).mockResolvedValue(target as never);
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { ...LINK_BODY, password: 'hunter2' },
+    });
+    expect(r.status).toBe(200);
+    expect(vi.mocked(linkWalletToAccount)).toHaveBeenCalledWith(7, NEW_ADDR);
+    expect(vi.mocked(emailWalletChanged)).toHaveBeenCalledWith(target, 'changed', NEW_ADDR);
+  });
+
+  it('relinking the SAME wallet needs no re-auth (no custody change)', async () => {
+    authedDb();
+    vi.mocked(consumeWalletChallenge).mockResolvedValue({
+      address: CURRENT_ADDR,
+      message: 'LINK MSG',
+    } as never);
+    vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { ...LINK_BODY, address: CURRENT_ADDR },
+    });
+    expect(r.status).toBe(200);
+    expect(vi.mocked(linkWalletToAccount)).toHaveBeenCalledWith(7, CURRENT_ADDR);
   });
 });
 

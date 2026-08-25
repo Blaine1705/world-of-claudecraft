@@ -2509,6 +2509,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'DELETE' && url === '/api/wallet/link') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      // R11: the unlink was the one wallet mutation with no limiter.
+      if (!walletLinkRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleWalletUnlink(req, res, accountId);
     }
     if (req.method === 'GET' && url === '/api/wallet') {

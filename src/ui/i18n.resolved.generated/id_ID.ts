@@ -4360,7 +4360,13 @@ export const id_ID: EnTranslations = {
       "upstream": "Epic tidak merespons. Coba lagi sebentar lagi."
     },
     "wallet": {
-      "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
+      "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Masukan tidak valid."
@@ -7285,6 +7291,13 @@ export const id_ID: EnTranslations = {
     "unlink": "Lepas Tautan",
     "unlinkTitle": "Hapus verifikasi dompet dari akun ini",
     "unlinkAria": "Hapus verifikasi dompet dari akun ini",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Putuskan Hubungan",
     "signOutTitle": "Putuskan hubungan aplikasi dompet di peramban ini",
     "signOutAria": "Putuskan hubungan aplikasi dompet di peramban ini",

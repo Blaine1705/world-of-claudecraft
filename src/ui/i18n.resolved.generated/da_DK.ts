@@ -4360,7 +4360,13 @@ export const da_DK: EnTranslations = {
       "upstream": "Epic svarede ikke. Prøv igen om et øjeblik."
     },
     "wallet": {
-      "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
+      "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Ugyldig indtastning."
@@ -7285,6 +7291,13 @@ export const da_DK: EnTranslations = {
     "unlink": "Frakobl",
     "unlinkTitle": "Fjern pung-verificeringen fra denne konto",
     "unlinkAria": "Fjern pung-verificeringen fra denne konto",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Afbryd forbindelse",
     "signOutTitle": "Afbryd forbindelsen til pung-appen i denne browser",
     "signOutAria": "Afbryd forbindelsen til pung-appen i denne browser",

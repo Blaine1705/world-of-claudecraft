@@ -397,9 +397,8 @@ import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_vie
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
-  type DiscordAccountStatus,
-  type DiscordPresenceState,
-  type DiscordVoiceMember,
+  coerceDiscordPresence,
+  coerceDiscordStatus,
   discordInviteUrl,
   discordPresence,
   discordStatus,
@@ -499,6 +498,11 @@ import {
 } from './ui/wallet_balance';
 import { claudiumCheckoutErrorText } from './ui/wallet_bridge_reason_text';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
+import {
+  acquireWalletReauth,
+  needsWalletReauth,
+  walletChangeErrorText,
+} from './ui/wallet_reauth_prompt';
 import type { IWorld } from './world_api';
 import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
@@ -8857,45 +8861,6 @@ function wireGithubLink(): void {
   void refreshGithubLinkStatus();
 }
 
-function coerceDiscordStatus(d: Record<string, unknown>): DiscordAccountStatus {
-  return {
-    linked: d.linked === true,
-    username: typeof d.username === 'string' ? d.username : null,
-    avatar: typeof d.avatar === 'string' ? d.avatar : null,
-    guildMember: d.guildMember === true,
-    points: typeof d.points === 'number' ? d.points : 0,
-    lifetimePoints: typeof d.lifetimePoints === 'number' ? d.lifetimePoints : 0,
-    statusTier: typeof d.statusTier === 'number' ? d.statusTier : 0,
-    claimedSwagIds: Array.isArray(d.claimedSwagIds)
-      ? d.claimedSwagIds.filter((s): s is string => typeof s === 'string')
-      : [],
-    // Default true: only an explicit false (a Discord-provisioned account with no
-    // real password yet) makes unlink demand one.
-    passwordSet: d.passwordSet !== false,
-  };
-}
-
-function coerceDiscordPresence(p: unknown): DiscordPresenceState {
-  const o = (p && typeof p === 'object' ? p : {}) as Record<string, unknown>;
-  const voice: DiscordVoiceMember[] = Array.isArray(o.voice)
-    ? o.voice.map((m) => {
-        const v = (m && typeof m === 'object' ? m : {}) as Record<string, unknown>;
-        return {
-          id: typeof v.id === 'string' ? v.id : '',
-          name: typeof v.name === 'string' ? v.name : '',
-          speaking: v.speaking === true,
-          selfMute: v.selfMute === true,
-        };
-      })
-    : [];
-  return {
-    onlineCount: typeof o.onlineCount === 'number' ? o.onlineCount : 0,
-    memberTotal: typeof o.memberTotal === 'number' ? o.memberTotal : 0,
-    voiceChannelName: typeof o.voiceChannelName === 'string' ? o.voiceChannelName : null,
-    voice,
-  };
-}
-
 // Pull current link status + rewards + live presence and feed the in-game widget.
 async function refreshDiscordStatus(): Promise<void> {
   if (!DISCORD_BUILD_ENABLED || !api.token) {
@@ -9349,13 +9314,25 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
   walletVerifyPending = false;
   walletVerifyInProgress = true;
   let verificationFailed = false;
+  let verifyError: unknown;
   try {
+    // R11: changing an existing link needs account proof, collected BEFORE the
+    // challenge (a refused attempt consumes the single-use nonce).
+    const reauth = needsWalletReauth(linkedWalletPubkey, address)
+      ? await acquireWalletReauth(() => api.getAccount(), 'relink', walletFocusManager)
+      : undefined;
+    if (reauth === null) {
+      // Cancelled at the prompt: drop the connected-but-unverified adapter so
+      // every exit from this flow either links the wallet or disconnects it.
+      await disconnectUnverifiedWallet();
+      return;
+    }
     const wallet = await loadWallet();
     setWalletFlowStatus('sign');
     const { message, nonce } = await api.walletLinkChallenge(address);
     const signature = await wallet.signMessageBase58(message);
     setWalletFlowStatus('verify');
-    const result = await api.linkWallet(address, signature, nonce);
+    const result = await api.linkWallet(address, signature, nonce, reauth);
     linkedWalletPubkey = result.pubkey;
     if (NATIVE_APP) {
       const attestation = await createNativeAttestationProof(api.base, 'seeker-claim');
@@ -9369,12 +9346,15 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
   } catch (err: unknown) {
     console.error('[wallet] verification failed', err);
     verificationFailed = true;
+    verifyError = err;
     await disconnectUnverifiedWallet();
   } finally {
     walletVerifyPending = false;
     walletVerifyInProgress = false;
     setWalletFlowStatus(null);
-    if (verificationFailed) flashWalletError(t('wallet.verifyFailed'));
+    if (verificationFailed) {
+      flashWalletError(walletChangeErrorText(verifyError, t('wallet.verifyFailed')));
+    }
   }
 }
 
@@ -9383,17 +9363,23 @@ async function completeDesktopWalletVerifyFlow(): Promise<void> {
   walletVerifyPending = false;
   walletVerifyInProgress = true;
   let verificationFailed = false;
+  let verifyError: unknown;
   try {
     setWalletFlowStatus('connect');
     const authorization = await authorizeDesktopWalletInBrowser({
       kind: 'link',
     });
     if (authorization.kind !== 'link') throw new Error('invalid wallet link authorization');
+    const reauth = needsWalletReauth(linkedWalletPubkey, authorization.address)
+      ? await acquireWalletReauth(() => api.getAccount(), 'relink', walletFocusManager)
+      : undefined;
+    if (reauth === null) return;
     setWalletFlowStatus('verify');
     const result = await api.linkWallet(
       authorization.address,
       authorization.signature,
       authorization.nonce,
+      reauth,
     );
     desktopWalletBrowserSessionActive = true;
     linkedWalletPubkey = result.pubkey;
@@ -9411,11 +9397,14 @@ async function completeDesktopWalletVerifyFlow(): Promise<void> {
     desktopWalletBrowserSessionActive = false;
     updateWalletButton();
     verificationFailed = true;
+    verifyError = err;
   } finally {
     walletVerifyPending = false;
     walletVerifyInProgress = false;
     setWalletFlowStatus(null);
-    if (verificationFailed) flashWalletError(t('wallet.verifyFailed'));
+    if (verificationFailed) {
+      flashWalletError(walletChangeErrorText(verifyError, t('wallet.verifyFailed')));
+    }
   }
 }
 
@@ -9517,15 +9506,17 @@ async function signOutWallet(): Promise<void> {
 
 async function unlinkVerifiedWallet(): Promise<void> {
   if (!api.token || !linkedWalletPubkey) return;
+  const reauth = await acquireWalletReauth(() => api.getAccount(), 'unlink', walletFocusManager);
+  if (reauth === null) return;
   try {
-    await api.unlinkWallet();
+    await api.unlinkWallet(reauth);
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     await disconnectUnverifiedWallet();
     updateWalletButton();
   } catch (err) {
     console.error('[wallet] unlink failed', err);
-    flashWalletError(t('wallet.unlinkFailed'));
+    flashWalletError(walletChangeErrorText(err, t('wallet.unlinkFailed')));
   }
 }
 

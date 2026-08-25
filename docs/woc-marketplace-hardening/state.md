@@ -1738,6 +1738,29 @@ Still open (a phase that hits one asks at session start):
   account holds live escrowed listings. Inert while WOC_MARKET_ENABLED stays
   off; the pre-enable audit (22) must resolve it. Also close `DELETE
   /api/wallet/link`'s missing rate limit in the same pass.
+  - R11 CLOSED (2026-08-26, owner ruled option (a) alone, plus a
+    wallet-changed email; the cooldown (b) was considered and rejected as
+    over-blocking): branch `fix/wallet-relink-reauth`. Server:
+    `server/wallet_reauth.ts` (the pure re-auth core; the CURRENT wallet's
+    signature over the same challenge message wins outright, else password
+    plus the second factor when enrolled via replay-safe
+    `verifyLoginTwoFactor`; passwordless accounts answer 403 pointing at
+    Set-a-Password), wired into `walletLinkCore` (relink to a DIFFERENT
+    address only; first links and same-wallet re-verifies stay prompt-free)
+    and a rewritten `handleWalletUnlink` (no-wallet no-op; PASSWORD arm only:
+    a link challenge cannot be action-scoped to a removal, so honoring a
+    signature there would let a same-wallet re-verify signature replay as an
+    unlink; the QA round also caught and closed an empty-message signature
+    bypass on this path, now pinned by tests). `DELETE
+    /api/wallet/link` now carries `rateLimit(WALLET_LINK_POLICY)` on both
+    dispatch arms (the missing-rate-limit rider above). Refusals carry stable
+    `wallet.reauth_*` codes (catalog + client matcher + M16 fills). The
+    compensating alert emails linked/changed/removed on every custody edit
+    (first links included: that path stays signature-only by design). Client:
+    `src/ui/wallet_reauth_prompt.ts` collects the password proof BEFORE the
+    challenge (a refused attempt would consume the single-use nonce);
+    `linkWallet`/`unlinkWallet` carry the proof. The step-up module header
+    was corrected from deferral to closed.
 
 ## Locked decisions
 

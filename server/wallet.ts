@@ -8,10 +8,15 @@
 
 import { randomBytes } from 'node:crypto';
 import type http from 'node:http';
+import { verifyLoginTwoFactor } from './account';
+import { verifyPassword } from './auth';
 import {
   accountAndScopeForToken,
+  accountById,
+  accountMailTarget,
   consumeWalletChallenge,
   createWalletChallenge,
+  findAccount,
   linkWalletToAccount,
   moderationStatusForAccount,
   primarySlugForAccount,
@@ -22,6 +27,7 @@ import {
   walletForAccount,
 } from './db';
 import { type DesktopWalletHandoffResult, desktopWalletHandoffs } from './desktop_wallet_handoff';
+import { emailWalletChanged } from './email';
 import { ctxAccountId } from './http/context';
 import {
   CARD_UPLOAD_POLICY,
@@ -36,6 +42,7 @@ import { cardUploadContentLengthTooLarge, handleCardUpload } from './player_card
 import { recordUsageMetric } from './provider_usage';
 import { requestIp, walletLinkRateLimited } from './ratelimit';
 import { buildLinkMessage, isSolanaAddress, verifySolanaSignature } from './wallet_link';
+import { authorizeWalletChange, type WalletReauthOutcome } from './wallet_reauth';
 import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
 
 const CHALLENGE_TTL_MINUTES = 10;
@@ -238,6 +245,38 @@ export async function handleWalletLink(
 // The link verification, WITHOUT the rate-limit gate (see walletChallengeCore for
 // the split rationale: the legacy handler self-limits with a prose 429, the
 // RouteDef limits via rateLimit(WALLET_LINK_POLICY) middleware with a coded 429).
+/** The R11 bridge: build the re-auth deps for THIS account and run the core.
+ *  The current wallet's pubkey anchors the signature arm; the account row
+ *  anchors the password and second-factor arms (findAccount carries the TOTP
+ *  columns accountById does not). */
+async function reauthorizeWalletChange(
+  accountId: number,
+  body: Record<string, unknown>,
+  message: string,
+  currentPubkey: string,
+): Promise<WalletReauthOutcome> {
+  const acct = await accountById(accountId);
+  if (!acct) {
+    // A bearer for a vanished account: answer the generic marker (the client
+    // prompt path is the same) rather than confirming account state.
+    return { ok: false, status: 401, error: 'account not found', code: 'wallet.reauth_required' };
+  }
+  const row = await findAccount(acct.username);
+  if (!row) {
+    // The username row vanished between the two reads (rename race): refuse
+    // outright rather than silently downgrading a 2FA-enrolled account to
+    // password-only (a null row would make hasTwoFactor read false).
+    return { ok: false, status: 401, error: 'account not found', code: 'wallet.reauth_required' };
+  }
+  return authorizeWalletChange(body, message, {
+    verifyCurrentSignature: (msg, sig) => verifySolanaSignature(msg, sig, currentPubkey),
+    verifyPassword: (password) => verifyPassword(password, acct.password_hash),
+    hasPassword: () => acct.password_set !== false,
+    hasTwoFactor: () => Boolean(row.totp_secret),
+    verifyTwoFactor: (code, recoveryCode) => verifyLoginTwoFactor(row, code, recoveryCode),
+  });
+}
+
 async function walletLinkCore(
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -266,11 +305,41 @@ async function walletLinkCore(
     return json(res, 401, { error: 'signature verification failed' });
   }
 
+  // R11: once a wallet is linked, sale proceeds pay to it, so CHANGING it is
+  // a custody-adjacent action a bearer alone must not perform. The incoming
+  // wallet's signature above proves the NEW wallet; this proves the account:
+  // the CURRENT wallet co-signs the same challenge message, or the password
+  // (plus the second factor when enrolled) rides the body.
+  // Ordering tradeoff, deliberate: the challenge is consumed above, so a
+  // refused re-auth burns the nonce and the user's fresh signature. The
+  // signature arm cannot run before consumption (it co-signs the consumed
+  // challenge's message), so the browser client compensates by collecting the
+  // proof BEFORE requesting the challenge (src/ui/wallet_reauth_prompt.ts);
+  // bare API callers pay one extra sign on a wrong password.
+  const current = await walletForAccount(accountId);
+  if (current && current.pubkey !== address) {
+    const authorized = await reauthorizeWalletChange(
+      accountId,
+      body,
+      challenge.message,
+      current.pubkey,
+    );
+    if (!authorized.ok) {
+      recordUsageMetric('wallet.link.failure');
+      return json(res, authorized.status, { error: authorized.error, code: authorized.code });
+    }
+  }
+
   const linked = await linkWalletToAccount(accountId, address);
   if (!linked) {
     recordUsageMetric('wallet.link.failure');
     return json(res, 409, { error: 'this wallet is already linked to another account' });
   }
+  // The compensating alert (fire-and-forget): first links included, because a
+  // stolen session first-linking a thief wallet is the residual the re-auth
+  // arm above cannot cover.
+  const target = await accountMailTarget(accountId);
+  if (target) emailWalletChanged(target, current ? 'changed' : 'linked', address);
   return json(res, 200, { pubkey: address, linked: true });
 }
 
@@ -284,13 +353,35 @@ export async function handleWalletGet(
   return json(res, 200, { wallet: row ? { pubkey: row.pubkey, linkedAt: row.linked_at } : null });
 }
 
-// DELETE /api/wallet/link  → { unlinked: true }
+// DELETE /api/wallet/link  → { unlinked: true }. R11: removing the link is
+// re-authorized with the PASSWORD arm only (plus the second factor when
+// enrolled). The current-wallet signature arm is deliberately NOT offered
+// here: the only challenge the client can mint is a LINK challenge, whose
+// signed text tells the player it links a wallet and authorizes nothing, so
+// honoring it for a removal would let a same-wallet re-verify signature be
+// replayed as an unlink (and a caller-supplied signature with no consumed
+// challenge would have nothing sound to verify against). The signature arm
+// stays on the RELINK path, where the current wallet co-signs the incoming
+// challenge message.
 export async function handleWalletUnlink(
-  _req: http.IncomingMessage,
+  req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
+  const current = await walletForAccount(accountId);
+  if (!current) return json(res, 200, { unlinked: true });
+  const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
+  // Build the proof afresh: only the password-arm fields may cross this
+  // boundary, so a caller-supplied currentSignature can never reach the
+  // verifier (there is no challenge message on this path to bind it to).
+  const proof = { password: body.password, totp: body.totp, recoveryCode: body.recoveryCode };
+  const authorized = await reauthorizeWalletChange(accountId, proof, '', current.pubkey);
+  if (!authorized.ok) {
+    return json(res, authorized.status, { error: authorized.error, code: authorized.code });
+  }
   await unlinkWallet(accountId);
+  const target = await accountMailTarget(accountId);
+  if (target) emailWalletChanged(target, 'removed', current.pubkey);
   return json(res, 200, { unlinked: true });
 }
 
@@ -591,10 +682,12 @@ export const routes: RouteDef[] = [
     handler: walletLinkHandler,
   },
   {
+    // R11: rate-limited like its POST siblings (the unlink was the one
+    // wallet mutation with no limiter).
     method: 'DELETE',
     path: '/api/wallet/link',
     surface: 'api',
-    middleware: [activeGuard],
+    middleware: [activeGuard, rateLimit(WALLET_LINK_POLICY)],
     handler: walletUnlinkHandler,
   },
   {

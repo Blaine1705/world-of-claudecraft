@@ -4360,7 +4360,13 @@ export const cs_CZ: EnTranslations = {
       "upstream": "Epic neodpověděl. Zkus to za chvíli znovu."
     },
     "wallet": {
-      "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
+      "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Neplatný vstup."
@@ -7285,6 +7291,13 @@ export const cs_CZ: EnTranslations = {
     "unlink": "Odpojit od účtu",
     "unlinkTitle": "Odebrat ověření peněženky z tohoto účtu",
     "unlinkAria": "Odebrat ověření peněženky z tohoto účtu",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Odpojit",
     "signOutTitle": "Odpojit aplikaci peněženky v tomto prohlížeči",
     "signOutAria": "Odpojit aplikaci peněženky v tomto prohlížeči",

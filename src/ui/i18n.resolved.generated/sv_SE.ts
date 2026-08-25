@@ -4360,7 +4360,13 @@ export const sv_SE: EnTranslations = {
       "upstream": "Epic svarade inte. Försök igen om en stund."
     },
     "wallet": {
-      "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen."
+      "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Ogiltig indata."
@@ -7285,6 +7291,13 @@ export const sv_SE: EnTranslations = {
     "unlink": "Avlänka",
     "unlinkTitle": "Ta bort plånboksverifieringen från det här kontot",
     "unlinkAria": "Ta bort plånboksverifieringen från det här kontot",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Koppla från",
     "signOutTitle": "Koppla från plånboksappen i den här webbläsaren",
     "signOutAria": "Koppla från plånboksappen i den här webbläsaren",

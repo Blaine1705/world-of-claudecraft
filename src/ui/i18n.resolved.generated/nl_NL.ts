@@ -4360,7 +4360,13 @@ export const nl_NL: EnTranslations = {
       "upstream": "Epic reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
-      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
+      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Ongeldige invoer."
@@ -7285,6 +7291,13 @@ export const nl_NL: EnTranslations = {
     "unlink": "Ontkoppelen",
     "unlinkTitle": "Verwijder portemonneeverificatie van dit account",
     "unlinkAria": "Verwijder portemonneeverificatie van dit account",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Verbinding verbreken",
     "signOutTitle": "Verbreek de verbinding met de portemonnee-app in deze browser",
     "signOutAria": "Verbreek de verbinding met de portemonnee-app in deze browser",

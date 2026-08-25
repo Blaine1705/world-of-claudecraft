@@ -4360,7 +4360,13 @@ export const fr_FR: EnTranslations = {
       "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
     },
     "wallet": {
-      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
+      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Saisie invalide."
@@ -7285,6 +7291,13 @@ export const fr_FR: EnTranslations = {
     "unlink": "Dissocier",
     "unlinkTitle": "Retirer la vérification du portefeuille de ce compte",
     "unlinkAria": "Retirer la vérification du portefeuille de ce compte",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Déconnecter",
     "signOutTitle": "Déconnecter l'appli de portefeuille sur ce navigateur",
     "signOutAria": "Déconnecter l'appli de portefeuille sur ce navigateur",

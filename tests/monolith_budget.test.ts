@@ -250,7 +250,11 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Lowered to the exact size after the Discord status/presence payload
+    // coercers moved into src/ui/discord_status.ts; the freed lines paid for
+    // the R11 wallet-reauth wiring (src/ui/wallet_reauth_prompt.ts) including
+    // the QA round's cancel-path adapter disconnect.
+    ceiling: 11557,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -312,7 +316,10 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    ceiling: 5855,
+    // Lowered to the exact size after the ApiError family moved into
+    // src/net/api_error.ts; the freed lines paid for the R11 wallet
+    // re-auth params on linkWallet/unlinkWallet.
+    ceiling: 5840,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

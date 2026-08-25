@@ -4360,7 +4360,13 @@ export const de_DE: EnTranslations = {
       "upstream": "Epic hat nicht geantwortet. Versuche es gleich noch einmal."
     },
     "wallet": {
-      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
+      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Ungültige Eingabe."
@@ -7285,6 +7291,13 @@ export const de_DE: EnTranslations = {
     "unlink": "Trennen",
     "unlinkTitle": "Wallet-Verifizierung von diesem Konto entfernen",
     "unlinkAria": "Wallet-Verifizierung von diesem Konto entfernen",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Abmelden",
     "signOutTitle": "Wallet-App in diesem Browser trennen",
     "signOutAria": "Wallet-App in diesem Browser trennen",

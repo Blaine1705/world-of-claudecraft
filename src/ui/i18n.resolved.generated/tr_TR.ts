@@ -4360,7 +4360,13 @@ export const tr_TR: EnTranslations = {
       "upstream": "Epic yanıt vermedi. Birazdan tekrar deneyin."
     },
     "wallet": {
-      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Geçersiz girdi."
@@ -7285,6 +7291,13 @@ export const tr_TR: EnTranslations = {
     "unlink": "Bağlantıyı Kaldır",
     "unlinkTitle": "Bu hesaptan cüzdan doğrulamasını kaldır",
     "unlinkAria": "Bu hesaptan cüzdan doğrulamasını kaldır",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Bağlantıyı Kes",
     "signOutTitle": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
     "signOutAria": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",

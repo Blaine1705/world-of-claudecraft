@@ -4360,7 +4360,13 @@ export const vi_VN: EnTranslations = {
       "upstream": "Epic không phản hồi. Hãy thử lại sau giây lát."
     },
     "wallet": {
-      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
+      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
@@ -7285,6 +7291,13 @@ export const vi_VN: EnTranslations = {
     "unlink": "Hủy liên kết",
     "unlinkTitle": "Gỡ xác minh ví khỏi tài khoản này",
     "unlinkAria": "Gỡ xác minh ví khỏi tài khoản này",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Ngắt kết nối",
     "signOutTitle": "Ngắt kết nối ứng dụng ví trên trình duyệt này",
     "signOutAria": "Ngắt kết nối ứng dụng ví trên trình duyệt này",

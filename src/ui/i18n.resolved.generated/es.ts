@@ -4360,7 +4360,13 @@ export const es: EnTranslations = {
       "upstream": "Epic no respondió. Inténtalo de nuevo en un momento."
     },
     "wallet": {
-      "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo."
+      "handoff_invalid": "La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Entrada no válida."
@@ -7285,6 +7291,13 @@ export const es: EnTranslations = {
     "unlink": "Desvincular",
     "unlinkTitle": "Eliminar la verificación de cartera de esta cuenta",
     "unlinkAria": "Eliminar la verificación de cartera de esta cuenta",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Desconectar",
     "signOutTitle": "Desconectar la app de cartera en este navegador",
     "signOutAria": "Desconectar la app de cartera en este navegador",

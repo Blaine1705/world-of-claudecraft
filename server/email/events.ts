@@ -20,6 +20,7 @@ export type EmailEvent =
   | 'two_factor_enabled'
   | 'two_factor_disabled'
   | 'security_incident'
+  | 'wallet_changed'
   | 'generic';
 
 // All template keys are the EmailEvent union. Kept as a separate alias so future
@@ -40,6 +41,9 @@ export interface EmailData {
   two_factor_enabled: { username: string; recoveryCodeCount: string };
   two_factor_disabled: { username: string };
   security_incident: { username: string; action: string; reason: string; until: string };
+  /** action is 'linked' | 'changed' | 'removed'; wallet is the full address of
+   *  the NEW wallet ('linked'/'changed') or the removed one. */
+  wallet_changed: { username: string; action: string; wallet: string };
   generic: { username: string; heading: string; body: string };
 }
 
@@ -65,5 +69,6 @@ export const EVENT_CATEGORY: Record<EmailEvent, EmailCategory> = {
   two_factor_enabled: 'transactional',
   two_factor_disabled: 'transactional',
   security_incident: 'transactional',
+  wallet_changed: 'transactional',
   generic: 'marketing',
 };
