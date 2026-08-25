@@ -90,6 +90,7 @@ export const apiErrorStrings = {
     // reuses hudChrome.account.deactivatedLocked
     deactivated: 'This account has been deactivated. Contact an admin to restore it.',
     not_found: 'Account not found.',
+    password_already_set: 'This account already has a password. Use Change Password instead.',
   },
   // character: character creation, selection, and world-entry failures.
   character: {
@@ -173,6 +174,12 @@ export const apiErrorStrings = {
   },
   deeds: {
     invalid_input: 'Invalid input.',
+  },
+  // The public guild roster read behind the signpost guild board
+  // (server/guild_roster.ts).
+  guilds: {
+    invalid_roster_name: 'Invalid guild name.',
+    unknown: 'No guild by that name.',
   },
   // steam: the env-gated Steam link family (server/steam/). Linking mirrors
   // deed unlocks to Steam achievements; it is never a sign-in method.

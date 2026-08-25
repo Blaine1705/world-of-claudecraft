@@ -2321,9 +2321,50 @@
   body.mobile-touch #pet-cluster {
     display: contents;
   }
+  /* Issue: on a narrow landscape phone the true-centered pet bar can reach far
+     enough left to sit on top of the #mobile-combat-controls row (Chat/Social/
+     Quests/Settings/More) or the #mobile-consumables-toggle chip docked right
+     past it, stealing More's tap target (bags/spellbook/character become
+     unreachable). left:50% stays the norm on a wide viewport, but never below
+     the toggle chip's own right edge (the trio's 338px un-scaled row -- the
+     wider tier, safe for the narrower landscape tier too -- plus the chip's own
+     10px dock gap and 40px width, echoing #mobile-consumables' own dock formula
+     above) plus HALF the pet bar's own worst-case rendered width (121px: a
+     4-button command group (attack/special/taunt/feed) + the 1-button stance
+     toggle). transform still centers around whichever left this resolves to,
+     so a wider (mode-menu-open) bar stays centered on that same anchor rather
+     than drifting further. Also clears #buff-bar on its right at the default
+     UI Scale (verified together, alongside #mobile-more, by the widest-pet-
+     plus-populated-buff-bar sweep in scripts/mobile_hud_overlap_audit.mjs);
+     a large UI Scale (below) grows both bars together and can still narrow
+     that margin, a pre-existing tension between two independently dynamic-
+     width bars this fix does not fully close, deliberately scoped to the
+     reported bug (#mobile-more unreachable), not a #buff-bar readability
+     regression. The trio and the chip live OUTSIDE #ui, in real viewport
+     pixels; #petbar lives inside it, zoomed by --ui-scale (src/ui/ui_scale.ts,
+     hudChrome.options.uiScale, 0.85 to 1.4), so that reference (the "+ 50px"
+     is the chip's own 10px dock gap plus 40px width) is converted back into
+     #ui's logical space the same way target_frame_pos.ts / #fiesta-augments
+     do. The +121px half-width stays OUTSIDE that division: it is already an
+     #ui-logical length (the zoom grows the bar's own rendered buttons
+     together with this reservation), so dividing it too would under-reserve
+     and the bar would crowd the chip again above a UI Scale of 1. */
   body.mobile-touch #petbar {
     position: fixed;
-    left: 50%;
+    left: max(
+      50%,
+      calc(
+        (
+          max(12px, env(safe-area-inset-left)) +
+          338px *
+          var(--btn-scale, 1) *
+          var(--mobile-chrome-scale, 1) +
+          50px
+        ) /
+        var(--ui-scale, 1) +
+        121px
+      )
+    );
     top: max(8px, env(safe-area-inset-top));
     transform: translateX(-50%);
     align-self: auto;
@@ -3549,69 +3590,6 @@
     width: 34px;
     height: 34px;
   }
-  /* Vale Cup notification compaction (mobile). The desktop indicator (top:70px) and
-     in-match strip (top:64px, min-width 260px, 24px score) carry no touch rules, so
-     on a short landscape phone they float as a large upper-middle band. Compact both
-     hard and seat them against the very top edge (the #banner recipe above is the
-     precedent) so they hug the frame. Behaviour is unchanged: no dismissal is added
-     and the strip stays pointer-events:none (components.css). The arena-status
-     stacking exception (components.css #arena-status[style*="block"] ~ #vcup-indicator)
-     keeps a higher specificity, so when an arena match is live it still nudges the
-     compacted indicator below the arena banner. */
-  body.mobile-touch #vcup-indicator {
-    top: calc(env(safe-area-inset-top) + 6px);
-    gap: 4px;
-    padding: 2px 8px;
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-title {
-    font-size: 10px;
-    letter-spacing: 0.2px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-score {
-    font-size: 12px;
-  }
-  body.mobile-touch #vcup-indicator .vcupi-clock {
-    font-size: 9.5px;
-  }
-  body.mobile-touch #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 6px);
-    min-width: auto;
-    gap: 1px;
-    padding: 3px 10px 2px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-row {
-    gap: 8px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-side {
-    min-width: 0;
-    gap: 4px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-name {
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-score {
-    font-size: 16px;
-    min-width: 16px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-colon {
-    margin: 0 3px;
-    font-size: 13px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-clock {
-    font-size: 10px;
-  }
-  body.mobile-touch #vcup-match-hud .vcuph-phase {
-    font-size: 10px;
-  }
-  /* The Vale Cup indicator/strip hug the top edge, but yield the top-centre line
-     to the pet bar when a pet is out. (The consumables row used to compete for the
-     same line; it now lives in the action ring and is transient, so it no longer
-     displaces anything.) */
-  body.mobile-touch.mobile-pet-active #vcup-indicator,
-  body.mobile-touch.mobile-pet-active #vcup-match-hud {
-    top: calc(env(safe-area-inset-top) + 64px);
-  }
   body.mobile-touch .window {
     max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
     /* --window-scale, never --ui-scale: this generic rule also governs the
@@ -3647,6 +3625,7 @@
     min-height: 48px;
   }
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window,
   body.mobile-touch #daily-rewards-window {
     z-index: 95;
   }
@@ -3886,10 +3865,10 @@
   body.mobile-touch #emote-editor,
   body.mobile-touch #arena-window,
   body.mobile-touch #dungeon-finder-window,
-  body.mobile-touch #valecup-window,
   body.mobile-touch #card-duel-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window,
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
   body.mobile-touch #dev-command-window,
@@ -4404,16 +4383,16 @@
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
-  body.mobile-touch #leaderboard-window {
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #guild-board-window {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
   }
   /* Loot Settings is a small dialog; JS docks it beside the party frames on desktop
      but on touch it joins the sheet. Its select is the one interactive control, so
      the sheet pin plus the touch floor below is all it needs (no reflow hazard). */
   /* Inspect (player profile) on mobile: a full-width, viewport-capped scrollable
-     window. The showcase compact language keeps the two columns flanking the
-     class-colored stage (not stacked); the shared body.mobile-touch socket / tile
-     rules below (in the character-window block) drive the sockets and stats. */
+     window. The ceremonial identity remains one centered column while the shared
+     paperdoll keeps its two equipment columns around the smaller model stage. */
   body.mobile-touch #inspect-window {
     left: 10px;
     right: 10px;
@@ -4425,19 +4404,47 @@
     box-sizing: border-box;
     overflow-y: auto;
   }
-  /* Compact header goes horizontal; the class-colored stage shrinks to the mobile
-     stage size (the shared .char-model-panel mobile size below applies its width). */
+  /* The mantle, standing, and honor ledger stay ordered instead of wrapping into
+     an unrelated badge cloud. */
   body.mobile-touch #inspect-window .inspect-card {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    gap: 8px 10px;
+    gap: 8px;
     padding: 2px 2px 8px;
+  }
+  body.mobile-touch #inspect-window .inspect-heraldry-banner,
+  body.mobile-touch #inspect-window .inspect-standing-row {
+    width: 100%;
   }
   body.mobile-touch #inspect-window .inspect-model-panel {
     flex: 0 0 230px;
     width: 230px;
     min-height: 220px;
+  }
+  @media (max-width: 520px) {
+    body.mobile-touch #inspect-window .inspect-heraldry-banner {
+      padding-left: 38px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-banner .deed-heraldry-seal {
+      width: 52px;
+      height: 52px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-face {
+      padding-right: 52px;
+      padding-left: 52px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-face .deed-heraldry-pattern {
+      right: 14px;
+      width: 38px;
+      height: 38px;
+    }
+    body.mobile-touch #inspect-window .inspect-heraldry-deed {
+      left: calc(50% + 19px);
+      width: min(64%, 220px);
+    }
+    body.mobile-touch #inspect-window .inspect-honor-rail {
+      grid-template-columns: minmax(0, 300px);
+    }
   }
   body.mobile-touch #social-window,
   body.mobile-touch #trade-window {
@@ -4756,10 +4763,20 @@
   }
   body.mobile-touch .soc-add input,
   body.mobile-touch .soc-billboard-edit input,
+  body.mobile-touch .soc-pledge-note-row input,
+  body.mobile-touch .soc-pledge-minlvl input,
   body.mobile-touch .trade-money input {
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  /* The pledge-settings accepting toggle and the board's Pledge button join the
+     40px touch floor (the checkbox rides its label's padded hit area). */
+  body.mobile-touch .soc-pledge-open,
+  body.mobile-touch .soc-my-pledge .btn,
+  body.mobile-touch .soc-pledge-note-row .btn,
+  body.mobile-touch .lb-pledge-btn {
+    min-height: 40px;
   }
   /* Three 16px digits did not fit the desktop 52px coin box: a five-digit gold
      value scrolled inside it. */
@@ -5221,6 +5238,23 @@
   body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
     display: none;
   }
+  body.mobile-touch #prompt-stack {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(12px, calc(env(safe-area-inset-top) + 12px));
+    transform: none;
+    z-index: 120;
+    align-items: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #prompt-stack .prompt {
+    width: min(340px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
+    min-width: 0;
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 20px);
+    box-sizing: border-box;
+    pointer-events: auto;
+  }
   /* The bank docks its bags companion side by side on touch exactly like the
      vendor cluster: a divided full-height panel split 50/50 at the viewport
      centre. This standalone block is also the neutralizer for the desktop
@@ -5444,6 +5478,14 @@
   body.mobile-touch #deeds-window .deeds-body {
     flex-direction: column;
     min-height: 0;
+  }
+  body.mobile-touch #deeds-window .deeds-titles,
+  body.mobile-touch #deeds-window .deeds-borders {
+    /* Preserve five CSS pixels of air beyond the selected row's focus ring
+       at the landscape-phone DPR instead of merging adjacent metal or
+       clipping the ring against either scroll shelf edge. */
+    gap: 10px;
+    padding-inline: 10px;
   }
   body.mobile-touch #deeds-window .deeds-rail {
     flex: none;
@@ -6333,11 +6375,6 @@
   }
   /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
      carry a pointer:coarse floor). */
-  body.mobile-touch #valecup-window .btn,
-  body.mobile-touch #valecup-window .vcup-guild-toggle {
-    min-height: 40px;
-    box-sizing: border-box;
-  }
   /* Mailbox: the folder tab strip and the "back to inbox" link. The Send-tab
      parcel chip is now a non-interactive span (the +/- stepper and remove
      button are the real controls); their own pointer: coarse 40x40 floor
@@ -7065,8 +7102,9 @@
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
       /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
-         ~35px, below the 40px touch floor. Keep them full-size (the two-group bar
-         still fits the top-centre band on the narrowest 740px landscape phone). */
+         ~35px, below the 40px touch floor. Keep them full-size; the base rule's
+         `left` clamp (above) is what keeps the bar clear of the top-left trio on
+         the narrowest 740px landscape phone, not centering alone. */
       transform: translateX(-50%);
     }
     body.mobile-touch #chatlog-wrap {

@@ -67,6 +67,19 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
 const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const strippedHudSource = stripComments(hudSource);
+const uiTsFiles = [...tsFilesUnder(uiRoot)];
+const uiSources = uiTsFiles.map(({ file, full }) => ({
+  file,
+  full,
+  source: stripComments(readFileSync(full, 'utf8')),
+}));
+const hudFieldsByClass = new Map<string, string[]>();
+for (const [, field, constructed] of strippedHudSource.matchAll(/(\w+)\s*=\s*new (\w+)\(/g)) {
+  const fields = hudFieldsByClass.get(constructed) ?? [];
+  fields.push(field);
+  hudFieldsByClass.set(constructed, fields);
+}
 
 // Raw source to the parser (a `//` inside one of hud.ts's regex literals or
 // template strings truncates a line for a comment stripper, and ts.createSourceFile
@@ -131,12 +144,6 @@ const FANOUT_ARMS: readonly string[] = [
   'this.dungeonFinderWindow.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
   'this.bgProposalPopup.relocalize|',
-  'this.valeCupWindow.relocalize|',
-  'this.vcupBetting.relocalize|',
-  'this.vcupIndicator.relocalize|',
-  'this.vcupMatchHud.relocalize|',
-  'this.vcupBriefing.relocalize|',
-  'this.vcupCharge.relocalize|',
   'this.questDialog.relocalize|',
   'this.calendarWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
@@ -146,6 +153,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.barEditorWindow.relocalize|',
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
+  'this.bootcamp.relocalize|',
+  'this.noticeboardPopup.relocalize|',
+  'this.guildBoardWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
@@ -175,8 +185,7 @@ interface GatedModule {
 
 function discoverGatedModules(): GatedModule[] {
   const out: GatedModule[] = [];
-  for (const { file, full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { file, source } of uiSources) {
     if (!EMITS_TEXT.test(source)) continue;
     const declared = [...source.matchAll(MEMO_DECL)].map((m) => m[1]);
     // A memo is only a REPAINT gate when the module compares it. A retained
@@ -222,6 +231,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastRaceId', 'lastPhase', 'lastSecond'],
     answer: 'this.mountRaceStrip.relocalize',
     why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
+  },
+  {
+    file: 'bootcamp.ts',
+    memos: ['lastCounts'],
+    answer: 'this.bootcamp.relocalize',
+    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders',
   },
   {
     file: 'arena_window.ts',
@@ -343,36 +358,6 @@ const ANSWERED: readonly AnsweredSurface[] = [
     answer: 'this.spellbookWindow.relocalize',
     why: 'the resolved ability ids and their rank/cost/cast/cooldown numbers, plus the hotbar toggle state (#2529)',
   },
-  {
-    file: 'vale_cup_betting.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBetting.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and a skeleton of each team roster',
-  },
-  {
-    file: 'vale_cup_briefing.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBriefing.relocalize',
-    why: 'the two nation ids, the away-palette flag, the local team and role, the format and a skeleton of each roster',
-  },
-  {
-    file: 'vale_cup_hud.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupMatchHud.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and the local team, pipe-joined',
-  },
-  {
-    file: 'vale_cup_indicator.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupIndicator.relocalize',
-    why: 'a hidden sentinel or the bracket, queue position and waiting count. The clock is deliberately out of it and rides the elided setText instead',
-  },
-  {
-    file: 'vale_cup_window.ts',
-    memos: ['lastSig'],
-    answer: 'this.valeCupWindow.relocalize',
-    why: 'standing, queue state, bracket, position, queue sizes, the deserter timer, nation, role and the live match scores',
-  },
 ];
 
 /**
@@ -398,6 +383,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     memos: ['lastHash', 'lastLanguage'],
     reason:
       'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
+  {
+    file: 'hud/quest/quest_tracker_controller.ts',
+    memos: ['lastHtml'],
+    reason:
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
   },
   {
     file: 'claudium_window.ts',
@@ -522,11 +513,9 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
-    const wiring = stripComments(hudSource).match(
-      /document\.addEventListener\('woc:languagechange'/g,
-    );
+    const wiring = strippedHudSource.match(/document\.addEventListener\('woc:languagechange'/g);
     expect(wiring, 'hud.ts no longer listens for woc:languagechange').toHaveLength(1);
-    expect(stripComments(hudSource)).toContain(
+    expect(strippedHudSource).toContain(
       "document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());",
     );
   });
@@ -587,7 +576,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // src/ui is the one DEEP scan root in this repo, so the floor has to sit
     // above what a NON-recursive read returns (about 300 top-level files today)
     // or it cannot detect the failure its own message names.
-    const corpus = tsFilesUnder(uiRoot);
+    const corpus = uiTsFiles;
     expect(corpus.length, 'the src/ui walk came back short').toBeGreaterThan(400);
     expect(
       corpus.filter((f) => f.file.includes('/')).length,
@@ -731,7 +720,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // localized summary without a separate fan-out arm. Each side of the
       // merge had added one row (woc_trade above, the map core here), so the
       // merged list carries both.
-    ).toBe(10);
+      // 11 as of the quest tracker's lastHtml repaint memo (the island coach
+      // glow strobe fix): the memo holds the freshly BUILT html, which
+      // embeds every t() string, so a locale switch moves the comparison
+      // itself and the tracker repaints with no fan-out arm.
+    ).toBe(11);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
@@ -741,22 +734,17 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     const armCalls = new Set(scan.sites.map((s) => s.call));
     const uncalled: string[] = [];
     const scanned: string[] = [];
-    for (const { file, full } of tsFilesUnder(uiRoot)) {
-      const source = stripComments(readFileSync(full, 'utf8'));
+    const ownedRelocalizeClasses = relocalizeOwnedClasses(armCalls);
+    for (const { file, source } of uiSources) {
       if (!/^\s{2}relocalize\(/m.test(source)) continue;
       scanned.push(file);
       const cls = /export class (\w+)/.exec(source)?.[1] ?? '';
       // Map the class back to the Hud field that holds it, then look for an arm
       // on that field. A module whose relocalize is reached through a wrapper
       // (LockpickWindow via LockpickController) is credited by the wrapper's arm.
-      const fields = [...stripComments(hudSource).matchAll(/(\w+)\s*=\s*new (\w+)\(/g)]
-        .filter(([, , constructed]) => constructed === cls)
-        .map(([, field]) => field);
+      const fields = hudFieldsByClass.get(cls) ?? [];
       const credited =
-        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) ||
-        [...armCalls].some(
-          (c) => c.endsWith('.relocalize') && (wrapperOwns(c, cls) || builderOwns(c, cls)),
-        );
+        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) || ownedRelocalizeClasses.has(cls);
       if (!credited) uncalled.push(`${file} (${cls || 'unnamed class'})`);
     }
     // The filter above is the whole test: an empty `uncalled` proves nothing if
@@ -788,34 +776,47 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
  *  the same chain the coordinator does (field <- builder result <- builder
  *  function <- the module that news the class) so the credit stays a proof, not
  *  an exemption. */
-function builderOwns(armCall: string, cls: string): boolean {
-  const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const hud = stripComments(hudSource);
-  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
-  if (!assigned) return false;
-  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
-  if (!built) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
-    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
-    return new RegExp(`new ${cls}\\(`).test(source);
+function relocalizeOwnedClasses(armCalls: ReadonlySet<string>): Set<string> {
+  const owned = new Set<string>();
+  for (const armCall of armCalls) {
+    if (!armCall.endsWith('.relocalize')) continue;
+    for (const cls of builderOwnedClasses(armCall)) owned.add(cls);
+    for (const cls of wrapperOwnedClasses(armCall)) owned.add(cls);
   }
-  return false;
+  return owned;
 }
 
-function wrapperOwns(armCall: string, cls: string): boolean {
+function builderOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(
-    stripComments(hudSource),
-  );
-  if (!constructed) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  const hud = strippedHudSource;
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
+  if (!assigned) return owned;
+  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  if (!built) return owned;
+  for (const { source } of uiSources) {
+    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
+    for (const [, cls] of source.matchAll(/\bnew (\w+)\(/g)) owned.add(cls);
+    return owned;
+  }
+  return owned;
+}
+
+function wrapperOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
+  const field = armCall.slice('this.'.length, -'.relocalize'.length);
+  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(strippedHudSource);
+  if (!constructed) return owned;
+  for (const { source } of uiSources) {
     if (!new RegExp(`export class ${constructed[1]}\\b`).test(source)) continue;
     // The wrapper must both hold one of these and forward to it.
-    return (
-      new RegExp(`:\\s*${cls}\\b|new ${cls}\\(`).test(source) && /\.relocalize\(\)/.test(source)
-    );
+    if (!/\.relocalize\(\)/.test(source)) return owned;
+    if (/:\s*\b/.test(source)) owned.add('');
+    for (const match of source.matchAll(/:\s*(\w+)\b|\bnew (\w+)\(/g)) {
+      const cls = match[1] ?? match[2];
+      if (cls) owned.add(cls);
+    }
+    return owned;
   }
-  return false;
+  return owned;
 }

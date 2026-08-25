@@ -217,7 +217,6 @@ const UI_PURE_CORES = [
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
-  'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
@@ -322,6 +321,11 @@ const UI_PURE_CORES = [
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/tutorial_greeting_view.ts',
+  'src/ui/bootcamp_view.ts',
+  'src/ui/coach_prompt_view.ts',
+  'src/ui/objective_glow_view.ts',
+  'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
@@ -364,24 +368,22 @@ const UI_PURE_CORES = [
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
-  'src/ui/vale_cup_window_view.ts',
-  'src/ui/vale_cup_indicator_view.ts',
-  'src/ui/vale_cup_hud_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
-  'src/ui/vale_cup_briefing_view.ts',
-  'src/ui/vale_cup_betting_view.ts',
-  'src/ui/vale_cup_charge_view.ts',
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',
+  // The signpost guild board's roster drill-in core (the board itself reuses
+  // guild_leaderboard_view above).
+  'src/ui/hud/guild_board/guild_roster_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/deed_border_view.ts',
+  'src/ui/deed_heraldry_plaque_core.ts',
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_cell_art.ts',
   'src/ui/reliquary_view.ts',
@@ -494,6 +496,9 @@ const RENDER_PURE_CORES = [
   'src/render/entry_detail_horizon_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
+  'src/render/quest_beacon_core.ts',
+  'src/render/coach_trail_core.ts',
+  'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
@@ -537,13 +542,17 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
+  'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',
   'src/render/foliage_decimation_core.ts',
+  'src/render/foliage_shore_gate_core.ts',
   'src/render/gpu_queue_window_core.ts',
   'src/render/compile_priority_core.ts',
   'src/render/view_create_budget_core.ts',
   'src/render/gpu_prep_budget_core.ts',
   'src/render/evil_eye_marker_core.ts',
+  'src/render/kit_uv_surface_core.ts',
+  'src/render/kit_window_panes_core.ts',
   'src/render/lich_audio_state_core.ts',
   'src/render/needle_of_fate_vfx_core.ts',
   'src/render/prewarm_resume_ledger_core.ts',
@@ -578,6 +587,7 @@ const RENDER_PURE_CORES = [
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_heraldry_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
@@ -1988,12 +1998,13 @@ const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-
 // Assigned, passed, returned, spread, shorthanded, probed or cast rather than
 // dereferenced: `= document)`, `(document)`, `return document;`, `() => window`,
 // `{ document }`, `[document, window]`, `{ ...globalThis }`,
-// `typeof window !== 'undefined'`, `(window as X).y`. Anchored on a code delimiter
-// at BOTH ends so prose ("close the window, then click") cannot match, and the
-// open brace refuses a `${...}` interpolation so a template variable named
-// `window` (talent_i18n has one) is not mistaken for the global.
+// `typeof window !== 'undefined'`, `(window as X).y`, and ternary value arms such
+// as `enabled ? window : fallback`. Anchored on a code delimiter at BOTH ends so
+// prose ("close the window, then click") cannot match, and the open brace refuses
+// a `${...}` interpolation so a template variable named `window` (talent_i18n has
+// one) is not mistaken for the global.
 const UI_HOST_VALUE_RE = new RegExp(
-  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|\\?\\s*(?:${UI_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
   'm',
 );
 // window.location reached bare. Pinned to the real Location members so a game
@@ -2054,7 +2065,7 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   [
     'a browser global, passed or probed',
     new RegExp(
-      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|\\?\\s*(?:${HELPER_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
       'm',
     ),
   ],
@@ -2117,6 +2128,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
@@ -2126,7 +2138,6 @@ const UI_DOM_MODULES = [
   'src/ui/bank_window.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
-  'src/ui/camera_prompt.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
@@ -2215,6 +2226,7 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
+  'src/ui/noticeboard_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',
@@ -2230,6 +2242,7 @@ const UI_DOM_MODULES = [
   'src/ui/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/tutorial_greeting_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
@@ -2260,13 +2273,10 @@ const UI_DOM_MODULES = [
   // pure core.
   'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
+  'src/ui/bootcamp.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',
   'src/ui/ui_scale.ts',
-  'src/ui/vale_cup_betting.ts',
-  'src/ui/vale_cup_briefing.ts',
-  'src/ui/vale_cup_charge.ts',
-  'src/ui/vale_cup_hud.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
@@ -2477,6 +2487,8 @@ describe('src/ui module classification (every module is swept by exactly one gat
       'const deps = { document };',
       'const hosts = [document, window];',
       'const merged = { ...globalThis };',
+      'const host = enabled ? window : fallback;',
+      'const doc = enabled ? document : fallback;',
     ]) {
       expect(UI_HOST_VALUE_RE.test(positive), positive).toBe(true);
     }
@@ -2552,6 +2564,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect(HELPER_HOST_PATTERNS[0][1].test('document.createElement(x)')).toBe(false);
     expect(HELPER_HOST_PATTERNS[0][1].test('window.innerWidth')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test("typeof localStorage !== 'undefined'")).toBe(true);
+    expect(HELPER_HOST_PATTERNS[1][1].test('const host = enabled ? window : fallback;')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test('return document;')).toBe(false);
     // The helper document rule counts every access, so a second, live-tree call
     // cannot hide behind the sanctioned one.
