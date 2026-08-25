@@ -12,6 +12,7 @@ import {
   WOC_MARKET_DELIVERY_LETTER,
 } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
+import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   MAIL_ATTACHMENT_EXPIRY_SECONDS,
@@ -276,6 +277,72 @@ describe('sending a letter', () => {
 
     sim.mailDelete(gift.id, bob);
     expect(sim.mailInfoFor(bob)?.messages.some((m) => m.id === gift.id)).toBe(false);
+  });
+
+  it('delivers Rift Essence and Rift Gems: forge currency, not the personal rift gear it is spent on', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    const bobMeta = sim.meta(bob);
+    if (!aliceMeta || !bobMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000;
+    sim.addItem(RIFT_ESSENCE_ITEM_ID, 5, alice);
+    for (const gemId of RIFT_GEM_IDS) sim.addItem(gemId, 5, alice);
+    moveToMailbox(sim, alice);
+
+    sim.mailSend(
+      'Bob',
+      'Essence',
+      'Spare stock.',
+      0,
+      [{ itemId: RIFT_ESSENCE_ITEM_ID, count: 5 }],
+      alice,
+    );
+    sim.mailSend(
+      'Bob',
+      'Gems',
+      'One of each.',
+      0,
+      RIFT_GEM_IDS.map((itemId) => ({ itemId, count: 5 })),
+      alice,
+    );
+    const sent = sim.drainEvents();
+    expect(
+      sent.filter((e) => e.type === 'mailResult' && e.code === 'sent' && e.pid === alice),
+    ).toHaveLength(2);
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, alice)).toBe(0);
+    for (const gemId of RIFT_GEM_IDS) expect(sim.countItem(gemId, alice)).toBe(0);
+
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+    const info = sim.mailInfoFor(bob);
+    for (const subject of ['Essence', 'Gems']) {
+      const letter = info?.messages.find((m) => m.subject === subject);
+      if (!letter) throw new Error(`${subject} letter not delivered`);
+      sim.mailTake(letter.id, bob);
+    }
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, bob)).toBe(5);
+    for (const gemId of RIFT_GEM_IDS) expect(sim.countItem(gemId, bob)).toBe(5);
+
+    // Mirror host: the personal rift rings (RIFT_GEAR_ITEM_IDS) still refuse to
+    // ride the raven, unlike the currency above; the fix must not loosen that
+    // def-level rule.
+    sim.addItem('riftbound_band_of_might', 1, alice);
+    sim.drainEvents();
+    sim.mailSend(
+      'Bob',
+      'Ring',
+      'Oops.',
+      0,
+      [{ itemId: 'riftbound_band_of_might', count: 1 }],
+      alice,
+    );
+    const refused = sim.drainEvents();
+    expect(refused.some((e) => e.type === 'mailResult' && e.code === 'noMailQuestItems')).toBe(
+      true,
+    );
+    expect(sim.countItem('riftbound_band_of_might', alice)).toBe(1);
   });
 
   // Review follow-up on PR #2605 (EnriqueGF, medium): mail was a third laundering
