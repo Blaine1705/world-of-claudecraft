@@ -124,4 +124,18 @@ describe('updateMovementOverrideEpochs', () => {
     updateMovementOverrideEpochs(sim, [session]);
     expect(session).toMatchObject(createMovementOverrideSessionState());
   });
+
+  it('reuses the stored signature and authoritative position objects', () => {
+    const { sim, session } = fixture();
+    updateMovementOverrideEpochs(sim, [session]);
+    const signature = session.movementOverrideSignature;
+    const position = session.movementAuthoritativePosition;
+
+    sim.player.auras.push(aura('root', 'test_root'));
+    sim.player.pos.x += 1;
+    updateMovementOverrideEpochs(sim, [session]);
+
+    expect(session.movementOverrideSignature).toBe(signature);
+    expect(session.movementAuthoritativePosition).toBe(position);
+  });
 });

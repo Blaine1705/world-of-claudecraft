@@ -518,8 +518,8 @@ const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop p
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
 const ATTACK_MOVE_MELEE_STOP = 3.5; // yards; how close an attack-move approach stops from its target (inside melee)
 const ATTACK_MOVE_ACQUIRE_RANGE = 12; // yards; an attack-move toward open ground auto-targets a hostile this near
-// Live-ops escape hatch for the online display-only self extrapolation
-// (src/render/self_motion.ts): ?nopredict restores the pre-prediction behavior.
+// Live-ops escape hatch for v2 prediction: ?nopredict uses interpolated display
+// without prediction. The v1 fallback keeps its legacy extrapolator.
 const SELF_MOTION_DISABLED = new URLSearchParams(location.search).has('nopredict');
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
 const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
@@ -4704,7 +4704,7 @@ async function startGame(
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
-    if (net.flushInput()) perf.markInputSent(performance.now());
+    if (net.movementWireVersion !== 2 && net.flushInput()) perf.markInputSent(performance.now());
     movementPrediction.advance(net, frameDt, net.moveInput, netFacing, performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     inputEcho.fold(echoSamples);

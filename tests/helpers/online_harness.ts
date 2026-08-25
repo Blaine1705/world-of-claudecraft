@@ -440,11 +440,10 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     selfMotionGateArgs.climbing = pe.climbing;
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(client, pe, predictionEnabled);
-    // The unconditional 50 ms
-    // lane runs beside this from ClientWorld's own timer.
+    // The unconditional 50 ms lane runs beside this from ClientWorld's own timer.
     Object.assign(client.moveInput, mi);
     client.setMouselookFacing(netFacing);
-    client.flushInput(now);
+    if (client.movementWireVersion !== 2) client.flushInput(now);
     const firstSampledCommand = commands.length;
     movementPrediction.advance(client, frameDt, client.moveInput, netFacing, now);
     const samplerInterpolationAlpha = movementPrediction.interpolationAlpha;

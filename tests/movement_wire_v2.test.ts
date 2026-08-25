@@ -51,6 +51,21 @@ describe('movement wire v2', () => {
     expect(consumeAt).toBeLessThan(tickAt);
   });
 
+  it('attributes v2 timeline and override work to the movement profiler bucket', () => {
+    const source = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    const consumeAt = source.indexOf('consumeMovementFramesV2(this.sim, this.clients.values());');
+    const tickAt = source.indexOf('const events = this.sim.tick();', consumeAt);
+    const overrideAt = source.indexOf('updateOverrideEpochs(this.sim, this.clients.values());');
+    const firstMovementLap = source.indexOf("lap('movementV2');", consumeAt);
+    const secondMovementLap = source.indexOf("lap('movementV2');", firstMovementLap + 1);
+
+    expect(source).toContain("'movementV2'");
+    expect(firstMovementLap).toBeGreaterThan(consumeAt);
+    expect(firstMovementLap).toBeLessThan(tickAt);
+    expect(secondMovementLap).toBeGreaterThan(overrideAt);
+    expect(source.indexOf("lap('movementV2');", secondMovementLap + 1)).toBe(-1);
+  });
+
   it.each([
     ['accepted v2', 2, 2],
     ['absent offer', undefined, 1],
@@ -163,6 +178,31 @@ describe('movement wire v2', () => {
       expect(timeline.starved - before.starved).toBe(0);
       expect(timeline.dropped - before.dropped).toBe(0);
       expect(timeline.resyncs - before.resyncs).toBe(0);
+    } finally {
+      harness.dispose();
+    }
+  });
+
+  it('sends no client-tick-less input frames during a v2 harness run', () => {
+    const harness = createOnlineHarness({ latency: link(50, 0), movementWire: 2 });
+    const receivedInputs: Record<string, unknown>[] = [];
+    const handleMessage = harness.server.handleMessage.bind(harness.server);
+    harness.server.handleMessage = (receivedSession, payload) => {
+      const parsed = JSON.parse(payload) as Record<string, unknown>;
+      if (parsed.t === 'input') receivedInputs.push(parsed);
+      handleMessage(receivedSession, payload);
+    };
+    try {
+      harness.runScript({
+        durationMs: 1000,
+        script: [
+          { atMs: 0, mi: { forward: true }, facing: 0 },
+          { atMs: 500, mi: { forward: false } },
+        ],
+      });
+
+      expect(receivedInputs.length).toBeGreaterThan(0);
+      expect(receivedInputs.every((frame) => Number.isSafeInteger(frame.ct))).toBe(true);
     } finally {
       harness.dispose();
     }

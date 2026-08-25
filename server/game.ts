@@ -1862,10 +1862,10 @@ export class GameServer {
   // sim.time (seconds) of the last head that carried tickHz; throttles the
   // scalar to TICK_HZ_HEAD_INTERVAL_S so it does not ride every 20 Hz head.
   private lastTickHzHeadTime: number | null = null;
-  // Rolling per-phase loop timing, localizes a stutter to a phase. Always-on
-  // (the hot path allocates nothing); read via perfProfile() for admin/ops.
+  // Always-on allocation-free per-phase timing, read via perfProfile() for admin/ops.
   private readonly tickProfiler = new TickProfiler([
     'stale',
+    'movementV2',
     'tick',
     'events',
     'antibot',
@@ -1873,13 +1873,9 @@ export class GameServer {
     'bcastGrid',
     'bcastSelf',
     'social',
-    // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
-    // Populated only while the detailed capture is active (an on-demand admin
-    // capture or PERF_TICK_LOG=1); zero otherwise.
+    // Detailed sim, zone, and self-wire buckets are populated only during captures.
     ...SIM_LAP_PHASES,
-    // Per-zone breakdown of the mob.update phase, with the same capture gating.
     ...SIM_MOB_ZONE_PHASES,
-    // Per-key-group breakdown of the bcastSelf phase, same capture gating.
     ...SELF_WIRE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
@@ -2744,10 +2740,14 @@ export class GameServer {
             lap('stale');
             this.riftUpgrader.drain(this.sim.ctx);
             this.riftAssets.drain(this.sim.ctx);
+            lap('tick');
             consumeMovementFramesV2(this.sim, this.clients.values());
+            lap('movementV2');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            lap('tick');
             updateOverrideEpochs(this.sim, this.clients.values());
+            lap('movementV2');
             this.riftUpgrader.observe(this.sim.ctx);
             this.riftAssets.observe(this.sim.ctx);
             lap('tick');

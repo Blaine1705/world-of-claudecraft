@@ -1,6 +1,8 @@
 import { DT, emptyMoveInput, type MoveInput } from '../sim/types';
 
 const DT_MS = DT * 1000;
+export const STALE_DEADLINE_RESEED_MS = 250;
+export const MAX_CATCHUP_FRAMES_PER_ADVANCE = 2;
 
 export interface InputTickSample {
   mi: MoveInput;
@@ -12,6 +14,8 @@ export interface InputTickFrame extends InputTickSample {
 }
 
 export class InputTickSampler {
+  staleDeadlineReseeds = 0;
+  catchupBacklogDrops = 0;
   private nowMs = 0;
   private nextTickAtMs = DT_MS;
   private nextClientTick = 0;
@@ -39,10 +43,18 @@ export class InputTickSampler {
 
   advance(now: number, sampleFn: () => InputTickSample): InputTickFrame[] {
     this.nowMs = now;
+    if (now - this.nextTickAtMs > STALE_DEADLINE_RESEED_MS) {
+      this.nextTickAtMs = now;
+      this.staleDeadlineReseeds++;
+    }
     const frames: InputTickFrame[] = [];
-    while (now >= this.nextTickAtMs) {
+    while (now >= this.nextTickAtMs && frames.length < MAX_CATCHUP_FRAMES_PER_ADVANCE) {
       frames.push({ ct: this.nextClientTick++, ...sampleFn() });
       this.nextTickAtMs += DT_MS;
+    }
+    if (now >= this.nextTickAtMs) {
+      this.nextTickAtMs = now;
+      this.catchupBacklogDrops++;
     }
     return frames;
   }

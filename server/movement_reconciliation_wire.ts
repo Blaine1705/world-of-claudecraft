@@ -15,6 +15,10 @@ export function reconciliationSelfWire(
   entity: Entity,
 ): Record<string, number> {
   if (session.movementWireVersion !== 2) return {};
+  // Full precision for px/py/pz/pf is LOAD-BEARING for exact-match reconciliation.
+  // Rounding makes every acknowledged pose mismatch and forces a replay.
+  // The self px/py/pz keys share wireEntity's namespace with its pet-autocast px flag.
+  // That flag is ownerId-gated here, so future wireEntity fields must use non-colliding keys.
   return {
     ackCt: session.lastConsumedCt,
     px: entity.pos.x,
@@ -23,6 +27,6 @@ export function reconciliationSelfWire(
     pf: entity.facing,
     ovE: session.movementOverrideEpoch,
     ...(session.movementOverrideActive ? { ovA: 1 } : {}),
-    msm: session.movementMoveSpeedMult,
+    ...(session.movementMoveSpeedMult !== 1 ? { msm: session.movementMoveSpeedMult } : {}),
   };
 }

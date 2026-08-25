@@ -74,24 +74,11 @@ export function overrideActive(signature: MovementOverrideSignature): boolean {
   );
 }
 
-function signaturesEqual(a: MovementOverrideSignature, b: MovementOverrideSignature): boolean {
-  return (
-    a.crowdControlled === b.crowdControlled &&
-    a.feared === b.feared &&
-    a.charging === b.charging &&
-    a.following === b.following &&
-    a.heroicLeaping === b.heroicLeaping &&
-    a.valkyrsCalling === b.valkyrsCalling &&
-    a.mountRaceLocked === b.mountRaceLocked &&
-    a.climbing === b.climbing &&
-    a.moveSpeedMult === b.moveSpeedMult
-  );
-}
-
 function positionDiscontinuous(
   entity: Entity,
   previousPosition: Vec3,
-  signature: MovementOverrideSignature,
+  active: boolean,
+  moveSpeedMult: number,
   previousSignature: MovementOverrideSignature | null,
 ): boolean {
   const dx = entity.pos.x - previousPosition.x;
@@ -106,11 +93,11 @@ function positionDiscontinuous(
   ) {
     return true;
   }
-  if (overrideActive(signature) || (previousSignature && overrideActive(previousSignature))) {
+  if (active || (previousSignature && overrideActive(previousSignature))) {
     return false;
   }
   const maxIntentStep =
-    RUN_SPEED * Math.max(signature.moveSpeedMult, previousSignature?.moveSpeedMult ?? 0) * DT;
+    RUN_SPEED * Math.max(moveSpeedMult, previousSignature?.moveSpeedMult ?? 0) * DT;
   return Math.hypot(dx, dz) > maxIntentStep + POSITION_EPSILON;
 }
 
@@ -123,22 +110,79 @@ export function updateMovementOverrideEpochs(
     const entity = sim.entities.get(session.pid);
     const meta = sim.meta(session.pid);
     if (!entity || !meta) continue;
-    const signature = computeOverrideSignature(entity, meta, sim.moveSpeedMult(entity));
+    const crowdControlled = entity.auras.some((aura) => OVERRIDE_CC_KINDS.has(aura.kind));
+    const feared = entity.auras.some(
+      (aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate',
+    );
+    const charging = entity.chargeTargetId !== null;
+    const following = entity.followTargetId !== null;
+    const heroicLeaping = entity.leap != null;
+    const valkyrsCalling = entity.valkyrsCalling != null;
+    const mountRaceLocked = meta.mountRace?.phase === 'countdown';
+    const climbing = entity.climb != null;
+    const moveSpeedMult = sim.moveSpeedMult(entity);
+    const active =
+      crowdControlled ||
+      feared ||
+      charging ||
+      following ||
+      heroicLeaping ||
+      valkyrsCalling ||
+      mountRaceLocked ||
+      climbing;
+    const signature = session.movementOverrideSignature;
     const signatureChanged =
-      session.movementOverrideSignature !== null &&
-      !signaturesEqual(session.movementOverrideSignature, signature);
+      signature !== null &&
+      (signature.crowdControlled !== crowdControlled ||
+        signature.feared !== feared ||
+        signature.charging !== charging ||
+        signature.following !== following ||
+        signature.heroicLeaping !== heroicLeaping ||
+        signature.valkyrsCalling !== valkyrsCalling ||
+        signature.mountRaceLocked !== mountRaceLocked ||
+        signature.climbing !== climbing ||
+        signature.moveSpeedMult !== moveSpeedMult);
     const discontinuous =
       session.movementAuthoritativePosition !== null &&
       positionDiscontinuous(
         entity,
         session.movementAuthoritativePosition,
+        active,
+        moveSpeedMult,
         signature,
-        session.movementOverrideSignature,
       );
     if (signatureChanged || discontinuous) session.movementOverrideEpoch++;
-    session.movementOverrideSignature = signature;
-    session.movementOverrideActive = overrideActive(signature);
-    session.movementMoveSpeedMult = signature.moveSpeedMult;
-    session.movementAuthoritativePosition = { ...entity.pos };
+    if (signature) {
+      signature.crowdControlled = crowdControlled;
+      signature.feared = feared;
+      signature.charging = charging;
+      signature.following = following;
+      signature.heroicLeaping = heroicLeaping;
+      signature.valkyrsCalling = valkyrsCalling;
+      signature.mountRaceLocked = mountRaceLocked;
+      signature.climbing = climbing;
+      signature.moveSpeedMult = moveSpeedMult;
+    } else {
+      session.movementOverrideSignature = {
+        crowdControlled,
+        feared,
+        charging,
+        following,
+        heroicLeaping,
+        valkyrsCalling,
+        mountRaceLocked,
+        climbing,
+        moveSpeedMult,
+      };
+    }
+    session.movementOverrideActive = active;
+    session.movementMoveSpeedMult = moveSpeedMult;
+    if (session.movementAuthoritativePosition) {
+      session.movementAuthoritativePosition.x = entity.pos.x;
+      session.movementAuthoritativePosition.y = entity.pos.y;
+      session.movementAuthoritativePosition.z = entity.pos.z;
+    } else {
+      session.movementAuthoritativePosition = { ...entity.pos };
+    }
   }
 }

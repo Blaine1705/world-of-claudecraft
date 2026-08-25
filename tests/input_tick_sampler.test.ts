@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { InputTickSampler } from '../src/game/input_tick_sampler';
+import {
+  InputTickSampler,
+  MAX_CATCHUP_FRAMES_PER_ADVANCE,
+  STALE_DEADLINE_RESEED_MS,
+} from '../src/game/input_tick_sampler';
 import { emptyMoveInput, type MoveInput } from '../src/sim/types';
 
 function sample(forward: boolean, facing: number | null): { mi: MoveInput; facing: number | null } {
@@ -7,6 +11,11 @@ function sample(forward: boolean, facing: number | null): { mi: MoveInput; facin
 }
 
 describe('InputTickSampler', () => {
+  it('pins the stale reseed and per-advance catch-up bounds', () => {
+    expect(STALE_DEADLINE_RESEED_MS).toBe(250);
+    expect(MAX_CATCHUP_FRAMES_PER_ADVANCE).toBe(2);
+  });
+
   it('emits fixed ticks across irregular render frame times', () => {
     const sampler = new InputTickSampler();
     sampler.reset(0);
@@ -80,12 +89,48 @@ describe('InputTickSampler', () => {
     let sampleIndex = 0;
     const frames = sampler.advance(151, () => sample(sampleIndex++ % 2 === 0, sampleIndex));
 
-    expect(sampleIndex).toBe(3);
+    expect(sampleIndex).toBe(MAX_CATCHUP_FRAMES_PER_ADVANCE);
     expect(frames.map(({ mi, facing }) => ({ forward: mi.forward, facing }))).toEqual([
       { forward: true, facing: 1 },
       { forward: false, facing: 2 },
-      { forward: true, facing: 3 },
     ]);
+    expect(sampler.catchupBacklogDrops).toBe(1);
+  });
+
+  it('reseeds after a stale deadline and emits exactly one current frame', () => {
+    const sampler = new InputTickSampler();
+    sampler.reset(0);
+
+    const resumedAt = 1000;
+    const resumed = sampler.advance(resumedAt, () => sample(true, 0.5));
+
+    expect(resumed.map((frame) => frame.ct)).toEqual([0]);
+    expect(sampler.staleDeadlineReseeds).toBe(1);
+    expect(sampler.catchupBacklogDrops).toBe(0);
+    expect(sampler.advance(resumedAt + 50, () => sample(false, null))[0].ct).toBe(1);
+  });
+
+  it('caps catch-up work per advance and keeps client ticks monotone', () => {
+    const sampler = new InputTickSampler();
+    sampler.reset(0);
+
+    const first = sampler.advance(151, () => sample(true, 0));
+    const second = sampler.advance(201, () => sample(false, null));
+    const ticks = [...first, ...second].map((frame) => frame.ct);
+
+    expect(first).toHaveLength(MAX_CATCHUP_FRAMES_PER_ADVANCE);
+    expect(sampler.catchupBacklogDrops).toBe(1);
+    expect(ticks.every((tick, index) => index === 0 || tick > ticks[index - 1])).toBe(true);
+  });
+
+  it('emits at most two frames after a 90 ms render frame', () => {
+    const sampler = new InputTickSampler();
+    sampler.reset(0);
+    sampler.advance(50, () => sample(true, 0));
+
+    expect(sampler.advance(140, () => sample(true, 0)).length).toBeLessThanOrEqual(
+      MAX_CATCHUP_FRAMES_PER_ADVANCE,
+    );
   });
 
   it('is deterministic for the same deltas and sampled intent', () => {

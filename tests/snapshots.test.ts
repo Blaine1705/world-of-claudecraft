@@ -1335,7 +1335,6 @@ describe('delta snapshots', () => {
       pz: self.pz,
       pf: self.pf,
       ovE: self.ovE,
-      msm: self.msm,
     }).toEqual({
       ack: 4,
       ackCt: 0,
@@ -1344,8 +1343,8 @@ describe('delta snapshots', () => {
       pz: 4 / 3,
       pf: Math.PI / 7,
       ovE: 0,
-      msm: v2Server.sim.moveSpeedMult(entity),
     });
+    expect(self).not.toHaveProperty('msm');
     expect({ x: self.x, y: self.y, z: self.z, f: self.f }).toEqual({
       x: 0.33,
       y: 0.67,
@@ -1354,6 +1353,7 @@ describe('delta snapshots', () => {
     });
 
     const client = bareClient(v2Session.pid, { movementWireVersion: 2 });
+    client.reconMoveSpeedMult = 2;
     (client as any).applySnapshot(lastSnap(v2Client.sent));
     expect({
       x: client.reconAuthoritativeX,
@@ -1372,7 +1372,7 @@ describe('delta snapshots', () => {
       ackCt: 0,
       epoch: 0,
       active: false,
-      moveSpeedMult: v2Server.sim.moveSpeedMult(entity),
+      moveSpeedMult: 1,
     });
     expect(client.player.pos).toEqual({ x: 0.33, y: 0.67, z: 1.33 });
 
@@ -1390,6 +1390,24 @@ describe('delta snapshots', () => {
     v2Client.sent.length = 0;
     broadcast(v2Server);
     expect(lastSnap(v2Client.sent).self).toMatchObject({ ovE: 1, ovA: 1 });
+
+    entity.auras.push({
+      id: 'test_speed',
+      name: 'Speed',
+      kind: 'buff_speed',
+      remaining: 1,
+      duration: 1,
+      value: 1.5,
+      sourceId: entity.id,
+      school: 'physical',
+    });
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    v2Client.sent.length = 0;
+    broadcast(v2Server);
+    const spedSelf = lastSnap(v2Client.sent).self;
+    expect(spedSelf.msm).toBe(1.5);
+    (client as any).applySnapshot(lastSnap(v2Client.sent));
+    expect(client.reconMoveSpeedMult).toBe(1.5);
   });
 
   it.each([

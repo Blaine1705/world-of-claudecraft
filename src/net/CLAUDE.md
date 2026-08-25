@@ -249,10 +249,12 @@ failure, kept as stable English that `main.ts` re-localizes.
   `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
   `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
   must keep it green. Changing this model is a maintainer decision. The legacy
-  v1 display extrapolator (`src/render/self_motion.ts`, leash + servo + block
-  episode, pinned by `tests/self_motion.test.ts`) remains for v1 sessions,
-  gated states, and `?nopredict`, under its original latency-cap constraints;
-  it is deleted when v1 is retired, not before.
+  display extrapolator (`src/render/self_motion.ts`, leash + servo + block
+  episode, pinned by `tests/self_motion.test.ts`) is only the mid-deploy v1
+  fallback under its original latency-cap constraints. On v2, gated states and
+  `?nopredict` use the plain interpolated fallback in
+  `src/render/self_render_position_core.ts`, with the rewind-clamped handoff.
+  The legacy extrapolator is deleted when v1 is retired, not before.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright by the server, corpse-guard only)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`
