@@ -1182,7 +1182,7 @@ export const it_IT: EnTranslations = {
       "endedForfeitLog": "La partita è stata persa a tavolino.",
       "firstWinBonusLine": "Prima vittoria del giorno: +{honor} Onore",
       "firstWinBonusLog": "Prima vittoria del giorno: guadagni {honor} Onore bonus.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Weekend dell'Onore Doppio: oggi l'Onore dei Campi di Thornhollow viene moltiplicato per {mult}, e una sconfitta giocata fino alla fine paga come una vittoria",
       "timeWarningMinutes": "Restano {minutes} minuti",
       "timeWarningOneMinute": "Resta un minuto",
       "timeWarningMinutesLog": "Restano {minutes} minuti alla fine della battaglia.",
@@ -2944,8 +2944,8 @@ export const it_IT: EnTranslations = {
           "note": "I duellanti accorrono al Colosseo Cinereo. Mettiti in coda e scala la classifica."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Weekend dell'Onore Doppio",
+          "note": "Gli accampamenti di guerra suonano l'adunata: per tutto il weekend, l'Onore dei Campi di Thornhollow viene raddoppiato e una sconfitta giocata fino alla fine paga come una vittoria."
         },
         "fishingDerby": {
           "title": "Gara di Pesca",

@@ -1182,7 +1182,7 @@ export const cs_CZ: EnTranslations = {
       "endedForfeitLog": "Zápas byl vzdán.",
       "firstWinBonusLine": "První výhra dne: +{honor} cti",
       "firstWinBonusLog": "První výhra dne: získáváš bonus {honor} cti.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Víkend dvojité cti: dnes se čest na Thornhollowských polích násobí {mult}krát, a dohraná prohra platí jako výhra",
       "timeWarningMinutes": "Zbývá {minutes} min",
       "timeWarningOneMinute": "Zbývá poslední minuta",
       "timeWarningMinutesLog": "V bitvě zbývá {minutes} min.",
@@ -2944,8 +2944,8 @@ export const cs_CZ: EnTranslations = {
           "note": "Duelisté míří do Popelavého kolosea. Zařaď se do fronty a stoupej v žebříčku."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Víkend dvojité cti",
+          "note": "Válečné tábory troubí ke shromáždění: celý víkend se čest na Thornhollowských polích násobí dvakrát, a dohraná prohra platí jako výhra."
         },
         "fishingDerby": {
           "title": "Rybářské derby",

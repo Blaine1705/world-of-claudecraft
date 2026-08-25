@@ -1002,6 +1002,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Karmazyn',
   'hudChrome.bg.defeatBanner':
     'Porażka. Pola Ciernistej Kotliny {crimson}:{azure}. Ranking {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Weekend Podwójnego Honoru: dziś Honor na Polach Ciernistej Kotliny wypłaca się {mult} razy, a rozegrana do końca porażka liczy się jak zwycięstwo',
   'hudChrome.bg.drawBanner':
     'Remis na Polach Ciernistej Kotliny {crimson}:{azure}. Ranking {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Upuść flagę',
@@ -3667,6 +3669,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Brat Halven zaznacza na swoich mapach: dobry dzień, by stawić czoła Zawalonemu Relikwiarzowi.',
   'hudChrome.calendar.events.delveDay.title': 'Dzień Wyprawy',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Obozy wojenne trąbią na zbiórkę: przez cały weekend Honor na Polach Ciernistej Kotliny wypłaca się podwójnie, a rozegrana do końca porażka liczy się jak zwycięstwo.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Weekend Podwójnego Honoru',
   'hudChrome.calendar.events.fishingDerby.note':
     'Wędkarze obstawiają jeziora. Weź wędkę i powymieniaj się rybackimi opowieściami.',
   'hudChrome.calendar.events.fishingDerby.title': 'Zawody Wędkarskie',

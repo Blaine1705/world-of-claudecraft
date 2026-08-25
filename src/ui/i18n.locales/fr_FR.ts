@@ -1016,6 +1016,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Carmin',
   'hudChrome.bg.defeatBanner':
     'Défaite. Champs de Thornhollow {crimson}:{azure}. Cote {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    "Week-end de double honneur : l'honneur des Champs de Thornhollow est multiplié par {mult} aujourd'hui, et une défaite menée à son terme compte comme une victoire",
   'hudChrome.bg.drawBanner':
     'Champs de Thornhollow, match nul {crimson}:{azure}. Cote {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Lâcher le drapeau',
@@ -4042,6 +4044,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Frère Halven l'inscrit sur ses cartes : un beau jour pour braver le Reliquaire effondré.",
   'hudChrome.calendar.events.delveDay.title': 'Jour de plongée',
+  'hudChrome.calendar.events.doubleHonor.note':
+    "Les camps de guerre sonnent le rassemblement : tout le week-end, l'honneur des Champs de Thornhollow est doublé et une défaite menée à son terme compte comme une victoire.",
+  'hudChrome.calendar.events.doubleHonor.title': 'Week-end de double honneur',
   'hudChrome.calendar.events.fishingDerby.note':
     'Les pêcheurs bordent les lacs. Apportez une canne et échangez des histoires de pêche.',
   'hudChrome.calendar.events.fishingDerby.title': 'Concours de pêche',

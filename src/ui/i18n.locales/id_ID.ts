@@ -994,6 +994,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Merah',
   'hudChrome.bg.defeatBanner':
     'Kekalahan. Medan Thornhollow {crimson}:{azure}. Rating {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Akhir Pekan Kehormatan Ganda: hari ini Kehormatan Medan Thornhollow dibayarkan {mult} kali lipat, dan kekalahan yang dimainkan sampai akhir dibayar seperti kemenangan',
   'hudChrome.bg.drawBanner': 'Medan Thornhollow seri {crimson}:{azure}. Rating {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Jatuhkan bendera',
   'hudChrome.bg.dropFlagConfirmBody':
@@ -3610,6 +3612,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven menandai petanya: hari yang baik untuk menantang Relikuari Runtuh.',
   'hudChrome.calendar.events.delveDay.title': 'Hari Delve',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Kemah-kemah perang membunyikan panggilan berkumpul: sepanjang akhir pekan, Kehormatan Medan Thornhollow dibayarkan dua kali lipat, dan kekalahan yang dimainkan sampai akhir dibayar seperti kemenangan.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Akhir Pekan Kehormatan Ganda',
   'hudChrome.calendar.events.fishingDerby.note':
     'Para pemancing berjajar di tepi danau. Bawalah joran dan saling bertukar kisah memancing.',
   'hudChrome.calendar.events.fishingDerby.title': 'Lomba Memancing',

@@ -1182,7 +1182,7 @@ export const fr_FR: EnTranslations = {
       "endedForfeitLog": "Le match a été abandonné.",
       "firstWinBonusLine": "Première victoire du jour : +{honor} points d'honneur",
       "firstWinBonusLog": "Première victoire du jour : vous gagnez {honor} points d'honneur bonus.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Week-end de double honneur : l'honneur des Champs de Thornhollow est multiplié par {mult} aujourd'hui, et une défaite menée à son terme compte comme une victoire",
       "timeWarningMinutes": "Il reste {minutes} minutes",
       "timeWarningOneMinute": "Il reste une minute",
       "timeWarningMinutesLog": "Il reste {minutes} minutes dans la bataille.",
@@ -2944,8 +2944,8 @@ export const fr_FR: EnTranslations = {
           "note": "Les duellistes affluent au Colisée cendré. Entrez en file et grimpez au classement."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Week-end de double honneur",
+          "note": "Les camps de guerre sonnent le rassemblement : tout le week-end, l'honneur des Champs de Thornhollow est doublé et une défaite menée à son terme compte comme une victoire."
         },
         "fishingDerby": {
           "title": "Concours de pêche",

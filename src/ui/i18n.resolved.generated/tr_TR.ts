@@ -1182,7 +1182,7 @@ export const tr_TR: EnTranslations = {
       "endedForfeitLog": "Maç hükmen sona erdi.",
       "firstWinBonusLine": "Günün ilk galibiyeti: +{honor} Onur",
       "firstWinBonusLog": "Günün ilk galibiyeti: {honor} bonus Onur kazanırsın.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Çifte Onur Hafta Sonu: bugün Dikenvadi Ovası Onuru {mult} kat ödeniyor ve sonuna kadar oynanan bir mağlubiyet galibiyet gibi ödeniyor",
       "timeWarningMinutes": "{minutes} dakika kaldı",
       "timeWarningOneMinute": "Bir dakika kaldı",
       "timeWarningMinutesLog": "Savaşta {minutes} dakika kaldı.",
@@ -2944,8 +2944,8 @@ export const tr_TR: EnTranslations = {
           "note": "Düellocular Kül Kolezyumu'na akın ediyor. Sıraya gir ve merdiveni tırman."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Çifte Onur Hafta Sonu",
+          "note": "Savaş kampları toplanma çağrısını duyuruyor: tüm hafta sonu boyunca Dikenvadi Ovası Onuru iki katına çıkıyor ve sonuna kadar oynanan bir mağlubiyet galibiyet gibi ödeniyor."
         },
         "fishingDerby": {
           "title": "Balık Tutma Yarışması",

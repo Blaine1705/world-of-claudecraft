@@ -1018,6 +1018,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Cremisi',
   'hudChrome.bg.defeatBanner':
     'Sconfitta. Campi di Thornhollow {crimson}:{azure}. Indice {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    "Weekend dell'Onore Doppio: oggi l'Onore dei Campi di Thornhollow viene moltiplicato per {mult}, e una sconfitta giocata fino alla fine paga come una vittoria",
   'hudChrome.bg.drawBanner':
     'Pareggio ai Campi di Thornhollow {crimson}:{azure}. Indice {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Lascia cadere la bandiera',
@@ -3623,6 +3625,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Fratello Halven annota le sue carte: un buon giorno per sfidare il Reliquiario Crollato.',
   'hudChrome.calendar.events.delveDay.title': "Giorno dell'Incursione",
+  'hudChrome.calendar.events.doubleHonor.note':
+    "Gli accampamenti di guerra suonano l'adunata: per tutto il weekend, l'Onore dei Campi di Thornhollow viene raddoppiato e una sconfitta giocata fino alla fine paga come una vittoria.",
+  'hudChrome.calendar.events.doubleHonor.title': "Weekend dell'Onore Doppio",
   'hudChrome.calendar.events.fishingDerby.note':
     'I pescatori affollano le rive dei laghi. Porta una canna e scambia storie di pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Gara di Pesca',

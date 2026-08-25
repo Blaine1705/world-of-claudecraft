@@ -1182,7 +1182,7 @@ export const da_DK: EnTranslations = {
       "endedForfeitLog": "Kampen blev opgivet.",
       "firstWinBonusLine": "Dagens første sejr: +{honor} Ære",
       "firstWinBonusLog": "Dagens første sejr: du får {honor} bonus-Ære.",
-      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
+      "doubleHonorLine": "Dobbelt Ære-Weekend: i dag udbetales Ære på Tornehulemarkerne {mult} gange, og et udkæmpet nederlag tæller som en sejr",
       "timeWarningMinutes": "{minutes} minutter tilbage",
       "timeWarningOneMinute": "Ét minut tilbage",
       "timeWarningMinutesLog": "{minutes} minutter tilbage af kampen.",
@@ -2944,8 +2944,8 @@ export const da_DK: EnTranslations = {
           "note": "Duellanter strømmer til Askekolosseet. Stil dig i kø, og klatr op ad ranglisten."
         },
         "doubleHonor": {
-          "title": "Double Honor Weekend",
-          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
+          "title": "Dobbelt Ære-Weekend",
+          "note": "Krigslejrene blæser til samling: hele weekenden udbetales Ære på Tornehulemarkerne dobbelt, og et udkæmpet nederlag tæller som en sejr."
         },
         "fishingDerby": {
           "title": "Fiskederby",

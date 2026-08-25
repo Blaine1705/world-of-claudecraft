@@ -979,6 +979,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.countdownBanner': 'Cánh Đồng Trũng Gai bắt đầu sau {seconds}',
   'hudChrome.bg.crimson': 'Đỏ Thẫm',
   'hudChrome.bg.defeatBanner': 'Thất bại. Cánh Đồng Trũng Gai {crimson}:{azure}. Xếp hạng {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Cuối Tuần Danh Dự Nhân Đôi: hôm nay Danh Dự tại Cánh Đồng Trũng Gai được nhân {mult} lần, và một trận thua đấu đến cùng được tính như một chiến thắng',
   'hudChrome.bg.drawBanner': 'Cánh Đồng Trũng Gai hòa {crimson}:{azure}. Xếp hạng {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Thả cờ',
   'hudChrome.bg.dropFlagConfirmBody': 'Bạn đang mang cờ địch. Thả nó xuống sẽ để nó nằm trên mặt đất, nơi cả hai đội đều có thể lấy được.',
@@ -3488,6 +3490,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Tu Huynh Halven đánh dấu vào những tấm bản đồ của mình: một ngày lành để thử sức Thánh Tích Sụp Đổ.',
   'hudChrome.calendar.events.delveDay.title': 'Ngày Hang Sâu',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Các doanh trại chiến tranh vang lên tiếng gọi tập hợp: suốt cuối tuần, Danh Dự tại Cánh Đồng Trũng Gai được nhân đôi, và một trận thua đấu đến cùng được tính như một chiến thắng.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Cuối Tuần Danh Dự Nhân Đôi',
   'hudChrome.calendar.events.fishingDerby.note':
     'Cần thủ xếp hàng quanh các hồ nước. Hãy mang theo cần câu và trao đổi chuyện câu cá.',
   'hudChrome.calendar.events.fishingDerby.title': 'Hội Thi Câu Cá',

@@ -997,6 +997,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Karmoisin',
   'hudChrome.bg.defeatBanner':
     'Nederlag. Tornehulemarkerne {crimson}:{azure}. Rating {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Dobbelt Ære-Weekend: i dag udbetales Ære på Tornehulemarkerne {mult} gange, og et udkæmpet nederlag tæller som en sejr',
   'hudChrome.bg.drawBanner':
     'Tornehulemarkerne uafgjort {crimson}:{azure}. Rating {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Tab flaget',
@@ -3498,6 +3500,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broder Halven markerer sine kort: en fin dag at trodse Det Sammenstyrtede Relikvarium.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-Dag',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Krigslejrene blæser til samling: hele weekenden udbetales Ære på Tornehulemarkerne dobbelt, og et udkæmpet nederlag tæller som en sejr.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Dobbelt Ære-Weekend',
   'hudChrome.calendar.events.fishingDerby.note':
     'Lystfiskere står langs søerne. Tag en stang med, og udveksl fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fiskederby',

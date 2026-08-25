@@ -1018,6 +1018,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Carmesí',
   'hudChrome.bg.defeatBanner':
     'Derrota. Campos Espinosos {crimson}:{azure}. Índice {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Fin de Semana de Honor Doble: hoy el Honor de Campos Espinosos se multiplica por {mult}, y una derrota jugada hasta el final paga como una victoria',
   'hudChrome.bg.drawBanner':
     'Empate en Campos Espinosos {crimson}:{azure}. Índice {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Soltar la bandera',
@@ -3685,6 +3687,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'El Hermano Halven marca sus cartas: un buen día para atreverse con el Relicario Hundido.',
   'hudChrome.calendar.events.delveDay.title': 'Día de Expedición',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Los campamentos de guerra tocan a formación: todo el fin de semana, el Honor de Campos Espinosos se paga el doble y una derrota jugada hasta el final paga como una victoria.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Fin de Semana de Honor Doble',
   'hudChrome.calendar.events.fishingDerby.note':
     'Los pescadores bordean los lagos. Trae una caña y comparte anécdotas de pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Torneo de Pesca',
