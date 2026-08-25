@@ -109,6 +109,7 @@ describe('listEscrowStateRows', () => {
     const rows = await listEscrowStateRows();
     expect(rows).toEqual([{ key: 'mail:eastbrook', data: { mail: [] } }]);
     expect(query.mock.calls[0][0]).toMatch(/key LIKE 'mail:%' OR key LIKE 'market:%'/);
+    expect(query.mock.calls[0][0]).toMatch(/key LIKE 'mail_partition_done:%'/);
   });
 });
 

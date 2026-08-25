@@ -1036,7 +1036,7 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
     assertInSync(); // a fresh send
 
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
-    applyDirty(); // delivery landing touches nothing persisted (deliverAt was already stored)
+    applyDirty(); // delivery landing persists deliverIn: 0 for the recipient
     assertInSync();
 
     moveToMailbox(sim, bob);
@@ -1275,6 +1275,50 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
       .flatMap((p) => p.letters)
       .find((m) => m.subject === WOC_MARKET_DELIVERY_LETTER.subject);
     expect(letter?.custodyRef).toBe('woc_ref_test_1');
+  });
+
+  it('a delayed never-expiring system parcel dirties only its recipient when delivery lands', () => {
+    const sim = makeWorld();
+    sim.postOffice.sendLetter(
+      'rewardee',
+      'Rewardee',
+      {
+        letterId: 'test_delayed_reward',
+        senderName: 'Quartermaster',
+        subject: 'Delayed reward',
+        body: 'For later.',
+        copper: 250,
+        delaySeconds: 5,
+      },
+      'system',
+    );
+    const sent = sim.takeDirtyMailPartitions();
+    expect(sent.map((p) => p.recipientKey)).toEqual(['rewardee']);
+    const sentLetter = sent[0].letters.find((m) => m.subject === 'Delayed reward');
+    expect(sentLetter?.deliverIn).toBe(5);
+    expect(sentLetter?.secondsLeft).toBe(-1);
+
+    sim.postOffice.sendLetter(
+      'bystander',
+      'Bystander',
+      {
+        letterId: 'test_other_reward',
+        senderName: 'Quartermaster',
+        subject: 'Other reward',
+        body: 'Still quiet.',
+        copper: 100,
+        delaySeconds: 500,
+      },
+      'system',
+    );
+    sim.takeDirtyMailPartitions();
+
+    tickFor(sim, 6);
+    const landed = sim.takeDirtyMailPartitions();
+    expect(landed.map((p) => p.recipientKey)).toEqual(['rewardee']);
+    const persisted = landed[0].letters.find((m) => m.subject === 'Delayed reward');
+    expect(persisted?.deliverIn).toBe(0);
+    expect(persisted?.secondsLeft).toBe(-1);
   });
 });
 

@@ -200,9 +200,8 @@ export class PostOffice {
     // former per-call scan at the exact tick (never a per-second lag). Iterates
     // only the small in-flight set, not the whole book, and touches no rng/event
     // stream (the arrival toast keeps its own per-second cadence below). A
-    // landing changes what mailInfoFor shows purely by time passing, so it is
-    // a rev bump like any other mutation (the wire gate would otherwise serve
-    // the pre-landing view until its staleness backstop).
+    // landing changes what mailInfoFor shows and what deliverIn persists, so it
+    // is a rev bump and a dirty-partition mark like any other mutation.
     if (this.index.deliverDue(this.ctx.time) > 0) this.bumpRev();
     if (this.ctx.tickCount % 20 !== 0) return;
     const now = this.ctx.time;
