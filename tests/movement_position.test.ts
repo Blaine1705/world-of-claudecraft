@@ -38,6 +38,161 @@ describe('authoritative client movement positions', () => {
     expect(sim.player.pos.z).toBeCloseTo(start.z + 0.35, 10);
   });
 
+  it('accepts exactly two render frames of phase credit and rejects just over it', () => {
+    const inputIntervalDistance = RUN_SPEED / 20;
+    const renderPhaseDistance = RUN_SPEED / 30;
+    const initialPathCredit = 0.05;
+    const exact = setup();
+    const exactStart = { x: exact.sim.player.pos.x, z: exact.sim.player.pos.z };
+    expect(applyMovementPositionSample(exact.sim, exact.session, exactStart, 0, neutral)).toBe(
+      true,
+    );
+    expect(
+      applyMovementPositionSample(
+        exact.sim,
+        exact.session,
+        { x: exactStart.x, z: exactStart.z + inputIntervalDistance + initialPathCredit },
+        50,
+        forward,
+      ),
+    ).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        exact.sim,
+        exact.session,
+        {
+          x: exactStart.x,
+          z: exactStart.z + inputIntervalDistance * 2 + initialPathCredit + renderPhaseDistance,
+        },
+        100,
+        forward,
+      ),
+    ).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        exact.sim,
+        exact.session,
+        {
+          x: exactStart.x,
+          z: exactStart.z + inputIntervalDistance * 3 + initialPathCredit + renderPhaseDistance,
+        },
+        150,
+        forward,
+      ),
+    ).toBe(true);
+
+    const excessive = setup();
+    const excessiveStart = { x: excessive.sim.player.pos.x, z: excessive.sim.player.pos.z };
+    expect(
+      applyMovementPositionSample(excessive.sim, excessive.session, excessiveStart, 0, neutral),
+    ).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        excessive.sim,
+        excessive.session,
+        { x: excessiveStart.x, z: excessiveStart.z + inputIntervalDistance + initialPathCredit },
+        50,
+        forward,
+      ),
+    ).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        excessive.sim,
+        excessive.session,
+        {
+          x: excessiveStart.x,
+          z:
+            excessiveStart.z +
+            inputIntervalDistance * 2 +
+            initialPathCredit +
+            renderPhaseDistance +
+            0.001,
+        },
+        100,
+        forward,
+      ),
+    ).toBe(false);
+  });
+
+  it('cannot spend the render-phase reserve indefinitely', () => {
+    const { sim, session } = setup();
+    const start = { x: sim.player.pos.x, z: sim.player.pos.z };
+    expect(applyMovementPositionSample(sim, session, start, 0, neutral)).toBe(true);
+    expect(
+      applyMovementPositionSample(sim, session, { x: start.x, z: start.z + 0.35 }, 50, forward),
+    ).toBe(true);
+    const firstCrossover = start.z + 0.35 + RUN_SPEED / 15;
+    expect(
+      applyMovementPositionSample(sim, session, { x: start.x, z: firstCrossover }, 100, forward),
+    ).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        sim,
+        session,
+        { x: start.x, z: firstCrossover + RUN_SPEED / 15 },
+        150,
+        forward,
+      ),
+    ).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        sim,
+        session,
+        { x: start.x, z: firstCrossover + (RUN_SPEED / 15) * 2 },
+        200,
+        forward,
+      ),
+    ).toBe(false);
+  });
+
+  it('does not consume movement time when a low-FPS client repeats its last rendered pose', () => {
+    const { sim, session } = setup();
+    const start = { x: sim.player.pos.x, z: sim.player.pos.z };
+    expect(applyMovementPositionSample(sim, session, start, 0, neutral)).toBe(true);
+    expect(session.movementPositionState?.authorityActive).toBe(true);
+    expect(applyMovementPositionSample(sim, session, start, 50, forward)).toBe(false);
+    expect(applyMovementPositionSample(sim, session, start, 100, forward)).toBe(false);
+    expect(session.movementPositionState?.clientAtMs).toBe(0);
+    expect(session.movementPositionState?.authorityActive).toBe(true);
+    expect(
+      applyMovementPositionSample(
+        sim,
+        session,
+        { x: start.x, z: start.z + RUN_SPEED * 0.125 },
+        150,
+        forward,
+      ),
+    ).toBe(true);
+  });
+
+  it('deactivates grounded authority after rejecting a held-input position', () => {
+    const { sim, session } = setup();
+    const start = { x: sim.player.pos.x, z: sim.player.pos.z };
+    expect(applyMovementPositionSample(sim, session, start, 0, neutral)).toBe(true);
+    expect(
+      applyMovementPositionSample(sim, session, { x: start.x, z: start.z + 0.35 }, 50, forward),
+    ).toBe(true);
+    const adoptedZ = sim.player.pos.z;
+
+    expect(
+      applyMovementPositionSample(sim, session, { x: start.x, z: start.z + 3 }, 100, forward),
+    ).toBe(false);
+    expect(session.movementPositionState?.authorityActive).toBe(false);
+    expect(sim.player.pos.z).toBe(adoptedZ);
+  });
+
+  it('deactivates position authority while airborne, including repeated rendered poses', () => {
+    const { sim, session } = setup();
+    const entity = sim.player;
+    const start = { x: entity.pos.x, z: entity.pos.z };
+    expect(applyMovementPositionSample(sim, session, start, 0, neutral)).toBe(true);
+    expect(session.movementPositionState?.authorityActive).toBe(true);
+
+    entity.onGround = false;
+    expect(applyMovementPositionSample(sim, session, start, 50, forward)).toBe(false);
+    expect(session.movementPositionState?.authorityActive).toBe(false);
+  });
+
   it('rejects speed gained beyond the episode path budget', () => {
     const { sim, session } = setup();
     const start = { x: sim.player.pos.x, z: sim.player.pos.z };
@@ -796,7 +951,7 @@ describe('authoritative client movement positions', () => {
       applyMovementPositionSample(
         mounted.sim,
         mounted.session,
-        { x: mountedStart.x, z: mountedStart.z + 1.2 },
+        { x: mountedStart.x, z: mountedStart.z + 1.7 },
         100,
         forward,
       ),
@@ -1002,7 +1157,7 @@ describe('authoritative client movement positions', () => {
       applyMovementPositionSample(
         inside.sim,
         inside.session,
-        { x: inside.start.x, z: inside.start.z + 1.49 },
+        { x: inside.start.x, z: inside.start.z + 1.61 },
         250,
         forward,
       ),
@@ -1013,7 +1168,7 @@ describe('authoritative client movement positions', () => {
       applyMovementPositionSample(
         outside.sim,
         outside.session,
-        { x: outside.start.x, z: outside.start.z + 1.51 },
+        { x: outside.start.x, z: outside.start.z + 1.62 },
         250,
         forward,
       ),

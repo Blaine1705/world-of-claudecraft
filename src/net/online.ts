@@ -1544,6 +1544,7 @@ export class ClientWorld implements IWorld {
   private readonly ownPlayerClass: PlayerClass;
   spectating: string | null = null;
   moveInput: MoveInput = emptyMoveInput();
+  movementPositionAuthority = false;
   known: ResolvedAbility[] = [];
   realm = '';
   // Whether this session's account holds a staff/admin role, from the hello
@@ -2145,6 +2146,7 @@ export class ClientWorld implements IWorld {
   // 'error' frame, handled in onMessage, which sets sessionEnded).
   private socketClosed(): void {
     this.connected = false;
+    this.movementPositionAuthority = false;
     // A reconnect may land on an older binary. Drop optional behavior before
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
@@ -2194,6 +2196,7 @@ export class ClientWorld implements IWorld {
     // lost to a deliberate logout within the debounce window.
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
+    this.movementPositionAuthority = false;
     this.failPendingCommandOutcomes();
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
@@ -2542,6 +2545,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'hello') {
+      this.movementPositionAuthority = false;
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
@@ -2648,6 +2652,7 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'error') {
       const wasConnected = this.connected;
       this.connected = false;
+      this.movementPositionAuthority = false;
       // 'character already in world' is the transient window where the
       // server has not yet noticed the old socket died (a black-holed drop
       // sends no FIN/RST): keep backing off, the server's keepalive sweep
@@ -3421,6 +3426,7 @@ export class ClientWorld implements IWorld {
         }
         this.ackedInputSeq = s.ack;
       }
+      this.movementPositionAuthority = s.mpa === 1;
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;

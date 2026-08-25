@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
+import {
+  applyMovementPositionSample,
+  type MovementPositionSession,
+} from '../server/movement_position';
 import { type MovementStopTarget, resolveMovementStop } from '../server/movement_stop';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
   SELF_MOTION_CAP_MAX_MS,
   SELF_MOTION_CAP_MIN_MS,
+  SELF_MOTION_MAIN_THREAD_STALL_MAX_MS,
   SELF_MOTION_SNAP_DIST_SQ,
   type SelfMotionFrame,
   SelfMotionPredictor,
@@ -75,6 +80,17 @@ class Lab {
   private processedInputEvents = 0;
   private pendingServerStop: MovementStopTarget | null = null;
   private lastDisplay: { x: number; z: number } | null = null;
+  private readonly positionAuthority: boolean;
+  private positionAuthoritySignal: boolean | null = null;
+  private readonly positionSession: MovementPositionSession;
+  private readonly positionLog: {
+    atMs: number;
+    input: MoveInput;
+    x: number;
+    z: number;
+  }[] = [];
+  private processedPositionEvents = 0;
+  private nextPositionSendMs = SNAP_MS;
   enabled = true;
   jitterMs = 0;
   echoMs: number;
@@ -112,6 +128,7 @@ class Lab {
        *  the display predicting a run the authority never performs. */
       serverDeaf?: boolean;
       serverMotionScale?: number;
+      positionAuthority?: boolean;
     } = {},
   ) {
     this.echoMs = lagMs;
@@ -119,6 +136,7 @@ class Lab {
     this.deliveryMs = opts.deliveryMs ?? SNAP_MS;
     this.serverDeaf = opts.serverDeaf ?? false;
     this.serverMotionScale = opts.serverMotionScale ?? 1;
+    this.positionAuthority = opts.positionAuthority ?? false;
     this.srv = new Sim({
       seed: SEED,
       playerClass: 'warrior',
@@ -132,7 +150,9 @@ class Lab {
     this.srv.player.facing = this.facing; // run straight north (+z) by default
     const p = this.srv.player;
     this.self = { ...p, pos: { ...p.pos }, prevPos: { ...p.prevPos } };
+    this.positionSession = { pid: p.id, movementPositionState: null };
     this.inputLog.push({ atMs: 0, input: mi(), stop: null });
+    this.positionLog.push({ atMs: 0, input: mi(), x: p.pos.x, z: p.pos.z });
   }
 
   readonly facing: number;
@@ -145,6 +165,19 @@ class Lab {
       input,
       stop: stopped && this.lastDisplay ? { ...this.lastDisplay } : null,
     });
+  }
+
+  setPositionAuthoritySignal(active: boolean): void {
+    this.positionAuthoritySignal = active;
+  }
+
+  movementPositionAuthorityActive(): boolean {
+    return this.positionSession.movementPositionState?.authorityActive === true;
+  }
+
+  shiftServerPosition(z: number): void {
+    this.srv.player.pos.z += z;
+    this.srv.player.prevPos.z += z;
   }
 
   private applyServerInputAt(tMs: number): void {
@@ -184,18 +217,50 @@ class Lab {
     }
   }
 
+  private sendPositionSamples(): void {
+    if (!this.positionAuthority || !this.lastDisplay) return;
+    while (this.nextPositionSendMs <= this.nowMs) {
+      this.positionLog.push({
+        atMs: this.nextPositionSendMs,
+        input: { ...this.localInput },
+        x: this.lastDisplay.x,
+        z: this.lastDisplay.z,
+      });
+      this.nextPositionSendMs += SNAP_MS;
+    }
+  }
+
+  private applyServerPositionsAt(tMs: number): void {
+    if (!this.positionAuthority) return;
+    while (
+      this.processedPositionEvents < this.positionLog.length &&
+      this.positionLog[this.processedPositionEvents].atMs + this.lagMs <= tMs
+    ) {
+      const event = this.positionLog[this.processedPositionEvents++];
+      applyMovementPositionSample(
+        this.srv,
+        this.positionSession,
+        { x: event.x, z: event.z },
+        event.atMs,
+        event.input,
+      );
+    }
+  }
+
   /** `drainFirst` models the other browser ordering: the socket is drained
    *  just BEFORE the rAF callback, so the long frame's step already sees the
    *  burst (fresh anchor, prevPos re-anchored at the drawn pose). */
   frame(frameMsOverride?: number, drainFirst = false): FrameResult {
     const frameMs = frameMsOverride ?? this.frameMs;
     this.nowMs += frameMs;
+    this.sendPositionSamples();
     this.sinceTickMs += frameMs;
     let delivered = false;
     while (this.sinceTickMs >= SNAP_MS) {
       this.sinceTickMs -= SNAP_MS;
       const meta = this.srv.players.get(this.srv.player.id);
       if (!meta) throw new Error('missing player meta');
+      this.applyServerPositionsAt(this.nowMs);
       this.applyServerInputAt(this.nowMs);
       const before = { ...this.srv.player.pos };
       const beforeX = this.srv.player.pos.x;
@@ -252,6 +317,10 @@ class Lab {
     const frame: SelfMotionFrame = {
       enabled: this.enabled,
       moveInput: this.localInput,
+      movementPositionAuthority:
+        this.positionAuthoritySignal ??
+        (this.positionAuthority &&
+          this.positionSession.movementPositionState?.authorityActive === true),
       displayFacing: this.facing,
       echoMs: this.echoMs,
       jitterMs: this.jitterMs,
@@ -408,6 +477,153 @@ describe('SelfMotionPredictor', () => {
       const pose = lab.frame().pose;
       if (!pose) throw new Error('predictor disabled unexpectedly');
       expect(pose.z - previous.z, `frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('keeps steady forward motion continuous when validated display positions become authority', () => {
+    const lab = new Lab(200, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+      positionAuthority: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+    for (let i = 0; i < 360; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('keeps validated-authority movement continuous through an isolated client frame drop', () => {
+    const lab = new Lab(200, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+      positionAuthority: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+
+    const frameDurations = [156, ...Array.from({ length: 90 }, () => FRAME_MS)];
+    for (const [index, frameMs] of frameDurations.entries()) {
+      const pose = lab.frame(frameMs).pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      const speed = (pose.z - previous.z) / (frameMs / 1000);
+      expect(speed, `frame ${index}`).toBeGreaterThanOrEqual(RUN_SPEED * 0.9);
+      expect(speed, `frame ${index}`).toBeLessThanOrEqual(RUN_SPEED * 1.1);
+      previous = pose;
+    }
+  });
+
+  it.each([300, 500, 600, 700, 750])(
+    'keeps validated movement continuous through a %ims main-thread stall',
+    (stallMs) => {
+      const lab = new Lab(200, FRAME_MS, {
+        start: { x: 0, z: -1000 },
+        deliverAfter: true,
+        positionAuthority: true,
+      });
+      lab.jitterMs = 50;
+      lab.setInput(mi({ forward: true }));
+      for (let i = 0; i < 180; i++) lab.frame();
+      const before = lab.frame().pose;
+      if (!before) throw new Error('predictor disabled unexpectedly');
+
+      const after = lab.frame(stallMs).pose;
+      if (!after) throw new Error('predictor disabled unexpectedly');
+      const advanceMs = Math.min(stallMs, SELF_MOTION_MAIN_THREAD_STALL_MAX_MS);
+      expect(after.z - before.z).toBeCloseTo(RUN_SPEED * (advanceMs / 1000), 2);
+      expect(lab.movementPositionAuthorityActive()).toBe(true);
+
+      let previous = after;
+      for (let i = 0; i < 40; i++) {
+        const recovered = lab.frame().pose;
+        if (!recovered) throw new Error('predictor disabled unexpectedly');
+        const recoveryStep = recovered.z - previous.z;
+        const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+        expect(recoveryStep, `recovery frame ${i}`).toBeGreaterThanOrEqual(expectedStep * 0.9);
+        expect(recoveryStep, `recovery frame ${i}`).toBeLessThanOrEqual(expectedStep * 1.1);
+        expect(lab.movementPositionAuthorityActive(), `authority frame ${i}`).toBe(true);
+        previous = recovered;
+      }
+    },
+  );
+
+  it('applies the stale-input catch-up cap without movement-position authority', () => {
+    expect(SELF_MOTION_MAIN_THREAD_STALL_MAX_MS).toBe(750);
+    const lab = new Lab(200, FRAME_MS, { start: { x: 0, z: -1000 }, serverDeaf: true });
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    const before = lab.frame().pose;
+    if (!before) throw new Error('predictor disabled unexpectedly');
+
+    const after = lab.frame(2000).pose;
+    if (!after) throw new Error('predictor disabled unexpectedly');
+    const advance = after.z - before.z;
+    expect(advance).toBeGreaterThan(RUN_SPEED * 0.7);
+    expect(advance).toBeLessThanOrEqual(
+      RUN_SPEED * (SELF_MOTION_MAIN_THREAD_STALL_MAX_MS / 1000) + 1e-6,
+    );
+  });
+
+  it('rebases a brief validator reset without interrupting held forward movement', () => {
+    const lab = new Lab(200, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.jitterMs = 50;
+    lab.setPositionAuthoritySignal(true);
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+
+    lab.shiftServerPosition(-3);
+    for (let i = 0; i < 3; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+
+    lab.setPositionAuthoritySignal(false);
+    for (let i = 0; i < 4; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `reset frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+
+    lab.setPositionAuthoritySignal(true);
+    for (let i = 0; i < 12; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `recovery frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('keeps validated-authority movement continuous at sustained low client FPS', () => {
+    const lowFpsFrameMs = 125;
+    const lab = new Lab(200, lowFpsFrameMs, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+      positionAuthority: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 30; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+
+    for (let i = 0; i < 60; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      const speed = (pose.z - previous.z) / (lowFpsFrameMs / 1000);
+      expect(speed, `frame ${i}`).toBeGreaterThanOrEqual(RUN_SPEED * 0.9);
+      expect(speed, `frame ${i}`).toBeLessThanOrEqual(RUN_SPEED * 1.1);
       previous = pose;
     }
   });

@@ -4,12 +4,36 @@ import {
   bufferMovementFrame,
   type MovementTimelineSession,
 } from '../server/movement_input_timeline';
+import { applyMovementPositionSample } from '../server/movement_position';
 import { ONLINE_MOVEMENT_INPUT_BUFFER_MS } from '../src/sim/movement_timing';
 import { Sim } from '../src/sim/sim';
 import { emptyMoveInput } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 describe('online movement input timeline', () => {
+  it('invalidates position authority when the buffered timeline overflows', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
+    const session: MovementTimelineSession = { pid: sim.player.id };
+    const input = { ...emptyMoveInput(), forward: true };
+    const start = { x: sim.player.pos.x, z: sim.player.pos.z };
+    expect(applyMovementPositionSample(sim, session, start, 0, emptyMoveInput())).toBe(true);
+
+    for (let index = 0; index < 64; index++) {
+      expect(
+        bufferMovementFrame(sim, session, 1_000 + index * 50, input, 0, null, index + 1, start),
+      ).toBe(true);
+    }
+    expect(session.movementPositionState).not.toBeNull();
+
+    expect(bufferMovementFrame(sim, session, 100_000, input, 0, null, 65, start)).toBe(false);
+    expect(session.pendingMovementFrames).toEqual([]);
+    expect(session.movementTimeline).toBeNull();
+    expect(session.movementPositionDisabled).toBe(true);
+    expect(session.movementPositionState).toBeNull();
+    expect(applyMovementPositionSample(sim, session, start, 100_000, input)).toBe(false);
+    expect(session.movementPositionState).toBeNull();
+  });
+
   it('preserves client transition spacing when packet delivery jitters', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     const session: MovementTimelineSession = { pid: sim.player.id, lastInputSeq: 0 };

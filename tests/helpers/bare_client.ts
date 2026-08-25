@@ -54,6 +54,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.ownPlayerClass = playerClass;
   c.spectating = null;
   c.moveInput = emptyMoveInput();
+  c.movementPositionAuthority = false;
   c.known = [];
   c.realm = '';
   c.inventory = [];

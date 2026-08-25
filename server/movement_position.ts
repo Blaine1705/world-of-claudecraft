@@ -20,8 +20,10 @@ import {
 const MOVEMENT_POSITION_INITIAL_TOLERANCE_YD = 0.1;
 const MOVEMENT_POSITION_COMPLETED_ENDPOINT_TOLERANCE_YD = 1e-6;
 const MOVEMENT_POSITION_PATH_CREDIT_YD = 0.05;
+const MOVEMENT_POSITION_RENDER_PHASE_CREDIT_SECONDS = 1 / 30;
 const MOVEMENT_POSITION_AUTHORITY_WINDOW_SECONDS = 0.2;
-const MOVEMENT_POSITION_MAX_SAMPLE_GAP_SECONDS = 0.5;
+const MOVEMENT_POSITION_AUTHORITY_PHASE_SECONDS = 1 / 60;
+const MOVEMENT_POSITION_MAX_SAMPLE_GAP_SECONDS = 0.75;
 const airVelocity = { vx: 0, vz: 0 };
 
 export interface MovementPositionSample {
@@ -30,6 +32,7 @@ export interface MovementPositionSample {
 }
 
 export interface MovementPositionState extends MovementPositionSample {
+  authorityActive: boolean;
   airVelocityTracked: boolean;
   airVx: number;
   airVz: number;
@@ -40,12 +43,15 @@ export interface MovementPositionState extends MovementPositionSample {
   lastDirectionZ: number;
   lastCompletedSegmentTick: number;
   pathCreditYd: number;
+  renderPhaseCreditYd: number;
+  renderPhaseCreditArmed: boolean;
   serverY: number;
   suspendedAirborne: boolean;
 }
 
 export interface MovementPositionSession {
   pid: number;
+  movementPositionDisabled?: boolean;
   movementPositionState?: MovementPositionState | null;
 }
 
@@ -186,6 +192,35 @@ function authorizedMovementSpeed(sim: Sim, entity: Entity, input: MoveInput): nu
   return RUN_SPEED * sim.moveSpeedMult(entity) * backpedalMultiplier * wadeSpeedMult(feetDepth);
 }
 
+function maximumRenderPhaseCreditYd(speed: number): number {
+  return speed * MOVEMENT_POSITION_RENDER_PHASE_CREDIT_SECONDS;
+}
+
+function nextPathCredit(
+  state: MovementPositionState,
+  availableDistance: number,
+  sampleDistance: number,
+  maximumRenderPhaseCreditYd: number,
+  moving: boolean,
+): Pick<MovementPositionState, 'pathCreditYd' | 'renderPhaseCreditYd' | 'renderPhaseCreditArmed'> {
+  const renderPhaseCreditArmed = state.renderPhaseCreditArmed || moving;
+  const newlyArmedCreditYd =
+    !state.renderPhaseCreditArmed && moving ? maximumRenderPhaseCreditYd : 0;
+  const remainingCreditYd = Math.max(
+    0,
+    Math.min(
+      MOVEMENT_POSITION_PATH_CREDIT_YD + maximumRenderPhaseCreditYd,
+      availableDistance - sampleDistance + newlyArmedCreditYd,
+    ),
+  );
+  const pathCreditYd = Math.min(MOVEMENT_POSITION_PATH_CREDIT_YD, remainingCreditYd);
+  return {
+    pathCreditYd,
+    renderPhaseCreditYd: remainingCreditYd - pathCreditYd,
+    renderPhaseCreditArmed,
+  };
+}
+
 export function applyMovementPositionSample(
   sim: Sim,
   session: MovementPositionSession,
@@ -193,14 +228,24 @@ export function applyMovementPositionSample(
   clientAtMs: number,
   input: MoveInput,
 ): boolean {
-  if (!sample || !Number.isFinite(clientAtMs)) return false;
+  if (session.movementPositionDisabled) return false;
+  const state = session.movementPositionState;
+  if (!sample || !Number.isFinite(clientAtMs)) {
+    if (state) state.authorityActive = false;
+    return false;
+  }
   const entity = sim.entities.get(session.pid);
   if (!entity || !canTrackMovementPosition(sim, entity)) {
     session.movementPositionState = null;
     return false;
   }
 
-  const state = session.movementPositionState;
+  if (!entity.onGround && state) state.authorityActive = false;
+  const repeatsLastSample =
+    state && Math.hypot(sample.x - state.x, sample.z - state.z) <= Number.EPSILON;
+  if (repeatsLastSample && (entity.onGround || state.suspendedAirborne)) {
+    return false;
+  }
   if (!entity.onGround) {
     if (!state) {
       session.movementPositionState = null;
@@ -208,15 +253,23 @@ export function applyMovementPositionSample(
     }
     const elapsedSeconds = Math.max(0, (clientAtMs - state.clientAtMs) / 1000);
     const creditedSeconds = Math.min(elapsedSeconds, MOVEMENT_POSITION_MAX_SAMPLE_GAP_SECONDS);
+    const wishSpeed = authorizedMovementSpeed(sim, entity, input);
+    const initialVx = state.airVelocityTracked ? state.airVx : entity.vx;
+    const initialVz = state.airVelocityTracked ? state.airVz : entity.vz;
     const airMovement = expectedAirMovement(
       entity,
       input,
-      authorizedMovementSpeed(sim, entity, input),
+      wishSpeed,
       creditedSeconds,
-      state.airVelocityTracked ? state.airVx : entity.vx,
-      state.airVelocityTracked ? state.airVz : entity.vz,
+      initialVx,
+      initialVz,
     );
-    const availableDistance = state.pathCreditYd + airMovement.distance;
+    const maximumRenderCreditYd = maximumRenderPhaseCreditYd(
+      Math.max(wishSpeed, Math.hypot(initialVx, initialVz)),
+    );
+    const pathCreditYd =
+      state.pathCreditYd + Math.min(state.renderPhaseCreditYd, maximumRenderCreditYd);
+    const availableDistance = pathCreditYd + airMovement.distance;
     const sampleDistance = Math.hypot(sample.x - state.x, sample.z - state.z);
     const completedDirection =
       state.lastCompletedSegmentTick === sim.tickCount
@@ -250,9 +303,15 @@ export function applyMovementPositionSample(
       state.airVx = airMovement.vx;
       state.airVz = airMovement.vz;
     }
-    state.pathCreditYd = Math.max(
-      0,
-      Math.min(MOVEMENT_POSITION_PATH_CREDIT_YD, availableDistance - sampleDistance),
+    Object.assign(
+      state,
+      nextPathCredit(
+        state,
+        availableDistance,
+        sampleDistance,
+        maximumRenderCreditYd,
+        airMovement.distance > Number.EPSILON,
+      ),
     );
     state.suspendedAirborne = true;
     return false;
@@ -269,6 +328,7 @@ export function applyMovementPositionSample(
     }
     session.movementPositionState = {
       ...sample,
+      authorityActive: true,
       airVelocityTracked: false,
       airVx: entity.vx,
       airVz: entity.vz,
@@ -279,6 +339,8 @@ export function applyMovementPositionSample(
       lastDirectionZ: 0,
       lastCompletedSegmentTick: -1,
       pathCreditYd: MOVEMENT_POSITION_PATH_CREDIT_YD,
+      renderPhaseCreditYd: 0,
+      renderPhaseCreditArmed: false,
       serverY: endpointY,
       suspendedAirborne: false,
     };
@@ -289,12 +351,17 @@ export function applyMovementPositionSample(
   const elapsedSeconds = Math.max(0, (clientAtMs - state.clientAtMs) / 1000);
   const creditedSeconds = Math.min(elapsedSeconds, MOVEMENT_POSITION_MAX_SAMPLE_GAP_SECONDS);
   const maxSpeed = authorizedMovementSpeed(sim, entity, input);
-  const availableDistance = state.pathCreditYd + maxSpeed * creditedSeconds;
+  const maximumRenderCreditYd = maximumRenderPhaseCreditYd(maxSpeed);
+  const pathCreditYd =
+    state.pathCreditYd + Math.min(state.renderPhaseCreditYd, maximumRenderCreditYd);
+  const availableDistance = pathCreditYd + maxSpeed * creditedSeconds;
   const sampleDistance = Math.hypot(sample.x - state.x, sample.z - state.z);
   const authorityDistance = Math.hypot(sample.x - entity.pos.x, sample.z - entity.pos.z);
   const maxAuthorityDistance =
     MOVEMENT_POSITION_INITIAL_TOLERANCE_YD +
-    RUN_SPEED * sim.moveSpeedMult(entity) * MOVEMENT_POSITION_AUTHORITY_WINDOW_SECONDS;
+    RUN_SPEED *
+      sim.moveSpeedMult(entity) *
+      (MOVEMENT_POSITION_AUTHORITY_WINDOW_SECONDS + MOVEMENT_POSITION_AUTHORITY_PHASE_SECONDS);
   const pathStart = state.suspendedAirborne
     ? { ...entity.pos }
     : { x: state.x, y: state.serverY, z: state.z };
@@ -326,7 +393,7 @@ export function applyMovementPositionSample(
         sample,
         availableDistance,
         maxSpeed * creditedSeconds,
-        state.pathCreditYd,
+        pathCreditYd,
         input,
       );
   let usedCompletedSegment = false;
@@ -338,7 +405,7 @@ export function applyMovementPositionSample(
       sample,
       availableDistance,
       maxSpeed * creditedSeconds,
-      state.pathCreditYd,
+      pathCreditYd,
       input,
       completedDirection,
     );
@@ -350,11 +417,13 @@ export function applyMovementPositionSample(
     authorityDistance > maxAuthorityDistance ||
     endpointY === null
   ) {
+    state.authorityActive = false;
     return false;
   }
 
   session.movementPositionState = {
     ...sample,
+    authorityActive: true,
     airVelocityTracked: false,
     airVx: entity.vx,
     airVz: entity.vz,
@@ -367,9 +436,12 @@ export function applyMovementPositionSample(
       usedCompletedSegment || (state.suspendedAirborne && landingResidual && completedDirection)
         ? sim.tickCount
         : state.lastCompletedSegmentTick,
-    pathCreditYd: Math.max(
-      0,
-      Math.min(MOVEMENT_POSITION_PATH_CREDIT_YD, availableDistance - sampleDistance),
+    ...nextPathCredit(
+      state,
+      availableDistance,
+      sampleDistance,
+      maximumRenderCreditYd,
+      maxSpeed > 0,
     ),
     serverY: endpointY,
     suspendedAirborne: false,
@@ -379,5 +451,11 @@ export function applyMovementPositionSample(
 }
 
 export function resetMovementPosition(session: MovementPositionSession): void {
+  session.movementPositionDisabled = false;
+  session.movementPositionState = null;
+}
+
+export function disableMovementPosition(session: MovementPositionSession): void {
+  session.movementPositionDisabled = true;
   session.movementPositionState = null;
 }

@@ -28,6 +28,7 @@ import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosm
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { applyMovementPositionSample } from '../server/movement_position';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -45,7 +46,13 @@ import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  type Aura,
+  DT,
+  emptyMoveInput,
+  type PlayerClass,
+  type WorldContent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -1281,6 +1288,83 @@ describe('delta snapshots', () => {
     fc.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fc.sent).self.ack).toBe(7);
+  });
+
+  it('mirrors whether the server is actively validating the display-position stream', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    expect(
+      applyMovementPositionSample(
+        server.sim,
+        session,
+        { x: player.pos.x, z: player.pos.z },
+        0,
+        emptyMoveInput(),
+      ),
+    ).toBe(true);
+    broadcast(server);
+    const active = lastSnap(fc.sent);
+    expect(active.self.mpa).toBe(1);
+
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(active);
+    expect(client.movementPositionAuthority).toBe(true);
+
+    expect(
+      applyMovementPositionSample(
+        server.sim,
+        session,
+        { x: player.pos.x, z: player.pos.z },
+        50,
+        emptyMoveInput(),
+      ),
+    ).toBe(false);
+    fc.sent.length = 0;
+    broadcast(server);
+    const repeated = lastSnap(fc.sent);
+    expect(repeated.self.mpa).toBe(1);
+    (client as any).applySnapshot(repeated);
+    expect(client.movementPositionAuthority).toBe(true);
+
+    expect(
+      applyMovementPositionSample(
+        server.sim,
+        session,
+        { x: player.pos.x, z: player.pos.z + 3 },
+        100,
+        { ...emptyMoveInput(), forward: true },
+      ),
+    ).toBe(false);
+    fc.sent.length = 0;
+    broadcast(server);
+    const rejected = lastSnap(fc.sent);
+    expect(rejected.self.mpa).toBe(0);
+    (client as any).applySnapshot(rejected);
+    expect(client.movementPositionAuthority).toBe(false);
+  });
+
+  it('does not confuse the legacy pet auto-taunt key with movement authority', () => {
+    const client = bareClient(session.pid, { movementPositionAuthority: true });
+    const self = wireEntity(server.sim.entities.get(session.pid)!);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [], self: { ...self, pa: 1 } });
+
+    expect(client.movementPositionAuthority).toBe(false);
+  });
+
+  it('clears movement authority across transport disconnect and hello reset', () => {
+    const disconnected = bareClient(session.pid, {
+      movementPositionAuthority: true,
+      sessionEnded: true,
+    });
+    const rejoined = bareClient(session.pid, { movementPositionAuthority: true });
+
+    (disconnected as any).socketClosed();
+    (rejoined as any).onMessage(
+      JSON.stringify({ t: 'hello', pid: session.pid, seed: server.sim.cfg.seed }),
+    );
+
+    expect(disconnected.movementPositionAuthority).toBe(false);
+    expect(rejoined.movementPositionAuthority).toBe(false);
   });
 
   it('turns echoed input acks into client latency samples', () => {

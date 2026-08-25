@@ -265,6 +265,11 @@ failure, kept as stable English that `main.ts` re-localizes.
   pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
   An ordinary snapshot gap may spend only the unused portion of the same hard
   cap; it freezes at that horizon and re-adopts authority after a prolonged gap.
+  While the self snapshot reports an active validated grounded-position stream,
+  that stream replaces the grounded spatial servo and leash. The temporal gap
+  horizon remains active, and a validator reset restores the ordinary path.
+  Predictor catch-up after a blocked main thread is separately capped at 750 ms,
+  matching the server's stale held-input cutoff.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright when the player may turn)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`

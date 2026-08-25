@@ -4332,8 +4332,11 @@ async function startGame(
       return;
     }
     maybeWarmCurrentZone();
-    let frameDt = (now - last) / 1000;
+    const elapsedFrameDt = (now - last) / 1000;
+    let frameDt = elapsedFrameDt;
     last = now;
+    // The display predictor owns its longer network horizon; the rest of the
+    // frame loop keeps the existing simulation/render catch-up clamp.
     if (frameDt > 0.25) frameDt = 0.25;
     // Not sampling a renderless frame reproduces the web hidden-tab shape (rAF
     // pauses there, so hidden frames never reach the sampler, and the reporter
@@ -4728,11 +4731,12 @@ async function startGame(
             // authoritative pull-up and show the correction as a stutter.
             pe.climbing !== true,
           resolved.mi,
+          net.movementPositionAuthority,
           netFacing ?? interpServerFacing,
           onlineInputEchoMs,
           onlineJitterMs,
           alpha,
-          frameDt,
+          elapsedFrameDt,
           Math.max(0, cameraLastSnapAge),
           net.snapInterval,
         );

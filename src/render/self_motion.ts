@@ -36,6 +36,9 @@
 //     isolation excludes steady low fps, where every frame is long and nothing
 //     is hitching. A NETWORK gap may advance only through the unused portion of
 //     the same hard prediction horizon; it freezes once that horizon is spent.
+//     An active validated grounded-position stream replaces the spatial servo
+//     and leash. The temporal horizon still freezes on a network gap, and a
+//     validator reset restores ordinary reconciliation on the next snapshot.
 //  3. Invisible to logic: the output feeds only the renderer's
 //     selfRenderPosition (mesh + camera). It never writes into ClientWorld
 //     mirrored state or IWorld reads. The network layer may send the displayed
@@ -79,6 +82,10 @@ import {
 export const SELF_MOTION_CAP_MIN_MS = 60;
 export const SELF_MOTION_CAP_MAX_MS = 1500;
 export const SELF_MOTION_BOOTSTRAP_CAP_MS = 1000;
+// A blocked main thread cannot refresh the held-input stream. Keep one-frame
+// catch-up inside the server's 750 ms stale-input cutoff even when the wider
+// network prediction horizon would otherwise permit more display travel.
+export const SELF_MOTION_MAIN_THREAD_STALL_MAX_MS = 750;
 // The divergence MEASUREMENT is aligned to the true echo, bounded only by
 // what the history ring can serve. This is a different bound from the lead
 // cap above on purpose: capping the measurement at 180ms on a 280ms link
@@ -104,7 +111,7 @@ const LEASH_SLACK_YD = 0.05;
 // Same teleport rule the renderer's self smoother uses (6 yd).
 export const SELF_MOTION_SNAP_DIST_SQ = 6 * 6;
 export const SELF_MOTION_PREDICTOR_VERTICAL_SNAP_YD = 6;
-const MAX_FRAME_DT = 0.25; // matches the main-loop frame clamp
+const MAX_PREDICTOR_FRAME_DT = SELF_MOTION_MAIN_THREAD_STALL_MAX_MS / 1000;
 // The block episode (see the header): how long a hitch may keep lending leash
 // room. It must outlast the browser's post-block catch-up frames with room to
 // spare, and it must END, because a real network stall starting right after a
@@ -130,6 +137,8 @@ export interface SelfMotionFrame {
   enabled: boolean;
   /** This frame's resolved held intent (click-move folded in, jump included). */
   moveInput: MoveInput;
+  /** The server is actively validating the streamed grounded display XZ. */
+  movementPositionAuthority?: boolean;
   /** The one display heading: mouselook/click-move facing, else the local keyboard turn, else the interpolated server facing. */
   displayFacing: number;
   echoMs: number;
@@ -241,6 +250,9 @@ export class SelfMotionPredictor {
   private networkGapWasActive = false;
   private networkGapSettleMs = 0;
   private networkGapAllowanceYd = 0;
+  private movementPositionAuthorityWasActive = false;
+  private authorityHandoffHoldMs = 0;
+  private authorityHandoffAllowanceYd = 0;
   private readonly history = createTrajectoryHistory(HISTORY_SIZE);
   private readonly reconciliation = createSelfReconciliation();
   private readonly residual: TrajectoryResidual = {
@@ -310,6 +322,9 @@ export class SelfMotionPredictor {
     this.networkGapWasActive = false;
     this.networkGapSettleMs = 0;
     this.networkGapAllowanceYd = 0;
+    this.movementPositionAuthorityWasActive = false;
+    this.authorityHandoffHoldMs = 0;
+    this.authorityHandoffAllowanceYd = 0;
   }
 
   private recordHistory(x: number, y: number, z: number): void {
@@ -356,7 +371,7 @@ export class SelfMotionPredictor {
       this.reset();
       return null;
     }
-    const dt = clamp(frame.frameDt, 0, MAX_FRAME_DT);
+    const dt = clamp(frame.frameDt, 0, MAX_PREDICTOR_FRAME_DT);
     this.timeMs += dt * 1000;
     // The authoritative anchor. Alpha is capped at 1 (unlike the renderer's
     // 1.25 display extrapolation): an extrapolated anchor overshoots every
@@ -369,8 +384,18 @@ export class SelfMotionPredictor {
     const wireDx = self.pos.x - this.lastWireX;
     const wireDy = self.pos.y - this.lastWireY;
     const wireDz = self.pos.z - this.lastWireZ;
+    const validatedWireMotion =
+      frame.movementPositionAuthority === true &&
+      self.onGround &&
+      (frame.moveInput.forward ||
+        frame.moveInput.back ||
+        frame.moveInput.strafeLeft ||
+        frame.moveInput.strafeRight ||
+        frame.moveInput.dive ||
+        frame.moveInput.surface);
     const rawWireDiscontinuity =
       this.wirePositionReady &&
+      !validatedWireMotion &&
       wireDx * wireDx + wireDy * wireDy + wireDz * wireDz > SELF_MOTION_SNAP_DIST_SQ;
     this.lastWireX = self.pos.x;
     this.lastWireY = self.pos.y;
@@ -434,6 +459,9 @@ export class SelfMotionPredictor {
       this.networkGapAllowanceYd = 0;
       this.networkGapWasActive = false;
       this.networkGapSettleMs = 0;
+      this.movementPositionAuthorityWasActive = false;
+      this.authorityHandoffHoldMs = 0;
+      this.authorityHandoffAllowanceYd = 0;
       // The old display trajectory is meaningless relative to the new anchor
       // (teleport / life-state flip); comparing against it would fling the pose.
       resetTrajectoryHistory(this.history);
@@ -553,6 +581,18 @@ export class SelfMotionPredictor {
     }
     this.lastMoveMask = moveMask;
     const translationalInput = moveMask !== 0;
+    const validatedGroundAuthority =
+      frame.movementPositionAuthority === true && translationalInput && actor.onGround;
+    const authorityLostDuringGroundMove =
+      this.movementPositionAuthorityWasActive &&
+      frame.movementPositionAuthority !== true &&
+      translationalInput &&
+      actor.onGround;
+    this.movementPositionAuthorityWasActive = frame.movementPositionAuthority === true;
+    if (validatedGroundAuthority) {
+      this.authorityHandoffHoldMs = 0;
+      this.authorityHandoffAllowanceYd = 0;
+    }
     // A blocked step needs NO special handling, and must never get any. The
     // kernel runs the same swept static collision as the server, so when the
     // display stops at a wall it is already RIGHT and the authoritative anchor
@@ -567,7 +607,7 @@ export class SelfMotionPredictor {
     const canAdvance = (!networkGapExpired || blockedFrame) && !bootstrapExpired;
     if (canAdvance) {
       if (!this.segmentPrimed) this.primeSegment(actor, inp, frame.displayFacing);
-      this.acc = Math.min(this.acc + dt, MAX_FRAME_DT);
+      this.acc += dt;
       while (this.acc >= DT) {
         this.acc -= DT;
         this.primeSegment(actor, inp, frame.displayFacing);
@@ -576,6 +616,23 @@ export class SelfMotionPredictor {
     const frac = this.segmentPrimed ? this.acc / DT : 0;
 
     const runSpeed = RUN_SPEED * moveSpeedMult(actor, 0);
+    if (authorityLostDuringGroundMove) {
+      resetTrajectoryHistory(this.history);
+      resetSelfReconciliation(this.reconciliation);
+      const handoffX = actor.prevPos.x + (actor.pos.x - actor.prevPos.x) * frac;
+      const handoffY = actor.prevPos.y + (actor.pos.y - actor.prevPos.y) * frac;
+      const handoffZ = actor.prevPos.z + (actor.pos.z - actor.prevPos.z) * frac;
+      this.recordHistory(handoffX, handoffY, handoffZ);
+      this.authorityHandoffHoldMs = capMs + snapIntervalMs;
+      const handoffLead = Math.hypot(actor.pos.x - ax, actor.pos.z - az);
+      const handoffBaseBudget = (runSpeed * capMs) / 1000 + LEASH_SLACK_YD;
+      this.authorityHandoffAllowanceYd = Math.max(
+        this.authorityHandoffAllowanceYd,
+        handoffLead - handoffBaseBudget,
+      );
+    } else {
+      this.authorityHandoffHoldMs = Math.max(0, this.authorityHandoffHoldMs - frameDtMs);
+    }
     // The local block episode (rationale: the header's Bounded exception).
     // An ISOLATED long frame is the trigger, staleness not required: in the
     // deliver-before ordering there is no staleness to see. Isolation is what
@@ -588,7 +645,7 @@ export class SelfMotionPredictor {
       // the first anchor the servo can trust as an independent reading is one
       // interval past the sweep. Resuming inside that window reads the sweep
       // as divergence, which is the rush half of the original artifact.
-      this.servoHoldMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
+      this.servoHoldMs = Math.max(this.servoHoldMs, SERVO_SETTLE_INTERVALS * snapIntervalMs);
     } else {
       this.servoHoldMs = Math.max(0, this.servoHoldMs - frameDtMs);
     }
@@ -617,6 +674,7 @@ export class SelfMotionPredictor {
       !networkGapActive &&
       !blockedFrame &&
       !staleWithLoan &&
+      this.authorityHandoffHoldMs <= 0 &&
       this.servoHoldMs <= 0;
     if (!servoActive) resetSelfReconciliationBoundary(this.reconciliation);
 
@@ -664,7 +722,7 @@ export class SelfMotionPredictor {
           dt,
           this.correction,
         );
-      } else if (translationalInput || !actor.onGround) {
+      } else if ((translationalInput || !actor.onGround) && !validatedGroundAuthority) {
         boundedReconciliationCorrectionInto(
           this.residual.x,
           this.residual.y,
@@ -716,8 +774,9 @@ export class SelfMotionPredictor {
       }
     }
 
-    // Horizontal leash: never show the player farther from the authoritative
-    // anchor than they could legitimately RUN inside the latency cap (the
+    // Horizontal leash: outside an active validated grounded stream, never
+    // show the player farther from the authoritative anchor than they could
+    // legitimately RUN inside the latency cap (the
     // kernel itself moves slower while backpedaling/swimming, so the run
     // budget is the honest upper bound; only corrections consume the slack).
     // Vertical is exempt (a jump apex must not be leash-clipped; gravity
@@ -741,6 +800,23 @@ export class SelfMotionPredictor {
         Math.min(
           this.networkGapAllowanceYd,
           Math.max(elen - baseBudget, this.networkGapAllowanceYd - runSpeed * dt),
+        ),
+      );
+    }
+    if (this.authorityHandoffHoldMs > 0) {
+      this.authorityHandoffAllowanceYd = Math.max(
+        this.authorityHandoffAllowanceYd,
+        elen - baseBudget - this.networkGapAllowanceYd - this.staleAllowanceYd,
+      );
+    } else if (!blockedFrame && this.servoHoldMs <= 0) {
+      this.authorityHandoffAllowanceYd = Math.max(
+        0,
+        Math.min(
+          this.authorityHandoffAllowanceYd,
+          Math.max(
+            elen - baseBudget - this.networkGapAllowanceYd - this.staleAllowanceYd,
+            this.authorityHandoffAllowanceYd - runSpeed * dt,
+          ),
         ),
       );
     }
@@ -771,8 +847,12 @@ export class SelfMotionPredictor {
         ),
       );
     }
-    const budget = baseBudget + this.networkGapAllowanceYd + this.staleAllowanceYd;
-    if (elen > budget) {
+    const budget =
+      baseBudget +
+      this.networkGapAllowanceYd +
+      this.staleAllowanceYd +
+      this.authorityHandoffAllowanceYd;
+    if (elen > budget && !validatedGroundAuthority) {
       // Clamp pos ONLY (unlike the correction blend above): prevPos keeps the
       // last displayed point, so the sub-frame interpolation glides onto the
       // boundary instead of stepping back. When the RTT exceeds the lead cap

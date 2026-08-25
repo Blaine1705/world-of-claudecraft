@@ -8968,6 +8968,12 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
+      mpa:
+        !session.spectating &&
+        p.onGround &&
+        anchorSession.movementPositionState?.authorityActive === true
+          ? 1
+          : 0,
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default

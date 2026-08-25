@@ -5,9 +5,11 @@ import type { Sim } from '../src/sim/sim';
 import type { MoveInput } from '../src/sim/types';
 import {
   applyMovementPositionSample,
+  disableMovementPosition,
   type MovementPositionSample,
   type MovementPositionSession,
   parseMovementPositionSample,
+  resetMovementPosition,
 } from './movement_position';
 import {
   beginMovementStop,
@@ -59,6 +61,7 @@ export function bufferMovementFrame(
   if (pending.length >= MAX_BUFFERED_MOVEMENT_FRAMES) {
     pending.length = 0;
     session.movementTimeline = null;
+    disableMovementPosition(session);
     return false;
   }
 
@@ -144,4 +147,5 @@ export function applyBufferedMovementFrames(
 export function resetMovementTimeline(session: MovementTimelineSession): void {
   session.pendingMovementFrames = [];
   session.movementTimeline = null;
+  resetMovementPosition(session);
 }

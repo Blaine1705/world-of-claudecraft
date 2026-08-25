@@ -41,7 +41,10 @@ here so the survey is not read as the as-built spec:
   `src/render/self_motion.ts`. A long render frame remains a bounded exception:
   the leash lends the block's own ground and reconciliation sits out the resume
   sweep, pinned by `describe('long render frames')` in
-  `tests/self_motion.test.ts`.
+  `tests/self_motion.test.ts`. While the server reports an active validated
+  grounded-position stream, that stream replaces the grounded spatial servo
+  and leash. The temporal prediction horizon still freezes on a network gap,
+  and a validator reset restores ordinary reconciliation on the next snapshot.
 - **The extrapolation cap is 1500 ms**, supporting healthy 1000 ms input echo
   plus bounded jitter without riding the leash. A fresh session gets a bounded
   1000 ms optimistic display budget until its first credible input echo; the
@@ -60,7 +63,14 @@ here so the survey is not read as the as-built spec:
   a bounded client-lead segment. That reachability check includes terrain
   slopes, collision sliding, step-up, and prop-edge slope glue. Deep-water entry
   stays server-owned on and off mounts; movement-speed credit includes the
-  entity's active speed modifiers, mount, backpedal, and wading state. It never
+  entity's active speed modifiers, mount, backpedal, and wading state. Repeated
+  cached poses from a low-FPS client do not spend elapsed movement time. A small
+  speed-scaled reserve absorbs the two render phases around an input-timer
+  crossover, then depletes with use, so it cannot fund sustained overspeed.
+  Sustained low FPS retains its real elapsed movement budget. An isolated
+  blocked-main-thread frame catches up at normal speed for at most 750 ms,
+  matching both the validator's maximum sample gap and the server's stale-input
+  cutoff; longer freezes cannot imply input the client stopped sending. It never
   adopts an airborne sample. Instead, an established jump or walk-off stream
   validates each airborne XZ increment against elapsed ground-speed credit and
   a cumulative authoritative-direction envelope without moving server
