@@ -463,11 +463,23 @@ export function claimDelveRun(
   run.seed = ctx.rng.int(1, 0x7fffffff);
   run.tierId = tierId;
   // §7.6, roll Bountiful once at run start (Heroic 20% / Normal 8%; raised 4x
-  // from the original 5%/2% launch tuning, issue: chase epics were landing
-  // near 1-in-700 per heroic clear once compounded with the epic roll below,
-  // see drownedLitanyChestItemsForTier). Derived from run.seed in its own
-  // stream (like affixes/modules) so it is deterministic without perturbing
-  // the global rng draw order that the chest loot depends on.
+  // from the original 5%/2% launch tuning). This roll is DELVE-AGNOSTIC (keyed
+  // only on tierId, not delveId), so the bump applies to every delve sharing
+  // it, currently both the Collapsed Reliquary and The Drowned Litany, not
+  // Drowned Litany alone: deliberate, to keep one canonical roll rather than
+  // forking it per delve, and because Collapsed Reliquary's own Bountiful
+  // Coffer (higher item-level ceiling, docs/prd/DELVE_HANDOFF.md §7.7) was
+  // equally under-tuned. The motivating report was Drowned Litany's chase
+  // epics landing near 1-in-700 per heroic clear once compounded with the
+  // epic roll below (see drownedLitanyChestItemsForTier). Derived from
+  // run.seed in its own stream (like affixes/modules): the ROLL ITSELF never
+  // consumes a global ctx.rng draw. What happens downstream still depends on
+  // the delve's own chest-loot function: drownedLitanyChestItemsForTier below
+  // draws a fixed 2 global draws on every branch, so the Litany draw order is
+  // rng-stable across the bountiful flip; the sibling delveChestItemsForTier
+  // (lockpick_tiers.ts, Collapsed Reliquary) draws a variable count per
+  // branch instead, a pre-existing asymmetry this bump exercises 4x more
+  // often but does not introduce.
   run.bountiful = new Rng((run.seed ^ 0x600dc0ff) >>> 0).chance(tierId === 'heroic' ? 0.2 : 0.08);
   run.affixes = rollDelveAffixes(delve, tierId, run.seed);
   run.modules = pickDelveModules(delve, run.seed, tierId);

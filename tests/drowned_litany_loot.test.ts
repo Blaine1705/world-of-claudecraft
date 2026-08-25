@@ -15,8 +15,13 @@ function rngAt(drawValue: number): Rng {
 
 describe('Drowned Reliquary Rite loot: bountiful epic roll', () => {
   // Bountiful always grants the uncommon (draw 1) and rare (unconditional);
-  // only the epic is gated on draw 2. `tier` is ignored on the bountiful arm,
-  // so 'low' pins that a tries-exhausted Bountiful Coffer still rolls it.
+  // only the epic is gated on draw 2. `tier` is ignored on the bountiful arm
+  // in the CURRENT implementation (a separate, pre-existing question from
+  // this rate change: unlike the Collapsed Reliquary's lockpick coffer,
+  // which requires an actual solve, the Drowned Litany rite's coffer check
+  // in drowned_litany_rite.ts carries no such gate, so a tries-exhausted
+  // 'low' grant still rolls it). Passing 'low' here pins that CURRENT
+  // contract of the function under test, not an endorsement of it.
   const epicId = (drawValue: number) =>
     drownedLitanyChestItemsForTier('low', 'warrior', rngAt(drawValue), true).find(
       (s) => s.itemId === 'blackwater_vanguard_chest',

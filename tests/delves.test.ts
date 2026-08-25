@@ -3776,18 +3776,33 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
   }
 
   it('rolls Bountiful at the raised rate (Heroic 5%→20%, Normal 2%→8%)', () => {
-    const rollFor = (seed: number, tier: 'normal' | 'heroic') => {
+    // Read the real run.seed a live delve entry produces, then re-derive the
+    // Bountiful roll straight from claimDelveRun's own formula against BOTH
+    // the retired and the live odds. This is deliberately decoupled from the
+    // exact global rng draw count preceding claimDelveRun (unlike asserting
+    // run.bountiful after the full Sim/enterDelve pipeline, which would
+    // silently start failing for the wrong reason the day an unrelated
+    // earlier draw shifts run.seed): only claimDelveRun's own p values are
+    // under test here. The roll is delve-agnostic (keyed on tierId only), so
+    // this pins the one shared formula regardless of which delve calls it.
+    const runSeedFor = (seed: number, tier: 'normal' | 'heroic') => {
       const s = makeSim('warrior', seed);
       enterLitany(s, tier);
-      return s.delveRunForPlayer(s.playerId)?.bountiful;
+      return s.delveRunForPlayer(s.playerId)!.seed;
     };
-    // Both seeds were found by brute-force search over the real formula in
-    // claimDelveRun: each is a MISS under the retired 5%/2% odds and a HIT
-    // under the live 20%/8% ones, so this proves the roll rate itself moved
-    // (the chase epics were landing near 1-in-700 per heroic clear before
-    // this bump, see the epic-in-bountiful roll in drowned_litany_loot.ts).
-    expect(rollFor(1, 'heroic')).toBe(true);
-    expect(rollFor(53, 'normal')).toBe(true);
+    const rolls = (runSeed: number, p: number) => new Rng((runSeed ^ 0x600dc0ff) >>> 0).chance(p);
+
+    // Both top-level seeds were found by brute-force search: each produces a
+    // run.seed that MISSES under the retired 5%/2% odds and HITS under the
+    // live 20%/8% ones (the chase epics were landing near 1-in-700 per
+    // heroic clear before this bump, see drowned_litany_loot.ts).
+    const heroicSeed = runSeedFor(1, 'heroic');
+    expect(rolls(heroicSeed, 0.05)).toBe(false);
+    expect(rolls(heroicSeed, 0.2)).toBe(true);
+
+    const normalSeed = runSeedFor(53, 'normal');
+    expect(rolls(normalSeed, 0.02)).toBe(false);
+    expect(rolls(normalSeed, 0.08)).toBe(true);
   });
 
   it('rejects a rite difficulty commit from a player away from the reliquary', () => {
