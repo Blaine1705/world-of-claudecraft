@@ -365,8 +365,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               const landing = consumeHealAbsorb(ctx, src, intended);
               const absorbed = intended - landing;
               const healed = Math.min(landing, src.maxHp - src.hp);
-              if (healed > 0) {
-                src.hp += healed;
+              if (healed > 0 || absorbed > 0) {
+                if (healed > 0) src.hp += healed;
                 const overheal = landing - healed;
                 ctx.emit({
                   type: 'heal2',
@@ -378,7 +378,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
                   ...(absorbed > 0 ? { absorbed } : {}),
                   ...(overheal > 0 ? { overheal } : {}),
                 });
-                ctx.healingThreat(src, src, healed);
+                if (healed > 0) ctx.healingThreat(src, src, healed);
               }
             }
           }
@@ -388,8 +388,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           const landing = consumeHealAbsorb(ctx, e, intended);
           const absorbed = intended - landing;
           const healed = Math.min(landing, e.maxHp - e.hp);
-          if (healed > 0) {
-            e.hp += healed;
+          if (healed > 0 || absorbed > 0) {
+            if (healed > 0) e.hp += healed;
             const overheal = landing - healed;
             ctx.emit({
               type: 'heal2',
@@ -404,7 +404,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
               ...(overheal > 0 ? { overheal } : {}),
             });
             const src = ctx.entities.get(a.sourceId);
-            if (src) ctx.healingThreat(src, e, healed);
+            if (src && healed > 0) ctx.healingThreat(src, e, healed);
           }
         } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
           e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));

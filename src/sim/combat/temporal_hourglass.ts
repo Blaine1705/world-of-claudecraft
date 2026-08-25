@@ -50,9 +50,9 @@ export function tickTemporalHourglassHealing(
   const landing = consumeHealAbsorb(ctx, target, intended);
   const absorbed = intended - landing;
   const healed = Math.min(landing, target.maxHp - target.hp);
-  if (healed <= 0) return;
+  if (healed <= 0 && absorbed <= 0) return;
 
-  target.hp += healed;
+  if (healed > 0) target.hp += healed;
   const overheal = landing - healed;
   ctx.emit({
     type: 'heal2',
@@ -65,7 +65,7 @@ export function tickTemporalHourglassHealing(
     ...(overheal > 0 ? { overheal } : {}),
   });
   const source = ctx.entities.get(aura.sourceId);
-  if (source) ctx.healingThreat(source, target, healed);
+  if (source && healed > 0) ctx.healingThreat(source, target, healed);
 }
 
 function applyProtectiveStasis(

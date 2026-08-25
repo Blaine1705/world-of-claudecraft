@@ -172,12 +172,19 @@ describe('heal-absorb vs periodic healing', () => {
     // The whole tick is devoured: the target stays exactly where it was.
     expect(mob.hp).toBe(500);
     expect(mob.auras.find((a) => a.kind === 'heal_absorb')!.value).toBe(20);
+    let heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({
+      hot: true,
+      abilityId: 'rejuvenation',
+      amount: 0,
+      absorbed: 100,
+    });
 
-    sim.drainEvents();
     updateAuras(sim.ctx, mob);
     // 20 left in the pool, so 80 of the 100 lands.
     expect(mob.hp).toBe(580);
-    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
     expect(heals).toHaveLength(1);
     expect(heals[0]).toMatchObject({
       hot: true,
@@ -224,6 +231,42 @@ describe('heal-absorb vs periodic healing', () => {
     expect(p.auras.some((a) => a.kind === 'heal_absorb')).toBe(false);
   });
 
+  it("emits absorbed feedback when a DoT leech self-heal is fully eaten", () => {
+    const sim = makeSim();
+    const p = sim.player;
+    p.maxHp = 1000;
+    p.hp = 500;
+    p.auras.push(shield(80));
+    const mob = spawnTarget(sim, 100000);
+    mob.auras.push({
+      id: 'leech_dot_test',
+      name: 'Siphon',
+      kind: 'dot',
+      remaining: 60,
+      duration: 60,
+      value: 100,
+      leechPct: 0.5,
+      tickInterval: DT,
+      sourceId: p.id,
+      school: 'shadow',
+    });
+
+    sim.drainEvents();
+    updateAuras(sim.ctx, mob);
+
+    expect(p.hp).toBe(500);
+    expect(p.auras.find((a) => a.kind === 'heal_absorb')!.value).toBe(30);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({
+      sourceId: p.id,
+      targetId: p.id,
+      ability: 'Siphon',
+      amount: 0,
+      absorbed: 50,
+    });
+  });
+
   it('applies both healingTakenMult and heal-absorb to Temporal Hourglass healing', () => {
     const sim = makeSim();
     const mob = spawnTarget(sim, 1000);
@@ -265,6 +308,41 @@ describe('heal-absorb vs periodic healing', () => {
     expect(heals[0]).toMatchObject({ amount: 20, absorbed: 30 });
     // The pool budget still drains by the PLANNED share, not the landed one.
     expect(mob.auras.find((a) => a.kind === 'stasis')!.temporalHealRemaining).toBe(100);
+  });
+
+  it('emits absorbed feedback when Temporal Hourglass healing is fully eaten', () => {
+    const sim = makeSim();
+    const mob = spawnTarget(sim, 1000);
+    mob.hp = 500;
+    mob.auras.push(
+      shield(100),
+      {
+        id: 'temporal_hourglass',
+        name: 'Temporal Hourglass',
+        kind: 'stasis',
+        remaining: 60,
+        duration: 60,
+        value: 1,
+        tickInterval: DT,
+        sourceId: -1,
+        school: 'arcane',
+        temporalHealRemaining: 100,
+        temporalHealTicksRemaining: 1,
+      } as Aura,
+    );
+
+    sim.drainEvents();
+    updateAuras(sim.ctx, mob);
+
+    expect(mob.hp).toBe(500);
+    expect(mob.auras.some((a) => a.kind === 'heal_absorb')).toBe(false);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal2');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({
+      ability: 'Temporal Hourglass',
+      amount: 0,
+      absorbed: 100,
+    });
   });
 
   it('leaves an unshielded HoT tick exactly as it was', () => {
