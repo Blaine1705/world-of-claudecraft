@@ -441,15 +441,29 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
 // Cluster 5: controller + the remaining interface toggles
 // ---------------------------------------------------------------------------
 describe('options_view: controller dispatch matrix (cluster 5)', () => {
-  it('lists the enable/invert toggles then the three controller sliders', () => {
+  it('lists the glyph family, enable, cross hotbar and invert controls then the sliders', () => {
     const controls = buildControllerControls(makeSource());
     expect(keysOf(controls)).toEqual([
+      'gamepadGlyphStyle',
       'gamepadEnabled',
+      'gamepadCrossHotbar',
+      'gamepadCrossHotbarExpand',
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
       'gamepadVibration',
     ]);
+    expect(find(controls, 'gamepadGlyphStyle')).toMatchObject({
+      control: 'choice',
+      current: 0,
+      rerender: false,
+      options: [
+        { value: 0, labelKey: 'hudChrome.controller.glyphStyleAuto' },
+        { value: 1, labelKey: 'hudChrome.controller.glyphStyleXbox' },
+        { value: 2, labelKey: 'hudChrome.controller.glyphStylePlayStation' },
+        { value: 3, labelKey: 'hudChrome.controller.glyphStyleNintendo' },
+      ],
+    });
     expect(find(controls, 'gamepadEnabled')).toMatchObject({ control: 'boolToggle' });
     // camera speed renders with a one-decimal readout, not a percent
     expect(find(controls, 'gamepadCameraSpeed')).toMatchObject({
@@ -468,7 +482,10 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
   it('extracts the setting key from every keyed control, in order, deduped', () => {
     const controls = buildControllerControls(makeSource());
     expect(optionsControlKeys(controls)).toEqual([
+      'gamepadGlyphStyle',
       'gamepadEnabled',
+      'gamepadCrossHotbar',
+      'gamepadCrossHotbarExpand',
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
@@ -520,6 +537,7 @@ const GENERAL_KEYS = [
   'showPlaytime',
   'showDailyRewardsChest',
   'showItemLevel',
+  'showReliquaryTracker',
   'showOwnNameplate',
   'showPlayerNameplates',
 ];

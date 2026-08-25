@@ -227,6 +227,22 @@ its affected set with the given paths themselves; the property is pinned by exec
 `tests/ci_shard_plan.test.ts`). The entry regenerates the generated artifacts once per
 job before spawning, since `npx vitest` has no npm lifecycle.
 
+**The real-SQL arm.** The shard gates and nightly's full suite each carry a per-job
+Postgres service and a job-level `TEST_DATABASE_URL`, so the pg integration suites
+(which skip green without the variable) actually run at the merge bar: the
+floor-resident ones on every PR, the `graph`-classified ones whenever selection reaches
+them and always in full mode. The wiring is pinned by a complete job classification in
+`tests/ci_workflow.test.ts` (every job key is pg-wired, guarded DB-less, or test-free)
+and guarded at runtime by `tests/ci_pg_presence.test.ts` (armed by the `WOCC_EXPECT_PG`
+sentinel riding the same pinned env block, plus `GITHUB_ACTIONS`; red wherever armed and
+the variable is missing; any diff that could lose the wiring forces full mode, where that
+suite always runs). Two asymmetries to know: a LOCAL
+`gate_select`/`gate` run sets no `TEST_DATABASE_URL` itself, so a green local gate
+proves less than CI unless you export it for the run; and the shard weight table
+predates the suites running in CI (the shared-database suites were harvested at their
+skipped cost and the branch-only suites are absent from it entirely), so the packing is
+approximate until the first post-wiring harvest lands.
+
 **The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
 `CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90
 seconds inside a full-mode shard, the chronomancy balance sweep among them, plus the
@@ -509,6 +525,7 @@ before reporting readiness.
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
+| GPU preparation | `render-performance-reviewer` | (not yet mirrored) |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
 | Content same-change obligations | `content-obligations-reviewer` | (not yet mirrored) |
 | Gate/CI selection integrity | `gate-integrity-reviewer` | (not yet mirrored) |
@@ -525,7 +542,12 @@ indexes, pool pressure, locks, timeout scope, write amplification, driver/depend
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
 Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
 serialization, cache seams, and retention for anything that grows (the seams in
-`server/CLAUDE.md` "Hot paths"). Dispatch every role whose set of risk applies.
+`server/CLAUDE.md` "Hot paths"). GPU-preparation review owns what the client asks the GPU to
+prepare and when: prewarm homes and twins, compile and reveal gates, program-key moves,
+post-boot lights, secondary GL contexts, the background queue and its admission budget, and
+the stand-in registry (the contract in `src/render/CLAUDE.md` "GPU work: every new producer is
+a client of the scheduler"), where frontend review keeps the presentation seams and tier
+fairness. Dispatch every role whose set of risk applies.
 
 ## Keep the gate current
 

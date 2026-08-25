@@ -305,7 +305,9 @@ export interface ActionBarView {
   tick(world: ActionBarWorldInput): ActionBarState;
 }
 
-function makeSlotState(): ActionBarSlotState {
+/** A blank slot state. Exported so another bar family can hold a fallback cell
+ *  for a position its layout does not fill. */
+export function makeSlotState(): ActionBarSlotState {
   return {
     kind: 'empty',
     abilityId: null,
@@ -380,7 +382,10 @@ function hasForbiddenReflection(
   return false;
 }
 
-function inventoryCount(
+/** How many of `itemId` the player is carrying, summed across stacks. Exported
+ *  because the consumables seat needs the same number for its tooltip's in-bags
+ *  line, off the same snapshot the bar state is built from. */
+export function inventoryCount(
   inventory: readonly { itemId: string; count: number }[],
   itemId: string,
 ): number {

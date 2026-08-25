@@ -15,6 +15,7 @@ import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
 } from './pbr_fragment_shader';
+import { markSharedMaterial } from './shared_resource';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -1962,6 +1963,11 @@ export interface SurfaceMatOpts {
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
+  /** PBR metalness map (high/ultra only; ignored on the Lambert tier). An
+   *  OPTION rather than a post-hoc write on the returned material: slot
+   *  presence is a program-cache-key input, so writing it onto a shared cache
+   *  entry relinks every material already drawing with it. */
+  metalnessMap?: THREE.Texture;
   /** baked AO map — needs uv2 on the geometry (high/ultra only) */
   aoMap?: THREE.Texture;
   roughness?: number;
@@ -2022,6 +2028,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     map: opts.map?.uuid,
     normalMap: opts.normalMap?.uuid,
     roughnessMap: opts.roughnessMap?.uuid,
+    metalnessMap: opts.metalnessMap?.uuid,
     aoMap: opts.aoMap?.uuid,
     std: GFX.standardMaterials,
   });
@@ -2034,6 +2041,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
+        metalnessMap: opts.metalnessMap ?? null,
         aoMap: opts.aoMap ?? null,
         roughness: opts.roughness ?? 0.85,
         metalness: opts.metalness ?? 0,
@@ -2056,6 +2064,13 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   // on tiers without a field): props and buildings at range must haze with
   // the ground under them or the effect reads as nothing.
   attachBiomeHaze(mat);
+  // Every material handed back from this cache is SHARED by construction: one
+  // instance is reused by every caller with the same key, process-wide. Marking
+  // it here is what keeps a per-root terminal owner (the interior resource
+  // registry, a view teardown) from claiming and disposing a material the rest
+  // of the world is still drawing with, and it is marked at the source rather
+  // than per consumer so a new caller cannot forget.
+  markSharedMaterial(mat);
   matCache.set(key, mat);
   return mat;
 }

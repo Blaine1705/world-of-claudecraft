@@ -111,14 +111,11 @@ vi.mock('../src/render/stations', () => ({
 vi.mock('../src/render/temporal_hourglass_visual', () => ({
   resetTemporalHourglassProfileCaches: mocks.reset,
 }));
-vi.mock('../src/render/vale_cup_ball', () => ({
-  resetValeCupBallProfileCaches: mocks.reset,
-}));
-vi.mock('../src/render/vale_cup_stadium', () => ({
-  resetValeCupStadiumProfileCaches: mocks.reset,
-}));
 vi.mock('../src/render/wildheart_terrain', () => ({
   resetWildheartTerrainProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/ground_decor_prewarm', () => ({
+  clearGroundDecorPrewarmDraws: mocks.reset,
 }));
 vi.mock('../src/render/gfx', async (importOriginal) => {
   const original = await importOriginal<typeof import('../src/render/gfx')>();
@@ -213,13 +210,12 @@ describe('graphics profile derived-cache reset', () => {
       'jail_scene',
       'cliff_scree',
       'door_portal',
-      'vale_cup_ball',
-      'vale_cup_stadium',
       'wildheart_terrain',
       'fireball_travel_visual',
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',
+      'ground_decor_prewarm',
     ]);
     expect(() => resetGraphicsProfileDerivedCaches()).not.toThrow();
     expect(mocks.reset).toHaveBeenCalledTimes(

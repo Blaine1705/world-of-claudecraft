@@ -38,7 +38,13 @@ import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
-import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
+import {
+  hydratePortraits,
+  isComposedPortraitKey,
+  modularLookFor,
+  onPortraitUpdate,
+  portraitChipHtml,
+} from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
@@ -167,6 +173,10 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderBags(): void;
   /** Refusal toast for a drop the socket will not take. */
   showError(text: string): void;
+  /** Whether the player's composed kit has a head piece to hide at all: some
+   *  class kits ship no head geometry (a helmless set, see ARMOR_BY_SET), and
+   *  the eye must not offer a toggle that can never change anything. */
+  helmSlotAvailable(): boolean;
   /** The paperdoll eye toggle's current state: is the composed kit helm hidden? */
   helmHidden(): boolean;
   /** Flip the helmet-visibility preference. HUD-owned side effects (wire
@@ -187,7 +197,9 @@ const SHARE_GLYPH =
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
 
-  constructor(private readonly deps: CharWindowDeps) {}
+  constructor(private readonly deps: CharWindowDeps) {
+    this.watchComposedPortrait();
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -215,6 +227,17 @@ export class CharWindow {
 
   renderIfOpen(): void {
     if (this.isOpen) this.render();
+  }
+
+  /** The title chip carries the player's own COMPOSED face, and that portrait
+   *  is captured off the frame that asks for it: a miss paints the class crest,
+   *  so the open sheet rebuilds once the real headshot lands. hydratePortraits
+   *  cannot upgrade this one in place (a look does not fit in the chip's data
+   *  attributes, which is why it is marked composed and skipped there). */
+  private watchComposedPortrait(): void {
+    onPortraitUpdate((_visualKey, _skin, key) => {
+      if (isComposedPortraitKey(key)) this.renderIfOpen();
+    });
   }
 
   render(): void {
@@ -413,7 +436,7 @@ export class CharWindow {
     // because that is where the player looks for "my helmet". State + side
     // effects are HUD-owned through deps (the wire command, the stored choice,
     // the portrait re-snapshot).
-    if (slot === 'helmet') {
+    if (slot === 'helmet' && this.deps.helmSlotAvailable()) {
       const hidden = this.deps.helmHidden();
       const labelKey = hidden
         ? 'hudChrome.paperdoll.showHelmAria'
