@@ -3,25 +3,33 @@ import { type InputTickFrame, InputTickSampler } from './input_tick_sampler';
 
 export interface MovementWireClient {
   movementWireVersion: 1 | 2;
-  onMovementWireNegotiated: ((version: 1 | 2) => void) | null;
+  onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null;
   onMovementWireNeutral: ((now: number) => boolean) | null;
   movementWireIsOpen(): boolean;
   sendMovementFrame(frame: InputTickFrame, now: number, bypassBackpressure?: boolean): boolean;
 }
 
 export class MovementWireGlue {
+  onFrame: ((frame: InputTickFrame) => void) | null = null;
+  onNegotiated: ((version: 1 | 2) => void) | null = null;
   private readonly sampler = new InputTickSampler();
   private paused = false;
 
-  connect(client: MovementWireClient): void {
-    client.onMovementWireNegotiated = (version) => this.negotiated(version);
-    client.onMovementWireNeutral = (now) => this.emitNeutralFrame(client, now);
-    this.negotiated(client.movementWireVersion);
+  get interpolationAlpha(): number {
+    return this.sampler.interpolationAlpha;
   }
 
-  negotiated(version: 1 | 2): void {
+  connect(client: MovementWireClient, now: number): void {
+    client.onMovementWireNegotiated = (version, negotiatedAt) =>
+      this.negotiated(version, negotiatedAt);
+    client.onMovementWireNeutral = (now) => this.emitNeutralFrame(client, now);
+    this.negotiated(client.movementWireVersion, now);
+  }
+
+  negotiated(version: 1 | 2, now: number): void {
+    this.onNegotiated?.(version);
     if (version !== 2) return;
-    this.sampler.reset();
+    this.sampler.reset(now);
     this.paused = false;
   }
 
@@ -31,9 +39,11 @@ export class MovementWireGlue {
 
   emitNeutralFrame(client: MovementWireClient, now: number): boolean {
     if (client.movementWireVersion !== 2 || !client.movementWireIsOpen()) return false;
-    const frame = this.sampler.emitNeutralFrame();
+    const frame = this.sampler.emitNeutralFrame(now);
     try {
-      return client.sendMovementFrame(frame, now, true);
+      const sent = client.sendMovementFrame(frame, now, true);
+      if (sent) this.onFrame?.(frame);
+      return sent;
     } finally {
       this.paused = true;
     }
@@ -41,14 +51,14 @@ export class MovementWireGlue {
 
   advance(
     client: MovementWireClient,
-    frameDtSec: number,
+    _frameDtSec: number,
     mi: MoveInput,
     facing: number | null,
     now: number,
   ): void {
     if (client.movementWireVersion !== 2 || this.paused || !client.movementWireIsOpen()) return;
-    for (const frame of this.sampler.advance(frameDtSec, () => ({ mi, facing }))) {
-      client.sendMovementFrame(frame, now);
+    for (const frame of this.sampler.advance(now, () => ({ mi, facing }))) {
+      if (client.sendMovementFrame(frame, now)) this.onFrame?.(frame);
     }
   }
 }

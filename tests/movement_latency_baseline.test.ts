@@ -26,6 +26,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import { MAX_SELF_REWIND_YD_PER_SEC } from '../src/render/self_render_position_core';
 import { DT, emptyMoveInput, type MoveInput, RUN_SPEED } from '../src/sim/types';
 import type { LatencyLinkConfig } from './helpers/latency_link';
 import {
@@ -34,6 +35,7 @@ import {
   runTwinServerTrajectory,
 } from './helpers/movement_ground_truth';
 import {
+  type CommandSample,
   computeMovementMetrics,
   type GroundTruthSample,
   MOVEMENT_FEEL_TARGETS,
@@ -113,14 +115,17 @@ const straightRun: RunScriptOptions = {
 
 /** Forward held while the heading sweeps 90 degrees, mouselook style. */
 const curvedSteering: RunScriptOptions = {
-  durationMs: RUN_MS,
-  script: [{ atMs: 0, mi: { forward: true }, facing: 0 }],
+  durationMs: RUN_MS + 1000,
+  script: [
+    { atMs: 0, mi: { forward: true }, facing: 0 },
+    { atMs: RUN_MS, mi: { forward: false } },
+  ],
   facingAt: (tMs) => (Math.PI / 4) * Math.sin((2 * Math.PI * tMs) / 2000),
 };
 
 /** Forward plus a strafe that flips every 500 ms. */
 const strafeWeave: RunScriptOptions = {
-  durationMs: RUN_MS,
+  durationMs: RUN_MS + 1000,
   script: (() => {
     const script: FrameScript = [{ atMs: 0, mi: { forward: true, strafeLeft: true }, facing: 0 }];
     const out = [...script];
@@ -130,17 +135,22 @@ const strafeWeave: RunScriptOptions = {
         mi: { strafeLeft: i % 2 === 0, strafeRight: i % 2 === 1 },
       });
     }
+    out.push({
+      atMs: RUN_MS,
+      mi: { forward: false, strafeLeft: false, strafeRight: false },
+    });
     return out;
   })(),
 };
 
 /** A jump taken mid-run, held for one input quantum. */
 const runWithJump: RunScriptOptions = {
-  durationMs: RUN_MS,
+  durationMs: RUN_MS + 1000,
   script: [
     { atMs: 0, mi: { forward: true }, facing: 0 },
     { atMs: 1500, mi: { jump: true } },
     { atMs: 1600, mi: { jump: false } },
+    { atMs: RUN_MS, mi: { forward: false } },
   ],
 };
 
@@ -193,6 +203,8 @@ interface BaselineRow {
   speedErrYdPerSec: number;
   speedDeltaYdPerSec: number;
   correctionEvents: number;
+  inputToAuthorityMaxMs: number;
+  inputToAuthorityMeanMs: number;
 }
 
 function rowOf(metrics: MovementMetrics): BaselineRow {
@@ -206,6 +218,8 @@ function rowOf(metrics: MovementMetrics): BaselineRow {
     speedErrYdPerSec: metrics.speedContinuity.maxSpeedErr,
     speedDeltaYdPerSec: metrics.speedContinuity.maxSpeedDelta,
     correctionEvents: metrics.correctionEvents.count,
+    inputToAuthorityMaxMs: metrics.inputToAuthorityMs.maxMs,
+    inputToAuthorityMeanMs: metrics.inputToAuthorityMs.meanMs,
   };
 }
 
@@ -238,12 +252,24 @@ const START_SAMPLE: GroundTruthSample = {
   z: COLLIDER_FREE_LANE.z,
 };
 
-function zeroLatencyTruth(poses: readonly Pose[]): GroundTruthSample[] {
-  return [START_SAMPLE, ...poses.map((pose, index) => ({ tick: index, x: pose.x, z: pose.z }))];
+function zeroLatencyTruth(
+  poses: readonly Pose[],
+  commands: readonly CommandSample[],
+): GroundTruthSample[] {
+  const sampledCommands = commands.filter(
+    (command): command is CommandSample & { ct: number } => command.ct !== undefined,
+  );
+  return [
+    START_SAMPLE,
+    ...poses.map((pose, tick) => ({ tick, x: pose.x, z: pose.z, ct: sampledCommands[tick]?.ct })),
+  ];
 }
 
 function authoritativeTruth(run: HarnessRun): GroundTruthSample[] {
-  return [START_SAMPLE, ...run.ticks.map((tick) => ({ tick: tick.tick, x: tick.x, z: tick.z }))];
+  return [
+    START_SAMPLE,
+    ...run.ticks.map((tick) => ({ tick: tick.tick, x: tick.x, z: tick.z, ct: tick.consumedCt })),
+  ];
 }
 
 function measure(
@@ -261,7 +287,7 @@ function measure(
       reference === 'zeroLatency'
         ? runTwinServerTrajectory({ script: run.tickScript, ticks: run.tickCount })
         : null;
-    const truth = twinPoses ? zeroLatencyTruth(twinPoses) : authoritativeTruth(run);
+    const truth = twinPoses ? zeroLatencyTruth(twinPoses, run.commands) : authoritativeTruth(run);
     const metrics = computeMovementMetrics(
       run.frames.map((frame) => ({ tMs: frame.tMs, x: frame.x, z: frame.z })),
       truth,
@@ -271,6 +297,7 @@ function measure(
       // period, and a silent default here would silently re-date every sample
       // if the metric's default ever moved.
       { tickMs: SERVER_TICK_MS, tickPhaseMs: SERVER_TICK_MS, ...metricOptions },
+      run.ticks,
     );
     return { run, truth, metrics, twinPoses };
   } finally {
@@ -283,7 +310,13 @@ const cellKey = (scenario: string, profile: string): string => `${scenario}/${pr
 
 // --- adversarial cells (all at 150 ms + 20 ms jitter) ---
 
+// There is no reconnect cell in this harness. LatencyLink.disconnect() is
+// deliberately one way, ClientWorld owns one fixed socket, and GameServer.join
+// owns one fixed session. A second harness would measure a fresh join rather
+// than the production reconnect path, so this suite does not claim that case.
+
 const ADVERSARIAL_PROFILE = link(150, 20);
+const STARVATION_PROFILE = link(300, 20);
 const STALL_AT_MS = 1500;
 const STALL_MS = 500;
 const CC_AT_MS = 1500;
@@ -291,6 +324,14 @@ const CC_AT_MS = 1500;
 const stallRun: RunScriptOptions = {
   durationMs: RUN_MS,
   script: [{ atMs: 0, mi: { forward: true }, facing: 0 }],
+};
+
+const overrideRun: RunScriptOptions = {
+  durationMs: RUN_MS + 1000,
+  script: [
+    { atMs: 0, mi: { forward: true }, facing: 0 },
+    { atMs: RUN_MS, mi: { forward: false } },
+  ],
 };
 
 function withStall(harness: OnlineHarness, options: RunScriptOptions): RunScriptOptions {
@@ -302,6 +343,20 @@ function withStall(harness: OnlineHarness, options: RunScriptOptions): RunScript
         // Head-of-line blocking on the downstream: every snapshot already in
         // flight is held too, which is what a congestion burst does.
         run: () => harness.link.stall('toClient', harness.clock.now() + STALL_MS),
+      },
+    ],
+  };
+}
+
+function withStarvationStall(harness: OnlineHarness, options: RunScriptOptions): RunScriptOptions {
+  return {
+    ...options,
+    actions: [
+      {
+        atMs: STALL_AT_MS,
+        // Beyond about 120 ms, the two-frame extrapolation budget is exhausted
+        // and leaves phase debt that makes the server end short. Follow-up work.
+        run: () => harness.link.stall('toServer', harness.clock.now() + 100),
       },
     ],
   };
@@ -335,6 +390,28 @@ function withServerAura(
   });
 }
 
+function withOverrideChurn(harness: OnlineHarness, options: RunScriptOptions): RunScriptOptions {
+  const applyStun = (id: string): void => {
+    harness.serverEntity.auras.push({
+      id,
+      name: 'Harness Churn Stun',
+      kind: 'stun',
+      remaining: 0.35,
+      duration: 0.35,
+      value: 0,
+      sourceId: harness.pid,
+      school: 'physical',
+    });
+  };
+  return {
+    ...options,
+    actions: [
+      { atMs: 600, run: () => applyStun('harness_churn_1') },
+      { atMs: 1800, run: () => applyStun('harness_churn_2') },
+    ],
+  };
+}
+
 beforeAll(() => {
   for (const scenario of SCENARIOS) {
     for (const profile of PROFILES) {
@@ -350,11 +427,19 @@ beforeAll(() => {
   );
   cells.set(
     'adv-stun/rtt150j20',
-    measure(ADVERSARIAL_PROFILE, stallRun, 'authoritative', withServerAura('stun', 0, 1)),
+    measure(ADVERSARIAL_PROFILE, overrideRun, 'authoritative', withServerAura('stun', 0, 1)),
   );
   cells.set(
     'adv-snare/rtt150j20',
-    measure(ADVERSARIAL_PROFILE, stallRun, 'authoritative', withServerAura('slow', 0.5, 1)),
+    measure(ADVERSARIAL_PROFILE, overrideRun, 'authoritative', withServerAura('slow', 0.5, 1)),
+  );
+  cells.set(
+    'adv-override-churn/rtt150j20',
+    measure(ADVERSARIAL_PROFILE, overrideRun, 'authoritative', withOverrideChurn),
+  );
+  cells.set(
+    'starvation-straight/rtt300j20',
+    measure(STARVATION_PROFILE, straightRun, 'zeroLatency', withStarvationStall),
   );
 }, 60_000);
 
@@ -377,12 +462,18 @@ function expectPinned(key: string, pinned: BaselineRow): void {
   expect(measured.progressTerminalYd).toBeCloseTo(pinned.progressTerminalYd, YD_DIGITS);
   expect(measured.speedErrYdPerSec).toBeCloseTo(pinned.speedErrYdPerSec, YD_DIGITS);
   expect(measured.speedDeltaYdPerSec).toBeCloseTo(pinned.speedDeltaYdPerSec, YD_DIGITS);
+  expect(measured.inputToAuthorityMaxMs).toBeCloseTo(pinned.inputToAuthorityMaxMs, YD_DIGITS);
+  expect(measured.inputToAuthorityMeanMs).toBeCloseTo(pinned.inputToAuthorityMeanMs, YD_DIGITS);
 }
 
 /** The cells scored against the crowd-control bar: the server is overriding the
  *  client's speed there, so the ordinary speed and correction targets would be
  *  asserting against correct behavior (see MOVEMENT_FEEL_TARGETS_CC). */
-const CC_TARGET_CELLS = new Set(['adv-stun/rtt150j20', 'adv-snare/rtt150j20']);
+const CC_TARGET_CELLS = new Set([
+  'adv-stun/rtt150j20',
+  'adv-snare/rtt150j20',
+  'adv-override-churn/rtt150j20',
+]);
 
 function expectTargets(key: string): void {
   const metrics = cell(key).metrics;
@@ -422,253 +513,325 @@ const BASELINE: Record<string, BaselineRow> = {
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.18961,
-    progressTerminalYd: -0.038187,
-    speedErrYdPerSec: 2.07826,
-    speedDeltaYdPerSec: 2.183506,
+    progressMaxAbsYd: 0,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 50,
+    inputToAuthorityMeanMs: 38.958333,
   },
   'straight/rtt50': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.265887,
-    progressTerminalYd: -0.004419,
-    speedErrYdPerSec: 2.132971,
-    speedDeltaYdPerSec: 2.160247,
+    progressMaxAbsYd: 0.097222,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 66.666667,
+    inputToAuthorityMeanMs: 66.666667,
   },
   'straight/rtt150j20': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.305148,
-    progressTerminalYd: 0.304669,
-    speedErrYdPerSec: 2.033319,
-    speedDeltaYdPerSec: 2.490148,
+    progressMaxAbsYd: 0.135763,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'straight/rtt300j40': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.523049,
-    progressTerminalYd: 0.096365,
-    speedErrYdPerSec: 3.531797,
-    speedDeltaYdPerSec: 3.617252,
+    progressMaxAbsYd: 0.082078,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 216.666667,
+    inputToAuthorityMeanMs: 216.666667,
   },
   'curved/rtt0': {
     backwardCount: 0,
     backwardWorstYd: 0,
-    deviationMaxYd: 0.058574,
-    deviationMeanYd: 0.026103,
-    progressMaxAbsYd: 0.192994,
-    progressTerminalYd: -0.086473,
-    speedErrYdPerSec: 1.970705,
-    speedDeltaYdPerSec: 2.19506,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 50,
+    inputToAuthorityMeanMs: 38.958333,
   },
   'curved/rtt50': {
     backwardCount: 0,
     backwardWorstYd: 0,
-    deviationMaxYd: 0.250757,
-    deviationMeanYd: 0.110001,
-    progressMaxAbsYd: 0.329894,
-    progressTerminalYd: -0.164181,
-    speedErrYdPerSec: 2.198417,
-    speedDeltaYdPerSec: 2.160969,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.097222,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0.013277,
+    speedDeltaYdPerSec: 0.013277,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 66.666667,
+    inputToAuthorityMeanMs: 66.666667,
   },
   'curved/rtt150j20': {
     backwardCount: 0,
     backwardWorstYd: 0,
-    deviationMaxYd: 0.190483,
-    deviationMeanYd: 0.093339,
-    progressMaxAbsYd: 0.328916,
-    progressTerminalYd: -0.047454,
-    speedErrYdPerSec: 1.661888,
-    speedDeltaYdPerSec: 2.217952,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.135763,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0.006991,
+    speedDeltaYdPerSec: 0.006991,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'curved/rtt300j40': {
     backwardCount: 0,
     backwardWorstYd: 0,
-    deviationMaxYd: 0.173885,
-    deviationMeanYd: 0.068397,
-    progressMaxAbsYd: 0.555042,
-    progressTerminalYd: -0.317116,
-    speedErrYdPerSec: 2.457945,
-    speedDeltaYdPerSec: 2.523584,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.082078,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0.0114,
+    speedDeltaYdPerSec: 0.0114,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 216.666667,
+    inputToAuthorityMeanMs: 216.666667,
   },
   'weave/rtt0': {
     backwardCount: 0,
     backwardWorstYd: 0,
-    deviationMaxYd: 0.116667,
-    deviationMeanYd: 0.012329,
-    progressMaxAbsYd: 0.25481,
-    progressTerminalYd: -0.088012,
-    speedErrYdPerSec: 1.99744,
-    speedDeltaYdPerSec: 2.137725,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 50,
+    inputToAuthorityMeanMs: 38.958333,
   },
   'weave/rtt50': {
     backwardCount: 0,
-    backwardWorstYd: -0.000145,
-    deviationMaxYd: 0.100398,
-    deviationMeanYd: 0.007365,
-    progressMaxAbsYd: 0.285644,
-    progressTerminalYd: -0.156758,
-    speedErrYdPerSec: 2.036255,
-    speedDeltaYdPerSec: 2.129034,
+    backwardWorstYd: 0,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.097222,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 66.666667,
+    inputToAuthorityMeanMs: 66.666667,
   },
   'weave/rtt150j20': {
-    backwardCount: 7,
-    backwardWorstYd: -0.004587,
-    deviationMaxYd: 0.638889,
-    deviationMeanYd: 0.247281,
-    progressMaxAbsYd: 0.87362,
-    progressTerminalYd: 0.214365,
-    speedErrYdPerSec: 5.153198,
-    speedDeltaYdPerSec: 4.989962,
-    correctionEvents: 3,
+    backwardCount: 0,
+    backwardWorstYd: 0,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.135763,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
+    correctionEvents: 0,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'weave/rtt300j40': {
     backwardCount: 0,
     backwardWorstYd: 0,
-    deviationMaxYd: 0.257528,
-    deviationMeanYd: 0.100556,
-    progressMaxAbsYd: 0.730342,
-    progressTerminalYd: -0.378675,
-    speedErrYdPerSec: 4.183016,
-    speedDeltaYdPerSec: 4.398782,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.082078,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 216.666667,
+    inputToAuthorityMeanMs: 216.666667,
   },
   'jump/rtt0': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.18961,
-    progressTerminalYd: -0.085872,
-    speedErrYdPerSec: 2.07826,
-    speedDeltaYdPerSec: 2.183506,
+    progressMaxAbsYd: 0,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 50,
+    inputToAuthorityMeanMs: 38.958333,
   },
   'jump/rtt50': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.265887,
-    progressTerminalYd: -0.159874,
-    speedErrYdPerSec: 2.132971,
-    speedDeltaYdPerSec: 2.160247,
+    progressMaxAbsYd: 0.097222,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 66.666667,
+    inputToAuthorityMeanMs: 66.666667,
   },
   'jump/rtt150j20': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.305148,
-    progressTerminalYd: -0.155496,
-    speedErrYdPerSec: 2.033319,
-    speedDeltaYdPerSec: 2.490148,
+    progressMaxAbsYd: 0.135763,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'jump/rtt300j40': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.523049,
-    progressTerminalYd: -0.280528,
-    speedErrYdPerSec: 3.531797,
-    speedDeltaYdPerSec: 3.617252,
+    progressMaxAbsYd: 0.082078,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 216.666667,
+    inputToAuthorityMeanMs: 216.666667,
   },
   'tapping/rtt0': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.202831,
-    progressTerminalYd: -0.038099,
-    speedErrYdPerSec: 0.955161,
-    speedDeltaYdPerSec: 0.674746,
+    progressMaxAbsYd: 0,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 50,
+    inputToAuthorityMeanMs: 40.277778,
   },
   'tapping/rtt50': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.273222,
-    progressTerminalYd: -0.002375,
-    speedErrYdPerSec: 1.287313,
-    speedDeltaYdPerSec: 1.414168,
+    progressMaxAbsYd: 0.097222,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 66.666667,
+    inputToAuthorityMeanMs: 66.666667,
   },
   'tapping/rtt150j20': {
-    backwardCount: 2,
-    backwardWorstYd: -0.00242,
+    backwardCount: 0,
+    backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 1.22175,
-    progressTerminalYd: -0.858518,
-    speedErrYdPerSec: 1.058307,
-    speedDeltaYdPerSec: 1.058307,
+    progressMaxAbsYd: 0.135763,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'tapping/rtt300j40': {
     backwardCount: 0,
     backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.233333,
-    progressTerminalYd: 0.156151,
-    speedErrYdPerSec: 0.375728,
-    speedDeltaYdPerSec: 0.163056,
+    progressMaxAbsYd: 0.082078,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
     correctionEvents: 0,
+    inputToAuthorityMaxMs: 216.666667,
+    inputToAuthorityMeanMs: 216.666667,
   },
   'adv-stall/rtt150j20': {
-    backwardCount: 12,
-    backwardWorstYd: -0.016,
+    backwardCount: 0,
+    backwardWorstYd: 0,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 3.371015,
-    progressTerminalYd: -0.124394,
-    speedErrYdPerSec: 7.157228,
-    speedDeltaYdPerSec: 6.406418,
-    correctionEvents: 6,
+    progressMaxAbsYd: 0.135763,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
+    correctionEvents: 0,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'adv-stun/rtt150j20': {
-    backwardCount: 12,
-    backwardWorstYd: -0.378075,
+    backwardCount: 24,
+    backwardWorstYd: -0.197877,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.966071,
-    progressTerminalYd: 0.031886,
-    speedErrYdPerSec: 15.684526,
-    speedDeltaYdPerSec: 14.927639,
-    correctionEvents: 8,
+    progressMaxAbsYd: 1.399262,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 14.316046,
+    speedDeltaYdPerSec: 13.82748,
+    correctionEvents: 14,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
   },
   'adv-snare/rtt150j20': {
-    backwardCount: 1,
-    backwardWorstYd: -0.18656,
+    backwardCount: 9,
+    backwardWorstYd: -0.19819,
     deviationMaxYd: 0,
     deviationMeanYd: 0,
-    progressMaxAbsYd: 0.557738,
-    progressTerminalYd: 0.198905,
-    speedErrYdPerSec: 6.201855,
-    speedDeltaYdPerSec: 9.980314,
-    correctionEvents: 1,
+    progressMaxAbsYd: 1.176938,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 14.073841,
+    speedDeltaYdPerSec: 13.896273,
+    correctionEvents: 9,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
+  },
+  'adv-override-churn/rtt150j20': {
+    backwardCount: 42,
+    backwardWorstYd: -0.197388,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 1.392203,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 14.225892,
+    speedDeltaYdPerSec: 13.853088,
+    correctionEvents: 30,
+    inputToAuthorityMaxMs: 100,
+    inputToAuthorityMeanMs: 100,
+  },
+  'starvation-straight/rtt300j20': {
+    backwardCount: 0,
+    backwardWorstYd: 0,
+    deviationMaxYd: 0,
+    deviationMeanYd: 0,
+    progressMaxAbsYd: 0.055604,
+    progressTerminalYd: 0,
+    speedErrYdPerSec: 0,
+    speedDeltaYdPerSec: 0,
+    correctionEvents: 0,
+    inputToAuthorityMaxMs: 183.333333,
+    inputToAuthorityMeanMs: 183.333333,
   },
 };
 
@@ -676,6 +839,8 @@ const CELL_LABELS: Record<string, string> = {
   'adv-stall/rtt150j20': 'HOL stall 500 ms mid-run',
   'adv-stun/rtt150j20': 'server stun mid-run',
   'adv-snare/rtt150j20': 'server snare mid-run',
+  'adv-override-churn/rtt150j20': 'server stun apply and expire twice',
+  'starvation-straight/rtt300j20': 'straight run + stop @ 300 ms + 20 jitter',
 };
 
 function formatRow(key: string, row: BaselineRow): string {
@@ -697,6 +862,8 @@ function formatRow(key: string, row: BaselineRow): string {
     row.speedErrYdPerSec.toFixed(2),
     row.speedDeltaYdPerSec.toFixed(2),
     row.correctionEvents.toString(),
+    row.inputToAuthorityMaxMs.toFixed(1),
+    row.inputToAuthorityMeanMs.toFixed(1),
   ];
   return `| ${label} | ${cells3.join(' | ')} |`;
 }
@@ -714,12 +881,12 @@ function renderBaselineDoc(): string {
     'Yards and yards per second; back = backward steps, dev = path deviation,',
     'prog = along-path progress error, corr = correction events.',
     '',
-    "The two crowd-control rows are scored against the harness server's OWN",
+    "The three crowd-control rows are scored against the harness server's OWN",
     'ticks instead: the zero-latency twin never receives the aura, so its',
     'trajectory would be a fiction to compare against.',
     '',
-    '| cell | back n | back worst | dev max | dev mean | prog max | prog settle | speed err | speed delta | corr |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| cell | back n | back worst | dev max | dev mean | prog max | prog settle | speed err | speed delta | corr | input-authority max ms | input-authority mean ms |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
   ];
   const rows = Object.entries(BASELINE).map(([key, row]) => formatRow(key, row));
   return `${[...header, ...rows].join('\n')}\n`;
@@ -827,6 +994,9 @@ describe('movement latency baseline', () => {
     const drain = at('net.drainEvents()');
     const discontinuity = at('hasAuthoritativeSelfPositionDiscontinuity(');
     const frameBuild = at('selfMotionFrameBuffer.write(');
+    const predictionPrepare = at('movementPrediction.prepare(');
+    const predictionAdvance = at('movementPrediction.advance(');
+    const predictionDisplay = at('movementPrediction.display(');
     // updateSelfRenderPosition itself lives in the renderer (src/render/
     // self_render_position_core.ts, called from renderer.sync); main.ts's half
     // of the contract is that the drawn pose is produced AFTER the frame the
@@ -838,6 +1008,12 @@ describe('movement latency baseline', () => {
     );
     expect(alpha, `alpha must be read before the echo fold: ${note}`).toBeLessThan(consumeEcho);
     expect(flush, `the wire write must precede the echo read: ${note}`).toBeLessThan(consumeEcho);
+    expect(predictionPrepare, `prediction context precedes sampling: ${note}`).toBeLessThan(
+      predictionAdvance,
+    );
+    expect(predictionAdvance, `sampled prediction precedes the echo read: ${note}`).toBeLessThan(
+      consumeEcho,
+    );
     expect(consumeEcho, `samples are consumed then folded: ${note}`).toBeLessThan(fold);
     expect(fold, `the fold must precede the frame build: ${note}`).toBeLessThan(frameBuild);
     expect(drain, `events are drained before the discontinuity read: ${note}`).toBeLessThan(
@@ -845,6 +1021,12 @@ describe('movement latency baseline', () => {
     );
     expect(discontinuity, `the discontinuity is read before the frame build: ${note}`).toBeLessThan(
       frameBuild,
+    );
+    expect(discontinuity, `reconciliation follows event drain: ${note}`).toBeLessThan(
+      predictionDisplay,
+    );
+    expect(draw, `the drawn pose follows v2 reconciliation: ${note}`).toBeGreaterThan(
+      predictionDisplay,
     );
     expect(draw, `the drawn pose comes after the frame build: ${note}`).toBeGreaterThan(frameBuild);
   });
@@ -862,7 +1044,7 @@ describe('movement latency baseline', () => {
       settleYd: 0.05,
     });
     expect(MOVEMENT_FEEL_TARGETS_CC).toEqual({
-      backwardStepYd: 0.5,
+      backwardStepYd: MAX_SELF_REWIND_YD_PER_SEC * (1 / 60) + 0.000001,
       settleYd: 0.05,
     });
   });
@@ -892,6 +1074,31 @@ describe('movement latency baseline', () => {
     const closed = stunned.run.frames.filter((frame) => !frame.predictionEnabled);
     expect(closed.length).toBeGreaterThan(10);
     expect(closed[0].tMs).toBeGreaterThan(CC_AT_MS);
+
+    const expectRecovered = (key: string, afterMs: number): void => {
+      const recovered = cell(key).run.frames.filter((frame) => frame.tMs > afterMs);
+      expect(recovered.length, key).toBeGreaterThan(10);
+      expect(
+        recovered.every((frame) => frame.predictorActive),
+        key,
+      ).toBe(true);
+    };
+    expectRecovered('adv-stun/rtt150j20', CC_AT_MS + 1000 + 150);
+    expectRecovered('adv-snare/rtt150j20', CC_AT_MS + 1000 + 150);
+    expectRecovered('adv-override-churn/rtt150j20', 1800 + 350 + 150);
+  });
+
+  it('does not over-travel the twin when the jitter buffer starves', () => {
+    const result = cell('starvation-straight/rtt300j20');
+    const expected = result.twinPoses?.at(-1);
+    if (!expected) throw new Error('the starvation cell has no final twin pose');
+    const actual = result.run.ticks.at(-1);
+    if (!actual) throw new Error('the starvation cell has no final server pose');
+
+    expect({ x: actual.x, y: actual.y, z: actual.z, facing: actual.facing }).toEqual(expected);
+    expect(result.run.movementTimeline?.extrapolated).toBeGreaterThan(0);
+    expect(result.run.movementTimeline?.discardedLate).toBeGreaterThan(0);
+    expect(result.run.movementTimeline?.resyncs).toBe(0);
   });
 
   const keys = [
@@ -901,6 +1108,8 @@ describe('movement latency baseline', () => {
     'adv-stall/rtt150j20',
     'adv-stun/rtt150j20',
     'adv-snare/rtt150j20',
+    'adv-override-churn/rtt150j20',
+    'starvation-straight/rtt300j20',
   ];
 
   it('measures every pinned cell and pins every measured cell', () => {
@@ -909,7 +1118,7 @@ describe('movement latency baseline', () => {
     // dropped from the tables would silently stop being measured while this
     // suite stayed green; and a BASELINE row with no matching cell (or a cell
     // with no row) would never be asserted at all.
-    expect(keys).toHaveLength(23);
+    expect(keys).toHaveLength(25);
     expect(Object.keys(BASELINE).sort()).toEqual([...keys].sort());
     expect(cells.size).toBe(keys.length);
   });

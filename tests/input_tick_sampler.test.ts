@@ -7,10 +7,11 @@ function sample(forward: boolean, facing: number | null): { mi: MoveInput; facin
 }
 
 describe('InputTickSampler', () => {
-  it('emits fixed ticks across irregular render frame deltas', () => {
+  it('emits fixed ticks across irregular render frame times', () => {
     const sampler = new InputTickSampler();
-    const frames = [0.02, 0.04, 0.09, 0.01].flatMap((dt) =>
-      sampler.advance(dt, () => sample(true, 0.5)),
+    sampler.reset(0);
+    const frames = [20, 60, 150, 160].flatMap((now) =>
+      sampler.advance(now, () => sample(true, 0.5)),
     );
 
     expect(frames).toHaveLength(3);
@@ -20,25 +21,64 @@ describe('InputTickSampler', () => {
 
   it('keeps client ticks monotone across advance calls', () => {
     const sampler = new InputTickSampler();
+    sampler.reset(0);
 
-    expect(sampler.advance(0.05, () => sample(true, 0)).map((frame) => frame.ct)).toEqual([0]);
-    expect(sampler.advance(0.1, () => sample(false, null)).map((frame) => frame.ct)).toEqual([
+    expect(sampler.advance(50, () => sample(true, 0)).map((frame) => frame.ct)).toEqual([0]);
+    expect(sampler.advance(150, () => sample(false, null)).map((frame) => frame.ct)).toEqual([
       1, 2,
     ]);
   });
 
-  it('clamps a pathological render delta to 250 ms', () => {
+  it('emits at exact 60 Hz deadline instants without a one-frame delay', () => {
     const sampler = new InputTickSampler();
-    const frames = sampler.advance(10, () => sample(true, 0));
+    sampler.reset(0);
 
-    expect(frames).toHaveLength(5);
-    expect(frames.map((frame) => frame.ct)).toEqual([0, 1, 2, 3, 4]);
+    expect(sampler.advance(1000 / 60, () => sample(true, 0))).toEqual([]);
+    expect(sampler.advance((2 * 1000) / 60, () => sample(true, 0))).toEqual([]);
+    expect(
+      sampler.advance((3 * 1000) / 60, () => sample(true, 0)).map((frame) => frame.ct),
+    ).toEqual([0]);
+  });
+
+  it('does not drift over twenty seconds of 60 Hz frames', () => {
+    const sampler = new InputTickSampler();
+    sampler.reset(0);
+    const emitted: number[] = [];
+
+    for (let frame = 1; frame <= 1200; frame++) {
+      emitted.push(
+        ...sampler
+          .advance((frame * 1000) / 60, () => sample(true, 0))
+          .map((sampledFrame) => sampledFrame.ct),
+      );
+    }
+
+    expect(emitted).toHaveLength(400);
+    expect(emitted.at(-1)).toBe(399);
+  });
+
+  it('ramps interpolation alpha from zero to one within each tick', () => {
+    const sampler = new InputTickSampler();
+    sampler.reset(0);
+
+    sampler.advance(50, () => sample(true, 0));
+    expect(sampler.interpolationAlpha).toBe(0);
+
+    sampler.advance(62.5, () => sample(true, 0));
+    expect(sampler.interpolationAlpha).toBeCloseTo(0.25, 10);
+
+    sampler.advance(75, () => sample(true, 0));
+    expect(sampler.interpolationAlpha).toBeCloseTo(0.5, 10);
+
+    sampler.advance(100, () => sample(true, 0));
+    expect(sampler.interpolationAlpha).toBe(0);
   });
 
   it('samples intent separately for every emitted tick', () => {
     const sampler = new InputTickSampler();
+    sampler.reset(0);
     let sampleIndex = 0;
-    const frames = sampler.advance(0.151, () => sample(sampleIndex++ % 2 === 0, sampleIndex));
+    const frames = sampler.advance(151, () => sample(sampleIndex++ % 2 === 0, sampleIndex));
 
     expect(sampleIndex).toBe(3);
     expect(frames.map(({ mi, facing }) => ({ forward: mi.forward, facing }))).toEqual([
@@ -51,9 +91,10 @@ describe('InputTickSampler', () => {
   it('is deterministic for the same deltas and sampled intent', () => {
     const run = () => {
       const sampler = new InputTickSampler();
+      sampler.reset(0);
       let sampleIndex = 0;
-      return [0.017, 0.034, 0.081, 0.006, 0.113].flatMap((dt) =>
-        sampler.advance(dt, () => {
+      return [17, 51, 132, 138, 251].flatMap((now) =>
+        sampler.advance(now, () => {
           const index = sampleIndex++;
           return sample(index % 2 === 0, index * 0.1);
         }),
@@ -65,10 +106,15 @@ describe('InputTickSampler', () => {
 
   it('emits one immediate neutral frame and resets the connection tick sequence', () => {
     const sampler = new InputTickSampler();
-    expect(sampler.advance(0.05, () => sample(true, 0))[0].ct).toBe(0);
+    sampler.reset(0);
+    expect(sampler.advance(50, () => sample(true, 0))[0].ct).toBe(0);
 
-    expect(sampler.emitNeutralFrame()).toEqual({ ct: 1, mi: emptyMoveInput(), facing: null });
-    sampler.reset();
-    expect(sampler.advance(0.05, () => sample(false, null))[0].ct).toBe(0);
+    expect(sampler.emitNeutralFrame(75)).toEqual({ ct: 1, mi: emptyMoveInput(), facing: null });
+    expect(sampler.advance(124, () => sample(false, null))).toEqual([]);
+    expect(sampler.advance(125, () => sample(false, null))[0].ct).toBe(2);
+
+    sampler.reset(200);
+    expect(sampler.advance(249, () => sample(false, null))).toEqual([]);
+    expect(sampler.advance(250, () => sample(false, null))[0].ct).toBe(0);
   });
 });

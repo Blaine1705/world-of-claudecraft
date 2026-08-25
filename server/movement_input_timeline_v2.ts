@@ -1,7 +1,13 @@
+// Short starvation extrapolates the last consumed input while advancing the client tick debt.
+// A late release may then disagree for one tick, and client reconciliation absorbs that correction.
 import { isStunned } from '../src/sim/combat/cc';
 import { type MoveInputFrame, parseMoveInputFrame } from '../src/sim/move_input';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
+import {
+  createMovementOverrideSessionState,
+  type MovementOverrideSessionState,
+} from './movement_override_epoch';
 
 export const MOVEMENT_INPUT_TIMELINE_DEPTH = 6;
 export const STARVE_RESYNC_TICKS = 3;
@@ -12,7 +18,7 @@ export interface MovementInputFrameV2 {
   facing: number | null;
 }
 
-export interface MovementInputSessionState {
+export interface MovementInputSessionState extends MovementOverrideSessionState {
   pid: number;
   lastInputAt: number;
   movementWireVersion: 1 | 2;
@@ -22,12 +28,13 @@ export interface MovementInputSessionState {
 
 export function createMovementInputSessionState(
   movementWireVersion: unknown,
-): Pick<MovementInputSessionState, 'movementWireVersion' | 'movementTimeline' | 'lastConsumedCt'> {
+): Omit<MovementInputSessionState, 'pid' | 'lastInputAt'> {
   const version = movementWireVersion === 2 ? 2 : 1;
   return {
     movementWireVersion: version,
     movementTimeline: version === 2 ? new MovementInputTimeline() : null,
     lastConsumedCt: -1,
+    ...createMovementOverrideSessionState(),
   };
 }
 
@@ -87,20 +94,22 @@ export function consumeMovementFramesV2(
 export class MovementInputTimeline {
   consumed = 0;
   starved = 0;
+  extrapolated = 0;
+  discardedLate = 0;
   dropped = 0;
   resyncs = 0;
 
   private readonly frames = new Map<number, MovementInputFrameV2>();
   private expectedClientTick = 0;
-  private starvedWithNewerFrames = 0;
+  private consecutiveStarvedTicks = 0;
+  private lastConsumedFrame: MovementInputFrameV2 | null = null;
 
   enqueue(frame: MovementInputFrameV2): boolean {
-    if (
-      !Number.isSafeInteger(frame.ct) ||
-      frame.ct < 0 ||
-      frame.ct < this.expectedClientTick ||
-      this.frames.has(frame.ct)
-    ) {
+    if (Number.isSafeInteger(frame.ct) && frame.ct >= 0 && frame.ct < this.expectedClientTick) {
+      this.discardedLate++;
+      return false;
+    }
+    if (!Number.isSafeInteger(frame.ct) || frame.ct < 0 || this.frames.has(frame.ct)) {
       return false;
     }
     this.frames.set(frame.ct, frame);
@@ -119,24 +128,34 @@ export class MovementInputTimeline {
     if (frame) {
       this.frames.delete(this.expectedClientTick);
       this.expectedClientTick++;
-      this.starvedWithNewerFrames = 0;
+      this.consecutiveStarvedTicks = 0;
+      this.lastConsumedFrame = frame;
       this.consumed++;
       return frame;
     }
 
     this.starved++;
+    this.consecutiveStarvedTicks++;
     const oldest = this.oldestBufferedClientTick();
-    if (oldest === null) {
-      this.starvedWithNewerFrames = 0;
+    if (this.consecutiveStarvedTicks >= STARVE_RESYNC_TICKS) {
+      if (oldest !== null) {
+        this.expectedClientTick = oldest;
+        this.consecutiveStarvedTicks = 0;
+        this.resyncs++;
+      }
       return null;
     }
-    this.starvedWithNewerFrames++;
-    if (this.starvedWithNewerFrames >= STARVE_RESYNC_TICKS) {
-      this.expectedClientTick = oldest;
-      this.starvedWithNewerFrames = 0;
-      this.resyncs++;
-    }
-    return null;
+    if (!this.lastConsumedFrame) return null;
+
+    const extrapolated: MovementInputFrameV2 = {
+      ct: this.expectedClientTick++,
+      mi: { ...this.lastConsumedFrame.mi },
+      facing: this.lastConsumedFrame.facing,
+    };
+    this.lastConsumedFrame = extrapolated;
+    this.extrapolated++;
+    this.consumed++;
+    return extrapolated;
   }
 
   private oldestBufferedClientTick(): number | null {

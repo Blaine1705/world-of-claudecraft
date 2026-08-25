@@ -46,10 +46,10 @@
 // facing_smooth.ts / locomotion.ts. tests/self_motion.test.ts drives it
 // against a real lagging Sim.
 
-import { moverHeight, resolveMovement } from '../sim/colliders';
 import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
+import { createClientPlayerMotionDeps } from './client_player_motion';
 
 // Latency cap on the extrapolation window: at least one snapshot-ish interval
 // so low-ping links still get the start-of-motion snap, and a hard ceiling so
@@ -235,19 +235,7 @@ export class SelfMotionPredictor {
   private readonly out: Vec3Like = { x: 0, y: 0, z: 0 };
 
   constructor(seed: number) {
-    // The client dep shape: pure static collision (delves are gated off by the
-    // enabled flag), aura-only speed (the Fiesta augment is not mirrored; the
-    // leash absorbs that bounded divergence), and no-op live-Sim callbacks.
-    this.deps = {
-      seed,
-      moveSpeedMult: (e) => moveSpeedMult(e, 0),
-      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
-        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
-      resolvedAbility: () => null,
-      cancelCast: () => {},
-      standUp: () => {},
-      dealDamage: () => {},
-    };
+    this.deps = createClientPlayerMotionDeps(seed);
   }
 
   reset(): void {

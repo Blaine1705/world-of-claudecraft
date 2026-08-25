@@ -300,6 +300,7 @@ import {
   type MovementInputSessionState,
   resetMovementInputSessionState,
 } from './movement_input_timeline_v2';
+import { reconciliationSelfWire, updateOverrideEpochs } from './movement_reconciliation_wire';
 import {
   classifyMsgLane,
   consumeLaneToken,
@@ -2746,6 +2747,7 @@ export class GameServer {
             consumeMovementFramesV2(this.sim, this.clients.values());
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            updateOverrideEpochs(this.sim, this.clients.values());
             this.riftUpgrader.observe(this.sim.ctx);
             this.riftAssets.observe(this.sim.ctx);
             lap('tick');
@@ -8834,7 +8836,7 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
-      ...(session.movementWireVersion === 2 ? { ackCt: session.lastConsumedCt } : {}),
+      ...reconciliationSelfWire(session, p),
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default

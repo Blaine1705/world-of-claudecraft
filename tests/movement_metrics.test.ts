@@ -89,7 +89,52 @@ describe('metric conventions', () => {
       progressError: { maxAbsYd: 0, meanYd: 0, terminalYd: 0, samples: 0 },
       speedContinuity: { maxSpeedErr: 0, maxSpeedDelta: 0, samples: 0 },
       correctionEvents: { count: 0, worstDeg: 0, samples: 0 },
+      inputToAuthorityMs: { maxMs: 0, meanMs: 0, samples: 0 },
     });
+  });
+
+  it('measures each consumed client tick from sampling to authority once', () => {
+    const commands: CommandSample[] = [
+      { tMs: 10, mi: held({ forward: true }), facing: 0, ct: 4 },
+      { tMs: 60, mi: held({ forward: true }), facing: 0, ct: 5 },
+    ];
+    const authorityTicks = [
+      { tMs: 50, consumedCt: -1 },
+      { tMs: 100, consumedCt: 4 },
+      { tMs: 150, consumedCt: 4 },
+      { tMs: 200, consumedCt: 5 },
+    ];
+
+    const metrics = computeMovementMetrics([], [], commands, {}, authorityTicks);
+
+    expect(metrics.inputToAuthorityMs).toEqual({ maxMs: 140, meanMs: 115, samples: 2 });
+  });
+
+  it('dates client-tick truth from its send instant and sampler phase', () => {
+    const truth: GroundTruthSample[] = [
+      { tick: -1, x: 0, z: 0 },
+      { tick: 0, x: 0, z: STEP_YD, ct: 10 },
+      { tick: 1, x: 0, z: STEP_YD * 2, ct: 11 },
+    ];
+    const commands: CommandSample[] = [
+      { tMs: 30, mi: held({ forward: true }), facing: 0, ct: 10, samplerInterpolationAlpha: 0.1 },
+      { tMs: 80, mi: held({ forward: true }), facing: 0, ct: 11, samplerInterpolationAlpha: 0.1 },
+    ];
+    const drawn: DrawnSample[] = [
+      { tMs: 75, x: 0, z: STEP_YD },
+      { tMs: 125, x: 0, z: STEP_YD * 2 },
+    ];
+
+    const dated = computeMovementMetrics(drawn, truth, commands);
+    expect(dated.progressError.maxAbsYd).toBeCloseTo(0, 12);
+    expect(dated.progressError.terminalYd).toBeCloseTo(0, 12);
+
+    const fallback = computeMovementMetrics(
+      drawn,
+      truth.map(({ ct: _ct, ...sample }) => sample),
+      commands,
+    );
+    expect(fallback.progressError.maxAbsYd).toBeCloseTo(STEP_YD / 2, 12);
   });
 
   it('resolves intent the way the real movement kernel moves a body', () => {

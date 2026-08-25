@@ -145,7 +145,6 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
-import { MovementWireGlue } from './game/movement_wire_glue';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
@@ -317,10 +316,8 @@ import {
 } from './render/gfx';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import { Renderer } from './render/renderer';
-import {
-  hasAuthoritativeSelfPositionDiscontinuity,
-  type SelfMotionFrame,
-} from './render/self_motion';
+import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
+import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
@@ -2885,7 +2882,7 @@ async function startGame(
     setClientPaused: (paused) => {
       graphicsRebuildPaused = paused;
       if (!paused) {
-        movementWireGlue.resume();
+        movementPrediction.resume();
         last = performance.now();
         acc = 0;
       }
@@ -4366,8 +4363,8 @@ async function startGame(
     alpha: 0,
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
-  const movementWireGlue = new MovementWireGlue();
-  if (online) movementWireGlue.connect(online);
+  const movementPrediction = new MovementPredictionPipeline(world.cfg.seed);
+  if (online) movementPrediction.connect(online);
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
@@ -4695,12 +4692,20 @@ async function startGame(
       net.moveInput.turnLeft = false;
       net.moveInput.turnRight = false;
     }
+    selfMotionGateArgs.spectating = net.spectating;
+    selfMotionGateArgs.movementFrozen = movementFrozen();
+    selfMotionGateArgs.playerImmobilized = playerImmobilized();
+    selfMotionGateArgs.posX = pe.pos.x;
+    selfMotionGateArgs.climbing = pe.climbing;
+    const selfPredictionEnabled =
+      !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
+    movementPrediction.prepare(net, pe, selfPredictionEnabled);
     net.setMouselookFacing(netFacing);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
     pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
-    movementWireGlue.advance(net, frameDt, net.moveInput, netFacing, performance.now());
+    movementPrediction.advance(net, frameDt, net.moveInput, netFacing, performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     inputEcho.fold(echoSamples);
     for (const sample of echoSamples) perf.markInputEcho(sample);
@@ -4770,28 +4775,22 @@ async function startGame(
     const netPipeline = net.netPipeline();
     netPipeline.onAnimationFrame(now);
     perf.setNetPipelineSource(netPipeline);
-    // Display-only self extrapolation (src/render/self_motion.ts); the gate
-    // itself lives in src/game/self_motion_gate.ts. The kill switch keeps its
-    // own arm here because a disabled frame is not the same as no frame: it
-    // would still build the predictor and feed it pose history.
-    selfMotionGateArgs.spectating = net.spectating;
-    selfMotionGateArgs.movementFrozen = movementFrozen();
-    selfMotionGateArgs.playerImmobilized = playerImmobilized();
-    selfMotionGateArgs.posX = pe.pos.x;
-    selfMotionGateArgs.climbing = pe.climbing;
-    const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
-      ? null
-      : selfMotionFrameBuffer.write(
-          selfMotionPredictionEnabled(selfMotionGateArgs),
-          resolved.mi,
-          netFacing ?? interpServerFacing,
-          inputEcho.echoMs,
-          inputEcho.jitterMs,
-          alpha,
-          frameDt,
-          Math.max(0, cameraLastSnapAge),
-          net.snapInterval,
-        );
+    const selfMotion =
+      net.movementWireVersion === 2
+        ? movementPrediction.display()
+        : SELF_MOTION_DISABLED
+          ? null
+          : selfMotionFrameBuffer.write(
+              selfPredictionEnabled,
+              resolved.mi,
+              netFacing ?? interpServerFacing,
+              inputEcho.echoMs,
+              inputEcho.jitterMs,
+              alpha,
+              frameDt,
+              Math.max(0, cameraLastSnapAge),
+              net.snapInterval,
+            );
     traceStart = perf.startTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);

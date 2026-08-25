@@ -10,9 +10,8 @@
 //     Server frames enter through `socket.onmessage`, the honest production
 //     door into the private onMessage, and client sends leave through
 //     `socket.send`. Nothing reaches into ClientWorld's private decode.
-//   - The client's OWN 50 ms input timer, registered on the VirtualClock's
-//     window stub in the ClientWorld constructor, so the unconditional send
-//     lane is live and the server never stale-clears a held key.
+//   - The client's fixed-tick v2 sampler and the legacy timer, both registered
+//     against the VirtualClock, so each negotiated wire follows its real lane.
 //   - The client frame pipeline: the four extracted seams (snapshotAlpha,
 //     InputEchoTracker, selfMotionPredictionEnabled, updateSelfRenderPosition)
 //     driven in the ORDER src/main.ts's online arm drives them, which is
@@ -45,7 +44,7 @@
 
 import type { ClientSession, GameServer } from '../../server/game';
 import { consumeMovementFramesV2 } from '../../server/movement_input_timeline_v2';
-import { MovementWireGlue } from '../../src/game/movement_wire_glue';
+import { updateMovementOverrideEpochs } from '../../server/movement_override_epoch';
 import { adaptiveSelfAlphaLead } from '../../src/game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from '../../src/game/self_motion_frame_buffer';
 import {
@@ -59,6 +58,7 @@ import { ClientWorld } from '../../src/net/online';
 import { snapshotAlpha } from '../../src/net/snapshot_alpha';
 import { wrapAngle } from '../../src/render/facing_smooth';
 import { hasAuthoritativeSelfPositionDiscontinuity } from '../../src/render/self_motion';
+import { MovementPredictionPipeline } from '../../src/render/self_prediction';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
@@ -129,6 +129,7 @@ export interface FrameRecord {
   echoMs: number;
   jitterMs: number;
   selfAlphaLead: number;
+  samplerInterpolationAlpha: number;
   /** True when the self-motion predictor owned the pose this frame. */
   predictorActive: boolean;
   /** Whether the gate allowed prediction (false: CC, delve, spectate...). */
@@ -147,6 +148,7 @@ export interface TickRecord {
   y: number;
   z: number;
   facing: number;
+  consumedCt: number;
 }
 
 export interface HarnessRun {
@@ -159,6 +161,13 @@ export interface HarnessRun {
    *  script (see frameCommandsToTickScript). */
   tickScript: MoveScript;
   tickCount: number;
+  movementTimeline: {
+    consumed: number;
+    starved: number;
+    extrapolated: number;
+    discardedLate: number;
+    resyncs: number;
+  } | null;
 }
 
 export interface OnlineHarnessOptions {
@@ -189,20 +198,25 @@ export interface OnlineHarness {
 /**
  * The zero-latency ground-truth script for a recorded WIRE timeline.
  *
- * A tick k runs at scenario time (k + 1) * tickMs, and the intent it acts on is
- * the one the last frame put on the wire STRICTLY BEFORE that instant. The
- * strictness is not a rounding preference, it is the arrival order the client's
- * own 50 ms send timer produces: that timer is phase-aligned with the world
- * loop, so a frame it emits at the tick instant is handled after the tick that
- * instant runs, and lands on tick k + 1. The rtt0 honesty check in
- * tests/movement_latency_baseline.test.ts is what pins this against the real
- * server rather than against this comment.
+ * A v2 twin consumes one recorded client tick per simulation tick, matching
+ * the sequence the predictor presents. Callers without client ticks retain the
+ * wall-clock fallback, where a server tick uses the last earlier command. The
+ * rtt0 honesty check pins both the resulting poses and facing to the real server.
  */
 export function frameCommandsToTickScript(
   commands: readonly CommandSample[],
   tickCount: number,
   tickMs = SERVER_TICK_MS,
 ): MoveScript {
+  const sampledCommands = commands.filter(
+    (command): command is CommandSample & { ct: number } => command.ct !== undefined,
+  );
+  if (sampledCommands.length > 0) {
+    return Array.from({ length: tickCount }, (_, tick) => {
+      const sample = sampledCommands[Math.min(tick, sampledCommands.length - 1)];
+      return { tick, mi: { ...sample.mi }, facing: sample.facing };
+    });
+  }
   const out: MoveScriptEntry[] = [];
   let cursor = 0;
   let current: CommandSample | null = null;
@@ -277,6 +291,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
   // A frame may omit `facing` (mouselookFacing null), which means UNCHANGED on
   // the server, so the wire heading is carried forward rather than defaulted.
   let wireFacing = startFacing;
+  const movementWireVersion = opts.movementWire ?? 2;
 
   /** Record one outgoing frame as the server's own parser would read it. */
   function noteClientFrame(payload: string): void {
@@ -288,14 +303,20 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     }
     if (typeof parsed !== 'object' || parsed === null) return;
     if ((parsed as { t?: unknown }).t !== 'input') return;
+    if (movementWireVersion === 2 && !Number.isSafeInteger((parsed as { ct?: unknown }).ct)) return;
     const frame = parseMoveInputFrame(parsed);
     if (frame.facing !== null) wireFacing = frame.facing;
     wireIntent = frame.moveInput;
     if (recordingFromMs === null) return;
-    commands.push({ tMs: clock.now() - recordingFromMs, mi: frame.moveInput, facing: wireFacing });
+    commands.push({
+      tMs: clock.now() - recordingFromMs,
+      mi: frame.moveInput,
+      facing: wireFacing,
+      ct: (parsed as { ct: number }).ct,
+    });
   }
 
-  const joined = joinGroundTruthCharacter(1, opts.playerClass ?? 'warrior', opts.movementWire ?? 1);
+  const joined = joinGroundTruthCharacter(1, opts.playerClass ?? 'warrior', movementWireVersion);
   const { server, session, pid } = joined;
   // The frames join() already wrote (hello, the entry notice, the social
   // snapshot) were captured raw by rawFakeWs. Virtual time has not moved since,
@@ -352,8 +373,8 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
   // per session.
   const inputEcho = new InputEchoTracker();
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
-  const movementWireGlue = new MovementWireGlue();
-  movementWireGlue.connect(client);
+  const movementPrediction = new MovementPredictionPipeline(client.cfg.seed);
+  movementPrediction.connect(client);
   const selfRender = createSelfRenderPositionState({ x: 0, y: 0, z: 0 });
   const selfMotionGateArgs: SelfMotionGateArgs = {
     disabled: false,
@@ -373,6 +394,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     internals.clearStaleInputs();
     consumeMovementFramesV2(server.sim, [session]);
     const events = server.sim.tick();
+    updateMovementOverrideEpochs(server.sim, [session]);
     internals.routeEvents(events);
     internals.broadcastSnapshots();
     if (recordingFromMs === null) return;
@@ -384,6 +406,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       y: serverEntity.pos.y,
       z: serverEntity.pos.z,
       facing: serverEntity.facing,
+      consumedCt: session.lastConsumedCt,
     });
   }
 
@@ -409,12 +432,25 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     const mi: MoveInput = { ...heldInput };
     const netFacing = heldFacing;
 
-    // 3) the wire write, exactly as main.ts does it. The unconditional 50 ms
+    // 3) the prediction gate, then the wire write exactly as main.ts does it.
+    selfMotionGateArgs.spectating = client.spectating;
+    selfMotionGateArgs.movementFrozen = isMovementFrozen(pe);
+    selfMotionGateArgs.playerImmobilized = isPlayerImmobilized(pe.auras);
+    selfMotionGateArgs.posX = pe.pos.x;
+    selfMotionGateArgs.climbing = pe.climbing;
+    const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
+    movementPrediction.prepare(client, pe, predictionEnabled);
+    // The unconditional 50 ms
     // lane runs beside this from ClientWorld's own timer.
     Object.assign(client.moveInput, mi);
     client.setMouselookFacing(netFacing);
     client.flushInput(now);
-    movementWireGlue.advance(client, frameDt, client.moveInput, netFacing, now);
+    const firstSampledCommand = commands.length;
+    movementPrediction.advance(client, frameDt, client.moveInput, netFacing, now);
+    const samplerInterpolationAlpha = movementPrediction.interpolationAlpha;
+    for (let i = firstSampledCommand; i < commands.length; i++) {
+      commands[i].samplerInterpolationAlpha = samplerInterpolationAlpha;
+    }
 
     // 4) fold the echo samples, then drain the events the discontinuity flag
     // is read from.
@@ -422,25 +458,22 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     const drainedEvents = client.drainEvents();
     const discontinuity = hasAuthoritativeSelfPositionDiscontinuity(drainedEvents, client.playerId);
 
-    // 5) the prediction gate and the frame the predictor reads.
-    selfMotionGateArgs.spectating = client.spectating;
-    selfMotionGateArgs.movementFrozen = isMovementFrozen(pe);
-    selfMotionGateArgs.playerImmobilized = isPlayerImmobilized(pe.auras);
-    selfMotionGateArgs.posX = pe.pos.x;
-    selfMotionGateArgs.climbing = pe.climbing;
-    const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
+    // 5) the display frame selected by the negotiated movement wire.
     const cameraLastSnapAge = client.lastSnapAt > 0 ? now - client.lastSnapAt : -1;
-    const selfMotion = selfMotionFrameBuffer.write(
-      predictionEnabled,
-      mi,
-      netFacing,
-      inputEcho.echoMs,
-      inputEcho.jitterMs,
-      alpha,
-      frameDt,
-      Math.max(0, cameraLastSnapAge),
-      client.snapInterval,
-    );
+    const selfMotion =
+      client.movementWireVersion === 2
+        ? movementPrediction.display()
+        : selfMotionFrameBuffer.write(
+            predictionEnabled,
+            mi,
+            netFacing,
+            inputEcho.echoMs,
+            inputEcho.jitterMs,
+            alpha,
+            frameDt,
+            Math.max(0, cameraLastSnapAge),
+            client.snapInterval,
+          );
 
     // 6) the drawn pose, through the same call renderer.sync makes.
     noteSelfIdentity(selfRender, pe.id);
@@ -475,6 +508,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       echoMs: inputEcho.echoMs,
       jitterMs: inputEcho.jitterMs,
       selfAlphaLead,
+      samplerInterpolationAlpha,
       predictorActive: selfRender.active,
       predictionEnabled,
       mi,
@@ -558,6 +592,15 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
         commands,
         tickScript: frameCommandsToTickScript(commands, tickCount),
         tickCount,
+        movementTimeline: session.movementTimeline
+          ? {
+              consumed: session.movementTimeline.consumed,
+              starved: session.movementTimeline.starved,
+              extrapolated: session.movementTimeline.extrapolated,
+              discardedLate: session.movementTimeline.discardedLate,
+              resyncs: session.movementTimeline.resyncs,
+            }
+          : null,
       };
     },
     dispose: teardown,

@@ -74,16 +74,40 @@ describe('movement wire v2', () => {
       },
     };
     const glue = new MovementWireGlue();
-    glue.connect(client);
+    glue.connect(client, 0);
 
     glue.advance(client, 0.1, { ...emptyMoveInput(), forward: true }, null, 0);
     open = true;
     glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 50);
     glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 100);
-    client.onMovementWireNegotiated?.(2);
+    client.onMovementWireNegotiated?.(2, 100);
     glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 150);
 
     expect(sent).toEqual([0, 1, 0]);
+  });
+
+  it('hands prediction the exact frame object accepted by the wire client', () => {
+    let sentFrame: object | null = null;
+    let predictedFrame: object | null = null;
+    const client: MovementWireClient = {
+      movementWireVersion: 2,
+      onMovementWireNegotiated: null,
+      onMovementWireNeutral: null,
+      movementWireIsOpen: () => true,
+      sendMovementFrame: (frame) => {
+        sentFrame = frame;
+        return true;
+      },
+    };
+    const glue = new MovementWireGlue();
+    glue.onFrame = (frame) => {
+      predictedFrame = frame;
+    };
+    glue.connect(client, 0);
+
+    glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, 0.25, 50);
+
+    expect(predictedFrame).toBe(sentFrame);
   });
 
   it('forces neutral v2 input into the next server consumption before pausing', () => {
@@ -97,7 +121,7 @@ describe('movement wire v2', () => {
       send: (payload: string) => server.handleMessage(session, payload),
     };
     const glue = new MovementWireGlue();
-    glue.connect(client);
+    glue.connect(client, 0);
     try {
       glue.advance(client, 0.05, { ...emptyMoveInput(), forward: true }, null, 50);
       consumeMovementFramesV2(server.sim, [session]);
@@ -139,6 +163,23 @@ describe('movement wire v2', () => {
       expect(timeline.starved - before.starved).toBe(0);
       expect(timeline.dropped - before.dropped).toBe(0);
       expect(timeline.resyncs - before.resyncs).toBe(0);
+    } finally {
+      harness.dispose();
+    }
+  });
+
+  it('keeps the harness option to force the legacy v1 display path', () => {
+    const harness = createOnlineHarness({ latency: link(50, 0), movementWire: 1 });
+    try {
+      const run = harness.runScript({
+        durationMs: 1000,
+        script: [{ atMs: 0, mi: { forward: true }, facing: 0 }],
+      });
+
+      expect(harness.client.movementWireVersion).toBe(1);
+      expect(harness.session.movementWireVersion).toBe(1);
+      expect(run.frames.some((frame) => frame.predictorActive)).toBe(true);
+      expect(run.frames.at(-1)?.z).toBeGreaterThan(run.frames[0].z);
     } finally {
       harness.dispose();
     }

@@ -602,10 +602,10 @@ import {
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import type { SelfMotionFrame } from './self_motion';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
+  type SelfRenderPrediction,
   updateSelfRenderPosition,
 } from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
@@ -10216,7 +10216,7 @@ export class Renderer {
     dt: number,
     renderFacingOverride: number | null,
     selfAlphaLead = 0,
-    selfMotion: SelfMotionFrame | null = null,
+    selfMotion: SelfRenderPrediction | null = null,
     selfAuthoritativeDiscontinuity = false,
     // False while the window is hidden: everything below still runs (view
     // lifecycle, mixers, uTime, the viewport poll) so coming back costs no

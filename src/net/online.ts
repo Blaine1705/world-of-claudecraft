@@ -166,6 +166,7 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
+import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
 import {
@@ -174,6 +175,7 @@ import {
   trackPendingInputSequence,
   trackPendingInputSequenceRange,
 } from './movement_frame_v2_wire';
+import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
@@ -1508,7 +1510,7 @@ function blankEntity(id: number): Entity {
   };
 }
 
-export class ClientWorld implements IWorld {
+export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
   // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
   // is IWorldCombat-owned but rides here as a self-wire mirror field with the rest
@@ -1845,8 +1847,7 @@ export class ClientWorld implements IWorld {
   // server-measured achieved sim tick rate (Hz), mirrored from the snap head;
   // null until the server's meter warms up (perf overlay hides the row)
   serverTickHz: number | null = null;
-  // False until a negotiated server snapshot advertises support. This keeps a
-  // new client from showing inert buttons while connected to an older server.
+  // False until a negotiated server snapshot advertises support.
   petSpecialCommandsSupported = false;
   movementWireVersion: 1 | 2 = 1;
   // Stable timer-wire decode state. These stay separate from the public
@@ -1956,7 +1957,7 @@ export class ClientWorld implements IWorld {
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
   private movementFrameOutbox: MovementFrameV2Outbox | undefined;
-  onMovementWireNegotiated: ((version: 1 | 2) => void) | null = null;
+  onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null = null;
   onMovementWireNeutral: ((now: number) => boolean) | null = null;
   // No initializer on purpose: bare ClientWorld test fixtures skip field
   // initializers, and the lazy accessor below keeps that construction idiom
@@ -1968,6 +1969,7 @@ export class ClientWorld implements IWorld {
   private pendingSpectateFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
+    super();
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
@@ -2464,7 +2466,7 @@ export class ClientWorld implements IWorld {
     if (msg.t === 'hello') {
       this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
       this.movementFrameOutbox?.reset();
-      this.onMovementWireNegotiated?.(this.movementWireVersion);
+      this.onMovementWireNegotiated?.(this.movementWireVersion, performance.now());
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
@@ -3328,6 +3330,7 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s, true) : null;
     if (s && e) {
+      applyReconSelfWire(this, s, this.movementWireVersion);
       const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)
           ? Math.min(5, Math.max(0, s.opRem))
@@ -3343,16 +3346,13 @@ export class ClientWorld implements IWorld {
         this.pendingSpectateFacing = e.facing;
       }
       seen.add(s.id);
-      if (typeof s.ack === 'number' && s.ack > this.ackedInputSeq) {
-        for (let seq = this.ackedInputSeq + 1; seq <= s.ack; seq++) {
-          const sentAt = this.pendingInputSeqSentAt.get(seq);
-          if (sentAt !== undefined) {
-            this.inputEchoSamples.push(now - sentAt);
-            this.pendingInputSeqSentAt.delete(seq);
-          }
-        }
-        this.ackedInputSeq = s.ack;
-      }
+      this.ackedInputSeq = foldInputAck(
+        s.ack,
+        this.ackedInputSeq,
+        this.pendingInputSeqSentAt,
+        this.inputEchoSamples,
+        now,
+      );
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;

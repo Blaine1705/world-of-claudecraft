@@ -29,6 +29,7 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
+import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -1280,6 +1281,13 @@ describe('delta snapshots', () => {
       ack: snap.self.ack,
       ...('ackCt' in snap.self ? { ackCt: snap.self.ackCt } : {}),
     }).toEqual({ ack: 7 });
+    expect(snap.self).not.toHaveProperty('px');
+    expect(snap.self).not.toHaveProperty('py');
+    expect(snap.self).not.toHaveProperty('pz');
+    expect(snap.self).not.toHaveProperty('pf');
+    expect(snap.self).not.toHaveProperty('ovE');
+    expect(snap.self).not.toHaveProperty('ovA');
+    expect(snap.self).not.toHaveProperty('msm');
 
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 6, mi: { f: 0 } }));
     fc.sent.length = 0;
@@ -1311,13 +1319,77 @@ describe('delta snapshots', () => {
     expect(v2Session.lastConsumedCt).toBe(0);
     expect(v2Session.lastInputAt).toBe(v2Server.sim.time);
     v2Server.sim.tick();
+    entity.pos.x = 1 / 3;
+    entity.pos.y = 2 / 3;
+    entity.pos.z = 4 / 3;
+    entity.facing = Math.PI / 7;
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
     broadcast(v2Server);
     const self = lastSnap(v2Client.sent).self;
 
-    expect({ ack: self.ack, ...('ackCt' in self ? { ackCt: self.ackCt } : {}) }).toEqual({
+    expect({
+      ack: self.ack,
+      ackCt: self.ackCt,
+      px: self.px,
+      py: self.py,
+      pz: self.pz,
+      pf: self.pf,
+      ovE: self.ovE,
+      msm: self.msm,
+    }).toEqual({
       ack: 4,
       ackCt: 0,
+      px: 1 / 3,
+      py: 2 / 3,
+      pz: 4 / 3,
+      pf: Math.PI / 7,
+      ovE: 0,
+      msm: v2Server.sim.moveSpeedMult(entity),
     });
+    expect({ x: self.x, y: self.y, z: self.z, f: self.f }).toEqual({
+      x: 0.33,
+      y: 0.67,
+      z: 1.33,
+      f: 0.45,
+    });
+
+    const client = bareClient(v2Session.pid, { movementWireVersion: 2 });
+    (client as any).applySnapshot(lastSnap(v2Client.sent));
+    expect({
+      x: client.reconAuthoritativeX,
+      y: client.reconAuthoritativeY,
+      z: client.reconAuthoritativeZ,
+      facing: client.reconAuthoritativeFacing,
+      ackCt: client.reconAckClientTick,
+      epoch: client.reconOverrideEpoch,
+      active: client.reconOverrideActive,
+      moveSpeedMult: client.reconMoveSpeedMult,
+    }).toEqual({
+      x: 1 / 3,
+      y: 2 / 3,
+      z: 4 / 3,
+      facing: Math.PI / 7,
+      ackCt: 0,
+      epoch: 0,
+      active: false,
+      moveSpeedMult: v2Server.sim.moveSpeedMult(entity),
+    });
+    expect(client.player.pos).toEqual({ x: 0.33, y: 0.67, z: 1.33 });
+
+    entity.auras.push({
+      id: 'test_root',
+      name: 'Root',
+      kind: 'root',
+      remaining: 1,
+      duration: 1,
+      value: 0,
+      sourceId: entity.id,
+      school: 'physical',
+    });
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    v2Client.sent.length = 0;
+    broadcast(v2Server);
+    expect(lastSnap(v2Client.sent).self).toMatchObject({ ovE: 1, ovA: 1 });
   });
 
   it.each([

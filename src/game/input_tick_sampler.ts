@@ -1,6 +1,6 @@
 import { DT, emptyMoveInput, type MoveInput } from '../sim/types';
 
-const MAX_FRAME_DT_SEC = 0.25;
+const DT_MS = DT * 1000;
 
 export interface InputTickSample {
   mi: MoveInput;
@@ -12,15 +12,24 @@ export interface InputTickFrame extends InputTickSample {
 }
 
 export class InputTickSampler {
-  private accumulator = 0;
+  private nowMs = 0;
+  private nextTickAtMs = DT_MS;
   private nextClientTick = 0;
 
-  reset(): void {
-    this.accumulator = 0;
+  get interpolationAlpha(): number {
+    const tickStartedAtMs = this.nextTickAtMs - DT_MS;
+    return Math.min(1, Math.max(0, (this.nowMs - tickStartedAtMs) / DT_MS));
+  }
+
+  reset(now: number): void {
+    this.nowMs = now;
+    this.nextTickAtMs = now + DT_MS;
     this.nextClientTick = 0;
   }
 
-  emitNeutralFrame(): InputTickFrame {
+  emitNeutralFrame(now: number): InputTickFrame {
+    this.nowMs = now;
+    this.nextTickAtMs = now + DT_MS;
     return {
       ct: this.nextClientTick++,
       mi: emptyMoveInput(),
@@ -28,12 +37,12 @@ export class InputTickSampler {
     };
   }
 
-  advance(frameDtSec: number, sampleFn: () => InputTickSample): InputTickFrame[] {
-    this.accumulator += Math.min(Math.max(frameDtSec, 0), MAX_FRAME_DT_SEC);
+  advance(now: number, sampleFn: () => InputTickSample): InputTickFrame[] {
+    this.nowMs = now;
     const frames: InputTickFrame[] = [];
-    while (this.accumulator >= DT) {
+    while (now >= this.nextTickAtMs) {
       frames.push({ ct: this.nextClientTick++, ...sampleFn() });
-      this.accumulator -= DT;
+      this.nextTickAtMs += DT_MS;
     }
     return frames;
   }

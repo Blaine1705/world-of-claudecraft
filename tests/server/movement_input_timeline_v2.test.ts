@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  consumeMovementFramesV2,
   createMovementInputSessionState,
   MOVEMENT_INPUT_TIMELINE_DEPTH,
   MovementInputTimeline,
@@ -71,6 +72,58 @@ describe('MovementInputTimeline', () => {
     expect(timeline.enqueue(frame(0))).toBe(false);
     expect(timeline.consumeNext()?.ct).toBe(0);
     expect(timeline.enqueue(frame(0))).toBe(false);
+    expect(timeline.discardedLate).toBe(1);
+  });
+
+  it('advances the ack with one held-input frame on a starved tick', () => {
+    const timeline = new MovementInputTimeline();
+    const session = {
+      pid: 1,
+      lastInputAt: 0,
+      ...createMovementInputSessionState(2),
+      movementTimeline: timeline,
+    };
+    const meta = { moveInput: emptyMoveInput() };
+    const entity = { auras: [], dead: false, facing: 0, ghost: false };
+    const sim = {
+      time: 1,
+      meta: () => meta,
+      entities: new Map([[1, entity]]),
+    };
+    timeline.enqueue(frame(0, true));
+
+    consumeMovementFramesV2(sim as never, [session]);
+    consumeMovementFramesV2(sim as never, [session]);
+
+    expect(meta.moveInput.forward).toBe(true);
+    expect(session.lastConsumedCt).toBe(1);
+    expect(timeline.consumed).toBe(2);
+    expect(timeline.extrapolated).toBe(1);
+    expect(timeline.starved).toBe(1);
+  });
+
+  it('discards and counts a real frame whose client tick was extrapolated', () => {
+    const timeline = new MovementInputTimeline();
+    timeline.enqueue(frame(0, true));
+    expect(timeline.consumeNext()).toEqual(frame(0, true));
+    expect(timeline.consumeNext()).toEqual({ ...frame(0, true), ct: 1 });
+
+    expect(timeline.enqueue(frame(1, false))).toBe(false);
+    expect(timeline.discardedLate).toBe(1);
+  });
+
+  it('extrapolates only until the genuine-gap resync threshold', () => {
+    const timeline = new MovementInputTimeline();
+    timeline.enqueue(frame(0, true));
+    timeline.enqueue(frame(4, false));
+
+    expect(timeline.consumeNext()).toEqual(frame(0, true));
+    expect(timeline.consumeNext()).toEqual({ ...frame(0, true), ct: 1 });
+    expect(timeline.consumeNext()).toEqual({ ...frame(0, true), ct: 2 });
+    expect(timeline.consumeNext()).toBeNull();
+    expect(timeline.resyncs).toBe(1);
+    expect(timeline.consumeNext()).toEqual(frame(4, false));
+    expect(timeline.extrapolated).toBe(STARVE_RESYNC_TICKS - 1);
   });
 
   it('recreates linkdead resume state so client tick zero consumes without starvation', () => {

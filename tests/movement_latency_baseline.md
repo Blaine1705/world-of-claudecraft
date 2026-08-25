@@ -9,32 +9,34 @@ zero-latency authoritative trajectory for the same intent timeline.
 Yards and yards per second; back = backward steps, dev = path deviation,
 prog = along-path progress error, corr = correction events.
 
-The two crowd-control rows are scored against the harness server's OWN
+The three crowd-control rows are scored against the harness server's OWN
 ticks instead: the zero-latency twin never receives the aura, so its
 trajectory would be a fiction to compare against.
 
-| cell | back n | back worst | dev max | dev mean | prog max | prog settle | speed err | speed delta | corr |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| straight run + stop @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.190 | -0.038 | 2.08 | 2.18 | 0 |
-| straight run + stop @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.266 | -0.004 | 2.13 | 2.16 | 0 |
-| straight run + stop @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.305 | 0.305 | 2.03 | 2.49 | 0 |
-| straight run + stop @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.523 | 0.096 | 3.53 | 3.62 | 0 |
-| curved steering @ 0 ms | 0 | 0.0000 | 0.059 | 0.026 | 0.193 | -0.086 | 1.97 | 2.20 | 0 |
-| curved steering @ 50 ms | 0 | 0.0000 | 0.251 | 0.110 | 0.330 | -0.164 | 2.20 | 2.16 | 0 |
-| curved steering @ 150 ms + 20 jitter | 0 | 0.0000 | 0.190 | 0.093 | 0.329 | -0.047 | 1.66 | 2.22 | 0 |
-| curved steering @ 300 ms + 40 jitter | 0 | 0.0000 | 0.174 | 0.068 | 0.555 | -0.317 | 2.46 | 2.52 | 0 |
-| strafe weave @ 0 ms | 0 | 0.0000 | 0.117 | 0.012 | 0.255 | -0.088 | 2.00 | 2.14 | 0 |
-| strafe weave @ 50 ms | 0 | -0.0001 | 0.100 | 0.007 | 0.286 | -0.157 | 2.04 | 2.13 | 0 |
-| strafe weave @ 150 ms + 20 jitter | 7 | -0.0046 | 0.639 | 0.247 | 0.874 | 0.214 | 5.15 | 4.99 | 3 |
-| strafe weave @ 300 ms + 40 jitter | 0 | 0.0000 | 0.258 | 0.101 | 0.730 | -0.379 | 4.18 | 4.40 | 0 |
-| run with jump @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.190 | -0.086 | 2.08 | 2.18 | 0 |
-| run with jump @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.266 | -0.160 | 2.13 | 2.16 | 0 |
-| run with jump @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.305 | -0.155 | 2.03 | 2.49 | 0 |
-| run with jump @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.523 | -0.281 | 3.53 | 3.62 | 0 |
-| start-stop tapping @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.203 | -0.038 | 0.96 | 0.67 | 0 |
-| start-stop tapping @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.273 | -0.002 | 1.29 | 1.41 | 0 |
-| start-stop tapping @ 150 ms + 20 jitter | 2 | -0.0024 | 0.000 | 0.000 | 1.222 | -0.859 | 1.06 | 1.06 | 0 |
-| start-stop tapping @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.233 | 0.156 | 0.38 | 0.16 | 0 |
-| HOL stall 500 ms mid-run | 12 | -0.0160 | 0.000 | 0.000 | 3.371 | -0.124 | 7.16 | 6.41 | 6 |
-| server stun mid-run | 12 | -0.3781 | 0.000 | 0.000 | 0.966 | 0.032 | 15.68 | 14.93 | 8 |
-| server snare mid-run | 1 | -0.1866 | 0.000 | 0.000 | 0.558 | 0.199 | 6.20 | 9.98 | 1 |
+| cell | back n | back worst | dev max | dev mean | prog max | prog settle | speed err | speed delta | corr | input-authority max ms | input-authority mean ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| straight run + stop @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.00 | 0.00 | 0 | 50.0 | 39.0 |
+| straight run + stop @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.097 | 0.000 | 0.00 | 0.00 | 0 | 66.7 | 66.7 |
+| straight run + stop @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.136 | 0.000 | 0.00 | 0.00 | 0 | 100.0 | 100.0 |
+| straight run + stop @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.082 | 0.000 | 0.00 | 0.00 | 0 | 216.7 | 216.7 |
+| curved steering @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.00 | 0.00 | 0 | 50.0 | 39.0 |
+| curved steering @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.097 | 0.000 | 0.01 | 0.01 | 0 | 66.7 | 66.7 |
+| curved steering @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.136 | 0.000 | 0.01 | 0.01 | 0 | 100.0 | 100.0 |
+| curved steering @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.082 | 0.000 | 0.01 | 0.01 | 0 | 216.7 | 216.7 |
+| strafe weave @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.00 | 0.00 | 0 | 50.0 | 39.0 |
+| strafe weave @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.097 | 0.000 | 0.00 | 0.00 | 0 | 66.7 | 66.7 |
+| strafe weave @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.136 | 0.000 | 0.00 | 0.00 | 0 | 100.0 | 100.0 |
+| strafe weave @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.082 | 0.000 | 0.00 | 0.00 | 0 | 216.7 | 216.7 |
+| run with jump @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.00 | 0.00 | 0 | 50.0 | 39.0 |
+| run with jump @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.097 | 0.000 | 0.00 | 0.00 | 0 | 66.7 | 66.7 |
+| run with jump @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.136 | 0.000 | 0.00 | 0.00 | 0 | 100.0 | 100.0 |
+| run with jump @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.082 | 0.000 | 0.00 | 0.00 | 0 | 216.7 | 216.7 |
+| start-stop tapping @ 0 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.00 | 0.00 | 0 | 50.0 | 40.3 |
+| start-stop tapping @ 50 ms | 0 | 0.0000 | 0.000 | 0.000 | 0.097 | 0.000 | 0.00 | 0.00 | 0 | 66.7 | 66.7 |
+| start-stop tapping @ 150 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.136 | 0.000 | 0.00 | 0.00 | 0 | 100.0 | 100.0 |
+| start-stop tapping @ 300 ms + 40 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.082 | 0.000 | 0.00 | 0.00 | 0 | 216.7 | 216.7 |
+| HOL stall 500 ms mid-run | 0 | 0.0000 | 0.000 | 0.000 | 0.136 | 0.000 | 0.00 | 0.00 | 0 | 100.0 | 100.0 |
+| server stun mid-run | 24 | -0.1979 | 0.000 | 0.000 | 1.399 | 0.000 | 14.32 | 13.83 | 14 | 100.0 | 100.0 |
+| server snare mid-run | 9 | -0.1982 | 0.000 | 0.000 | 1.177 | 0.000 | 14.07 | 13.90 | 9 | 100.0 | 100.0 |
+| server stun apply and expire twice | 42 | -0.1974 | 0.000 | 0.000 | 1.392 | 0.000 | 14.23 | 13.85 | 30 | 100.0 | 100.0 |
+| straight run + stop @ 300 ms + 20 jitter | 0 | 0.0000 | 0.000 | 0.000 | 0.056 | 0.000 | 0.00 | 0.00 | 0 | 183.3 | 183.3 |

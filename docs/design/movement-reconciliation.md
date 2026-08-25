@@ -72,10 +72,16 @@ struct. Each server tick consumes EXACTLY ONE frame, the next `ct` in sequence:
 
 - Buffer depth targets a small fixed window at first (2 to 3 ticks); an
   adaptive target based on observed arrival jitter is a later refinement.
-- Starvation (next frame missing): hold the last consumed intent for a bounded
-  number of ticks (the stale-input rule already bounds runaway), count it, and
-  resynchronize the sequence when frames resume (consume forward to the newest
-  contiguous run rather than replaying a stale backlog).
+- Starvation (next frame missing): extrapolate with debt. The tick consumes a
+  SYNTHESIZED frame equal to the last consumed input, advancing both the cursor
+  and the ack, so total travel stays one tick of movement per client tick; the
+  real frame for an extrapolated tick is discarded on arrival. Without the debt,
+  a starved tick re-applies the held input while the cursor waits, minting free
+  distance from lag. If the late frame differed (a release during the starve),
+  the client absorbs the one-tick divergence as a bounded replay correction.
+  Extrapolation runs for at most the resync threshold; a genuinely gapped
+  stream then resynchronizes to the newest contiguous run, and the stale-input
+  rule stays the runaway bound.
 - Overflow (client burst or clock skew): consume forward, dropping the oldest
   frames past the depth cap, and count it.
 - The anti-cheat posture is unchanged: the server accepts only intent and
@@ -104,6 +110,11 @@ the divergence servo, and the measure-window machinery in
 interpolation remains for states where prediction is off (spectate, delves,
 climbing, CC, and the `?nopredict` kill switch).
 
+A stronger future refinement is to retain input history across prediction
+suspension and resume by replaying unacknowledged frames from the authoritative
+`ackCt`. The current resume anchors open-loop at the last snapshot pose and
+absorbs the resulting catch-up glide in the display residual.
+
 ### Server overrides (the only legitimate corrections)
 
 Any server-side effect that changes the player's motion outside their own
@@ -120,6 +131,18 @@ the active override class. The client:
 Speed-multiplier changes need no suspension once mirrored: the client's kernel
 deps read the same multiplier the server applies, and the mirror carries it;
 the epoch covers the one-echo window where they disagree.
+
+### Client input clock
+
+The sampler runs on an absolute tick deadline, never a summed frame-dt
+accumulator (float residue at 60 Hz emits every tick one render frame late and
+lets the phase wander). Its phase relative to the server tick is set by when
+negotiation completes and is deliberately NOT servo-locked to the server
+cadence: the display is phase-independent by construction (prediction plus
+sub-tick interpolation on the sampler's own clock), so a phase lock would only
+reduce the time frames wait in the server timeline. That delay is observable as
+the harness's inputToAuthorityMs metric; a phase lock is a deferred refinement
+to be justified by that number, not assumed.
 
 ## Rollout inside the rework PR
 

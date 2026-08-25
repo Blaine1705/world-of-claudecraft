@@ -24,8 +24,11 @@
 // Every threshold is a named parameter with a default; nothing is hard-coded
 // inside the math.
 
+import { MAX_SELF_REWIND_YD_PER_SEC } from '../../src/render/self_render_position_core';
 import { BACKPEDAL_MULT } from '../../src/sim/player_motion';
-import { type MoveInput, RUN_SPEED } from '../../src/sim/types';
+import { DT, type MoveInput, RUN_SPEED } from '../../src/sim/types';
+
+const DT_MS = DT * 1000;
 
 /** One drawn frame: when it was drawn and where the avatar was put. */
 export interface DrawnSample {
@@ -39,6 +42,7 @@ export interface GroundTruthSample {
   tick: number;
   x: number;
   z: number;
+  ct?: number;
 }
 
 /** The intent that was on the wire at `tMs` (held between samples). */
@@ -46,6 +50,13 @@ export interface CommandSample {
   tMs: number;
   mi: MoveInput;
   facing: number;
+  ct?: number;
+  samplerInterpolationAlpha?: number;
+}
+
+export interface AuthorityTickSample {
+  tMs: number;
+  consumedCt: number;
 }
 
 export interface MovementMetricsOptions {
@@ -109,12 +120,19 @@ export interface CorrectionEventsMetric {
   samples: number;
 }
 
+export interface InputToAuthorityMetric {
+  maxMs: number;
+  meanMs: number;
+  samples: number;
+}
+
 export interface MovementMetrics {
   backwardSteps: BackwardStepsMetric;
   pathDeviation: PathDeviationMetric;
   progressError: ProgressErrorMetric;
   speedContinuity: SpeedContinuityMetric;
   correctionEvents: CorrectionEventsMetric;
+  inputToAuthorityMs: InputToAuthorityMetric;
 }
 
 export const MOVEMENT_METRICS_DEFAULTS = {
@@ -169,12 +187,15 @@ export const MOVEMENT_FEEL_TARGETS = {
  * What still has to hold is that the override is absorbed cleanly: the visible
  * snap-back it costs stays bounded, and once motion stops the display sits on
  * the authority.
+ *
+ * Authoritative scoring carries about a +0.45 yard mid-motion lead at 150 ms:
+ * a healthy predictor leads the concurrent server tick. Per-sample client-clock
+ * dating applies only to cells scored against their zero-latency twin.
  */
 export const MOVEMENT_FEEL_TARGETS_CC = {
-  /** Worst backward step while the server is overriding (yards). Provisional:
-   *  Phase 3 tightens this once the server signals an override explicitly, at
-   *  which point the display can absorb one rather than discover it. */
-  backwardStepYd: 0.5,
+  /** The predictor-to-fallback residual may rewind by one bounded display
+   *  frame, plus a small allowance for floating-point arithmetic. */
+  backwardStepYd: MAX_SELF_REWIND_YD_PER_SEC * (1 / 60) + 0.000001,
   /** Terminal settle is NOT excused by crowd control: once the aura and the
    *  motion are done the display must land on the authority. */
   settleYd: 0.05,
@@ -275,15 +296,26 @@ interface PathPoint extends Vec2 {
 
 function buildPath(
   truth: readonly GroundTruthSample[],
+  commands: readonly CommandSample[],
   tickMs: number,
   tickPhaseMs: number,
 ): PathPoint[] {
+  const commandsByClientTick = new Map(
+    commands
+      .filter((sample): sample is CommandSample & { ct: number } => sample.ct !== undefined)
+      .map((sample) => [sample.ct, sample]),
+  );
   const out: PathPoint[] = [];
   let s = 0;
   for (let i = 0; i < truth.length; i++) {
     const sample = truth[i];
     if (i > 0) s += Math.hypot(sample.x - truth[i - 1].x, sample.z - truth[i - 1].z);
-    out.push({ x: sample.x, z: sample.z, tMs: sample.tick * tickMs + tickPhaseMs, s });
+    const command = sample.ct === undefined ? undefined : commandsByClientTick.get(sample.ct);
+    const tMs =
+      command?.samplerInterpolationAlpha === undefined
+        ? sample.tick * tickMs + tickPhaseMs
+        : command.tMs + DT_MS - command.samplerInterpolationAlpha * DT_MS;
+    out.push({ x: sample.x, z: sample.z, tMs, s });
   }
   return out;
 }
@@ -384,6 +416,7 @@ export function computeMovementMetrics(
   truth: readonly GroundTruthSample[],
   commands: readonly CommandSample[],
   options: MovementMetricsOptions = {},
+  authorityTicks: readonly AuthorityTickSample[] = [],
 ): MovementMetrics {
   const tickMs = options.tickMs ?? MOVEMENT_METRICS_DEFAULTS.tickMs;
   const tickPhaseMs = options.tickPhaseMs ?? MOVEMENT_METRICS_DEFAULTS.tickPhaseMs;
@@ -394,7 +427,7 @@ export function computeMovementMetrics(
     options.correctionAngleDeg ?? MOVEMENT_METRICS_DEFAULTS.correctionAngleDeg;
   const minStepYd = options.minStepYd ?? MOVEMENT_METRICS_DEFAULTS.minStepYd;
 
-  const path = buildPath(truth, tickMs, tickPhaseMs);
+  const path = buildPath(truth, commands, tickMs, tickPhaseMs);
   const changes = heldInputChangeTimes(commands);
   const correctionCos = Math.cos((correctionAngleDeg * Math.PI) / 180);
 
@@ -403,6 +436,7 @@ export function computeMovementMetrics(
   const progress: ProgressErrorMetric = { maxAbsYd: 0, meanYd: 0, terminalYd: 0, samples: 0 };
   const speed: SpeedContinuityMetric = { maxSpeedErr: 0, maxSpeedDelta: 0, samples: 0 };
   const corrections: CorrectionEventsMetric = { count: 0, worstDeg: 0, samples: 0 };
+  const inputToAuthority: InputToAuthorityMetric = { maxMs: 0, meanMs: 0, samples: 0 };
 
   let deviationSum = 0;
   let progressSum = 0;
@@ -478,11 +512,31 @@ export function computeMovementMetrics(
 
   deviation.meanYd = deviation.samples > 0 ? deviationSum / deviation.samples : 0;
   progress.meanYd = progress.samples > 0 ? progressSum / progress.samples : 0;
+  const commandsByClientTick = new Map(
+    commands
+      .filter((sample): sample is CommandSample & { ct: number } => sample.ct !== undefined)
+      .map((sample) => [sample.ct, sample]),
+  );
+  const measuredClientTicks = new Set<number>();
+  let inputToAuthoritySum = 0;
+  for (const tick of authorityTicks) {
+    if (tick.consumedCt < 0 || measuredClientTicks.has(tick.consumedCt)) continue;
+    const command = commandsByClientTick.get(tick.consumedCt);
+    if (!command) continue;
+    measuredClientTicks.add(tick.consumedCt);
+    const delayMs = tick.tMs - command.tMs;
+    inputToAuthority.samples++;
+    inputToAuthoritySum += delayMs;
+    if (delayMs > inputToAuthority.maxMs) inputToAuthority.maxMs = delayMs;
+  }
+  inputToAuthority.meanMs =
+    inputToAuthority.samples > 0 ? inputToAuthoritySum / inputToAuthority.samples : 0;
   return {
     backwardSteps: backward,
     pathDeviation: deviation,
     progressError: progress,
     speedContinuity: speed,
     correctionEvents: corrections,
+    inputToAuthorityMs: inputToAuthority,
   };
 }

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { SelfMotionFrame, SelfMotionPredictor, Vec3Like } from '../src/render/self_motion';
-import { SELF_MOTION_SNAP_DIST_SQ, SELF_RENDER_SMOOTH_RATE } from '../src/render/self_motion';
+import { SELF_MOTION_SNAP_DIST_SQ } from '../src/render/self_motion';
 import {
   createSelfRenderPositionState,
+  MAX_SELF_REWIND_YD_PER_SEC,
   noteSelfIdentity,
   type SelfRenderPositionState,
   selfSnapshotAlpha,
@@ -209,20 +210,82 @@ describe('updateSelfRenderPosition predictor path', () => {
     expect(state.offset.x).toBeCloseTo(decay * decay, 10);
     expect(state.position.x).toBeCloseTo(8 + decay * decay, 10);
 
-    // 4. The predictor declines a frame: the fallback path resumes from the
-    //    predicted pose (smoothed, not snapped) and the active flag drops, so a
-    //    later re-entry captures a fresh offset.
+    // 4. The predictor declines a frame: the fallback path captures the gap
+    //    and starts a bounded handoff, while the active flag drops so a later
+    //    re-entry captures a fresh offset.
     const handedOver = state.position.x;
     state.predictor = stubPredictor(() => null);
     runPredicted(state, player);
     expect(state.active).toBe(false);
-    const smooth = 1 - Math.exp(-SELF_RENDER_SMOOTH_RATE * FRAME_DT);
-    expect(state.position.x).toBeCloseTo(handedOver + (10 - handedOver) * smooth, 10);
+    expect(state.position.x).toBeCloseTo(handedOver + MAX_SELF_REWIND_YD_PER_SEC * FRAME_DT, 10);
 
     // 5. A new character invalidates the whole carry-over.
     expect(noteSelfIdentity(state, 2)).toBe(true);
     expect(state.ready).toBe(false);
     expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+  });
+
+  it('bounds and smoothly decays a 1.4 yard predictor lead when the gate closes', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      { kind: 'reconciled', position: { x: 1.4, y: 0, z: 0 }, residual: null },
+      false,
+    );
+
+    let previous = state.position.x;
+    for (let frameIndex = 0; frameIndex < 20; frameIndex++) {
+      updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+      const rewind = previous - state.position.x;
+      expect(rewind).toBeGreaterThan(0);
+      expect(rewind).toBeLessThanOrEqual(MAX_SELF_REWIND_YD_PER_SEC * FRAME_DT + 1e-12);
+      previous = state.position.x;
+    }
+
+    expect(state.position.x).toBeLessThan(0.1);
+    expect(state.position.x).toBeGreaterThan(0);
+  });
+
+  it('bounds the total rewind when the fallback base also retreats', () => {
+    const state = createSelfRenderPositionState();
+    updateSelfRenderPosition(
+      state,
+      playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }),
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      { kind: 'reconciled', position: { x: 1.4, y: 0, z: 0 }, residual: null },
+      false,
+    );
+    updateSelfRenderPosition(
+      state,
+      playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }),
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      null,
+      false,
+    );
+
+    const previous = state.position.x;
+    const retreatedBase = playerAt({ x: -0.02, y: 0, z: 0 }, { x: -0.02, y: 0, z: 0 });
+    updateSelfRenderPosition(state, retreatedBase, SEED, 1, FRAME_DT, 0.2, null, false);
+
+    expect(previous - state.position.x).toBeCloseTo(MAX_SELF_REWIND_YD_PER_SEC * FRAME_DT, 12);
+
+    for (let frameIndex = 0; frameIndex < 100; frameIndex++) {
+      updateSelfRenderPosition(state, retreatedBase, SEED, 1, FRAME_DT, 0.2, null, false);
+    }
+    expect(state.offset.x).toBeCloseTo(0, 10);
+    expect(state.position.x).toBeCloseTo(-0.02, 10);
   });
 
   it('captures no offset when the predictor is the first to place the body', () => {
@@ -231,6 +294,31 @@ describe('updateSelfRenderPosition predictor path', () => {
     runPredicted(state, playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }));
     expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
     expect(state.position).toEqual({ x: 5, y: 1, z: 2 });
+  });
+
+  it('uses the shared handoff offset for a reconciled v2 residual', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    const decay = Math.exp(-HANDOFF_RATE * FRAME_DT);
+    updateSelfRenderPosition(
+      state,
+      player,
+      SEED,
+      1,
+      FRAME_DT,
+      0,
+      {
+        kind: 'reconciled',
+        position: { x: 4, y: 2, z: 1 },
+        residual: { x: 1, y: -1, z: 0.5 },
+      },
+      false,
+    );
+
+    expect(state.position.x).toBeCloseTo(4 + decay, 10);
+    expect(state.position.y).toBeCloseTo(2 - decay, 10);
+    expect(state.position.z).toBeCloseTo(1 + 0.5 * decay, 10);
+    expect(state.predictor).toBeNull();
   });
 
   it('clears the handoff offset outright on an authoritative discontinuity', () => {
