@@ -13,6 +13,7 @@ import type {
   TopWealthHolderRow,
 } from './account_wealth_db';
 import { type CachedRead, createCachedRead } from './cached_read';
+import { MAIL_PARTITION_MARKER_PREFIX, MAIL_RECIPIENT_KEY_INFIX } from './mail_partition_backfill';
 
 // Sweep cadence. The database-visible purse only advances on the 30 s
 // character autosave, so a 60 s sweep bounds admin-visible staleness at about
@@ -44,16 +45,30 @@ function positiveCopper(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
 }
 
-/** 'mail:eastbrook' -> { kind: 'mail', realm: 'eastbrook' }; null for any
- *  other world_state key (including the retained bare legacy 'market' row). */
+type EscrowStateKey =
+  | { kind: 'mail'; realm: string; format: 'legacy' | 'partition' }
+  | { kind: 'market'; realm: string }
+  | { kind: 'mailPartitionMarker'; realm: string };
+
+/** Classify world_state keys the escrow sweep reads; null for unrelated rows. */
 export function parseEscrowStateKey(
   key: string,
-): { kind: 'mail' | 'market'; realm: string } | null {
+): EscrowStateKey | null {
+  if (key.startsWith(MAIL_PARTITION_MARKER_PREFIX)) {
+    const realm = key.slice(MAIL_PARTITION_MARKER_PREFIX.length);
+    return realm === '' ? null : { kind: 'mailPartitionMarker', realm };
+  }
   const sep = key.indexOf(':');
   if (sep === -1) return null;
   const kind = key.slice(0, sep);
   if (kind !== 'mail' && kind !== 'market') return null;
-  return { kind, realm: key.slice(sep + 1) };
+  const rest = key.slice(sep + 1);
+  if (rest === '') return null;
+  if (kind === 'market') return { kind, realm: rest };
+  const recipientSep = rest.indexOf(MAIL_RECIPIENT_KEY_INFIX);
+  if (recipientSep === -1) return { kind: 'mail', realm: rest, format: 'legacy' };
+  const realm = rest.slice(0, recipientSep);
+  return realm === '' ? null : { kind: 'mail', realm, format: 'partition' };
 }
 
 /**
@@ -64,6 +79,13 @@ export function parseEscrowStateKey(
  * and is skipped. Pure: a Vitest drives it with literal blobs.
  */
 export function escrowTotalsFromStateRows(rows: EscrowStateRow[]): EscrowCharacterTotal[] {
+  const migratedMailRealms = new Set<string>();
+  const parsedRows = rows.map((row) => ({ row, parsed: parseEscrowStateKey(row.key) }));
+  for (const { parsed } of parsedRows) {
+    if (!parsed) continue;
+    if (parsed.kind === 'mailPartitionMarker') migratedMailRealms.add(parsed.realm);
+    if (parsed.kind === 'mail' && parsed.format === 'partition') migratedMailRealms.add(parsed.realm);
+  }
   const byKey = new Map<string, EscrowCharacterTotal>();
   const bucket = (rawKey: string, realm: string): EscrowCharacterTotal | null => {
     const key = rawKey.trim();
@@ -86,12 +108,13 @@ export function escrowTotalsFromStateRows(rows: EscrowStateRow[]): EscrowCharact
     }
     return entry;
   };
-  for (const row of rows) {
-    const parsed = parseEscrowStateKey(row.key);
+  for (const { row, parsed } of parsedRows) {
     if (!parsed) continue;
+    if (parsed.kind === 'mailPartitionMarker') continue;
     const data = row.data;
     if (typeof data !== 'object' || data === null) continue;
     if (parsed.kind === 'mail') {
+      if (parsed.format === 'legacy' && migratedMailRealms.has(parsed.realm)) continue;
       const letters = (data as MailSaveShape).mail;
       if (!Array.isArray(letters)) continue;
       for (const letter of letters) {

@@ -153,11 +153,10 @@ export class MailIndex<M extends IndexedLetter> {
   }
 
   // Per-tick: land any in-flight letter whose delivery time has arrived,
-  // moving it from `undelivered` into the unread count. Returns how many
-  // landed so the caller can advance its wire revision only when the visible
-  // mailbox contents actually changed. Draws no rng and emits nothing (the
-  // arrival toast stays on its own per-second cadence in PostOffice.update()),
-  // so it never perturbs the deterministic event/rng stream.
+  // moving it from `undelivered` into the unread count and dirtying only the
+  // recipients whose persisted deliverIn must now be 0. Draws no rng and emits
+  // nothing (arrival toasts stay in PostOffice.update()), so it never perturbs
+  // the deterministic event/rng stream.
   deliverDue(now: number): number {
     if (this.undelivered.size === 0) return 0;
     let landed = 0;
@@ -165,6 +164,7 @@ export class MailIndex<M extends IndexedLetter> {
       if (now < m.deliverAt) continue;
       this.undelivered.delete(m);
       if (!m.read) this.inc(m.recipientKey);
+      this.dirty.add(m.recipientKey);
       landed++;
     }
     return landed;

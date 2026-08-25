@@ -20,6 +20,7 @@
 // endpoint surfaces each character's guild treasury as context instead.
 
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
+import { MAIL_PARTITION_MARKER_PREFIX } from './mail_partition_backfill';
 
 // account_wealth is bounded (one row per account, cascade-deleted with the
 // account), so it needs no retention registration: it can never grow past the
@@ -148,11 +149,12 @@ export interface EscrowStateRow {
 }
 
 /** Every realm's mail and market blob (the escrow inputs the sweep parses in
- *  Node). The retained bare legacy 'market' rollback row does not match the
- *  'market:%' pattern and is deliberately excluded. */
+ *  Node), plus mail partition markers so retained legacy blobs can be ignored.
+ *  The retained bare legacy 'market' rollback row does not match 'market:%'. */
 export async function listEscrowStateRows(): Promise<EscrowStateRow[]> {
   const res = await pool.query(
-    `SELECT key, data FROM world_state WHERE key LIKE 'mail:%' OR key LIKE 'market:%'`,
+    `SELECT key, data FROM world_state
+     WHERE key LIKE 'mail:%' OR key LIKE 'market:%' OR key LIKE '${MAIL_PARTITION_MARKER_PREFIX}%'`,
   );
   return res.rows.map((row) => ({ key: row.key, data: row.data }));
 }
