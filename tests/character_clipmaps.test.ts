@@ -166,6 +166,7 @@ function requiredClipNames(clips: ClipMap): string[] {
     ...clips.attack,
     ...(clips.hit ?? []),
     ...Object.values(clips.attackByAbility ?? {}),
+    ...Object.values(clips.castByAbility ?? {}),
     ...Object.values(clips.attackByHand ?? {}),
   ].filter((name): name is string => !!name);
 }
@@ -200,6 +201,8 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'hit',
   'attackByAbility',
   'attackTimeScaleByAbility',
+  'castByAbility',
+  'castTimeScaleByAbility',
   'attackByHand',
   'emote',
 ]);

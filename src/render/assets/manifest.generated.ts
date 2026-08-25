@@ -428,6 +428,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/treant_ability_anims.glb": "/media/models/creatures/treant_ability_anims.6d81c3efd4d4.glb",
   "models/creatures/tribal.glb": "/media/models/creatures/tribal.36f1f0f698db.glb",
   "models/creatures/troll_ability_anims.glb": "/media/models/creatures/troll_ability_anims.95293af97655.glb",
+  "models/creatures/varkhul_forgefather.glb": "/media/models/creatures/varkhul_forgefather.cfaa7b2c5d25.glb",
   "models/creatures/veiled_doe.glb": "/media/models/creatures/veiled_doe.ee0dd9450b96.glb",
   "models/creatures/veiled_stag.glb": "/media/models/creatures/veiled_stag.4854cf2afd69.glb",
   "models/creatures/velociraptor.glb": "/media/models/creatures/velociraptor.3385fbba757a.glb",

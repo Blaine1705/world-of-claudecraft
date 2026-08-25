@@ -11,6 +11,7 @@ import type {
   VarkhulAssemblyPhase,
   VarkhulAssemblyRuneControl,
 } from './varkhul_assembly';
+import type { VarkhulEngageState } from './varkhul_engage';
 import type { VarkhulForgeBeamWindow } from './varkhul_forge_intermission';
 
 export const TICK_RATE = 20; // sim ticks per second
@@ -5037,6 +5038,7 @@ export interface IgnivarEncounterState {
 }
 
 export interface VarkhulEncounterState {
+  engage: VarkhulEngageState;
   makersBrandTimer: number;
   frontalTimer: number;
   frontalCastKey: number;

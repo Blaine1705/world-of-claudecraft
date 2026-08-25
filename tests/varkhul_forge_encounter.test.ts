@@ -1452,6 +1452,8 @@ describe('Varkhul forge pillars and add intermission', () => {
     state.assemblyPhase = 'done';
     state.forgeBeamTeachingTriggered = true;
     state.forgeBeamPressureTriggered = true;
+    // manufactured deep mid-fight state: the walk-in staging is long over
+    state.engage.phase = 'done';
     boss.damageFloorHp = undefined;
     boss.hp = Math.floor(boss.maxHp * 0.2);
     updateVarkhulEncounter(sim.ctx, boss);

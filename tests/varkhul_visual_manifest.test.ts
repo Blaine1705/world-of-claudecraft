@@ -2,11 +2,48 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 
 describe('expanded Ignivar raid visual manifest', () => {
-  it('keeps only the unfinished Varkhul body on the visible elemental fallback', () => {
+  it('routes the Forgefather to his authored smith body and strike clips', () => {
     expect(
       visualKeyFor({ kind: 'mob', templateId: 'varkhul_forgefather_of_the_last_flame' } as never),
-    ).toBe('mob_elemental');
-    expect(VISUALS.mob_elemental.url).toBe('models/creatures/golelingevolved.glb');
+    ).toBe('mob_varkhul_forgefather');
+    expect(VISUALS.mob_varkhul_forgefather).toMatchObject({
+      url: 'models/creatures/varkhul_forgefather.glb',
+      height: 3,
+      yaw: 0,
+      clips: {
+        idle: 'Idle',
+        walk: 'Walk',
+        run: 'Run',
+        attack: ['Slash'],
+        attackByAbility: {
+          "Forgefather's Hammer": 'Forging',
+          "Anvil's Decree": 'Forging',
+        },
+        attackTimeScaleByAbility: {
+          "Forgefather's Hammer": 0.815,
+          "Anvil's Decree": 0.815,
+        },
+        cast: 'Casting',
+        castByAbility: {
+          "Forgefather's Sweep": 'Slam',
+          Forgestorm: 'Slam',
+          "Anvil's Decree": 'Forging',
+        },
+        castTimeScaleByAbility: {
+          "Forgefather's Sweep": 0.65,
+          Forgestorm: 0.65,
+          "Anvil's Decree": 0.815,
+        },
+        flourish: 'PowerUp',
+        death: 'Death',
+      },
+    });
+    // Raid-wide damage must never thrash the boss rig: no hit mapping, like
+    // the Ignivar colossus.
+    expect(VISUALS.mob_varkhul_forgefather.clips.hit).toBeUndefined();
+    // anti-slide gait refs are pinned so a retimed clip cannot silently skate
+    expect(VISUALS.mob_varkhul_forgefather.walkRef).toBe(6.9);
+    expect(VISUALS.mob_varkhul_forgefather.runRef).toBe(18);
   });
 
   it('routes all three second-boss adds to their dedicated automa bodies and authored clips', () => {

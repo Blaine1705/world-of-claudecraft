@@ -377,7 +377,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
   const isIgnivar = mob.templateId === IGNIVAR_BOSS_ID;
   const isVarkhul = mob.templateId === VARKHUL_BOSS_ID;
-  if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
+  // Varkhul stages his own pre-pull (anvil work + the proximity pull gate),
+  // so his encounter module owns him even out of combat.
+  if (
+    mob.inCombat ||
+    isVarkhul ||
+    (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')
+  ) {
     const nythraxisScriptLocked =
       isNythraxis &&
       mob.nythraxis &&

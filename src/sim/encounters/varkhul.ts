@@ -87,6 +87,15 @@ import {
   varkhulCinderOrbProjectileId,
 } from '../varkhul_cinder_orbs';
 import {
+  initVarkhulEngage,
+  startVarkhulEngage,
+  tickVarkhulEngage,
+  VARKHUL_ENGAGE_ARENA_LOCAL_POS,
+  varkhulEngagePulled,
+  varkhulForgingHammerTick,
+  varkhulLeapPos,
+} from '../varkhul_engage';
+import {
   VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
   VARKHUL_FORGE_BEAM_COUNT,
   VARKHUL_FORGE_BEAM_WARMUP_SECONDS,
@@ -329,6 +338,7 @@ export function varkhulForgestormPattern(
 function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
   if (!boss.varkhul) {
     boss.varkhul = {
+      engage: initVarkhulEngage(),
       makersBrandTimer: VARKHUL_MAKERS_BRAND_EVERY,
       frontalTimer: VARKHUL_FIRST_FRONTAL_SECONDS,
       frontalCastKey: 0,
@@ -1158,6 +1168,13 @@ function updateAssemblyForging(ctx: SimContext, boss: Entity, st: VarkhulEncount
   if (st.assemblyForgeHammerTimer > CAST_COMPLETE_EPS) return;
   st.assemblyForgeHammerTimer += VARKHUL_FORGE_HAMMER_EVERY_SECONDS;
   boss.aiState = 'attack';
+  emitVarkhulForgeHammerStrike(ctx, boss);
+}
+
+/** One anvil blow: the positional strike event the render Forging swing and
+ *  the metal ring key off. Shared by the assembly phase and the pre-pull
+ *  anvil work. */
+function emitVarkhulForgeHammerStrike(ctx: SimContext, boss: Entity): void {
   const forge = anvilWorldPosition(ctx, boss);
   ctx.emit({
     type: 'spellfxAt',
@@ -2478,6 +2495,11 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   if (boss.templateId !== VARKHUL_BOSS_TEMPLATE_ID || boss.dead) return;
   let players = playersInEncounter(ctx, boss);
   if (players.length === 0) {
+    if (!boss.inCombat && boss.varkhul?.engage.phase === 'forging') {
+      // Nobody has entered yet and he never engaged: he is simply at his
+      // anvil. Nothing to evade or reset, and no audience for hammer events.
+      return;
+    }
     boss.aiState = 'evade';
     if (boss.combatExitHoldUntil > ctx.time) return;
     resetVarkhulEncounter(ctx, boss);
@@ -2499,7 +2521,32 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   updateAnvilMeteors(ctx, boss, st, players);
   updateMobTarget(ctx, boss);
   let target = resolveLivingTarget(boss, players);
-  if (!target) return;
+  if (
+    target &&
+    st.engage.phase === 'forging' &&
+    !varkhulEngagePulled(
+      boss.pos,
+      boss.hp / boss.maxHp,
+      players.map((player) => player.pos),
+    )
+  ) {
+    // The room-wide auto-target would engage him the moment anyone steps
+    // through the gate. Hold the pull until someone actually approaches (or
+    // hits him), so walking in shows the Forgefather at work, back to the
+    // door. Every post-pull mechanic keeps the room-wide target exactly as
+    // before.
+    boss.aggroTargetId = null;
+    target = null;
+  }
+  if (!target) {
+    // Pre-pull staging: nobody has engaged. He keeps working his anvil (his
+    // spawn is the work spot), so walking in shows the forge being hammered
+    // before the fight exists.
+    boss.inCombat = false;
+    boss.aiState = 'idle';
+    if (varkhulForgingHammerTick(st.engage, DT)) emitVarkhulForgeHammerStrike(ctx, boss);
+    return;
+  }
   boss.aggroTargetId = target.id;
   boss.inCombat = true;
   boss.aiState = 'attack';
@@ -2580,6 +2627,40 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     return;
   }
 
+  if (st.engage.phase !== 'done') {
+    // First engage: turn from the anvil, roar, then leap to the arena center.
+    // Runs BELOW every ability timer on purpose: the cast schedule ticks
+    // through the staging, so mechanics are byte-identical to an unstaged
+    // pull; only his melee and chase start ~2.2s late.
+    if (st.engage.phase === 'forging') {
+      startVarkhulEngage(st.engage, boss.pos);
+      ctx.emit({
+        type: 'spellfx',
+        sourceId: boss.id,
+        targetId: boss.id,
+        school: 'fire',
+        fx: 'shout',
+      });
+    }
+    boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
+    const step = tickVarkhulEngage(st.engage, DT);
+    if (step.phase === 'leaping' || step.landed) {
+      const instance = encounterInstance(ctx, boss);
+      const origin = instance ? ctx.instanceOriginOf(instance) : null;
+      const from = st.engage.leapFrom ?? boss.pos;
+      const to = origin
+        ? ctx.groundPos(
+            origin.x + VARKHUL_ENGAGE_ARENA_LOCAL_POS.x,
+            origin.z + VARKHUL_ENGAGE_ARENA_LOCAL_POS.z,
+          )
+        : { ...boss.spawnPos };
+      const pos = varkhulLeapPos(from, to, to.y, step.landed ? 1 : step.leapT);
+      if (step.landed) pos.y = to.y;
+      boss.prevPos = { ...boss.pos };
+      boss.pos = pos;
+    }
+    return;
+  }
   boss.swingTimer = Math.max(0, boss.swingTimer - DT);
   tryMobMeleeSwingInRange(ctx, boss, target);
   if (!pursueTarget) return;
