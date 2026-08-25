@@ -1455,7 +1455,7 @@ export const de_DE: EnTranslations = {
       "endedForfeitLog": "Das Spiel wurde aufgegeben.",
       "firstWinBonusLine": "Erster Sieg des Tages: +{honor} Ehre",
       "firstWinBonusLog": "Erster Sieg des Tages: Ihr erhaltet {honor} Bonus-Ehre.",
-      "doubleHonorLine": "Doppelte-Ehre-Wochenende: Ehre auf den Thornhollow-Feldern zahlt heute das {mult}-Fache, und eine ausgetragene Niederlage zahlt wie ein Sieg",
+      "doubleHonorLine": "Wochenende der doppelten Ehre: Die Ehre der Thornhollow-Felder zahlt heute das {mult}-Fache, und eine ausgetragene Niederlage zählt wie ein Sieg",
       "timeWarningMinutes": "{minutes} Minuten verbleiben",
       "timeWarningOneMinute": "Eine Minute verbleibt",
       "timeWarningMinutesLog": "{minutes} Minuten verbleiben im Kampf.",
@@ -3135,8 +3135,8 @@ export const de_DE: EnTranslations = {
           "note": "Duellanten strömen zum Aschenkolosseum. Stell dich an und erklimm die Rangliste."
         },
         "doubleHonor": {
-          "title": "Doppelte-Ehre-Wochenende",
-          "note": "Die Kriegslager blasen zur Musterung: Das ganze Wochenende zahlt Ehre auf den Thornhollow-Feldern doppelt, und eine ausgetragene Niederlage zahlt wie ein Sieg."
+          "title": "Wochenende der doppelten Ehre",
+          "note": "Die Kriegslager rufen zur Sammlung: Das ganze Wochenende zahlt die Ehre der Thornhollow-Felder das Doppelte, und eine ausgetragene Niederlage zählt wie ein Sieg."
         },
         "fishingDerby": {
           "title": "Angelderby",

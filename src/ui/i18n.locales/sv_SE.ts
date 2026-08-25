@@ -1642,6 +1642,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Karmosinröd',
   'hudChrome.bg.defeatBanner':
     'Nederlag. Törnhålefälten {crimson}:{azure}. Rankning {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Helg med dubbel heder: idag betalas heder på Törnhålefälten ut {mult} gånger, och ett utspelat nederlag räknas som en vinst',
   'hudChrome.bg.drawBanner':
     'Törnhålefälten oavgjort {crimson}:{azure}. Rankning {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Släpp flaggan',
@@ -3966,6 +3968,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broder Halven markerar i sina tabeller: en fin dag att trotsa Det rasade relikvariet.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-dag',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Krigslägren blåser till samling: hela helgen betalas heder på Törnhålefälten ut dubbelt, och ett utspelat nederlag räknas som en vinst.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Helg med dubbel heder',
   'hudChrome.calendar.events.fishingDerby.note':
     'Metare kantar sjöarna. Ta med ett spö och byt fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fisketävling',

@@ -1455,7 +1455,7 @@ export const es_ES: EnTranslations = {
       "endedForfeitLog": "El combate terminó en abandono.",
       "firstWinBonusLine": "Primera victoria del día: +{honor} de Honor",
       "firstWinBonusLog": "Primera victoria del día: obtienes {honor} de Honor adicional.",
-      "doubleHonorLine": "Fin de Semana de Honor Doble: hoy el Honor de Campos Espinosos paga {mult}x, y una derrota jugada hasta el final paga como una victoria",
+      "doubleHonorLine": "Fin de Semana de Honor Doble: hoy el Honor de Campos Espinosos se multiplica por {mult}, y una derrota jugada hasta el final paga como una victoria",
       "timeWarningMinutes": "Quedan {minutes} minutos",
       "timeWarningOneMinute": "Queda un minuto",
       "timeWarningMinutesLog": "Quedan {minutes} minutos de combate.",
@@ -3136,7 +3136,7 @@ export const es_ES: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Fin de Semana de Honor Doble",
-          "note": "Los campamentos de guerra tocan a filas: el fin de semana entero, el Honor de Campos Espinosos paga el doble y una derrota jugada hasta el final paga como una victoria."
+          "note": "Los campamentos de guerra tocan a formación: todo el fin de semana, el Honor de Campos Espinosos se paga el doble y una derrota jugada hasta el final paga como una victoria."
         },
         "fishingDerby": {
           "title": "Torneo de Pesca",

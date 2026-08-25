@@ -1663,6 +1663,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Carmesim',
   'hudChrome.bg.defeatBanner':
     'Derrota. Campos de Thornhollow {crimson}:{azure}. Ranque {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Fim de Semana de Honra em Dobro: hoje a Honra dos Campos de Thornhollow é multiplicada por {mult}, e uma derrota disputada até o fim paga como uma vitória',
   'hudChrome.bg.drawBanner':
     'Empate em Campos de Thornhollow {crimson}:{azure}. Ranque {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Soltar a bandeira',
@@ -4049,6 +4051,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'O Irmão Halven marca seus mapas: um belo dia para desbravar o Relicário Desmoronado.',
   'hudChrome.calendar.events.delveDay.title': 'Dia de Incursão',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Os acampamentos de guerra tocam a reunião: o fim de semana todo, a Honra dos Campos de Thornhollow é paga em dobro e uma derrota disputada até o fim paga como uma vitória.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Fim de Semana de Honra em Dobro',
   'hudChrome.calendar.events.fishingDerby.note':
     'Pescadores se enfileiram nos lagos. Traga uma vara e troque histórias de pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Torneio de Pesca',

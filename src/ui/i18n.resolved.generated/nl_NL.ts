@@ -1455,7 +1455,7 @@ export const nl_NL: EnTranslations = {
       "endedForfeitLog": "De wedstrijd werd opgegeven.",
       "firstWinBonusLine": "Eerste overwinning van de dag: +{honor} Eer",
       "firstWinBonusLog": "Eerste overwinning van de dag: je krijgt {honor} bonus Eer.",
-      "doubleHonorLine": "Weekend van Dubbele Eer: Eer op de Doornholte-Velden betaalt vandaag {mult}x, en een uitgevochten nederlaag betaalt als een overwinning",
+      "doubleHonorLine": "Weekend van Dubbele Eer: vandaag wordt Eer in de Doornholte-Velden {mult} keer uitgekeerd, en een uitgespeelde nederlaag telt als een overwinning",
       "timeWarningMinutes": "Nog {minutes} minuten te gaan",
       "timeWarningOneMinute": "Nog een minuut te gaan",
       "timeWarningMinutesLog": "Nog {minutes} minuten te gaan in het gevecht.",
@@ -3136,7 +3136,7 @@ export const nl_NL: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Weekend van Dubbele Eer",
-          "note": "De oorlogskampen blazen de verzamelroep: het hele weekend betaalt Eer op de Doornholte-Velden dubbel, en een uitgevochten nederlaag betaalt als een overwinning."
+          "note": "De legerkampen roepen op tot verzamelen: het hele weekend wordt Eer in de Doornholte-Velden dubbel uitgekeerd, en een uitgespeelde nederlaag telt als een overwinning."
         },
         "fishingDerby": {
           "title": "Visderby",

@@ -1644,6 +1644,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Kızıl',
   'hudChrome.bg.defeatBanner':
     'Yenilgi. Dikenvadi Ovası {crimson}:{azure}. Derece {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Çifte Onur Hafta Sonu: bugün Dikenvadi Ovası Onuru {mult} kat ödeniyor ve sonuna kadar oynanan bir mağlubiyet galibiyet gibi ödeniyor',
   'hudChrome.bg.drawBanner':
     'Dikenvadi Ovası berabere {crimson}:{azure}. Derece {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Sancağı bırak',
@@ -4062,6 +4064,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     "Birader Halven haritalarını işaretliyor: Çökmüş Emanetlik'e meydan okumak için güzel bir gün.",
   'hudChrome.calendar.events.delveDay.title': 'Mağara Günü',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Savaş kampları toplanma çağrısını duyuruyor: tüm hafta sonu boyunca Dikenvadi Ovası Onuru iki katına çıkıyor ve sonuna kadar oynanan bir mağlubiyet galibiyet gibi ödeniyor.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Çifte Onur Hafta Sonu',
   'hudChrome.calendar.events.fishingDerby.note':
     'Oltacılar göl kıyılarını doldurdu. Bir olta kap ve balıkçı hikayeleri paylaş.',
   'hudChrome.calendar.events.fishingDerby.title': 'Balık Tutma Yarışması',

@@ -1455,7 +1455,7 @@ export const tr_TR: EnTranslations = {
       "endedForfeitLog": "Maç hükmen sona erdi.",
       "firstWinBonusLine": "Günün ilk galibiyeti: +{honor} Onur",
       "firstWinBonusLog": "Günün ilk galibiyeti: {honor} bonus Onur kazanırsın.",
-      "doubleHonorLine": "Çifte Onur Hafta Sonu: Bugün Dikenvadi Ovası Onuru {mult}x öder, sonuna kadar oynanan bir mağlubiyet ise bir galibiyet gibi öder",
+      "doubleHonorLine": "Çifte Onur Hafta Sonu: bugün Dikenvadi Ovası Onuru {mult} kat ödeniyor ve sonuna kadar oynanan bir mağlubiyet galibiyet gibi ödeniyor",
       "timeWarningMinutes": "{minutes} dakika kaldı",
       "timeWarningOneMinute": "Bir dakika kaldı",
       "timeWarningMinutesLog": "Savaşta {minutes} dakika kaldı.",
@@ -3136,7 +3136,7 @@ export const tr_TR: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Çifte Onur Hafta Sonu",
-          "note": "Savaş kampları toplanma borusunu çalıyor: tüm hafta sonu boyunca Dikenvadi Ovası Onuru iki katına çıkıyor ve sonuna kadar oynanan bir mağlubiyet bir galibiyet gibi ödüyor."
+          "note": "Savaş kampları toplanma çağrısını duyuruyor: tüm hafta sonu boyunca Dikenvadi Ovası Onuru iki katına çıkıyor ve sonuna kadar oynanan bir mağlubiyet galibiyet gibi ödeniyor."
         },
         "fishingDerby": {
           "title": "Balık Tutma Yarışması",

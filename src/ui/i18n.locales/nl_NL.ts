@@ -1651,6 +1651,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Karmozijn',
   'hudChrome.bg.defeatBanner':
     'Nederlaag. Doornholte-Velden {crimson}:{azure}. Rating {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Weekend van Dubbele Eer: vandaag wordt Eer in de Doornholte-Velden {mult} keer uitgekeerd, en een uitgespeelde nederlaag telt als een overwinning',
   'hudChrome.bg.drawBanner':
     'Doornholte-Velden gelijkspel {crimson}:{azure}. Rating {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Laat de vlag vallen',
@@ -4203,6 +4205,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broeder Halven markeert zijn kaarten: een mooie dag om het Ingestorte Reliekschrijn te trotseren.',
   'hudChrome.calendar.events.delveDay.title': 'Delvedag',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'De legerkampen roepen op tot verzamelen: het hele weekend wordt Eer in de Doornholte-Velden dubbel uitgekeerd, en een uitgespeelde nederlaag telt als een overwinning.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Weekend van Dubbele Eer',
   'hudChrome.calendar.events.fishingDerby.note':
     'Hengelaars staan langs de meren. Neem een hengel mee en wissel visverhalen uit.',
   'hudChrome.calendar.events.fishingDerby.title': 'Visderby',

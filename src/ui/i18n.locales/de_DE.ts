@@ -1668,6 +1668,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.crimson': 'Karmesin',
   'hudChrome.bg.defeatBanner':
     'Niederlage. Thornhollow-Felder {crimson}:{azure}. Wertung {rating} ({delta})',
+  'hudChrome.bg.doubleHonorLine':
+    'Wochenende der doppelten Ehre: Die Ehre der Thornhollow-Felder zahlt heute das {mult}-Fache, und eine ausgetragene Niederlage zählt wie ein Sieg',
   'hudChrome.bg.drawBanner':
     'Thornhollow-Felder unentschieden {crimson}:{azure}. Wertung {rating} ({delta})',
   'hudChrome.bg.dropFlagConfirmAccept': 'Flagge fallen lassen',
@@ -4110,6 +4112,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven markiert seine Karten: ein guter Tag, um das Eingestürzte Reliquiar zu wagen.',
   'hudChrome.calendar.events.delveDay.title': 'Tiefgang-Tag',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Die Kriegslager rufen zur Sammlung: Das ganze Wochenende zahlt die Ehre der Thornhollow-Felder das Doppelte, und eine ausgetragene Niederlage zählt wie ein Sieg.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Wochenende der doppelten Ehre',
   'hudChrome.calendar.events.fishingDerby.note':
     'Angler säumen die Seen. Bring eine Rute mit und tausche Anglergeschichten aus.',
   'hudChrome.calendar.events.fishingDerby.title': 'Angelderby',

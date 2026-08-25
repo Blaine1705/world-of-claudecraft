@@ -1455,7 +1455,7 @@ export const da_DK: EnTranslations = {
       "endedForfeitLog": "Kampen blev opgivet.",
       "firstWinBonusLine": "Dagens første sejr: +{honor} Ære",
       "firstWinBonusLog": "Dagens første sejr: du får {honor} bonus-Ære.",
-      "doubleHonorLine": "Dobbelt Ære-weekend: Ære fra Tornehulemarkerne udbetales {mult}x i dag, og et udkæmpet nederlag udbetales som en sejr",
+      "doubleHonorLine": "Dobbelt Ære-Weekend: i dag udbetales Ære på Tornehulemarkerne {mult} gange, og et udkæmpet nederlag tæller som en sejr",
       "timeWarningMinutes": "{minutes} minutter tilbage",
       "timeWarningOneMinute": "Ét minut tilbage",
       "timeWarningMinutesLog": "{minutes} minutter tilbage af kampen.",
@@ -3135,8 +3135,8 @@ export const da_DK: EnTranslations = {
           "note": "Duellanter strømmer til Askekolosseet. Stil dig i kø, og klatr op ad ranglisten."
         },
         "doubleHonor": {
-          "title": "Dobbelt Ære-weekend",
-          "note": "Krigslejrene lyder til mønstring: hele weekenden udbetales Ære fra Tornehulemarkerne dobbelt, og et udkæmpet nederlag udbetales som en sejr."
+          "title": "Dobbelt Ære-Weekend",
+          "note": "Krigslejrene blæser til samling: hele weekenden udbetales Ære på Tornehulemarkerne dobbelt, og et udkæmpet nederlag tæller som en sejr."
         },
         "fishingDerby": {
           "title": "Fiskederby",
