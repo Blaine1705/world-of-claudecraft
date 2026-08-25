@@ -332,6 +332,45 @@ describe('self talent wire decode (IWorldTalents facet)', () => {
 });
 
 describe('spectate client POV', () => {
+  it('clears movement reconciliation state when the observed identity changes', () => {
+    const client = bareClient(1, {
+      movementWireVersion: 2,
+      reconAuthoritativeX: 1,
+      reconAuthoritativeY: 2,
+      reconAuthoritativeZ: 3,
+      reconPreviousAuthoritativeFacing: 0.25,
+      reconAuthoritativeFacing: 0.5,
+      reconAckClientTick: 17,
+      reconOverrideEpoch: 4,
+      reconOverrideActive: true,
+      reconMoveSpeedMult: 1.5,
+    });
+
+    (client as any).onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+
+    expect({
+      x: client.reconAuthoritativeX,
+      y: client.reconAuthoritativeY,
+      z: client.reconAuthoritativeZ,
+      previousFacing: client.reconPreviousAuthoritativeFacing,
+      facing: client.reconAuthoritativeFacing,
+      ackCt: client.reconAckClientTick,
+      epoch: client.reconOverrideEpoch,
+      active: client.reconOverrideActive,
+      moveSpeedMult: client.reconMoveSpeedMult,
+    }).toEqual({
+      x: null,
+      y: null,
+      z: null,
+      previousFacing: null,
+      facing: null,
+      ackCt: -1,
+      epoch: 0,
+      active: false,
+      moveSpeedMult: 1,
+    });
+  });
+
   it('follows observed self, aligns on entry and respawn, then restores identity', () => {
     const client = bareClient(1);
     const internals = client as unknown as {
@@ -1281,10 +1320,10 @@ describe('delta snapshots', () => {
       ack: snap.self.ack,
       ...('ackCt' in snap.self ? { ackCt: snap.self.ackCt } : {}),
     }).toEqual({ ack: 7 });
-    expect(snap.self).not.toHaveProperty('px');
-    expect(snap.self).not.toHaveProperty('py');
-    expect(snap.self).not.toHaveProperty('pz');
-    expect(snap.self).not.toHaveProperty('pf');
+    expect(snap.self).not.toHaveProperty('rpx');
+    expect(snap.self).not.toHaveProperty('rpy');
+    expect(snap.self).not.toHaveProperty('rpz');
+    expect(snap.self).not.toHaveProperty('rpf');
     expect(snap.self).not.toHaveProperty('ovE');
     expect(snap.self).not.toHaveProperty('ovA');
     expect(snap.self).not.toHaveProperty('msm');
@@ -1330,18 +1369,18 @@ describe('delta snapshots', () => {
     expect({
       ack: self.ack,
       ackCt: self.ackCt,
-      px: self.px,
-      py: self.py,
-      pz: self.pz,
-      pf: self.pf,
+      rpx: self.rpx,
+      rpy: self.rpy,
+      rpz: self.rpz,
+      rpf: self.rpf,
       ovE: self.ovE,
     }).toEqual({
       ack: 4,
       ackCt: 0,
-      px: 1 / 3,
-      py: 2 / 3,
-      pz: 4 / 3,
-      pf: Math.PI / 7,
+      rpx: 1 / 3,
+      rpy: 2 / 3,
+      rpz: 4 / 3,
+      rpf: Math.PI / 7,
       ovE: 0,
     });
     expect(self).not.toHaveProperty('msm');
@@ -1377,6 +1416,7 @@ describe('delta snapshots', () => {
       moveSpeedMult: 1,
     });
     expect(client.player.pos).toEqual({ x: 0.33, y: 0.67, z: 1.33 });
+    expect(client.player.petAutoSkill).toBe(false);
 
     entity.auras.push({
       id: 'test_root',
@@ -1410,6 +1450,26 @@ describe('delta snapshots', () => {
     expect(spedSelf.msm).toBe(1.5);
     (client as any).applySnapshot(lastSnap(v2Client.sent));
     expect(client.reconMoveSpeedMult).toBe(1.5);
+  });
+
+  it('omits movement reconciliation fields from a spectating v2 self record', () => {
+    const spectateServer = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joinServer(spectateServer, moderatorWs, 4, 'Moderator', 'warrior', {
+      movementWireVersion: 2,
+    });
+    const target = joinServer(spectateServer, targetWs, 5, 'Observed');
+    (spectateServer as any).enterSpectate(moderator, target);
+    moderatorWs.sent.length = 0;
+
+    broadcast(spectateServer);
+
+    const self = lastSnap(moderatorWs.sent).self;
+    expect(self.id).toBe(target.pid);
+    for (const key of ['rpx', 'rpy', 'rpz', 'rpf', 'ackCt', 'ovE', 'ovA', 'msm']) {
+      expect(self).not.toHaveProperty(key);
+    }
   });
 
   it.each([

@@ -77,6 +77,62 @@ describe('computeOverrideSignature', () => {
 });
 
 describe('updateMovementOverrideEpochs', () => {
+  it('drives every crowd-control and forced-movement arm through the live updater', () => {
+    const { sim, session } = fixture();
+    const entity = sim.player;
+    const meta = sim.meta(entity.id)!;
+    updateMovementOverrideEpochs(sim, [session]);
+
+    for (const kind of ['stun', 'root', 'incapacitate', 'polymorph'] as const) {
+      entity.auras = [aura(kind)];
+      updateMovementOverrideEpochs(sim, [session]);
+      expect(session.movementOverrideActive, kind).toBe(true);
+      entity.auras = [];
+      updateMovementOverrideEpochs(sim, [session]);
+    }
+
+    const forcedModes = [
+      () => (entity.chargeTargetId = 2),
+      () => (entity.followTargetId = 2),
+      () => (entity.leap = {} as NonNullable<typeof entity.leap>),
+      () => (entity.valkyrsCalling = {} as NonNullable<typeof entity.valkyrsCalling>),
+      () => (meta.mountRace = { phase: 'countdown' } as NonNullable<typeof meta.mountRace>),
+      () => (entity.climb = {} as NonNullable<typeof entity.climb>),
+    ];
+    for (const arm of forcedModes) {
+      arm();
+      updateMovementOverrideEpochs(sim, [session]);
+      expect(session.movementOverrideActive).toBe(true);
+      entity.chargeTargetId = null;
+      entity.followTargetId = null;
+      entity.leap = null;
+      entity.valkyrsCalling = null;
+      meta.mountRace = null;
+      entity.climb = null;
+      updateMovementOverrideEpochs(sim, [session]);
+    }
+  });
+
+  it('classifies fear through the crowd-control arm with one aura scan', () => {
+    const { sim, session } = fixture();
+    const auras = [aura('incapacitate', 'fear_incap')];
+    const some = auras.some.bind(auras);
+    let scans = 0;
+    auras.some = ((predicate: Parameters<typeof auras.some>[0]) => {
+      scans++;
+      return some(predicate);
+    }) as typeof auras.some;
+    sim.player.auras = auras;
+    sim.moveSpeedMult(sim.player);
+    const speedScans = scans;
+    scans = 0;
+
+    updateMovementOverrideEpochs(sim, [session]);
+
+    expect(session.movementOverrideActive).toBe(true);
+    expect(scans).toBe(speedScans + 1);
+  });
+
   it('increments on signature transitions and exact speed multiplier changes', () => {
     const { sim, session } = fixture();
     updateMovementOverrideEpochs(sim, [session]);

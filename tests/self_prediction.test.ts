@@ -29,6 +29,13 @@ class FakeSelfPredictionWire implements SelfPredictionWire {
   reconMoveSpeedMult = 1;
   open = true;
   readonly sends: SendRecord[] = [];
+  readonly reconcileOutcomes: Array<'match' | 'replayed' | 'ignore' | 'stale' | 'suspend'> = [];
+
+  netPipeline(): {
+    noteReconcileOutcome: (outcome: 'match' | 'replayed' | 'ignore' | 'stale' | 'suspend') => void;
+  } {
+    return { noteReconcileOutcome: (outcome) => this.reconcileOutcomes.push(outcome) };
+  }
 
   movementWireIsOpen(): boolean {
     return this.open;
@@ -98,6 +105,7 @@ describe('MovementPredictionPipeline', () => {
 
     wire.reconOverrideEpoch = 1;
     expect(pipeline.display()).toBeNull();
+    expect(wire.reconcileOutcomes).toEqual(['suspend']);
     const authoritative = setAuthoritativePose(wire, 20, 28, 1.25);
     drivePredictionFrame(pipeline, 11);
     expect(pipeline.display()?.position).toEqual(authoritative);
@@ -111,6 +119,7 @@ describe('MovementPredictionPipeline', () => {
 
     wire.reconAckClientTick = 68;
     expect(pipeline.display()).toEqual(beforeAcknowledgement);
+    expect(wire.reconcileOutcomes).toEqual(['ignore']);
   });
 
   it('acknowledgement rolled past the retained ring tail suspends', () => {
@@ -123,6 +132,23 @@ describe('MovementPredictionPipeline', () => {
     wire.reconAckClientTick = 0;
     expect(pipeline.display()).toBeNull();
     expect(pipeline.display()).toBeNull();
+    expect(wire.reconcileOutcomes).toEqual(['stale']);
+  });
+
+  it('records exact matches and correction replays from the live pipeline', () => {
+    const exact = predictionFixture();
+    drivePredictionFrame(exact.pipeline, 0);
+    exact.pipeline.display();
+    exact.wire.reconAckClientTick = 0;
+    exact.pipeline.display();
+    expect(exact.wire.reconcileOutcomes).toEqual(['match']);
+
+    const corrected = predictionFixture();
+    drivePredictionFrame(corrected.pipeline, 0, { ...emptyMoveInput(), forward: true });
+    corrected.pipeline.display();
+    corrected.wire.reconAckClientTick = 0;
+    corrected.pipeline.display();
+    expect(corrected.wire.reconcileOutcomes).toEqual(['replayed']);
   });
 
   it('resume plus a subsequent predicted frame re-anchors after suspension', () => {

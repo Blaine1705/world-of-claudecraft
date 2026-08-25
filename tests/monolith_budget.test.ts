@@ -301,7 +301,9 @@ const MONOLITHS: MonolithRow[] = [
     // routeEvents into the guild board window's live REST read (the
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
-    ceiling: 10645,
+    // Lowered after the perf capture result contract moved to
+    // server/perf_capture_types.ts. Exact count, zero slack.
+    ceiling: 10628,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

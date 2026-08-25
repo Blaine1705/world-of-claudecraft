@@ -4703,8 +4703,8 @@ async function startGame(
       performance.now(),
       turnEngageEdge,
     );
-    if (net.movementWireVersion !== 2 && movementFrameEmitted)
-      perf.markInputSent(performance.now());
+    // On v2 this duration includes the fixed-tick sampler phase before the frame is emitted.
+    if (movementFrameEmitted) perf.markInputSent(performance.now());
     if (movementFrameEmitted) pendingReleaseFacing = null;
     const echoSamples = net.consumeInputEchoSamples();
     inputEcho.fold(echoSamples);

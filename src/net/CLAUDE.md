@@ -239,7 +239,7 @@ failure, kept as stable English that `main.ts` re-localizes.
   on movement wire v2; design authority `docs/design/movement-reconciliation.md`):
   the drawn pose is the shared kernel stepped over the SAME per-tick input
   frames the client actually sent, reconciled exact-match against the acked
-  authoritative pose (`ackCt` + `px/py/pz/pf`). Its constraints: (a) prediction
+  authoritative pose (`ackCt` + `rpx/rpy/rpz/rpf`). Its constraints: (a) prediction
   state is never written into `ClientWorld` mirrored state or any `IWorld` read
   that logic consumes (targeting, range checks, quest triggers, and interest
   all use authoritative positions); (b) the drawn pose reflects only input that

@@ -2535,6 +2535,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
+      this.resetReconWireState();
       if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;

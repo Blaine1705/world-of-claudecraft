@@ -8,13 +8,25 @@ export class ReconWireState {
   reconOverrideEpoch = 0;
   reconOverrideActive = false;
   reconMoveSpeedMult = 1;
+
+  resetReconWireState(): void {
+    this.reconAuthoritativeX = null;
+    this.reconAuthoritativeY = null;
+    this.reconAuthoritativeZ = null;
+    this.reconPreviousAuthoritativeFacing = null;
+    this.reconAuthoritativeFacing = null;
+    this.reconAckClientTick = -1;
+    this.reconOverrideEpoch = 0;
+    this.reconOverrideActive = false;
+    this.reconMoveSpeedMult = 1;
+  }
 }
 
 interface MovementReconciliationSelfWire {
-  px?: unknown;
-  py?: unknown;
-  pz?: unknown;
-  pf?: unknown;
+  rpx?: unknown;
+  rpy?: unknown;
+  rpz?: unknown;
+  rpf?: unknown;
   ackCt?: unknown;
   ovE?: unknown;
   ovA?: unknown;
@@ -32,10 +44,10 @@ export function applyReconSelfWire(
 ): void {
   if (
     movementWireVersion !== 2 ||
-    !finiteNumber(self.px) ||
-    !finiteNumber(self.py) ||
-    !finiteNumber(self.pz) ||
-    !finiteNumber(self.pf) ||
+    !finiteNumber(self.rpx) ||
+    !finiteNumber(self.rpy) ||
+    !finiteNumber(self.rpz) ||
+    !finiteNumber(self.rpf) ||
     !Number.isSafeInteger(self.ackCt) ||
     (self.ackCt as number) < -1 ||
     !Number.isSafeInteger(self.ovE) ||
@@ -44,11 +56,11 @@ export function applyReconSelfWire(
   ) {
     return;
   }
-  target.reconAuthoritativeX = self.px;
-  target.reconAuthoritativeY = self.py;
-  target.reconAuthoritativeZ = self.pz;
-  target.reconPreviousAuthoritativeFacing = target.reconAuthoritativeFacing ?? self.pf;
-  target.reconAuthoritativeFacing = self.pf;
+  target.reconAuthoritativeX = self.rpx;
+  target.reconAuthoritativeY = self.rpy;
+  target.reconAuthoritativeZ = self.rpz;
+  target.reconPreviousAuthoritativeFacing = target.reconAuthoritativeFacing ?? self.rpf;
+  target.reconAuthoritativeFacing = self.rpf;
   target.reconAckClientTick = self.ackCt as number;
   target.reconOverrideEpoch = self.ovE as number;
   target.reconOverrideActive = self.ovA === 1;

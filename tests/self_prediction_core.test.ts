@@ -106,7 +106,7 @@ describe('self prediction core', () => {
 
     expect(result).toEqual({
       mode: 'replayed',
-      residual: { x: 0.75, y: 0, z: 0, facing: -0.75 },
+      residual: { x: 0.75, y: 0, z: 0 },
     });
     expect(ring.size).toBe(2);
     expect(ring.find(1)?.pose.pos.x).toBe(1.25);

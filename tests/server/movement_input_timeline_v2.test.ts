@@ -75,6 +75,15 @@ describe('MovementInputTimeline', () => {
     expect(timeline.discardedLate).toBe(1);
   });
 
+  it('rejects a far-future client tick without wedging the buffer', () => {
+    const timeline = new MovementInputTimeline();
+
+    expect(timeline.enqueue(frame(1e12))).toBe(false);
+    expect(timeline.dropped).toBe(1);
+    expect(timeline.enqueue(frame(0, true))).toBe(true);
+    expect(timeline.consumeNext()).toEqual(frame(0, true));
+  });
+
   it('advances the ack with one held-input frame on a starved tick', () => {
     const timeline = new MovementInputTimeline();
     const session = {

@@ -9,6 +9,8 @@ export interface PredictionPose {
   facing: number;
 }
 
+export type PredictionResidual = Pick<PredictionPose, 'x' | 'y' | 'z'>;
+
 export interface PredictionFrame {
   ct: number;
   mi: MoveInput;
@@ -50,7 +52,7 @@ export type PredictionStep = (state: MotionState, frame: PredictionFrame) => voi
 
 export type ReconciliationResult =
   | { mode: 'match' }
-  | { mode: 'replayed'; residual: PredictionPose }
+  | { mode: 'replayed'; residual: PredictionResidual }
   | { mode: 'ignore' }
   | { mode: 'stale' }
   | { mode: 'suspend' };
@@ -199,7 +201,6 @@ export function reconcile(
       x: (oldHead?.pos.x ?? authoritative.x) - newHead.pos.x,
       y: (oldHead?.pos.y ?? authoritative.y) - newHead.pos.y,
       z: (oldHead?.pos.z ?? authoritative.z) - newHead.pos.z,
-      facing: (oldHead?.facing ?? authoritative.facing) - newHead.facing,
     },
   };
 }

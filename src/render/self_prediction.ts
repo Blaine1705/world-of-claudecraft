@@ -22,6 +22,9 @@ export interface SelfPredictionWire extends MovementWireClient {
   reconOverrideEpoch: number;
   reconOverrideActive: boolean;
   reconMoveSpeedMult: number;
+  netPipeline(): {
+    noteReconcileOutcome(outcome: 'match' | 'replayed' | 'ignore' | 'stale' | 'suspend'): void;
+  };
 }
 
 function hasAuthoritativePose(wire: SelfPredictionWire): boolean {
@@ -136,6 +139,7 @@ export class MovementPredictionPipeline {
     }
     if (this.lastEpoch === null) this.lastEpoch = wire.reconOverrideEpoch;
     if (wire.reconOverrideEpoch !== this.lastEpoch) {
+      wire.netPipeline().noteReconcileOutcome('suspend');
       this.suspendAtCurrentWireState();
       return null;
     }
@@ -154,6 +158,7 @@ export class MovementPredictionPipeline {
         this.lastEpoch,
         this.stepFn,
       );
+      wire.netPipeline().noteReconcileOutcome(result.mode);
       this.lastAckClientTick = wire.reconAckClientTick;
       if (result.mode === 'stale' || result.mode === 'suspend') {
         this.suspendAtCurrentWireState();

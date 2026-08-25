@@ -70,9 +70,10 @@ stays accepted so mid-deploy sessions degrade instead of breaking.
 Per session, a jitter buffer keyed by `ct` replaces the overwrite-latest
 struct. Each server tick consumes EXACTLY ONE frame, the next `ct` in sequence:
 
-- Frames are consumed on arrival. The depth cap is 6 frames with drop-oldest
-  overflow. Starvation extrapolates for up to 2 ticks before resynchronizing;
-  a target-depth jitter window remains a possible future refinement.
+- Frames are buffered on arrival, with exactly one consumed per server tick.
+  The depth cap is 6 frames with drop-oldest overflow. Starvation extrapolates
+  for up to 2 ticks before resynchronizing; a target-depth jitter window remains
+  a possible future refinement.
 - Starvation (next frame missing): extrapolate with debt. The tick consumes a
   SYNTHESIZED frame equal to the last consumed input, advancing both the cursor
   and the ack, so total travel stays one tick of movement per client tick; the

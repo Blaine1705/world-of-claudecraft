@@ -293,6 +293,7 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import { MovementInputTimelineTickStats } from './movement_input_timeline_stats';
 import {
   applyMovementInputFrame,
   consumeMovementFramesV2,
@@ -324,6 +325,10 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+
+export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -1669,35 +1674,6 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// A frozen server tick-loop profile captured over one on-demand window, plus the
-// context needed to read it: when it was taken, how long the window was, and the
-// crowd it was taken under. The admin dashboard renders this.
-export interface PerfCaptureResult {
-  captureId: string; // server-generated correlation id returned when the window starts
-  capturedAt: number; // epoch ms the window closed
-  durationMs: number; // the (clamped) capture window length
-  loopCallbacks: number; // setInterval callbacks observed during the window
-  simTicks: number; // authoritative sim ticks run across those callbacks
-  catchUpCallbacks: number; // callbacks that ran more than one sim tick
-  maxTicksPerCallback: number;
-  online: number; // live sessions at capture close
-  simEntities: number; // sim entity count at capture close
-  aggroVisitsTotal: number; // aggro-scan player visits summed across the window
-  aggroVisitsMaxPerTick: number; // peak aggro-scan player visits in any one tick
-  threatVisitsTotal: number; // threat-table entry visits summed across the window
-  threatVisitsMaxPerTick: number; // peak threat-table entry visits in any one tick
-  profile: ReturnType<TickProfiler['profile']>;
-}
-
-// The /admin/api/perf/tick status envelope: whether a capture is currently running
-// (with when it ends, so the UI can show a countdown), plus the last frozen result.
-export interface PerfCaptureStatus {
-  captureId: string | null; // id of the in-flight capture, or null while idle
-  capturing: boolean;
-  endsAt: number | null; // epoch ms the in-flight capture closes, or null
-  last: PerfCaptureResult | null;
-}
-
 // The creation fee as WHOLE GOLD, computed once for the two refusal emits.
 //
 // The client matcher splices an INTEGER (src/ui/server_i18n.ts guild.createFee,
@@ -1924,6 +1900,7 @@ export class GameServer {
   // the latest tick's aggro/threat visit counts surfaced on the [perf] heartbeat, plus
   // the four capture-window accumulators frozen into a PerfCaptureResult.
   private readonly mobScanTickStats = createMobScanTickStats();
+  private readonly movementTimelineTickStats = new MovementInputTimelineTickStats();
   // Ops kill-switch: SELF_SNAPSHOT_FULL=1 re-diffs every heavy self field every
   // tick (pre-optimization behavior), for A/B benchmarking or rollback.
   private readonly heavySelfGate = process.env.SELF_SNAPSHOT_FULL !== '1';
@@ -2742,6 +2719,10 @@ export class GameServer {
             this.riftAssets.drain(this.sim.ctx);
             lap('tick');
             consumeMovementFramesV2(this.sim, this.clients.values());
+            this.movementTimelineTickStats.fold(
+              this.clients.values(),
+              this.perfCaptureDeadlineNs !== null,
+            );
             lap('movementV2');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
@@ -5695,6 +5676,7 @@ export class GameServer {
     this.perfCaptureCatchUpCallbacks = 0;
     this.perfCaptureMaxTicksPerCallback = 0;
     resetMobScanCaptureAccumulators(this.mobScanTickStats);
+    this.movementTimelineTickStats.resetCapture();
     this.perfCaptureEndsAtMs = Date.now() + clamped;
     this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
     return this.perfCaptureStatus();
@@ -5768,6 +5750,7 @@ export class GameServer {
       aggroVisitsMaxPerTick: this.mobScanTickStats.aggroVisitsMaxPerTick,
       threatVisitsTotal: this.mobScanTickStats.threatVisitsTotal,
       threatVisitsMaxPerTick: this.mobScanTickStats.threatVisitsMaxPerTick,
+      ...this.movementTimelineTickStats.captureTotals(),
       profile: this.tickProfiler.profile(),
     };
     this.perfCaptureDeadlineNs = null;
@@ -5790,7 +5773,7 @@ export class GameServer {
     console.log(
       `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickHz=${this.tickHz == null ? 'n/a' : round2(this.tickHz)} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
         ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
-        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits}`,
+        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits} ${this.movementTimelineTickStats.heartbeatTokens()}`,
     );
     // The sim.tick() internal breakdown, mean-sorted so the phase that actually eats
     // the average (not just a spike) leads. Populated only while detailed timing is on.
@@ -8836,7 +8819,7 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
-      ...reconciliationSelfWire(session, p),
+      ...(session.spectating ? {} : reconciliationSelfWire(session, p)),
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default

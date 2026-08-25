@@ -105,11 +105,15 @@ export class MovementInputTimeline {
   private lastConsumedFrame: MovementInputFrameV2 | null = null;
 
   enqueue(frame: MovementInputFrameV2): boolean {
-    if (Number.isSafeInteger(frame.ct) && frame.ct >= 0 && frame.ct < this.expectedClientTick) {
+    if (!Number.isSafeInteger(frame.ct) || frame.ct < 0 || this.frames.has(frame.ct)) {
+      return false;
+    }
+    if (frame.ct < this.expectedClientTick) {
       this.discardedLate++;
       return false;
     }
-    if (!Number.isSafeInteger(frame.ct) || frame.ct < 0 || this.frames.has(frame.ct)) {
+    if (frame.ct > this.expectedClientTick + MOVEMENT_INPUT_TIMELINE_DEPTH) {
+      this.dropped++;
       return false;
     }
     this.frames.set(frame.ct, frame);
