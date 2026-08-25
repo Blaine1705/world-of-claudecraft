@@ -231,7 +231,7 @@ describe('heal-absorb vs periodic healing', () => {
     expect(p.auras.some((a) => a.kind === 'heal_absorb')).toBe(false);
   });
 
-  it("emits absorbed feedback when a DoT leech self-heal is fully eaten", () => {
+  it('emits absorbed feedback when a DoT leech self-heal is fully eaten', () => {
     const sim = makeSim();
     const p = sim.player;
     p.maxHp = 1000;
@@ -314,22 +314,19 @@ describe('heal-absorb vs periodic healing', () => {
     const sim = makeSim();
     const mob = spawnTarget(sim, 1000);
     mob.hp = 500;
-    mob.auras.push(
-      shield(100),
-      {
-        id: 'temporal_hourglass',
-        name: 'Temporal Hourglass',
-        kind: 'stasis',
-        remaining: 60,
-        duration: 60,
-        value: 1,
-        tickInterval: DT,
-        sourceId: -1,
-        school: 'arcane',
-        temporalHealRemaining: 100,
-        temporalHealTicksRemaining: 1,
-      } as Aura,
-    );
+    mob.auras.push(shield(100), {
+      id: 'temporal_hourglass',
+      name: 'Temporal Hourglass',
+      kind: 'stasis',
+      remaining: 60,
+      duration: 60,
+      value: 1,
+      tickInterval: DT,
+      sourceId: -1,
+      school: 'arcane',
+      temporalHealRemaining: 100,
+      temporalHealTicksRemaining: 1,
+    } as Aura);
 
     sim.drainEvents();
     updateAuras(sim.ctx, mob);

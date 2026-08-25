@@ -3476,23 +3476,6 @@ export class GameServer {
     }
   }
 
-  private replaceLiveAccountCosmetics(accountId: number, cosmetics: AccountCosmetics): void {
-    const exact = {
-      completedQuestIds: [...new Set(cosmetics.completedQuestIds)],
-      mechChromaIds: [...new Set(cosmetics.mechChromaIds)],
-      weaponSkinIds: [...new Set(cosmetics.weaponSkinIds ?? [])],
-      weaponSkinLoadout: { ...(cosmetics.weaponSkinLoadout ?? {}) },
-    };
-    this.accountCosmeticsByAccount.set(accountId, exact);
-    for (const live of this.clients.values()) {
-      if (live.accountId !== accountId) continue;
-      live.accountCosmetics = exact;
-      this.applyAccountQuestLockouts(live.pid, exact);
-      this.sim.setWeaponSkinLoadout(live.pid, this.ownedWeaponSkinLoadout(exact));
-      this.resyncQuests(live);
-    }
-  }
-
   private noteAccountQuestComplete(session: ClientSession, questId: string): void {
     const current = session.accountCosmetics;
     const completedQuestIds = current.completedQuestIds.includes(questId)
