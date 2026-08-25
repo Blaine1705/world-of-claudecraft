@@ -35,6 +35,13 @@ export interface EmoteClipSpec {
 
 export interface ClipMap {
   idle: string;
+  /** The braced battle stance: the idle a body holds while it is actually
+   *  fighting someone, played instead of `idle` whenever the rig is engaged and
+   *  standing still (see anim_state.desiredBaseState). Absent = the rig relaxes
+   *  into its normal idle between swings, as every rig did before this existed.
+   *  Its pose should match what the rig's attack and hit one-shots open and
+   *  close on, so those blend into and out of it without a snap. */
+  combatIdle?: string;
   walk: string;
   run: string;
   /** one-shot swing clips, rotated per attack */
@@ -532,6 +539,23 @@ const OGRE: ClipMap = {
   attack: ['Attack'],
   hit: ['Hit'],
   death: 'Death',
+};
+
+// Warlord Drogmar's own drop (tmp/drogmar_v02_build.mjs): a rigged Tripo donor
+// carrying a bone-parented Skull Cleaver, with the full slate authored, so it
+// gets its own ClipMap rather than reading OGRE.
+//
+// CombatIdle is the one clip the artist did not ship and the build synthesizes
+// (tmp/drogmar_combat_stance.mjs): the drop authors Attack AND Hit to both open
+// and close on one braced guard pose (hips sunk 5.7u under the relaxed idle,
+// feet 38.5u apart against its 21.6, torso 10deg forward, cleaver carried 6.6u
+// higher), but never shipped the loop that HOLDS it. The stance is that pose
+// wearing Idle's own breathing delta, so the warlord stays set between blows
+// and his swings and flinches blend into and out of it with nothing to
+// reconcile at either end.
+const DROGMAR: ClipMap = {
+  ...OGRE,
+  combatIdle: 'CombatIdle',
 };
 
 // The kobold family's own attack (scripts/build_kobold_anims.mjs, issue
@@ -2183,6 +2207,29 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.12,
   },
+  // Warlord Drogmar, the ogre family's quest boss. His own body rather than the
+  // family's mob_ogre fallback: he is a named kill objective fought up close, so
+  // the atlas ships at full 1024 (no maxTex clamp in specs/drogmar.json) where
+  // the trash ogres clamp to 512.
+  //
+  // Gait refs are the drop's own MEASURED natural speeds at this height and his
+  // content scale of 1.5 (tmp/drogmar_v02_gait.mjs): Walk 1.37s/stride 37.6u ->
+  // 2.65 yd/s, Run 0.80s/stride 41.1u -> 4.95 yd/s. Declared as measured rather
+  // than retimed to the family's numbers, which is what makes the foot match
+  // exact: his moveSpeed 7 chase lands at timeScale 1.41, inside the 1.6 run
+  // clamp with headroom to spare.
+  mob_drogmar: {
+    url: `${CREATURES}/drogmar.glb`,
+    height: 2.8,
+    clips: DROGMAR,
+    walkRef: 2.65,
+    runRef: 4.95,
+    // Same light wash as mob_ogre and for its reason: the drop ships an authored
+    // hide, so a heavy tint would only muddy it. Entity tint still separates him
+    // from the Crushers he leads.
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
   // Five Wildheart troll silhouettes use the same complete biped vocabulary,
   // but preserve their woven cloth, bone paint, feathers, and jungle palette.
   mob_wildheart_stalker: {
@@ -3177,6 +3224,9 @@ const MOB_KEYS: Record<string, string> = {
   widow_hatchling: 'mob_spider',
   sump_troll_devourer: 'mob_troll',
   grave_silt_bulwark: 'mob_ogre',
+  // The ogre family's quest boss gets his own body instead of the family's
+  // mob_ogre fallback (visualKeyFor checks MOB_KEYS first).
+  warlord_drogmar: 'mob_drogmar',
   drowned_cantor: 'delve_mob_acolyte',
   deepfen_spearjaw: 'mob_spearjaw',
   choir_thrall: 'mob_choir_thrall',

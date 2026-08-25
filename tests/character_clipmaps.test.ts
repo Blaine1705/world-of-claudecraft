@@ -148,6 +148,7 @@ function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: strin
 function requiredClipNames(clips: ClipMap): string[] {
   return [
     clips.idle,
+    clips.combatIdle,
     clips.walk,
     clips.run,
     clips.death,
@@ -180,6 +181,7 @@ function emoteChains(clips: ClipMap): [string, readonly string[]][] {
 // silently stop covering it.
 const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'idle',
+  'combatIdle',
   'walk',
   'run',
   'death',

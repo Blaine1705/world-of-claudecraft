@@ -149,6 +149,7 @@ import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
   type AssembleOptions,
+  applyEntityAnimOverrides,
   type CharacterVisual,
   composedLookPiecesOf,
   createCharacterVisual,
@@ -11668,14 +11669,9 @@ export class Renderer {
       st.sitting =
         e.kind === 'player' &&
         (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
-      // Ice slide: the sim glides the player at speed but they should read as
-      // FROZEN (gliding stiff on the ice), not sprinting. Suppress locomotion +
-      // airborne so the state machine holds the static idle pose while they slide.
-      if (e.riftSliding && !visuallyDead) {
-        st.moving = false;
-        st.running = false;
-        st.airborne = false;
-      }
+      // Facts about the ENTITY that override what its displayed motion implies
+      // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
+      applyEntityAnimOverrides(st, e, visuallyDead);
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;

@@ -2939,10 +2939,14 @@ export class CharacterVisual {
     // Passed as a flag rather than a doctored copy of `s`: this runs per entity
     // per frame, and the copy allocated a fresh object every frame for every
     // rig with no wade clip standing in a ford.
+    //
+    // The battle stance is gated the same way and for the walkBack reason: only
+    // a rig that ships the loop may enter the state.
     return desiredBaseState(
       s,
       !!this.action(this.def.clips.walkBack),
       !!this.action(this.def.clips.wade),
+      !!this.action(this.def.clips.combatIdle),
     );
   }
 
@@ -3130,6 +3134,11 @@ export class CharacterVisual {
   private baseAction(): THREE.AnimationAction | null {
     const c = this.def.clips;
     switch (this.baseState) {
+      case 'combatIdle':
+        // desiredBaseState only picks this for a rig that HAS the loop, so the
+        // fallback is unreachable belt-and-braces (a def whose clip name misses
+        // in the GLB resolves to null in both places and lands on idle).
+        return this.action(c.combatIdle) ?? this.action(c.idle);
       case 'walk':
         return this.action(c.walk) ?? this.action(c.idle);
       case 'walkBack':
@@ -3416,6 +3425,7 @@ function clipNamesOf(def: VisualDef): string[] {
   const c = def.clips;
   return [
     c.idle,
+    c.combatIdle,
     c.walk,
     c.run,
     c.death,
