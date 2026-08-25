@@ -53,7 +53,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
-import { LOOT_FFA_DELAY } from './loot_ffa';
+import { isTapGroupMember, LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
 // users are startNeedGreedRoll + pruneCorpseLoot, so the constant lives with them.
@@ -101,6 +101,26 @@ export interface PendingLootRoll {
 function partyLootStrategiesForMob(ctx: SimContext, mob: Entity): LootStrategies | null {
   if (mob.tappedById === null) return null;
   return ctx.partyOf(mob.tappedById)?.lootStrategies ?? null;
+}
+
+// An FFA corpse opened by someone outside the tapper's group: the rights model handed
+// them the corpse, so distribution must follow it and let them keep what they loot.
+// Without this the tapping party's strategies split the copper and route the items to
+// members who are not there, emptying the corpse and paying the looter nothing.
+function ffaLooterTakesAll(
+  ctx: SimContext,
+  mob: Entity,
+  looter: PlayerMeta,
+  ffaUnlocked: boolean,
+): boolean {
+  if (!ffaUnlocked) return false;
+  const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  return !isTapGroupMember(
+    looter.entityId,
+    mob.tappedById,
+    tapperParty?.members ?? null,
+    mob.lootRecipientIds ?? null,
+  );
 }
 
 export function partyLootCandidatesForMob(ctx: SimContext, mob: Entity): PlayerMeta[] {
@@ -368,10 +388,17 @@ function tryAwardCopperByFairSplit(ctx: SimContext, mob: Entity, copper: number)
   return true;
 }
 
-export function distributeLootCopper(ctx: SimContext, mob: Entity, looter: PlayerMeta): void {
+export function distributeLootCopper(
+  ctx: SimContext,
+  mob: Entity,
+  looter: PlayerMeta,
+  ffaUnlocked = false,
+): void {
   if (!mob.loot || mob.loot.copper <= 0) return;
   const copper = mob.loot.copper;
-  if (!tryAwardCopperByFairSplit(ctx, mob, copper)) awardAllCopperToLooter(ctx, looter, copper);
+  const takesAll = ffaLooterTakesAll(ctx, mob, looter, ffaUnlocked);
+  if (takesAll || !tryAwardCopperByFairSplit(ctx, mob, copper))
+    awardAllCopperToLooter(ctx, looter, copper);
   mob.loot.copper = 0;
 }
 
@@ -486,10 +513,13 @@ export function awardSharedLootItem(
   itemId: string,
   mob: Entity,
   looter: PlayerMeta,
+  ffaUnlocked = false,
 ): boolean {
-  if (startMasterLootRoll(ctx, itemId, mob)) return true;
-  if (startNeedGreedRoll(ctx, itemId, mob)) return true;
-  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
+  if (!ffaLooterTakesAll(ctx, mob, looter, ffaUnlocked)) {
+    if (startMasterLootRoll(ctx, itemId, mob)) return true;
+    if (startNeedGreedRoll(ctx, itemId, mob)) return true;
+    if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
+  }
   if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
   ctx.addItem(itemId, 1, looter.entityId);
   return true;
