@@ -56,6 +56,7 @@ import { aurasSurvivingDeath } from '../resurrection';
 import { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { settleTeleportArrival } from '../teleport_arrival';
 import {
   DELVE_COMPANION_MAX_RANK,
   DELVE_PLATE_RADIUS,
@@ -457,6 +458,7 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   p.pos = pos;
   p.prevPos = { ...pos };
   ctx.rebucket(p);
+  settleTeleportArrival(p);
   p.facing = 0;
   p.prevFacing = 0;
   p.targetId = null;
@@ -493,6 +495,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  settleTeleportArrival(p);
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: delve.leaveText, color: '#b9f', pid: r.meta.entityId });

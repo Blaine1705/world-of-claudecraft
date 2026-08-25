@@ -146,7 +146,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1008,
-      "state": "06b58c3a",
+      "state": "ad935ba5",
       "events": "d4634cfa",
       "rng": {
         "draws": 1,
@@ -222,7 +222,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": -1.952555,
           "fiveSecondRule": 99,
           "hp": 93,
           "id": 993,
