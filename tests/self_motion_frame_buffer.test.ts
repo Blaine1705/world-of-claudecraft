@@ -35,15 +35,21 @@ describe('self motion frame buffer', () => {
   it('updates one stable frame object in place', () => {
     const buffer = new SelfMotionFrameBuffer();
     const firstMove = moveInput(true);
-<<<<<<< HEAD
-    const first = buffer.write(true, firstMove, 1, 80, 4, 0.5, 1 / 60, 12, 50, null);
+    const first = buffer.write(true, firstMove, true, 1, 80, 4, 0.5, 1 / 60, 12, 50, null);
     const secondMove = moveInput(false);
-    const second = buffer.write(false, secondMove, 2, 120, 8, 0.75, 1 / 30, 31, 52, riftFloor);
-=======
-    const first = buffer.write(true, firstMove, true, 1, 80, 4, 0.5, 1 / 60, 12, 50);
-    const secondMove = moveInput(false);
-    const second = buffer.write(false, secondMove, false, 2, 120, 8, 0.75, 1 / 30, 31, 52);
->>>>>>> origin/pr/3631
+    const second = buffer.write(
+      false,
+      secondMove,
+      false,
+      2,
+      120,
+      8,
+      0.75,
+      1 / 30,
+      31,
+      52,
+      riftFloor,
+    );
 
     expect(second).toBe(first);
     expect(second).toEqual({
@@ -61,7 +67,7 @@ describe('self motion frame buffer', () => {
     });
 
     // Clearing back to null (leaving a rift) must also land on the shared object.
-    const third = buffer.write(false, secondMove, 2, 120, 8, 0.75, 1 / 30, 31, 52, null);
+    const third = buffer.write(false, secondMove, false, 2, 120, 8, 0.75, 1 / 30, 31, 52, null);
     expect(third).toBe(first);
     expect(third.riftFloor).toBeNull();
   });

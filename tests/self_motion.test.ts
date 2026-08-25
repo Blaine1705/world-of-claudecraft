@@ -15,12 +15,9 @@ import {
   updateSelfRenderFallback,
   type Vec3Like,
 } from '../src/render/self_motion';
-<<<<<<< HEAD
 import { DUNGEON_FLOOR_Y } from '../src/sim/data';
-import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
-=======
 import { hasTranslationalMoveInput } from '../src/sim/move_input';
->>>>>>> origin/pr/3631
+import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';

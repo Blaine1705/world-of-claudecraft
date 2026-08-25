@@ -66,10 +66,7 @@ import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calli
 import { isRiftPos } from '../sim/data';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
-<<<<<<< HEAD
 import type { RiftFloorView } from '../world_api/dungeons';
-import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
-=======
 import {
   boundedReconciliationCorrectionInto,
   createSelfReconciliation,
@@ -85,7 +82,7 @@ import {
   type TrajectoryResidual,
   trajectoryResidualInto,
 } from './self_reconciliation_core';
->>>>>>> origin/pr/3631
+import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 
 // Latency cap on the extrapolation window: at least one snapshot-ish interval
 // so low-ping links still get the start-of-motion snap, and a hard ceiling so
@@ -436,14 +433,12 @@ export class SelfMotionPredictor {
     const ax = self.prevPos.x + (self.pos.x - self.prevPos.x) * alpha;
     const ay = self.prevPos.y + (self.pos.y - self.prevPos.y) * alpha;
     const az = self.prevPos.z + (self.pos.z - self.prevPos.z) * alpha;
-<<<<<<< HEAD
     // Resolved once and reused for every lift lookup this frame (self_motion_rift_lift.ts);
     // 0 outside a rift for every position, so non-rift prediction is unaffected below.
     const riftPlan = resolvedRiftFloorPlan(frame.riftFloor);
     const riftOrigin = frame.riftFloor?.origin;
     const liftAt = (x: number, z: number): number =>
       riftOrigin ? riftLiftFor(riftPlan, riftOrigin, x, z) : 0;
-=======
     const wireDx = self.pos.x - this.lastWireX;
     const wireDy = self.pos.y - this.lastWireY;
     const wireDz = self.pos.z - this.lastWireZ;
@@ -464,7 +459,6 @@ export class SelfMotionPredictor {
     this.lastWireY = self.pos.y;
     this.lastWireZ = self.pos.z;
     this.wirePositionReady = true;
->>>>>>> origin/pr/3631
 
     // Re-adopt the authoritative pose outright on identity/life-state flips and
     // teleports; otherwise keep the persistent scratch actor.
@@ -540,7 +534,7 @@ export class SelfMotionPredictor {
       this.out.x = self.pos.x;
       this.out.y = self.pos.y;
       this.out.z = self.pos.z;
-      this.recordHistory(self.pos.x, self.pos.y, self.pos.z);
+      this.recordHistory(self.pos.x, self.pos.y - liftAt(self.pos.x, self.pos.z), self.pos.z);
       this.leadMs = 0;
       return this.out;
     }
@@ -561,27 +555,6 @@ export class SelfMotionPredictor {
     actor.mountCastRemaining = self.mountCastRemaining;
     actor.mountCastKey = self.mountCastKey;
 
-<<<<<<< HEAD
-    // Verticality: strip the raised-tier lift from the WORKING actor before
-    // any of this frame's position math runs, exactly like
-    // Sim.updatePlayerMovement strips it before the kernel (its
-    // riftPlayerLift; src/sim/rift/runs.ts). Both pos and prevPos are
-    // stripped by their OWN current x/z, since they can already sit at
-    // different points along a ramp. Zero outside a rift, so non-rift
-    // prediction is unaffected. Unlike the server, this frame does more than
-    // one kernel step's worth of position math after the strip (the DT loop,
-    // then the divergence servo, then the horizontal leash can all move x/z
-    // further), so the reapply below waits until ALL of it is done and reads
-    // the FINAL x/z, rather than re-deriving the lift once per kernel step
-    // the way an early version of this fix did: that left the servo blend
-    // and the leash clamp free to shift x/z out from under an already-baked
-    // Y on a ramp, since neither recomputed the lift for where they moved
-    // the body to. Working in flat-baseline space end to end removes the
-    // possibility rather than chasing each mutation site for it: a
-    // position-independent Y cannot desync from a position that moves.
-    actor.pos.y -= liftAt(actor.pos.x, actor.pos.z);
-    actor.prevPos.y -= liftAt(actor.prevPos.x, actor.prevPos.z);
-=======
     const frameDtMs = dt * 1000;
     if (frame.echoMs > 0) {
       this.credibleEchoMs = frame.echoMs;
@@ -625,7 +598,26 @@ export class SelfMotionPredictor {
     const networkGapHeadroomMs = Math.max(0, SELF_MOTION_CAP_MAX_MS - capMs);
     const networkGapAllowanceMs = networkGapActive ? Math.min(staleMs, networkGapHeadroomMs) : 0;
     const networkGapExpired = staleMs > networkGapHeadroomMs;
->>>>>>> origin/pr/3631
+
+    // Verticality: strip the raised-tier lift from the WORKING actor before
+    // any of this frame's position math runs, exactly like
+    // Sim.updatePlayerMovement strips it before the kernel (its
+    // riftPlayerLift; src/sim/rift/runs.ts). Both pos and prevPos are
+    // stripped by their OWN current x/z, since they can already sit at
+    // different points along a ramp. Zero outside a rift, so non-rift
+    // prediction is unaffected. Unlike the server, this frame does more than
+    // one kernel step's worth of position math after the strip (the DT loop,
+    // then the divergence servo, then the horizontal leash can all move x/z
+    // further), so the reapply below waits until ALL of it is done and reads
+    // the FINAL x/z, rather than re-deriving the lift once per kernel step
+    // the way an early version of this fix did: that left the servo blend
+    // and the leash clamp free to shift x/z out from under an already-baked
+    // Y on a ramp, since neither recomputed the lift for where they moved
+    // the body to. Working in flat-baseline space end to end removes the
+    // possibility rather than chasing each mutation site for it: a
+    // position-independent Y cannot desync from a position that moves.
+    actor.pos.y -= liftAt(actor.pos.x, actor.pos.z);
+    actor.prevPos.y -= liftAt(actor.prevPos.x, actor.prevPos.z);
 
     // Fixed-step advance with the held intent. Turn flags are stripped: the
     // heading is assigned from the one display source each step, and letting
@@ -654,7 +646,7 @@ export class SelfMotionPredictor {
       (inp.surface ? 32 : 0);
     if (this.lastMoveMask >= 0 && moveMask !== this.lastMoveMask) {
       const transitionX = this.out.x;
-      const transitionY = this.out.y;
+      const transitionY = this.out.y - liftAt(this.out.x, this.out.z);
       const transitionZ = this.out.z;
       actor.pos.x = transitionX;
       actor.pos.y = transitionY;
@@ -690,28 +682,17 @@ export class SelfMotionPredictor {
     // RUN_SPEED x echo in a SINGLE frame (a yard at 200ms, unsmoothed, because
     // the renderer follows this pose exactly), and then walks it back into the
     // wall: the "collide and snap back" artifact. Leave the block alone.
-<<<<<<< HEAD
-    this.acc = Math.min(this.acc + dt, MAX_FRAME_DT);
-    while (this.acc >= DT) {
-      actor.prevPos.x = actor.pos.x;
-      actor.prevPos.y = actor.pos.y;
-      actor.prevPos.z = actor.pos.z;
-      actor.facing = frame.displayFacing;
+    const canAdvance = (!networkGapExpired || blockedFrame) && !bootstrapExpired;
+    if (canAdvance) {
       // actor.pos.y is flat-baseline here (stripped above): the kernel's
       // gravity/onGround pass integrates against the true flat rift floor,
       // same as outside a rift, and needs no rift-specific handling at all.
-      stepPlayerMotion(this.deps, actor, inp);
-      this.acc -= DT;
-=======
-    const canAdvance = (!networkGapExpired || blockedFrame) && !bootstrapExpired;
-    if (canAdvance) {
       if (!this.segmentPrimed) this.primeSegment(actor, inp, frame.displayFacing);
       this.acc += dt;
       while (this.acc >= DT) {
         this.acc -= DT;
         this.primeSegment(actor, inp, frame.displayFacing);
       }
->>>>>>> origin/pr/3631
     }
     const frac = this.segmentPrimed ? this.acc / DT : 0;
 
@@ -778,49 +759,6 @@ export class SelfMotionPredictor {
       this.servoHoldMs <= 0;
     if (!servoActive) resetSelfReconciliationBoundary(this.reconciliation);
 
-<<<<<<< HEAD
-    // Divergence correction: the authoritative anchor shows where the server
-    // had the player ~capMs ago, so compare it against where the LOCAL display
-    // was capMs ago. During agreed motion (steady run, start, stop, jump arc)
-    // that error is ~zero; it only grows on genuine divergence, and the pull
-    // glides the visual back at SELF_MOTION_BLEND_RATE. Server-driven motion
-    // with no local intent (charge, knockback) is also captured: the history
-    // stands still while the anchor moves, so the error tracks the ride.
-    const latencyMs = frame.echoMs + 0.5 * frame.jitterMs;
-    const capMs = clamp(latencyMs, SELF_MOTION_CAP_MIN_MS, SELF_MOTION_CAP_MAX_MS);
-    const measureMs = clamp(latencyMs, SELF_MOTION_CAP_MIN_MS, SELF_MOTION_MEASURE_MAX_MS);
-    const past = this.sampleHistory(this.timeMs - measureMs);
-    if (past && servoActive) {
-      // The blend dt is clamped tighter than the frame clamp: at load-hitch
-      // frame times (100-250ms at world entry, or on weak hardware) an
-      // unclamped exponential eats ~95% of the error in ONE frame, turning
-      // every correction into a visible jerk. Capped at 1/30 a correction
-      // never moves more than ~33% of the gap per frame and still converges.
-      // The rate itself is bounded so that rate x measurement-delay stays
-      // under 0.5: the correction loop runs through its own delayed history,
-      // and a delayed servo rings near gain x delay ~1 (at 0.8 it still
-      // pumped ~17cm over a 2s settle in the 280ms-RTT lab).
-      const rate = Math.min(SELF_MOTION_BLEND_RATE, 500 / measureMs);
-      const k = 1 - Math.exp(-rate * Math.min(dt, 1 / 30));
-      const errX = ax - past.x;
-      // Both sides flattened to match the WORKING actor's flat-baseline Y at
-      // this point in the frame (stripped above, not yet reapplied): the
-      // anchor and the history sample are otherwise each correctly lifted
-      // for their OWN (different) x/z, and comparing them lifted here would
-      // just be comparing the lift difference between two positions, not the
-      // divergence this correction exists to measure.
-      const errY = ay - liftAt(ax, az) - (past.y - liftAt(past.x, past.z));
-      const errZ = az - past.z;
-      const errLen = Math.hypot(errX, errY, errZ);
-      const scale =
-        errLen > SELF_MOTION_DEADBAND_YD ? ((errLen - SELF_MOTION_DEADBAND_YD) / errLen) * k : 0;
-      actor.pos.x += errX * scale;
-      actor.pos.y += errY * scale;
-      actor.pos.z += errZ * scale;
-      actor.prevPos.x += errX * scale;
-      actor.prevPos.y += errY * scale;
-      actor.prevPos.z += errZ * scale;
-=======
     // Echo is the expected trajectory age. Jitter widens the eligible timing
     // window around it, but never shifts its center.
     const measureMs = clamp(effectiveEchoMs, 0, SELF_MOTION_MEASURE_MAX_MS);
@@ -832,7 +770,7 @@ export class SelfMotionPredictor {
       frame.jitterMs,
       snapIntervalMs,
       ax,
-      ay,
+      ay - liftAt(ax, az),
       az,
       SELF_MOTION_DEADBAND_YD,
       this.residual,
@@ -857,7 +795,7 @@ export class SelfMotionPredictor {
       if (this.idleMs >= idleConfirmMs && wireStable) {
         exactIdleAdopt = idleReconciliationCorrectionInto(
           self.pos.x - actor.pos.x,
-          self.pos.y - actor.pos.y,
+          self.pos.y - liftAt(self.pos.x, self.pos.z) - actor.pos.y,
           self.pos.z - actor.pos.z,
           SELF_MOTION_BLEND_RATE,
           0,
@@ -909,13 +847,12 @@ export class SelfMotionPredictor {
       actor.prevPos.z += this.correction.z;
       if (exactIdleAdopt) {
         actor.pos.x = self.pos.x;
-        actor.pos.y = self.pos.y;
+        actor.pos.y = self.pos.y - liftAt(self.pos.x, self.pos.z);
         actor.pos.z = self.pos.z;
         actor.prevPos.x = self.pos.x;
-        actor.prevPos.y = self.pos.y;
+        actor.prevPos.y = self.pos.y - liftAt(self.pos.x, self.pos.z);
         actor.prevPos.z = self.pos.z;
       }
->>>>>>> origin/pr/3631
     }
 
     // Horizontal leash: outside an active validated grounded stream, never
@@ -1012,13 +949,14 @@ export class SelfMotionPredictor {
     // back to the same visual/lifted space `self`'s own pos/prevPos are in,
     // which is what `this.actor` must stay in between calls (the entry
     // snap-reset check above compares it against the lifted anchor).
+    const outFlatY = actor.prevPos.y + (actor.pos.y - actor.prevPos.y) * frac;
     actor.pos.y += liftAt(actor.pos.x, actor.pos.z);
     actor.prevPos.y += liftAt(actor.prevPos.x, actor.prevPos.z);
 
     this.out.x = actor.prevPos.x + (actor.pos.x - actor.prevPos.x) * frac;
     this.out.y = actor.prevPos.y + (actor.pos.y - actor.prevPos.y) * frac;
     this.out.z = actor.prevPos.z + (actor.pos.z - actor.prevPos.z) * frac;
-    this.recordHistory(this.out.x, this.out.y, this.out.z);
+    this.recordHistory(this.out.x, outFlatY, this.out.z);
     this.leadMs =
       runSpeed > 0 ? (Math.hypot(this.out.x - ax, this.out.z - az) / runSpeed) * 1000 : 0;
     return this.out;

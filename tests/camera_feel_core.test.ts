@@ -3,11 +3,7 @@ import {
   cameraFovOffset,
   createCameraFeel,
   punchCameraFov,
-<<<<<<< HEAD
   resolveCameraFov,
-  SPEED_FOV_MAX,
-=======
->>>>>>> origin/pr/3631
   stepCameraFeel,
   stepLandingDetector,
 } from '../src/render/camera_feel_core';

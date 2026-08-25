@@ -263,7 +263,6 @@ failure, kept as stable English that `main.ts` re-localizes.
   and (b) the blend toward the server pose is held for the settle window that
   the burst sweep needs. Both live in `src/render/self_motion.ts` and are
   pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
-<<<<<<< HEAD
   A second amendment (issue #3479): prediction now covers rifts too, the same
   as the overworld and regular dungeons. The predictor strips and reapplies
   the raised-tier lift around each kernel step (`self_motion_rift_lift.ts`,
@@ -289,7 +288,6 @@ failure, kept as stable English that `main.ts` re-localizes.
   Pinned by `describe('rift prediction (issue #3479)')` in
   `tests/self_motion.test.ts` and the rift case in
   `tests/player_motion.test.ts`'s kernel parity suite.
-=======
   An ordinary snapshot gap may spend only the unused portion of the same hard
   cap; it freezes at that horizon and re-adopts authority after a prolonged gap.
   While the self snapshot reports an active validated grounded-position stream,
@@ -297,7 +295,6 @@ failure, kept as stable English that `main.ts` re-localizes.
   horizon remains active, and a validator reset restores the ordinary path.
   Predictor catch-up after a blocked main thread is separately capped at 750 ms,
   matching the server's stale held-input cutoff.
->>>>>>> origin/pr/3631
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright when the player may turn)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`
