@@ -54,7 +54,7 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
-import { parseMoveInputFrame } from '../src/sim/move_input';
+import { hasTranslationalMoveInput, parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -296,6 +296,21 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import {
+  applyBufferedMovementFrames,
+  type BufferedMovementFrame,
+  bufferMovementFrame,
+  type MovementTimelineState,
+  resetMovementTimeline,
+} from './movement_input_timeline';
+import { type MovementPositionState, resetMovementPosition } from './movement_position';
+import {
+  beginMovementStop,
+  finishMovementStops,
+  type PendingMovementStop,
+  parseMovementStopTarget,
+  prepareMovementStops,
+} from './movement_stop';
 import {
   classifyMsgLane,
   consumeLaneToken,
@@ -712,6 +727,8 @@ type ClientMessage = Record<string, unknown> & {
   marker?: number;
   mi?: unknown;
   mode?: string;
+  mt?: number;
+  mv?: number;
   n?: string;
   name?: string;
   mount?: string;
@@ -729,6 +746,7 @@ type ClientMessage = Record<string, unknown> & {
   roles?: unknown;
   rollId?: number;
   seq?: number;
+  stop?: unknown;
   sid?: string;
   sig?: string;
   skin?: number;
@@ -1025,8 +1043,15 @@ export interface ClientSession {
   rememberedChat: RememberedChat;
   // last client input sequence processed; echoed in snapshots for latency telemetry
   lastInputSeq: number;
+  // receive high-water used only to attribute packet gaps before buffered input applies
+  lastReceivedInputSeq: number;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
+  pendingMovementStop?: PendingMovementStop | null;
+  pendingMovementFrames?: BufferedMovementFrame[];
+  movementTimeline?: MovementTimelineState | null;
+  movementPositionState?: MovementPositionState | null;
+  movementProtocolV2?: boolean;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -2736,11 +2761,14 @@ export class GameServer {
           let ticksRun = 0;
           while (acc >= DT) {
             this.clearStaleInputs();
+            applyBufferedMovementFrames(this.sim, this.clients.values());
+            prepareMovementStops(this.sim, this.clients.values());
             lap('stale');
             this.riftUpgrader.drain(this.sim.ctx);
             this.riftAssets.drain(this.sim.ctx);
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
+            finishMovementStops(this.sim, this.clients.values());
             this.riftUpgrader.observe(this.sim.ctx);
             this.riftAssets.observe(this.sim.ctx);
             lap('tick');
@@ -3361,6 +3389,9 @@ export class GameServer {
   private clearStaleInputs(): void {
     for (const session of this.clients.values()) {
       if (this.sim.time - session.lastInputAt <= STALE_INPUT_SECONDS) continue;
+      session.pendingMovementStop = null;
+      resetMovementTimeline(session);
+      resetMovementPosition(session);
       const meta = this.sim.meta(session.pid);
       if (!meta) continue;
       const mi = meta.moveInput;
@@ -3769,7 +3800,13 @@ export class GameServer {
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
+      lastReceivedInputSeq: 0,
       lastInputAt: this.sim.time,
+      pendingMovementStop: null,
+      pendingMovementFrames: [],
+      movementTimeline: null,
+      movementPositionState: null,
+      movementProtocolV2: false,
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
@@ -4010,7 +4047,12 @@ export class GameServer {
       }
     }
     session.lastInputSeq = 0;
+    session.lastReceivedInputSeq = 0;
     session.lastInputAt = this.sim.time;
+    session.pendingMovementStop = null;
+    resetMovementTimeline(session);
+    resetMovementPosition(session);
+    session.movementProtocolV2 = false;
     // Load-bearing for every rev + cadence gate (market, mail, corder):
     // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
     // each gate's `sent.X === undefined` arm forces both dueness and a
@@ -6486,22 +6528,57 @@ export class GameServer {
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
-      Object.assign(meta.moveInput, frame.moveInput);
+      if (msg.mv === 2) session.movementProtocolV2 = true;
+      const bufferedMovementFrame =
+        session.movementProtocolV2 === true &&
+        bufferMovementFrame(
+          sim,
+          session,
+          msg.mt,
+          frame.moveInput,
+          frame.facing,
+          msg.stop,
+          msg.seq,
+          msg.p,
+        );
+      if (!bufferedMovementFrame) {
+        const continuesPendingStop =
+          session.pendingMovementStop && !hasTranslationalMoveInput(frame.moveInput);
+        const wasTranslating = hasTranslationalMoveInput(meta.moveInput);
+        const stopTarget =
+          !continuesPendingStop &&
+          e.onGround &&
+          !frame.moveInput.jump &&
+          wasTranslating &&
+          !hasTranslationalMoveInput(frame.moveInput)
+            ? parseMovementStopTarget(msg.stop, e.pos)
+            : null;
+        if (stopTarget) {
+          if (!beginMovementStop(sim, session, stopTarget, frame.moveInput)) {
+            session.pendingMovementStop = null;
+            Object.assign(meta.moveInput, frame.moveInput);
+          }
+        } else if (!continuesPendingStop) {
+          session.pendingMovementStop = null;
+          Object.assign(meta.moveInput, frame.moveInput);
+        }
+      }
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
         // R9: the client seq is a per-send increment on an ordered socket, so
-        // a forward jump past lastInputSeq + 1 proves the missing seqs were
+        // a forward jump past the receive high-water proves the missing seqs were
         // sent and never processed (the input-frame-attributed share of the
         // server's own drops). Guarded to a positive high-water because resume
         // zeroes it while the client restarts its counter on reconnect, and
         // capped so a reset mismatch never books a giant gap.
-        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
+        if (session.lastReceivedInputSeq > 0 && seq > session.lastReceivedInputSeq + 1) {
           gameMetricsCounters().wsInputSeqGap(
-            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
+            Math.min(seq - session.lastReceivedInputSeq - 1, MSG_SEQ_GAP_SANITY),
           );
         }
-        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
+        session.lastReceivedInputSeq = Math.max(session.lastReceivedInputSeq, seq);
+        if (!bufferedMovementFrame) session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
       // A released spirit turns with the camera like the living; only a corpse that
       // has not yet released (dead and not a ghost) keeps its facing frozen. Without
@@ -6510,7 +6587,12 @@ export class GameServer {
       // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
       // this out-of-band channel and must be rejected here, the authoritative side,
       // not trusted to a client that could simply keep sending it.
-      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
+      if (
+        !bufferedMovementFrame &&
+        frame.facing !== null &&
+        (!e.dead || e.ghost) &&
+        !isStunned(e)
+      ) {
         e.facing = frame.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -8838,6 +8920,12 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
+      mpa:
+        !session.spectating &&
+        p.onGround &&
+        anchorSession.movementPositionState?.authorityActive === true
+          ? 1
+          : 0,
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default

@@ -1,19 +1,28 @@
 import { describe, expect, it } from 'vitest';
 import {
-  BLOCK_EPISODE_MAX_MS,
+  applyMovementPositionSample,
+  type MovementPositionSession,
+} from '../server/movement_position';
+import { type MovementStopTarget, resolveMovementStop } from '../server/movement_stop';
+import {
   hasAuthoritativeSelfPositionDiscontinuity,
   SELF_MOTION_CAP_MAX_MS,
   SELF_MOTION_CAP_MIN_MS,
+  SELF_MOTION_MAIN_THREAD_STALL_MAX_MS,
   SELF_MOTION_SNAP_DIST_SQ,
   type SelfMotionFrame,
   SelfMotionPredictor,
   updateSelfRenderFallback,
   type Vec3Like,
 } from '../src/render/self_motion';
+<<<<<<< HEAD
 import { DUNGEON_FLOOR_Y } from '../src/sim/data';
 import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
+=======
+import { hasTranslationalMoveInput } from '../src/sim/move_input';
+>>>>>>> origin/pr/3631
 import { Sim } from '../src/sim/sim';
-import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
+import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
@@ -72,8 +81,24 @@ class Lab {
   private lastSnapMs = 0;
   private sinceTickMs = 0;
   private localInput = mi();
-  private inputLog: { atMs: number; input: MoveInput }[] = [];
+  private inputLog: { atMs: number; input: MoveInput; stop: MovementStopTarget | null }[] = [];
+  private processedInputEvents = 0;
+  private pendingServerStop: MovementStopTarget | null = null;
+  private lastDisplay: { x: number; z: number } | null = null;
+  private readonly positionAuthority: boolean;
+  private positionAuthoritySignal: boolean | null = null;
+  private readonly positionSession: MovementPositionSession;
+  private readonly positionLog: {
+    atMs: number;
+    input: MoveInput;
+    x: number;
+    z: number;
+  }[] = [];
+  private processedPositionEvents = 0;
+  private nextPositionSendMs = SNAP_MS;
   enabled = true;
+  jitterMs = 0;
+  echoMs: number;
   // Scripted broadcast stall: while positive, tick boundaries still advance
   // the server (it never stops simulating) but the mirror and lastSnapMs are
   // suppressed, so the client renders against a frozen snapshot exactly like
@@ -88,6 +113,7 @@ class Lab {
   private readonly deliverAfter: boolean;
   private readonly deliveryMs: number;
   private readonly serverDeaf: boolean;
+  private readonly serverMotionScale: number;
   /** While true the frame tail keeps the queue: a scripted delivery burst. */
   holdSnapshots = false;
 
@@ -106,11 +132,16 @@ class Lab {
       /** The server never receives the local intent: worst-case divergence,
        *  the display predicting a run the authority never performs. */
       serverDeaf?: boolean;
+      serverMotionScale?: number;
+      positionAuthority?: boolean;
     } = {},
   ) {
+    this.echoMs = lagMs;
     this.deliverAfter = opts.deliverAfter ?? false;
     this.deliveryMs = opts.deliveryMs ?? SNAP_MS;
     this.serverDeaf = opts.serverDeaf ?? false;
+    this.serverMotionScale = opts.serverMotionScale ?? 1;
+    this.positionAuthority = opts.positionAuthority ?? false;
     this.srv = new Sim({
       seed: SEED,
       playerClass: 'warrior',
@@ -133,24 +164,101 @@ class Lab {
     this.srv.player.facing = this.facing; // run straight north (+z) by default
     const p = this.srv.player;
     this.self = { ...p, pos: { ...p.pos }, prevPos: { ...p.prevPos } };
-    this.inputLog.push({ atMs: 0, input: mi() });
+    this.positionSession = { pid: p.id, movementPositionState: null };
+    this.inputLog.push({ atMs: 0, input: mi(), stop: null });
+    this.positionLog.push({ atMs: 0, input: mi(), x: p.pos.x, z: p.pos.z });
   }
 
   readonly facing: number;
 
   setInput(input: MoveInput): void {
+    const stopped = hasTranslationalMoveInput(this.localInput) && !hasTranslationalMoveInput(input);
     this.localInput = input;
-    this.inputLog.push({ atMs: this.nowMs, input });
+    this.inputLog.push({
+      atMs: this.nowMs,
+      input,
+      stop: stopped && this.lastDisplay ? { ...this.lastDisplay } : null,
+    });
   }
 
-  // What the server has received by time t (inputs travel lagMs).
-  private serverInputAt(tMs: number): MoveInput {
-    if (this.serverDeaf) return this.inputLog[0].input;
-    let eff = this.inputLog[0].input;
-    for (const e of this.inputLog) {
-      if (e.atMs + this.lagMs <= tMs) eff = e.input;
+  setPositionAuthoritySignal(active: boolean): void {
+    this.positionAuthoritySignal = active;
+  }
+
+  movementPositionAuthorityActive(): boolean {
+    return this.positionSession.movementPositionState?.authorityActive === true;
+  }
+
+  shiftServerPosition(z: number): void {
+    this.srv.player.pos.z += z;
+    this.srv.player.prevPos.z += z;
+  }
+
+  private applyServerInputAt(tMs: number): void {
+    const meta = this.srv.players.get(this.srv.player.id);
+    if (!meta) throw new Error('missing player meta');
+    if (this.serverDeaf) {
+      Object.assign(meta.moveInput, this.inputLog[0].input);
+      return;
     }
-    return eff;
+    while (
+      this.processedInputEvents < this.inputLog.length &&
+      this.inputLog[this.processedInputEvents].atMs + this.lagMs <= tMs
+    ) {
+      const event = this.inputLog[this.processedInputEvents++];
+      if (event.stop && hasTranslationalMoveInput(meta.moveInput)) {
+        const resolution = resolveMovementStop(
+          event.stop,
+          this.srv.player.prevPos,
+          this.srv.player.pos,
+        );
+        if (resolution.kind === 'reached') {
+          this.srv.player.pos.x = resolution.x;
+          this.srv.player.pos.y = resolution.y;
+          this.srv.player.pos.z = resolution.z;
+          Object.assign(meta.moveInput, event.input);
+          this.pendingServerStop = null;
+        } else if (resolution.kind === 'pending') {
+          this.pendingServerStop = event.stop;
+        } else {
+          Object.assign(meta.moveInput, event.input);
+          this.pendingServerStop = null;
+        }
+      } else if (!(this.pendingServerStop && !hasTranslationalMoveInput(event.input))) {
+        this.pendingServerStop = null;
+        Object.assign(meta.moveInput, event.input);
+      }
+    }
+  }
+
+  private sendPositionSamples(): void {
+    if (!this.positionAuthority || !this.lastDisplay) return;
+    while (this.nextPositionSendMs <= this.nowMs) {
+      this.positionLog.push({
+        atMs: this.nextPositionSendMs,
+        input: { ...this.localInput },
+        x: this.lastDisplay.x,
+        z: this.lastDisplay.z,
+      });
+      this.nextPositionSendMs += SNAP_MS;
+    }
+  }
+
+  private applyServerPositionsAt(tMs: number): void {
+    if (!this.positionAuthority) return;
+    while (
+      this.processedPositionEvents < this.positionLog.length &&
+      this.positionLog[this.processedPositionEvents].atMs + this.lagMs <= tMs
+    ) {
+      const event = this.positionLog[this.processedPositionEvents++];
+      applyMovementPositionSample(
+        this.srv,
+        this.positionSession,
+        { x: event.x, z: event.z },
+        event.atMs,
+        event.input,
+      );
+    }
   }
 
   /** `drainFirst` models the other browser ordering: the socket is drained
@@ -159,14 +267,42 @@ class Lab {
   frame(frameMsOverride?: number, drainFirst = false): FrameResult {
     const frameMs = frameMsOverride ?? this.frameMs;
     this.nowMs += frameMs;
+    this.sendPositionSamples();
     this.sinceTickMs += frameMs;
     let delivered = false;
     while (this.sinceTickMs >= SNAP_MS) {
       this.sinceTickMs -= SNAP_MS;
       const meta = this.srv.players.get(this.srv.player.id);
       if (!meta) throw new Error('missing player meta');
-      Object.assign(meta.moveInput, this.serverInputAt(this.nowMs));
+      this.applyServerPositionsAt(this.nowMs);
+      this.applyServerInputAt(this.nowMs);
+      const before = { ...this.srv.player.pos };
+      const beforeX = this.srv.player.pos.x;
+      const beforeZ = this.srv.player.pos.z;
       this.srv.tick();
+      if (this.serverMotionScale !== 1) {
+        this.srv.player.pos.x =
+          beforeX + (this.srv.player.pos.x - beforeX) * this.serverMotionScale;
+        this.srv.player.pos.z =
+          beforeZ + (this.srv.player.pos.z - beforeZ) * this.serverMotionScale;
+        this.srv.player.pos.y = terrainHeight(
+          this.srv.player.pos.x,
+          this.srv.player.pos.z,
+          this.srv.cfg.seed,
+        );
+      }
+      if (this.pendingServerStop) {
+        const resolution = resolveMovementStop(this.pendingServerStop, before, this.srv.player.pos);
+        if (resolution.kind !== 'pending') {
+          if (resolution.kind === 'reached') {
+            this.srv.player.pos.x = resolution.x;
+            this.srv.player.pos.y = resolution.y;
+            this.srv.player.pos.z = resolution.z;
+          }
+          Object.assign(meta.moveInput, mi());
+          this.pendingServerStop = null;
+        }
+      }
       if (this.skipDeliveries > 0) {
         this.skipDeliveries--;
         continue;
@@ -195,9 +331,13 @@ class Lab {
     const frame: SelfMotionFrame = {
       enabled: this.enabled,
       moveInput: this.localInput,
+      movementPositionAuthority:
+        this.positionAuthoritySignal ??
+        (this.positionAuthority &&
+          this.positionSession.movementPositionState?.authorityActive === true),
       displayFacing: this.facing,
-      echoMs: this.lagMs,
-      jitterMs: 0,
+      echoMs: this.echoMs,
+      jitterMs: this.jitterMs,
       alpha,
       frameDt: frameMs / 1000,
       snapAgeMs: this.lastSnapMs > 0 ? this.nowMs - this.lastSnapMs : 0,
@@ -208,6 +348,7 @@ class Lab {
       riftFloor: this.srv.riftFloor,
     };
     const out = this.predictor.step(this.self, frame);
+    if (out) this.lastDisplay = { x: out.x, z: out.z };
     const a = {
       x: this.self.prevPos.x + (this.self.pos.x - this.self.prevPos.x) * alpha,
       y: this.self.prevPos.y + (this.self.pos.y - this.self.prevPos.y) * alpha,
@@ -248,12 +389,385 @@ class Lab {
   }
 
   budget(): number {
-    const cap = Math.min(SELF_MOTION_CAP_MAX_MS, Math.max(SELF_MOTION_CAP_MIN_MS, this.lagMs));
+    const cap = Math.min(
+      SELF_MOTION_CAP_MAX_MS,
+      Math.max(SELF_MOTION_CAP_MIN_MS, this.lagMs + 0.5 * this.jitterMs),
+    );
     return (RUN_SPEED * cap) / 1000 + 0.05;
   }
 }
 
 describe('SelfMotionPredictor', () => {
+  it.each([
+    { echoMs: 50, jitterMs: [20, 50], cycles: 4 },
+    { echoMs: 170, jitterMs: [5, 120], cycles: 4 },
+    { echoMs: 1000, jitterMs: [120], cycles: 1 },
+  ])(
+    'does not reconcile timing phase into motion at $echoMs ms echo and $jitterMs ms jitter',
+    ({ echoMs, jitterMs, cycles }) => {
+      const lab = new Lab(echoMs, FRAME_MS, { start: { x: 0, z: -1000 } });
+      const next = (): FrameResult => {
+        lab.jitterMs = jitterMs[Math.floor(performanceCounter / 3) % jitterMs.length];
+        performanceCounter++;
+        return lab.frame();
+      };
+      let performanceCounter = 0;
+      for (let i = 0; i < 30; i++) next();
+
+      let maxSpeed = 0;
+      let wrongWay = 0;
+      let postStopDrift = 0;
+      let previous = next().pose;
+      if (!previous) throw new Error('predictor disabled unexpectedly');
+
+      const drive = (input: MoveInput, direction: 1 | -1): void => {
+        lab.setInput(input);
+        for (let i = 0; i < 24; i++) {
+          const pose = next().pose;
+          if (!pose || !previous) throw new Error('predictor disabled unexpectedly');
+          const dz = pose.z - previous.z;
+          maxSpeed = Math.max(maxSpeed, Math.abs(dz) / (FRAME_MS / 1000));
+          wrongWay = Math.max(wrongWay, -direction * dz);
+          previous = pose;
+        }
+      };
+      const stop = (label: string): void => {
+        lab.setInput(mi());
+        const moving = previous;
+        const stopped = next().pose;
+        if (!stopped || !moving) throw new Error('predictor disabled unexpectedly');
+        expect(Math.hypot(stopped.x - moving.x, stopped.z - moving.z)).toBeLessThanOrEqual(0.005);
+        previous = stopped;
+        const confirmationFrames = Math.ceil((echoMs + Math.max(...jitterMs) + SNAP_MS) / FRAME_MS);
+        let thisStopDrift = 0;
+        for (let i = 0; i < confirmationFrames + 90; i++) {
+          const pose = next().pose;
+          if (!pose) throw new Error('predictor disabled unexpectedly');
+          const drift = Math.hypot(pose.x - previous.x, pose.y - previous.y, pose.z - previous.z);
+          postStopDrift += drift;
+          thisStopDrift += drift;
+          previous = pose;
+        }
+        expect(thisStopDrift, label).toBeLessThanOrEqual(0.01);
+        expect(
+          Math.hypot(
+            previous.x - lab.self.pos.x,
+            previous.y - lab.self.pos.y,
+            previous.z - lab.self.pos.z,
+          ),
+        ).toBeLessThanOrEqual(0.005);
+        const still = next().pose;
+        if (!still) throw new Error('predictor disabled unexpectedly');
+        for (let i = 0; i < 5; i++) expect(next().pose).toEqual(still);
+      };
+
+      for (let cycle = 0; cycle < cycles; cycle++) {
+        drive(mi({ forward: true }), 1);
+        stop(`forward stop ${cycle}`);
+        drive(mi({ back: true }), -1);
+        stop(`back stop ${cycle}`);
+      }
+
+      expect(maxSpeed).toBeLessThanOrEqual(RUN_SPEED * 1.15);
+      expect(wrongWay).toBeLessThan(0.01);
+      expect(postStopDrift).toBeLessThanOrEqual(0.01 * cycles * 2);
+      const final = next();
+      if (!final.pose) throw new Error('predictor disabled unexpectedly');
+      expect(
+        Math.hypot(final.pose.x - final.ac.x, final.pose.y - final.ac.y, final.pose.z - final.ac.z),
+      ).toBeLessThanOrEqual(0.01);
+    },
+  );
+
+  it.each([
+    { echoMs: 50, jitterMs: 50 },
+    { echoMs: 170, jitterMs: 120 },
+    { echoMs: 1000, jitterMs: 120 },
+  ])('keeps steady forward motion continuous at $echoMs ms echo', ({ echoMs, jitterMs }) => {
+    const lab = new Lab(echoMs, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.jitterMs = jitterMs;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 120; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+    for (let i = 0; i < 180; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('keeps steady forward motion continuous when validated display positions become authority', () => {
+    const lab = new Lab(200, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+      positionAuthority: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+    for (let i = 0; i < 360; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('keeps validated-authority movement continuous through an isolated client frame drop', () => {
+    const lab = new Lab(200, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+      positionAuthority: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+
+    const frameDurations = [156, ...Array.from({ length: 90 }, () => FRAME_MS)];
+    for (const [index, frameMs] of frameDurations.entries()) {
+      const pose = lab.frame(frameMs).pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      const speed = (pose.z - previous.z) / (frameMs / 1000);
+      expect(speed, `frame ${index}`).toBeGreaterThanOrEqual(RUN_SPEED * 0.9);
+      expect(speed, `frame ${index}`).toBeLessThanOrEqual(RUN_SPEED * 1.1);
+      previous = pose;
+    }
+  });
+
+  it.each([300, 500, 600, 700, 750])(
+    'keeps validated movement continuous through a %ims main-thread stall',
+    (stallMs) => {
+      const lab = new Lab(200, FRAME_MS, {
+        start: { x: 0, z: -1000 },
+        deliverAfter: true,
+        positionAuthority: true,
+      });
+      lab.jitterMs = 50;
+      lab.setInput(mi({ forward: true }));
+      for (let i = 0; i < 180; i++) lab.frame();
+      const before = lab.frame().pose;
+      if (!before) throw new Error('predictor disabled unexpectedly');
+
+      const after = lab.frame(stallMs).pose;
+      if (!after) throw new Error('predictor disabled unexpectedly');
+      const advanceMs = Math.min(stallMs, SELF_MOTION_MAIN_THREAD_STALL_MAX_MS);
+      expect(after.z - before.z).toBeCloseTo(RUN_SPEED * (advanceMs / 1000), 2);
+      expect(lab.movementPositionAuthorityActive()).toBe(true);
+
+      let previous = after;
+      for (let i = 0; i < 40; i++) {
+        const recovered = lab.frame().pose;
+        if (!recovered) throw new Error('predictor disabled unexpectedly');
+        const recoveryStep = recovered.z - previous.z;
+        const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+        expect(recoveryStep, `recovery frame ${i}`).toBeGreaterThanOrEqual(expectedStep * 0.9);
+        expect(recoveryStep, `recovery frame ${i}`).toBeLessThanOrEqual(expectedStep * 1.1);
+        expect(lab.movementPositionAuthorityActive(), `authority frame ${i}`).toBe(true);
+        previous = recovered;
+      }
+    },
+  );
+
+  it('applies the stale-input catch-up cap without movement-position authority', () => {
+    expect(SELF_MOTION_MAIN_THREAD_STALL_MAX_MS).toBe(750);
+    const lab = new Lab(200, FRAME_MS, { start: { x: 0, z: -1000 }, serverDeaf: true });
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    const before = lab.frame().pose;
+    if (!before) throw new Error('predictor disabled unexpectedly');
+
+    const after = lab.frame(2000).pose;
+    if (!after) throw new Error('predictor disabled unexpectedly');
+    const advance = after.z - before.z;
+    expect(advance).toBeGreaterThan(RUN_SPEED * 0.7);
+    expect(advance).toBeLessThanOrEqual(
+      RUN_SPEED * (SELF_MOTION_MAIN_THREAD_STALL_MAX_MS / 1000) + 1e-6,
+    );
+  });
+
+  it('rebases a brief validator reset without interrupting held forward movement', () => {
+    const lab = new Lab(200, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.jitterMs = 50;
+    lab.setPositionAuthoritySignal(true);
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+
+    lab.shiftServerPosition(-3);
+    for (let i = 0; i < 3; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+
+    lab.setPositionAuthoritySignal(false);
+    for (let i = 0; i < 4; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `reset frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+
+    lab.setPositionAuthoritySignal(true);
+    for (let i = 0; i < 12; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `recovery frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('keeps validated-authority movement continuous at sustained low client FPS', () => {
+    const lowFpsFrameMs = 125;
+    const lab = new Lab(200, lowFpsFrameMs, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+      positionAuthority: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 30; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+
+    for (let i = 0; i < 60; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      const speed = (pose.z - previous.z) / (lowFpsFrameMs / 1000);
+      expect(speed, `frame ${i}`).toBeGreaterThanOrEqual(RUN_SPEED * 0.9);
+      expect(speed, `frame ${i}`).toBeLessThanOrEqual(RUN_SPEED * 1.1);
+      previous = pose;
+    }
+  });
+
+  it('keeps a steady forward hold continuous while measured echo and jitter change', () => {
+    const lab = new Lab(50, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      deliverAfter: true,
+    });
+    lab.setInput(mi({ forward: true }));
+    let echoMean = 50;
+    let jitterMean = 20;
+    const echoSamples = [50, 55, 45, 100, 50, 45, 55, 50];
+    let sampleIndex = 0;
+
+    for (let i = 0; i < 120; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+
+    for (let i = 0; i < 60 * 12; i++) {
+      const gapFrame = i % 150;
+      lab.holdSnapshots = gapFrame >= 120 && gapFrame < 128;
+      if (i % 3 === 0) {
+        const sample = echoSamples[sampleIndex++ % echoSamples.length];
+        const priorMean = echoMean;
+        echoMean += 0.2 * (sample - echoMean);
+        jitterMean += 0.2 * (Math.abs(sample - priorMean) - jitterMean);
+        lab.echoMs = echoMean;
+        lab.jitterMs = jitterMean;
+      }
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('does not turn a changing input-echo estimate into a periodic speed pulse', () => {
+    const lab = new Lab(50, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.setInput(mi({ forward: true }));
+    let echoMean = 50;
+    let jitterMean = 0;
+    let sampleIndex = 0;
+    for (let i = 0; i < 120; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+
+    for (let i = 0; i < 60 * 15; i++) {
+      if (i % 3 === 0) {
+        const sample = 50 + (sampleIndex++ % 50);
+        const priorMean = echoMean;
+        echoMean = priorMean === 0 ? sample : priorMean + 0.2 * (sample - priorMean);
+        const deviation = priorMean === 0 ? 0 : Math.abs(sample - priorMean);
+        jitterMean = jitterMean === 0 ? deviation : jitterMean + 0.2 * (deviation - jitterMean);
+        lab.echoMs = echoMean;
+        lab.jitterMs = jitterMean;
+      }
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `frame ${i}`).toBeCloseTo(expectedStep, 2);
+      previous = pose;
+    }
+  });
+
+  it('answers every rapid strafe reversal instead of dropping partial movement segments', () => {
+    const lab = new Lab(170, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.jitterMs = 120;
+    for (let i = 0; i < 120; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    for (let i = 0; i < 60; i++) {
+      const direction = i % 2 === 0 ? 1 : -1;
+      lab.setInput(mi(direction > 0 ? { strafeLeft: true } : { strafeRight: true }));
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect((pose.x - previous.x) * direction, `frame ${i}`).toBeGreaterThan(0.05);
+      previous = pose;
+    }
+  });
+
+  it('does not visibly slide after movement input is released', () => {
+    const lab = new Lab(170, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.jitterMs = 120;
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 120; i++) lab.frame();
+    const moving = lab.frame().pose;
+    if (!moving) throw new Error('predictor disabled unexpectedly');
+    lab.setInput(mi());
+    const released = lab.frame().pose;
+    if (!released) throw new Error('predictor disabled unexpectedly');
+    expect(Math.hypot(released.x - moving.x, released.z - moving.z)).toBeLessThanOrEqual(0.005);
+    for (let i = 0; i < 180; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(Math.hypot(pose.x - released.x, pose.z - released.z), `frame ${i}`).toBeLessThan(0.01);
+    }
+  });
+
+  it.each(Array.from({ length: 12 }, (_, phase) => phase + 1))(
+    'stops without a correction at release phase %i',
+    (phase) => {
+      const lab = new Lab(50, FRAME_MS, { start: { x: 0, z: -1000 } });
+      lab.jitterMs = 50;
+      lab.setInput(mi({ forward: true }));
+      for (let i = 0; i < 60 + phase; i++) lab.frame();
+      const moving = lab.frame().pose;
+      if (!moving) throw new Error('predictor disabled unexpectedly');
+      lab.setInput(mi());
+      const released = lab.frame().pose;
+      if (!released) throw new Error('predictor disabled unexpectedly');
+      expect(Math.hypot(released.x - moving.x, released.z - moving.z)).toBeLessThanOrEqual(0.005);
+      for (let i = 0; i < 180; i++) {
+        const pose = lab.frame().pose;
+        if (!pose) throw new Error('predictor disabled unexpectedly');
+        expect(Math.hypot(pose.x - released.x, pose.z - released.z), `frame ${i}`).toBeLessThan(
+          0.01,
+        );
+      }
+      expect(Math.hypot(released.x - lab.self.pos.x, released.z - lab.self.pos.z)).toBeLessThan(
+        0.01,
+      );
+    },
+  );
+
   it('recognizes only the local completed-unstuck event as an authoritative discontinuity', () => {
     const completed = {
       type: 'unstuck',
@@ -274,6 +788,17 @@ describe('SelfMotionPredictor', () => {
         7,
       ),
     ).toBe(false);
+    const blink = {
+      type: 'spellfx',
+      sourceId: 7,
+      targetId: 7,
+      school: 'shadow',
+      fx: 'blinkStep',
+    } as SimEvent;
+    expect(hasAuthoritativeSelfPositionDiscontinuity([blink], 7)).toBe(true);
+    expect(hasAuthoritativeSelfPositionDiscontinuity([blink], 8)).toBe(false);
+    expect(hasAuthoritativeSelfPositionDiscontinuity([{ type: 'respawn', pid: 7 }], 7)).toBe(true);
+    expect(hasAuthoritativeSelfPositionDiscontinuity([{ type: 'respawn', pid: 7 }], 8)).toBe(false);
   });
 
   it('snaps both predictive and fallback poses on a sub-threshold authoritative recovery', () => {
@@ -340,6 +865,201 @@ describe('SelfMotionPredictor', () => {
     expect(moved).toBeGreaterThan(0.2); // ~4 frames of RUN_SPEED
     // the server has not even received the input yet (120ms lag > 4 frames)
     expect(lab.srv.player.pos.z).toBeCloseTo(-1000, 3);
+  });
+
+  it('keeps forward and lateral response through rapid direction-combination changes', () => {
+    const lab = new Lab(170, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 30; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const startX = previous.x;
+    for (let i = 0; i < 18; i++) {
+      lab.setInput(mi({ forward: true, strafeLeft: i % 2 === 0 }));
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose.z - previous.z, `frame ${i} forward`).toBeGreaterThan(0.02);
+      previous = pose;
+    }
+    expect(Math.abs(previous.x - startX)).toBeGreaterThan(0.1);
+  });
+
+  it('responds on every frame through rapid true reversals', () => {
+    const lab = new Lab(170, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 30; i++) lab.frame();
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    for (let i = 0; i < 18; i++) {
+      const direction = i % 2 === 0 ? 1 : -1;
+      lab.setInput(direction > 0 ? mi({ forward: true }) : mi({ back: true }));
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(direction * (pose.z - previous.z), `frame ${i} reversal`).toBeGreaterThan(0.02);
+      previous = pose;
+    }
+  });
+
+  it('keeps a small same-path speed correction continuous as jitter changes', () => {
+    const lab = new Lab(170, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      serverMotionScale: 6.5 / RUN_SPEED,
+    });
+    lab.setInput(mi({ forward: true }));
+    let previous = lab.frame().pose;
+    if (!previous) throw new Error('predictor disabled unexpectedly');
+    const speeds: number[] = [];
+    for (let i = 0; i < 360; i++) {
+      lab.jitterMs = i % 6 < 3 ? 5 : 120;
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      if (i >= 300) speeds.push((pose.z - previous.z) / (FRAME_MS / 1000));
+      previous = pose;
+    }
+    expect(Math.min(...speeds)).toBeGreaterThan(6.35);
+    expect(Math.max(...speeds)).toBeLessThan(6.65);
+    for (let i = 1; i < speeds.length; i++) {
+      expect(Math.abs(speeds[i] - speeds[i - 1]), `frame ${i}`).toBeLessThan(0.15);
+    }
+  });
+
+  it('re-adopts a large raw server relocation independently of the legitimate visual lead', () => {
+    const lab = new Lab(1000, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 120; i++) lab.frame();
+    const before = lab.frame().pose;
+    if (!before) throw new Error('predictor disabled unexpectedly');
+    expect(before.z - lab.self.pos.z).toBeGreaterThan(6);
+
+    lab.self.pos.x += 20;
+    const relocated = lab.frame().pose;
+    expect(relocated).toEqual(lab.self.pos);
+  });
+
+  it('keeps locomotion immediate and bounded at 1000 ms echo', () => {
+    const lab = new Lab(1000, FRAME_MS, { start: { x: 0, z: -1000 } });
+    for (let i = 0; i < 10; i++) lab.frame();
+    const before = lab.frame().pose;
+    if (!before) throw new Error('predictor disabled unexpectedly');
+    lab.setInput(mi({ forward: true }));
+    let immediate = before;
+    for (let i = 0; i < 4; i++) {
+      const pose = lab.frame().pose;
+      if (pose) immediate = pose;
+    }
+    expect(immediate.z - before.z).toBeGreaterThan(0.2);
+    expect(lab.srv.player.pos.z).toBeCloseTo(-1000, 3);
+
+    for (let i = 0; i < 120; i++) lab.frame();
+    const speedStart = lab.frame().pose;
+    if (!speedStart) throw new Error('predictor disabled unexpectedly');
+    let speedEnd = speedStart;
+    let worstBackstep = 0;
+    for (let i = 0; i < 120; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      worstBackstep = Math.min(worstBackstep, pose.z - speedEnd.z);
+      speedEnd = pose;
+    }
+    expect((speedEnd.z - speedStart.z) / 2).toBeGreaterThan(6.5);
+    expect(worstBackstep).toBeGreaterThanOrEqual(-0.005);
+
+    lab.setInput(mi());
+    const stopped = lab.frame().pose;
+    if (!stopped) throw new Error('predictor disabled unexpectedly');
+    for (let i = 0; i < 100; i++) lab.frame();
+    lab.setInput(mi({ back: true }));
+    let reverse = lab.frame().pose;
+    if (!reverse) throw new Error('predictor disabled unexpectedly');
+    const reverseStart = reverse.z;
+    for (let i = 0; i < 30; i++) {
+      const pose = lab.frame().pose;
+      if (pose) reverse = pose;
+    }
+    expect(reverse.z).toBeLessThan(reverseStart - 2);
+
+    lab.setInput(mi());
+    for (let i = 0; i < 120; i++) lab.frame();
+    const settled = lab.frame();
+    if (!settled.pose) throw new Error('predictor disabled unexpectedly');
+    expect(
+      Math.hypot(
+        settled.pose.x - lab.self.pos.x,
+        settled.pose.y - lab.self.pos.y,
+        settled.pose.z - lab.self.pos.z,
+      ),
+    ).toBeLessThanOrEqual(0.005);
+    const still = settled.pose;
+    for (let i = 0; i < 20; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      expect(pose).toEqual(still);
+    }
+
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 120; i++) lab.frame();
+    lab.skipDeliveries = 1000;
+    const frozen: number[] = [];
+    for (let i = 0; i < 180; i++) {
+      const pose = lab.frame().pose;
+      if (pose && i >= 160) frozen.push(pose.z);
+    }
+    expect(Math.max(...frozen) - Math.min(...frozen)).toBeLessThan(0.02);
+  });
+
+  it('expires optimistic no-echo movement while snapshots remain fresh', () => {
+    const lab = new Lab(0, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      serverDeaf: true,
+    });
+    lab.echoMs = 0;
+    lab.setInput(mi({ forward: true }));
+    const start = lab.frame().pose;
+    if (!start) throw new Error('predictor disabled unexpectedly');
+    let immediate = start;
+    for (let i = 0; i < 4; i++) {
+      const pose = lab.frame().pose;
+      if (pose) immediate = pose;
+    }
+    expect(immediate.z - start.z).toBeGreaterThan(0.2);
+
+    const tail: number[] = [];
+    for (let i = 0; i < 180; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      if (i >= 150) tail.push(pose.z);
+    }
+    expect(Math.max(...tail) - Math.min(...tail)).toBeLessThan(0.02);
+    expect(lab.srv.player.pos.z).toBeCloseTo(-1000, 3);
+
+    lab.setInput(mi());
+    for (let i = 0; i < 120; i++) lab.frame();
+    const settled = lab.frame().pose;
+    expect(settled).toEqual(lab.self.pos);
+  });
+
+  it('does not re-adopt a legitimate mounted lead at 1000 ms echo', () => {
+    const lab = new Lab(1000, FRAME_MS, { start: { x: 0, z: -1000 } });
+    lab.srv.addItem('reins_aether_hover_cycle', 1);
+    lab.srv.player.mountKey = 'aether_hover_cycle';
+    lab.self.mountKey = 'aether_hover_cycle';
+    lab.setInput(mi({ forward: true }));
+    for (let i = 0; i < 180; i++) lab.frame();
+    const first = lab.frame().pose;
+    if (!first) throw new Error('predictor disabled unexpectedly');
+    let previous = first;
+    let last = first;
+    let worstBackstep = 0;
+    for (let i = 0; i < 120; i++) {
+      const pose = lab.frame().pose;
+      if (!pose) throw new Error('predictor disabled unexpectedly');
+      worstBackstep = Math.min(worstBackstep, pose.z - previous.z);
+      previous = pose;
+      last = pose;
+    }
+    expect((last.z - first.z) / 2).toBeGreaterThan(11.5);
+    expect(worstBackstep).toBeGreaterThanOrEqual(-0.005);
+    expect(last.z - lab.self.pos.z).toBeGreaterThan(10);
   });
 
   // Running into a blocker (the Grand Armoury's flat south face at z = -12) is
@@ -417,6 +1137,21 @@ describe('SelfMotionPredictor', () => {
       const err = Math.hypot(pose.x - a.x, pose.z - a.z);
       expect(err, `frame ${i}`).toBeLessThanOrEqual(budget + 1e-6);
     }
+  });
+
+  it('keeps half-jitter in the leash budget without shifting reconciliation center age', () => {
+    const lab = new Lab(50, FRAME_MS, {
+      start: { x: 0, z: -1000 },
+      serverDeaf: true,
+    });
+    lab.jitterMs = 50;
+    lab.setInput(mi({ forward: true }));
+    let last: FrameResult | null = null;
+    for (let i = 0; i < 120; i++) last = lab.frame();
+    if (!last?.pose) throw new Error('predictor disabled unexpectedly');
+    const error = Math.hypot(last.pose.x - last.ac.x, last.pose.z - last.ac.z);
+    expect(error).toBeLessThanOrEqual(lab.budget() + 1e-6);
+    expect(lab.budget()).toBeCloseTo((RUN_SPEED * 75) / 1000 + 0.05, 8);
   });
 
   it('leads the authoritative pose in a steady run (latency actually hidden)', () => {
@@ -559,10 +1294,10 @@ describe('SelfMotionPredictor', () => {
   // regime. The server keeps ticking while the mirror and lastSnapMs are
   // suppressed, then one resume delivery re-anchors interpolation, exactly
   // like a real broadcast stall: the rAF loop never stops, snapshots do.
-  // During the stall the leash freezes the display at the latency-scaled
-  // budget from the frozen anchor, the intended anti-divergence behavior; on
-  // resume the anchor sweeps to the fresh pose over one snapshot interval and
-  // the display glides after it with no snap. The straight-north lane doubles
+  // During an ordinary stall the client keeps integrating the held input at
+  // its normal speed inside the fixed maximum prediction horizon. On resume
+  // the anchor sweeps to the fresh pose without changing display speed. A gap
+  // longer than the horizon freezes there instead of predicting forever. The straight-north lane doubles
   // as the yaw proxy: yaw is never server-gated, so the predictor must not
   // touch it, and any yaw contamination shows up as lateral drift.
   describe('scripted broadcast stalls', () => {
@@ -575,6 +1310,7 @@ describe('SelfMotionPredictor', () => {
     interface StallTrace {
       budget: number;
       stallErrs: number[];
+      stallSteps: number[];
       resumeSteps: number[];
       resumeErrs: number[];
       recoveryErrs: number[];
@@ -619,6 +1355,7 @@ describe('SelfMotionPredictor', () => {
       for (let i = 0; i < WARMUP_FRAMES; i++) advance(lab.frame());
       lab.skipDeliveries = gapMs / SNAP_MS - 1;
       const stallErrs: number[] = [];
+      const stallSteps: number[] = [];
       const resumeSteps: number[] = [];
       const resumeErrs: number[] = [];
       let resumed = false;
@@ -630,7 +1367,7 @@ describe('SelfMotionPredictor', () => {
           resumeErrs.push(errOf(r));
           break;
         }
-        advance(r);
+        stallSteps.push(advance(r));
         stallErrs.push(errOf(r));
       }
       if (!resumed) throw new Error('stall never resumed');
@@ -671,6 +1408,7 @@ describe('SelfMotionPredictor', () => {
       return {
         budget,
         stallErrs,
+        stallSteps,
         resumeSteps,
         resumeErrs,
         recoveryErrs,
@@ -682,42 +1420,20 @@ describe('SelfMotionPredictor', () => {
       };
     }
 
-    // Per-arm literals are measured on this deterministic rig, with headroom:
-    // saturation floor: gaps of 250 ms and up pin the leash boundary itself
-    //   (observed 1.098 on a 1.100 budget); the 100 ms arm only NEARS it
-    //   (observed 0.997), because the anchor keeps sweeping the last
-    //   delivered segment for the first 50 ms of a one-interval gap.
-    // step ceiling: observed resume maxima 0.148 / 0.205 / 0.274 / 0.498 yd,
-    //   each far below the one-frame gap replay a snap would show
-    //   (0.7 / 1.75 / 2.8 / 3.5 yd) and below the 6 yd reset rule.
-    it.each([
-      [100, 0.95, 0.25],
-      [250, 1.05, 0.35],
-      [400, 1.05, 0.45],
-      [500, 1.05, 0.75],
-    ])(
-      'freezes on the leash and recovers across a %ims broadcast stall',
-      (gapMs, satFloorYd, maxStepYd) => {
+    it.each([100, 250, 400, 500])(
+      'holds constant display speed across a %ims broadcast stall',
+      (gapMs) => {
         const run = runStall(gapMs);
-        // a: leash containment on every stall frame
+        const maxPredictionBudget = (RUN_SPEED * SELF_MOTION_CAP_MAX_MS) / 1000 + 0.05;
         run.stallErrs.forEach((err, i) => {
-          expect(err, `stall frame ${i}`).toBeLessThanOrEqual(run.budget + 1e-6);
+          expect(err, `stall frame ${i}`).toBeLessThanOrEqual(maxPredictionBudget + 1e-6);
         });
-        // b: the stall drives the error into the leash boundary, so the
-        // containment above is a boundary claim, not slack
-        expect(Math.max(...run.stallErrs)).toBeGreaterThanOrEqual(satFloorYd);
-        // c: no backward step on resume. The worst observed value is a single
-        // 2.3 cm servo-settle frame at 250 ms; the artifact class this pins
-        // against, lead stripping and the prevPos-clamp sawtooth, is 10x up.
-        expect(Math.min(...run.resumeSteps)).toBeGreaterThanOrEqual(-0.03);
-        const backslide = run.resumeSteps.reduce((s, v) => s + (v < 0 ? -v : 0), 0);
-        expect(backslide).toBeLessThan(0.05);
-        // d: bounded forward step on resume: the anchor sweep spreads the gap
-        // distance over one snapshot interval and the display glides after it
-        const maxStep = Math.max(...run.resumeSteps);
-        expect(maxStep).toBeLessThanOrEqual(maxStepYd);
-        expect(maxStep).toBeLessThan(Math.sqrt(SELF_MOTION_SNAP_DIST_SQ));
-        // e: back in the steady lead band within about a second: contained,
+        const expectedStep = RUN_SPEED * (FRAME_MS / 1000);
+        const stepReport = `\n  stall: ${run.stallSteps.map((step) => step.toFixed(4)).join(' ')}\n  resume: ${run.resumeSteps.map((step) => step.toFixed(4)).join(' ')}`;
+        for (const [i, step] of [...run.stallSteps, ...run.resumeSteps].entries()) {
+          expect(step, `gap/resume frame ${i}${stepReport}`).toBeCloseTo(expectedStep, 2);
+        }
+        // Back in the steady lead band within about a second: contained,
         // meaningfully leading, and equal to the unstalled control's band
         run.recoveryErrs.forEach((err, i) => {
           expect(err, `recovery frame ${i}`).toBeLessThanOrEqual(run.budget + 1e-6);
@@ -725,50 +1441,32 @@ describe('SelfMotionPredictor', () => {
         const meanLead = run.recoveryLeads.reduce((s, v) => s + v, 0) / run.recoveryLeads.length;
         expect(meanLead).toBeGreaterThanOrEqual(0.45);
         expect(Math.abs(meanLead - run.controlMeanLead)).toBeLessThanOrEqual(0.05);
-        // f: zero lateral drift on the straight lane, the yaw-untouched proxy.
+        // Zero lateral drift on the straight lane, the yaw-untouched proxy.
         // The server assert proves the lane itself is straight, so the display
         // assert is a real claim about the predictor and not about terrain.
         expect(run.serverLateral).toBeLessThanOrEqual(1e-9);
         expect(run.worstLateral).toBeLessThanOrEqual(1e-9);
-        // g: not one backward frame anywhere in the run, stall and recovery
+        // Not one backward frame anywhere in the run, stall and recovery
         // included, not just the resume window sampled above
         expect(run.worstStep).toBeGreaterThanOrEqual(-0.03);
       },
     );
 
-    it('snap-resets deliberately when the resume anchor outruns the 6 yd rule', () => {
-      // 2500 ms of missed broadcasts: the resume sweep moves the anchor about
-      // 5.8 yd per frame, so the pre-clamp distance check exceeds the 6 yd
-      // rule and the predictor re-adopts outright, the same deliberate reset
-      // the teleport arm exercises. This is the boundary pin for the regime
-      // above: at 500 ms and below the reset must never fire.
+    it('freezes at the maximum horizon and re-adopts authority after a prolonged gap', () => {
       const run = runStall(2500);
-      // the stall itself is still just the leash freeze
+      const maxPredictionBudget = (RUN_SPEED * SELF_MOTION_CAP_MAX_MS) / 1000 + 0.05;
       run.stallErrs.forEach((err, i) => {
-        expect(err, `stall frame ${i}`).toBeLessThanOrEqual(run.budget + 1e-6);
+        expect(err, `stall frame ${i}`).toBeLessThanOrEqual(maxPredictionBudget + 1e-6);
       });
-      expect(Math.max(...run.stallErrs)).toBeGreaterThanOrEqual(1.05);
-      // The detection threshold below is the SAME constant production uses to
-      // DECIDE the reset, so a moderate drift of the rule (36 to 64) would
-      // move detection and decision together and stay invisible; this literal
-      // pins the 6 yd rule itself so that drift is caught.
+      expect(Math.max(...run.stallErrs)).toBeGreaterThanOrEqual(maxPredictionBudget - 0.5);
+      expect(Math.max(...run.stallSteps.slice(-12).map(Math.abs))).toBeLessThan(0.01);
       expect(SELF_MOTION_SNAP_DIST_SQ).toBe(36);
-      // the reset is a single deliberate discontinuity: exactly one frame
-      // jumps farther than the 6 yd rule, and it lands ON the fresh anchor
       const snapDist = Math.sqrt(SELF_MOTION_SNAP_DIST_SQ);
-      const snapIdx = run.resumeSteps.findIndex((s) => s > snapDist);
-      expect(run.resumeSteps.filter((s) => s > snapDist)).toHaveLength(1);
-      expect(run.resumeErrs[snapIdx]).toBeLessThan(0.2);
-      // and the predictor is re-locked afterwards
+      expect(run.resumeSteps.some((step) => Math.abs(step) >= snapDist)).toBe(true);
       run.recoveryErrs.forEach((err, i) => {
         expect(err, `recovery frame ${i}`).toBeLessThanOrEqual(run.budget + 1e-6);
       });
       expect(run.worstLateral).toBeLessThanOrEqual(1e-9);
-      // The resume sweep here clips MORE than the kernel step the frame took,
-      // which leaves prevPos ahead of the clamped pos; without the collapse in
-      // step() the sub-tick interpolation walks the display backward on that
-      // frame. Measured at about -0.05 yd with the collapse removed.
-      expect(run.worstStep).toBeGreaterThanOrEqual(-0.03);
     });
   });
 
@@ -991,15 +1689,14 @@ describe('SelfMotionPredictor', () => {
       expect(errs[7], report).toBeLessThan(0.15);
     });
 
-    // The declared worst case, and the one the broadcast-stall arms cannot
-    // reach: an isolated hitch opens an episode and THEN the network gaps for
-    // half a second, so the lending mechanism meets a genuine stall already
-    // switched on. The episode cap is what bounds it.
+    // An isolated local hitch followed by an ordinary network gap must keep
+    // the same display speed through both causes without exceeding the shared
+    // maximum prediction horizon.
     it.each([
       [40, 156],
       [120, 156],
     ])(
-      'caps the episode when a %ims-echo hitch of %ims is followed by a 500 ms gap',
+      'keeps constant speed when a %ims-echo hitch of %ims is followed by a 500 ms gap',
       (lagMs, longMs) => {
         const lab = warmLab(lagMs);
         const record = recorder(lab);
@@ -1012,37 +1709,20 @@ describe('SelfMotionPredictor', () => {
         // resume sweep is the whole gap replayed over one snapshot interval.
         const post = record('+', FRAME_MS, GAP_RECOVERY_FRAMES);
         const report = trace([...blocked, ...post]);
-        // a: the lending is bounded by the episode cap, stated from the
-        // constants: the plain leash budget plus what one capped episode plus
-        // its opening frame can cover at run speed.
-        const bound = lab.budget() + (RUN_SPEED * (BLOCK_EPISODE_MAX_MS + longMs)) / 1000;
+        const bound = (RUN_SPEED * SELF_MOTION_CAP_MAX_MS) / 1000 + 0.05;
         for (const step of [...blocked, ...post]) {
-          expect(step.err, `${step.label}${report}`).toBeLessThanOrEqual(bound);
+          expect(step.err, `${step.label}${report}`).toBeLessThanOrEqual(bound + 1e-6);
         }
-        // b: the cap expires INSIDE the gap and the display drops back onto
-        // the plain leash freeze: the error stops growing and the display
-        // stops advancing while the anchor stays frozen. With no cap the
-        // lending would run for the whole gap and both would keep going.
-        const frozen = blocked.slice(-6);
-        const errs = frozen.map((step) => step.err);
-        expect(Math.max(...errs) - Math.min(...errs), report).toBeLessThan(0.02);
-        for (const step of frozen) {
-          expect(step.speed, `frozen ${step.label}${report}`).toBeLessThan(1);
-        }
-        // c: the burst re-contains it on the stall arms' own terms
-        for (const step of post) {
-          expect(step.forward, `${step.label}${report}`).toBeGreaterThanOrEqual(-0.03);
-        }
+        expectSteadyBand(blocked);
+        expectSteadyBand(post);
         expectSteadyBand(post.slice(-8));
       },
     );
 
-    // The loan is temporary, pinned where it matters: a plain broadcast gap
-    // arriving later must be contained by the PLAIN leash, not by whatever
-    // room the earlier hitch was lent. A loan that never drained would ride
-    // straight through this.
+    // The local-hitch loan is temporary. A later network gap gets only its own
+    // bounded prediction allowance and still runs at the normal display speed.
     it.each([[40], [120]])(
-      'drains the loan so a later broadcast gap is contained by the plain leash at %ims echo',
+      'drains the hitch loan before a later smooth broadcast gap at %ims echo',
       (lagMs) => {
         const lab = warmLab(lagMs);
         const record = recorder(lab);
@@ -1052,13 +1732,10 @@ describe('SelfMotionPredictor', () => {
         lab.holdSnapshots = true; // now a network gap, with no hitch of its own
         const stall = record('stall', FRAME_MS, Math.round(250 / FRAME_MS));
         const report = trace(stall);
-        for (const step of stall) {
-          expect(step.err, `${step.label}${report}`).toBeLessThanOrEqual(lab.budget() + 1e-6);
-        }
-        // and the gap really does drive the display into that boundary
-        expect(Math.max(...stall.map((step) => step.err)), report).toBeGreaterThan(
-          lab.budget() * 0.8,
-        );
+        const bound = (RUN_SPEED * SELF_MOTION_CAP_MAX_MS) / 1000 + 0.05;
+        for (const step of stall)
+          expect(step.err, `${step.label}${report}`).toBeLessThanOrEqual(bound + 1e-6);
+        expectSteadyBand(stall);
       },
     );
 
@@ -1216,34 +1893,28 @@ describe('SelfMotionPredictor', () => {
       const after = pair(FRAME_MS / 1000, 300); // ...and a stale frame behind it
       expect(hitch.a).toEqual(hitch.b);
       expect(after.a).toEqual(after.b);
-      // the episode still opened despite the sentinel: full kernel ground, not
-      // the base-budget clamp, and the frame after it keeps advancing
-      expect(hitch.a.z - before.a.z).toBeGreaterThan(0.9);
+      // The episode still opens despite the sentinel: the output advances by
+      // the hitch duration within one fixed-step interpolation interval instead
+      // of staying pinned to the base latency budget.
+      expect(hitch.a.z - before.a.z).toBeGreaterThan(RUN_SPEED * (0.156 - DT));
       expect(after.a.z).toBeGreaterThan(hitch.a.z);
     });
 
-    // The boundary of the fix, pinned from the other side. A delivery burst
-    // with no long frame is a NETWORK gap: nothing local explains the stale
-    // anchor, so it stays in the broadcast-stall regime above (the display
-    // freezes on the leash, then the resume sweep repays the gap). The
-    // staleness allowance must not leak into it, or the leash containment the
-    // stall arms pin would quietly stop holding.
+    // A delivery burst with no long frame is a network gap. The display keeps
+    // integrating its held input and the resume sweep does not change speed.
     it.each([
       [40, 15.5],
       [120, 12.0],
     ])(
-      'leaves a delivery burst with no long frame frozen on the leash at %ims echo',
+      'keeps a delivery burst with no long frame at constant speed at %ims echo',
       (lagMs, peakYdS) => {
         const steps = runBurst(lagMs);
         const report = trace(steps);
-        // the freeze itself: the frame whose tail applies the burst still steps
-        // against the frozen anchor, so it shows the leash, not the kernel
-        expect(steps[0].speed, `frozen${report}`).toBeLessThan(2);
-        // the repayment: forward, bounded, and back on the steady band by the end
         for (const step of steps) {
           expect(step.forward, `${step.label}${report}`).toBeGreaterThanOrEqual(-0.03);
           expect(step.speed, `${step.label}${report}`).toBeLessThanOrEqual(peakYdS);
         }
+        expectSteadyBand(steps);
         expectSteadyBand(steps.slice(-8));
       },
     );

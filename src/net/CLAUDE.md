@@ -236,12 +236,25 @@ failure, kept as stable English that `main.ts` re-localizes.
   target one).
 - **Display-layer locomotion anticipation is the one sanctioned prediction**, and
   it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
-  the LOCAL player that is (a) bounded by measured latency with a hard cap,
-  (b) always blending toward the authoritative server pose, (c) never written
-  into `ClientWorld` mirrored state or any `IWorld` read that logic consumes
+  the LOCAL player that is (a) bounded by a speed-derived measured-latency leash
+  with a hard cap, (b) trajectory-matched within bounded timing uncertainty and
+  exactly converged to authoritative wire XYZ at stable idle, (c) frozen when
+  snapshot flow exhausts the remaining hard-cap horizon, (d) never written into
+  `ClientWorld` mirrored state or any `IWorld` read that logic consumes
   (targeting, range checks, quest triggers, and interest all use authoritative
-  positions), and (d) never affects what is sent to the server. Widening any of
-  those four constraints is a maintainer decision, see
+  positions). Protocol-v2 inputs carry the displayed XZ and client timestamp,
+  but neither is authority by itself: `server/movement_position.ts` accepts only
+  grounded samples within elapsed movement-speed credit, a short authority
+  window, and a swept collision-clear path. Airborne, forced, rooted, instance,
+  and stale-idle movement stay server-owned. `server/movement_stop.ts` adds a
+  stricter release check against the immediately previous or next authoritative
+  movement segment. Invalid samples are ignored and can never pull or teleport
+  authority. The protocol-v2 timeline applies transitions after the shared 150
+  ms jitter window (`src/sim/movement_timing.ts`); self prediction includes that
+  known delay, while old clients keep the legacy immediate path. Fresh sessions
+  may use the bounded optimistic bootstrap in `self_motion.ts` until the first
+  credible input echo; that bootstrap expires if no echo arrives. Widening any
+  of these constraints is a maintainer decision, see
   `docs/online-movement-latency.md`. One amendment is already in force, for the
   long render frame: when a frame outlasts the mirror's snapshot interval the
   browser applies the snapshots it swallowed in one burst, so for that block
@@ -250,6 +263,7 @@ failure, kept as stable English that `main.ts` re-localizes.
   and (b) the blend toward the server pose is held for the settle window that
   the burst sweep needs. Both live in `src/render/self_motion.ts` and are
   pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
+<<<<<<< HEAD
   A second amendment (issue #3479): prediction now covers rifts too, the same
   as the overworld and regular dungeons. The predictor strips and reapplies
   the raised-tier lift around each kernel step (`self_motion_rift_lift.ts`,
@@ -275,13 +289,24 @@ failure, kept as stable English that `main.ts` re-localizes.
   Pinned by `describe('rift prediction (issue #3479)')` in
   `tests/self_motion.test.ts` and the rift case in
   `tests/player_motion.test.ts`'s kernel parity suite.
+=======
+  An ordinary snapshot gap may spend only the unused portion of the same hard
+  cap; it freezes at that horizon and re-adopts authority after a prolonged gap.
+  While the self snapshot reports an active validated grounded-position stream,
+  that stream replaces the grounded spatial servo and leash. The temporal gap
+  horizon remains active, and a validator reset restores the ordinary path.
+  Predictor catch-up after a blocked main thread is separately capped at 750 ms,
+  matching the server's stale held-input cutoff.
+>>>>>>> origin/pr/3631
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
-  channel (`input.facing`, applied outright by the server, corpse-guard only)
+  channel (`input.facing`, applied outright when the player may turn)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`
   streams keyboard turns on the SAME channel (with the turn flags zeroed on the
   wire, except the engage-edge frame that still fires the server's manual-turn
   behaviors) so the server never integrates a turn a round trip late. That is
   real input, not anticipation: constraint (d) above does not apply to it, and
-  its authority stays exactly what mouselook already had.
+  its authority stays exactly what mouselook already had. A keyboard turn's
+  release heading remains wire-owned until its input sequence is acknowledged,
+  preventing a rounded snapshot from masquerading as an applied final heading.
 - Never read `Math.random`/timing into *gameplay*; `performance.now` here is for
   render interpolation only (`lastSnapAt`, per-entity `netInterval`), not logic.

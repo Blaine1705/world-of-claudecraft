@@ -9,11 +9,10 @@
 // respond the frame the key changes.
 //
 // It is a visual layer with three hard safety properties, in order:
-//  1. Anchored: every frame the authoritative pose (which shows the past, one
-//     echo ago) is compared against where the local display WAS one echo ago
-//     (a short pose-history ring); any disagreement, from server-driven motion
-//     (charge, knockback) or a misprediction (a stun landing mid-press),
-//     corrects as a short glide, never a divergence.
+//  1. Anchored: the authoritative pose is matched against the closest point in
+//     the recent predicted trajectory inside the measured timing window. ACK
+//     and snapshot phase variation therefore causes no spatial correction,
+//     while off-path disagreement still converges under a capped servo.
 //  2. Bounded: the horizontal error from the authoritative pose is leashed to
 //     what the player could legitimately cover in the latency cap; a server
 //     teleport (or any gap over the renderer's 6 yd snap rule) resets outright.
@@ -35,12 +34,16 @@
 //     the burst sweep and the leash lends the lead the kernel took, drained
 //     back afterwards. The episode is bounded (BLOCK_EPISODE_MAX_MS) and
 //     isolation excludes steady low fps, where every frame is long and nothing
-//     is hitching. A NETWORK gap looks the same from here but earns neither:
-//     freezing the display on the leash is the right answer when nothing local
-//     explains the stale anchor.
+//     is hitching. A NETWORK gap may advance only through the unused portion of
+//     the same hard prediction horizon; it freezes once that horizon is spent.
+//     An active validated grounded-position stream replaces the spatial servo
+//     and leash. The temporal horizon still freezes on a network gap, and a
+//     validator reset restores ordinary reconciliation on the next snapshot.
 //  3. Invisible to logic: the output feeds only the renderer's
 //     selfRenderPosition (mesh + camera). It never writes into ClientWorld
-//     mirrored state, IWorld reads, or the input stream.
+//     mirrored state or IWorld reads. The network layer may send the displayed
+//     XZ, but server/movement_position.ts independently bounds speed and sweeps
+//     collision before authority may adopt it.
 //
 // Pure and Node-testable (no Three, no DOM): plain {x,y,z} in and out, like
 // facing_smooth.ts / locomotion.ts. tests/self_motion.test.ts drives it
@@ -63,8 +66,26 @@ import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calli
 import { isRiftPos } from '../sim/data';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
+<<<<<<< HEAD
 import type { RiftFloorView } from '../world_api/dungeons';
 import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
+=======
+import {
+  boundedReconciliationCorrectionInto,
+  createSelfReconciliation,
+  createTrajectoryHistory,
+  idleReconciliationCorrectionInto,
+  reconciliationLeadDiscontinuity,
+  recordTrajectoryPoint,
+  resetSelfReconciliation,
+  resetSelfReconciliationBoundary,
+  resetTrajectoryHistory,
+  SELF_RECONCILIATION_HISTORY_MAX_AGE_MS,
+  SELF_RECONCILIATION_MAX_TIMING_INPUT_MS,
+  type TrajectoryResidual,
+  trajectoryResidualInto,
+} from './self_reconciliation_core';
+>>>>>>> origin/pr/3631
 
 // Latency cap on the extrapolation window: at least one snapshot-ish interval
 // so low-ping links still get the start-of-motion snap, and a hard ceiling so
@@ -77,7 +98,12 @@ import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 // teleports snap, so the cost of a higher ceiling is only a longer correction
 // glide in the rare genuine-divergence case.
 export const SELF_MOTION_CAP_MIN_MS = 60;
-export const SELF_MOTION_CAP_MAX_MS = 350;
+export const SELF_MOTION_CAP_MAX_MS = 1500;
+export const SELF_MOTION_BOOTSTRAP_CAP_MS = 1000;
+// A blocked main thread cannot refresh the held-input stream. Keep one-frame
+// catch-up inside the server's 750 ms stale-input cutoff even when the wider
+// network prediction horizon would otherwise permit more display travel.
+export const SELF_MOTION_MAIN_THREAD_STALL_MAX_MS = 750;
 // The divergence MEASUREMENT is aligned to the true echo, bounded only by
 // what the history ring can serve. This is a different bound from the lead
 // cap above on purpose: capping the measurement at 180ms on a 280ms link
@@ -87,7 +113,7 @@ export const SELF_MOTION_CAP_MAX_MS = 350;
 // delayed output. With gain x delay > 1 that loop self-oscillates (the
 // observed forward/backward pumping under netem). Alignment kills the
 // phantom error; the rate bound below keeps the residual loop damped.
-export const SELF_MOTION_MEASURE_MAX_MS = 400;
+export const SELF_MOTION_MEASURE_MAX_MS = SELF_RECONCILIATION_HISTORY_MAX_AGE_MS;
 // Pull rate of the divergence correction. The correction compares the
 // authoritative pose against WHERE THE LOCAL PREDICTION WAS one latency cap
 // ago (a short pose-history ring), so during agreed motion (steady runs,
@@ -99,9 +125,11 @@ export const SELF_MOTION_BLEND_RATE = 12; // 1/s
 // history sampling is frame-quantized; inside this radius the pose is left
 // alone so a settled stop never jiggles. Real corrections are far larger.
 export const SELF_MOTION_DEADBAND_YD = 0.05;
+const LEASH_SLACK_YD = 0.05;
 // Same teleport rule the renderer's self smoother uses (6 yd).
 export const SELF_MOTION_SNAP_DIST_SQ = 6 * 6;
-const MAX_FRAME_DT = 0.25; // matches the main-loop frame clamp
+export const SELF_MOTION_PREDICTOR_VERTICAL_SNAP_YD = 6;
+const MAX_PREDICTOR_FRAME_DT = SELF_MOTION_MAIN_THREAD_STALL_MAX_MS / 1000;
 // The block episode (see the header): how long a hitch may keep lending leash
 // room. It must outlast the browser's post-block catch-up frames with room to
 // spare, and it must END, because a real network stall starting right after a
@@ -115,17 +143,20 @@ const SERVO_SETTLE_INTERVALS = 2;
 // The mirror's interval EWMA can arrive degenerate (a fresh or reset
 // ClientWorld); floor it the way every other consumer does (online.ts alpha).
 const MIN_SNAP_INTERVAL_MS = 20;
-const LEASH_SLACK_YD = 0.05;
-// Pose-history ring: enough to look SELF_MOTION_CAP_MAX_MS into the past with
-// headroom even on high-refresh displays (128 entries covers 267 ms at 480 fps
-// and over 2 s at 60 fps).
-const HISTORY_SIZE = 128;
+
+// Covers the full measurement horizon at 480 Hz with ring-wrap headroom.
+const HISTORY_SIZE = 1024;
+const IDLE_WIRE_STABLE_YD = 0.01;
+const LEASH_JITTER_HOLD_INTERVALS = 2;
+const LEASH_JITTER_DECAY_RATE = 0.5;
 
 export interface SelfMotionFrame {
   /** Gate computed by main.ts: online, not spectating, not frozen/CC'd, not in a delve. */
   enabled: boolean;
   /** This frame's resolved held intent (click-move folded in, jump included). */
   moveInput: MoveInput;
+  /** The server is actively validating the streamed grounded display XZ. */
+  movementPositionAuthority?: boolean;
   /** The one display heading: mouselook/click-move facing, else the local keyboard turn, else the interpolated server facing. */
   displayFacing: number;
   echoMs: number;
@@ -170,9 +201,11 @@ export function hasAuthoritativeSelfPositionDiscontinuity(
 ): boolean {
   return events.some(
     (event) =>
-      event.type === 'unstuck' &&
-      event.phase === 'completed' &&
-      (event.pid === undefined || event.pid === playerId),
+      (event.type === 'unstuck' &&
+        event.phase === 'completed' &&
+        (event.pid === undefined || event.pid === playerId)) ||
+      (event.type === 'respawn' && (event.pid === undefined || event.pid === playerId)) ||
+      (event.type === 'spellfx' && event.fx === 'blinkStep' && event.sourceId === playerId),
   );
 }
 
@@ -233,7 +266,12 @@ export class SelfMotionPredictor {
   private lastSelfId = -1;
   private lastDead = false;
   private lastGhost = false;
+  private wirePositionReady = false;
+  private lastWireX = 0;
+  private lastWireY = 0;
+  private lastWireZ = 0;
   private acc = 0;
+  private segmentPrimed = false;
   private timeMs = 0;
   // Long-frame block bookkeeping: the leash room the frozen anchor owes the
   // display, the post-burst settle window the servo sits out, and what is left
@@ -244,15 +282,29 @@ export class SelfMotionPredictor {
   private prevFrameDtMs = 0;
   // Lending capacity earned while the anchor is blocked, in yards of run.
   private episodeCapYd = 0;
-  // Ring of end-of-frame display poses, for the "where was the prediction one
-  // latency cap ago" comparison. Preallocated; hist* index HISTORY_SIZE slots.
-  private histCount = 0;
-  private histHead = 0;
-  private readonly histT = new Float64Array(HISTORY_SIZE);
-  private readonly histX = new Float64Array(HISTORY_SIZE);
-  private readonly histY = new Float64Array(HISTORY_SIZE);
-  private readonly histZ = new Float64Array(HISTORY_SIZE);
-  private readonly histSample: Vec3Like = { x: 0, y: 0, z: 0 };
+  private networkGapWasActive = false;
+  private networkGapSettleMs = 0;
+  private networkGapAllowanceYd = 0;
+  private movementPositionAuthorityWasActive = false;
+  private authorityHandoffHoldMs = 0;
+  private authorityHandoffAllowanceYd = 0;
+  private readonly history = createTrajectoryHistory(HISTORY_SIZE);
+  private readonly reconciliation = createSelfReconciliation();
+  private readonly residual: TrajectoryResidual = {
+    matched: false,
+    matchTimeMs: 0,
+    x: 0,
+    y: 0,
+    z: 0,
+  };
+  private readonly correction: Vec3Like = { x: 0, y: 0, z: 0 };
+  private idleMs = 0;
+  private lastMoveMask = -1;
+  private credibleEchoMs = 0;
+  private bootstrapMs = 0;
+  private leashJitterMs = 0;
+  private leashJitterLowMs = 0;
+  private leashJitterReady = false;
   private readonly stepInput: MoveInput = {
     forward: false,
     back: false,
@@ -301,54 +353,42 @@ export class SelfMotionPredictor {
   reset(): void {
     this.actor = null;
     this.acc = 0;
-    this.histCount = 0;
-    this.histHead = 0;
+    this.segmentPrimed = false;
+    this.wirePositionReady = false;
+    resetTrajectoryHistory(this.history);
+    resetSelfReconciliation(this.reconciliation);
+    this.idleMs = 0;
+    this.lastMoveMask = -1;
+    this.credibleEchoMs = 0;
+    this.bootstrapMs = 0;
+    this.leashJitterMs = 0;
+    this.leashJitterLowMs = 0;
+    this.leashJitterReady = false;
     this.leadMs = 0;
     this.staleAllowanceYd = 0;
     this.servoHoldMs = 0;
     this.blockEpisodeMs = 0;
     this.prevFrameDtMs = 0;
     this.episodeCapYd = 0;
+    this.networkGapWasActive = false;
+    this.networkGapSettleMs = 0;
+    this.networkGapAllowanceYd = 0;
+    this.movementPositionAuthorityWasActive = false;
+    this.authorityHandoffHoldMs = 0;
+    this.authorityHandoffAllowanceYd = 0;
   }
 
   private recordHistory(x: number, y: number, z: number): void {
-    const i = this.histHead;
-    this.histT[i] = this.timeMs;
-    this.histX[i] = x;
-    this.histY[i] = y;
-    this.histZ[i] = z;
-    this.histHead = (i + 1) % HISTORY_SIZE;
-    if (this.histCount < HISTORY_SIZE) this.histCount++;
+    recordTrajectoryPoint(this.history, this.timeMs, x, y, z);
   }
 
-  // The display pose at time tMs (linear between recorded frames; clamped to
-  // the oldest/newest sample). Writes into histSample and returns it.
-  private sampleHistory(tMs: number): Vec3Like | null {
-    if (this.histCount === 0) return null;
-    const n = this.histCount;
-    let newer = (this.histHead - 1 + HISTORY_SIZE) % HISTORY_SIZE;
-    if (this.histT[newer] <= tMs) {
-      this.histSample.x = this.histX[newer];
-      this.histSample.y = this.histY[newer];
-      this.histSample.z = this.histZ[newer];
-      return this.histSample;
-    }
-    for (let step = 1; step < n; step++) {
-      const older = (newer - 1 + HISTORY_SIZE) % HISTORY_SIZE;
-      if (this.histT[older] <= tMs) {
-        const span = this.histT[newer] - this.histT[older];
-        const f = span > 0 ? (tMs - this.histT[older]) / span : 0;
-        this.histSample.x = this.histX[older] + (this.histX[newer] - this.histX[older]) * f;
-        this.histSample.y = this.histY[older] + (this.histY[newer] - this.histY[older]) * f;
-        this.histSample.z = this.histZ[older] + (this.histZ[newer] - this.histZ[older]) * f;
-        return this.histSample;
-      }
-      newer = older;
-    }
-    this.histSample.x = this.histX[newer];
-    this.histSample.y = this.histY[newer];
-    this.histSample.z = this.histZ[newer];
-    return this.histSample;
+  private primeSegment(actor: Entity, input: MoveInput, displayFacing: number): void {
+    actor.prevPos.x = actor.pos.x;
+    actor.prevPos.y = actor.pos.y;
+    actor.prevPos.z = actor.pos.z;
+    actor.facing = displayFacing;
+    stepPlayerMotion(this.deps, actor, input);
+    this.segmentPrimed = true;
   }
 
   /**
@@ -368,7 +408,25 @@ export class SelfMotionPredictor {
       this.reset();
       return null;
     }
-    const dt = clamp(frame.frameDt, 0, MAX_FRAME_DT);
+    if (
+      !Number.isFinite(frame.frameDt) ||
+      !Number.isFinite(frame.echoMs) ||
+      !Number.isFinite(frame.jitterMs) ||
+      !Number.isFinite(frame.snapIntervalMs) ||
+      !Number.isFinite(frame.snapAgeMs) ||
+      !Number.isFinite(frame.alpha) ||
+      !Number.isFinite(frame.displayFacing) ||
+      !Number.isFinite(self.pos.x) ||
+      !Number.isFinite(self.pos.y) ||
+      !Number.isFinite(self.pos.z) ||
+      !Number.isFinite(self.prevPos.x) ||
+      !Number.isFinite(self.prevPos.y) ||
+      !Number.isFinite(self.prevPos.z)
+    ) {
+      this.reset();
+      return null;
+    }
+    const dt = clamp(frame.frameDt, 0, MAX_PREDICTOR_FRAME_DT);
     this.timeMs += dt * 1000;
     // The authoritative anchor. Alpha is capped at 1 (unlike the renderer's
     // 1.25 display extrapolation): an extrapolated anchor overshoots every
@@ -378,12 +436,35 @@ export class SelfMotionPredictor {
     const ax = self.prevPos.x + (self.pos.x - self.prevPos.x) * alpha;
     const ay = self.prevPos.y + (self.pos.y - self.prevPos.y) * alpha;
     const az = self.prevPos.z + (self.pos.z - self.prevPos.z) * alpha;
+<<<<<<< HEAD
     // Resolved once and reused for every lift lookup this frame (self_motion_rift_lift.ts);
     // 0 outside a rift for every position, so non-rift prediction is unaffected below.
     const riftPlan = resolvedRiftFloorPlan(frame.riftFloor);
     const riftOrigin = frame.riftFloor?.origin;
     const liftAt = (x: number, z: number): number =>
       riftOrigin ? riftLiftFor(riftPlan, riftOrigin, x, z) : 0;
+=======
+    const wireDx = self.pos.x - this.lastWireX;
+    const wireDy = self.pos.y - this.lastWireY;
+    const wireDz = self.pos.z - this.lastWireZ;
+    const validatedWireMotion =
+      frame.movementPositionAuthority === true &&
+      self.onGround &&
+      (frame.moveInput.forward ||
+        frame.moveInput.back ||
+        frame.moveInput.strafeLeft ||
+        frame.moveInput.strafeRight ||
+        frame.moveInput.dive ||
+        frame.moveInput.surface);
+    const rawWireDiscontinuity =
+      this.wirePositionReady &&
+      !validatedWireMotion &&
+      wireDx * wireDx + wireDy * wireDy + wireDz * wireDz > SELF_MOTION_SNAP_DIST_SQ;
+    this.lastWireX = self.pos.x;
+    this.lastWireY = self.pos.y;
+    this.lastWireZ = self.pos.z;
+    this.wirePositionReady = true;
+>>>>>>> origin/pr/3631
 
     // Re-adopt the authoritative pose outright on identity/life-state flips and
     // teleports; otherwise keep the persistent scratch actor.
@@ -393,49 +474,73 @@ export class SelfMotionPredictor {
     this.lastDead = self.dead;
     this.lastGhost = self.ghost;
     let actor = this.actor;
-    if (actor && !flipped && !authoritativeDiscontinuity) {
+    if (actor && !flipped && !authoritativeDiscontinuity && !rawWireDiscontinuity) {
       const dx = actor.pos.x - ax;
       const dy = actor.pos.y - ay;
       const dz = actor.pos.z - az;
-      if (dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ) actor = null;
+      const maxHorizontalLead =
+        (RUN_SPEED * moveSpeedMult(self, 0) * SELF_MOTION_CAP_MAX_MS) / 1000 + LEASH_SLACK_YD;
+      if (
+        reconciliationLeadDiscontinuity(
+          dx,
+          dy,
+          dz,
+          maxHorizontalLead,
+          SELF_MOTION_PREDICTOR_VERTICAL_SNAP_YD,
+        )
+      )
+        actor = null;
     } else {
       actor = null;
     }
+    const adoptRawWire = authoritativeDiscontinuity || rawWireDiscontinuity;
     if (!actor) {
+      const rootX = adoptRawWire ? self.pos.x : ax;
+      const rootY = adoptRawWire ? self.pos.y : ay;
+      const rootZ = adoptRawWire ? self.pos.z : az;
       actor = {
         ...self,
-        pos: { x: ax, y: ay, z: az },
-        prevPos: { x: ax, y: ay, z: az },
+        pos: { x: rootX, y: rootY, z: rootZ },
+        prevPos: { x: rootX, y: rootY, z: rootZ },
         facing: frame.displayFacing,
         vx: 0,
         vy: 0,
         vz: 0,
         onGround: true,
         jumping: false,
-        fallStartY: ay,
+        fallStartY: rootY,
         swimStroke: 0,
         swimDiving: false,
       };
       this.actor = actor;
       this.acc = 0;
+      this.segmentPrimed = false;
       this.staleAllowanceYd = 0;
       this.servoHoldMs = 0;
       this.blockEpisodeMs = 0;
       this.prevFrameDtMs = 0;
       this.episodeCapYd = 0;
+      this.networkGapAllowanceYd = 0;
+      this.networkGapWasActive = false;
+      this.networkGapSettleMs = 0;
+      this.movementPositionAuthorityWasActive = false;
+      this.authorityHandoffHoldMs = 0;
+      this.authorityHandoffAllowanceYd = 0;
       // The old display trajectory is meaningless relative to the new anchor
       // (teleport / life-state flip); comparing against it would fling the pose.
-      this.histCount = 0;
-      this.histHead = 0;
+      resetTrajectoryHistory(this.history);
+      resetSelfReconciliation(this.reconciliation);
+      this.idleMs = 0;
+      this.lastMoveMask = -1;
     }
-    if (authoritativeDiscontinuity) {
+    if (adoptRawWire) {
       // Do not integrate even one held-input step on the recovery frame. The
       // event's destination is the authoritative visual truth for this frame,
       // and the next frame may resume bounded prediction from this clean root.
-      this.out.x = ax;
-      this.out.y = ay;
-      this.out.z = az;
-      this.recordHistory(ax, ay, az);
+      this.out.x = self.pos.x;
+      this.out.y = self.pos.y;
+      this.out.z = self.pos.z;
+      this.recordHistory(self.pos.x, self.pos.y, self.pos.z);
       this.leadMs = 0;
       return this.out;
     }
@@ -456,6 +561,7 @@ export class SelfMotionPredictor {
     actor.mountCastRemaining = self.mountCastRemaining;
     actor.mountCastKey = self.mountCastKey;
 
+<<<<<<< HEAD
     // Verticality: strip the raised-tier lift from the WORKING actor before
     // any of this frame's position math runs, exactly like
     // Sim.updatePlayerMovement strips it before the kernel (its
@@ -475,6 +581,51 @@ export class SelfMotionPredictor {
     // position-independent Y cannot desync from a position that moves.
     actor.pos.y -= liftAt(actor.pos.x, actor.pos.z);
     actor.prevPos.y -= liftAt(actor.prevPos.x, actor.prevPos.z);
+=======
+    const frameDtMs = dt * 1000;
+    if (frame.echoMs > 0) {
+      this.credibleEchoMs = frame.echoMs;
+      this.bootstrapMs = 0;
+    } else if (this.credibleEchoMs <= 0) {
+      this.bootstrapMs += frameDtMs;
+    }
+    const effectiveEchoMs = this.credibleEchoMs;
+    const snapIntervalMs = Math.max(MIN_SNAP_INTERVAL_MS, frame.snapIntervalMs);
+    const boundedJitterMs = clamp(frame.jitterMs, 0, SELF_RECONCILIATION_MAX_TIMING_INPUT_MS);
+    if (!this.leashJitterReady || boundedJitterMs >= this.leashJitterMs) {
+      this.leashJitterMs = boundedJitterMs;
+      this.leashJitterLowMs = 0;
+      this.leashJitterReady = true;
+    } else {
+      this.leashJitterLowMs += frameDtMs;
+      if (this.leashJitterLowMs >= LEASH_JITTER_HOLD_INTERVALS * snapIntervalMs) {
+        const decay = 1 - Math.exp(-LEASH_JITTER_DECAY_RATE * dt);
+        this.leashJitterMs += (boundedJitterMs - this.leashJitterMs) * decay;
+      }
+    }
+    const staleMs = Math.max(0, Math.max(0, frame.snapAgeMs) - snapIntervalMs);
+    const hitchFrame = frameDtMs > snapIntervalMs && this.prevFrameDtMs <= snapIntervalMs;
+    this.prevFrameDtMs = frameDtMs;
+    if (hitchFrame) {
+      this.blockEpisodeMs = BLOCK_EPISODE_MAX_MS;
+      this.episodeCapYd = 0;
+    } else if (this.blockEpisodeMs > 0)
+      this.blockEpisodeMs = staleMs > 0 ? Math.max(0, this.blockEpisodeMs - frameDtMs) : 0;
+    const blockedFrame = hitchFrame || this.blockEpisodeMs > 0;
+    const networkGapActive = !blockedFrame && staleMs > 0.5 * snapIntervalMs;
+    const resumedNetworkGap = this.networkGapWasActive && !networkGapActive;
+    this.networkGapWasActive = networkGapActive;
+    const bootstrapExpired = effectiveEchoMs <= 0 && this.bootstrapMs > SELF_MOTION_CAP_MAX_MS;
+    const capMs = clamp(
+      (effectiveEchoMs > 0 ? effectiveEchoMs : SELF_MOTION_BOOTSTRAP_CAP_MS) +
+        0.5 * this.leashJitterMs,
+      SELF_MOTION_CAP_MIN_MS,
+      SELF_MOTION_CAP_MAX_MS,
+    );
+    const networkGapHeadroomMs = Math.max(0, SELF_MOTION_CAP_MAX_MS - capMs);
+    const networkGapAllowanceMs = networkGapActive ? Math.min(staleMs, networkGapHeadroomMs) : 0;
+    const networkGapExpired = staleMs > networkGapHeadroomMs;
+>>>>>>> origin/pr/3631
 
     // Fixed-step advance with the held intent. Turn flags are stripped: the
     // heading is assigned from the one display source each step, and letting
@@ -494,6 +645,40 @@ export class SelfMotionPredictor {
     inp.dive = frame.moveInput.dive;
     inp.surface = frame.moveInput.surface;
     inp.swimSteer = frame.moveInput.swimSteer;
+    const moveMask =
+      (inp.forward ? 1 : 0) |
+      (inp.back ? 2 : 0) |
+      (inp.strafeLeft ? 4 : 0) |
+      (inp.strafeRight ? 8 : 0) |
+      (inp.dive ? 16 : 0) |
+      (inp.surface ? 32 : 0);
+    if (this.lastMoveMask >= 0 && moveMask !== this.lastMoveMask) {
+      const transitionX = this.out.x;
+      const transitionY = this.out.y;
+      const transitionZ = this.out.z;
+      actor.pos.x = transitionX;
+      actor.pos.y = transitionY;
+      actor.pos.z = transitionZ;
+      actor.prevPos.x = transitionX;
+      actor.prevPos.y = transitionY;
+      actor.prevPos.z = transitionZ;
+      this.acc = 0;
+      this.segmentPrimed = false;
+    }
+    this.lastMoveMask = moveMask;
+    const translationalInput = moveMask !== 0;
+    const validatedGroundAuthority =
+      frame.movementPositionAuthority === true && translationalInput && actor.onGround;
+    const authorityLostDuringGroundMove =
+      this.movementPositionAuthorityWasActive &&
+      frame.movementPositionAuthority !== true &&
+      translationalInput &&
+      actor.onGround;
+    this.movementPositionAuthorityWasActive = frame.movementPositionAuthority === true;
+    if (validatedGroundAuthority) {
+      this.authorityHandoffHoldMs = 0;
+      this.authorityHandoffAllowanceYd = 0;
+    }
     // A blocked step needs NO special handling, and must never get any. The
     // kernel runs the same swept static collision as the server, so when the
     // display stops at a wall it is already RIGHT and the authoritative anchor
@@ -505,6 +690,7 @@ export class SelfMotionPredictor {
     // RUN_SPEED x echo in a SINGLE frame (a yard at 200ms, unsmoothed, because
     // the renderer follows this pose exactly), and then walks it back into the
     // wall: the "collide and snap back" artifact. Leave the block alone.
+<<<<<<< HEAD
     this.acc = Math.min(this.acc + dt, MAX_FRAME_DT);
     while (this.acc >= DT) {
       actor.prevPos.x = actor.pos.x;
@@ -516,29 +702,42 @@ export class SelfMotionPredictor {
       // same as outside a rift, and needs no rift-specific handling at all.
       stepPlayerMotion(this.deps, actor, inp);
       this.acc -= DT;
+=======
+    const canAdvance = (!networkGapExpired || blockedFrame) && !bootstrapExpired;
+    if (canAdvance) {
+      if (!this.segmentPrimed) this.primeSegment(actor, inp, frame.displayFacing);
+      this.acc += dt;
+      while (this.acc >= DT) {
+        this.acc -= DT;
+        this.primeSegment(actor, inp, frame.displayFacing);
+      }
+>>>>>>> origin/pr/3631
     }
-    const frac = this.acc / DT;
+    const frac = this.segmentPrimed ? this.acc / DT : 0;
 
     const runSpeed = RUN_SPEED * moveSpeedMult(actor, 0);
+    if (authorityLostDuringGroundMove) {
+      resetTrajectoryHistory(this.history);
+      resetSelfReconciliation(this.reconciliation);
+      const handoffX = actor.prevPos.x + (actor.pos.x - actor.prevPos.x) * frac;
+      const handoffY = actor.prevPos.y + (actor.pos.y - actor.prevPos.y) * frac;
+      const handoffZ = actor.prevPos.z + (actor.pos.z - actor.prevPos.z) * frac;
+      this.recordHistory(handoffX, handoffY, handoffZ);
+      this.authorityHandoffHoldMs = capMs + snapIntervalMs;
+      const handoffLead = Math.hypot(actor.pos.x - ax, actor.pos.z - az);
+      const handoffBaseBudget = (runSpeed * capMs) / 1000 + LEASH_SLACK_YD;
+      this.authorityHandoffAllowanceYd = Math.max(
+        this.authorityHandoffAllowanceYd,
+        handoffLead - handoffBaseBudget,
+      );
+    } else {
+      this.authorityHandoffHoldMs = Math.max(0, this.authorityHandoffHoldMs - frameDtMs);
+    }
     // The local block episode (rationale: the header's Bounded exception).
     // An ISOLATED long frame is the trigger, staleness not required: in the
     // deliver-before ordering there is no staleness to see. Isolation is what
     // keeps steady low fps out, where nothing is hitching and the servo must
     // keep correcting every frame.
-    const snapIntervalMs = Math.max(MIN_SNAP_INTERVAL_MS, frame.snapIntervalMs);
-    const staleMs = Math.max(0, Math.max(0, frame.snapAgeMs) - snapIntervalMs);
-    const frameDtMs = dt * 1000;
-    const hitchFrame = frameDtMs > snapIntervalMs && this.prevFrameDtMs <= snapIntervalMs;
-    this.prevFrameDtMs = frameDtMs;
-    // The episode outlives the frame that opened it: the browser can run
-    // several short catch-up frames before it drains the socket, and judging
-    // those on their own length would put the stall back a few frames later.
-    if (hitchFrame) {
-      this.blockEpisodeMs = BLOCK_EPISODE_MAX_MS;
-      this.episodeCapYd = 0;
-    } else if (this.blockEpisodeMs > 0)
-      this.blockEpisodeMs = staleMs > 0 ? Math.max(0, this.blockEpisodeMs - frameDtMs) : 0;
-    const blockedFrame = hitchFrame || this.blockEpisodeMs > 0;
     if (blockedFrame) {
       // Two snapshot intervals, counted down only once the snapshots flow
       // again: one for the burst sweep itself, and one more because the sweep
@@ -546,9 +745,15 @@ export class SelfMotionPredictor {
       // the first anchor the servo can trust as an independent reading is one
       // interval past the sweep. Resuming inside that window reads the sweep
       // as divergence, which is the rush half of the original artifact.
-      this.servoHoldMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
+      this.servoHoldMs = Math.max(this.servoHoldMs, SERVO_SETTLE_INTERVALS * snapIntervalMs);
     } else {
       this.servoHoldMs = Math.max(0, this.servoHoldMs - frameDtMs);
+    }
+    if (resumedNetworkGap) {
+      this.servoHoldMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
+      this.networkGapSettleMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
+    } else if (!networkGapActive) {
+      this.networkGapSettleMs = Math.max(0, this.networkGapSettleMs - frameDtMs);
     }
     // A stale anchor the display has already been lent room against is not a
     // reference: correcting toward it would drag the pose off the position the
@@ -564,8 +769,16 @@ export class SelfMotionPredictor {
     // divergence and hauling the display back off the pose the burst is about
     // to confirm.
     if (staleWithLoan) this.servoHoldMs = SERVO_SETTLE_INTERVALS * snapIntervalMs;
-    const servoActive = !blockedFrame && !staleWithLoan && this.servoHoldMs <= 0;
+    const servoActive =
+      (effectiveEchoMs > 0 || !translationalInput) &&
+      !networkGapActive &&
+      !blockedFrame &&
+      !staleWithLoan &&
+      this.authorityHandoffHoldMs <= 0 &&
+      this.servoHoldMs <= 0;
+    if (!servoActive) resetSelfReconciliationBoundary(this.reconciliation);
 
+<<<<<<< HEAD
     // Divergence correction: the authoritative anchor shows where the server
     // had the player ~capMs ago, so compare it against where the LOCAL display
     // was capMs ago. During agreed motion (steady run, start, stop, jump arc)
@@ -607,10 +820,107 @@ export class SelfMotionPredictor {
       actor.prevPos.x += errX * scale;
       actor.prevPos.y += errY * scale;
       actor.prevPos.z += errZ * scale;
+=======
+    // Echo is the expected trajectory age. Jitter widens the eligible timing
+    // window around it, but never shifts its center.
+    const measureMs = clamp(effectiveEchoMs, 0, SELF_MOTION_MEASURE_MAX_MS);
+    trajectoryResidualInto(
+      this.reconciliation,
+      this.history,
+      this.timeMs,
+      effectiveEchoMs > 0 ? effectiveEchoMs : SELF_MOTION_BOOTSTRAP_CAP_MS,
+      frame.jitterMs,
+      snapIntervalMs,
+      ax,
+      ay,
+      az,
+      SELF_MOTION_DEADBAND_YD,
+      this.residual,
+    );
+
+    this.idleMs = translationalInput || !actor.onGround ? 0 : this.idleMs + frameDtMs;
+    const idleConfirmMs = Math.min(
+      SELF_MOTION_MEASURE_MAX_MS,
+      Math.max(0, effectiveEchoMs) +
+        Math.min(SELF_RECONCILIATION_MAX_TIMING_INPUT_MS, Math.max(0, frame.jitterMs)) +
+        Math.min(SELF_RECONCILIATION_MAX_TIMING_INPUT_MS, snapIntervalMs),
+    );
+    const wireStable =
+      Math.hypot(
+        self.pos.x - self.prevPos.x,
+        self.pos.y - self.prevPos.y,
+        self.pos.z - self.prevPos.z,
+      ) <= IDLE_WIRE_STABLE_YD;
+
+    if (servoActive) {
+      let exactIdleAdopt = false;
+      if (this.idleMs >= idleConfirmMs && wireStable) {
+        exactIdleAdopt = idleReconciliationCorrectionInto(
+          self.pos.x - actor.pos.x,
+          self.pos.y - actor.pos.y,
+          self.pos.z - actor.pos.z,
+          SELF_MOTION_BLEND_RATE,
+          0,
+          runSpeed,
+          dt,
+          this.correction,
+        );
+      } else if ((translationalInput || !actor.onGround) && !validatedGroundAuthority) {
+        boundedReconciliationCorrectionInto(
+          this.residual.x,
+          this.residual.y,
+          this.residual.z,
+          SELF_MOTION_DEADBAND_YD,
+          SELF_MOTION_BLEND_RATE,
+          measureMs,
+          runSpeed,
+          dt,
+          this.correction,
+        );
+      } else {
+        this.correction.x = 0;
+        this.correction.y = 0;
+        this.correction.z = 0;
+      }
+      if (translationalInput) {
+        const predictedX = actor.prevPos.x + (actor.pos.x - actor.prevPos.x) * frac;
+        const predictedZ = actor.prevPos.z + (actor.pos.z - actor.prevPos.z) * frac;
+        const motionX = predictedX - this.out.x;
+        const motionZ = predictedZ - this.out.z;
+        const motionLength = Math.hypot(motionX, motionZ);
+        if (motionLength > 1e-9) {
+          const correctionAlongMotion =
+            (this.correction.x * motionX + this.correction.z * motionZ) / motionLength;
+          if (correctionAlongMotion < -motionLength) {
+            const adjustment = -motionLength - correctionAlongMotion;
+            this.correction.x += (motionX / motionLength) * adjustment;
+            this.correction.z += (motionZ / motionLength) * adjustment;
+          }
+        } else {
+          this.correction.x = 0;
+          this.correction.z = 0;
+        }
+      }
+      actor.pos.x += this.correction.x;
+      actor.pos.y += this.correction.y;
+      actor.pos.z += this.correction.z;
+      actor.prevPos.x += this.correction.x;
+      actor.prevPos.y += this.correction.y;
+      actor.prevPos.z += this.correction.z;
+      if (exactIdleAdopt) {
+        actor.pos.x = self.pos.x;
+        actor.pos.y = self.pos.y;
+        actor.pos.z = self.pos.z;
+        actor.prevPos.x = self.pos.x;
+        actor.prevPos.y = self.pos.y;
+        actor.prevPos.z = self.pos.z;
+      }
+>>>>>>> origin/pr/3631
     }
 
-    // Horizontal leash: never show the player farther from the authoritative
-    // anchor than they could legitimately RUN inside the latency cap (the
+    // Horizontal leash: outside an active validated grounded stream, never
+    // show the player farther from the authoritative anchor than they could
+    // legitimately RUN inside the latency cap (the
     // kernel itself moves slower while backpedaling/swimming, so the run
     // budget is the honest upper bound; only corrections consume the slack).
     // Vertical is exempt (a jump apex must not be leash-clipped; gravity
@@ -619,6 +929,41 @@ export class SelfMotionPredictor {
     const ex = actor.pos.x - ax;
     const ez = actor.pos.z - az;
     const elen = Math.hypot(ex, ez);
+    if (networkGapAllowanceMs > 0 || this.networkGapSettleMs > 0) {
+      this.networkGapAllowanceYd = Math.min(
+        (runSpeed * networkGapHeadroomMs) / 1000,
+        Math.max(
+          this.networkGapAllowanceYd,
+          (runSpeed * networkGapAllowanceMs) / 1000,
+          elen - baseBudget,
+        ),
+      );
+    } else if (!blockedFrame && this.servoHoldMs <= 0) {
+      this.networkGapAllowanceYd = Math.max(
+        0,
+        Math.min(
+          this.networkGapAllowanceYd,
+          Math.max(elen - baseBudget, this.networkGapAllowanceYd - runSpeed * dt),
+        ),
+      );
+    }
+    if (this.authorityHandoffHoldMs > 0) {
+      this.authorityHandoffAllowanceYd = Math.max(
+        this.authorityHandoffAllowanceYd,
+        elen - baseBudget - this.networkGapAllowanceYd - this.staleAllowanceYd,
+      );
+    } else if (!blockedFrame && this.servoHoldMs <= 0) {
+      this.authorityHandoffAllowanceYd = Math.max(
+        0,
+        Math.min(
+          this.authorityHandoffAllowanceYd,
+          Math.max(
+            elen - baseBudget - this.networkGapAllowanceYd - this.staleAllowanceYd,
+            this.authorityHandoffAllowanceYd - runSpeed * dt,
+          ),
+        ),
+      );
+    }
     if (blockedFrame) {
       // Lend at RUN SPEED IN WALL CLOCK, and only what THIS episode has
       // earned. Wall clock rather than a tick per frame because the fixed-step
@@ -646,8 +991,12 @@ export class SelfMotionPredictor {
         ),
       );
     }
-    const budget = baseBudget + this.staleAllowanceYd;
-    if (elen > budget) {
+    const budget =
+      baseBudget +
+      this.networkGapAllowanceYd +
+      this.staleAllowanceYd +
+      this.authorityHandoffAllowanceYd;
+    if (elen > budget && !validatedGroundAuthority) {
       // Clamp pos ONLY (unlike the correction blend above): prevPos keeps the
       // last displayed point, so the sub-frame interpolation glides onto the
       // boundary instead of stepping back. When the RTT exceeds the lead cap
