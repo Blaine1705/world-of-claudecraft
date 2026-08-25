@@ -93,9 +93,17 @@ export async function handleInternalApi(
  * payout and economy services, with a shared secret injected server-side, so no
  * privileged user credential is stored merely to read an ops table.
  *
- * READ ONLY, deliberately. Every mutation the dashboard could want already
- * exists on the role-gated /admin/api surface with its own audit trail, and
- * moving one here would move it out from under that.
+ * Reads plus exactly ONE write, the parked-review settlement ruling. Every
+ * OTHER mutation an operator could want lives on the role-gated /admin/api
+ * surface with its own audit trail, and moving one here would move it out
+ * from under that. The ruling is the deliberate exception: its workflow is
+ * inseparable from the stuck readout the dashboard renders (verify the row
+ * on chain, then rule it), and the game admin SPA has no market surface at
+ * all. What compensates for the shared secret carrying no actor: the
+ * dashboard side gates the control on its settlement-management role and
+ * sends the acting username in the body's note (echoed into the audit log
+ * line here), the service's kill switch freezes the arm with the other
+ * operator writes, and the ruling rides the realm-scoped transition CAS.
  */
 const LISTING_STATUSES = ['active', 'ending', 'settling', 'closed', 'all'] as const;
 const OFFER_STATUSES = ['pending', 'accepted', 'declined', 'withdrawn', 'expired', 'all'] as const;
@@ -180,27 +188,49 @@ async function opsResolveSettlementHandler(ctx: Ctx): Promise<void> {
   const service = wocMarketOps;
   // An unwired market is a 404, matching the sibling reads above.
   if (!service) return fail(ctx.res, 404, 'unknown endpoint');
-  const id = Number(ctx.params.id);
-  if (!Number.isInteger(id) || id <= 0 || id > Number.MAX_SAFE_INTEGER) {
+  // Digits-only, then range: Number() alone also accepts hex, exponent and
+  // whitespace-padded forms, which an operator pasting from a log must not
+  // discover the hard way on a money path.
+  const rawId = ctx.params.id ?? '';
+  if (!/^\d+$/.test(rawId)) return fail(ctx.res, 400, 'invalid settlement id');
+  const id = Number(rawId);
+  if (!Number.isSafeInteger(id) || id <= 0) {
     return fail(ctx.res, 400, 'invalid settlement id');
   }
-  const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+  // A malformed or over-cap body is its own refusal, never disguised as a
+  // verdict complaint.
+  let body: Record<string, unknown>;
+  try {
+    body = (await readBody(ctx.req)) as Record<string, unknown>;
+  } catch {
+    return fail(ctx.res, 400, 'invalid JSON body');
+  }
   const verdict = body.verdict;
   if (verdict !== 'paid' && verdict !== 'unpaid') {
     return fail(ctx.res, 400, "verdict must be 'paid' or 'unpaid'");
   }
+  // Optional attribution (the dashboard sends who clicked; a ticket id or the
+  // verified signature may ride along): bounded and flattened for the log.
+  const note =
+    typeof body.note === 'string' ? body.note.replace(/\s+/g, ' ').trim().slice(0, 200) : '';
   const out = await service.adminResolveReviewSettlement(id, verdict);
   if (!out.ok) {
-    // The kill switch freezes this write (the service's own gate); the two
-    // CAS answers are operator truths, not errors in the request.
+    // The kill switch freezes this write (the service's own gate); the CAS
+    // answers are operator truths, not errors in the request. A live row
+    // outside review carries its actual state so the operator can tell a
+    // lost race from a mistyped id onto a settlement in another phase.
     if (out.reason === 'disabled') return fail(ctx.res, 409, 'market disabled');
-    if (out.reason === 'contended') return fail(ctx.res, 409, 'settlement already resolved');
+    if ('state' in out) {
+      return fail(ctx.res, 409, 'settlement is not in review', { state: out.state });
+    }
     return fail(ctx.res, 404, 'settlement not found');
   }
   // Dev-channel breadcrumb (no player surface): the ruling is the one manual
-  // state transition in the market, so the log line is the audit trail's
-  // anchor alongside the row's own fail_reason provenance.
-  console.log(`[woc_market] review settlement ${id} resolved ${verdict} -> ${out.to}`);
+  // state transition in the market, so this line plus the row's fail_reason
+  // provenance and updated_at are the durable audit trail.
+  console.log(
+    `[woc_market] review settlement ${id} resolved ${verdict} -> ${out.to}${note ? ` (${note})` : ''}`,
+  );
   ok(ctx.res, { resolved: verdict, state: out.to });
 }
 

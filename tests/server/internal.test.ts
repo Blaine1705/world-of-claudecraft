@@ -2442,7 +2442,8 @@ describe('the parked-review resolve arm: POST /internal/woc-market/settlements/:
   let calls: { id: number; verdict: string }[] = [];
   let outcome:
     | { ok: true; to: 'confirmed' | 'failed' }
-    | { ok: false; reason: 'disabled' | 'not_found' | 'contended' } = {
+    | { ok: false; reason: 'disabled' | 'not_found' }
+    | { ok: false; reason: 'contended'; state: 'confirmed' | 'delivering' } = {
     ok: true,
     to: 'confirmed',
   };
@@ -2516,10 +2517,39 @@ describe('the parked-review resolve arm: POST /internal/woc-market/settlements/:
     expect(res.status).toBe(404);
   });
 
-  it('refuses a non-integer settlement id before reaching the service', async () => {
-    const res = await resolve({ id: 'abc' });
-    expect(res.status).toBe(400);
+  it('refuses every non-decimal id form before reaching the service', async () => {
+    // Number() alone accepts hex, exponent and padded forms; the guard is
+    // digits-only then range, so each malformed arm answers 400.
+    for (const id of ['abc', '0x29', '4e1', ' 41', '41 ', '-3', '4.5', '0', '']) {
+      const res = await resolve({ id });
+      expect(res.status, JSON.stringify(id)).toBe(400);
+    }
     expect(calls).toEqual([]);
+  });
+
+  it('a malformed body is its own refusal, never disguised as a verdict complaint', async () => {
+    const res = await resolve({ body: 'not json{' });
+    expect(res.status).toBe(400);
+    expect((res.body as { error: string }).error).toBe('invalid JSON body');
+    expect(calls).toEqual([]);
+  });
+
+  it('echoes a bounded, flattened note into the audit log line', async () => {
+    const logged: string[] = [];
+    const spy = vi.spyOn(console, 'log').mockImplementation((line: string) => {
+      logged.push(String(line));
+    });
+    try {
+      const res = await resolve({
+        body: { verdict: 'paid', note: 'by:trev  sig\n5KJh...x9 ' },
+      });
+      expect(res.status).toBe(200);
+    } finally {
+      spy.mockRestore();
+    }
+    expect(logged).toEqual([
+      '[woc_market] review settlement 41 resolved paid -> confirmed (by:trev sig 5KJh...x9)',
+    ]);
   });
 
   it('refuses a verdict outside paid/unpaid before reaching the service', async () => {
@@ -2534,10 +2564,15 @@ describe('the parked-review resolve arm: POST /internal/woc-market/settlements/:
     expect(res.status).toBe(409);
   });
 
-  it('maps a lost operator race to 409, so the caller re-reads instead of retrying blind', async () => {
-    outcome = { ok: false, reason: 'contended' };
+  it('maps a live row outside review to 409 carrying the state actually hit', async () => {
+    outcome = { ok: false, reason: 'contended', state: 'delivering' };
     const res = await resolve();
     expect(res.status).toBe(409);
+    expect(res.body).toEqual({
+      success: false,
+      data: { state: 'delivering' },
+      error: 'settlement is not in review',
+    });
   });
 
   it('maps a missing settlement to 404', async () => {

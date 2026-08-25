@@ -2953,8 +2953,9 @@ configureWocMarketRuntime({
   readCache: wocMarketReadCache,
   authGuardDb: wocAuthGuardCache,
 });
-// The dashboard's read-only ops views. Injected here so internal.ts never
-// imports the market route module (and admin/account behind it).
+// The dashboard's ops surface (the Exchange reads plus the parked-review
+// resolve arm). Injected here so internal.ts never imports the market route
+// module (and admin/account behind it).
 configureInternalWocMarketOps(wocMarketService);
 // The sweep duration watchdog: mid-flight visibility for a camping pass
 // (constructed here so the ops readout below can serve it; the sweep shell

@@ -56,7 +56,11 @@ export function checkRouteCompleteness(routes: RouteDef[]): CompletenessIssue[] 
  * segment:
  *  - surface 'admin' is operator territory: exempt (no requireOwned required).
  *  - surface 'internal' is secret-gated operator territory too (no account
- *    bearer exists to own anything): exempt for the same reason.
+ *    bearer exists to own anything): exempt for the same reason. Residual:
+ *    the ownership sweep proves every /internal route rides a secret gate,
+ *    not that an account-scoped :id under /internal is owner-checked, so a
+ *    future /internal/accounts/:id route would pass both guards; such a
+ *    route should not exist (account data belongs on the api surface).
  *  - meta.publicRead marks an intentional no-owner public read: exempt.
  *  - otherwise it is account territory: it MUST carry meta.requireOwned. An
  *    operator-scoped requireOwned exempts it from the missing-loader clause but

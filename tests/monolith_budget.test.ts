@@ -376,12 +376,12 @@ const MONOLITHS: MonolithRow[] = [
     // Down 4032 -> 3989 at the second round: the stuck-custody monitor
     // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
     // paying for the seller-history read.
-    // Up 3989 -> 4008 for the parked-review operator arm: the resolution
+    // Up 3989 -> 4019 for the parked-review operator arm: the resolution
     // logic lives in woc_market_review_resolution.ts (the sibling pattern);
-    // these lines are the thin enabled-gated service method the route family
-    // requires on the class, matching its three admin siblings. Exact count,
-    // zero slack.
-    ceiling: 4008,
+    // these lines are the thin enabled-gated service method plus the two
+    // realm-scoped rows on the WocMarketDb contract the review round asked
+    // for. Exact count, zero slack.
+    ceiling: 4019,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

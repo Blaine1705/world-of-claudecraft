@@ -349,7 +349,15 @@ keep-forever, either of which disarms the prune coupling.
   off like the other operator writes, and answers 409 on a lost operator
   race. An unpaid ruling stamps `fail_reason = review_unpaid`; a paid ruling
   keeps the `confirming_overdue` park fingerprint on the confirmed row.
-  Hand SQL remains FORBIDDEN because it bypasses those guards.
+  Hand SQL remains FORBIDDEN because it bypasses those guards. KNOW WHAT
+  UNPAID DOES DOWNSTREAM: review_unpaid is not in the abandon-exempt list,
+  so the overdue default pass that picks up the failed row strikes the
+  buyer, exactly as any other settlement default does; a verified-unpaid
+  ruling IS a default, so only rule unpaid once the chain check is certain.
+  Under the retained API_DISPATCH=legacy rollback the resolve route
+  terminal-404s like its read siblings (the legacy ladder knows no
+  woc-market arm), which is why the enable-time check verifies the route
+  answers on the build being enabled.
 - The service expires a `confirming` quote five hours past its expiry
   (`service/src/market/quotes.ts`, MAX_CONFIRMING_AGE_MS, code-owned; sized
   under the game's review bound and under RPC signature-history depth so the

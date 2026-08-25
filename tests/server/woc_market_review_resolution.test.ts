@@ -1,9 +1,11 @@
 // The parked-review operator arm (server/woc_market_review_resolution.ts):
 // the sanctioned surface for the one transition pair the sweep never drives,
 // review -> confirmed (paid) / review -> failed (unpaid). These pins hold the
-// arm to the CAS contract: the from-set is exactly ['review'], the unpaid
-// ruling stamps its provenance, the paid ruling keeps the park fingerprint,
-// and a CAS miss answers the two operator truths apart.
+// arm to the CAS contract: realm-scoped on BOTH db calls (realms share one
+// database, and a cross-realm ruling would walk around the other realm's kill
+// switch), the from-set exactly ['review'], the unpaid provenance stamp, the
+// kept park fingerprint on paid, and CAS-miss answers that tell a lost race
+// (with the actual state) apart from a row this realm does not have.
 import { describe, expect, it } from 'vitest';
 import {
   REVIEW_UNPAID_FAIL_REASON,
@@ -17,6 +19,7 @@ import {
 } from '../../server/woc_market_rules';
 
 interface TransitionCall {
+  realm: string;
   id: number;
   from: WocSettlementState[];
   to: WocSettlementState;
@@ -26,20 +29,20 @@ interface TransitionCall {
 function fakeDb(opts: { moved: boolean; row: { state: WocSettlementState } | null }): {
   db: WocReviewResolutionDb;
   calls: TransitionCall[];
-  lookups: number[];
+  lookups: { realm: string; id: number }[];
 } {
   const calls: TransitionCall[] = [];
-  const lookups: number[] = [];
+  const lookups: { realm: string; id: number }[] = [];
   return {
     calls,
     lookups,
     db: {
-      transitionSettlement: async (id, from, to, failReason) => {
-        calls.push({ id, from, to, failReason });
+      transitionSettlementInRealm: async (realm, id, from, to, failReason) => {
+        calls.push({ realm, id, from, to, failReason });
         return opts.moved;
       },
-      settlementById: async (id) => {
-        lookups.push(id);
+      settlementStateInRealm: async (realm, id) => {
+        lookups.push({ realm, id });
         return opts.row;
       },
     },
@@ -54,38 +57,51 @@ describe('the parked-review settlement operator arm', () => {
     expect(validSettlementTransition('review', 'failed')).toBe(true);
   });
 
-  it('paid rules review -> confirmed through the CAS, keeping the park fingerprint', async () => {
+  it('paid rules review -> confirmed through the realm-scoped CAS, keeping the park fingerprint', async () => {
     const { db, calls, lookups } = fakeDb({ moved: true, row: null });
-    const out = await resolveReviewSettlement(db, 41, 'paid');
+    const out = await resolveReviewSettlement(db, 'Claudemoon', 41, 'paid');
     expect(out).toEqual({ ok: true, to: 'confirmed' });
     expect(calls).toEqual([
-      // failReason undefined: transitionSettlement COALESCEs, so the row
-      // keeps 'confirming_overdue' as its went-through-review provenance.
-      { id: 41, from: ['review'], to: 'confirmed', failReason: undefined },
+      // failReason undefined: the CAS COALESCEs, so the row keeps
+      // 'confirming_overdue' as its went-through-review provenance.
+      { realm: 'Claudemoon', id: 41, from: ['review'], to: 'confirmed', failReason: undefined },
     ]);
     expect(lookups).toEqual([]);
   });
 
   it('unpaid rules review -> failed with the review_unpaid provenance stamp', async () => {
     const { db, calls } = fakeDb({ moved: true, row: null });
-    const out = await resolveReviewSettlement(db, 42, 'unpaid');
+    const out = await resolveReviewSettlement(db, 'Claudemoon', 42, 'unpaid');
     expect(out).toEqual({ ok: true, to: 'failed' });
     expect(calls).toEqual([
-      { id: 42, from: ['review'], to: 'failed', failReason: REVIEW_UNPAID_FAIL_REASON },
+      {
+        realm: 'Claudemoon',
+        id: 42,
+        from: ['review'],
+        to: 'failed',
+        failReason: REVIEW_UNPAID_FAIL_REASON,
+      },
     ]);
   });
 
-  it('a CAS miss on a live row answers contended (a lost operator race)', async () => {
-    const { db, lookups } = fakeDb({ moved: false, row: { state: 'confirmed' } });
-    const out = await resolveReviewSettlement(db, 43, 'paid');
-    expect(out).toEqual({ ok: false, reason: 'contended' });
-    expect(lookups).toEqual([43]);
+  it('a CAS miss on a live row answers contended WITH the state actually hit', async () => {
+    // A lost operator race lands on confirmed/failed; a mistyped id can land
+    // on any live phase. Either way the operator sees what they hit instead
+    // of a flat "already resolved" that would be wrong on a money path.
+    const { db, lookups } = fakeDb({ moved: false, row: { state: 'delivering' } });
+    const out = await resolveReviewSettlement(db, 'Claudemoon', 43, 'paid');
+    expect(out).toEqual({ ok: false, reason: 'contended', state: 'delivering' });
+    expect(lookups).toEqual([{ realm: 'Claudemoon', id: 43 }]);
   });
 
-  it('a CAS miss on a missing row answers not_found', async () => {
-    const { db } = fakeDb({ moved: false, row: null });
-    const out = await resolveReviewSettlement(db, 44, 'unpaid');
+  it('a CAS miss with no row IN THIS REALM answers not_found', async () => {
+    // The realm scoping makes another realm's settlement indistinguishable
+    // from a missing one on purpose: a wrong-realm id must not leak state,
+    // and must certainly not be rulable from here.
+    const { db, lookups } = fakeDb({ moved: false, row: null });
+    const out = await resolveReviewSettlement(db, 'Claudemoon', 44, 'unpaid');
     expect(out).toEqual({ ok: false, reason: 'not_found' });
+    expect(lookups).toEqual([{ realm: 'Claudemoon', id: 44 }]);
   });
 
   it('review_unpaid stays OFF the wire fail-reason list, screening to other', () => {
