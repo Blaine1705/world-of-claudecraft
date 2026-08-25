@@ -523,13 +523,11 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // end advance separately, so floating-point drift can leave the final
       // tick a hair short exactly when they coincide, silently dropping the
       // last missile (the Arcane Missiles 5-barrage bug). A tick still
-      // meaningfully in the future was not lost to drift: pushbackCast's
-      // channel-fraction branch shortens castRemaining without rescheduling
-      // channelTickTimer, so a big enough pushback can end the channel before
-      // a later tick's timer ever comes due. Classic-era pushback trims the
-      // trailing tick count along with the time, so that tick is dropped too,
-      // never forced out as a same-instant completion burst. Inert for
-      // duration-based channels, whose channelTicksLeft is 0.
+      // meaningfully in the future was not lost to drift: a pushback-shortened
+      // channel already gave up the boundaries it no longer reaches (see
+      // pushbackCast), and anything still orphaned here is dropped rather than
+      // forced out as a same-instant completion burst. Inert for duration-based
+      // channels, whose channelTicksLeft is 0.
       while (p.channelTicksLeft > 0 && p.channelTickTimer <= CAST_COMPLETE_EPS) {
         p.channelTicksLeft -= 1;
         p.channelTickTimer += p.channelTickEvery;
@@ -751,6 +749,14 @@ export function pushbackCast(p: Entity): void {
       0,
       p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION * factor,
     );
+    // The shortened channel keeps only the ticks whose boundaries still fit: the
+    // next lands in channelTickTimer, the rest one channelTickEvery apart.
+    if (p.channelTicksLeft > 0 && p.channelTickEvery > 0) {
+      const roomAfterNextTick = p.castRemaining - p.channelTickTimer + CAST_COMPLETE_EPS;
+      const stillFit =
+        roomAfterNextTick < 0 ? 0 : Math.floor(roomAfterNextTick / p.channelTickEvery) + 1;
+      p.channelTicksLeft = Math.min(p.channelTicksLeft, stillFit);
+    }
   } else {
     p.castRemaining += CAST_PUSHBACK_SEC * factor;
     p.castTotal += CAST_PUSHBACK_SEC * factor;
