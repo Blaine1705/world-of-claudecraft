@@ -126,12 +126,17 @@ describe('bags_window vendor right-click menu (Sell all)', () => {
   });
 
   it('Ctrl+right-click keeps its direct split-stack sell shortcut, not the menu', () => {
+    // True junk (poor quality, no instance payload) is the one case
+    // sellBagItem's ctrl arm still sells instantly with no confirm
+    // (vendorSellIsInstant, bags_view.ts): a common+ item now routes ctrl
+    // through the same confirm gate release/v0.41.0 carries (issue #3547),
+    // covered by tests/bags_vendor_sell_confirm.test.ts, not here.
     const sold: Array<[string, number | undefined]> = [];
-    const { root, menuCalls } = harness([{ itemId: 'baked_bread', count: 5 }], (itemId, count) =>
+    const { root, menuCalls } = harness([{ itemId: 'tangled_weed', count: 5 }], (itemId, count) =>
       sold.push([itemId, count]),
     );
     rightClickFirstCell(root, { ctrlKey: true });
     expect(menuCalls).toEqual([]);
-    expect(sold).toEqual([['baked_bread', 5]]);
+    expect(sold).toEqual([['tangled_weed', 5]]);
   });
 });
