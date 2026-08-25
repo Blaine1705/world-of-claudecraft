@@ -211,6 +211,13 @@ export class BootcampOverlay {
     const cameraTurned = this.cameraTravel >= CAMERA_LESSON_TRAVEL_RAD;
 
     this.engaged = true;
+    // Mint the coach DOM on ENGAGEMENT, not as a caption side effect: the
+    // keepsake-ring round deleted the coach card whose renderPanel() used to
+    // ensureDom() every engage, leaving showCaption() the only minter. A
+    // session that resumes MID-LESSON (station already active/ready, so the
+    // one-shot arrival caption never fires) then no-ops every instruction
+    // bubble and edge glow for the whole session. Idempotent.
+    this.ensureDom();
     const mode = currentInputHintMode();
     let nextRenderKey: string;
     if (this.bellPhase) {
