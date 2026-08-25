@@ -5,6 +5,7 @@ import {
   LEAD_MAX,
   LEAD_TIME,
   punchCameraFov,
+  resolveCameraFov,
   SPEED_FOV_MAX,
   stepCameraFeel,
   stepLandingDetector,
@@ -54,6 +55,30 @@ describe('FOV kicks', () => {
     expect(cameraFovOffset(s)).toBeLessThanOrEqual(12);
     punchCameraFov(s, -300);
     expect(cameraFovOffset(s)).toBeGreaterThanOrEqual(-8);
+  });
+});
+
+describe('resolveCameraFov (the player-configured FOV slider)', () => {
+  it('honors a non-default base FOV at rest, instead of snapping back to a hard-coded 60', () => {
+    const s = createCameraFeel();
+    expect(resolveCameraFov(80, s)).toBeCloseTo(80, 5);
+    expect(resolveCameraFov(55, s)).toBeCloseTo(55, 5);
+    expect(resolveCameraFov(100, s)).toBeCloseTo(100, 5);
+  });
+
+  it('applies the feel kicks on top of the configured base, not on top of a fixed default', () => {
+    const s = createCameraFeel();
+    punchCameraFov(s, 5);
+    expect(resolveCameraFov(70, s)).toBeCloseTo(75, 5);
+    expect(resolveCameraFov(60, s)).toBeCloseTo(65, 5);
+  });
+
+  it('still clamps the combined result to the 50..100 envelope at either extreme', () => {
+    const s = createCameraFeel();
+    punchCameraFov(s, 50);
+    expect(resolveCameraFov(100, s)).toBe(100);
+    punchCameraFov(s, -200);
+    expect(resolveCameraFov(55, s)).toBe(50);
   });
 });
 

@@ -323,8 +323,12 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the release/v0.41.0 merge into the FOV slider fix branch:
+// the resolved renderer.ts combines the release's own inputs with the FOV
+// slider fix's baseFov/resolveCameraFov wiring, so the composite matches
+// neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
+  '3960d9499ffdcc35c91fc8a10ae115a840a21e360da909704719e13ba4ecfbcd';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
