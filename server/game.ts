@@ -340,7 +340,7 @@ import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport 
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
-import { recordDetectorSuspicionFlags } from './suspicion_flags';
+import { attachDetectorFlagHost } from './suspicion_flags';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
@@ -1932,6 +1932,7 @@ export class GameServer {
   private readonly riftAssets: RiftAssetCoordinator;
 
   constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
+    attachDetectorFlagHost(this.botDetector);
     this.generalChatQuota = new GeneralChatQuotaCoordinator({
       consume: consumeGeneralChatQuota,
       maxInFlight: generalChatQuotaMaxInFlight,
@@ -3320,11 +3321,6 @@ export class GameServer {
         void this.kickSession(session, 'rejected by server', 'disconnected');
       }
     }
-    // Persist a suspicion flag for every CONFIRMED session so the admin
-    // Flagged workflow sees detector confirmations even after the session
-    // ends. Fire-and-forget with its own per-account throttle; the thin
-    // consumer rule: all logic lives in server/suspicion_flags.ts.
-    recordDetectorSuspicionFlags(this.botDetector.listSuspiciousPlayers(), now);
   }
 
   private captureBotDetectionSnapshot(
