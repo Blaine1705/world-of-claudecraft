@@ -2314,10 +2314,11 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.65,
     // The contributor rig is authored directly onto the game's +Z-facing bind.
     yaw: 0,
-    // Preserve the furnace read in the dark coliseum without restoring the
-    // glossy HIFI treatment that clashed with the game's faceted materials.
-    selfIllumination: 0.2,
-    envMapIntensity: 1.6,
+    // Preserve the furnace read without the glossy HIFI treatment. The old
+    // 0.2 plus an envMapIntensity boost date from the near-black arena grade;
+    // under the sunset forge rig the boost read as a milky IBL sheen, so the
+    // boss keeps a lower ember glow and the stock envMapIntensity of 1.
+    selfIllumination: 0.14,
     clips: IGNIVAR,
     walkRef: 1.6,
     runRef: 3.2,
@@ -2328,8 +2329,8 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.8,
     // Tripo authored the rig facing +X; character visuals face +Z at world facing 0.
     yaw: -Math.PI / 2,
-    selfIllumination: 0.16,
-    envMapIntensity: 1.3,
+    // Toned down with the sunset forge rig, same story as mob_ignivar above.
+    selfIllumination: 0.1,
     clips: IGNIVAR_HEART,
     attackTimeScale: 6,
     deathTimeScale: 3,
@@ -2338,24 +2339,26 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/crucible_warden.glb`,
     height: 2.2,
     yaw: 0,
-    selfIllumination: 0.18,
-    envMapIntensity: 1.35,
+    // The three automata (this def and the two below) carried 0.18 plus an
+    // envMapIntensity of 1.35 as a readability crutch for the near-black
+    // rooms; against the daylight environment map that boost was most of the
+    // white sheen on their gunmetal. The sunset forge rig lights them now, so
+    // they keep only a whisper of glow and the stock envMapIntensity of 1.
+    selfIllumination: 0.08,
     clips: IGNIVAR_CRUCIBLE_WARDEN,
   },
   mob_ignivar_ember_sentinel: {
     url: `${CREATURES}/ember_sentinel.glb`,
     height: 2.3,
     yaw: 0,
-    selfIllumination: 0.18,
-    envMapIntensity: 1.35,
+    selfIllumination: 0.08,
     clips: IGNIVAR_EMBER_SENTINEL,
   },
   mob_ignivar_cinder_artificer: {
     url: `${CREATURES}/cinder_artificer.glb`,
     height: 2.1,
     yaw: 0,
-    selfIllumination: 0.18,
-    envMapIntensity: 1.35,
+    selfIllumination: 0.08,
     clips: IGNIVAR_CINDER_ARTIFICER,
   },
   mob_water_elemental: {

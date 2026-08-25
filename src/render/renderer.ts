@@ -9508,6 +9508,7 @@ export class Renderer {
       hemi: this.hemi,
       scene: this.scene,
       rim: sharedUniforms.uRimBoost,
+      rimColor: sharedUniforms.uRimColor,
     };
     if (state === 'rift') {
       applyRiftLightRig(this.riftFogAuthored, targets);

@@ -16,18 +16,23 @@ export const IGNIVAR_AMBIENT_PARTICLES_NAME = 'ignivarAmbientEmbers';
 /** No arena-atmosphere geometry enters this central combat radius. */
 export const IGNIVAR_ARENA_FLOOR_CLEAR_RADIUS = 18;
 
-/** Static grade consumed by the renderer while the Ignivar interior is active. */
+/** Static grade consumed by the renderer while the Ignivar interior is active.
+ *  Sunset-in-a-forge, the shared vibe of all three raid rooms (the room set
+ *  and its rationale live in ignivar_raid_environment.ts): a warm amber key
+ *  bright enough to read by, lifted smoke fog, near-floor IBL so the daylight
+ *  environment map cannot frost the rigs blue, and an ember-tinted rim. */
 export const IGNIVAR_ARENA_LIGHTING = Object.freeze({
-  fogColor: 0x120806,
+  fogColor: 0x391408,
   fogNear: 34,
-  fogFar: 108,
-  sunColor: 0xff8a4c,
-  sunIntensity: 0.42,
-  hemiSkyColor: 0x553028,
-  hemiGroundColor: 0x090405,
-  hemiIntensity: 0.34,
-  envIntensity: 0.3,
-  rimIntensity: 1.45,
+  fogFar: 112,
+  sunColor: 0xff9d48,
+  sunIntensity: 0.98,
+  hemiSkyColor: 0x93422a,
+  hemiGroundColor: 0x280d06,
+  hemiIntensity: 0.43,
+  envIntensity: 0.1,
+  rimIntensity: 1.05,
+  rimColor: 0xffa45c,
   forgeLightColor: 0xff6a24,
   emberLightColor: 0xffb15a,
 } as const);
@@ -43,6 +48,7 @@ export function applyIgnivarArenaLighting(target: {
   hemi: Pick<THREE.HemisphereLight, 'color' | 'groundColor' | 'intensity'>;
   scene: { environmentIntensity: number };
   rim: { value: number };
+  rimColor: { value: { setHex(value: number): unknown } };
 }): void {
   target.sun.color.setHex(IGNIVAR_ARENA_LIGHTING.sunColor);
   target.sun.intensity = IGNIVAR_ARENA_LIGHTING.sunIntensity;
@@ -51,6 +57,7 @@ export function applyIgnivarArenaLighting(target: {
   target.hemi.intensity = IGNIVAR_ARENA_LIGHTING.hemiIntensity;
   target.scene.environmentIntensity = IGNIVAR_ARENA_LIGHTING.envIntensity;
   target.rim.value = IGNIVAR_ARENA_LIGHTING.rimIntensity;
+  target.rimColor.value.setHex(IGNIVAR_ARENA_LIGHTING.rimColor);
 }
 
 export interface IgnivarArenaAtmosphereOptions {

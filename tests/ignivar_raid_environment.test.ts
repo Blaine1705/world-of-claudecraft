@@ -29,6 +29,7 @@ describe('Ignivar raid room environment', () => {
         },
         scene: { environmentIntensity: 0 },
         rim: { value: 0 },
+        rimColor: { value: { setHex: vi.fn() } },
       };
       const expected = IGNIVAR_RAID_ENVIRONMENT[state];
 
@@ -45,6 +46,7 @@ describe('Ignivar raid room environment', () => {
       expect(target.hemi.intensity).toBe(expected.hemiIntensity);
       expect(target.scene.environmentIntensity).toBe(expected.envIntensity);
       expect(target.rim.value).toBe(expected.rimIntensity);
+      expect(target.rimColor.value.setHex).toHaveBeenCalledWith(expected.rimColor);
     }
   });
 });

@@ -75,8 +75,7 @@ describe('Ignivar boss model', () => {
       url: 'models/creatures/ignivar_heart_of_the_end.glb',
       height: 1.8,
       yaw: -Math.PI / 2,
-      selfIllumination: 0.16,
-      envMapIntensity: 1.3,
+      selfIllumination: 0.1,
       deathTimeScale: 3,
       clips: {
         idle: 'Idle',
@@ -85,6 +84,13 @@ describe('Ignivar boss model', () => {
       },
     });
     expect(VISUALS.mob_ignivar_heart_of_the_end.clips?.hit).toBeUndefined();
+    // The IBL boost was the white-sheen crutch for the old near-black rooms;
+    // the sunset forge rig replaced it, so it must stay off the raid defs.
+    expect(VISUALS.mob_ignivar_heart_of_the_end.envMapIntensity).toBeUndefined();
+    expect(VISUALS.mob_ignivar.envMapIntensity).toBeUndefined();
+    expect(VISUALS.mob_ignivar_cinder_artificer.envMapIntensity).toBeUndefined();
+    expect(VISUALS.mob_ignivar_ember_sentinel.envMapIntensity).toBeUndefined();
+    expect(VISUALS.mob_ignivar_crucible_warden.envMapIntensity).toBeUndefined();
     expect(manifestUrls()).toContain('models/creatures/ignivar_heart_of_the_end.glb');
   });
 

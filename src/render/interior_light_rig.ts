@@ -10,6 +10,7 @@
 // means in light.
 import type * as THREE from 'three';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
+import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
 
 /** Every fog scene state the renderer resolves to (single source of truth). */
 export type FogSceneState =
@@ -97,6 +98,9 @@ export interface InteriorLightTargets {
   scene: THREE.Scene;
   /** the shared rim-boost uniform's live value slot */
   rim: { value: number };
+  /** the shared rim-tint uniform's live color: cool by default, re-graded warm
+   *  by the forge rooms and reset by every other state settling */
+  rimColor: { value: { setHex(value: number): unknown } };
 }
 
 /** The outdoor rig legs, graded per frame by the renderer before the call. */
@@ -172,6 +176,10 @@ export function applyInteriorLightRig(
           : underground
             ? DUNGEON_RIM_BOOST
             : 1;
+  // The rim tint defaults cool everywhere; the forge applier below re-grades
+  // it, and setting it first means leaving the raid restores it in the same
+  // settle that restores the legs.
+  targets.rimColor.value.setHex(RIM_GLOW_DEFAULT_COLOR);
   if (wildheartSun) {
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);
@@ -202,4 +210,5 @@ export function applyRiftLightRig(authored: boolean, targets: InteriorLightTarge
   targets.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
   targets.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
   targets.rim.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
+  targets.rimColor.value.setHex(RIM_GLOW_DEFAULT_COLOR);
 }
