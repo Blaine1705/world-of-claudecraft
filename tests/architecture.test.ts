@@ -2264,6 +2264,10 @@ const UI_DOM_MODULES = [
   'src/ui/swing_timer_bars.ts',
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',
+  // target_swing_timer_bars.ts mirrors swing_timer_bars.ts's own reach: it
+  // resolves the #swingbar-target/#swingbar-tot elements via document.querySelector
+  // once in its constructor, the same DOM-owning shape as its sibling above.
+  'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
