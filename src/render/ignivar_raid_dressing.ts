@@ -2,12 +2,24 @@ import * as THREE from 'three';
 import type { DungeonLayout } from '../sim/dungeon_layout';
 import { VARKHUL_FORGE_LOCAL_POS } from '../sim/encounters/varkhul';
 import { surfaceMat } from './gfx';
+import {
+  filterIgnivarPropPlacements,
+  type IgnivarEnvPropKey,
+  type IgnivarPropPlacement,
+  ignivarApproachPropPlan,
+  ignivarArenaPropPlan,
+  ignivarCruciblePropPlan,
+} from './ignivar_dressing_plan_core';
+import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
-import { buildVarkhulGrandForge, prepareVarkhulGrandForgeAssets } from './varkhul_grand_forge';
+import { radialGlowTexture } from './textures';
 
 export const IGNIVAR_APPROACH_DRESSING_NAME = 'ignivarForgeApproachDressing';
+export const IGNIVAR_ARENA_DRESSING_NAME = 'ignivarCrucibleArenaDressing';
 export const VARKHUL_CRUCIBLE_DRESSING_NAME = 'varkhulInnerCrucibleDressing';
 export const IGNIVAR_APPROACH_CLEAR_HALF_WIDTH = 7.5;
+
+type PropAppender = typeof appendIgnivarEnvProps;
 
 let railGeometry: THREE.BoxGeometry | null = null;
 let stationGeometry: THREE.CylinderGeometry | null = null;
@@ -18,9 +30,61 @@ function sharedMaterial(options: Parameters<typeof surfaceMat>[0]): THREE.Materi
 }
 
 export function ensureIgnivarRaidDressingAssets(interior: string): Promise<void> {
-  return interior === 'ignivar_depths'
-    ? prepareVarkhulGrandForgeAssets().catch(() => undefined)
+  return interior === 'ignivar_approach' || interior === 'ignivar' || interior === 'ignivar_depths'
+    ? prepareIgnivarEnvProps().catch(() => undefined)
     : Promise.resolve();
+}
+
+/** Baked additive floor pools under the molten props (the addTorchGlow
+ *  recipe: no new lights, the light census stays frozen). Skipped on the low
+ *  tier like every other glow decal. */
+const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale: number }>> = {
+  firepit: { color: 0xff7a2e, scale: 0.75 },
+  lava_face: { color: 0xff4316, scale: 0.85 },
+  anvil: { color: 0xff5c1e, scale: 1.25 },
+  forge: { color: 0xff5c1e, scale: 1.05 },
+  reactor: { color: 0xffa04a, scale: 0.7 },
+};
+
+let glowDecalGeo: THREE.CircleGeometry | null = null;
+let glowDecalTex: THREE.Texture | null = null;
+const glowDecalMats = new Map<number, THREE.Material>();
+
+function addPropGlowPools(
+  group: THREE.Group,
+  placements: readonly IgnivarPropPlacement[],
+  lowGfx: boolean,
+): void {
+  // The pools are canvas-backed cosmetics: skip on the low tier, and in
+  // DOM-less hosts (the dressing builders are unit-tested in Node).
+  if (lowGfx || typeof document === 'undefined') return;
+  for (const placement of placements) {
+    const pool = PROP_GLOW_POOLS[placement.key];
+    if (!pool || placement.y !== 0) continue;
+    glowDecalGeo ??= markSharedGeometry(
+      new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2),
+    ) as THREE.CircleGeometry;
+    glowDecalTex ??= radialGlowTexture();
+    let mat = glowDecalMats.get(pool.color);
+    if (!mat) {
+      mat = markSharedMaterial(
+        new THREE.MeshBasicMaterial({
+          map: glowDecalTex,
+          color: pool.color,
+          transparent: true,
+          opacity: 0.46,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
+      glowDecalMats.set(pool.color, mat);
+    }
+    const glow = new THREE.Mesh(glowDecalGeo, mat);
+    glow.position.set(placement.x, 0.07, placement.z);
+    glow.scale.setScalar(pool.scale);
+    glow.renderOrder = 1; // after the floor it floats over
+    group.add(glow);
+  }
 }
 
 function markDressing(group: THREE.Group, name: string): THREE.Group {
@@ -31,8 +95,15 @@ function markDressing(group: THREE.Group, name: string): THREE.Group {
   return group;
 }
 
-function buildForgeApproachDressing(layout: DungeonLayout, lowGfx: boolean): THREE.Group {
+function buildForgeApproachDressing(
+  layout: DungeonLayout,
+  lowGfx: boolean,
+  appendProps: PropAppender = appendIgnivarEnvProps,
+): THREE.Group {
   const group = markDressing(new THREE.Group(), IGNIVAR_APPROACH_DRESSING_NAME);
+  const placements = filterIgnivarPropPlacements(ignivarApproachPropPlan(layout), lowGfx);
+  appendProps(group, placements, lowGfx);
+  addPropGlowPools(group, placements, lowGfx);
   const halfWidth = layout.floorHalfX ?? layout.wallX ?? 18;
   const sideX = Math.max(IGNIVAR_APPROACH_CLEAR_HALF_WIDTH + 2, Math.min(halfWidth - 3.5, 13));
   const length = Math.max(12, layout.zMax - layout.zMin - 10);
@@ -81,16 +152,33 @@ function buildForgeApproachDressing(layout: DungeonLayout, lowGfx: boolean): THR
   return group;
 }
 
+/** Crucible of the Last Spring: authored props only; the arena atmosphere
+ *  module owns the floor bands and embers. */
+function buildCrucibleArenaDressing(
+  layout: DungeonLayout,
+  lowGfx: boolean,
+  appendProps: PropAppender = appendIgnivarEnvProps,
+): THREE.Group {
+  const group = markDressing(new THREE.Group(), IGNIVAR_ARENA_DRESSING_NAME);
+  const placements = filterIgnivarPropPlacements(ignivarArenaPropPlan(layout), lowGfx);
+  appendProps(group, placements, lowGfx);
+  addPropGlowPools(group, placements, lowGfx);
+  return group;
+}
+
 function buildInnerCrucibleDressing(
   layout: DungeonLayout,
   lowGfx: boolean,
-  forgeBuilder: (x: number, z: number) => THREE.Group = buildVarkhulGrandForge,
+  appendProps: PropAppender = appendIgnivarEnvProps,
 ): THREE.Group {
   const group = markDressing(new THREE.Group(), VARKHUL_CRUCIBLE_DRESSING_NAME);
   const halfWidth = layout.floorHalfX ?? layout.wallX ?? 40;
   const forgeZ = VARKHUL_FORGE_LOCAL_POS.z;
-  const forge = forgeBuilder(VARKHUL_FORGE_LOCAL_POS.x, forgeZ);
-  group.add(forge);
+  // The authored anvil sits exactly on the encounter's forge anchor (the
+  // boss works it pre-pull); the furnace and sealed vault stack behind it.
+  const placements = filterIgnivarPropPlacements(ignivarCruciblePropPlan(layout), lowGfx);
+  appendProps(group, placements, lowGfx);
+  addPropGlowPools(group, placements, lowGfx);
 
   trenchGeometry ??= markSharedGeometry(new THREE.BoxGeometry(1, 0.045, 1));
   const trenchMaterial = sharedMaterial({
@@ -123,11 +211,13 @@ export function buildIgnivarRaidDressing(
   lowGfx: boolean,
 ): THREE.Group | null {
   if (interior === 'ignivar_approach') return buildForgeApproachDressing(layout, lowGfx);
+  if (interior === 'ignivar') return buildCrucibleArenaDressing(layout, lowGfx);
   if (interior === 'ignivar_depths') return buildInnerCrucibleDressing(layout, lowGfx);
   return null;
 }
 
 export const ignivarRaidDressingInternalsForTest = {
   buildForgeApproachDressing,
+  buildCrucibleArenaDressing,
   buildInnerCrucibleDressing,
 };
