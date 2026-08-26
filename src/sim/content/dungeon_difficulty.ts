@@ -10,10 +10,10 @@ export const HEROIC_MARK_ITEM_ID = 'heroic_mark';
 // it for the normal copper base on the same single rng draw). Heroic runs
 // sit behind the per-dungeon daily lockout, so this rewards the legitimate
 // clear while the modest normal-mode bases stay the anti-farm line.
-// Five-man finales pay 10g nominal (rolls 6g to 14g); the Nythraxis raid
-// finale pays 20g nominal (rolls 12g to 28g). Full ladder + the daily
-// circuit ceiling: docs/design/dungeon-gold.md; pinned by
-// tests/heroic_finale_gold.test.ts.
+// Five-man finales pay 10g nominal (rolls 6g to 14g); a raid finale
+// (Nythraxis, and the Ignivar herald with it) pays 20g nominal (rolls 12g
+// to 28g). Full ladder + the daily circuit ceiling:
+// docs/design/dungeon-gold.md; pinned by tests/heroic_finale_gold.test.ts.
 export const HEROIC_FINALE_COPPER = 100000;
 export const NYTHRAXIS_HEROIC_COPPER = 200000;
 

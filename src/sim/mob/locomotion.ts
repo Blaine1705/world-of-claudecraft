@@ -543,7 +543,9 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       // Dormant-until-pulled mobs (the downed forge mechs, and any hand-placed
       // pack marked per-spawn) never idle-wander, so the formation holds. Drawn
       // AFTER the aggro scan so proximity still wakes them; skips the wander draw.
-      if (template.idleStationary || mob.idleStationary) break;
+      // A synthetic mob whose templateId does not resolve (perf-capture rigs)
+      // has no template flag; tolerate that like the hardLeashRadius read does.
+      if (template?.idleStationary || mob.idleStationary) break;
       mob.wanderTimer -= DT;
       // ONE idle sub-stream for the whole wander step, threaded through all three
       // draw sites below (the ambient stable horses do the same, mob/ambient.ts).

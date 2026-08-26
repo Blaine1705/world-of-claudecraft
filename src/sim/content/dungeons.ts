@@ -219,9 +219,18 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 42,
     moveSpeed: 7,
     aggroRadius: 30,
-    loot: [],
+    // Raid-finale money ladder, the Nythraxis wiring mirrored: 15g normal
+    // base, and a heroic-claim kill substitutes the shared 20g raid base on
+    // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
+    // still to be authored for the development raid tier.
+    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
     scale: 3.4,
     color: 0xd64316,
+    // Deliberately NO hasteMult: the encounter script owns Ignivar's frenzy.
+    // Last Inferno flips `enraged` itself at 20% (so dmgMult applies) and
+    // carries the swing-speed half as its encounter-owned 1.2x haste aura;
+    // a template hasteMult would stack on that aura and double-dip. Pinned
+    // by tests/mob_enrage.test.ts and tests/ignivar_encounter.test.ts.
     enrage: { belowHpPct: 0.25, dmgMult: 1.35 },
   },
   // Stationary priority target for Ignivar's Normal intermission.
