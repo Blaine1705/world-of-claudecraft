@@ -61,12 +61,12 @@
 // instead of locally resolved. Delves remain excluded (a separate, tracked
 // gap: their door/prop state is not mirrored client-side).
 
-import { moverHeight, resolveMovement } from '../sim/colliders';
 import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
 import { isRiftPos } from '../sim/data';
-import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
+import { type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 import type { RiftFloorView } from '../world_api/dungeons';
+import { createClientPlayerMotionDeps } from './client_player_motion';
 import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 import {
   boundedReconciliationCorrectionInto,
@@ -324,27 +324,7 @@ export class SelfMotionPredictor {
     // online client registers the current rift floor's colliders under it
     // (src/net/online.ts applyRiftStateEvent), so a rift wall resolves here the
     // same way it does for the server and for the offline Sim.
-    this.deps = {
-      seed,
-      moveSpeedMult: (e) => moveSpeedMult(e, 0),
-      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
-        resolveMovement(
-          seed,
-          fromX,
-          fromZ,
-          nx,
-          nz,
-          r,
-          ignoreFences,
-          undefined,
-          moverHeight(e),
-          riftCollisionToken,
-        ),
-      resolvedAbility: () => null,
-      cancelCast: () => {},
-      standUp: () => {},
-      dealDamage: () => {},
-    };
+    this.deps = createClientPlayerMotionDeps(seed, undefined, riftCollisionToken);
   }
 
   reset(): void {

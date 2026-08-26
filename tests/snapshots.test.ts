@@ -29,6 +29,8 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { applyMovementPositionSample } from '../server/movement_position';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
+import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -338,6 +340,45 @@ describe('self talent wire decode (IWorldTalents facet)', () => {
 });
 
 describe('spectate client POV', () => {
+  it('clears movement reconciliation state when the observed identity changes', () => {
+    const client = bareClient(1, {
+      movementWireVersion: 2,
+      reconAuthoritativeX: 1,
+      reconAuthoritativeY: 2,
+      reconAuthoritativeZ: 3,
+      reconPreviousAuthoritativeFacing: 0.25,
+      reconAuthoritativeFacing: 0.5,
+      reconAckClientTick: 17,
+      reconOverrideEpoch: 4,
+      reconOverrideActive: true,
+      reconMoveSpeedMult: 1.5,
+    });
+
+    (client as any).onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+
+    expect({
+      x: client.reconAuthoritativeX,
+      y: client.reconAuthoritativeY,
+      z: client.reconAuthoritativeZ,
+      previousFacing: client.reconPreviousAuthoritativeFacing,
+      facing: client.reconAuthoritativeFacing,
+      ackCt: client.reconAckClientTick,
+      epoch: client.reconOverrideEpoch,
+      active: client.reconOverrideActive,
+      moveSpeedMult: client.reconMoveSpeedMult,
+    }).toEqual({
+      x: null,
+      y: null,
+      z: null,
+      previousFacing: null,
+      facing: null,
+      ackCt: -1,
+      epoch: 0,
+      active: false,
+      moveSpeedMult: 1,
+    });
+  });
+
   it('follows observed self, aligns on entry and respawn, then restores identity', () => {
     const client = bareClient(1);
     const internals = client as unknown as {
@@ -1321,7 +1362,17 @@ describe('delta snapshots', () => {
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
     broadcast(server);
     const snap = lastSnap(fc.sent);
-    expect(snap.self.ack).toBe(7);
+    expect({
+      ack: snap.self.ack,
+      ...('ackCt' in snap.self ? { ackCt: snap.self.ackCt } : {}),
+    }).toEqual({ ack: 7 });
+    expect(snap.self).not.toHaveProperty('rpx');
+    expect(snap.self).not.toHaveProperty('rpy');
+    expect(snap.self).not.toHaveProperty('rpz');
+    expect(snap.self).not.toHaveProperty('rpf');
+    expect(snap.self).not.toHaveProperty('ovE');
+    expect(snap.self).not.toHaveProperty('ovA');
+    expect(snap.self).not.toHaveProperty('msm');
 
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 6, mi: { f: 0 } }));
     fc.sent.length = 0;
@@ -1405,6 +1456,190 @@ describe('delta snapshots', () => {
     expect(disconnected.movementPositionAuthority).toBe(false);
     expect(rejoined.movementPositionAuthority).toBe(false);
   });
+
+  it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
+    const v2Server = new GameServer();
+    const v2Client = fakeWs();
+    const v2Session = joinServer(v2Server, v2Client, 2, 'Ticked', 'warrior', {
+      movementWireVersion: 2,
+    });
+    const meta = v2Server.sim.meta(v2Session.pid)!;
+    const entity = v2Server.sim.entities.get(v2Session.pid)!;
+    const facingBeforeArrival = entity.facing;
+    const lastInputAtBeforeArrival = v2Session.lastInputAt;
+    v2Server.handleMessage(
+      v2Session,
+      JSON.stringify({ t: 'input', seq: 4, ct: 0, mi: { f: 1 }, facing: 0.25 }),
+    );
+
+    expect(meta.moveInput.forward).toBe(false);
+    expect(entity.facing).toBe(facingBeforeArrival);
+    expect(v2Session.lastInputAt).toBe(lastInputAtBeforeArrival);
+    consumeMovementFramesV2(v2Server.sim, [v2Session]);
+    expect(meta.moveInput.forward).toBe(true);
+    expect(entity.facing).toBe(0.25);
+    expect(v2Session.lastConsumedCt).toBe(0);
+    expect(v2Session.lastInputAt).toBe(v2Server.sim.time);
+    v2Server.sim.tick();
+    entity.pos.x = 1 / 3;
+    entity.pos.y = 2 / 3;
+    entity.pos.z = 4 / 3;
+    entity.facing = Math.PI / 7;
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    broadcast(v2Server);
+    const self = lastSnap(v2Client.sent).self;
+
+    expect({
+      ack: self.ack,
+      ackCt: self.ackCt,
+      rpx: self.rpx,
+      rpy: self.rpy,
+      rpz: self.rpz,
+      rpf: self.rpf,
+      ovE: self.ovE,
+    }).toEqual({
+      ack: 4,
+      ackCt: 0,
+      rpx: 1 / 3,
+      rpy: 2 / 3,
+      rpz: 4 / 3,
+      rpf: Math.PI / 7,
+      ovE: 0,
+    });
+    expect(self).not.toHaveProperty('msm');
+    expect({ x: self.x, y: self.y, z: self.z, f: self.f }).toEqual({
+      x: 0.33,
+      y: 0.67,
+      z: 1.33,
+      f: 0.45,
+    });
+
+    const client = bareClient(v2Session.pid, { movementWireVersion: 2 });
+    client.reconMoveSpeedMult = 2;
+    (client as any).applySnapshot(lastSnap(v2Client.sent));
+    expect({
+      x: client.reconAuthoritativeX,
+      y: client.reconAuthoritativeY,
+      z: client.reconAuthoritativeZ,
+      previousFacing: client.reconPreviousAuthoritativeFacing,
+      facing: client.reconAuthoritativeFacing,
+      ackCt: client.reconAckClientTick,
+      epoch: client.reconOverrideEpoch,
+      active: client.reconOverrideActive,
+      moveSpeedMult: client.reconMoveSpeedMult,
+    }).toEqual({
+      x: 1 / 3,
+      y: 2 / 3,
+      z: 4 / 3,
+      previousFacing: Math.PI / 7,
+      facing: Math.PI / 7,
+      ackCt: 0,
+      epoch: 0,
+      active: false,
+      moveSpeedMult: 1,
+    });
+    expect(client.player.pos).toEqual({ x: 0.33, y: 0.67, z: 1.33 });
+    expect(client.player.petAutoSkill).toBe(false);
+
+    entity.auras.push({
+      id: 'test_root',
+      name: 'Root',
+      kind: 'root',
+      remaining: 1,
+      duration: 1,
+      value: 0,
+      sourceId: entity.id,
+      school: 'physical',
+    });
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    v2Client.sent.length = 0;
+    broadcast(v2Server);
+    expect(lastSnap(v2Client.sent).self).toMatchObject({ ovE: 1, ovA: 1 });
+
+    entity.auras.push({
+      id: 'test_speed',
+      name: 'Speed',
+      kind: 'buff_speed',
+      remaining: 1,
+      duration: 1,
+      value: 1.5,
+      sourceId: entity.id,
+      school: 'physical',
+    });
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    v2Client.sent.length = 0;
+    broadcast(v2Server);
+    const spedSelf = lastSnap(v2Client.sent).self;
+    expect(spedSelf.msm).toBe(1.5);
+    (client as any).applySnapshot(lastSnap(v2Client.sent));
+    expect(client.reconMoveSpeedMult).toBe(1.5);
+  });
+
+  it('omits movement reconciliation fields from a spectating v2 self record', () => {
+    const spectateServer = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joinServer(spectateServer, moderatorWs, 4, 'Moderator', 'warrior', {
+      movementWireVersion: 2,
+    });
+    const target = joinServer(spectateServer, targetWs, 5, 'Observed');
+    (spectateServer as any).enterSpectate(moderator, target);
+    moderatorWs.sent.length = 0;
+
+    broadcast(spectateServer);
+
+    const self = lastSnap(moderatorWs.sent).self;
+    expect(self.id).toBe(target.pid);
+    for (const key of ['rpx', 'rpy', 'rpz', 'rpf', 'ackCt', 'ovE', 'ovA', 'msm']) {
+      expect(self).not.toHaveProperty(key);
+    }
+  });
+
+  it.each([
+    ['unreleased corpse', true, false, false, false],
+    ['released ghost', true, true, false, true],
+    ['stunned player', false, false, true, false],
+  ] as const)(
+    'applies v2 facing guards at consumption for a %s',
+    (_name, dead, ghost, stunned, appliesFacing) => {
+      const facingServer = new GameServer();
+      const facingClient = fakeWs();
+      const facingSession = joinServer(
+        facingServer,
+        facingClient,
+        3,
+        `Facing ${_name}`,
+        'warrior',
+        {
+          movementWireVersion: 2,
+        },
+      );
+      const entity = facingServer.sim.entities.get(facingSession.pid)!;
+      entity.facing = 0.25;
+      entity.dead = dead;
+      entity.ghost = ghost;
+      if (stunned) {
+        entity.auras.push({
+          id: 'test_stun',
+          name: 'Test Stun',
+          kind: 'stun',
+          remaining: 5,
+          duration: 5,
+          value: 0,
+          sourceId: entity.id,
+          school: 'physical',
+        } satisfies Aura);
+      }
+
+      facingServer.handleMessage(
+        facingSession,
+        JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: {}, facing: 1.25 }),
+      );
+      consumeMovementFramesV2(facingServer.sim, [facingSession]);
+
+      expect(entity.facing).toBe(appliesFacing ? 1.25 : 0.25);
+    },
+  );
 
   it('turns echoed input acks into client latency samples', () => {
     const client = bareClient(1);
@@ -2381,6 +2616,69 @@ describe('client-side delta merge', () => {
         mt: 120,
         mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
       });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('sends movement v2 frames with client ticks and nullable facing', () => {
+    const client = bareClient(1, { movementWireVersion: 2 });
+    const sent: any[] = [];
+    (client as any).ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      expect(
+        client.sendMovementFrame(
+          { ct: 5, mi: { ...client.moveInput, forward: true }, facing: null },
+          100,
+        ),
+      ).toBe(true);
+      expect(
+        client.sendMovementFrame(
+          { ct: 6, mi: { ...client.moveInput, strafeLeft: true }, facing: 0.25 },
+          150,
+        ),
+      ).toBe(true);
+      expect(sent).toEqual([
+        {
+          t: 'input',
+          seq: 1,
+          ct: 5,
+          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
+        },
+        {
+          t: 'input',
+          seq: 2,
+          ct: 6,
+          mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 1, sr: 0, j: 0, dv: 0, sf: 0 },
+          facing: 0.25,
+        },
+      ]);
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('bounds movement v2 input echo telemetry to the legacy window', () => {
+    const client = bareClient(1, { movementWireVersion: 2 });
+    (client as any).ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: () => {},
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      for (let ct = 0; ct < 121; ct++) {
+        expect(client.sendMovementFrame({ ct, mi: client.moveInput, facing: null }, ct)).toBe(true);
+      }
+      expect((client as any).pendingInputSeqSentAt.size).toBe(120);
+      expect([...(client as any).pendingInputSeqSentAt.keys()].slice(0, 2)).toEqual([2, 3]);
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }

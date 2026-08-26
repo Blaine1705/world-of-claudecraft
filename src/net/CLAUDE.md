@@ -234,67 +234,31 @@ failure, kept as stable English that `main.ts` re-localizes.
   reconcile-on-snapshot contract: display-only, and the server's value always
   wins within a bounded window (`tests/target_echo_client.test.ts` pins the
   target one).
-- **Display-layer locomotion anticipation is the one sanctioned prediction**, and
-  it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
-  the LOCAL player that is (a) bounded by a speed-derived measured-latency leash
-  with a hard cap, (b) trajectory-matched within bounded timing uncertainty and
-  exactly converged to authoritative wire XYZ at stable idle, (c) frozen when
-  snapshot flow exhausts the remaining hard-cap horizon, (d) never written into
-  `ClientWorld` mirrored state or any `IWorld` read that logic consumes
-  (targeting, range checks, quest triggers, and interest all use authoritative
-  positions). Protocol-v2 inputs carry the displayed XZ and client timestamp,
-  but neither is authority by itself: `server/movement_position.ts` accepts only
-  grounded samples within elapsed movement-speed credit, a short authority
-  window, and a swept collision-clear path. Airborne, forced, rooted, instance,
-  and stale-idle movement stay server-owned. `server/movement_stop.ts` adds a
-  stricter release check against the immediately previous or next authoritative
-  movement segment. Invalid samples are ignored and can never pull or teleport
-  authority. The protocol-v2 timeline applies transitions after the shared 150
-  ms jitter window (`src/sim/movement_timing.ts`); self prediction includes that
-  known delay, while old clients keep the legacy immediate path. Fresh sessions
-  may use the bounded optimistic bootstrap in `self_motion.ts` until the first
-  credible input echo; that bootstrap expires if no echo arrives. Widening any
-  of these constraints is a maintainer decision, see
-  `docs/online-movement-latency.md`. One amendment is already in force, for the
-  long render frame: when a frame outlasts the mirror's snapshot interval the
-  browser applies the snapshots it swallowed in one burst, so for that block
-  episode (a) the leash budget may exceed the latency cap by the ground the
-  frozen anchor did not cover, bounded by `BLOCK_EPISODE_MAX_MS` of run speed,
-  and (b) the blend toward the server pose is held for the settle window that
-  the burst sweep needs. Both live in `src/render/self_motion.ts` and are
-  pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
-  A second amendment (issue #3479): prediction now covers rifts too, the same
-  as the overworld and regular dungeons. The predictor strips and reapplies
-  the raised-tier lift around each kernel step (`self_motion_rift_lift.ts`,
-  mirroring `Sim.updatePlayerMovement`'s `riftPlayerLift` pair in
-  `src/sim/rift/runs.ts`) and resolves rift walls through a real, per-
-  `ClientWorld` `riftCollisionToken` registered on `riftState`
-  (`online.ts` `applyRiftStateEvent`, `src/sim/colliders.ts` `setRiftRegion`,
-  cleared on session end). This is `IWorldDungeons.riftCollisionToken`'s
-  narrower client-side reach only (`src/world_api/dungeons.ts` has the full
-  picture): the swept-collision crest re-resolve behind Blink, Shadowstep,
-  and Heroic Leap reads `SimContext`'s token instead, which is always the
-  authoritative Sim online, so it was never affected by the client's own
-  token being inert and stays exactly as it was. The one rift mechanic still
-  excluded is the ice slide: it is server-driven and unmirrored (only the
-  `riftSliding` boolean rides the wire, never a direction), so prediction
-  suspends on it exactly like a ledge climb. Delves stay excluded (the
-  portcullis door clamps are not mirrored client-side); that gap is tracked
-  separately. A rift's OWN switch-gated portcullis is a runtime clamp too
-  (`inst.gateOpen`, not a static collider `setRiftRegion` publishes), so it is
-  deliberately left leash-bounded rather than locally resolved: the display
-  can lead into a closed gate for at most one latency cap before the
-  authoritative correction pulls it back, same as any other misprediction.
-  Pinned by `describe('rift prediction (issue #3479)')` in
-  `tests/self_motion.test.ts` and the rift case in
-  `tests/player_motion.test.ts`'s kernel parity suite.
-  An ordinary snapshot gap may spend only the unused portion of the same hard
-  cap; it freezes at that horizon and re-adopts authority after a prolonged gap.
-  While the self snapshot reports an active validated grounded-position stream,
-  that stream replaces the grounded spatial servo and leash. The temporal gap
-  horizon remains active, and a validator reset restores the ordinary path.
-  Predictor catch-up after a blocked main thread is separately capped at 750 ms,
-  matching the server's stale held-input cutoff.
+- **Local-player movement prediction is the one sanctioned prediction**, and it
+  lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`
+  on movement wire v2; design authority `docs/design/movement-reconciliation.md`):
+  the drawn pose is the shared kernel stepped over the SAME per-tick input
+  frames the client actually sent, reconciled exact-match against the acked
+  authoritative pose (`ackCt` + `rpx/rpy/rpz/rpf`). Its constraints: (a) prediction
+  state is never written into `ClientWorld` mirrored state or any `IWorld` read
+  that logic consumes (targeting, range checks, quest triggers, and interest
+  all use authoritative positions); (b) the drawn pose reflects only input that
+  is really on the wire, never an outcome guess; (c) corrections exist only on
+  server override epochs (`ovE`/`ovA`) and genuine reconcile mismatches, and
+  the display absorbs them through the handoff offset bounded by
+  `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
+  `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
+  must keep it green. Changing this model is a maintainer decision. The legacy
+  display extrapolator (`src/render/self_motion.ts`, leash + servo + block
+  episode, pinned by `tests/self_motion.test.ts`) is only the mid-deploy v1
+  fallback under its original latency-cap constraints. Both the v2 exact-match
+  predictor and the v1 fallback use the per-`ClientWorld` `riftCollisionToken`
+  registered on `riftState` for rift wall resolution, and v1 also strips and
+  reapplies the raised-tier lift via `self_motion_rift_lift.ts`. Delves stay
+  excluded because their portcullis clamps are not mirrored client-side. On v2,
+  gated states and `?nopredict` use the plain interpolated fallback in
+  `src/render/self_render_position_core.ts`, with the rewind-clamped handoff.
+  The legacy extrapolator is deleted when v1 is retired, not before.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
   channel (`input.facing`, applied outright when the player may turn)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`

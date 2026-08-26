@@ -120,6 +120,7 @@ import { Keybinds } from './game/keybinds';
 import {
   type KeyboardTurnArgs,
   newKeyboardTurnState,
+  seedKeyboardTurnRelease,
   stepKeyboardTurnFacing,
 } from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
@@ -150,6 +151,8 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { interpolatedOnlineSelfFacing } from './game/online_facing_mirror';
+import { sendOnlineMovementFrame } from './game/online_movement_frame';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -160,6 +163,12 @@ import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_ent
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
+import {
+  isMovementFrozen,
+  isPlayerImmobilized,
+  type SelfMotionGateArgs,
+  selfMotionPredictionEnabled,
+} from './game/self_motion_gate';
 import {
   type GameSettings,
   normalizeClickMoveButton,
@@ -201,6 +210,7 @@ import {
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
 import { watchWorldEntry } from './net/entry_watch';
+import { InputEchoTracker } from './net/input_echo_tracker';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -245,6 +255,7 @@ import {
   savePlayMarker,
 } from './net/resume_play';
 import { createSeekerEntitlementSync } from './net/seeker_entitlement_sync';
+import { snapshotAlpha } from './net/snapshot_alpha';
 import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
@@ -309,11 +320,8 @@ import {
 } from './render/gfx';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import { Renderer } from './render/renderer';
-import {
-  hasAuthoritativeSelfPositionDiscontinuity,
-  type SelfMotionFrame,
-  selfMotionAllowedAt,
-} from './render/self_motion';
+import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
+import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
@@ -327,7 +335,6 @@ import { rowTreeFor } from './sim/content/talents';
 import {
   GATHER_NODES,
   ITEMS,
-  isDelvePos,
   isRiftPos,
   MOBS,
   QUESTS,
@@ -516,12 +523,8 @@ const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop p
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
 const ATTACK_MOVE_MELEE_STOP = 3.5; // yards; how close an attack-move approach stops from its target (inside melee)
 const ATTACK_MOVE_ACQUIRE_RANGE = 12; // yards; an attack-move toward open ground auto-targets a hostile this near
-// Aura kinds that stop the player from moving (mirrors the sim's isRooted/isStunned):
-// while one of these is up, click-to-move can't make progress, so the destination
-// marker shows a "held" state instead of looking like a stuck game.
-const IMMOBILE_AURA_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph']);
-// Live-ops escape hatch for the online display-only self extrapolation
-// (src/render/self_motion.ts): ?nopredict restores the pre-prediction behavior.
+// Live-ops escape hatch for v2 prediction: ?nopredict uses interpolated display
+// without prediction. The v1 fallback keeps its legacy extrapolator.
 const SELF_MOTION_DISABLED = new URLSearchParams(location.search).has('nopredict');
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
 const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
@@ -2843,7 +2846,6 @@ async function startGame(
   // apply persisted settings to the freshly-built subsystems
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
-
   const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
     normalizeGraphicsSettingsSnapshot({
       graphicsPreset: settings.get('graphicsPreset'),
@@ -2855,7 +2857,6 @@ async function startGame(
     });
   let appliedGraphicsSettings = captureGraphicsSettings();
   const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
-
   const configureRebuiltRenderer = (next: Renderer): void => {
     next.showNameplates = renderer.showNameplates;
     next.showDevBadges = settings.get('showDevBadges');
@@ -2874,7 +2875,6 @@ async function startGame(
       next.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
   };
-
   const graphicsRebuild = new GraphicsRebuildCoordinator<
     GraphicsSettingsSnapshot,
     Renderer,
@@ -2887,6 +2887,7 @@ async function startGame(
     setClientPaused: (paused) => {
       graphicsRebuildPaused = paused;
       if (!paused) {
+        movementPrediction.resume();
         last = performance.now();
         acc = 0;
       }
@@ -2900,6 +2901,7 @@ async function startGame(
       mobileControls.syncAutorun(false);
     },
     neutralizeOnlineInput: () => {
+      // V2 consumes this frame, then starvation holds neutral throughout the pause.
       online?.neutralizeInputForClientPause();
     },
     showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
@@ -3150,9 +3152,9 @@ async function startGame(
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
-      onlineInputEchoMs = onlineJitterMs = 0;
+      inputEcho.echoMs = 0;
+      inputEcho.jitterMs = 0;
       Object.assign(kbTurn, newKeyboardTurnState());
-      renderer.resetSelfMotionPrediction();
       hud.marketResyncAfterReconnect();
       // A fresh join (as opposed to a resume within the linkdead grace window)
       // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
@@ -3748,16 +3750,11 @@ async function startGame(
     }
   }
 
-  // The player can't move toward a click-to-move destination while rooted/stunned
-  // surface that on the marker so the freeze reads as crowd control, not a bug.
   function playerImmobilized(): boolean {
-    return world.player.auras.some((a) => IMMOBILE_AURA_KINDS.has(a.kind));
+    return isPlayerImmobilized(world.player.auras);
   }
-  // A released spirit (ghost) moves, turns, and drives the camera like the living; only
-  // a corpse that has not yet released its spirit is frozen. Combat stays gated by
-  // `dead` (and re-validated server-side), so this only unlocks locomotion for ghosts.
   function movementFrozen(): boolean {
-    return world.player.dead && !world.player.ghost;
+    return isMovementFrozen(world.player);
   }
 
   // Pop a "Can't move!" note over the player when a movement command lands while
@@ -3835,10 +3832,11 @@ async function startGame(
 
   let last = performance.now();
   let acc = 0;
-  let onlineInputEchoMs = 0;
+  // Smoothed input-echo RTT plus its jitter (mean absolute deviation of the
+  // samples), feeding the latency compensation and the perf overlay's rows.
+  const inputEcho = new InputEchoTracker();
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
-  let onlineJitterMs = 0;
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
@@ -4013,16 +4011,9 @@ async function startGame(
   // commit the final camera yaw to the player facing (see mouselook_release.ts
   // and camera_driven_facing.ts).
   let prevCameraDrivenFacing = false;
-  // The release yaw, latched until a sim tick actually commits it. Offline a tick
-  // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
-  // the release frame would drop the one-shot when release lands on a zero-tick
-  // frame. Held here until consumed, then cleared.
+  // The release yaw is held until a sim tick consumes it because release can
+  // land on an offline frame with no tick.
   let pendingReleaseFacing: number | null = null;
-  // Local integration of keyboard turns online, streamed on the facing channel
-  // (see the module docs). The module also decides the per-frame wire turn-flag
-  // gating (suppressTurnFlags): zeroed while the streamed heading owns the
-  // channel, passed through on the one engage-edge frame so the server still
-  // sees a manual turn (breaks /follow, marks anti-AFK activity).
   const kbTurn = newKeyboardTurnState();
   const kbTurnArgs: KeyboardTurnArgs = {
     turnLeft: false,
@@ -4032,7 +4023,18 @@ async function startGame(
     serverFacing: 0,
     releaseCommitAcknowledged: false,
     echoMs: 0,
+    snapshotIntervalMs: 50,
+    movementWireVersion: 1,
     frameDt: 0,
+  };
+  const selfMotionGateArgs: SelfMotionGateArgs = {
+    disabled: SELF_MOTION_DISABLED,
+    spectating: null,
+    movementFrozen: false,
+    playerImmobilized: false,
+    posX: 0,
+    climbing: undefined,
+    riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
@@ -4347,19 +4349,17 @@ async function startGame(
     meter: perfMeter,
     getOnline: () => online,
     getEntityCount: () => world.entities.size,
-    getEchoMs: () => onlineInputEchoMs,
-    getJitterMs: () => onlineJitterMs,
+    getEchoMs: () => inputEcho.echoMs,
+    getJitterMs: () => inputEcho.jitterMs,
     getPredLeadMs: () => renderer.selfMotionLeadMs,
     getApm: () => inputMeter.apm(performance.now()),
   });
-
   function visualFacingFor(
     mi: ReturnType<typeof input.readMoveInput>,
     baseFacing: number,
   ): number | null {
     return !movementFrozen() ? diagonalMovementVisualFacing(mi, baseFacing) : null;
   }
-
   const perfNetworkStats = {
     connected: false,
     snapInterval: 0,
@@ -4367,8 +4367,8 @@ async function startGame(
     alpha: 0,
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
-  const onlineStopPosition = { x: 0, z: 0 };
-
+  const movementPrediction = new MovementPredictionPipeline(world.cfg.seed, world.riftCollisionToken);
+  if (online) movementPrediction.connect(online);
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
@@ -4663,63 +4663,63 @@ async function startGame(
       mouselook,
       world.player.pos,
       world.player.facing,
-      onlineInputEchoMs,
+      inputEcho.echoMs,
     );
     const pe = world.player;
-    const alpha =
-      net.lastSnapAt > 0
-        ? Math.min(1.25, (performance.now() - net.lastSnapAt) / Math.max(20, net.snapInterval))
-        : 1;
+    const alpha = snapshotAlpha(performance.now(), net.lastSnapAt, net.snapInterval);
     // facing interp capped at 1 - extrapolating angles past the snapshot oscillates
-    const interpServerFacing =
-      pe.prevFacing + wrapAngle(pe.facing - pe.prevFacing) * Math.min(1, alpha);
+    const interpServerFacing = interpolatedOnlineSelfFacing(net, pe, alpha);
     const foreignFacing = movementFacing ?? resolved.facing;
-    // Keyboard turns stream their local heading like mouselook, with turn flags
-    // suppressed after the engage edge so the server never integrates twice.
+    if (edgeReleaseFacing !== null) seedKeyboardTurnRelease(kbTurn, edgeReleaseFacing);
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
-    kbTurnArgs.sentFacing = foreignFacing;
+    kbTurnArgs.sentFacing =
+      (!movementFrozen() ? (renderFacing ?? controllerFacing) : null) ?? resolved.facing;
     kbTurnArgs.serverFacing = interpServerFacing;
     kbTurnArgs.releaseCommitAcknowledged = net.inputFacingAcknowledged(kbTurn.pendingReleaseCommit);
-    kbTurnArgs.echoMs = onlineInputEchoMs;
+    kbTurnArgs.echoMs = inputEcho.echoMs;
+    kbTurnArgs.snapshotIntervalMs = net.snapInterval;
+    kbTurnArgs.movementWireVersion = net.movementWireVersion;
     kbTurnArgs.frameDt = frameDt;
     const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
-    // wireFacing, not kbFacing: only input-derived headings go on the wire.
-    // Streaming fallback glide corrections (which chase the mirror) would
-    // close a feedback loop through the server that at high RTT never
-    // converges (the observed self-spinning resonance under netem).
     const netFacing = foreignFacing ?? kbTurn.wireFacing;
+    const localFacing = netFacing ?? kbFacing;
     const onlineRenderFacing =
-      visualFacingFor(resolved.mi, netFacing ?? kbFacing ?? interpServerFacing) ?? netFacing;
-    const wasTranslating = hasTranslationalMoveInput(net.moveInput);
+      visualFacingFor(resolved.mi, localFacing ?? interpServerFacing) ?? localFacing;
+    const turnEngageEdge =
+      kbFacing !== null &&
+      (resolved.mi.turnLeft || resolved.mi.turnRight) &&
+      !kbTurn.suppressTurnFlags;
     Object.assign(net.moveInput, resolved.mi);
     if (kbTurn.suppressTurnFlags) {
       net.moveInput.turnLeft = false;
       net.moveInput.turnRight = false;
     }
-    net.setMouselookFacing(netFacing);
-    // Online streams facing every frame, so the mouselook release yaw is
-    // consumed here; drop it so it is not re-applied next frame.
-    pendingReleaseFacing = null;
-    const stoppedTranslating = wasTranslating && !hasTranslationalMoveInput(net.moveInput);
-    const movementPositionReady = renderer.copySelfRenderPosition(onlineStopPosition);
-    net.setMovementPosition(movementPositionReady ? onlineStopPosition : null);
-    const stopPosition =
-      stoppedTranslating && movementPositionReady ? onlineStopPosition : undefined;
-    if (net.flushInput(performance.now(), stopPosition)) perf.markInputSent(performance.now());
+    selfMotionGateArgs.spectating = net.spectating;
+    selfMotionGateArgs.movementFrozen = movementFrozen();
+    selfMotionGateArgs.playerImmobilized = playerImmobilized();
+    selfMotionGateArgs.posX = pe.pos.x;
+    selfMotionGateArgs.climbing = pe.climbing;
+    selfMotionGateArgs.riftFloor = net.riftFloor;
+    const selfPredictionEnabled =
+      !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
+    movementPrediction.prepare(net, pe, selfPredictionEnabled);
+    const movementFrameEmitted = sendOnlineMovementFrame(
+      net,
+      movementPrediction,
+      frameDt,
+      net.moveInput,
+      netFacing,
+      performance.now(),
+      turnEngageEdge,
+    );
+    // On v2 this duration includes the fixed-tick sampler phase before the frame is emitted.
+    if (movementFrameEmitted) perf.markInputSent(performance.now());
+    if (movementFrameEmitted) pendingReleaseFacing = null;
     const echoSamples = net.consumeInputEchoSamples();
-    for (const sample of echoSamples) {
-      if (Number.isFinite(sample) && sample >= 0) {
-        // Jitter is the mean absolute deviation against the PRIOR mean (measuring
-        // it after the EMA update would bias it low).
-        const prevMean = onlineInputEchoMs;
-        onlineInputEchoMs = prevMean === 0 ? sample : prevMean + 0.2 * (sample - prevMean);
-        const dev = prevMean === 0 ? 0 : Math.abs(sample - prevMean);
-        onlineJitterMs = onlineJitterMs === 0 ? dev : onlineJitterMs + 0.2 * (dev - onlineJitterMs);
-      }
-      perf.markInputEcho(sample);
-    }
+    inputEcho.fold(echoSamples);
+    for (const sample of echoSamples) perf.markInputEcho(sample);
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
     const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
@@ -4786,39 +4786,24 @@ async function startGame(
     const netPipeline = net.netPipeline();
     netPipeline.onAnimationFrame(now);
     perf.setNetPipelineSource(netPipeline);
-    // Display-only self extrapolation (src/render/self_motion.ts). Off while
-    // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
-    // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
-    // fear steer and the charge/follow modes run server-side only), and inside
-    // a delve (the portcullis door clamps are not mirrored client-side). Rifts
-    // are predicted too now (issue #3479): the predictor strips/reapplies the
-    // raised-tier lift and resolves rift walls itself (net.riftFloor +
-    // net.riftCollisionToken), and the ice slide suspends prediction on its own
-    // via Entity.riftSliding (self_motion.ts); no gate needed here for it.
-    const selfMotion: SelfMotionFrame | null = SELF_MOTION_DISABLED
-      ? null
-      : selfMotionFrameBuffer.write(
-          net.connected &&
-            net.spectating === null &&
-            !movementFrozen() &&
-            !playerImmobilized() &&
-            !isDelvePos(pe.pos.x) &&
-            selfMotionAllowedAt(pe.pos.x, net.riftFloor) &&
-            // A ledge climb is a server-owned scripted move the client does
-            // not re-simulate: predicting a fall through it would fight the
-            // authoritative pull-up and show the correction as a stutter.
-            pe.climbing !== true,
-          resolved.mi,
-          net.movementPositionAuthority,
-          netFacing ?? interpServerFacing,
-          onlineInputEchoMs,
-          onlineJitterMs,
-          alpha,
-          elapsedFrameDt,
-          Math.max(0, cameraLastSnapAge),
-          net.snapInterval,
-          net.riftFloor,
-        );
+    const selfMotion =
+      net.movementWireVersion === 2
+        ? movementPrediction.display()
+        : SELF_MOTION_DISABLED
+          ? null
+          : selfMotionFrameBuffer.write(
+              selfPredictionEnabled,
+              resolved.mi,
+              net.movementPositionAuthority,
+              netFacing ?? interpServerFacing,
+              inputEcho.echoMs,
+              inputEcho.jitterMs,
+              alpha,
+              frameDt,
+              Math.max(0, cameraLastSnapAge),
+              net.snapInterval,
+              net.riftFloor,
+            );
     traceStart = perf.startTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);
@@ -4856,7 +4841,7 @@ async function startGame(
         // show it immediately; without it the click-move yaw would lag
         // the predicted position by a round trip and corners would slide.
         net.spectating === null ? onlineRenderFacing : null,
-        adaptiveSelfAlphaLead(onlineInputEchoMs, onlineJitterMs, net.snapInterval),
+        adaptiveSelfAlphaLead(inputEcho.echoMs, inputEcho.jitterMs, net.snapInterval),
         selfMotion,
         selfAuthoritativeDiscontinuity,
         drawWorld,

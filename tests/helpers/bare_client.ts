@@ -71,6 +71,16 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   };
   c.accountAdmin = false;
   c.petSpecialCommandsSupported = false;
+  c.movementWireVersion = 1;
+  c.reconAuthoritativeX = null;
+  c.reconAuthoritativeY = null;
+  c.reconAuthoritativeZ = null;
+  c.reconPreviousAuthoritativeFacing = null;
+  c.reconAuthoritativeFacing = null;
+  c.reconAckClientTick = -1;
+  c.reconOverrideEpoch = 0;
+  c.reconOverrideActive = false;
+  c.reconMoveSpeedMult = 1;
   c.xp = 0;
   c.lifetimeXp = 0;
   c.prestigeRank = 0;
@@ -232,6 +242,8 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.onDisconnect = null;
   c.onConnectionLost = null;
   c.onReconnected = null;
+  c.onMovementWireNegotiated = null;
+  c.onMovementWireNeutral = null;
 
   Object.assign(c, rest);
   return c;

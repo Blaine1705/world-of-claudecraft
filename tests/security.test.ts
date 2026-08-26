@@ -116,6 +116,7 @@ describe('websocket authentication', () => {
       clientSeed: '',
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
+      movementWire: 2,
     });
   });
 
@@ -127,6 +128,7 @@ describe('websocket authentication', () => {
       clientSeed: 'seed-123',
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
+      movementWire: 2,
     });
   });
 });

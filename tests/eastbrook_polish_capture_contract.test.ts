@@ -337,8 +337,11 @@ interface AttributionTargetFixture {
 // drop-rate and artifact-evidence tree: the composite now seals both the
 // prior Litany evidence inputs and the battleground flag/rune
 // entity_view_policy_core.ts bytes. No capture was retaken.
+// Re-minted for the PR #3647 movement-reconciliation merge: renderer.ts now
+// combines the extracted self-render core, exact-match prediction wiring and
+// the release batch's rift collision token thread. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '7aa6993676c327765384181307142ba6865a3aa0cd2389fdf63ed01afa1ee804';
+  '1784cef7953a042726b962fc1ca28b76fed1692ddb81d6e72f75eabc4119b157';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

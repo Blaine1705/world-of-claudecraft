@@ -9,7 +9,6 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
-import { isStunned } from '../src/sim/combat/cc';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
@@ -54,7 +53,6 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
-import { hasTranslationalMoveInput, parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -296,21 +294,16 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import { MovementInputTimelineTickStats } from './movement_input_timeline_stats';
 import {
-  applyBufferedMovementFrames,
-  type BufferedMovementFrame,
-  bufferMovementFrame,
-  type MovementTimelineState,
-  resetMovementTimeline,
-} from './movement_input_timeline';
+  applyMovementInputFrame,
+  consumeMovementFramesV2,
+  createMovementInputSessionState,
+  type MovementInputSessionState,
+  resetMovementInputSessionState,
+} from './movement_input_timeline_v2';
+import { reconciliationSelfWire, updateOverrideEpochs } from './movement_reconciliation_wire';
 import { type MovementPositionState, resetMovementPosition } from './movement_position';
-import {
-  beginMovementStop,
-  finishMovementStops,
-  type PendingMovementStop,
-  parseMovementStopTarget,
-  prepareMovementStops,
-} from './movement_stop';
 import {
   classifyMsgLane,
   consumeLaneToken,
@@ -334,6 +327,10 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
+import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+
+export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -941,7 +938,7 @@ const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
-export interface ClientSession {
+export interface ClientSession extends MovementInputSessionState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -1047,11 +1044,7 @@ export interface ClientSession {
   lastReceivedInputSeq: number;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
-  pendingMovementStop?: PendingMovementStop | null;
-  pendingMovementFrames?: BufferedMovementFrame[];
-  movementTimeline?: MovementTimelineState | null;
   movementPositionState?: MovementPositionState | null;
-  movementProtocolV2?: boolean;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -1689,35 +1682,6 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// A frozen server tick-loop profile captured over one on-demand window, plus the
-// context needed to read it: when it was taken, how long the window was, and the
-// crowd it was taken under. The admin dashboard renders this.
-export interface PerfCaptureResult {
-  captureId: string; // server-generated correlation id returned when the window starts
-  capturedAt: number; // epoch ms the window closed
-  durationMs: number; // the (clamped) capture window length
-  loopCallbacks: number; // setInterval callbacks observed during the window
-  simTicks: number; // authoritative sim ticks run across those callbacks
-  catchUpCallbacks: number; // callbacks that ran more than one sim tick
-  maxTicksPerCallback: number;
-  online: number; // live sessions at capture close
-  simEntities: number; // sim entity count at capture close
-  aggroVisitsTotal: number; // aggro-scan player visits summed across the window
-  aggroVisitsMaxPerTick: number; // peak aggro-scan player visits in any one tick
-  threatVisitsTotal: number; // threat-table entry visits summed across the window
-  threatVisitsMaxPerTick: number; // peak threat-table entry visits in any one tick
-  profile: ReturnType<TickProfiler['profile']>;
-}
-
-// The /admin/api/perf/tick status envelope: whether a capture is currently running
-// (with when it ends, so the UI can show a countdown), plus the last frozen result.
-export interface PerfCaptureStatus {
-  captureId: string | null; // id of the in-flight capture, or null while idle
-  capturing: boolean;
-  endsAt: number | null; // epoch ms the in-flight capture closes, or null
-  last: PerfCaptureResult | null;
-}
-
 // The creation fee as WHOLE GOLD, computed once for the two refusal emits.
 //
 // The client matcher splices an INTEGER (src/ui/server_i18n.ts guild.createFee,
@@ -1882,10 +1846,10 @@ export class GameServer {
   // sim.time (seconds) of the last head that carried tickHz; throttles the
   // scalar to TICK_HZ_HEAD_INTERVAL_S so it does not ride every 20 Hz head.
   private lastTickHzHeadTime: number | null = null;
-  // Rolling per-phase loop timing, localizes a stutter to a phase. Always-on
-  // (the hot path allocates nothing); read via perfProfile() for admin/ops.
+  // Always-on allocation-free per-phase timing, read via perfProfile() for admin/ops.
   private readonly tickProfiler = new TickProfiler([
     'stale',
+    'movementV2',
     'tick',
     'events',
     'antibot',
@@ -1893,13 +1857,9 @@ export class GameServer {
     'bcastGrid',
     'bcastSelf',
     'social',
-    // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
-    // Populated only while the detailed capture is active (an on-demand admin
-    // capture or PERF_TICK_LOG=1); zero otherwise.
+    // Detailed sim, zone, and self-wire buckets are populated only during captures.
     ...SIM_LAP_PHASES,
-    // Per-zone breakdown of the mob.update phase, with the same capture gating.
     ...SIM_MOB_ZONE_PHASES,
-    // Per-key-group breakdown of the bcastSelf phase, same capture gating.
     ...SELF_WIRE_PHASES,
   ]);
   // Detailed-timing switch. When true, the per-client broadcast sub-phase timing
@@ -1948,6 +1908,7 @@ export class GameServer {
   // the latest tick's aggro/threat visit counts surfaced on the [perf] heartbeat, plus
   // the four capture-window accumulators frozen into a PerfCaptureResult.
   private readonly mobScanTickStats = createMobScanTickStats();
+  private readonly movementTimelineTickStats = new MovementInputTimelineTickStats();
   // Ops kill-switch: SELF_SNAPSHOT_FULL=1 re-diffs every heavy self field every
   // tick (pre-optimization behavior), for A/B benchmarking or rollback.
   private readonly heavySelfGate = process.env.SELF_SNAPSHOT_FULL !== '1';
@@ -2761,14 +2722,21 @@ export class GameServer {
           let ticksRun = 0;
           while (acc >= DT) {
             this.clearStaleInputs();
-            applyBufferedMovementFrames(this.sim, this.clients.values());
-            prepareMovementStops(this.sim, this.clients.values());
             lap('stale');
             this.riftUpgrader.drain(this.sim.ctx);
             this.riftAssets.drain(this.sim.ctx);
+            lap('tick');
+            consumeMovementFramesV2(this.sim, this.clients.values());
+            this.movementTimelineTickStats.fold(
+              this.clients.values(),
+              this.perfCaptureDeadlineNs !== null,
+            );
+            lap('movementV2');
             if (this.perfDetailActive) this.simLapMark = process.hrtime.bigint();
             const events = this.sim.tick();
-            finishMovementStops(this.sim, this.clients.values());
+            lap('tick');
+            updateOverrideEpochs(this.sim, this.clients.values());
+            lap('movementV2');
             this.riftUpgrader.observe(this.sim.ctx);
             this.riftAssets.observe(this.sim.ctx);
             lap('tick');
@@ -3389,8 +3357,6 @@ export class GameServer {
   private clearStaleInputs(): void {
     for (const session of this.clients.values()) {
       if (this.sim.time - session.lastInputAt <= STALE_INPUT_SECONDS) continue;
-      session.pendingMovementStop = null;
-      resetMovementTimeline(session);
       resetMovementPosition(session);
       const meta = this.sim.meta(session.pid);
       if (!meta) continue;
@@ -3622,6 +3588,7 @@ export class GameServer {
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
+        movementWireVersion?: 1 | 2;
         generalChatRateLimit?: GeneralChatRateLimit | null;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
@@ -3785,11 +3752,8 @@ export class GameServer {
       lastInputSeq: 0,
       lastReceivedInputSeq: 0,
       lastInputAt: this.sim.time,
-      pendingMovementStop: null,
-      pendingMovementFrames: [],
-      movementTimeline: null,
       movementPositionState: null,
-      movementProtocolV2: false,
+      ...createMovementInputSessionState(meta.movementWireVersion),
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
@@ -3913,6 +3877,7 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: session.movementWireVersion,
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -4032,10 +3997,8 @@ export class GameServer {
     session.lastInputSeq = 0;
     session.lastReceivedInputSeq = 0;
     session.lastInputAt = this.sim.time;
-    session.pendingMovementStop = null;
-    resetMovementTimeline(session);
     resetMovementPosition(session);
-    session.movementProtocolV2 = false;
+    resetMovementInputSessionState(session, meta.movementWireVersion);
     // Load-bearing for every rev + cadence gate (market, mail, corder):
     // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
     // each gate's `sent.X === undefined` arm forces both dueness and a
@@ -4075,6 +4038,7 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      movementWire: session.movementWireVersion,
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
@@ -5708,6 +5672,7 @@ export class GameServer {
     this.perfCaptureCatchUpCallbacks = 0;
     this.perfCaptureMaxTicksPerCallback = 0;
     resetMobScanCaptureAccumulators(this.mobScanTickStats);
+    this.movementTimelineTickStats.resetCapture();
     this.perfCaptureEndsAtMs = Date.now() + clamped;
     this.perfCaptureDeadlineNs = process.hrtime.bigint() + BigInt(clamped) * 1_000_000n;
     return this.perfCaptureStatus();
@@ -5781,6 +5746,7 @@ export class GameServer {
       aggroVisitsMaxPerTick: this.mobScanTickStats.aggroVisitsMaxPerTick,
       threatVisitsTotal: this.mobScanTickStats.threatVisitsTotal,
       threatVisitsMaxPerTick: this.mobScanTickStats.threatVisitsMaxPerTick,
+      ...this.movementTimelineTickStats.captureTotals(),
       profile: this.tickProfiler.profile(),
     };
     this.perfCaptureDeadlineNs = null;
@@ -5803,7 +5769,7 @@ export class GameServer {
     console.log(
       `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickHz=${this.tickHz == null ? 'n/a' : round2(this.tickHz)} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
         ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
-        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits}`,
+        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits} ${this.movementTimelineTickStats.heartbeatTokens()}`,
     );
     // The sim.tick() internal breakdown, mean-sorted so the phase that actually eats
     // the average (not just a spike) leads. Populated only while detailed timing is on.
@@ -6510,43 +6476,7 @@ export class GameServer {
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
-      const frame = parseMoveInputFrame(msg);
-      if (msg.mv === 2) session.movementProtocolV2 = true;
-      const bufferedMovementFrame =
-        session.movementProtocolV2 === true &&
-        bufferMovementFrame(
-          sim,
-          session,
-          msg.mt,
-          frame.moveInput,
-          frame.facing,
-          msg.stop,
-          msg.seq,
-          msg.p,
-        );
-      if (!bufferedMovementFrame) {
-        const continuesPendingStop =
-          session.pendingMovementStop && !hasTranslationalMoveInput(frame.moveInput);
-        const wasTranslating = hasTranslationalMoveInput(meta.moveInput);
-        const stopTarget =
-          !continuesPendingStop &&
-          e.onGround &&
-          !frame.moveInput.jump &&
-          wasTranslating &&
-          !hasTranslationalMoveInput(frame.moveInput)
-            ? parseMovementStopTarget(msg.stop, e.pos)
-            : null;
-        if (stopTarget) {
-          if (!beginMovementStop(sim, session, stopTarget, frame.moveInput)) {
-            session.pendingMovementStop = null;
-            Object.assign(meta.moveInput, frame.moveInput);
-          }
-        } else if (!continuesPendingStop) {
-          session.pendingMovementStop = null;
-          Object.assign(meta.moveInput, frame.moveInput);
-        }
-      }
-      session.lastInputAt = sim.time;
+      const frame = applyMovementInputFrame(session, meta, e, msg, sim.time);
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
         // R9: the client seq is a per-send increment on an ordered socket, so
@@ -6561,22 +6491,7 @@ export class GameServer {
           );
         }
         session.lastReceivedInputSeq = Math.max(session.lastReceivedInputSeq, seq);
-        if (!bufferedMovementFrame) session.lastInputSeq = Math.max(session.lastInputSeq, seq);
-      }
-      // A released spirit turns with the camera like the living; only a corpse that
-      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
-      // this the server drops the ghost's mouselook facing and its run feels inverted.
-      // A stun locks facing too (issue #2426): the offline kernel already blocks its
-      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
-      // this out-of-band channel and must be rejected here, the authoritative side,
-      // not trusted to a client that could simply keep sending it.
-      if (
-        !bufferedMovementFrame &&
-        frame.facing !== null &&
-        (!e.dead || e.ghost) &&
-        !isStunned(e)
-      ) {
-        e.facing = frame.facing;
+        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
@@ -8910,6 +8825,7 @@ export class GameServer {
         anchorSession.movementPositionState?.authorityActive === true
           ? 1
           : 0,
+      ...(session.spectating ? {} : reconciliationSelfWire(session, p)),
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the
     // real pool aside): self-only, and omitted at rest per the omit-when-default
