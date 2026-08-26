@@ -17,6 +17,7 @@ import {
   isKtx2MipReleaseEnabled,
   KTX2_MIP_EXEMPT_MODEL_ROOTS,
   KTX2_MIP_RELEASABLE_MODEL_ROOTS,
+  KTX2_RESTORE_MAX_WAIT_MS,
   type Ktx2MipLevel,
   ktx2MipReleaseInternalsForTest,
   ktx2MipsOnContextLost,
@@ -252,6 +253,101 @@ describe('context-loss restore story', () => {
     await ktx2MipsRestored();
     // Immediately after the gate, the real chain is already in place.
     expect(tex.mipmaps as unknown).toBe(freshMips);
+  });
+
+  it('bounds the curtain wait so a slow/contended backlog cannot hold it past maxWaitMs, and the abandoned restore still lands (graphics-rebuild stall)', async () => {
+    const tex = armedTexture(2);
+    simulateUpload(tex);
+    const freshMips = makeMips(2);
+    let transcodeSettled = false;
+    setKtx2MipRederive(async (source) => {
+      structuredClone(source, { transfer: [source] });
+      // A long-session graphics-preset switch can carry many textures still
+      // contending for the shared transcode worker pool well past any single
+      // curtain's patience: simulate one still in flight when the bound hits.
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      transcodeSettled = true;
+      return { mipmaps: freshMips, format: tex.format as number };
+    });
+    ktx2MipsOnContextLost();
+    const settled = await ktx2MipsRestored(10);
+    // The bound must have won the race: this call cannot itself have blocked
+    // for the transcode's full 30ms, and must report that it timed out.
+    expect(settled).toBe(false);
+    expect(transcodeSettled).toBe(false);
+    // The restore keeps running in the background...
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('restoring');
+    // ...and lands correctly once it actually finishes: giving up on the wait
+    // must not corrupt or drop the in-flight restore itself.
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(transcodeSettled).toBe(true);
+    expect(tex.mipmaps as unknown).toBe(freshMips);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
+  });
+
+  it('the default bound is KTX2_RESTORE_MAX_WAIT_MS: the real (no-argument) main.ts call site is actually bounded', async () => {
+    vi.useFakeTimers();
+    try {
+      const tex = armedTexture(2);
+      simulateUpload(tex);
+      setKtx2MipRederive(() => new Promise<never>(() => {})); // never settles
+      ktx2MipsOnContextLost();
+      let settled: boolean | null = null;
+      void ktx2MipsRestored().then((v) => {
+        settled = v;
+      });
+      await vi.advanceTimersByTimeAsync(KTX2_RESTORE_MAX_WAIT_MS - 1);
+      expect(settled).toBeNull();
+      await vi.advanceTimersByTimeAsync(1);
+      expect(settled as boolean | null).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("pins KTX2_RESTORE_MAX_WAIT_MS to the tightest of this rebuild curtain's stage bounds", () => {
+    // Below FAR_VISTA_ENTRY_MAX_WAIT_MS (4000, far_terrain.ts) and renderer.ts's
+    // private VIEW_PREWARM_MAX_MS (3000, pinned by tests/prewarm_policy.test.ts)
+    // on purpose: this stage protects a purely cosmetic, self-healing transient
+    // (a stub-black texture that repaints itself once its restore lands), while
+    // the other two protect a horizon pop and real first-draw links, so it is
+    // the one that can most afford to give up first.
+    expect(KTX2_RESTORE_MAX_WAIT_MS).toBe(3000);
+  });
+
+  it('an Infinity bound waits outright instead of firing almost immediately (the setTimeout(fn, Infinity) coercion trap)', async () => {
+    const tex = armedTexture(2);
+    simulateUpload(tex);
+    const freshMips = makeMips(2);
+    setKtx2MipRederive(async (source) => {
+      structuredClone(source, { transfer: [source] });
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return { mipmaps: freshMips, format: tex.format as number };
+    });
+    ktx2MipsOnContextLost();
+    const settled = await ktx2MipsRestored(Number.POSITIVE_INFINITY);
+    expect(settled).toBe(true);
+    expect(tex.mipmaps as unknown).toBe(freshMips);
+  });
+
+  it('starts restores most-recently-armed first, so a session-wide backlog does not starve the zone the player is standing in', () => {
+    enableKtx2MipRelease(() => false);
+    const older = makeTexture(2);
+    stashKtx2TranscodeSource(older, new Uint8Array([1]).buffer);
+    armKtx2MipRelease(older);
+    simulateUpload(older);
+    const newer = makeTexture(2);
+    stashKtx2TranscodeSource(newer, new Uint8Array([2]).buffer);
+    armKtx2MipRelease(newer);
+    simulateUpload(newer);
+
+    const order: number[] = [];
+    setKtx2MipRederive((source) => {
+      order.push(new Uint8Array(source)[0] as number);
+      return new Promise<never>(() => {}); // never settles; call order is all this pins
+    });
+    ktx2MipsOnContextLost();
+    expect(order).toEqual([2, 1]);
   });
 
   it('does not restart a transcode already in flight on a second loss', () => {
@@ -590,7 +686,9 @@ describe('wiring pins (source scans, anchor style per docs/qa-gate.md)', () => {
       between(mainSrc, "addEventListener('webglcontextlost'", 'webglcontextrestored'),
     ).toContain('ktx2MipsOnContextLost()');
     // (3) The curtain gate must sit INSIDE the rebuild prewarm step, after the
-    // far-vista hold, so the reveal never shows stub-black world textures.
+    // far-vista hold, so the reveal normally shows no stub-black world
+    // textures (bounded by KTX2_RESTORE_MAX_WAIT_MS: a large session-wide
+    // backlog can still outlast it, see the bounded-wait tests above).
     expect(between(mainSrc, 'prewarmRenderer: async (next)', 'validateRenderer')).toContain(
       'await ktx2MipsRestored()',
     );

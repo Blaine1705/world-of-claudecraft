@@ -3038,8 +3038,8 @@ async function startGame(
       // reveals a finished horizon instead of easing the fog out on screen.
       await next.farVistaReady();
       // Released KTX2 mip chains re-transcode after the recycle's context
-      // loss; hold the curtain until they are back so the reveal never shows
-      // stub-black world textures (settles on failure too, never hangs).
+      // loss; hold the curtain (bounded, see KTX2_RESTORE_MAX_WAIT_MS) until
+      // they are back so the reveal normally shows no stub-black textures.
       await ktx2MipsRestored();
     },
     validateRenderer: (next) => {
