@@ -25,15 +25,12 @@
 //   recovery-scan  the provisional hold armed synchronously at a fresh join,
 //                  before the pending-row scan says whether a debited but
 //                  unapplied purchase is even waiting. Bounded by the scan.
-//   recovery-drive a scan that ANSWERED YES, waiting for a drive slot. Phase
-//                  14 moved row work out of the scan's gate, so this wait is
-//                  bounded by the drive queue rather than by anything internal:
-//                  under the restart-storm-after-an-outage the gate exists for,
-//                  it can exceed a minute. The row is proven pending, so the
-//                  money may already have moved and the claim is the SAME one
-//                  'settling' makes; it carries the same bound rather than the
-//                  stuck-promise backstop, which would open the gold rail over
-//                  a live debit while the drive was merely queued.
+//   recovery-drive a scan that ANSWERED YES, waiting for a drive slot. This is
+//                  deliberately NON-YIELDING: the database has proved an open
+//                  row whose older attempt may already have debited, and queue
+//                  age cannot disprove that debit. The bounded coordinator owns
+//                  and eventually releases this hold; opening gold merely
+//                  because the queue is slow can force a paid grant unresolved.
 //   settling       an AMBIGUOUS outcome handed to the background retry. The
 //                  one claim with no internal bound: the service may be
 //                  unreachable for hours.
@@ -46,7 +43,8 @@
 //   spend cannot outlive SERVICE_TIMEOUT_MS), so it fires only when something
 //   is genuinely stuck and never in normal operation.
 //
-//   AMBIGUITY_HOLD_MAX_MS is the argued trade, and it is deliberately not a
+//   AMBIGUITY_HOLD_MAX_MS is the argued trade for an ACTUAL ambiguous service
+//   response, and it is deliberately not a
 //   number picked here. It borrows its DURATION from the price cache's
 //   staleness bound (server/storage_store_cache.ts), the span the packet has
 //   already ruled is long enough that a Claudium rail which has gone quiet for
@@ -101,16 +99,14 @@ export const AMBIGUITY_HOLD_MAX_MS = STORAGE_PRICE_MAX_STALE_MS;
 
 /** How long a hold of this reason may keep the gold rail shut.
  *
- *  Two reasons share AMBIGUITY_HOLD_MAX_MS because they are the same claim:
- *  a purchase whose money MAY ALREADY HAVE MOVED and only the service can
- *  say. 'settling' reaches that state from an ambiguous spend; 'recovery-drive'
- *  reaches it from a scan that PROVED a pending row exists and has not yet
- *  been able to ask. Everything else is bounded by construction and gets the
- *  stuck-promise backstop instead. */
+ *  A scanned open row does not yield while queued: elapsed local queue time is
+ *  no evidence about whether its older attempt debited. Once a recovery drive
+ *  actually calls the service, the normal `purchase`/`settling` transitions
+ *  apply. Everything else is bounded by construction or by the explicit
+ *  post-response ambiguity policy. */
 export function ladderHoldMaxMs(reason: LadderHoldReason): number {
-  return reason === 'settling' || reason === 'recovery-drive'
-    ? AMBIGUITY_HOLD_MAX_MS
-    : WEDGED_HOLD_MAX_MS;
+  if (reason === 'recovery-drive') return Number.POSITIVE_INFINITY;
+  return reason === 'settling' ? AMBIGUITY_HOLD_MAX_MS : WEDGED_HOLD_MAX_MS;
 }
 
 /** Does this hold still refuse a GOLD bank_buy_slots at `nowMs`?

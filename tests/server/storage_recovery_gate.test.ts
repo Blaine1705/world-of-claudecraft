@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { WEDGED_HOLD_MAX_MS } from '../../server/storage_ladder_hold';
+import { AMBIGUITY_HOLD_MAX_MS, WEDGED_HOLD_MAX_MS } from '../../server/storage_ladder_hold';
 import type { StoragePurchaseRow } from '../../server/storage_purchase_db';
 import {
   configureStoragePurchaseRuntime,
@@ -131,6 +131,79 @@ describe('bounded storage recovery integration', () => {
     expect(heldDuringSpend).toBe(true);
     expect(storagePurchaseInFlight(51)).toBe(false);
     expect(runtime.db.discardWithoutDebit).toBeDefined();
+  });
+
+  it('keeps a scanned tail row gold-closed past the ambiguity horizon while drive slots are busy', async () => {
+    type SpendOutcome = Awaited<ReturnType<StoragePurchaseHost['spend']>>;
+    const spendGates = new Map<number, ReturnType<typeof deferred<SpendOutcome>>>();
+    const spendStarted: number[] = [];
+    const scans = new Map<number, number>();
+    const runtime = host({
+      spend: (input) => {
+        spendStarted.push(input.accountId);
+        const gate = deferred<SpendOutcome>();
+        spendGates.set(input.accountId, gate);
+        return gate.promise;
+      },
+      db: {
+        ...host().db,
+        openFor: async (characterId) => {
+          const count = (scans.get(characterId) ?? 0) + 1;
+          scans.set(characterId, count);
+          return count === 1 ? row(characterId) : null;
+        },
+      },
+    });
+    configureStoragePurchaseRuntime(() => runtime);
+    const clock = vi.spyOn(Date, 'now');
+    const armedAt = 3_000_000;
+    clock.mockReturnValue(armedAt);
+    try {
+      for (const characterId of [71, 72, 73]) kickStoragePurchaseRecovery(characterId);
+      await waitFor(() => {
+        const metrics = storagePurchaseRecoveryMetrics();
+        return metrics.driveActive === 2 && metrics.driveQueued === 1;
+      });
+      const queuedCharacter = [71, 72, 73].find((id) => !spendStarted.includes(id));
+      expect(queuedCharacter).toBeDefined();
+
+      // A scan has proved this exact row open. Neither the 5s operational slot
+      // target nor the 10m alert horizon is evidence that its older attempt did
+      // not debit, so queue age must never open the conflicting gold rung.
+      clock.mockReturnValue(armedAt + AMBIGUITY_HOLD_MAX_MS * 2);
+      expect(storagePurchaseInFlight(queuedCharacter!)).toBe(true);
+
+      const refused: SpendOutcome = {
+        result: {
+          granted: false,
+          balance: 0,
+          costClaudium: 100,
+          reason: 'insufficient_balance',
+        },
+        neverReached: false,
+      };
+      spendGates.get(spendStarted[0]!)?.resolve(refused);
+      await waitFor(() => spendStarted.includes(queuedCharacter!));
+      // Admission restarts the active-operation clock without a one-turn gap.
+      expect(storagePurchaseInFlight(queuedCharacter!)).toBe(true);
+
+      for (const gate of spendGates.values()) gate.resolve(refused);
+      await waitFor(() => storagePurchaseRecoveryMetrics().tracked === 0);
+      expect(storagePurchaseInFlight(queuedCharacter!)).toBe(false);
+    } finally {
+      for (const gate of spendGates.values()) {
+        gate.resolve({
+          result: {
+            granted: false,
+            balance: 0,
+            costClaudium: 100,
+            reason: 'insufficient_balance',
+          },
+          neverReached: false,
+        });
+      }
+      clock.mockRestore();
+    }
   });
 
   it('never spends a new key while another key is open for the character', async () => {

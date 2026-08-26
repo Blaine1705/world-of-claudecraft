@@ -60,10 +60,14 @@ describe('ladderHoldBlocksGold', () => {
     expect(ladderHoldMaxMs('settling')).toBe(STORAGE_PRICE_MAX_STALE_MS);
     expect(ladderHoldMaxMs('purchase')).toBe(WEDGED_HOLD_MAX_MS);
     expect(ladderHoldMaxMs('recovery-scan')).toBe(WEDGED_HOLD_MAX_MS);
-    // A scan that PROVED a pending row exists makes the same claim an ambiguous
-    // spend does, so it carries the same bound rather than the backstop: the
-    // wait it is exposed to (a drive queue) is not bounded by construction.
-    expect(ladderHoldMaxMs('recovery-drive')).toBe(AMBIGUITY_HOLD_MAX_MS);
+    // A scan that PROVED a pending row exists cannot use queue age as evidence
+    // that no debit happened. It stays closed until the bounded coordinator
+    // admits and transitions or definitively settles that exact row.
+    expect(ladderHoldMaxMs('recovery-drive')).toBe(Number.POSITIVE_INFINITY);
+    expect(ladderHoldBlocksGold(hold('recovery-drive'), T0 + AMBIGUITY_HOLD_MAX_MS)).toBe(true);
+    expect(ladderHoldBlocksGold(hold('recovery-drive'), T0 + AMBIGUITY_HOLD_MAX_MS * 100)).toBe(
+      true,
+    );
     // The ordering the design rests on: the bound on a BUG must be shorter than
     // the bound on a purchase whose money may have moved.
     expect(WEDGED_HOLD_MAX_MS).toBeLessThan(AMBIGUITY_HOLD_MAX_MS);

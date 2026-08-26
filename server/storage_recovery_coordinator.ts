@@ -12,17 +12,17 @@ import { AMBIGUITY_HOLD_MAX_MS } from './storage_ladder_hold';
 export const STORAGE_RECOVERY_MAX_TRACKED = 200;
 export const STORAGE_RECOVERY_SCAN_CONCURRENCY = 2;
 export const STORAGE_RECOVERY_DRIVE_CONCURRENCY = 2;
-// This is a conditional drive-stage budget, not a completion guarantee. With
-// two drive slots and at most five seconds of end-to-end occupancy per slot,
-// all 200 admitted keys can finish that stage within 500 seconds. The remaining
-// 100 seconds before the ambiguity hold yields must absorb the initial and
-// follow-up indexed scans, scheduling, and event-loop turns. Dependency latency,
-// retry backoff, or a hook that ignores cancellation can exhaust that margin,
-// so the coordinator exposes live ages and warns at the exact hold boundary.
+// Five seconds is an operational target for one healthy drive, not a live
+// end-to-end upper bound: DB deadlines, queue waits, retries, and character-save
+// deadlines can all exceed it. The derived drain budget is therefore scheduler
+// capacity telemetry only. Money safety does not depend on meeting it; a scanned
+// pending row's `recovery-drive` ladder hold cannot yield while it is queued.
 export const STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS = 5_000;
-export const STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS =
+export const STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS =
   Math.ceil(STORAGE_RECOVERY_MAX_TRACKED / STORAGE_RECOVERY_DRIVE_CONCURRENCY) *
   STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS;
+// Operational age alarm. This shares the duration of the ambiguity policy for
+// operator familiarity only; crossing it does not change the queued-row hold.
 export const STORAGE_RECOVERY_HORIZON_WARNING_MS = AMBIGUITY_HOLD_MAX_MS;
 // One realm may begin at most ten recovery drives or failed-scan retries per
 // second after a two-start burst. The rate ceiling limits downstream bursts;

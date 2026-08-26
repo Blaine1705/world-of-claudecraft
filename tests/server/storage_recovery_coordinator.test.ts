@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { AMBIGUITY_HOLD_MAX_MS } from '../../server/storage_ladder_hold';
 import {
   STORAGE_RECOVERY_BACKOFF_MS,
-  STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS,
   STORAGE_RECOVERY_DRIVE_CONCURRENCY,
   STORAGE_RECOVERY_HORIZON_WARNING_MS,
   STORAGE_RECOVERY_MAX_TRACKED,
@@ -11,6 +10,7 @@ import {
   STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
   STORAGE_RECOVERY_START_BURST,
   STORAGE_RECOVERY_START_RATE_PER_SECOND,
+  STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS,
   STORAGE_RECOVERY_WARNING_WINDOW_MS,
   StorageRecoveryCoordinator,
   type StorageRecoveryScheduler,
@@ -81,7 +81,7 @@ describe('StorageRecoveryCoordinator', () => {
     expect(STORAGE_RECOVERY_SCAN_CONCURRENCY).toBe(2);
     expect(STORAGE_RECOVERY_DRIVE_CONCURRENCY).toBe(2);
     expect(STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS).toBe(5_000);
-    expect(STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS).toBe(500_000);
+    expect(STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS).toBe(500_000);
     expect(STORAGE_RECOVERY_HORIZON_WARNING_MS).toBe(600_000);
     expect(STORAGE_RECOVERY_HORIZON_WARNING_MS).toBe(AMBIGUITY_HOLD_MAX_MS);
     expect(STORAGE_RECOVERY_START_RATE_PER_SECOND).toBe(10);
@@ -331,7 +331,7 @@ describe('StorageRecoveryCoordinator', () => {
     coordinator.reset();
   });
 
-  it('starts and finishes 200 five-second drive stages within the 500-second budget', async () => {
+  it('models 200 target-duration drive stages within the scheduler capacity target', async () => {
     const scheduler = fakeScheduler();
     const startedAt: number[] = [];
     const finishedAt: number[] = [];
@@ -368,11 +368,9 @@ describe('StorageRecoveryCoordinator', () => {
     expect(startedAt).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
     expect(finishedAt).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
     expect(Math.max(...startedAt)).toBeLessThanOrEqual(
-      STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS - STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
+      STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS - STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
     );
-    expect(Math.max(...finishedAt)).toBeLessThanOrEqual(
-      STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS,
-    );
+    expect(Math.max(...finishedAt)).toBeLessThanOrEqual(STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS);
     expect(coordinator.metrics()).toMatchObject({
       tracked: 0,
       horizonBreached: false,
@@ -380,12 +378,12 @@ describe('StorageRecoveryCoordinator', () => {
     });
   });
 
-  it('finishes the normal done-yield-rescan path inside the 600-second hold boundary', async () => {
+  it('models the healthy done-yield-rescan path inside its scheduler target', async () => {
     const scheduler = fakeScheduler();
     const warn = vi.fn();
     const scanOccupancyAssumptionMs = 250;
     const normalPathBudgetMs =
-      STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS + scanOccupancyAssumptionMs * 2;
+      STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS + scanOccupancyAssumptionMs * 2;
     const scansByCharacter = new Map<number, number>();
     let drivesFinished = 0;
     const coordinator = new StorageRecoveryCoordinator<Row>(
@@ -432,6 +430,9 @@ describe('StorageRecoveryCoordinator', () => {
     expect([...scansByCharacter.values()].every((count) => count === 2)).toBe(true);
     expect(coordinator.metrics()).toMatchObject({ tracked: 0, horizonBreached: false });
     expect(scheduler.now()).toBeLessThanOrEqual(normalPathBudgetMs);
+    // This proves the coordinator arithmetic under injected target-duration
+    // hooks. It is intentionally not a production latency or money-safety
+    // proof; live DB/save deadlines can exceed those fake occupancies.
     expect(scheduler.now()).toBeLessThan(STORAGE_RECOVERY_HORIZON_WARNING_MS);
     expect(warn).not.toHaveBeenCalled();
   });
