@@ -205,12 +205,33 @@ function reserveLedgerRows(
 
 function runReservedSimCall<T>(
   reservation: BankLedgerAdmissionHandle | undefined,
-  call: () => T,
+  readBefore: () => T,
+  mutate: () => void,
 ): T {
+  let before: T;
   try {
-    return call();
+    before = readBefore();
   } catch (err) {
     reservation?.cancel();
+    throw err;
+  }
+  try {
+    mutate();
+    return before;
+  } catch (err) {
+    reservation?.failAfterMutation(err);
+    throw err;
+  }
+}
+
+function finishReservedSimCall<T>(
+  reservation: BankLedgerAdmissionHandle | undefined,
+  finish: () => T,
+): T {
+  try {
+    return finish();
+  } catch (err) {
+    reservation?.failAfterMutation(err);
     throw err;
   }
 }
@@ -241,14 +262,16 @@ export function dispatchVaultCommand(
         const count = typeof msg.count === 'number' ? msg.count : undefined;
         const reservation = reserveLedgerRows(admission, sim, pid, 1);
         if (reservation === null) break;
-        const before = runReservedSimCall(reservation, () => {
-          const snapshot = sim.vaultInfoFor(pid);
-          sim.vaultDeposit(slot, count, pid);
-          return snapshot;
+        const before = runReservedSimCall(
+          reservation,
+          () => sim.vaultInfoFor(pid),
+          () => sim.vaultDeposit(slot, count, pid),
+        );
+        finishReservedSimCall(reservation, () => {
+          const after = sim.vaultInfoFor(pid);
+          if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
+          else recordVaultOp('deposit', who, before, after);
         });
-        const after = sim.vaultInfoFor(pid);
-        if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
-        else recordVaultOp('deposit', who, before, after);
       }
       break;
     case 'vault_withdraw':
@@ -259,15 +282,19 @@ export function dispatchVaultCommand(
         const reservation = reserveLedgerRows(admission, sim, pid, 1);
         if (reservation === null) break;
         const count = typeof msg.count === 'number' ? msg.count : undefined;
-        const before = runReservedSimCall(reservation, () => {
-          const snapshot = sim.vaultInfoFor(pid);
-          if (special === undefined) sim.vaultWithdraw(itemId, count, pid);
-          else sim.vaultWithdraw(itemId, count, special, pid);
-          return snapshot;
+        const before = runReservedSimCall(
+          reservation,
+          () => sim.vaultInfoFor(pid),
+          () => {
+            if (special === undefined) sim.vaultWithdraw(itemId, count, pid);
+            else sim.vaultWithdraw(itemId, count, special, pid);
+          },
+        );
+        finishReservedSimCall(reservation, () => {
+          const after = sim.vaultInfoFor(pid);
+          if (reservation) reservation.commit(buildVaultLedgerRows('withdraw', who, before, after));
+          else recordVaultOp('withdraw', who, before, after);
         });
-        const after = sim.vaultInfoFor(pid);
-        if (reservation) reservation.commit(buildVaultLedgerRows('withdraw', who, before, after));
-        else recordVaultOp('withdraw', who, before, after);
       }
       break;
     case 'vault_deposit_all': {
@@ -277,27 +304,31 @@ export function dispatchVaultCommand(
       // per material moved) as ONE batched insert.
       const reservation = reserveLedgerRows(admission, sim, pid, 112);
       if (reservation === null) break;
-      const before = runReservedSimCall(reservation, () => {
-        const snapshot = sim.vaultInfoFor(pid);
-        sim.vaultDepositAll(pid);
-        return snapshot;
+      const before = runReservedSimCall(
+        reservation,
+        () => sim.vaultInfoFor(pid),
+        () => sim.vaultDepositAll(pid),
+      );
+      finishReservedSimCall(reservation, () => {
+        const after = sim.vaultInfoFor(pid);
+        if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
+        else recordVaultOp('deposit', who, before, after);
       });
-      const after = sim.vaultInfoFor(pid);
-      if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
-      else recordVaultOp('deposit', who, before, after);
       break;
     }
     case 'vault_buy_upgrade': {
       const reservation = reserveLedgerRows(admission, sim, pid, 1);
       if (reservation === null) break;
-      const before = runReservedSimCall(reservation, () => {
-        const snapshot = sim.vaultInfoFor(pid);
-        sim.vaultBuyUpgrade(pid);
-        return snapshot;
+      const before = runReservedSimCall(
+        reservation,
+        () => sim.vaultInfoFor(pid),
+        () => sim.vaultBuyUpgrade(pid),
+      );
+      finishReservedSimCall(reservation, () => {
+        const after = sim.vaultInfoFor(pid);
+        if (reservation) reservation.commit(buildVaultLedgerRows('buy_slots', who, before, after));
+        else recordVaultOp('buy_slots', who, before, after);
       });
-      const after = sim.vaultInfoFor(pid);
-      if (reservation) reservation.commit(buildVaultLedgerRows('buy_slots', who, before, after));
-      else recordVaultOp('buy_slots', who, before, after);
       break;
     }
     default: {

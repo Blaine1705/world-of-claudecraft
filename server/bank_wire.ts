@@ -85,12 +85,38 @@ function reserveLedgerRows(
 
 function runReservedSimCall<T>(
   reservation: BankLedgerAdmissionHandle | undefined,
-  call: () => T,
+  readBefore: () => T,
+  mutate: () => void,
 ): T {
+  let before: T;
   try {
-    return call();
+    before = readBefore();
   } catch (err) {
     reservation?.cancel();
+    throw err;
+  }
+  try {
+    mutate();
+    return before;
+  } catch (err) {
+    // A throwing Sim command may have mutated before it failed. Its state is
+    // therefore unprovable: keep capacity charged and synchronously tell the
+    // host to quarantine rather than canceling evidence it may now require.
+    reservation?.failAfterMutation(err);
+    throw err;
+  }
+}
+
+function finishReservedSimCall<T>(
+  reservation: BankLedgerAdmissionHandle | undefined,
+  finish: () => T,
+): T {
+  try {
+    return finish();
+  } catch (err) {
+    // The Sim call returned, so after-snapshot, row projection, and outbox
+    // serialization failures all happen after a possible mutation.
+    reservation?.failAfterMutation(err);
     throw err;
   }
 }
@@ -110,15 +136,17 @@ export function dispatchBankCommand(
         const count = typeof msg.count === 'number' ? msg.count : undefined;
         const reservation = reserveLedgerRows(admission, sim, pid, 1);
         if (reservation === null) break;
-        const before = runReservedSimCall(reservation, () => {
-          const snapshot = sim.bankInfoFor(pid);
-          sim.bankDeposit(slot, count, pid);
-          return snapshot;
+        const before = runReservedSimCall(
+          reservation,
+          () => sim.bankInfoFor(pid),
+          () => sim.bankDeposit(slot, count, pid),
+        );
+        finishReservedSimCall(reservation, () => {
+          const after = sim.bankInfoFor(pid);
+          if (reservation)
+            reservation.commit(buildPersonalBankLedgerRows('deposit', who, before, after));
+          else recordBankOp('deposit', who, before, after);
         });
-        const after = sim.bankInfoFor(pid);
-        if (reservation)
-          reservation.commit(buildPersonalBankLedgerRows('deposit', who, before, after));
-        else recordBankOp('deposit', who, before, after);
       }
       break;
     case 'bank_withdraw':
@@ -127,15 +155,17 @@ export function dispatchBankCommand(
         const count = typeof msg.count === 'number' ? msg.count : undefined;
         const reservation = reserveLedgerRows(admission, sim, pid, 1);
         if (reservation === null) break;
-        const before = runReservedSimCall(reservation, () => {
-          const snapshot = sim.bankInfoFor(pid);
-          sim.bankWithdraw(slot, count, pid);
-          return snapshot;
+        const before = runReservedSimCall(
+          reservation,
+          () => sim.bankInfoFor(pid),
+          () => sim.bankWithdraw(slot, count, pid),
+        );
+        finishReservedSimCall(reservation, () => {
+          const after = sim.bankInfoFor(pid);
+          if (reservation)
+            reservation.commit(buildPersonalBankLedgerRows('withdraw', who, before, after));
+          else recordBankOp('withdraw', who, before, after);
         });
-        const after = sim.bankInfoFor(pid);
-        if (reservation)
-          reservation.commit(buildPersonalBankLedgerRows('withdraw', who, before, after));
-        else recordBankOp('withdraw', who, before, after);
       }
       break;
     case 'bank_buy_slots': {
@@ -153,22 +183,24 @@ export function dispatchBankCommand(
       }
       const reservation = reserveLedgerRows(admission, sim, pid, 1);
       if (reservation === null) break;
-      const before = runReservedSimCall(reservation, () => {
-        const snapshot = sim.bankInfoFor(pid);
-        sim.bankBuySlots(pid);
-        return snapshot;
+      const before = runReservedSimCall(
+        reservation,
+        () => sim.bankInfoFor(pid),
+        () => sim.bankBuySlots(pid),
+      );
+      finishReservedSimCall(reservation, () => {
+        const after = sim.bankInfoFor(pid);
+        // The gold rail stamps its paid-with dimension from the server-derived
+        // path (never the request); the Claudium rail's twin row is written by
+        // the purchase flow's apply site.
+        if (reservation) {
+          reservation.commit(
+            buildPersonalBankLedgerRows('buy_slots', who, before, after, { paidWith: 'gold' }),
+          );
+        } else {
+          recordBankOp('buy_slots', who, before, after, { paidWith: 'gold' });
+        }
       });
-      const after = sim.bankInfoFor(pid);
-      // The gold rail stamps its paid-with dimension from the server-derived
-      // path (never the request); the Claudium rail's twin row is written by
-      // the purchase flow's apply site.
-      if (reservation) {
-        reservation.commit(
-          buildPersonalBankLedgerRows('buy_slots', who, before, after, { paidWith: 'gold' }),
-        );
-      } else {
-        recordBankOp('buy_slots', who, before, after, { paidWith: 'gold' });
-      }
       break;
     }
     // The socket trio (Bank Storage phase 07). One socket differ observes all
@@ -179,14 +211,16 @@ export function dispatchBankCommand(
       // the next socket in order, or refuses without mutating anything.
       const reservation = reserveLedgerRows(admission, sim, pid, 1);
       if (reservation === null) break;
-      const before = runReservedSimCall(reservation, () => {
-        const snapshot = sim.bankInfoFor(pid);
-        sim.bankUnlockSocket(pid);
-        return snapshot;
+      const before = runReservedSimCall(
+        reservation,
+        () => sim.bankInfoFor(pid),
+        () => sim.bankUnlockSocket(pid),
+      );
+      finishReservedSimCall(reservation, () => {
+        const after = sim.bankInfoFor(pid);
+        if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
+        else recordBankSocketOp(who, before, after);
       });
-      const after = sim.bankInfoFor(pid);
-      if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
-      else recordBankSocketOp(who, before, after);
       break;
     }
     case 'bank_socket_bag':
@@ -200,14 +234,16 @@ export function dispatchBankCommand(
         const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
         const reservation = reserveLedgerRows(admission, sim, pid, 2);
         if (reservation === null) break;
-        const before = runReservedSimCall(reservation, () => {
-          const snapshot = sim.bankInfoFor(pid);
-          sim.bankSocketBag(itemId, socket, pid, slot);
-          return snapshot;
+        const before = runReservedSimCall(
+          reservation,
+          () => sim.bankInfoFor(pid),
+          () => sim.bankSocketBag(itemId, socket, pid, slot),
+        );
+        finishReservedSimCall(reservation, () => {
+          const after = sim.bankInfoFor(pid);
+          if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
+          else recordBankSocketOp(who, before, after);
         });
-        const after = sim.bankInfoFor(pid);
-        if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
-        else recordBankSocketOp(who, before, after);
       }
       break;
     case 'bank_unsocket_bag':
@@ -215,14 +251,16 @@ export function dispatchBankCommand(
         const socket = msg.socket;
         const reservation = reserveLedgerRows(admission, sim, pid, 1);
         if (reservation === null) break;
-        const before = runReservedSimCall(reservation, () => {
-          const snapshot = sim.bankInfoFor(pid);
-          sim.bankUnsocketBag(socket, pid);
-          return snapshot;
+        const before = runReservedSimCall(
+          reservation,
+          () => sim.bankInfoFor(pid),
+          () => sim.bankUnsocketBag(socket, pid),
+        );
+        finishReservedSimCall(reservation, () => {
+          const after = sim.bankInfoFor(pid);
+          if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
+          else recordBankSocketOp(who, before, after);
         });
-        const after = sim.bankInfoFor(pid);
-        if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
-        else recordBankSocketOp(who, before, after);
       }
       break;
     default: {

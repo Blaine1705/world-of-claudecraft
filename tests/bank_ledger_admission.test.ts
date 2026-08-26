@@ -95,7 +95,9 @@ function ledgerRow(overrides: Partial<BankLedgerRow> = {}): BankLedgerRow {
   };
 }
 
-function outboxRig(options: { rows?: number; bytes?: number } = {}) {
+function outboxRig(
+  options: { rows?: number; bytes?: number; onProjectionFailure?: (error: unknown) => void } = {},
+) {
   let key = 0;
   const rows = options.rows ?? 200;
   const bytes = options.bytes ?? 2 * 1024 * 1024;
@@ -106,7 +108,13 @@ function outboxRig(options: { rows?: number; bytes?: number } = {}) {
     limits: { maxRows: rows, maxEncodedBytes: bytes },
     nextBatchKey: () => `wire:${++key}`,
   });
-  return { outbox, admission: new BankLedgerOutboxAdmission(outbox), keys: () => key };
+  return {
+    outbox,
+    admission: new BankLedgerOutboxAdmission(outbox, {
+      onProjectionFailure: options.onProjectionFailure,
+    }),
+    keys: () => key,
+  };
 }
 
 function bankSim(initial: BankInfo = bankInfo()): BankSim & {
@@ -342,8 +350,9 @@ describe('bank and vault synchronous ledger admission', () => {
     expect(vaultRows).toEqual([1, 1, 112, 1]);
   });
 
-  it('cancels the full byte reservation when a Sim mutation throws', () => {
-    const bankRig = outboxRig();
+  it('retains capacity and signals quarantine when a Sim mutation throws ambiguously', () => {
+    const bankFailure = vi.fn();
+    const bankRig = outboxRig({ onProjectionFailure: bankFailure });
     const bank = bankSim();
     vi.mocked(bank.bankDeposit).mockImplementation(() => {
       throw new Error('bank mutation failed');
@@ -351,10 +360,12 @@ describe('bank and vault synchronous ledger admission', () => {
     expect(() =>
       dispatchBankCommand(bank, WHO, 'bank_deposit', { slot: 0 }, 1, bankRig.admission),
     ).toThrow('bank mutation failed');
-    expect(bankRig.outbox.hasPending).toBe(false);
-    expect(bankRig.outbox.usage.reservedEncodedBytes).toBe(0);
+    expect(bankRig.outbox.hasPending).toBe(true);
+    expect(bankRig.outbox.usage.reservedEncodedBytes).toBeGreaterThan(0);
+    expect(bankFailure).toHaveBeenCalledOnce();
 
-    const vaultRig = outboxRig();
+    const vaultFailure = vi.fn();
+    const vaultRig = outboxRig({ onProjectionFailure: vaultFailure });
     const vault = vaultSim();
     vi.mocked(vault.vaultDepositAll).mockImplementation(() => {
       throw new Error('vault mutation failed');
@@ -362,8 +373,65 @@ describe('bank and vault synchronous ledger admission', () => {
     expect(() =>
       dispatchVaultCommand(vault, WHO, 'vault_deposit_all', {}, 1, vaultRig.admission),
     ).toThrow('vault mutation failed');
-    expect(vaultRig.outbox.hasPending).toBe(false);
-    expect(vaultRig.outbox.usage.reservedEncodedBytes).toBe(0);
+    expect(vaultRig.outbox.hasPending).toBe(true);
+    expect(vaultRig.outbox.usage.reservedEncodedBytes).toBeGreaterThan(0);
+    expect(vaultFailure).toHaveBeenCalledOnce();
+  });
+
+  it('cancels cleanly when the pre-mutation snapshot throws', () => {
+    const quarantine = vi.fn();
+    const rig = outboxRig({ onProjectionFailure: quarantine });
+    const bank = bankSim();
+    bank.bankInfoFor = vi.fn(() => {
+      throw new Error('before snapshot failed');
+    });
+
+    expect(() =>
+      dispatchBankCommand(bank, WHO, 'bank_deposit', { slot: 0 }, 1, rig.admission),
+    ).toThrow('before snapshot failed');
+    expect(bank.bankDeposit).not.toHaveBeenCalled();
+    expect(rig.outbox.hasPending).toBe(false);
+    expect(rig.outbox.usage.reservedEncodedBytes).toBe(0);
+    expect(quarantine).not.toHaveBeenCalled();
+  });
+
+  it('signals quarantine when after-snapshot or commit projection fails', () => {
+    const afterFailure = vi.fn();
+    const afterRig = outboxRig({ onProjectionFailure: afterFailure });
+    const bank = bankSim();
+    let reads = 0;
+    bank.bankInfoFor = vi.fn(() => {
+      reads++;
+      if (reads === 2) throw new Error('after snapshot failed');
+      return bankInfo();
+    });
+    expect(() =>
+      dispatchBankCommand(bank, WHO, 'bank_deposit', { slot: 0 }, 1, afterRig.admission),
+    ).toThrow('after snapshot failed');
+    expect(bank.bankDeposit).toHaveBeenCalledOnce();
+    expect(afterFailure).toHaveBeenCalledOnce();
+    expect(afterRig.outbox.hasPending).toBe(true);
+
+    const failAfterMutation = vi.fn();
+    const commitFailure = new Error('commit projection failed');
+    const admission: BankLedgerAdmission = {
+      tryReserve: () => ({
+        commit: () => {
+          throw commitFailure;
+        },
+        cancel: () => true,
+        failAfterMutation,
+      }),
+    };
+    const vault = vaultSim();
+    vi.mocked(vault.vaultBuyUpgrade).mockImplementation(() => {
+      vault.setInfo(vaultInfo({ upgrades: 2, perMaterialCap: 80 }));
+    });
+    expect(() => dispatchVaultCommand(vault, WHO, 'vault_buy_upgrade', {}, 1, admission)).toThrow(
+      commitFailure,
+    );
+    expect(failAfterMutation).toHaveBeenCalledOnce();
+    expect(failAfterMutation).toHaveBeenCalledWith(commitFailure);
   });
 
   it('commits a socket swap as one immutable ordered batch without a legacy insert', async () => {
