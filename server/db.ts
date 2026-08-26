@@ -57,6 +57,11 @@ import {
   mergeGuildBankRow,
 } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
+import {
+  deleteBakedCustodyRefs,
+  MAIL_CUSTODY_PARCELS_SCHEMA,
+  snapshotPendingCustodyRefs,
+} from './mail_custody_overlay';
 import { MAPS_SCHEMA } from './maps_db';
 import {
   LEGACY_MARKET_KEY,
@@ -1333,6 +1338,11 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the other schema modules.
     await client.query(ACCOUNT_WEALTH_SCHEMA);
     await client.query(SUSPICION_FLAGS_SCHEMA);
+    // The $WOC custody mail overlay (server/mail_custody_overlay.ts): one
+    // durable row per booked parcel until the next full mail-book write
+    // bakes it. No FK on purpose: rows must survive character deletion long
+    // enough for an operator to attribute them.
+    await client.query(MAIL_CUSTODY_PARCELS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
@@ -3455,6 +3465,11 @@ export async function saveCharacterAndMarketState(
   // Out-parameter, same contract as saveCharacterAndGuildBankState's.
   results?: GuildBankWriteResult[],
 ): Promise<boolean> {
+  // Custody overlay bake, the saveMailState contract: snapshot at entry
+  // (before anything awaits; the mail argument was serialized synchronously
+  // just before this call), delete only on the committed arm below. The
+  // fence-refused false arm and every rollback keep the rows.
+  const bakedCustodyRefs = snapshotPendingCustodyRefs();
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
   // has confirmed the marker and opened the gate. Checked before any pool work.
@@ -3504,6 +3519,7 @@ export async function saveCharacterAndMarketState(
     // the character, market, mail, and book halves together.
     await writeGuildBankRows(client, guildBanks ?? [], results);
     await client.query('COMMIT');
+    await deleteBakedCustodyRefs(bakedCustodyRefs);
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -4481,7 +4497,14 @@ export async function loadMailState(): Promise<MailSave | null> {
 }
 
 export async function saveMailState(save: MailSave): Promise<void> {
+  // Custody overlay bake (mail_custody_overlay.ts): the snapshot runs before
+  // anything awaits, and no awaited gap separates the caller's
+  // serializeMail() from this entry, so every snapshotted parcel is inside
+  // `save` or durably collected out of it. The delete runs only after the
+  // book committed and is non-throwing by contract.
+  const bakedCustodyRefs = snapshotPendingCustodyRefs();
   await saveWorldState(mailStateKey(REALM), save);
+  await deleteBakedCustodyRefs(bakedCustodyRefs);
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are

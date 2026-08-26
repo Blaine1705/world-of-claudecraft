@@ -2899,7 +2899,6 @@ const wocMarketService = new WocMarketService({
         return liveGame().sim;
       },
       wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
-      persistMailBlob: () => liveGame().persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) =>
         liveGame().enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>

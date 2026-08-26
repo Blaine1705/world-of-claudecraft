@@ -1,0 +1,108 @@
+// Opt-in REAL-Postgres proof for the custody parcel overlay: the table DDL
+// through the real ensureSchema (pinning the db.ts registration), the
+// insert/merge/bake lifecycle against a REAL Sim post office, and the
+// crash-then-clean-shutdown story end to end. The mocked-pool suite
+// (tests/server/mail_custody_overlay.test.ts) pins shapes and set
+// semantics; this one proves the SQL and the durability claim.
+//
+// Gated on TEST_DATABASE_URL like every other *_integration.test.ts:
+// without it the file skips green and CI's DB-free floor is unchanged.
+
+import type { Pool as PgPool } from 'pg';
+import { Pool } from 'pg';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { Sim } from '../src/sim/sim';
+
+const ADMIN_URL = process.env.TEST_DATABASE_URL;
+const VERIFY_DB = 'wocc_mail_custody_verify';
+
+function verifyUrl(admin: string): string {
+  const u = new URL(admin);
+  u.pathname = `/${VERIFY_DB}`;
+  return u.toString();
+}
+
+if (ADMIN_URL) process.env.DATABASE_URL = verifyUrl(ADMIN_URL);
+
+const describeDb = ADMIN_URL ? describe : describe.skip;
+
+describeDb('mail custody overlay (REAL Postgres)', () => {
+  let admin: PgPool;
+  let pool: PgPool;
+  let db: typeof import('../server/db');
+  let overlay: typeof import('../server/mail_custody_overlay');
+
+  beforeAll(async () => {
+    admin = new Pool({ connectionString: ADMIN_URL, max: 2 });
+    const own = new URL(ADMIN_URL as string).pathname.replace(/^\//, '');
+    // Never drop the database the caller pointed us at.
+    expect(own).not.toBe(VERIFY_DB);
+    await admin.query(
+      `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()`,
+      [VERIFY_DB],
+    );
+    await admin.query(`DROP DATABASE IF EXISTS ${VERIFY_DB}`);
+    await admin.query(`CREATE DATABASE ${VERIFY_DB}`);
+
+    db = await import('../server/db');
+    overlay = await import('../server/mail_custody_overlay');
+
+    // The REAL boot path: proves the mail_custody_parcels registration in
+    // ensureSchema, not just the DDL string.
+    await db.ensureSchema();
+
+    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 4 });
+  }, 120_000);
+
+  afterAll(async () => {
+    await pool?.end().catch(() => {});
+    await db?.pool?.end().catch(() => {});
+    await admin?.end().catch(() => {});
+  }, 30_000);
+
+  const REF = 'settlement:pg:1';
+  const ROW = {
+    custodyRef: REF,
+    recipient: { key: '4242', name: 'Buyer' },
+    letter: 'delivery' as const,
+    items: [{ itemId: 'rusty_hatchet', count: 1 }],
+  };
+
+  it('carries a parcel through crash replay, then bakes it into a clean book write', async () => {
+    overlay.resetCustodyParcelOverlayForTests();
+
+    // Book + persist the row (the parcel path; the book itself is the live
+    // sim's and is deliberately NOT written here).
+    const sim1 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    expect(
+      sim1.mailSystemParcel(ROW.recipient, overlay.CUSTODY_PARCEL_LETTERS.delivery, ROW.items, REF),
+    ).toBe(true);
+    await overlay.persistCustodyParcelRow(ROW);
+    // Idempotent re-insert (the retry arm).
+    await overlay.persistCustodyParcelRow(ROW);
+    const stored = await pool.query(`SELECT custody_ref, letter FROM mail_custody_parcels`);
+    expect(stored.rows).toEqual([{ custody_ref: REF, letter: 'delivery' }]);
+
+    // CRASH: the process dies before any full-book write. A new process
+    // loads a book WITHOUT the parcel and merges the overlay.
+    overlay.resetCustodyParcelOverlayForTests();
+    const sim2 = new Sim({ seed: 43, playerClass: 'warrior', noPlayer: true });
+    const merged = await overlay.mergeCustodyParcelOverlay(sim2);
+    expect(merged).toEqual({ replayed: 1, present: 0, refused: 0 });
+    expect(sim2.hasCustodyParcel(REF)).toBe(true);
+
+    // CLEAN SHUTDOWN: the next full-book write carries the parcel; the bake
+    // inside saveMailState deletes the row.
+    await db.saveMailState(sim2.serializeMail());
+    const after = await pool.query(`SELECT count(*)::int AS n FROM mail_custody_parcels`);
+    expect(after.rows[0].n).toBe(0);
+
+    // Next boot: the parcel now arrives from the blob itself, no overlay
+    // rows left to replay, and the book-once state is intact.
+    const sim3 = new Sim({ seed: 44, playerClass: 'warrior', noPlayer: true });
+    sim3.loadMail(await db.loadMailState());
+    expect(sim3.hasCustodyParcel(REF)).toBe(true);
+    const remerge = await overlay.mergeCustodyParcelOverlay(sim3);
+    expect(remerge).toEqual({ replayed: 0, present: 0, refused: 0 });
+  });
+});
