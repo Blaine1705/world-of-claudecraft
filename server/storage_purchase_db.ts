@@ -1,3 +1,8 @@
+import {
+  createDbTransactionDeadline,
+  type DbTransactionDeadlineClient,
+} from './db_transaction_deadline';
+
 // The pending-purchase table behind the Claudium storage flow (Bank Storage
 // phase 11, server/storage_purchases.ts). One row per purchase attempt,
 // keyed by the client-minted idempotency key, written and DURABLE before any
@@ -41,14 +46,11 @@
 //               means receipt history is not globally constant-bounded. It is
 //               paid exactly-once evidence, with the same deliberate
 //               append-only growth posture as bank_ledger.
-//   unresolved  NOT catalog-bounded, and the earlier wording claiming so was
-//               wrong: an unresolved row leaves its rung UNGRANTED, so a later
-//               key can pre-check 'fits' and go unresolved again. What bounds
-//               it is real money, since every such row cost a real debit, and
-//               it is the status the audit script exists to surface. Expected
-//               near zero; a rising count is an incident, not growth.
-//   pending     database-capped at one per character. The bounded recovery
-//               coordinator drives that row while the character is online.
+//   unresolved  database-capped together with pending at one OPEN row per
+//               character. It keeps both storage-purchase rails closed until
+//               support reconciles the confirmed debit.
+//   pending     shares that one-open-row character cap. The bounded recovery
+//               coordinator drives pending work while the character is online.
 //
 // ROLLBACK, and be precise about authority: the receipt is the durable
 // exactly-once record. The in-blob appliedStorageKeys entry protects the live
@@ -75,18 +77,16 @@ interface Queryable {
   ): Promise<{ rows: Record<string, unknown>[]; rowCount: number | null }>;
 }
 
-interface TransactionClient extends Queryable {
-  release(): void;
-}
-
 interface TransactionalQueryable extends Queryable {
-  connect(): Promise<TransactionClient>;
+  connect(): Promise<DbTransactionDeadlineClient>;
 }
 
 /** Three times the economy RPC timeout. A stale owner can be taken over, while
  * an ordinary five-second call cannot overlap a second cross-process spender. */
 export const STORAGE_PURCHASE_SPEND_CLAIM_MS = 15_000;
 export const STORAGE_APPLIED_EFFECT_MAX_PENDING = 1;
+export const STORAGE_PURCHASE_TRANSACTION_TIMEOUT_MS = 15_000;
+export const STORAGE_PURCHASE_TX_STATEMENT_TIMEOUT_MS = 15_000;
 export const STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS = 2_000;
 export const STORAGE_PURCHASE_TX_IDLE_TIMEOUT_MS = 2_000;
 const STORAGE_PURCHASE_CLAIM_TOKEN_PATTERN =
@@ -96,9 +96,8 @@ const STORAGE_PURCHASE_CLAIM_TOKEN_PATTERN =
 // lock. It also removes the feature branch's abandoned refusal history before
 // installing the closed status constraint. The full character and account
 // indexes support their FK cascades. The partial unique character index is
-// both paid-rail authority and the hot recovery access path: at most one row
-// can match, so ORDER BY created_at/id is deterministic without a second
-// redundant pending index.
+// paid-rail authority for both pending and unresolved work and the hot
+// recovery access path: at most one open row can match.
 export const STORAGE_PURCHASE_SCHEMA = `
 CREATE TABLE IF NOT EXISTS storage_purchases (
   id BIGSERIAL PRIMARY KEY,
@@ -151,50 +150,63 @@ $storage_purchase_status_constraint$;
 DROP INDEX IF EXISTS storage_purchases_refused;
 
 -- Cross-process paid-rail authority: another key cannot start while this
--- character has a possibly-debited pending purchase. Use a new name rather
--- than reusing the non-unique recovery index behind IF NOT EXISTS. An earlier
--- feature-branch database with sibling pending rows fails boot loudly: deleting
--- either row could erase a real debit, so only an operator may reconcile it.
-DO $storage_purchase_pending_unique_guard$
+-- character has either a possibly-debited pending purchase or a confirmed
+-- unresolved debit. Use a new name so a deployed pending-only index can never
+-- pass behind IF NOT EXISTS. Multiple open rows fail boot loudly: only an
+-- operator may reconcile paid evidence.
+DO $storage_purchase_open_unique_guard$
 DECLARE
   duplicate_character_id int;
-  pending_index_ready boolean;
+  open_index_ready boolean;
 BEGIN
   SELECT i.indisunique
          AND i.indisvalid
          AND i.indisready
          AND i.indrelid = 'storage_purchases'::regclass
          AND i.indnkeyatts = 1
+         AND i.indnatts = 1
+         AND i.indexprs IS NULL
          AND a.attname = 'character_id'
-         AND pg_get_expr(i.indpred, i.indrelid) = '(status = ''pending''::text)'
-    INTO pending_index_ready
+         AND am.amname = 'btree'
+         AND opc.opcname = 'int4_ops'
+         AND opcnsp.nspname = 'pg_catalog'
+         AND pg_get_expr(i.indpred, i.indrelid) =
+             '(status = ANY (ARRAY[''pending''::text, ''unresolved''::text]))'
+    INTO open_index_ready
     FROM pg_index i
+    JOIN pg_class index_rel ON index_rel.oid = i.indexrelid
+    JOIN pg_am am ON am.oid = index_rel.relam
     LEFT JOIN pg_attribute a
       ON a.attrelid = i.indrelid AND a.attnum = i.indkey[0]
-   WHERE i.indexrelid = to_regclass('storage_purchases_one_pending_per_character');
-  IF NOT COALESCE(pending_index_ready, false) THEN
+    LEFT JOIN pg_opclass opc ON opc.oid = i.indclass[0]
+    LEFT JOIN pg_namespace opcnsp ON opcnsp.oid = opc.opcnamespace
+   WHERE i.indexrelid = to_regclass('storage_purchases_one_open_per_character');
+  IF NOT COALESCE(open_index_ready, false) THEN
     SELECT character_id INTO duplicate_character_id
       FROM storage_purchases
-     WHERE status = 'pending'
+     WHERE status IN ('pending', 'unresolved')
      GROUP BY character_id
     HAVING count(*) > 1
      ORDER BY character_id
      LIMIT 1;
     IF duplicate_character_id IS NOT NULL THEN
-      RAISE EXCEPTION 'multiple pending storage purchases for character %',
+      RAISE EXCEPTION 'multiple open storage purchases for character %',
         duplicate_character_id
         USING ERRCODE = '23505',
               HINT = 'Reconcile possibly-debited rows before restarting the server.';
     END IF;
-    IF to_regclass('storage_purchases_one_pending_per_character') IS NOT NULL THEN
-      DROP INDEX storage_purchases_one_pending_per_character;
+    IF to_regclass('storage_purchases_one_open_per_character') IS NOT NULL THEN
+      DROP INDEX storage_purchases_one_open_per_character;
     END IF;
   END IF;
 END;
-$storage_purchase_pending_unique_guard$;
-CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_pending_per_character
-  ON storage_purchases (character_id)
-  WHERE status = 'pending';
+$storage_purchase_open_unique_guard$;
+CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_open_per_character
+  ON storage_purchases USING btree (character_id)
+  WHERE status IN ('pending', 'unresolved');
+-- Drop only after the stronger authority exists, so rollout never has a
+-- window without a database-enforced character rail.
+DROP INDEX IF EXISTS storage_purchases_one_pending_per_character;
 
 DO $storage_purchase_claim_constraint$
 DECLARE
@@ -274,18 +286,6 @@ BEGIN
 END;
 $storage_purchase_parent_delete$;
 
-DROP TRIGGER IF EXISTS storage_purchase_guard_character_delete ON characters;
-CREATE TRIGGER storage_purchase_guard_character_delete
-BEFORE DELETE ON characters
-FOR EACH ROW
-EXECUTE FUNCTION guard_pending_storage_purchase_parent_delete();
-
-DROP TRIGGER IF EXISTS storage_purchase_guard_account_delete ON accounts;
-CREATE TRIGGER storage_purchase_guard_account_delete
-BEFORE DELETE ON accounts
-FOR EACH ROW
-EXECUTE FUNCTION guard_pending_storage_purchase_parent_delete();
-
 -- Paid-and-applied tombstones deliberately retain the original character id
 -- as a scalar, not an FK. Account deletion still removes the account's entire
 -- history, while character deletion cannot erase the exactly-once guard.
@@ -322,6 +322,13 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $storage_purchase_receipt$
 BEGIN
+  -- Serialize mixed-release UPDATE-to-applied writers with current begin/save
+  -- authority before probing or archiving the consumed key. An older UPDATE
+  -- necessarily locks its child row before reaching this AFTER trigger, so a
+  -- rare old/new interleave may deadlock and abort one transaction with 40P01;
+  -- that is a fail-closed availability retry, never permission to weaken the
+  -- key authority.
+  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.idempotency_key, 0));
   INSERT INTO storage_purchase_applied_receipts
     (source_purchase_id, realm, account_id, character_id, item_id,
      expected_cost_claudium, idempotency_key, applied_at)
@@ -347,12 +354,6 @@ BEGIN
   RETURN NEW;
 END;
 $storage_purchase_receipt$;
-
-DROP TRIGGER IF EXISTS storage_purchase_archive_applied ON storage_purchases;
-CREATE TRIGGER storage_purchase_archive_applied
-AFTER INSERT OR UPDATE OF status ON storage_purchases
-FOR EACH ROW WHEN (NEW.status = 'applied')
-EXECUTE FUNCTION archive_storage_purchase_applied_receipt();
 
 -- Backfill exactly once. The marker and copy share ensureSchema's transaction,
 -- so a failed copy rolls the marker back and the next boot safely retries.
@@ -399,6 +400,13 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $storage_purchase_guard$
 BEGIN
+  -- A pre-claim binary reaches this trigger without the ordered locks current
+  -- begin takes. Acquire account -> character -> key here so its receipt probe
+  -- gets a fresh snapshot after any conflicting receipt/delete transaction
+  -- commits, and so parent deletion cannot invert the lock order.
+  PERFORM 1 FROM accounts WHERE id = NEW.account_id FOR KEY SHARE;
+  PERFORM 1 FROM characters WHERE id = NEW.character_id FOR UPDATE;
+  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.idempotency_key, 0));
   IF EXISTS (
     SELECT 1 FROM storage_purchase_applied_receipts
      WHERE idempotency_key = NEW.idempotency_key
@@ -409,11 +417,101 @@ BEGIN
 END;
 $storage_purchase_guard$;
 
-DROP TRIGGER IF EXISTS storage_purchase_guard_consumed_key ON storage_purchases;
-CREATE TRIGGER storage_purchase_guard_consumed_key
-BEFORE INSERT ON storage_purchases
-FOR EACH ROW
-EXECUTE FUNCTION guard_storage_purchase_consumed_key();
+-- Trigger creation is last so first-rollout relation locks are held for the
+-- shortest interval. Steady-state boot is catalog-only: each exact definition
+-- survives untouched, while a missing, disabled, or malformed trigger is
+-- repaired once. tgtype constants are PostgreSQL's ROW/BEFORE/operation bits.
+DO $storage_purchase_trigger_guard$
+DECLARE
+  trigger_ready boolean;
+BEGIN
+  SELECT t.tgrelid = 'characters'::regclass
+         AND NOT t.tgisinternal
+         AND t.tgenabled = 'O'
+         AND t.tgfoid = to_regprocedure('guard_pending_storage_purchase_parent_delete()')
+         AND t.tgnargs = 0
+         AND octet_length(t.tgargs) = 0
+         AND t.tgtype = 11
+         AND t.tgattr::text = ''
+         AND t.tgqual IS NULL
+    INTO trigger_ready
+    FROM pg_trigger t
+   WHERE t.tgname = 'storage_purchase_guard_character_delete'
+     AND t.tgrelid = 'characters'::regclass;
+  IF NOT COALESCE(trigger_ready, false) THEN
+    DROP TRIGGER IF EXISTS storage_purchase_guard_character_delete ON characters;
+    CREATE TRIGGER storage_purchase_guard_character_delete
+    BEFORE DELETE ON characters
+    FOR EACH ROW
+    EXECUTE FUNCTION guard_pending_storage_purchase_parent_delete();
+  END IF;
+
+  SELECT t.tgrelid = 'accounts'::regclass
+         AND NOT t.tgisinternal
+         AND t.tgenabled = 'O'
+         AND t.tgfoid = to_regprocedure('guard_pending_storage_purchase_parent_delete()')
+         AND t.tgnargs = 0
+         AND octet_length(t.tgargs) = 0
+         AND t.tgtype = 11
+         AND t.tgattr::text = ''
+         AND t.tgqual IS NULL
+    INTO trigger_ready
+    FROM pg_trigger t
+   WHERE t.tgname = 'storage_purchase_guard_account_delete'
+     AND t.tgrelid = 'accounts'::regclass;
+  IF NOT COALESCE(trigger_ready, false) THEN
+    DROP TRIGGER IF EXISTS storage_purchase_guard_account_delete ON accounts;
+    CREATE TRIGGER storage_purchase_guard_account_delete
+    BEFORE DELETE ON accounts
+    FOR EACH ROW
+    EXECUTE FUNCTION guard_pending_storage_purchase_parent_delete();
+  END IF;
+
+  SELECT t.tgrelid = 'storage_purchases'::regclass
+         AND NOT t.tgisinternal
+         AND t.tgenabled = 'O'
+         AND t.tgfoid = to_regprocedure('guard_storage_purchase_consumed_key()')
+         AND t.tgnargs = 0
+         AND octet_length(t.tgargs) = 0
+         AND t.tgtype = 7
+         AND t.tgattr::text = ''
+         AND t.tgqual IS NULL
+    INTO trigger_ready
+    FROM pg_trigger t
+   WHERE t.tgname = 'storage_purchase_guard_consumed_key'
+     AND t.tgrelid = 'storage_purchases'::regclass;
+  IF NOT COALESCE(trigger_ready, false) THEN
+    DROP TRIGGER IF EXISTS storage_purchase_guard_consumed_key ON storage_purchases;
+    CREATE TRIGGER storage_purchase_guard_consumed_key
+    BEFORE INSERT ON storage_purchases
+    FOR EACH ROW
+    EXECUTE FUNCTION guard_storage_purchase_consumed_key();
+  END IF;
+
+  SELECT t.tgrelid = 'storage_purchases'::regclass
+         AND NOT t.tgisinternal
+         AND t.tgenabled = 'O'
+         AND t.tgfoid = to_regprocedure('archive_storage_purchase_applied_receipt()')
+         AND t.tgnargs = 0
+         AND octet_length(t.tgargs) = 0
+         AND t.tgtype = 21
+         AND t.tgattr::text = status_col.attnum::text
+         AND pg_get_expr(t.tgqual, t.tgrelid) = '(new.status = ''applied''::text)'
+    INTO trigger_ready
+    FROM pg_trigger t
+    JOIN pg_attribute status_col
+      ON status_col.attrelid = t.tgrelid AND status_col.attname = 'status'
+   WHERE t.tgname = 'storage_purchase_archive_applied'
+     AND t.tgrelid = 'storage_purchases'::regclass;
+  IF NOT COALESCE(trigger_ready, false) THEN
+    DROP TRIGGER IF EXISTS storage_purchase_archive_applied ON storage_purchases;
+    CREATE TRIGGER storage_purchase_archive_applied
+    AFTER INSERT OR UPDATE OF status ON storage_purchases
+    FOR EACH ROW WHEN (NEW.status = 'applied')
+    EXECUTE FUNCTION archive_storage_purchase_applied_receipt();
+  END IF;
+END;
+$storage_purchase_trigger_guard$;
 `;
 
 export type StoragePurchaseStatus = 'pending' | 'applied' | 'unresolved';
@@ -595,12 +693,20 @@ export async function writeStorageAppliedEffectsOnClient(
     const existing = await readAppliedReceipt(db, effect.idempotencyKey);
     if (existing) {
       assertReceiptMatches(existing, effect);
-      await db.query(
+      // Defense in depth for a mixed-release row inserted after the receipt.
+      // Delete by the consumed key and OUR token, not the receipt's historical
+      // source id. RETURNING lets a fingerprint mismatch throw and roll the
+      // caller-owned transaction back, restoring rather than hiding evidence.
+      const residue = await db.query(
         `DELETE FROM storage_purchases
-          WHERE id = $1 AND idempotency_key = $2 AND status = 'pending'
-            AND spend_claim_token = $3`,
-        [Number(existing.source_purchase_id), effect.idempotencyKey, effect.spendClaimToken],
+          WHERE idempotency_key = $1 AND status = 'pending'
+            AND spend_claim_token = $2
+          RETURNING ${ROW_COLUMNS}, spend_claim_token`,
+        [effect.idempotencyKey, effect.spendClaimToken],
       );
+      if (residue.rows[0]) {
+        assertPendingMatches(rowFrom(residue.rows[0]), effect, residue.rows[0].spend_claim_token);
+      }
       continue;
     }
 
@@ -679,8 +785,8 @@ const ROW_COLUMNS =
 export interface StoragePurchaseBeginResult {
   inserted: boolean;
   existing: StoragePurchaseRow | null;
-  /** A different key already owns this character's one pending slot. */
-  blockedByPending?: StoragePurchaseRow;
+  /** A different key owns this character's pending-or-unresolved paid rail. */
+  blockedByOpen?: StoragePurchaseRow;
 }
 
 async function readStoragePurchaseBeginConflict(
@@ -701,9 +807,11 @@ async function readStoragePurchaseBeginConflict(
            FROM storage_purchases
           WHERE idempotency_key = $1
          UNION ALL
-         SELECT ${ROW_COLUMNS}, 'character_pending'::text AS conflict_kind, 2 AS source_rank
+         SELECT ${ROW_COLUMNS}, 'character_open'::text AS conflict_kind, 2 AS source_rank
            FROM storage_purchases
-          WHERE character_id = $2 AND status = 'pending' AND idempotency_key <> $1
+          WHERE character_id = $2
+            AND status IN ('pending', 'unresolved')
+            AND idempotency_key <> $1
        ) purchase_conflict
       ORDER BY source_rank
       LIMIT 1`,
@@ -712,13 +820,13 @@ async function readStoragePurchaseBeginConflict(
   const recorded = conflict.rows[0];
   if (!recorded) return null;
   const parsed = rowFrom(recorded);
-  return String(recorded.conflict_kind) === 'character_pending'
-    ? { inserted: false, existing: null, blockedByPending: parsed }
+  return String(recorded.conflict_kind) === 'character_open'
+    ? { inserted: false, existing: null, blockedByOpen: parsed }
     : { inserted: false, existing: parsed };
 }
 
 /** Persist the pending record, surface the row already holding the key, or
- *  identify the different pending key that owns this character's paid rail.
+ *  identify the different open key that owns this character's paid rail.
  *  Returns { inserted: true } when this call created the row, else the
  *  existing row so the caller can distinguish a same-purchase retry from a
  *  cross-purchase key collision. Bare ON CONFLICT covers both unique
@@ -737,30 +845,35 @@ export async function beginStoragePurchase(
   },
 ): Promise<StoragePurchaseBeginResult> {
   const client = await db.connect();
-  let inTransaction = false;
+  const transaction = createDbTransactionDeadline(client, {
+    operation: 'storage purchase begin',
+    timeoutMs: STORAGE_PURCHASE_TRANSACTION_TIMEOUT_MS,
+  });
   try {
-    await client.query('BEGIN');
-    inTransaction = true;
+    await transaction.query('BEGIN');
     // Bound each lock wait and an event-loop-stalled transaction before taking
     // any parent lock. PostgreSQL 16 has no transaction_timeout, so the three
     // ordered lock statements can still sum their individual two-second caps.
-    await client.query(
-      `SET LOCAL lock_timeout = ${STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS}; ` +
+    await transaction.query(
+      `SET LOCAL statement_timeout = ${STORAGE_PURCHASE_TX_STATEMENT_TIMEOUT_MS}; ` +
+        `SET LOCAL lock_timeout = ${STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS}; ` +
         `SET LOCAL idle_in_transaction_session_timeout = ${STORAGE_PURCHASE_TX_IDLE_TIMEOUT_MS}`,
     );
     // Match the character-save lock order: parent account first, character
     // row second. The character lock serializes different keys for one paid
     // rail against both begin and the save transaction that archives/deletes
     // its pending row.
-    await client.query('SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE', [row.accountId]);
-    await client.query('SELECT id FROM characters WHERE id = $1 FOR UPDATE', [row.characterId]);
+    await transaction.query('SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE', [row.accountId]);
+    await transaction.query('SELECT id FROM characters WHERE id = $1 FOR UPDATE', [
+      row.characterId,
+    ]);
     // Same-key attempts can name different characters. Serialize that key with
     // writeStorageAppliedEffectsOnClient too. The INSERT begins only after the
     // wait, so its statement snapshot sees any receipt committed by the saver.
-    await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))', [
+    await transaction.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))', [
       row.idempotencyKey,
     ]);
-    const ins = await client.query(
+    const ins = await transaction.query(
       `INSERT INTO storage_purchases
          (realm, account_id, character_id, item_id, expected_cost_claudium, idempotency_key,
           spend_claim_token, spend_claim_expires_at)
@@ -781,8 +894,7 @@ export async function beginStoragePurchase(
     );
     if (ins.rows.length > 0) {
       const result = { inserted: true, existing: rowFrom(ins.rows[0]) };
-      await client.query('COMMIT');
-      inTransaction = false;
+      await transaction.commit();
       return result;
     }
 
@@ -790,18 +902,17 @@ export async function beginStoragePurchase(
     // snapshot after any ON CONFLICT wait, so a rolling-deploy writer that won
     // outside the locks is visible too.
     const raced = await readStoragePurchaseBeginConflict(
-      client,
+      transaction,
       row.idempotencyKey,
       row.characterId,
     );
-    await client.query('COMMIT');
-    inTransaction = false;
+    await transaction.commit();
     return raced ?? { inserted: false, existing: null };
   } catch (err) {
-    if (inTransaction) await client.query('ROLLBACK').catch(() => {});
+    await transaction.rollback();
     throw err;
   } finally {
-    client.release();
+    transaction.release();
   }
 }
 
@@ -942,6 +1053,24 @@ export async function pendingStoragePurchasesForCharacter(
   const res = await db.query(
     `SELECT ${ROW_COLUMNS} FROM storage_purchases
       WHERE character_id = $1 AND status = 'pending'
+      ORDER BY created_at, id
+      LIMIT 1`,
+    [characterId],
+  );
+  return res.rows[0] ? rowFrom(res.rows[0]) : null;
+}
+
+/** The database-authoritative paid rail, used at login to distinguish an
+ * operator-held unresolved debit from recoverable pending work. This seam is
+ * deliberately separate from pendingStoragePurchasesForCharacter: unresolved
+ * rows must block both purchase rails but must never enter spend recovery. */
+export async function openStoragePurchaseForCharacter(
+  db: Queryable,
+  characterId: number,
+): Promise<StoragePurchaseRow | null> {
+  const res = await db.query(
+    `SELECT ${ROW_COLUMNS} FROM storage_purchases
+      WHERE character_id = $1 AND status IN ('pending', 'unresolved')
       ORDER BY created_at, id
       LIMIT 1`,
     [characterId],

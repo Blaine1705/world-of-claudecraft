@@ -26,6 +26,7 @@ import {
   type StoragePurchaseHost,
   storagePurchaseCharacterOffline,
   storagePurchaseInFlight,
+  storagePurchaseRecoveryMetrics,
 } from '../../server/storage_purchases';
 import { STORAGE_RECOVERY_MAX_TRACKED } from '../../server/storage_recovery_coordinator';
 import {
@@ -92,15 +93,16 @@ function makeFakeDb() {
       }) => {
         const existing = rows.get(row.idempotencyKey);
         if (existing) return { inserted: false, existing: { ...existing } };
-        const characterPending = [...rows.values()].find(
+        const characterOpen = [...rows.values()].find(
           (candidate) =>
-            candidate.characterId === row.characterId && candidate.status === 'pending',
+            candidate.characterId === row.characterId &&
+            (candidate.status === 'pending' || candidate.status === 'unresolved'),
         );
-        if (characterPending) {
+        if (characterOpen) {
           return {
             inserted: false,
             existing: null,
-            blockedByPending: { ...characterPending },
+            blockedByOpen: { ...characterOpen },
           };
         }
         const fresh: FakeRow = {
@@ -156,6 +158,16 @@ function makeFakeDb() {
     pendingFor: vi.fn(async (characterId: number): Promise<FakeRow | null> => {
       const match = [...rows.values()]
         .filter((r) => r.characterId === characterId && r.status === 'pending')
+        .sort((a, b) => a.id - b.id)
+        .at(0);
+      return match ? { ...match } : null;
+    }),
+    openFor: vi.fn(async (characterId: number): Promise<FakeRow | null> => {
+      const match = [...rows.values()]
+        .filter(
+          (r) =>
+            r.characterId === characterId && (r.status === 'pending' || r.status === 'unresolved'),
+        )
         .sort((a, b) => a.id - b.id)
         .at(0);
       return match ? { ...match } : null;
@@ -1103,6 +1115,68 @@ describe('the apply-time re-check (defense in depth) and the unresolved surface'
     });
     expect(retry.reason).toBe('grant_unresolved');
     expect(h.spend).toHaveBeenCalledTimes(1);
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+  });
+
+  it('an unresolved sibling blocks a different key before any service call', async () => {
+    const h = makeHarness();
+    h.db.rows.set('operator-case', {
+      id: 99,
+      realm: h.host.realm,
+      accountId: ACCOUNT,
+      characterId: CHARACTER,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'operator-case',
+      status: 'unresolved',
+      resolvedAt: 1,
+      spendClaimToken: null,
+    });
+
+    const result = await executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'must-not-spend',
+    });
+
+    expect(result.reason).toBe('purchase_in_progress');
+    expect(h.db.begin).toHaveBeenCalledOnce();
+    expect(h.spend).not.toHaveBeenCalled();
+    expect(h.db.rows.has('must-not-spend')).toBe(false);
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+  });
+
+  it('login discovery keeps unresolved closed and a later support clear plus relog reopens it', async () => {
+    const h = makeHarness();
+    h.db.rows.set('login-operator-case', {
+      id: 100,
+      realm: h.host.realm,
+      accountId: ACCOUNT,
+      characterId: CHARACTER,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'login-operator-case',
+      status: 'unresolved',
+      resolvedAt: 1,
+      spendClaimToken: null,
+    });
+    configureStoragePurchaseRuntime(() => h.host);
+
+    expect(kickStoragePurchaseRecovery(CHARACTER)).toBe(true);
+    await waitFor(
+      () => h.db.openFor.mock.calls.length === 1 && storagePurchaseRecoveryMetrics().tracked === 0,
+    );
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+    expect(h.spend).not.toHaveBeenCalled();
+
+    storagePurchaseCharacterOffline(CHARACTER);
+    h.db.rows.delete('login-operator-case');
+    expect(kickStoragePurchaseRecovery(CHARACTER)).toBe(true);
+    await waitFor(
+      () => h.db.openFor.mock.calls.length === 2 && storagePurchaseRecoveryMetrics().tracked === 0,
+    );
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
   });
 
   it('a session dropping between spend and apply defers to the next login, then applies once', async () => {
@@ -1179,7 +1253,7 @@ describe('login recovery', () => {
   it('the kick closes the gold rail SYNCHRONOUSLY, before the scan answers', async () => {
     const h = makeHarness();
     let resolvePending!: (row: FakeRow | null) => void;
-    h.db.pendingFor.mockImplementationOnce(
+    h.db.openFor.mockImplementationOnce(
       () =>
         new Promise<FakeRow | null>((r) => {
           resolvePending = r;
@@ -1292,7 +1366,7 @@ describe('login recovery', () => {
     const h = makeHarness();
     // Two slow scans occupy every slot in the bounded coordinator.
     const release: (() => void)[] = [];
-    h.db.pendingFor.mockImplementation(
+    h.db.openFor.mockImplementation(
       () =>
         new Promise<FakeRow | null>((r) => {
           release.push(() => r(null));
@@ -1322,7 +1396,7 @@ describe('login recovery', () => {
 
   it('keeps both purchase rails blocked and retries in-session at the recovery cap', async () => {
     const h = makeHarness();
-    h.db.pendingFor.mockImplementation(() => new Promise<FakeRow | null>(() => {}));
+    h.db.openFor.mockImplementation(() => new Promise<FakeRow | null>(() => {}));
     configureStoragePurchaseRuntime(() => h.host);
     for (let offset = 0; offset < STORAGE_RECOVERY_MAX_TRACKED; offset++) {
       kickStoragePurchaseRecovery(10_000 + offset);

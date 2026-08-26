@@ -156,6 +156,10 @@ export interface StoragePurchaseHost {
     ): Promise<boolean>;
     discardWithoutDebit(idempotencyKey: string, claimToken: string): Promise<boolean>;
     pendingFor(characterId: number): Promise<StoragePurchaseRow | null>;
+    /** The authoritative pending-or-unresolved rail used at login. Keep this
+     * required: a pending-only fallback would forget an unresolved debit on
+     * final-session teardown and reopen the synchronous gold rail at relog. */
+    openFor(characterId: number): Promise<StoragePurchaseRow | null>;
   };
   realm: string;
   /** Dev-channel only; never player-visible text. */
@@ -253,12 +257,23 @@ interface LedgerOrderingHold {
 }
 const ledgerOrderingHold = new Map<number, LedgerOrderingHold>();
 
+// Live characters whose database-authoritative open row is unresolved. Unlike
+// ordinary holds this never ages out: the debit is confirmed and only support
+// may reconcile it. Final-session teardown removes the in-memory bit; the next
+// login's openFor scan re-arms it before the provisional scan hold releases.
+const unresolvedByCharacter = new Map<number, string>();
+
+function markUnresolvedPurchase(characterId: number, key: string): void {
+  unresolvedByCharacter.set(characterId, key);
+}
+
 /** The gold-path guard (server/bank_wire.ts): while a character's storage
  *  purchase is between initiation and slot application, a conflicting
  *  ladder purchase must refuse rather than race the fit check. Slot
  *  application is not finished until the audit row is durable, so the guard
  *  spans the settle chain too (ledgerOrderingHold). */
 export function storagePurchaseInFlight(characterId: number): boolean {
+  if (unresolvedByCharacter.has(characterId)) return true;
   // A coordinator-cap refusal is stored on the already-live session rather
   // than in another unbounded global collection. Treat a host read failure as
   // blocked: without a successful scan there is no proof an older debit is
@@ -391,6 +406,7 @@ export function resetStoragePurchasesForTests(): void {
   recoveryHosts.clear();
   warnedYields.clear();
   warnedLedgerYields.clear();
+  unresolvedByCharacter.clear();
   runtimeHostFactory = null;
 }
 
@@ -488,7 +504,9 @@ async function safeSettle(
     // A false result is deliberately not treated as terminal. Token ownership
     // may have rotated while this UPDATE waited, in which case this caller is
     // stale and must not infer anything about the row from its local reply.
-    return (await host.db.settle(p.key, status, p.claimToken)) ? 'settled' : 'lost';
+    const settled = await host.db.settle(p.key, status, p.claimToken);
+    if (settled && status === 'unresolved') markUnresolvedPurchase(p.characterId, p.key);
+    return settled ? 'settled' : 'lost';
   } catch (err) {
     // The row stays pending; the next login recovery converges it.
     host.warn(`storage purchase ${p.key}: settle(${status}) failed, deferred: ${String(err)}`);
@@ -710,6 +728,10 @@ export async function executeStoragePurchase(
   const live = host.resolveLiveCharacter(input.accountId);
   if (!live) return refusal('no_live_character');
   const { characterId, pid } = live;
+  const unresolvedKey = unresolvedByCharacter.get(characterId);
+  if (unresolvedKey !== undefined && unresolvedKey !== key) {
+    return refusal('purchase_in_progress');
+  }
   try {
     if (host.recoveryAdmissionPending?.(characterId)) {
       return refusal('purchase_in_progress');
@@ -781,6 +803,7 @@ export async function executeStoragePurchase(
         return { granted: true, balance: null, costClaudium: null, reason: 'already_granted' };
       }
       if (prior.status === 'unresolved') {
+        markUnresolvedPurchase(characterId, prior.idempotencyKey);
         return { granted: true, balance: null, costClaudium: null, reason: 'grant_unresolved' };
       }
     }
@@ -851,11 +874,15 @@ export async function executeStoragePurchase(
     // earlier attempt under the key might have debited. Existing pending rows
     // always remain ambiguous and are resolved by the same-key coordinator.
     if (!begun.inserted) {
-      if (begun.blockedByPending) {
-        // A different key already owns this character's database-enforced
-        // pending slot. It may have debited, so never spend the new key. Kick
-        // the owner and keep the client on the retryable in-progress answer.
-        needsRecoveryKick = true;
+      if (begun.blockedByOpen) {
+        // A different key owns this character's database-enforced open rail.
+        // Pending work is kicked; unresolved is operator-held and must never
+        // be sent through spend recovery.
+        if (begun.blockedByOpen.status === 'unresolved') {
+          markUnresolvedPurchase(characterId, begun.blockedByOpen.idempotencyKey);
+        } else {
+          needsRecoveryKick = true;
+        }
         return refusal('purchase_in_progress');
       }
       const row = begun.existing;
@@ -879,6 +906,7 @@ export async function executeStoragePurchase(
         return { granted: true, balance: null, costClaudium: null, reason: 'already_granted' };
       }
       if (row.status === 'unresolved') {
+        markUnresolvedPurchase(characterId, row.idempotencyKey);
         return { granted: true, balance: null, costClaudium: null, reason: 'grant_unresolved' };
       }
       // A pending row is owned (or was abandoned) by another process claim.
@@ -1043,7 +1071,7 @@ function releaseRecovery(characterId: number, row: StoragePurchaseRow | null): v
 }
 
 const recoveryCoordinator = new StorageRecoveryCoordinator<StoragePurchaseRow>({
-  scan: (characterId) => recoveryHost(characterId).db.pendingFor(characterId),
+  scan: (characterId) => scanStoragePurchaseRecovery(recoveryHost(characterId), characterId),
   reserve: reserveRecoveryRow,
   drive: (characterId, row, isCurrent) =>
     drivePendingPurchase(recoveryHost(characterId), characterId, row, isCurrent),
@@ -1072,6 +1100,7 @@ export async function stopStoragePurchaseRecovery(): Promise<void> {
 /** Final-session teardown hook. Only a character proven offline may become a
  * capacity-eviction candidate; login/request kicks mark it live again. */
 export function storagePurchaseCharacterOffline(characterId: number): void {
+  unresolvedByCharacter.delete(characterId);
   recoveryCoordinator.characterOffline(characterId);
 }
 
@@ -1141,7 +1170,7 @@ export async function resumeStoragePurchasesAtLogin(
   for (;;) {
     let row: StoragePurchaseRow | null;
     try {
-      row = await host.db.pendingFor(characterId);
+      row = await scanStoragePurchaseRecovery(host, characterId);
     } catch (err) {
       host.warn(`storage purchase recovery for character ${characterId} skipped: ${String(err)}`);
       releaseRecovery(characterId, null);
@@ -1166,6 +1195,22 @@ export async function resumeStoragePurchasesAtLogin(
     // seam honest: a pathological character never drains all rows in one turn.
     await new Promise<void>((resolve) => setImmediate(resolve));
   }
+}
+
+/** Resolve the login scan without ever handing an unresolved row to the spend
+ * coordinator. A successful authoritative openFor read also clears a stale
+ * in-memory bit after support removed the row. */
+async function scanStoragePurchaseRecovery(
+  host: StoragePurchaseHost,
+  characterId: number,
+): Promise<StoragePurchaseRow | null> {
+  const row = await host.db.openFor(characterId);
+  if (row?.status === 'unresolved') {
+    markUnresolvedPurchase(characterId, row.idempotencyKey);
+    return null;
+  }
+  unresolvedByCharacter.delete(characterId);
+  return row;
 }
 
 function purchaseRef(row: StoragePurchaseRow, claimToken = randomUUID()): PurchaseRef {

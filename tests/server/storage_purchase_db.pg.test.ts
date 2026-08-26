@@ -39,6 +39,7 @@ d('storage_purchases against real PostgreSQL', () => {
     storagePurchaseByKey: typeof import('../../server/storage_purchase_db').storagePurchaseByKey;
     settleStoragePurchase: typeof import('../../server/storage_purchase_db').settleStoragePurchase;
     deletePendingStoragePurchaseWithoutDebit: typeof import('../../server/storage_purchase_db').deletePendingStoragePurchaseWithoutDebit;
+    openStoragePurchaseForCharacter: typeof import('../../server/storage_purchase_db').openStoragePurchaseForCharacter;
     pendingStoragePurchasesForCharacter: typeof import('../../server/storage_purchase_db').pendingStoragePurchasesForCharacter;
     renewStoragePurchaseSpendClaim: typeof import('../../server/storage_purchase_db').renewStoragePurchaseSpendClaim;
     lockStorageAppliedEffectAccountsOnClient: typeof import('../../server/storage_purchase_db').lockStorageAppliedEffectAccountsOnClient;
@@ -134,19 +135,24 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(defs.has('storage_purchases_account')).toBe(true);
     expect(defs.get('storage_purchases_account')).not.toContain('WHERE');
     expect(defs.has('storage_purchases_character_pending')).toBe(false);
-    const pendingDef = defs.get('storage_purchases_one_pending_per_character') ?? '';
-    expect(pendingDef).toContain('UNIQUE INDEX');
-    expect(pendingDef).toContain('(character_id)');
-    expect(pendingDef).toContain("WHERE (status = 'pending'::text)");
-    const pendingAuthority = await pool.query(
-      `SELECT indexrelid::regclass::text AS name, indisunique
+    expect(defs.has('storage_purchases_one_pending_per_character')).toBe(false);
+    const openDef = defs.get('storage_purchases_one_open_per_character') ?? '';
+    expect(openDef).toContain('UNIQUE INDEX');
+    expect(openDef).toContain('USING btree (character_id)');
+    expect(openDef).toContain("WHERE (status = ANY (ARRAY['pending'::text, 'unresolved'::text]))");
+    const openAuthority = await pool.query(
+      `SELECT indexrelid::regclass::text AS name, indisunique, indisvalid, indisready,
+              pg_get_expr(indpred, indrelid) AS predicate
          FROM pg_index
-        WHERE indexrelid = '${SCHEMA}.storage_purchases_one_pending_per_character'::regclass`,
+        WHERE indexrelid = '${SCHEMA}.storage_purchases_one_open_per_character'::regclass`,
     );
-    expect(pendingAuthority.rows).toEqual([
+    expect(openAuthority.rows).toEqual([
       expect.objectContaining({
-        name: 'storage_purchases_one_pending_per_character',
+        name: 'storage_purchases_one_open_per_character',
         indisunique: true,
+        indisvalid: true,
+        indisready: true,
+        predicate: "(status = ANY (ARRAY['pending'::text, 'unresolved'::text]))",
       }),
     ]);
     expect(defs.has('storage_purchases_refused')).toBe(false);
@@ -191,9 +197,9 @@ d('storage_purchases against real PostgreSQL', () => {
     ]);
   });
 
-  it('repairs a same-named but non-authoritative pending index', async () => {
-    await pool.query('DROP INDEX storage_purchases_one_pending_per_character');
-    await pool.query(`CREATE UNIQUE INDEX storage_purchases_one_pending_per_character
+  it('repairs a same-named but non-authoritative open-rail index', async () => {
+    await pool.query('DROP INDEX storage_purchases_one_open_per_character');
+    await pool.query(`CREATE UNIQUE INDEX storage_purchases_one_open_per_character
       ON storage_purchases (id) WHERE status = 'unresolved'`);
     await pool.query(db.STORAGE_PURCHASE_SCHEMA);
     const repaired = await pool.query(
@@ -202,15 +208,54 @@ d('storage_purchases against real PostgreSQL', () => {
          FROM pg_index i
          JOIN pg_attribute a
            ON a.attrelid = i.indrelid AND a.attnum = i.indkey[0]
-        WHERE i.indexrelid = '${SCHEMA}.storage_purchases_one_pending_per_character'::regclass`,
+        WHERE i.indexrelid = '${SCHEMA}.storage_purchases_one_open_per_character'::regclass`,
     );
     expect(repaired.rows).toEqual([
       {
         indisunique: true,
         attname: 'character_id',
-        predicate: "(status = 'pending'::text)",
+        predicate: "(status = ANY (ARRAY['pending'::text, 'unresolved'::text]))",
       },
     ]);
+  });
+
+  it('fails schema repair closed when legacy data has two open rows for one character', async () => {
+    const first = {
+      ...ROW,
+      accountId: 2,
+      characterId: 2,
+      idempotencyKey: 'pg-duplicate-open-unresolved',
+      claimToken: '00000000-0000-4000-8000-000000000071',
+    };
+    const second = {
+      ...first,
+      idempotencyKey: 'pg-duplicate-open-pending',
+      claimToken: '00000000-0000-4000-8000-000000000072',
+    };
+    await pool.query('DROP INDEX storage_purchases_one_open_per_character');
+    try {
+      await db.beginStoragePurchase(pool, first);
+      await db.settleStoragePurchase(pool, first.idempotencyKey, 'unresolved', first.claimToken);
+      await db.beginStoragePurchase(pool, second);
+
+      await expect(pool.query(db.STORAGE_PURCHASE_SCHEMA)).rejects.toMatchObject({ code: '23505' });
+      const preserved = await pool.query(
+        `SELECT idempotency_key, status FROM storage_purchases
+          WHERE character_id = 2 AND status IN ('pending', 'unresolved')
+          ORDER BY idempotency_key`,
+      );
+      expect(preserved.rows).toEqual([
+        { idempotency_key: second.idempotencyKey, status: 'pending' },
+        { idempotency_key: first.idempotencyKey, status: 'unresolved' },
+      ]);
+    } finally {
+      await pool.query(
+        `DELETE FROM storage_purchases
+          WHERE idempotency_key = ANY($1::text[])`,
+        [[first.idempotencyKey, second.idempotencyKey]],
+      );
+      await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    }
   });
 
   it('repairs a same-named weak or unvalidated spend-claim constraint', async () => {
@@ -270,8 +315,124 @@ d('storage_purchases against real PostgreSQL', () => {
     }
   });
 
-  it('serializes two clients racing different keys onto one pending character authority', async () => {
-    await pool.query("DELETE FROM storage_purchases WHERE character_id = 2 AND status = 'pending'");
+  it('keeps the open index and every trigger catalog row stable on a steady-state second boot', async () => {
+    const readTriggerIdentity = () =>
+      pool.query(
+        `SELECT c.relname, t.tgname, t.oid::text AS oid, t.xmin::text AS xmin
+           FROM pg_trigger t
+           JOIN pg_class c ON c.oid = t.tgrelid
+          WHERE NOT t.tgisinternal
+            AND t.tgname LIKE 'storage_purchase_%'
+          ORDER BY c.relname, t.tgname`,
+      );
+    const readIndexIdentity = () =>
+      pool.query(
+        `SELECT index_rel.oid::text AS oid, index_rel.xmin::text AS xmin
+           FROM pg_class index_rel
+          WHERE index_rel.oid =
+                '${SCHEMA}.storage_purchases_one_open_per_character'::regclass`,
+      );
+    const triggerBefore = await readTriggerIdentity();
+    const indexBefore = await readIndexIdentity();
+    expect(triggerBefore.rows).toHaveLength(4);
+    expect(indexBefore.rows).toHaveLength(1);
+    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    expect((await readTriggerIdentity()).rows).toEqual(triggerBefore.rows);
+    expect((await readIndexIdentity()).rows).toEqual(indexBefore.rows);
+  });
+
+  it('repairs malformed same-named triggers to their exact catalog definitions', async () => {
+    await pool.query(
+      'DROP TRIGGER storage_purchase_guard_character_delete ON characters; ' +
+        'CREATE TRIGGER storage_purchase_guard_character_delete AFTER DELETE ON characters ' +
+        'FOR EACH ROW EXECUTE FUNCTION guard_pending_storage_purchase_parent_delete()',
+    );
+    await pool.query(
+      'DROP TRIGGER storage_purchase_guard_account_delete ON accounts; ' +
+        'CREATE TRIGGER storage_purchase_guard_account_delete BEFORE UPDATE ON accounts ' +
+        'FOR EACH ROW EXECUTE FUNCTION guard_pending_storage_purchase_parent_delete()',
+    );
+    await pool.query(
+      'DROP TRIGGER storage_purchase_guard_consumed_key ON storage_purchases; ' +
+        'CREATE TRIGGER storage_purchase_guard_consumed_key AFTER INSERT ON storage_purchases ' +
+        'FOR EACH ROW EXECUTE FUNCTION guard_storage_purchase_consumed_key()',
+    );
+    await pool.query(
+      'DROP TRIGGER storage_purchase_archive_applied ON storage_purchases; ' +
+        'CREATE TRIGGER storage_purchase_archive_applied AFTER UPDATE ON storage_purchases ' +
+        'FOR EACH ROW EXECUTE FUNCTION archive_storage_purchase_applied_receipt()',
+    );
+
+    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    const definitions = await pool.query(
+      `SELECT c.relname,
+              t.tgname,
+              t.tgtype::int AS tgtype,
+              t.tgenabled,
+              t.tgnargs,
+              octet_length(t.tgargs) AS arg_bytes,
+              t.tgattr::text AS tgattr,
+              pg_get_expr(t.tgqual, t.tgrelid) AS qualifier,
+              p.proname
+         FROM pg_trigger t
+         JOIN pg_class c ON c.oid = t.tgrelid
+         JOIN pg_proc p ON p.oid = t.tgfoid
+        WHERE NOT t.tgisinternal
+          AND t.tgname LIKE 'storage_purchase_%'
+        ORDER BY c.relname, t.tgname`,
+    );
+    expect(definitions.rows).toEqual([
+      expect.objectContaining({
+        relname: 'accounts',
+        tgname: 'storage_purchase_guard_account_delete',
+        tgtype: 11,
+        tgenabled: 'O',
+        tgnargs: 0,
+        arg_bytes: 0,
+        tgattr: '',
+        qualifier: null,
+        proname: 'guard_pending_storage_purchase_parent_delete',
+      }),
+      expect.objectContaining({
+        relname: 'characters',
+        tgname: 'storage_purchase_guard_character_delete',
+        tgtype: 11,
+        tgenabled: 'O',
+        tgnargs: 0,
+        arg_bytes: 0,
+        tgattr: '',
+        qualifier: null,
+        proname: 'guard_pending_storage_purchase_parent_delete',
+      }),
+      expect.objectContaining({
+        relname: 'storage_purchases',
+        tgname: 'storage_purchase_archive_applied',
+        tgtype: 21,
+        tgenabled: 'O',
+        tgnargs: 0,
+        arg_bytes: 0,
+        qualifier: "(new.status = 'applied'::text)",
+        proname: 'archive_storage_purchase_applied_receipt',
+      }),
+      expect.objectContaining({
+        relname: 'storage_purchases',
+        tgname: 'storage_purchase_guard_consumed_key',
+        tgtype: 7,
+        tgenabled: 'O',
+        tgnargs: 0,
+        arg_bytes: 0,
+        tgattr: '',
+        qualifier: null,
+        proname: 'guard_storage_purchase_consumed_key',
+      }),
+    ]);
+    expect(definitions.rows[2].tgattr).not.toBe('');
+  });
+
+  it('serializes two clients racing different keys onto one open character authority', async () => {
+    await pool.query(
+      "DELETE FROM storage_purchases WHERE character_id = 2 AND status IN ('pending', 'unresolved')",
+    );
     const attempts = await Promise.all([
       db.beginStoragePurchase(pool, {
         ...ROW,
@@ -291,7 +452,7 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(attempts.filter((attempt) => attempt.inserted)).toHaveLength(1);
     const loser = attempts.find((attempt) => !attempt.inserted);
     expect(loser?.existing).toBeNull();
-    expect(loser?.blockedByPending?.idempotencyKey).toMatch(/^pg-character-race-[ab]$/);
+    expect(loser?.blockedByOpen?.idempotencyKey).toMatch(/^pg-character-race-[ab]$/);
     const rows = await pool.query(
       "SELECT idempotency_key FROM storage_purchases WHERE character_id = 2 AND status = 'pending'",
     );
@@ -299,7 +460,74 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(rows.rows[0].idempotency_key).toBe(
       attempts.find((attempt) => attempt.inserted)?.existing?.idempotencyKey,
     );
-    await pool.query("DELETE FROM storage_purchases WHERE character_id = 2 AND status = 'pending'");
+    await pool.query(
+      "DELETE FROM storage_purchases WHERE character_id = 2 AND status IN ('pending', 'unresolved')",
+    );
+  });
+
+  it('makes a concurrent unresolved transition block a new key after the wait', async () => {
+    const oldKey = 'pg-unresolved-race-old';
+    const newKey = 'pg-unresolved-race-new';
+    const oldToken = '00000000-0000-4000-8000-000000000073';
+    await db.beginStoragePurchase(pool, {
+      ...ROW,
+      accountId: 2,
+      characterId: 2,
+      idempotencyKey: oldKey,
+      claimToken: oldToken,
+    });
+    const resolver = await pool.connect();
+    try {
+      await resolver.query('BEGIN');
+      await resolver.query(
+        `UPDATE storage_purchases
+            SET status = 'unresolved', resolved_at = now(),
+                spend_claim_token = NULL, spend_claim_expires_at = NULL
+          WHERE idempotency_key = $1 AND spend_claim_token = $2`,
+        [oldKey, oldToken],
+      );
+      let resolved = false;
+      const racingBegin = db
+        .beginStoragePurchase(pool, {
+          ...ROW,
+          accountId: 2,
+          characterId: 2,
+          idempotencyKey: newKey,
+          claimToken: '00000000-0000-4000-8000-000000000074',
+        })
+        .then((result) => {
+          resolved = true;
+          return result;
+        });
+      let sawWait = false;
+      for (let attempt = 0; attempt < 100 && !sawWait; attempt++) {
+        const waiting = await resolver.query(
+          `SELECT count(*)::int AS n
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND wait_event_type = 'Lock'
+              AND query LIKE 'INSERT INTO storage_purchases%'`,
+        );
+        sawWait = waiting.rows[0].n > 0;
+        if (!sawWait) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(sawWait).toBe(true);
+      expect(resolved).toBe(false);
+      await resolver.query('COMMIT');
+      const loser = await racingBegin;
+      expect(loser).toMatchObject({
+        inserted: false,
+        existing: null,
+        blockedByOpen: { idempotencyKey: oldKey, status: 'unresolved' },
+      });
+      expect(await db.storagePurchaseByKey(pool, newKey)).toBeNull();
+    } finally {
+      await resolver.query('ROLLBACK').catch(() => {});
+      resolver.release();
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = ANY($1::text[])', [
+        [oldKey, newKey],
+      ]);
+    }
   });
 
   it('gives only one of two same-key begin clients the initial spend claim', async () => {
@@ -568,6 +796,272 @@ d('storage_purchases against real PostgreSQL', () => {
     }
   });
 
+  it('suppresses an old-shape insert that waited behind receipt archival and deletion', async () => {
+    const key = 'pg-old-shape-consumed-race';
+    const token = '00000000-0000-4000-8000-000000000075';
+    const effect = {
+      realm: ROW.realm,
+      accountId: 2,
+      characterId: 2,
+      itemId: 'strongbox_old_shape_test',
+      expectedCostClaudium: ROW.expectedCostClaudium,
+      idempotencyKey: key,
+      spendClaimToken: token,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    };
+    await db.beginStoragePurchase(pool, { ...effect, claimToken: token });
+    const saver = await pool.connect();
+    try {
+      await saver.query('BEGIN');
+      await db.lockStorageAppliedEffectAccountsOnClient(saver, [effect]);
+      await saver.query('UPDATE characters SET id = id WHERE id = 2');
+      await db.writeStorageAppliedEffectsOnClient(saver, [effect]);
+
+      let resolved = false;
+      const legacyInsert = pool
+        .query(
+          `INSERT INTO storage_purchases
+             (realm, account_id, character_id, item_id, expected_cost_claudium,
+              idempotency_key)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT (idempotency_key) DO NOTHING
+           RETURNING id`,
+          // Different parents prove this wait is the idempotency-key advisory
+          // authority inside the legacy INSERT trigger, not the saver-held
+          // character lock.
+          [effect.realm, 1, 1, effect.itemId, effect.expectedCostClaudium, key],
+        )
+        .then((result) => {
+          resolved = true;
+          return result;
+        });
+      let sawWait = false;
+      for (let attempt = 0; attempt < 100 && !sawWait; attempt++) {
+        const waiting = await saver.query(
+          `SELECT count(*)::int AS n
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND wait_event_type = 'Lock'
+              AND query LIKE 'INSERT INTO storage_purchases%'`,
+        );
+        sawWait = waiting.rows[0].n > 0;
+        if (!sawWait) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(sawWait).toBe(true);
+      expect(resolved).toBe(false);
+      await saver.query('COMMIT');
+      expect((await legacyInsert).rowCount).toBe(0);
+      expect(
+        (
+          await pool.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+      expect(await db.storagePurchaseByKey(pool, key)).toMatchObject({ status: 'applied' });
+    } finally {
+      await saver.query('ROLLBACK').catch(() => {});
+      saver.release();
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
+      await pool.query('DELETE FROM storage_purchase_applied_receipts WHERE idempotency_key = $1', [
+        key,
+      ]);
+      await pool.query('DELETE FROM bank_ledger WHERE item_id = $1', [effect.itemId]);
+    }
+  });
+
+  it('lets a waiting old-shape insert proceed when the competing receipt rolls back', async () => {
+    const key = 'pg-old-shape-receipt-rollback';
+    const writer = await pool.connect();
+    try {
+      await writer.query('BEGIN');
+      await writer.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))', [key]);
+      await writer.query(
+        `INSERT INTO storage_purchase_applied_receipts
+           (source_purchase_id, realm, account_id, character_id, item_id,
+            expected_cost_claudium, idempotency_key, applied_at)
+         VALUES (nextval('storage_purchases_id_seq'), 'pgtest', 2, 2,
+                 'rollback_probe', 100, $1, now())`,
+        [key],
+      );
+      let resolved = false;
+      const legacyInsert = pool
+        .query(
+          `INSERT INTO storage_purchases
+             (realm, account_id, character_id, item_id, expected_cost_claudium,
+              idempotency_key)
+           VALUES ('pgtest', 2, 2, 'rollback_probe', 100, $1)
+           ON CONFLICT (idempotency_key) DO NOTHING
+           RETURNING id`,
+          [key],
+        )
+        .then((result) => {
+          resolved = true;
+          return result;
+        });
+      let sawWait = false;
+      for (let attempt = 0; attempt < 100 && !sawWait; attempt++) {
+        const waiting = await writer.query(
+          `SELECT count(*)::int AS n
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND wait_event_type = 'Lock'
+              AND query LIKE 'INSERT INTO storage_purchases%'`,
+        );
+        sawWait = waiting.rows[0].n > 0;
+        if (!sawWait) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(sawWait).toBe(true);
+      expect(resolved).toBe(false);
+      await writer.query('ROLLBACK');
+      expect((await legacyInsert).rowCount).toBe(1);
+      expect(await db.storagePurchaseByKey(pool, key)).toMatchObject({ status: 'pending' });
+    } finally {
+      await writer.query('ROLLBACK').catch(() => {});
+      writer.release();
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
+      await pool.query('DELETE FROM storage_purchase_applied_receipts WHERE idempotency_key = $1', [
+        key,
+      ]);
+    }
+  });
+
+  it('fails a mixed-release update/key-lock inversion closed and converges after retry', async () => {
+    const key = 'pg-legacy-update-deadlock';
+    const token = '00000000-0000-4000-8000-000000000076';
+    const itemId = 'legacy_update_deadlock_probe';
+    const effect = {
+      realm: ROW.realm,
+      accountId: 2,
+      characterId: 2,
+      itemId,
+      expectedCostClaudium: ROW.expectedCostClaudium,
+      idempotencyKey: key,
+      spendClaimToken: token,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    };
+    await db.beginStoragePurchase(pool, { ...effect, claimToken: token });
+    const saver = await pool.connect();
+    const legacy = await pool.connect();
+    try {
+      await saver.query('BEGIN');
+      await db.lockStorageAppliedEffectAccountsOnClient(saver, [effect]);
+      await saver.query('UPDATE characters SET id = id WHERE id = 2');
+      // Current writers acquire key -> operational row. Hold only the key so
+      // the old UPDATE can first lock the row, then block inside its AFTER
+      // trigger while trying to acquire the same key.
+      await saver.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))', [key]);
+      await legacy.query('BEGIN');
+      const legacyUpdate = legacy
+        .query(
+          `UPDATE storage_purchases
+                SET status = 'applied', resolved_at = now()
+              WHERE idempotency_key = $1`,
+          [key],
+        )
+        .then(
+          (value) => ({ value, error: null as unknown }),
+          (error: unknown) => ({ value: null, error }),
+        );
+      let sawLegacyWait = false;
+      for (let attempt = 0; attempt < 100 && !sawLegacyWait; attempt++) {
+        const waiting = await saver.query(
+          `SELECT count(*)::int AS n
+               FROM pg_stat_activity
+              WHERE datname = current_database()
+                AND wait_event_type = 'Lock'
+                AND query LIKE 'UPDATE storage_purchases%'`,
+        );
+        sawLegacyWait = waiting.rows[0].n > 0;
+        if (!sawLegacyWait) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(sawLegacyWait).toBe(true);
+
+      const currentWrite = db.writeStorageAppliedEffectsOnClient(saver, [effect]).then(
+        () => ({ error: null as unknown }),
+        (error: unknown) => ({ error }),
+      );
+      const [legacyResult, currentResult] = await Promise.all([legacyUpdate, currentWrite]);
+      const legacyCode = (legacyResult.error as { code?: string } | null)?.code;
+      const currentCode = (currentResult.error as { code?: string } | null)?.code;
+      expect([legacyCode, currentCode].filter((code) => code === '40P01')).toHaveLength(1);
+
+      if (legacyCode === '40P01') {
+        await legacy.query('ROLLBACK');
+        await saver.query('COMMIT');
+        // Retry the deadlock victim after the current receipt+delete commits.
+        // The old writer sees no operational row and creates no second receipt.
+        const retry = await legacy.query(
+          `UPDATE storage_purchases
+                SET status = 'applied', resolved_at = now()
+              WHERE idempotency_key = $1`,
+          [key],
+        );
+        expect(retry.rowCount).toBe(0);
+      } else {
+        expect(currentCode).toBe('40P01');
+        await saver.query('ROLLBACK');
+        await legacy.query('COMMIT');
+        // Retry the current writer against the receipt archived by the old
+        // writer. It validates the fingerprint and must not duplicate audit.
+        await saver.query('BEGIN');
+        await db.lockStorageAppliedEffectAccountsOnClient(saver, [effect]);
+        await saver.query('UPDATE characters SET id = id WHERE id = 2');
+        await db.writeStorageAppliedEffectsOnClient(saver, [effect]);
+        await saver.query('COMMIT');
+      }
+
+      expect(
+        (
+          await saver.query(
+            'SELECT count(*)::int AS n FROM storage_purchase_applied_receipts ' +
+              'WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(1);
+      expect(
+        (
+          await saver.query(
+            `SELECT count(*)::int AS n FROM storage_purchases
+                WHERE idempotency_key = $1 AND status IN ('pending', 'unresolved')`,
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+      expect(
+        (
+          await saver.query('SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1', [
+            itemId,
+          ])
+        ).rows[0].n,
+      ).toBeLessThanOrEqual(1);
+      const replay = await saver.query(
+        `INSERT INTO storage_purchases
+             (realm, account_id, character_id, item_id, expected_cost_claudium,
+              idempotency_key)
+           VALUES ('pgtest', 2, 2, $1, 100, $2)
+           ON CONFLICT (idempotency_key) DO NOTHING
+           RETURNING id`,
+        [itemId, key],
+      );
+      expect(replay.rowCount).toBe(0);
+    } finally {
+      await saver.query('ROLLBACK').catch(() => {});
+      await legacy.query('ROLLBACK').catch(() => {});
+      saver.release();
+      legacy.release();
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
+      await pool.query('DELETE FROM storage_purchase_applied_receipts WHERE idempotency_key = $1', [
+        key,
+      ]);
+      await pool.query('DELETE FROM bank_ledger WHERE item_id = $1', [itemId]);
+    }
+  }, 15_000);
+
   it('commits the character-side receipt and Claudium ledger exactly once', async () => {
     const effect = {
       realm: 'pgtest',
@@ -691,7 +1185,23 @@ d('storage_purchases against real PostgreSQL', () => {
     expect((await db.storagePurchaseByKey(pool, 'pg-key-1'))?.status).toBe('unresolved');
     expect(await db.pendingStoragePurchasesForCharacter(pool, 1)).toBeNull();
 
-    await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-key-2' });
+    const blocked = await db.beginStoragePurchase(pool, {
+      ...ROW,
+      idempotencyKey: 'pg-key-2',
+    });
+    expect(blocked).toMatchObject({
+      inserted: false,
+      existing: null,
+      blockedByOpen: { idempotencyKey: 'pg-key-1', status: 'unresolved' },
+    });
+    expect(await db.storagePurchaseByKey(pool, 'pg-key-2')).toBeNull();
+    // Model the explicit support resolution before proving the rail can open
+    // for a later key. Unresolved is not a recovery retry and cannot be closed
+    // through the no-debit helper.
+    await pool.query("DELETE FROM storage_purchases WHERE idempotency_key = 'pg-key-1'");
+    expect(
+      (await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-key-2' })).inserted,
+    ).toBe(true);
     expect((await db.pendingStoragePurchasesForCharacter(pool, 1))?.idempotencyKey).toBe(
       'pg-key-2',
     );
@@ -792,27 +1302,40 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(await db.storagePurchaseByKey(pool, 'pg-cascade-control')).not.toBeNull();
   });
 
-  it('the login-recovery scan is served by an index, not a sequential scan', async () => {
-    // The module comment claims the character-scoped partial index serves this read.
-    // Ask the planner rather than trusting the prose: pin the ACCESS SHAPE (no
-    // Seq Scan on the table) rather than a plan string, which drifts across
-    // versions and row counts.
-    const planner = await pool.connect();
-    let inTransaction = false;
+  it('the default planner uses the open-rail index at realistic closed-row cardinality', async () => {
+    await pool.query('INSERT INTO accounts (id) VALUES (7)');
+    await pool.query('INSERT INTO characters (id) VALUES (7)');
     try {
-      await planner.query('BEGIN');
-      inTransaction = true;
-      await planner.query('SET LOCAL enable_seqscan = off');
-      const plan = await planner.query(
-        'EXPLAIN (FORMAT JSON) SELECT id FROM storage_purchases ' +
-          "WHERE character_id = 1 AND status = 'pending' ORDER BY created_at, id LIMIT 1",
+      await pool.query(
+        `INSERT INTO storage_purchases
+           (realm, account_id, character_id, item_id, expected_cost_claudium,
+            idempotency_key, status, resolved_at)
+         SELECT 'pgtest', 7, 7, 'planner_closed', 100,
+                'pg-planner-closed-' || n::text, 'applied', now()
+           FROM generate_series(1, 1500) AS n`,
       );
-      expect(JSON.stringify(plan.rows[0])).toContain('storage_purchases_one_pending_per_character');
-      await planner.query('ROLLBACK');
-      inTransaction = false;
+      await db.beginStoragePurchase(pool, {
+        ...ROW,
+        accountId: 7,
+        characterId: 7,
+        idempotencyKey: 'pg-planner-open',
+        claimToken: '00000000-0000-4000-8000-000000000077',
+      });
+      await pool.query('ANALYZE storage_purchases');
+      const plan = await pool.query(
+        'EXPLAIN (FORMAT JSON) SELECT id FROM storage_purchases ' +
+          "WHERE character_id = 7 AND status IN ('pending', 'unresolved') " +
+          'ORDER BY created_at, id LIMIT 1',
+      );
+      expect(JSON.stringify(plan.rows[0])).toContain('storage_purchases_one_open_per_character');
+      expect(await db.openStoragePurchaseForCharacter(pool, 7)).toMatchObject({
+        idempotencyKey: 'pg-planner-open',
+        status: 'pending',
+      });
     } finally {
-      if (inTransaction) await planner.query('ROLLBACK').catch(() => {});
-      planner.release();
+      await pool.query("DELETE FROM storage_purchases WHERE account_id = 7 AND status = 'pending'");
+      await pool.query('DELETE FROM characters WHERE id = 7');
+      await pool.query('DELETE FROM accounts WHERE id = 7');
     }
   });
   it('rejects persistent refused history at the database boundary', async () => {

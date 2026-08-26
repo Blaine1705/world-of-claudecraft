@@ -148,6 +148,7 @@ describe('the gold-path mutex refusal', () => {
         settle: async () => true,
         discardWithoutDebit: async () => true,
         pendingFor: async () => null,
+        openFor: async () => null,
       },
       realm: 'testrealm',
       warn: vi.fn(),
@@ -506,6 +507,7 @@ describe('phase 14: the outage that used to strand the gold rung', () => {
           return true;
         },
         pendingFor: async () => null,
+        openFor: async () => null,
       },
       realm: 'testrealm',
       warn: vi.fn(),

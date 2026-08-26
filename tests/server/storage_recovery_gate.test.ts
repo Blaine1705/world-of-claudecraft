@@ -48,6 +48,7 @@ function host(over: Partial<StoragePurchaseHost> = {}): StoragePurchaseHost {
       settle: async () => true,
       discardWithoutDebit: async () => true,
       pendingFor: async () => null,
+      openFor: async () => null,
     },
     realm: 'testrealm',
     warn: vi.fn(),
@@ -75,18 +76,18 @@ afterEach(resetStoragePurchasesForTests);
 describe('bounded storage recovery integration', () => {
   it('arms the gold hold synchronously and coalesces duplicate login kicks', async () => {
     const firstScan = deferred<StoragePurchaseRow | null>();
-    const pendingFor = vi
-      .fn<StoragePurchaseHost['db']['pendingFor']>()
+    const openFor = vi
+      .fn<StoragePurchaseHost['db']['openFor']>()
       .mockImplementationOnce(() => firstScan.promise)
       .mockResolvedValue(null);
-    const runtime = host({ db: { ...host().db, pendingFor } });
+    const runtime = host({ db: { ...host().db, openFor } });
     configureStoragePurchaseRuntime(() => runtime);
 
     kickStoragePurchaseRecovery(42);
     kickStoragePurchaseRecovery(42);
     kickStoragePurchaseRecovery(42);
     expect(storagePurchaseInFlight(42)).toBe(true);
-    expect(pendingFor).toHaveBeenCalledTimes(1);
+    expect(openFor).toHaveBeenCalledTimes(1);
     expect(storagePurchaseRecoveryMetrics()).toMatchObject({
       tracked: 1,
       coalescedKicks: 2,
@@ -97,7 +98,7 @@ describe('bounded storage recovery integration', () => {
     await waitFor(() => !storagePurchaseInFlight(42));
     // All duplicates collapse into one newer read, rather than one read per
     // kick, because the first scan's snapshot could predate their open row.
-    expect(pendingFor).toHaveBeenCalledTimes(2);
+    expect(openFor).toHaveBeenCalledTimes(2);
     expect(storagePurchaseRecoveryMetrics().tracked).toBe(0);
   });
 
@@ -118,8 +119,8 @@ describe('bounded storage recovery integration', () => {
       },
       db: {
         ...host().db,
-        pendingFor: vi
-          .fn<StoragePurchaseHost['db']['pendingFor']>()
+        openFor: vi
+          .fn<StoragePurchaseHost['db']['openFor']>()
           .mockResolvedValueOnce(row(51))
           .mockResolvedValueOnce(null),
       },
@@ -132,7 +133,7 @@ describe('bounded storage recovery integration', () => {
     expect(runtime.db.discardWithoutDebit).toBeDefined();
   });
 
-  it('never spends a new key while another key is pending for the character', async () => {
+  it('never spends a new key while another key is open for the character', async () => {
     const blocking = row(53);
     const spend = vi.fn<StoragePurchaseHost['spend']>();
     const runtime = host({
@@ -142,7 +143,7 @@ describe('bounded storage recovery integration', () => {
         begin: async () => ({
           inserted: false,
           existing: null,
-          blockedByPending: blocking,
+          blockedByOpen: blocking,
         }),
       },
     });
@@ -162,8 +163,8 @@ describe('bounded storage recovery integration', () => {
   it('re-drives a row inserted after an older scan snapshot without leaking its hold', async () => {
     const oldScan = deferred<StoragePurchaseRow | null>();
     const inserted = row(57);
-    const pendingFor = vi
-      .fn<StoragePurchaseHost['db']['pendingFor']>()
+    const openFor = vi
+      .fn<StoragePurchaseHost['db']['openFor']>()
       .mockImplementationOnce(() => oldScan.promise)
       .mockResolvedValueOnce(inserted)
       .mockResolvedValueOnce(null);
@@ -192,7 +193,7 @@ describe('bounded storage recovery integration', () => {
       db: {
         ...host().db,
         begin: async () => ({ inserted: true, existing: inserted }),
-        pendingFor,
+        openFor,
       },
     });
     configureStoragePurchaseRuntime(() => runtime);
@@ -216,7 +217,7 @@ describe('bounded storage recovery integration', () => {
 
       oldScan.resolve(null);
       await waitFor(() => storagePurchaseRecoveryMetrics().tracked === 0);
-      expect(pendingFor).toHaveBeenCalledTimes(3);
+      expect(openFor).toHaveBeenCalledTimes(3);
       expect(spend).toHaveBeenCalledTimes(2);
       expect(storagePurchaseInFlight(57)).toBe(false);
     } finally {
@@ -227,8 +228,8 @@ describe('bounded storage recovery integration', () => {
   it('re-drives failed no-debit cleanup inserted after an older scan snapshot', async () => {
     const oldScan = deferred<StoragePurchaseRow | null>();
     const inserted = row(58);
-    const pendingFor = vi
-      .fn<StoragePurchaseHost['db']['pendingFor']>()
+    const openFor = vi
+      .fn<StoragePurchaseHost['db']['openFor']>()
       .mockImplementationOnce(() => oldScan.promise)
       .mockResolvedValueOnce(inserted)
       .mockResolvedValueOnce(null);
@@ -251,7 +252,7 @@ describe('bounded storage recovery integration', () => {
         ...host().db,
         begin: async () => ({ inserted: true, existing: inserted }),
         discardWithoutDebit,
-        pendingFor,
+        openFor,
       },
     });
     configureStoragePurchaseRuntime(() => runtime);
@@ -277,7 +278,7 @@ describe('bounded storage recovery integration', () => {
 
       oldScan.resolve(null);
       await waitFor(() => storagePurchaseRecoveryMetrics().tracked === 0);
-      expect(pendingFor).toHaveBeenCalledTimes(3);
+      expect(openFor).toHaveBeenCalledTimes(3);
       expect(spend).toHaveBeenCalledTimes(2);
       expect(discardWithoutDebit).toHaveBeenCalledTimes(2);
       expect(storagePurchaseInFlight(58)).toBe(false);
@@ -290,8 +291,8 @@ describe('bounded storage recovery integration', () => {
     const events: string[] = [];
     let crossedTurn = false;
     const firstDelete = deferred<boolean>();
-    const pendingFor = vi
-      .fn<StoragePurchaseHost['db']['pendingFor']>()
+    const openFor = vi
+      .fn<StoragePurchaseHost['db']['openFor']>()
       .mockImplementationOnce(async () => {
         events.push('scan:a');
         return row(61);
@@ -319,7 +320,7 @@ describe('bounded storage recovery integration', () => {
       },
       db: {
         ...host().db,
-        pendingFor,
+        openFor,
         discardWithoutDebit: vi
           .fn<StoragePurchaseHost['db']['discardWithoutDebit']>()
           .mockImplementationOnce(() => firstDelete.promise)

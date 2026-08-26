@@ -5,16 +5,19 @@
 // CLAUSES: the unique-key upsert, monotone settlement and guarded deletion,
 // the closed status vocabulary, and the DDL's recovery index. Each anchor is a
 // contiguous clause with its occurrence pinned, never a lone keyword.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { DbTransactionDeadlineClient } from '../../server/db_transaction_deadline';
 import {
   beginStoragePurchase,
   claimStoragePurchaseSpend,
   deletePendingStoragePurchaseWithoutDebit,
   lockStorageAppliedEffectAccountsOnClient,
+  openStoragePurchaseForCharacter,
   pendingStoragePurchasesForCharacter,
   releaseStoragePurchaseSpendClaim,
   renewStoragePurchaseSpendClaim,
   STORAGE_PURCHASE_SCHEMA,
+  STORAGE_PURCHASE_TRANSACTION_TIMEOUT_MS,
   settleStoragePurchase,
   storagePurchaseByKey,
   writeStorageAppliedEffectsOnClient,
@@ -45,7 +48,13 @@ function makeCapture(results: { rows?: Record<string, unknown>[]; rowCount?: num
     calls,
     db: {
       query,
-      connect: async () => ({ query, release: () => {} }),
+      connect: async () =>
+        ({
+          query,
+          release: () => {},
+          on: () => {},
+          removeListener: () => {},
+        }) as unknown as DbTransactionDeadlineClient,
     },
   };
 }
@@ -91,8 +100,8 @@ describe('the DDL', () => {
     expect(folded).toContain("SELECT c.convalidated AND c.contype = 'c'");
     expect(folded).toContain('cardinality(c.conkey) = 2');
     expect(folded).toContain("pg_get_constraintdef(c.oid) LIKE '%spend_claim_token IS NOT NULL%'");
-    // The FK indexes stay FULL for cascades. The partial unique index is both
-    // the paid-rail authority and the one-row recovery access path.
+    // The FK indexes stay FULL for cascades. The partial unique index is the
+    // paid-rail authority for both possibly and confirmed debited work.
     expect(
       count(
         STORAGE_PURCHASE_SCHEMA,
@@ -137,25 +146,31 @@ describe('the DDL', () => {
     );
     expect(folded).toContain('DROP INDEX IF EXISTS storage_purchases_character_pending;');
     expect(folded).toContain(
-      'CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_pending_per_character ' +
-        "ON storage_purchases (character_id) WHERE status = 'pending';",
+      'CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_open_per_character ' +
+        "ON storage_purchases USING btree (character_id) WHERE status IN ('pending', 'unresolved');",
     );
+    expect(folded).toContain('DROP INDEX IF EXISTS storage_purchases_one_pending_per_character;');
     expect(folded).toContain("a.attname = 'character_id'");
-    expect(folded).toContain("pg_get_expr(i.indpred, i.indrelid) = '(status = ''pending''::text)'");
+    expect(folded).toContain("am.amname = 'btree'");
+    expect(folded).toContain("opc.opcname = 'int4_ops'");
+    expect(folded).toContain("opcnsp.nspname = 'pg_catalog'");
+    expect(folded).toContain(
+      "pg_get_expr(i.indpred, i.indrelid) = '(status = ANY (ARRAY[''pending''::text, ''unresolved''::text]))'",
+    );
     expect(folded).toContain('i.indisunique AND i.indisvalid AND i.indisready');
-    const pendingGuard = folded.slice(
-      folded.indexOf('DO $storage_purchase_pending_unique_guard$'),
-      folded.indexOf(
-        'CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_pending_per_character',
-      ),
+    expect(folded).toContain('i.indnkeyatts = 1 AND i.indnatts = 1');
+    const openGuard = folded.slice(
+      folded.indexOf('DO $storage_purchase_open_unique_guard$'),
+      folded.indexOf('CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_open_per_character'),
     );
-    expect(pendingGuard).toContain(
-      'IF NOT COALESCE(pending_index_ready, false) THEN SELECT character_id INTO duplicate_character_id FROM storage_purchases',
+    expect(openGuard).toContain(
+      'IF NOT COALESCE(open_index_ready, false) THEN SELECT character_id INTO duplicate_character_id FROM storage_purchases',
     );
-    expect(pendingGuard.indexOf('IF NOT COALESCE(pending_index_ready, false)')).toBeLessThan(
-      pendingGuard.indexOf('GROUP BY character_id'),
+    expect(openGuard).toContain("WHERE status IN ('pending', 'unresolved')");
+    expect(openGuard.indexOf('IF NOT COALESCE(open_index_ready, false)')).toBeLessThan(
+      openGuard.indexOf('GROUP BY character_id'),
     );
-    expect(count(pendingGuard, 'GROUP BY character_id')).toBe(1);
+    expect(count(openGuard, 'GROUP BY character_id')).toBe(1);
     expect(folded).toContain('DROP INDEX IF EXISTS storage_purchases_refused;');
     expect(count(folded, "DELETE FROM storage_purchases WHERE status = 'refused';")).toBe(1);
     expect(folded).toContain(
@@ -176,6 +191,44 @@ describe('the DDL', () => {
     expect(folded).toContain(
       'CREATE TRIGGER storage_purchase_guard_account_delete BEFORE DELETE ON accounts',
     );
+    const consumedGuard = folded.slice(
+      folded.indexOf('CREATE OR REPLACE FUNCTION guard_storage_purchase_consumed_key()'),
+      folded.indexOf(
+        '$storage_purchase_guard$;',
+        folded.indexOf('guard_storage_purchase_consumed_key'),
+      ),
+    );
+    expect(consumedGuard.indexOf('FOR KEY SHARE')).toBeLessThan(
+      consumedGuard.indexOf('FOR UPDATE'),
+    );
+    expect(consumedGuard.indexOf('FOR UPDATE')).toBeLessThan(
+      consumedGuard.indexOf('PERFORM pg_advisory_xact_lock'),
+    );
+    expect(consumedGuard.indexOf('PERFORM pg_advisory_xact_lock')).toBeLessThan(
+      consumedGuard.indexOf('IF EXISTS'),
+    );
+    const archiveGuard = folded.slice(
+      folded.indexOf('CREATE OR REPLACE FUNCTION archive_storage_purchase_applied_receipt()'),
+      folded.indexOf('$storage_purchase_receipt$;', folded.indexOf('archive_storage_purchase')),
+    );
+    expect(archiveGuard.indexOf('PERFORM pg_advisory_xact_lock')).toBeLessThan(
+      archiveGuard.indexOf('INSERT INTO storage_purchase_applied_receipts'),
+    );
+    const triggerGuard = folded.slice(folded.indexOf('DO $storage_purchase_trigger_guard$'));
+    expect(triggerGuard).toContain('t.tgtype = 11');
+    expect(triggerGuard).toContain('t.tgtype = 7');
+    expect(triggerGuard).toContain('t.tgtype = 21');
+    expect(triggerGuard).toContain("t.tgenabled = 'O'");
+    expect(triggerGuard).toContain('NOT t.tgisinternal');
+    expect(triggerGuard).toContain('t.tgnargs = 0');
+    expect(triggerGuard).toContain(
+      "pg_get_expr(t.tgqual, t.tgrelid) = '(new.status = ''applied''::text)'",
+    );
+    expect(folded.indexOf('DO $storage_purchase_trigger_guard$')).toBeGreaterThan(
+      folded.indexOf('CREATE OR REPLACE FUNCTION guard_storage_purchase_consumed_key()'),
+    );
+    expect(count(folded, 'DROP TRIGGER IF EXISTS')).toBe(4);
+    expect(count(triggerGuard, 'IF NOT COALESCE(trigger_ready, false) THEN')).toBe(4);
     // Both FK indexes stay FULL: a partial index cannot serve a delete cascade.
     expect(folded).not.toContain(
       'storage_purchases_character ON storage_purchases (character_id) WHERE',
@@ -261,7 +314,7 @@ describe('beginStoragePurchase', () => {
     expect(cap.calls.map(({ text }) => text.trim())).toEqual(
       expect.arrayContaining([
         'BEGIN',
-        'SET LOCAL lock_timeout = 2000; SET LOCAL idle_in_transaction_session_timeout = 2000',
+        'SET LOCAL statement_timeout = 15000; SET LOCAL lock_timeout = 2000; SET LOCAL idle_in_transaction_session_timeout = 2000',
         'SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE',
         'SELECT id FROM characters WHERE id = $1 FOR UPDATE',
         'SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))',
@@ -313,7 +366,7 @@ describe('beginStoragePurchase', () => {
     expect(res.existing?.accountId).toBe(8);
   });
 
-  it('distinguishes a different pending key for the same character', async () => {
+  it('distinguishes a different unresolved key holding the same character rail', async () => {
     const cap = makeCapture([
       { rows: [] },
       {
@@ -326,8 +379,8 @@ describe('beginStoragePurchase', () => {
             item_id: 'strongbox_rung_01',
             expected_cost_claudium: 100,
             idempotency_key: 'older-open-key',
-            status: 'pending',
-            conflict_kind: 'character_pending',
+            status: 'unresolved',
+            conflict_kind: 'character_open',
           },
         ],
       },
@@ -338,17 +391,57 @@ describe('beginStoragePurchase', () => {
     expect(data).toHaveLength(2);
     expect(data[0].text).toContain('ON CONFLICT DO NOTHING');
     expect(data[0].text).not.toContain('ON CONFLICT (idempotency_key)');
-    expect(data[1].text).toContain("character_id = $2 AND status = 'pending'");
+    expect(data[1].text.replace(/\s+/g, ' ')).toContain(
+      "character_id = $2 AND status IN ('pending', 'unresolved')",
+    );
     expect(data[1].values).toEqual(['new-key', 42]);
     expect(res).toEqual({
       inserted: false,
       existing: null,
-      blockedByPending: expect.objectContaining({
+      blockedByOpen: expect.objectContaining({
         characterId: 42,
         idempotencyKey: 'older-open-key',
-        status: 'pending',
+        status: 'unresolved',
       }),
     });
+  });
+
+  it('destroys a checked-out begin client when its whole transaction deadline expires', async () => {
+    vi.useFakeTimers();
+    let rejectActiveQuery: ((error: unknown) => void) | undefined;
+    const release = vi.fn((error?: Error | boolean) => {
+      if (error instanceof Error) rejectActiveQuery?.(error);
+    });
+    const query = vi.fn<(text: string, values?: unknown[]) => Promise<never>>(
+      () =>
+        new Promise<never>((_resolve, reject) => {
+          rejectActiveQuery = reject;
+        }),
+    );
+    const client = {
+      query,
+      release,
+      on: vi.fn(),
+      removeListener: vi.fn(),
+    } as unknown as DbTransactionDeadlineClient;
+    try {
+      const begun = beginStoragePurchase({ query, connect: async () => client }, ROW);
+      const rejection = expect(begun).rejects.toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+        commitMayHaveSucceeded: false,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(query).toHaveBeenCalledWith('BEGIN', undefined);
+      await vi.advanceTimersByTimeAsync(STORAGE_PURCHASE_TRANSACTION_TIMEOUT_MS);
+      await rejection;
+      expect(release).toHaveBeenCalledTimes(1);
+      expect(release.mock.calls[0][0]).toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+      });
+      expect(query.mock.calls.some(([text]) => text === 'ROLLBACK')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
@@ -520,7 +613,93 @@ describe('writeStorageAppliedEffectsOnClient', () => {
 
     await writeStorageAppliedEffectsOnClient(cap.db, [EFFECT]);
     expect(cap.calls).toHaveLength(3);
-    expect(cap.calls[2].text).toContain('AND spend_claim_token = $3');
+    expect(cap.calls[2].text).toContain('WHERE idempotency_key = $1');
+    expect(cap.calls[2].text).toContain('AND spend_claim_token = $2');
+    expect(cap.calls[2].text).not.toContain('source_purchase_id');
+    expect(cap.calls.some((call) => call.text.includes('INSERT INTO bank_ledger'))).toBe(false);
+  });
+
+  it('cleans a token-owned post-receipt residue by key and validates its fingerprint', async () => {
+    const cap = makeCapture([
+      {
+        rows: [
+          {
+            source_purchase_id: 9,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            purchased_slots_before: 0,
+            purchased_slots_after: 6,
+          },
+        ],
+      },
+      {
+        rows: [
+          {
+            id: 99,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            spend_claim_token: EFFECT.spendClaimToken,
+            status: 'pending',
+          },
+        ],
+        rowCount: 1,
+      },
+    ]);
+
+    await writeStorageAppliedEffectsOnClient(cap.db, [EFFECT]);
+    expect(cap.calls).toHaveLength(3);
+    expect(cap.calls[2].text).toContain('DELETE FROM storage_purchases');
+    expect(cap.calls[2].text).toContain('RETURNING');
+    expect(cap.calls[2].values).toEqual(['k-applied', EFFECT.spendClaimToken]);
+  });
+
+  it('rolls back a consumed-key residue cleanup when its fingerprint is unexpected', async () => {
+    const cap = makeCapture([
+      {
+        rows: [
+          {
+            source_purchase_id: 9,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            purchased_slots_before: 0,
+            purchased_slots_after: 6,
+          },
+        ],
+      },
+      {
+        rows: [
+          {
+            id: 99,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 99,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            spend_claim_token: EFFECT.spendClaimToken,
+            status: 'pending',
+          },
+        ],
+        rowCount: 1,
+      },
+    ]);
+
+    await expect(writeStorageAppliedEffectsOnClient(cap.db, [EFFECT])).rejects.toThrow(
+      /pending fingerprint conflict/,
+    );
+    expect(cap.calls).toHaveLength(3);
     expect(cap.calls.some((call) => call.text.includes('INSERT INTO bank_ledger'))).toBe(false);
   });
 
@@ -587,6 +766,15 @@ describe('pendingStoragePurchasesForCharacter', () => {
     expect(count(cap.calls[0].text, "status = 'pending'")).toBe(1);
     expect(count(cap.calls[0].text, 'ORDER BY created_at, id')).toBe(1);
     expect(count(cap.calls[0].text, 'LIMIT 1')).toBe(1);
+    expect(cap.calls[0].values).toEqual([42]);
+  });
+
+  it('reads the one pending-or-unresolved row through the open-rail seam', async () => {
+    const cap = makeCapture([{ rows: [] }]);
+    await openStoragePurchaseForCharacter(cap.db, 42);
+    expect(cap.calls[0].text).toContain("status IN ('pending', 'unresolved')");
+    expect(cap.calls[0].text).toContain('ORDER BY created_at, id');
+    expect(cap.calls[0].text).toContain('LIMIT 1');
     expect(cap.calls[0].values).toEqual([42]);
   });
 });
