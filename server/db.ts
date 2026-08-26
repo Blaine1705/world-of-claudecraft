@@ -29,7 +29,7 @@ import { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } from './bank_ledger_batch_db';
 import {
   type BankLedgerSaveEffects,
   characterUpdateStatement,
-  lockCharacterSaveEffectAccountsOnClient,
+  lockCharacterSaveEffectAccountsOnClient as lockSaveEffectAccounts,
   prepareBankLedgerSaveEffects,
   writeBankLedgerSaveEffectsOnClient,
 } from './bank_ledger_save_effects_db';
@@ -3431,7 +3431,7 @@ export async function saveCharacterState(
   try {
     await client.query('BEGIN');
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
+    await lockSaveEffectAccounts(client, storageEffects, ledger);
     const res = await client.query(stmt.text, stmt.values);
     if ((res.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
@@ -3478,7 +3478,7 @@ export async function saveCharacterAndMarketState(
     await client.query('BEGIN');
     // Wait out slow storage without exceeding the bounded heavy allowance.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
+    await lockSaveEffectAccounts(client, storageEffects, ledger);
     // Fence the bag half first; a miss rolls back before shared escrow writes.
     const stmt = characterUpdateStatement(
       characterId,
@@ -3654,7 +3654,7 @@ export async function saveCharacterAndGuildBankState(
     await client.query('BEGIN');
     // Escrow flushes use the bounded heavy allowance.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
+    await lockSaveEffectAccounts(client, storageEffects, ledger);
     const stmt = characterUpdateStatement(
       characterId,
       level,
@@ -3755,8 +3755,7 @@ export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
   }
 }
 
-// Reusable character-save arm for caller-owned escrow transactions. The
-// caller owns transaction boundaries/timeouts; a fence miss returns false.
+// Reusable character-save arm for caller-owned transactions; a fence miss returns false.
 export async function saveCharacterStateOnClient(
   client: PoolClient,
   characterId: number,
@@ -3765,10 +3764,11 @@ export async function saveCharacterStateOnClient(
   leaseNonce?: string,
   storageEffects: readonly StorageAppliedEffect[] = [],
   ledgerEffects?: BankLedgerSaveEffects,
+  existingAccountLock?: import('./bank_ledger_save_effects_db').CharacterSaveAccountLockProof,
 ): Promise<boolean> {
   const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
-  await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
+  await lockSaveEffectAccounts(client, storageEffects, ledger, existingAccountLock);
   const stmt = characterUpdateStatement(
     characterId,
     level,

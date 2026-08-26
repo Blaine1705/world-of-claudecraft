@@ -21,6 +21,7 @@
 import type { Pool, PoolClient, QueryResult } from 'pg';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
+import { lockCharacterSaveAccountParentOnClient } from './bank_ledger_save_effects_db';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
 import type {
   CharacterSaveArgs,
@@ -880,26 +881,44 @@ export const GUARD_IDLE_TX_TIMEOUT_MS = ESCROW_LOCK_TIMEOUT_MS;
  *  event-loop stall has bigger problems than this transaction). */
 export const SAVE_IDLE_TX_TIMEOUT_MS = 10_000;
 
+/** Query-count inputs to the escrow timeout ladder. The directed arm is the
+ *  widest base (account lock, cap count, character update, listing insert,
+ *  offer stamp). One generic ledger prefix is one batched CTE regardless of
+ *  its 2,048-row/2 MiB maximum. The live storage flow admits at most one
+ *  staged effect, whose new-receipt arm is six statements including its
+ *  batched advisory-lock acquisition. */
+export const ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS = 5;
+export const ESCROW_LEDGER_WORKLOAD_STATEMENTS = 6;
+export const ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS = 12;
+
 /** Per-statement allowance for the escrow listing transaction, WORKLOAD
  *  scoped (exported for the tunables-ladder pin). It sits between the lock
  *  wait ceiling and the session default: the transaction now runs inside the
  *  per-character save FIFO, so its worst case bounds the seller's own
  *  autosave chain, a saveAll worker slot, and leave/takeover, and it must
- *  stay well under the 30s autosave period even across all five real
- *  statements. Measured against Postgres 16 with a 27KB character blob:
+ *  keep the five-statement ledger-free base under the 30s autosave period.
+ *  A normal ledger-bearing save is six statements (31s conservative sum
+ *  including lock wait and pool checkout); the one-storage-effect maximum
+ *  is twelve (55s by the same sum). Both stay bounded by the started-request
+ *  ceiling below rather than pretending every optional effect fits one
+ *  autosave interval. Measured against Postgres 16 with a 27KB character blob:
  *  p50 3.5ms, max 8.3ms over 25 passes, whole-transaction timings (the
  *  delivery pg suite's escrow-cost test re-measures and asserts the
  *  observed MAX stays under a twenty-fifth of this allowance, 160ms; an
- *  env-gated local gate per tests/CLAUDE.md, not a CI floor), so 4s is
- *  orders of magnitude of headroom while a genuinely wedged statement can
- *  no longer hold the FIFO for the 60s heavy allowance. 4000, down from the
+ *  env-gated local gate per tests/CLAUDE.md, not a CI floor). Its sibling
+ *  max-prefix case drives all 2,048 rows, nearly 2 MiB, and one storage
+ *  effect through PostgreSQL 16; success proves each of the twelve queries
+ *  stayed under the installed allowance while the measured wall time is
+ *  logged rather than made a CI promise. For the measured base, 4s is orders
+ *  of magnitude of headroom, while a genuinely wedged statement can no
+ *  longer hold the FIFO for the 60s heavy allowance. 4000, down from the
  *  original 5000, BECAUSE the statement count grew: the directed rail added
  *  the offer-stamp CAS and stopped skipping the cap count, and five 5s
  *  allowances would put the pinned worst-case sum past one autosave period.
- *  Honest ceiling accounting: this allowance bounds the FIVE workload
- *  statements (the
- *  tunables relation pins exactly those, plus the lock wait and the pool
- *  checkout, 27s; the two later SET LOCALs also run under it but are
+ *  Honest ceiling accounting: this allowance bounds up to TWELVE workload
+ *  statements (the tunables relation pins the five-statement base, the
+ *  six-statement ledger path, and the twelve-statement ledger-plus-storage
+ *  maximum; the two later SET LOCALs also run under it but are
  *  protocol statements with no locks, IO, or planning, excluded from the
  *  worst-case sum on that ground); BEGIN and the SET LOCAL that installs
  *  the allowance necessarily run under the 15s session default, and
@@ -911,7 +930,7 @@ export const SAVE_IDLE_TX_TIMEOUT_MS = 10_000;
  *  the pre-job guild flush is an ordinary saveCharacter on the same FIFO
  *  whose statements ride the 60s heavy allowance, exceeding this whole
  *  workload sum on its own (the tunables ladder pins that relation, plus
- *  the 157s started-request ceiling derived from these constants,
+ *  the 255s started-request ceiling derived from these constants,
  *  inter-statement idle windows included). What
  *  bounds the player-facing impact in that tail is the queue wait deadline
  *  plus the depth cap plus the realm-global escrow gate (later requests
@@ -1426,7 +1445,7 @@ export class PgWocMarketDb implements WocMarketDb {
         // statements (those two surface as the typed 'contended' refusal;
         // the statement bound's 57014 deliberately does NOT: it proves
         // rollback, so the copy restores, and then it 500s, because a
-        // statement blowing a 5s allowance measured at single-digit
+        // statement blowing a 4s allowance measured at single-digit
         // milliseconds is an incident to surface, not contention to retry).
         await client.query(`SET LOCAL statement_timeout = ${ESCROW_STATEMENT_TIMEOUT_MS}`);
         await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
@@ -1450,9 +1469,10 @@ export class PgWocMarketDb implements WocMarketDb {
         // battery pins both halves: same-account creates still serialize at
         // the cap, and a child insert proceeds where plain FOR UPDATE
         // provably blocked it.
-        await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [
+        const accountLock = await lockCharacterSaveAccountParentOnClient(
+          client,
           listing.sellerAccount,
-        ]);
+        );
         // The cap counts EVERY non-closed listing, directed included (H12),
         // matching the service's pre-check byte for byte. Directed rows used
         // to be exempt and invisible on the stated ground that a directed
@@ -1478,6 +1498,7 @@ export class PgWocMarketDb implements WocMarketDb {
           save.leaseNonce,
           save.storageEffects,
           save.bankLedgerSnapshot,
+          accountLock,
         );
         if (!saved) {
           throw new TxAbort({ ok: false as const, reason: 'lease_lost' as const });

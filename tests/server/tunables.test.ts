@@ -491,6 +491,9 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
       '../../server/db'
     );
     const {
+      ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS,
+      ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS,
+      ESCROW_LEDGER_WORKLOAD_STATEMENTS,
       ESCROW_STATEMENT_TIMEOUT_MS,
       ESCROW_LOCK_TIMEOUT_MS,
       GUARD_IDLE_TX_TIMEOUT_MS,
@@ -498,12 +501,13 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     } = await import('../../server/woc_market_db');
     const { ESCROW_QUEUE_WAIT_MS, ESCROW_QUEUE_WARN_MS, ESCROW_QUEUE_WARN_THROTTLE_MS } =
       await import('../../server/woc_market_custody');
-    // 4000 since the directed-rail work: FIVE workload statements now share
-    // the occupancy relation (the cap count stopped skipping directed rows
-    // and the offer stamp joined), and five 5s allowances would price the
-    // pinned sum past one autosave period.
+    // The statement allowance applies per query. Pin all three supported
+    // shapes so adding a save effect cannot leave the occupancy math stale.
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBe(4_000);
     expect(ESCROW_LOCK_TIMEOUT_MS).toBe(2_000);
+    expect(ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS).toBe(5);
+    expect(ESCROW_LEDGER_WORKLOAD_STATEMENTS).toBe(6);
+    expect(ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS).toBe(12);
     // Equal BY RULING (the idle bound and the lock wait tell one story).
     expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(2_000);
     expect(GUARD_IDLE_TX_TIMEOUT_MS).toBe(ESCROW_LOCK_TIMEOUT_MS);
@@ -537,9 +541,10 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
     expect(ESCROW_STATEMENT_TIMEOUT_MS).toBeGreaterThan(ESCROW_LOCK_TIMEOUT_MS);
     // The escrow FIFO-occupancy relation, and it bounds exactly this much: the
-    // FIVE workload statements plus the lock wait plus the pool checkout, kept
-    // under one autosave period so a listing does not stall a saveAll worker
-    // across a whole wave. It is NOT the whole worst case: BEGIN and the SET
+    // workload statements plus the lock wait plus the pool checkout. Only the
+    // five-statement base stays under one autosave period; a personal-ledger
+    // prefix is six statements and the live ledger-plus-one-storage maximum is
+    // twelve. It is NOT the whole worst case: BEGIN and the SET
     // LOCAL that installs the allowance run under the 15s session default, the
     // two LATER SET LOCALs run under the 4s allowance but are protocol
     // statements with no locks, IO, or planning (excluded from the sum on
@@ -563,14 +568,18 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // asserts for itself first.
     const autosaveMs = Number(autosaveMatch?.[1]) * 1000;
     expect(autosaveMs).toBeGreaterThan(0);
-    // FIVE workload statements since the directed-rail work: the accounts
-    // lock, the cap count (no longer skipped for directed rows), the fenced
-    // character save, the listing insert, and the offer-stamp CAS. The
-    // allowance dropped 5000 -> 4000 in the same change, because five 5s
-    // allowances would put this sum past one autosave period.
-    expect(
-      ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
-    ).toBeLessThan(autosaveMs);
+    const workloadCeiling = (statements: number): number =>
+      ESCROW_STATEMENT_TIMEOUT_MS * statements +
+      ESCROW_LOCK_TIMEOUT_MS +
+      DB_POOL_CONNECT_TIMEOUT_MS;
+    const baseWorkloadCeilingMs = workloadCeiling(ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS);
+    const ledgerWorkloadCeilingMs = workloadCeiling(ESCROW_LEDGER_WORKLOAD_STATEMENTS);
+    const maxWorkloadCeilingMs = workloadCeiling(ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS);
+    expect(baseWorkloadCeilingMs).toBe(27_000);
+    expect(baseWorkloadCeilingMs).toBeLessThan(autosaveMs);
+    expect(ledgerWorkloadCeilingMs).toBe(31_000);
+    expect(ledgerWorkloadCeilingMs).toBeGreaterThan(autosaveMs);
+    expect(maxWorkloadCeilingMs).toBe(55_000);
     // The honest occupancy tail (the escrow write-path rider). The pre-job
     // guild flush is an ordinary saveCharacter on the SAME per-character
     // FIFO, and its statements ride the 60s heavy allowance, so that ONE
@@ -584,14 +593,12 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // open): the heavy allowance is correct for the logout-shaped saves
     // whose loss is data loss, and the flush IS one of those saves.
     const { DB_QUERY_TIMEOUT_MS } = await import('../../server/db');
-    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(
-      ESCROW_STATEMENT_TIMEOUT_MS * 5 + ESCROW_LOCK_TIMEOUT_MS + DB_POOL_CONNECT_TIMEOUT_MS,
-    );
+    expect(DB_HEAVY_STATEMENT_TIMEOUT_MS).toBeGreaterThan(maxWorkloadCeilingMs);
     // The started-request ceiling, DERIVED so the docblocks can state a
     // number that cannot drift from the constants: once the escrow job has
     // STARTED, the request rides pool checkout + BEGIN and the installing
-    // SET LOCAL under the session default + the five workload statements +
-    // the lock wait + the five inter-statement idle windows under the SAVE
+    // SET LOCAL under the session default + the twelve workload statements +
+    // the lock wait + twelve inter-statement idle windows under the SAVE
     // bound (the review round's term: the character serialize and every
     // round-trip gap run between statements, each bounded only by the
     // idle-in-transaction kill) + COMMIT under the driver backstop. The
@@ -601,11 +608,11 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     const startedCeilingMs =
       DB_POOL_CONNECT_TIMEOUT_MS +
       DB_STATEMENT_TIMEOUT_MS +
-      ESCROW_STATEMENT_TIMEOUT_MS * 5 +
-      SAVE_IDLE_TX_TIMEOUT_MS * 5 +
+      ESCROW_STATEMENT_TIMEOUT_MS * ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS +
+      SAVE_IDLE_TX_TIMEOUT_MS * ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS +
       ESCROW_LOCK_TIMEOUT_MS +
       DB_QUERY_TIMEOUT_MS;
-    expect(startedCeilingMs).toBe(157_000);
+    expect(startedCeilingMs).toBe(255_000);
     expect(startedCeilingMs).toBeLessThan(300_000);
     // The docblocks that QUOTE the ceiling scrape-pin against the derived
     // figure, so re-tuning a constant cannot leave prose lying (the audit
@@ -654,7 +661,7 @@ describe('db pool timeouts hold their literal values and the query_timeout layer
     // and a misleading line, never correctness). Re-tuning any term moves
     // this arithmetic, which is the point: the slack is decided, not assumed.
     const { WOC_ESCROW_GATE_HOLD_CEILING_MS } = await import('../../server/woc_market_escrow_gate');
-    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(300_000);
+    expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBe(400_000);
     const holdFloor = startedCeilingMs + DB_HEAVY_STATEMENT_TIMEOUT_MS;
     expect(WOC_ESCROW_GATE_HOLD_CEILING_MS).toBeGreaterThan(holdFloor);
     // One queued heavy save fits.

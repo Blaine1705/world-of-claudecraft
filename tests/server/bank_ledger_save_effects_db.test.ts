@@ -39,6 +39,10 @@ vi.mock('pg', () => ({
 import { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } from '../../server/bank_ledger_batch_db';
 import type { SerializedBankLedgerOutboxRow } from '../../server/bank_ledger_outbox';
 import {
+  type CharacterSaveAccountLockProof,
+  lockCharacterSaveAccountParentOnClient,
+} from '../../server/bank_ledger_save_effects_db';
+import {
   type BankLedgerSaveEffects,
   ensureSchema,
   openMarketWriteGate,
@@ -88,6 +92,7 @@ const STORAGE_EFFECT: StorageAppliedEffect = {
   itemId: 'strongbox_rung_01',
   expectedCostClaudium: 100,
   idempotencyKey: 'storage-and-ledger-save',
+  spendClaimToken: '00000000-0000-4000-8000-000000000001',
   purchasedSlotsBefore: 0,
   purchasedSlotsAfter: 6,
 };
@@ -109,7 +114,8 @@ function clientStub(options: ClientOptions = {}) {
   const characterRows = options.characterRows ?? 1;
   const query = vi.fn(async (sql: string, values?: unknown[]) => {
     if (/SELECT id FROM accounts/i.test(sql)) {
-      return { rows: [{ id: OWNER.accountId }], rowCount: 1 };
+      const requested = Array.isArray(values?.[0]) ? OWNER.accountId : Number(values?.[0]);
+      return { rows: [{ id: requested }], rowCount: 1 };
     }
     if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: characterRows };
     if (/FROM storage_purchase_applied_receipts/i.test(sql)) {
@@ -126,6 +132,7 @@ function clientStub(options: ClientOptions = {}) {
             item_id: STORAGE_EFFECT.itemId,
             expected_cost_claudium: STORAGE_EFFECT.expectedCostClaudium,
             idempotency_key: STORAGE_EFFECT.idempotencyKey,
+            spend_claim_token: STORAGE_EFFECT.spendClaimToken,
             status: 'pending',
           },
         ],
@@ -403,6 +410,69 @@ describe('fenced character save ledger effects', () => {
     expect(indexOf(sql, /SELECT id FROM accounts/)).toBeLessThan(indexOf(sql, /UPDATE characters/));
     expect(indexOf(sql, /UPDATE characters/)).toBeLessThan(indexOf(sql, /WITH receipt_input AS/));
     expect(sql.some((statement) => /^(?:BEGIN|COMMIT|ROLLBACK)/.test(statement))).toBe(false);
+  });
+
+  it('consumes a matching same-client parent-lock proof without a redundant KEY SHARE', async () => {
+    const client = clientStub();
+    const proof = await lockCharacterSaveAccountParentOnClient(client as never, OWNER.accountId);
+
+    await expect(
+      saveCharacterStateOnClient(
+        client as never,
+        OWNER.characterId,
+        7,
+        STATE,
+        'nonce-1',
+        [STORAGE_EFFECT],
+        EFFECTS,
+        proof,
+      ),
+    ).resolves.toBe(true);
+
+    const accountLocks = sqlCalls(client).filter((sql) => /SELECT id FROM accounts/.test(sql));
+    expect(accountLocks).toHaveLength(1);
+    expect(accountLocks[0]).toContain('FOR NO KEY UPDATE');
+    expect(accountLocks[0]).not.toContain('FOR KEY SHARE');
+  });
+
+  it('rejects forged, cross-client, mismatched, and consumed parent-lock proofs', async () => {
+    const ownerClient = clientStub();
+    const otherClient = clientStub();
+    const proof = await lockCharacterSaveAccountParentOnClient(
+      ownerClient as never,
+      OWNER.accountId,
+    );
+    const saveWith = (
+      client: ReturnType<typeof clientStub>,
+      candidate: CharacterSaveAccountLockProof,
+    ) =>
+      saveCharacterStateOnClient(
+        client as never,
+        OWNER.characterId,
+        7,
+        STATE,
+        'nonce-1',
+        [],
+        EFFECTS,
+        candidate,
+      );
+
+    await expect(saveWith(otherClient, proof)).rejects.toThrow(/invalid or consumed/);
+    await expect(
+      saveWith(
+        ownerClient,
+        Object.freeze({ accountId: OWNER.accountId }) as CharacterSaveAccountLockProof,
+      ),
+    ).rejects.toThrow(/invalid or consumed/);
+
+    const wrongAccountProof = await lockCharacterSaveAccountParentOnClient(
+      ownerClient as never,
+      OWNER.accountId + 1,
+    );
+    await expect(saveWith(ownerClient, wrongAccountProof)).rejects.toThrow(/does not match/);
+
+    await expect(saveWith(ownerClient, proof)).resolves.toBe(true);
+    await expect(saveWith(ownerClient, proof)).rejects.toThrow(/invalid or consumed/);
   });
 });
 

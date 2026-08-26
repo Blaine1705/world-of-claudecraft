@@ -23,6 +23,8 @@
 // database the URL points at. Pattern: tests/woc_market_settlement_pg_integration.test.ts.
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { BankLedgerOutboxSnapshot } from '../server/bank_ledger_outbox';
+import type { StorageAppliedEffect } from '../server/storage_purchase_db';
 import type {
   WocCustodyGrant,
   WocMarketCustody,
@@ -1636,7 +1638,7 @@ describeDb('woc market delivery finalization against real Postgres', () => {
     }, 30_000);
 
     it('measures the transaction cost against its statement allowance', async () => {
-      // The workload-scoped 5s statement_timeout replaced the 60s heavy
+      // The workload-scoped 4s statement_timeout replaced the 60s heavy
       // allowance because this transaction now heads a character's save FIFO.
       // Prove the expected cost really is orders of magnitude under the
       // ceiling with a representative blob (a few hundred inventory slots),
@@ -1680,9 +1682,158 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       );
       // 25x the observed 8.3ms max: loose enough for a loaded dev box, tight
       // enough that a plan regression (a scan, a lost index) reds here
-      // instead of hiding under the 5s allowance.
+      // instead of hiding under the 4s allowance.
       expect(p99).toBeLessThan(ESCROW_STATEMENT_TIMEOUT_MS / 25);
     }, 30_000);
+
+    it('persists the maximum ledger prefix plus one storage effect under PostgreSQL 16', async () => {
+      const { BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS, serializeBankLedgerCommandBatch } =
+        await import('../server/bank_ledger_outbox');
+      const { REALM } = await import('../server/realm');
+      const { ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS, ESCROW_STATEMENT_TIMEOUT_MS } =
+        await import('../server/woc_market_db');
+      const versionResult = await pool.query('SHOW server_version_num');
+      const serverVersion = Number(versionResult.rows[0]?.server_version_num);
+      expect(serverVersion).toBeGreaterThanOrEqual(160_000);
+      expect(serverVersion).toBeLessThan(170_000);
+
+      const account = await seedAccount();
+      const buyer = await seedAccount();
+      const characterId = await seedCharacter(REALM, account);
+      await seedLease(REALM, characterId, 'escrow-max-prefix-live');
+      const { maxRows, maxEncodedBytes } = BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS;
+      const buildBatch = (batchKey: string, payloadBytes: number) => {
+        const instance = { padding: 'x'.repeat(payloadBytes) };
+        return serializeBankLedgerCommandBatch(
+          batchKey,
+          Array.from({ length: maxRows }, () => ({
+            realm: REALM,
+            characterId,
+            accountId: account,
+            op: 'deposit' as const,
+            itemId: 'peacebloom',
+            count: 1,
+            instance,
+            copperDelta: 0,
+            purchasedSlotsAfter: 6,
+            container: 'personal' as const,
+            containerId: null,
+          })),
+        );
+      };
+
+      // Find the largest equal-sized instance payload whose exact retained
+      // JSON shape fits the production 2 MiB prefix budget. Each extra byte
+      // costs one byte per row, so the accepted batch finishes within one
+      // 2,048-byte step of the configured ceiling.
+      let low = 0;
+      let high = Math.ceil(maxEncodedBytes / maxRows);
+      let payloadBytes = -1;
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const candidate = buildBatch('woc.pg16.max.0000', mid);
+        if (candidate.encodedBytes <= maxEncodedBytes) {
+          payloadBytes = mid;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+      expect(payloadBytes).toBeGreaterThanOrEqual(0);
+      const calibrated = buildBatch('woc.pg16.max.0000', payloadBytes);
+      expect(calibrated.rows).toHaveLength(maxRows);
+      expect(calibrated.encodedBytes).toBeLessThanOrEqual(maxEncodedBytes);
+      expect(maxEncodedBytes - calibrated.encodedBytes).toBeLessThan(maxRows);
+
+      const samples: number[] = [];
+      for (let sample = 0; sample < 3; sample++) {
+        const suffix = String(sample + 1).padStart(4, '0');
+        const batch = buildBatch(`woc.pg16.max.${suffix}`, payloadBytes);
+        expect(batch.rows).toHaveLength(maxRows);
+        expect(batch.encodedBytes).toBeLessThanOrEqual(maxEncodedBytes);
+        const bankLedgerSnapshot: BankLedgerOutboxSnapshot = Object.freeze({
+          owner: Object.freeze({ realm: REALM, characterId, accountId: account }),
+          batches: Object.freeze([batch]),
+          rowCount: batch.rows.length,
+          encodedBytes: batch.encodedBytes,
+          guildIds: batch.guildIds,
+          hasUnscopedRows: batch.hasUnscopedRows,
+        });
+        const itemId = `strongbox_rung_${String(sample + 1).padStart(2, '0')}`;
+        const idempotencyKey = `woc-pg16-max-storage-${suffix}`;
+        const spendClaimToken = `00000000-0000-4000-8000-${String(sample + 1).padStart(12, '0')}`;
+        const expectedCostClaudium = 100 + sample;
+        await pool.query(
+          `INSERT INTO storage_purchases (
+             realm, account_id, character_id, item_id, expected_cost_claudium,
+             idempotency_key, spend_claim_token, spend_claim_expires_at, status
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, now() + interval '90 seconds', 'pending')`,
+          [
+            REALM,
+            account,
+            characterId,
+            itemId,
+            expectedCostClaudium,
+            idempotencyKey,
+            spendClaimToken,
+          ],
+        );
+        const storageEffect: StorageAppliedEffect = {
+          realm: REALM,
+          accountId: account,
+          characterId,
+          itemId,
+          expectedCostClaudium,
+          idempotencyKey,
+          spendClaimToken,
+          purchasedSlotsBefore: sample * 6,
+          purchasedSlotsAfter: (sample + 1) * 6,
+        };
+        const offer = await pool.query(
+          `INSERT INTO woc_market_directed_offers (
+             realm, seller_account, seller_character, seller_name, buyer_account,
+             buyer_name, item_ref, item_id, item_pin, usd_cents, status,
+             buyer_accepted, seller_accepted, expires_at
+           ) VALUES ($1, $2, $3, 'MaxSeller', $4, 'MaxBuyer',
+                     '{"index":0,"itemId":"crown_of_embers"}'::jsonb,
+                     'crown_of_embers', 'max-pin', 5000, 'accepted', true, true,
+                     now() + interval '10 minutes')
+           RETURNING id`,
+          [REALM, account, characterId, buyer],
+        );
+        const listing = escrowListing(REALM, account, characterId, {
+          directedBuyerAccount: buyer,
+        });
+        const startedAt = performance.now();
+        const out = await marketDb.escrowInsertListing(
+          {
+            characterId,
+            level: 12,
+            state: SAVE_STATE,
+            leaseNonce: 'escrow-max-prefix-live',
+            storageEffects: [storageEffect],
+            bankLedgerSnapshot,
+          },
+          { ...listing, directedOfferId: Number(offer.rows[0].id) },
+        );
+        samples.push(performance.now() - startedAt);
+        if (!out.ok) throw new Error(`maximum-prefix escrow refused: ${out.reason}`);
+        await pool.query(
+          `UPDATE woc_market_listings SET status = 'closed', resolution = 'cancelled' WHERE id = $1`,
+          [out.id],
+        );
+      }
+      samples.sort((a, b) => a - b);
+      const p50 = samples[Math.floor(samples.length / 2)] ?? 0;
+      const max = samples[samples.length - 1] ?? 0;
+      console.log(
+        `[escrow-max-prefix] PostgreSQL ${serverVersion}, ${maxRows} rows, ${calibrated.encodedBytes} encoded bytes, ${ESCROW_LEDGER_STORAGE_WORKLOAD_STATEMENTS} statements under ${ESCROW_STATEMENT_TIMEOUT_MS}ms each: p50 ${p50.toFixed(1)}ms max ${max.toFixed(1)}ms over ${samples.length} passes`,
+      );
+      // Success is the timeout proof: PostgreSQL itself enforces the installed
+      // 4s statement_timeout on every workload statement. The observed wall
+      // time is logged, not promoted into a made-up CI latency promise.
+      expect(max).toBeGreaterThan(0);
+    }, 120_000);
   });
 
   describe('custody claim intent ledger, in real SQL', () => {

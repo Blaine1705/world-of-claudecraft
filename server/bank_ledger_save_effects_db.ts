@@ -22,6 +22,53 @@ interface Queryable {
   ): Promise<{ rows: Record<string, unknown>[]; rowCount: number | null }>;
 }
 
+/** An opaque, one-use proof that this exact transaction client already holds
+ *  a parent account lock strong enough for character save effects. Callers
+ *  cannot construct or move a proof to another client: the private WeakMap is
+ *  the authority, while accountId remains visible only for diagnostics. */
+const characterSaveAccountLockProofBrand: unique symbol = Symbol('CharacterSaveAccountLockProof');
+export interface CharacterSaveAccountLockProof {
+  readonly [characterSaveAccountLockProofBrand]: true;
+  readonly accountId: number;
+}
+
+interface AccountLockProofState {
+  readonly db: Queryable;
+  readonly accountId: number;
+  consumed: boolean;
+}
+
+const accountLockProofs = new WeakMap<CharacterSaveAccountLockProof, AccountLockProofState>();
+
+function assertPositiveAccountId(accountId: number): void {
+  if (!Number.isSafeInteger(accountId) || accountId <= 0) {
+    throw new RangeError('character save account lock id must be a positive safe integer');
+  }
+}
+
+/** Take the accounts-first NO KEY UPDATE lock used by a capped WOC escrow
+ *  insert and return a proof the later character-save helper can consume.
+ *  This is stronger than the KEY SHARE lock save effects otherwise acquire,
+ *  while still admitting unrelated FK-child inserts. */
+export async function lockCharacterSaveAccountParentOnClient(
+  db: Queryable,
+  accountId: number,
+): Promise<CharacterSaveAccountLockProof> {
+  assertPositiveAccountId(accountId);
+  const locked = await db.query('SELECT id FROM accounts WHERE id = $1 FOR NO KEY UPDATE', [
+    accountId,
+  ]);
+  if (Number(locked.rows[0]?.id) !== accountId) {
+    throw new Error('character save account disappeared before parent lock');
+  }
+  const proof = Object.freeze({
+    [characterSaveAccountLockProofBrand]: true as const,
+    accountId,
+  });
+  accountLockProofs.set(proof, { db, accountId, consumed: false });
+  return proof;
+}
+
 /** Build the one UPDATE whose EXISTS clause is the character-lease fence. */
 export function characterUpdateStatement(
   characterId: number,
@@ -94,7 +141,24 @@ export async function lockCharacterSaveEffectAccountsOnClient(
   db: Queryable,
   storageEffects: readonly StorageAppliedEffect[],
   ledgerEffects: BankLedgerSaveEffects | undefined,
+  existingLock?: CharacterSaveAccountLockProof,
 ): Promise<void> {
+  if (existingLock) {
+    const state = accountLockProofs.get(existingLock);
+    if (!state || state.db !== db || state.consumed) {
+      throw new Error('invalid or consumed character save account lock proof');
+    }
+    const effectAccountIds = new Set(storageEffects.map((effect) => effect.accountId));
+    if (ledgerEffects) effectAccountIds.add(ledgerEffects.owner.accountId);
+    // A save without external effects needs no parent lock. Do not consume a
+    // proof the helper did not rely on, although the WOC caller keeps it local.
+    if (effectAccountIds.size === 0) return;
+    if (effectAccountIds.size !== 1 || !effectAccountIds.has(state.accountId)) {
+      throw new Error('character save account lock proof does not match save effects');
+    }
+    state.consumed = true;
+    return;
+  }
   await lockStorageAppliedEffectAccountsOnClient(db, storageEffects);
   if (!ledgerEffects || storageEffects.length > 0) return;
   const locked = await db.query('SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE', [
