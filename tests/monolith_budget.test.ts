@@ -298,7 +298,12 @@ const MONOLITHS: MonolithRow[] = [
     // routeEvents into the guild board window's live REST read (the
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
-    ceiling: 10645,
+    // Raised to the exact new count for the target-swing-timer wire field: one
+    // conditional line in dynamicFields (`if (e.autoAttack) out.swing = ...`),
+    // the general non-self mirror of the existing self-only swing field.
+    // Thin, unavoidable wiring; no clean branch-owned extraction exists for a
+    // single conditional line inside an already-inline-conditional function.
+    ceiling: 10655,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

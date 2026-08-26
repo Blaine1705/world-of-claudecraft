@@ -601,6 +601,52 @@ describe('pet signature skill over the wire', () => {
   });
 });
 
+describe('target swing timer over the wire', () => {
+  it('mirrors a non-self mob auto-attacking, gated on autoAttack', () => {
+    const mob = createMob(9310, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
+    mob.autoAttack = true;
+    mob.swingTimer = 1.42;
+
+    const wire = wireEntity(mob);
+    expect(wire.swing).toBe(1.42);
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(mob.id)!;
+    expect(mirrored.autoAttack).toBe(true);
+    expect(mirrored.swingTimer).toBe(1.42);
+  });
+
+  it('omits swing and resets a stale mirror when the mob is not auto-attacking', () => {
+    const mob = createMob(9311, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
+    mob.autoAttack = false;
+    mob.swingTimer = 0.5; // stale/frozen value while disengaged; must not ride the wire
+
+    const idleWire = wireEntity(mob);
+    expect(idleWire).not.toHaveProperty('swing');
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [
+        {
+          ...idleWire,
+          id: mob.id,
+          k: 'mob',
+          tid: mob.templateId,
+          nm: mob.name,
+          lv: mob.level,
+          swing: 1.1,
+        },
+      ],
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [idleWire] });
+    const mirrored = client.entities.get(mob.id)!;
+    expect(mirrored.autoAttack).toBe(false);
+    expect(mirrored.swingTimer).toBe(0);
+  });
+});
+
 // Operator-set account flair (the [AI] mark + an official streamer's links). The
 // wire keys `ai` and `slk` ARE the protocol, so pin both halves together: the REAL
 // server emit (wireEntity) into the REAL client mirror (applySnapshot). Pinning only
