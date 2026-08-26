@@ -37,6 +37,7 @@ import { loadKtx2Texture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
+import { markSharedMaterial } from './shared_resource';
 
 export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
 
@@ -515,6 +516,9 @@ const KIT_FALLBACK: Record<string, WornFamilyPick | null> = {
   shroom: null, // mushroom caps read as clean color cards
   tent: { family: 'fabric', strength: 0.3 }, // colorRed/colorRedDark canvas
   pirate: { family: 'wood', strength: 0.35 }, // colormap docks/rowboats
+  // the sea half of the old shared pirate kit (hulls and buoys, which ship
+  // their own atlas); same painted-plank treatment as the dock half
+  pirateSea: { family: 'wood', strength: 0.35 },
   town: { family: 'wood', strength: 0.35 }, // colormap timber pillar
   grave: { family: 'stone', strength: 0.45 }, // colormap gravestones
   dungeon: { family: 'rock', strength: 0.45 }, // 'texture' atlas delve cave mouths
@@ -1058,6 +1062,12 @@ export function detailedSurfaceMat(
   if (!mat) {
     mat = base.clone();
     applySurfaceDetail(mat as THREE.MeshStandardMaterial, family, detail);
+    // Shared for the same reason surfaceMat's own cache is: one instance per
+    // key, reused process-wide. three's Material.copy deep-copies userData, so
+    // the clone already inherits the base's marker; marking it explicitly keeps
+    // that from being a silent dependency on three's copy semantics across a
+    // version bump, which is the kind of thing a bump would break quietly.
+    markSharedMaterial(mat);
     detailedMats.set(key, mat);
   }
   return mat;

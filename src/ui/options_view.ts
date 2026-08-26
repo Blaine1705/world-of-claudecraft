@@ -565,6 +565,8 @@ export function buildGraphicsSections(
         // concern for touch players.
         boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'),
         boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'),
+        boolToggle(s, 'touchTapMenus', 'hudChrome.options.touchTapMenus'),
+        note('hudChrome.options.touchTapMenusNote'),
       ],
     });
   }
@@ -612,6 +614,12 @@ export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
 
 export function buildControllerControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
+    choice(s, 'gamepadGlyphStyle', 'hudChrome.controller.glyphStyle', [
+      { value: 0, labelKey: 'hudChrome.controller.glyphStyleAuto' },
+      { value: 1, labelKey: 'hudChrome.controller.glyphStyleXbox' },
+      { value: 2, labelKey: 'hudChrome.controller.glyphStylePlayStation' },
+      { value: 3, labelKey: 'hudChrome.controller.glyphStyleNintendo' },
+    ]),
     boolToggle(s, 'gamepadEnabled', 'hudChrome.controller.enable'),
     boolToggle(s, 'gamepadCrossHotbar', 'hudChrome.controller.crossHotbarEnable'),
     boolToggle(s, 'gamepadCrossHotbarExpand', 'hudChrome.controller.crossHotbarExpand'),
@@ -674,6 +682,7 @@ export function buildInterfaceControls(
     boolToggle(s, 'showPlaytime', 'hudChrome.options.showPlaytime'),
     boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
+    boolToggle(s, 'showReliquaryTracker', 'hudChrome.options.showReliquaryTracker'),
     boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
   ];
