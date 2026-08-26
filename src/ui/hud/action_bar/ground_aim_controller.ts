@@ -40,7 +40,12 @@ export interface GroundAimControllerDeps {
   castAt(abilityId: string, point: AimPoint): void;
   /** Hide the world reticle (cancel and commit both clear it). */
   clearReticle(): void;
+  /** The world's authoritative landing for a placement-adjusted ability
+   *  (Heroic Leap's diverted landing); identity for everything else. */
+  projectPlacement?(abilityId: string, point: AimPoint): AimPoint;
 }
+
+const PROJECTION_DIVERGENCE_EPSILON = 0.05;
 
 export class GroundAimController {
   private state: GroundAimState = createGroundAimState();
@@ -113,17 +118,27 @@ export class GroundAimController {
     ).point;
   }
 
+  // The ring paints the PROJECTED point (where the cast truly lands) while the
+  // commit still sends the clamped aim: the authoritative cast re-derives its
+  // own landing, so projecting the submission would double-apply it. A
+  // divergence dims the ring like a range clamp does: honest "not exactly
+  // where you point" feedback. Min range judges the submitted aim, matching
+  // the sim's refusal.
   reticle(): GroundAimReticleView | null {
     if (!this.isActive() || !this.rawPoint) return null;
     const res = this.activeAbility();
     if (!res) return null;
     const player = this.deps.player();
     const aim = clampAimToRange(player, this.rawPoint, res.def.range);
+    const projected = this.deps.projectPlacement?.(res.def.id, aim.point) ?? aim.point;
+    const diverged =
+      Math.hypot(projected.x - aim.point.x, projected.z - aim.point.z) >
+      PROJECTION_DIVERGENCE_EPSILON;
     return {
-      point: aim.point,
+      point: projected,
       radius: abilityAoeRadius(res),
       school: res.def.school,
-      dimmed: aim.clamped || withinMinRange(player, aim.point, res.def.minRange),
+      dimmed: aim.clamped || diverged || withinMinRange(player, aim.point, res.def.minRange),
     };
   }
 

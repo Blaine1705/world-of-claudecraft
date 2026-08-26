@@ -230,7 +230,10 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
-    ceiling: 12538,
+    // Plus 4 for the groundAimPlacementPreview IWorld member (the placement
+    // reticle's true-landing preview; the sanctioned both-worlds seam, a
+    // one-line delegate into combat/heroic_leap.ts). Exact count, zero slack.
+    ceiling: 12542,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -312,7 +315,10 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    ceiling: 5855,
+    // Plus 5 for the groundAimPlacementPreview IWorld member (the placement
+    // reticle's true-landing preview; the sanctioned both-worlds seam, a
+    // one-line delegate into the shared sim gate). Exact count, zero slack.
+    ceiling: 5860,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

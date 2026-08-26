@@ -475,4 +475,55 @@ describe('Hud ground aim behavior', () => {
       expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 0, z: 15 });
     });
   });
+
+  describe('placement projection', () => {
+    it('paints the projected landing dimmed while committing the clamped aim', () => {
+      const castAt = vi.fn();
+      const controller = new GroundAimController({
+        player: () => entity(1, 0, 0),
+        resolveAbility: () => ({
+          def: { id: 'heroic_leap', range: 30, school: 'physical' },
+          effects: [],
+        }),
+        seedTargetPoint: () => null,
+        fallbackPoint: () => ({ x: 0, z: 0 }),
+        castAt,
+        clearReticle: vi.fn(),
+        projectPlacement: (id, point) =>
+          id === 'heroic_leap' ? { x: point.x, z: point.z - 6 } : point,
+      });
+
+      controller.begin('heroic_leap', 3);
+      controller.updatePoint({ x: 0, z: 20 });
+
+      const reticle = controller.reticle();
+      expect(reticle?.point).toEqual({ x: 0, z: 14 });
+      expect(reticle?.dimmed).toBe(true);
+
+      controller.commitAt();
+      expect(castAt).toHaveBeenCalledWith('heroic_leap', { x: 0, z: 20 });
+    });
+
+    it('leaves an unadjusted ability bright at its own point', () => {
+      const controller = new GroundAimController({
+        player: () => entity(1, 0, 0),
+        resolveAbility: () => ({
+          def: { id: 'flamestrike', range: 30, school: 'fire' },
+          effects: [],
+        }),
+        seedTargetPoint: () => null,
+        fallbackPoint: () => ({ x: 0, z: 0 }),
+        castAt: vi.fn(),
+        clearReticle: vi.fn(),
+        projectPlacement: (_id, point) => point,
+      });
+
+      controller.begin('flamestrike', 3);
+      controller.updatePoint({ x: 0, z: 20 });
+
+      const reticle = controller.reticle();
+      expect(reticle?.point).toEqual({ x: 0, z: 20 });
+      expect(reticle?.dimmed).toBe(false);
+    });
+  });
 });

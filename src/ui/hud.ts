@@ -1341,6 +1341,7 @@ export class Hud {
     fallbackPoint: () => this.groundTargetAim(),
     castAt: (id, point) => this.sim.castAbilityAt(id, point),
     clearReticle: () => this.renderer.setGroundAimReticle(null),
+    projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point),
   });
   private empowerCharge: { slot: number; abilityId: string } | null = null;
   private dragAction: {

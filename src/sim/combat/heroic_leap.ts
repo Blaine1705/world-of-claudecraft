@@ -10,6 +10,83 @@ const FLIGHT_DURATION = 0.6;
 const FLIGHT_APEX = 3.2;
 const EXTERNAL_RELOCATION_EPSILON = 0.05;
 
+/**
+ * Mirrors sweptLanding's seed-derived terrain, static-collider, and seating arms.
+ * Live delve modules, doors, rift walls, and entity feet state are omitted because
+ * they are mutable per-Sim inputs unavailable to a host-agnostic preview.
+ */
+export function computeHeroicLeapLanding(
+  seed: number,
+  from: { x: number; z: number },
+  to: { x: number; z: number },
+): { x: number; z: number } {
+  const fromFeetY = groundHeight(from.x, from.z, seed);
+  const dx = to.x - from.x;
+  const dz = to.z - from.z;
+  const distance = Math.hypot(dx, dz);
+  let safeX = from.x;
+  let safeZ = from.z;
+  let previousGround = fromFeetY;
+
+  if (distance > 1e-6) {
+    const steps = Math.max(1, Math.ceil(distance / SWEEP_STEP));
+    for (let index = 1; index <= steps; index++) {
+      const progress = index / steps;
+      const nextX = from.x + dx * progress;
+      const nextZ = from.z + dz * progress;
+      const step = Math.hypot(nextX - safeX, nextZ - safeZ);
+      const nextGround = groundHeight(nextX, nextZ, seed);
+      if (nextGround < waterLevelAt(nextX, nextZ, seed) - PLAYER_SWIM_DEPTH) break;
+      if (
+        nextGround > previousGround &&
+        step > 1e-6 &&
+        ((nextGround - previousGround) / step > PLAYER_MAX_CLIMB_SLOPE ||
+          terrainSteepnessAt(nextX, nextZ, seed) > PLAYER_MAX_CLIMB_SLOPE)
+      ) {
+        break;
+      }
+
+      const resolved = resolvePosition(seed, nextX, nextZ, PLAYER_BODY_RADIUS, false, undefined, {
+        y: fromFeetY,
+        lift: 0,
+      });
+      const moved = Math.hypot(resolved.x - safeX, resolved.z - safeZ);
+      const diverted =
+        Math.hypot(resolved.x - nextX, resolved.z - nextZ) > PLAYER_BODY_RADIUS * 0.25;
+      if (diverted || moved < step * 0.5) {
+        const over = resolvePosition(seed, nextX, nextZ, PLAYER_BODY_RADIUS, false, undefined, {
+          y: fromFeetY + FLIGHT_APEX,
+          lift: 0,
+        });
+        if (Math.hypot(over.x - nextX, over.z - nextZ) > PLAYER_BODY_RADIUS * 0.25) break;
+        safeX = nextX;
+        safeZ = nextZ;
+        previousGround = groundHeight(safeX, safeZ, seed);
+        continue;
+      }
+
+      safeX = resolved.x;
+      safeZ = resolved.z;
+      previousGround = groundHeight(safeX, safeZ, seed);
+    }
+  }
+
+  const seat = seatGroundedAt(seed, safeX, safeZ, PLAYER_BODY_RADIUS, fromFeetY + FLIGHT_APEX);
+  return { x: seat.x, z: seat.z };
+}
+
+/** The IWorld placement-preview gate both hosts delegate to: leap gets the
+ *  mirrored landing, every other ability keeps its own point. */
+export function heroicLeapPlacementPreview(
+  seed: number,
+  from: { x: number; z: number },
+  abilityId: string,
+  point: { x: number; z: number },
+): { x: number; z: number } {
+  if (abilityId !== 'heroic_leap') return point;
+  return computeHeroicLeapLanding(seed, from, point);
+}
+
 function pointOnFlight(entity: Entity, elapsed: number): Vec3 {
   const flight = entity.leap;
   if (!flight) return { ...entity.pos };
