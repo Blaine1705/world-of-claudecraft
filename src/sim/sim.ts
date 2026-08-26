@@ -2278,11 +2278,15 @@ export class Sim {
             origin.z + VARKHUL_ASSEMBLY_FORGE_LOCAL_POS.z,
           )
         : entity.pos;
-      const active = entity.varkhul
-        ? activeVarkhulAssembly(entity.id, entity.varkhul, forge, entity.pos, (id) =>
-            this.entities.get(id),
-          )
-        : inactiveVarkhulAssembly(entity.id, instance?.difficulty ?? 'normal', forge);
+      // Pre-pull the boss carries engage staging state but the assembly set
+      // piece has not entered the fight: keep the inactive readout until he
+      // actually engages, exactly as when the encounter had never ticked.
+      const active =
+        entity.varkhul && (entity.varkhul.engage?.phase ?? 'done') !== 'forging'
+          ? activeVarkhulAssembly(entity.id, entity.varkhul, forge, entity.pos, (id) =>
+              this.entities.get(id),
+            )
+          : inactiveVarkhulAssembly(entity.id, instance?.difficulty ?? 'normal', forge);
       if (active) assemblies.push(active);
     }
     return assemblies;

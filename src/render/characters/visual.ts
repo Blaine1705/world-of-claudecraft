@@ -625,6 +625,9 @@ export class CharacterVisual {
   /** The ability driving the cast base state, mirrored from AnimState so the
    *  aim pin can tell a drawn shot from a pet utility cast. */
   private castingAbility: string | null = null;
+  /** which ability's cast clip the current cast-state base action was chosen
+   *  for; lets chained casts refresh their per-ability override */
+  private castClipAbility: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -962,7 +965,16 @@ export class CharacterVisual {
       } else if (baseChanged && !this.currentIsOneShot) {
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
         this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
+      } else if (
+        desired === 'cast' &&
+        !this.currentIsOneShot &&
+        this.castClipAbility !== this.castingAbility
+      ) {
+        // one cast chained into another without leaving the cast state: the
+        // base-edge fade above never fires, so refresh the per-ability clip
+        this.fadeTo(this.baseAction(), 0.15, false);
       }
+      if (desired === 'cast') this.castClipAbility = this.castingAbility;
       // foot-speed matching on locomotion cycles
       if (!this.currentIsOneShot && this.current) {
         const timeScale = locomotionTimeScale(this.baseState, s, this.def.walkRef, this.def.runRef);
@@ -972,6 +984,15 @@ export class CharacterVisual {
           this.current.timeScale = timeScale;
         }
         if (this.baseState === 'spin') this.current.timeScale = SPIN_ATTACK_TIMESCALE;
+        if (this.baseState === 'cast') {
+          // per-frame on purpose: actions are cached per clip, so a clip that
+          // doubles as an attackByAbility one-shot would otherwise leak that
+          // route's timescale into the cast loop
+          this.current.timeScale =
+            (this.castingAbility
+              ? this.def.clips.castTimeScaleByAbility?.[this.castingAbility]
+              : undefined) ?? 1;
+        }
       }
       // Frozen idle pose (the downed forge mech): hold the idle clip on its first
       // frame while standing still, and release it the moment we leave idle. Done
@@ -3153,9 +3174,11 @@ export class CharacterVisual {
         return this.action(c.run) ?? this.action(c.walk);
       case 'cast':
         // A displayed bow holds its draw here instead of the shared caster
-        // gesture; every other weapon keeps the rig's authored cast.
+        // gesture; a per-ability authored cast clip beats the generic channel;
+        // every other weapon keeps the rig's authored cast.
         return (
           this.action(weaponSkinCastClip(this.weaponSkinId, this.castingAbility) ?? undefined) ??
+          this.action(this.castingAbility ? c.castByAbility?.[this.castingAbility] : undefined) ??
           this.action(c.cast) ??
           this.action(c.idle)
         );
@@ -3436,6 +3459,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.death,
     ...(c.attack ?? []),
     ...Object.values(c.attackByAbility ?? {}),
+    ...Object.values(c.castByAbility ?? {}),
     ...Object.values(c.attackByHand ?? {}),
     ...(c.hit ?? []),
     c.cast,

@@ -7,6 +7,13 @@ import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ITEMS, MOBS } from '../../sim/data';
 import {
+  VARKHUL_ANVILS_DECREE_CAST_ID,
+  VARKHUL_BOSS_ID,
+  VARKHUL_FORGE_HAMMER_ABILITY_ID,
+  VARKHUL_FORGESTORM_CAST_ID,
+  VARKHUL_FRONTAL_CAST_ID,
+} from '../../sim/encounters/varkhul';
+import {
   IGNIVAR_CINDER_ARTIFICER_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
   IGNIVAR_EMBER_SENTINEL_ID,
@@ -50,6 +57,15 @@ export interface ClipMap {
   hit?: string[];
   /** looping cast channel */
   cast?: string;
+  /** Per-ability override for the looping cast clip (the windup LOOK of one
+   *  cast differing from the rig's generic channel; the one-shot route in
+   *  attackByAbility cannot cover held cast states). */
+  castByAbility?: Record<string, string>;
+  /** Playback rate for per-ability cast clips whose authored length must land
+   *  its key pose inside the cast window. Also re-applied every frame, since
+   *  actions are cached per clip and a clip shared with attackByAbility would
+   *  otherwise carry that route's one-shot timescale into the cast loop. */
+  castTimeScaleByAbility?: Record<string, number>;
   sitDown?: string;
   sitIdle?: string;
   /** swim base. On the authored player lane this is the SUBMERGED stroke and
@@ -776,6 +792,50 @@ const IGNIVAR_CINDER_ARTIFICER: ClipMap = {
   },
   cast: 'Channel',
   hit: ['Hit'],
+  death: 'Death',
+};
+
+// Varkhul, Forgefather of the Last Flame (varkhul_forgefather.glb): the
+// authored smith body. Every major windup runs through the cast loop (PowerUp,
+// a two-hand gathering raise); the payoff one-shots are dispatched per strike
+// by varkhul_forge_hammer.ts (the assembly forge hammer, the Anvil's Decree
+// strikes, the Molten Fissure release). Forging is 1.63s, stretched to the
+// sim's exact 2s hammer cadence. No hit mapping on purpose: raid-wide damage
+// must never thrash the boss rig (the mob_ignivar precedent).
+const VARKHUL_FORGEFATHER: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  // plain swings only; Slam is reserved for the meteor windups below
+  attack: ['Slash'],
+  attackByAbility: {
+    [VARKHUL_FORGE_HAMMER_ABILITY_ID]: 'Forging',
+    [VARKHUL_ANVILS_DECREE_CAST_ID]: 'Forging',
+  },
+  attackTimeScaleByAbility: {
+    [VARKHUL_FORGE_HAMMER_ABILITY_ID]: 0.815,
+    [VARKHUL_ANVILS_DECREE_CAST_ID]: 0.815,
+  },
+  // generic channel: the contained hand gesture, never the roar
+  cast: 'Casting',
+  castByAbility: {
+    // the meteor windups are full Slam swings: he crashes the hammer down and
+    // the cone or the storm answers it
+    [VARKHUL_FRONTAL_CAST_ID]: 'Slam',
+    [VARKHUL_FORGESTORM_CAST_ID]: 'Slam',
+    // at the anvil the decree cast IS the forging loop; the 2s strike
+    // one-shots land on the same clip so the cadence stays seamless
+    [VARKHUL_ANVILS_DECREE_CAST_ID]: 'Forging',
+  },
+  castTimeScaleByAbility: {
+    // Slam's crash sits ~1.5s in; 0.65 lands it just before the 2.5s release
+    [VARKHUL_FRONTAL_CAST_ID]: 0.65,
+    [VARKHUL_FORGESTORM_CAST_ID]: 0.65,
+    [VARKHUL_ANVILS_DECREE_CAST_ID]: 0.815,
+  },
+  jump: 'Jump',
+  // the roar is the ENGAGE cue only (and respawn), never a cast loop
+  flourish: 'PowerUp',
   death: 'Death',
 };
 
@@ -2317,6 +2377,23 @@ export const VISUALS: Record<string, VisualDef> = {
     envMapIntensity: 1.35,
     clips: IGNIVAR_CINDER_ARTIFICER,
   },
+  mob_varkhul_forgefather: {
+    url: `${CREATURES}/varkhul_forgefather.glb`,
+    // 9.6u at the template's 3.2 scale: colossus-class, matching Ignivar's
+    // own arena presence.
+    height: 3,
+    yaw: 0,
+    // The smith atlas is near-black leather and iron; the add-tier grade
+    // (0.18/1.35) reads as a silhouette in the Crucible. Match the Ignivar
+    // colossus furnace grade instead so the bronze and beard stay legible.
+    selfIllumination: 0.22,
+    envMapIntensity: 1.6,
+    clips: VARKHUL_FORGEFATHER,
+    // planted-foot naturals measured off the shipped clips (63.4 and 166.2
+    // raw units/s at rawHeight 88.48, scaled by height 3 x mob scale 3.2)
+    walkRef: 6.9,
+    runRef: 18,
+  },
   mob_water_elemental: {
     url: `${CREATURES}/water_elemental.glb`,
     height: 2.65,
@@ -3134,6 +3211,7 @@ const MOB_KEYS: Record<string, string> = {
   [IGNIVAR_CRUCIBLE_WARDEN_ID]: 'mob_ignivar_crucible_warden',
   [IGNIVAR_EMBER_SENTINEL_ID]: 'mob_ignivar_ember_sentinel',
   [IGNIVAR_CINDER_ARTIFICER_ID]: 'mob_ignivar_cinder_artificer',
+  [VARKHUL_BOSS_ID]: 'mob_varkhul_forgefather',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',

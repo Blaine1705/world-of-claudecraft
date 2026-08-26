@@ -14,6 +14,7 @@ function anvilImpactHarness() {
   const addShake = vi.fn();
   const renderer = Object.create(Renderer.prototype) as EventHarness & Record<string, unknown>;
   renderer.warlockMeteorFx = {};
+  renderer.views = new Map();
   renderer.abilityVfx = { handleSpellfxAt: vi.fn().mockReturnValue(false) };
   renderer.sim = { cfg: { seed: 42 } };
   renderer.vfx = { burst };

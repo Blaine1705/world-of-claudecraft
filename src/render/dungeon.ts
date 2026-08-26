@@ -67,6 +67,14 @@ import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
+import {
+  IGNIVAR_TILE_CARRIERS,
+  IGNIVAR_TILE_KINDS,
+  IGNIVAR_TILE_PREFIX,
+  ignivarTileKind,
+  ignivarTilePack,
+  isIgnivarInterior,
+} from './ignivar_tile_kit';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
@@ -357,7 +365,7 @@ const BITS_MODELS = [
   'arch',
 ] as const;
 
-type Pack = 'kit' | 'bits';
+type Pack = 'kit' | 'bits' | 'ignivarKit' | 'ignivarFloor' | 'ignivarWall';
 
 interface ModuleAsset {
   geo: THREE.BufferGeometry;
@@ -422,6 +430,31 @@ export function ensureDungeonAssets(): Promise<void> {
     ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
   ]).then(() => undefined);
   return dungeonAssetsPromise;
+}
+
+// The Ignivar raid's dark-iron structural duplicates (see ignivar_tile_kit).
+// Loaded only when one of the three forge rooms builds, into their own pack so
+// the recolored source material never reaches the shared kit.
+let ignivarTileAssetsPromise: Promise<void> | null = null;
+function ensureIgnivarTileAssets(interior: string): Promise<void> {
+  if (!isIgnivarInterior(interior)) return Promise.resolve();
+  ignivarTileAssetsPromise ??= (async () => {
+    // The two texture CARRIERS load first so each raid pack's shared material
+    // is always sourced from the module that actually embeds the texture; the
+    // remaining modules are geometry-only and ride those materials.
+    await Promise.all(
+      Object.entries(IGNIVAR_TILE_CARRIERS).map(([pack, name]) =>
+        loadModuleAsset(`${IGNIVAR_TILE_PREFIX}${name}`, pack as Pack),
+      ),
+    );
+    const carrierNames = new Set<string>(Object.values(IGNIVAR_TILE_CARRIERS));
+    await Promise.all(
+      IGNIVAR_TILE_KINDS.filter((name) => !carrierNames.has(name)).map((name) =>
+        loadModuleAsset(`${IGNIVAR_TILE_PREFIX}${name}`, ignivarTilePack(name)),
+      ),
+    );
+  })();
+  return ignivarTileAssetsPromise;
 }
 
 // Kit-pack modules loaded on demand by scenes outside the dungeon interiors
@@ -804,6 +837,7 @@ export class DungeonInteriors {
   ): Promise<THREE.Group> {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
+    await ensureIgnivarTileAssets(interior);
     if (interior === 'wildheart') {
       const group = buildWildheartFieldInterior({
         lowGfx: this.lowGfx,
@@ -855,7 +889,7 @@ export class DungeonInteriors {
     // Every standard-layout interior routes its outer walls through the
     // hideable-wall path (formerly arena-only), so any wall crossing the
     // eye-to-camera segment fades to 20% opacity instead of blanking the view.
-    const arenaWalls = this.pendingArenaWalls(layout, ox, oz);
+    const arenaWalls = this.pendingArenaWalls(layout, ox, oz, variant);
 
     // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
     // replace the single-room shell entirely. Walls come from the SAME segment
@@ -1462,6 +1496,18 @@ export class DungeonInteriors {
     // the high/ultra parallax height response.
     if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial)
       applySurfaceDetail(mat as THREE.MeshStandardMaterial, 'stone');
+    if (pack === 'ignivarKit' || pack === 'ignivarFloor' || pack === 'ignivarWall') {
+      // The forge rooms' authored iron carries its detail in the ALBEDO, and
+      // their grades run dim: a faint albedo-driven self-glow keeps the tile
+      // read alive in shadow and sets the ember grout luminous. Raid-only by
+      // construction: this pack never serves any other interior.
+      const lit = mat as THREE.MeshStandardMaterial | THREE.MeshLambertMaterial;
+      if (lit.map) {
+        lit.emissiveMap = lit.map;
+        lit.emissive = new THREE.Color(0xffffff);
+        lit.emissiveIntensity = 0.24;
+      }
+    }
     this.packMats.set(pack, mat);
     return mat;
   }
@@ -1510,7 +1556,10 @@ export class DungeonInteriors {
   ): void {
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, mats] of p.byKind) {
-      const asset = moduleAssets.get(kind);
+      // The Ignivar rooms swap their structural stone for the raid-only
+      // dark-iron duplicates; kind-keyed policy below (shadows, tints) still
+      // reads the ORIGINAL kind, so only geometry + material identity change.
+      const asset = moduleAssets.get(ignivarTileKind(variant, kind));
       if (!asset) {
         // ensureDungeonAssets() guarantees loads completed; guard against a bad kind name
         console.warn(`dungeon: unknown module kind '${kind}'`);
@@ -1540,8 +1589,15 @@ export class DungeonInteriors {
     }
   }
 
-  private pendingArenaWalls(layout: DungeonLayout, ox: number, oz: number): PendingArenaWalls {
-    const topY = DUNGEON_WALL_HEIGHT;
+  private pendingArenaWalls(
+    layout: DungeonLayout,
+    ox: number,
+    oz: number,
+    variant?: Variant,
+  ): PendingArenaWalls {
+    // the Ignivar rooms stack a second wall course, so the hide/fade footprint
+    // reaches the true top
+    const topY = variant === 'ignivar' ? DUNGEON_WALL_HEIGHT * 2 : DUNGEON_WALL_HEIGHT;
     const wallX = layout.wallX ?? DUNGEON_WALL_X;
     const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
     const wall = (footprint: ArenaWallFootprint): PendingArenaWall => ({
@@ -1591,7 +1647,7 @@ export class DungeonInteriors {
     const mats: OccluderFadeMat[] = [];
     const isMarsh = variant === 'delve_marsh' || variant === 'delve_marsh_apse';
     for (const [kind, matrices] of pending.placements.byKind) {
-      const asset = moduleAssets.get(kind);
+      const asset = moduleAssets.get(ignivarTileKind(variant, kind));
       if (!asset) {
         console.warn(`dungeon: unknown arena wall module kind '${kind}'`);
         continue;
@@ -1716,6 +1772,18 @@ export class DungeonInteriors {
         t,
       );
     }
+    if (variant === 'ignivar') {
+      // The forge rooms tile clean: the raid's authored iron flags carry the
+      // identity, so no dirt or rubble kinds break the grid. Small tiles keep
+      // a little placement variety without changing the surface.
+      return pickKind(
+        [
+          ['floor_tile_large', 82],
+          ['quad', 18],
+        ],
+        t,
+      );
+    }
     if (isDelveVariant(variant)) {
       // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
       return pickKind(
@@ -1742,6 +1810,10 @@ export class DungeonInteriors {
   }
 
   private floorQuadKind(variant: Variant, t: number): string {
+    if (variant === 'ignivar') {
+      // one clean small tile: the raid kit ships no broken/weed/votive smalls
+      return 'floor_tile_small';
+    }
     if (variant === 'arena_drowned') return this.floorQuadKind('temple', t);
     if (variant === 'bastion') {
       return pickKind(
@@ -2245,6 +2317,13 @@ export class DungeonInteriors {
       const scale: [number, number, number] = [halfLength / 2, MODULE_SCALE, MODULE_SCALE];
       const target = hideableWalls?.[i]?.placements ?? p;
       target.add(kind, x, 0, z, rot, scale);
+      if (variant === 'ignivar') {
+        // The forge rooms stack a second full course on top (no stretching):
+        // plain iron wall with the occasional cracked module, doors and gates
+        // stay ground level.
+        const upper = hash2(z * 3.1, x) < 0.25 ? 'wall_cracked' : 'wall';
+        target.add(upper, x, DUNGEON_WALL_HEIGHT, z, rot, scale);
+      }
       if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
         target.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
       }
