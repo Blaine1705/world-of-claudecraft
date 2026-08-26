@@ -327,7 +327,7 @@ describe('live Soul Rend player-visual prewarm', () => {
     // the renderer only REPORTS every change, including leaving one.
     expect(renderer).not.toContain('activeInterior: string | null = null');
     expect(renderer).toContain(
-      'encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null)',
+      'encounterPrewarm.setEncounterPrewarmInterior(this, fogScene.interior ?? null)',
     );
     const createStart = renderer.indexOf('private createView(');
     const createEnd = renderer.indexOf('\n  // Shared core for every compile gate', createStart);
