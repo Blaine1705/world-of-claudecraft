@@ -10,8 +10,7 @@ import {
   IGNIVAR_SKYFIRE_CAST_ID,
 } from '../../sim/encounters/ignivar';
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from '../ability_vfx_core';
-import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
-import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
+import { abilityVfxFullSpec, abilityVfxSpec } from '../ability_vfx_registry';
 
 const ENCOUNTER_VFX_SPECS: Readonly<Record<string, AbilityVfxSpec>> = {
   [IGNIVAR_FRONTAL_CAST_ID]: {
@@ -178,10 +177,13 @@ const ENCOUNTER_VFX_FULL_SPECS: Readonly<Record<string, AbilityVfxFullSpec>> = {
   },
 };
 
+// Fall back through the bespoke class registry, never the raw generated
+// tables: class-owned premium identities (destruction, necromancy, warlock
+// pets) must keep routing even when the painter resolves via this overlay.
 export function abilityVfxSpecFor(abilityId: string): AbilityVfxSpec | undefined {
-  return ENCOUNTER_VFX_SPECS[abilityId] ?? ABILITY_VFX_SPECS[abilityId];
+  return ENCOUNTER_VFX_SPECS[abilityId] ?? abilityVfxSpec(abilityId);
 }
 
 export function abilityVfxFullSpecFor(abilityId: string): AbilityVfxFullSpec | undefined {
-  return ENCOUNTER_VFX_FULL_SPECS[abilityId] ?? ABILITY_VFX_FULL_SPECS[abilityId];
+  return ENCOUNTER_VFX_FULL_SPECS[abilityId] ?? abilityVfxFullSpec(abilityId);
 }
