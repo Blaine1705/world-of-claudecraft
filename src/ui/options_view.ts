@@ -565,6 +565,8 @@ export function buildGraphicsSections(
         // concern for touch players.
         boolToggle(s, 'mobileCameraJoystick', 'hudChrome.options.mobileCameraJoystick'),
         boolToggle(s, 'leftHandedTouch', 'hudChrome.options.mobileLeftHanded'),
+        boolToggle(s, 'touchPreciseGroundAim', 'hudChrome.options.touchPreciseAim'),
+        note('hudChrome.options.touchPreciseAimNote'),
         boolToggle(s, 'touchTapMenus', 'hudChrome.options.touchTapMenus'),
         note('hudChrome.options.touchTapMenusNote'),
       ],

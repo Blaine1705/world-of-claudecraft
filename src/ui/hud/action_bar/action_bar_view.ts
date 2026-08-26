@@ -158,6 +158,9 @@ export interface ActionBarSlotDescriptor {
   item(): ItemDef | null;
   /** The slot's keybind label. Host resolves from the keybind map. */
   keybindLabel(): string;
+  /** Whether this rendered slot owns the source slot of an active ground aim.
+   *  Omitted for bar families that do not cast ground-targeted abilities. */
+  ownsAimSlot?(activeAimSlot: number): boolean;
 }
 
 /** The bar descriptor: the slot set. The FAMILY parameter. */
@@ -249,6 +252,8 @@ export interface ActionBarWorldInput {
   /** Fate Threads attached to this Warlock's primary Evil Eye, 0 to 3. */
   fateThreads?: number;
   entities: Iterable<OwnedDominionServant>;
+  /** Source action-bar slot that owns the active ground aim, or null. */
+  activeAimSlot: number | null;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -275,6 +280,7 @@ export interface ActionBarSlotState {
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
+  aiming: boolean;
   /** A free-cost proc (Battle Trance) covers this ability right now: the
    *  painter renders the classic gold proc glow. Actionable info, so it is
    *  NEVER shed by a graphics tier. */
@@ -323,6 +329,7 @@ export function makeSlotState(): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    aiming: false,
     procGlow: false,
     empowered: false,
     ascensionSpender: false,
@@ -436,11 +443,22 @@ export function createActionBarView(
         }
       }
       let boundCount = 0;
+      let aimingSlotIndex = -1;
+      if (world.activeAimSlot !== null) {
+        for (let i = 0; i < descriptor.slots.length; i++) {
+          const sd = descriptor.slots[i];
+          if (sd.ownsAimSlot?.(world.activeAimSlot) === true) {
+            aimingSlotIndex = i;
+            break;
+          }
+        }
+      }
 
       for (let i = 0; i < descriptor.slots.length; i++) {
         const sd = descriptor.slots[i];
         const slot = slots[i];
         const slotLabel = deps.slotLabel(sd.slotIndex);
+        slot.aiming = i === aimingSlotIndex;
 
         // many-spells counts RAW assigned slots (the attack slot reports no action),
         // byte-identical to the former hotbarActions.filter(a => a !== null).length.

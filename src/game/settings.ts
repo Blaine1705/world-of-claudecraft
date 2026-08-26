@@ -212,6 +212,9 @@ export const BOOL_SETTINGS = {
   // gameplay space is the primary camera path; this is an opt-in alternative for
   // players who prefer a dedicated stick. Gated on body.mobile-camera-joystick-on.
   mobileCameraJoystick: { def: false },
+  // on by default: touch position abilities enter ground aim before casting.
+  // Turning it off casts immediately at the smart seed point instead.
+  touchPreciseGroundAim: { def: true },
   // off by default: replaces every touch gesture menu (the action radial, the
   // consumables row, the menu control) with a tap-only flow. Opening a menu casts
   // nothing, a second tap on the control runs its default action, and a tap

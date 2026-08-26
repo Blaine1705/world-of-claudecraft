@@ -1550,6 +1550,8 @@ export const de_DE: EnTranslations = {
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
       "mobileLeftHanded": "Linkshänder-Layout",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Menüs antippen",
       "touchTapMenusNote": "Öffne die Aktions-, Verbrauchsgüter- und Menüsteuerung mit einem Tipp statt mit einem Wischen. Tippe einen Gegenstand an, um ihn zu benutzen, tippe die Steuerung erneut an für ihre übliche Aktion, oder tippe außerhalb, um zu schließen."
     },

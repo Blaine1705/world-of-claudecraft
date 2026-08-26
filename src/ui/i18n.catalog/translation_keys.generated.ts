@@ -9426,6 +9426,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.stickyTarget'
   | 'hudChrome.options.stopAutoAttackOnTargetSwitch'
   | 'hudChrome.options.targetFrameScale'
+  | 'hudChrome.options.touchPreciseAim'
+  | 'hudChrome.options.touchPreciseAimNote'
   | 'hudChrome.options.touchTapMenus'
   | 'hudChrome.options.touchTapMenusNote'
   | 'hudChrome.options.uiScale'

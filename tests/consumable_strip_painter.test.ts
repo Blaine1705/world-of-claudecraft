@@ -147,6 +147,7 @@ function slotState(iconKey: string): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    aiming: false,
     procGlow: false,
     empowered: false,
     ascensionSpender: false,

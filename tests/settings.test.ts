@@ -255,6 +255,14 @@ describe('Settings', () => {
     expect(b.get('mobileCameraJoystick')).toBe(true);
   });
 
+  it('defaults precise touch ground targeting on and persists quick mode across instances', () => {
+    const a = new Settings();
+    expect(a.get('touchPreciseGroundAim')).toBe(true);
+    a.set('touchPreciseGroundAim', false);
+    const b = new Settings();
+    expect(b.get('touchPreciseGroundAim')).toBe(false);
+  });
+
   it('defaults the own nameplate on for a fresh player and preserves an existing off choice', () => {
     const fresh = new Settings();
     expect(fresh.get('showOwnNameplate')).toBe(true);
@@ -370,6 +378,7 @@ describe('Settings', () => {
     s.set('fullscreen', 0);
     s.set('mouseCamera', true);
     s.set('mobileCameraJoystick', true);
+    s.set('touchPreciseGroundAim', false);
     s.reset();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);
     expect(s.get('renderScale')).toBe(SETTING_RANGES.renderScale.def);
@@ -382,6 +391,7 @@ describe('Settings', () => {
     expect(s.get('clickToMoveButton')).toBe(SETTING_RANGES.clickToMoveButton.def);
     expect(s.get('mouseCamera')).toBe(false);
     expect(s.get('mobileCameraJoystick')).toBe(false);
+    expect(s.get('touchPreciseGroundAim')).toBe(true);
   });
 
   // Issue 2341: the Esc options menu's Graphics/Audio/Controller sub-views each

@@ -2552,10 +2552,10 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
+    if (key === 'startAttackOnAbilityUse' || key === 'touchPreciseGroundAim') {
+      // No live subsystem to update: the HUD reads these settings at ability-cast
       // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
+      settings.set(key, !!value);
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {

@@ -12,15 +12,15 @@ export interface GroundAimState {
 
 export const DEFAULT_GROUND_AOE_RADIUS = 6;
 
-/** Touch normally keeps instant target-feet casting, but Meteor needs an
- * explicit terrain tap so it never falls on the caster merely for lacking a
- * selected target. Desktop remains governed by the player's reticle setting. */
+/** Touch uses the dedicated precise-targeting preference. Desktop remains
+ * governed by the player's ground-reticle preference. */
 export function shouldUseGroundAim(
-  abilityId: string,
+  _abilityId: string,
   mobileTouch: boolean,
   desktopPreference: boolean,
+  touchPrecise: boolean,
 ): boolean {
-  return mobileTouch ? abilityId === 'meteor' : desktopPreference;
+  return mobileTouch ? touchPrecise : desktopPreference;
 }
 
 export function createGroundAimState(): GroundAimState {

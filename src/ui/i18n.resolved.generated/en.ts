@@ -1550,6 +1550,8 @@ export const en: EnTranslations = {
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
       "mobileLeftHanded": "Left-handed layout",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Tap menus",
       "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },

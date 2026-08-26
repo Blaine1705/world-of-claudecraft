@@ -10,54 +10,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "es_ES": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "fr_FR": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "fr_CA": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "de_DE": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "ru_RU": [],
   "cs_CZ": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "nl_NL": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "pl_PL": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "id_ID": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "tr_TR": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "sv_SE": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "vi_VN": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ],
   "da_DK": [
-    "hudChrome.controller.reticleSpeed"
+    "hudChrome.controller.reticleSpeed",
+    "hudChrome.options.touchPreciseAim",
+    "hudChrome.options.touchPreciseAimNote"
   ]
 };

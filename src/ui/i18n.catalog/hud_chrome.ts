@@ -1897,6 +1897,9 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+    touchPreciseAim: 'Precise Ground Targeting',
+    touchPreciseAimNote:
+      'Aim before casting ground spells. Turn off to cast instantly at the suggested point.',
     // Touch accessibility toggle (off by default): every gesture menu opens on a
     // tap instead of a swipe or a hold. The note below is the row's description.
     touchTapMenus: 'Tap menus',

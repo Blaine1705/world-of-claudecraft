@@ -1444,6 +1444,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'デイリー報酬の宝箱を表示',
   'hudChrome.options.mobileCameraJoystick': 'カメラスティック',
   'hudChrome.options.mobileLeftHanded': '左利き用レイアウト',
+  'hudChrome.options.touchPreciseAim': '精密な地面指定',
+  'hudChrome.options.touchPreciseAimNote': '地面対象の呪文は指定してから発動します。オフにすると推奨地点ですぐに発動します。',
   'hudChrome.options.touchTapMenus': 'タップメニュー',
   'hudChrome.options.touchTapMenusNote': 'アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。',
   'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',

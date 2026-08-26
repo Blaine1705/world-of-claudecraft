@@ -1550,6 +1550,8 @@ export const nl_NL: EnTranslations = {
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
       "mobileLeftHanded": "Linkshandige indeling",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Tik voor menu's",
       "touchTapMenusNote": "Open de actie-, verbruiksartikelen- en menuknoppen met een tik in plaats van een veeg. Tik op een item om het te gebruiken, tik nogmaals op de knop voor de gebruikelijke actie, of tik buiten het venster om te sluiten."
     },

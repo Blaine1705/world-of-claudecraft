@@ -19,15 +19,17 @@ function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
 }
 
 describe('ground_aim', () => {
-  it('opens touch placement for Meteor without changing other mobile ground casts', () => {
-    expect(shouldUseGroundAim('meteor', true, false)).toBe(true);
-    expect(shouldUseGroundAim('flamestrike', true, true)).toBe(false);
+  it('uses the precise touch preference for every mobile ground cast', () => {
+    expect(shouldUseGroundAim('meteor', true, false, true)).toBe(true);
+    expect(shouldUseGroundAim('flamestrike', true, true, true)).toBe(true);
+    expect(shouldUseGroundAim('meteor', true, true, false)).toBe(false);
+    expect(shouldUseGroundAim('flamestrike', true, false, false)).toBe(false);
   });
 
   it('keeps desktop ground placement controlled by its preference', () => {
-    expect(shouldUseGroundAim('meteor', false, true)).toBe(true);
-    expect(shouldUseGroundAim('meteor', false, false)).toBe(false);
-    expect(shouldUseGroundAim('flamestrike', false, true)).toBe(true);
+    expect(shouldUseGroundAim('meteor', false, true, false)).toBe(true);
+    expect(shouldUseGroundAim('meteor', false, false, true)).toBe(false);
+    expect(shouldUseGroundAim('flamestrike', false, true, false)).toBe(true);
   });
 
   it('passes through points inside range', () => {

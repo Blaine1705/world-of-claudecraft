@@ -28,7 +28,7 @@ vi.mock('../src/ui/icons', () => ({
 
 import { ABILITIES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { AbilityDef, Entity } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
 import {
   type AimPoint,
@@ -46,7 +46,11 @@ interface GroundAimHarness {
     castAbilityAt: ReturnType<typeof vi.fn>;
   };
   renderer: { setGroundAimReticle: ReturnType<typeof vi.fn> };
-  optionsHooks: { groundAimTargetAttackable?: (targetId: number) => boolean } | null;
+  optionsHooks: {
+    groundAimTargetAttackable?: (targetId: number) => boolean;
+    settings: { get(key: 'groundReticle' | 'touchPreciseGroundAim'): boolean };
+  } | null;
+  mobileActionPage: number;
   actionForSlot(slot: number): { type: 'ability'; id: string } | null;
   abilityForSlot(slot: number): ResolvedAbility | null;
   groundReticleEnabled(abilityId: string): boolean;
@@ -64,14 +68,16 @@ interface GroundAimHarness {
   } | null;
   commitGroundAimAt(point?: AimPoint | null): boolean;
   commitGroundAim(): boolean;
+  cycleMobileActionPage(): void;
 }
 
 function resolvedPositionAbility(
-  range = 30,
+  abilityDef: AbilityDef = ABILITIES.flamestrike,
+  range = abilityDef.range,
   minRange?: number,
   cooldownId?: string,
 ): ResolvedAbility {
-  const def = { ...ABILITIES.flamestrike, range, minRange };
+  const def = { ...abilityDef, range, minRange };
   return {
     def,
     rank: 1,
@@ -105,15 +111,27 @@ function makeHud(
     range?: number;
     minRange?: number;
     cooldownId?: string;
+    abilityDef?: AbilityDef;
+    mobileTouch?: boolean;
+    touchPrecise?: boolean;
+    desktopPreference?: boolean;
   } = {},
 ): GroundAimHarness {
   const player = options.player ?? entity(1, 0, 0);
   const target = options.target;
   if (target) player.targetId = target.id;
-  const ability = resolvedPositionAbility(options.range, options.minRange, options.cooldownId);
+  const abilityDef = options.abilityDef ?? ABILITIES.flamestrike;
+  const ability = resolvedPositionAbility(
+    abilityDef,
+    options.range ?? abilityDef.range,
+    options.minRange ?? abilityDef.minRange,
+    options.cooldownId,
+  );
   const hud = Object.create(Hud.prototype) as unknown as GroundAimHarness;
+  document.body.classList.toggle('mobile-touch', options.mobileTouch ?? false);
   hud.groundAim = createGroundAimState();
   hud.groundAimPoint = null;
+  hud.mobileActionPage = 0;
   hud.sim = {
     player,
     entities: new Map(
@@ -125,15 +143,66 @@ function makeHud(
   hud.renderer = { setGroundAimReticle: vi.fn() };
   hud.optionsHooks = {
     groundAimTargetAttackable: () => options.attackable ?? false,
+    settings: {
+      get: (key) =>
+        key === 'touchPreciseGroundAim'
+          ? (options.touchPrecise ?? true)
+          : (options.desktopPreference ?? true),
+    },
   };
   hud.actionForSlot = () => ({ type: 'ability', id: ability.def.id });
   hud.abilityForSlot = () => ability;
-  hud.groundReticleEnabled = () => true;
   hud.flashActionSlot = vi.fn();
   return hud;
 }
 
 describe('Hud ground aim behavior', () => {
+  it('enters precise touch aim for every non-self-centered position ability', () => {
+    const positionAbilities = Object.values(ABILITIES).filter(
+      (def) => def.targetMode === 'position' && !def.selfCentered,
+    );
+
+    expect(positionAbilities.length).toBeGreaterThan(1);
+    for (const abilityDef of positionAbilities) {
+      const hud = makeHud({ abilityDef, mobileTouch: true, touchPrecise: true });
+
+      hud.castSlot(3);
+
+      expect(hud.groundAim.activeAbilityId).toBe(abilityDef.id);
+      expect(hud.sim.castAbilityAt).not.toHaveBeenCalled();
+    }
+  });
+
+  it('quick touch mode casts at the smart seed without entering aim', () => {
+    const hud = makeHud({ mobileTouch: true, touchPrecise: false });
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 0, z: 15 });
+  });
+
+  it('desktop reticle-off casting keeps the target-feet fallback', () => {
+    const target = entity(2, 12, 0);
+    const hud = makeHud({ target, attackable: false, desktopPreference: false });
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 12, z: 0 });
+  });
+
+  it('desktop same-slot re-press commits the active aim', () => {
+    const hud = makeHud();
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 9, z: 4 });
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 9, z: 4 });
+  });
+
   it('seeds an attackable selected target clamped to range', () => {
     const target = entity(2, 50, 0);
     const hud = makeHud({ target, attackable: true });
@@ -212,6 +281,16 @@ describe('Hud ground aim behavior', () => {
     expect(hud.sim.castAbilityAt).toHaveBeenCalledOnce();
   });
 
+  it('uses the smart seed for the mobile cooldown fallback', () => {
+    const hud = makeHud({ mobileTouch: true });
+    hud.sim.player.cooldowns.set('flamestrike', 4);
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 0, z: 15 });
+  });
+
   it('enters aim when Forbidden Reflection bypasses the running cooldown', () => {
     const hud = makeHud();
     hud.sim.player.cooldowns.set('flamestrike', 4);
@@ -234,13 +313,29 @@ describe('Hud ground aim behavior', () => {
   });
 
   it('casts immediately instead of entering aim while dead', () => {
-    const hud = makeHud();
+    const hud = makeHud({ mobileTouch: true });
     hud.sim.player.dead = true;
 
     hud.castSlot(3);
 
     expect(hud.isGroundAimActive()).toBe(false);
-    expect(hud.sim.castAbilityAt).toHaveBeenCalledOnce();
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 0, z: 15 });
+  });
+
+  it('cancels active aim before flipping the mobile action page', () => {
+    const hud = makeHud({ mobileTouch: true });
+    hud.castSlot(3);
+    const pagesObservedWhileCancelling: number[] = [];
+    hud.renderer.setGroundAimReticle.mockImplementation((reticle) => {
+      if (reticle === null) pagesObservedWhileCancelling.push(hud.mobileActionPage);
+    });
+
+    hud.cycleMobileActionPage();
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(pagesObservedWhileCancelling).toEqual([0]);
+    expect(hud.mobileActionPage).toBe(1);
+    expect(hud.renderer.setGroundAimReticle).toHaveBeenCalledWith(null);
   });
 
   it('dims an unclamped point inside the authored minimum range', () => {

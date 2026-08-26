@@ -82,6 +82,7 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    aiming: false,
     procGlow: false,
     empowered: false,
     ascensionSpender: false,
@@ -116,6 +117,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
           usable: false,
           outOfRange: true,
           queued: true,
+          aiming: true,
           procGlow: true,
           empowered: true,
           ascensionSpender: true,
@@ -141,6 +143,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'unusable', true] },
       { m: 'toggleClass', args: [el.btn, 'oor', true] },
       { m: 'toggleClass', args: [el.btn, 'queued', true] },
+      { m: 'toggleClass', args: [el.btn, 'aiming', true] },
       { m: 'toggleClass', args: [el.btn, 'proc', true] },
       { m: 'toggleClass', args: [el.btn, 'empowered', true] },
       { m: 'toggleClass', args: [el.btn, 'ascension-spender', true] },
@@ -152,6 +155,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setAttr', args: [el.btn, 'aria-description', ''] },
       { m: 'setAttr', args: [el.btn, 'aria-disabled', 'true'] },
+      { m: 'setAttr', args: [el.btn, 'aria-pressed', 'true'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);
   });
@@ -170,6 +174,26 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
     expect(calls).toContainEqual({
       m: 'setStyleProp',
       args: [el.label, 'background-image', 'URL()'],
+    });
+  });
+
+  it('keeps the fixed attack button pressed while auto-attack is active', () => {
+    const { calls, writers } = recordingFacet();
+    const el = slotElements('attack');
+    const painter = new ActionBarPainter(
+      writers,
+      { container: CONTAINER, slots: [el] },
+      (key) => `URL(${key})`,
+    );
+
+    painter.paint({
+      manySpells: false,
+      slots: [slotState({ kind: 'attack', aiming: false, queued: true })],
+    });
+
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [el.btn, 'aria-pressed', 'true'],
     });
   });
 
@@ -196,6 +220,14 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
     );
     expect(mobileCss).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?#mobile-action-ring button\.proc,[\s\S]*?animation: none;/,
+    );
+  });
+
+  it('styles the aiming marker on desktop slots and mobile ring buttons', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+
+    expect(css).toMatch(
+      /\.action-btn\.aiming,\s*body\.mobile-touch #mobile-action-ring button\.aiming \{[\s\S]*?outline: 2px solid var\(--color-border-focus\);/,
     );
   });
 });
@@ -262,6 +294,7 @@ function idleWorld(): ActionBarWorldInput {
     inventory: [],
     stealthed: false,
     entities: [],
+    activeAimSlot: null,
   };
 }
 

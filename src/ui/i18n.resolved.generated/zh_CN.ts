@@ -1550,6 +1550,8 @@ export const zh_CN: EnTranslations = {
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",
       "mobileLeftHanded": "左手布局",
+      "touchPreciseAim": "精确地面选点",
+      "touchPreciseAimNote": "施放地面法术前先瞄准。关闭后会立即在建议位置施放。",
       "touchTapMenus": "点击菜单",
       "touchTapMenusNote": "用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。"
     },

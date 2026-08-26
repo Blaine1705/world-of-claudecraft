@@ -1440,6 +1440,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
+  'hudChrome.options.touchPreciseAim': '정밀 지면 지정',
+  'hudChrome.options.touchPreciseAimNote': '지면 주문은 조준한 뒤 시전합니다. 끄면 추천 지점에 즉시 시전합니다.',
   'hudChrome.options.touchTapMenus': '탭 메뉴',
   'hudChrome.options.touchTapMenusNote': '스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다.',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',

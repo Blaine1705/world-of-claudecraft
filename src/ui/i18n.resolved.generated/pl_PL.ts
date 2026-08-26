@@ -1550,6 +1550,8 @@ export const pl_PL: EnTranslations = {
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",
       "mobileLeftHanded": "Układ leworęczny",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Dotykowe menu",
       "touchTapMenusNote": "Otwieraj kontrolki akcji, materiałów zużywalnych i menu dotknięciem zamiast przeciągnięciem. Dotknij pozycji, aby jej użyć, dotknij kontrolki ponownie, aby wykonać jej zwykłe działanie, albo dotknij poza nią, aby zamknąć."
     },

@@ -2949,6 +2949,11 @@
       0 0 9px #ffd100cc,
       inset 0 1px 0 #ffffff18;
   }
+  .action-btn.aiming,
+  body.mobile-touch #mobile-action-ring button.aiming {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
   /* Proc glow (Battle Trance and similar): the classic pulsing
      gold rim on the covered abilities. Actionable info: never gated by a graphics tier; the
      pulse (motion only) stops under reduced motion, the steady glow stays. */

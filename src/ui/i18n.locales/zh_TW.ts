@@ -1401,6 +1401,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
   'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
   'hudChrome.options.mobileLeftHanded': '左手配置',
+  'hudChrome.options.touchPreciseAim': '精確地面選點',
+  'hudChrome.options.touchPreciseAimNote': '施放地面法術前先瞄準。關閉後會立即在建議位置施放。',
   'hudChrome.options.touchTapMenus': '點擊選單',
   'hudChrome.options.touchTapMenusNote': '用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',

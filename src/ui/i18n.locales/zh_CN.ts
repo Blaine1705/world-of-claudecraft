@@ -1399,6 +1399,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '显示每日奖励宝箱',
   'hudChrome.options.mobileCameraJoystick': '摄像机摇杆',
   'hudChrome.options.mobileLeftHanded': '左手布局',
+  'hudChrome.options.touchPreciseAim': '精确地面选点',
+  'hudChrome.options.touchPreciseAimNote': '施放地面法术前先瞄准。关闭后会立即在建议位置施放。',
   'hudChrome.options.touchTapMenus': '点击菜单',
   'hudChrome.options.touchTapMenusNote': '用点击代替滑动来打开动作、消耗品和菜单控件。点击条目即可使用，再次点击控件执行其常用操作，点击外部则关闭。',
   'hudChrome.options.itemLevelLine': '物品等级 {level}',

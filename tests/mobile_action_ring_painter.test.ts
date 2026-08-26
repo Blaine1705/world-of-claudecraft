@@ -131,6 +131,7 @@ function idleWorld(): ActionBarWorldInput {
     inventory: [],
     stealthed: false,
     entities: [],
+    activeAimSlot: null,
   };
 }
 
@@ -843,6 +844,13 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(ring).toContain("deps.itemForSlot(deps.sourceSlot(i, 'center'))");
   });
 
+  it('maps active aim ownership across every direction on a physical ring button', () => {
+    expect(ring).toContain('aimOwnsButton: (buttonIndex) => deps.aimOwnsButton(buttonIndex),');
+    expect(hud).toContain('mobileButtonOwnsSourceSlot(');
+    expect(ring).toContain('cancelAim: () => deps.cancelAim(),');
+    expect(ring).toContain('ownsAimSlot: () => deps.aimOwnsButton(i),');
+  });
+
   it('binds the empowered hold BEFORE the radial gesture', () => {
     // Order decides who wins a release: the hold arms the shared suppress flag
     // from its own pointerup and the radial reads it. Attached first, the radial
@@ -852,6 +860,7 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
     expect(hold).toBeGreaterThan(-1);
     expect(attach).toBeGreaterThan(hold);
     expect(ring).toContain('takeSuppressedPress: () => deps.takeSuppressedClick(),');
+    expect(ring).toContain("deps.aimOwnsButton(i) ? -1 : deps.sourceSlot(i, 'center')");
     expect(hud).toContain('takeSuppressedClick: () => {');
   });
 
@@ -931,9 +940,7 @@ describe('Hud.buildMobileActionRing wiring (source scan)', () => {
   });
 
   it('passes the live mobile-visible source-slot count into the mobile ring painter', () => {
-    expect(hud).toContain(
-      'const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();',
-    );
+    expect(hud).toContain('const mobileActionSourceSlotCount = MOBILE_ACTION_SOURCE_SLOT_COUNT;');
   });
 
   it('leaves the primary attack slot with no painted background (the crisp data-icon SVG shows through instead)', () => {

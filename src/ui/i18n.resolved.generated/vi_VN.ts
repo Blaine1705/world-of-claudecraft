@@ -1550,6 +1550,8 @@ export const vi_VN: EnTranslations = {
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
       "mobileLeftHanded": "Bố cục thuận tay trái",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Chạm để mở menu",
       "touchTapMenusNote": "Mở các nút điều khiển hành động, vật phẩm tiêu hao và menu bằng một cú chạm thay vì vuốt. Chạm vào một mục để dùng nó, chạm lại vào nút điều khiển để thực hiện hành động thông thường của nó, hoặc chạm ra ngoài để đóng lại."
     },

@@ -1462,6 +1462,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'Показывать сундук ежедневных наград',
   'hudChrome.options.mobileCameraJoystick': 'Джойстик камеры',
   'hudChrome.options.mobileLeftHanded': 'Раскладка для левшей',
+  'hudChrome.options.touchPreciseAim': 'Точное наведение по земле',
+  'hudChrome.options.touchPreciseAimNote': 'Наземные заклинания сначала требуют наведения. Если отключить этот параметр, они мгновенно применяются в предложенной точке.',
   'hudChrome.options.touchTapMenus': 'Меню по нажатию',
   'hudChrome.options.touchTapMenusNote': 'Открывайте элементы действий, расходников и меню нажатием вместо смахивания. Нажмите на предмет, чтобы использовать его, нажмите на элемент ещё раз для обычного действия или нажмите за его пределами, чтобы закрыть.',
   'hudChrome.options.itemLevelLine': 'Уровень предмета {level}',

@@ -1550,6 +1550,8 @@ export const it_IT: EnTranslations = {
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",
       "mobileLeftHanded": "Disposizione per mancini",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Menu al tocco",
       "touchTapMenusNote": "Apri i controlli di azione, consumabili e menu con un tocco invece che con uno scorrimento. Tocca un elemento per usarlo, tocca di nuovo il controllo per la sua azione abituale, oppure tocca fuori per chiudere."
     },

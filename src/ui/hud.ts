@@ -419,8 +419,10 @@ import {
 import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
-  mobileActionSourceSlotCount,
+  MOBILE_ACTION_PAGE_COUNT,
+  MOBILE_ACTION_SOURCE_SLOT_COUNT,
   mobileButtonHasSourceSlot,
+  mobileButtonOwnsSourceSlot,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
@@ -5329,7 +5331,7 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     hideTooltip: () => this.hideTooltip(),
     barActions: () => this.hotbarActions,
-    sourceSlotCount: () => this.mobileActionSourceSlotCount(),
+    sourceSlotCount: () => MOBILE_ACTION_SOURCE_SLOT_COUNT,
     editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
     placeAbility: (abilityId, slot) => {
       if (!this.actionBarController.isAssignableAction({ type: 'ability', id: abilityId })) return;
@@ -6834,6 +6836,7 @@ export class Hud {
       abilityId,
       document.body.classList.contains('mobile-touch'),
       this.optionsHooks?.settings.get('groundReticle') ?? true,
+      this.optionsHooks?.settings.get('touchPreciseGroundAim') ?? true,
     );
   }
 
@@ -7021,10 +7024,14 @@ export class Hud {
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
           const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
+          const mobileTouch = document.body.classList.contains('mobile-touch');
           if (this.groundReticleEnabled(action.id) && !this.sim.player.dead && cooldown <= 0) {
             this.beginGroundAim(action.id, barSlot);
           } else {
-            this.sim.castAbilityAt(action.id, this.groundTargetAim());
+            const point = mobileTouch
+              ? smartSeedPoint(this.sim.player, this.groundAimSeedTarget(), resolved.def.range)
+              : this.groundTargetAim();
+            this.sim.castAbilityAt(action.id, point);
           }
         } else {
           // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
@@ -7088,18 +7095,8 @@ export class Hud {
     if ($('#bags').style.display !== 'none') this.renderBags();
   }
 
-  private mobileActionSourceSlotCount(): number {
-    return mobileActionSourceSlotCount();
-  }
-
-  private mobileActionPageCount(): number {
-    return mobilePageCount(this.mobileActionSourceSlotCount());
-  }
-
   private currentMobileActionPage(): number {
-    const page = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
-    this.mobileActionPage = page;
-    return page;
+    return clampMobilePage(this.mobileActionPage);
   }
 
   private mobileSourceSlotForButton(
@@ -7109,14 +7106,17 @@ export class Hud {
     return sourceSlotForMobileButton(this.currentMobileActionPage(), buttonIndex, direction);
   }
 
-  // Advance the mobile action ring to its next page. Mutates mobileActionPage
+  // Advance the mobile action ring to its next page. Drops any armed ground aim
+  // first (the aim's re-press identity is a source SLOT, which the same physical
+  // button no longer maps to after the flip), then mutates mobileActionPage
   // ONLY: the ring descriptor's per-slot closures (built once in buildActionBar)
   // resolve sourceSlotForMobileButton(mobileActionPage, i) fresh every tick, so no
   // descriptor rebuild is needed and hidden-page cooldowns keep ticking (their
   // state lives on hotbarActions + sim, not on the view). The next update() call
   // repaints the ring from the new page.
   private cycleMobileActionPage(): void {
-    this.mobileActionPage = nextMobilePage(this.mobileActionPage, this.mobileActionPageCount());
+    this.cancelGroundAim();
+    this.mobileActionPage = nextMobilePage(this.mobileActionPage, MOBILE_ACTION_PAGE_COUNT);
   }
 
   private flashActionSlot(barSlot: number): void {
@@ -7470,6 +7470,7 @@ export class Hud {
           const slotKey = `slot${i}`;
           return {
             slotIndex: i,
+            ownsAimSlot: (activeAimSlot: number) => activeAimSlot === i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
             isAttack: () => i === 0 && this.attackSlotIsAttack(),
@@ -7559,9 +7560,9 @@ export class Hud {
       sourceSlot: (i, direction) => this.mobileSourceSlotForButton(i, direction),
       hasSourceSlot: (i, direction) =>
         mobileButtonHasSourceSlot(
-          this.currentMobileActionPage(),
+          clampMobilePage(this.mobileActionPage),
           i,
-          this.mobileActionSourceSlotCount(),
+          MOBILE_ACTION_SOURCE_SLOT_COUNT,
           direction,
         ),
       actionForSlot: (slot) => this.actionForSlot(slot),
@@ -7574,6 +7575,13 @@ export class Hud {
         this.suppressNextActionClick = false;
         return true;
       },
+      aimOwnsButton: (buttonIndex) =>
+        mobileButtonOwnsSourceSlot(
+          clampMobilePage(this.mobileActionPage),
+          buttonIndex,
+          this.groundAim.activeSlot,
+        ),
+      cancelAim: () => this.cancelGroundAim(),
       castSlot: (slot) => this.castSlot(slot),
       cyclePage: () => this.cycleMobileActionPage(),
       activateFixedAttackSlot: () => this.activateFixedAttackSlot(),
@@ -8968,6 +8976,7 @@ export class Hud {
       actionBarWorld.paladinSpec = sim.talentSpec;
       actionBarWorld.fateThreads = fateThreads;
       actionBarWorld.entities = sim.entities.values();
+      actionBarWorld.activeAimSlot = this.groundAim.activeSlot;
     } else {
       actionBarWorld = {
         player: p,
@@ -8977,6 +8986,7 @@ export class Hud {
         paladinSpec: sim.talentSpec,
         fateThreads,
         entities: sim.entities.values(),
+        activeAimSlot: this.groundAim.activeSlot,
       };
       this.actionBarWorldInput = actionBarWorld;
     }
@@ -8991,12 +9001,11 @@ export class Hud {
     // that row's mobile gate.
     this.crossHotbar?.paint(actionBarWorld);
 
-    // mobile action ring: the paged touch cluster replacing the bar above
-    // (view/painter stay undefined if the ring DOM never got built, e.g. an
-    // older cached template). Reuses the desktop bar's world snapshot.
+    // The paged touch ring reuses the desktop bar's world snapshot and stays
+    // absent when older cached markup did not build its view and painter.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       const mobileActionPage = this.currentMobileActionPage();
-      const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();
+      const mobileActionSourceSlotCount = MOBILE_ACTION_SOURCE_SLOT_COUNT;
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick(actionBarWorld),
         mobileActionPage,
