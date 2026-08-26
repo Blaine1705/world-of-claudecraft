@@ -5,7 +5,7 @@ import type { AbilityDef, Entity, PlayerClass, ResourceType } from '../sim/types
 import { formatAbilityNumber } from './ability_description';
 import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, itemDisplayName, tEntity } from './entity_i18n';
-import { formatNumber, t, type TranslationKey } from './i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { localizeSimAuraName } from './sim_i18n';
 
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
@@ -57,7 +57,11 @@ export function questTitle(questId: string): string {
   return tEntity({ kind: 'quest', id: questId, field: 'title' });
 }
 
-export function questNarrative(questId: string, field: 'text' | 'completion', playerName: string): string {
+export function questNarrative(
+  questId: string,
+  field: 'text' | 'completion',
+  playerName: string,
+): string {
   return tEntity({ kind: 'quest', id: questId, field, values: { playerName } });
 }
 

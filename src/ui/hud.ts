@@ -285,17 +285,6 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
-  classDisplayName,
-  dungeonDisplayName,
-  itemDisplayName,
-  itemSetBonusField,
-  knownLetterId,
-  riftFloorLabel,
-  tEntity,
-  zoneDisplayName,
-  zonePoiLabel,
-} from './entity_i18n';
-import {
   abilityCastLine,
   abilityRangeLine,
   combatAbilityName,
@@ -317,6 +306,17 @@ import {
   resourceDisplayName,
   zoneWelcome,
 } from './entity_display_labels';
+import {
+  classDisplayName,
+  dungeonDisplayName,
+  itemDisplayName,
+  itemSetBonusField,
+  knownLetterId,
+  riftFloorLabel,
+  tEntity,
+  zoneDisplayName,
+  zonePoiLabel,
+} from './entity_i18n';
 import {
   delveDisplayName,
   dungeonDisplayNameFromSource,

@@ -14,9 +14,9 @@ import { resumeWhenAllowed } from './audio_unlock';
 import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
+import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
 import { buildIgnivarRaidThemes } from './raid_music_themes';
-import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
 
 export type MusicZone =
   | 'town_eastbrook'
