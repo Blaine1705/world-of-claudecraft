@@ -34,6 +34,7 @@ import {
   isConsuming,
   SALVAGE_CAST_ID,
 } from '../types';
+import { SALVAGE_MATERIAL_BY_QUALITY } from './salvage_materials';
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -44,19 +45,9 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'legendary',
 ];
 
-// Materials returned per rarity tier (issue #1300 scope: "which items are
-// salvageable and their yield tables"). Reuses existing harvested-material
-// item ids (bone_fragments/linen_scrap/spider_leg) rather than introducing
-// new item ids, same rationale content/recipes.ts documents for the same
-// reason (avoids expanding the positional item-name arrays in
-// src/ui/i18n.catalog/items.ts for this issue).
-export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
-  common: 'bone_fragments',
-  uncommon: 'linen_scrap',
-  rare: 'spider_leg',
-  epic: 'spider_leg',
-  legendary: 'spider_leg',
-};
+// Public compatibility for callers that historically imported the canonical
+// table through the command module.
+export { SALVAGE_MATERIAL_BY_QUALITY } from './salvage_materials';
 
 /** Eligible for salvage: an equippable weapon, armor, or held-offhand piece,
  *  at least `common` quality (a `poor`/undefined-quality piece has nothing

@@ -1,26 +1,20 @@
-// The ONE material-set derivation, shared by the two modules that must agree on
-// what counts as a material: material_taxonomy.ts (the UI-side set, derived
-// EAGERLY at module evaluation) and materials_vault.ts (the sim-side set,
-// derived LAZILY on first use). The rule set itself lives here exactly once, so
-// the vault can never drift from the chip and sweep the player already sees.
+// The ONE material-set derivation behind the canonical eager registry in
+// material_ids.ts. The UI taxonomy, bags, bank, and vault all read that same
+// immutable view, so their classification and identity cannot drift.
 //
 // This module is deliberately RUNTIME-IMPORT-FREE: every content table arrives
 // as a parameter, and the table modules are pulled in with `import type` for
 // their typeofs alone (legal on a value binding in a typeof position, and fully
-// erased at build time). That is what lets the two consumers keep their own
-// evaluation timing. It must never gain a runtime import and must never derive
-// anything at module-evaluation time: either one puts a derive back inside
-// data.ts's own evaluation cycle, where load order alone decides between a
-// clean run and reading a still-undefined source table. The full statement of
-// that hazard, and the static scan that guards it, live in the header of
-// material_taxonomy.ts.
+// erased at build time). It must never gain a runtime content dependency: the
+// registry supplies fully evaluated tables explicitly and injection tests can
+// exercise each source without a parallel derivation implementation.
 
 import type { ENCHANTS } from './content/enchants';
 import type { HARVEST_COMPONENT_ITEMS, HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import type { ALL_RECIPES, ITEMS } from './data';
-import type { NODE_MATERIAL_TABLE } from './professions/gathering';
+import type { NODE_MATERIAL_TABLE } from './professions/gathering_materials';
 import type { MATERIAL_GRADES } from './professions/material_grades';
-import type { SALVAGE_MATERIAL_BY_QUALITY } from './professions/salvage';
+import type { SALVAGE_MATERIAL_BY_QUALITY } from './professions/salvage_materials';
 
 /** The content tables the material set derives from. Injectable so the
  *  per-source pins in tests/material_taxonomy.test.ts can prove each table is
@@ -35,6 +29,42 @@ export interface MaterialSourceTables {
   recipes: typeof ALL_RECIPES;
   enchants: typeof ENCHANTS;
   items: typeof ITEMS;
+}
+
+/** A runtime-immutable ReadonlySet facade. The mutable Set is closure-private,
+ *  and the frozen public object exposes only standard read operations. */
+function readonlySetView<T>(values: Iterable<T>): ReadonlySet<T> {
+  const backing = new Set(values);
+  let view: ReadonlySet<T>;
+  view = Object.freeze({
+    get size(): number {
+      return backing.size;
+    },
+    has(value: T): boolean {
+      return backing.has(value);
+    },
+    entries(): SetIterator<[T, T]> {
+      return backing.entries();
+    },
+    keys(): SetIterator<T> {
+      return backing.keys();
+    },
+    values(): SetIterator<T> {
+      return backing.values();
+    },
+    forEach(
+      callbackfn: (value: T, value2: T, set: ReadonlySet<T>) => void,
+      thisArg?: unknown,
+    ): void {
+      backing.forEach((value) => {
+        callbackfn.call(thisArg, value, value, view);
+      });
+    },
+    [Symbol.iterator](): SetIterator<T> {
+      return backing[Symbol.iterator]();
+    },
+  });
+  return view;
 }
 
 export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet<string> {
@@ -61,5 +91,5 @@ export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet
   for (const enchant of Object.values(tables.enchants)) {
     for (const reagent of enchant.reagents) sources.add(reagent.itemId);
   }
-  return new Set([...sources].filter((id) => tables.items[id]?.kind === 'junk'));
+  return readonlySetView([...sources].filter((id) => tables.items[id]?.kind === 'junk'));
 }

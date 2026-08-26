@@ -1447,7 +1447,7 @@ describe('the vault material scope', () => {
     expect(ids.has('totally_unknown_item')).toBe(false);
   });
 
-  it('returns the SAME memoized set object on every call (a lazy derive, not a rebuild)', () => {
+  it('returns the same eager canonical view on every call', () => {
     expect(vaultMaterialIds()).toBe(vaultMaterialIds());
   });
 
@@ -1533,12 +1533,9 @@ describe('the vault material scope', () => {
 });
 
 // ---------------------------------------------------------------------------
-// material_derivation.ts is the shared derive both material_taxonomy.ts and the
-// vault read from. It must stay a pure TYPE leaf: a runtime import there would put
-// the derive inside data.ts's own evaluation cycle, where load order decides
-// between a clean run and a crash, and the defect is invisible under one host entry
-// point and fatal under another (the reasoning material_taxonomy.ts's header
-// spells out). A static scan is the only thing that catches that reliably.
+// material_derivation.ts is the injectable rule engine behind the one registry.
+// It stays a pure type leaf so callers supply fully evaluated content tables and
+// source-by-source tests can exercise it without hidden module state.
 describe('material_derivation.ts stays a runtime-import-free leaf', () => {
   // Every line that pulls a RUNTIME dependency: a value import in any form (a
   // from-clause, a bare side-effect import, a dynamic import()) or a value

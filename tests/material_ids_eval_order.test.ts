@@ -1,38 +1,16 @@
-// The module-evaluation-order probe for the src/sim import cycle that
-// bags.ts and material_ids.ts sit at the center of (phase 05 architecture
-// review). Tarjan over the RUNTIME imports of src/sim (type-only imports
-// excluded, they vanish at emit) finds one strongly connected component of
-// seven modules:
-//
-//   bags.ts, items.ts, material_ids.ts, professions/battlefield_xp.ts,
-//   professions/gathering.ts, professions/salvage.ts, vendor_buy_stack.ts
-//
-// bags.ts imports material_ids.ts, which imports professions/gathering.ts and
-// professions/salvage.ts for their content tables, and BOTH of those import
-// ../bags again; items.ts and vendor_buy_stack.ts close further loops back
-// through bags.ts, and battlefield_xp.ts through gathering.ts. The cycle is
-// benign exactly as long as every cross-cycle read stays lazy (inside a
-// function body): the day any member gains a module-evaluation-time call
-// into another, a TDZ throw appears ONLY when the unlucky member is the
-// entry module, a load-order-dependent failure no ordinary suite sees
-// because vitest happens to enter the graph elsewhere. This file makes EVERY
-// member of the SCC (plus the pool and vault consumers, and sim.ts for the
-// order production actually uses) the entry module in turn, with a fresh
-// module registry per arm, and then proves the lazy derivation still answers,
-// so the hazard cannot land silently.
-//
-// The items.ts, vendor_buy_stack.ts and battlefield_xp.ts arms exist because
-// those three entry orders are precisely the ones ordinary suites never
-// produce: every other suite reaches those modules THROUGH another member, so
-// an eval-time cross-cycle read added to one of them would be invisible
-// without an arm that enters there first.
+// Module-evaluation-order probes around the material registry. The canonical
+// gathering and salvage tables now live in pure leaves, which cuts the former
+// bags -> material_ids -> command module -> bags cycle and lets material_ids
+// derive one eager registry. Entering through every former cycle member still
+// protects the boundary: any future runtime edge back into a command module
+// would make at least one fresh-module arm fail or answer from partial content.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 // Type-only, so it is erased at emit and cannot put src/sim/sim.ts (or
 // anything it reaches) into the runtime graph ahead of an arm's entry module.
 // The value imports in this file are ALL dynamic, inside the arms, on purpose.
 import type { PlayerMeta } from '../src/sim/sim';
 
-describe('material_ids evaluation-order probe (the bags cycle stays lazy)', () => {
+describe('material_ids evaluation-order probe (pure table leaves keep the registry eager)', () => {
   beforeEach(() => {
     vi.resetModules();
   });
@@ -45,6 +23,7 @@ describe('material_ids evaluation-order probe (the bags cycle stays lazy)', () =
   it('evaluates cleanly with material_ids.ts as the entry module, and the set answers', async () => {
     const mod = await import('../src/sim/material_ids');
     const ids = mod.materialItemIds();
+    expect(ids).toBe(mod.MATERIAL_ITEM_IDS);
     expect(ids.size).toBeGreaterThan(0);
     expect(ids.has('copper_ore')).toBe(true);
   });
@@ -79,11 +58,11 @@ describe('material_ids evaluation-order probe (the bags cycle stays lazy)', () =
     expect(ids.isMaterialItemId('copper_ore')).toBe(true);
   });
 
-  it('evaluates cleanly with vendor_buy_stack.ts as the entry module, and its fit cap crosses the cycle', async () => {
+  it('evaluates cleanly with vendor_buy_stack.ts as the entry module, and its fit cap reaches the registry', async () => {
     const mod = await import('../src/sim/vendor_buy_stack');
     const { ITEMS } = await import('../src/sim/data');
     // maxBuyCount routes through bags.countFit -> bag_pools.freePoolSlots ->
-    // material_ids.isMaterialItemId, so this IS the cross-cycle read, taken
+    // material_ids.isMaterialItemId, so this is the registry read, taken
     // from the entry module's own export rather than a bystander import. With
     // only a materials-pool slot free, copper_ore fills it (20 to a stack, one
     // unit per purchase) and the non-material loaf cannot take it at all.
@@ -121,7 +100,7 @@ describe('material_ids evaluation-order probe (the bags cycle stays lazy)', () =
     expect(sim.canAddItem('copper_ore', 1)).toBe(true);
   });
 
-  it('evaluates cleanly with bag_pools.ts as the entry module, and its lazy ITEMS read answers', async () => {
+  it('evaluates cleanly with bag_pools.ts as the entry module, and its ITEMS read answers', async () => {
     const mod = await import('../src/sim/bag_pools');
     expect(mod.generalOnlyPools(4)).toEqual({ general: 4, materials: 0 });
     // generalOnlyPools is pure arithmetic and never touches ITEMS, so it alone
@@ -140,11 +119,9 @@ describe('material_ids evaluation-order probe (the bags cycle stays lazy)', () =
     expect([...vault.vaultMaterialIds()].sort()).toEqual([...ids.materialItemIds()].sort());
   });
 
-  it('a bags-first load still derives the material set lazily and correctly', async () => {
-    // The worst-case order for the cycle: enter at bags.ts, THEN ask the fit
-    // gate a question whose answer needs the derived set. A regression that
-    // moved the derive to evaluation time would have thrown one arm earlier;
-    // this arm proves the lazy read is also CORRECT after that entry order.
+  it('a bags-first load reaches the eager material set correctly', async () => {
+    // Enter through bags.ts, then ask the fit gate a question whose answer
+    // needs the eagerly derived canonical set.
     const bags = await import('../src/sim/bags');
     const pools = { general: 0, materials: 1 };
     expect(bags.countFit([], pools, 'copper_ore', 1)).toBe(1); // a material may take the pool

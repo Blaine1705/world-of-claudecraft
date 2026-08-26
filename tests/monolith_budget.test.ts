@@ -352,7 +352,10 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 12633,
+    // Lowered after CharacterState and PetState moved to the type-only
+    // character_state.ts leaf. Persistence callers keep the sim.ts re-export,
+    // while the coordinator no longer owns the JSONB schema declaration.
+    ceiling: 12363,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

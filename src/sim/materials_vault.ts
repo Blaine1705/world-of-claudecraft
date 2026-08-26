@@ -56,11 +56,8 @@
 // is a PLACE gate of its own, vault_craft_gate.ts, which is about which
 // contexts may draw at all rather than about standing at a counter.
 //
-// The material set arrives through material_ids.ts, the sim-side lazy memo
-// shared with the two-pool bag capacity math (its header carries the
-// freeze-point caveat versus material_taxonomy.ts's eager set); the
-// set-equality pin in tests/materials_vault.test.ts holds vaultMaterialIds to
-// the UI-side set.
+// The material set arrives through material_ids.ts, the eager immutable
+// registry shared with the two-pool bag capacity math and UI taxonomy.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
@@ -106,9 +103,7 @@ export function vaultCapacityPerMaterial(state: MaterialsVaultState): number {
  *  chip and the deposit-all sweep show the player, derived from the one shared
  *  rule set rather than approximated by kind (kind 'junk' over-includes the
  *  vendor trash and the trophies the taxonomy settlement deliberately excluded).
- *  The lazy memo itself lives in material_ids.ts since the two-pool bag
- *  capacity mechanic became its third consumer; this export stays as the
- *  vault's public surface. */
+ *  This export stays as the vault's public surface over the canonical view. */
 export function vaultMaterialIds(): ReadonlySet<string> {
   return materialItemIds();
 }
