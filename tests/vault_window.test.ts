@@ -13,7 +13,7 @@ import type { InvSlot } from '../src/sim/types';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { vaultWithdrawFit, vaultWithdrawNotice } from '../src/ui/vault_view';
-import type { BankInfo, IWorld, VaultInfo } from '../src/world_api';
+import type { BankInfo, IWorld, VaultInfo, VaultSpecialRef } from '../src/world_api';
 
 function personalInfo(): BankInfo {
   return {
@@ -59,7 +59,7 @@ interface Harness {
     /** Reassignable so the offline-shape arm can install a MUTATING double. */
     vaultDepositAll: () => void;
     /** Reassignable for the same reason, on the withdraw side (both call sites). */
-    vaultWithdraw: (itemId: string, count?: number) => void;
+    vaultWithdraw: (itemId: string, count?: number, special?: VaultSpecialRef) => void;
   };
   calls: string[];
 }
@@ -84,8 +84,11 @@ function harness(vault: VaultInfo | null, opts: { consumePeek?: () => boolean } 
     bankWithdraw: (...a: unknown[]) => calls.push(`bankWithdraw:${a.join(',')}`),
     bankBuySlots: () => calls.push('bankBuySlots'),
     vaultDeposit: (...a: unknown[]) => calls.push(`vaultDeposit:${a.join(',')}`),
-    vaultWithdraw: (...a: unknown[]) =>
-      calls.push(`vaultWithdraw:${a.filter((x) => x !== undefined).join(',')}`),
+    vaultWithdraw: (itemId: string, count?: number, special?: VaultSpecialRef) => {
+      const countArg = count === undefined ? '' : `,${count}`;
+      const specialArg = special === undefined ? '' : `,${JSON.stringify(special)}`;
+      calls.push(`vaultWithdraw:${itemId}${countArg}${specialArg}`);
+    },
     vaultDepositAll: () => calls.push('vaultDepositAll'),
     vaultBuyUpgrade: () => calls.push('vaultBuyUpgrade'),
   };
@@ -317,6 +320,131 @@ describe('the stocked pane', () => {
     expect(h.calls).toEqual(['vaultWithdraw:copper_ore,7']);
   });
 
+  it('offers an explicit sibling partial-withdraw action for pooled rows and restores it after submit', () => {
+    const h = harness(vaultInfo({ stock: { copper_ore: 7, iron_ore: 1 } }));
+    h.window.open();
+    clickVaultTab(h);
+    const partials = h.root.querySelectorAll<HTMLButtonElement>('.vault-row-partial');
+    expect(partials).toHaveLength(1);
+    const full = partials[0].closest('.vault-row-wrap')?.querySelector('.vault-row');
+    expect(full).not.toBeNull();
+    expect(partials[0].getAttribute('aria-label')).toBe('Quantity to withdraw');
+    expect(partials[0].getAttribute('aria-label')).not.toBe(full?.getAttribute('aria-label'));
+    expect(partials[0].title).toBe('Quantity to withdraw');
+    expect(partials[0].textContent).toContain('Quantity to withdraw');
+
+    partials[0].focus();
+    partials[0].click();
+    const prompt = document.querySelector('#prompt-stack .vault-quantity-prompt') as HTMLElement;
+    expect(prompt).not.toBeNull();
+    const input = prompt.querySelector('input') as HTMLInputElement;
+    input.value = '3';
+    const confirm = Array.from(prompt.querySelectorAll('button')).find(
+      (button) => button.textContent === 'Withdraw',
+    ) as HTMLButtonElement;
+    confirm.click();
+
+    expect(h.calls).toEqual(['vaultWithdraw:copper_ore,3']);
+    expect(document.activeElement).toBe(
+      h.root.querySelector<HTMLElement>('[data-focus-key="vault:partial:0"]'),
+    );
+  });
+
+  it('renders a special instance with canonical glyph/lock marks and withdraws its exact ref whole', () => {
+    const h = harness(
+      vaultInfo({
+        special: [
+          {
+            itemId: 'copper_ore',
+            count: 2,
+            instance: { signer: 'Ada', locked: true },
+          },
+          { itemId: 'future_material', count: 1, instance: { signer: 'Rin' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    const row = h.root.querySelector<HTMLElement>('[data-vault-special-index="0"]');
+    expect(row).not.toBeNull();
+    expect(row?.classList.contains('vault-row-special')).toBe(true);
+    expect(row?.querySelector('.bi-glyph-signed')).not.toBeNull();
+    expect(row?.querySelector('.bi-lock-seal')).not.toBeNull();
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    expect(css).toMatch(/\.vault-row \.bi-glyph,\s*\.bag-item \.bi-glyph,/);
+    expect(css).toMatch(/\.vault-row \.bi-lock-seal,\s*\.bag-item \.bi-lock-seal,/);
+    expect(css).toMatch(
+      /body\.mobile-touch \.vault-row,[\s\S]*?body\.mobile-touch \.vault-unlock-btn,[\s\S]*?min-height:\s*44px/,
+    );
+    expect(row?.closest('.vault-row-wrap')?.querySelector('.vault-row-partial')).toBeNull();
+    expect(row?.getAttribute('aria-label')).toBe('Withdraw Copper Ore');
+    const described = row?.getAttribute('aria-describedby')?.split(' ') ?? [];
+    expect(described.map((id) => h.root.querySelector(`#${id}`)?.textContent).join(' ')).toContain(
+      'maker-marked copy',
+    );
+    const unknown = h.root.querySelector<HTMLElement>('[data-vault-special-index="1"]');
+    expect(unknown?.querySelector('.vault-row-name')?.textContent).toBe('future_material');
+    expect(unknown?.getAttribute('aria-label')).toBe('Withdraw future_material');
+
+    row?.dispatchEvent(new MouseEvent('click', { shiftKey: true, bubbles: true }));
+    expect(document.querySelector('.vault-quantity-prompt')).toBeNull();
+    expect(h.calls).toEqual([
+      'vaultWithdraw:copper_ore,{"index":0,"instance":{"signer":"Ada","locked":true}}',
+    ]);
+  });
+
+  it('re-resolves a recipe-only special row by fingerprint before quantity submit', () => {
+    const target: InvSlot = {
+      itemId: 'copper_ore',
+      count: 5,
+      craftedRecipeId: 'smelt_copper',
+    };
+    const other: InvSlot = {
+      itemId: 'copper_ore',
+      count: 2,
+      craftedRecipeId: 'smelt_other',
+    };
+    const h = harness(vaultInfo({ special: [target, other] }));
+    h.window.open();
+    clickVaultTab(h);
+    const wrap = h.root
+      .querySelector<HTMLElement>('[data-vault-special-index="0"]')
+      ?.closest('.vault-row-wrap');
+    const partial = wrap?.querySelector<HTMLButtonElement>('.vault-row-partial');
+    expect(partial).not.toBeNull();
+    partial?.click();
+
+    // The row moved and shrank while the prompt was open. Submit must scan by
+    // exact recipe fingerprint, clamp to the live count, and send its new index.
+    (h.world.vaultInfo as VaultInfo).special = [other, { ...target, count: 3 }];
+    const prompt = document.querySelector('.vault-quantity-prompt') as HTMLElement;
+    (prompt.querySelector('input') as HTMLInputElement).value = '999';
+    (
+      Array.from(prompt.querySelectorAll('button')).find(
+        (button) => button.textContent === 'Withdraw',
+      ) as HTMLButtonElement
+    ).click();
+
+    expect(h.calls).toEqual([
+      'vaultWithdraw:copper_ore,3,{"index":1,"craftedRecipeId":"smelt_copper"}',
+    ]);
+  });
+
+  it('keeps duplicate exact special rows separately selectable by snapshot index', () => {
+    const copy = (): InvSlot => ({
+      itemId: 'copper_ore',
+      count: 1,
+      instance: { signer: 'Ada' },
+    });
+    const h = harness(vaultInfo({ special: [copy(), copy()] }));
+    h.window.open();
+    clickVaultTab(h);
+    const rows = h.root.querySelectorAll<HTMLElement>('.vault-row-special');
+    expect(rows).toHaveLength(2);
+    rows[1].click();
+    expect(h.calls).toEqual(['vaultWithdraw:copper_ore,{"index":1,"instance":{"signer":"Ada"}}']);
+  });
+
   it('explains a partial-fit withdraw from the click-time snapshot (the phase 01 open call)', () => {
     // Bags: 14 gear fillers + a 15/20 copper stack = 15 of 16 base slots used,
     // so a 40-count withdraw fits only 25 (5 stack headroom + one free slot).
@@ -354,8 +482,8 @@ describe('the stocked pane', () => {
       { itemId: 'copper_ore', count: 15 },
     ];
     const spy = h.world.vaultWithdraw;
-    h.world.vaultWithdraw = (itemId, count) => {
-      spy(itemId, count);
+    h.world.vaultWithdraw = (itemId, count, special) => {
+      spy(itemId, count, special);
       // The sim's own outcome for this rig, applied IN PLACE on the live array
       // (a reassignment would not be the offline shape): the carried stack tops
       // out at 20, a second 20 takes the last free slot, and the vault keeps the
@@ -665,6 +793,53 @@ describe('signature-driven repaints', () => {
     expect(h.root.querySelector('.vault-row-count')?.textContent).toBe('9/40');
   });
 
+  it('an in-place special-row change repaints while the vault pane is showing', () => {
+    const h = harness(
+      vaultInfo({
+        special: [{ itemId: 'copper_ore', count: 1, instance: { signer: 'Ada' } }],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    h.window.refreshIfChanged();
+    const row = h.root.querySelector('.vault-row-special') as HTMLElement;
+    row.dataset.probe = 'stale';
+
+    (h.world.vaultInfo as VaultInfo).special[0].count = 2;
+    h.window.refreshIfChanged();
+
+    const fresh = h.root.querySelector('.vault-row-special') as HTMLElement;
+    expect(fresh.dataset.probe).toBeUndefined();
+    expect(fresh.querySelector('.vault-row-stack-count')?.textContent).toContain('2');
+  });
+
+  it('a special-row reorder repaints exact index selectors even when fingerprints duplicate', () => {
+    const h = harness(
+      vaultInfo({
+        special: [
+          { itemId: 'copper_ore', count: 1, instance: { signer: 'Ada' } },
+          { itemId: 'copper_ore', count: 2, instance: { signer: 'Ada' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    h.window.refreshIfChanged();
+    const first = h.root.querySelector<HTMLElement>('[data-vault-special-index="0"]');
+    expect(first?.querySelector('.vault-row-stack-count')?.textContent).toContain('1');
+    if (first) first.dataset.probe = 'stale-index';
+
+    // The wire selector's index is authoritative when two payload fingerprints
+    // are otherwise identical. Reordering must repaint even though the sorted
+    // multiset of row contents did not change.
+    (h.world.vaultInfo as VaultInfo).special.reverse();
+    h.window.refreshIfChanged();
+
+    const fresh = h.root.querySelector<HTMLElement>('[data-vault-special-index="0"]');
+    expect(fresh?.dataset.probe).toBeUndefined();
+    expect(fresh?.querySelector('.vault-row-stack-count')?.textContent).toContain('2');
+  });
+
   it('a stock change on ANOTHER tab elides (the gated term), and re-entry paints fresh', () => {
     // The signature's stock term is scoped to the vault tab: no other pane
     // renders stock, so its churn must not rebuild them (deleting the gate
@@ -813,7 +988,10 @@ describe('the vault render sinks resolve their catalog keys', () => {
       'Each material holds up to 40.',
     );
     const row = h.root.querySelector('.vault-row') as HTMLElement;
-    expect(row.getAttribute('aria-label')).toBe('Copper Ore: 40 of 40 stored');
+    expect(row.getAttribute('aria-label')).toBe('Withdraw Copper Ore');
+    expect(h.root.querySelector(`#${row.getAttribute('aria-describedby')}`)?.textContent).toBe(
+      'Copper Ore: 40 of 40 stored',
+    );
     // The KNOWN item renders its display name, never the raw id, and carries
     // its quality custom property (the core's known/qualityKey decisions).
     expect(row.querySelector('.vault-row-name')?.textContent).toBe('Copper Ore');

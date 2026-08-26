@@ -626,7 +626,12 @@ const MONOLITHS: MonolithRow[] = [
     //
     // The next clean extraction is the summary / tasks markup pair, the last of
     // the rewards tab still built inside the window.
-    ceiling: 1281,
+    // LOWERED 1281 -> 1264 by the Store lifecycle extraction: ordered snapshot
+    // ownership and prompt invalidation moved to store_surface_runtime.ts, and
+    // the full guarded skin purchase flow moved to store_armory_purchase.ts.
+    // The new Store-owned modal itself lives in store_decision_prompt.ts, while
+    // the cold shell markup moved to daily_rewards_chrome_view.ts.
+    ceiling: 1264,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

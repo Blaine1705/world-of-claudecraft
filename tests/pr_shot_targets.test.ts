@@ -863,3 +863,39 @@ describe('the bank-meter target routing (phase 08 QA)', () => {
     expect(runner).not.toMatch(/width\s*=\s*844/);
   });
 });
+
+describe('the Materials Vault evidence target', () => {
+  it('routes both vault modules and covers touch plus light/high-contrast themes', () => {
+    for (const path of ['src/ui/vault_view.ts', 'src/ui/vault_window.ts']) {
+      expect(classifyDiff([path]).specific.map((target: { key: string }) => target.key)).toContain(
+        'bank-vault',
+      );
+    }
+    const target = classifyDiff(['src/ui/vault_window.ts']).specific.find(
+      (candidate: { key: string }) => candidate.key === 'bank-vault',
+    );
+    expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+      'locked',
+      'locked-mobile',
+      'desktop',
+      'mobile',
+      'parchment',
+      'high-contrast',
+      'fine',
+      'fine-mobile',
+    ]);
+    for (const key of ['parchment', 'high-contrast']) {
+      expect(
+        target.variants.find((variant: { key: string }) => variant.key === key)?.beforeLoad,
+      ).toBeTypeOf('function');
+    }
+    expect(
+      target.variants.find(
+        (variant: { key: string; forcedColors?: boolean }) => variant.key === 'high-contrast',
+      )?.forcedColors,
+    ).toBe(true);
+    expect(target.capture.toString()).toContain("matchMedia('(forced-colors: active)').matches");
+    expect(target.capture.toString()).toContain("getElementById('tutorial-greeting')");
+    expect(target.capture.toString()).toContain('signedSpecial');
+  });
+});

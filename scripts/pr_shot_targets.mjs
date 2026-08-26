@@ -28,6 +28,24 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
   return false;
 }
 
+// Teleport-based recipes can raise the loading veil again after the shared
+// entry flow has dismissed it. DOM geometry underneath that veil is real but
+// not actionable, so interaction evidence must wait for the world paint that
+// the player would actually receive.
+async function awaitWorldPainted(page) {
+  await page.waitForFunction(
+    () => {
+      const veil = document.getElementById('loading-screen');
+      if (!veil) return true;
+      const style = getComputedStyle(veil);
+      return (
+        style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0
+      );
+    },
+    { timeout: 120000 },
+  );
+}
+
 // Seed the theme preset BEFORE the document loads (variant.beforeLoad), in string
 // form because this script runs under tsx (keepNames breaks nested functions inside
 // evaluate callbacks). Every themed variant seeds explicitly, never relies on a
@@ -37,6 +55,17 @@ const themeSeed = (preset) => async (page) => {
   await page.evaluateOnNewDocument(
     `try { localStorage.setItem('woc_theme', JSON.stringify({ preset: '${preset}', custom: {} })); } catch {}`,
   );
+};
+
+/** High-contrast theme plus the browser/OS forced-colors mode. Raw CDP is
+ *  required because Puppeteer's media wrapper rejects this feature name on
+ *  some bundled versions even though Chromium supports it. */
+const forcedColorsThemeSeed = async (page) => {
+  await themeSeed('highContrast')(page);
+  const media = await page.createCDPSession();
+  await media.send('Emulation.setEmulatedMedia', {
+    features: [{ name: 'forced-colors', value: 'active' }],
+  });
 };
 
 // Seed the LOWEST graphics preset before the document loads, the same beforeLoad
@@ -2157,6 +2186,12 @@ export const TARGETS = [
       { key: 'locked-mobile', mobile: true },
       { key: 'desktop' },
       { key: 'mobile', mobile: true },
+      { key: 'parchment', beforeLoad: themeSeed('parchment') },
+      {
+        key: 'high-contrast',
+        forcedColors: true,
+        beforeLoad: forcedColorsThemeSeed,
+      },
       // Phase 04 QA (the v0.36.0 merge-drift repair): the fine-grade pair.
       // The base-only 'desktop'/'mobile' shots above double as the BEFORE
       // images (a base-only stock renders byte-identically to the pre-repair
@@ -2172,11 +2207,12 @@ export const TARGETS = [
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
       await dismissEntryOverlays(page);
       const locked = variant.key.startsWith('locked');
-      await page.evaluate(
+      const staged = await page.evaluate(
         (staging) => {
           const isLocked = staging.locked;
           const game = window.__game;
           const sim = game?.sim;
+          let signedSpecial = false;
           try {
             // Stand beside the banker FIRST: the vault ops and the proximity
             // snapshot are both nearBanker-gated (the bank-chips idiom).
@@ -2196,6 +2232,13 @@ export const TARGETS = [
             // batched command, then re-grant a couple so the bags stay busy.
             sim.addItem('iron_ore', 12);
             sim.addItem('rough_hide', 5);
+            // One identity-bearing material proves the Vault preserves and
+            // paints the same signed-copy glyph players see in bags/bank.
+            meta.inventory.push({
+              itemId: 'copper_ore',
+              count: 1,
+              instance: { signer: 'Evidence Crafter' },
+            });
             sim.addItem('baked_bread', 3);
             if (staging.fine) {
               // The fine pair rides the same sweep: base and fine grades land
@@ -2207,9 +2250,13 @@ export const TARGETS = [
               sim.vaultBuyUpgrade(); // rung 0: the 2g unlock, ceiling 40
               sim.vaultDepositAll(); // the one batched sweep stocks the rows
               sim.addItem('iron_ore', 4);
+              signedSpecial = meta.vault.special.some(
+                (slot) => slot.instance?.signer === 'Evidence Crafter',
+              );
             }
           } catch {}
           game?.hud?.openBank?.();
+          return { signedSpecial };
         },
         {
           locked,
@@ -2219,6 +2266,9 @@ export const TARGETS = [
           fine: Boolean(variant?.fine),
         },
       );
+      if (!locked && !staged.signedSpecial) {
+        throw new Error('signed special row did not reach the staged vault');
+      }
       if (!(await pollForSize(page, '#bank-window'))) {
         throw new Error('bank window did not open');
       }
@@ -2233,6 +2283,147 @@ export const TARGETS = [
       if (!(await pollForSize(page, '#bank-window .vault-pane'))) {
         throw new Error('vault pane did not render after the tab click');
       }
+      await awaitWorldPainted(page);
+      await dismissEntryOverlays(page);
+      // The first-spawn greeting is a window, not the tutorial overlay the
+      // shared entry helper owns. It can arrive after the banker teleport and
+      // cover the Vault while every underlying DOM geometry check still looks
+      // healthy, so dismiss it at the last responsible moment.
+      const dismissedGreeting = await page.evaluate(() => {
+        const greeting = document.getElementById('tutorial-greeting');
+        if (!(greeting instanceof HTMLElement) || getComputedStyle(greeting).display === 'none') {
+          return false;
+        }
+        const close = [...greeting.querySelectorAll('button')].at(-1);
+        close?.click();
+        return true;
+      });
+      if (dismissedGreeting) await wait(400);
+      const geometry = await page.evaluate(
+        ({ touch, isLocked, fine, forcedColors }) => {
+          const root = document.getElementById('bank-window');
+          const title = root?.querySelector('.panel-title');
+          const tab = root?.querySelector('.bank-tab[data-tab="vault"]');
+          const pane = root?.querySelector('.vault-pane');
+          if (!(root instanceof HTMLElement) || !(title instanceof HTMLElement)) return 'no-title';
+          if (!(tab instanceof HTMLElement) || !(pane instanceof HTMLElement)) return 'no-pane';
+          if (!title.textContent?.trim() || !tab.textContent?.trim()) return 'empty-label';
+          if (forcedColors && !matchMedia('(forced-colors: active)').matches) {
+            return 'forced-colors-inactive';
+          }
+          const painted = (el) => {
+            const r = el.getBoundingClientRect();
+            const cs = getComputedStyle(el);
+            return (
+              cs.display !== 'none' &&
+              cs.visibility !== 'hidden' &&
+              r.width > 0 &&
+              r.height > 0 &&
+              r.right > 0 &&
+              r.bottom > 0 &&
+              r.left < innerWidth &&
+              r.top < innerHeight
+            );
+          };
+          const hit = (el) => {
+            const r = el.getBoundingClientRect();
+            const x = Math.max(0, Math.min(innerWidth - 1, r.left + r.width / 2));
+            const y = Math.max(0, Math.min(innerHeight - 1, r.top + r.height / 2));
+            if (x < r.left || x > r.right || y < r.top || y > r.bottom) return false;
+            const at = document.elementFromPoint(x, y);
+            return !!at && (at === el || el.contains(at));
+          };
+          if (![root, title, tab, pane].every(painted)) return 'chrome-clipped';
+          const fineTouchRow =
+            touch && fine
+              ? pane.querySelector('.vault-row.bag-fine')?.closest('.vault-row-wrap')
+              : null;
+          const control = isLocked
+            ? pane.querySelector('.vault-unlock-btn')
+            : (fineTouchRow?.querySelector('.vault-row-partial') ??
+              pane.querySelector('.vault-row-partial'));
+          if (!(control instanceof HTMLElement))
+            return isLocked ? 'no-unlock' : 'no-partial-action';
+          // On the short touch viewport only one stocked row fits above the
+          // pinned footer. Reveal the explicit amount action by scrolling the
+          // Vault-owned scroller, never the page/window (which would lose the
+          // title and tab labels this frame also proves).
+          if (touch && !isLocked) {
+            const scroller = pane.querySelector('.bank-scroll');
+            if (scroller instanceof HTMLElement) {
+              const row = control.closest('.vault-row-wrap');
+              const scrollerRect = scroller.getBoundingClientRect();
+              if (row instanceof HTMLElement) {
+                // Align to an exact row boundary: revealing only the minimum
+                // bottom edge left a stray two-pixel sliver of the previous
+                // row in the touch evidence. Fine-mobile intentionally aligns
+                // the fine row so that variant proves its seal and amount
+                // action together.
+                scroller.scrollTop += row.getBoundingClientRect().top - scrollerRect.top;
+              }
+            }
+          }
+          if (!painted(control) || !hit(control)) {
+            const controlRect = control.getBoundingClientRect();
+            const x = Math.max(
+              0,
+              Math.min(innerWidth - 1, controlRect.left + controlRect.width / 2),
+            );
+            const y = Math.max(
+              0,
+              Math.min(innerHeight - 1, controlRect.top + controlRect.height / 2),
+            );
+            const interceptor = document.elementFromPoint(x, y);
+            return `control-not-hittable-${controlRect.left}x${controlRect.top}x${controlRect.width}x${controlRect.height}-at-${interceptor?.id || interceptor?.className || interceptor?.tagName || 'none'}`;
+          }
+          const required = touch ? 44 : 40;
+          const rect = control.getBoundingClientRect();
+          if (rect.width < required || rect.height < required)
+            return `undersized-${rect.width}x${rect.height}`;
+          if (!isLocked) {
+            const row = pane.querySelector('.vault-row');
+            const glyph = pane.querySelector('.vault-row-special .bi-glyph-signed');
+            const label = control.querySelector('.vault-row-partial-label');
+            if (
+              !(row instanceof HTMLElement) ||
+              !row.getAttribute('aria-label')?.toLowerCase().includes('withdraw')
+            ) {
+              return 'row-action-unnamed';
+            }
+            if (!(glyph instanceof HTMLElement)) {
+              const specialRows = pane.querySelectorAll('.vault-row-special').length;
+              const liveSpecial = window.__game?.sim?.vaultInfo?.special?.length ?? -1;
+              const marks = [...pane.querySelectorAll('.vault-row-special [class*="bi-"]')]
+                .map((mark) => mark.className)
+                .join(',');
+              return `special-glyph-absent-rows${specialRows}-live${liveSpecial}-marks${marks}`;
+            }
+            // Desktop/theme frames prove the glyph is painted. The short
+            // touch frame deliberately scrolls to the sibling quantity
+            // action; there it proves the canonical glyph still exists in
+            // the DOM while the reachable touch control is the painted arm.
+            if (!touch && !painted(glyph)) {
+              const glyphRect = glyph.getBoundingClientRect();
+              return `special-glyph-clipped-${glyphRect.left}x${glyphRect.top}x${glyphRect.width}x${glyphRect.height}`;
+            }
+            if (
+              !control.getAttribute('aria-label') ||
+              !control.title ||
+              !label?.textContent?.trim()
+            ) {
+              return 'partial-action-undiscoverable';
+            }
+          }
+          return 'ok';
+        },
+        {
+          touch: Boolean(variant.mobile),
+          isLocked: locked,
+          fine: Boolean(variant.fine),
+          forcedColors: Boolean(variant.forcedColors),
+        },
+      );
+      if (geometry !== 'ok') throw new Error(`vault evidence geometry failed: ${geometry}`);
       await wait(700);
       return {};
     },

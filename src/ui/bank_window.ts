@@ -45,13 +45,11 @@ import { bankMeterAriaLabel, bankMeterTooltipHtml } from './bank_meter_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { BankRungPurchase } from './bank_rung_purchase_core';
 import {
-  type BankRungNotice,
   bankRungClaudiumTagHtml,
   bankRungNoticeText,
   bankRungResultHtml,
   bankRungTopUpCopy,
   claudiumAmountText,
-  planBankRungRefusal,
 } from './bank_rung_view';
 import {
   type BankBuySlotsModel,
@@ -67,7 +65,7 @@ import {
   hasDepositableMaterials,
   planDepositAllMaterials,
 } from './bank_view';
-import type { ClaudiumPurchaseFacet, StoreSpendResult } from './claudium_purchase_bridge';
+import type { ClaudiumPurchaseFacet } from './claudium_purchase_bridge';
 import { formatCount } from './count_format';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
@@ -97,12 +95,11 @@ import {
 // Claudium-spending surface uses (a second minter is exactly the drift the
 // packet warns about; see src/ui/purchase_intent_key.ts).
 import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
-import type { PurchaseIntent } from './store_purchase_intent';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
-import { hasVaultDepositable } from './vault_view';
+import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
 import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
@@ -935,6 +932,7 @@ export class BankWindow {
         v.perMaterialCap,
         v.nextUpgradeCost,
         this.tab === 'vault' ? Object.entries(v.stock).sort() : null,
+        this.tab === 'vault' ? vaultSpecialContentKey(v.special) : null,
         this.tab === 'vault' && v.nextUpgradeCost !== null
           ? this.deps.world().copper >= v.nextUpgradeCost
           : null,
@@ -1925,7 +1923,6 @@ export class BankWindow {
     );
   }
 
-  // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
   // #bank-window is the inert root while a prompt is open; close() clears it too
   // as a force-close backstop, so the window is never left inert while hidden.
   private installPromptDialog(

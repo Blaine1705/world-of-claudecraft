@@ -84,8 +84,83 @@ describe('buildVaultView', () => {
     if (model.kind !== 'vault') throw new Error('expected vault');
     expect(model.rows.map((r) => r.itemId)).toEqual(['ashwood_log', 'copper_ore', 'frost_lotus']);
     expect(model.rows.map((r) => r.count)).toEqual([4, 6, 2]);
+    expect(model.rows.map((r) => [r.canChooseQuantity, r.partialMax])).toEqual([
+      [true, 4],
+      [true, 6],
+      [true, 2],
+    ]);
     expect(model.rows.every((r) => r.cap === 40)).toBe(true);
     expect(model.empty).toBe(false);
+  });
+
+  it('puts partial-withdraw eligibility and its maximum in the row model', () => {
+    const model = buildVaultView(vinfo({ ashwood_log: 1, copper_ore: 7 }), lookup);
+    if (model.kind !== 'vault') throw new Error('expected vault');
+    expect(
+      model.rows.map(({ itemId, canChooseQuantity, partialMax }) => ({
+        itemId,
+        canChooseQuantity,
+        partialMax,
+      })),
+    ).toEqual([
+      { itemId: 'ashwood_log', canChooseQuantity: false, partialMax: null },
+      { itemId: 'copper_ore', canChooseQuantity: true, partialMax: 7 },
+    ]);
+  });
+
+  it('discriminates pooled and exact special rows, shares their cap, and clones identity fields', () => {
+    const signed = slot('copper_ore', 2, { instance: { signer: 'Ada' } });
+    const recipe = slot('copper_ore', 3, { craftedRecipeId: 'smelt_copper' });
+    const unknown = slot('future_material', 1, { instance: { signer: 'Rin' } });
+    const model = buildVaultView(
+      vinfo({ copper_ore: 35 }, 1, 40, 50000, [recipe, signed, unknown]),
+      lookup,
+    );
+    if (model.kind !== 'vault') throw new Error('expected vault');
+
+    const copper = model.rows.filter((row) => row.itemId === 'copper_ore');
+    expect(copper.map((row) => row.kind)).toEqual(['pooled', 'special', 'special']);
+    expect(copper.every((row) => row.storedTotal === 40 && row.atCap)).toBe(true);
+    const signedRow = copper.find(
+      (row) => row.kind === 'special' && row.instance?.signer === 'Ada',
+    );
+    const recipeRow = copper.find(
+      (row) => row.kind === 'special' && row.craftedRecipeId === 'smelt_copper',
+    );
+    expect(signedRow).toMatchObject({
+      kind: 'special',
+      count: 2,
+      canChooseQuantity: false,
+      partialMax: null,
+      specialRef: { index: 1, instance: { signer: 'Ada' } },
+    });
+    expect(recipeRow).toMatchObject({
+      kind: 'special',
+      count: 3,
+      canChooseQuantity: true,
+      partialMax: 3,
+      specialRef: { index: 0, craftedRecipeId: 'smelt_copper' },
+    });
+    expect(model.rows.find((row) => row.itemId === 'future_material')).toMatchObject({
+      kind: 'special',
+      known: false,
+    });
+
+    expect(signed.instance).toBeDefined();
+    if (signed.instance) signed.instance.signer = 'Mutated after build';
+    expect(signedRow?.kind === 'special' ? signedRow.instance?.signer : null).toBe('Ada');
+    expect(signedRow?.kind === 'special' ? signedRow.specialRef.instance?.signer : null).toBe(
+      'Ada',
+    );
+  });
+
+  it('keeps duplicate special rows separately addressable by their snapshot indices', () => {
+    const copy = (): InvSlot => slot('copper_ore', 1, { instance: { signer: 'Ada' } });
+    const model = buildVaultView(vinfo({}, 1, 40, 50000, [copy(), copy()]), lookup);
+    if (model.kind !== 'vault') throw new Error('expected vault');
+    expect(model.rows.map((row) => (row.kind === 'special' ? row.specialRef.index : null))).toEqual(
+      [0, 1],
+    );
   });
 
   it('a fine grade sorts BESIDE its base (base first) and carries the fine flag (PIN MOVED)', () => {
@@ -179,9 +254,9 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
 
   it('mirrors the sim: per-material headroom clamp, DESCENDING, skip set intact', () => {
     // Two copper stacks (idx 0 and 3): headroom 30 takes the HIGHER-indexed 20
-    // whole, then 10 of the first (partial -> full). The instanced and crafted
-    // slots and the non-material never move; the unrelated ashwood_log moves
-    // whole.
+    // whole, then the exact special stacks, then 7 of the first (partial ->
+    // full). Identity/provenance are preserved by the sim but are eligible for
+    // this sweep; only the non-material stays carried.
     const inv = [
       slot('copper_ore', 20),
       slot('rusty_dagger', 1),
@@ -191,9 +266,21 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
       slot('ashwood_log', 2),
     ];
     const p = predictVaultDepositAll(inv, vinfo({ copper_ore: 10 }, 1, 40), MATERIALS);
-    // Whole stacks: the idx-3 copper (20) and the idx-5 log (2) = 2 stacks;
-    // items: 20 + 10 (partial) + 2 = 32; full: the partial fill.
-    expect(p).toEqual({ stacks: 2, items: 32, full: true });
+    // Whole stacks: copper idx 3 + signed idx 2 + both log rows = 4 stacks;
+    // items: 20 + 3 + 4 + 2 + 7 = 36; full: the partial final fill.
+    expect(p).toEqual({ stacks: 4, items: 36, full: true });
+  });
+
+  it('counts existing special stock against the shared cap and never splits an instance', () => {
+    const info = vinfo({ copper_ore: 30 }, 1, 40, 50000, [
+      slot('copper_ore', 8, { craftedRecipeId: 'smelt_copper' }),
+    ]);
+    const inv = [slot('copper_ore', 5, { instance: { signer: 'Ada' } })];
+    expect(predictVaultDepositAll(inv, info, MATERIALS)).toEqual({
+      stacks: 0,
+      items: 0,
+      full: true,
+    });
   });
 
   it('a corrupt degenerate carried count is skipped by the shared predicate', () => {
@@ -264,16 +351,16 @@ describe('hasVaultDepositable (the button enable)', () => {
   it('true for a plain material stack; ignores headroom by design', () => {
     expect(hasVaultDepositable([slot('copper_ore', 1)], MATERIALS)).toBe(true);
   });
-  it('false for non-materials, instanced, and crafted-provenance slots', () => {
+  it('accepts identity/provenance materials and still rejects non-materials', () => {
     expect(hasVaultDepositable([slot('rusty_dagger', 1)], MATERIALS)).toBe(false);
     expect(
       hasVaultDepositable(
         [slot('copper_ore', 1, { instance: { signer: 'A' } as InvSlot['instance'] })],
         MATERIALS,
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(hasVaultDepositable([slot('copper_ore', 1, { craftedRecipeId: 'r' })], MATERIALS)).toBe(
-      false,
+      true,
     );
   });
 });
@@ -325,6 +412,15 @@ describe('vaultWithdrawFit + vaultWithdrawNotice (the shortfall explanation)', (
     // countFit models stacking exactly (stackSize 20): 5 into the open stack,
     // 20 into the one free slot.
     expect(fit).toBe(25);
+  });
+
+  it('passes identity/provenance into countFit and keeps instances all-or-nothing', () => {
+    const inv = Array.from({ length: 15 }, (_, i) => slot(`gear_${i}`, 1));
+    const bags = [null, null, null, null];
+    expect(vaultWithdrawFit(inv, bags, 'copper_ore', 30, { signer: 'Ada' }, 'smelt_copper')).toBe(
+      0,
+    );
+    expect(vaultWithdrawFit(inv, bags, 'copper_ore', 30, undefined, 'smelt_copper')).toBe(20);
   });
 
   it('notice arms: silent when all fits, silent when NOTHING fits, short otherwise', () => {

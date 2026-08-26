@@ -19,8 +19,8 @@
 import { bagPools, countFit } from '../sim/bags';
 import { isVaultDepositableSlot, VAULT_BASE_CAP, VAULT_UPGRADE_STEP } from '../sim/materials_vault';
 import { baseMaterialFor } from '../sim/professions/material_grades';
-import type { InvSlot } from '../sim/types';
-import type { VaultInfo } from '../world_api';
+import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from '../sim/types';
+import type { VaultInfo, VaultSpecialRef } from '../world_api';
 import { bagFineMark } from './bag_fine_mark_view';
 import { bagQualityKey } from './bags_view';
 import type { BankItemLookup } from './bank_view';
@@ -35,9 +35,20 @@ import type { BankItemLookup } from './bank_view';
  *  full clean-up ladder (category/slot/quality) reduces to exactly this
  *  fine-adjacency over the id order; the narrow BankItemLookup cannot feed
  *  the full ladder and does not need to. */
-export interface VaultRowModel {
+interface VaultRowBase {
   itemId: string;
+  /** Count owned by this actionable row. A pooled row owns the fungible
+   *  count; a special row owns exactly one identity/provenance stack. */
   count: number;
+  /** Total for this material across pooled and special storage. Capacity is
+   *  shared, so fill/over-cap decisions always key off this value. */
+  storedTotal: number;
+  /** Whether the row exposes the explicit partial-withdraw action. The model
+   *  owns this eligibility so every painter presents pooled counts alike. */
+  canChooseQuantity: boolean;
+  /** The click-time ceiling shown by the quantity prompt, null when splitting
+   *  a one-count row would have no meaning. Submit still clamps to live stock. */
+  partialMax: number | null;
   /** The uniform per-material ceiling (wire perMaterialCap), repeated per row
    *  for the painter's count/cap readout. */
   cap: number;
@@ -56,6 +67,24 @@ export interface VaultRowModel {
    *  release's all-surfaces mark-family rule. */
   fine: boolean;
 }
+
+/** One compact fungible-count row. */
+export interface VaultPooledRowModel extends VaultRowBase {
+  kind: 'pooled';
+}
+
+/** One identity/provenance-preserving row. The payload is cloned off the wire
+ *  snapshot and the exact selector carries its original snapshot index plus
+ *  every present identity field. Instance rows are whole/all-or-nothing;
+ *  recipe-only rows remain safely splittable. */
+export interface VaultSpecialRowModel extends VaultRowBase {
+  kind: 'special';
+  specialRef: VaultSpecialRef;
+  instance?: ItemInstancePayload;
+  craftedRecipeId?: string;
+}
+
+export type VaultRowModel = VaultPooledRowModel | VaultSpecialRowModel;
 
 /** The upgrade footer: the NEXT rung's copper price from the wire (null once
  *  every rung is bought), the maxed flag, and the ceiling the next rung would
@@ -88,6 +117,28 @@ export type VaultViewModel =
       upgrade: VaultUpgradeModel;
     };
 
+/** Exact command selector for one boundary-cloned special row. Clone the
+ *  payload again so rendering state and a later wire send never share a
+ *  mutable object. */
+export function vaultSpecialRef(index: number, slot: InvSlot): VaultSpecialRef {
+  return {
+    index,
+    ...(slot.instance ? { instance: cloneItemInstancePayload(slot.instance) } : {}),
+    ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
+  };
+}
+
+/** Content signature term for BankWindow's slow repaint band. Canonicalize
+ *  nested key order, but preserve array order: the special selector includes
+ *  the snapshot index, so a reorder must repaint even when two payload
+ *  fingerprints are otherwise identical. */
+export function vaultSpecialContentKey(special: readonly InvSlot[]): readonly string[] {
+  return special.map(
+    (slot) =>
+      `${slot.itemId}\u0000${slot.count}\u0000${canonicalJson(slot.instance)}\u0000${slot.craftedRecipeId ?? ''}`,
+  );
+}
+
 /** Map the proximity-gated vault snapshot to the render model. Stock rows are
  *  sorted base-grade-adjacent (see VaultRowModel); counts and caps ride
  *  through verbatim, over-capacity included. */
@@ -97,33 +148,78 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
     return { kind: 'locked', unlockCost: info.nextUpgradeCost, unlockCap: VAULT_BASE_CAP };
   }
   const cap = info.perMaterialCap;
+  const storedTotals = new Map<string, number>();
+  for (const [itemId, count] of Object.entries(info.stock)) {
+    storedTotals.set(itemId, saneStoredCount(count));
+  }
+  for (const slot of info.special) {
+    storedTotals.set(
+      slot.itemId,
+      Math.min(
+        Number.MAX_SAFE_INTEGER,
+        (storedTotals.get(slot.itemId) ?? 0) + saneStoredCount(slot.count),
+      ),
+    );
+  }
   // Base-grade-adjacent order (see VaultRowModel): group key is the base id
   // (a fine grade sorts under its base), base leads inside a group, groups
   // and every other tie in plain itemId order.
   const groupKey = (itemId: string): string => baseMaterialFor(itemId) ?? itemId;
-  const rows: VaultRowModel[] = Object.entries(info.stock)
-    .sort(([a], [b]) => {
-      const ga = groupKey(a);
-      const gb = groupKey(b);
-      if (ga !== gb) return ga < gb ? -1 : 1;
-      const fa = bagFineMark(a);
-      const fb = bagFineMark(b);
-      if (fa !== fb) return fa ? 1 : -1;
-      return a < b ? -1 : a > b ? 1 : 0;
-    })
-    .map(([itemId, count]) => {
-      const item = lookup(itemId);
-      return {
-        itemId,
-        count,
-        cap,
-        atCap: count >= cap,
-        overCap: count > cap,
-        known: item !== undefined,
-        qualityKey: bagQualityKey(item ?? {}),
-        fine: bagFineMark(itemId),
+  const common = (itemId: string, count: number): VaultRowBase => {
+    const item = lookup(itemId);
+    const storedTotal = storedTotals.get(itemId) ?? 0;
+    return {
+      itemId,
+      count,
+      storedTotal,
+      canChooseQuantity: count > 1,
+      partialMax: count > 1 ? count : null,
+      cap,
+      atCap: storedTotal >= cap,
+      overCap: storedTotal > cap,
+      known: item !== undefined,
+      qualityKey: bagQualityKey(item ?? {}),
+      fine: bagFineMark(itemId),
+    };
+  };
+  const sortable: Array<{ row: VaultRowModel; identityKey: string }> = [
+    ...Object.entries(info.stock).map(([itemId, count]) => ({
+      row: { kind: 'pooled' as const, ...common(itemId, count) },
+      identityKey: '',
+    })),
+    ...info.special.map((slot, index) => {
+      const instance = slot.instance ? cloneItemInstancePayload(slot.instance) : undefined;
+      const specialRef = vaultSpecialRef(index, slot);
+      const row: VaultSpecialRowModel = {
+        kind: 'special',
+        ...common(slot.itemId, slot.count),
+        // One instance payload describes the entire row and may never be
+        // split into two independently mutable identities.
+        canChooseQuantity: instance === undefined && slot.count > 1,
+        partialMax: instance === undefined && slot.count > 1 ? slot.count : null,
+        specialRef,
+        ...(instance === undefined ? {} : { instance }),
+        ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
       };
-    });
+      return {
+        row,
+        identityKey: `${canonicalJson(slot.instance)}\u0000${slot.craftedRecipeId ?? ''}\u0000${String(index).padStart(10, '0')}`,
+      };
+    }),
+  ];
+  const rows = sortable
+    .sort((a, b) => {
+      const ga = groupKey(a.row.itemId);
+      const gb = groupKey(b.row.itemId);
+      if (ga !== gb) return ga < gb ? -1 : 1;
+      const fa = a.row.fine;
+      const fb = b.row.fine;
+      if (fa !== fb) return fa ? 1 : -1;
+      if (a.row.itemId !== b.row.itemId) return a.row.itemId < b.row.itemId ? -1 : 1;
+      if (a.row.kind !== b.row.kind) return a.row.kind === 'pooled' ? -1 : 1;
+      return a.identityKey < b.identityKey ? -1 : a.identityKey > b.identityKey ? 1 : 0;
+    })
+    .map(({ row }) => row);
   return {
     kind: 'vault',
     rows,
@@ -138,9 +234,9 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
 }
 
 /** What a click on a stocked row does: a whole-count withdraw, the split
- *  prompt (shift on a multi-count row), or nothing. Vault rows are pooled
- *  fungible counts, never instanced, so there is no whole-moves-only arm the
- *  bank's slot action needs. Affordability and bag fit stay server-decided. */
+ *  prompt (shift on a splittable multi-count row), or nothing. The caller
+ *  suppresses Shift for an instance row because one payload must move whole.
+ *  Affordability and bag fit stay server-decided. */
 export type VaultRowAction =
   | { kind: 'withdraw' }
   | { kind: 'withdrawPartial'; max: number }
@@ -178,23 +274,30 @@ export interface VaultDepositAllPrediction {
 
 /** Replay the sim's deposit-all sweep on the snapshot WITHOUT mutating it.
  *  The skip set IS the sim's: both sides call the one exported
- *  isVaultDepositableSlot predicate (ids outside the material set, instance
- *  payload or crafted provenance, degenerate corrupt-save counts), so a
- *  future rule change cannot silently desynchronize the summary from the
- *  authoritative outcome; materials whose headroom is exhausted are skipped
- *  here with the same clamp, and a partial fill moves what fits and flags
- *  `full`. `materialIds` is the caller-supplied honest set
+ *  isVaultDepositableSlot predicate (ids outside the material set and
+ *  degenerate corrupt-save counts), so a future rule change cannot silently
+ *  desynchronize the summary from the authoritative outcome. Identity and
+ *  provenance rows are included and counted against the shared ceiling;
+ *  instance rows remain whole/all-or-nothing. Materials whose headroom is
+ *  exhausted are skipped here with the same clamp, and a partial fill moves
+ *  what fits and flags `full`. `materialIds` is the caller-supplied honest set
  *  (vaultMaterialIds()), a parameter so tests drive the replay with a small
  *  fixture set. */
 export function predictVaultDepositAll(
   inventory: readonly InvSlot[],
-  info: Pick<VaultInfo, 'stock' | 'upgrades' | 'perMaterialCap'>,
+  info: Pick<VaultInfo, 'stock' | 'special' | 'upgrades' | 'perMaterialCap'>,
   materialIds: ReadonlySet<string>,
 ): VaultDepositAllPrediction {
   if (info.upgrades <= 0) return { stacks: 0, items: 0, full: false };
   // A Map, not a spread: a tolerated save can stock a dormant own '__proto__'
   // row, which a record rebuild would drop into the prototype setter.
   const held = new Map(Object.entries(info.stock));
+  for (const slot of info.special) {
+    held.set(
+      slot.itemId,
+      Math.min(Number.MAX_SAFE_INTEGER, (held.get(slot.itemId) ?? 0) + saneStoredCount(slot.count)),
+    );
+  }
   let stacks = 0;
   let items = 0;
   let full = false;
@@ -204,6 +307,13 @@ export function predictVaultDepositAll(
     const have = held.get(slot.itemId) ?? 0;
     const headroom = Math.max(0, info.perMaterialCap - have);
     if (headroom <= 0) {
+      full = true;
+      continue;
+    }
+    // One instance payload describes the whole row. The authoritative sweep
+    // leaves it carried when the entire count cannot fit; predicting a partial
+    // move would claim items were stored when the sim moved none.
+    if (slot.instance !== undefined && headroom < slot.count) {
       full = true;
       continue;
     }
@@ -217,10 +327,10 @@ export function predictVaultDepositAll(
 }
 
 /** True when the carried inventory holds at least one stack the deposit-all
- *  sweep would even consider (an honest material with no instance payload and
- *  no crafted provenance): the button's enabled state. Deliberately ignores
- *  headroom, like the bank's hasDepositableMaterials: a full vault still
- *  enables the button and the summary explains the outcome. */
+ *  sweep would consider, including identity/provenance materials: the
+ *  button's enabled state. Deliberately ignores headroom, like the bank's
+ *  hasDepositableMaterials: a full vault still enables the button and the
+ *  summary explains the outcome. */
 export function hasVaultDepositable(
   inventory: readonly InvSlot[],
   materialIds: ReadonlySet<string>,
@@ -256,8 +366,29 @@ export function vaultWithdrawFit(
   bags: readonly (string | null)[],
   itemId: string,
   want: number,
+  instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): number {
-  return countFit(inventory, bagPools(bags), itemId, want);
+  const fit = countFit(inventory, bagPools(bags), itemId, want, instance, craftedRecipeId);
+  return instance !== undefined && fit < want ? 0 : fit;
+}
+
+function saneStoredCount(count: number): number {
+  return Number.isSafeInteger(count) && count > 0 ? count : 0;
+}
+
+/** Canonical JSON for deterministic special-row ordering across a JSONB wire
+ *  hop that may reorder payload object keys. The snapshot index is only the
+ *  final equal-payload tiebreak and remains the exact command selector. */
+function canonicalJson(value: unknown): string {
+  if (value === undefined) return 'undefined';
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  const record = value as Record<string, unknown>;
+  return `{${Object.keys(record)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`)
+    .join(',')}}`;
 }
 
 /** The withdraw shortfall notice decision: 'none' when everything fits or when

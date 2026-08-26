@@ -43,14 +43,41 @@ import { charterName } from '../src/ui/charter_card_view';
 import { ClaudiumWindow } from '../src/ui/claudium_window';
 import { DailyRewardsWindow, mintIntentKey } from '../src/ui/daily_rewards_window';
 import { t } from '../src/ui/i18n';
+import { StoreArmoryPurchase } from '../src/ui/store_armory_purchase';
 import type { ArmorySkinRow, WocStoreItemInput } from '../src/ui/woc_store_view';
-import type { IWorld } from '../src/world_api';
+import type { DailyRewardStatus, IWorld } from '../src/world_api';
 
 function worldStub(): IWorld {
   return {
     player: { templateId: 'warrior', mainhandItemId: null },
     accountCosmetics: { weaponSkinIds: [], weaponSkinLoadout: {} },
   } as unknown as IWorld;
+}
+
+function rewardStatus(): DailyRewardStatus {
+  return {
+    enabled: true,
+    day: '2026-08-25',
+    resetAt: '2026-08-26T00:00:00.000Z',
+    prizePoolUsd: 0,
+    prizePoolSol: null,
+    eligibility: {
+      eligible: false,
+      reason: 'no_wallet',
+      banReason: null,
+      walletPubkey: null,
+      wocBalance: null,
+      wocUsdPrice: null,
+      usdValue: null,
+      minUsd: 20,
+    },
+    score: 0,
+    rank: null,
+    spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
+    tasks: [],
+    leaderboard: [],
+    leaderboardTotal: 0,
+  };
 }
 
 function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
@@ -66,6 +93,33 @@ function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
       return null;
     },
   } as unknown as HTMLElement;
+}
+
+interface CapturedStoreDecision {
+  title: string;
+  body: string;
+  onOk?: () => void;
+  onCancel?: () => void;
+}
+
+function interceptStoreDecisions(
+  window: DailyRewardsWindow,
+  capture: (decision: CapturedStoreDecision) => void,
+): void {
+  Object.assign(window as unknown as Record<string, unknown>, {
+    showStoreDecision: (options: {
+      title: string;
+      body: string;
+      onConfirm: () => void;
+      onCancel?: () => void;
+    }) =>
+      capture({
+        title: options.title,
+        body: options.body,
+        onOk: options.onConfirm,
+        onCancel: options.onCancel,
+      }),
+  });
 }
 
 describe('DailyRewardsWindow store intent', () => {
@@ -152,7 +206,159 @@ describe('DailyRewardsWindow store intent', () => {
   });
 });
 
+describe('StoreArmoryPurchase lifecycle guard', () => {
+  it('holds the skin guard until the authoritative refresh finishes', async () => {
+    let releaseRefresh!: () => void;
+    const refresh = new Promise<void>((resolve) => (releaseRefresh = resolve));
+    const spend = vi.fn(async () => ({
+      granted: true,
+      balance: 800,
+      costClaudium: 200,
+      reason: null,
+    }));
+    const showDecision = vi.fn();
+    const row = {
+      skin: WEAPON_SKINS.cinderbrand_sword,
+      costClaudium: 200,
+      purchasable: true,
+      owned: false,
+      affordable: true,
+    } as ArmorySkinRow;
+    const purchases = new StoreArmoryPurchase({
+      balance: () => 1_000,
+      setBalance: vi.fn(),
+      captureSurface: () => 7,
+      surfaceIsCurrent: () => true,
+      spend,
+      showDecision,
+      showNeedMore: vi.fn(),
+      showResult: vi.fn(),
+      needMoreText: () => 'Need more',
+      setPriceChanged: vi.fn(),
+      setError: vi.fn(),
+      refreshStore: () => refresh,
+      rebuildAndPaint: vi.fn(),
+      rowById: () => row,
+      refreshInspector: vi.fn(),
+    });
+
+    const first = purchases.purchase(row);
+    await vi.waitFor(() => expect(spend).toHaveBeenCalledOnce());
+    // spend() has settled, but the mirror is still stale until refresh resolves.
+    purchases.request(row);
+    void purchases.purchase(row);
+    await Promise.resolve();
+
+    expect(showDecision).not.toHaveBeenCalled();
+    expect(spend).toHaveBeenCalledOnce();
+
+    releaseRefresh();
+    await first;
+    purchases.request(row);
+    expect(showDecision).toHaveBeenCalledOnce();
+  });
+});
+
 describe('DailyRewardsWindow store refresh behavior', () => {
+  afterEach(() => {
+    (document.activeElement as HTMLElement | null)?.blur();
+    document.body.innerHTML = '';
+  });
+
+  function pendingRewardsHarness() {
+    document.body.innerHTML = '<section id="daily-test" style="display: block"></section>';
+    const root = document.getElementById('daily-test') as HTMLElement;
+    let resolveStatus!: (status: DailyRewardStatus) => void;
+    const status = new Promise<DailyRewardStatus>((resolve) => (resolveStatus = resolve));
+    const world = {
+      ...worldStub(),
+      dailyRewards: () => status,
+      dailyRewardHistory: async () => ({ payouts: [] }),
+    } as unknown as IWorld;
+    const window = new DailyRewardsWindow({
+      root: () => root,
+      world: () => world,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      storeEnabled: () => true,
+      storeSnapshot: async () => ({ available: true, balance: 1_000, items: [] }),
+    });
+    const internals = window as unknown as {
+      tab: 'store' | 'rewards';
+      paint(view: unknown): void;
+    };
+    internals.tab = 'rewards';
+    const paint = vi.spyOn(internals, 'paint');
+    return { root, window, internals, resolveStatus, paint };
+  }
+
+  it('cannot let a stale Rewards request repaint the shared body after selecting Store', async () => {
+    const h = pendingRewardsHarness();
+    const pending = h.window.render();
+
+    h.window.openStore();
+    h.resolveStatus(rewardStatus());
+    await pending;
+
+    expect(h.internals.tab).toBe('store');
+    expect(h.paint).not.toHaveBeenCalled();
+  });
+
+  it('cannot let a stale Rewards request repaint after Store close and rapid reopen', async () => {
+    const h = pendingRewardsHarness();
+    const pending = h.window.render();
+
+    h.window.close();
+    h.window.openStore();
+    h.resolveStatus(rewardStatus());
+    await pending;
+
+    expect(h.root.style.display).toBe('block');
+    expect(h.internals.tab).toBe('store');
+    expect(h.paint).not.toHaveBeenCalled();
+    h.window.close();
+  });
+
+  it('lets only the newest snapshot write state or clear its loading indicator', async () => {
+    type Snapshot = { available: boolean; balance: number | null; items: WocStoreItemInput[] };
+    let resolveFirst!: (snapshot: Snapshot) => void;
+    let resolveSecond!: (snapshot: Snapshot) => void;
+    const snapshots = [
+      new Promise<Snapshot>((resolve) => (resolveFirst = resolve)),
+      new Promise<Snapshot>((resolve) => (resolveSecond = resolve)),
+    ];
+    let call = 0;
+    const body = { innerHTML: '', querySelector: () => null, querySelectorAll: () => [] };
+    const window = new DailyRewardsWindow({
+      root: () => rootStub(body),
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+      storeEnabled: () => true,
+      storeSnapshot: () => snapshots[call++],
+    });
+    Object.assign(window as unknown as Record<string, unknown>, { tab: 'store' });
+    const internals = window as unknown as {
+      renderStore(focus: null): Promise<void>;
+      storeBalance: number | null;
+      storeLoading: boolean;
+    };
+
+    const first = internals.renderStore(null);
+    const second = internals.renderStore(null);
+    resolveFirst({ available: true, balance: 111, items: [] });
+    await first;
+    expect(internals.storeBalance).toBeNull();
+    expect(internals.storeLoading).toBe(true);
+
+    resolveSecond({ available: true, balance: 222, items: [] });
+    await second;
+    expect(internals.storeBalance).toBe(222);
+    expect(internals.storeLoading).toBe(false);
+  });
+
   it('does not render wallet connection controls in the Store', () => {
     let html = '';
     const body = {
@@ -386,10 +592,10 @@ describe('DailyRewardsWindow store refresh behavior', () => {
       restoreFocus: () => undefined,
       spendStoreItem,
       openClaudium,
-      confirmDialog: (_title, body, _ok, _cancel, onOk) => {
-        dialog.body = body;
-        dialog.onOk = onOk;
-      },
+    });
+    interceptStoreDecisions(window, (decision) => {
+      dialog.body = decision.body;
+      dialog.onOk = decision.onOk;
     });
     const row = {
       skin: WEAPON_SKINS.cinderbrand_sword,
@@ -400,8 +606,10 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     });
 
     await (
-      window as unknown as { purchaseArmorySkin(row: ArmorySkinRow): Promise<void> }
-    ).purchaseArmorySkin(row);
+      window as unknown as {
+        armoryPurchases: { purchase(row: ArmorySkinRow): Promise<void> };
+      }
+    ).armoryPurchases.purchase(row);
 
     expect(spendStoreItem).toHaveBeenCalledWith('cinderbrand_sword', 'skin', 200);
     expect((window as unknown as { storeBalance: number | null }).storeBalance).toBe(100);
@@ -428,8 +636,8 @@ describe('DailyRewardsWindow store refresh behavior', () => {
       captureFocus: () => null,
       restoreFocus: () => undefined,
       spendStoreItem,
-      confirmDialog: (_title, body) => confirmations.push(body),
     });
+    interceptStoreDecisions(window, (decision) => confirmations.push(decision.body));
     const original = {
       skin: WEAPON_SKINS.cinderbrand_sword,
       costClaudium: 200,
@@ -448,8 +656,10 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     });
 
     await (
-      window as unknown as { purchaseArmorySkin(row: ArmorySkinRow): Promise<void> }
-    ).purchaseArmorySkin(original);
+      window as unknown as {
+        armoryPurchases: { purchase(row: ArmorySkinRow): Promise<void> };
+      }
+    ).armoryPurchases.purchase(original);
 
     expect(spendStoreItem).toHaveBeenCalledWith('cinderbrand_sword', 'skin', 200);
     expect(confirmations).toHaveLength(1);
@@ -552,6 +762,11 @@ function charterHarness(
   // the loading indicator and the persistent live region both live outside the
   // rebuilt body on purpose.
   const root = document.createElement('div');
+  if (!document.getElementById('prompt-stack')) {
+    const promptStack = document.createElement('div');
+    promptStack.id = 'prompt-stack';
+    document.body.appendChild(promptStack);
+  }
   root.innerHTML =
     '<div class="woc-store-tabs">' +
     '<span data-woc-store-loading></span>' +
@@ -606,9 +821,8 @@ function charterHarness(
           );
         },
     openClaudium: (onClosed) => claudiumReturns.push(onClosed),
-    confirmDialog: (title, body_, _ok, _cancel, onOk, onCancel) =>
-      dialogs.push({ title, body: body_, onOk, onCancel }),
   });
+  interceptStoreDecisions(window_, (decision) => dialogs.push(decision));
   const internals = window_ as unknown as {
     renderStore(focus: 'open' | null, opts?: { background?: boolean }): Promise<void>;
     purchaseCharter(itemId: string): Promise<void>;
@@ -623,6 +837,10 @@ function charterHarness(
     purchaseArmorySkin(row: unknown): Promise<void>;
     setCharterBusy(itemId: string, busy: boolean): void;
   };
+  const armoryPurchases = (
+    window_ as unknown as { armoryPurchases: { purchase(row: unknown): Promise<void> } }
+  ).armoryPurchases;
+  internals.purchaseArmorySkin = (row) => armoryPurchases.purchase(row);
   const buyButton = (itemId: string) =>
     root.querySelector<HTMLButtonElement>(`[data-charter-buy="${itemId}"]`);
   // A PAINT counter, because the DOM cannot answer "did it repaint": the window
@@ -1775,6 +1993,9 @@ describe('WOC Store Strongbox charters', () => {
     await pending;
 
     expect(h.internals.charterNotice).toBeNull();
+    expect(document.querySelector('.woc-store-global-result')?.textContent).toContain(
+      'charter was applied',
+    );
     // The negative arm is load-bearing: with the window OPEN the same result
     // must still arm the band, or this guard would be silently swallowing every
     // outcome rather than only the orphaned ones.
@@ -1805,6 +2026,9 @@ describe('WOC Store Strongbox charters', () => {
     await pending;
 
     expect(h.dialogs).toHaveLength(0);
+    expect(document.querySelector('.woc-store-global-result')?.textContent).toContain(
+      '490 more Claudium',
+    );
     // Open, the same refusal DOES raise the top-up prompt.
     const open = charterHarness({
       results: [{ granted: false, balance: 10, costClaudium: 500, reason: 'insufficient_balance' }],

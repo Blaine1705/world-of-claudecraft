@@ -22,28 +22,39 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import { vaultMaterialIds } from '../sim/materials_vault';
-import type { ItemDef, ItemInstancePayload } from '../sim/types';
-import type { IWorld } from '../world_api';
-import { bagRimClasses } from './bag_corner_mark_view';
+import { isItemLocked } from '../sim/item_lock';
+import { resolveVaultSpecialIndex, vaultMaterialIds } from '../sim/materials_vault';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
+import type { IWorld, VaultSpecialRef } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { formatCount } from './count_format';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { FOCUS_KEY_ATTR, restoreFirstEnabled } from './focus_restore';
 import { formatMoney, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import { fineSealMarkHtml } from './item_instance_glyph_mark';
+import {
+  cornerMarkHtml,
+  INSTANCE_GLYPH_ARIA_KEYS,
+  lockMarkHtml,
+  UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
+} from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import {
   buildVaultView,
   hasVaultDepositable,
   predictVaultDepositAll,
   type VaultRowModel,
+  type VaultSpecialRowModel,
   type VaultViewModel,
   vaultDepositAllSummaryKey,
   vaultRowAction,
+  vaultSpecialRef,
   vaultWithdrawFit,
   vaultWithdrawNotice,
 } from './vault_view';
@@ -243,8 +254,11 @@ export class VaultTab {
   // resolves the ItemDef only for the icon/name/tooltip PAINTERS, which need
   // the def itself rather than a decision about it.
   private appendRow(list: HTMLElement, model: VaultRowModel): void {
-    const { itemId, count, cap } = model;
+    const { itemId, count, storedTotal, cap } = model;
+    const ordinal = list.childElementCount;
     const item = model.known ? knownItemDef(ITEMS, itemId) : undefined;
+    const wrap = document.createElement('div');
+    wrap.className = 'vault-row-wrap';
     const row = document.createElement('button');
     row.type = 'button';
     // over-cap (a tolerated legacy over-stock) composes ON TOP of at-cap: the
@@ -252,8 +266,13 @@ export class VaultTab {
     // The fine rim (bag-rim-fine) joins per the release's all-surfaces
     // mark-family rule: a fine grade is marked in bags, bank, and guild bank,
     // so the vault row beside them marks it the same way.
-    row.className = `vault-row${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;
+    const glyphKind = model.kind === 'special' ? bagInstanceGlyphKind(model.instance) : null;
+    const cornerMark = bagCornerMark(glyphKind, null, model.fine);
+    const locked = model.kind === 'special' && isItemLocked(model.instance);
+    row.className = `vault-row vault-row-${model.kind}${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;
     row.dataset.itemId = itemId;
+    if (model.kind === 'special') row.dataset.vaultSpecialIndex = String(model.specialRef.index);
+    row.setAttribute(FOCUS_KEY_ATTR, `vault:row:${ordinal}`);
     row.style.setProperty(
       '--bank-slot-quality',
       QUALITY_COLOR[model.qualityKey] ?? QUALITY_DEFAULT_COLOR,
@@ -263,34 +282,77 @@ export class VaultTab {
     // its withdraw stays live (the server resolves by itemId, no def needed).
     const name = item ? itemDisplayName(item) : itemId;
     const countLabel = formatCount(count);
+    const totalLabel = formatCount(storedTotal);
     const capLabel = formatCount(cap);
+    const rowStateId = `vault-row-state-${ordinal}`;
+    const instanceStateId = `vault-row-instance-${ordinal}`;
+    row.setAttribute('aria-label', t('hudChrome.bank.withdrawQuantityTitle', { item: name }));
     row.setAttribute(
-      'aria-label',
-      t('hudChrome.bank.vaultRowAria', { item: name, count: countLabel, cap: capLabel }),
+      'aria-describedby',
+      glyphKind ? `${rowStateId} ${instanceStateId}` : rowStateId,
     );
+    const instanceState = glyphKind
+      ? t(
+          model.known
+            ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+            : UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind],
+          {
+            ...(model.known ? { item: name } : { id: itemId }),
+            count: countLabel,
+          },
+        )
+      : '';
     row.innerHTML =
       `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(itemId)}` +
-      `${model.fine ? fineSealMarkHtml() : ''}` +
+      cornerMarkHtml(cornerMark) +
+      lockMarkHtml(locked) +
       `<span class="vault-row-name">${esc(name)}</span>` +
-      `<span class="vault-row-count">${esc(t('hudChrome.bank.capacity', { used: countLabel, total: capLabel }))}</span>`;
+      (model.kind === 'special'
+        ? `<span class="vault-row-stack-count">${esc(t('itemUi.bags.stackCount', { count: countLabel }))}</span>`
+        : '') +
+      `<span class="vault-row-count">${esc(t('hudChrome.bank.capacity', { used: totalLabel, total: capLabel }))}</span>` +
+      `<span class="visually-hidden" id="${rowStateId}">${esc(t('hudChrome.bank.vaultRowAria', { item: name, count: totalLabel, cap: capLabel }))}</span>` +
+      (instanceState
+        ? `<span class="visually-hidden" id="${instanceStateId}">${esc(instanceState)}</span>`
+        : '');
     row.addEventListener('click', (ev) => {
       if (this.deps.consumePeek()) {
         this.deps.hideTooltip();
         return;
       }
-      this.onRowClick(itemId, ev.shiftKey);
+      this.onRowClick(model, ev.shiftKey, ordinal);
     });
     this.deps.attachTooltip(row, () => {
       const body = item
-        ? this.deps.itemTooltip(item)
+        ? this.deps.itemTooltip(item, model.kind === 'special' ? model.instance : undefined)
         : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
-      const partial =
-        count > 1
-          ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
-          : '';
+      const partial = model.canChooseQuantity
+        ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
+        : '';
       return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
     });
-    list.appendChild(row);
+    wrap.appendChild(row);
+    if (model.canChooseQuantity && model.partialMax !== null) {
+      // A visible sibling action gives touch and switch users the same partial
+      // withdraw path desktop users have through Shift-click. It is a sibling,
+      // not a nested button, so both controls retain valid native semantics.
+      const partial = document.createElement('button');
+      partial.type = 'button';
+      partial.className = 'vault-row-partial';
+      partial.setAttribute(FOCUS_KEY_ATTR, `vault:partial:${ordinal}`);
+      const partialLabel = t('hudChrome.bank.withdrawQuantityInput');
+      partial.setAttribute('aria-label', partialLabel);
+      partial.title = partialLabel;
+      partial.innerHTML =
+        svgIcon('more') +
+        `<span class="vault-row-partial-label">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</span>`;
+      const partialMax = model.partialMax;
+      partial.addEventListener('click', () =>
+        this.showWithdrawQuantityPrompt(model, partialMax, ordinal),
+      );
+      wrap.appendChild(partial);
+    }
+    list.appendChild(wrap);
   }
 
   // Plain click withdraws the whole pooled count; shift-click on a multi-count
@@ -298,20 +360,28 @@ export class VaultTab {
   // CLICK-TIME snapshot: the sim resolves a bags-can-only-hold-part withdraw
   // silently (the phase 01 recorded open call, resolved UI-side here), while a
   // zero-fit click stays quiet because the sim emits its own bags-full line.
-  private onRowClick(itemId: string, shift: boolean): void {
+  private onRowClick(model: VaultRowModel, shift: boolean, ordinal: number): void {
     const world = this.deps.world();
-    const count = this.stockCount(itemId);
-    const action = vaultRowAction(count, shift);
+    const liveSpecial = model.kind === 'special' ? this.liveSpecialRow(model) : null;
+    if (model.kind === 'special' && !liveSpecial) return;
+    const count = liveSpecial?.slot.count ?? this.stockCount(model.itemId);
+    const action = vaultRowAction(count, shift && model.canChooseQuantity);
     if (action.kind === 'none') return;
     if (action.kind === 'withdraw') {
-      this.noteShortfall(itemId, count);
-      world.vaultWithdraw(itemId);
+      this.noteShortfall(
+        model.itemId,
+        count,
+        liveSpecial?.slot.instance,
+        liveSpecial?.slot.craftedRecipeId,
+      );
+      if (liveSpecial) world.vaultWithdraw(model.itemId, undefined, liveSpecial.ref);
+      else world.vaultWithdraw(model.itemId);
       audio.click();
       this.deps.onInventoryChanged();
       this.deps.requestRender();
       return;
     }
-    this.showWithdrawQuantityPrompt(itemId, action.max);
+    this.showWithdrawQuantityPrompt(model, action.max, ordinal);
   }
 
   // hasOwn, not a plain index: a tolerated save can stock a dormant
@@ -326,13 +396,25 @@ export class VaultTab {
   // Predict the withdraw's bag fit from the click-time snapshot and stage the
   // shortfall line when only part will move (fit 0 stays silent: the sim's own
   // bags-full error covers it, and a second line would double-speak).
-  private noteShortfall(itemId: string, want: number): void {
+  private noteShortfall(
+    itemId: string,
+    want: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void {
     const world = this.deps.world();
     // While dead every vault op is a silent sim no-op (the town-service
     // idiom), so predicting a shortfall would explain a withdraw that never
     // happens: send and stay quiet, like the sim.
     if (world.player.dead) return;
-    const fit = vaultWithdrawFit(world.inventory, world.bags, itemId, want);
+    const fit = vaultWithdrawFit(
+      world.inventory,
+      world.bags,
+      itemId,
+      want,
+      instance,
+      craftedRecipeId,
+    );
     const notice = vaultWithdrawNotice(fit, want);
     if (notice.kind !== 'short') return;
     this.setStatus('hudChrome.bank.vaultWithdrawShort', {
@@ -341,9 +423,16 @@ export class VaultTab {
     });
   }
 
-  private showWithdrawQuantityPrompt(itemId: string, maxCount: number): void {
+  private showWithdrawQuantityPrompt(
+    model: VaultRowModel,
+    maxCount: number,
+    ordinal: number,
+  ): void {
+    const { itemId } = model;
     const item = knownItemDef(ITEMS, itemId);
     const itemName = item ? itemDisplayName(item) : itemId;
+    let resolvedSpecial: { slot: InvSlot; ref: VaultSpecialRef } | null =
+      model.kind === 'special' ? this.liveSpecialRow(model) : null;
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>
@@ -363,22 +452,55 @@ export class VaultTab {
           // open prompt) and clamp to it; a row that emptied refuses. The
           // shared prompt owns the number parsing, so no raw parsed value ever
           // reaches vaultWithdraw (the recorded non-number count ruling).
-          const live = this.stockCount(itemId);
+          let live: number;
+          if (model.kind === 'special') {
+            resolvedSpecial = this.liveSpecialRow(model);
+            live = resolvedSpecial?.slot.count ?? 0;
+          } else {
+            live = this.stockCount(itemId);
+          }
           if (live <= 0) return null;
           return Math.max(1, Math.min(maxCount, live, requested));
         },
         send: (count) => {
-          this.noteShortfall(itemId, count);
-          this.deps.world().vaultWithdraw(itemId, count);
+          this.noteShortfall(
+            itemId,
+            count,
+            resolvedSpecial?.slot.instance,
+            resolvedSpecial?.slot.craftedRecipeId,
+          );
+          this.deps.world().vaultWithdraw(itemId, count, resolvedSpecial?.ref);
           audio.click();
           this.deps.onInventoryChanged();
         },
         afterClose: () => {
           this.deps.requestRender();
-          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+          restoreFirstEnabled([
+            this.deps
+              .root()
+              .querySelector<HTMLElement>(`[${FOCUS_KEY_ATTR}="vault:partial:${ordinal}"]`),
+            this.deps
+              .root()
+              .querySelector<HTMLElement>(`[${FOCUS_KEY_ATTR}="vault:row:${ordinal}"]`),
+            this.deps.root().querySelector<HTMLElement>('[data-close]'),
+          ]);
         },
       },
     );
+  }
+
+  /** Re-resolve a special row from the live mirror by its full fingerprint.
+   *  The snapshot index is the fast path; the shared resolver scans exact
+   *  identity on a stale index and never falls back by item id. */
+  private liveSpecialRow(
+    model: VaultSpecialRowModel,
+  ): { slot: InvSlot; ref: VaultSpecialRef } | null {
+    const special = this.deps.world().vaultInfo?.special;
+    if (!special) return null;
+    const index = resolveVaultSpecialIndex(special, model.itemId, model.specialRef);
+    if (index < 0) return null;
+    const slot = special[index];
+    return { slot, ref: vaultSpecialRef(index, slot) };
   }
 
   // The footer: the batched deposit-all button beside the ceiling upgrade row.

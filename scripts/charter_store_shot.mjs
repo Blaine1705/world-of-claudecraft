@@ -31,7 +31,7 @@
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
-import { enterOfflineGame } from './enter_offline_game.mjs';
+import { dismissEntryOverlays, enterOfflineGame } from './enter_offline_game.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -87,6 +87,24 @@ async function seedLowGraphics(page) {
       localStorage.setItem('woc_settings', JSON.stringify(s));
     } catch {}
   });
+}
+
+async function seedTheme(page, preset) {
+  if (!preset) return;
+  await page.evaluateOnNewDocument((themePreset) => {
+    try {
+      localStorage.setItem('woc_theme', JSON.stringify({ preset: themePreset, custom: {} }));
+    } catch {}
+  }, preset);
+  // The app preset and the OS/browser accessibility mode are independent.
+  // Exercise both so this evidence actually paints the forced-colors rules
+  // rather than only the author's high-contrast token palette.
+  if (preset === 'highContrast') {
+    const media = await page.createCDPSession();
+    await media.send('Emulation.setEmulatedMedia', {
+      features: [{ name: 'forced-colors', value: 'active' }],
+    });
+  }
 }
 
 /** Stand at the bursar (bankBuySlots is proximity-gated) and, for the fit-gated
@@ -306,23 +324,135 @@ async function shoot(page, file, mobile) {
   await el.screenshot({ path: file });
 }
 
+/** Scroll only the Store's owned body and prove the evidence frame still
+ *  contains usable chrome. A prior scrollIntoView call moved the page itself on
+ *  short touch viewports: the charter cards were present, but the Store title
+ *  and tab labels had left the captured frame. */
+async function stageAndAssertPaintedGeometry(page, mobile) {
+  const state = await page.evaluate((touch) => {
+    const root = document.getElementById('daily-rewards-window');
+    const body = root?.querySelector('.woc-store-body');
+    const section = root?.querySelector('.charter-section');
+    const title = document.getElementById('daily-rewards-title');
+    const storeTab = document.getElementById('woc-store-tab-store');
+    const rewardsTab = document.getElementById('woc-store-tab-rewards');
+    if (!(root instanceof HTMLElement) || !(body instanceof HTMLElement))
+      return { err: 'no-store' };
+    if (!(section instanceof HTMLElement)) return { err: 'no-charter-section' };
+    if (!(title instanceof HTMLElement)) return { err: 'no-title' };
+    if (!(storeTab instanceof HTMLElement) || !(rewardsTab instanceof HTMLElement)) {
+      return { err: 'no-tabs' };
+    }
+
+    // offsetTop is in the body content coordinate space. This leaves the
+    // section header at the top of the Store scroller without moving the page.
+    body.scrollTop = Math.max(0, section.offsetTop - 8);
+    const viewport = { width: innerWidth, height: innerHeight };
+    const rect = (el) => {
+      const r = el.getBoundingClientRect();
+      return {
+        left: r.left,
+        top: r.top,
+        right: r.right,
+        bottom: r.bottom,
+        width: r.width,
+        height: r.height,
+      };
+    };
+    const painted = (el) => {
+      const r = rect(el);
+      const cs = getComputedStyle(el);
+      return (
+        cs.display !== 'none' &&
+        cs.visibility !== 'hidden' &&
+        Number(cs.opacity) !== 0 &&
+        r.width > 0 &&
+        r.height > 0 &&
+        r.right > 0 &&
+        r.bottom > 0 &&
+        r.left < viewport.width &&
+        r.top < viewport.height
+      );
+    };
+    const hit = (el) => {
+      const r = el.getBoundingClientRect();
+      const x = Math.max(0, Math.min(viewport.width - 1, r.left + r.width / 2));
+      const y = Math.max(0, Math.min(viewport.height - 1, r.top + r.height / 2));
+      const at = document.elementFromPoint(x, y);
+      return !!at && (el === at || el.contains(at));
+    };
+    const buy = section.querySelector('.charter-buy:not(:disabled)');
+    const card = section.querySelector('.charter-card') ?? section.querySelector('.charter-empty');
+    if (!(buy instanceof HTMLElement) && section.querySelector('.charter-card')) {
+      return { err: 'no-enabled-buy' };
+    }
+    const controls = [storeTab, rewardsTab, ...(buy instanceof HTMLElement ? [buy] : [])];
+    const required = touch ? 44 : 40;
+    const undersized = controls
+      .filter((control) => control === buy || touch)
+      .map((control) => ({ id: control.id || control.className, ...rect(control) }))
+      .filter((r) => r.width < required || r.height < required);
+    const missingText = [title, storeTab, rewardsTab].filter((el) => !el.textContent?.trim());
+    const notPainted = [root, title, storeTab, rewardsTab, section, card, buy]
+      .filter((el) => el instanceof HTMLElement && !painted(el))
+      .map((el) => el.id || el.className);
+    const missedHits = controls.filter((el) => !hit(el)).map((el) => el.id || el.className);
+    const rootRect = rect(root);
+    const sectionRect = rect(section);
+    const escapedHorizontally =
+      sectionRect.left < rootRect.left - 1 || sectionRect.right > rootRect.right + 1;
+    return {
+      err: null,
+      title: title.textContent?.trim(),
+      tabs: [storeTab.textContent?.trim(), rewardsTab.textContent?.trim()],
+      pageScroll: document.scrollingElement?.scrollTop ?? 0,
+      bodyScroll: body.scrollTop,
+      undersized,
+      missingText: missingText.length,
+      notPainted,
+      missedHits,
+      escapedHorizontally,
+    };
+  }, mobile);
+  if (state.err) throw new Error(`store geometry failed: ${state.err}`);
+  if (state.pageScroll !== 0)
+    throw new Error(`store geometry moved the page by ${state.pageScroll}px`);
+  if (state.missingText) throw new Error('store geometry lost the title or a tab label');
+  if (state.notPainted.length)
+    throw new Error(`store geometry clipped: ${state.notPainted.join(', ')}`);
+  if (state.missedHits.length)
+    throw new Error(`store controls missed hit tests: ${state.missedHits.join(', ')}`);
+  if (state.undersized.length)
+    throw new Error(`store controls undersized: ${JSON.stringify(state.undersized)}`);
+  if (state.escapedHorizontally) throw new Error('charter section escaped the Store frame');
+  return state;
+}
+
 async function runStage({
   mobile,
   rungs,
   expectedCards,
   expectScope = true,
   walkAway = false,
+  theme,
   file,
 }) {
   const browser = await launchBrowser(mobile);
   try {
     const page = await browser.newPage();
     await seedLowGraphics(page);
+    await seedTheme(page, theme);
     // Headless runs on swiftshader, so the real GPU-acceleration toast always
     // fires and lands in the frame. Suppress it for the capture SESSION only
     // (it is a legitimate player notice and stays in game code).
     await suppressGpuNotice(page);
     await page.goto(GAME_URL, { waitUntil: 'domcontentloaded' });
+    if (
+      theme === 'highContrast' &&
+      !(await page.evaluate(() => matchMedia('(forced-colors: active)').matches))
+    ) {
+      throw new Error('high-contrast stage did not activate forced-colors');
+    }
     await enterOfflineGame(page, { settleMs: 4000 });
     // src/main.ts publishes window.__game only inside its post-entry callback,
     // after the spawn cinematic and the camera prompt resolve, so a fixed
@@ -356,16 +486,17 @@ async function runStage({
     );
     await new Promise((r) => setTimeout(r, 1500));
     const cards = await assertCharterUp(page, expectedCards, expectScope);
-    // Scroll the category into frame so the desktop clip actually shows it.
-    await page.evaluate(() => {
-      document
-        .querySelector('#daily-rewards-window .charter-section')
-        ?.scrollIntoView({ block: 'center' });
-    });
+    // Staging can re-raise both after the entry helper completed. Clear them
+    // BEFORE geometry: otherwise the Store exists and measures correctly
+    // underneath a veil that intercepts every real click.
+    await awaitWorldPainted(page);
+    await dismissEntryOverlays(page);
+    await dismissTutorialDialog(page);
+    const geometry = await stageAndAssertPaintedGeometry(page, mobile);
     await new Promise((r) => setTimeout(r, 400));
     await shoot(page, `${OUT}/${file}`, mobile);
     console.log(
-      `${file}: purchasedSlots=${purchased} cards=${cards}${walkAway ? ' (away from every bursar)' : ''}`,
+      `${file}: purchasedSlots=${purchased} cards=${cards} title=${geometry.title} tabs=${geometry.tabs.join('/')}${walkAway ? ' (away from every bursar)' : ''}`,
     );
   } finally {
     await browser.close();
@@ -375,6 +506,20 @@ async function runStage({
 const STAGES = [
   { mobile: false, rungs: 0, expectedCards: 4, file: 'after-desktop.png' },
   { mobile: true, rungs: 0, expectedCards: 4, file: 'after-mobile.png' },
+  {
+    mobile: false,
+    rungs: 0,
+    expectedCards: 4,
+    theme: 'parchment',
+    file: 'after-desktop-parchment.png',
+  },
+  {
+    mobile: false,
+    rungs: 0,
+    expectedCards: 4,
+    theme: 'highContrast',
+    file: 'after-desktop-high-contrast.png',
+  },
   // 8 rungs = 48 purchased of 72, so only the 12 and 24 slot charters still fit
   // their FULL grant. The 48 and 72 charters are omitted entirely, never
   // clamped and never shown disabled.

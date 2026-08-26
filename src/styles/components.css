@@ -2699,12 +2699,16 @@
     justify-content: space-between;
     gap: 10px;
     padding: 8px 10px;
-    border: 1px solid #6f592d;
+    border: 1px solid var(--color-border-showcase);
     border-bottom: none;
-    background: linear-gradient(180deg, rgb(200 163 74 / 0.14), transparent);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-accent) 14%, transparent),
+      transparent
+    );
   }
   .charter-section > header span {
-    color: #c8a34a;
+    color: var(--color-accent);
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -2715,9 +2719,9 @@
   }
   .charter-body {
     padding: 10px;
-    border: 1px solid #6f592d;
-    border-top: 1px solid rgb(255 255 255 / 0.06);
-    background: #0a1119;
+    border: 1px solid var(--color-border-showcase);
+    border-top: 1px solid color-mix(in srgb, var(--color-text-light) 10%, transparent);
+    background: var(--panel-base);
   }
   .charter-scope {
     margin: 0 0 10px;
@@ -2735,12 +2739,12 @@
     flex-direction: column;
     gap: 6px;
     padding: 12px;
-    border: 1px solid #866c35;
-    background: #0d1620;
+    border: 1px solid var(--color-primary-dim);
+    background: color-mix(in srgb, var(--panel-base) 86%, var(--panel-edge));
   }
   .charter-card h4 {
     margin: 0;
-    color: #f3dfaa;
+    color: var(--color-text-light);
     font-size: 14px;
     line-height: 1.25;
   }
@@ -2754,7 +2758,7 @@
     align-items: center;
     gap: 6px;
     margin-top: auto;
-    color: #f3dfaa;
+    color: var(--color-accent);
     font-size: 15px;
     font-weight: 700;
   }
@@ -2771,15 +2775,21 @@
     /* 40px is the comfortable pointer floor; hud.mobile.css raises it to 44 for
        thumbs. The 36px it replaced was below the floor on desktop too. */
     min-height: 40px;
-    border: 1px solid #b18b3d;
-    background: linear-gradient(#6e5427, #3b2b16);
-    color: #fff0c5;
+    border: 1px solid var(--color-primary-dim);
+    background: linear-gradient(
+      color-mix(in srgb, var(--color-primary) 38%, var(--panel-base)),
+      color-mix(in srgb, var(--color-primary-dim) 20%, var(--panel-edge))
+    );
+    color: var(--color-text-light);
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
   }
   .charter-buy:hover:not(:disabled) {
-    background: linear-gradient(#8a6a31, #4a361c);
+    background: linear-gradient(
+      color-mix(in srgb, var(--color-primary) 48%, var(--panel-base)),
+      color-mix(in srgb, var(--color-primary-dim) 28%, var(--panel-edge))
+    );
   }
   .charter-buy:disabled {
     opacity: 0.5;
@@ -2808,16 +2818,16 @@
     margin-top: 6px;
   }
   .charter-notice.success {
-    border-color: rgb(127 224 127 / 0.5);
-    color: #9be89b;
-    background: rgb(127 224 127 / 0.1);
+    border-color: color-mix(in srgb, var(--color-text-success) 55%, transparent);
+    color: var(--color-text-success);
+    background: color-mix(in srgb, var(--color-text-success) 10%, transparent);
   }
   /* The failure tone was emitted with no rule of its own, so it rendered as the
      neutral notice and read identically to a success. */
   .charter-notice.failure {
-    border-color: rgb(232 120 120 / 0.55);
-    color: #f0a9a9;
-    background: rgb(232 120 120 / 0.12);
+    border-color: color-mix(in srgb, var(--color-text-error) 55%, transparent);
+    color: var(--color-text-error);
+    background: color-mix(in srgb, var(--color-text-error) 12%, transparent);
   }
   /* Title subtitle ("Lifetime XP, realm"): the muted-gold token + 11px the painter
      used to set with an inline style (keeps the literals out of TS). */
@@ -5139,6 +5149,103 @@
     }
   }
 
+  /* Store-owned decision prompt: mounted in #prompt-stack, above the Armory
+     inspector, while the Store root is inert. The generic #confirm-dialog
+     geometry assumes a body-level window, so this scoped rule resets it to a
+     normal stack child. */
+  #prompt-stack .woc-store-prompt {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(380px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 18px;
+    transform: none;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  .woc-store-prompt .prompt-text {
+    padding-right: 38px;
+    margin-bottom: 8px;
+    color: var(--color-accent);
+    font-family: var(--title-font);
+    font-size: 15px;
+  }
+  .woc-store-prompt-body {
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .woc-store-prompt-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .woc-store-prompt-close,
+  .woc-store-global-result button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--panel-base) 85%, var(--panel-edge));
+    color: var(--color-text-light);
+    cursor: var(--cursor-point);
+  }
+  .woc-store-prompt-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+  .woc-store-prompt-close .ui-icon,
+  .woc-store-global-result .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  .woc-store-prompt-confirm {
+    border-color: var(--color-primary-dim);
+    color: var(--color-accent);
+  }
+  .woc-store-global-result {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(440px, calc(100vw - 32px));
+    min-width: 0;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    color: var(--color-text-light);
+    font: 13px / 1.45 var(--ui-font);
+  }
+  .woc-store-global-result > span {
+    flex: 1 1 auto;
+  }
+  /* The mobile HUD deliberately makes #prompt-stack click-through and restores
+     hits only on `.prompt`; this nonmodal status is not a dialog, so opt its
+     own dismiss action back into pointer input without misrepresenting it. */
+  body.mobile-touch #prompt-stack .woc-store-global-result {
+    pointer-events: auto;
+  }
+  .woc-store-global-result.success {
+    border-color: var(--color-text-success);
+  }
+  .woc-store-global-result.failure {
+    border-color: var(--color-text-error);
+  }
+  @media (pointer: coarse) {
+    .woc-store-prompt-close,
+    .woc-store-prompt-actions .btn,
+    .woc-store-global-result button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+
   .native-update-backdrop {
     position: fixed;
     inset: 0;
@@ -7018,6 +7125,7 @@
      the named kinds below. Always visible on the cell itself on desktop and
      touch (information-add, identical on every graphics preset, so no --fx-*
      gate). Top-left, clear of the bottom-right count badge. */
+  .vault-row .bi-instance,
   .bag-item .bi-instance,
   .bank-item .bi-instance {
     position: absolute;
@@ -7043,6 +7151,7 @@
      masterwork or fine stack keeps the mark bags gave it (marks are an
      all-surfaces family, see item_instance_glyph_mark.ts). Only the quest
      seal stays bag-only: quest items cannot enter either bank. */
+  .vault-row .bi-glyph,
   .bag-item .bi-glyph,
   .bank-item .bi-glyph,
   .bag-item .bi-quest-seal,
@@ -7057,6 +7166,7 @@
     pointer-events: none;
     filter: drop-shadow(0 1px 1px #000);
   }
+  .vault-row .bi-glyph .ui-icon,
   .bag-item .bi-glyph .ui-icon,
   .vault-row .bi-fine-seal .ui-icon,
   .bank-item .bi-glyph .ui-icon,
@@ -7067,18 +7177,22 @@
     width: 100%;
     height: 100%;
   }
+  .vault-row .bi-glyph-enchanted,
   .bag-item .bi-glyph-enchanted,
   .bank-item .bi-glyph-enchanted {
     color: var(--color-bag-glyph-enchanted);
   }
+  .vault-row .bi-glyph-signed,
   .bag-item .bi-glyph-signed,
   .bank-item .bi-glyph-signed {
     color: var(--color-bag-glyph-signed);
   }
+  .vault-row .bi-glyph-bound,
   .bag-item .bi-glyph-bound,
   .bank-item .bi-glyph-bound {
     color: var(--color-bag-glyph-bound);
   }
+  .vault-row .bi-masterwork-seal,
   .bag-item .bi-masterwork-seal,
   .bank-item .bi-masterwork-seal {
     position: absolute;
@@ -7144,6 +7258,7 @@
      desktop and touch, identical on every graphics preset (no --fx-* gate);
      aria-hidden, the cell accessible name carries the locked fact. All-surfaces
      family (item_instance_glyph_mark.ts): bags and both banks share this rule. */
+  .vault-row .bi-lock-seal,
   .bag-item .bi-lock-seal,
   .bank-item .bi-lock-seal {
     position: absolute;
@@ -7155,6 +7270,7 @@
     pointer-events: none;
     filter: drop-shadow(0 1px 1px #000);
   }
+  .vault-row .bi-lock-seal .ui-icon,
   .bag-item .bi-lock-seal .ui-icon,
   .bank-item .bi-lock-seal .ui-icon {
     display: block;
@@ -8306,6 +8422,12 @@
     flex-direction: column;
     gap: 3px;
   }
+  .vault-row-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    min-width: 0;
+  }
   .vault-row {
     position: relative; /* anchors the fine corner seal to the icon corner */
     display: flex;
@@ -8316,7 +8438,9 @@
     border-radius: 4px;
     border: 1px solid var(--color-border-showcase);
     border-left: 3px solid var(--bank-slot-quality, var(--color-quality-default));
-    background: #15100d;
+    flex: 1 1 auto;
+    min-width: 0;
+    background: color-mix(in srgb, var(--panel-base) 88%, var(--panel-edge));
     color: var(--color-text);
     font-family: var(--ui-font);
     font-size: 12px;
@@ -8330,12 +8454,17 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
+  .vault-row-special {
+    background: color-mix(in srgb, var(--panel-base) 82%, var(--color-accent));
+  }
   /* Fine corner seal on a vault ROW (Phase 04 QA): color and drop shadow ride
      the shared family groups above (the vault selectors are prepended there),
      but the CELL group's 1px/1px coords assume the seal's box IS the item
      cell, and a vault row is a wide flex button, so the placement is stated
      here against the row's padding box, over the leading item icon's corner
      (the row is position: relative for exactly this). */
+  .vault-row .bi-instance,
+  .vault-row .bi-glyph,
   .vault-row .bi-fine-seal {
     position: absolute;
     top: 4px;
@@ -8344,7 +8473,15 @@
     height: 12px;
     display: block;
     pointer-events: none;
-    filter: drop-shadow(0 1px 1px #000);
+    filter: drop-shadow(0 1px 1px var(--panel-edge));
+  }
+  .vault-row .bi-masterwork-seal {
+    top: 3px;
+    left: 7px;
+  }
+  .vault-row .bi-lock-seal {
+    left: 8px;
+    bottom: 3px;
   }
   .vault-row-name {
     flex: 1 1 auto;
@@ -8357,6 +8494,15 @@
     color: var(--gold-dim);
     font-family: var(--title-font);
   }
+  .vault-row-stack-count {
+    flex: none;
+    padding: 2px 4px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--panel-edge) 72%, transparent);
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1;
+  }
   /* At the ceiling: the readout carries the fact in TEXT (count == cap); the
      brighter tint is reinforcement, never the only signal. */
   .vault-row.at-cap .vault-row-count {
@@ -8368,13 +8514,67 @@
   .vault-row.over-cap .vault-row-count {
     font-weight: 700;
   }
+  .vault-row-partial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--panel-base) 78%, var(--panel-edge));
+    color: var(--color-accent);
+    font: 11px / 1.1 var(--ui-font);
+    cursor: var(--cursor-point);
+  }
+  .vault-row-partial:hover {
+    border-color: var(--color-primary-dim);
+    filter: brightness(1.12);
+  }
+  .vault-row-partial:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .vault-row-partial .ui-icon {
+    flex: none;
+    width: 14px;
+    height: 14px;
+  }
+  .vault-row-partial-label {
+    max-width: 72px;
+  }
+  @media (pointer: coarse) {
+    .vault-row,
+    .vault-row-partial,
+    .vault-unlock-btn,
+    .vault-footer button {
+      min-height: 44px;
+    }
+    .vault-row-partial {
+      min-width: 44px;
+    }
+  }
+  /* Puppeteer touch emulation and a few hybrid devices expose touch input
+     without reporting `pointer: coarse`; the runtime class is the second
+     truthful arm, keeping the same targets usable in both environments. */
+  body.mobile-touch .vault-row,
+  body.mobile-touch .vault-row-partial,
+  body.mobile-touch .vault-unlock-btn,
+  body.mobile-touch .vault-footer button {
+    min-height: 44px;
+  }
+  body.mobile-touch .vault-row-partial {
+    min-width: 44px;
+  }
   .vault-locked-intro {
     flex: none;
     margin: 4px 0 8px;
     padding: 6px 8px;
     border-radius: 4px;
     border: 1px solid var(--color-border-showcase);
-    background: #1c1812;
+    background: color-mix(in srgb, var(--panel-base) 84%, var(--panel-edge));
     color: var(--gold-dim);
     font-family: var(--ui-font);
     font-size: 12px;
@@ -8395,6 +8595,51 @@
   .vault-footer .bank-buy-btn {
     width: auto;
     flex: 1 1 auto;
+  }
+  @media (forced-colors: active) {
+    .charter-section > header,
+    .charter-body,
+    .charter-card,
+    .charter-buy,
+    .charter-notice,
+    .vault-row,
+    .vault-row-partial,
+    .vault-locked-intro,
+    .woc-store-prompt,
+    .woc-store-global-result,
+    .woc-store-prompt-close,
+    .woc-store-global-result button {
+      forced-color-adjust: auto;
+      background: Canvas;
+      border-color: CanvasText;
+      color: CanvasText;
+      filter: none;
+    }
+    .charter-buy:focus-visible,
+    .vault-row:focus-visible,
+    .vault-row-partial:focus-visible,
+    .woc-store-prompt button:focus-visible,
+    .woc-store-global-result button:focus-visible {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+    .charter-notice.success,
+    .charter-notice.failure,
+    .woc-store-global-result.success,
+    .woc-store-global-result.failure {
+      border-color: Highlight;
+      color: CanvasText;
+    }
+    .vault-row .bi-instance {
+      background: CanvasText;
+    }
+    .vault-row .bi-glyph,
+    .vault-row .bi-fine-seal,
+    .vault-row .bi-lock-seal,
+    .vault-row .bi-masterwork-seal {
+      color: CanvasText;
+      filter: none;
+    }
   }
   /* ---------- deeds ---------- */
   /* The Book of Deeds: a cold catalog browser (summary strip, category rail,

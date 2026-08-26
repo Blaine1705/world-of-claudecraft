@@ -81,6 +81,10 @@ const armoryCardView = readSource('../src/ui/armory_card_view.ts');
 // pins that used to read the window's own restoreStoreFocus read this instead,
 // and the window keeps a NEGATIVE pin so the seam cannot quietly move back.
 const storeFocusPolicy = readSource('../src/ui/store_focus_policy.ts');
+const storeDecisionPrompt = readSource('../src/ui/store_decision_prompt.ts');
+const storeSurfaceRuntime = readSource('../src/ui/store_surface_runtime.ts');
+const storeArmoryPurchase = readSource('../src/ui/store_armory_purchase.ts');
+const dailyRewardsChrome = readSource('../src/ui/daily_rewards_chrome_view.ts');
 const claudiumWindow = readSource('../src/ui/claudium_window.ts');
 const hud = readSource('../src/ui/hud.ts');
 // The Claudium spend seam moved OUT of the hud deps literal in Bank Storage
@@ -99,41 +103,49 @@ const hudChromeCatalog = readSource('../src/ui/i18n.catalog/hud_chrome.ts');
 describe('WOC Store window contract', () => {
   it('opens on the Store tab and keeps Daily Rewards as a sub-tab', () => {
     expect(storeWindow).toContain("private tab: 'store' | 'rewards' = 'store'");
-    expect(storeWindow).toContain('data-woc-store-tab="store"');
-    expect(storeWindow).toContain('data-woc-store-tab="rewards"');
+    expect(dailyRewardsChrome).toContain('data-woc-store-tab="store"');
+    expect(dailyRewardsChrome).toContain('data-woc-store-tab="rewards"');
   });
 
   it('offers a Claudium top-up when the selected skin is unaffordable', () => {
-    const purchase = storeWindow.slice(storeWindow.indexOf('private requestArmoryPurchase'));
+    const purchase = storeArmoryPurchase.slice(
+      anchor(storeArmoryPurchase, '  request(row: ArmorySkinRow): void {'),
+      anchor(storeArmoryPurchase, '  async purchase('),
+    );
     expect(purchase).toContain('if (!row.affordable)');
-    expect(purchase).toContain("t('hudChrome.wocStore.needMoreTitle')");
-    expect(purchase).toContain('this.openClaudiumFromStore()');
+    expect(purchase).toContain('this.deps.showNeedMore(');
+    expect(storeSurfaceRuntime).toContain("title: t('hudChrome.wocStore.needMoreTitle')");
+    expect(storeWindow).toContain('onConfirm: () => this.openClaudiumFromStore()');
   });
 
   it('uses the authoritative insufficient-balance response for the top-up flow', () => {
-    const purchase = storeWindow.slice(storeWindow.indexOf('private async purchaseArmorySkin'));
+    const purchase = storeArmoryPurchase.slice(anchor(storeArmoryPurchase, '  async purchase('));
     expect(purchase).toContain("result?.reason === 'insufficient_balance'");
     expect(purchase).toContain('result.costClaudium');
     expect(purchase).toContain('result.balance');
-    expect(purchase).toContain('this.openNeedMoreDialog');
-    expect(purchase.indexOf("result?.reason === 'insufficient_balance'")).toBeLessThan(
-      purchase.indexOf('this.storeError = true'),
-    );
+    expect(purchase).toContain('this.deps.showNeedMore(');
+    expect(purchase).toContain('this.deps.needMoreText(');
+    expect(purchase).toContain('this.deps.surfaceIsCurrent(generation)');
     expect(main).toContain('costClaudium: result.costClaudium');
     expect(main).toContain('reason: result.reason');
   });
 
   it('marks owned skins and prevents another purchase attempt', () => {
     // The MARK is markup and lives in the extracted core; the REFUSAL is flow
-    // and stays in the window. Both halves are pinned, in the file that now
-    // owns each, so moving one without the other reds here.
+    // and lives in the purchase controller. Both halves are pinned where their
+    // respective modules own them, so moving one without the other reds here.
     expect(armoryCardView).toContain('armory-state');
     // The negative half its two neighbours already carry: a PARTIAL move that
     // duplicated the markup back into the window would not red without it.
     expect(storeWindow).not.toContain('armory-state');
-    expect(storeWindow).toContain(
-      'if (row.owned || !row.purchasable || row.costClaudium === null) return;',
+    const request = storeArmoryPurchase.slice(
+      anchor(storeArmoryPurchase, '  request(row: ArmorySkinRow): void {'),
+      anchor(storeArmoryPurchase, '  async purchase('),
     );
+    expect(request).toContain('row.owned');
+    expect(request).toContain('!row.purchasable');
+    expect(request).toContain('row.costClaudium === null');
+    expect(request).toContain('this.inFlight.has(row.skin.id)');
   });
 
   it('sells only the Season 1 Armory (no legacy cosmetics grid)', () => {
@@ -160,8 +172,8 @@ describe('WOC Store window contract', () => {
 
   it('implements roving keyboard tabs with explicit tabpanel ownership', () => {
     expect(storeWindow).toContain("rovingTarget(ke.key, i, tabs.length, 'horizontal')");
-    expect(storeWindow).toContain('aria-controls="woc-store-panel"');
-    expect(storeWindow).toContain('role="tabpanel"');
+    expect(dailyRewardsChrome).toContain('aria-controls="woc-store-panel"');
+    expect(dailyRewardsChrome).toContain('role="tabpanel"');
     expect(storeWindow).toContain("panel?.setAttribute(\n      'aria-labelledby'");
   });
 
@@ -299,8 +311,9 @@ describe('WOC Store window contract', () => {
   it('shows a visible loading state in the store body until the first snapshot paints', () => {
     // An opaque store shell awaiting an un-timed snapshot fetch must read as
     // "loading", never as a bare black box (the fallback black-window lead).
-    const start = storeWindow.indexOf('private loadingHtml');
-    const loading = storeWindow.slice(start, storeWindow.indexOf('private ', start + 1));
+    const loading = dailyRewardsChrome.slice(
+      anchor(dailyRewardsChrome, 'export function dailyRewardsLoadingHtml('),
+    );
     expect(loading).toContain('cl-loading');
     expect(loading).toContain('cl-spinner');
     expect(loading).toContain("t('hudChrome.wocStore.loading')");
@@ -315,9 +328,9 @@ describe('WOC Store window contract', () => {
   });
 
   it('keeps storefront content mounted while a background refresh is loading', () => {
-    expect(storeWindow).toContain('data-woc-store-loading');
-    expect(storeWindow).toContain(
-      "setAttribute('aria-busy', this.storeLoading ? 'true' : 'false')",
+    expect(dailyRewardsChrome).toContain('data-woc-store-loading');
+    expect(storeSurfaceRuntime).toContain(
+      "indicator.setAttribute('aria-busy', loading ? 'true' : 'false')",
     );
     expect(storeWindow).not.toContain('if (this.storeLoading) {\n      body.innerHTML');
     expect(storeWindow).toContain('if (!snapshot.available || snapshot.balance === null)');
@@ -358,7 +371,8 @@ describe('WOC Store window contract', () => {
     expect(hud).toContain(": 'hudChrome.dailyRewards.title';");
     expect(hud).toContain('this.syncDailyRewardsSurfaceLabels();');
     expect(storeWindow).toContain("if (!this.storeEnabled()) this.tab = 'rewards';");
-    expect(storeWindow).toContain("(storeEnabled ? this.tabsHtml() : '')");
+    expect(storeWindow).toContain("(storeEnabled ? wocStoreTabsHtml() : '')");
+    expect(storeWindow).toContain('dailyRewardsLoadingHtml(storeEnabled)');
   });
 
   it('refreshes only store balance and catalog while the WOC Store is open', () => {
@@ -560,7 +574,9 @@ describe('WOC Store window contract', () => {
     expect(wire).toContain("(itemId, 'storage', intent.costClaudium, intent.key)");
     expect(wire).not.toContain('expectedCostClaudium');
     // The refusal handler judges against what was SENT, not the caller's value.
-    expect(purchase).toContain('this.refuseCharterPurchase(itemId, intent.costClaudium, result);');
+    expect(purchase).toContain(
+      'this.refuseCharterPurchase(itemId, intent.costClaudium, result, surfaceGeneration)',
+    );
     const refuse = storeWindow.slice(
       anchor(storeWindow, 'private async refuseCharterPurchase('),
       anchor(storeWindow, 'private repaintStore('),
@@ -628,15 +644,16 @@ describe('WOC Store window contract', () => {
 
     // Weapon skins keep passing NO key: main.ts then mints one per attempt,
     // byte-identical to the behavior before the charter path existed.
-    const skinPurchase = storeWindow.slice(
-      anchor(storeWindow, 'private async purchaseArmorySkin'),
-      anchor(storeWindow, 'private rebuildCharterSection'),
+    const skinPurchase = storeArmoryPurchase.slice(
+      anchor(storeArmoryPurchase, '  async purchase('),
+      anchor(storeArmoryPurchase, '  private fail('),
     );
-    expect(skinPurchase).toContain(
-      "this.deps.spendStoreItem?.(row.skin.id, 'skin', expectedCostClaudium)",
-    );
+    expect(skinPurchase).toContain('result = await this.deps.spend(row.skin.id, cost)');
     expect(skinPurchase).not.toContain('idempotencyKey');
     expect(skinPurchase).not.toContain('charterIntents');
+    expect(storeWindow).toContain(
+      "spend: async (itemId, cost) => this.deps.spendStoreItem?.(itemId, 'skin', cost)",
+    );
   });
 
   it('carries keyboard focus across its own rebuild through the shared seam', () => {
@@ -670,9 +687,9 @@ describe('WOC Store window contract', () => {
     // namespace's one builder, which is what keeps a markup-only emitter inside
     // the single-reader rule (tests/focus_restore.test.ts pins the rule itself,
     // and caught the armory half the moment the extraction landed).
-    expect(charterCardView).toContain('focusKeyAttr(`charter-${row.itemId}`)');
+    expect(charterCardView).toContain(`focusKeyAttr(\`charter-\${row.itemId}\`)`);
     expect(charterCardView).not.toContain('data-focus-key=');
-    expect(armoryCardView).toContain('focusKeyAttr(`armory-${row.skin.id}`)');
+    expect(armoryCardView).toContain(`focusKeyAttr(\`armory-\${row.skin.id}\`)`);
     expect(armoryCardView).not.toContain('data-focus-key=');
     expect(storeWindow).not.toContain('data-focus-key=');
     const paintStore = storeWindow.slice(
@@ -743,7 +760,7 @@ describe('WOC Store window contract', () => {
     // attribute in this window). It was the only focusable control in the store
     // body without one, so captureFocusKey read null while focus sat on a real
     // element and every wipe dropped a keyboard player standing on it to <body>.
-    expect(storeWindow).toContain("data-buy-claudium${focusKeyAttr('topup')}");
+    expect(storeWindow).toContain(`data-buy-claudium\${focusKeyAttr('topup')}`);
 
     // Focuses nothing when focus was not in this subtree, and degrades through
     // the shared helper rather than a bare focus() on candidates[0]. The degrade
@@ -804,19 +821,29 @@ describe('WOC Store window contract', () => {
     );
     expect(request).toContain('this.charterFocus.arm(body ? captureFocusKey(body) : null);');
     expect(request.indexOf('captureFocusKey(body)')).toBeLessThan(
-      request.indexOf('this.deps.confirmDialog?.('),
+      request.indexOf('this.showStoreDecision({'),
     );
     // The other entry point refuses too, so a card click cannot open a second
     // dialog over a live spend.
     expect(request).toContain('if (this.charterInFlight.has(itemId)) return;');
   });
 
+  it('owns Store decisions in the prompt stack instead of the HUD confirm dialog', () => {
+    expect(storeWindow).not.toContain('this.deps.confirmDialog?.(');
+    expect(storeWindow).toContain('private readonly storeRuntime = new StoreSurfaceRuntime');
+    expect(storeSurfaceRuntime).toContain('this.prompts = new StoreDecisionPrompts(root)');
+    expect(storeDecisionPrompt).toContain("document.getElementById('prompt-stack')");
+    expect(storeDecisionPrompt).toContain("prompt.id = 'confirm-dialog'");
+    expect(storeDecisionPrompt).toContain('installPromptDialog(prompt, opener, close');
+    expect(storeDecisionPrompt).toContain("result.setAttribute('role', 'status')");
+  });
+
   it('announces results through one persistent live region, not a freshly written role', () => {
     // A role="status" node created in the same innerHTML write as its text is
     // commonly never announced, and success is the status case.
-    const tabs = storeWindow.slice(
-      anchor(storeWindow, 'private tabsHtml('),
-      anchor(storeWindow, 'private loadingHtml('),
+    const tabs = dailyRewardsChrome.slice(
+      anchor(dailyRewardsChrome, 'export function wocStoreTabsHtml('),
+      anchor(dailyRewardsChrome, 'export function dailyRewardsLoadingHtml('),
     );
     expect(tabs).toContain('data-charter-live');
     expect(tabs).toContain('role="status"');
