@@ -298,8 +298,7 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
   if (hasMoveInput(meta) && !bgWallTrap) return 'moving';
-  if (activeBattlegroundAt(ctx, p) && !bgWallTrap && (!p.dead || p.ghost))
-    return 'competitive';
+  if (activeBattlegroundAt(ctx, p) && !bgWallTrap && (!p.dead || p.ghost)) return 'competitive';
   return null;
 }
 
