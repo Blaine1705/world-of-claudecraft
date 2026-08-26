@@ -1206,6 +1206,12 @@ try {
   }
 } finally {
   linuxUrlHandler.restore();
+  // AFTER setAsDefaultProtocolClient, never alongside it. Electron's Linux path shells out to
+  // xdg-settings, which runs `xdg-mime default` itself against the same unlocked file, and a
+  // torn read there makes it restore the ORIGINAL association and fail: exactly the broken
+  // state this is meant to fix. Ours stays as the fallback for when Electron's registration
+  // does not take.
+  linuxUrlHandler.associate();
 }
 
 const singleInstance = app.requestSingleInstanceLock();

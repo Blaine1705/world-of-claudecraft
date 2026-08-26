@@ -3,11 +3,12 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import {
+  APPIMAGE_ENTRY_NAME,
   appImagePathFrom,
   buildDesktopEntry,
   configureLinuxDesktopName,
+  DEB_ENTRY_NAME,
   DESKTOP_ENTRY_BASENAME,
-  DESKTOP_ENTRY_NAME,
   defaultRunCommand,
   desktopEntryDir,
   execArgumentFor,
@@ -21,7 +22,7 @@ const PKG = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const APPIMAGE = '/home/deck/Applications/world-of-claudecraft.AppImage';
 const SCHEME = 'worldofclaudecraft';
 const APPS_DIR = '/home/deck/.local/share/applications';
-const ENTRY_PATH = `${APPS_DIR}/world-of-claudecraft.desktop`;
+const ENTRY_PATH = `${APPS_DIR}/world-of-claudecraft-appimage.desktop`;
 
 // Built without literals so no control character ever appears in this source file.
 const NL = String.fromCharCode(10);
@@ -106,9 +107,19 @@ describe('the .desktop entry filename (a cross-package literal)', () => {
     // entry and the CHROME_DESKTOP value must both use that exact name, or the deb fix
     // silently reverts to pointing at a file that does not exist. Derived from package.json
     // here rather than restated, so a rename fails this test instead of shipping.
-    expect(DESKTOP_ENTRY_NAME).toBe(`${String(PKG.name).toLowerCase()}.desktop`);
-    expect(DESKTOP_ENTRY_NAME).toBe('world-of-claudecraft.desktop');
-    expect(DESKTOP_ENTRY_NAME).toBe(`${DESKTOP_ENTRY_BASENAME}.desktop`);
+    expect(DEB_ENTRY_NAME).toBe(`${String(PKG.name).toLowerCase()}.desktop`);
+    expect(DEB_ENTRY_NAME).toBe('world-of-claudecraft.desktop');
+    expect(DEB_ENTRY_NAME).toBe(`${DESKTOP_ENTRY_BASENAME}.desktop`);
+  });
+
+  it('does NOT reuse the deb basename for the entry it writes', () => {
+    // Same basename means the same desktop-file ID, and XDG first-match makes a user-level file
+    // win outright, so one AppImage run would replace the deb's entry everywhere it is looked
+    // up. With TryExec that becomes a silent removal: delete the AppImage and the launcher
+    // refuses the entry, so a deb-installed game disappears from the menu and the scheme
+    // resolves to nothing, unfixable by `apt reinstall` because the file is in $HOME.
+    expect(APPIMAGE_ENTRY_NAME).not.toBe(DEB_ENTRY_NAME);
+    expect(APPIMAGE_ENTRY_NAME).toBe('world-of-claudecraft-appimage.desktop');
   });
 
   it('pins the electron-builder inputs that the derivation ASSUMES are unset', () => {
@@ -169,7 +180,9 @@ describe('main.cjs wiring', () => {
     const restore = main.indexOf('linuxUrlHandler.restore()');
     expect(restore).toBeGreaterThan(-1);
     expect(restore).toBeGreaterThan(register);
-    expect(main).toMatch(/\}\s*finally\s*\{\s*linuxUrlHandler\.restore\(\);\s*\}/);
+    expect(main).toMatch(
+      /\}\s*finally\s*\{\s*linuxUrlHandler\.restore\(\);\s*linuxUrlHandler\.associate\(\);\s*\}/,
+    );
   });
 
   it('actually CALLS it, exactly once, and not from inside a comment', () => {
@@ -434,6 +447,7 @@ describe('installDesktopEntry', () => {
 
     expect(result.status).toBe('failed');
     expect(h.removed).toEqual([h.written[0].file]);
+    result.associate();
     expect(h.ran).toEqual([]);
   });
 
@@ -450,13 +464,18 @@ describe('installDesktopEntry', () => {
     // promotes it from candidate to default. Dropping either leaves the Discord callback
     // landing in the "choose an application" dialog this whole module exists to fix.
     const h = harness();
-    installDesktopEntry(h.deps);
+    const result = installDesktopEntry(h.deps);
 
+    // Nothing has run yet: the caller owns the timing, so it can keep it clear of Electron's
+    // own xdg-settings pass (see the module comment on the shared unlocked file).
+    expect(h.ran).toEqual([]);
+
+    result.associate();
     expect(h.ran).toEqual([
       { command: 'update-desktop-database', args: [APPS_DIR] },
       {
         command: 'xdg-mime',
-        args: ['default', 'world-of-claudecraft.desktop', `x-scheme-handler/${SCHEME}`],
+        args: ['default', 'world-of-claudecraft-appimage.desktop', `x-scheme-handler/${SCHEME}`],
       },
     ]);
   });
@@ -471,7 +490,11 @@ describe('installDesktopEntry', () => {
     expect(result.status).toBe('unchanged');
     expect(h.written).toEqual([]);
     expect(h.renamed).toEqual([]);
-    expect(h.ran.map((r) => r.command)).toEqual(['update-desktop-database', 'xdg-mime']);
+
+    result.associate();
+    // Only xdg-mime: the bytes did not change, so the MIME cache already describes this entry
+    // and rebuilding it would be a subprocess spent on nothing.
+    expect(h.ran.map((r) => r.command)).toEqual(['xdg-mime']);
   });
 
   it('re-installs when the AppImage moved, so Exec never points at a deleted file', () => {
@@ -492,6 +515,8 @@ describe('installDesktopEntry', () => {
 
     expect(result.status).toBe('not-appimage');
     expect(h.written).toEqual([]);
+    expect(typeof result.associate).toBe('function');
+    result.associate();
     expect(h.ran).toEqual([]);
   });
 
@@ -501,6 +526,7 @@ describe('installDesktopEntry', () => {
 
     expect(result.status).toBe('unsafe-path');
     expect(h.written).toEqual([]);
+    result.associate();
     expect(h.ran).toEqual([]);
     expect(h.deps.log.warn).toHaveBeenCalled();
   });
@@ -513,6 +539,7 @@ describe('installDesktopEntry', () => {
 
     expect(result.status).toBe('unsafe-dir');
     expect(h.written).toEqual([]);
+    result.associate();
     expect(h.ran).toEqual([]);
   });
 
@@ -528,6 +555,7 @@ describe('installDesktopEntry', () => {
 
     expect(result.status).toBe('invalid-scheme');
     expect(h.written).toEqual([]);
+    result.associate();
     expect(h.ran).toEqual([]);
   });
 
@@ -547,6 +575,7 @@ describe('installDesktopEntry', () => {
     const result = installDesktopEntry(h.deps);
 
     expect(result.status).toBe('failed');
+    result.associate();
     expect(h.ran).toEqual([]);
     expect(h.deps.log.warn).toHaveBeenCalled();
   });
@@ -603,7 +632,10 @@ describe('defaultRunCommand (the real subprocess seam)', () => {
     expect(c.calls[0].command).not.toContain(' ');
   });
 
-  it('unrefs the child so a hung xdg-utils cannot hold the app open', () => {
+  it('unrefs the child, and bounds it with a timeout', () => {
+    // The timeout is what actually bounds a hang: execFile with a callback keeps the stdout and
+    // stderr pipes ref'd, so unref on the process handle does not by itself release the loop.
+    // Both are asserted because both are deliberate.
     const c = capture();
     defaultRunCommand('xdg-mime', [], undefined, c.execFile);
     expect(c.unref).toHaveBeenCalled();
@@ -634,8 +666,8 @@ describe('configureLinuxDesktopName', () => {
       fileExists: () => true,
     });
 
-    expect(out.desktopName).toBe(DESKTOP_ENTRY_NAME);
-    expect(env.CHROME_DESKTOP).toBe('world-of-claudecraft.desktop');
+    expect(out.desktopName).toBe(APPIMAGE_ENTRY_NAME);
+    expect(env.CHROME_DESKTOP).toBe('world-of-claudecraft-appimage.desktop');
   });
 
   it('leaves CHROME_DESKTOP ALONE when no such entry exists anywhere', () => {
@@ -663,12 +695,14 @@ describe('configureLinuxDesktopName', () => {
       dir: APPS_DIR,
       fileExists: (p: string) => {
         seen.push(p);
-        return p === `/usr/share/applications/${DESKTOP_ENTRY_NAME}`;
+        return p === `/usr/share/applications/${DEB_ENTRY_NAME}`;
       },
     });
 
-    expect(out.desktopName).toBe(DESKTOP_ENTRY_NAME);
-    expect(seen).toContain(`/usr/share/applications/${DESKTOP_ENTRY_NAME}`);
+    // Reports the DEB's name here, not ours: we never wrote a user-level entry on this box, so
+    // pointing CHROME_DESKTOP at our filename would name a file that does not exist.
+    expect(out.desktopName).toBe(DEB_ENTRY_NAME);
+    expect(seen).toContain(`/usr/share/applications/${DEB_ENTRY_NAME}`);
   });
 
   it('restore() puts a previous value back exactly', () => {
@@ -679,7 +713,7 @@ describe('configureLinuxDesktopName', () => {
       dir: APPS_DIR,
       fileExists: () => true,
     });
-    expect(env.CHROME_DESKTOP).toBe(DESKTOP_ENTRY_NAME);
+    expect(env.CHROME_DESKTOP).toBe(APPIMAGE_ENTRY_NAME);
 
     out.restore();
     expect(env.CHROME_DESKTOP).toBe('previous.desktop');
@@ -717,8 +751,8 @@ describe('registerLinuxUrlHandler', () => {
     const result = registerLinuxUrlHandler(h.deps);
 
     expect(result.status).toBe('installed');
-    expect(result.desktopName).toBe('world-of-claudecraft.desktop');
-    expect(h.deps.env.CHROME_DESKTOP).toBe('world-of-claudecraft.desktop');
+    expect(result.desktopName).toBe('world-of-claudecraft-appimage.desktop');
+    expect(h.deps.env.CHROME_DESKTOP).toBe('world-of-claudecraft-appimage.desktop');
     result.restore();
     expect(Object.hasOwn(h.deps.env, 'CHROME_DESKTOP')).toBe(false);
   });
@@ -730,10 +764,12 @@ describe('registerLinuxUrlHandler', () => {
       env,
       scheme: SCHEME,
       dir: APPS_DIR,
-      fileExists: () => true,
+      // Only the deb's system entry exists on this box; we never wrote a user-level one.
+      fileExists: (p: string) => p === `/usr/share/applications/${DEB_ENTRY_NAME}`,
     });
 
     expect(result.status).toBe('not-appimage');
+    // The DEB's name: on that channel we never write an entry, so ours would not exist.
     expect(result.desktopName).toBe('world-of-claudecraft.desktop');
     expect(env.CHROME_DESKTOP).toBe('world-of-claudecraft.desktop');
   });
@@ -764,7 +800,7 @@ describe('installDesktopEntry against a REAL filesystem', () => {
     runCommand: (command: string, args: string[]) => ran.push({ command, args }),
     log: { info: vi.fn(), warn: vi.fn() },
   };
-  const expectedFile = path.join(root, 'applications', DESKTOP_ENTRY_NAME);
+  const expectedFile = path.join(root, 'applications', APPIMAGE_ENTRY_NAME);
 
   it('derives the path from XDG_DATA_HOME and really creates the file', () => {
     const result = installDesktopEntry(deps);
@@ -789,8 +825,10 @@ describe('installDesktopEntry against a REAL filesystem', () => {
     const result = installDesktopEntry(deps);
 
     expect(result.status).toBe('unchanged');
-    // Still re-asserts the association, which is the self-heal path.
-    expect(ran.map((r) => r.command)).toEqual(['update-desktop-database', 'xdg-mime']);
+    result.associate();
+    // Still re-asserts the association (the self-heal path), but only the part that asserts
+    // anything: the bytes are unchanged, so the MIME cache already describes this entry.
+    expect(ran.map((r) => r.command)).toEqual(['xdg-mime']);
   });
 
   it('REPLACES a symlink at the destination instead of writing through it', () => {

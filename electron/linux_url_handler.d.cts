@@ -3,7 +3,8 @@
 // tests/electron_linux_url_handler.test.ts exercises directly. main.cjs itself runs outside
 // tsc; these types serve the test.
 
-export const DESKTOP_ENTRY_NAME: string;
+export const APPIMAGE_ENTRY_NAME: string;
+export const DEB_ENTRY_NAME: string;
 export const DESKTOP_ENTRY_BASENAME: string;
 export const PRODUCT_NAME: string;
 export const SYSTEM_APPLICATIONS_DIR: string;
@@ -78,6 +79,9 @@ export interface InstallDesktopEntryResult {
   status: InstallDesktopEntryStatus;
   file?: string;
   entry?: string;
+  /** Runs update-desktop-database and xdg-mime. MUST be called after
+   * app.setAsDefaultProtocolClient, never concurrently with it. */
+  associate: () => void;
 }
 
 export function installDesktopEntry(deps?: InstallDesktopEntryDeps): InstallDesktopEntryResult;

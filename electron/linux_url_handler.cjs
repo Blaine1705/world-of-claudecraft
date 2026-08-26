@@ -52,7 +52,17 @@ const nodePath = require('node:path');
 // it: one CHROME_DESKTOP value then serves both channels, and on a machine with both the
 // user-level AppImage entry cleanly shadows the system-level deb one per the XDG lookup order.
 const DESKTOP_ENTRY_BASENAME = 'world-of-claudecraft';
-const DESKTOP_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}.desktop`;
+// What dpkg installs. We never write this file, only look for it.
+const DEB_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}.desktop`;
+// What WE write, for an AppImage run. Deliberately NOT the deb's basename. Those two paths are
+// the same desktop-file ID, and XDG first-match means a user-level file wins outright, so
+// reusing the name would have one AppImage run replace the deb's entry everywhere it is looked
+// up. Combined with TryExec that turns into a silent removal: delete the AppImage afterwards
+// and the launcher refuses to load the entry at all, so a deb-installed game vanishes from the
+// applications menu and the scheme resolves to nothing, with `apt reinstall` unable to fix it
+// because the shadowing file lives in $HOME. A distinct name costs one branch below.
+const NO_ASSOCIATE = () => {};
+const APPIMAGE_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}-appimage.desktop`;
 
 // Rejected outright rather than escaped. A newline would let a crafted filename inject
 // further key=value lines (an attacker-chosen Exec); the shell-reserved characters would
@@ -191,16 +201,21 @@ function configureLinuxDesktopName(deps = {}) {
   // AppImageLauncher-integrated entry, say) with a dangling one: strictly worse than today.
   const fileExists = deps.fileExists ?? nodeExistsSync;
   const userDir = deps.dir ?? desktopEntryDir(env, deps.homeDir ?? nodeOs.homedir());
-  const resolves =
-    fileExists(nodePath.join(userDir, DESKTOP_ENTRY_NAME)) ||
-    fileExists(nodePath.join(SYSTEM_APPLICATIONS_DIR, DESKTOP_ENTRY_NAME));
-  if (!resolves) return noop;
+  // Ours first: on a machine with both, the AppImage the player just launched is the one the
+  // scheme should resolve to. Falling back to the deb's entry keeps that channel working
+  // without our ever writing to /usr/share.
+  const found = fileExists(nodePath.join(userDir, APPIMAGE_ENTRY_NAME))
+    ? APPIMAGE_ENTRY_NAME
+    : fileExists(nodePath.join(SYSTEM_APPLICATIONS_DIR, DEB_ENTRY_NAME))
+      ? DEB_ENTRY_NAME
+      : null;
+  if (!found) return noop;
 
   const had = Object.hasOwn(env, 'CHROME_DESKTOP');
   const previous = env.CHROME_DESKTOP;
-  env.CHROME_DESKTOP = DESKTOP_ENTRY_NAME;
+  env.CHROME_DESKTOP = found;
   return {
-    desktopName: DESKTOP_ENTRY_NAME,
+    desktopName: found,
     // Restored by the caller once the registration has run. It is a process-wide variable
     // inherited by every child, including the browser we spawn for the Discord login itself
     // (shell.openExternal -> xdg-open). Chromium reads CHROME_DESKTOP for its own shell
@@ -221,7 +236,8 @@ function configureLinuxDesktopName(deps = {}) {
  *   'invalid-scheme' the caller passed something that is not a URL scheme
  *   'unsafe-path'   the AppImage lives somewhere we refuse to encode (see unrepresentable)
  *   'unsafe-dir'    the XDG applications dir did not resolve to an absolute path
- *   'unchanged'     the entry on disk already matches, so no write and no xdg-utils work
+ *   'unchanged'     the entry on disk already matches, so no write (the caller's associate
+ *                   still re-asserts the default, see below)
  *   'installed'     the entry was written and the association commands were kicked off
  *   'failed'        the write itself failed (read-only home, no permission)
  *
@@ -237,12 +253,12 @@ function installDesktopEntry(deps = {}) {
   const scheme = deps.scheme;
   const productName = deps.productName ?? PRODUCT_NAME;
 
-  if (platform !== 'linux') return { status: 'not-appimage' };
+  if (platform !== 'linux') return { status: 'not-appimage', associate: NO_ASSOCIATE };
   const appImagePath = deps.appImagePath ?? appImagePathFrom(env);
-  if (!appImagePath) return { status: 'not-appimage' };
+  if (!appImagePath) return { status: 'not-appimage', associate: NO_ASSOCIATE };
   if (typeof scheme !== 'string' || !VALID_SCHEME.test(scheme)) {
     log?.warn?.('[deeplink] refusing to register an invalid URL scheme', { scheme });
-    return { status: 'invalid-scheme' };
+    return { status: 'invalid-scheme', associate: NO_ASSOCIATE };
   }
 
   const execArgument = execArgumentFor(appImagePath);
@@ -250,7 +266,7 @@ function installDesktopEntry(deps = {}) {
     log?.warn?.('[deeplink] AppImage path cannot be encoded in a .desktop entry', {
       appImagePath,
     });
-    return { status: 'unsafe-path' };
+    return { status: 'unsafe-path', associate: NO_ASSOCIATE };
   }
 
   // os.homedir() returns $HOME verbatim on POSIX, so a hostile or malformed HOME (with
@@ -258,10 +274,10 @@ function installDesktopEntry(deps = {}) {
   const dir = deps.dir ?? desktopEntryDir(env, deps.homeDir ?? nodeOs.homedir());
   if (!nodePath.isAbsolute(dir)) {
     log?.warn?.('[deeplink] refusing a non-absolute applications dir', { dir });
-    return { status: 'unsafe-dir' };
+    return { status: 'unsafe-dir', associate: NO_ASSOCIATE };
   }
 
-  const file = nodePath.join(dir, DESKTOP_ENTRY_NAME);
+  const file = nodePath.join(dir, APPIMAGE_ENTRY_NAME);
   const entry = buildDesktopEntry({
     execArgument,
     scheme,
@@ -274,7 +290,7 @@ function installDesktopEntry(deps = {}) {
   });
   if (!entry) {
     log?.warn?.('[deeplink] refusing to write an unrepresentable .desktop entry');
-    return { status: 'unsafe-path' };
+    return { status: 'unsafe-path', associate: NO_ASSOCIATE };
   }
 
   const readFile = deps.readFile ?? nodeReadFileSync;
@@ -288,10 +304,20 @@ function installDesktopEntry(deps = {}) {
   // xdg-mime then makes it the DEFAULT rather than merely a candidate. Both are best-effort:
   // a distro without xdg-utils still gets a valid entry on disk, and desktop environments
   // that read mimeapps.list directly pick it up on their own.
-  const associate = () => {
+  //
+  // RETURNED rather than called: it must not overlap Electron's own registration. Every
+  // url-scheme branch of xdg-settings runs `xdg-mime default` itself, and xdg-mime is an
+  // unlocked read-modify-write (`awk ... > "$f.new" && mv "$f.new" "$f"`) at a fixed path, so
+  // two concurrent runs write the same temp file. Worse than a lost update: xdg-settings reads
+  // the current default, sets ours, re-queries to verify, and on a torn read writes the ORIGINAL
+  // back and fails, which restores exactly the broken state this module exists to remove. The
+  // caller runs this after setAsDefaultProtocolClient has returned.
+  const associate = (rewrote) => {
     const runCommand = deps.runCommand ?? defaultRunCommand;
-    runCommand('update-desktop-database', [dir], log);
-    runCommand('xdg-mime', ['default', DESKTOP_ENTRY_NAME, `x-scheme-handler/${scheme}`], log);
+    // Only when the bytes actually changed: an unchanged entry means the MIME cache already
+    // describes it, so rebuilding it is a subprocess spent on nothing.
+    if (rewrote) runCommand('update-desktop-database', [dir], log);
+    runCommand('xdg-mime', ['default', APPIMAGE_ENTRY_NAME, `x-scheme-handler/${scheme}`], log);
   };
 
   // An unchanged FILE does not imply an intact ASSOCIATION: another application can claim the
@@ -300,11 +326,8 @@ function installDesktopEntry(deps = {}) {
   // break Discord login permanently, with no relaunch that ever recovers it. The two commands
   // are async, unref'd, and timeout-bounded, so re-asserting costs nothing on the boot path.
   if (existing === entry) {
-    associate();
-    log?.info?.('[deeplink] Linux URL scheme handler entry current, association re-asserted', {
-      file,
-    });
-    return { status: 'unchanged', file, entry };
+    log?.info?.('[deeplink] entry current; the association will be re-asserted', { file });
+    return { status: 'unchanged', file, entry, associate: () => associate(false) };
   }
 
   const mkdir = deps.mkdir ?? nodeMkdirSync;
@@ -331,12 +354,11 @@ function installDesktopEntry(deps = {}) {
     }
   } catch (err) {
     log?.warn?.('[deeplink] could not write the .desktop entry', err);
-    return { status: 'failed', file, entry };
+    return { status: 'failed', file, entry, associate: NO_ASSOCIATE };
   }
 
-  associate();
   log?.info?.('[deeplink] installed the Linux URL scheme handler', { file, scheme });
-  return { status: 'installed', file, entry };
+  return { status: 'installed', file, entry, associate: () => associate(true) };
 }
 
 /**
@@ -375,9 +397,10 @@ function registerLinuxUrlHandler(deps = {}) {
 }
 
 module.exports = {
+  APPIMAGE_ENTRY_NAME,
+  DEB_ENTRY_NAME,
   SYSTEM_APPLICATIONS_DIR,
   DESKTOP_ENTRY_BASENAME,
-  DESKTOP_ENTRY_NAME,
   PRODUCT_NAME,
   appImagePathFrom,
   defaultRunCommand,

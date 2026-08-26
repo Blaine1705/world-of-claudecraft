@@ -408,15 +408,27 @@ equal: `tests/electron_linux_url_handler.test.ts` derives the expected basename 
 `package.json` `name` AND pins that no `executableName` / `desktopName` override exists,
 so either kind of rename fails there rather than silently breaking Discord login.
 
-Four deliberate narrowings worth knowing before changing any of it:
+Deliberate narrowings worth knowing before changing any of it:
 - `CHROME_DESKTOP` is set only when the entry actually exists on disk (ours or the
   deb's), and is restored immediately after the registration call. Setting it
   unconditionally would make a Steam depot, an Epic package, or a dev run point
   `xdg-settings` at a dangling name, which can REPLACE a working association; leaving it
   set leaks our app identity to every child process, including the browser opened for
   the Discord login itself.
-- The entry is written temp-then-`rename`, so a concurrent second instance cannot leave a
-  torn file and a symlink at the destination is replaced rather than followed.
+- The entry is written temp-then-`rename` (with `wx` on the temp), so a concurrent second
+  instance cannot leave a torn file and a symlink at either path is refused or replaced rather
+  than followed.
+- The AppImage entry is `world-of-claudecraft-appimage.desktop`, deliberately NOT the deb's
+  basename. Same basename means the same desktop-file ID, and a user-level file wins outright,
+  so reusing it would let one AppImage run replace the deb's entry everywhere; with `TryExec`
+  that becomes a silent removal once the AppImage is deleted, and `apt reinstall` cannot fix it
+  because the shadowing file is in `$HOME`. `CHROME_DESKTOP` is pointed at whichever entry
+  actually exists, ours first, the deb's second.
+- The association (`update-desktop-database` and `xdg-mime`) runs AFTER
+  `app.setAsDefaultProtocolClient`, never alongside it. Electron's Linux path shells out to
+  `xdg-settings`, which runs `xdg-mime default` itself against the same unlocked
+  read-modify-write file; on a torn read `xdg-settings` restores the ORIGINAL association and
+  fails, which is exactly the broken state this exists to remove.
 - An unchanged entry still re-runs the association commands. The file being identical does
   not mean the association survived: another app can claim the scheme and a desktop
   environment can reset `mimeapps.list`, and without the re-assert that breaks Discord
