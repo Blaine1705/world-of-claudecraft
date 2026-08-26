@@ -20,8 +20,9 @@
 // so pruning any prefix would turn later legitimate withdraws into false
 // findings and erase the evidence a real dupe investigation needs. The growth
 // bound is therefore economic activity (one row per successful op, EXCEPT the
-// vault sweep: vault_deposit_all diffs to one row per material moved, at most
-// the material set's 55), not time.
+// vault sweep: vault_deposit_all diffs to one row per distinct carried slot,
+// including separate crafted/signer identities, at most the 112-slot inventory),
+// not time.
 // This is deliberately not open-ended: the named REVISIT threshold is
 // 10,000,000 rows. At that size the audit's single ordered full scan is the
 // thing that breaks first (the recorded deferral there is a keyset cursor), and
