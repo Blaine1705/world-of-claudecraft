@@ -281,11 +281,12 @@ describe('targetSwingTimerState: visibility gating', () => {
 });
 
 describe('targetSwingTimerState: no weapon-speed hint, degrades to the raw timer on first show', () => {
-  it('uses swingTimer itself as the first-frame period guess (no weapon speed sent over the wire)', () => {
+  it('uses swingTimer itself as the first-frame period guess when prevPeriod is 0 (no weapon speed sent over the wire)', () => {
     // No weapon speed available for a non-self entity (see server/game.ts's
     // dynamicFields comment); period = max(swingTimer, 0) = swingTimer.
-    const s = targetSwingTimerState(target({ swingTimer: 1.6 }), 0, 0);
-    expect(s.nextPeriod).toBe(1.6);
+    // This exercises the branch where prevPeriod <= 0 and the timer did not jump.
+    const s = targetSwingTimerState(target({ swingTimer: 1 }), 0, 1);
+    expect(s.nextPeriod).toBe(1);
     expect(s.frac).toBe(0);
   });
 
