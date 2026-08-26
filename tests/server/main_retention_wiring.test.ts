@@ -55,6 +55,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneResolvedWocOffersBatch(',
       'pruneBookedWocCustodyClaimsBatch(',
       'pruneExpiredWocStepUpChallengesBatch(',
+      'pruneMailCustodyParcelsBatch(',
       'pruneClosedWocListingsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
@@ -122,6 +123,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneResolvedWocOffersBatch(',
       'pruneBookedWocCustodyClaimsBatch(',
       'pruneExpiredWocStepUpChallengesBatch(',
+      'pruneMailCustodyParcelsBatch(',
       'pruneClosedWocListingsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
@@ -187,6 +189,9 @@ describe('retention sweep wiring in server/main.ts', () => {
     // Deliberately knobless: expired step-up nonces are garbage, not history,
     // so the drain takes no retention-days argument to misthread.
     expect(MAIN).toContain('pruneExpiredWocStepUpChallengesBatch(pool, n)');
+    // The custody-mail overlay residue prune is knobless too (constant
+    // 30-day window inside the module, no retention-days argument).
+    expect(MAIN).toContain('pruneMailCustodyParcelsBatch(n)');
     // The custody-claims window relation check must actually be WIRED (the
     // helper is unit-tested in the market SQL floor; this catches dead code),
     // with both knobs threaded in the documented order (whitespace-collapsed

@@ -1,23 +1,33 @@
 // The durable per-parcel custody overlay (server/mail_custody_overlay.ts):
 // SQL shapes against a mocked pool, the snapshot/bake set semantics that keep
 // a row alive until its parcel is provably inside a committed full-book
-// write, and the boot merge driven against a REAL Sim post office, because
-// the replay-through-book-once-dedupe is exactly what a fake book would
-// paper over.
+// write, the accounting watermark's advance gate, and the boot merge driven
+// against a REAL Sim post office, because the replay-through-book-once-dedupe
+// is exactly what a fake book would paper over. The transaction-level
+// contract (one client, ordered statements, rollback keeps refs) is proven
+// behaviorally in tests/server/save_mail_state_custody_bake.test.ts; the
+// source pins at the bottom anchor only what a behavioral test cannot see
+// (statement POSITIONS inside the writers and the callers).
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-type TestQuery = (text: string, values?: readonly unknown[]) => Promise<{ rows: unknown[] }>;
+type TestQuery = (
+  text: string,
+  values?: readonly unknown[],
+) => Promise<{ rows: unknown[]; rowCount?: number }>;
 
 const db = vi.hoisted(() => ({ query: vi.fn<TestQuery>() }));
 
 vi.mock('../../server/db', () => ({ pool: { query: db.query } }));
 
 import {
+  advanceCustodyWatermarkIn,
   CUSTODY_PARCEL_LETTERS,
   confirmBakedCustodyRefs,
   custodyOverlayStats,
   deleteBakedCustodyRefsIn,
+  MERGE_MAX_PAGES,
+  MERGE_PAGE_LIMIT,
   mergeCustodyParcelOverlay,
   persistCustodyParcelRow,
   pruneMailCustodyParcelsBatch,
@@ -102,7 +112,7 @@ describe('the bake set', () => {
   });
 
   it('prunes only aged residue, batched', async () => {
-    query.mockResolvedValueOnce({ rows: [], rowCount: 3 } as never);
+    query.mockResolvedValueOnce({ rows: [], rowCount: 3 });
     await expect(pruneMailCustodyParcelsBatch(500)).resolves.toBe(3);
     const [sql, params] = query.mock.calls[0];
     expect(sql).toMatch(/DELETE FROM mail_custody_parcels/);
@@ -112,37 +122,91 @@ describe('the bake set', () => {
   });
 });
 
+/** Drive one fully-drained empty merge so the watermark gate opens (the
+ *  module arms it only after a complete merge). */
+async function completeEmptyMerge(): Promise<void> {
+  const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+  query.mockResolvedValueOnce({ rows: [] });
+  const counts = await mergeCustodyParcelOverlay(sim);
+  expect(counts.ok).toBe(true);
+  query.mockClear();
+}
+
+describe('advanceCustodyWatermarkIn', () => {
+  it('no-ops until a boot merge has fully drained', async () => {
+    const txQuery = vi.fn(async (_text: string, _values: unknown[]) => ({ rows: [] }));
+    await advanceCustodyWatermarkIn(txQuery);
+    expect(txQuery).not.toHaveBeenCalled();
+  });
+
+  it('advances accounted_through to the PREVIOUS book write on the caller client, once armed', async () => {
+    await completeEmptyMerge();
+    const txQuery = vi.fn(async (_text: string, _values: unknown[]) => ({ rows: [] }));
+    await advanceCustodyWatermarkIn(txQuery);
+    expect(query).not.toHaveBeenCalled();
+    expect(txQuery).toHaveBeenCalledTimes(1);
+    const [sql, params] = txQuery.mock.calls[0];
+    // The two-column lag is the soundness core: accounted_through takes the
+    // PREVIOUS write's transaction start, never this one's, so a row
+    // inserted between a writer's serialize and its BEGIN can never be
+    // classified stale.
+    expect(sql).toMatch(/INSERT INTO mail_custody_watermark/);
+    expect(sql).toMatch(/VALUES \(\$1, '-infinity', now\(\)\)/);
+    expect(sql).toMatch(/ON CONFLICT \(realm\) DO UPDATE/);
+    expect(sql).toMatch(/SET accounted_through = mail_custody_watermark\.last_book_write/);
+    expect(sql).toMatch(/last_book_write = now\(\)/);
+    expect(params).toEqual([REALM]);
+  });
+
+  it('stays frozen for the whole uptime after a failed merge', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    query.mockRejectedValueOnce(new Error('db down'));
+    const counts = await mergeCustodyParcelOverlay(sim);
+    expect(counts.ok).toBe(false);
+    const txQuery = vi.fn(async (_text: string, _values: unknown[]) => ({ rows: [] }));
+    await advanceCustodyWatermarkIn(txQuery);
+    expect(txQuery).not.toHaveBeenCalled();
+  });
+});
+
 describe('mergeCustodyParcelOverlay', () => {
-  const FRESH = new Date('2026-08-26T12:00:00Z');
-  function overlayRows(refs: string[], letter = 'delivery', createdAt: Date = FRESH) {
+  function overlayRows(refs: string[], letter = 'delivery', items: unknown = GOOD_ITEMS) {
     return refs.map((ref) => ({
       custody_ref: ref,
       recipient_key: '4242',
       recipient_name: 'Buyer',
       letter,
-      items: GOOD_ITEMS,
-      created_at: createdAt,
+      items,
     }));
   }
 
-  /** First query of every merge: the mail blob's durability timestamp. */
-  function mockBlobWrittenAt(at: Date | null) {
-    query.mockResolvedValueOnce({ rows: at === null ? [] : [{ updated_at: at }] });
+  /** First query of every merge: the in-SQL watermark cutoff DELETE. */
+  function mockStaleDelete(rowCount: number) {
+    query.mockResolvedValueOnce({ rows: [], rowCount });
   }
 
   it('replays a crash-lost parcel into a real book, and dedupes it on the next boot', async () => {
-    // The crash story: the parcel row survived, the blob write did not (no
-    // blob row at all, so no cutoff applies).
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    mockBlobWrittenAt(null);
+    mockStaleDelete(0);
     query.mockResolvedValueOnce({ rows: overlayRows(['settlement:9']) });
     const first = await mergeCustodyParcelOverlay(sim);
-    expect(first).toEqual({ replayed: 1, present: 0, refused: 0, stale: 0 });
-    expect(query.mock.calls[0][0]).toMatch(/SELECT updated_at FROM world_state/);
-    expect(query.mock.calls[1][0]).toMatch(/FROM mail_custody_parcels WHERE realm = \$1/);
-    // The page bound: a pathological backlog cannot hold the boot hostage.
-    expect(query.mock.calls[1][0]).toMatch(/LIMIT 10000/);
-    expect(query.mock.calls[1][1]).toEqual([REALM]);
+    expect(first).toEqual({ replayed: 1, present: 0, refused: 0, stale: 0, ok: true });
+    // The cutoff runs entirely in SQL at full timestamp precision: rows at
+    // or before the accounting watermark are deleted, never replayed, and
+    // never round-trip through a millisecond Date.
+    const cutoff = query.mock.calls[0];
+    expect(cutoff[0]).toMatch(/DELETE FROM mail_custody_parcels/);
+    expect(cutoff[0]).toMatch(/realm = \$1/);
+    expect(cutoff[0]).toMatch(
+      /created_at <= \(SELECT accounted_through FROM mail_custody_watermark WHERE realm = \$1\)/,
+    );
+    expect(cutoff[1]).toEqual([REALM]);
+    // The replay SELECT is a primary-key keyset page.
+    const select = query.mock.calls[1];
+    expect(select[0]).toMatch(/FROM mail_custody_parcels WHERE realm = \$1 AND custody_ref > \$2/);
+    expect(select[0]).toMatch(/ORDER BY custody_ref LIMIT 10000/);
+    expect(select[1]).toEqual([REALM, '']);
     expect(sim.postOffice.mail).toHaveLength(1);
     expect(sim.postOffice.mail[0].custodyRef).toBe('settlement:9');
     expect(sim.postOffice.mail[0].items.map((s) => s.itemId)).toEqual(['rusty_hatchet']);
@@ -151,66 +215,114 @@ describe('mergeCustodyParcelOverlay', () => {
     expect(snapshotPendingCustodyRefs()).toEqual(['settlement:9']);
 
     // Second boot with the parcel already inside the loaded blob: the
-    // book-once dedupe reports it present and books nothing new. The blob
-    // write predates the row here (booked mid-write), so the cutoff must
-    // NOT eat it.
+    // book-once dedupe reports it present and books nothing new.
     resetCustodyParcelOverlayForTests();
-    mockBlobWrittenAt(new Date(FRESH.getTime() - 60_000));
+    mockStaleDelete(0);
     query.mockResolvedValueOnce({ rows: overlayRows(['settlement:9']) });
     const second = await mergeCustodyParcelOverlay(sim);
-    expect(second).toEqual({ replayed: 0, present: 1, refused: 0, stale: 0 });
+    expect(second).toEqual({ replayed: 0, present: 1, refused: 0, stale: 0, ok: true });
     expect(sim.postOffice.mail).toHaveLength(1);
     expect(snapshotPendingCustodyRefs()).toEqual(['settlement:9']);
   });
 
-  it('deletes a stale row instead of replaying it (the rollback re-book guard)', async () => {
-    // A committed book write POSTDATES the row: that write accounted for the
-    // parcel, in the blob or durably collected out of it. Replaying it could
-    // re-book a collected parcel, so the row is cleaned, never replayed.
+  it('counts the rows the watermark cutoff deleted and still replays fresh ones', async () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    mockBlobWrittenAt(new Date(FRESH.getTime() + 60_000));
-    query.mockResolvedValueOnce({
-      rows: [
-        ...overlayRows(['collected:1']),
-        ...overlayRows(['fresh:1'], 'delivery', new Date(FRESH.getTime() + 120_000)),
-      ],
-    });
+    mockStaleDelete(2);
+    query.mockResolvedValueOnce({ rows: overlayRows(['fresh:1']) });
     const result = await mergeCustodyParcelOverlay(sim);
-    expect(result).toEqual({ replayed: 1, present: 0, refused: 0, stale: 1 });
+    expect(result).toEqual({ replayed: 1, present: 0, refused: 0, stale: 2, ok: true });
     expect(sim.postOffice.mail.map((m) => m.custodyRef)).toEqual(['fresh:1']);
-    const del = query.mock.calls[2];
-    expect(del[0]).toMatch(/DELETE FROM mail_custody_parcels WHERE custody_ref = ANY/);
-    expect(del[1]).toEqual([['collected:1']]);
     expect(snapshotPendingCustodyRefs()).toEqual(['fresh:1']);
   });
 
   it('keeps a malformed or refused row out of the bake set instead of destroying it', async () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    mockBlobWrittenAt(null);
-    query.mockResolvedValueOnce({
-      rows: [
-        ...overlayRows(['bogus:1'], 'not_a_letter'),
-        // A parcel whose items no longer validate: refused by the book and
-        // absent, so the row must survive for the operator.
-        {
-          custody_ref: 'refused:1',
-          recipient_key: '4242',
-          recipient_name: 'Buyer',
-          letter: 'delivery',
-          items: [{ itemId: 'no_such_item_id', count: 1 }],
-          created_at: FRESH,
-        },
-        ...overlayRows(['ok:1']),
-      ],
-    });
-    const result = await mergeCustodyParcelOverlay(sim);
-    expect(result).toEqual({ replayed: 1, present: 0, refused: 2, stale: 0 });
-    // Only the accounted ref may ever be baked away; the refused rows'
-    // absence from the set is what keeps their rows in the table.
-    expect(snapshotPendingCustodyRefs()).toEqual(['ok:1']);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      mockStaleDelete(0);
+      query.mockResolvedValueOnce({
+        rows: [
+          // Both malformed dimensions, one row each: an unknown letter kind,
+          // and non-array items.
+          ...overlayRows(['bogus:1'], 'not_a_letter'),
+          ...overlayRows(['bogus:2'], 'delivery', { itemId: 'rusty_hatchet' }),
+          // A parcel whose items no longer validate: refused by the book and
+          // absent, so the row must survive for the operator.
+          ...overlayRows(['refused:1'], 'delivery', [{ itemId: 'no_such_item_id', count: 1 }]),
+          ...overlayRows(['ok:1']),
+        ],
+      });
+      const result = await mergeCustodyParcelOverlay(sim);
+      expect(result).toEqual({ replayed: 1, present: 0, refused: 3, stale: 0, ok: true });
+      // Only the accounted ref may ever be baked away; the refused rows'
+      // absence from the set is what keeps their rows in the table. And no
+      // statement beyond the cutoff and the page SELECT ran: nothing
+      // deletes a refused row.
+      expect(snapshotPendingCustodyRefs()).toEqual(['ok:1']);
+      expect(query).toHaveBeenCalledTimes(2);
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 
-  it('never throws: a merge failure reads as replay-later, not as a load failure', async () => {
+  it('pages the whole table on the keyset and reports ok only when drained', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      // One FULL page of cheap (malformed, so no book work) rows, then a
+      // short page carrying the real parcel.
+      const fullPage = overlayRows(
+        Array.from({ length: MERGE_PAGE_LIMIT }, (_, i) => `bulk:${String(i).padStart(6, '0')}`),
+        'not_a_letter',
+      );
+      mockStaleDelete(0);
+      query.mockResolvedValueOnce({ rows: fullPage });
+      query.mockResolvedValueOnce({ rows: overlayRows(['tail:1']) });
+      const result = await mergeCustodyParcelOverlay(sim);
+      expect(result).toEqual({
+        replayed: 1,
+        present: 0,
+        refused: MERGE_PAGE_LIMIT,
+        stale: 0,
+        ok: true,
+      });
+      // The second page resumes strictly after the first page's last ref.
+      expect(query).toHaveBeenCalledTimes(3);
+      expect(query.mock.calls[2][1]).toEqual([
+        REALM,
+        `bulk:${String(MERGE_PAGE_LIMIT - 1).padStart(6, '0')}`,
+      ]);
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it('stops at the page cap with ok false, leaving the watermark frozen', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const fullPage = overlayRows(
+        Array.from({ length: MERGE_PAGE_LIMIT }, (_, i) => `bulk:${String(i).padStart(6, '0')}`),
+        'not_a_letter',
+      );
+      mockStaleDelete(0);
+      // Every page comes back full: the cap must stop the loop, not the
+      // boot path.
+      query.mockResolvedValue({ rows: fullPage });
+      const result = await mergeCustodyParcelOverlay(sim);
+      expect(result.ok).toBe(false);
+      expect(query).toHaveBeenCalledTimes(1 + MERGE_MAX_PAGES);
+      // An undrained merge must never arm the watermark: the unexamined
+      // remainder would otherwise be classified stale at a later boot.
+      const txQuery = vi.fn(async (_text: string, _values: unknown[]) => ({ rows: [] }));
+      await advanceCustodyWatermarkIn(txQuery);
+      expect(txQuery).not.toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it('never throws, and a failed merge is distinguishable from an empty one on the readout', async () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     query.mockRejectedValueOnce(new Error('db down'));
     await expect(mergeCustodyParcelOverlay(sim)).resolves.toEqual({
@@ -218,59 +330,141 @@ describe('mergeCustodyParcelOverlay', () => {
       present: 0,
       refused: 0,
       stale: 0,
+      ok: false,
     });
     expect(sim.postOffice.mail).toHaveLength(0);
+    // The ops readout carries the failure: all-zero counts with ok false is
+    // a FAILED merge, not an empty table.
+    expect(custodyOverlayStats().lastMerge).toEqual({
+      replayed: 0,
+      present: 0,
+      refused: 0,
+      stale: 0,
+      ok: false,
+    });
+  });
+
+  it('keeps partial progress visible when a later page fails', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const fullPage = overlayRows(
+        Array.from({ length: MERGE_PAGE_LIMIT }, (_, i) => `bulk:${String(i).padStart(6, '0')}`),
+        'not_a_letter',
+      );
+      mockStaleDelete(1);
+      query.mockResolvedValueOnce({ rows: fullPage });
+      query.mockRejectedValueOnce(new Error('db down mid-merge'));
+      const result = await mergeCustodyParcelOverlay(sim);
+      expect(result).toEqual({
+        replayed: 0,
+        present: 0,
+        refused: MERGE_PAGE_LIMIT,
+        stale: 1,
+        ok: false,
+      });
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it('resetCustodyParcelOverlayForTests clears the readout too', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({ rows: [] });
+    await mergeCustodyParcelOverlay(sim);
+    expect(custodyOverlayStats().lastMerge).not.toBeNull();
+    resetCustodyParcelOverlayForTests();
+    expect(custodyOverlayStats().lastMerge).toBeNull();
+    expect(custodyOverlayStats().pendingBake).toBe(0);
   });
 });
 
 // ---------------------------------------------------------------------------
 // Wiring-order pins. The bake contract is positional (snapshot before the
-// serialize-adjacent await, delete only after the committed arm), and the
-// merge must only run after a successful book load: these read the source
-// because the ordering IS the contract, and a refactor that reorders it
-// silently reopens the fast-collect dupe or the failed-load clobber.
+// serialize-adjacent await, the bake and the watermark advance inside the
+// transaction, confirm after the committed arm), and the merge must only run
+// after a successful book load: these read the source because the ordering
+// IS the contract. Comments are stripped first (the sibling
+// main_retention_wiring.test.ts rationale: a commented-out call must never
+// satisfy an order pin), every index is guarded against -1, and each slice
+// is bounded to its function. The statement-level behavior (one client,
+// rollback keeps refs) is proven in save_mail_state_custody_bake.test.ts.
 // ---------------------------------------------------------------------------
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { stripComments } from '../helpers/strip_comments';
+
+function boundedBody(src: string, startNeedle: string, endNeedle: string): string {
+  const start = src.indexOf(startNeedle);
+  expect(start).toBeGreaterThan(-1);
+  const end = src.indexOf(endNeedle, start + startNeedle.length);
+  expect(end).toBeGreaterThan(start);
+  return src.slice(start, end);
+}
 
 describe('bake and merge wiring order', () => {
-  const dbSrc = readFileSync(path.resolve(process.cwd(), 'server/db.ts'), 'utf8');
-  const gameSrc = readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  const dbSrc = stripComments(readFileSync(path.resolve(process.cwd(), 'server/db.ts'), 'utf8'));
+  const gameSrc = stripComments(
+    readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
+  );
 
-  it('saveMailState snapshots at entry and bakes inside the book transaction', () => {
-    const body = dbSrc.slice(dbSrc.indexOf('export async function saveMailState'));
+  it('saveMailState snapshots at entry; bake and watermark ride the book transaction', () => {
+    const body = boundedBody(dbSrc, 'export async function saveMailState', '\nexport ');
     const snapshotAt = body.indexOf('snapshotPendingCustodyRefs()');
+    const firstAwaitAt = body.indexOf('await ');
     const beginAt = body.indexOf("client.query('BEGIN')");
-    const writeAt = body.indexOf('INSERT INTO world_state');
+    const writeAt = body.indexOf('upsertWorldStateRowIn(');
     const deleteAt = body.indexOf('deleteBakedCustodyRefsIn(');
+    const advanceAt = body.indexOf('advanceCustodyWatermarkIn(');
     const commitAt = body.indexOf("client.query('COMMIT')");
     const confirmAt = body.indexOf('confirmBakedCustodyRefs(');
-    // Snapshot before anything awaits; the bake DELETE strictly inside the
-    // transaction (after the upsert, before COMMIT), so the blob and the row
-    // removal commit together; the in-memory confirm only after COMMIT.
-    expect(snapshotAt).toBeGreaterThan(-1);
-    expect(snapshotAt).toBeLessThan(body.indexOf('await '));
-    expect(writeAt).toBeGreaterThan(beginAt);
-    expect(deleteAt).toBeGreaterThan(writeAt);
-    expect(deleteAt).toBeLessThan(commitAt);
+    for (const at of [
+      snapshotAt,
+      firstAwaitAt,
+      beginAt,
+      writeAt,
+      deleteAt,
+      advanceAt,
+      commitAt,
+      confirmAt,
+    ]) {
+      expect(at).toBeGreaterThan(-1);
+    }
+    // Snapshot before anything awaits; the book upsert, the bake DELETE,
+    // and the watermark advance strictly inside the transaction (after
+    // BEGIN, before COMMIT); the in-memory confirm only after COMMIT.
+    expect(snapshotAt).toBeLessThan(firstAwaitAt);
+    expect(beginAt).toBeLessThan(writeAt);
+    expect(writeAt).toBeLessThan(deleteAt);
+    expect(deleteAt).toBeLessThan(advanceAt);
+    expect(advanceAt).toBeLessThan(commitAt);
     expect(confirmAt).toBeGreaterThan(commitAt);
   });
 
-  it('the atomic leave-path save bakes inside the fenced transaction, confirmed after COMMIT', () => {
-    const start = dbSrc.indexOf('export async function saveCharacterAndMarketState');
-    const body = dbSrc.slice(start, dbSrc.indexOf('export', start + 10));
+  it('the atomic leave-path save bakes and advances inside the fenced transaction', () => {
+    const body = boundedBody(
+      dbSrc,
+      'export async function saveCharacterAndMarketState',
+      '\nexport ',
+    );
     const snapshotAt = body.indexOf('snapshotPendingCustodyRefs()');
+    const firstAwaitAt = body.indexOf('await ');
     const deleteAt = body.indexOf('deleteBakedCustodyRefsIn(');
+    const advanceAt = body.indexOf('advanceCustodyWatermarkIn(');
     const commitAt = body.indexOf("await client.query('COMMIT')");
     const confirmAt = body.indexOf('confirmBakedCustodyRefs(');
-    // Snapshot at entry, before the first await; the DELETE inside the
-    // transaction; the confirm on the committed arm only, so neither the
-    // fence-refused false arm nor a rollback can forget a pending ref.
-    expect(snapshotAt).toBeGreaterThan(-1);
-    expect(snapshotAt).toBeLessThan(body.indexOf('await '));
-    expect(deleteAt).toBeGreaterThan(-1);
-    expect(deleteAt).toBeLessThan(commitAt);
+    for (const at of [snapshotAt, firstAwaitAt, deleteAt, advanceAt, commitAt, confirmAt]) {
+      expect(at).toBeGreaterThan(-1);
+    }
+    // Snapshot at entry, before the first await; the DELETE and the advance
+    // inside the transaction; the confirm on the committed arm only, so
+    // neither the fence-refused false arm nor a rollback can forget a
+    // pending ref.
+    expect(snapshotAt).toBeLessThan(firstAwaitAt);
+    expect(deleteAt).toBeLessThan(advanceAt);
+    expect(advanceAt).toBeLessThan(commitAt);
     expect(confirmAt).toBeGreaterThan(commitAt);
     expect(body.split('deleteBakedCustodyRefsIn(')).toHaveLength(2);
     expect(body.split('confirmBakedCustodyRefs(')).toHaveLength(2);
@@ -299,16 +493,28 @@ describe('bake and merge wiring order', () => {
   });
 
   it('game.loadMail merges the overlay only after a successful book load', () => {
-    const start = gameSrc.indexOf('async loadMail()');
-    const body = gameSrc.slice(start, gameSrc.indexOf('async saveMail()', start));
+    const body = boundedBody(gameSrc, 'async loadMail()', 'async saveMail()');
     const loadAt = body.indexOf('this.sim.loadMail(await loadMailState())');
     const mergeAt = body.indexOf('mergeCustodyParcelOverlay(this.sim)');
     const catchAt = body.indexOf('catch');
+    for (const at of [loadAt, mergeAt, catchAt]) {
+      expect(at).toBeGreaterThan(-1);
+    }
     // The merge sits after the load INSIDE the same try: a failed load must
     // skip it (merging onto an unloaded book would re-book parcels the
     // stored blob still owns).
-    expect(loadAt).toBeGreaterThan(-1);
     expect(mergeAt).toBeGreaterThan(loadAt);
     expect(mergeAt).toBeLessThan(catchAt);
+  });
+
+  it('both callers serialize the book synchronously at the call, never across an await', () => {
+    // The third leg of the snapshot contract: no awaited gap between the
+    // caller's serializeMail() and the writer's entry. A hoist above an
+    // await would silently reopen the fast-collect bake hole with every
+    // other pin still green.
+    expect(gameSrc).toContain('saveMailState(this.sim.serializeMail())');
+    expect(gameSrc).toMatch(
+      /saveCharacterAndMarketState\(\s*session\.characterId,\s*snap\.level,\s*snap,\s*this\.sim\.serializeMarket\(\),\s*this\.sim\.serializeMail\(\),/,
+    );
   });
 });
