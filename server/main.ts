@@ -53,8 +53,8 @@ import {
   TOP_WEALTH_HOLDERS_LIMIT,
 } from './account_wealth';
 import {
+  aggregateEscrowTotals,
   applyEscrowTotals,
-  listEscrowStateRows,
   refreshAccountPurseTotals,
   topWealthHolders,
   withAccountWealthSweepLock,
@@ -292,6 +292,7 @@ import {
   readArenaLeaderboard,
   readProjectStats,
 } from './leaderboard';
+import { custodyOverlayStats, pruneMailCustodyParcelsBatch } from './mail_custody_overlay';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -2899,7 +2900,6 @@ const wocMarketService = new WocMarketService({
         return liveGame().sim;
       },
       wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
-      persistMailBlob: () => liveGame().persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) =>
         liveGame().enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
@@ -3013,6 +3013,10 @@ configureInternalWocMarketStuckRead(async () => ({
   // The extract-side per-listing serialize cost (event-loop CPU): the number
   // the SAVE_IDLE bound's sizing argument rests on.
   escrowSerialize: wocEscrowSerializeStats(),
+  // The custody mail overlay: a growing pendingBake or a lastMerge with
+  // refused rows is the stuck-parcel signal an operator needs without a
+  // log grep (mail_custody_overlay.ts).
+  custodyOverlay: custodyOverlayStats(),
   // Stamp-ledger high-water crossings (the counted half of the intent-map
   // bound: the maps never shed entries, so crossings are the incident count).
   stampHighWater: wocStampHighWaterCount(),
@@ -3812,6 +3816,14 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) => pruneExpiredWocStepUpChallengesBatch(pool, n),
       },
       {
+        // $WOC custody mail overlay residue: the bake and the boot merge's
+        // stale cutoff clean every healthy row, so this entry drains only
+        // refused rows an operator never resolved and rows for realms no
+        // process serves (constant window; deliberately no env knob).
+        name: 'mail_custody_parcels',
+        pruneBatch: (n) => pruneMailCustodyParcelsBatch(n),
+      },
+      {
         // Closed, fully-disposed $WOC Exchange listings (bids + settlements
         // cascade; sales are provenance and never prune). LAST in the array on
         // purpose: a rebase auto-merge has twice spliced this entry into the
@@ -3881,7 +3893,7 @@ export async function startServer(): Promise<http.Server> {
   configureSuspicionFlagDataset(listSuspicionFlagDataset);
   const accountWealthSweep = startAccountWealthSweep({
     refreshAccountPurseTotals,
-    listEscrowStateRows,
+    aggregateEscrowTotals,
     applyEscrowTotals,
     // The sweep's queries are global, so exactly one process across all realms
     // runs a pass; losers of the advisory lock stand down until their next tick.
