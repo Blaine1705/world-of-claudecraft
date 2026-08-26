@@ -24,6 +24,7 @@ export interface DbTransactionDeadlineOptions {
   timeoutMs: number;
   operation?: string;
   scheduler?: DbTransactionDeadlineScheduler;
+  signal?: AbortSignal;
 }
 
 const DEFAULT_SCHEDULER: DbTransactionDeadlineScheduler = {
@@ -45,6 +46,17 @@ export class DbTransactionDeadlineExceeded extends Error {
   }
 }
 
+export class DbTransactionAborted extends Error {
+  readonly code = 'DB_TRANSACTION_ABORTED' as const;
+  readonly commitMayHaveSucceeded: boolean;
+
+  constructor(operation: string, commitMayHaveSucceeded: boolean) {
+    super(`${operation} transaction aborted`);
+    this.name = 'DbTransactionAborted';
+    this.commitMayHaveSucceeded = commitMayHaveSucceeded;
+  }
+}
+
 const pgErrorCode = (error: unknown): string | undefined =>
   (error as { code?: string } | null | undefined)?.code;
 
@@ -57,16 +69,26 @@ const errorForRelease = (error: unknown): Error =>
  */
 export class DbTransactionDeadline {
   private readonly deadlineAtMs: number;
-  private readonly timer: DbTransactionDeadlineTimer;
+  private timer: DbTransactionDeadlineTimer | null = null;
   private completion: Completion | null = null;
   private activePhase: QueryPhase | null = null;
   private released = false;
   private releaseReason: Error | null = null;
   private timerCleared = false;
-  private listenerAttached = true;
+  private clientErrorListenerAttached = false;
+  private abortListenerAttached = false;
 
   private readonly onClientError = (error: Error): void => {
     this.forceRelease(error);
+  };
+
+  private readonly onAbort = (): void => {
+    if (this.released || this.completion !== null) return;
+    if (this.scheduler.nowMs() >= this.deadlineAtMs) {
+      this.expire(this.activePhase === 'commit');
+      return;
+    }
+    this.forceRelease(new DbTransactionAborted(this.operation, this.activePhase === 'commit'));
   };
 
   constructor(
@@ -74,12 +96,22 @@ export class DbTransactionDeadline {
     private readonly timeoutMs: number,
     private readonly operation: string,
     private readonly scheduler: DbTransactionDeadlineScheduler,
+    private readonly signal?: AbortSignal,
   ) {
     if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
       throw new RangeError('transaction deadline timeoutMs must be a positive finite number');
     }
     this.deadlineAtMs = scheduler.nowMs() + timeoutMs;
     client.on('error', this.onClientError);
+    this.clientErrorListenerAttached = true;
+    if (signal) {
+      signal.addEventListener('abort', this.onAbort, { once: true });
+      this.abortListenerAttached = true;
+      if (signal.aborted) {
+        this.onAbort();
+        return;
+      }
+    }
     this.timer = scheduler.setTimeout(() => {
       this.expire(this.activePhase === 'commit');
     }, timeoutMs);
@@ -98,6 +130,7 @@ export class DbTransactionDeadline {
     await this.executeQuery('commit', 'COMMIT');
     this.completion = 'committed';
     this.clearDeadlineTimer();
+    this.detachAbortListener();
   }
 
   /** Best-effort cleanup that never replaces the transaction's primary error. */
@@ -107,6 +140,7 @@ export class DbTransactionDeadline {
       await this.executeQuery('rollback', 'ROLLBACK');
       this.completion = 'rolled_back';
       this.clearDeadlineTimer();
+      this.detachAbortListener();
     } catch (error) {
       this.forceRelease(errorForRelease(error));
     }
@@ -121,7 +155,7 @@ export class DbTransactionDeadline {
     }
     this.released = true;
     this.clearDeadlineTimer();
-    this.detachErrorListener();
+    this.detachListeners();
     this.client.release();
   }
 
@@ -134,6 +168,7 @@ export class DbTransactionDeadline {
     this.activePhase = phase;
     try {
       const response = await this.client.query<Row>(text, values);
+      if (this.released && this.releaseReason) throw this.releaseReason;
       if (this.scheduler.nowMs() >= this.deadlineAtMs) {
         this.expire(phase === 'commit');
         throw this.releaseReason;
@@ -184,20 +219,31 @@ export class DbTransactionDeadline {
     this.released = true;
     this.releaseReason = error;
     this.clearDeadlineTimer();
-    this.detachErrorListener();
+    this.detachListeners();
     this.client.release(error);
   }
 
   private clearDeadlineTimer(): void {
     if (this.timerCleared) return;
     this.timerCleared = true;
-    this.scheduler.clearTimeout(this.timer);
+    if (this.timer) this.scheduler.clearTimeout(this.timer);
   }
 
-  private detachErrorListener(): void {
-    if (!this.listenerAttached) return;
-    this.listenerAttached = false;
+  private detachClientErrorListener(): void {
+    if (!this.clientErrorListenerAttached) return;
+    this.clientErrorListenerAttached = false;
     this.client.removeListener('error', this.onClientError);
+  }
+
+  private detachAbortListener(): void {
+    if (!this.signal || !this.abortListenerAttached) return;
+    this.abortListenerAttached = false;
+    this.signal.removeEventListener('abort', this.onAbort);
+  }
+
+  private detachListeners(): void {
+    this.detachClientErrorListener();
+    this.detachAbortListener();
   }
 }
 
@@ -210,5 +256,6 @@ export function createDbTransactionDeadline(
     options.timeoutMs,
     options.operation ?? 'PostgreSQL operation',
     options.scheduler ?? DEFAULT_SCHEDULER,
+    options.signal,
   );
 }

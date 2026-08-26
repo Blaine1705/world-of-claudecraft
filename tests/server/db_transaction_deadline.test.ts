@@ -3,6 +3,7 @@ import type { PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
   createDbTransactionDeadline,
+  DbTransactionAborted,
   type DbTransactionDeadlineClient,
   DbTransactionDeadlineExceeded,
   type DbTransactionDeadlineScheduler,
@@ -83,11 +84,17 @@ const fakeClient = (
   return new FakeClient(responder);
 };
 
-const owner = (client: FakeClient, scheduler: FakeScheduler, timeoutMs = 100) =>
+const owner = (
+  client: FakeClient,
+  scheduler: FakeScheduler,
+  timeoutMs = 100,
+  signal?: AbortSignal,
+) =>
   createDbTransactionDeadline(client, {
     operation: 'bank save',
     timeoutMs,
     scheduler,
+    signal,
   });
 
 describe('database transaction whole-operation deadline', () => {
@@ -283,6 +290,194 @@ describe('database transaction whole-operation deadline', () => {
 
     expect(client.releases).toEqual([connectionError]);
     await expect(transaction.query('SELECT 1')).rejects.toBe(connectionError);
+  });
+
+  it('rejects a pre-aborted transaction with a stable owned error before issuing SQL', async () => {
+    const scheduler = new FakeScheduler();
+    const client = fakeClient();
+    const controller = new AbortController();
+    controller.abort(new Error('sensitive caller reason'));
+
+    const transaction = owner(client, scheduler, 100, controller.signal);
+    const abortError = client.releases[0];
+
+    if (!(abortError instanceof Error)) throw new Error('expected abort release error');
+    expect(abortError).toBeInstanceOf(DbTransactionAborted);
+    expect(abortError).toMatchObject({
+      code: 'DB_TRANSACTION_ABORTED',
+      commitMayHaveSucceeded: false,
+      message: 'bank save transaction aborted',
+      name: 'DbTransactionAborted',
+    });
+    expect(abortError).not.toHaveProperty('cause');
+    expect(abortError.message).not.toContain('sensitive caller reason');
+    await expect(transaction.query('BEGIN')).rejects.toBe(abortError);
+    expect(client.queries).toEqual([]);
+    expect(client.releases).toEqual([abortError]);
+    expect(scheduler.timers).toEqual([]);
+  });
+
+  it('destroys an idle transaction once when its signal aborts', async () => {
+    const scheduler = new FakeScheduler();
+    const client = fakeClient();
+    const controller = new AbortController();
+    const transaction = owner(client, scheduler, 100, controller.signal);
+    await transaction.query('BEGIN');
+
+    controller.abort();
+    const abortError = client.releases[0];
+
+    expect(abortError).toBeInstanceOf(DbTransactionAborted);
+    expect(abortError).toMatchObject({ commitMayHaveSucceeded: false });
+    await expect(transaction.query('SELECT 1')).rejects.toBe(abortError);
+    transaction.release();
+    scheduler.advance(1_000);
+    expect(client.queries).toEqual(['BEGIN']);
+    expect(client.releases).toEqual([abortError]);
+  });
+
+  it('keeps an active-statement abort causal over the later driver socket error', async () => {
+    const scheduler = new FakeScheduler();
+    const active: { reject?: (error: Error) => void } = {};
+    const client = fakeClient((text) =>
+      text === 'SELECT slow'
+        ? new Promise((_resolve, reject) => {
+            active.reject = reject;
+          })
+        : Promise.resolve(result()),
+    );
+    const controller = new AbortController();
+    const transaction = owner(client, scheduler, 100, controller.signal);
+    const pending = transaction.query('SELECT slow');
+
+    controller.abort();
+    const abortError = client.releases[0];
+    const laterSocketError = new Error('distinct later driver socket error');
+    active.reject?.(laterSocketError);
+
+    await expect(pending).rejects.toBe(abortError);
+    expect(abortError).toBeInstanceOf(DbTransactionAborted);
+    expect(abortError).toMatchObject({ commitMayHaveSucceeded: false });
+    expect(abortError).not.toBe(laterSocketError);
+    expect(client.releases).toEqual([abortError]);
+  });
+
+  it('marks only an active COMMIT abort as outcome-ambiguous', async () => {
+    const scheduler = new FakeScheduler();
+    const active: { reject?: (error: Error) => void } = {};
+    const client = fakeClient((text) =>
+      text === 'COMMIT'
+        ? new Promise((_resolve, reject) => {
+            active.reject = reject;
+          })
+        : Promise.resolve(result()),
+    );
+    const controller = new AbortController();
+    const transaction = owner(client, scheduler, 100, controller.signal);
+    await transaction.query('BEGIN');
+    const pendingCommit = transaction.commit();
+
+    controller.abort();
+    const abortError = client.releases[0];
+    const laterSocketError = new Error('driver error after COMMIT socket destruction');
+    active.reject?.(laterSocketError);
+
+    await expect(pendingCommit).rejects.toBe(abortError);
+    expect(abortError).toBeInstanceOf(DbTransactionAborted);
+    expect(abortError).toMatchObject({ commitMayHaveSucceeded: true });
+    expect(abortError).not.toBe(laterSocketError);
+    await transaction.rollback();
+    transaction.release();
+    expect(client.releases).toEqual([abortError]);
+  });
+
+  it('keeps the first terminal cause across abort and deadline races', async () => {
+    const abortFirstScheduler = new FakeScheduler();
+    const abortFirstActive: { reject?: (error: Error) => void } = {};
+    const abortFirstClient = fakeClient(
+      () =>
+        new Promise((_resolve, reject) => {
+          abortFirstActive.reject = reject;
+        }),
+    );
+    const abortFirstController = new AbortController();
+    const abortFirst = owner(
+      abortFirstClient,
+      abortFirstScheduler,
+      100,
+      abortFirstController.signal,
+    );
+    const abortFirstPending = abortFirst.query('SELECT slow');
+    abortFirstController.abort();
+    const abortWon = abortFirstClient.releases[0];
+    abortFirstScheduler.advance(100);
+    abortFirstActive.reject?.(new Error('socket closed after abort'));
+    await expect(abortFirstPending).rejects.toBe(abortWon);
+    expect(abortWon).toBeInstanceOf(DbTransactionAborted);
+    expect(abortFirstClient.releases).toEqual([abortWon]);
+
+    const deadlineFirstScheduler = new FakeScheduler();
+    const deadlineFirstActive: { reject?: (error: Error) => void } = {};
+    const deadlineFirstClient = fakeClient(
+      () =>
+        new Promise((_resolve, reject) => {
+          deadlineFirstActive.reject = reject;
+        }),
+    );
+    const deadlineFirstController = new AbortController();
+    const deadlineFirst = owner(
+      deadlineFirstClient,
+      deadlineFirstScheduler,
+      100,
+      deadlineFirstController.signal,
+    );
+    const deadlineFirstPending = deadlineFirst.query('SELECT slow');
+    deadlineFirstScheduler.advance(100);
+    const deadlineWon = deadlineFirstClient.releases[0];
+    deadlineFirstController.abort();
+    deadlineFirstActive.reject?.(new Error('socket closed after deadline'));
+    await expect(deadlineFirstPending).rejects.toBe(deadlineWon);
+    expect(deadlineWon).toBeInstanceOf(DbTransactionDeadlineExceeded);
+    expect(deadlineFirstClient.releases).toEqual([deadlineWon]);
+  });
+
+  it('detaches the abort listener after commit, rollback, and release', async () => {
+    for (const completion of ['commit', 'rollback', 'release'] as const) {
+      const scheduler = new FakeScheduler();
+      const client = fakeClient();
+      const controller = new AbortController();
+      const removeListener = vi.spyOn(controller.signal, 'removeEventListener');
+      const transaction = owner(client, scheduler, 100, controller.signal);
+      await transaction.query('BEGIN');
+
+      if (completion === 'commit') await transaction.commit();
+      if (completion === 'rollback') await transaction.rollback();
+      if (completion === 'release') transaction.release();
+
+      expect(removeListener).toHaveBeenCalledWith('abort', expect.any(Function));
+      const releaseCount = client.releases.length;
+      controller.abort();
+      expect(client.releases).toHaveLength(releaseCount);
+
+      if (completion !== 'release') transaction.release();
+      expect(client.releases).toHaveLength(1);
+      removeListener.mockRestore();
+    }
+  });
+
+  it('ignores abort after a known commit and returns the client normally', async () => {
+    const scheduler = new FakeScheduler();
+    const client = fakeClient();
+    const controller = new AbortController();
+    const transaction = owner(client, scheduler, 100, controller.signal);
+
+    await transaction.query('BEGIN');
+    await transaction.commit();
+    controller.abort();
+    transaction.release();
+
+    expect(client.queries).toEqual(['BEGIN', 'COMMIT']);
+    expect(client.releases).toEqual([undefined]);
   });
 
   it('accepts a real pg PoolClient structurally', () => {
