@@ -379,12 +379,25 @@ describe('the stocked pane', () => {
     expect(row?.closest('.vault-row-wrap')?.querySelector('.vault-row-partial')).toBeNull();
     expect(row?.getAttribute('aria-label')).toBe('Withdraw Copper Ore');
     const described = row?.getAttribute('aria-describedby')?.split(' ') ?? [];
-    expect(described.map((id) => h.root.querySelector(`#${id}`)?.textContent).join(' ')).toContain(
-      'maker-marked copy',
-    );
+    const lockedDescription = described
+      .map((id) => h.root.querySelector(`#${id}`)?.textContent)
+      .join(' ');
+    // The bottom-left lock seal is aria-hidden, so the row description must
+    // carry the same owner-protection fact the personal and guild bank cells
+    // announce. Locked outranks the still-visible signed glyph: assistive tech
+    // hears the actionable state instead of only "maker-marked copy".
+    expect(lockedDescription).toContain('Copper Ore, quantity 2, locked');
+    expect(lockedDescription).not.toContain('maker-marked copy');
     const unknown = h.root.querySelector<HTMLElement>('[data-vault-special-index="1"]');
+    expect(unknown?.querySelector('.bi-glyph-signed')).not.toBeNull();
     expect(unknown?.querySelector('.vault-row-name')?.textContent).toBe('future_material');
     expect(unknown?.getAttribute('aria-label')).toBe('Withdraw future_material');
+    const unknownDescription = (unknown?.getAttribute('aria-describedby')?.split(' ') ?? [])
+      .map((id) => h.root.querySelector(`#${id}`)?.textContent)
+      .join(' ');
+    // Keep the unlocked-glyph arm decisive while the locked sibling switches
+    // to the higher-priority lock wording above.
+    expect(unknownDescription).toContain('maker-marked copy');
 
     row?.dispatchEvent(new MouseEvent('click', { shiftKey: true, bubbles: true }));
     expect(document.querySelector('.vault-quantity-prompt')).toBeNull();

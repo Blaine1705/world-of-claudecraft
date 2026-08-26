@@ -1,16 +1,19 @@
 // One-off local capture tool for the Strongbox Charters store category (Bank
 // Storage phase 12): shoots the WOC Store tab's charter grid on desktop and
 // mobile, in both the all-fit state and the fit-gated state where a part-bought
-// ladder leaves room for only the smaller charters.
+// ladder leaves room for only the smaller charters. It also captures the real
+// Store-owned purchase decision and stale-result surfaces with keyboard focus
+// visible on desktop, mobile landscape, and forced-colors.
 //
 // WHY THIS NEEDS A STUB, and why there is no shared pr_shot_targets entry: the
 // WOC Store does not exist offline. src/main.ts builds claudiumHooks inside its
 // `if (online)` arm and only then calls hud.attachClaudium, so offline
 // storeEnabled() is false, the tab strip is dropped, and the store tab cannot be
 // reached at all. The offline capture rig therefore has to attach a stub hooks
-// object itself. The stub answers ONLY the reads the store paints from (balance
-// plus a store snapshot carrying the four charter rows); it never fakes a
-// purchase result, so nothing here can drift from the real spend contract.
+// object itself. Category frames consume only the balance and store snapshot.
+// Prompt frames additionally release one bridge-shaped `unavailable` refusal
+// after leaving the Store tab, which exercises the real stale-result routing
+// without pretending that an offline character received a paid grant.
 //
 // The fit gate reads world.bankPurchasedSlots, the ALWAYS-available owner-only
 // ladder read (Bank Storage phase 15). Every stage still stands the player at the
@@ -28,6 +31,7 @@
 //   BROWSER_PATH=~/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome \
 //   GAME_URL=http://localhost:5173 \
 //     node scripts/charter_store_shot.mjs
+//   CHARTER_SHOT_SET=prompts limits a run to the six prompt evidence frames.
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
@@ -35,6 +39,7 @@ import { dismissEntryOverlays, enterOfflineGame } from './enter_offline_game.mjs
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/bank-storage-charters';
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -180,9 +185,9 @@ async function stageBank(page, rungs, walkAway = false) {
  *  wall of "Unavailable" cards above the charter grid: a rig artifact that
  *  makes an otherwise healthy store look broken in the captured frame. The
  *  caller collects the real ids from the first paint and re-attaches. */
-async function attachStubHooks(page, prices, skinIds) {
+async function attachStubHooks(page, prices, skinIds, deferSpend = false) {
   await page.evaluate(
-    (priceMap, skins) => {
+    (priceMap, skins, deferred) => {
       const storeItems = Object.entries(priceMap).map(([itemId, costClaudium]) => ({
         itemId,
         name: itemId,
@@ -199,21 +204,38 @@ async function attachStubHooks(page, prices, skinIds) {
           owned: false,
         });
       }
+      // Baseline category shots never spend. Prompt evidence uses the same
+      // deterministic unavailable verdict, but holds it until the harness has
+      // moved off the Store surface so the real stale-result route is exercised.
+      window.__charterShotSpendControl = deferred ? { calls: 0, resolve: null } : null;
       window.__game.hud.attachClaudium({
         balance: async () => 900,
         storeSnapshot: async () => ({ available: true, balance: 900, storeItems }),
         snapshot: async () => ({ available: false, packs: [], rails: [] }),
         buy: async () => {},
-        spend: async () => ({
-          granted: false,
-          balance: 900,
-          costClaudium: null,
-          reason: 'unavailable',
-        }),
+        spend: async () => {
+          const refusal = {
+            granted: false,
+            balance: 900,
+            costClaudium: null,
+            reason: 'unavailable',
+          };
+          if (!deferred) return refusal;
+          const control = window.__charterShotSpendControl;
+          if (!control || control.resolve) throw new Error('prompt evidence spend overlap');
+          control.calls += 1;
+          return new Promise((resolve) => {
+            control.resolve = () => {
+              control.resolve = null;
+              resolve(refusal);
+            };
+          });
+        },
       });
     },
     prices,
     skinIds,
+    deferSpend,
   );
 }
 
@@ -428,6 +450,154 @@ async function stageAndAssertPaintedGeometry(page, mobile) {
   return state;
 }
 
+/** Put the browser into keyboard modality before moving focus to a precise
+ *  evidence target. Programmatic focus alone can correctly omit :focus-visible
+ *  after pointer input, so the Tab is load-bearing rather than cosmetic. */
+async function focusForEvidence(page, selector) {
+  await page.keyboard.press('Tab');
+  return page.evaluate((sel) => {
+    const target = document.querySelector(sel);
+    if (!(target instanceof HTMLElement)) return { err: `missing-${sel}` };
+    target.focus();
+    const style = getComputedStyle(target);
+    const rect = target.getBoundingClientRect();
+    return {
+      err: null,
+      active: document.activeElement === target,
+      focusVisible: target.matches(':focus-visible'),
+      outlineStyle: style.outlineStyle,
+      outlineWidth: style.outlineWidth,
+      width: rect.width,
+      height: rect.height,
+    };
+  }, selector);
+}
+
+function assertVisibleFocus(state, label, mobile) {
+  if (state.err) throw new Error(`${label} focus failed: ${state.err}`);
+  if (!state.active || !state.focusVisible) {
+    throw new Error(`${label} did not hold keyboard-visible focus: ${JSON.stringify(state)}`);
+  }
+  if (state.outlineStyle === 'none' || state.outlineWidth === '0px') {
+    throw new Error(`${label} focus ring was not painted: ${JSON.stringify(state)}`);
+  }
+  const floor = mobile ? 44 : 24;
+  if (state.width < floor || state.height < floor) {
+    throw new Error(`${label} target undersized: ${state.width}x${state.height}`);
+  }
+}
+
+/** Capture both halves of the Store-owned purchase feedback flow. The real buy
+ *  listener opens the confirmation, then the harness establishes keyboard
+ *  modality and verifies its focused confirm control. Its deferred refusal is
+ *  released only after switching to Rewards, proving the nonmodal result route
+ *  rather than a hand-mounted approximation. */
+async function capturePromptEvidence(page, key, mobile) {
+  const buyFocus = await focusForEvidence(page, '.charter-buy:not(:disabled)');
+  assertVisibleFocus(buyFocus, 'charter buy', mobile);
+  // The game owns global Enter bindings, so activate the native button's real
+  // click listener directly. Focus semantics are asserted on both resulting
+  // surfaces below, independent of that game-level key routing.
+  await page.evaluate(() => {
+    const buy = document.querySelector('.charter-buy:not(:disabled)');
+    if (!(buy instanceof HTMLElement)) throw new Error('charter buy missing');
+    buy.click();
+  });
+  await page.waitForSelector('#prompt-stack .woc-store-prompt', { visible: true });
+  const confirmFocus = await focusForEvidence(page, '[data-store-prompt-confirm]');
+  assertVisibleFocus(confirmFocus, 'Store decision confirm', mobile);
+
+  const decision = await page.evaluate(() => {
+    const root = document.getElementById('daily-rewards-window');
+    const prompt = document.querySelector('#prompt-stack .woc-store-prompt');
+    const confirm = prompt?.querySelector('[data-store-prompt-confirm]');
+    const bodyId = prompt?.getAttribute('aria-describedby');
+    const body = bodyId ? document.getElementById(bodyId) : null;
+    if (!(root instanceof HTMLElement) || !(prompt instanceof HTMLElement)) {
+      return { err: 'decision-missing' };
+    }
+    if (!(confirm instanceof HTMLElement) || !(body instanceof HTMLElement)) {
+      return { err: 'decision-wiring-missing' };
+    }
+    const rect = confirm.getBoundingClientRect();
+    return {
+      err: null,
+      rootInert: root.inert,
+      role: prompt.getAttribute('role'),
+      modal: prompt.getAttribute('aria-modal'),
+      labelledBy: prompt.getAttribute('aria-labelledby'),
+      body: body.textContent?.trim() ?? '',
+      active: document.activeElement === confirm,
+      focusVisible: confirm.matches(':focus-visible'),
+      outlineStyle: getComputedStyle(confirm).outlineStyle,
+      outlineWidth: getComputedStyle(confirm).outlineWidth,
+      width: rect.width,
+      height: rect.height,
+    };
+  });
+  if (decision.err) throw new Error(`Store decision evidence failed: ${decision.err}`);
+  if (
+    !decision.rootInert ||
+    decision.role !== 'dialog' ||
+    decision.modal !== 'true' ||
+    !decision.labelledBy ||
+    !decision.body
+  ) {
+    throw new Error(`Store decision semantics failed: ${JSON.stringify(decision)}`);
+  }
+  assertVisibleFocus(decision, 'Store decision confirm', mobile);
+  await page.screenshot({ path: `${OUT}/after-store-confirm-${key}.png` });
+
+  // Confirm through the focused native control. The spend stub now holds one
+  // real bridge-shaped refusal until the Store surface has gone stale.
+  await page.evaluate(() => {
+    const confirm = document.querySelector('[data-store-prompt-confirm]');
+    if (!(confirm instanceof HTMLElement)) throw new Error('Store confirm missing');
+    confirm.click();
+  });
+  await page.waitForFunction(
+    () => typeof window.__charterShotSpendControl?.resolve === 'function',
+    { timeout: 10000 },
+  );
+  // Let installPromptDialog's deferred opener restore finish, then leave the
+  // Store surface through its real tab control before the service result lands.
+  await new Promise((r) => setTimeout(r, 50));
+  await page.evaluate(() => {
+    const rewards = document.getElementById('woc-store-tab-rewards');
+    if (!(rewards instanceof HTMLElement)) throw new Error('Rewards tab missing');
+    rewards.click();
+    const resolveSpend = window.__charterShotSpendControl?.resolve;
+    if (typeof resolveSpend !== 'function') throw new Error('deferred spend resolver missing');
+    resolveSpend();
+  });
+  await page.waitForFunction(
+    () => {
+      const result = document.querySelector('.woc-store-global-result');
+      return !!result?.querySelector('[data-store-result-text]')?.textContent?.trim();
+    },
+    { timeout: 10000 },
+  );
+  const resultFocus = await focusForEvidence(page, '.woc-store-global-result button');
+  assertVisibleFocus(resultFocus, 'Store result close', mobile);
+  const result = await page.evaluate(() => {
+    const root = document.getElementById('daily-rewards-window');
+    const notice = document.querySelector('.woc-store-global-result');
+    const text = notice?.querySelector('[data-store-result-text]')?.textContent?.trim() ?? '';
+    return {
+      rootInert: root instanceof HTMLElement && root.inert,
+      role: notice?.getAttribute('role'),
+      live: notice?.getAttribute('aria-live'),
+      atomic: notice?.getAttribute('aria-atomic'),
+      text,
+    };
+  });
+  if (result.rootInert || result.role !== 'status' || result.live !== 'polite' || !result.text) {
+    throw new Error(`Store result semantics failed: ${JSON.stringify(result)}`);
+  }
+  await page.screenshot({ path: `${OUT}/after-store-result-${key}.png` });
+  console.log(`after-store-confirm-${key}.png / after-store-result-${key}.png: focus visible`);
+}
+
 async function runStage({
   mobile,
   rungs,
@@ -436,6 +606,7 @@ async function runStage({
   walkAway = false,
   theme,
   file,
+  promptKey,
 }) {
   const browser = await launchBrowser(mobile);
   try {
@@ -477,7 +648,7 @@ async function runStage({
     // Pass two: re-attach with those skins priced and reopen, so the frame shows
     // a healthy store rather than a stub-induced wall of "Unavailable".
     const skinIds = await paintedSkinIds(page);
-    await attachStubHooks(page, CHARTER_PRICES, skinIds);
+    await attachStubHooks(page, CHARTER_PRICES, skinIds, Boolean(promptKey));
     await openStore(page);
     await openStore(page);
     await page.waitForFunction(
@@ -494,9 +665,10 @@ async function runStage({
     await dismissTutorialDialog(page);
     const geometry = await stageAndAssertPaintedGeometry(page, mobile);
     await new Promise((r) => setTimeout(r, 400));
-    await shoot(page, `${OUT}/${file}`, mobile);
+    if (promptKey) await capturePromptEvidence(page, promptKey, mobile);
+    else await shoot(page, `${OUT}/${file}`, mobile);
     console.log(
-      `${file}: purchasedSlots=${purchased} cards=${cards} title=${geometry.title} tabs=${geometry.tabs.join('/')}${walkAway ? ' (away from every bursar)' : ''}`,
+      `${file ?? promptKey}: purchasedSlots=${purchased} cards=${cards} title=${geometry.title} tabs=${geometry.tabs.join('/')}${walkAway ? ' (away from every bursar)' : ''}`,
     );
   } finally {
     await browser.close();
@@ -556,9 +728,28 @@ const STAGES = [
     expectedCards: 2,
     file: 'after-mobile-fit-gated-away-from-bursar.png',
   },
+  // Store-owned modal and stale-result evidence. Mobile is the standing
+  // 844x390 landscape box; the forced-colors arm also seeds the high-contrast
+  // theme so both the browser palette and the authored theme are visible.
+  { mobile: false, rungs: 0, expectedCards: 4, promptKey: 'desktop' },
+  { mobile: true, rungs: 0, expectedCards: 4, promptKey: 'mobile-landscape' },
+  {
+    mobile: false,
+    rungs: 0,
+    expectedCards: 4,
+    theme: 'highContrast',
+    promptKey: 'forced-colors',
+  },
 ];
 
-for (const stage of STAGES) {
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Screenshot-only CLI input is not a Turbo task dependency.
+const requestedSet = process.env.CHARTER_SHOT_SET ?? 'all';
+const selectedStages =
+  requestedSet === 'prompts' ? STAGES.filter((stage) => stage.promptKey) : STAGES;
+if (requestedSet !== 'all' && requestedSet !== 'prompts') {
+  throw new Error(`unknown CHARTER_SHOT_SET ${requestedSet}`);
+}
+for (const stage of selectedStages) {
   await runStage(stage);
 }
 console.log('done');

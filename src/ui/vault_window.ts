@@ -291,17 +291,22 @@ export class VaultTab {
       'aria-describedby',
       glyphKind ? `${rowStateId} ${instanceStateId}` : rowStateId,
     );
-    const instanceState = glyphKind
-      ? t(
-          model.known
-            ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
-            : UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind],
-          {
-            ...(model.known ? { item: name } : { id: itemId }),
-            count: countLabel,
-          },
-        )
-      : '';
+    // Match the personal and guild bank accessibility priority: the player
+    // lock is the actionable owner fact, so it outranks the still-visible
+    // per-copy glyph in the announcement. The lock seal itself is aria-hidden.
+    const instanceState = locked
+      ? t('hudChrome.bags.itemAriaLocked', { item: name, count: countLabel })
+      : glyphKind
+        ? t(
+            model.known
+              ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+              : UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind],
+            {
+              ...(model.known ? { item: name } : { id: itemId }),
+              count: countLabel,
+            },
+          )
+        : '';
     row.innerHTML =
       `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(itemId)}` +
       cornerMarkHtml(cornerMark) +

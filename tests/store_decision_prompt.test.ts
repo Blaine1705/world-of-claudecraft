@@ -69,6 +69,31 @@ describe('StoreDecisionPrompts', () => {
     expect(document.activeElement).toBe(opener);
   });
 
+  it('returns focus and clears the inert background when the visible Cancel action is used', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const opener = document.getElementById('buy') as HTMLButtonElement;
+    const cancelled = vi.fn();
+    const prompts = new StoreDecisionPrompts(() => root);
+    opener.focus();
+    prompts.open({
+      title: 'Confirm purchase',
+      body: 'Buy the charter?',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      onConfirm: vi.fn(),
+      onCancel: cancelled,
+    });
+
+    expect(root.inert).toBe(true);
+    document.querySelector<HTMLButtonElement>('[data-store-prompt-cancel]')?.click();
+
+    expect(cancelled).toHaveBeenCalledOnce();
+    expect(document.getElementById('confirm-dialog')).toBeNull();
+    expect(root.inert).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
   it('restores an inspector to its pre-existing inert state', () => {
     const root = document.getElementById('store') as HTMLElement;
     const inspector = document.createElement('div');
