@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
+import {
+  BG_GRAVEYARDS,
+  battlegroundColliders,
+  bgFieldPlanWalls,
+} from '../src/sim/battleground_layout';
 import { resolvePosition } from '../src/sim/colliders';
 import {
   BUILTIN_WORLD,
@@ -161,6 +165,53 @@ function forceBattlegroundWallTrap(
   sim.ctx.rebucket(p);
   const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
   expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBeGreaterThan(0.01);
+  return p;
+}
+
+function forceBattlegroundWallContact(
+  sim: Sim,
+  match: NonNullable<ReturnType<Sim['bgMatchFor']>>,
+  pid: number,
+): Sim['player'] {
+  const origin = battlegroundOrigin(match.slot);
+  const p = required(sim.entities.get(pid), 'trapped battleground player');
+  let contact: { x: number; z: number; normalX: number; normalZ: number } | null = null;
+  for (const wall of battlegroundColliders()) {
+    if (wall.type !== 'obb' || wall.moveTopY !== undefined || wall.hw < 1 || wall.hd < 1) continue;
+    const axes = [
+      { x: Math.cos(wall.rot), z: -Math.sin(wall.rot), d: wall.hw },
+      { x: -Math.cos(wall.rot), z: Math.sin(wall.rot), d: wall.hw },
+      { x: Math.sin(wall.rot), z: Math.cos(wall.rot), d: wall.hd },
+      { x: -Math.sin(wall.rot), z: -Math.cos(wall.rot), d: wall.hd },
+    ];
+    for (const axis of axes) {
+      const x = origin.x + wall.x + axis.x * (axis.d + PLAYER_BODY_RADIUS + 0.05);
+      const z = origin.z + wall.z + axis.z * (axis.d + PLAYER_BODY_RADIUS + 0.05);
+      const resolved = resolvePosition(sim.cfg.seed, x, z, PLAYER_BODY_RADIUS);
+      if (Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6) {
+        contact = { x, z, normalX: axis.x, normalZ: axis.z };
+        break;
+      }
+    }
+    if (contact) break;
+  }
+  contact = required(contact, 'clear battleground wall-contact point');
+  p.pos = sim.groundPos(contact.x, contact.z);
+  p.prevPos = { ...p.pos };
+  p.facing = Math.atan2(-contact.normalX, -contact.normalZ);
+  p.prevFacing = p.facing;
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = true;
+  p.jumping = false;
+  p.inCombat = false;
+  p.combatTimer = 999;
+  const meta = required(sim.meta(pid), 'battleground player metadata');
+  meta.moveInput.forward = true;
+  sim.ctx.rebucket(p);
+  const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBe(0);
   return p;
 }
 
@@ -803,6 +854,35 @@ describe('unstuck area identity', () => {
     expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
       1e-6,
     );
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('accepts a battleground wall-contact ESC attempt while movement input is still held', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+
+    const start = required(
+      unstuckLocationAt(sim.ctx, pid, player.pos),
+      'battleground unstuck wall-contact start location',
+    );
+    expect(start.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+    expect(completed?.area).toMatchObject(start.area);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+
     const plot = BG_GRAVEYARDS[0];
     expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
