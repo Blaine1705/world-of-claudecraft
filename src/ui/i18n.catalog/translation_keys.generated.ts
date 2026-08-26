@@ -9418,6 +9418,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.showReliquaryTracker'
   | 'hudChrome.options.showSecondaryActionBar'
   | 'hudChrome.options.showTargetOfTarget'
+  | 'hudChrome.options.showTargetSwingTimer'
   | 'hudChrome.options.showThirdActionBar'
   | 'hudChrome.options.showWalletOnCharacterScreen'
   | 'hudChrome.options.showWalletOnPlayerCard'

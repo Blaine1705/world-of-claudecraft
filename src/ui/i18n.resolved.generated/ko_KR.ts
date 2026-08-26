@@ -1544,6 +1544,7 @@ export const ko_KR: EnTranslations = {
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "내 펫 표시",
       "waterRipples": "수면 물결 (물살)",
       "showAttackButton": "공격 버튼 표시",

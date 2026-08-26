@@ -1874,6 +1874,10 @@ export const hudChromeStrings = {
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
+    // Interface panel toggle (off by default) for the current target's (and
+    // target-of-target's) own melee/ranged swing timer, under the target
+    // frame. Independent of showTargetOfTarget (the portrait mini-frame).
+    showTargetSwingTimer: 'Show Target Swing Timer',
     // Interface panel toggle for the pet health strip under the player frame (on by
     // default; it only appears while you actually have a pet). Phrased from the
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY

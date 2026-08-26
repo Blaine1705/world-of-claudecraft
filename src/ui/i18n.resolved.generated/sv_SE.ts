@@ -1544,6 +1544,7 @@ export const sv_SE: EnTranslations = {
       "hideUnusedActionSlots": "Dölj oanvända åtgärdsrutor",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Visa ditt djur",
       "waterRipples": "Vattenkrusningar (kölvatten)",
       "showAttackButton": "Visa attackknapp",

@@ -1544,6 +1544,7 @@ export const cs_CZ: EnTranslations = {
       "hideUnusedActionSlots": "Skrýt nepoužitá políčka akcí",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Zobrazit tvého mazlíčka",
       "waterRipples": "Vlnky na vodě (brázdy)",
       "showAttackButton": "Zobrazit tlačítko útoku",

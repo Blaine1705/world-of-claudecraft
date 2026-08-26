@@ -1544,6 +1544,7 @@ export const tr_TR: EnTranslations = {
       "hideUnusedActionSlots": "Kullanılmayan Eylem Alanlarını Gizle",
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Yoldaşını Göster",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",

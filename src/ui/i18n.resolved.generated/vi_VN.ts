@@ -1544,6 +1544,7 @@ export const vi_VN: EnTranslations = {
       "hideUnusedActionSlots": "Ẩn Ô Hành Động Chưa Sử Dụng",
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Hiện Thú Cưng Của Bạn",
       "waterRipples": "Gợn nước (sóng rẽ nước)",
       "showAttackButton": "Hiển Thị Nút Tấn Công",

@@ -1544,6 +1544,7 @@ export const pl_PL: EnTranslations = {
       "hideUnusedActionSlots": "Ukryj nieużywane pola akcji",
       "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Pokaż swoje zwierzę",
       "waterRipples": "Zmarszczki na wodzie (kilwater)",
       "showAttackButton": "Pokaż Przycisk Ataku",

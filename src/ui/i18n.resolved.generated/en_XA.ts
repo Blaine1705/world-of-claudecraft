@@ -1544,6 +1544,7 @@ export const en_XA: EnTranslations = {
       "hideUnusedActionSlots": "[Ĥíðé Úñúšéð Áçţíóñ Šļóţš]",
       "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
+      "showTargetSwingTimer": "[Šĥóŵ Ţáŕĝéţ Šŵíñĝ Ţíɱéŕ]",
       "showPetFrame": "[Šĥóŵ Ýóúŕ Þéţ]",
       "waterRipples": "[Ŵáţéŕ Ŕíþþļéš (Ŵáķéš)]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",

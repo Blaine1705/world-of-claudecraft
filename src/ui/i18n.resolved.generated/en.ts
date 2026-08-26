@@ -1544,6 +1544,7 @@ export const en: EnTranslations = {
       "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Show Your Pet",
       "waterRipples": "Water Ripples (Wakes)",
       "showAttackButton": "Show Attack Button",

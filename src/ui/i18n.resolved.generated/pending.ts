@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "es_ES": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "fr_FR": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "fr_CA": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "de_DE": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "zh_CN": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "zh_TW": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "ko_KR": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "ja_JP": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "pt_BR": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "ru_RU": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "cs_CZ": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "nl_NL": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "pl_PL": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "id_ID": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "tr_TR": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "sv_SE": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "vi_VN": [
+    "hudChrome.options.showTargetSwingTimer"
+  ],
+  "da_DK": [
+    "hudChrome.options.showTargetSwingTimer"
+  ]
 };

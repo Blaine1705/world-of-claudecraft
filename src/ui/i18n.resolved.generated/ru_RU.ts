@@ -1544,6 +1544,7 @@ export const ru_RU: EnTranslations = {
       "hideUnusedActionSlots": "Скрыть неиспользуемые ячейки действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Показывать вашего питомца",
       "waterRipples": "Рябь на воде (кильватер)",
       "showAttackButton": "Показывать кнопку атаки",
