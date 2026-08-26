@@ -271,21 +271,23 @@
   body.mobile-touch.mobile-chat-open #mobile-move-zone {
     display: none;
   }
-  /* Pairing a controller to a phone: the movement/camera joysticks and the
-     combat action ring are exactly what the pad replaces (movement, camera
-     look, abilities via its own bindings and the cross hotbar), so they stand
-     down entirely rather than sitting on screen unused, the same way the
-     cross-hotbar overlay stands down for touch (further below, body.mobile-
-     touch .xhb). Menu-access chrome (Chat/Social/the Quick Actions seat) is
-     NOT part of this: only the direct gameplay-input surfaces yield. Keyed off
-     PAD CONNECTION (mobile_pad_chrome.ts, applied on GamepadManager's
-     onConnectionChange and after any gamepadEnabled setting change), not the
-     cross-hotbar overlay's own setting: a player who turns that overlay off
-     still drives movement/camera/attack through the pad's base bindings. */
-  body.mobile-touch.pad-connected #mobile-move-zone,
-  body.mobile-touch.pad-connected #mobile-move-joystick,
-  body.mobile-touch.pad-connected #mobile-camera-joystick,
-  body.mobile-touch.pad-connected #mobile-action-ring {
+  /* Pairing a controller to a phone: the cross hotbar becomes the ONLY
+     hotbar and stands ALONE (further below, body.mobile-touch:not(.xhb-mode)
+     .xhb), so the movement/camera joysticks and the combat action ring --
+     exactly what the pad replaces (movement, camera look, abilities via its
+     own bindings and the cross hotbar, which is also seeded with the class's
+     stance) -- stand down entirely rather than sitting on screen unused.
+     Menu-access chrome (Chat/Social/the Quick Actions seat) is NOT part of
+     this: only the direct gameplay-input surfaces yield. Keyed off XHB MODE
+     (.xhb-mode, cross_hotbar_wiring.ts's syncPadMode: enabled AND connected),
+     not raw pad connection, so a player who turns the cross-hotbar overlay
+     off keeps this touch chrome instead of losing both: they still drive
+     movement/camera/attack through the pad's base bindings, but with no
+     overlay to replace the ring they need it on screen. */
+  body.mobile-touch.xhb-mode #mobile-move-zone,
+  body.mobile-touch.xhb-mode #mobile-move-joystick,
+  body.mobile-touch.xhb-mode #mobile-camera-joystick,
+  body.mobile-touch.xhb-mode #mobile-action-ring {
     display: none;
   }
   body.mobile-touch #mobile-move-joystick {
@@ -2442,9 +2444,41 @@
      of #mobile-extra-grid) instead, so the whole #side-buttons rail (every
      .micro-btn on it is already hidden below) and the standalone chest button
      are hidden on mobile; the desktop rail and #daily-rewards-window are
-     untouched. */
-  body.mobile-touch #side-buttons {
+     untouched.
+     UNLESS a pad is actively driving the XHB (.xhb-mode): its right-stick
+     mouse mode (src/game/gamepad.ts) is the same pointer-plus-click scheme
+     desktop uses to reach this rail, and Quick Actions' tap/hold/swipe touch
+     gestures are not reachable one-handed off the pad. The rail stands back up
+     for the pad's cursor exactly as it does on desktop; the Quick Actions seat
+     stays available too, so the touch path and the pad path coexist. The
+     standalone chest button stays hidden either way (below): its mobile
+     equivalent already lives in the More tray, so it never needs the desktop
+     rail's copy back. */
+  body.mobile-touch:not(.xhb-mode) #side-buttons {
     display: none;
+  }
+  /* The desktop rail is bottom-anchored and grows upward; on a landscape phone
+     that runs it straight into the minimap cluster claiming the top-right
+     corner (confirmed live: the two overlapped by ~65px at the standard
+     844x390 landscape viewport). Re-anchored from the top instead, below the
+     minimap, using the same 140px clearance #buff-bar/#debuff-bar already use
+     for this exact problem, rather than a second XHB-mode-only compaction
+     tier: the short-viewport rescue above (@media max-height: 600px) already
+     shrinks the rail enough that it fits in the remaining height either way. */
+  body.mobile-touch.xhb-mode #side-buttons {
+    top: max(140px, env(safe-area-inset-top));
+    bottom: auto;
+  }
+  /* The desktop short-viewport rescue (24px buttons, 1px column gap) is not
+     quite enough headroom here: the tallest column plus the 140px top
+     clearance above leaves under 10px before env(safe-area-inset-bottom) on a
+     notched phone, too tight a margin for a home-indicator gesture area.
+     Trimmed a little further for this mode alone. */
+  body.mobile-touch.xhb-mode #side-buttons .micro-btn {
+    height: 20px;
+  }
+  body.mobile-touch.xhb-mode .side-buttons-col {
+    gap: 0;
   }
   body.mobile-touch #daily-rewards-button {
     display: none !important;
@@ -2545,25 +2579,23 @@
   body.mobile-touch #actionbar {
     display: none;
   }
-  /* Pairing a pad to a phone changes the INPUT, not the layout. The action ring
-     above already owns this band, so the cross hotbar stands down here rather
-     than drawing its bar across the ring and shoving the touch seats around. */
-  body.mobile-touch .xhb {
+  /* The action ring above owns the touch action-bar band, so the cross
+     hotbar overlay stands down here to avoid drawing its bar across the ring
+     and shoving the touch seats around -- UNLESS a pad is actively driving it
+     (.xhb-mode): then the ring already stood itself down (above), the XHB is
+     the only hotbar left, and it takes over the band the ring vacated instead
+     of leaving the player with no hotbar at all. */
+  body.mobile-touch:not(.xhb-mode) .xhb {
     display: none;
   }
-  /* !important because cross_hotbar_wiring writes the measured lift inline on
-     body, which a stylesheet declaration alone cannot outrank. */
-  body.mobile-touch {
+  /* Zeroed only when the bar is not shown: with it visible (.xhb-mode) the
+     lift is what moves #player-frame and #castbar clear of it (hud.css's
+     body.xhb-mode #player-frame), so zeroing it there would sit the player
+     frame on top of the bar. !important because cross_hotbar_wiring writes
+     the measured lift inline on body, which a stylesheet declaration alone
+     cannot outrank. */
+  body.mobile-touch:not(.xhb-mode) {
     --xhb-lift: 0px !important;
-  }
-  /* Pad mode stands the desktop stance ROW down because the cross hotbar is
-     seeded with the stances, and on touch the cross hotbar itself stands down
-     (above), which would leave a warrior no way to switch stance at all. The
-     touch shape is no longer that row, so the exemption moves with it: the ring's
-     stance control is not #stancebar and pad mode never hides it. Kept as a rule
-     rather than deleted so the reasoning survives next to what it guards. */
-  body.mobile-touch.xhb-mode #mobile-stance-anchor {
-    visibility: visible;
   }
   /* The community-links rail (Discord/GitHub/Donate) is hidden in-game on
      touch: its two-person toggle icon under the minimap read as a Friends

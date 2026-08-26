@@ -87,7 +87,7 @@ function unlayeredTopLevelOpeners(css: string, expectedLayerName: string): strin
 // .appearance-customizer block), which are a real instance of the same
 // defect class but unrelated to the mobile-controller cross-hotbar overlap
 // this suite guards, so they are out of scope for this change and tracked
-// separately rather than fixed here.
+// separately (issue #3667) rather than fixed here.
 const LAYERED_MODULES: { file: string; layer: string }[] = [
   { file: 'src/styles/tokens.css', layer: 'tokens' },
   { file: 'src/styles/base.css', layer: 'base' },

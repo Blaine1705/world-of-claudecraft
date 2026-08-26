@@ -145,7 +145,6 @@ import {
 } from './game/mobile_controls';
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
-import { applyPadConnectedClass } from './game/mobile_pad_chrome';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
@@ -2382,7 +2381,6 @@ async function startGame(
   }
   const syncPadChrome = () => {
     crossHotbar.syncPadMode(gamepad);
-    applyPadConnectedClass(gamepad.isConnected());
   };
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
