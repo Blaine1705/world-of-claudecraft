@@ -172,9 +172,6 @@ describe('retention sweep wiring in server/main.ts', () => {
     );
     expect(MAIN).toContain('pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)');
     expect(MAIN).toContain(
-      'pruneRefusedStoragePurchasesBatch(pool, config.storagePurchaseRetentionDays, n)',
-    );
-    expect(MAIN).toContain(
       'prunePasswordResetRequestsBatch(config.passwordResetRequestRetentionDays, n)',
     );
     expect(MAIN).toContain(
@@ -232,10 +229,6 @@ describe('retention sweep wiring in server/main.ts', () => {
       'admin_site_presence_samples',
       'site_presence_sessions',
       'play_sessions',
-      // The branch's Claudium pending-purchase table, seated between the
-      // play-session feeder and its ager at the v0.40.0 sync: both arms of that
-      // merge grew this array, and only the union is the real order.
-      'storage_purchases',
       'account_ip_associations',
       'unstuck_reports',
       'password_reset_requests',
@@ -312,19 +305,13 @@ describe('retention sweep wiring in server/main.ts', () => {
     }
   });
 
-  it('the deliberate bank_ledger no-sweep asymmetry is pinned, not just commented', () => {
-    // Bank Storage phase 11 added storage_purchases to the sweep while
-    // bank_ledger stays FOREVER, and that asymmetry is the packet's most
-    // load-bearing retention decision: bank_ledger is the anti-dupe trail every
-    // conservation replay reads end to end. It lived only in a comment, so a
-    // future "sweep the big table too" edit would have gone in green.
+  it('neither storage receipts nor bank_ledger are placed on the retention sweep', () => {
+    // Refusals now delete synchronously, while successful receipts and the
+    // audit ledger are durable exactly-once evidence. Neither has a sweep arm.
     const listStart = MAIN.indexOf('saveLastSweepDay:');
     expect(listStart).toBeGreaterThan(-1);
-    // The sweep's own table list: storage_purchases IS swept via its batch
-    // prune, and no bank_ledger prune exists anywhere in the file.
-    expect(MAIN).toContain(
-      'pruneRefusedStoragePurchasesBatch(pool, config.storagePurchaseRetentionDays, n)',
-    );
+    expect(MAIN).not.toContain('pruneRefusedStoragePurchasesBatch');
+    expect(MAIN).not.toContain('storagePurchaseRetentionDays');
     expect(MAIN).not.toContain('pruneBankLedger');
     expect(MAIN).not.toContain('DELETE FROM bank_ledger');
     // And the reason survives next to the list, so the asymmetry reads as a
@@ -384,13 +371,13 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(bodyOf('resolveLiveCharacter: (accountId) => {')).toContain(
       's.left || s.escrowQuarantined',
     );
-    expect(bodyOf('saveCharacter: (characterId) => {')).toContain(
+    expect(bodyOf('saveCharacter: (characterId, shouldStart) => {')).toContain(
       '!s.left && !s.escrowQuarantined',
     );
 
     // Exactly one of each, so a second host wiring cannot ship unguarded.
     expect(count(MAIN, 'resolveLiveCharacter: (accountId) => {')).toBe(1);
-    expect(count(MAIN, 'saveCharacter: (characterId) => {')).toBe(1);
+    expect(count(MAIN, 'saveCharacter: (characterId, shouldStart) => {')).toBe(1);
   });
 
   it('the storage purchase host stages the atomic save effect on the live game', () => {
@@ -403,5 +390,15 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(body).toContain(
       'stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect)',
     );
+  });
+
+  it('stops admitting storage recovery before the database pool closes', () => {
+    const shutdown = MAIN.indexOf('const shutdown = async () => {');
+    const stopRecovery = MAIN.indexOf('await stopStoragePurchaseRecovery();', shutdown);
+    const closePool = MAIN.indexOf('await pool.end();', shutdown);
+    expect(shutdown).toBeGreaterThan(-1);
+    expect(stopRecovery).toBeGreaterThan(shutdown);
+    expect(stopRecovery).toBeLessThan(closePool);
+    expect(count(MAIN, 'await stopStoragePurchaseRecovery();')).toBe(1);
   });
 });

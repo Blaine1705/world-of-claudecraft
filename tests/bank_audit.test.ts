@@ -2687,7 +2687,7 @@ describe('the storage purchase operator arm', () => {
   it('reads UNRESOLVED storage rows before PENDING ones, so truncation cannot hide a debit', () => {
     const src = readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8');
     const clause =
-      "WHERE status <> 'applied' AND status <> 'refused'\n          ORDER BY (status = 'unresolved') DESC, id\n          LIMIT $1";
+      "WHERE status <> 'applied'\n          ORDER BY (status = 'unresolved') DESC, id\n          LIMIT $1";
     expect(src.split(clause).length - 1).toBe(1);
     // The plain id ordering it replaced is gone, so a revert fails here rather
     // than silently changing which rows an operator gets to see.
@@ -2728,22 +2728,21 @@ describe('the storage purchase operator arm', () => {
     expect(auditStoragePurchases({ rows: [P({ created_at: agoIso(6) })], nowMs: NOW })).toEqual([]);
   });
 
-  it('never reports the terminal happy paths, and always reports an unknown status', () => {
+  it('never reports the terminal happy path, and always reports an unknown status', () => {
     expect(
       auditStoragePurchases({
-        rows: [
-          P({ status: 'applied', resolved_at: agoIso(900) }),
-          P({ status: 'refused', resolved_at: agoIso(900) }),
-        ],
+        rows: [P({ status: 'applied', resolved_at: agoIso(900) })],
         nowMs: NOW,
       }),
     ).toEqual([]);
-    // The column is free text with no CHECK, so a value outside the vocabulary
-    // is corruption or an unknown writer, and either is worth a person's time.
-    const odd = auditStoragePurchases({ rows: [P({ status: 'settled' })], nowMs: NOW });
-    expect(odd).toHaveLength(1);
-    expect(odd[0].kind).toBe('storage_purchase_bad_status');
-    expect(odd[0].detail).toContain('"settled"');
+    // The database CHECK rejects these values now. The audit still reports one
+    // if a stale schema, disabled constraint, or corrupt restore exposes it.
+    for (const status of ['refused', 'settled']) {
+      const odd = auditStoragePurchases({ rows: [P({ status })], nowMs: NOW });
+      expect(odd).toHaveLength(1);
+      expect(odd[0].kind).toBe('storage_purchase_bad_status');
+      expect(odd[0].detail).toContain(JSON.stringify(status));
+    }
   });
 
   it('reads a Date as readily as a string, and never invents an age it cannot read', () => {
@@ -2828,7 +2827,8 @@ describe('the storage purchase operator arm', () => {
       readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
     );
     expect(src).toContain("SELECT to_regclass('storage_purchases') IS NOT NULL AS present");
-    expect(src).toContain("WHERE status <> 'applied' AND status <> 'refused'");
+    expect(src).toContain("WHERE status <> 'applied'");
+    expect(src).not.toContain("status <> 'refused'");
     // The exit code has to count BOTH sets, or an unresolved purchase would
     // print and still exit 0 on an otherwise clean ledger.
     expect(src).toContain('findings.length + storageFindings.length > 0 ? 1 : 0');

@@ -14,9 +14,22 @@ const base = {
   itemId: 'strongbox_rung_01',
   expectedCostClaudium: 100,
   idempotencyKey: 'purchase-a',
+  spendClaimToken: '00000000-0000-4000-8000-000000000001',
 };
 
 describe('storage applied effect queue', () => {
+  it('refuses to stage work without a valid opaque spend claim', () => {
+    const queue: StorageAppliedEffect[] = [];
+    expect(() =>
+      stageStorageAppliedEffect(
+        queue,
+        { ...base, spendClaimToken: '', purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 },
+        6,
+      ),
+    ).toThrow(/invalid spend claim/);
+    expect(queue).toEqual([]);
+  });
+
   it('deduplicates an exact stage and rejects a conflicting reuse', () => {
     const queue: StorageAppliedEffect[] = [];
     const exact = { ...base, purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 };
@@ -34,6 +47,19 @@ describe('storage applied effect queue', () => {
     // exact staged record wins instead of being reconstructed from 12.
     expect(stageStorageAppliedEffect(queue, base, 12)).toEqual(exact);
     expect(queue).toEqual([exact]);
+  });
+
+  it('replaces only the opaque claim when recovery takes over the exact staged grant', () => {
+    const queue: StorageAppliedEffect[] = [];
+    const first = { ...base, purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 };
+    stageStorageAppliedEffect(queue, first, 6);
+    const replacement = {
+      ...first,
+      spendClaimToken: '00000000-0000-4000-8000-000000000002',
+    };
+    stageStorageAppliedEffect(queue, replacement, 6);
+    expect(queue).toEqual([replacement]);
+    expect(storageAppliedEffectsMatchPrefix(queue, [first])).toBe(false);
   });
 
   it('rejects malformed or SKU-inconsistent progression before it reaches SQL', () => {
@@ -58,7 +84,7 @@ describe('storage applied effect queue', () => {
     expect(queue).toEqual([{ ...base, purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 }]);
   });
 
-  it('acknowledges only the committed prefix and retains additions made mid-save', () => {
+  it('caps a character queue at one different pending purchase before save', () => {
     const queue: StorageAppliedEffect[] = [];
     const first = { ...base, purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 };
     const second = {
@@ -70,12 +96,12 @@ describe('storage applied effect queue', () => {
     };
     stageStorageAppliedEffect(queue, first, 6);
     const captured = snapshotStorageAppliedEffects(queue);
-    stageStorageAppliedEffect(queue, second, 12);
+    expect(() => stageStorageAppliedEffect(queue, second, 12)).toThrow(/already has a different/);
 
     expect(storageAppliedEffectsMatchPrefix(queue, captured)).toBe(true);
     acknowledgeStorageAppliedEffects(queue, captured);
 
-    expect(queue).toEqual([second]);
+    expect(queue).toEqual([]);
     expect(captured).toEqual([first]);
     expect(storageAppliedEffectsMatchPrefix(queue, captured)).toBe(false);
   });

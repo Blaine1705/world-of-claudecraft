@@ -81,6 +81,7 @@ const storageEffect = (
   itemId,
   expectedCostClaudium: 100,
   idempotencyKey,
+  spendClaimToken: '00000000-0000-4000-8000-000000000001',
   purchasedSlotsBefore,
   purchasedSlotsAfter,
 });
@@ -1331,6 +1332,44 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(order).toEqual(['save:22', 'job', 'save:21']);
   });
 
+  it('a cancelled queued save never starts or reaches the database', async () => {
+    const rig = makeRig();
+    const targetCharacterId = 31_337;
+    const target = rig.join(31_337, targetCharacterId, 'CancelledSave');
+    // Joining schedules unrelated account-flair/welcome work. Let that drain
+    // and establish a clean write baseline before exercising this save.
+    await settle();
+    dbMock.saveCharacterState.mockClear();
+    dbMock.saveCharacterAndGuildBankState.mockClear();
+    dbMock.saveCharacterAndMarketState.mockClear();
+    let releaseBlocker!: () => void;
+    const blocker = new Promise<void>((resolve) => {
+      releaseBlocker = resolve;
+    });
+    const blockingWrite = rig.server.enqueueCharacterWrite(targetCharacterId, async () => {
+      await blocker;
+    });
+    const shouldStart = vi.fn(() => false);
+
+    const cancelled = rig.server.saveCharacter(target, { shouldStart });
+    releaseBlocker();
+    await blockingWrite;
+
+    await expect(cancelled).resolves.toBe(false);
+    expect(shouldStart).toHaveBeenCalledTimes(1);
+    expect(dbMock.saveCharacterState.mock.calls.some((call) => call[0] === targetCharacterId)).toBe(
+      false,
+    );
+    expect(
+      dbMock.saveCharacterAndGuildBankState.mock.calls.some(
+        (call) => call[0] === targetCharacterId,
+      ),
+    ).toBe(false);
+    expect(
+      dbMock.saveCharacterAndMarketState.mock.calls.some((call) => call[0] === targetCharacterId),
+    ).toBe(false);
+  });
+
   it('saveCharacter still propagates a db throw to its caller through the queue', async () => {
     const rig = makeRig();
     dbMock.saveCharacterState.mockImplementationOnce(async () => {
@@ -1341,7 +1380,7 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
   });
 
-  it('a committed save releases only its captured storage-effect prefix', async () => {
+  it('a save queue never admits a second storage purchase behind its captured effect', async () => {
     const rig = makeRig();
     const meta = requirePlayerMeta(rig);
     const first = storageEffect('storage-a');
@@ -1358,13 +1397,11 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(dbMock.saveCharacterState.mock.calls[0]?.[4]).toEqual([first]);
 
     meta.bank.purchasedSlots = 12;
-    expect(rig.server.stageStorageAppliedEffect(second)).toBe(true);
+    expect(() => rig.server.stageStorageAppliedEffect(second)).toThrow(
+      /different pending purchase/,
+    );
     finish(true);
     await expect(saving).resolves.toBe(true);
-    expect(rig.session.pendingStorageAppliedEffects).toEqual([second]);
-
-    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
-    expect(dbMock.saveCharacterState.mock.calls[1]?.[4]).toEqual([second]);
     expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
   });
 

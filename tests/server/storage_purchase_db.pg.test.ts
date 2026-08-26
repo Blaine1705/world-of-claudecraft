@@ -1,13 +1,8 @@
 // Bank Storage phase 11: the EXECUTED proof for storage_purchase_db.ts
-// against a real PostgreSQL (the novel-SQL rule: a fake pool cannot tell
-// whether SQL parses, whether ON CONFLICT actually converges, or whether a
-// partial index is accepted). Gated on TEST_DATABASE_URL and therefore NOT
-// CI coverage: the game repo's CI has NO postgres job today, so this suite
-// skips green there and the executed proof is developer-local only (run it
-// against the user-space PG16 harness and say so in the change record; the
-// fake-pool twin storage_purchase_db.test.ts carries the always-on text
-// pins). Wiring a postgres job is a maintainer call recorded in the packet
-// ledger.
+// against real PostgreSQL (the novel-SQL rule: a fake pool cannot tell whether
+// SQL parses, locks converge, or a partial unique index is authoritative).
+// The PG16 CI shard provides TEST_DATABASE_URL; local runs without it skip and
+// retain the always-on text pins in storage_purchase_db.test.ts.
 //
 // The FK parents are MINIMAL STAND-INS (id-only accounts/characters): this
 // suite proves the storage_purchases DDL and queries, not the core schema,
@@ -40,14 +35,16 @@ d('storage_purchases against real PostgreSQL', () => {
   let pool: import('pg').Pool;
   let db: {
     beginStoragePurchase: typeof import('../../server/storage_purchase_db').beginStoragePurchase;
+    claimStoragePurchaseSpend: typeof import('../../server/storage_purchase_db').claimStoragePurchaseSpend;
     storagePurchaseByKey: typeof import('../../server/storage_purchase_db').storagePurchaseByKey;
     settleStoragePurchase: typeof import('../../server/storage_purchase_db').settleStoragePurchase;
-    reopenStoragePurchase: typeof import('../../server/storage_purchase_db').reopenStoragePurchase;
+    deletePendingStoragePurchaseWithoutDebit: typeof import('../../server/storage_purchase_db').deletePendingStoragePurchaseWithoutDebit;
     pendingStoragePurchasesForCharacter: typeof import('../../server/storage_purchase_db').pendingStoragePurchasesForCharacter;
-    pruneRefusedStoragePurchasesBatch: typeof import('../../server/storage_purchase_db').pruneRefusedStoragePurchasesBatch;
+    renewStoragePurchaseSpendClaim: typeof import('../../server/storage_purchase_db').renewStoragePurchaseSpendClaim;
     lockStorageAppliedEffectAccountsOnClient: typeof import('../../server/storage_purchase_db').lockStorageAppliedEffectAccountsOnClient;
     writeStorageAppliedEffectsOnClient: typeof import('../../server/storage_purchase_db').writeStorageAppliedEffectsOnClient;
     STORAGE_PURCHASE_SCHEMA: string;
+    STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS: number;
   };
 
   const ROW = {
@@ -57,6 +54,7 @@ d('storage_purchases against real PostgreSQL', () => {
     itemId: 'strongbox_rung_01',
     expectedCostClaudium: 100,
     idempotencyKey: 'pg-key-1',
+    claimToken: '00000000-0000-4000-8000-000000000001',
   };
 
   beforeAll(async () => {
@@ -135,13 +133,23 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(defs.get('storage_purchases_character')).not.toContain('WHERE');
     expect(defs.has('storage_purchases_account')).toBe(true);
     expect(defs.get('storage_purchases_account')).not.toContain('WHERE');
-    expect(defs.has('storage_purchases_refused')).toBe(true);
-    // Executed against the real catalog: the partial predicate is the sweep's
-    // own, so the index cannot carry the statuses retention must never delete.
-    const refusedDef = defs.get('storage_purchases_refused') ?? '';
-    expect(refusedDef).toContain('WHERE');
-    expect(refusedDef).toContain("'refused'");
-    expect(refusedDef).not.toContain("'applied'");
+    expect(defs.has('storage_purchases_character_pending')).toBe(false);
+    const pendingDef = defs.get('storage_purchases_one_pending_per_character') ?? '';
+    expect(pendingDef).toContain('UNIQUE INDEX');
+    expect(pendingDef).toContain('(character_id)');
+    expect(pendingDef).toContain("WHERE (status = 'pending'::text)");
+    const pendingAuthority = await pool.query(
+      `SELECT indexrelid::regclass::text AS name, indisunique
+         FROM pg_index
+        WHERE indexrelid = '${SCHEMA}.storage_purchases_one_pending_per_character'::regclass`,
+    );
+    expect(pendingAuthority.rows).toEqual([
+      expect.objectContaining({
+        name: 'storage_purchases_one_pending_per_character',
+        indisunique: true,
+      }),
+    ]);
+    expect(defs.has('storage_purchases_refused')).toBe(false);
 
     const receipt = await pool.query(
       `SELECT column_name, is_nullable
@@ -183,75 +191,380 @@ d('storage_purchases against real PostgreSQL', () => {
     ]);
   });
 
-  it('the sweep never walks the statuses retention must keep, measured', async () => {
-    // Phase 14 narrowed the sweep predicate to 'refused' and kept applied rows
-    // FOREVER, which puts a permanently growing body of aged applied rows in
-    // the table. `status` is not an index column, so a partial index merely
-    // WIDER than the predicate cannot separate them by index alone. This is the
-    // executed proof that the shipped index does, and it is pinned by PROPERTY
-    // rather than by node type: what matters is that the plan discards NOTHING,
-    // which stays true whether the planner picks an index or a bitmap scan.
-    //
-    // Measured on this shape before the fix: the wide index was not merely
-    // wasteful, the planner declined it outright and fell back to a sequential
-    // scan plus a sort, discarding every aged applied row (50000 rows removed,
-    // 2040 buffer blocks) against 0 removed and 32 blocks now. That is the
-    // shape that eventually exceeds the pool statement timeout and stalls
-    // retention for this table silently.
-    //
-    // The rows below go into the suite's SHARED table, so this case restores it
-    // completely before it returns: later cases pin a sweep count and a planner
-    // shape that 5200 extra rows would otherwise change, which is exactly how
-    // this pin first announced itself.
-    const AGED_KEPT = 5000;
-    const AGED_REFUSED = 200;
+  it('repairs a same-named but non-authoritative pending index', async () => {
+    await pool.query('DROP INDEX storage_purchases_one_pending_per_character');
+    await pool.query(`CREATE UNIQUE INDEX storage_purchases_one_pending_per_character
+      ON storage_purchases (id) WHERE status = 'unresolved'`);
+    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    const repaired = await pool.query(
+      `SELECT i.indisunique, a.attname,
+              pg_get_expr(i.indpred, i.indrelid) AS predicate
+         FROM pg_index i
+         JOIN pg_attribute a
+           ON a.attrelid = i.indrelid AND a.attnum = i.indkey[0]
+        WHERE i.indexrelid = '${SCHEMA}.storage_purchases_one_pending_per_character'::regclass`,
+    );
+    expect(repaired.rows).toEqual([
+      {
+        indisunique: true,
+        attname: 'character_id',
+        predicate: "(status = 'pending'::text)",
+      },
+    ]);
+  });
+
+  it('repairs a same-named weak or unvalidated spend-claim constraint', async () => {
+    await pool.query('ALTER TABLE storage_purchases DROP CONSTRAINT storage_purchases_claim_pair');
+    await pool.query(`ALTER TABLE storage_purchases
+      ADD CONSTRAINT storage_purchases_claim_pair
+      CHECK (spend_claim_token IS NULL OR spend_claim_token IS NOT NULL) NOT VALID`);
+    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    const repaired = await pool.query(
+      `SELECT convalidated, pg_get_constraintdef(oid) AS def
+         FROM pg_constraint
+        WHERE conname = 'storage_purchases_claim_pair'
+          AND conrelid = 'storage_purchases'::regclass`,
+    );
+    expect(repaired.rows).toEqual([
+      expect.objectContaining({
+        convalidated: true,
+        def: expect.stringContaining('spend_claim_expires_at IS NOT NULL'),
+      }),
+    ]);
+    await expect(
+      pool.query(
+        `INSERT INTO storage_purchases
+           (realm, account_id, character_id, item_id, expected_cost_claudium,
+            idempotency_key, spend_claim_expires_at)
+         VALUES ('pgtest', 2, 2, 'strongbox_rung_01', 100,
+                 'pg-invalid-claim-pair', now())`,
+      ),
+    ).rejects.toMatchObject({ code: '23514' });
+  });
+
+  it('does not execute the legacy refused-row DELETE on steady-state schema boot', async () => {
+    const probe = await pool.connect();
+    await probe.query('CREATE TEMP TABLE storage_boot_delete_probe (calls int NOT NULL)');
+    await probe.query('INSERT INTO storage_boot_delete_probe VALUES (0)');
+    await probe.query(`CREATE FUNCTION storage_boot_note_delete() RETURNS trigger
+      LANGUAGE plpgsql AS $probe$
+      BEGIN
+        UPDATE storage_boot_delete_probe SET calls = calls + 1;
+        RETURN NULL;
+      END
+      $probe$`);
+    await probe.query(`CREATE TRIGGER storage_boot_delete_probe_trigger
+      AFTER DELETE ON storage_purchases
+      FOR EACH STATEMENT EXECUTE FUNCTION storage_boot_note_delete()`);
     try {
-      await pool.query(
-        `INSERT INTO storage_purchases
-         (realm, account_id, character_id, item_id, expected_cost_claudium, idempotency_key, status, resolved_at)
-       SELECT 'Claudemoon', 1, 1, 'strongbox_rung_01', 100, 'plan-a'||g, 'applied',
-              now() - interval '400 days' - (g || ' seconds')::interval
-         FROM generate_series(1, $1) g`,
-        [AGED_KEPT],
+      await probe.query(db.STORAGE_PURCHASE_SCHEMA);
+      expect((await probe.query('SELECT calls FROM storage_boot_delete_probe')).rows[0].calls).toBe(
+        0,
       );
-      await pool.query(
-        `INSERT INTO storage_purchases
-         (realm, account_id, character_id, item_id, expected_cost_claudium, idempotency_key, status, resolved_at)
-       SELECT 'Claudemoon', 1, 1, 'strongbox_rung_01', 100, 'plan-r'||g, 'refused',
-              now() - interval '100 days'
-         FROM generate_series(1, $1) g`,
-        [AGED_REFUSED],
-      );
-      await pool.query('ANALYZE storage_purchases');
-      const explained = await pool.query(
-        `EXPLAIN (ANALYZE, FORMAT JSON) SELECT id FROM storage_purchases
-         WHERE status = 'refused' AND resolved_at < now() - ('90' || ' days')::interval
-         ORDER BY resolved_at LIMIT $1`,
-        [AGED_REFUSED],
-      );
-      const nodes: Record<string, unknown>[] = [];
-      const walk = (node: Record<string, unknown>): void => {
-        nodes.push(node);
-        for (const child of (node.Plans as Record<string, unknown>[]) ?? []) walk(child);
-      };
-      walk((explained.rows[0]['QUERY PLAN'] as { Plan: Record<string, unknown> }[])[0].Plan);
-      const discarded = nodes.reduce((sum, n) => sum + Number(n['Rows Removed by Filter'] ?? 0), 0);
-      // THE PROPERTY: the aged rows retention must keep are never visited.
-      expect(discarded).toBe(0);
-      // ... and at this sample size the shipped index is the one serving it.
-      expect(JSON.stringify(explained.rows[0])).toContain('storage_purchases_refused');
-      // The kept rows really were there to be walked, so the pin above is not
-      // vacuous.
-      const kept = await pool.query(
-        "SELECT count(*)::int AS n FROM storage_purchases WHERE status = 'applied'",
-      );
-      expect(kept.rows[0].n).toBeGreaterThanOrEqual(AGED_KEPT);
     } finally {
-      await pool.query("DELETE FROM storage_purchases WHERE idempotency_key LIKE 'plan-%'");
-      await pool.query(
-        "DELETE FROM storage_purchase_applied_receipts WHERE idempotency_key LIKE 'plan-%'",
+      await probe.query(
+        'DROP TRIGGER IF EXISTS storage_boot_delete_probe_trigger ON storage_purchases',
       );
-      await pool.query('ANALYZE storage_purchases');
+      await probe.query('DROP FUNCTION IF EXISTS storage_boot_note_delete()');
+      probe.release();
+    }
+  });
+
+  it('serializes two clients racing different keys onto one pending character authority', async () => {
+    await pool.query("DELETE FROM storage_purchases WHERE character_id = 2 AND status = 'pending'");
+    const attempts = await Promise.all([
+      db.beginStoragePurchase(pool, {
+        ...ROW,
+        accountId: 2,
+        characterId: 2,
+        idempotencyKey: 'pg-character-race-a',
+        claimToken: '00000000-0000-4000-8000-00000000000a',
+      }),
+      db.beginStoragePurchase(pool, {
+        ...ROW,
+        accountId: 2,
+        characterId: 2,
+        idempotencyKey: 'pg-character-race-b',
+        claimToken: '00000000-0000-4000-8000-00000000000b',
+      }),
+    ]);
+    expect(attempts.filter((attempt) => attempt.inserted)).toHaveLength(1);
+    const loser = attempts.find((attempt) => !attempt.inserted);
+    expect(loser?.existing).toBeNull();
+    expect(loser?.blockedByPending?.idempotencyKey).toMatch(/^pg-character-race-[ab]$/);
+    const rows = await pool.query(
+      "SELECT idempotency_key FROM storage_purchases WHERE character_id = 2 AND status = 'pending'",
+    );
+    expect(rows.rows).toHaveLength(1);
+    expect(rows.rows[0].idempotency_key).toBe(
+      attempts.find((attempt) => attempt.inserted)?.existing?.idempotencyKey,
+    );
+    await pool.query("DELETE FROM storage_purchases WHERE character_id = 2 AND status = 'pending'");
+  });
+
+  it('gives only one of two same-key begin clients the initial spend claim', async () => {
+    await pool.query("DELETE FROM storage_purchases WHERE character_id = 2 AND status = 'pending'");
+    const key = 'pg-same-key-race';
+    const attempts = await Promise.all([
+      db.beginStoragePurchase(pool, {
+        ...ROW,
+        accountId: 2,
+        characterId: 2,
+        idempotencyKey: key,
+        claimToken: '00000000-0000-4000-8000-00000000001a',
+      }),
+      db.beginStoragePurchase(pool, {
+        ...ROW,
+        accountId: 2,
+        characterId: 2,
+        idempotencyKey: key,
+        claimToken: '00000000-0000-4000-8000-00000000001b',
+      }),
+    ]);
+    expect(attempts.filter((attempt) => attempt.inserted)).toHaveLength(1);
+    expect(attempts.filter((attempt) => !attempt.inserted)).toEqual([
+      expect.objectContaining({
+        existing: expect.objectContaining({ idempotencyKey: key, status: 'pending' }),
+      }),
+    ]);
+    const stored = await pool.query(
+      'SELECT spend_claim_token FROM storage_purchases WHERE idempotency_key = $1',
+      [key],
+    );
+    expect([
+      '00000000-0000-4000-8000-00000000001a',
+      '00000000-0000-4000-8000-00000000001b',
+    ]).toContain(stored.rows[0].spend_claim_token);
+    await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
+  });
+
+  it('bounds a contended begin before it can camp on the character lock', async () => {
+    const blocker = await pool.connect();
+    try {
+      await blocker.query('BEGIN');
+      await blocker.query('UPDATE characters SET id = id WHERE id = 2');
+      const started = performance.now();
+      await expect(
+        db.beginStoragePurchase(pool, {
+          ...ROW,
+          accountId: 2,
+          characterId: 2,
+          idempotencyKey: 'pg-lock-timeout',
+          claimToken: '00000000-0000-4000-8000-00000000001c',
+        }),
+      ).rejects.toMatchObject({ code: '55P03' });
+      expect(performance.now() - started).toBeLessThan(
+        db.STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS + 1_500,
+      );
+      expect(await db.storagePurchaseByKey(pool, 'pg-lock-timeout')).toBeNull();
+    } finally {
+      await blocker.query('ROLLBACK').catch(() => {});
+      blocker.release();
+    }
+  });
+
+  it('permits stale-claim takeover but rejects every terminal write by the old token', async () => {
+    const key = 'pg-stale-claim';
+    const oldToken = '00000000-0000-4000-8000-00000000002a';
+    const newToken = '00000000-0000-4000-8000-00000000002b';
+    await db.beginStoragePurchase(pool, {
+      ...ROW,
+      accountId: 2,
+      characterId: 2,
+      idempotencyKey: key,
+      claimToken: oldToken,
+    });
+    expect(await db.claimStoragePurchaseSpend(pool, key, newToken)).toBe(false);
+    await pool.query(
+      "UPDATE storage_purchases SET spend_claim_expires_at = now() - interval '1 second' WHERE idempotency_key = $1",
+      [key],
+    );
+    expect(await db.claimStoragePurchaseSpend(pool, key, newToken)).toBe(true);
+    expect(await db.renewStoragePurchaseSpendClaim(pool, key, oldToken)).toBe(false);
+    expect(await db.deletePendingStoragePurchaseWithoutDebit(pool, key, oldToken)).toBe(false);
+    expect(await db.settleStoragePurchase(pool, key, 'unresolved', oldToken)).toBe(false);
+    expect(await db.deletePendingStoragePurchaseWithoutDebit(pool, key, newToken)).toBe(true);
+  });
+
+  it('refuses direct and cascaded parent deletion while a purchase is pending', async () => {
+    const pending = {
+      ...ROW,
+      accountId: 2,
+      characterId: 2,
+      idempotencyKey: 'pg-parent-delete-guard',
+      claimToken: '00000000-0000-4000-8000-00000000002c',
+    };
+    await db.beginStoragePurchase(pool, pending);
+    await expect(pool.query('DELETE FROM characters WHERE id = 2')).rejects.toMatchObject({
+      code: '55006',
+      constraint: 'storage_purchases_open_delete_guard',
+      message: 'storage_purchase_open',
+    });
+    await expect(pool.query('DELETE FROM accounts WHERE id = 2')).rejects.toMatchObject({
+      code: '55006',
+      constraint: 'storage_purchases_open_delete_guard',
+      message: 'storage_purchase_open',
+    });
+    expect(await db.storagePurchaseByKey(pool, pending.idempotencyKey)).toMatchObject({
+      status: 'pending',
+    });
+    await db.settleStoragePurchase(pool, pending.idempotencyKey, 'applied', pending.claimToken);
+    await pool.query('DELETE FROM characters WHERE id = 2');
+    expect(await db.storagePurchaseByKey(pool, pending.idempotencyKey)).toMatchObject({
+      status: 'applied',
+    });
+    await pool.query('INSERT INTO characters (id) VALUES (2)');
+
+    const unresolved = {
+      ...pending,
+      idempotencyKey: 'pg-unresolved-delete-guard',
+      claimToken: '00000000-0000-4000-8000-00000000002d',
+    };
+    await db.beginStoragePurchase(pool, unresolved);
+    await db.settleStoragePurchase(
+      pool,
+      unresolved.idempotencyKey,
+      'unresolved',
+      unresolved.claimToken,
+    );
+    await expect(pool.query('DELETE FROM characters WHERE id = 2')).rejects.toMatchObject({
+      code: '55006',
+      constraint: 'storage_purchases_open_delete_guard',
+    });
+    await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [
+      unresolved.idempotencyKey,
+    ]);
+  });
+
+  it('sees a pending insert that commits while character deletion waits', async () => {
+    await pool.query('INSERT INTO accounts (id) VALUES (6)');
+    await pool.query('INSERT INTO characters (id) VALUES (6)');
+    const writer = await pool.connect();
+    const token = '00000000-0000-4000-8000-00000000006a';
+    try {
+      await writer.query('BEGIN');
+      await writer.query('SELECT id FROM accounts WHERE id = 6 FOR KEY SHARE');
+      await writer.query('SELECT id FROM characters WHERE id = 6 FOR UPDATE');
+      await writer.query(
+        `INSERT INTO storage_purchases
+           (realm, account_id, character_id, item_id, expected_cost_claudium,
+            idempotency_key, spend_claim_token, spend_claim_expires_at)
+         VALUES ('pgtest', 6, 6, 'strongbox_rung_01', 100,
+                 'pg-delete-race', $1, now() + interval '15 seconds')`,
+        [token],
+      );
+      const deleting = pool.query('DELETE FROM characters WHERE id = 6').then(
+        (value) => ({ value, error: null }),
+        (error: unknown) => ({ value: null, error }),
+      );
+      let sawDeleteWait = false;
+      for (let attempt = 0; attempt < 100 && !sawDeleteWait; attempt++) {
+        const waiting = await writer.query(
+          `SELECT count(*)::int AS n
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND wait_event_type = 'Lock'
+              AND query LIKE 'DELETE FROM characters WHERE id = 6%'`,
+        );
+        sawDeleteWait = waiting.rows[0].n > 0;
+        if (!sawDeleteWait) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(sawDeleteWait).toBe(true);
+      await writer.query('COMMIT');
+      const deleted = await deleting;
+      expect(deleted.value).toBeNull();
+      expect(deleted.error).toMatchObject({
+        code: '55006',
+        constraint: 'storage_purchases_open_delete_guard',
+      });
+      expect(await db.storagePurchaseByKey(pool, 'pg-delete-race')).toMatchObject({
+        status: 'pending',
+      });
+    } finally {
+      await writer.query('ROLLBACK').catch(() => {});
+      writer.release();
+      await pool.query("DELETE FROM storage_purchases WHERE idempotency_key = 'pg-delete-race'");
+      await pool.query('DELETE FROM characters WHERE id = 6');
+      await pool.query('DELETE FROM accounts WHERE id = 6');
+    }
+  });
+
+  it('blocks same-key begin behind receipt archival and returns the committed receipt', async () => {
+    const key = 'pg-archive-begin-race';
+    const oldToken = '00000000-0000-4000-8000-00000000003a';
+    await db.beginStoragePurchase(pool, {
+      ...ROW,
+      accountId: 2,
+      characterId: 2,
+      idempotencyKey: key,
+      claimToken: oldToken,
+    });
+    const effect = {
+      realm: ROW.realm,
+      accountId: 2,
+      characterId: 2,
+      itemId: ROW.itemId,
+      expectedCostClaudium: ROW.expectedCostClaudium,
+      idempotencyKey: key,
+      spendClaimToken: oldToken,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    };
+    const saver = await pool.connect();
+    try {
+      await saver.query('BEGIN');
+      await db.lockStorageAppliedEffectAccountsOnClient(saver, [effect]);
+      await saver.query('UPDATE characters SET id = id WHERE id = 2');
+      await db.writeStorageAppliedEffectsOnClient(saver, [effect]);
+
+      let resolved = false;
+      const racingBegin = db
+        .beginStoragePurchase(pool, {
+          ...ROW,
+          // A different parent pair proves the wait is the SAME-KEY advisory
+          // authority, not the character row lock the saver already holds.
+          accountId: 1,
+          characterId: 1,
+          idempotencyKey: key,
+          claimToken: '00000000-0000-4000-8000-00000000003b',
+        })
+        .then((result) => {
+          resolved = true;
+          return result;
+        });
+      let sawAdvisoryWait = false;
+      for (let attempt = 0; attempt < 100 && !sawAdvisoryWait; attempt++) {
+        const waiting = await saver.query(
+          `SELECT count(*)::int AS n
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND wait_event_type = 'Lock'
+              AND query LIKE 'SELECT pg_advisory_xact_lock(hashtextextended%'`,
+        );
+        sawAdvisoryWait = waiting.rows[0].n > 0;
+        if (!sawAdvisoryWait) {
+          await new Promise<void>((resolve) => setTimeout(resolve, 10));
+        }
+      }
+      expect(sawAdvisoryWait).toBe(true);
+      expect(resolved).toBe(false);
+      await saver.query('COMMIT');
+      const result = await racingBegin;
+      expect(result).toMatchObject({
+        inserted: false,
+        existing: { idempotencyKey: key, status: 'applied' },
+      });
+      expect(
+        (
+          await pool.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+    } finally {
+      await saver.query('ROLLBACK').catch(() => {});
+      saver.release();
     }
   });
 
@@ -263,8 +576,10 @@ d('storage_purchases against real PostgreSQL', () => {
       itemId: 'strongbox_rung_01',
       expectedCostClaudium: 100,
       idempotencyKey: 'pg-atomic-apply',
+      claimToken: ROW.claimToken,
       purchasedSlotsBefore: 0,
       purchasedSlotsAfter: 6,
+      spendClaimToken: ROW.claimToken,
     };
     await db.beginStoragePurchase(pool, effect);
 
@@ -348,7 +663,7 @@ d('storage_purchases against real PostgreSQL', () => {
     ).rejects.toThrow(/index row/);
   });
 
-  it('runs the whole lifecycle: upsert convergence, guards, recovery scan, sweep', async () => {
+  it('runs the whole lifecycle: upsert convergence, one-row recovery, and no-debit delete', async () => {
     // Fresh insert.
     const first = await db.beginStoragePurchase(pool, ROW);
     expect(first.inserted).toBe(true);
@@ -359,41 +674,30 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(retry.existing?.accountId).toBe(1);
     // The recovery scan sees the pending row.
     const pending = await db.pendingStoragePurchasesForCharacter(pool, 1);
-    expect(pending.map((r) => r.idempotencyKey)).toEqual(['pg-key-1']);
-    // Settle from pending works once; a second settle is refused by the
-    // status guard (monotone), as is settling a fresh status over it.
-    expect(await db.settleStoragePurchase(pool, 'pg-key-1', 'refused')).toBe(true);
-    expect(await db.settleStoragePurchase(pool, 'pg-key-1', 'applied')).toBe(false);
-    expect((await db.storagePurchaseByKey(pool, 'pg-key-1'))?.status).toBe('refused');
-    // Reopen only moves refused rows; then settle applied.
-    expect(await db.reopenStoragePurchase(pool, 'pg-key-1')).toBe(true);
-    expect(await db.reopenStoragePurchase(pool, 'pg-key-1')).toBe(false);
-    expect(await db.settleStoragePurchase(pool, 'pg-key-1', 'applied')).toBe(true);
-    // The recovery scan no longer returns it.
-    expect(await db.pendingStoragePurchasesForCharacter(pool, 1)).toEqual([]);
-    // The sweep takes REFUSED rows past the window and NOTHING else, executed
-    // against a real planner: one row per surviving status, all backdated to the
-    // same ancient resolved_at, so the only thing separating them is the
-    // predicate under test (Bank Storage phase 14 closed the applied arm, which
-    // is the rollback dedupe backstop).
-    await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-key-2' });
-    await db.settleStoragePurchase(pool, 'pg-key-2', 'unresolved');
-    await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-key-3' });
-    await db.settleStoragePurchase(pool, 'pg-key-3', 'refused');
-    await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-key-4' });
-    await pool.query(
-      "UPDATE storage_purchases SET resolved_at = now() - interval '400 days' WHERE idempotency_key IN ('pg-key-1', 'pg-key-2', 'pg-key-3', 'pg-key-4')",
+    expect(pending?.idempotencyKey).toBe('pg-key-1');
+    expect(
+      await db.deletePendingStoragePurchaseWithoutDebit(pool, 'pg-key-1', ROW.claimToken),
+    ).toBe(true);
+    expect(
+      await db.deletePendingStoragePurchaseWithoutDebit(pool, 'pg-key-1', ROW.claimToken),
+    ).toBe(false);
+    expect(await db.storagePurchaseByKey(pool, 'pg-key-1')).toBeNull();
+    // No refusal tombstone blocks a legitimate same-key retry.
+    expect((await db.beginStoragePurchase(pool, ROW)).inserted).toBe(true);
+    expect(await db.settleStoragePurchase(pool, 'pg-key-1', 'unresolved', ROW.claimToken)).toBe(
+      true,
     );
-    const deleted = await db.pruneRefusedStoragePurchasesBatch(pool, 90, 100);
-    expect(deleted).toBe(1);
-    expect(await db.storagePurchaseByKey(pool, 'pg-key-3')).toBeNull();
-    // The applied row survives: it is the only replay refusal after a rollback
-    // strips the in-blob dedupe keys.
-    expect((await db.storagePurchaseByKey(pool, 'pg-key-1'))?.status).toBe('applied');
-    expect((await db.storagePurchaseByKey(pool, 'pg-key-2'))?.status).toBe('unresolved');
-    expect((await db.storagePurchaseByKey(pool, 'pg-key-4'))?.status).toBe('pending');
-    // Keep-forever (0) touches nothing even with ancient rows present.
-    expect(await db.pruneRefusedStoragePurchasesBatch(pool, 0, 100)).toBe(0);
+    expect(await db.settleStoragePurchase(pool, 'pg-key-1', 'applied', ROW.claimToken)).toBe(false);
+    expect((await db.storagePurchaseByKey(pool, 'pg-key-1'))?.status).toBe('unresolved');
+    expect(await db.pendingStoragePurchasesForCharacter(pool, 1)).toBeNull();
+
+    await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-key-2' });
+    expect((await db.pendingStoragePurchasesForCharacter(pool, 1))?.idempotencyKey).toBe(
+      'pg-key-2',
+    );
+    expect(
+      await db.deletePendingStoragePurchaseWithoutDebit(pool, 'pg-key-2', ROW.claimToken),
+    ).toBe(true);
   });
 
   it('character deletion preserves applied identity and blocks replacement replay', async () => {
@@ -406,7 +710,7 @@ d('storage_purchases against real PostgreSQL', () => {
     await pool.query('INSERT INTO accounts (id) VALUES (3)');
     await pool.query('INSERT INTO characters (id) VALUES (3)');
     // A control row on the parents this test never deletes, minted here rather
-    // than relying on an earlier case's leftovers (the lifecycle case sweeps
+    // than relying on an earlier case's leftovers (the lifecycle case removes
     // its own rows, so borrowing one makes this assertion order-dependent).
     await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-cascade-control' });
     const applied = {
@@ -416,12 +720,30 @@ d('storage_purchases against real PostgreSQL', () => {
       idempotencyKey: 'pg-cascade-applied',
     };
     await db.beginStoragePurchase(pool, applied);
-    await db.settleStoragePurchase(pool, applied.idempotencyKey, 'applied');
+    await db.settleStoragePurchase(pool, applied.idempotencyKey, 'applied', applied.claimToken);
     await db.beginStoragePurchase(pool, {
       ...applied,
       idempotencyKey: 'pg-cascade-pending',
     });
-    // A CHARACTER delete takes operational work but not the applied receipt.
+    // An open paid operation blocks CHARACTER deletion and survives the
+    // rejected statement. Close that control row explicitly before proving
+    // that the eventual cascade takes only closed operational history, never
+    // the deletion-proof applied receipt.
+    await expect(pool.query('DELETE FROM characters WHERE id = 3')).rejects.toMatchObject({
+      code: '55006',
+      constraint: 'storage_purchases_open_delete_guard',
+      message: 'storage_purchase_open',
+    });
+    expect(await db.storagePurchaseByKey(pool, 'pg-cascade-pending')).toMatchObject({
+      status: 'pending',
+    });
+    expect(
+      await db.deletePendingStoragePurchaseWithoutDebit(
+        pool,
+        'pg-cascade-pending',
+        applied.claimToken,
+      ),
+    ).toBe(true);
     await pool.query('DELETE FROM characters WHERE id = 3');
     expect(await db.storagePurchaseByKey(pool, 'pg-cascade-pending')).toBeNull();
     expect(await db.storagePurchaseByKey(pool, applied.idempotencyKey)).toMatchObject({
@@ -455,7 +777,12 @@ d('storage_purchases against real PostgreSQL', () => {
       idempotencyKey: 'pg-cascade-account',
     };
     await db.beginStoragePurchase(pool, accountApplied);
-    await db.settleStoragePurchase(pool, accountApplied.idempotencyKey, 'applied');
+    await db.settleStoragePurchase(
+      pool,
+      accountApplied.idempotencyKey,
+      'applied',
+      accountApplied.claimToken,
+    );
     // ... and so does an ACCOUNT delete, through the other reference.
     await pool.query('DELETE FROM accounts WHERE id = 3');
     expect(await db.storagePurchaseByKey(pool, 'pg-cascade-account')).toBeNull();
@@ -466,84 +793,36 @@ d('storage_purchases against real PostgreSQL', () => {
   });
 
   it('the login-recovery scan is served by an index, not a sequential scan', async () => {
-    // The module comment claims storage_purchases_character serves this read.
+    // The module comment claims the character-scoped partial index serves this read.
     // Ask the planner rather than trusting the prose: pin the ACCESS SHAPE (no
     // Seq Scan on the table) rather than a plan string, which drifts across
     // versions and row counts.
-    await pool.query('SET LOCAL enable_seqscan = off');
-    const plan = await pool.query(
-      'EXPLAIN (FORMAT JSON) SELECT id FROM storage_purchases ' +
-        "WHERE character_id = 1 AND status = 'pending' ORDER BY created_at",
-    );
-    const text = JSON.stringify(plan.rows[0]);
-    expect(text).toContain('storage_purchases_character');
+    const planner = await pool.connect();
+    let inTransaction = false;
+    try {
+      await planner.query('BEGIN');
+      inTransaction = true;
+      await planner.query('SET LOCAL enable_seqscan = off');
+      const plan = await planner.query(
+        'EXPLAIN (FORMAT JSON) SELECT id FROM storage_purchases ' +
+          "WHERE character_id = 1 AND status = 'pending' ORDER BY created_at, id LIMIT 1",
+      );
+      expect(JSON.stringify(plan.rows[0])).toContain('storage_purchases_one_pending_per_character');
+      await planner.query('ROLLBACK');
+      inTransaction = false;
+    } finally {
+      if (inTransaction) await planner.query('ROLLBACK').catch(() => {});
+      planner.release();
+    }
   });
-  it('the sweep cannot delete a row a concurrent same-key retry reopened', async () => {
-    // THE EXECUTED PROOF for the QA round's central new claim. The fake-pool
-    // twin can only count that "status = 'refused'" appears twice in the text;
-    // it cannot tell whether the second occurrence is on the clause that makes
-    // the DELETE re-check the row's CURRENT status. Only two real sessions can.
-    //
-    // The race: the sweep's inner SELECT chooses ids, and reopenStoragePurchase
-    // (a same-key retry, on the request path) can move one of them back to
-    // 'pending' before the DELETE reaches it. Deleting by id alone destroys a
-    // row that is once again recoverable work, over a spend that may be about
-    // to debit.
-    const aged = "now() - interval '400 days'";
-    for (let i = 0; i < 4; i++) {
-      await pool.query(
+  it('rejects persistent refused history at the database boundary', async () => {
+    await expect(
+      pool.query(
         `INSERT INTO storage_purchases
            (realm, account_id, character_id, item_id, expected_cost_claudium,
-            idempotency_key, status, resolved_at)
-         VALUES ('r', 1, 1, 'strongbox_rung_01', 100, $1, 'refused', ${aged})`,
-        [`pg-race-${i}`],
-      );
-    }
-
-    // Session A reopens one of them and HOLDS the row lock uncommitted.
-    const holder = await pool.connect();
-    let deleted: number;
-    try {
-      await holder.query('BEGIN');
-      await holder.query(
-        "UPDATE storage_purchases SET status = 'pending', resolved_at = NULL " +
-          "WHERE idempotency_key = 'pg-race-2'",
-      );
-      // Session B sweeps. It blocks on the reopened row, then re-checks the
-      // status the commit reveals.
-      const sweeping = db.pruneRefusedStoragePurchasesBatch(pool, 90, 4);
-      await new Promise((r) => setTimeout(r, 200));
-      await holder.query('COMMIT');
-      deleted = await sweeping;
-    } finally {
-      holder.release();
-    }
-
-    // The reopened row SURVIVED, still pending and still recoverable ...
-    const survivor = await db.storagePurchaseByKey(pool, 'pg-race-2');
-    expect(survivor?.status).toBe('pending');
-    // ... and the other three aged refused rows were taken.
-    for (const key of ['pg-race-0', 'pg-race-1', 'pg-race-3']) {
-      expect(await db.storagePurchaseByKey(pool, key)).toBeNull();
-    }
-    // The COUNT is the batch the sweep CHOSE, not the rows it managed to
-    // delete. server/retention_sweep.ts reads a short batch as proof the table
-    // is caught up, so returning 3 here would end the night's sweep with every
-    // remaining aged row stranded.
-    expect(deleted).toBe(4);
-
-    // Clean up so the later cases' counts and planner shapes are unaffected:
-    // this suite shares one table and two arms downstream pin both.
-    await pool.query("DELETE FROM storage_purchases WHERE idempotency_key LIKE 'pg-race-%'");
-  });
-
-  it('an open-row index would steal the login scan, which is why there is none', () => {
-    // Pins the DECISION, not a plan: the audit's open-row predicate has no
-    // index because building one measurably took the login-recovery scan's plan
-    // (a bitmap scan over every open row with a character_id FILTER, instead of
-    // the character-scoped index). If a future change adds one, it must give the
-    // login path a better-matching index first, and this arm is where that gets
-    // re-argued.
-    expect(db.STORAGE_PURCHASE_SCHEMA).not.toContain('storage_purchases_open');
+            idempotency_key, status)
+         VALUES ('r', 1, 1, 'strongbox_rung_01', 100, 'pg-refused', 'refused')`,
+      ),
+    ).rejects.toThrow(/storage_purchases_status_allowed/);
   });
 });

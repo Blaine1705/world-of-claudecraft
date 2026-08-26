@@ -347,7 +347,8 @@ import {
   stageStorageAppliedEffect as stageEffect,
 } from './storage_applied_effect_queue';
 import type { StorageAppliedEffect } from './storage_purchase_db';
-import { storageAppliedEffectsCommitted } from './storage_purchases';
+import { storageAppliedEffectsCommitted, storageRecovery } from './storage_purchases';
+import { StorageRecoverySessionSweep as RecoverySweep } from './storage_recovery_session_sweep';
 import { attachDetectorFlagHost } from './suspicion_flags';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
@@ -1137,6 +1138,7 @@ export interface ClientSession {
   dirtyGuildBanks: Map<number, number>;
   // Paid Claudium grants waiting for the same transaction as their bank blob.
   pendingStorageAppliedEffects: StorageAppliedEffect[];
+  storageRecoveryAdmissionPending?: boolean; // Coordinator overflow; blocks both purchase rails.
   // The UNFLUSHED book deltas behind those dirty marks, in op order (guild id
   // -> the diffGuildBankOp output of every successful op not yet committed by
   // an escrow save). This log is this session's UNCOMMITTED WORK and it is the
@@ -1756,6 +1758,7 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
+  private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
@@ -2087,6 +2090,14 @@ export class GameServer {
   // owns that lease (keep it) or the lease is an orphan to release.
   hasSessionForCharacter(characterId: number): boolean {
     return this.sessionsByCharacterId.has(characterId);
+  }
+
+  storageRecoveryAdmission(characterId: number, pending?: boolean): boolean {
+    const session = this.sessionsByCharacterId.get(characterId);
+    if (session && !session.left && pending !== undefined) {
+      session.storageRecoveryAdmissionPending = pending;
+    }
+    return !!session && !session.left && !!session.storageRecoveryAdmissionPending;
   }
 
   // Cheap admin readout: character ids with a live socket only. Linkdead
@@ -2787,6 +2798,7 @@ export class GameServer {
           }
           this.recordPerfCaptureCallback(ticksRun);
           this.expireLinkdeadSessions();
+          this.storageRecoverySweep.run();
           // Anchor the achieved-rate meter to the wall clock (hrtime), never to
           // callback counts: late timer fires and the dt clamp are exactly the
           // losses it exists to expose.
@@ -4216,6 +4228,7 @@ export class GameServer {
       this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     }
     this.sessionsByCharacterId.delete(session.characterId);
+    storageRecovery.offline(session.characterId);
     // Release the per-character load lease so a fresh login (here or on another
     // process) can reload the character without waiting out the TTL. Order
     // matters: only after saveCharacterOnLeave has awaited above, so the lease
@@ -4284,7 +4297,7 @@ export class GameServer {
   // (the audited GM restores) read it; every legacy void caller ignores it.
   async saveCharacter(
     session: ClientSession,
-    opts: { withMarket?: boolean; final?: boolean } = {},
+    opts: { withMarket?: boolean; final?: boolean; shouldStart?: () => boolean } = {},
   ): Promise<boolean> {
     // A quarantined session's live state was abandoned when its escrow was
     // rolled back: its character half is the half that would carry the value
@@ -4292,6 +4305,8 @@ export class GameServer {
     // refusal prevented. It reloads from its durable row instead.
     if (session.escrowQuarantined) return false;
     return this.characterSaveQueues.enqueue(session.characterId, async () => {
+      // Recovery cancellation is checked inside the FIFO, before stale work starts.
+      if (opts.shouldStart && !opts.shouldStart()) return false;
       // Re-checked INSIDE the queue, not only at entry: a save enqueued before
       // the rollback would otherwise run after it, and by then this session's
       // book ops have been undone while its character blob still reflects

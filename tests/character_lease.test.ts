@@ -225,6 +225,7 @@ const STORAGE_EFFECT: StorageAppliedEffect = {
   itemId: 'strongbox_rung_01',
   expectedCostClaudium: 100,
   idempotencyKey: 'storage-effect-1',
+  spendClaimToken: '00000000-0000-4000-8000-000000000001',
   purchasedSlotsBefore: 0,
   purchasedSlotsAfter: 6,
 };
@@ -245,6 +246,7 @@ function storageEffectClient(updateRowCount: number) {
             item_id: 'strongbox_rung_01',
             expected_cost_claudium: 100,
             idempotency_key: 'storage-effect-1',
+            spend_claim_token: STORAGE_EFFECT.spendClaimToken,
             status: 'pending',
           },
         ],

@@ -380,6 +380,7 @@ describe('fenced character save ledger effects', () => {
       itemId: 'strongbox_rung_01',
       expectedCostClaudium: 100,
       idempotencyKey: 'storage-owner-mismatch',
+      spendClaimToken: '00000000-0000-4000-8000-000000000099',
       purchasedSlotsBefore: 0,
       purchasedSlotsAfter: 6,
     };

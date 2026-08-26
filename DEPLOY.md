@@ -260,9 +260,9 @@ For off-box safety, sync the directory to S3 occasionally:
   across this boundary, any character that lands on an old process loses that
   state on its next autosave, so cut over cleanly rather than rolling. Claudium
   granted slots are NOT in this class: they land in `purchasedSlots`, which an old
-  binary understands and preserves; only `appliedStorageKeys` is stripped, and the
-  retained `applied` row plus the `STORAGE_PURCHASE_RETENTION_DAYS=0` instruction
-  below is what backstops that. Any FUTURE release that LENGTHENS the bank
+  binary understands and preserves. Only `appliedStorageKeys` is stripped; the
+  immutable `storage_purchase_applied_receipts` row is the durable replay guard
+  outside the character blob. Any FUTURE release that LENGTHENS the bank
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
   owes its own caveat here.
@@ -828,21 +828,27 @@ For off-box safety, sync the directory to S3 occasionally:
   also performs the largest fold it will ever do (the whole backlog, budget-
   capped per night), so the deploy-time catch-up guidance above applies with
   extra weight.
-  `STORAGE_PURCHASE_RETENTION_DAYS=` (empty means the default 90; 0 keeps
-  forever) bounds how long REFUSED Claudium storage purchase rows are kept
-  (`storage_purchases`). Nothing else sweeps: pending rows are recoverable
-  work, unresolved rows are open operator cases, and applied rows are the
-  rollback dedupe backstop (a pre-phase-11 binary strips the in-blob purchase
-  dedupe keys on its first save of a character, after which the applied row
-  here is the only replay refusal). Keeping them needs no special setting from
-  this release forward, and applied rows are bounded by the catalog itself, at
-  most about sixteen per character ever. ROLLBACK STILL NEEDS THE OLD
-  INSTRUCTION: a binary from before this release sweeps applied rows on the old
-  terms, and whichever binary wins the nightly sweep is the one that runs, so
-  if you roll the fleet back past this release set
-  `STORAGE_PURCHASE_RETENTION_DAYS=0` for the duration. Refused retries are the
-  only status a player accumulates freely, so the window's real cost is the
-  fleet refusal rate across it.
+  Claudium storage refusals leave no retained operational row: the pending row
+  is deleted before a definitive no-debit refusal is reported. Pending rows are
+  bounded recovery work, unresolved rows remain operator cases, and successful
+  grants move to immutable `storage_purchase_applied_receipts` in the same
+  transaction as the character blob and audit row. The receipt, not the blob
+  alone, is the durable exactly-once authority after a rollback strips
+  `appliedStorageKeys`. The current cap is twelve purchased expansions (72
+  actual `purchasedSlots`), so at most twelve successful single-rung receipts
+  are needed to fill it. There
+  is no storage-purchase retention knob or old-binary sweep to disable: the
+  release base predates both the table and the abandoned refused-row sweep.
+  PostgreSQL enforces one pending row per character and one leased outbound
+  spender per key. Recovery tracks at most 5,000 characters per realm process,
+  runs two scans and two drives concurrently, and paces outbound drives plus
+  failed-scan retries at 10 starts/second with a burst of two. A live character
+  beyond that bound remains blocked on both the gold and Claudium storage rails
+  and is retried incrementally from the session sweep; do not treat a capacity
+  refusal as proof that no older debit exists. Character and account deletion
+  are database-refused while a `pending` or `unresolved` purchase exists, using
+  the stable `storage_purchases_open_delete_guard` marker. Finish recovery or
+  resolve the operator case before retrying deletion.
   Details in server/storage_purchase_db.ts. To find purchases that got stuck,
   run `node scripts/bank_audit.mjs`, which reports unresolved and stranded
   pending rows.

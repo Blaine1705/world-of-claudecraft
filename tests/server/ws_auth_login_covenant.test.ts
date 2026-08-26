@@ -83,11 +83,10 @@ function neverAnsweringHost(): StoragePurchaseHost {
       begin: vi.fn(),
       byKey: vi.fn(),
       settle: vi.fn(),
-      reopen: vi.fn(),
+      discardWithoutDebit: vi.fn(),
       pendingFor: () => new Promise(() => {}),
     },
     realm: 'test',
-    delay: () => new Promise(() => {}),
     warn: vi.fn(),
   } as unknown as StoragePurchaseHost;
 }

@@ -1,5 +1,11 @@
 import { STORAGE_SKUS } from '../src/sim/content/storage_charters';
-import type { StorageAppliedEffect } from './storage_purchase_db';
+import {
+  STORAGE_APPLIED_EFFECT_MAX_PENDING,
+  type StorageAppliedEffect,
+} from './storage_purchase_db';
+
+const SPEND_CLAIM_TOKEN_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 export type StorageAppliedEffectDraft = Omit<
   StorageAppliedEffect,
@@ -15,6 +21,7 @@ function sameEffect(a: StorageAppliedEffect, b: StorageAppliedEffect): boolean {
     a.itemId === b.itemId &&
     a.expectedCostClaudium === b.expectedCostClaudium &&
     a.idempotencyKey === b.idempotencyKey &&
+    a.spendClaimToken === b.spendClaimToken &&
     a.purchasedSlotsBefore === b.purchasedSlotsBefore &&
     a.purchasedSlotsAfter === b.purchasedSlotsAfter
   );
@@ -74,6 +81,9 @@ export function stageStorageAppliedEffect(
   draft: StorageAppliedEffectDraft,
   purchasedSlotsNow: number,
 ): StorageAppliedEffect {
+  if (!SPEND_CLAIM_TOKEN_PATTERN.test(draft.spendClaimToken)) {
+    throw new Error(`storage purchase ${draft.idempotencyKey} has invalid spend claim`);
+  }
   const existing = queue.find((candidate) => candidate.idempotencyKey === draft.idempotencyKey);
   if (existing) {
     const noBounds =
@@ -86,7 +96,14 @@ export function stageStorageAppliedEffect(
     ) {
       throw new Error(`storage purchase staged effect conflict for ${draft.idempotencyKey}`);
     }
+    // A crashed/expired spender may leave the same exact grant staged under a
+    // stale DB claim. Recovery replaces only that opaque authority token; an
+    // in-flight save captured the old value by copy and therefore fails closed.
+    existing.spendClaimToken = draft.spendClaimToken;
     return existing;
+  }
+  if (queue.length >= STORAGE_APPLIED_EFFECT_MAX_PENDING) {
+    throw new Error('storage applied effect queue already has a different pending purchase');
   }
   const effect = resolvedEffect(draft, purchasedSlotsNow);
   queue.push(effect);

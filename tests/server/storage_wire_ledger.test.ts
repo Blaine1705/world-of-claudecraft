@@ -142,12 +142,14 @@ describe('the gold-path mutex refusal', () => {
       db: {
         begin: async () => ({ inserted: true, existing: null }),
         byKey: async () => null,
+        claimSpend: async () => true,
+        renewSpendClaim: async () => true,
+        releaseSpendClaim: async () => true,
         settle: async () => true,
-        reopen: async () => false,
-        pendingFor: async () => [],
+        discardWithoutDebit: async () => true,
+        pendingFor: async () => null,
       },
       realm: 'testrealm',
-      delay: async () => {},
       warn: vi.fn(),
     };
     const purchase = executeStoragePurchase(host, {
@@ -477,6 +479,7 @@ describe('phase 14: the outage that used to strand the gold rung', () => {
     // buy the same rung with gold.
     const sim = makeBankSim();
     const settled: [string, string][] = [];
+    const discarded: string[] = [];
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: () => ({ characterId: WHO.characterId, pid: 5 }),
       grant: () => ({ status: 'fits' }),
@@ -491,20 +494,20 @@ describe('phase 14: the outage that used to strand the gold rung', () => {
       db: {
         begin: async () => ({ inserted: true, existing: null }),
         byKey: async () => null,
+        claimSpend: async () => true,
+        renewSpendClaim: async () => true,
+        releaseSpendClaim: async () => true,
         settle: async (key, status) => {
           settled.push([key, status]);
           return true;
         },
-        reopen: async () => false,
-        pendingFor: async () => [],
+        discardWithoutDebit: async (key) => {
+          discarded.push(key);
+          return true;
+        },
+        pendingFor: async () => null,
       },
       realm: 'testrealm',
-      // The backoff PARKS rather than resolving immediately, which is what a
-      // real one does. With an instant delay, a build that lost the
-      // never-reached arm would spin the ambiguity retry against a permanently
-      // unavailable service in a hot loop and hang the run instead of failing
-      // it (found by mutation).
-      delay: () => new Promise<void>(() => {}),
       warn: vi.fn(),
     };
 
@@ -516,8 +519,9 @@ describe('phase 14: the outage that used to strand the gold rung', () => {
     });
     expect(res.granted).toBe(false);
     expect(res.reason).toBe('unavailable');
-    // The row is settled rather than left open holding the character.
-    expect(settled).toEqual([['outage-wire', 'refused']]);
+    // A definitive no-debit refusal leaves no operational history.
+    expect(discarded).toEqual(['outage-wire']);
+    expect(settled).toEqual([]);
 
     // THE POINT OF THE PHASE: gold still works, with no refusal line.
     dispatchBankCommand(sim, WHO, 'bank_buy_slots', {}, 1);

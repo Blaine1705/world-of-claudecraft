@@ -140,9 +140,22 @@ must never be interpreted; visibility is fit gating only. Nothing in this reposi
 reads an ownership record for a storage SKU, so a diff that starts to is the violation to refuse:
 `isKnownStorageSkuId` is the whole admission gate. Do not describe these
 purchases as deduplicated the way skins are. There is no ownership row to dedupe against: the
-guarantee is exactly-once per idempotency **key**, held in `BankState.appliedStorageKeys` inside
-the same blob as the counter it guards, which is precisely what lets the same SKU be bought
-again under a new key.
+guarantee is exactly-once per idempotency **key**. `BankState.appliedStorageKeys` rejects a replay
+inside the live character state, while `storage_purchase_applied_receipts` is the deletion-proof
+durable authority if an older binary strips that blob field. The character blob, receipt, and
+Claudium audit row commit together. The current cap is twelve purchased expansions (72 actual
+`purchasedSlots`), so a character needs at most twelve successful receipts to fill it with
+single-rung purchases. The same SKU can still be bought again under a new key while another rung
+remains.
+
+The operational authority is deliberately stricter than the UI mutex. PostgreSQL permits at most
+one `pending` storage purchase per character, even across realm processes. A fresh request owns a
+short database spend claim; an existing row never authorizes a second economy-service call, and a
+recovery worker must acquire and revalidate its own opaque claim before it can delete, settle,
+grant, or stage the atomic save. Claim expiry permits takeover after a crashed process, but never
+authorizes a stale reply. Character and account deletion are database-refused while either a
+`pending` or `unresolved` purchase still carries money-side uncertainty; support must let recovery
+finish or resolve the case first.
 
 **7. A charter is offered only when its full grant fits.** There is no partial clamping and no
 prorating: `bankGrantStorageSlots` run with `{ dryRun: true }` answers `fits`, `does_not_fit` or

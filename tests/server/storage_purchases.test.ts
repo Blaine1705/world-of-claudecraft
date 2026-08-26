@@ -2,8 +2,7 @@
 // (server/storage_purchases.ts) driven end to end against the REAL sim grant
 // command (bankGrantStorageSlots through sim.ctx, the exact production call
 // shape) with a hand-rolled host: scripted spend results, an in-memory
-// pending-row table with the SQL guards mirrored, a controllable save, and
-// an immediate delay so no test ever sleeps on a real timer.
+// pending-row table with the SQL guards mirrored and a controllable save.
 //
 // The matrix here is the phase's ordering contract: exactly-once under
 // ambiguous retry, the settle-only-after-save rule, the apply-time re-check
@@ -25,8 +24,10 @@ import {
   resetStoragePurchasesForTests,
   resumeStoragePurchasesAtLogin,
   type StoragePurchaseHost,
+  storagePurchaseCharacterOffline,
   storagePurchaseInFlight,
 } from '../../server/storage_purchases';
+import { STORAGE_RECOVERY_MAX_TRACKED } from '../../server/storage_recovery_coordinator';
 import {
   BANK_EXPANSION_PRICES,
   BANK_EXPANSION_SLOTS,
@@ -68,11 +69,12 @@ const neverReached = (): ClaudiumSpendOutcome => ({
 
 interface FakeRow extends StoragePurchaseRow {
   resolvedAt: number | null;
+  spendClaimToken: string | null;
 }
 
 // The in-memory stand-in for storage_purchase_db, mirroring the SQL guards
-// exactly: unique key on begin, settle only FROM pending, reopen only FROM
-// refused, pendingFor filters status pending.
+// exactly: unique key on begin, settle only FROM pending, no-debit cleanup as
+// a guarded DELETE, and pendingFor returning one oldest pending row.
 function makeFakeDb() {
   const rows = new Map<string, FakeRow>();
   let nextId = 1;
@@ -86,9 +88,21 @@ function makeFakeDb() {
         itemId: string;
         expectedCostClaudium: number;
         idempotencyKey: string;
+        claimToken?: string;
       }) => {
         const existing = rows.get(row.idempotencyKey);
         if (existing) return { inserted: false, existing: { ...existing } };
+        const characterPending = [...rows.values()].find(
+          (candidate) =>
+            candidate.characterId === row.characterId && candidate.status === 'pending',
+        );
+        if (characterPending) {
+          return {
+            inserted: false,
+            existing: null,
+            blockedByPending: { ...characterPending },
+          };
+        }
         const fresh: FakeRow = {
           id: nextId++,
           realm: row.realm,
@@ -99,6 +113,7 @@ function makeFakeDb() {
           idempotencyKey: row.idempotencyKey,
           status: 'pending',
           resolvedAt: null,
+          spendClaimToken: row.claimToken ?? null,
         };
         rows.set(row.idempotencyKey, fresh);
         return { inserted: true, existing: { ...fresh } };
@@ -108,31 +123,50 @@ function makeFakeDb() {
       const row = rows.get(key);
       return row ? { ...row } : null;
     }),
-    settle: vi.fn(async (key: string, status: 'applied' | 'refused' | 'unresolved') => {
+    claimSpend: vi.fn(async (key: string, claimToken: string) => {
       const row = rows.get(key);
-      if (!row || row.status !== 'pending') return false;
+      if (row?.status !== 'pending' || row.spendClaimToken) return false;
+      row.spendClaimToken = claimToken;
+      return true;
+    }),
+    renewSpendClaim: vi.fn(async (key: string, claimToken: string) => {
+      const row = rows.get(key);
+      return row?.status === 'pending' && row.spendClaimToken === claimToken;
+    }),
+    releaseSpendClaim: vi.fn(async (key: string, claimToken: string) => {
+      const row = rows.get(key);
+      if (row?.status !== 'pending' || row.spendClaimToken !== claimToken) return false;
+      row.spendClaimToken = null;
+      return true;
+    }),
+    settle: vi.fn(async (key: string, status: 'applied' | 'unresolved', claimToken: string) => {
+      const row = rows.get(key);
+      if (row?.status !== 'pending' || row.spendClaimToken !== claimToken) return false;
       row.status = status;
       row.resolvedAt = 1;
+      row.spendClaimToken = null;
       return true;
     }),
-    reopen: vi.fn(async (key: string) => {
+    discardWithoutDebit: vi.fn(async (key: string, claimToken: string) => {
       const row = rows.get(key);
-      if (!row || row.status !== 'refused') return false;
-      row.status = 'pending';
-      row.resolvedAt = null;
+      if (row?.status !== 'pending' || row.spendClaimToken !== claimToken) return false;
+      rows.delete(key);
       return true;
     }),
-    pendingFor: vi.fn(async (characterId: number) =>
-      [...rows.values()]
+    pendingFor: vi.fn(async (characterId: number): Promise<FakeRow | null> => {
+      const match = [...rows.values()]
         .filter((r) => r.characterId === characterId && r.status === 'pending')
-        .map((r) => ({ ...r })),
-    ),
+        .sort((a, b) => a.id - b.id)
+        .at(0);
+      return match ? { ...match } : null;
+    }),
   };
 }
 
 function makeHarness(seed = 42) {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: GRANT_TEST_WORLD });
-  const meta = sim.meta(sim.playerId)!;
+  const meta = sim.meta(sim.playerId);
+  if (!meta) throw new Error('missing player meta');
   const db = makeFakeDb();
   type ScriptedSpend =
     | ClaudiumSpendResult
@@ -152,12 +186,17 @@ function makeHarness(seed = 42) {
     const value = typeof next === 'function' ? await next() : next;
     return 'result' in value ? value : { result: value, neverReached: false };
   });
-  const state = { live: true, saveResult: true as boolean | Promise<boolean> };
+  const state = {
+    live: true,
+    saveResult: true as boolean | Promise<boolean>,
+    recoveryAdmissionPending: false,
+    offlineCharacters: new Set<number>(),
+  };
   const stagedEffects: StorageAppliedEffect[] = [];
   const commitStaged = (captured: readonly StorageAppliedEffect[]): void => {
     for (const effect of captured) {
       const row = db.rows.get(effect.idempotencyKey);
-      if (row) {
+      if (row && effect.spendClaimToken && row.spendClaimToken === effect.spendClaimToken) {
         row.status = 'applied';
         row.resolvedAt = 1;
       }
@@ -180,6 +219,12 @@ function makeHarness(seed = 42) {
   const host: StoragePurchaseHost = {
     resolveLiveCharacter: (accountId) =>
       state.live && accountId === ACCOUNT ? { characterId: CHARACTER, pid: sim.playerId } : null,
+    isCharacterLive: (characterId) => !state.offlineCharacters.has(characterId),
+    setRecoveryAdmissionPending: (characterId, pending) => {
+      if (characterId === CHARACTER) state.recoveryAdmissionPending = pending;
+    },
+    recoveryAdmissionPending: (characterId) =>
+      characterId === CHARACTER && state.recoveryAdmissionPending,
     grant: (pid, skuId, key, dryRun) => bankGrantStorageSlots(sim.ctx, pid, skuId, key, { dryRun }),
     stageAppliedEffect,
     saveCharacter: (characterId) =>
@@ -187,7 +232,6 @@ function makeHarness(seed = 42) {
     spend,
     db,
     realm: 'testrealm',
-    delay: async () => {},
     warn,
   };
   return {
@@ -206,12 +250,23 @@ function makeHarness(seed = 42) {
   };
 }
 
-// Await full quiescence of the fire-and-forget chains (save -> settle, the
-// background settle task): condition-polled, never a real sleep.
+// Await full quiescence of the fire-and-forget save and bounded-recovery
+// chains: condition-polled, never a fixed sleep.
 async function waitFor(cond: () => boolean): Promise<void> {
-  await vi.waitFor(() => {
-    if (!cond()) throw new Error('not yet');
+  await vi.waitFor(
+    () => {
+      if (!cond()) throw new Error('not yet');
+    },
+    { timeout: 10_000 },
+  );
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((done) => {
+    resolve = done;
   });
+  return { promise, resolve };
 }
 
 beforeEach(() => {
@@ -246,6 +301,16 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
     expect(h.db.rows.get('key-1')?.status).toBe('pending');
     expect(h.stagedEffects).toHaveLength(1);
+    const overlapping = await executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_02',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'key-1-overlap',
+    });
+    expect(overlapping.reason).toBe('purchase_in_progress');
+    expect(h.spend).toHaveBeenCalledTimes(1);
+    expect(h.db.rows.has('key-1-overlap')).toBe(false);
+    expect(h.stagedEffects).toHaveLength(1);
     saveResolve(true);
     await waitFor(() => h.db.rows.get('key-1')?.status === 'applied');
     // ... and reopens once the audit row is durable.
@@ -259,8 +324,10 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
       idempotencyKey: 'key-1',
       purchasedSlotsBefore: 0,
       purchasedSlotsAfter: 6,
+      spendClaimToken: expect.stringMatching(/^[0-9a-f-]{36}$/),
     });
     expect(h.stagedEffects).toEqual([]);
+    expect(h.db.releaseSpendClaim).not.toHaveBeenCalled();
     // The pending row was durable BEFORE the money moved.
     expect(h.db.begin.mock.invocationCallOrder[0]).toBeLessThan(
       h.spend.mock.invocationCallOrder[0],
@@ -319,6 +386,8 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     await waitFor(() => h.saveCharacter.mock.calls.length === 1);
     expect(h.db.rows.get('key-audit-gap')?.status).toBe('pending');
     expect(h.stagedEffects).toHaveLength(1);
+    const firstClaim = h.stagedEffects[0]?.spendClaimToken;
+    await waitFor(() => h.db.rows.get('key-audit-gap')?.spendClaimToken === null);
     // The slots and the key ARE in the live blob; the ordinary save that lands
     // next makes them durable. Unlike the fresh-sim case above, this harness
     // KEEPS that state, which is exactly what distinguishes the two.
@@ -333,6 +402,8 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     expect(h.meta.bank.purchasedSlots).toBe(6);
     expect(h.spend).toHaveBeenCalledTimes(1);
     expect(h.stageAppliedEffect).toHaveBeenCalledTimes(2);
+    const recoveryClaim = h.stageAppliedEffect.mock.calls[1]?.[0].spendClaimToken;
+    expect(recoveryClaim).not.toBe(firstClaim);
     expect(h.stagedEffects).toEqual([]);
   });
 
@@ -384,6 +455,7 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
       itemId: 'strongbox_rung_01',
       expectedCostClaudium: 100,
       idempotencyKey: 'key-already-applied-arm',
+      spendClaimToken: expect.stringMatching(/^[0-9a-f-]{36}$/),
     });
     expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
   });
@@ -532,7 +604,7 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     // widening the set has to be a deliberate edit here too. 'invalid_request'
     // is deliberately ABSENT: the service emits it only from its admin
     // recovery surface, and treating a token the spend surface cannot return
-    // as definitive would settle 'refused' over a live debit if it ever did.
+    // as definitive would delete a live debit's recovery row if it ever did.
     for (const [reason, definitive] of [
       ['insufficient_balance', true],
       ['unknown_item', true],
@@ -553,8 +625,8 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
         idempotencyKey: `key-vocab-${reason}`,
       });
       if (definitive) {
-        // Settled terminally, and the caller sees the service's own token.
-        await waitFor(() => h.db.rows.get(`key-vocab-${reason}`)?.status === 'refused');
+        // Deleted with zero refusal history, and the caller sees the service's token.
+        expect(h.db.rows.has(`key-vocab-${reason}`)).toBe(false);
         expect(res.reason).toBe(reason);
       } else {
         // Ambiguous: the row stays pending over a possible debit and the
@@ -568,8 +640,8 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
 
   it('a begin-conflict row belonging to ANOTHER purchase is refused, never settled', async () => {
     // byKey saw no row, so a colliding key was inserted between the two reads.
-    // settle() and reopen() are keyed by idempotency_key alone, so without the
-    // identity recheck on the conflict arm this flow would reopen and spend
+    // writes are keyed by idempotency_key alone, so without the identity
+    // recheck on the conflict arm this flow would spend
     // against someone else's pending purchase.
     const h = makeHarness();
     await h.db.begin({
@@ -638,7 +710,7 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
   it('a granted:false reply with an unknown or null reason is AMBIGUOUS, never a refusal settle', async () => {
     const h = makeHarness();
     // A malformed 2xx (an interposed proxy, service version skew) coerces to
-    // granted:false reason:null; settling that 'refused' could erase a
+    // granted:false reason:null; treating it as no-debit could erase a
     // debited purchase. It must retry the same key like 'unavailable'.
     h.spendResults.push(
       { granted: false, balance: null, costClaudium: null, reason: null },
@@ -656,9 +728,17 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     expect(h.meta.bank.purchasedSlots).toBe(6);
     await waitFor(() => h.db.rows.get('key-mal')?.status === 'applied');
     expect(h.spend).toHaveBeenCalledTimes(3);
+    // The request inserted with its claim; only the two recovery turns need a
+    // claim acquisition. Every reply is revalidated once, and the request also
+    // renews after its multi-statement begin immediately before service IO.
+    expect(h.db.claimSpend).toHaveBeenCalledTimes(2);
+    expect(h.db.renewSpendClaim).toHaveBeenCalledTimes(4);
+    // Only the two ambiguous attempts leave the row open. The successful save
+    // deletes it transactionally and performs no guaranteed-zero-row release.
+    expect(h.db.releaseSpendClaim).toHaveBeenCalledTimes(2);
   });
 
-  it('a swept refused row re-inserts before the retry spends (the reopen race)', async () => {
+  it('an unconfirmed definitive-refusal delete reports unavailable and keeps recovery armed', async () => {
     const h = makeHarness();
     h.spendResults.push({
       granted: false,
@@ -666,36 +746,17 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
       costClaudium: 100,
       reason: 'insufficient_balance',
     });
-    await executeStoragePurchase(h.host, {
+    h.db.discardWithoutDebit.mockResolvedValueOnce(false);
+    configureStoragePurchaseRuntime(() => h.host);
+    const result = await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
       itemId: 'strongbox_rung_01',
       expectedCostClaudium: 100,
-      idempotencyKey: 'key-swept',
+      idempotencyKey: 'key-cleanup-miss',
     });
-    expect(h.db.rows.get('key-swept')?.status).toBe('refused');
-    // The retention sweep takes the aged refused row between the byKey read
-    // and the reopen: reopen reports false, and the flow must re-insert a
-    // pending row before any money can move.
-    h.db.reopen.mockImplementationOnce(async (key: string) => {
-      h.db.rows.delete(key);
-      return false;
-    });
-    h.spendResults.push(granted());
-    const retry = await executeStoragePurchase(h.host, {
-      accountId: ACCOUNT,
-      itemId: 'strongbox_rung_01',
-      expectedCostClaudium: 100,
-      idempotencyKey: 'key-swept',
-    });
-    expect(retry.granted).toBe(true);
-    await waitFor(() => h.db.rows.get('key-swept')?.status === 'applied');
-    expect(h.meta.bank.purchasedSlots).toBe(6);
-    // The re-insert provably preceded the retry's spend: three begin calls
-    // (the first purchase, the retry's conflict read, the post-reopen-miss
-    // re-insert), the last ordered before the retry's spend.
-    const beginOrders = h.db.begin.mock.invocationCallOrder;
-    expect(beginOrders.length).toBe(3);
-    expect(beginOrders[2]).toBeLessThan(h.spend.mock.invocationCallOrder[1]);
+    expect(result.reason).toBe('unavailable');
+    expect(h.db.rows.get('key-cleanup-miss')?.status).toBe('pending');
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
   });
 
   it('resolves an ambiguous outcome by retrying the SAME key in the background, applying once', async () => {
@@ -842,7 +903,7 @@ describe('refusals before any money moves', () => {
     expect(h.spend).not.toHaveBeenCalled();
   });
 
-  it('a definitive service refusal settles the row refused and passes the reason through', async () => {
+  it('a definitive service refusal deletes its row and passes the reason through', async () => {
     const h = makeHarness();
     h.spendResults.push({
       granted: false,
@@ -858,10 +919,11 @@ describe('refusals before any money moves', () => {
     });
     expect(res.reason).toBe('insufficient_balance');
     expect(res.balance).toBe(40);
-    expect(h.db.rows.get('key-9')?.status).toBe('refused');
+    expect(h.db.rows.has('key-9')).toBe(false);
     expect(h.meta.bank.purchasedSlots).toBe(0);
-    // A later same-key retry is a legitimate fresh attempt (the service
-    // keeps no record of a refusal): the row reopens and the retry lands.
+    expect(h.db.releaseSpendClaim).not.toHaveBeenCalled();
+    // A later same-key retry is a legitimate fresh attempt: neither the game
+    // nor the service retained no-debit history under that key.
     h.spendResults.push(granted());
     const retry = await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
@@ -973,6 +1035,36 @@ describe('the per-character mutex', () => {
     expect(h.spend).toHaveBeenCalledTimes(1);
     expect(h.meta.bank.purchasedSlots).toBe(6);
   });
+
+  it('an overlapping host that finds the same pending key performs zero service I/O', async () => {
+    const h = makeHarness();
+    const service = deferred<ClaudiumSpendOutcome>();
+    h.spendResults.push(() => service.promise);
+    const first = executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'cross-host-key',
+    });
+    await waitFor(() => h.spend.mock.calls.length === 1);
+
+    // Model a second process: its in-memory mutex is empty, but it shares the
+    // authoritative database row and claim owned by the first process.
+    resetStoragePurchasesForTests();
+    const second = await executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'cross-host-key',
+    });
+    expect(second.reason).toBe('purchase_in_progress');
+    expect(h.spend).toHaveBeenCalledTimes(1);
+
+    service.resolve({ result: granted(), neverReached: false });
+    expect((await first).granted).toBe(true);
+    await waitFor(() => h.db.rows.get('cross-host-key')?.status === 'applied');
+    expect(h.meta.bank.purchasedSlots).toBe(6);
+  });
 });
 
 describe('the apply-time re-check (defense in depth) and the unresolved surface', () => {
@@ -1077,15 +1169,20 @@ describe('login recovery', () => {
     expect(h.meta.bank.purchasedSlots).toBe(6);
     await waitFor(() => h.db.rows.get('key-17')?.status === 'applied');
     expect(h.spend).toHaveBeenCalledTimes(3);
+    expect(h.db.claimSpend).toHaveBeenCalledTimes(3);
+    // Claim acquisition is the pre-service lease; there is exactly one
+    // post-service revalidation, not a redundant UPDATE immediately before IO.
+    expect(h.db.renewSpendClaim).toHaveBeenCalledTimes(3);
+    expect(h.db.releaseSpendClaim).toHaveBeenCalledTimes(2);
   });
 
   it('the kick closes the gold rail SYNCHRONOUSLY, before the scan answers', async () => {
     const h = makeHarness();
-    let resolvePending!: (rows: never[]) => void;
+    let resolvePending!: (row: FakeRow | null) => void;
     h.db.pendingFor.mockImplementationOnce(
       () =>
-        new Promise((r) => {
-          resolvePending = r as never;
+        new Promise<FakeRow | null>((r) => {
+          resolvePending = r;
         }),
     );
     configureStoragePurchaseRuntime(() => h.host);
@@ -1095,7 +1192,7 @@ describe('login recovery', () => {
     // racing the login kick is refused instead of interleaving a debited,
     // unapplied purchase.
     expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
-    resolvePending([]);
+    resolvePending(null);
     await waitFor(() => storagePurchaseInFlight(CHARACTER) === false);
   });
 
@@ -1118,93 +1215,145 @@ describe('login recovery', () => {
     expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
   });
 
-  it('a settle re-kicks the scan, converging the sibling row the hand-off abandoned', async () => {
-    // The one behaviour settleInBackground's finally exists for. The login scan
-    // is one-at-a-time: when a row's spend comes back ambiguous it hands off to
-    // the background task and RETURNS, leaving every later pending row of that
-    // character untouched. Only the re-kick revisits them, and until it does the
-    // mutex is free, so a gold rung buy can advance the ladder underneath the
-    // abandoned row and turn its eventual replay into a debit with no slots.
-    //
-    // configureStoragePurchaseRuntime is load-bearing here, not scaffolding:
-    // kickStoragePurchaseRecovery returns at its first line when no runtime
-    // factory is set, and resetStoragePurchasesForTests nulls it between cases,
-    // so without this line the re-kick is inert and the case would pass with or
-    // without the code under test.
+  it('never spends a second key while a same-SKU pending row owns the character', async () => {
     const h = makeHarness();
-    for (const [itemId, idempotencyKey] of [
-      ['strongbox_rung_01', 'key-sibling-a'],
-      ['strongbox_rung_02', 'key-sibling-b'],
-    ]) {
-      await h.db.begin({
-        realm: 'testrealm',
-        accountId: ACCOUNT,
-        characterId: CHARACTER,
-        itemId,
-        expectedCostClaudium: 100,
-        idempotencyKey,
-      });
-    }
-    // A: ambiguous once, then granted by the background retry. B: granted on
-    // the re-kicked scan's first attempt.
-    h.spendResults.push(unavailable(), granted(), granted());
-    configureStoragePurchaseRuntime(() => h.host);
+    await h.db.begin({
+      realm: 'testrealm',
+      accountId: ACCOUNT,
+      characterId: CHARACTER,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'older-pending',
+    });
 
-    await resumeStoragePurchasesAtLogin(h.host, CHARACTER);
-    // The hand-off really did abandon B: the scan returned with B untouched.
-    expect(h.db.rows.get('key-sibling-b')?.status).toBe('pending');
+    const result = await executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'new-key-same-sku',
+    });
+    expect(result.reason).toBe('purchase_in_progress');
+    expect(h.spend).not.toHaveBeenCalled();
+    expect([...h.db.rows.keys()]).toEqual(['older-pending']);
+  });
 
-    await waitFor(() => h.db.rows.get('key-sibling-b')?.status === 'applied');
-    expect(h.db.rows.get('key-sibling-a')?.status).toBe('applied');
-    // Decisive: BOTH rungs landed, so the counter advanced by two whole grants
-    // rather than stopping at the one the scan happened to reach.
-    expect(h.meta.bank.purchasedSlots).toBe(12);
-    expect(h.meta.bank.appliedStorageKeys).toEqual(['key-sibling-a', 'key-sibling-b']);
-    expect(h.spend).toHaveBeenCalledTimes(3);
-    // The chain terminates: the final re-kick finds nothing left and the rail
-    // reopens, so this is convergence and not a hot loop holding the mutex.
-    await waitFor(() => storagePurchaseInFlight(CHARACTER) === false);
-  }, 15_000);
+  it('a stale never-reached reply cannot delete after another process takes the claim', async () => {
+    const h = makeHarness();
+    const response = deferred<ClaudiumSpendOutcome>();
+    h.spendResults.push(() => response.promise);
+    const purchase = executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'stale-never-reached',
+    });
+    await waitFor(() => h.spend.mock.calls.length === 1);
+    const pending = h.db.rows.get('stale-never-reached');
+    if (!pending) throw new Error('pending row was not inserted before spend');
+    pending.spendClaimToken = '00000000-0000-4000-8000-000000000099';
+    response.resolve(neverReached());
+
+    expect((await purchase).reason).toBe('unavailable');
+    expect(h.db.discardWithoutDebit).not.toHaveBeenCalled();
+    expect(h.db.rows.get('stale-never-reached')?.status).toBe('pending');
+  });
+
+  it('a stale granted reply cannot mutate or stage after another process takes the claim', async () => {
+    const h = makeHarness();
+    const response = deferred<ClaudiumSpendOutcome>();
+    h.spendResults.push(() => response.promise);
+    const purchase = executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'stale-granted',
+    });
+    await waitFor(() => h.spend.mock.calls.length === 1);
+    const pending = h.db.rows.get('stale-granted');
+    if (!pending) throw new Error('pending row was not inserted before spend');
+    pending.spendClaimToken = '00000000-0000-4000-8000-000000000098';
+    response.resolve({ result: granted(), neverReached: false });
+
+    expect((await purchase).reason).toBe('unavailable');
+    expect(h.meta.bank.purchasedSlots).toBe(0);
+    expect(h.stageAppliedEffect).not.toHaveBeenCalled();
+    expect(h.db.rows.get('stale-granted')?.status).toBe('pending');
+  });
 
   it('a QUEUED kick holds the gold rail for its whole wait, not just its scan', async () => {
     // The RESIDUAL exposure after phase 14, kept observable. The gate now
     // holds only the SCAN (the sibling storm suite pins that row work no
     // longer queues anyone), so this arm is deliberately built out of scans
-    // that never answer: a character whose kick is still queued behind four
+    // that never answer: a character whose kick is still queued behind two
     // WEDGED scans is refused a GOLD bank_buy_slots although it has no
     // purchase at all. That remainder is covered by the stuck-promise
     // backstop in server/storage_ladder_hold.ts, which is a bound on a bug
     // rather than a policy, and the arm below runs well inside it.
     const h = makeHarness();
-    // Four slow scans occupy every slot in the gate.
+    // Two slow scans occupy every slot in the bounded coordinator.
     const release: (() => void)[] = [];
     h.db.pendingFor.mockImplementation(
       () =>
-        new Promise((r) => {
-          release.push(() => r([]));
+        new Promise<FakeRow | null>((r) => {
+          release.push(() => r(null));
         }),
     );
     configureStoragePurchaseRuntime(() => h.host);
-    const BLOCKERS = [901, 902, 903, 904];
+    const BLOCKERS = [901, 902];
     for (const id of BLOCKERS) kickStoragePurchaseRecovery(id);
-    await waitFor(() => release.length === 4);
+    await waitFor(() => release.length === 2);
 
-    // The fifth character joins. Its kick can only QUEUE, so its scan has not
+    // The third character joins. Its kick can only QUEUE, so its scan has not
     // started, yet its rail is already closed.
-    kickStoragePurchaseRecovery(905);
-    expect(release.length).toBe(4);
-    expect(storagePurchaseInFlight(905)).toBe(true);
+    kickStoragePurchaseRecovery(903);
+    expect(release.length).toBe(2);
+    expect(storagePurchaseInFlight(903)).toBe(true);
 
     // Draining one slot is not enough to reach it either: strictly FIFO.
     release[0]();
-    await waitFor(() => release.length === 5);
+    await waitFor(() => release.length === 3);
     // Now its scan runs; once it answers, the rail reopens.
-    release[4]();
-    await waitFor(() => storagePurchaseInFlight(905) === false);
+    release[2]();
+    await waitFor(() => storagePurchaseInFlight(903) === false);
 
-    for (const r of release.slice(1, 4)) r();
+    for (const r of release.slice(1, 2)) r();
     await waitFor(() => BLOCKERS.every((id) => storagePurchaseInFlight(id) === false));
   }, 20_000);
+
+  it('keeps both purchase rails blocked and retries in-session at the recovery cap', async () => {
+    const h = makeHarness();
+    h.db.pendingFor.mockImplementation(() => new Promise<FakeRow | null>(() => {}));
+    configureStoragePurchaseRuntime(() => h.host);
+    for (let offset = 0; offset < STORAGE_RECOVERY_MAX_TRACKED; offset++) {
+      kickStoragePurchaseRecovery(10_000 + offset);
+    }
+
+    // The 5,001st live character is not retained by the coordinator. Its
+    // session-owned bit is the bounded-overflow lane and independently guards
+    // gold until the game loop can re-admit its scan.
+    expect(kickStoragePurchaseRecovery(CHARACTER)).toBe(false);
+    expect(h.state.recoveryAdmissionPending).toBe(true);
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+    const paid = await executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'overflow-paid',
+    });
+    expect(paid.reason).toBe('purchase_in_progress');
+    expect(h.db.begin).not.toHaveBeenCalled();
+    expect(h.spend).not.toHaveBeenCalled();
+
+    // A final-session teardown creates one exact O(1) eviction candidate. The
+    // next bounded sweep attempt admits this live key and transfers protection
+    // back to the ordinary recovery-scan hold.
+    const victim = 10_002;
+    h.state.offlineCharacters.add(victim);
+    storagePurchaseCharacterOffline(victim);
+    expect(kickStoragePurchaseRecovery(CHARACTER)).toBe(true);
+    expect(h.state.recoveryAdmissionPending).toBe(false);
+    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+  });
 
   it('recovery for an offline character leaves the row pending and takes nothing', async () => {
     const h = makeHarness();
@@ -1230,7 +1379,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
   // is taken for too long OR released too early. Every yield has its blocking
   // twin beside it.
 
-  it('an outage press that never reached the service settles refused and reserves nothing', async () => {
+  it('an outage press that never reached the service deletes its row and reserves nothing', async () => {
     // RULING 27, the reproduction. The economy service is down, the price cache
     // is still quoting, so the Claudium rail is on the button; pressing it must
     // not cost the player their GOLD rung.
@@ -1248,71 +1397,13 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       costClaudium: null,
       reason: 'unavailable',
     });
-    // No debit was possible, so the row is settled rather than left open...
-    expect(h.db.rows.get('outage-1')?.status).toBe('refused');
+    // No debit was possible, so the operational row leaves no history...
+    expect(h.db.rows.has('outage-1')).toBe(false);
     // ... nothing is holding the ladder ...
     expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
     // ... and no slots were granted on the way through.
     expect(h.meta.bank.purchasedSlots).toBe(0);
     expect(h.meta.bank.appliedStorageKeys).toEqual([]);
-  });
-
-  it("one apply's save cannot close ANOTHER apply's ledger-ordering window", async () => {
-    // Recovery drives rows in a loop and fires the atomic saves without awaiting
-    // them, so two applied effects for one character overlap. The window
-    // exists so a gold rung landing between a sim mutation and its durable
-    // claudium ledger row is visible as a purchased_regression; closing it
-    // early on somebody else's save reopens exactly that gap.
-    const h = makeHarness();
-    const saves: ((v: boolean) => void)[] = [];
-    h.saveCharacter.mockImplementation(
-      () =>
-        new Promise<boolean>((resolve) =>
-          saves.push((saved) => {
-            if (saved && h.stagedEffects[0]) h.commitStaged([h.stagedEffects[0]]);
-            resolve(saved);
-          }),
-        ),
-    );
-    h.db.rows.set('ord-1', {
-      id: 1,
-      realm: 'testrealm',
-      accountId: ACCOUNT,
-      characterId: CHARACTER,
-      itemId: 'strongbox_rung_01',
-      expectedCostClaudium: 100,
-      idempotencyKey: 'ord-1',
-      status: 'pending',
-      resolvedAt: null,
-    });
-    h.db.rows.set('ord-2', {
-      id: 2,
-      realm: 'testrealm',
-      accountId: ACCOUNT,
-      characterId: CHARACTER,
-      itemId: 'strongbox_rung_02',
-      expectedCostClaudium: 100,
-      idempotencyKey: 'ord-2',
-      status: 'pending',
-      resolvedAt: null,
-    });
-    h.spendResults.push(granted(), granted());
-
-    await resumeStoragePurchasesAtLogin(h.host, CHARACTER);
-    // Both applies have run and both saves are outstanding.
-    await waitFor(() => saves.length === 2);
-    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
-
-    // The FIRST purchase's save confirms. Its finally must close only its own
-    // window; the second purchase's ledger row is still unwritten.
-    saves[0](true);
-    await waitFor(() => h.db.rows.get('ord-1')?.status === 'applied');
-    expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
-
-    // Once the second confirms too, the rail is genuinely clear.
-    saves[1](true);
-    await waitFor(() => h.db.rows.get('ord-2')?.status === 'applied');
-    await waitFor(() => storagePurchaseInFlight(CHARACTER) === false);
   });
 
   it('a wedged ledger-ordering hold and a lapsed ladder hold do not flood together', async () => {
@@ -1323,7 +1414,6 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     // gold press, on the thread that runs the world loop.
     const h = makeHarness();
     h.state.saveResult = new Promise<boolean>(() => {});
-    h.host.delay = () => new Promise<void>(() => {});
     h.spendResults.push(granted());
     await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
@@ -1397,7 +1487,6 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     // second, which is the one that says a gold rung may now land on a live
     // debit. The dedupe token therefore carries the reason as well.
     const h = makeHarness();
-    h.host.delay = () => new Promise<void>(() => {});
     let releaseSpend: ((v: ClaudiumSpendOutcome) => void) | undefined;
     h.spendResults.push(
       () =>
@@ -1442,14 +1531,13 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     }
   });
 
-  it('a SECOND press during the same outage still settles refused and still holds nothing', async () => {
+  it('a SECOND press during the same outage still leaves no row and holds nothing', async () => {
     // The phase's goal is that a character's GOLD rung keeps working through a
     // service outage. Pressing an unresponsive button twice is the most
     // ordinary input there is, and the client is documented to retry the SAME
-    // key on 'unavailable'. Press two finds its own 'refused' row, reopens it,
-    // and used to fall through to the ambiguity retry because the row was not
-    // freshly INSERTED, shutting that player's gold rail for ten minutes over a
-    // purchase that provably never reached anybody.
+    // key on 'unavailable'. Each press creates its recoverability row before
+    // spend and deletes it only after proving this attempt never reached the
+    // service.
     const h = makeHarness();
     h.spendResults.push(neverReached(), neverReached());
     const press = {
@@ -1459,13 +1547,13 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       idempotencyKey: 'outage-twice',
     };
     await executeStoragePurchase(h.host, press);
-    expect(h.db.rows.get('outage-twice')?.status).toBe('refused');
+    expect(h.db.rows.has('outage-twice')).toBe(false);
     expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
 
     const second = await executeStoragePurchase(h.host, press);
     expect(second.reason).toBe('unavailable');
-    // Reopened, spent, provably never reached, settled again ...
-    expect(h.db.rows.get('outage-twice')?.status).toBe('refused');
+    // Reinserted, spent, provably never reached, deleted again ...
+    expect(h.db.rows.has('outage-twice')).toBe(false);
     // ... and the gold rail is STILL free, with no ten-minute settling hold.
     expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
     expect(h.meta.bank.purchasedSlots).toBe(0);
@@ -1473,7 +1561,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
 
   it('a never-reached press whose settle write FAILS leaves a driver behind', async () => {
     // The one exit that used to release the mutex over an open row with nothing
-    // arranged to revisit it. The settle fails on exactly the infrastructure
+    // arranged to revisit it. The delete fails on exactly the infrastructure
     // trouble that accompanies an economy outage, and the row then sits pending
     // with the gold rail open until the character's next login.
     const h = makeHarness();
@@ -1483,12 +1571,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       kicked.push(CHARACTER);
       throw new Error('runtime unavailable in this arm');
     });
-    // A real write FAILURE, not merely a row that was no longer pending.
-    // safeSettle distinguishes the two on purpose: settle() is guarded FROM
-    // pending, so a false means somebody else already moved the row to a
-    // terminal status, which is a closed row needing no driver. Only a thrown
-    // write leaves an open row behind.
-    h.db.settle.mockRejectedValue(new Error('pool exhausted'));
+    h.db.discardWithoutDebit.mockRejectedValue(new Error('pool exhausted'));
     const res = await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
       itemId: 'strongbox_rung_01',
@@ -1501,12 +1584,9 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     expect(kicked.length).toBeGreaterThan(0);
   });
 
-  it('a never-reached press whose row was ALREADY settled arranges no driver', async () => {
-    // The negative twin, and the reason safeSettle reports three states rather
-    // than a boolean. settle() is guarded FROM pending, so a false answer means
-    // a concurrent driver already moved the row to a terminal status. Arming a
-    // recovery scan for that is a database round trip for work that does not
-    // exist, on the outage path where the pool is already the scarce thing.
+  it('a never-reached press whose delete cannot be confirmed arranges a driver', async () => {
+    // A false DELETE result cannot prove why the row was absent or changed.
+    // Fail closed exactly like a thrown write and let recovery re-read truth.
     const h = makeHarness();
     h.spendResults.push(neverReached());
     const kicked: number[] = [];
@@ -1514,7 +1594,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       kicked.push(CHARACTER);
       throw new Error('runtime unavailable in this arm');
     });
-    h.db.settle.mockResolvedValue(false);
+    h.db.discardWithoutDebit.mockResolvedValue(false);
     const res = await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
       itemId: 'strongbox_rung_01',
@@ -1522,7 +1602,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       idempotencyKey: 'outage-already-settled',
     });
     expect(res.reason).toBe('unavailable');
-    expect(kicked).toHaveLength(0);
+    expect(kicked.length).toBeGreaterThan(0);
   });
 
   it('a REACHED ambiguous outcome still reserves the ladder: the arm that must not yield', async () => {
@@ -1530,7 +1610,6 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     // guarantee: a timeout or a 5xx may be sitting on top of a live debit, so
     // the reservation stands and the row stays open for the retry.
     const h = makeHarness();
-    h.host.delay = () => new Promise<void>(() => {});
     h.spendResults.push(unavailable());
     const res = await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
@@ -1549,7 +1628,6 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     // reached the service, so answering its retry with a definitive refusal is
     // exactly the mis-settle over a live debit the classifier exists to stop.
     const h = makeHarness();
-    h.host.delay = () => new Promise<void>(() => {});
     h.spendResults.push(unavailable());
     await executeStoragePurchase(h.host, {
       accountId: ACCOUNT,
@@ -1570,9 +1648,9 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     expect(h.db.rows.get('poisoned')?.status).toBe('pending');
     expect(h.spend).toHaveBeenCalledTimes(1);
 
-    // And once the holder has gone (a process that dropped the in-memory hold),
-    // the retry re-spends the same key and a NEVER-REACHED answer still leaves
-    // the row open, because the FIRST attempt may have debited.
+    // Once the holder has gone (a process that dropped the in-memory hold), a
+    // request still cannot become a second cross-process spender. It re-kicks
+    // recovery, whose DB claim serializes the same-key service retry.
     resetStoragePurchasesForTests();
     h.spendResults.push(neverReached());
     const later = await executeStoragePurchase(h.host, {
@@ -1581,13 +1659,13 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       expectedCostClaudium: 100,
       idempotencyKey: 'poisoned',
     });
-    expect(later.reason).toBe('unavailable');
+    expect(later.reason).toBe('purchase_in_progress');
     expect(h.db.rows.get('poisoned')?.status).toBe('pending');
+    expect(h.spend).toHaveBeenCalledTimes(1);
   });
 
   it('an ambiguous hold yields the GOLD rail at its bound, and still refuses a new Claudium buy', async () => {
     const h = makeHarness();
-    h.host.delay = () => new Promise<void>(() => {});
     const clock = vi.spyOn(Date, 'now');
     const start = 1_700_000_000_000;
     clock.mockReturnValue(start);

@@ -375,9 +375,11 @@ import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import {
   beginStoragePurchase,
+  claimStoragePurchaseSpend,
+  deletePendingStoragePurchaseWithoutDebit,
   pendingStoragePurchasesForCharacter,
-  pruneRefusedStoragePurchasesBatch,
-  reopenStoragePurchase,
+  releaseStoragePurchaseSpendClaim,
+  renewStoragePurchaseSpendClaim,
   settleStoragePurchase,
   storagePurchaseByKey,
 } from './storage_purchase_db';
@@ -385,6 +387,7 @@ import {
   configureStoragePurchaseRuntime,
   executeStoragePurchase,
   type StoragePurchaseHost,
+  stopStoragePurchaseRecovery,
 } from './storage_purchases';
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
@@ -3166,6 +3169,13 @@ function storagePurchaseHost(): StoragePurchaseHost {
       }
       return found;
     },
+    // O(1) sessionsByCharacterId lookup. Recovery may evict only nonactive
+    // work for a character this process no longer owns; the next login safely
+    // re-arms its provisional hold and scan.
+    isCharacterLive: (characterId) => game.hasSessionForCharacter(characterId),
+    setRecoveryAdmissionPending: (characterId, pending) =>
+      void game.storageRecoveryAdmission(characterId, pending),
+    recoveryAdmissionPending: (characterId) => game.storageRecoveryAdmission(characterId),
     grant: (pid, skuId, purchaseKey, dryRun) =>
       bankGrantStorageSlots(game.sim.ctx, pid, skuId, purchaseKey, { dryRun }),
     stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect),
@@ -3174,10 +3184,10 @@ function storagePurchaseHost(): StoragePurchaseHost {
     // single session; it matters when a quarantined session and a live one
     // share a character id, where taking the first match would answer false for
     // a character that can in fact save.
-    saveCharacter: (characterId) => {
+    saveCharacter: (characterId, shouldStart) => {
       for (const s of game.clients.values()) {
         if (s.characterId === characterId && !s.left && !s.escrowQuarantined) {
-          return game.saveCharacter(s);
+          return game.saveCharacter(s, { shouldStart });
         }
       }
       return Promise.resolve(false);
@@ -3189,12 +3199,15 @@ function storagePurchaseHost(): StoragePurchaseHost {
     db: {
       begin: (row) => beginStoragePurchase(pool, row),
       byKey: (key) => storagePurchaseByKey(pool, key),
-      settle: (key, status) => settleStoragePurchase(pool, key, status),
-      reopen: (key) => reopenStoragePurchase(pool, key),
+      claimSpend: (key, token) => claimStoragePurchaseSpend(pool, key, token),
+      renewSpendClaim: (key, token) => renewStoragePurchaseSpendClaim(pool, key, token),
+      releaseSpendClaim: (key, token) => releaseStoragePurchaseSpendClaim(pool, key, token),
+      settle: (key, status, token) => settleStoragePurchase(pool, key, status, token),
+      discardWithoutDebit: (key, token) =>
+        deletePendingStoragePurchaseWithoutDebit(pool, key, token),
       pendingFor: (characterId) => pendingStoragePurchasesForCharacter(pool, characterId),
     },
     realm: REALM,
-    delay: (ms) => new Promise((resolve) => setTimeout(resolve, ms).unref()),
     warn: (message) => console.warn(`[storage-purchase] ${message}`),
   };
 }
@@ -3827,21 +3840,6 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) => prunePlaySessionsBatch(pool, config.playSessionRetentionDays, n),
       },
       {
-        // The Claudium storage pending-purchase table (Bank Storage phase
-        // 11): an OPERATIONAL table, so REFUSED rows sweep after the window
-        // while every other status is never touched (pending is recoverable
-        // work, unresolved is an open operator case, and applied is the
-        // rollback dedupe backstop, kept forever since phase 14). The
-        // deliberate OPPOSITE of bank_ledger above: that is the append-only
-        // audit ledger of the same purchases (now also fed by the Claudium
-        // rail's buy_slots rows) and stays out of this list by ruling (see
-        // the server/bank_ledger.ts header and its 10,000,000-row revisit
-        // threshold); do not unify the two rules.
-        name: 'storage_purchases',
-        pruneBatch: (n) =>
-          pruneRefusedStoragePurchasesBatch(pool, config.storagePurchaseRetentionDays, n),
-      },
-      {
         name: 'account_ip_associations',
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
@@ -4018,6 +4016,7 @@ export async function startServer(): Promise<http.Server> {
     // fire before pool.end()).
     await businessMetrics.stop();
     game.beginShutdown();
+    await stopStoragePurchaseRecovery();
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();

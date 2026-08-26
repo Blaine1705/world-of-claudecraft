@@ -1395,9 +1395,9 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
 
 // THE STORAGE PURCHASE ARM (Bank Storage phase 14, closing the ruling that
 // unresolved rows had no operator surface at all: no admin route, no metric, and
-// nothing here read status). storage_purchases is the ONLY durable game-side
-// record of a paid-but-unapplied Claudium grant, and two of its statuses are
-// things a person has to look at:
+// nothing here read status). The pending operational row and the deletion-proof
+// applied receipt are the durable game-side records of a Claudium purchase.
+// Two operational statuses are things a person has to look at:
 //
 //   unresolved  the spend was accepted and the apply-time re-check refused.
 //               Impossible-state territory: the player was charged and holds no
@@ -1408,9 +1408,10 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
 //               past the threshold below, either the character has not come back
 //               or nothing is driving the row at all.
 //
-// applied and refused rows are deliberately not reported: they are the terminal
-// happy paths, and applied rows are kept forever as the rollback dedupe backstop
-// rather than because anyone needs to read them.
+// `applied` is a legacy mixed-version status. Current successful writers archive
+// the immutable receipt and delete the operational row in the character-save
+// transaction. A definitive no-debit refusal also deletes its pending row before
+// it is reported to the player; refusal history is not a persistent status.
 //
 // This arm is DE-COUPLED from the ledger replay above: it reconciles nothing
 // against character state, so it takes no part in the container grouping and
@@ -1434,9 +1435,9 @@ export const STORAGE_PURCHASE_REPORT_LIMIT = 500;
 /** The status vocabulary, mirrored from StoragePurchaseStatus in
  *  server/storage_purchase_db.ts (this script stays dependency-free of the TS
  *  server; tests/bank_audit.test.ts pins the two in lockstep). A row outside it
- *  is reported rather than ignored: the column is free text with no CHECK, so a
- *  bad value is either corruption or a writer nobody knows about. */
-export const STORAGE_PURCHASE_STATUSES = new Set(['pending', 'applied', 'refused', 'unresolved']);
+ *  is reported rather than ignored: the current schema carries a CHECK, so a
+ *  bad value means a stale/disabled constraint or a corrupt restore. */
+export const STORAGE_PURCHASE_STATUSES = new Set(['pending', 'applied', 'unresolved']);
 
 // pg returns TIMESTAMPTZ as a Date and a fixture as a string; both parse, and
 // anything unreadable answers null so the caller reports rather than inventing
@@ -1517,7 +1518,7 @@ export function formatStoragePurchaseReport(rows, findings, truncated = false, t
   // report: an operator reading a tidy list has to know more rows exist.
   if (truncated) {
     lines.push(
-      `storage purchases: TRUNCATED at ${STORAGE_PURCHASE_REPORT_LIMIT} open rows: more exist and are NOT listed below. UNRESOLVED rows are read first, so every charged-player row is listed; the rows omitted are PENDING. Query storage_purchases directly for the full picture.`,
+      `storage purchases: TRUNCATED at ${STORAGE_PURCHASE_REPORT_LIMIT} open rows: more exist and are NOT listed below. UNRESOLVED rows are read first, so pending rows cannot hide them; if unresolved alone exceeds this limit, some are omitted too. Omitted rows can also include corrupt out-of-vocabulary statuses. Query storage_purchases directly for the full picture.`,
     );
   }
   // Prefer the whole-table totals when the caller has them: over a truncated
@@ -1705,9 +1706,9 @@ async function main() {
     // schema) must still get its ledger audit. to_regclass honours the
     // search_path, so the probe names the same relation the read would.
     //
-    // Only the OPEN statuses are read. Be precise about what that buys: the
-    // RESULT is small, the SCAN is not. `status` carries no index and applied
-    // rows are now kept forever, so this reads the whole table and filters. That
+    // Only non-applied statuses are read. Be precise about what that buys: the
+    // RESULT is small, the SCAN is not. `status` carries no general index, so
+    // this reads the whole table and filters. That
     // is acceptable here and nowhere else: an offline operator tool, under a
     // statement timeout, in a run that already scans the whole bank_ledger. It
     // is also LIMITED, because the incident that makes this report interesting
@@ -1722,7 +1723,7 @@ async function main() {
         `SELECT id, realm, account_id, character_id, item_id, expected_cost_claudium,
                 idempotency_key, status, created_at, resolved_at
            FROM storage_purchases
-          WHERE status <> 'applied' AND status <> 'refused'
+          WHERE status <> 'applied'
           ORDER BY (status = 'unresolved') DESC, id
           LIMIT $1`,
         [STORAGE_PURCHASE_REPORT_LIMIT + 1],
@@ -1737,7 +1738,7 @@ async function main() {
       const totals = await pool.query(
         `SELECT status, count(*)::int AS n
            FROM storage_purchases
-          WHERE status <> 'applied' AND status <> 'refused'
+          WHERE status <> 'applied'
           GROUP BY status`,
       );
       storageFindings = auditStoragePurchases({ rows, nowMs: Date.now() });
