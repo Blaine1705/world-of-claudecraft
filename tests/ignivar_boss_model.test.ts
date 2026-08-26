@@ -168,7 +168,7 @@ describe('Ignivar boss model', () => {
   it('applies its readability controls without mutating the source material', () => {
     const map = new THREE.Texture();
     const source = new THREE.MeshStandardMaterial({ map, roughness: 0.7, metalness: 0.8 });
-    const material = tintedMaterial(source, null, 0, null, null, 'body', null, 'rig', 0.32, 2.4);
+    const material = tintedMaterial(source, null, 0, null, null, 'body', null, 'rig', '', 0.32, 2.4);
 
     expect(material).not.toBe(source);
     expect((material as THREE.MeshStandardMaterial).emissiveMap).toBe(map);

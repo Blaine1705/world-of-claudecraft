@@ -1383,10 +1383,12 @@ export class MageGroundFx {
         meteor.trailOuterMat,
         meteor.trailInnerMat,
         meteor.emberMat,
+        meteor.footprintMat,
         meteor.boundaryMat,
-        meteor.innerRingMat,
+        meteor.countdownMat,
         meteor.veinMat,
         meteor.flameMat,
+        meteor.beaconEmberMat,
       ]) {
         materials.add(material);
       }

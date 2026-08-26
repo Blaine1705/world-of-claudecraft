@@ -25,7 +25,7 @@ export function prepareVarkhulGrandForgeAssets(): Promise<void> {
 }
 
 if (typeof window !== 'undefined') {
-  registerDeferredPreload(prepareVarkhulGrandForgeAssets, 'background');
+  registerDeferredPreload(prepareVarkhulGrandForgeAssets);
 }
 
 export function resetVarkhulGrandForgeCaches(): void {
