@@ -11,12 +11,13 @@ export interface BankLedgerOutboxLimits {
   readonly maxEncodedBytes: number;
 }
 
-// bank_ledger.ts derives a combined adversarial ceiling of 62.3 rows/s and the
-// live character autosave interval is 30 seconds. That is 1,869 rows per normal
-// save window. 2,048 leaves a small scheduler margin while deliberately refusing
-// to retain two failed-save windows for one session. The byte cap gives those
-// rows about 1 KiB each on average and independently catches unusually large item
-// instances before their object graphs can become an unbounded memory queue.
+// The completed admission map derives a combined adversarial ceiling of about
+// 63.43 rows/s and the live character autosave interval is 30 seconds. That is
+// 1,903 rows per normal save window after rounding up. 2,048 leaves a small
+// scheduler margin while deliberately refusing to retain two failed-save windows
+// for one session. The byte cap gives those rows about 1 KiB each on average and
+// independently catches unusually large item instances before their object graphs
+// can become an unbounded memory queue.
 export const BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS: BankLedgerOutboxLimits = Object.freeze({
   maxRows: 2_048,
   maxEncodedBytes: 2 * 1024 * 1024,
@@ -38,6 +39,12 @@ export const BANK_LEDGER_OUTBOX_DEFAULT_GLOBAL_LIMITS: BankLedgerOutboxLimits = 
 export const BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH = 200;
 const BANK_LEDGER_OUTBOX_BATCH_KEY_SHAPE = /^[A-Za-z0-9_.:-]+$/;
 
+export interface BankLedgerOutboxOwner {
+  readonly realm: string;
+  readonly characterId: number;
+  readonly accountId: number;
+}
+
 export type BankLedgerOutboxRowInput = Readonly<BankLedgerRow>;
 
 export type SerializedBankLedgerOutboxRow = Readonly<
@@ -56,6 +63,15 @@ export interface BankLedgerCommandBatch {
   readonly encodedBytes: number;
 }
 
+/**
+ * A batch detached by this module. The additive correlation fields stay out of
+ * the receipt fingerprint, which remains exactly `{ batchKey, rows }`.
+ */
+export interface PreparedBankLedgerCommandBatch extends BankLedgerCommandBatch {
+  readonly guildIds: readonly number[];
+  readonly hasUnscopedRows: boolean;
+}
+
 export interface BankLedgerOutboxReservationRequest {
   readonly maxRows: number;
   readonly maxEncodedBytes: number;
@@ -72,6 +88,10 @@ export interface BankLedgerOutboxReservation {
   readonly maxEncodedBytes: number;
 }
 
+export interface BankLedgerOutboxPreparedReservation extends BankLedgerOutboxReservation {
+  readonly batch: PreparedBankLedgerCommandBatch;
+}
+
 export interface BankLedgerOutboxUsage {
   readonly queuedRows: number;
   readonly queuedEncodedBytes: number;
@@ -85,9 +105,14 @@ export interface BankLedgerOutboxBudgetUsage {
 }
 
 export interface BankLedgerOutboxSnapshot {
-  readonly batches: readonly BankLedgerCommandBatch[];
+  readonly owner: BankLedgerOutboxOwner;
+  readonly batches: readonly PreparedBankLedgerCommandBatch[];
   readonly rowCount: number;
   readonly encodedBytes: number;
+  /** Sorted guild ids mentioned anywhere in this blind exact prefix. */
+  readonly guildIds: readonly number[];
+  /** True when the prefix also carries personal or vault rows. */
+  readonly hasUnscopedRows: boolean;
 }
 
 export type BankLedgerBatchKeyFactory = () => string;
@@ -123,6 +148,20 @@ function checkedLimits(limits: BankLedgerOutboxLimits, name: string): BankLedger
   return Object.freeze({
     maxRows: limits.maxRows,
     maxEncodedBytes: limits.maxEncodedBytes,
+  });
+}
+
+function checkedOwner(owner: BankLedgerOutboxOwner): BankLedgerOutboxOwner {
+  if (typeof owner !== 'object' || owner === null) {
+    throw new TypeError('bank ledger outbox owner must be an object');
+  }
+  checkedString(owner.realm, 'owner.realm');
+  assertPositiveInteger(owner.characterId, 'owner.characterId');
+  assertPositiveInteger(owner.accountId, 'owner.accountId');
+  return Object.freeze({
+    realm: owner.realm,
+    characterId: owner.characterId,
+    accountId: owner.accountId,
   });
 }
 
@@ -239,8 +278,14 @@ function serializeRow(row: BankLedgerOutboxRowInput): SerializedBankLedgerOutbox
     throw new RangeError('row.copperDelta must be a safe integer');
   }
   assertNonNegativeInteger(row.purchasedSlotsAfter, 'row.purchasedSlotsAfter');
-  checkedString(row.container, 'row.container');
-  assertIntegerOrNull(row.containerId, 'row.containerId');
+  if (row.container !== 'personal' && row.container !== 'guild' && row.container !== 'vault') {
+    throw new TypeError('row.container must be personal, guild, or vault');
+  }
+  if (row.container === 'guild') {
+    assertPositiveInteger(row.containerId as number, 'row.containerId');
+  } else if (row.containerId !== null) {
+    throw new TypeError(`row.containerId must be null for ${row.container}`);
+  }
   assertIntegerOrNull(row.counterpartyCopperDelta ?? null, 'row.counterpartyCopperDelta');
   assertIntegerOrNull(row.counterpartyCount ?? null, 'row.counterpartyCount');
 
@@ -262,6 +307,30 @@ function serializeRow(row: BankLedgerOutboxRowInput): SerializedBankLedgerOutbox
 }
 
 const utf8Encoder = new TextEncoder();
+const preparedBatches = new WeakSet<PreparedBankLedgerCommandBatch>();
+
+function batchCorrelation(rows: readonly SerializedBankLedgerOutboxRow[]): {
+  guildIds: readonly number[];
+  hasUnscopedRows: boolean;
+} {
+  const guildIds = new Set<number>();
+  let hasUnscopedRows = false;
+  for (const row of rows) {
+    if (row.container === 'guild') {
+      // serializeRow already proved a guild row has a positive id.
+      guildIds.add(row.containerId as number);
+    } else {
+      hasUnscopedRows = true;
+    }
+  }
+  if (guildIds.size > 1) {
+    throw new Error('one bank ledger command batch cannot span multiple guilds');
+  }
+  return {
+    guildIds: Object.freeze([...guildIds].sort((a, b) => a - b)),
+    hasUnscopedRows,
+  };
+}
 
 /**
  * Detach one logical command from all caller-owned objects and measure the
@@ -270,34 +339,41 @@ const utf8Encoder = new TextEncoder();
 export function serializeBankLedgerCommandBatch(
   batchKey: string,
   rows: readonly BankLedgerOutboxRowInput[],
-): BankLedgerCommandBatch {
+): PreparedBankLedgerCommandBatch {
   const checkedKey = checkedBatchKey(batchKey);
   if (!Array.isArray(rows) || rows.length === 0) {
     throw new RangeError('bank ledger command batch must contain at least one row');
   }
   const serializedRows = Object.freeze(rows.map(serializeRow));
+  const correlation = batchCorrelation(serializedRows);
   const encodedBytes = utf8Encoder.encode(
     JSON.stringify({ batchKey: checkedKey, rows: serializedRows }),
   ).byteLength;
-  return Object.freeze({
+  const batch = Object.freeze({
     batchKey: checkedKey,
     rows: serializedRows,
     encodedBytes,
+    guildIds: correlation.guildIds,
+    hasUnscopedRows: correlation.hasUnscopedRows,
   });
+  preparedBatches.add(batch);
+  return batch;
 }
 
 interface ReservationState {
   readonly batchKey: string;
   readonly maxRows: number;
   readonly maxEncodedBytes: number;
+  readonly preparedBatch?: PreparedBankLedgerCommandBatch;
 }
 
 interface SnapshotState {
-  readonly batches: readonly BankLedgerCommandBatch[];
+  readonly batches: readonly PreparedBankLedgerCommandBatch[];
   consumed: boolean;
 }
 
 export interface BankLedgerOutboxOptions {
+  readonly owner: BankLedgerOutboxOwner;
   readonly budget?: BankLedgerOutboxBudget;
   readonly limits?: BankLedgerOutboxLimits;
   /** No Date.now or randomness lives here. The host owns stable key allocation. */
@@ -305,6 +381,7 @@ export interface BankLedgerOutboxOptions {
 }
 
 export class BankLedgerOutbox {
+  readonly owner: BankLedgerOutboxOwner;
   readonly limits: BankLedgerOutboxLimits;
 
   private readonly budget: BankLedgerOutboxBudget;
@@ -312,14 +389,15 @@ export class BankLedgerOutbox {
   private readonly reservations = new Map<BankLedgerOutboxReservation, ReservationState>();
   private readonly pendingKeys = new Set<string>();
   private readonly snapshotStates = new WeakMap<BankLedgerOutboxSnapshot, SnapshotState>();
-  private readonly batches: BankLedgerCommandBatch[] = [];
+  private readonly batches: PreparedBankLedgerCommandBatch[] = [];
   private queuedRows = 0;
   private queuedEncodedBytes = 0;
   private reservedRows = 0;
   private reservedEncodedBytes = 0;
   private closed = false;
 
-  constructor(options: BankLedgerOutboxOptions = {}) {
+  constructor(options: BankLedgerOutboxOptions) {
+    this.owner = checkedOwner(options.owner);
     this.budget = options.budget ?? bankLedgerOutboxProcessBudget;
     this.limits = checkedLimits(
       options.limits ?? BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS,
@@ -387,6 +465,49 @@ export class BankLedgerOutbox {
     return reservation;
   }
 
+  /**
+   * Reserve the exact cost of a module-prepared batch before gameplay changes.
+   * All serialization, ownership, correlation, and size work finishes in this
+   * call. commitPrepared is then an accounting-only post-mutation transition.
+   */
+  tryReservePrepared(
+    batch: PreparedBankLedgerCommandBatch,
+  ): BankLedgerOutboxPreparedReservation | null {
+    this.assertOpen();
+    if (!preparedBatches.has(batch)) {
+      throw new TypeError('bank ledger batch must be module-prepared');
+    }
+    this.assertBatchOwner(batch);
+    if (this.pendingKeys.has(batch.batchKey)) {
+      throw new Error(`duplicate bank ledger batch key: ${batch.batchKey}`);
+    }
+    if (
+      this.queuedRows + this.reservedRows + batch.rows.length > this.limits.maxRows ||
+      this.queuedEncodedBytes + this.reservedEncodedBytes + batch.encodedBytes >
+        this.limits.maxEncodedBytes
+    ) {
+      return null;
+    }
+    if (!budgetAcquire(this.budget, batch.rows.length, batch.encodedBytes)) return null;
+
+    const reservation = Object.freeze({
+      batchKey: batch.batchKey,
+      maxRows: batch.rows.length,
+      maxEncodedBytes: batch.encodedBytes,
+      batch,
+    });
+    this.reservations.set(reservation, {
+      batchKey: batch.batchKey,
+      maxRows: batch.rows.length,
+      maxEncodedBytes: batch.encodedBytes,
+      preparedBatch: batch,
+    });
+    this.pendingKeys.add(batch.batchKey);
+    this.reservedRows += batch.rows.length;
+    this.reservedEncodedBytes += batch.encodedBytes;
+    return reservation;
+  }
+
   /** Cancel only when the guarded mutation did not happen. */
   cancel(reservation: BankLedgerOutboxReservation): boolean {
     if (this.closed) return false;
@@ -408,11 +529,15 @@ export class BankLedgerOutbox {
   commit(
     reservation: BankLedgerOutboxReservation,
     rows: readonly BankLedgerOutboxRowInput[],
-  ): BankLedgerCommandBatch {
+  ): PreparedBankLedgerCommandBatch {
     this.assertOpen();
     const state = this.reservations.get(reservation);
     if (!state) throw new Error('inactive bank ledger outbox reservation');
+    if (state.preparedBatch) {
+      throw new Error('prepared bank ledger reservation must use commitPrepared');
+    }
     const batch = serializeBankLedgerCommandBatch(state.batchKey, rows);
+    this.assertBatchOwner(batch);
     if (batch.rows.length > state.maxRows) {
       throw new RangeError('bank ledger batch exceeds its reserved row limit');
     }
@@ -420,31 +545,37 @@ export class BankLedgerOutbox {
       throw new RangeError('bank ledger batch exceeds its reserved byte limit');
     }
 
-    this.reservations.delete(reservation);
-    this.reservedRows -= state.maxRows;
-    this.reservedEncodedBytes -= state.maxEncodedBytes;
-    this.queuedRows += batch.rows.length;
-    this.queuedEncodedBytes += batch.encodedBytes;
-    this.batches.push(batch);
+    return this.finishCommit(reservation, state, batch);
+  }
 
-    // The full maximum was acquired by tryReserve. Only the unused tail is
-    // released here, so the actual queued batch remains charged exactly once.
-    budgetRelease(
-      this.budget,
-      state.maxRows - batch.rows.length,
-      state.maxEncodedBytes - batch.encodedBytes,
-    );
-    return batch;
+  /** Commit an exact reservation without serialization or size validation. */
+  commitPrepared(reservation: BankLedgerOutboxPreparedReservation): PreparedBankLedgerCommandBatch {
+    this.assertOpen();
+    const state = this.reservations.get(reservation);
+    if (!state) throw new Error('inactive bank ledger outbox reservation');
+    if (!state.preparedBatch || state.preparedBatch !== reservation.batch) {
+      throw new Error('bank ledger reservation has no prepared batch');
+    }
+    return this.finishCommit(reservation, state, state.preparedBatch);
   }
 
   /** Capture all committed work currently queued, never live reservations. */
   snapshot(): BankLedgerOutboxSnapshot {
     this.assertOpen();
     const batches = Object.freeze(this.batches.slice());
+    const guildIds = new Set<number>();
+    let hasUnscopedRows = false;
+    for (const batch of batches) {
+      for (const guildId of batch.guildIds) guildIds.add(guildId);
+      hasUnscopedRows ||= batch.hasUnscopedRows;
+    }
     const snapshot = Object.freeze({
+      owner: this.owner,
       batches,
       rowCount: this.queuedRows,
       encodedBytes: this.queuedEncodedBytes,
+      guildIds: Object.freeze([...guildIds].sort((a, b) => a - b)),
+      hasUnscopedRows,
     });
     this.snapshotStates.set(snapshot, { batches, consumed: false });
     return snapshot;
@@ -501,5 +632,42 @@ export class BankLedgerOutbox {
 
   private assertOpen(): void {
     if (this.closed) throw new Error('bank ledger outbox was discarded');
+  }
+
+  private assertBatchOwner(batch: BankLedgerCommandBatch): void {
+    for (let index = 0; index < batch.rows.length; index++) {
+      const row = batch.rows[index];
+      if (
+        row.realm !== this.owner.realm ||
+        row.characterId !== this.owner.characterId ||
+        row.accountId !== this.owner.accountId
+      ) {
+        throw new Error(
+          `bank ledger batch ${batch.batchKey} row ${index} does not match outbox owner`,
+        );
+      }
+    }
+  }
+
+  private finishCommit(
+    reservation: BankLedgerOutboxReservation,
+    state: ReservationState,
+    batch: PreparedBankLedgerCommandBatch,
+  ): PreparedBankLedgerCommandBatch {
+    this.reservations.delete(reservation);
+    this.reservedRows -= state.maxRows;
+    this.reservedEncodedBytes -= state.maxEncodedBytes;
+    this.queuedRows += batch.rows.length;
+    this.queuedEncodedBytes += batch.encodedBytes;
+    this.batches.push(batch);
+
+    // The full maximum was acquired by tryReserve. Only the unused tail is
+    // released here, so the actual queued batch remains charged exactly once.
+    budgetRelease(
+      this.budget,
+      state.maxRows - batch.rows.length,
+      state.maxEncodedBytes - batch.encodedBytes,
+    );
+    return batch;
   }
 }

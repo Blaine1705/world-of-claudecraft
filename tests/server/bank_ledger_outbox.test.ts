@@ -6,11 +6,17 @@ import {
   BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS,
   BankLedgerOutbox,
   BankLedgerOutboxBudget,
+  type BankLedgerOutboxOwner,
   type BankLedgerOutboxRowInput,
   serializeBankLedgerCommandBatch,
 } from '../../server/bank_ledger_outbox';
 
 const LARGE_BYTES = 1_000_000;
+const OWNER: BankLedgerOutboxOwner = Object.freeze({
+  realm: 'Azeroth',
+  characterId: 101,
+  accountId: 202,
+});
 
 function required<T>(value: T | null): T {
   if (value === null) throw new Error('expected reservation capacity');
@@ -41,6 +47,7 @@ function rig(
     sessionRows?: number;
     sessionBytes?: number;
     nextBatchKey?: () => string;
+    owner?: BankLedgerOutboxOwner;
   } = {},
 ) {
   const globalRows = options.globalRows ?? 100;
@@ -51,6 +58,7 @@ function rig(
   });
   const makeOutbox = (nextBatchKey = options.nextBatchKey) =>
     new BankLedgerOutbox({
+      owner: options.owner ?? OWNER,
       budget,
       limits: {
         maxRows: options.sessionRows ?? globalRows,
@@ -63,20 +71,21 @@ function rig(
 
 describe('BankLedgerOutbox limits and reservations', () => {
   it('pins a one-autosave adversarial row allowance and conservative byte budgets', () => {
-    // The live header prices the combined socket plus craft ceiling at 62.3 rows/s,
-    // and character autosaves run every 30 seconds: ceil(62.3 * 30) = 1,869.
+    // The completed admission map prices the combined command plus craft ceiling
+    // at about 63.43 rows/s. A 30-second autosave window therefore admits 1,903
+    // rows after rounding up.
     // 2,048 covers that interval plus a small scheduling margin without retaining
     // multiple failed-save windows in memory.
     expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS).toEqual({
       maxRows: 2_048,
       maxEncodedBytes: 2 * 1024 * 1024,
     });
+    const rowsPerAutosave = Math.ceil(63.43 * 30);
+    expect(rowsPerAutosave).toBe(1_903);
     expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows).toBeGreaterThanOrEqual(
-      Math.ceil(62.3 * 30),
+      rowsPerAutosave,
     );
-    expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows).toBeLessThan(
-      Math.ceil(62.3 * 30 * 2),
-    );
+    expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows).toBeLessThan(rowsPerAutosave * 2);
     expect(BANK_LEDGER_OUTBOX_DEFAULT_GLOBAL_LIMITS).toEqual({
       maxRows: 65_536,
       maxEncodedBytes: 64 * 1024 * 1024,
@@ -114,6 +123,26 @@ describe('BankLedgerOutbox limits and reservations', () => {
       reservedEncodedBytes: 0,
     });
     expect(budget.usage).toEqual({ rows: 0, encodedBytes: 0 });
+  });
+
+  it('binds an immutable validated owner at construction without retaining the caller object', () => {
+    const mutableOwner = { realm: 'Azeroth', characterId: 101, accountId: 202 };
+    const { makeOutbox } = rig({ owner: mutableOwner });
+    const outbox = makeOutbox();
+
+    mutableOwner.realm = 'Outland';
+    mutableOwner.characterId = 999;
+    mutableOwner.accountId = 888;
+
+    expect(outbox.owner).toEqual(OWNER);
+    expect(Object.isFrozen(outbox.owner)).toBe(true);
+    expect(() => rig({ owner: { ...OWNER, realm: '' } }).makeOutbox()).toThrow(/owner\.realm/);
+    expect(() => rig({ owner: { ...OWNER, characterId: 0 } }).makeOutbox()).toThrow(
+      /owner\.characterId/,
+    );
+    expect(() => rig({ owner: { ...OWNER, accountId: -1 } }).makeOutbox()).toThrow(
+      /owner\.accountId/,
+    );
   });
 
   it('enforces the process-global row and byte budgets across sessions', () => {
@@ -231,6 +260,32 @@ describe('BankLedgerOutbox batches and accounting', () => {
     expect(Object.isFrozen(prepared)).toBe(true);
     expect(Object.isFrozen(prepared.rows)).toBe(true);
     expect(prepared.rows.every(Object.isFrozen)).toBe(true);
+    expect(prepared.guildIds).toEqual([]);
+    expect(Object.isFrozen(prepared.guildIds)).toBe(true);
+    expect(prepared.hasUnscopedRows).toBe(true);
+  });
+
+  it('summarizes one guild correlation per logical batch and rejects mixed guild identities', () => {
+    const correlated = serializeBankLedgerCommandBatch('guild:correlated', [
+      ledgerRow({ container: 'guild', containerId: 41 }),
+      ledgerRow({ container: 'personal', containerId: null }),
+      ledgerRow({ container: 'guild', containerId: 41 }),
+    ]);
+
+    expect(correlated.guildIds).toEqual([41]);
+    expect(correlated.hasUnscopedRows).toBe(true);
+    const guildOnly = serializeBankLedgerCommandBatch('guild:only', [
+      ledgerRow({ container: 'guild', containerId: 41 }),
+    ]);
+    expect(guildOnly.guildIds).toEqual([41]);
+    expect(Object.isFrozen(guildOnly.guildIds)).toBe(true);
+    expect(guildOnly.hasUnscopedRows).toBe(false);
+    expect(() =>
+      serializeBankLedgerCommandBatch('guild:mixed', [
+        ledgerRow({ container: 'guild', containerId: 41 }),
+        ledgerRow({ container: 'guild', containerId: 42 }),
+      ]),
+    ).toThrow(/multiple guilds/i);
   });
 
   it('uses the canonical JSON normalization and rejects true serialization failures', () => {
@@ -288,6 +343,99 @@ describe('BankLedgerOutbox batches and accounting', () => {
     expect(outbox.cancel(reservation)).toBe(false);
     expect(() => outbox.commit(reservation, [row])).toThrow(/inactive .*reservation/i);
     expect(budget.usage).toEqual({ rows: 1, encodedBytes: prepared.encodedBytes });
+  });
+
+  it.each([
+    ['realm', { realm: 'Outland' }],
+    ['character', { characterId: OWNER.characterId + 1 }],
+    ['account', { accountId: OWNER.accountId + 1 }],
+  ])('rejects a row with a mismatched %s owner before changing accounting', (_kind, mismatch) => {
+    const { budget, makeOutbox } = rig();
+    const outbox = makeOutbox();
+    const reservation = required(
+      outbox.tryReserve({ maxRows: 2, maxEncodedBytes: 2_000, batchKey: 'owner:mismatch' }),
+    );
+    const beforeUsage = outbox.usage;
+    const beforeBudget = budget.usage;
+
+    expect(() => outbox.commit(reservation, [ledgerRow(mismatch)])).toThrow(
+      /does not match outbox owner/i,
+    );
+    expect(outbox.usage).toEqual(beforeUsage);
+    expect(budget.usage).toEqual(beforeBudget);
+    expect(outbox.cancel(reservation)).toBe(true);
+  });
+
+  it('reserves a prebuilt batch at exact cost and commits it without reserializing caller data', () => {
+    const instance: { signer: string; self?: unknown } = { signer: 'Ada' };
+    const sourceRows = [ledgerRow({ instance })];
+    const prepared = serializeBankLedgerCommandBatch('prepared:exact', sourceRows);
+    const { budget, makeOutbox } = rig();
+    const outbox = makeOutbox();
+    const reservation = required(outbox.tryReservePrepared(prepared));
+
+    expect(reservation).toMatchObject({
+      batchKey: prepared.batchKey,
+      maxRows: prepared.rows.length,
+      maxEncodedBytes: prepared.encodedBytes,
+      batch: prepared,
+    });
+    expect(outbox.usage).toEqual({
+      queuedRows: 0,
+      queuedEncodedBytes: 0,
+      reservedRows: prepared.rows.length,
+      reservedEncodedBytes: prepared.encodedBytes,
+    });
+
+    // The guarded gameplay mutation can invalidate every source object. The
+    // post-mutation transition consumes only the already detached batch.
+    instance.signer = 'mutated';
+    instance.self = instance;
+    sourceRows.length = 0;
+
+    expect(outbox.commitPrepared(reservation)).toBe(prepared);
+    expect(outbox.usage).toEqual({
+      queuedRows: prepared.rows.length,
+      queuedEncodedBytes: prepared.encodedBytes,
+      reservedRows: 0,
+      reservedEncodedBytes: 0,
+    });
+    expect(budget.usage).toEqual({
+      rows: prepared.rows.length,
+      encodedBytes: prepared.encodedBytes,
+    });
+  });
+
+  it('rejects foreign or forged prebuilt batches before acquiring exact capacity', () => {
+    const { budget, makeOutbox } = rig();
+    const outbox = makeOutbox();
+    const foreign = serializeBankLedgerCommandBatch('prepared:foreign', [
+      ledgerRow({ accountId: OWNER.accountId + 1 }),
+    ]);
+    expect(() => outbox.tryReservePrepared(foreign)).toThrow(/does not match outbox owner/i);
+
+    const valid = serializeBankLedgerCommandBatch('prepared:valid', [ledgerRow()]);
+    const forged = { ...valid };
+    expect(() => outbox.tryReservePrepared(forged)).toThrow(/module-prepared/i);
+    expect(budget.usage).toEqual({ rows: 0, encodedBytes: 0 });
+    expect(outbox.usage).toEqual({
+      queuedRows: 0,
+      queuedEncodedBytes: 0,
+      reservedRows: 0,
+      reservedEncodedBytes: 0,
+    });
+  });
+
+  it('refuses an exact reservation that exceeds a session bound without spending global capacity', () => {
+    const { budget, makeOutbox } = rig({ sessionRows: 1 });
+    const outbox = makeOutbox();
+    const prepared = serializeBankLedgerCommandBatch('prepared:too-many', [
+      ledgerRow({ itemId: 'peacebloom' }),
+      ledgerRow({ itemId: 'silverleaf' }),
+    ]);
+
+    expect(outbox.tryReservePrepared(prepared)).toBeNull();
+    expect(budget.usage).toEqual({ rows: 0, encodedBytes: 0 });
   });
 
   it('meters UTF-8 bytes exactly and refuses a commit one byte over its reservation', () => {
@@ -413,6 +561,30 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     expect(outbox.snapshot().batches.map((batch) => batch.batchKey)).toEqual(['batch:second']);
     expect(budget.usage).toEqual({ rows: 1, encodedBytes: second.encodedBytes });
     expect(budget.usage.encodedBytes).not.toBe(first.encodedBytes + second.encodedBytes);
+  });
+
+  it('captures immutable owner and guild-correlation metadata without filtering the prefix', () => {
+    const { makeOutbox } = rig();
+    const outbox = makeOutbox();
+    commitOne(outbox, 'batch:personal', 'peacebloom');
+
+    for (const guildId of [42, 7]) {
+      const row = ledgerRow({ container: 'guild', containerId: guildId });
+      const prepared = serializeBankLedgerCommandBatch(`batch:guild:${guildId}`, [row]);
+      const reservation = required(outbox.tryReservePrepared(prepared));
+      outbox.commitPrepared(reservation);
+    }
+
+    const snapshot = outbox.snapshot();
+    expect(snapshot.batches.map((batch) => batch.batchKey)).toEqual([
+      'batch:personal',
+      'batch:guild:42',
+      'batch:guild:7',
+    ]);
+    expect(snapshot.owner).toBe(outbox.owner);
+    expect(snapshot.guildIds).toEqual([7, 42]);
+    expect(Object.isFrozen(snapshot.guildIds)).toBe(true);
+    expect(snapshot.hasUnscopedRows).toBe(true);
   });
 
   it('refuses stale, overlapping, and foreign snapshots without splicing newer work', () => {
