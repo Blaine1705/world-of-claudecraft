@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "3c39f14605cbbe20e31194efab053f19ac2946376b431ebc85438c8d9659459a",
-  "catalogHash": "93d96308460ceffecec11c7de351e9d3f9d512b01e17437f0b9dd88148d63b16",
+  "bundleId": "75161a3d97b57b528d1f944c8dc76785862414b34f39fc57458bd20d92839943",
+  "catalogHash": "9a31e1e35398a332b675f1ecf36e40f0dc1ba69f58328d4f34e5d094bec9c93f",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2854,18 +2854,6 @@
       "gain": 1,
       "playbackRate": 1
     },
-    "mount_loop_rickshaw_mount": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/mount_loop_rickshaw_mount.mp3?v=90fafb2c1bb7",
-          "bytes": 187497,
-          "sha256": "90fafb2c1bb702068d31a596b5e2758605c089f4c2c0b95547eb5e520f824f00"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
     "mount_run_aether_hover_cycle": {
       "variants": [
         {
@@ -2996,18 +2984,6 @@
         }
       ],
       "gain": 1,
-      "playbackRate": 1
-    },
-    "mount_summon_rickshaw_mount": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/mount_summon_rickshaw_mount.mp3?v=4f9ba1123aa4",
-          "bytes": 38913,
-          "sha256": "4f9ba1123aa480436c91e1222e9b55d2922b21f41d4ddc535df1475dc902560d"
-        }
-      ],
-      "gain": 2.06538,
       "playbackRate": 1
     },
     "move_jump": {
@@ -4457,18 +4433,6 @@
           "url": "/audio/sfx/ui_sheep.mp3?v=70d353a7b3a0",
           "bytes": 18224,
           "sha256": "70d353a7b3a0c912c7aba97ea7f878f7784ceddc370e2d439640aacb0abe6a6c"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "ui_vcup_kickoff": {
-      "variants": [
-        {
-          "id": "main",
-          "url": "/audio/sfx/ui_vcup_kickoff.mp3?v=b29c56adf6c7",
-          "bytes": 20732,
-          "sha256": "b29c56adf6c7b91a0e2ca050d0765a7101a769e9b305db1f2792f1bf3c2ea687"
         }
       ],
       "gain": 1,
