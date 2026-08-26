@@ -10703,6 +10703,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.charter.noRoom'
   | 'hudChrome.wocStore.charter.notPurchasable'
   | 'hudChrome.wocStore.charter.outage'
+  | 'hudChrome.wocStore.charter.outageStale'
   | 'hudChrome.wocStore.charter.scope'
   | 'hudChrome.wocStore.charter.title'
   | 'hudChrome.wocStore.close'

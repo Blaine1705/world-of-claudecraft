@@ -70,7 +70,7 @@ import { formatCount } from './count_format';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, findFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import {
   GUILD_PANEL_ID,
   GUILD_TAB_ID,
@@ -784,18 +784,9 @@ export class BankWindow {
     if (buy) buy.dataset.focusKey = 'gbank:buy';
   }
 
-  // The vault pane's focus keys, stamped AFTER renderInto returned for the
-  // same single-reader reason as the guild annotation above. Rows are keyed by
-  // ORDINAL (the gbank:slot idiom), deliberately not by itemId: the captured
-  // key is interpolated into restoreControlFocus's attribute selector, and a
-  // stock key is a server-supplied string (a tolerated save can hold arbitrary
-  // ids), so every focus key in this file stays a literal or a number. The
-  // sorted row order makes the ordinal stable across an unchanged repaint.
+  // VaultTab owns semantic row/action keys because it has the row model in
+  // hand. This window adds only its fixed footer controls after renderInto.
   private annotateVaultFocusKeys(el: HTMLElement): void {
-    let rowIndex = 0;
-    for (const row of el.querySelectorAll<HTMLElement>('.vault-row')) {
-      row.dataset.focusKey = `vault:row:${rowIndex++}`;
-    }
     const deposit = el.querySelector<HTMLElement>('.vault-deposit-all');
     if (deposit) deposit.dataset.focusKey = 'vault:deposit-all';
     const unlock = el.querySelector<HTMLElement>('.vault-unlock-btn');
@@ -809,11 +800,7 @@ export class BankWindow {
   // disabled), else the always-present close button. Never <body> (WCAG 2.4.3).
   private restoreControlFocus(el: HTMLElement, focusKey: string | null): void {
     restoreFirstEnabled([
-      focusKey
-        ? (el.querySelector(`[data-focus-key="${focusKey}"]`) as
-            | (HTMLElement & { disabled?: boolean })
-            | null)
-        : null,
+      focusKey ? findFocusKey(el, focusKey) : null,
       el.querySelector('[data-close]') as HTMLElement | null,
     ]);
   }

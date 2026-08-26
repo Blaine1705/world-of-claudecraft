@@ -569,6 +569,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.noCharterFits': '이 캐릭터의 은행에 남은 자리에 들어갈 수 있는 특허장이 없습니다.',
   'hudChrome.wocStore.charter.noRoom': '이 캐릭터의 은행에는 더 이상 특허장을 넣을 자리가 없습니다.',
   'hudChrome.wocStore.charter.outage': '구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
+  'hudChrome.wocStore.charter.outageStale': '상점으로 돌아가 동일한 “특허장 구매” 동작을 다시 사용하세요. 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
   'hudChrome.wocStore.charter.failed': '구매를 완료하지 못했습니다.',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': '하급 금고 특허장',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': '상급 금고 특허장',

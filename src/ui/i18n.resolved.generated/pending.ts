@@ -93,6 +93,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -180,6 +181,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -267,6 +269,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -354,6 +357,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -442,6 +446,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -529,6 +534,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -620,6 +626,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -708,6 +715,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -795,6 +803,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -882,6 +891,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -969,6 +979,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1056,6 +1067,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1143,6 +1155,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1230,6 +1243,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1317,6 +1331,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.noRoom",
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
+    "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ]

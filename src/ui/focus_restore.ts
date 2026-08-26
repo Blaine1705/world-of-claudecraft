@@ -135,6 +135,20 @@ export function captureFocusKey(root: HTMLElement): string | null {
 }
 
 /**
+ * Resolve one focus key in a rebuilt subtree by exact dataset equality.
+ *
+ * Keys may include server-supplied item ids, so the value is deliberately never
+ * interpolated into a CSS attribute selector. The literal selector discovers the
+ * namespace members; the DOM's dataset value then performs the identity match.
+ */
+export function findFocusKey(root: ParentNode, key: string): HTMLElement | null {
+  for (const candidate of root.querySelectorAll(`[${FOCUS_KEY_ATTR}]`)) {
+    if (candidate instanceof HTMLElement && candidate.dataset.focusKey === key) return candidate;
+  }
+  return null;
+}
+
+/**
  * The focused element, if it is inside `root`, else null.
  *
  * This is the narrowing-plus-containment half of {@link captureFocusKey} with the

@@ -809,6 +809,7 @@ export const de_DE: EnTranslations = {
         "noRoom": "The bank of this character has no room left for a charter.",
         "noCharterFits": "No charter fits the room left in the bank of this character.",
         "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
         "failed": "The purchase could not be completed.",
         "names": {
           "strongbox_charter_1": "Lesser Strongbox Charter",

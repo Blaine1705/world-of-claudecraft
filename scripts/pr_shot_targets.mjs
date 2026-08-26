@@ -491,6 +491,12 @@ async function seedParchmentOnLowPreset(page) {
   await themeSeed('parchment')(page);
 }
 
+/** Forced colors on the low preset, with both browser and authored contrast. */
+async function seedForcedColorsOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await forcedColorsThemeSeed(page);
+}
+
 /** The tracker variants need BOTH pre-load seeds: the pin-store wipe and the
  *  low preset (a variant carries one beforeLoad, so this composes the pair). */
 async function clearPinsOnLowPreset(page) {
@@ -2182,23 +2188,28 @@ export const TARGETS = [
     // no .bank-scroll (nothing scrolls if it overflows a short phone), so its
     // phone rendering is verified by capture, not arithmetic (QA finding).
     variants: [
-      { key: 'locked' },
-      { key: 'locked-mobile', mobile: true },
-      { key: 'desktop' },
-      { key: 'mobile', mobile: true },
-      { key: 'parchment', beforeLoad: themeSeed('parchment') },
+      { key: 'locked', beforeLoad: seedClassicOnLowPreset },
+      { key: 'locked-mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'desktop', beforeLoad: seedClassicOnLowPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedClassicOnLowPreset },
+      { key: 'parchment', beforeLoad: seedParchmentOnLowPreset },
       {
         key: 'high-contrast',
         forcedColors: true,
-        beforeLoad: forcedColorsThemeSeed,
+        beforeLoad: seedForcedColorsOnLowPreset,
       },
       // Phase 04 QA (the v0.36.0 merge-drift repair): the fine-grade pair.
       // The base-only 'desktop'/'mobile' shots above double as the BEFORE
       // images (a base-only stock renders byte-identically to the pre-repair
       // pane); these stage a fine grade beside its base so the seal, the rim,
       // and the base-adjacent sort are capture-verified on both form factors.
-      { key: 'fine', fine: true },
-      { key: 'fine-mobile', fine: true, mobile: true },
+      { key: 'fine', fine: true, beforeLoad: seedClassicOnLowPreset },
+      {
+        key: 'fine-mobile',
+        fine: true,
+        mobile: true,
+        beforeLoad: seedClassicOnLowPreset,
+      },
     ],
     async capture(page, variant) {
       // A LATE swiftshader boot can outlive the shared flow's fallback; wait

@@ -943,12 +943,11 @@ export class DailyRewardsWindow {
     if (!result) {
       // No hook at all is indistinguishable from a lost reply: leave the intent
       // OPEN so the next attempt replays under the same key.
-      const text = t('hudChrome.wocStore.charter.outage');
       if (this.storeSurfaceIsCurrent(surfaceGeneration)) {
-        this.setCharterNotice('failure', text);
+        this.setCharterNotice('failure', t('hudChrome.wocStore.charter.outage'));
         this.repaintStore();
       } else {
-        this.showStoreResult('failure', text);
+        this.showStoreResult('failure', t('hudChrome.wocStore.charter.outageStale'));
       }
       return;
     }
@@ -1005,7 +1004,7 @@ export class DailyRewardsWindow {
           'failure',
           result.reason === 'price_changed'
             ? t('hudChrome.wocStore.priceChanged')
-            : charterRefusalText(result.reason),
+            : charterRefusalText(result.reason, 'stale'),
         );
       }
       return;

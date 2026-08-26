@@ -353,7 +353,7 @@ describe('the stocked pane', () => {
 
     expect(h.calls).toEqual(['vaultWithdraw:copper_ore,3']);
     expect(document.activeElement).toBe(
-      h.root.querySelector<HTMLElement>('[data-focus-key="vault:partial:0"]'),
+      h.root.querySelector<HTMLElement>('[data-focus-key="vault:partial:pooled:copper_ore"]'),
     );
   });
 
@@ -738,11 +738,11 @@ describe('assistive-tech wiring and focus continuity', () => {
     h.window.open();
     clickVaultTab(h);
     const rows = h.root.querySelectorAll<HTMLElement>('.vault-row');
-    expect(rows[1].dataset.focusKey).toBe('vault:row:1');
+    expect(rows[1].dataset.focusKey).toBe('vault:row:pooled:copper_ore');
     rows[1].focus();
     // A data change (another client's echo) drives a signature repaint; the
-    // ordinal focus key re-lands focus on the same row position, never <body>
-    // and never the close button while the row survives.
+    // material focus key re-lands focus on the same row, never <body> and
+    // never the close button while the row survives.
     h.world.vaultInfo = vaultInfo({ stock: { ashwood_log: 3, copper_ore: 9 } });
     h.window.refreshIfChanged();
     const fresh = h.root.querySelectorAll<HTMLElement>('.vault-row');
@@ -750,12 +750,10 @@ describe('assistive-tech wiring and focus continuity', () => {
     expect(fresh[1].dataset.itemId).toBe('copper_ore');
   });
 
-  it('ordinal keys DELIBERATELY follow position when a row is inserted above', () => {
-    // The ruling made explicit (the gbank:slot idiom shares it): keys are
-    // ordinals, so an insertion ABOVE the focused row re-lands focus on the
-    // same POSITION, now a different material. The alternative (keying by
-    // itemId) would interpolate a server-supplied string into the
-    // restore-focus attribute selector, which is why ordinals won.
+  it('an inserted earlier row keeps focus and activation on the same material', () => {
+    // A repaint may insert or re-sort stock above the focused material. Focus
+    // identity follows the MATERIAL, not its old row position, so pressing
+    // Enter after the echo can never withdraw a different item.
     const h = harness(vaultInfo({ stock: { ashwood_log: 3, copper_ore: 5 } }));
     h.window.open();
     clickVaultTab(h);
@@ -766,14 +764,15 @@ describe('assistive-tech wiring and focus continuity', () => {
     h.window.refreshIfChanged();
     const fresh = h.root.querySelectorAll<HTMLElement>('.vault-row');
     expect(fresh).toHaveLength(3);
-    expect(document.activeElement).toBe(fresh[1]);
-    expect((document.activeElement as HTMLElement).dataset.itemId).toBe('ashwood_log');
+    const copper = Array.from(fresh).find((row) => row.dataset.itemId === 'copper_ore');
+    expect(document.activeElement).toBe(copper);
+    (document.activeElement as HTMLElement).click();
+    expect(h.calls).toEqual(['vaultWithdraw:copper_ore']);
   });
 
   it('a hostile stock id (an attribute-breaking quote) cannot fault the repaint', () => {
-    // The selector-injection hazard the ordinal keys close: the captured
-    // focus key rides into restoreControlFocus's attribute selector, and a
-    // stock key is server-supplied text a tolerated save can make arbitrary.
+    // The captured focus key includes this server-supplied stock id. Resolution
+    // must compare dataset values, never splice it into an attribute selector.
     const hostile = 'a"b]';
     const h = harness(vaultInfo({ stock: { [hostile]: 3, copper_ore: 5 } }));
     h.window.open();

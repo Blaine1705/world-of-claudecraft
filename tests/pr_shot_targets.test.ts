@@ -865,7 +865,7 @@ describe('the bank-meter target routing (phase 08 QA)', () => {
 });
 
 describe('the Materials Vault evidence target', () => {
-  it('routes both vault modules and covers touch plus light/high-contrast themes', () => {
+  it('routes both vault modules and pins low graphics plus each intended theme', async () => {
     for (const path of ['src/ui/vault_view.ts', 'src/ui/vault_window.ts']) {
       expect(classifyDiff([path]).specific.map((target: { key: string }) => target.key)).toContain(
         'bank-vault',
@@ -884,10 +884,30 @@ describe('the Materials Vault evidence target', () => {
       'fine',
       'fine-mobile',
     ]);
-    for (const key of ['parchment', 'high-contrast']) {
-      expect(
-        target.variants.find((variant: { key: string }) => variant.key === key)?.beforeLoad,
-      ).toBeTypeOf('function');
+    for (const variant of target.variants) {
+      const storageSeeds: string[] = [];
+      const mediaCalls: Array<{ method: string; payload: unknown }> = [];
+      await variant.beforeLoad({
+        async evaluateOnNewDocument(script: string) {
+          storageSeeds.push(script);
+        },
+        async createCDPSession() {
+          return {
+            async send(method: string, payload: unknown) {
+              mediaCalls.push({ method, payload });
+            },
+          };
+        },
+      });
+      expect(storageSeeds.join('\n')).toContain('s.graphicsPreset = 1');
+      const expectedTheme =
+        variant.key === 'parchment'
+          ? "preset: 'parchment'"
+          : variant.key === 'high-contrast'
+            ? "preset: 'highContrast'"
+            : "preset: 'classic'";
+      expect(storageSeeds.join('\n')).toContain(expectedTheme);
+      expect(mediaCalls).toHaveLength(variant.key === 'high-contrast' ? 1 : 0);
     }
     expect(
       target.variants.find(

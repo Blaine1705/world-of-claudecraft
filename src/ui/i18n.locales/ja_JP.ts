@@ -564,6 +564,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.noCharterFits': 'このキャラクターの銀行に残された空きに収まる特許状はありません。',
   'hudChrome.wocStore.charter.noRoom': 'このキャラクターの銀行には、もう特許状を収める余地がありません。',
   'hudChrome.wocStore.charter.outage': '購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
+  'hudChrome.wocStore.charter.outageStale': 'ストアに戻り、同じ「特許状を購入」操作をもう一度使用してください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
   'hudChrome.wocStore.charter.failed': '購入を完了できませんでした。',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': '下級金庫特許状',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': '上級金庫特許状',

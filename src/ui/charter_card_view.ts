@@ -60,7 +60,10 @@ export function charterGrantedText(reason: string | null): string {
  *  intent mid-debit, so it keeps the key while still getting its own message.
  *  The default covers the AMBIGUOUS class ('unavailable', null, or a token this
  *  build does not know). */
-export function charterRefusalText(reason: string | null): string {
+export function charterRefusalText(
+  reason: string | null,
+  surface: 'current' | 'stale' = 'current',
+): string {
   switch (reason) {
     case 'purchase_in_progress':
       return t('hudChrome.wocStore.charter.inProgress');
@@ -77,7 +80,11 @@ export function charterRefusalText(reason: string | null): string {
     case 'no_live_character':
       return t('hudChrome.wocStore.charter.notPurchasable');
     default:
-      return t('hudChrome.wocStore.charter.outage');
+      return t(
+        surface === 'stale'
+          ? 'hudChrome.wocStore.charter.outageStale'
+          : 'hudChrome.wocStore.charter.outage',
+      );
   }
 }
 

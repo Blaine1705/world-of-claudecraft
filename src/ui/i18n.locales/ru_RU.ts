@@ -564,6 +564,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.noCharterFits': 'Ни одна грамота не помещается в оставшееся место в банке этого персонажа.',
   'hudChrome.wocStore.charter.noRoom': 'В банке этого персонажа больше нет места ни для одной грамоты.',
   'hudChrome.wocStore.charter.outage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
+  'hudChrome.wocStore.charter.outageStale': 'Вернитесь в магазин и снова используйте то же действие «Купить грамоту». Средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
   'hudChrome.wocStore.charter.failed': 'Не удалось завершить покупку.',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': 'Малая грамота на сундук',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': 'Большая грамота на сундук',

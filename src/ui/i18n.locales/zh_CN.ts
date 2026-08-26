@@ -412,6 +412,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.noCharterFits': '当前角色的银行剩余空间已放不下任何特许状。',
   'hudChrome.wocStore.charter.noRoom': '当前角色的银行已没有空间容纳任何特许状。',
   'hudChrome.wocStore.charter.outage': '无法确认此次购买。使用此按钮重试不会重复扣费。若先重新加载游戏，可能会失去这一保护。',
+  'hudChrome.wocStore.charter.outageStale': '返回商店，再次使用同一个“购买特许状”操作。系统不会重复扣费。若先重新加载游戏，可能会失去这一保护。',
   'hudChrome.wocStore.charter.failed': '此次购买未能完成。',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': '次级保险箱特许状',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': '高级保险箱特许状',

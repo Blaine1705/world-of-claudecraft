@@ -730,6 +730,8 @@ function charterHarness(
     onSpend?(call: number, items: WocStoreItemInput[]): void;
     /** Omit spendStoreItem entirely (the offline / hookless store). */
     noSpendHook?: boolean;
+    /** Reject after the optional gate, modeling a transport outage. */
+    rejectSpend?: boolean;
     /** Hold the spend open until the test resolves it, for the in-flight guard. */
     gate?: { wait: Promise<void> };
     /** Give the stub world an identity, which is what turns DURABILITY on
@@ -811,6 +813,7 @@ function charterHarness(
           spendCalls.push({ itemId, kind, cost, key });
           options.onSpend?.(spendCalls.length, state.items);
           if (options.gate) await options.gate.wait;
+          if (options.rejectSpend) throw new Error('transport unavailable');
           return (
             results[spendCalls.length - 1] ?? {
               granted: true,
@@ -2415,9 +2418,40 @@ describe('WOC Store Strongbox charters', () => {
 
     expect(h.spendCalls).toHaveLength(0);
     expect(h.internals.charterNotice?.tone).toBe('failure');
-    expect(h.internals.charterNotice?.text).toContain('could not be confirmed');
+    expect(h.internals.charterNotice?.text).toBe(t('hudChrome.wocStore.charter.outage'));
     expect(h.html()).toContain('charter-notice failure');
+    expect(document.querySelector('.woc-store-global-result')).toBeNull();
     expect(h.internals.charterIntents.isOpen('strongbox_charter_1')).toBe(true);
+  });
+
+  it('routes a stale-surface outage to explicit Store recovery guidance', async () => {
+    for (const outage of [
+      { rejectSpend: true },
+      {
+        results: [{ granted: false, balance: null, costClaudium: null, reason: 'unavailable' }],
+      },
+    ]) {
+      let release: () => void = () => undefined;
+      const gate = { wait: new Promise<void>((resolve) => (release = resolve)) };
+      const h = charterHarness({ gate, ...outage });
+      await h.internals.renderStore(null);
+
+      const pending = h.internals.purchaseCharter('strongbox_charter_1');
+      await Promise.resolve();
+      h.window.close();
+      release();
+      await pending;
+
+      expect(h.internals.charterNotice).toBeNull();
+      const result = document.querySelector<HTMLElement>('[data-store-result-text]');
+      expect(result?.textContent).toBe(t('hudChrome.wocStore.charter.outageStale'));
+      expect(result?.textContent).toContain(
+        'Return to the Store and use the same Purchase Charter action',
+      );
+      expect(result?.textContent).not.toContain('this button');
+      expect(h.internals.charterIntents.isOpen('strongbox_charter_1')).toBe(true);
+      document.querySelector<HTMLButtonElement>('.woc-store-global-result button')?.click();
+    }
   });
 
   // THE FOCUS PIN. replaceStoreBody assigns innerHTML, which destroys the control

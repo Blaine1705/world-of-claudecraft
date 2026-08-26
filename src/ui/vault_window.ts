@@ -33,7 +33,7 @@ import { showQuantityPrompt } from './bank_quantity_prompt';
 import { formatCount } from './count_format';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { FOCUS_KEY_ATTR, restoreFirstEnabled } from './focus_restore';
+import { FOCUS_KEY_ATTR, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import { formatMoney, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
@@ -74,6 +74,20 @@ export const VAULT_TAB_ID = 'bank-tab-vault';
 // The deposit-all button's visually-hidden description (aria-describedby):
 // a module constant like the two ids above, so the pair cannot drift.
 const VAULT_DEPOSIT_ALL_DESC_ID = 'vault-deposit-all-desc';
+
+type VaultFocusRole = 'row' | 'partial';
+
+/** Stable across row insertion and sorting. A special row retains its wire
+ * selector as a disambiguator, while itemId prevents an index reuse from
+ * resolving to another material. Resolution uses dataset equality, so an
+ * arbitrary tolerated item id never enters a selector. */
+function vaultFocusKey(model: VaultRowModel, role: VaultFocusRole): string {
+  const identity =
+    model.kind === 'pooled'
+      ? `pooled:${model.itemId}`
+      : `special:${model.specialRef.index}:${model.itemId}`;
+  return `vault:${role}:${identity}`;
+}
 
 /** BankWindow-supplied glue, the GuildBankTabDeps shape: the shared
  *  presentation painters plus the window's prompt-dialog chrome. */
@@ -272,7 +286,7 @@ export class VaultTab {
     row.className = `vault-row vault-row-${model.kind}${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;
     row.dataset.itemId = itemId;
     if (model.kind === 'special') row.dataset.vaultSpecialIndex = String(model.specialRef.index);
-    row.setAttribute(FOCUS_KEY_ATTR, `vault:row:${ordinal}`);
+    row.setAttribute(FOCUS_KEY_ATTR, vaultFocusKey(model, 'row'));
     row.style.setProperty(
       '--bank-slot-quality',
       QUALITY_COLOR[model.qualityKey] ?? QUALITY_DEFAULT_COLOR,
@@ -325,7 +339,7 @@ export class VaultTab {
         this.deps.hideTooltip();
         return;
       }
-      this.onRowClick(model, ev.shiftKey, ordinal);
+      this.onRowClick(model, ev.shiftKey);
     });
     this.deps.attachTooltip(row, () => {
       const body = item
@@ -344,7 +358,7 @@ export class VaultTab {
       const partial = document.createElement('button');
       partial.type = 'button';
       partial.className = 'vault-row-partial';
-      partial.setAttribute(FOCUS_KEY_ATTR, `vault:partial:${ordinal}`);
+      partial.setAttribute(FOCUS_KEY_ATTR, vaultFocusKey(model, 'partial'));
       const partialLabel = t('hudChrome.bank.withdrawQuantityAction', { item: name });
       partial.setAttribute('aria-label', partialLabel);
       partial.title = partialLabel;
@@ -352,9 +366,7 @@ export class VaultTab {
         svgIcon('more') +
         `<span class="vault-row-partial-label">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</span>`;
       const partialMax = model.partialMax;
-      partial.addEventListener('click', () =>
-        this.showWithdrawQuantityPrompt(model, partialMax, ordinal),
-      );
+      partial.addEventListener('click', () => this.showWithdrawQuantityPrompt(model, partialMax));
       wrap.appendChild(partial);
     }
     list.appendChild(wrap);
@@ -365,7 +377,7 @@ export class VaultTab {
   // CLICK-TIME snapshot: the sim resolves a bags-can-only-hold-part withdraw
   // silently (the phase 01 recorded open call, resolved UI-side here), while a
   // zero-fit click stays quiet because the sim emits its own bags-full line.
-  private onRowClick(model: VaultRowModel, shift: boolean, ordinal: number): void {
+  private onRowClick(model: VaultRowModel, shift: boolean): void {
     const world = this.deps.world();
     const liveSpecial = model.kind === 'special' ? this.liveSpecialRow(model) : null;
     if (model.kind === 'special' && !liveSpecial) return;
@@ -386,7 +398,7 @@ export class VaultTab {
       this.deps.requestRender();
       return;
     }
-    this.showWithdrawQuantityPrompt(model, action.max, ordinal);
+    this.showWithdrawQuantityPrompt(model, action.max);
   }
 
   // hasOwn, not a plain index: a tolerated save can stock a dormant
@@ -428,11 +440,7 @@ export class VaultTab {
     });
   }
 
-  private showWithdrawQuantityPrompt(
-    model: VaultRowModel,
-    maxCount: number,
-    ordinal: number,
-  ): void {
+  private showWithdrawQuantityPrompt(model: VaultRowModel, maxCount: number): void {
     const { itemId } = model;
     const item = knownItemDef(ITEMS, itemId);
     const itemName = item ? itemDisplayName(item) : itemId;
@@ -481,12 +489,8 @@ export class VaultTab {
         afterClose: () => {
           this.deps.requestRender();
           restoreFirstEnabled([
-            this.deps
-              .root()
-              .querySelector<HTMLElement>(`[${FOCUS_KEY_ATTR}="vault:partial:${ordinal}"]`),
-            this.deps
-              .root()
-              .querySelector<HTMLElement>(`[${FOCUS_KEY_ATTR}="vault:row:${ordinal}"]`),
+            findFocusKey(this.deps.root(), vaultFocusKey(model, 'partial')),
+            findFocusKey(this.deps.root(), vaultFocusKey(model, 'row')),
             this.deps.root().querySelector<HTMLElement>('[data-close]'),
           ]);
         },
