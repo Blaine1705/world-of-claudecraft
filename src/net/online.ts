@@ -172,6 +172,13 @@ import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
+import {
+  decodeConsecrations,
+  decodeFrostRings,
+  decodeIgnivarMeteors,
+  decodeTemporalHourglasses,
+  decodeVarkhulForgestormWarnings,
+} from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
@@ -2874,162 +2881,17 @@ export class ClientWorld implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    this.activeFrostRings = Array.isArray(snap.rings)
-      ? snap.rings.flatMap((value: unknown): ActiveFrostRing[] => {
-          if (!value || typeof value !== 'object') return [];
-          const ring = value as Record<string, unknown>;
-          if (
-            typeof ring.id !== 'string' ||
-            ![ring.x, ring.z, ring.r, ring.i, ring.dur, ring.rem].every(
-              (value) => typeof value === 'number' && Number.isFinite(value),
-            ) ||
-            (ring.r as number) <= 0 ||
-            (ring.i as number) < 0 ||
-            (ring.i as number) >= (ring.r as number) ||
-            (ring.dur as number) <= 0 ||
-            (ring.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: ring.id,
-              x: ring.x as number,
-              z: ring.z as number,
-              radius: ring.r as number,
-              innerRadius: ring.i as number,
-              duration: ring.dur as number,
-              remaining: Math.min(ring.rem as number, ring.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeIgnivarMeteors = Array.isArray(snap.ignivarMeteors)
-      ? snap.ignivarMeteors.flatMap((value: unknown): ActiveIgnivarMeteorWarning[] => {
-          if (!value || typeof value !== 'object') return [];
-          const meteor = value as Record<string, unknown>;
-          if (
-            typeof meteor.id !== 'string' ||
-            ![meteor.x, meteor.z, meteor.r, meteor.dur, meteor.rem, meteor.lead].every(
-              (entry) => typeof entry === 'number' && Number.isFinite(entry),
-            ) ||
-            (meteor.r as number) <= 0 ||
-            (meteor.dur as number) <= 0 ||
-            (meteor.rem as number) <= 0 ||
-            (meteor.lead as number) < 0 ||
-            (meteor.lead as number) >= (meteor.dur as number)
-          ) {
-            return [];
-          }
-          return [
-            {
-              id: meteor.id,
-              x: meteor.x as number,
-              z: meteor.z as number,
-              radius: meteor.r as number,
-              duration: meteor.dur as number,
-              remaining: Math.min(meteor.rem as number, meteor.dur as number),
-              warningLead: meteor.lead as number,
-            },
-          ];
-        })
-      : [];
-    this.activeVarkhulForgestormWarnings = Array.isArray(snap.varkhulForgestorm)
-      ? snap.varkhulForgestorm.flatMap((value: unknown): ActiveVarkhulForgestormWarning[] => {
-          if (!value || typeof value !== 'object') return [];
-          const warning = value as Record<string, unknown>;
-          if (
-            ![
-              warning.id,
-              warning.sourceId,
-              warning.x,
-              warning.z,
-              warning.r,
-              warning.dur,
-              warning.rem,
-            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
-            (warning.id as number) < 0 ||
-            (warning.sourceId as number) < 0 ||
-            (warning.r as number) <= 0 ||
-            (warning.dur as number) <= 0 ||
-            (warning.rem as number) <= 0
-          ) {
-            return [];
-          }
-          return [
-            {
-              id: warning.id as number,
-              sourceId: warning.sourceId as number,
-              x: warning.x as number,
-              z: warning.z as number,
-              radius: warning.r as number,
-              duration: warning.dur as number,
-              remaining: Math.min(warning.rem as number, warning.dur as number),
-            },
-          ];
-        })
-      : [];
+    this.activeFrostRings = decodeFrostRings(snap.rings);
+    this.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
+    this.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
     this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
     this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
       snap.varkhulCinderOrbs,
     );
     this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
     this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
-    this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
-      ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
-          if (!value || typeof value !== 'object') return [];
-          const hourglass = value as Record<string, unknown>;
-          if (
-            typeof hourglass.id !== 'string' ||
-            ![hourglass.x, hourglass.z, hourglass.r, hourglass.dur, hourglass.rem].every(
-              (entry) => typeof entry === 'number' && Number.isFinite(entry),
-            ) ||
-            (hourglass.r as number) <= 0 ||
-            (hourglass.dur as number) <= 0 ||
-            (hourglass.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: hourglass.id,
-              x: hourglass.x as number,
-              z: hourglass.z as number,
-              radius: hourglass.r as number,
-              duration: hourglass.dur as number,
-              remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeConsecrations = Array.isArray(snap.consecrations)
-      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
-          if (!value || typeof value !== 'object') return [];
-          const consecration = value as Record<string, unknown>;
-          if (
-            typeof consecration.id !== 'string' ||
-            ![
-              consecration.x,
-              consecration.z,
-              consecration.r,
-              consecration.dur,
-              consecration.rem,
-            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
-            (consecration.r as number) <= 0 ||
-            (consecration.dur as number) <= 0 ||
-            (consecration.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: consecration.id,
-              x: consecration.x as number,
-              z: consecration.z as number,
-              radius: consecration.r as number,
-              duration: consecration.dur as number,
-              remaining: Math.min(consecration.rem as number, consecration.dur as number),
-            },
-          ];
-        })
-      : [];
+    this.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
+    this.activeConsecrations = decodeConsecrations(snap.consecrations);
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
