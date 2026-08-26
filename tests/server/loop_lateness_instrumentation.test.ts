@@ -127,6 +127,18 @@ describe('scrape-time profile readout', () => {
     const main = readFileSync(join(ROOT, 'server/main.ts'), 'utf8');
     expect(main).toContain('tickPhaseMillis: () => game.tickPhaseMillis(WOC_TICK_PHASES)');
   });
+
+  it('phaseMillis is the exporter shape (p95 + max only) with the same narrowing', () => {
+    const profiler = new TickProfiler(['a', 'b'], 8);
+    profiler.add('a', 4);
+    profiler.add('b', 9);
+    profiler.commit(13);
+    expect(profiler.phaseMillis(['a', 'nope'])).toEqual({ a: { p95: 4, max: 4 } });
+    expect(Object.keys(profiler.phaseMillis()).sort()).toEqual(['a', 'b', 'ticksRun', 'total']);
+    expect(profiler.phaseMillis().b).toEqual({ p95: 9, max: 9 });
+    const game = readFileSync(join(ROOT, 'server/game.ts'), 'utf8');
+    expect(game).toContain('return this.tickProfiler.phaseMillis(only);');
+  });
 });
 
 describe('catch-up divisor', () => {

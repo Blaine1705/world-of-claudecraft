@@ -126,4 +126,16 @@ export class TickProfiler {
     }
     return { samples: this.count, windowTicks: this.windowTicks, phases };
   }
+
+  /**
+   * The exporter's readout: p95 + max per phase, in milliseconds, keyed by phase
+   * name. Same `only` narrowing (and the same skip-not-zero rule) as `profile`.
+   */
+  phaseMillis(only?: readonly string[]): Record<string, { p95: number; max: number }> {
+    const out: Record<string, { p95: number; max: number }> = {};
+    for (const [name, stats] of Object.entries(this.profile(only).phases)) {
+      out[name] = { p95: stats.p95, max: stats.max };
+    }
+    return out;
+  }
 }
