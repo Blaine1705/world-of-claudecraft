@@ -185,8 +185,8 @@ function forceBattlegroundWallContact(
       { x: -Math.sin(wall.rot), z: -Math.cos(wall.rot), d: wall.hd },
     ];
     for (const axis of axes) {
-      const x = origin.x + wall.x + axis.x * (axis.d + PLAYER_BODY_RADIUS + 0.05);
-      const z = origin.z + wall.z + axis.z * (axis.d + PLAYER_BODY_RADIUS + 0.05);
+      const x = origin.x + wall.x + axis.x * (axis.d + PLAYER_BODY_RADIUS + 0.005);
+      const z = origin.z + wall.z + axis.z * (axis.d + PLAYER_BODY_RADIUS + 0.005);
       const resolved = resolvePosition(sim.cfg.seed, x, z, PLAYER_BODY_RADIUS);
       if (Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6) {
         contact = { x, z, normalX: axis.x, normalZ: axis.z };
@@ -886,6 +886,42 @@ describe('unstuck area identity', () => {
     const plot = BG_GRAVEYARDS[0];
     expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('rejects a battleground wall-adjacent ESC attempt while moving along the wall', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+
+    player.facing += Math.PI / 2;
+    player.prevFacing = player.facing;
+    sim.drainEvents();
+    sim.tick();
+
+    expect(Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z)).toBeGreaterThan(
+      0.05,
+    );
+    expect(meta.moveInput.forward).toBe(true);
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'moving' }),
+    );
+
+    player.cooldowns.delete(UNSTUCK_COOLDOWN_ID);
+    forceBattlegroundWallContact(sim, match, pid);
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+
+    player.facing += Math.PI / 2;
+    player.prevFacing = player.facing;
+    const events = eventsOf(sim.tick());
+    expect(Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z)).toBeGreaterThan(
+      0.05,
+    );
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'moved' }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
   });
 
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {

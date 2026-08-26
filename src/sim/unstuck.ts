@@ -58,6 +58,8 @@ export { UNSTUCK_COOLDOWN_ID } from './unstuck_cooldown';
 
 const POSITION_EPS = 1e-4;
 const BG_GEOMETRY_CONTACT_MARGIN = 0.1;
+const BG_WALL_CONTACT_STUCK_DISTANCE = 0.03;
+const BG_WALL_CONTACT_STUCK_SPEED = 0.15;
 const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
 
@@ -236,7 +238,20 @@ function pointInBattlegroundColliderContact(
   return false;
 }
 
-function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
+function battlegroundWallContactStuck(meta: PlayerMeta, p: Entity): boolean {
+  return (
+    hasMoveInput(meta) &&
+    p.onGround &&
+    !p.jumping &&
+    Math.hypot(p.pos.x - p.prevPos.x, p.pos.z - p.prevPos.z) <=
+      BG_WALL_CONTACT_STUCK_DISTANCE &&
+    Math.abs(p.pos.y - p.prevPos.y) <= BG_WALL_CONTACT_STUCK_DISTANCE &&
+    Math.hypot(p.vx, p.vz) <= BG_WALL_CONTACT_STUCK_SPEED &&
+    Math.abs(p.vy) <= BG_WALL_CONTACT_STUCK_SPEED
+  );
+}
+
+function battlegroundWallTrap(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
   if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
   const match = ctx.bgMatches.get(p.id);
   if (!match) return false;
@@ -251,27 +266,26 @@ function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
     undefined,
     moverHeight(p),
   );
-  return (
-    Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS ||
-    pointInBattlegroundColliderContact(p, origin, BG_GEOMETRY_CONTACT_MARGIN)
-  );
+  if (Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS) return true;
+  if (!battlegroundWallContactStuck(meta, p)) return false;
+  return pointInBattlegroundColliderContact(p, origin, BG_GEOMETRY_CONTACT_MARGIN);
 }
 
-function motionBlock(ctx: SimContext, p: Entity): UnstuckBlockedReason | null {
+function motionBlock(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlockedReason | null {
   if (isFrozenCorpse(p)) return null;
   if (forcedAction(p)) return 'moving';
-  if (battlegroundWallTrap(ctx, p)) return null;
+  if (battlegroundWallTrap(ctx, meta, p)) return null;
   if (!p.onGround || p.jumping) return 'falling';
   if (Math.hypot(p.vx, p.vy, p.vz) > POSITION_EPS) return 'moving';
   return null;
 }
 
 function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlockedReason | null {
-  const bgWallTrap = battlegroundWallTrap(ctx, p);
+  const bgWallTrap = battlegroundWallTrap(ctx, meta, p);
   if (p.jailed) return 'jailed';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
-  const motion = motionBlock(ctx, p);
+  const motion = motionBlock(ctx, meta, p);
   if (motion) return motion;
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (bgCarryingFlag(ctx, p.id)) return 'competitive';
@@ -345,7 +359,7 @@ function cancelReason(
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (
-    (hasMoveInput(meta) && !battlegroundWallTrap(ctx, p)) ||
+    (hasMoveInput(meta) && !battlegroundWallTrap(ctx, meta, p)) ||
     (pending.area.kind !== 'battleground' &&
       (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
         Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
@@ -359,7 +373,7 @@ function cancelReason(
     p.jailed ||
     isStunned(p) ||
     isRooted(p) ||
-    motionBlock(ctx, p) !== null ||
+    motionBlock(ctx, meta, p) !== null ||
     competitive(ctx, p.id, p) ||
     ctx.tradeFor(p.id)
   )
