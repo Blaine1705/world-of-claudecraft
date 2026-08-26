@@ -2352,6 +2352,24 @@
   .buff.own:not(.debuff) {
     border-color: var(--color-primary);
   }
+  /* The low-tier buff-cap overflow badge (auraVisibleCap, src/game/ui_tier_knobs.ts): a
+     dashed "+N" tile standing in for the buff icons the LOW preset sheds past the cap.
+     Hidden by default (the painter mints it via createElement, no class this rule does
+     not match), then reveals it (display:flex) only on a frame that actually sheds
+     something; the auras themselves stay active the whole time, only the icon is
+     cosmetic (docs/design/graphics-settings-fairness.md), so the full tiers never show
+     it. display:flex is set here to center the "+N" text; the painter's shown/hidden
+     writes use the explicit value pair, not the stacks badge's revert-to-default idiom
+     (auras_painter.ts OVERFLOW_SHOWN/OVERFLOW_HIDDEN), because the default here is
+     none, not shown. */
+  .buff.buff-overflow {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font: 700 12px var(--body-font);
+    color: var(--color-text-muted);
+    border-style: dashed;
+  }
   /* The player's own cancelable buffs: right-click to drop, with a hover cue. */
   .buff.cancelable {
     cursor: context-menu;

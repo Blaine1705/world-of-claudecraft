@@ -603,7 +603,9 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 14, '.setAttribute': 3 },
     reflowAllow: {},
   },
-  { file: 'auras_painter.ts', allow: { '.className': 3 }, reflowAllow: {} },
+  // 3 one-time pooled-node builds (createNode's .buff/.dur/.stacks) + the overflow
+  // badge span built once in the constructor.
+  { file: 'auras_painter.ts', allow: { '.className': 4 }, reflowAllow: {} },
   {
     file: 'fct_painter.ts',
     allow: { '.className': 1, '.setAttribute': 1 },

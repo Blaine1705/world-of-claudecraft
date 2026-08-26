@@ -925,7 +925,8 @@ export const ja_JP: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "時",
-      "durationUnitDays": "日"
+      "durationUnitDays": "日",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "キャラクターモデルプレビュー"
@@ -2099,6 +2100,12 @@ export const ja_JP: EnTranslations = {
         "few": "残り {count} 秒",
         "many": "残り {count} 秒",
         "other": "残り {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "few": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "many": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "other": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です"
       },
       "playtimeDays": {
         "one": "{count} 日",

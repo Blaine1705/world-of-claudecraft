@@ -130,6 +130,17 @@ What each knob does, and why it is gameplay-neutral:
   interleaves buffs and debuffs in sim-application order) is likewise never tier-gated: it can
   carry a purgeable buff, an allied maintained buff, or a group-coordinated foreign debuff that a
   player reacts to, so it repaints every frame on every preset just like the player's own bars.
+  **The 2026-08-26 buff-bar overflow badge:** the shed itself stayed a silent count for a while
+  (a player on low with more than `AURA_VISIBLE_CAP_LOW` buffs simply saw fewer icons than they
+  had, with nothing distinguishing "hidden" from "gone"), which read as a bug report even though
+  no rule here was actually violated. The fix restores no information (the classification above
+  is unchanged: a buff icon is still cosmetic, and the cap still never touches a debuff); it only
+  makes the shed HONEST. `AurasPainter` now accepts an optional `overflowEl`, a static sibling
+  `hud.ts` mints once into `#buff-bar` ahead of the pooled aura nodes; on a paint that actually
+  sheds N buffs, the badge shows a dashed "+N" tile (`hudChrome.unitFrame.buffOverflowLabel`)
+  with a native tooltip (`hudChrome.plurals.buffsHidden`) explaining that those buffs are still
+  active. Full tiers never see it (the cap never bites there), and neither does the debuff bar or
+  the target strip (their `overflowEl` stays null: neither can ever shed).
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
   (`nonSelfRepaintDue`), and the cast bar and the debuffs strip are both painted OUTSIDE the
@@ -276,7 +287,11 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
-  exceeds the cap; the cap is byte-identical on full tiers.
+  exceeds the cap; the cap is byte-identical on full tiers. The "overflow badge" block pins the
+  new honesty affordance: hidden and blank under the cap or on a full tier, revealed with the
+  EXACT shed count once the low-tier buff cap bites, the shed count excludes a debuff that
+  rendered past the cap (only dropped buffs count), a painter built with no `overflowEl` never
+  touches one, and the count clears again once the buff count drops back under the cap.
 - `tests/ui_tier_knobs.test.ts`: the LOW shed constants are literal-pinned; a `Hud.fxTier()`
   source-scan proves the knobs read the static `data-fx-level` stamp and never the FPS
   governor; a source-scan pins that party frames are not tiered.

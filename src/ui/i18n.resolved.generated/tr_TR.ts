@@ -925,7 +925,8 @@ export const tr_TR: EnTranslations = {
       "durationUnitSeconds": "sn",
       "durationUnitMinutes": "dk",
       "durationUnitHours": "sa",
-      "durationUnitDays": "g"
+      "durationUnitDays": "g",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Karakter Modeli Önizlemesi"
@@ -2099,6 +2100,12 @@ export const tr_TR: EnTranslations = {
         "few": "{count} saniye kaldı",
         "many": "{count} saniye kaldı",
         "other": "{count} saniye kaldı"
+      },
+      "buffsHidden": {
+        "one": "{count} more buff is active but hidden on this graphics preset",
+        "few": "{count} more buffs are active but hidden on this graphics preset",
+        "many": "{count} more buffs are active but hidden on this graphics preset",
+        "other": "{count} more buffs are active but hidden on this graphics preset"
       },
       "playtimeDays": {
         "one": "{count} gün",

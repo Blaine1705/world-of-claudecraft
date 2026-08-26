@@ -24,9 +24,16 @@
 // ORDER: the active records are reconciled into the container with the minimum number
 // of node moves (the reconcileOrder discipline), so a steady-state frame moves no
 // nodes. The buff bar is `flex-wrap` row-reverse, so DOM order is the aura order.
+//
+// OVERFLOW BADGE: a painter built with showOverflowBadge=true (today only the player buff
+// bar) mints a static "+N" sibling element ONCE at construction, ahead of the pooled aura
+// nodes and never through the pool itself, then reveals it when the low-tier cap
+// (auraVisibleCap) actually sheds N buffs this frame, so the shed stays HONEST instead of
+// silent (see paint()'s closing block).
 
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import { auraVisibleCap } from '../game/ui_tier_knobs';
+import { AURA_OVERFLOW_TEXT, type AuraOverflowTextDeps } from './aura_overflow_badge';
 import type { AurasState } from './auras_view';
 import type { PainterHostWriters } from './painter_host';
 
@@ -66,6 +73,16 @@ const DUP_KEY_SEP = '#';
 // appended the badge only when stacks > 1).
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
+// The overflow badge class + display pair. Unlike the stacks badge (default shown,
+// `''` reverts to it), the overflow badge's CSS default is display:none (it is absent far
+// more often than present), so revealing it needs an explicit value, not a revert.
+const OVERFLOW_CLASS = 'buff-overflow';
+const OVERFLOW_SHOWN = 'flex';
+const OVERFLOW_HIDDEN = 'none';
+// The overflow badge's native tooltip attribute (a plain `title`, not the custom
+// attachTooltip system the pooled aura nodes use: the badge is a single static element,
+// not a per-aura pool entry, so it needs no lazy-build-once closure).
+const TITLE_ATTR = 'title';
 const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
   'divine_ascension',
   'shaman_thunder_charges',
@@ -148,6 +165,11 @@ export class AurasPainter {
   // Monotonic frame stamp for the detach sweep (cheaper than building a key Set each
   // frame). Wraps harmlessly: a record's stamp is rewritten every frame it is active.
   private frame = 0;
+  // The overflow badge element, minted ONCE below (never through the pool) only for a
+  // painter built with showOverflowBadge=true. null for every other instance (the debuff
+  // bar, the target strip, the party mini-strip): their shed is always 0, so building one
+  // would be dead weight.
+  private readonly overflowEl: HTMLElement | null;
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -159,7 +181,20 @@ export class AurasPainter {
     // governor). Read per paint to cap the visible aura count on low. Defaults to the
     // full tier so a painter built without it is untiered (uncapped, byte-faithful).
     private readonly getFxTier: () => UiEffectsTier = () => 'ultra',
-  ) {}
+    showOverflowBadge = false,
+    // The overflow badge's i18n text, real by default; a test overrides it with a fake
+    // (matching renderTooltip/attachTooltip) instead of loading the real i18n runtime.
+    private readonly overflowText: AuraOverflowTextDeps = AURA_OVERFLOW_TEXT,
+  ) {
+    if (showOverflowBadge) {
+      const el = doc.createElement('span');
+      el.className = `${BUFF_CLASS} ${OVERFLOW_CLASS}`;
+      container.appendChild(el);
+      this.overflowEl = el;
+    } else {
+      this.overflowEl = null;
+    }
+  }
 
   /** Reconcile the pool to this frame's active auras and repaint each in place. Runs
    *  every frame; the elided writers make an unchanged frame cost no DOM mutation. */
@@ -190,6 +225,7 @@ export class AurasPainter {
     const cap = auraVisibleCap(this.getFxTier());
     this.ordered.length = 0;
     let rendered = 0;
+    let shed = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
       // Never a debuff, never an id on the always-visible list (Divine Ascension
@@ -198,8 +234,15 @@ export class AurasPainter {
       // aura whose icon IS the affordance is not, and the carried-flag buff is
       // applied at the pickup so it sorts LAST and a flat first-N cap would shed
       // it first.
-      if (!s.isDebuff && !s.alwaysRender && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key))
+      if (
+        !s.isDebuff &&
+        !s.alwaysRender &&
+        rendered >= cap &&
+        !ALWAYS_VISIBLE_AURA_IDS.has(s.key)
+      ) {
+        shed++;
         continue;
+      }
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a
@@ -265,6 +308,22 @@ export class AurasPainter {
       }
     }
     this.reconcileOrder();
+    // The overflow badge: makes the cap's shed count HONEST rather than silent, so a
+    // player on low reads "N more buffs are active but hidden" instead of wondering
+    // whether a buff dropped or the game glitched. `shed` restores no actionable
+    // information (a debuff is never shed, so this is always 0 unless this instance is
+    // the player buff bar; see the FAIRNESS comment above), it only says so. A painter
+    // with no overflowEl (the debuff bar, the target strip) skips this entirely.
+    if (this.overflowEl) {
+      const show = shed > 0;
+      this.writers.setDisplay(this.overflowEl, show ? OVERFLOW_SHOWN : OVERFLOW_HIDDEN);
+      this.writers.setText(this.overflowEl, show ? this.overflowText.label(shed) : '');
+      this.writers.setAttr(
+        this.overflowEl,
+        TITLE_ATTR,
+        show ? this.overflowText.tooltip(shed) : '',
+      );
+    }
   }
 
   /** Build one aura node (.buff > .dur + .stacks) and attach its tooltip ONCE. The

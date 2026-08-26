@@ -925,7 +925,8 @@ export const id_ID: EnTranslations = {
       "durationUnitSeconds": "d",
       "durationUnitMinutes": "m",
       "durationUnitHours": "j",
-      "durationUnitDays": "h"
+      "durationUnitDays": "h",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Pratinjau Model Karakter"
@@ -2099,6 +2100,12 @@ export const id_ID: EnTranslations = {
         "few": "{count} detik tersisa",
         "many": "{count} detik tersisa",
         "other": "{count} detik tersisa"
+      },
+      "buffsHidden": {
+        "one": "{count} more buff is active but hidden on this graphics preset",
+        "few": "{count} more buffs are active but hidden on this graphics preset",
+        "many": "{count} more buffs are active but hidden on this graphics preset",
+        "other": "{count} more buffs are active but hidden on this graphics preset"
       },
       "playtimeDays": {
         "one": "{count} hari",

@@ -925,7 +925,8 @@ export const zh_TW: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "時",
-      "durationUnitDays": "天"
+      "durationUnitDays": "天",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "角色模型預覽"
@@ -2099,6 +2100,12 @@ export const zh_TW: EnTranslations = {
         "few": "剩餘 {count} 秒",
         "many": "剩餘 {count} 秒",
         "other": "剩餘 {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示",
+        "few": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示",
+        "many": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示",
+        "other": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示"
       },
       "playtimeDays": {
         "one": "{count} 天",

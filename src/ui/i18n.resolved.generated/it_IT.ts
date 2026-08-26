@@ -925,7 +925,8 @@ export const it_IT: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "g"
+      "durationUnitDays": "g",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Anteprima del modello del personaggio"
@@ -2099,6 +2100,12 @@ export const it_IT: EnTranslations = {
         "few": "{count} secondi rimanenti",
         "many": "{count} secondi rimanenti",
         "other": "{count} secondi rimanenti"
+      },
+      "buffsHidden": {
+        "one": "{count} more buff is active but hidden on this graphics preset",
+        "few": "{count} more buffs are active but hidden on this graphics preset",
+        "many": "{count} more buffs are active but hidden on this graphics preset",
+        "other": "{count} more buffs are active but hidden on this graphics preset"
       },
       "playtimeDays": {
         "one": "{count} giorno",

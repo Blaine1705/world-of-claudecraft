@@ -925,7 +925,8 @@ export const ru_RU: EnTranslations = {
       "durationUnitSeconds": "с",
       "durationUnitMinutes": "м",
       "durationUnitHours": "ч",
-      "durationUnitDays": "д"
+      "durationUnitDays": "д",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Предпросмотр модели персонажа"
@@ -2099,6 +2100,12 @@ export const ru_RU: EnTranslations = {
         "few": "Осталось {count} сек.",
         "many": "Осталось {count} сек.",
         "other": "Осталось {count} сек."
+      },
+      "buffsHidden": {
+        "one": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики",
+        "few": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики",
+        "many": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики",
+        "other": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики"
       },
       "playtimeDays": {
         "one": "{count} день",

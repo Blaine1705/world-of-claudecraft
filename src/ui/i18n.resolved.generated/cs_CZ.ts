@@ -925,7 +925,8 @@ export const cs_CZ: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Náhled modelu postavy"
@@ -2099,6 +2100,12 @@ export const cs_CZ: EnTranslations = {
         "few": "zbývají {count} sekundy",
         "many": "zbývá {count} sekundy",
         "other": "zbývá {count} sekund"
+      },
+      "buffsHidden": {
+        "one": "{count} more buff is active but hidden on this graphics preset",
+        "few": "{count} more buffs are active but hidden on this graphics preset",
+        "many": "{count} more buffs are active but hidden on this graphics preset",
+        "other": "{count} more buffs are active but hidden on this graphics preset"
       },
       "playtimeDays": {
         "one": "{count} den",

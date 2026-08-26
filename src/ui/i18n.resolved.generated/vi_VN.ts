@@ -925,7 +925,8 @@ export const vi_VN: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "ph",
       "durationUnitHours": "g",
-      "durationUnitDays": "ng"
+      "durationUnitDays": "ng",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Xem Trước Mô Hình Nhân Vật"
@@ -2099,6 +2100,12 @@ export const vi_VN: EnTranslations = {
         "few": "còn lại {count} giây",
         "many": "còn lại {count} giây",
         "other": "còn lại {count} giây"
+      },
+      "buffsHidden": {
+        "one": "{count} more buff is active but hidden on this graphics preset",
+        "few": "{count} more buffs are active but hidden on this graphics preset",
+        "many": "{count} more buffs are active but hidden on this graphics preset",
+        "other": "{count} more buffs are active but hidden on this graphics preset"
       },
       "playtimeDays": {
         "one": "{count} ngày",
