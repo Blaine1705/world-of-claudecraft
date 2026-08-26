@@ -372,6 +372,7 @@ import {
   type ActionBarView,
   type ActionBarWorldInput,
   ATTACK_ICON_KEY,
+  actionBarCooldownRemaining,
   createActionBarView,
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
@@ -397,6 +398,8 @@ import {
   enterGroundAim,
   type GroundAimState,
   shouldUseGroundAim,
+  smartSeedPoint,
+  withinMinRange,
 } from './hud/action_bar/ground_aim';
 import {
   applyLoadoutBar as applyLoadoutBarActions,
@@ -821,6 +824,7 @@ export interface OptionsHooks {
   // structurally), so the Controller options panel can read & rebind buttons
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
+  groundAimTargetAttackable?: (targetId: number) => boolean;
 }
 
 export type GraphicsApplyOutcome = 'applied' | 'saved' | 'failed' | 'fatal';
@@ -1332,7 +1336,6 @@ export class Hud {
   }
   private groundAim: GroundAimState = createGroundAimState();
   private groundAimPoint: AimPoint | null = null;
-  private groundAimClamped = false;
   private empowerCharge: { slot: number; abilityId: string } | null = null;
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -6756,6 +6759,14 @@ export class Hud {
     return { x: me.pos.x, z: me.pos.z };
   }
 
+  private groundAimSeedTarget(): AimPoint | null {
+    const me = this.sim.player;
+    const target = me.targetId !== null ? this.sim.entities.get(me.targetId) : null;
+    if (!target || target.dead || target.id === me.id) return null;
+    const attackable = this.optionsHooks?.groundAimTargetAttackable;
+    return !attackable || attackable(target.id) ? { x: target.pos.x, z: target.pos.z } : null;
+  }
+
   private empoweredAbilityIdForSlot(slot: number): string | null {
     const known = this.abilityForSlot(slot);
     return known?.def.empowerStages ? known.def.id : null;
@@ -6834,14 +6845,16 @@ export class Hud {
     if (!this.isGroundAimActive()) return false;
     this.groundAim = cancelGroundAim(this.groundAim);
     this.groundAimPoint = null;
-    this.groundAimClamped = false;
     this.renderer.setGroundAimReticle(null);
     return true;
   }
 
   private beginGroundAim(abilityId: string, slot: number): void {
     this.groundAim = enterGroundAim(this.groundAim, abilityId, slot);
-    this.groundAimPoint = null;
+    const res = this.activeGroundAimAbility();
+    this.groundAimPoint = res
+      ? smartSeedPoint(this.sim.player, this.groundAimSeedTarget(), res.def.range)
+      : null;
   }
 
   private activeGroundAimAbility(): ResolvedAbility | null {
@@ -6853,7 +6866,6 @@ export class Hud {
   updateGroundAimPoint(rawPoint: AimPoint | null): void {
     if (!this.isGroundAimActive() || !rawPoint) {
       this.groundAimPoint = null;
-      this.groundAimClamped = false;
       return;
     }
     const res = this.activeGroundAimAbility();
@@ -6861,27 +6873,26 @@ export class Hud {
       this.cancelGroundAim();
       return;
     }
-    const aim = clampAimToRange(this.sim.player, rawPoint, res.def.range);
-    this.groundAimPoint = aim.point;
-    this.groundAimClamped = aim.clamped;
+    this.groundAimPoint = rawPoint;
   }
 
   groundAimReticle(): {
     point: AimPoint;
     radius: number;
     school: string;
-    clamped: boolean;
+    dimmed: boolean;
   } | null {
     if (!this.isGroundAimActive()) return null;
     const point = this.groundAimPoint;
     if (!point) return null;
     const res = this.activeGroundAimAbility();
     if (!res) return null;
+    const aim = clampAimToRange(this.sim.player, point, res.def.range);
     return {
-      point,
+      point: aim.point,
       radius: abilityAoeRadius(res),
       school: res.def.school,
-      clamped: this.groundAimClamped,
+      dimmed: aim.clamped || withinMinRange(this.sim.player, aim.point, res.def.minRange),
     };
   }
 
@@ -6899,7 +6910,6 @@ export class Hud {
     const committed = commitGroundAim(this.groundAim);
     this.groundAim = committed.state;
     this.groundAimPoint = null;
-    this.groundAimClamped = false;
     this.renderer.setGroundAimReticle(null);
     this.sim.castAbilityAt(abilityId, point);
     return true;
@@ -6988,7 +6998,8 @@ export class Hud {
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
-          if (this.groundReticleEnabled(action.id)) {
+          const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
+          if (this.groundReticleEnabled(action.id) && !this.sim.player.dead && cooldown <= 0) {
             this.beginGroundAim(action.id, barSlot);
           } else {
             this.sim.castAbilityAt(action.id, this.groundTargetAim());

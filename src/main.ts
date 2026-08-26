@@ -3054,6 +3054,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
+    groundAimTargetAttackable: (targetId) =>
+      isAttackableEntity(world.entities.get(targetId), world.playerId, activePvpOpponentIds(world)),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3147,6 +3149,9 @@ async function startGame(
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
+      // A ground aim armed before the drop is anchored to a stale world; the
+      // rebuilt mirror may place the player elsewhere entirely.
+      hud.cancelGroundAim();
       hud.marketResyncAfterReconnect();
       // A fresh join (as opposed to a resume within the linkdead grace window)
       // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
@@ -3529,9 +3534,9 @@ async function startGame(
     // reading it here would erase the finger-owned point every render frame.
     if (!document.body.classList.contains('mobile-touch')) {
       const cursor = input.cursorPoint();
-      hud.updateGroundAimPoint(
-        cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
-      );
+      if (cursor) {
+        hud.updateGroundAimPoint(renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y));
+      }
     }
     const reticle = hud.groundAimReticle();
     renderer.setGroundAimReticle(
@@ -3541,7 +3546,7 @@ async function startGame(
             z: reticle.point.z,
             radius: reticle.radius,
             school: reticle.school,
-            dimmed: reticle.clamped,
+            dimmed: reticle.dimmed,
           }
         : null,
     );
@@ -4094,7 +4099,9 @@ async function startGame(
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
     // click-to-move: the destination is across the transition, and chasing it
-    // walks the player straight back into the trigger.
+    // walks the player straight back into the trigger. An armed ground aim is
+    // anchored to the prior position the same way, so it drops with it.
+    if (clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) hud.cancelGroundAim();
     if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
       input.clearClickMove();
     }
@@ -4447,6 +4454,7 @@ async function startGame(
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
+      hud.cancelGroundAim();
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
     }

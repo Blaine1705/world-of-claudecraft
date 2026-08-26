@@ -70,6 +70,28 @@ export function clampAimToRange(
   };
 }
 
+export function smartSeedPoint(
+  caster: Pick<Entity, 'pos' | 'facing'>,
+  targetPoint: AimPoint | null,
+  range: number,
+): AimPoint {
+  if (targetPoint) return clampAimToRange(caster, targetPoint, range).point;
+  const effectiveRange = range > 0 ? range : 5;
+  const distance = effectiveRange / 2;
+  return {
+    x: caster.pos.x + Math.sin(caster.facing) * distance,
+    z: caster.pos.z + Math.cos(caster.facing) * distance,
+  };
+}
+
+export function withinMinRange(
+  caster: Pick<Entity, 'pos'>,
+  point: AimPoint,
+  minRange: number | undefined,
+): boolean {
+  return !!minRange && Math.hypot(point.x - caster.pos.x, point.z - caster.pos.z) < minRange;
+}
+
 export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): number {
   const effect = res.effects.find(
     (eff) =>

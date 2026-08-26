@@ -1,0 +1,290 @@
+// @vitest-environment happy-dom
+
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../src/game/audio', () => ({
+  audio: { click: vi.fn() },
+}));
+vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
+vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
+vi.mock('../src/render/characters/portrait', () => ({
+  onPortraitUpdate: vi.fn(),
+  onPortraitsReady: vi.fn(),
+  playerPortraitDataUrl: vi.fn(),
+  portraitsReady: vi.fn(() => false),
+  visualPortraitDataUrl: vi.fn(),
+}));
+vi.mock('../src/ui/icons', () => ({
+  iconDataUrl: (kind: string, id: string) => `mock:${kind}:${id}`,
+  QUALITY_COLOR: {},
+  raidMarkerDataUrl: vi.fn(() => ''),
+  auraImageUrl: vi.fn(() => null),
+  cachedProceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
+  hasAbilityIconIdentity: vi.fn(() => false),
+  hasAuraImageIdentity: vi.fn(() => false),
+  hasAuraRecipe: vi.fn(() => false),
+  proceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
+}));
+
+import { ABILITIES } from '../src/sim/data';
+import type { ResolvedAbility } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
+import { Hud } from '../src/ui/hud';
+import {
+  type AimPoint,
+  createGroundAimState,
+  type GroundAimState,
+} from '../src/ui/hud/action_bar/ground_aim';
+
+interface GroundAimHarness {
+  groundAim: GroundAimState;
+  groundAimPoint: AimPoint | null;
+  sim: {
+    player: Entity;
+    entities: Map<number, Entity>;
+    known: ResolvedAbility[];
+    castAbilityAt: ReturnType<typeof vi.fn>;
+  };
+  renderer: { setGroundAimReticle: ReturnType<typeof vi.fn> };
+  optionsHooks: { groundAimTargetAttackable?: (targetId: number) => boolean } | null;
+  actionForSlot(slot: number): { type: 'ability'; id: string } | null;
+  abilityForSlot(slot: number): ResolvedAbility | null;
+  groundReticleEnabled(abilityId: string): boolean;
+  flashActionSlot(slot: number): void;
+  castSlot(slot: number): void;
+  isGroundAimActive(): boolean;
+  updateGroundAimPoint(point: AimPoint | null): void;
+  groundAimReticle(): {
+    point: AimPoint;
+    radius: number;
+    school: string;
+    dimmed: boolean;
+  } | null;
+  commitGroundAimAt(point?: AimPoint | null): boolean;
+}
+
+function resolvedPositionAbility(
+  range = 30,
+  minRange?: number,
+  cooldownId?: string,
+): ResolvedAbility {
+  const def = { ...ABILITIES.flamestrike, range, minRange };
+  return {
+    def,
+    rank: 1,
+    cost: def.cost,
+    castTime: def.castTime,
+    cooldown: def.cooldown,
+    effects: def.effects,
+    threatFlat: 0,
+    threatMult: 1,
+    cooldownId,
+  };
+}
+
+function entity(id: number, x: number, z: number): Entity {
+  return {
+    id,
+    pos: { x, y: 0, z },
+    facing: 0,
+    targetId: null,
+    dead: false,
+    auras: [],
+    cooldowns: new Map(),
+  } as unknown as Entity;
+}
+
+function makeHud(
+  options: {
+    player?: Entity;
+    target?: Entity;
+    attackable?: boolean;
+    range?: number;
+    minRange?: number;
+    cooldownId?: string;
+  } = {},
+): GroundAimHarness {
+  const player = options.player ?? entity(1, 0, 0);
+  const target = options.target;
+  if (target) player.targetId = target.id;
+  const ability = resolvedPositionAbility(options.range, options.minRange, options.cooldownId);
+  const hud = Object.create(Hud.prototype) as unknown as GroundAimHarness;
+  hud.groundAim = createGroundAimState();
+  hud.groundAimPoint = null;
+  hud.sim = {
+    player,
+    entities: new Map(
+      [...[player, target].filter((value): value is Entity => !!value)].map((e) => [e.id, e]),
+    ),
+    known: [ability],
+    castAbilityAt: vi.fn(),
+  };
+  hud.renderer = { setGroundAimReticle: vi.fn() };
+  hud.optionsHooks = {
+    groundAimTargetAttackable: () => options.attackable ?? false,
+  };
+  hud.actionForSlot = () => ({ type: 'ability', id: ability.def.id });
+  hud.abilityForSlot = () => ability;
+  hud.groundReticleEnabled = () => true;
+  hud.flashActionSlot = vi.fn();
+  return hud;
+}
+
+describe('Hud ground aim behavior', () => {
+  it('seeds an attackable selected target clamped to range', () => {
+    const target = entity(2, 50, 0);
+    const hud = makeHud({ target, attackable: true });
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(true);
+    expect(hud.groundAimPoint).toEqual({ x: 30, z: 0 });
+  });
+
+  it('seeds ahead at half range when there is no selected target', () => {
+    const hud = makeHud();
+
+    hud.castSlot(3);
+
+    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+    expect(hud.groundAimPoint).not.toEqual({ x: 0, z: 0 });
+  });
+
+  it('seeds ahead when the selected target is not attackable', () => {
+    const hud = makeHud({ target: entity(2, 12, 0), attackable: false });
+
+    hud.castSlot(3);
+
+    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+  });
+
+  it('uses the live selected target when the attackability hook is absent', () => {
+    const target = entity(2, 12, 0);
+    const hud = makeHud({ target });
+    hud.optionsHooks = null;
+
+    hud.castSlot(3);
+
+    expect(hud.groundAimPoint).toEqual({ x: 12, z: 0 });
+  });
+
+  it('seeds ahead when the selected target is dead', () => {
+    const target = entity(2, 12, 0);
+    target.dead = true;
+    const hud = makeHud({ target, attackable: true });
+
+    hud.castSlot(3);
+
+    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+  });
+
+  it('seeds ahead when the selected target is the player', () => {
+    const player = entity(1, 0, 0);
+    player.targetId = player.id;
+    const hud = makeHud({ player, attackable: true });
+
+    hud.castSlot(3);
+
+    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+  });
+
+  it('casts immediately instead of entering aim while on cooldown', () => {
+    const target = entity(2, 12, 0);
+    const hud = makeHud({ target, attackable: true });
+    hud.sim.player.cooldowns.set('flamestrike', 4);
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 12, z: 0 });
+  });
+
+  it('reads the resolved cooldown key before entering aim', () => {
+    const hud = makeHud({ cooldownId: 'shared_clock' });
+    hud.sim.player.cooldowns.set('shared_clock', 4);
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledOnce();
+  });
+
+  it('enters aim when Forbidden Reflection bypasses the running cooldown', () => {
+    const hud = makeHud();
+    hud.sim.player.cooldowns.set('flamestrike', 4);
+    hud.sim.player.auras.push({
+      id: 'wlk_forbidden_reflection',
+      name: 'Forbidden Reflection',
+      kind: 'internal_cd',
+      remaining: 5,
+      duration: 5,
+      value: 0,
+      sourceId: hud.sim.player.id,
+      school: 'shadow',
+      empowerAbilities: ['flamestrike'],
+    });
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(true);
+    expect(hud.sim.castAbilityAt).not.toHaveBeenCalled();
+  });
+
+  it('casts immediately instead of entering aim while dead', () => {
+    const hud = makeHud();
+    hud.sim.player.dead = true;
+
+    hud.castSlot(3);
+
+    expect(hud.isGroundAimActive()).toBe(false);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledOnce();
+  });
+
+  it('dims an unclamped point inside the authored minimum range', () => {
+    const hud = makeHud({ minRange: 8 });
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 3, z: 0 });
+
+    const reticle = hud.groundAimReticle();
+
+    expect(reticle?.point).toEqual({ x: 3, z: 0 });
+    expect(reticle?.dimmed).toBe(true);
+  });
+
+  it('does not dim an unclamped point at the minimum-range boundary', () => {
+    const hud = makeHud({ minRange: 8 });
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 8, z: 0 });
+
+    const reticle = hud.groundAimReticle();
+
+    expect(reticle?.point).toEqual({ x: 8, z: 0 });
+    expect(reticle?.dimmed).toBe(false);
+  });
+
+  it('re-clamps the raw point from the player current position', () => {
+    const hud = makeHud();
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 100, z: 0 });
+    hud.sim.player.pos.x = -50;
+
+    const reticle = hud.groundAimReticle();
+
+    expect(hud.groundAimPoint).toEqual({ x: 100, z: 0 });
+    expect(reticle?.point).toEqual({ x: -20, z: 0 });
+    expect(reticle?.dimmed).toBe(true);
+  });
+
+  it('commits the same live clamp shown by the reticle', () => {
+    const hud = makeHud();
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 100, z: 0 });
+    hud.sim.player.pos.x = -50;
+    const shown = hud.groundAimReticle();
+
+    hud.commitGroundAimAt();
+
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', shown?.point);
+    expect(hud.isGroundAimActive()).toBe(false);
+  });
+});

@@ -382,6 +382,18 @@ function hasForbiddenReflection(
   return false;
 }
 
+export function actionBarCooldownRemaining(
+  player: Pick<ActionBarPlayerInput, 'auras' | 'cooldowns'>,
+  ability: ActionBarAbility,
+  bypassesCooldown = dawnsWrathHammerActive(player, ability.def.id) ||
+    hasForbiddenReflection(player.auras, ability.def.id) ||
+    solarReprisalBypassesCooldown(player, ability.def.id),
+): number {
+  const abilityId = ability.def.id;
+  if (bypassesCooldown) return 0;
+  return player.cooldowns.get(ability.cooldownId ?? abilityId) ?? 0;
+}
+
 /** How many of `itemId` the player is carrying, summed across stacks. Exported
  *  because the consumables seat needs the same number for its tooltip's in-bags
  *  line, off the same snapshot the bar state is built from. */
@@ -549,10 +561,11 @@ export function createActionBarView(
         const dawnsWrathActive = dawnsWrathHammerActive(player, def.id);
         const solarReprisalActive = solarReprisalAbilityGlowActive(player, def.id);
         const reflectionReady = hasForbiddenReflection(player.auras, def.id);
-        const cd =
-          dawnsWrathActive || reflectionReady || solarReprisalBypassesCooldown(player, def.id)
-            ? 0
-            : (player.cooldowns.get(ability.cooldownId ?? def.id) ?? 0);
+        const cd = actionBarCooldownRemaining(
+          player,
+          ability,
+          dawnsWrathActive || reflectionReady || solarReprisalBypassesCooldown(player, def.id),
+        );
         const gcdActive = !def.offGcd && player.gcdRemaining > 0;
         const shown = Math.max(cd, gcdActive ? player.gcdRemaining : 0);
         const denom = cd > 0 ? def.cooldown : GCD;
