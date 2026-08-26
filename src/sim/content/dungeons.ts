@@ -62,9 +62,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     hardLeashRadius: 18,
     idleStationary: true,
     // Suicide bomber: crawl to the target, stand up over ~the StandUp clip length
-    // (2.8s) flashing red, then detonate an AoE fire blast and die. Placeholder
-    // blast numbers, tune per role.
-    meleeBomb: { windup: 2.8, min: 1100, max: 1400, radius: 8, name: 'Meltdown', school: 'fire' },
+    // (2.8s) flashing red, then detonate an AoE fire blast and die. Blast tuned
+    // to the classic living-bomb proportion (about 70% of a cloth raider's HP
+    // when unavoided, about a third of a warrior's): measured BiS level-20
+    // pools run cloth ~870-910 / warrior ~1700, so 550-700 keeps the classic
+    // "move out or a clothie nearly dies" pressure without a guaranteed kill.
+    meleeBomb: { windup: 2.8, min: 550, max: 700, radius: 8, name: 'Meltdown', school: 'fire' },
     loot: [],
     scale: 0.8,
     color: 0x8a8f96,
