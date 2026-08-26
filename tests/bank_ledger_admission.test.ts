@@ -26,10 +26,18 @@ import {
   recordVaultCraftConsume,
 } from '../server/bank_ledger';
 import {
+  BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES,
+  BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES,
   type BankLedgerAdmission,
   BankLedgerOutboxAdmission,
+  bankLedgerSyncMinimumEncodedBytes,
 } from '../server/bank_ledger_admission';
-import { BankLedgerOutbox, BankLedgerOutboxBudget } from '../server/bank_ledger_outbox';
+import {
+  BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH,
+  BankLedgerOutbox,
+  BankLedgerOutboxBudget,
+  serializeBankLedgerCommandBatch,
+} from '../server/bank_ledger_outbox';
 import { type BankSim, dispatchBankCommand } from '../server/bank_wire';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from '../server/db';
 import { REALM } from '../server/realm';
@@ -90,7 +98,7 @@ function ledgerRow(overrides: Partial<BankLedgerRow> = {}): BankLedgerRow {
 function outboxRig(options: { rows?: number; bytes?: number } = {}) {
   let key = 0;
   const rows = options.rows ?? 200;
-  const bytes = options.bytes ?? 64 * 1024;
+  const bytes = options.bytes ?? 2 * 1024 * 1024;
   const budget = new BankLedgerOutboxBudget({ maxRows: rows, maxEncodedBytes: bytes });
   const outbox = new BankLedgerOutbox({
     owner: { realm: REALM, ...WHO },
@@ -157,7 +165,8 @@ beforeEach(async () => {
 
 describe('BankLedgerOutboxAdmission', () => {
   it('reserves the entire remaining byte allowance and completes each handle once', () => {
-    const { outbox, admission, keys } = outboxRig({ rows: 4, bytes: 4_096 });
+    const bytes = bankLedgerSyncMinimumEncodedBytes(2);
+    const { outbox, admission, keys } = outboxRig({ rows: 4, bytes });
     const first = admission.tryReserve(2);
     if (!first) throw new Error('expected admission capacity');
 
@@ -165,7 +174,7 @@ describe('BankLedgerOutboxAdmission', () => {
       queuedRows: 0,
       queuedEncodedBytes: 0,
       reservedRows: 2,
-      reservedEncodedBytes: 4_096,
+      reservedEncodedBytes: bytes,
     });
     expect(first.cancel()).toBe(true);
     expect(first.cancel()).toBe(false);
@@ -176,6 +185,77 @@ describe('BankLedgerOutboxAdmission', () => {
     expect(second.commit([ledgerRow()])).toBe(false);
     expect(outbox.hasPending).toBe(false);
     expect(keys()).toBe(2);
+  });
+
+  it('refuses a near-full outbox one byte below the conservative row allowance', () => {
+    const firstRowBytes = serializeBankLedgerCommandBatch('wire:1', [ledgerRow()]).encodedBytes;
+    const { outbox, admission, keys } = outboxRig({
+      rows: 4,
+      bytes: firstRowBytes + bankLedgerSyncMinimumEncodedBytes(1) - 1,
+    });
+    const first = admission.tryReserve(1);
+    if (!first) throw new Error('expected initial admission capacity');
+    expect(first.commit([ledgerRow()])).toBe(true);
+
+    expect(outbox.usage.queuedEncodedBytes).toBe(firstRowBytes);
+    const bank = bankSim();
+    dispatchBankCommand(bank, WHO, 'bank_deposit', { slot: 0 }, 1, admission);
+    expect(bank.bankDeposit).not.toHaveBeenCalled();
+    expect(bank.errors).toEqual(['You are busy.']);
+    expect(outbox.usage.reservedEncodedBytes).toBe(0);
+    expect(keys()).toBe(1);
+  });
+
+  it('admits at the exact conservative byte boundary and reserves that full remainder', () => {
+    const firstRowBytes = serializeBankLedgerCommandBatch('wire:1', [ledgerRow()]).encodedBytes;
+    const { outbox, admission, keys } = outboxRig({
+      rows: 4,
+      bytes: firstRowBytes + bankLedgerSyncMinimumEncodedBytes(1),
+    });
+    const first = admission.tryReserve(1);
+    if (!first) throw new Error('expected initial admission capacity');
+    expect(first.commit([ledgerRow()])).toBe(true);
+
+    const boundary = admission.tryReserve(1);
+    if (!boundary) throw new Error('expected exact-boundary admission capacity');
+    expect(outbox.usage.reservedEncodedBytes).toBe(bankLedgerSyncMinimumEncodedBytes(1));
+    expect(keys()).toBe(2);
+    expect(boundary.cancel()).toBe(true);
+  });
+
+  it('pins the formal envelope and per-row allowance used by every boundary check', () => {
+    const maxKeyEnvelope = new TextEncoder().encode(
+      JSON.stringify({
+        batchKey: 'x'.repeat(BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH),
+        rows: [],
+      }),
+    ).byteLength;
+    expect(BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES).toBe(256);
+    expect(BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES).toBeGreaterThanOrEqual(maxKeyEnvelope);
+    expect(BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES).toBe(16 * 1024);
+    expect(bankLedgerSyncMinimumEncodedBytes(112)).toBe(256 + 112 * (16 * 1024 + 1));
+    expect(() => bankLedgerSyncMinimumEncodedBytes(0)).toThrow(/positive safe integer/);
+  });
+
+  it('quarantines a post-mutation failure once while retaining all reserved capacity', () => {
+    const failure = new Error('forward payload could not serialize');
+    const quarantined: unknown[] = [];
+    const { outbox } = outboxRig();
+    const admission = new BankLedgerOutboxAdmission(outbox, {
+      onProjectionFailure: (error) => void quarantined.push(error),
+    });
+    const handle = admission.tryReserve(1);
+    if (!handle) throw new Error('expected admission capacity');
+    const reserved = outbox.usage;
+
+    handle.failAfterMutation(failure);
+    handle.failAfterMutation(new Error('duplicate callback'));
+
+    expect(quarantined).toEqual([failure]);
+    expect(outbox.usage).toEqual(reserved);
+    expect(outbox.hasPending).toBe(true);
+    expect(handle.cancel()).toBe(false);
+    expect(handle.commit([ledgerRow()])).toBe(false);
   });
 
   it('keeps legacy guild and craft writers byte-shaped with their pure row builders', async () => {
@@ -239,7 +319,7 @@ describe('bank and vault synchronous ledger admission', () => {
     const collector = (target: number[]): BankLedgerAdmission => ({
       tryReserve: (maxRows) => {
         target.push(maxRows);
-        return { commit: () => true, cancel: () => true };
+        return { commit: () => true, cancel: () => true, failAfterMutation: () => {} };
       },
     });
     const bank = bankSim();

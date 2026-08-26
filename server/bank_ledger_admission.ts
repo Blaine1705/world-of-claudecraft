@@ -7,16 +7,60 @@
 import type { BankLedgerOutbox } from './bank_ledger_outbox';
 import type { BankLedgerRow } from './db';
 
+/**
+ * Conservative allowance for one row produced by a legal current writer.
+ * Known item-instance fields are bounded far below this by
+ * item_instance_load.ts; multiplying by the command's maximum row count also
+ * leaves room for row metadata and batch JSON. The outbox still reserves every
+ * remaining byte, this threshold only refuses a mutation when that remainder
+ * is too small to safely hold its worst-case legal command.
+ *
+ * Forward-compatible unknown instance objects are deliberately not globally
+ * size-bounded on load. A post-mutation projection or serialization failure
+ * from such corrupt or forward data is therefore still terminal: the live host
+ * must quarantine the session and must not save the mutation without its row.
+ */
+export const BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES = 16 * 1024;
+
+/** Max-key JSON object syntax around the row array, rounded up from the
+ *  current 200-byte key contract so the proof is independent of one key. */
+export const BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES = 256;
+
+/** Formal worst-case legal batch allowance. The extra byte per row prices the
+ *  array separator, deliberately including one more than JSON needs. */
+export function bankLedgerSyncMinimumEncodedBytes(maxRows: number): number {
+  if (!Number.isSafeInteger(maxRows) || maxRows <= 0) {
+    throw new RangeError('bank ledger admission maxRows must be a positive safe integer');
+  }
+  const minimumEncodedBytes =
+    BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES +
+    maxRows * (BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES + 1);
+  if (!Number.isSafeInteger(minimumEncodedBytes)) {
+    throw new RangeError('bank ledger admission byte allowance exceeds the safe integer range');
+  }
+  return minimumEncodedBytes;
+}
+
 export interface BankLedgerAdmissionHandle {
   /** Commit one logical command. Empty rows cancel the reservation. */
   commit(rows: readonly BankLedgerRow[]): boolean;
   /** Release a no-op or refused mutation. Repeated completion is a no-op. */
   cancel(): boolean;
+  /** Quarantine signal for a failure after the Sim already mutated. Capacity
+   *  deliberately remains charged so no later admitted command can pass it;
+   *  the synchronous callback is what prevents a subsequent save. */
+  failAfterMutation(error: unknown): void;
 }
 
 /** Structural seam accepted by synchronous bank and vault wire dispatchers. */
 export interface BankLedgerAdmission {
   tryReserve(maxRows: number): BankLedgerAdmissionHandle | null;
+}
+
+export interface BankLedgerOutboxAdmissionOptions {
+  /** Must synchronously quarantine the session before any disconnect path can
+   *  save its now-unpaired mutation. Called once per failed handle. */
+  readonly onProjectionFailure?: (error: unknown) => void;
 }
 
 /**
@@ -25,13 +69,21 @@ export interface BankLedgerAdmission {
  * factory only after both row and byte capacity checks pass.
  */
 export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
-  constructor(private readonly outbox: BankLedgerOutbox) {}
+  private readonly onProjectionFailure: ((error: unknown) => void) | undefined;
+
+  constructor(
+    private readonly outbox: BankLedgerOutbox,
+    options: BankLedgerOutboxAdmissionOptions = {},
+  ) {
+    this.onProjectionFailure = options.onProjectionFailure;
+  }
 
   tryReserve(maxRows: number): BankLedgerAdmissionHandle | null {
+    const minimumEncodedBytes = bankLedgerSyncMinimumEncodedBytes(maxRows);
     const usage = this.outbox.usage;
     const remainingEncodedBytes =
       this.outbox.limits.maxEncodedBytes - usage.queuedEncodedBytes - usage.reservedEncodedBytes;
-    if (remainingEncodedBytes <= 0) return null;
+    if (remainingEncodedBytes < minimumEncodedBytes) return null;
 
     const reservation = this.outbox.tryReserve({
       maxRows,
@@ -44,17 +96,27 @@ export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
       commit: (rows: readonly BankLedgerRow[]): boolean => {
         if (!active) return false;
         if (rows.length === 0) {
+          const cancelled = this.outbox.cancel(reservation);
           active = false;
-          return this.outbox.cancel(reservation);
+          return cancelled;
         }
+        // A failure here happens after the guarded Sim call. Keep the handle
+        // active and the full reservation charged so the live host can detect
+        // the terminal condition, quarantine, and refuse to save the mutation.
         this.outbox.commit(reservation, rows);
         active = false;
         return true;
       },
       cancel: (): boolean => {
         if (!active) return false;
+        const cancelled = this.outbox.cancel(reservation);
         active = false;
-        return this.outbox.cancel(reservation);
+        return cancelled;
+      },
+      failAfterMutation: (error: unknown): void => {
+        if (!active) return;
+        active = false;
+        this.onProjectionFailure?.(error);
       },
     });
   }
