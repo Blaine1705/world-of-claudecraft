@@ -125,7 +125,18 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    ceiling: 18488,
+    // Lowered 18488 -> 18474 after extracting the melee-weaving off-hand
+    // swing-timer bar's element caching, edge-tracking clocks, and painter
+    // instantiation (both the main-hand and off-hand bars) into
+    // src/ui/swing_timer_bars.ts, leaving hud.ts a single per-frame call
+    // (the ratchet's own rule: an extraction lowers the ceiling).
+    // Raised to the exact new count for the target/target-of-target swing-
+    // timer bars: one import, one cached toggle field, one painter-bars field,
+    // one setter, and one per-frame call site, all thin-consumer wiring to
+    // src/ui/target_swing_timer_bars.ts (the ratchet's own rule: the real
+    // logic lives in the extracted module, not here). No clean branch-owned
+    // extraction exists for wholly new functionality.
+    ceiling: 18491,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -264,7 +275,14 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the PR #3647 release merge: main.ts wires the v2 movement
     // predictor plus the legacy v1 fallback frame. Exact merged count, zero
     // slack.
-    ceiling: 11563,
+    // Raised to the exact new count for the showTargetSwingTimer dispatch
+    // case: a three-line thin delegate onto hud.setShowTargetSwingTimer,
+    // exactly the shape every other boolean toggle's dispatch already takes
+    // in this method (main.ts is a firewall, not a home; the real state and
+    // paint logic live in settings.ts and target_swing_timer_bars.ts). The
+    // merged tree lands below PR #3648's parent pin because the movement
+    // harness extractions ride in too, so keep the exact merged count.
+    ceiling: 11567,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -312,7 +330,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the PR #3647 release merge: server/game.ts keeps the v2
     // movement timeline and self reconciliation wire plus the batch rift
     // resume state replay. Exact merged count, zero slack.
-    ceiling: 10635,
+    // Raised to the exact new count for the target-swing-timer wire field: one
+    // conditional line in dynamicFields (`if (e.autoAttack) out.swing = ...`),
+    // the general non-self mirror of the existing self-only swing field.
+    // Thin, unavoidable wiring; no clean branch-owned extraction exists for a
+    // single conditional line inside an already-inline-conditional function.
+    // The merged tree lands between the two parent pins; keep the exact count.
+    ceiling: 10645,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -336,7 +360,18 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the PR #3647 release merge: online.ts keeps the v2 outbox,
     // reconciliation decoder, rift mirror and legacy movement authority flag.
     // Exact merged count, zero slack.
-    ceiling: 5956,
+    // Lowered 5855 -> 5835 after extracting the static combat-rating-scalar +
+    // weapon/offhand-weapon self-wire mirroring into
+    // src/net/combat_scalar_wire.ts (the account_cosmetics_wire.ts /
+    // guild_bank_log_wire.ts convention), leaving online.ts a single call.
+    // Raised to the exact new count for the target-swing-timer client decode:
+    // two lines mirroring w.swing into autoAttack/swingTimer for every entity,
+    // the general (non-self) counterpart to the self-only decode further down
+    // this method. Thin, unavoidable wiring in an already flat per-field decode
+    // block; no clean branch-owned extraction exists for two field assignments.
+    // The merged tree includes both movement-wire and target-swing mirror
+    // surfaces, so keep the exact merged count.
+    ceiling: 5961,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

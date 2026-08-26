@@ -1544,6 +1544,7 @@ export const da_DK: EnTranslations = {
       "hideUnusedActionSlots": "Skjul ubrugte handlingsfelter",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Vis dit kæledyr",
       "waterRipples": "Vandkrusninger (kølvand)",
       "showAttackButton": "Vis angrebsknap",

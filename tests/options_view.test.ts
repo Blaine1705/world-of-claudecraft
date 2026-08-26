@@ -559,6 +559,7 @@ const FRAMES_KEYS = [
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
   'showTargetOfTarget',
+  'showTargetSwingTimer',
   'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];

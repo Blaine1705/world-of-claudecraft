@@ -135,3 +135,26 @@ export function offhandSwingTimerState(
     prevTimer,
   );
 }
+
+/** The target/target-of-target fields the new bars read. A structural subset
+ *  of Entity that both the offline Sim and the online ClientWorld mirror
+ *  expose (the mirror is populated by src/net/online.ts's general per-entity
+ *  decode of the server's dynamicFields `swing` key, not the self-only path). */
+export interface TargetSwingInput {
+  dead: boolean;
+  kind: string; // entity kind; only 'object' (doors/crates) suppresses the bar
+  autoAttack: boolean;
+  swingTimer: number; // seconds remaining; counts down to 0 (= ready)
+}
+
+export function targetSwingTimerState(
+  target: TargetSwingInput | null,
+  prevPeriod: number,
+  prevTimer: number,
+): SwingTimerState {
+  if (!target || target.dead || target.kind === 'object' || !target.autoAttack) return HIDDEN;
+  // No weapon-speed hint rides the wire for a non-self entity (see
+  // server/game.ts dynamicFields): pass 0, so computeSwingState's first-frame
+  // guess degrades to swingTimer itself, self-correcting at the next reset edge.
+  return computeSwingState(target.swingTimer, 0, prevPeriod, prevTimer);
+}

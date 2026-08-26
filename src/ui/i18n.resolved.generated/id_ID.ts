@@ -1544,6 +1544,7 @@ export const id_ID: EnTranslations = {
       "hideUnusedActionSlots": "Sembunyikan Slot Aksi yang Tidak Terpakai",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Tampilkan Peliharaan Anda",
       "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",

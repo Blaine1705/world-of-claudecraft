@@ -1452,6 +1452,16 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
+  // Target/target-of-target swing-timer bar: the general (non-self) mirror of
+  // the self-only `swing` field above selfWireJson, gated on autoAttack so an
+  // idle entity costs nothing extra on the broadcast (same style as the
+  // castingAbility gate above it). No weapon-speed field rides with it: the
+  // client's targetSwingTimerState degrades gracefully to the raw swingTimer
+  // as its first-frame period guess, self-correcting at the next swing-reset
+  // edge, trading one swing's worth of first-frame fill accuracy for not
+  // adding a second field to every broadcast tick for every auto-attacking
+  // entity in interest range.
+  if (e.autoAttack) out.swing = round2(e.swingTimer);
   // Mount summon/dismount transition, so every client can time the summon FX / call
   // pose and the self-extrapolator can root the local player in lockstep. Volatile
   // (rides the per-tick dynamic fields, not identity): mcr omitted when idle (0), mck

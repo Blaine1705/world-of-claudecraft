@@ -418,6 +418,12 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  // off by default: the target and target-of-target's own melee/ranged swing
+  // timer bars, under the target frame. Purely a display preference read by
+  // the HUD's per-frame update; the swingTimer/autoAttack data already rides
+  // the wire (server/game.ts dynamicFields), and both bars hide themselves
+  // when the target (or its own target) is unknown or not auto-attacking.
+  showTargetSwingTimer: { def: false },
   // on by default: the pet health strip under the player frame (hunter / warlock /
   // mage). It paints only while the player actually HAS a pet, so the six petless
   // classes never see it and the default costs them nothing. Purely a display

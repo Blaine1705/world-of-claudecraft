@@ -14,6 +14,8 @@ import {
   type SwingPlayerInput,
   type SwingTargetInput,
   swingTimerState,
+  type TargetSwingInput,
+  targetSwingTimerState,
 } from '../src/ui/swing_timer';
 
 // A live, non-object target (the bar shows only against one).
@@ -253,6 +255,77 @@ describe('offhandSwingTimerState: determinism + ClientWorld-vs-Sim parity', () =
     const fromClient = offhandSwingTimerState(clientPlayer, LIVE_TARGET, 1.8, 1.2);
     expect(fromSim).toEqual(fromClient);
     expect(fromSim.visible).toBe(true);
+  });
+});
+
+function target(over: Partial<TargetSwingInput> = {}): TargetSwingInput {
+  return { dead: false, kind: 'mob', autoAttack: true, swingTimer: 1, ...over };
+}
+
+describe('targetSwingTimerState: visibility gating', () => {
+  it('is hidden when there is no target', () => {
+    expect(targetSwingTimerState(null, 1, 1).visible).toBe(false);
+  });
+
+  it('is hidden when the target is dead, an object, or not auto-attacking', () => {
+    expect(targetSwingTimerState(target({ dead: true }), 1, 1).visible).toBe(false);
+    expect(targetSwingTimerState(target({ kind: 'object' }), 1, 1).visible).toBe(false);
+    expect(targetSwingTimerState(target({ autoAttack: false }), 1, 1).visible).toBe(false);
+  });
+
+  it('is visible against a live, auto-attacking mob/npc/player target', () => {
+    expect(targetSwingTimerState(target({ kind: 'mob' }), 0, 0).visible).toBe(true);
+    expect(targetSwingTimerState(target({ kind: 'npc' }), 0, 0).visible).toBe(true);
+    expect(targetSwingTimerState(target({ kind: 'player' }), 0, 0).visible).toBe(true);
+  });
+});
+
+describe('targetSwingTimerState: no weapon-speed hint, degrades to the raw timer on first show', () => {
+  it('uses swingTimer itself as the first-frame period guess when prevPeriod is 0 (no weapon speed sent over the wire)', () => {
+    // No weapon speed available for a non-self entity (see server/game.ts's
+    // dynamicFields comment); period = max(swingTimer, 0) = swingTimer.
+    // This exercises the branch where prevPeriod <= 0 and the timer did not jump.
+    const s = targetSwingTimerState(target({ swingTimer: 1 }), 0, 1);
+    expect(s.nextPeriod).toBe(1);
+    expect(s.frac).toBe(0);
+  });
+
+  it('self-corrects at the next swing-reset edge like the player bars do', () => {
+    // prevTimer 0.1, now swingTimer 2.0 jumped up: a fresh swing, so period is
+    // recovered accurately from the reset edge exactly like swingTimerState.
+    const s = targetSwingTimerState(target({ swingTimer: 2.0 }), 1.6, 0.1);
+    expect(s.nextPeriod).toBe(2.0);
+    expect(s.frac).toBe(0);
+  });
+
+  it('carries the recovered period so the fill grows smoothly as the timer drops', () => {
+    const s = targetSwingTimerState(target({ swingTimer: 1 }), 2, 2);
+    expect(s.nextPeriod).toBe(2);
+    expect(s.frac).toBe(0.5);
+  });
+});
+
+describe('targetSwingTimerState: the ready vs seconds label discriminator', () => {
+  it('reports ready with a full bar once swingTimer hits 0', () => {
+    const s = targetSwingTimerState(target({ swingTimer: 0 }), 2, 0.5);
+    expect(s.ready).toBe(true);
+    expect(s.labelKind).toBe('ready');
+    expect(s.frac).toBe(1);
+  });
+});
+
+describe('targetSwingTimerState: determinism', () => {
+  it('is deterministic: identical inputs produce a deep-equal result', () => {
+    const a = targetSwingTimerState(target({ swingTimer: 1.3 }), 2, 1.5);
+    const b = targetSwingTimerState(target({ swingTimer: 1.3 }), 2, 1.5);
+    expect(a).toEqual(b);
+  });
+
+  it('the target and target-of-target cores run independently off separate edge-tracking state', () => {
+    const t1 = targetSwingTimerState(target({ swingTimer: 1 }), 2, 2);
+    const tot = targetSwingTimerState(target({ swingTimer: 0.2 }), 1.8, 1.8);
+    expect(t1.frac).toBe(0.5);
+    expect(tot.frac).toBeCloseTo(1 - 0.2 / 1.8, 5);
   });
 });
 

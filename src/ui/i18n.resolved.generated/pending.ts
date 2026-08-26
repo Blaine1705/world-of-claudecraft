@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -19,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -26,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -33,6 +36,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -41,6 +45,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -48,6 +53,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -71,6 +77,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -82,6 +89,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -89,6 +97,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -96,6 +105,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -103,6 +113,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -110,6 +121,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -117,6 +129,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -124,6 +137,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
@@ -131,6 +145,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"

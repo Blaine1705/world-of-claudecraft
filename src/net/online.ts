@@ -3285,6 +3285,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
+      // General (non-self) auto-attack/swing mirror: absent w.swing means not
+      // auto-attacking, matching dynamicFields' autoAttack-gated omission.
+      // Overwritten below for the self entity by the richer self-only fields.
+      e.autoAttack = w.swing !== undefined;
+      e.swingTimer = typeof w.swing === 'number' ? w.swing : 0;
       // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
       // the summon FX / call pose and (for the local player) the self-extrapolator's
       // movement root, which reads mountCastRemaining.

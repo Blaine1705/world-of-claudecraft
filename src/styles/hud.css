@@ -2478,6 +2478,55 @@
     text-shadow: 1px 1px 2px #000;
     font-variant-numeric: tabular-nums;
   }
+  /* Target / target-of-target swing timers: sit in the SAME .uf-bars flex
+     flow as #tf-castbar (position: relative, NOT the absolute-positioned
+     #swingbar/#swingbar-offhand family), so they inherit the target frame's
+     existing responsive/mobile scaling for free with zero new breakpoint
+     rules. Violet (target) / rose (target-of-target) fills keep all four
+     possible swing bars (own main-hand amber, own off-hand teal, target
+     violet, target-of-target rose) visually distinct when several are up
+     at once. */
+  #swingbar-target,
+  #swingbar-tot {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    margin-top: 4px;
+    display: none;
+    border: 1px solid var(--border);
+    outline: 1px solid #000;
+    border-radius: 3px;
+    background: #0c0a07;
+    overflow: hidden;
+  }
+  #swingbar-target .fill,
+  #swingbar-tot .fill {
+    height: 100%;
+    width: 0%;
+    box-shadow: inset 0 1px 0 #fff4;
+    transition: width 60ms linear;
+  }
+  #swingbar-target .fill {
+    background: linear-gradient(#c9a3ff, #7c3fd9 60%, #481f8a);
+  }
+  #swingbar-tot .fill {
+    background: linear-gradient(#ffb3c6, #d9427c 60%, #8a1f4e);
+  }
+  #swingbar-target.ready .fill,
+  #swingbar-tot.ready .fill {
+    background: linear-gradient(#d8e8ff, #8fb6e6 60%, #5b86b8);
+  }
+  #swingbar-target .label,
+  #swingbar-tot .label {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 10px;
+    line-height: 12px;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+    font-family: var(--title-font);
+  }
   /* Swing timers: sit just under the cast bar, steel-on-amber (main-hand) /
      steel-on-teal (off-hand, dual-wield only) to read as melee. The off-hand
      bar is the same family stacked directly under the main-hand one, sharing

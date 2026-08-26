@@ -1544,6 +1544,7 @@ export const nl_NL: EnTranslations = {
       "hideUnusedActionSlots": "Ongebruikte actievakjes verbergen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Je huisdier tonen",
       "waterRipples": "Waterrimpels (kielzog)",
       "showAttackButton": "Aanvalsknop Tonen",

@@ -2199,7 +2199,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1006,
-      "state": "c14f8a49",
+      "state": "3b6c4138",
       "events": "fdd84c48",
       "rng": {
         "draws": 151,
@@ -2210,7 +2210,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1006,
-      "state": "e882b1cc",
+      "state": "f2af39b3",
       "events": "2c347020",
       "rng": {
         "draws": 286,
@@ -2221,7 +2221,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1006,
-      "state": "e882b1cc",
+      "state": "f2af39b3",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2435,6 +2435,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2595,7 +2596,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1008,
-      "state": "60b7c165",
+      "state": "0afa6e2c",
       "events": "e81ef396",
       "rng": {
         "draws": 286,
@@ -2809,6 +2810,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -2970,7 +2972,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1010,
-      "state": "c1cddeb3",
+      "state": "44b37c42",
       "events": "72e1057d",
       "rng": {
         "draws": 286,
@@ -3184,6 +3186,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -3352,7 +3355,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1010,
-      "state": "c1cddeb3",
+      "state": "44b37c42",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3566,6 +3569,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
