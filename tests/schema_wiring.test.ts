@@ -83,6 +83,9 @@ import {
   BANK_LEDGER_ACCOUNT_FK_INDEX_SQL,
   BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL,
   BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_DROP_SQL,
+  BANK_LEDGER_ACCOUNT_INDEX_SQL,
+  BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL,
+  BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL,
 } from '../server/bank_ledger_indexes';
 import { CONCURRENT_INDEX_MIGRATIONS } from '../server/concurrent_indexes';
 import {
@@ -421,7 +424,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS storage_purchases');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_character');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_account');
-    expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_refused');
+    expect(applied).toContain('DROP INDEX IF EXISTS storage_purchases_refused');
   });
 
   it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
@@ -528,10 +531,20 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(worst10sIdx).toBeLessThan(sessionUnlock);
     expect(h.calls[worst10sIdx]).toContain('worst_10s_frame_p95_ms DESC, created_at DESC');
 
+    const broadAccountIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_recent'),
+    );
+    const sellerSalesIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS woc_market_sales_seller'),
+    );
     const largeMovementIdx = h.calls.findIndex((sql) =>
       sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
     );
-    expect(largeMovementIdx).toBeGreaterThan(worst10sIdx);
+    expect(broadAccountIdx).toBeGreaterThan(worst10sIdx);
+    expect(h.calls[broadAccountIdx]).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(h.calls[broadAccountIdx]).not.toContain('WHERE');
+    expect(sellerSalesIdx).toBeGreaterThan(broadAccountIdx);
+    expect(largeMovementIdx).toBeGreaterThan(sellerSalesIdx);
     expect(h.calls[largeMovementIdx]).toContain('ON bank_ledger(account_id, id DESC)');
     expect(h.calls[largeMovementIdx]).toContain('WHERE abs(copper_delta) >= 100000');
     expect(largeMovementIdx).toBeLessThan(sessionUnlock);
@@ -772,8 +785,9 @@ describe('ensureSchema wires every schema module at boot', () => {
       'bank_ledger_container_recent',
       'player_reports_retention_created',
       'chat_violations_retention_created',
-      'bank_ledger_account_large_recent',
+      'bank_ledger_account_recent',
       'woc_market_sales_seller',
+      'bank_ledger_account_large_recent',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -808,21 +822,33 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bankLedgerContainer?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
     );
+    // The shipped broad account index remains in its original registry slot.
+    // Fresh databases need its unqualified key for the account FK, while old
+    // binaries need its ordered shape during the rolling-deploy window.
+    const bankLedgerBroadAccount = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'bank_ledger_account_recent',
+    );
+    expect(bankLedgerBroadAccount?.createSql).toBe(BANK_LEDGER_ACCOUNT_INDEX_SQL);
+    expect(bankLedgerBroadAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerBroadAccount?.createSql).not.toContain('WHERE');
+    expect(bankLedgerBroadAccount?.checkSql).toBe(BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL);
+    expect(bankLedgerBroadAccount?.dropSql).toBe(BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL);
+    expect(bankLedgerBroadAccount?.retireSql).toBeUndefined();
     // The admin economy-oversight per-account bank_ledger reader
     // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
     // same bounded-backwards-scan shape as the guild reader. It is partial on
     // the fixed production threshold so small movements add no permanent
     // write amplification to this keep-forever audit table.
-    const bankLedgerAccount = CONCURRENT_INDEX_MIGRATIONS.find(
+    const bankLedgerLargeAccount = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'bank_ledger_account_large_recent',
     );
-    expect(bankLedgerAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
-    expect(bankLedgerAccount?.createSql).toContain('WHERE abs(copper_delta) >= 100000');
-    expect(bankLedgerAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
-    expect(bankLedgerAccount?.checkSql).toContain(
+    expect(bankLedgerLargeAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerLargeAccount?.createSql).toContain('WHERE abs(copper_delta) >= 100000');
+    expect(bankLedgerLargeAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
+    expect(bankLedgerLargeAccount?.checkSql).toContain(
       "to_regclass('bank_ledger_account_large_recent')",
     );
-    expect(bankLedgerAccount?.dropSql).toBe(
+    expect(bankLedgerLargeAccount?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_large_recent',
     );
     // Phase two is explicit but deliberately not armed in this release: an
@@ -847,7 +873,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(CONCURRENT_INDEX_MIGRATIONS.some((m) => m.name === 'bank_ledger_account_fk')).toBe(
       false,
     );
-    expect(bankLedgerAccount?.retireSql).toBeUndefined();
+    expect(bankLedgerLargeAccount?.retireSql).toBeUndefined();
     // player_reports retention prune (prunePlayerReportsBatch): account-agnostic
     // age scan, so the index leads with created_at rather than either existing
     // account column, and is partial on the resolved-report predicate the

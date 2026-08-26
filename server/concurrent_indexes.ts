@@ -25,6 +25,9 @@ import {
   GUILDS_REALM_LOWER_NAME_PREFIX_INVALID_INDEX_DROP_SQL,
 } from './admin_guilds_schema';
 import {
+  BANK_LEDGER_ACCOUNT_INDEX_SQL,
+  BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL,
+  BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL,
   BANK_LEDGER_ACCOUNT_LARGE_INDEX_SQL,
   BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_CHECK_SQL,
   BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_DROP_SQL,
@@ -146,15 +149,14 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     dropSql: CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_DROP_SQL,
   },
   // The admin economy-oversight per-account bank_ledger reader
-  // (account_wealth_db.ts largeGoldMovementsForAccount). Phase one builds the
-  // partial ordered reader only. The prior broad index remains for FK support
-  // and mixed-version readers; bank_ledger_indexes.ts pins the phase-two full
-  // replacement and retirement SQL.
+  // (account_wealth_db.ts largeGoldMovementsForAccount). This shipped entry
+  // stays in its original position: fresh databases need it for FK support,
+  // and mixed-release peers still use its broad ordered shape.
   {
-    name: 'bank_ledger_account_large_recent',
-    createSql: BANK_LEDGER_ACCOUNT_LARGE_INDEX_SQL,
-    checkSql: BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_CHECK_SQL,
-    dropSql: BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_DROP_SQL,
+    name: 'bank_ledger_account_recent',
+    createSql: BANK_LEDGER_ACCOUNT_INDEX_SQL,
+    checkSql: BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL,
+    dropSql: BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL,
   },
   // The Exchange's seller click-through read (woc_market_db.ts
   // salesForSeller). See woc_market_sales_seller_index.ts.
@@ -163,5 +165,14 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     createSql: WOC_MARKET_SALES_SELLER_INDEX_SQL,
     checkSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
     dropSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
+  },
+  // The partial ordered reader for large per-account movements. New entries
+  // append after every previously shipped migration, never replace or move an
+  // old entry. See bank_ledger_indexes.ts for the staged retirement plan.
+  {
+    name: 'bank_ledger_account_large_recent',
+    createSql: BANK_LEDGER_ACCOUNT_LARGE_INDEX_SQL,
+    checkSql: BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_CHECK_SQL,
+    dropSql: BANK_LEDGER_ACCOUNT_LARGE_INVALID_INDEX_DROP_SQL,
   },
 ];

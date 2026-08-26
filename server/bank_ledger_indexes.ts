@@ -103,11 +103,12 @@ export const BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL =
 // CONCURRENTLY, never boot DDL, same as the guild reader: bank_ledger is too
 // large to lock for a transactional build. This partial index takes over the
 // ordered-read role of bank_ledger_account_recent. Phase one (this release)
-// builds only the partial ordered index and keeps the predecessor: it continues
-// supporting both the account FK and a peer whose prior binary still sends a
-// parameterized threshold that cannot use the partial index under a generic
-// plan. Phase two, after the fleet and rollback window converge, APPENDS the
-// compact full migration below and attaches
+// keeps the predecessor migration in its original registry position, then
+// appends the partial ordered index after every previously shipped entry. The
+// predecessor continues supporting both the account FK and a peer whose prior
+// binary still sends a parameterized threshold that cannot use the partial
+// index under a generic plan. Phase two, after the fleet and rollback window
+// converge, APPENDS the compact full migration below and attaches
 // BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL to that new migration. Appending keeps
 // the registry's shipped order stable; it also means a failed repair of the
 // earlier partial entry aborts the loop before compact-build or broad-drop.
@@ -115,6 +116,25 @@ export const BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL =
 // Staging the compact build avoids four heap scans in this release.
 
 export const BANK_LEDGER_LARGE_MOVEMENT_PREDICATE_SQL = 'abs(copper_delta) >= 100000';
+
+// This shipped predecessor must remain in the append-only concurrent-index
+// registry until a later migration has built its full `(account_id)`
+// replacement. Existing databases already have it, while a fresh database
+// depends on this entry for the account FK and rollback-compatible readers.
+export const BANK_LEDGER_ACCOUNT_INDEX_SQL = `
+CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_recent
+  ON bank_ledger(account_id, id DESC);
+`;
+
+export const BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL = `
+SELECT 1
+  FROM pg_index i
+ WHERE i.indexrelid = to_regclass('bank_ledger_account_recent')
+   AND NOT i.indisvalid
+`;
+
+export const BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL =
+  'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent';
 
 export const BANK_LEDGER_ACCOUNT_FK_INDEX_SQL = `
 CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_fk
