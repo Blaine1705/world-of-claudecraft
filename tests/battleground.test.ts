@@ -174,6 +174,29 @@ function forceIntoBgWallTrap(sim: Sim, match: BgMatch, pid: number): Entity {
   return e;
 }
 
+function forceReportedBgWallContactShortcut(sim: Sim, match: BgMatch, pid: number): Entity {
+  const origin = battlegroundOrigin(match.slot);
+  const e = must(sim.entities.get(pid), 'entity');
+  e.pos = sim.ctx.groundPos(origin.x - 48.5, origin.z - 133.5);
+  e.prevPos = { ...e.pos };
+  e.facing = -Math.PI / 2;
+  e.prevFacing = e.facing;
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = true;
+  e.jumping = false;
+  e.inCombat = false;
+  e.combatTimer = 999;
+  const meta = must(sim.meta(pid), 'player meta');
+  meta.moveInput.forward = true;
+  sim.ctx.rebucket(e);
+  expectClearPlayerPosition(sim, e);
+  expect(e.pos.x - origin.x).toBeCloseTo(-48.5, 6);
+  expect(e.pos.z - origin.z).toBeCloseTo(-133.5, 6);
+  return e;
+}
+
 function forceOntoBgStandableCollider(sim: Sim, match: BgMatch, pid: number): Entity {
   const origin = battlegroundOrigin(match.slot);
   const standable = must(
@@ -1300,6 +1323,29 @@ describe('Thornhollow Fields: the graveyard rite', () => {
       }),
     );
     expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+  });
+
+  it('Unstuck refuses the reported legal battleground wall-contact shortcut', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceReportedBgWallContactShortcut(sim, match, pid);
+    const meta = must(sim.meta(pid), 'player meta');
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'moving',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(false);
+    expectClearPlayerPosition(sim, e);
   });
 
   it('Unstuck still refuses an idle clear battleground fighter as a shortcut', () => {
