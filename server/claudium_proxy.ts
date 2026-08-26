@@ -15,6 +15,7 @@
 // The functions mirror the service SDK v1 surface; they do NOT recompute any
 // value, they only pass through what the service returns.
 
+import { parseClaudiumSpendWireResult } from './claudium_spend_wire';
 import { DESKTOP_WALLET_HANDOFF_TTL_MS, desktopWalletHandoffs } from './desktop_wallet_handoff';
 import { requestNeverReachedService } from './service_reachability';
 
@@ -646,25 +647,20 @@ export interface ClaudiumSpendOutcome {
 export async function claudiumSpendDetailed(
   input: ClaudiumSpendInput,
 ): Promise<ClaudiumSpendOutcome> {
-  const { data, neverReached } = await callServiceDetailed<{
-    granted: boolean;
-    balance: number;
-    costClaudium?: number;
-    reason?: string;
-  }>({ method: 'POST', path: 'spend', body: input });
-  if (!data) {
+  const { data, neverReached } = await callServiceDetailed<unknown>({
+    method: 'POST',
+    path: 'spend',
+    body: input,
+  });
+  const parsed = parseClaudiumSpendWireResult(data);
+  if (!parsed) {
     return {
       result: { granted: false, balance: null, costClaudium: null, reason: 'unavailable' },
       neverReached,
     };
   }
   return {
-    result: {
-      granted: Boolean(data.granted),
-      balance: typeof data.balance === 'number' ? data.balance : null,
-      costClaudium: typeof data.costClaudium === 'number' ? data.costClaudium : null,
-      reason: data.reason ?? null,
-    },
+    result: parsed,
     neverReached: false,
   };
 }

@@ -89,6 +89,73 @@ describe('claudiumSpendDetailed: which failures may claim no debit is possible',
     expect(out.result.granted).toBe(false);
   });
 
+  it('a 2xx with a non-boolean grant verdict stays ambiguous and cannot grant storage', async () => {
+    for (const granted of ['false', 1, null, {}, []]) {
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify({ granted, balance: 900, costClaudium: 100 }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+      const out = await claudiumSpendDetailed(SPEND);
+      expect(out, JSON.stringify(granted)).toEqual({
+        result: {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        },
+        neverReached: false,
+      });
+    }
+  });
+
+  it('a 2xx with malformed currency or reason fields invalidates the whole response', async () => {
+    for (const payload of [
+      { granted: true, balance: '900', costClaudium: 100 },
+      { granted: true, balance: -1, costClaudium: 100 },
+      { granted: true, balance: 900.5, costClaudium: 100 },
+      { granted: true, balance: 900, costClaudium: -1 },
+      { granted: true, balance: 900, costClaudium: 100.5 },
+      { granted: true, balance: 900, costClaudium: '100' },
+      { granted: true, balance: 900, costClaudium: 100, reason: {} },
+    ]) {
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      );
+      expect(await claudiumSpendDetailed(SPEND), JSON.stringify(payload)).toEqual({
+        result: {
+          granted: false,
+          balance: null,
+          costClaudium: null,
+          reason: 'unavailable',
+        },
+        neverReached: false,
+      });
+    }
+  });
+
+  it('retains nullable optional fields without weakening the boolean verdict', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ granted: false, reason: 'insufficient_balance' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    expect(await claudiumSpendDetailed(SPEND)).toEqual({
+      result: {
+        granted: false,
+        balance: null,
+        costClaudium: null,
+        reason: 'insufficient_balance',
+      },
+      neverReached: false,
+    });
+  });
+
   it('a successful spend is never flagged, whatever the service answered', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ granted: true, balance: 900, costClaudium: 100 }), {
