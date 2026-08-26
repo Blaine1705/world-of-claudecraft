@@ -394,6 +394,43 @@ Linux AppImage caveat: the updater requires the `APPIMAGE` env (set automaticall
 when running a real AppImage); running the raw unpacked binary logs an updater error
 and skips, by design.
 
+Linux deep-link caveat: `worldofclaudecraft://` is owned by a `.desktop` entry, not by
+an OS registry, so `electron/linux_url_handler.cjs` runs before
+`app.setAsDefaultProtocolClient` on both Linux channels. On the AppImage it writes
+`~/.local/share/applications/world-of-claudecraft.desktop` (the entry electron-builder
+bakes into the squashfs is never installed unless the player has AppImageLauncher) and
+runs `update-desktop-database` + `xdg-mime default`. It then repoints `CHROME_DESKTOP`
+at that filename, because Electron resolves the name it hands `xdg-settings` from that
+variable and, with no `desktopName` in `package.json`, the name it infers comes from
+`app.name` (`World of ClaudeCraft.desktop`) while electron-builder names the real file
+after `executableName` (`world-of-claudecraft.desktop`). Those two names MUST stay
+equal: `tests/electron_linux_url_handler.test.ts` derives the expected basename from
+`package.json` `name` AND pins that no `executableName` / `desktopName` override exists,
+so either kind of rename fails there rather than silently breaking Discord login.
+
+Four deliberate narrowings worth knowing before changing any of it:
+- `CHROME_DESKTOP` is set only when the entry actually exists on disk (ours or the
+  deb's), and is restored immediately after the registration call. Setting it
+  unconditionally would make a Steam depot, an Epic package, or a dev run point
+  `xdg-settings` at a dangling name, which can REPLACE a working association; leaving it
+  set leaks our app identity to every child process, including the browser opened for
+  the Discord login itself.
+- The entry is written temp-then-`rename`, so a concurrent second instance cannot leave a
+  torn file and a symlink at the destination is replaced rather than followed.
+- An unchanged entry still re-runs the association commands. The file being identical does
+  not mean the association survived: another app can claim the scheme and a desktop
+  environment can reset `mimeapps.list`, and without the re-assert that breaks Discord
+  login permanently with no relaunch that recovers it.
+- Not `app.setDesktopName()`, the public API for the same value: it also drives the
+  Wayland app id and X11 `WM_CLASS`, which electron-builder independently writes as
+  `StartupWMClass` from `productName`. Changing one without the other breaks the
+  window-to-launcher association that works today.
+
+An AppImageLauncher user ends up with two entries (theirs, `appimagekit_*.desktop`, plus
+ours); ours takes the scheme default, which is the working one. All of it is best-effort:
+a player with no `xdg-utils` or a read-only home still signs in with a username and
+password, which never leaves the shell.
+
 ## Steam
 
 Build: `npm run electron:build:steam` on each OS runner (signing env still applies on
@@ -645,6 +682,13 @@ product exist. Coding and merge stay dark-safe without those credentials.
 3. Login both paths: email/password in-app, and Discord via the external browser +
    `worldofclaudecraft://desktop-login` deep link handoff (app focuses and enters
    the world; second-instance and cold-start deep links both work).
+   On Linux run this on a machine with NO prior install and no AppImageLauncher (a
+   stock SteamOS or Bazzite box is the realistic case): the AppImage must register its
+   own handler on first launch. Confirm with
+   `xdg-mime query default x-scheme-handler/worldofclaudecraft` returning
+   `world-of-claudecraft.desktop`, then `xdg-open "worldofclaudecraft://desktop-login?code=x"`
+   reaching the running game. A regression here shows up as the OS "choose an
+   application" dialog, which cannot select an AppImage at all.
 4. Play 5 minutes: steady frame rate, alt-tab out/in does not hitch or freeze the
    world (backgroundThrottling stays off).
 5. Website channel only: with a higher-version build on the feed, the update toast

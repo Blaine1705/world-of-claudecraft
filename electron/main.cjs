@@ -65,6 +65,7 @@ const {
 } = require('./diagnostics.cjs');
 const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
+const { registerLinuxUrlHandler } = require('./linux_url_handler.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
 const {
@@ -1183,6 +1184,13 @@ ipcMain.on('desktop-renderer-error', (event, payload) => {
   log.error('[renderer]', entry);
 });
 
+// Linux has no OS-level protocol registry to write: the scheme is owned by a .desktop
+// entry, which an AppImage never installs and which Electron's own registration misnames.
+// electron/linux_url_handler.cjs fixes both, and MUST run first so the file and the
+// CHROME_DESKTOP name are in place before setAsDefaultProtocolClient shells out to
+// xdg-settings. No-op on win32/darwin and on every non-AppImage Linux channel.
+const linuxUrlHandler = registerLinuxUrlHandler({ scheme: deepLinkProtocol, log });
+
 if (process.defaultApp) {
   app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
     path.resolve(process.argv[1]),
@@ -1190,6 +1198,10 @@ if (process.defaultApp) {
 } else {
   app.setAsDefaultProtocolClient(deepLinkProtocol);
 }
+// CHROME_DESKTOP is process-wide and inherited by every child, including the browser we open
+// for the Discord login itself. It exists only for the registration above, so put it back the
+// moment that call returns (no-op on win32/darwin, and when nothing was set).
+linuxUrlHandler.restore();
 
 const singleInstance = app.requestSingleInstanceLock();
 if (!singleInstance) {
