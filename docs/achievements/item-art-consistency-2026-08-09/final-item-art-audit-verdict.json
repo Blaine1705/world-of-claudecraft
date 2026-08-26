@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-10T04:33:00.640Z",
+  "generatedAt": "2026-08-26T05:07:29.368Z",
   "auditScope": {
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
@@ -342,6 +342,25 @@
           "docs/achievements/icon-brief.md"
         ],
         "note": "The two Proving Shore interact-prop icons, rendered from their own shipped world models (supply_crate.glb, marsh_bell_gallows.glb) by scripts/render_island_item_icons.mjs and owner-reviewed pass on 2026-08-17; the prior reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-26",
+        "branch": "feature/bank-storage-pr",
+        "reviewer": "implementation agent",
+        "replacedIds": [
+          "burlap_reagent_pouch",
+          "duskweave_bag",
+          "foragers_haversack",
+          "loombound_reagent_satchel",
+          "necromancers_reagent_satchel",
+          "resonant_weave_bag",
+          "wayfarers_backpack"
+        ],
+        "provenance": [
+          "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json",
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
       }
     ]
   },
@@ -1227,7 +1246,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 836 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons re-encoded onto opaque grounds, owner-reviewed and passed on 2026-08-12, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
+    "summary": "All 836 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
   },
   "nonVisualContentWatch": [
     {
@@ -1384,8 +1403,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "fc4b0477cc8fd64be4c82056ca0c03a7767458305d52141571f60645f7850826",
-      "bytes": 458446
+      "sha256": "691107c88450b6ef09fa36d12d4c330c602bcfddd08a70ce8d8dca72472ad2dd",
+      "bytes": 458451
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1399,7 +1418,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "ad78a5894e952e74f210f36a4e3664c43ddc22aaef1bc0aea175ce8fb602882d",
+    "sheetSetSha256": "f920e8c845f1bf3f91ebaf8090f6fdd07f6a8d581edd6653c884d8ac6d59bea8",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2107,64 +2126,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--128-color.png",
-        "sha256": "13807dc6cc8b68ec5eccf59bca14d1d738615bac791f75228a8b61c08e7b2b81",
-        "bytes": 300005,
+        "sha256": "9dc1f42b24861f08ef7e490a4729dd544a31c347e1e554f6dc017dfb2d1d5f8a",
+        "bytes": 414632,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--40-color.png",
-        "sha256": "5184e1a1466bc5bd6a4028dc074172c24ca1010b78697e9f93abcc452432fc1d",
-        "bytes": 64690,
+        "sha256": "22912fcf62c7d7f65d3d4bc8e29b396c07ccbb5b5eedc4253725e739b67ce419",
+        "bytes": 78985,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-color.png",
-        "sha256": "f2257838f0f02f3fb5243a71eef56431f252955391adb53ea2cc7d36868f0d52",
-        "bytes": 49253,
+        "sha256": "6eac7554711e37c601ea708d8a83be2f5931533764cbc1b3c4afb74109e14df8",
+        "bytes": 56117,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--22-color.png",
-        "sha256": "3a303c1119021108a9dcd286c63568e422db72eb3093c90927f43c6ec2372a66",
-        "bytes": 40467,
+        "sha256": "fbd4efa3ca67d1187fffb6d9ac55c28e78715b0efd3b805794434393b35f552e",
+        "bytes": 44574,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-grayscale.png",
-        "sha256": "d4a9264ad1c517c38dd155db7270dd37a2cd91ea2ba8c6ad14e842ea5dfa50d2",
-        "bytes": 39335,
+        "sha256": "683c1f076191d6cb982d14aa9c664d907976ed415d0df0983a014e847b0670b7",
+        "bytes": 42438,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--64-circle.png",
-        "sha256": "d5b4c4f6f9f2c6f2f401688c2caf7c57c61305205d275c08dd5cb55675e4ecfc",
-        "bytes": 105970,
+        "sha256": "39eaeaac0afba4a9679b5b8e73461d6961da4b99dd30daf832db394a8fff9fc0",
+        "bytes": 137853,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--small-multiview.png",
-        "sha256": "9dddd46602c88f59fbe321f544f79dbf62b8637be0ce3bfb532d55624d532dd8",
-        "bytes": 194157,
+        "sha256": "71e5d5474a416238942554830cdb5dd860ca99e07a1fce6925437dd2ae817261",
+        "bytes": 247595,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--identity.png",
-        "sha256": "fa8227b577c33c6e6522aa2bbf668f618a60a8843d93c4a65be943abd185c447",
-        "bytes": 316196,
+        "sha256": "5352ee0940df7aa86a7e39fb209613f68f2be127ba86c53095970f59a4644c3e",
+        "bytes": 432542,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -3066,6 +3085,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "3aec6f3e8a1319f6c07f1a63c816a62ea582afb5b941a9c4a83feaea807268ab"
+    "shippingCatalogSha256": "5b40b3ab9e6795e169f08b202829dc529690316d2251359539bfcaddc83cf0dd"
   }
 }

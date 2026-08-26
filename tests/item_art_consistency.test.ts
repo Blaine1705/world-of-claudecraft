@@ -147,6 +147,15 @@ type FinalAuditVerdict = {
     modifiedItemArtCount: number;
     modifiedItemArtPaths: string[];
     groups: Record<string, number>;
+    incrementalReviews: Array<{
+      reviewedAt: string;
+      branch: string;
+      reviewer: string;
+      addedIds?: string[];
+      replacedIds?: string[];
+      provenance: string[];
+      note: string;
+    }>;
   };
   reviewContract: {
     everyShippingFileReviewedInModes: string[];
@@ -333,8 +342,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '1f282c987f308bae9ad3f73fb7e422a9c8101327df5714721f21f2294d53582a',
-        acceptedBytes: 109_717,
+        acceptedSha256: 'aadf8ae9fe7e124a07a67acfea39021211d8f741d4e901d729e420a4b4535601',
+        acceptedBytes: 110_855,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -449,13 +458,14 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(109_717);
+    expect(verdictBytes.length).toBe(110_855);
     expect(sha256(verdictBytes)).toBe(
-      '1f282c987f308bae9ad3f73fb7e422a9c8101327df5714721f21f2294d53582a',
+      'aadf8ae9fe7e124a07a67acfea39021211d8f741d4e901d729e420a4b4535601',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
     expect(verdict.schemaVersion).toBe(1);
+    expect(verdict.generatedAt).toBe('2026-08-26T05:07:29.368Z');
     expect(verdict.auditScope).toMatchObject({
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
@@ -474,6 +484,25 @@ describe('item-art consistency accepted-art provenance', () => {
       836,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
+    expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
+      reviewedAt: '2026-08-26',
+      branch: 'feature/bank-storage-pr',
+      reviewer: 'implementation agent',
+      replacedIds: [
+        'burlap_reagent_pouch',
+        'duskweave_bag',
+        'foragers_haversack',
+        'loombound_reagent_satchel',
+        'necromancers_reagent_satchel',
+        'resonant_weave_bag',
+        'wayfarers_backpack',
+      ],
+      provenance: [
+        'docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json',
+        'public/ui/items/mapping.json',
+      ],
+      note: 'Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged.',
+    });
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
         .filter((name) => name.endsWith('.webp'))
@@ -522,7 +551,7 @@ describe('item-art consistency accepted-art provenance', () => {
       rejectCount: 0,
       reject: [],
       summary:
-        'All 836 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons re-encoded onto opaque grounds, owner-reviewed and passed on 2026-08-12, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review.',
+        'All 836 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,8 +591,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'fc4b0477cc8fd64be4c82056ca0c03a7767458305d52141571f60645f7850826',
-      bytes: 458_446,
+      sha256: '691107c88450b6ef09fa36d12d4c330c602bcfddd08a70ce8d8dca72472ad2dd',
+      bytes: 458_451,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
@@ -616,7 +645,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      'ad78a5894e952e74f210f36a4e3664c43ddc22aaef1bc0aea175ce8fb602882d',
+      'f920e8c845f1bf3f91ebaf8090f6fdd07f6a8d581edd6653c884d8ac6d59bea8',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +655,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '3aec6f3e8a1319f6c07f1a63c816a62ea582afb5b941a9c4a83feaea807268ab',
+      '5b40b3ab9e6795e169f08b202829dc529690316d2251359539bfcaddc83cf0dd',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -736,9 +765,9 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(47);
+    expect(mapping.entries).toHaveLength(40);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(18);
+    expect(mapping.generatedBatches).toHaveLength(19);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -755,7 +784,7 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(515);
+    expect(oldGeneratedIds).toHaveLength(522);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
