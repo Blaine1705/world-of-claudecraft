@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "32def841703e09f284a07601659e01ee47b088a5d155b5a485d233e82bcb4035",
-  "catalogHash": "abb3e0f8367c8034e29c9f629e9221daf80b48aacdf3070b6878ec22f9935c37",
+  "bundleId": "0c623d53ae1465463c97dfa5a47aead60d40e33618e8ea6aea54127645941d83",
+  "catalogHash": "cc91b2a188eaa0fe425b3e8be17cea0735f0a8c324086f57b06b26a7c6f4fbc7",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2854,6 +2854,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_loop_rickshaw_mount": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_loop_rickshaw_mount.mp3?v=90fafb2c1bb7",
+          "bytes": 187497,
+          "sha256": "90fafb2c1bb702068d31a596b5e2758605c089f4c2c0b95547eb5e520f824f00"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mount_run_aether_hover_cycle": {
       "variants": [
         {
@@ -2984,6 +2996,18 @@
         }
       ],
       "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_summon_rickshaw_mount": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_summon_rickshaw_mount.mp3?v=4f9ba1123aa4",
+          "bytes": 38913,
+          "sha256": "4f9ba1123aa480436c91e1222e9b55d2922b21f41d4ddc535df1475dc902560d"
+        }
+      ],
+      "gain": 2.06538,
       "playbackRate": 1
     },
     "move_jump": {

@@ -202,7 +202,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the PR #3647 release merge: renderer.ts only keeps the
     // riftCollisionToken thread into the extracted self-render core. Exact
     // merged count, zero slack.
-    ceiling: 13261,
+    // Merging the rickshaw mount work onto that release composite adds the
+    // mount view-state thread while keeping selfSnapshotAlpha extracted.
+    // Exact merged count, zero slack.
+    ceiling: 13324,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

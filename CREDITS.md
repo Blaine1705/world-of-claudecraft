@@ -94,6 +94,7 @@ than free, so ask before you rely on it.
 |---|---|---|---|---|
 | Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 | Yes |
 | Skeleton character models + animations, bone weapons | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0 | CC0 1.0 | Yes |
+| Skeleton minion rig + FREE-tier animations (rebuilt as skeleton_minion_free.glb, backing the Bonebound Rickshaw's skel_rickshaw_puller; see scripts/assets/rebuild_kaykit_skeletons_free.mjs) | Kay Lousberg (KayKit) | KayKit_Skeletons_1.1_FREE (kaylousberg.itch.io) | CC0 1.0 | Yes |
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture; also the Drakelands castle structure set) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 | Yes |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 | Yes |
 | Extra character animation library (Rig_Medium) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 | Yes |
@@ -233,6 +234,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Hover-Cycle movement layer (`mount_run_aether_hover_cycle.mp3`) | Umplix | [Hovermobile SFX](https://opengameart.org/content/hovermobile-sfx) | CC0 1.0 | Yes |
 | Stormfeather and Grand Gobbler wing layers (`mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | AntumDeluge, derived from dave.des | [Large Wings Flap](https://opengameart.org/content/large-wings-flap) | CC0 1.0 | Yes |
 | Terrorspark Groundshaker movement layer (`mount_run_terrorspark_groundshaker.mp3`) | World of ClaudeCraft | Original deterministic FFmpeg synthesis via `scripts/gen_terrorspark_groundshaker_sfx.mjs` | Project asset | With the project only |
+| Bonebound Rickshaw rolling loop (`mount_loop_rickshaw_mount.mp3`) | @jamiecypher | Original recording | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) | Non-commercial only, with attribution |
 | Quest event sounds (`quest_accept`, `quest_ready`, `quest_complete`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) | Non-commercial only, with attribution |
 | Lockpick minigame sounds (`lockpick_*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) | Non-commercial only, with attribution |
 | Wand auto-attack sounds (`wand_*`) | @jamiecypher | Original work | CC BY-NC 4.0 (+ perpetual commercial grant to World of ClaudeCraft) | Non-commercial only, with attribution |

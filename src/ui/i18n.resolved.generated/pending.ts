@@ -10,32 +10,44 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "es_ES": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "fr_FR": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "fr_CA": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
@@ -43,16 +55,22 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "de_DE": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
@@ -75,8 +93,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemMenu.sellAll"
   ],
   "pt_BR": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
@@ -87,64 +108,88 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.itemMenu.sellAll"
   ],
   "cs_CZ": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "nl_NL": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "pl_PL": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "id_ID": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "tr_TR": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "sv_SE": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "vi_VN": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",
     "hudChrome.steam.wishlistShort"
   ],
   "da_DK": [
+    "entities.items.reins_rickshaw_mount.name",
     "hudChrome.itemMenu.sell",
     "hudChrome.itemMenu.sellAll",
+    "hudChrome.mounts.desc_rickshaw_mount",
+    "hudChrome.mounts.name_rickshaw_mount",
     "hudChrome.options.showTargetSwingTimer",
     "hudChrome.steam.wishlist",
     "hudChrome.steam.wishlistAria",

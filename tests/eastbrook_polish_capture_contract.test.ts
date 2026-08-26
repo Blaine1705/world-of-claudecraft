@@ -340,8 +340,11 @@ interface AttributionTargetFixture {
 // Re-minted for the PR #3647 movement-reconciliation merge: renderer.ts now
 // combines the extracted self-render core, exact-match prediction wiring and
 // the release batch's rift collision token thread. No capture was retaken.
+// Re-minted for the rickshaw mount merge into release/v0.41.0: renderer.ts
+// keeps the release self-render extraction while adding the Bonebound Rickshaw
+// mount wiring. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '1784cef7953a042726b962fc1ca28b76fed1692ddb81d6e72f75eabc4119b157';
+  '0e5883c2040bc919fadb1cbabb71b83341a909a28575ffdd8fe1e94558eb9f43';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

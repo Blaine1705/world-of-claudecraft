@@ -404,12 +404,13 @@ import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { applyMountJumpAttitude } from './mount_jump_attitude';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { mountBobY, mountVisualSpec } from './mount_visuals';
+import { mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -587,6 +588,16 @@ import { disposeRendererPrewarmAndGroundFx } from './renderer_resource_lifecycle
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  attachPullerIfRickshaw,
+  preloadPullerIfRickshaw,
+  type RickshawMountViewState,
+  releaseRickshawMountState,
+  rickshawMountBuildReady,
+  spinMountWheels,
+  updateRickshawPuller,
+  updateRollingMountLoop,
+} from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -1066,7 +1077,7 @@ interface AoeRingSlot {
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
 }
 
-export interface EntityView {
+export interface EntityView extends RickshawMountViewState {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -1081,6 +1092,8 @@ export interface EntityView {
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
+  /** Display-only jump attitude; see mount_jump_attitude. */
+  mountJumpPitch: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
@@ -8479,7 +8492,9 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      mountPullerVisual: null,
       mountLift: 0,
+      mountJumpPitch: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
@@ -10083,6 +10098,7 @@ export class Renderer {
       v.travelVisual?.dispose();
       v.mountVisual?.dispose();
       v.metamorphVisual?.dispose();
+      releaseRickshawMountState(v, true);
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -10108,6 +10124,10 @@ export class Renderer {
     if (disposeObjectResources)
       disposeUnsharedMeshResources(v.group, { geometries: true, materials: true });
     this.audioSink?.mountEngineReset(id);
+    // A mount loop is keyed by entity id and driven from the per-frame sync
+    // pass; once the view is gone nothing calls it again, so it would keep
+    // playing at the spot the entity vanished from. Stop it here.
+    this.audioSink?.stopMountLoop(id);
     this.views.delete(id);
   }
 
@@ -10974,13 +10994,15 @@ export class Renderer {
           v.mountVisual.dispose();
           v.mountVisual = null;
         }
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
-        if (mountAssetsReady(mountSpec.visualKey)) {
+        if (rickshawMountBuildReady(mountSpec.visualKey, mountAssetsReady(mountSpec.visualKey))) {
           const mountStarted = performance.now();
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
           // A newly summoned mount is exactly a brand-new rig's materials
           // linking for the first time; gate it like a gear swap instead of
           // freezing the frame the mount lands on (#2571).
@@ -10992,11 +11014,13 @@ export class Renderer {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
           );
+          preloadPullerIfRickshaw(mountSpec.visualKey);
         }
       } else if (!mountSpec && v.mountVisual) {
         v.group.remove(v.mountVisual.root);
         v.mountVisual.dispose();
         v.mountVisual = null;
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
@@ -11048,6 +11072,11 @@ export class Renderer {
       // model origin (the toad's is well back toward the tail).
       v.visual.root.position.y = v.mountLift;
       v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
+      // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
+      if (!mountShown) {
+        v.mountJumpPitch = 0;
+        v.visual.root.rotation.x = 0;
+      }
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
       v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
@@ -11420,6 +11449,17 @@ export class Renderer {
         // state (an ordinary mount, or the loop already stopped).
         sink.mountEngineReset(e.id);
       }
+      updateRollingMountLoop(
+        sink,
+        v,
+        e.id,
+        e.mountKey,
+        ax,
+        ay,
+        az,
+        logicallyMounted && !visuallyDead,
+        moving && !airborne,
+      );
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.
       const entryFallSpeed = v.fallSpeed;
@@ -11628,11 +11668,25 @@ export class Renderer {
         mst.swimming = st.swimming;
         if (runCharacterPresentation) {
           v.mountVisual.update(dt, mst, animate);
-          // the rider floats WITH the procedural bob (the hover cycle's idle
-          // float), not just the mount body
-          const bob = mountBobY(mountSpec, this.time, moving);
-          v.mountVisual.root.position.y = bob;
-          v.visual.root.position.y = v.mountLift + bob;
+          // RAW per-frame travel, not st.speed. loco.speed is exponentially
+          // smoothed for footstep cadence and additionally latches its last
+          // value while "stalled", so it keeps reporting motion for a beat
+          // after the player actually stops -- which the wheels rode as a
+          // visible coast. The displayed position delta is the ground truth
+          // the wheels should agree with anyway: if the cart did not move this
+          // frame, the wheels must not turn this frame.
+          spinMountWheels(v, dt > 0 ? Math.hypot(vx, vz) / dt : 0, st.backwards, dt);
+          applyMountJumpAttitude(
+            v,
+            v.mountVisual.root,
+            v.visual.root,
+            mountSpec,
+            this.time,
+            moving,
+            airborne,
+            dt > 1e-4 ? dyRaw / dt : 0,
+            dt,
+          );
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -11643,6 +11697,7 @@ export class Renderer {
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
+        updateRickshawPuller(v, dt, mst, animate, runCharacterPresentation);
       }
 
       const emoteId =
@@ -11686,6 +11741,14 @@ export class Renderer {
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          // The mount's own call, on the same edge as the glow but only when a
+          // mount actually APPEARED: e.mountKey === '' is a dismount, which
+          // keeps the glow and gets no call. A live swap is a genuine
+          // appearance and does play the new mount's call. lastMountKey is
+          // seeded from the entity's current state at view creation, so a rider
+          // already mounted when they enter interest range (or at login) never
+          // reaches this edge and stays silent.
+          if (e.mountKey !== '') this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf);
           // A mountKey change (dismount, a live mount swap, or a fresh summon
           // reusing this entity id) must drop any engine mount's windup/loop
           // state; otherwise the old loop node stays connected forever once
