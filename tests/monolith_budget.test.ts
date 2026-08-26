@@ -136,7 +136,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/target_swing_timer_bars.ts (the ratchet's own rule: the real
     // logic lives in the extracted module, not here). No clean branch-owned
     // extraction exists for wholly new functionality.
-    ceiling: 18491,
+    // Merging release/v0.41.0 with the staged voice branch: the voice-clip key
+    // resolvers stay out in src/ui/hud_voice_cues.ts, and the merged file lands
+    // below the batch-side pin above. Pinned to the exact merged count, keeping
+    // the zero-headroom posture.
+    ceiling: 18482,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

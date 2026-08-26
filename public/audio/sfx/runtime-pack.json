@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "75161a3d97b57b528d1f944c8dc76785862414b34f39fc57458bd20d92839943",
-  "catalogHash": "9a31e1e35398a332b675f1ecf36e40f0dc1ba69f58328d4f34e5d094bec9c93f",
+  "bundleId": "32def841703e09f284a07601659e01ee47b088a5d155b5a485d233e82bcb4035",
+  "catalogHash": "abb3e0f8367c8034e29c9f629e9221daf80b48aacdf3070b6878ec22f9935c37",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3136,6 +3136,30 @@
       "gain": 2.06538,
       "playbackRate": 1
     },
+    "player_death_female": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/player_death_female_1.mp3?v=38149e3ea49a",
+          "bytes": 15716,
+          "sha256": "38149e3ea49a7c013fcb91cf26bd6b7841877c3409a878c66dd12360597e665c"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/player_death_female_2.mp3?v=23417a064753",
+          "bytes": 16343,
+          "sha256": "23417a0647534a6b9c389dc6f53c86089106a67943db975d730bff9b98a6c1f1"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/player_death_female_3.mp3?v=280ce1bc8c52",
+          "bytes": 11954,
+          "sha256": "280ce1bc8c527f82530239a24abebd97755fb68c0cda6de915c5dfd0c6b3e74a"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "player_drink_potion": {
       "variants": [
         {
@@ -3206,6 +3230,42 @@
         }
       ],
       "gain": 1.819701,
+      "playbackRate": 1
+    },
+    "player_hurt_female": {
+      "variants": [
+        {
+          "id": "1",
+          "url": "/audio/sfx/player_hurt_female_1.mp3?v=ca0ee6e2fed4",
+          "bytes": 8820,
+          "sha256": "ca0ee6e2fed4941ba2757cc2f67b6c1ff3ccb45d8433155986d5f2597c41ddfb"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/player_hurt_female_2.mp3?v=723bd54bb5b9",
+          "bytes": 8820,
+          "sha256": "723bd54bb5b98b53373effe57085b72a980ab0a0cb8fa205b3904506b5c4a40b"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/player_hurt_female_3.mp3?v=43e728e4618a",
+          "bytes": 6939,
+          "sha256": "43e728e4618a12becbb34d6424140e1557f37b0356b7b00997428272ab4e1d1d"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/player_hurt_female_4.mp3?v=352422af5d17",
+          "bytes": 21359,
+          "sha256": "352422af5d17c3f92112494a77f2b8cec120c0ff8c5a85d927858aee83d83065"
+        },
+        {
+          "id": "5",
+          "url": "/audio/sfx/player_hurt_female_5.mp3?v=8767c95081fa",
+          "bytes": 13835,
+          "sha256": "8767c95081fa43b18f854bfd16e4096d64ea60b4e59bd81208fe9960a4616b3c"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "proj_arcane": {
