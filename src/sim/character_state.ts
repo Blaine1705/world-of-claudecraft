@@ -9,7 +9,7 @@ import type { SavedCooldowns } from './cooldown_persist';
 import type { SavedDeedStats } from './deeds';
 import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
-import type { MaterialsVaultState } from './materials_vault';
+import type { SavedMaterialsVaultState } from './materials_vault';
 import type { ArchetypeState } from './professions/archetype';
 import type { ToolEffectSlot } from './professions/tools';
 import type { SavedReliquaryState } from './reliquary';
@@ -90,7 +90,7 @@ export interface CharacterState {
   // Per-character Materials Vault (JSONB; optional so pre-vault saves load cleanly,
   // defaulting to the empty locked vault). sanitizeVaultState is the one load path
   // (never destroys stock; tolerates an over-capacity count).
-  vault?: MaterialsVaultState;
+  vault?: SavedMaterialsVaultState;
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];

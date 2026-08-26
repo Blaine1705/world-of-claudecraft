@@ -347,18 +347,18 @@ describe('vault-tab bag click routing (behavioral, real BagsWindow)', () => {
     expect(h.errors).toEqual([tSim('error.vaultOnlyMaterials')]);
   });
 
-  it('an instance-payload material denies with the sim cannot-store line and dispatches nothing', () => {
+  it('an instance-payload material dispatches to identity-preserving vault storage', () => {
     const h = vaultHarness([{ itemId: materialId, count: 1, instance: { signer: 'Ana' } }]);
     clickCellFor(h.root, materialId);
-    expect(h.calls).toEqual([]);
-    expect(h.errors).toEqual([tSim('error.vaultCannotStore')]);
+    expect(h.calls).toEqual(['vaultDeposit:0']);
+    expect(h.errors).toEqual([]);
   });
 
-  it('a crafted-provenance material denies the same way (count-only storage)', () => {
+  it('a crafted-provenance material dispatches without flattening its marker', () => {
     const h = vaultHarness([{ itemId: materialId, count: 1, craftedRecipeId: 'recipe_x' }]);
     clickCellFor(h.root, materialId);
-    expect(h.calls).toEqual([]);
-    expect(h.errors).toEqual([tSim('error.vaultCannotStore')]);
+    expect(h.calls).toEqual(['vaultDeposit:0']);
+    expect(h.errors).toEqual([]);
   });
 });
 

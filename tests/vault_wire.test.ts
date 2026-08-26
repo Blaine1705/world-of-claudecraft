@@ -32,6 +32,7 @@ import {
 import { REALM } from '../server/realm';
 import {
   CVAULT_WIRE_INTERVAL_TICKS,
+  decodeVaultSpecialRef,
   dispatchVaultCommand,
   takeCvaultWireTurn,
   VaultCraftConsumeBatch,
@@ -193,6 +194,7 @@ describe('materials vault wire round-trip', () => {
     const first = lastSnap(fw.sent);
     expect(first.self.vault).toEqual({
       stock: { copper_ore: 3 },
+      special: [],
       upgrades: 1,
       perMaterialCap: 40, // VAULT_BASE_CAP at rung 1
       nextUpgradeCost: 50000, // VAULT_UPGRADE_PRICES[1]
@@ -209,6 +211,7 @@ describe('materials vault wire round-trip', () => {
     (client as any).applySnapshot(first);
     expect(client.vaultInfo).toEqual({
       stock: { copper_ore: 3 },
+      special: [],
       upgrades: 1,
       perMaterialCap: 40,
       nextUpgradeCost: 50000,
@@ -219,6 +222,70 @@ describe('materials vault wire round-trip', () => {
     // which is what the __proto__ round-trip pin further down depends on NOT
     // happening.
     expect(client.vaultInfo).toBe(wireVault);
+  });
+
+  it('round-trips a glyph-bearing material through server, wire mirror, and exact selector', async () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const { session, pid, meta } = seat(server, fw, 1, 'Vaultglyph', 0);
+    meta.vault.upgrades = 1;
+    meta.inventory.push({
+      itemId: 'copper_ore',
+      count: 1,
+      instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+    });
+
+    send(server, session, {
+      cmd: 'vault_deposit',
+      slot: meta.inventory.length - 1,
+    });
+    expect(meta.vault.stock).toEqual({});
+    expect(meta.vault.special).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 1,
+        instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+      },
+    ]);
+
+    broadcast(server);
+    const client = bareClient(pid);
+    // biome-ignore lint/suspicious/noExplicitAny: applySnapshot is a ClientWorld internal
+    (client as any).applySnapshot(lastSnap(fw.sent));
+    expect(client.vaultInfo?.special).toEqual(meta.vault.special);
+    const row = client.vaultInfo?.special[0];
+    if (!row) throw new Error('expected mirrored special vault row');
+    send(server, session, {
+      cmd: 'vault_withdraw',
+      itemId: row.itemId,
+      special: { index: 0, instance: row.instance },
+    });
+
+    expect(meta.vault.special).toEqual([]);
+    expect(
+      meta.inventory.find(
+        (slot: { instance?: { signer?: string } }) => slot.instance?.signer === 'Ada',
+      ),
+    ).toMatchObject({ itemId: 'copper_ore', count: 1 });
+    await bankLedgerIdle();
+    expect(ledgerRows().map((row) => [row.op, row.instance])).toEqual([
+      [
+        'deposit',
+        {
+          vaultSpecial: 1,
+          instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+          craftedRecipeId: null,
+        },
+      ],
+      [
+        'withdraw',
+        {
+          vaultSpecial: 1,
+          instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+          craftedRecipeId: null,
+        },
+      ],
+    ]);
   });
 
   it('a LOCKED vault near a banker encodes non-null with the unlock price and mirrors', () => {
@@ -235,6 +302,7 @@ describe('materials vault wire round-trip', () => {
     const first = lastSnap(fw.sent);
     expect(first.self.vault).toEqual({
       stock: {},
+      special: [],
       upgrades: 0,
       perMaterialCap: 0, // locked: no capacity before the unlock rung
       nextUpgradeCost: 20000, // VAULT_UPGRADE_PRICES[0], the 2g unlock
@@ -244,6 +312,7 @@ describe('materials vault wire round-trip', () => {
     (client as any).applySnapshot(first);
     expect(client.vaultInfo).toEqual({
       stock: {},
+      special: [],
       upgrades: 0,
       perMaterialCap: 0,
       nextUpgradeCost: 20000,
@@ -339,16 +408,12 @@ describe('materials vault wire round-trip', () => {
     // the assignment form runs the Object.prototype setter and changes the
     // PROTOTYPE, leaving no own key at all and pinning nothing.
     //
-    // The seeded value is an OBJECT, not a number, and that choice is what makes
-    // the prototype assertions below mean anything. The Object.prototype
-    // '__proto__' setter silently IGNORES a non-object, so a polluting rebuild
-    // (Object.assign, or any keyed copy that goes through [[Set]]) fed a number
-    // would leave the prototype untouched and pass those assertions vacuously.
-    // Fed an object it really does reparent the copy, so a rebuild reddens both
-    // the hasOwn arms AND the prototype arms.
+    // Stock values are strictly positive counts at the browser boundary, so
+    // the dormant hostile key carries a valid numeric value. An object value
+    // is malformed and the strict decoder deliberately drops that snapshot.
     const stock = meta.vault.stock as unknown as Record<string, unknown>;
     Object.defineProperty(stock, '__proto__', {
-      value: { polluted: true },
+      value: 3,
       enumerable: true,
       writable: true,
       configurable: true,
@@ -369,9 +434,7 @@ describe('materials vault wire round-trip', () => {
     // the ordinary material. An Object.assign or keyed rebuild in the mirror
     // would run the inherited setter, which defines no own key at all.
     expect(Object.hasOwn(mirrored, '__proto__')).toBe(true);
-    expect(Object.getOwnPropertyDescriptor(mirrored, '__proto__')?.value).toEqual({
-      polluted: true,
-    });
+    expect(Object.getOwnPropertyDescriptor(mirrored, '__proto__')?.value).toBe(3);
     expect(mirrored.copper_ore).toBe(3);
     // And nothing was reparented: the mirrored stock still inherits from
     // Object.prototype, not from the seeded object.
@@ -404,6 +467,7 @@ describe('materials vault wire round-trip', () => {
     expect(meta.copper).toBe(50000);
     expect(applyLatest()).toEqual({
       stock: {},
+      special: [],
       upgrades: 1,
       perMaterialCap: 40,
       nextUpgradeCost: 50000,
@@ -428,6 +492,7 @@ describe('materials vault wire round-trip', () => {
     expect(meta.copper).toBe(0);
     expect(applyLatest()).toEqual({
       stock: { copper_ore: 4 },
+      special: [],
       upgrades: 2,
       perMaterialCap: 80, // VAULT_BASE_CAP + VAULT_UPGRADE_STEP
       nextUpgradeCost: 100000, // VAULT_UPGRADE_PRICES[2]
@@ -577,6 +642,7 @@ describe('materials vault wire round-trip', () => {
     broadcast(server);
     expect(lastSnap(fw.sent).self.vault).toEqual({
       stock: {},
+      special: [],
       upgrades: 5,
       perMaterialCap: 200, // 40 + 40 * 4
       nextUpgradeCost: null,
@@ -676,6 +742,7 @@ describe('materials vault wire round-trip', () => {
     const modSnap = lastSnap(modWs.sent);
     expect(modSnap.self.vault).toEqual({
       stock: { copper_ore: 3 },
+      special: [],
       upgrades: 1,
       perMaterialCap: 40,
       nextUpgradeCost: 50000,
@@ -1130,6 +1197,7 @@ describe('materials vault wire round-trip', () => {
     // Both paths land the same literal outcome...
     expect(offInfo).toEqual({
       stock: { copper_ore: 10, rough_hide: 3 },
+      special: [],
       upgrades: 2,
       perMaterialCap: 80,
       nextUpgradeCost: 100000,
@@ -1418,10 +1486,14 @@ describe('craft-from-vault stock delta (cvault)', () => {
 // ---------------------------------------------------------------------------
 describe('vault_wire module units', () => {
   const calls: string[] = [];
+  const withdrawArgs: unknown[][] = [];
   const unitSim = (): VaultSim => ({
     vaultInfoFor: () => null,
     vaultDeposit: (slot, count) => void calls.push(`deposit:${slot}:${count}`),
-    vaultWithdraw: (itemId, count) => void calls.push(`withdraw:${itemId}:${count}`),
+    vaultWithdraw: (itemId, count, ...rest: unknown[]) => {
+      calls.push(`withdraw:${itemId}:${count}`);
+      withdrawArgs.push([itemId, count, ...rest]);
+    },
     vaultDepositAll: () => void calls.push('depositAll'),
     vaultBuyUpgrade: () => void calls.push('buyUpgrade'),
   });
@@ -1429,6 +1501,39 @@ describe('vault_wire module units', () => {
 
   beforeEach(() => {
     calls.length = 0;
+    withdrawArgs.length = 0;
+  });
+
+  it('strictly decodes and forwards a full special selector, rejecting malformed lookalikes', () => {
+    const sim = unitSim();
+    const special = {
+      index: 2,
+      instance: { signer: 'Ada', rolled: { quality: 'rare', stats: { sta: 2 } } },
+      craftedRecipeId: 'smelt_copper',
+    };
+    dispatchVaultCommand(
+      sim,
+      WHO,
+      'vault_withdraw',
+      { itemId: 'copper_ore', count: 1, special },
+      9,
+    );
+    expect(withdrawArgs).toEqual([['copper_ore', 1, special, 9]]);
+
+    const malformed = [
+      { ...special, index: -1 },
+      { ...special, extra: true },
+      { ...special, instance: null },
+      { ...special, instance: [] },
+      { ...special, instance: { signer: 'x'.repeat(65) } },
+      { ...special, instance: { ['x'.repeat(65)]: 1 } },
+      { ...special, craftedRecipeId: '' },
+    ];
+    for (const value of malformed) {
+      expect(decodeVaultSpecialRef(value)).toBeNull();
+      dispatchVaultCommand(sim, WHO, 'vault_withdraw', { itemId: 'copper_ore', special: value }, 9);
+    }
+    expect(withdrawArgs).toHaveLength(1);
   });
 
   it('routes each command to its sim verb and refuses malformed shapes', () => {

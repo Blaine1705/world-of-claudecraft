@@ -193,15 +193,10 @@ describe('bagItemAction vault arms (the Materials Vault tab)', () => {
     expect(bagItemAction(ITEMS.questItem, VAULT_MODE)).toBe('vaultDepositBlockedNotMaterial');
   });
 
-  it('refuses an instance payload or crafted provenance on a REAL material (count-only storage)', () => {
-    expect(bagItemAction(material, VAULT_MODE, { signer: 'Ana' })).toBe(
-      'vaultDepositBlockedPayload',
-    );
-    expect(bagItemAction(material, VAULT_MODE, undefined, 'recipe_x')).toBe(
-      'vaultDepositBlockedPayload',
-    );
-    // The payload arm never fires for a non-material: the membership gate wins
-    // (both gates true picks the sim's own precedence).
+  it('deposits instance payloads and crafted provenance on a real material', () => {
+    expect(bagItemAction(material, VAULT_MODE, { signer: 'Ana' })).toBe('vaultDeposit');
+    expect(bagItemAction(material, VAULT_MODE, undefined, 'recipe_x')).toBe('vaultDeposit');
+    // Identity does not widen eligibility: a non-material stays blocked.
     expect(bagItemAction(ITEMS.sword, VAULT_MODE, { signer: 'Ana' })).toBe(
       'vaultDepositBlockedNotMaterial',
     );
@@ -211,10 +206,10 @@ describe('bagItemAction vault arms (the Materials Vault tab)', () => {
     expect(bagTooltipHintKey(material, VAULT_MODE)).toBe('hudChrome.bank.vaultDepositHint');
     expect(bagTooltipHintKey(ITEMS.sword, VAULT_MODE)).toBe('hudChrome.bank.vaultCannotDeposit');
     expect(bagTooltipHintKey(material, VAULT_MODE, { signer: 'Ana' })).toBe(
-      'hudChrome.bank.vaultCannotDeposit',
+      'hudChrome.bank.vaultDepositHint',
     );
     expect(bagTooltipHintKey(material, VAULT_MODE, undefined, 'recipe_x')).toBe(
-      'hudChrome.bank.vaultCannotDeposit',
+      'hudChrome.bank.vaultDepositHint',
     );
     expect(bagUnknownAction(VAULT_MODE)).toBe('none');
   });

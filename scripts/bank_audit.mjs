@@ -50,9 +50,9 @@
 //
 // THE VAULT CONTAINER reuses the personal op vocabulary ('deposit', 'withdraw',
 // 'buy_slots'), so every shape and replay rule above applies to it unchanged.
-// Two container-specific facts it reconciles against: vault storage is
-// COUNT-ONLY (a number per material id, no slots and no per-instance payload,
-// so every key is [itemId, null]), and its purchased_slots_after column carries
+// Ordinary pooled stock keys as [itemId, null]. Identity-preserving rows key as
+// [itemId, {vaultSpecial:1,instance,craftedRecipeId}], so crafted and glyph-bearing
+// copies reconcile without flattening. Its purchased_slots_after column carries
 // the upgrade RUNG (state.vault.upgrades), the monotonic ladder analogue of the
 // bank's purchasedSlots. A character with vault rows but no persisted
 // state.vault reconciles against an EMPTY vault, the same corruption signature
@@ -322,6 +322,33 @@ function multisetKey(itemId, instance) {
   return JSON.stringify([itemId ?? null, instance ?? null]);
 }
 
+function vaultSpecialIdentity(slot) {
+  return {
+    vaultSpecial: 1,
+    instance: slot.instance ?? null,
+    craftedRecipeId: slot.craftedRecipeId ?? null,
+  };
+}
+
+function isExactVaultSpecialIdentity(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const keys = Object.keys(value).sort();
+  if (JSON.stringify(keys) !== JSON.stringify(['craftedRecipeId', 'instance', 'vaultSpecial'])) {
+    return false;
+  }
+  if (value.vaultSpecial !== 1) return false;
+  if (
+    value.instance !== null &&
+    (typeof value.instance !== 'object' || Array.isArray(value.instance))
+  ) {
+    return false;
+  }
+  return (
+    value.craftedRecipeId === null ||
+    (typeof value.craftedRecipeId === 'string' && value.craftedRecipeId !== '')
+  );
+}
+
 function itemIdFromKey(key) {
   try {
     return JSON.parse(key)[0];
@@ -378,17 +405,21 @@ function vaultStockOf(vault) {
   return stock;
 }
 
-// The item multiset a vault currently holds. Count-only storage means there is
-// no per-instance dimension, so every key is [itemId, null], exactly the key a
-// vault ledger row produces. Keys are walked SORTED: the stock arrives from
-// JSONB, whose key order Postgres does not preserve, so an insertion-ordered
-// walk would make finding order depend on how the row happened to be stored.
+// The item multiset a vault currently holds. Ordinary stock stays pooled under
+// [itemId, null]; each special row carries the exact versioned identity the
+// ledger writer emits. Keys are walked sorted where source order is irrelevant.
 function vaultStateMultiset(vault) {
   const m = new Map();
   const stock = vaultStockOf(vault);
   for (const itemId of Object.keys(stock).sort()) {
     const key = multisetKey(itemId, null);
     m.set(key, (m.get(key) ?? 0) + Number(stock[itemId] ?? 0));
+  }
+  const special = Array.isArray(vault?.special) ? vault.special : [];
+  for (const slot of special) {
+    if (!slot || typeof slot !== 'object' || typeof slot.itemId !== 'string') continue;
+    const key = multisetKey(slot.itemId, vaultSpecialIdentity(slot));
+    m.set(key, (m.get(key) ?? 0) + Number(slot.count ?? 0));
   }
   return m;
 }
@@ -799,18 +830,21 @@ function checkRowShape(row, findings) {
       detail: `${container} row ${row.id} has container_id ${String(row.container_id)}`,
     });
   }
-  // The same mirror for `instance`: vault storage is COUNT-ONLY. Its stock is a
-  // plain itemId -> count record, so src/sim/materials_vault.ts can hold no
-  // per-instance payload and server/bank_ledger.ts diffVaultOp stamps
-  // instance: null on every element it emits. A non-null one means a writer
-  // recorded a distinction the vault cannot represent, so the replay would net
-  // counts that the state can never reproduce. Guild and personal rows are
-  // exempt by design (both carry real per-instance payloads).
-  if (container === 'vault' && row.instance != null) {
+  // Vault item evidence is either pooled null or the exact versioned special
+  // wrapper. Craft consumption can only draw pooled stock, and purchases carry
+  // no item identity, so both of those ops require null specifically.
+  const vaultInstanceAllowed =
+    row.instance == null ||
+    ((row.op === 'deposit' || row.op === 'withdraw') && isExactVaultSpecialIdentity(row.instance));
+  if (
+    container === 'vault' &&
+    (!vaultInstanceAllowed ||
+      ((row.op === 'craft_consume' || row.op === 'buy_slots') && row.instance != null))
+  ) {
     findings.push({
       ...base,
       kind: 'unexpected_instance',
-      detail: `vault row ${row.id} carries an instance payload`,
+      detail: `vault row ${row.id} carries invalid identity evidence`,
     });
   }
   // A container this script does not know is replayed by NOTHING: the grouping
@@ -1224,6 +1258,34 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
           kind: 'negative_state_count',
           detail: `state vault holds ${itemId} with a negative count ${Number(stock[itemId])}`,
         });
+      }
+    }
+    const special = effectiveVault?.special;
+    if (special !== undefined && !Array.isArray(special)) {
+      findings.push({
+        ...base,
+        kind: 'malformed_special_state',
+        detail: 'state vault special collection is not an array',
+      });
+    }
+    if (Array.isArray(special)) {
+      for (let index = 0; index < special.length; index++) {
+        const slot = special[index];
+        if (!slot || typeof slot !== 'object' || typeof slot.itemId !== 'string') {
+          findings.push({
+            ...base,
+            kind: 'malformed_special_state',
+            detail: `state vault special row ${index} is malformed`,
+          });
+          continue;
+        }
+        if (Number(slot.count) < 0) {
+          findings.push({
+            ...base,
+            kind: 'negative_state_count',
+            detail: `state vault special row ${index} holds ${slot.itemId} with a negative count ${Number(slot.count)}`,
+          });
+        }
       }
     }
 

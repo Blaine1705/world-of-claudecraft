@@ -30,9 +30,11 @@
 //   vault key. CADENCE-GATED, unlike vault, because the cost property
 //   inverts (see CVAULT_WIRE_HZ): off-cadence snapshots omit the key, which
 //   the client reads as unchanged.
+
+import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
 import type { SimEvent } from '../src/sim/types';
 import { DT } from '../src/sim/types';
-import type { VaultInfo } from '../src/world_api';
+import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
 import { recordVaultCraftConsume, recordVaultOp, type VaultCraftConsumption } from './bank_ledger';
 
 /** The cvault snapshot cadence. The gate exists because cvault INVERTS the
@@ -52,8 +54,61 @@ export interface VaultSim {
   vaultInfoFor(pid?: number): VaultInfo | null;
   vaultDeposit(slot: number, count?: number, pid?: number): void;
   vaultWithdraw(itemId: string, count?: number, pid?: number): void;
+  vaultWithdraw(
+    itemId: string,
+    count: number | undefined,
+    special: VaultSpecialRef,
+    pid: number,
+  ): void;
   vaultDepositAll(pid?: number): void;
   vaultBuyUpgrade(pid?: number): void;
+}
+
+const SPECIAL_REF_KEYS = new Set(['index', 'instance', 'craftedRecipeId']);
+const MAX_SPECIAL_REF_NODES = 1_024;
+const MAX_SPECIAL_REF_DEPTH = 12;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isBoundedJson(value: unknown): boolean {
+  let nodes = 0;
+  const visit = (current: unknown, depth: number): boolean => {
+    if (++nodes > MAX_SPECIAL_REF_NODES || depth > MAX_SPECIAL_REF_DEPTH) return false;
+    if (current === null || typeof current === 'boolean') return true;
+    if (typeof current === 'string') return current.length <= MAX_INSTANCE_STRING_LENGTH;
+    if (typeof current === 'number') return Number.isFinite(current);
+    if (Array.isArray(current)) return current.every((entry) => visit(entry, depth + 1));
+    if (!isRecord(current)) return false;
+    return Object.entries(current).every(
+      ([key, entry]) => key.length <= MAX_INSTANCE_STRING_LENGTH && visit(entry, depth + 1),
+    );
+  };
+  return visit(value, 0);
+}
+
+/** Strictly decode the optional identity-bearing withdrawal selector. Unknown
+ *  keys, advisory slot data, malformed payload trees, and lossy recipe markers
+ *  all fail closed before the sim sees the request. */
+export function decodeVaultSpecialRef(value: unknown): VaultSpecialRef | null {
+  if (!isRecord(value) || Object.keys(value).some((key) => !SPECIAL_REF_KEYS.has(key))) return null;
+  if (!Number.isSafeInteger(value.index) || Number(value.index) < 0) return null;
+  if (
+    value.craftedRecipeId !== undefined &&
+    (typeof value.craftedRecipeId !== 'string' ||
+      value.craftedRecipeId === '' ||
+      value.craftedRecipeId.length > MAX_INSTANCE_STRING_LENGTH)
+  ) {
+    return null;
+  }
+  if (
+    value.instance !== undefined &&
+    (!isRecord(value.instance) || !isBoundedJson(value.instance))
+  ) {
+    return null;
+  }
+  return value as unknown as VaultSpecialRef;
 }
 
 export type VaultCommandName =
@@ -91,8 +146,12 @@ export function dispatchVaultCommand(
       break;
     case 'vault_withdraw':
       if (typeof msg.itemId === 'string') {
+        const special = msg.special === undefined ? undefined : decodeVaultSpecialRef(msg.special);
+        if (special === null) break;
         const before = sim.vaultInfoFor(pid);
-        sim.vaultWithdraw(msg.itemId, typeof msg.count === 'number' ? msg.count : undefined, pid);
+        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        if (special === undefined) sim.vaultWithdraw(msg.itemId, count, pid);
+        else sim.vaultWithdraw(msg.itemId, count, special, pid);
         recordVaultOp('withdraw', who, before, sim.vaultInfoFor(pid));
       }
       break;

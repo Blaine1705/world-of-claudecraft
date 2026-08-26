@@ -41,8 +41,9 @@ function vinfo(
   upgrades = 1,
   perMaterialCap = 40,
   nextUpgradeCost: number | null = 50000,
+  special: InvSlot[] = [],
 ): VaultInfo {
-  return { stock, upgrades, perMaterialCap, nextUpgradeCost };
+  return { stock, special, upgrades, perMaterialCap, nextUpgradeCost };
 }
 
 function slot(itemId: string, count: number, extra: Partial<InvSlot> = {}): InvSlot {

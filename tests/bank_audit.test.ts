@@ -359,7 +359,7 @@ describe('auditBank', () => {
 // The Materials Vault container (Bank Storage Phase 2). Vault rows reuse the
 // personal op vocabulary ('deposit' / 'withdraw' / 'buy_slots') and group per
 // character like the personal bank, but reconcile against characters.state.vault:
-// a count-only record (no slots, no per-instance dimension) plus an `upgrades`
+// pooled stock plus an identity-preserving special multiset, and an `upgrades`
 // rung that purchased_slots_after mirrors.
 // ---------------------------------------------------------------------------
 
@@ -412,6 +412,66 @@ describe('auditBank (vault container)', () => {
             id: 1,
             realm: 'Claudemoon',
             state: { vault: { stock: { copper_ore: 4 }, upgrades: 2 } },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('reconciles pooled and exact-versioned special identities as separate multisets', () => {
+    const identity = {
+      vaultSpecial: 1,
+      instance: { signer: 'Ada', rolled: { quality: 'rare' } },
+      craftedRecipeId: 'smelt_copper',
+    };
+    expect(
+      auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 4,
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 3,
+            instance: identity,
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 3,
+            character_id: 1,
+            op: 'withdraw',
+            item_id: 'copper_ore',
+            count: 1,
+            instance: identity,
+            purchased_slots_after: 1,
+          }),
+        ],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: {
+              vault: {
+                stock: { copper_ore: 4 },
+                special: [
+                  {
+                    itemId: 'copper_ore',
+                    count: 2,
+                    instance: identity.instance,
+                    craftedRecipeId: 'smelt_copper',
+                  },
+                ],
+                upgrades: 1,
+              },
+            },
           },
         ],
       }),
@@ -703,6 +763,27 @@ describe('auditBank (vault container)', () => {
     expect(findings.every((f) => f.container === 'vault')).toBe(true);
   });
 
+  it('flags a negative count in persisted special storage itself', () => {
+    const findings = auditBank({
+      ledgerRows: [],
+      characters: [
+        {
+          id: 6,
+          realm: 'Claudemoon',
+          state: {
+            vault: {
+              stock: {},
+              special: [{ itemId: 'copper_ore', count: -2, instance: { signer: 'Ada' } }],
+              upgrades: 1,
+            },
+          },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 6)).toContain('negative_state_count');
+    expect(findingKindsFor(findings, 6)).toContain('ledger_state_mismatch');
+  });
+
   it('keeps the two per-character containers SEPARATE: neither replay papers over the other', () => {
     // The same item id in both stores. The personal bank is short by 2 and the
     // vault is long by 2, so a replay that pooled the containers would net to
@@ -880,37 +961,12 @@ describe('auditBank (vault container)', () => {
     expect(guild.map((f) => f.kind)).not.toContain('unexpected_container_id');
   });
 
-  it('flags a vault row carrying an instance payload: vault storage is count-only', () => {
-    // The mirror of the container_id check on the other column recordVaultOp
-    // hardcodes. src/sim/materials_vault.ts stock is itemId -> count, so it can
-    // hold no per-instance distinction and diffVaultOp stamps instance: null on
-    // every element. A non-null one means a writer recorded a distinction the
-    // state can never reproduce, and the replay keys on [itemId, instance], so
-    // the row's counts would sit under a key no state key ever matches.
-    // characters: [] isolates the shape finding: with the character present the
-    // mismatched replay key ALSO reports ledger_state_mismatch (honest, but it
-    // would bury the shape finding this arm is about; the mismatch cascade is
-    // covered by its own tests).
-    const findings = auditBank({
-      ledgerRows: [
-        V({
-          id: 1,
-          character_id: 1,
-          op: 'deposit',
-          item_id: 'copper_ore',
-          count: 2,
-          purchased_slots_after: 1,
-          instance: { ilvl: 5 },
-        }),
-      ],
-      characters: [],
-    });
-    expect(findings.map((f) => f.kind)).toEqual(['unexpected_instance']);
-    expect(findings[0]).toMatchObject({ container: 'vault', realm: 'Claudemoon', characterId: 1 });
-    expect(findings[0].detail).toContain('vault row 1');
-
-    // A null instance on a vault row is the correct shape, and a personal row
-    // with a real instance payload is legitimate: neither may report here.
+  it('accepts only the exact special identity wrapper on vault deposit/withdraw rows', () => {
+    const identity = {
+      vaultSpecial: 1,
+      instance: { signer: 'Ada' },
+      craftedRecipeId: null,
+    };
     const clean = auditBank({
       ledgerRows: [
         V({
@@ -920,6 +976,7 @@ describe('auditBank (vault container)', () => {
           item_id: 'copper_ore',
           count: 2,
           purchased_slots_after: 1,
+          instance: identity,
         }),
         L({
           id: 2,
@@ -933,6 +990,48 @@ describe('auditBank (vault container)', () => {
       characters: [],
     });
     expect(clean.map((f) => f.kind)).not.toContain('unexpected_instance');
+
+    for (const instance of [
+      { ilvl: 5 },
+      { ...identity, vaultSpecial: 2 },
+      { ...identity, extra: true },
+      { vaultSpecial: 1, instance: { signer: 'Ada' } },
+    ]) {
+      const findings = auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 2,
+            purchased_slots_after: 1,
+            instance,
+          }),
+        ],
+        characters: [],
+      });
+      expect(
+        findings.map((f) => f.kind),
+        JSON.stringify(instance),
+      ).toContain('unexpected_instance');
+    }
+
+    const craft = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'craft_consume',
+          item_id: 'copper_ore',
+          count: 1,
+          purchased_slots_after: 1,
+          instance: identity,
+        }),
+      ],
+      characters: [],
+    });
+    expect(craft.map((f) => f.kind)).toContain('unexpected_instance');
   });
 
   it('a guild-only op wearing the vault container is flagged', () => {

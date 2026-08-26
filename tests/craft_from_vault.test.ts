@@ -677,11 +677,11 @@ describe('consumeVaultStock refuses any draw the row cannot pay in full', () => 
     // The apply half of the two-pool mechanic, driven directly: partial spends
     // do not exist here, because a half-spent line is the partial-consumption
     // defect the craft path denies precisely to avoid.
-    const corrupt: MaterialsVaultState = { stock: { copper_ore: 2.5 }, upgrades: 0 };
+    const corrupt: MaterialsVaultState = { stock: { copper_ore: 2.5 }, special: [], upgrades: 0 };
     expect(consumeVaultStock(corrupt, 'copper_ore', 2)).toBe(false);
     expect(corrupt.stock.copper_ore).toBe(2.5); // dormant, not floored
 
-    const sane: MaterialsVaultState = { stock: { copper_ore: 4 }, upgrades: 0 };
+    const sane: MaterialsVaultState = { stock: { copper_ore: 4 }, special: [], upgrades: 0 };
     expect(consumeVaultStock(sane, 'copper_ore', 5)).toBe(false); // more than held
     expect(consumeVaultStock(sane, 'copper_ore', 0)).toBe(false);
     expect(consumeVaultStock(sane, 'copper_ore', -1)).toBe(false);
@@ -810,6 +810,27 @@ describe('batch crafting counts the vault', () => {
     seedVault(sim, { spider_leg: 2 }, pid); // 2 more from the vault
 
     expect(maxCraftCountForRecipe(sim.ctx, recipeById(JERKY)!, pid)).toBe(3);
+  });
+
+  it('excludes identity-bearing vault rows from Create All and automatic consumption', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim, pid);
+    meta.vault.special.push({
+      itemId: 'spider_leg',
+      count: 5,
+      instance: { signer: 'Ada' },
+    });
+    const before = structuredClone(meta.vault.special);
+    const recipe = recipeById(JERKY);
+    if (!recipe) throw new Error(`missing recipe ${JERKY}`);
+
+    expect(maxCraftCountForRecipe(sim.ctx, recipe, pid)).toBe(0);
+    expect(resolveCraft(sim.ctx, pid, JERKY)).toMatchObject({
+      ok: false,
+      reason: 'insufficient_materials',
+    });
+    expect(meta.vault.special).toEqual(before);
   });
 
   it('promises only the carried crafts inside a blocked context', () => {

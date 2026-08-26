@@ -38,6 +38,7 @@ function personalInfo(): BankInfo {
 function vaultInfo(over: Partial<VaultInfo> = {}): VaultInfo {
   return {
     stock: {},
+    special: [],
     upgrades: 1,
     perMaterialCap: 40,
     nextUpgradeCost: 50000,

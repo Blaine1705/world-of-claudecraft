@@ -3,6 +3,7 @@ import {
   type BankInfo,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_LAYOUT_VERSION,
+  type VaultInfo,
 } from '../src/world_api';
 
 // Exact required BankInfo shape from origin/release/v0.41.0. Keeping the
@@ -27,14 +28,32 @@ const BANK_STORAGE_REQUIRED_KEYS = [
   'materialsUsed',
 ] as const satisfies readonly (keyof BankInfo)[];
 
+// Exact auth-world-10 VaultInfo shape. It has no way to reveal or select an
+// identity-bearing material after the new server stores one in `special`.
+const AUTH_WORLD_10_VAULT_INFO = {
+  stock: { copper_ore: 3 },
+  upgrades: 1,
+  perMaterialCap: 40,
+  nextUpgradeCost: 50000,
+} as const;
+
+const VAULT_SPECIAL_REQUIRED_KEYS = ['special'] as const satisfies readonly (keyof VaultInfo)[];
+
 describe('BankInfo wire compatibility epoch', () => {
   it('separates the bank-storage snapshot from release/v0.41.0 before admission', () => {
     for (const key of BANK_STORAGE_REQUIRED_KEYS) {
       expect(key in RELEASE_V041_BANK_INFO, key).toBe(false);
     }
+  });
 
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(10);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-10');
+  it('separates identity-preserving vault snapshots from auth-world-10 before admission', () => {
+    for (const key of VAULT_SPECIAL_REQUIRED_KEYS) {
+      expect(key in AUTH_WORLD_10_VAULT_INFO, key).toBe(false);
+    }
+
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(11);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-11');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-10');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-9');
   });
 });

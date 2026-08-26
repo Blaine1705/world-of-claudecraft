@@ -461,9 +461,8 @@ export const BANK_LEDGER_SHUTDOWN_DRAIN_MS = 10_000;
 // rows group per character on their own, never mixing with the personal bank.
 //
 // Two shape differences from the bank, both structural rather than stylistic:
-//   - vault stock is COUNT-ONLY (one number per material id, no slots and no
-//     per-instance payload, see src/sim/materials_vault.ts), so every row's
-//     `instance` is null and the diff keys on the bare item id;
+//   - ordinary pooled stock keys on [itemId, null], while identity-preserving
+//     material keys on [itemId, {vaultSpecial:1,instance,craftedRecipeId}];
 //   - `purchased_slots_after` carries the vault's UPGRADE RUNG (VaultInfo
 //     .upgrades), the monotonic ladder analogue of the bank's purchasedSlots.
 //     The column is NOT NULL and pass B scans it for regressions, so the rung
@@ -477,15 +476,43 @@ export const BANK_LEDGER_SHUTDOWN_DRAIN_MS = 10_000;
 // even while its only readers live in this module.
 export type VaultLedgerOp = 'deposit' | 'withdraw' | 'buy_slots';
 
-// One material's stocked count, read defensively. Object.keys only yields OWN
-// keys, but a key own to one side of the pair need not be own to the other, so
-// a plain index could reach an inherited Object.prototype member for a dormant
-// hostile id ('constructor') that a tolerated save kept as stock. hasOwn is the
-// same call src/sim/materials_vault.ts makes on both of its own reads.
-function vaultCount(stock: VaultInfo['stock'], itemId: string): number {
-  if (!Object.hasOwn(stock, itemId)) return 0;
-  const held = Number(stock[itemId]);
-  return Number.isFinite(held) ? held : 0;
+/** Versioned ledger identity for a full-payload Materials Vault row. The
+ *  wrapper distinguishes even a sanitizer-demoted special row (both markers
+ *  null) from ordinary pooled stock. */
+export function vaultSpecialLedgerIdentity(slot: VaultInfo['special'][number]): {
+  vaultSpecial: 1;
+  instance: VaultInfo['special'][number]['instance'] | null;
+  craftedRecipeId: string | null;
+} {
+  return {
+    vaultSpecial: 1,
+    instance: slot.instance ?? null,
+    craftedRecipeId: slot.craftedRecipeId ?? null,
+  };
+}
+
+interface VaultMultisetRow {
+  itemId: string;
+  instance: unknown;
+  count: number;
+}
+
+function vaultMultiset(info: VaultInfo): Map<string, VaultMultisetRow> {
+  const rows = new Map<string, VaultMultisetRow>();
+  for (const itemId of Object.keys(info.stock)) {
+    const held = Number(info.stock[itemId]);
+    const count = Number.isFinite(held) ? held : 0;
+    const key = JSON.stringify([itemId, null]);
+    rows.set(key, { itemId, instance: null, count });
+  }
+  for (const slot of info.special) {
+    const instance = vaultSpecialLedgerIdentity(slot);
+    const key = JSON.stringify([slot.itemId, instance]);
+    const prior = rows.get(key);
+    if (prior) prior.count += slot.count;
+    else rows.set(key, { itemId: slot.itemId, instance, count: slot.count });
+  }
+  return rows;
 }
 
 // Observe a vault op's outcome by diffing the before/after vaultInfoFor
@@ -526,26 +553,32 @@ export function diffVaultOp(
     ];
   }
 
-  const keys = [...new Set([...Object.keys(before.stock), ...Object.keys(after.stock)])].sort();
+  const beforeRows = vaultMultiset(before);
+  const afterRows = vaultMultiset(after);
+  const keys = [...new Set([...beforeRows.keys(), ...afterRows.keys()])].sort();
   const out: BankOpDelta[] = [];
-  for (const itemId of keys) {
-    const delta = vaultCount(after.stock, itemId) - vaultCount(before.stock, itemId);
+  for (const key of keys) {
+    const beforeRow = beforeRows.get(key);
+    const afterRow = afterRows.get(key);
+    const row = afterRow ?? beforeRow;
+    if (!row) continue;
+    const delta = (afterRow?.count ?? 0) - (beforeRow?.count ?? 0);
     // A deposit takes ids the vault GAINED, a withdraw ids it LOST. A key that
     // fell to zero is deleted from the record by vaultWithdraw, which the
     // key-union walk sees as a full withdraw of its whole before-count.
     if (op === 'deposit' && delta > 0) {
       out.push({
-        itemId,
+        itemId: row.itemId,
         count: delta,
-        instance: null,
+        instance: row.instance,
         copperDelta: 0,
         purchasedSlotsAfter: after.upgrades,
       });
     } else if (op === 'withdraw' && delta < 0) {
       out.push({
-        itemId,
+        itemId: row.itemId,
         count: -delta,
-        instance: null,
+        instance: row.instance,
         copperDelta: 0,
         purchasedSlotsAfter: after.upgrades,
       });

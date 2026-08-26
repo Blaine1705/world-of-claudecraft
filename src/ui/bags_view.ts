@@ -120,9 +120,6 @@ export type BagAction =
   | 'vaultDeposit'
   /** Not in the honest material set: the vault stores materials only. */
   | 'vaultDepositBlockedNotMaterial'
-  /** A material slot carrying an instance payload or crafted provenance:
-   *  count-only storage refuses rather than flattens it. */
-  | 'vaultDepositBlockedPayload'
   | 'petFeed'
   | 'petFeedBlocked'
   | 'discardQuest'
@@ -173,9 +170,8 @@ export function bagItemAction(
   mode: BagMode,
   instance?: ItemInstancePayload,
   /** The slot's crafting provenance marker (InvSlot.craftedRecipeId): read
-   *  only by the vaultDeposit arm (count-only storage refuses it) and the
-   *  bank socket arm (bank sockets store bare ids, so a marked bag deposits
-   *  instead), so every other caller may omit it. */
+   *  by the bank socket arm (bank sockets store bare ids, so a marked bag
+   *  deposits instead). The vault preserves it, so it never blocks there. */
   craftedRecipeId?: string,
 ): BagAction {
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
@@ -227,14 +223,10 @@ export function bagItemAction(
     return 'bankDeposit';
   }
   // The VAULT tab: materials only (membership computed by the caller from the
-  // honest id set, never approximated by kind), and a slot carrying an
-  // instance payload or crafted provenance is refused rather than flattened
-  // (count-only storage, the sim's own two deny lines pre-empted in order:
-  // the payload arm fires only for a stack that IS a material, mirroring the
-  // sim's gate order so both surfaces voice the same sentence).
+  // honest id set, never approximated by kind). Identity payloads and crafted
+  // provenance are accepted and preserved by the vault's special collection.
   if (mode.vaultDeposit) {
     if (!item.vaultMaterial) return 'vaultDepositBlockedNotMaterial';
-    if (instance || craftedRecipeId !== undefined) return 'vaultDepositBlockedPayload';
     return 'vaultDeposit';
   }
   // The bank window is open but NEITHER grid is on screen to drop into (today:
@@ -484,12 +476,10 @@ export function bagTooltipHintKey(
     }
     return 'hudChrome.bank.depositHint';
   }
-  // The vault twin: every refused dimension (not a material, instance payload,
-  // crafted provenance) reads the one vault cannot-hint; the click deny then
-  // voices the exact sim line. Distinct keys from the personal pair because
-  // the target differs.
+  // The vault twin: only a non-material is refused. Identity-bearing materials
+  // keep the same deposit hint because the vault preserves their visuals.
   if (mode.vaultDeposit) {
-    return !item.vaultMaterial || instance || craftedRecipeId !== undefined
+    return !item.vaultMaterial
       ? 'hudChrome.bank.vaultCannotDeposit'
       : 'hudChrome.bank.vaultDepositHint';
   }

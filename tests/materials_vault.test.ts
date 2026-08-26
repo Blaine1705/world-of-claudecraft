@@ -25,6 +25,7 @@ import {
   VAULT_UPGRADE_STEP,
   vaultCapacityPerMaterial,
   vaultMaterialIds,
+  vaultStoredCount,
 } from '../src/sim/materials_vault';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
@@ -151,7 +152,7 @@ const stripComments = (src: string): string =>
 // The item-safety covenant, mechanized: carried copies plus vaulted copies of one id.
 function totalHeld(m: Meta, itemId: string): number {
   const carried = m.inventory.reduce((n, s) => (s.itemId === itemId ? n + s.count : n), 0);
-  return carried + (m.vault.stock[itemId] ?? 0);
+  return carried + vaultStoredCount(m.vault, itemId);
 }
 const carriedCount = (m: Meta, itemId: string) =>
   m.inventory.reduce((n, s) => (s.itemId === itemId ? n + s.count : n), 0);
@@ -210,7 +211,7 @@ describe('every vault command is banker-gated', () => {
     const sim = makeVaultWorld();
     const pid = sim.addPlayer('warrior', 'Withdrawer');
     const m = meta(sim, pid);
-    m.vault = { stock: { copper_ore: 7 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 7 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
 
     moveFarFromBankers(sim, pid);
@@ -281,7 +282,7 @@ describe('every vault command is banker-gated', () => {
     // the proximity gate, so a corpse gets no refusal line at all.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 6 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 6 }, special: [], upgrades: 1 };
     m.copper = LADDER_TOTAL;
     sim.addItem('iron_ore', 4);
     sim.player.dead = true;
@@ -434,42 +435,43 @@ describe('deposit rules', () => {
     expect(totalHeld(m, 'boar_hide')).toBe(before);
   });
 
-  it('refuses a material slot carrying an instance payload (the stock is count-only)', () => {
-    // Vault stock is a bare id-to-count map with nowhere to keep a payload, so a
-    // slot that HAS one must be refused rather than silently laundered.
+  it('preserves a material slot carrying an instance payload in special storage', () => {
     const sim = makeSim();
     const m = meta(sim);
     m.vault.upgrades = 5;
+    const bagBase = clone(m.inventory);
     m.inventory.push({ itemId: 'copper_ore', count: 3, instance: { signer: 'Ana' } });
     const before = totalHeld(m, 'copper_ore');
-    const bagSnap = clone(m.inventory);
     sim.drainEvents();
     sim.vaultDeposit(m.inventory.findIndex((s) => s.instance !== undefined));
-    // The distinct literal matters: the slot IS a material, so the only-materials
-    // line would lie about why it was refused.
-    const evs = sim.drainEvents();
-    expect(hasErr(evs, CANNOT_STORE)).toBe(true);
-    expect(hasErr(evs, NOT_A_MATERIAL)).toBe(false);
-    expect(m.inventory).toEqual(bagSnap);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(m.inventory).toEqual(bagBase);
     expect(m.vault.stock).toEqual({});
+    expect(m.vault.special).toEqual([
+      { itemId: 'copper_ore', count: 3, instance: { signer: 'Ana' } },
+    ]);
     expect(totalHeld(m, 'copper_ore')).toBe(before);
   });
 
-  it('refuses a material slot carrying a craftedRecipeId marker', () => {
-    // The same defect one arm over: the crafted-provenance marker rides the SLOT,
-    // and a count-only stock would erase it, laundering a self-crafted material
-    // into an indistinguishable gathered one on one round trip.
+  it('preserves a material slot carrying a craftedRecipeId marker', () => {
     const sim = makeSim();
     const m = meta(sim);
     m.vault.upgrades = 5;
+    const bagBase = clone(m.inventory);
     sim.addItem('copper_ore', 4, sim.playerId, { craftedRecipeId: 'recipe_test_crafted' });
     const before = totalHeld(m, 'copper_ore');
-    const bagSnap = clone(m.inventory);
     sim.drainEvents();
     sim.vaultDeposit(m.inventory.findIndex((s) => s.craftedRecipeId !== undefined));
-    expect(hasErr(sim.drainEvents(), CANNOT_STORE)).toBe(true);
-    expect(m.inventory).toEqual(bagSnap);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(m.inventory).toEqual(bagBase);
     expect(m.vault.stock).toEqual({});
+    expect(m.vault.special).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 4,
+        craftedRecipeId: 'recipe_test_crafted',
+      },
+    ]);
     expect(totalHeld(m, 'copper_ore')).toBe(before);
   });
 
@@ -515,7 +517,7 @@ describe('deposit rules', () => {
     // completely unaffected.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 40 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 40 }, special: [], upgrades: 1 };
     sim.addItem('iron_ore', 9);
     sim.drainEvents();
     sim.vaultDeposit(slotIndexOf(m, 'iron_ore'));
@@ -529,7 +531,7 @@ describe('deposit rules', () => {
     // apply here: a material is fungible, so a partial move loses nothing).
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 30 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 30 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 20);
     const before = totalHeld(m, 'copper_ore');
     expect(before).toBe(50);
@@ -544,7 +546,7 @@ describe('deposit rules', () => {
   it('refuses a deposit at exactly zero headroom, moving nothing', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 40 }, upgrades: 1 }; // sitting exactly on the cap
+    m.vault = { stock: { copper_ore: 40 }, special: [], upgrades: 1 }; // sitting exactly on the cap
     sim.addItem('copper_ore', 5);
     const before = totalHeld(m, 'copper_ore');
     const bagSnap = clone(m.inventory);
@@ -641,7 +643,7 @@ describe('deposit rules', () => {
     // on the stored count's own sanity arm.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     m.inventory.push({ itemId: 'copper_ore', count: 1e21 });
     m.inventory.push({ itemId: 'rough_hide', count: Number.NaN });
     m.inventory.push({ itemId: 'ashwood_log', count: Number.POSITIVE_INFINITY });
@@ -697,7 +699,7 @@ describe('deposit rules', () => {
     // cadence change even though the final state would agree).
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     QUESTS.__vault_uncredit = {
       ...QUESTS.q_widows,
       id: '__vault_uncredit',
@@ -729,7 +731,7 @@ describe('withdraw rules', () => {
   it('withdraws the whole stock back into the bags', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 15 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 15 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
     sim.drainEvents();
     sim.vaultWithdraw('copper_ore');
@@ -742,7 +744,7 @@ describe('withdraw rules', () => {
   it('withdraws an exact partial count, decrementing the stock', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 15 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 15 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
     sim.vaultWithdraw('copper_ore', 4);
     expect(m.vault.stock).toEqual({ copper_ore: 11 });
@@ -756,7 +758,7 @@ describe('withdraw rules', () => {
     // like any other addStacked grant.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 10 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 10 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 15);
     const before = totalHeld(m, 'copper_ore');
     sim.vaultWithdraw('copper_ore');
@@ -774,7 +776,7 @@ describe('withdraw rules', () => {
     // an ordinary stale read and takes everything stored rather than nothing.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 6 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 6 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
     sim.drainEvents();
     sim.vaultWithdraw('copper_ore', 99);
@@ -787,7 +789,7 @@ describe('withdraw rules', () => {
   it('treats a non-positive count as a SILENT no-op', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 6 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 6 }, special: [], upgrades: 1 };
     const bagSnap = clone(m.inventory);
     const vaultSnap = clone(m.vault);
     sim.drainEvents();
@@ -801,7 +803,7 @@ describe('withdraw rules', () => {
   it('treats an unknown or absent itemId as a SILENT no-op', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 5 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 5 }, special: [], upgrades: 1 };
     const bagSnap = clone(m.inventory);
     const vaultSnap = clone(m.vault);
     sim.drainEvents();
@@ -822,7 +824,7 @@ describe('withdraw rules', () => {
     // sanitization suite below.)
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 5 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 5 }, special: [], upgrades: 1 };
     const bagSnap = clone(m.inventory);
     const vaultSnap = clone(m.vault);
     sim.drainEvents();
@@ -840,7 +842,7 @@ describe('withdraw rules', () => {
   it('refuses a withdraw into full bags with the existing bags-full line, moving nothing', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 6 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 6 }, special: [], upgrades: 1 };
     fillBags(sim);
     const before = totalHeld(m, 'copper_ore');
     const bagSnap = clone(m.inventory);
@@ -857,7 +859,7 @@ describe('withdraw rules', () => {
     // 10-count withdrawal moves exactly 2 and leaves 8 in the vault.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 10 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 10 }, special: [], upgrades: 1 };
     fillBags(sim);
     m.inventory[m.inventory.length - 1] = { itemId: 'copper_ore', count: 18 };
     // Fixture preconditions: no free slot at all, and the one copper_ore stack has
@@ -900,7 +902,7 @@ describe('withdraw rules', () => {
     // to top up, and not one gear id is in the derived material set, so the only
     // headroom left in the bags is materials-only.
     m.inventory = GEAR_IDS.slice(0, 16).map((id) => ({ itemId: id, count: 1 }));
-    m.vault = { stock: { copper_ore: 15 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 15 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
     sim.drainEvents();
     sim.vaultWithdraw('copper_ore');
@@ -928,7 +930,7 @@ describe('withdraw rules', () => {
     expect(m.inventory.length).toBeGreaterThan(16); // general pool over budget
     // copper_ore stacks to 20, so 180 is exactly 9 fresh slots: it fits the split's
     // 12 free materials slots whole and does NOT fit the flat total's 8.
-    m.vault = { stock: { copper_ore: 180 }, upgrades: 5 };
+    m.vault = { stock: { copper_ore: 180 }, special: [], upgrades: 5 };
     // The revert this arm exists to catch, made EXECUTABLE rather than asserted in
     // prose: on this exact fixture the pre-phase-05 flat total pays out only 160,
     // so the full 180 below can only come from the split. If a backpack, satchel,
@@ -968,7 +970,7 @@ describe('withdraw rules', () => {
       ...fillers.map((id) => ({ itemId: id, count: 1 })),
     ];
     expect(m.inventory).toHaveLength(bagCapacity(m.bags)); // both pools exactly full
-    m.vault = { stock: { copper_ore: 6 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 6 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
     const bagSnap = clone(m.inventory);
     sim.drainEvents();
@@ -1026,7 +1028,7 @@ describe('the vaultInfo read boundary', () => {
   it('clones the stock at the read boundary: mutating the view never touches sim state', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 12, iron_ore: 3 }, upgrades: 2 };
+    m.vault = { stock: { copper_ore: 12, iron_ore: 3 }, special: [], upgrades: 2 };
     const info = sim.vaultInfoFor(sim.playerId);
     expect(info).not.toBeNull();
     info!.stock.copper_ore = 999;
@@ -1065,7 +1067,7 @@ describe('persistence and back-compat', () => {
   it('round-trips a populated vault deep-equal through serialize -> load -> serialize', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 37, iron_ore: 4 }, upgrades: 3 };
+    m.vault = { stock: { copper_ore: 37, iron_ore: 4 }, special: [], upgrades: 3 };
     m.copper = 4242;
 
     const s1 = sim.serializeCharacter(sim.playerId)!;
@@ -1080,6 +1082,7 @@ describe('persistence and back-compat', () => {
     expect(s2.vault).toEqual({ stock: { copper_ore: 37, iron_ore: 4 }, upgrades: 3 });
     expect(meta(sim2, pid2).vault).toEqual({
       stock: { copper_ore: 37, iron_ore: 4 },
+      special: [],
       upgrades: 3,
     });
   });
@@ -1093,7 +1096,7 @@ describe('persistence and back-compat', () => {
     expect('vault' in empty).toBe(true);
     expect(empty.vault).toEqual({ stock: {}, upgrades: 0 });
 
-    m.vault = { stock: { copper_ore: 5 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 5 }, special: [], upgrades: 1 };
     const state = sim.serializeCharacter(sim.playerId)!;
     expect(state.vault).not.toBe(m.vault);
     expect(state.vault!.stock).not.toBe(m.vault.stock);
@@ -1113,7 +1116,7 @@ describe('persistence and back-compat', () => {
     expect(() => {
       pid = sim2.addPlayer('warrior', 'Legacy', { state: legacy as never });
     }).not.toThrow();
-    expect(meta(sim2, pid).vault).toEqual({ stock: {}, upgrades: 0 });
+    expect(meta(sim2, pid).vault).toEqual({ stock: {}, special: [], upgrades: 0 });
     expect(() => sim2.serializeCharacter(pid)).not.toThrow();
     expect(sim2.serializeCharacter(pid)!.vault).toEqual({ stock: {}, upgrades: 0 });
   });
@@ -1284,10 +1287,19 @@ describe('vault load-path sanitization', () => {
     // A malformed stock must not take the rung count down with it (that would
     // silently re-lock a paid-up vault), and a malformed ladder must not discard
     // recoverable stock.
-    expect(loadWith({ stock: [1, 2, 3], upgrades: 3 }).m.vault).toEqual({ stock: {}, upgrades: 3 });
-    expect(loadWith({ stock: 'nope', upgrades: 2 }).m.vault).toEqual({ stock: {}, upgrades: 2 });
+    expect(loadWith({ stock: [1, 2, 3], upgrades: 3 }).m.vault).toEqual({
+      stock: {},
+      special: [],
+      upgrades: 3,
+    });
+    expect(loadWith({ stock: 'nope', upgrades: 2 }).m.vault).toEqual({
+      stock: {},
+      special: [],
+      upgrades: 2,
+    });
     expect(loadWith({ stock: { copper_ore: 5 }, upgrades: 'junk' }).m.vault).toEqual({
       stock: { copper_ore: 5 },
+      special: [],
       upgrades: 0,
     });
   });
@@ -1371,11 +1383,7 @@ describe('vault load-path sanitization', () => {
     }
   });
 
-  it('the REAL load path warns on a wholesale-dropped stock shape (the wiring, not just the sink)', () => {
-    // Deleting the owner argument at the sim.ts load site would leave every pure
-    // sanitize test green while returning the drop to a mislabeled or missing
-    // trace; this drives addPlayer with the wrong-shaped stock and asserts the
-    // accurately-labeled line reaches the console with the character's name.
+  it('the REAL load path aggregates a wholesale-dropped stock shape into the character warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       loadWith({ stock: [{ itemId: 'copper_ore', count: 5 }], upgrades: 1 });
@@ -1383,7 +1391,7 @@ describe('vault load-path sanitization', () => {
       expect(
         lines.some(
           (l) =>
-            l.includes('dropped malformed vault stock') &&
+            l.includes('dropped item-instance junk') &&
             l.includes('Tampered') &&
             l.includes('vault.stock:array'),
         ),
@@ -1402,7 +1410,11 @@ describe('vault load-path sanitization', () => {
         },
         `raw ${JSON.stringify(raw)}`,
       ).not.toThrow();
-      expect(loaded?.m.vault, `raw ${JSON.stringify(raw)}`).toEqual({ stock: {}, upgrades: 0 });
+      expect(loaded?.m.vault, `raw ${JSON.stringify(raw)}`).toEqual({
+        stock: {},
+        special: [],
+        upgrades: 0,
+      });
     }
   });
 
@@ -1655,12 +1667,12 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   // Total held count of one id across bags AND vault: the covenant's unit.
   const heldTotal = (m: Meta, itemId: string) =>
     m.inventory.filter((s) => s.itemId === itemId).reduce((sum, s) => sum + s.count, 0) +
-    (Object.hasOwn(m.vault.stock, itemId) ? m.vault.stock[itemId] : 0);
+    vaultStoredCount(m.vault, itemId);
 
   it('sweeps every eligible material in ONE call and leaves everything else alone', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 }; // cap 40 per material
+    m.vault = { stock: {}, special: [], upgrades: 1 }; // cap 40 per material
     sim.addItem('copper_ore', 10);
     sim.addItem('iron_ore', 4);
     sim.addItem(GEAR_IDS[0], 1); // not a material: must survive the sweep
@@ -1684,7 +1696,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('fills each material only to its headroom, descending by slot index', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 }; // cap 40
+    m.vault = { stock: {}, special: [], upgrades: 1 }; // cap 40
     // 60 copper_ore = three 20-stacks (stackSize 20). Headroom 40: the sweep
     // walks DESCENDING, so the two HIGHEST-index stacks splice out and the
     // FIRST stack survives untouched. The exact survivor pins the direction: an
@@ -1704,30 +1716,29 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     expect(heldTotal(m, 'copper_ore')).toBe(60);
   });
 
-  it('skips instance-payload and crafted-provenance slots silently (count-only storage)', () => {
+  it('sweeps instance-payload and crafted-provenance slots into special storage', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
+    const bagBase = clone(m.inventory);
     sim.addItem('copper_ore', 3);
     m.inventory.push({ itemId: 'copper_ore', count: 2, instance: { signer: 'Ana' } });
     sim.addItem('iron_ore', 2, sim.playerId, { craftedRecipeId: 'recipe_test_crafted' });
     sim.drainEvents();
     sim.vaultDepositAll();
-    // Where the TARGETED op refuses aloud (error.vaultCannotStore), the sweep
-    // skips silently: an offer over the whole inventory, not a claim about one
-    // slot.
     expect(errorTexts(sim.drainEvents())).toEqual([]);
     expect(m.vault.stock).toEqual({ copper_ore: 3 });
-    const instanced = m.inventory.find((s) => s.itemId === 'copper_ore' && s.instance);
-    expect(instanced?.count).toBe(2);
-    const crafted = m.inventory.find((s) => s.craftedRecipeId !== undefined);
-    expect(crafted?.count).toBe(2);
+    expect(m.vault.special).toEqual([
+      { itemId: 'iron_ore', count: 2, craftedRecipeId: 'recipe_test_crafted' },
+      { itemId: 'copper_ore', count: 2, instance: { signer: 'Ana' } },
+    ]);
+    expect(m.inventory).toEqual(bagBase);
   });
 
   it('a material already AT its ceiling is skipped whole, silently', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 40 }, upgrades: 1 }; // headroom 0
+    m.vault = { stock: { copper_ore: 40 }, special: [], upgrades: 1 }; // headroom 0
     sim.addItem('copper_ore', 5);
     sim.drainEvents();
     sim.vaultDepositAll();
@@ -1740,7 +1751,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('an over-capacity tolerated stock blocks new deposits without losing anything', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 90 }, upgrades: 1 }; // legacy over-cap (cap 40)
+    m.vault = { stock: { copper_ore: 90 }, special: [], upgrades: 1 }; // legacy over-cap (cap 40)
     sim.addItem('copper_ore', 5);
     sim.vaultDepositAll();
     expect(m.vault.stock).toEqual({ copper_ore: 90 }); // never truncated
@@ -1756,13 +1767,13 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     sim.vaultDepositAll();
     expect(hasErr(sim.drainEvents(), LOCKED)).toBe(true);
     expect(m.inventory).toEqual(bagSnap);
-    expect(m.vault).toEqual({ stock: {}, upgrades: 0 });
+    expect(m.vault).toEqual({ stock: {}, special: [], upgrades: 0 });
   });
 
   it('refuses away from every banker with the too-far line, moving nothing', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 5);
     moveFarFromBankers(sim);
     const bagSnap = clone(m.inventory);
@@ -1776,7 +1787,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('is a silent no-op while dead (the town-service idiom)', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 5);
     sim.player.dead = true;
     const bagSnap = clone(m.inventory);
@@ -1790,7 +1801,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('an inventory with nothing eligible is a silent success (no chatter, no change)', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     sim.addItem(GEAR_IDS[0], 1);
     const bagSnap = clone(m.inventory);
     sim.drainEvents();
@@ -1806,7 +1817,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     // THE SAME SLOT, and the total is conserved exactly.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 25 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 25 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 20);
     const stack = m.inventory.find((s) => s.itemId === 'copper_ore');
     sim.vaultDepositAll();
@@ -1827,7 +1838,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     // three units gone.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 10 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 10 }, special: [], upgrades: 1 };
     m.inventory.push({ itemId: 'copper_ore', count: -3 });
     m.inventory.push({ itemId: 'copper_ore', count: 0 });
     m.inventory.push({ itemId: 'copper_ore', count: Number.NaN });
@@ -1848,7 +1859,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     // slots beside it still sweep normally.
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     sim.addItem('iron_ore', 7); // the honest neighbor that must still move
     m.inventory.push({ itemId: 'copper_ore', count: 1e21 });
     m.inventory.push({ itemId: 'rough_hide', count: Number.POSITIVE_INFINITY });
@@ -1870,7 +1881,7 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   it('double-send: the second sweep finds nothing left and changes nothing', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: {}, upgrades: 1 };
+    m.vault = { stock: {}, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 10);
     sim.vaultDepositAll();
     const bagSnap = clone(m.inventory);
@@ -1882,11 +1893,11 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
   });
 
   // The mixed fixture both differentials share: honest full and partial moves,
-  // an at-cap material, payload and provenance refusals, a non-material, and
+  // an at-cap material, identity-preserving payload/provenance moves, a non-material, and
   // corrupt counts, applied identically to any sim the caller hands in.
   function seedDifferentialFixture(sim: Sim): void {
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 25, iron_ore: 40 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 25, iron_ore: 40 }, special: [], upgrades: 1 };
     sim.addItem('copper_ore', 20); // partial: headroom 15 of 20
     sim.addItem('rough_hide', 3); // full move
     sim.addItem('baked_bread', 1); // non-material, refused/skipped
@@ -1938,17 +1949,19 @@ describe('vaultDepositAll (the batched server-side sweep, Bank Storage Phase 03)
     const info = sim.vaultInfo;
     if (!info) throw new Error('vaultInfo must be non-null at the banker');
     const prediction = predictVaultDepositAll(invSnap, info, vaultMaterialIds());
-    const before = { ...m.vault.stock };
+    const before = new Map(
+      [...vaultMaterialIds()].map((itemId) => [itemId, vaultStoredCount(m.vault, itemId)]),
+    );
     sim.vaultDepositAll();
-    const movedTotal = Object.entries(m.vault.stock).reduce(
-      (n, [id, count]) => n + count - (before[id] ?? 0),
+    const movedTotal = [...vaultMaterialIds()].reduce(
+      (n, itemId) => n + vaultStoredCount(m.vault, itemId) - (before.get(itemId) ?? 0),
       0,
     );
     expect(prediction.items).toBe(movedTotal);
-    expect(prediction.items).toBe(18); // copper 15 (9 whole + 6 partial) + hide 3
+    expect(prediction.items).toBe(22); // copper 15 + hide 3 + two identity rows of 2
     // The order probe: whole-stack empties equal the slots that disappeared.
     expect(prediction.stacks).toBe(invSnap.length - m.inventory.length);
-    expect(prediction.stacks).toBe(2); // the copper 9-stack and the hide stack
+    expect(prediction.stacks).toBe(4); // copper 9, hide, instance, and recipe stacks
     // `full` means a ceiling held something depositable back: exactly the
     // slots that still pass the shared predicate after the sweep ran.
     expect(prediction.full).toBe(
@@ -2094,7 +2107,7 @@ describe('double-send safety', () => {
   it('a double-sent withdraw clamps to what remains; a double-sent buy charges per rung', () => {
     const sim = makeSim();
     const m = meta(sim);
-    m.vault = { stock: { copper_ore: 6 }, upgrades: 1 };
+    m.vault = { stock: { copper_ore: 6 }, special: [], upgrades: 1 };
     const before = totalHeld(m, 'copper_ore');
     sim.vaultWithdraw('copper_ore', 4);
     sim.vaultWithdraw('copper_ore', 4); // only 2 left: clamps, never negative
@@ -2165,7 +2178,7 @@ describe('emitVaultCraftConsume (the sort-and-aggregate contract, Phase 04 revie
   function emitted(draws: { itemId: string; count: number }[]): unknown[] {
     const events: unknown[] = [];
     const ctx = { emit: (ev: unknown) => events.push(ev) } as never;
-    const meta = { entityId: 9, vault: { stock: {}, upgrades: 3 } } as never;
+    const meta = { entityId: 9, vault: { stock: {}, special: [], upgrades: 3 } } as never;
     emitVaultCraftConsume(ctx, meta, draws);
     return events;
   }

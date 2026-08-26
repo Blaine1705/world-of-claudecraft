@@ -132,7 +132,10 @@ export type {
 // 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
 // Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
 // rejected before the new client can consume the old six-field snapshot.
-export const ONLINE_WORLD_LAYOUT_VERSION = 10 as const;
+// 11 = Materials Vault snapshots require the identity-preserving `special`
+// collection. An epoch-10 client can neither render nor select those rows, and
+// an epoch-10 server would omit them, stranding deposited special materials.
+export const ONLINE_WORLD_LAYOUT_VERSION = 11 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -166,7 +169,7 @@ export type {
   ActionBarLayoutRestore,
   ActionBarSlotAction,
 } from './world_api/action_bar';
-export type { BankBonusSource, BankInfo, VaultInfo } from './world_api/bank';
+export type { BankBonusSource, BankInfo, VaultInfo, VaultSpecialRef } from './world_api/bank';
 export type {
   BgFlagInfo,
   BgInfo,

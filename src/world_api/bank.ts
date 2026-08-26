@@ -81,10 +81,22 @@ export interface VaultInfo {
   // order (the loaded blob's, then deposits). A consumer that renders or
   // iterates it must sort.
   stock: Record<string, number>;
+  // Identity-bearing material stacks. Every row is a boundary-deep-clone and
+  // carries no advisory bag-cell `slot`; array order is snapshot-local only.
+  special: InvSlot[];
   upgrades: number; // purchased rungs 0..5 (0 = the vault is still locked)
   perMaterialCap: number; // 0 while locked, else 40 per purchased rung
   // Copper price of the NEXT rung, null once every rung is purchased.
   nextUpgradeCost: number | null;
+}
+
+/** Exact identity-preserving vault-row selector. The displayed index is only
+ *  the fast path; the server re-matches the complete fingerprint if it has
+ *  gone stale and never falls back to another copy by item id. */
+export interface VaultSpecialRef {
+  index: number;
+  instance?: InvSlot['instance'];
+  craftedRecipeId?: string;
 }
 
 export interface IWorldBank {
@@ -140,7 +152,7 @@ export interface IWorldBank {
   // Non-null only while standing at a banker NPC, like bankInfo.
   vaultInfo: VaultInfo | null;
   vaultDeposit(slotIndex: number, count?: number): void;
-  vaultWithdraw(itemId: string, count?: number): void;
+  vaultWithdraw(itemId: string, count?: number, special?: VaultSpecialRef): void;
   // Deposit every depositable carried material in ONE batched server-side
   // command (never a client-side loop of vaultDeposit sends: the command lane
   // burst and the per-send ledger amplification both forbid it; the ruling is

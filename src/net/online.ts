@@ -182,6 +182,7 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { decodeVaultInfoWire, vaultWithdrawPayload } from './vault_snapshot_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -3735,7 +3736,7 @@ export class ClientWorld implements IWorld {
       // explicit null that clears it. The parsed object is adopted BY REFERENCE:
       // a tolerated save can carry a dormant own '__proto__' key in `stock`, so
       // this must never be rebuilt by keyed assignment or Object.assign.
-      if (s.vault !== undefined) this.vaultInfo = s.vault;
+      if (s.vault !== undefined) this.vaultInfo = decodeVaultInfoWire(s.vault);
       // `cvault` follows the same delta contract as `vault` (omitted means
       // unchanged; the server encodes an explicit null when the craft-draw
       // gate closes, e.g. entering a dungeon) and the same BY-REFERENCE
@@ -5221,15 +5222,14 @@ export class ClientWorld implements IWorld {
   }
   // --- IWorldBank: Materials Vault deposit/withdraw/buy-upgrade (snake_case wire
   // strings). vaultInfo is a snapshot read (the mirror field above); the server
-  // re-validates banker proximity, material scope, the per-material cap, and the
-  // exact upgrade copper on every send. Deposit rides the bank idiom (`slot` is a
-  // carried-inventory index, optional partial `count`); withdraw is keyed by
-  // `itemId` because vault stock has no slots to index. ---
+  // re-validates banker proximity, material scope, cap, and price. Deposit uses
+  // carried-inventory index, optional partial `count`); pooled withdrawals use
+  // `itemId`, while special rows add their snapshot index plus fingerprint. ---
   vaultDeposit(slotIndex: number, count?: number): void {
     this.cmd({ cmd: 'vault_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
   }
-  vaultWithdraw(itemId: string, count?: number): void {
-    this.cmd({ cmd: 'vault_withdraw', itemId, ...(count !== undefined ? { count } : {}) });
+  vaultWithdraw(...args: Parameters<typeof vaultWithdrawPayload>): void {
+    this.cmd({ cmd: 'vault_withdraw', ...vaultWithdrawPayload(...args) });
   }
   vaultDepositAll(): void {
     this.cmd({ cmd: 'vault_deposit_all' });

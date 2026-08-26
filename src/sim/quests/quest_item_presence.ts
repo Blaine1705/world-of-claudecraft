@@ -54,6 +54,7 @@ export function playerHoldsQuestItem(
   // A hostile itemId ('toString') reads an inherited function here; NaN
   // comparisons make that arm false, so no Object.hasOwn dance is needed.
   if ((meta.vault.stock[itemId] ?? 0) > 0) return true;
+  if (meta.vault.special.some((slot) => slot.itemId === itemId && slot.count > 0)) return true;
   if (ctx.mailboxHoldsItem(meta, itemId)) return true;
   return ctx.marketListings.some(
     (l) => l.itemId === itemId && l.count > 0 && ctx.marketListingBelongsTo(l, meta),

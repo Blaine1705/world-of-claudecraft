@@ -21,7 +21,7 @@ import { bankLedgerIdle, diffBankOp, diffBankSocketOp, recordBankOp } from '../s
 import { insertBankLedgerRow, insertBankLedgerRows } from '../server/db';
 import { GameServer } from '../server/game';
 import { REALM } from '../server/realm';
-import type { BankInfo } from '../src/world_api';
+import type { BankInfo, VaultInfo } from '../src/world_api';
 
 const insertMock = vi.mocked(insertBankLedgerRow);
 // The vault observer writes through the BATCHED sibling (one insert per op,
@@ -570,13 +570,17 @@ describe('bank ledger dispatch integration', () => {
 // tests/vault_wire.test.ts; this block owns the pure diff contract.
 // ---------------------------------------------------------------------------
 
-import { diffVaultOp, recordVaultCraftConsume, recordVaultOp } from '../server/bank_ledger';
+import {
+  diffVaultOp,
+  recordVaultCraftConsume,
+  recordVaultOp,
+  vaultSpecialLedgerIdentity,
+} from '../server/bank_ledger';
 import {
   noopGameMetricsCounters,
   setGameMetricsCounters,
   type VaultLedgerIncident,
 } from '../server/http/game_signals';
-import type { VaultInfo } from '../src/world_api';
 
 // perMaterialCap follows VAULT_BASE_CAP + VAULT_UPGRADE_STEP * (upgrades - 1)
 // for realism, but diffVaultOp reads only stock, upgrades, and (for a buy)
@@ -585,9 +589,11 @@ function vinfo(
   stock: Record<string, number>,
   upgrades = 1,
   nextUpgradeCost: number | null = 50000,
+  special: VaultInfo['special'] = [],
 ): VaultInfo {
   return {
     stock,
+    special,
     upgrades,
     perMaterialCap: upgrades > 0 ? 40 + 40 * (upgrades - 1) : 0,
     nextUpgradeCost,
@@ -607,6 +613,55 @@ describe('diffVaultOp (pure)', () => {
     // 5, whereas recording 5 here would over-count to 7.
     expect(diffVaultOp('deposit', vinfo({ copper_ore: 2 }), vinfo({ copper_ore: 5 }))).toEqual([
       { itemId: 'copper_ore', count: 3, instance: null, copperDelta: 0, purchasedSlotsAfter: 1 },
+    ]);
+  });
+
+  it('diffs special rows by versioned full identity without merging them into pooled stock', () => {
+    const ada = {
+      itemId: 'copper_ore',
+      count: 1,
+      instance: { signer: 'Ada', rolled: { quality: 'rare' as const } },
+      craftedRecipeId: 'smelt_copper',
+    };
+    const after = vinfo({ copper_ore: 2 }, 1, 50000, [ada, { ...ada, count: 2 }]);
+
+    expect(diffVaultOp('deposit', vinfo({}), after)).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+      },
+      {
+        itemId: 'copper_ore',
+        count: 3,
+        instance: {
+          vaultSpecial: 1,
+          instance: { signer: 'Ada', rolled: { quality: 'rare' } },
+          craftedRecipeId: 'smelt_copper',
+        },
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+      },
+    ]);
+  });
+
+  it('keeps a sanitizer-demoted special row distinct with an all-null wrapper', () => {
+    const slot = { itemId: 'copper_ore', count: 2 };
+    expect(vaultSpecialLedgerIdentity(slot)).toEqual({
+      vaultSpecial: 1,
+      instance: null,
+      craftedRecipeId: null,
+    });
+    expect(diffVaultOp('withdraw', vinfo({}, 1, 50000, [slot]), vinfo({}))).toEqual([
+      {
+        itemId: 'copper_ore',
+        count: 2,
+        instance: { vaultSpecial: 1, instance: null, craftedRecipeId: null },
+        copperDelta: 0,
+        purchasedSlotsAfter: 1,
+      },
     ]);
   });
 

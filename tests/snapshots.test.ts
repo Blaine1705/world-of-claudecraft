@@ -4895,6 +4895,7 @@ describe('full self-state snapshot delta fixture', () => {
     // from the rung-2 literal in src/sim/materials_vault.ts).
     expect(client.vaultInfo).toEqual({
       stock: { copper_ore: 7 },
+      special: [],
       upgrades: 2,
       perMaterialCap: 80,
       nextUpgradeCost: 100000,

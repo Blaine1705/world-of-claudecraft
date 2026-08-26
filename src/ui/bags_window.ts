@@ -1624,13 +1624,11 @@ export class BagsWindow {
         }
         break;
       }
-      // The vault's pre-empt denies, voicing the exact lines the sim would
-      // refuse with (its established sim_i18n keys), sending nothing.
+      // The vault's one pre-empt deny voices the exact materials-only line the
+      // sim would refuse with, sending nothing. Identity-bearing materials
+      // reach the normal deposit arm and retain their payload in the vault.
       case 'vaultDepositBlockedNotMaterial':
         this.deps.showError(tSim('error.vaultOnlyMaterials'));
-        return;
-      case 'vaultDepositBlockedPayload':
-        this.deps.showError(tSim('error.vaultCannotStore'));
         return;
       // The guild pipe's pre-empt denies, each voicing the exact line the sim
       // would refuse with (its established sim_i18n keys), sending nothing.

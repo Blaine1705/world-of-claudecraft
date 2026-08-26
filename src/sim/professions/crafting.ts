@@ -503,8 +503,9 @@ function planCraftReagentDraw(
  *  The carried half counts only UNLOCKED units (issue 3042, item_lock.ts): a
  *  player-locked reagent copy is not spendable material, exactly like a
  *  held-but-bound copy is not sellable, so it can never satisfy this gate.
- *  Vault stock is bare counts with no instance payloads, so nothing there can
- *  be locked.
+ *  The drawable vault view deliberately exposes only ordinary pooled stock.
+ *  Identity-bearing special rows can be locked and are excluded from every
+ *  automatic craft and Create All plan.
  *
  *  `vaultStock` lets a caller that has ALREADY resolved the place gate hand
  *  its answer in rather than making this resolve it again (the gate walks the
@@ -828,8 +829,8 @@ export function resolveCraftForRecipe(
   // The masterwork signed-reagent input: a holding check over the recipe's
   // reagents BEFORE consumption (removeItem consumes end-backward, so the
   // signed copy itself may be what gets consumed), any signer counting.
-  // Deliberately still an INVENTORY-only check: vault stock is bare counts
-  // with no instance payloads, so nothing in it can carry a signer.
+  // Deliberately still an INVENTORY-only check: drawable vault stock excludes
+  // identity-bearing special rows, so nothing it can spend carries a signer.
   let signedReagentUsed = false;
   // Apply the plans decided above, one per reagent in reagent order. The two
   // flags are read off the SAME reagent this plan belongs to (the planner
@@ -1168,7 +1169,7 @@ export function maxCraftCountForRecipe(
   const scratch = meta.inventory.map((s) => ({ ...s }));
   const scratchVaultStock = craftVaultStockFor(ctx, pid);
   const scratchVault: MaterialsVaultState | null =
-    scratchVaultStock === null ? null : { stock: scratchVaultStock, upgrades: 0 };
+    scratchVaultStock === null ? null : { stock: scratchVaultStock, special: [], upgrades: 0 };
   const isJack = !!meta.archetype?.isJackOfAllTrades;
   let crafts = 0;
   while (crafts < CRAFT_BATCH_MAX) {
@@ -1183,9 +1184,9 @@ export function maxCraftCountForRecipe(
       (reagent) =>
         requiredReagentCountFor(
           // Inventory-only, and it stays that way: the discount is keyed on
-          // HOLDING a signed instance, and vault stock is bare counts with no
-          // instance payloads at all, so no signed copy can ever live there
-          // and the discount can never derive from the vault. Re-derived per
+          // HOLDING a signed instance, and drawable vault stock excludes every
+          // identity-bearing special row, so the discount can never derive
+          // from the vault. Re-derived per
           // iteration because the hold expires when the last signed copy is
           // consumed mid-batch.
           materialGradeIds(reagent.itemId).some((gradeId) =>

@@ -600,7 +600,7 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     });
   });
 
-  it('fails closed when the bank-storage client reaches an auth-world-9 server', () => {
+  it('fails closed when the special-vault client reaches an auth-world-10 server', () => {
     withDomStubs((_doc, harness) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
       const w = world as unknown as WorldProbe;
@@ -614,14 +614,14 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
       expect(socket.sent).toHaveLength(1);
       expect(JSON.parse(socket.sent[0])).toEqual(
         expect.objectContaining({
-          t: 'auth-world-10',
+          t: 'auth-world-11',
           token: 't',
           character: 1,
         }),
       );
 
-      // The release/v0.41.0 auth-world-9 server rejects this unknown future
-      // epoch before it can send the old six-field BankInfo shape.
+      // The auth-world-10 server rejects this unknown future epoch before it
+      // can send a VaultInfo shape with no identity-preserving collection.
       w.onMessage(
         JSON.stringify({
           t: 'error',

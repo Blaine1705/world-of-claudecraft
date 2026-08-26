@@ -1235,15 +1235,24 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   for (const slot of meta.bank.inventory) {
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
-  // Vault stock is count-only (no instance payloads by construction), so no
-  // rolled quality rides along. Sorted: stock is persisted as an object keyed by
-  // item id and Postgres jsonb re-orders object keys, so the raw walk order
-  // differs between a server-loaded and an offline character. The PERSISTED
-  // itemsDiscovered array is already host-identical (serializeDeedStats sorts on
-  // the way out); what the sort here protects is the LIVE Set's iteration
-  // order, which rides the dstats self-wire spread unsorted.
+  // Ordinary vault stock carries no instance quality. Sorted: stock is
+  // persisted as an object keyed by item id and Postgres jsonb re-orders object
+  // keys, so the raw walk order differs between a server-loaded and an offline
+  // character. The PERSISTED itemsDiscovered array is already host-identical
+  // (serializeDeedStats sorts on the way out); this protects the LIVE Set order
+  // that rides the dstats self wire.
   for (const itemId of Object.keys(meta.vault.stock).sort()) {
     markItemDiscovered(ctx, meta, itemId, undefined, RETRO_SEED);
+  }
+  // Identity-preserving vault rows retain rolled quality. Sort on every field
+  // that can affect the discovery marks, rather than on JSON serialization
+  // whose nested key order differs after a Postgres jsonb round trip.
+  for (const slot of [...meta.vault.special].sort((a, b) => {
+    const ak = `${a.itemId}\u0000${a.instance?.rolled?.quality ?? ''}\u0000${a.craftedRecipeId ?? ''}`;
+    const bk = `${b.itemId}\u0000${b.instance?.rolled?.quality ?? ''}\u0000${b.craftedRecipeId ?? ''}`;
+    return ak < bk ? -1 : ak > bk ? 1 : 0;
+  })) {
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
   // Sorted for the same reason: meta.equipment is rebuilt by spreading the save
   // blob, so its key order is jsonb-hostage too.

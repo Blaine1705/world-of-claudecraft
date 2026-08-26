@@ -16,17 +16,19 @@ import {
   type QuestItemPresenceCtx,
 } from '../src/sim/quests/quest_item_presence';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
+import type { InvSlot } from '../src/sim/types';
 
 const TOOL = 'gathering_sickle';
 
 function fakeMeta(
   bankItems: { itemId: string; count: number }[] = [],
   vaultStock: Record<string, number> = {},
+  vaultSpecial: InvSlot[] = [],
 ): PlayerMeta {
   return {
     entityId: 7,
     bank: { inventory: bankItems },
-    vault: { stock: vaultStock, upgrades: 0 },
+    vault: { stock: vaultStock, special: vaultSpecial, upgrades: 0 },
   } as unknown as PlayerMeta;
 }
 
@@ -91,6 +93,30 @@ describe('playerHoldsQuestItem, one store at a time', () => {
     // keeps the arm false, which is what lets it skip an Object.hasOwn guard.
     expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], {}), 'toString')).toBe(false);
     expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], {}), '__proto__')).toBe(false);
+  });
+
+  it('an identity-preserving Materials Vault copy counts too', () => {
+    expect(
+      playerHoldsQuestItem(
+        fakeCtx(),
+        fakeMeta([], {}, [{ itemId: TOOL, count: 1, instance: { signer: 'Ada' } }]),
+        TOOL,
+      ),
+    ).toBe(true);
+    expect(
+      playerHoldsQuestItem(
+        fakeCtx(),
+        fakeMeta([], {}, [{ itemId: TOOL, count: 0, craftedRecipeId: 'recipe_x' }]),
+        TOOL,
+      ),
+    ).toBe(false);
+    expect(
+      playerHoldsQuestItem(
+        fakeCtx(),
+        fakeMeta([], {}, [{ itemId: 'iron_ore', count: 3, instance: { signer: 'Ada' } }]),
+        TOOL,
+      ),
+    ).toBe(false);
   });
 
   it('a mailbox attachment counts', () => {

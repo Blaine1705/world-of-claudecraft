@@ -2724,7 +2724,7 @@ export class Sim {
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
       bank: emptyBankState(),
       bankBonusSources: [],
-      vault: { stock: {}, upgrades: 0 },
+      vault: { stock: {}, special: [], upgrades: 0 },
       guildMembership: null,
       vendorBuyback: [],
       copper: 0,
@@ -3072,7 +3072,7 @@ export class Sim {
       // materials_vault.ts sanitizeVaultState. Passing the owner (and no sink) makes
       // a wholesale-dropped wrong-shaped stock (the one shape tolerance cannot keep)
       // warn on its own accurately-labeled line, not the item-instance one.
-      meta.vault = vaultMod.sanitizeVaultState(s.vault, meta.name);
+      meta.vault = vaultMod.sanitizeVaultState(s.vault, meta.name, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
       for (const q of s.questLog) {
@@ -3919,7 +3919,7 @@ export class Sim {
       bank: savedBankState(meta.bank),
       // Hand-enumerated clone: tsc forces a new REQUIRED MaterialsVaultState field
       // to appear here, but an optional one would compile unpersisted; add it by hand.
-      vault: { stock: { ...meta.vault.stock }, upgrades: meta.vault.upgrades },
+      vault: vaultMod.savedVaultState(meta.vault),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -10960,8 +10960,8 @@ export class Sim {
     vaultMod.vaultDepositAll(this.ctx, pid);
   }
 
-  vaultWithdraw(itemId: string, count?: number, pid?: number): void {
-    vaultMod.vaultWithdraw(this.ctx, itemId, count, pid);
+  vaultWithdraw(...args: vaultMod.VaultWithdrawArgs): void {
+    vaultMod.vaultWithdraw(this.ctx, ...args);
   }
 
   vaultBuyUpgrade(pid?: number): void {
