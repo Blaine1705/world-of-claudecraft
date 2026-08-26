@@ -587,14 +587,10 @@ export class BankLedgerOutbox {
    * acknowledged snapshot is a no-op.
    */
   acknowledge(snapshot: BankLedgerOutboxSnapshot): boolean {
-    if (this.closed) return false;
+    if (!this.canAcknowledge(snapshot)) return false;
     const state = this.snapshotStates.get(snapshot);
-    if (!state || state.consumed) return false;
+    if (!state) return false;
     state.consumed = true;
-    if (state.batches.length > this.batches.length) return false;
-    for (let i = 0; i < state.batches.length; i++) {
-      if (this.batches[i] !== state.batches[i]) return false;
-    }
 
     let rows = 0;
     let encodedBytes = 0;
@@ -607,6 +603,19 @@ export class BankLedgerOutbox {
     this.queuedRows -= rows;
     this.queuedEncodedBytes -= encodedBytes;
     budgetRelease(this.budget, rows, encodedBytes);
+    return true;
+  }
+
+  /** Query-only half of acknowledge, used when several committed effect
+   *  queues must advance all-or-none. It accepts only an exact live snapshot
+   *  object whose immutable batch prefix is still at the queue head. */
+  canAcknowledge(snapshot: BankLedgerOutboxSnapshot): boolean {
+    if (this.closed) return false;
+    const state = this.snapshotStates.get(snapshot);
+    if (!state || state.consumed || state.batches.length > this.batches.length) return false;
+    for (let index = 0; index < state.batches.length; index++) {
+      if (this.batches[index] !== state.batches[index]) return false;
+    }
     return true;
   }
 

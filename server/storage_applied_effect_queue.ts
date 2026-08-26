@@ -100,17 +100,28 @@ export function snapshotStorageAppliedEffects(
   return queue.map((effect) => ({ ...effect }));
 }
 
+/** Query-only prefix check for a host that must acknowledge several effect
+ *  queues all-or-none after one transaction commits. */
+export function storageAppliedEffectsMatchPrefix(
+  queue: readonly StorageAppliedEffect[],
+  committed: readonly StorageAppliedEffect[],
+): boolean {
+  if (committed.length > queue.length) return false;
+  for (let index = 0; index < committed.length; index++) {
+    const pending = queue[index];
+    if (!pending || !sameEffect(pending, committed[index])) return false;
+  }
+  return true;
+}
+
 /** Release only work proven durable by one committed save. Additions appended
  * while that save awaited remain behind the captured prefix. */
 export function acknowledgeStorageAppliedEffects(
   queue: StorageAppliedEffect[],
   committed: readonly StorageAppliedEffect[],
 ): void {
-  for (let i = 0; i < committed.length; i++) {
-    const pending = queue[i];
-    if (!pending || !sameEffect(pending, committed[i])) {
-      throw new Error('storage purchase effect acknowledgement mismatch');
-    }
+  if (!storageAppliedEffectsMatchPrefix(queue, committed)) {
+    throw new Error('storage purchase effect acknowledgement mismatch');
   }
   queue.splice(0, committed.length);
 }

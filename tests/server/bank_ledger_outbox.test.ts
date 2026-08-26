@@ -557,7 +557,9 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     expect(snapshot.batches.map((batch) => batch.batchKey)).toEqual(['batch:first']);
     expect(Object.isFrozen(snapshot)).toBe(true);
     expect(Object.isFrozen(snapshot.batches)).toBe(true);
+    expect(outbox.canAcknowledge(snapshot)).toBe(true);
     expect(outbox.acknowledge(snapshot)).toBe(true);
+    expect(outbox.canAcknowledge(snapshot)).toBe(false);
     expect(outbox.snapshot().batches.map((batch) => batch.batchKey)).toEqual(['batch:second']);
     expect(budget.usage).toEqual({ rows: 1, encodedBytes: second.encodedBytes });
     expect(budget.usage.encodedBytes).not.toBe(first.encodedBytes + second.encodedBytes);
@@ -597,6 +599,8 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
 
     expect(outbox.acknowledge(firstOnly)).toBe(true);
     const afterFirstAck = budget.usage;
+    expect(outbox.canAcknowledge(both)).toBe(false);
+    expect(outbox.canAcknowledge({ ...both })).toBe(false);
     expect(outbox.acknowledge(both)).toBe(false);
     expect(outbox.acknowledge(firstOnly)).toBe(false);
     expect(outbox.acknowledge({ ...both })).toBe(false);
@@ -629,6 +633,7 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
       reservedEncodedBytes: 0,
     });
     expect(outbox.acknowledge(snapshot)).toBe(false);
+    expect(outbox.canAcknowledge(snapshot)).toBe(false);
     expect(outbox.cancel(reservation)).toBe(false);
     expect(() => outbox.commit(reservation, [ledgerRow()])).toThrow(/discarded/i);
     expect(() =>

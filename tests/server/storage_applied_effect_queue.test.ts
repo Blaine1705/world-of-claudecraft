@@ -3,6 +3,7 @@ import {
   acknowledgeStorageAppliedEffects,
   snapshotStorageAppliedEffects,
   stageStorageAppliedEffect,
+  storageAppliedEffectsMatchPrefix,
 } from '../../server/storage_applied_effect_queue';
 import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
 
@@ -71,10 +72,12 @@ describe('storage applied effect queue', () => {
     const captured = snapshotStorageAppliedEffects(queue);
     stageStorageAppliedEffect(queue, second, 12);
 
+    expect(storageAppliedEffectsMatchPrefix(queue, captured)).toBe(true);
     acknowledgeStorageAppliedEffects(queue, captured);
 
     expect(queue).toEqual([second]);
     expect(captured).toEqual([first]);
+    expect(storageAppliedEffectsMatchPrefix(queue, captured)).toBe(false);
   });
 
   it('never splices work when the committed prefix does not match', () => {
@@ -82,9 +85,11 @@ describe('storage applied effect queue', () => {
     const exact = { ...base, purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 };
     stageStorageAppliedEffect(queue, exact, 6);
 
-    expect(() =>
-      acknowledgeStorageAppliedEffects(queue, [{ ...exact, itemId: 'strongbox_rung_02' }]),
-    ).toThrow(/acknowledgement mismatch/);
+    const mismatch = [{ ...exact, itemId: 'strongbox_rung_02' }];
+    expect(storageAppliedEffectsMatchPrefix(queue, mismatch)).toBe(false);
+    expect(() => acknowledgeStorageAppliedEffects(queue, mismatch)).toThrow(
+      /acknowledgement mismatch/,
+    );
     expect(queue).toEqual([exact]);
   });
 });
