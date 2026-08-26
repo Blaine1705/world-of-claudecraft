@@ -1335,6 +1335,8 @@ export interface PlayerMeta {
   // per-material ceiling. Capacity and move math live in materials_vault.ts.
   // Persisted (inside the character save, exactly like inventory/bags/bank).
   vault: MaterialsVaultState;
+  // Runtime-only change signal for the large owner-only vault wire; never persisted.
+  vaultWireRev: number;
   // Server-stamped guild membership (guild id + rank), the authorization input
   // the Guild Bank's officer-plus gate reads; written only through
   // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
@@ -2725,6 +2727,7 @@ export class Sim {
       bank: emptyBankState(),
       bankBonusSources: [],
       vault: { stock: {}, special: [], upgrades: 0 },
+      vaultWireRev: 0,
       guildMembership: null,
       vendorBuyback: [],
       copper: 0,
@@ -10947,31 +10950,28 @@ export class Sim {
   // -------------------------------------------------------------------------
   // The Materials Vault: the per-character material stockpile
   // -------------------------------------------------------------------------
-
-  // Thin delegates to the vault free functions (materials_vault.ts). The vault
-  // state lives on PlayerMeta.vault and serializes inside the character save;
-  // like the bank ops, each has one entry point gated on banker proximity.
-
+  // Thin delegates; materials_vault.ts owns state, persistence, gates, and revisions.
   vaultDeposit(slotIndex: number, count?: number, pid?: number): void {
     vaultMod.vaultDeposit(this.ctx, slotIndex, count, pid);
   }
-
   vaultDepositAll(pid?: number): void {
     vaultMod.vaultDepositAll(this.ctx, pid);
   }
-
   vaultWithdraw(...args: vaultMod.VaultWithdrawArgs): void {
     vaultMod.vaultWithdraw(this.ctx, ...args);
   }
-
   vaultBuyUpgrade(pid?: number): void {
     vaultMod.vaultBuyUpgrade(this.ctx, pid);
   }
-
   vaultInfoFor(pid: number): import('../world_api').VaultInfo | null {
     return vaultMod.vaultInfoFor(this.ctx, pid);
   }
-
+  vaultInfoWireRevFor(pid: number): number | null {
+    return vaultMod.vaultInfoWireRevFor(this.ctx, pid);
+  }
+  vaultWireRevFor(pid: number): number | null {
+    return vaultMod.vaultWireRevFor(this.ctx, pid);
+  }
   // NOT banker-gated, unlike every read above: gated instead on the
   // craft-from-vault context predicate (src/sim/vault_craft_gate.ts).
   craftVaultStockFor(pid: number): Record<string, number> | null {

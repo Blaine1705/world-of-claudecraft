@@ -74,6 +74,7 @@ import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import {
+  consumePlayerVaultStock,
   consumeVaultStock,
   craftVaultStockFor,
   drawableCounterFor,
@@ -861,7 +862,7 @@ export function resolveCraftForRecipe(
         removeUnlockedFromSlots(meta.inventory, take.itemId, take.count);
       }
     }
-    // REACHABLE ONLY BY A BUG. consumeVaultStock re-checks the row it is about
+    // REACHABLE ONLY BY A BUG. consumePlayerVaultStock re-checks the row it is about
     // to spend, and it cannot refuse one of these: the plan was built from
     // drawableVaultCount over this same live record, no take exceeds what its
     // row held, and no reagent's take was promised twice (the planner tallies
@@ -870,7 +871,7 @@ export function resolveCraftForRecipe(
     // really moved. (`meta &&` is unreachable for the same class of reason:
     // with no meta, vaultDrawStock returned null and plan.vault is empty.)
     for (const take of plan.vault) {
-      if (meta && consumeVaultStock(meta.vault, take.itemId, take.count)) vaultDraws.push(take);
+      if (meta && consumePlayerVaultStock(meta, take.itemId, take.count)) vaultDraws.push(take);
     }
   });
   // removeUnlockedFromSlots mutates the array only, unlike ctx.removeItem

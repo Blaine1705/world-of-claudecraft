@@ -17,6 +17,8 @@ import { bagCapacity, bagPools, countFit } from '../src/sim/bags';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import {
+  consumePlayerVaultStock,
+  consumeVaultStock,
   emitVaultCraftConsume,
   isVaultDepositableSlot,
   sanitizeVaultState,
@@ -2166,6 +2168,67 @@ describe('determinism', () => {
     expect(a.events).toContain(`log:${UPGRADE_NOTICE}`);
     expect(a.events).toContain(`error:${LOCKED}`);
     expect(a).toEqual(run());
+  });
+});
+
+describe('vault wire revision', () => {
+  it('bumps once per successful live mutation and never for refusals or scratch consumption', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItem('copper_ore', 8);
+
+    expect(m.vaultWireRev).toBe(0);
+    sim.vaultDeposit(slotIndexOf(m, 'copper_ore')); // locked refusal
+    expect(m.vaultWireRev).toBe(0);
+
+    m.copper = 20000;
+    sim.vaultBuyUpgrade();
+    expect(m.vaultWireRev).toBe(1);
+    sim.vaultBuyUpgrade(); // insufficient-funds refusal
+    expect(m.vaultWireRev).toBe(1);
+
+    sim.vaultDeposit(slotIndexOf(m, 'copper_ore'), 4);
+    expect(m.vaultWireRev).toBe(2);
+    sim.vaultWithdraw('copper_ore', 1);
+    expect(m.vaultWireRev).toBe(3);
+    sim.vaultWithdraw('iron_ore', 1); // empty-row refusal
+    expect(m.vaultWireRev).toBe(3);
+
+    m.inventory.push({
+      itemId: 'copper_ore',
+      count: 1,
+      instance: { signer: 'Wire revision' },
+    });
+    sim.vaultDeposit(m.inventory.length - 1);
+    expect(m.vaultWireRev).toBe(4);
+    sim.vaultWithdraw(
+      'copper_ore',
+      undefined,
+      { index: 0, instance: { signer: 'Wire revision' } },
+      sim.playerId,
+    );
+    expect(m.vaultWireRev).toBe(5);
+
+    sim.addItem('rough_hide', 2);
+    sim.addItem('ashwood_log', 3);
+    sim.vaultDepositAll();
+    expect(m.vaultWireRev).toBe(6); // one sweep, not one bump per moved row
+    sim.vaultDepositAll(); // empty sweep
+    expect(m.vaultWireRev).toBe(6);
+
+    expect(consumePlayerVaultStock(m, 'copper_ore', 1)).toBe(true);
+    expect(m.vaultWireRev).toBe(7);
+    expect(consumePlayerVaultStock(m, 'copper_ore', 999)).toBe(false);
+    expect(m.vaultWireRev).toBe(7);
+
+    const scratch = { stock: { copper_ore: 2 }, special: [], upgrades: 0 };
+    expect(consumeVaultStock(scratch, 'copper_ore', 1)).toBe(true);
+    expect(scratch.stock).toEqual({ copper_ore: 1 });
+    expect(m.vaultWireRev).toBe(7); // batch-planning scratch stays revision-free
+
+    const saved = sim.serializeCharacter(sim.playerId);
+    if (!saved) throw new Error('missing serialized character');
+    expect(saved).not.toHaveProperty('vaultWireRev');
   });
 });
 

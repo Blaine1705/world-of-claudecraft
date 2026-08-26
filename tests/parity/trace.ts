@@ -250,6 +250,7 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'talentMods', // derived from talents (recomputed)
   'fiestaMods', // derived from talentMods + augments
   'fiestaSpecial', // derived from augments
+  'vaultWireRev', // runtime-only vault snapshot dirty counter; never serialized/persisted
   'wireRev', // runtime-only wire-dirty counter; never serialized/persisted
 ]);
 

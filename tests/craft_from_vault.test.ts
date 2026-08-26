@@ -402,6 +402,7 @@ describe('craft consumption spends the bags before the vault', () => {
 
     expect(fingerprint(vaultOf(sim, pid))).toBe(before);
     expect(fingerprint(vaultOf(sim, pid))).toBe('copper_ore=10,smithing_flux=10');
+    expect(metaOf(sim, pid).vaultWireRev).toBe(0);
     expect(sim.countItem('copper_ore', pid)).toBe(0);
   });
 
@@ -411,6 +412,7 @@ describe('craft consumption spends the bags before the vault', () => {
     seedVault(sim, { copper_ore: 4, smithing_flux: 9 }, pid);
 
     expect(hasRecipeMaterials(sim.ctx, recipeById(VEST)!, pid)).toBe(true);
+    expect(metaOf(sim, pid).vaultWireRev).toBe(0);
     expect(resolveCraft(sim.ctx, pid, VEST).ok).toBe(true);
 
     expect(sim.countItem('eastbrook_chain_vest', pid)).toBe(1);
@@ -418,6 +420,7 @@ describe('craft consumption spends the bags before the vault', () => {
     expect(Object.hasOwn(vaultOf(sim, pid), 'copper_ore')).toBe(false);
     expect(Object.hasOwn(vaultOf(sim, pid), 'smithing_flux')).toBe(false);
     expect(vaultOf(sim, pid)).toEqual({});
+    expect(metaOf(sim, pid).vaultWireRev).toBe(2); // one immediate bump per live row decrement
   });
 
   it('a row drawn to zero is DELETED, and a partly spent row keeps its count', () => {
@@ -810,6 +813,7 @@ describe('batch crafting counts the vault', () => {
     seedVault(sim, { spider_leg: 2 }, pid); // 2 more from the vault
 
     expect(maxCraftCountForRecipe(sim.ctx, recipeById(JERKY)!, pid)).toBe(3);
+    expect(metaOf(sim, pid).vaultWireRev).toBe(0); // scratch planning never marks the live wire
   });
 
   it('excludes identity-bearing vault rows from Create All and automatic consumption', () => {
@@ -1209,6 +1213,7 @@ describe('apply-enchant draws carried-then-vault, grade-blind', () => {
     // 5 dust: the 2 carried go first, the vault pays the other 3.
     expect(sim.countItem('arcane_dust', pid)).toBe(0);
     expect(vaultOf(sim, pid).arcane_dust).toBe(7);
+    expect(metaOf(sim, pid).vaultWireRev).toBe(1);
     // The victim is untouched apart from carrying the enchant payload.
     const enchanted = metaOf(sim, pid).inventory.find(
       (slot) => slot.itemId === SWORD && slot.instance?.enchant,

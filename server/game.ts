@@ -356,7 +356,7 @@ import { recordUnstuckEvent } from './unstuck_records';
 import {
   CVAULT_WIRE_INTERVAL_TICKS,
   dispatchVaultCommand,
-  takeCvaultWireTurn,
+  emitVaultSelfKeys,
   VaultCraftConsumeBatch,
 } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
@@ -1099,7 +1099,11 @@ export interface ClientSession {
   lastMailWireTick: number;
   lastMailRev: number | null;
   lastMailRebuildTick: number;
-  // Craft-from-vault stock view, same idea at its own cadence (CVAULT_WIRE_HZ)
+  // Materials Vault projections: revision-gated, with cvault also cadence-gated.
+  lastVaultWirePid: number | null;
+  lastVaultWireRev: number | null;
+  lastCvaultWirePid: number | null;
+  lastCvaultWireRev: number | null;
   lastCvaultWireTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
@@ -2193,7 +2197,6 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
-    moderator.lastCvaultWireTick = -CVAULT_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastSellPriceItemIdRef = null;
@@ -2235,7 +2238,6 @@ export class GameServer {
     moderator.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
     moderator.lastDfWireTick = -DF_WIRE_INTERVAL_TICKS;
     moderator.lastMarketWireTick = -MARKET_WIRE_INTERVAL_TICKS;
-    moderator.lastCvaultWireTick = -CVAULT_WIRE_INTERVAL_TICKS;
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastSellPriceItemIdRef = null;
@@ -3789,6 +3791,10 @@ export class GameServer {
       lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
       lastMailRev: null,
       lastMailRebuildTick: 0,
+      lastVaultWirePid: null,
+      lastVaultWireRev: null,
+      lastCvaultWirePid: null,
+      lastCvaultWireRev: null,
       lastCvaultWireTick: -CVAULT_WIRE_INTERVAL_TICKS,
       selfHeavyDirty: true,
       lastWireRev: -1,
@@ -4011,19 +4017,10 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
-    // Load-bearing for every rev + cadence gate (market, mail, corder):
-    // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
-    // each gate's `sent.X === undefined` arm forces both dueness and a
-    // rebuild on the next snapshot, so the stale lastXRev trackers need no
-    // reset here (pinned by the resume case in
-    // tests/commission_wire_cadence.test.ts). A future resume that PRESERVES
-    // lastSent (a reconnect-bandwidth optimization) must reset those
-    // trackers instead, or the gates serve a stale view until their
-    // staleness backstops. cvault is the fourth gate and needs NOTHING here
-    // under either design: it is cadence-only (no rev tracker, no
-    // sent-undefined arm) and rebuilds unconditionally at dueness, so a
-    // rebuilt mirror is fresh within one CVAULT_WIRE_INTERVAL_TICKS window
-    // (250 ms), the key's documented staleness envelope.
+    // Load-bearing for every revision/cadence gate: sent.X === undefined forces
+    // a rebuild on the next snapshot, so stale market/mail/corder/vault/cvault
+    // trackers need no reset. Preserving lastSent here would require resetting
+    // those trackers instead. Focused reconnect tests pin the force-reship arm.
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
@@ -9123,13 +9120,8 @@ export class GameServer {
     // gate, the always-available ladder counter and why the two are keyed on
     // DIFFERENT sessions are all documented at the emission in bank_wire.ts.
     emitBankSelfKeys(maybe, this.sim, session, anchorSession);
-    // The Materials Vault + craft-from-vault stock view: bank's proximity
-    // posture and the cvault cadence inversion are documented in
-    // server/vault_wire.ts, which owns the dueness rule.
-    maybe('vault', this.sim.vaultInfoFor(anchorSession.pid));
-    if (takeCvaultWireTurn(session, this.sim.tickCount)) {
-      maybe('cvault', this.sim.craftVaultStockFor(anchorSession.pid));
-    }
+    // Revision-gated Materials Vault + cadence-backed craft stock projection.
+    emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid, this.sim.tickCount);
     // guild bank info follows the same pattern with a stricter gate: null
     // unless the player is alive, at a banker, AND stamped into a guild whose
     // book is loaded (sim guildBankInfoFor; ANY rank sees it, the snapshot's

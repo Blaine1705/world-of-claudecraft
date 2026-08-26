@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => {}),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -34,6 +35,7 @@ import {
   CVAULT_WIRE_INTERVAL_TICKS,
   decodeVaultSpecialRef,
   dispatchVaultCommand,
+  emitVaultSelfKeys,
   takeCvaultWireTurn,
   VaultCraftConsumeBatch,
   type VaultSim,
@@ -394,6 +396,42 @@ describe('materials vault wire round-trip', () => {
     (client as any).applySnapshot(snap2);
     expect(client.vaultInfo).toBe(vaultRef);
     expect(client.vaultInfo?.stock).toEqual({ copper_ore: 4 });
+  });
+
+  it('never rebuilds a large unchanged special-item snapshot, while proximity transitions stay immediate', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const { sim, pid, meta, banker } = seat(server, fw, 1, 'Vaultlarge', 0);
+    meta.vault.upgrades = 1;
+    meta.vault.special = Array.from({ length: 2_000 }, (_, index) => ({
+      itemId: 'copper_ore',
+      count: 1,
+      instance: { signer: `row-${index}` },
+    }));
+    const build = vi.spyOn(server.sim, 'vaultInfoFor');
+
+    broadcast(server);
+    expect(lastSnap(fw.sent).self.vault.special).toHaveLength(2_000);
+    expect(build).toHaveBeenCalledTimes(1);
+
+    for (let tick = 0; tick < 12; tick++) {
+      sim.tick();
+      broadcast(server);
+    }
+    expect(build).toHaveBeenCalledTimes(1);
+
+    const player = sim.entities.get(pid);
+    banker.pos = { x: player.pos.x + 1000, y: player.pos.y, z: player.pos.z + 1000 };
+    fw.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fw.sent).self.vault).toBeNull();
+    expect(build).toHaveBeenCalledTimes(1); // closing needs no deep clone
+
+    banker.pos = { ...player.pos };
+    fw.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fw.sent).self.vault.special).toHaveLength(2_000);
+    expect(build).toHaveBeenCalledTimes(2);
   });
 
   it("a dormant '__proto__' stock key rides the wire as an OWN key and pollutes no prototype", () => {
@@ -771,6 +809,58 @@ describe('materials vault wire round-trip', () => {
       expect(valuesUnderKey(rest, 'vault')).toEqual([]);
     }
     expect(moderator.pid).not.toBe(owner.pid);
+  });
+
+  it('spectate retarget re-ships vault and cvault even when both targets have the same revision', () => {
+    const server = new GameServer();
+    const modWs = fakeWs();
+    const aWs = fakeWs();
+    const bWs = fakeWs();
+    const moderator = joinServer(server, modWs, 5, 'Vaultswitcher');
+    const a = seat(server, aWs, 6, 'Vaultalpha', 0);
+    const b = seat(server, bWs, 7, 'Vaultbeta', 0);
+    a.meta.vault = { stock: { copper_ore: 2 }, special: [], upgrades: 1 };
+    b.meta.vault = { stock: { iron_ore: 3 }, special: [], upgrades: 1 };
+    expect(a.meta.vaultWireRev).toBe(0);
+    expect(b.meta.vaultWireRev).toBe(0);
+
+    // biome-ignore lint/suspicious/noExplicitAny: spectate entry is private by design
+    (server as any).enterSpectate(moderator, a.session);
+    broadcast(server);
+    expect(lastSnap(modWs.sent).self.vault.stock).toEqual({ copper_ore: 2 });
+    expect(lastSnap(modWs.sent).self.cvault).toEqual({ copper_ore: 2 });
+
+    // No tick and no revision change. The anchor reset's empty lastSent is the
+    // only signal that can force equal-revision target B through both gates.
+    // biome-ignore lint/suspicious/noExplicitAny: spectate entry is private by design
+    (server as any).enterSpectate(moderator, b.session);
+    modWs.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(modWs.sent).self.vault.stock).toEqual({ iron_ore: 3 });
+    expect(lastSnap(modWs.sent).self.cvault).toEqual({ iron_ore: 3 });
+  });
+
+  it('a linkdead resume re-ships unchanged vault keys immediately on the fresh socket', () => {
+    const server = new GameServer();
+    const firstWs = fakeWs();
+    const { session, meta } = seat(server, firstWs, 8, 'Vaultresume', 0);
+    meta.vault = { stock: { copper_ore: 4 }, special: [], upgrades: 1 };
+    broadcast(server);
+    expect(lastSnap(firstWs.sent).self.vault.stock).toEqual({ copper_ore: 4 });
+    expect(lastSnap(firstWs.sent).self.cvault).toEqual({ copper_ore: 4 });
+
+    firstWs.ws.readyState = 3;
+    expect(server.socketClosed(session, firstWs.ws)).toBe(true);
+    const resumedWs = fakeWs();
+    const resumed = server.join(resumedWs.ws, 8, 8, 'Vaultresume', 'warrior', null);
+    if ('error' in resumed) throw new Error(resumed.error);
+    expect(resumed).toBe(session);
+
+    // Same tick, same revisions, and the cadence marker still consumed. The
+    // empty lastSent created by resumeSession must nevertheless force both.
+    broadcast(server);
+    expect(lastSnap(resumedWs.sent).self.vault.stock).toEqual({ copper_ore: 4 });
+    expect(lastSnap(resumedWs.sent).self.cvault).toEqual({ copper_ore: 4 });
   });
 
   it('ledger rows: each successful op writes one container=vault row with the right fields', async () => {
@@ -1278,12 +1368,9 @@ describe('materials vault wire round-trip', () => {
 // decisive decode pins the dirtyEveryDeltaField harness cannot carry (its
 // player holds a live delve run, so the gate is closed there by construction).
 //
-// cvault is CADENCE-GATED (CVAULT_WIRE_INTERVAL_TICKS, 4 Hz): a snapshot
-// inside the interval omits the key regardless of change, so every arm that
-// wants a re-evaluation advances the sim past the interval first. The gate
-// itself has its own decisive pin below ("the cadence gate defers..."):
-// a same-tick rebroadcast after a REAL stock change must still omit the key,
-// which delta elision alone cannot explain.
+// cvault keeps the 4 Hz cadence (CVAULT_WIRE_INTERVAL_TICKS) while unchanged,
+// but a live vault mutation bypasses it so the crafting window never offers
+// already-spent stock. Context-only changes retain the existing <=250ms bound.
 // ---------------------------------------------------------------------------
 function advancePastCvaultCadence(sim: { tick(): unknown }): void {
   // The exported interval (CVAULT_WIRE_HZ 4 at DT 1/20 = 5 ticks) plus one
@@ -1293,31 +1380,27 @@ function advancePastCvaultCadence(sim: { tick(): unknown }): void {
 }
 
 describe('craft-from-vault stock delta (cvault)', () => {
-  it('the cadence gate defers a changed stock to the next EVALUATED snapshot (F2 pin)', () => {
-    // Delta elision cannot explain this omission: the stock REALLY changed
-    // between the two same-tick broadcasts, so only the cadence gate
-    // (takeCvaultWireTurn in server/vault_wire.ts) keeps the key off the
-    // second frame. Deleting the gate wrapper turns the middle assertion red.
+  it('a successful vault mutation bypasses cadence, then unchanged frames stay gated', () => {
     const server = new GameServer();
     const fw = fakeWs();
-    const { sim, meta } = seat(server, fw, 60, 'Cvaultcadence', 0);
+    const { sim, pid, meta } = seat(server, fw, 60, 'Cvaultcadence', 0, [['copper_ore', 5]]);
     meta.vault.upgrades = 1;
     meta.vault.stock = { copper_ore: 4 };
 
     broadcast(server);
     expect(lastSnap(fw.sent).self.cvault).toEqual({ copper_ore: 4 });
 
-    // A REAL change, then a SAME-TICK rebroadcast: the key must be absent.
-    meta.vault.stock = { copper_ore: 9 };
-    fw.sent.length = 0;
-    broadcast(server);
-    expect(lastSnap(fw.sent).self).not.toHaveProperty('cvault');
-
-    // Past the interval the changed rows arrive.
-    advancePastCvaultCadence(sim);
+    // Same tick and therefore nowhere near cadence due. The real deposit bumps
+    // the raw revision and must ship the new count immediately.
+    sim.vaultDeposit(itemIndex(sim, pid, 'copper_ore'), 5, pid);
     fw.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fw.sent).self.cvault).toEqual({ copper_ore: 9 });
+
+    // With the revision consumed, another same-tick pass stays cheap.
+    fw.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fw.sent).self).not.toHaveProperty('cvault');
   });
 
   it('an open-world snapshot carries the DRAWABLE rows and the mirror adopts by reference', () => {
@@ -1559,6 +1642,160 @@ describe('vault_wire module units', () => {
     expect(takeCvaultWireTurn(session, 0)).toBe(false);
     expect(takeCvaultWireTurn(session, CVAULT_WIRE_INTERVAL_TICKS - 1)).toBe(false);
     expect(takeCvaultWireTurn(session, CVAULT_WIRE_INTERVAL_TICKS)).toBe(true);
+  });
+
+  it('probes revisions every pass but builds vault payloads only on first send, change, or open/close', () => {
+    let gatedRev: number | null = 3;
+    const rawRev: number | null = 3;
+    let vaultBuilds = 0;
+    let cvaultBuilds = 0;
+    const sim = {
+      vaultInfoWireRevFor: () => gatedRev,
+      vaultWireRevFor: () => rawRev,
+      vaultInfoFor: () => {
+        vaultBuilds++;
+        return {
+          stock: { copper_ore: rawRev ?? 0 },
+          special: [],
+          upgrades: 1,
+          perMaterialCap: 40,
+          nextUpgradeCost: 50000,
+        };
+      },
+      craftVaultStockFor: () => {
+        cvaultBuilds++;
+        return { copper_ore: rawRev ?? 0 };
+      },
+    };
+    const session = {
+      lastSent: {} as Record<string, string>,
+      lastVaultWirePid: null as number | null,
+      lastVaultWireRev: null as number | null,
+      lastCvaultWirePid: null as number | null,
+      lastCvaultWireRev: null as number | null,
+      lastCvaultWireTick: -CVAULT_WIRE_INTERVAL_TICKS,
+    };
+    const emitted: [string, unknown][] = [];
+    const emit = (key: string, value: unknown): void => {
+      session.lastSent[key] = JSON.stringify(value ?? null);
+      emitted.push([key, value]);
+    };
+
+    emitVaultSelfKeys(emit, sim, session, 9, 0);
+    expect(emitted.map(([key]) => key)).toEqual(['vault', 'cvault']);
+    expect([vaultBuilds, cvaultBuilds]).toEqual([1, 1]);
+
+    emitted.length = 0;
+    emitVaultSelfKeys(emit, sim, session, 9, 1);
+    expect(emitted).toEqual([]);
+    expect([vaultBuilds, cvaultBuilds]).toEqual([1, 1]);
+
+    // A retarget is part of the signature even when the two characters happen
+    // to share a revision and lastSent remains populated.
+    emitVaultSelfKeys(emit, sim, session, 10, 1);
+    expect(emitted.map(([key]) => key)).toEqual(['vault', 'cvault']);
+    expect([vaultBuilds, cvaultBuilds]).toEqual([2, 2]);
+
+    emitted.length = 0;
+    gatedRev = null;
+    emitVaultSelfKeys(emit, sim, session, 10, 2);
+    expect(emitted).toEqual([['vault', null]]);
+    expect(vaultBuilds).toBe(2); // closing never builds the large value
+
+    emitted.length = 0;
+    gatedRev = 3;
+    emitVaultSelfKeys(emit, sim, session, 10, 3);
+    expect(emitted[0]?.[0]).toBe('vault');
+    expect(vaultBuilds).toBe(3);
+  });
+
+  it('bypasses cvault cadence on revision or lastSent change, then restores the 4 Hz gate', () => {
+    let rev = 4;
+    let builds = 0;
+    const sim = {
+      vaultInfoWireRevFor: () => rev,
+      vaultWireRevFor: () => rev,
+      vaultInfoFor: () => ({
+        stock: {},
+        special: [],
+        upgrades: 1,
+        perMaterialCap: 40,
+        nextUpgradeCost: 50000,
+      }),
+      craftVaultStockFor: () => {
+        builds++;
+        return { copper_ore: rev };
+      },
+    };
+    const session = {
+      lastSent: { vault: '{}' } as Record<string, string>,
+      lastVaultWirePid: 9 as number | null,
+      lastVaultWireRev: 4 as number | null,
+      lastCvaultWirePid: 9 as number | null,
+      lastCvaultWireRev: 4 as number | null,
+      lastCvaultWireTick: 10,
+    };
+    const emit = (key: string, value: unknown): void => {
+      session.lastSent[key] = JSON.stringify(value ?? null);
+    };
+
+    emitVaultSelfKeys(emit, sim, session, 9, 11);
+    expect(builds).toBe(1); // sent.cvault undefined forces a reconnect-style send
+
+    emitVaultSelfKeys(emit, sim, session, 9, 12);
+    expect(builds).toBe(1);
+    rev = 5;
+    emitVaultSelfKeys(emit, sim, session, 9, 12);
+    expect(builds).toBe(2); // mutation bypasses the not-due cadence
+    emitVaultSelfKeys(emit, sim, session, 9, 12 + CVAULT_WIRE_INTERVAL_TICKS - 1);
+    expect(builds).toBe(2);
+    emitVaultSelfKeys(emit, sim, session, 9, 12 + CVAULT_WIRE_INTERVAL_TICKS);
+    expect(builds).toBe(3); // unchanged context retains its cadence refresh
+  });
+
+  it('stamps cvault trackers only after the emitter accepts the rebuilt value', () => {
+    const session = {
+      lastSent: { vault: '{}' } as Record<string, string>,
+      lastVaultWirePid: 9 as number | null,
+      lastVaultWireRev: 8 as number | null,
+      lastCvaultWirePid: 9 as number | null,
+      lastCvaultWireRev: 7 as number | null,
+      lastCvaultWireTick: 20,
+    };
+    const sim = {
+      vaultInfoWireRevFor: () => 8,
+      vaultWireRevFor: () => 8,
+      vaultInfoFor: () => null,
+      craftVaultStockFor: () => ({ copper_ore: 8 }),
+    };
+    expect(() =>
+      emitVaultSelfKeys(
+        () => {
+          throw new Error('wire rejected');
+        },
+        sim,
+        session,
+        9,
+        21,
+      ),
+    ).toThrow('wire rejected');
+    expect(session.lastCvaultWireRev).toBe(7);
+    expect(session.lastCvaultWireTick).toBe(20);
+
+    session.lastSent.cvault = '{}';
+    session.lastCvaultWireRev = 8;
+    expect(() =>
+      emitVaultSelfKeys(
+        () => {
+          throw new Error('cadence wire rejected');
+        },
+        sim,
+        session,
+        9,
+        20 + CVAULT_WIRE_INTERVAL_TICKS,
+      ),
+    ).toThrow('cadence wire rejected');
+    expect(session.lastCvaultWireTick).toBe(20);
   });
 
   it('the consume batch filters sessionless pids, keeps rows, and drains on flush', async () => {

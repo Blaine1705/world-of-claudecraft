@@ -62,7 +62,11 @@ import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
-import { consumeVaultStock, drawableCounterFor, emitVaultCraftConsume } from '../materials_vault';
+import {
+  consumePlayerVaultStock,
+  drawableCounterFor,
+  emitVaultCraftConsume,
+} from '../materials_vault';
 import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
 // Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
@@ -837,7 +841,7 @@ function planEnchantReagentDraw(
 }
 
 /** Spend a planned reagent draw for real: bag takes through ctx.removeItem,
- *  vault takes through consumeVaultStock. Returns the vault units that
+ *  vault takes through consumePlayerVaultStock. Returns the vault units that
  *  actually moved, in spend order, for the caller's result field. */
 function applyEnchantReagentDraw(
   ctx: SimContext,
@@ -857,7 +861,7 @@ function applyEnchantReagentDraw(
     // a claim that units really moved, and recording only what committed is
     // the safe direction if that ever stops being true.
     for (const take of plan.vault) {
-      if (meta && consumeVaultStock(meta.vault, take.itemId, take.count)) drawn.push(take);
+      if (meta && consumePlayerVaultStock(meta, take.itemId, take.count)) drawn.push(take);
     }
   }
   // ONE emission site for all three apply arms: the tick-side ledger record

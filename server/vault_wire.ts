@@ -6,17 +6,16 @@
 // keep a one-line call into this module.
 //
 // Wire posture (moved verbatim from the game.ts self-block emission):
-// - `vault` rides beside `bank` on the same proximity gate (sim vaultInfoFor
-//   is null unless the player stands at a banker) and is SELF-BLOCK-ONLY: a
+// - `vault` rides beside `bank` on the same proximity gate and is
+//   SELF-BLOCK-ONLY: a
 //   private per-character store, so it never enters the interest-scoped
 //   entity broadcast and rides only the ANCHOR session's self block. Under
 //   moderator spectate the anchor is re-pointed at the spectated character,
 //   so a spectating moderator sees the SPECTATED player's vault in their own
-//   self block, exactly the posture bank and guildBank have. Not heavy-gated,
-//   for bank's reason. It is the third per-session nearBanker scan plus
-//   stringify on that path (bank, vault, guildBank), but the common away path
-//   is the cheap one: vaultInfoFor early-returns null before it clones any
-//   stock, and the unchanged null then delta-elides.
+//   self block, exactly the posture bank and guildBank have. A cheap proximity
+//   + revision signature runs every snapshot; the full identity-preserving
+//   projection is cloned only when that signature changes or a fresh
+//   connection has no lastSent value.
 // - `cvault` (the craft-from-vault stock view, Bank Storage Phase 04) has the
 //   SAME owner-only self-block posture, but is gated on the craft-draw
 //   context predicate (src/sim/vault_craft_gate.ts) instead of banker
@@ -62,6 +61,64 @@ export interface VaultSim {
   ): void;
   vaultDepositAll(pid?: number): void;
   vaultBuyUpgrade(pid?: number): void;
+}
+
+/** Narrow snapshot host: cheap revision probes stay separate from the two
+ *  potentially large boundary projections they guard. */
+export interface VaultSelfWireSim {
+  vaultInfoWireRevFor(pid: number): number | null;
+  vaultWireRevFor(pid: number): number | null;
+  vaultInfoFor(pid: number): VaultInfo | null;
+  craftVaultStockFor(pid: number): Record<string, number> | null;
+}
+
+export interface VaultSelfWireSession {
+  lastSent: Readonly<Record<string, string>>;
+  lastVaultWirePid: number | null;
+  lastVaultWireRev: number | null;
+  lastCvaultWirePid: number | null;
+  lastCvaultWireRev: number | null;
+  lastCvaultWireTick: number;
+}
+
+/** Emit the two owner-only vault self keys without rebuilding unchanged
+ *  projections. Banker proximity is still probed every snapshot, so vault
+ *  open/close is immediate. A live mutation bypasses cvault's 4 Hz cadence;
+ *  unchanged context evaluation keeps the existing cadence bound. */
+export function emitVaultSelfKeys(
+  emit: (key: 'vault' | 'cvault', value: unknown) => void,
+  sim: VaultSelfWireSim,
+  session: VaultSelfWireSession,
+  anchorPid: number,
+  tickCount: number,
+): void {
+  const vaultRev = sim.vaultInfoWireRevFor(anchorPid);
+  if (
+    session.lastSent.vault === undefined ||
+    anchorPid !== session.lastVaultWirePid ||
+    vaultRev !== session.lastVaultWireRev
+  ) {
+    emit('vault', vaultRev === null ? null : sim.vaultInfoFor(anchorPid));
+    session.lastVaultWirePid = anchorPid;
+    session.lastVaultWireRev = vaultRev;
+  }
+
+  const cvaultRev = sim.vaultWireRevFor(anchorPid);
+  const changed =
+    session.lastSent.cvault === undefined ||
+    anchorPid !== session.lastCvaultWirePid ||
+    cvaultRev !== session.lastCvaultWireRev;
+  if (changed) {
+    emit('cvault', sim.craftVaultStockFor(anchorPid));
+    session.lastCvaultWireTick = tickCount;
+    session.lastCvaultWirePid = anchorPid;
+    session.lastCvaultWireRev = cvaultRev;
+  } else if (cvaultWireDue(session, tickCount)) {
+    emit('cvault', sim.craftVaultStockFor(anchorPid));
+    session.lastCvaultWireTick = tickCount;
+    session.lastCvaultWirePid = anchorPid;
+    session.lastCvaultWireRev = cvaultRev;
+  }
 }
 
 const SPECIAL_REF_KEYS = new Set(['index', 'instance', 'craftedRecipeId']);
@@ -186,11 +243,15 @@ export function dispatchVaultCommand(
  *  Named as a TAKE, not a query: the true arm consumes this interval's turn,
  *  so a second call in the same pass returns false. The comparison keeps the
  *  original inline gate's `>=` form verbatim (its NaN behavior included). */
+function cvaultWireDue(session: { lastCvaultWireTick: number }, tickCount: number): boolean {
+  return tickCount - session.lastCvaultWireTick >= CVAULT_WIRE_INTERVAL_TICKS;
+}
+
 export function takeCvaultWireTurn(
   session: { lastCvaultWireTick: number },
   tickCount: number,
 ): boolean {
-  if (tickCount - session.lastCvaultWireTick >= CVAULT_WIRE_INTERVAL_TICKS) {
+  if (cvaultWireDue(session, tickCount)) {
     session.lastCvaultWireTick = tickCount;
     return true;
   }

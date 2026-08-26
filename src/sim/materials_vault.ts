@@ -190,6 +190,10 @@ export function vaultMaterialIds(): ReadonlySet<string> {
   return materialItemIds();
 }
 
+function bumpVaultWireRev(meta: Pick<PlayerMeta, 'vaultWireRev'>): void {
+  meta.vaultWireRev++;
+}
+
 /** Deposit a carried material into the vault. Ordinary fungible stacks join
  *  `stock`; identity-bearing stacks join `special` with their payload and
  *  provenance intact. Recipe-only stacks may partially fill the remaining
@@ -280,6 +284,7 @@ export function vaultDeposit(
     // id passed the content-derived material set, which contains no '__proto__'.
     vault.stock[slot.itemId] = pooled + moved;
   }
+  bumpVaultWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
 }
 
@@ -392,7 +397,10 @@ export function vaultDepositAll(ctx: SimContext, pid?: number): void {
     }
     movedAny = true;
   }
-  if (movedAny) ctx.onInventoryChangedForQuests(meta);
+  if (movedAny) {
+    bumpVaultWireRev(meta);
+    ctx.onInventoryChangedForQuests(meta);
+  }
 }
 
 /** Withdraw a material back into the carried inventory, gated by bag capacity.
@@ -448,6 +456,7 @@ export function vaultWithdraw(
     if (moved >= held) vault.special.splice(index, 1);
     else slot.count = held - moved;
     addStacked(meta.inventory, itemId, moved, slot.instance, slot.craftedRecipeId);
+    bumpVaultWireRev(meta);
     ctx.onInventoryChangedForQuests(meta);
     return;
   }
@@ -478,6 +487,7 @@ export function vaultWithdraw(
   if (moved >= held) delete vault.stock[itemId];
   else vault.stock[itemId] = held - moved;
   addStacked(meta.inventory, itemId, moved);
+  bumpVaultWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
 }
 
@@ -583,6 +593,15 @@ export function consumeVaultStock(
   return true;
 }
 
+/** Apply a planned draw to a LIVE player vault and advance its wire revision
+ *  immediately after the decrement. Scratch batch simulation keeps calling
+ *  consumeVaultStock directly, so planning remains side-effect free. */
+export function consumePlayerVaultStock(meta: PlayerMeta, itemId: string, count: number): boolean {
+  if (!consumeVaultStock(meta.vault, itemId, count)) return false;
+  bumpVaultWireRev(meta);
+  return true;
+}
+
 /** Emit the personal `vaultCraftConsume` event for a completed craft or
  *  enchant that drew reagent units from the vault, AFTER the decrement.
  *
@@ -685,6 +704,7 @@ export function vaultBuyUpgrade(ctx: SimContext, pid?: number): void {
   const unlocking = vault.upgrades === 0;
   meta.copper -= price;
   vault.upgrades += 1;
+  bumpVaultWireRev(meta);
   // Two emit sites rather than one with a ternary, so each line stays a literal
   // the client matcher and the S3 drift guard can both see.
   if (unlocking) ctx.notice(meta.entityId, 'You unlock the Materials Vault.');
@@ -699,11 +719,27 @@ export function vaultBuyUpgrade(ctx: SimContext, pid?: number): void {
  *  boundary-cloned view of PlayerMeta.vault. A pure read: it draws NO rng and
  *  never hands out the live stock record. `nextUpgradeCost` is the copper price
  *  of the NEXT rung, null once every rung has been bought. */
-export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {
+function vaultViewerFor(ctx: SimContext, pid: number): PlayerMeta | null {
   const r = ctx.resolve(pid);
   if (!r) return null;
   const { meta, e: p } = r;
   if (!nearBanker(ctx, p)) return null;
+  return meta;
+}
+
+/** Cheap proximity signature for the owner-only vault wire. */
+export function vaultInfoWireRevFor(ctx: SimContext, pid: number): number | null {
+  return vaultViewerFor(ctx, pid)?.vaultWireRev ?? null;
+}
+
+/** Cheap ungated revision for the craft-from-vault wire. */
+export function vaultWireRevFor(ctx: SimContext, pid: number): number | null {
+  return ctx.players.get(pid)?.vaultWireRev ?? null;
+}
+
+export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {
+  const meta = vaultViewerFor(ctx, pid);
+  if (!meta) return null;
   const vault = meta.vault;
   return {
     stock: { ...vault.stock },

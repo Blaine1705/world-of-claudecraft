@@ -190,6 +190,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'skin',
       'skinCatalog',
       'talentMods',
+      'vaultWireRev',
       'wireRev',
     ]);
   });
