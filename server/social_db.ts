@@ -391,6 +391,10 @@ export class PgSocialDb implements SocialDb {
         await client.query('ROLLBACK');
         return { error: 'already_in_guild' };
       }
+      // Founding a guild is joining one: clear any standing pledge in the
+      // same transaction, so no stale request lingers on another guild's
+      // board (docs/prd/guild-pledge-board.md).
+      await client.query('DELETE FROM guild_pledges WHERE character_id = $1', [leaderId]);
       await client.query('COMMIT');
       this.guildRoster.bust(guildId);
       bustAdminGuildListReads();

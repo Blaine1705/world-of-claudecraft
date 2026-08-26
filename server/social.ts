@@ -1175,13 +1175,17 @@ export class SocialService {
       // Online: accept sends the standard guild invite; membership stays the
       // invite flow's (which also wipes the ladder). The pledge is the
       // player's standing request, so it only resolves on a definite outcome:
-      // joining deletes it (guildAccept), a refused send leaves it on the
-      // board, and the silent blocked arm drops it so repeated accepts stay
-      // indistinguishable from the ordinary decline-then-nothing.
+      // joining deletes it (guildAccept), and a pledger who already joined a
+      // guild since pledging left the request stale, so it drops here. Every
+      // other refusal (full, a pending invite) AND the silent blocked arm
+      // leave the request standing: the pledge surviving an accept must never
+      // depend on the block relationship, or the board becomes an oracle for
+      // "this player has me blocked".
       const outcome = await this.guildInvite(actor, target.name);
-      if (outcome === 'blocked') {
+      if (outcome === 'refused' && (await this.db.guildMembership(target.id))) {
         await this.db.deletePledge(target.id);
         await this.refreshPledgeBadge(target.id);
+        this.tx.pushSnapshot(target.id);
       }
       await this.pushGuild(membership.guildId);
       return;
@@ -1208,8 +1212,10 @@ export class SocialService {
    *  request to join, so officer acceptance completes membership without the
    *  online invite handshake (which cannot reach an offline character); they
    *  find themselves in the guild on their next login (the join path stamps
-   *  membership from durable truth). Failure arms leave the pledge on the
-   *  board so an accepted request never silently disappears. */
+   *  membership from durable truth). A full guild keeps the request on the
+   *  board so the officer can free a seat and accept again; a pledger who
+   *  joined a guild since pledging left the request stale, so that arm
+   *  drops it. */
   private async seatOfflinePledger(
     actor: SocialActor,
     target: { id: number; name: string },

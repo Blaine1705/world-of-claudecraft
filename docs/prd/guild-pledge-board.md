@@ -62,7 +62,14 @@ high-score board) with the recruitment column:
     the rejection ladder either way, exactly like a real invite.
   - A refused accept (guild full, pledger already guilded elsewhere) leaves
     or resolves the pledge accordingly: full keeps it on the board; already
-    guilded drops the stale pledge.
+    guilded drops the stale pledge. Founding a guild also counts as joining
+    one and clears the founder's standing pledge.
+  - Block policy: a pledge is guild-scoped consent. A per-officer block still
+    suppresses the ONLINE invite delivery (the silent fake-success arm of the
+    invite flow), and that arm leaves the request standing, exactly like an
+    invite the pledger never answered, so nothing an officer observes can
+    reveal a block. The OFFLINE seat is not gated on any single officer's
+    block relationship: the player asked the guild, and the guild said yes.
 - Reject removes the pledge and advances that player's cooldown ladder for
   THIS guild (below).
 - Per-guild settings, officer-plus editable: pledges on/off, minimum pledge
