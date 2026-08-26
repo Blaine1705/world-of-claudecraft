@@ -25,6 +25,14 @@ import {
   tokenInfoFromRow,
 } from './auth_guard_core';
 import type { BankBonusFacts } from './bank_entitlements';
+import { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } from './bank_ledger_batch_db';
+import {
+  type BankLedgerSaveEffects,
+  characterUpdateStatement,
+  lockCharacterSaveEffectAccountsOnClient,
+  prepareBankLedgerSaveEffects,
+  writeBankLedgerSaveEffectsOnClient,
+} from './bank_ledger_save_effects_db';
 import {
   configureLifetimeXpRankCache,
   readLifetimeXpRankForCharacter,
@@ -81,7 +89,6 @@ import { chooseArchiveName } from './reclaim_name';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import {
-  lockStorageAppliedEffectAccountsOnClient,
   STORAGE_PURCHASE_SCHEMA,
   type StorageAppliedEffect,
   writeStorageAppliedEffectsOnClient,
@@ -93,6 +100,7 @@ import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
 
+export type { BankLedgerSaveEffects } from './bank_ledger_save_effects_db';
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
 // db.ts can import it without a cycle). Only marketStateKey was ever part of
@@ -1271,6 +1279,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    await client.query(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
     // Local-recovery reports reference accounts/characters, so their additive
     // schema runs after the core tables under the same boot advisory lock.
     await client.query(UNSTUCK_SCHEMA);
@@ -3393,47 +3402,26 @@ export async function renameCharacter(
   return row;
 }
 
-// The ONE fenced character UPDATE the whole save family issues
-// (saveCharacterState, saveCharacterAndMarketState, and the guild bank escrow
-// sibling). Extracted so the lease fence stays byte-identical across the
-// family: the fence rides the write statement itself (never a separate
-// pre-check that would race a takeover), and a nonce that matches no lease row
-// touches nothing, which every caller must treat as "persist NOTHING".
-function characterUpdateStatement(
-  characterId: number,
-  level: number,
-  stateJson: string,
-  leaseNonce: string | undefined,
-): { text: string; values: unknown[] } {
-  return leaseNonce === undefined
-    ? {
-        text: 'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-        values: [characterId, level, stateJson],
-      }
-    : {
-        text: `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
-        values: [characterId, level, stateJson, PROCESS_LEASE_HOLDER, leaseNonce],
-      };
-}
-
 export async function saveCharacterState(
   characterId: number,
   level: number,
   state: CharacterState,
   leaseNonce?: string,
   storageEffects: readonly StorageAppliedEffect[] = [],
+  ledgerEffects?: BankLedgerSaveEffects,
 ): Promise<boolean> {
+  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
-  // A character save should wait out a slow database rather than lose state, so
-  // run it on the raised heavy allowance; still bounded so a leave / shutdown
-  // flush cannot hang past the container stop grace.
-  const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), leaseNonce);
-  if (storageEffects.length === 0) {
+  // Wait on the bounded heavy allowance rather than lose state; leave and
+  // shutdown still cannot hang past the container stop grace.
+  const stmt = characterUpdateStatement(
+    characterId,
+    level,
+    JSON.stringify(cleanState),
+    PROCESS_LEASE_HOLDER,
+    leaseNonce,
+  );
+  if (storageEffects.length === 0 && !ledger) {
     const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
       query(stmt.text, stmt.values),
     );
@@ -3443,12 +3431,13 @@ export async function saveCharacterState(
   try {
     await client.query('BEGIN');
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
+    await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
     const res = await client.query(stmt.text, stmt.values);
     if ((res.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return false;
     }
+    await writeBankLedgerSaveEffectsOnClient(client, ledger);
     await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
@@ -3460,8 +3449,7 @@ export async function saveCharacterState(
   }
 }
 
-// Persist the character plus this realm's market/mail blobs atomically. They
-// are escrow halves: independent writes can lose or duplicate the item.
+// Persist character plus this realm's market/mail escrow blobs atomically.
 export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
@@ -3474,25 +3462,31 @@ export async function saveCharacterAndMarketState(
   // Out-parameter, same contract as saveCharacterAndGuildBankState's.
   results?: GuildBankWriteResult[],
   storageEffects: readonly StorageAppliedEffect[] = [],
+  ledgerEffects?: BankLedgerSaveEffects,
 ): Promise<boolean> {
   // The market backfill gate must open before this shared-row write.
   assertMarketWriteGateOpen();
+  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     // Wait out slow storage without exceeding the bounded heavy allowance.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
+    await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
     // Fence the bag half first; a miss rolls back before shared escrow writes.
     const stmt = characterUpdateStatement(
       characterId,
       level,
       JSON.stringify(cleanState),
+      PROCESS_LEASE_HOLDER,
       leaseNonce,
     );
     const charRes = await client.query(stmt.text, stmt.values);
-    if ((leaseNonce !== undefined || storageEffects.length > 0) && (charRes.rowCount ?? 0) === 0) {
+    if (
+      (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
+      (charRes.rowCount ?? 0) === 0
+    ) {
       await client.query('ROLLBACK');
       return false;
     }
@@ -3514,6 +3508,7 @@ export async function saveCharacterAndMarketState(
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
     await writeGuildBankRows(client, guildBanks ?? [], results);
+    await writeBankLedgerSaveEffectsOnClient(client, ledger);
     await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
@@ -3640,26 +3635,33 @@ export async function saveCharacterAndGuildBankState(
   // A refused result aborts and throws; committed entries are all written.
   results?: GuildBankWriteResult[],
   storageEffects: readonly StorageAppliedEffect[] = [],
+  ledgerEffects?: BankLedgerSaveEffects,
 ): Promise<boolean> {
+  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     // Escrow flushes use the bounded heavy allowance.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
+    await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
     const stmt = characterUpdateStatement(
       characterId,
       level,
       JSON.stringify(cleanState),
+      PROCESS_LEASE_HOLDER,
       leaseNonce,
     );
     const charRes = (await client.query(stmt.text, stmt.values)) as { rowCount: number | null };
-    if ((leaseNonce !== undefined || storageEffects.length > 0) && (charRes.rowCount ?? 0) === 0) {
+    if (
+      (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
+      (charRes.rowCount ?? 0) === 0
+    ) {
       await client.query('ROLLBACK');
       return false;
     }
     await writeGuildBankRows(client, guildBanks, results);
+    await writeBankLedgerSaveEffectsOnClient(client, ledger);
     await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
@@ -3752,27 +3754,25 @@ export async function saveCharacterStateOnClient(
   state: CharacterState,
   leaseNonce?: string,
   storageEffects: readonly StorageAppliedEffect[] = [],
+  ledgerEffects?: BankLedgerSaveEffects,
 ): Promise<boolean> {
+  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
-  await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
-  const res =
-    leaseNonce === undefined
-      ? await client.query(
-          'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
-          [characterId, level, JSON.stringify(cleanState)],
-        )
-      : await client.query(
-          `UPDATE characters SET level = $2, state = $3, updated_at = now()
-            WHERE id = $1
-              AND EXISTS (
-                SELECT 1 FROM character_leases
-                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
-              )`,
-          [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
-        );
+  await lockCharacterSaveEffectAccountsOnClient(client, storageEffects, ledger);
+  const stmt = characterUpdateStatement(
+    characterId,
+    level,
+    JSON.stringify(cleanState),
+    PROCESS_LEASE_HOLDER,
+    leaseNonce,
+  );
+  const res = await client.query(stmt.text, stmt.values);
   const saved =
-    leaseNonce === undefined && storageEffects.length === 0 ? true : (res.rowCount ?? 0) > 0;
+    leaseNonce === undefined && storageEffects.length === 0 && !ledger
+      ? true
+      : (res.rowCount ?? 0) > 0;
   if (!saved) return false;
+  await writeBankLedgerSaveEffectsOnClient(client, ledger);
   await writeStorageAppliedEffectsOnClient(client, storageEffects);
   return true;
 }
