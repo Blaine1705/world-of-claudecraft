@@ -65,7 +65,8 @@ export interface InstallDesktopEntryDeps {
   dir?: string;
   homeDir?: string;
   readFile?: (file: string, encoding: string) => string;
-  writeFile?: (file: string, data: string, encoding: string) => void;
+  writeFile?: (file: string, data: string, options: unknown) => void;
+  removeFile?: (file: string) => void;
   mkdir?: (dir: string, options: { recursive: boolean }) => unknown;
   rename?: (from: string, to: string) => void;
   fileExists?: (path: string) => boolean;

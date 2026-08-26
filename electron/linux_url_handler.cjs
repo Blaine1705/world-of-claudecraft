@@ -4,6 +4,7 @@ const {
   mkdirSync: nodeMkdirSync,
   readFileSync: nodeReadFileSync,
   renameSync: nodeRenameSync,
+  unlinkSync: nodeUnlinkSync,
   writeFileSync: nodeWriteFileSync,
 } = require('node:fs');
 const nodeOs = require('node:os');
@@ -135,6 +136,9 @@ function buildDesktopEntry({ execArgument, scheme, productName, tryExecPath }) {
   if (typeof execArgument !== 'string' || execArgument === '') return null;
   if (typeof scheme !== 'string' || !VALID_SCHEME.test(scheme)) return null;
   if (typeof productName !== 'string' || unrepresentable(productName)) return null;
+  if (tryExecPath != null && (typeof tryExecPath !== 'string' || unrepresentable(tryExecPath))) {
+    return null;
+  }
   const lines = [
     '[Desktop Entry]',
     'Type=Application',
@@ -146,6 +150,10 @@ function buildDesktopEntry({ execArgument, scheme, productName, tryExecPath }) {
   if (tryExecPath) lines.push(`TryExec=${tryExecPath}`);
   lines.push(
     `Icon=${DESKTOP_ENTRY_BASENAME}`,
+    // Matches the StartupWMClass electron-builder writes into the deb entry (it derives it
+    // from productName), so a window started from this entry groups under it instead of
+    // opening an unlabelled second taskbar item.
+    `StartupWMClass=${productName}`,
     'Terminal=false',
     'Categories=Game;',
     `MimeType=x-scheme-handler/${scheme};`,
@@ -258,9 +266,11 @@ function installDesktopEntry(deps = {}) {
     execArgument,
     scheme,
     productName,
-    // Only when the raw path needs no quoting: TryExec is a plain path key, not an Exec line,
-    // so it has no quoting or field-code layer to hide behind.
-    tryExecPath: EXEC_BARE_SAFE.test(appImagePath) ? appImagePath : null,
+    // Every path the module is willing to write, not just unquoted ones: TryExec is a plain
+    // path key with no Exec quoting or field-code layer, so a space in it needs no treatment.
+    // Gating it on the narrower unquoted set dropped it for exactly the paths most likely to
+    // go stale later (a space or a percent), which is where a launcher most needs it.
+    tryExecPath: appImagePath,
   });
   if (!entry) {
     log?.warn?.('[deeplink] refusing to write an unrepresentable .desktop entry');
@@ -306,8 +316,19 @@ function installDesktopEntry(deps = {}) {
     // crash or a concurrent second instance can never leave a torn entry, and it REPLACES a
     // symlink at the destination instead of following it into whatever it points at.
     const temp = `${file}.${process.pid}.tmp`;
-    writeFile(temp, entry, 'utf8');
-    rename(temp, file);
+    // 'wx' fails instead of following a symlink someone planted at the predictable temp path;
+    // the destination is already covered because rename replaces rather than follows.
+    try {
+      writeFile(temp, entry, { encoding: 'utf8', flag: 'wx' });
+      rename(temp, file);
+    } catch (err) {
+      // A rename that fails after the write lands would otherwise litter the applications
+      // directory with a .tmp file that nothing ever cleans up.
+      try {
+        (deps.removeFile ?? nodeUnlinkSync)(temp);
+      } catch {}
+      throw err;
+    }
   } catch (err) {
     log?.warn?.('[deeplink] could not write the .desktop entry', err);
     return { status: 'failed', file, entry };
@@ -323,11 +344,11 @@ function installDesktopEntry(deps = {}) {
  *
  * The safety property this module rests on lives HERE, not in the callers: execFile with an
  * ARRAY argv and NO `shell` option, so every argument reaches execve untouched and no
- * argument can ever be re-parsed by a shell. `execFile` is imported under an alias, which
- * means the malware scanner's call-site regex does not see this line at all (only the
- * child_process import on line 1, which scripts/malware_scan.mjs demotes for this file) --
- * so the test that pins these arguments is the real control against a later `shell: true`,
- * not the scanner. execFile is injectable for exactly that test.
+ * argument can ever be re-parsed by a shell. The scanner sees this call (the injectable
+ * parameter is itself named execFile, which its call-site regex matches) and demotes it to
+ * medium along with the import, so a reviewer reading a scan report finds the real spawn, not
+ * just the require. What the scanner cannot judge is the OPTIONS object, so the test pinning
+ * the absence of a `shell` key is the control against a later change adding one.
  */
 function defaultRunCommand(command, args, log, execFile = nodeExecFile) {
   try {

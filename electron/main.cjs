@@ -1191,17 +1191,22 @@ ipcMain.on('desktop-renderer-error', (event, payload) => {
 // xdg-settings. No-op on win32/darwin and on every non-AppImage Linux channel.
 const linuxUrlHandler = registerLinuxUrlHandler({ scheme: deepLinkProtocol, log });
 
-if (process.defaultApp) {
-  app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
-    path.resolve(process.argv[1]),
-  ]);
-} else {
-  app.setAsDefaultProtocolClient(deepLinkProtocol);
-}
 // CHROME_DESKTOP is process-wide and inherited by every child, including the browser we open
-// for the Discord login itself. It exists only for the registration above, so put it back the
-// moment that call returns (no-op on win32/darwin, and when nothing was set).
-linuxUrlHandler.restore();
+// for the Discord login itself. It exists only for the registration below, so the restore runs
+// in a finally: a throw from setAsDefaultProtocolClient would otherwise leave our app identity
+// set for every child, which is the exact outcome the module documents as the reason to
+// restore it. No-op on win32/darwin, and when nothing was set.
+try {
+  if (process.defaultApp) {
+    app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  } else {
+    app.setAsDefaultProtocolClient(deepLinkProtocol);
+  }
+} finally {
+  linuxUrlHandler.restore();
+}
 
 const singleInstance = app.requestSingleInstanceLock();
 if (!singleInstance) {

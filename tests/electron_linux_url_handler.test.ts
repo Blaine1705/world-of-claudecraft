@@ -36,21 +36,25 @@ function harness({
   existing = null,
   writeThrows = false,
   mkdirThrows = false,
+  renameThrows = false,
   entryExists = false,
   env = { APPIMAGE, HOME: '/home/deck' } as Record<string, string | undefined>,
 }: {
   existing?: string | null;
   writeThrows?: boolean;
   mkdirThrows?: boolean;
+  renameThrows?: boolean;
   entryExists?: boolean;
   env?: Record<string, string | undefined>;
 } = {}) {
-  const written: { file: string; data: string }[] = [];
+  const written: { file: string; data: string; options: unknown }[] = [];
+  const removed: string[] = [];
   const renamed: { from: string; to: string }[] = [];
   const dirs: { dir: string; options: unknown }[] = [];
   const ran: Ran[] = [];
   return {
     written,
+    removed,
     renamed,
     dirs,
     ran,
@@ -64,12 +68,16 @@ function harness({
         if (existing === null) throw new Error('ENOENT');
         return existing;
       },
-      writeFile: (file: string, data: string) => {
+      writeFile: (file: string, data: string, options: unknown) => {
         if (writeThrows) throw new Error('EROFS: read-only file system');
-        written.push({ file, data });
+        written.push({ file, data, options });
       },
       rename: (from: string, to: string) => {
+        if (renameThrows) throw new Error('EXDEV: cross-device link');
         renamed.push({ from, to });
+      },
+      removeFile: (file: string) => {
+        removed.push(file);
       },
       mkdir: (dir: string, options: unknown) => {
         if (mkdirThrows) throw new Error('EROFS: read-only file system');
@@ -153,13 +161,15 @@ describe('main.cjs wiring', () => {
     expect(install).toBeLessThan(register);
   });
 
-  it('restores CHROME_DESKTOP AFTER the registration, never before', () => {
-    // Restoring early would defeat the registration; never restoring leaks our app identity
-    // into every child process, including the login browser.
+  it('restores CHROME_DESKTOP after the registration, from a finally', () => {
+    // Restoring early would defeat the registration; not restoring at all leaks our app
+    // identity into every child, including the login browser. A finally makes it hold even if
+    // setAsDefaultProtocolClient throws, which is the case a plain trailing call misses.
     const register = main.indexOf('app.setAsDefaultProtocolClient(');
     const restore = main.indexOf('linuxUrlHandler.restore()');
     expect(restore).toBeGreaterThan(-1);
     expect(restore).toBeGreaterThan(register);
+    expect(main).toMatch(/\}\s*finally\s*\{\s*linuxUrlHandler\.restore\(\);\s*\}/);
   });
 
   it('actually CALLS it, exactly once, and not from inside a comment', () => {
@@ -298,6 +308,7 @@ describe('buildDesktopEntry', () => {
         `Exec=${APPIMAGE} %u`,
         `TryExec=${APPIMAGE}`,
         'Icon=world-of-claudecraft',
+        'StartupWMClass=World of ClaudeCraft',
         'Terminal=false',
         'Categories=Game;',
         `MimeType=x-scheme-handler/${SCHEME};`,
@@ -313,10 +324,26 @@ describe('buildDesktopEntry', () => {
     expect(entry).toContain(`Exec=${APPIMAGE} %u`);
   });
 
-  it('omits TryExec when the path needs quoting', () => {
-    // TryExec is a plain path key with no quoting layer, so a quoted Exec argument must not be
-    // copied into it verbatim.
-    expect(entryFor(`${DQUOTE}/a b/c.AppImage${DQUOTE}`, null)).not.toContain('TryExec');
+  it('carries TryExec for a path with spaces, UNQUOTED', () => {
+    // TryExec is a plain path key, not an Exec line: no field codes, no shell parsing, so a
+    // space needs no treatment and the quoted Exec form must NOT be copied into it. Gating this
+    // on the unquoted-safe set dropped TryExec for exactly the paths most likely to go stale,
+    // which is where a launcher most needs it to skip a dead entry.
+    const spaced = '/home/deck/My Games/woc.AppImage';
+    const entry = entryFor(`${DQUOTE}${spaced}${DQUOTE}`, spaced);
+    expect(entry).toContain(`TryExec=${spaced}`);
+    expect(entry).toContain(`Exec=${DQUOTE}${spaced}${DQUOTE} %u`);
+  });
+
+  it('refuses a tryExecPath it could not represent', () => {
+    expect(
+      buildDesktopEntry({
+        execArgument: '/x',
+        scheme: SCHEME,
+        productName: PRODUCT_NAME,
+        tryExecPath: `/x${NL}Exec=/bin/sh`,
+      }),
+    ).toBeNull();
   });
 
   it('is NOT NoDisplay, so it stays hand-pickable in an "open with" dialog', () => {
@@ -365,6 +392,49 @@ describe('installDesktopEntry', () => {
     expect(h.written[0].file.startsWith(`${ENTRY_PATH}.`)).toBe(true);
     expect(h.written[0].file.endsWith('.tmp')).toBe(true);
     expect(h.renamed).toEqual([{ from: h.written[0].file, to: ENTRY_PATH }]);
+  });
+
+  it('writes TryExec even when the AppImage path needs QUOTING in Exec', () => {
+    // The decisive level for this: the bug was installDesktopEntry deciding what to hand
+    // buildDesktopEntry, not buildDesktopEntry itself, so asserting on the built string alone
+    // cannot see it. A spaced path is quoted in Exec and must still appear bare in TryExec.
+    const spaced = '/home/deck/My Games/woc.AppImage';
+    const h = harness({ env: { APPIMAGE: spaced, HOME: '/home/deck' } });
+    installDesktopEntry(h.deps);
+
+    expect(h.written[0].data).toContain(`TryExec=${spaced}`);
+    expect(h.written[0].data).toContain(`Exec=${DQUOTE}${spaced}${DQUOTE} %u`);
+  });
+
+  it('writes TryExec for a path carrying a percent, which Exec has to escape', () => {
+    const pct = '/home/deck/Games 100%/woc.AppImage';
+    const h = harness({ env: { APPIMAGE: pct, HOME: '/home/deck' } });
+    installDesktopEntry(h.deps);
+
+    // Escaped in Exec (field codes), literal in TryExec (plain path key).
+    expect(h.written[0].data).toContain(
+      `Exec=${DQUOTE}/home/deck/Games 100%%/woc.AppImage${DQUOTE} %u`,
+    );
+    expect(h.written[0].data).toContain(`TryExec=${pct}`);
+  });
+
+  it('creates the temp file EXCLUSIVELY, so a planted symlink is an error not a write', () => {
+    // rename already protects the destination (it replaces rather than follows), but the temp
+    // path is predictable, so 'wx' is what stops a same-user process aiming it at another file.
+    const h = harness();
+    installDesktopEntry(h.deps);
+    expect(h.written[0].options).toEqual({ encoding: 'utf8', flag: 'wx' });
+  });
+
+  it('cleans up the temp file when the rename fails', () => {
+    // Otherwise a failed rename leaves a .tmp behind in the applications directory that nothing
+    // ever removes, and the next launch writes another one.
+    const h = harness({ renameThrows: true });
+    const result = installDesktopEntry(h.deps);
+
+    expect(result.status).toBe('failed');
+    expect(h.removed).toEqual([h.written[0].file]);
+    expect(h.ran).toEqual([]);
   });
 
   it('creates the applications dir RECURSIVELY', () => {
