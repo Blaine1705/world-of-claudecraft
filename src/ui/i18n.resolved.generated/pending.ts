@@ -28,24 +28,14 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "hudChrome.options.showTargetSwingTimer"
   ],
-  "zh_CN": [
-    "hudChrome.options.showTargetSwingTimer"
-  ],
-  "zh_TW": [
-    "hudChrome.options.showTargetSwingTimer"
-  ],
-  "ko_KR": [
-    "hudChrome.options.showTargetSwingTimer"
-  ],
-  "ja_JP": [
-    "hudChrome.options.showTargetSwingTimer"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.options.showTargetSwingTimer"
   ],
-  "ru_RU": [
-    "hudChrome.options.showTargetSwingTimer"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.options.showTargetSwingTimer"
   ],

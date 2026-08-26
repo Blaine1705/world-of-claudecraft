@@ -10397,6 +10397,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.blockedTaken': '{source}の攻撃をブロックし、{amount}のダメージを受けました。',
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
+  'hudChrome.options.showTargetSwingTimer': 'ターゲットの攻撃タイマーを表示',
   'hudChrome.options.showPetFrame': '自分のペットを表示',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',

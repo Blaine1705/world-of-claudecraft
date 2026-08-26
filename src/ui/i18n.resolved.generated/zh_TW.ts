@@ -1544,7 +1544,7 @@ export const zh_TW: EnTranslations = {
       "hideUnusedActionSlots": "隱藏未使用的動作欄位",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "顯示目標的揮砍計時器",
       "showPetFrame": "顯示你的寵物",
       "waterRipples": "水面漣漪（尾波）",
       "showAttackButton": "顯示攻擊按鈕",
