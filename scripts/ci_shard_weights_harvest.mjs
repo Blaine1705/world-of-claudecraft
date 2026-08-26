@@ -75,14 +75,16 @@ const out = {
   ...sorted,
 };
 const target = resolve(import.meta.dirname, 'ci_shard_weights.generated.json');
-// A wholesale re-harvest replaces any locally-measured rows a release-sync
-// session merged in (the __provenance.localMerge block); say so, or that
-// substitution vanishes from the log without a trace.
+// A wholesale re-harvest replaces any locally measured rows a release sync
+// merged in. The checked-in provenance uses sibling mergedLocal/mergedFiles;
+// accept the older nested localMerge shape too so either table warns.
 try {
-  const prior = JSON.parse(readFileSync(target, 'utf8')).__provenance?.localMerge;
-  if (prior) {
+  const provenance = JSON.parse(readFileSync(target, 'utf8')).__provenance;
+  const measured = provenance?.mergedLocal ?? provenance?.localMerge?.measured;
+  const files = provenance?.mergedFiles ?? provenance?.localMerge?.files;
+  if (typeof measured === 'string' && measured && Number.isInteger(files) && files > 0) {
     console.log(
-      `[harvest] replacing a prior localMerge block (${prior.files} locally measured rows from ${prior.measured}) with CI-harvested weights`,
+      `[harvest] replacing ${files} locally measured rows from ${measured} with CI-harvested weights`,
     );
   }
 } catch {

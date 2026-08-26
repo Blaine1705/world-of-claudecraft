@@ -1,5 +1,17 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { parseWeightLines, SKIPPED_FILE_WEIGHT_MS } from '../scripts/lib/ci_shard_weight_parse.mjs';
+
+const harvestIo = vi.hoisted(() => ({
+  execFileSync: vi.fn(),
+  readFileSync: vi.fn(),
+  writeFileSync: vi.fn(),
+}));
+
+vi.mock('node:child_process', () => ({ execFileSync: harvestIo.execFileSync }));
+vi.mock('node:fs', () => ({
+  readFileSync: harvestIo.readFileSync,
+  writeFileSync: harvestIo.writeFileSync,
+}));
 
 const ESC = String.fromCharCode(27);
 
@@ -28,5 +40,54 @@ describe('ci shard weight log parser', () => {
     // A later RAN occurrence still wins over the skip floor.
     parseWeightLines('\u2713 tests/db_integration.test.ts (9 tests) 800ms', into);
     expect(into['tests/db_integration.test.ts']).toBe(800);
+  });
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe('CI shard weight harvester provenance', () => {
+  it('warns before replacing the checked-in mergedLocal/mergedFiles rows', async () => {
+    const jobs = [
+      ...Array.from({ length: 8 }, (_, i) => ({
+        id: i + 1,
+        name: `PR tests (${i + 1})`,
+        conclusion: 'success',
+      })),
+      { id: 9, name: 'PR long sims', conclusion: 'success' },
+      { id: 10, name: 'PR gate', conclusion: 'success' },
+    ];
+    harvestIo.execFileSync.mockImplementation((_file: string, args: string[]) =>
+      args.includes('--json')
+        ? JSON.stringify(jobs)
+        : 'changes-job decision: mode=full\n\u2713 tests/example.test.ts (1 test) 20ms',
+    );
+    harvestIo.readFileSync.mockReturnValue(
+      JSON.stringify({
+        __provenance: {
+          run: '32621561241',
+          mergedLocal: '2026-08-24',
+          mergedFiles: 46,
+        },
+      }),
+    );
+    const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const priorArg = process.argv[2];
+    process.argv[2] = '123456789';
+    try {
+      // @ts-expect-error The executable intentionally has no public module API.
+      await import('../scripts/ci_shard_weights_harvest.mjs');
+    } finally {
+      if (priorArg === undefined) process.argv.splice(2, 1);
+      else process.argv[2] = priorArg;
+    }
+
+    const replacement = logs.mock.calls
+      .map(([line]) => String(line))
+      .find((line) => line.includes('locally measured rows'));
+    expect(replacement).toContain('46 locally measured rows');
+    expect(replacement).toContain('2026-08-24');
+    expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
   });
 });
