@@ -35,6 +35,16 @@ export function charterName(itemId: string): string {
   }
 }
 
+/** Keep detached purchase results attributable after the originating Store
+ *  surface has gone away or moved to a different SKU. */
+export function charterOffSurfaceNotice(itemId: string, message: string): string {
+  return t('hudChrome.wocStore.charter.resultContext', {
+    item: charterName(itemId),
+    sku: itemId,
+    message,
+  });
+}
+
 /** Success copy for a GRANTED charter spend. Every arm here means the money
  *  moved and the purchase is real, so none of them may read as a failure or as
  *  a lost purchase. */

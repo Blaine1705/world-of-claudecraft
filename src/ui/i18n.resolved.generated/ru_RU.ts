@@ -799,6 +799,7 @@ export const ru_RU: EnTranslations = {
         "buyAria": "Купить: {item}",
         "confirmTitle": "Подтвердите покупку грамоты",
         "confirmBody": "Купить {item} за {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
         "granted": "Грамота применена. Банк этого персонажа стал больше.",
         "alreadyGranted": "Эта грамота уже есть у персонажа. Повторно средства не списаны.",
         "applyDeferred": "Оплата прошла. Ячейки появятся автоматически при следующем входе этим персонажем.",

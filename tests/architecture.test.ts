@@ -297,6 +297,7 @@ const UI_PURE_CORES = [
   // markup it projects a BankBonusModel into (Bank Storage phase 17, the extraction
   // this window's ratchet row named).
   'src/ui/bank_bonus_view.ts',
+  'src/ui/storage_rung_echo_core.ts',
   'src/ui/vault_view.ts',
   'src/ui/guild_bank_log_view.ts',
   'src/ui/guild_bank_view.ts',

@@ -210,6 +210,84 @@ describe('the locked pane (the unlock offer)', () => {
     expect(document.querySelector('.vault-buy-prompt')).toBeNull(); // dismissed
   });
 
+  it('holds an unlock busy across a stale mirror and ignores a second activation', () => {
+    const h = harness(locked());
+    h.window.open();
+    clickVaultTab(h);
+    (h.root.querySelector('.vault-unlock-btn') as HTMLElement).click();
+    (document.querySelector('.vault-buy-prompt .btn') as HTMLElement).click();
+
+    const stale = h.root.querySelector('.vault-unlock-btn') as HTMLButtonElement;
+    expect(h.calls.filter((call) => call === 'vaultBuyUpgrade')).toHaveLength(1);
+    expect(stale.disabled).toBe(true);
+    expect(stale.getAttribute('aria-busy')).toBe('true');
+    stale.click();
+    expect(document.querySelector('.vault-buy-prompt')).toBeNull();
+    expect(h.calls.filter((call) => call === 'vaultBuyUpgrade')).toHaveLength(1);
+
+    h.world.vaultInfo = vaultInfo();
+    h.window.refreshIfChanged();
+    const echoed = h.root.querySelector('.vault-upgrade-btn') as HTMLButtonElement;
+    expect(echoed.disabled).toBe(false);
+    expect(echoed.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('refuses a stale visible offer instead of consenting to the next rung', () => {
+    const h = harness(locked());
+    h.window.open();
+    clickVaultTab(h);
+    (h.root.querySelector('.vault-unlock-btn') as HTMLElement).click();
+    h.world.vaultInfo = vaultInfo();
+
+    (document.querySelector('.vault-buy-prompt .btn') as HTMLElement).click();
+
+    expect(h.calls).not.toContain('vaultBuyUpgrade');
+    expect(document.querySelector('.vault-buy-prompt')).toBeNull();
+    expect(h.root.querySelector('.vault-upgrade-btn')?.textContent).toContain('50000');
+  });
+
+  it('keeps the latch across close, ignores generic errors, and releases on a vault refusal', () => {
+    const h = harness(locked());
+    h.window.open();
+    clickVaultTab(h);
+    (h.root.querySelector('.vault-unlock-btn') as HTMLElement).click();
+    (document.querySelector('.vault-buy-prompt .btn') as HTMLElement).click();
+    h.window.close();
+    h.window.open();
+    clickVaultTab(h);
+
+    const reopened = h.root.querySelector('.vault-unlock-btn') as HTMLButtonElement;
+    expect(reopened.disabled).toBe(true);
+    h.window.observeStorageText('You are busy.');
+    expect(reopened.disabled).toBe(true);
+    expect(reopened.getAttribute('aria-busy')).toBe('true');
+
+    h.window.observeStorageText('You cannot afford that vault upgrade.');
+    const released = h.root.querySelector('.vault-unlock-btn') as HTMLButtonElement;
+    expect(released.disabled).toBe(false);
+    expect(released.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('repaints and re-enables the stale offer at the literal 12,000ms lost-echo bound', () => {
+    vi.useFakeTimers();
+    try {
+      const h = harness(locked());
+      h.window.open();
+      clickVaultTab(h);
+      (h.root.querySelector('.vault-unlock-btn') as HTMLElement).click();
+      (document.querySelector('.vault-buy-prompt .btn') as HTMLElement).click();
+
+      vi.advanceTimersByTime(11_999);
+      expect(h.root.querySelector<HTMLButtonElement>('.vault-unlock-btn')?.disabled).toBe(true);
+      vi.advanceTimersByTime(1);
+      const released = h.root.querySelector('.vault-unlock-btn') as HTMLButtonElement;
+      expect(released.disabled).toBe(false);
+      expect(released.hasAttribute('aria-busy')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('the unlock/upgrade confirm carries the economy disclaimer (tunable since phase 09)', () => {
     // Phase 09 put the vault ladder on the STORAGE_PRICES override, so this
     // price is retunable between sessions and the shared confirm adopts the

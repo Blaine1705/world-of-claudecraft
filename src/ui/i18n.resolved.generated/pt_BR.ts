@@ -799,6 +799,7 @@ export const pt_BR: EnTranslations = {
         "buyAria": "Purchase {item}",
         "confirmTitle": "Confirm Charter Purchase",
         "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
         "granted": "The charter was applied. The bank of this character is larger now.",
         "alreadyGranted": "This charter is already on this character. You were not charged again.",
         "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",

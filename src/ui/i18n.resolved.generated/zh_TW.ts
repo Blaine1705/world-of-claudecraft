@@ -799,6 +799,7 @@ export const zh_TW: EnTranslations = {
         "buyAria": "購買{item}",
         "confirmTitle": "確認購買特許狀",
         "confirmBody": "花費 {cost} Claudium 購買{item}？",
+        "resultContext": "{item} ({sku}): {message}",
         "granted": "特許狀已生效。目前角色的銀行已經變大。",
         "alreadyGranted": "目前角色已擁有該特許狀，不會重複扣款。",
         "applyDeferred": "付款完成。該角色下次登入時會自動取得這些格子。",

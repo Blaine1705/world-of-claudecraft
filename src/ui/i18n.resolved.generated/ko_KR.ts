@@ -799,6 +799,7 @@ export const ko_KR: EnTranslations = {
         "buyAria": "{item} 구매",
         "confirmTitle": "특허장 구매 확인",
         "confirmBody": "{item}을(를) {cost} Claudium에 구매할까요?",
+        "resultContext": "{item} ({sku}): {message}",
         "granted": "특허장이 적용되었습니다. 이 캐릭터의 은행이 넓어졌습니다.",
         "alreadyGranted": "이 특허장은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.",
         "applyDeferred": "결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.",

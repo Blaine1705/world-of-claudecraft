@@ -72,7 +72,12 @@ describe('buildVaultView', () => {
     expect(model.empty).toBe(true);
     expect(model.rows).toEqual([]);
     expect(model.perMaterialCap).toBe(40);
-    expect(model.upgrade).toEqual({ nextCost: 50000, maxed: false, nextCap: 80 });
+    expect(model.upgrade).toEqual({
+      currentUpgrades: 1,
+      nextCost: 50000,
+      maxed: false,
+      nextCap: 80,
+    });
   });
 
   it('rows come out in the deterministic base-adjacent order whatever the stock key order was', () => {
@@ -228,7 +233,12 @@ describe('buildVaultView', () => {
   it('the exhausted ladder is maxed with no next cap and no next price', () => {
     const model = buildVaultView(vinfo({ copper_ore: 1 }, 5, 200, null), lookup);
     if (model.kind !== 'vault') throw new Error('expected vault');
-    expect(model.upgrade).toEqual({ nextCost: null, maxed: true, nextCap: null });
+    expect(model.upgrade).toEqual({
+      currentUpgrades: 5,
+      nextCost: null,
+      maxed: true,
+      nextCap: null,
+    });
     expect(model.perMaterialCap).toBe(200);
   });
 });

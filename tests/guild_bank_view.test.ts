@@ -16,6 +16,7 @@ import {
   guildBankGoldWithdrawMax,
   guildBankSlotAction,
   guildBankSlotDormant,
+  guildBankSlotFocusKeys,
 } from '../src/ui/guild_bank_view';
 import type { GuildBankInfo } from '../src/world_api';
 
@@ -172,6 +173,7 @@ describe('buildGuildBankView', () => {
     const afford = buildGuildBankView(guildInfo({ treasury: price }), lookup, 0);
     if (afford.kind !== 'guild') throw new Error('expected guild');
     expect(afford.buy).toEqual({
+      purchasedSlots: 24,
       nextPrice: price,
       blockSlots: GUILD_BANK_EXPANSION_SLOTS,
       maxed: false,
@@ -208,6 +210,46 @@ describe('buildGuildBankView', () => {
     );
     if (view.kind !== 'guild') throw new Error('expected guild');
     expect(view.slots[0].instance).toBe(instance);
+  });
+});
+
+describe('guildBankSlotFocusKeys', () => {
+  const keysFor = (slots: InvSlot[]): string[] => {
+    const view = buildGuildBankView(guildInfo({ slots }), lookup, 0);
+    if (view.kind !== 'guild') throw new Error('expected guild');
+    return guildBankSlotFocusKeys(view.slots);
+  };
+
+  it('follows a semantic copy across preceding removal and unrelated reorder', () => {
+    const ada = { itemId: 'sword', count: 1, instance: { signer: 'Ada' } };
+    const bea = { itemId: 'sword', count: 1, instance: { signer: 'Bea' } };
+    const potion = { itemId: 'potion', count: 5 };
+    const original = keysFor([potion, ada, bea]);
+    const reordered = keysFor([bea, ada]);
+    expect(reordered[1]).toBe(original[1]);
+    expect(reordered[0]).toBe(original[2]);
+  });
+
+  it('invalidates an indistinguishable duplicate group when one copy disappears', () => {
+    const duplicateA = { itemId: 'potion', count: 2 };
+    const duplicateB = { itemId: 'potion', count: 7 };
+    const duplicateKeys = keysFor([duplicateA, duplicateB]);
+    const [survivorKey] = keysFor([duplicateB]);
+    expect(new Set(duplicateKeys).size).toBe(2);
+    expect(duplicateKeys).not.toContain(survivorKey);
+  });
+
+  it('uses crafted provenance and canonical instance fields as copy identity', () => {
+    const recipeA = keysFor([{ itemId: 'potion', count: 1, craftedRecipeId: 'recipe_a' }]);
+    const recipeB = keysFor([{ itemId: 'potion', count: 1, craftedRecipeId: 'recipe_b' }]);
+    expect(recipeA).not.toEqual(recipeB);
+    const ordered = keysFor([
+      { itemId: 'sword', count: 1, instance: { signer: 'Ada', rolled: { stats: { str: 2 } } } },
+    ]);
+    const reordered = keysFor([
+      { itemId: 'sword', count: 1, instance: { rolled: { stats: { str: 2 } }, signer: 'Ada' } },
+    ]);
+    expect(reordered).toEqual(ordered);
   });
 });
 

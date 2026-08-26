@@ -21,7 +21,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { BankWindow, type BankWindowDeps } from '../../src/ui/bank_window';
-import type { BankInfo, IWorld } from '../../src/world_api';
+import { ru_RU } from '../../src/ui/i18n.resolved.generated/ru_RU';
+import type { BankInfo } from '../../src/world_api';
 import { cleanup, host, stubDeps } from './_harness';
 
 // The footer may eat into the window's bottom padding, never past its border.
@@ -33,8 +34,7 @@ const TOUCH_FLOOR = 40;
  *  by MEASURING every locale's rendered band at both profiles rather than by
  *  counting characters: CJK copy is far shorter in characters and taller in
  *  nothing, while ja_JP and the en_XA pseudo-locale tie this one for height. */
-const WORDIEST_OUTAGE_COPY =
-  'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.';
+const WORDIEST_OUTAGE_COPY = ru_RU.hudChrome.bank.rungOutage;
 
 const PROFILES = [
   { name: '844x390', width: 844, height: 390 },
@@ -295,9 +295,8 @@ for (const profile of PROFILES) {
       // so the true margin is 4.6px rather than the comfortable slack English
       // suggests. ru_RU is the longest; ja_JP and en_XA reach the same height.
       //
-      // The literal is a FIXTURE, not a render sink: it stands in for the real
-      // hudChrome.bank.rungOutage value so this arm sees the tallest band the
-      // catalog can produce. Re-measure it when that copy is reworded.
+      // The fixture reads the generated ru_RU bundle directly, so a catalog
+      // reword cannot leave this geometry arm measuring a stale duplicate.
       //
       // It does NOT assert that the wordier copy is TALLER here. Measured: in
       // this harness the English band already wraps to the same bucket, so a

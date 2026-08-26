@@ -62,6 +62,7 @@ import { cornerMarkHtml, INSTANCE_GLYPH_ARIA_KEYS, lockMarkHtml } from './item_i
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { tSim } from './sim_i18n';
+import { StorageRungEchoLatch } from './storage_rung_echo_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
@@ -124,8 +125,17 @@ export class GuildBankTab {
   private readonly logPane = new GuildBankLogPane({
     itemDef: (id) => knownItemDef(ITEMS, id),
   });
+  private readonly purchaseEcho: StorageRungEchoLatch;
 
-  constructor(private readonly deps: GuildBankTabDeps) {}
+  constructor(private readonly deps: GuildBankTabDeps) {
+    this.purchaseEcho = new StorageRungEchoLatch(
+      {
+        schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+        cancel: (handle) => window.clearTimeout(handle),
+      },
+      () => this.deps.requestRender(),
+    );
+  }
 
   /** The active sub-view, for BankWindow's per-pane scroll scoping. */
   get activeView(): GuildBankPaneView {
@@ -172,11 +182,17 @@ export class GuildBankTab {
    *  marker; the opened pane ignores it (snapshot-only enablement). */
   model(): GuildBankViewModel {
     const world = this.deps.world();
+    this.purchaseEcho.observe(world.guildBankInfo?.purchasedSlots);
     // knownItemDef, never a raw ITEMS index: a prototype key ('constructor',
     // '__proto__') indexes to a truthy Function, which would send an unknown
     // server item id down the KNOWN arm below. The release's stale-client sweep
     // made every other bags/bank read go through this; the guild pane follows.
     return buildGuildBankView(world.guildBankInfo, (id) => knownItemDef(ITEMS, id), world.copper);
+  }
+
+  /** Release an in-flight rung when the authoritative command path refuses it. */
+  onDefinitivePurchaseRefusal(): boolean {
+    return this.purchaseEcho.refuse();
   }
 
   /** Append the guild pane sections (capacity, treasury, grid, buy row; for
@@ -381,7 +397,8 @@ export class GuildBankTab {
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.guildOpenBank'))}</span>` +
       this.deps.moneyHtml(open.price) +
       short;
-    btn.addEventListener('click', () => this.showOpenBankPrompt(open.price));
+    this.markPurchaseBusy(btn);
+    btn.addEventListener('click', () => this.showOpenBankPrompt(open));
     row.appendChild(btn);
     const note = document.createElement('div');
     note.className = 'gbank-buy-note';
@@ -396,11 +413,12 @@ export class GuildBankTab {
   // `.gbank-open-prompt` is a structural marker (no CSS rule of its own; the
   // shared bank-buy-prompt classes carry the styling): it distinguishes the
   // open confirm in tests and DOM tooling.
-  private showOpenBankPrompt(price: number): void {
+  private showOpenBankPrompt(open: GuildBankOpenModel): void {
     this.showGuildBuyConfirm({
       className: 'gbank-open-prompt',
-      text: t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(price) }),
+      text: t('hudChrome.bank.guildOpenConfirm', { price: formatMoney(open.price) }),
       confirmLabel: t('hudChrome.bank.guildOpenAccept'),
+      offer: open,
     });
   }
 
@@ -414,7 +432,9 @@ export class GuildBankTab {
     className?: string;
     text: string;
     confirmLabel: string;
+    offer: { purchasedSlots: number; blockSlots: number; price: number };
   }): void {
+    if (this.purchaseEcho.pending) return;
     showBuyConfirmPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>
@@ -427,7 +447,23 @@ export class GuildBankTab {
         confirmLabel: opts.confirmLabel,
         cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
         onConfirm: (dismiss) => {
-          this.deps.world().guildBankBuySlots();
+          const world = this.deps.world();
+          const info = world.guildBankInfo;
+          if (
+            !info ||
+            info.purchasedSlots !== opts.offer.purchasedSlots ||
+            info.nextExpansionPrice !== opts.offer.price ||
+            !this.purchaseEcho.arm(
+              opts.offer.purchasedSlots,
+              opts.offer.purchasedSlots + opts.offer.blockSlots,
+            )
+          ) {
+            dismiss();
+            this.deps.requestRender();
+            this.focusClose();
+            return;
+          }
+          world.guildBankBuySlots();
           audio.coin();
           dismiss();
           this.deps.requestRender();
@@ -801,8 +837,9 @@ export class GuildBankTab {
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.buySlots', { count: this.fmt(buy.blockSlots) }))}</span>` +
       this.deps.moneyHtml(buy.nextPrice) +
       short;
+    this.markPurchaseBusy(btn);
     const price = buy.nextPrice;
-    btn.addEventListener('click', () => this.showBuySlotsPrompt(price, buy.blockSlots));
+    btn.addEventListener('click', () => this.showBuySlotsPrompt(buy, price));
     row.appendChild(btn);
     // The treasury-paid note: always-visible text (the price above is the
     // guild's money, not the officer's purse; saying so prevents mis-reads).
@@ -813,14 +850,25 @@ export class GuildBankTab {
     return row;
   }
 
-  private showBuySlotsPrompt(price: number, blockSlots: number): void {
+  private showBuySlotsPrompt(buy: GuildBankBuySlotsModel, price: number): void {
     this.showGuildBuyConfirm({
       text: t('hudChrome.bank.guildBuyConfirm', {
-        count: this.fmt(blockSlots),
+        count: this.fmt(buy.blockSlots),
         price: formatMoney(price),
       }),
       confirmLabel: t('hudChrome.bank.buyConfirmAccept'),
+      offer: {
+        purchasedSlots: buy.purchasedSlots,
+        blockSlots: buy.blockSlots,
+        price,
+      },
     });
+  }
+
+  private markPurchaseBusy(button: HTMLButtonElement): void {
+    if (!this.purchaseEcho.pending) return;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
   }
 
   // Land focus on the window's always-present close button after an op-driven

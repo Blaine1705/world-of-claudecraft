@@ -90,6 +90,7 @@ export type VaultRowModel = VaultPooledRowModel | VaultSpecialRowModel;
  *  every rung is bought), the maxed flag, and the ceiling the next rung would
  *  set (null when maxed). */
 export interface VaultUpgradeModel {
+  currentUpgrades: number;
   nextCost: number | null;
   maxed: boolean;
   nextCap: number | null;
@@ -226,6 +227,7 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
     empty: rows.length === 0,
     perMaterialCap: cap,
     upgrade: {
+      currentUpgrades: info.upgrades,
       nextCost: info.nextUpgradeCost,
       maxed: info.nextUpgradeCost === null,
       nextCap: info.nextUpgradeCost === null ? null : cap + VAULT_UPGRADE_STEP,

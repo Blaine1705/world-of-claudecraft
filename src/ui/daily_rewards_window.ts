@@ -6,6 +6,7 @@ import { ArmoryInspect } from './armory_inspect';
 import {
   charterGrantedText,
   charterName,
+  charterOffSurfaceNotice,
   charterRefusalText,
   charterSectionHtml,
 } from './charter_card_view';
@@ -920,6 +921,7 @@ export class DailyRewardsWindow {
     if (this.charterInFlight.has(itemId)) return;
     const row = this.charterRowById(itemId);
     const intent = this.charterIntents.intentFor(itemId, row?.costClaudium ?? 0);
+    const staleNotice = (message: string) => charterOffSurfaceNotice(itemId, message);
     // Only NOW has the key reached the service, so only now must a cancel stop
     // dropping it.
     this.charterSent.add(itemId);
@@ -947,7 +949,7 @@ export class DailyRewardsWindow {
         this.setCharterNotice('failure', t('hudChrome.wocStore.charter.outage'));
         this.repaintStore();
       } else {
-        this.showStoreResult('failure', t('hudChrome.wocStore.charter.outageStale'));
+        this.showStoreResult('failure', staleNotice(t('hudChrome.wocStore.charter.outageStale')));
       }
       return;
     }
@@ -968,7 +970,7 @@ export class DailyRewardsWindow {
         this.setCharterNotice('success', text);
         await this.renderStore(null);
       } else {
-        this.showStoreResult('success', text);
+        this.showStoreResult('success', staleNotice(text));
       }
       return;
     }
@@ -988,6 +990,7 @@ export class DailyRewardsWindow {
     surfaceGeneration = this.storeRuntime.captureSurface(),
   ): Promise<void> {
     if (!this.storeSurfaceIsCurrent(surfaceGeneration)) {
+      const staleNotice = (message: string) => charterOffSurfaceNotice(itemId, message);
       if (result.reason === 'insufficient_balance') {
         const authoritativeCost =
           result.costClaudium !== null &&
@@ -995,17 +998,14 @@ export class DailyRewardsWindow {
           result.costClaudium > 0
             ? result.costClaudium
             : sentCostClaudium;
-        this.showStoreResult(
-          'failure',
-          this.needMoreText(charterName(itemId), authoritativeCost, result.balance),
-        );
+        const message = this.needMoreText(charterName(itemId), authoritativeCost, result.balance);
+        this.showStoreResult('failure', staleNotice(message));
       } else {
-        this.showStoreResult(
-          'failure',
+        const message =
           result.reason === 'price_changed'
             ? t('hudChrome.wocStore.priceChanged')
-            : charterRefusalText(result.reason, 'stale'),
-        );
+            : charterRefusalText(result.reason, 'stale');
+        this.showStoreResult('failure', staleNotice(message));
       }
       return;
     }

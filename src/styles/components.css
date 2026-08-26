@@ -2002,6 +2002,10 @@
     padding: 0 12px;
     border-bottom: 1px solid var(--color-border-showcase);
   }
+  .woc-store-tablist {
+    display: flex;
+    gap: 2px;
+  }
   .woc-store-tabs button {
     min-height: 42px;
     padding: 0 18px;

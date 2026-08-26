@@ -95,6 +95,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -184,6 +185,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -273,6 +275,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -362,6 +365,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -452,6 +456,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -541,13 +546,22 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.wocStore.charter.resultContext"
+  ],
+  "zh_TW": [
+    "hudChrome.wocStore.charter.resultContext"
+  ],
+  "ko_KR": [
+    "hudChrome.wocStore.charter.resultContext"
+  ],
+  "ja_JP": [
+    "hudChrome.wocStore.charter.resultContext"
+  ],
   "pt_BR": [
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
@@ -634,10 +648,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.wocStore.charter.resultContext"
+  ],
   "cs_CZ": [
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
@@ -724,6 +741,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -813,6 +831,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -902,6 +921,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -991,6 +1011,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1080,6 +1101,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1169,6 +1191,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1258,6 +1281,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ],
@@ -1347,6 +1371,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.notPurchasable",
     "hudChrome.wocStore.charter.outage",
     "hudChrome.wocStore.charter.outageStale",
+    "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.title"
   ]

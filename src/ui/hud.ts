@@ -12147,7 +12147,7 @@ export class Hud {
           if (quota) {
             this.showLocalizedError(quota.text, quota.channel, quota.announceWhenFiltered);
           } else {
-            this.showError(this.localizeErrorText(ev.text));
+            this.showError(this.localizeErrorText(this.bankWindow.observeStorageText(ev.text)));
           }
           break;
         }
@@ -13080,7 +13080,7 @@ export class Hud {
           break;
         }
         case 'log': {
-          const text = this.localizeSystemText(ev.text);
+          const text = this.localizeSystemText(this.bankWindow.observeStorageText(ev.text));
           // Route mob/boss combat-flavor chatter to the Combat Log tab instead of
           // General/Chat (see log_event_route.ts): pid-scoped personal narrative and
           // entityId-anchored actionable mechanic telegraphs both stay in General/Chat,

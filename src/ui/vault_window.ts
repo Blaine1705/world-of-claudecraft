@@ -43,6 +43,7 @@ import {
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { StorageRungEchoLatch } from './storage_rung_echo_core';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import {
@@ -130,13 +131,29 @@ export class VaultTab {
   // fallback timer clears a lost echo.
   private depositAllPending = false;
   private depositAllTimer: number | null = null;
+  private readonly purchaseEcho: StorageRungEchoLatch;
 
-  constructor(private readonly deps: VaultTabDeps) {}
+  constructor(private readonly deps: VaultTabDeps) {
+    this.purchaseEcho = new StorageRungEchoLatch(
+      {
+        schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+        cancel: (handle) => window.clearTimeout(handle),
+      },
+      () => this.deps.requestRender(),
+    );
+  }
 
   /** The render model off the live mirror. 'away' collapses the tab
    *  (BankWindow's strip rule); the window never calls renderInto with it. */
   model(): VaultViewModel {
-    return buildVaultView(this.deps.world().vaultInfo, (id) => knownItemDef(ITEMS, id));
+    const info = this.deps.world().vaultInfo;
+    this.purchaseEcho.observe(info?.upgrades);
+    return buildVaultView(info, (id) => knownItemDef(ITEMS, id));
+  }
+
+  /** Release an in-flight rung when the authoritative command path refuses it. */
+  onDefinitivePurchaseRefusal(): boolean {
+    return this.purchaseEcho.refuse();
   }
 
   /** True while the pane shows a stocked, UNLOCKED vault: the bags companion
@@ -147,8 +164,9 @@ export class VaultTab {
     return (this.deps.world().vaultInfo?.upgrades ?? 0) > 0;
   }
 
-  /** Close/teardown: drop the transient status and the pending guard so a
-   *  reopened bank never flashes a stale line (BankWindow.close calls this). */
+  /** Close/teardown: drop transient status and the deposit-all guard so a
+   *  reopened bank never flashes a stale line (BankWindow.close calls this).
+   *  A purchase guard deliberately survives until echo, refusal, or timeout. */
   reset(): void {
     this.clearStatus();
     this.clearDepositAllPending();
@@ -222,7 +240,13 @@ export class VaultTab {
       scroll.appendChild(list);
     }
     panel.appendChild(scroll);
-    panel.appendChild(this.buildFooter(model.upgrade.nextCost, model.upgrade.nextCap));
+    panel.appendChild(
+      this.buildFooter(
+        model.upgrade.currentUpgrades,
+        model.upgrade.nextCost,
+        model.upgrade.nextCap,
+      ),
+    );
     root.appendChild(panel);
   }
 
@@ -254,9 +278,11 @@ export class VaultTab {
       (affordable
         ? ''
         : `<span class="bank-buy-short-label">${esc(t('hudChrome.bank.guildPurseShort'))}</span>`);
+    this.markPurchaseBusy(btn);
     btn.addEventListener('click', () =>
       this.showBuyPrompt(
         t('hudChrome.bank.vaultUnlockConfirm', { price: formatMoney(unlockCost) }),
+        { upgrades: 0, cost: unlockCost },
       ),
     );
     row.appendChild(btn);
@@ -513,7 +539,11 @@ export class VaultTab {
   }
 
   // The footer: the batched deposit-all button beside the ceiling upgrade row.
-  private buildFooter(nextCost: number | null, nextCap: number | null): HTMLElement {
+  private buildFooter(
+    currentUpgrades: number,
+    nextCost: number | null,
+    nextCap: number | null,
+  ): HTMLElement {
     const row = document.createElement('div');
     row.className = 'bank-buy-row vault-footer';
 
@@ -554,12 +584,14 @@ export class VaultTab {
       (affordable
         ? ''
         : `<span class="bank-buy-short-label">${esc(t('hudChrome.bank.guildPurseShort'))}</span>`);
+    this.markPurchaseBusy(btn);
     btn.addEventListener('click', () =>
       this.showBuyPrompt(
         t('hudChrome.bank.vaultUpgradeConfirm', {
           cap: formatCount(nextCap),
           price: formatMoney(nextCost),
         }),
+        { upgrades: currentUpgrades, cost: nextCost },
       ),
     );
     row.appendChild(btn);
@@ -641,7 +673,8 @@ export class VaultTab {
   // The unlock / upgrade confirm in the prompt stack (the shared family
   // builder; both purchases send the same next-rung command, so one call
   // serves both with its caller-localized body).
-  private showBuyPrompt(body: string): void {
+  private showBuyPrompt(body: string, offer: { upgrades: number; cost: number }): void {
+    if (this.purchaseEcho.pending) return;
     showBuyConfirmPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>
@@ -659,7 +692,20 @@ export class VaultTab {
         confirmLabel: t('hudChrome.bank.buyConfirmAccept'),
         cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
         onConfirm: (dismiss) => {
-          this.deps.world().vaultBuyUpgrade();
+          const world = this.deps.world();
+          const info = world.vaultInfo;
+          if (
+            !info ||
+            info.upgrades !== offer.upgrades ||
+            info.nextUpgradeCost !== offer.cost ||
+            !this.purchaseEcho.arm(offer.upgrades, offer.upgrades + 1)
+          ) {
+            dismiss();
+            this.deps.requestRender();
+            (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+            return;
+          }
+          world.vaultBuyUpgrade();
           audio.coin();
           this.deps.onInventoryChanged();
           dismiss();
@@ -668,5 +714,11 @@ export class VaultTab {
         },
       },
     );
+  }
+
+  private markPurchaseBusy(button: HTMLButtonElement): void {
+    if (!this.purchaseEcho.pending) return;
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
   }
 }

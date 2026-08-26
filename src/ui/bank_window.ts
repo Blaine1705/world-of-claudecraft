@@ -71,6 +71,7 @@ import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, findFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { type GuildBankViewModel, guildBankSlotFocusKeys } from './guild_bank_view';
 import {
   GUILD_PANEL_ID,
   GUILD_TAB_ID,
@@ -95,6 +96,7 @@ import {
 // Claudium-spending surface uses (a second minter is exactly the drift the
 // packet warns about; see src/ui/purchase_intent_key.ts).
 import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
+import { storageRungRefusalTargets } from './storage_rung_echo_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
@@ -430,6 +432,15 @@ export class BankWindow {
     return this.opened && this.tab === 'vault' && this.vaultPane.unlocked;
   }
 
+  /** Observe raw authoritative refusals before Hud translates their text. */
+  observeStorageText(text: string): string {
+    const target = storageRungRefusalTargets(text);
+    const guildCleared = target.guild ? this.guildPane.onDefinitivePurchaseRefusal() : false;
+    const vaultCleared = target.vault ? this.vaultPane.onDefinitivePurchaseRefusal() : false;
+    if ((guildCleared || vaultCleared) && this.opened) this.render();
+    return text;
+  }
+
   // Re-interacting with the banker while already open must not re-run the open
   // bookkeeping: re-capturing openerFocus could record a node INSIDE this window
   // (returned-to after close, i.e. destroyed), and a fresh render would tear an
@@ -683,7 +694,7 @@ export class BankWindow {
       if (guildTab && el.querySelector(`#${GUILD_PANEL_ID}`)) {
         guildTab.setAttribute('aria-controls', GUILD_PANEL_ID);
       }
-      this.annotateGuildFocusKeys(el);
+      this.annotateGuildFocusKeys(el, guildModel);
       this.restoreScroll(el, prevScroll);
       // The guild pane has no search box, so a searchFocus capture degrades
       // through the key ladder to the close button, never to <body>.
@@ -762,20 +773,20 @@ export class BankWindow {
   // returned: the shared data-focus-key namespace stays inside this module,
   // the one that imports focus_restore (the single-reader guard in
   // tests/focus_restore.test.ts), and the pane stays focus-agnostic. Cells are
-  // keyed by wire index: fillGrid appends model.slots in order (slotIndex ==
-  // array index) before the empty pad, so DOM order IS slot order; the pinned
-  // focus test drives a real repaint over a focused cell, so a reorder that
-  // broke this coupling goes red there.
-  private annotateGuildFocusKeys(el: HTMLElement): void {
+  // keyed by semantic item/copy identity. Duplicate-group cardinality is part
+  // of that key, so an ambiguous disappearing twin safely falls back instead
+  // of transferring focus to a different physical copy.
+  private annotateGuildFocusKeys(el: HTMLElement, model: GuildBankViewModel): void {
     // The Contents / Log sub-strip first: the log repaints on ANY officer's op
     // (its cache busts and the response lands), so a keyboard user reading it
     // must not be thrown off the strip by somebody else's deposit.
     for (const tab of el.querySelectorAll<HTMLElement>('.gbank-view-tab')) {
       tab.dataset.focusKey = `gbank:view:${tab.dataset.tab}`;
     }
-    let slotIndex = 0;
+    const slotKeys = model.kind === 'guild' ? guildBankSlotFocusKeys(model.slots) : [];
+    let renderedIndex = 0;
     for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
-      cell.dataset.focusKey = `gbank:slot:${slotIndex++}`;
+      cell.dataset.focusKey = slotKeys[renderedIndex++] ?? '';
     }
     const [deposit, withdraw] = Array.from(el.querySelectorAll<HTMLElement>('.gbank-gold-btn'));
     if (deposit) deposit.dataset.focusKey = 'gbank:deposit-gold';

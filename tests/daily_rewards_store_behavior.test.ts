@@ -1996,9 +1996,10 @@ describe('WOC Store Strongbox charters', () => {
     await pending;
 
     expect(h.internals.charterNotice).toBeNull();
-    expect(document.querySelector('.woc-store-global-result')?.textContent).toContain(
-      'charter was applied',
-    );
+    const resultText = document.querySelector('.woc-store-global-result')?.textContent ?? '';
+    expect(resultText).toContain('charter was applied');
+    expect(resultText).toContain('Lesser Strongbox Charter');
+    expect(resultText).toContain('strongbox_charter_1');
     // The negative arm is load-bearing: with the window OPEN the same result
     // must still arm the band, or this guard would be silently swallowing every
     // outcome rather than only the orphaned ones.
@@ -2029,9 +2030,10 @@ describe('WOC Store Strongbox charters', () => {
     await pending;
 
     expect(h.dialogs).toHaveLength(0);
-    expect(document.querySelector('.woc-store-global-result')?.textContent).toContain(
-      '490 more Claudium',
-    );
+    const detachedResult = document.querySelector('.woc-store-global-result')?.textContent ?? '';
+    expect(detachedResult).toContain('490 more Claudium');
+    expect(detachedResult).toContain('Lesser Strongbox Charter');
+    expect(detachedResult).toContain('strongbox_charter_1');
     // Open, the same refusal DOES raise the top-up prompt.
     const open = charterHarness({
       results: [{ granted: false, balance: 10, costClaudium: 500, reason: 'insufficient_balance' }],
@@ -2444,7 +2446,9 @@ describe('WOC Store Strongbox charters', () => {
 
       expect(h.internals.charterNotice).toBeNull();
       const result = document.querySelector<HTMLElement>('[data-store-result-text]');
-      expect(result?.textContent).toBe(t('hudChrome.wocStore.charter.outageStale'));
+      expect(result?.textContent).toContain(t('hudChrome.wocStore.charter.outageStale'));
+      expect(result?.textContent).toContain('Lesser Strongbox Charter');
+      expect(result?.textContent).toContain('strongbox_charter_1');
       expect(result?.textContent).toContain(
         'Return to the Store and use the same Purchase Charter action',
       );
@@ -2452,6 +2456,29 @@ describe('WOC Store Strongbox charters', () => {
       expect(h.internals.charterIntents.isOpen('strongbox_charter_1')).toBe(true);
       document.querySelector<HTMLButtonElement>('.woc-store-global-result button')?.click();
     }
+  });
+
+  it('names the exact charter and SKU in an off-surface retry notice', async () => {
+    let release: () => void = () => undefined;
+    const gate = { wait: new Promise<void>((resolve) => (release = resolve)) };
+    const h = charterHarness({
+      gate,
+      results: [
+        { granted: false, balance: 5_000, costClaudium: 900, reason: 'purchase_in_progress' },
+      ],
+    });
+    await h.internals.renderStore(null);
+
+    const pending = h.internals.purchaseCharter('strongbox_charter_2');
+    await Promise.resolve();
+    h.window.close();
+    release();
+    await pending;
+
+    const result = document.querySelector<HTMLElement>('[data-store-result-text]');
+    expect(result?.textContent).toContain('still being completed');
+    expect(result?.textContent).toContain('Greater Strongbox Charter');
+    expect(result?.textContent).toContain('strongbox_charter_2');
   });
 
   // THE FOCUS PIN. replaceStoreBody assigns innerHTML, which destroys the control

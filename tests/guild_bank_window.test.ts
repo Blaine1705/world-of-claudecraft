@@ -319,6 +319,31 @@ describe('guild tab visibility', () => {
     );
   });
 
+  it('keeps focus on the same guild item when an earlier slot disappears', () => {
+    const h = harness(
+      guildInfo({
+        slots: [
+          { itemId: questId, count: 1 },
+          { itemId: plainId, count: 5 },
+        ],
+        treasury: 700,
+      }),
+    );
+    h.window.open();
+    clickGuildTab(h);
+    const cells = h.root.querySelectorAll<HTMLButtonElement>('.bank-grid .bank-item');
+    cells[1].focus();
+
+    h.world.guildBankInfo = guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 900 });
+    h.window.refreshIfChanged();
+
+    const survivingItem = h.root.querySelector<HTMLButtonElement>('.bank-grid .bank-item');
+    expect(document.activeElement).toBe(survivingItem);
+    (document.activeElement as HTMLButtonElement).click();
+    expect(h.calls).toContain('guildBankWithdraw:0');
+    expect(h.world.guildBankInfo?.slots[0]?.itemId).toBe(plainId);
+  });
+
   it('close() resets the pane to Personal for the next open', () => {
     const h = harness(guildInfo());
     h.window.open();
@@ -601,6 +626,97 @@ describe('guild pane actions round-trip through the facet', () => {
     expect(prompt).not.toBeNull();
     (prompt.querySelector('.btn') as HTMLElement).click();
     expect(h.calls).toContain('guildBankBuySlots');
+  });
+
+  it('holds an expansion busy across a stale mirror and ignores a second activation', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.bank-buy-btn') as HTMLElement).click();
+    (document.querySelector('.gbank-buy-prompt .btn') as HTMLElement).click();
+
+    const stale = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+    expect(h.calls.filter((call) => call === 'guildBankBuySlots')).toHaveLength(1);
+    expect(stale.disabled).toBe(true);
+    expect(stale.getAttribute('aria-busy')).toBe('true');
+    stale.click();
+    expect(document.querySelector('.gbank-buy-prompt')).toBeNull();
+    expect(h.calls.filter((call) => call === 'guildBankBuySlots')).toHaveLength(1);
+
+    h.world.guildBankInfo = guildInfo({
+      purchasedSlots: 30,
+      capacity: 18,
+      treasury: 35_000,
+      nextExpansionPrice: GUILD_BANK_RUNG_PRICES[2],
+    });
+    h.window.refreshIfChanged();
+    const echoed = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+    expect(echoed.disabled).toBe(false);
+    expect(echoed.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('refuses a stale visible offer instead of consenting to the next rung', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.bank-buy-btn') as HTMLElement).click();
+    h.world.guildBankInfo = guildInfo({
+      purchasedSlots: 30,
+      capacity: 18,
+      nextExpansionPrice: GUILD_BANK_RUNG_PRICES[2],
+    });
+
+    (document.querySelector('.gbank-buy-prompt .btn') as HTMLElement).click();
+
+    expect(h.calls).not.toContain('guildBankBuySlots');
+    expect(document.querySelector('.gbank-buy-prompt')).toBeNull();
+    expect(h.root.querySelector('.bank-buy-btn')?.textContent).toContain(
+      String(GUILD_BANK_RUNG_PRICES[2]),
+    );
+  });
+
+  it('keeps the latch across close, ignores generic errors, and releases on a guild refusal', () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.bank-buy-btn') as HTMLElement).click();
+    (document.querySelector('.gbank-buy-prompt .btn') as HTMLElement).click();
+    h.window.close();
+    h.window.open();
+    clickGuildTab(h);
+
+    const reopened = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+    expect(reopened.disabled).toBe(true);
+    h.window.observeStorageText('Not enough money.');
+    expect(reopened.disabled).toBe(true);
+    expect(reopened.getAttribute('aria-busy')).toBe('true');
+
+    h.window.observeStorageText('Your guild cannot afford that expansion.');
+    const released = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+    expect(released.disabled).toBe(false);
+    expect(released.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('repaints and re-enables the stale offer at the literal 12,000ms lost-echo bound', () => {
+    vi.useFakeTimers();
+    try {
+      const h = harness(guildInfo());
+      h.window.open();
+      clickGuildTab(h);
+      (h.root.querySelector('.bank-buy-btn') as HTMLElement).click();
+      (document.querySelector('.gbank-buy-prompt .btn') as HTMLElement).click();
+
+      vi.advanceTimersByTime(11_999);
+      expect(
+        (h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement).disabled,
+      ).toBe(true);
+      vi.advanceTimersByTime(1);
+      const released = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+      expect(released.disabled).toBe(false);
+      expect(released.hasAttribute('aria-busy')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('opening a second guild prompt tears the first down (dismissPrompts at every opener)', () => {
@@ -1175,7 +1291,8 @@ describe('guild_bank_window: the activity log view', () => {
 
     const contents = h.root.querySelector('.bank-scroll') as HTMLElement | null;
     expect(contents, 'the contents view must mount a scroll region').not.toBeNull();
-    contents!.scrollTop = 60;
+    if (!contents) throw new Error('expected contents scroll region');
+    contents.scrollTop = 60;
 
     // POSITIVE CONTROL FIRST: a repaint that does NOT change the sub-view must
     // KEEP the offset. Without this the arm below is satisfied by a restore that

@@ -799,6 +799,7 @@ export const ja_JP: EnTranslations = {
         "buyAria": "{item}を購入",
         "confirmTitle": "特許状の購入確認",
         "confirmBody": "{item}を{cost} Claudiumで購入しますか？",
+        "resultContext": "{item} ({sku}): {message}",
         "granted": "特許状が適用されました。このキャラクターの銀行が広がりました。",
         "alreadyGranted": "この特許状はすでにこのキャラクターに適用されています。二重に請求されることはありません。",
         "applyDeferred": "支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。",
