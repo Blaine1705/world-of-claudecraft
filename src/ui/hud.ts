@@ -6863,6 +6863,10 @@ export class Hud {
     return this.sim.known.find((k) => k.def.id === id) ?? null;
   }
 
+  groundAimAbilityRange(): number | null {
+    return this.activeGroundAimAbility()?.def.range ?? null;
+  }
+
   updateGroundAimPoint(rawPoint: AimPoint | null): void {
     if (!this.isGroundAimActive() || !rawPoint) {
       this.groundAimPoint = null;
@@ -6874,6 +6878,20 @@ export class Hud {
       return;
     }
     this.groundAimPoint = rawPoint;
+  }
+
+  nudgeGroundAimPoint(dx: number, dz: number): void {
+    if (!this.isGroundAimActive() || !this.groundAimPoint) return;
+    const res = this.activeGroundAimAbility();
+    if (!res) {
+      this.cancelGroundAim();
+      return;
+    }
+    this.groundAimPoint = clampAimToRange(
+      this.sim.player,
+      { x: this.groundAimPoint.x + dx, z: this.groundAimPoint.z + dz },
+      res.def.range,
+    ).point;
   }
 
   groundAimReticle(): {
@@ -6913,6 +6931,10 @@ export class Hud {
     this.renderer.setGroundAimReticle(null);
     this.sim.castAbilityAt(abilityId, point);
     return true;
+  }
+
+  commitGroundAim(): boolean {
+    return this.commitGroundAimAt();
   }
 
   private activateFixedAttackSlot(): void {

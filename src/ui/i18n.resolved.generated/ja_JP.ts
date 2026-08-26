@@ -1585,6 +1585,7 @@ export const ja_JP: EnTranslations = {
       "invertY": "カメラ反転（Y軸）",
       "deadzone": "スティックの遊び",
       "cameraSpeed": "カメラ速度",
+      "reticleSpeed": "レティクル速度",
       "vibration": "振動",
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",

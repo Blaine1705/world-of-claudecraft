@@ -47,7 +47,30 @@ describe('ground aim lifecycle wiring', () => {
   it('preserves the smart seed when there is no desktop cursor sample', () => {
     const sync = section('function syncGroundAimReticle(): void {', 'const reticle =');
 
+    expect(sync).toContain("currentInputHintMode() !== 'pad'");
     expect(sync).toContain('if (cursor) {');
     expect(sync).not.toContain(': null');
+  });
+
+  it('wires pad steering through the active range, camera, and live sensitivity', () => {
+    const gamepad = section('const gamepad = new GamepadManager(', 'crossHotbar.attach(gamepad);');
+
+    expect(gamepad).toContain('isGroundAimActive: () => hud.isGroundAimActive()');
+    expect(gamepad).toContain('const range = hud.groundAimAbilityRange();');
+    expect(gamepad).toContain('reticleStickDelta(');
+    expect(gamepad).toContain('input.camYaw');
+    expect(gamepad).toContain("settings.get('gamepadReticleSpeed')");
+    expect(gamepad).toContain('hud.nudgeGroundAimPoint(delta.dx, delta.dz);');
+  });
+
+  it('wires pad snapping through attackability, PvP, range, and the current reticle', () => {
+    const gamepad = section('const gamepad = new GamepadManager(', 'crossHotbar.attach(gamepad);');
+
+    expect(gamepad).toContain('const pvpOpponents = activePvpOpponentIds(world);');
+    expect(gamepad).toContain('isAttackableEntity(entity, world.playerId, pvpOpponents)');
+    expect(gamepad).toContain('if (dist2d(player.pos, entity.pos) > range) continue;');
+    expect(gamepad).toContain('hud.groundAimReticle()?.point ?? null');
+    expect(gamepad).toContain('hud.updateGroundAimPoint(point);');
+    expect(gamepad).not.toContain('selectTarget');
   });
 });

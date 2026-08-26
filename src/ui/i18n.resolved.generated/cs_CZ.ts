@@ -1585,6 +1585,7 @@ export const cs_CZ: EnTranslations = {
       "invertY": "Invertovat kameru (Y)",
       "deadzone": "Mrtvá zóna páčky",
       "cameraSpeed": "Rychlost kamery",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibrace",
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",

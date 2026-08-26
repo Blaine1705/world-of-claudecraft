@@ -104,6 +104,7 @@ import {
 } from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { currentInputHintMode } from './game/input_hint_mode';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
@@ -149,6 +150,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { nextSnapPoint, reticleStickDelta } from './game/pad_ground_aim';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -2383,6 +2385,41 @@ async function startGame(
         cameraPromptOpen(),
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
+    isGroundAimActive: () => hud.isGroundAimActive(),
+    cancelGroundAim: () => hud.cancelGroundAim(),
+    onGroundAimStick: (x, y, dt) => {
+      const range = hud.groundAimAbilityRange();
+      if (range === null) return;
+      const delta = reticleStickDelta(
+        x,
+        y,
+        input.camYaw,
+        dt,
+        range,
+        settings.get('gamepadReticleSpeed'),
+      );
+      hud.nudgeGroundAimPoint(delta.dx, delta.dz);
+    },
+    onGroundAimCommit: () => hud.commitGroundAimAt(),
+    onGroundAimSnap: (direction) => {
+      const range = hud.groundAimAbilityRange();
+      if (range === null) return;
+      const player = world.player;
+      const pvpOpponents = activePvpOpponentIds(world);
+      const candidates: { x: number; z: number }[] = [];
+      for (const entity of world.entities.values()) {
+        if (!isAttackableEntity(entity, world.playerId, pvpOpponents)) continue;
+        if (dist2d(player.pos, entity.pos) > range) continue;
+        candidates.push({ x: entity.pos.x, z: entity.pos.z });
+      }
+      const point = nextSnapPoint(
+        player.pos,
+        candidates,
+        hud.groundAimReticle()?.point ?? null,
+        direction,
+      );
+      if (point) hud.updateGroundAimPoint(point);
+    },
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
@@ -3532,7 +3569,7 @@ async function startGame(
     // Touch placement is updated directly by MobileControls. Some mobile
     // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
     // reading it here would erase the finger-owned point every render frame.
-    if (!document.body.classList.contains('mobile-touch')) {
+    if (!document.body.classList.contains('mobile-touch') && currentInputHintMode() !== 'pad') {
       const cursor = input.cursorPoint();
       if (cursor) {
         hud.updateGroundAimPoint(renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y));

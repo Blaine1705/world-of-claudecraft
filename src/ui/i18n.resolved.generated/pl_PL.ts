@@ -1585,6 +1585,7 @@ export const pl_PL: EnTranslations = {
       "invertY": "Odwróć kamerę (Y)",
       "deadzone": "Martwa strefa gałki",
       "cameraSpeed": "Szybkość kamery",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Wibracje",
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",

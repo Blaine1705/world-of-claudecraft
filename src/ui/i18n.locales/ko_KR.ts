@@ -5903,6 +5903,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': '카메라 반전(Y축)',
   'hudChrome.controller.deadzone': '스틱 데드존',
   'hudChrome.controller.cameraSpeed': '카메라 속도',
+  'hudChrome.controller.reticleSpeed': '조준점 속도',
   'hudChrome.controller.vibration': '진동',
   'hudChrome.controller.buttons': '버튼 배치',
   'hudChrome.controller.resetButtons': '버튼 배치 초기화',

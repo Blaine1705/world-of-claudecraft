@@ -5973,6 +5973,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': 'Инверсия камеры (Y)',
   'hudChrome.controller.deadzone': 'Мёртвая зона стика',
   'hudChrome.controller.cameraSpeed': 'Скорость камеры',
+  'hudChrome.controller.reticleSpeed': 'Скорость прицела',
   'hudChrome.controller.vibration': 'Вибрация',
   'hudChrome.controller.buttons': 'Раскладка кнопок',
   'hudChrome.controller.resetButtons': 'Сбросить раскладку кнопок',

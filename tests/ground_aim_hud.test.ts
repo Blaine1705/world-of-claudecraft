@@ -53,7 +53,9 @@ interface GroundAimHarness {
   flashActionSlot(slot: number): void;
   castSlot(slot: number): void;
   isGroundAimActive(): boolean;
+  groundAimAbilityRange(): number | null;
   updateGroundAimPoint(point: AimPoint | null): void;
+  nudgeGroundAimPoint(dx: number, dz: number): void;
   groundAimReticle(): {
     point: AimPoint;
     radius: number;
@@ -61,6 +63,7 @@ interface GroundAimHarness {
     dimmed: boolean;
   } | null;
   commitGroundAimAt(point?: AimPoint | null): boolean;
+  commitGroundAim(): boolean;
 }
 
 function resolvedPositionAbility(
@@ -273,6 +276,45 @@ describe('Hud ground aim behavior', () => {
     expect(hud.groundAimPoint).toEqual({ x: 100, z: 0 });
     expect(reticle?.point).toEqual({ x: -20, z: 0 });
     expect(reticle?.dimmed).toBe(true);
+  });
+
+  it('leashes a pad nudge to the ability range edge', () => {
+    const hud = makeHud({ range: 30 });
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 0, z: 0 });
+
+    hud.nudgeGroundAimPoint(100, 0);
+
+    expect(hud.groundAimPoint).toEqual({ x: 30, z: 0 });
+    expect(hud.groundAimReticle()?.point).toEqual({ x: 30, z: 0 });
+  });
+
+  it('nudges and clamps from the live player position', () => {
+    const hud = makeHud({ range: 30 });
+    hud.sim.player.pos.x = 40;
+    hud.sim.player.pos.z = -10;
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 40, z: -10 });
+
+    hud.nudgeGroundAimPoint(-100, 100);
+
+    const distance = Math.hypot(
+      (hud.groundAimPoint?.x ?? 0) - hud.sim.player.pos.x,
+      (hud.groundAimPoint?.z ?? 0) - hud.sim.player.pos.z,
+    );
+    expect(distance).toBeCloseTo(30);
+    expect(hud.groundAimReticle()?.point).toEqual(hud.groundAimPoint);
+  });
+
+  it('exposes the active range and commits through the pad entry point', () => {
+    const hud = makeHud({ range: 30 });
+    hud.castSlot(3);
+    hud.updateGroundAimPoint({ x: 10, z: 5 });
+
+    expect(hud.groundAimAbilityRange()).toBe(30);
+    expect(hud.commitGroundAim()).toBe(true);
+    expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 10, z: 5 });
+    expect(hud.groundAimAbilityRange()).toBeNull();
   });
 
   it('commits the same live clamp shown by the reticle', () => {

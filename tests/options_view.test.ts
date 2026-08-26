@@ -451,6 +451,7 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
+      'gamepadReticleSpeed',
       'gamepadVibration',
     ]);
     expect(find(controls, 'gamepadGlyphStyle')).toMatchObject({
@@ -467,6 +468,10 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
     expect(find(controls, 'gamepadEnabled')).toMatchObject({ control: 'boolToggle' });
     // camera speed renders with a one-decimal readout, not a percent
     expect(find(controls, 'gamepadCameraSpeed')).toMatchObject({
+      control: 'slider',
+      fmt: 'oneDecimal',
+    });
+    expect(find(controls, 'gamepadReticleSpeed')).toMatchObject({
       control: 'slider',
       fmt: 'oneDecimal',
     });
@@ -489,6 +494,7 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
+      'gamepadReticleSpeed',
       'gamepadVibration',
     ]);
   });

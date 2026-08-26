@@ -1585,6 +1585,7 @@ export const nl_NL: EnTranslations = {
       "invertY": "Camera omkeren (Y)",
       "deadzone": "Stickdode zone",
       "cameraSpeed": "Camerasnelheid",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Trilling",
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",

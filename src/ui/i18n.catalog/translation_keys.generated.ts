@@ -8320,6 +8320,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.controller.invertY'
   | 'hudChrome.controller.menuAction'
   | 'hudChrome.controller.resetButtons'
+  | 'hudChrome.controller.reticleSpeed'
   | 'hudChrome.controller.subcommandsAction'
   | 'hudChrome.controller.title'
   | 'hudChrome.controller.vibration'

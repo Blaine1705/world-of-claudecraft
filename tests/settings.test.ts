@@ -91,6 +91,15 @@ describe('Settings', () => {
     expect(settings.set('gamepadGlyphStyle', 99)).toBe(3);
   });
 
+  it('defaults and clamps controller reticle speed to its slider range', () => {
+    const settings = new Settings();
+
+    expect(SETTING_RANGES.gamepadReticleSpeed).toEqual({ min: 0.5, max: 2, def: 1 });
+    expect(settings.get('gamepadReticleSpeed')).toBe(1);
+    expect(settings.set('gamepadReticleSpeed', 99)).toBe(2);
+    expect(settings.set('gamepadReticleSpeed', 0)).toBe(0.5);
+  });
+
   it('keeps graphicsDefaultApplied false through an unrelated save and clears it on reset', () => {
     const s = new Settings();
     expect(s.get('graphicsDefaultApplied')).toBe(false);

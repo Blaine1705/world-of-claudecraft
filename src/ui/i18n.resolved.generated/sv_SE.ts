@@ -1585,6 +1585,7 @@ export const sv_SE: EnTranslations = {
       "invertY": "Invertera kamera (Y)",
       "deadzone": "Spakens dödzon",
       "cameraSpeed": "Kamerahastighet",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibration",
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",

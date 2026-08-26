@@ -1585,6 +1585,7 @@ export const da_DK: EnTranslations = {
       "invertY": "Vend kamera om (Y)",
       "deadzone": "Stikkets dødzone",
       "cameraSpeed": "Kamerahastighed",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibration",
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",

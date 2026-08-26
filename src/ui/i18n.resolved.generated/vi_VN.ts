@@ -1585,6 +1585,7 @@ export const vi_VN: EnTranslations = {
       "invertY": "Đảo Ngược Camera (Y)",
       "deadzone": "Vùng Chết Cần Điều Khiển",
       "cameraSpeed": "Tốc Độ Camera",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Rung",
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",

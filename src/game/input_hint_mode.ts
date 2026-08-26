@@ -40,6 +40,10 @@ function clearPadActivity(): void {
   if (hasDom()) document.body.classList.remove(PAD_ACTIVE_CLASS);
 }
 
+function clearPadActivityOnMouseMove(event: MouseEvent): void {
+  if (event.isTrusted) clearPadActivity();
+}
+
 /** Called by GamepadManager.poll whenever the pad produced real input this
  *  frame. Cheap when already marked (a classList.add no-op). */
 export function markPadActivity(): void {
@@ -48,6 +52,7 @@ export function markPadActivity(): void {
     clearsInstalled = true;
     window.addEventListener('keydown', clearPadActivity);
     window.addEventListener('mousedown', clearPadActivity);
+    window.addEventListener('mousemove', clearPadActivityOnMouseMove);
   }
   document.body.classList.add(PAD_ACTIVE_CLASS);
 }

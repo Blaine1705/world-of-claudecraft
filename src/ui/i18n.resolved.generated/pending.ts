@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "es_ES": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "fr_FR": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "fr_CA": [
+    "hudChrome.controller.reticleSpeed"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "de_DE": [
+    "hudChrome.controller.reticleSpeed"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.controller.reticleSpeed"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "nl_NL": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "pl_PL": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "id_ID": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "tr_TR": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "sv_SE": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "vi_VN": [
+    "hudChrome.controller.reticleSpeed"
+  ],
+  "da_DK": [
+    "hudChrome.controller.reticleSpeed"
+  ]
 };

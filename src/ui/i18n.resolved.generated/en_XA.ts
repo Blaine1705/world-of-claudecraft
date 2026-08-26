@@ -1585,6 +1585,7 @@ export const en_XA: EnTranslations = {
       "invertY": "[Íñʋéŕţ Çáɱéŕá (Ý)]",
       "deadzone": "[Šţíçķ Ðéáðžóñé]",
       "cameraSpeed": "[Çáɱéŕá Šþééð]",
+      "reticleSpeed": "[Ŕéţíçļé Šþééð]",
       "vibration": "[Ʋíƀŕáţíóñ]",
       "buttons": "[Ɓúţţóñ Ļáýóúţ]",
       "resetButtons": "[Ŕéšéţ Ɓúţţóñ Ļáýóúţ]",

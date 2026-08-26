@@ -1585,6 +1585,7 @@ export const zh_TW: EnTranslations = {
       "invertY": "反轉鏡頭（Y軸）",
       "deadzone": "搖桿死區",
       "cameraSpeed": "鏡頭速度",
+      "reticleSpeed": "準星速度",
       "vibration": "震動",
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",

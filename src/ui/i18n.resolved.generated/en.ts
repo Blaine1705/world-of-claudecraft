@@ -1585,6 +1585,7 @@ export const en: EnTranslations = {
       "invertY": "Invert Camera (Y)",
       "deadzone": "Stick Deadzone",
       "cameraSpeed": "Camera Speed",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibration",
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",

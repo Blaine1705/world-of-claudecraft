@@ -1585,6 +1585,7 @@ export const ru_RU: EnTranslations = {
       "invertY": "Инверсия камеры (Y)",
       "deadzone": "Мёртвая зона стика",
       "cameraSpeed": "Скорость камеры",
+      "reticleSpeed": "Скорость прицела",
       "vibration": "Вибрация",
       "buttons": "Раскладка кнопок",
       "resetButtons": "Сбросить раскладку кнопок",

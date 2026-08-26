@@ -1585,6 +1585,7 @@ export const pt_BR: EnTranslations = {
       "invertY": "Inverter Câmera (Y)",
       "deadzone": "Zona Morta do Analógico",
       "cameraSpeed": "Velocidade da Câmera",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibração",
       "buttons": "Disposição dos Botões",
       "resetButtons": "Redefinir Disposição dos Botões",

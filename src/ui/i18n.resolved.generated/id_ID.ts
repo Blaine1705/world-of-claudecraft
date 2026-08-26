@@ -1585,6 +1585,7 @@ export const id_ID: EnTranslations = {
       "invertY": "Balikkan Kamera (Y)",
       "deadzone": "Zona Mati Tuas",
       "cameraSpeed": "Kecepatan Kamera",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Getaran",
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",

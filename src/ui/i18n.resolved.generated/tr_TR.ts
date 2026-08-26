@@ -1585,6 +1585,7 @@ export const tr_TR: EnTranslations = {
       "invertY": "Kamerayı Ters Çevir (Y)",
       "deadzone": "Çubuk Ölü Bölgesi",
       "cameraSpeed": "Kamera Hızı",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Titreşim",
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",

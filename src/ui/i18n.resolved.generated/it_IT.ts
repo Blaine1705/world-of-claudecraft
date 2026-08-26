@@ -1585,6 +1585,7 @@ export const it_IT: EnTranslations = {
       "invertY": "Inverti telecamera (Y)",
       "deadzone": "Zona morta dello stick",
       "cameraSpeed": "Velocità telecamera",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibrazione",
       "buttons": "Disposizione dei pulsanti",
       "resetButtons": "Ripristina disposizione dei pulsanti",

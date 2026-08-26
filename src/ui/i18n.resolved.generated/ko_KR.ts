@@ -1585,6 +1585,7 @@ export const ko_KR: EnTranslations = {
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",
       "cameraSpeed": "카메라 속도",
+      "reticleSpeed": "조준점 속도",
       "vibration": "진동",
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",

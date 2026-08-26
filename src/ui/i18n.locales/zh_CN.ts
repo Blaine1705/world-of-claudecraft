@@ -5726,6 +5726,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': '反转镜头（Y轴）',
   'hudChrome.controller.deadzone': '摇杆死区',
   'hudChrome.controller.cameraSpeed': '镜头速度',
+  'hudChrome.controller.reticleSpeed': '准星速度',
   'hudChrome.controller.vibration': '震动',
   'hudChrome.controller.buttons': '按键布局',
   'hudChrome.controller.resetButtons': '重置按键布局',

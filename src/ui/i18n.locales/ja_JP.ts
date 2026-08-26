@@ -5923,6 +5923,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': 'カメラ反転（Y軸）',
   'hudChrome.controller.deadzone': 'スティックの遊び',
   'hudChrome.controller.cameraSpeed': 'カメラ速度',
+  'hudChrome.controller.reticleSpeed': 'レティクル速度',
   'hudChrome.controller.vibration': '振動',
   'hudChrome.controller.buttons': 'ボタン配置',
   'hudChrome.controller.resetButtons': 'ボタン配置をリセット',
