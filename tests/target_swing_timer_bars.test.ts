@@ -102,6 +102,33 @@ describe('TargetSwingTimerBars: visibility follows the enabled flag', () => {
       args: [document.querySelector('#swingbar-target'), 'none'],
     });
   });
+
+  // Distinct from the first test above: ATTACKING's aggroTargetId is null, so
+  // that test cannot tell whether the enabled gate actually reaches the tot
+  // resolution, only the target one (totId resolves to null either way). This
+  // one gives the target a REAL, live target-of-target so a dropped `enabled`
+  // check on the tot side would surface the tot bar even while disabled.
+  it('hides the tot bar when disabled, even against a live target-of-target of its own', () => {
+    const { calls, writers } = recordingWriters();
+    const bars = new TargetSwingTimerBars(writers);
+    const target = {
+      dead: false,
+      kind: 'mob',
+      autoAttack: true,
+      swingTimer: 1,
+      targetId: null,
+      aggroTargetId: 55,
+    };
+    const totEntity = { dead: false, kind: 'player', autoAttack: true, swingTimer: 0.5 };
+
+    bars.update(target as any, entitiesOf({ 55: totEntity }), false);
+
+    const displayCalls = calls.filter((c) => c.m === 'setDisplay');
+    expect(displayCalls).toEqual([
+      { m: 'setDisplay', args: [document.querySelector('#swingbar-target'), 'none'] },
+      { m: 'setDisplay', args: [document.querySelector('#swingbar-tot'), 'none'] },
+    ]);
+  });
 });
 
 describe('TargetSwingTimerBars: resolves the target-of-target entity itself', () => {
