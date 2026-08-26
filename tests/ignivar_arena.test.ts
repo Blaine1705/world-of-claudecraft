@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { arenaWallSegmentHits } from '../src/render/arena_wall_occlusion_core';
 import {
-  arenaWallSegmentHits,
   dungeonDaisHasRaisedPlatform,
   dungeonVariantKeepsFightingFloorClear,
 } from '../src/render/dungeon';

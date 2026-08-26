@@ -48,6 +48,7 @@ import {
   doorRampHalf,
   type WallSeg,
 } from '../sim/rift/authored';
+import { type ArenaWallFootprint, arenaWallSegmentHits } from './arena_wall_occlusion_core';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -62,18 +63,24 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import {
+  type PendingArenaWall,
+  type PendingArenaWalls,
+  Placements,
+  pendingArenaWallsFor,
+} from './dungeon_arena_walls';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
 import {
-  IGNIVAR_TILE_CARRIERS,
-  IGNIVAR_TILE_KINDS,
-  IGNIVAR_TILE_PREFIX,
+  applyIgnivarTilePackEmissive,
+  ensureIgnivarTileAssets,
+  IGNIVAR_FLOOR_KIND_WEIGHTS,
+  IGNIVAR_FLOOR_QUAD_KIND,
   ignivarTileKind,
-  ignivarTilePack,
-  isIgnivarInterior,
+  ignivarUpperWallKind,
 } from './ignivar_tile_kit';
 import {
   collectOwnedInteriorResources,
@@ -440,31 +447,6 @@ export function ensureDungeonAssets(): Promise<void> {
   return dungeonAssetsPromise;
 }
 
-// The Ignivar raid's dark-iron structural duplicates (see ignivar_tile_kit).
-// Loaded only when one of the three forge rooms builds, into their own pack so
-// the recolored source material never reaches the shared kit.
-let ignivarTileAssetsPromise: Promise<void> | null = null;
-function ensureIgnivarTileAssets(interior: string): Promise<void> {
-  if (!isIgnivarInterior(interior)) return Promise.resolve();
-  ignivarTileAssetsPromise ??= (async () => {
-    // The two texture CARRIERS load first so each raid pack's shared material
-    // is always sourced from the module that actually embeds the texture; the
-    // remaining modules are geometry-only and ride those materials.
-    await Promise.all(
-      Object.entries(IGNIVAR_TILE_CARRIERS).map(([pack, name]) =>
-        loadModuleAsset(`${IGNIVAR_TILE_PREFIX}${name}`, pack as Pack),
-      ),
-    );
-    const carrierNames = new Set<string>(Object.values(IGNIVAR_TILE_CARRIERS));
-    await Promise.all(
-      IGNIVAR_TILE_KINDS.filter((name) => !carrierNames.has(name)).map((name) =>
-        loadModuleAsset(`${IGNIVAR_TILE_PREFIX}${name}`, ignivarTilePack(name)),
-      ),
-    );
-  })();
-  return ignivarTileAssetsPromise;
-}
-
 // Kit-pack modules loaded on demand by scenes outside the dungeon interiors
 // (the jail). They land in the same moduleAssets/material registry, so
 // buildDungeonPropMesh serves them once resolved.
@@ -511,56 +493,6 @@ function pickKind(kinds: WeightedKinds, t: number): string {
     if (t * total < acc) return name;
   }
   return kinds[kinds.length - 1][0];
-}
-
-/** Accumulates instance transforms per module kind, then emits InstancedMeshes. */
-class Placements {
-  readonly byKind = new Map<string, THREE.Matrix4[]>();
-  private readonly pos = new THREE.Vector3();
-  private readonly quat = new THREE.Quaternion();
-  private readonly scl = new THREE.Vector3();
-  private readonly euler = new THREE.Euler();
-
-  add(
-    kind: string,
-    x: number,
-    y: number,
-    z: number,
-    rotY = 0,
-    scale: number | [number, number, number] = 1,
-  ): void {
-    const m = new THREE.Matrix4();
-    this.pos.set(x, y, z);
-    this.quat.setFromEuler(this.euler.set(0, rotY, 0));
-    if (typeof scale === 'number') this.scl.set(scale, scale, scale);
-    else this.scl.set(scale[0], scale[1], scale[2]);
-    m.compose(this.pos, this.quat, this.scl);
-    const list = this.byKind.get(kind);
-    if (list) list.push(m);
-    else this.byKind.set(kind, [m]);
-  }
-}
-
-export interface ArenaWallFootprint {
-  x: number;
-  z: number;
-  hw: number;
-  hd: number;
-  topY: number;
-  ry?: number;
-}
-
-interface PendingArenaWall {
-  placements: Placements;
-  footprint: ArenaWallFootprint;
-}
-
-interface PendingArenaWalls {
-  left: PendingArenaWall;
-  right: PendingArenaWall;
-  front: PendingArenaWall;
-  back: PendingArenaWall;
-  all: PendingArenaWall[];
 }
 
 interface ArenaHideable {
@@ -653,88 +585,6 @@ export function scaleUv(geo: THREE.BufferGeometry, su: number, sv: number): THRE
   const uv = geo.attributes.uv as THREE.BufferAttribute;
   for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * su, uv.getY(i) * sv);
   return geo;
-}
-
-function pointInsideArenaWall(f: ArenaWallFootprint, x: number, z: number): boolean {
-  const ry = f.ry ?? 0;
-  const dx = x - f.x;
-  const dz = z - f.z;
-  const lx = Math.cos(ry) * dx - Math.sin(ry) * dz;
-  const lz = Math.sin(ry) * dx + Math.cos(ry) * dz;
-  return Math.abs(lx) < f.hw && Math.abs(lz) < f.hd;
-}
-
-function segmentArenaWallEntry(
-  f: ArenaWallFootprint,
-  ax: number,
-  az: number,
-  bx: number,
-  bz: number,
-): number {
-  if (pointInsideArenaWall(f, ax, az)) return 0;
-  const ry = f.ry ?? 0;
-  const c = Math.cos(ry);
-  const s = Math.sin(ry);
-  const adx = ax - f.x;
-  const adz = az - f.z;
-  const bdx = bx - f.x;
-  const bdz = bz - f.z;
-  const lax = c * adx - s * adz;
-  const laz = s * adx + c * adz;
-  const lbx = c * bdx - s * bdz;
-  const lbz = s * bdx + c * bdz;
-  const dx = lbx - lax;
-  const dz = lbz - laz;
-  let tmin = -Infinity;
-  let tmax = Infinity;
-  if (Math.abs(dx) < 1e-9) {
-    if (lax < -f.hw || lax > f.hw) return Infinity;
-  } else {
-    let t1 = (-f.hw - lax) / dx;
-    let t2 = (f.hw - lax) / dx;
-    if (t1 > t2) {
-      const tmp = t1;
-      t1 = t2;
-      t2 = tmp;
-    }
-    tmin = Math.max(tmin, t1);
-    tmax = Math.min(tmax, t2);
-  }
-  if (Math.abs(dz) < 1e-9) {
-    if (laz < -f.hd || laz > f.hd) return Infinity;
-  } else {
-    let t1 = (-f.hd - laz) / dz;
-    let t2 = (f.hd - laz) / dz;
-    if (t1 > t2) {
-      const tmp = t1;
-      t1 = t2;
-      t2 = tmp;
-    }
-    tmin = Math.max(tmin, t1);
-    tmax = Math.min(tmax, t2);
-  }
-  if (tmax < tmin || tmax < 0) return Infinity;
-  return tmin;
-}
-
-export function arenaWallSegmentHits(
-  f: ArenaWallFootprint,
-  eyeX: number,
-  eyeY: number,
-  eyeZ: number,
-  camX: number,
-  camY: number,
-  camZ: number,
-): boolean {
-  if (
-    (eyeY < f.topY && pointInsideArenaWall(f, eyeX, eyeZ)) ||
-    (camY < f.topY && pointInsideArenaWall(f, camX, camZ))
-  ) {
-    return true;
-  }
-  const t = segmentArenaWallEntry(f, eyeX, eyeZ, camX, camZ);
-  if (t < 0 || t > 1) return false;
-  return eyeY + (camY - eyeY) * t < f.topY;
 }
 
 export class DungeonInteriors {
@@ -850,7 +700,7 @@ export class DungeonInteriors {
   ): Promise<THREE.Group> {
     await ensureDungeonAssets();
     await ensureIgnivarRaidDressingAssets(interior);
-    await ensureIgnivarTileAssets(interior);
+    await ensureIgnivarTileAssets(interior, loadModuleAsset);
     if (interior === 'wildheart') {
       const group = buildWildheartFieldInterior({
         lowGfx: this.lowGfx,
@@ -909,7 +759,7 @@ export class DungeonInteriors {
         // Every standard-layout interior routes its outer walls through the
         // hideable-wall path (formerly arena-only), so any wall crossing the
         // eye-to-camera segment fades to 20% opacity instead of blanking the view.
-        const arenaWalls = this.pendingArenaWalls(layout, ox, oz, variant);
+        const arenaWalls = pendingArenaWallsFor(layout, ox, oz, variant);
 
         // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
         // replace the single-room shell entirely. Walls come from the SAME segment
@@ -1562,18 +1412,7 @@ export class DungeonInteriors {
     // the high/ultra parallax height response.
     if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial)
       applySurfaceDetail(mat as THREE.MeshStandardMaterial, 'stone');
-    if (pack === 'ignivarKit' || pack === 'ignivarFloor' || pack === 'ignivarWall') {
-      // The forge rooms' authored iron carries its detail in the ALBEDO, and
-      // their grades run dim: a faint albedo-driven self-glow keeps the tile
-      // read alive in shadow and sets the ember grout luminous. Raid-only by
-      // construction: this pack never serves any other interior.
-      const lit = mat as THREE.MeshStandardMaterial | THREE.MeshLambertMaterial;
-      if (lit.map) {
-        lit.emissiveMap = lit.map;
-        lit.emissive = new THREE.Color(0xffffff);
-        lit.emissiveIntensity = 0.24;
-      }
-    }
+    applyIgnivarTilePackEmissive(pack, mat);
     this.packMats.set(pack, markSharedMaterial(mat));
     return mat;
   }
@@ -1654,59 +1493,6 @@ export class DungeonInteriors {
       mesh.receiveShadow = RECEIVER_KINDS.has(kind);
       group.add(mesh);
     }
-  }
-
-  private pendingArenaWalls(
-    layout: DungeonLayout,
-    ox: number,
-    oz: number,
-    variant?: Variant,
-  ): PendingArenaWalls {
-    // the Ignivar rooms stack a second wall course, so the hide/fade footprint
-    // reaches the true top
-    const topY = variant === 'ignivar' ? DUNGEON_WALL_HEIGHT * 2 : DUNGEON_WALL_HEIGHT;
-    const wallX = layout.wallX ?? DUNGEON_WALL_X;
-    const endWallHw = layout.endWallHw ?? DUNGEON_END_WALL_HW;
-    const wall = (footprint: ArenaWallFootprint): PendingArenaWall => ({
-      placements: new Placements(),
-      footprint,
-    });
-    const left = wall({
-      x: ox - wallX,
-      z: oz + layout.sideWallZ,
-      hw: DUNGEON_WALL_HW,
-      hd: layout.sideWallHd,
-      topY,
-    });
-    const right = wall({
-      x: ox + wallX,
-      z: oz + layout.sideWallZ,
-      hw: DUNGEON_WALL_HW,
-      hd: layout.sideWallHd,
-      topY,
-    });
-    const front = wall({ x: ox, z: oz + layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
-    const back = wall({ x: ox, z: oz + layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
-    if (layout.shellPolygon) {
-      const polygon = polygonWallSegments(layout.shellPolygon).map((segment) =>
-        wall({
-          x: ox + segment.x,
-          z: oz + segment.z,
-          hw: segment.halfLength,
-          hd: DUNGEON_WALL_HW,
-          topY,
-          ry: segment.rot,
-        }),
-      );
-      return { left, right, front, back, all: polygon };
-    }
-    return {
-      left,
-      right,
-      front,
-      back,
-      all: [left, right, front, back],
-    };
   }
 
   private emitArenaHideable(group: THREE.Group, pending: PendingArenaWall, variant: Variant): void {
@@ -1843,18 +1629,7 @@ export class DungeonInteriors {
         t,
       );
     }
-    if (variant === 'ignivar') {
-      // The forge rooms tile clean: the raid's authored iron flags carry the
-      // identity, so no dirt or rubble kinds break the grid. Small tiles keep
-      // a little placement variety without changing the surface.
-      return pickKind(
-        [
-          ['floor_tile_large', 82],
-          ['quad', 18],
-        ],
-        t,
-      );
-    }
+    if (variant === 'ignivar') return pickKind(IGNIVAR_FLOOR_KIND_WEIGHTS, t);
     if (isDelveVariant(variant)) {
       // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
       return pickKind(
@@ -1881,10 +1656,7 @@ export class DungeonInteriors {
   }
 
   private floorQuadKind(variant: Variant, t: number): string {
-    if (variant === 'ignivar') {
-      // one clean small tile: the raid kit ships no broken/weed/votive smalls
-      return 'floor_tile_small';
-    }
+    if (variant === 'ignivar') return IGNIVAR_FLOOR_QUAD_KIND;
     if (variant === 'arena_drowned') return this.floorQuadKind('temple', t);
     if (variant === 'bastion') {
       return pickKind(
@@ -2389,10 +2161,7 @@ export class DungeonInteriors {
       const target = hideableWalls?.[i]?.placements ?? p;
       target.add(kind, x, 0, z, rot, scale);
       if (variant === 'ignivar') {
-        // The forge rooms stack a second full course on top (no stretching):
-        // plain iron wall with the occasional cracked module, doors and gates
-        // stay ground level.
-        const upper = hash2(z * 3.1, x) < 0.25 ? 'wall_cracked' : 'wall';
+        const upper = ignivarUpperWallKind(hash2(z * 3.1, x));
         target.add(upper, x, DUNGEON_WALL_HEIGHT, z, rot, scale);
       }
       if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
