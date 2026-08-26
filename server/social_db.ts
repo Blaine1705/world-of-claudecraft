@@ -431,7 +431,8 @@ export class PgSocialDb implements SocialDb {
     charId: number,
     rank: GuildRank,
     limit: number,
-  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    requirePledge = false,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
@@ -468,6 +469,19 @@ export class PgSocialDb implements SocialDb {
       if (ins.rowCount === 0) {
         await client.query('ROLLBACK');
         return 'already_member';
+      }
+      if (requirePledge) {
+        // The pledge is the seat's consent: consume it in the same
+        // transaction, so a withdraw or decline racing the caller's pledge
+        // read rolls the seat back instead of seating a player who said no.
+        const consumed = await client.query(
+          'DELETE FROM guild_pledges WHERE character_id = $1 AND guild_id = $2',
+          [charId, guildId],
+        );
+        if ((consumed.rowCount ?? 0) === 0) {
+          await client.query('ROLLBACK');
+          return 'no_pledge';
+        }
       }
       await client.query('COMMIT');
       this.guildRoster.bust(guildId);

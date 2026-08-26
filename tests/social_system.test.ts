@@ -200,11 +200,19 @@ class FakeDb implements SocialDb {
     c: number,
     rank: GuildRank,
     limit: number,
-  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    requirePledge = false,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     if (!this.guilds.has(guildId)) return 'no_guild';
     if (this.members.has(c)) return 'already_member';
     const count = [...this.members.values()].filter((m) => m.guildId === guildId).length;
     if (count >= limit) return 'full';
+    // Mirrors the real transaction: the pledge is consumed with the seat, and
+    // a missing pledge to THIS guild refuses the whole seat.
+    if (requirePledge) {
+      const p = this.pledges.get(c);
+      if (!p || p.guildId !== guildId) return 'no_pledge';
+      this.pledges.delete(c);
+    }
     this.members.set(c, { guildId, rank });
     return 'ok';
   }
@@ -2529,6 +2537,9 @@ describe('guild pledges', () => {
     await h.svc.guildAccept(h.actor(4));
     expect(await h.db.guildMembership(4)).toMatchObject({ guildName: 'Bookbinders' });
     expect(await h.db.pledgeOf(4)).toBeNull();
+    // Joining restamps the live pledge tag from durable truth (now empty), so
+    // a later guild leave cannot resurface a stale pledged nameplate line.
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
   });
 
   it('accepting an OFFLINE pledger seats them directly, wiping the ladder, no invite involved', async () => {
@@ -2688,11 +2699,56 @@ describe('guild pledges', () => {
 
   it('founding a guild clears the founder standing pledge', async () => {
     const h = await seed();
+    h.tx.setOnline(2);
+    h.tx.setOnline(4);
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');
     expect(await h.db.pledgeOf(4)).not.toBeNull();
+    const boardPushes = h.tx.snapshotCount.get(2) ?? 0;
     const ok = await h.svc.guildCreate(h.actor(4), 'Aspirant Collective');
     expect(ok).toBe(true);
     expect(await h.db.pledgeOf(4)).toBeNull();
+    // The live tag restamps from durable truth (now empty) and the pledged
+    // guild's officers hear the board row disappear.
+    expect(h.tx.pledgeStamps.at(-1)).toEqual({ characterId: 4, pledgeGuild: '', guildTier: 0 });
+    expect(h.tx.snapshotCount.get(2) ?? 0).toBeGreaterThan(boardPushes);
+  });
+
+  it('rejecting after an accept cancels the outstanding invite: the reject stops the join', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect((h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInvite')).toHaveLength(1);
+    // The officer changes their mind while the invite is still pending: the
+    // explicit no must cancel the invite, not just bump the ladder.
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', false);
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    expect(
+      (h.tx.delivered.get(4) ?? []).filter((e) => e.type === 'guildInviteCancelled'),
+    ).toHaveLength(1);
+    // The inviting officer hears the cancel too (the guildRenamed shape).
+    expect(
+      (h.tx.delivered.get(2) ?? []).filter((e) => e.type === 'guildInviteCancelled'),
+    ).toHaveLength(1);
+    // The cancelled invite can no longer seat them.
+    await h.svc.guildAccept(h.actor(4));
+    expect(await h.db.guildMembership(4)).toBeNull();
+    expect(h.tx.errorsFor(4).at(-1)).toBe('The guild invitation has expired.');
+  });
+
+  it('a withdraw racing the offline seat rolls the seat back', async () => {
+    const h = await seed();
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    // The pledger's withdraw lands after the officer's pledge read but before
+    // the seat transaction: the consent is gone, so the seat must refuse.
+    const realSeat = h.db.addGuildMemberAtomic.bind(h.db);
+    h.db.addGuildMemberAtomic = async (guildId, charId, rank, limit, requirePledge) => {
+      await h.db.deletePledge(4);
+      return realSeat(guildId, charId, rank, limit, requirePledge);
+    };
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(await h.db.guildMembership(4)).toBeNull();
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant has no pledge to your guild.');
   });
 
   it('withdraw clears the pledge and restamps the badge', async () => {
