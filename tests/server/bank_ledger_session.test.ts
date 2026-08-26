@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   BankLedgerOutboxBudget,
+  type BankLedgerOutboxRowInput,
   serializeBankLedgerCommandBatch,
 } from '../../server/bank_ledger_outbox';
 import {
@@ -174,19 +175,22 @@ describe('bank ledger session journal', () => {
         },
       },
     );
-    const rows = Array.from({ length: BANK_LEDGER_SAVE_HIGH_WATER_ROWS }, (_, index) => ({
-      realm: OWNER.realm,
-      characterId: OWNER.characterId,
-      accountId: OWNER.accountId,
-      op: 'deposit',
-      itemId: `material_${index}`,
-      count: 1,
-      instance: null,
-      copperDelta: 0,
-      purchasedSlotsAfter: 0,
-      container: 'vault' as const,
-      containerId: null,
-    }));
+    const rows: BankLedgerOutboxRowInput[] = Array.from(
+      { length: BANK_LEDGER_SAVE_HIGH_WATER_ROWS },
+      (_, index) => ({
+        realm: OWNER.realm,
+        characterId: OWNER.characterId,
+        accountId: OWNER.accountId,
+        op: 'deposit',
+        itemId: `material_${index}`,
+        count: 1,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+        container: 'vault',
+        containerId: null,
+      }),
+    );
     const batch = serializeBankLedgerCommandBatch('ledger:high-water', rows);
     const reservation = rowJournal.outbox.tryReservePrepared(batch);
     expect(reservation).not.toBeNull();
