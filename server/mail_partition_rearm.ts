@@ -29,10 +29,11 @@ export function rearmMailPartitionsOnFailure(
 // flush (log and retry next cycle) from persistMailBlob()'s
 // durability-critical callers (server/woc_market_custody.ts), which must see
 // the failure to know their just-booked parcel is not yet durable.
-export async function writeDirtyMailPartitions(
+export async function writeDirtyMailPartitions<WriteContext = unknown>(
   sim: MailPartitionRearmSim,
-  enqueueWrite: <T>(write: () => Promise<T>) => Promise<T>,
+  enqueueWrite: <T>(write: () => Promise<T>, context?: WriteContext) => Promise<T>,
   propagate: boolean,
+  context?: WriteContext,
 ): Promise<void> {
   await enqueueWrite(async () => {
     const partitions = sim.takeDirtyMailPartitions();
@@ -44,5 +45,5 @@ export async function writeDirtyMailPartitions(
       if (propagate) throw err;
       console.error('failed to save mail:', err);
     }
-  });
+  }, context);
 }

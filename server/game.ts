@@ -354,7 +354,7 @@ import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { attachDetectorFlagHost } from './suspicion_flags';
-import { TickProfiler } from './tick_profiler';
+import { TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
@@ -1826,12 +1826,19 @@ export class GameServer {
   // queue a leave flush behind an autosave batch. The depth watch below makes
   // that collapse loud; if the warn fires in production, the escalation path
   // is a per-guild serializer for the autosave arm (state.md records it).
+  // Lazy on purpose: this runs at field-init time, before tickProfiler exists.
+  private readonly onSaveMs = (ms: number, sample?: TickProfilerSample) => {
+    if (!sample) return;
+    this.tickProfiler.addToSample(sample, 'saves', ms);
+    this.tickProfiler.addToSample(sample, 'total', ms);
+  };
   private readonly enqueueMarketWrite = createDepthWarnedSerialWriter(
     MARKET_WRITE_QUEUE_WARN_DEPTH,
     (depth) =>
       `market serial writer queue depth ${depth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+    this.onSaveMs,
   );
-  private readonly enqueueRiftWrite = createSerialWriter();
+  private readonly enqueueRiftWrite = createSerialWriter(this.onSaveMs);
   private restartCountdownStartedAt: number | null = null;
   private readonly restartCountdownTimers: NodeJS.Timeout[] = [];
   private readonly startedAt = Date.now();
@@ -1867,8 +1874,13 @@ export class GameServer {
     'bcastGrid',
     'bcastSelf',
     'social',
-    // Detailed sim, zone, and self-wire buckets are populated only during captures.
+    'saves',
+    'lateness',
+    // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
+    // Populated only while the detailed capture is active (an on-demand admin
+    // capture or PERF_TICK_LOG=1); zero otherwise.
     ...SIM_LAP_PHASES,
+    // Detailed zone and self-wire buckets are populated only during captures.
     ...SIM_MOB_ZONE_PHASES,
     ...SELF_WIRE_PHASES,
   ]);
@@ -2700,6 +2712,8 @@ export class GameServer {
           const now = process.hrtime.bigint();
           let dt = Number(now - last) / 1e9;
           last = now;
+          // Ahead of the clamp, which discards exactly what a stall reading must keep.
+          this.tickProfiler.add('lateness', Math.max(0, dt * 1000 - DT * 1000));
           if (dt > 0.5) dt = 0.5;
           acc += dt;
           // Feed the authoritative calendar to the sim so its daily windows work
@@ -2793,15 +2807,15 @@ export class GameServer {
             this.broadcastSocialPositions();
           }
           lap('social');
+          this.flushPeriodicSaves(dt);
           const tickMs = Number(process.hrtime.bigint() - now) / 1e6;
-          this.tickProfiler.commit(tickMs);
+          this.tickProfiler.commit(tickMs, ticksRun);
           this.maybeLogTickPerf(tickMs);
           this.finalizePerfCaptureIfDue();
           this.tickMsAvg =
             this.tickMsAvg === 0
               ? tickMs
               : this.tickMsAvg + TICK_EMA_ALPHA * (tickMs - this.tickMsAvg);
-          this.flushPeriodicSaves(dt);
           // LAST statement of the guarded body, deliberately: this timestamp is the
           // liveness signal /livez reads, so only a pass that ran to completion may
           // refresh it (a body that throws every tick must go stale, not look alive).
@@ -2839,10 +2853,11 @@ export class GameServer {
     this.saveTimer += dt;
     if (this.saveTimer >= AUTOSAVE_SECONDS) {
       this.saveTimer = 0;
+      const sample = this.tickProfiler.currentSample();
       void this.saveAll('autosave');
-      void this.saveMarket();
-      void this.saveMail();
-      void this.saveRifts();
+      void this.saveMarket(sample);
+      void this.saveMail(sample);
+      void this.saveRifts(sample);
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
   }
@@ -4677,9 +4692,9 @@ export class GameServer {
     }
   }
 
-  async saveMarket(): Promise<void> {
+  async saveMarket(sample?: TickProfilerSample): Promise<void> {
     try {
-      await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
+      await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()), sample);
     } catch (err) {
       console.error('failed to save world market:', err);
     }
@@ -4693,8 +4708,8 @@ export class GameServer {
     }
   }
 
-  async saveMail(): Promise<void> {
-    await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, false);
+  async saveMail(sample?: TickProfilerSample): Promise<void> {
+    await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, false, sample);
   }
 
   // Guild bank books (Guild Bank Phase 3): boot-load every realm guild's book
@@ -5496,15 +5511,16 @@ export class GameServer {
     }
   }
 
-  private async persistRifts(): Promise<void> {
+  private async persistRifts(sample?: TickProfilerSample): Promise<void> {
     await this.enqueueRiftWrite(() =>
       saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
+      sample,
     );
   }
 
-  async saveRifts(): Promise<void> {
+  async saveRifts(sample?: TickProfilerSample): Promise<void> {
     try {
-      await this.persistRifts();
+      await this.persistRifts(sample);
     } catch (err) {
       console.error('failed to save shared Rift state:', err);
     }
@@ -5654,15 +5670,9 @@ export class GameServer {
   }
 
   // Per-phase loop timing (p95 + max, in MILLISECONDS) for the /metrics exporter,
-  // keyed by phase name. The exporter converts to seconds and surfaces only its
-  // fixed WOC_TICK_PHASES subset, so the exported label set stays bounded.
-  tickPhaseMillis(): Record<string, { p95: number; max: number }> {
-    const { phases } = this.tickProfiler.profile();
-    const out: Record<string, { p95: number; max: number }> = {};
-    for (const [name, stats] of Object.entries(phases)) {
-      out[name] = { p95: stats.p95, max: stats.max };
-    }
-    return out;
+  // which converts to seconds and surfaces only its fixed WOC_TICK_PHASES subset.
+  tickPhaseMillis(only?: readonly string[]): Record<string, { p95: number; max: number }> {
+    return this.tickProfiler.phaseMillis(only);
   }
 
   // Start an on-demand detailed capture (admin-triggered). Clears the profiler so the
