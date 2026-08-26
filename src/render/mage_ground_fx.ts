@@ -19,6 +19,7 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import type { SimEvent } from '../sim/types';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import { SCHOOL_COLORS } from './vfx';
 
@@ -1609,4 +1610,65 @@ export class MageGroundFx {
       sfx.ring.rotation.z += 0.15 * dt; // a lazy drift so the edge reads alive
     }
   }
+}
+
+/** The 'spellfxAt' fx union, so a typo in a dispatch arm stays a compile error. */
+type SpellfxAtFx = Extract<SimEvent, { type: 'spellfxAt' }>['fx'];
+
+/** The 'spellfxAt' fields the meteor and rune arms read. */
+export interface MageGroundSpellfxEvent {
+  fx: SpellfxAtFx;
+  x: number;
+  z: number;
+  school: string;
+  radius?: number;
+  duration?: number;
+  sourceId?: number;
+  ability?: string;
+  warningLead?: number;
+  persistentId?: string;
+}
+
+/**
+ * Claim the stateful ground cues this module owns, moved verbatim from the
+ * renderer's event switch: a persistent-warning impact resolves that meteor in
+ * place, a fall (telegraphed or ambient) spawns the falling body, and a rune
+ * circle spawns the persistent inscription. Returns true when the event was
+ * consumed so the caller can break out of its switch arm; a 'meteorImpact'
+ * without a persistentId stays unclaimed and falls through to the caller's
+ * generic ground-impact burst.
+ */
+export function handleMageGroundSpellfxEvent(
+  fx: MageGroundFx,
+  ev: MageGroundSpellfxEvent,
+): boolean {
+  if (ev.fx === 'meteorImpact' && ev.persistentId) {
+    fx.impactMeteor(ev.persistentId, ev.x, ev.z);
+    return true;
+  }
+  if (ev.fx === 'meteorFall' || ev.fx === 'ambientMeteorFall') {
+    fx.spawnMeteor({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius ?? 8,
+      duration: ev.duration ?? 2,
+      sourceId: ev.sourceId,
+      ability: ev.ability,
+      showTelegraph: ev.fx !== 'ambientMeteorFall',
+      warningLead: ev.warningLead,
+      persistentId: ev.persistentId,
+    });
+    return true;
+  }
+  if (ev.fx === 'runeCircle') {
+    fx.spawnRune({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius ?? 8,
+      duration: ev.duration ?? 15,
+      school: ev.school,
+    });
+    return true;
+  }
+  return false;
 }

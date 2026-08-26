@@ -23,6 +23,7 @@ import {
   syncIgnivarEncounterVisuals,
 } from '../src/render/ignivar_encounter';
 import {
+  ignivarBossFacingLocked,
   ignivarEncounterBypassesCharacterCulling,
   ignivarEncounterViewVisibleDuringCompile,
   ignivarEncounterVisualPlan,
@@ -63,6 +64,11 @@ import {
   IGNIVAR_SOAK_FLAME_NAME,
   IGNIVAR_SOAK_READY_NAME,
 } from '../src/render/ignivar_soak_telegraph';
+import { handleMageGroundSpellfxEvent, type MageGroundFx } from '../src/render/mage_ground_fx';
+import {
+  syncRaidEncounterAnchorVisuals,
+  syncRaidEncounterRigVisuals,
+} from '../src/render/raid_encounter_visuals';
 import type { Vfx } from '../src/render/vfx';
 import {
   IGNIVAR_BRAND_AURA_ID,
@@ -1487,51 +1493,194 @@ describe('Ignivar encounter renderer', () => {
 
   it('pins the production renderer integration for cleanup, stable conduits, and facing', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const raidVisuals = readFileSync(
+      new URL('../src/render/raid_encounter_visuals.ts', import.meta.url),
+      'utf8',
+    );
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(renderer).toContain('disposeRaidEncounterVisuals(v.group);');
     expect(renderer).toContain(
       'isStableIgnivarWaterConduitTransition(v.builtTemplateId, e.templateId)',
     );
-    expect(renderer).toContain('e.castingAbility === IGNIVAR_FRONTAL_CAST_ID');
-    expect(renderer).toContain('e.castingAbility === IGNIVAR_SKYFIRE_CAST_ID');
-    expect(renderer).toContain('e.castingAbility === IGNIVAR_ROTATING_RAYS_CAST_ID');
-    expect(renderer).toContain('e.castingAbility === IGNIVAR_FORGE_WAVE_CAST_ID');
-    expect(renderer).toContain('e.castingAbility === IGNIVAR_JUDGMENT_CAST_ID');
+    expect(renderer).toContain('if (ignivarBossFacingLocked(e)) facing = e.facing;');
     expect(renderer).toContain('characterBodyOnScreen || raidEncounterBypassesCharacterCulling(e)');
-    expect(renderer).toContain('hasVisibleRaidEncounterTelegraph(v.group)');
     expect(renderer).toMatch(
-      /this\.gateViewOnCompile\(\s*view,\s*group,\s*e\.templateId === IGNIVAR_BOSS_ID && view\.visual \? view\.visual\.root : group,\s*\)/,
+      /this\.gateViewOnCompile\(\s*view,\s*group,\s*e\.templateId === IGNIVAR_BOSS_ID && view\.visual \? view\.visual\.root : group,\s*requiredForEntry,\s*\)/,
     );
     expect(renderer).toContain('v.group.visible = raidEncounterViewVisibleDuringCompile(');
+    // The rig-attached sync rides the extracted wrapper with the real cull and
+    // presentation verdicts, in that order, and the wrapper owns the
+    // still-visible-telegraph escape for culled bodies.
     expect(renderer).toMatch(
-      /v\.visual\.root,\s*characterBodyOnScreen,\s*undefined,\s*this\.sim\.entities/,
+      /syncRaidEncounterRigVisuals\(\s*v\.group,\s*e,\s*dt,\s*this\.vfx,\s*v\.visual\.root,\s*characterBodyOnScreen,\s*runCharacterPresentation,\s*this\.sim\.entities,\s*this\.reducedMotion\(\),\s*\)/,
     );
-    const chainSync = renderer.indexOf('syncIgnivarPlayerChainVisual(');
-    expect(chainSync).toBeGreaterThan(-1);
-    expect(renderer.slice(chainSync, chainSync + 180)).toContain('this.reducedMotion(),');
-    const unloadedRigBlockStart = renderer.indexOf('if (!v.visual) {', chainSync);
-    const unloadedRigBlockEnd = renderer.indexOf(
-      '// Decide visibility from the real world position before presentation work.',
-      unloadedRigBlockStart,
+    expect(raidVisuals).toContain(
+      'if (!runPresentation && !hasVisibleRaidEncounterTelegraph(group)) return;',
     );
-    expect(unloadedRigBlockStart).toBeGreaterThan(chainSync);
-    expect(unloadedRigBlockEnd).toBeGreaterThan(unloadedRigBlockStart);
-    const unloadedRigBlock = renderer.slice(unloadedRigBlockStart, unloadedRigBlockEnd);
-    const playerEncounterSync = renderer.indexOf(
-      'if (raidEncounterBypassesCharacterCulling(e))',
-      chainSync,
+    // The anchor overlays (the actionable player chain plus the unloaded-rig
+    // telegraph sync) run BEFORE the unloaded-rig early return, so a
+    // still-compiling body cannot hide them.
+    expect(renderer).toMatch(
+      /syncRaidEncounterAnchorVisuals\(\s*v\.group,\s*e,\s*this\.views,\s*dt,\s*this\.vfx,\s*this\.sim\.entities,\s*this\.reducedMotion\(\),\s*v\.visual !== null,\s*\);\s*if \(!v\.visual\) continue;/,
     );
-    expect(playerEncounterSync).toBeGreaterThan(chainSync);
-    expect(playerEncounterSync).toBeLessThan(unloadedRigBlockEnd);
-    expect(unloadedRigBlock).toMatch(
-      /syncRaidEncounterVisuals\([\s\S]*?this\.sim\.entities,[\s\S]*?\);[\s\S]*?continue;/,
+    expect(raidVisuals).toContain(
+      'syncIgnivarPlayerChainVisual(group, entity, views, dt, entities, reducedMotion);',
+    );
+    expect(raidVisuals).toContain(
+      '!hasCharacterRig && raidEncounterBypassesCharacterCulling(entity)',
     );
     expect(
       renderer.match(/this\.mageGroundFx\.syncWorldMeteorWarnings\(this\.sim\);/g),
     ).toHaveLength(2);
-    expect(renderer).toContain('this.mageGroundFx.impactMeteor(ev.persistentId, ev.x, ev.z)');
-    expect(renderer).toContain('warningLead: ev.warningLead');
+    expect(renderer).toContain('if (handleMageGroundSpellfxEvent(this.mageGroundFx, ev)) break;');
     expect(hud).toContain('resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label)');
+  });
+
+  it('locks the boss render facing for every facing-anchored telegraph cast', () => {
+    for (const cast of [
+      IGNIVAR_FRONTAL_CAST_ID,
+      IGNIVAR_FORGE_WAVE_CAST_ID,
+      IGNIVAR_JUDGMENT_CAST_ID,
+      IGNIVAR_ROTATING_RAYS_CAST_ID,
+      IGNIVAR_SKYFIRE_CAST_ID,
+    ]) {
+      expect(ignivarBossFacingLocked({ templateId: IGNIVAR_BOSS_ID, castingAbility: cast })).toBe(
+        true,
+      );
+    }
+    expect(ignivarBossFacingLocked({ templateId: IGNIVAR_BOSS_ID, castingAbility: null })).toBe(
+      false,
+    );
+    expect(ignivarBossFacingLocked({ templateId: IGNIVAR_BOSS_ID, castingAbility: 'melee' })).toBe(
+      false,
+    );
+    expect(
+      ignivarBossFacingLocked({
+        templateId: 'fire_elemental',
+        castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+      }),
+    ).toBe(false);
+  });
+
+  it('claims the meteor and rune ground cues and passes the warning lead through', () => {
+    const stub = { impactMeteor: vi.fn(), spawnMeteor: vi.fn(), spawnRune: vi.fn() };
+    const mage = stub as unknown as MageGroundFx;
+    expect(
+      handleMageGroundSpellfxEvent(mage, {
+        fx: 'meteorFall',
+        x: 1,
+        z: 2,
+        school: 'fire',
+        radius: 5,
+        duration: 3,
+        warningLead: 1.25,
+        persistentId: 'm1',
+      }),
+    ).toBe(true);
+    expect(stub.spawnMeteor).toHaveBeenCalledWith({
+      x: 1,
+      z: 2,
+      radius: 5,
+      duration: 3,
+      sourceId: undefined,
+      ability: undefined,
+      showTelegraph: true,
+      warningLead: 1.25,
+      persistentId: 'm1',
+    });
+    expect(
+      handleMageGroundSpellfxEvent(mage, { fx: 'ambientMeteorFall', x: 4, z: 5, school: 'fire' }),
+    ).toBe(true);
+    expect(stub.spawnMeteor).toHaveBeenLastCalledWith(
+      expect.objectContaining({ showTelegraph: false }),
+    );
+    expect(
+      handleMageGroundSpellfxEvent(mage, {
+        fx: 'meteorImpact',
+        x: 7,
+        z: 8,
+        school: 'fire',
+        persistentId: 'm1',
+      }),
+    ).toBe(true);
+    expect(stub.impactMeteor).toHaveBeenCalledWith('m1', 7, 8);
+    // Without a persistent id the impact stays unclaimed so the renderer's
+    // generic ground-impact burst still fires for it.
+    expect(
+      handleMageGroundSpellfxEvent(mage, { fx: 'meteorImpact', x: 7, z: 8, school: 'fire' }),
+    ).toBe(false);
+    expect(stub.impactMeteor).toHaveBeenCalledTimes(1);
+    expect(
+      handleMageGroundSpellfxEvent(mage, {
+        fx: 'runeCircle',
+        x: 9,
+        z: 10,
+        school: 'frost',
+        radius: 6,
+        duration: 12,
+      }),
+    ).toBe(true);
+    expect(stub.spawnRune).toHaveBeenCalledWith({
+      x: 9,
+      z: 10,
+      radius: 6,
+      duration: 12,
+      school: 'frost',
+    });
+  });
+
+  it('runs the rig sync for a culled body only while one of its telegraphs is visible', () => {
+    const vfx = undefined as unknown as Vfx;
+    const entities = new Map();
+    const group = new THREE.Group();
+    const bodyRoot = new THREE.Group();
+    const boss = {
+      kind: 'mob',
+      templateId: IGNIVAR_BOSS_ID,
+      castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+      castRemaining: 1.2,
+      castTotal: 2.4,
+      auras: [],
+    };
+    // Culled and idle: the sync is skipped entirely, nothing attaches.
+    syncRaidEncounterRigVisuals(group, boss, 0.1, vfx, bodyRoot, false, false, entities, false);
+    expect(group.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME)).toBeUndefined();
+    // Presentation running attaches the frontal telegraph.
+    syncRaidEncounterRigVisuals(group, boss, 0.1, vfx, bodyRoot, true, true, entities, false);
+    const frontal = group.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME) as THREE.Group;
+    expect(frontal.visible).toBe(true);
+    // Once visible, the sync keeps running for the culled body (the telegraph
+    // itself can still be on screen), so the cast keeps animating.
+    syncRaidEncounterRigVisuals(group, boss, 0.1, vfx, bodyRoot, false, false, entities, false);
+    expect(frontal.visible).toBe(true);
+  });
+
+  it('attaches telegraphs for a rigless bypass entity and leaves them to the rig sync otherwise', () => {
+    const vfx = undefined as unknown as Vfx;
+    const entities = new Map();
+    const views = new Map();
+    const boss = {
+      kind: 'mob',
+      templateId: IGNIVAR_BOSS_ID,
+      castingAbility: IGNIVAR_FRONTAL_CAST_ID,
+      castRemaining: 1.2,
+      castTotal: 2.4,
+      auras: [],
+    };
+    // A view with no character rig yet still shows the actionable telegraph.
+    const rigless = new THREE.Group();
+    syncRaidEncounterAnchorVisuals(rigless, boss, views, 0.1, vfx, entities, false, false);
+    expect(rigless.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME)).toBeDefined();
+    // Once a rig exists the rig sync owns the telegraphs; the anchor pass
+    // attaches nothing.
+    const rigged = new THREE.Group();
+    syncRaidEncounterAnchorVisuals(rigged, boss, views, 0.1, vfx, entities, false, true);
+    expect(rigged.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME)).toBeUndefined();
+    // A rigless entity with no culling-bypass mark attaches nothing either.
+    const idle = new THREE.Group();
+    const idleMob = { kind: 'mob', templateId: 'fire_elemental', castingAbility: null, auras: [] };
+    syncRaidEncounterAnchorVisuals(idle, idleMob, views, 0.1, vfx, entities, false, false);
+    expect(idle.children).toHaveLength(0);
   });
 
   it('keeps the Ignivar telegraph anchor visible while the cosmetic rig compiles', () => {

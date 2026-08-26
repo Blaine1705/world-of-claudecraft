@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { applyFogScenePreset } from '../src/render/fog_scene_state';
 import { sharedUniforms } from '../src/render/gfx';
 import {
   applyIgnivarArenaFog,
@@ -312,11 +313,29 @@ describe('Ignivar arena atmosphere', () => {
     });
 
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-
-    expect(source).toContain('ignivarRaidFogStateForInterior(interior ?? null)');
-    expect(source).toMatch(
-      /else if \(ignivarRaidFogState && desired === ignivarRaidFogState\) \{[\s\S]{0,160}?applyIgnivarRaidFog\(ignivarRaidFogState, fog\);/,
+    const fogScene = readFileSync(
+      new URL('../src/render/fog_scene_state.ts', import.meta.url),
+      'utf8',
     );
+
+    // The fog resolution and presets moved to fog_scene_state.ts; the renderer
+    // stays the thin caller that owns the settle edge.
+    expect(source).toContain(
+      'const fogScene = resolveFogScene(inside, px, camY, this.camera.position, this.sim.cfg.seed);',
+    );
+    expect(source).toContain('applyFogScenePreset(desired, fog, () => this.outdoorFogPreset());');
+    expect(fogScene).toContain('ignivarRaidFogStateForInterior(interior ?? null)');
+    expect(fogScene).toMatch(
+      /desired === 'ignivarApproach' \|\| desired === 'ignivar' \|\| desired === 'varkhul'[\s\S]{0,320}?applyIgnivarRaidFog\(desired, fog\);/,
+    );
+    // ...and the preset applier really lands the arena grade on a settled fog.
+    const presetFog = new THREE.Fog(0, 0, 1);
+    applyFogScenePreset('ignivar', presetFog, () => ({ color: 0, near: 0, far: 1 }));
+    expect({ color: presetFog.color.getHex(), near: presetFog.near, far: presetFog.far }).toEqual({
+      color: IGNIVAR_ARENA_LIGHTING.fogColor,
+      near: IGNIVAR_ARENA_LIGHTING.fogNear,
+      far: IGNIVAR_ARENA_LIGHTING.fogFar,
+    });
 
     const routedSun = new THREE.DirectionalLight(0, 0);
     const routedHemi = new THREE.HemisphereLight(0, 0, 0);

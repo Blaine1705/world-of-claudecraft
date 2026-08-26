@@ -20,3 +20,32 @@ export function shouldStartDamageAttackAnimation({
   if (playerRangedAttackAlreadyStarted(sourceKind, attackAnimationStarted)) return false;
   return !(sourceKind === 'mob' && castingAbility !== null && authoredCastOwnsBody);
 }
+
+/** A character visual's authored-clip lookup (CharacterVisual, structurally). */
+export interface AttackClipOverrideSource {
+  hasAttackClipOverride(abilityId: string): boolean;
+}
+
+/**
+ * Resolve the gate above from the live source entity and its active visual,
+ * moved verbatim from the renderer's damage-event arm: an authored full-body
+ * cast clip on a casting mob owns the rig, so the landing damage must not
+ * restart a generic attack gesture underneath it.
+ */
+export function damageEventStartsAttackAnimation(
+  source: { kind: string; castingAbility?: string | null } | undefined,
+  sourceVisual: AttackClipOverrideSource | null,
+  attackAnimationStarted: boolean | undefined,
+): boolean {
+  const authoredCastOwnsBody =
+    source?.kind === 'mob' &&
+    source.castingAbility !== null &&
+    source.castingAbility !== undefined &&
+    sourceVisual?.hasAttackClipOverride(source.castingAbility) === true;
+  return shouldStartDamageAttackAnimation({
+    sourceKind: source?.kind,
+    attackAnimationStarted,
+    castingAbility: source?.castingAbility,
+    authoredCastOwnsBody,
+  });
+}

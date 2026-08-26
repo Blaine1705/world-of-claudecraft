@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import type { SimEvent } from '../sim/types';
 
 const MAX_PORTALS = 4;
 const PORTAL_CENTER_Y = 2.7;
@@ -490,4 +491,42 @@ export function buildVarkhulForgePortalPrewarmVisual(): VarkhulForgePortalPrewar
   }
   root.userData.portalCount = MAX_PORTALS;
   return { root, dispose: () => fx.dispose() };
+}
+
+/**
+ * The 'spellfxAt' burst cues this portal answers, moved verbatim from the
+ * renderer's event switch: Army of the Dead opens on the caster's own facing,
+ * while Varkhul's Forge Legion Portal opens toward its summoner and swaps to
+ * the forge palette. Any other event is ignored.
+ */
+export function spawnArmyPortalBurstEvent(
+  fx: NecromancyArmyPortalFx,
+  ev: {
+    ability?: string;
+    /** the fx union keeps a typo in the dispatch arm a compile error */
+    fx: Extract<SimEvent, { type: 'spellfxAt' }>['fx'];
+    x: number;
+    z: number;
+    duration?: number;
+    sourceId?: number;
+  },
+  lookupEntity: (id: number) => { pos: { x: number; z: number }; facing: number } | undefined,
+): void {
+  if (
+    (ev.ability !== 'army_of_the_dead' && ev.ability !== 'Forge Legion Portal') ||
+    ev.fx !== 'burst'
+  ) {
+    return;
+  }
+  const source = ev.sourceId === undefined ? undefined : lookupEntity(ev.sourceId);
+  fx.spawn({
+    x: ev.x,
+    z: ev.z,
+    facing:
+      ev.ability === 'Forge Legion Portal' && source
+        ? Math.atan2(source.pos.x - ev.x, source.pos.z - ev.z)
+        : (source?.facing ?? 0),
+    duration: ev.duration ?? 2.8,
+    palette: ev.ability === 'Forge Legion Portal' ? 'forge' : 'necromancy',
+  });
 }

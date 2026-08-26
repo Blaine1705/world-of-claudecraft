@@ -21,7 +21,6 @@ import {
   delveModuleStackEndRelZ,
   delveOrigin,
   delveSlotAt,
-  dungeonAt,
   INSTANCE_SLOT_COUNT,
   ITEM_SETS,
   instanceOrigin,
@@ -38,13 +37,6 @@ import {
   zoneAt,
 } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
-import {
-  IGNIVAR_FORGE_WAVE_CAST_ID,
-  IGNIVAR_FRONTAL_CAST_ID,
-  IGNIVAR_JUDGMENT_CAST_ID,
-  IGNIVAR_ROTATING_RAYS_CAST_ID,
-  IGNIVAR_SKYFIRE_CAST_ID,
-} from '../sim/encounters/ignivar';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import {
@@ -183,7 +175,7 @@ import {
   preloadTrainingDummyAssets,
   trainingDummyAssetsReady,
 } from './characters/assets';
-import { shouldStartDamageAttackAnimation } from './characters/damage_attack_animation';
+import { damageEventStartsAttackAnimation } from './characters/damage_attack_animation';
 import {
   activeCharacterFormVisual,
   characterFormMaskForAura,
@@ -317,6 +309,7 @@ import {
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
+import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
   buildFoliageMaterialPrewarmGroup,
@@ -334,7 +327,7 @@ import {
   syncFrostNovaRootVisual,
 } from './frost_nova_root_visual';
 import { buildFrostSky, type FrostSkyView } from './frost_sky';
-import { FrozenOrbFx } from './frozen_orb_fx';
+import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from './frozen_orb_fx';
 import { buildGaleFeatures, type GaleFeaturesView } from './gale_features';
 import { buildGardenFeatures, type GardenFeaturesView } from './garden_features';
 import { gardenMazeCameraLift } from './garden_maze_core';
@@ -375,9 +368,8 @@ import {
   isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
 } from './ignivar_conduit';
-import { syncIgnivarPlayerChainVisual } from './ignivar_encounter';
+import { ignivarBossFacingLocked } from './ignivar_encounter_core';
 import { attachIgnivarModelVfx } from './ignivar_model_vfx';
-import { applyIgnivarRaidFog, ignivarRaidFogStateForInterior } from './ignivar_raid_environment';
 import { buildIgnivarRaidGate, ignivarRaidGatePlan } from './ignivar_raid_gate';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
 import { deferredPassArms, initialFrameDeferral, type LinkDebt } from './initial_frame_core';
@@ -420,7 +412,7 @@ import {
   mageBarrierStateForAura,
   syncMageBarrierVisual,
 } from './mage_barrier_visual';
-import { MageGroundFx } from './mage_ground_fx';
+import { handleMageGroundSpellfxEvent, MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
 import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
@@ -437,7 +429,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
-import { NecromancyArmyPortalFx } from './necromancy_army_portal_fx';
+import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_army_portal_fx';
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
@@ -576,10 +568,10 @@ import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
 import {
   disposeRaidEncounterVisuals,
-  hasVisibleRaidEncounterTelegraph,
   raidEncounterBypassesCharacterCulling,
   raidEncounterViewVisibleDuringCompile,
-  syncRaidEncounterVisuals,
+  syncRaidEncounterAnchorVisuals,
+  syncRaidEncounterRigVisuals,
 } from './raid_encounter_visuals';
 import { isOwnedPetHostile } from './reaction';
 import { buildRealmFlora, type RealmFloraView } from './realm_flora';
@@ -7781,22 +7773,9 @@ export class Renderer {
         if (ev.ability === 'abyssal_rift' && ev.fx === 'nova') {
           this.abyssalRiftFx.spawn({ x: ev.x, z: ev.z, radius: ev.radius ?? 8, duration: 2.2 });
         }
-        if (
-          (ev.ability === 'army_of_the_dead' || ev.ability === 'Forge Legion Portal') &&
-          ev.fx === 'burst'
-        ) {
-          const source = ev.sourceId === undefined ? undefined : this.sim.entities.get(ev.sourceId);
-          this.necromancyArmyPortalFx.spawn({
-            x: ev.x,
-            z: ev.z,
-            facing:
-              ev.ability === 'Forge Legion Portal' && source
-                ? Math.atan2(source.pos.x - ev.x, source.pos.z - ev.z)
-                : (source?.facing ?? 0),
-            duration: ev.duration ?? 2.8,
-            palette: ev.ability === 'Forge Legion Portal' ? 'forge' : 'necromancy',
-          });
-        }
+        spawnArmyPortalBurstEvent(this.necromancyArmyPortalFx, ev, (id) =>
+          this.sim.entities.get(id),
+        );
         dispatchVarkhulForgeHammerAttack(ev, (entityId, abilityId) =>
           this.triggerAttack(entityId, abilityId),
         );
@@ -7822,29 +7801,8 @@ export class Renderer {
           }
           break;
         }
-        if (ev.fx === 'meteorImpact' && ev.persistentId) {
-          this.mageGroundFx.impactMeteor(ev.persistentId, ev.x, ev.z);
-          break;
-        }
-        // The Frozen Orb flight, animated locally from its three moments:
-        // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
-        // the server's real coordinates when the orb latches onto an enemy.
-        // The pulse novas below stay the area telegraph, so no actionable
-        // information rides on this mesh.
-        if (ev.fx === 'meteorFall' || ev.fx === 'ambientMeteorFall') {
-          this.mageGroundFx.spawnMeteor({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 8,
-            duration: ev.duration ?? 2,
-            sourceId: ev.sourceId,
-            ability: ev.ability,
-            showTelegraph: ev.fx !== 'ambientMeteorFall',
-            warningLead: ev.warningLead,
-            persistentId: ev.persistentId,
-          });
-          break;
-        }
+        if (handleMageGroundSpellfxEvent(this.mageGroundFx, ev)) break;
+        if (handleFrozenOrbSpellfxEvent(this.frozenOrbFx, ev)) break;
         if (ev.fx === 'snowZone') {
           const zoneDuration = ev.duration ?? 6;
           this.mageGroundFx.spawnSnow({
@@ -7868,32 +7826,6 @@ export class Renderer {
               zoneDuration,
             );
           }
-          break;
-        }
-        if (ev.fx === 'runeCircle') {
-          this.mageGroundFx.spawnRune({
-            x: ev.x,
-            z: ev.z,
-            radius: ev.radius ?? 8,
-            duration: ev.duration ?? 15,
-            school: ev.school,
-          });
-          break;
-        }
-        if (ev.fx === 'orb') {
-          const orbSource = ev.sourceId ?? -1;
-          if (ev.phase === 'halt') this.frozenOrbFx.halt(orbSource, ev.x, ev.z);
-          else if (ev.phase === 'resume') this.frozenOrbFx.resume(orbSource, ev.x, ev.z);
-          else
-            this.frozenOrbFx.spawn({
-              sourceId: orbSource,
-              x: ev.x,
-              z: ev.z,
-              dirX: ev.dirX ?? 0,
-              dirZ: ev.dirZ ?? 1,
-              speed: ev.speed ?? 2.5,
-              duration: ev.duration ?? 8,
-            });
           break;
         }
         // Ground-targeted impact: burst draped onto the terrain where the spell
@@ -7924,20 +7856,12 @@ export class Renderer {
         // Every melee/ranged hit animates the attacker. A ranged projectile
         // carrying the typed launch cue already began its cosmetic one-shot,
         // so do not restart that same shot when its damage lands.
-        const source = this.sim.entities.get(ev.sourceId);
         const sourceView = this.views.get(ev.sourceId);
-        const sourceVisual = sourceView ? this.activeVisual(sourceView) : null;
-        const authoredCastOwnsBody =
-          source?.kind === 'mob' &&
-          source.castingAbility !== null &&
-          source.castingAbility !== undefined &&
-          sourceVisual?.hasAttackClipOverride(source.castingAbility) === true;
-        const startsAttackAnimation = shouldStartDamageAttackAnimation({
-          sourceKind: source?.kind,
-          attackAnimationStarted: ev.attackAnimationStarted,
-          castingAbility: source?.castingAbility,
-          authoredCastOwnsBody,
-        });
+        const startsAttackAnimation = damageEventStartsAttackAnimation(
+          this.sim.entities.get(ev.sourceId),
+          sourceView ? this.activeVisual(sourceView) : null,
+          ev.attackAnimationStarted,
+        );
         if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
         if (ev.kind === 'hit' && ev.amount > 0) {
@@ -8754,14 +8678,9 @@ export class Renderer {
     console.error('Live shader compile gate failed', error);
   }
 
-  // Generic anti-freeze layer. A freshly-streamed view links its shader programs
-  // SYNCHRONOUSLY on first draw - a 50-1700ms frame stall (the open-world travel
-  // hitch). Instead link them OFF the main thread and keep the view hidden until
-  // ready: it pops in a frame or two late rather than freezing. Unlike the boot
-  // prewarm this enumerates NOTHING, so new content and render-state variants the
-  // prewarm cannot anticipate (e.g. the env-map-lit material that links only when
-  // you walk into a biome) never hitch in-world. The prewarm stays a pure
-  // optimization: already-compiled spawn content resolves instantly, no pop-in.
+  // Generic anti-freeze layer: link a freshly streamed view off-thread and keep
+  // it hidden until ready. This also covers variants the boot prewarm cannot
+  // anticipate; already-compiled spawn content resolves without visible pop-in.
   private gateViewOnCompile(
     view: EntityView,
     group: THREE.Group,
@@ -9631,53 +9550,11 @@ export class Renderer {
         }
       }
     }
-    // the Drowned Temple reads as submerged: a teal murk instead of the
-    // crypt's near-black, so its flooded halls feel underwater, not just dark
-    const inDelve = inside && isDelvePos(px);
-    const inYumiMaze = inside && isYumiMazePos(px);
-    const inBattleground = inside && isBgPos(px);
-    const interior =
-      inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
-        ? dungeonAt(px)?.interior
-        : null;
-    encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
-    const inTemple = interior === 'temple';
-    const inNythraxis = interior === 'nythraxis';
-    const ignivarRaidFogState = ignivarRaidFogStateForInterior(interior ?? null);
-    // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
-    // sky dome and the daylight rig and only swaps in its own field haze.
-    const inWildheartField = interior === 'wildheart';
-    const inLastKeep = interior === 'lastkeep';
-    const inDawnhold = interior === 'dawnhold';
-    const desired = inDelve
-      ? 'delve'
-      : inYumiMaze
-        ? 'yumiMaze'
-        : inBattleground
-          ? 'battleground'
-          : inTemple
-            ? 'temple'
-            : inNythraxis
-              ? 'nythraxis'
-              : ignivarRaidFogState
-                ? ignivarRaidFogState
-                : inWildheartField
-                  ? 'wildheartField'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inDawnhold
-                      ? 'dawnhold'
-                      : inside
-                        ? 'dungeon'
-                        : camY <
-                            waterLevelAt(
-                              this.camera.position.x,
-                              this.camera.position.z,
-                              this.sim.cfg.seed,
-                            ) -
-                              0.05
-                          ? 'underwater'
-                          : 'outdoor';
+    // Which state this position means (and its preset below) is
+    // fog_scene_state.ts's to own, the fog twin of interior_light_rig.ts.
+    const fogScene = resolveFogScene(inside, px, camY, this.camera.position, this.sim.cfg.seed);
+    encounterPrewarm.setEncounterPrewarmInterior(this, fogScene.interior ?? null);
+    const desired = fogScene.desired;
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9707,79 +9584,7 @@ export class Renderer {
     this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
-      if (desired === 'dungeon') {
-        fog.color.setHex(0x05060a);
-        fog.near = 18;
-        fog.far = 90;
-      } else if (desired === 'temple') {
-        fog.color.setHex(0x0a3a44);
-        fog.near = 12;
-        fog.far = 78;
-      } else if (desired === 'nythraxis') {
-        // the raid arena is huge (±230), push the murk back so ~50yd reads
-        // clear (linear-fog midpoint (near+far)/2 = 50), not the old ~30
-        fog.color.setHex(0x020106);
-        fog.near = 20;
-        fog.far = 80;
-      } else if (ignivarRaidFogState && desired === ignivarRaidFogState) {
-        applyIgnivarRaidFog(ignivarRaidFogState, fog);
-      } else if (desired === 'wildheartField') {
-        // Sunlit humid depth keeps the full caldera readable while the rear
-        // shrine and limestone shell settle into a warm green atmospheric veil.
-        fog.color.setHex(0x8ca786);
-        fog.near = 105;
-        fog.far = 430;
-      } else if (desired === 'lastkeep') {
-        // The Last Keep: a warm hearth-lit haze pushed well back, so its
-        // grand three-story halls read golden and inhabited instead of
-        // dissolving into the crypt's cold near-black murk.
-        fog.color.setHex(0x241610);
-        fog.near = 30;
-        fog.far = 150;
-      } else if (desired === 'dawnhold') {
-        // Dawnhold Castle: brighter and greener-warm than the keep's hearth
-        // murk: a pale sage-gold air pushed even further back, so the garden
-        // palace reads sunlit end to end.
-        fog.color.setHex(0x3d422a);
-        fog.near = 40;
-        fog.far = 190;
-      } else if (desired === 'delve') {
-        // the collapsed reliquary breathes a warm ember murk, dried-blood
-        // charcoal, tighter than the overworld crypt's cold near-black, so the
-        // delve reads as its own claustrophobic place under the red torches
-        fog.color.setHex(0x0e0705);
-        fog.near = 14;
-        fog.far = 74;
-      } else if (desired === 'yumiMaze') {
-        // the Protect Yumi maze is a COMPETITIVE arena: a lighter night-blue
-        // murk pushed well past the ~90yd footprint, so the torches + team
-        // beacons read across the maze instead of dissolving mid-corridor
-        fog.color.setHex(0x161d31);
-        fog.near = 30;
-        fog.far = 170;
-      } else if (desired === 'battleground') {
-        // Thornhollow Fields is OPEN-AIR at immersive scale (100x280): true
-        // view-distance fog, the open world's own rule. The fight around you
-        // (~a chamber) reads clearly; the far keep's detail still dissolves
-        // before the 236yd flag-to-flag line, so the far chambers stay places
-        // you travel to, not read from spawn. Pushed back from the original
-        // 55/130 after the playtest: the tighter wall of haze swallowed the
-        // sky and flattened the light; at 70/210 the dome and ramparts
-        // breathe while the tactical veil holds. Symmetric for both teams:
-        // distance, never information.
-        fog.color.setHex(0xaecbe0);
-        fog.near = 70;
-        fog.far = 210;
-      } else if (desired === 'underwater') {
-        fog.color.setHex(0x17506e);
-        fog.near = 2;
-        fog.far = 48;
-      } else {
-        const preset = this.outdoorFogPreset();
-        fog.color.setHex(preset.color);
-        fog.near = preset.near;
-        fog.far = preset.far;
-      }
+      applyFogScenePreset(desired, fog, () => this.outdoorFogPreset());
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
@@ -10609,14 +10414,9 @@ export class Renderer {
         }
       }
       if (!isSelf) {
-        // Per-frame visibility uses the same create/destroy hysteresis as view
-        // retention (above) so a rig hovering right at the draw edge
-        // doesn't toggle visible/invisible every frame, that hard cutoff is the
-        // actual on-screen boundary flicker. group.visible carries last frame's
-        // state: once shown, keep it until past the 96yd destroy radius (where
-        // the view is torn down anyway); while hidden, show only within 80yd.
-        // hidden until its shaders finish linking off-thread (async-compile gate);
-        // the object branch below may still re-hide loot
+        // Per-frame visibility follows the create/destroy hysteresis above so
+        // rigs at the draw edge do not flicker. The object branch below may
+        // still re-hide loot.
         v.group.visible = raidEncounterViewVisibleDuringCompile(e, v.compilePending);
         // The graveyard resurrection angel is present only to a released spirit: hide
         // it from the living local player. It stays in the sim for the ghost and for
@@ -10682,16 +10482,7 @@ export class Renderer {
       const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
       v.group.position.set(x, y, z);
       let facing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * facingAlpha(ea);
-      if (
-        e.templateId === IGNIVAR_BOSS_ID &&
-        (e.castingAbility === IGNIVAR_FRONTAL_CAST_ID ||
-          e.castingAbility === IGNIVAR_FORGE_WAVE_CAST_ID ||
-          e.castingAbility === IGNIVAR_JUDGMENT_CAST_ID ||
-          e.castingAbility === IGNIVAR_ROTATING_RAYS_CAST_ID ||
-          e.castingAbility === IGNIVAR_SKYFIRE_CAST_ID)
-      ) {
-        facing = e.facing;
-      }
+      if (ignivarBossFacingLocked(e)) facing = e.facing;
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
         // (up to 180deg when engaging after an orbit) under the rate limiter
@@ -10846,30 +10637,17 @@ export class Renderer {
         dt,
         this.reducedMotion(),
       );
-      syncIgnivarPlayerChainVisual(
+      syncRaidEncounterAnchorVisuals(
         v.group,
         e,
         this.views,
         dt,
+        this.vfx,
         this.sim.entities,
         this.reducedMotion(),
+        v.visual !== null,
       );
-      if (!v.visual) {
-        if (raidEncounterBypassesCharacterCulling(e)) {
-          syncRaidEncounterVisuals(
-            v.group,
-            e,
-            dt,
-            this.vfx,
-            undefined,
-            false,
-            undefined,
-            this.sim.entities,
-            this.reducedMotion(),
-          );
-        }
-        continue;
-      }
+      if (!v.visual) continue;
       const veilboundState = characterVeilboundState(e);
       const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
       // Decide visibility from the real world position before presentation work.
@@ -10888,19 +10666,17 @@ export class Renderer {
         charOnScreen,
         actionablePose,
       );
-      if (runCharacterPresentation || hasVisibleRaidEncounterTelegraph(v.group)) {
-        syncRaidEncounterVisuals(
-          v.group,
-          e,
-          dt,
-          this.vfx,
-          v.visual.root,
-          characterBodyOnScreen,
-          undefined,
-          this.sim.entities,
-          this.reducedMotion(),
-        );
-      }
+      syncRaidEncounterRigVisuals(
+        v.group,
+        e,
+        dt,
+        this.vfx,
+        v.visual.root,
+        characterBodyOnScreen,
+        runCharacterPresentation,
+        this.sim.entities,
+        this.reducedMotion(),
+      );
 
       let iceBlockActivated = false;
       if (runCharacterPresentation) {

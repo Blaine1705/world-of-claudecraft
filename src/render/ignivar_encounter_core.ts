@@ -91,6 +91,26 @@ export function ignivarJudgmentCueIntensity(progress: number): number {
   return Math.max(cuePulse(clamped, 0.03, 0.25), cuePulse(clamped, 0.305, 0.525));
 }
 
+/**
+ * The boss holds its exact sim facing while a facing-anchored telegraph cast
+ * runs (moved verbatim from the renderer's facing interpolation): easing the
+ * render yaw there would swing the frontal, wave, judgment, ray, and skyfire
+ * anchors off the ground truth the sim resolves the hit against.
+ */
+export function ignivarBossFacingLocked(entity: {
+  templateId: string;
+  castingAbility: string | null;
+}): boolean {
+  return (
+    entity.templateId === IGNIVAR_BOSS_ID &&
+    (entity.castingAbility === IGNIVAR_FRONTAL_CAST_ID ||
+      entity.castingAbility === IGNIVAR_FORGE_WAVE_CAST_ID ||
+      entity.castingAbility === IGNIVAR_JUDGMENT_CAST_ID ||
+      entity.castingAbility === IGNIVAR_ROTATING_RAYS_CAST_ID ||
+      entity.castingAbility === IGNIVAR_SKYFIRE_CAST_ID)
+  );
+}
+
 /** Keeps arena-wide actionable visuals alive when the boss body leaves the camera frustum. */
 export function ignivarEncounterBypassesCharacterCulling(entity: IgnivarVisualEntity): boolean {
   if (entity.kind === 'player') {
