@@ -354,7 +354,7 @@ import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
 import { attachDetectorFlagHost } from './suspicion_flags';
-import { TickProfiler, type TickProfilerSample } from './tick_profiler';
+import { createTickSaveObserver, TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
@@ -1826,12 +1826,7 @@ export class GameServer {
   // queue a leave flush behind an autosave batch. The depth watch below makes
   // that collapse loud; if the warn fires in production, the escalation path
   // is a per-guild serializer for the autosave arm (state.md records it).
-  // Lazy on purpose: this runs at field-init time, before tickProfiler exists.
-  private readonly onSaveMs = (ms: number, sample?: TickProfilerSample) => {
-    if (!sample) return;
-    this.tickProfiler.addToSample(sample, 'saves', ms);
-    this.tickProfiler.addToSample(sample, 'total', ms);
-  };
+  private readonly onSaveMs = createTickSaveObserver(() => this.tickProfiler);
   private readonly enqueueMarketWrite = createDepthWarnedSerialWriter(
     MARKET_WRITE_QUEUE_WARN_DEPTH,
     (depth) =>
@@ -1876,11 +1871,7 @@ export class GameServer {
     'social',
     'saves',
     'lateness',
-    // sim.tick() internal phases, fed by the injected cfg.perfLap probe below.
-    // Populated only while the detailed capture is active (an on-demand admin
-    // capture or PERF_TICK_LOG=1); zero otherwise.
     ...SIM_LAP_PHASES,
-    // Detailed zone and self-wire buckets are populated only during captures.
     ...SIM_MOB_ZONE_PHASES,
     ...SELF_WIRE_PHASES,
   ]);
@@ -5669,8 +5660,7 @@ export class GameServer {
     return this.loopStartedAtMs;
   }
 
-  // Per-phase loop timing (p95 + max, in MILLISECONDS) for the /metrics exporter,
-  // which converts to seconds and surfaces only its fixed WOC_TICK_PHASES subset.
+  // Per-phase loop timing (p95 + max, ms) for the narrowed /metrics export.
   tickPhaseMillis(only?: readonly string[]): Record<string, { p95: number; max: number }> {
     return this.tickProfiler.phaseMillis(only);
   }

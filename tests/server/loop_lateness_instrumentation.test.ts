@@ -22,6 +22,7 @@ import { TickProfiler, type TickProfilerSample } from '../../server/tick_profile
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const GAME_TS = readFileSync(join(ROOT, 'server/game.ts'), 'utf8');
+const TICK_PROFILER_TS = readFileSync(join(ROOT, 'server/tick_profiler.ts'), 'utf8');
 
 /** The guarded 20 Hz loop body, from the callback head to its last statement. */
 function loopBody(): string {
@@ -266,8 +267,8 @@ describe('saves measures the deferred write, not the enqueue', () => {
     // The market writer carries the market AND mail books (saveMail rides
     // enqueueMarketWrite); the rift writer carries the rift blob.
     expect(GAME_TS).toContain('const sample = this.tickProfiler.currentSample();');
-    expect(GAME_TS).toContain("this.tickProfiler.addToSample(sample, 'saves', ms);");
-    expect(GAME_TS).toContain("this.tickProfiler.addToSample(sample, 'total', ms);");
+    expect(TICK_PROFILER_TS).toContain("target.addToSample(sample, 'saves', ms);");
+    expect(TICK_PROFILER_TS).toContain("target.addToSample(sample, 'total', ms);");
     expect(GAME_TS).toContain('void this.saveMarket(sample);');
     expect(GAME_TS).toContain('void this.saveMail(sample);');
     expect(GAME_TS).toContain('void this.saveRifts(sample);');

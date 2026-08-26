@@ -2380,6 +2380,10 @@ async function startGame(
         break;
     }
   }
+  const syncPadChrome = () => {
+    crossHotbar.syncPadMode(gamepad);
+    applyPadConnectedClass(gamepad.isConnected());
+  };
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
@@ -2390,10 +2394,7 @@ async function startGame(
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => {
-      crossHotbar.syncPadMode(gamepad);
-      applyPadConnectedClass(gamepad.isConnected());
-    },
+    onConnectionChange: syncPadChrome,
     onActivity: createGamepadActivityNotifier(desktopBridge()),
     onCrossHotbarCast: (action) => {
       padTargetPick.autoTarget(action);
@@ -2403,10 +2404,7 @@ async function startGame(
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
   crossHotbar.attach(gamepad);
-  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, () => {
-    crossHotbar.syncPadMode(gamepad);
-    applyPadConnectedClass(gamepad.isConnected());
-  });
+  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, syncPadChrome);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
@@ -2979,9 +2977,6 @@ async function startGame(
       // eagerly behind this opaque curtain; hold (bounded) so the commit
       // reveals a finished horizon instead of easing the fog out on screen.
       await next.farVistaReady();
-      // Released KTX2 mip chains re-transcode after the recycle's context
-      // loss; hold the curtain (bounded, see KTX2_RESTORE_MAX_WAIT_MS) until
-      // they are back so the reveal normally shows no stub-black textures.
       await ktx2MipsRestored();
     },
     validateRenderer: (next) => {

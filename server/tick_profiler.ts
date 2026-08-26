@@ -26,6 +26,17 @@ export interface TickProfilerSample {
   readonly id: number;
 }
 
+export function createTickSaveObserver(
+  profiler: () => TickProfiler,
+): (ms: number, sample: TickProfilerSample | undefined) => void {
+  return (ms, sample) => {
+    if (!sample) return;
+    const target = profiler();
+    target.addToSample(sample, 'saves', ms);
+    target.addToSample(sample, 'total', ms);
+  };
+}
+
 const EMPTY: PhaseStats = { mean: 0, p50: 0, p95: 0, p99: 0, max: 0 };
 
 function round2(v: number): number {

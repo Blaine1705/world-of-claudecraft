@@ -28,21 +28,19 @@ describe('main.ts wires applyPadConnectedClass to every pad connection-state cha
     expect(mainTs).toContain("import { applyPadConnectedClass } from './game/mobile_pad_chrome';");
   });
 
-  it('calls it from GamepadManager.onConnectionChange, alongside the cross-hotbar sync', () => {
-    const block = mainTs.match(/onConnectionChange:\s*\(\)\s*=>\s*\{([\s\S]*?)\n\s*\},/)?.[1] ?? '';
-    expect(block, 'onConnectionChange callback body not found').toBeTruthy();
+  it('keeps the shared pad chrome callback paired with the cross-hotbar sync', () => {
+    const block = mainTs.match(/const syncPadChrome = \(\) => \{([\s\S]*?)\n\s*\};/)?.[1] ?? '';
+    expect(block, 'syncPadChrome callback body not found').toBeTruthy();
     expect(block).toContain('crossHotbar.syncPadMode(gamepad)');
     expect(block).toContain('applyPadConnectedClass(gamepad.isConnected())');
   });
 
+  it('calls it from GamepadManager.onConnectionChange', () => {
+    expect(mainTs).toContain('onConnectionChange: syncPadChrome,');
+  });
+
   it('calls it from the gamepadEnabled setting applier too (start/stop is synchronous, no event fires)', () => {
-    const block =
-      mainTs.match(
-        /createGamepadSettingApplier\(gamepad, settings, \(\) => \{([\s\S]*?)\n\s*\}\);/,
-      )?.[1] ?? '';
-    expect(block, 'createGamepadSettingApplier callback body not found').toBeTruthy();
-    expect(block).toContain('crossHotbar.syncPadMode(gamepad)');
-    expect(block).toContain('applyPadConnectedClass(gamepad.isConnected())');
+    expect(mainTs).toContain('createGamepadSettingApplier(gamepad, settings, syncPadChrome)');
   });
 });
 
