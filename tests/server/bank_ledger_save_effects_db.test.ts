@@ -723,6 +723,27 @@ describe('fenced character save ledger effects', () => {
     expect(() =>
       prepareBankLedgerSaveEffects(OWNER.characterId, [], ordinaryCrossOwner, [19]),
     ).toThrow(/does not match the character save owner/);
+
+    const purgeBatch = ADMIN_PURGE_EFFECTS.batches[0];
+    const purgeRow = purgeBatch.rows[0];
+    const purgeEffect = purgeBatch.guildEffect;
+    if (!purgeRow || !purgeEffect) throw new Error('missing admin-purge fixture');
+    const mixedActors: BankLedgerSaveEffects = {
+      owner: OWNER,
+      batches: [
+        {
+          ...purgeBatch,
+          rows: [purgeRow, { ...purgeRow, accountId: 100 }],
+          guildEffect: {
+            ...purgeEffect,
+            deltas: [purgeEffect.deltas[0], purgeEffect.deltas[0]],
+          },
+        },
+      ],
+    };
+    expect(() => prepareBankLedgerSaveEffects(OWNER.characterId, [], mixedActors, [19])).toThrow(
+      /does not match the character save owner/,
+    );
   });
 
   it('refuses a single-owner lock proof for a cross-account admin purge', async () => {

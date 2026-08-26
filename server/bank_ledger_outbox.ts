@@ -86,6 +86,38 @@ export interface BankLedgerCommandBatch {
   readonly guildEffect?: SerializedBankLedgerGuildEffect | null;
 }
 
+/** Normal command rows belong to the character/outbox account. The sole
+ *  cross-account exception is an operator-attributed admin purge: the carrier
+ *  character owns the fenced guild-book transaction, while every row in that
+ *  command names the staff account that ordered the destructive removal. */
+export function bankLedgerBatchMatchesOwner(
+  owner: BankLedgerOutboxOwner,
+  batch: BankLedgerCommandBatch,
+): boolean {
+  const sameCharacter = batch.rows.every(
+    (row) => row.realm === owner.realm && row.characterId === owner.characterId,
+  );
+  if (!sameCharacter) return false;
+  if (batch.rows.every((row) => row.accountId === owner.accountId)) return true;
+  const effect = batch.guildEffect;
+  const actorAccountId = batch.rows[0]?.accountId;
+  return Boolean(
+    effect &&
+      Number.isSafeInteger(actorAccountId) &&
+      (actorAccountId ?? 0) > 0 &&
+      effect.deltas.length > 0 &&
+      effect.deltas.every((delta) => delta.op === 'admin_purge') &&
+      batch.rows.length === effect.deltas.length &&
+      batch.rows.every(
+        (row) =>
+          row.accountId === actorAccountId &&
+          row.op === 'admin_purge' &&
+          row.container === 'guild' &&
+          row.containerId === effect.guildId,
+      ),
+  );
+}
+
 /**
  * A batch detached by this module. Correlation fields are derived, while the
  * optional guild effect is part of both retained bytes and the receipt hash.
@@ -822,17 +854,8 @@ export class BankLedgerOutbox {
   }
 
   private assertBatchOwner(batch: BankLedgerCommandBatch): void {
-    for (let index = 0; index < batch.rows.length; index++) {
-      const row = batch.rows[index];
-      if (
-        row.realm !== this.owner.realm ||
-        row.characterId !== this.owner.characterId ||
-        row.accountId !== this.owner.accountId
-      ) {
-        throw new Error(
-          `bank ledger batch ${batch.batchKey} row ${index} does not match outbox owner`,
-        );
-      }
+    if (!bankLedgerBatchMatchesOwner(this.owner, batch)) {
+      throw new Error(`bank ledger batch ${batch.batchKey} does not match outbox owner`);
     }
   }
 

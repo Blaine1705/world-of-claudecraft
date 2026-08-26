@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import {
   BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH,
   type BankLedgerCommandBatch,
+  bankLedgerBatchMatchesOwner,
   bankLedgerCommandBatchFingerprintJson,
   type SerializedBankLedgerGuildEffect,
   type SerializedBankLedgerOutboxRow,
@@ -203,6 +204,9 @@ function prepareWrite(
       ? serializeBankLedgerGuildEffect(batch.guildEffect)
       : null;
     const hash = payloadSha256(batch);
+    if (!bankLedgerBatchMatchesOwner(owner, batch)) {
+      throw new Error(`bank ledger batch ${batch.batchKey} does not match owner`);
+    }
 
     const normalizedRows: SerializedBankLedgerOutboxRow[] = [];
     for (let rowOrdinal = 0; rowOrdinal < batch.rows.length; rowOrdinal++) {
@@ -210,16 +214,6 @@ function prepareWrite(
       if (typeof sourceRow !== 'object' || sourceRow === null) {
         throw new TypeError(`bank ledger batch ${batch.batchKey} row ${rowOrdinal} is invalid`);
       }
-      if (
-        sourceRow.realm !== owner.realm ||
-        sourceRow.characterId !== owner.characterId ||
-        sourceRow.accountId !== owner.accountId
-      ) {
-        throw new Error(
-          `bank ledger batch ${batch.batchKey} row ${rowOrdinal} does not match owner`,
-        );
-      }
-
       const value = normalizedRow(sourceRow);
       normalizedRows.push(value);
       rowBatchOrdinals.push(batchOrdinal);
