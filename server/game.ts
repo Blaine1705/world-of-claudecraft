@@ -7606,7 +7606,7 @@ export class GameServer {
             .catch(logSocialErr);
         break;
       case 'guild_decline':
-        this.social.guildDecline(this.actorFor(session));
+        void this.social.guildDecline(this.actorFor(session)).catch(logSocialErr);
         break;
       case 'guild_leave':
         void this.social.guildLeave(this.actorFor(session)).catch(logSocialErr);

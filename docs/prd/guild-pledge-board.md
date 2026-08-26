@@ -67,9 +67,15 @@ high-score board) with the recruitment column:
   - Block policy: a pledge is guild-scoped consent. A per-officer block still
     suppresses the ONLINE invite delivery (the silent fake-success arm of the
     invite flow), and that arm leaves the request standing, exactly like an
-    invite the pledger never answered, so nothing an officer observes can
-    reveal a block. The OFFLINE seat is not gated on any single officer's
-    block relationship: the player asked the guild, and the guild said yes.
+    invite the pledger never answered, so the board row itself never reveals
+    a block. (The invite flow's own refusal messages are a separate,
+    pre-existing observation surface, not changed here.) The OFFLINE seat is
+    not gated on any single officer's block relationship: the player asked
+    the guild, and the guild said yes.
+  - Declining the guild's invite withdraws the pledge: an explicit "no" to
+    the guild you pledged to ends the standing request, so a declined player
+    can never be seated offline afterwards. Letting an invite expire or
+    logging out with it pending is NOT a withdrawal; the request stands.
 - Reject removes the pledge and advances that player's cooldown ladder for
   THIS guild (below).
 - Per-guild settings, officer-plus editable: pledges on/off, minimum pledge

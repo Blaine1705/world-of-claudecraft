@@ -2659,6 +2659,33 @@ describe('guild pledges', () => {
     expect(await h.db.pledgeOf(4)).toBeNull();
   });
 
+  it('declining the pledged guild invite withdraws the pledge: no offline force-seat', async () => {
+    const h = await seed();
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    // The explicit "no" to the guild they pledged to ends the standing
+    // request, so a later accept cannot seat them while offline.
+    await h.svc.guildDecline(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toBeNull();
+    h.tx.setOffline(4);
+    await h.svc.guildPledgeDecide(h.actor(2), 'Aspirant', true);
+    expect(h.tx.errorsFor(2).at(-1)).toBe('Aspirant has no pledge to your guild.');
+    expect(await h.db.guildMembership(4)).toBeNull();
+  });
+
+  it('declining an unrelated guild invite leaves the pledge standing', async () => {
+    const h = await seed();
+    h.add(5, 'Scribe');
+    const other = await h.db.createGuildWithLeader('Inkwrights', 5);
+    if ('error' in other) throw new Error('guild seed failed');
+    h.tx.setOnline(4);
+    await h.svc.guildPledge(h.actor(4), 'Bookbinders');
+    await h.svc.guildInvite(h.actor(5), 'Aspirant');
+    await h.svc.guildDecline(h.actor(4));
+    expect(await h.db.pledgeOf(4)).toMatchObject({ guildName: 'Bookbinders' });
+  });
+
   it('founding a guild clears the founder standing pledge', async () => {
     const h = await seed();
     await h.svc.guildPledge(h.actor(4), 'Bookbinders');

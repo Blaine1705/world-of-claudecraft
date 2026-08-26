@@ -1178,9 +1178,10 @@ export class SocialService {
       // joining deletes it (guildAccept), and a pledger who already joined a
       // guild since pledging left the request stale, so it drops here. Every
       // other refusal (full, a pending invite) AND the silent blocked arm
-      // leave the request standing: the pledge surviving an accept must never
-      // depend on the block relationship, or the board becomes an oracle for
-      // "this player has me blocked".
+      // leave the request standing: whether the row survives an accept never
+      // depends on the block relationship, so the BOARD is not a block
+      // oracle. (The invite flow's own refusal messages remain a separate,
+      // pre-existing observation surface; see guildInvite.)
       const outcome = await this.guildInvite(actor, target.name);
       if (outcome === 'refused' && (await this.db.guildMembership(target.id))) {
         await this.db.deletePledge(target.id);
@@ -1237,10 +1238,13 @@ export class SocialService {
       return;
     }
     if (result === 'already_member') {
-      // The pledger joined a guild since pledging: the pledge is stale.
+      // The pledger joined a guild since pledging: the pledge is stale. The
+      // badge restamp covers a login racing this arm (no-op while offline).
       await this.db.deletePledge(target.id);
+      await this.refreshPledgeBadge(target.id);
       this.err(actor.characterId, `${target.name} is already in a guild.`);
       await this.pushGuild(membership.guildId);
+      this.tx.pushSnapshot(target.id);
       return;
     }
     // Seated in the DB. The pledge resolves, and acceptance wipes the
@@ -1307,8 +1311,21 @@ export class SocialService {
     this.tx.applyPledge(charId, pledge?.guildName ?? '', tier);
   }
 
-  guildDecline(actor: SocialActor): void {
-    this.takeGuildInvite(actor.characterId);
+  async guildDecline(actor: SocialActor): Promise<void> {
+    const invite = this.takeGuildInvite(actor.characterId);
+    if (!invite) return;
+    // Declining the invite from the guild you pledged to is an explicit
+    // withdrawal of that standing request. Without this, the surviving
+    // pledge would let an officer seat the decliner directly the moment
+    // they log off (a consent bypass). An invite from any OTHER guild
+    // leaves the pledge untouched.
+    const pledge = await this.db.pledgeOf(actor.characterId);
+    if (pledge && pledge.guildId === invite.guildId) {
+      await this.db.deletePledge(actor.characterId);
+      await this.refreshPledgeBadge(actor.characterId);
+      await this.pushGuild(invite.guildId);
+      this.tx.pushSnapshot(actor.characterId);
+    }
   }
 
   async guildLeave(actor: SocialActor): Promise<void> {
