@@ -45,7 +45,6 @@
 //   guild_bank.ts       IWorldGuildBank      shared guild treasury + item store (guild-wide view
 //                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
-//   vale_cup.ts         IWorldValeCup        Vale Cup boarball queue/roles/betting/practice
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
@@ -95,7 +94,6 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
-import type { IWorldValeCup } from './world_api/vale_cup';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -120,34 +118,46 @@ export type {
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
 // before either binary loads a character into a differently shaped world.
-// 9 = Varkhul's Forge Links became ten individual room runes with concentric
+// 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
+// disagree about the authoritative resource carrier, so they must fail closed.
+// 8 = the New Eastbrook program's Copper Dig relocation to the dig headland
+// (new coast lobe, dig terrain stamp, moved camps/props/veins and colliders;
+// docs/design/eastbrook-revamp/master-plan.md). Numbered 7 on the pre-merge
+// eastbrook branch, which forked before the Fate Threads bump.
+// 9 = phase 0b of the same program: the dig headland reverts to open sea (the
+// ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
+// the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
+// land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
+// 11 = Varkhul's Forge Links became ten individual room runes with concentric
 // movement controls. Mixed binaries disagree about actionable raid instructions,
 // so they must fail closed before entering the world.
-// 10 = Heroic Forge Links added orphaned-rune rescue state and neighbor signals.
+// 12 = Heroic Forge Links added orphaned-rune rescue state and neighbor signals.
 // Older clients cannot render who is authorized to rescue an orphan.
-// 11 = Forge Links became one five-track rune loom with moving controls, two
+// 13 = Forge Links became one five-track rune loom with moving controls, two
 // waves on both difficulties, and explicit Normal/Heroic wire identity. Older
 // clients would render ten overlapping stations and give unsafe instructions.
-// 12 = Forge Links returned to ten separate room stations while retaining the
-// moving controls and two-wave flow. Epoch 11 clients would stack every rune at
+// 14 = Forge Links returned to ten separate room stations while retaining the
+// moving controls and two-wave flow. Epoch 13 clients would stack every rune at
 // one shared center and present the wrong interaction geometry.
-// 13 = Forge Links added two authoritative crucible beams, blocker endpoints,
-// forge overheat, and Forge Meltdown. Epoch 12 clients cannot show or react to
+// 15 = Forge Links added two authoritative crucible beams, blocker endpoints,
+// forge overheat, and Forge Meltdown. Epoch 14 clients cannot show or react to
 // those lethal signals, so mixed binaries must fail closed.
-// 14 = Forge Links removed the rune interface and became persistent crucible
-// pillars plus timed beam windows, forge heat and portal add waves. Epoch 13
+// 16 = Forge Links removed the rune interface and became persistent crucible
+// pillars plus timed beam windows, forge heat and portal add waves. Epoch 15
 // clients would still render obsolete runes and hide inactive pillar hardware.
-// 15 = Varkhul added an authoritative moving Tempering Ray with a first-body
-// interceptor. Epoch 14 clients cannot render its lethal line or safe blocker.
-// 16 = Varkhul enlarged Cinder Orb fire from 2.4 to 3.5 yards. The persistent
+// 17 = Varkhul added an authoritative moving Tempering Ray with a first-body
+// interceptor. Epoch 16 clients cannot render its lethal line or safe blocker.
+// 18 = Varkhul enlarged Cinder Orb fire from 2.4 to 3.5 yards. The persistent
 // fire radius is authoritative, but the four-second player warning is compiled
-// into the client, so epoch 15 clients would preview a dangerously smaller area.
-// 17 = Heroic Varkhul added Worldfire, a compiled six-stage room-filling fire
-// wall. Epoch 16 clients would take lethal damage from bands they cannot see.
-// 18 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
-// 120 degrees to 42 yards and 140 degrees. Epoch 17 clients would display a
+// into the client, so epoch 17 clients would preview a dangerously smaller area.
+// 19 = Heroic Varkhul added Worldfire, a compiled six-stage room-filling fire
+// wall. Epoch 18 clients would take lethal damage from bands they cannot see.
+// 20 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
+// 120 degrees to 42 yards and 140 degrees. Epoch 19 clients would display a
 // dangerously smaller warning than the authoritative server damage.
-export const ONLINE_WORLD_LAYOUT_VERSION = 18 as const;
+// (11 through 20 were numbered 9 through 18 on the pre-merge raid branch,
+// which forked before the Eastbrook program bumps above.)
+export const ONLINE_WORLD_LAYOUT_VERSION = 20 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -274,6 +284,8 @@ export type {
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
+  GuildRosterEntry,
+  GuildRosterInfo,
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {
@@ -289,24 +301,14 @@ export type {
   GuildEventInfo,
   GuildInfo,
   GuildMemberInfo,
+  GuildPledgeInfo,
+  GuildPledgeSettings,
   GuildRank,
+  MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
-export type {
-  CupInfo,
-  VcBetInfo,
-  VcBetRecord,
-  VcBoardEntry,
-  VcLiveMatch,
-  VcMatchInfo,
-  VcPhase,
-  VcRosterPlayer,
-  VcSharedCupInfo,
-  VcStanding,
-  VcViewerReadout,
-} from './world_api/vale_cup';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -339,7 +341,6 @@ export interface IWorld
     IWorldProfessions,
     IWorldBank,
     IWorldGuildBank,
-    IWorldValeCup,
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
@@ -436,6 +437,11 @@ export const COMMAND_NAMES = [
   'trade_offer',
   'trade_confirm',
   'trade_cancel',
+  // Landed beside its trade siblings rather than appended at the tail; this
+  // list feeds only KNOWN_COMMANDS (a Set) and the CommandName union, and
+  // moving an already-shipped token would be the very reorder the tail rule
+  // forbids, so it stays filed here.
+  'trade_close',
   'duel_req',
   'duel_accept',
   'duel_decline',
@@ -452,6 +458,10 @@ export const COMMAND_NAMES = [
   'guild_kick',
   'guild_promote',
   'guild_demote',
+  'guild_pledge',
+  'guild_pledge_withdraw',
+  'guild_pledge_decide',
+  'guild_pledge_settings',
   'guild_transfer',
   'guild_disband',
   'arena_queue',
@@ -512,12 +522,6 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
-  'vcup_queue',
-  'vcup_leave',
-  'vcup_role',
-  'vcup_ready',
-  'vcup_bet',
-  'vcup_practice',
   'mount_toggle',
   'mount_train_begin',
   'mount_train_answer',
@@ -645,6 +649,11 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // The tutorial greeting's accept: the ferry ride to the Proving Shore
+  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
+  // life, and band server-side). Appended because wire tokens are never
+  // reordered.
+  'tutorial_start',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -722,7 +731,6 @@ export type WorldFacet =
   | 'IWorldTelemetry'
   | 'IWorldBank'
   | 'IWorldGuildBank'
-  | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
@@ -825,6 +833,7 @@ export const COMMAND_FACETS = {
   trade_offer: 'IWorldTrade',
   trade_confirm: 'IWorldTrade',
   trade_cancel: 'IWorldTrade',
+  trade_close: 'IWorldTrade',
   // IWorldDuelArena: duels + rated-arena queue + the 2v2 Fiesta augment pick. Fiesta
   // has no top-level member (it lives in arenaInfo.match.fiesta and flows over the
   // events queue); arena_augment is its only command. duelInfo/arenaInfo are snapshot
@@ -860,6 +869,10 @@ export const COMMAND_FACETS = {
   ignore_remove: 'IWorldSocialGraph',
   guild_create: 'IWorldSocialGraph',
   guild_invite: 'IWorldSocialGraph',
+  guild_pledge: 'IWorldSocialGraph',
+  guild_pledge_withdraw: 'IWorldSocialGraph',
+  guild_pledge_decide: 'IWorldSocialGraph',
+  guild_pledge_settings: 'IWorldSocialGraph',
   guild_accept: 'IWorldSocialGraph',
   guild_decline: 'IWorldSocialGraph',
   guild_leave: 'IWorldSocialGraph',
@@ -923,14 +936,6 @@ export const COMMAND_FACETS = {
   guild_bank_withdraw: 'IWorldGuildBank',
   guild_bank_buy_slots: 'IWorldGuildBank',
   guild_bank_log: 'IWorldGuildBank',
-  // IWorldValeCup: the Vale Cup boarball queue. cupInfo is a snapshot read (no
-  // send); vcup_practice starts a private instanced practice bout (online + off).
-  vcup_queue: 'IWorldValeCup',
-  vcup_leave: 'IWorldValeCup',
-  vcup_role: 'IWorldValeCup',
-  vcup_ready: 'IWorldValeCup',
-  vcup_bet: 'IWorldValeCup',
-  vcup_practice: 'IWorldValeCup',
   // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
   // The active mount is a self-snapshot read (terse `mnt`, no send, untagged);
   // summoning one is an item use (use_item), not a mount command.
