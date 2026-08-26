@@ -3146,23 +3146,21 @@ async function startGame(
   if (online) {
     // Issue #2416: chain onto whatever onReconnected enterWorld already armed
     // (the reconnect overlay teardown), rather than replacing it: hud does not
-    // exist yet when enterWorld sets that handler, so the market resync has to
-    // be wired here instead, once hud is actually available.
+    // exist yet when enterWorld sets that handler, so wire it once hud is available.
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
-      inputEcho.echoMs = 0;
-      inputEcho.jitterMs = 0;
+      inputEcho.echoMs = inputEcho.jitterMs = 0;
       Object.assign(kbTurn, newKeyboardTurnState());
+      movementPrediction.reset();
       hud.marketResyncAfterReconnect();
-      // A fresh join (as opposed to a resume within the linkdead grace window)
-      // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
+      // A fresh join hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
       // undefined, so the stored preference needs a re-push, the same way it is
       // pushed once on world entry above. onReconnected fires before ClientWorld
       // marks itself connected again, so any send from here would be silently
       // dropped; ClientWorld owns the re-push itself (it remembers the last
-      // value passed to setStopAutoAttackOnTargetSwitch and replays it right
-      // after connected flips true, and again after spectate ends), so nothing
+      // value passed to setStopAutoAttackOnTargetSwitch and replays it after
+      // connected flips true, and again after spectate ends), so nothing
       // needs to happen on this side.
     };
     // A hosted dev/PBE realm booted with ALLOW_DEV_COMMANDS=1 lights the /dev GUI
@@ -4794,7 +4792,7 @@ async function startGame(
         : SELF_MOTION_DISABLED
           ? null
           : selfMotionFrameBuffer.write(
-              selfPredictionEnabled,
+              net.connected && selfPredictionEnabled,
               resolved.mi,
               net.movementPositionAuthority,
               netFacing ?? interpServerFacing,

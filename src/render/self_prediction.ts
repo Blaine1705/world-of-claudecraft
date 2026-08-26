@@ -225,7 +225,7 @@ export class MovementPredictionPipeline {
     this.lastPredictedClientTick = -1;
   }
 
-  private reset(): void {
+  reset(): void {
     this.resetPrediction();
     this.lastEpoch = null;
     this.lastAckClientTick = -1;

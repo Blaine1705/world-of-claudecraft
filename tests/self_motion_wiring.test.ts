@@ -16,8 +16,8 @@ describe('online self-motion lifecycle wiring', () => {
       mainSource.indexOf('hud.marketResyncAfterReconnect();') +
         'hud.marketResyncAfterReconnect();'.length,
     );
-    expect(reconnectHook).toContain('onlineInputEchoMs = onlineJitterMs = 0;');
+    expect(reconnectHook).toContain('inputEcho.echoMs = inputEcho.jitterMs = 0;');
     expect(reconnectHook).toContain('Object.assign(kbTurn, newKeyboardTurnState());');
-    expect(reconnectHook).toContain('renderer.resetSelfMotionPrediction();');
+    expect(reconnectHook).toContain('movementPrediction.reset();');
   });
 });
