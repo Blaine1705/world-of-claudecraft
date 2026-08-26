@@ -32,6 +32,7 @@ type EngagedTickHook = () => void;
 function startEvadeHome(mob: Entity): void {
   mob.aiState = 'evade';
   mob.aggroTargetId = null;
+  mob.autoAttack = false; // leashing home: not swinging, whatever it was doing before
   clearThreat(mob);
   mob.leashAnchor = null;
   clearChainPullInbound(mob);
@@ -57,8 +58,12 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
 }
 
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
-  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) return false;
+  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) {
+    mob.autoAttack = false;
+    return false;
+  }
   mob.aiState = 'attack';
+  mob.autoAttack = true;
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   if (mob.swingTimer <= 0) {
     ctx.mobSwing(mob, target);
@@ -84,6 +89,7 @@ export function updateMobCombatProfile(
   updateMobTarget(ctx, mob);
   const target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
   if (!target || target.dead) {
+    mob.autoAttack = false;
     retargetMob(ctx, mob);
     return 'done';
   }
@@ -138,6 +144,7 @@ export function updateMobCombatProfile(
     if (mob.shoutIntroUntil !== undefined && ctx.time < mob.shoutIntroUntil) {
       mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
       mob.aiState = 'attack';
+      mob.autoAttack = false; // standing through the shout window, not swinging yet
       return 'done';
     }
   }
@@ -200,6 +207,7 @@ function updateHealerHold(ctx: SimContext, mob: Entity): MobCombatProfileResult 
     mob.healProtecteeId = protectee?.id ?? null;
   }
   if (!protectee) return null; // nobody to heal: fall back to melee AI
+  mob.autoAttack = false; // healing/standing off, never melee, in every branch below
   mob.facing = Math.atan2(protectee.pos.x - mob.pos.x, protectee.pos.z - mob.pos.z);
   const clearBar = () => {
     mob.castingAbility = null;
