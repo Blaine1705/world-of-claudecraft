@@ -243,25 +243,29 @@ describe('Ignivar arena atmosphere', () => {
 
   it('exports the immutable Ignivar lighting grade as pinned literals', () => {
     expect(IGNIVAR_ARENA_LIGHTING).toEqual({
-      fogColor: 0x120806,
+      fogColor: 0x391408,
       fogNear: 34,
-      fogFar: 108,
-      sunColor: 0xff8a4c,
-      sunIntensity: 0.42,
-      hemiSkyColor: 0x553028,
-      hemiGroundColor: 0x090405,
-      hemiIntensity: 0.34,
-      envIntensity: 0.3,
-      rimIntensity: 1.45,
+      fogFar: 112,
+      sunColor: 0xff9d48,
+      sunIntensity: 0.98,
+      hemiSkyColor: 0x93422a,
+      hemiGroundColor: 0x280d06,
+      hemiIntensity: 0.43,
+      envIntensity: 0.1,
+      rimIntensity: 1.05,
+      rimColor: 0xffa45c,
       forgeLightColor: 0xff6a24,
       emberLightColor: 0xffb15a,
     });
     expect(Object.isFrozen(IGNIVAR_ARENA_LIGHTING)).toBe(true);
     expect(IGNIVAR_ARENA_LIGHTING.fogNear).toBeLessThan(IGNIVAR_ARENA_LIGHTING.fogFar);
-    expect(IGNIVAR_ARENA_LIGHTING.sunIntensity).toBeLessThanOrEqual(0.5);
-    expect(IGNIVAR_ARENA_LIGHTING.hemiIntensity).toBeLessThanOrEqual(0.4);
-    expect(IGNIVAR_ARENA_LIGHTING.envIntensity).toBeLessThanOrEqual(0.35);
-    expect(IGNIVAR_ARENA_LIGHTING.rimIntensity).toBeLessThanOrEqual(1.5);
+    // The sunset forge stays a readable interior, never full daylight, and the
+    // env ceiling is the anti-sheen bound: the shared environment map is the
+    // daylight sky, and anything near the old 0.3 frosted the rigs blue-white.
+    expect(IGNIVAR_ARENA_LIGHTING.sunIntensity).toBeLessThanOrEqual(1);
+    expect(IGNIVAR_ARENA_LIGHTING.hemiIntensity).toBeLessThanOrEqual(0.6);
+    expect(IGNIVAR_ARENA_LIGHTING.envIntensity).toBeLessThanOrEqual(0.15);
+    expect(IGNIVAR_ARENA_LIGHTING.rimIntensity).toBeLessThanOrEqual(1.3);
   });
 
   it('is attached only through the Ignivar dungeon interior branch', () => {
@@ -279,8 +283,9 @@ describe('Ignivar arena atmosphere', () => {
     const hemi = new THREE.HemisphereLight(0, 0, 0);
     const scene = new THREE.Scene();
     const rim = { value: 0 };
+    const rimColor = { value: new THREE.Color(0) };
     applyIgnivarArenaFog(fog);
-    applyIgnivarArenaLighting({ sun, hemi, scene, rim });
+    applyIgnivarArenaLighting({ sun, hemi, scene, rim, rimColor });
     expect({ color: fog.color.getHex(), near: fog.near, far: fog.far }).toEqual({
       color: IGNIVAR_ARENA_LIGHTING.fogColor,
       near: IGNIVAR_ARENA_LIGHTING.fogNear,
@@ -294,6 +299,7 @@ describe('Ignivar arena atmosphere', () => {
       hemiIntensity: hemi.intensity,
       envIntensity: scene.environmentIntensity,
       rimIntensity: rim.value,
+      rimColor: rimColor.value.getHex(),
     }).toEqual({
       sunColor: IGNIVAR_ARENA_LIGHTING.sunColor,
       sunIntensity: IGNIVAR_ARENA_LIGHTING.sunIntensity,
@@ -302,6 +308,7 @@ describe('Ignivar arena atmosphere', () => {
       hemiIntensity: IGNIVAR_ARENA_LIGHTING.hemiIntensity,
       envIntensity: IGNIVAR_ARENA_LIGHTING.envIntensity,
       rimIntensity: IGNIVAR_ARENA_LIGHTING.rimIntensity,
+      rimColor: IGNIVAR_ARENA_LIGHTING.rimColor,
     });
 
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
@@ -315,9 +322,16 @@ describe('Ignivar arena atmosphere', () => {
     const routedHemi = new THREE.HemisphereLight(0, 0, 0);
     const routedScene = new THREE.Scene();
     const routedRim = { value: 0 };
+    const routedRimColor = { value: new THREE.Color(0) };
     applyInteriorLightRig(
       'ignivar',
-      { sun: routedSun, hemi: routedHemi, scene: routedScene, rim: routedRim },
+      {
+        sun: routedSun,
+        hemi: routedHemi,
+        scene: routedScene,
+        rim: routedRim,
+        rimColor: routedRimColor,
+      },
       { sunIntensity: 9, hemiIntensity: 9, envIntensity: 9 },
     );
     expect({
@@ -328,6 +342,7 @@ describe('Ignivar arena atmosphere', () => {
       hemiIntensity: routedHemi.intensity,
       envIntensity: routedScene.environmentIntensity,
       rimIntensity: routedRim.value,
+      rimColor: routedRimColor.value.getHex(),
     }).toEqual({
       sunColor: IGNIVAR_ARENA_LIGHTING.sunColor,
       sunIntensity: IGNIVAR_ARENA_LIGHTING.sunIntensity,
@@ -336,6 +351,7 @@ describe('Ignivar arena atmosphere', () => {
       hemiIntensity: IGNIVAR_ARENA_LIGHTING.hemiIntensity,
       envIntensity: IGNIVAR_ARENA_LIGHTING.envIntensity,
       rimIntensity: IGNIVAR_ARENA_LIGHTING.rimIntensity,
+      rimColor: IGNIVAR_ARENA_LIGHTING.rimColor,
     });
   });
 });

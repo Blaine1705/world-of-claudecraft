@@ -14,6 +14,7 @@ import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
+  RIM_GLOW_DEFAULT_COLOR,
 } from './pbr_fragment_shader';
 import { isSoftwareRendererName } from './software_renderer';
 
@@ -1919,10 +1920,12 @@ export const gfxInternalsForTest = {
 // One clock uniform shared by every onBeforeCompile shader (wind, water,
 // grade grain). The renderer ticks it once per frame in sync(). uRimBoost
 // scales the character rim glow (raised inside dungeons so silhouettes
-// separate from the murk).
+// separate from the murk); uRimColor is its tint, cool by default and
+// re-graded by the interior light rig (warm ember in the Ignivar forge).
 export const sharedUniforms = {
   uTime: { value: 0 },
   uRimBoost: { value: 1 },
+  uRimColor: { value: new THREE.Color(RIM_GLOW_DEFAULT_COLOR) },
   /** (player x, player z, dense blade-carpet radius): the paint-free ring the
    *  terrain splat reads so painted blades never show under the real carpet.
    *  Radius 0 (a tier with no carpet) leaves the paint everywhere. Written by
@@ -1997,6 +2000,7 @@ export function addRimGlow(mat: THREE.Material): void {
     const patched = patchPbrRimGlowFragmentShader(sh.fragmentShader);
     if (patched === sh.fragmentShader) return;
     sh.uniforms.uRimBoost = sharedUniforms.uRimBoost;
+    sh.uniforms.uRimColor = sharedUniforms.uRimColor;
     sh.fragmentShader = patched;
   };
   mat.customProgramCacheKey = () =>

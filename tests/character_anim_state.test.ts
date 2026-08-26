@@ -191,6 +191,38 @@ describe('desiredBaseState', () => {
     expect(desiredBaseState(anim({ ...moving, sitting: true }), true)).toBe('sit');
     expect(desiredBaseState(anim(), true)).toBe('idle');
   });
+
+  it('holds the battle stance instead of the idle while engaged and standing', () => {
+    expect(desiredBaseState(anim({ combat: true }), true, true, true)).toBe('combatIdle');
+    // Not engaged: the relaxed idle, exactly as before the stance existed.
+    expect(desiredBaseState(anim(), true, true, true)).toBe('idle');
+  });
+
+  it('never asks for the battle stance when the loaded rig has no stance clip', () => {
+    // Same rule as walkBack: baseAction() falls back to the plain idle action, so
+    // a machine believing it is in combatIdle would desync from what is playing.
+    expect(desiredBaseState(anim({ combat: true }), true, true, false)).toBe('idle');
+    // ...and the default is off, so every existing rig is untouched by the flag.
+    expect(desiredBaseState(anim({ combat: true }), true, true)).toBe('idle');
+  });
+
+  it('lets every other pose outrank the battle stance', () => {
+    // The stance is an IDLE variant: it must lose to anything that describes the
+    // body actually doing something. One arm per competing branch, since a single
+    // combined case would pass on any one of them working.
+    const fighting = { combat: true };
+    expect(desiredBaseState(anim({ ...fighting, moving: true }), true, true, true)).toBe('walk');
+    expect(
+      desiredBaseState(anim({ ...fighting, moving: true, running: true }), true, true, true),
+    ).toBe('run');
+    expect(desiredBaseState(anim({ ...fighting, swimming: true }), true, true, true)).toBe(
+      'swimIdle',
+    );
+    expect(desiredBaseState(anim({ ...fighting, airborne: true }), true, true, true)).toBe('jump');
+    expect(desiredBaseState(anim({ ...fighting, spinning: true }), true, true, true)).toBe('spin');
+    expect(desiredBaseState(anim({ ...fighting, casting: true }), true, true, true)).toBe('cast');
+    expect(desiredBaseState(anim({ ...fighting, sitting: true }), true, true, true)).toBe('sit');
+  });
 });
 
 describe('locomotionTimeScale', () => {

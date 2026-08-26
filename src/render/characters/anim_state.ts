@@ -40,10 +40,17 @@ export interface AnimState {
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** Engaged with someone right now: a standing body holds its rig's braced
+   *  battle stance instead of the relaxed idle (see desiredBaseState). Derived
+   *  from the mob's live aggro target, which both hosts carry, so peers brace
+   *  identically with no new wire traffic. Display-only; never gates gameplay. */
+  combat?: boolean;
 }
 
 export type BaseState =
   | 'idle'
+  /** Standing, but engaged: the braced guard loop, not the relaxed idle. */
+  | 'combatIdle'
   | 'walk'
   | 'walkBack'
   | 'run'
@@ -345,6 +352,7 @@ export function desiredBaseState(
   s: AnimState,
   hasWalkBackClip: boolean,
   hasWadeClip = true,
+  hasCombatIdleClip = false,
 ): BaseState {
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
@@ -365,6 +373,13 @@ export function desiredBaseState(
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
     return s.running ? 'run' : 'walk';
   }
+  // Standing still. A body that is currently fighting someone holds its braced
+  // guard instead of dropping to the relaxed idle: between swings a warlord
+  // stays set, weight low and weapon up, and only stands down once the fight
+  // ends. Gated on the rig actually HAVING the loop, the same rule walkBack and
+  // wade follow: baseAction() falls back to idle for a rig without one, and the
+  // machine must not sit in a state nothing is playing.
+  if (s.combat && hasCombatIdleClip) return 'combatIdle';
   return 'idle';
 }
 
