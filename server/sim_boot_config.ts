@@ -4,13 +4,20 @@
 // touches again. The one parameter is the perfLap hook, which must stay a
 // game.ts closure because it reads the GameServer's live tick-profiler state.
 
-import { PLAYER_INTEREST_DROP_RADIUS, type SimConfig } from '../src/sim/types';
+import {
+  PLAYER_INTEREST_DROP_RADIUS,
+  type SimConfig,
+  type VaultConsumptionAdmission,
+} from '../src/sim/types';
 import { WORLD_SEED } from '../src/sim/world_seed';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM_RESET_TIME_ZONE } from './realm';
 import { STORAGE_PRICES } from './storage_prices';
 
-export function buildRealmSimConfig(perfLap: SimConfig['perfLap']): SimConfig {
+export function buildRealmSimConfig(
+  perfLap: SimConfig['perfLap'],
+  vaultConsumptionAdmission?: VaultConsumptionAdmission,
+): SimConfig {
   return {
     seed: WORLD_SEED,
     playerClass: 'warrior',
@@ -47,6 +54,7 @@ export function buildRealmSimConfig(perfLap: SimConfig['perfLap']): SimConfig {
     // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
     raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
     perfLap,
+    vaultConsumptionAdmission,
     // Boot-time construction input: the optional STORAGE_PRICES env override
     // (server/storage_prices.ts), resolved once by the Sim ctor.
     storagePrices: STORAGE_PRICES,

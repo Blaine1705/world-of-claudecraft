@@ -54,6 +54,8 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   // The fence-miss arm kicks the displaced session; leave() releases its lease.
   releaseCharacterLease: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
 import { bankLedgerIdle } from '../server/bank_ledger';
@@ -193,6 +195,25 @@ function officerSetup(server: GameServer, session: ClientSession, treasury = 100
 
 const dispatch = (server: GameServer, session: ClientSession, msg: Record<string, unknown>) =>
   priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), 0);
+
+type CapturedLedgerEffects = {
+  batches?: readonly { rows?: readonly Record<string, unknown>[] }[];
+};
+
+const ledgerRowsFromEffects = (effects: unknown): readonly Record<string, unknown>[] =>
+  ((effects as CapturedLedgerEffects | undefined)?.batches ?? []).flatMap(
+    (batch) => batch.rows ?? [],
+  );
+
+const queuedLedgerRows = (session: ClientSession): readonly Record<string, unknown>[] =>
+  session.bankLedgerJournal.outbox
+    .snapshot()
+    .batches.flatMap((batch) => batch.rows as readonly Record<string, unknown>[]);
+
+const guildSaveLedgerRows = (callIndex = 0): readonly Record<string, unknown>[] => {
+  const call = dbMock.saveCharacterAndGuildBankState.mock.calls[callIndex] as unknown[] | undefined;
+  return ledgerRowsFromEffects(call?.[7]);
+};
 
 beforeEach(() => {
   dbMock.saveCharacterState.mockClear();
@@ -370,15 +391,14 @@ describe('the round trip (serialize -> reload on a fresh Sim)', () => {
 });
 
 describe('the dispatch observer: ledger rows + the dirty mark', () => {
-  it('a successful op writes exactly one guild row and marks the book dirty', async () => {
+  it('a successful op queues exactly one guild row and marks the book dirty', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Off');
     officerSetup(server, session);
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_500 });
     expect([...session.dirtyGuildBanks.keys()]).toEqual([GUILD_ID]);
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    expect(queuedLedgerRows(session)).toHaveLength(1);
+    expect(queuedLedgerRows(session)[0]).toMatchObject({
       characterId: 1,
       op: 'deposit_gold',
       copperDelta: 1_500,
@@ -388,7 +408,7 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
     });
   });
 
-  it('opening the bank (rung 0) writes an open_bank row: purse charged, treasury untouched', async () => {
+  it('opening the bank (rung 0) queues an open_bank row: purse charged, treasury untouched', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Opener');
     moveToBanker(server, session.pid);
@@ -423,9 +443,8 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
         purchasedSlotsAfter: 24,
       },
     ]);
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    expect(queuedLedgerRows(session)).toHaveLength(1);
+    expect(queuedLedgerRows(session)[0]).toMatchObject({
       characterId: 1,
       op: 'open_bank',
       copperDelta: -90_000,
@@ -434,19 +453,15 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
       containerId: GUILD_ID,
     });
     // A later expansion still records plain buy_slots from the treasury.
-    dbMock.insertBankLedgerRow.mockClear();
     meta.copper = 100_000; // refill the purse for the treasury top-up deposit
     dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 30_000 });
     dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
-    await bankLedgerIdle();
-    const ops = dbMock.insertBankLedgerRow.mock.calls.map(
-      (c) => (c as unknown[])[0] as { op: string; copperDelta: number },
-    );
+    const ops = queuedLedgerRows(session).slice(-2);
     expect(ops.map((o) => o.op)).toEqual(['deposit_gold', 'buy_slots']);
     expect(ops[1].copperDelta).toBe(-25_000); // rung 1, treasury-paid
   });
 
-  it('a tampered below-base count still records open_bank (the rung derivation matches the sim)', async () => {
+  it('a tampered below-base count still records open_bank (the rung derivation matches the sim)', () => {
     // A live count below the opened base is NOT a valid ladder position, but
     // the sim's buy op floors it to rung 0 and charges the PURSE. The
     // observer must derive the rung the same way (guildBankRungsBought), not
@@ -467,9 +482,8 @@ describe('the dispatch observer: ledger rows + the dirty mark', () => {
     dispatch(server, session, { cmd: 'guild_bank_buy_slots' });
     expect(meta.copper).toBe(10_000); // rung 0: purse-paid
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(5_000); // never the treasury
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    expect(queuedLedgerRows(session)).toHaveLength(1);
+    expect(queuedLedgerRows(session)[0]).toMatchObject({
       op: 'open_bank',
       copperDelta: -90_000,
       // purchasedSlotsBefore is NOT a ledger column (insertBankLedgerRow picks
@@ -802,7 +816,7 @@ describe('the guild bank op guard (the keep-forever ledger write meter)', () => 
   ) =>
     priv(server).dispatchMessage(session, { t: 'cmd', ...msg }, JSON.stringify(msg), receivedAtMs);
 
-  it('caps a ledger-write flood at the bucket and refills over time', async () => {
+  it('caps a ledger-write flood at the bucket and refills over time', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Flooder');
     officerSetup(server, session);
@@ -813,95 +827,50 @@ describe('the guild bank op guard (the keep-forever ledger write meter)', () => 
       dispatchAt(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1 }, t0);
     }
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_010);
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(10);
+    expect(queuedLedgerRows(session)).toHaveLength(10);
     // Two tokens per second of refill: five seconds later the next op runs.
-    // The awaited ledger idle let the join-time social snapshot resolve
-    // against the EMPTY mocked social DB, which re-stamped membership null
-    // (correct server behavior; not under test here): re-stamp the officer.
+    // Re-stamp explicitly so this assertion does not depend on the async
+    // join-time social snapshot's scheduling against the mocked social DB.
     server.sim.setPlayerGuildMembership(session.pid, { guildId: GUILD_ID, rank: 'officer' });
     dispatchAt(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1 }, t0 + 5_000);
     expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_011);
   });
 });
 
-describe('the unflushed-op log cap (bounded memory under a failing DB)', () => {
-  it('COMPACTS the log at the cap, semantics-preserving, and never drops it', () => {
-    // RETIRED (and replaced): this used to pin "the cap drops the log and the
-    // reconcile falls back to evict-and-reload from durable truth". Under the
-    // escrow root fix the log IS the write payload, so dropping it would
-    // discard committed-intent work, and there is no evict-and-reload arm to
-    // fall back to: the old pin's precondition is unconstructible. Its SOUND
-    // half (a partial log must never be trusted) survives here, strengthened
-    // from a prohibition into a positive obligation: the compacted log must
-    // replay to exactly the same book as the original.
-    // biome-ignore lint/suspicious/noExplicitAny: reading a private static pin
-    expect((GameServer as any).GUILD_BANK_UNFLUSHED_OP_CAP).toBe(500);
+describe('the exact unflushed-op journal (bounded memory under a failing DB)', () => {
+  it('keeps more than 500 commands exact and clears only their committed prefix', async () => {
     const server = new GameServer();
     const a = joinServer(server, 1, 'Overflow').session;
     officerSetup(server, a);
-    // Fill A's log past the cap with a realistic mixture (gold both ways, an
-    // item in and out, and a ladder step), then one more op trips it.
-    const synthetic: GuildBankOpDelta[] = [];
-    for (let i = 0; i < 500; i++) {
-      const base = {
-        itemId: null,
-        count: null,
-        instance: null,
-        craftedRecipeId: null,
-        purchasedSlotsBefore: 0,
-        purchasedSlotsAfter: 0,
-      };
-      if (i % 4 === 0) synthetic.push({ ...base, op: 'deposit_gold', copperDelta: 7 });
-      else if (i % 4 === 1) synthetic.push({ ...base, op: 'withdraw_gold', copperDelta: -3 });
-      else if (i % 4 === 2) {
-        synthetic.push({ ...base, op: 'deposit', itemId: 'wolf_fang', count: 2, copperDelta: 0 });
-      } else {
-        synthetic.push({ ...base, op: 'withdraw', itemId: 'wolf_fang', count: 1, copperDelta: 0 });
-      }
+    const commandCount = 501;
+    const t0 = Date.now();
+    for (let i = 0; i < commandCount; i++) {
+      priv(server).dispatchMessage(
+        a,
+        { t: 'cmd', cmd: 'guild_bank_deposit_gold', amount: 1 },
+        '{"cmd":"guild_bank_deposit_gold","amount":1}',
+        t0 + i * 500,
+      );
     }
-    const original = synthetic.map((d) => ({ ...d }));
-    a.unflushedGuildBankOps.set(GUILD_ID, [...synthetic]);
-    dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 500 });
-    const compacted = a.unflushedGuildBankOps.get(GUILD_ID) ?? [];
 
-    // 1. Memory is bounded: the whole run collapses to a handful of entries.
-    expect(compacted.length).toBeGreaterThan(0);
-    expect(compacted.length).toBeLessThan(10);
-    // 2. NOTHING was dropped: replaying the compacted log and replaying the
-    //    original leave a durable book in exactly the same state. This is the
-    //    positive obligation the retired pin's "must not trust a partial log"
-    //    rule becomes.
-    const withOp = [
-      ...original,
-      {
-        op: 'deposit_gold' as const,
-        itemId: null,
-        count: null,
-        instance: null,
-        craftedRecipeId: null,
-        copperDelta: 500,
-        purchasedSlotsBefore: 24,
-        purchasedSlotsAfter: 24,
-      },
-    ];
-    const base = (): GuildBankState => ({
-      treasury: 100_000,
-      inventory: [{ itemId: 'wolf_fang', count: 3 }],
+    const log = a.unflushedGuildBankOps.get(GUILD_ID) ?? [];
+    expect(log).toHaveLength(commandCount);
+    expect(log.every((delta) => delta.op === 'deposit_gold' && delta.copperDelta === 1)).toBe(true);
+    const snapshot = a.bankLedgerJournal.outbox.snapshot();
+    expect(snapshot.batches).toHaveLength(commandCount);
+    expect(snapshot.rowCount).toBe(commandCount);
+    expect(queuedLedgerRows(a).map((row) => row.copperDelta)).toEqual(
+      Array.from({ length: commandCount }, () => 1),
+    );
+
+    await expect(priv(server).saveCharacter(a)).resolves.toBe(true);
+    expect(a.unflushedGuildBankOps.get(GUILD_ID) ?? []).toEqual([]);
+    expect(a.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(durableBook()).toEqual({
+      treasury: 100_000 + commandCount,
+      inventory: [],
       purchasedSlots: 24,
     });
-    const fromOriginal = base();
-    const fromCompacted = base();
-    expect(applyGuildBankDeltasTo(fromOriginal, withOp)).toBeNull();
-    expect(applyGuildBankDeltasTo(fromCompacted, compacted)).toBeNull();
-    expect(fromCompacted.treasury).toBe(fromOriginal.treasury);
-    expect(fromCompacted.purchasedSlots).toBe(fromOriginal.purchasedSlots);
-    const multiset = (b: GuildBankState) => {
-      const m = new Map<string, number>();
-      for (const slot of b.inventory) m.set(slot.itemId, (m.get(slot.itemId) ?? 0) + slot.count);
-      return [...m.entries()].sort();
-    };
-    expect(multiset(fromCompacted)).toEqual(multiset(fromOriginal));
   });
 
   it('compaction keeps ladder steps verbatim and in place (they are order sensitive)', () => {
@@ -1318,16 +1287,15 @@ describe('the guild_create fee gate + the create/disband hooks', () => {
         purchasedSlots: 0,
       });
     });
-    // The fee save carries the charged purse and the seeded empty book
-    // together, and the create_fee row is written only AFTER it commits (the
-    // durability ordering: a row written first would book a payment that a
-    // fenced-out save never made).
+    // The fee save carries the charged purse, seeded empty book, and
+    // create_fee row in one transaction. No audit row can precede the state it
+    // claims was charged.
     await vi.waitFor(() => {
       expect(dbMock.saveCharacterAndGuildBankState).toHaveBeenCalled();
     });
-    await bankLedgerIdle();
-    expect(dbMock.insertBankLedgerRow).toHaveBeenCalledTimes(1);
-    expect((dbMock.insertBankLedgerRow.mock.calls[0] as unknown[])[0]).toMatchObject({
+    const createRows = guildSaveLedgerRows();
+    expect(createRows).toHaveLength(1);
+    expect(createRows[0]).toMatchObject({
       op: 'create_fee',
       characterId: 1,
       copperDelta: -GUILD_CREATION_FEE_COPPER,
@@ -1979,20 +1947,25 @@ describe('guild bank incident counters at their real emission sites', () => {
     expect(server.sim.guildBanks.has(9)).toBe(true);
   });
 
-  it('counts ledger_write_failed when a guild bank_ledger insert rejects', async () => {
+  it('quarantines and counts ledger_write_failed when post-mutation projection fails', () => {
     const server = new GameServer();
     const { session } = joinServer(server, 1, 'Ledger');
     officerSetup(server, session);
     const rec = recordingIncidents();
     setGameMetricsCounters(rec.sink);
-    dbMock.insertBankLedgerRow.mockRejectedValueOnce(new Error('insert rejected'));
+    vi.spyOn(session.bankLedgerJournal.outbox, 'commit').mockImplementationOnce(() => {
+      throw new Error('projection rejected');
+    });
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 });
-    await bankLedgerIdle();
+    expect(() =>
+      dispatch(server, session, { cmd: 'guild_bank_deposit_gold', amount: 1_000 }),
+    ).toThrow('projection rejected');
     errSpy.mockRestore();
-    expect(rec.kinds).toEqual(['ledger_write_failed']);
-    // The op itself still landed: the observer never faults the dispatch path.
-    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(101_000);
+    expect(rec.kinds).toEqual(['ledger_write_failed', 'reconcile']);
+    expect(session.escrowQuarantined).toBe(true);
+    // The mutation cannot be saved without its exact evidence, so the live
+    // shared book is restored before teardown can persist this character.
+    expect(server.sim.guildBanks.get(GUILD_ID)?.treasury).toBe(100_000);
   });
 
   it('books nothing at all on a healthy op + save (the vacuity guard)', async () => {
@@ -2061,12 +2034,9 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       carrierCharacterId: session.characterId,
     });
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([]);
-    // The observed mutation path did its two jobs: the audit row and the
-    // per-session unflushed delta the fence-out revert depends on.
-    await bankLedgerIdle();
-    const rows = (
-      dbMock.insertBankLedgerRow.mock.calls as unknown as Record<string, unknown>[][]
-    ).map((c) => c[0]);
+    // The observed mutation path carried both the audit row and the
+    // per-session delta through the same save transaction.
+    const rows = guildSaveLedgerRows();
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({
       op: 'admin_purge',
@@ -2080,7 +2050,7 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
       characterId: session.characterId,
     });
     // Evidence: the REAL instance payload, not the wire projection.
-    expect(rows[0].instance).toEqual({ boundTo: 424242 });
+    expect(rows[0].instanceJson).toBe('{"boundTo":424242}');
     expect(session.unflushedGuildBankOps.get(GUILD_ID) ?? []).toEqual([]); // consumed by the save
     // It rode the SAME fenced escrow save (never a standalone book write), and
     // the call awaited it: the mark is already released when the call returns.
@@ -2120,10 +2090,8 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     officerSetup(server, session);
     seatDormant(server);
     await server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
-    await bankLedgerIdle();
-    const row = (
-      dbMock.insertBankLedgerRow.mock.calls as unknown as Record<string, unknown>[][]
-    )[0][0];
+    const row = guildSaveLedgerRows()[0];
+    if (!row) throw new Error('missing transactional admin-purge row');
     expect(row.accountId).toBe(OPERATOR);
     expect(row.accountId).not.toBe(session.accountId);
   });
@@ -2201,6 +2169,46 @@ describe('adminPurgeGuildBankSlot (the operator escape hatch)', () => {
     expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toHaveLength(1);
     await bankLedgerIdle();
     expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['already leaving', (session: ClientSession) => (session.left = true)],
+    ['quarantined', (session: ClientSession) => (session.escrowQuarantined = true)],
+  ])('never selects an %s session as the purge carrier', async (_label, makeUnusable) => {
+    const server = new GameServer();
+    const session = joinServer(server, 1, 'Unavailable').session;
+    stampMember(server, session, 'officer');
+    seatBook(server, { treasury: 0, inventory: [{ ...DORMANT_SLOT }], purchasedSlots: 24 });
+    makeUnusable(session);
+
+    await expect(
+      server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR),
+    ).resolves.toEqual({ ok: false, reason: 'no_carrier' });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+  });
+
+  it('rechecks the exact carrier after the fresh roster read', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, 1, 'LeavingDuringLookup').session;
+    stampMember(server, session, 'officer');
+    seatBook(server, { treasury: 0, inventory: [{ ...DORMANT_SLOT }], purchasedSlots: 24 });
+    let releaseLookup!: () => void;
+    vi.spyOn(priv(server).socialDb, 'guildMembersFresh').mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseLookup = () => resolve([{ id: session.characterId, rank: 'officer' }]);
+        }),
+    );
+
+    const purging = server.adminPurgeGuildBankSlot(GUILD_ID, 0, 'wolf_fang', OPERATOR);
+    await vi.waitFor(() => expect(releaseLookup).toBeTypeOf('function'));
+    session.left = true;
+    releaseLookup();
+
+    await expect(purging).resolves.toEqual({ ok: false, reason: 'no_carrier' });
+    expect(server.sim.guildBanks.get(GUILD_ID)?.inventory).toEqual([DORMANT_SLOT]);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
   });
 
   it('prefers an officer-plus carrier over a plain member', async () => {

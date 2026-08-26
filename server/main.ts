@@ -378,6 +378,7 @@ import {
   beginStoragePurchase,
   claimStoragePurchaseSpend,
   deletePendingStoragePurchaseWithoutDebit,
+  openStoragePurchaseForCharacter,
   pendingStoragePurchasesForCharacter,
   releaseStoragePurchaseSpendClaim,
   renewStoragePurchaseSpendClaim,
@@ -2926,8 +2927,9 @@ const wocMarketService = new WocMarketService({
         liveGame().enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
         liveGame().serializeCharacterForPersist(characterId),
-      acknowledgeStorageCharacterSave: (characterId, leaseNonce, effects) =>
-        liveGame().acknowledgeStorageCharacterSave(characterId, leaseNonce, effects),
+      acknowledgeCharacterSaveEffects: (save) => liveGame().acknowledgeCharacterSaveEffects(save),
+      hasCharacterOnlySaveConflict: (characterId) =>
+        liveGame().hasCharacterOnlySaveConflict(characterId),
       hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
       escrowSessionLost: (pid, characterId, kind) =>
@@ -3214,6 +3216,7 @@ function storagePurchaseHost(): StoragePurchaseHost {
       discardWithoutDebit: (key, token) =>
         deletePendingStoragePurchaseWithoutDebit(pool, key, token),
       pendingFor: (characterId) => pendingStoragePurchasesForCharacter(pool, characterId),
+      openFor: (characterId) => openStoragePurchaseForCharacter(pool, characterId),
     },
     realm: REALM,
     warn: (message) => console.warn(`[storage-purchase] ${message}`),

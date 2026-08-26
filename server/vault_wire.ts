@@ -198,7 +198,7 @@ function reserveLedgerRows(
   maxRows: number,
 ): BankLedgerAdmissionHandle | null | undefined {
   if (admission === undefined) return undefined;
-  const reservation = admission?.tryReserve(maxRows) ?? null;
+  const reservation = admission?.tryReserve(maxRows, 0, 'vault') ?? null;
   if (!reservation) refuseLedgerAdmission(sim, pid);
   return reservation;
 }

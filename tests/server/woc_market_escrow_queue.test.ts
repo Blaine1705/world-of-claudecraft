@@ -39,7 +39,7 @@ vi.mock('../../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   releaseCharacterLease: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
-  loadAccountFlair: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
 import { type ClientSession, GameServer } from '../../server/game';
@@ -232,8 +232,9 @@ function makeRig(
       enqueueCharacterWrite: (characterId, job) => server.enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
         server.serializeCharacterForPersist(characterId),
-      acknowledgeStorageCharacterSave: (characterId, leaseNonce, effects) =>
-        server.acknowledgeStorageCharacterSave(characterId, leaseNonce, effects),
+      acknowledgeCharacterSaveEffects: (save) => server.acknowledgeCharacterSaveEffects(save),
+      hasCharacterOnlySaveConflict: (characterId) =>
+        server.hasCharacterOnlySaveConflict(characterId),
       hasDirtyGuildBooks: (characterId) => server.hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => server.flushDirtyGuildBooks(characterId),
       escrowSessionLost: (pid, characterId, kind) =>
@@ -1415,10 +1416,15 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await expect(rig.server.saveCharacter(rig.session)).rejects.toThrow('db down');
     expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
 
+    // A real lease-fence miss stays false for the displaced lease. Mark this
+    // fixture as already departing so the one-shot false does not schedule a
+    // second, unrealistically successful leave save behind this assertion.
+    rig.session.left = true;
     dbMock.saveCharacterState.mockResolvedValueOnce(false);
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
     expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
 
+    rig.session.left = false;
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
     expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
   });

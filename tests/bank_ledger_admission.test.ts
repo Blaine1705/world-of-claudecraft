@@ -30,6 +30,7 @@ import {
   BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES,
   type BankLedgerAdmission,
   BankLedgerOutboxAdmission,
+  type BankLedgerProjectionSurface,
   bankLedgerSyncMinimumEncodedBytes,
 } from '../server/bank_ledger_admission';
 import {
@@ -97,7 +98,11 @@ function ledgerRow(overrides: Partial<BankLedgerRow> = {}): BankLedgerRow {
 }
 
 function outboxRig(
-  options: { rows?: number; bytes?: number; onProjectionFailure?: (error: unknown) => void } = {},
+  options: {
+    rows?: number;
+    bytes?: number;
+    onProjectionFailure?: (error: unknown, surface: BankLedgerProjectionSurface) => void;
+  } = {},
 ) {
   let key = 0;
   const rows = options.rows ?? 200;
@@ -400,6 +405,7 @@ describe('bank and vault synchronous ledger admission', () => {
     expect(bankRig.outbox.hasPending).toBe(true);
     expect(bankRig.outbox.usage.reservedEncodedBytes).toBeGreaterThan(0);
     expect(bankFailure).toHaveBeenCalledOnce();
+    expect(bankFailure).toHaveBeenCalledWith(expect.any(Error), 'personal');
 
     const vaultFailure = vi.fn();
     const vaultRig = outboxRig({ onProjectionFailure: vaultFailure });
@@ -413,6 +419,7 @@ describe('bank and vault synchronous ledger admission', () => {
     expect(vaultRig.outbox.hasPending).toBe(true);
     expect(vaultRig.outbox.usage.reservedEncodedBytes).toBeGreaterThan(0);
     expect(vaultFailure).toHaveBeenCalledOnce();
+    expect(vaultFailure).toHaveBeenCalledWith(expect.any(Error), 'vault');
   });
 
   it('cancels cleanly when the pre-mutation snapshot throws', () => {

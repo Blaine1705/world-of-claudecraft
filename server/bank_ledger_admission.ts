@@ -60,15 +60,24 @@ export interface BankLedgerAdmissionHandle {
   failAfterMutation(error: unknown): void;
 }
 
+/** The gameplay surface whose already-applied mutation lost its projection.
+ *  Fixed-cardinality so the host can route the incident without inspecting
+ *  player or item data. */
+export type BankLedgerProjectionSurface = 'personal' | 'vault' | 'guild';
+
 /** Structural seam accepted by synchronous bank and vault wire dispatchers. */
 export interface BankLedgerAdmission {
-  tryReserve(maxRows: number, maxGuildEffectDeltas?: number): BankLedgerAdmissionHandle | null;
+  tryReserve(
+    maxRows: number,
+    maxGuildEffectDeltas?: number,
+    surface?: BankLedgerProjectionSurface,
+  ): BankLedgerAdmissionHandle | null;
 }
 
 export interface BankLedgerOutboxAdmissionOptions {
   /** Must synchronously quarantine the session before any disconnect path can
    *  save its now-unpaired mutation. Called once per failed handle. */
-  readonly onProjectionFailure?: (error: unknown) => void;
+  readonly onProjectionFailure?: (error: unknown, surface: BankLedgerProjectionSurface) => void;
 }
 
 /**
@@ -77,7 +86,9 @@ export interface BankLedgerOutboxAdmissionOptions {
  * factory only after both row and byte capacity checks pass.
  */
 export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
-  private readonly onProjectionFailure: ((error: unknown) => void) | undefined;
+  private readonly onProjectionFailure:
+    | ((error: unknown, surface: BankLedgerProjectionSurface) => void)
+    | undefined;
 
   constructor(
     private readonly outbox: BankLedgerOutbox,
@@ -86,7 +97,11 @@ export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
     this.onProjectionFailure = options.onProjectionFailure;
   }
 
-  tryReserve(maxRows: number, maxGuildEffectDeltas = 0): BankLedgerAdmissionHandle | null {
+  tryReserve(
+    maxRows: number,
+    maxGuildEffectDeltas = 0,
+    surface: BankLedgerProjectionSurface = 'personal',
+  ): BankLedgerAdmissionHandle | null {
     const minimumEncodedBytes = bankLedgerSyncMinimumEncodedBytes(maxRows, maxGuildEffectDeltas);
     const usage = this.outbox.usage;
     const remainingEncodedBytes =
@@ -130,7 +145,7 @@ export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
       failAfterMutation: (error: unknown): void => {
         if (!active) return;
         active = false;
-        this.onProjectionFailure?.(error);
+        this.onProjectionFailure?.(error, surface);
       },
     });
   }

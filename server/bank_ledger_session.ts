@@ -6,7 +6,11 @@
 import { randomUUID } from 'node:crypto';
 import type { VaultConsumptionReservation, VaultConsumptionTake } from '../src/sim/types';
 import { buildVaultCraftConsumeLedgerRows } from './bank_ledger';
-import { type BankLedgerAdmission, BankLedgerOutboxAdmission } from './bank_ledger_admission';
+import {
+  type BankLedgerAdmission,
+  BankLedgerOutboxAdmission,
+  type BankLedgerProjectionSurface,
+} from './bank_ledger_admission';
 import {
   BankLedgerOutbox,
   type BankLedgerOutboxOptions,
@@ -37,7 +41,7 @@ export interface BankLedgerSessionJournal {
 export interface BankLedgerSessionJournalHooks {
   /** Runs synchronously after a guarded mutation can no longer be projected.
    *  The live host must quarantine before any disconnect can save it. */
-  readonly onProjectionFailure: (error: unknown) => void;
+  readonly onProjectionFailure: (error: unknown, surface: BankLedgerProjectionSurface) => void;
   /** A malformed pre-mutation host projection is safe to refuse and log. */
   readonly onReservationFailure?: (error: unknown) => void;
   /** Coalesced by the host; this callback must never save synchronously. */
@@ -109,7 +113,7 @@ export function createBankLedgerSessionJournal(
             // commitPrepared is accounting-only, but a broken invariant here
             // follows the same fail-closed rule as a post-mutation projection.
             active = false;
-            hooks.onProjectionFailure(error);
+            hooks.onProjectionFailure(error, 'vault');
             return;
           }
           try {

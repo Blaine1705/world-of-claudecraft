@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Postgres is mocked (hoisted above the server/game import), the bank_wire.test.ts
-// block plus insertBankLedgerRow, so GameServer runs with no live DB and the
-// fire-and-forget vault ledger writer is a spy we can assert against.
+// Postgres is mocked (hoisted above the server/game import), so GameServer runs
+// with no live DB. Live GameServer commands stage rows in their session-owned
+// transactional journal; isolated dispatcher tests below still exercise the
+// legacy insert spies explicitly.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
@@ -10,6 +11,7 @@ vi.mock('../server/db', () => ({
   openPlaySession: vi.fn(async () => {}),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
+  releaseCharacterLease: vi.fn(async () => true),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
@@ -73,14 +75,45 @@ import { completeCraftCast } from './helpers/enchant_family_cast';
 // other field on those rows is a literal.
 
 const insertMock = vi.mocked(insertBankLedgerRow);
-// The vault observer writes through the BATCHED sibling: ONE insert call per
-// op, carrying every row the diff produced (the Phase 03 deposit-all ruling).
-// FIFO order across ops is the call order; row order inside a call is the
-// differ's sorted key union. `ledgerRows()` flattens both back into the
-// row-sequence shape the assertions below pin.
+// Isolated dispatchers without an admission owner write through the legacy
+// batched sibling. Live GameServer sessions instead retain one immutable batch
+// per command until the character state and rows commit together.
 const insertRowsMock = vi.mocked(insertBankLedgerRows);
-function ledgerRows(): Record<string, unknown>[] {
-  return insertRowsMock.mock.calls.flatMap((c) => c[0] as unknown as Record<string, unknown>[]);
+
+interface JournalSession {
+  bankLedgerJournal: {
+    outbox: {
+      snapshot(): {
+        batches: readonly { rows: readonly Record<string, unknown>[] }[];
+      };
+    };
+  };
+}
+
+/** Materialize the journal's canonical serialized row into the public DB-row
+ *  shape these behavior pins predate. Null optional counterparty fields are
+ *  omitted exactly as they were at the original vault writer. */
+function journalLedgerRows(session: JournalSession, fromBatch = 0): Record<string, unknown>[] {
+  return session.bankLedgerJournal.outbox
+    .snapshot()
+    .batches.slice(fromBatch)
+    .flatMap((batch) => batch.rows)
+    .map((row) => {
+      const { instanceJson, counterpartyCopperDelta, counterpartyCount, ...plain } = row;
+      return {
+        ...plain,
+        instance:
+          instanceJson === null || instanceJson === undefined
+            ? null
+            : JSON.parse(String(instanceJson)),
+        ...(counterpartyCopperDelta == null ? {} : { counterpartyCopperDelta }),
+        ...(counterpartyCount == null ? {} : { counterpartyCount }),
+      };
+    });
+}
+
+function journalBatchCount(session: JournalSession): number {
+  return session.bankLedgerJournal.outbox.snapshot().batches.length;
 }
 
 // The canonical fake-socket family (tests/helpers/bare_client.ts, issue #2088)
@@ -269,8 +302,7 @@ describe('materials vault wire round-trip', () => {
         (slot: { instance?: { signer?: string } }) => slot.instance?.signer === 'Ada',
       ),
     ).toMatchObject({ itemId: 'copper_ore', count: 1 });
-    await bankLedgerIdle();
-    expect(ledgerRows().map((row) => [row.op, row.instance])).toEqual([
+    expect(journalLedgerRows(session).map((row) => [row.op, row.instance])).toEqual([
       [
         'deposit',
         {
@@ -549,8 +581,7 @@ describe('materials vault wire round-trip', () => {
       slot: itemIndex(sim, pid, 'copper_ore'),
       count: 5,
     });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
 
     // The whole persisted vault, byte-for-byte, before the hostile batch.
     const before = JSON.stringify(meta.vault);
@@ -593,7 +624,7 @@ describe('materials vault wire round-trip', () => {
     // batched one the vault observer uses today, AND the legacy single-row
     // one, so a rewire back to per-row writes cannot slip through this arm
     // as silence on the wrong mock.
-    await bankLedgerIdle();
+    expect(journalBatchCount(session)).toBe(journalStart);
     expect(insertRowsMock).not.toHaveBeenCalled();
     expect(insertMock).not.toHaveBeenCalled();
   });
@@ -615,22 +646,19 @@ describe('materials vault wire round-trip', () => {
       ['copper_ore', 5],
     ]);
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
 
     send(server, session, {
       cmd: 'vault_deposit',
       slot: itemIndex(sim, pid, 'copper_ore'),
       count: null,
     });
-    await bankLedgerIdle();
-
     // The WHOLE stack moved: 5 stocked, 0 carried, not a refusal and not a
     // partial. A dispatch that passed the raw null through would deposit
     // nothing at all and leave the bags at 5.
     expect(meta.vault.stock).toEqual({ copper_ore: 5 });
     expect(bagCount(sim, pid, 'copper_ore')).toBe(0);
-    const rows = ledgerRows();
+    const rows = journalLedgerRows(session, journalStart);
     expect(rows).toHaveLength(1);
     expect(rows[0].op).toBe('deposit');
     expect(rows[0].count).toBe(5);
@@ -663,17 +691,15 @@ describe('materials vault wire round-trip', () => {
     for (let i = 0; i < 5; i++) send(server, session, { cmd: 'vault_buy_upgrade' });
     expect(meta.vault.upgrades).toBe(5); // VAULT_UPGRADE_PRICES.length
     expect(meta.copper).toBe(400000);
-    await bankLedgerIdle();
-    // Five ops, five batched writes of one row each: the batch is per OP.
-    expect(insertRowsMock).toHaveBeenCalledTimes(5);
-    expect(ledgerRows()).toHaveLength(5);
-    insertRowsMock.mockClear();
+    // Five ops, five immutable command batches of one row each.
+    expect(journalBatchCount(session)).toBe(5);
+    expect(journalLedgerRows(session)).toHaveLength(5);
+    const journalStart = journalBatchCount(session);
 
     send(server, session, { cmd: 'vault_buy_upgrade' });
     expect(meta.vault.upgrades).toBe(5);
     expect(meta.copper).toBe(400000);
-    await bankLedgerIdle();
-    expect(insertRowsMock).not.toHaveBeenCalled();
+    expect(journalBatchCount(session)).toBe(journalStart);
 
     // The capped snapshot advertises no next rung at the top ceiling.
     fw.sent.length = 0;
@@ -876,13 +902,10 @@ describe('materials vault wire round-trip', () => {
     });
     send(server, session, { cmd: 'vault_withdraw', itemId: 'copper_ore', count: 2 });
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-
-    // Four ops, four rows, in the order they happened: the writer chains every
-    // insert onto one FIFO tail, so a character's op order survives the
-    // fire-and-forget queue.
-    expect(insertRowsMock).toHaveBeenCalledTimes(4);
-    const rows = ledgerRows();
+    // Four ops, four batches, in the order they happened. The character-owned
+    // journal preserves both command and within-command row order until save.
+    expect(journalBatchCount(session)).toBe(4);
+    const rows = journalLedgerRows(session);
     expect(rows.map((r) => r.op)).toEqual(['buy_slots', 'deposit', 'withdraw', 'buy_slots']);
 
     // The unlock: negated rung-0 price, no item fields, ladder position 1.
@@ -964,16 +987,13 @@ describe('materials vault wire round-trip', () => {
     sim.addItem('copper_ore', 3, pid);
 
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
     send(server, session, {
       cmd: 'vault_deposit',
       slot: itemIndex(sim, pid, 'copper_ore'),
       count: 3,
     });
-    await bankLedgerIdle();
-
-    const rows = ledgerRows();
+    const rows = journalLedgerRows(session, journalStart);
     expect(rows).toHaveLength(1);
     expect(rows[0]).toEqual({
       realm: REALM,
@@ -1007,31 +1027,28 @@ describe('materials vault wire round-trip', () => {
       count: 15,
     });
     expect(meta.vault.stock).toEqual({ copper_ore: 35 });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    let journalStart = journalBatchCount(session);
 
     // A whole untouched 20-stack against 5 headroom: the vault's PARTIAL fill
     // moves 5 and leaves 15 in the bags, and the row must record what actually
     // MOVED (5), never what was asked for (20). Recording the request is the
     // shape that makes an audit read a phantom 15 into the vault.
     send(server, session, { cmd: 'vault_deposit', slot: lastItemIndex(sim, pid, 'copper_ore') });
-    await bankLedgerIdle();
     expect(meta.vault.stock).toEqual({ copper_ore: 40 });
     expect(bagCount(sim, pid, 'copper_ore')).toBe(20); // 5 left in slot 0 + 15 left in the last
-    const partial = ledgerRows();
+    const partial = journalLedgerRows(session, journalStart);
     expect(partial).toHaveLength(1);
     expect(partial[0].op).toBe('deposit');
     expect(partial[0].count).toBe(5);
     expect(partial[0].container).toBe('vault');
-    insertRowsMock.mockClear();
+    journalStart = journalBatchCount(session);
 
     // Now the vault is full: the op is refused at the banker, so both snapshots
     // are non-null and IDENTICAL, and the differ writes no row.
     send(server, session, { cmd: 'vault_deposit', slot: itemIndex(sim, pid, 'copper_ore') });
-    await bankLedgerIdle();
     expect(meta.vault.stock).toEqual({ copper_ore: 40 });
     expect(bagCount(sim, pid, 'copper_ore')).toBe(20);
-    expect(insertRowsMock).not.toHaveBeenCalled();
+    expect(journalBatchCount(session)).toBe(journalStart);
   });
 
   it('ledger rows: an over-ask withdraw records what actually LEFT, never the requested count', async () => {
@@ -1047,8 +1064,7 @@ describe('materials vault wire round-trip', () => {
       count: 6,
     });
     expect(meta.vault.stock).toEqual({ copper_ore: 6 });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
 
     // The withdraw twin of the partial-deposit arm above: an ask far past the
     // stock is CLAMPED by the Sim (a withdraw names an id whose count the
@@ -1056,10 +1072,9 @@ describe('materials vault wire round-trip', () => {
     // 6, never the 999 that was asked for. Recording the request is the shape
     // that makes an audit read a phantom 993 out of the vault.
     send(server, session, { cmd: 'vault_withdraw', itemId: 'copper_ore', count: 999 });
-    await bankLedgerIdle();
     expect(meta.vault.stock).toEqual({}); // fully drained: the key is DELETED
     expect(bagCount(sim, pid, 'copper_ore')).toBe(10);
-    const rows = ledgerRows();
+    const rows = journalLedgerRows(session, journalStart);
     expect(rows).toHaveLength(1);
     expect(rows[0].op).toBe('withdraw');
     expect(rows[0].count).toBe(6);
@@ -1084,8 +1099,7 @@ describe('materials vault wire round-trip', () => {
       count: 20,
     });
     expect(meta.vault.stock).toEqual({ copper_ore: 20 });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
 
     send(server, session, { cmd: 'vault_deposit_all' });
     await bankLedgerIdle();
@@ -1098,11 +1112,11 @@ describe('materials vault wire round-trip', () => {
     expect(bagCount(sim, pid, 'iron_ore')).toBe(0);
     expect(bagCount(sim, pid, 'rusty_dagger')).toBe(1);
 
-    // ONE batched insert for the whole sweep (the Phase 03 ruling: never one
-    // write per material), rows in the differ's sorted key order, each row
-    // recording what MOVED.
-    expect(insertRowsMock).toHaveBeenCalledTimes(1);
-    const batch = insertRowsMock.mock.calls[0][0] as unknown as Record<string, unknown>[];
+    // ONE immutable command batch for the whole sweep (never one write per
+    // material), rows in the differ's sorted key order, each recording what
+    // MOVED. The later save emits this batch transactionally.
+    expect(journalBatchCount(session)).toBe(journalStart + 1);
+    const batch = journalLedgerRows(session, journalStart);
     expect(batch.map((r) => [r.op, r.itemId, r.count])).toEqual([
       ['deposit', 'copper_ore', 10],
       ['deposit', 'iron_ore', 4],
@@ -1137,13 +1151,11 @@ describe('materials vault wire round-trip', () => {
       sim.players.get(pid).inventory.filter((s: { itemId: string }) => s.itemId === 'copper_ore'),
     ).toHaveLength(2);
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
     send(server, session, { cmd: 'vault_deposit_all' });
-    await bankLedgerIdle();
     expect(meta.vault.stock).toEqual({ copper_ore: 35, iron_ore: 3 });
-    expect(insertRowsMock).toHaveBeenCalledTimes(1);
-    const batch = insertRowsMock.mock.calls[0][0] as unknown as Record<string, unknown>[];
+    expect(journalBatchCount(session)).toBe(journalStart + 1);
+    const batch = journalLedgerRows(session, journalStart);
     // ...but ONE ledger row: three slots moved, two rows land. The row ORDER
     // here comes from diffVaultOp's SORTED key union, not stock insertion
     // order (the descending sweep actually stocks iron_ore first), so this
@@ -1163,23 +1175,20 @@ describe('materials vault wire round-trip', () => {
     ]);
     // Locked (rung 0): the sweep refuses before touching any slot.
     send(server, session, { cmd: 'vault_deposit_all' });
-    await bankLedgerIdle();
     expect(meta.vault.stock).toEqual({});
     expect(bagCount(sim, pid, 'copper_ore')).toBe(5);
-    expect(insertRowsMock).not.toHaveBeenCalled();
+    expect(journalBatchCount(session)).toBe(0);
 
     // Away from every banker: both snapshots null, the differ writes nothing.
     meta.copper = 20000;
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
     const p = sim.entities.get(pid);
     banker.pos = { x: p.pos.x + 1000, y: p.pos.y, z: p.pos.z + 1000 };
     send(server, session, { cmd: 'vault_deposit_all' });
-    await bankLedgerIdle();
     expect(meta.vault.stock).toEqual({});
     expect(bagCount(sim, pid, 'copper_ore')).toBe(5);
-    expect(insertRowsMock).not.toHaveBeenCalled();
+    expect(journalBatchCount(session)).toBe(journalStart);
   });
 
   it('ledger rows: an op away from every banker writes nothing (a null snapshot on both sides)', async () => {
@@ -1189,29 +1198,23 @@ describe('materials vault wire round-trip', () => {
       ['copper_ore', 5],
     ]);
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-    insertRowsMock.mockClear();
+    const journalStart = journalBatchCount(session);
 
     const p = sim.entities.get(pid);
     banker.pos = { x: p.pos.x + 1000, y: p.pos.y, z: p.pos.z + 1000 };
     send(server, session, { cmd: 'vault_deposit', slot: itemIndex(sim, pid, 'copper_ore') });
     send(server, session, { cmd: 'vault_withdraw', itemId: 'copper_ore' });
     send(server, session, { cmd: 'vault_buy_upgrade' });
-    await bankLedgerIdle();
-
     expect(meta.vault.stock).toEqual({});
     expect(meta.vault.upgrades).toBe(1);
-    expect(insertRowsMock).not.toHaveBeenCalled();
+    expect(journalBatchCount(session)).toBe(journalStart);
   });
 
-  it('ledger rows: a rejected insert on the real dispatch path counts a vault incident', async () => {
-    // The counter is unit-tested against recordVaultOp directly
-    // (tests/bank_ledger.test.ts), which proves the writer emits it but not that
-    // anything on the SERVER reaches that writer. This arm closes that: a real
-    // wire vault_deposit, the mocked insert rejecting once, and the incident
-    // arriving through GameServer dispatch. A dispatch wired to a writer that
-    // never records would leave the alert silent while the unit test stayed
-    // green.
+  it('ledger rows: a rejected live projection quarantines and counts a vault incident', () => {
+    // The transactional writer does not discover a missing row after an async
+    // insert: it must stage exact evidence synchronously or prevent the mutated
+    // character from ever saving. Force that accounting failure on a real wire
+    // command and pin both halves of the fail-closed contract.
     const kinds: VaultLedgerIncident[] = [];
     setGameMetricsCounters({
       ...noopGameMetricsCounters,
@@ -1227,20 +1230,21 @@ describe('materials vault wire round-trip', () => {
         ['copper_ore', 5],
       ]);
       send(server, session, { cmd: 'vault_buy_upgrade' });
-      await bankLedgerIdle();
       expect(kinds).toEqual([]); // the unlock landed: a healthy write counts nothing
 
-      insertRowsMock.mockRejectedValueOnce(new Error('vault ledger down'));
+      vi.spyOn(session.bankLedgerJournal.outbox, 'commit').mockImplementationOnce(() => {
+        throw new Error('vault ledger projection failed');
+      });
       send(server, session, {
         cmd: 'vault_deposit',
         slot: itemIndex(sim, pid, 'copper_ore'),
         count: 3,
       });
-      await bankLedgerIdle();
 
-      // The op itself SUCCEEDED in the sim (the ledger is an observer, never an
-      // authority), and the failed row is the hole the counter exists to name.
+      // The Sim mutation happened, but it can never become durable without its
+      // row: the session is synchronously quarantined before the kick microtask.
       expect(meta.vault.stock).toEqual({ copper_ore: 3 });
+      expect(session.escrowQuarantined).toBe(true);
       expect(kinds).toEqual(['ledger_write_failed']);
     } finally {
       setGameMetricsCounters(noopGameMetricsCounters);
