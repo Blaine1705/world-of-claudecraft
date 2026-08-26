@@ -5512,8 +5512,8 @@ export class GameServer {
   }
 
   private async persistRifts(sample?: TickProfilerSample): Promise<void> {
-    await this.enqueueRiftWrite(() =>
-      saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
+    await this.enqueueRiftWrite(
+      () => saveRiftState(serializeRiftWorldState(this.sim.ctx, Date.now())),
       sample,
     );
   }
