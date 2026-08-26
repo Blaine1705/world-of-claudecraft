@@ -143,6 +143,7 @@ import {
 } from './game/mobile_controls';
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
+import { applyPadConnectedClass } from './game/mobile_pad_chrome';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
@@ -2384,7 +2385,10 @@ async function startGame(
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
+    onConnectionChange: () => {
+      crossHotbar.syncPadMode(gamepad);
+      applyPadConnectedClass(gamepad.isConnected());
+    },
     onActivity: createGamepadActivityNotifier(desktopBridge()),
     onCrossHotbarCast: (action) => {
       padTargetPick.autoTarget(action);
@@ -2394,9 +2398,10 @@ async function startGame(
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
   crossHotbar.attach(gamepad);
-  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, () =>
-    crossHotbar.syncPadMode(gamepad),
-  );
+  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, () => {
+    crossHotbar.syncPadMode(gamepad);
+    applyPadConnectedClass(gamepad.isConnected());
+  });
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
