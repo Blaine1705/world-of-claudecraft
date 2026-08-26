@@ -68,7 +68,7 @@ function clientStub(rowCounts?: (sql: string) => number) {
     return Promise.resolve({ rows: [], rowCount: rowCounts ? rowCounts(String(sql)) : 0 });
   });
   const release = vi.fn();
-  return { query, release };
+  return { query, release, on: vi.fn(), removeListener: vi.fn() };
 }
 
 const STATE = {
@@ -246,7 +246,7 @@ function storageEffectClient() {
     if (/DELETE FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 1 };
     return { rows: [], rowCount: 1 };
   });
-  return { query, release: vi.fn() };
+  return { query, release: vi.fn(), on: vi.fn(), removeListener: vi.fn() };
 }
 
 describe('the guild_banks DDL (SOCIAL_SCHEMA, the family that owns guilds)', () => {
@@ -381,7 +381,9 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     const client = clientStub(() => 1);
     const ordinaryQuery = client.query.getMockImplementation();
     client.query.mockImplementation((sql: string, values?: unknown[]) => {
-      if (/INSERT INTO guild_banks/i.test(String(sql))) throw new Error('book boom');
+      if (/INSERT INTO guild_banks/i.test(String(sql))) {
+        throw Object.assign(new Error('book boom'), { code: 'XX000' });
+      }
       return ordinaryQuery?.(sql, values);
     });
     dbMock.connect.mockResolvedValueOnce(client as never);

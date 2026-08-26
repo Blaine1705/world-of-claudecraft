@@ -19,6 +19,7 @@ vi.mock('../server/admin_guilds_read', () => ({
   bustAdminGuildListReads: dbMock.bustGuildList,
 }));
 
+import { CharacterStoragePurchaseOpen } from '../server/character_delete_db';
 import { configureCommunityTestAccounts } from '../server/community_test_accounts';
 import {
   backfillAccountEmailIfEmpty,
@@ -143,16 +144,56 @@ describe('community test account transaction', () => {
 function clientStub() {
   const query = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 } as any);
   const release = vi.fn();
-  return { query, release };
+  return { query, release, on: vi.fn(), removeListener: vi.fn() };
+}
+
+function deleteClient(
+  options: {
+    account?: boolean;
+    character?: boolean;
+    openStatus?: 'pending' | 'unresolved';
+    deleted?: boolean;
+    deleteError?: Error;
+  } = {},
+) {
+  const client = clientStub();
+  client.query.mockImplementation(async (sql: string) => {
+    if (/SELECT id FROM accounts/i.test(sql)) {
+      return options.account === false
+        ? { rows: [], rowCount: 0 }
+        : { rows: [{ id: 7 }], rowCount: 1 };
+    }
+    if (/SELECT id FROM characters/i.test(sql)) {
+      return options.character === false
+        ? { rows: [], rowCount: 0 }
+        : { rows: [{ id: 42 }], rowCount: 1 };
+    }
+    if (/FROM storage_purchases/i.test(sql)) {
+      return options.openStatus
+        ? { rows: [{ status: options.openStatus }], rowCount: 1 }
+        : { rows: [], rowCount: 0 };
+    }
+    if (/DELETE FROM characters/i.test(sql)) {
+      if (options.deleteError) throw options.deleteError;
+      return { rows: [], rowCount: options.deleted === false ? 0 : 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  });
+  return client;
 }
 
 describe('deleteCharacter', () => {
   it('scopes the delete to the current realm so cross-realm characters are safe', async () => {
-    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    const client = deleteClient();
+    dbMock.connect.mockResolvedValueOnce(client);
 
     await deleteCharacter(7, 42);
 
-    const [sql, params] = dbMock.query.mock.calls[0];
+    const deletionCall = client.query.mock.calls.find((call) =>
+      /DELETE FROM characters/i.test(call[0]),
+    );
+    expect(deletionCall).toBeDefined();
+    const [sql, params] = deletionCall ?? [];
     expect(sql).toMatch(/realm/i);
     expect(params).toContain(REALM);
     // id + account + realm: the same three predicates getCharacter/renameCharacter use
@@ -161,20 +202,68 @@ describe('deleteCharacter', () => {
   });
 
   it('reports whether a row was actually deleted', async () => {
-    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient({ character: false }));
     expect(await deleteCharacter(7, 42)).toBe(false);
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
 
-    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient());
     expect(await deleteCharacter(7, 42)).toBe(true);
     expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
   });
 
+  it('takes parent, character, and fresh open-purchase locks in lifecycle order', async () => {
+    const client = deleteClient();
+    dbMock.connect.mockResolvedValueOnce(client);
+
+    await deleteCharacter(7, 42);
+
+    const sql = client.query.mock.calls.map((call) => String(call[0]));
+    const account = sql.findIndex((statement) => /FROM accounts/.test(statement));
+    const character = sql.findIndex((statement) => /FROM characters/.test(statement));
+    const purchase = sql.findIndex((statement) => /FROM storage_purchases/.test(statement));
+    const deletion = sql.findIndex((statement) => /DELETE FROM characters/.test(statement));
+    expect(sql).toHaveLength(7);
+    expect(sql[0]).toBe('BEGIN');
+    expect(sql[1]).toContain("statement_timeout = '15s'");
+    expect(sql[1]).toContain("lock_timeout = '2s'");
+    expect(sql[1]).toContain("idle_in_transaction_session_timeout = '2s'");
+    expect(account).toBeLessThan(character);
+    expect(character).toBeLessThan(purchase);
+    expect(purchase).toBeLessThan(deletion);
+    expect(sql.at(-1)).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledOnce();
+  });
+
+  it.each(['pending', 'unresolved'] as const)(
+    'refuses deletion while a %s storage purchase remains open',
+    async (openStatus) => {
+      const client = deleteClient({ openStatus });
+      dbMock.connect.mockResolvedValueOnce(client);
+
+      await expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: CharacterStoragePurchaseOpen.name,
+        code: 'CHARACTER_STORAGE_PURCHASE_OPEN',
+        characterId: 42,
+        status: openStatus,
+      });
+
+      expect(client.query.mock.calls.some((call) => /DELETE FROM characters/.test(call[0]))).toBe(
+        false,
+      );
+      expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+    },
+  );
+
   it('does not invalidate the guild directory when the delete fails', async () => {
-    dbMock.query.mockRejectedValueOnce(new Error('delete failed'));
+    const error = Object.assign(new Error('delete failed'), { code: 'XX000' });
+    const client = deleteClient({ deleteError: error });
+    dbMock.connect.mockResolvedValueOnce(client);
 
     await expect(deleteCharacter(7, 42)).rejects.toThrow('delete failed');
 
+    expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
+    expect(client.release).toHaveBeenCalledOnce();
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
   });
 });
@@ -895,11 +984,11 @@ describe('character roster feed enqueues', () => {
   });
 
   it('enqueues for a delete that matched a row, never for one that matched none', async () => {
-    dbMock.query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient({ character: false }));
     expect(await deleteCharacter(7, 42)).toBe(false);
     expect(drainLinkChanges()).toEqual([]);
 
-    dbMock.query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    dbMock.connect.mockResolvedValueOnce(deleteClient());
     expect(await deleteCharacter(7, 42)).toBe(true);
     expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
   });

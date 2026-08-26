@@ -207,7 +207,7 @@ function checkedOutClient(updateRowCount: number | undefined) {
       : ({ rows: [], rowCount: 0 } as any),
   );
   const release = vi.fn();
-  return { query, release };
+  return { query, release, on: vi.fn(), removeListener: vi.fn() };
 }
 
 const STATE = {
@@ -259,7 +259,7 @@ function storageEffectClient(updateRowCount: number) {
     if (/DELETE FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 1 };
     return { rows: [], rowCount: 1 };
   });
-  return { query, release: vi.fn() };
+  return { query, release: vi.fn(), on: vi.fn(), removeListener: vi.fn() };
 }
 
 describe('acquireCharacterLease fail-closed form (a NULL account_id can never be stolen)', () => {

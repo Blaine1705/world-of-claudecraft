@@ -34,13 +34,19 @@ import {
   type BankLedgerSaveEffects,
   characterUpdateStatement,
   lockCharacterSaveEffectAccountsOnClient as lockSaveEffectAccounts,
-  prepareBankLedgerSaveEffects,
   writeBankLedgerSaveEffectsOnClient,
 } from './bank_ledger_save_effects_db';
+import { deleteOwnedCharacterRow } from './character_delete_db';
 import {
   configureLifetimeXpRankCache,
   readLifetimeXpRankForCharacter,
 } from './character_rank_cache';
+import {
+  beginCharacterSaveTx,
+  CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
+  CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS,
+  prepareCharacterSaveEffects,
+} from './character_save_transaction';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import {
@@ -227,7 +233,7 @@ export const DB_STATEMENT_TIMEOUT_MS = 15_000;
 // the account-detail playtime aggregate), applied via runWithStatementTimeout.
 // Bounded so even an exempted scan that goes runaway still dies rather than
 // pinning a pooled client indefinitely.
-export const DB_HEAVY_STATEMENT_TIMEOUT_MS = 60_000;
+export const DB_HEAVY_STATEMENT_TIMEOUT_MS = CHARACTER_SAVE_STATEMENT_TIMEOUT_MS;
 
 // Client-side backstop timeout per connection. query_timeout is enforced in the
 // driver, NOT the database, so a SET LOCAL cannot lift it: it MUST sit strictly
@@ -236,7 +242,7 @@ export const DB_HEAVY_STATEMENT_TIMEOUT_MS = 60_000;
 // statement_timeout is the real working limit; this only catches a black-holed
 // server that accepted a query and then never answers (so no server-side timer
 // ever fires), one layer outside the heavy allowance.
-export const DB_QUERY_TIMEOUT_MS = DB_HEAVY_STATEMENT_TIMEOUT_MS + 5000;
+export const DB_QUERY_TIMEOUT_MS = CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS;
 
 export const pool = new Pool({
   connectionString: DATABASE_URL,
@@ -1304,10 +1310,6 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id) and characters(id), so they run after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(PROGRESS_EVENTS_SCHEMA);
-    // The Claudium storage pending-purchase table (Bank Storage phase 11).
-    // FK-references accounts(id) and characters(id), so it runs after SCHEMA.
-    // Applied unconditionally (idempotent), like the other schema modules.
-    await client.query(STORAGE_PURCHASE_SCHEMA);
     // First-touch signup attribution (one row per account, written at
     // registration). FK-references accounts(id), so it runs after SCHEMA.
     await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
@@ -1399,6 +1401,9 @@ export async function ensureSchema(): Promise<void> {
         `[market-backfill] applied for realm ${REALM} (legacyRowFound=${backfill.legacyRowFound})`,
       );
     }
+    // Apply storage purchase parent triggers last, so first-rollout table locks
+    // are held only for this final fragment before COMMIT.
+    await client.query(STORAGE_PURCHASE_SCHEMA);
     await client.query('COMMIT');
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
@@ -3330,12 +3335,12 @@ export async function reclaimDeactivatedName(name: string): Promise<{
   }
 }
 
-export async function deleteCharacter(accountId: number, characterId: number): Promise<boolean> {
-  const res = await pool.query(
-    'DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
-    [characterId, accountId, REALM],
-  );
-  const deleted = (res.rowCount ?? 0) > 0;
+export async function deleteCharacter(
+  accountId: number,
+  characterId: number,
+  signal?: AbortSignal,
+): Promise<boolean> {
+  const deleted = await deleteOwnedCharacterRow(pool, accountId, characterId, REALM, signal);
   // Only a delete that matched a row is a transition: deleting the top character
   // promotes the next-ordered one (or none). A miss (wrong owner, wrong realm,
   // already gone) changes nothing and must not enqueue.
@@ -3414,11 +3419,10 @@ export async function saveCharacterState(
   leaseNonce?: string,
   storageEffects: readonly StorageAppliedEffect[] = [],
   ledgerEffects?: BankLedgerSaveEffects,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
+  const ledger = prepareCharacterSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
-  // Wait on the bounded heavy allowance rather than lose state; leave and
-  // shutdown still cannot hang past the container stop grace.
   const stmt = characterUpdateStatement(
     characterId,
     level,
@@ -3426,33 +3430,30 @@ export async function saveCharacterState(
     PROCESS_LEASE_HOLDER,
     leaseNonce,
   );
-  if (storageEffects.length === 0 && !ledger) {
-    const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-      query(stmt.text, stmt.values),
-    );
-    return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
-  }
   const client = await pool.connect();
+  const transaction = await beginCharacterSaveTx(client, 'character save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
-    await client.query('BEGIN');
-    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockSaveEffectAccounts(client, storageEffects, ledger);
-    const res = await client.query(stmt.text, stmt.values);
-    if ((res.rowCount ?? 0) === 0) {
-      await client.query('ROLLBACK');
+    await lockSaveEffectAccounts(transaction, storageEffects, ledger);
+    const res = await transaction.query(stmt.text, stmt.values);
+    const saved =
+      leaseNonce === undefined && storageEffects.length === 0 && !ledger
+        ? true
+        : (res.rowCount ?? 0) > 0;
+    if (!saved) {
+      await transaction.rollback();
       return false;
     }
-    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
-    await writeStorageAppliedEffectsOnClient(client, storageEffects);
-    await client.query('COMMIT');
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(transaction, ledger);
+    await writeStorageAppliedEffectsOnClient(transaction, storageEffects);
+    await transaction.commit();
     return true;
   } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
+    await transaction.rollback();
     attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
     throw err;
   } finally {
-    client.release();
+    transaction.release();
   }
 }
 
@@ -3470,24 +3471,23 @@ export async function saveCharacterAndMarketState(
   results?: GuildBankWriteResult[],
   storageEffects: readonly StorageAppliedEffect[] = [],
   ledgerEffects?: BankLedgerSaveEffects,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  // The market backfill gate must open before this shared-row write.
-  assertMarketWriteGateOpen();
-  const ledger = prepareBankLedgerSaveEffects(
+  const ledger = prepareCharacterSaveEffects(
     characterId,
     storageEffects,
     ledgerEffects,
     guildBanks?.map((book) => book.guildId),
   );
+  // The market backfill gate must open before this shared-row write.
+  assertMarketWriteGateOpen();
   const guildReplay = prepareGuildBankReceiptReplay(guildBanks ?? [], ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
+  const transaction = await beginCharacterSaveTx(client, 'character and market save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
-    await client.query('BEGIN');
-    // Wait out slow storage without exceeding the bounded heavy allowance.
-    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockSaveEffectAccounts(client, storageEffects, ledger);
+    await lockSaveEffectAccounts(transaction, storageEffects, ledger);
     // Fence the bag half first; a miss rolls back before shared escrow writes.
     const stmt = characterUpdateStatement(
       characterId,
@@ -3496,16 +3496,16 @@ export async function saveCharacterAndMarketState(
       PROCESS_LEASE_HOLDER,
       leaseNonce,
     );
-    const charRes = await client.query(stmt.text, stmt.values);
+    const charRes = await transaction.query(stmt.text, stmt.values);
     if (
       (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
       (charRes.rowCount ?? 0) === 0
     ) {
-      await client.query('ROLLBACK');
+      await transaction.rollback();
       return false;
     }
-    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
-    await client.query(
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(transaction, ledger);
+    await transaction.query(
       `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
       // Same realm-scoped key loadMarketState/saveMarketState use: the leave
@@ -3513,7 +3513,7 @@ export async function saveCharacterAndMarketState(
       // is written to a key nothing loads and the item is stranded on next boot.
       [marketStateKey(REALM), JSON.stringify(market)],
     );
-    await client.query(
+    await transaction.query(
       `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
       [mailStateKey(REALM), JSON.stringify(mail)],
@@ -3522,16 +3522,16 @@ export async function saveCharacterAndMarketState(
     // the character UPDATE above already passed the lease fence, so these can
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
-    await writeClaimedGuildBankEffectsOnClient(client, guildReplay, ledgerWrite, results);
-    await writeStorageAppliedEffectsOnClient(client, storageEffects);
-    await client.query('COMMIT');
+    await writeClaimedGuildBankEffectsOnClient(transaction, guildReplay, ledgerWrite, results);
+    await writeStorageAppliedEffectsOnClient(transaction, storageEffects);
+    await transaction.commit();
     return true;
   } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
+    await transaction.rollback();
     attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
     throw err;
   } finally {
-    client.release();
+    transaction.release();
   }
 }
 
@@ -3561,8 +3561,9 @@ export async function saveCharacterAndGuildBankState(
   results?: GuildBankWriteResult[],
   storageEffects: readonly StorageAppliedEffect[] = [],
   ledgerEffects?: BankLedgerSaveEffects,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const ledger = prepareBankLedgerSaveEffects(
+  const ledger = prepareCharacterSaveEffects(
     characterId,
     storageEffects,
     ledgerEffects,
@@ -3571,12 +3572,10 @@ export async function saveCharacterAndGuildBankState(
   const guildReplay = prepareGuildBankReceiptReplay(guildBanks, ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
+  const transaction = await beginCharacterSaveTx(client, 'character and guild bank save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
-    await client.query('BEGIN');
-    // Escrow flushes use the bounded heavy allowance.
-    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    await lockSaveEffectAccounts(client, storageEffects, ledger);
+    await lockSaveEffectAccounts(transaction, storageEffects, ledger);
     const stmt = characterUpdateStatement(
       characterId,
       level,
@@ -3584,25 +3583,25 @@ export async function saveCharacterAndGuildBankState(
       PROCESS_LEASE_HOLDER,
       leaseNonce,
     );
-    const charRes = (await client.query(stmt.text, stmt.values)) as { rowCount: number | null };
+    const charRes = await transaction.query(stmt.text, stmt.values);
     if (
       (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
       (charRes.rowCount ?? 0) === 0
     ) {
-      await client.query('ROLLBACK');
+      await transaction.rollback();
       return false;
     }
-    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
-    await writeClaimedGuildBankEffectsOnClient(client, guildReplay, ledgerWrite, results);
-    await writeStorageAppliedEffectsOnClient(client, storageEffects);
-    await client.query('COMMIT');
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(transaction, ledger);
+    await writeClaimedGuildBankEffectsOnClient(transaction, guildReplay, ledgerWrite, results);
+    await writeStorageAppliedEffectsOnClient(transaction, storageEffects);
+    await transaction.commit();
     return true;
   } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
+    await transaction.rollback();
     attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
     throw err;
   } finally {
-    client.release();
+    transaction.release();
   }
 }
 
@@ -3687,7 +3686,7 @@ export async function saveCharacterStateOnClient(
   ledgerEffects?: BankLedgerSaveEffects,
   existingAccountLock?: import('./bank_ledger_save_effects_db').CharacterSaveAccountLockProof,
 ): Promise<boolean> {
-  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
+  const ledger = prepareCharacterSaveEffects(characterId, storageEffects, ledgerEffects);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   await lockSaveEffectAccounts(client, storageEffects, ledger, existingAccountLock);
   const stmt = characterUpdateStatement(

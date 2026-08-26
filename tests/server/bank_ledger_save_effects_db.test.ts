@@ -42,6 +42,8 @@ import {
   bankLedgerCommittedPrefixForError,
   type CharacterSaveAccountLockProof,
   lockCharacterSaveAccountParentOnClient,
+  lockCharacterSaveEffectAccountsOnClient,
+  prepareBankLedgerSaveEffects,
 } from '../../server/bank_ledger_save_effects_db';
 import {
   type BankLedgerSaveEffects,
@@ -52,8 +54,12 @@ import {
   saveCharacterState,
   saveCharacterStateOnClient,
 } from '../../server/db';
+import { DbTransactionAborted } from '../../server/db_transaction_deadline';
 import { REALM } from '../../server/realm';
-import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
+import {
+  STORAGE_PURCHASE_SCHEMA,
+  type StorageAppliedEffect,
+} from '../../server/storage_purchase_db';
 import type { CharacterState, MailSave, MarketSave } from '../../src/sim/sim';
 
 const OWNER = { realm: REALM, characterId: 42, accountId: 7 } as const;
@@ -88,6 +94,41 @@ const GUILD_EFFECTS: BankLedgerSaveEffects = {
         deltas: [
           {
             op: 'deposit',
+            itemId: 'linen_cloth',
+            count: 3,
+            instanceJson: null,
+            craftedRecipeId: null,
+            copperDelta: 0,
+            purchasedSlotsBefore: 0,
+            purchasedSlotsAfter: 0,
+          },
+        ],
+      },
+    },
+  ],
+};
+const ADMIN_PURGE_EFFECTS: BankLedgerSaveEffects = {
+  owner: OWNER,
+  batches: [
+    {
+      batchKey: 'save.guild.admin-purge',
+      rows: [
+        {
+          ...ROW,
+          accountId: 99,
+          op: 'admin_purge',
+          itemId: 'linen_cloth',
+          count: 3,
+          container: 'guild',
+          containerId: 19,
+        },
+      ],
+      encodedBytes: 256,
+      guildEffect: {
+        guildId: 19,
+        deltas: [
+          {
+            op: 'admin_purge',
             itemId: 'linen_cloth',
             count: 3,
             instanceJson: null,
@@ -159,14 +200,18 @@ interface ClientOptions {
   characterRows?: number;
   lostCommit?: boolean;
   claims?: readonly boolean[];
+  abortOnCommit?: AbortController;
 }
 
 function clientStub(options: ClientOptions = {}) {
   const characterRows = options.characterRows ?? 1;
   const query = vi.fn(async (sql: string, values?: unknown[]) => {
+    if (/^COMMIT/.test(sql) && options.abortOnCommit) options.abortOnCommit.abort();
     if (/SELECT id FROM accounts/i.test(sql)) {
-      const requested = Array.isArray(values?.[0]) ? OWNER.accountId : Number(values?.[0]);
-      return { rows: [{ id: requested }], rowCount: 1 };
+      const requested = Array.isArray(values?.[0])
+        ? (values[0] as number[])
+        : [Number(values?.[0])];
+      return { rows: requested.map((id) => ({ id })), rowCount: requested.length };
     }
     if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: characterRows };
     if (/FROM storage_purchase_applied_receipts/i.test(sql)) {
@@ -225,7 +270,7 @@ function clientStub(options: ClientOptions = {}) {
     }
     return { rows: [], rowCount: 1 };
   });
-  return { query, release: vi.fn() };
+  return { query, release: vi.fn(), on: vi.fn(), removeListener: vi.fn() };
 }
 
 function sqlCalls(client: ReturnType<typeof clientStub>): string[] {
@@ -245,6 +290,23 @@ beforeEach(() => {
 });
 
 describe('fenced character save ledger effects', () => {
+  it('bounds an ordinary save in four database round trips', async () => {
+    const client = clientStub();
+    h.pool.connect.mockResolvedValueOnce(client);
+
+    await expect(saveCharacterState(OWNER.characterId, 7, STATE)).resolves.toBe(true);
+
+    const sql = sqlCalls(client);
+    expect(sql).toHaveLength(4);
+    expect(sql[0]).toBe('BEGIN');
+    expect(sql[1]).toContain('statement_timeout = 60000');
+    expect(sql[1]).toContain("lock_timeout = '2s'");
+    expect(sql[1]).toContain("idle_in_transaction_session_timeout = '10s'");
+    expect(sql[2]).toMatch(/UPDATE characters/);
+    expect(sql[3]).toBe('COMMIT');
+    expect(client.release).toHaveBeenCalledOnce();
+  });
+
   it('forces a plain save through one transaction and locks the parent before the child', async () => {
     const client = clientStub();
     h.pool.connect.mockResolvedValueOnce(client);
@@ -447,6 +509,32 @@ describe('fenced character save ledger effects', () => {
     expect(sqlCalls(client)).toContain('ROLLBACK');
   });
 
+  it('preserves COMMIT ambiguity and the verified ledger prefix when shutdown aborts', async () => {
+    const abort = new AbortController();
+    const client = clientStub({ claims: [false], abortOnCommit: abort });
+    h.pool.connect.mockResolvedValueOnce(client);
+
+    let thrown: unknown;
+    await saveCharacterState(
+      OWNER.characterId,
+      7,
+      STATE,
+      'nonce-1',
+      [],
+      EFFECTS,
+      abort.signal,
+    ).catch((error) => {
+      thrown = error;
+    });
+
+    expect(thrown).toBeInstanceOf(DbTransactionAborted);
+    expect(thrown).toMatchObject({ commitMayHaveSucceeded: true });
+    expect(bankLedgerCommittedPrefixForError(thrown)?.batches).toEqual(EFFECTS.batches);
+    expect(sqlCalls(client)).not.toContain('ROLLBACK');
+    expect(client.release).toHaveBeenCalledOnce();
+    expect(client.release.mock.calls[0]?.[0]).toBe(thrown);
+  });
+
   it('rejects a new-before-existing classification before any guild query', async () => {
     const first = guildGoldBatch('save.guild.new.first', 10);
     const second = guildGoldBatch('save.guild.existing.later', 20);
@@ -614,6 +702,140 @@ describe('fenced character save ledger effects', () => {
     expect(h.pool.query).not.toHaveBeenCalled();
   });
 
+  it('accepts only attributed admin purges across accounts and locks every parent in order', async () => {
+    const prepared = prepareBankLedgerSaveEffects(OWNER.characterId, [], ADMIN_PURGE_EFFECTS, [19]);
+    const client = clientStub();
+
+    await lockCharacterSaveEffectAccountsOnClient(client, [], prepared);
+
+    const lock = client.query.mock.calls.find((call) => /id = ANY/.test(String(call[0])));
+    expect(lock?.[1]).toEqual([[OWNER.accountId, 99]]);
+
+    const ordinaryCrossOwner: BankLedgerSaveEffects = {
+      owner: OWNER,
+      batches: [
+        {
+          ...GUILD_EFFECTS.batches[0],
+          rows: [{ ...GUILD_EFFECTS.batches[0].rows[0], accountId: 99 }],
+        },
+      ],
+    };
+    expect(() =>
+      prepareBankLedgerSaveEffects(OWNER.characterId, [], ordinaryCrossOwner, [19]),
+    ).toThrow(/does not match the character save owner/);
+  });
+
+  it('refuses a single-owner lock proof for a cross-account admin purge', async () => {
+    const client = clientStub();
+    const proof = await lockCharacterSaveAccountParentOnClient(client as never, OWNER.accountId);
+    const prepared = prepareBankLedgerSaveEffects(OWNER.characterId, [], ADMIN_PURGE_EFFECTS, [19]);
+
+    await expect(
+      lockCharacterSaveEffectAccountsOnClient(client, [], prepared, proof),
+    ).rejects.toThrow(/does not match save effects/);
+  });
+
+  it('rejects oversized no-ledger storage effects before every save family touches SQL', async () => {
+    const overflow = [
+      STORAGE_EFFECT,
+      {
+        ...STORAGE_EFFECT,
+        idempotencyKey: 'storage-overflow-second',
+        spendClaimToken: '00000000-0000-4000-8000-000000000002',
+      },
+    ];
+    const callerOwned = clientStub();
+
+    await expect(
+      saveCharacterState(OWNER.characterId, 7, STATE, undefined, overflow),
+    ).rejects.toThrow(/exceeds one pending purchase/);
+    await expect(
+      saveCharacterAndMarketState(
+        OWNER.characterId,
+        7,
+        STATE,
+        MARKET,
+        MAIL,
+        undefined,
+        undefined,
+        undefined,
+        overflow,
+      ),
+    ).rejects.toThrow(/exceeds one pending purchase/);
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [],
+        undefined,
+        undefined,
+        overflow,
+      ),
+    ).rejects.toThrow(/exceeds one pending purchase/);
+    await expect(
+      saveCharacterStateOnClient(
+        callerOwned as never,
+        OWNER.characterId,
+        7,
+        STATE,
+        undefined,
+        overflow,
+      ),
+    ).rejects.toThrow(/exceeds one pending purchase/);
+
+    expect(h.pool.connect).not.toHaveBeenCalled();
+    expect(h.pool.query).not.toHaveBeenCalled();
+    expect(callerOwned.query).not.toHaveBeenCalled();
+  });
+
+  it('rejects standalone storage owner mismatches before every save family touches SQL', async () => {
+    const mismatched = [{ ...STORAGE_EFFECT, realm: 'other-realm' }];
+    const callerOwned = clientStub();
+
+    await expect(
+      saveCharacterState(OWNER.characterId, 7, STATE, undefined, mismatched),
+    ).rejects.toThrow(/does not match the character save/);
+    await expect(
+      saveCharacterAndMarketState(
+        OWNER.characterId,
+        7,
+        STATE,
+        MARKET,
+        MAIL,
+        undefined,
+        undefined,
+        undefined,
+        mismatched,
+      ),
+    ).rejects.toThrow(/does not match the character save/);
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [],
+        undefined,
+        undefined,
+        mismatched,
+      ),
+    ).rejects.toThrow(/does not match the character save/);
+    await expect(
+      saveCharacterStateOnClient(
+        callerOwned as never,
+        OWNER.characterId,
+        7,
+        STATE,
+        undefined,
+        mismatched,
+      ),
+    ).rejects.toThrow(/does not match the character save/);
+
+    expect(h.pool.connect).not.toHaveBeenCalled();
+    expect(h.pool.query).not.toHaveBeenCalled();
+    expect(callerOwned.query).not.toHaveBeenCalled();
+  });
+
   it('writes the same locked and fenced prefix on a caller-owned client', async () => {
     const client = clientStub();
 
@@ -711,5 +933,6 @@ describe('bank ledger receipt schema boot wiring', () => {
     expect(core).toBeGreaterThanOrEqual(0);
     expect(core).toBeLessThan(receipts);
     expect(receipts).toBeLessThan(commit);
+    expect(h.bootCalls.indexOf(STORAGE_PURCHASE_SCHEMA)).toBe(commit - 1);
   });
 });

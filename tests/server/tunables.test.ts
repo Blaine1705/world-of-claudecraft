@@ -1005,16 +1005,20 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
       'export async function topLifetimeXp',
       'export async function topGuilds',
       'export async function deedsBoardRanked',
-      'export async function saveCharacterState',
     ]) {
       expect(bodyOf(dbSrc, decl)).toContain(
         'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
       );
     }
-    // saveCharacterAndMarketState owns its escrow transaction and inlines the raise.
-    expect(bodyOf(dbSrc, 'export async function saveCharacterAndMarketState')).toContain(
-      'SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}',
-    );
+    // Character saves share one owner that bounds BEGIN through COMMIT, rather
+    // than the read-only wrapper used by aggregates.
+    for (const decl of [
+      'export async function saveCharacterState',
+      'export async function saveCharacterAndMarketState',
+      'export async function saveCharacterAndGuildBankState',
+    ]) {
+      expect(bodyOf(dbSrc, decl)).toContain('beginCharacterSaveTx(');
+    }
     const adminSrc = read('server/admin_db.ts');
     expect(bodyOf(adminSrc, 'export async function overviewCounts')).toContain(
       'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
@@ -1194,13 +1198,17 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   });
 
   it('the heavy-statement exemption interpolates the named constant and validates the integer', () => {
-    // runWithStatementTimeout is the single SET LOCAL site; it interpolates the raw
-    // integer (SET LOCAL cannot bind a parameter) after a safe-integer guard, which
-    // is the injection guard. The named heavy constant is what the exempt call sites
-    // pass, never a re-inlined 60000.
+    // The read helper interpolates the raw integer (SET LOCAL cannot bind a
+    // parameter) after a safe-integer guard. Character saves use their fixed
+    // sibling transaction bound, never a re-inlined 60000 in db.ts.
     expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{timeoutMs\}/);
     expect(dbSrc).toContain('Number.isSafeInteger(timeoutMs)');
-    expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{DB_HEAVY_STATEMENT_TIMEOUT_MS\}/);
+    const saveTxSrc = read('server/character_save_transaction.ts');
+    expect(saveTxSrc).toContain(
+      'SET LOCAL statement_timeout = $' + '{CHARACTER_SAVE_STATEMENT_TIMEOUT_MS}',
+    );
+    expect(saveTxSrc).toContain("SET LOCAL lock_timeout = '2s'");
+    expect(saveTxSrc).toContain("SET LOCAL idle_in_transaction_session_timeout = '10s'");
     // Boot DDL disables the timeout entirely for its advisory-lock-serialized wait.
     expect(dbSrc).toContain('SET LOCAL statement_timeout = 0');
     expect(dbSrc).not.toContain('SET LOCAL statement_timeout = 60000');

@@ -9,13 +9,11 @@ import {
 } from './bank_ledger_batch_db';
 import {
   type BankLedgerCommandBatch,
+  bankLedgerBatchMatchesOwner,
   bankLedgerCommandBatchFingerprintJson,
 } from './bank_ledger_outbox';
 import { REALM } from './realm';
-import {
-  lockStorageAppliedEffectAccountsOnClient,
-  type StorageAppliedEffect,
-} from './storage_purchase_db';
+import type { StorageAppliedEffect } from './storage_purchase_db';
 
 export interface BankLedgerSaveEffects {
   readonly owner: BankLedgerBatchOwner;
@@ -98,6 +96,20 @@ function assertPositiveAccountId(accountId: number): void {
   }
 }
 
+function characterSaveEffectAccountIds(
+  storageEffects: readonly StorageAppliedEffect[],
+  ledgerEffects: BankLedgerSaveEffects | undefined,
+): number[] {
+  const accountIds = new Set(storageEffects.map((effect) => effect.accountId));
+  if (ledgerEffects) {
+    accountIds.add(ledgerEffects.owner.accountId);
+    for (const batch of ledgerEffects.batches) {
+      for (const row of batch.rows) accountIds.add(row.accountId);
+    }
+  }
+  return [...accountIds].sort((a, b) => a - b);
+}
+
 /** Take the accounts-first NO KEY UPDATE lock used by a capped WOC escrow
  *  insert and return a proof the later character-save helper can consume.
  *  This is stronger than the KEY SHARE lock save effects otherwise acquire,
@@ -152,6 +164,31 @@ export function prepareBankLedgerSaveEffects(
   ledgerEffects: BankLedgerSaveEffects | undefined,
   allowedGuildIds: readonly number[] = [],
 ): BankLedgerSaveEffects | undefined {
+  for (const effect of storageEffects) {
+    if (
+      !effect ||
+      effect.realm !== REALM ||
+      effect.characterId !== characterId ||
+      !Number.isSafeInteger(effect.characterId) ||
+      effect.characterId <= 0 ||
+      !Number.isSafeInteger(effect.accountId) ||
+      effect.accountId <= 0 ||
+      typeof effect.itemId !== 'string' ||
+      effect.itemId.length === 0 ||
+      !Number.isSafeInteger(effect.expectedCostClaudium) ||
+      effect.expectedCostClaudium <= 0 ||
+      typeof effect.idempotencyKey !== 'string' ||
+      effect.idempotencyKey.length === 0 ||
+      typeof effect.spendClaimToken !== 'string' ||
+      effect.spendClaimToken.length === 0 ||
+      !Number.isSafeInteger(effect.purchasedSlotsBefore) ||
+      effect.purchasedSlotsBefore < 0 ||
+      !Number.isSafeInteger(effect.purchasedSlotsAfter) ||
+      effect.purchasedSlotsAfter <= effect.purchasedSlotsBefore
+    ) {
+      throw new Error('storage save effect does not match the character save');
+    }
+  }
   if (!ledgerEffects) return undefined;
   const { owner, batches } = ledgerEffects;
   if (
@@ -179,6 +216,9 @@ export function prepareBankLedgerSaveEffects(
     // Full receipt/sidecar validation is deliberately synchronous. This also
     // rejects an ordinary guild row without its command-owned sidecar.
     bankLedgerCommandBatchFingerprintJson(batch);
+    if (!bankLedgerBatchMatchesOwner(owner, batch)) {
+      throw new Error('bank ledger batch does not match the character save owner');
+    }
     if (batch.guildEffect && !allowedGuilds.has(batch.guildEffect.guildId)) {
       throw new Error('bank ledger guild effect requires a matching guild bank save');
     }
@@ -209,24 +249,31 @@ export async function lockCharacterSaveEffectAccountsOnClient(
     if (!state || state.db !== db || state.consumed) {
       throw new Error('invalid or consumed character save account lock proof');
     }
-    const effectAccountIds = new Set(storageEffects.map((effect) => effect.accountId));
-    if (ledgerEffects) effectAccountIds.add(ledgerEffects.owner.accountId);
+    const effectAccountIds = characterSaveEffectAccountIds(storageEffects, ledgerEffects);
     // A save without external effects needs no parent lock. Do not consume a
     // proof the helper did not rely on, although the WOC caller keeps it local.
-    if (effectAccountIds.size === 0) return;
-    if (effectAccountIds.size !== 1 || !effectAccountIds.has(state.accountId)) {
+    if (effectAccountIds.length === 0) return;
+    if (effectAccountIds.length !== 1 || effectAccountIds[0] !== state.accountId) {
       throw new Error('character save account lock proof does not match save effects');
     }
     state.consumed = true;
     return;
   }
-  await lockStorageAppliedEffectAccountsOnClient(db, storageEffects);
-  if (!ledgerEffects || storageEffects.length > 0) return;
-  const locked = await db.query('SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE', [
-    ledgerEffects.owner.accountId,
-  ]);
-  if (Number(locked.rows[0]?.id) !== ledgerEffects.owner.accountId) {
-    throw new Error('bank ledger account disappeared before character save');
+  const orderedAccountIds = characterSaveEffectAccountIds(storageEffects, ledgerEffects);
+  if (orderedAccountIds.length === 0) return;
+  const locked = await db.query(
+    `SELECT id FROM accounts
+      WHERE id = ANY($1::int[])
+      ORDER BY id
+      FOR KEY SHARE`,
+    [orderedAccountIds],
+  );
+  const lockedIds = locked.rows.map((row) => Number(row.id));
+  if (
+    lockedIds.length !== orderedAccountIds.length ||
+    lockedIds.some((accountId, index) => accountId !== orderedAccountIds[index])
+  ) {
+    throw new Error('character save account disappeared before parent lock');
   }
 }
 
