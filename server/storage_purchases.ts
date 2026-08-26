@@ -124,7 +124,7 @@ export interface StoragePurchaseHost {
   setRecoveryAdmissionPending?(characterId: number, pending: boolean): void;
   recoveryAdmissionPending?(characterId: number): boolean;
   /** Realm-wide cap shared by autosave, market custody, and recovery. Recovery
-   * holds one permit around each direct DB call only—never an economy RPC or
+   * holds one permit around each direct DB call only, never an economy RPC or
    * character FIFO wait. */
   acquireBackgroundPermit?(signal: AbortSignal): Promise<{ release(): void } | null>;
   /** bankGrantStorageSlots against the live sim (the one rules body). */
