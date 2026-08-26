@@ -200,10 +200,14 @@ export async function aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]> {
     //   same must-not-abort rule for absurd stored values that would
     //   overflow the bigint pipeline (the retired Node fold would have
     //   mis-summed those in doubles and then failed in applyEscrowTotals).
-    // - The id-key test is a NESTED CASE, never an AND: PostgreSQL does not
-    //   guarantee short-circuit order, and the regex must bound the digits
-    //   (leading zeros aside, 16 significant digits) before the ::numeric
-    //   cast may run.
+    // - The id-key test and the copper guard are both CASE-armored, never
+    //   bare AND chains: PostgreSQL does not guarantee AND evaluation order,
+    //   so the digit-bounding regex must run before raw_key's ::numeric cast
+    //   (leading zeros aside, 16 significant digits), and copper's
+    //   jsonb_typeof check must run before its cast (a non-number copper
+    //   would otherwise abort the whole sweep if the planner ever reordered
+    //   the quals). CASE is the one construct whose evaluation order is
+    //   guaranteed.
     return query(
       `WITH books AS (
          SELECT realm, true AS is_mail,
@@ -222,15 +226,18 @@ export async function aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]> {
                   CASE WHEN b.is_mail THEN elem->>'recipientKey' ELSE elem->>'key' END,
                   E' \\t\\n\\r\\f\\v'
                 ) AS raw_key,
-                floor((elem->>'copper')::numeric)::bigint AS copper
+                floor(cn.copper_numeric)::bigint AS copper
          FROM books b
          CROSS JOIN LATERAL jsonb_array_elements(b.arr) AS elem
+         CROSS JOIN LATERAL (
+           SELECT CASE WHEN jsonb_typeof(elem->'copper') = 'number'
+                       THEN (elem->>'copper')::numeric END AS copper_numeric
+         ) cn
          WHERE jsonb_typeof(
                  CASE WHEN b.is_mail THEN elem->'recipientKey' ELSE elem->'key' END
                ) = 'string'
-           AND jsonb_typeof(elem->'copper') = 'number'
-           AND (elem->>'copper')::numeric >= 1
-           AND (elem->>'copper')::numeric < 9007199254740992
+           AND cn.copper_numeric >= 1
+           AND cn.copper_numeric < 9007199254740992
        ),
        keyed AS (
          SELECT CASE WHEN raw_key ~ '^0*[0-9]{1,16}$' THEN

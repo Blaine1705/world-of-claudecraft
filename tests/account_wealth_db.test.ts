@@ -170,9 +170,16 @@ describe('aggregateEscrowTotals', () => {
     expect(sql).toMatch(/CASE WHEN jsonb_typeof\(arr\) = 'array' THEN arr END/);
     // Entry guards mirror positiveCopper + the string-key requirement, with
     // the absurd-copper upper bound that keeps the bigint pipeline alive.
-    expect(sql).toMatch(/jsonb_typeof\(elem->'copper'\) = 'number'/);
-    expect(sql).toMatch(/\(elem->>'copper'\)::numeric >= 1/);
-    expect(sql).toMatch(/\(elem->>'copper'\)::numeric < 9007199254740992/);
+    // The ::numeric cast on copper is CASE-armored behind the jsonb_typeof
+    // check (PostgreSQL guarantees no AND evaluation order, so a bare AND
+    // chain could cast a non-number copper and abort the sweep), and that
+    // guarded expression is the ONLY place the cast appears.
+    expect(sql).toMatch(
+      /CASE WHEN jsonb_typeof\(elem->'copper'\) = 'number'\s+THEN \(elem->>'copper'\)::numeric END AS copper_numeric/,
+    );
+    expect(sql.match(/\(elem->>'copper'\)::numeric/g)).toHaveLength(1);
+    expect(sql).toMatch(/cn\.copper_numeric >= 1/);
+    expect(sql).toMatch(/cn\.copper_numeric < 9007199254740992/);
     // The id-key line: a digit-bounding regex runs BEFORE the ::numeric cast
     // in a NESTED CASE (PostgreSQL guarantees no AND short-circuit order),
     // the bound is Number.MAX_SAFE_INTEGER like the oracle's isSafeInteger,

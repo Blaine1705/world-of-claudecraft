@@ -157,6 +157,13 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
         { recipientKey: String(idKeyed), copper: 0 },
         { recipientKey: String(idKeyed), copper: -50 },
         { recipientKey: String(idKeyed), copper: '50' },
+        // Non-castable coppers: '50' above would survive a ::numeric cast,
+        // so these three pin that the typeof CASE armor (not qual luck)
+        // keeps a string, object, or boolean copper from aborting the
+        // statement.
+        { recipientKey: String(idKeyed), copper: 'abc' },
+        { recipientKey: String(idKeyed), copper: { nested: true } },
+        { recipientKey: String(idKeyed), copper: true },
         { recipientKey: 42, copper: 10 },
         { recipientKey: String(idKeyed) },
         null,
