@@ -4,6 +4,7 @@
 
 export const STEAM_OVERLAY_LIB: string;
 export const GPU_SANDBOX_SWITCH: string;
+export const OVERLAY_DETECTED_LOG: string;
 
 export function steamOverlayPreloaded(env?: Record<string, string | undefined>): boolean;
 

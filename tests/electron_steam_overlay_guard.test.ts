@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   allowGpuUnderSteamOverlay,
   GPU_SANDBOX_SWITCH,
+  OVERLAY_DETECTED_LOG,
   STEAM_OVERLAY_LIB,
   steamOverlayPreloaded,
 } from '../electron/steam_overlay_guard.cjs';
@@ -116,7 +117,10 @@ describe('allowGpuUnderSteamOverlay', () => {
     expect(f.switches).toEqual([]);
   });
 
-  it('records the decision, so main.log can answer "did this launch relax the sandbox"', () => {
+  it('logs the exact token docs/desktop-release.md tells an operator to grep for', () => {
+    // The doc names this string as the way to verify a Steam launch, which makes it a support
+    // procedure rather than prose. Asserting only that log.info fired would let a reword break
+    // the documented check with the suite still green.
     const log = { info: vi.fn(), warn: vi.fn() };
     allowGpuUnderSteamOverlay({
       platform: 'linux',
@@ -124,7 +128,13 @@ describe('allowGpuUnderSteamOverlay', () => {
       app: fakeApp().app,
       log,
     });
-    expect(log.info).toHaveBeenCalled();
+    expect(log.info).toHaveBeenCalledWith(
+      expect.stringContaining(OVERLAY_DETECTED_LOG),
+      expect.anything(),
+    );
+    expect(OVERLAY_DETECTED_LOG).toBe('[steam] Steam overlay detected');
+    const doc = readFileSync(new URL('../docs/desktop-release.md', import.meta.url), 'utf8');
+    expect(doc).toContain(OVERLAY_DETECTED_LOG);
   });
 
   it('never takes the app down if appending fails', () => {

@@ -47,6 +47,9 @@ const STEAM_OVERLAY_LIB = 'gameoverlayrenderer.so';
 // Relaxes the GPU process sandbox only. The renderer sandbox, which is the one containing page
 // content, is untouched.
 const GPU_SANDBOX_SWITCH = 'disable-gpu-sandbox';
+// docs/desktop-release.md tells an operator to grep main.log for this, which makes it a support
+// procedure rather than prose: pinned by the test so a reword cannot break it silently.
+const OVERLAY_DETECTED_LOG = '[steam] Steam overlay detected';
 
 /**
  * True when Steam launched this process with its overlay preloaded.
@@ -78,21 +81,34 @@ function allowGpuUnderSteamOverlay(deps = {}) {
   if (platform !== 'linux') return false;
   if (!steamOverlayPreloaded(env)) return false;
 
+  // Checked rather than optional-chained away: a missing app or commandLine would otherwise
+  // append nothing, log success and return true, and the log line is the operator's grep handle
+  // for "did this launch relax the sandbox". It has to be false exactly when nothing happened.
+  const appendSwitch = app?.commandLine?.appendSwitch;
+  if (typeof appendSwitch !== 'function') {
+    deps.log?.warn?.('[steam] Steam overlay detected but the GPU sandbox could not be relaxed', {
+      reason: 'no app.commandLine.appendSwitch',
+    });
+    return false;
+  }
   try {
-    app?.commandLine?.appendSwitch?.(GPU_SANDBOX_SWITCH);
+    appendSwitch.call(app.commandLine, GPU_SANDBOX_SWITCH);
   } catch (err) {
     deps.log?.warn?.('[steam] could not relax the GPU sandbox', err);
     return false;
   }
   deps.log?.info?.(
-    '[steam] Steam overlay detected; relaxing the GPU sandbox so the GPU process can start',
-    { switch: GPU_SANDBOX_SWITCH },
+    `${OVERLAY_DETECTED_LOG}; relaxing the GPU sandbox so the GPU process can start`,
+    {
+      switch: GPU_SANDBOX_SWITCH,
+    },
   );
   return true;
 }
 
 module.exports = {
   GPU_SANDBOX_SWITCH,
+  OVERLAY_DETECTED_LOG,
   STEAM_OVERLAY_LIB,
   allowGpuUnderSteamOverlay,
   steamOverlayPreloaded,
