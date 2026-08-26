@@ -8,12 +8,22 @@ import { performance } from 'node:perf_hooks';
 // login and settle kicks coalesce instead of multiplying database and economy
 // service work during the outage/restart shape recovery exists for.
 
-export const STORAGE_RECOVERY_MAX_TRACKED = 5_000;
+export const STORAGE_RECOVERY_MAX_TRACKED = 200;
 export const STORAGE_RECOVERY_SCAN_CONCURRENCY = 2;
 export const STORAGE_RECOVERY_DRIVE_CONCURRENCY = 2;
+// This is a conditional capacity target, not a completion guarantee. With two
+// drive slots and at most five seconds of end-to-end occupancy per slot, all
+// 200 admitted keys can finish within 500 seconds. Dependency latency, retry
+// backoff, or a hook that ignores cancellation can extend that horizon, so the
+// coordinator exposes live ages and warns once tracked work exceeds 600 seconds.
+export const STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS = 5_000;
+export const STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS =
+  Math.ceil(STORAGE_RECOVERY_MAX_TRACKED / STORAGE_RECOVERY_DRIVE_CONCURRENCY) *
+  STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS;
+export const STORAGE_RECOVERY_HORIZON_WARNING_MS = 600_000;
 // One realm may begin at most ten recovery drives or failed-scan retries per
-// second after a two-start burst. At that rate all 5,000 tracked keys receive
-// an outbound turn inside the existing ten-minute ambiguity-hold horizon.
+// second after a two-start burst. The rate ceiling limits downstream bursts;
+// the two drive slots are the binding term in the conditional target above.
 export const STORAGE_RECOVERY_START_RATE_PER_SECOND = 10;
 export const STORAGE_RECOVERY_START_BURST = 2;
 export const STORAGE_RECOVERY_WARNING_WINDOW_MS = 60_000;
@@ -26,7 +36,7 @@ export interface StorageRecoveryTimer {
 }
 
 export interface StorageRecoveryScheduler {
-  /** Schedule one retry. The returned handle must make cancellation idempotent. */
+  /** Schedule one timer. The returned handle must make cancellation idempotent. */
   schedule(delayMs: number, run: () => void): StorageRecoveryTimer;
   /** Monotonic-enough wall clock for the aggregate start token bucket. */
   now(): number;
@@ -37,13 +47,14 @@ export interface StorageRecoveryScheduler {
 }
 
 export interface StorageRecoveryHooks<Row> {
-  scan(characterId: number): Promise<Row | null>;
+  scan(characterId: number, signal: AbortSignal): Promise<Row | null>;
   /** Reserve the exact recovered purchase before its outbound spend can start. */
   reserve(characterId: number, row: Row): boolean;
   drive(
     characterId: number,
     row: Row,
     isCurrent: () => boolean,
+    signal: AbortSignal,
   ): Promise<StorageRecoveryDriveResult>;
   /** Atomically move the domain hold from row back to scan (or release it). */
   prepareScan(characterId: number, previousRow: Row | null): void;
@@ -64,6 +75,15 @@ export interface StorageRecoveryMetrics {
   queuedStorage: number;
   retryTimers: number;
   startRateGateTimers: number;
+  horizonWarningTimers: number;
+  /** Age since admission for the oldest retained key. */
+  oldestTrackedAgeMs: number;
+  /** Oldest time spent in the current queued or retry phase. */
+  oldestQueuedAgeMs: number;
+  /** Oldest time spent inside a scan or drive hook. */
+  oldestActiveAgeMs: number;
+  activePastSlotTarget: number;
+  horizonBreached: boolean;
   kicks: number;
   coalescedKicks: number;
   capacityRefusals: number;
@@ -76,6 +96,7 @@ export interface StorageRecoveryMetrics {
   rateLimitedStarts: number;
   startRateDeferrals: number;
   retriesScheduled: number;
+  horizonBreaches: number;
 }
 
 type Phase = 'scan-queued' | 'scanning' | 'drive-queued' | 'driving' | 'retry';
@@ -90,10 +111,12 @@ interface Entry<Row> {
   followup: boolean;
   /** Set only by the authoritative final-session teardown hook. */
   offline: boolean;
+  readonly admittedAtMs: number;
+  phaseStartedAtMs: number;
 }
 
 type RateLimitedKind = 'scan' | 'drive';
-type WarningKind = 'capacity' | 'drive' | 'eviction' | 'host' | 'scan';
+type WarningKind = 'capacity' | 'drive' | 'eviction' | 'horizon' | 'host' | 'scan';
 
 function defaultScheduler(): StorageRecoveryScheduler {
   return {
@@ -124,11 +147,14 @@ export class StorageRecoveryCoordinator<Row> {
   private readonly driveQueue = new Map<number, Entry<Row>>();
   private readonly evictable = new Map<number, Entry<Row>>();
   private nextRateKind: RateLimitedKind = 'scan';
-  private scanActive = 0;
-  private driveActive = 0;
+  private readonly activeScans = new Set<AbortController>();
+  private readonly activeDrives = new Set<AbortController>();
   private startTokens = STORAGE_RECOVERY_START_BURST;
   private lastStartRefillMs: number;
   private startRateGateTimer: StorageRecoveryTimer | null = null;
+  private horizonWarningTimer: StorageRecoveryTimer | null = null;
+  private horizonWarningDueAtMs: number | null = null;
+  private horizonCurrentlyBreached = false;
   private generation = 0;
   private stopping = false;
   private stopWaiters: (() => void)[] = [];
@@ -139,6 +165,7 @@ export class StorageRecoveryCoordinator<Row> {
     capacity: { lastEmittedMs: null, suppressed: 0 },
     drive: { lastEmittedMs: null, suppressed: 0 },
     eviction: { lastEmittedMs: null, suppressed: 0 },
+    horizon: { lastEmittedMs: null, suppressed: 0 },
     host: { lastEmittedMs: null, suppressed: 0 },
     scan: { lastEmittedMs: null, suppressed: 0 },
   };
@@ -155,6 +182,7 @@ export class StorageRecoveryCoordinator<Row> {
     rateLimitedStarts: 0,
     startRateDeferrals: 0,
     retriesScheduled: 0,
+    horizonBreaches: 0,
   };
 
   constructor(
@@ -196,8 +224,11 @@ export class StorageRecoveryCoordinator<Row> {
       timer: null,
       followup: false,
       offline: false,
+      admittedAtMs: this.scheduler.now(),
+      phaseStartedAtMs: this.scheduler.now(),
     };
     this.entries.set(characterId, entry);
+    this.refreshHorizonWatch();
     this.markEvictable(entry);
     this.scanQueue.set(characterId, entry);
     this.pumpScans();
@@ -234,8 +265,11 @@ export class StorageRecoveryCoordinator<Row> {
       timer: null,
       followup: false,
       offline: false,
+      admittedAtMs: this.scheduler.now(),
+      phaseStartedAtMs: this.scheduler.now(),
     };
     this.entries.set(characterId, entry);
+    this.refreshHorizonWatch();
     if (!this.hooks.reserve(characterId, row)) {
       this.finish(entry);
       return false;
@@ -257,10 +291,12 @@ export class StorageRecoveryCoordinator<Row> {
   }
 
   metrics(): StorageRecoveryMetrics {
+    this.refreshHorizonWatch();
     let retryTimers = 0;
     for (const entry of this.entries.values()) {
       if (entry.timer) retryTimers++;
     }
+    const ages = this.currentAges();
     return {
       tracked: this.entries.size,
       scanActive: this.scanActive,
@@ -272,6 +308,9 @@ export class StorageRecoveryCoordinator<Row> {
       queuedStorage: this.scanQueue.size + this.pacedScanQueue.size + this.driveQueue.size,
       retryTimers,
       startRateGateTimers: this.startRateGateTimer ? 1 : 0,
+      horizonWarningTimers: this.horizonWarningTimer ? 1 : 0,
+      ...ages,
+      horizonBreached: ages.oldestTrackedAgeMs > STORAGE_RECOVERY_HORIZON_WARNING_MS,
       ...this.counts,
     };
   }
@@ -289,12 +328,14 @@ export class StorageRecoveryCoordinator<Row> {
   async stop(): Promise<void> {
     if (!this.stopping) {
       this.stopping = true;
+      this.abortActiveOperations();
       for (const entry of [...this.entries.values()]) {
         if (entry.phase === 'scanning' || entry.phase === 'driving') continue;
         this.finish(entry);
       }
       this.startRateGateTimer?.cancel();
       this.startRateGateTimer = null;
+      this.cancelHorizonWarningTimer();
       this.scanQueue.clear();
       this.pacedScanQueue.clear();
       this.driveQueue.clear();
@@ -307,17 +348,19 @@ export class StorageRecoveryCoordinator<Row> {
   /** Test-only immediate teardown. Stale completions fail their generation check. */
   reset(): void {
     this.stopping = true;
+    this.abortActiveOperations();
     for (const entry of [...this.entries.values()]) this.finish(entry);
     this.entries.clear();
     this.startRateGateTimer?.cancel();
     this.startRateGateTimer = null;
+    this.cancelHorizonWarningTimer();
     this.scanQueue.clear();
     this.pacedScanQueue.clear();
     this.driveQueue.clear();
     this.evictable.clear();
     this.nextRateKind = 'scan';
-    this.scanActive = 0;
-    this.driveActive = 0;
+    this.activeScans.clear();
+    this.activeDrives.clear();
     this.startTokens = STORAGE_RECOVERY_START_BURST;
     this.lastStartRefillMs = this.scheduler.now();
     this.stopWaiters.splice(0).forEach((resolve) => {
@@ -336,12 +379,22 @@ export class StorageRecoveryCoordinator<Row> {
       rateLimitedStarts: 0,
       startRateDeferrals: 0,
       retriesScheduled: 0,
+      horizonBreaches: 0,
     };
     for (const state of Object.values(this.warningState)) {
       state.lastEmittedMs = null;
       state.suppressed = 0;
     }
+    this.horizonCurrentlyBreached = false;
     this.stopping = false;
+  }
+
+  private get scanActive(): number {
+    return this.activeScans.size;
+  }
+
+  private get driveActive(): number {
+    return this.activeDrives.size;
   }
 
   private isCurrent(entry: Entry<Row>): boolean {
@@ -408,19 +461,24 @@ export class StorageRecoveryCoordinator<Row> {
 
   private startScan(entry: Entry<Row>): void {
     this.evictable.delete(entry.characterId);
-    entry.phase = 'scanning';
-    this.scanActive++;
+    this.setPhase(entry, 'scanning');
+    const controller = new AbortController();
+    this.activeScans.add(controller);
     this.counts.scansStarted++;
     void this.hooks
-      .scan(entry.characterId)
+      .scan(entry.characterId, controller.signal)
       .then((row) => this.scanFinished(entry, row))
       .catch((err) => {
         if (!this.isCurrent(entry)) return;
+        if (this.stopping || controller.signal.aborted) {
+          this.finish(entry);
+          return;
+        }
         this.warn('scan', `storage purchase recovery scan failed: ${String(err)}`);
         this.scheduleRetry(entry);
       })
       .finally(() => {
-        this.scanActive = Math.max(0, this.scanActive - 1);
+        this.activeScans.delete(controller);
         this.pumpScans();
         this.pumpRateLimited();
         this.maybeResolveStop();
@@ -436,7 +494,7 @@ export class StorageRecoveryCoordinator<Row> {
     if (!row) {
       if (entry.followup) {
         entry.followup = false;
-        entry.phase = 'scan-queued';
+        this.setPhase(entry, 'scan-queued');
         this.markEvictable(entry);
         this.scheduler.yieldTurn(() => {
           if (!this.isCurrent(entry) || this.stopping) {
@@ -457,7 +515,7 @@ export class StorageRecoveryCoordinator<Row> {
       this.scheduleRetry(entry);
       return;
     }
-    entry.phase = 'drive-queued';
+    this.setPhase(entry, 'drive-queued');
     this.markEvictable(entry);
     this.enqueueRateLimited(entry, 'drive');
   }
@@ -466,19 +524,29 @@ export class StorageRecoveryCoordinator<Row> {
     const row = entry.row;
     if (!row) return;
     this.evictable.delete(entry.characterId);
-    entry.phase = 'driving';
-    this.driveActive++;
+    this.setPhase(entry, 'driving');
+    const controller = new AbortController();
+    this.activeDrives.add(controller);
     this.counts.drivesStarted++;
     void this.hooks
-      .drive(entry.characterId, row, () => this.isCurrent(entry) && !this.stopping)
+      .drive(
+        entry.characterId,
+        row,
+        () => this.isCurrent(entry) && !this.stopping && !controller.signal.aborted,
+        controller.signal,
+      )
       .then((result) => this.driveFinished(entry, result))
       .catch((err) => {
         if (!this.isCurrent(entry)) return;
+        if (this.stopping || controller.signal.aborted) {
+          this.finish(entry);
+          return;
+        }
         this.warn('drive', `storage purchase recovery drive failed: ${String(err)}`);
         this.scheduleRetry(entry);
       })
       .finally(() => {
-        this.driveActive = Math.max(0, this.driveActive - 1);
+        this.activeDrives.delete(controller);
         this.pumpRateLimited();
         this.maybeResolveStop();
       });
@@ -601,7 +669,7 @@ export class StorageRecoveryCoordinator<Row> {
     entry.row = null;
     entry.retryAttempt = 0;
     entry.followup = false;
-    entry.phase = 'scan-queued';
+    this.setPhase(entry, 'scan-queued');
     this.markEvictable(entry);
     this.hooks.prepareScan(entry.characterId, previous);
     // One operational row per event-loop turn, including an all-immediate fake.
@@ -625,7 +693,7 @@ export class StorageRecoveryCoordinator<Row> {
     const index = Math.min(entry.retryAttempt, STORAGE_RECOVERY_BACKOFF_MS.length - 1);
     const base = STORAGE_RECOVERY_BACKOFF_MS[index];
     entry.retryAttempt++;
-    entry.phase = 'retry';
+    this.setPhase(entry, 'retry');
     this.markEvictable(entry);
     this.counts.retriesScheduled++;
     const delay = storageRecoveryRetryDelay(base, this.scheduler.random());
@@ -637,12 +705,12 @@ export class StorageRecoveryCoordinator<Row> {
           this.scheduleRetry(entry);
           return;
         }
-        entry.phase = 'drive-queued';
+        this.setPhase(entry, 'drive-queued');
         this.markEvictable(entry);
         this.enqueueRateLimited(entry, 'drive');
         return;
       }
-      entry.phase = 'scan-queued';
+      this.setPhase(entry, 'scan-queued');
       this.markEvictable(entry);
       this.enqueueRateLimited(entry, 'scan');
     });
@@ -658,7 +726,80 @@ export class StorageRecoveryCoordinator<Row> {
     this.evictable.delete(entry.characterId);
     this.entries.delete(entry.characterId);
     this.hooks.release(entry.characterId, entry.row);
+    this.refreshHorizonWatch();
     this.maybeResolveStop();
+  }
+
+  private setPhase(entry: Entry<Row>, phase: Phase): void {
+    entry.phase = phase;
+    entry.phaseStartedAtMs = this.scheduler.now();
+  }
+
+  private abortActiveOperations(): void {
+    for (const controller of this.activeScans) controller.abort();
+    for (const controller of this.activeDrives) controller.abort();
+  }
+
+  private currentAges(): Pick<
+    StorageRecoveryMetrics,
+    'activePastSlotTarget' | 'oldestActiveAgeMs' | 'oldestQueuedAgeMs' | 'oldestTrackedAgeMs'
+  > {
+    const now = this.scheduler.now();
+    let oldestTrackedAgeMs = 0;
+    let oldestQueuedAgeMs = 0;
+    let oldestActiveAgeMs = 0;
+    let activePastSlotTarget = 0;
+    for (const entry of this.entries.values()) {
+      oldestTrackedAgeMs = Math.max(oldestTrackedAgeMs, Math.max(0, now - entry.admittedAtMs));
+      const phaseAgeMs = Math.max(0, now - entry.phaseStartedAtMs);
+      if (entry.phase === 'scanning' || entry.phase === 'driving') {
+        oldestActiveAgeMs = Math.max(oldestActiveAgeMs, phaseAgeMs);
+        if (phaseAgeMs > STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS) activePastSlotTarget++;
+      } else {
+        oldestQueuedAgeMs = Math.max(oldestQueuedAgeMs, phaseAgeMs);
+      }
+    }
+    return {
+      activePastSlotTarget,
+      oldestActiveAgeMs,
+      oldestQueuedAgeMs,
+      oldestTrackedAgeMs,
+    };
+  }
+
+  private refreshHorizonWatch(): void {
+    const oldestTrackedAgeMs = this.currentAges().oldestTrackedAgeMs;
+    const breached = oldestTrackedAgeMs > STORAGE_RECOVERY_HORIZON_WARNING_MS;
+    if (breached && !this.horizonCurrentlyBreached) {
+      this.counts.horizonBreaches++;
+      this.warn(
+        'horizon',
+        `storage purchase recovery horizon breached: oldest tracked work is ${Math.floor(oldestTrackedAgeMs)}ms old`,
+      );
+    }
+    this.horizonCurrentlyBreached = breached;
+    if (this.stopping || breached || this.entries.size === 0) {
+      this.cancelHorizonWarningTimer();
+      return;
+    }
+    const oldest = this.entries.values().next().value as Entry<Row> | undefined;
+    if (!oldest) return;
+    const dueAt = oldest.admittedAtMs + STORAGE_RECOVERY_HORIZON_WARNING_MS + 1;
+    if (this.horizonWarningTimer && this.horizonWarningDueAtMs === dueAt) return;
+    this.cancelHorizonWarningTimer();
+    const delay = Math.max(1, dueAt - this.scheduler.now());
+    this.horizonWarningDueAtMs = dueAt;
+    this.horizonWarningTimer = this.scheduler.schedule(delay, () => {
+      this.horizonWarningTimer = null;
+      this.horizonWarningDueAtMs = null;
+      this.refreshHorizonWatch();
+    });
+  }
+
+  private cancelHorizonWarningTimer(): void {
+    this.horizonWarningTimer?.cancel();
+    this.horizonWarningTimer = null;
+    this.horizonWarningDueAtMs = null;
   }
 
   private warn(kind: WarningKind, message: string): void {

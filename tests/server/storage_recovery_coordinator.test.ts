@@ -2,9 +2,12 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   STORAGE_RECOVERY_BACKOFF_MS,
+  STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS,
   STORAGE_RECOVERY_DRIVE_CONCURRENCY,
+  STORAGE_RECOVERY_HORIZON_WARNING_MS,
   STORAGE_RECOVERY_MAX_TRACKED,
   STORAGE_RECOVERY_SCAN_CONCURRENCY,
+  STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
   STORAGE_RECOVERY_START_BURST,
   STORAGE_RECOVERY_START_RATE_PER_SECOND,
   STORAGE_RECOVERY_WARNING_WINDOW_MS,
@@ -73,9 +76,12 @@ async function tick(): Promise<void> {
 
 describe('StorageRecoveryCoordinator', () => {
   it('pins the hard population and concurrency bounds', () => {
-    expect(STORAGE_RECOVERY_MAX_TRACKED).toBe(5_000);
+    expect(STORAGE_RECOVERY_MAX_TRACKED).toBe(200);
     expect(STORAGE_RECOVERY_SCAN_CONCURRENCY).toBe(2);
     expect(STORAGE_RECOVERY_DRIVE_CONCURRENCY).toBe(2);
+    expect(STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS).toBe(5_000);
+    expect(STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS).toBe(500_000);
+    expect(STORAGE_RECOVERY_HORIZON_WARNING_MS).toBe(600_000);
     expect(STORAGE_RECOVERY_START_RATE_PER_SECOND).toBe(10);
     expect(STORAGE_RECOVERY_START_BURST).toBe(2);
     expect(STORAGE_RECOVERY_WARNING_WINDOW_MS).toBe(60_000);
@@ -112,7 +118,7 @@ describe('StorageRecoveryCoordinator', () => {
     coordinator.reset();
   });
 
-  it('evicts the exact offline key in O(1), even behind thousands of live entries', () => {
+  it('evicts the exact offline key in O(1), even behind a saturated live set', () => {
     const scheduler = fakeScheduler();
     const never = new Promise<Row | null>(() => {});
     const released: number[] = [];
@@ -287,7 +293,7 @@ describe('StorageRecoveryCoordinator', () => {
     });
   });
 
-  it('rate-limits a 5,000-key fast-drive burst after two immediate starts', async () => {
+  it('rate-limits a capped fast-drive burst after two immediate starts', async () => {
     const scheduler = fakeScheduler();
     const startedAt: number[] = [];
     const coordinator = new StorageRecoveryCoordinator<Row>(
@@ -321,6 +327,97 @@ describe('StorageRecoveryCoordinator', () => {
     expect(startedAt.filter((time) => time > 0 && time <= 1_000)).toHaveLength(10);
     expect(startedAt).toHaveLength(12);
     coordinator.reset();
+  });
+
+  it('drains 200 five-second drive slots within the conditional 500-second horizon', async () => {
+    const scheduler = fakeScheduler();
+    const startedAt: number[] = [];
+    const finishedAt: number[] = [];
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: async (characterId) => ({ idempotencyKey: `k${characterId}` }),
+        reserve: () => true,
+        drive: (_characterId) => {
+          startedAt.push(scheduler.now());
+          return new Promise<'stop'>((resolve) => {
+            scheduler.scheduler.schedule(STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS, () => {
+              finishedAt.push(scheduler.now());
+              resolve('stop');
+            });
+          });
+        },
+        prepareScan: vi.fn(),
+        release: vi.fn(),
+        warn: vi.fn(),
+      },
+      scheduler.scheduler,
+    );
+    for (let id = 1; id <= STORAGE_RECOVERY_MAX_TRACKED; id++) coordinator.kick(id);
+    await vi.waitFor(() => {
+      expect(coordinator.metrics().scansStarted).toBe(STORAGE_RECOVERY_MAX_TRACKED);
+      expect(startedAt).toHaveLength(STORAGE_RECOVERY_DRIVE_CONCURRENCY);
+    });
+
+    for (let completed = 0; completed < STORAGE_RECOVERY_MAX_TRACKED; completed++) {
+      scheduler.fireNext();
+      await tick();
+    }
+
+    expect(startedAt).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
+    expect(finishedAt).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
+    expect(Math.max(...startedAt)).toBeLessThanOrEqual(
+      STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS - STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
+    );
+    expect(Math.max(...finishedAt)).toBeLessThanOrEqual(STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS);
+    expect(coordinator.metrics()).toMatchObject({
+      tracked: 0,
+      horizonBreached: false,
+      horizonBreaches: 0,
+    });
+  });
+
+  it('reports 5001ms slot occupancy and warns once when the 600-second horizon breaches', async () => {
+    const scheduler = fakeScheduler();
+    const warn = vi.fn();
+    let driveSignal: AbortSignal | undefined;
+    const never = new Promise<'stop'>(() => {});
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: async () => ({ idempotencyKey: 'slow' }),
+        reserve: () => true,
+        drive: (_characterId, _row, _isCurrent, signal) => {
+          driveSignal = signal;
+          return never;
+        },
+        prepareScan: vi.fn(),
+        release: vi.fn(),
+        warn,
+      },
+      scheduler.scheduler,
+    );
+    coordinator.kick(1);
+    await vi.waitFor(() => expect(coordinator.metrics().driveActive).toBe(1));
+
+    scheduler.setNow(STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS + 1);
+    expect(coordinator.metrics()).toMatchObject({
+      activePastSlotTarget: 1,
+      horizonBreached: false,
+      oldestActiveAgeMs: STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS + 1,
+      oldestTrackedAgeMs: STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS + 1,
+    });
+
+    scheduler.setNow(STORAGE_RECOVERY_HORIZON_WARNING_MS + 1);
+    expect(coordinator.metrics()).toMatchObject({
+      horizonBreached: true,
+      horizonBreaches: 1,
+      oldestTrackedAgeMs: STORAGE_RECOVERY_HORIZON_WARNING_MS + 1,
+    });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]?.[0]).toContain('horizon breached');
+    coordinator.metrics();
+    expect(warn).toHaveBeenCalledTimes(1);
+    coordinator.reset();
+    expect(driveSignal?.aborted).toBe(true);
   });
 
   it('starts a failed-scan retry while both drive slots are saturated', async () => {
@@ -664,7 +761,10 @@ describe('StorageRecoveryCoordinator', () => {
     await tick();
     for (let attempt = 0; attempt < 7; attempt++) {
       const base = STORAGE_RECOVERY_BACKOFF_MS[Math.min(attempt, 4)];
-      const live = scheduler.timers.filter((timer) => !timer.cancelled);
+      const maxBackoffMs = STORAGE_RECOVERY_BACKOFF_MS.at(-1) ?? 0;
+      const live = scheduler.timers.filter(
+        (timer) => !timer.cancelled && timer.delay <= maxBackoffMs,
+      );
       expect(live).toHaveLength(1);
       expect(live[0].delay).toBe(storageRecoveryRetryDelay(base, 0.5));
       scheduler.fireNext();
@@ -710,6 +810,78 @@ describe('StorageRecoveryCoordinator', () => {
     expect(stopped).toBe(true);
     expect(coordinator.kick(4)).toBe(false);
     expect(coordinator.metrics().tracked).toBe(0);
+  });
+
+  it('aborts active scan and drive hooks before stop waits for their settlement', async () => {
+    const scheduler = fakeScheduler();
+    const signals: { drive?: AbortSignal; scan?: AbortSignal } = {};
+    const abortable = <T>(signal: AbortSignal) =>
+      new Promise<T>((_resolve, reject) => {
+        signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+      });
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: (characterId, signal) => {
+          if (characterId === 1) return Promise.resolve({ idempotencyKey: 'drive' });
+          signals.scan = signal;
+          return abortable<Row | null>(signal);
+        },
+        reserve: () => true,
+        drive: (_characterId, _row, _isCurrent, signal) => {
+          signals.drive = signal;
+          return abortable<'stop'>(signal);
+        },
+        prepareScan: vi.fn(),
+        release: vi.fn(),
+        warn: vi.fn(),
+      },
+      scheduler.scheduler,
+    );
+    coordinator.kick(1);
+    coordinator.kick(2);
+    await vi.waitFor(() => {
+      expect(coordinator.metrics()).toMatchObject({ scanActive: 1, driveActive: 1 });
+    });
+
+    let settled = false;
+    const stopping = coordinator.stop().then(() => {
+      settled = true;
+    });
+    expect(signals.scan?.aborted).toBe(true);
+    expect(signals.drive?.aborted).toBe(true);
+    expect(settled).toBe(false);
+    await stopping;
+    expect(settled).toBe(true);
+    expect(coordinator.metrics()).toMatchObject({ scanActive: 0, driveActive: 0, tracked: 0 });
+  });
+
+  it('aborts active hooks during test reset and ignores their stale completions', async () => {
+    const scheduler = fakeScheduler();
+    let scanSignal: AbortSignal | undefined;
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: (_characterId, signal) => {
+          scanSignal = signal;
+          return new Promise<Row | null>((_resolve, reject) => {
+            signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+          });
+        },
+        reserve: () => true,
+        drive: async () => 'stop',
+        prepareScan: vi.fn(),
+        release: vi.fn(),
+        warn: vi.fn(),
+      },
+      scheduler.scheduler,
+    );
+    coordinator.kick(1);
+    expect(coordinator.metrics().scanActive).toBe(1);
+
+    coordinator.reset();
+    expect(scanSignal?.aborted).toBe(true);
+    expect(coordinator.metrics()).toMatchObject({ scanActive: 0, tracked: 0 });
+    await tick();
+    expect(coordinator.metrics()).toMatchObject({ scanActive: 0, tracked: 0 });
   });
 
   it('a stopped queued drive never starts and its current guard turns false', async () => {
