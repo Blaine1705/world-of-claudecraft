@@ -407,6 +407,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     playerImmobilized: false,
     posX: 0,
     climbing: false,
+    riftFloor: null,
   };
   const heldInput = emptyMoveInput();
   let heldFacing: number | null = opts.keyTimeline ? null : startFacing;
@@ -418,6 +419,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     turnAllowed: true,
     sentFacing: null,
     serverFacing: startFacing,
+    releaseCommitAcknowledged: false,
     echoMs: 0,
     snapshotIntervalMs: SERVER_TICK_MS,
     movementWireVersion,
@@ -497,6 +499,9 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
         client.spectating === null && !isMovementFrozen(pe) && !isPlayerImmobilized(pe.auras);
       kbTurnArgs.sentFacing = heldFacing;
       kbTurnArgs.serverFacing = interpServerFacing;
+      kbTurnArgs.releaseCommitAcknowledged = client.inputFacingAcknowledged(
+        kbTurn.pendingReleaseCommit,
+      );
       kbTurnArgs.echoMs = inputEcho.echoMs;
       kbTurnArgs.snapshotIntervalMs = client.snapInterval;
       kbTurnArgs.movementWireVersion = client.movementWireVersion;
@@ -521,6 +526,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     selfMotionGateArgs.playerImmobilized = isPlayerImmobilized(pe.auras);
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;
+    selfMotionGateArgs.riftFloor = client.riftFloor;
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(client, pe, predictionEnabled);
     // The unconditional 50 ms lane runs beside this from ClientWorld's own timer.
@@ -557,6 +563,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
         : selfMotionFrameBuffer.write(
             predictionEnabled,
             mi,
+            client.movementPositionAuthority,
             netFacing ?? interpServerFacing,
             inputEcho.echoMs,
             inputEcho.jitterMs,
@@ -564,6 +571,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
             frameDt,
             Math.max(0, cameraLastSnapAge),
             client.snapInterval,
+            client.riftFloor,
           );
 
     let drawnYaw = interpServerFacing;

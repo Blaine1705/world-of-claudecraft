@@ -194,12 +194,14 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
     state.wireFacing = state.facing;
   }
 
+  let releaseCommitJustAcknowledged = false;
   if (state.pendingReleaseCommit !== null) {
     if (!args.releaseCommitAcknowledged) {
       state.wireFacing = state.facing;
       return state.facing;
     }
     state.pendingReleaseCommit = null;
+    releaseCommitJustAcknowledged = true;
   }
 
   // Release phase: hold the local heading until the mirrored server facing
@@ -207,6 +209,13 @@ function stepFacing(state: KeyboardTurnState, args: KeyboardTurnArgs): number | 
   // is already there; the mirror just needs the last round trip to show it).
   // Eps-arrival only, from either side: no crossing shortcuts, no rewinds.
   const gap = wrapAngle(args.serverFacing - state.facing);
+  if (releaseCommitJustAcknowledged && Math.abs(gap) <= HANDOFF_DONE_EPS) {
+    state.facing = null;
+    state.wireFacing = null;
+    state.mirrorDerived = false;
+    state.handoffStableMs = 0;
+    return args.serverFacing;
+  }
   if (Math.abs(gap) <= HANDOFF_DONE_EPS) {
     state.handoffStableMs += dt * 1000;
     state.wireFacing = state.mirrorDerived ? null : state.facing;

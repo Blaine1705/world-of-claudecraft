@@ -50,7 +50,7 @@ export function selfMotionPredictionEnabled(args: SelfMotionGateArgs): boolean {
     // A resumed ClientWorld starts with riftFloor null until the server replays
     // riftState. Once present, the client has the raised-floor descriptor and
     // colliders needed by the shared motion kernel.
-    (!isRiftPos(args.posX) || args.riftFloor !== null) &&
+    (!isRiftPos(args.posX) || args.riftFloor != null) &&
     // A ledge climb is a server-owned scripted move the client does
     // not re-simulate: predicting a fall through it would fight the
     // authoritative pull-up and show the correction as a stutter.

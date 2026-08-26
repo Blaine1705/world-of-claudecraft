@@ -39,6 +39,7 @@ const frame = (over: Partial<SelfMotionFrame> = {}): SelfMotionFrame => ({
   frameDt: FRAME_DT,
   snapAgeMs: 25,
   snapIntervalMs: 50,
+  riftFloor: null,
   ...over,
 });
 

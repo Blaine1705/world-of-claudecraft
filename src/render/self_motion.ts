@@ -63,7 +63,7 @@
 
 import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
 import { isRiftPos } from '../sim/data';
-import { type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
+import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 import type { RiftFloorView } from '../world_api/dungeons';
 import { createClientPlayerMotionDeps } from './client_player_motion';

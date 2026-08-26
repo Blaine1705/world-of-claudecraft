@@ -412,7 +412,10 @@ describe('stepKeyboardTurnFacing', () => {
     const held = st.facing as number;
     const stalledMirror = held - 0.4;
     for (let i = 0; i < 29; i++) {
-      stepKeyboardTurnFacing(st, args({ serverFacing: stalledMirror }));
+      stepKeyboardTurnFacing(
+        st,
+        args({ serverFacing: stalledMirror, releaseCommitAcknowledged: true }),
+      );
     }
     const giveback = Math.abs(held - (st.facing as number));
     expect(giveback).toBeCloseTo(0.225, 12);

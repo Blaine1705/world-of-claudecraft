@@ -7,12 +7,29 @@ import {
 } from '../src/game/self_motion_gate';
 import { DELVE_X_MIN, isDelvePos, isRiftPos, RIFT_X_MIN } from '../src/sim/data';
 import type { Aura } from '../src/sim/types';
+import type { RiftFloorView } from '../src/world_api/dungeons';
 
 const aura = (kind: string): Aura =>
   ({ id: kind, name: kind, kind, remaining: 5, duration: 5, value: 0 }) as Aura;
 
 // An open-world position: the two instanced bands are keyed off x alone.
 const OPEN_WORLD_X = 0;
+
+const riftFloor: RiftFloorView = {
+  eventId: null,
+  instanceId: 1,
+  seed: 42,
+  baseLevel: 20,
+  floorIndex: 0,
+  floorCount: 4,
+  origin: { x: RIFT_X_MIN, z: 200 },
+  contentId: 'procedural-v1:42:20',
+  contentHash: 'procedural-v1:42:20',
+  upgrade: null,
+  name: 'Test Rift',
+  themeName: 'Test Theme',
+  tier: null,
+};
 
 const enabledArgs = (over: Partial<SelfMotionGateArgs> = {}): SelfMotionGateArgs => ({
   disabled: false,
@@ -21,6 +38,7 @@ const enabledArgs = (over: Partial<SelfMotionGateArgs> = {}): SelfMotionGateArgs
   playerImmobilized: false,
   posX: OPEN_WORLD_X,
   climbing: undefined,
+  riftFloor: null,
   ...over,
 });
 
@@ -70,13 +88,18 @@ describe('selfMotionPredictionEnabled', () => {
     }
   });
 
-  it('is off inside a delve and inside a rift, on the sim band tests', () => {
+  it('is off inside a delve and inside a rift before the rift floor descriptor arrives', () => {
     const delveX = DELVE_X_MIN;
     const riftX = RIFT_X_MIN;
     expect(isDelvePos(delveX)).toBe(true);
     expect(isRiftPos(riftX)).toBe(true);
     expect(selfMotionPredictionEnabled(enabledArgs({ posX: delveX }))).toBe(false);
     expect(selfMotionPredictionEnabled(enabledArgs({ posX: riftX }))).toBe(false);
+  });
+
+  it('is on inside a rift once the mirrored rift floor descriptor is present', () => {
+    expect(isRiftPos(RIFT_X_MIN)).toBe(true);
+    expect(selfMotionPredictionEnabled(enabledArgs({ posX: RIFT_X_MIN, riftFloor }))).toBe(true);
   });
 
   it('treats only an explicit climbing:true as a climb', () => {
