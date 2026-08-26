@@ -78,7 +78,7 @@ export function varkhulEncounterWireJson(
       );
       const beams = assembly.forgeBeams.map(
         (beam) =>
-          `{"i":${beam.index},"cx":${round2(beam.columnX)},"cz":${round2(beam.columnZ)},"ix":${round2(beam.impactX)},"iz":${round2(beam.impactZ)},"a":${beam.active ? 1 : 0},"bid":${beam.blockerId ?? 'null'}}`,
+          `{"i":${beam.index},"cx":${round2(beam.columnX)},"cz":${round2(beam.columnZ)},"ix":${round2(beam.impactX)},"iz":${round2(beam.impactZ)},"a":${beam.active ? 1 : 0},"w":${beam.warning ? 1 : 0},"bid":${beam.blockerId ?? 'null'}}`,
       );
       const interceptBeam = assembly.interceptBeam
         ? `{"sid":${assembly.interceptBeam.sourceId},"tid":${assembly.interceptBeam.targetId},"bid":${assembly.interceptBeam.blockerId ?? 'null'},"sx":${round2(assembly.interceptBeam.sourceX)},"sz":${round2(assembly.interceptBeam.sourceZ)},"tx":${round2(assembly.interceptBeam.targetX)},"tz":${round2(assembly.interceptBeam.targetZ)},"bx":${assembly.interceptBeam.blockerX === null ? 'null' : round2(assembly.interceptBeam.blockerX)},"bz":${assembly.interceptBeam.blockerZ === null ? 'null' : round2(assembly.interceptBeam.blockerZ)},"w":${round2(assembly.interceptBeam.width)},"dur":${round2(assembly.interceptBeam.duration)},"rem":${round2(assembly.interceptBeam.remaining)}}`

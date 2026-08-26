@@ -68,8 +68,8 @@ describe('Varkhul assembly wire', () => {
         bm: 0,
         oh: 0,
         beams: [
-          { i: 0, cx: -18, cz: 20, ix: 10, iz: 20, a: 0, bid: null },
-          { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, a: 0, bid: null },
+          { i: 0, cx: -18, cz: 20, ix: 10, iz: 20, a: 0, w: 0, bid: null },
+          { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, a: 0, w: 1, bid: null },
         ],
         cores: [],
         assign: [],
@@ -86,8 +86,8 @@ describe('Varkhul assembly wire', () => {
         phase: 'idle',
         forgeBeamActiveMask: 0,
         forgeBeams: [
-          expect.objectContaining({ index: 0, active: false, blocked: false }),
-          expect.objectContaining({ index: 1, active: false, blocked: false }),
+          expect.objectContaining({ index: 0, active: false, warning: false, blocked: false }),
+          expect.objectContaining({ index: 1, active: false, warning: true, blocked: false }),
         ],
         assignments: [],
         runes: [],
@@ -132,6 +132,20 @@ describe('Varkhul assembly wire', () => {
     ]) {
       expect(decodeVarkhulAssemblies([assemblyRow(invalid)])).toEqual([]);
     }
+  });
+
+  it('defaults legacy beam warnings off and rejects malformed warning flags', () => {
+    expect(decodeVarkhulAssemblies([assemblyRow()])[0]?.forgeBeams).toEqual([
+      expect.objectContaining({ index: 0, warning: false }),
+      expect.objectContaining({ index: 1, warning: false }),
+    ]);
+    const malformed = assemblyRow({
+      beams: [
+        { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, w: 2, bid: 4 },
+        { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, w: 0, bid: null },
+      ],
+    });
+    expect(decodeVarkhulAssemblies([malformed])).toEqual([]);
   });
 
   it('decodes the moving Tempering Ray and rejects every unsafe endpoint branch', () => {
@@ -218,6 +232,7 @@ describe('Varkhul assembly wire', () => {
         impactX: -8,
         impactZ: 20,
         active: true,
+        warning: false,
         blocked: true,
         blockerId: 4,
       },
@@ -228,6 +243,7 @@ describe('Varkhul assembly wire', () => {
         impactX: 10,
         impactZ: 20,
         active: true,
+        warning: false,
         blocked: false,
         blockerId: null,
       },

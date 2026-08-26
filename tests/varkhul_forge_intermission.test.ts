@@ -9,9 +9,12 @@ import {
   VARKHUL_FORGE_FINAL_BEAM_SECONDS,
   VARKHUL_FORGE_FINAL_GAP_SECONDS,
   VARKHUL_FORGE_FINAL_HP_THRESHOLD,
+  VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_HEROIC,
+  VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_NORMAL,
   VARKHUL_FORGE_INTERMISSION_HP_THRESHOLD,
   VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC,
   VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL,
+  VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS,
   VARKHUL_FORGE_LOCAL_POS,
   VARKHUL_FORGE_PORTAL_ABILITY_ID,
   VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
@@ -25,7 +28,10 @@ import {
   VARKHUL_WORK_LOCAL_POS,
   varkhulCrucibleQuakeDamageRange,
   varkhulForgeBeamIsActive,
+  varkhulForgeBeamWarningMask,
   varkhulForgeBeamWindowMask,
+  varkhulForgeIntermissionBeamSeconds,
+  varkhulForgeIntermissionNextWindow,
   varkhulForgeIntermissionSeconds,
   varkhulForgeIntermissionWave,
   varkhulForgeIntermissionWaveCount,
@@ -63,11 +69,14 @@ describe('Varkhul forge intermission contract', () => {
     expect(varkhulForgeBeamWindowMask('teaching_right')).toBe(2);
     expect(varkhulForgeBeamWindowMask('pressure_left')).toBe(1);
     expect(varkhulForgeBeamWindowMask('pressure_right')).toBe(2);
-    expect(varkhulForgeBeamWindowMask('intermission')).toBe(3);
+    expect(varkhulForgeBeamWindowMask('intermission')).toBe(1);
+    expect(varkhulForgeBeamWindowMask('intermission_left')).toBe(1);
+    expect(varkhulForgeBeamWindowMask('intermission_right')).toBe(2);
     expect(varkhulForgeBeamWindowMask('final_left')).toBe(1);
     expect(varkhulForgeBeamWindowMask('final_gap_left')).toBe(0);
     expect(varkhulForgeBeamWindowMask('final_right')).toBe(2);
     expect(varkhulForgeBeamWindowMask('final_gap_right')).toBe(0);
+    expect(varkhulForgeBeamWindowMask('meltdown')).toBe(0);
     expect(varkhulForgeBeamIsActive(1, 0)).toBe(true);
     expect(varkhulForgeBeamIsActive(1, 1)).toBe(false);
     expect(varkhulForgeBeamIsActive(2, 0)).toBe(false);
@@ -76,6 +85,27 @@ describe('Varkhul forge intermission contract', () => {
     expect(varkhulForgeBeamIsActive(3, 1)).toBe(true);
     expect(varkhulForgePressureWindow(2)).toBe('pressure_left');
     expect(varkhulForgePressureWindow(3)).toBe('pressure_right');
+  });
+
+  it('alternates the intermission pillars without ever activating both together', () => {
+    expect(VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_NORMAL).toBe(8);
+    expect(VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_HEROIC).toBe(6);
+    expect(VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS).toBe(2);
+    expect(varkhulForgeIntermissionBeamSeconds('normal')).toBe(8);
+    expect(varkhulForgeIntermissionBeamSeconds('heroic')).toBe(6);
+    expect(varkhulForgeIntermissionNextWindow('intermission_left')).toBe('intermission_right');
+    expect(varkhulForgeIntermissionNextWindow('intermission_right')).toBe('intermission_left');
+    expect(varkhulForgeBeamWarningMask('intermission_left', 2.01)).toBe(0);
+    expect(varkhulForgeBeamWarningMask('intermission_left', 2)).toBe(2);
+    expect(varkhulForgeBeamWarningMask('intermission_right', 2)).toBe(1);
+    for (const window of [
+      'intermission',
+      'intermission_left',
+      'intermission_right',
+      'meltdown',
+    ] as const) {
+      expect(varkhulForgeBeamWindowMask(window)).not.toBe(3);
+    }
   });
 
   it('keeps the independent Artificer out of the ordinary three/four-wave plans', () => {

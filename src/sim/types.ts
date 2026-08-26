@@ -5223,6 +5223,7 @@ export interface VarkhulEncounterState {
   forgeBeamFinalTriggered: boolean;
   forgeHeatWarningMask: number;
   assemblyForgeBeamActiveMask: number;
+  assemblyForgeBeamWarningMask: number;
   assemblyForgeBeamWarmupRemaining: number;
   assemblyForgeBeamBlockerIds: Array<number | null>;
   assemblyForgeBeamDamageTimers: number[];

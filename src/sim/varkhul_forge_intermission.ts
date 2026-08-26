@@ -18,6 +18,8 @@ export type VarkhulForgeBeamWindow =
   | 'pressure_left'
   | 'pressure_right'
   | 'intermission'
+  | 'intermission_left'
+  | 'intermission_right'
   | 'final_left'
   | 'final_gap_left'
   | 'final_right'
@@ -36,6 +38,9 @@ export const VARKHUL_FORGE_FINAL_HP_THRESHOLD = 0.2;
 export const VARKHUL_FORGE_TEACHING_BEAM_SECONDS = 8;
 export const VARKHUL_FORGE_TEACHING_GAP_SECONDS = 2;
 export const VARKHUL_FORGE_PRESSURE_BEAM_SECONDS = 6;
+export const VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_NORMAL = 8;
+export const VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_HEROIC = 6;
+export const VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS = 2;
 export const VARKHUL_FORGE_FINAL_BEAM_SECONDS = 8;
 export const VARKHUL_FORGE_FINAL_GAP_SECONDS = 4;
 export const VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS = 2;
@@ -121,18 +126,40 @@ export function varkhulForgeBeamWindowMask(window: VarkhulForgeBeamWindow): numb
   switch (window) {
     case 'teaching_left':
     case 'pressure_left':
+    case 'intermission':
+    case 'intermission_left':
     case 'final_left':
       return 1;
     case 'teaching_right':
     case 'pressure_right':
+    case 'intermission_right':
     case 'final_right':
       return 2;
-    case 'intermission':
-    case 'meltdown':
-      return 3;
     default:
       return 0;
   }
+}
+
+export function varkhulForgeIntermissionBeamSeconds(difficulty: VarkhulAssemblyDifficulty): number {
+  return difficulty === 'heroic'
+    ? VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_HEROIC
+    : VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_NORMAL;
+}
+
+export function varkhulForgeIntermissionNextWindow(
+  window: 'intermission_left' | 'intermission_right',
+): 'intermission_left' | 'intermission_right' {
+  return window === 'intermission_left' ? 'intermission_right' : 'intermission_left';
+}
+
+export function varkhulForgeBeamWarningMask(
+  window: VarkhulForgeBeamWindow,
+  remaining: number,
+): number {
+  if (remaining > VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS) return 0;
+  if (window === 'intermission_left') return 2;
+  if (window === 'intermission_right') return 1;
+  return 0;
 }
 
 export function varkhulForgeBeamIsActive(mask: number, index: VarkhulForgeBeamIndex): boolean {

@@ -93,6 +93,7 @@ export interface ActiveVarkhulAssembly {
     impactX: number;
     impactZ: number;
     active: boolean;
+    warning: boolean;
     blocked: boolean;
     blockerId: number | null;
   }>;
@@ -114,6 +115,7 @@ export interface VarkhulAssemblyProjectionState {
   assemblyForgeHp: number;
   assemblyForgeOverheat: number;
   assemblyForgeBeamActiveMask: number;
+  assemblyForgeBeamWarningMask: number;
   assemblyForgeBeamWarmupRemaining: number;
   assemblyForgeBeamBlockerIds: readonly (number | null)[];
   assemblyForgeMeltdownRemaining: number;
@@ -562,6 +564,7 @@ export function activeVarkhulAssembly(
       : 0;
   const forgeBeams = varkhulForgeBeamColumns(forgeAnchor).map((column) => {
     const active = (state.assemblyForgeBeamActiveMask & (1 << column.index)) !== 0;
+    const warning = (state.assemblyForgeBeamWarningMask & (1 << column.index)) !== 0;
     const blockerId = state.assemblyForgeBeamBlockerIds?.[column.index] ?? null;
     const blocker = !active || blockerId === null ? undefined : entityOf(blockerId);
     const impact = varkhulForgeBeamImpactPosition(
@@ -578,6 +581,7 @@ export function activeVarkhulAssembly(
       impactX: impact.x,
       impactZ: impact.z,
       active,
+      warning,
       blocked: blocker !== undefined && !blocker.dead,
       blockerId: blocker !== undefined && !blocker.dead ? blockerId : null,
     };
@@ -637,6 +641,7 @@ export function inactiveVarkhulAssembly(
       impactX: forge.x,
       impactZ: forge.z,
       active: false,
+      warning: false,
       blocked: false,
       blockerId: null,
     })),

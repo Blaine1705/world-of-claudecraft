@@ -115,10 +115,10 @@ describe('Varkhul forge beams', () => {
 
   it('pins healer pressure and the forge meltdown damage profile', () => {
     expect(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS).toBe(1);
-    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 1)).toBe(0.06);
-    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 3)).toBe(0.1);
-    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 1)).toBe(0.08);
-    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 3)).toBe(0.14);
+    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 1)).toBe(0.07);
+    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 3)).toBeCloseTo(0.11, 8);
+    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 1)).toBe(0.1);
+    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 3)).toBeCloseTo(0.16, 8);
     expect(varkhulForgeBeamExposureResetSeconds('normal')).toBe(10);
     expect(varkhulForgeBeamExposureResetSeconds('heroic')).toBe(60);
     expect(varkhulForgeMeltdownInitialDamageMaxHp('normal')).toBe(0.65);

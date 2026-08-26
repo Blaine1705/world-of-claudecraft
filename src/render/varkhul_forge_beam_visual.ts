@@ -23,6 +23,7 @@ interface BeamLaneVisual {
   end: THREE.Vector3;
   blocked: boolean;
   active: boolean;
+  warning: boolean;
 }
 
 interface ForgeBeamVisual {
@@ -141,6 +142,7 @@ function buildLane(index: number): BeamLaneVisual {
     end: new THREE.Vector3(),
     blocked: false,
     active: false,
+    warning: false,
   };
 }
 
@@ -439,6 +441,9 @@ export class VarkhulForgeBeamVisuals {
         const beam = state.forgeBeams.find((candidate) => candidate.index === index);
         lane.column.visible = true;
         lane.active = beam?.active ?? false;
+        lane.warning = beam?.warning ?? false;
+        lane.column.userData.active = lane.active;
+        lane.column.userData.warning = lane.warning;
         const laneIgnited = lane.active && beamsIgnited;
         lane.core.visible = laneIgnited;
         lane.sheath.visible = laneIgnited;
@@ -464,12 +469,16 @@ export class VarkhulForgeBeamVisuals {
         lane.sheath.material.color.setHex(signalColor);
         lane.core.material.color.setHex(beam.blocked ? 0xffffff : 0xffe07a);
         for (const material of lane.columnGlowMaterials) {
-          material.color.setHex(!beam.active ? 0x3a1712 : beam.blocked ? 0x6befff : 0xff6b16);
-          material.opacity = !beam.active
-            ? 0.1
-            : beamsIgnited
+          material.color.setHex(
+            beam.active ? (beam.blocked ? 0x6befff : 0xff6b16) : beam.warning ? 0xffb52e : 0x3a1712,
+          );
+          material.opacity = beam.active
+            ? beamsIgnited
               ? 0.82
-              : 0.24 + visual.warmupFraction * 0.48;
+              : 0.24 + visual.warmupFraction * 0.48
+            : beam.warning
+              ? 0.34
+              : 0.1;
         }
       }
 
@@ -551,6 +560,11 @@ export class VarkhulForgeBeamVisuals {
       if (!reducedMotion) visual.time = (visual.time + Math.max(0, dt)) % 1000;
       const pulse = reducedMotion ? 1 : 0.82 + Math.sin(visual.time * 8) * 0.18;
       for (const lane of visual.lanes) {
+        if (lane.warning && !lane.active) {
+          for (const material of lane.columnGlowMaterials) {
+            material.opacity = reducedMotion ? 0.34 : 0.24 + pulse * 0.18;
+          }
+        }
         if (!lane.active) continue;
         lane.core.material.opacity = (0.42 + visual.warmupFraction * 0.54) * pulse;
         lane.sheath.material.opacity = (0.12 + visual.warmupFraction * 0.28) * pulse;

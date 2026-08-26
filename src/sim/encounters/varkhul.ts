@@ -129,7 +129,10 @@ import {
   VARKHUL_WORK_LOCAL_POS,
   varkhulCrucibleQuakeDamageRange,
   varkhulForgeBeamIsActive,
+  varkhulForgeBeamWarningMask,
   varkhulForgeBeamWindowMask,
+  varkhulForgeIntermissionBeamSeconds,
+  varkhulForgeIntermissionNextWindow,
   varkhulForgeIntermissionSeconds,
   varkhulForgeIntermissionWave,
   varkhulForgeIntermissionWaveCount,
@@ -413,6 +416,7 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       forgeBeamFinalTriggered: false,
       forgeHeatWarningMask: 0,
       assemblyForgeBeamActiveMask: 0,
+      assemblyForgeBeamWarningMask: 0,
       assemblyForgeBeamWarmupRemaining: 0,
       assemblyForgeBeamBlockerIds: Array.from({ length: VARKHUL_FORGE_BEAM_COUNT }, () => null),
       assemblyForgeBeamDamageTimers: Array.from(
@@ -1733,9 +1737,10 @@ function startMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyLinkWardenSpawns = [];
   st.assemblyCores = [];
   st.assemblyForgeHp = VARKHUL_ASSEMBLY_FORGE_MAX_HP;
-  st.forgeBeamWindow = 'intermission';
-  st.forgeBeamWindowRemaining = st.assemblyRemaining;
-  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
+  st.forgeBeamWindow = 'intermission_left';
+  st.forgeBeamWindowRemaining = varkhulForgeIntermissionBeamSeconds(difficulty);
+  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission_left');
+  st.assemblyForgeBeamWarningMask = 0;
   st.assemblyForgeBeamWarmupRemaining = VARKHUL_FORGE_BEAM_WARMUP_SECONDS;
   st.assemblyForgeBeamBlockerIds = Array.from({ length: VARKHUL_FORGE_BEAM_COUNT }, () => null);
   st.assemblyForgeBeamDamageTimers = Array.from(
@@ -1793,7 +1798,7 @@ function beginMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyPhase = 'adds';
   boss.aiState = 'idle';
   boss.facing = VARKHUL_WORK_FACING;
-  emitVarkhulCallout(ctx, boss, 'bothPillarsCharging');
+  emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
   emitVarkhulCallout(ctx, boss, 'portalsOpening');
   queueForgeAddWave(ctx, boss, st, 0);
 }
@@ -1847,6 +1852,7 @@ function finishAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounterState
   st.forgeBeamWindow = 'idle';
   st.forgeBeamWindowRemaining = 0;
   st.assemblyForgeBeamActiveMask = 0;
+  st.assemblyForgeBeamWarningMask = 0;
   st.assemblyForgeBeamWarmupRemaining = 0;
   st.assemblyForgeBeamBlockerIds.fill(null);
   st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
@@ -1912,6 +1918,7 @@ function triggerForgeMeltdown(
   }
   st.forgeBeamWindow = 'meltdown';
   st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('meltdown');
+  st.assemblyForgeBeamWarningMask = 0;
   st.assemblyWipeResolved = resumesIntermission ? st.assemblyRemaining <= CAST_COMPLETE_EPS : true;
   st.assemblyForgeOverheat = 1;
   st.assemblyForgeMeltdownRemaining = VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS;
@@ -1971,17 +1978,19 @@ function updateForgeMeltdown(
     st.assemblyForgeOverheat = 0;
     st.assemblyForgeVentedThisTick = true;
     if (st.assemblyTriggered && st.assemblyPhase === 'adds') {
-      st.forgeBeamWindow = 'intermission';
-      st.forgeBeamWindowRemaining = st.assemblyRemaining;
-      st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
+      st.forgeBeamWindow = 'intermission_left';
+      st.forgeBeamWindowRemaining = varkhulForgeIntermissionBeamSeconds(st.assemblyRuneDifficulty);
+      st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission_left');
+      st.assemblyForgeBeamWarningMask = 0;
       st.assemblyForgeBeamWarmupRemaining = VARKHUL_FORGE_BEAM_WARMUP_SECONDS;
-      emitVarkhulCallout(ctx, boss, 'bothPillarsCharging');
+      emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
       emitVarkhulCallout(ctx, boss, 'portalsOpening');
       retelegraphPendingForgePortals(ctx, boss, st);
     } else {
       st.forgeBeamWindow = 'idle';
       st.forgeBeamWindowRemaining = 0;
       st.assemblyForgeBeamActiveMask = 0;
+      st.assemblyForgeBeamWarningMask = 0;
       st.assemblyForgeBeamWarmupRemaining = 0;
     }
     st.assemblyForgeBeamBlockerIds.fill(null);
@@ -2116,6 +2125,46 @@ function updateAssemblyForgeBeams(
   triggerForgeMeltdown(ctx, boss, st, players, forge);
   return true;
 }
+
+function updateIntermissionForgeBeamWindow(
+  ctx: SimContext,
+  boss: Entity,
+  st: VarkhulEncounterState,
+): void {
+  if (st.forgeBeamWindow !== 'intermission_left' && st.forgeBeamWindow !== 'intermission_right') {
+    st.forgeBeamWindow = 'intermission_left';
+    st.forgeBeamWindowRemaining = varkhulForgeIntermissionBeamSeconds(st.assemblyRuneDifficulty);
+    st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask(st.forgeBeamWindow);
+    st.assemblyForgeBeamWarningMask = 0;
+    return;
+  }
+
+  const warningBefore = st.assemblyForgeBeamWarningMask;
+  st.forgeBeamWindowRemaining = Math.max(0, st.forgeBeamWindowRemaining - DT);
+  const warningAfter = varkhulForgeBeamWarningMask(st.forgeBeamWindow, st.forgeBeamWindowRemaining);
+  st.assemblyForgeBeamWarningMask = warningAfter;
+  if (warningBefore === 0 && warningAfter !== 0) {
+    emitVarkhulCallout(
+      ctx,
+      boss,
+      warningAfter === 1 ? 'leftPillarCharging' : 'rightPillarCharging',
+    );
+  }
+  if (st.forgeBeamWindowRemaining > CAST_COMPLETE_EPS) return;
+
+  st.forgeBeamWindow = varkhulForgeIntermissionNextWindow(st.forgeBeamWindow);
+  st.forgeBeamWindowRemaining = varkhulForgeIntermissionBeamSeconds(st.assemblyRuneDifficulty);
+  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask(st.forgeBeamWindow);
+  st.assemblyForgeBeamWarningMask = 0;
+  st.assemblyForgeBeamBlockerIds.fill(null);
+  st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
+  emitVarkhulCallout(
+    ctx,
+    boss,
+    st.forgeBeamWindow === 'intermission_left' ? 'leftPillar' : 'rightPillar',
+  );
+}
+
 function updateMastersAssembly(
   ctx: SimContext,
   boss: Entity,
@@ -2141,14 +2190,12 @@ function updateMastersAssembly(
     return st.assemblyPhase !== 'done';
   }
   updateAssemblyForging(ctx, boss, st);
-  st.forgeBeamWindow = 'intermission';
-  st.forgeBeamWindowRemaining = st.assemblyRemaining;
-  st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask('intermission');
+  const wasWarming = st.assemblyForgeBeamWarmupRemaining > CAST_COMPLETE_EPS;
   if (updateAssemblyForgeBeams(ctx, boss, st, players, forge)) return true;
+  if (!wasWarming) updateIntermissionForgeBeamWindow(ctx, boss, st);
   updateForgeAddSpawns(ctx, boss, st);
   updateForgeArtificerSpawns(ctx, boss, st);
   st.assemblyRemaining = Math.max(0, st.assemblyRemaining - DT);
-  st.forgeBeamWindowRemaining = st.assemblyRemaining;
   const allWavesQueued = st.assemblyNextWaveIndex >= st.assemblyIntermissionWaves;
   const allAddsSpawned =
     allWavesQueued &&
@@ -2179,6 +2226,7 @@ function startForgeBeamWindow(
   st.forgeBeamWindow = window;
   st.forgeBeamWindowRemaining = seconds;
   st.assemblyForgeBeamActiveMask = varkhulForgeBeamWindowMask(window);
+  st.assemblyForgeBeamWarningMask = 0;
   st.assemblyForgeBeamBlockerIds.fill(null);
   st.assemblyForgeBeamDamageTimers.fill(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS);
   st.assemblyForgeBeamWarmupRemaining =

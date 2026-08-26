@@ -116,6 +116,7 @@ describe('Varkhul snapshot wire fragment', () => {
                 impactX: -8,
                 impactZ: 20,
                 active: true,
+                warning: false,
                 blocked: true,
                 blockerId: 9,
               },
@@ -126,6 +127,7 @@ describe('Varkhul snapshot wire fragment', () => {
                 impactX: 10,
                 impactZ: 20,
                 active: true,
+                warning: true,
                 blocked: false,
                 blockerId: null,
               },
@@ -162,8 +164,8 @@ describe('Varkhul snapshot wire fragment', () => {
     expect(assembly.hc).toBe(1);
     expect(assembly).toMatchObject({ oh: 0.42, bm: 3, bw: 2.35, mr: 0, aw: 2, aws: 4, ar: 7 });
     expect(assembly.beams).toEqual([
-      { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, a: 1, bid: 9 },
-      { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, a: 1, bid: null },
+      { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, a: 1, w: 0, bid: 9 },
+      { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, a: 1, w: 1, bid: null },
     ]);
     expect(assembly.ib).toEqual({
       sid: 7,

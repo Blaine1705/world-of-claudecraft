@@ -156,7 +156,7 @@ export function varkhulForgeBeamBlockDamageMaxHp(
   exposureStack: number,
 ): number {
   const safeStack = Math.max(1, Math.floor(exposureStack));
-  const base = difficulty === 'heroic' ? 0.08 : 0.06;
+  const base = difficulty === 'heroic' ? 0.1 : 0.07;
   const growth = difficulty === 'heroic' ? 0.03 : 0.02;
   return base + (safeStack - 1) * growth;
 }

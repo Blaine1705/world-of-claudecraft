@@ -24,6 +24,7 @@ import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, MELEE_RANGE } from '../src/sim/types';
+import { activeVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import {
   VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
@@ -49,6 +50,7 @@ import {
   VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS,
   VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC,
   VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL,
+  VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS,
   VARKHUL_FORGE_LOCAL_POS,
   VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
   VARKHUL_FORGE_PRESSURE_BEAM_SECONDS,
@@ -897,7 +899,7 @@ describe('Varkhul forge pillars and add intermission', () => {
         if (tick + 1 < VARKHUL_FORGE_MELTDOWN_DURATION_SECONDS / DT) {
           expect(state.assemblyForgeOverheat).toBe(1);
           expect(state.forgeBeamWindow).toBe('meltdown');
-          expect(state.assemblyForgeBeamActiveMask).toBe(3);
+          expect(state.assemblyForgeBeamActiveMask).toBe(0);
         }
         expect(
           sim.player.auras.some((aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID),
@@ -917,8 +919,8 @@ describe('Varkhul forge pillars and add intermission', () => {
       expect(state.assemblyForgeOverheat).toBe(0);
       expect(state.assemblyPhase).toBe('adds');
       expect(boss.damageImmune).toBe(true);
-      expect(state.forgeBeamWindow).toBe('intermission');
-      expect(state.assemblyForgeBeamActiveMask).toBe(3);
+      expect(state.forgeBeamWindow).toBe('intermission_left');
+      expect(state.assemblyForgeBeamActiveMask).toBe(1);
       expect(state.assemblyForgeBeamWarmupRemaining).toBe(VARKHUL_FORGE_BEAM_WARMUP_SECONDS);
 
       for (let tick = 0; tick < 20; tick++) updateVarkhulEncounter(sim.ctx, boss);
@@ -995,7 +997,7 @@ describe('Varkhul forge pillars and add intermission', () => {
       (event) => event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
     ).length;
     const chargingCalloutsBeforeMeltdown = sim.events.filter(
-      (event) => event.type === 'varkhulCallout' && event.call === 'bothPillarsCharging',
+      (event) => event.type === 'varkhulCallout' && event.call === 'leftPillarCharging',
     ).length;
     const portalCalloutsBeforeMeltdown = sim.events.filter(
       (event) => event.type === 'varkhulCallout' && event.call === 'portalsOpening',
@@ -1041,8 +1043,8 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(boss.damageImmune).toBe(true);
     expect(state.assemblyForgeMeltdownRemaining).toBe(0);
     expect(state.assemblyForgeOverheat).toBe(0);
-    expect(state.forgeBeamWindow).toBe('intermission');
-    expect(state.assemblyForgeBeamActiveMask).toBe(3);
+    expect(state.forgeBeamWindow).toBe('intermission_left');
+    expect(state.assemblyForgeBeamActiveMask).toBe(1);
     expect(state.assemblyForgeBeamWarmupRemaining).toBe(VARKHUL_FORGE_BEAM_WARMUP_SECONDS);
     expect(state.assemblyPortalSpawns).toEqual(pendingBeforeMeltdown);
     expect(state.assemblyArtificerPortalSpawns).toEqual(artificerPendingBeforeMeltdown);
@@ -1101,7 +1103,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     ).toBe(true);
     expect(
       sim.events.filter(
-        (event) => event.type === 'varkhulCallout' && event.call === 'bothPillarsCharging',
+        (event) => event.type === 'varkhulCallout' && event.call === 'leftPillarCharging',
       ),
     ).toHaveLength(chargingCalloutsBeforeMeltdown + 1);
     expect(
@@ -1139,14 +1141,14 @@ describe('Varkhul forge pillars and add intermission', () => {
     ).toHaveLength(portalEventCount + 8);
 
     const ignitionCalloutsBeforeResume = sim.events.filter(
-      (event) => event.type === 'varkhulCallout' && event.call === 'bothPillars',
+      (event) => event.type === 'varkhulCallout' && event.call === 'leftPillar',
     ).length;
     const ticksUntilIgnition = Math.round(state.assemblyForgeBeamWarmupRemaining / DT);
     for (let tick = 1; tick < ticksUntilIgnition; tick++) {
       updateVarkhulEncounter(sim.ctx, boss);
       expect(
         sim.events.filter(
-          (event) => event.type === 'varkhulCallout' && event.call === 'bothPillars',
+          (event) => event.type === 'varkhulCallout' && event.call === 'leftPillar',
         ),
       ).toHaveLength(ignitionCalloutsBeforeResume);
     }
@@ -1154,7 +1156,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyForgeBeamWarmupRemaining).toBe(0);
     expect(state.assemblyForgeBeamBlockerIds).toEqual([null, null]);
     expect(
-      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'bothPillars'),
+      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'leftPillar'),
     ).toHaveLength(ignitionCalloutsBeforeResume + 1);
 
     expect(state.assemblyNextWaveIndex).toBe(nextWaveIndexBeforeMeltdown + 1);
@@ -2115,7 +2117,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyForgeBeamBlockerIds).toEqual([null, sim.player.id]);
   });
 
-  it('delays both-pillar ignition and both blockers until the intermission warmup completes', () => {
+  it('warms the first pillar, warns the next for two seconds, then hands off with zero overlap', () => {
     const { sim, boss } = claimedEncounter(733);
     const rightBlocker = addTank(sim, boss, 'BothWarmupRightBlocker');
     const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
@@ -2132,14 +2134,17 @@ describe('Varkhul forge pillars and add intermission', () => {
     updateVarkhulEncounter(sim.ctx, boss);
     const state = boss.varkhul;
     if (!state) throw new Error('Varkhul state missing');
+    expect(state.forgeBeamWindow).toBe('intermission_left');
+    expect(state.assemblyForgeBeamActiveMask).toBe(1);
+    expect(state.assemblyForgeBeamWarningMask).toBe(0);
     expect(state.assemblyForgeBeamBlockerIds).toEqual([null, null]);
     expect(
       sim.events.filter(
-        (event) => event.type === 'varkhulCallout' && event.call === 'bothPillarsCharging',
+        (event) => event.type === 'varkhulCallout' && event.call === 'leftPillarCharging',
       ),
     ).toHaveLength(2);
     expect(
-      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'bothPillars'),
+      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'leftPillar'),
     ).toHaveLength(0);
 
     for (let tick = 1; tick < VARKHUL_FORGE_BEAM_WARMUP_SECONDS / DT; tick++) {
@@ -2149,11 +2154,42 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyForgeBeamWarmupRemaining).toBe(0);
     expect(state.assemblyForgeBeamBlockerIds).toEqual([null, null]);
     expect(
-      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'bothPillars'),
+      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'leftPillar'),
     ).toHaveLength(2);
 
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(state.assemblyForgeBeamBlockerIds).toEqual([sim.player.id, rightBlocker.id]);
+    expect(state.assemblyForgeBeamBlockerIds).toEqual([sim.player.id, null]);
+    state.forgeBeamWindowRemaining = VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS + DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.forgeBeamWindow).toBe('intermission_left');
+    expect(state.assemblyForgeBeamActiveMask).toBe(1);
+    expect(state.assemblyForgeBeamWarningMask).toBe(2);
+    expect(
+      sim.events.filter(
+        (event) => event.type === 'varkhulCallout' && event.call === 'rightPillarCharging',
+      ),
+    ).toHaveLength(2);
+    expect(
+      activeVarkhulAssembly(boss.id, state, { x: forgeX, z: forgeZ }, boss.pos, (entityId) =>
+        sim.entities.get(entityId),
+      )?.forgeBeams,
+    ).toEqual([
+      expect.objectContaining({ index: 0, active: true, warning: false }),
+      expect.objectContaining({ index: 1, active: false, warning: true }),
+    ]);
+
+    state.forgeBeamWindowRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.forgeBeamWindow).toBe('intermission_right');
+    expect(state.assemblyForgeBeamActiveMask).toBe(2);
+    expect(state.assemblyForgeBeamWarningMask).toBe(0);
+    expect(state.assemblyForgeBeamBlockerIds).toEqual([null, null]);
+    expect(
+      sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'rightPillar'),
+    ).toHaveLength(2);
+
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyForgeBeamBlockerIds).toEqual([null, rightBlocker.id]);
   });
 
   it('waits for a Normal wave to die, then telegraphs the next wave after three seconds', () => {
@@ -2349,20 +2385,20 @@ describe('Varkhul forge pillars and add intermission', () => {
     if (!state) throw new Error('Varkhul state missing');
     expect(state.assemblyPhase).toBe('adds');
     expect(state.assemblyRemaining).toBeCloseTo(VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC - DT, 5);
-    expect(state.assemblyForgeBeamActiveMask).toBe(3);
+    expect(state.assemblyForgeBeamActiveMask).toBe(1);
     expect(state.assemblyPortalSpawns).toHaveLength(5);
     expect(new Set(state.assemblyPortalSpawns.map((spawn) => spawn.spawnIndex)).size).toBe(5);
     expect(state.assemblyAddIds).toEqual([]);
     expect(
       sim.events.filter((event) => event.type === 'varkhulCallout').map((event) => event.call),
-    ).toEqual(expect.arrayContaining(['bothPillarsCharging', 'portalsOpening']));
+    ).toEqual(expect.arrayContaining(['leftPillarCharging', 'portalsOpening']));
     for (const player of [sim.player, topTank, deadTank, highThreatDps]) {
       expect(
         sim.events.filter(
           (event) =>
             event.type === 'varkhulCallout' &&
             event.pid === player.id &&
-            (event.call === 'bothPillarsCharging' || event.call === 'portalsOpening'),
+            (event.call === 'leftPillarCharging' || event.call === 'portalsOpening'),
         ),
       ).toHaveLength(2);
     }
@@ -2385,7 +2421,7 @@ describe('Varkhul forge pillars and add intermission', () => {
           (event) =>
             event.type === 'varkhulCallout' &&
             event.pid === player.id &&
-            event.call === 'bothPillars',
+            event.call === 'leftPillar',
         ),
       ).toBe(true);
     }
@@ -2447,7 +2483,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     state.assemblyForgeBeamDamageTimers[0] = DT;
     const hpBeforeFirst = sim.player.hp;
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(hpBeforeFirst - sim.player.hp).toBe(Math.ceil(sim.player.maxHp * 0.08));
+    expect(hpBeforeFirst - sim.player.hp).toBe(Math.ceil(sim.player.maxHp * 0.1));
     const exposure = sim.player.auras.find(
       (aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
     );
@@ -2457,7 +2493,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     state.assemblyForgeBeamDamageTimers[0] = DT;
     const hpBeforeSecond = sim.player.hp;
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(hpBeforeSecond - sim.player.hp).toBe(Math.ceil(sim.player.maxHp * 0.11));
+    expect(hpBeforeSecond - sim.player.hp).toBe(Math.ceil(sim.player.maxHp * 0.13));
     expect(exposure?.stacks).toBe(2);
     expect(exposure?.remaining).toBe(60);
     expect(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS).toBe(1);
