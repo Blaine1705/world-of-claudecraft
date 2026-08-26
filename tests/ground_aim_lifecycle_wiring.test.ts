@@ -1,7 +1,16 @@
+// @vitest-environment happy-dom
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { join } from 'node:path';
+import { describe, expect, it, vi } from 'vitest';
+import { reticleStickDelta } from '../src/game/pad_ground_aim';
+import {
+  padGroundAimCallbacks,
+  syncGroundAimReticleFrame,
+} from '../src/game/pad_ground_aim_wiring';
+import type { Entity } from '../src/sim/types';
 
-const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+// happy-dom rewrites import.meta.url off the file scheme, so resolve via cwd.
+const main = readFileSync(join(process.cwd(), 'src/main.ts'), 'utf8');
 
 function section(from: string, to: string): string {
   const start = main.indexOf(from);
@@ -9,6 +18,36 @@ function section(from: string, to: string): string {
   expect(start).toBeGreaterThanOrEqual(0);
   expect(end).toBeGreaterThan(start);
   return main.slice(start, end);
+}
+
+function mob(id: number, x: number, z: number, overrides: Partial<Entity> = {}): Entity {
+  return {
+    id,
+    kind: 'mob',
+    hostile: true,
+    dead: false,
+    pos: { x, y: 0, z },
+    ...overrides,
+  } as unknown as Entity;
+}
+
+function fakeAimHud(range: number | null) {
+  return {
+    isGroundAimActive: vi.fn(() => range !== null),
+    cancelGroundAim: vi.fn(() => true),
+    groundAimAbilityRange: vi.fn(() => range),
+    nudgeGroundAimPoint: vi.fn(),
+    updateGroundAimPoint: vi.fn(),
+    commitGroundAimAt: vi.fn(() => true),
+    groundAimReticle: vi.fn(
+      (): {
+        point: { x: number; z: number };
+        radius: number;
+        school: string;
+        dimmed: boolean;
+      } | null => null,
+    ),
+  };
 }
 
 describe('ground aim lifecycle wiring', () => {
@@ -45,32 +84,80 @@ describe('ground aim lifecycle wiring', () => {
   });
 
   it('preserves the smart seed when there is no desktop cursor sample', () => {
-    const sync = section('function syncGroundAimReticle(): void {', 'const reticle =');
+    const hud = fakeAimHud(30);
+    const setReticle = vi.fn();
+    syncGroundAimReticleFrame({
+      hud,
+      isMobileTouch: () => false,
+      cursorPoint: () => null,
+      groundPoint: () => ({ x: 5, z: 5 }),
+      setReticle,
+    });
 
-    expect(sync).toContain("currentInputHintMode() !== 'pad'");
-    expect(sync).toContain('if (cursor) {');
-    expect(sync).not.toContain(': null');
+    expect(hud.updateGroundAimPoint).not.toHaveBeenCalled();
+    expect(setReticle).toHaveBeenCalledWith(null);
+  });
+
+  it('keeps the pad-owned point when the pad was the last active input', () => {
+    document.body.classList.add('pad-active');
+    try {
+      const hud = fakeAimHud(30);
+      syncGroundAimReticleFrame({
+        hud,
+        isMobileTouch: () => false,
+        cursorPoint: () => ({ x: 100, y: 100 }),
+        groundPoint: () => ({ x: 5, z: 5 }),
+        setReticle: vi.fn(),
+      });
+
+      expect(hud.updateGroundAimPoint).not.toHaveBeenCalled();
+    } finally {
+      document.body.classList.remove('pad-active');
+    }
   });
 
   it('wires pad steering through the active range, camera, and live sensitivity', () => {
-    const gamepad = section('const gamepad = new GamepadManager(', 'crossHotbar.attach(gamepad);');
+    const hud = fakeAimHud(30);
+    const callbacks = padGroundAimCallbacks({
+      hud,
+      world: () => ({ player: mob(1, 0, 0), playerId: 1, entities: new Map() }) as never,
+      camYaw: () => Math.PI / 2,
+      reticleSpeed: () => 1.5,
+    });
 
-    expect(gamepad).toContain('isGroundAimActive: () => hud.isGroundAimActive()');
-    expect(gamepad).toContain('const range = hud.groundAimAbilityRange();');
-    expect(gamepad).toContain('reticleStickDelta(');
-    expect(gamepad).toContain('input.camYaw');
-    expect(gamepad).toContain("settings.get('gamepadReticleSpeed')");
-    expect(gamepad).toContain('hud.nudgeGroundAimPoint(delta.dx, delta.dz);');
+    callbacks.onGroundAimStick(1, 0, 0.05);
+    const expected = reticleStickDelta(1, 0, Math.PI / 2, 0.05, 30, 1.5);
+    expect(hud.nudgeGroundAimPoint).toHaveBeenCalledWith(expected.dx, expected.dz);
+
+    hud.groundAimAbilityRange.mockReturnValue(null);
+    callbacks.onGroundAimStick(1, 0, 0.05);
+    expect(hud.nudgeGroundAimPoint).toHaveBeenCalledTimes(1);
   });
 
   it('wires pad snapping through attackability, PvP, range, and the current reticle', () => {
-    const gamepad = section('const gamepad = new GamepadManager(', 'crossHotbar.attach(gamepad);');
+    const hud = fakeAimHud(30);
+    const player = mob(1, 0, 0, { kind: 'player', hostile: false } as Partial<Entity>);
+    const inRange = mob(2, 10, 0);
+    const dead = mob(3, 5, 0, { dead: true });
+    const outOfRange = mob(4, 500, 0);
+    const callbacks = padGroundAimCallbacks({
+      hud,
+      world: () =>
+        ({
+          player,
+          playerId: 1,
+          entities: new Map([
+            [player.id, player],
+            [inRange.id, inRange],
+            [dead.id, dead],
+            [outOfRange.id, outOfRange],
+          ]),
+        }) as never,
+      camYaw: () => 0,
+      reticleSpeed: () => 1,
+    });
 
-    expect(gamepad).toContain('const pvpOpponents = activePvpOpponentIds(world);');
-    expect(gamepad).toContain('isAttackableEntity(entity, world.playerId, pvpOpponents)');
-    expect(gamepad).toContain('if (dist2d(player.pos, entity.pos) > range) continue;');
-    expect(gamepad).toContain('hud.groundAimReticle()?.point ?? null');
-    expect(gamepad).toContain('hud.updateGroundAimPoint(point);');
-    expect(gamepad).not.toContain('selectTarget');
+    callbacks.onGroundAimSnap(1);
+    expect(hud.updateGroundAimPoint).toHaveBeenCalledWith({ x: 10, z: 0 });
   });
 });

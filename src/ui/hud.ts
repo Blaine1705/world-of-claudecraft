@@ -388,19 +388,11 @@ import {
   buildMobileConsumableSeat,
   type MobileConsumableSeat,
 } from './hud/action_bar/consumable_seat_controller';
+import { type AimPoint, shouldUseGroundAim, smartSeedPoint } from './hud/action_bar/ground_aim';
 import {
-  type AimPoint,
-  abilityAoeRadius,
-  cancelGroundAim,
-  clampAimToRange,
-  commitGroundAim,
-  createGroundAimState,
-  enterGroundAim,
-  type GroundAimState,
-  shouldUseGroundAim,
-  smartSeedPoint,
-  withinMinRange,
-} from './hud/action_bar/ground_aim';
+  GroundAimController,
+  type GroundAimReticleView,
+} from './hud/action_bar/ground_aim_controller';
 import {
   applyLoadoutBar as applyLoadoutBarActions,
   assignAttackSlotAction,
@@ -1336,8 +1328,14 @@ export class Hud {
   private set attackSlotAction(action: HotbarAction) {
     this.actionBarController.replaceAttackAction(action);
   }
-  private groundAim: GroundAimState = createGroundAimState();
-  private groundAimPoint: AimPoint | null = null;
+  private readonly groundAim = new GroundAimController({
+    player: () => this.sim.player,
+    resolveAbility: (id) => this.sim.known.find((k) => k.def.id === id) ?? null,
+    seedTargetPoint: () => this.groundAimSeedTarget(),
+    fallbackPoint: () => this.groundTargetAim(),
+    castAt: (id, point) => this.sim.castAbilityAt(id, point),
+    clearReticle: () => this.renderer.setGroundAimReticle(null),
+  });
   private empowerCharge: { slot: number; abilityId: string } | null = null;
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -6840,104 +6838,42 @@ export class Hud {
     );
   }
 
+  // Ground-aim state and derivation live in GroundAimController; these thin
+  // delegates keep the Hud's public surface stable for main.ts and the tests.
   isGroundAimActive(): boolean {
-    return this.groundAim.activeAbilityId !== null;
+    return this.groundAim.isActive();
   }
 
   cancelGroundAim(): boolean {
-    if (!this.isGroundAimActive()) return false;
-    this.groundAim = cancelGroundAim(this.groundAim);
-    this.groundAimPoint = null;
-    this.renderer.setGroundAimReticle(null);
-    return true;
+    return this.groundAim.cancel();
   }
 
   private beginGroundAim(abilityId: string, slot: number): void {
-    this.groundAim = enterGroundAim(this.groundAim, abilityId, slot);
-    const res = this.activeGroundAimAbility();
-    this.groundAimPoint = res
-      ? smartSeedPoint(this.sim.player, this.groundAimSeedTarget(), res.def.range)
-      : null;
-  }
-
-  private activeGroundAimAbility(): ResolvedAbility | null {
-    const id = this.groundAim.activeAbilityId;
-    if (!id) return null;
-    return this.sim.known.find((k) => k.def.id === id) ?? null;
+    this.groundAim.begin(abilityId, slot);
   }
 
   groundAimAbilityRange(): number | null {
-    return this.activeGroundAimAbility()?.def.range ?? null;
+    return this.groundAim.abilityRange();
   }
 
   updateGroundAimPoint(rawPoint: AimPoint | null): void {
-    if (!this.isGroundAimActive() || !rawPoint) {
-      this.groundAimPoint = null;
-      return;
-    }
-    const res = this.activeGroundAimAbility();
-    if (!res) {
-      this.cancelGroundAim();
-      return;
-    }
-    this.groundAimPoint = rawPoint;
+    this.groundAim.updatePoint(rawPoint);
   }
 
   nudgeGroundAimPoint(dx: number, dz: number): void {
-    if (!this.isGroundAimActive() || !this.groundAimPoint) return;
-    const res = this.activeGroundAimAbility();
-    if (!res) {
-      this.cancelGroundAim();
-      return;
-    }
-    this.groundAimPoint = clampAimToRange(
-      this.sim.player,
-      { x: this.groundAimPoint.x + dx, z: this.groundAimPoint.z + dz },
-      res.def.range,
-    ).point;
+    this.groundAim.nudge(dx, dz);
   }
 
-  groundAimReticle(): {
-    point: AimPoint;
-    radius: number;
-    school: string;
-    dimmed: boolean;
-  } | null {
-    if (!this.isGroundAimActive()) return null;
-    const point = this.groundAimPoint;
-    if (!point) return null;
-    const res = this.activeGroundAimAbility();
-    if (!res) return null;
-    const aim = clampAimToRange(this.sim.player, point, res.def.range);
-    return {
-      point: aim.point,
-      radius: abilityAoeRadius(res),
-      school: res.def.school,
-      dimmed: aim.clamped || withinMinRange(this.sim.player, aim.point, res.def.minRange),
-    };
+  groundAimReticle(): GroundAimReticleView | null {
+    return this.groundAim.reticle();
   }
 
-  commitGroundAimAt(rawPoint: AimPoint | null = this.groundAimPoint): boolean {
-    if (!this.isGroundAimActive()) return false;
-    const res = this.activeGroundAimAbility();
-    const abilityId = this.groundAim.activeAbilityId;
-    if (!res || !abilityId) {
-      this.cancelGroundAim();
-      return true;
-    }
-    const point = rawPoint
-      ? clampAimToRange(this.sim.player, rawPoint, res.def.range).point
-      : this.groundTargetAim();
-    const committed = commitGroundAim(this.groundAim);
-    this.groundAim = committed.state;
-    this.groundAimPoint = null;
-    this.renderer.setGroundAimReticle(null);
-    this.sim.castAbilityAt(abilityId, point);
-    return true;
+  commitGroundAimAt(rawPoint?: AimPoint | null): boolean {
+    return this.groundAim.commitAt(rawPoint);
   }
 
   commitGroundAim(): boolean {
-    return this.commitGroundAimAt();
+    return this.groundAim.commitAt();
   }
 
   private activateFixedAttackSlot(): void {
@@ -6995,7 +6931,7 @@ export class Hud {
 
   castSlot(barSlot: number): void {
     if (this.isGroundAimActive()) {
-      if (this.groundAim.activeSlot === barSlot) {
+      if (this.groundAim.activeSlot() === barSlot) {
         this.commitGroundAimAt();
         this.flashActionSlot(barSlot);
         return;
@@ -7579,7 +7515,7 @@ export class Hud {
         mobileButtonOwnsSourceSlot(
           clampMobilePage(this.mobileActionPage),
           buttonIndex,
-          this.groundAim.activeSlot,
+          this.groundAim.activeSlot(),
         ),
       cancelAim: () => this.cancelGroundAim(),
       castSlot: (slot) => this.castSlot(slot),
@@ -8976,7 +8912,7 @@ export class Hud {
       actionBarWorld.paladinSpec = sim.talentSpec;
       actionBarWorld.fateThreads = fateThreads;
       actionBarWorld.entities = sim.entities.values();
-      actionBarWorld.activeAimSlot = this.groundAim.activeSlot;
+      actionBarWorld.activeAimSlot = this.groundAim.activeSlot();
     } else {
       actionBarWorld = {
         player: p,
@@ -8986,7 +8922,7 @@ export class Hud {
         paladinSpec: sim.talentSpec,
         fateThreads,
         entities: sim.entities.values(),
-        activeAimSlot: this.groundAim.activeSlot,
+        activeAimSlot: this.groundAim.activeSlot(),
       };
       this.actionBarWorldInput = actionBarWorld;
     }

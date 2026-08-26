@@ -30,15 +30,13 @@ import { ABILITIES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { AbilityDef, Entity } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
-import {
-  type AimPoint,
-  createGroundAimState,
-  type GroundAimState,
-} from '../src/ui/hud/action_bar/ground_aim';
+import type { AimPoint } from '../src/ui/hud/action_bar/ground_aim';
+import { GroundAimController } from '../src/ui/hud/action_bar/ground_aim_controller';
 
 interface GroundAimHarness {
-  groundAim: GroundAimState;
-  groundAimPoint: AimPoint | null;
+  groundAim: GroundAimController;
+  groundAimSeedTarget(): AimPoint | null;
+  groundTargetAim(): AimPoint;
   sim: {
     player: Entity;
     entities: Map<number, Entity>;
@@ -129,8 +127,6 @@ function makeHud(
   );
   const hud = Object.create(Hud.prototype) as unknown as GroundAimHarness;
   document.body.classList.toggle('mobile-touch', options.mobileTouch ?? false);
-  hud.groundAim = createGroundAimState();
-  hud.groundAimPoint = null;
   hud.mobileActionPage = 0;
   hud.sim = {
     player,
@@ -141,6 +137,15 @@ function makeHud(
     castAbilityAt: vi.fn(),
   };
   hud.renderer = { setGroundAimReticle: vi.fn() };
+  // Mirrors Hud's field initializer, which Object.create(Hud.prototype) skips.
+  hud.groundAim = new GroundAimController({
+    player: () => hud.sim.player,
+    resolveAbility: (id) => hud.sim.known.find((k) => k.def.id === id) ?? null,
+    seedTargetPoint: () => hud.groundAimSeedTarget(),
+    fallbackPoint: () => hud.groundTargetAim(),
+    castAt: (id, point) => (hud.sim.castAbilityAt as (i: string, p: AimPoint) => void)(id, point),
+    clearReticle: () => (hud.renderer.setGroundAimReticle as (r: null) => void)(null),
+  });
   hud.optionsHooks = {
     groundAimTargetAttackable: () => options.attackable ?? false,
     settings: {
@@ -168,7 +173,7 @@ describe('Hud ground aim behavior', () => {
 
       hud.castSlot(3);
 
-      expect(hud.groundAim.activeAbilityId).toBe(abilityDef.id);
+      expect(hud.groundAim.activeAbilityId()).toBe(abilityDef.id);
       expect(hud.sim.castAbilityAt).not.toHaveBeenCalled();
     }
   });
@@ -210,7 +215,7 @@ describe('Hud ground aim behavior', () => {
     hud.castSlot(3);
 
     expect(hud.isGroundAimActive()).toBe(true);
-    expect(hud.groundAimPoint).toEqual({ x: 30, z: 0 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 30, z: 0 });
   });
 
   it('seeds ahead at half range when there is no selected target', () => {
@@ -218,8 +223,8 @@ describe('Hud ground aim behavior', () => {
 
     hud.castSlot(3);
 
-    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
-    expect(hud.groundAimPoint).not.toEqual({ x: 0, z: 0 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 0, z: 15 });
+    expect(hud.groundAim.rawAimPoint()).not.toEqual({ x: 0, z: 0 });
   });
 
   it('seeds ahead when the selected target is not attackable', () => {
@@ -227,7 +232,7 @@ describe('Hud ground aim behavior', () => {
 
     hud.castSlot(3);
 
-    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 0, z: 15 });
   });
 
   it('uses the live selected target when the attackability hook is absent', () => {
@@ -237,7 +242,7 @@ describe('Hud ground aim behavior', () => {
 
     hud.castSlot(3);
 
-    expect(hud.groundAimPoint).toEqual({ x: 12, z: 0 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 12, z: 0 });
   });
 
   it('seeds ahead when the selected target is dead', () => {
@@ -247,7 +252,7 @@ describe('Hud ground aim behavior', () => {
 
     hud.castSlot(3);
 
-    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 0, z: 15 });
   });
 
   it('seeds ahead when the selected target is the player', () => {
@@ -257,7 +262,7 @@ describe('Hud ground aim behavior', () => {
 
     hud.castSlot(3);
 
-    expect(hud.groundAimPoint).toEqual({ x: 0, z: 15 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 0, z: 15 });
   });
 
   it('casts immediately instead of entering aim while on cooldown', () => {
@@ -368,7 +373,7 @@ describe('Hud ground aim behavior', () => {
 
     const reticle = hud.groundAimReticle();
 
-    expect(hud.groundAimPoint).toEqual({ x: 100, z: 0 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 100, z: 0 });
     expect(reticle?.point).toEqual({ x: -20, z: 0 });
     expect(reticle?.dimmed).toBe(true);
   });
@@ -380,7 +385,7 @@ describe('Hud ground aim behavior', () => {
 
     hud.nudgeGroundAimPoint(100, 0);
 
-    expect(hud.groundAimPoint).toEqual({ x: 30, z: 0 });
+    expect(hud.groundAim.rawAimPoint()).toEqual({ x: 30, z: 0 });
     expect(hud.groundAimReticle()?.point).toEqual({ x: 30, z: 0 });
   });
 
@@ -394,11 +399,11 @@ describe('Hud ground aim behavior', () => {
     hud.nudgeGroundAimPoint(-100, 100);
 
     const distance = Math.hypot(
-      (hud.groundAimPoint?.x ?? 0) - hud.sim.player.pos.x,
-      (hud.groundAimPoint?.z ?? 0) - hud.sim.player.pos.z,
+      (hud.groundAim.rawAimPoint()?.x ?? 0) - hud.sim.player.pos.x,
+      (hud.groundAim.rawAimPoint()?.z ?? 0) - hud.sim.player.pos.z,
     );
     expect(distance).toBeCloseTo(30);
-    expect(hud.groundAimReticle()?.point).toEqual(hud.groundAimPoint);
+    expect(hud.groundAimReticle()?.point).toEqual(hud.groundAim.rawAimPoint());
   });
 
   it('exposes the active range and commits through the pad entry point', () => {
