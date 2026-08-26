@@ -39,6 +39,7 @@ vi.mock('pg', () => ({
 import { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } from '../../server/bank_ledger_batch_db';
 import type { SerializedBankLedgerOutboxRow } from '../../server/bank_ledger_outbox';
 import {
+  bankLedgerCommittedPrefixForError,
   type CharacterSaveAccountLockProof,
   lockCharacterSaveAccountParentOnClient,
 } from '../../server/bank_ledger_save_effects_db';
@@ -82,6 +83,21 @@ const GUILD_EFFECTS: BankLedgerSaveEffects = {
       batchKey: 'save.guild.1',
       rows: [{ ...ROW, container: 'guild', containerId: 19 }],
       encodedBytes: 256,
+      guildEffect: {
+        guildId: 19,
+        deltas: [
+          {
+            op: 'deposit',
+            itemId: 'linen_cloth',
+            count: 3,
+            instanceJson: null,
+            craftedRecipeId: null,
+            copperDelta: 0,
+            purchasedSlotsBefore: 0,
+            purchasedSlotsAfter: 0,
+          },
+        ],
+      },
     },
   ],
 };
@@ -105,9 +121,44 @@ const STATE = {
 const MARKET = { listings: [], collections: [], nextListingId: 1 } as MarketSave;
 const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
 
+function guildGoldBatch(batchKey: string, copperDelta: number) {
+  const op = copperDelta >= 0 ? ('deposit_gold' as const) : ('withdraw_gold' as const);
+  return {
+    batchKey,
+    encodedBytes: 512,
+    rows: [
+      {
+        ...ROW,
+        op,
+        itemId: null,
+        count: null,
+        copperDelta,
+        container: 'guild' as const,
+        containerId: 19,
+      },
+    ],
+    guildEffect: {
+      guildId: 19,
+      deltas: [
+        {
+          op,
+          itemId: null,
+          count: null,
+          instanceJson: null,
+          craftedRecipeId: null,
+          copperDelta,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+        },
+      ],
+    },
+  };
+}
+
 interface ClientOptions {
   characterRows?: number;
   lostCommit?: boolean;
+  claims?: readonly boolean[];
 }
 
 function clientStub(options: ClientOptions = {}) {
@@ -151,12 +202,16 @@ function clientStub(options: ClientOptions = {}) {
       const accountIds = params[4] as number[];
       const rowCounts = params[5] as number[];
       const hashes = params[6] as string[];
-      const inserted = options.lostCommit ? 0 : rowCounts.reduce((sum, count) => sum + count, 0);
+      const claims = options.claims ?? ordinals.map(() => !options.lostCommit);
+      const inserted = rowCounts.reduce(
+        (sum, count, index) => sum + (claims[index] ? count : 0),
+        0,
+      );
       return {
         rows: ordinals.map((ordinal, index) => ({
           batch_ordinal: ordinal,
           batch_key: keys[index],
-          newly_claimed: !options.lostCommit,
+          newly_claimed: claims[index],
           stored_batch_key: keys[index],
           stored_realm: realms[index],
           stored_character_id: characterIds[index],
@@ -208,7 +263,7 @@ describe('fenced character save ledger effects', () => {
     expect(client.release).toHaveBeenCalledOnce();
   });
 
-  it('accepts a lost-COMMIT receipt retry after market/mail rows and before COMMIT', async () => {
+  it('classifies a lost-COMMIT receipt before market/mail rows and COMMIT', async () => {
     const client = clientStub({ lostCommit: true });
     h.pool.connect.mockResolvedValueOnce(client);
 
@@ -233,8 +288,9 @@ describe('fenced character save ledger effects', () => {
     );
     const ledger = indexOf(sql, /WITH receipt_input AS/);
     expect(worlds).toHaveLength(2);
-    expect(worlds.at(-1)).toBeLessThan(ledger);
-    expect(ledger).toBeLessThan(indexOf(sql, /^COMMIT/));
+    expect(indexOf(sql, /UPDATE characters/)).toBeLessThan(ledger);
+    expect(ledger).toBeLessThan(worlds[0]);
+    expect(worlds.at(-1)).toBeLessThan(indexOf(sql, /^COMMIT/));
     const ledgerCall = client.query.mock.calls.find((call) =>
       /WITH receipt_input AS/.test(call[0]),
     );
@@ -243,19 +299,19 @@ describe('fenced character save ledger effects', () => {
     expect(ledgerCall?.[1]?.[1]).toEqual(['save.session.1']);
   });
 
-  it('writes a successful guild book before its ledger prefix', async () => {
+  it('classifies the ledger receipt before writing a successful guild book', async () => {
     const client = clientStub();
     h.pool.connect.mockResolvedValueOnce(client);
     const guildSave = {
       guildId: 19,
       deltas: [
         {
-          op: 'deposit_gold' as const,
-          itemId: null,
-          count: null,
+          op: 'deposit' as const,
+          itemId: 'linen_cloth',
+          count: 3,
           instance: null,
           craftedRecipeId: null,
-          copperDelta: 25,
+          copperDelta: 0,
           purchasedSlotsBefore: 0,
           purchasedSlotsAfter: 0,
         },
@@ -280,9 +336,175 @@ describe('fenced character save ledger effects', () => {
       (last, statement, at) => (/INSERT INTO guild_banks/.test(statement) ? at : last),
       -1,
     );
-    expect(book).toBeGreaterThan(indexOf(sql, /UPDATE characters/));
-    expect(book).toBeLessThan(indexOf(sql, /WITH receipt_input AS/));
-    expect(indexOf(sql, /WITH receipt_input AS/)).toBeLessThan(indexOf(sql, /^COMMIT/));
+    expect(indexOf(sql, /UPDATE characters/)).toBeLessThan(indexOf(sql, /WITH receipt_input AS/));
+    expect(indexOf(sql, /WITH receipt_input AS/)).toBeLessThan(book);
+    expect(book).toBeLessThan(indexOf(sql, /^COMMIT/));
+  });
+
+  it('uses all-existing receipts as committed results without any guild query', async () => {
+    const client = clientStub({ claims: [false] });
+    h.pool.connect.mockResolvedValueOnce(client);
+    const results: Array<{ guildId: number; written: boolean }> = [];
+    const guildSave = {
+      guildId: 19,
+      deltas: [
+        {
+          op: 'deposit' as const,
+          itemId: 'linen_cloth',
+          count: 3,
+          instance: null,
+          craftedRecipeId: null,
+          copperDelta: 0,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+        },
+      ],
+    };
+
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [guildSave],
+        'nonce-1',
+        results as never,
+        [],
+        GUILD_EFFECTS,
+      ),
+    ).resolves.toBe(true);
+    expect(sqlCalls(client).some((sql) => /guild_banks/.test(sql))).toBe(false);
+    expect(results).toEqual([{ guildId: 19, written: true, deficit: null, rowUnusable: false }]);
+  });
+
+  it('replays only the new suffix when duplicate-guild commands share one captured save', async () => {
+    const first = guildGoldBatch('save.guild.existing', 10);
+    const second = guildGoldBatch('save.guild.new', 20);
+    const effects: BankLedgerSaveEffects = { owner: OWNER, batches: [first, second] };
+    const client = clientStub({ claims: [false, true] });
+    h.pool.connect.mockResolvedValueOnce(client);
+
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [
+          {
+            guildId: 19,
+            deltas: [
+              { ...first.guildEffect.deltas[0], instance: null },
+              { ...second.guildEffect.deltas[0], instance: null },
+            ],
+          },
+        ],
+        'nonce-1',
+        undefined,
+        [],
+        effects,
+      ),
+    ).resolves.toBe(true);
+
+    const upsert = client.query.mock.calls.find((call) =>
+      /INSERT INTO guild_banks[\s\S]*DO UPDATE/.test(String(call[0])),
+    );
+    expect(JSON.parse(String(upsert?.[1]?.[2]))).toMatchObject({ treasury: 20 });
+  });
+
+  it('preserves only the exact existing prefix when a new guild replay later refuses', async () => {
+    const first = guildGoldBatch('save.guild.durable', 10);
+    const second = guildGoldBatch('save.guild.refused', -50);
+    const effects: BankLedgerSaveEffects = { owner: OWNER, batches: [first, second] };
+    const client = clientStub({ claims: [false, true] });
+    h.pool.connect.mockResolvedValueOnce(client);
+
+    let thrown: unknown;
+    await saveCharacterAndGuildBankState(
+      OWNER.characterId,
+      7,
+      STATE,
+      [
+        {
+          guildId: 19,
+          deltas: [
+            { ...first.guildEffect.deltas[0], instance: null },
+            { ...second.guildEffect.deltas[0], instance: null },
+          ],
+        },
+      ],
+      'nonce-1',
+      undefined,
+      [],
+      effects,
+    ).catch((error) => {
+      thrown = error;
+    });
+
+    const evidence = bankLedgerCommittedPrefixForError(thrown);
+    expect(evidence?.batches).toEqual([first]);
+    expect(evidence?.batches[0]).toBe(first);
+    expect(evidence?.batches).not.toContain(second);
+    expect(sqlCalls(client)).toContain('ROLLBACK');
+  });
+
+  it('rejects a new-before-existing classification before any guild query', async () => {
+    const first = guildGoldBatch('save.guild.new.first', 10);
+    const second = guildGoldBatch('save.guild.existing.later', 20);
+    const effects: BankLedgerSaveEffects = { owner: OWNER, batches: [first, second] };
+    const client = clientStub({ claims: [true, false] });
+    h.pool.connect.mockResolvedValueOnce(client);
+
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [
+          {
+            guildId: 19,
+            deltas: [
+              { ...first.guildEffect.deltas[0], instance: null },
+              { ...second.guildEffect.deltas[0], instance: null },
+            ],
+          },
+        ],
+        'nonce-1',
+        undefined,
+        [],
+        effects,
+      ),
+    ).rejects.toThrow(/existing batch .* follows a new batch/);
+    expect(sqlCalls(client).some((sql) => /guild_banks/.test(sql))).toBe(false);
+    expect(sqlCalls(client)).toContain('ROLLBACK');
+  });
+
+  it('rejects nonempty unreceipted guild deltas before pool checkout', async () => {
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [
+          {
+            guildId: 19,
+            deltas: [
+              {
+                op: 'deposit_gold',
+                itemId: null,
+                count: null,
+                instance: null,
+                craftedRecipeId: null,
+                copperDelta: 1,
+                purchasedSlotsBefore: 0,
+                purchasedSlotsAfter: 0,
+              },
+            ],
+          },
+        ],
+        'nonce-1',
+      ),
+    ).rejects.toThrow(/nonempty unreceipted deltas/);
+    expect(h.pool.connect).not.toHaveBeenCalled();
   });
 
   it('rejects a guild ledger prefix unless the same transaction carries its book', async () => {

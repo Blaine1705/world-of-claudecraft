@@ -75,6 +75,8 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
   let admin: PgPool;
   let pool: PgPool;
   let db: typeof import('../server/db');
+  let rawDb: typeof import('../server/db');
+  let outbox: typeof import('../server/bank_ledger_outbox');
   let bankState: typeof import('../server/guild_bank_state');
   let social: typeof import('../server/social');
   let socialDb: typeof import('../server/social_db');
@@ -83,6 +85,41 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
   // Monotonic fixture ids so cases never collide on a shared database.
   let nextSeq = 0;
   const seq = () => ++nextSeq;
+  let nextReceipt = 0;
+
+  async function receiptEffectsFor(
+    characterId: number,
+    saves: readonly import('../server/db').GuildBankSave[],
+  ): Promise<import('../server/bank_ledger_save_effects_db').BankLedgerSaveEffects> {
+    const ownerRow = await pool.query('SELECT account_id FROM characters WHERE id = $1', [
+      characterId,
+    ]);
+    const accountId = Number(ownerRow.rows[0]?.account_id);
+    const batches = saves.flatMap((save) => {
+      return save.deltas.map((delta) =>
+        outbox.serializeBankLedgerCommandBatch(
+          `pg.guild.${characterId}.${++nextReceipt}.${save.guildId}`,
+          [
+            {
+              realm,
+              characterId,
+              accountId,
+              op: delta.op,
+              itemId: delta.itemId,
+              count: delta.count,
+              instance: delta.instance,
+              copperDelta: delta.copperDelta,
+              purchasedSlotsAfter: delta.purchasedSlotsAfter,
+              container: 'guild',
+              containerId: save.guildId,
+            },
+          ],
+          { guildId: save.guildId, deltas: [delta] },
+        ),
+      );
+    });
+    return { owner: { realm, characterId, accountId }, batches };
+  }
 
   async function makeAccount(): Promise<number> {
     const res = await pool.query(
@@ -145,7 +182,9 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
     await admin.query(`DROP DATABASE IF EXISTS ${VERIFY_DB}`);
     await admin.query(`CREATE DATABASE ${VERIFY_DB}`);
 
-    db = await import('../server/db');
+    rawDb = await import('../server/db');
+    db = rawDb;
+    outbox = await import('../server/bank_ledger_outbox');
     bankState = await import('../server/guild_bank_state');
     social = await import('../server/social');
     socialDb = await import('../server/social_db');
@@ -153,10 +192,63 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
 
     // The REAL boot path: every table, column, default, constraint and index
     // the server actually creates, plus the post-listen CONCURRENTLY builds.
-    await db.ensureSchema();
-    await db.runConcurrentIndexMigrations();
+    await rawDb.ensureSchema();
+    await rawDb.runConcurrentIndexMigrations();
 
     pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 12 });
+
+    // Most cases predate command receipts but intentionally exercise the live
+    // save API. Give each nonempty guild save its production-shaped immutable
+    // sidecars; explicit ledgerEffects still pass through for retry tests.
+    const saveGuild: typeof rawDb.saveCharacterAndGuildBankState = async (
+      characterId,
+      level,
+      state,
+      guildBanks,
+      leaseNonce,
+      results,
+      storageEffects = [],
+      ledgerEffects,
+    ) =>
+      rawDb.saveCharacterAndGuildBankState(
+        characterId,
+        level,
+        state,
+        guildBanks,
+        leaseNonce,
+        results,
+        storageEffects,
+        ledgerEffects ?? (await receiptEffectsFor(characterId, guildBanks)),
+      );
+    const saveMarket: typeof rawDb.saveCharacterAndMarketState = async (
+      characterId,
+      level,
+      state,
+      market,
+      mail,
+      leaseNonce,
+      guildBanks,
+      results,
+      storageEffects = [],
+      ledgerEffects,
+    ) =>
+      rawDb.saveCharacterAndMarketState(
+        characterId,
+        level,
+        state,
+        market,
+        mail,
+        leaseNonce,
+        guildBanks,
+        results,
+        storageEffects,
+        ledgerEffects ?? (await receiptEffectsFor(characterId, guildBanks ?? [])),
+      );
+    db = {
+      ...rawDb,
+      saveCharacterAndGuildBankState: saveGuild,
+      saveCharacterAndMarketState: saveMarket,
+    } as typeof rawDb;
   }, 120_000);
 
   afterAll(async () => {
@@ -317,6 +409,138 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
   // 1b. The batched ledger writer (Bank Storage Phase 03).
   // -------------------------------------------------------------------------
   describe('the batched ledger writer (REAL Postgres, Bank Storage Phase 03)', () => {
+    it('applies an exact lost-COMMIT retry once and returns its committed guild result', async () => {
+      const acct = await makeAccount();
+      const charId = await makeCharacter(acct);
+      const guildId = await makeGuild();
+      await grantLease(charId, 'nonce-retry');
+      const save = { guildId, deltas: [goldDelta('deposit_gold', 125)] };
+      const effects = await receiptEffectsFor(charId, [save]);
+
+      const firstResults: import('../server/db').GuildBankWriteResult[] = [];
+      await db.saveCharacterAndGuildBankState(
+        charId,
+        5,
+        CHAR_STATE('first-commit'),
+        [save],
+        'nonce-retry',
+        firstResults,
+        [],
+        effects,
+      );
+      const retryResults: import('../server/db').GuildBankWriteResult[] = [];
+      await db.saveCharacterAndGuildBankState(
+        charId,
+        5,
+        CHAR_STATE('retry-after-ambiguous-commit'),
+        [save],
+        'nonce-retry',
+        retryResults,
+        [],
+        effects,
+      );
+
+      expect(await bookOf(guildId)).toMatchObject({ treasury: 125 });
+      expect(firstResults).toEqual([{ guildId, written: true, deficit: null, rowUnusable: false }]);
+      expect(retryResults).toEqual([{ guildId, written: true, deficit: null, rowUnusable: false }]);
+      const durable = await pool.query(
+        `SELECT
+           (SELECT count(*) FROM bank_ledger_batch_receipts WHERE character_id = $1) AS receipts,
+           (SELECT count(*) FROM bank_ledger WHERE character_id = $1) AS ledger`,
+        [charId],
+      );
+      expect(durable.rows[0]).toMatchObject({ receipts: '1', ledger: '1' });
+    });
+
+    it('retries an existing prefix and applies only its new suffix', async () => {
+      const acct = await makeAccount();
+      const charId = await makeCharacter(acct);
+      const guildId = await makeGuild();
+      await grantLease(charId, 'nonce-mixed-retry');
+      const oldDelta = goldDelta('deposit_gold', 100);
+      const newDelta = goldDelta('deposit_gold', 40);
+      const oldEffects = await receiptEffectsFor(charId, [{ guildId, deltas: [oldDelta] }]);
+
+      await db.saveCharacterAndGuildBankState(
+        charId,
+        5,
+        CHAR_STATE('old-committed'),
+        [{ guildId, deltas: [oldDelta] }],
+        'nonce-mixed-retry',
+        undefined,
+        [],
+        oldEffects,
+      );
+      const newEffects = await receiptEffectsFor(charId, [{ guildId, deltas: [newDelta] }]);
+      const mixedEffects = {
+        owner: oldEffects.owner,
+        batches: [...oldEffects.batches, ...newEffects.batches],
+      };
+      const results: import('../server/db').GuildBankWriteResult[] = [];
+      await db.saveCharacterAndGuildBankState(
+        charId,
+        5,
+        CHAR_STATE('mixed-retry'),
+        [{ guildId, deltas: [oldDelta, newDelta] }],
+        'nonce-mixed-retry',
+        results,
+        [],
+        mixedEffects,
+      );
+
+      expect(await bookOf(guildId)).toMatchObject({ treasury: 140 });
+      // One durable-prefix result and one newly written suffix result retain
+      // duplicate-guild command correlation for host-side prefix retirement.
+      expect(results.map((result) => result.guildId)).toEqual([guildId, guildId]);
+    });
+
+    it('rolls back a new-before-existing receipt prefix before any guild effect lands', async () => {
+      const acct = await makeAccount();
+      const charId = await makeCharacter(acct);
+      const guildId = await makeGuild();
+      await grantLease(charId, 'nonce-invalid-order');
+      const laterDelta = goldDelta('deposit_gold', 30);
+      const laterEffects = await receiptEffectsFor(charId, [{ guildId, deltas: [laterDelta] }]);
+      await db.saveCharacterAndGuildBankState(
+        charId,
+        5,
+        CHAR_STATE('later-committed'),
+        [{ guildId, deltas: [laterDelta] }],
+        'nonce-invalid-order',
+        undefined,
+        [],
+        laterEffects,
+      );
+
+      const earlierDelta = goldDelta('deposit_gold', 900);
+      const earlierEffects = await receiptEffectsFor(charId, [{ guildId, deltas: [earlierDelta] }]);
+      await expect(
+        db.saveCharacterAndGuildBankState(
+          charId,
+          99,
+          CHAR_STATE('must-roll-back'),
+          [{ guildId, deltas: [earlierDelta, laterDelta] }],
+          'nonce-invalid-order',
+          undefined,
+          [],
+          {
+            owner: earlierEffects.owner,
+            batches: [...earlierEffects.batches, ...laterEffects.batches],
+          },
+        ),
+      ).rejects.toThrow(/existing batch .* follows a new batch/);
+
+      expect(await bookOf(guildId)).toMatchObject({ treasury: 30 });
+      expect(await characterRow(charId)).toEqual({ level: 5, marker: 'later-committed' });
+      const durable = await pool.query(
+        `SELECT
+           (SELECT count(*) FROM bank_ledger_batch_receipts WHERE character_id = $1) AS receipts,
+           (SELECT count(*) FROM bank_ledger WHERE character_id = $1) AS ledger`,
+        [charId],
+      );
+      expect(durable.rows[0]).toMatchObject({ receipts: '1', ledger: '1' });
+    });
+
     // insertBankLedgerRows is the vault sweep's write path and, until this
     // arm, the phase's only NEW SQL never executed against a real engine:
     // the mocked suite pins statement text and binds, but a cast the engine

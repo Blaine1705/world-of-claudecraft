@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import {
   BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH,
   BANK_LEDGER_OUTBOX_DEFAULT_GLOBAL_LIMITS,
@@ -10,6 +9,7 @@ import {
   type BankLedgerOutboxRowInput,
   serializeBankLedgerCommandBatch,
 } from '../../server/bank_ledger_outbox';
+import type { GuildBankOpDelta } from '../../src/sim/guild_bank';
 
 const LARGE_BYTES = 1_000_000;
 const OWNER: BankLedgerOutboxOwner = Object.freeze({
@@ -36,6 +36,20 @@ function ledgerRow(overrides: Partial<BankLedgerOutboxRowInput> = {}): BankLedge
     purchasedSlotsAfter: 6,
     container: 'personal',
     containerId: null,
+    ...overrides,
+  };
+}
+
+function guildDelta(overrides: Partial<GuildBankOpDelta> = {}): GuildBankOpDelta {
+  return {
+    op: 'deposit' as const,
+    itemId: 'peacebloom',
+    count: 1,
+    instance: null,
+    craftedRecipeId: null,
+    copperDelta: 0,
+    purchasedSlotsBefore: 0,
+    purchasedSlotsAfter: 6,
     ...overrides,
   };
 }
@@ -266,17 +280,23 @@ describe('BankLedgerOutbox batches and accounting', () => {
   });
 
   it('summarizes one guild correlation per logical batch and rejects mixed guild identities', () => {
-    const correlated = serializeBankLedgerCommandBatch('guild:correlated', [
-      ledgerRow({ container: 'guild', containerId: 41 }),
-      ledgerRow({ container: 'personal', containerId: null }),
-      ledgerRow({ container: 'guild', containerId: 41 }),
-    ]);
+    const correlated = serializeBankLedgerCommandBatch(
+      'guild:correlated',
+      [
+        ledgerRow({ container: 'guild', containerId: 41 }),
+        ledgerRow({ container: 'personal', containerId: null }),
+        ledgerRow({ container: 'guild', containerId: 41 }),
+      ],
+      { guildId: 41, deltas: [guildDelta(), guildDelta()] },
+    );
 
     expect(correlated.guildIds).toEqual([41]);
     expect(correlated.hasUnscopedRows).toBe(true);
-    const guildOnly = serializeBankLedgerCommandBatch('guild:only', [
-      ledgerRow({ container: 'guild', containerId: 41 }),
-    ]);
+    const guildOnly = serializeBankLedgerCommandBatch(
+      'guild:only',
+      [ledgerRow({ container: 'guild', containerId: 41 })],
+      { guildId: 41, deltas: [guildDelta()] },
+    );
     expect(guildOnly.guildIds).toEqual([41]);
     expect(Object.isFrozen(guildOnly.guildIds)).toBe(true);
     expect(guildOnly.hasUnscopedRows).toBe(false);
@@ -286,6 +306,66 @@ describe('BankLedgerOutbox batches and accounting', () => {
         ledgerRow({ container: 'guild', containerId: 42 }),
       ]),
     ).toThrow(/multiple guilds/i);
+  });
+
+  it('detaches and freezes guild sidecars and binds their exact bytes to the batch', () => {
+    const instance = { signer: 'Ada' };
+    const delta = guildDelta({
+      itemId: 'crafted_blade',
+      instance,
+      craftedRecipeId: 'recipe.blade',
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    });
+    const prepared = serializeBankLedgerCommandBatch(
+      'guild:sidecar',
+      [
+        ledgerRow({
+          container: 'guild',
+          containerId: 41,
+          itemId: 'crafted_blade',
+          instance,
+          purchasedSlotsAfter: 30,
+        }),
+      ],
+      { guildId: 41, deltas: [delta] },
+    );
+
+    instance.signer = 'mutated';
+    expect(prepared.guildEffect?.deltas[0]).toMatchObject({
+      instanceJson: '{"signer":"Ada"}',
+      craftedRecipeId: 'recipe.blade',
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: 30,
+    });
+    expect(Object.isFrozen(prepared.guildEffect)).toBe(true);
+    expect(Object.isFrozen(prepared.guildEffect?.deltas)).toBe(true);
+    expect(prepared.guildEffect?.deltas.every(Object.isFrozen)).toBe(true);
+  });
+
+  it('requires an exact sidecar for ordinary guild rows but permits ledger-only diagnostics', () => {
+    const row = ledgerRow({ container: 'guild', containerId: 41 });
+    expect(() => serializeBankLedgerCommandBatch('guild:missing-sidecar', [row])).toThrow(
+      /requires a matching guild effect/,
+    );
+    expect(() =>
+      serializeBankLedgerCommandBatch('guild:mismatched-sidecar', [row], {
+        guildId: 41,
+        deltas: [guildDelta({ count: 2 })],
+      }),
+    ).toThrow(/does not match its ledger row/);
+
+    expect(
+      serializeBankLedgerCommandBatch('guild:diagnostic-only', [
+        ledgerRow({
+          op: 'escrow_deficit',
+          itemId: null,
+          count: null,
+          container: 'guild',
+          containerId: 41,
+        }),
+      ]).guildEffect,
+    ).toBeNull();
   });
 
   it('uses the canonical JSON normalization and rejects true serialization failures', () => {
@@ -443,10 +523,12 @@ describe('BankLedgerOutbox batches and accounting', () => {
     const key = 'utf8:batch';
     const prepared = serializeBankLedgerCommandBatch(key, [row]);
     expect(prepared.encodedBytes).toBe(
-      new TextEncoder().encode(JSON.stringify({ batchKey: key, rows: prepared.rows })).byteLength,
+      new TextEncoder().encode(
+        JSON.stringify({ batchKey: key, rows: prepared.rows, guildEffect: null }),
+      ).byteLength,
     );
     expect(prepared.encodedBytes).toBeGreaterThan(
-      JSON.stringify({ batchKey: key, rows: prepared.rows }).length,
+      JSON.stringify({ batchKey: key, rows: prepared.rows, guildEffect: null }).length,
     );
 
     const { budget, makeOutbox } = rig();
@@ -573,7 +655,10 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
 
     for (const guildId of [42, 7]) {
       const row = ledgerRow({ container: 'guild', containerId: guildId });
-      const prepared = serializeBankLedgerCommandBatch(`batch:guild:${guildId}`, [row]);
+      const prepared = serializeBankLedgerCommandBatch(`batch:guild:${guildId}`, [row], {
+        guildId,
+        deltas: [guildDelta()],
+      });
       const reservation = required(outbox.tryReservePrepared(prepared));
       outbox.commitPrepared(reservation);
       expect(outbox.hasQueuedGuildRows).toBe(true);
@@ -591,6 +676,20 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     expect(snapshot.hasUnscopedRows).toBe(true);
     expect(outbox.acknowledge(snapshot)).toBe(true);
     expect(outbox.hasQueuedGuildRows).toBe(false);
+  });
+
+  it('acknowledges only exact receipt-proven batch objects from a live snapshot', () => {
+    const { makeOutbox } = rig();
+    const outbox = makeOutbox();
+    const first = commitOne(outbox, 'batch:first', 'peacebloom');
+    const second = commitOne(outbox, 'batch:second', 'silverleaf');
+    const snapshot = outbox.snapshot();
+
+    expect(outbox.acknowledgeCommittedPrefix(snapshot, [{ ...first }])).toBe(false);
+    expect(outbox.acknowledgeCommittedPrefix(snapshot, [second])).toBe(false);
+    expect(outbox.acknowledgeCommittedPrefix(snapshot, [first])).toBe(true);
+    expect(outbox.snapshot().batches).toEqual([second]);
+    expect(outbox.acknowledge(snapshot)).toBe(false);
   });
 
   it('refuses stale, overlapping, and foreign snapshots without splicing newer work', () => {

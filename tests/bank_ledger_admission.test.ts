@@ -42,6 +42,7 @@ import { type BankSim, dispatchBankCommand } from '../server/bank_wire';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from '../server/db';
 import { REALM } from '../server/realm';
 import { dispatchVaultCommand, type VaultSim } from '../server/vault_wire';
+import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import type { BankInfo, VaultInfo } from '../src/world_api';
 
 const WHO = Object.freeze({ characterId: 101, accountId: 202 });
@@ -242,7 +243,43 @@ describe('BankLedgerOutboxAdmission', () => {
     expect(BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES).toBeGreaterThanOrEqual(maxKeyEnvelope);
     expect(BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES).toBe(16 * 1024);
     expect(bankLedgerSyncMinimumEncodedBytes(112)).toBe(256 + 112 * (16 * 1024 + 1));
+    expect(bankLedgerSyncMinimumEncodedBytes(2, 3)).toBe(256 + 5 * (16 * 1024 + 1));
     expect(() => bankLedgerSyncMinimumEncodedBytes(0)).toThrow(/positive safe integer/);
+    expect(() => bankLedgerSyncMinimumEncodedBytes(1, -1)).toThrow(/non-negative safe integer/);
+  });
+
+  it('commits ledger rows and their detached guild effect as one admission batch', () => {
+    const { outbox, admission } = outboxRig({
+      rows: 1,
+      bytes: bankLedgerSyncMinimumEncodedBytes(1, 1),
+    });
+    const row = ledgerRow({
+      container: 'guild',
+      containerId: 303,
+      purchasedSlotsAfter: 24,
+    });
+    const delta: GuildBankOpDelta = {
+      op: 'deposit',
+      itemId: row.itemId,
+      count: row.count,
+      instance: null,
+      craftedRecipeId: null,
+      copperDelta: row.copperDelta,
+      purchasedSlotsBefore: 24,
+      purchasedSlotsAfter: row.purchasedSlotsAfter,
+    };
+    const handle = admission.tryReserve(1, 1);
+    if (!handle) throw new Error('expected guild admission capacity');
+
+    expect(handle.commit([row], { guildId: 303, deltas: [delta] })).toBe(true);
+    expect(outbox.snapshot().batches).toMatchObject([
+      {
+        guildEffect: {
+          guildId: 303,
+          deltas: [{ op: 'deposit', itemId: 'peacebloom', purchasedSlotsBefore: 24 }],
+        },
+      },
+    ]);
   });
 
   it('quarantines a post-mutation failure once while retaining all reserved capacity', () => {

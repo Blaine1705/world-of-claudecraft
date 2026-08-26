@@ -4,6 +4,7 @@
 // prefix and acknowledges it only after the state and ledger rows commit in the
 // same database transaction.
 
+import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import type { BankLedgerRow } from './db';
 
 export interface BankLedgerOutboxLimits {
@@ -47,6 +48,25 @@ export interface BankLedgerOutboxOwner {
 
 export type BankLedgerOutboxRowInput = Readonly<BankLedgerRow>;
 
+export interface BankLedgerGuildEffectInput {
+  readonly guildId: number;
+  readonly deltas: readonly GuildBankOpDelta[];
+}
+
+export type SerializedBankLedgerGuildDelta = Readonly<
+  Omit<GuildBankOpDelta, 'instance' | 'craftedRecipeId'> & {
+    /** Detached JSON, kept beside the command receipt instead of a live Sim object. */
+    readonly instanceJson: string | null;
+    /** Optional source markers normalize to null so receipt bytes stay canonical. */
+    readonly craftedRecipeId: string | null;
+  }
+>;
+
+export interface SerializedBankLedgerGuildEffect {
+  readonly guildId: number;
+  readonly deltas: readonly SerializedBankLedgerGuildDelta[];
+}
+
 export type SerializedBankLedgerOutboxRow = Readonly<
   Omit<BankLedgerRow, 'instance' | 'counterpartyCopperDelta' | 'counterpartyCount'> & {
     /** The detached JSON payload bound to the future jsonb parameter. */
@@ -61,13 +81,17 @@ export interface BankLedgerCommandBatch {
   readonly batchKey: string;
   readonly rows: readonly SerializedBankLedgerOutboxRow[];
   readonly encodedBytes: number;
+  /** One command's durable guild-book replay payload. Older typed fixtures may
+   *  omit it; receipt normalization treats omission exactly as null. */
+  readonly guildEffect?: SerializedBankLedgerGuildEffect | null;
 }
 
 /**
- * A batch detached by this module. The additive correlation fields stay out of
- * the receipt fingerprint, which remains exactly `{ batchKey, rows }`.
+ * A batch detached by this module. Correlation fields are derived, while the
+ * optional guild effect is part of both retained bytes and the receipt hash.
  */
 export interface PreparedBankLedgerCommandBatch extends BankLedgerCommandBatch {
+  readonly guildEffect: SerializedBankLedgerGuildEffect | null;
   readonly guildIds: readonly number[];
   readonly hasUnscopedRows: boolean;
 }
@@ -306,6 +330,86 @@ function serializeRow(row: BankLedgerOutboxRowInput): SerializedBankLedgerOutbox
   });
 }
 
+const GUILD_BANK_DELTA_OPS = new Set<GuildBankOpDelta['op']>([
+  'deposit_gold',
+  'withdraw_gold',
+  'deposit',
+  'withdraw',
+  'buy_slots',
+  'open_bank',
+  'admin_purge',
+]);
+
+const GUILD_LEDGER_ONLY_OPS = new Set(['create_fee', 'escrow_deficit', 'counterparty_orphan']);
+
+function normalizeSerializedRow(row: SerializedBankLedgerOutboxRow): SerializedBankLedgerOutboxRow {
+  if (typeof row !== 'object' || row === null) {
+    throw new TypeError('bank ledger serialized row must be an object');
+  }
+  checkedNullableString(row.instanceJson, 'row.instanceJson');
+  return serializeRow({
+    ...row,
+    instance: row.instanceJson === null ? null : JSON.parse(row.instanceJson),
+  });
+}
+
+function serializeGuildDelta(delta: GuildBankOpDelta): SerializedBankLedgerGuildDelta {
+  if (typeof delta !== 'object' || delta === null || !GUILD_BANK_DELTA_OPS.has(delta.op)) {
+    throw new TypeError('bank ledger guild delta has an invalid op');
+  }
+  checkedNullableString(delta.itemId, 'guild delta.itemId');
+  assertIntegerOrNull(delta.count, 'guild delta.count');
+  checkedNullableString(delta.craftedRecipeId ?? null, 'guild delta.craftedRecipeId');
+  if (!Number.isSafeInteger(delta.copperDelta)) {
+    throw new RangeError('guild delta.copperDelta must be a safe integer');
+  }
+  assertNonNegativeInteger(delta.purchasedSlotsBefore, 'guild delta.purchasedSlotsBefore');
+  assertNonNegativeInteger(delta.purchasedSlotsAfter, 'guild delta.purchasedSlotsAfter');
+  return Object.freeze({
+    op: delta.op,
+    itemId: delta.itemId,
+    count: delta.count,
+    instanceJson: serializedInstance(delta.instance),
+    craftedRecipeId: delta.craftedRecipeId ?? null,
+    copperDelta: delta.copperDelta,
+    purchasedSlotsBefore: delta.purchasedSlotsBefore,
+    purchasedSlotsAfter: delta.purchasedSlotsAfter,
+  });
+}
+
+/** Detach one guild effect into the same canonical shape the receipt hashes. */
+export function serializeBankLedgerGuildEffect(
+  effect: BankLedgerGuildEffectInput | SerializedBankLedgerGuildEffect,
+): SerializedBankLedgerGuildEffect {
+  if (typeof effect !== 'object' || effect === null) {
+    throw new TypeError('bank ledger guild effect must be an object');
+  }
+  assertPositiveInteger(effect.guildId, 'guild effect.guildId');
+  if (!Array.isArray(effect.deltas) || effect.deltas.length === 0) {
+    throw new RangeError('bank ledger guild effect must contain at least one delta');
+  }
+  const deltas = Object.freeze(
+    effect.deltas.map((delta) => {
+      if ('instanceJson' in delta) {
+        const serialized = delta as SerializedBankLedgerGuildDelta;
+        checkedNullableString(serialized.instanceJson, 'guild delta.instanceJson');
+        return serializeGuildDelta({
+          op: serialized.op,
+          itemId: serialized.itemId,
+          count: serialized.count,
+          instance: serialized.instanceJson === null ? null : JSON.parse(serialized.instanceJson),
+          craftedRecipeId: serialized.craftedRecipeId,
+          copperDelta: serialized.copperDelta,
+          purchasedSlotsBefore: serialized.purchasedSlotsBefore,
+          purchasedSlotsAfter: serialized.purchasedSlotsAfter,
+        });
+      }
+      return serializeGuildDelta(delta as GuildBankOpDelta);
+    }),
+  );
+  return Object.freeze({ guildId: effect.guildId, deltas });
+}
+
 const utf8Encoder = new TextEncoder();
 const preparedBatches = new WeakSet<PreparedBankLedgerCommandBatch>();
 
@@ -332,6 +436,53 @@ function batchCorrelation(rows: readonly SerializedBankLedgerOutboxRow[]): {
   };
 }
 
+function assertGuildEffectCorrelation(
+  rows: readonly SerializedBankLedgerOutboxRow[],
+  guildEffect: SerializedBankLedgerGuildEffect | null,
+): void {
+  const ordinaryGuildRows = rows.filter(
+    (row) => row.container === 'guild' && !GUILD_LEDGER_ONLY_OPS.has(row.op),
+  );
+  if (!guildEffect) {
+    if (ordinaryGuildRows.length > 0) {
+      throw new Error('a guild bank mutation row requires a matching guild effect');
+    }
+    return;
+  }
+  if (ordinaryGuildRows.length !== guildEffect.deltas.length) {
+    throw new Error('bank ledger guild effect does not match its mutation rows');
+  }
+  for (let index = 0; index < guildEffect.deltas.length; index++) {
+    const row = ordinaryGuildRows[index];
+    const delta = guildEffect.deltas[index];
+    if (
+      row.containerId !== guildEffect.guildId ||
+      row.op !== delta.op ||
+      row.itemId !== delta.itemId ||
+      row.count !== delta.count ||
+      row.instanceJson !== delta.instanceJson ||
+      row.copperDelta !== delta.copperDelta ||
+      row.purchasedSlotsAfter !== delta.purchasedSlotsAfter
+    ) {
+      throw new Error(`bank ledger guild effect delta ${index} does not match its ledger row`);
+    }
+  }
+}
+
+/** Canonical receipt payload. This revalidates hand-built fixtures and makes
+ *  object insertion order irrelevant without trusting encodedBytes. */
+export function bankLedgerCommandBatchFingerprintJson(batch: BankLedgerCommandBatch): string {
+  const batchKey = checkedBatchKey(batch.batchKey);
+  if (!Array.isArray(batch.rows) || batch.rows.length === 0) {
+    throw new RangeError(`bank ledger batch ${batchKey} must contain at least one row`);
+  }
+  const rows = Object.freeze(batch.rows.map(normalizeSerializedRow));
+  const guildEffect = batch.guildEffect ? serializeBankLedgerGuildEffect(batch.guildEffect) : null;
+  batchCorrelation(rows);
+  assertGuildEffectCorrelation(rows, guildEffect);
+  return JSON.stringify({ batchKey, rows, guildEffect });
+}
+
 /**
  * Detach one logical command from all caller-owned objects and measure the
  * exact UTF-8 JSON shape retained by this outbox. Array order is durable order.
@@ -339,6 +490,7 @@ function batchCorrelation(rows: readonly SerializedBankLedgerOutboxRow[]): {
 export function serializeBankLedgerCommandBatch(
   batchKey: string,
   rows: readonly BankLedgerOutboxRowInput[],
+  guildEffect?: BankLedgerGuildEffectInput | null,
 ): PreparedBankLedgerCommandBatch {
   const checkedKey = checkedBatchKey(batchKey);
   if (!Array.isArray(rows) || rows.length === 0) {
@@ -346,13 +498,20 @@ export function serializeBankLedgerCommandBatch(
   }
   const serializedRows = Object.freeze(rows.map(serializeRow));
   const correlation = batchCorrelation(serializedRows);
+  const serializedGuildEffect = guildEffect ? serializeBankLedgerGuildEffect(guildEffect) : null;
+  assertGuildEffectCorrelation(serializedRows, serializedGuildEffect);
   const encodedBytes = utf8Encoder.encode(
-    JSON.stringify({ batchKey: checkedKey, rows: serializedRows }),
+    JSON.stringify({
+      batchKey: checkedKey,
+      rows: serializedRows,
+      guildEffect: serializedGuildEffect,
+    }),
   ).byteLength;
   const batch = Object.freeze({
     batchKey: checkedKey,
     rows: serializedRows,
     encodedBytes,
+    guildEffect: serializedGuildEffect,
     guildIds: correlation.guildIds,
     hasUnscopedRows: correlation.hasUnscopedRows,
   });
@@ -536,6 +695,7 @@ export class BankLedgerOutbox {
   commit(
     reservation: BankLedgerOutboxReservation,
     rows: readonly BankLedgerOutboxRowInput[],
+    guildEffect?: BankLedgerGuildEffectInput | null,
   ): PreparedBankLedgerCommandBatch {
     this.assertOpen();
     const state = this.reservations.get(reservation);
@@ -543,7 +703,7 @@ export class BankLedgerOutbox {
     if (state.preparedBatch) {
       throw new Error('prepared bank ledger reservation must use commitPrepared');
     }
-    const batch = serializeBankLedgerCommandBatch(state.batchKey, rows);
+    const batch = serializeBankLedgerCommandBatch(state.batchKey, rows, guildEffect);
     this.assertBatchOwner(batch);
     if (batch.rows.length > state.maxRows) {
       throw new RangeError('bank ledger batch exceeds its reserved row limit');
@@ -599,18 +759,27 @@ export class BankLedgerOutbox {
     if (!state) return false;
     state.consumed = true;
 
-    let rows = 0;
-    let encodedBytes = 0;
-    for (const batch of state.batches) {
-      rows += batch.rows.length;
-      encodedBytes += batch.encodedBytes;
-      if (batch.guildIds.length > 0) this.queuedGuildBatches -= 1;
-      this.pendingKeys.delete(batch.batchKey);
+    this.spliceHead(state.batches);
+    return true;
+  }
+
+  /** Advance only durable leading commands after a later transaction failure.
+   *  The exact batch objects must be the head of both this live snapshot and
+   *  the queue, so a copied or reordered claim cannot release capacity. */
+  acknowledgeCommittedPrefix(
+    snapshot: BankLedgerOutboxSnapshot,
+    batches: readonly BankLedgerCommandBatch[],
+  ): boolean {
+    if (batches.length === 0 || this.closed) return false;
+    const state = this.snapshotStates.get(snapshot);
+    if (!state || state.consumed || batches.length > state.batches.length) return false;
+    for (let index = 0; index < batches.length; index++) {
+      if (batches[index] !== state.batches[index] || this.batches[index] !== batches[index]) {
+        return false;
+      }
     }
-    this.batches.splice(0, state.batches.length);
-    this.queuedRows -= rows;
-    this.queuedEncodedBytes -= encodedBytes;
-    budgetRelease(this.budget, rows, encodedBytes);
+    state.consumed = true;
+    this.spliceHead(batches as readonly PreparedBankLedgerCommandBatch[]);
     return true;
   }
 
@@ -688,5 +857,20 @@ export class BankLedgerOutbox {
       state.maxEncodedBytes - batch.encodedBytes,
     );
     return batch;
+  }
+
+  private spliceHead(batches: readonly PreparedBankLedgerCommandBatch[]): void {
+    let rows = 0;
+    let encodedBytes = 0;
+    for (const batch of batches) {
+      rows += batch.rows.length;
+      encodedBytes += batch.encodedBytes;
+      if (batch.guildIds.length > 0) this.queuedGuildBatches -= 1;
+      this.pendingKeys.delete(batch.batchKey);
+    }
+    this.batches.splice(0, batches.length);
+    this.queuedRows -= rows;
+    this.queuedEncodedBytes -= encodedBytes;
+    budgetRelease(this.budget, rows, encodedBytes);
   }
 }

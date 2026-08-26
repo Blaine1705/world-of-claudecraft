@@ -1,13 +1,17 @@
 // Transactional persistence for the bounded bank-ledger outbox. The caller
-// owns the transaction and has already taken the character save FIFO plus any
-// guild-book locks. This module claims immutable command receipts and inserts
+// owns the transaction and has already taken the character save FIFO plus the
+// account parent lock and character fence. This classifier deliberately runs
+// before any guild-book lock. It claims immutable command receipts and inserts
 // only newly claimed commands, in caller order, in one PostgreSQL statement.
 
 import { createHash } from 'node:crypto';
 import {
   BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH,
   type BankLedgerCommandBatch,
+  bankLedgerCommandBatchFingerprintJson,
+  type SerializedBankLedgerGuildEffect,
   type SerializedBankLedgerOutboxRow,
+  serializeBankLedgerGuildEffect,
 } from './bank_ledger_outbox';
 
 /**
@@ -59,12 +63,27 @@ interface ExpectedReceipt {
   readonly batchKey: string;
   readonly rowCount: number;
   readonly payloadSha256: string;
+  readonly batch: BankLedgerCommandBatch;
+  readonly guildEffect: SerializedBankLedgerGuildEffect | null;
 }
 
 interface PreparedWrite {
   readonly values: unknown[];
   readonly receipts: readonly ExpectedReceipt[];
-  readonly guildIds: readonly number[];
+}
+
+export interface BankLedgerBatchClaim {
+  /** Exact input object, used by the owning outbox as durable-prefix evidence. */
+  readonly batch: BankLedgerCommandBatch;
+  readonly newlyClaimed: boolean;
+  /** Detached replay payload verified by this command's receipt hash. */
+  readonly guildEffect: SerializedBankLedgerGuildEffect | null;
+}
+
+export interface BankLedgerBatchWriteResult {
+  readonly batches: readonly BankLedgerBatchClaim[];
+  /** The only legal prior-commit shape: a leading, exact input-object prefix. */
+  readonly alreadyCommittedPrefix: readonly BankLedgerCommandBatch[];
 }
 
 const BATCH_KEY_SHAPE = /^[A-Za-z0-9_.:-]+$/;
@@ -123,8 +142,8 @@ function normalizedRow(row: SerializedBankLedgerOutboxRow): SerializedBankLedger
   };
 }
 
-function payloadSha256(batchKey: string, rows: readonly SerializedBankLedgerOutboxRow[]): string {
-  return createHash('sha256').update(JSON.stringify({ batchKey, rows })).digest('hex');
+function payloadSha256(batch: BankLedgerCommandBatch): string {
+  return createHash('sha256').update(bankLedgerCommandBatchFingerprintJson(batch)).digest('hex');
 }
 
 function prepareWrite(
@@ -137,7 +156,6 @@ function prepareWrite(
   }
 
   const seenBatchKeys = new Set<string>();
-  const guildIds = new Set<number>();
   const receipts: ExpectedReceipt[] = [];
 
   const receiptOrdinals: number[] = [];
@@ -179,6 +197,13 @@ function prepareWrite(
       throw new RangeError(`bank ledger batch ${batch.batchKey} must contain at least one row`);
     }
 
+    // This validates the complete receipt shape, including guild sidecar
+    // correlation, before the first query and returns no caller-owned alias.
+    const guildEffect = batch.guildEffect
+      ? serializeBankLedgerGuildEffect(batch.guildEffect)
+      : null;
+    const hash = payloadSha256(batch);
+
     const normalizedRows: SerializedBankLedgerOutboxRow[] = [];
     for (let rowOrdinal = 0; rowOrdinal < batch.rows.length; rowOrdinal++) {
       const sourceRow = batch.rows[rowOrdinal];
@@ -213,13 +238,8 @@ function prepareWrite(
       rowContainerIds.push(value.containerId);
       rowCounterpartyCopperDeltas.push(value.counterpartyCopperDelta);
       rowCounterpartyCounts.push(value.counterpartyCount);
-
-      if (value.container === 'guild' && value.containerId !== null) {
-        guildIds.add(value.containerId);
-      }
     }
 
-    const hash = payloadSha256(batch.batchKey, normalizedRows);
     receiptOrdinals.push(batchOrdinal);
     receiptKeys.push(batch.batchKey);
     receiptRealms.push(owner.realm);
@@ -232,6 +252,8 @@ function prepareWrite(
       batchKey: batch.batchKey,
       rowCount: normalizedRows.length,
       payloadSha256: hash,
+      batch,
+      guildEffect,
     });
   }
 
@@ -262,7 +284,6 @@ function prepareWrite(
       rowCounterpartyCounts,
     ],
     receipts,
-    guildIds: Object.freeze([...guildIds].sort((a, b) => a - b)),
   };
 }
 
@@ -369,7 +390,7 @@ async function executePreparedWrite(
   tx: BankLedgerBatchQueryable,
   owner: BankLedgerBatchOwner,
   prepared: PreparedWrite,
-): Promise<readonly number[]> {
+): Promise<BankLedgerBatchWriteResult> {
   const result = await tx.query(WRITE_BANK_LEDGER_COMMAND_BATCHES_SQL, prepared.values);
   if (result.rows.length !== prepared.receipts.length) {
     throw new Error(
@@ -379,6 +400,9 @@ async function executePreparedWrite(
 
   let expectedInsertedRows = 0;
   let reportedInsertedRows: number | null = null;
+  let sawNew = false;
+  const claims: BankLedgerBatchClaim[] = [];
+  const alreadyCommittedPrefix: BankLedgerCommandBatch[] = [];
   for (let index = 0; index < prepared.receipts.length; index++) {
     const expected = prepared.receipts[index];
     const row = result.rows[index];
@@ -400,7 +424,24 @@ async function executePreparedWrite(
       throw receiptVerificationFailed(expected.batchKey);
     }
 
-    if (newlyClaimed) expectedInsertedRows += expected.rowCount;
+    if (newlyClaimed) {
+      sawNew = true;
+      expectedInsertedRows += expected.rowCount;
+    } else {
+      if (sawNew) {
+        throw new Error(
+          `bank ledger receipt ordering invalid: existing batch ${expected.batchKey} follows a new batch`,
+        );
+      }
+      alreadyCommittedPrefix.push(expected.batch);
+    }
+    claims.push(
+      Object.freeze({
+        batch: expected.batch,
+        newlyClaimed,
+        guildEffect: expected.guildEffect,
+      }),
+    );
     if (reportedInsertedRows === null) reportedInsertedRows = insertedRows;
     else if (reportedInsertedRows !== insertedRows) {
       throw new Error('bank ledger inserted row count was inconsistent across receipts');
@@ -412,7 +453,10 @@ async function executePreparedWrite(
       `bank ledger inserted row count mismatch: expected ${expectedInsertedRows}, got ${reportedInsertedRows}`,
     );
   }
-  return prepared.guildIds;
+  return Object.freeze({
+    batches: Object.freeze(claims),
+    alreadyCommittedPrefix: Object.freeze(alreadyCommittedPrefix),
+  });
 }
 
 /**
@@ -426,8 +470,12 @@ export function writeBankLedgerCommandBatches(
   tx: BankLedgerBatchQueryable,
   owner: BankLedgerBatchOwner,
   batches: readonly BankLedgerCommandBatch[],
-): Promise<readonly number[]> {
+): Promise<BankLedgerBatchWriteResult> {
   const prepared = prepareWrite(owner, batches);
-  if (prepared.receipts.length === 0) return Promise.resolve(Object.freeze([]));
+  if (prepared.receipts.length === 0) {
+    return Promise.resolve(
+      Object.freeze({ batches: Object.freeze([]), alreadyCommittedPrefix: Object.freeze([]) }),
+    );
+  }
   return executePreparedWrite(tx, owner, prepared);
 }

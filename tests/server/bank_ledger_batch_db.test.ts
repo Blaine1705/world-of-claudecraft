@@ -11,8 +11,10 @@ import {
 } from '../../server/bank_ledger_batch_db';
 import type {
   BankLedgerCommandBatch,
+  SerializedBankLedgerGuildEffect,
   SerializedBankLedgerOutboxRow,
 } from '../../server/bank_ledger_outbox';
+import { BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS } from '../../server/bank_ledger_outbox';
 
 interface CapturedQuery {
   text: string;
@@ -49,14 +51,40 @@ function row(
 function batch(
   batchKey: string,
   rows: readonly SerializedBankLedgerOutboxRow[],
+  guildEffect: SerializedBankLedgerGuildEffect | null = null,
 ): BankLedgerCommandBatch {
-  return { batchKey, rows, encodedBytes: 1 };
+  return { batchKey, rows, encodedBytes: 1, guildEffect };
 }
 
 function fingerprint(value: BankLedgerCommandBatch): string {
   return createHash('sha256')
-    .update(JSON.stringify({ batchKey: value.batchKey, rows: value.rows }))
+    .update(
+      JSON.stringify({
+        batchKey: value.batchKey,
+        rows: value.rows,
+        guildEffect: value.guildEffect ?? null,
+      }),
+    )
     .digest('hex');
+}
+
+function guildEffect(
+  guildId: number,
+  rows: readonly SerializedBankLedgerOutboxRow[],
+): SerializedBankLedgerGuildEffect {
+  return {
+    guildId,
+    deltas: rows.map((value) => ({
+      op: value.op as 'deposit' | 'withdraw' | 'deposit_gold',
+      itemId: value.itemId,
+      count: value.count,
+      instanceJson: value.instanceJson,
+      craftedRecipeId: value.itemId === 'crafted_blade' ? 'recipe.blade' : null,
+      copperDelta: value.copperDelta,
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: value.purchasedSlotsAfter,
+    })),
+  };
 }
 
 function successfulVerification(
@@ -129,7 +157,7 @@ describe('bank ledger batch receipt DDL', () => {
 
 describe('writeBankLedgerCommandBatches', () => {
   it('uses one statement and flattens receipt and ledger columns in command order', async () => {
-    const first = batch('session.1', [
+    const firstRows = [
       row(),
       row({
         op: 'withdraw',
@@ -143,8 +171,9 @@ describe('writeBankLedgerCommandBatches', () => {
         counterpartyCopperDelta: 25,
         counterpartyCount: 1,
       }),
-    ]);
-    const second = batch('session.2', [
+    ];
+    const first = batch('session.1', firstRows, guildEffect(99, [firstRows[1]]));
+    const secondRows = [
       row({
         op: 'deposit_gold',
         itemId: null,
@@ -155,11 +184,12 @@ describe('writeBankLedgerCommandBatches', () => {
         containerId: 15,
         counterpartyCopperDelta: -50,
       }),
-    ]);
+    ];
+    const second = batch('session.2', secondRows, guildEffect(15, secondRows));
     const batches = [first, second];
     const cap = captureWith(() => successfulVerification(batches));
 
-    const guildIds = await writeBankLedgerCommandBatches(cap.db, OWNER, batches);
+    const result = await writeBankLedgerCommandBatches(cap.db, OWNER, batches);
 
     expect(cap.calls).toHaveLength(1);
     const call = cap.calls[0];
@@ -197,17 +227,21 @@ describe('writeBankLedgerCommandBatches', () => {
       [null, 25, -50],
       [null, 1, null],
     ]);
-    expect(guildIds).toEqual([15, 99]);
-    expect(Object.isFrozen(guildIds)).toBe(true);
+    expect(result.batches.map((claim) => claim.batch)).toEqual(batches);
+    expect(result.batches.every((claim) => claim.newlyClaimed)).toBe(true);
+    expect(result.alreadyCommittedPrefix).toEqual([]);
+    expect(Object.isFrozen(result.batches)).toBe(true);
   });
 
   it('accepts a matching lost-COMMIT retry and requires zero new ledger rows', async () => {
-    const value = batch('storage:already-committed', [
-      row({ container: 'guild', containerId: 81 }),
-    ]);
+    const rows = [row({ container: 'guild', containerId: 81 })];
+    const value = batch('storage:already-committed', rows, guildEffect(81, rows));
     const cap = captureWith(() => successfulVerification([value], [false]));
 
-    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [value])).resolves.toEqual([81]);
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [value])).resolves.toMatchObject({
+      batches: [{ batch: value, newlyClaimed: false }],
+      alreadyCommittedPrefix: [value],
+    });
     expect(cap.calls).toHaveLength(1);
   });
 
@@ -247,6 +281,56 @@ describe('writeBankLedgerCommandBatches', () => {
     );
   });
 
+  it('accepts only an existing prefix followed by a new suffix', async () => {
+    const values = [
+      batch('session.existing.1', [row()]),
+      batch('session.existing.2', [row()]),
+      batch('session.new.1', [row()]),
+      batch('session.new.2', [row()]),
+    ];
+    const cap = captureWith(() => successfulVerification(values, [false, false, true, true]));
+
+    const result = await writeBankLedgerCommandBatches(cap.db, OWNER, values);
+    expect(result.batches.map((claim) => claim.newlyClaimed)).toEqual([false, false, true, true]);
+    expect(result.alreadyCommittedPrefix).toEqual(values.slice(0, 2));
+
+    const invalid = captureWith(() => successfulVerification(values, [false, true, false, true]));
+    await expect(writeBankLedgerCommandBatches(invalid.db, OWNER, values)).rejects.toThrow(
+      /existing batch .* follows a new batch/,
+    );
+    expect(invalid.calls).toHaveLength(1);
+  });
+
+  it('binds crafted provenance and both ladder witnesses into the receipt fingerprint', async () => {
+    const rows = [row({ container: 'guild', containerId: 19 })];
+    const base = batch('session.guild.fingerprint', rows, guildEffect(19, rows));
+    const changedRecipe = batch('session.guild.fingerprint', rows, {
+      ...guildEffect(19, rows),
+      deltas: [{ ...guildEffect(19, rows).deltas[0], craftedRecipeId: 'recipe.other' }],
+    });
+    const changedBefore = batch('session.guild.fingerprint', rows, {
+      ...guildEffect(19, rows),
+      deltas: [{ ...guildEffect(19, rows).deltas[0], purchasedSlotsBefore: 24 }],
+    });
+    const changedAfterRows = [{ ...rows[0], purchasedSlotsAfter: 30 }];
+    const changedAfter = batch(
+      'session.guild.fingerprint',
+      changedAfterRows,
+      guildEffect(19, changedAfterRows),
+    );
+
+    const expectedHash = fingerprint(base);
+    for (const changed of [changedRecipe, changedBefore, changedAfter]) {
+      expect(fingerprint(changed)).not.toBe(expectedHash);
+      const cap = captureWith(() => [
+        { ...successfulVerification([changed], [false])[0], stored_payload_sha256: expectedHash },
+      ]);
+      await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [changed])).rejects.toThrow(
+        /receipt verification failed/,
+      );
+    }
+  });
+
   it('validates owner, keys, nonempty rows, and row ownership before querying', () => {
     const cap = captureWith(() => []);
     const mismatch = batch('session.owner', [row({ characterId: OWNER.characterId + 1 })]);
@@ -273,7 +357,23 @@ describe('writeBankLedgerCommandBatches', () => {
 
   it('does no query for a valid empty snapshot', async () => {
     const cap = captureWith(() => []);
-    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [])).resolves.toEqual([]);
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [])).resolves.toEqual({
+      batches: [],
+      alreadyCommittedPrefix: [],
+    });
     expect(cap.calls).toHaveLength(0);
+  });
+
+  it('keeps the row-saturated outbox prefix to one classification query', async () => {
+    const batches = Array.from(
+      { length: BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows },
+      (_, index) => batch(`session.max.${index}`, [row({ itemId: `material_${index}` })]),
+    );
+    const cap = captureWith(() => successfulVerification(batches));
+
+    const result = await writeBankLedgerCommandBatches(cap.db, OWNER, batches);
+    expect(cap.calls).toHaveLength(1);
+    expect(result.batches).toHaveLength(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows);
+    expect(cap.calls[0].text.match(/WITH receipt_input AS/g)).toHaveLength(1);
   });
 });

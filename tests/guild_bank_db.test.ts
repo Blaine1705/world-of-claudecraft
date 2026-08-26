@@ -15,15 +15,18 @@ vi.mock('pg', () => ({
   },
 }));
 
+import { serializeBankLedgerCommandBatch } from '../server/bank_ledger_outbox';
 import {
+  type BankLedgerSaveEffects,
   GUILD_BANK_BOOT_BATCH,
   GUILD_BANK_ROW_MAX_BYTES,
   type GuildBankWriteResult,
   loadGuildBankRows,
   openMarketWriteGate,
-  saveCharacterAndGuildBankState,
-  saveCharacterAndMarketState,
+  saveCharacterAndGuildBankState as saveGuildDb,
+  saveCharacterAndMarketState as saveMarketDb,
 } from '../server/db';
+import type { GuildBankSave } from '../server/guild_bank_state';
 import { REALM } from '../server/realm';
 import { SOCIAL_SCHEMA } from '../server/social_db';
 import type { StorageAppliedEffect } from '../server/storage_purchase_db';
@@ -34,10 +37,34 @@ beforeEach(() => {
   dbMock.connect.mockReset();
   dbMock.query.mockResolvedValue({ rows: [], rowCount: 0 } as never);
   openMarketWriteGate();
+  batchSeq = 0;
 });
 
 function clientStub(rowCounts?: (sql: string) => number) {
-  const query = vi.fn().mockImplementation((sql: string) => {
+  const query = vi.fn().mockImplementation((sql: string, values?: unknown[]) => {
+    if (/SELECT id FROM accounts/i.test(sql)) {
+      return Promise.resolve({ rows: [{ id: Number(values?.[0]) }], rowCount: 1 });
+    }
+    if (/WITH receipt_input AS/i.test(sql)) {
+      const params = values as unknown[];
+      const ordinals = params[0] as number[];
+      const rowCounts = params[5] as number[];
+      return Promise.resolve({
+        rows: ordinals.map((ordinal, index) => ({
+          batch_ordinal: ordinal,
+          batch_key: (params[1] as string[])[index],
+          newly_claimed: true,
+          stored_batch_key: (params[1] as string[])[index],
+          stored_realm: (params[2] as string[])[index],
+          stored_character_id: (params[3] as number[])[index],
+          stored_account_id: (params[4] as number[])[index],
+          stored_row_count: rowCounts[index],
+          stored_payload_sha256: (params[6] as string[])[index],
+          inserted_row_count: rowCounts.reduce((sum, count) => sum + count, 0),
+        })),
+        rowCount: ordinals.length,
+      });
+    }
     return Promise.resolve({ rows: [], rowCount: rowCounts ? rowCounts(String(sql)) : 0 });
   });
   const release = vi.fn();
@@ -83,6 +110,82 @@ const DEPOSIT_FANGS = {
 };
 const SAVE_7 = { guildId: 7, deltas: [DEPOSIT_GOLD, DEPOSIT_FANGS] };
 const SAVE_9 = { guildId: 9, deltas: [DEPOSIT_GOLD] };
+let batchSeq = 0;
+
+function effectsFor(characterId: number, saves: readonly GuildBankSave[]): BankLedgerSaveEffects {
+  return {
+    owner: { realm: REALM, characterId, accountId: 7 },
+    batches: saves.flatMap((save) =>
+      save.deltas.map((delta) =>
+        serializeBankLedgerCommandBatch(
+          `test.guild.${++batchSeq}`,
+          [
+            {
+              realm: REALM,
+              characterId,
+              accountId: 7,
+              op: delta.op,
+              itemId: delta.itemId,
+              count: delta.count,
+              instance: delta.instance,
+              copperDelta: delta.copperDelta,
+              purchasedSlotsAfter: delta.purchasedSlotsAfter,
+              container: 'guild',
+              containerId: save.guildId,
+              counterpartyCopperDelta: null,
+              counterpartyCount: null,
+            },
+          ],
+          { guildId: save.guildId, deltas: [delta] },
+        ),
+      ),
+    ),
+  };
+}
+
+function saveCharacterAndGuildBankState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  saves: readonly GuildBankSave[],
+  leaseNonce?: string,
+  results?: GuildBankWriteResult[],
+  storageEffects: readonly StorageAppliedEffect[] = [],
+) {
+  return saveGuildDb(
+    characterId,
+    level,
+    state,
+    saves,
+    leaseNonce,
+    results,
+    storageEffects,
+    effectsFor(characterId, saves),
+  );
+}
+
+function saveCharacterAndMarketState(
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  market: MarketSave,
+  mail: MailSave,
+  leaseNonce?: string,
+  saves?: readonly GuildBankSave[],
+) {
+  return saveMarketDb(
+    characterId,
+    level,
+    state,
+    market,
+    mail,
+    leaseNonce,
+    saves,
+    undefined,
+    [],
+    saves ? effectsFor(characterId, saves) : undefined,
+  );
+}
 const STORAGE_EFFECT: StorageAppliedEffect = {
   realm: REALM,
   accountId: 7,
@@ -96,9 +199,28 @@ const STORAGE_EFFECT: StorageAppliedEffect = {
 };
 
 function storageEffectClient() {
-  const query = vi.fn(async (sql: string) => {
+  const query = vi.fn(async (sql: string, values?: unknown[]) => {
     if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
     if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: 1 };
+    if (/WITH receipt_input AS/i.test(sql)) {
+      const params = values as unknown[];
+      const rowCounts = params[5] as number[];
+      return {
+        rows: (params[0] as number[]).map((ordinal, index) => ({
+          batch_ordinal: ordinal,
+          batch_key: (params[1] as string[])[index],
+          newly_claimed: true,
+          stored_batch_key: (params[1] as string[])[index],
+          stored_realm: (params[2] as string[])[index],
+          stored_character_id: (params[3] as number[])[index],
+          stored_account_id: (params[4] as number[])[index],
+          stored_row_count: rowCounts[index],
+          stored_payload_sha256: (params[6] as string[])[index],
+          inserted_row_count: rowCounts.reduce((sum, count) => sum + count, 0),
+        })),
+        rowCount: rowCounts.length,
+      };
+    }
     if (/FROM storage_purchase_applied_receipts/i.test(sql)) return { rows: [], rowCount: 0 };
     if (/FROM storage_purchases[\s\S]*FOR UPDATE/i.test(sql)) {
       return {
@@ -154,7 +276,7 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
       42,
       5,
       STATE,
-      [SAVE_7, SAVE_9],
+      [SAVE_9, SAVE_7],
       'nonce-1',
       results,
     );
@@ -257,9 +379,10 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
 
   it('a failing book write rolls the character half back too and rethrows', async () => {
     const client = clientStub(() => 1);
-    client.query.mockImplementation((sql: string) => {
+    const ordinaryQuery = client.query.getMockImplementation();
+    client.query.mockImplementation((sql: string, values?: unknown[]) => {
       if (/INSERT INTO guild_banks/i.test(String(sql))) throw new Error('book boom');
-      return Promise.resolve({ rows: [], rowCount: 1 });
+      return ordinaryQuery?.(sql, values);
     });
     dbMock.connect.mockResolvedValueOnce(client as never);
 

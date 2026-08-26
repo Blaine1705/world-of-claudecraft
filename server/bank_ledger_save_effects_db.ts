@@ -2,8 +2,15 @@
 // bank-ledger batch writer. Validation stays query-free, account parents lock
 // before their character child, and callers keep ownership of BEGIN/COMMIT.
 
-import { type BankLedgerBatchOwner, writeBankLedgerCommandBatches } from './bank_ledger_batch_db';
-import type { BankLedgerCommandBatch } from './bank_ledger_outbox';
+import {
+  type BankLedgerBatchOwner,
+  type BankLedgerBatchWriteResult,
+  writeBankLedgerCommandBatches,
+} from './bank_ledger_batch_db';
+import {
+  type BankLedgerCommandBatch,
+  bankLedgerCommandBatchFingerprintJson,
+} from './bank_ledger_outbox';
 import { REALM } from './realm';
 import {
   lockStorageAppliedEffectAccountsOnClient,
@@ -13,6 +20,51 @@ import {
 export interface BankLedgerSaveEffects {
   readonly owner: BankLedgerBatchOwner;
   readonly batches: readonly BankLedgerCommandBatch[];
+}
+
+export interface BankLedgerCommittedPrefixEvidence {
+  readonly owner: BankLedgerBatchOwner;
+  readonly batches: readonly BankLedgerCommandBatch[];
+}
+
+const committedPrefixEvidence = new WeakMap<object, BankLedgerCommittedPrefixEvidence>();
+
+/** Read the ledger-only durable evidence attached to a later save failure.
+ *  Storage effects are deliberately absent: their receipt owns its own retry. */
+export function bankLedgerCommittedPrefixForError(
+  error: unknown,
+): BankLedgerCommittedPrefixEvidence | null {
+  if ((typeof error !== 'object' && typeof error !== 'function') || error === null) return null;
+  return committedPrefixEvidence.get(error) ?? null;
+}
+
+/** Preserve only the verified pre-existing prefix. Newly claimed commands may
+ *  have rolled back, and an ambiguous COMMIT provides no stronger evidence. */
+export function attachBankLedgerCommittedPrefixToError(
+  error: unknown,
+  effects: BankLedgerSaveEffects | undefined,
+  result: BankLedgerBatchWriteResult | undefined,
+): void {
+  if (
+    !effects ||
+    !result ||
+    result.alreadyCommittedPrefix.length === 0 ||
+    (typeof error !== 'object' && typeof error !== 'function') ||
+    error === null
+  ) {
+    return;
+  }
+  committedPrefixEvidence.set(
+    error,
+    Object.freeze({
+      owner: Object.freeze({
+        realm: effects.owner.realm,
+        characterId: effects.owner.characterId,
+        accountId: effects.owner.accountId,
+      }),
+      batches: result.alreadyCommittedPrefix,
+    }),
+  );
 }
 
 interface Queryable {
@@ -124,9 +176,18 @@ export function prepareBankLedgerSaveEffects(
   }
   const allowedGuilds = new Set(allowedGuildIds);
   for (const batch of batches) {
+    // Full receipt/sidecar validation is deliberately synchronous. This also
+    // rejects an ordinary guild row without its command-owned sidecar.
+    bankLedgerCommandBatchFingerprintJson(batch);
+    if (batch.guildEffect && !allowedGuilds.has(batch.guildEffect.guildId)) {
+      throw new Error('bank ledger guild effect requires a matching guild bank save');
+    }
     for (const row of batch.rows) {
       if (
         row.container === 'guild' &&
+        row.op !== 'create_fee' &&
+        row.op !== 'escrow_deficit' &&
+        row.op !== 'counterparty_orphan' &&
         (row.containerId === null || !allowedGuilds.has(row.containerId))
       ) {
         throw new Error('bank ledger guild rows require a matching guild bank save');
@@ -173,6 +234,7 @@ export async function lockCharacterSaveEffectAccountsOnClient(
 export async function writeBankLedgerSaveEffectsOnClient(
   db: Queryable,
   effects: BankLedgerSaveEffects | undefined,
-): Promise<void> {
-  if (effects) await writeBankLedgerCommandBatches(db, effects.owner, effects.batches);
+): Promise<BankLedgerBatchWriteResult> {
+  if (effects) return writeBankLedgerCommandBatches(db, effects.owner, effects.batches);
+  return Object.freeze({ batches: Object.freeze([]), alreadyCommittedPrefix: Object.freeze([]) });
 }

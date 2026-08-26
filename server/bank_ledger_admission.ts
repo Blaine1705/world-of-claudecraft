@@ -4,7 +4,7 @@
 // session's entire remaining byte allowance while one event-loop turn mutates
 // the Sim and computes its exact rows.
 
-import type { BankLedgerOutbox } from './bank_ledger_outbox';
+import type { BankLedgerGuildEffectInput, BankLedgerOutbox } from './bank_ledger_outbox';
 import type { BankLedgerRow } from './db';
 
 /**
@@ -28,13 +28,21 @@ export const BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES = 256;
 
 /** Formal worst-case legal batch allowance. The extra byte per row prices the
  *  array separator, deliberately including one more than JSON needs. */
-export function bankLedgerSyncMinimumEncodedBytes(maxRows: number): number {
+export function bankLedgerSyncMinimumEncodedBytes(
+  maxRows: number,
+  maxGuildEffectDeltas = 0,
+): number {
   if (!Number.isSafeInteger(maxRows) || maxRows <= 0) {
     throw new RangeError('bank ledger admission maxRows must be a positive safe integer');
   }
+  if (!Number.isSafeInteger(maxGuildEffectDeltas) || maxGuildEffectDeltas < 0) {
+    throw new RangeError(
+      'bank ledger admission maxGuildEffectDeltas must be a non-negative safe integer',
+    );
+  }
   const minimumEncodedBytes =
     BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES +
-    maxRows * (BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES + 1);
+    (maxRows + maxGuildEffectDeltas) * (BANK_LEDGER_SYNC_SERIALIZED_ROW_CEILING_BYTES + 1);
   if (!Number.isSafeInteger(minimumEncodedBytes)) {
     throw new RangeError('bank ledger admission byte allowance exceeds the safe integer range');
   }
@@ -43,7 +51,7 @@ export function bankLedgerSyncMinimumEncodedBytes(maxRows: number): number {
 
 export interface BankLedgerAdmissionHandle {
   /** Commit one logical command. Empty rows cancel the reservation. */
-  commit(rows: readonly BankLedgerRow[]): boolean;
+  commit(rows: readonly BankLedgerRow[], guildEffect?: BankLedgerGuildEffectInput | null): boolean;
   /** Release a no-op or refused mutation. Repeated completion is a no-op. */
   cancel(): boolean;
   /** Quarantine signal for a failure after the Sim already mutated. Capacity
@@ -54,7 +62,7 @@ export interface BankLedgerAdmissionHandle {
 
 /** Structural seam accepted by synchronous bank and vault wire dispatchers. */
 export interface BankLedgerAdmission {
-  tryReserve(maxRows: number): BankLedgerAdmissionHandle | null;
+  tryReserve(maxRows: number, maxGuildEffectDeltas?: number): BankLedgerAdmissionHandle | null;
 }
 
 export interface BankLedgerOutboxAdmissionOptions {
@@ -78,8 +86,8 @@ export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
     this.onProjectionFailure = options.onProjectionFailure;
   }
 
-  tryReserve(maxRows: number): BankLedgerAdmissionHandle | null {
-    const minimumEncodedBytes = bankLedgerSyncMinimumEncodedBytes(maxRows);
+  tryReserve(maxRows: number, maxGuildEffectDeltas = 0): BankLedgerAdmissionHandle | null {
+    const minimumEncodedBytes = bankLedgerSyncMinimumEncodedBytes(maxRows, maxGuildEffectDeltas);
     const usage = this.outbox.usage;
     const remainingEncodedBytes =
       this.outbox.limits.maxEncodedBytes - usage.queuedEncodedBytes - usage.reservedEncodedBytes;
@@ -93,9 +101,15 @@ export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
 
     let active = true;
     return Object.freeze({
-      commit: (rows: readonly BankLedgerRow[]): boolean => {
+      commit: (
+        rows: readonly BankLedgerRow[],
+        guildEffect?: BankLedgerGuildEffectInput | null,
+      ): boolean => {
         if (!active) return false;
         if (rows.length === 0) {
+          if (guildEffect) {
+            throw new Error('bank ledger guild effect cannot commit without ledger rows');
+          }
           const cancelled = this.outbox.cancel(reservation);
           active = false;
           return cancelled;
@@ -103,7 +117,7 @@ export class BankLedgerOutboxAdmission implements BankLedgerAdmission {
         // A failure here happens after the guarded Sim call. Keep the handle
         // active and the full reservation charged so the live host can detect
         // the terminal condition, quarantine, and refuse to save the mutation.
-        this.outbox.commit(reservation, rows);
+        this.outbox.commit(reservation, rows, guildEffect);
         active = false;
         return true;
       },

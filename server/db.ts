@@ -25,8 +25,12 @@ import {
   tokenInfoFromRow,
 } from './auth_guard_core';
 import type { BankBonusFacts } from './bank_entitlements';
-import { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } from './bank_ledger_batch_db';
 import {
+  BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
+  type BankLedgerBatchWriteResult,
+} from './bank_ledger_batch_db';
+import {
+  attachBankLedgerCommittedPrefixToError,
   type BankLedgerSaveEffects,
   characterUpdateStatement,
   lockCharacterSaveEffectAccountsOnClient as lockSaveEffectAccounts,
@@ -59,11 +63,11 @@ import {
 import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
 import {
-  GuildBankEscrowRefused,
-  type GuildBankSave,
-  type GuildBankWriteResult,
-  mergeGuildBankRow,
-} from './guild_bank_state';
+  GUILD_BANK_ROW_MAX_BYTES,
+  prepareGuildBankReceiptReplay,
+  writeClaimedGuildBankEffectsOnClient,
+} from './guild_bank_receipt_db';
+import type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
 import { MAPS_SCHEMA } from './maps_db';
 import {
@@ -101,6 +105,7 @@ import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
 
 export type { BankLedgerSaveEffects } from './bank_ledger_save_effects_db';
+export { GUILD_BANK_ROW_MAX_BYTES } from './guild_bank_receipt_db';
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
 // db.ts can import it without a cycle). Only marketStateKey was ever part of
@@ -3428,6 +3433,7 @@ export async function saveCharacterState(
     return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
   }
   const client = await pool.connect();
+  let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await client.query('BEGIN');
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
@@ -3437,12 +3443,13 @@ export async function saveCharacterState(
       await client.query('ROLLBACK');
       return false;
     }
-    await writeBankLedgerSaveEffectsOnClient(client, ledger);
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
     await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
+    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
     throw err;
   } finally {
     client.release();
@@ -3472,8 +3479,10 @@ export async function saveCharacterAndMarketState(
     ledgerEffects,
     guildBanks?.map((book) => book.guildId),
   );
+  const guildReplay = prepareGuildBankReceiptReplay(guildBanks ?? [], ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
+  let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await client.query('BEGIN');
     // Wait out slow storage without exceeding the bounded heavy allowance.
@@ -3495,6 +3504,7 @@ export async function saveCharacterAndMarketState(
       await client.query('ROLLBACK');
       return false;
     }
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
     await client.query(
       `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
        ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
@@ -3512,13 +3522,13 @@ export async function saveCharacterAndMarketState(
     // the character UPDATE above already passed the lease fence, so these can
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
-    await writeGuildBankRows(client, guildBanks ?? [], results);
-    await writeBankLedgerSaveEffectsOnClient(client, ledger);
+    await writeClaimedGuildBankEffectsOnClient(client, guildReplay, ledgerWrite, results);
     await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
+    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
     throw err;
   } finally {
     client.release();
@@ -3539,96 +3549,6 @@ export async function saveCharacterAndMarketState(
 export type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
 export { GuildBankEscrowRefused } from './guild_bank_state';
 
-// Write every carried book inside the already-fenced transaction, then decide
-// the transaction's fate on the result. A refused book half ABORTS the whole
-// thing, character row included: the two halves commit together or not at all,
-// and "commit the character and record that the book could not follow" is a
-// receipt for a mint, not a mitigation. The caller retries; see
-// server/game.ts handleGuildBankEscrowRefusal for what happens when a retry
-// can never succeed.
-async function writeGuildBankRows(
-  client: { query: (text: string, values: unknown[]) => Promise<unknown> },
-  guildBanks: readonly GuildBankSave[],
-  results?: GuildBankWriteResult[],
-): Promise<void> {
-  const written: GuildBankWriteResult[] = [];
-  for (const gb of guildBanks) {
-    written.push(await writeGuildBankRow(client, gb));
-  }
-  results?.push(...written);
-  if (written.some((r) => !r.written)) {
-    await client.query('ROLLBACK', []);
-    throw new GuildBankEscrowRefused(written);
-  }
-}
-
-// The one guild_banks write, only ever issued on a client that is inside the
-// fenced escrow transaction (see the section comment above), and always a
-// READ-MODIFY-WRITE rather than a blind blob overwrite:
-//
-//   SELECT ... FOR UPDATE  ->  mergeGuildBankRow(durable, this session's own
-//   deltas)  ->  upsert
-//
-// The row lock is what makes the merge safe across PROCESSES (in-process, the
-// market serial writer already means no two book transactions overlap, but the
-// lease system exists precisely because more than one process can contend for
-// the same character, and a realm's book rows are reachable from any process
-// holding a lease). It is a primary-key lock, sub-millisecond and free in the
-// uncontended case. Reading OUTSIDE the transaction instead would be a
-// lost-update window: two saves could read the same base and the later write
-// would discard the earlier's deltas.
-//
-// The read is issued AFTER the fenced character UPDATE has already passed, so
-// a fence miss still rolls back before any book row is touched or locked.
-//
-// The same size bound the boot read applies (GUILD_BANK_ROW_MAX_BYTES) is
-// applied here in SQL: an oversized blob never crosses the wire and its row is
-// PRESERVED rather than overwritten, exactly like the boot skip.
-async function writeGuildBankRow(
-  client: { query: (text: string, values: unknown[]) => Promise<unknown> },
-  gb: GuildBankSave,
-): Promise<GuildBankWriteResult> {
-  // Keyed on (guild_id, realm), not guild_id alone. Guild ids are globally
-  // unique, so the realm predicate cannot change which row this finds today; it
-  // is the discipline every sibling statement in this file already carries, and
-  // it means a realm that somehow met another realm's row locks and merges
-  // nothing rather than silently rewriting it.
-  const lockedRead = async () =>
-    (await client.query(
-      `SELECT octet_length(data::text) AS data_bytes,
-              CASE WHEN octet_length(data::text) <= $2 THEN data ELSE NULL END AS data
-         FROM guild_banks
-        WHERE guild_id = $1 AND realm = $3
-          FOR UPDATE`,
-      [gb.guildId, GUILD_BANK_ROW_MAX_BYTES, REALM],
-    )) as { rows: { data_bytes?: unknown; data?: unknown }[] };
-  let read = await lockedRead();
-  if (!read.rows?.[0]) {
-    // FOR UPDATE locks ROWS, so a guild with no row yet locks nothing and two
-    // processes could both merge onto the empty base, the second upsert
-    // discarding the first's deltas. Seed the empty row first (idempotent,
-    // and a no-op for every save after the guild's first), then re-read it
-    // under the lock. Only ever runs once per guild in the whole realm's life.
-    await client.query(
-      `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
-       ON CONFLICT (guild_id) DO NOTHING`,
-      [gb.guildId, REALM, JSON.stringify({ treasury: 0, inventory: [], purchasedSlots: 0 })],
-    );
-    read = await lockedRead();
-  }
-  const row = read.rows?.[0];
-  const oversized = row ? Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES : false;
-  const merged = mergeGuildBankRow(row ? (row.data ?? null) : null, gb.deltas, { oversized });
-  if (merged.data === null) return { guildId: gb.guildId, ...merged.result };
-  await client.query(
-    `INSERT INTO guild_banks (guild_id, realm, data, updated_at) VALUES ($1, $2, $3, now())
-     ON CONFLICT (guild_id) DO UPDATE SET realm = EXCLUDED.realm, data = EXCLUDED.data,
-       updated_at = now()`,
-    [gb.guildId, REALM, JSON.stringify(merged.data)],
-  );
-  return { guildId: gb.guildId, ...merged.result };
-}
-
 // Game-loop sibling of the market save: character + dirty guild books share a
 // fenced transaction. It needs no market gate because it writes no world_state.
 export async function saveCharacterAndGuildBankState(
@@ -3648,8 +3568,10 @@ export async function saveCharacterAndGuildBankState(
     ledgerEffects,
     guildBanks.map((book) => book.guildId),
   );
+  const guildReplay = prepareGuildBankReceiptReplay(guildBanks, ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
+  let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await client.query('BEGIN');
     // Escrow flushes use the bounded heavy allowance.
@@ -3670,13 +3592,14 @@ export async function saveCharacterAndGuildBankState(
       await client.query('ROLLBACK');
       return false;
     }
-    await writeGuildBankRows(client, guildBanks, results);
-    await writeBankLedgerSaveEffectsOnClient(client, ledger);
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
+    await writeClaimedGuildBankEffectsOnClient(client, guildReplay, ledgerWrite, results);
     await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
+    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
     throw err;
   } finally {
     client.release();
@@ -3692,8 +3615,6 @@ export async function saveCharacterAndGuildBankState(
 // leaving that guild's ops silently inert and the row untouched on disk
 // (items are never destroyed by a load path), rather than loading an empty
 // book that the next save would persist over the real row.
-export const GUILD_BANK_ROW_MAX_BYTES = 262_144;
-
 export interface GuildBankRow {
   guildId: number;
   // Parsed JSONB (pg hands objects, never strings), or null when the guild has
@@ -3782,9 +3703,15 @@ export async function saveCharacterStateOnClient(
       ? true
       : (res.rowCount ?? 0) > 0;
   if (!saved) return false;
-  await writeBankLedgerSaveEffectsOnClient(client, ledger);
-  await writeStorageAppliedEffectsOnClient(client, storageEffects);
-  return true;
+  let ledgerWrite: BankLedgerBatchWriteResult | undefined;
+  try {
+    ledgerWrite = await writeBankLedgerSaveEffectsOnClient(client, ledger);
+    await writeStorageAppliedEffectsOnClient(client, storageEffects);
+    return true;
+  } catch (err) {
+    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
+    throw err;
+  }
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {
