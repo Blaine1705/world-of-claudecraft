@@ -1,0 +1,279 @@
+// The transactional bank-ledger batch writer is exercised against a capturing
+// Queryable. These tests pin the one-round-trip SQL shape and the exact column
+// arrays; the caller owns the real transaction and rolls it back on a rejected
+// receipt verification.
+import { createHash } from 'node:crypto';
+import { describe, expect, it } from 'vitest';
+import {
+  BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
+  type BankLedgerBatchOwner,
+  writeBankLedgerCommandBatches,
+} from '../../server/bank_ledger_batch_db';
+import type {
+  BankLedgerCommandBatch,
+  SerializedBankLedgerOutboxRow,
+} from '../../server/bank_ledger_outbox';
+
+interface CapturedQuery {
+  text: string;
+  values: unknown[] | undefined;
+}
+
+const OWNER: BankLedgerBatchOwner = {
+  realm: 'moonbrook',
+  characterId: 42,
+  accountId: 7,
+};
+
+function row(
+  overrides: Partial<SerializedBankLedgerOutboxRow> = {},
+): SerializedBankLedgerOutboxRow {
+  return {
+    realm: OWNER.realm,
+    characterId: OWNER.characterId,
+    accountId: OWNER.accountId,
+    op: 'deposit',
+    itemId: 'linen_cloth',
+    count: 3,
+    instanceJson: null,
+    copperDelta: 0,
+    purchasedSlotsAfter: 0,
+    container: 'personal',
+    containerId: null,
+    counterpartyCopperDelta: null,
+    counterpartyCount: null,
+    ...overrides,
+  };
+}
+
+function batch(
+  batchKey: string,
+  rows: readonly SerializedBankLedgerOutboxRow[],
+): BankLedgerCommandBatch {
+  return { batchKey, rows, encodedBytes: 1 };
+}
+
+function fingerprint(value: BankLedgerCommandBatch): string {
+  return createHash('sha256')
+    .update(JSON.stringify({ batchKey: value.batchKey, rows: value.rows }))
+    .digest('hex');
+}
+
+function successfulVerification(
+  batches: readonly BankLedgerCommandBatch[],
+  newlyClaimed: readonly boolean[] = batches.map(() => true),
+): Record<string, unknown>[] {
+  const insertedRowCount = batches.reduce(
+    (total, value, index) => total + (newlyClaimed[index] ? value.rows.length : 0),
+    0,
+  );
+  return batches.map((value, index) => ({
+    batch_ordinal: index,
+    batch_key: value.batchKey,
+    newly_claimed: newlyClaimed[index],
+    stored_batch_key: value.batchKey,
+    stored_realm: OWNER.realm,
+    stored_character_id: OWNER.characterId,
+    stored_account_id: OWNER.accountId,
+    stored_row_count: value.rows.length,
+    stored_payload_sha256: fingerprint(value),
+    inserted_row_count: insertedRowCount,
+  }));
+}
+
+function captureWith(rowsFor: (values: unknown[]) => Record<string, unknown>[]): {
+  calls: CapturedQuery[];
+  db: {
+    query(
+      text: string,
+      values?: unknown[],
+    ): Promise<{ rows: Record<string, unknown>[]; rowCount: number }>;
+  };
+} {
+  const calls: CapturedQuery[] = [];
+  return {
+    calls,
+    db: {
+      async query(text: string, values?: unknown[]) {
+        calls.push({ text, values });
+        const rows = rowsFor(values ?? []);
+        return { rows, rowCount: rows.length };
+      },
+    },
+  };
+}
+
+describe('bank ledger batch receipt DDL', () => {
+  it('creates an append-only receipt with both cascade FKs fully indexed', () => {
+    const folded = BANK_LEDGER_BATCH_RECEIPTS_SCHEMA.replace(/\s+/g, ' ');
+
+    expect(folded).toContain(
+      'CREATE TABLE IF NOT EXISTS bank_ledger_batch_receipts ( batch_key TEXT PRIMARY KEY',
+    );
+    expect(folded).toContain(
+      'character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE',
+    );
+    expect(folded).toContain('account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE');
+    expect(folded).toContain('row_count INT NOT NULL');
+    expect(folded).toContain('payload_sha256 TEXT NOT NULL');
+    expect(folded).toContain('created_at TIMESTAMPTZ NOT NULL DEFAULT now()');
+    expect(folded).toContain(
+      'CREATE INDEX IF NOT EXISTS bank_ledger_batch_receipts_character ON bank_ledger_batch_receipts (character_id);',
+    );
+    expect(folded).toContain(
+      'CREATE INDEX IF NOT EXISTS bank_ledger_batch_receipts_account ON bank_ledger_batch_receipts (account_id);',
+    );
+    expect(folded).not.toMatch(/bank_ledger_batch_receipts_(?:character|account)[^;]+WHERE/i);
+  });
+});
+
+describe('writeBankLedgerCommandBatches', () => {
+  it('uses one statement and flattens receipt and ledger columns in command order', async () => {
+    const first = batch('session.1', [
+      row(),
+      row({
+        op: 'withdraw',
+        itemId: 'crafted_blade',
+        count: 1,
+        instanceJson: '{"durability":17}',
+        copperDelta: -25,
+        purchasedSlotsAfter: 2,
+        container: 'guild',
+        containerId: 99,
+        counterpartyCopperDelta: 25,
+        counterpartyCount: 1,
+      }),
+    ]);
+    const second = batch('session.2', [
+      row({
+        op: 'deposit_gold',
+        itemId: null,
+        count: null,
+        copperDelta: 50,
+        purchasedSlotsAfter: 4,
+        container: 'guild',
+        containerId: 15,
+        counterpartyCopperDelta: -50,
+      }),
+    ]);
+    const batches = [first, second];
+    const cap = captureWith(() => successfulVerification(batches));
+
+    const guildIds = await writeBankLedgerCommandBatches(cap.db, OWNER, batches);
+
+    expect(cap.calls).toHaveLength(1);
+    const call = cap.calls[0];
+    expect(call.text).toContain('WITH receipt_input AS');
+    expect(call.text).toContain('row_input AS');
+    expect(call.text).toContain('ON CONFLICT (batch_key) DO NOTHING');
+    expect(call.text).toContain('JOIN claimed AS c ON c.batch_key = ri.batch_key');
+    expect(call.text).toContain('ORDER BY ri.batch_ordinal, ri.row_ordinal');
+    expect(call.text).toContain('FROM bank_ledger_batch_receipts AS existing');
+    expect(call.text).toContain('FROM inserted');
+    expect(call.values).toEqual([
+      // Receipt input.
+      [0, 1],
+      ['session.1', 'session.2'],
+      [OWNER.realm, OWNER.realm],
+      [OWNER.characterId, OWNER.characterId],
+      [OWNER.accountId, OWNER.accountId],
+      [2, 1],
+      [fingerprint(first), fingerprint(second)],
+      // Row input. Both rows of the first command stay adjacent and ordered.
+      [0, 0, 1],
+      [0, 1, 0],
+      ['session.1', 'session.1', 'session.2'],
+      [OWNER.realm, OWNER.realm, OWNER.realm],
+      [OWNER.characterId, OWNER.characterId, OWNER.characterId],
+      [OWNER.accountId, OWNER.accountId, OWNER.accountId],
+      ['deposit', 'withdraw', 'deposit_gold'],
+      ['linen_cloth', 'crafted_blade', null],
+      [3, 1, null],
+      [null, '{"durability":17}', null],
+      [0, -25, 50],
+      [0, 2, 4],
+      ['personal', 'guild', 'guild'],
+      [null, 99, 15],
+      [null, 25, -50],
+      [null, 1, null],
+    ]);
+    expect(guildIds).toEqual([15, 99]);
+    expect(Object.isFrozen(guildIds)).toBe(true);
+  });
+
+  it('accepts a matching lost-COMMIT retry and requires zero new ledger rows', async () => {
+    const value = batch('storage:already-committed', [
+      row({ container: 'guild', containerId: 81 }),
+    ]);
+    const cap = captureWith(() => successfulVerification([value], [false]));
+
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [value])).resolves.toEqual([81]);
+    expect(cap.calls).toHaveLength(1);
+  });
+
+  it.each([
+    ['owner', { stored_account_id: OWNER.accountId + 1 }],
+    ['count', { stored_row_count: 99 }],
+    ['fingerprint', { stored_payload_sha256: 'f'.repeat(64) }],
+    [
+      'missing',
+      {
+        stored_batch_key: null,
+        stored_realm: null,
+        stored_character_id: null,
+        stored_account_id: null,
+        stored_row_count: null,
+        stored_payload_sha256: null,
+      },
+    ],
+  ])('rejects a %s receipt mismatch', async (_kind, override) => {
+    const value = batch('session.mismatch', [row()]);
+    const result = { ...successfulVerification([value], [false])[0], ...override };
+    const cap = captureWith(() => [result]);
+
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [value])).rejects.toThrow(
+      /receipt verification failed.*session\.mismatch/,
+    );
+    expect(cap.calls).toHaveLength(1);
+  });
+
+  it('rejects an inserted-row count mismatch', async () => {
+    const value = batch('session.short-insert', [row(), row()]);
+    const result = { ...successfulVerification([value])[0], inserted_row_count: 1 };
+    const cap = captureWith(() => [result]);
+
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [value])).rejects.toThrow(
+      /inserted row count mismatch/,
+    );
+  });
+
+  it('validates owner, keys, nonempty rows, and row ownership before querying', () => {
+    const cap = captureWith(() => []);
+    const mismatch = batch('session.owner', [row({ characterId: OWNER.characterId + 1 })]);
+    const empty = batch('session.empty', []);
+    const duplicate = [batch('session.dupe', [row()]), batch('session.dupe', [row()])];
+
+    expect(() => writeBankLedgerCommandBatches(cap.db, { ...OWNER, realm: '' }, [])).toThrow(
+      /owner\.realm/,
+    );
+    expect(() => writeBankLedgerCommandBatches(cap.db, OWNER, [mismatch])).toThrow(
+      /does not match owner/,
+    );
+    expect(() => writeBankLedgerCommandBatches(cap.db, OWNER, [empty])).toThrow(
+      /must contain at least one row/,
+    );
+    expect(() => writeBankLedgerCommandBatches(cap.db, OWNER, duplicate)).toThrow(
+      /duplicate bank ledger batch key/,
+    );
+    expect(() =>
+      writeBankLedgerCommandBatches(cap.db, OWNER, [batch('unsafe key', [row()])]),
+    ).toThrow(/batch key/);
+    expect(cap.calls).toHaveLength(0);
+  });
+
+  it('does no query for a valid empty snapshot', async () => {
+    const cap = captureWith(() => []);
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [])).resolves.toEqual([]);
+    expect(cap.calls).toHaveLength(0);
+  });
+});
