@@ -52,7 +52,7 @@ export function markPadActivity(): void {
     clearsInstalled = true;
     window.addEventListener('keydown', clearPadActivity);
     window.addEventListener('mousedown', clearPadActivity);
-    window.addEventListener('mousemove', clearPadActivityOnMouseMove);
+    window.addEventListener('mousemove', clearPadActivityOnMouseMove, { passive: true });
   }
   document.body.classList.add(PAD_ACTIVE_CLASS);
 }

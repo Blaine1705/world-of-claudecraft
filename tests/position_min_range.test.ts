@@ -94,15 +94,29 @@ describe('position ability minimum range', () => {
     expect(damageEvents(events, 'Splitshot')).toHaveLength(1);
   });
 
-  it('refuses the at-feet fallback inside Splitshot minimum range', () => {
+  it('pushes the no-aim fallback out to the minimum range along facing', () => {
+    const sim = makeHunter();
+    sim.player.facing = 0;
+    const target = addTargetAt(sim, 8);
+    sim.player.targetId = target.id;
+    sim.drainEvents();
+
+    sim.castAbility('multi_shot', sim.playerId);
+    const events = sim.tick();
+
+    expect(events).not.toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
+    expect(damageEvents(events, 'Splitshot')).toHaveLength(1);
+  });
+
+  it('never refuses a bare no-aim, no-target cast at the caster feet', () => {
     const sim = makeHunter();
     sim.drainEvents();
 
     sim.castAbility('multi_shot', sim.playerId);
     const events = sim.tick();
 
-    expect(events).toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
-    expect(sim.player.cooldowns.has('multi_shot')).toBe(false);
+    expect(events).not.toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
+    expect(sim.player.cooldowns.has('multi_shot')).toBe(true);
   });
 
   it('allows Blizzard near the caster when no minimum range is authored', () => {

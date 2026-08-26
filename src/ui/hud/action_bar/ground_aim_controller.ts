@@ -50,8 +50,42 @@ const PROJECTION_DIVERGENCE_EPSILON = 0.05;
 export class GroundAimController {
   private state: GroundAimState = createGroundAimState();
   private rawPoint: AimPoint | null = null;
+  // Per-frame projection memo: Heroic Leap's preview walks the whole landing
+  // sweep, so recompute only when the ability, aim point, or caster moved.
+  private projMemo: {
+    abilityId: string;
+    aimX: number;
+    aimZ: number;
+    fromX: number;
+    fromZ: number;
+    point: AimPoint;
+  } | null = null;
 
   constructor(private readonly deps: GroundAimControllerDeps) {}
+
+  private projectedPoint(abilityId: string, aim: AimPoint, from: AimPoint): AimPoint {
+    const memo = this.projMemo;
+    if (
+      memo &&
+      memo.abilityId === abilityId &&
+      memo.aimX === aim.x &&
+      memo.aimZ === aim.z &&
+      memo.fromX === from.x &&
+      memo.fromZ === from.z
+    ) {
+      return memo.point;
+    }
+    const point = this.deps.projectPlacement?.(abilityId, aim) ?? aim;
+    this.projMemo = {
+      abilityId,
+      aimX: aim.x,
+      aimZ: aim.z,
+      fromX: from.x,
+      fromZ: from.z,
+      point,
+    };
+    return point;
+  }
 
   isActive(): boolean {
     return this.state.activeAbilityId !== null;
@@ -130,7 +164,10 @@ export class GroundAimController {
     if (!res) return null;
     const player = this.deps.player();
     const aim = clampAimToRange(player, this.rawPoint, res.def.range);
-    const projected = this.deps.projectPlacement?.(res.def.id, aim.point) ?? aim.point;
+    const projected = this.projectedPoint(res.def.id, aim.point, {
+      x: player.pos.x,
+      z: player.pos.z,
+    });
     const diverged =
       Math.hypot(projected.x - aim.point.x, projected.z - aim.point.z) >
       PROJECTION_DIVERGENCE_EPSILON;

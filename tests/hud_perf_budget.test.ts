@@ -2486,6 +2486,7 @@ function fakeEl(): HTMLElement {
       toggle(): void {},
     },
     setAttribute(): void {},
+    removeAttribute(): void {},
   } as unknown as HTMLElement;
 }
 

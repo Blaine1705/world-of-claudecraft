@@ -125,10 +125,13 @@ export class ActionBarPainter {
       this.writers.setAttr(el.btn, ARIA_LABEL_ATTR, s.ariaLabel);
       this.writers.setAttr(el.btn, ARIA_DESCRIPTION_ATTR, s.ariaDescription);
       this.writers.setAttr(el.btn, ARIA_DISABLED_ATTR, s.usable ? 'false' : 'true');
+      // aria-pressed only where a toggle semantic is real: the Attack toggle
+      // always, any other slot only while it owns the armed ground aim
+      // (removed afterwards, so ordinary cast buttons stay plain buttons).
       this.writers.setAttr(
         el.btn,
         ARIA_PRESSED_ATTR,
-        s.aiming || (s.kind === 'attack' && s.queued) ? 'true' : 'false',
+        s.kind === 'attack' ? (s.queued ? 'true' : 'false') : s.aiming ? 'true' : null,
       );
       this.writers.setText(el.keybindEl, s.keybindLabel);
     }

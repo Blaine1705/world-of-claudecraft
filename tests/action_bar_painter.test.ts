@@ -235,7 +235,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
 // --- Elision against a REAL facet over recording elements ----------------------
 
 function recordingEl() {
-  const setAttrCalls: Array<[string, string]> = [];
+  const setAttrCalls: Array<[string, string | null]> = [];
   const node = {
     textContent: '',
     style: {
@@ -246,6 +246,9 @@ function recordingEl() {
     },
     setAttribute(name: string, value: string): void {
       setAttrCalls.push([name, value]);
+    },
+    removeAttribute(name: string): void {
+      setAttrCalls.push([name, null]);
     },
   };
   return { setAttrCalls, el: node as unknown as HTMLElement };

@@ -1505,6 +1505,16 @@ export function castAbility(
         d > maxRange
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: fallback.x, y: p.pos.y, z: fallback.z };
+      // A minRange ability with no aim would refuse forever at the at-feet
+      // fallback (distance 0), so a caller that cannot aim (a bare keybind
+      // cast, the RL env) lands at the minimum along facing instead.
+      if (ability.minRange && dist2d(p.pos, aimPoint) < ability.minRange) {
+        aimPoint = {
+          x: p.pos.x + Math.sin(p.facing) * ability.minRange,
+          y: p.pos.y,
+          z: p.pos.z + Math.cos(p.facing) * ability.minRange,
+        };
+      }
     }
     if (ability.minRange && dist2d(p.pos, aimPoint) < ability.minRange) {
       ctx.error(p.id, 'Too close!');
