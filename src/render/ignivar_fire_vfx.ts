@@ -116,7 +116,7 @@ void main() {
   // vertical a hand-span off the vent.
   vec4 world = modelMatrix * vec4(pos, 1.0);
   float mscale = length(modelMatrix[1].xyz);
-  world.y += (pow(life, 1.3) * uReach * 2.0
+  world.y += (pow(max(life, 0.0), 1.3) * uReach * 2.0
            + sin(uTime * 7.0 + aSeed * 53.0) * 0.02 * life) * mscale;
 
   vec4 mv = viewMatrix * world;
@@ -185,7 +185,7 @@ void main() {
   vec3 pos = vec3(cos(ang) * r + wave, dist, sin(ang) * r);
   vec4 world = modelMatrix * vec4(pos, 1.0);
   float mscale = length(modelMatrix[1].xyz);
-  world.y += pow(t, 1.15) * uReach * 2.6 * mscale;
+  world.y += pow(max(t, 0.0), 1.15) * uReach * 2.6 * mscale;
   vec3 camRight = normalize(vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]));
   float width = (0.018 + t * 0.085) * mscale;
   world.xyz += camRight * aSide * width;
@@ -358,7 +358,7 @@ void main() {
   // fast launch, decelerating -- a pressured jet, not a lobbed ember.
   // the reach breathes a little so the tip never sits on a fixed plane
   float reach = uReach * (0.38 + 0.62 * uFlame) * (0.9 + 0.1 * sin(uTime * 9.0 + iSeed * 31.0));
-  float dist = (1.0 - pow(1.0 - life, 1.55)) * reach;
+  float dist = (1.0 - pow(max(1.0 - life, 0.0), 1.55)) * reach;
   float ang = h11(iSeed + 1.7) * 6.2831853;
   float rad = (0.10 + 0.85 * h11(iSeed + 3.1)) * life * 0.40;
   float swirl = uTime * (0.6 + 0.8 * h11(iSeed + 5.3));
@@ -369,9 +369,9 @@ void main() {
   vec4 world = modelMatrix * vec4(pos, 1.0);
   float mscale = length(modelMatrix[1].xyz);
   // hot gas: the tail of the stream bends up in WORLD space
-  world.y += pow(life, 2.0) * 0.55 * mscale;
+  world.y += pow(max(life, 0.0), 2.0) * 0.55 * mscale;
 
-  float size = (0.13 + 0.55 * pow(life, 0.7)) * (0.8 + 0.4 * h11(iSeed + 9.7)) * mscale;
+  float size = (0.13 + 0.55 * pow(max(life, 0.0), 0.7)) * (0.8 + 0.4 * h11(iSeed + 9.7)) * mscale;
   float rot = h11(iSeed + 4.4) * 6.2831853 + uTime * (h11(iSeed + 6.1) - 0.5) * 2.4;
   vec2 rc = vec2(position.x * cos(rot) - position.y * sin(rot),
                  position.x * sin(rot) + position.y * cos(rot));
@@ -603,7 +603,7 @@ void main() {
   pos.z += cos(uTime * 4.3 + iSeed * 29.0 + life * 4.0) * 0.05 * life * uLocalFlameScale;
   vec4 world = modelMatrix * vec4(pos, 1.0);
   float mscale = length(modelMatrix[1].xyz);
-  float size = (0.16 + 0.42 * pow(life, 0.7)) * (0.75 + 0.5 * h11(iSeed + 9.7)) * mscale * uLocalFlameScale;
+  float size = (0.16 + 0.42 * pow(max(life, 0.0), 0.7)) * (0.75 + 0.5 * h11(iSeed + 9.7)) * mscale * uLocalFlameScale;
   float rot = h11(iSeed + 4.4) * 6.2831853 + uTime * (h11(iSeed + 6.1) - 0.5) * 2.0;
   vec2 rc = vec2(position.x * cos(rot) - position.y * sin(rot),
                  position.x * sin(rot) + position.y * cos(rot));
