@@ -256,6 +256,20 @@ Expected: PASS. These exercise the other call sites touched (dragonkin shout,
 healer hold, leashing) without asserting `autoAttack` directly; a regression
 here would mean the new lines broke an untouched behavior, not the flag itself.
 
+- [ ] **Step 5b: Confirm the IWorld parity pin has no player-only assumption**
+
+Run: `grep -n "autoAttack" tests/world_api_parity.test.ts`
+
+Expected: either no match, or a match that pins `autoAttack` as a plain
+`boolean` member with no comment/logic implying it is player-only. This is a
+design-review confirmation, not a new test: `Entity.autoAttack` already
+exists on both `Sim` and `ClientWorld`, so this task changes WHEN mobs
+populate an existing field, not the `IWorld` surface itself, and no pin
+update is expected. If the grep finds a comment asserting player-only
+semantics, stop and flag it before continuing, since that would mean this
+task's premise (mobs already read as `Entity.autoAttack`-compatible) is
+wrong somewhere this plan did not anticipate.
+
 - [ ] **Step 6: Format and commit**
 
 ```bash
@@ -1509,3 +1523,15 @@ Confirm the comment posted with `gh pr view 3648 --repo levy-street/world-of-cla
   `aggroTargetId`) and as `TargetSwingEntities`'s return type; `Hud.
   setShowTargetSwingTimer` (Task 6) is the exact name Task 7's `main.ts`
   dispatch calls.
+- **Coordinator-side review (done by the session, not a subagent, per this
+  skill's own self-review instruction):** traced `updatePursuitProfileCombat`'s
+  full control flow (`src/sim/mob/combat_profile.ts:274-307`) to confirm Task 1
+  does not need a redundant top-of-function `autoAttack` reset there: its final
+  line (`mob.aiState = ... 'attack' : 'chase'`) recomputes `aiState` fresh from
+  live distance every tick, and both of its `tryMobMeleeSwingInRange` call
+  sites gate on that same tick-start value, so any tick where `aiState` was
+  `'attack'` entering the function is guaranteed to re-run
+  `tryMobMeleeSwingInRange` (which now owns the true/false write), and any
+  tick where it was not, `autoAttack` was already `false`. Added Task 1 Step
+  5b (the `tests/world_api_parity.test.ts` grep) to close the one spec item
+  (parity confirmation) that had no explicit task step.
