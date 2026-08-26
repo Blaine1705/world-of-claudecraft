@@ -67,6 +67,31 @@ describe('the wallet re-auth modal', () => {
     expect(document.querySelector('#wallet-reauth-modal')).toBeNull();
   });
 
+  it('autofocuses the password input (the trap engages on open)', async () => {
+    const { focusManager } = fakeFocus();
+    const { promptWalletReauth } = await import('../src/ui/wallet_reauth_prompt');
+    void promptWalletReauth({ kind: 'password', showTwoFactor: false }, 'relink', focusManager);
+    await vi.waitFor(() => {
+      expect(document.activeElement?.id).toBe('wallet-reauth-password');
+    });
+  });
+
+  it('Enter in either field submits', async () => {
+    const { focusManager } = fakeFocus();
+    const { promptWalletReauth } = await import('../src/ui/wallet_reauth_prompt');
+    const pending = promptWalletReauth(
+      { kind: 'password', showTwoFactor: true },
+      'relink',
+      focusManager,
+    );
+    const password = document.querySelector<HTMLInputElement>('#wallet-reauth-password');
+    if (password) password.value = 'hunter2';
+    const factor = document.querySelector<HTMLInputElement>('#wallet-reauth-factor');
+    if (factor) factor.value = 'abcd-efgh';
+    factor?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await expect(pending).resolves.toEqual({ password: 'hunter2', recoveryCode: 'abcd-efgh' });
+  });
+
   it('hides the factor field when no second factor is enrolled', async () => {
     const { focusManager } = fakeFocus();
     const { promptWalletReauth } = await import('../src/ui/wallet_reauth_prompt');

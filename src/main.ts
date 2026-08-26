@@ -62,6 +62,7 @@ import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { installDevTeleports } from './game/dev_shortcuts';
 import {
   clearDiscordChoice,
+  DISCORD_CHOICE_KEY,
   type ExternalAuthLoginChoice,
   readDiscordChoice,
 } from './game/discord_login_choice';
@@ -8703,7 +8704,7 @@ async function handleNativeDiscordResult(result: NativeDiscordResult): Promise<v
     const exchange = await api.exchangeNativeDiscordCode(result.code, verifier);
     if (exchange.choose && exchange.linkToken) {
       localStorage.setItem(
-        'woc_discord_choice',
+        DISCORD_CHOICE_KEY,
         JSON.stringify({
           linkToken: exchange.linkToken,
           username: exchange.username,
@@ -9272,10 +9273,9 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
   let verifyError: unknown;
   try {
     // R11: changing an existing link needs account proof, collected BEFORE the
-    // challenge (a refused attempt consumes the single-use nonce). The cached
-    // linkedWalletPubkey can be stale (a blipped status read at login keeps
-    // the prior value), so re-read the authoritative link state first; on a
-    // failed read keep the cache and let the server be the judge.
+    // challenge (a refused attempt consumes the single-use nonce). Re-read the
+    // authoritative link state first: the cache can be stale (a blipped login
+    // status read keeps the prior value); a failed read keeps the cache.
     try {
       linkedWalletPubkey = (await api.linkedWallet())?.pubkey ?? null;
     } catch {}

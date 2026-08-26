@@ -102,6 +102,14 @@ describe('walletChangeErrorText', () => {
     expect(text).toBe('Your password is incorrect.');
   });
 
+  it('the lockout 429 renders its own message too (the shared identity)', () => {
+    const text = walletChangeErrorText(
+      { code: 'auth.too_many_failed_attempts', status: 429 },
+      'FALLBACK',
+    );
+    expect(text).toBe('Too many failed attempts. Wait a few minutes and try again.');
+  });
+
   it('a non-reauth error keeps the fallback', () => {
     expect(walletChangeErrorText(new Error('boom'), 'FALLBACK')).toBe('FALLBACK');
     expect(walletChangeErrorText({ code: 'woc_market.disabled' }, 'FALLBACK')).toBe('FALLBACK');

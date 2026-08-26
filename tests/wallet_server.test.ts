@@ -18,6 +18,7 @@ vi.mock('pg', () => ({
 
 import { hashPassword } from '../server/auth';
 import {
+  resetAuthFailures,
   resetWalletLinkRateLimits,
   WALLET_LINK_MAX_PER_MINUTE,
   walletLinkRateLimited,
@@ -88,6 +89,7 @@ beforeEach(() => {
   walletRows = [];
   accountRows = [];
   resetWalletLinkRateLimits();
+  resetAuthFailures();
   dbMock.query.mockReset();
   dbMock.query.mockImplementation((sql: string) => {
     // The real queries are multi-line; collapse whitespace so routing is robust.

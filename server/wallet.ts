@@ -10,6 +10,7 @@ import { randomBytes } from 'node:crypto';
 import type http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
 import { verifyPassword } from './auth';
+import { TOO_MANY_FAILED_ATTEMPTS } from './auth_routes';
 import {
   accountAndScopeForToken,
   accountById,
@@ -275,15 +276,16 @@ async function reauthorizeWalletChange(
     // row would make hasTwoFactor read false).
     return { ok: false, status: 401, error: 'account not found', code: 'wallet.reauth_required' };
   }
-  // The password arm shares the account failed-credential budget (the
-  // handleAccount2faDisable template): guesses here must hit the same
-  // lockout, feed the same attack signal, and clear on success, or a stolen
-  // bearer gets a silent password oracle at the wallet limiter's higher rate.
+  // The password arm shares the account failed-credential budget: the
+  // authThrottled pre-check mirrors the login ladder, the record/clear pair
+  // mirrors handleAccount2faDisable, so guesses here hit the same lockout,
+  // feed the same attack signal, and clear on success (else a stolen bearer
+  // gets a silent password oracle at the wallet limiter's higher rate).
   if (!authThrottled(acct.username).allowed) {
     return {
       ok: false,
       status: 429,
-      error: 'too many failed attempts, wait a few minutes and try again',
+      error: TOO_MANY_FAILED_ATTEMPTS,
       code: 'auth.too_many_failed_attempts',
     };
   }

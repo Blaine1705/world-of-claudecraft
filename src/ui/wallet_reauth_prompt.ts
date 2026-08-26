@@ -61,11 +61,15 @@ export function buildWalletReauthProof(password: string, secondFactor: string): 
   };
 }
 
-/** Player text for a failed wallet change: a reauth-coded refusal renders its
- *  own precise message; anything else keeps the flow's generic fallback. */
+/** Player text for a failed wallet change: a reauth-coded refusal (or the
+ *  shared lockout identity the throttled arm answers with) renders its own
+ *  precise message; anything else keeps the flow's generic fallback. */
 export function walletChangeErrorText(err: unknown, fallback: string): string {
   const code = err && typeof err === 'object' ? (err as { code?: unknown }).code : undefined;
-  if (typeof code === 'string' && code.startsWith('wallet.reauth_')) {
+  if (
+    typeof code === 'string' &&
+    (code.startsWith('wallet.reauth_') || code === 'auth.too_many_failed_attempts')
+  ) {
     return userFacingApiError(err);
   }
   return fallback;

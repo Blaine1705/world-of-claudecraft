@@ -44,6 +44,7 @@ import type { Ctx, Method, Middleware } from '../../server/http/types';
 import {
   authThrottled,
   recordAuthFailure,
+  resetAuthFailures,
   resetRateLimitClock,
   resetWalletLinkRateLimits,
   setRateLimitClock,
@@ -96,6 +97,12 @@ vi.mock('../../server/auth', async (importActual) => {
 vi.mock('../../server/email', async (importActual) => {
   const actual = await importActual<typeof import('../../server/email')>();
   return { ...actual, emailWalletChanged: vi.fn() };
+});
+
+// The unlink outcome metrics are pinned, so capture instead of counting.
+vi.mock('../../server/provider_usage', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/provider_usage')>();
+  return { ...actual, recordUsageMetric: vi.fn() };
 });
 
 // Relink re-auth runs AFTER the incoming wallet's signature verifies; pin the
@@ -236,6 +243,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  resetAuthFailures();
   resetWalletDbForTests();
   resetWalletRuntimeForTests();
   resetWalletLinkRateLimits();
@@ -695,6 +703,9 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ error: WALLET_REAUTH_REQUIRED_ERROR, code: 'wallet.reauth_required' });
     expect(vi.mocked(unlinkWallet)).not.toHaveBeenCalled();
+    const { recordUsageMetric } = await import('../../server/provider_usage');
+    expect(vi.mocked(recordUsageMetric)).toHaveBeenCalledWith('wallet.unlink.failure');
+    expect(vi.mocked(recordUsageMetric)).not.toHaveBeenCalledWith('wallet.unlink.success');
   });
 
   it('unlinks on the password arm and fires the removed alert', async () => {
@@ -718,6 +729,8 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
       'removed',
       'CurrentWallet1111',
     );
+    const { recordUsageMetric } = await import('../../server/provider_usage');
+    expect(vi.mocked(recordUsageMetric)).toHaveBeenCalledWith('wallet.unlink.success');
   });
 
   it('403s the passwordless account at the set-a-password marker', async () => {
@@ -883,20 +896,26 @@ describe('DELETE /api/wallet/link (migrated chain)', () => {
     expect(routeDef.middleware?.length, 'RouteDef arm: guard + rateLimit').toBeGreaterThanOrEqual(
       2,
     );
-    // Comments are stripped so a comment mentioning the limiter can never
-    // satisfy the pin, and both anchors must actually be found before slicing.
-    const ladder = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8').replace(
-      /\/\/[^\n]*/g,
-      '',
-    );
+    // Both anchors must actually be found; the small window between them is
+    // then stripped of line AND block comments (whole-file stripping would be
+    // confused by comment markers inside unrelated string literals), so a
+    // comment mentioning the limiter can never satisfy the pin; and the match
+    // requires the GATED form: the outcome must decide the branch, not just a
+    // call whose result is dropped.
+    const ladder = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
     const anchor = ladder.indexOf("req.method === 'DELETE' && url === '/api/wallet/link'");
     expect(anchor).toBeGreaterThanOrEqual(0);
     const arm = ladder.slice(anchor);
     const handlerAt = arm.indexOf('handleWalletUnlink');
     expect(handlerAt).toBeGreaterThanOrEqual(0);
-    expect(arm.slice(0, handlerAt), 'legacy arm: limiter CALL before handleWalletUnlink').toContain(
-      'walletLinkRateLimited(',
-    );
+    const window = arm
+      .slice(0, handlerAt)
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/[^\n]*/g, '');
+    expect(
+      window,
+      'legacy arm: the limiter outcome gates the branch before handleWalletUnlink',
+    ).toContain('if (!walletLinkRateLimited(');
   });
 });
 
@@ -923,6 +942,11 @@ describe('POST /api/wallet/link relink re-auth (R11)', () => {
     marketing_opt_in: false,
   };
   const LINK_BODY = { address: NEW_ADDR, signature: 'sig58', nonce: 'n1' };
+  const LINKED_FOR_BUDGET = {
+    account_id: 7,
+    pubkey: CURRENT_ADDR,
+    linked_at: '2026-07-01T00:00:00.000Z',
+  };
 
   function armChallenge(): void {
     vi.mocked(consumeWalletChallenge).mockResolvedValue({
@@ -979,6 +1003,77 @@ describe('POST /api/wallet/link relink re-auth (R11)', () => {
     expect(r.status).toBe(200);
     expect(vi.mocked(linkWalletToAccount)).toHaveBeenCalledWith(7, NEW_ADDR);
     expect(vi.mocked(emailWalletChanged)).toHaveBeenCalledWith(target, 'changed', NEW_ADDR);
+  });
+
+  it('a bad co-signature does NOT record into the failed-credential budget', async () => {
+    // The budget records CREDENTIAL failures only; widening the record
+    // condition to any refusal would let a bearer holder lock the account
+    // out of LOGIN with free non-credential refusals.
+    authedDb();
+    armChallenge();
+    vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'sigbudget' } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
+    const { verifySolanaSignature } = await import('../../server/wallet_link');
+    vi.mocked(verifySolanaSignature).mockReturnValueOnce(true).mockReturnValueOnce(false);
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { ...LINK_BODY, currentSignature: 'forged' },
+    });
+    expect(r.status).toBe(401);
+    expect(bodyRecord(r.body).code).toBe('wallet.reauth_bad_signature');
+    expect(authThrottled('sigbudget').remaining).toBe(10);
+  });
+
+  it('a wrong second factor DOES record into the failed-credential budget', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue(LINKED_FOR_BUDGET as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'totpbudget' } as never);
+    vi.mocked(findAccount).mockResolvedValue({
+      id: 7,
+      totp_secret: 'JBSWY3DPEHPK3PXP',
+      totp_last_window: null,
+    } as never);
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    const r = await runRoute('DELETE', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { password: 'hunter2', totp: '000000' },
+    });
+    expect(r.status).toBe(401);
+    expect(bodyRecord(r.body).code).toBe('wallet.reauth_bad_two_factor');
+    expect(authThrottled('totpbudget').remaining).toBe(9);
+  });
+
+  it("a co-signature success does NOT clear another proof arm's guess budget", async () => {
+    authedDb();
+    armChallenge();
+    vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'sigclear' } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
+    recordAuthFailure('sigclear');
+    recordAuthFailure('sigclear');
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { ...LINK_BODY, currentSignature: 'goodsig' },
+    });
+    expect(r.status).toBe(200);
+    expect(authThrottled('sigclear').remaining).toBe(8);
+  });
+
+  it('a locked-out account answers 429 on the RELINK path too (the shared wrap)', async () => {
+    authedDb();
+    armChallenge();
+    vi.mocked(walletForAccount).mockResolvedValue(CURRENT as never);
+    vi.mocked(accountById).mockResolvedValue({ ...ACCT, username: 'locked2' } as never);
+    vi.mocked(findAccount).mockResolvedValue({ id: 7, totp_secret: null } as never);
+    for (let i = 0; i < 10; i++) recordAuthFailure('locked2');
+    const r = await runRoute('POST', '/api/wallet/link', {
+      headers: { authorization: BEARER },
+      body: { ...LINK_BODY, password: 'hunter2' },
+    });
+    expect(r.status).toBe(429);
+    expect(bodyRecord(r.body).code).toBe('auth.too_many_failed_attempts');
+    expect(vi.mocked(linkWalletToAccount)).not.toHaveBeenCalled();
   });
 
   it('relinking the SAME wallet needs no re-auth (no custody change)', async () => {
