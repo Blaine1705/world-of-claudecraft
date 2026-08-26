@@ -56,13 +56,18 @@ import {
 import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type PlayerClass } from '../src/sim/types';
+import { DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
 import {
   VARKHUL_ANVIL_METEOR_CAST_ID,
   VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP,
   VARKHUL_ANVIL_METEOR_RADIUS,
 } from '../src/sim/varkhul_anvil_meteors';
 import { VARKHUL_WORK_LOCAL_POS } from '../src/sim/varkhul_forge_intermission';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_CAST_SECONDS,
+  VARKHUL_SHARED_PYRE_NAME,
+} from '../src/sim/varkhul_shared_pyre';
 
 function claimedEncounter(seed = 42): { sim: Sim; boss: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', devCommands: true });
@@ -104,6 +109,7 @@ function isolateMechanics(boss: Entity): NonNullable<Entity['varkhul']> {
   boss.varkhul.frontalTimer = 999;
   boss.varkhul.cinderOrbsTimer = 999;
   boss.varkhul.forgestormTimer = 999;
+  boss.varkhul.sharedPyreTimer = 999;
   boss.varkhul.anvilTimer = 999;
   boss.varkhul.interceptBeamTimer = 999;
   boss.swingTimer = Number.POSITIVE_INFINITY;
@@ -607,6 +613,11 @@ describe('Varkhul encounter behavior', () => {
 
     updateVarkhulEncounter(sim.ctx, boss);
 
+    expect(state.majorAbility).toBe('forgestorm');
+    expect(boss.castingAbility).toBeNull();
+    expect(boss.castTotal).toBe(0);
+    expect(boss.castRemaining).toBe(0);
+    expect(boss.channeling).toBe(false);
     const warnings = sim.ctx.groundAoEs.filter(
       (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
     );
@@ -618,6 +629,7 @@ describe('Varkhul encounter behavior', () => {
       duration: VARKHUL_FORGESTORM_WARNING_SECONDS,
       remaining: VARKHUL_FORGESTORM_WARNING_SECONDS,
     });
+    const firstWaveWarningIds = sim.activeVarkhulForgestormWarnings.map((warning) => warning.id);
     expect(warnings[0].remaining).toBeCloseTo(VARKHUL_FORGESTORM_WARNING_SECONDS + DT * 2, 5);
     sim.player.pos = { ...state.forgestormPoints[0] };
     state.forgestormWarningRemaining = DT;
@@ -625,7 +637,18 @@ describe('Varkhul encounter behavior', () => {
     updateVarkhulEncounter(sim.ctx, boss);
 
     expect(sim.player.hp).toBe(1_000 - 1_000 * VARKHUL_FORGESTORM_DAMAGE_MAX_HP);
+    expect(
+      sim.events
+        .filter(
+          (event): event is Extract<SimEvent, { type: 'spellfxAt' }> => event.type === 'spellfxAt',
+        )
+        .filter(
+          (event) => event.ability === VARKHUL_FORGESTORM_CAST_ID && event.fx === 'meteorImpact',
+        )
+        .map((event) => event.persistentId),
+    ).toEqual(firstWaveWarningIds);
     expect(state.forgestormWaveIndex).toBe(1);
+    expect(boss.castingAbility).toBeNull();
     expect(
       sim.ctx.groundAoEs.filter(
         (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
@@ -653,6 +676,51 @@ describe('Varkhul encounter behavior', () => {
     ).toHaveLength(0);
   });
 
+  it('casts Shared Pyre on a non-tank while preserving Forgestorm as a separate major', () => {
+    const { sim, boss } = claimedEncounter(441);
+    const raiders = [
+      addEncounterPlayer(sim, boss, 'Pyre One'),
+      addEncounterPlayer(sim, boss, 'Pyre Two'),
+      addEncounterPlayer(sim, boss, 'Pyre Three'),
+    ];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.sharedPyreTimer = DT;
+    state.forgestormTimer = 7;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.majorAbility).toBe('sharedPyre');
+    expect(state.forgestormTimer).toBeCloseTo(7 - DT, 8);
+    const target =
+      state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+    if (!target) throw new Error('Shared Pyre did not select a target');
+    expect(raiders.map((player) => player.id)).toContain(target.id);
+    expect(target.auras).toContainEqual(
+      expect.objectContaining({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        name: VARKHUL_SHARED_PYRE_NAME,
+        remaining: VARKHUL_SHARED_PYRE_CAST_SECONDS,
+        stacks: 4,
+        sourceId: boss.id,
+      }),
+    );
+    for (const player of [sim.player, ...raiders]) {
+      player.maxHp = 100_000;
+      player.hp = 100_000;
+      player.damageImmune = false;
+      player.pos = { ...target.pos };
+    }
+    state.sharedPyreRemaining = DT;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    for (const player of [sim.player, ...raiders]) expect(player.hp).toBe(65_000);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+  });
+
   it.each([
     ['normal', [900, 800, 600]],
     ['heroic', [860, 720, 470]],
@@ -670,12 +738,29 @@ describe('Varkhul encounter behavior', () => {
     updateVarkhulEncounter(sim.ctx, boss);
     const state = isolateMechanics(boss);
     state.anvilTimer = DT;
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const work = sim.ctx.groundPos(
+      origin.x + VARKHUL_WORK_LOCAL_POS.x,
+      origin.z + VARKHUL_WORK_LOCAL_POS.z,
+    );
+    boss.pos = sim.ctx.groundPos(work.x - 12, work.z - 9);
+    boss.prevPos = { ...boss.pos };
+    const distanceBefore = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
     updateVarkhulEncounter(sim.ctx, boss);
 
-    const origin = sim.ctx.instanceOriginOf(instance);
+    const distanceAfterStart = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+    expect(state.majorAbility).toBe('anvil');
+    expect(boss.castingAbility).toBeNull();
+    expect(distanceAfterStart).toBeLessThan(distanceBefore);
+    expect(distanceAfterStart).toBeGreaterThan(0);
+
+    let walkTicks = 0;
+    while (boss.castingAbility !== VARKHUL_ANVILS_DECREE_CAST_ID && walkTicks++ < 400) {
+      updateVarkhulEncounter(sim.ctx, boss);
+    }
+    expect(walkTicks).toBeLessThan(400);
     expect(boss.castingAbility).toBe(VARKHUL_ANVILS_DECREE_CAST_ID);
-    expect(boss.pos.x).toBeCloseTo(origin.x + VARKHUL_WORK_LOCAL_POS.x, 5);
-    expect(boss.pos.z).toBeCloseTo(origin.z + VARKHUL_WORK_LOCAL_POS.z, 5);
+    expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThan(0.1);
     sim.player.pos = { ...boss.pos };
     raider.pos = { ...boss.pos, z: boss.pos.z + 8 };
 

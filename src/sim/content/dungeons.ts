@@ -8,12 +8,19 @@ import {
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
-import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import type {
+  DungeonDef,
+  DungeonSpawn,
+  DungeonSpawnMinibossTuning,
+  ItemDef,
+  MobTemplate,
+} from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
 import {
   IGNIVAR_LORE_OBJECTS,
@@ -83,7 +90,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ccImmune: true,
     slowImmune: true,
     damageFloorPct: 0.5,
-    hpBase: 80000 / 2.3,
+    hpBase: 120000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 52,
     dmgPerLevel: 10.5,
@@ -211,7 +218,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     boss: true,
     ccImmune: true,
     slowImmune: true,
-    hpBase: 70000 / 2.3,
+    hpBase: 120000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 48,
     dmgPerLevel: 10,
@@ -236,7 +243,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   // Stationary priority target for Ignivar's Normal intermission.
   ignivar_heart_of_the_end: {
     id: 'ignivar_heart_of_the_end',
-    name: 'Heart of the End',
+    name: 'Ignivar Ashcaller',
     minLevel: 20,
     maxLevel: 20,
     family: 'elemental',
@@ -1057,6 +1064,13 @@ const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
 ];
 
+const IGNIVAR_WARDEN_MINIBOSS: DungeonSpawnMinibossTuning = {
+  healthMultiplier: 2.35,
+  scale: 2.75,
+  ccImmune: true,
+  slowImmune: true,
+};
+
 // First-room packs: five tight, inward-facing huddles up the Halls of the First
 // Tempering, hand-placed from live in-world coordinates (instance origin
 // (116200, -1250) subtracted to local). "crawler" = derelict_mech. Each pack is
@@ -1065,28 +1079,110 @@ const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
 // already are via their template; the guardians take the per-spawn flag).
 const IGNIVAR_FORGE_APPROACH_SPAWN_LIST: DungeonSpawn[] = [
   // Pack 1 (2 crawlers + 1 Ember Sentinel), center local (-16, -15)
-  { mobId: 'derelict_mech', x: -16, z: -17, facing: 0 },
-  { mobId: 'derelict_mech', x: -14.3, z: -14, facing: -2.09 },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -17.7, z: -14, facing: 2.09, idleStationary: true },
+  { mobId: 'derelict_mech', x: -16, z: -17, facing: 0, packId: 'approach_1' },
+  { mobId: 'derelict_mech', x: -14.3, z: -14, facing: -2.09, packId: 'approach_1' },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: -17.7,
+    z: -14,
+    facing: 2.09,
+    idleStationary: true,
+    packId: 'approach_1',
+  },
   // Pack 2 (2 crawlers + 1 Crucible Warden), center local (13, 4)
-  { mobId: 'derelict_mech', x: 13, z: 2, facing: 0 },
-  { mobId: 'derelict_mech', x: 14.7, z: 5, facing: -2.09 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 11.3, z: 5, facing: 2.09, idleStationary: true },
-  // Pack 3 (1 Cinder Artificer + 2 crawlers), center local (-21, 9)
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -21, z: 7, facing: 0, idleStationary: true },
-  { mobId: 'derelict_mech', x: -19.3, z: 10, facing: -2.09 },
-  { mobId: 'derelict_mech', x: -22.7, z: 10, facing: 2.09 },
+  { mobId: 'derelict_mech', x: 13, z: 2, facing: 0, packId: 'approach_2' },
+  { mobId: 'derelict_mech', x: 14.7, z: 5, facing: -2.09, packId: 'approach_2' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 11.3,
+    z: 5,
+    facing: 2.09,
+    idleStationary: true,
+    packId: 'approach_2',
+  },
+  // Pack 3 (1 promoted Warden + 2 crawlers), center local (-21, 9)
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -21,
+    z: 7,
+    facing: 0,
+    idleStationary: true,
+    packId: 'approach_3',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: 'derelict_mech', x: -19.3, z: 10, facing: -2.09, packId: 'approach_3' },
+  { mobId: 'derelict_mech', x: -22.7, z: 10, facing: 2.09, packId: 'approach_3' },
   // Pack 4 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel), center local (19, 42)
-  { mobId: 'derelict_mech', x: 19, z: 39.7, facing: 0 },
-  { mobId: 'derelict_mech', x: 21.3, z: 42, facing: -1.57 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 19, z: 44.3, facing: -3.14, idleStationary: true },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 16.7, z: 42, facing: 1.57, idleStationary: true },
-  // Pack 5 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel + 1 Cinder Artificer), center local (-22, 42)
-  { mobId: 'derelict_mech', x: -22, z: 39.4, facing: 0 },
-  { mobId: 'derelict_mech', x: -19.5, z: 41.2, facing: -1.26 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: -20.5, z: 44.1, facing: -2.51, idleStationary: true },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -23.5, z: 44.1, facing: 2.51, idleStationary: true },
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -24.5, z: 41.2, facing: 1.26, idleStationary: true },
+  { mobId: 'derelict_mech', x: 19, z: 39.7, facing: 0, packId: 'approach_4' },
+  { mobId: 'derelict_mech', x: 21.3, z: 42, facing: -1.57, packId: 'approach_4' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 19,
+    z: 44.3,
+    facing: -3.14,
+    idleStationary: true,
+    packId: 'approach_4',
+  },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: 16.7,
+    z: 42,
+    facing: 1.57,
+    idleStationary: true,
+    packId: 'approach_4',
+  },
+  // Pack 5 (2 crawlers + 2 Wardens + 1 Ember Sentinel), center local (-22, 42)
+  { mobId: 'derelict_mech', x: -22, z: 39.4, facing: 0, packId: 'approach_5' },
+  { mobId: 'derelict_mech', x: -19.5, z: 41.2, facing: -1.26, packId: 'approach_5' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -20.5,
+    z: 44.1,
+    facing: -2.51,
+    idleStationary: true,
+    packId: 'approach_5',
+  },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: -23.5,
+    z: 44.1,
+    facing: 2.51,
+    idleStationary: true,
+    packId: 'approach_5',
+  },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -24.5,
+    z: 41.2,
+    facing: 1.26,
+    idleStationary: true,
+    packId: 'approach_5',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+];
+
+const IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: -24, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: -22, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: -24, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: 4, packId: 'middle' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 6, packId: 'middle' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: 4, packId: 'middle' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -5,
+    z: 31,
+    packId: 'final',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 33, packId: 'final' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 5,
+    z: 31,
+    packId: 'final',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
 ];
 
 const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
@@ -1354,11 +1450,11 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       })),
       {
         itemId: '',
-        name: 'Sealed Inner Crucible Gate',
+        name: 'Sealed Assembly Gate',
         x: 0,
         z: 31.5,
         templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
-        dungeonId: IGNIVAR_SECOND_WING_ID,
+        dungeonId: IGNIVAR_MOLTEN_ASSEMBLY_ID,
         lootable: false,
       },
     ],
@@ -1367,11 +1463,40 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     enterText: 'Heat shimmers above the sealed waters of the Crucible.',
     leaveText: 'You step away from the Crucible and breathe freely again.',
   },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    name: 'Molten Assembly',
+    index: 13,
+    // Internal raid route reached only through the gate behind Ignivar.
+    doorPos: { x: 0, z: 0 },
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -50 },
+    exitOffset: { x: 0, z: -54 },
+    spawns: IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST,
+    mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: -47 }],
+    objects: [
+      {
+        itemId: '',
+        name: 'Sealed Inner Crucible Gate',
+        x: 0,
+        z: 53,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_SECOND_WING_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar_approach',
+    suggestedPlayers: 10,
+    enterText: 'The opened gate leads into a molten assembly hall.',
+    leaveText: 'You leave the assembly line and return to the Crucible.',
+  },
   [IGNIVAR_SECOND_WING_ID]: {
     id: IGNIVAR_SECOND_WING_ID,
     name: 'The Inner Crucible',
     index: 12,
-    // Internal raid wing reached only through the gate behind Ignivar.
+    // Internal raid wing reached only through the Molten Assembly gate.
     doorPos: { x: 0, z: 0 },
     overworldDoor: false,
     guideVisible: false,

@@ -18,6 +18,7 @@ import {
   IGNIVAR_CRUCIBLE_WARDEN_ID,
   IGNIVAR_EMBER_SENTINEL_ID,
 } from '../../sim/ignivar_raid_ids';
+import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import {
   ALL_CLASSES,
@@ -158,6 +159,10 @@ export interface VisualDef {
   runRef?: number;
   attackTimeScale?: number;
   deathTimeScale?: number;
+  /** Final model-local sink for an authored death pose that ends above the
+   *  normalized feet anchor. CharacterVisual eases it in only over the final
+   *  quarter of the Death clip and restores the base offset on revive. */
+  deathGroundOffset?: number;
   /** Hold the idle base state frozen on the FIRST frame of its clip instead of
    *  looping it: a downed/dormant look (the forge mech lies still on the ground
    *  on crawl frame 0 until it moves). Walk/run still play the clip normally, so
@@ -769,16 +774,15 @@ const IGNIVAR: ClipMap = {
   flourish: 'FistSpin360',
 };
 
-// Heart of the End is stationary in the encounter. Its generated Hit clip stays
-// unmapped so raid damage cannot interrupt the sustained Apocalypse cast pose.
+// Ignivar Ashcaller is stationary in the encounter. Its clips keep Apocalypse
+// in a sustained channel pose while retaining its authored cast and death motion.
 const IGNIVAR_HEART: ClipMap = {
   idle: 'Idle',
-  walk: 'Walk',
-  run: 'Run',
-  attack: ['Attack'],
+  walk: 'Move',
+  run: 'Move',
+  attack: ['Cast'],
   death: 'Death',
-  cast: 'Cast',
-  jump: 'Jump',
+  cast: 'Channel',
 };
 
 const IGNIVAR_CRUCIBLE_WARDEN: ClipMap = {
@@ -786,8 +790,14 @@ const IGNIVAR_CRUCIBLE_WARDEN: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
-  attackByAbility: { [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 'JumpSlam' },
-  attackTimeScaleByAbility: { [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 0.8 },
+  attackByAbility: {
+    [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 'JumpSlam',
+    [DUNGEON_MINIBOSS_STOMP_ABILITY_ID]: 'JumpSlam',
+  },
+  attackTimeScaleByAbility: {
+    [VARKHUL_CRUCIBLE_QUAKE_CAST_ID]: 0.8,
+    [DUNGEON_MINIBOSS_STOMP_ABILITY_ID]: 1.35,
+  },
   hit: ['Hit'],
   death: 'Death',
 };
@@ -2391,12 +2401,11 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1,
   },
   mob_ignivar_heart_of_the_end: {
-    url: `${CREATURES}/ignivar_heart_of_the_end.glb`,
+    url: `${CREATURES}/ignivar_ashcaller.glb`,
     height: 1.8,
-    // Tripo authored the rig facing +X; character visuals face +Z at world facing 0.
-    yaw: -Math.PI / 2,
-    // Toned down with the sunset forge rig, same story as mob_ignivar above.
-    selfIllumination: 0.1,
+    yaw: 0,
+    selfIllumination: 0.16,
+    envMapIntensity: 1.3,
     clips: IGNIVAR_HEART,
     attackTimeScale: 6,
     deathTimeScale: 3,
@@ -2433,6 +2442,9 @@ export const VISUALS: Record<string, VisualDef> = {
     // own arena presence.
     height: 3,
     yaw: 0,
+    // The authored Death lies flat with its lowest skinned vertex 16.62 raw
+    // units above the feet anchor. At this 3u normalization that is 0.565u.
+    deathGroundOffset: 0.565,
     // The smith atlas is near-black leather and iron; the add-tier grade
     // (0.18/1.35) reads as a silhouette in the Crucible. Match the Ignivar
     // colossus furnace grade instead so the bronze and beard stay legible.

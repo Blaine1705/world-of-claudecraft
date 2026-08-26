@@ -4,15 +4,19 @@
 
 import * as THREE from 'three';
 import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
-import type { ActiveVarkhulInterceptBeam } from '../sim/varkhul_intercept_beam';
+import {
+  type ActiveVarkhulInterceptBeam,
+  VARKHUL_INTERCEPT_BEAM_CAST_SECONDS,
+  VARKHUL_INTERCEPT_BEAM_HALF_WIDTH,
+} from '../sim/varkhul_intercept_beam';
 
 export const VARKHUL_INTERCEPT_BEAM_VISUAL_NAME = 'varkhul-tempering-ray';
 
 const GROUND_LIFT = 0.11;
 const SOURCE_HEIGHT = 3.1;
 const TARGET_HEIGHT = 1.15;
-const CORE_RADIUS = 0.075;
-const SHEATH_RADIUS = 0.22;
+const CORE_RADIUS = 0.16;
+const SHEATH_RADIUS = 0.42;
 const UP = new THREE.Vector3(0, 1, 0);
 
 interface InterceptBeamVisual {
@@ -257,9 +261,9 @@ export function buildVarkhulInterceptBeamPrewarmVisual(): THREE.Group {
     targetZ: 0,
     blockerX: 0,
     blockerZ: 0,
-    width: 1.35,
-    duration: 3.5,
-    remaining: 1.75,
+    width: VARKHUL_INTERCEPT_BEAM_HALF_WIDTH,
+    duration: VARKHUL_INTERCEPT_BEAM_CAST_SECONDS,
+    remaining: VARKHUL_INTERCEPT_BEAM_CAST_SECONDS * 0.5,
   };
   syncVisual(
     visual,

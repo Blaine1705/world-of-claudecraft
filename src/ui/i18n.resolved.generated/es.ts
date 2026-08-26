@@ -2450,6 +2450,7 @@ export const es: EnTranslations = {
       "leftPillarCharging": "¡El pilar izquierdo de la forja está cargándose! Se encenderá en 3 s.",
       "rightPillarCharging": "¡El pilar derecho de la forja está cargándose! Se encenderá en 3 s.",
       "bothPillarsCharging": "¡Los pilares de la forja están cargándose! Se encenderán en 3 s.",
+      "artificerApproaches": "¡Un Artífice de ceniza se acerca a la forja!",
       "leftPillar": "¡El pilar izquierdo de la forja se enciende!",
       "rightPillar": "¡El pilar derecho de la forja se enciende!",
       "bothPillars": "¡Los pilares de la forja se encienden!",
@@ -2460,6 +2461,33 @@ export const es: EnTranslations = {
       "worldfireBegins": "¡El Fuego del Mundo prende en el borde de la sala! El crisol quedará consumido en 42 s.",
       "worldfireClosing": "¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!",
       "worldfireConsumed": "¡Todo el crisol está en llamas!"
+    },
+    "varkhulWaveStatus": "Oleada {wave}/{waves} | Enemigos: {remaining}",
+    "raidBossGuide": {
+      "title": "Guía de jefes",
+      "button": "Guía: {boss}",
+      "subtitle": "{boss} | Normal y heroico",
+      "close": "Cerrar la guía de jefes",
+      "ignivar": {
+        "brand": "Marca de la Pira: separaos. Apunta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.",
+        "movement": "Movimiento: evita los conos y meteoros de Lluvia de cenizas, muévete con Infierno giratorio y usa los dos huecos de Ola de la Forja.",
+        "apocalypse": "Apocalipsis: mata a Ignivar Ashcaller antes de que termine su lanzamiento.",
+        "judgment": "Juicio de la Forja: identifica el refugio distinto durante el aviso y reuníos dentro de su límite marcado cuando arda el suelo.",
+        "finale": "Último Infierno: acaba con Ignivar antes de la aniquilación mientras continúan los meteoros, ataques frontales e Infierno giratorio acelerados.",
+        "heroic": "Heroico: las parejas permanecen juntas durante Cadenas de la Forja y Marca sigue activa dentro de Juicio."
+      },
+      "varkhul": {
+        "tanks": "Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a distancia cuerpo a cuerpo.",
+        "orbs": "Orbes de ceniza: los jugadores marcados se separan hacia el borde. Sus charcos de fuego persisten y los orbes liberados cruzan la sala.",
+        "pyre": "Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro en Normal o cinco en Heroico dentro del círculo móvil.",
+        "forgestorm": "Tormenta de la Forja: observa los meteoros que caen y sal de cada impacto marcado antes de que aterrice cada una de las tres oleadas.",
+        "anvil": "Decreto del Yunque: Varkhul se desplaza hasta la gran forja y la golpea tres veces, dañando a la banda. En heroico también caen meteoros marcados.",
+        "ray": "Rayo de temple: otro jugador, normalmente un tanque, intercepta la línea móvil antes de que termine el largo aviso. Quien recibe el golpe sufre Herida templada.",
+        "forge": "Pilares de la forja: bloquea los rayos antes de que lleguen a la forja y rota a los bloqueadores cuando aumente Exposición del Crisol. El calor completo provoca Colapso de la Forja.",
+        "assembly": "La Asamblea del Maestro: bloquea ambos rayos, mata todas las oleadas de portales, interrumpe Terremoto del Crisol e impide que los Artífices de ceniza curen a Varkhul.",
+        "worldfire": "Fuego del Mundo: en heroico, el borde en llamas avanza hacia el centro durante la fase final. Derrota a Varkhul antes de que arda todo el crisol.",
+        "heroic": "Heroico: el calor de la forja nunca baja, Decreto del Yunque añade meteoros y la fase final elimina casi todas las mecánicas para centrarse en Fuego del Mundo."
+      }
     },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
@@ -8578,6 +8606,8 @@ export const es: EnTranslations = {
         "riftEntrance": "Entrada a la brecha: {name}",
         "hostileEnemy": "Enemigo hostil",
         "aggressiveEnemy": "Enemigo que te está atacando",
+        "bossEnemy": "Jefe: {name}",
+        "bossAggressiveEnemy": "Jefe que te está atacando: {name}",
         "lootableEnemy": "Enemigo con botín",
         "corpse": "Tu cadáver",
         "deathZone": "Zona peligrosa",
@@ -13867,7 +13897,7 @@ export const es: EnTranslations = {
         "name": "Ignivar, Heraldo de la Última Llama"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Corazón del Fin"
+        "name": "Ignivar Ashcaller"
       },
       "ignivar_ember_sentinel": {
         "name": "Ember Sentinel"
@@ -15712,9 +15742,6 @@ export const es: EnTranslations = {
           },
           "1": {
             "label": "Crucible Wardens destroyed"
-          },
-          "2": {
-            "label": "Cinder Artificers destroyed"
           }
         }
       },
@@ -17624,6 +17651,11 @@ export const es: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Molten Assembly",
+        "enterText": "The opened gate leads into a molten assembly hall.",
+        "leaveText": "You leave the assembly line and return to the Crucible."
       },
       "ignivar_inner_crucible": {
         "name": "The Inner Crucible",

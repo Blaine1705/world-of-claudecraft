@@ -7,8 +7,8 @@ export interface IgnivarForgeWavePoint {
   z: number;
 }
 
-export const IGNIVAR_FIRST_FORGE_WAVE_SECONDS = 44;
-export const IGNIVAR_FORGE_WAVE_EVERY = 46;
+export const IGNIVAR_FIRST_FORGE_WAVE_SECONDS = 50;
+export const IGNIVAR_FORGE_WAVE_EVERY = 60;
 export const IGNIVAR_FORGE_WAVE_WINDUP_SECONDS = 2.5;
 export const IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS = 3;
 // Covers the farthest pair of vertices in the 66 by 66 octagonal arena even

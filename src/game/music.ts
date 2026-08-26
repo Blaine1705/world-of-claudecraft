@@ -124,6 +124,7 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
   ignivar_forge_approach: 'ignivar_forge_approach',
   ignivar_raid_arena: 'ignivar_raid_arena',
+  ignivar_molten_assembly: 'ignivar_forge_approach',
   ignivar_inner_crucible: 'ignivar_inner_crucible',
 };
 

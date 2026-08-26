@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
-import { formatNumber, getI18nRevision } from '../ui/i18n';
+import { formatNumber, getI18nRevision, t } from '../ui/i18n';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const BEAM_HEIGHT = 4.8;
@@ -34,6 +34,9 @@ interface ForgeBeamVisual {
   heatLabel: THREE.Sprite;
   heatLabelCanvas: HTMLCanvasElement;
   heatLabelTexture: THREE.CanvasTexture;
+  waveLabel: THREE.Sprite;
+  waveLabelCanvas: HTMLCanvasElement;
+  waveLabelTexture: THREE.CanvasTexture;
   meltdownPlume: THREE.Mesh<THREE.ConeGeometry, THREE.MeshBasicMaterial>;
   time: number;
   beamsActive: boolean;
@@ -41,7 +44,11 @@ interface ForgeBeamVisual {
   renderedHeatSegments: number;
   renderedMeltdown: boolean;
   renderedHeatPercent: number;
-  renderedI18nRevision: number;
+  renderedHeatI18nRevision: number;
+  renderedWaveI18nRevision: number;
+  renderedAddWave: number;
+  renderedAddWaves: number;
+  renderedAddsRemaining: number;
 }
 
 function basicMaterial(color: number, opacity: number, additive = false): THREE.MeshBasicMaterial {
@@ -166,10 +173,52 @@ function buildHeatLabel(): {
   return { sprite, canvas, texture };
 }
 
+function buildWaveLabel(): {
+  sprite: THREE.Sprite;
+  canvas: HTMLCanvasElement;
+  texture: THREE.CanvasTexture;
+} {
+  const canvas =
+    typeof document === 'undefined'
+      ? ({ width: 512, height: 96, getContext: () => null } as unknown as HTMLCanvasElement)
+      : document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 96;
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearFilter;
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+    }),
+  );
+  sprite.name = 'varkhul-forge-wave-status';
+  sprite.scale.set(8.4, 1.58, 1);
+  sprite.position.y = -0.55;
+  sprite.renderOrder = 18;
+  sprite.userData.actionable = true;
+  return { sprite, canvas, texture };
+}
+
 export function varkhulForgeHeatPercentLabel(percent: number): string {
   return formatNumber(THREE.MathUtils.clamp(percent, 0, 100) / 100, {
     style: 'percent',
     maximumFractionDigits: 0,
+  });
+}
+
+export function varkhulForgeWaveStatusLabel(
+  wave: number,
+  waves: number,
+  remaining: number,
+): string {
+  return t('hudChrome.varkhulWaveStatus', {
+    wave: formatNumber(Math.max(0, Math.floor(wave))),
+    waves: formatNumber(Math.max(0, Math.floor(waves))),
+    remaining: formatNumber(Math.max(0, Math.floor(remaining))),
   });
 }
 
@@ -194,6 +243,35 @@ function paintHeatLabel(visual: ForgeBeamVisual, percent: number, meltdown: bool
   ctx.fillStyle = meltdown ? '#fff0e8' : '#ffffff';
   ctx.fillText(label, 128, 49);
   visual.heatLabelTexture.needsUpdate = true;
+}
+
+function paintWaveLabel(
+  visual: ForgeBeamVisual,
+  wave: number,
+  waves: number,
+  remaining: number,
+): void {
+  const label = varkhulForgeWaveStatusLabel(wave, waves, remaining);
+  visual.waveLabel.userData.label = label;
+  visual.waveLabel.userData.wave = wave;
+  visual.waveLabel.userData.waves = waves;
+  visual.waveLabel.userData.remaining = remaining;
+  const ctx = visual.waveLabelCanvas.getContext('2d');
+  if (!ctx) return;
+  ctx.clearRect(0, 0, visual.waveLabelCanvas.width, visual.waveLabelCanvas.height);
+  ctx.fillStyle = 'rgba(18, 5, 3, 0.9)';
+  ctx.beginPath();
+  ctx.roundRect(12, 12, 488, 70, 18);
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = '#ff9b2f';
+  ctx.stroke();
+  ctx.font = 'bold 42px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#fff5dd';
+  ctx.fillText(label, 256, 49, 452);
+  visual.waveLabelTexture.needsUpdate = true;
 }
 
 function setBeamBetween(
@@ -258,6 +336,8 @@ function createVisual(bossId: number): ForgeBeamVisual {
   heatMeter.add(heatSegments);
   const heatLabel = buildHeatLabel();
   heatMeter.add(heatLabel.sprite);
+  const waveLabel = buildWaveLabel();
+  heatMeter.add(waveLabel.sprite);
   root.add(heatMeter);
 
   const meltdownPlume = new THREE.Mesh(
@@ -277,6 +357,9 @@ function createVisual(bossId: number): ForgeBeamVisual {
     heatLabel: heatLabel.sprite,
     heatLabelCanvas: heatLabel.canvas,
     heatLabelTexture: heatLabel.texture,
+    waveLabel: waveLabel.sprite,
+    waveLabelCanvas: waveLabel.canvas,
+    waveLabelTexture: waveLabel.texture,
     meltdownPlume,
     time: 0,
     beamsActive: false,
@@ -284,7 +367,11 @@ function createVisual(bossId: number): ForgeBeamVisual {
     renderedHeatSegments: -1,
     renderedMeltdown: false,
     renderedHeatPercent: -1,
-    renderedI18nRevision: -1,
+    renderedHeatI18nRevision: -1,
+    renderedWaveI18nRevision: -1,
+    renderedAddWave: -1,
+    renderedAddWaves: -1,
+    renderedAddsRemaining: -1,
   };
 }
 
@@ -305,6 +392,8 @@ function disposeVisual(visual: ForgeBeamVisual): void {
   for (const material of materials) material.dispose();
   (visual.heatLabel.material as THREE.SpriteMaterial).dispose();
   visual.heatLabelTexture.dispose();
+  (visual.waveLabel.material as THREE.SpriteMaterial).dispose();
+  visual.waveLabelTexture.dispose();
   visual.root.removeFromParent();
 }
 
@@ -394,10 +483,25 @@ export class VarkhulForgeBeamVisuals {
       const heatPercent = Math.round(THREE.MathUtils.clamp(state.forgeOverheat, 0, 1) * 100);
       const meltdown = state.forgeMeltdownRemaining > 0;
       const i18nRevision = getI18nRevision();
+      const waveVisible = state.phase === 'adds' && state.addWaves > 0;
+      visual.waveLabel.visible = waveVisible;
+      if (
+        waveVisible &&
+        (state.addWave !== visual.renderedAddWave ||
+          state.addWaves !== visual.renderedAddWaves ||
+          state.addsRemaining !== visual.renderedAddsRemaining ||
+          i18nRevision !== visual.renderedWaveI18nRevision)
+      ) {
+        paintWaveLabel(visual, state.addWave, state.addWaves, state.addsRemaining);
+        visual.renderedAddWave = state.addWave;
+        visual.renderedAddWaves = state.addWaves;
+        visual.renderedAddsRemaining = state.addsRemaining;
+        visual.renderedWaveI18nRevision = i18nRevision;
+      }
       const heatLabelNeedsUpdate =
         heatPercent !== visual.renderedHeatPercent ||
         meltdown !== visual.renderedMeltdown ||
-        i18nRevision !== visual.renderedI18nRevision;
+        i18nRevision !== visual.renderedHeatI18nRevision;
       if (filledCount !== visual.renderedHeatSegments || meltdown !== visual.renderedMeltdown) {
         const filledStates = visual.heatSegments.userData.filled as boolean[];
         for (let index = 0; index < HEAT_SEGMENTS; index++) {
@@ -425,7 +529,7 @@ export class VarkhulForgeBeamVisuals {
       if (heatLabelNeedsUpdate) {
         paintHeatLabel(visual, heatPercent, meltdown);
         visual.renderedHeatPercent = heatPercent;
-        visual.renderedI18nRevision = i18nRevision;
+        visual.renderedHeatI18nRevision = i18nRevision;
       }
       visual.meltdownPlume.position.set(
         state.forgeX,

@@ -6296,26 +6296,37 @@ describe('Varkhul Forgestorm snapshot parity', () => {
       t: 'snap',
       ents: [],
       varkhulForgestorm: [
-        { id: 9901000100, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 9 },
-        { id: 'bad', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1 },
-        { id: 1, sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1 },
-        { id: 2, sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1 },
-        { id: 20, sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1 },
-        { id: 3, sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1 },
-        { id: 30, sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1 },
-        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0 },
+        {
+          id: 'varkhul-forgestorm:9901:1:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 4,
+          dur: 2.5,
+          rem: 9,
+          lead: 0,
+        },
+        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad', sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:2', sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:3', sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:4', sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:5', sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1, lead: 0 },
+        { id: 'bad:6', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0, lead: 0 },
+        { id: 'bad:7', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: -1 },
       ],
     });
 
     expect(client.activeVarkhulForgestormWarnings).toEqual([
       {
-        id: 9901000100,
+        id: 'varkhul-forgestorm:9901:1:0:0',
         sourceId: 9901,
         x: 3,
         z: 5,
         radius: 4,
         duration: 2.5,
         remaining: 2.5,
+        warningLead: 0,
       },
     ]);
 
@@ -6323,7 +6334,7 @@ describe('Varkhul Forgestorm snapshot parity', () => {
     expect(client.activeVarkhulForgestormWarnings).toEqual([]);
   });
 
-  it('interest-scopes active warnings with stable numeric ids and authoritative time', () => {
+  it('interest-scopes active warnings with stable meteor ids and authoritative time', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Forgewire', 'warrior');
@@ -6351,11 +6362,12 @@ describe('Varkhul Forgestorm snapshot parity', () => {
 
     expect(lastSnap(fc.sent).varkhulForgestorm).toEqual([
       expect.objectContaining({
-        id: boss.id * 1_000_000 + 710,
+        id: `varkhul-forgestorm:${boss.id}:7:1:0`,
         sourceId: boss.id,
         r: 4,
         dur: 2.5,
         rem: 1.4,
+        lead: 0,
       }),
     ]);
   });
@@ -6395,7 +6407,7 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
             bx: 8,
             bz: 12,
             w: 1.35,
-            dur: 3.5,
+            dur: 5,
             rem: 2.25,
           },
           win: 0,
@@ -6454,7 +6466,7 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
       blockerX: 8,
       blockerZ: 12,
       width: 1.35,
-      duration: 3.5,
+      duration: 5,
       remaining: 2.25,
     });
     expect(client.activeVarkhulAssemblies[0].runes[2]).toMatchObject({

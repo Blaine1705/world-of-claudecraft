@@ -12,7 +12,10 @@ import {
   IGNIVAR_SOAK_VISUAL_NAME,
   syncIgnivarSoakTelegraph,
 } from '../src/render/ignivar_soak_telegraph';
-import { IGNIVAR_SOAK_RADIUS, IGNIVAR_SOAK_REQUIRED_PLAYERS } from '../src/sim/encounters/ignivar';
+import {
+  VARKHUL_SHARED_PYRE_RADIUS,
+  VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+} from '../src/sim/varkhul_shared_pyre';
 
 function expectGeometryInsideRadius(object: THREE.Object3D, radius: number): void {
   object.traverse((child) => {
@@ -27,7 +30,7 @@ function expectGeometryInsideRadius(object: THREE.Object3D, radius: number): voi
   });
 }
 
-describe('Ignivar Shared Pyre soak telegraph', () => {
+describe('Varkhul Shared Pyre soak telegraph', () => {
   it('combines the WoW soak flame, inward arrows, swirl, and four occupancy runes', () => {
     const soak = buildIgnivarSoakTelegraph();
 
@@ -39,8 +42,8 @@ describe('Ignivar Shared Pyre soak telegraph', () => {
     expect(soak.getObjectByName(IGNIVAR_SOAK_FLAME_NAME)).toBeInstanceOf(THREE.InstancedMesh);
     expect(soak.getObjectByName(IGNIVAR_SOAK_BEACON_NAME)).toBeInstanceOf(THREE.Group);
     expect(soak.getObjectByName(IGNIVAR_SOAK_READY_NAME)).toBeInstanceOf(THREE.Mesh);
-    expect(soak.userData.requiredPlayers).toBe(IGNIVAR_SOAK_REQUIRED_PLAYERS);
-    expectGeometryInsideRadius(soak, IGNIVAR_SOAK_RADIUS);
+    expect(soak.userData.requiredPlayers).toBe(VARKHUL_SHARED_PYRE_REQUIRED_NORMAL);
+    expectGeometryInsideRadius(soak, VARKHUL_SHARED_PYRE_RADIUS);
   });
 
   it('fills four runes with occupancy and replaces the call-in flame when the soak is ready', () => {

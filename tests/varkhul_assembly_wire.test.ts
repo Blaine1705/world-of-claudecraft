@@ -37,6 +37,9 @@ function assemblyRow(overrides: Record<string, unknown> = {}) {
     oh: 0.35,
     bw: 0,
     mr: 0,
+    aw: 2,
+    aws: 4,
+    ar: 7,
     beams: [
       { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, bid: 4 },
       { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, bid: null },
@@ -97,6 +100,9 @@ describe('Varkhul assembly wire', () => {
       phase: 'links',
       forgeBeamWarmupRemaining: 2.35,
       forgeMeltdownRemaining: 0,
+      addWave: 2,
+      addWaves: 4,
+      addsRemaining: 7,
     });
     expect(
       decodeVarkhulAssemblies([assemblyRow({ phase: 'done', beams: [], bw: 0, mr: 4.5 })])[0],
@@ -106,6 +112,26 @@ describe('Varkhul assembly wire', () => {
       forgeMeltdownRemaining: 4.5,
       forgeBeams: [],
     });
+  });
+
+  it('accepts legacy missing wave progress and rejects malformed counters', () => {
+    const { aw: _aw, aws: _aws, ar: _ar, ...legacy } = assemblyRow();
+    expect(decodeVarkhulAssemblies([legacy])[0]).toMatchObject({
+      addWave: 0,
+      addWaves: 0,
+      addsRemaining: 0,
+    });
+    for (const invalid of [
+      { aw: -1 },
+      { aw: 1.5 },
+      { aw: 5, aws: 4 },
+      { aws: -1 },
+      { aws: Number.POSITIVE_INFINITY },
+      { ar: -1 },
+      { ar: 2.5 },
+    ]) {
+      expect(decodeVarkhulAssemblies([assemblyRow(invalid)])).toEqual([]);
+    }
   });
 
   it('decodes the moving Tempering Ray and rejects every unsafe endpoint branch', () => {
@@ -120,7 +146,7 @@ describe('Varkhul assembly wire', () => {
       bx: 8,
       bz: 11,
       w: 1.35,
-      dur: 3.5,
+      dur: 5,
       rem: 2.25,
     };
     expect(decodeVarkhulAssemblies([assemblyRow({ ib })])[0].interceptBeam).toEqual({
@@ -134,7 +160,7 @@ describe('Varkhul assembly wire', () => {
       blockerX: 8,
       blockerZ: 11,
       width: 1.35,
-      duration: 3.5,
+      duration: 5,
       remaining: 2.25,
     });
     const unsafe: Record<string, unknown>[] = [
@@ -157,7 +183,7 @@ describe('Varkhul assembly wire', () => {
       { ...ib, dur: 0 },
       { ...ib, dur: 15.01 },
       { ...ib, rem: 0 },
-      { ...ib, rem: 3.51 },
+      { ...ib, rem: 5.01 },
     ];
     for (const invalid of unsafe) {
       expect(decodeVarkhulAssemblies([assemblyRow({ ib: invalid })])).toEqual([]);

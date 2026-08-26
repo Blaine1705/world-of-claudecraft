@@ -41,7 +41,7 @@ export function varkhulEncounterWireJson(
     .filter((warning) => inRange(warning, anchor, eventRadius))
     .map(
       (warning) =>
-        `{"id":${warning.id},"sourceId":${warning.sourceId},"x":${round2(warning.x)},"z":${round2(warning.z)},"r":${round2(warning.radius)},"dur":${round2(warning.duration)},"rem":${round2(warning.remaining)}}`,
+        `{"id":${JSON.stringify(warning.id)},"sourceId":${warning.sourceId},"x":${round2(warning.x)},"z":${round2(warning.z)},"r":${round2(warning.radius)},"dur":${round2(warning.duration)},"rem":${round2(warning.remaining)},"lead":${round2(warning.warningLead)}}`,
     );
   const fires = world.activeVarkhulCinderFires
     .filter((fire) => inRange(fire, anchor, eventRadius))
@@ -83,7 +83,7 @@ export function varkhulEncounterWireJson(
       const interceptBeam = assembly.interceptBeam
         ? `{"sid":${assembly.interceptBeam.sourceId},"tid":${assembly.interceptBeam.targetId},"bid":${assembly.interceptBeam.blockerId ?? 'null'},"sx":${round2(assembly.interceptBeam.sourceX)},"sz":${round2(assembly.interceptBeam.sourceZ)},"tx":${round2(assembly.interceptBeam.targetX)},"tz":${round2(assembly.interceptBeam.targetZ)},"bx":${assembly.interceptBeam.blockerX === null ? 'null' : round2(assembly.interceptBeam.blockerX)},"bz":${assembly.interceptBeam.blockerZ === null ? 'null' : round2(assembly.interceptBeam.blockerZ)},"w":${round2(assembly.interceptBeam.width)},"dur":${round2(assembly.interceptBeam.duration)},"rem":${round2(assembly.interceptBeam.remaining)}}`
         : 'null';
-      return `{"bossId":${assembly.bossId},"hc":${assembly.difficulty === 'heroic' ? 1 : 0},"phase":${JSON.stringify(assembly.phase)},"fx":${round2(assembly.forgeX)},"fz":${round2(assembly.forgeZ)},"hp":${round2(assembly.forgeHp)},"mhp":${round2(assembly.forgeMaxHp)},"oh":${round2(assembly.forgeOverheat)},"bm":${assembly.forgeBeamActiveMask},"bw":${round2(assembly.forgeBeamWarmupRemaining)},"mr":${round2(assembly.forgeMeltdownRemaining)},"win":${round2(assembly.deliveryWindowRemaining)},"round":${assembly.round},"rounds":${assembly.rounds},"rem":${round2(assembly.remaining)},"ib":${interceptBeam},"beams":[${beams.join(',')}],"cores":[${cores.join(',')}],"assign":[${assignments.join(',')}],"runes":[${runes.join(',')}]}`;
+      return `{"bossId":${assembly.bossId},"hc":${assembly.difficulty === 'heroic' ? 1 : 0},"phase":${JSON.stringify(assembly.phase)},"fx":${round2(assembly.forgeX)},"fz":${round2(assembly.forgeZ)},"hp":${round2(assembly.forgeHp)},"mhp":${round2(assembly.forgeMaxHp)},"oh":${round2(assembly.forgeOverheat)},"bm":${assembly.forgeBeamActiveMask},"bw":${round2(assembly.forgeBeamWarmupRemaining)},"mr":${round2(assembly.forgeMeltdownRemaining)},"aw":${assembly.addWave},"aws":${assembly.addWaves},"ar":${assembly.addsRemaining},"win":${round2(assembly.deliveryWindowRemaining)},"round":${assembly.round},"rounds":${assembly.rounds},"rem":${round2(assembly.remaining)},"ib":${interceptBeam},"beams":[${beams.join(',')}],"cores":[${cores.join(',')}],"assign":[${assignments.join(',')}],"runes":[${runes.join(',')}]}`;
     });
   const forgestormJson =
     forgestorm.length > 0 ? `,"varkhulForgestorm":[${forgestorm.join(',')}]` : '';

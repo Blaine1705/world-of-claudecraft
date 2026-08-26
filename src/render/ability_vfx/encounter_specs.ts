@@ -9,10 +9,22 @@ import {
   IGNIVAR_LAST_INFERNO_AURA_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
 } from '../../sim/encounters/ignivar';
+import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_miniboss_stomp';
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from '../ability_vfx_core';
 import { abilityVfxFullSpec, abilityVfxSpec } from '../ability_vfx_registry';
 
 const ENCOUNTER_VFX_SPECS: Readonly<Record<string, AbilityVfxSpec>> = {
+  [DUNGEON_MINIBOSS_STOMP_ABILITY_ID]: {
+    c: '#ff8a26',
+    p: 'fire',
+    pw: 1.35,
+    sp: 30,
+    rg: 1,
+    vr: 1,
+    sm: 1,
+    li: 2.2,
+    a: 'burst',
+  },
   [IGNIVAR_FRONTAL_CAST_ID]: {
     c: '#ff4a12',
     p: 'fire',

@@ -99,6 +99,7 @@ import {
   MAX_LEVEL,
   type MobFamily,
   PLAYER_INTEREST_DROP_RADIUS,
+  PLAYER_INTEREST_RADIUS,
   RUN_SPEED,
   type SimEvent,
   type UnstuckBlockedReason,
@@ -356,7 +357,7 @@ const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 // Interest management: the client renders entities out to 80yd, so new
 // entities enter interest just past that, and known entities persist a
 // little farther so the boundary doesn't churn create/destroy cycles.
-const INTEREST_RADIUS = 90;
+const INTEREST_RADIUS = PLAYER_INTEREST_RADIUS;
 // Exported so the idle-mob-tick radius below (and its test) stay pinned to this
 // exact number instead of drifting into a second copy.
 export const INTEREST_DROP_RADIUS = PLAYER_INTEREST_DROP_RADIUS;

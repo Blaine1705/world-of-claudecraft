@@ -18,6 +18,10 @@ import {
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
 } from '../src/sim/encounters/varkhul';
 import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
+} from '../src/sim/varkhul_shared_pyre';
+import {
   type AuraEffectInput,
   auraEffectDescriptor,
   auraEffectMaximumFractionDigits,
@@ -41,6 +45,35 @@ describe('auraEffectDescriptor', () => {
     expect(hudChromeStrings.auraEffect.sharedPyre).toBe(
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     );
+  });
+
+  it('explains Varkhul Shared Pyre from its Heroic five-player split', () => {
+    expect(
+      desc({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        kind: 'vulnerability',
+        value: 0,
+        stacks: 5,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.sharedPyre',
+      nums: { total: 200, players: 5, perPlayer: 40 },
+    });
+    expect(VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC).toBe(2);
+  });
+
+  it('explains Varkhul Shared Pyre from its Normal four-player split', () => {
+    expect(
+      desc({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        kind: 'vulnerability',
+        value: 0,
+        stacks: 4,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.sharedPyre',
+      nums: { total: 140, players: 4, perPlayer: 35 },
+    });
   });
 
   it("teaches Maker's Brand from the encounter's live stack constants", () => {

@@ -4,9 +4,10 @@ import {
   buildVarkhulForgeBeamPrewarmVisual,
   VarkhulForgeBeamVisuals,
   varkhulForgeHeatPercentLabel,
+  varkhulForgeWaveStatusLabel,
 } from '../src/render/varkhul_forge_beam_visual';
 import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
-import { setLanguage } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 
 const ACTIVE: ActiveVarkhulAssembly = {
   bossId: 42,
@@ -20,6 +21,9 @@ const ACTIVE: ActiveVarkhulAssembly = {
   forgeBeamActiveMask: 3,
   forgeBeamWarmupRemaining: 0,
   forgeMeltdownRemaining: 0,
+  addWave: 0,
+  addWaves: 0,
+  addsRemaining: 0,
   forgeBeams: [
     {
       index: 0,
@@ -68,6 +72,37 @@ describe('Varkhul forge beam visuals', () => {
       expect(varkhulForgeHeatPercentLabel(46)).not.toBe('46%');
     } finally {
       setLanguage('en');
+    }
+  });
+
+  it('shows a localized wave counter and updates the remaining enemy count', async () => {
+    const scene = new THREE.Scene();
+    const visuals = new VarkhulForgeBeamVisuals(scene, () => 0);
+    setLanguage('en');
+    try {
+      expect(varkhulForgeWaveStatusLabel(2, 4, 7)).toBe('Wave 2/4 | Enemies: 7');
+      visuals.sync([{ ...ACTIVE, phase: 'adds', addWave: 2, addWaves: 4, addsRemaining: 7 }]);
+      const label = scene.getObjectByName('varkhul-forge-wave-status');
+      expect(label).toMatchObject({ visible: true });
+      expect(label?.userData).toMatchObject({
+        label: 'Wave 2/4 | Enemies: 7',
+        wave: 2,
+        waves: 4,
+        remaining: 7,
+      });
+
+      visuals.sync([{ ...ACTIVE, phase: 'adds', addWave: 2, addWaves: 4, addsRemaining: 3 }]);
+      expect(label?.userData.label).toBe('Wave 2/4 | Enemies: 3');
+
+      await ensureLocaleLoaded('es_ES');
+      setLanguage('es_ES');
+      visuals.sync([{ ...ACTIVE, phase: 'adds', addWave: 2, addWaves: 4, addsRemaining: 3 }]);
+      expect(label?.userData.label).toBe('Oleada 2/4 | Enemigos: 3');
+      visuals.sync([ACTIVE]);
+      expect(label?.visible).toBe(false);
+    } finally {
+      setLanguage('en');
+      visuals.dispose();
     }
   });
 

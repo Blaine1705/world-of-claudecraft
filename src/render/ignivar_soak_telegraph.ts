@@ -1,8 +1,11 @@
 // Shared Pyre presentation. It combines WoW's persistent soak flame and
-// meteor swirl with inward arrows and four explicit occupancy runes.
+// meteor swirl with inward arrows and explicit difficulty-sized occupancy runes.
 
 import * as THREE from 'three';
-import { IGNIVAR_SOAK_RADIUS, IGNIVAR_SOAK_REQUIRED_PLAYERS } from '../sim/encounters/ignivar';
+import {
+  VARKHUL_SHARED_PYRE_RADIUS,
+  VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+} from '../sim/varkhul_shared_pyre';
 
 export const IGNIVAR_SOAK_VISUAL_NAME = 'ignivarSoakCircle';
 export const IGNIVAR_SOAK_FILL_NAME = 'ignivarSoakFill';
@@ -84,8 +87,8 @@ function arrowsGeometry(): THREE.BufferGeometry {
     const forwardZ = Math.cos(angle);
     const tangentX = Math.cos(angle);
     const tangentZ = -Math.sin(angle);
-    const tipRadius = IGNIVAR_SOAK_RADIUS * 0.53;
-    const baseRadius = IGNIVAR_SOAK_RADIUS * 0.78;
+    const tipRadius = VARKHUL_SHARED_PYRE_RADIUS * 0.53;
+    const baseRadius = VARKHUL_SHARED_PYRE_RADIUS * 0.78;
     const vertex = positions.length / 3;
     positions.push(
       forwardX * tipRadius,
@@ -115,8 +118,8 @@ function swirlGeometry(): THREE.BufferGeometry {
     for (let index = 0; index < segments; index++) {
       const progressA = index / segments;
       const progressB = (index + 1) / segments;
-      const radiusA = 0.9 + progressA * (IGNIVAR_SOAK_RADIUS * 0.72 - 0.9);
-      const radiusB = 0.9 + progressB * (IGNIVAR_SOAK_RADIUS * 0.72 - 0.9);
+      const radiusA = 0.9 + progressA * (VARKHUL_SHARED_PYRE_RADIUS * 0.72 - 0.9);
+      const radiusB = 0.9 + progressB * (VARKHUL_SHARED_PYRE_RADIUS * 0.72 - 0.9);
       const angleA = (arm / arms) * Math.PI * 2 + progressA * Math.PI * 1.55;
       const angleB = (arm / arms) * Math.PI * 2 + progressB * Math.PI * 1.55;
       const halfWidth = 0.1;
@@ -144,14 +147,14 @@ function swirlGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-function occupancyGeometry(): THREE.BufferGeometry {
+function occupancyGeometry(requiredPlayers: number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
   const centerRadius = 1.62;
   const half = 0.28;
-  for (let slot = 0; slot < IGNIVAR_SOAK_REQUIRED_PLAYERS; slot++) {
-    const angle = (slot / IGNIVAR_SOAK_REQUIRED_PLAYERS) * Math.PI * 2 + Math.PI / 4;
+  for (let slot = 0; slot < requiredPlayers; slot++) {
+    const angle = (slot / requiredPlayers) * Math.PI * 2 + Math.PI / 4;
     const centerX = Math.sin(angle) * centerRadius;
     const centerZ = Math.cos(angle) * centerRadius;
     const vertex = positions.length / 3;
@@ -246,20 +249,24 @@ function callInBeacon(): THREE.Group {
   return beacon;
 }
 
-export function buildIgnivarSoakTelegraph(): THREE.Group {
+export function buildIgnivarSoakTelegraph(
+  requiredPlayers = VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+): THREE.Group {
+  const occupancySlots = Math.max(1, Math.floor(requiredPlayers));
   const root = new THREE.Group();
   root.name = IGNIVAR_SOAK_VISUAL_NAME;
   root.userData.renderCategory = 'ui3d';
-  root.userData.requiredPlayers = IGNIVAR_SOAK_REQUIRED_PLAYERS;
+  root.userData.requiredPlayers = occupancySlots;
+  root.userData.occupancySlots = occupancySlots;
 
   const fill = new THREE.Mesh(
-    discGeometry(IGNIVAR_SOAK_RADIUS, 64, 0.04),
+    discGeometry(VARKHUL_SHARED_PYRE_RADIUS, 64, 0.04),
     material(0xb85a08, 0.16),
   );
   fill.name = IGNIVAR_SOAK_FILL_NAME;
   fill.renderOrder = 2;
   const rim = new THREE.Mesh(
-    radialBandGeometry(IGNIVAR_SOAK_RADIUS - 0.22, IGNIVAR_SOAK_RADIUS, 64, 0.064),
+    radialBandGeometry(VARKHUL_SHARED_PYRE_RADIUS - 0.22, VARKHUL_SHARED_PYRE_RADIUS, 64, 0.064),
     material(0xffcf58, 0.94),
   );
   rim.name = IGNIVAR_SOAK_RIM_NAME;
@@ -272,11 +279,16 @@ export function buildIgnivarSoakTelegraph(): THREE.Group {
   arrows.renderOrder = 4;
   const occupancyMaterial = material(0xffffff, 0.96);
   occupancyMaterial.vertexColors = true;
-  const occupancy = new THREE.Mesh(occupancyGeometry(), occupancyMaterial);
+  const occupancy = new THREE.Mesh(occupancyGeometry(occupancySlots), occupancyMaterial);
   occupancy.name = IGNIVAR_SOAK_OCCUPANCY_NAME;
   occupancy.renderOrder = 6;
   const timer = new THREE.Mesh(
-    radialBandGeometry(IGNIVAR_SOAK_RADIUS - 0.48, IGNIVAR_SOAK_RADIUS - 0.32, 64, 0.082),
+    radialBandGeometry(
+      VARKHUL_SHARED_PYRE_RADIUS - 0.48,
+      VARKHUL_SHARED_PYRE_RADIUS - 0.32,
+      64,
+      0.082,
+    ),
     material(0xfff0ae, 0.74),
   );
   timer.name = IGNIVAR_SOAK_TIMER_NAME;
@@ -323,7 +335,8 @@ export function syncIgnivarSoakTelegraph(
   const arrows = root.getObjectByName(IGNIVAR_SOAK_ARROWS_NAME) as THREE.Mesh | undefined;
   if (occupancy) {
     const colors = occupancy.geometry.getAttribute('color') as THREE.BufferAttribute;
-    for (let slot = 0; slot < IGNIVAR_SOAK_REQUIRED_PLAYERS; slot++) {
+    const occupancySlots = Math.max(1, Math.floor(Number(root.userData.occupancySlots ?? 4)));
+    for (let slot = 0; slot < occupancySlots; slot++) {
       const color = slot < root.userData.playersInside ? OCCUPIED_COLOR : EMPTY_COLOR;
       for (let vertex = 0; vertex < 4; vertex++)
         colors.setXYZ(slot * 4 + vertex, color.r, color.g, color.b);

@@ -2,13 +2,14 @@
 // owns damage and timing; this leaf owns the minimal presentation contract.
 
 export interface ActiveVarkhulForgestormWarning {
-  id: number;
+  id: string;
   sourceId: number;
   x: number;
   z: number;
   radius: number;
   duration: number;
   remaining: number;
+  warningLead: number;
 }
 
 export interface VarkhulForgestormWarningState {
@@ -26,8 +27,8 @@ export function varkhulForgestormWarningId(
   castKey: number,
   waveIndex: number,
   pointIndex: number,
-): number {
-  return bossId * 1_000_000 + castKey * 100 + waveIndex * 10 + pointIndex;
+): string {
+  return `varkhul-forgestorm:${bossId}:${castKey}:${waveIndex}:${pointIndex}`;
 }
 
 export function activeVarkhulForgestormWarnings(
@@ -48,5 +49,6 @@ export function activeVarkhulForgestormWarnings(
     radius: VARKHUL_FORGESTORM_RADIUS,
     duration: VARKHUL_FORGESTORM_WARNING_SECONDS,
     remaining: Math.min(state.forgestormWarningRemaining, VARKHUL_FORGESTORM_WARNING_SECONDS),
+    warningLead: 0,
   }));
 }

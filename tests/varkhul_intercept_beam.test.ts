@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   VARKHUL_INTERCEPT_BEAM_BLOCKED_DAMAGE_MAX_HP_HEROIC,
   VARKHUL_INTERCEPT_BEAM_BLOCKED_DAMAGE_MAX_HP_NORMAL,
+  VARKHUL_INTERCEPT_BEAM_CAST_SECONDS,
   VARKHUL_INTERCEPT_BEAM_EVERY_SECONDS,
   VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS,
   VARKHUL_INTERCEPT_BEAM_HALF_WIDTH,
@@ -72,6 +73,7 @@ describe('Varkhul intercept beam', () => {
   });
 
   it('pins the blocked and unblocked maximum-health damage on both difficulties', () => {
+    expect(VARKHUL_INTERCEPT_BEAM_CAST_SECONDS).toBe(5);
     expect(VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS).toBe(17);
     expect(VARKHUL_INTERCEPT_BEAM_EVERY_SECONDS).toBe(32);
     expect(VARKHUL_INTERCEPT_BEAM_BLOCKED_DAMAGE_MAX_HP_NORMAL).toBe(0.7);

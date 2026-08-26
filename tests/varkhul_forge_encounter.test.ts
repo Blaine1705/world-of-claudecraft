@@ -8,6 +8,7 @@ import {
   VARKHUL_CINDER_ARTIFICER_ID,
   VARKHUL_CINDER_ORBS_AURA_ID,
   VARKHUL_CRUCIBLE_WARDEN_ID,
+  VARKHUL_DEATH_YELL,
   VARKHUL_EMBER_SENTINEL_ID,
   VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
   VARKHUL_FORGE_HAMMER_ABILITY_ID,
@@ -27,13 +28,13 @@ import {
   VARKHUL_CINDER_ARTIFICER_FIRST_SECONDS,
   VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
-  VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS,
   VARKHUL_CINDER_REPAIR_CAST_ID,
   VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
   VARKHUL_CINDER_REPAIR_END_ANIMATION_ID,
   VARKHUL_CINDER_REPAIR_RETRY_SECONDS,
   VARKHUL_CINDER_REPAIR_START_ANIMATION_ID,
-  varkhulCinderRepairAmount,
+  VARKHUL_CINDER_REPAIR_TICK_SECONDS,
+  varkhulCinderRepairTickAmount,
 } from '../src/sim/varkhul_cinder_artificer';
 import {
   VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
@@ -44,11 +45,12 @@ import {
   varkhulForgeMeltdownTickDamageMaxHp,
 } from '../src/sim/varkhul_forge_beams';
 import {
+  VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS,
+  VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS,
   VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC,
   VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL,
   VARKHUL_FORGE_LOCAL_POS,
   VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS,
-  VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
   VARKHUL_FORGE_PRESSURE_BEAM_SECONDS,
   VARKHUL_FORGE_PRESSURE_HP_THRESHOLD,
   VARKHUL_FORGE_TEACHING_BEAM_SECONDS,
@@ -122,6 +124,31 @@ function addEncounterPlayer(
 }
 
 describe('Varkhul forge pillars and add intermission', () => {
+  it('names his unseen master once when Varkhul dies', () => {
+    const { sim, boss } = claimedEncounter(699);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul).toBeDefined();
+
+    boss.dead = true;
+    const deathEvents = sim.tick();
+
+    expect(
+      deathEvents.filter(
+        (event) =>
+          event.type === 'chat' && event.channel === 'yell' && event.text === VARKHUL_DEATH_YELL,
+      ),
+    ).toHaveLength(1);
+    expect(boss.varkhul).toBeUndefined();
+    expect(
+      sim
+        .tick()
+        .filter(
+          (event) =>
+            event.type === 'chat' && event.channel === 'yell' && event.text === VARKHUL_DEATH_YELL,
+        ),
+    ).toHaveLength(0);
+  });
+
   it('keeps the authored boss set-piece in front of the anvil, facing away from the raid', () => {
     const { sim, boss } = claimedEncounter(701, false, false);
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
@@ -160,6 +187,43 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(boss.pos.z).toBeCloseTo(origin.z + VARKHUL_WORK_LOCAL_POS.z, 5);
     expect(boss.facing).toBe(VARKHUL_WORK_FACING);
     expect(boss.prevFacing).toBe(VARKHUL_WORK_FACING);
+  });
+
+  it("walks to the forge before opening the Master's Assembly portals", () => {
+    const { sim, boss } = claimedEncounter(704);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
+    if (!state || !instance) throw new Error('Varkhul fixture missing');
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const work = { x: origin.x + VARKHUL_WORK_LOCAL_POS.x, z: origin.z + VARKHUL_WORK_LOCAL_POS.z };
+    boss.pos = sim.ctx.groundPos(work.x - 12, work.z);
+    boss.prevPos = { ...boss.pos };
+    sim.player.pos = sim.ctx.groundPos(boss.pos.x, boss.pos.z - 2);
+    sim.player.prevPos = { ...sim.player.pos };
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    const distanceBefore = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const distanceAfterFirstStep = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+    expect(state.assemblyTriggered).toBe(true);
+    expect(state.assemblyPhase).toBe('idle');
+    expect(distanceAfterFirstStep).toBeLessThan(distanceBefore);
+    expect(distanceAfterFirstStep).toBeGreaterThan(0.3);
+    expect(state.assemblyPortalSpawns).toHaveLength(0);
+
+    for (let tick = 0; tick < 100 && state.assemblyPhase === 'idle'; tick++) {
+      const before = { ...boss.pos };
+      updateVarkhulEncounter(sim.ctx, boss);
+      expect(Math.hypot(boss.pos.x - before.x, boss.pos.z - before.z)).toBeLessThanOrEqual(
+        boss.moveSpeed * DT + 1e-6,
+      );
+    }
+
+    expect(state.assemblyPhase).toBe('adds');
+    expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThanOrEqual(0.3);
+    expect(state.assemblyPortalSpawns.length).toBeGreaterThan(0);
   });
 
   it('swings and strikes the anvil with a bounded metal-impact cue throughout the intermission', () => {
@@ -221,11 +285,17 @@ describe('Varkhul forge pillars and add intermission', () => {
   });
 
   it('schedules Cinder Artificers independently from the ordinary add waves', () => {
-    const { sim, boss } = claimedEncounter(744);
+    const { sim, boss } = claimedEncounter(744, true);
     boss.hp = Math.floor(boss.maxHp * 0.5);
     updateVarkhulEncounter(sim.ctx, boss);
     const state = boss.varkhul;
     if (!state) throw new Error('Varkhul state missing');
+    for (const pending of state.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    for (const id of state.assemblyAddIds) {
+      const add = sim.entities.get(id);
+      if (add && add.templateId !== VARKHUL_CINDER_ARTIFICER_ID) add.dead = true;
+    }
     const nextWaveIndex = state.assemblyNextWaveIndex;
     state.assemblyNextWaveRemaining = DT;
     state.assemblyArtificerNextSpawnRemaining = DT;
@@ -237,6 +307,11 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyArtificerPortalSpawns).toEqual([{ portalIndex: 0, remaining: 2 }]);
     expect(state.assemblyArtificerSpawnIndex).toBe(1);
     expect(state.assemblyArtificerNextSpawnRemaining).toBe(VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS);
+    expect(
+      sim.events.filter(
+        (event) => event.type === 'varkhulCallout' && event.call === 'artificerApproaches',
+      ),
+    ).toHaveLength(1);
 
     const ordinaryRemaining = state.assemblyNextWaveRemaining;
     const artificerRemaining = state.assemblyArtificerNextSpawnRemaining;
@@ -334,6 +409,42 @@ describe('Varkhul forge pillars and add intermission', () => {
     ).toHaveLength(1);
   });
 
+  it('only opens an Artificer portal when the full warning and repair window remains', () => {
+    const setupDuePortal = (seed: number, remaining: number) => {
+      const { sim, boss } = claimedEncounter(seed, true);
+      boss.hp = Math.floor(boss.maxHp * 0.5);
+      updateVarkhulEncounter(sim.ctx, boss);
+      const state = boss.varkhul;
+      if (!state) throw new Error('Varkhul state missing');
+      state.assemblyForgeBeamWarmupRemaining = 999;
+      state.assemblyRemaining = remaining;
+      state.assemblyArtificerNextSpawnRemaining = DT;
+      updateVarkhulEncounter(sim.ctx, boss);
+      return { state };
+    };
+
+    const fair = setupDuePortal(
+      748,
+      VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS +
+        VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS +
+        DT,
+    );
+    expect(fair.state.assemblyArtificerPortalSpawns).toEqual([
+      { portalIndex: 0, remaining: VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS },
+    ]);
+    expect(fair.state.assemblyArtificerSpawnIndex).toBe(1);
+
+    const tooLate = setupDuePortal(
+      749,
+      VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS + VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS,
+    );
+    expect(tooLate.state.assemblyArtificerPortalSpawns).toEqual([]);
+    expect(tooLate.state.assemblyArtificerSpawnIndex).toBe(0);
+    expect(tooLate.state.assemblyArtificerNextSpawnRemaining).toBe(
+      VARKHUL_CINDER_ARTIFICER_REPEAT_SECONDS,
+    );
+  });
+
   it('lets control stop the Artificer, then plays start, loop and end around a real repair', () => {
     const { sim, boss } = claimedEncounter(745, true);
     sim.setPlayerLevel(20);
@@ -398,7 +509,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(artificer.castTargetId).toBe(boss.id);
     expect(artificer.castRemaining).toBe(VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS);
     expect(artificer.channeling).toBe(true);
-    expect(artificer.channelTickTimer).toBe(VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS);
+    expect(artificer.channelTickTimer).toBe(VARKHUL_CINDER_REPAIR_TICK_SECONDS);
     expect(sim.events.slice(eventStart)).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -428,23 +539,30 @@ describe('Varkhul forge pillars and add intermission', () => {
             event.ability === VARKHUL_CINDER_REPAIR_CAST_ID,
         );
     expect(beamEvents()).toHaveLength(1);
-    for (let tick = 0; tick < 8; tick++) {
+    for (let tick = 0; tick < VARKHUL_CINDER_REPAIR_TICK_SECONDS / DT - 1; tick++) {
       updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     }
     expect(beamEvents()).toHaveLength(1);
+    expect(boss.hp).toBe(hpBefore);
     updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     expect(beamEvents()).toHaveLength(2);
+    const tickHeal = varkhulCinderRepairTickAmount(boss.maxHp, state.assemblyRuneDifficulty);
+    expect(boss.hp).toBe(hpBefore + tickHeal);
 
-    for (let tick = 9; tick < VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / DT - 1; tick++) {
+    for (
+      let tick = VARKHUL_CINDER_REPAIR_TICK_SECONDS / DT;
+      tick < VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / DT - 1;
+      tick++
+    ) {
       updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     }
-    expect(boss.hp).toBe(hpBefore);
     expect(artificer.castingAbility).toBe(VARKHUL_CINDER_REPAIR_CAST_ID);
     const completionStart = sim.events.length;
     updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
 
     expect(boss.hp).toBe(
-      hpBefore + varkhulCinderRepairAmount(boss.maxHp, state.assemblyRuneDifficulty),
+      hpBefore +
+        tickHeal * (VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS / VARKHUL_CINDER_REPAIR_TICK_SECONDS),
     );
     expect(artificer.castingAbility).toBeNull();
     expect(artificer.channeling).toBe(false);
@@ -548,7 +666,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(artificer.castingAbility).toBeNull();
   });
 
-  it('repairs exactly six percent in Normal through the real six-second channel', () => {
+  it('repairs two percent each second for six seconds in Normal', () => {
     const { sim, boss } = claimedEncounter(743);
     boss.hp = Math.floor(boss.maxHp * 0.5);
     updateVarkhulEncounter(sim.ctx, boss);
@@ -567,13 +685,58 @@ describe('Varkhul forge pillars and add intermission', () => {
     const hpBefore = boss.hp;
 
     updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
-    for (let tick = 0; tick < 119; tick++) {
+    const tickHeal = varkhulCinderRepairTickAmount(boss.maxHp, 'normal');
+    for (let second = 1; second <= 6; second++) {
+      for (let tick = 1; tick < VARKHUL_CINDER_REPAIR_TICK_SECONDS / DT; tick++) {
+        updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+      }
+      expect(boss.hp - hpBefore).toBe(tickHeal * (second - 1));
+      updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+      expect(boss.hp - hpBefore).toBe(tickHeal * second);
+    }
+
+    expect(boss.hp - hpBefore).toBe(Math.round(boss.maxHp * 0.12));
+    expect(state.assemblyArtificerRepaired).toBe(true);
+  });
+
+  it('keeps earned repair ticks but stops all future healing after interruption', () => {
+    const { sim, boss } = claimedEncounter(751);
+    boss.hp = Math.floor(boss.maxHp * 0.25);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.assemblyArtificerPortalSpawns = [{ portalIndex: 1, remaining: DT }];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const artificer = state.assemblyAddIds
+      .map((id) => sim.entities.get(id))
+      .find((add) => add?.templateId === VARKHUL_CINDER_ARTIFICER_ID);
+    if (!artificer) throw new Error('Cinder Artificer did not emerge');
+    artificer.pos = { x: boss.pos.x + 3, y: boss.pos.y, z: boss.pos.z };
+    artificer.prevPos = { ...artificer.pos };
+    artificer.bigCastTimer = 0;
+    const hpBefore = boss.hp;
+
+    updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+    for (let tick = 0; tick < (2 * VARKHUL_CINDER_REPAIR_TICK_SECONDS) / DT; tick++) {
       updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
     }
-    expect(boss.hp).toBe(hpBefore);
-    updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+    const earnedHp = boss.hp;
+    expect(earnedHp - hpBefore).toBe(2 * varkhulCinderRepairTickAmount(boss.maxHp, 'normal'));
 
-    expect(boss.hp - hpBefore).toBe(Math.round(boss.maxHp * 0.06));
+    sim.ctx.applyAura(artificer, {
+      id: 'test_partial_repair_silence',
+      name: 'Test Partial Repair Silence',
+      kind: 'silence',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: sim.player.id,
+      school: 'arcane',
+    });
+    for (let tick = 0; tick < 130; tick++) updateVarkhulAssemblyAutomaton(sim.ctx, artificer);
+
+    expect(boss.hp).toBe(earnedHp);
+    expect(artificer.castingAbility).toBeNull();
     expect(state.assemblyArtificerRepaired).toBe(true);
   });
 
@@ -796,7 +959,7 @@ describe('Varkhul forge pillars and add intermission', () => {
   });
 
   it('pauses Meltdown, then resumes pending and future portals with a fresh pillar warning', () => {
-    const { sim, boss } = claimedEncounter(731);
+    const { sim, boss } = claimedEncounter(731, true);
     const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
     if (!instance) throw new Error('Varkhul instance missing');
     const origin = sim.ctx.instanceOriginOf(instance);
@@ -994,7 +1157,8 @@ describe('Varkhul forge pillars and add intermission', () => {
       sim.events.filter((event) => event.type === 'varkhulCallout' && event.call === 'bothPillars'),
     ).toHaveLength(ignitionCalloutsBeforeResume + 1);
 
-    expect(state.assemblyNextWaveIndex).toBe(state.assemblyIntermissionWaves);
+    expect(state.assemblyNextWaveIndex).toBe(nextWaveIndexBeforeMeltdown + 1);
+    expect(state.assemblyNextWaveIndex).toBeLessThan(state.assemblyIntermissionWaves);
     expect(state.assemblyPortalSpawns).toEqual([]);
 
     state.assemblyRemaining = DT;
@@ -1013,6 +1177,7 @@ describe('Varkhul forge pillars and add intermission', () => {
       5,
     );
 
+    state.assemblyNextWaveIndex = state.assemblyIntermissionWaves;
     for (const id of state.assemblyAddIds) {
       const add = sim.entities.get(id);
       if (add) add.dead = true;
@@ -1433,7 +1598,8 @@ describe('Varkhul forge pillars and add intermission', () => {
 
       expect(state.masterpieceTriggered).toBe(true);
       expect(state.majorAbility).toBe(majorAbility);
-      expect(boss.castingAbility).not.toBeNull();
+      if (majorAbility === 'forgestorm') expect(boss.castingAbility).toBeNull();
+      else expect(boss.castingAbility).not.toBeNull();
       if (majorAbility === 'cinderOrbs') expect(state.cinderOrbsMarkRemaining).toBeLessThan(1);
       if (majorAbility === 'forgestorm') expect(state.forgestormWarningRemaining).toBeLessThan(1);
       if (majorAbility === 'interceptBeam') {
@@ -1990,111 +2156,84 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyForgeBeamBlockerIds).toEqual([sim.player.id, rightBlocker.id]);
   });
 
-  it.each([
-    { heroic: false, waves: 3, adds: 12, lastSpawnTick: 360 },
-    { heroic: true, waves: 4, adds: 20, lastSpawnTick: 520 },
-  ])(
-    'uses real two-second portals and eight-second $heroic wave cadence without runes or teleports',
-    ({ heroic, waves, adds, lastSpawnTick }) => {
-      const { sim, boss } = claimedEncounter(heroic ? 711 : 712, heroic);
-      const rightBlocker = addTank(sim, boss, 'RightBlocker');
-      const instance = sim.instances.find((entry) => entry.mobIds.includes(boss.id));
-      if (!instance) throw new Error('Varkhul instance missing');
-      const origin = sim.ctx.instanceOriginOf(instance);
-      const forge = {
-        x: origin.x + VARKHUL_FORGE_LOCAL_POS.x,
-        z: origin.z + VARKHUL_FORGE_LOCAL_POS.z,
-      };
-      sim.player.pos = sim.ctx.groundPos(forge.x - 14, forge.z);
-      sim.player.prevPos = { ...sim.player.pos };
-      rightBlocker.pos = sim.ctx.groundPos(forge.x + 14, forge.z);
-      rightBlocker.prevPos = { ...rightBlocker.pos };
-      const positionsBefore = [sim.player, rightBlocker].map((player) => ({ ...player.pos }));
-      boss.hp = Math.floor(boss.maxHp * 0.5);
+  it('waits for a Normal wave to die, then telegraphs the next wave after three seconds', () => {
+    const { sim, boss } = claimedEncounter(712);
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.assemblyArtificerNextSpawnRemaining = 999;
+    const portalEvents = () =>
+      sim.events.filter(
+        (event) => event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
+      );
+    expect(state.assemblyIntermissionWaves).toBe(3);
+    state.engage.phase = 'done';
+    expect(portalEvents()).toHaveLength(4);
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
+      addWave: 1,
+      addWaves: 3,
+      addsRemaining: 4,
+    });
+    for (const pending of state.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyAddIds).toHaveLength(4);
 
+    state.assemblyNextWaveRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyNextWaveIndex).toBe(1);
+    expect(state.assemblyNextWaveRemaining).toBe(VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS);
+    expect(state.assemblyPortalSpawns).toEqual([]);
+
+    for (const id of state.assemblyAddIds) {
+      const add = sim.entities.get(id);
+      if (add) add.dead = true;
+    }
+    for (let tick = 1; tick < VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS / DT; tick++) {
       updateVarkhulEncounter(sim.ctx, boss);
-      const state = boss.varkhul;
-      if (!state) throw new Error('Varkhul state missing');
-      expect(state.assemblyPortalSpawns).toHaveLength(heroic ? 5 : 4);
-      expect(state.assemblyAddIds).toEqual([]);
-      expect(state.assemblyRemaining).toBeCloseTo(
-        (heroic
-          ? VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC
-          : VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL) - DT,
-        5,
-      );
-      expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
-        runes: [],
-        assignments: [],
-        cores: [],
-      });
-      const portalEvents = () =>
-        sim.events.filter(
-          (event) =>
-            event.type === 'spellfxAt' && event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID,
-        );
-      expect(portalEvents()).toHaveLength(4);
-      expect(
-        new Set(
-          portalEvents().map((event) =>
-            event.type === 'spellfxAt'
-              ? `${(event.x - origin.x).toFixed(2)}:${(event.z - origin.z).toFixed(2)}`
-              : '',
-          ),
-        ),
-      ).toEqual(
-        new Set(
-          VARKHUL_FORGE_PORTAL_LOCAL_POSITIONS.map(
-            (portal) => `${portal.x.toFixed(2)}:${portal.z.toFixed(2)}`,
-          ),
-        ),
-      );
-      expect(
-        portalEvents().every(
-          (event) =>
-            event.type === 'spellfxAt' && event.duration === VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS,
-        ),
-      ).toBe(true);
+    }
+    expect(state.assemblyNextWaveIndex).toBe(1);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.assemblyNextWaveIndex).toBe(2);
+    expect(state.assemblyPortalSpawns).toHaveLength(4);
+    expect(portalEvents()).toHaveLength(8);
+    expect(sim.activeVarkhulAssemblies[0]).toMatchObject({ addWave: 2, addsRemaining: 4 });
+  });
 
-      for (let tick = 0; tick < 38; tick++) updateVarkhulEncounter(sim.ctx, boss);
-      expect(state.assemblyAddIds).toEqual([]);
-      updateVarkhulEncounter(sim.ctx, boss);
-      expect(state.assemblyAddIds).toHaveLength(heroic ? 5 : 4);
+  it('overlaps Heroic waves after fourteen seconds or queues early when the prior wave dies', () => {
+    const timed = claimedEncounter(711, true);
+    timed.boss.hp = Math.floor(timed.boss.maxHp * 0.5);
+    updateVarkhulEncounter(timed.sim.ctx, timed.boss);
+    const timedState = timed.boss.varkhul;
+    if (!timedState) throw new Error('Varkhul state missing');
+    timedState.engage.phase = 'done';
+    timedState.assemblyArtificerNextSpawnRemaining = 999;
+    for (const pending of timedState.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(timed.sim.ctx, timed.boss);
+    expect(timedState.assemblyAddIds).toHaveLength(5);
+    timedState.assemblyNextWaveRemaining = DT;
+    updateVarkhulEncounter(timed.sim.ctx, timed.boss);
+    expect(timedState.assemblyNextWaveIndex).toBe(2);
+    expect(timedState.assemblyPortalSpawns).toHaveLength(5);
+    expect(timedState.assemblyNextWaveRemaining).toBe(VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS);
 
-      for (let totalTick = 41; totalTick <= lastSpawnTick; totalTick++) {
-        updateVarkhulEncounter(sim.ctx, boss);
-        if (totalTick % 160 === 0) {
-          const independentArtificerPortals = totalTick >= 200 ? 1 : 0;
-          expect(portalEvents()).toHaveLength(
-            4 * (totalTick / 160 + 1) + independentArtificerPortals,
-          );
-        }
-        if (totalTick >= 200 && (totalTick - 40) % 160 === 0) {
-          const spawnedWaves = (totalTick - 40) / 160 + 1;
-          const ordinaryAdds = state.assemblyAddIds.filter(
-            (id) => sim.entities.get(id)?.templateId !== VARKHUL_CINDER_ARTIFICER_ID,
-          );
-          expect(ordinaryAdds).toHaveLength(spawnedWaves * (heroic ? 5 : 4));
-        }
-      }
-      expect(portalEvents()).toHaveLength(waves * 4 + 1);
-      const ordinaryAdds = state.assemblyAddIds.filter(
-        (id) => sim.entities.get(id)?.templateId !== VARKHUL_CINDER_ARTIFICER_ID,
-      );
-      expect(ordinaryAdds).toHaveLength(adds);
-      expect(
-        state.assemblyAddIds.filter(
-          (id) => sim.entities.get(id)?.templateId === VARKHUL_CINDER_ARTIFICER_ID,
-        ),
-      ).toHaveLength(1);
-      expect([sim.player.pos, rightBlocker.pos]).toEqual(positionsBefore);
-      expect(sim.activeVarkhulAssemblies[0]).toMatchObject({
-        runes: [],
-        assignments: [],
-        cores: [],
-      });
-    },
-  );
+    const early = claimedEncounter(713, true);
+    early.boss.hp = Math.floor(early.boss.maxHp * 0.5);
+    updateVarkhulEncounter(early.sim.ctx, early.boss);
+    const earlyState = early.boss.varkhul;
+    if (!earlyState) throw new Error('Varkhul state missing');
+    earlyState.assemblyArtificerNextSpawnRemaining = 999;
+    for (const pending of earlyState.assemblyPortalSpawns) pending.remaining = DT;
+    updateVarkhulEncounter(early.sim.ctx, early.boss);
+    for (const id of earlyState.assemblyAddIds) {
+      const add = early.sim.entities.get(id);
+      if (add) add.dead = true;
+    }
+    earlyState.assemblyNextWaveRemaining = 13;
+    updateVarkhulEncounter(early.sim.ctx, early.boss);
+    expect(earlyState.assemblyNextWaveIndex).toBe(2);
+    expect(earlyState.assemblyPortalSpawns).toHaveLength(5);
+  });
 
   it('waits for future and pending waves even when every add already spawned is dead', () => {
     const { sim, boss } = claimedEncounter(725);
@@ -2465,7 +2604,7 @@ describe('Varkhul forge pillars and add intermission', () => {
   });
 
   it('makes each portal Warden pursue, melee, cast Quake, and recast on cadence', () => {
-    const { sim, boss } = claimedEncounter(704);
+    const { sim, boss } = claimedEncounter(704, true);
     sim.player.autoAttack = false;
     sim.player.damageImmune = false;
     sim.player.maxHp = 100_000;
@@ -2561,13 +2700,23 @@ describe('Varkhul forge pillars and add intermission', () => {
 
     warden.swingTimer = 999;
     state.assemblyForgeOverheat = 0.2;
-    const hpBeforeQuake = sim.player.hp;
+    const quakeDamage: number[] = [];
     for (let tick = 0; tick < 60 && warden.castingAbility === 'crucible_quake'; tick++) {
-      sim.tick();
+      for (const event of sim.tick()) {
+        if (
+          event.type === 'damage' &&
+          event.sourceId === warden.id &&
+          event.ability === 'Crucible Quake'
+        ) {
+          quakeDamage.push(event.amount);
+        }
+      }
     }
     expect(warden.castingAbility).toBeNull();
-    expect(sim.player.hp).toBeLessThan(hpBeforeQuake);
-    expect(state.assemblyForgeOverheat).toBeCloseTo(0.28, 8);
+    expect(quakeDamage).toHaveLength(1);
+    expect(quakeDamage[0]).toBeGreaterThanOrEqual(260);
+    expect(quakeDamage[0]).toBeLessThanOrEqual(330);
+    expect(state.assemblyForgeOverheat).toBeCloseTo(0.3, 8);
     for (let tick = 0; tick < 240 && warden.castingAbility !== 'crucible_quake'; tick++) {
       sim.tick();
     }
@@ -2575,11 +2724,11 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(sim.ctx.time - firstCastStartedAt).toBeCloseTo(12, 4);
 
     state.assemblyPhase = 'done';
-    state.assemblyForgeOverheat = 0.28;
+    state.assemblyForgeOverheat = 0.3;
     warden.castRemaining = DT;
     sim.tick();
     expect(warden.castingAbility).toBeNull();
-    expect(state.assemblyForgeOverheat).toBeCloseTo(0.28, 8);
+    expect(state.assemblyForgeOverheat).toBeCloseTo(0.3, 8);
   });
 
   it('lets Pummel interrupt Quake, applies fire lockout, and preserves its 12-second cadence', () => {

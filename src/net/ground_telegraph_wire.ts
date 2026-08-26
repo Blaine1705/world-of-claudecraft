@@ -81,32 +81,35 @@ export function decodeVarkhulForgestormWarnings(value: unknown): ActiveVarkhulFo
     if (!value || typeof value !== 'object') return [];
     const warning = value as Record<string, unknown>;
     if (
+      typeof warning.id !== 'string' ||
       ![
-        warning.id,
         warning.sourceId,
         warning.x,
         warning.z,
         warning.r,
         warning.dur,
         warning.rem,
+        warning.lead,
       ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
-      (warning.id as number) < 0 ||
       (warning.sourceId as number) < 0 ||
       (warning.r as number) <= 0 ||
       (warning.dur as number) <= 0 ||
-      (warning.rem as number) <= 0
+      (warning.rem as number) <= 0 ||
+      (warning.lead as number) < 0 ||
+      (warning.lead as number) >= (warning.dur as number)
     ) {
       return [];
     }
     return [
       {
-        id: warning.id as number,
+        id: warning.id,
         sourceId: warning.sourceId as number,
         x: warning.x as number,
         z: warning.z as number,
         radius: warning.r as number,
         duration: warning.dur as number,
         remaining: Math.min(warning.rem as number, warning.dur as number),
+        warningLead: warning.lead as number,
       },
     ];
   });

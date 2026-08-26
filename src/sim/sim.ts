@@ -318,6 +318,7 @@ import {
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
+import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
@@ -7918,6 +7919,10 @@ export class Sim {
     // actually reach the fight. Reordering these two would quietly shorten the
     // leash on every mob they both claim.
     if (playerPull) chainPullInstanceOnBossAggro(this.ctx, mob, target);
+    // Authored dungeon packs engage as a unit on every player/pet pull, including
+    // the non-social aggro path used by taunts. Keep this separate from the generic
+    // same-template radius below: `social` only controls that legacy propagation.
+    if (playerPull) aggroDungeonPackmates(this.entities.values(), mob, target);
     if (social) {
       const family = MOBS[mob.templateId]?.family;
       const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;

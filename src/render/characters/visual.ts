@@ -56,6 +56,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { deathGroundingOffset } from './death_grounding_core';
 import {
   createGhostEffectMaterial,
   createMoonkinEffectMaterial,
@@ -521,6 +522,7 @@ export class CharacterVisual {
   private actions = new Map<string, THREE.AnimationAction>();
   private model: THREE.Object3D;
   private modelWrap = new THREE.Group();
+  private modelWrapGroundY = 0;
   private poseWrap = new THREE.Group();
   private farMesh: THREE.Mesh | null = null;
   private farMaterials: THREE.Material | THREE.Material[] | null = null;
@@ -810,6 +812,7 @@ export class CharacterVisual {
       this.modelWrap.name = 'character_model_wrap';
       this.modelWrap.scale.setScalar(prep.normScale);
       this.modelWrap.position.y = prep.yOffset;
+      this.modelWrapGroundY = prep.yOffset;
       this.hairSway.build(this.model);
       this.modelWrap.add(this.model);
       this.poseWrap.add(this.modelWrap);
@@ -1153,6 +1156,16 @@ export class CharacterVisual {
       // integrating a hair spring.
       this.hairSway.update(dt, s);
     }
+    this.syncDeathGrounding(s.dead);
+  }
+
+  private syncDeathGrounding(dead: boolean): void {
+    const finalOffset = this.def.deathGroundOffset ?? 0;
+    if (finalOffset <= 0) return;
+    const death = this.action(this.def.clips.death);
+    this.modelWrap.position.y =
+      this.modelWrapGroundY -
+      deathGroundingOffset(dead, death?.time ?? 0, death?.getClip().duration ?? 0, finalOffset);
   }
 
   private updateMetamorphWings(dt: number, s: AnimState, reducedMotion: boolean): void {
@@ -3461,6 +3474,7 @@ export class CharacterVisual {
   private revive(): void {
     this.deadLock = false;
     this.baseState = 'idle';
+    this.modelWrap.position.y = this.modelWrapGroundY;
     this.applyCorpseMeshSwap(false);
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base

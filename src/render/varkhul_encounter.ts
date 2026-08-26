@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { VARKHUL_CINDER_FIRE_RADIUS } from '../sim/varkhul_cinder_orbs';
+import { VARKHUL_SHARED_PYRE_RADIUS } from '../sim/varkhul_shared_pyre';
+import { buildIgnivarSoakTelegraph, syncIgnivarSoakTelegraph } from './ignivar_soak_telegraph';
 import {
   buildVarkhulCinderFire,
   buildVarkhulCinderOrbProjectile,
@@ -13,6 +15,35 @@ import {
 
 export const VARKHUL_CINDER_ORBS_VISUAL_NAME = 'varkhulCinderOrbsTelegraph';
 export const VARKHUL_BRAND_VISUAL_NAME = 'varkhulMakersBrandTelegraph';
+export const VARKHUL_SHARED_PYRE_VISUAL_NAME = 'varkhulSharedPyreCircle';
+
+function buildVarkhulSharedPyreTelegraph(requiredPlayers: number): THREE.Group {
+  const visual = buildIgnivarSoakTelegraph(requiredPlayers);
+  visual.name = VARKHUL_SHARED_PYRE_VISUAL_NAME;
+  return visual;
+}
+
+function disposeVarkhulOwnedVisual(root: THREE.Object3D): void {
+  const geometries = new Set<THREE.BufferGeometry>();
+  const materials = new Set<THREE.Material>();
+  root.traverse((child) => {
+    const renderable = child as THREE.Mesh | THREE.Line;
+    if ((renderable as THREE.InstancedMesh).isInstancedMesh) {
+      (renderable as THREE.InstancedMesh).dispose();
+    }
+    if ('geometry' in renderable && renderable.geometry) geometries.add(renderable.geometry);
+    if ('material' in renderable && renderable.material) {
+      for (const material of Array.isArray(renderable.material)
+        ? renderable.material
+        : [renderable.material]) {
+        materials.add(material);
+      }
+    }
+  });
+  root.removeFromParent();
+  for (const geometry of geometries) geometry.dispose();
+  for (const material of materials) material.dispose();
+}
 
 function warningMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
@@ -133,6 +164,7 @@ export function syncVarkhulEncounterVisuals(
   entity: VarkhulVisualEntity,
   dtOrReducedMotion: number | boolean = 0,
   reducedMotion = false,
+  encounterEntities?: ReadonlyMap<number, VarkhulVisualEntity>,
 ): void {
   const dt = typeof dtOrReducedMotion === 'number' ? dtOrReducedMotion : 0;
   if (typeof dtOrReducedMotion === 'boolean') reducedMotion = dtOrReducedMotion;
@@ -175,12 +207,52 @@ export function syncVarkhulEncounterVisuals(
     group.add(brand);
   }
   if (brand) syncBrandTelegraph(brand, plan.makersBrandStacks, plan.inverseEntityScale);
+
+  let sharedPyre = group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME);
+  if (
+    sharedPyre &&
+    plan.sharedPyreVisible &&
+    Number(sharedPyre.userData.occupancySlots) !== plan.sharedPyreRequiredPlayers
+  ) {
+    disposeVarkhulOwnedVisual(sharedPyre);
+    sharedPyre = undefined;
+  }
+  if (!sharedPyre && plan.sharedPyreVisible) {
+    sharedPyre = buildVarkhulSharedPyreTelegraph(plan.sharedPyreRequiredPlayers);
+    group.add(sharedPyre);
+  }
+  if (sharedPyre) {
+    let playersInside = plan.sharedPyreVisible ? 1 : 0;
+    if (plan.sharedPyreVisible && entity.pos && encounterEntities) {
+      playersInside = 0;
+      for (const candidate of encounterEntities.values()) {
+        if (candidate.kind !== 'player' || candidate.dead || !candidate.pos) continue;
+        if (
+          Math.hypot(candidate.pos.x - entity.pos.x, candidate.pos.z - entity.pos.z) <=
+          VARKHUL_SHARED_PYRE_RADIUS
+        ) {
+          playersInside++;
+        }
+      }
+    }
+    syncIgnivarSoakTelegraph(
+      sharedPyre,
+      plan.sharedPyreVisible,
+      playersInside,
+      plan.sharedPyreRequiredPlayers,
+      plan.sharedPyreProgress,
+      plan.inverseEntityScale,
+      dt,
+      reducedMotion,
+    );
+  }
 }
 
 export function hasVisibleVarkhulEncounterTelegraph(group: THREE.Group): boolean {
   return (
     group.getObjectByName(VARKHUL_CINDER_ORBS_VISUAL_NAME)?.visible === true ||
-    group.getObjectByName(VARKHUL_FRONTAL_VISUAL_NAME)?.visible === true
+    group.getObjectByName(VARKHUL_FRONTAL_VISUAL_NAME)?.visible === true ||
+    group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME)?.visible === true
   );
 }
 
@@ -192,6 +264,7 @@ export function buildVarkhulEncounterPrewarmVisual(): THREE.Group {
     buildVarkhulFrontalVisual(),
     buildVarkhulCinderOrbsTelegraph(),
     buildVarkhulMakersBrandTelegraph(),
+    buildVarkhulSharedPyreTelegraph(5),
     buildVarkhulCinderFire(
       { id: 'prewarm-fire', sourceId: 0, x: 0, z: 0, radius: VARKHUL_CINDER_FIRE_RADIUS },
       0,
@@ -230,11 +303,15 @@ export function disposeVarkhulEncounterVisuals(group: THREE.Group): void {
     VARKHUL_CINDER_ORBS_VISUAL_NAME,
     VARKHUL_BRAND_VISUAL_NAME,
     VARKHUL_FRONTAL_VISUAL_NAME,
+    VARKHUL_SHARED_PYRE_VISUAL_NAME,
   ]) {
     const visual = group.getObjectByName(name);
     if (!visual) continue;
     visual.traverse((child) => {
       const renderable = child as THREE.Mesh | THREE.Line;
+      if ((renderable as THREE.InstancedMesh).isInstancedMesh) {
+        (renderable as THREE.InstancedMesh).dispose();
+      }
       if ('geometry' in renderable && renderable.geometry) geometries.add(renderable.geometry);
       if ('material' in renderable && renderable.material) {
         for (const material of Array.isArray(renderable.material)

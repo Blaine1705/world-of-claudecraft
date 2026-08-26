@@ -129,9 +129,10 @@ describe('Varkhul forge beams', () => {
     expect(varkhulForgeMeltdownTickDamageMaxHp('heroic')).toBe(0.2);
   });
 
-  it('adds eight forge-heat points only when a Crucible Quake resolves', () => {
+  it('adds eight Normal or ten Heroic forge-heat points when a Crucible Quake resolves', () => {
     expect(VARKHUL_FORGE_QUAKE_OVERHEAT).toBe(0.08);
-    expect(varkhulForgeOverheatAfterQuake(0.4)).toBeCloseTo(0.48, 8);
-    expect(varkhulForgeOverheatAfterQuake(0.97)).toBe(1);
+    expect(varkhulForgeOverheatAfterQuake(0.4, 'normal')).toBeCloseTo(0.48, 8);
+    expect(varkhulForgeOverheatAfterQuake(0.4, 'heroic')).toBeCloseTo(0.5, 8);
+    expect(varkhulForgeOverheatAfterQuake(0.97, 'heroic')).toBe(1);
   });
 });
