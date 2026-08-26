@@ -108,14 +108,6 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
-   "itemId": "burlap_reagent_pouch",
-   "name": "Burlap Reagent Pouch",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
-  },
-  {
    "itemId": "cooking_salt",
    "name": "Cooking Salt",
    "sourcePack": "woc_professions_art",
@@ -140,28 +132,12 @@
    "license": "World of ClaudeCraft project-authored vector illustration (original SVG rendered to WebP), project asset, rights reserved"
   },
   {
-   "itemId": "duskweave_bag",
-   "name": "Duskweave Bag",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
-  },
-  {
    "itemId": "elderwood_log",
    "name": "Highpine Log",
    "sourcePack": "woc_professions_art",
    "sourceFile": "batch-7/masters/elderwood_log.png (accepted v1)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-  },
-  {
-   "itemId": "foragers_haversack",
-   "name": "Forager's Haversack",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
   },
   {
    "itemId": "game_meat",
@@ -228,28 +204,12 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
-   "itemId": "loombound_reagent_satchel",
-   "name": "Loombound Reagent Satchel",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
-  },
-  {
    "itemId": "mistcallers_duffel",
    "name": "Fogbinder's Duffel",
    "sourcePack": "woc_bags",
    "sourceFile": "WoC_Bag_07.png",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-  },
-  {
-   "itemId": "necromancers_reagent_satchel",
-   "name": "Necromancer's Reagent Satchel",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
   },
   {
    "itemId": "prime_cut",
@@ -322,14 +282,6 @@
    "sourceFile": "batch-12/masters/resonant_timber.png (accepted v2)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-  },
-  {
-   "itemId": "resonant_weave_bag",
-   "name": "Resonantweave Bag",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
   },
   {
    "itemId": "rough_hide",
@@ -418,14 +370,6 @@
    "sourceFile": "batch-8/masters/venom_gland.png (accepted v2)",
    "confidence": "high",
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-  },
-  {
-   "itemId": "wayfarers_backpack",
-   "name": "Wayfarer's Backpack",
-   "sourcePack": "woc_original_svg",
-   "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
-   "confidence": "high",
-   "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)"
   },
   {
    "itemId": "wolfhide_satchel",
@@ -6117,6 +6061,31 @@
     "mother_of_pearl",
     "ps_briny_lure",
     "ps_lustrous_pearl"
+   ]
+  },
+  {
+   "batchId": "bank-storage-painted-bags-2026-08-25",
+   "source": "OpenAI built-in image generation",
+   "owner": "World of ClaudeCraft",
+   "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+   "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+   },
+   "styleReference": "Generated under woc-item-icon-v1. Exact per-item prompts, ordered repository reference roles, original results, normalized masters, shipping hashes, processing, review evidence, and retired-placeholder supersession records are retained in docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json.",
+   "commonPrompt": "Premium hand-painted classic dark-fantasy MMORPG inventory icon of one lore-specific bag or satchel in readable three-quarter volume, with tactile cloth, leather, metal, or bone; centered complete silhouette at about 72 percent fill; safe margins; opaque subdued painted vignette and contact shadow; warm top-left key light and cool deep bottom-right shadow; crisp at 22px and in a circular crop; no text, pseudo-writing, loose inventory, hand, mannequin, UI border, rarity frame, watermark, transparency, split sheet, collage, flat vector, cel shading, plastic gradient, photograph, or crop.",
+   "provenanceRecord": "docs/achievements/bank-storage-painted-bags-2026-08-25/",
+   "provenanceRecords": [
+    "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json"
+   ],
+   "itemIds": [
+    "burlap_reagent_pouch",
+    "duskweave_bag",
+    "foragers_haversack",
+    "loombound_reagent_satchel",
+    "necromancers_reagent_satchel",
+    "resonant_weave_bag",
+    "wayfarers_backpack"
    ]
   }
  ]
