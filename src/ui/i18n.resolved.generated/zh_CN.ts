@@ -4382,6 +4382,7 @@ export const zh_CN: EnTranslations = {
       "online": "角色当前在线。",
       "rename_not_permitted": "不允许为此角色改名。",
       "delete_confirm": "输入角色名称以确认删除。",
+      "storage_purchase_open": "此储物空间购买必须完成或解决后，才能删除该角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一个会话接管。",
       "rename_required": "此角色必须先改名才能进入世界。",

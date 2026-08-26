@@ -4382,6 +4382,7 @@ export const ko_KR: EnTranslations = {
       "online": "캐릭터가 현재 접속 중입니다.",
       "rename_not_permitted": "이 캐릭터의 이름을 변경할 수 없습니다.",
       "delete_confirm": "삭제를 확인하려면 캐릭터 이름을 입력하세요.",
+      "storage_purchase_open": "이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.",
       "already_in_world": "캐릭터가 이미 세계에 있습니다.",
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",

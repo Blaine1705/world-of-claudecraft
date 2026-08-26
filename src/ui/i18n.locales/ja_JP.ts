@@ -8707,6 +8707,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': 'キャラクターは現在オンラインです。',
   'apiError.character.rename_not_permitted': 'このキャラクターの名前変更は許可されていません。',
   'apiError.character.delete_confirm': '削除を確認するにはキャラクター名を入力してください。',
+  'apiError.character.storage_purchase_open':
+    'このキャラクターを削除するには、保管庫の購入を完了または解決する必要があります。',
   'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
   'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',

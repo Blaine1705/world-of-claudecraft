@@ -106,6 +106,7 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { characterDeleteHttpRefusal } from './character_delete_http';
 import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
@@ -2061,7 +2062,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           code: 'character.delete_confirm',
         });
       }
-      const ok = await deleteCharacter(accountId, characterId);
+      let ok: boolean;
+      try {
+        ok = await deleteCharacter(accountId, characterId);
+      } catch (error) {
+        const refusal = characterDeleteHttpRefusal(error);
+        if (refusal === null) throw error;
+        return json(res, refusal.status, refusal.body);
+      }
       if (ok) {
         // The SAME world-state purge the migrated deleteHandler runs (R43), through
         // the one shared helper, so an API_DISPATCH=legacy rollback keeps it.

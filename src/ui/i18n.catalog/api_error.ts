@@ -112,6 +112,8 @@ export const apiErrorStrings = {
     rename_not_permitted: 'Renaming this character is not allowed.',
     // reuses errors.api.deleteConfirm
     delete_confirm: 'Type the character name to confirm deletion.',
+    storage_purchase_open:
+      'A storage purchase must finish or be resolved before this character can be deleted.',
     // reuses errors.api.alreadyInWorld
     already_in_world: 'Character is already in world.',
     // reuses errors.api.takenOver

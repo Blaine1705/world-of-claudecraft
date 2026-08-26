@@ -32,6 +32,7 @@ const EXPECTED_CODES = [
   'body.unsupported_media_type',
   'character.already_in_world',
   'character.delete_confirm',
+  'character.storage_purchase_open',
   'character.invalid_class',
   'character.limit_reached',
   'character.name_invalid',

@@ -4382,6 +4382,7 @@ export const da_DK: EnTranslations = {
       "online": "Karakteren er i øjeblikket online.",
       "rename_not_permitted": "Det er ikke tilladt at omdøbe denne karakter.",
       "delete_confirm": "Skriv karakterens navn for at bekræfte sletning.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
       "already_in_world": "Karakteren er allerede i verdenen.",
       "taken_over": "Din karakter blev overtaget af en anden session.",
       "rename_required": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",

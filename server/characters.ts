@@ -52,6 +52,7 @@ import type { PlayerClass } from '../src/sim/types';
 // only guarantees the stored document is small and well shaped.
 import { sanitizeAppearance } from '../src/world_api/appearance';
 import { normalizeCharName, offensiveName } from './auth';
+import { characterDeleteHttpRefusal } from './character_delete_http';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
@@ -858,7 +859,15 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 400, DELETE_CONFIRM);
     return;
   }
-  const ok = await charactersDb.deleteCharacter(accountId, character.id);
+  let ok: boolean;
+  try {
+    ok = await charactersDb.deleteCharacter(accountId, character.id);
+  } catch (error) {
+    const refusal = characterDeleteHttpRefusal(error);
+    if (refusal === null) throw error;
+    json(ctx.res, refusal.status, refusal.body);
+    return;
+  }
   // The row is gone; take its shared world state with it (R43). Read freshness
   // comes from the SYNCHRONOUS in-memory purge (both reads serve from the live
   // sim in this process). The AWAITED saves NARROW the crash window before the

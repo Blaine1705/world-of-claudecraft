@@ -4382,6 +4382,7 @@ export const pt_BR: EnTranslations = {
       "online": "O personagem está online no momento.",
       "rename_not_permitted": "Não é permitido renomear este personagem.",
       "delete_confirm": "Digite o nome do personagem para confirmar a exclusão.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
       "already_in_world": "O personagem já está no mundo.",
       "taken_over": "Seu personagem foi assumido por outra sessão.",
       "rename_required": "Este personagem precisa ser renomeado antes de entrar no mundo.",

@@ -4382,6 +4382,7 @@ export const de_DE: EnTranslations = {
       "online": "Der Charakter ist derzeit online.",
       "rename_not_permitted": "Das Umbenennen dieses Charakters ist nicht erlaubt.",
       "delete_confirm": "Gib den Charakternamen ein, um das Löschen zu bestätigen.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
       "already_in_world": "Der Charakter ist bereits in der Welt.",
       "taken_over": "Dein Charakter wurde von einer anderen Sitzung übernommen.",
       "rename_required": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.",

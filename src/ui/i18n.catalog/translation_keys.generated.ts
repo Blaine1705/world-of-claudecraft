@@ -129,6 +129,7 @@ export type TranslationKeyFlat =
   | 'apiError.character.rename_not_permitted'
   | 'apiError.character.rename_required'
   | 'apiError.character.reroll_unavailable'
+  | 'apiError.character.storage_purchase_open'
   | 'apiError.character.taken_over'
   | 'apiError.cheater_mark.admin_target'
   | 'apiError.cheater_mark.invalid_duration'

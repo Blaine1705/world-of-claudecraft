@@ -20,6 +20,7 @@ import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { CharacterStoragePurchaseOpen } from '../../server/character_delete_db';
 import {
   APPEARANCE_REROLL_CUTOFF,
   type CharactersRuntime,
@@ -1576,6 +1577,36 @@ describe('takeover handler', () => {
 // ---------------------------------------------------------------------------
 
 describe('delete handler', () => {
+  it.each(['pending', 'unresolved'] as const)(
+    '409s without purging when the character has an open %s storage purchase',
+    async (status) => {
+      const spies = purgeSpies();
+      setCharactersDbForTests({
+        deleteCharacter: async () => {
+          throw new CharacterStoragePurchaseOpen(9, status);
+        },
+      });
+      installRuntime({ isCharacterOnline: () => false, ...spies });
+
+      const res = await callHandler('DELETE', '/api/characters/:id', {
+        account: { accountId: 7, scope: 'full' },
+        state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+        body: { name: 'Deleteme' },
+      });
+
+      expect(res.status).toBe(409);
+      expect(res.body).toEqual({
+        error:
+          'A storage purchase must finish or be resolved before this character can be deleted.',
+        code: 'character.storage_purchase_open',
+      });
+      expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+      expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+      expect(spies.saveMarket).not.toHaveBeenCalled();
+      expect(spies.saveMail).not.toHaveBeenCalled();
+    },
+  );
+
   it('200s ok:true when offline, name-confirmed, and the delete lands', async () => {
     setCharactersDbForTests({ deleteCharacter: async () => true });
     installRuntime({ isCharacterOnline: () => false });
@@ -1746,6 +1777,25 @@ describe('purgeDeletedCharacterWorldState', () => {
 });
 
 describe('legacy DELETE dispatch arm (main.ts)', () => {
+  it('maps the shared open-storage refusal before any world-state purge', () => {
+    const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const start = src.indexOf("if (req.method === 'DELETE' && delMatch) {");
+    expect(start).toBeGreaterThan(-1);
+    const end = src.indexOf("url === '/api/realms'", start);
+    expect(end).toBeGreaterThan(start);
+    const arm = stripComments(src.slice(start, end));
+
+    const deleteAt = arm.indexOf('await deleteCharacter(accountId, characterId)');
+    const refusalAt = arm.indexOf('characterDeleteHttpRefusal(error)');
+    const responseAt = arm.indexOf('return json(res, refusal.status, refusal.body)');
+    const purgeAt = arm.indexOf('purgeDeletedCharacterWorldState(');
+    expect(deleteAt).toBeGreaterThan(-1);
+    expect(refusalAt).toBeGreaterThan(deleteAt);
+    expect(responseAt).toBeGreaterThan(refusalAt);
+    expect(purgeAt).toBeGreaterThan(responseAt);
+  });
+
   it('runs the same shared purge, after the db delete', () => {
     const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
     // Strip `//` line comments (keeping `://` protocol slashes) before the substring
