@@ -388,7 +388,13 @@ import {
   buildMobileConsumableSeat,
   type MobileConsumableSeat,
 } from './hud/action_bar/consumable_seat_controller';
-import { type AimPoint, shouldUseGroundAim, smartSeedPoint } from './hud/action_bar/ground_aim';
+import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
+import {
+  type AimPoint,
+  shouldUseGroundAim,
+  smartSeedPoint,
+  XHB_ONLY_AIM_SLOT,
+} from './hud/action_bar/ground_aim';
 import {
   GroundAimController,
   type GroundAimReticleView,
@@ -6798,35 +6804,16 @@ export class Hud {
   }
 
   private bindEmpoweredActionHold(btn: HTMLButtonElement, resolveSlot: () => number): void {
-    let heldPointer: number | null = null;
-    let heldSlot: number | null = null;
-    btn.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
-      if (this.actionBarBind) return; // bind mode owns clicks/holds on the bar
-      const slot = resolveSlot();
-      if (!this.empoweredAbilityIdForSlot(slot)) return;
-      if (this.empowerCharge) return;
-      heldPointer = event.pointerId;
-      heldSlot = slot;
-      this.pressSlot(slot);
-      try {
-        btn.setPointerCapture?.(event.pointerId);
-      } catch {
-        /* pointer already released */
-      }
-      event.preventDefault();
+    bindEmpoweredActionHold(btn, resolveSlot, {
+      bindModeActive: () => this.actionBarBind !== null,
+      empoweredAbilityIdForSlot: (slot) => this.empoweredAbilityIdForSlot(slot),
+      chargeActive: () => this.empowerCharge !== null,
+      pressSlot: (slot) => this.pressSlot(slot),
+      releaseSlot: (slot) => this.releaseSlot(slot),
+      suppressNextClick: () => {
+        this.suppressNextActionClick = true;
+      },
     });
-    const release = (event: PointerEvent, suppressClick: boolean) => {
-      if (heldPointer !== event.pointerId || heldSlot === null) return;
-      const slot = heldSlot;
-      heldPointer = null;
-      heldSlot = null;
-      this.releaseSlot(slot);
-      if (suppressClick) this.suppressNextActionClick = true;
-      event.preventDefault();
-    };
-    btn.addEventListener('pointerup', (event) => release(event, true));
-    btn.addEventListener('pointercancel', (event) => release(event, false));
   }
 
   private groundReticleEnabled(abilityId: string): boolean {
@@ -6890,8 +6877,9 @@ export class Hud {
    * auto-attack QoL) rather than a second cast path that would drift from it.
    *
    * The bar is seeded from the action bar, so the lookup almost always hits. An
-   * action arranged onto the pad and nowhere else falls back to a plain cast (the
-   * one case without a reticle) or, for an item, to the shared item-use seam.
+   * action arranged onto the pad and nowhere else falls back to a plain cast
+   * (position abilities keep the reticle via the ability-id aim identity) or,
+   * for an item, to the shared item-use seam.
    */
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
@@ -6914,8 +6902,24 @@ export class Hud {
       this.castSlot(slot);
       return;
     }
-    // The sim owns the refusal for an ability the player no longer knows.
     if (action.type === 'ability') {
+      // A position ability arranged only on the pad still gets the reticle: the
+      // aim identity falls back to the ability id (the XHB_ONLY_AIM_SLOT
+      // sentinel), so a same-cell re-press commits and cancel backs out exactly
+      // like a bar-backed cast.
+      const known = this.sim.known.find((k) => k.def.id === action.id) ?? null;
+      if (known && known.def.targetMode === 'position' && !known.def.selfCentered) {
+        if (this.isGroundAimActive()) {
+          if (this.groundAim.activeAbilityId() === action.id) {
+            this.commitGroundAimAt();
+            return;
+          }
+          this.cancelGroundAim();
+        }
+        this.castPositionAbility(action.id, known, XHB_ONLY_AIM_SLOT);
+        return;
+      }
+      // The sim owns the refusal for an ability the player no longer knows.
       this.sim.castAbility(action.id);
       return;
     }
@@ -6927,6 +6931,27 @@ export class Hud {
     // A cell left holding an item this client cannot use is a stale binding, so
     // refuse it out loud rather than eating the press.
     this.showError(tSim('error.noItem'));
+  }
+
+  // One decision for a position-targeted press, shared by the bar slots and the
+  // XHB-only fallback: enter aim when the reticle applies and the cast could
+  // actually start (alive, off cooldown; resources and GCD legitimately change
+  // while aiming, so they never gate entry), else cast instantly at the
+  // device's quick point. slotForAim is the re-press commit identity.
+  private castPositionAbility(
+    abilityId: string,
+    resolved: ResolvedAbility,
+    slotForAim: number,
+  ): void {
+    const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
+    if (this.groundReticleEnabled(abilityId) && !this.sim.player.dead && cooldown <= 0) {
+      this.beginGroundAim(abilityId, slotForAim);
+      return;
+    }
+    const point = document.body.classList.contains('mobile-touch')
+      ? smartSeedPoint(this.sim.player, this.groundAimSeedTarget(), resolved.def.range)
+      : this.groundTargetAim();
+    this.sim.castAbilityAt(abilityId, point);
   }
 
   castSlot(barSlot: number): void {
@@ -6959,16 +6984,7 @@ export class Hud {
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
-          const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
-          const mobileTouch = document.body.classList.contains('mobile-touch');
-          if (this.groundReticleEnabled(action.id) && !this.sim.player.dead && cooldown <= 0) {
-            this.beginGroundAim(action.id, barSlot);
-          } else {
-            const point = mobileTouch
-              ? smartSeedPoint(this.sim.player, this.groundAimSeedTarget(), resolved.def.range)
-              : this.groundTargetAim();
-            this.sim.castAbilityAt(action.id, point);
-          }
+          this.castPositionAbility(action.id, resolved, barSlot);
         } else {
           // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
           // while hovering a party frame lands on the hovered member instead of

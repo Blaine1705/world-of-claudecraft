@@ -59,6 +59,7 @@ interface CastHarness {
     castAbility: ReturnType<typeof vi.fn>;
     useItem: ReturnType<typeof vi.fn>;
     tradeInfo: unknown;
+    known: unknown[];
   };
   castSlot: ReturnType<typeof vi.fn>;
   activateFixedAttackSlot: ReturnType<typeof vi.fn>;
@@ -96,6 +97,7 @@ function makeHud(
     castAbility: vi.fn(),
     useItem: vi.fn(),
     tradeInfo: opts.tradeOpen ? { items: [] } : null,
+    known: [],
   };
   hud.castSlot = vi.fn();
   hud.activateFixedAttackSlot = vi.fn();

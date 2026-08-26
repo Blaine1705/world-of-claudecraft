@@ -30,7 +30,7 @@ import { ABILITIES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { AbilityDef, Entity } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
-import type { AimPoint } from '../src/ui/hud/action_bar/ground_aim';
+import { type AimPoint, XHB_ONLY_AIM_SLOT } from '../src/ui/hud/action_bar/ground_aim';
 import { GroundAimController } from '../src/ui/hud/action_bar/ground_aim_controller';
 
 interface GroundAimHarness {
@@ -158,6 +158,20 @@ function makeHud(
   hud.actionForSlot = () => ({ type: 'ability', id: ability.def.id });
   hud.abilityForSlot = () => ability;
   hud.flashActionSlot = vi.fn();
+  return hud;
+}
+
+/** The same harness with an EMPTY bar, so castCrossHotbarAction takes the
+ *  no-slot fallback and aim identity resolves by ability id. */
+function makeXhbOnlyHud(options: Parameters<typeof makeHud>[0] = {}): GroundAimHarness & {
+  hotbarActions: unknown[];
+  castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void;
+} {
+  const hud = makeHud(options) as ReturnType<typeof makeXhbOnlyHud>;
+  // hotbarActions is a Hud accessor that forwards to the (absent) action bar
+  // controller, so shadow it with a plain own property for the slot-scan loop.
+  Object.defineProperty(hud, 'hotbarActions', { value: [], configurable: true });
+  hud.actionForSlot = () => null;
   return hud;
 }
 
@@ -428,5 +442,37 @@ describe('Hud ground aim behavior', () => {
 
     expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', shown?.point);
     expect(hud.isGroundAimActive()).toBe(false);
+  });
+
+  describe('XHB-only aim identity', () => {
+    it('enters aim under the sentinel slot for a pad-only position ability', () => {
+      const hud = makeXhbOnlyHud();
+
+      hud.castCrossHotbarAction({ type: 'ability', id: 'flamestrike' });
+
+      expect(hud.groundAim.activeAbilityId()).toBe('flamestrike');
+      expect(hud.groundAim.activeSlot()).toBe(XHB_ONLY_AIM_SLOT);
+      expect(hud.sim.castAbilityAt).not.toHaveBeenCalled();
+    });
+
+    it('commits on a same-cell re-press by ability id', () => {
+      const hud = makeXhbOnlyHud();
+
+      hud.castCrossHotbarAction({ type: 'ability', id: 'flamestrike' });
+      hud.castCrossHotbarAction({ type: 'ability', id: 'flamestrike' });
+
+      expect(hud.isGroundAimActive()).toBe(false);
+      expect(hud.sim.castAbilityAt).toHaveBeenCalledTimes(1);
+      expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 0, z: 15 });
+    });
+
+    it('quick mode still casts at a point, never a plain castAbility', () => {
+      const hud = makeXhbOnlyHud({ mobileTouch: true, touchPrecise: false });
+
+      hud.castCrossHotbarAction({ type: 'ability', id: 'flamestrike' });
+
+      expect(hud.isGroundAimActive()).toBe(false);
+      expect(hud.sim.castAbilityAt).toHaveBeenCalledWith('flamestrike', { x: 0, z: 15 });
+    });
   });
 });

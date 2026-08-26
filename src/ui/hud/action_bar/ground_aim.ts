@@ -12,6 +12,10 @@ export interface GroundAimState {
 
 export const DEFAULT_GROUND_AOE_RADIUS = 6;
 
+/** Aim-slot sentinel for an ability arranged only on the cross hotbar: no bar
+ *  slot can equal it, so re-press commit resolves by ability id instead. */
+export const XHB_ONLY_AIM_SLOT = -1;
+
 /** Touch uses the dedicated precise-targeting preference. Desktop remains
  * governed by the player's ground-reticle preference. */
 export function shouldUseGroundAim(
