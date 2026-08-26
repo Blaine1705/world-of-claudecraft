@@ -28,9 +28,9 @@ import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosm
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
-import { applyMovementPositionSample } from '../server/movement_position';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
+import { applyMovementPositionSample } from '../server/movement_position';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';

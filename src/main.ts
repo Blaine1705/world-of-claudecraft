@@ -345,7 +345,6 @@ import {
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
-import { hasTranslationalMoveInput } from './sim/move_input';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { isSubmerged } from './sim/player_motion';
 import { Sim } from './sim/sim';
@@ -4367,7 +4366,10 @@ async function startGame(
     alpha: 0,
   };
   const selfMotionFrameBuffer = new SelfMotionFrameBuffer();
-  const movementPrediction = new MovementPredictionPipeline(world.cfg.seed, world.riftCollisionToken);
+  const movementPrediction = new MovementPredictionPipeline(
+    world.cfg.seed,
+    world.riftCollisionToken,
+  );
   if (online) movementPrediction.connect(online);
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it

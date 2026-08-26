@@ -39,7 +39,6 @@ import { riftFx } from './fx';
 import {
   RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
-  RIFT_TIER_INFO,
   sealNaturalRiftPortalForRecovery,
 } from './portals';
 import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';

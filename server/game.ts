@@ -302,8 +302,8 @@ import {
   type MovementInputSessionState,
   resetMovementInputSessionState,
 } from './movement_input_timeline_v2';
-import { reconciliationSelfWire, updateOverrideEpochs } from './movement_reconciliation_wire';
 import { type MovementPositionState, resetMovementPosition } from './movement_position';
+import { reconciliationSelfWire, updateOverrideEpochs } from './movement_reconciliation_wire';
 import {
   classifyMsgLane,
   consumeLaneToken,
