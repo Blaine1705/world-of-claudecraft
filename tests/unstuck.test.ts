@@ -859,10 +859,9 @@ describe('unstuck area identity', () => {
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
   });
 
-  it('accepts a battleground wall-contact ESC attempt while movement input is still held', () => {
+  it('rejects a battleground wall-contact ESC attempt while movement input is still held', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallContact(sim, match, pid);
-    const origin = battlegroundOrigin(match.slot);
 
     const start = required(
       unstuckLocationAt(sim.ctx, pid, player.pos),
@@ -875,17 +874,19 @@ describe('unstuck area identity', () => {
       slot: match.slot,
     });
 
-    expect(sim.unstuck(pid)).toBe(true);
-    sim.drainEvents();
-    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
-    const completed = eventsOf(events).find((event) => event.phase === 'completed');
-    expect(completed?.area).toMatchObject(start.area);
+    const before = { ...player.pos };
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'moving', pid }),
+    );
     expect(sim.bgMatchFor(pid)).toBe(match);
     expect(isBgPos(player.pos.x)).toBe(true);
+    expect(player.pos).toEqual(before);
 
-    const plot = BG_GRAVEYARDS[0];
-    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
-    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    expect(eventsOf(events)).not.toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
   });
 
   it('rejects a battleground wall-adjacent ESC attempt while moving along the wall', () => {
@@ -907,20 +908,6 @@ describe('unstuck area identity', () => {
       expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'moving' }),
     );
 
-    player.cooldowns.delete(UNSTUCK_COOLDOWN_ID);
-    forceBattlegroundWallContact(sim, match, pid);
-    expect(sim.unstuck(pid)).toBe(true);
-    sim.drainEvents();
-
-    player.facing += Math.PI / 2;
-    player.prevFacing = player.facing;
-    const events = eventsOf(sim.tick());
-    expect(
-      Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z),
-    ).toBeGreaterThan(0.05);
-    expect(events).toContainEqual(
-      expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'moved' }),
-    );
     expect(meta.pendingUnstuck).toBeNull();
   });
 
