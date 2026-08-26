@@ -83,7 +83,7 @@ const listing = (id: number): WocListingRow =>
     item: { itemId: 'iron_sword', count: 1 },
   }) as unknown as WocListingRow;
 
-function makeGrantDeliveryCtx(result: 'booked' | 'lease_lost' | 'claim_missing'): {
+function makeGrantDeliveryCtx(result: 'booked' | 'lease_lost' | 'claim_missing' | Error): {
   ctx: WocDeliveryCtx;
   acknowledge: ReturnType<typeof vi.fn>;
   save: CharacterSaveArgs;
@@ -115,6 +115,14 @@ function makeGrantDeliveryCtx(result: 'booked' | 'lease_lost' | 'claim_missing')
     state: {} as CharacterSaveArgs['state'],
     leaseNonce: 'buyer-nonce',
     storageEffects: [],
+    bankLedgerSnapshot: Object.freeze({
+      owner: Object.freeze({ realm: 'test-realm', characterId: 55, accountId: 8 }),
+      batches: Object.freeze([]),
+      rowCount: 0,
+      encodedBytes: 0,
+      guildIds: Object.freeze([]),
+      hasUnscopedRows: true,
+    }),
   };
   const acknowledge = vi.fn();
   const db = {
@@ -127,7 +135,10 @@ function makeGrantDeliveryCtx(result: 'booked' | 'lease_lost' | 'claim_missing')
       grantCharacterId: 55,
       mailIntent: false,
     })),
-    saveDeliveredCharacterBooked: vi.fn(async () => result),
+    saveDeliveredCharacterBooked: vi.fn(async () => {
+      if (result instanceof Error) throw result;
+      return result;
+    }),
     finalizeDeliveredSettlement: vi.fn(async () => 'already_final' as const),
     touchSettlementRow: vi.fn(async () => {}),
   };
@@ -176,6 +187,7 @@ describe('direct-grant storage-effect acknowledgement', () => {
     expect(advanced).toBe(1);
     expect(acknowledge).toHaveBeenCalledOnce();
     expect(acknowledge).toHaveBeenCalledWith(save);
+    expect(acknowledge.mock.calls[0]?.[0].bankLedgerSnapshot).toBe(save.bankLedgerSnapshot);
   });
 
   it.each(['lease_lost', 'claim_missing'] as const)(
@@ -191,6 +203,18 @@ describe('direct-grant storage-effect acknowledgement', () => {
       expect(acknowledge).not.toHaveBeenCalled();
     },
   );
+
+  it('does not acknowledge an exact ledger prefix after an unknown transaction throw', async () => {
+    const { ctx, acknowledge, save } = makeGrantDeliveryCtx(new Error('commit reply lost'));
+    const advanced = await createWocMarketDeliveryArms(ctx).reconcileDelivering(1_000, {
+      contended: false,
+      parked: 0,
+    });
+
+    expect(advanced).toBe(0);
+    expect(acknowledge).not.toHaveBeenCalled();
+    expect(save.bankLedgerSnapshot?.batches).toEqual([]);
+  });
 });
 
 describe('the stamp-ledger high-water (counted, re-arming, never shedding)', () => {

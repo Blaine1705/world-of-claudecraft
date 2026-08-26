@@ -15,6 +15,7 @@ import {
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { CharacterState, Sim } from '../src/sim/sim';
 import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
+import type { BankLedgerOutboxSnapshot } from './bank_ledger_outbox';
 import { gameMetricsCounters } from './http/game_signals';
 import type { StorageAppliedEffect } from './storage_purchase_db';
 import type {
@@ -47,15 +48,26 @@ export interface WocCustodyGameHost {
    *  this module hands to a durable write comes from here; a raw
    *  sim.serializeCharacter is a jail escape. Null when the session is
    *  gone, torn down, or escrow-quarantined. */
-  serializeCharacterForPersist(
-    characterId: number,
-  ): { level: number; state: CharacterState; storageEffects?: StorageAppliedEffect[] } | null;
-  acknowledgeStorageCharacterSave?(
-    characterId: number,
-    leaseNonce: string | undefined,
-    effects: readonly StorageAppliedEffect[],
-  ): void;
-  hasDirtyGuildBooks(characterId: number): boolean;
+  serializeCharacterForPersist(characterId: number): {
+    level: number;
+    state: CharacterState;
+    storageEffects?: StorageAppliedEffect[];
+    bankLedgerSnapshot?: BankLedgerOutboxSnapshot;
+  } | null;
+  /** Acknowledge every exact save effect as one host decision after COMMIT.
+   *  The host must exact-match character and lease identity, consume neither
+   *  queue on any mismatch, and return false rather than throw. This bridge
+   *  still catches a broken host so a known database commit can never enter
+   *  marketplace compensation. */
+  acknowledgeCharacterSaveEffects?(save: CharacterSaveArgs): boolean;
+  /** True when a character-only market transaction would split any dirty
+   *  guild book from its character state OR any queued guild-scoped ledger
+   *  row from that book. A mixed personal+guild prefix is still a conflict:
+   *  callers refuse the whole exact prefix and never filter it. */
+  hasCharacterOnlySaveConflict(characterId: number): boolean;
+  /** Retained during the host migration only; all custody decisions use the
+   *  wider hasCharacterOnlySaveConflict guard above. */
+  hasDirtyGuildBooks?(characterId: number): boolean;
   flushDirtyGuildBooks(characterId: number): Promise<void>;
   /** Terminal escrow-job signals (game.ts owns the semantics: 'fenced' kicks
    *  the displaced zombie, 'ambiguous' quarantines so the durable row
@@ -115,6 +127,28 @@ export function wocEscrowSerializeStats(): { count: number; totalMs: number; max
   };
 }
 
+function characterSaveArgs(
+  characterId: number,
+  leaseNonce: string | undefined,
+  snapshot: {
+    level: number;
+    state: CharacterState;
+    storageEffects?: StorageAppliedEffect[];
+    bankLedgerSnapshot?: BankLedgerOutboxSnapshot;
+  },
+): CharacterSaveArgs {
+  return {
+    characterId,
+    level: snapshot.level,
+    state: snapshot.state,
+    leaseNonce,
+    storageEffects: snapshot.storageEffects ?? [],
+    // Object identity is load-bearing: BankLedgerOutbox.acknowledge uses the
+    // exact captured object to remove only this prefix, leaving later appends.
+    bankLedgerSnapshot: snapshot.bankLedgerSnapshot,
+  };
+}
+
 export function createWocMarketCustody(
   host: WocCustodyGameHost,
   opts: {
@@ -171,13 +205,7 @@ export function createWocMarketCustody(
         pid: session.pid,
         extracted: out.extracted,
         characterName: session.name,
-        save: {
-          characterId,
-          level: snap.level,
-          state: snap.state,
-          leaseNonce: session.leaseNonce,
-          storageEffects: snap.storageEffects ?? [],
-        },
+        save: characterSaveArgs(characterId, session.leaseNonce, snap),
       };
     },
 
@@ -241,7 +269,7 @@ export function createWocMarketCustody(
                 `[woc_market] escrow queue wait ${waited}ms for character ${characterId}`,
               );
             }
-            if (host.hasDirtyGuildBooks(characterId)) {
+            if (host.hasCharacterOnlySaveConflict(characterId)) {
               gameMetricsCounters().wocEscrowQueue('books_dirty_refused');
               return 'contended';
             }
@@ -311,6 +339,15 @@ export function createWocMarketCustody(
           async () => {
             if (cancelled) return 'busy';
             started = true;
+            // This transaction persists the character row without a guild
+            // book. Check in the FIFO slot immediately before the fresh
+            // snapshot so neither a dirty book nor a guild-bearing outbox
+            // prefix can be split by the WOC save. The whole prefix parks;
+            // filtering its guild rows would destroy command-batch identity.
+            if (host.hasCharacterOnlySaveConflict(characterId)) {
+              gameMetricsCounters().wocEscrowQueue('books_dirty_refused');
+              return 'busy';
+            }
             // Validated UNDER the slot: a session that left or rotated its
             // lease during the wait must park (only the operator can
             // attribute the earlier grant), and the fresh serialize below is
@@ -321,13 +358,7 @@ export function createWocMarketCustody(
             if (session.leaseNonce !== expectedNonce) return 'session_lost';
             const snap = host.serializeCharacterForPersist(characterId);
             if (!snap) return 'session_lost';
-            return persist({
-              characterId,
-              level: snap.level,
-              state: snap.state,
-              leaseNonce: session.leaseNonce,
-              storageEffects: snap.storageEffects ?? [],
-            });
+            return persist(characterSaveArgs(characterId, session.leaseNonce, snap));
           },
         );
         const timeout = new Promise<'timeout'>((resolve) => {
@@ -373,13 +404,7 @@ export function createWocMarketCustody(
       }
       return {
         ok: true,
-        save: {
-          characterId,
-          level: snap.level,
-          state: snap.state,
-          leaseNonce: session.leaseNonce,
-          storageEffects: snap.storageEffects ?? [],
-        },
+        save: characterSaveArgs(characterId, session.leaseNonce, snap),
       };
     },
 
@@ -396,22 +421,27 @@ export function createWocMarketCustody(
       if (!snap) return { ok: false, reason: 'offline' };
       return {
         ok: true,
-        save: {
-          characterId,
-          level: snap.level,
-          state: snap.state,
-          leaseNonce: session.leaseNonce,
-          storageEffects: snap.storageEffects ?? [],
-        },
+        save: characterSaveArgs(characterId, session.leaseNonce, snap),
       };
     },
 
     acknowledgeCharacterSave(save: CharacterSaveArgs): void {
-      host.acknowledgeStorageCharacterSave?.(
-        save.characterId,
-        save.leaseNonce,
-        save.storageEffects ?? [],
-      );
+      const acknowledge = host.acknowledgeCharacterSaveEffects;
+      if (!acknowledge) return;
+      try {
+        if (!acknowledge(save)) {
+          console.error(
+            `[woc_market] committed character save effects were retained for character ${save.characterId}: acknowledgement identity mismatch`,
+          );
+        }
+      } catch (err) {
+        // COMMIT is already known. A bookkeeping failure must retain effects
+        // for their idempotent retry, never throw into copy compensation.
+        console.error(
+          `[woc_market] committed character save effects were retained for character ${save.characterId}: acknowledgement failed`,
+          err,
+        );
+      }
     },
 
     restoreCopy(pid: number, characterId: number, slot: InvSlot): void {

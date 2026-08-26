@@ -22,6 +22,7 @@ import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
+import type { BankLedgerOutboxSnapshot } from './bank_ledger_outbox';
 import { throwProvedRollback } from './pg_rollback_proof';
 import {
   BOND_PAYOUT_BUDGET_MS,
@@ -336,6 +337,10 @@ export interface CharacterSaveArgs {
   state: CharacterState;
   leaseNonce: string | undefined;
   storageEffects?: readonly import('./storage_purchase_db').StorageAppliedEffect[];
+  /** The exact immutable outbox prefix captured with this state. Never clone,
+   *  rebuild, or filter this object: its identity is the acknowledgement key
+   *  that leaves concurrent appends queued after COMMIT. */
+  bankLedgerSnapshot?: BankLedgerOutboxSnapshot;
 }
 
 export interface WocMarketDb {

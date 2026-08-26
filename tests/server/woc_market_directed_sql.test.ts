@@ -2073,6 +2073,25 @@ describe('the atomic save-and-book, in SQL', () => {
     leaseNonce: 'nonce-1',
   };
 
+  it('passes the exact ledger snapshot as argument seven at both WOC character-save sites', async () => {
+    // There are exactly two character-only marketplace transactions. Both
+    // must hand the generic save helper the captured object itself: rebuilding
+    // or filtering a mixed prefix breaks receipt identity, while omitting one
+    // site makes that WOC rail commit state without its audit rows.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
+    );
+    const calls = [...src.matchAll(/saveCharacterStateOnClient\s*\(([\s\S]*?)\n\s*\);/g)].map(
+      (match) => match[1] ?? '',
+    );
+    expect(calls).toHaveLength(2);
+    for (const args of calls) {
+      expect(args.match(/save\.bankLedgerSnapshot/g)).toHaveLength(1);
+      expect(args).toMatch(/save\.bankLedgerSnapshot,\s*$/);
+    }
+  });
+
   it('persists the fenced character write and the booking in one transaction', async () => {
     const { pool, sql } = recordingTxPool();
     expect(await new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1')).toBe(
