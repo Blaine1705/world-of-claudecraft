@@ -1302,6 +1302,37 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
   });
 
+  it('Unstuck still refuses an idle clear battleground fighter as a shortcut', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    const meta = must(sim.meta(pid), 'player meta');
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    meta.moveInput.forward = false;
+    meta.moveInput.back = false;
+    meta.moveInput.strafeLeft = false;
+    meta.moveInput.strafeRight = false;
+    meta.moveInput.jump = false;
+    expectClearPlayerPosition(sim, e);
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
   it('Unstuck does not treat clear standable battleground footing as a wall trap', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
@@ -1352,16 +1383,8 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
-    const e = must(sim.entities.get(pid), 'entity');
     const origin = battlegroundOrigin(match.slot);
-    e.pos = sim.ctx.groundPos(origin.x + 50, origin.z);
-    e.prevPos = { ...e.pos };
-    e.vx = 0;
-    e.vy = 0;
-    e.vz = 0;
-    e.onGround = true;
-    e.jumping = false;
-    sim.ctx.rebucket(e);
+    const e = forceIntoBgWallTrap(sim, match, pid);
 
     const originalPlot = { ...BG_GRAVEYARDS[0] };
     Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
@@ -1389,22 +1412,12 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     }
   });
 
-  it('Unstuck relocates a fighter trapped on their indexed spawn point', () => {
+  it('Unstuck relocates a fighter trapped in battleground collision', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
-    const e = must(sim.entities.get(pid), 'entity');
-    const origin = battlegroundOrigin(match.slot);
-    const trapped = BG_BASES[0].spawns[0];
-    e.pos = sim.ctx.groundPos(origin.x + trapped.x, origin.z + trapped.z);
-    e.prevPos = { ...e.pos };
-    e.vx = 0;
-    e.vy = 0;
-    e.vz = 0;
-    e.onGround = true;
-    e.jumping = false;
-    sim.ctx.rebucket(e);
+    const e = forceIntoBgWallTrap(sim, match, pid);
     const before = { ...e.pos };
 
     expect(sim.unstuck(pid)).toBe(true);

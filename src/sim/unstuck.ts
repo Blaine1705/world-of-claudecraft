@@ -270,6 +270,12 @@ function battlegroundWallTrap(ctx: SimContext, meta: PlayerMeta, p: Entity): boo
   return pointInBattlegroundColliderContact(p, origin, BG_GEOMETRY_CONTACT_MARGIN);
 }
 
+function activeBattlegroundAt(ctx: SimContext, p: Entity): boolean {
+  const match = ctx.bgMatches.get(p.id);
+  if (!match || !isBgPos(p.pos.x)) return false;
+  return match.slot === bgOriginAt(p.pos.z).slot;
+}
+
 function motionBlock(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlockedReason | null {
   if (isFrozenCorpse(p)) return null;
   if (forcedAction(p)) return 'moving';
@@ -292,6 +298,8 @@ function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlo
   if (ctx.tradeFor(p.id)) return 'trading';
   if (!unstuckLocationAt(ctx, p.id, p.pos)) return 'invalid_area';
   if (hasMoveInput(meta) && !bgWallTrap) return 'moving';
+  if (activeBattlegroundAt(ctx, p) && !bgWallTrap && (!p.dead || p.ghost))
+    return 'competitive';
   return null;
 }
 
