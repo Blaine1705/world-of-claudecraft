@@ -503,16 +503,22 @@ describe('build_sfx_manifest.mjs step order', () => {
     'utf8',
   );
 
-  it('writes the gain ceilings before the manifest that validates against them', () => {
+  it('writes the gain ceilings before loading the manifest that validates against them', () => {
+    expect(entryScript).not.toMatch(
+      /import\s+\{[^}]*\bwriteSfxManifest\b[^}]*\}\s+from\s+['"]\.\/sfx\/manifest\.mjs['"]/,
+    );
     const ceilingsAt = entryScript.indexOf('writeSfxGainCeilings(');
-    const manifestAt = entryScript.indexOf('writeSfxManifest(');
+    const manifestImportAt = entryScript.indexOf("await import('./sfx/manifest.mjs')");
+    const manifestWriteAt = entryScript.indexOf('writeSfxManifest(');
     expect(ceilingsAt).toBeGreaterThan(-1);
-    expect(manifestAt).toBeGreaterThan(-1);
+    expect(manifestImportAt).toBeGreaterThan(-1);
+    expect(manifestWriteAt).toBeGreaterThan(-1);
     expect(
       ceilingsAt,
-      'writeSfxGainCeilings must run BEFORE writeSfxManifest: the manifest validates ' +
-        'resolved gains against the ceiling file, so a new custom key with a positive ' +
-        'trim cannot bootstrap if the ceilings are written second',
-    ).toBeLessThan(manifestAt);
+      'writeSfxGainCeilings must run BEFORE manifest.mjs is imported: importing the ' +
+        'manifest evaluates playback_profile.mjs and reads the generated ceiling file, ' +
+        'so a new custom key with a positive trim cannot bootstrap if the import happens first',
+    ).toBeLessThan(manifestImportAt);
+    expect(manifestImportAt).toBeLessThan(manifestWriteAt);
   });
 });

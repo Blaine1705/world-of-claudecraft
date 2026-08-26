@@ -2,7 +2,6 @@
 
 import { relative } from 'node:path';
 import ffmpegPath from 'ffmpeg-static';
-import { writeSfxManifest } from './sfx/manifest.mjs';
 import { writeSfxGainCeilings } from './sfx/sfx_gain_ceiling.mjs';
 
 const repoRoot = process.cwd();
@@ -31,6 +30,11 @@ console.log(
 // Regenerated in the SAME step as the ceilings above so the two can never
 // silently drift: any change to a custom key's audio, or to which keys are
 // marked custom, is reflected in both on the very next build.
+//
+// Import the manifest builder only after the generated ceiling file is current.
+// manifest.mjs imports playback_profile.mjs, whose module-scope ceiling cache is
+// populated while that module is evaluated.
+const { writeSfxManifest } = await import('./sfx/manifest.mjs');
 const { path, runtimePath, entries } = writeSfxManifest(repoRoot);
 console.log(`SFX manifest: ${Object.keys(entries).length} clips -> ${relative(repoRoot, path)}`);
 console.log(`SFX runtime pack: ${relative(repoRoot, runtimePath)}`);
