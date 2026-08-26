@@ -179,7 +179,7 @@ describe('aggregateEscrowTotals', () => {
     // and the house-stock '' key is skipped.
     expect(sql).toMatch(/raw_key ~ '\^0\*\[0-9\]\{1,16\}\$'/);
     expect(sql).toMatch(
-      /CASE WHEN raw_key ~ [^]*THEN\s+CASE WHEN raw_key::numeric <= 9007199254740991/,
+      /CASE WHEN raw_key ~ [\s\S]*THEN\s+CASE WHEN raw_key::numeric <= 9007199254740991/,
     );
     expect(sql).toMatch(/raw_key <> ''/);
   });
