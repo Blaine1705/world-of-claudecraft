@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { AMBIGUITY_HOLD_MAX_MS } from '../../server/storage_ladder_hold';
 import {
   STORAGE_RECOVERY_BACKOFF_MS,
-  STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS,
+  STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS,
   STORAGE_RECOVERY_DRIVE_CONCURRENCY,
   STORAGE_RECOVERY_HORIZON_WARNING_MS,
   STORAGE_RECOVERY_MAX_TRACKED,
@@ -80,8 +81,9 @@ describe('StorageRecoveryCoordinator', () => {
     expect(STORAGE_RECOVERY_SCAN_CONCURRENCY).toBe(2);
     expect(STORAGE_RECOVERY_DRIVE_CONCURRENCY).toBe(2);
     expect(STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS).toBe(5_000);
-    expect(STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS).toBe(500_000);
+    expect(STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS).toBe(500_000);
     expect(STORAGE_RECOVERY_HORIZON_WARNING_MS).toBe(600_000);
+    expect(STORAGE_RECOVERY_HORIZON_WARNING_MS).toBe(AMBIGUITY_HOLD_MAX_MS);
     expect(STORAGE_RECOVERY_START_RATE_PER_SECOND).toBe(10);
     expect(STORAGE_RECOVERY_START_BURST).toBe(2);
     expect(STORAGE_RECOVERY_WARNING_WINDOW_MS).toBe(60_000);
@@ -329,7 +331,7 @@ describe('StorageRecoveryCoordinator', () => {
     coordinator.reset();
   });
 
-  it('drains 200 five-second drive slots within the conditional 500-second horizon', async () => {
+  it('starts and finishes 200 five-second drive stages within the 500-second budget', async () => {
     const scheduler = fakeScheduler();
     const startedAt: number[] = [];
     const finishedAt: number[] = [];
@@ -366,9 +368,11 @@ describe('StorageRecoveryCoordinator', () => {
     expect(startedAt).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
     expect(finishedAt).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
     expect(Math.max(...startedAt)).toBeLessThanOrEqual(
-      STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS - STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
+      STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS - STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS,
     );
-    expect(Math.max(...finishedAt)).toBeLessThanOrEqual(STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS);
+    expect(Math.max(...finishedAt)).toBeLessThanOrEqual(
+      STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS,
+    );
     expect(coordinator.metrics()).toMatchObject({
       tracked: 0,
       horizonBreached: false,
@@ -376,7 +380,63 @@ describe('StorageRecoveryCoordinator', () => {
     });
   });
 
-  it('reports 5001ms slot occupancy and warns once when the 600-second horizon breaches', async () => {
+  it('finishes the normal done-yield-rescan path inside the 600-second hold boundary', async () => {
+    const scheduler = fakeScheduler();
+    const warn = vi.fn();
+    const scanOccupancyAssumptionMs = 250;
+    const normalPathBudgetMs =
+      STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS + scanOccupancyAssumptionMs * 2;
+    const scansByCharacter = new Map<number, number>();
+    let drivesFinished = 0;
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: (characterId) =>
+          new Promise<Row | null>((resolve) => {
+            scheduler.scheduler.schedule(scanOccupancyAssumptionMs, () => {
+              const scanNumber = (scansByCharacter.get(characterId) ?? 0) + 1;
+              scansByCharacter.set(characterId, scanNumber);
+              resolve(scanNumber === 1 ? { idempotencyKey: `k${characterId}` } : null);
+            });
+          }),
+        reserve: () => true,
+        drive: () =>
+          new Promise<'done'>((resolve) => {
+            scheduler.scheduler.schedule(STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS, () => {
+              drivesFinished++;
+              resolve('done');
+            });
+          }),
+        prepareScan: vi.fn(),
+        release: vi.fn(),
+        warn,
+      },
+      scheduler.scheduler,
+    );
+    for (let id = 1; id <= STORAGE_RECOVERY_MAX_TRACKED; id++) coordinator.kick(id);
+
+    for (
+      let operations = 0;
+      coordinator.metrics().tracked > 0 && operations < 1_000;
+      operations++
+    ) {
+      scheduler.fireNext();
+      await tick();
+      while (scheduler.turns.length > 0) {
+        scheduler.yieldNext();
+        await tick();
+      }
+    }
+
+    expect(drivesFinished).toBe(STORAGE_RECOVERY_MAX_TRACKED);
+    expect([...scansByCharacter.values()]).toHaveLength(STORAGE_RECOVERY_MAX_TRACKED);
+    expect([...scansByCharacter.values()].every((count) => count === 2)).toBe(true);
+    expect(coordinator.metrics()).toMatchObject({ tracked: 0, horizonBreached: false });
+    expect(scheduler.now()).toBeLessThanOrEqual(normalPathBudgetMs);
+    expect(scheduler.now()).toBeLessThan(STORAGE_RECOVERY_HORIZON_WARNING_MS);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('reports 5001ms slot occupancy and warns at 600s without a metrics scrape', async () => {
     const scheduler = fakeScheduler();
     const warn = vi.fn();
     let driveSignal: AbortSignal | undefined;
@@ -406,14 +466,15 @@ describe('StorageRecoveryCoordinator', () => {
       oldestTrackedAgeMs: STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS + 1,
     });
 
-    scheduler.setNow(STORAGE_RECOVERY_HORIZON_WARNING_MS + 1);
+    scheduler.fireNext();
+    expect(scheduler.now()).toBe(STORAGE_RECOVERY_HORIZON_WARNING_MS);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]?.[0]).toContain('horizon breached');
     expect(coordinator.metrics()).toMatchObject({
       horizonBreached: true,
       horizonBreaches: 1,
-      oldestTrackedAgeMs: STORAGE_RECOVERY_HORIZON_WARNING_MS + 1,
+      oldestTrackedAgeMs: STORAGE_RECOVERY_HORIZON_WARNING_MS,
     });
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0]?.[0]).toContain('horizon breached');
     coordinator.metrics();
     expect(warn).toHaveBeenCalledTimes(1);
     coordinator.reset();

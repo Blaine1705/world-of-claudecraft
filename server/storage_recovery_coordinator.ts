@@ -1,4 +1,5 @@
 import { performance } from 'node:perf_hooks';
+import { AMBIGUITY_HOLD_MAX_MS } from './storage_ladder_hold';
 
 // Bounded, keyed scheduling for Claudium storage-purchase recovery.
 //
@@ -11,16 +12,18 @@ import { performance } from 'node:perf_hooks';
 export const STORAGE_RECOVERY_MAX_TRACKED = 200;
 export const STORAGE_RECOVERY_SCAN_CONCURRENCY = 2;
 export const STORAGE_RECOVERY_DRIVE_CONCURRENCY = 2;
-// This is a conditional capacity target, not a completion guarantee. With two
-// drive slots and at most five seconds of end-to-end occupancy per slot, all
-// 200 admitted keys can finish within 500 seconds. Dependency latency, retry
-// backoff, or a hook that ignores cancellation can extend that horizon, so the
-// coordinator exposes live ages and warns once tracked work exceeds 600 seconds.
+// This is a conditional drive-stage budget, not a completion guarantee. With
+// two drive slots and at most five seconds of end-to-end occupancy per slot,
+// all 200 admitted keys can finish that stage within 500 seconds. The remaining
+// 100 seconds before the ambiguity hold yields must absorb the initial and
+// follow-up indexed scans, scheduling, and event-loop turns. Dependency latency,
+// retry backoff, or a hook that ignores cancellation can exhaust that margin,
+// so the coordinator exposes live ages and warns at the exact hold boundary.
 export const STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS = 5_000;
-export const STORAGE_RECOVERY_CONDITIONAL_HORIZON_MS =
+export const STORAGE_RECOVERY_CONDITIONAL_DRIVE_BUDGET_MS =
   Math.ceil(STORAGE_RECOVERY_MAX_TRACKED / STORAGE_RECOVERY_DRIVE_CONCURRENCY) *
   STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS;
-export const STORAGE_RECOVERY_HORIZON_WARNING_MS = 600_000;
+export const STORAGE_RECOVERY_HORIZON_WARNING_MS = AMBIGUITY_HOLD_MAX_MS;
 // One realm may begin at most ten recovery drives or failed-scan retries per
 // second after a two-start burst. The rate ceiling limits downstream bursts;
 // the two drive slots are the binding term in the conditional target above.
@@ -310,7 +313,7 @@ export class StorageRecoveryCoordinator<Row> {
       startRateGateTimers: this.startRateGateTimer ? 1 : 0,
       horizonWarningTimers: this.horizonWarningTimer ? 1 : 0,
       ...ages,
-      horizonBreached: ages.oldestTrackedAgeMs > STORAGE_RECOVERY_HORIZON_WARNING_MS,
+      horizonBreached: ages.oldestTrackedAgeMs >= STORAGE_RECOVERY_HORIZON_WARNING_MS,
       ...this.counts,
     };
   }
@@ -769,7 +772,7 @@ export class StorageRecoveryCoordinator<Row> {
 
   private refreshHorizonWatch(): void {
     const oldestTrackedAgeMs = this.currentAges().oldestTrackedAgeMs;
-    const breached = oldestTrackedAgeMs > STORAGE_RECOVERY_HORIZON_WARNING_MS;
+    const breached = oldestTrackedAgeMs >= STORAGE_RECOVERY_HORIZON_WARNING_MS;
     if (breached && !this.horizonCurrentlyBreached) {
       this.counts.horizonBreaches++;
       this.warn(
@@ -784,10 +787,10 @@ export class StorageRecoveryCoordinator<Row> {
     }
     const oldest = this.entries.values().next().value as Entry<Row> | undefined;
     if (!oldest) return;
-    const dueAt = oldest.admittedAtMs + STORAGE_RECOVERY_HORIZON_WARNING_MS + 1;
+    const dueAt = oldest.admittedAtMs + STORAGE_RECOVERY_HORIZON_WARNING_MS;
     if (this.horizonWarningTimer && this.horizonWarningDueAtMs === dueAt) return;
     this.cancelHorizonWarningTimer();
-    const delay = Math.max(1, dueAt - this.scheduler.now());
+    const delay = Math.max(0, dueAt - this.scheduler.now());
     this.horizonWarningDueAtMs = dueAt;
     this.horizonWarningTimer = this.scheduler.schedule(delay, () => {
       this.horizonWarningTimer = null;
