@@ -48,8 +48,21 @@ high-score board) with the recruitment column:
 - GM and officers (the `GUILD_BANK_EDIT_RANKS` officer-plus family) get a
   Pledges tab in the guild UI: every open pledge (name, class, level, when),
   with Accept and Reject.
-- Accept sends the standard guild invite (the existing invite flow; the
-  invite, not the accept, is what creates membership) and removes the pledge.
+- Accept, REVISED 2026-08-26 (owner decision): the pledge is the player's
+  standing request to join, so it persists across logout and only resolves on
+  a definite outcome.
+  - Pledger ONLINE: accept sends the standard guild invite (the existing
+    invite flow; the invite, not the accept, is what creates membership). The
+    pledge stays on the board until the player actually joins (joining any
+    guild clears it), so an invite that expires or drops at logout never
+    destroys the request.
+  - Pledger OFFLINE: accept seats them directly as a member (the pledge is
+    their standing consent; there is no one online to hand an invite to).
+    They find themselves in the guild on their next login. Acceptance wipes
+    the rejection ladder either way, exactly like a real invite.
+  - A refused accept (guild full, pledger already guilded elsewhere) leaves
+    or resolves the pledge accordingly: full keeps it on the board; already
+    guilded drops the stale pledge.
 - Reject removes the pledge and advances that player's cooldown ladder for
   THIS guild (below).
 - Per-guild settings, officer-plus editable: pledges on/off, minimum pledge

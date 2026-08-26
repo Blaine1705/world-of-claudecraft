@@ -955,39 +955,43 @@ export class SocialService {
     return true;
   }
 
-  async guildInvite(actor: SocialActor, name: string): Promise<void> {
+  /** 'sent' when a real invite went out, 'blocked' for the silent fake-success
+   *  arm (the target blocks the inviter), 'refused' when the actor was told
+   *  why nothing happened. Callers that resolve a pledge off this outcome
+   *  (guildPledgeDecide) must only do so on a definite resolution. */
+  async guildInvite(actor: SocialActor, name: string): Promise<'sent' | 'blocked' | 'refused'> {
     const membership = await this.db.guildMembership(actor.characterId);
     if (!membership) {
       this.err(actor.characterId, 'You are not in a guild.');
-      return;
+      return 'refused';
     }
     if (membership.rank === 'member') {
       this.err(actor.characterId, 'Only officers and the Guild Master may invite.');
-      return;
+      return 'refused';
     }
     const target = await this.resolveTarget(actor, name);
-    if (!target) return;
+    if (!target) return 'refused';
     if (target.id === actor.characterId) {
       this.err(actor.characterId, 'You are already in the guild.');
-      return;
+      return 'refused';
     }
     if (!this.tx.isOnline(target.id)) {
       this.err(actor.characterId, `${target.name} must be online to be invited.`);
-      return;
+      return 'refused';
     }
     if (await this.db.guildMembership(target.id)) {
       this.err(actor.characterId, `${target.name} is already in a guild.`);
-      return;
+      return 'refused';
     }
     const existing = this.pendingGuildInvites.get(target.id);
     if (existing && existing.expiresAt >= this.now()) {
       this.err(actor.characterId, `${target.name} already has a pending guild invitation.`);
-      return;
+      return 'refused';
     }
     const members = await this.db.guildMembers(membership.guildId);
     if (members.length >= GUILD_MEMBER_LIMIT) {
       this.err(actor.characterId, 'Your guild is full.');
-      return;
+      return 'refused';
     }
     // A target who has the inviter on their ignore list never sees the invite.
     // From the inviter's side this is indistinguishable from an ordinary
@@ -995,7 +999,7 @@ export class SocialService {
     // No pending state is created, so other guilds can still invite the target.
     if (this.tx.isBlocking(target.id, actor.characterId)) {
       this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
-      return;
+      return 'blocked';
     }
     this.rememberGuildInvite(target.id, {
       guildId: membership.guildId,
@@ -1012,6 +1016,7 @@ export class SocialService {
       { type: 'guildInvite', fromName: actor.name, guildName: membership.guildName },
     ]);
     this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
+    return 'sent';
   }
 
   async guildAccept(actor: SocialActor): Promise<void> {
@@ -1163,11 +1168,21 @@ export class SocialService {
       return;
     }
     if (accept) {
-      // Accept sends the standard guild invite; membership stays the invite
-      // flow's (which also wipes the ladder). The pledge itself resolves.
-      await this.db.deletePledge(target.id);
-      await this.refreshPledgeBadge(target.id);
-      await this.guildInvite(actor, target.name);
+      if (!this.tx.isOnline(target.id)) {
+        await this.seatOfflinePledger(actor, target, membership);
+        return;
+      }
+      // Online: accept sends the standard guild invite; membership stays the
+      // invite flow's (which also wipes the ladder). The pledge is the
+      // player's standing request, so it only resolves on a definite outcome:
+      // joining deletes it (guildAccept), a refused send leaves it on the
+      // board, and the silent blocked arm drops it so repeated accepts stay
+      // indistinguishable from the ordinary decline-then-nothing.
+      const outcome = await this.guildInvite(actor, target.name);
+      if (outcome === 'blocked') {
+        await this.db.deletePledge(target.id);
+        await this.refreshPledgeBadge(target.id);
+      }
       await this.pushGuild(membership.guildId);
       return;
     }
@@ -1187,6 +1202,58 @@ export class SocialService {
     await this.refreshPledgeBadge(target.id);
     await this.pushGuild(membership.guildId);
     this.tx.pushSnapshot(target.id);
+  }
+
+  /** Seat an OFFLINE pledger directly. The pledge is the player's standing
+   *  request to join, so officer acceptance completes membership without the
+   *  online invite handshake (which cannot reach an offline character); they
+   *  find themselves in the guild on their next login (the join path stamps
+   *  membership from durable truth). Failure arms leave the pledge on the
+   *  board so an accepted request never silently disappears. */
+  private async seatOfflinePledger(
+    actor: SocialActor,
+    target: { id: number; name: string },
+    membership: { guildId: number; guildName: string },
+  ): Promise<void> {
+    const result = await this.db.addGuildMemberAtomic(
+      membership.guildId,
+      target.id,
+      'member',
+      GUILD_MEMBER_LIMIT,
+    );
+    if (result === 'no_guild') {
+      this.err(actor.characterId, 'That guild no longer exists.');
+      return;
+    }
+    if (result === 'full') {
+      // The pledge stays: the officer can free a seat and accept again.
+      this.err(actor.characterId, 'Your guild is full.');
+      return;
+    }
+    if (result === 'already_member') {
+      // The pledger joined a guild since pledging: the pledge is stale.
+      await this.db.deletePledge(target.id);
+      this.err(actor.characterId, `${target.name} is already in a guild.`);
+      await this.pushGuild(membership.guildId);
+      return;
+    }
+    // Seated in the DB. The pledge resolves, and acceptance wipes the
+    // rejection ladder exactly like a real invite (the guild said
+    // "we do want you", docs/prd/guild-pledge-board.md).
+    await this.db.deletePledge(target.id);
+    const accountId = await this.db.accountIdForCharacter(target.id);
+    if (accountId !== null) await this.db.wipePledgeLadder(membership.guildId, accountId);
+    // No-ops while they stay offline; covers a login racing the seat.
+    this.tx.onGuildMembershipChanged(target.id, {
+      guildId: membership.guildId,
+      guildName: membership.guildName,
+      rank: 'member',
+    });
+    await this.refreshPledgeBadge(target.id);
+    await this.broadcastGuild(membership.guildId, [
+      { type: 'log', text: `${target.name} has joined the guild.`, color: '#40ff7f' },
+    ]);
+    await this.pushGuild(membership.guildId);
   }
 
   async setGuildPledgeSettings(
