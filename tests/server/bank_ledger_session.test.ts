@@ -64,6 +64,26 @@ describe('bank ledger session journal', () => {
     });
   });
 
+  it('keeps a high-water scheduling failure outside the projection quarantine', () => {
+    const projectionFailure = vi.fn();
+    const reservationFailure = vi.fn();
+    const j = journal({
+      onProjectionFailure: projectionFailure,
+      onReservationFailure: reservationFailure,
+      onHighWater: () => {
+        throw new Error('scheduler unavailable');
+      },
+    });
+    const takes = Array.from({ length: BANK_LEDGER_SAVE_HIGH_WATER_ROWS }, (_, index) => ({
+      itemId: `material_${index}`,
+      count: 1,
+    }));
+    expect(() => j.reserveVaultConsumption(takes, 2)?.commit()).not.toThrow();
+    expect(j.outbox.snapshot().rowCount).toBe(BANK_LEDGER_SAVE_HIGH_WATER_ROWS);
+    expect(projectionFailure).not.toHaveBeenCalled();
+    expect(reservationFailure).toHaveBeenCalledOnce();
+  });
+
   it('turns a non-empty exact snapshot into DB effects and elides an empty one', () => {
     const j = journal();
     expect(bankLedgerSaveEffects(j.outbox.snapshot())).toBeUndefined();

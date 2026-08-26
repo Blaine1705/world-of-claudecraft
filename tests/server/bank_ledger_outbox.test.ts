@@ -569,12 +569,14 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     const { makeOutbox } = rig();
     const outbox = makeOutbox();
     commitOne(outbox, 'batch:personal', 'peacebloom');
+    expect(outbox.hasQueuedGuildRows).toBe(false);
 
     for (const guildId of [42, 7]) {
       const row = ledgerRow({ container: 'guild', containerId: guildId });
       const prepared = serializeBankLedgerCommandBatch(`batch:guild:${guildId}`, [row]);
       const reservation = required(outbox.tryReservePrepared(prepared));
       outbox.commitPrepared(reservation);
+      expect(outbox.hasQueuedGuildRows).toBe(true);
     }
 
     const snapshot = outbox.snapshot();
@@ -587,6 +589,8 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     expect(snapshot.guildIds).toEqual([7, 42]);
     expect(Object.isFrozen(snapshot.guildIds)).toBe(true);
     expect(snapshot.hasUnscopedRows).toBe(true);
+    expect(outbox.acknowledge(snapshot)).toBe(true);
+    expect(outbox.hasQueuedGuildRows).toBe(false);
   });
 
   it('refuses stale, overlapping, and foreign snapshots without splicing newer work', () => {
@@ -625,6 +629,7 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     outbox.discard();
 
     expect(outbox.discarded).toBe(true);
+    expect(outbox.hasQueuedGuildRows).toBe(false);
     expect(budget.usage).toEqual({ rows: 0, encodedBytes: 0 });
     expect(outbox.usage).toEqual({
       queuedRows: 0,

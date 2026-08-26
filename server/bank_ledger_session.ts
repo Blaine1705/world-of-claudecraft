@@ -10,6 +10,7 @@ import { type BankLedgerAdmission, BankLedgerOutboxAdmission } from './bank_ledg
 import {
   BankLedgerOutbox,
   type BankLedgerOutboxOptions,
+  type BankLedgerOutboxPreparedReservation,
   type BankLedgerOutboxSnapshot,
   type PreparedBankLedgerCommandBatch,
   serializeBankLedgerCommandBatch,
@@ -76,6 +77,7 @@ export function createBankLedgerSessionJournal(
       vaultUpgrades: number,
     ): VaultConsumptionReservation | null {
       let batch: PreparedBankLedgerCommandBatch;
+      let reservation: BankLedgerOutboxPreparedReservation | null;
       try {
         batch = serializeBankLedgerCommandBatch(
           nextBankLedgerBatchKey(),
@@ -90,11 +92,11 @@ export function createBankLedgerSessionJournal(
             },
           ]),
         );
+        reservation = outbox.tryReservePrepared(batch);
       } catch (error) {
         hooks.onReservationFailure?.(error);
         return null;
       }
-      const reservation = outbox.tryReservePrepared(batch);
       if (!reservation) return null;
       let active = true;
       return Object.freeze({
@@ -103,12 +105,19 @@ export function createBankLedgerSessionJournal(
           try {
             outbox.commitPrepared(reservation);
             active = false;
-            noteHighWater();
           } catch (error) {
             // commitPrepared is accounting-only, but a broken invariant here
             // follows the same fail-closed rule as a post-mutation projection.
             active = false;
             hooks.onProjectionFailure(error);
+            return;
+          }
+          try {
+            noteHighWater();
+          } catch (error) {
+            // Scheduling is outside the mutation/evidence pair. The row is
+            // safely queued and the normal autosave remains its backstop.
+            hooks.onReservationFailure?.(error);
           }
         },
         cancel(): void {

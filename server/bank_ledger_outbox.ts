@@ -392,6 +392,7 @@ export class BankLedgerOutbox {
   private readonly batches: PreparedBankLedgerCommandBatch[] = [];
   private queuedRows = 0;
   private queuedEncodedBytes = 0;
+  private queuedGuildBatches = 0;
   private reservedRows = 0;
   private reservedEncodedBytes = 0;
   private closed = false;
@@ -421,6 +422,12 @@ export class BankLedgerOutbox {
 
   get hasPending(): boolean {
     return this.queuedRows > 0 || this.reservedRows > 0;
+  }
+
+  /** O(1) custody guard: a character-only save must not split any queued
+   *  guild row from the matching guild-book transaction. */
+  get hasQueuedGuildRows(): boolean {
+    return this.queuedGuildBatches > 0;
   }
 
   /**
@@ -597,6 +604,7 @@ export class BankLedgerOutbox {
     for (const batch of state.batches) {
       rows += batch.rows.length;
       encodedBytes += batch.encodedBytes;
+      if (batch.guildIds.length > 0) this.queuedGuildBatches -= 1;
       this.pendingKeys.delete(batch.batchKey);
     }
     this.batches.splice(0, state.batches.length);
@@ -634,6 +642,7 @@ export class BankLedgerOutbox {
     this.pendingKeys.clear();
     this.queuedRows = 0;
     this.queuedEncodedBytes = 0;
+    this.queuedGuildBatches = 0;
     this.reservedRows = 0;
     this.reservedEncodedBytes = 0;
     budgetRelease(this.budget, rows, encodedBytes);
@@ -668,6 +677,7 @@ export class BankLedgerOutbox {
     this.reservedEncodedBytes -= state.maxEncodedBytes;
     this.queuedRows += batch.rows.length;
     this.queuedEncodedBytes += batch.encodedBytes;
+    if (batch.guildIds.length > 0) this.queuedGuildBatches += 1;
     this.batches.push(batch);
 
     // The full maximum was acquired by tryReserve. Only the unused tail is
