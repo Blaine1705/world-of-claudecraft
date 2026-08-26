@@ -77,8 +77,158 @@ interface Queryable {
   ): Promise<{ rows: Record<string, unknown>[]; rowCount: number | null }>;
 }
 
+interface ConnectableQueryable extends Queryable {
+  connect?: () => Promise<DbTransactionDeadlineClient>;
+}
+
 interface TransactionalQueryable extends Queryable {
   connect(): Promise<DbTransactionDeadlineClient>;
+}
+
+/** Stable shutdown cancellation for one non-transactional storage query. */
+export class StoragePurchaseDbAborted extends Error {
+  readonly code = 'STORAGE_PURCHASE_DB_ABORTED' as const;
+
+  constructor(readonly operation: string) {
+    super(`${operation} aborted`);
+    this.name = 'AbortError';
+  }
+}
+
+const pgErrorCode = (error: unknown): string | undefined =>
+  (error as { code?: string } | null | undefined)?.code;
+
+const errorForRelease = (error: unknown): Error =>
+  error instanceof Error ? error : new Error('PostgreSQL storage purchase query failed');
+
+/**
+ * Acquire a pool client without leaking a cancelled waiter's eventual client.
+ * Pool checkout has no cancellation API: if abort wins, reject immediately,
+ * then destroy the client when the already-queued checkout eventually lands.
+ */
+function acquireStoragePurchaseClient(
+  db: ConnectableQueryable,
+  signal: AbortSignal,
+  operation: string,
+): Promise<DbTransactionDeadlineClient> {
+  if (signal.aborted) return Promise.reject(new StoragePurchaseDbAborted(operation));
+  if (typeof db.connect !== 'function') {
+    return Promise.reject(
+      new TypeError(`${operation} requires a connectable database when cancellation is enabled`),
+    );
+  }
+
+  let checkout: Promise<DbTransactionDeadlineClient>;
+  try {
+    checkout = db.connect();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+
+  return new Promise((resolve, reject) => {
+    let state: 'waiting' | 'aborted' | 'settled' = 'waiting';
+    let abortError: StoragePurchaseDbAborted | null = null;
+    const detach = () => signal.removeEventListener('abort', onAbort);
+    const onAbort = () => {
+      if (state !== 'waiting') return;
+      state = 'aborted';
+      abortError = new StoragePurchaseDbAborted(operation);
+      detach();
+      reject(abortError);
+    };
+
+    signal.addEventListener('abort', onAbort, { once: true });
+    if (signal.aborted) onAbort();
+
+    void checkout.then(
+      (client) => {
+        if (state === 'aborted') {
+          client.release(abortError ?? new StoragePurchaseDbAborted(operation));
+          return;
+        }
+        state = 'settled';
+        detach();
+        resolve(client);
+      },
+      (error) => {
+        if (state !== 'waiting') return;
+        state = 'settled';
+        detach();
+        reject(error);
+      },
+    );
+  });
+}
+
+/**
+ * Run one auto-commit statement on an owned client. Destroying the socket is
+ * the only safe active-query cancellation available through node-postgres:
+ * it cancels server work and ensures no desynchronized client or lock returns
+ * to the pool. SQLSTATE failures that win remain reusable and are preserved.
+ */
+async function storagePurchaseQuery(
+  db: ConnectableQueryable,
+  text: string,
+  values: unknown[],
+  operation: string,
+  signal?: AbortSignal,
+): Promise<{ rows: Record<string, unknown>[]; rowCount: number | null }> {
+  if (!signal) return db.query(text, values);
+  const client = await acquireStoragePurchaseClient(db, signal, operation);
+  let released = false;
+  let causalError: Error | null = null;
+  let clientErrorListenerAttached = false;
+  let abortListenerAttached = false;
+
+  const detach = () => {
+    if (abortListenerAttached) {
+      abortListenerAttached = false;
+      signal.removeEventListener('abort', onAbort);
+    }
+    if (clientErrorListenerAttached) {
+      clientErrorListenerAttached = false;
+      client.removeListener('error', onClientError);
+    }
+  };
+  const release = (error?: Error) => {
+    if (released) return;
+    released = true;
+    detach();
+    if (error) client.release(error);
+    else client.release();
+  };
+  const onAbort = () => {
+    if (released) return;
+    causalError = new StoragePurchaseDbAborted(operation);
+    release(causalError);
+  };
+  const onClientError = (error: Error) => {
+    if (released) return;
+    causalError = error;
+    release(error);
+  };
+
+  client.on('error', onClientError);
+  clientErrorListenerAttached = true;
+  signal.addEventListener('abort', onAbort, { once: true });
+  abortListenerAttached = true;
+  if (signal.aborted) onAbort();
+
+  try {
+    if (released) throw causalError ?? new StoragePurchaseDbAborted(operation);
+    const result = await client.query(text, values);
+    if (released && causalError) throw causalError;
+    return result;
+  } catch (error) {
+    if (causalError) throw causalError;
+    // A codeless driver timeout does not cancel the server query. Destroy its
+    // socket; a real PostgreSQL error with SQLSTATE leaves auto-commit idle.
+    if (pgErrorCode(error) === undefined) release(errorForRelease(error));
+    else release();
+    throw error;
+  } finally {
+    release();
+  }
 }
 
 /** Three times the economy RPC timeout. A stale owner can be taken over, while
@@ -843,11 +993,15 @@ export async function beginStoragePurchase(
     idempotencyKey: string;
     claimToken: string;
   },
+  signal?: AbortSignal,
 ): Promise<StoragePurchaseBeginResult> {
-  const client = await db.connect();
+  const client = signal
+    ? await acquireStoragePurchaseClient(db, signal, 'storage purchase begin checkout')
+    : await db.connect();
   const transaction = createDbTransactionDeadline(client, {
     operation: 'storage purchase begin',
     timeoutMs: STORAGE_PURCHASE_TRANSACTION_TIMEOUT_MS,
+    signal,
   });
   try {
     await transaction.query('BEGIN');
@@ -921,10 +1075,12 @@ export async function beginStoragePurchase(
  *  settled (applied / unresolved) or that names a different fingerprint is
  *  answered from its recorded state instead of re-judged as a fresh one. */
 export async function storagePurchaseByKey(
-  db: Queryable,
+  db: ConnectableQueryable,
   idempotencyKey: string,
+  signal?: AbortSignal,
 ): Promise<StoragePurchaseRow | null> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `SELECT ${ROW_COLUMNS}
        FROM (
          SELECT source_purchase_id AS id, realm, account_id, character_id, item_id,
@@ -940,6 +1096,8 @@ export async function storagePurchaseByKey(
       ORDER BY source_rank
       LIMIT 1`,
     [idempotencyKey],
+    'storage purchase key lookup',
+    signal,
   );
   return res.rows[0] ? rowFrom(res.rows[0]) : null;
 }
@@ -948,11 +1106,13 @@ export async function storagePurchaseByKey(
  * takeover after a crashed owner; every post-service mutation still compares
  * the opaque token, so expiry alone never authorizes stale work. */
 export async function claimStoragePurchaseSpend(
-  db: Queryable,
+  db: ConnectableQueryable,
   idempotencyKey: string,
   claimToken: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `UPDATE storage_purchases
         SET spend_claim_token = $2,
             spend_claim_expires_at = now() + ($3 * interval '1 millisecond')
@@ -962,6 +1122,8 @@ export async function claimStoragePurchaseSpend(
              OR spend_claim_expires_at <= now())
       RETURNING id`,
     [idempotencyKey, claimToken, STORAGE_PURCHASE_SPEND_CLAIM_MS],
+    'storage purchase spend claim',
+    signal,
   );
   return (res.rowCount ?? res.rows.length) === 1;
 }
@@ -969,32 +1131,40 @@ export async function claimStoragePurchaseSpend(
 /** Revalidate the same owner after service IO. Unlike acquisition this never
  * takes over an expired foreign token. */
 export async function renewStoragePurchaseSpendClaim(
-  db: Queryable,
+  db: ConnectableQueryable,
   idempotencyKey: string,
   claimToken: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `UPDATE storage_purchases
         SET spend_claim_expires_at = now() + ($3 * interval '1 millisecond')
       WHERE idempotency_key = $1 AND status = 'pending'
         AND spend_claim_token = $2
       RETURNING id`,
     [idempotencyKey, claimToken, STORAGE_PURCHASE_SPEND_CLAIM_MS],
+    'storage purchase spend claim renewal',
+    signal,
   );
   return (res.rowCount ?? res.rows.length) === 1;
 }
 
 export async function releaseStoragePurchaseSpendClaim(
-  db: Queryable,
+  db: ConnectableQueryable,
   idempotencyKey: string,
   claimToken: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `UPDATE storage_purchases
         SET spend_claim_token = NULL, spend_claim_expires_at = NULL
       WHERE idempotency_key = $1 AND status = 'pending'
         AND spend_claim_token = $2`,
     [idempotencyKey, claimToken],
+    'storage purchase spend claim release',
+    signal,
   );
   return (res.rowCount ?? 0) === 1;
 }
@@ -1003,12 +1173,14 @@ export async function releaseStoragePurchaseSpendClaim(
  *  status. Guarded on the FROM set so a stale writer can never regress a
  *  settled row; returns whether a row actually moved. */
 export async function settleStoragePurchase(
-  db: Queryable,
+  db: ConnectableQueryable,
   idempotencyKey: string,
   status: 'applied' | 'unresolved',
   claimToken: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `UPDATE storage_purchases
         SET status = $2,
             resolved_at = now(),
@@ -1017,6 +1189,8 @@ export async function settleStoragePurchase(
       WHERE idempotency_key = $1 AND status = 'pending'
         AND spend_claim_token = $3`,
     [idempotencyKey, status, claimToken],
+    'storage purchase settlement',
+    signal,
   );
   return (res.rowCount ?? 0) > 0;
 }
@@ -1028,15 +1202,19 @@ export async function settleStoragePurchase(
  * rather than claiming the row is gone.
  */
 export async function deletePendingStoragePurchaseWithoutDebit(
-  db: Queryable,
+  db: ConnectableQueryable,
   idempotencyKey: string,
   claimToken: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `DELETE FROM storage_purchases
       WHERE idempotency_key = $1 AND status = 'pending'
         AND spend_claim_token = $2`,
     [idempotencyKey, claimToken],
+    'storage purchase no-debit discard',
+    signal,
   );
   return (res.rowCount ?? 0) === 1;
 }
@@ -1047,15 +1225,19 @@ export async function deletePendingStoragePurchaseWithoutDebit(
  * for the character FK cascade.
  */
 export async function pendingStoragePurchasesForCharacter(
-  db: Queryable,
+  db: ConnectableQueryable,
   characterId: number,
+  signal?: AbortSignal,
 ): Promise<StoragePurchaseRow | null> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `SELECT ${ROW_COLUMNS} FROM storage_purchases
       WHERE character_id = $1 AND status = 'pending'
       ORDER BY created_at, id
       LIMIT 1`,
     [characterId],
+    'storage purchase pending scan',
+    signal,
   );
   return res.rows[0] ? rowFrom(res.rows[0]) : null;
 }
@@ -1065,15 +1247,19 @@ export async function pendingStoragePurchasesForCharacter(
  * deliberately separate from pendingStoragePurchasesForCharacter: unresolved
  * rows must block both purchase rails but must never enter spend recovery. */
 export async function openStoragePurchaseForCharacter(
-  db: Queryable,
+  db: ConnectableQueryable,
   characterId: number,
+  signal?: AbortSignal,
 ): Promise<StoragePurchaseRow | null> {
-  const res = await db.query(
+  const res = await storagePurchaseQuery(
+    db,
     `SELECT ${ROW_COLUMNS} FROM storage_purchases
       WHERE character_id = $1 AND status IN ('pending', 'unresolved')
       ORDER BY created_at, id
       LIMIT 1`,
     [characterId],
+    'storage purchase open scan',
+    signal,
   );
   return res.rows[0] ? rowFrom(res.rows[0]) : null;
 }

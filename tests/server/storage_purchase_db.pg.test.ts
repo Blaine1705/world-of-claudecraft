@@ -44,6 +44,7 @@ d('storage_purchases against real PostgreSQL', () => {
     renewStoragePurchaseSpendClaim: typeof import('../../server/storage_purchase_db').renewStoragePurchaseSpendClaim;
     lockStorageAppliedEffectAccountsOnClient: typeof import('../../server/storage_purchase_db').lockStorageAppliedEffectAccountsOnClient;
     writeStorageAppliedEffectsOnClient: typeof import('../../server/storage_purchase_db').writeStorageAppliedEffectsOnClient;
+    StoragePurchaseDbAborted: typeof import('../../server/storage_purchase_db').StoragePurchaseDbAborted;
     STORAGE_PURCHASE_SCHEMA: string;
     STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS: number;
   };
@@ -63,7 +64,12 @@ d('storage_purchases against real PostgreSQL', () => {
     db = await import('../../server/storage_purchase_db');
     // search_path is a STARTUP option so the module functions, which take the
     // pool and issue unqualified SQL, land in the private schema.
-    pool = new Pool({ connectionString: url, max: 2, options: `-c search_path=${SCHEMA}` });
+    pool = new Pool({
+      connectionString: url,
+      max: 2,
+      options: `-c search_path=${SCHEMA}`,
+      application_name: SCHEMA,
+    });
     const admin = new Pool({ connectionString: url, max: 1 });
     await admin.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
     await admin.query(`CREATE SCHEMA ${SCHEMA}`);
@@ -588,6 +594,339 @@ d('storage_purchases against real PostgreSQL', () => {
     } finally {
       await blocker.query('ROLLBACK').catch(() => {});
       blocker.release();
+    }
+  });
+
+  it('cancels a queued checkout, destroys its late client, and leaves the pool healthy', async () => {
+    const first = await pool.connect();
+    const second = await pool.connect();
+    const controller = new AbortController();
+    let secondReleased = false;
+    let settled:
+      | Promise<
+          | {
+              value: import('../../server/storage_purchase_db').StoragePurchaseRow | null;
+              error: null;
+            }
+          | { value: null; error: unknown }
+        >
+      | undefined;
+    try {
+      const pending = db.pendingStoragePurchasesForCharacter(pool, 1, controller.signal);
+      settled = pending.then(
+        (value) => ({ value, error: null as null }),
+        (error: unknown) => ({ value: null, error }),
+      );
+      for (let attempt = 0; attempt < 100 && pool.waitingCount === 0; attempt++) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(pool.totalCount).toBe(2);
+      expect(pool.idleCount).toBe(0);
+      expect(pool.waitingCount).toBe(1);
+
+      controller.abort();
+      expect((await settled).error).toBeInstanceOf(db.StoragePurchaseDbAborted);
+      // node-postgres cannot dequeue the already-issued connect request. The
+      // helper destroys the client as soon as that queued request receives it.
+      second.release();
+      secondReleased = true;
+      for (
+        let attempt = 0;
+        attempt < 100 && (pool.waitingCount !== 0 || pool.totalCount !== 1);
+        attempt++
+      ) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(pool.waitingCount).toBe(0);
+      expect(pool.totalCount).toBe(1);
+      expect(pool.idleCount).toBe(0);
+    } finally {
+      controller.abort();
+      if (!secondReleased) second.release();
+      if (settled) await settled;
+      first.release();
+    }
+
+    expect(await pool.query('SELECT 1 AS healthy')).toMatchObject({
+      rows: [{ healthy: 1 }],
+    });
+    expect(pool.waitingCount).toBe(0);
+    expect(pool.idleCount).toBeGreaterThan(0);
+  });
+
+  it('aborts a live recovery SELECT blocked on a table lock and destroys its socket', async () => {
+    const blocker = await pool.connect();
+    const blockerPid = Number((await blocker.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    const controller = new AbortController();
+    let settled:
+      | Promise<
+          | {
+              value: import('../../server/storage_purchase_db').StoragePurchaseRow | null;
+              error: null;
+            }
+          | { value: null; error: unknown }
+        >
+      | undefined;
+    try {
+      await blocker.query('BEGIN');
+      await blocker.query('LOCK TABLE storage_purchases IN ACCESS EXCLUSIVE MODE');
+      const pending = db.openStoragePurchaseForCharacter(pool, 1, controller.signal);
+      settled = pending.then(
+        (value) => ({ value, error: null as null }),
+        (error: unknown) => ({ value: null, error }),
+      );
+
+      let blockedPid: number | null = null;
+      for (let attempt = 0; attempt < 100 && blockedPid === null; attempt++) {
+        const waiting = await blocker.query(
+          `SELECT pid
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND application_name = $1
+              AND wait_event_type = 'Lock'
+              AND $2::int = ANY(pg_blocking_pids(pid))
+              AND query LIKE 'SELECT %FROM storage_purchases%status IN%'
+            ORDER BY pid
+            LIMIT 1`,
+          [SCHEMA, blockerPid],
+        );
+        blockedPid = waiting.rows[0] ? Number(waiting.rows[0].pid) : null;
+        if (blockedPid === null) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(blockedPid).not.toBeNull();
+      expect(pool.totalCount).toBe(2);
+
+      controller.abort();
+      expect((await settled).error).toBeInstanceOf(db.StoragePurchaseDbAborted);
+      let backendAlive = true;
+      for (let attempt = 0; attempt < 100 && backendAlive; attempt++) {
+        const active = await blocker.query(
+          'SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE pid = $1) AS alive',
+          [blockedPid],
+        );
+        backendAlive = active.rows[0].alive;
+        if (backendAlive) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(backendAlive).toBe(false);
+      for (let attempt = 0; attempt < 100 && pool.totalCount !== 1; attempt++) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(pool.totalCount).toBe(1);
+      expect(pool.idleCount).toBe(0);
+      expect(pool.waitingCount).toBe(0);
+    } finally {
+      controller.abort();
+      if (settled) await settled;
+      await blocker.query('ROLLBACK').catch(() => {});
+      blocker.release();
+    }
+
+    expect(await db.openStoragePurchaseForCharacter(pool, 1)).toBeNull();
+    expect(pool.waitingCount).toBe(0);
+    expect(pool.idleCount).toBeGreaterThan(0);
+  });
+
+  it('aborts a begin blocked on its advisory lock and rolls back every acquired lock', async () => {
+    const key = 'pg-abort-begin-advisory';
+    await pool.query(
+      "DELETE FROM storage_purchases WHERE character_id = 2 AND status IN ('pending', 'unresolved')",
+    );
+    const blocker = await pool.connect();
+    const blockerPid = Number((await blocker.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    const controller = new AbortController();
+    let settled: Promise<{ error: unknown }> | undefined;
+    try {
+      await blocker.query('BEGIN');
+      await blocker.query('SELECT pg_advisory_xact_lock(hashtextextended($1::text, 0))', [key]);
+      const pending = db.beginStoragePurchase(
+        pool,
+        {
+          ...ROW,
+          accountId: 2,
+          characterId: 2,
+          idempotencyKey: key,
+          claimToken: '00000000-0000-4000-8000-000000000075',
+        },
+        controller.signal,
+      );
+      settled = pending.then(
+        () => ({ error: null }),
+        (error: unknown) => ({ error }),
+      );
+
+      let blockedPid: number | null = null;
+      for (let attempt = 0; attempt < 100 && blockedPid === null; attempt++) {
+        const waiting = await blocker.query(
+          `SELECT pid
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND application_name = $1
+              AND state = 'active'
+              AND wait_event_type = 'Lock'
+              AND $2::int = ANY(pg_blocking_pids(pid))
+              AND query LIKE 'SELECT pg_advisory_xact_lock(hashtextextended%'
+            ORDER BY pid
+            LIMIT 1`,
+          [SCHEMA, blockerPid],
+        );
+        blockedPid = waiting.rows[0] ? Number(waiting.rows[0].pid) : null;
+        if (blockedPid === null) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(blockedPid).not.toBeNull();
+
+      controller.abort();
+      expect((await settled).error).toMatchObject({
+        name: 'DbTransactionAborted',
+        code: 'DB_TRANSACTION_ABORTED',
+        commitMayHaveSucceeded: false,
+      });
+      let backendAlive = true;
+      for (let attempt = 0; attempt < 100 && backendAlive; attempt++) {
+        const active = await blocker.query(
+          'SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE pid = $1) AS alive',
+          [blockedPid],
+        );
+        backendAlive = active.rows[0].alive;
+        if (backendAlive) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(backendAlive).toBe(false);
+      expect(
+        (
+          await blocker.query('SELECT count(*)::int AS n FROM pg_locks WHERE pid = $1', [
+            blockedPid,
+          ])
+        ).rows[0].n,
+      ).toBe(0);
+      expect(
+        (
+          await blocker.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+      // The aborted begin acquired the character lock before the advisory
+      // wait. This write completes while the blocker still holds the advisory
+      // lock, proving the destroyed transaction released its earlier locks.
+      await pool.query('UPDATE characters SET id = id WHERE id = 2');
+    } finally {
+      controller.abort();
+      if (settled) await settled;
+      await blocker.query('ROLLBACK').catch(() => {});
+      blocker.release();
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
+    }
+  });
+
+  it('marks an interrupted live COMMIT ambiguous and converges on one retry', async () => {
+    const key = 'pg-abort-begin-commit';
+    await pool.query(
+      "DELETE FROM storage_purchases WHERE character_id = 2 AND status IN ('pending', 'unresolved')",
+    );
+    const observer = await pool.connect();
+    const controller = new AbortController();
+    let settled: Promise<{ error: unknown }> | undefined;
+    try {
+      await observer.query(`CREATE FUNCTION storage_purchase_test_delay_commit()
+        RETURNS trigger LANGUAGE plpgsql AS $delay$
+        BEGIN
+          PERFORM pg_sleep(30);
+          RETURN NEW;
+        END
+        $delay$`);
+      await observer.query(`CREATE CONSTRAINT TRIGGER storage_purchase_test_delay_commit
+        AFTER INSERT ON storage_purchases
+        DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW EXECUTE FUNCTION storage_purchase_test_delay_commit()`);
+
+      const pending = db.beginStoragePurchase(
+        pool,
+        {
+          ...ROW,
+          accountId: 2,
+          characterId: 2,
+          idempotencyKey: key,
+          claimToken: '00000000-0000-4000-8000-000000000076',
+        },
+        controller.signal,
+      );
+      settled = pending.then(
+        () => ({ error: null }),
+        (error: unknown) => ({ error }),
+      );
+
+      let committingPid: number | null = null;
+      for (let attempt = 0; attempt < 100 && committingPid === null; attempt++) {
+        const committing = await observer.query(
+          `SELECT pid
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND application_name = $1
+              AND state = 'active'
+              AND query = 'COMMIT'
+              AND wait_event = 'PgSleep'
+            ORDER BY pid
+            LIMIT 1`,
+          [SCHEMA],
+        );
+        committingPid = committing.rows[0] ? Number(committing.rows[0].pid) : null;
+        if (committingPid === null) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(committingPid).not.toBeNull();
+
+      controller.abort();
+      expect((await settled).error).toMatchObject({
+        name: 'DbTransactionAborted',
+        code: 'DB_TRANSACTION_ABORTED',
+        commitMayHaveSucceeded: true,
+      });
+      let backendAlive = true;
+      for (let attempt = 0; attempt < 100 && backendAlive; attempt++) {
+        const active = await observer.query(
+          'SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE pid = $1) AS alive',
+          [committingPid],
+        );
+        backendAlive = active.rows[0].alive;
+        if (backendAlive) await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(backendAlive).toBe(false);
+      expect(
+        (
+          await observer.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+    } finally {
+      controller.abort();
+      if (settled) await settled;
+      await observer.query(
+        'DROP TRIGGER IF EXISTS storage_purchase_test_delay_commit ON storage_purchases',
+      );
+      await observer.query('DROP FUNCTION IF EXISTS storage_purchase_test_delay_commit()');
+      observer.release();
+    }
+
+    try {
+      const retry = await db.beginStoragePurchase(pool, {
+        ...ROW,
+        accountId: 2,
+        characterId: 2,
+        idempotencyKey: key,
+        claimToken: '00000000-0000-4000-8000-000000000077',
+      });
+      expect(retry.inserted).toBe(true);
+      expect(
+        (
+          await pool.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      ).toBe(1);
+    } finally {
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [key]);
     }
   });
 
