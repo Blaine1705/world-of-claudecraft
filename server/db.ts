@@ -80,7 +80,12 @@ import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
-import { STORAGE_PURCHASE_SCHEMA } from './storage_purchase_db';
+import {
+  lockStorageAppliedEffectAccountsOnClient,
+  STORAGE_PURCHASE_SCHEMA,
+  type StorageAppliedEffect,
+  writeStorageAppliedEffectsOnClient,
+} from './storage_purchase_db';
 import { SUSPICION_FLAGS_SCHEMA } from './suspicion_flags_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
@@ -1443,6 +1448,12 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
         await client.query(migration.dropSql);
       }
       await client.query(migration.createSql);
+      // A replacement must be valid before its superseded index disappears.
+      // If CREATE throws (including an interrupted concurrent build), this is
+      // never reached and the old index keeps serving until the next boot.
+      if (migration.retireSql !== undefined) {
+        await client.query(migration.retireSql);
+      }
     }
   } finally {
     if (locked) {
@@ -3382,15 +3393,6 @@ export async function renameCharacter(
   return row;
 }
 
-// Persist a character row. Returns true when the write landed. When a leaseNonce is
-// given the UPDATE is fenced to the current lease holder+nonce in the SAME statement:
-// a displaced session (its lease reclaimed by a same-account takeover, which rotated
-// the nonce) matches no lease row, the UPDATE touches nothing, and this returns false
-// so the caller can refuse to overwrite the live session's state. The fence rides the
-// write statement itself and never a separate pre-check, because a check-then-write
-// pair would race the takeover that steals the lease between the two. The no-nonce path
-// (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
-// as before.
 // The ONE fenced character UPDATE the whole save family issues
 // (saveCharacterState, saveCharacterAndMarketState, and the guild bank escrow
 // sibling). Extracted so the lease fence stays byte-identical across the
@@ -3424,26 +3426,42 @@ export async function saveCharacterState(
   level: number,
   state: CharacterState,
   leaseNonce?: string,
+  storageEffects: readonly StorageAppliedEffect[] = [],
 ): Promise<boolean> {
   const cleanState = sanitizeRemovedZone1Content(state).state;
   // A character save should wait out a slow database rather than lose state, so
   // run it on the raised heavy allowance; still bounded so a leave / shutdown
   // flush cannot hang past the container stop grace.
   const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), leaseNonce);
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(stmt.text, stmt.values),
-  );
-  return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
+  if (storageEffects.length === 0) {
+    const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+      query(stmt.text, stmt.values),
+    );
+    return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
+    const res = await client.query(stmt.text, stmt.values);
+    if ((res.rowCount ?? 0) === 0) {
+      await client.query('ROLLBACK');
+      return false;
+    }
+    await writeStorageAppliedEffectsOnClient(client, storageEffects);
+    await client.query('COMMIT');
+    return true;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
-// Persist a character row AND this realm's World Market + Ravenpost mail blobs
-// in ONE transaction. They live in different tables (characters / world_state),
-// but a Market listing and a mail attachment are both escrows: the item leaves
-// the character's bags (character state) and becomes a listing / a letter
-// parcel (world state) in the same Sim action. Saving them as independent
-// writes lets an unclean crash persist one half and not the other, vaporising
-// the item or duplicating it across bags and book. The leave path uses this so
-// a logout flush of bags can never tear away from either escrow.
+// Persist the character plus this realm's market/mail blobs atomically. They
+// are escrow halves: independent writes can lose or duplicate the item.
 export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
@@ -3451,34 +3469,22 @@ export async function saveCharacterAndMarketState(
   market: MarketSave,
   mail: MailSave,
   leaseNonce?: string,
-  // Guild bank books dirtied by this character's session (Guild Bank Phase 3):
-  // they are escrows exactly like the market/mail blobs (an item leaves the
-  // bags and becomes a book slot in one Sim action), so a leave flush that
-  // carries both MUST land them in this same fenced transaction. Optional and
-  // additive: omitted (or empty) writes exactly what this function always has.
+  // Optional guild-book escrow halves dirtied by this session.
   guildBanks?: readonly GuildBankSave[],
   // Out-parameter, same contract as saveCharacterAndGuildBankState's.
   results?: GuildBankWriteResult[],
+  storageEffects: readonly StorageAppliedEffect[] = [],
 ): Promise<boolean> {
-  // Gate the escrow flush on the boot backfill just like saveMarketState:
-  // this writes the realm-market row, so it must not run before ensureSchema
-  // has confirmed the marker and opened the gate. Checked before any pool work.
+  // The market backfill gate must open before this shared-row write.
   assertMarketWriteGateOpen();
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // Same rationale as saveCharacterState: a logout / shutdown escrow flush should
-    // wait out a slow database rather than lose the character + market blobs, so
-    // raise this transaction to the heavy allowance; still bounded so shutdown
-    // cannot hang past the container stop grace. SET LOCAL reverts at COMMIT.
+    // Wait out slow storage without exceeding the bounded heavy allowance.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-    // Fence the bag half on the current lease holder+nonce when one is given (same
-    // in-statement fence as saveCharacterState). If a same-account takeover rotated
-    // the nonce out from under this displaced session, the character UPDATE matches
-    // no row: ROLL BACK before touching the market/mail rows and report false. The
-    // escrow halves must never land without the bag half, and a displaced session
-    // must not overwrite the realm's shared Market/Ravenpost escrow either.
+    await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
+    // Fence the bag half first; a miss rolls back before shared escrow writes.
     const stmt = characterUpdateStatement(
       characterId,
       level,
@@ -3486,7 +3492,7 @@ export async function saveCharacterAndMarketState(
       leaseNonce,
     );
     const charRes = await client.query(stmt.text, stmt.values);
-    if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
+    if ((leaseNonce !== undefined || storageEffects.length > 0) && (charRes.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return false;
     }
@@ -3508,6 +3514,7 @@ export async function saveCharacterAndMarketState(
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
     await writeGuildBankRows(client, guildBanks ?? [], results);
+    await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
   } catch (err) {
@@ -3622,35 +3629,25 @@ async function writeGuildBankRow(
   return { guildId: gb.guildId, ...merged.result };
 }
 
-// The game-loop escrow save: the acting character's state AND the guild books
-// their session dirtied, in ONE transaction carrying the character-lease
-// fence. The sibling of saveCharacterAndMarketState for saves that carry no
-// market/mail half (the autosave path); a fence miss rolls back everything and
-// returns false, exactly like the market sibling, so a displaced session can
-// never persist either half. No market gate assertion: this writes no
-// world_state row, and books only exist in the sim after the boot load (or the
-// guild_create seed), both of which run after ensureSchema.
+// Game-loop sibling of the market save: character + dirty guild books share a
+// fenced transaction. It needs no market gate because it writes no world_state.
 export async function saveCharacterAndGuildBankState(
   characterId: number,
   level: number,
   state: CharacterState,
   guildBanks: readonly GuildBankSave[],
   leaseNonce?: string,
-  // Out-parameter: what each book write did. A refused one aborts the whole
-  // transaction and throws GuildBankEscrowRefused (which carries these too),
-  // so on the COMMITTED path every entry reads written; the parameter exists
-  // for tests and for the defensive check at the call site. An out-parameter
-  // rather than a richer return type because the boolean return IS the fence
-  // signal and every call site (and every test double) reads it as one.
+  // A refused result aborts and throws; committed entries are all written.
   results?: GuildBankWriteResult[],
+  storageEffects: readonly StorageAppliedEffect[] = [],
 ): Promise<boolean> {
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // Same rationale as saveCharacterAndMarketState: an escrow flush waits out
-    // a slow database on the heavy allowance. SET LOCAL reverts at COMMIT.
+    // Escrow flushes use the bounded heavy allowance.
     await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
+    await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
     const stmt = characterUpdateStatement(
       characterId,
       level,
@@ -3658,11 +3655,12 @@ export async function saveCharacterAndGuildBankState(
       leaseNonce,
     );
     const charRes = (await client.query(stmt.text, stmt.values)) as { rowCount: number | null };
-    if (leaseNonce !== undefined && (charRes.rowCount ?? 0) === 0) {
+    if ((leaseNonce !== undefined || storageEffects.length > 0) && (charRes.rowCount ?? 0) === 0) {
       await client.query('ROLLBACK');
       return false;
     }
     await writeGuildBankRows(client, guildBanks, results);
+    await writeStorageAppliedEffectsOnClient(client, storageEffects);
     await client.query('COMMIT');
     return true;
   } catch (err) {
@@ -3745,20 +3743,18 @@ export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
   }
 }
 
-// The character-save arm of the escrow transactions above, reusable inside a
-// caller-owned transaction (the $WOC Exchange listing escrow in
-// woc_market_db.ts commits a character UPDATE and a listing INSERT together,
-// the saveCharacterAndMarketState rationale). Same sanitize + lease fence as
-// saveCharacterState; the caller owns BEGIN/COMMIT/ROLLBACK and any timeout
-// raise. Returns false when the fence matched no row (a displaced session).
+// Reusable character-save arm for caller-owned escrow transactions. The
+// caller owns transaction boundaries/timeouts; a fence miss returns false.
 export async function saveCharacterStateOnClient(
   client: PoolClient,
   characterId: number,
   level: number,
   state: CharacterState,
   leaseNonce?: string,
+  storageEffects: readonly StorageAppliedEffect[] = [],
 ): Promise<boolean> {
   const cleanState = sanitizeRemovedZone1Content(state).state;
+  await lockStorageAppliedEffectAccountsOnClient(client, storageEffects);
   const res =
     leaseNonce === undefined
       ? await client.query(
@@ -3774,7 +3770,11 @@ export async function saveCharacterStateOnClient(
               )`,
           [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
         );
-  return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
+  const saved =
+    leaseNonce === undefined && storageEffects.length === 0 ? true : (res.rowCount ?? 0) > 0;
+  if (!saved) return false;
+  await writeStorageAppliedEffectsOnClient(client, storageEffects);
+  return true;
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {

@@ -97,7 +97,7 @@ import {
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
-import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle, recordBankOp } from './bank_ledger';
+import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle } from './bank_ledger';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import {
   BUG_DESCRIPTION_MAX,
@@ -2915,6 +2915,8 @@ const wocMarketService = new WocMarketService({
         liveGame().enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
         liveGame().serializeCharacterForPersist(characterId),
+      acknowledgeStorageCharacterSave: (characterId, leaseNonce, effects) =>
+        liveGame().acknowledgeStorageCharacterSave(characterId, leaseNonce, effects),
       hasDirtyGuildBooks: (characterId) => liveGame().hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => liveGame().flushDirtyGuildBooks(characterId),
       escrowSessionLost: (pid, characterId, kind) =>
@@ -3166,18 +3168,7 @@ function storagePurchaseHost(): StoragePurchaseHost {
     },
     grant: (pid, skuId, purchaseKey, dryRun) =>
       bankGrantStorageSlots(game.sim.ctx, pid, skuId, purchaseKey, { dryRun }),
-    // The character-side audit row for an applied Claudium grant: the
-    // claudium rail, copper delta 0, the SKU id for attribution. Snapshots
-    // are minimal BankOpSnapshot pairs (the apply can land away from any
-    // banker, where bankInfoFor is null by design).
-    recordGrantLedger: (who, skuId, purchasedSlotsBefore, purchasedSlotsAfter) =>
-      recordBankOp(
-        'buy_slots',
-        who,
-        { slots: [], purchasedSlots: purchasedSlotsBefore, nextExpansionCost: null },
-        { slots: [], purchasedSlots: purchasedSlotsAfter, nextExpansionCost: null },
-        { paidWith: 'claudium', itemId: skuId },
-      ),
+    stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect),
     // Same absence rule as the resolver above. game.saveCharacter already
     // answers false for a quarantined session, so this changes no outcome for a
     // single session; it matters when a quarantined session and a live one

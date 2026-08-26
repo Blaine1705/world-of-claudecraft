@@ -16,7 +16,13 @@ import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { CharacterState, Sim } from '../src/sim/sim';
 import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
 import { gameMetricsCounters } from './http/game_signals';
-import type { WocCustodyExtract, WocCustodyGrant, WocMarketCustody } from './woc_market';
+import type { StorageAppliedEffect } from './storage_purchase_db';
+import type {
+  CharacterSaveArgs,
+  WocCustodyExtract,
+  WocCustodyGrant,
+  WocMarketCustody,
+} from './woc_market';
 import { createWocEscrowGate, type WocEscrowGate } from './woc_market_escrow_gate';
 
 /** The narrow slice of GameServer the custody module consumes (game.ts
@@ -43,7 +49,12 @@ export interface WocCustodyGameHost {
    *  gone, torn down, or escrow-quarantined. */
   serializeCharacterForPersist(
     characterId: number,
-  ): { level: number; state: CharacterState } | null;
+  ): { level: number; state: CharacterState; storageEffects?: StorageAppliedEffect[] } | null;
+  acknowledgeStorageCharacterSave?(
+    characterId: number,
+    leaseNonce: string | undefined,
+    effects: readonly StorageAppliedEffect[],
+  ): void;
   hasDirtyGuildBooks(characterId: number): boolean;
   flushDirtyGuildBooks(characterId: number): Promise<void>;
   /** Terminal escrow-job signals (game.ts owns the semantics: 'fenced' kicks
@@ -165,6 +176,7 @@ export function createWocMarketCustody(
           level: snap.level,
           state: snap.state,
           leaseNonce: session.leaseNonce,
+          storageEffects: snap.storageEffects ?? [],
         },
       };
     },
@@ -274,12 +286,7 @@ export function createWocMarketCustody(
       accountId: number,
       characterId: number,
       expectedNonce: string | undefined,
-      persist: (save: {
-        characterId: number;
-        level: number;
-        state: CharacterState;
-        leaseNonce: string | undefined;
-      }) => Promise<T>,
+      persist: (save: CharacterSaveArgs) => Promise<T>,
     ): Promise<T | 'busy' | 'session_lost'> {
       // The delivered-save FIFO entry (the escrow write-path rider closes
       // the commitGrant carve-out). The blob is serialized INSIDE the
@@ -319,6 +326,7 @@ export function createWocMarketCustody(
               level: snap.level,
               state: snap.state,
               leaseNonce: session.leaseNonce,
+              storageEffects: snap.storageEffects ?? [],
             });
           },
         );
@@ -370,6 +378,7 @@ export function createWocMarketCustody(
           level: snap.level,
           state: snap.state,
           leaseNonce: session.leaseNonce,
+          storageEffects: snap.storageEffects ?? [],
         },
       };
     },
@@ -392,8 +401,17 @@ export function createWocMarketCustody(
           level: snap.level,
           state: snap.state,
           leaseNonce: session.leaseNonce,
+          storageEffects: snap.storageEffects ?? [],
         },
       };
+    },
+
+    acknowledgeCharacterSave(save: CharacterSaveArgs): void {
+      host.acknowledgeStorageCharacterSave?.(
+        save.characterId,
+        save.leaseNonce,
+        save.storageEffects ?? [],
+      );
     },
 
     restoreCopy(pid: number, characterId: number, slot: InvSlot): void {

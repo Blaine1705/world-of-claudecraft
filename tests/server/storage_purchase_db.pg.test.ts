@@ -45,6 +45,8 @@ d('storage_purchases against real PostgreSQL', () => {
     reopenStoragePurchase: typeof import('../../server/storage_purchase_db').reopenStoragePurchase;
     pendingStoragePurchasesForCharacter: typeof import('../../server/storage_purchase_db').pendingStoragePurchasesForCharacter;
     pruneRefusedStoragePurchasesBatch: typeof import('../../server/storage_purchase_db').pruneRefusedStoragePurchasesBatch;
+    lockStorageAppliedEffectAccountsOnClient: typeof import('../../server/storage_purchase_db').lockStorageAppliedEffectAccountsOnClient;
+    writeStorageAppliedEffectsOnClient: typeof import('../../server/storage_purchase_db').writeStorageAppliedEffectsOnClient;
     STORAGE_PURCHASE_SCHEMA: string;
   };
 
@@ -69,6 +71,21 @@ d('storage_purchases against real PostgreSQL', () => {
     await admin.end();
     await pool.query('CREATE TABLE accounts (id SERIAL PRIMARY KEY)');
     await pool.query('CREATE TABLE characters (id SERIAL PRIMARY KEY)');
+    await pool.query(`CREATE TABLE bank_ledger (
+      id BIGSERIAL PRIMARY KEY,
+      realm TEXT NOT NULL,
+      character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+      account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+      op TEXT NOT NULL,
+      item_id TEXT,
+      count INT,
+      instance JSONB,
+      copper_delta BIGINT NOT NULL DEFAULT 0,
+      purchased_slots_after INT NOT NULL,
+      container TEXT NOT NULL,
+      container_id BIGINT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`);
     await pool.query('INSERT INTO accounts (id) VALUES (1), (2)');
     await pool.query('INSERT INTO characters (id) VALUES (1), (2)');
     // The DDL executes for real, twice: idempotency is part of the contract
@@ -102,7 +119,7 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(owner.rows.map((r: { schemaname: string }) => r.schemaname)).toContain(SCHEMA);
   });
 
-  it('materialized the table, both FULL FK indexes, and the partial sweep index', async () => {
+  it('materialized operational rows, deletion-proof receipts, triggers, and indexes', async () => {
     const reg = await pool.query(`SELECT to_regclass('${SCHEMA}.storage_purchases') AS reg`);
     expect(reg.rows[0].reg).toBe('storage_purchases');
     const idx = await pool.query(
@@ -125,6 +142,45 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(refusedDef).toContain('WHERE');
     expect(refusedDef).toContain("'refused'");
     expect(refusedDef).not.toContain("'applied'");
+
+    const receipt = await pool.query(
+      `SELECT column_name, is_nullable
+         FROM information_schema.columns
+        WHERE table_schema = $1 AND table_name = 'storage_purchase_applied_receipts'`,
+      [SCHEMA],
+    );
+    const receiptColumns = new Map(
+      receipt.rows.map((row: { column_name: string; is_nullable: string }) => [
+        row.column_name,
+        row.is_nullable,
+      ]),
+    );
+    expect(receiptColumns.get('character_id')).toBe('NO');
+    expect(receiptColumns.get('purchased_slots_before')).toBe('YES');
+    expect(receiptColumns.get('purchased_slots_after')).toBe('YES');
+    const receiptConstraints = await pool.query(
+      `SELECT pg_get_constraintdef(oid) AS def
+         FROM pg_constraint
+        WHERE conrelid = '${SCHEMA}.storage_purchase_applied_receipts'::regclass`,
+    );
+    const constraintText = receiptConstraints.rows
+      .map((row: { def: string }) => row.def)
+      .join('\n');
+    const fkText = receiptConstraints.rows
+      .map((row: { def: string }) => row.def)
+      .filter((def: string) => def.startsWith('FOREIGN KEY'))
+      .join('\n');
+    expect(fkText).toContain('account_id');
+    expect(fkText).not.toContain('character_id');
+    expect(constraintText).toContain('purchased_slots_after > purchased_slots_before');
+    const triggers = await pool.query(
+      `SELECT tgname FROM pg_trigger
+        WHERE tgrelid = '${SCHEMA}.storage_purchases'::regclass AND NOT tgisinternal`,
+    );
+    expect(triggers.rows.map((row: { tgname: string }) => row.tgname).sort()).toEqual([
+      'storage_purchase_archive_applied',
+      'storage_purchase_guard_consumed_key',
+    ]);
   });
 
   it('the sweep never walks the statuses retention must keep, measured', async () => {
@@ -192,8 +248,91 @@ d('storage_purchases against real PostgreSQL', () => {
       expect(kept.rows[0].n).toBeGreaterThanOrEqual(AGED_KEPT);
     } finally {
       await pool.query("DELETE FROM storage_purchases WHERE idempotency_key LIKE 'plan-%'");
+      await pool.query(
+        "DELETE FROM storage_purchase_applied_receipts WHERE idempotency_key LIKE 'plan-%'",
+      );
       await pool.query('ANALYZE storage_purchases');
     }
+  });
+
+  it('commits the character-side receipt and Claudium ledger exactly once', async () => {
+    const effect = {
+      realm: 'pgtest',
+      accountId: 1,
+      characterId: 1,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'pg-atomic-apply',
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    };
+    await db.beginStoragePurchase(pool, effect);
+
+    const rolledBack = await pool.connect();
+    try {
+      await rolledBack.query('BEGIN');
+      await db.lockStorageAppliedEffectAccountsOnClient(rolledBack, [effect]);
+      await db.writeStorageAppliedEffectsOnClient(rolledBack, [effect]);
+      await rolledBack.query('ROLLBACK');
+    } finally {
+      rolledBack.release();
+    }
+    expect((await db.storagePurchaseByKey(pool, effect.idempotencyKey))?.status).toBe('pending');
+    expect(
+      (
+        await pool.query('SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1', [
+          effect.itemId,
+        ])
+      ).rows[0].n,
+    ).toBe(0);
+
+    const committed = await pool.connect();
+    try {
+      await committed.query('BEGIN');
+      await db.lockStorageAppliedEffectAccountsOnClient(committed, [effect]);
+      await db.writeStorageAppliedEffectsOnClient(committed, [effect]);
+      await committed.query('COMMIT');
+    } finally {
+      committed.release();
+    }
+    expect(await db.storagePurchaseByKey(pool, effect.idempotencyKey)).toMatchObject({
+      characterId: 1,
+      status: 'applied',
+    });
+    expect(
+      (
+        await pool.query(
+          'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+          [effect.idempotencyKey],
+        )
+      ).rows[0].n,
+    ).toBe(0);
+    expect(
+      (
+        await pool.query(
+          "SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1 AND instance->>'paidWith' = 'claudium'",
+          [effect.itemId],
+        )
+      ).rows[0].n,
+    ).toBe(1);
+
+    const replay = await pool.connect();
+    try {
+      await replay.query('BEGIN');
+      await db.lockStorageAppliedEffectAccountsOnClient(replay, [effect]);
+      await db.writeStorageAppliedEffectsOnClient(replay, [effect]);
+      await replay.query('COMMIT');
+    } finally {
+      replay.release();
+    }
+    expect(
+      (
+        await pool.query(
+          "SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1 AND instance->>'paidWith' = 'claudium'",
+          [effect.itemId],
+        )
+      ).rows[0].n,
+    ).toBe(1);
   });
 
   it('rejects an incompressible key past the btree tuple bound at the raw layer', async () => {
@@ -257,7 +396,7 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(await db.pruneRefusedStoragePurchasesBatch(pool, 0, 100)).toBe(0);
   });
 
-  it('both ON DELETE CASCADE arms actually fire, and the FK indexes serve them', async () => {
+  it('character deletion preserves applied identity and blocks replacement replay', async () => {
     // The two REFERENCES clauses were declared and never executed by either
     // suite, so a cascade dropped in a future edit (or a FK pointed at the
     // wrong parent) would ship green. This matters beyond tidiness: the whole
@@ -270,26 +409,57 @@ d('storage_purchases against real PostgreSQL', () => {
     // than relying on an earlier case's leftovers (the lifecycle case sweeps
     // its own rows, so borrowing one makes this assertion order-dependent).
     await db.beginStoragePurchase(pool, { ...ROW, idempotencyKey: 'pg-cascade-control' });
-    await db.beginStoragePurchase(pool, {
+    const applied = {
       ...ROW,
       accountId: 3,
       characterId: 3,
-      idempotencyKey: 'pg-cascade-character',
+      idempotencyKey: 'pg-cascade-applied',
+    };
+    await db.beginStoragePurchase(pool, applied);
+    await db.settleStoragePurchase(pool, applied.idempotencyKey, 'applied');
+    await db.beginStoragePurchase(pool, {
+      ...applied,
+      idempotencyKey: 'pg-cascade-pending',
     });
-    // A CHARACTER delete takes its rows with it.
+    // A CHARACTER delete takes operational work but not the applied receipt.
     await pool.query('DELETE FROM characters WHERE id = 3');
-    expect(await db.storagePurchaseByKey(pool, 'pg-cascade-character')).toBeNull();
+    expect(await db.storagePurchaseByKey(pool, 'pg-cascade-pending')).toBeNull();
+    expect(await db.storagePurchaseByKey(pool, applied.idempotencyKey)).toMatchObject({
+      accountId: 3,
+      characterId: 3,
+      status: 'applied',
+    });
+
+    await pool.query('INSERT INTO characters (id) VALUES (5)');
+    const replacement = await db.beginStoragePurchase(pool, {
+      ...applied,
+      characterId: 5,
+    });
+    expect(replacement.inserted).toBe(false);
+    expect(replacement.existing?.characterId).toBe(3);
+    const legacyInsert = await pool.query(
+      `INSERT INTO storage_purchases
+         (realm, account_id, character_id, item_id, expected_cost_claudium, idempotency_key)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT (idempotency_key) DO NOTHING
+       RETURNING id`,
+      [applied.realm, applied.accountId, 5, applied.itemId, 100, applied.idempotencyKey],
+    );
+    expect(legacyInsert.rowCount).toBe(0);
 
     await pool.query('INSERT INTO characters (id) VALUES (4)');
-    await db.beginStoragePurchase(pool, {
+    const accountApplied = {
       ...ROW,
       accountId: 3,
       characterId: 4,
       idempotencyKey: 'pg-cascade-account',
-    });
+    };
+    await db.beginStoragePurchase(pool, accountApplied);
+    await db.settleStoragePurchase(pool, accountApplied.idempotencyKey, 'applied');
     // ... and so does an ACCOUNT delete, through the other reference.
     await pool.query('DELETE FROM accounts WHERE id = 3');
     expect(await db.storagePurchaseByKey(pool, 'pg-cascade-account')).toBeNull();
+    expect(await db.storagePurchaseByKey(pool, applied.idempotencyKey)).toBeNull();
 
     // Unrelated rows are untouched: the cascade is scoped, not a wipe.
     expect(await db.storagePurchaseByKey(pool, 'pg-cascade-control')).not.toBeNull();

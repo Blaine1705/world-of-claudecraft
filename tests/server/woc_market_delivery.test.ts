@@ -7,7 +7,12 @@
 // service and escrow-queue suites.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import type { WocListingRow, WocSweepErrorTag } from '../../server/woc_market';
+import type {
+  CharacterSaveArgs,
+  WocListingRow,
+  WocSettlementRow,
+  WocSweepErrorTag,
+} from '../../server/woc_market';
 import {
   createWocMarketDeliveryArms,
   type WocDeliveryCtx,
@@ -77,6 +82,116 @@ const listing = (id: number): WocListingRow =>
     resolution: 'no_bids',
     item: { itemId: 'iron_sword', count: 1 },
   }) as unknown as WocListingRow;
+
+function makeGrantDeliveryCtx(result: 'booked' | 'lease_lost' | 'claim_missing'): {
+  ctx: WocDeliveryCtx;
+  acknowledge: ReturnType<typeof vi.fn>;
+  save: CharacterSaveArgs;
+} {
+  const settlement = {
+    id: 9,
+    listingId: 3,
+    bidId: null,
+    buyerAccount: 8,
+    buyerCharacter: 55,
+    buyerName: 'Buyer',
+    amountCents: 500,
+    quoteReference: null,
+    settledAmountBase: null,
+  } as WocSettlementRow;
+  const directed = {
+    ...listing(3),
+    sellerAccount: 4,
+    sellerCharacter: 11,
+    sellerName: 'Seller',
+    itemId: 'iron_sword',
+    item: { itemId: 'iron_sword', count: 1 },
+    itemDisposed: false,
+    directedBuyerAccount: 8,
+  } as WocListingRow;
+  const save = {
+    characterId: 55,
+    level: 7,
+    state: {} as CharacterSaveArgs['state'],
+    leaseNonce: 'buyer-nonce',
+    storageEffects: [],
+  };
+  const acknowledge = vi.fn();
+  const db = {
+    deliveringSettlements: vi.fn(async () => [settlement]),
+    listingById: vi.fn(async () => directed),
+    deliveryTarget: vi.fn(async () => ({ characterId: 55, name: 'Buyer' })),
+    claimCustodyRef: vi.fn(async () => false),
+    custodyRefState: vi.fn(async () => ({
+      booked: false,
+      grantCharacterId: 55,
+      mailIntent: false,
+    })),
+    saveDeliveredCharacterBooked: vi.fn(async () => result),
+    finalizeDeliveredSettlement: vi.fn(async () => 'already_final' as const),
+    touchSettlementRow: vi.fn(async () => {}),
+  };
+  const custody = {
+    snapshotCopy: vi.fn(() => ({ ok: true as const, save })),
+    persistGrantSerialized: vi.fn(
+      async (
+        _accountId: number,
+        _characterId: number,
+        _nonce: string | undefined,
+        persist: (captured: CharacterSaveArgs) => Promise<unknown>,
+      ) => persist(save),
+    ),
+    acknowledgeCharacterSave: acknowledge,
+  };
+  return {
+    ctx: {
+      db: db as unknown as WocDeliveryCtx['db'],
+      custody: custody as unknown as WocDeliveryCtx['custody'],
+      realm: 'test-realm',
+      now: () => 1_000,
+      sweepError: vi.fn(),
+      pruneLocalLedgers: () => {},
+      parkedDeliveries: new Map(),
+      parkedReturns: new Map(),
+      pendingGrants: new Map([
+        ['woc_settlement:9', { characterId: 55, leaseNonce: 'buyer-nonce', stampMs: 1 }],
+      ]),
+      pendingMail: new Map(),
+      parkRetryMs: 60_000,
+      sweepBatch: 25,
+    },
+    acknowledge,
+    save,
+  };
+}
+
+describe('direct-grant storage-effect acknowledgement', () => {
+  it('acknowledges the captured save only when save+booking reports committed', async () => {
+    const { ctx, acknowledge, save } = makeGrantDeliveryCtx('booked');
+    const advanced = await createWocMarketDeliveryArms(ctx).reconcileDelivering(1_000, {
+      contended: false,
+      parked: 0,
+    });
+
+    expect(advanced).toBe(1);
+    expect(acknowledge).toHaveBeenCalledOnce();
+    expect(acknowledge).toHaveBeenCalledWith(save);
+  });
+
+  it.each(['lease_lost', 'claim_missing'] as const)(
+    'does not acknowledge after a %s rollback verdict',
+    async (result) => {
+      const { ctx, acknowledge } = makeGrantDeliveryCtx(result);
+      const advanced = await createWocMarketDeliveryArms(ctx).reconcileDelivering(1_000, {
+        contended: false,
+        parked: 0,
+      });
+
+      expect(advanced).toBe(0);
+      expect(acknowledge).not.toHaveBeenCalled();
+    },
+  );
+});
 
 describe('the stamp-ledger high-water (counted, re-arming, never shedding)', () => {
   it('warns once per crossing, counts it, and never drops an intent', async () => {

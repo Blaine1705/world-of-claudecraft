@@ -48,6 +48,7 @@ import {
   setGameMetricsCounters,
   type WocEscrowQueueOutcome,
 } from '../../server/http/game_signals';
+import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
 import type { CharacterSaveArgs, WocMarketCustody } from '../../server/woc_market';
 import { WocMarketService } from '../../server/woc_market';
 import { createWocMarketCustody, wocEscrowSerializeStats } from '../../server/woc_market_custody';
@@ -67,6 +68,22 @@ const SELLER = 21;
 const SELLER_CHAR = 21;
 const NONCE = 'nonce-live';
 const GUILD = 913;
+
+const storageEffect = (
+  idempotencyKey: string,
+  itemId = 'strongbox_rung_01',
+  purchasedSlotsBefore = 0,
+  purchasedSlotsAfter = 6,
+): StorageAppliedEffect => ({
+  realm: REALM,
+  accountId: SELLER,
+  characterId: SELLER_CHAR,
+  itemId,
+  expectedCostClaudium: 100,
+  idempotencyKey,
+  purchasedSlotsBefore,
+  purchasedSlotsAfter,
+});
 
 // A real eligible equipment def from the content tables (the service-test
 // fixture shape): tradable, non-quest, so only the custody edge is under test.
@@ -177,6 +194,12 @@ interface Rig {
   join: (accountId: number, characterId: number, name: string) => ClientSession;
 }
 
+function requirePlayerMeta(rig: Pick<Rig, 'server' | 'session'>) {
+  const meta = rig.server.sim.meta(rig.session.pid);
+  if (!meta) throw new Error('missing test player meta');
+  return meta;
+}
+
 const blobHoldsItem = (state: CharacterState, itemId: string): boolean =>
   state.inventory.some((s) => s.itemId === itemId);
 
@@ -208,6 +231,8 @@ function makeRig(
       enqueueCharacterWrite: (characterId, job) => server.enqueueCharacterWrite(characterId, job),
       serializeCharacterForPersist: (characterId) =>
         server.serializeCharacterForPersist(characterId),
+      acknowledgeStorageCharacterSave: (characterId, leaseNonce, effects) =>
+        server.acknowledgeStorageCharacterSave(characterId, leaseNonce, effects),
       hasDirtyGuildBooks: (characterId) => server.hasDirtyGuildBooks(characterId),
       flushDirtyGuildBooks: (characterId) => server.flushDirtyGuildBooks(characterId),
       escrowSessionLost: (pid, characterId, kind) =>
@@ -316,6 +341,28 @@ afterEach(() => {
 });
 
 describe('the escrow critical section rides the per-character save queue (H5)', () => {
+  it('acknowledges listing storage effects only after the escrow transaction commits', async () => {
+    const committed = makeRig();
+    const effect = storageEffect('listing-storage-commit');
+    requirePlayerMeta(committed).bank.purchasedSlots = 6;
+    expect(committed.server.stageStorageAppliedEffect(effect)).toBe(true);
+
+    const listed = await createListing(committed);
+    expect(listed.ok).toBe(true);
+    expect(committed.db.escrowSaves[0]?.storageEffects).toEqual([effect]);
+    expect(committed.session.pendingStorageAppliedEffects).toEqual([]);
+
+    const refused = makeRig();
+    const retained = storageEffect('listing-storage-refused');
+    requirePlayerMeta(refused).bank.purchasedSlots = 6;
+    expect(refused.server.stageStorageAppliedEffect(retained)).toBe(true);
+    refused.db.failNextEscrow = 'cap_reached';
+
+    await expect(createListing(refused)).resolves.toEqual({ ok: false, reason: 'cap_reached' });
+    expect(refused.db.escrowSaves[0]?.storageEffects).toEqual([retained]);
+    expect(refused.session.pendingStorageAppliedEffects).toEqual([retained]);
+  });
+
   it('a stale autosave snapshot can never resurrect an escrowed item', async () => {
     const rig = makeRig();
     const kinds = recordEscrowKinds();
@@ -1292,5 +1339,76 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await expect(rig.server.saveCharacter(rig.session)).rejects.toThrow('db down');
     // The chain is not poisoned: the next save for the same character runs.
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
+  });
+
+  it('a committed save releases only its captured storage-effect prefix', async () => {
+    const rig = makeRig();
+    const meta = requirePlayerMeta(rig);
+    const first = storageEffect('storage-a');
+    const second = storageEffect('storage-b', 'strongbox_rung_02', 6, 12);
+    meta.bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(first)).toBe(true);
+
+    let finish!: (saved: boolean) => void;
+    dbMock.saveCharacterState.mockImplementationOnce(
+      async () => new Promise<boolean>((resolve) => (finish = resolve)),
+    );
+    const saving = rig.server.saveCharacter(rig.session);
+    await vi.waitFor(() => expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1));
+    expect(dbMock.saveCharacterState.mock.calls[0]?.[4]).toEqual([first]);
+
+    meta.bank.purchasedSlots = 12;
+    expect(rig.server.stageStorageAppliedEffect(second)).toBe(true);
+    finish(true);
+    await expect(saving).resolves.toBe(true);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([second]);
+
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
+    expect(dbMock.saveCharacterState.mock.calls[1]?.[4]).toEqual([second]);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
+  });
+
+  it('false and throwing saves retain staged storage effects for a later commit', async () => {
+    const rig = makeRig();
+    const effect = storageEffect('storage-retry');
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(effect)).toBe(true);
+
+    dbMock.saveCharacterState.mockRejectedValueOnce(new Error('db down'));
+    await expect(rig.server.saveCharacter(rig.session)).rejects.toThrow('db down');
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
+
+    dbMock.saveCharacterState.mockResolvedValueOnce(false);
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
+
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
+  });
+
+  it('a missing serializable character refuses while a storage effect is pending', async () => {
+    const rig = makeRig();
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(storageEffect('storage-no-state'))).toBe(true);
+    rig.server.sim.removePlayer(rig.session.pid);
+
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterState).not.toHaveBeenCalled();
+    expect(rig.session.pendingStorageAppliedEffects).toHaveLength(1);
+  });
+
+  it('a WOC acknowledgement from the pre-takeover lease cannot touch the new lease', () => {
+    const rig = makeRig();
+    const effect = storageEffect('storage-takeover');
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(effect)).toBe(true);
+    const snap = rig.custody.snapshotCopy(SELLER, SELLER_CHAR);
+    if (!snap.ok) throw new Error(`snapshotCopy refused: ${snap.reason}`);
+    expect(snap.save.leaseNonce).toBe(NONCE);
+
+    rig.session.leaseNonce = 'nonce-after-takeover';
+    rig.custody.acknowledgeCharacterSave?.(snap.save);
+
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
   });
 });

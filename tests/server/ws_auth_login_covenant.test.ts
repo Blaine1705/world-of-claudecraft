@@ -76,7 +76,7 @@ function neverAnsweringHost(): StoragePurchaseHost {
   return {
     resolveLiveCharacter: () => ({ characterId: CHARACTER, pid: 1 }),
     grant: () => ({ status: 'fits' }),
-    recordGrantLedger: vi.fn(),
+    stageAppliedEffect: vi.fn(() => true),
     saveCharacter: async () => true,
     spend: vi.fn(),
     db: {

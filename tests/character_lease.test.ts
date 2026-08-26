@@ -24,8 +24,10 @@ import {
   releaseCharacterLease,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveCharacterStateOnClient,
 } from '../server/db';
 import { REALM } from '../server/realm';
+import type { StorageAppliedEffect } from '../server/storage_purchase_db';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 // The load-bearing values are pinned as bare literals below, never as the same
@@ -216,6 +218,47 @@ const STATE = {
 } as unknown as CharacterState;
 const MARKET = { listings: [], collections: {} } as unknown as MarketSave;
 const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
+const STORAGE_EFFECT: StorageAppliedEffect = {
+  realm: REALM,
+  accountId: 7,
+  characterId: 42,
+  itemId: 'strongbox_rung_01',
+  expectedCostClaudium: 100,
+  idempotencyKey: 'storage-effect-1',
+  purchasedSlotsBefore: 0,
+  purchasedSlotsAfter: 6,
+};
+
+function storageEffectClient(updateRowCount: number) {
+  const query = vi.fn(async (sql: string) => {
+    if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+    if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: updateRowCount };
+    if (/FROM storage_purchase_applied_receipts/i.test(sql)) return { rows: [], rowCount: 0 };
+    if (/FROM storage_purchases[\s\S]*FOR UPDATE/i.test(sql)) {
+      return {
+        rows: [
+          {
+            id: 81,
+            realm: REALM,
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'storage-effect-1',
+            status: 'pending',
+          },
+        ],
+        rowCount: 1,
+      };
+    }
+    if (/INSERT INTO storage_purchase_applied_receipts/i.test(sql)) {
+      return { rows: [{ source_purchase_id: 81 }], rowCount: 1 };
+    }
+    if (/DELETE FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 1 };
+    return { rows: [], rowCount: 1 };
+  });
+  return { query, release: vi.fn() };
+}
 
 describe('acquireCharacterLease fail-closed form (a NULL account_id can never be stolen)', () => {
   it('carries the same-account arm as PLAIN equality and never IS NOT DISTINCT FROM', async () => {
@@ -286,6 +329,52 @@ describe('saveCharacterState lease fence', () => {
     expect(String(updateCall?.[0])).not.toContain('EXISTS');
     expect(updateCall?.[1]).toEqual([42, 7, expect.any(String)]);
   });
+
+  it('atomically locks account -> writes character -> archives effect -> commits', async () => {
+    const client = storageEffectClient(1);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    await expect(saveCharacterState(42, 7, STATE, 'nonce-1', [STORAGE_EFFECT])).resolves.toBe(true);
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    const at = (pattern: RegExp) => sqls.findIndex((sql) => pattern.test(sql));
+    expect(at(/SELECT id FROM accounts/)).toBeLessThan(at(/UPDATE characters/));
+    expect(at(/UPDATE characters/)).toBeLessThan(
+      at(/INSERT INTO storage_purchase_applied_receipts/),
+    );
+    expect(at(/INSERT INTO bank_ledger/)).toBeLessThan(at(/DELETE FROM storage_purchases/));
+    expect(at(/DELETE FROM storage_purchases/)).toBeLessThan(at(/^COMMIT/));
+    expect(sqls).not.toContain('ROLLBACK');
+  });
+
+  it('retains the effect transaction when the character fence misses', async () => {
+    const client = storageEffectClient(0);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    await expect(saveCharacterState(42, 7, STATE, 'stale', [STORAGE_EFFECT])).resolves.toBe(false);
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    expect(sqls.some((sql) => /SELECT id FROM accounts/.test(sql))).toBe(true);
+    expect(sqls.some((sql) => /storage_purchase_applied_receipts/.test(sql))).toBe(false);
+    expect(sqls.some((sql) => /bank_ledger/.test(sql))).toBe(false);
+    expect(sqls).toContain('ROLLBACK');
+  });
+});
+
+describe('saveCharacterStateOnClient storage effects', () => {
+  it('owns the account lock and effect write around its fenced character update', async () => {
+    const client = storageEffectClient(1);
+    await expect(
+      saveCharacterStateOnClient(client as any, 42, 7, STATE, 'nonce-1', [STORAGE_EFFECT]),
+    ).resolves.toBe(true);
+
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    const account = sqls.findIndex((sql) => /SELECT id FROM accounts/.test(sql));
+    const character = sqls.findIndex((sql) => /UPDATE characters/.test(sql));
+    const receipt = sqls.findIndex((sql) =>
+      /INSERT INTO storage_purchase_applied_receipts/.test(sql),
+    );
+    expect(account).toBeLessThan(character);
+    expect(character).toBeLessThan(receipt);
+  });
 });
 
 describe('saveCharacterAndMarketState lease fence', () => {
@@ -308,6 +397,31 @@ describe('saveCharacterAndMarketState lease fence', () => {
     expect(stmts.filter((s) => /world_state/i.test(s))).toHaveLength(2);
     expect(stmts.some((s) => /^COMMIT/.test(s))).toBe(true);
     expect(stmts.some((s) => /ROLLBACK/.test(s))).toBe(false);
+  });
+
+  it('writes storage effects after both world escrows and before COMMIT', async () => {
+    const client = storageEffectClient(1);
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    await expect(
+      saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-1', undefined, undefined, [
+        STORAGE_EFFECT,
+      ]),
+    ).resolves.toBe(true);
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    const account = sqls.findIndex((sql) => /SELECT id FROM accounts/.test(sql));
+    const character = sqls.findIndex((sql) => /UPDATE characters/.test(sql));
+    const world = sqls
+      .map((sql, index) => (/world_state/.test(sql) ? index : -1))
+      .filter((i) => i >= 0);
+    const receipt = sqls.findIndex((sql) =>
+      /INSERT INTO storage_purchase_applied_receipts/.test(sql),
+    );
+    const commit = sqls.findIndex((sql) => /^COMMIT/.test(sql));
+    expect(account).toBeLessThan(character);
+    expect(world).toHaveLength(2);
+    expect(world.at(-1) ?? -1).toBeLessThan(receipt);
+    expect(receipt).toBeLessThan(commit);
   });
 
   it('a fenced-out character UPDATE (rowCount 0) rolls back, writes neither escrow, and resolves false', async () => {

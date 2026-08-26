@@ -9,12 +9,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   beginStoragePurchase,
+  lockStorageAppliedEffectAccountsOnClient,
   pendingStoragePurchasesForCharacter,
   pruneRefusedStoragePurchasesBatch,
   reopenStoragePurchase,
   STORAGE_PURCHASE_SCHEMA,
   settleStoragePurchase,
   storagePurchaseByKey,
+  writeStorageAppliedEffectsOnClient,
 } from '../../server/storage_purchase_db';
 
 interface Captured {
@@ -39,10 +41,23 @@ function makeCapture(results: { rows?: Record<string, unknown>[]; rowCount?: num
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
 
 describe('the DDL', () => {
-  it('creates the table with the unique key and both partial indexes', () => {
+  it('creates operational rows plus deletion-proof applied receipts', () => {
+    const folded = STORAGE_PURCHASE_SCHEMA.replace(/\s+/g, ' ');
     expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE TABLE IF NOT EXISTS storage_purchases')).toBe(1);
+    expect(
+      count(
+        STORAGE_PURCHASE_SCHEMA,
+        'CREATE TABLE IF NOT EXISTS storage_purchase_applied_receipts',
+      ),
+    ).toBe(1);
+    expect(
+      count(
+        STORAGE_PURCHASE_SCHEMA,
+        'CREATE TABLE IF NOT EXISTS storage_purchase_schema_migrations',
+      ),
+    ).toBe(1);
     expect(count(STORAGE_PURCHASE_SCHEMA, 'idempotency_key TEXT NOT NULL UNIQUE')).toBe(1);
-    expect(count(STORAGE_PURCHASE_SCHEMA, 'expected_cost_claudium INT NOT NULL')).toBe(1);
+    expect(count(STORAGE_PURCHASE_SCHEMA, 'expected_cost_claudium INT NOT NULL')).toBe(2);
     expect(count(STORAGE_PURCHASE_SCHEMA, "status TEXT NOT NULL DEFAULT 'pending'")).toBe(1);
     // The FK indexes must stay FULL (they serve the ON DELETE CASCADE
     // lookups as well as the login-recovery scan; a partial index cannot
@@ -71,12 +86,32 @@ describe('the DDL', () => {
     expect(STORAGE_PURCHASE_SCHEMA).toContain(
       'character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE',
     );
+    const receiptStart = folded.indexOf(
+      'CREATE TABLE IF NOT EXISTS storage_purchase_applied_receipts',
+    );
+    const receiptClause = folded.slice(receiptStart, folded.indexOf(';', receiptStart));
+    expect(receiptClause).toContain('character_id INT NOT NULL');
+    expect(receiptClause).not.toContain('character_id INT NOT NULL REFERENCES characters');
+    expect(receiptClause).toContain(
+      'account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE',
+    );
+    expect(receiptClause).toContain('purchased_slots_after > purchased_slots_before');
+    expect(folded).toContain(
+      'CREATE INDEX IF NOT EXISTS storage_purchase_applied_receipts_account ON storage_purchase_applied_receipts (account_id);',
+    );
+    expect(folded).toContain("VALUES ('applied-receipts-v1') ON CONFLICT DO NOTHING");
+    expect(folded).toContain("WHERE p.status = 'applied'");
+    expect(folded).toContain(
+      'CREATE TRIGGER storage_purchase_archive_applied AFTER INSERT OR UPDATE OF status ON storage_purchases',
+    );
+    expect(folded).toContain(
+      'CREATE TRIGGER storage_purchase_guard_consumed_key BEFORE INSERT ON storage_purchases',
+    );
     // The sweep index is pinned as ONE contiguous clause, whitespace-folded:
     // counting the name and the WHERE separately over the whole schema proves
     // only that both strings exist somewhere, not that the partial predicate
     // belongs to THIS index. A WHERE that drifted onto a different index, or a
     // column swapped from resolved_at to created_at, would pass the split form.
-    const folded = STORAGE_PURCHASE_SCHEMA.replace(/\s+/g, ' ');
     expect(
       count(
         folded,
@@ -148,6 +183,10 @@ describe('beginStoragePurchase', () => {
     const res = await beginStoragePurchase(cap.db, ROW);
     expect(cap.calls).toHaveLength(1);
     expect(count(cap.calls[0].text, 'INSERT INTO storage_purchases')).toBe(1);
+    expect(count(cap.calls[0].text, 'SELECT $1, $2, $3, $4, $5, $6')).toBe(1);
+    expect(
+      count(cap.calls[0].text, 'NOT EXISTS (SELECT 1 FROM storage_purchase_applied_receipts'),
+    ).toBe(1);
     expect(count(cap.calls[0].text, 'ON CONFLICT (idempotency_key) DO NOTHING')).toBe(1);
     expect(count(cap.calls[0].text, 'RETURNING')).toBe(1);
     expect(cap.calls[0].values).toEqual(['r1', 7, 42, 'strongbox_rung_01', 100, 'k-1']);
@@ -186,8 +225,9 @@ describe('beginStoragePurchase', () => {
     ]);
     const res = await beginStoragePurchase(cap.db, ROW);
     expect(cap.calls).toHaveLength(2);
-    expect(count(cap.calls[1].text, 'SELECT')).toBe(1);
-    expect(count(cap.calls[1].text, 'WHERE idempotency_key = $1')).toBe(1);
+    expect(count(cap.calls[1].text, 'storage_purchase_applied_receipts')).toBe(1);
+    expect(count(cap.calls[1].text, 'storage_purchases')).toBe(1);
+    expect(count(cap.calls[1].text, 'ORDER BY source_rank')).toBe(1);
     expect(cap.calls[1].values).toEqual(['k-1']);
     expect(res.inserted).toBe(false);
     expect(res.existing?.status).toBe('applied');
@@ -196,15 +236,148 @@ describe('beginStoragePurchase', () => {
 });
 
 describe('storagePurchaseByKey', () => {
-  it('is a pure read on the unique key', async () => {
+  it('reads a durable receipt before an operational row with the same key', async () => {
     const cap = makeCapture([{ rows: [] }]);
     const res = await storagePurchaseByKey(cap.db, 'k-2');
     expect(cap.calls).toHaveLength(1);
-    expect(count(cap.calls[0].text, 'SELECT')).toBe(1);
     expect(count(cap.calls[0].text, 'INSERT')).toBe(0);
-    expect(count(cap.calls[0].text, 'WHERE idempotency_key = $1')).toBe(1);
+    expect(count(cap.calls[0].text, 'storage_purchase_applied_receipts')).toBe(1);
+    expect(count(cap.calls[0].text, 'storage_purchases')).toBe(1);
+    expect(count(cap.calls[0].text, "'applied'::text AS status")).toBe(1);
+    expect(count(cap.calls[0].text, 'ORDER BY source_rank')).toBe(1);
+    expect(count(cap.calls[0].text, 'LIMIT 1')).toBe(1);
     expect(cap.calls[0].values).toEqual(['k-2']);
     expect(res).toBeNull();
+  });
+});
+
+describe('writeStorageAppliedEffectsOnClient', () => {
+  const EFFECT = {
+    realm: 'r1',
+    accountId: 7,
+    characterId: 42,
+    itemId: 'strongbox_rung_01',
+    expectedCostClaudium: 100,
+    idempotencyKey: 'k-applied',
+    purchasedSlotsBefore: 0,
+    purchasedSlotsAfter: 6,
+  };
+
+  it('locks distinct parent accounts in lifecycle order before character writes', async () => {
+    const cap = makeCapture([{ rows: [{ id: 3 }, { id: 7 }] }]);
+    await lockStorageAppliedEffectAccountsOnClient(cap.db, [
+      EFFECT,
+      { ...EFFECT, accountId: 3, characterId: 99, idempotencyKey: 'k-other' },
+      { ...EFFECT, idempotencyKey: 'k-same-account' },
+    ]);
+    expect(cap.calls).toHaveLength(1);
+    expect(cap.calls[0].text).toContain('WHERE id = ANY($1::int[])');
+    expect(cap.calls[0].text).toContain('ORDER BY id');
+    expect(cap.calls[0].text).toContain('FOR KEY SHARE');
+    expect(cap.calls[0].values).toEqual([[3, 7]]);
+  });
+
+  it('fails the save when a parent account cannot be locked', async () => {
+    const cap = makeCapture([{ rows: [] }]);
+    await expect(lockStorageAppliedEffectAccountsOnClient(cap.db, [EFFECT])).rejects.toThrow(
+      /account disappeared/,
+    );
+  });
+
+  it('does not query when there are no staged effects', async () => {
+    const cap = makeCapture();
+    await lockStorageAppliedEffectAccountsOnClient(cap.db, []);
+    expect(cap.calls).toHaveLength(0);
+  });
+
+  it('archives, audits, and removes a pending row in one caller-owned transaction', async () => {
+    const cap = makeCapture([
+      { rows: [] },
+      {
+        rows: [
+          {
+            id: 9,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            status: 'pending',
+          },
+        ],
+      },
+      { rows: [{ source_purchase_id: 9 }] },
+      { rowCount: 1 },
+      { rowCount: 1 },
+    ]);
+
+    await writeStorageAppliedEffectsOnClient(cap.db, [EFFECT]);
+    expect(cap.calls).toHaveLength(5);
+    expect(cap.calls[0].text).toContain('storage_purchase_applied_receipts');
+    expect(cap.calls[1].text).toContain('FOR UPDATE');
+    expect(cap.calls[2].text).toContain('INSERT INTO storage_purchase_applied_receipts');
+    expect(cap.calls[2].text).toContain('RETURNING source_purchase_id');
+    expect(cap.calls[3].text).toContain('INSERT INTO bank_ledger');
+    expect(cap.calls[3].values).toEqual([
+      'r1',
+      42,
+      7,
+      'strongbox_rung_01',
+      JSON.stringify({ paidWith: 'claudium' }),
+      6,
+    ]);
+    expect(cap.calls[4].text).toContain('DELETE FROM storage_purchases');
+  });
+
+  it('treats an existing matching receipt as a lost-commit replay without a second ledger row', async () => {
+    const cap = makeCapture([
+      {
+        rows: [
+          {
+            source_purchase_id: 9,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            purchased_slots_before: 0,
+            purchased_slots_after: 6,
+          },
+        ],
+      },
+      { rowCount: 0 },
+    ]);
+
+    await writeStorageAppliedEffectsOnClient(cap.db, [EFFECT]);
+    expect(cap.calls).toHaveLength(2);
+    expect(cap.calls.some((call) => call.text.includes('INSERT INTO bank_ledger'))).toBe(false);
+  });
+
+  it('throws on a consumed-key fingerprint mismatch before writing audit data', async () => {
+    const cap = makeCapture([
+      {
+        rows: [
+          {
+            source_purchase_id: 9,
+            realm: 'r1',
+            account_id: 7,
+            character_id: 99,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'k-applied',
+            purchased_slots_before: 0,
+            purchased_slots_after: 6,
+          },
+        ],
+      },
+    ]);
+
+    await expect(writeStorageAppliedEffectsOnClient(cap.db, [EFFECT])).rejects.toThrow(
+      /fingerprint conflict/,
+    );
+    expect(cap.calls).toHaveLength(1);
   });
 });
 

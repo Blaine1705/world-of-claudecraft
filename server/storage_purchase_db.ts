@@ -23,8 +23,18 @@
 //                which also removes the case). Never a clawback, never a
 //                partial apply.
 //
-// Retention (the deliberate asymmetry with bank_ledger): this is an
-// OPERATIONAL table, not an audit ledger, so REFUSED rows are swept by the
+// Applied purchases have a second, append-only receipt outside the character
+// FK lifecycle. The operational row still cascades when its character is
+// deleted, but the receipt keeps the original character id and purchase
+// fingerprint so a recreated character can never replay the paid key. The
+// character-save transaction writes the receipt, Claudium audit row, and
+// operational-row deletion together. The archive trigger protects a
+// mixed-version writer that still transitions a row to `applied`; the insert
+// guard also makes that older writer fail closed on a consumed key it does not
+// know how to query.
+//
+// Retention (the deliberate asymmetry with bank_ledger): the operational table
+// is not an audit ledger, so REFUSED rows are swept by the
 // nightly retention sweep after the configured window (server/http/config.ts
 // storagePurchaseRetentionDays). Nothing else is: pending rows are recoverable
 // work, unresolved rows are open operator cases, and applied rows are the
@@ -34,9 +44,12 @@
 //
 // WHAT BOUNDS THE TABLE, status by status (Bank Storage phase 14, closing the
 // ruling the paragraph below used to carry), stated rather than asserted:
-//   applied     bounded BY CONSTRUCTION at the catalog: a character can apply
-//               at most the whole ladder, once each, because the next-rung gate
-//               and the in-blob dedupe both refuse a repeat.
+//   applied     removed from this operational table by the character-save
+//               transaction. Its immutable receipt is bounded to at most the
+//               whole ladder per character generation, but character churn
+//               means receipt history is not globally constant-bounded. It is
+//               paid exactly-once evidence, with the same deliberate
+//               append-only growth posture as bank_ledger.
 //   unresolved  NOT catalog-bounded, and the earlier wording claiming so was
 //               wrong: an unresolved row leaves its rung UNGRANTED, so a later
 //               key can pre-check 'fits' and go unresolved again. What bounds
@@ -61,18 +74,13 @@
 // primary exactly-once guard is the in-blob appliedStorageKeys entry, but a
 // PRE-phase-11 server strips that field on the first save after a version
 // rollback (its bank writer does not know the key). After such a rollback the
-// applied row here is the only thing refusing a hoarded-key replay. Keeping
-// applied rows forever is therefore not a retention exception, it is the
-// backstop working.
+// applied receipt here is the only thing refusing a hoarded-key replay. Keeping
+// receipts forever is therefore not a retention exception, it is the backstop
+// working.
 //
-// What that buys is that THIS binary can no longer sweep the backstop away. It
-// does NOT make the operator step unnecessary, because the sweep that would
-// delete an applied row is the OLD binary's, and whichever binary wins the
-// nightly run is the one that runs: rolling the fleet back past this release
-// still needs STORAGE_PURCHASE_RETENTION_DAYS=0 for the duration. DEPLOY.md
-// carries that instruction and is the authority; an earlier version of this
-// paragraph claimed the requirement was gone, which would have talked an
-// operator out of the one step that protects the replay guard.
+// The exact release base predates this table and its retention sweep entirely,
+// so rollback cannot delete these receipts. The database-level insert guard
+// continues protecting consumed keys even while an older binary is running.
 //
 // `realm` is operator forensics only: character ids are globally unique
 // across realms (characters.id is the one sequence), so the recovery scan
@@ -154,6 +162,135 @@ CREATE INDEX IF NOT EXISTS storage_purchases_account ON storage_purchases (accou
 CREATE INDEX IF NOT EXISTS storage_purchases_refused
   ON storage_purchases (resolved_at)
   WHERE status = 'refused';
+
+-- Paid-and-applied tombstones deliberately retain the original character id
+-- as a scalar, not an FK. Account deletion still removes the account's entire
+-- history, while character deletion cannot erase the exactly-once guard.
+CREATE TABLE IF NOT EXISTS storage_purchase_applied_receipts (
+  source_purchase_id BIGINT NOT NULL UNIQUE,
+  realm TEXT NOT NULL,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  character_id INT NOT NULL,
+  item_id TEXT NOT NULL,
+  expected_cost_claudium INT NOT NULL,
+  idempotency_key TEXT PRIMARY KEY,
+  -- Null only on the one-time legacy backfill or a mixed-version trigger
+  -- archive, whose historical before/after pair cannot be reconstructed.
+  purchased_slots_before INT,
+  purchased_slots_after INT,
+  applied_at TIMESTAMPTZ NOT NULL,
+  CONSTRAINT storage_purchase_receipt_slot_progression CHECK (
+    (purchased_slots_before IS NULL AND purchased_slots_after IS NULL)
+    OR
+    (purchased_slots_before IS NOT NULL AND purchased_slots_after IS NOT NULL
+     AND purchased_slots_after > purchased_slots_before)
+  )
+);
+CREATE INDEX IF NOT EXISTS storage_purchase_applied_receipts_account
+  ON storage_purchase_applied_receipts (account_id);
+
+CREATE TABLE IF NOT EXISTS storage_purchase_schema_migrations (
+  name TEXT PRIMARY KEY,
+  migrated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE OR REPLACE FUNCTION archive_storage_purchase_applied_receipt()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $storage_purchase_receipt$
+BEGIN
+  INSERT INTO storage_purchase_applied_receipts
+    (source_purchase_id, realm, account_id, character_id, item_id,
+     expected_cost_claudium, idempotency_key, applied_at)
+  VALUES
+    (NEW.id, NEW.realm, NEW.account_id, NEW.character_id, NEW.item_id,
+     NEW.expected_cost_claudium, NEW.idempotency_key, COALESCE(NEW.resolved_at, now()))
+  ON CONFLICT (idempotency_key) DO NOTHING;
+
+  IF NOT EXISTS (
+    SELECT 1
+      FROM storage_purchase_applied_receipts receipt
+     WHERE receipt.idempotency_key = NEW.idempotency_key
+       AND receipt.source_purchase_id = NEW.id
+       AND receipt.realm = NEW.realm
+       AND receipt.account_id = NEW.account_id
+       AND receipt.character_id = NEW.character_id
+       AND receipt.item_id = NEW.item_id
+       AND receipt.expected_cost_claudium = NEW.expected_cost_claudium
+  ) THEN
+    RAISE EXCEPTION 'storage purchase receipt fingerprint conflict for key %',
+      NEW.idempotency_key USING ERRCODE = '23514';
+  END IF;
+  RETURN NEW;
+END;
+$storage_purchase_receipt$;
+
+DROP TRIGGER IF EXISTS storage_purchase_archive_applied ON storage_purchases;
+CREATE TRIGGER storage_purchase_archive_applied
+AFTER INSERT OR UPDATE OF status ON storage_purchases
+FOR EACH ROW WHEN (NEW.status = 'applied')
+EXECUTE FUNCTION archive_storage_purchase_applied_receipt();
+
+-- Backfill exactly once. The marker and copy share ensureSchema's transaction,
+-- so a failed copy rolls the marker back and the next boot safely retries.
+DO $storage_purchase_receipt_migration$
+DECLARE
+  first_run bigint;
+BEGIN
+  INSERT INTO storage_purchase_schema_migrations (name)
+  VALUES ('applied-receipts-v1')
+  ON CONFLICT DO NOTHING;
+  GET DIAGNOSTICS first_run = ROW_COUNT;
+
+  IF first_run > 0 THEN
+    INSERT INTO storage_purchase_applied_receipts
+      (source_purchase_id, realm, account_id, character_id, item_id,
+       expected_cost_claudium, idempotency_key, applied_at)
+    SELECT p.id, p.realm, p.account_id, p.character_id, p.item_id,
+           p.expected_cost_claudium, p.idempotency_key, COALESCE(p.resolved_at, now())
+      FROM storage_purchases p
+     WHERE p.status = 'applied'
+    ON CONFLICT (idempotency_key) DO NOTHING;
+
+    IF EXISTS (
+      SELECT 1
+        FROM storage_purchases p
+        JOIN storage_purchase_applied_receipts receipt
+          ON receipt.idempotency_key = p.idempotency_key
+       WHERE p.status = 'applied'
+         AND (receipt.source_purchase_id, receipt.realm, receipt.account_id,
+              receipt.character_id, receipt.item_id, receipt.expected_cost_claudium)
+             IS DISTINCT FROM
+             (p.id, p.realm, p.account_id, p.character_id, p.item_id,
+              p.expected_cost_claudium)
+    ) THEN
+      RAISE EXCEPTION 'storage purchase receipt backfill fingerprint conflict'
+        USING ERRCODE = '23514';
+    END IF;
+  END IF;
+END;
+$storage_purchase_receipt_migration$;
+
+CREATE OR REPLACE FUNCTION guard_storage_purchase_consumed_key()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $storage_purchase_guard$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM storage_purchase_applied_receipts
+     WHERE idempotency_key = NEW.idempotency_key
+  ) THEN
+    RETURN NULL;
+  END IF;
+  RETURN NEW;
+END;
+$storage_purchase_guard$;
+
+DROP TRIGGER IF EXISTS storage_purchase_guard_consumed_key ON storage_purchases;
+CREATE TRIGGER storage_purchase_guard_consumed_key
+BEFORE INSERT ON storage_purchases
+FOR EACH ROW
+EXECUTE FUNCTION guard_storage_purchase_consumed_key();
 `;
 
 export type StoragePurchaseStatus = 'pending' | 'applied' | 'refused' | 'unresolved';
@@ -173,6 +310,21 @@ export interface StoragePurchaseRow {
   status: StoragePurchaseStatus;
 }
 
+/** A paid slot grant staged on the live session until the character save that
+ * carries its bank blob commits. The save transaction consumes this effect by
+ * writing the immutable receipt and its one Claudium audit row, then removing
+ * the operational pending row. */
+export interface StorageAppliedEffect {
+  realm: string;
+  accountId: number;
+  characterId: number;
+  itemId: string;
+  expectedCostClaudium: number;
+  idempotencyKey: string;
+  purchasedSlotsBefore: number;
+  purchasedSlotsAfter: number;
+}
+
 function rowFrom(r: Record<string, unknown>): StoragePurchaseRow {
   return {
     id: Number(r.id),
@@ -184,6 +336,184 @@ function rowFrom(r: Record<string, unknown>): StoragePurchaseRow {
     idempotencyKey: String(r.idempotency_key),
     status: String(r.status) as StoragePurchaseStatus,
   };
+}
+
+const RECEIPT_COLUMNS =
+  'source_purchase_id, realm, account_id, character_id, item_id, expected_cost_claudium, ' +
+  'idempotency_key, purchased_slots_before, purchased_slots_after';
+
+function assertReceiptMatches(
+  receipt: Record<string, unknown>,
+  effect: StorageAppliedEffect,
+): void {
+  const before = receipt.purchased_slots_before;
+  const after = receipt.purchased_slots_after;
+  const legacyAuditUnknown = before === null && after === null;
+  const hasAuditPair = before != null && after != null;
+  const matches =
+    String(receipt.realm) === effect.realm &&
+    Number(receipt.account_id) === effect.accountId &&
+    Number(receipt.character_id) === effect.characterId &&
+    String(receipt.item_id) === effect.itemId &&
+    Number(receipt.expected_cost_claudium) === effect.expectedCostClaudium &&
+    String(receipt.idempotency_key) === effect.idempotencyKey &&
+    (legacyAuditUnknown ||
+      (hasAuditPair &&
+        Number(before) === effect.purchasedSlotsBefore &&
+        Number(after) === effect.purchasedSlotsAfter));
+  if (!matches) {
+    throw new Error(
+      `storage purchase receipt fingerprint conflict for key ${effect.idempotencyKey}`,
+    );
+  }
+}
+
+function assertPendingMatches(row: StoragePurchaseRow, effect: StorageAppliedEffect): void {
+  if (
+    row.status !== 'pending' ||
+    row.realm !== effect.realm ||
+    row.accountId !== effect.accountId ||
+    row.characterId !== effect.characterId ||
+    row.itemId !== effect.itemId ||
+    row.expectedCostClaudium !== effect.expectedCostClaudium ||
+    row.idempotencyKey !== effect.idempotencyKey
+  ) {
+    throw new Error(
+      `storage purchase pending fingerprint conflict for key ${effect.idempotencyKey}`,
+    );
+  }
+}
+
+async function readAppliedReceipt(
+  db: Queryable,
+  idempotencyKey: string,
+): Promise<Record<string, unknown> | null> {
+  const res = await db.query(
+    `SELECT ${RECEIPT_COLUMNS}
+       FROM storage_purchase_applied_receipts
+      WHERE idempotency_key = $1`,
+    [idempotencyKey],
+  );
+  return res.rows[0] ?? null;
+}
+
+/**
+ * Acquire parent-account key locks before an effect-bearing character write.
+ * Account deletion locks the same parents before cascading to characters, so
+ * taking these locks first preserves that lifecycle order and prevents a
+ * character-update -> receipt-FK inversion from deadlocking with deletion.
+ */
+export async function lockStorageAppliedEffectAccountsOnClient(
+  db: Queryable,
+  effects: readonly StorageAppliedEffect[],
+): Promise<void> {
+  const accountIds = [...new Set(effects.map((effect) => effect.accountId))].sort((a, b) => a - b);
+  if (accountIds.length === 0) return;
+
+  const locked = await db.query(
+    `SELECT id FROM accounts
+      WHERE id = ANY($1::int[])
+      ORDER BY id
+      FOR KEY SHARE`,
+    [accountIds],
+  );
+  const lockedIds = locked.rows.map((row) => Number(row.id));
+  if (
+    lockedIds.length !== accountIds.length ||
+    lockedIds.some((accountId, index) => accountId !== accountIds[index])
+  ) {
+    throw new Error('storage purchase account disappeared before character save');
+  }
+}
+
+/**
+ * Write the durable effects that must commit with a character blob. The caller
+ * owns BEGIN/COMMIT. A newly archived effect writes exactly one Claudium
+ * bank_ledger row; a retry after an ambiguous COMMIT sees the matching receipt
+ * and writes neither a second receipt nor a second audit row.
+ */
+export async function writeStorageAppliedEffectsOnClient(
+  db: Queryable,
+  effects: readonly StorageAppliedEffect[],
+): Promise<void> {
+  for (const effect of effects) {
+    const existing = await readAppliedReceipt(db, effect.idempotencyKey);
+    if (existing) {
+      assertReceiptMatches(existing, effect);
+      await db.query(
+        `DELETE FROM storage_purchases
+          WHERE id = $1 AND idempotency_key = $2 AND status = 'pending'`,
+        [Number(existing.source_purchase_id), effect.idempotencyKey],
+      );
+      continue;
+    }
+
+    const pendingResult = await db.query(
+      `SELECT ${ROW_COLUMNS}
+         FROM storage_purchases
+        WHERE idempotency_key = $1
+        FOR UPDATE`,
+      [effect.idempotencyKey],
+    );
+    const pendingRaw = pendingResult.rows[0];
+    if (!pendingRaw) {
+      throw new Error(`storage purchase pending row missing for key ${effect.idempotencyKey}`);
+    }
+    const pending = rowFrom(pendingRaw);
+    assertPendingMatches(pending, effect);
+
+    const inserted = await db.query(
+      `INSERT INTO storage_purchase_applied_receipts
+         (source_purchase_id, realm, account_id, character_id, item_id,
+          expected_cost_claudium, idempotency_key, purchased_slots_before,
+          purchased_slots_after, applied_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())
+       ON CONFLICT (idempotency_key) DO NOTHING
+       RETURNING source_purchase_id`,
+      [
+        pending.id,
+        effect.realm,
+        effect.accountId,
+        effect.characterId,
+        effect.itemId,
+        effect.expectedCostClaudium,
+        effect.idempotencyKey,
+        effect.purchasedSlotsBefore,
+        effect.purchasedSlotsAfter,
+      ],
+    );
+    if (inserted.rows.length === 0) {
+      const raced = await readAppliedReceipt(db, effect.idempotencyKey);
+      if (!raced) {
+        throw new Error(`storage purchase receipt insert lost for key ${effect.idempotencyKey}`);
+      }
+      assertReceiptMatches(raced, effect);
+    } else {
+      await db.query(
+        `INSERT INTO bank_ledger
+           (realm, character_id, account_id, op, item_id, count, instance,
+            copper_delta, purchased_slots_after, container, container_id)
+         VALUES ($1, $2, $3, 'buy_slots', $4, NULL, $5, 0, $6, 'personal', NULL)`,
+        [
+          effect.realm,
+          effect.characterId,
+          effect.accountId,
+          effect.itemId,
+          JSON.stringify({ paidWith: 'claudium' }),
+          effect.purchasedSlotsAfter,
+        ],
+      );
+    }
+
+    const closed = await db.query(
+      `DELETE FROM storage_purchases
+        WHERE id = $1 AND idempotency_key = $2 AND status = 'pending'`,
+      [pending.id, effect.idempotencyKey],
+    );
+    if ((closed.rowCount ?? 0) !== 1) {
+      throw new Error(`storage purchase pending close failed for key ${effect.idempotencyKey}`);
+    }
+  }
 }
 
 const ROW_COLUMNS =
@@ -208,7 +538,9 @@ export async function beginStoragePurchase(
   const ins = await db.query(
     `INSERT INTO storage_purchases
        (realm, account_id, character_id, item_id, expected_cost_claudium, idempotency_key)
-     VALUES ($1, $2, $3, $4, $5, $6)
+     SELECT $1, $2, $3, $4, $5, $6
+      WHERE NOT EXISTS (SELECT 1 FROM storage_purchase_applied_receipts
+                         WHERE idempotency_key = $6)
      ON CONFLICT (idempotency_key) DO NOTHING
      RETURNING ${ROW_COLUMNS}`,
     [
@@ -221,11 +553,10 @@ export async function beginStoragePurchase(
     ],
   );
   if (ins.rows.length > 0) return { inserted: true, existing: rowFrom(ins.rows[0]) };
-  const existing = await db.query(
-    `SELECT ${ROW_COLUMNS} FROM storage_purchases WHERE idempotency_key = $1`,
-    [row.idempotencyKey],
-  );
-  return { inserted: false, existing: existing.rows[0] ? rowFrom(existing.rows[0]) : null };
+  return {
+    inserted: false,
+    existing: await storagePurchaseByKey(db, row.idempotencyKey),
+  };
 }
 
 /** Pure lookup by the unique idempotency key (no insert): what the flow
@@ -237,7 +568,20 @@ export async function storagePurchaseByKey(
   idempotencyKey: string,
 ): Promise<StoragePurchaseRow | null> {
   const res = await db.query(
-    `SELECT ${ROW_COLUMNS} FROM storage_purchases WHERE idempotency_key = $1`,
+    `SELECT ${ROW_COLUMNS}
+       FROM (
+         SELECT source_purchase_id AS id, realm, account_id, character_id, item_id,
+                expected_cost_claudium, idempotency_key, 'applied'::text AS status,
+                0 AS source_rank
+           FROM storage_purchase_applied_receipts
+          WHERE idempotency_key = $1
+         UNION ALL
+         SELECT ${ROW_COLUMNS}, 1 AS source_rank
+           FROM storage_purchases
+          WHERE idempotency_key = $1
+       ) recorded_purchase
+      ORDER BY source_rank
+      LIMIT 1`,
     [idempotencyKey],
   );
   return res.rows[0] ? rowFrom(res.rows[0]) : null;

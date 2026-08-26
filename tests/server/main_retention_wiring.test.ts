@@ -393,22 +393,15 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(count(MAIN, 'saveCharacter: (characterId) => {')).toBe(1);
   });
 
-  it('the claudium ledger rail is stamped at the production wiring site', () => {
-    // server/main.ts builds the recordGrantLedger closure the purchase flow
-    // calls. The unit tests drive recordBankOp directly with hand-copied
-    // arguments, so the closure itself was unexecuted and unpinned: dropping
-    // the paidWith stamp or the SKU id there would leave every test green while
-    // shipping unattributable audit rows.
-    expect(MAIN).toContain("{ paidWith: 'claudium', itemId: skuId }");
-    const factory = MAIN.indexOf('recordGrantLedger:');
+  it('the storage purchase host stages the atomic save effect on the live game', () => {
+    // The database helper owns receipt + Claudium ledger insertion now. Main's
+    // security-critical job is to stage that immutable payload synchronously
+    // on the exact live GameServer before the coordinator requests its save.
+    const factory = MAIN.indexOf('function storagePurchaseHost()');
     expect(factory).toBeGreaterThan(-1);
-    const body = MAIN.slice(factory, factory + 600);
-    expect(body).toContain('recordBankOp(');
-    expect(body).toContain("'buy_slots'");
-    // The claudium rail moves no copper, so both snapshots carry the ladder
-    // counter and nothing else that could imply a price.
-    expect(body).toContain('purchasedSlots: purchasedSlotsBefore');
-    expect(body).toContain('purchasedSlots: purchasedSlotsAfter');
-    expect(body).toContain('nextExpansionCost: null');
+    const body = MAIN.slice(factory, factory + 2500);
+    expect(body).toContain(
+      'stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect)',
+    );
   });
 });

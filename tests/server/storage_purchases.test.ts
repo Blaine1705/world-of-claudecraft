@@ -11,8 +11,13 @@
 // mutex, the next-login auto-apply, and the refuse-before-money gates.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ClaudiumSpendOutcome, ClaudiumSpendResult } from '../../server/claudium_proxy';
+import {
+  acknowledgeStorageAppliedEffects,
+  snapshotStorageAppliedEffects,
+  stageStorageAppliedEffect,
+} from '../../server/storage_applied_effect_queue';
 import { AMBIGUITY_HOLD_MAX_MS, WEDGED_HOLD_MAX_MS } from '../../server/storage_ladder_hold';
-import type { StoragePurchaseRow } from '../../server/storage_purchase_db';
+import type { StorageAppliedEffect, StoragePurchaseRow } from '../../server/storage_purchase_db';
 import {
   configureStoragePurchaseRuntime,
   executeStoragePurchase,
@@ -148,13 +153,35 @@ function makeHarness(seed = 42) {
     return 'result' in value ? value : { result: value, neverReached: false };
   });
   const state = { live: true, saveResult: true as boolean | Promise<boolean> };
-  const saveCharacter = vi.fn(async () => state.saveResult);
+  const stagedEffects: StorageAppliedEffect[] = [];
+  const commitStaged = (captured: readonly StorageAppliedEffect[]): void => {
+    for (const effect of captured) {
+      const row = db.rows.get(effect.idempotencyKey);
+      if (row) {
+        row.status = 'applied';
+        row.resolvedAt = 1;
+      }
+    }
+    acknowledgeStorageAppliedEffects(stagedEffects, captured);
+  };
+  const saveCharacter = vi.fn(async () => {
+    const captured = snapshotStorageAppliedEffects(stagedEffects);
+    const saved = await state.saveResult;
+    if (saved) commitStaged(captured);
+    return saved;
+  });
+  const stageAppliedEffect = vi.fn(
+    (effect: Parameters<StoragePurchaseHost['stageAppliedEffect']>[0]) => {
+      stageStorageAppliedEffect(stagedEffects, effect, meta.bank.purchasedSlots);
+      return true;
+    },
+  );
   const warn = vi.fn();
   const host: StoragePurchaseHost = {
     resolveLiveCharacter: (accountId) =>
       state.live && accountId === ACCOUNT ? { characterId: CHARACTER, pid: sim.playerId } : null,
     grant: (pid, skuId, key, dryRun) => bankGrantStorageSlots(sim.ctx, pid, skuId, key, { dryRun }),
-    recordGrantLedger: vi.fn(),
+    stageAppliedEffect,
     saveCharacter: (characterId) =>
       characterId === CHARACTER ? saveCharacter() : Promise.resolve(false),
     spend,
@@ -163,7 +190,20 @@ function makeHarness(seed = 42) {
     delay: async () => {},
     warn,
   };
-  return { sim, meta, db, spend, spendResults, state, saveCharacter, warn, host };
+  return {
+    sim,
+    meta,
+    db,
+    spend,
+    spendResults,
+    stagedEffects,
+    stageAppliedEffect,
+    commitStaged,
+    state,
+    saveCharacter,
+    warn,
+    host,
+  };
 }
 
 // Await full quiescence of the fire-and-forget chains (save -> settle, the
@@ -205,17 +245,22 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     // row ahead of the claudium one and read as purchased_regression.
     expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
     expect(h.db.rows.get('key-1')?.status).toBe('pending');
-    expect(h.host.recordGrantLedger).not.toHaveBeenCalled();
+    expect(h.stagedEffects).toHaveLength(1);
     saveResolve(true);
     await waitFor(() => h.db.rows.get('key-1')?.status === 'applied');
     // ... and reopens once the audit row is durable.
     await waitFor(() => storagePurchaseInFlight(CHARACTER) === false);
-    expect(h.host.recordGrantLedger).toHaveBeenCalledWith(
-      { characterId: CHARACTER, accountId: ACCOUNT },
-      'strongbox_rung_01',
-      0,
-      6,
-    );
+    expect(h.stageAppliedEffect).toHaveBeenCalledWith({
+      realm: 'testrealm',
+      accountId: ACCOUNT,
+      characterId: CHARACTER,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'key-1',
+      purchasedSlotsBefore: 0,
+      purchasedSlotsAfter: 6,
+    });
+    expect(h.stagedEffects).toEqual([]);
     // The pending row was durable BEFORE the money moved.
     expect(h.db.begin.mock.invocationCallOrder[0]).toBeLessThan(
       h.spend.mock.invocationCallOrder[0],
@@ -236,7 +281,7 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     expect(h.db.rows.get('key-2')?.status).toBe('pending');
     // An apply that never proved durable writes NO audit row: the durable
     // replay below writes exactly one (the verify round's over-count fix).
-    expect(h.host.recordGrantLedger).not.toHaveBeenCalled();
+    expect(h.stagedEffects).toHaveLength(1);
     resetStoragePurchasesForTests();
     // The process dies before any save: the reloaded state has neither the
     // slots nor the key (a FRESH sim from the same seed), and the login
@@ -252,18 +297,16 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     await waitFor(() => h2.db.rows.get('key-2')?.status === 'applied');
     expect(h2.spend).toHaveBeenCalledTimes(1);
     // Exactly ONE audit row across both attempts: the durable apply's.
-    expect(h2.host.recordGrantLedger).toHaveBeenCalledTimes(1);
+    expect(h2.stageAppliedEffect).toHaveBeenCalledTimes(1);
   });
 
-  it('the KNOWN audit gap: a save-refused apply that later becomes durable settles with no ledger row', async () => {
-    // Pins the bounded gap the module header records, so it cannot silently
-    // widen and a future "fix" cannot quietly start writing a SECOND row.
+  it('a save-refused apply stays staged until a later save commits its audit row', async () => {
     // saveCharacter returning false is ORDINARY concurrency, not a failure:
     // server/game.ts returns false when the guild-book half of the transaction
     // is escrow-refused, and the periodic autosave persists the same blob a
     // moment later. The slots and the key are then durable while the row is
-    // still pending, so the replay settles it 'applied' and no claudium
-    // bank_ledger row is ever written for that purchase.
+    // still pending. The staged effect survives and the next save commits the
+    // blob, receipt, and Claudium bank_ledger row together.
     const h = makeHarness();
     h.state.saveResult = false;
     h.spendResults.push(granted());
@@ -275,7 +318,7 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     });
     await waitFor(() => h.saveCharacter.mock.calls.length === 1);
     expect(h.db.rows.get('key-audit-gap')?.status).toBe('pending');
-    expect(h.host.recordGrantLedger).not.toHaveBeenCalled();
+    expect(h.stagedEffects).toHaveLength(1);
     // The slots and the key ARE in the live blob; the ordinary save that lands
     // next makes them durable. Unlike the fresh-sim case above, this harness
     // KEEPS that state, which is exactly what distinguishes the two.
@@ -289,20 +332,19 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     // reached the service, because the key was already in the blob.
     expect(h.meta.bank.purchasedSlots).toBe(6);
     expect(h.spend).toHaveBeenCalledTimes(1);
-    // THE GAP, pinned: the purchase is applied and paid, with zero audit rows.
-    expect(h.host.recordGrantLedger).not.toHaveBeenCalled();
+    expect(h.stageAppliedEffect).toHaveBeenCalledTimes(2);
+    expect(h.stagedEffects).toEqual([]);
   });
 
-  it('settleDefinitive already_applied re-settles behind a save and writes NO second ledger row', async () => {
+  it('settleDefinitive already_applied stages the missing receipt behind a save', async () => {
     // The defense-in-depth arm behind the mutex: the service answers granted
     // for a key whose slots are already in the blob. No production caller
     // chain reaches it today (the pre-spend dry run and the login recovery
     // both catch an applied key earlier, and the per-character mutex keeps a
     // second flow off the same key), so it is driven straight through the
     // injected host. A mutation audit found it completely uncovered, which
-    // matters because it is one of the four sites that could write a claudium
-    // audit row: this pins that it writes NONE, so exactly-once on the ledger
-    // cannot be broken here without a test going red.
+    // matters because the durable receipt must still be written for a key
+    // already present in the blob.
     const h = makeHarness();
     h.spendResults.push(granted());
     const realGrant = h.host.grant;
@@ -311,7 +353,11 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
       calls += 1;
       // Call 1 is the pre-spend dry run (let it pass); call 2 is the real
       // apply, which reports the slots already landed under this key.
-      if (calls === 2) return { status: 'already_applied' } as ReturnType<typeof realGrant>;
+      if (calls === 2) {
+        h.meta.bank.purchasedSlots = 6;
+        h.meta.bank.appliedStorageKeys.push(key);
+        return { status: 'already_applied' } as ReturnType<typeof realGrant>;
+      }
       return realGrant(pid, sku, key, dryRun);
     }) as typeof h.host.grant;
 
@@ -324,13 +370,21 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     // Granted stays true (the money moved) and the replay marker is surfaced.
     expect(res.granted).toBe(true);
     expect(res.reason).toBe('already_granted');
-    // The row settles only behind a confirmed save, and NO audit row is
-    // written: the one that counted rode the original apply.
+    // The operational row closes only behind a confirmed save.
     await waitFor(() => h.db.rows.get('key-already-applied-arm')?.status === 'applied');
     expect(h.saveCharacter).toHaveBeenCalled();
-    expect(h.host.recordGrantLedger).not.toHaveBeenCalled();
-    // Nothing was clamped or double-applied: the arm mutates no state.
-    expect(h.meta.bank.purchasedSlots).toBe(0);
+    expect(h.stageAppliedEffect).toHaveBeenCalledTimes(1);
+    // Nothing was clamped or double-applied: the arm preserves the six slots
+    // already present and only stages their missing durable receipt.
+    expect(h.meta.bank.purchasedSlots).toBe(6);
+    expect(h.stageAppliedEffect).toHaveBeenCalledWith({
+      realm: 'testrealm',
+      accountId: ACCOUNT,
+      characterId: CHARACTER,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'key-already-applied-arm',
+    });
     expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
   });
 
@@ -1204,15 +1258,21 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
   });
 
   it("one apply's save cannot close ANOTHER apply's ledger-ordering window", async () => {
-    // Recovery drives rows in a loop and fires scheduleAppliedSettle WITHOUT
-    // awaiting it, so two applied settles for one character overlap. The window
+    // Recovery drives rows in a loop and fires the atomic saves without awaiting
+    // them, so two applied effects for one character overlap. The window
     // exists so a gold rung landing between a sim mutation and its durable
     // claudium ledger row is visible as a purchased_regression; closing it
     // early on somebody else's save reopens exactly that gap.
     const h = makeHarness();
     const saves: ((v: boolean) => void)[] = [];
     h.saveCharacter.mockImplementation(
-      () => new Promise<boolean>((resolve) => saves.push(resolve)),
+      () =>
+        new Promise<boolean>((resolve) =>
+          saves.push((saved) => {
+            if (saved && h.stagedEffects[0]) h.commitStaged([h.stagedEffects[0]]);
+            resolve(saved);
+          }),
+        ),
     );
     h.db.rows.set('ord-1', {
       id: 1,

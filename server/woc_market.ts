@@ -335,6 +335,7 @@ export interface CharacterSaveArgs {
   level: number;
   state: CharacterState;
   leaseNonce: string | undefined;
+  storageEffects?: readonly import('./storage_purchase_db').StorageAppliedEffect[];
 }
 
 export interface WocMarketDb {
@@ -1071,11 +1072,9 @@ export interface WocMarketCustody {
   /** Hand a held copy straight to a live buyer's bags. Returns the save the
    *  caller must persist before treating the delivery as done. */
   grantCopy(accountId: number, characterId: number, slot: InvSlot): WocCustodyGrant;
-  /** Re-serialize a live session WITHOUT granting anything: the resume path
-   *  for a direct hand-off whose atomic save threw mid-flight. The bags in
-   *  the returned save already hold the earlier grant (same live session), so
-   *  persisting it retries the delivery without minting a second copy. */
+  /** Re-serialize after an ambiguous hand-off; retrying the held grant cannot mint. */
   snapshotCopy(accountId: number, characterId: number): WocCustodyGrant;
+  acknowledgeCharacterSave?(save: CharacterSaveArgs): void;
   /** The delivered-save FIFO entry (the write-path rider closed the
    *  commitGrant carve-out): run `persist` with a snapshot serialized INSIDE
    *  the character's save-FIFO slot, so the grant's blob orders against the
@@ -1845,6 +1844,7 @@ export class WocMarketService {
           this.deps.custody.restoreCopy(extract.pid, args.characterId, extract.extracted);
           return { refusal: inserted.reason };
         }
+        this.deps.custody.acknowledgeCharacterSave?.(extract.save);
         return { id: inserted.id };
       },
     );

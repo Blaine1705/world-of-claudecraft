@@ -340,6 +340,14 @@ import type { GuildRank, Presence, PresenceStatus, SocialActor, SocialTransport 
 import { SocialService } from './social';
 import { PgSocialDb } from './social_db';
 import { reconcileOnLogin as reconcileSteamOnLogin } from './steam/mirror';
+import {
+  acknowledgeStorageAppliedEffects,
+  type StorageAppliedEffectDraft,
+  snapshotStorageAppliedEffects,
+  stageStorageAppliedEffect as stageEffect,
+} from './storage_applied_effect_queue';
+import type { StorageAppliedEffect } from './storage_purchase_db';
+import { storageAppliedEffectsCommitted } from './storage_purchases';
 import { attachDetectorFlagHost } from './suspicion_flags';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
@@ -1123,6 +1131,8 @@ export interface ClientSession {
   // cleared per guild after a SUCCESSFUL save only if the seq is unchanged, so
   // an op landing mid-save keeps the book scheduled for the next save.
   dirtyGuildBanks: Map<number, number>;
+  // Paid Claudium grants waiting for the same transaction as their bank blob.
+  pendingStorageAppliedEffects: StorageAppliedEffect[];
   // The UNFLUSHED book deltas behind those dirty marks, in op order (guild id
   // -> the diffGuildBankOp output of every successful op not yet committed by
   // an escrow save). This log is this session's UNCOMMITTED WORK and it is the
@@ -3749,6 +3759,7 @@ export class GameServer {
       blockListLoaded: false,
       guildStampSeq: 0,
       dirtyGuildBanks: new Map(),
+      pendingStorageAppliedEffects: [],
       unflushedGuildBankOps: new Map(),
       guildBankDeficitSkips: new Map(),
       escrowQuarantined: false,
@@ -4305,6 +4316,10 @@ export class GameServer {
       // stays pending for the save queued behind it, so the character_deeds
       // index (and Steam, chained off it) never runs ahead of durable state.
       const recordUpTo = session.pendingDeedRecords.length;
+      const storageEffectsAtT0 = snapshotStorageAppliedEffects(
+        session.pendingStorageAppliedEffects,
+      );
+      if (!state || !e) return storageEffectsAtT0.length === 0;
       if (state && e) {
         // The session-position/jail fixups, applicable to ANY snapshot of this
         // character (the T0 one below, or a re-serialized one inside the
@@ -4325,39 +4340,17 @@ export class GameServer {
         // mirror of the v0.34.0 lastPersistedLevel change onto this branch's
         // three-path saveCharacter.
         let persistedLevel = state.level;
-        // Guild books this save will carry (Guild Bank Phase 3, reshaped by
-        // the escrow root fix). The payload is NOT the shared live book: it is
-        // this session's OWN unflushed delta log per guild, and the write is a
-        // read-modify-write inside the fenced transaction
-        // (server/db.ts writeGuildBankRow: SELECT ... FOR UPDATE, then
-        // mergeGuildBankRow, then the upsert). That is the whole guarantee:
-        //
-        //   A session persists DURABLE TRUTH PLUS ITS OWN DELTAS, so its
-        //   commit can only ever contain its own work. Another officer's
-        //   not-yet-durable op is not in this payload and cannot ride it into
-        //   the row, so the fence means exactly what its comments say: a
-        //   fenced-out session's ops reach durable state through NO path.
-        //
-        // The marks and log lengths are still captured at write time inside
-        // the queued closure, exactly like the market snapshot, so an op
-        // dispatched during the serial-writer wait re-schedules itself instead
-        // of being dropped. A guild whose serializeGuildBank returns null (no
-        // loaded book: unloaded, oversized, or malformed at boot) is SKIPPED
-        // entirely (collectGuildBankDeltas), so an unloaded book's row is
-        // never touched.
+        let carriedStorageEffects = storageEffectsAtT0;
+        // Guild saves carry only this session's unflushed deltas, merged under
+        // the row lock with durable truth. Marks and log lengths are captured
+        // inside the queued write; a mid-wait op therefore survives for the
+        // next save. Unloaded/oversized/malformed books are skipped entirely.
         const carriedGuildBankSeqs: [number, number][] = [];
-        // How many unflushed-op log entries per guild this save's payload
-        // includes (captured with the marks): a commit consumes exactly that
-        // many from the front of each log, so a mid-save op's entry survives
-        // alongside its surviving dirty mark.
+        // A commit consumes only this captured prefix; mid-save ops survive.
         const carriedGuildBankOpCounts = new Map<number, number>();
-        // What each book write actually did, filled by the db layer inside the
-        // transaction (see GuildBankWriteResult).
+        // Filled by the db layer inside the transaction.
         const guildBankResults: GuildBankWriteResult[] = [];
-        // Guilds the payload SKIPPED (no loaded book: unloaded, oversized, or
-        // malformed at boot). Their rows are not this process's to touch, so
-        // their marks and logs must survive the commit: releasing them would
-        // leave a character half durable with a book half never written.
+        // Skipped books retain their marks/logs because nothing was written.
         const skippedGuildBanks = new Set<number>();
         const collectDeltas = () => {
           carriedGuildBankSeqs.length = 0;
@@ -4389,29 +4382,20 @@ export class GameServer {
         // the queued closure actually runs.
         const carriesGuildBooks = session.dirtyGuildBanks.size > 0;
         if (opts.withMarket || carriesGuildBooks) {
-          // Atomic on the leave path so a logout bag-flush can never tear away
-          // from the global Market escrow (see saveCharacterAndMarketState),
-          // and on any save carrying a guild book so the character half and
-          // the book half commit or vanish together (the same escrow shape;
-          // both siblings ride the character-lease fence). Run through the
-          // market queue and capture the market/book snapshots at write time
-          // so this commit can't clobber newer ones.
+          // Market/mail/books and the character blob share one fenced queued
+          // transaction. Capture their snapshots at write time.
           try {
             saved = await this.enqueueMarketWrite(() => {
-              // BOTH escrow halves are captured HERE, in one synchronous step at
-              // write time, after the serial-writer wait: an op dispatched
-              // during the wait mutates the live character AND the live book,
-              // so a character blob serialized before the wait paired with a
-              // book serialized inside it would commit two different instants
-              // (a deposit lands in both halves, a withdraw in neither: the
-              // Phase 3 QA database-review BLOCKING). Re-serializing may fail
-              // only if the player left mid-wait; then the T0 snapshot (whose
-              // ops are all pre-wait) is still self-consistent with the books
-              // its session could have dirtied. recordUpTo stays captured at
-              // T0: the fresher blob can only contain MORE than it publishes,
-              // never less (publish never runs ahead of durable state).
+              // Capture both escrow halves after the queue wait. If teardown
+              // removed the player, the pre-wait snapshot is still consistent
+              // with its pre-wait book work. Deed publication remains T0-bound.
               const fresh = this.sim.serializeCharacter(session.pid);
               const snap = fresh ? applyFixups(fresh) : state;
+              if (fresh) {
+                carriedStorageEffects = snapshotStorageAppliedEffects(
+                  session.pendingStorageAppliedEffects,
+                );
+              }
               persistedLevel = snap.level;
               return opts.withMarket
                 ? saveCharacterAndMarketState(
@@ -4423,6 +4407,7 @@ export class GameServer {
                     session.leaseNonce,
                     collectDeltas(),
                     guildBankResults,
+                    carriedStorageEffects,
                   )
                 : saveCharacterAndGuildBankState(
                     session.characterId,
@@ -4431,34 +4416,17 @@ export class GameServer {
                     collectDeltas(),
                     session.leaseNonce,
                     guildBankResults,
+                    carriedStorageEffects,
                   );
             });
           } catch (err) {
-            // The whole escrow rolled back: the character half AND every book
-            // half. The live sim is now ahead of durable truth for those books
-            // until a later save or a reconcile lands, which is exactly the
-            // window the dupe guards live in, so it must be visible in
-            // production, not only in a log line. The counter observes, it
-            // never swallows: the refusal arm still runs below and a foreign
-            // error is still rethrown.
-            //
-            // A REFUSAL is deliberately not counted here. Two officers of one
-            // guild contending is ordinary concurrency and the usual outcome is
-            // "refused, will retry, resolves in a round trip", which is not a
-            // failure and must not share a counter kind with one (an operator
-            // alerting on escrow_save_failed > 0 was getting that noise).
-            // handleGuildBankEscrowRefusal below owns the vocabulary instead:
-            // escrow_refused_retry per guild on the retry arm, and this
-            // escrow_save_failed once for the session on the TERMINAL arm,
-            // where the save really did fail for good.
+            // The whole escrow rolled back. Count foreign failures, but not an
+            // ordinary concurrent GuildBankEscrowRefused; its handler owns the
+            // retry/terminal metrics and all errors keep their existing route.
             if (carriesGuildBooks && !(err instanceof GuildBankEscrowRefused)) {
               gameMetricsCounters().guildBankIncident('escrow_save_failed');
             }
-            // A REFUSED book half aborts the whole transaction, character row
-            // included, so this save persisted nothing at all. Skip every
-            // post-save step (no lastSave, no deed publish, no mark release:
-            // the log is exactly as it was) and decide whether to retry or
-            // roll the session back.
+            // A refused book aborts the character row too; run no post-save work.
             if (err instanceof GuildBankEscrowRefused) {
               this.handleGuildBankEscrowRefusal(session, err.results, opts.final === true);
               // Nothing persisted, character row included, so this reports the
@@ -4477,17 +4445,11 @@ export class GameServer {
             state.level,
             state,
             session.leaseNonce,
+            carriedStorageEffects,
           );
         }
-        // A same-account takeover can reclaim this character's lease and rotate the
-        // nonce out from under a displaced session; the lease-fenced save then matches
-        // no row and reports false, meaning nothing persisted. Skip every post-save
-        // step: never stamp lastSave (the write did not land) and never drain
-        // pendingDeedRecords into the durable index (a deed must never publish ahead
-        // of the blob that proves it). The ids stay queued and simply never drain for
-        // this doomed session; the live holder records its own unlocks from its own
-        // saves. Only an explicit false is a fence-out: the no-nonce legacy path
-        // returns true, so a strict comparison never mistakes an ordinary save for one.
+        // A false result is a lease fence miss: nothing persisted, so publish
+        // no deeds, clear no staged work, and stamp no lastSave.
         if (saved === false) {
           // Same dupe-sensitive shape as the throw above, reached the other
           // way: the write matched no row, so nothing persisted. Counted only
@@ -4521,6 +4483,11 @@ export class GameServer {
           return false;
         }
         session.lastSave = Date.now();
+        this.acknowledgeStorageCharacterSave(
+          session.characterId,
+          session.leaseNonce,
+          carriedStorageEffects,
+        );
         // The carried books: release their dirty marks where the write
         // actually landed AND the seq is unchanged (a mid-save op re-dirtied
         // the book with state this commit did not include), consuming the
@@ -5989,15 +5956,40 @@ export class GameServer {
   // The save-shaped snapshot every marketplace custody persist must use: the
   // live serialization PLUS the session save fixups (character_save_fixups.ts
   // owns the rationale; skipping them is a jail escape, not cosmetics).
-  serializeCharacterForPersist(
-    characterId: number,
-  ): { level: number; state: import('../src/sim/sim').CharacterState } | null {
+  serializeCharacterForPersist(characterId: number): {
+    level: number;
+    state: import('../src/sim/sim').CharacterState;
+    storageEffects: StorageAppliedEffect[];
+  } | null {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.left || session.escrowQuarantined) return null;
     const state = this.sim.serializeCharacter(session.pid);
     if (!state) return null;
     applyCharacterSaveFixups(session, state, () => this.jailSpawnFor(session));
-    return { level: state.level, state };
+    return {
+      level: state.level,
+      state,
+      storageEffects: snapshotStorageAppliedEffects(session.pendingStorageAppliedEffects),
+    };
+  }
+
+  stageStorageAppliedEffect(effect: StorageAppliedEffectDraft): boolean {
+    const session = this.sessionByCharacterId(effect.characterId);
+    const slots = session ? this.sim.meta(session.pid)?.bank.purchasedSlots : undefined;
+    if (!session || session.left || session.escrowQuarantined || slots === undefined) return false;
+    stageEffect(session.pendingStorageAppliedEffects, effect, slots);
+    return true;
+  }
+
+  acknowledgeStorageCharacterSave(
+    characterId: number,
+    leaseNonce: string | undefined,
+    effects: readonly StorageAppliedEffect[],
+  ): void {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.leaseNonce !== leaseNonce) return;
+    acknowledgeStorageAppliedEffects(session.pendingStorageAppliedEffects, effects);
+    storageAppliedEffectsCommitted(characterId, effects);
   }
 
   hasDirtyGuildBooks(characterId: number): boolean {

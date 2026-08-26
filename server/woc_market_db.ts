@@ -1476,6 +1476,7 @@ export class PgWocMarketDb implements WocMarketDb {
           save.level,
           save.state,
           save.leaseNonce,
+          save.storageEffects,
         );
         if (!saved) {
           throw new TxAbort({ ok: false as const, reason: 'lease_lost' as const });
@@ -2678,6 +2679,7 @@ export class PgWocMarketDb implements WocMarketDb {
         save.level,
         save.state,
         save.leaseNonce,
+        save.storageEffects,
       );
       if (!saved) throw new TxAbort('lease_lost' as const);
       const booked = await client.query(

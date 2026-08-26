@@ -55,7 +55,7 @@ describe('phase 14: a login storm cannot shut an innocent gold rail', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: () =>
         new Promise((resolve) => {
@@ -155,7 +155,7 @@ describe('phase 14 fix round: row work is bounded, just not by the scan gate', (
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: () =>
         new Promise((resolve) => {
@@ -238,7 +238,7 @@ describe('phase 14 QA: a queued drive is not a wedged one', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: (input) => {
         spendsStarted.push(input.accountId);
@@ -329,7 +329,7 @@ describe('phase 14 QA: a queued drive is not a wedged one', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async () => {
         throw new Error('no spend should happen with an empty scan');
@@ -364,7 +364,7 @@ describe('phase 14 QA: recovery defers to a live purchase, and never strands a s
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: (input) => {
         spends.push(input.idempotencyKey);
@@ -438,7 +438,7 @@ describe('phase 14 QA: recovery defers to a live purchase, and never strands a s
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async (input) => {
         spends.push(input.idempotencyKey);
@@ -501,7 +501,7 @@ describe('phase 14 QA: the scan gate cannot be widened by a reset mid-flight', (
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async () => ({
         result: { granted: false, balance: 0, costClaudium: 1, reason: 'insufficient_balance' },
@@ -553,7 +553,7 @@ describe('phase 14 QA: the fix round is code too', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async () => {
         throw new Error('no spend expected');
@@ -612,7 +612,7 @@ describe('phase 14 QA: the fix round is code too', () => {
     const h: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async () => ({
         result: { granted: false, balance: null, costClaudium: null, reason: 'unavailable' },
@@ -665,7 +665,7 @@ describe('phase 14 QA: the fix round is code too', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async () => {
         throw new Error('no spend expected');
@@ -729,7 +729,7 @@ describe('phase 14 QA round 2: the fix must not regress itself', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: (input) => {
         spendsStarted.push(input.accountId);
@@ -805,7 +805,7 @@ describe('phase 14 QA round 2: the fix must not regress itself', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: (accountId) => ({ characterId: accountId, pid: 1 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: async () => {
         throw new Error('no spend expected');

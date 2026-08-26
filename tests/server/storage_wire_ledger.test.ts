@@ -133,7 +133,7 @@ describe('the gold-path mutex refusal', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: () => ({ characterId: WHO.characterId, pid: 5 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       spend: () =>
         new Promise<ClaudiumSpendResult>((r) => {
@@ -480,7 +480,7 @@ describe('phase 14: the outage that used to strand the gold rung', () => {
     const host: StoragePurchaseHost = {
       resolveLiveCharacter: () => ({ characterId: WHO.characterId, pid: 5 }),
       grant: () => ({ status: 'fits' }),
-      recordGrantLedger: vi.fn(),
+      stageAppliedEffect: vi.fn(() => true),
       saveCharacter: async () => true,
       // The economy service is DOWN: the connection is refused, so no request
       // was delivered and no debit is possible.

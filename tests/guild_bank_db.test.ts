@@ -26,6 +26,7 @@ import {
 } from '../server/db';
 import { REALM } from '../server/realm';
 import { SOCIAL_SCHEMA } from '../server/social_db';
+import type { StorageAppliedEffect } from '../server/storage_purchase_db';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 beforeEach(() => {
@@ -82,6 +83,47 @@ const DEPOSIT_FANGS = {
 };
 const SAVE_7 = { guildId: 7, deltas: [DEPOSIT_GOLD, DEPOSIT_FANGS] };
 const SAVE_9 = { guildId: 9, deltas: [DEPOSIT_GOLD] };
+const STORAGE_EFFECT: StorageAppliedEffect = {
+  realm: REALM,
+  accountId: 7,
+  characterId: 42,
+  itemId: 'strongbox_rung_01',
+  expectedCostClaudium: 100,
+  idempotencyKey: 'guild-storage-effect',
+  purchasedSlotsBefore: 0,
+  purchasedSlotsAfter: 6,
+};
+
+function storageEffectClient() {
+  const query = vi.fn(async (sql: string) => {
+    if (/SELECT id FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+    if (/UPDATE characters/i.test(sql)) return { rows: [], rowCount: 1 };
+    if (/FROM storage_purchase_applied_receipts/i.test(sql)) return { rows: [], rowCount: 0 };
+    if (/FROM storage_purchases[\s\S]*FOR UPDATE/i.test(sql)) {
+      return {
+        rows: [
+          {
+            id: 82,
+            realm: REALM,
+            account_id: 7,
+            character_id: 42,
+            item_id: 'strongbox_rung_01',
+            expected_cost_claudium: 100,
+            idempotency_key: 'guild-storage-effect',
+            status: 'pending',
+          },
+        ],
+        rowCount: 1,
+      };
+    }
+    if (/INSERT INTO storage_purchase_applied_receipts/i.test(sql)) {
+      return { rows: [{ source_purchase_id: 82 }], rowCount: 1 };
+    }
+    if (/DELETE FROM storage_purchases/i.test(sql)) return { rows: [], rowCount: 1 };
+    return { rows: [], rowCount: 1 };
+  });
+  return { query, release: vi.fn() };
+}
 
 describe('the guild_banks DDL (SOCIAL_SCHEMA, the family that owns guilds)', () => {
   it('is additive and idempotent with the state.md column set and the disband cascade', () => {
@@ -188,6 +230,27 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     // The displaced session persisted NEITHER half: no guild_banks statement ran.
     expect(sqls.some((s) => /guild_banks/i.test(s))).toBe(false);
     expect(client.release).toHaveBeenCalled();
+  });
+
+  it('writes storage effects after guild books and before COMMIT', async () => {
+    const client = storageEffectClient();
+    dbMock.connect.mockResolvedValueOnce(client as never);
+
+    await expect(
+      saveCharacterAndGuildBankState(42, 5, STATE, [SAVE_7], 'nonce-1', undefined, [
+        STORAGE_EFFECT,
+      ]),
+    ).resolves.toBe(true);
+    const sqls = client.query.mock.calls.map((call) => String(call[0]));
+    const at = (pattern: RegExp) => sqls.findIndex((sql) => pattern.test(sql));
+    const book = sqls.reduce(
+      (last, sql, index) => (/INSERT INTO guild_banks/.test(sql) ? index : last),
+      -1,
+    );
+    expect(at(/SELECT id FROM accounts/)).toBeLessThan(at(/UPDATE characters/));
+    expect(book).toBeGreaterThan(at(/UPDATE characters/));
+    expect(book).toBeLessThan(at(/INSERT INTO storage_purchase_applied_receipts/));
+    expect(at(/INSERT INTO storage_purchase_applied_receipts/)).toBeLessThan(at(/^COMMIT/));
   });
 
   it('a failing book write rolls the character half back too and rethrows', async () => {

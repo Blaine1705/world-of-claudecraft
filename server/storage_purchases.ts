@@ -24,9 +24,11 @@
 //      a background settle task that inherits the mutex;
 //   6. a granted receipt applies exactly once. The dedupe key lands INSIDE
 //      the character's bank blob next to the counter it guards
-//      (BankState.appliedStorageKeys), so the row may only settle 'applied'
-//      AFTER a character save confirms that blob durable: a crash in any
-//      window replays to exactly one durable apply. The apply-time re-check
+//      (BankState.appliedStorageKeys). The grant stages an immutable effect
+//      before saving; the character blob, applied receipt, Claudium audit row,
+//      and removal of the operational pending row commit in one transaction.
+//      A crash in any window therefore replays to exactly one durable apply.
+//      The apply-time re-check
 //      (the same dryRun rules, re-run inside the real apply) is DEFENSE IN
 //      DEPTH behind the mutex; it stays even though the mutex makes it
 //      unreachable, and if it ever fires the row settles 'unresolved' for
@@ -39,8 +41,8 @@
 //      rail is closed before the client's first command can race the
 //      pending-row scan, and every settle re-kicks the scan so no pending
 //      row is left holding a debit without a driver while its character
-//      stays online. The claudium bank_ledger row is written only when the
-//      apply's save CONFIRMS, so a fenced-out apply leaves no audit row.
+//      stays online. False/throw saves retain their staged prefix for the
+//      next character save; only a committed transaction acknowledges it.
 //
 // NEVER confirm a storage purchase by re-reading the store's `owned`: a
 // storage spend writes no grant row, so owned is false by construction and
@@ -57,13 +59,14 @@ import type {
   ClaudiumSpendOutcome,
   ClaudiumSpendResult,
 } from './claudium_proxy';
+import type { StorageAppliedEffectDraft } from './storage_applied_effect_queue';
 import {
   type LadderHold,
   type LadderHoldReason,
   ladderHoldBlocksGold,
   WEDGED_HOLD_MAX_MS,
 } from './storage_ladder_hold';
-import type { StoragePurchaseRow } from './storage_purchase_db';
+import type { StorageAppliedEffect, StoragePurchaseRow } from './storage_purchase_db';
 
 /** The wire-boundary key rule the spend gate enforces BEFORE the flow runs:
  *  a bounded safe-charset token (UUIDs and ULIDs fit; whitespace and control
@@ -98,13 +101,8 @@ export interface StoragePurchaseHost {
   resolveLiveCharacter(accountId: number): { characterId: number; pid: number } | null;
   /** bankGrantStorageSlots against the live sim (the one rules body). */
   grant(pid: number, skuId: string, purchaseKey: string, dryRun: boolean): StorageGrantResult;
-  /** The bank_ledger buy_slots row for an applied grant (claudium rail). */
-  recordGrantLedger(
-    who: { characterId: number; accountId: number },
-    skuId: string,
-    purchasedSlotsBefore: number,
-    purchasedSlotsAfter: number,
-  ): void;
+  /** Stage the receipt and audit payload on the live session before saving. */
+  stageAppliedEffect(effect: StorageAppliedEffectDraft): boolean;
   /** Durably persist the character's live state (GameServer.saveCharacter:
    *  per-character queued, so writes are ordered). false = not saved. */
   saveCharacter(characterId: number): Promise<boolean>;
@@ -459,59 +457,58 @@ async function safeSettle(
   }
 }
 
-// A row settles 'applied' ONLY behind a confirmed character save: the save
-// is what makes the in-blob dedupe key durable, and settling before it
-// would let a crash strand a paid, recorded-applied, never-persisted grant.
-// A failed or refused save (a fenced-out session after a takeover included)
-// leaves the row pending on purpose; the next login replays the SAME key
-// (the service answers already_granted with no second debit) against
-// whatever state proved durable, applying at most once more. `onDurable`
-// runs once when the save confirms: the claudium bank_ledger row rides it,
-// so a fenced-out apply that never became durable writes NO audit row.
-//
-// KNOWN, BOUNDED AUDIT GAP (pinned by tests/server/storage_purchases.test.ts,
-// queued as a maintainer ruling): the row is written ONLY by the first apply
-// whose own save confirms. The replay arms cannot write it, because the sim's
-// already_applied result carries no before/after pair and the historical one
-// cannot be reconstructed once any other ladder move has landed. So an apply
-// whose save returns false (an escrow-refused save is ordinary concurrency,
-// not a failure) and whose blob then becomes durable through the periodic
-// save settles 'applied' on the next replay with NO claudium ledger row. No
-// money and no slots are lost and exactly-once still holds; what is lost is
-// that purchase's line in the keep-forever audit rail. storage_purchases
-// retains the full record until retention, and the service keeps the debit.
-function scheduleAppliedSettle(
+// Stage before requesting the save. Every character-save path snapshots the
+// staged prefix into its transaction, then acknowledges only after COMMIT.
+// A false/throw keeps the prefix queued. A replay whose key is already in the
+// blob stages the same receipt too: an exact queued duplicate keeps its original
+// bounds, while a fresh-process replay reconstructs the one catalog-sized rung
+// ending at the live total. The receipt insert is the ledger idempotency gate.
+function scheduleAppliedSave(
   host: StoragePurchaseHost,
   p: PurchaseRef,
-  onDurable?: () => void,
+  bounds?: Pick<StorageAppliedEffect, 'purchasedSlotsBefore' | 'purchasedSlotsAfter'>,
 ): void {
-  // Only the arm that WRITES the audit row takes the ordering hold; the replay
-  // arms write none, so a gold buy beside them reorders nothing.
-  if (onDurable) ledgerOrderingHold.set(p.characterId, { key: p.key, sinceMs: Date.now() });
+  const staged = host.stageAppliedEffect({
+    realm: host.realm,
+    accountId: p.accountId,
+    characterId: p.characterId,
+    itemId: p.itemId,
+    expectedCostClaudium: p.expectedCostClaudium,
+    idempotencyKey: p.key,
+    ...(bounds
+      ? {
+          purchasedSlotsBefore: bounds.purchasedSlotsBefore,
+          purchasedSlotsAfter: bounds.purchasedSlotsAfter,
+        }
+      : {}),
+  });
+  if (!staged) {
+    host.warn(`storage purchase ${p.key}: applied effect could not be staged on the live session`);
+    kickStoragePurchaseRecovery(p.characterId);
+    return;
+  }
+  ledgerOrderingHold.set(p.characterId, { key: p.key, sinceMs: Date.now() });
   void host
     .saveCharacter(p.characterId)
     .then((saved) => {
-      if (!saved) return undefined;
-      onDurable?.();
-      return host.db.settle(p.key, 'applied');
+      if (saved) storageAppliedEffectsCommitted(p.characterId, [{ idempotencyKey: p.key }]);
     })
     .catch((err) =>
-      host.warn(`storage purchase ${p.key}: applied settle deferred to next login: ${String(err)}`),
-    )
-    .finally(() => {
-      // Key-guarded, exactly as the ladder hold's release is. drivePendingPurchases
-      // fires these without awaiting, so two applied settles for ONE character
-      // can overlap: without the guard the first save to confirm would close the
-      // second purchase's audit-ordering window while its own ledger row was
-      // still unwritten, and a gold rung landing in that gap would reorder the
-      // claudium row behind it.
-      if (onDurable && ledgerOrderingHold.get(p.characterId)?.key === p.key) {
-        ledgerOrderingHold.delete(p.characterId);
-        // The window is closed, so a LATER wedged one is a new incident and
-        // must be able to log again.
-        warnedLedgerYields.delete(p.characterId);
-      }
-    });
+      host.warn(`storage purchase ${p.key}: atomic apply save deferred: ${String(err)}`),
+    );
+}
+
+/** Release the gold-ordering hold only after a save transaction committed the
+ * staged receipt and audit row. GameServer also calls this for marketplace
+ * saves that win the per-character FIFO ahead of the requested save. */
+export function storageAppliedEffectsCommitted(
+  characterId: number,
+  effects: readonly Pick<StorageAppliedEffect, 'idempotencyKey'>[],
+): void {
+  const held = ledgerOrderingHold.get(characterId);
+  if (!held || !effects.some((effect) => effect.idempotencyKey === held.key)) return;
+  ledgerOrderingHold.delete(characterId);
+  warnedLedgerYields.delete(characterId);
 }
 
 // Interpret a DEFINITIVE service answer (the caller has already routed
@@ -538,23 +535,13 @@ async function settleDefinitive(
   const applied = host.grant(live.pid, p.itemId, p.key, false);
   switch (applied.status) {
     case 'applied':
-      // The audit row waits for the durability confirm: an apply whose save
-      // is fenced out (a session takeover) never became real, so it must
-      // write no ledger row; the durable replay writes exactly one.
-      scheduleAppliedSettle(host, p, () =>
-        host.recordGrantLedger(
-          { characterId: p.characterId, accountId: p.accountId },
-          p.itemId,
-          applied.purchasedSlotsBefore,
-          applied.purchasedSlotsAfter,
-        ),
-      );
+      scheduleAppliedSave(host, p, applied);
       return result;
     case 'already_applied':
       // The crash-window replay: the slots landed under this key before.
       // Exactly-once holds because the grant refused; re-settle behind a
       // fresh save-confirm (the earlier settle may not have landed).
-      scheduleAppliedSettle(host, p);
+      scheduleAppliedSave(host, p);
       return { ...result, reason: result.reason ?? 'already_granted' };
     default:
       // Impossible-state territory (the mutex makes an interleaved ladder
@@ -716,7 +703,7 @@ export async function executeStoragePurchase(
         // landed once. Answer the replay without spending, and (re)settle
         // the row behind a save-confirm in case the first settle never
         // landed.
-        scheduleAppliedSettle(host, {
+        scheduleAppliedSave(host, {
           accountId: input.accountId,
           characterId,
           itemId: input.itemId,
@@ -1217,7 +1204,7 @@ async function drivePendingPurchases(
       // failure settles unresolved).
       const pre = host.grant(live.pid, row.itemId, row.idempotencyKey, true);
       if (pre.status === 'already_applied') {
-        scheduleAppliedSettle(host, p);
+        scheduleAppliedSave(host, p);
         continue;
       }
       const { result } = await host.spend({
