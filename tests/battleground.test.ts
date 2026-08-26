@@ -1325,7 +1325,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
   });
 
-  it('Unstuck refuses the reported legal battleground wall-contact shortcut', () => {
+  it('Unstuck accepts the reported legal battleground wall-contact rescue', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
@@ -1333,18 +1333,23 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     const e = forceReportedBgWallContactShortcut(sim, match, pid);
     const meta = must(sim.meta(pid), 'player meta');
 
-    expect(sim.unstuck(pid)).toBe(false);
+    expect(sim.unstuck(pid)).toBe(true);
     expect(sim.drainEvents()).toContainEqual(
       expect.objectContaining({
         type: 'unstuck',
-        phase: 'blocked',
-        reason: 'moving',
+        phase: 'started',
         pid,
       }),
     );
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
     expect(meta.pendingUnstuck).toBeNull();
     expect(sim.bgMatchFor(pid)).toBe(match);
-    expect(inGraveyard(sim, match, pid, 0)).toBe(false);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
     expectClearPlayerPosition(sim, e);
   });
 

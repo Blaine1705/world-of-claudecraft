@@ -859,9 +859,10 @@ describe('unstuck area identity', () => {
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
   });
 
-  it('rejects a battleground wall-contact ESC attempt while movement input is still held', () => {
+  it('completes a battleground wall-press ESC attempt while movement input is still held', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallContact(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
 
     const start = required(
       unstuckLocationAt(sim.ctx, pid, player.pos),
@@ -874,18 +875,23 @@ describe('unstuck area identity', () => {
       slot: match.slot,
     });
 
-    const before = { ...player.pos };
-    expect(sim.unstuck(pid)).toBe(false);
-    expect(eventsOf(sim.drainEvents())).toContainEqual(
-      expect.objectContaining({ type: 'unstuck', phase: 'blocked', reason: 'moving', pid }),
-    );
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+    expect(completed?.area).toMatchObject(start.area);
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
     expect(sim.bgMatchFor(pid)).toBe(match);
     expect(isBgPos(player.pos.x)).toBe(true);
-    expect(player.pos).toEqual(before);
-
-    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
-    expect(eventsOf(events)).not.toContainEqual(
-      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    expect(
+      Math.hypot(
+        player.pos.x - (origin.x + BG_GRAVEYARDS[0].x),
+        player.pos.z - (origin.z + BG_GRAVEYARDS[0].z),
+      ),
+    ).toBeLessThanOrEqual(Math.hypot(BG_GRAVEYARDS[0].hw, BG_GRAVEYARDS[0].hd));
+    expect(required(sim.meta(pid), 'battleground player metadata').moveInput).toEqual(
+      expect.objectContaining({ forward: false }),
     );
   });
 
