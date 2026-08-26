@@ -114,10 +114,11 @@ export type {
   OverheadEmoteId,
 } from './sim/types';
 
-// Online world-layout compatibility is encoded in the first WebSocket frame's
-// discriminator. Changing the authoritative town layout requires a new epoch:
-// the strict discriminator makes both rolling-deploy directions fail closed
-// before either binary loads a character into a differently shaped world.
+// Online world and required-snapshot compatibility is encoded in the first
+// WebSocket frame's discriminator. Changing the authoritative town layout or
+// a required snapshot shape requires a new epoch: the strict discriminator
+// makes both rolling-deploy directions fail closed before either binary loads
+// a character into an incompatible world.
 // 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
 // disagree about the authoritative resource carrier, so they must fail closed.
 // 8 = the New Eastbrook program's Copper Dig relocation to the dig headland
@@ -128,7 +129,10 @@ export type {
 // ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
+// 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
+// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
+// rejected before the new client can consume the old six-field snapshot.
+export const ONLINE_WORLD_LAYOUT_VERSION = 10 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
