@@ -243,8 +243,7 @@ function battlegroundWallContactStuck(meta: PlayerMeta, p: Entity): boolean {
     hasMoveInput(meta) &&
     p.onGround &&
     !p.jumping &&
-    Math.hypot(p.pos.x - p.prevPos.x, p.pos.z - p.prevPos.z) <=
-      BG_WALL_CONTACT_STUCK_DISTANCE &&
+    Math.hypot(p.pos.x - p.prevPos.x, p.pos.z - p.prevPos.z) <= BG_WALL_CONTACT_STUCK_DISTANCE &&
     Math.abs(p.pos.y - p.prevPos.y) <= BG_WALL_CONTACT_STUCK_DISTANCE &&
     Math.hypot(p.vx, p.vz) <= BG_WALL_CONTACT_STUCK_SPEED &&
     Math.abs(p.vy) <= BG_WALL_CONTACT_STUCK_SPEED

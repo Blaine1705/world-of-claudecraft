@@ -45,6 +45,11 @@ function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42): Sim 
   return new Sim({ seed, playerClass: cls, autoEquip: true });
 }
 
+function required<T>(value: T | null | undefined, label: string): T {
+  if (value == null) throw new Error(`Expected ${label}`);
+  return value;
+}
+
 function nearestMob(sim: Sim) {
   const p = sim.player;
   let best: any = null,
@@ -208,12 +213,12 @@ describe('party grantXp at the cap', () => {
 
     const wolf = nearestMob(sim);
     wolf.level = MAX_LEVEL; // make it worth XP for level-20 killers (anti-gray)
-    const e1 = sim.entities.get(p1)!;
-    const e2 = sim.entities.get(p2)!;
+    const e1 = required(sim.entities.get(p1), 'party leader entity');
+    const e2 = required(sim.entities.get(p2), 'party member entity');
     teleport(sim, e1, wolf.pos.x, wolf.pos.z);
     teleport(sim, e2, wolf.pos.x, wolf.pos.z);
 
-    const m2 = sim.meta(p2)!;
+    const m2 = required(sim.meta(p2), 'party member metadata');
     const before2 = m2.lifetimeXp;
     wolf.hp = 1;
     (sim as any).dealDamage(e1, wolf, 9999, false, 'physical', 'Test', 'hit');
@@ -295,7 +300,7 @@ describe('prestige', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.grantXp(800_000); // build a real lifetime total
-    const m = sim.meta(sim.playerId)!;
+    const m = required(sim.meta(sim.playerId), 'prestige player metadata');
     m.xp = 123; // simulate stray bar XP to prove the reset clears it
     const lifeBefore = sim.lifetimeXp;
     const ok = sim.prestige();
@@ -396,14 +401,14 @@ describe('persistence', () => {
     sim.grantXp(MILESTONES[0].lifetimeXp + 5);
     sim.tick(); // milestone deeds grant (and dual-write the legacy set) at the tick tail
     sim.prestige();
-    const state = sim.serializeCharacter(sim.playerId)!;
+    const state = required(sim.serializeCharacter(sim.playerId), 'serialized character state');
     expect(state.lifetimeXp).toBeGreaterThan(0);
     expect(state.prestigeRank).toBe(1);
     expect(state.unlockedMilestones).toContain(MILESTONES[0].id);
 
     const sim2 = makeSim('warrior');
     const pid = sim2.addPlayer('warrior', 'Reload', { state });
-    const m = sim2.meta(pid)!;
+    const m = required(sim2.meta(pid), 'reloaded player metadata');
     expect(m.lifetimeXp).toBe(state.lifetimeXp);
     expect(m.prestigeRank).toBe(1);
     expect([...m.unlockedMilestones]).toContain(MILESTONES[0].id);
@@ -412,12 +417,15 @@ describe('persistence', () => {
   it('backfills lifetimeXp for characters saved before the counter existed', () => {
     const sim = makeSim('warrior');
     // a legacy save: level + bar XP, but no lifetimeXp field
-    const legacy = sim.serializeCharacter(sim.playerId)!;
+    const legacy = required(
+      sim.serializeCharacter(sim.playerId),
+      'legacy serialized character state',
+    );
     const state: CharacterState = { ...legacy, level: 12, xp: 500 };
     delete (state as any).lifetimeXp;
     const sim2 = makeSim('warrior');
     const pid = sim2.addPlayer('warrior', 'Legacy', { state });
-    const m = sim2.meta(pid)!;
+    const m = required(sim2.meta(pid), 'legacy player metadata');
     expect(m.lifetimeXp).toBe(xpToReachLevel(12) + 500);
   });
 });
@@ -510,16 +518,17 @@ describe('online ClientWorld path', () => {
     if ('error' in session) throw new Error(session.error);
 
     server.sim.setPlayerLevel(MAX_LEVEL, session.pid);
-    server.sim.grantXp(xpToReachLevel(23), server.sim.meta(session.pid)!);
+    const meta = required(server.sim.meta(session.pid), 'snapshot player metadata');
+    server.sim.grantXp(xpToReachLevel(23), meta);
     server.sim.prestige(session.pid);
 
     (server as any).broadcastSnapshots();
     const snap = [...fc.sent].reverse().find((m) => m.t === 'snap');
     expect(snap).toBeTruthy();
-    expect(snap.self.lxp).toBe(server.sim.meta(session.pid)!.lifetimeXp);
+    expect(snap.self.lxp).toBe(meta.lifetimeXp);
     expect(snap.self.prk).toBe(1);
 
-    const serverLifetime = server.sim.meta(session.pid)!.lifetimeXp;
+    const serverLifetime = meta.lifetimeXp;
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.lifetimeXp).toBe(serverLifetime);

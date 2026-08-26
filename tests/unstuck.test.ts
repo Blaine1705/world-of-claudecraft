@@ -898,9 +898,9 @@ describe('unstuck area identity', () => {
     sim.drainEvents();
     sim.tick();
 
-    expect(Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z)).toBeGreaterThan(
-      0.05,
-    );
+    expect(
+      Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z),
+    ).toBeGreaterThan(0.05);
     expect(meta.moveInput.forward).toBe(true);
     expect(sim.unstuck(pid)).toBe(false);
     expect(eventsOf(sim.drainEvents())).toContainEqual(
@@ -915,9 +915,9 @@ describe('unstuck area identity', () => {
     player.facing += Math.PI / 2;
     player.prevFacing = player.facing;
     const events = eventsOf(sim.tick());
-    expect(Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z)).toBeGreaterThan(
-      0.05,
-    );
+    expect(
+      Math.hypot(player.pos.x - player.prevPos.x, player.pos.z - player.prevPos.z),
+    ).toBeGreaterThan(0.05);
     expect(events).toContainEqual(
       expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'moved' }),
     );
