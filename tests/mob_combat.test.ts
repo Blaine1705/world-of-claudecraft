@@ -230,24 +230,35 @@ describe('mob Entity.autoAttack tracks genuine melee engagement', () => {
   });
 
   it('pet autoAttack is false when out of melee range', () => {
-    const sim = new Sim({ seed: 7794, playerClass: 'hunter' });
+    const sim = new Sim({ seed: 7794, playerClass: 'warrior' });
     const player = sim.entities.get(sim.playerId);
     if (!player) throw new Error('expected default player');
     player.pos = { x: 0, y: 0, z: 0 };
 
     // Create a pet (forest_wolf with owner)
-    const pet = createMob(9013, MOBS.forest_wolf, 1, { x: 20, y: 0, z: 0 });
+    const pet = createMob(9013, MOBS.forest_wolf, 1, { x: 10, y: 0, z: 0 });
     pet.ownerId = player.id;
-    pet.aggroTargetId = player.id;
-    pet.autoAttack = true;
     pet.weapon = { min: 10, max: 10, speed: 2 };
     pet.prevPos = { ...pet.pos };
     sim.entities.set(pet.id, pet);
 
-    // Pet is out of range, so autoAttack should be false after updatePet
+    // Create a hostile mob target far from the pet (outside melee range ~5 yards)
+    const target = createMob(9023, MOBS.forest_wolf, 5, { x: 20, y: 0, z: 0 });
+    target.hostile = true;
+    target.hp = target.maxHp;
+    target.prevPos = { ...target.pos };
+    sim.entities.set(target.id, target);
+
+    // Pet targets the far mob
+    pet.aggroTargetId = target.id;
+    pet.autoAttack = true;
+
     sim.ctx.updatePet(pet);
 
+    // Pet should be out of melee range, so autoAttack should be false
     expect(pet.autoAttack).toBe(false);
+    // Verify we're actually in the out-of-range path, not the no-target path
+    expect(pet.aggroTargetId).toBe(target.id);
   });
 
   it('pet autoAttack is true when in melee range and swinging', () => {
@@ -305,20 +316,22 @@ describe('mob Entity.autoAttack tracks genuine melee engagement', () => {
     const player = sim.entities.get(sim.playerId);
     if (!player) throw new Error('expected default player');
     player.pos = { x: 0, y: 0, z: 0 };
+    player.hp = player.maxHp;
 
-    // Create a ranged caster mob with spell
-    const mob = createMob(9016, MOBS.forest_wolf, 5, { x: 15, y: 0, z: 0 });
+    // Create a warlock_imp caster mob with petSpell (range 24)
+    const mob = createMob(9016, MOBS.warlock_imp, 1, { x: 15, y: 0, z: 0 });
     mob.aggroTargetId = player.id;
-    mob.aiState = 'attack';
-    mob.autoAttack = true;
+    mob.aiState = 'attack'; // already in attack state to reach casting branch
+    mob.autoAttack = true; // stale true from a previous state
     mob.prevPos = { ...mob.pos };
+    sim.entities.set(mob.id, mob);
 
+    // Call updateMobCombatProfile: warlock_imp has petSpell, so updateCasterCombat
+    // runs. With aiState 'attack' and distance 15 < spell.range 24, it enters the
+    // casting branch and should clear autoAttack.
     updateMobCombatProfile(sim.ctx, mob);
 
-    // After combat profile update, if mob is in spell range with ranged profile,
-    // it would be casting, not swinging. We verify it clears autoAttack.
-    // (Note: most forest_wolf don't have petSpell, so this tests the guard path,
-    // but the logic is covered by the implementation)
-    expect(mob.autoAttack).toBeDefined();
+    // Mob is casting from in-range, so autoAttack should be false
+    expect(mob.autoAttack).toBe(false);
   });
 });
