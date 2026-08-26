@@ -730,6 +730,7 @@ import { TargetAurasWindow } from './target_auras_window';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
+import { TargetSwingTimerBars } from './target_swing_timer_bars';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
@@ -1509,6 +1510,10 @@ export class Hud {
   // Cached showTargetOfTarget preference (set from main.ts applySetting via
   // setShowTargetOfTarget); when off, the frame is painted hidden every frame.
   private showTargetOfTarget = false;
+  // Cached showTargetSwingTimer preference (set from main.ts applySetting via
+  // setShowTargetSwingTimer); independent of showTargetOfTarget (that toggle
+  // is the unrelated portrait mini-frame). When off, both new bars stay hidden.
+  private showTargetSwingTimer = false;
   // Pet frame (showPetFrame option): element refs for the #pet-frame strip under the
   // player frame, resolved ONCE like the refs above. A FOURTH instance of the
   // unit_frame family (petFramePainter below), driven by pet_frame_view.ts.
@@ -4137,6 +4142,7 @@ export class Hud {
   // element caching, edge-tracking clocks, and painter instances live behind
   // this one binding (src/ui/swing_timer_bars.ts).
   private readonly swingTimerBars = new SwingTimerBars(this.writerFacet);
+  private readonly targetSwingTimerBars = new TargetSwingTimerBars(this.writerFacet);
   // The spell-activation proc overlay (the Rising Phoenix, owner design
   // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
   // (proc_overlay_drag), class-toggled per frame via the elided writers
@@ -5419,6 +5425,13 @@ export class Hud {
   // main.ts applySetting. When off, the per-frame update paints the frame hidden.
   setShowTargetOfTarget(on: boolean): void {
     this.showTargetOfTarget = on;
+  }
+
+  // Toggle the target / target-of-target swing-timer bars (showTargetSwingTimer
+  // option), driven from main.ts applySetting. Independent of
+  // setShowTargetOfTarget: the swing bars are unrelated to the portrait mini-frame.
+  setShowTargetSwingTimer(on: boolean): void {
+    this.showTargetSwingTimer = on;
   }
 
   // A pet is always a mob entity, so it uses the same committed portrait and
@@ -8854,6 +8867,10 @@ export class Hud {
     // and the off-hand clock for dual-wield melee weaving). See
     // src/ui/swing_timer_bars.ts for the edge-tracking + painting detail.
     this.swingTimerBars.update(p, target ?? null);
+    // Target / target-of-target swing timers: see
+    // src/ui/target_swing_timer_bars.ts for the visibility gating and the
+    // independent target-of-target resolution.
+    this.targetSwingTimerBars.update(target ?? null, sim.entities, this.showTargetSwingTimer);
     // The phoenix: Heating Up lights its left half, Hot Streak completes it,
     // spending puts it out (pure rule in proc_overlay_view; an unchanged state
     // writes nothing). On the FIRST frame in-world, preview the unlit bird for

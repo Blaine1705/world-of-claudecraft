@@ -130,7 +130,13 @@ const MONOLITHS: MonolithRow[] = [
     // instantiation (both the main-hand and off-hand bars) into
     // src/ui/swing_timer_bars.ts, leaving hud.ts a single per-frame call
     // (the ratchet's own rule: an extraction lowers the ceiling).
-    ceiling: 18474,
+    // Raised to the exact new count for the target/target-of-target swing-
+    // timer bars: one import, one cached toggle field, one painter-bars field,
+    // one setter, and one per-frame call site, all thin-consumer wiring to
+    // src/ui/target_swing_timer_bars.ts (the ratchet's own rule: the real
+    // logic lives in the extracted module, not here). No clean branch-owned
+    // extraction exists for wholly new functionality.
+    ceiling: 18491,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
