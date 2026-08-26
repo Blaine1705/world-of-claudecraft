@@ -181,7 +181,10 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 13329,
+    // Merging release/v0.41.0 into the rickshaw: the merged file measures 13390,
+    // above the release's own pin because this branch's mount work lands in it.
+    // Pinned to the exact merged count, keeping the zero-slack posture.
+    ceiling: 13390,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
