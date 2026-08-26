@@ -16,6 +16,7 @@ const h = vi.hoisted(() => {
     rateLimitsExists: true,
     invalidMetricsIndexExists: false,
     failOpenIndexCreate: false,
+    failLargeAccountIndexCreate: false,
   };
   const query = vi.fn((sql: string) => {
     calls.push(String(sql));
@@ -26,6 +27,14 @@ const h = vi.hoisted(() => {
       String(sql).includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character')
     ) {
       return Promise.reject(new Error('index build interrupted'));
+    }
+    if (
+      state.failLargeAccountIndexCreate &&
+      String(sql).includes(
+        'CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent',
+      )
+    ) {
+      return Promise.reject(new Error('large account index build interrupted'));
     }
     // The invalid-carcass check for the post-commit metrics index build; a test
     // flips the flag to exercise the repair arm. Checked before the to_regclass
@@ -69,6 +78,12 @@ vi.mock('pg', () => ({
   }),
 }));
 
+import {
+  BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL,
+  BANK_LEDGER_ACCOUNT_FK_INDEX_SQL,
+  BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL,
+  BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_DROP_SQL,
+} from '../server/bank_ledger_indexes';
 import { CONCURRENT_INDEX_MIGRATIONS } from '../server/concurrent_indexes';
 import {
   closeMarketWriteGateForTests,
@@ -87,6 +102,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     h.state.rateLimitsExists = true;
     h.state.invalidMetricsIndexExists = false;
     h.state.failOpenIndexCreate = false;
+    h.state.failLargeAccountIndexCreate = false;
     h.clientConfigs.length = 0;
   });
 
@@ -482,6 +498,8 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(carcassCheck).toBeGreaterThan(sessionLock);
     expect(carcassCheck).toBeLessThan(concurrentIndex);
+    // Healthy entries need no INVALID-carcass drops. In particular, this
+    // release keeps the broad account index for mixed-version readers.
     expect(h.calls.some((sql) => sql.includes('DROP INDEX CONCURRENTLY'))).toBe(false);
     const rewardEventsIndex = h.calls.findIndex((sql) =>
       sql.includes(
@@ -509,6 +527,15 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(worst10sIdx).toBeGreaterThan(openIdx);
     expect(worst10sIdx).toBeLessThan(sessionUnlock);
     expect(h.calls[worst10sIdx]).toContain('worst_10s_frame_p95_ms DESC, created_at DESC');
+
+    const largeMovementIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
+    );
+    expect(largeMovementIdx).toBeGreaterThan(worst10sIdx);
+    expect(h.calls[largeMovementIdx]).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(h.calls[largeMovementIdx]).toContain('WHERE abs(copper_delta) >= 100000');
+    expect(largeMovementIdx).toBeLessThan(sessionUnlock);
+    expect(h.calls).not.toContain(BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL);
   });
 
   it('keeps the CONCURRENTLY builds OUT of ensureSchema (they run after listen)', async () => {
@@ -611,6 +638,50 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(unlock).toBeGreaterThan(failedCreate);
   });
 
+  it('keeps the broad account index when its partial replacement build fails', async () => {
+    const migration = CONCURRENT_INDEX_MIGRATIONS.find(
+      (entry) => entry.name === 'bank_ledger_account_large_recent',
+    ) as { retireSql?: string };
+    const syntheticRetire = 'SELECT 1 /* synthetic concurrent-index retirement */';
+    migration.retireSql = syntheticRetire;
+    h.state.failLargeAccountIndexCreate = true;
+    try {
+      await expect(runConcurrentIndexMigrations()).rejects.toThrow(
+        'large account index build interrupted',
+      );
+      const failedCreate = h.calls.findIndex((sql) =>
+        sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
+      );
+      expect(failedCreate).toBeGreaterThan(-1);
+      // The generic retirement arm is strictly post-create: an interrupted
+      // build must never reach it.
+      expect(h.calls).not.toContain(syntheticRetire);
+      const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+      expect(unlock).toBeGreaterThan(failedCreate);
+    } finally {
+      delete migration.retireSql;
+    }
+  });
+
+  it('runs a staged index retirement only after its replacement create succeeds', async () => {
+    const migration = CONCURRENT_INDEX_MIGRATIONS.find(
+      (entry) => entry.name === 'bank_ledger_account_large_recent',
+    ) as { retireSql?: string };
+    const syntheticRetire = 'SELECT 1 /* synthetic concurrent-index retirement */';
+    migration.retireSql = syntheticRetire;
+    try {
+      await runConcurrentIndexMigrations();
+      const create = h.calls.findIndex((sql) =>
+        sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_large_recent'),
+      );
+      const retire = h.calls.indexOf(syntheticRetire);
+      expect(create).toBeGreaterThan(-1);
+      expect(retire).toBeGreaterThan(create);
+    } finally {
+      delete migration.retireSql;
+    }
+  });
+
   it('applies the play-session retention schema after the metrics schema and before the relocated exclusion view', async () => {
     // The exclusion view's association arm reads account_ip_associations, which
     // PLAY_SESSION_RETENTION_SCHEMA creates, so on a FRESH boot the view must be
@@ -701,7 +772,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'bank_ledger_container_recent',
       'player_reports_retention_created',
       'chat_violations_retention_created',
-      'bank_ledger_account_recent',
+      'bank_ledger_account_large_recent',
       'woc_market_sales_seller',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
@@ -739,17 +810,44 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     // The admin economy-oversight per-account bank_ledger reader
     // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
-    // same bounded-backwards-scan shape as the guild reader. NOT partial: the
-    // threshold is a parameter here, applied as a trailing Filter.
+    // same bounded-backwards-scan shape as the guild reader. It is partial on
+    // the fixed production threshold so small movements add no permanent
+    // write amplification to this keep-forever audit table.
     const bankLedgerAccount = CONCURRENT_INDEX_MIGRATIONS.find(
-      (m) => m.name === 'bank_ledger_account_recent',
+      (m) => m.name === 'bank_ledger_account_large_recent',
     );
     expect(bankLedgerAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerAccount?.createSql).toContain('WHERE abs(copper_delta) >= 100000');
     expect(bankLedgerAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
-    expect(bankLedgerAccount?.checkSql).toContain("to_regclass('bank_ledger_account_recent')");
+    expect(bankLedgerAccount?.checkSql).toContain(
+      "to_regclass('bank_ledger_account_large_recent')",
+    );
     expect(bankLedgerAccount?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_large_recent',
+    );
+    // Phase two is explicit but deliberately not armed in this release: an
+    // old realm's parameterized generic plan still needs the broad ordering
+    // index during rolling deploys and the rollback window. That release
+    // appends the compact migration and attaches this retirement to IT, never
+    // by inserting ahead of today's already-shipped partial migration.
+    expect(BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent',
     );
+    expect(BANK_LEDGER_ACCOUNT_FK_INDEX_SQL).toContain(
+      'CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_fk',
+    );
+    expect(BANK_LEDGER_ACCOUNT_FK_INDEX_SQL).toContain('ON bank_ledger(account_id)');
+    expect(BANK_LEDGER_ACCOUNT_FK_INDEX_SQL).not.toContain('WHERE');
+    expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL).toContain(
+      "to_regclass('bank_ledger_account_fk')",
+    );
+    expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_DROP_SQL).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_fk',
+    );
+    expect(CONCURRENT_INDEX_MIGRATIONS.some((m) => m.name === 'bank_ledger_account_fk')).toBe(
+      false,
+    );
+    expect(bankLedgerAccount?.retireSql).toBeUndefined();
     // player_reports retention prune (prunePlayerReportsBatch): account-agnostic
     // age scan, so the index leads with created_at rather than either existing
     // account column, and is partial on the resolved-report predicate the
