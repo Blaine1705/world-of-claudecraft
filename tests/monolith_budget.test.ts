@@ -253,7 +253,9 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Re-pinned after the /daynight dev-command extraction to
+    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
+    ceiling: 11495,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -405,7 +407,10 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/colliders.ts',
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 2621,
+    // Re-pinned after the interior-collider-set assembly extraction to
+    // interior_collider_sets.ts (which appends the Ignivar authored prop
+    // colliders). Exact count, zero slack.
+    ceiling: 2609,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -417,7 +422,10 @@ const MONOLITHS: MonolithRow[] = [
     // fix is extraction behind the seam named here.
     file: 'src/render/dungeon.ts',
     // the raid consolidation moved the arena-wall occlusion core, the pending-wall builder, and the ignivar tile loaders out; exact count.
-    ceiling: 2789,
+    // Re-pinned after the addTorchGlow extraction to torch_glow_decal.ts
+    // (shared with the Ignivar dressing glow pools), net of the ignivar
+    // pillar-swap gate. Exact count, zero slack.
+    ceiling: 2770,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];

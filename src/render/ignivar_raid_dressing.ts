@@ -12,7 +12,7 @@ import {
 } from './ignivar_dressing_plan_core';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
-import { radialGlowTexture } from './textures';
+import { addTorchGlowDecal } from './torch_glow_decal';
 
 export const IGNIVAR_APPROACH_DRESSING_NAME = 'ignivarForgeApproachDressing';
 export const IGNIVAR_ARENA_DRESSING_NAME = 'ignivarCrucibleArenaDressing';
@@ -46,10 +46,6 @@ const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale:
   reactor: { color: 0xffa04a, scale: 0.7 },
 };
 
-let glowDecalGeo: THREE.CircleGeometry | null = null;
-let glowDecalTex: THREE.Texture | null = null;
-const glowDecalMats = new Map<number, THREE.Material>();
-
 function addPropGlowPools(
   group: THREE.Group,
   placements: readonly IgnivarPropPlacement[],
@@ -61,29 +57,7 @@ function addPropGlowPools(
   for (const placement of placements) {
     const pool = PROP_GLOW_POOLS[placement.key];
     if (!pool || placement.y !== 0) continue;
-    glowDecalGeo ??= markSharedGeometry(
-      new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2),
-    ) as THREE.CircleGeometry;
-    glowDecalTex ??= radialGlowTexture();
-    let mat = glowDecalMats.get(pool.color);
-    if (!mat) {
-      mat = markSharedMaterial(
-        new THREE.MeshBasicMaterial({
-          map: glowDecalTex,
-          color: pool.color,
-          transparent: true,
-          opacity: 0.46,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        }),
-      );
-      glowDecalMats.set(pool.color, mat);
-    }
-    const glow = new THREE.Mesh(glowDecalGeo, mat);
-    glow.position.set(placement.x, 0.07, placement.z);
-    glow.scale.setScalar(pool.scale);
-    glow.renderOrder = 1; // after the floor it floats over
-    group.add(glow);
+    addTorchGlowDecal(group, placement.x, placement.z, pool.color, 0.07, pool.scale);
   }
 }
 

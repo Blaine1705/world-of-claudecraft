@@ -97,6 +97,7 @@ import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 import { radialGlowTexture } from './textures';
+import { addTorchGlowDecal } from './torch_glow_decal';
 import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
 
@@ -588,9 +589,6 @@ export function scaleUv(geo: THREE.BufferGeometry, su: number, sv: number): THRE
 }
 
 export class DungeonInteriors {
-  private glowDecalGeo: THREE.BufferGeometry | null = null;
-  private glowDecalTex: THREE.Texture | null = null;
-  private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
   private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
   /**
@@ -2188,8 +2186,11 @@ export class DungeonInteriors {
     const colors = torch ?? TORCH_COLORS[variant];
     for (const pt of layout.pillars) {
       const faceAisle = pt.x < 0 ? Math.PI / 2 : -Math.PI / 2;
-      p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
-      this.addPillarTorch(group, p, pt, colors);
+      // Ignivar swaps the stone pillar for the authored forge pillar (placed
+      // by the dressing plan); the torch rig stays, pushed out to its face.
+      if (variant !== 'ignivar')
+        p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
+      this.addPillarTorch(group, p, pt, colors, variant === 'ignivar' ? 1.15 : 0);
     }
   }
 
@@ -2201,9 +2202,11 @@ export class DungeonInteriors {
     p: Placements,
     pt: GridPoint,
     colors: TorchColors,
+    extraOffset = 0,
   ): void {
     const dir = pt.x < 0 ? 1 : -1; // toward the centre aisle
-    p.add('torch_mounted', pt.x + dir * 0.98, 5.5, pt.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 1.6);
+    const mountX = pt.x + dir * (0.98 + extraOffset);
+    p.add('torch_mounted', mountX, 5.5, pt.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 1.6);
 
     this.flameGeo ??= markSharedGeometry(new THREE.ConeGeometry(0.22, 0.6, 6));
     const flame = new THREE.Mesh(
@@ -2216,7 +2219,7 @@ export class DungeonInteriors {
         opacity: 0.92,
       }),
     );
-    flame.position.set(pt.x + dir * 1.7, 6.6, pt.z);
+    flame.position.set(pt.x + dir * (1.7 + extraOffset), 6.6, pt.z);
     group.add(flame);
     this.flames.push(flame);
 
@@ -2227,11 +2230,11 @@ export class DungeonInteriors {
       2,
     );
     if (!this.lowGfx) light.userData.baseIntensity = DUNGEON_LIGHT_INTENSITY;
-    light.position.set(pt.x + dir * 1.2, this.lowGfx ? 8.2 : DUNGEON_LIGHT_Y, pt.z);
+    light.position.set(pt.x + dir * (1.2 + extraOffset), this.lowGfx ? 8.2 : DUNGEON_LIGHT_Y, pt.z);
     group.add(light);
     this.fireLights.push(light);
 
-    this.addTorchGlow(group, pt.x + dir * 1.7, pt.z, colors.light);
+    this.addTorchGlow(group, pt.x + dir * (1.7 + extraOffset), pt.z, colors.light);
   }
 
   // Additive light-pool decal under a torch: the point-light budget only keeps
@@ -2245,29 +2248,7 @@ export class DungeonInteriors {
     scale = 1,
   ): void {
     if (this.lowGfx) return;
-    this.glowDecalGeo ??= markSharedGeometry(
-      new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2),
-    );
-    this.glowDecalTex ??= markSharedTexture(radialGlowTexture());
-    let mat = this.glowDecalMats.get(colorHex);
-    if (!mat) {
-      mat = markSharedMaterial(
-        new THREE.MeshBasicMaterial({
-          map: this.glowDecalTex,
-          color: colorHex,
-          transparent: true,
-          opacity: 0.46,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        }),
-      );
-      this.glowDecalMats.set(colorHex, mat);
-    }
-    const glow = new THREE.Mesh(this.glowDecalGeo, mat);
-    glow.position.set(x, y, z);
-    glow.scale.setScalar(scale);
-    glow.renderOrder = 1; // after the floor it floats over
-    group.add(glow);
+    addTorchGlowDecal(group, x, z, colorHex, y, scale);
   }
 
   /** A real, budgeted light plus its baked floor pool for the authored citadel.
