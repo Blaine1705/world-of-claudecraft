@@ -256,6 +256,7 @@ function updateCasterCombat(
       mob.aiState = 'chase';
       return 'done';
     }
+    mob.autoAttack = false; // casting from range, not swinging
     ctx.updateRangedPetAttack(mob, target, spell);
     return 'done';
   }
@@ -285,6 +286,7 @@ function updatePursuitProfileCombat(
   target: Entity,
   profile: MobCombatProfile,
 ): void {
+  mob.autoAttack = false; // default: tryMobMeleeSwingInRange will overwrite to true if genuinely in range
   mob.swingTimer = Math.max(0, mob.swingTimer - DT);
   if (profile.swingWhilePursuing || mob.aiState === 'attack') {
     tryMobMeleeSwingInRange(ctx, mob, target);
