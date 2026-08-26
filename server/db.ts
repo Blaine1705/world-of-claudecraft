@@ -3466,7 +3466,12 @@ export async function saveCharacterAndMarketState(
 ): Promise<boolean> {
   // The market backfill gate must open before this shared-row write.
   assertMarketWriteGateOpen();
-  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
+  const ledger = prepareBankLedgerSaveEffects(
+    characterId,
+    storageEffects,
+    ledgerEffects,
+    guildBanks?.map((book) => book.guildId),
+  );
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
   try {
@@ -3637,7 +3642,12 @@ export async function saveCharacterAndGuildBankState(
   storageEffects: readonly StorageAppliedEffect[] = [],
   ledgerEffects?: BankLedgerSaveEffects,
 ): Promise<boolean> {
-  const ledger = prepareBankLedgerSaveEffects(characterId, storageEffects, ledgerEffects);
+  const ledger = prepareBankLedgerSaveEffects(
+    characterId,
+    storageEffects,
+    ledgerEffects,
+    guildBanks.map((book) => book.guildId),
+  );
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
   try {

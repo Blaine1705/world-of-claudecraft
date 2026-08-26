@@ -71,6 +71,16 @@ const EFFECTS: BankLedgerSaveEffects = {
   owner: OWNER,
   batches: [{ batchKey: 'save.session.1', rows: [ROW], encodedBytes: 256 }],
 };
+const GUILD_EFFECTS: BankLedgerSaveEffects = {
+  owner: OWNER,
+  batches: [
+    {
+      batchKey: 'save.guild.1',
+      rows: [{ ...ROW, container: 'guild', containerId: 19 }],
+      encodedBytes: 256,
+    },
+  ],
+};
 const STORAGE_EFFECT: StorageAppliedEffect = {
   realm: REALM,
   accountId: OWNER.accountId,
@@ -254,7 +264,7 @@ describe('fenced character save ledger effects', () => {
         'nonce-1',
         undefined,
         [],
-        EFFECTS,
+        GUILD_EFFECTS,
       ),
     ).resolves.toBe(true);
 
@@ -266,6 +276,46 @@ describe('fenced character save ledger effects', () => {
     expect(book).toBeGreaterThan(indexOf(sql, /UPDATE characters/));
     expect(book).toBeLessThan(indexOf(sql, /WITH receipt_input AS/));
     expect(indexOf(sql, /WITH receipt_input AS/)).toBeLessThan(indexOf(sql, /^COMMIT/));
+  });
+
+  it('rejects a guild ledger prefix unless the same transaction carries its book', async () => {
+    const guildSave = {
+      guildId: 20,
+      deltas: [],
+    };
+
+    await expect(
+      saveCharacterState(OWNER.characterId, 7, STATE, 'nonce-1', [], GUILD_EFFECTS),
+    ).rejects.toThrow(/matching guild bank save/);
+    await expect(
+      saveCharacterAndGuildBankState(
+        OWNER.characterId,
+        7,
+        STATE,
+        [guildSave],
+        'nonce-1',
+        undefined,
+        [],
+        GUILD_EFFECTS,
+      ),
+    ).rejects.toThrow(/matching guild bank save/);
+    await expect(
+      saveCharacterAndMarketState(
+        OWNER.characterId,
+        7,
+        STATE,
+        MARKET,
+        MAIL,
+        'nonce-1',
+        undefined,
+        undefined,
+        [],
+        GUILD_EFFECTS,
+      ),
+    ).rejects.toThrow(/matching guild bank save/);
+
+    expect(h.pool.connect).not.toHaveBeenCalled();
+    expect(h.pool.query).not.toHaveBeenCalled();
   });
 
   it('reuses the storage parent lock and writes ledger before storage receipts', async () => {

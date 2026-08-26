@@ -51,6 +51,7 @@ export function prepareBankLedgerSaveEffects(
   characterId: number,
   storageEffects: readonly StorageAppliedEffect[],
   ledgerEffects: BankLedgerSaveEffects | undefined,
+  allowedGuildIds: readonly number[] = [],
 ): BankLedgerSaveEffects | undefined {
   if (!ledgerEffects) return undefined;
   const { owner, batches } = ledgerEffects;
@@ -73,6 +74,17 @@ export function prepareBankLedgerSaveEffects(
     )
   ) {
     throw new Error('bank ledger and storage save owners do not match');
+  }
+  const allowedGuilds = new Set(allowedGuildIds);
+  for (const batch of batches) {
+    for (const row of batch.rows) {
+      if (
+        row.container === 'guild' &&
+        (row.containerId === null || !allowedGuilds.has(row.containerId))
+      ) {
+        throw new Error('bank ledger guild rows require a matching guild bank save');
+      }
+    }
   }
   return batches.length > 0 ? ledgerEffects : undefined;
 }
