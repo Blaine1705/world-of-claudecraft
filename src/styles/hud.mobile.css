@@ -271,6 +271,23 @@
   body.mobile-touch.mobile-chat-open #mobile-move-zone {
     display: none;
   }
+  /* Pairing a controller to a phone: the movement/camera joysticks and the
+     combat action ring are exactly what the pad replaces (movement, camera
+     look, abilities via its own bindings and the cross hotbar), so they stand
+     down entirely rather than sitting on screen unused, the same way the
+     cross-hotbar overlay stands down for touch (further below, body.mobile-
+     touch .xhb). Menu-access chrome (Chat/Social/the Quick Actions seat) is
+     NOT part of this: only the direct gameplay-input surfaces yield. Keyed off
+     PAD CONNECTION (mobile_pad_chrome.ts, applied on GamepadManager's
+     onConnectionChange and after any gamepadEnabled setting change), not the
+     cross-hotbar overlay's own setting: a player who turns that overlay off
+     still drives movement/camera/attack through the pad's base bindings. */
+  body.mobile-touch.pad-connected #mobile-move-zone,
+  body.mobile-touch.pad-connected #mobile-move-joystick,
+  body.mobile-touch.pad-connected #mobile-camera-joystick,
+  body.mobile-touch.pad-connected #mobile-action-ring {
+    display: none;
+  }
   body.mobile-touch #mobile-move-joystick {
     opacity: 0.5;
     transition: opacity 0.12s linear;
