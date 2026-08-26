@@ -42,6 +42,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
+import { ignivarArenaFloorTileCenterHasStone } from '../sim/ignivar_arena';
 import {
   authoredLiftAt,
   authoredWallSegments,
@@ -73,6 +74,7 @@ import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
+import { buildIgnivarLavaMoat, ensureIgnivarLavaMoatAssets } from './ignivar_lava_moat';
 import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
 import {
   applyIgnivarTilePackEmissive,
@@ -755,6 +757,7 @@ export class DungeonInteriors {
       group,
       registry,
       async () => {
+        if (interior === 'ignivar') await ensureIgnivarLavaMoatAssets();
         const p = new Placements();
         // Every standard-layout interior routes its outer walls through the
         // hideable-wall path (formerly arena-only), so any wall crossing the
@@ -890,6 +893,7 @@ export class DungeonInteriors {
 
         this.emit(group, p, variant);
         if (interior === 'ignivar') {
+          group.add(buildIgnivarLavaMoat({ lowGfx: this.lowGfx }));
           group.add(buildIgnivarArenaAtmosphere({ lowGfx: this.lowGfx }));
         }
         const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx);
@@ -1754,6 +1758,10 @@ export class DungeonInteriors {
         // whose own center falls outside the polygon). Boundary tiles will
         // stair-step; accepted for this kit.
         if (poly && !polygonContainsPoint(poly, x, z)) continue;
+        // Ignivar's lethal mask consumes the exact union of these 4x4 floor
+        // tiles. Decide authoring from the same pure center predicate; the
+        // dedicated bridge decks are emitted by ignivar_lava_moat.ts.
+        if (variant === 'ignivar' && !ignivarArenaFloorTileCenterHasStone(x, z)) continue;
         let kind = this.floorKind(variant, hash2(x * 1.31, z));
         if (kind === 'grate' && Math.abs(x) < 4) kind = 'floor_tile_large'; // keep pits off the walk aisle
         if (kind === 'grate') {

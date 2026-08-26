@@ -58,6 +58,7 @@ import {
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
+import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -1166,6 +1167,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
+  tickIgnivarLavaHazard(ctx);
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     let occupied = false;

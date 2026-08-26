@@ -2,6 +2,8 @@
 // encounter driver, dungeon content, renderer, and tests all consume these
 // values so conduit placement and frontal resolution cannot drift.
 
+import { polygonContainsPoint } from './geometry2d';
+
 export type IgnivarConduitId = 'north_west' | 'north_east' | 'south_east' | 'south_west';
 
 export type IgnivarConduitState = 'ready' | 'active' | 'cooldown';
@@ -12,11 +14,96 @@ export interface IgnivarConduitPoint {
   z: number;
 }
 
+export const IGNIVAR_ARENA_SHELL_POLYGON = [
+  { x: -14, z: -33 },
+  { x: 14, z: -33 },
+  { x: 33, z: -14 },
+  { x: 33, z: 14 },
+  { x: 14, z: 33 },
+  { x: -14, z: 33 },
+  { x: -33, z: 14 },
+  { x: -33, z: -14 },
+] as const;
+
+/** The dry stone platform inside the perimeter moat. */
+export const IGNIVAR_PLAYABLE_FLOOR_POLYGON = [
+  { x: -12, z: -29 },
+  { x: 12, z: -29 },
+  { x: 29, z: -12 },
+  { x: 29, z: 12 },
+  { x: 12, z: 29 },
+  { x: -12, z: 29 },
+  { x: -29, z: 12 },
+  { x: -29, z: -12 },
+] as const;
+
+export const IGNIVAR_LAVA_MOAT_DEPTH = 0.8;
+export const IGNIVAR_LAVA_BRIDGE_HALF_WIDTH = 4;
+export const IGNIVAR_LAVA_BRIDGE_INNER_Z = 27.5;
+/** KayKit's authored Ignivar floor is a 4u grid. These origins are the exact
+ * first centers emitted by DungeonInteriors.placeFloor for IGNIVAR_LAYOUT. */
+export const IGNIVAR_FLOOR_TILE_SIZE = 4;
+export const IGNIVAR_FLOOR_GRID_X_ORIGIN = -33;
+export const IGNIVAR_FLOOR_GRID_Z_ORIGIN = -35;
+export const IGNIVAR_LAVA_MOAT_DAMAGE_FRACTION = Object.freeze({
+  normal: 0.15,
+  heroic: 0.2,
+});
+export const IGNIVAR_LAVA_MOAT_ABILITY_ID = 'ignivar_crucible_perimeter';
+export const IGNIVAR_LAVA_MOAT_ABILITY_NAME = 'Crucible Perimeter';
+
+export function ignivarArenaBridgeAt(x: number, z: number): boolean {
+  return (
+    polygonContainsPoint(IGNIVAR_ARENA_SHELL_POLYGON, x, z) &&
+    Math.abs(x) <= IGNIVAR_LAVA_BRIDGE_HALF_WIDTH &&
+    Math.abs(z) >= IGNIVAR_LAVA_BRIDGE_INNER_Z
+  );
+}
+
+/** Whether the renderer authors the 4x4 KayKit tile at this exact grid center.
+ * Bridges are separate exact-width decks and intentionally do not participate. */
+export function ignivarArenaFloorTileCenterHasStone(x: number, z: number): boolean {
+  return polygonContainsPoint(IGNIVAR_PLAYABLE_FLOOR_POLYGON, x, z);
+}
+
+/** Pointwise union of every visible 4x4 KayKit tile. Gameplay consumes the
+ * union, not the idealized octagon, so no visible slab can ever be lethal. */
+export function ignivarArenaTiledFloorAt(x: number, z: number): boolean {
+  const size = IGNIVAR_FLOOR_TILE_SIZE;
+  const half = size / 2;
+  const firstX =
+    IGNIVAR_FLOOR_GRID_X_ORIGIN + Math.floor((x - IGNIVAR_FLOOR_GRID_X_ORIGIN) / size) * size;
+  const firstZ =
+    IGNIVAR_FLOOR_GRID_Z_ORIGIN + Math.floor((z - IGNIVAR_FLOOR_GRID_Z_ORIGIN) / size) * size;
+
+  // At a shared tile edge either adjacent visible tile makes the point dry.
+  // Checking both candidate centers avoids assigning the exact boundary by a
+  // floating-point rounding convention that the renderer does not have.
+  for (const centerX of [firstX, firstX + size]) {
+    if (Math.abs(x - centerX) > half + 1e-6) continue;
+    for (const centerZ of [firstZ, firstZ + size]) {
+      if (Math.abs(z - centerZ) > half + 1e-6) continue;
+      if (ignivarArenaFloorTileCenterHasStone(centerX, centerZ)) return true;
+    }
+  }
+  return false;
+}
+
+export function ignivarArenaHasStoneFloorAt(x: number, z: number): boolean {
+  return ignivarArenaTiledFloorAt(x, z) || ignivarArenaBridgeAt(x, z);
+}
+
+export function ignivarArenaPointInLava(x: number, z: number): boolean {
+  return (
+    polygonContainsPoint(IGNIVAR_ARENA_SHELL_POLYGON, x, z) && !ignivarArenaHasStoneFloorAt(x, z)
+  );
+}
+
 export const IGNIVAR_CONDUITS: readonly IgnivarConduitPoint[] = [
-  { id: 'north_west', x: -22, z: 22 },
-  { id: 'north_east', x: 22, z: 22 },
-  { id: 'south_east', x: 22, z: -22 },
-  { id: 'south_west', x: -22, z: -22 },
+  { id: 'north_west', x: -18, z: 18 },
+  { id: 'north_east', x: 18, z: 18 },
+  { id: 'south_east', x: 18, z: -18 },
+  { id: 'south_west', x: -18, z: -18 },
 ];
 
 export const IGNIVAR_WATER_CONDUIT_TEMPLATES = {

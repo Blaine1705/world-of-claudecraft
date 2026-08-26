@@ -111,10 +111,10 @@ describe('Ignivar raid arena', () => {
 
   it('places four symmetric diagonal conductors around the central seal', () => {
     expect(IGNIVAR_CONDUITS).toEqual([
-      { id: 'north_west', x: -22, z: 22 },
-      { id: 'north_east', x: 22, z: 22 },
-      { id: 'south_east', x: 22, z: -22 },
-      { id: 'south_west', x: -22, z: -22 },
+      { id: 'north_west', x: -18, z: 18 },
+      { id: 'north_east', x: 18, z: 18 },
+      { id: 'south_east', x: 18, z: -18 },
+      { id: 'south_west', x: -18, z: -18 },
     ]);
   });
 
@@ -131,7 +131,7 @@ describe('Ignivar raid arena', () => {
       const facing = Math.atan2(conduit.x, conduit.z);
       expect(ignivarConduitHitByFrontal({ x: 0, z: 0 }, facing)).toBe(conduit.id);
     }
-    expect(ignivarConduitHitByFrontal({ x: -22, z: 22 }, 0)).not.toBe('north_west');
+    expect(ignivarConduitHitByFrontal({ x: -18, z: 18 }, 0)).not.toBe('north_west');
   });
 
   it('resolves three narrow rotating rays with a safe gap between every pair', () => {
@@ -183,9 +183,9 @@ describe('Ignivar raid arena', () => {
       })),
     );
     expect(dungeon.objects?.at(-1)).toMatchObject({
-      name: 'Sealed Inner Crucible Gate',
+      name: 'Sealed Assembly Gate',
       templateId: 'ignivar_raid_gate_locked',
-      dungeonId: 'ignivar_inner_crucible',
+      dungeonId: 'ignivar_molten_assembly',
       lootable: false,
     });
   });

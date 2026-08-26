@@ -1400,6 +1400,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/eastbrook_surface_atlas.webp": "/media/textures/eastbrook_surface_atlas.d66f2fab603a.webp",
   "textures/eastbrook_surface_normal.webp": "/media/textures/eastbrook_surface_normal.905e7210b9f3.webp",
   "textures/eastbrook_surface_rough.webp": "/media/textures/eastbrook_surface_rough.c236f266a994.webp",
+  "textures/encounters/ignivar/ignivar_lava_original.webp": "/media/textures/encounters/ignivar/ignivar_lava_original.7f09961b2ceb.webp",
   "textures/fenbridge_surface_atlas.webp": "/media/textures/fenbridge_surface_atlas.527a4afd4116.webp",
   "textures/fenbridge_surface_normal.webp": "/media/textures/fenbridge_surface_normal.d68714b1925f.webp",
   "textures/fenbridge_surface_roughness.webp": "/media/textures/fenbridge_surface_roughness.ea442943770b.webp",

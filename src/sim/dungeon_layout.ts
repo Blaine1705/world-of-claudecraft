@@ -5,6 +5,7 @@
 // the old hand-mirroring between renderer geometry and collider literals.
 // Sim layer: no three.js imports.
 import type { Collider } from './colliders';
+import { IGNIVAR_ARENA_SHELL_POLYGON } from './ignivar_arena';
 import {
   type AuthoredDecor,
   type AuthoredDoor,
@@ -324,16 +325,7 @@ export const IGNIVAR_LAYOUT: DungeonLayout = {
   tombs: [],
   stubs: [],
   dais: { x: 0, z: 0, r: 8 },
-  shellPolygon: [
-    { x: -14, z: -33 },
-    { x: 14, z: -33 },
-    { x: 33, z: -14 },
-    { x: 33, z: 14 },
-    { x: 14, z: 33 },
-    { x: -14, z: 33 },
-    { x: -33, z: 14 },
-    { x: -33, z: -14 },
-  ],
+  shellPolygon: [...IGNIVAR_ARENA_SHELL_POLYGON],
   shellPole: { x: 0, z: 0 },
 };
 
