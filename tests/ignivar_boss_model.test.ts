@@ -289,12 +289,14 @@ describe('Ignivar boss model', () => {
       expect(material.vertexShader).toContain('float mscale = length(modelMatrix[1].xyz);');
     }
     expect(plume.material.vertexShader).toContain('gl_PointSize = aSize * mscale * grow');
+    // The pow bases are clamped with max(x, 0.0): GLSL pow is undefined for a
+    // negative base, and some drivers return NaN, which blanks the whole plume.
     expect(plume.material.vertexShader).toMatch(
-      /\(pow\(life, 1\.3\) \* uReach \* 2\.0\s*\+\s*sin\([^;]+\) \* mscale;/s,
+      /\(pow\(max\(life, 0\.0\), 1\.3\) \* uReach \* 2\.0\s*\+\s*sin\([^;]+\) \* mscale;/s,
     );
     expect(smoke.material.vertexShader).toContain('float width = (0.018 + t * 0.085) * mscale;');
     expect(smoke.material.vertexShader).toContain(
-      'world.y += pow(t, 1.15) * uReach * 2.6 * mscale;',
+      'world.y += pow(max(t, 0.0), 1.15) * uReach * 2.6 * mscale;',
     );
     expect(shimmer.material.vertexShader).toContain(
       'float s = 0.55 * (0.8 + 0.4 * uIntensity) * mscale;',
