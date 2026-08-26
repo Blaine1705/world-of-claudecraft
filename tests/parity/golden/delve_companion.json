@@ -152,7 +152,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1007,
-      "state": "f1974e8e",
+      "state": "84529c27",
       "events": "006b44a2",
       "rng": {
         "draws": 5,
@@ -163,7 +163,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1007,
-      "state": "f64b12cf",
+      "state": "63e7805c",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -174,7 +174,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1007,
-      "state": "781f0cee",
+      "state": "eb268403",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -185,7 +185,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1007,
-      "state": "1217cd8f",
+      "state": "bb2332b4",
       "events": "7fe4245a",
       "rng": {
         "draws": 5,
@@ -196,7 +196,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1007,
-      "state": "2c3b336f",
+      "state": "5cebb274",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -207,7 +207,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1007,
-      "state": "c9512e74",
+      "state": "67674525",
       "events": "b1145bc2",
       "rng": {
         "draws": 8,
@@ -218,7 +218,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1007,
-      "state": "11b0ab68",
+      "state": "487c7e73",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -229,7 +229,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "444e1eee",
+      "state": "d5e41233",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -240,7 +240,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "444e1eee",
+      "state": "d5e41233",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -429,6 +429,7 @@
         {
           "aggroTargetId": 1002,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -486,7 +487,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1007,
-      "state": "ead65ac5",
+      "state": "1d060376",
       "events": "2282c15f",
       "rng": {
         "draws": 16,
@@ -676,6 +677,7 @@
         {
           "aggroTargetId": 1002,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.6,
           "comboUntil": -1,
           "critChance": 0.05,

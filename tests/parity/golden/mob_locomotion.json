@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1000,
-      "state": "ebe7ef81",
+      "state": "16cd2f3e",
       "events": "6beb4287",
       "rng": {
         "draws": 5,
@@ -278,6 +278,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -326,7 +327,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1001,
-      "state": "3feaee40",
+      "state": "c062268e",
       "events": "509a748c",
       "rng": {
         "draws": 10,
@@ -592,6 +593,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -637,6 +639,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -684,7 +687,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1002,
-      "state": "00e43b09",
+      "state": "5a3facdc",
       "events": "95fa62d4",
       "rng": {
         "draws": 15,
@@ -961,6 +964,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1006,6 +1010,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1050,6 +1055,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1098,7 +1104,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1003,
-      "state": "c9409e80",
+      "state": "1a05d261",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -1375,6 +1381,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1420,6 +1427,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1464,6 +1472,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1560,7 +1569,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1004,
-      "state": "1bc58fdc",
+      "state": "ba3b2185",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1837,6 +1846,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1882,6 +1892,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1926,6 +1937,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2065,7 +2077,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1005,
-      "state": "6ff6fb8f",
+      "state": "9fde381c",
       "events": "313f06ea",
       "rng": {
         "draws": 18,
@@ -2342,6 +2354,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2387,6 +2400,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2431,6 +2445,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2615,7 +2630,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1005,
-      "state": "c88b0014",
+      "state": "959d3eef",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -2892,6 +2907,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2937,6 +2953,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2981,6 +2998,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3166,7 +3184,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1005,
-      "state": "c88b0014",
+      "state": "959d3eef",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -3443,6 +3461,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3488,6 +3507,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3532,6 +3552,7 @@
         {
           "aggroTargetId": 997,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
