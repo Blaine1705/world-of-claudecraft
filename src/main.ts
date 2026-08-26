@@ -2620,6 +2620,10 @@ async function startGame(
       hud.setShowTargetOfTarget(settings.set('showTargetOfTarget', !!value));
       return;
     }
+    if (key === 'showTargetSwingTimer') {
+      hud.setShowTargetSwingTimer(settings.set('showTargetSwingTimer', !!value));
+      return;
+    }
     if (key === 'showPetFrame') {
       hud.setShowPetFrame(settings.set('showPetFrame', !!value));
       return;

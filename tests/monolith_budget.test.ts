@@ -261,7 +261,12 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Raised to the exact new count for the showTargetSwingTimer dispatch
+    // case: a three-line thin delegate onto hud.setShowTargetSwingTimer,
+    // exactly the shape every other boolean toggle's dispatch already takes
+    // in this method (main.ts is a firewall, not a home; the real state and
+    // paint logic live in settings.ts and target_swing_timer_bars.ts).
+    ceiling: 11570,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
