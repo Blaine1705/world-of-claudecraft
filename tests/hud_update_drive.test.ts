@@ -722,11 +722,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'selects the active source page for the touch action ring; no DOM write',
   },
   {
-    call: 'this.mobileActionSourceSlotCount',
+    call: 'this.groundAim.activeSlot',
     band: 'frame',
-    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    gate: 'actionBarWorld',
     surface: 'none',
-    why: 'counts the source slots that determine the touch action ring pagination; no DOM write',
+    why: 'stamps the armed ground-aim slot into the bar world snapshot so the owning button paints its aiming accent; no DOM write of its own',
   },
   {
     call: 'this.mobileActionRingPainter.paint',

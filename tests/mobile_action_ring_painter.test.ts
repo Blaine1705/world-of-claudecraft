@@ -355,12 +355,14 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       style: { setProperty(): void {} },
       classList: { toggle(): void {} },
       setAttribute(): void {},
+      removeAttribute(): void {},
     } as unknown as HTMLElement;
     const indicator = {
       textContent: '',
       style: { setProperty(): void {} },
       classList: { toggle(): void {} },
       setAttribute(): void {},
+      removeAttribute(): void {},
     } as unknown as HTMLElement;
     // Give the bar's own elements a real-ish shape too so ActionBarPainter's
     // writes succeed against the shared facet.
@@ -369,6 +371,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       style: { setProperty(): void {} },
       classList: { toggle(): void {} },
       setAttribute(): void {},
+      removeAttribute(): void {},
     });
     const bar = els.map(() => ({
       btn: realNode() as unknown as HTMLElement,

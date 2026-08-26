@@ -304,6 +304,9 @@ function recordingEl(tag: string, writes: string[]): HTMLElement {
     setAttribute(name: string, value: string): void {
       writes.push(`${name}=${value}`);
     },
+    removeAttribute(name: string): void {
+      writes.push(`${name}=REMOVED`);
+    },
   } as unknown as HTMLElement;
 }
 
