@@ -1506,6 +1506,10 @@ export function castAbility(
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: fallback.x, y: p.pos.y, z: fallback.z };
     }
+    if (ability.minRange && dist2d(p.pos, aimPoint) < ability.minRange) {
+      ctx.error(p.id, 'Too close!');
+      return;
+    }
   }
 
   if (p.sitting) ctx.standUp(p);
