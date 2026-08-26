@@ -33,6 +33,9 @@ import {
   WOC_MARKET_SOLD_LETTER,
 } from '../src/sim/content/letters';
 import type { InvSlot } from '../src/sim/types';
+// Deliberate cycle with ./db (which imports this module's SCHEMA const):
+// safe ONLY because `pool` is dereferenced inside function bodies, never at
+// module scope. Do not add module-scope pool usage here.
 import { pool } from './db';
 import { REALM } from './realm';
 
@@ -46,7 +49,8 @@ CREATE TABLE IF NOT EXISTS mail_custody_parcels (
   items JSONB NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS mail_custody_parcels_realm ON mail_custody_parcels (realm);
+CREATE INDEX IF NOT EXISTS mail_custody_parcels_realm_created
+  ON mail_custody_parcels (realm, created_at);
 `;
 
 export type CustodyParcelLetter = 'delivery' | 'return' | 'sold_notice';
@@ -115,72 +119,162 @@ export function snapshotPendingCustodyRefs(): string[] {
   return [...pendingBake];
 }
 
-/** Delete the snapshotted rows after their full-book write provably
- *  committed. Deliberately non-throwing: this runs AFTER the commit, so a
- *  failure here must not re-mark a committed save as failed. Rows linger,
- *  their refs stay pending (removed only on successful delete), and the
- *  next full-book write retries; a crash meanwhile replays them through the
- *  book-once dedupe. */
-export async function deleteBakedCustodyRefs(refs: readonly string[]): Promise<void> {
+/** Issue the bake DELETE on the SAME client, INSIDE the transaction that
+ *  makes the book durable: "blob durable without the parcel" and "row gone"
+ *  must commit together, or two failed post-commit deletes bracketing a
+ *  collection would leave a row that replays a collected parcel (the
+ *  structural exactly-once the old whole-book write had for free). A throw
+ *  here rolls the book write back with it, which is the correct atomicity.
+ *  The realm qualifier is defensive scoping (refs are globally unique
+ *  today). */
+export async function deleteBakedCustodyRefsIn(
+  query: (text: string, values: unknown[]) => Promise<unknown>,
+  refs: readonly string[],
+): Promise<void> {
   if (refs.length === 0) return;
-  try {
-    await pool.query(`DELETE FROM mail_custody_parcels WHERE custody_ref = ANY($1::text[])`, [
-      [...refs],
-    ]);
-    for (const ref of refs) pendingBake.delete(ref);
-  } catch (err) {
-    console.error('[mail_custody] baked row delete failed (the next book write retries):', err);
-  }
+  await query(
+    `DELETE FROM mail_custody_parcels WHERE custody_ref = ANY($1::text[]) AND realm = $2`,
+    [[...refs], REALM],
+  );
+}
+
+/** Forget the baked refs AFTER their transaction committed (never before: a
+ *  rollback must leave them pending so the next write re-bakes them). */
+export function confirmBakedCustodyRefs(refs: readonly string[]): void {
+  for (const ref of refs) pendingBake.delete(ref);
+}
+
+// The last boot merge's counts plus the live bake-set size, for the market
+// monitor readout: a growing overlay table or a stuck refused row must be
+// visible to an operator without a log grep.
+let lastMergeCounts: CustodyOverlayMergeCounts | null = null;
+export function custodyOverlayStats(): {
+  pendingBake: number;
+  lastMerge: CustodyOverlayMergeCounts | null;
+} {
+  return { pendingBake: pendingBake.size, lastMerge: lastMergeCounts };
+}
+
+/** Residue reaper for the nightly retention sweep. The bake and the boot
+ *  merge's stale cutoff clean every healthy row, so this drains only the
+ *  residue those paths structurally cannot reach: refused rows an operator
+ *  never resolved, and rows for a realm no process serves any more. The
+ *  window is a constant (deliberately no env knob, the stepup-challenges
+ *  pattern): far past any plausible investigation, and rows this old
+ *  describe parcels whose settlement machinery gave up long ago. */
+export const MAIL_CUSTODY_RESIDUE_RETENTION_DAYS = 30;
+
+export async function pruneMailCustodyParcelsBatch(batchSize: number): Promise<number> {
+  const res = await pool.query(
+    `DELETE FROM mail_custody_parcels
+      WHERE ctid IN (
+        SELECT ctid FROM mail_custody_parcels
+         WHERE created_at < now() - ($1 || ' days')::interval
+         ORDER BY created_at
+         LIMIT $2)`,
+    [String(MAIL_CUSTODY_RESIDUE_RETENTION_DAYS), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 function isCustodyParcelLetter(value: unknown): value is CustodyParcelLetter {
   return value === 'delivery' || value === 'return' || value === 'sold_notice';
 }
 
-/** Boot merge: replay every surviving overlay row for this realm through the
+/** The boot merge's page bound: past it the merge logs loudly and leaves the
+ *  remainder for the next boot or bake, so a pathological backlog can never
+ *  hold the boot path hostage. */
+export const MERGE_PAGE_LIMIT = 10_000;
+
+export interface CustodyOverlayMergeCounts {
+  replayed: number;
+  present: number;
+  refused: number;
+  stale: number;
+}
+
+/** Boot merge: replay the surviving overlay rows for this realm through the
  *  book-once parcel entry. A parcel already in the loaded blob dedupes on
  *  its custodyRef; one the crash window lost re-books. Every accounted ref
- *  joins pendingBake so the next full-book write cleans its row. A row that
- *  is refused AND absent (its items no longer validate, which a parcel that
- *  booked once should never hit) is kept in the table and reported, so the
- *  operator can attribute it instead of it silently vanishing. */
+ *  joins pendingBake so the next full-book write cleans its row.
+ *
+ *  THE STALE CUTOFF is the rollback-window guard: a row whose created_at
+ *  predates the mail blob's own updated_at describes a parcel that some
+ *  committed full-book write already accounted for, in the blob or durably
+ *  collected out of it (the writers snapshot at entry, and only this realm's
+ *  single process writes its blob), so replaying it could re-book a
+ *  COLLECTED parcel: the one dupe an old binary running without the bake
+ *  could otherwise leave behind. Stale rows are deleted, never replayed;
+ *  both timestamps are database-clock now(), so no host skew. A row that is
+ *  fresh but refused (its items no longer validate, which a parcel that
+ *  booked once should never hit) is kept and reported for the operator, and
+ *  becomes stale, then cleaned, once a later book write postdates it.
+ *
+ *  Never throws: the book already loaded successfully by the time this runs,
+ *  and a merge failure must read as "parcels replay on a later boot", not as
+ *  a mail-load failure. */
 export async function mergeCustodyParcelOverlay(
   book: CustodyParcelBook,
-): Promise<{ replayed: number; present: number; refused: number }> {
-  const res = await pool.query(
-    `SELECT custody_ref, recipient_key, recipient_name, letter, items
-     FROM mail_custody_parcels WHERE realm = $1 ORDER BY created_at, custody_ref`,
-    [REALM],
-  );
-  let replayed = 0;
-  let present = 0;
-  let refused = 0;
-  for (const r of res.rows) {
-    const ref = String(r.custody_ref);
-    const letter: unknown = r.letter;
-    if (!isCustodyParcelLetter(letter) || !Array.isArray(r.items)) {
-      refused++;
-      console.error(`[mail_custody] overlay row malformed for custodyRef ${ref}`);
-      continue;
-    }
-    const recipient = { key: String(r.recipient_key), name: String(r.recipient_name) };
-    if (book.mailSystemParcel(recipient, CUSTODY_PARCEL_LETTERS[letter], r.items, ref)) {
-      replayed++;
-    } else if (book.hasCustodyParcel(ref)) {
-      present++;
-    } else {
-      refused++;
-      console.error(`[mail_custody] overlay replay refused for custodyRef ${ref}`);
-      continue;
-    }
-    pendingBake.add(ref);
-  }
-  if (replayed > 0 || refused > 0) {
-    console.log(
-      `mail custody overlay: ${replayed} parcels replayed, ${present} already in the book, ${refused} refused`,
+): Promise<CustodyOverlayMergeCounts> {
+  const counts: CustodyOverlayMergeCounts = { replayed: 0, present: 0, refused: 0, stale: 0 };
+  try {
+    // The blob's durability point (db.ts mailStateKey format).
+    const blob = await pool.query(`SELECT updated_at FROM world_state WHERE key = $1`, [
+      `mail:${REALM}`,
+    ]);
+    const bookWrittenAtMs = blob.rows[0] ? new Date(blob.rows[0].updated_at).getTime() : null;
+    const res = await pool.query(
+      `SELECT custody_ref, recipient_key, recipient_name, letter, items, created_at
+       FROM mail_custody_parcels WHERE realm = $1 ORDER BY created_at, custody_ref
+       LIMIT ${MERGE_PAGE_LIMIT}`,
+      [REALM],
     );
+    const staleRefs: string[] = [];
+    for (const r of res.rows) {
+      const ref = String(r.custody_ref);
+      if (bookWrittenAtMs !== null && new Date(r.created_at).getTime() <= bookWrittenAtMs) {
+        staleRefs.push(ref);
+        continue;
+      }
+      const letter: unknown = r.letter;
+      if (!isCustodyParcelLetter(letter) || !Array.isArray(r.items)) {
+        counts.refused++;
+        console.error(`[mail_custody] overlay row malformed for custodyRef ${ref}`);
+        continue;
+      }
+      const recipient = { key: String(r.recipient_key), name: String(r.recipient_name) };
+      if (book.mailSystemParcel(recipient, CUSTODY_PARCEL_LETTERS[letter], r.items, ref)) {
+        counts.replayed++;
+      } else if (book.hasCustodyParcel(ref)) {
+        counts.present++;
+      } else {
+        counts.refused++;
+        console.error(`[mail_custody] overlay replay refused for custodyRef ${ref}`);
+        continue;
+      }
+      pendingBake.add(ref);
+    }
+    if (staleRefs.length > 0) {
+      counts.stale = staleRefs.length;
+      await pool.query(`DELETE FROM mail_custody_parcels WHERE custody_ref = ANY($1::text[])`, [
+        staleRefs,
+      ]);
+    }
+    if (res.rows.length >= MERGE_PAGE_LIMIT) {
+      console.error(
+        `[mail_custody] overlay merge page full at ${MERGE_PAGE_LIMIT} rows; remainder waits for the next boot or bake`,
+      );
+    }
+    if (res.rows.length > 0) {
+      console.log(
+        `mail custody overlay: ${counts.replayed} parcels replayed, ${counts.present} already in the book, ${counts.refused} refused, ${counts.stale} stale rows cleaned`,
+      );
+    }
+  } catch (err) {
+    console.error('[mail_custody] overlay merge failed (parcels replay on a later boot):', err);
   }
-  return { replayed, present, refused };
+  lastMergeCounts = counts;
+  return counts;
 }
 
 /** Test-only: the module-level bake set survives across cases otherwise. */

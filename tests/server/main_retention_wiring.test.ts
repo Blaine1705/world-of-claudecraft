@@ -237,6 +237,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'woc_market_directed_offers',
       'woc_market_custody_claims',
       'woc_market_stepup_challenges',
+      'mail_custody_parcels',
       'woc_market_listings',
     ]);
     expect(new Set(names).size).toBe(names.length);

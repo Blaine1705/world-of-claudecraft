@@ -88,7 +88,7 @@ describeDb('mail custody overlay (REAL Postgres)', () => {
     overlay.resetCustodyParcelOverlayForTests();
     const sim2 = new Sim({ seed: 43, playerClass: 'warrior', noPlayer: true });
     const merged = await overlay.mergeCustodyParcelOverlay(sim2);
-    expect(merged).toEqual({ replayed: 1, present: 0, refused: 0 });
+    expect(merged).toEqual({ replayed: 1, present: 0, refused: 0, stale: 0 });
     expect(sim2.hasCustodyParcel(REF)).toBe(true);
 
     // CLEAN SHUTDOWN: the next full-book write carries the parcel; the bake
@@ -103,6 +103,22 @@ describeDb('mail custody overlay (REAL Postgres)', () => {
     sim3.loadMail(await db.loadMailState());
     expect(sim3.hasCustodyParcel(REF)).toBe(true);
     const remerge = await overlay.mergeCustodyParcelOverlay(sim3);
-    expect(remerge).toEqual({ replayed: 0, present: 0, refused: 0 });
+    expect(remerge).toEqual({ replayed: 0, present: 0, refused: 0, stale: 0 });
+
+    // The rollback guard end to end: a row PREDATING the blob's own
+    // durability point describes a parcel some committed book write already
+    // accounted for; the merge deletes it instead of replaying it.
+    await pool.query(
+      `INSERT INTO mail_custody_parcels (custody_ref, realm, recipient_key, recipient_name, letter, items, created_at)
+       VALUES ('stale:pg:1', $1, '4242', 'Buyer', 'delivery', $2::jsonb, now() - interval '1 hour')`,
+      [(await import('../server/realm')).REALM, JSON.stringify(ROW.items)],
+    );
+    const sim4 = new Sim({ seed: 45, playerClass: 'warrior', noPlayer: true });
+    sim4.loadMail(await db.loadMailState());
+    const staleMerge = await overlay.mergeCustodyParcelOverlay(sim4);
+    expect(staleMerge).toEqual({ replayed: 0, present: 0, refused: 0, stale: 1 });
+    expect(sim4.hasCustodyParcel('stale:pg:1')).toBe(false);
+    const left = await pool.query(`SELECT count(*)::int AS n FROM mail_custody_parcels`);
+    expect(left.rows[0].n).toBe(0);
   });
 });

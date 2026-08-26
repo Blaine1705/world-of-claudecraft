@@ -58,7 +58,8 @@ import {
 } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
 import {
-  deleteBakedCustodyRefs,
+  confirmBakedCustodyRefs,
+  deleteBakedCustodyRefsIn,
   MAIL_CUSTODY_PARCELS_SCHEMA,
   snapshotPendingCustodyRefs,
 } from './mail_custody_overlay';
@@ -3518,8 +3519,10 @@ export async function saveCharacterAndMarketState(
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
     await writeGuildBankRows(client, guildBanks ?? [], results);
+    // The custody bake rides this same fenced transaction (see saveMailState).
+    await deleteBakedCustodyRefsIn((text, values) => client.query(text, values), bakedCustodyRefs);
     await client.query('COMMIT');
-    await deleteBakedCustodyRefs(bakedCustodyRefs);
+    confirmBakedCustodyRefs(bakedCustodyRefs);
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -4500,11 +4503,32 @@ export async function saveMailState(save: MailSave): Promise<void> {
   // Custody overlay bake (mail_custody_overlay.ts): the snapshot runs before
   // anything awaits, and no awaited gap separates the caller's
   // serializeMail() from this entry, so every snapshotted parcel is inside
-  // `save` or durably collected out of it. The delete runs only after the
-  // book committed and is non-throwing by contract.
+  // `save` or durably collected out of it. The bake DELETE rides the SAME
+  // transaction as the book upsert: the blob without a parcel and the row's
+  // removal must commit together, or a failed post-commit delete bracketing
+  // a collection could later replay a collected parcel.
   const bakedCustodyRefs = snapshotPendingCustodyRefs();
-  await saveWorldState(mailStateKey(REALM), save);
-  await deleteBakedCustodyRefs(bakedCustodyRefs);
+  if (bakedCustodyRefs.length === 0) {
+    await saveWorldState(mailStateKey(REALM), save);
+    return;
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+      [mailStateKey(REALM), JSON.stringify(save)],
+    );
+    await deleteBakedCustodyRefsIn((text, values) => client.query(text, values), bakedCustodyRefs);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+  confirmBakedCustodyRefs(bakedCustodyRefs);
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are
