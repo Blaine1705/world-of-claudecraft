@@ -33,7 +33,10 @@
 // back in, restores dataReady, and sets needsUpdate; the re-upload's onUpdate
 // re-releases them to stubs. Until a texture's transcode lands, an upload
 // shows it black rather than crashing; the graphics-rebuild curtain awaits
-// ktx2MipsRestored() so that path never reveals stubs. The in-place GPU-loss
+// ktx2MipsRestored() so that path normally never reveals stubs, bounded by
+// KTX2_RESTORE_MAX_WAIT_MS so a large session-wide backlog cannot hold the
+// curtain past a few seconds (any restore still in flight past the bound
+// keeps running and swaps in on its own next render). The in-place GPU-loss
 // path (no curtain) accepts a black window of a few seconds on the affected
 // world props while the workers catch up: a designed, self-healing transient
 // on an exceptional recovery path.
@@ -307,19 +310,82 @@ function releaseAfterUpload(tex: ReleasableCompressedTexture, entry: ReleaseEntr
 /** Kick the re-transcode for every released texture. Wired to the game
  *  canvas's webglcontextlost listener in src/main.ts, which fires for both
  *  in-place GPU loss and the graphics-rebuild context recycle. Idempotent:
- *  textures already restoring are left to their in-flight transcode. */
+ *  textures already restoring are left to their in-flight transcode.
+ *
+ *  Started MOST-RECENTLY-ARMED FIRST, reversing the registry's session
+ *  insertion order: on the graphics-rebuild path (the only path with a bound,
+ *  see ktx2MipsRestored) the entries that armed most recently are the ones the
+ *  player most likely still has in view, and the shared transcode pool only
+ *  has capacity to land some of a large session-wide backlog before the bound
+ *  fires. Kicking off oldest-first would spend that capacity on zones the
+ *  player is no longer near, at the direct expense of the ones they are
+ *  standing next to. Correctness does not depend on order (every entry starts
+ *  its own restore), only which finish before an unrelated caller stops
+ *  awaiting them. */
 export function ktx2MipsOnContextLost(): void {
   if (!rederive) return;
-  for (const [tex, entry] of entries.entries()) {
-    if (entry.state === 'released') startRestore(tex, entry);
+  const released: [ReleasableCompressedTexture, ReleaseEntry][] = [];
+  for (const pair of entries.entries()) {
+    if (pair[1].state === 'released') released.push(pair);
+  }
+  for (let i = released.length - 1; i >= 0; i--) {
+    const [tex, entry] = released[i] as [ReleasableCompressedTexture, ReleaseEntry];
+    startRestore(tex, entry);
   }
 }
 
-/** Resolves when every re-transcode in flight at call time has settled
- *  (success or failure). The graphics-rebuild curtain awaits this so a reveal
- *  never shows stub-black world textures. */
-export function ktx2MipsRestored(): Promise<void> {
-  return Promise.allSettled([...inflightRestores]).then(() => undefined);
+/** Bound on how long the graphics-rebuild curtain (`ktx2MipsRestored`'s
+ *  default) may hold for outstanding restores before revealing anyway. The
+ *  `entries` registry is session-wide and weakly keyed: a long session that has
+ *  visited many zones can carry a large backlog of released textures that are
+ *  no longer near the player, and every graphics-preset switch's context
+ *  recycle kicks off a restore for ALL of them (ktx2MipsOnContextLost), not
+ *  just the ones the rebuilt scene is about to show. Without a bound this made
+ *  a routine settings change hold the curtain for however long that backlog
+ *  took to drain through the shared transcode worker pool. Set to the
+ *  TIGHTEST of this rebuild's sibling bounds (renderer.ts's
+ *  VIEW_PREWARM_MAX_MS = 3000, far_terrain.ts's FAR_VISTA_ENTRY_MAX_WAIT_MS =
+ *  4000), not the loosest: this stage protects a purely cosmetic,
+ *  self-healing transient (a stub-black texture that repaints itself once its
+ *  restore lands), while the other two protect a horizon pop and real
+ *  first-draw links, so it is the stage that can most afford to give up early.
+ *  A restore still in flight past the bound keeps running and swaps in on its
+ *  own next render: the same accepted transient the in-place GPU-loss path
+ *  already lives with (see the module header). */
+export const KTX2_RESTORE_MAX_WAIT_MS = 3000;
+
+/** Resolves once every re-transcode in flight at call time has settled
+ *  (success or failure), or after `maxWaitMs`, whichever comes first; resolves
+ *  to `true` on the former, `false` on the latter (so a caller can tell
+ *  whether the bound actually fired). The graphics-rebuild curtain awaits this
+ *  (at the default bound) so a reveal normally shows no stub-black world
+ *  textures, without risking an unbounded hold against a large session-wide
+ *  backlog. `Infinity` (or any other non-finite value) waits outright, same as
+ *  waitForPrefetch's Infinity arm in prewarm_resume.ts: setTimeout would
+ *  otherwise coerce it to fire almost immediately, the exact opposite of what
+ *  a caller spelling "no bound" means. */
+export function ktx2MipsRestored(maxWaitMs: number = KTX2_RESTORE_MAX_WAIT_MS): Promise<boolean> {
+  const settled = Promise.allSettled([...inflightRestores]).then(() => true as const);
+  if (inflightRestores.size === 0 || !Number.isFinite(maxWaitMs)) return settled;
+  return new Promise((resolve) => {
+    let done = false;
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      // Dev-channel English: a field recurrence of the reported hang must be
+      // visible, not silently absorbed by the bound that replaced it.
+      console.warn(
+        `[ktx2] restore bound hit with ${inflightRestores.size} texture(s) still restoring; continuing in the background`,
+      );
+      resolve(false);
+    }, maxWaitMs);
+    void settled.then(() => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      resolve(true);
+    });
+  });
 }
 
 /** Source bytes currently retained for restore (stashed plus armed/released),
