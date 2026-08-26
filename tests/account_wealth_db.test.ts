@@ -34,10 +34,10 @@ vi.mock('../server/db', () => ({
 import {
   ACCOUNT_WEALTH_SWEEP_LOCK_KEY,
   accountWealthBreakdown,
+  aggregateEscrowTotals,
   applyEscrowTotals,
   LARGE_GOLD_MOVEMENTS_TIMEOUT_MS,
   largeGoldMovementsForAccount,
-  listEscrowStateRows,
   refreshAccountPurseTotals,
   topWealthHolders,
   withAccountWealthSweepLock,
@@ -103,12 +103,68 @@ describe('refreshAccountPurseTotals', () => {
   });
 });
 
-describe('listEscrowStateRows', () => {
-  it('reads only the realm-scoped mail/market blobs (never the legacy bare row)', async () => {
-    query.mockResolvedValueOnce(queryResult([{ key: 'mail:eastbrook', data: { mail: [] } }]));
-    const rows = await listEscrowStateRows();
-    expect(rows).toEqual([{ key: 'mail:eastbrook', data: { mail: [] } }]);
-    expect(query.mock.calls[0][0]).toMatch(/key LIKE 'mail:%' OR key LIKE 'market:%'/);
+describe('aggregateEscrowTotals', () => {
+  it('aggregates inside Postgres on the heavy allowance, never shipping a blob to Node', async () => {
+    query.mockResolvedValueOnce(
+      queryResult([
+        {
+          character_id: '12',
+          character_name: null,
+          realm: null,
+          mail_copper: '750',
+          market_copper: '0',
+        },
+        {
+          character_id: null,
+          character_name: 'Oldname',
+          realm: 'eastbrook',
+          mail_copper: '0',
+          market_copper: '300',
+        },
+      ]),
+    );
+    const totals = await aggregateEscrowTotals();
+    expect(totals).toEqual([
+      { characterId: 12, characterName: null, realm: null, mailCopper: 750, marketCopper: 0 },
+      {
+        characterId: null,
+        characterName: 'Oldname',
+        realm: 'eastbrook',
+        mailCopper: 0,
+        marketCopper: 300,
+      },
+    ]);
+    // Rides the heavy allowance like the purse scan (the expansion detoasts
+    // every realm's blobs), never the bare pool default.
+    expect(runWithStatementTimeout).toHaveBeenCalledTimes(1);
+    expect(runWithStatementTimeout.mock.calls[0][0]).toBe(60_000);
+    expect(boundedQuery).toHaveBeenCalledTimes(1);
+    const sql = boundedQuery.mock.calls[0][0];
+    // The core of the fix: the data column is expanded in SQL, never selected
+    // whole for a Node-side parse.
+    expect(sql).not.toMatch(/SELECT key, data/);
+    expect(sql).toMatch(/jsonb_array_elements/);
+    // Realm scoping matches the retired Node fold: realm-keyed blobs only,
+    // never the bare legacy 'market' rollback row.
+    expect(sql).toMatch(/key LIKE 'mail:%'/);
+    expect(sql).toMatch(/key LIKE 'market:%'/);
+    // The malformed-blob guard: the lateral input is CASE-guarded on
+    // jsonb_typeof so a non-array 'mail'/'collections' yields zero rows
+    // instead of failing the whole sweep statement.
+    expect(sql).toMatch(
+      /jsonb_array_elements\(\s*CASE WHEN jsonb_typeof\(w\.data->'mail'\) = 'array' THEN w\.data->'mail' END\s*\)/,
+    );
+    expect(sql).toMatch(
+      /jsonb_array_elements\(\s*CASE WHEN jsonb_typeof\(w\.data->'collections'\) = 'array' THEN w\.data->'collections' END\s*\)/,
+    );
+    // Entry guards mirror positiveCopper + the string-key requirement.
+    expect(sql).toMatch(/jsonb_typeof\(elem->'recipientKey'\) = 'string'/);
+    expect(sql).toMatch(/jsonb_typeof\(elem->'key'\) = 'string'/);
+    expect(sql).toMatch(/floor\(\(elem->>'copper'\)::numeric\) >= 1/);
+    // The id-key line is Number.MAX_SAFE_INTEGER, same as the Node oracle's
+    // Number.isSafeInteger, and the house-stock '' key is skipped.
+    expect(sql).toMatch(/9007199254740991/);
+    expect(sql).toMatch(/raw_key <> ''/);
   });
 });
 

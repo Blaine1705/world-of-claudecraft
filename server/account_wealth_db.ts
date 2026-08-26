@@ -147,14 +147,88 @@ export interface EscrowStateRow {
   data: unknown;
 }
 
-/** Every realm's mail and market blob (the escrow inputs the sweep parses in
- *  Node). The retained bare legacy 'market' rollback row does not match the
- *  'market:%' pattern and is deliberately excluded. */
-export async function listEscrowStateRows(): Promise<EscrowStateRow[]> {
-  const res = await pool.query(
-    `SELECT key, data FROM world_state WHERE key LIKE 'mail:%' OR key LIKE 'market:%'`,
+// Number.MAX_SAFE_INTEGER, the id-key bound the retired Node fold enforced via
+// Number.isSafeInteger; the SQL arm must draw the identical line so a key just
+// past it stays name-resolved on both sides.
+const MAX_SAFE_INTEGER_SQL = '9007199254740991';
+
+/** Per-character escrow totals aggregated INSIDE Postgres. The jsonb
+ *  expansion of every realm's mail and market blob never leaves the database:
+ *  the result set is proportional to the number of distinct recipients with
+ *  escrowed copper, never to the size of the books (the production mail row
+ *  has been 89 MB; shipping and JSON.parse-ing it in Node blocked the world
+ *  loop for hundreds of ms every sweep tick).
+ *
+ *  Semantics mirror the Node fold `escrowTotalsFromStateRows` exactly (that
+ *  fold is retained in server/account_wealth.ts as the parity oracle, pinned
+ *  by tests/account_wealth_pg_integration.test.ts): realm is everything after
+ *  the key's first colon; the bare legacy 'market' rollback row does not
+ *  match 'market:%' and is excluded; a letter or collection entry counts only
+ *  when its recipient key is a string and its copper is a number whose floor
+ *  is at least 1; keys are trimmed and the house-stock '' key is skipped;
+ *  an all-digit key within Number.MAX_SAFE_INTEGER resolves by character id
+ *  (merged across realms), anything else stays a realm-scoped legacy name.
+ *
+ *  Both expansions scan every realm's blobs, so the read rides the heavy
+ *  allowance like refreshAccountPurseTotals. The CASE around each
+ *  jsonb_array_elements input is load-bearing: the lateral evaluates before
+ *  any WHERE guard could, and a malformed blob whose 'mail'/'collections' is
+ *  not an array must yield zero rows, not fail the whole sweep. */
+export async function aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]> {
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `WITH entries AS (
+         SELECT substr(w.key, strpos(w.key, ':') + 1) AS realm,
+                btrim(elem->>'recipientKey') AS raw_key,
+                floor((elem->>'copper')::numeric)::bigint AS copper,
+                true AS is_mail
+         FROM world_state w
+         CROSS JOIN LATERAL jsonb_array_elements(
+           CASE WHEN jsonb_typeof(w.data->'mail') = 'array' THEN w.data->'mail' END
+         ) AS elem
+         WHERE w.key LIKE 'mail:%'
+           AND jsonb_typeof(elem->'recipientKey') = 'string'
+           AND jsonb_typeof(elem->'copper') = 'number'
+           AND floor((elem->>'copper')::numeric) >= 1
+         UNION ALL
+         SELECT substr(w.key, strpos(w.key, ':') + 1),
+                btrim(elem->>'key'),
+                floor((elem->>'copper')::numeric)::bigint,
+                false
+         FROM world_state w
+         CROSS JOIN LATERAL jsonb_array_elements(
+           CASE WHEN jsonb_typeof(w.data->'collections') = 'array' THEN w.data->'collections' END
+         ) AS elem
+         WHERE w.key LIKE 'market:%'
+           AND jsonb_typeof(elem->'key') = 'string'
+           AND jsonb_typeof(elem->'copper') = 'number'
+           AND floor((elem->>'copper')::numeric) >= 1
+       ),
+       keyed AS (
+         SELECT CASE WHEN raw_key ~ '^[0-9]+$' AND raw_key::numeric <= ${MAX_SAFE_INTEGER_SQL}
+                     THEN (raw_key::numeric)::bigint END AS character_id,
+                realm, raw_key, copper, is_mail
+         FROM entries
+         WHERE raw_key <> ''
+       )
+       SELECT character_id,
+              CASE WHEN character_id IS NULL THEN raw_key END AS character_name,
+              CASE WHEN character_id IS NULL THEN realm END AS realm,
+              COALESCE(sum(copper) FILTER (WHERE is_mail), 0)::bigint AS mail_copper,
+              COALESCE(sum(copper) FILTER (WHERE NOT is_mail), 0)::bigint AS market_copper
+       FROM keyed
+       GROUP BY character_id,
+                CASE WHEN character_id IS NULL THEN raw_key END,
+                CASE WHEN character_id IS NULL THEN realm END`,
+    ),
   );
-  return res.rows.map((row) => ({ key: row.key, data: row.data }));
+  return res.rows.map((row) => ({
+    characterId: row.character_id === null ? null : Number(row.character_id),
+    characterName: row.character_name ?? null,
+    realm: row.realm ?? null,
+    mailCopper: Number(row.mail_copper),
+    marketCopper: Number(row.market_copper),
+  }));
 }
 
 /** Per-character escrow totals resolved by stable character id, or (for legacy
