@@ -65,6 +65,7 @@ const {
 } = require('./diagnostics.cjs');
 const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
+const { allowGpuUnderSteamOverlay } = require('./steam_overlay_guard.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
 const {
@@ -229,6 +230,14 @@ if (gpuForceDisabledByEnv) {
 } else {
   forceHighPerformanceGpu({ app, log });
 }
+
+// Steam preloads its overlay into every native Linux game, and with that library mapped
+// Chromium's GPU process cannot start: the browser process gives up with a CHECK and the app
+// dies on SIGTRAP with no window and no log, which is the launching spinner that never ends.
+// Relaxing the GPU sandbox is enough and is the narrowest fix; the renderer stays sandboxed.
+// Applies ONLY when Steam actually injected, so an ordinary launch keeps the full sandbox.
+// Must be before app 'ready', like the switches above, or Chromium never reads it.
+allowGpuUnderSteamOverlay({ app, log });
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'

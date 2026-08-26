@@ -394,6 +394,39 @@ Linux AppImage caveat: the updater requires the `APPIMAGE` env (set automaticall
 when running a real AppImage); running the raw unpacked binary logs an updater error
 and skips, by design.
 
+Steam-on-Linux caveat: Steam preloads `gameoverlayrenderer.so` into every native Linux game
+it launches, and with that library mapped Chromium's GPU process cannot start. The browser
+process retries, gives up, and dies on a `CHECK`:
+
+```
+FATAL:content/browser/gpu/gpu_data_manager_impl_private.cc] GPU process isn't usable. Goodbye.
+```
+
+`SIGTRAP`, no window, no `main.log`. To a player that is Steam's launching spinner, forever.
+`electron/steam_overlay_guard.cjs` appends `--disable-gpu-sandbox` when, and only when, the
+overlay is actually preloaded. Measured on a Steam Deck with the overlay in place: no flags
+crashes; `--disable-gpu-sandbox`, `--no-sandbox` and `--in-process-gpu` all boot. The narrowest
+one ships, because the RENDERER sandbox is the boundary that contains page content and it stays
+on. It boots on real hardware rather than falling back to software (3 runs of 3 reported the
+Deck's AMD adapter `0x1002:0x1435` active, with `webgl`, `gpu_compositing` and `rasterization`
+all `enabled`), which is the thing to re-check if this is ever changed: a "fix" that silently
+swapped in SwiftShader would be worse than the crash.
+
+Two things that look like fixes and are not, both measured rather than assumed:
+- **Stripping the overlay from `LD_PRELOAD`.** It cannot be done from inside the app, since
+  `ld.so` reads the variable at exec time. Every shape of re-exec fails: a detached parent exits
+  at once and Steam reads that as the game closing; a parent blocked in `spawnSync` cannot run a
+  signal handler, and the child lands in its own `app-world-of-claudecraft-<pid>.scope` while the
+  parent stays in `app-steam@autostart.service`, so Steam's stop kills the parent and strands the
+  game; a supervising parent can forward signals but is itself an Electron process with the
+  overlay mapped, so it dies of the crash it exists to avoid.
+- **Turning the overlay off in Steam.** It does not stop the injection. With `AllowOverlay=0` on
+  the shortcut, Steam still handed the launch both `gameoverlayrenderer.so` paths. Do not ship a
+  Linux depot betting on the Steamworks per-app overlay setting.
+
+Verify a Steam launch by grepping `main.log` for `[steam] Steam overlay detected`. This applies
+to the Steam depot channel as much as to a non-Steam shortcut, since Steam injects either way.
+
 ## Steam
 
 Build: `npm run electron:build:steam` on each OS runner (signing env still applies on
