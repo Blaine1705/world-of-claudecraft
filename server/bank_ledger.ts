@@ -64,7 +64,7 @@
 // retention sweep's table list, which is where an operator looks first.
 
 import type { BankInfo, GuildBankInfo, GuildBankLogOp, VaultInfo } from '../src/world_api';
-import { insertBankLedgerRow, insertBankLedgerRows } from './db';
+import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from './db';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { gameMetricsCounters } from './http/game_signals';
 import { REALM } from './realm';
@@ -251,23 +251,9 @@ export function recordBankOp(
   opts: BankBuyOpts = {},
 ): void {
   try {
-    for (const delta of diffBankOp(op, before, after, opts)) {
+    for (const row of buildPersonalBankLedgerRows(op, who, before, after, opts)) {
       tail = tail
-        .then(() =>
-          insertBankLedgerRow({
-            realm: REALM,
-            characterId: who.characterId,
-            accountId: who.accountId,
-            op,
-            itemId: delta.itemId,
-            count: delta.count,
-            instance: delta.instance,
-            copperDelta: delta.copperDelta,
-            purchasedSlotsAfter: delta.purchasedSlotsAfter,
-            container: 'personal',
-            containerId: null,
-          }),
-        )
+        .then(() => insertBankLedgerRow(row))
         .catch((err) => {
           console.error('bank_ledger write failed:', err);
         });
@@ -276,6 +262,32 @@ export function recordBankOp(
     // The observer must never fault the dispatch path.
     console.error('bank_ledger recordBankOp failed:', err);
   }
+}
+
+/** Build the complete durable rows for one personal-bank command. The wire
+ *  admission path and the legacy fire-and-forget observer share this pure
+ *  projection so moving persistence into the character save cannot drift the
+ *  audit shape. Array order is the differ's command order. */
+export function buildPersonalBankLedgerRows(
+  op: BankLedgerOp,
+  who: { characterId: number; accountId: number },
+  before: BankOpSnapshot | null,
+  after: BankOpSnapshot | null,
+  opts: BankBuyOpts = {},
+): BankLedgerRow[] {
+  return diffBankOp(op, before, after, opts).map((delta) => ({
+    realm: REALM,
+    characterId: who.characterId,
+    accountId: who.accountId,
+    op,
+    itemId: delta.itemId,
+    count: delta.count,
+    instance: delta.instance,
+    copperDelta: delta.copperDelta,
+    purchasedSlotsAfter: delta.purchasedSlotsAfter,
+    container: 'personal',
+    containerId: null,
+  }));
 }
 
 /** One socket-op diff element: the row's own op beside its delta, because a
@@ -377,19 +389,7 @@ export function recordBankSocketOp(
   after: BankInfo | null,
 ): void {
   try {
-    const rows = diffBankSocketOp(before, after).map(({ op, delta }) => ({
-      realm: REALM,
-      characterId: who.characterId,
-      accountId: who.accountId,
-      op,
-      itemId: delta.itemId,
-      count: delta.count,
-      instance: delta.instance,
-      copperDelta: delta.copperDelta,
-      purchasedSlotsAfter: delta.purchasedSlotsAfter,
-      container: 'personal' as const,
-      containerId: null,
-    }));
+    const rows = buildBankSocketLedgerRows(who, before, after);
     if (rows.length === 0) return;
     tail = tail
       .then(() => insertBankLedgerRows(rows))
@@ -400,6 +400,28 @@ export function recordBankSocketOp(
     // The observer must never fault the dispatch path.
     console.error('bank_ledger recordBankSocketOp failed:', err);
   }
+}
+
+/** Build the complete rows for one socket command. A swap deliberately keeps
+ *  the differ's unsocket-then-socket order inside one logical batch. */
+export function buildBankSocketLedgerRows(
+  who: { characterId: number; accountId: number },
+  before: BankInfo | null,
+  after: BankInfo | null,
+): BankLedgerRow[] {
+  return diffBankSocketOp(before, after).map(({ op, delta }) => ({
+    realm: REALM,
+    characterId: who.characterId,
+    accountId: who.accountId,
+    op,
+    itemId: delta.itemId,
+    count: delta.count,
+    instance: delta.instance,
+    copperDelta: delta.copperDelta,
+    purchasedSlotsAfter: delta.purchasedSlotsAfter,
+    container: 'personal' as const,
+    containerId: null,
+  }));
 }
 
 /**
@@ -611,19 +633,7 @@ export function recordVaultOp(
   after: VaultInfo | null,
 ): void {
   try {
-    const rows = diffVaultOp(op, before, after).map((delta) => ({
-      realm: REALM,
-      characterId: who.characterId,
-      accountId: who.accountId,
-      op,
-      itemId: delta.itemId,
-      count: delta.count,
-      instance: delta.instance,
-      copperDelta: delta.copperDelta,
-      purchasedSlotsAfter: delta.purchasedSlotsAfter,
-      container: 'vault' as const,
-      containerId: null,
-    }));
+    const rows = buildVaultLedgerRows(op, who, before, after);
     if (rows.length === 0) return;
     tail = tail
       .then(() => insertBankLedgerRows(rows))
@@ -651,6 +661,29 @@ export function recordVaultOp(
     gameMetricsCounters().vaultLedgerIncident('ledger_write_failed');
     console.error(`bank_ledger recordVaultOp failed for character ${who.characterId}:`, err);
   }
+}
+
+/** Build the complete durable rows for one vault command. Multi-material
+ *  sweeps retain the differ's stable sorted order inside one command batch. */
+export function buildVaultLedgerRows(
+  op: VaultLedgerOp,
+  who: { characterId: number; accountId: number },
+  before: VaultInfo | null,
+  after: VaultInfo | null,
+): BankLedgerRow[] {
+  return diffVaultOp(op, before, after).map((delta) => ({
+    realm: REALM,
+    characterId: who.characterId,
+    accountId: who.accountId,
+    op,
+    itemId: delta.itemId,
+    count: delta.count,
+    instance: delta.instance,
+    copperDelta: delta.copperDelta,
+    purchasedSlotsAfter: delta.purchasedSlotsAfter,
+    container: 'vault',
+    containerId: null,
+  }));
 }
 
 // ---------------------------------------------------------------------------
@@ -690,6 +723,28 @@ export interface VaultCraftConsumption {
   upgrades: number;
 }
 
+/** Build the complete rows for one or more completed craft casts. Input order
+ *  and each event's sorted take order become durable row order. */
+export function buildVaultCraftConsumeLedgerRows(
+  consumptions: readonly VaultCraftConsumption[],
+): BankLedgerRow[] {
+  return consumptions.flatMap((c) =>
+    c.takes.map((take) => ({
+      realm: REALM,
+      characterId: c.who.characterId,
+      accountId: c.who.accountId,
+      op: 'craft_consume',
+      itemId: take.itemId,
+      count: take.count,
+      instance: null,
+      copperDelta: 0,
+      purchasedSlotsAfter: c.upgrades,
+      container: 'vault',
+      containerId: null,
+    })),
+  );
+}
+
 /** Rows are built from `consumptions` SYNCHRONOUSLY, before this function
  *  returns: callers (VaultCraftConsumeBatch.flush) drain and reuse the array
  *  they pass, so moving the row build inside the FIFO promise chain would
@@ -697,21 +752,7 @@ export interface VaultCraftConsumption {
  *  contract says "not retained"; keep both. */
 export function recordVaultCraftConsume(consumptions: readonly VaultCraftConsumption[]): void {
   try {
-    const rows = consumptions.flatMap((c) =>
-      c.takes.map((take) => ({
-        realm: REALM,
-        characterId: c.who.characterId,
-        accountId: c.who.accountId,
-        op: 'craft_consume' as const,
-        itemId: take.itemId,
-        count: take.count,
-        instance: null,
-        copperDelta: 0,
-        purchasedSlotsAfter: c.upgrades,
-        container: 'vault' as const,
-        containerId: null,
-      })),
-    );
+    const rows = buildVaultCraftConsumeLedgerRows(consumptions);
     if (rows.length === 0) return;
     tail = tail
       .then(() => insertBankLedgerRows(rows))
@@ -785,6 +826,12 @@ export type GuildBankLedgerOp =
   // replay accounts for the removal instead of reading it as an unexplained
   // shortfall, and so an operator can find every purge with one WHERE clause.
   | 'admin_purge';
+
+export type GuildBankRecordedOp =
+  | GuildBankLedgerOp
+  | 'create_fee'
+  | typeof GUILD_BANK_ESCROW_DEFICIT_OP
+  | typeof GUILD_BANK_COUNTERPARTY_ORPHAN_OP;
 
 // The guild multiset key: itemId + instance payload + craft provenance. The
 // third dimension exists because guild deltas feed the revert path
@@ -914,16 +961,13 @@ export function diffGuildBankOp(
 // diffGuildBankOp (it needs the success signal to mark the book dirty), so
 // this only enqueues; an empty array writes nothing.
 export function recordGuildBankDeltas(
-  op:
-    | GuildBankLedgerOp
-    | 'create_fee'
-    | typeof GUILD_BANK_ESCROW_DEFICIT_OP
-    | typeof GUILD_BANK_COUNTERPARTY_ORPHAN_OP,
+  op: GuildBankRecordedOp,
   who: { characterId: number; accountId: number },
   guildId: number,
   deltas: readonly BankOpDelta[],
 ): void {
   try {
+    const rows = buildGuildBankLedgerRows(op, who, guildId, deltas);
     // The inserts THIS call enqueues, so the post-write bust below can wait on
     // exactly them. The module FIFO `tail` is process-global (every character's
     // personal and guild rows share it), so chaining on the tail would make one
@@ -931,7 +975,10 @@ export function recordGuildBankDeltas(
     // minutes later on a slow database, invalidating an entry that is fresh by
     // then. That is an extra query at the worst possible moment.
     const enqueued: Promise<void>[] = [];
-    for (const delta of deltas) {
+    for (let index = 0; index < deltas.length; index++) {
+      const delta = deltas[index];
+      const row = rows[index];
+      if (!delta || !row) throw new Error('guild bank ledger row projection lost alignment');
       // The nullable counterparty columns rest entirely on "NULL can only ever
       // mean a row written before they existed". Nothing in the schema enforces
       // that: the fields are optional on BankOpDelta and the insert coerces
@@ -959,26 +1006,7 @@ export function recordGuildBankDeltas(
         }
       }
       tail = tail
-        .then(() =>
-          insertBankLedgerRow({
-            realm: REALM,
-            characterId: who.characterId,
-            accountId: who.accountId,
-            op,
-            itemId: delta.itemId,
-            count: delta.count,
-            instance: delta.instance,
-            copperDelta: delta.copperDelta,
-            purchasedSlotsAfter: delta.purchasedSlotsAfter,
-            container: 'guild',
-            containerId: guildId,
-            // The payer/payee half. A guild delta always carries it (the
-            // observer stamps every one), so a NULL in this column can only
-            // ever mean a pre-feature row.
-            counterpartyCopperDelta: delta.counterpartyCopperDelta ?? null,
-            counterpartyCount: delta.counterpartyCount ?? null,
-          }),
-        )
+        .then(() => insertBankLedgerRow(row))
         .catch((err) => {
           // A rejected insert is a HOLE in the keep-forever audit trail: the
           // op happened in the live book but scripts/bank_audit.mjs can never
@@ -1019,6 +1047,31 @@ export function recordGuildBankDeltas(
     gameMetricsCounters().guildBankIncident('ledger_write_failed');
     console.error('bank_ledger recordGuildBankDeltas failed:', err);
   }
+}
+
+/** Build complete guild rows from the already-computed command deltas. The
+ *  pure batch projection is shared by fenced saves and the legacy observer. */
+export function buildGuildBankLedgerRows(
+  op: GuildBankRecordedOp,
+  who: { characterId: number; accountId: number },
+  guildId: number,
+  deltas: readonly BankOpDelta[],
+): BankLedgerRow[] {
+  return deltas.map((delta) => ({
+    realm: REALM,
+    characterId: who.characterId,
+    accountId: who.accountId,
+    op,
+    itemId: delta.itemId,
+    count: delta.count,
+    instance: delta.instance,
+    copperDelta: delta.copperDelta,
+    purchasedSlotsAfter: delta.purchasedSlotsAfter,
+    container: 'guild',
+    containerId: guildId,
+    counterpartyCopperDelta: delta.counterpartyCopperDelta ?? null,
+    counterpartyCount: delta.counterpartyCount ?? null,
+  }));
 }
 
 // The ANOMALY op. Not an op a player performed: an escrow save whose own book

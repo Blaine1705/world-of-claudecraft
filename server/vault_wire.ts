@@ -34,7 +34,13 @@ import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
 import type { SimEvent } from '../src/sim/types';
 import { DT } from '../src/sim/types';
 import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
-import { recordVaultCraftConsume, recordVaultOp, type VaultCraftConsumption } from './bank_ledger';
+import {
+  buildVaultLedgerRows,
+  recordVaultCraftConsume,
+  recordVaultOp,
+  type VaultCraftConsumption,
+} from './bank_ledger';
+import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 
 /** The cvault snapshot cadence. The gate exists because cvault INVERTS the
  *  vault key's cost property: vaultInfoFor is null (cheap) away from a
@@ -50,6 +56,10 @@ export const CVAULT_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * CVAUL
 /** The slice of Sim the vault dispatch bodies call; a narrow host interface
  *  so a Vitest drives the bodies without a GameServer. */
 export interface VaultSim {
+  ctx: {
+    resolve(pid?: number): { meta: { entityId: number } } | null;
+    error(id: number, text: string): void;
+  };
   vaultInfoFor(pid?: number): VaultInfo | null;
   vaultDeposit(slot: number, count?: number, pid?: number): void;
   vaultWithdraw(itemId: string, count?: number, pid?: number): void;
@@ -174,42 +184,90 @@ export type VaultCommandName =
   | 'vault_deposit_all'
   | 'vault_buy_upgrade';
 
+function refuseLedgerAdmission(sim: VaultSim, pid: number): void {
+  const entityId = sim.ctx.resolve(pid)?.meta.entityId;
+  if (entityId !== undefined) sim.ctx.error(entityId, 'You are busy.');
+}
+
+/** Undefined preserves the temporary legacy observer path. Null means the
+ *  live session has no admission owner and must refuse before mutation. */
+function reserveLedgerRows(
+  admission: BankLedgerAdmission | null | undefined,
+  sim: VaultSim,
+  pid: number,
+  maxRows: number,
+): BankLedgerAdmissionHandle | null | undefined {
+  if (admission === undefined) return undefined;
+  const reservation = admission?.tryReserve(maxRows) ?? null;
+  if (!reservation) refuseLedgerAdmission(sim, pid);
+  return reservation;
+}
+
+function runReservedSimCall<T>(
+  reservation: BankLedgerAdmissionHandle | undefined,
+  call: () => T,
+): T {
+  try {
+    return call();
+  } catch (err) {
+    reservation?.cancel();
+    throw err;
+  }
+}
+
 /** The four vault command-case bodies, moved verbatim from dispatchMessage.
  *  Shape-only checks here (the bank_* idiom): the Sim owns every gameplay
  *  rule (banker proximity, material scope, the per-material cap, the exact
  *  upgrade copper). Deposit takes a carried-inventory index in `slot` with an
  *  optional partial `count`; withdraw is keyed by `itemId` because vault
  *  stock has no slots.
- *  The bank_ledger observer is WIRED (container='vault'), on the same terms
- *  as the bank cases: OBSERVATIONAL and fire-and-forget, never awaited and
- *  never a gameplay dependency. The sim methods return void and emit no
- *  success event, so recordVaultOp derives success by DIFFING the
- *  vaultInfoFor snapshot before and after each call, never from the absence
- *  of an exception; a refused/no-op call diffs empty and writes no row. */
+ *  The live bank_ledger path reserves bounded outbox capacity before mutation,
+ *  then derives the exact command batch by DIFFING vaultInfoFor before and
+ *  after. A refused/no-op call diffs empty and cancels its reservation.
+ *  Undefined admission preserves the fire-and-forget recorder for isolated
+ *  callers until every host supplies a character-owned outbox. */
 export function dispatchVaultCommand(
   sim: VaultSim,
   who: { characterId: number; accountId: number },
   cmd: VaultCommandName,
   msg: Record<string, unknown>,
   pid: number,
+  admission?: BankLedgerAdmission | null,
 ): void {
   switch (cmd) {
     case 'vault_deposit':
       if (typeof msg.slot === 'number') {
-        const before = sim.vaultInfoFor(pid);
-        sim.vaultDeposit(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
-        recordVaultOp('deposit', who, before, sim.vaultInfoFor(pid));
+        const slot = msg.slot;
+        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        if (reservation === null) break;
+        const before = runReservedSimCall(reservation, () => {
+          const snapshot = sim.vaultInfoFor(pid);
+          sim.vaultDeposit(slot, count, pid);
+          return snapshot;
+        });
+        const after = sim.vaultInfoFor(pid);
+        if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
+        else recordVaultOp('deposit', who, before, after);
       }
       break;
     case 'vault_withdraw':
       if (typeof msg.itemId === 'string') {
+        const itemId = msg.itemId;
         const special = msg.special === undefined ? undefined : decodeVaultSpecialRef(msg.special);
         if (special === null) break;
-        const before = sim.vaultInfoFor(pid);
+        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        if (reservation === null) break;
         const count = typeof msg.count === 'number' ? msg.count : undefined;
-        if (special === undefined) sim.vaultWithdraw(msg.itemId, count, pid);
-        else sim.vaultWithdraw(msg.itemId, count, special, pid);
-        recordVaultOp('withdraw', who, before, sim.vaultInfoFor(pid));
+        const before = runReservedSimCall(reservation, () => {
+          const snapshot = sim.vaultInfoFor(pid);
+          if (special === undefined) sim.vaultWithdraw(itemId, count, pid);
+          else sim.vaultWithdraw(itemId, count, special, pid);
+          return snapshot;
+        });
+        const after = sim.vaultInfoFor(pid);
+        if (reservation) reservation.commit(buildVaultLedgerRows('withdraw', who, before, after));
+        else recordVaultOp('withdraw', who, before, after);
       }
       break;
     case 'vault_deposit_all': {
@@ -217,15 +275,29 @@ export function dispatchVaultCommand(
       // shape guard; the Sim owns every per-slot rule. ONE before/after diff
       // spans the whole batch, so recordVaultOp writes the sweep's rows (one
       // per material moved) as ONE batched insert.
-      const before = sim.vaultInfoFor(pid);
-      sim.vaultDepositAll(pid);
-      recordVaultOp('deposit', who, before, sim.vaultInfoFor(pid));
+      const reservation = reserveLedgerRows(admission, sim, pid, 112);
+      if (reservation === null) break;
+      const before = runReservedSimCall(reservation, () => {
+        const snapshot = sim.vaultInfoFor(pid);
+        sim.vaultDepositAll(pid);
+        return snapshot;
+      });
+      const after = sim.vaultInfoFor(pid);
+      if (reservation) reservation.commit(buildVaultLedgerRows('deposit', who, before, after));
+      else recordVaultOp('deposit', who, before, after);
       break;
     }
     case 'vault_buy_upgrade': {
-      const before = sim.vaultInfoFor(pid);
-      sim.vaultBuyUpgrade(pid);
-      recordVaultOp('buy_slots', who, before, sim.vaultInfoFor(pid));
+      const reservation = reserveLedgerRows(admission, sim, pid, 1);
+      if (reservation === null) break;
+      const before = runReservedSimCall(reservation, () => {
+        const snapshot = sim.vaultInfoFor(pid);
+        sim.vaultBuyUpgrade(pid);
+        return snapshot;
+      });
+      const after = sim.vaultInfoFor(pid);
+      if (reservation) reservation.commit(buildVaultLedgerRows('buy_slots', who, before, after));
+      else recordVaultOp('buy_slots', who, before, after);
       break;
     }
     default: {

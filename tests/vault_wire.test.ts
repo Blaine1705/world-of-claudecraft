@@ -1571,6 +1571,10 @@ describe('vault_wire module units', () => {
   const calls: string[] = [];
   const withdrawArgs: unknown[][] = [];
   const unitSim = (): VaultSim => ({
+    ctx: {
+      resolve: () => ({ meta: { entityId: 9 } }),
+      error: (_id, text) => void calls.push(`error:${text}`),
+    },
     vaultInfoFor: () => null,
     vaultDeposit: (slot, count) => void calls.push(`deposit:${slot}:${count}`),
     vaultWithdraw: (itemId, count, ...rest: unknown[]) => {

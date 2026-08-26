@@ -18,14 +18,20 @@
 // equip_bag wire shape verbatim: `item` + optional integer `socket` +
 // optional integer `slot`), so one client idiom covers both socket families.
 //
-// The bank_ledger observer is WIRED on the same terms as the vault cases:
-// OBSERVATIONAL and fire-and-forget, never awaited and never a gameplay
-// dependency. The sim methods return void and emit no success event, so the
-// recorders derive success by DIFFING the bankInfoFor snapshot before and
-// after each call; a refused/no-op call diffs empty and writes no row.
+// The live bank_ledger path reserves bounded outbox capacity before mutation,
+// then derives the exact command batch by DIFFING bankInfoFor before and after.
+// A refused/no-op call diffs empty and cancels its reservation. Undefined
+// admission preserves the fire-and-forget recorder for isolated callers until
+// every host supplies a character-owned outbox.
 import { bankPurchasedSlotsFor } from '../src/sim/bank';
 import type { BankInfo } from '../src/world_api';
-import { recordBankOp, recordBankSocketOp } from './bank_ledger';
+import {
+  buildBankSocketLedgerRows,
+  buildPersonalBankLedgerRows,
+  recordBankOp,
+  recordBankSocketOp,
+} from './bank_ledger';
+import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 import { storagePurchaseInFlight } from './storage_purchases';
 import { nextRungClaudiumPriceFor } from './storage_store_cache';
 
@@ -58,26 +64,78 @@ export type BankCommandName =
   | 'bank_socket_bag'
   | 'bank_unsocket_bag';
 
+function refuseLedgerAdmission(sim: BankSim, pid: number): void {
+  const entityId = sim.ctx.resolve(pid)?.meta.entityId;
+  if (entityId !== undefined) sim.ctx.error(entityId, 'You are busy.');
+}
+
+/** Undefined preserves the temporary legacy observer path. Null means the
+ *  live session has no admission owner and must refuse before mutation. */
+function reserveLedgerRows(
+  admission: BankLedgerAdmission | null | undefined,
+  sim: BankSim,
+  pid: number,
+  maxRows: number,
+): BankLedgerAdmissionHandle | null | undefined {
+  if (admission === undefined) return undefined;
+  const reservation = admission?.tryReserve(maxRows) ?? null;
+  if (!reservation) refuseLedgerAdmission(sim, pid);
+  return reservation;
+}
+
+function runReservedSimCall<T>(
+  reservation: BankLedgerAdmissionHandle | undefined,
+  call: () => T,
+): T {
+  try {
+    return call();
+  } catch (err) {
+    reservation?.cancel();
+    throw err;
+  }
+}
+
 export function dispatchBankCommand(
   sim: BankSim,
   who: { characterId: number; accountId: number },
   cmd: BankCommandName,
   msg: Record<string, unknown>,
   pid: number,
+  admission?: BankLedgerAdmission | null,
 ): void {
   switch (cmd) {
     case 'bank_deposit':
       if (typeof msg.slot === 'number') {
-        const before = sim.bankInfoFor(pid);
-        sim.bankDeposit(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
-        recordBankOp('deposit', who, before, sim.bankInfoFor(pid));
+        const slot = msg.slot;
+        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        if (reservation === null) break;
+        const before = runReservedSimCall(reservation, () => {
+          const snapshot = sim.bankInfoFor(pid);
+          sim.bankDeposit(slot, count, pid);
+          return snapshot;
+        });
+        const after = sim.bankInfoFor(pid);
+        if (reservation)
+          reservation.commit(buildPersonalBankLedgerRows('deposit', who, before, after));
+        else recordBankOp('deposit', who, before, after);
       }
       break;
     case 'bank_withdraw':
       if (typeof msg.slot === 'number') {
-        const before = sim.bankInfoFor(pid);
-        sim.bankWithdraw(msg.slot, typeof msg.count === 'number' ? msg.count : undefined, pid);
-        recordBankOp('withdraw', who, before, sim.bankInfoFor(pid));
+        const slot = msg.slot;
+        const count = typeof msg.count === 'number' ? msg.count : undefined;
+        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        if (reservation === null) break;
+        const before = runReservedSimCall(reservation, () => {
+          const snapshot = sim.bankInfoFor(pid);
+          sim.bankWithdraw(slot, count, pid);
+          return snapshot;
+        });
+        const after = sim.bankInfoFor(pid);
+        if (reservation)
+          reservation.commit(buildPersonalBankLedgerRows('withdraw', who, before, after));
+        else recordBankOp('withdraw', who, before, after);
       }
       break;
     case 'bank_buy_slots': {
@@ -93,12 +151,24 @@ export function dispatchBankCommand(
         }
         break;
       }
-      const before = sim.bankInfoFor(pid);
-      sim.bankBuySlots(pid);
+      const reservation = reserveLedgerRows(admission, sim, pid, 1);
+      if (reservation === null) break;
+      const before = runReservedSimCall(reservation, () => {
+        const snapshot = sim.bankInfoFor(pid);
+        sim.bankBuySlots(pid);
+        return snapshot;
+      });
+      const after = sim.bankInfoFor(pid);
       // The gold rail stamps its paid-with dimension from the server-derived
       // path (never the request); the Claudium rail's twin row is written by
       // the purchase flow's apply site.
-      recordBankOp('buy_slots', who, before, sim.bankInfoFor(pid), { paidWith: 'gold' });
+      if (reservation) {
+        reservation.commit(
+          buildPersonalBankLedgerRows('buy_slots', who, before, after, { paidWith: 'gold' }),
+        );
+      } else {
+        recordBankOp('buy_slots', who, before, after, { paidWith: 'gold' });
+      }
       break;
     }
     // The socket trio (Bank Storage phase 07). One socket differ observes all
@@ -107,29 +177,52 @@ export function dispatchBankCommand(
     case 'bank_unlock_socket': {
       // Argument-free like bank_buy_slots: the Sim charges the table price for
       // the next socket in order, or refuses without mutating anything.
-      const before = sim.bankInfoFor(pid);
-      sim.bankUnlockSocket(pid);
-      recordBankSocketOp(who, before, sim.bankInfoFor(pid));
+      const reservation = reserveLedgerRows(admission, sim, pid, 1);
+      if (reservation === null) break;
+      const before = runReservedSimCall(reservation, () => {
+        const snapshot = sim.bankInfoFor(pid);
+        sim.bankUnlockSocket(pid);
+        return snapshot;
+      });
+      const after = sim.bankInfoFor(pid);
+      if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
+      else recordBankSocketOp(who, before, after);
       break;
     }
     case 'bank_socket_bag':
       if (typeof msg.item === 'string') {
+        const itemId = msg.item;
         // The equip_bag gate shapes, verbatim: a present-but-malformed socket
         // or slot reads as undefined (first-empty scan / legacy newest-first
         // walk), never as index 0; the sim re-validates range and ownership.
         const socket =
           typeof msg.socket === 'number' && Number.isInteger(msg.socket) ? msg.socket : undefined;
         const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-        const before = sim.bankInfoFor(pid);
-        sim.bankSocketBag(msg.item, socket, pid, slot);
-        recordBankSocketOp(who, before, sim.bankInfoFor(pid));
+        const reservation = reserveLedgerRows(admission, sim, pid, 2);
+        if (reservation === null) break;
+        const before = runReservedSimCall(reservation, () => {
+          const snapshot = sim.bankInfoFor(pid);
+          sim.bankSocketBag(itemId, socket, pid, slot);
+          return snapshot;
+        });
+        const after = sim.bankInfoFor(pid);
+        if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
+        else recordBankSocketOp(who, before, after);
       }
       break;
     case 'bank_unsocket_bag':
       if (typeof msg.socket === 'number' && Number.isInteger(msg.socket)) {
-        const before = sim.bankInfoFor(pid);
-        sim.bankUnsocketBag(msg.socket, pid);
-        recordBankSocketOp(who, before, sim.bankInfoFor(pid));
+        const socket = msg.socket;
+        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        if (reservation === null) break;
+        const before = runReservedSimCall(reservation, () => {
+          const snapshot = sim.bankInfoFor(pid);
+          sim.bankUnsocketBag(socket, pid);
+          return snapshot;
+        });
+        const after = sim.bankInfoFor(pid);
+        if (reservation) reservation.commit(buildBankSocketLedgerRows(who, before, after));
+        else recordBankSocketOp(who, before, after);
       }
       break;
     default: {
