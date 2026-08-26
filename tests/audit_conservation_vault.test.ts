@@ -115,6 +115,7 @@ import {
   VAULT_UPGRADE_STEP,
   vaultMaterialIds,
 } from '../src/sim/materials_vault';
+import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, SimEvent, WorldContent } from '../src/sim/types';
 import { completeCraftCast } from './helpers/enchant_family_cast';
@@ -385,15 +386,22 @@ function moveToBanker(sim: Sim, pid: number): void {
   throw new Error('no banker NPC spawned in the trimmed world');
 }
 
-function makeWorld(seed: number): World {
+function makeWorld(seed: number, reusableSim?: Sim): World {
   store.reset();
-  const sim = new Sim({
-    seed,
-    playerClass: 'warrior',
-    autoEquip: false,
-    world: VAULT_TEST_WORLD,
-  });
-  const pid = sim.playerId;
+  const sim =
+    reusableSim ??
+    new Sim({
+      seed,
+      playerClass: 'warrior',
+      autoEquip: false,
+      noPlayer: true,
+      world: VAULT_TEST_WORLD,
+    });
+  // Reusing the expensive static world must not reuse a prior run's random
+  // stream. The property still gets the exact per-seed Sim RNG it had when it
+  // constructed a whole world for every case.
+  sim.rng = new Rng(seed);
+  const pid = sim.addPlayer('warrior', `Vault audit ${seed}`, { autoEquip: false });
   moveToBanker(sim, pid);
   const meta = metaOf(sim, pid);
   // A clean slate: the vault starts empty and LOCKED (rung 0), which is what
@@ -917,14 +925,14 @@ interface RunResult {
   rows: number;
 }
 
-async function runSteps(seed: number, steps: Step[]): Promise<RunResult> {
+async function runSteps(seed: number, steps: Step[], reusableSim?: Sim): Promise<RunResult> {
   // vi.fn retains every call's arguments, and a sweep runs hundreds of
   // sequences inside ONE `it`: nothing here reads the histories, so they are
   // bounded to a single run rather than a whole test (the guild file's
   // clearStoreHistory note, which cost a CI shard an OOM before it existed).
   store.insertBankLedgerRow.mockClear();
   store.insertBankLedgerRows.mockClear();
-  const w = makeWorld(seed);
+  const w = makeWorld(seed, reusableSim);
   coverage.runs++;
 
   const fail = (at: string, problems: string[]): RunResult => ({
@@ -933,74 +941,81 @@ async function runSteps(seed: number, steps: Step[]): Promise<RunResult> {
     rows: store.rows.length,
   });
 
-  for (let i = 0; i < steps.length; i++) {
-    coverage.steps++;
-    const problems = applyStep(w, steps[i]);
-    problems.push(...conservationViolations(w));
-    if (problems.length > 0) {
-      await bankLedgerIdle();
-      return fail(`after step ${i} (${fmtStep(steps[i])})`, problems);
+  try {
+    for (let i = 0; i < steps.length; i++) {
+      coverage.steps++;
+      const problems = applyStep(w, steps[i]);
+      problems.push(...conservationViolations(w));
+      if (problems.length > 0) {
+        await bankLedgerIdle();
+        return fail(`after step ${i} (${fmtStep(steps[i])})`, problems);
+      }
     }
-  }
 
-  // The ledger is fire-and-forget: drain the FIFO tail before reading it, or
-  // the audit replays an empty table and passes for the wrong reason.
-  await bankLedgerIdle();
-  const rows = [...store.rows];
+    // The ledger is fire-and-forget: drain the FIFO tail before reading it, or
+    // the audit replays an empty table and passes for the wrong reason.
+    await bankLedgerIdle();
+    const rows = [...store.rows];
 
-  const shape: string[] = [];
-  for (const row of rows) {
-    if (row.container !== 'vault')
-      shape.push(`row ${row.id} carries container ${String(row.container)}`);
-    if (row.container_id !== null) shape.push(`row ${row.id} carries a container_id`);
-    if (row.character_id !== CHARACTER_ID)
-      shape.push(`row ${row.id} books character ${String(row.character_id)}`);
-    if (row.realm !== REALM) shape.push(`row ${row.id} books realm ${String(row.realm)}`);
-  }
-  const consumeRows = rows.filter((row) => row.op === 'craft_consume');
-  if (consumeRows.length !== w.expectedConsume.length) {
-    shape.push(
-      `${consumeRows.length} craft_consume rows for ${w.expectedConsume.length} recorded takes`,
-    );
-  }
-  consumeRows.forEach((row, i) => {
-    const want = w.expectedConsume[i];
-    if (!want) return;
-    if (row.item_id !== want.itemId || row.count !== want.count) {
+    const shape: string[] = [];
+    for (const row of rows) {
+      if (row.container !== 'vault')
+        shape.push(`row ${row.id} carries container ${String(row.container)}`);
+      if (row.container_id !== null) shape.push(`row ${row.id} carries a container_id`);
+      if (row.character_id !== CHARACTER_ID)
+        shape.push(`row ${row.id} books character ${String(row.character_id)}`);
+      if (row.realm !== REALM) shape.push(`row ${row.id} books realm ${String(row.realm)}`);
+    }
+    const consumeRows = rows.filter((row) => row.op === 'craft_consume');
+    if (consumeRows.length !== w.expectedConsume.length) {
       shape.push(
-        `craft_consume row ${row.id} says ${String(row.item_id)} x${String(row.count)}, the event took ${want.itemId} x${want.count}`,
+        `${consumeRows.length} craft_consume rows for ${w.expectedConsume.length} recorded takes`,
       );
     }
-    if (row.purchased_slots_after !== want.rung) {
-      shape.push(
-        `craft_consume row ${row.id} carries rung ${String(row.purchased_slots_after)}, the vault stood at ${want.rung}`,
+    consumeRows.forEach((row, i) => {
+      const want = w.expectedConsume[i];
+      if (!want) return;
+      if (row.item_id !== want.itemId || row.count !== want.count) {
+        shape.push(
+          `craft_consume row ${row.id} says ${String(row.item_id)} x${String(row.count)}, the event took ${want.itemId} x${want.count}`,
+        );
+      }
+      if (row.purchased_slots_after !== want.rung) {
+        shape.push(
+          `craft_consume row ${row.id} carries rung ${String(row.purchased_slots_after)}, the vault stood at ${want.rung}`,
+        );
+      }
+      if (row.instance !== null)
+        shape.push(`craft_consume row ${row.id} carries an instance payload`);
+      if (row.copper_delta !== 0) shape.push(`craft_consume row ${row.id} carries copper`);
+      if (!Number.isInteger(row.count) || Number(row.count) <= 0) {
+        shape.push(`craft_consume row ${row.id} has a non-positive or fractional count`);
+      }
+    });
+    if (shape.length > 0) return fail('the ledger rows are misshapen', shape);
+
+    // The independent reconciliation: the reference replayer over the rows the
+    // real recorders wrote and the character's REAL persisted vault slice (the
+    // save blob, not the live record, so the save path rides along).
+    const persisted = w.sim.serializeCharacter(w.pid);
+    const findings = auditBank({
+      ledgerRows: rows as unknown as BankLedgerAuditRow[],
+      characters: [{ id: CHARACTER_ID, realm: REALM, state: { vault: persisted?.vault } }],
+      guildBanks: [],
+    });
+    if (findings.length > 0) {
+      return fail(
+        'scripts/bank_audit.mjs disagrees with the persisted vault',
+        findings.map((f) => `[${f.kind}] ${f.detail}`),
       );
     }
-    if (row.instance !== null)
-      shape.push(`craft_consume row ${row.id} carries an instance payload`);
-    if (row.copper_delta !== 0) shape.push(`craft_consume row ${row.id} carries copper`);
-    if (!Number.isInteger(row.count) || Number(row.count) <= 0) {
-      shape.push(`craft_consume row ${row.id} has a non-positive or fractional count`);
+    return { ok: true, detail: '', rows: rows.length };
+  } finally {
+    if (reusableSim) {
+      reusableSim.removePlayer(w.pid);
+      reusableSim.drainEvents();
     }
-  });
-  if (shape.length > 0) return fail('the ledger rows are misshapen', shape);
-
-  // The independent reconciliation: the reference replayer over the rows the
-  // real recorders wrote and the character's REAL persisted vault slice (the
-  // save blob, not the live record, so the save path rides along).
-  const persisted = w.sim.serializeCharacter(w.pid);
-  const findings = auditBank({
-    ledgerRows: rows as unknown as BankLedgerAuditRow[],
-    characters: [{ id: CHARACTER_ID, realm: REALM, state: { vault: persisted?.vault } }],
-    guildBanks: [],
-  });
-  if (findings.length > 0) {
-    return fail(
-      'scripts/bank_audit.mjs disagrees with the persisted vault',
-      findings.map((f) => `[${f.kind}] ${f.detail}`),
-    );
   }
-  return { ok: true, detail: '', rows: rows.length };
 }
 
 interface Failure {
@@ -1012,9 +1027,21 @@ interface Failure {
 async function sweep(seeds: number[]): Promise<{ failures: Failure[]; rows: number }> {
   const failures: Failure[] = [];
   let rows = 0;
+  // Static content/NPC construction is ~three orders of magnitude more
+  // expensive than a clean player lifecycle. Reuse one empty world while each
+  // seed still receives a fresh player and RNG, then remove that player in the
+  // runner's finally block. This keeps all 250 cases and coverage floors while
+  // avoiding full-suite CPU/memory contention around 250 identical worlds.
+  const sim = new Sim({
+    seed: 0,
+    playerClass: 'warrior',
+    autoEquip: false,
+    noPlayer: true,
+    world: VAULT_TEST_WORLD,
+  });
   for (const seed of seeds) {
     const steps = genSteps(seed);
-    const r = await runSteps(seed, steps);
+    const r = await runSteps(seed, steps, sim);
     rows += r.rows;
     if (!r.ok) {
       failures.push({ seed, detail: r.detail, steps });
