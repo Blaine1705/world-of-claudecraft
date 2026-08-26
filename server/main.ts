@@ -53,8 +53,8 @@ import {
   TOP_WEALTH_HOLDERS_LIMIT,
 } from './account_wealth';
 import {
+  aggregateEscrowTotals,
   applyEscrowTotals,
-  listEscrowStateRows,
   refreshAccountPurseTotals,
   topWealthHolders,
   withAccountWealthSweepLock,
@@ -3881,7 +3881,7 @@ export async function startServer(): Promise<http.Server> {
   configureSuspicionFlagDataset(listSuspicionFlagDataset);
   const accountWealthSweep = startAccountWealthSweep({
     refreshAccountPurseTotals,
-    listEscrowStateRows,
+    aggregateEscrowTotals,
     applyEscrowTotals,
     // The sweep's queries are global, so exactly one process across all realms
     // runs a pass; losers of the advisory lock stand down until their next tick.
