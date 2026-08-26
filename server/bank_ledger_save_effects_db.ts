@@ -110,6 +110,18 @@ function characterSaveEffectAccountIds(
   return [...accountIds].sort((a, b) => a - b);
 }
 
+function rememberCharacterSaveAccountLock(
+  db: Queryable,
+  accountId: number,
+): CharacterSaveAccountLockProof {
+  const proof = Object.freeze({
+    [characterSaveAccountLockProofBrand]: true as const,
+    accountId,
+  });
+  accountLockProofs.set(proof, { db, accountId, consumed: false });
+  return proof;
+}
+
 /** Take the accounts-first NO KEY UPDATE lock used by a capped WOC escrow
  *  insert and return a proof the later character-save helper can consume.
  *  This is stronger than the KEY SHARE lock save effects otherwise acquire,
@@ -125,12 +137,22 @@ export async function lockCharacterSaveAccountParentOnClient(
   if (Number(locked.rows[0]?.id) !== accountId) {
     throw new Error('character save account disappeared before parent lock');
   }
-  const proof = Object.freeze({
-    [characterSaveAccountLockProofBrand]: true as const,
-    accountId,
-  });
-  accountLockProofs.set(proof, { db, accountId, consumed: false });
-  return proof;
+  return rememberCharacterSaveAccountLock(db, accountId);
+}
+
+/** Take the accounts-first KEY SHARE lock used by ordinary save effects and
+ *  return a proof the later character-save helper can consume. This is the
+ *  narrow lock for callers that only need the account FK parent to survive. */
+export async function lockCharacterSaveAccountParentKeyShareOnClient(
+  db: Queryable,
+  accountId: number,
+): Promise<CharacterSaveAccountLockProof> {
+  assertPositiveAccountId(accountId);
+  const locked = await db.query('SELECT id FROM accounts WHERE id = $1 FOR KEY SHARE', [accountId]);
+  if (Number(locked.rows[0]?.id) !== accountId) {
+    throw new Error('character save account disappeared before parent lock');
+  }
+  return rememberCharacterSaveAccountLock(db, accountId);
 }
 
 /** Build the one UPDATE whose EXISTS clause is the character-lease fence. */

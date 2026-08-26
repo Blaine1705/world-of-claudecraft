@@ -1,0 +1,835 @@
+import { EventEmitter } from 'node:events';
+import type { QueryResult, QueryResultRow } from 'pg';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { bankLedgerCommandBatchPayloadSha256 } from '../../server/bank_ledger_batch_db';
+import {
+  BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+  BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+  BankLedgerGrowthLimitExceeded,
+} from '../../server/bank_ledger_growth_budget';
+import {
+  type PreparedBankLedgerCommandBatch,
+  serializeBankLedgerCommandBatch,
+} from '../../server/bank_ledger_outbox';
+import type { BankLedgerSaveEffects } from '../../server/bank_ledger_save_effects_db';
+import { REALM } from '../../server/realm';
+import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
+import type { CharacterState } from '../../src/sim/character_state';
+import { GUILD_CREATION_FEE_COPPER } from '../../src/sim/guild_bank';
+
+const mocks = vi.hoisted(() => ({
+  events: [] as string[],
+  saveCharacterStateOnClient: vi.fn(),
+  bustAdminGuildListReads: vi.fn(),
+}));
+
+vi.mock('../../server/db', () => ({
+  saveCharacterStateOnClient: mocks.saveCharacterStateOnClient,
+}));
+
+vi.mock('../../server/admin_guilds_read', () => ({
+  bustAdminGuildListReads: mocks.bustAdminGuildListReads,
+}));
+
+import { DbTransactionAborted } from '../../server/db_transaction_deadline';
+import {
+  createPaidGuildWithLeaderAtomic,
+  type PaidGuildCreateArgs,
+  type PaidGuildCreateDbClient,
+  PaidGuildCreateFeeInvariantError,
+} from '../../server/guild_create_db';
+
+const CHARACTER_ID = 41;
+const ACCOUNT_ID = 7;
+const GUILD_ID = 913;
+
+function state(): CharacterState {
+  return {
+    level: 23,
+    xp: 100,
+    copper: 90_000,
+    hp: 100,
+    resource: 100,
+    pos: { x: 1, z: 2 },
+    facing: 0,
+    equipment: {},
+    inventory: [],
+    questLog: [],
+    questsDone: [],
+  } as CharacterState;
+}
+
+function existingLedgerBatch(): PreparedBankLedgerCommandBatch {
+  return serializeBankLedgerCommandBatch('ledger:existing', [
+    {
+      realm: REALM,
+      characterId: CHARACTER_ID,
+      accountId: ACCOUNT_ID,
+      op: 'deposit_gold',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: 500,
+      purchasedSlotsAfter: 0,
+      container: 'personal',
+      containerId: null,
+      counterpartyCopperDelta: -500,
+      counterpartyCount: 0,
+    },
+  ]);
+}
+
+interface FakeClientOptions {
+  collision?: boolean;
+  guildInsertError?: unknown;
+  memberInserted?: boolean;
+  failAt?: string;
+  failError?: unknown;
+  failures?: Readonly<Record<string, unknown>>;
+  commitError?: unknown;
+  receipt?: Readonly<Record<string, unknown>> | null;
+}
+
+function queryKind(text: string): string {
+  if (text === 'BEGIN') return 'begin';
+  if (text.startsWith('SET LOCAL statement_timeout')) return 'bounds';
+  if (text.includes('pg_advisory_xact_lock')) return 'name_lock';
+  if (text.includes('FROM guilds') && text.includes('lower(name)')) return 'name_collision';
+  if (text.includes('FROM accounts') && text.includes('FOR KEY SHARE')) return 'account_lock';
+  if (text.startsWith('INSERT INTO guilds')) return 'guild_insert';
+  if (text.startsWith('INSERT INTO guild_members')) return 'leader_insert';
+  if (text.startsWith('INSERT INTO guild_banks')) return 'bank_insert';
+  if (text.includes('FROM bank_ledger_batch_receipts')) return 'receipt_lookup';
+  if (text === 'COMMIT') return 'commit';
+  if (text === 'ROLLBACK') return 'rollback';
+  return 'other';
+}
+
+class FakeClient extends EventEmitter implements PaidGuildCreateDbClient {
+  readonly queries: Array<{ kind: string; text: string; values?: unknown[] }> = [];
+  readonly release = vi.fn<(error?: Error | boolean) => void>();
+
+  constructor(private readonly options: FakeClientOptions = {}) {
+    super();
+  }
+
+  async query<Row extends QueryResultRow = QueryResultRow>(
+    text: string,
+    values?: unknown[],
+  ): Promise<QueryResult<Row>> {
+    const result = (rows: QueryResultRow[], rowCount: number): QueryResult<Row> =>
+      ({ rows, rowCount }) as unknown as QueryResult<Row>;
+    const kind = queryKind(text);
+    this.queries.push({ kind, text, values });
+    mocks.events.push(kind);
+    if (this.options.failures && kind in this.options.failures) {
+      throw this.options.failures[kind];
+    }
+    if (kind === this.options.failAt) throw this.options.failError ?? new Error(`failed ${kind}`);
+    if (kind === 'commit' && this.options.commitError) throw this.options.commitError;
+    if (kind === 'name_collision') {
+      return result(this.options.collision ? [{ '?column?': 1 }] : [], 0);
+    }
+    if (kind === 'account_lock') return result([{ id: ACCOUNT_ID }], 1);
+    if (kind === 'guild_insert') {
+      if (this.options.guildInsertError) throw this.options.guildInsertError;
+      return result([{ id: GUILD_ID }], 1);
+    }
+    if (kind === 'leader_insert') {
+      return result([], this.options.memberInserted === false ? 0 : 1);
+    }
+    if (kind === 'receipt_lookup') {
+      return result(
+        this.options.receipt ? [this.options.receipt] : [],
+        this.options.receipt ? 1 : 0,
+      );
+    }
+    return result([], 1);
+  }
+}
+
+function feeReceipt(
+  overrides: Readonly<Record<string, unknown>> = {},
+): Readonly<Record<string, unknown>> {
+  const batch = serializeBankLedgerCommandBatch('ledger:guild-create', [
+    {
+      realm: REALM,
+      characterId: CHARACTER_ID,
+      accountId: ACCOUNT_ID,
+      op: 'create_fee',
+      itemId: null,
+      count: null,
+      instance: null,
+      copperDelta: -GUILD_CREATION_FEE_COPPER,
+      purchasedSlotsAfter: 0,
+      container: 'guild',
+      containerId: GUILD_ID,
+      counterpartyCopperDelta: -GUILD_CREATION_FEE_COPPER,
+      counterpartyCount: 0,
+    },
+  ]);
+  return {
+    realm: REALM,
+    character_id: CHARACTER_ID,
+    account_id: ACCOUNT_ID,
+    row_count: 1,
+    payload_sha256: bankLedgerCommandBatchPayloadSha256(batch),
+    ...overrides,
+  };
+}
+
+function args(overrides: Partial<PaidGuildCreateArgs> = {}): PaidGuildCreateArgs {
+  const existingBatch = existingLedgerBatch();
+  const ledgerEffects: BankLedgerSaveEffects = Object.freeze({
+    owner: Object.freeze({ realm: REALM, characterId: CHARACTER_ID, accountId: ACCOUNT_ID }),
+    batches: Object.freeze([existingBatch]),
+  });
+  return {
+    name: 'Iron Vanguard',
+    characterId: CHARACTER_ID,
+    accountId: ACCOUNT_ID,
+    level: 23,
+    state: state(),
+    leaseNonce: 'lease-nonce',
+    storageEffects: Object.freeze([
+      {
+        realm: REALM,
+        characterId: CHARACTER_ID,
+        accountId: ACCOUNT_ID,
+        itemId: 'bank_bag_1',
+        expectedCostClaudium: 100,
+        idempotencyKey: 'storage:existing',
+        spendClaimToken: 'claim',
+        purchasedSlotsBefore: 0,
+        purchasedSlotsAfter: 1,
+      } as StorageAppliedEffect,
+    ]),
+    ledgerEffects,
+    fee: {
+      batchKey: 'ledger:guild-create',
+      chargedCopper: 10_000,
+      purseCopperDelta: -10_000,
+    },
+    ...overrides,
+  };
+}
+
+function harness(client: FakeClient, receiptClients: FakeClient[] = []) {
+  const checkedOut = [client];
+  let checkoutCount = 0;
+  const connect = vi.fn(async () => {
+    if (checkoutCount++ === 0) return client;
+    const receiptClient = receiptClients.shift() ?? new FakeClient();
+    checkedOut.push(receiptClient);
+    return receiptClient;
+  });
+  const bustGuildRoster = vi.fn((guildId: number) => {
+    mocks.events.push(`roster_bust:${guildId}`);
+  });
+  return {
+    deps: { pool: { connect }, bustGuildRoster },
+    connect,
+    bustGuildRoster,
+    checkedOut,
+  };
+}
+
+beforeEach(() => {
+  mocks.events.length = 0;
+  mocks.saveCharacterStateOnClient.mockReset().mockImplementation(async () => {
+    mocks.events.push('save');
+    return true;
+  });
+  mocks.bustAdminGuildListReads.mockReset().mockImplementation(() => {
+    mocks.events.push('admin_bust');
+  });
+});
+
+describe('createPaidGuildWithLeaderAtomic', () => {
+  it('delegates one bounded transaction with the exact fee batch and carried snapshots', async () => {
+    const client = new FakeClient();
+    const { deps, connect, bustGuildRoster } = harness(client);
+    const input = args();
+    const existingBatch = input.ledgerEffects?.batches[0];
+
+    const result = await createPaidGuildWithLeaderAtomic(deps, input);
+
+    expect(result).toEqual({
+      durability: 'committed',
+      guildId: GUILD_ID,
+      feeBatchKey: input.fee.batchKey,
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(mocks.events).toEqual([
+      'begin',
+      'bounds',
+      'name_lock',
+      'name_collision',
+      'account_lock',
+      'guild_insert',
+      'leader_insert',
+      'save',
+      'bank_insert',
+      'commit',
+      'admin_bust',
+      `roster_bust:${GUILD_ID}`,
+    ]);
+    expect(mocks.saveCharacterStateOnClient).toHaveBeenCalledTimes(1);
+    const saveCall = mocks.saveCharacterStateOnClient.mock.calls[0];
+    expect(saveCall[1]).toBe(CHARACTER_ID);
+    expect(saveCall[2]).toBe(input.level);
+    expect(saveCall[3]).toEqual(input.state);
+    expect(saveCall[3]).not.toBe(input.state);
+    expect(saveCall[4]).toBe(input.leaseNonce);
+    expect(saveCall[5]).toEqual(input.storageEffects);
+    expect(saveCall[5]).not.toBe(input.storageEffects);
+    const savedLedger = saveCall[6] as BankLedgerSaveEffects;
+    expect(savedLedger.owner).toEqual({
+      realm: REALM,
+      characterId: CHARACTER_ID,
+      accountId: ACCOUNT_ID,
+    });
+    expect(savedLedger.batches).toHaveLength(2);
+    expect(savedLedger.batches[0]).toBe(existingBatch);
+    expect(savedLedger.batches[1]).toMatchObject({ batchKey: input.fee.batchKey });
+    expect(savedLedger.batches[1]?.rows).toEqual([
+      {
+        realm: REALM,
+        characterId: CHARACTER_ID,
+        accountId: ACCOUNT_ID,
+        op: 'create_fee',
+        itemId: null,
+        count: null,
+        instanceJson: null,
+        copperDelta: -10_000,
+        purchasedSlotsAfter: 0,
+        container: 'guild',
+        containerId: GUILD_ID,
+        counterpartyCopperDelta: -10_000,
+        counterpartyCount: 0,
+      },
+    ]);
+    expect(saveCall[7]).toMatchObject({ accountId: ACCOUNT_ID });
+    const accountLock = client.queries.find((query) => query.kind === 'account_lock');
+    expect(accountLock?.text).toContain('FOR KEY SHARE');
+    expect(accountLock?.text).not.toContain('FOR NO KEY UPDATE');
+    const bankInsert = client.queries.find((query) => query.kind === 'bank_insert');
+    expect(bankInsert?.values).toEqual([
+      GUILD_ID,
+      REALM,
+      JSON.stringify({ treasury: 0, inventory: [], purchasedSlots: 0 }),
+    ]);
+    expect(client.release).toHaveBeenCalledWith();
+    expect(bustGuildRoster).toHaveBeenCalledWith(GUILD_ID);
+  });
+
+  it('returns a known refusal on a case-insensitive name collision without locking the account', async () => {
+    const client = new FakeClient({ collision: true });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'name_taken',
+    });
+
+    expect(client.queries.map((query) => query.kind)).toEqual([
+      'begin',
+      'bounds',
+      'name_lock',
+      'name_collision',
+      'rollback',
+    ]);
+    expect(mocks.saveCharacterStateOnClient).not.toHaveBeenCalled();
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('preserves a known refusal when its best-effort rollback fails', async () => {
+    const rollbackFailure = Object.assign(new Error('rollback connection loss'), {
+      code: '57P01',
+    });
+    const client = new FakeClient({ collision: true, failures: { rollback: rollbackFailure } });
+    const cleanupErrors: unknown[] = [];
+    const { deps } = harness(client);
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { ...deps, onCleanupError: (error) => cleanupErrors.push(error) },
+        args(),
+      ),
+    ).resolves.toEqual({ durability: 'not_committed', reason: 'name_taken' });
+    expect(client.release).toHaveBeenCalledWith(rollbackFailure);
+    // DbTransactionDeadline absorbs the rollback error after destroying the
+    // client, so no cleanup callback is needed and the refusal stays typed.
+    expect(cleanupErrors).toEqual([]);
+  });
+
+  it('rejects a duplicate direct fee receipt before checking out a client', async () => {
+    const client = new FakeClient();
+    const { deps, connect } = harness(client);
+    const existing = existingLedgerBatch();
+    const input = args({
+      ledgerEffects: {
+        owner: { realm: REALM, characterId: CHARACTER_ID, accountId: ACCOUNT_ID },
+        batches: Object.freeze([existing]),
+      },
+      fee: {
+        batchKey: existing.batchKey,
+        chargedCopper: 10_000,
+        purseCopperDelta: -10_000,
+      },
+    });
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, input)).rejects.toThrow(
+      'duplicate bank ledger batch key',
+    );
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    {
+      label: 'zero charge',
+      fee: { batchKey: 'ledger:guild-create', chargedCopper: 0, purseCopperDelta: 0 },
+    },
+    {
+      label: 'discounted charge',
+      fee: {
+        batchKey: 'ledger:guild-create',
+        chargedCopper: GUILD_CREATION_FEE_COPPER - 1,
+        purseCopperDelta: -(GUILD_CREATION_FEE_COPPER - 1),
+      },
+    },
+    {
+      label: 'overcharge',
+      fee: {
+        batchKey: 'ledger:guild-create',
+        chargedCopper: GUILD_CREATION_FEE_COPPER + 1,
+        purseCopperDelta: -(GUILD_CREATION_FEE_COPPER + 1),
+      },
+    },
+    {
+      label: 'mismatched purse movement',
+      fee: {
+        batchKey: 'ledger:guild-create',
+        chargedCopper: GUILD_CREATION_FEE_COPPER,
+        purseCopperDelta: -(GUILD_CREATION_FEE_COPPER - 1),
+      },
+    },
+  ])('rejects $label before pool checkout', async ({ fee }) => {
+    const client = new FakeClient();
+    const { deps, connect } = harness(client);
+
+    const refusal = createPaidGuildWithLeaderAtomic(deps, args({ fee }));
+    await expect(refusal).rejects.toBeInstanceOf(PaidGuildCreateFeeInvariantError);
+    await expect(refusal).rejects.toThrow(/paid guild (charge|purse delta) must be exactly/);
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('detaches mutable character and storage snapshots before the first await', async () => {
+    const client = new FakeClient();
+    const { deps } = harness(client);
+    const input = args();
+    const originalCopper = input.state.copper;
+    const originalSlots = input.storageEffects[0]?.purchasedSlotsAfter;
+
+    const pending = createPaidGuildWithLeaderAtomic(deps, input);
+    input.state.copper = 1;
+    const mutableEffect = input.storageEffects[0] as StorageAppliedEffect;
+    mutableEffect.purchasedSlotsAfter = 99;
+    (input.fee as { purseCopperDelta: number }).purseCopperDelta = -1;
+    await pending;
+
+    const saveCall = mocks.saveCharacterStateOnClient.mock.calls[0];
+    expect((saveCall[3] as CharacterState).copper).toBe(originalCopper);
+    expect((saveCall[5] as readonly StorageAppliedEffect[])[0]?.purchasedSlotsAfter).toBe(
+      originalSlots,
+    );
+    expect((saveCall[6] as BankLedgerSaveEffects).batches.at(-1)?.rows[0]).toMatchObject({
+      counterpartyCopperDelta: -GUILD_CREATION_FEE_COPPER,
+    });
+  });
+
+  it('maps the guild insert unique race to name_taken and rolls back', async () => {
+    const unique = Object.assign(new Error('duplicate'), {
+      code: '23505',
+      constraint: 'guilds_realm_lower_name_guard',
+    });
+    const client = new FakeClient({ guildInsertError: unique });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'name_taken',
+    });
+    expect(client.queries.at(-1)?.kind).toBe('rollback');
+    expect(mocks.saveCharacterStateOnClient).not.toHaveBeenCalled();
+  });
+
+  it('does not disguise an unrelated unique violation as a taken name', async () => {
+    const unique = Object.assign(new Error('sequence collision'), {
+      code: '23505',
+      constraint: 'guilds_pkey',
+    });
+    const client = new FakeClient({ guildInsertError: unique });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: unique,
+    });
+    expect(client.queries.at(-1)?.kind).toBe('rollback');
+  });
+
+  it('rolls back a leader conflict so no leaderless guild or bank survives', async () => {
+    const client = new FakeClient({ memberInserted: false });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'already_in_guild',
+    });
+    expect(client.queries.map((query) => query.kind)).not.toContain('bank_insert');
+    expect(client.queries.at(-1)?.kind).toBe('rollback');
+    expect(mocks.saveCharacterStateOnClient).not.toHaveBeenCalled();
+  });
+
+  it('rolls the guild back when the character lease fence misses', async () => {
+    mocks.saveCharacterStateOnClient.mockImplementationOnce(async () => {
+      mocks.events.push('save');
+      return false;
+    });
+    const client = new FakeClient();
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'lease_lost',
+    });
+    expect(client.queries.map((query) => query.kind)).not.toContain('bank_insert');
+    expect(client.queries.at(-1)?.kind).toBe('rollback');
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('types a codeless failure before COMMIT as known not committed and never retries', async () => {
+    const failure = new Error('socket lost during bank insert');
+    const client = new FakeClient({ failAt: 'bank_insert', failError: failure });
+    const { deps, connect } = harness(client);
+
+    const result = await createPaidGuildWithLeaderAtomic(deps, args());
+
+    expect(result).toEqual({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: failure,
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.queries.filter((query) => query.kind === 'begin')).toHaveLength(1);
+    expect(client.release).toHaveBeenCalledWith(failure);
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('preserves the pre-COMMIT error when the following rollback also fails', async () => {
+    const primary = Object.assign(new Error('bank row rejected'), { code: '23503' });
+    const rollbackFailure = Object.assign(new Error('rollback backend stopped'), {
+      code: '57P01',
+    });
+    const client = new FakeClient({
+      failures: { bank_insert: primary, rollback: rollbackFailure },
+    });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: primary,
+    });
+    expect(client.release).toHaveBeenCalledWith(rollbackFailure);
+  });
+
+  it('honors an already-aborted signal without retrying or issuing guild SQL', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const client = new FakeClient();
+    const { deps, connect } = harness(client);
+
+    const result = await createPaidGuildWithLeaderAtomic(deps, args({ signal: controller.signal }));
+
+    expect(result).toMatchObject({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: { code: 'DB_TRANSACTION_ABORTED', commitMayHaveSucceeded: false },
+    });
+    expect(connect).not.toHaveBeenCalled();
+    expect(client.queries).toEqual([]);
+    expect(client.release).not.toHaveBeenCalled();
+  });
+
+  it('returns promptly on abort during pool checkout and destroys the eventual client', async () => {
+    const controller = new AbortController();
+    const client = new FakeClient();
+    let finishCheckout: ((client: PaidGuildCreateDbClient) => void) | undefined;
+    const checkout = new Promise<PaidGuildCreateDbClient>((resolve) => {
+      finishCheckout = resolve;
+    });
+    const connect = vi.fn(() => checkout);
+    const deps = { pool: { connect }, bustGuildRoster: vi.fn() };
+
+    const pending = createPaidGuildWithLeaderAtomic(deps, args({ signal: controller.signal }));
+    controller.abort();
+
+    const result = await pending;
+    expect(result).toMatchObject({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: { code: 'DB_TRANSACTION_ABORTED', commitMayHaveSucceeded: false },
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.queries).toEqual([]);
+
+    finishCheckout?.(client);
+    await Promise.resolve();
+    expect(client.release).toHaveBeenCalledTimes(1);
+    expect(client.release.mock.calls[0]?.[0]).toMatchObject({
+      code: 'DB_TRANSACTION_ABORTED',
+      commitMayHaveSucceeded: false,
+    });
+  });
+
+  it('types a failed pool checkout as known not committed', async () => {
+    const failure = new Error('pool checkout timed out');
+    const connect = vi.fn(async () => {
+      throw failure;
+    });
+    const deps = { pool: { connect }, bustGuildRoster: vi.fn() };
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: failure,
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('types a proven rollback returned by COMMIT as known not committed', async () => {
+    const failure = Object.assign(new Error('serialization failure'), { code: '40001' });
+    const client = new FakeClient({ commitError: failure });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: failure,
+    });
+    expect(client.queries.map((query) => query.kind).slice(-2)).toEqual(['commit', 'rollback']);
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('does not call a pre-COMMIT abort ambiguous when COMMIT never started', async () => {
+    const failure = new DbTransactionAborted('paid guild create', false);
+    const client = new FakeClient({ commitError: failure });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: failure,
+    });
+    expect(client.queries.map((query) => query.kind).slice(-2)).toEqual(['commit', 'rollback']);
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('decodes a deferred ledger growth refusal at COMMIT as a proved rollback', async () => {
+    const failure = Object.assign(new Error('bank ledger growth limit exceeded'), {
+      code: BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+      detail: JSON.stringify({
+        committed_rows: 999,
+        attempted_rows: 2,
+        hard_limit_rows: 1_000,
+      }),
+    });
+    const client = new FakeClient({ commitError: failure });
+    const { deps, connect } = harness(client);
+
+    const result = await createPaidGuildWithLeaderAtomic(deps, args());
+    expect(result).toMatchObject({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: {
+        name: BankLedgerGrowthLimitExceeded.name,
+        committedRows: 999,
+        attemptedRows: 2,
+        hardLimitRows: 1_000,
+      },
+    });
+    expect(connect).toHaveBeenCalledTimes(1);
+    expect(client.queries.map((query) => query.kind).slice(-2)).toEqual(['commit', 'rollback']);
+    expect(mocks.bustAdminGuildListReads).not.toHaveBeenCalled();
+  });
+
+  it('upgrades a lost COMMIT response when the exact fee receipt is visible', async () => {
+    const failure = new Error('socket lost after COMMIT write');
+    const client = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({ receipt: feeReceipt() });
+    const { deps, connect, bustGuildRoster } = harness(client, [receiptClient]);
+    const input = args();
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, input)).resolves.toEqual({
+      durability: 'committed',
+      guildId: GUILD_ID,
+      feeBatchKey: input.fee.batchKey,
+    });
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(receiptClient.queries).toEqual([
+      expect.objectContaining({ kind: 'receipt_lookup', values: [input.fee.batchKey] }),
+    ]);
+    expect(receiptClient.release).toHaveBeenCalledWith();
+    expect(mocks.bustAdminGuildListReads).toHaveBeenCalledTimes(1);
+    expect(bustGuildRoster).toHaveBeenCalledWith(GUILD_ID);
+  });
+
+  it('keeps a lost COMMIT response ambiguous after bounded absent-receipt reads', async () => {
+    const failure = new Error('socket lost after COMMIT write');
+    const client = new FakeClient({ commitError: failure });
+    const { deps, connect, bustGuildRoster, checkedOut } = harness(client);
+    const input = args();
+
+    const result = await createPaidGuildWithLeaderAtomic(deps, input);
+
+    expect(result).toEqual({
+      durability: 'commit_ambiguous',
+      guildId: GUILD_ID,
+      feeBatchKey: input.fee.batchKey,
+      error: failure,
+    });
+    expect(connect).toHaveBeenCalledTimes(4);
+    expect(client.queries.filter((query) => query.kind === 'commit')).toHaveLength(1);
+    expect(client.release).toHaveBeenCalledWith(failure);
+    expect(
+      checkedOut
+        .slice(1)
+        .flatMap((checkedClient) =>
+          checkedClient.queries.filter((query) => query.kind === 'receipt_lookup'),
+        ),
+    ).toHaveLength(3);
+    expect(mocks.bustAdminGuildListReads).toHaveBeenCalledTimes(1);
+    expect(bustGuildRoster).toHaveBeenCalledWith(GUILD_ID);
+  });
+
+  it('keeps a mismatched fee receipt ambiguous without accepting another command', async () => {
+    const failure = new Error('completion unknown');
+    const client = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({
+      receipt: feeReceipt({ payload_sha256: '0'.repeat(64) }),
+    });
+    const { deps, connect } = harness(client, [receiptClient]);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'commit_ambiguous',
+      guildId: GUILD_ID,
+      feeBatchKey: 'ledger:guild-create',
+      error: failure,
+    });
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(receiptClient.queries.filter((query) => query.kind === 'receipt_lookup')).toHaveLength(
+      1,
+    );
+  });
+
+  it('keeps query outages ambiguous and contains late-client cleanup failures', async () => {
+    const commitFailure = new Error('completion unknown');
+    const lookupFailure = new Error('receipt connection lost');
+    const cleanupFailure = new Error('receipt client release failed');
+    const client = new FakeClient({ commitError: commitFailure });
+    const receiptClients = Array.from(
+      { length: 3 },
+      () => new FakeClient({ failures: { receipt_lookup: lookupFailure } }),
+    );
+    receiptClients[0]?.release.mockImplementationOnce(() => {
+      throw cleanupFailure;
+    });
+    const cleanupErrors: unknown[] = [];
+    const { deps, connect } = harness(client, [...receiptClients]);
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { ...deps, onCleanupError: (error) => cleanupErrors.push(error) },
+        args(),
+      ),
+    ).resolves.toEqual({
+      durability: 'commit_ambiguous',
+      guildId: GUILD_ID,
+      feeBatchKey: 'ledger:guild-create',
+      error: commitFailure,
+    });
+    expect(connect).toHaveBeenCalledTimes(4);
+    expect(cleanupErrors).toContain(cleanupFailure);
+    for (const receiptClient of receiptClients) {
+      expect(receiptClient.release).toHaveBeenCalledWith(lookupFailure);
+    }
+  });
+
+  it('preserves COMMIT ambiguity when its best-effort rollback fails', async () => {
+    const commitFailure = Object.assign(new Error('completion unknown'), { code: '40003' });
+    const rollbackFailure = Object.assign(new Error('rollback backend stopped'), {
+      code: '57P01',
+    });
+    const client = new FakeClient({
+      commitError: commitFailure,
+      failures: { rollback: rollbackFailure },
+    });
+    const { deps } = harness(client);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'commit_ambiguous',
+      guildId: GUILD_ID,
+      feeBatchKey: 'ledger:guild-create',
+      error: commitFailure,
+    });
+    expect(client.release).toHaveBeenCalledWith(rollbackFailure);
+    expect(mocks.bustAdminGuildListReads).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not let cache-bust failures replace a known commit', async () => {
+    const client = new FakeClient();
+    const errors: unknown[] = [];
+    const adminFailure = new Error('admin cache failed');
+    const rosterFailure = new Error('roster cache failed');
+    mocks.bustAdminGuildListReads.mockImplementationOnce(() => {
+      throw adminFailure;
+    });
+    const deps = {
+      pool: { connect: vi.fn(async () => client) },
+      bustGuildRoster: vi.fn(() => {
+        throw rosterFailure;
+      }),
+      onCacheBustError: vi.fn((error: unknown) => errors.push(error)),
+    };
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toMatchObject({
+      durability: 'committed',
+      guildId: GUILD_ID,
+    });
+    expect(errors).toEqual([adminFailure, rosterFailure]);
+  });
+
+  it('does not demote a returned COMMIT when client release reports a cleanup error', async () => {
+    const cleanupFailure = new Error('pool release failed');
+    const client = new FakeClient();
+    client.release.mockImplementationOnce(() => {
+      throw cleanupFailure;
+    });
+    const cleanupErrors: unknown[] = [];
+    const { deps } = harness(client);
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { ...deps, onCleanupError: (error) => cleanupErrors.push(error) },
+        args(),
+      ),
+    ).resolves.toMatchObject({ durability: 'committed', guildId: GUILD_ID });
+    expect(cleanupErrors).toEqual([cleanupFailure]);
+    expect(mocks.bustAdminGuildListReads).toHaveBeenCalledTimes(1);
+  });
+});
