@@ -125,7 +125,15 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    ceiling: 18488,
+    // Raised 18488 -> 18527 (+39) for the $WOC Exchange wrapped-DESKTOP-shell
+    // browser hand-off: attachWocMarketBrowserOnlyNotice, the shared
+    // revealWocMarketLauncher extraction, attachWocMarket's browser-only-flag
+    // reset, and toggleWocMarket's switch over the pure decision
+    // wocMarketToggleAction (src/ui/woc_market_link.ts), which carries the
+    // actual state-machine logic and its own test coverage so hud.ts keeps
+    // only thin delegators. Maintainer decision prepared for PR review; exact
+    // count, any further growth reds again.
+    ceiling: 18527,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

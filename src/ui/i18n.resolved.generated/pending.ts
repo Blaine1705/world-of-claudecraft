@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "es_ES": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "fr_FR": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "fr_CA": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "de_DE": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "nl_NL": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "pl_PL": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "id_ID": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "tr_TR": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "sv_SE": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "vi_VN": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ],
+  "da_DK": [
+    "hudChrome.wocMarket.browserOnlyConfirmBody",
+    "hudChrome.wocMarket.browserOnlyConfirmCancel",
+    "hudChrome.wocMarket.browserOnlyConfirmOpen",
+    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+  ]
 };

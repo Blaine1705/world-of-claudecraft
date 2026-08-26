@@ -9056,6 +9056,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': 'Загрузка биржи...',
   'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Открыть Биржу $WOC в браузере?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Биржа $WOC доступна только в браузерной версии World of ClaudeCraft. В браузере откроется World of ClaudeCraft, где вы сможете войти и открыть биржу, игра продолжит работать здесь.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Открыть в браузере',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Отмена',
   'hudChrome.wocMarket.pausedBanner':
     'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
   'hudChrome.wocMarket.walletBanner':
