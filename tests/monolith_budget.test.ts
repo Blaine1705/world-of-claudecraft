@@ -326,7 +326,12 @@ const MONOLITHS: MonolithRow[] = [
     // weapon/offhand-weapon self-wire mirroring into
     // src/net/combat_scalar_wire.ts (the account_cosmetics_wire.ts /
     // guild_bank_log_wire.ts convention), leaving online.ts a single call.
-    ceiling: 5835,
+    // Raised to the exact new count for the target-swing-timer client decode:
+    // two lines mirroring w.swing into autoAttack/swingTimer for every entity,
+    // the general (non-self) counterpart to the self-only decode further down
+    // this method. Thin, unavoidable wiring in an already flat per-field decode
+    // block; no clean branch-owned extraction exists for two field assignments.
+    ceiling: 5840,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
