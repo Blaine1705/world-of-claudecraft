@@ -79,13 +79,12 @@ import {
   isStunned,
   isUnbreakableControlAura,
 } from './combat/cc';
-import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
+import { aetherSurgeCostMult } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
   handleDeath as handleDeathImpl,
 } from './combat/damage';
-import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { steerFearFromWalls } from './combat/fear_steering';
@@ -129,7 +128,6 @@ import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
-import { rewindHealAmount } from './combat/rewind';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
@@ -264,10 +262,10 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
-import { type ActiveIgnivarMeteorWarning, activeIgnivarMeteorWarnings } from './ignivar_meteors';
-import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
+import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import {
@@ -576,30 +574,6 @@ import { updateGauntletRuns } from './tutorial/gauntlet_run';
 import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import {
-  type ActiveVarkhulAnvilMeteorWarning,
-  activeVarkhulAnvilMeteorWarnings,
-} from './varkhul_anvil_meteors';
-import {
-  type ActiveVarkhulAssembly,
-  activeVarkhulAssembly,
-  inactiveVarkhulAssembly,
-  VARKHUL_ASSEMBLY_FORGE_LOCAL_POS,
-} from './varkhul_assembly';
-import {
-  type ActiveVarkhulCinderFire,
-  type ActiveVarkhulCinderOrbProjectile,
-  activeVarkhulCinderFires,
-  activeVarkhulCinderOrbProjectiles,
-} from './varkhul_cinder_orbs';
-import {
-  activeVarkhulForgePortalTelegraphs,
-  type VarkhulForgePortalTelegraph,
-} from './varkhul_forge_intermission';
-import {
-  type ActiveVarkhulForgestormWarning,
-  activeVarkhulForgestormWarnings,
-} from './varkhul_forgestorm';
-import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
   WORLD_BOSSES,
@@ -704,13 +678,7 @@ export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
-import {
-  partyFrameAbsorb,
-  partyFrameAggroTargets,
-  partyFrameAuras,
-  partyFrameIncomingHeals,
-  partyFrameRole,
-} from './party_frame_info';
+import { collectPartyInfo } from './party_frame_info';
 import { DungeonFinderMachine } from './social/dungeon_finder';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
@@ -769,7 +737,6 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
   type HonorArenaDailyState,
-  IGNIVAR_BOSS_ID,
   type InventoryUnit,
   type InvSlot,
   type ItemInstancePayload,
@@ -2249,136 +2216,34 @@ export class Sim {
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
   get activeFrostRings(): ActiveFrostRing[] {
-    const rings: ActiveFrostRing[] = [];
-    for (const effect of this.groundAoEs) {
-      const ring = effect.frostRing;
-      if (!ring || effect.remaining <= 0) continue;
-      rings.push({
-        id: ring.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        innerRadius: ring.innerRadius,
-        duration: ring.duration,
-        remaining: effect.remaining,
-      });
-    }
-    return rings;
+    return groundAoeReadouts.collectActiveFrostRings(this.groundAoEs);
   }
-  get activeIgnivarMeteors(): ActiveIgnivarMeteorWarning[] {
-    const warnings: ActiveIgnivarMeteorWarning[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== IGNIVAR_BOSS_ID || !entity.ignivar) continue;
-      warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
-    }
-    return warnings;
+  get activeIgnivarMeteors(): raidReadouts.ActiveIgnivarMeteorWarning[] {
+    return raidReadouts.collectActiveIgnivarMeteors(this.ctx);
   }
-  get activeVarkhulForgestormWarnings(): ActiveVarkhulForgestormWarning[] {
-    const warnings: ActiveVarkhulForgestormWarning[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || !entity.varkhul) continue;
-      warnings.push(...activeVarkhulForgestormWarnings(entity.id, entity.varkhul));
-    }
-    return warnings;
+  get activeVarkhulForgestormWarnings(): raidReadouts.ActiveVarkhulForgestormWarning[] {
+    return raidReadouts.collectActiveVarkhulForgestormWarnings(this.ctx);
   }
-  get activeVarkhulAnvilMeteors(): ActiveVarkhulAnvilMeteorWarning[] {
-    const warnings: ActiveVarkhulAnvilMeteorWarning[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
-      for (const batch of entity.varkhul.anvilMeteorBatches ?? []) {
-        warnings.push(...activeVarkhulAnvilMeteorWarnings(entity.id, batch));
-      }
-    }
-    return warnings;
+  get activeVarkhulAnvilMeteors(): raidReadouts.ActiveVarkhulAnvilMeteorWarning[] {
+    return raidReadouts.collectActiveVarkhulAnvilMeteors(this.ctx);
   }
-  get activeVarkhulAssemblies(): ActiveVarkhulAssembly[] {
-    const assemblies: ActiveVarkhulAssembly[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead) continue;
-      const instance = this.instances.find((candidate) => candidate.mobIds.includes(entity.id));
-      const origin = instance ? this.instanceOriginOf(instance) : null;
-      const forge = origin
-        ? this.groundPos(
-            origin.x + VARKHUL_ASSEMBLY_FORGE_LOCAL_POS.x,
-            origin.z + VARKHUL_ASSEMBLY_FORGE_LOCAL_POS.z,
-          )
-        : entity.pos;
-      // Pre-pull the boss carries engage staging state but the assembly set
-      // piece has not entered the fight: keep the inactive readout until he
-      // actually engages, exactly as when the encounter had never ticked.
-      const active =
-        entity.varkhul && (entity.varkhul.engage?.phase ?? 'done') !== 'forging'
-          ? activeVarkhulAssembly(entity.id, entity.varkhul, forge, entity.pos, (id) =>
-              this.entities.get(id),
-            )
-          : inactiveVarkhulAssembly(entity.id, instance?.difficulty ?? 'normal', forge);
-      if (active) assemblies.push(active);
-    }
-    return assemblies;
+  get activeVarkhulAssemblies(): raidReadouts.ActiveVarkhulAssembly[] {
+    return raidReadouts.collectActiveVarkhulAssemblies(this.ctx);
   }
-  get activeVarkhulForgePortalTelegraphs(): VarkhulForgePortalTelegraph[] {
-    const telegraphs: VarkhulForgePortalTelegraph[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
-      const instance = this.instances.find((candidate) => candidate.mobIds.includes(entity.id));
-      if (!instance) continue;
-      telegraphs.push(
-        ...activeVarkhulForgePortalTelegraphs(
-          entity.id,
-          entity.varkhul,
-          this.instanceOriginOf(instance),
-        ),
-      );
-    }
-    return telegraphs;
+  get activeVarkhulForgePortalTelegraphs(): raidReadouts.VarkhulForgePortalTelegraph[] {
+    return raidReadouts.collectActiveVarkhulForgePortalTelegraphs(this.ctx);
   }
-  get activeVarkhulCinderFires(): ActiveVarkhulCinderFire[] {
-    const fires: ActiveVarkhulCinderFire[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
-      fires.push(...activeVarkhulCinderFires(entity.id, entity.varkhul));
-    }
-    return fires;
+  get activeVarkhulCinderFires(): raidReadouts.ActiveVarkhulCinderFire[] {
+    return raidReadouts.collectActiveVarkhulCinderFires(this.ctx);
   }
-  get activeVarkhulCinderOrbProjectiles(): ActiveVarkhulCinderOrbProjectile[] {
-    const projectiles: ActiveVarkhulCinderOrbProjectile[] = [];
-    for (const entity of this.entities.values()) {
-      if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
-      projectiles.push(...activeVarkhulCinderOrbProjectiles(entity.id, entity.varkhul));
-    }
-    return projectiles;
+  get activeVarkhulCinderOrbProjectiles(): raidReadouts.ActiveVarkhulCinderOrbProjectile[] {
+    return raidReadouts.collectActiveVarkhulCinderOrbProjectiles(this.ctx);
   }
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
-    const hourglasses: ActiveTemporalHourglass[] = [];
-    for (const effect of this.groundAoEs) {
-      const hourglass = effect.temporalHourglass;
-      if (!hourglass || effect.remaining <= 0) continue;
-      hourglasses.push({
-        id: hourglass.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        duration: hourglass.groundDuration,
-        remaining: effect.remaining,
-      });
-    }
-    return hourglasses;
+    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs);
   }
   get activeConsecrations(): ActiveConsecration[] {
-    const consecrations: ActiveConsecration[] = [];
-    for (const effect of this.groundAoEs) {
-      const consecration = effect.consecration;
-      if (!consecration || effect.remaining <= 0) continue;
-      consecrations.push({
-        id: consecration.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        duration: consecration.duration,
-        remaining: effect.remaining,
-      });
-    }
-    return consecrations;
+    return groundAoeReadouts.collectActiveConsecrations(this.groundAoEs);
   }
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;
@@ -11718,58 +11583,7 @@ export class Sim {
   }
 
   get partyInfo(): import('../world_api').PartyInfo | null {
-    const party = this.partyOf(this.primaryId);
-    if (!party) return null;
-    const aggroTargets = partyFrameAggroTargets(this.entities.values());
-    const incomingHeals = partyFrameIncomingHeals(this.entities.values(), (abilityId, casterId) =>
-      this.resolvedAbility(abilityId, casterId),
-    );
-    return {
-      leader: party.leader,
-      raid: party.raid,
-      master: { ...party.lootStrategies.master },
-      members: party.members.flatMap((mPid) => {
-        const meta = this.players.get(mPid);
-        const e = this.entities.get(mPid);
-        return meta && e
-          ? [
-              {
-                pid: mPid,
-                name: meta.name,
-                cls: meta.cls,
-                level: e.level,
-                hp: e.hp,
-                mhp: e.maxHp,
-                res: Math.round(e.resource),
-                mres: e.maxResource,
-                rtype: e.resourceType,
-                x: e.pos.x,
-                z: e.pos.z,
-                dead: e.dead ? 1 : 0,
-                inCombat: e.inCombat ? 1 : 0,
-                group: party.raidGroups.get(mPid) ?? 1,
-                absorb: partyFrameAbsorb(e.auras),
-                role: partyFrameRole(meta.talentMods.role),
-                // Effective health Rewind could currently restore to this member
-                // (combat/rewind.ts); 0 for members with no recent recorded loss.
-                rewind: rewindHealAmount(damageTakenWithin(e, this.tickCount), e.hp, e.maxHp),
-                connected: 1,
-                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
-                incomingHeal: incomingHeals.get(mPid) ?? 0,
-                // Temporal Echo marks are filtered to the LOCAL player's own (owner
-                // 2026-07-12): other chronomancers' echoes still heal in the sim but
-                // never show in this viewer's group/raid strip. echoVisibleTo reads
-                // the real aura sourceId, so no wire field is added.
-                auras: partyFrameAuras(
-                  e.auras.filter((a) => echoVisibleTo(a, this.primaryId)),
-                  undefined,
-                  e.maxHp,
-                ),
-              },
-            ]
-          : [];
-      }),
-    };
+    return collectPartyInfo(this.ctx);
   }
 
   get tradeInfo(): import('../world_api').TradeInfo | null {
