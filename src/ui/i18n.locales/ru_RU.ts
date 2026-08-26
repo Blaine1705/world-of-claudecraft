@@ -9767,6 +9767,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityTitle': 'Забрать {item}',
   'hudChrome.bank.withdrawQuantityInput': 'Количество для получения',
   'hudChrome.bank.withdrawQuantityConfirm': 'Забрать',
+  'hudChrome.bank.withdrawQuantityAction': 'Выбрать количество для получения: {item}',
   'hudChrome.bank.filterGroupAria': 'Фильтровать банк по категории',
   'hudChrome.bank.sortAria': 'Сортировать предметы в банке',
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',

@@ -3074,6 +3074,7 @@ export const nl_NL: EnTranslations = {
       "withdrawQuantityTitle": "{item} opnemen",
       "withdrawQuantityInput": "Aantal om op te nemen",
       "withdrawQuantityConfirm": "Opnemen",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Bank filteren op categorie",
       "sortAria": "Bankvoorwerpen sorteren",
       "searchAria": "Bankvoorwerpen zoeken op naam",

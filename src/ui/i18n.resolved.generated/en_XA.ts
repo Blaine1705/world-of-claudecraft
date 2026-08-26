@@ -3074,6 +3074,7 @@ export const en_XA: EnTranslations = {
       "withdrawQuantityTitle": "[Ŵíţĥðŕáŵ {item}]",
       "withdrawQuantityInput": "[Ɋúáñţíţý ţó ŵíţĥðŕáŵ]",
       "withdrawQuantityConfirm": "[Ŵíţĥðŕáŵ]",
+      "withdrawQuantityAction": "[Çĥóóšé ŵíţĥðŕáŵáļ ɋúáñţíţý ƒóŕ {item}]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáñķ ƀý çáţéĝóŕý]",
       "sortAria": "[Šóŕţ ƀáñķ íţéɱš]",
       "searchAria": "[Šéáŕçĥ ƀáñķ íţéɱš ƀý ñáɱé]",

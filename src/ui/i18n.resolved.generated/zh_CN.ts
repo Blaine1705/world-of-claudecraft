@@ -3074,6 +3074,7 @@ export const zh_CN: EnTranslations = {
       "withdrawQuantityTitle": "取出 {item}",
       "withdrawQuantityInput": "要取出的数量",
       "withdrawQuantityConfirm": "取出",
+      "withdrawQuantityAction": "选择 {item} 的取出数量",
       "filterGroupAria": "按类别筛选银行",
       "sortAria": "排序银行物品",
       "searchAria": "按名称搜索银行物品",

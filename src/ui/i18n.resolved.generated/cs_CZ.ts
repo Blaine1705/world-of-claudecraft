@@ -3074,6 +3074,7 @@ export const cs_CZ: EnTranslations = {
       "withdrawQuantityTitle": "Vybrat {item}",
       "withdrawQuantityInput": "Množství k výběru",
       "withdrawQuantityConfirm": "Vybrat",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Filtrovat banku podle kategorie",
       "sortAria": "Seřadit předměty v bance",
       "searchAria": "Hledat předměty v bance podle názvu",

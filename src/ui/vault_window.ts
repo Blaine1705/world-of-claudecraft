@@ -345,7 +345,7 @@ export class VaultTab {
       partial.type = 'button';
       partial.className = 'vault-row-partial';
       partial.setAttribute(FOCUS_KEY_ATTR, `vault:partial:${ordinal}`);
-      const partialLabel = t('hudChrome.bank.withdrawQuantityInput');
+      const partialLabel = t('hudChrome.bank.withdrawQuantityAction', { item: name });
       partial.setAttribute('aria-label', partialLabel);
       partial.title = partialLabel;
       partial.innerHTML =

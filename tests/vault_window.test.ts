@@ -320,18 +320,25 @@ describe('the stocked pane', () => {
     expect(h.calls).toEqual(['vaultWithdraw:copper_ore,7']);
   });
 
-  it('offers an explicit sibling partial-withdraw action for pooled rows and restores it after submit', () => {
-    const h = harness(vaultInfo({ stock: { copper_ore: 7, iron_ore: 1 } }));
+  it('item-labels every pooled-row partial action and restores the chosen one after submit', () => {
+    const h = harness(vaultInfo({ stock: { copper_ore: 7, iron_ore: 4 } }));
     h.window.open();
     clickVaultTab(h);
-    const partials = h.root.querySelectorAll<HTMLButtonElement>('.vault-row-partial');
-    expect(partials).toHaveLength(1);
+    const partials = Array.from(h.root.querySelectorAll<HTMLButtonElement>('.vault-row-partial'));
+    expect(partials).toHaveLength(2);
     const full = partials[0].closest('.vault-row-wrap')?.querySelector('.vault-row');
     expect(full).not.toBeNull();
-    expect(partials[0].getAttribute('aria-label')).toBe('Quantity to withdraw');
+    const accessibleLabels = partials.map((partial) => partial.getAttribute('aria-label'));
+    expect(accessibleLabels).toEqual([
+      'Choose withdrawal quantity for Copper Ore',
+      'Choose withdrawal quantity for Iron Ore',
+    ]);
+    expect(new Set(accessibleLabels)).toHaveLength(partials.length);
     expect(partials[0].getAttribute('aria-label')).not.toBe(full?.getAttribute('aria-label'));
-    expect(partials[0].title).toBe('Quantity to withdraw');
-    expect(partials[0].textContent).toContain('Quantity to withdraw');
+    expect(partials.map((partial) => partial.title)).toEqual(accessibleLabels);
+    for (const partial of partials) {
+      expect(partial.textContent).toContain('Quantity to withdraw');
+    }
 
     partials[0].focus();
     partials[0].click();

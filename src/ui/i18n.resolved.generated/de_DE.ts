@@ -3074,6 +3074,7 @@ export const de_DE: EnTranslations = {
       "withdrawQuantityTitle": "{item} entnehmen",
       "withdrawQuantityInput": "Zu entnehmende Menge",
       "withdrawQuantityConfirm": "Entnehmen",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Bank nach Kategorie filtern",
       "sortAria": "Bankgegenstände sortieren",
       "searchAria": "Bankgegenstände nach Namen durchsuchen",

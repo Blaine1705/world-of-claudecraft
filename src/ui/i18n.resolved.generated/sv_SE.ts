@@ -3074,6 +3074,7 @@ export const sv_SE: EnTranslations = {
       "withdrawQuantityTitle": "Ta ut {item}",
       "withdrawQuantityInput": "Antal att ta ut",
       "withdrawQuantityConfirm": "Ta ut",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Filtrera banken efter kategori",
       "sortAria": "Sortera bankföremål",
       "searchAria": "Sök bankföremål efter namn",

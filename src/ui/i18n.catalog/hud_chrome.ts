@@ -3992,6 +3992,9 @@ export const hudChromeStrings = {
     withdrawQuantityTitle: 'Withdraw {item}',
     withdrawQuantityInput: 'Quantity to withdraw',
     withdrawQuantityConfirm: 'Withdraw',
+    // Item-qualified accessible name/title for every stocked-row partial action.
+    // (Wordy value, M16: the five non-Latin fills land in this same change.)
+    withdrawQuantityAction: 'Choose withdrawal quantity for {item}',
     // Search / category / sort toolbar. The category chip and sort option
     // labels reuse the generic hudChrome.bags.* strings; only these bank-named aria
     // labels are distinct from the bags wording.

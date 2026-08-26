@@ -3074,6 +3074,7 @@ export const vi_VN: EnTranslations = {
       "withdrawQuantityTitle": "Rút {item}",
       "withdrawQuantityInput": "Số lượng cần rút",
       "withdrawQuantityConfirm": "Rút Ra",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Lọc ngân hàng theo danh mục",
       "sortAria": "Sắp xếp vật phẩm ngân hàng",
       "searchAria": "Tìm vật phẩm ngân hàng theo tên",

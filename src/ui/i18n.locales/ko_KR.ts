@@ -9591,6 +9591,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityTitle': '{item} 꺼내기',
   'hudChrome.bank.withdrawQuantityInput': '꺼낼 수량',
   'hudChrome.bank.withdrawQuantityConfirm': '꺼내기',
+  'hudChrome.bank.withdrawQuantityAction': '{item} 꺼낼 수량 선택',
   'hudChrome.bank.filterGroupAria': '은행을 분류별로 필터링',
   'hudChrome.bank.sortAria': '은행 아이템 정렬',
   'hudChrome.bank.searchAria': '이름으로 은행 아이템 검색',

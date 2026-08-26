@@ -9169,6 +9169,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityTitle': '取出 {item}',
   'hudChrome.bank.withdrawQuantityInput': '要取出的数量',
   'hudChrome.bank.withdrawQuantityConfirm': '取出',
+  'hudChrome.bank.withdrawQuantityAction': '选择 {item} 的取出数量',
   'hudChrome.bank.filterGroupAria': '按类别筛选银行',
   'hudChrome.bank.sortAria': '排序银行物品',
   'hudChrome.bank.searchAria': '按名称搜索银行物品',

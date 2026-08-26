@@ -3074,6 +3074,7 @@ export const ko_KR: EnTranslations = {
       "withdrawQuantityTitle": "{item} 꺼내기",
       "withdrawQuantityInput": "꺼낼 수량",
       "withdrawQuantityConfirm": "꺼내기",
+      "withdrawQuantityAction": "{item} 꺼낼 수량 선택",
       "filterGroupAria": "은행을 분류별로 필터링",
       "sortAria": "은행 아이템 정렬",
       "searchAria": "이름으로 은행 아이템 검색",

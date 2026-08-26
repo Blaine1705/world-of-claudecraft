@@ -3074,6 +3074,7 @@ export const id_ID: EnTranslations = {
       "withdrawQuantityTitle": "Tarik {item}",
       "withdrawQuantityInput": "Jumlah yang ditarik",
       "withdrawQuantityConfirm": "Tarik",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Saring bank menurut kategori",
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",

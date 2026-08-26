@@ -3074,6 +3074,7 @@ export const ja_JP: EnTranslations = {
       "withdrawQuantityTitle": "{item}を引き出す",
       "withdrawQuantityInput": "引き出す数量",
       "withdrawQuantityConfirm": "引き出す",
+      "withdrawQuantityAction": "引き出す{item}の数量を選択",
       "filterGroupAria": "銀行をカテゴリーで絞り込む",
       "sortAria": "銀行のアイテムを並べ替える",
       "searchAria": "名前で銀行のアイテムを検索",

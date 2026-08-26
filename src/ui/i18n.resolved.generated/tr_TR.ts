@@ -3074,6 +3074,7 @@ export const tr_TR: EnTranslations = {
       "withdrawQuantityTitle": "{item} çek",
       "withdrawQuantityInput": "Çekilecek miktar",
       "withdrawQuantityConfirm": "Çek",
+      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
       "filterGroupAria": "Bankayı kategoriye göre filtrele",
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",

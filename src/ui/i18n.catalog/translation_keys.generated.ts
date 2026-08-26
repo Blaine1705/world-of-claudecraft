@@ -7940,6 +7940,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bank.vaultWithdrawShort'
   | 'hudChrome.bank.withdrawHint'
   | 'hudChrome.bank.withdrawPartialHint'
+  | 'hudChrome.bank.withdrawQuantityAction'
   | 'hudChrome.bank.withdrawQuantityConfirm'
   | 'hudChrome.bank.withdrawQuantityInput'
   | 'hudChrome.bank.withdrawQuantityTitle'
