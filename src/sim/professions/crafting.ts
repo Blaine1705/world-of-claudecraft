@@ -84,7 +84,7 @@ import {
 import { forceDismount } from '../mounts';
 import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
+import { reservePlannedVaultConsumption, type SimContext } from '../sim_context';
 import type { Entity, InvSlot, ItemDef, ItemInstancePayload } from '../types';
 import { CRAFT_CAST_ID, isConsuming } from '../types';
 import { vaultDrawStock } from '../vault_craft_gate';
@@ -641,7 +641,6 @@ export function evaluateCraftAdmission(
   // read (content lookups plus archetype state; none reads the inventory and
   // none draws rng).
   const def: ItemDef | undefined = ITEMS[recipe.resultItemId];
-  const outputQuality = defOutputQuality(def);
   // #1129/#1148: the archetype empowerment ceiling.
   const ceilingTier = meta
     ? archetypeCeilingFor(
@@ -822,6 +821,15 @@ export function resolveCraftForRecipe(
     // an arm only a bug can reach.
     return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
   }
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    plans,
+    meta?.vault.upgrades ?? 0,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, recipeId: recipe.id, reason: 'busy' };
+  }
   if (meta) {
     const goldFee = Math.ceil(recipe.itemLevelBudget * CRAFT_GOLD_SINK_COPPER_PER_BUDGET);
     meta.copper = Math.max(0, meta.copper - goldFee);
@@ -874,6 +882,9 @@ export function resolveCraftForRecipe(
       if (meta && consumePlayerVaultStock(meta, take.itemId, take.count)) vaultDraws.push(take);
     }
   });
+  // The host reservation becomes durable only after the exact planned vault
+  // draw has landed. A bags-only craft has no handle and stays allocation-free.
+  vaultReservation?.commit();
   // removeUnlockedFromSlots mutates the array only, unlike ctx.removeItem
   // (which fires this itself): fire it once for the whole reagent consumption,
   // the same one-call-at-the-end contract items.ts's own hand-rolled removal

@@ -72,8 +72,34 @@ import type {
   SkinCatalog,
   StationDef,
   StoragePrices,
+  VaultConsumptionAdmission,
+  VaultConsumptionReservation,
+  VaultConsumptionTake,
   Vec3,
 } from './types';
+
+/** Shared inert success handle for hosts with no durable audit sink. Reused by
+ *  reference so offline/headless vault actions allocate no reservation object. */
+export const INERT_VAULT_CONSUMPTION_RESERVATION: VaultConsumptionReservation = Object.freeze({
+  commit(): void {},
+  cancel(): void {},
+});
+
+export const inertVaultConsumptionAdmission: VaultConsumptionAdmission = () =>
+  INERT_VAULT_CONSUMPTION_RESERVATION;
+
+export type RuntimeSimConfig = Required<
+  Omit<
+    SimConfig,
+    | 'noPlayer'
+    | 'world'
+    | 'perfLap'
+    | 'respawnSeconds'
+    | 'storagePrices'
+    | 'vaultConsumptionAdmission'
+  >
+> &
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
 
 export interface DamageResolution {
   landedHpLoss: number;
@@ -184,10 +210,7 @@ export interface SimContextPrimitives {
   // global base from "fall through to the zone tier"; the rest defaulted.
   // `storagePrices` is consumed at construction like `noPlayer` (resolved once
   // into the storagePrices view below), so it never rides cfg.
-  readonly cfg: Required<
-    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'storagePrices'>
-  > &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  readonly cfg: RuntimeSimConfig;
   // Per-Sim key for the rift collision registry in colliders.ts (rift/runs.ts
   // registers regions under it, rift-aware collision reads pass it). Per INSTANCE,
   // not per seed: two same-seed Sims in one process must stay isolated.
@@ -354,6 +377,13 @@ export interface SimContextCallbacks {
   // Personal error toast/event to a player (core). Routes to `Sim.error`, which
   // emits `{ type: 'error', text, pid, reason? }`.
   error(pid: number, text: string, reason?: ErrorReason): void;
+  /** Reserve host audit capacity before a craft/enchant vault draw mutates
+   *  character state. Null is the retryable busy refusal. */
+  reserveVaultConsumption(
+    pid: number,
+    takes: readonly VaultConsumptionTake[],
+    vaultUpgrades: number,
+  ): VaultConsumptionReservation | null;
 
   // I1 dungeon instancing. `lockoutNowMs` is the shared raid-lockout clock (stays on
   // Sim; N1 also writes lockouts through it). instanceKeyFor/instanceOriginOf/
@@ -1097,7 +1127,10 @@ export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
 // resolved table would otherwise silently charge compiled defaults under a live
 // override, so the compiler enforces the wiring (host fakes import
 // DEFAULT_STORAGE_PRICES for it).
-export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
+type SimContextHostCallbacks = Omit<SimContextCallbacks, 'reserveVaultConsumption'> &
+  Partial<Pick<SimContextCallbacks, 'reserveVaultConsumption'>>;
+
+export interface SimContextHost extends SimContextPrimitives, SimContextHostCallbacks {
   readonly storagePrices: StoragePrices;
 }
 
@@ -1405,6 +1438,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     emit: host.emit,
     error: host.error,
+    reserveVaultConsumption: host.reserveVaultConsumption ?? inertVaultConsumptionAdmission,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     instanceKeyFor: host.instanceKeyFor,
@@ -1647,4 +1681,27 @@ export function createSimContext(host: SimContextHost): SimContext {
     bgOnPlayerHealed: host.bgOnPlayerHealed,
     bgCancelFlagAura: host.bgCancelFlagAura,
   };
+}
+
+/** Canonicalize every vault half of a reagent plan and offer it to the host.
+ *
+ * Undefined means the action has no vault draw and the host was deliberately
+ * not called. Null is a host refusal. A handle is an accepted reservation.
+ * The cloned rows and array are frozen before crossing the host boundary, and
+ * sorting uses code-unit order so it is deterministic across runtimes. */
+export function reservePlannedVaultConsumption(
+  ctx: SimContext,
+  pid: number,
+  plans: readonly { readonly vault: readonly VaultConsumptionTake[] }[],
+  vaultUpgrades: number,
+): VaultConsumptionReservation | null | undefined {
+  const takes: VaultConsumptionTake[] = [];
+  for (const plan of plans) {
+    for (const take of plan.vault) {
+      takes.push(Object.freeze({ itemId: take.itemId, count: take.count }));
+    }
+  }
+  if (takes.length === 0) return undefined;
+  takes.sort((a, b) => (a.itemId < b.itemId ? -1 : a.itemId > b.itemId ? 1 : a.count - b.count));
+  return ctx.reserveVaultConsumption(pid, Object.freeze(takes), vaultUpgrades);
 }

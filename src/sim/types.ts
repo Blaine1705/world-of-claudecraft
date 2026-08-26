@@ -6888,6 +6888,27 @@ export interface StoragePricesOverride {
   readonly vaultUpgrades?: readonly number[];
 }
 
+/** One identity-free Materials Vault unit draw offered to the authoritative
+ *  host before the sim mutates any character state. */
+export interface VaultConsumptionTake {
+  readonly itemId: string;
+  readonly count: number;
+}
+
+/** Opaque host reservation for one planned Materials Vault consumption. */
+export interface VaultConsumptionReservation {
+  commit(): void;
+  cancel(): void;
+}
+
+/** Host-side bounded-admission seam for craft/enchant vault consumption.
+ *  Returning null refuses the action before its first mutation. */
+export type VaultConsumptionAdmission = (
+  pid: number,
+  takes: readonly VaultConsumptionTake[],
+  vaultUpgrades: number,
+) => VaultConsumptionReservation | null;
+
 export interface SimConfig {
   seed: number;
   playerClass: PlayerClass;
@@ -6954,6 +6975,10 @@ export interface SimConfig {
   // Sim.storagePrices table (never carried onto Sim.cfg, the noPlayer idiom)
   // and no code reads it mid-tick.
   storagePrices?: StoragePricesOverride;
+  // Authoritative hosts reserve bounded audit capacity through this callback
+  // before a craft or enchant consumes from the Materials Vault. Offline and
+  // headless hosts omit it and receive an inert successful reservation.
+  vaultConsumptionAdmission?: VaultConsumptionAdmission;
 }
 
 export function emptyMoveInput(): MoveInput {

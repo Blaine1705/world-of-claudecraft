@@ -72,7 +72,7 @@ import type { Rng } from '../rng';
 // Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
 // shape, never the Sim class, so this module stays host-agnostic.
 import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
+import { reservePlannedVaultConsumption, type SimContext } from '../sim_context';
 import {
   cloneItemInstancePayload,
   DISENCHANT_CAST_ID,
@@ -973,7 +973,17 @@ function resolveApplyEnchantWorn(
   // capacity gate belongs to the bagged arm alone, where the mint really does
   // land in the inventory. (Which pool a reagent came out of changes nothing
   // here for the same reason: this arm has no bag-space question to answer.)
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    reagentPlans,
+    meta.vault.upgrades,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
+  }
   const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
+  vaultReservation?.commit();
   meta.equipmentInstance ??= {};
   meta.equipmentInstance[slot] = replacing
     ? // The replace mint: old enchant peeled off exactly, new one applied,
@@ -1079,6 +1089,15 @@ function resolveReplaceEnchantBagged(
   ) {
     return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
   }
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    reagentPlans,
+    meta.vault.upgrades,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
+  }
   const consumed = consumeEnchantedVictim(meta.inventory, itemId);
   // Deny rather than mint when nothing was consumed. Note what this does and
   // does NOT cover: consumeEnchantedVictim returns undefined ONLY from its
@@ -1088,9 +1107,13 @@ function resolveReplaceEnchantBagged(
   // destroyed the copy by the time we get here, and this return would skip the
   // mint, losing the item rather than duping it. Any such change has to keep
   // the removal and the mint atomic here, not lean on this line.
-  if (!consumed?.instance) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  if (!consumed?.instance) {
+    vaultReservation?.cancel();
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
   ctx.onInventoryChangedForQuests(meta);
   const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
+  vaultReservation?.commit();
   // silent + callerLogs, exactly like the plain apply mint below: the
   // enchantResult event fires its own dedicated cue (audio.enchant in
   // src/game/audio.ts) and logs the one enchant line. This mint re-grants the
@@ -1230,8 +1253,22 @@ export function resolveApplyEnchant(
       return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
     }
   }
+  const vaultReservation = reservePlannedVaultConsumption(
+    ctx,
+    pid,
+    reagentPlans,
+    meta?.vault.upgrades ?? 0,
+  );
+  if (vaultReservation === null) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
+  }
   const [consumed] = ctx.removeEnchantableItem(itemId, 1, pid);
+  if (!consumed) {
+    vaultReservation?.cancel();
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
   const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
+  vaultReservation?.commit();
   // The minted payload: the consumed copy's markers plus the enchant's
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).

@@ -555,6 +555,8 @@ import { persistedResource } from './serialize_resource';
 import {
   createSimContext,
   type DamageResolution,
+  inertVaultConsumptionAdmission,
+  type RuntimeSimConfig,
   type SimContext,
   type SimContextHost,
 } from './sim_context';
@@ -1736,10 +1738,7 @@ export class Sim {
   // built-in world); everything else is defaulted to a concrete value below.
   // `storagePrices` is consumed at construction like `noPlayer`, never carried
   // here: the resolved table below is the single truth.
-  cfg: Required<
-    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'storagePrices'>
-  > &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  cfg: RuntimeSimConfig;
   // The resolved storage price table (storage_prices.ts): frozen once in the
   // ctor from cfg.storagePrices; every bank/vault price read charges from it.
   readonly storagePrices: StoragePrices;
@@ -2088,7 +2087,7 @@ export class Sim {
     // S0b seam: the shared SimContext every extracted slice routes through. Built
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
-    this.ctx = this.buildSimContext();
+    this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission);
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -4857,7 +4856,7 @@ export class Sim {
   // routes straight back to the Sim method of the same name (the callback registry
   // in 02-WORKING-MEMORY.md). As a later slice owns one of these, it reimplements the
   // callback in its own module without renaming it here, so consumers never change.
-  private buildSimContext(): SimContext {
+  private buildSimContext(reserveVaultConsumption = inertVaultConsumptionAdmission): SimContext {
     const sim = this;
     const host: SimContextHost = {
       get rng() {
@@ -4986,6 +4985,7 @@ export class Sim {
       get storagePrices() {
         return sim.storagePrices;
       },
+      reserveVaultConsumption,
       // A2: duel + arena state stays on Sim, exposed as live views (backing fields
       // mutated in place / the queues reassigned by the matchmaker filter).
       get trades() {

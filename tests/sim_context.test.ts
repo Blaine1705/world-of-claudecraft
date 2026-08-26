@@ -22,6 +22,7 @@ import type { Entity, SimEvent } from '../src/sim/types';
 const CALLBACK_KEYS = [
   'emit',
   'error',
+  'reserveVaultConsumption',
   'dealDamage',
   'handleDeath',
   'cancelCast',
@@ -358,6 +359,7 @@ function makeFakeHost() {
     grantDeed: vi.fn(() => true),
     emit: vi.fn(),
     error: vi.fn(),
+    reserveVaultConsumption: vi.fn(() => ({ commit: vi.fn(), cancel: vi.fn() })),
     dealDamage: vi.fn(),
     handleDeath: vi.fn(),
     cancelCast: vi.fn(),
