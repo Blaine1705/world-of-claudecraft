@@ -4887,6 +4887,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.leaveText': '쏜피크의 차가운 공기 속으로 돌아옵니다.',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': '이그니바르, 마지막 불꽃의 전령',
   'entities.mobs.ignivar_heart_of_the_end.name': '종말의 심장',
+  'entities.mobs.derelict_mech.name': '버려진 기계병',
   'entities.dungeons.ignivar_raid_arena.name': '마지막 샘의 도가니',
   'entities.dungeons.ignivar_raid_arena.enterText': '도가니의 봉인된 물 위로 열기가 아른거립니다.',
   'entities.dungeons.ignivar_raid_arena.leaveText': '도가니를 벗어나 다시 편히 숨을 쉽니다.',

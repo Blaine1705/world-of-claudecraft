@@ -13881,6 +13881,9 @@ export const da_DK: EnTranslations = {
       "varkhul_forgefather_of_the_last_flame": {
         "name": "Varkhul, Forgefather of the Last Flame"
       },
+      "derelict_mech": {
+        "name": "Derelict Mech"
+      },
       "reliquary_ledger_wraith": {
         "name": "Regnskabsgenfærd"
       },

@@ -13881,6 +13881,9 @@ export const zh_CN: EnTranslations = {
       "varkhul_forgefather_of_the_last_flame": {
         "name": "末焰锻父瓦尔库尔"
       },
+      "derelict_mech": {
+        "name": "废弃机甲"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },

@@ -4738,6 +4738,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.leaveText': '你回到荊峰的寒冷空氣中。',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': '伊格尼瓦，末焰使者',
   'entities.mobs.ignivar_heart_of_the_end.name': '終焉之心',
+  'entities.mobs.derelict_mech.name': '廢棄機甲',
   'entities.dungeons.ignivar_raid_arena.name': '最後泉源熔爐',
   'entities.dungeons.ignivar_raid_arena.enterText': '熱浪在熔爐封印的水源上方翻湧。',
   'entities.dungeons.ignivar_raid_arena.leaveText': '你離開熔爐，終於再次暢快呼吸。',

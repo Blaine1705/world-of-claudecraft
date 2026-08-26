@@ -13881,6 +13881,9 @@ export const ru_RU: EnTranslations = {
       "varkhul_forgefather_of_the_last_flame": {
         "name": "Варкхул, отец ковки Последнего Пламени"
       },
+      "derelict_mech": {
+        "name": "Заброшенный механизм"
+      },
       "reliquary_ledger_wraith": {
         "name": "Книжный призрак"
       },

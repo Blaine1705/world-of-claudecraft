@@ -13881,6 +13881,9 @@ export const en_XA: EnTranslations = {
       "varkhul_forgefather_of_the_last_flame": {
         "name": "[Ʋáŕķĥúļ, Ƒóŕĝéƒáţĥéŕ óƒ ţĥé Ļášţ Ƒļáɱé]"
       },
+      "derelict_mech": {
+        "name": "[Ðéŕéļíçţ Ɱéçĥ]"
+      },
       "reliquary_ledger_wraith": {
         "name": "[Ļéðĝéŕ Ŵŕáíţĥ]"
       },

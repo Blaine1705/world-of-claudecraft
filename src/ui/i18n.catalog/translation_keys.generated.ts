@@ -3127,6 +3127,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.deepfen_murloc.name'
   | 'entities.mobs.deepfen_spearjaw.name'
   | 'entities.mobs.deeprock_kobold.name'
+  | 'entities.mobs.derelict_mech.name'
   | 'entities.mobs.downs_bandit.name'
   | 'entities.mobs.dragonkin_broodguard.name'
   | 'entities.mobs.dragonkin_egg.name'

@@ -4908,6 +4908,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.leaveText': 'ソーンピークの冷たい空気へ戻ります。',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': 'イグニヴァル、最後の炎の先触れ',
   'entities.mobs.ignivar_heart_of_the_end.name': '終焉の心臓',
+  'entities.mobs.derelict_mech.name': '朽ちた機械兵',
   'entities.dungeons.ignivar_raid_arena.name': '最後の泉のるつぼ',
   'entities.dungeons.ignivar_raid_arena.enterText':
     'るつぼの封じられた水面に熱気が揺らめいています。',

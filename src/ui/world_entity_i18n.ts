@@ -100,6 +100,8 @@ const MOB_IDS = [
   'ignivar_crucible_warden',
   'ignivar_cinder_artificer',
   'varkhul_forgefather_of_the_last_flame',
+  // Ignivar raid approach: the downed forge automaton packs (DUNGEON_MOBS).
+  'derelict_mech',
   // Collapsed Reliquary delve mobs
   'reliquary_ledger_wraith',
   'reliquary_funeral_ringer',

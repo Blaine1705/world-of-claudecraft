@@ -13881,6 +13881,9 @@ export const ko_KR: EnTranslations = {
       "varkhul_forgefather_of_the_last_flame": {
         "name": "마지막 불꽃의 대장장이 발쿨"
       },
+      "derelict_mech": {
+        "name": "버려진 기계병"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },

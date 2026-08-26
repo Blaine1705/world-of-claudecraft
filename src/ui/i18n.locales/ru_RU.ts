@@ -4939,6 +4939,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы возвращаетесь в холодный воздух Терновых высот.',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Игнивар, Вестник Последнего Пламени',
   'entities.mobs.ignivar_heart_of_the_end.name': 'Сердце Конца',
+  'entities.mobs.derelict_mech.name': 'Заброшенный механизм',
   'entities.dungeons.ignivar_raid_arena.name': 'Горнило Последнего Источника',
   'entities.dungeons.ignivar_raid_arena.enterText':
     'Жар дрожит над запечатанными водами Горнила.',

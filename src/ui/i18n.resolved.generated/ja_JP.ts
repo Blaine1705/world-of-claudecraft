@@ -13881,6 +13881,9 @@ export const ja_JP: EnTranslations = {
       "varkhul_forgefather_of_the_last_flame": {
         "name": "最後の炎の鍛造父、ヴァルクル"
       },
+      "derelict_mech": {
+        "name": "朽ちた機械兵"
+      },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
       },
