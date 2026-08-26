@@ -152,6 +152,17 @@ export interface EscrowStateRow {
 // past it stays name-resolved on both sides.
 const MAX_SAFE_INTEGER_SQL = '9007199254740991';
 
+// The one-statement work_mem raise for the escrow aggregate. Measured on a
+// 134k-letter, 103 MB book (PostgreSQL 16): at the stock 4 MB the pass
+// spills ~145 MB of temp-file writes and re-reads every tick (690 ms); at
+// 128 MB the sort fits but the expansion tuplestore still spills ~107 MB
+// (565 ms); at 256 MB nothing spills (500 ms). A book grown past the bound
+// degrades back to a graceful spill, never a failure. Safe to hold: exactly
+// one statement runs under it per pass, and the sweep is globally serialized
+// across realm processes by the advisory lock, so the allocation can never
+// multiply.
+export const ESCROW_AGGREGATE_WORK_MEM = '256MB';
+
 /** Per-character escrow totals aggregated INSIDE Postgres. The jsonb
  *  expansion of every realm's mail and market blob never leaves the database:
  *  the result set is proportional to the number of distinct recipients with
@@ -175,38 +186,57 @@ const MAX_SAFE_INTEGER_SQL = '9007199254740991';
  *  any WHERE guard could, and a malformed blob whose 'mail'/'collections' is
  *  not an array must yield zero rows, not fail the whole sweep. */
 export async function aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]> {
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(
-      `WITH entries AS (
-         SELECT substr(w.key, strpos(w.key, ':') + 1) AS realm,
-                btrim(elem->>'recipientKey') AS raw_key,
-                floor((elem->>'copper')::numeric)::bigint AS copper,
-                true AS is_mail
-         FROM world_state w
-         CROSS JOIN LATERAL jsonb_array_elements(
-           CASE WHEN jsonb_typeof(w.data->'mail') = 'array' THEN w.data->'mail' END
-         ) AS elem
-         WHERE w.key LIKE 'mail:%'
-           AND jsonb_typeof(elem->'recipientKey') = 'string'
-           AND jsonb_typeof(elem->'copper') = 'number'
-           AND floor((elem->>'copper')::numeric) >= 1
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, async (query) => {
+    // SET LOCAL: scoped to this transaction only (see the constant's comment).
+    await query(`SET LOCAL work_mem = '${ESCROW_AGGREGATE_WORK_MEM}'`);
+    // Statement shape notes, all load-bearing:
+    // - The inner OFFSET 0 subqueries compute each blob's array datum ONCE;
+    //   without the barrier the planner inlines the expression into both the
+    //   jsonb_typeof guard and the value use and detoasts the 89 MB blob
+    //   twice per pass.
+    // - The CASE around each jsonb_array_elements input yields NULL (zero
+    //   rows) for a malformed non-array 'mail'/'collections' instead of
+    //   failing the whole sweep; the copper upper bound below serves the
+    //   same must-not-abort rule for absurd stored values that would
+    //   overflow the bigint pipeline (the retired Node fold would have
+    //   mis-summed those in doubles and then failed in applyEscrowTotals).
+    // - The id-key test is a NESTED CASE, never an AND: PostgreSQL does not
+    //   guarantee short-circuit order, and the regex must bound the digits
+    //   (leading zeros aside, 16 significant digits) before the ::numeric
+    //   cast may run.
+    return query(
+      `WITH books AS (
+         SELECT realm, true AS is_mail,
+                CASE WHEN jsonb_typeof(arr) = 'array' THEN arr END AS arr
+         FROM (SELECT substr(w.key, strpos(w.key, ':') + 1) AS realm, w.data->'mail' AS arr
+               FROM world_state w WHERE w.key LIKE 'mail:%' OFFSET 0) m
          UNION ALL
-         SELECT substr(w.key, strpos(w.key, ':') + 1),
-                btrim(elem->>'key'),
-                floor((elem->>'copper')::numeric)::bigint,
-                false
-         FROM world_state w
-         CROSS JOIN LATERAL jsonb_array_elements(
-           CASE WHEN jsonb_typeof(w.data->'collections') = 'array' THEN w.data->'collections' END
-         ) AS elem
-         WHERE w.key LIKE 'market:%'
-           AND jsonb_typeof(elem->'key') = 'string'
+         SELECT realm, false,
+                CASE WHEN jsonb_typeof(arr) = 'array' THEN arr END
+         FROM (SELECT substr(w.key, strpos(w.key, ':') + 1) AS realm, w.data->'collections' AS arr
+               FROM world_state w WHERE w.key LIKE 'market:%' OFFSET 0) c
+       ),
+       entries AS (
+         SELECT b.realm, b.is_mail,
+                btrim(
+                  CASE WHEN b.is_mail THEN elem->>'recipientKey' ELSE elem->>'key' END,
+                  E' \\t\\n\\r\\f\\v'
+                ) AS raw_key,
+                floor((elem->>'copper')::numeric)::bigint AS copper
+         FROM books b
+         CROSS JOIN LATERAL jsonb_array_elements(b.arr) AS elem
+         WHERE jsonb_typeof(
+                 CASE WHEN b.is_mail THEN elem->'recipientKey' ELSE elem->'key' END
+               ) = 'string'
            AND jsonb_typeof(elem->'copper') = 'number'
-           AND floor((elem->>'copper')::numeric) >= 1
+           AND (elem->>'copper')::numeric >= 1
+           AND (elem->>'copper')::numeric < 9007199254740992
        ),
        keyed AS (
-         SELECT CASE WHEN raw_key ~ '^[0-9]+$' AND raw_key::numeric <= ${MAX_SAFE_INTEGER_SQL}
-                     THEN (raw_key::numeric)::bigint END AS character_id,
+         SELECT CASE WHEN raw_key ~ '^0*[0-9]{1,16}$' THEN
+                  CASE WHEN raw_key::numeric <= ${MAX_SAFE_INTEGER_SQL}
+                       THEN (raw_key::numeric)::bigint END
+                END AS character_id,
                 realm, raw_key, copper, is_mail
          FROM entries
          WHERE raw_key <> ''
@@ -220,8 +250,8 @@ export async function aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]> {
        GROUP BY character_id,
                 CASE WHEN character_id IS NULL THEN raw_key END,
                 CASE WHEN character_id IS NULL THEN realm END`,
-    ),
-  );
+    );
+  });
   return res.rows.map((row) => ({
     characterId: row.character_id === null ? null : Number(row.character_id),
     characterName: row.character_name ?? null,

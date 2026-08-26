@@ -68,7 +68,13 @@ export function parseEscrowStateKey(
  * (account_wealth_db.ts aggregateEscrowTotals), and this fold is the
  * executable definition that SQL is pinned against
  * (tests/account_wealth_pg_integration.test.ts). Keep the two in lockstep:
- * any semantic change lands in BOTH, same change.
+ * any semantic change lands in BOTH, same change. Two deliberate SQL-side
+ * divergences, both outside any real blob: a copper value at or past
+ * Number.MAX_SAFE_INTEGER + 1 is SKIPPED by the SQL (this fold would
+ * mis-sum it in doubles and applyEscrowTotals would then abort on the
+ * bigint cast, so skipping is the arm that keeps the sweep alive), and a
+ * key padded with exotic Unicode whitespace stays name-keyed in SQL where
+ * String.trim would strip it (the SQL trims the ASCII whitespace set).
  *
  * Fold the mail and market blobs into per-character escrow totals. Keys follow
  * the market sellerKey convention: a stable character id string, with legacy

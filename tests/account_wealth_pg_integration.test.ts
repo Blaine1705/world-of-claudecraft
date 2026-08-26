@@ -142,6 +142,10 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
         { recipientKey: String(idKeyed), copper: 500 },
         { recipientKey: `0${idKeyed}`, copper: 250 },
         { recipientKey: ` ${idKeyed} `, copper: 40 },
+        // Control-character padding trims like String.trim on both sides,
+        // and a whitespace-only key collapses to the skipped '' key.
+        { recipientKey: `\t${idKeyed}\n`, copper: 8 },
+        { recipientKey: '\t', copper: 11 },
         // Legacy name-keyed letter, realm-scoped.
         { recipientKey: 'AwvOldname', copper: 300 },
         // Floors: 2.9 counts 2; 0.9 floors to zero and is skipped.
@@ -156,9 +160,11 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
         { recipientKey: 42, copper: 10 },
         { recipientKey: String(idKeyed) },
         null,
-        // An all-digit key past Number.MAX_SAFE_INTEGER stays name-resolved
-        // (and matches no character, so it never reaches account_wealth).
+        // All-digit keys past Number.MAX_SAFE_INTEGER stay name-resolved
+        // (and match no character, so they never reach account_wealth),
+        // including one long past the SQL's 16-significant-digit regex line.
         { recipientKey: '9007199254740993', copper: 5 },
+        { recipientKey: '123456789012345678901', copper: 3 },
       ],
     });
     await putWorldState('mail:awv-frostmark', {
@@ -201,12 +207,12 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
     // can never pass by both sides being wrong the same way.
     expect(canon(aggregated)).toEqual(
       canon([
-        // 500 + 250 + 40 + floor(2.9) across realms (+5 frostmark) = 797.
+        // 500 + 250 + 40 + 8 + floor(2.9) across realms (+5 frostmark) = 805.
         {
           characterId: idKeyed,
           characterName: null,
           realm: null,
-          mailCopper: 797,
+          mailCopper: 805,
           marketCopper: 60,
         },
         {
@@ -230,12 +236,19 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
           mailCopper: 5,
           marketCopper: 0,
         },
+        {
+          characterId: null,
+          characterName: '123456789012345678901',
+          realm,
+          mailCopper: 3,
+          marketCopper: 0,
+        },
       ]),
     );
 
     // --- End to end: resolve + upsert through the real applyEscrowTotals. ---
     await wealthDb.applyEscrowTotals(aggregated);
-    expect(await wealthRow(accountA)).toEqual({ mail: 797, market: 60, total: 857 });
+    expect(await wealthRow(accountA)).toEqual({ mail: 805, market: 60, total: 865 });
     expect(await wealthRow(accountB)).toEqual({ mail: 300, market: 30, total: 330 });
     expect(await wealthRow(accountC)).toEqual({ mail: 20, market: 0, total: 20 });
 
@@ -247,6 +260,22 @@ describeDb('account wealth escrow aggregation (REAL Postgres)', () => {
     expect(await wealthRow(accountA)).toEqual({ mail: 0, market: 0, total: 0 });
     expect(await wealthRow(accountB)).toEqual({ mail: 0, market: 0, total: 0 });
     expect(await wealthRow(accountC)).toEqual({ mail: 0, market: 0, total: 0 });
+  });
+
+  it('skips an absurd copper value instead of aborting the sweep (deliberate oracle divergence)', async () => {
+    const account = await makeAccount();
+    const charId = await makeCharacter(account, 'AwvAbsurd', realm);
+    await putWorldState('mail:awv-absurd', {
+      mail: [
+        // At MAX_SAFE_INTEGER + 1 the bigint pipeline would abort in
+        // applyEscrowTotals even under the retired Node fold; the SQL skips
+        // the entry so the pass stays alive, and sums the sane sibling.
+        { recipientKey: String(charId), copper: 9007199254740992 },
+        { recipientKey: String(charId), copper: 25 },
+      ],
+    });
+    const aggregated = await wealthDb.aggregateEscrowTotals();
+    expect(aggregated.find((t) => t.characterId === charId)?.mailCopper).toBe(25);
   });
 
   it('holds the parity and the sums on a large book (the flat-cost claim, sampled)', async () => {

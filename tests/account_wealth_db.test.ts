@@ -105,6 +105,8 @@ describe('refreshAccountPurseTotals', () => {
 
 describe('aggregateEscrowTotals', () => {
   it('aggregates inside Postgres on the heavy allowance, never shipping a blob to Node', async () => {
+    // First statement under the transaction is the work_mem raise.
+    query.mockResolvedValueOnce(queryResult([]));
     query.mockResolvedValueOnce(
       queryResult([
         {
@@ -138,8 +140,13 @@ describe('aggregateEscrowTotals', () => {
     // every realm's blobs), never the bare pool default.
     expect(runWithStatementTimeout).toHaveBeenCalledTimes(1);
     expect(runWithStatementTimeout.mock.calls[0][0]).toBe(60_000);
-    expect(boundedQuery).toHaveBeenCalledTimes(1);
-    const sql = boundedQuery.mock.calls[0][0];
+    // Two statements under the one transaction: the per-statement work_mem
+    // raise (at the stock 4 MB the production-size expansion spills ~145 MB
+    // of temp file per pass; see ESCROW_AGGREGATE_WORK_MEM), then the
+    // aggregate itself.
+    expect(boundedQuery).toHaveBeenCalledTimes(2);
+    expect(boundedQuery.mock.calls[0][0]).toBe("SET LOCAL work_mem = '256MB'");
+    const sql = boundedQuery.mock.calls[1][0];
     // The core of the fix: the data column is expanded in SQL, never selected
     // whole for a Node-side parse.
     expect(sql).not.toMatch(/SELECT key, data/);
@@ -148,22 +155,32 @@ describe('aggregateEscrowTotals', () => {
     // never the bare legacy 'market' rollback row.
     expect(sql).toMatch(/key LIKE 'mail:%'/);
     expect(sql).toMatch(/key LIKE 'market:%'/);
+    // The single-detoast barrier: each blob's array datum is computed once
+    // inside an OFFSET 0 subquery, then guarded; inlining the -> into both
+    // the typeof and the value would detoast the 89 MB blob twice.
+    expect(sql).toMatch(
+      /w\.data->'mail' AS arr\s+FROM world_state w WHERE w\.key LIKE 'mail:%' OFFSET 0/,
+    );
+    expect(sql).toMatch(
+      /w\.data->'collections' AS arr\s+FROM world_state w WHERE w\.key LIKE 'market:%' OFFSET 0/,
+    );
     // The malformed-blob guard: the lateral input is CASE-guarded on
     // jsonb_typeof so a non-array 'mail'/'collections' yields zero rows
     // instead of failing the whole sweep statement.
+    expect(sql).toMatch(/CASE WHEN jsonb_typeof\(arr\) = 'array' THEN arr END/);
+    // Entry guards mirror positiveCopper + the string-key requirement, with
+    // the absurd-copper upper bound that keeps the bigint pipeline alive.
+    expect(sql).toMatch(/jsonb_typeof\(elem->'copper'\) = 'number'/);
+    expect(sql).toMatch(/\(elem->>'copper'\)::numeric >= 1/);
+    expect(sql).toMatch(/\(elem->>'copper'\)::numeric < 9007199254740992/);
+    // The id-key line: a digit-bounding regex runs BEFORE the ::numeric cast
+    // in a NESTED CASE (PostgreSQL guarantees no AND short-circuit order),
+    // the bound is Number.MAX_SAFE_INTEGER like the oracle's isSafeInteger,
+    // and the house-stock '' key is skipped.
+    expect(sql).toMatch(/raw_key ~ '\^0\*\[0-9\]\{1,16\}\$'/);
     expect(sql).toMatch(
-      /jsonb_array_elements\(\s*CASE WHEN jsonb_typeof\(w\.data->'mail'\) = 'array' THEN w\.data->'mail' END\s*\)/,
+      /CASE WHEN raw_key ~ [^]*THEN\s+CASE WHEN raw_key::numeric <= 9007199254740991/,
     );
-    expect(sql).toMatch(
-      /jsonb_array_elements\(\s*CASE WHEN jsonb_typeof\(w\.data->'collections'\) = 'array' THEN w\.data->'collections' END\s*\)/,
-    );
-    // Entry guards mirror positiveCopper + the string-key requirement.
-    expect(sql).toMatch(/jsonb_typeof\(elem->'recipientKey'\) = 'string'/);
-    expect(sql).toMatch(/jsonb_typeof\(elem->'key'\) = 'string'/);
-    expect(sql).toMatch(/floor\(\(elem->>'copper'\)::numeric\) >= 1/);
-    // The id-key line is Number.MAX_SAFE_INTEGER, same as the Node oracle's
-    // Number.isSafeInteger, and the house-stock '' key is skipped.
-    expect(sql).toMatch(/9007199254740991/);
     expect(sql).toMatch(/raw_key <> ''/);
   });
 });
