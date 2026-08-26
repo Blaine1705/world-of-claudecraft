@@ -103,16 +103,18 @@ export function createBackgroundDbGate(
       if (inFlight < max && waiters.size === 0) return Promise.resolve(permit());
       return new Promise((resolve) => {
         const token = {};
-        const onAbort = signal
-          ? () => {
-              if (!waiters.delete(token)) return;
-              signal.removeEventListener('abort', onAbort);
-              cancelled++;
-              resolve(null);
-            }
-          : undefined;
+        if (!signal) {
+          waiters.set(token, { resolve });
+          return;
+        }
+        const onAbort = () => {
+          if (!waiters.delete(token)) return;
+          signal.removeEventListener('abort', onAbort);
+          cancelled++;
+          resolve(null);
+        };
         waiters.set(token, { resolve, signal, onAbort });
-        if (signal && onAbort) signal.addEventListener('abort', onAbort, { once: true });
+        signal.addEventListener('abort', onAbort, { once: true });
       });
     },
     tryAcquire(): BackgroundDbPermit | null {
