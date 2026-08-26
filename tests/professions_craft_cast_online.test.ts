@@ -19,8 +19,8 @@ import { describe, expect, it, vi } from 'vitest';
 // under test (the hoisting caveat applies: this block cannot reference imports).
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
-  saveCharacterState: vi.fn(async () => {}),
-  saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveCharacterState: vi.fn(async () => true),
+  saveCharacterAndMarketState: vi.fn(async () => true),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -35,15 +35,14 @@ vi.mock('../server/db', () => ({
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   })),
-  // Phase 04 craft-from-vault: the tick observer writes craft_consume ledger
-  // rows through the batched insert; mocked so the vault arm below can assert
-  // the exact rows (the tests/vault_wire.test.ts pattern).
+  // Isolated legacy recorders keep these spies. Live craft consumption stages
+  // in the session journal and rides saveCharacterState atomically instead.
   insertBankLedgerRow: vi.fn(async () => {}),
   insertBankLedgerRows: vi.fn(async () => {}),
 }));
 
 import { bankLedgerIdle } from '../server/bank_ledger';
-import { insertBankLedgerRows } from '../server/db';
+import { insertBankLedgerRows, saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { REALM } from '../server/realm';
 import type { ClientWorld } from '../src/net/online';
@@ -54,6 +53,25 @@ import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // The batched ledger writer the Phase 04 vault arm asserts against.
 const insertLedgerRowsMock = vi.mocked(insertBankLedgerRows);
+const saveCharacterMock = vi.mocked(saveCharacterState);
+
+function decodedJournalRows(session: ClientSession): Record<string, unknown>[] {
+  return session.bankLedgerJournal.outbox
+    .snapshot()
+    .batches.flatMap((batch) => batch.rows)
+    .map((row) => {
+      const { instanceJson, counterpartyCopperDelta, counterpartyCount, ...plain } = row;
+      return {
+        ...plain,
+        instance:
+          instanceJson === null || instanceJson === undefined
+            ? null
+            : JSON.parse(String(instanceJson)),
+        ...(counterpartyCopperDelta == null ? {} : { counterpartyCopperDelta }),
+        ...(counterpartyCount == null ? {} : { counterpartyCount }),
+      };
+    });
+}
 
 // A field recipe (skillReq 0, no station), so a freshly joined character can
 // start it standing in the open with nothing but reagents and coin.
@@ -375,9 +393,10 @@ describe('the ccast self fragment round-trips a running batch craft', () => {
 // tests/craft_from_vault.test.ts; this block is the server-observation seam.
 // ---------------------------------------------------------------------------
 describe('craft-from-vault online (Phase 04)', () => {
-  it('a vault-backed craft writes ONE craft_consume batch and the cvault delta converges the mirror', async () => {
+  it('a vault-backed craft commits ONE craft_consume batch with the cvault character snapshot', async () => {
     await bankLedgerIdle();
     insertLedgerRowsMock.mockClear();
+    saveCharacterMock.mockClear();
     const server = new GameServer();
     const fw = fakeWs();
     const session = joinServer(server, fw, 71, 'Vaultcraft');
@@ -412,13 +431,15 @@ describe('craft-from-vault online (Phase 04)', () => {
     (server as any).routeEvents(events);
     // biome-ignore lint/suspicious/noExplicitAny: see above
     (server as any).detectActivity(events);
-    await bankLedgerIdle();
 
     // The sim consumed carried FIRST (the one carried fang), then the vault.
     expect(meta.vault.stock).toEqual({ wolf_fang: 3 });
-    // Exactly ONE batched insert, rows verbatim from the event.
-    expect(insertLedgerRowsMock).toHaveBeenCalledTimes(1);
-    expect(insertLedgerRowsMock.mock.calls[0][0]).toEqual([
+    // No row can race ahead of the changed vault blob. One immutable command
+    // batch waits in the session journal until the character transaction.
+    expect(insertLedgerRowsMock).not.toHaveBeenCalled();
+    const staged = session.bankLedgerJournal.outbox.snapshot();
+    expect(staged.batches).toHaveLength(1);
+    expect(decodedJournalRows(session)).toEqual([
       {
         realm: REALM,
         characterId: 71,
@@ -433,6 +454,16 @@ describe('craft-from-vault online (Phase 04)', () => {
         containerId: null,
       },
     ]);
+    // Craft completion may also enqueue the deed durability save. Calling the
+    // public save seam joins that same character FIFO, so all earlier work has
+    // settled when it resolves. Exactly one transaction may claim this prefix.
+    await expect(server.saveCharacter(session)).resolves.toBe(true);
+    const ledgerSaveCalls = saveCharacterMock.mock.calls.filter((call) => call[5] !== undefined);
+    expect(ledgerSaveCalls).toHaveLength(1);
+    const saveCall = ledgerSaveCalls[0];
+    expect(saveCall[2]).toMatchObject({ vault: { upgrades: 1, stock: { wolf_fang: 3 } } });
+    expect(saveCall[5]).toEqual({ owner: staged.owner, batches: staged.batches });
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
     // The personal event reached the owner's wire (routeEvents relays every
     // pid-tagged event to its owner; the payload is the owner's own data).
     expect(JSON.stringify(fw.sent)).toContain('vaultCraftConsume');
@@ -448,6 +479,7 @@ describe('craft-from-vault online (Phase 04)', () => {
   it('a carried-sufficient craft writes NO ledger row, no event, and leaves the vault byte-identical', async () => {
     await bankLedgerIdle();
     insertLedgerRowsMock.mockClear();
+    saveCharacterMock.mockClear();
     const server = new GameServer();
     const fw = fakeWs();
     const session = joinServer(server, fw, 72, 'Bagscraft');
@@ -467,10 +499,11 @@ describe('craft-from-vault online (Phase 04)', () => {
     (server as any).routeEvents(events);
     // biome-ignore lint/suspicious/noExplicitAny: see above
     (server as any).detectActivity(events);
-    await bankLedgerIdle();
 
     expect(JSON.stringify(meta.vault)).toBe(vaultBefore);
     expect(insertLedgerRowsMock).not.toHaveBeenCalled();
+    expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(saveCharacterMock).not.toHaveBeenCalled();
     expect(JSON.stringify(events)).not.toContain('vaultCraftConsume');
   });
 

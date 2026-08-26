@@ -36,11 +36,7 @@ import {
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
 import { specialRoleChatTag } from '../src/sim/discord_roles';
-import {
-  GUILD_CREATION_FEE_COPPER,
-  type GuildBankOpDelta,
-  guildBankRungsBought,
-} from '../src/sim/guild_bank';
+import type { GuildBankOpDelta } from '../src/sim/guild_bank';
 import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
 import {
   isInJailCage,
@@ -120,21 +116,17 @@ import { sameAppearance } from '../src/world_api/appearance';
 import { recordOnlineSample } from './admin_db';
 import { type AdminGuildBankView, adminGuildBankView } from './admin_guild_bank_view';
 import { offensiveName } from './auth';
+import type { BackgroundDbGate } from './background_db_gate';
+import { type GuildBankLedgerOp, recordGuildBankEscrowRollback } from './bank_ledger';
+import type { BankLedgerProjectionSurface } from './bank_ledger_admission';
+import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import {
-  buildGuildBankLedgerRows,
-  diffGuildBankOp,
-  type GuildBankLedgerOp,
-  guildCreateFeeDelta,
-  recordGuildBankEscrowRollback,
-} from './bank_ledger';
-import type {
-  BankLedgerAdmissionHandle,
-  BankLedgerProjectionSurface,
-} from './bank_ledger_admission';
-import type {
-  BankLedgerOutboxSnapshot,
-  SerializedBankLedgerGuildDelta,
-} from './bank_ledger_outbox';
+  consumeCommittedGuildLedgerPrefix,
+  guildLedgerPrefixCounts,
+  ledgerProjectionSurface,
+  visitGuildLedgerIdsForOps,
+} from './bank_ledger_guild_prefix';
+import type { BankLedgerOutboxSnapshot } from './bank_ledger_outbox';
 import { bankLedgerCommittedPrefixForError } from './bank_ledger_save_effects_db';
 import {
   acknowledgeCharacterSaveEffects as acknowledgeCommittedCharacterSaveEffects,
@@ -143,6 +135,11 @@ import {
   bankLedgerSaveEffects,
   createBankLedgerSessionJournal,
 } from './bank_ledger_session';
+import {
+  type BankVaultLedgerGuardCoordinator,
+  type BankVaultLedgerGuardRuntime,
+  createBankVaultLedgerGuardCoordinator,
+} from './bank_vault_ledger_guard';
 import { dispatchBankCommand, emitBankSelfKeys } from './bank_wire';
 import { reportBgOutcomes } from './battleground_telemetry';
 import type {
@@ -184,7 +181,7 @@ import {
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
 import { dailyRewardService } from './daily_rewards';
-import type { AccountChatMuteStatus, AccountCosmetics, BankLedgerRow, RequestMetadata } from './db';
+import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
@@ -193,6 +190,7 @@ import {
   heartbeatCharacterLeases,
   insertChatLogs,
   loadAccountFlair,
+  loadGuildBankRow,
   loadGuildBankRows,
   loadMailState,
   loadMarketState,
@@ -253,17 +251,10 @@ import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_ch
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
-import {
-  type CounterpartyActor,
-  type CounterpartyMovement,
-  counterpartyIdle,
-  counterpartyMovement,
-  counterpartyOrphan,
-  counterpartyOrphanEvidence,
-  counterpartySnapshot,
-  stampCounterpartyDeltas,
-} from './guild_bank_counterparty';
-import { readGuildBankLog } from './guild_bank_log';
+import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
+import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
+import { deliverGuildBankLog } from './guild_bank_log_delivery';
+import { runGuildBankOp as coordinateGuildBankOp } from './guild_bank_op_coordinator';
 import {
   consumeGuildBankOpToken,
   createGuildBankOpGuard,
@@ -278,6 +269,7 @@ import {
   type GuildBankWriteResult,
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
+import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
@@ -323,6 +315,10 @@ import {
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
+import {
+  createPaidGuildCreationCoordinator,
+  type PaidGuildCreationCoordinator,
+} from './paid_guild_creation';
 import {
   createParseSubsystem,
   type FightParticipant,
@@ -1151,6 +1147,8 @@ export interface ClientSession {
   // The admission surface is the pre-mutation capacity gate; the outbox owns
   // exact immutable prefixes until a known COMMIT advances them.
   bankLedgerJournal: BankLedgerSessionJournal;
+  // Manual commands and craft consumption share one retained-row budget.
+  bankVaultLedgerGuard: BankVaultLedgerGuardRuntime;
   // Coalesces the journal high-water callback into at most one queued save.
   bankLedgerSaveScheduled: boolean;
   // A guild-create request owns a charged purse + reserved ledger command
@@ -1755,30 +1753,14 @@ export interface PerfCaptureStatus {
   last: PerfCaptureResult | null;
 }
 
-// The creation fee as WHOLE GOLD, computed once for the two refusal emits.
-//
-// The client matcher splices an INTEGER (src/ui/server_i18n.ts guild.createFee,
-// `You need (\\d+) gold to found a guild.`), so a fee that stopped being whole
-// gold would emit "1.5" and silently ship raw English to every locale with
-// nothing reddening. The requirement is asserted HERE, where the number is
-// made, rather than left to a comment: a non-whole fee fails at import (and so
-// in every server test) instead of at a player's screen.
-const GUILD_CREATION_FEE_GOLD = ((): number => {
-  const gold = GUILD_CREATION_FEE_COPPER / 10_000;
-  if (!Number.isInteger(gold) || gold <= 0) {
-    throw new Error(
-      `GUILD_CREATION_FEE_COPPER must be a positive whole number of gold for the guild.createFee matcher, got ${GUILD_CREATION_FEE_COPPER}`,
-    );
-  }
-  return gold;
-})();
-
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
+  private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
+    createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000);
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
   // Combat parse capture; constructed in the constructor (needs this.sim).
@@ -1789,28 +1771,8 @@ export class GameServer {
   private readonly ipBlockList = new IpBlockList();
   private readonly socialDb = new PgSocialDb(pool);
   readonly social: SocialService;
-  // Guild creation fees reserved at the guild_create dispatch gate (Guild Bank
-  // Phase 3 QA, reserve-at-gate), keyed by character id and consumed by
-  // exactly one of: the create's committed success arm (onGuildCreated writes
-  // the create_fee ledger row) or the refusal/error arm
-  // (refundGuildCreateFee returns the copper). A character can hold at most
-  // one reservation; the gate refuses a second guild_create while one is
-  // pending, so a pipelined double-create can never double-charge or
-  // double-refund.
-  private readonly pendingGuildCreateFees = new Map<
-    number,
-    // `pursePaid` is the SIGNED copper the founder's purse was observed to
-    // move across the charge (negative), snapshotted at the gate rather than
-    // derived from `amount`, so the create_fee ledger row's two halves are two
-    // independent measurements and their balance check can actually fail.
-    {
-      accountId: number;
-      amount: number;
-      pursePaid: number;
-      ledgerReservation: BankLedgerAdmissionHandle;
-      origin: ClientSession;
-    }
-  >();
+  private readonly paidGuildCreation: PaidGuildCreationCoordinator;
+  private readonly guildBankLazyLoader: GuildBankLazyLoader;
   // Guilds whose bank is CLOSED because a guild-delete is in flight: the
   // window between the empty-bank guard passing and the guilds DELETE (which
   // cascades the guild_banks row away) plus its post-commit hooks. Guild bank
@@ -2001,7 +1963,10 @@ export class GameServer {
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
 
-  constructor(generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT) {
+  constructor(
+    generalChatQuotaMaxInFlight = GENERAL_CHAT_QUOTA_MAX_IN_FLIGHT,
+    private readonly backgroundDbGate?: BackgroundDbGate,
+  ) {
     attachDetectorFlagHost(this.botDetector);
     this.generalChatQuota = new GeneralChatQuotaCoordinator({
       consume: consumeGeneralChatQuota,
@@ -2048,7 +2013,9 @@ export class GameServer {
           ) {
             return null;
           }
-          return session.bankLedgerJournal.reserveVaultConsumption(takes, vaultUpgrades);
+          return session.bankVaultLedgerGuard.reserveVaultConsumption(takes.length, () =>
+            session.bankLedgerJournal.reserveVaultConsumption(takes, vaultUpgrades),
+          );
         },
       ),
     );
@@ -2065,6 +2032,51 @@ export class GameServer {
       // the shared ChatFilter instance.
       (text) => this.chatFilter.findHardHit(text),
     );
+    this.paidGuildCreation = createPaidGuildCreationCoordinator({
+      characterSaveQueues: this.characterSaveQueues,
+      sessionByCharacterId: (characterId) => this.sessionsByCharacterId.get(characterId),
+      copperFor: (pid) => this.sim.meta(pid)?.copper,
+      hasEntity: (pid) => this.sim.entities.has(pid),
+      chargeFee: (pid) => this.sim.chargeGuildCreationFeeFor(pid),
+      refundFee: (pid, amount) => this.sim.refundGuildCreationFeeFor(pid, amount),
+      serializeForPersist: (characterId) => this.serializeCharacterForPersist(characterId),
+      createAtomic: (args) =>
+        createPaidGuildWithLeaderAtomic(
+          {
+            pool,
+            bustGuildRoster: (guildId) => this.socialDb.bustGuildRoster(guildId),
+          },
+          args,
+        ),
+      guildCreate: (session, rawName, create) =>
+        this.social.guildCreate(this.actorFor(session), rawName, create),
+      sendNotice: (session, text) => this.sendChatNotice(session, text),
+      quarantineProjection: (session, error) =>
+        this.quarantineBankLedgerProjection(session, error, 'guild'),
+      quarantineGrowthLimit: (session, error) =>
+        this.quarantineBankLedgerGrowthLimit(session, error),
+      bustCommittedGuildLog: (guildId) => bustGuildBankLog(guildId),
+      kick: (session, reason, auditReason) => {
+        void this.kickSession(session, reason, auditReason);
+      },
+      logSocialError: logSocialErr,
+    });
+    this.guildBankLazyLoader = createGuildBankLazyLoader({
+      hasLoaded: (guildId) => this.sim.guildBanks.has(guildId),
+      loadRow: (guildId) => loadGuildBankRow(guildId),
+      applyRows: (rows) => loadGuildBanksIntoSim(this.sim, rows),
+      ...(backgroundDbGate
+        ? { tryAcquireImmediatePermit: () => backgroundDbGate.tryAcquire() }
+        : {}),
+      scheduleRetry: (delayMs, retry) => {
+        const timer = setTimeout(retry, delayMs).unref();
+        return () => clearTimeout(timer);
+      },
+      recordBookUnloadedIncident: () => gameMetricsCounters().guildBankIncident('book_unloaded'),
+      warn: (message) => console.warn(message),
+      error: (message, error) => console.error(message, ...(error === undefined ? [] : [error])),
+      nowMs: Date.now,
+    });
     this.moderation = new ModerationService(this.moderationHost(), {
       recordAction: (input) => recordInGameAction(input),
       mute: (input) => muteAccountChat(input),
@@ -2563,48 +2575,12 @@ export class GameServer {
           membership ? { guildId: membership.guildId, rank: membership.rank } : null,
         );
       },
-      // Guild Bank Phase 3: the create commit's book seed + creation fee.
-      onGuildCreated: (id, guildId) => {
-        // Seed the empty book into the LIVE sim in the same success arm that
-        // stamped the founder: ops never lazily create a book (loadGuildBank
-        // is load-once; a lazy book would shadow the persisted row after a
-        // restart), so without this seed the founder's bank would be silently
-        // inert until a realm restart boot-loads it.
+      // The paid creator has already committed the empty durable row beside
+      // the founder charge and receipt. This hook mirrors only that known
+      // committed book into the live sim; it must never queue a second fee or
+      // mark an empty book dirty for a follow-up save.
+      onGuildCreated: (_id, guildId) => {
         this.sim.loadGuildBank(guildId, null);
-        // RESERVE-AT-GATE (Phase 3 QA, revising create-then-charge): the fee
-        // was already deducted synchronously at the guild_create dispatch
-        // gate, so this success arm only consumes the pending reservation:
-        // it writes the create_fee ledger row and schedules the escrow save.
-        // A founder who vanished mid-flight already paid at the gate (their
-        // leave flush persists the charged purse), so the fee can no longer
-        // be dodged by logging out before the commit.
-        const fee = this.pendingGuildCreateFees.get(id);
-        this.pendingGuildCreateFees.delete(id);
-        const s = this.sessionByCharacterId(id);
-        if (!s || !fee || fee.amount <= 0 || s !== fee.origin) {
-          fee?.ledgerReservation.failAfterMutation(
-            new Error('committed guild creation lost its live fee owner'),
-          );
-          gameMetricsCounters().guildBankIncident('create_fee_unpaid');
-          console.error(
-            `guild ${guildId} committed without a live reserved creation fee for character ${id}`,
-          );
-          return;
-        }
-        this.markGuildBankDirty(s, guildId);
-        try {
-          fee.ledgerReservation.commit(
-            buildGuildBankLedgerRows(
-              'create_fee',
-              { characterId: id, accountId: fee.accountId },
-              guildId,
-              [guildCreateFeeDelta(fee.amount, fee.pursePaid)],
-            ),
-          );
-        } catch (error) {
-          fee.ledgerReservation.failAfterMutation(error);
-          throw error;
-        }
       },
       // Disband committed (the empty-bank guard passed): evict the book so the
       // map stays bounded and a re-created guild id can never inherit a stale
@@ -2687,6 +2663,13 @@ export class GameServer {
       // not overwrite them below.
       const seqBefore = session.guildStampSeq;
       const snap = await this.social.snapshot(charId);
+      // A guild can be created after this process's boot load (including an
+      // ambiguous COMMIT resolved by reconnect). Load its durable book before
+      // exposing membership locally; never synthesize empty state when the row
+      // is absent, oversized, malformed, or temporarily unreadable.
+      if (snap.guild && !this.sim.guildBanks.has(snap.guild.id)) {
+        await this.guildBankLazyLoader.ensureLoaded(snap.guild.id);
+      }
       this.send(session, { t: 'social', ...snap });
       // Stamp the guild name onto the player's world entity so it rides the
       // identity wire and shows under their nameplate for everyone nearby,
@@ -2912,6 +2895,7 @@ export class GameServer {
       void this.saveMarket();
       void this.saveMail();
       void this.saveRifts();
+      this.bankVaultLedgerGuardCoordinator.pruneIdle();
       void heartbeatCharacterLeases().catch((err) => console.error('lease heartbeat failed:', err));
     }
   }
@@ -3016,6 +3000,7 @@ export class GameServer {
   }
 
   stop(): void {
+    this.guildBankLazyLoader.stop();
     if (this.interval) clearInterval(this.interval);
     if (this.holderTierInterval) clearInterval(this.holderTierInterval);
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
@@ -3787,6 +3772,17 @@ export class GameServer {
         onHighWater: () => this.scheduleBankLedgerHighWaterSave(session),
       },
     );
+    const bankVaultLedgerGuard = this.bankVaultLedgerGuardCoordinator.createRuntime(
+      accountId,
+      bankLedgerJournal.admission,
+      (_reason, refusedAtSec) => {
+        gameMetricsCounters().wsMessageDropped('bank_vault');
+        if (tallyDrop(session.msgRate, refusedAtSec) === 'kick') {
+          gameMetricsCounters().wsRateKick();
+          void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+        }
+      },
+    );
     session = {
       ws,
       accountId,
@@ -3835,6 +3831,7 @@ export class GameServer {
       dirtyGuildBanks: new Map(),
       pendingStorageAppliedEffects: [],
       bankLedgerJournal,
+      bankVaultLedgerGuard,
       bankLedgerSaveScheduled: false,
       unflushedGuildBankOps: new Map(),
       guildBankDeficitSkips: new Map(),
@@ -4246,6 +4243,9 @@ export class GameServer {
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
     session.left = true;
+    // Release only the session binding. The account-keyed token state remains
+    // cached until it has naturally refilled, so reconnect cannot reset it.
+    session.bankVaultLedgerGuard.release();
     this.clients.delete(session.pid);
     if (![...this.clients.values()].some((live) => live.accountId === session.accountId)) {
       this.generalChatQuota.forgetAccount(session.accountId);
@@ -4280,10 +4280,12 @@ export class GameServer {
     // synchronous prefix, a roll or boss death can mutate the character after
     // serialization and removePlayer then discards that unsaved reward.
     this.sim.preparePlayerLeave(session.pid);
-    // A guild-create settlement owns a pre-charged purse and an outbox
-    // reservation. Let its success/refund arm finish before the final snapshot;
-    // otherwise teardown could discard the session between the guild COMMIT
-    // and its paired create_fee command.
+    // A guild-create settlement may own an atomic post-charge transaction.
+    // Cancel it only while it is still queued and uncharged; once started,
+    // durability must reach a real commit/rollback/ambiguity verdict.
+    this.paidGuildCreation.cancelQueuedForLeave(session);
+    // Let its commit/refund/ambiguity arm finish before the final snapshot;
+    // otherwise teardown could race the durable guild and fee verdict.
     await session.guildCreateSettlement;
     await this.saveCharacterOnLeave(session);
     // Whatever book work this session still holds can never commit now: it has
@@ -4384,18 +4386,25 @@ export class GameServer {
     });
   }
 
-  /** Pick the most specific existing incident series for a durable-prefix
-   *  invariant failure. Guild custody outranks vault rows when a save carried
-   *  both; personal-bank writes historically have no dedicated counter. */
-  private ledgerProjectionSurface(snapshot: BankLedgerOutboxSnapshot): BankLedgerProjectionSurface {
-    let sawVault = false;
-    for (const batch of snapshot.batches) {
-      for (const row of batch.rows) {
-        if (row.container === 'guild') return 'guild';
-        if (row.container === 'vault') sawVault = true;
-      }
+  /** The durable global ceiling refused this save before any row committed. */
+  private quarantineBankLedgerGrowthLimit(
+    session: ClientSession,
+    error: BankLedgerGrowthLimitExceeded,
+  ): void {
+    if (!session || session.escrowQuarantined) return;
+    session.escrowQuarantined = true;
+    gameMetricsCounters().bankLedgerGrowthLimitRefused();
+    console.error(
+      `bank ledger growth ceiling refused ${error.attemptedRows} rows for character ${session.characterId} (${session.name}) at ${error.committedRows}/${error.hardLimitRows}; quarantining the live session`,
+    );
+    if (session.dirtyGuildBanks.size > 0) {
+      this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     }
-    return sawVault ? 'vault' : 'personal';
+    queueMicrotask(() => {
+      if (!session.left) {
+        void this.kickSession(session, 'character state could not be saved', 'bank ledger full');
+      }
+    });
   }
 
   /** High-water is a scheduling hint, never a synchronous gameplay
@@ -4415,59 +4424,10 @@ export class GameServer {
       ) {
         return;
       }
-      void this.saveCharacter(session).catch((error) =>
+      void this.saveCharacterWithBackgroundPermit(session).catch((error) =>
         console.error(`bank ledger high-water save failed for ${session.name}:`, error),
       );
     });
-  }
-
-  private guildLedgerPrefixCounts(
-    session: ClientSession,
-    batches: BankLedgerOutboxSnapshot['batches'],
-  ): Map<number, number> | null {
-    const counts = new Map<number, number>();
-    const matches = (live: GuildBankOpDelta, durable: SerializedBankLedgerGuildDelta): boolean =>
-      live.op === durable.op &&
-      live.itemId === durable.itemId &&
-      live.count === durable.count &&
-      (live.instance == null
-        ? durable.instanceJson === null
-        : JSON.stringify(live.instance) === durable.instanceJson) &&
-      (live.craftedRecipeId ?? null) === durable.craftedRecipeId &&
-      live.copperDelta === durable.copperDelta &&
-      live.purchasedSlotsBefore === durable.purchasedSlotsBefore &&
-      live.purchasedSlotsAfter === durable.purchasedSlotsAfter;
-
-    for (const batch of batches) {
-      const effect = batch.guildEffect;
-      if (!effect) continue;
-      const offset = counts.get(effect.guildId) ?? 0;
-      const log = session.unflushedGuildBankOps.get(effect.guildId);
-      if (!log || offset + effect.deltas.length > log.length) return null;
-      for (let index = 0; index < effect.deltas.length; index++) {
-        const live = log[offset + index];
-        const durable = effect.deltas[index];
-        if (!live || !durable || !matches(live, durable)) return null;
-      }
-      counts.set(effect.guildId, offset + effect.deltas.length);
-    }
-    return counts;
-  }
-
-  private consumeCommittedGuildLedgerPrefix(
-    session: ClientSession,
-    counts: ReadonlyMap<number, number>,
-  ): void {
-    for (const [guildId, count] of counts) {
-      const log = session.unflushedGuildBankOps.get(guildId);
-      if (!log) continue;
-      log.splice(0, count);
-      if (log.length === 0) {
-        session.unflushedGuildBankOps.delete(guildId);
-        session.dirtyGuildBanks.delete(guildId);
-        session.guildBankDeficitSkips.delete(guildId);
-      }
-    }
   }
 
   /** A failed retry may still prove that a leading command receipt was
@@ -4488,17 +4448,18 @@ export class GameServer {
       return;
     }
     const batches = evidence.batches as BankLedgerOutboxSnapshot['batches'];
-    const guildCounts = this.guildLedgerPrefixCounts(session, batches);
+    const guildCounts = guildLedgerPrefixCounts(session, batches);
     if (!guildCounts) {
       this.quarantineBankLedgerProjection(
         session,
         new Error('durable bank-ledger prefix no longer matches the guild operation log'),
-        this.ledgerProjectionSurface(snapshot),
+        ledgerProjectionSurface(snapshot),
       );
       return;
     }
     if (!session.bankLedgerJournal.outbox.acknowledgeCommittedPrefix(snapshot, batches)) return;
-    this.consumeCommittedGuildLedgerPrefix(session, guildCounts);
+    consumeCommittedGuildLedgerPrefix(session, guildCounts);
+    visitGuildLedgerIdsForOps(batches, GUILD_BANK_LOG_VISIBLE_OPS, bustGuildBankLog);
   }
 
   // Resolves false when the blob DID NOT PERSIST, which is now three shapes:
@@ -4512,14 +4473,22 @@ export class GameServer {
   // (the audited GM restores) read it; every legacy void caller ignores it.
   async saveCharacter(
     session: ClientSession,
-    opts: { withMarket?: boolean; final?: boolean; shouldStart?: () => boolean } = {},
+    opts: {
+      withMarket?: boolean;
+      final?: boolean;
+      shouldStart?: () => boolean;
+      signal?: AbortSignal;
+      /** Join the character/market FIFOs first, then acquire the shared
+       * background-DB permit immediately around the database transaction. */
+      backgroundDbPermit?: boolean;
+    } = {},
   ): Promise<boolean> {
     // A quarantined session's live state was abandoned when its escrow was
     // rolled back: its character half is the half that would carry the value
     // its book half could not, so persisting it is exactly the mint the
     // refusal prevented. It reloads from its durable row instead.
     if (session.escrowQuarantined) return false;
-    return this.characterSaveQueues.enqueue(session.characterId, async () => {
+    const write = async (): Promise<boolean> => {
       // Recovery cancellation is checked inside the FIFO, before stale work starts.
       if (opts.shouldStart && !opts.shouldStart()) return false;
       // Re-checked INSIDE the queue, not only at entry: a save enqueued before
@@ -4581,13 +4550,10 @@ export class GameServer {
         const carriedGuildBankOpCounts = new Map<number, number>();
         // Filled by the db layer inside the transaction.
         const guildBankResults: GuildBankWriteResult[] = [];
-        // Skipped books retain their marks/logs because nothing was written.
-        const skippedGuildBanks = new Set<number>();
         const collectDeltas = () => {
           carriedGuildBankSeqs.length = 0;
           carriedGuildBankOpCounts.clear();
           guildBankResults.length = 0;
-          skippedGuildBanks.clear();
           session.inFlightGuildBankOps.clear();
           for (const entry of session.dirtyGuildBanks) {
             carriedGuildBankSeqs.push(entry);
@@ -4601,9 +4567,10 @@ export class GameServer {
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
           const carriedIds = new Set(saves.map((save) => save.guildId));
-          for (const [guildId] of carriedGuildBankSeqs) {
-            if (!carriedIds.has(guildId)) skippedGuildBanks.add(guildId);
-          }
+          const missing = carriedGuildBankSeqs
+            .filter(([guildId]) => !carriedIds.has(guildId))
+            .map(([guildId]) => ({ guildId, written: false, deficit: null, rowUnusable: true }));
+          if (missing.length > 0) throw new GuildBankEscrowRefused(missing);
           return saves;
         };
         // Captured BEFORE the await: a save that carries a guild book is the
@@ -4616,7 +4583,7 @@ export class GameServer {
           // Market/mail/books and the character blob share one fenced queued
           // transaction. Capture their snapshots at write time.
           try {
-            saved = await this.enqueueMarketWrite(() => {
+            saved = await this.enqueueMarketWriteForSave(opts.signal, () => {
               // Capture both escrow halves after the queue wait. If teardown
               // removed the player, the pre-wait snapshot is still consistent
               // with its pre-wait book work. Deed publication remains T0-bound.
@@ -4630,36 +4597,46 @@ export class GameServer {
               }
               persistedLevel = snap.level;
               const guildDeltas = collectDeltas();
-              return opts.withMarket
-                ? saveCharacterAndMarketState(
-                    session.characterId,
-                    snap.level,
-                    snap,
-                    this.sim.serializeMarket(),
-                    this.sim.serializeMail(),
-                    session.leaseNonce,
-                    guildDeltas,
-                    guildBankResults,
-                    carriedStorageEffects,
-                    bankLedgerSaveEffects(carriedLedgerSnapshot),
-                  )
-                : saveCharacterAndGuildBankState(
-                    session.characterId,
-                    snap.level,
-                    snap,
-                    guildDeltas,
-                    session.leaseNonce,
-                    guildBankResults,
-                    carriedStorageEffects,
-                    bankLedgerSaveEffects(carriedLedgerSnapshot),
-                  );
+              const persist = () =>
+                opts.withMarket
+                  ? saveCharacterAndMarketState(
+                      session.characterId,
+                      snap.level,
+                      snap,
+                      this.sim.serializeMarket(),
+                      this.sim.serializeMail(),
+                      session.leaseNonce,
+                      guildDeltas,
+                      guildBankResults,
+                      carriedStorageEffects,
+                      bankLedgerSaveEffects(carriedLedgerSnapshot),
+                      opts.signal,
+                    )
+                  : saveCharacterAndGuildBankState(
+                      session.characterId,
+                      snap.level,
+                      snap,
+                      guildDeltas,
+                      session.leaseNonce,
+                      guildBankResults,
+                      carriedStorageEffects,
+                      bankLedgerSaveEffects(carriedLedgerSnapshot),
+                      opts.signal,
+                    );
+              return opts.backgroundDbPermit
+                ? this.withBackgroundDbPermit(persist, opts.signal)
+                : persist();
             });
           } catch (err) {
             this.acknowledgeDurableLedgerPrefixAfterError(session, carriedLedgerSnapshot, err);
             // The whole escrow rolled back. Count foreign failures, but not an
             // ordinary concurrent GuildBankEscrowRefused; its handler owns the
             // retry/terminal metrics and all errors keep their existing route.
-            if (carriesGuildBooks && !(err instanceof GuildBankEscrowRefused)) {
+            if (
+              carriesGuildBooks &&
+              !(err instanceof GuildBankEscrowRefused) &&
+              !(err instanceof BankLedgerGrowthLimitExceeded)
+            ) {
               gameMetricsCounters().guildBankIncident('escrow_save_failed');
             }
             // A refused book aborts the character row too; run no post-save work.
@@ -4669,6 +4646,9 @@ export class GameServer {
               // same "did not land" as a fence-out to any caller reading it.
               return false;
             }
+            if (err instanceof BankLedgerGrowthLimitExceeded) {
+              this.quarantineBankLedgerGrowthLimit(session, err);
+            }
             throw err;
           } finally {
             // Whatever happened to the write, no payload is in flight any more.
@@ -4676,16 +4656,24 @@ export class GameServer {
           }
         } else {
           try {
-            saved = await saveCharacterState(
-              session.characterId,
-              state.level,
-              state,
-              session.leaseNonce,
-              carriedStorageEffects,
-              bankLedgerSaveEffects(carriedLedgerSnapshot),
-            );
+            const persist = () =>
+              saveCharacterState(
+                session.characterId,
+                state.level,
+                state,
+                session.leaseNonce,
+                carriedStorageEffects,
+                bankLedgerSaveEffects(carriedLedgerSnapshot),
+                opts.signal,
+              );
+            saved = await (opts.backgroundDbPermit
+              ? this.withBackgroundDbPermit(persist, opts.signal)
+              : persist());
           } catch (err) {
             this.acknowledgeDurableLedgerPrefixAfterError(session, carriedLedgerSnapshot, err);
+            if (err instanceof BankLedgerGrowthLimitExceeded) {
+              this.quarantineBankLedgerGrowthLimit(session, err);
+            }
             throw err;
           }
         }
@@ -4712,19 +4700,18 @@ export class GameServer {
             carriedGuildBankSeqs.map(([guildId]) => guildId),
           );
           // The lease is gone: this session is a displaced zombie whose writes
-          // can never land again. Give the player the same explicit signal an
-          // in-process takeover sends instead of letting them keep playing an
-          // unsaved session. Deliberately not awaited: kickSession -> leave ->
-          // the leave save queues behind this closure on the per-character save
-          // queue, so awaiting here would deadlock. leave() is idempotent
-          // (session.left), so that leave save fencing out again cannot re-kick.
+          // can never land again. Mark it terminal before kicking so leave()
+          // cannot enqueue a second save carrying the now-reverted guild-ledger
+          // prefix. Deliberately not awaited: kickSession -> leave queues behind
+          // this closure on the per-character FIFO, so awaiting here deadlocks.
+          session.escrowQuarantined = true;
           if (!session.left) {
             void this.kickSession(session, 'character taken over', 'character taken over');
           }
           return false;
         }
         session.lastSave = Date.now();
-        const committedGuildCounts = this.guildLedgerPrefixCounts(
+        const committedGuildCounts = guildLedgerPrefixCounts(
           session,
           carriedLedgerSnapshot.batches,
         );
@@ -4732,7 +4719,7 @@ export class GameServer {
           this.quarantineBankLedgerProjection(
             session,
             new Error('committed bank-ledger snapshot no longer matches the guild operation log'),
-            this.ledgerProjectionSurface(carriedLedgerSnapshot),
+            ledgerProjectionSurface(carriedLedgerSnapshot),
           );
           return false;
         }
@@ -4753,7 +4740,12 @@ export class GameServer {
             `committed character effects were retained for character ${session.characterId}: exact acknowledgement prefix changed`,
           );
         } else {
-          this.consumeCommittedGuildLedgerPrefix(session, committedGuildCounts);
+          consumeCommittedGuildLedgerPrefix(session, committedGuildCounts);
+          visitGuildLedgerIdsForOps(
+            carriedLedgerSnapshot.batches,
+            GUILD_BANK_LOG_VISIBLE_OPS,
+            bustGuildBankLog,
+          );
         }
         // The carried books: release their dirty marks where the write
         // actually landed AND the seq is unchanged (a mid-save op re-dirtied
@@ -4764,10 +4756,7 @@ export class GameServer {
         // Reaching here means the transaction COMMITTED, so every book half it
         // CARRIED landed: a refused one aborts the whole transaction and throws
         // (GuildBankEscrowRefused), so there is no partial arm to handle. A
-        // guild the payload SKIPPED is the one thing that still needs guarding:
-        // nothing was written for it, so nothing may be released.
         for (const [guildId, seq] of carriedGuildBankSeqs) {
-          if (skippedGuildBanks.has(guildId)) continue;
           const written = guildBankResults.find((r) => r.guildId === guildId);
           if (written && !written.written) continue; // defensive: a refusal throws
           const carried = carriedGuildBankOpCounts.get(guildId) ?? 0;
@@ -4814,7 +4803,45 @@ export class GameServer {
         }
       }
       return true;
-    });
+    };
+    return opts.signal
+      ? this.characterSaveQueues.enqueueCancellable(session.characterId, opts.signal, write)
+      : this.characterSaveQueues.enqueue(session.characterId, write);
+  }
+
+  private enqueueMarketWriteForSave<T>(
+    signal: AbortSignal | undefined,
+    write: () => Promise<T>,
+  ): Promise<T> {
+    return signal
+      ? this.enqueueMarketWrite.enqueueCancellable(signal, write)
+      : this.enqueueMarketWrite(write);
+  }
+
+  private async withBackgroundDbPermit<T>(run: () => Promise<T>, signal?: AbortSignal): Promise<T> {
+    if (!this.backgroundDbGate) return run();
+    const permit = await this.backgroundDbGate.acquire(signal);
+    if (!permit) throw new DOMException('background database save cancelled', 'AbortError');
+    try {
+      return await run();
+    } finally {
+      permit.release();
+    }
+  }
+
+  /** Shared-state writers always join the market FIFO before taking a major-
+   * producer permit. Keeping that order in one helper prevents the cap-one
+   * market-FIFO/permit inversion that can otherwise deadlock a dirty-book
+   * character save against a periodic market or mail save. */
+  private enqueueBackgroundMarketWrite<T>(write: () => Promise<T>): Promise<T> {
+    return this.enqueueMarketWrite(() => this.withBackgroundDbPermit(write));
+  }
+
+  private saveCharacterWithBackgroundPermit(
+    session: ClientSession,
+    opts: Parameters<GameServer['saveCharacter']>[1] = {},
+  ): Promise<boolean> {
+    return this.saveCharacter(session, { ...opts, backgroundDbPermit: true });
   }
 
   /** An out-of-band durable character write (the marketplace escrow persist)
@@ -4825,14 +4852,14 @@ export class GameServer {
     return this.characterSaveQueues.enqueue(characterId, job);
   }
 
-  /** Terminal escrow-job arms, fired from inside the job: 'fenced' kicks the displaced
-   *  zombie; 'ambiguous' quarantines so the durable row decides an unknown COMMIT (right in
-   *  BOTH branches, committed or rolled back). Pid = extraction identity; a mid-leave session
-   *  still quarantines (its queued flush re-checks); books revert; kick WIRES the takeover literal. */
+  /** Terminal escrow-job arms, fired from inside the job. Both outcomes make
+   *  the live session unsaveable: a proven fence lost its lease, while an
+   *  ambiguous result must let durable truth decide an unknown COMMIT. Pid is
+   *  the extraction identity; books revert and the kick wires the takeover literal. */
   escrowSessionLost(pid: number, characterId: number, kind: 'fenced' | 'ambiguous'): void {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.pid !== pid) return;
-    if (kind === 'ambiguous') session.escrowQuarantined = true;
+    session.escrowQuarantined = true;
     this.revertOwnGuildBookOps(session, [...session.dirtyGuildBanks.keys()]);
     if (!session.left) {
       void this.kickSession(session, 'character taken over', `market escrow ${kind}`);
@@ -4861,7 +4888,7 @@ export class GameServer {
       for (;;) {
         const session = sessions[next++];
         if (!session) return;
-        await this.saveCharacter(session).catch((err) =>
+        await this.saveCharacterWithBackgroundPermit(session).catch((err) =>
           console.error(`${reason} failed for ${session.name}:`, err),
         );
       }
@@ -4880,7 +4907,7 @@ export class GameServer {
     for (const session of stillDirty) {
       // FINAL: there is no pass three, so a refusal here resolves now rather
       // than waiting for a retry that will never come.
-      await this.saveCharacter(session, { final: true }).catch((err) =>
+      await this.saveCharacterWithBackgroundPermit(session, { final: true }).catch((err) =>
         console.error(`${reason} retry failed for ${session.name}:`, err),
       );
     }
@@ -4897,7 +4924,7 @@ export class GameServer {
 
   async saveMarket(): Promise<void> {
     try {
-      await this.enqueueMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
+      await this.enqueueBackgroundMarketWrite(() => saveMarketState(this.sim.serializeMarket()));
     } catch (err) {
       console.error('failed to save world market:', err);
     }
@@ -4916,7 +4943,7 @@ export class GameServer {
 
   async saveMail(): Promise<void> {
     try {
-      await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+      await this.enqueueBackgroundMarketWrite(() => saveMailState(this.sim.serializeMail()));
     } catch (err) {
       console.error('failed to save mail:', err);
     }
@@ -4931,10 +4958,10 @@ export class GameServer {
   // DESIGN: books persist only through the fenced escrow save that carries the
   // acting character (saveCharacter below), never standalone.
   async loadGuildBanks(): Promise<void> {
-    // A failed boot load leaves EVERY guild bank on the realm silently inert
-    // until restart (ops refuse, and last-member-leave/disband fail closed on
-    // the unloaded books, refusing guild deletion), so a transient DB blip is
-    // retried before giving up LOUDLY. Never throws: the realm still boots.
+    // A failed boot load initially leaves EVERY guild bank inert (ops refuse,
+    // and deletion fails closed), so a transient DB blip is retried before
+    // giving up LOUDLY. Join/social refresh can later heal individual books
+    // through the bounded lazy loader above. Never throws: the realm still boots.
     const attempts = 3;
     let rows: Awaited<ReturnType<typeof loadGuildBankRows>> | null = null;
     for (let attempt = 1; attempt <= attempts && rows === null; attempt++) {
@@ -4947,7 +4974,7 @@ export class GameServer {
     }
     if (rows === null) {
       console.error(
-        'GUILD BANKS UNAVAILABLE: the boot load failed after every retry; all guild bank ops on this realm stay inert and guild deletion (disband, last-member leave) is refused fail-closed until a restart loads the books',
+        'GUILD BANKS UNAVAILABLE: the boot load failed after every retry; affected guild bank ops stay inert and guild deletion (disband, last-member leave) is refused fail-closed until a bounded per-guild lazy load succeeds on join or social refresh',
       );
       return;
     }
@@ -4963,10 +4990,10 @@ export class GameServer {
       }
     }
     const result = loadGuildBanksIntoSim(this.sim, rows);
-    // Each of these leaves ONE guild's book unloaded until a restart: its ops
-    // are inert and its disband is refused fail-closed, an outage for that
-    // guild rather than a transient. Counted per guild beside the loud log
-    // (the guild id stays in the log; it is never a metric label).
+    // Each of these leaves ONE guild's book unloaded: its ops are inert and its
+    // disband is refused fail-closed until the row is repaired and a bounded
+    // join/social-refresh lazy load succeeds. Counted per guild beside the
+    // loud log (the guild id stays in the log; it is never a metric label).
     for (const guildId of result.oversized) {
       gameMetricsCounters().guildBankIncident('book_unloaded');
       console.error(
@@ -4988,27 +5015,6 @@ export class GameServer {
   // Schedule a guild's book for the next fenced escrow save of this session.
   private markGuildBankDirty(session: ClientSession, guildId: number): void {
     session.dirtyGuildBanks.set(guildId, (session.dirtyGuildBanks.get(guildId) ?? 0) + 1);
-  }
-
-  // The refusal/error arm of the reserve-at-gate creation fee: return the
-  // reserved copper to the founder's purse. Consumes the pending reservation
-  // exactly once (the success arm consumed it instead when the create
-  // committed). A founder who left before the refusal arm ran cannot be
-  // refunded in the live sim; that arm is logged LOUDLY for operator
-  // compensation (rare: it needs a refused create racing a logout).
-  private refundGuildCreateFee(characterId: number): void {
-    const fee = this.pendingGuildCreateFees.get(characterId);
-    if (!fee) return; // already consumed by the success arm
-    this.pendingGuildCreateFees.delete(characterId);
-    fee.ledgerReservation.cancel();
-    if (fee.amount <= 0) return;
-    const s = this.sessionsByCharacterId.get(characterId);
-    const refunded = s ? this.sim.refundGuildCreationFeeFor(s.pid, fee.amount) : 0;
-    if (refunded !== fee.amount) {
-      console.error(
-        `guild create fee refund could not be applied for character ${characterId}: reserved ${fee.amount}, refunded ${refunded}; operator compensation needed`,
-      );
-    }
   }
 
   // When this session's escrow can never commit again, its guild-book
@@ -5153,7 +5159,7 @@ export class GameServer {
       console.error(
         `guild bank escrow rolled back for guild ${guildId} (character ${session.characterId}): ${
           result.rowUnusable
-            ? 'the stored row is oversized or malformed, or the merged book would cross the size bound, so it is preserved untouched'
+            ? 'the stored row is oversized or malformed, its live shadow vanished, or the merged book would cross the size bound, so it is preserved untouched'
             : `${result.deficit?.kind} shortfall ${result.deficit?.shortfall} on ${result.deficit?.op}${result.deficit?.itemId ? ` (${result.deficit.itemId})` : ''}, and ${
                 anotherSessionDirty
                   ? `it did not resolve within ${skips} escrow saves`
@@ -5190,271 +5196,45 @@ export class GameServer {
     }
   }
 
-  // Run one guild bank op with the observer pair around it: the before/after
-  // book diff (the personal bank's recordBankOp idiom) detects success, writes
-  // the fire-and-forget ledger rows, and marks the guild book dirty for the
-  // escrow save. Never awaited, never a gameplay dependency; a refused op
-  // diffs empty and does nothing.
-  //
-  // THE ONLY server-side guild book mutation path. `target` says how to read
-  // the book around the mutation:
-  //  - `{ pid }`  a dispatched player op: the gated guildBankInfoFor read, and
-  //    the guild id comes from that player's membership stamp.
-  //  - `{ guildId, actorAccountId }`  the OPERATOR path (the admin dormant-slot
-  //    purge), which has no acting player: the ungated guild-scoped read, the
-  //    guild id is explicit, and the LEDGER ROW IS ATTRIBUTED TO THE OPERATOR'S
-  //    ACCOUNT rather than the carrier's owner, so the evidence names who
-  //    ordered the removal. `session` is then only the CARRIER whose fenced
-  //    escrow save takes the book (see adminPurgeGuildBankSlot).
-  // Extending this seam rather than writing a second mutation path is the
-  // Phase 3 acceptance line: the diff feeds BOTH the bank_ledger rows and the
-  // per-session unflushed-delta log the fence-out revert depends on, so a
-  // mutation outside it would be invisible to the audit and unrevertable.
+  // The only server-side guild-book mutation seam. The extracted coordinator
+  // brackets the synchronous Sim mutation with pre-reserved ledger evidence,
+  // counterparty accounting, and the escrow replay sidecar. Those staged rows
+  // later commit atomically with the character and guild book.
   private runGuildBankOp(
     session: ClientSession,
     target: { pid: number } | { guildId: number; actorAccountId: number },
     op: GuildBankLedgerOp,
     run: () => void,
   ): void {
-    // A guild whose DELETE is already in flight has passed its empty-bank
-    // guard, so its row is about to cascade away: an op landing now would be
-    // destroyed by that cascade with its dirty mark and unflushed log wiped by
-    // the post-commit hook (onGuildDisbanded), leaving an orphaned ledger row
-    // behind. Refuse before the sim runs, so nothing mutates, no ledger row is
-    // written and no book is marked dirty. The window's contract
-    // (beginGuildBankDelete) is stated over THIS method, so it covers the
-    // operator arm too; only the player arm has somebody to TELL, and it is
-    // told, because the window is only two DB round trips wide but a deposit
-    // that appears to do nothing at all is worse than one that says to try
-    // again. The operator arm's answer is shaped by adminPurgeGuildBankSlot,
-    // which pre-checks the same window so it can name the reason.
-    const actingGuildId =
-      'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
-    if (actingGuildId !== undefined && this.guildBankDeleteWindows.has(actingGuildId)) {
-      // English on the wire, re-localized by the client matcher
-      // (src/ui/server_i18n.ts guild.bankClosing), the server-text contract:
-      // src/sim and server stay language-agnostic.
-      if ('pid' in target) {
-        this.sendChatNotice(session, 'The guild bank is closing. Try again in a moment.');
-      }
-      return;
-    }
-    const reservation = session.bankLedgerJournal.admission.tryReserve(2, 2, 'guild');
-    if (!reservation) {
-      if ('pid' in target) this.sendChatNotice(session, 'You are busy. Try again in a moment.');
-      return;
-    }
-    const read = () =>
-      'pid' in target
-        ? this.sim.guildBankInfoFor(target.pid)
-        : this.sim.guildBankInfoForGuild(target.guildId);
-    // The COUNTERPARTY read, taken from the SAME instants as the book read so
-    // both halves of the op describe one moment. Server-derived throughout:
-    // the acting character's live purse and bags off the sim's own meta, never
-    // anything the client sent. The operator purge path has no acting
-    // character, so its counterparty is null on both sides and the movement
-    // resolves to a recorded ZERO (the copy is destroyed, not handed to
-    // anybody), which is what lets the audit check a purge instead of skipping
-    // it.
-    //
-    // counterpartySnapshot COPIES the quantities out. `meta.inventory` is the
-    // live array the sim mutates in place, so holding it across run() would
-    // difference every item movement to zero and pass everything silently.
-    const readCounterparty = () => {
-      if (!('pid' in target)) return null;
-      const meta = this.sim.meta(target.pid);
-      const actor: CounterpartyActor | null = meta
-        ? { copper: meta.copper, inventory: meta.inventory }
-        : null;
-      return counterpartySnapshot(actor);
-    };
-    let before: ReturnType<typeof read>;
-    let actorBefore: ReturnType<typeof readCounterparty>;
-    try {
-      before = read();
-      actorBefore = readCounterparty();
-    } catch (error) {
-      reservation.cancel();
-      throw error;
-    }
-    try {
-      run();
-    } catch (error) {
-      reservation.failAfterMutation(error);
-      throw error;
-    }
-    let after: ReturnType<typeof read>;
-    try {
-      after = read();
-    } catch (error) {
-      reservation.failAfterMutation(error);
-      throw error;
-    }
-    try {
-      const movement = counterpartyMovement(actorBefore, readCounterparty());
-      // Rung 0 of the ladder OPENS the bank from the acting officer's own PURSE
-      // (the sim decides which rung is next off the BEFORE book); it gets its
-      // own ledger op name so the audit's treasury replay can exclude the
-      // purse-paid copper like create_fee, and so the revert path never credits
-      // the treasury for money it never held. The rung is derived EXACTLY as
-      // the sim's buy op derives it (guildBankRungsBought, which floors a
-      // non-position count): a tampered live count below the opened base still
-      // charges the purse, so naming it buy_slots here would corrupt the audit
-      // replay and let a revert mint treasury copper.
-      const effectiveOp: GuildBankLedgerOp =
-        op === 'buy_slots' && before !== null && guildBankRungsBought(before.purchasedSlots) === 0
-          ? 'open_bank'
-          : op;
-      const deltas = diffGuildBankOp(effectiveOp, before, after);
-      // A successful player op requires a stamped officer-plus membership, and
-      // the stamp cannot change inside the synchronous run() above. The operator
-      // path names its guild outright (it has no acting player to read).
-      const guildId =
-        'pid' in target ? this.sim.meta(target.pid)?.guildMembership?.guildId : target.guildId;
-      // Attribution: a player op is the acting character's own; an operator op
-      // keeps the carrier's character (the column is NOT NULL and an operator may
-      // hold no character) but books the OPERATOR'S account, so the row names who
-      // ordered it instead of the bystander who lent the escrow transaction.
-      const who =
-        'pid' in target
-          ? session
-          : { characterId: session.characterId, accountId: target.actorAccountId };
-      // Movement of the acting character's purse or bags that NO ledger row
-      // accounts for. Two ways to get here, and both are the same defect seen
-      // from different sides:
-      //  - the book did not move at all (deltas empty), so no ordinary row is
-      //    written and the value that left the purse would leave no trace;
-      //  - the book moved, but the purse/bags ALSO moved under an id no row
-      //    names, so every written row balances by construction and the extra
-      //    movement is invisible again.
-      // Neither can happen legitimately (an op moves both sides or refuses and
-      // moves neither), so both get the loud path: an anomaly ledger row for the
-      // offline audit, a counter for production alerting, and a log line naming
-      // the guild. Never a silent drop.
-      const orphanRows = (unaccounted: CounterpartyMovement): BankLedgerRow[] => {
-        if (guildId === undefined || counterpartyIdle(unaccounted)) return [];
-        const orphan = counterpartyOrphan(unaccounted);
-        if (!orphan) return [];
-        gameMetricsCounters().guildBankIncident('counterparty_orphan');
-        console.error(
-          `guild bank counterparty orphan on ${effectiveOp} for guild ${guildId} (character ${session.characterId}): the acting character's purse/bags moved value no ledger row accounts for (copper ${orphan.copperDelta}${orphan.itemId ? `, ${orphan.count} x ${orphan.itemId}` : ''})`,
-        );
-        return buildGuildBankLedgerRows('counterparty_orphan', who, guildId, [
-          {
-            itemId: orphan.itemId,
-            count: orphan.count,
-            instance: counterpartyOrphanEvidence(effectiveOp, unaccounted),
-            copperDelta: 0,
-            purchasedSlotsBefore: after?.purchasedSlots ?? before?.purchasedSlots ?? 0,
-            purchasedSlotsAfter: after?.purchasedSlots ?? before?.purchasedSlots ?? 0,
-            counterpartyCopperDelta: orphan.copperDelta,
-            counterpartyCount: orphan.count ?? 0,
-          },
-        ]);
-      };
-      if (deltas.length === 0) {
-        const rows = orphanRows(movement);
-        if (rows.length > 0) reservation.commit(rows);
-        else reservation.cancel();
-        if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
-          this.scheduleBankLedgerHighWaterSave(session);
-        }
-        return;
-      }
-      if (guildId === undefined) {
-        reservation.failAfterMutation(new Error('guild bank mutation lost its guild identity'));
-        return;
-      }
-      // Stamp the payer/payee half onto the rows the book diff produced. The
-      // stamp DRAINS the movement across the deltas, so the recorded numbers sum
-      // to exactly what moved and a multi-row op can never book one purse
-      // movement twice. Whatever is LEFT is movement no row claimed, and it goes
-      // down the orphan path rather than being dropped.
-      const unaccounted = stampCounterpartyDeltas(deltas, movement);
-      const guildDeltas: GuildBankOpDelta[] = deltas.map((d) => ({
-        op: effectiveOp,
-        itemId: d.itemId,
-        count: d.count,
-        instance: (d.instance ?? null) as GuildBankOpDelta['instance'],
-        craftedRecipeId: d.craftedRecipeId ?? null,
-        copperDelta: d.copperDelta,
-        purchasedSlotsBefore: d.purchasedSlotsBefore ?? 0,
-        purchasedSlotsAfter: d.purchasedSlotsAfter,
-      }));
-      this.markGuildBankDirty(session, guildId);
-      // Record the op in the session's unflushed log: this log is the escrow
-      // save's WRITE PAYLOAD (replayed forward onto durable truth) and the
-      // reconcile's undo list (replayed backward onto the live book).
-      const log = session.unflushedGuildBankOps.get(guildId) ?? [];
-      log.push(...guildDeltas);
-      session.unflushedGuildBankOps.set(guildId, log);
-      const rows = [
-        ...buildGuildBankLedgerRows(effectiveOp, who, guildId, deltas),
-        ...orphanRows(unaccounted),
-      ];
-      reservation.commit(rows, { guildId, deltas: guildDeltas });
-      if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
-        this.scheduleBankLedgerHighWaterSave(session);
-      }
-      // AFTER the op's own rows, so the anomaly reads as a follow-on to them:
-      // purse/bags movement that none of those rows accounts for.
-    } catch (error) {
-      reservation.failAfterMutation(error);
-      throw error;
-    }
+    coordinateGuildBankOp(
+      {
+        sim: this.sim,
+        guildBankDeleteInFlight: (guildId) => this.guildBankDeleteWindows.has(guildId),
+        sendPlayerNotice: (text) => this.sendChatNotice(session, text),
+        bankLedgerNeedsSave: () => bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox),
+        scheduleBankLedgerHighWaterSave: () => this.scheduleBankLedgerHighWaterSave(session),
+        markGuildBankDirty: (guildId) => this.markGuildBankDirty(session, guildId),
+        recordGuildBankIncident: (kind) => gameMetricsCounters().guildBankIncident(kind),
+        logError: (message) => console.error(message),
+      },
+      session,
+      target,
+      op,
+      run,
+    );
   }
 
-  /** Answer a `guild_bank_log` request with the guild's visible bank history,
-   *  or refuse it.
-   *
-   *  THE GATE IS THE BANK'S OWN GATE, deliberately not a looser one:
-   *  `guildBankInfoFor(pid)` is non-null only for an alive guild member (ANY
-   *  rank: the view gate is membership-wide, and the log is the trust surface
-   *  that lets the whole guild audit its officers) whose book is loaded,
-   *  standing at a banker. A NON-member is refused by exactly the same
-   *  predicate that denies them the bank itself, so the log can never become a
-   *  side channel around the membership gate, and the guild id comes from
-   *  the server's own membership STAMP, never from the request: a client cannot
-   *  name a guild to read.
-   *
-   *  The gate is re-checked AFTER the awaited read, because the read may share
-   *  an in-flight query and a leave, a kick, a death, or a walk-away can
-   *  land in that window; the answer must reflect the authority at DELIVERY
-   *  time, not at request time. A refusal is an explicit frame rather than
-   *  silence, so the pane can say so instead of rendering an empty history that
-   *  reads as "no officer has ever done anything". */
+  /** Answer one activity-log request, re-checking live authority after the
+   *  cached database read before any entries cross the wire. */
   private sendGuildBankLog(session: ClientSession, pid: number): void {
-    const guildId = this.guildBankLogGuildFor(pid);
-    if (guildId === null) {
-      this.send(session, { t: 'gbanklog', ok: false });
-      return;
-    }
-    readGuildBankLog(guildId)
-      .then((entries) => {
-        // Same session, same character, same guild, still authorized. A
-        // linkdead or replaced session is caught by sendRaw's readyState guard
-        // as well; this is the AUTHORIZATION half.
-        if (session.left || session.pid !== pid || this.guildBankLogGuildFor(pid) !== guildId) {
-          this.send(session, { t: 'gbanklog', ok: false });
-          return;
-        }
-        this.send(session, { t: 'gbanklog', ok: true, entries });
-      })
-      .catch((err) => {
-        // A cold cache whose query failed or timed out. Never a stack trace to
-        // the player, and never a silent drop: the pane needs an answer to
-        // leave its loading state, and "refused" is the honest one (we do not
-        // know the history right now).
-        //
-        // COUNTED, because the frame a player gets is byte-identical to the
-        // "you are not an officer" refusal: without its own incident kind a
-        // total read outage would look exactly like ordinary refusals at the
-        // wire and nothing would ever page. The counter sits beside the loud
-        // log, never instead of it.
-        gameMetricsCounters().guildBankIncident('log_read_failed');
-        console.error(`guild bank log read failed for guild ${guildId}:`, err);
-        this.send(session, { t: 'gbanklog', ok: false });
-      });
+    deliverGuildBankLog({
+      guildId: this.guildBankLogGuildFor(pid),
+      stillAuthorized: (guildId) =>
+        !session.left && session.pid === pid && this.guildBankLogGuildFor(pid) === guildId,
+      send: (frame) => this.send(session, frame),
+      recordReadFailure: () => gameMetricsCounters().guildBankIncident('log_read_failed'),
+      logError: (message, error) => console.error(message, error),
+    });
   }
 
   /** The guild whose bank log this pid may read, or null when it may read
@@ -6243,7 +6023,7 @@ export class GameServer {
     ) {
       return false;
     }
-    return acknowledgeCommittedCharacterSaveEffects({
+    const acknowledged = acknowledgeCommittedCharacterSaveEffects({
       pendingStorageEffects: session.pendingStorageAppliedEffects,
       storageSnapshot: save.storageEffects ?? [],
       ledgerOutbox: session.bankLedgerJournal.outbox,
@@ -6255,6 +6035,10 @@ export class GameServer {
           error,
         ),
     });
+    if (acknowledged) {
+      visitGuildLedgerIdsForOps(snapshot.batches, GUILD_BANK_LOG_VISIBLE_OPS, bustGuildBankLog);
+    }
+    return acknowledged;
   }
 
   hasCharacterOnlySaveConflict(characterId: number): boolean {
@@ -6279,11 +6063,11 @@ export class GameServer {
   async flushDirtyGuildBooks(characterId: number): Promise<void> {
     const session = this.sessionByCharacterId(characterId);
     if (!session || session.left || session.dirtyGuildBanks.size === 0) return;
-    await this.saveCharacter(session);
+    await this.saveCharacterWithBackgroundPermit(session);
   }
 
   async persistMailBlob(): Promise<void> {
-    await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+    await this.enqueueBackgroundMarketWrite(() => saveMailState(this.sim.serializeMail()));
   }
 
   // Force-close every live session for the account. A bearer token is a reusable
@@ -7764,100 +7548,7 @@ export class GameServer {
         void this.sendSocialSnapshot(session.characterId);
         break;
       case 'guild_create':
-        if (typeof msg.name === 'string') {
-          // The creation-fee gate, BEFORE any DB work (Guild Bank Phase 3):
-          // a founder whose sim purse cannot cover GUILD_CREATION_FEE_COPPER
-          // is refused right here, so a refused create never touches the
-          // database. RESERVE-AT-GATE (Phase 3 QA, revising the original
-          // create-then-charge decision in state.md): the fee is deducted
-          // SYNCHRONOUSLY here, in the same tick as the gate check, and
-          // refunded on every refusal arm (guildCreate returning false) or
-          // error. Charging after the commit left a deterministic exploit: a
-          // client could pipeline guild_create with a spend so the deferred
-          // clamped charge collected residue, or log out before the commit
-          // and pay nothing. A crash between this reserve and the commit
-          // loses at most the fee for at most one autosave window, the
-          // deliberate trade. The English literal is re-localized client-side
-          // (src/ui/server_i18n.ts guild.createFee, pinned byte-for-byte in
-          // tests/server_i18n.test.ts).
-          const meta = this.sim.meta(pid);
-          if (!meta || meta.copper < GUILD_CREATION_FEE_COPPER) {
-            this.sendChatNotice(
-              session,
-              `You need ${GUILD_CREATION_FEE_GOLD} gold to found a guild.`,
-            );
-            break;
-          }
-          // At most one reservation per character: a pipelined second create
-          // while one is in flight is dropped (the double-click race), so the
-          // success/refund arms can never mismatch reservations.
-          if (this.pendingGuildCreateFees.has(session.characterId)) break;
-          const ledgerReservation = session.bankLedgerJournal.admission.tryReserve(1, 0, 'guild');
-          if (!ledgerReservation) {
-            this.sendChatNotice(session, 'You are busy. Try again in a moment.');
-            break;
-          }
-          const purseBefore = meta.copper;
-          const charged = this.sim.chargeGuildCreationFeeFor(pid);
-          // What the PURSE actually did, read back from the sim rather than
-          // inferred from `charged`: the create_fee row records both, so a
-          // charge the sim reported taking that the purse never gave up is a
-          // finding instead of an arithmetic identity.
-          const pursePaid = (this.sim.meta(pid)?.copper ?? purseBefore) - purseBefore;
-          if (charged < GUILD_CREATION_FEE_COPPER) {
-            ledgerReservation.cancel();
-            // The purse check above passed but the charge came back short: the
-            // pid resolved meta-only (no live entity) or a state edge. Never
-            // found a discounted or free guild: return whatever was taken and
-            // refuse with the same line.
-            if (charged > 0) this.sim.refundGuildCreationFeeFor(pid, charged);
-            this.sendChatNotice(
-              session,
-              `You need ${GUILD_CREATION_FEE_GOLD} gold to found a guild.`,
-            );
-            break;
-          }
-          this.pendingGuildCreateFees.set(session.characterId, {
-            accountId: session.accountId,
-            amount: charged,
-            pursePaid,
-            ledgerReservation,
-            origin: session,
-          });
-          const settlement = this.social
-            .guildCreate(this.actorFor(session), msg.name)
-            .then(async (created) => {
-              if (!created) {
-                this.refundGuildCreateFee(session.characterId);
-                return;
-              }
-              const live = this.sessionByCharacterId(session.characterId);
-              if (!live || live !== session) {
-                gameMetricsCounters().guildBankIncident('create_fee_unpaid');
-                console.error(
-                  `guild creation settled after character ${session.characterId} lost its live session`,
-                );
-                return;
-              }
-              const durable = await this.saveCharacter(live);
-              if (!durable) {
-                gameMetricsCounters().guildBankIncident('create_fee_unpaid');
-                console.error(
-                  `guild creation fee save fenced out for character ${session.characterId}`,
-                );
-              }
-            })
-            .catch((err) => {
-              logSocialErr(err);
-              this.refundGuildCreateFee(session.characterId);
-            })
-            .finally(() => {
-              if (session.guildCreateSettlement === settlement) {
-                session.guildCreateSettlement = undefined;
-              }
-            });
-          session.guildCreateSettlement = settlement;
-        }
+        if (typeof msg.name === 'string') this.paidGuildCreation.start(session, msg.name);
         break;
       case 'guild_invite':
         if (typeof msg.name === 'string')
@@ -8330,33 +8021,39 @@ export class GameServer {
       case 'mail_read':
         if (typeof msg.id === 'number') sim.mailMarkRead(msg.id, pid);
         break;
-      // Bank: the per-character deposit box plus its bag sockets. The six case
-      // bodies (shape checks + the recordBankOp / recordBankSocketOp observer
-      // discipline) live in server/bank_wire.ts (the vault_wire.ts seam).
-      // `command` narrows to the BankCommandName union inside this case group,
-      // so a seventh label added here without extending the module is a
-      // compile error, never a silently dropped command.
+      // Personal bank commands reserve retained-row and outbox capacity in the
+      // extracted wire module before any Sim mutation.
       case 'bank_deposit':
       case 'bank_withdraw':
       case 'bank_buy_slots':
       case 'bank_unlock_socket':
       case 'bank_socket_bag':
       case 'bank_unsocket_bag':
-        dispatchBankCommand(sim, session, command, msg, pid, session.bankLedgerJournal.admission);
+        dispatchBankCommand(
+          sim,
+          session,
+          command,
+          msg,
+          pid,
+          session.bankVaultLedgerGuard.admission,
+        );
         if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
           this.scheduleBankLedgerHighWaterSave(session);
         }
         break;
-      // Materials Vault: the four case bodies (shape checks + the recordVaultOp
-      // observer discipline) live in server/vault_wire.ts. `command` narrows to
-      // the VaultCommandName union inside this case group, so a fifth label
-      // added here without extending the module is a compile error, never a
-      // silently dropped command.
+      // Materials Vault uses the same row-aware retained-ledger admission.
       case 'vault_deposit':
       case 'vault_withdraw':
       case 'vault_deposit_all':
       case 'vault_buy_upgrade':
-        dispatchVaultCommand(sim, session, command, msg, pid, session.bankLedgerJournal.admission);
+        dispatchVaultCommand(
+          sim,
+          session,
+          command,
+          msg,
+          pid,
+          session.bankVaultLedgerGuard.admission,
+        );
         if (bankLedgerJournalNeedsSave(session.bankLedgerJournal.outbox)) {
           this.scheduleBankLedgerHighWaterSave(session);
         }
@@ -8367,9 +8064,10 @@ export class GameServer {
       // quest-bind, treasury cap, table price, capacity). `slot` is a container
       // index, `count` optional (omit = whole stack), `amount` copper. Every op
       // runs through runGuildBankOp: the before/after guildBankInfoFor diff is
-      // the ONE success signal, feeding both the fire-and-forget bank_ledger
-      // rows (container='guild') and the dirty mark that schedules the book
-      // for the fenced escrow save. A refusal diffs empty: no row, no mark.
+      // the ONE success signal, pre-reserving the bank_ledger rows
+      // (container='guild') and marking the book dirty. The later fenced save
+      // commits those rows atomically with the character and book; a refusal
+      // diffs empty and stages neither row nor mark.
       case 'guild_bank_deposit_gold':
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
         if (typeof msg.amount === 'number') {

@@ -30,6 +30,7 @@ import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -78,6 +79,12 @@ const VAULT_DEPOSIT_ALL_DESC_ID = 'vault-deposit-all-desc';
 
 type VaultFocusRole = 'row' | 'partial';
 
+interface VaultStatus extends BankStatusAnnouncementState {
+  key: TranslationKey;
+  params?: Record<string, string>;
+  at: number;
+}
+
 /** Stable across row insertion and sorting. A special row retains its wire
  * selector as a disambiguator, while itemId prevents an index reuse from
  * resolving to another material. Resolution uses dataset equality, so an
@@ -114,14 +121,12 @@ export interface VaultTabDeps {
 }
 
 export class VaultTab {
-  // The transient status line (deposit-all summary or withdraw shortfall) and
-  // its self-expire timer: a polite aria-live line inside the pane, the bank's
-  // depositStatus idiom. Stored as KEY plus params, resolved at build time, so
-  // a language switch inside the 4-second window relocalizes the line with the
-  // rest of the pane (the bank stores the resolved string; recorded family
-  // follow-up).
-  private status: { key: TranslationKey; params?: Record<string, string>; at: number } | null =
-    null;
+  // The transient status (deposit-all summary, withdraw shortfall, or refreshed
+  // purchase price) and its self-expire timer: a synchronous visible band plus
+  // an empty-then-published polite live region. Stored as KEY plus params,
+  // resolved at build time, so a language switch inside the 4-second window
+  // relocalizes the line with the rest of the pane.
+  private status: VaultStatus | null = null;
   private statusTimer: number | null = null;
 
   // In-flight guard for deposit-all: ONE command, but the online mirror still
@@ -193,7 +198,7 @@ export class VaultTab {
   /** The pane stopped rendering (a tab switch): stop the STATUS self-expire
    *  timer so it cannot fire a whole-window rebuild for a line nobody can
    *  see. The status itself is kept: switching back inside the window
-   *  re-shows it and buildStatusLine's age check still owns expiry. The
+   *  re-shows it and appendStatusLine's age check still owns expiry. The
    *  depositAllTimer deliberately keeps running: its fallback re-enables the
    *  button after a lost echo, which must happen wherever the player is, or
    *  switching back would find it wedged shut. */
@@ -224,8 +229,7 @@ export class VaultTab {
       cap: formatCount(model.perMaterialCap),
     });
     panel.appendChild(note);
-    const status = this.buildStatusLine();
-    if (status) panel.appendChild(status);
+    this.appendStatusLine(panel);
     const scroll = document.createElement('div');
     scroll.className = 'bank-scroll';
     if (model.empty) {
@@ -261,6 +265,10 @@ export class VaultTab {
       cap: formatCount(unlockCap),
     });
     panel.appendChild(intro);
+    // A stale unlock confirm can discover a refreshed rung-0 price. The same
+    // transient status used by the stocked pane must therefore render here too
+    // (before the refreshed offer the keyboard focus lands on).
+    this.appendStatusLine(panel);
     if (unlockCost === null) return;
     const row = document.createElement('div');
     row.className = 'bank-buy-row';
@@ -643,31 +651,37 @@ export class VaultTab {
   }
 
   private setStatus(key: TranslationKey, params?: Record<string, string>): void {
-    this.status = { key, params, at: performance.now() };
+    this.status = { key, params, at: performance.now(), announcedText: null };
   }
 
-  // The polite aria-live line while fresh, with a single self-expire timer
-  // (the bank's buildDepositStatus idiom).
-  private buildStatusLine(): HTMLElement | null {
+  // Paint the visible band synchronously, then mount a separate EMPTY live
+  // region and publish into it on a microtask. A live region created already
+  // populated is commonly never announced. Keeping the nodes separate also
+  // leaves the visible text available to virtual-cursor users without giving
+  // the freshly inserted band live semantics of its own.
+  private appendStatusLine(parent: HTMLElement): void {
     const s = this.status;
-    if (!s) return null;
+    if (!s) return;
     const age = performance.now() - s.at;
     if (age >= VAULT_STATUS_MS) {
       this.clearStatus();
-      return null;
+      return;
     }
-    const status = document.createElement('div');
-    status.className = 'bank-status vault-status';
-    status.setAttribute('role', 'status');
-    status.setAttribute('aria-live', 'polite');
-    status.textContent = t(s.key, s.params);
+    const text = t(s.key, s.params);
+    appendBankStatusLine(parent, s, {
+      text,
+      visibleClass: 'vault-status',
+      liveDataAttribute: 'data-vault-status-live',
+      // A locale switch or signature repaint may replace this node before the
+      // microtask. Its replacement schedules its own guarded publication.
+      isCurrent: () => this.status === s,
+    });
     if (this.statusTimer !== null) window.clearTimeout(this.statusTimer);
     this.statusTimer = window.setTimeout(() => {
       this.statusTimer = null;
       this.status = null;
       this.deps.requestRender();
     }, VAULT_STATUS_MS - age);
-    return status;
   }
 
   // The unlock / upgrade confirm in the prompt stack (the shared family
@@ -700,11 +714,13 @@ export class VaultTab {
             info.nextUpgradeCost !== offer.cost ||
             !this.purchaseEcho.arm(offer.upgrades, offer.upgrades + 1)
           ) {
+            this.setStatus('hudChrome.wocStore.priceChanged');
             dismiss();
             this.deps.requestRender();
-            (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+            this.focusPurchaseOffer();
             return;
           }
+          this.clearStatus();
           world.vaultBuyUpgrade();
           audio.coin();
           this.deps.onInventoryChanged();
@@ -720,5 +736,14 @@ export class VaultTab {
     if (!this.purchaseEcho.pending) return;
     button.disabled = true;
     button.setAttribute('aria-busy', 'true');
+  }
+
+  /** A stale confirmation always returns the keyboard user to the refreshed
+   * offer they must review. If the snapshot removed the offer entirely, the
+   * window close remains the safe, always-present fallback. */
+  private focusPurchaseOffer(): void {
+    const root = this.deps.root();
+    const offer = root.querySelector<HTMLElement>('.vault-unlock-btn, .vault-upgrade-btn');
+    (offer ?? root.querySelector<HTMLElement>('[data-close]'))?.focus();
   }
 }

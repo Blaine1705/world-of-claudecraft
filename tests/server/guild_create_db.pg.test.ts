@@ -5,12 +5,18 @@
 
 import type { Pool } from 'pg';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import type { PaidGuildCreateArgs, PaidGuildCreateResult } from '../../server/guild_create_db';
+import type {
+  PaidGuildCreateArgs,
+  PaidGuildCreateDbClient,
+  PaidGuildCreateResult,
+} from '../../server/guild_create_db';
 import type { StorageAppliedEffect } from '../../server/storage_purchase_db';
 import type { CharacterState } from '../../src/sim/character_state';
 
 const url = process.env.TEST_DATABASE_URL ?? '';
 const d = url === '' ? describe.skip : describe;
+const priorGrowthLimit = process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS;
+if (url !== '') process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS = '4';
 const SCHEMA = 'guild_create_pg_test';
 const ACCOUNT_ID = 7;
 const CHARACTER_ID = 41;
@@ -41,6 +47,7 @@ d('atomic paid guild creation against real PostgreSQL', () => {
   let realm: string;
   let leaseHolder: string;
   let guildFeeCopper: number;
+  let receiptServerTimeoutMs: number;
   let createPaidGuildWithLeaderAtomic: (
     deps: Parameters<
       typeof import('../../server/guild_create_db').createPaidGuildWithLeaderAtomic
@@ -91,12 +98,14 @@ d('atomic paid guild creation against real PostgreSQL', () => {
     const guildCreate = await import('../../server/guild_create_db');
     const db = await import('../../server/db');
     const { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } = await import('../../server/bank_ledger_batch_db');
+    const growth = await import('../../server/bank_ledger_growth_budget');
     const { ADMIN_GUILDS_SCHEMA } = await import('../../server/admin_guilds_schema');
     const storage = await import('../../server/storage_purchase_db');
     const guildBank = await import('../../src/sim/guild_bank');
     realm = (await import('../../server/realm')).REALM;
     leaseHolder = db.PROCESS_LEASE_HOLDER;
     guildFeeCopper = guildBank.GUILD_CREATION_FEE_COPPER;
+    receiptServerTimeoutMs = guildCreate.PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS;
     createPaidGuildWithLeaderAtomic = guildCreate.createPaidGuildWithLeaderAtomic;
 
     const admin = new pg.Pool({ connectionString: url, max: 1 });
@@ -119,7 +128,8 @@ d('atomic paid guild creation against real PostgreSQL', () => {
       id INT PRIMARY KEY,
       account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
       level INT NOT NULL,
-      state JSONB NOT NULL
+      state JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
     await pool.query(`CREATE TABLE character_leases (
       character_id INT PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
@@ -168,7 +178,8 @@ d('atomic paid guild creation against real PostgreSQL', () => {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
     await pool.query(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
-    await pool.query(storage.STORAGE_PURCHASE_SCHEMA);
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(SCHEMA));
+    await pool.query(storage.storagePurchaseSchema(SCHEMA));
     await pool.query(ADMIN_GUILDS_SCHEMA);
   }, 30_000);
 
@@ -186,6 +197,7 @@ d('atomic paid guild creation against real PostgreSQL', () => {
       characters,
       accounts
       RESTART IDENTITY CASCADE`);
+    await pool.query('UPDATE bank_ledger_growth_budget SET committed_rows = 0');
     await pool.query('INSERT INTO accounts (id) VALUES ($1)', [ACCOUNT_ID]);
     await pool.query(
       'INSERT INTO characters (id, account_id, level, state) VALUES ($1, $2, $3, $4::jsonb)',
@@ -207,12 +219,21 @@ d('atomic paid guild creation against real PostgreSQL', () => {
   });
 
   afterAll(async () => {
-    if (!pool) return;
-    await pool.end();
-    const { Pool: AdminPool } = await import('pg');
-    const admin = new AdminPool({ connectionString: url, max: 1 });
-    await admin.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
-    await admin.end();
+    try {
+      if (pool) {
+        await pool.end();
+        const { Pool: AdminPool } = await import('pg');
+        const admin = new AdminPool({ connectionString: url, max: 1 });
+        await admin.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
+        await admin.end();
+      }
+    } finally {
+      if (priorGrowthLimit === undefined) {
+        delete process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS;
+      } else {
+        process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS = priorGrowthLimit;
+      }
+    }
   });
 
   it('commits the founder, fenced state, fee receipt, carried storage effect, and empty bank', async () => {
@@ -304,6 +325,158 @@ d('atomic paid guild creation against real PostgreSQL', () => {
     expect((await pool.query('SELECT count(*)::int AS n FROM storage_purchases')).rows[0].n).toBe(
       0,
     );
+  });
+
+  it('server-bounds a blocked receipt proof, then succeeds on the next bounded attempt', async () => {
+    const blocker = await pool.connect();
+    const observer = await pool.connect();
+    const blockerPid = Number((await blocker.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+    const lostCommitReply = new Error('test lost the already-committed reply');
+    let injected = false;
+    let blockerOpen = false;
+    let pending: Promise<PaidGuildCreateResult> | null = null;
+
+    const ambiguousPool = {
+      connect: async (): Promise<PaidGuildCreateDbClient> => {
+        const client = await pool.connect();
+        return {
+          query: async (text: string, values?: unknown[]) => {
+            const result = await client.query(text, values);
+            if (text === 'COMMIT' && !injected) {
+              injected = true;
+              await blocker.query('BEGIN');
+              blockerOpen = true;
+              await blocker.query('LOCK TABLE bank_ledger_batch_receipts IN ACCESS EXCLUSIVE MODE');
+              throw lostCommitReply;
+            }
+            return result;
+          },
+          release: (error?: Error | boolean) => client.release(error),
+          on: (event: 'error', listener: (error: Error) => void) => client.on(event, listener),
+          removeListener: (event: 'error', listener: (error: Error) => void) =>
+            client.removeListener(event, listener),
+        } as PaidGuildCreateDbClient;
+      },
+    };
+
+    try {
+      pending = createPaidGuildWithLeaderAtomic(
+        { pool: ambiguousPool, bustGuildRoster: () => {} },
+        args('PG Receipt Timeout'),
+      );
+
+      let receiptPid: number | null = null;
+      for (let attempt = 0; attempt < 150 && receiptPid === null; attempt++) {
+        await observer.query('SELECT pg_stat_clear_snapshot()');
+        const waiting = await observer.query(
+          `SELECT pid
+             FROM pg_stat_activity
+            WHERE datname = current_database()
+              AND application_name = $1
+              AND wait_event_type = 'Lock'
+              AND $2::int = ANY(pg_blocking_pids(pid))
+              AND query LIKE 'SELECT %FROM bank_ledger_batch_receipts%'
+            ORDER BY pid
+            LIMIT 1`,
+          [SCHEMA, blockerPid],
+        );
+        receiptPid = waiting.rows[0] ? Number(waiting.rows[0].pid) : null;
+        if (receiptPid === null) await new Promise<void>((resolve) => setTimeout(resolve, 5));
+      }
+      expect(injected).toBe(true);
+      expect(receiptPid).not.toBeNull();
+
+      const serverDeadline = Date.now() + receiptServerTimeoutMs + 1_500;
+      let stillWaiting = true;
+      while (Date.now() < serverDeadline && stillWaiting) {
+        await observer.query('SELECT pg_stat_clear_snapshot()');
+        const active = await observer.query(
+          `SELECT EXISTS (
+             SELECT 1 FROM pg_stat_activity
+              WHERE pid = $1 AND wait_event_type = 'Lock'
+           ) AS waiting`,
+          [receiptPid],
+        );
+        stillWaiting = active.rows[0].waiting === true;
+        if (stillWaiting) await new Promise<void>((resolve) => setTimeout(resolve, 5));
+      }
+      expect(stillWaiting).toBe(false);
+      await observer.query('SELECT pg_stat_clear_snapshot()');
+      expect(
+        (
+          await observer.query(
+            `SELECT count(*)::int AS n FROM pg_stat_activity
+              WHERE pid = $1 AND xact_start IS NOT NULL`,
+            [receiptPid],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+
+      await blocker.query('ROLLBACK');
+      blockerOpen = false;
+      await expect(pending).resolves.toMatchObject({
+        durability: 'committed',
+        feeBatchKey: FEE_BATCH_KEY,
+      });
+      expect((await pool.query('SELECT count(*)::int AS n FROM guilds')).rows[0].n).toBe(1);
+      expect(
+        (await pool.query('SELECT count(*)::int AS n FROM bank_ledger_batch_receipts')).rows[0].n,
+      ).toBe(1);
+    } finally {
+      if (blockerOpen) await blocker.query('ROLLBACK').catch(() => {});
+      blocker.release();
+      observer.release();
+      if (pending) await pending.catch(() => {});
+    }
+  });
+
+  it('rolls the whole paid create back when the real deferred ledger ceiling refuses COMMIT', async () => {
+    await pool.query(
+      `INSERT INTO bank_ledger
+         (realm, character_id, account_id, op, item_id, count, instance,
+          copper_delta, purchased_slots_after, container, container_id,
+          counterparty_copper_delta, counterparty_count)
+       SELECT $1, $2, $3, 'deposit', 'growth_seed_' || ordinal::text, 1, NULL,
+              0, 0, 'personal', NULL, NULL, NULL
+         FROM generate_series(1, 3) AS ordinal`,
+      [realm, CHARACTER_ID, ACCOUNT_ID],
+    );
+
+    const result = await create('PG Growth Refusal');
+    expect(result).toMatchObject({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: {
+        name: 'BankLedgerGrowthLimitExceeded',
+        committedRows: 3,
+        attemptedRows: 2,
+        hardLimitRows: 4,
+      },
+    });
+
+    const artifacts = await pool.query(`
+      SELECT
+        (SELECT count(*)::int FROM guilds) AS guilds,
+        (SELECT count(*)::int FROM guild_members) AS members,
+        (SELECT count(*)::int FROM guild_banks) AS banks,
+        (SELECT count(*)::int FROM bank_ledger) AS ledger,
+        (SELECT count(*)::int FROM bank_ledger_batch_receipts) AS ledger_receipts,
+        (SELECT count(*)::int FROM storage_purchase_applied_receipts) AS storage_receipts,
+        (SELECT count(*)::int FROM storage_purchases) AS open_storage,
+        (SELECT committed_rows::int FROM bank_ledger_growth_budget) AS growth_rows,
+        (SELECT (state->>'copper')::int FROM characters WHERE id = ${CHARACTER_ID}) AS copper
+    `);
+    expect(artifacts.rows[0]).toEqual({
+      guilds: 0,
+      members: 0,
+      banks: 0,
+      ledger: 3,
+      ledger_receipts: 0,
+      storage_receipts: 0,
+      open_storage: 1,
+      growth_rows: 3,
+      copper: 100_000,
+    });
   });
 
   it('rolls every artifact back when a concurrent lease takeover wins before the fence', async () => {

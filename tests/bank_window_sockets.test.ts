@@ -7,7 +7,7 @@
 // confirm prompt, and the repaint signature's socket terms (an unlock at the
 // banker moves ONLY socketsUnlocked and nextSocketCost, so without the terms
 // the row sits stale until unrelated bank data happens to move).
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
 import type { BankInfo, IWorld } from '../src/world_api';
 
@@ -199,6 +199,166 @@ describe('the socket clicks dispatch the IWorld verbs (the real player callers)'
     expect(confirm?.textContent).toBe('Unlock');
     confirm?.click();
     expect(h.calls).toEqual(['bankUnlockSocket']);
+  });
+
+  it('holds the confirmed offer busy across a stale mirror and sends exactly one unlock', () => {
+    const h = harness(bankInfo({ socketsUnlocked: 0, nextSocketCost: 1000000 }));
+    h.window.open();
+    cells(h.root)[0].click();
+    const confirm = document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement;
+    confirm.click();
+    // The arm check also protects the deepest boundary: even a queued second
+    // activation on the now-detached confirm cannot send another command.
+    confirm.click();
+
+    const stale = cells(h.root)[0] as HTMLButtonElement;
+    expect(h.calls.filter((call) => call === 'bankUnlockSocket')).toHaveLength(1);
+    expect(h.root.querySelector('.bank-socket-purchase-status')).toBeNull();
+    expect(stale.disabled).toBe(true);
+    expect(stale.getAttribute('aria-disabled')).toBe('true');
+    expect(stale.getAttribute('aria-busy')).toBe('true');
+    expect(document.activeElement).toBe(h.root.querySelector('[data-close]'));
+
+    // The online mirror still advertises the exact offer that was just sent.
+    // A rapid second activation cannot open another confirm or send the
+    // argument-free command that would buy the next authoritative rung.
+    stale.click();
+    expect(document.querySelector('.bank-buy-prompt')).toBeNull();
+    expect(h.calls.filter((call) => call === 'bankUnlockSocket')).toHaveLength(1);
+
+    // Only the expected authoritative revision releases the guard. The next
+    // rung is a fresh, independently actionable offer with its own live price.
+    h.world.bankInfo = bankInfo({ socketsUnlocked: 1, nextSocketCost: 2000000 });
+    h.window.refreshIfChanged();
+    const echoed = cells(h.root);
+    expect(echoed[0].classList.contains('empty')).toBe(true);
+    expect((echoed[1] as HTMLButtonElement).disabled).toBe(false);
+    expect(echoed[1].hasAttribute('aria-disabled')).toBe(false);
+    expect(echoed[1].hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('refuses a stale revision, announces the refreshed price, and focuses that offer', async () => {
+    const h = harness(bankInfo({ socketsUnlocked: 0, nextSocketCost: 1000000 }));
+    h.window.open();
+    cells(h.root)[0].click();
+
+    // An authoritative rung advance lands while the socket-0 confirmation is
+    // open. Sending now would act on socket 1, which was never shown.
+    h.world.bankInfo = bankInfo({ socketsUnlocked: 1, nextSocketCost: 1000000 });
+    (document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement).click();
+
+    expect(h.calls).not.toContain('bankUnlockSocket');
+    expect(document.querySelector('.bank-buy-prompt')).toBeNull();
+    const fresh = cells(h.root);
+    expect(fresh[0].classList.contains('empty')).toBe(true);
+    const refreshed = fresh[1] as HTMLButtonElement;
+    expect(refreshed.getAttribute('aria-label')).toContain('100');
+    expect(document.activeElement).toBe(refreshed);
+
+    const message =
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.';
+    const visible = h.root.querySelector('.bank-socket-purchase-status');
+    const detachedLive = h.root.querySelector('[data-bank-socket-purchase-live]') as HTMLElement;
+    expect(visible?.textContent).toBe(message);
+    expect(visible?.getAttribute('aria-live')).toBeNull();
+    expect(detachedLive.getAttribute('role')).toBe('status');
+    expect(detachedLive.getAttribute('aria-live')).toBe('polite');
+    expect(detachedLive.getAttribute('aria-atomic')).toBe('true');
+    expect(detachedLive.textContent).toBe('');
+
+    // A repaint before publication cannot make the detached region speak.
+    // Its mounted replacement publishes once and retains focus on the offer.
+    h.window.render();
+    const currentLive = h.root.querySelector('[data-bank-socket-purchase-live]') as HTMLElement;
+    const currentOffer = cells(h.root)[1] as HTMLButtonElement;
+    expect(currentLive).not.toBe(detachedLive);
+    expect(currentLive.textContent).toBe('');
+    expect(document.activeElement).toBe(currentOffer);
+    await Promise.resolve();
+    expect(detachedLive.textContent).toBe('');
+    expect(currentLive.textContent).toBe(message);
+  });
+
+  it('refuses a visible offer whose price changed before confirmation', () => {
+    const h = harness(bankInfo({ socketsUnlocked: 0, nextSocketCost: 1000000 }));
+    h.window.open();
+    cells(h.root)[0].click();
+
+    // The same rung is still live, but the tunable price no longer matches
+    // the amount in the confirmation. It needs a fresh consent prompt too.
+    h.world.bankInfo = bankInfo({ socketsUnlocked: 0, nextSocketCost: 1500000 });
+    (document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement).click();
+
+    expect(h.calls).not.toContain('bankUnlockSocket');
+    expect(document.querySelector('.bank-buy-prompt')).toBeNull();
+    const refreshed = cells(h.root)[0];
+    expect(refreshed.getAttribute('aria-label')).toContain('150');
+    expect(document.activeElement).toBe(refreshed);
+    expect(h.root.querySelector('.bank-socket-purchase-status')).not.toBeNull();
+  });
+
+  it('falls back to Close when a stale confirmation no longer has a socket offer', () => {
+    const h = harness(bankInfo({ socketsUnlocked: 3, nextSocketCost: 4000000 }));
+    h.window.open();
+    cells(h.root)[3].click();
+
+    h.world.bankInfo = bankInfo({ socketsUnlocked: 4, nextSocketCost: null });
+    (document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement).click();
+
+    expect(h.calls).not.toContain('bankUnlockSocket');
+    expect(document.activeElement).toBe(h.root.querySelector('[data-close]'));
+    expect(h.root.querySelector('.bank-socket-purchase-status')).not.toBeNull();
+  });
+
+  it('keeps the socket latch across close, ignores generic errors, and releases on refusal', () => {
+    const h = harness(bankInfo({ socketsUnlocked: 0, nextSocketCost: 1000000 }));
+    h.window.open();
+    cells(h.root)[0].click();
+    (document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement).click();
+    h.window.close();
+    h.window.open();
+
+    const reopened = cells(h.root)[0] as HTMLButtonElement;
+    expect(reopened.disabled).toBe(true);
+    expect(reopened.getAttribute('aria-busy')).toBe('true');
+    h.window.observeStorageText('You are busy.');
+    expect(reopened.disabled).toBe(true);
+
+    h.window.observeStorageText('You cannot afford that bag socket.');
+    const released = cells(h.root)[0] as HTMLButtonElement;
+    expect(released.disabled).toBe(false);
+    expect(released.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('releases the socket latch on the authoritative max-sockets refusal too', () => {
+    const h = harness(bankInfo({ socketsUnlocked: 0, nextSocketCost: 1000000 }));
+    h.window.open();
+    cells(h.root)[0].click();
+    (document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement).click();
+
+    h.window.observeStorageText('Your bank has no more bag sockets to unlock.');
+    const released = cells(h.root)[0] as HTMLButtonElement;
+    expect(released.disabled).toBe(false);
+    expect(released.hasAttribute('aria-busy')).toBe(false);
+  });
+
+  it('re-enables the stale socket offer at the bounded 12,000ms lost-echo timeout', () => {
+    vi.useFakeTimers();
+    try {
+      const h = harness(bankInfo({ socketsUnlocked: 0, nextSocketCost: 1000000 }));
+      h.window.open();
+      cells(h.root)[0].click();
+      (document.querySelector('.bank-buy-prompt .btn') as HTMLButtonElement).click();
+
+      vi.advanceTimersByTime(11_999);
+      expect((cells(h.root)[0] as HTMLButtonElement).disabled).toBe(true);
+      vi.advanceTimersByTime(1);
+      const released = cells(h.root)[0] as HTMLButtonElement;
+      expect(released.disabled).toBe(false);
+      expect(released.hasAttribute('aria-busy')).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('the empty and later-locked cells dispatch nothing', () => {

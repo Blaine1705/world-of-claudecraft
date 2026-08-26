@@ -1542,7 +1542,7 @@ describe('guild bank ops: the stale-rank scenario and determinism', () => {
 
 // ---------------------------------------------------------------------------
 // Phase 3: the persistence-facing sim helpers the server wires up (the evict,
-// the disband-guard holdings read, and the reserve-at-gate fee charge/refund).
+// the disband-guard holdings read, and the atomic-create fee charge/refund).
 // The SQL side lives in server/db.ts and is pinned in the server suites.
 // ---------------------------------------------------------------------------
 
@@ -1596,7 +1596,7 @@ describe('evictGuildBank (the sanctioned evict) + guildBankHoldings', () => {
   });
 });
 
-describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
+describe('chargeGuildCreationFeeFor (atomic-create purse mutation)', () => {
   it('charges exactly the fee once when the purse covers it', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;
@@ -1604,10 +1604,9 @@ describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
     expect(meta(sim).copper).toBe(140_000);
   });
 
-  it('clamps to the purse on a shortfall (never negative); the GATE refuses a short charge', () => {
-    // The dispatch gate checks the purse and charges in the same synchronous
-    // block, refusing (and refunding) when the charge comes back short, so
-    // the clamp here is defensive only.
+  it('clamps to the purse on a shortfall (never negative); the FIFO re-check refuses it', () => {
+    // The authoritative funds check and this charge share one character-save
+    // FIFO task, so the clamp is defensive against an invalid direct caller.
     const sim = freshSim();
     meta(sim).copper = 4_000;
     expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(4_000);
@@ -1638,7 +1637,7 @@ describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
   });
 });
 
-describe('refundGuildCreationFeeFor (the reserve-at-gate refusal arm)', () => {
+describe('refundGuildCreationFeeFor (proved atomic rollback)', () => {
   it('returns exactly the reserved fee to the purse', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;

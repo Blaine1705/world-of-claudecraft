@@ -706,7 +706,9 @@ export class BankLedgerOutbox {
     return reservation;
   }
 
-  /** Cancel only when the guarded mutation did not happen. */
+  /** Release an unused reservation when the guarded mutation did not happen,
+   *  or when its evidence committed through a separate direct transaction and
+   *  must not also enter this outbox. Unknown durability must retain it. */
   cancel(reservation: BankLedgerOutboxReservation): boolean {
     if (this.closed) return false;
     const state = this.reservations.get(reservation);

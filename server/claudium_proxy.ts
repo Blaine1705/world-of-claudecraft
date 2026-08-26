@@ -200,6 +200,7 @@ interface ServiceRequest {
   path: string;
   body?: unknown;
   timeoutMs?: number;
+  signal?: AbortSignal;
 }
 
 /** A call outcome that also reports whether the request PROVABLY never reached
@@ -239,6 +240,7 @@ async function callServiceDetailed<T>(req: ServiceRequest): Promise<ServiceCallO
   }
   let res: Response;
   try {
+    const timeoutSignal = AbortSignal.timeout(req.timeoutMs ?? SERVICE_TIMEOUT_MS);
     res = await fetch(url, {
       method: req.method,
       headers,
@@ -253,10 +255,12 @@ async function callServiceDetailed<T>(req: ServiceRequest): Promise<ServiceCallO
       // no part of this service's contract; treating one as a failure keeps the
       // ambiguous answer ambiguous, which is the safe direction.
       redirect: 'error',
-      signal: AbortSignal.timeout(req.timeoutMs ?? SERVICE_TIMEOUT_MS),
+      signal: req.signal ? AbortSignal.any([req.signal, timeoutSignal]) : timeoutSignal,
     });
   } catch (err) {
-    logFailure(err);
+    // Coordinator shutdown is expected control flow. It remains an ambiguous
+    // money outcome, but should not page/log as an economy-service outage.
+    if (!req.signal?.aborted) logFailure(err);
     return { data: null, neverReached: requestNeverReachedService(err) };
   }
   try {
@@ -646,11 +650,13 @@ export interface ClaudiumSpendOutcome {
 
 export async function claudiumSpendDetailed(
   input: ClaudiumSpendInput,
+  signal?: AbortSignal,
 ): Promise<ClaudiumSpendOutcome> {
   const { data, neverReached } = await callServiceDetailed<unknown>({
     method: 'POST',
     path: 'spend',
     body: input,
+    signal,
   });
   const parsed = parseClaudiumSpendWireResult(data);
   if (!parsed) {

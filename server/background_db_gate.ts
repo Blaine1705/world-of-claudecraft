@@ -3,11 +3,13 @@
 // The pg Pool is shared with login, auth, and player request traffic. Autosave,
 // storage-purchase recovery, and World Market escrow each have useful local
 // concurrency limits, but independent limits can still add up past the pool's
-// capacity. This one gate composes those producers and leaves an interactive
-// reserve instead of making the pool checkout queue the first backpressure
-// boundary.
+// capacity. This one gate composes those named major producers before the pool
+// checkout queue becomes their first shared backpressure boundary. Other
+// background jobs still use the same pool, so the configured headroom is NOT
+// a guaranteed interactive reserve; a true reserve requires classifying every
+// checkout or separate priority pools under one connection budget.
 
-export const BACKGROUND_DB_INTERACTIVE_RESERVE = 2;
+export const BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM = 2;
 
 export interface BackgroundDbPermit {
   /** Idempotent: a stale finally block cannot over-release the gate. */
@@ -18,7 +20,9 @@ export interface BackgroundDbGateStats {
   inFlight: number;
   waiting: number;
   max: number;
-  interactiveReserve: number;
+  /** Pool clients outside this gate's named-producer cap. Bypass work can use
+   *  them, so this is composition headroom rather than a reserved partition. */
+  configuredHeadroom: number;
   acquired: number;
   refused: number;
   cancelled: number;
@@ -39,25 +43,23 @@ interface Waiter {
   readonly onAbort?: () => void;
 }
 
-/** At very small operator-configured pools, keep one background lane so
- * durability can still make progress. The full two-client reserve therefore
- * exists whenever the pool has at least three clients; smaller pools report
- * their reduced effective reserve truthfully in stats(). */
+/** At very small operator-configured pools, keep one named-producer lane so
+ * durability can still make progress. */
 export function backgroundDbCapacity(
   poolMaxClients: number,
-  requestedReserve = BACKGROUND_DB_INTERACTIVE_RESERVE,
+  requestedHeadroom = BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM,
 ): number {
   const poolMax = Math.max(1, Math.floor(poolMaxClients));
-  const reserve = Math.max(0, Math.floor(requestedReserve));
-  return Math.max(1, poolMax - reserve);
+  const headroom = Math.max(0, Math.floor(requestedHeadroom));
+  return Math.max(1, poolMax - headroom);
 }
 
 export function createBackgroundDbGate(
   poolMaxClients: number,
-  requestedReserve = BACKGROUND_DB_INTERACTIVE_RESERVE,
+  requestedHeadroom = BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM,
 ): BackgroundDbGate {
   const poolMax = Math.max(1, Math.floor(poolMaxClients));
-  const max = backgroundDbCapacity(poolMax, requestedReserve);
+  const max = backgroundDbCapacity(poolMax, requestedHeadroom);
   const waiters = new Map<object, Waiter>();
   let inFlight = 0;
   let acquired = 0;
@@ -130,7 +132,7 @@ export function createBackgroundDbGate(
         inFlight,
         waiting: waiters.size,
         max,
-        interactiveReserve: Math.max(0, poolMax - max),
+        configuredHeadroom: Math.max(0, poolMax - max),
         acquired,
         refused,
         cancelled,

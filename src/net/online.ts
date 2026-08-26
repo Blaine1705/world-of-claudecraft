@@ -163,6 +163,7 @@ import type {
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
+import { decodeBankPurchasedSlotsWire, decodeCraftVaultStockWire } from './bank_snapshot_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -3737,19 +3738,18 @@ export class ClientWorld implements IWorld {
       // a tolerated save can carry a dormant own '__proto__' key in `stock`, so
       // this must never be rebuilt by keyed assignment or Object.assign.
       if (s.vault !== undefined) this.vaultInfo = decodeVaultInfoWire(s.vault);
-      // `cvault` follows the same delta contract as `vault` (omitted means
-      // unchanged; the server encodes an explicit null when the craft-draw
-      // gate closes, e.g. entering a dungeon) and the same BY-REFERENCE
-      // adoption rule: the record can carry a dormant own '__proto__' key
-      // from a tolerated save, so it is never rebuilt by keyed assignment or
-      // Object.assign.
-      if (s.cvault !== undefined) this.craftVaultStock = s.cvault;
-      // `bpsl` follows the same delta contract as the three above: omitted means
-      // UNCHANGED, never "no ladder", so an omission must not reset the count a
-      // joined session already holds. The server always has an answer for a live
-      // session, so the `?? null` arm is the defensive one (a malformed frame),
-      // not a state the flow produces.
-      if (s.bpsl !== undefined) this.bankPurchasedSlots = s.bpsl ?? null;
+      // Both owner-only fields are delta-omitted, so omission retains prior mirrors.
+      // Explicit null clears them; malformed values leave the last valid state intact.
+      // Valid cvault records are adopted by reference so an own `__proto__` row
+      // stays inert data rather than reaching a prototype-setting assignment.
+      if (s.cvault !== undefined) {
+        const decoded = decodeCraftVaultStockWire(s.cvault);
+        if (decoded !== undefined) this.craftVaultStock = decoded;
+      }
+      if (s.bpsl !== undefined) {
+        const decoded = decodeBankPurchasedSlotsWire(s.bpsl);
+        if (decoded !== undefined) this.bankPurchasedSlots = decoded;
+      }
       // `guildBank` follows the same delta contract; the server encodes null
       // away from a banker, on death, and outside a guild (the proximity +
       // membership gate lives in sim guildBankInfoFor; any rank sees it, the

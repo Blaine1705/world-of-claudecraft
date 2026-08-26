@@ -85,23 +85,35 @@ interface KeyedWriteEntry<K> {
 // market writer rides this so a dirty-book autosave pile-up is loud before it
 // becomes save latency; the message is the wrapper's one behavior, so it is
 // caller-supplied and unchanged by this move.
+export interface DepthWarnedSerialWriter {
+  <T>(write: () => Promise<T>): Promise<T>;
+  /** Cancel a queued shared-resource write before it starts. Once running, the
+   *  job receives the caller-owned signal and owns active-I/O cancellation. */
+  enqueueCancellable<T>(signal: AbortSignal, write: () => Promise<T>): Promise<T>;
+}
+
 export function createDepthWarnedSerialWriter(
   warnDepth: number,
   message: (depth: number) => string,
-): <T>(write: () => Promise<T>) => Promise<T> {
-  const writer = createSerialWriter();
+): DepthWarnedSerialWriter {
+  const writer = createKeyedSerialWriter<'shared'>();
   let depth = 0;
   let lastWarnMs = 0;
-  return <T>(write: () => Promise<T>): Promise<T> => {
+  const track = <T>(enqueue: () => Promise<T>): Promise<T> => {
     depth++;
     if (depth > warnDepth && Date.now() - lastWarnMs > 60_000) {
       lastWarnMs = Date.now();
       console.warn(message(depth));
     }
-    return writer(write).finally(() => {
+    return enqueue().finally(() => {
       depth--;
     });
   };
+  const enqueue = (<T>(write: () => Promise<T>): Promise<T> =>
+    track(() => writer.enqueue('shared', write))) as DepthWarnedSerialWriter;
+  enqueue.enqueueCancellable = <T>(signal: AbortSignal, write: () => Promise<T>): Promise<T> =>
+    track(() => writer.enqueueCancellable('shared', signal, write));
+  return enqueue;
 }
 
 export function createKeyedSerialWriter<K>(): KeyedSerialWriter<K> {

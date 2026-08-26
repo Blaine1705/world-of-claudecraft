@@ -96,8 +96,10 @@ import {
   verifyPassword,
 } from './auth';
 import { configureAuthRuntime } from './auth_routes';
+import { createBackgroundDbGate } from './background_db_gate';
 import { computeBankBonus } from './bank_entitlements';
 import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle } from './bank_ledger';
+import { createBankLedgerGrowthMonitor } from './bank_ledger_growth_monitor';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import {
   BUG_DESCRIPTION_MAX,
@@ -151,6 +153,7 @@ import {
   createAccount,
   createCharacterCapped,
   createCompanionToken,
+  DB_POOL_MAX_CLIENTS,
   deedsBoardRanked,
   deleteCharacter,
   ensureSchema,
@@ -390,6 +393,7 @@ import {
   executeStoragePurchase,
   type StoragePurchaseHost,
   stopStoragePurchaseRecovery,
+  storagePurchaseRecoveryMetrics,
 } from './storage_purchases';
 import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
 import { listSuspicionFlagDataset } from './suspicion_flags_db';
@@ -546,12 +550,13 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // WITHOUT running startServer(), so their first request constructs the world
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
+const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS);
 function liveGame(): GameServer {
   // LISTEN uses its own dedicated connection and quota consumes use their own
   // max-two pool. The coordinator cap equals that pool exactly, so it creates
   // no pg waiters and leaves every shared-pool client to auth/save work. The
   // constructor default keeps DB-mocked unit worlds independent from config.
-  gameInstance ??= new GameServer();
+  gameInstance ??= new GameServer(undefined, majorBackgroundDbGate);
   return gameInstance;
 }
 
@@ -2924,7 +2929,14 @@ const wocMarketService = new WocMarketService({
       wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
       persistMailBlob: () => liveGame().persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) =>
-        liveGame().enqueueCharacterWrite(characterId, job),
+        liveGame().enqueueCharacterWrite(characterId, async () => {
+          const permit = await majorBackgroundDbGate.acquire();
+          try {
+            return await job();
+          } finally {
+            permit?.release();
+          }
+        }),
       serializeCharacterForPersist: (characterId) =>
         liveGame().serializeCharacterForPersist(characterId),
       acknowledgeCharacterSaveEffects: (save) => liveGame().acknowledgeCharacterSaveEffects(save),
@@ -3017,6 +3029,11 @@ configureInternalWocMarketStuckRead(async () => ({
   // the join-veto refetch counter; a bust storm or eviction thrash here is
   // DB pressure returning to the guards.
   authGuard: wocAuthGuardCacheStats(),
+  // Shared named-producer admission and bounded paid-storage recovery. These
+  // are scrape-visible too, but colocating them with the custody readout makes
+  // a pool-pressure incident diagnosable from the existing secret ops page.
+  backgroundDbGate: majorBackgroundDbGate.stats(),
+  storageRecovery: storagePurchaseRecoveryMetrics(),
   // The price cache's memo ages (null on the dev economy, which has no
   // cache): a stale-served or blanked price during a brownout is a NUMBER
   // here, not an invisible state the module never logs.
@@ -3186,6 +3203,7 @@ function storagePurchaseHost(): StoragePurchaseHost {
     setRecoveryAdmissionPending: (characterId, pending) =>
       void game.storageRecoveryAdmission(characterId, pending),
     recoveryAdmissionPending: (characterId) => game.storageRecoveryAdmission(characterId),
+    acquireBackgroundPermit: (signal) => majorBackgroundDbGate.acquire(signal),
     grant: (pid, skuId, purchaseKey, dryRun) =>
       bankGrantStorageSlots(game.sim.ctx, pid, skuId, purchaseKey, { dryRun }),
     stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect),
@@ -3194,10 +3212,10 @@ function storagePurchaseHost(): StoragePurchaseHost {
     // single session; it matters when a quarantined session and a live one
     // share a character id, where taking the first match would answer false for
     // a character that can in fact save.
-    saveCharacter: (characterId, shouldStart) => {
+    saveCharacter: (characterId, shouldStart, signal) => {
       for (const s of game.clients.values()) {
         if (s.characterId === characterId && !s.left && !s.escrowQuarantined) {
-          return game.saveCharacter(s, { shouldStart });
+          return game.saveCharacter(s, { shouldStart, signal, backgroundDbPermit: true });
         }
       }
       return Promise.resolve(false);
@@ -3207,16 +3225,20 @@ function storagePurchaseHost(): StoragePurchaseHost {
     // reserving the character's ladder against a gold buy.
     spend: claudiumSpendDetailed,
     db: {
-      begin: (row) => beginStoragePurchase(pool, row),
-      byKey: (key) => storagePurchaseByKey(pool, key),
-      claimSpend: (key, token) => claimStoragePurchaseSpend(pool, key, token),
-      renewSpendClaim: (key, token) => renewStoragePurchaseSpendClaim(pool, key, token),
-      releaseSpendClaim: (key, token) => releaseStoragePurchaseSpendClaim(pool, key, token),
-      settle: (key, status, token) => settleStoragePurchase(pool, key, status, token),
-      discardWithoutDebit: (key, token) =>
-        deletePendingStoragePurchaseWithoutDebit(pool, key, token),
-      pendingFor: (characterId) => pendingStoragePurchasesForCharacter(pool, characterId),
-      openFor: (characterId) => openStoragePurchaseForCharacter(pool, characterId),
+      begin: (row, signal) => beginStoragePurchase(pool, row, signal),
+      byKey: (key, signal) => storagePurchaseByKey(pool, key, signal),
+      claimSpend: (key, token, signal) => claimStoragePurchaseSpend(pool, key, token, signal),
+      renewSpendClaim: (key, token, signal) =>
+        renewStoragePurchaseSpendClaim(pool, key, token, signal),
+      releaseSpendClaim: (key, token, signal) =>
+        releaseStoragePurchaseSpendClaim(pool, key, token, signal),
+      settle: (key, status, token, signal) =>
+        settleStoragePurchase(pool, key, status, token, signal),
+      discardWithoutDebit: (key, token, signal) =>
+        deletePendingStoragePurchaseWithoutDebit(pool, key, token, signal),
+      pendingFor: (characterId, signal) =>
+        pendingStoragePurchasesForCharacter(pool, characterId, signal),
+      openFor: (characterId, signal) => openStoragePurchaseForCharacter(pool, characterId, signal),
     },
     realm: REALM,
     warn: (message) => console.warn(`[storage-purchase] ${message}`),
@@ -3505,6 +3527,13 @@ export async function startServer(): Promise<http.Server> {
   await ensureSchema();
   await seedOAuthClients();
   const game = liveGame();
+  const bankLedgerGrowthMonitor = createBankLedgerGrowthMonitor({
+    pool,
+    // Metrics yield immediately under durability pressure. The next minute's
+    // point read catches up; observation_age_seconds makes sustained skips loud.
+    tryAcquireBackgroundPermit: () => majorBackgroundDbGate.tryAcquire(),
+    onError: (error) => console.error('bank ledger growth monitor failed:', error),
+  });
   const generalChatQuotaListener = createGeneralChatQuotaListener({
     activeAccountIds: () => [...game.liveAccountIds()],
     onResync: (accountIds, policies) => {
@@ -3695,6 +3724,8 @@ export async function startServer(): Promise<http.Server> {
     simTickHz: () => game.simTickHz(),
     savePendingKeys: () => game.characterSaveQueues.pendingKeys(),
     escrowGateInFlight: () => wocEscrowGate.stats().inFlight,
+    backgroundDbGate: () => majorBackgroundDbGate.stats(),
+    storageRecovery: () => storagePurchaseRecoveryMetrics(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
     // Coerced at the untyped boundary: @types/pg hand-declares these getters,
     // so a pg upgrade that drops one type-checks clean and would otherwise
@@ -3745,6 +3776,7 @@ export async function startServer(): Promise<http.Server> {
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
     console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
+  bankLedgerGrowthMonitor.start();
 
   // The CONCURRENTLY index builds run AFTER listen, deliberately. They
   // serialize across every realm process on the schema advisory lock, and a
@@ -3797,13 +3829,13 @@ export async function startServer(): Promise<http.Server> {
     // above do. Its rows are per-character (container_id null), so they are
     // served by bank_ledger_character and add nothing to the guild-only partial
     // index below.
-    // Growth is accepted: one row per successful op, insert-only, EXCEPT the
-    // vault sweep (vault_deposit_all), which writes one row per material
-    // moved, at most 55, the size of the material set. Accepted is
-    // not open-ended: the named REVISIT threshold for all three containers is
-    // 10,000,000 rows, at which point the audit's single ordered full scan is
-    // what breaks first (its own recorded deferral is a keyset cursor) and the
-    // posture should be re-decided rather than discovered. It carries
+    // Growth is bounded database-wide: one row per successful op, except the
+    // vault sweep (vault_deposit_all), which writes one row per material moved.
+    // The bank_ledger_growth_budget trigger covers EVERY insert writer and
+    // enforces the configured hard ceiling (10,000,000 by default) in the same
+    // transaction; rolled-back inserts and idempotent retries consume zero.
+    // Reaching the ceiling is an operator-visible refusal, not an invitation to
+    // prune this anti-dupe history. The table carries
     // three append-only indexes (bank_ledger_character, bank_ledger_created,
     // and bank_ledger_container_recent), and as of the in-game guild bank
     // ACTIVITY LOG it has one player-triggerable hot read: the officer-visible
@@ -4026,6 +4058,7 @@ export async function startServer(): Promise<http.Server> {
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
     await businessMetrics.stop();
+    await bankLedgerGrowthMonitor.stop();
     game.beginShutdown();
     await stopStoragePurchaseRecovery();
     // Same rationale for the retention sweep: an in-flight prune batch must not

@@ -517,8 +517,8 @@ export class DailyRewardsWindow {
     this.storeRuntime.setLoading(this.storeLoading);
   }
 
-  private showStoreDecision(options: Omit<StoreDecisionPromptOptions, 'closeText'>): void {
-    this.storeRuntime.openDecision(options);
+  private showStoreDecision(options: Omit<StoreDecisionPromptOptions, 'closeText'>): boolean {
+    return this.storeRuntime.openDecision(options);
   }
 
   private showStoreResult(tone: 'success' | 'failure', text: string): void {
@@ -875,7 +875,7 @@ export class DailyRewardsWindow {
     const body = this.deps.root().querySelector<HTMLElement>('.dr-body');
     this.charterFocus.arm(body ? captureFocusKey(body) : null);
     const surfaceGeneration = this.storeRuntime.captureSurface();
-    this.showStoreDecision({
+    const opened = this.showStoreDecision({
       title: t('hudChrome.wocStore.charter.confirmTitle'),
       body: t('hudChrome.wocStore.charter.confirmBody', {
         item: name,
@@ -886,10 +886,11 @@ export class DailyRewardsWindow {
       onConfirm: () => void this.purchaseCharter(itemId, surfaceGeneration),
       onCancel: () => this.abandonCharterIntent(itemId),
     });
+    if (!opened) this.abandonCharterIntent(itemId);
   }
 
-  /** Drop an intent the player walked away from, but ONLY while it has never
-   *  reached the service. Once a spend HAS been sent under the key, an ambiguous
+  /** Drop an intent the player left, or whose prompt never opened, but ONLY
+   *  before it reaches the service. Once a spend HAS been sent under the key, an ambiguous
    *  outcome may be hiding a live debit, so the key must outlive the cancel: the
    *  next attempt replays under it instead of minting a second key over that
    *  debit. Minting at confirm time is what gives this method something to drop:

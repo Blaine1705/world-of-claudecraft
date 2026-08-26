@@ -1,16 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Postgres is mocked (hoisted above the server/game import), the bank_wire.test.ts
-// block plus insertBankLedgerRow, so GameServer runs with no live DB and the
-// fire-and-forget ledger writer is a spy we can assert against.
+// Postgres is mocked (hoisted above the server/game import), so GameServer runs
+// with no live DB. Live commands stage immutable batches in the session journal
+// until saveCharacter commits the character snapshot and ledger effects through
+// one mocked transaction call; direct legacy recorder tests keep their insert spies.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
-  saveCharacterState: vi.fn(async () => {}),
+  saveCharacterState: vi.fn(async () => true),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   insertBankLedgerRow: vi.fn(async () => {}),
@@ -18,16 +20,45 @@ vi.mock('../server/db', () => ({
 }));
 
 import { bankLedgerIdle, diffBankOp, diffBankSocketOp, recordBankOp } from '../server/bank_ledger';
-import { insertBankLedgerRow, insertBankLedgerRows } from '../server/db';
-import { GameServer } from '../server/game';
+import { insertBankLedgerRow, insertBankLedgerRows, saveCharacterState } from '../server/db';
+import { type ClientSession, GameServer } from '../server/game';
 import { REALM } from '../server/realm';
 import type { BankInfo, VaultInfo } from '../src/world_api';
 
 const insertMock = vi.mocked(insertBankLedgerRow);
+const saveCharacterMock = vi.mocked(saveCharacterState);
 // The vault observer writes through the BATCHED sibling (one insert per op,
 // however many materials the diff produced); the personal bank and guild arms
 // stay on the single-row writer above.
 const insertRowsMock = vi.mocked(insertBankLedgerRows);
+
+interface LedgerBatchView {
+  readonly rows: readonly Record<string, unknown>[];
+}
+
+/** Decode the journal's canonical instanceJson representation back into the
+ *  public row shape these assertions predate. Null optional counterparty
+ *  fields are omitted exactly like the old personal/vault recorders. */
+function decodedLedgerRows(batches: readonly LedgerBatchView[]): Record<string, unknown>[] {
+  return batches
+    .flatMap((batch) => batch.rows)
+    .map((row) => {
+      const { instanceJson, counterpartyCopperDelta, counterpartyCount, ...plain } = row;
+      return {
+        ...plain,
+        instance:
+          instanceJson === null || instanceJson === undefined
+            ? null
+            : JSON.parse(String(instanceJson)),
+        ...(counterpartyCopperDelta == null ? {} : { counterpartyCopperDelta }),
+        ...(counterpartyCount == null ? {} : { counterpartyCount }),
+      };
+    });
+}
+
+function queuedLedgerRows(session: ClientSession): Record<string, unknown>[] {
+  return decodedLedgerRows(session.bankLedgerJournal.outbox.snapshot().batches);
+}
 
 // A BankInfo with the given slots; capacity/nextExpansionCost are set for realism
 // but diffBankOp only reads slots, purchasedSlots, and (for buy) nextExpansionCost.
@@ -291,13 +322,16 @@ function wolfFangIndex(sim: any, pid: number): number {
 
 describe('bank ledger dispatch integration', () => {
   beforeEach(async () => {
-    // Drain any pending writes from a prior test, then clear the call history but
-    // keep the default async impl.
+    // Drain direct-recorder work from a prior test. Live GameServer commands do
+    // not touch that FIFO: they stay in the character-owned journal until save.
     await bankLedgerIdle();
     insertMock.mockClear();
+    insertRowsMock.mockClear();
+    saveCharacterMock.mockReset();
+    saveCharacterMock.mockResolvedValue(true);
   });
 
-  it('deposit, withdraw, and buy each write exactly one row with the right fields', async () => {
+  it('deposit, withdraw, and buy stage exact rows until the matching character snapshot commits', async () => {
     const server = new GameServer();
     const fw = fakeWs();
     const s = joinLedger(server, fw, 'Ledgera');
@@ -306,29 +340,27 @@ describe('bank ledger dispatch integration', () => {
     bringBankerToPlayer(sim, pid);
     sim.addItem('wolf_fang', 5, pid);
 
-    // 1) deposit 2 of 5: one deposit row, count 2, no copper, 0 purchased slots.
+    // 1) deposit 2 of 5: one queued deposit row, count 2, no copper, 0 purchased slots.
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 2 });
-    await bankLedgerIdle();
-    expect(insertMock).toHaveBeenCalledTimes(1);
-    expect(insertMock.mock.calls[0][0]).toEqual({
-      realm: REALM,
-      characterId: 42,
-      accountId: 7,
-      op: 'deposit',
-      itemId: 'wolf_fang',
-      count: 2,
-      instance: null,
-      copperDelta: 0,
-      purchasedSlotsAfter: 0,
-      container: 'personal',
-      containerId: null,
-    });
+    expect(queuedLedgerRows(s)).toEqual([
+      {
+        realm: REALM,
+        characterId: 42,
+        accountId: 7,
+        op: 'deposit',
+        itemId: 'wolf_fang',
+        count: 2,
+        instance: null,
+        copperDelta: 0,
+        purchasedSlotsAfter: 0,
+        container: 'personal',
+        containerId: null,
+      },
+    ]);
 
-    // 2) withdraw 1: one withdraw row, count 1.
+    // 2) withdraw 1: a second immutable command batch follows the deposit.
     send(server, s, { cmd: 'bank_withdraw', slot: 0, count: 1 });
-    await bankLedgerIdle();
-    expect(insertMock).toHaveBeenCalledTimes(2);
-    expect(insertMock.mock.calls[1][0]).toEqual({
+    expect(queuedLedgerRows(s)[1]).toEqual({
       realm: REALM,
       characterId: 42,
       accountId: 7,
@@ -346,9 +378,7 @@ describe('bank ledger dispatch integration', () => {
     // slots, stamped with the gold rail (Bank Storage phase 11 paid-with).
     sim.players.get(pid).copper = 1000;
     send(server, s, { cmd: 'bank_buy_slots' });
-    await bankLedgerIdle();
-    expect(insertMock).toHaveBeenCalledTimes(3);
-    expect(insertMock.mock.calls[2][0]).toEqual({
+    expect(queuedLedgerRows(s)[2]).toEqual({
       realm: REALM,
       characterId: 42,
       accountId: 7,
@@ -361,14 +391,30 @@ describe('bank ledger dispatch integration', () => {
       container: 'personal',
       containerId: null,
     });
+
+    // No legacy insert can race ahead of the character blob. The one save call
+    // receives the final blob and the exact three-batch prefix together.
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(insertRowsMock).not.toHaveBeenCalled();
+    expect(saveCharacterMock).not.toHaveBeenCalled();
+    const snapshot = s.bankLedgerJournal.outbox.snapshot();
+    expect(snapshot.batches).toHaveLength(3);
+    await expect(server.saveCharacter(s)).resolves.toBe(true);
+    expect(saveCharacterMock).toHaveBeenCalledTimes(1);
+    const saveCall = saveCharacterMock.mock.calls[0];
+    expect(saveCall[2]).toMatchObject({
+      bank: {
+        inventory: [{ itemId: 'wolf_fang', count: 1 }],
+        purchasedSlots: 6,
+      },
+    });
+    expect(saveCall[5]).toEqual({ owner: snapshot.owner, batches: snapshot.batches });
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
   });
 
-  it('the socket trio writes bounded BATCHES: unlock one row, socket one, swap two, refusals zero', async () => {
-    // Socket ops ride the BATCHED writer (insertBankLedgerRows), one call per
-    // player command however many rows the diff produced: a swap's two rows
-    // land atomically (all-or-none, the vault_deposit_all rule), so a DB blip
-    // can never strand half a swap as a permanent audit finding. The
-    // single-row writer must see NO socket traffic.
+  it('the socket trio retains bounded command batches: unlock one, socket one, swap two, refusals zero', async () => {
+    // A swap's two rows share one immutable command batch, so the eventual
+    // character transaction can never commit half of it.
     const server = new GameServer();
     const fw = fakeWs();
     const s = joinLedger(server, fw, 'Ledgersock');
@@ -379,14 +425,12 @@ describe('bank ledger dispatch integration', () => {
     meta.copper = 1000000; // exactly the first socket price (src/sim/bank.ts)
     sim.addItem('linen_pouch', 1, pid);
     sim.addItem('burlap_reagent_pouch', 1, pid);
-    insertRowsMock.mockClear();
 
-    // 1) the unlock: ONE batch of ONE copper-only row at the negated table
+    // 1) the unlock: ONE retained batch of ONE copper-only row at the negated table
     // price, with the slot-ladder bystander stamp (purchasedSlots is 0 here).
     send(server, s, { cmd: 'bank_unlock_socket' });
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(1);
-    expect(insertRowsMock.mock.calls[0][0]).toEqual([
+    expect(s.bankLedgerJournal.outbox.snapshot().batches).toHaveLength(1);
+    expect(queuedLedgerRows(s)).toEqual([
       {
         realm: REALM,
         characterId: 42,
@@ -402,12 +446,10 @@ describe('bank ledger dispatch integration', () => {
       },
     ]);
 
-    // 2) socketing a carried bag: ONE batch of ONE socket_bag row.
+    // 2) socketing a carried bag: ONE more batch of ONE socket_bag row.
     send(server, s, { cmd: 'bank_socket_bag', item: 'linen_pouch' });
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(2);
-    expect(insertRowsMock.mock.calls[1][0]).toHaveLength(1);
-    expect(insertRowsMock.mock.calls[1][0][0]).toMatchObject({
+    expect(s.bankLedgerJournal.outbox.snapshot().batches).toHaveLength(2);
+    expect(queuedLedgerRows(s)[1]).toMatchObject({
       op: 'socket_bag',
       itemId: 'linen_pouch',
       count: 1,
@@ -418,9 +460,9 @@ describe('bank ledger dispatch integration', () => {
     // 3) a swap into the occupied socket 0: ONE batch of exactly TWO rows,
     // the displaced bag's unsocket_bag first, then the incoming socket_bag.
     send(server, s, { cmd: 'bank_socket_bag', item: 'burlap_reagent_pouch', socket: 0 });
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(3);
-    const swapRows = insertRowsMock.mock.calls[2][0];
+    const staged = s.bankLedgerJournal.outbox.snapshot();
+    expect(staged.batches).toHaveLength(3);
+    const swapRows = decodedLedgerRows([staged.batches[2]]);
     expect(swapRows).toHaveLength(2);
     expect(swapRows[0]).toMatchObject({ op: 'unsocket_bag', itemId: 'linen_pouch', count: 1 });
     expect(swapRows[1]).toMatchObject({
@@ -434,24 +476,23 @@ describe('bank ledger dispatch integration', () => {
     send(server, s, { cmd: 'bank_unlock_socket' });
     send(server, s, { cmd: 'bank_unsocket_bag', socket: 3 });
     send(server, s, { cmd: 'bank_socket_bag', item: 'linen_pouch', socket: 2 });
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(3);
+    expect(s.bankLedgerJournal.outbox.snapshot().batches).toHaveLength(3);
 
     // 5) the real unsocket: ONE batch of ONE unsocket_bag row.
     send(server, s, { cmd: 'bank_unsocket_bag', socket: 0 });
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(4);
-    expect(insertRowsMock.mock.calls[3][0]).toHaveLength(1);
-    expect(insertRowsMock.mock.calls[3][0][0]).toMatchObject({
+    const finalSnapshot = s.bankLedgerJournal.outbox.snapshot();
+    expect(finalSnapshot.batches).toHaveLength(4);
+    expect(decodedLedgerRows([finalSnapshot.batches[3]])[0]).toMatchObject({
       op: 'unsocket_bag',
       itemId: 'burlap_reagent_pouch',
       count: 1,
     });
-    // ...and the single-row writer carried NOTHING this whole test: only
-    // socket commands ran, so an exact zero distinguishes "no socket traffic
-    // on the single-row path" from a scan over an accidentally empty log
-    // (beforeEach cleared the mock before the first send).
-    expect(insertMock).toHaveBeenCalledTimes(0);
+    await expect(server.saveCharacter(s)).resolves.toBe(true);
+    const effects = saveCharacterMock.mock.calls[0][5];
+    expect(effects?.batches.map((batch) => batch.rows.length)).toEqual([1, 1, 2, 1]);
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(insertMock).not.toHaveBeenCalled();
+    expect(insertRowsMock).not.toHaveBeenCalled();
   });
 
   it('a refused op away from every banker writes zero rows', async () => {
@@ -468,8 +509,8 @@ describe('bank ledger dispatch integration', () => {
     // returns null on both sides, so the diff is empty and nothing is written.
     banker.pos = { x: p.pos.x + 1000, y: p.pos.y, z: p.pos.z + 1000 };
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 1 });
-    await bankLedgerIdle();
-    expect(insertMock).not.toHaveBeenCalled();
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(saveCharacterMock).not.toHaveBeenCalled();
   });
 
   it('an op refused AT the banker writes zero rows (identical non-null snapshots)', async () => {
@@ -484,18 +525,16 @@ describe('bank ledger dispatch integration', () => {
 
     // Withdrawing from an empty bank slot changes nothing.
     send(server, s, { cmd: 'bank_withdraw', slot: 0, count: 1 });
-    await bankLedgerIdle();
-    expect(insertMock).not.toHaveBeenCalled();
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
 
     // An unaffordable slot purchase changes nothing.
     sim.players.get(pid).copper = 0;
     send(server, s, { cmd: 'bank_buy_slots' });
-    await bankLedgerIdle();
-    expect(insertMock).not.toHaveBeenCalled();
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
+    expect(saveCharacterMock).not.toHaveBeenCalled();
   });
 
-  it('a rejecting insert neither throws into dispatch nor stops the next op writing', async () => {
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  it('a rejected transaction retains its exact prefix and the next save commits it with later work', async () => {
     const server = new GameServer();
     const fw = fakeWs();
     const s = joinLedger(server, fw, 'Ledgerd');
@@ -504,23 +543,28 @@ describe('bank ledger dispatch integration', () => {
     bringBankerToPlayer(sim, pid);
     sim.addItem('wolf_fang', 5, pid);
 
-    // The first insert rejects; the second uses the default resolving impl.
-    insertMock.mockRejectedValueOnce(new Error('ledger down'));
+    // Dispatch never observes the database failure because it only stages the
+    // immutable command. The attempted save propagates, and acknowledges none.
+    const ledgerDown = new Error('ledger down');
+    saveCharacterMock.mockRejectedValueOnce(ledgerDown);
     expect(() =>
       send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 2 }),
     ).not.toThrow();
-    await bankLedgerIdle();
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(1);
+    await expect(server.saveCharacter(s)).rejects.toBe(ledgerDown);
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(1);
 
     send(server, s, { cmd: 'bank_withdraw', slot: 0, count: 1 });
-    await bankLedgerIdle();
-
-    // Both ops enqueued their insert; the rejection was logged, not thrown.
-    expect(insertMock).toHaveBeenCalledTimes(2);
-    expect(errSpy).toHaveBeenCalledWith('bank_ledger write failed:', expect.any(Error));
-    errSpy.mockRestore();
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(2);
+    await expect(server.saveCharacter(s)).resolves.toBe(true);
+    expect(saveCharacterMock).toHaveBeenCalledTimes(2);
+    expect(
+      decodedLedgerRows(saveCharacterMock.mock.calls[1][5]?.batches ?? []).map((row) => row.op),
+    ).toEqual(['deposit', 'withdraw']);
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
   });
 
-  it('recordBankOp is fire-and-forget: returns void and never blocks the loop', async () => {
+  it('direct recording and live dispatch are both non-blocking at their persistence seams', async () => {
     // Directly: a diffed op returns undefined (not a promise).
     expect(
       recordBankOp(
@@ -533,12 +577,11 @@ describe('bank ledger dispatch integration', () => {
     await bankLedgerIdle();
     insertMock.mockClear();
 
-    // Through dispatch, with an insert that stays pending: the deposit still lands
-    // in the sim and dispatch returns synchronously (the loop never awaits the
-    // write). Release the pending insert afterward so the shared FIFO drains.
+    // Through dispatch, the command stages synchronously. Even when the later
+    // character transaction stays pending, the mutation is already visible.
     let releasePending: () => void = () => {};
-    insertMock.mockImplementationOnce(
-      () => new Promise<void>((resolve) => (releasePending = resolve)),
+    saveCharacterMock.mockImplementationOnce(
+      () => new Promise<boolean>((resolve) => (releasePending = () => resolve(true))),
     );
     const server = new GameServer();
     const fw = fakeWs();
@@ -549,17 +592,16 @@ describe('bank ledger dispatch integration', () => {
     sim.addItem('wolf_fang', 3, pid);
 
     send(server, s, { cmd: 'bank_deposit', slot: wolfFangIndex(sim, pid), count: 2 });
-    // The non-blocking proof: send() returned and the sim already applied the
-    // deposit, even though the enqueued insert will never settle. dispatch did not
-    // await the writer (recordBankOp returned void and the FIFO runs off-loop).
     expect(sim.players.get(pid).bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(1);
+    expect(saveCharacterMock).not.toHaveBeenCalled();
 
-    // Let the FIFO microtask fire the enqueued (still-pending) insert, then release
-    // it so the shared tail drains rather than poisoning later suites.
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(insertMock).toHaveBeenCalledTimes(1);
+    const pendingSave = server.saveCharacter(s);
+    await vi.waitFor(() => expect(saveCharacterMock).toHaveBeenCalledTimes(1));
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(1);
     releasePending();
-    await bankLedgerIdle();
+    await expect(pendingSave).resolves.toBe(true);
+    expect(s.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
   });
 });
 

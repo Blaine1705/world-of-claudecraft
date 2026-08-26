@@ -110,6 +110,7 @@ describe('bank ledger durable growth budget', () => {
     expect(bankLedgerGrowthBudgetReadout()).toEqual({
       committedRows: 9_999_999,
       hardLimitRows: 10_000_000,
+      observedAtMs: expect.any(Number),
     });
 
     expect(bankLedgerGrowthLimitFromError({ ...pgError, code: '23505' })).toBeNull();
@@ -132,8 +133,22 @@ describe('bank ledger durable growth budget', () => {
   });
 
   it('ignores observations that do not match the configured durable limit', () => {
-    observeBankLedgerGrowthBudget(21);
-    observeBankLedgerGrowthBudget(99, 101);
-    expect(bankLedgerGrowthBudgetReadout().committedRows).toBe(21);
+    expect(observeBankLedgerGrowthBudget(10_000_000, 10_000_000, 1234)).toBe(true);
+    expect(observeBankLedgerGrowthBudget(99, 101, 9999)).toBe(false);
+    expect(bankLedgerGrowthBudgetReadout()).toEqual({
+      committedRows: 10_000_000,
+      hardLimitRows: 10_000_000,
+      observedAtMs: 1234,
+    });
+  });
+
+  it('never lets an older in-flight observation move the durable gauge backward', () => {
+    expect(observeBankLedgerGrowthBudget(10_000_000, 10_000_000, 2000)).toBe(true);
+    expect(observeBankLedgerGrowthBudget(9_999_999, 10_000_000, 3000)).toBe(true);
+    expect(bankLedgerGrowthBudgetReadout()).toEqual({
+      committedRows: 10_000_000,
+      hardLimitRows: 10_000_000,
+      observedAtMs: 2000,
+    });
   });
 });

@@ -43,6 +43,12 @@ export const BANK_EXPANSION_PRICES: readonly number[] = [
   500, 1000, 2500, 5000, 10000, 20000, 40000, 80000, 150000, 300000, 600000, 1200000,
 ];
 
+/** Maximum personal-bank capacity bought through the expansion ladder, not
+ * including the base, entitlement bonus, or socketed bags. This semantic
+ * geometry constant lets wire/UI code validate the counter without importing
+ * or naming the server-authoritative price table. */
+export const BANK_PURCHASED_SLOTS_MAX = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
+
 /** The most bonus slots the server's entitlement registry can grant: +2 email,
  *  +2 Discord, +2 wallet, +2 per qualified referral capped at 5 (+10), so 16.
  *  This is the load-path clamp for `bonusSlots` (a tampered save must not mint
@@ -712,10 +718,9 @@ export function sanitizeBankState(
   // value on load and then persists the loss. That is the professions cap-raise
   // class DEPLOY.md already names; the release that lengthens the table owes its
   // own caveat there.
-  const maxPurchased = BANK_EXPANSION_PRICES.length * BANK_EXPANSION_SLOTS;
   let purchasedSlots = Math.max(
     0,
-    Math.min(maxPurchased, Math.floor(Number(r.purchasedSlots)) || 0),
+    Math.min(BANK_PURCHASED_SLOTS_MAX, Math.floor(Number(r.purchasedSlots)) || 0),
   );
   purchasedSlots -= purchasedSlots % BANK_EXPANSION_SLOTS;
   // Clamped to the entitlement-registry ceiling: a tampered save must not mint more

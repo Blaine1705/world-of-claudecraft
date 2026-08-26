@@ -232,7 +232,7 @@ describe('the locked pane (the unlock offer)', () => {
     expect(echoed.hasAttribute('aria-busy')).toBe(false);
   });
 
-  it('refuses a stale visible offer instead of consenting to the next rung', () => {
+  it('refuses a stale visible offer, announces the refreshed price, and focuses that offer', async () => {
     const h = harness(locked());
     h.window.open();
     clickVaultTab(h);
@@ -243,7 +243,22 @@ describe('the locked pane (the unlock offer)', () => {
 
     expect(h.calls).not.toContain('vaultBuyUpgrade');
     expect(document.querySelector('.vault-buy-prompt')).toBeNull();
-    expect(h.root.querySelector('.vault-upgrade-btn')?.textContent).toContain('50000');
+    const refreshed = h.root.querySelector('.vault-upgrade-btn') as HTMLButtonElement;
+    expect(refreshed.textContent).toContain('50000');
+    expect(document.activeElement).toBe(refreshed);
+    const visible = h.root.querySelector('.vault-status');
+    const live = h.root.querySelector('[data-vault-status-live]');
+    const message =
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.';
+    // Visible feedback is synchronous, while the announcing node first mounts
+    // empty so assistive tech observes a subsequent content change.
+    expect(visible?.textContent).toBe(message);
+    expect(visible?.getAttribute('aria-live')).toBeNull();
+    expect(live?.getAttribute('role')).toBe('status');
+    expect(live?.getAttribute('aria-live')).toBe('polite');
+    expect(live?.textContent).toBe('');
+    await Promise.resolve();
+    expect(live?.textContent).toBe(message);
   });
 
   it('keeps the latch across close, ignores generic errors, and releases on a vault refusal', () => {
@@ -543,7 +558,7 @@ describe('the stocked pane', () => {
     expect(h.calls).toEqual(['vaultWithdraw:copper_ore,{"index":1,"instance":{"signer":"Ada"}}']);
   });
 
-  it('explains a partial-fit withdraw from the click-time snapshot (the phase 01 open call)', () => {
+  it('explains and announces a partial-fit withdraw from the click-time snapshot', async () => {
     // Bags: 14 gear fillers + a 15/20 copper stack = 15 of 16 base slots used,
     // so a 40-count withdraw fits only 25 (5 stack headroom + one free slot).
     const h = harness(vaultInfo({ stock: { copper_ore: 40 } }));
@@ -557,7 +572,14 @@ describe('the stocked pane', () => {
     expect(h.calls).toEqual(['vaultWithdraw:copper_ore']);
     const status = h.root.querySelector('.vault-status');
     expect(status?.textContent).toBe('Only 25 of 40 fit in your bags.');
-    expect(status?.getAttribute('aria-live')).toBe('polite');
+    expect(status?.getAttribute('aria-live')).toBeNull();
+    const live = h.root.querySelector('[data-vault-status-live]');
+    expect(live?.getAttribute('role')).toBe('status');
+    expect(live?.getAttribute('aria-live')).toBe('polite');
+    expect(live?.getAttribute('aria-atomic')).toBe('true');
+    expect(live?.textContent).toBe('');
+    await Promise.resolve();
+    expect(live?.textContent).toBe('Only 25 of 40 fit in your bags.');
   });
 
   // Both withdraw call sites note the shortfall BEFORE sending, and the ordering
@@ -651,6 +673,34 @@ describe('the stocked pane', () => {
     const prompt = document.querySelector('#prompt-stack .vault-buy-prompt') as HTMLElement;
     (prompt.querySelector('button') as HTMLElement).click();
     expect(h.calls).toEqual(['vaultBuyUpgrade']);
+  });
+
+  it('rejects a same-rung price retune and focuses the refreshed Vault upgrade', async () => {
+    const h = harness(vaultInfo({ stock: { copper_ore: 1 }, nextUpgradeCost: 50_000 }));
+    h.window.open();
+    clickVaultTab(h);
+    (h.root.querySelector('.vault-upgrade-btn') as HTMLButtonElement).click();
+
+    // Keep the revision fixed so only the exact quoted-cost guard can refuse
+    // this stale confirmation. Storage prices are server-tunable at runtime.
+    h.world.vaultInfo = vaultInfo({
+      stock: { copper_ore: 1 },
+      upgrades: 1,
+      nextUpgradeCost: 77_777,
+    });
+    (document.querySelector('.vault-buy-prompt .btn') as HTMLButtonElement).click();
+
+    expect(h.calls).not.toContain('vaultBuyUpgrade');
+    const refreshed = h.root.querySelector('.vault-upgrade-btn') as HTMLButtonElement;
+    expect(refreshed.querySelector('.money-inline')?.textContent).toBe('77777');
+    expect(document.activeElement).toBe(refreshed);
+    expect(h.root.querySelector('.vault-status')?.textContent).toBe(
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    );
+    const live = h.root.querySelector('[data-vault-status-live]');
+    expect(live?.textContent).toBe('');
+    await Promise.resolve();
+    expect(live?.textContent).toContain('The price changed before the purchase completed.');
   });
 
   it('renders rows past the ceiling with BOTH cap classes (tolerated over-stock)', () => {
@@ -800,6 +850,26 @@ describe('deposit-all (ONE batched command)', () => {
 });
 
 describe('assistive-tech wiring and focus continuity', () => {
+  it('publishes only into the current mounted Vault status region after a repaint', async () => {
+    const h = harness(vaultInfo({ stock: { copper_ore: 40 } }));
+    h.world.inventory = [{ itemId: 'copper_ore', count: 5 }];
+    h.window.open();
+    clickVaultTab(h);
+    (h.root.querySelector('.vault-deposit-all') as HTMLButtonElement).click();
+    const detached = h.root.querySelector('[data-vault-status-live]') as HTMLElement;
+    expect(detached.textContent).toBe('');
+
+    // Repaint before either microtask runs. The first callback must not write
+    // into its detached region; the replacement is the one that announces.
+    h.window.render();
+    const current = h.root.querySelector('[data-vault-status-live]') as HTMLElement;
+    expect(current).not.toBe(detached);
+    expect(current.textContent).toBe('');
+    await Promise.resolve();
+    expect(detached.textContent).toBe('');
+    expect(current.textContent).toBe('Vault ceilings full: nothing deposited.');
+  });
+
   it('the pane is a role=tabpanel labelled by its tab, and the tab controls it', () => {
     const h = harness(vaultInfo({ stock: { copper_ore: 5 } }));
     h.window.open();
@@ -1027,6 +1097,10 @@ describe('signature-driven repaints', () => {
       setLanguage('zh_CN');
       h.window.render();
       expect(h.root.querySelector('.vault-status')?.textContent).toContain('已存入材料');
+      const live = h.root.querySelector('[data-vault-status-live]');
+      expect(live?.textContent).toBe('');
+      await Promise.resolve();
+      expect(live?.textContent).toContain('已存入材料');
     } finally {
       setLanguage('en');
     }

@@ -10,6 +10,7 @@ import {
   pendingStoragePurchasesForCharacter,
   releaseStoragePurchaseSpendClaim,
   renewStoragePurchaseSpendClaim,
+  STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS,
   StoragePurchaseDbAborted,
   settleStoragePurchase,
   storagePurchaseByKey,
@@ -54,6 +55,10 @@ function clientWithQuery(
 }
 
 describe('storage purchase database cancellation', () => {
+  it('pins the recovery statement timeout to two seconds', () => {
+    expect(STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS).toBe(2_000);
+  });
+
   it('refuses a pre-aborted read before pool checkout or SQL', async () => {
     const controller = new AbortController();
     controller.abort();
@@ -144,10 +149,13 @@ describe('storage purchase database cancellation', () => {
   it('preserves a SQLSTATE error that wins and returns that client normally', async () => {
     const pgError = Object.assign(new Error('lock timeout'), { code: '55P03' });
     const release = vi.fn();
-    const client = clientWithQuery(
-      vi.fn(async () => Promise.reject(pgError)),
-      release,
-    );
+    const query = vi.fn(async (text: string): Promise<QueryResult> => {
+      if (text.startsWith('SET statement_timeout') || text === 'RESET statement_timeout') {
+        return { rows: [], rowCount: null };
+      }
+      throw pgError;
+    });
+    const client = clientWithQuery(query, release);
     const db = { query: vi.fn(), connect: vi.fn(async () => client) };
 
     await expect(
@@ -155,15 +163,73 @@ describe('storage purchase database cancellation', () => {
     ).rejects.toBe(pgError);
     expect(release).toHaveBeenCalledTimes(1);
     expect(release).toHaveBeenCalledWith();
+    expect(query.mock.calls.map(([text]) => text)).toEqual([
+      'SET statement_timeout = 2000',
+      expect.stringContaining('UPDATE storage_purchases'),
+      'RESET statement_timeout',
+    ]);
+  });
+
+  it('destroys a client when setting the recovery statement timeout fails', async () => {
+    const setError = Object.assign(new Error('cannot set timeout'), { code: '57P01' });
+    const release = vi.fn();
+    const query = vi.fn(async () => Promise.reject(setError));
+    const client = clientWithQuery(query, release);
+    const db = { query: vi.fn(), connect: vi.fn(async () => client) };
+
+    await expect(
+      claimStoragePurchaseSpend(db, ROW.idempotencyKey, CLAIM_TOKEN, new AbortController().signal),
+    ).rejects.toBe(setError);
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(query).toHaveBeenCalledWith('SET statement_timeout = 2000');
+    expect(release).toHaveBeenCalledWith(setError);
+  });
+
+  it('poisons on RESET failure but preserves the target SQLSTATE error', async () => {
+    const pgError = Object.assign(new Error('lock timeout'), { code: '55P03' });
+    const resetError = new Error('reset failed');
+    const release = vi.fn();
+    const query = vi.fn(async (text: string): Promise<QueryResult> => {
+      if (text.startsWith('SET statement_timeout')) return { rows: [], rowCount: null };
+      if (text === 'RESET statement_timeout') throw resetError;
+      throw pgError;
+    });
+    const client = clientWithQuery(query, release);
+    const db = { query: vi.fn(), connect: vi.fn(async () => client) };
+
+    await expect(
+      claimStoragePurchaseSpend(db, ROW.idempotencyKey, CLAIM_TOKEN, new AbortController().signal),
+    ).rejects.toBe(pgError);
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(release).toHaveBeenCalledWith(resetError);
+  });
+
+  it('poisons on RESET failure without replacing a known target result', async () => {
+    const resetError = new Error('reset failed');
+    const release = vi.fn();
+    const query = vi.fn(async (text: string): Promise<QueryResult> => {
+      if (text.startsWith('SET statement_timeout')) return { rows: [], rowCount: null };
+      if (text === 'RESET statement_timeout') throw resetError;
+      return { rows: [{ id: 5 }], rowCount: 1 };
+    });
+    const client = clientWithQuery(query, release);
+    const db = { query: vi.fn(), connect: vi.fn(async () => client) };
+
+    await expect(
+      claimStoragePurchaseSpend(db, ROW.idempotencyKey, CLAIM_TOKEN, new AbortController().signal),
+    ).resolves.toBe(true);
+    expect(release).toHaveBeenCalledTimes(1);
+    expect(release).toHaveBeenCalledWith(resetError);
   });
 
   it('destroys a client after a codeless driver failure without replacing the error', async () => {
     const driverError = new Error('query timeout');
     const release = vi.fn();
-    const client = clientWithQuery(
-      vi.fn(async () => Promise.reject(driverError)),
-      release,
-    );
+    const query = vi.fn(async (text: string): Promise<QueryResult> => {
+      if (text.startsWith('SET statement_timeout')) return { rows: [], rowCount: null };
+      throw driverError;
+    });
+    const client = clientWithQuery(query, release);
     const db = { query: vi.fn(), connect: vi.fn(async () => client) };
 
     await expect(

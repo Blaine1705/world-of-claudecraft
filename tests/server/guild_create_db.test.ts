@@ -34,6 +34,8 @@ vi.mock('../../server/admin_guilds_read', () => ({
 import { DbTransactionAborted } from '../../server/db_transaction_deadline';
 import {
   createPaidGuildWithLeaderAtomic,
+  PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS,
+  PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS,
   type PaidGuildCreateArgs,
   type PaidGuildCreateDbClient,
   PaidGuildCreateFeeInvariantError,
@@ -88,10 +90,11 @@ interface FakeClientOptions {
   failures?: Readonly<Record<string, unknown>>;
   commitError?: unknown;
   receipt?: Readonly<Record<string, unknown>> | null;
+  advanceClockAfterBeginMs?: number;
 }
 
 function queryKind(text: string): string {
-  if (text === 'BEGIN') return 'begin';
+  if (text === 'BEGIN' || text === 'BEGIN READ ONLY') return 'begin';
   if (text.startsWith('SET LOCAL statement_timeout')) return 'bounds';
   if (text.includes('pg_advisory_xact_lock')) return 'name_lock';
   if (text.includes('FROM guilds') && text.includes('lower(name)')) return 'name_collision';
@@ -122,6 +125,9 @@ class FakeClient extends EventEmitter implements PaidGuildCreateDbClient {
     const kind = queryKind(text);
     this.queries.push({ kind, text, values });
     mocks.events.push(kind);
+    if (kind === 'begin' && this.options.advanceClockAfterBeginMs !== undefined) {
+      vi.setSystemTime(Date.now() + this.options.advanceClockAfterBeginMs);
+    }
     if (this.options.failures && kind in this.options.failures) {
       throw this.options.failures[kind];
     }
@@ -145,6 +151,38 @@ class FakeClient extends EventEmitter implements PaidGuildCreateDbClient {
       );
     }
     return result([], 1);
+  }
+}
+
+/** Receipt client whose query stays in flight until destructive release
+ *  cancels the underlying connection, matching node-postgres' release(error)
+ *  behavior without needing a real socket in the timer-bound unit suite. */
+class BlockingReceiptClient extends FakeClient {
+  readonly receiptStarted = vi.fn();
+  private rejectReceipt: ((error: Error) => void) | null = null;
+
+  constructor() {
+    super();
+    this.release.mockImplementation((error?: Error | boolean) => {
+      if (!(error instanceof Error)) return;
+      const reject = this.rejectReceipt;
+      this.rejectReceipt = null;
+      reject?.(error);
+    });
+  }
+
+  override async query<Row extends QueryResultRow = QueryResultRow>(
+    text: string,
+    values?: unknown[],
+  ): Promise<QueryResult<Row>> {
+    const kind = queryKind(text);
+    if (kind !== 'receipt_lookup') return super.query<Row>(text, values);
+    this.queries.push({ kind, text, values });
+    mocks.events.push(kind);
+    this.receiptStarted();
+    return new Promise<QueryResult<Row>>((_resolve, reject) => {
+      this.rejectReceipt = reject;
+    });
   }
 }
 
@@ -246,6 +284,11 @@ beforeEach(() => {
 });
 
 describe('createPaidGuildWithLeaderAtomic', () => {
+  it('pins the receipt server ceiling and cleanup margin', () => {
+    expect(PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS).toBe(400);
+    expect(PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS).toBe(25);
+  });
+
   it('delegates one bounded transaction with the exact fee batch and carried snapshots', async () => {
     const client = new FakeClient();
     const { deps, connect, bustGuildRoster } = harness(client);
@@ -384,6 +427,32 @@ describe('createPaidGuildWithLeaderAtomic', () => {
     );
     expect(connect).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ['realm', { realm: `${REALM}-other`, characterId: CHARACTER_ID, accountId: ACCOUNT_ID }],
+    ['character', { realm: REALM, characterId: CHARACTER_ID + 1, accountId: ACCOUNT_ID }],
+    ['account', { realm: REALM, characterId: CHARACTER_ID, accountId: ACCOUNT_ID + 1 }],
+  ] as const)(
+    'rejects a ledger owner with a mismatched %s before checkout',
+    async (_label, owner) => {
+      const client = new FakeClient();
+      const { deps, connect } = harness(client);
+      const input = args();
+
+      await expect(
+        createPaidGuildWithLeaderAtomic(
+          deps,
+          args({
+            ledgerEffects: Object.freeze({
+              owner: Object.freeze(owner),
+              batches: input.ledgerEffects?.batches ?? Object.freeze([]),
+            }),
+          }),
+        ),
+      ).rejects.toThrow('paid guild ledger owner does not match the founder');
+      expect(connect).not.toHaveBeenCalled();
+    },
+  );
 
   it.each([
     {
@@ -681,12 +750,113 @@ describe('createPaidGuildWithLeaderAtomic', () => {
       feeBatchKey: input.fee.batchKey,
     });
     expect(connect).toHaveBeenCalledTimes(2);
-    expect(receiptClient.queries).toEqual([
-      expect.objectContaining({ kind: 'receipt_lookup', values: [input.fee.batchKey] }),
+    expect(receiptClient.queries.map((query) => query.kind)).toEqual([
+      'begin',
+      'bounds',
+      'receipt_lookup',
+      'rollback',
     ]);
+    expect(receiptClient.queries[2]).toMatchObject({
+      values: [input.fee.batchKey],
+    });
+    expect(receiptClient.queries[1]?.text).toBe(
+      'SET LOCAL statement_timeout = 400; SET LOCAL lock_timeout = 400; ' +
+        'SET LOCAL idle_in_transaction_session_timeout = 400',
+    );
     expect(receiptClient.release).toHaveBeenCalledWith();
     expect(mocks.bustAdminGuildListReads).toHaveBeenCalledTimes(1);
     expect(bustGuildRoster).toHaveBeenCalledWith(GUILD_ID);
+  });
+
+  it('refuses a receipt SELECT when only the cleanup margin remains after BEGIN', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    const failure = new Error('completion unknown');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const marginOnly = new FakeClient({ advanceClockAfterBeginMs: 475 });
+    const provingReceipt = new FakeClient({ receipt: feeReceipt() });
+    const { deps } = harness(transactionClient, [marginOnly, provingReceipt]);
+
+    try {
+      const outcome = createPaidGuildWithLeaderAtomic(deps, args());
+      await vi.advanceTimersByTimeAsync(25);
+      await expect(outcome).resolves.toMatchObject({ durability: 'committed' });
+      expect(marginOnly.queries.map((query) => query.kind)).toEqual(['begin']);
+      expect(provingReceipt.queries.map((query) => query.kind)).toEqual([
+        'begin',
+        'bounds',
+        'receipt_lookup',
+        'rollback',
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('uses the one remaining query millisecond when BEGIN leaves 26ms', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    const failure = new Error('completion unknown');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({
+      receipt: feeReceipt(),
+      advanceClockAfterBeginMs: 474,
+    });
+    const { deps } = harness(transactionClient, [receiptClient]);
+
+    try {
+      await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toMatchObject({
+        durability: 'committed',
+      });
+      expect(receiptClient.queries.find((query) => query.kind === 'bounds')?.text).toBe(
+        'SET LOCAL statement_timeout = 1; SET LOCAL lock_timeout = 1; ' +
+          'SET LOCAL idle_in_transaction_session_timeout = 1',
+      );
+      expect(receiptClient.queries.filter((query) => query.kind === 'receipt_lookup')).toHaveLength(
+        1,
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('keeps a proved receipt authoritative when its ROLLBACK cleanup fails', async () => {
+    const failure = new Error('completion unknown');
+    const rollbackFailure = new Error('receipt rollback failed');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({
+      receipt: feeReceipt(),
+      failures: { rollback: rollbackFailure },
+    });
+    const cleanupErrors: unknown[] = [];
+    const { deps } = harness(transactionClient, [receiptClient]);
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { ...deps, onCleanupError: (error) => cleanupErrors.push(error) },
+        args(),
+      ),
+    ).resolves.toMatchObject({ durability: 'committed' });
+    expect(receiptClient.release).toHaveBeenCalledWith(rollbackFailure);
+    expect(cleanupErrors).toEqual([]);
+  });
+
+  it('keeps a proved receipt authoritative when releasing its client throws', async () => {
+    const failure = new Error('completion unknown');
+    const releaseFailure = new Error('receipt release failed');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({ receipt: feeReceipt() });
+    receiptClient.release.mockImplementationOnce(() => {
+      throw releaseFailure;
+    });
+    const cleanupErrors: unknown[] = [];
+    const { deps } = harness(transactionClient, [receiptClient]);
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { ...deps, onCleanupError: (error) => cleanupErrors.push(error) },
+        args(),
+      ),
+    ).resolves.toMatchObject({ durability: 'committed' });
+    expect(cleanupErrors).toContain(releaseFailure);
   });
 
   it('keeps a lost COMMIT response ambiguous after bounded absent-receipt reads', async () => {
@@ -735,6 +905,132 @@ describe('createPaidGuildWithLeaderAtomic', () => {
     expect(receiptClient.queries.filter((query) => query.kind === 'receipt_lookup')).toHaveLength(
       1,
     );
+  });
+
+  it.each([
+    ['realm', { realm: `${REALM}-other` }],
+    ['character id', { character_id: CHARACTER_ID + 1 }],
+    ['account id', { account_id: ACCOUNT_ID + 1 }],
+    ['row count', { row_count: 2 }],
+  ] as const)('keeps a fee receipt with a mismatched %s ambiguous', async (_label, mismatch) => {
+    const failure = new Error('completion unknown');
+    const client = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({ receipt: feeReceipt(mismatch) });
+    const { deps, connect } = harness(client, [receiptClient]);
+
+    await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toEqual({
+      durability: 'commit_ambiguous',
+      guildId: GUILD_ID,
+      feeBatchKey: 'ledger:guild-create',
+      error: failure,
+    });
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(receiptClient.queries.filter((query) => query.kind === 'receipt_lookup')).toHaveLength(
+      1,
+    );
+  });
+
+  it('bounds receipt checkout at 500ms and destroys a client that arrives after abort', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    let resolveLateCheckout!: (client: PaidGuildCreateDbClient) => void;
+    const lateCheckout = new Promise<PaidGuildCreateDbClient>((resolve) => {
+      resolveLateCheckout = resolve;
+    });
+    const failure = new Error('completion unknown');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const mismatchClient = new FakeClient({
+      receipt: feeReceipt({ account_id: ACCOUNT_ID + 1 }),
+    });
+    const lateClient = new FakeClient();
+    let checkout = 0;
+    const connect = vi.fn(async (): Promise<PaidGuildCreateDbClient> => {
+      checkout++;
+      if (checkout === 1) return transactionClient;
+      if (checkout === 2) return lateCheckout;
+      return mismatchClient;
+    });
+    const bustGuildRoster = vi.fn();
+
+    try {
+      const outcome = createPaidGuildWithLeaderAtomic(
+        { pool: { connect }, bustGuildRoster },
+        args(),
+      );
+      await vi.advanceTimersByTimeAsync(0);
+      expect(connect).toHaveBeenCalledTimes(2);
+
+      await vi.advanceTimersByTimeAsync(499);
+      expect(connect).toHaveBeenCalledTimes(2);
+      await vi.advanceTimersByTimeAsync(1);
+      await vi.advanceTimersByTimeAsync(25);
+
+      await expect(outcome).resolves.toEqual({
+        durability: 'commit_ambiguous',
+        guildId: GUILD_ID,
+        feeBatchKey: 'ledger:guild-create',
+        error: failure,
+      });
+      expect(connect).toHaveBeenCalledTimes(3);
+      resolveLateCheckout(lateClient);
+      await vi.advanceTimersByTimeAsync(0);
+      expect(lateClient.release).toHaveBeenCalledTimes(1);
+      expect(lateClient.release.mock.calls[0]?.[0]).toMatchObject({
+        name: 'DbTransactionAborted',
+        commitMayHaveSucceeded: false,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('bounds an in-flight receipt query at 500ms and lets the next proof attempt succeed', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    const failure = new Error('completion unknown');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const blockedReceipt = new BlockingReceiptClient();
+    const provingReceipt = new FakeClient({ receipt: feeReceipt() });
+    const { deps, connect } = harness(transactionClient, [blockedReceipt, provingReceipt]);
+
+    try {
+      let settled = false;
+      const outcome = createPaidGuildWithLeaderAtomic(deps, args()).finally(() => {
+        settled = true;
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(blockedReceipt.receiptStarted).toHaveBeenCalledTimes(1);
+      expect(connect).toHaveBeenCalledTimes(2);
+
+      await vi.advanceTimersByTimeAsync(499);
+      expect(settled).toBe(false);
+      expect(blockedReceipt.release).not.toHaveBeenCalled();
+
+      await vi.advanceTimersByTimeAsync(1);
+      expect(blockedReceipt.release).toHaveBeenCalledTimes(1);
+      const releaseError = blockedReceipt.release.mock.calls[0]?.[0] as
+        | { name?: string; commitMayHaveSucceeded?: boolean }
+        | undefined;
+      expect(['DbTransactionAborted', 'DbTransactionDeadlineExceeded']).toContain(
+        releaseError?.name,
+      );
+      expect(releaseError?.commitMayHaveSucceeded).toBe(false);
+      expect(blockedReceipt.listenerCount('error')).toBe(0);
+      expect(settled).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(25);
+      await expect(outcome).resolves.toEqual({
+        durability: 'committed',
+        guildId: GUILD_ID,
+        feeBatchKey: 'ledger:guild-create',
+      });
+      expect(connect).toHaveBeenCalledTimes(3);
+      expect(
+        provingReceipt.queries.filter((query) => query.kind === 'receipt_lookup'),
+      ).toHaveLength(1);
+      expect(provingReceipt.release).toHaveBeenCalledWith();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('keeps query outages ambiguous and contains late-client cleanup failures', async () => {

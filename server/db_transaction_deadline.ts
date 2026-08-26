@@ -176,12 +176,15 @@ export class DbTransactionDeadline {
       return response;
     } catch (error) {
       // Socket destruction makes pg reject the active query with a generic
-      // connection error. When this owner already forced that destruction,
-      // keep its causal error (including COMMIT ambiguity) instead.
+      // connection error. PostgreSQL may continue server work until that
+      // statement's server-side timeout, so callers must install one before
+      // work that accepts cancellation. When this owner already forced the
+      // destruction, keep its causal error (including COMMIT ambiguity).
       if (this.released && this.releaseReason) throw this.releaseReason;
-      // A driver-side timeout has no SQLSTATE and does not cancel the server
-      // query. Destroy the socket rather than issue a ROLLBACK into a response
-      // that may still be in flight and return a desynchronized client.
+      // A driver-side timeout has no SQLSTATE and does not prove the server
+      // query stopped. Destroy the socket rather than issue a ROLLBACK into a
+      // response that may still be in flight and return a desynchronized
+      // client; the caller's server timeout bounds the detached backend.
       if (!this.released && pgErrorCode(error) === undefined) {
         this.forceRelease(errorForRelease(error));
       }

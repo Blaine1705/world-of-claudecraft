@@ -39,7 +39,7 @@ import {
   planBankScrollRestore,
 } from '../src/ui/bank_chrome_layout_core';
 import { BankWindow, type BankWindowDeps } from '../src/ui/bank_window';
-import type { BankInfo, IWorld } from '../src/world_api';
+import type { BankInfo, IWorld, VaultInfo } from '../src/world_api';
 
 // Resolved off the runner's root rather than import.meta.url: this file runs in
 // jsdom, where import.meta.url is not a file: URL. Every slice taken out of
@@ -231,7 +231,13 @@ function harness(): { window: BankWindow; root: HTMLElement } {
     // vaultInfo rides the SAME nearBanker gate as bankInfo, so a bank open at a
     // bursar always has one. It is also what makes a real pane SWITCH drivable
     // below, which is the wiring the pure plan is useless without.
-    vaultInfo: { stock: {}, upgrades: 1, perMaterialCap: 40, nextUpgradeCost: 2_000 },
+    vaultInfo: {
+      stock: {},
+      special: [],
+      upgrades: 1,
+      perMaterialCap: 40,
+      nextUpgradeCost: 2_000,
+    } satisfies VaultInfo,
     inventory: [],
     bags: [null, null, null, null],
     copper: 100_000_000,

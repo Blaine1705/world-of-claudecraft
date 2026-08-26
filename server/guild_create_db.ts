@@ -19,6 +19,7 @@ import {
 import { beginCharacterSaveTx, prepareCharacterSaveEffects } from './character_save_transaction';
 import { saveCharacterStateOnClient } from './db';
 import {
+  createDbTransactionDeadline,
   DbTransactionAborted,
   type DbTransactionDeadlineClient,
   DbTransactionDeadlineExceeded,
@@ -40,6 +41,8 @@ export interface PaidGuildCreateDbPool {
 
 export const PAID_GUILD_RECEIPT_RECONCILE_ATTEMPTS = 3;
 export const PAID_GUILD_RECEIPT_RECONCILE_QUERY_TIMEOUT_MS = 500;
+export const PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS = 400;
+export const PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS = 25;
 export const PAID_GUILD_RECEIPT_RECONCILE_BACKOFF_MS = 25;
 
 export interface PaidGuildCreateFee {
@@ -210,17 +213,27 @@ interface PaidGuildReceiptRow {
   readonly payload_sha256: unknown;
 }
 
-function releaseReceiptClient(
+/** DbTransactionDeadline owns outcome state, while this adapter makes the
+ * driver's cleanup callback observational: a throwing release must be logged,
+ * never replace the receipt query's primary result or error. */
+function receiptDeadlineClient(
   deps: PaidGuildCreateDeps,
   client: PaidGuildCreateDbClient,
-  error?: Error,
-): void {
-  try {
-    if (error) client.release(error);
-    else client.release();
-  } catch (releaseError) {
-    reportCleanupError(deps, releaseError);
-  }
+): PaidGuildCreateDbClient {
+  return {
+    query: (text: string, values?: unknown[]) => client.query(text, values),
+    release: (error?: Error | boolean) => {
+      try {
+        if (error === undefined) client.release();
+        else client.release(error);
+      } catch (releaseError) {
+        reportCleanupError(deps, releaseError);
+      }
+    },
+    on: (event: 'error', listener: (error: Error) => void) => client.on(event, listener),
+    removeListener: (event: 'error', listener: (error: Error) => void) =>
+      client.removeListener(event, listener),
+  } as PaidGuildCreateDbClient;
 }
 
 async function readPaidGuildReceiptOnce(
@@ -228,6 +241,7 @@ async function readPaidGuildReceiptOnce(
   batchKey: string,
 ): Promise<PaidGuildReceiptRow | null> {
   const operation = 'paid guild receipt reconciliation';
+  const deadlineAtMs = Date.now() + PAID_GUILD_RECEIPT_RECONCILE_QUERY_TIMEOUT_MS;
   const controller = new AbortController();
   const timeout = setTimeout(
     () => controller.abort(),
@@ -235,64 +249,81 @@ async function readPaidGuildReceiptOnce(
   );
   timeout.unref();
 
-  let client: PaidGuildCreateDbClient | null = null;
-  let released = false;
-  let causalError: Error | null = null;
-  let clientErrorListenerAttached = false;
-  let abortListenerAttached = false;
-  const detach = () => {
-    if (abortListenerAttached) {
-      abortListenerAttached = false;
-      controller.signal.removeEventListener('abort', onAbort);
-    }
-    if (client && clientErrorListenerAttached) {
-      clientErrorListenerAttached = false;
-      client.removeListener('error', onClientError);
-    }
-  };
-  const release = (error?: Error) => {
-    if (!client || released) return;
-    released = true;
-    detach();
-    releaseReceiptClient(deps, client, error);
-  };
-  const onAbort = () => {
-    if (released) return;
-    causalError = new DbTransactionAborted(operation, false);
-    release(causalError);
-  };
-  const onClientError = (error: Error) => {
-    if (released) return;
-    causalError = error;
-    release(error);
-  };
-
+  let transaction: ReturnType<typeof createDbTransactionDeadline> | null = null;
+  let unownedClient: PaidGuildCreateDbClient | null = null;
   try {
-    client = await acquirePaidGuildCreateClient(deps, controller.signal, operation);
-    client.on('error', onClientError);
-    clientErrorListenerAttached = true;
-    controller.signal.addEventListener('abort', onAbort, { once: true });
-    abortListenerAttached = true;
-    if (controller.signal.aborted) onAbort();
-    if (released) throw causalError ?? new DbTransactionAborted(operation, false);
-
-    const result = await client.query(
+    unownedClient = await acquirePaidGuildCreateClient(deps, controller.signal, operation);
+    const client = unownedClient;
+    const transactionBudgetMs = deadlineAtMs - Date.now();
+    try {
+      transaction = createDbTransactionDeadline(receiptDeadlineClient(deps, client), {
+        operation,
+        timeoutMs: Math.max(1, transactionBudgetMs),
+        signal: controller.signal,
+      });
+      unownedClient = null;
+    } catch (error) {
+      try {
+        client.release(error instanceof Error ? error : new Error(String(error)));
+      } catch (releaseError) {
+        reportCleanupError(deps, releaseError);
+      }
+      unownedClient = null;
+      throw error;
+    }
+    if (transactionBudgetMs <= 0) {
+      controller.abort();
+      throw new DbTransactionAborted(operation, false);
+    }
+    await transaction.query('BEGIN READ ONLY');
+    const remainingMs = deadlineAtMs - Date.now();
+    if (remainingMs <= PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS) {
+      controller.abort();
+      throw new DbTransactionAborted(operation, false);
+    }
+    const statementBudgetMs = Math.min(
+      PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS,
+      remainingMs - PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS,
+    );
+    // The JavaScript deadline bounds checkout plus every round trip. These
+    // LOCAL GUCs independently stop a lock-waiting backend even if PostgreSQL
+    // has not yet noticed that node-postgres destroyed its frontend socket.
+    await transaction.query(
+      `SET LOCAL statement_timeout = ${statementBudgetMs}; ` +
+        `SET LOCAL lock_timeout = ${statementBudgetMs}; ` +
+        `SET LOCAL idle_in_transaction_session_timeout = ${statementBudgetMs}`,
+    );
+    const result = await transaction.query(
       `SELECT realm, character_id, account_id, row_count, payload_sha256
          FROM bank_ledger_batch_receipts
         WHERE batch_key = $1`,
       [batchKey],
     );
-    if (released && causalError) throw causalError;
-    release();
+    // No write exists to commit. ROLLBACK ends the snapshot and clears every
+    // LOCAL setting; cleanup failure cannot erase the already-known read.
+    try {
+      await transaction.rollback();
+    } catch (error) {
+      reportCleanupError(deps, error);
+    }
+    try {
+      transaction.release();
+    } catch (error) {
+      reportCleanupError(deps, error);
+    }
     return (result.rows[0] as PaidGuildReceiptRow | undefined) ?? null;
   } catch (error) {
-    const primary = causalError ?? (error instanceof Error ? error : new Error(String(error)));
-    release(primary);
-    throw primary;
+    if (transaction) await rollbackAndRelease(deps, transaction);
+    throw error;
   } finally {
     clearTimeout(timeout);
-    detach();
-    if (client && !released) release();
+    if (unownedClient) {
+      try {
+        unownedClient.release(new DbTransactionAborted(operation, false));
+      } catch (error) {
+        reportCleanupError(deps, error);
+      }
+    }
   }
 }
 

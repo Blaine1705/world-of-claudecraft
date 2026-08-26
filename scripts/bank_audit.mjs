@@ -74,13 +74,12 @@
 // (pre-feature rows, and every personal-container row) are SKIPPED, never read
 // as balanced, and the report says how many were skipped.
 //
-// OPERATOR CAVEAT: run against a QUIESCED realm (or accept false positives).
-// The ledger rows are written fire-and-forget at op time while the book rows
-// land later on the fenced escrow save, so a live realm's unflushed window
-// shows as transient ledger/book mismatches; a fenced-out session's rolled-
-// back ops also leave their ledger rows behind by design (the evidence trail
-// for the incident the loud fence-out log records). Findings on a quiesced
-// realm are real.
+// OPERATOR CONSISTENCY: the CLI wraps every table read in one read-only,
+// repeatable-read transaction. Character rows, guild books, and their ledger
+// prefix commit atomically, and a proven lease fence commits none of them, so
+// every finding reflects one coherent database snapshot even on a live realm.
+// Quiesce first only when the audit must include every save accepted before an
+// operational cutoff rather than the snapshot established at invocation.
 //
 // Structure: PURE exported functions (unit-tested directly) plus a main() that
 // only runs when the file is executed directly. main() talks to Postgres via pg;
@@ -1004,6 +1003,18 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
       if (ANOMALY_OPS.has(row.op)) continue;
       const after = Number(row.purchased_slots_after);
       if (!Number.isFinite(after)) continue;
+      // Guild commands from different officers are committed with their
+      // character saves, so a bystander row can legitimately arrive after a
+      // later ladder purchase while retaining the lower position it observed
+      // at command time. The guild-row CAS still forces open_bank/buy_slots
+      // commits themselves into ladder order. Use every row's maximum as the
+      // final birth-complete witness, but run regression checks only across
+      // the commands that actually move the guild ladder. Personal and vault
+      // rows remain one-character FIFO streams, where every row is ordered.
+      if (group.container === 'guild') {
+        finalPurchased = finalPurchased === null ? after : Math.max(finalPurchased, after);
+        if (row.op !== 'open_bank' && row.op !== 'buy_slots') continue;
+      }
       if (prevPurchased !== null && after < prevPurchased) {
         findings.push({
           ...base,
@@ -1012,11 +1023,12 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
         });
       }
       prevPurchased = prevPurchased === null ? after : Math.max(prevPurchased, after);
-      finalPurchased = after;
+      if (group.container !== 'guild') finalPurchased = after;
     }
 
     const net = new Map();
     const flaggedNegative = new Set();
+    const finalRowForKey = new Map();
     for (const row of group.rows) {
       // admin_purge removes a dormant copy from a guild book, so it replays as
       // a REMOVAL exactly like a withdraw: without it the purged copy would
@@ -1036,12 +1048,29 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
       const delta = row.op === 'deposit' ? Number(row.count) : -Number(row.count);
       const next = (net.get(key) ?? 0) + delta;
       net.set(key, next);
-      if (next < 0 && !flaggedNegative.has(key)) {
+      finalRowForKey.set(key, row);
+      if (group.container !== 'guild' && next < 0 && !flaggedNegative.has(key)) {
         flaggedNegative.add(key);
         findings.push({
           ...base,
           kind: 'negative_net',
           detail: `item ${row.item_id} net fell to ${next} at row ${row.id}: withdrew more than was ever deposited`,
+        });
+      }
+    }
+    if (group.container === 'guild') {
+      // A successful guild save may use the same netted replay as
+      // mergeGuildBankRow: cross-officer commit order can make the original
+      // rows dip below zero inside one self-balancing batch even though the
+      // durable transaction applied an equivalent nonnegative order. The
+      // final net remains authoritative and is still reconciled to the book.
+      for (const [key, count] of net) {
+        if (count >= 0) continue;
+        const row = finalRowForKey.get(key);
+        findings.push({
+          ...base,
+          kind: 'negative_net',
+          detail: `item ${itemIdFromKey(key)} final net is ${count} after row ${row?.id}: withdrew more than was ever deposited`,
         });
       }
     }
@@ -1104,30 +1133,32 @@ export function auditBank({ ledgerRows, characters, guildBanks }) {
       // Treasury replay: deposit_gold, withdraw_gold, and buy_slots all move
       // TREASURY copper; create_fee (the founder's purse) and open_bank (the
       // opening officer's purse, ladder rung 0) are excluded.
-      // The running balance must never fall below zero: more copper leaving
-      // the treasury than ever entered it is a dupe/corruption signature.
+      // More copper leaving the treasury than ever entered it is a
+      // dupe/corruption signature. As with item replay above, rows from
+      // different officers' atomic saves may interleave in an order that
+      // makes a valid self-balancing batch dip below zero, so only the final
+      // total is ordered strongly enough to judge from ledger ids.
       let treasury = 0;
-      let flaggedTreasury = false;
+      let lastTreasuryRow = null;
       for (const row of group.rows) {
         if (row.op !== 'deposit_gold' && row.op !== 'withdraw_gold' && row.op !== 'buy_slots') {
           continue;
         }
         treasury += Number(row.copper_delta);
-        if (treasury < 0 && !flaggedTreasury) {
-          flaggedTreasury = true;
-          findings.push({
-            ...base,
-            kind: 'negative_treasury',
-            detail: `treasury fell to ${treasury} at row ${row.id}: more copper left than ever entered`,
-          });
-        }
+        lastTreasuryRow = row;
+      }
+      if (treasury < 0) {
+        findings.push({
+          ...base,
+          kind: 'negative_treasury',
+          detail: `treasury ended at ${treasury} after row ${lastTreasuryRow?.id}: more copper left than ever entered`,
+        });
       }
 
       // A guild opens its bank at most once (the ladder never returns to
-      // rung 0 through any legitimate op). A second open_bank row points at a
-      // fenced-out (reverted) opening whose row remained as evidence, or a
-      // corruption: either way an operator should look (the same
-      // rows-remain-by-design caveat as reverted ops elsewhere).
+      // rung 0 through any legitimate op). A second open_bank row means
+      // legacy pre-transactional history or corruption: a current fenced
+      // save commits neither the opening nor its ledger row.
       const openRows = group.rows.filter((row) => row.op === 'open_bank');
       if (openRows.length > 1) {
         findings.push({
@@ -1647,10 +1678,18 @@ async function main() {
   // cursor once bank_ledger reaches millions of rows.
   const pool = new Pool({
     connectionString: databaseUrl,
-    max: 2,
+    max: 1,
     options: '-c statement_timeout=300000',
   });
+  let client = null;
+  let transactionOpen = false;
   try {
+    client = await pool.connect();
+    // Every reconciliation spans several tables. One read-only snapshot makes
+    // the CLI safe to run against a live realm: a save can land before or after
+    // this instant, but never between the ledger and state views we compare.
+    await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    transactionOpen = true;
     // DEGRADE, never die, on a database that predates the counterparty
     // columns. DEPLOY.md tells operators to run this tool after a restore, and
     // a restored pg_dump (or a replica that has not booted the new schema yet)
@@ -1666,7 +1705,7 @@ async function main() {
     // have. That would kill the audit with "column does not exist" in exactly
     // the restore scenario this fallback exists for. to_regclass honours the
     // search_path, so the probe names the same relation the scan will.
-    const present = await pool.query(
+    const present = await client.query(
       `SELECT attname AS column_name FROM pg_attribute
         WHERE attrelid = to_regclass('bank_ledger')
           AND attnum > 0 AND NOT attisdropped
@@ -1681,7 +1720,7 @@ async function main() {
           'unbalanceable. Boot a realm process against it to apply the schema.',
       );
     }
-    const ledger = await pool.query(
+    const ledger = await client.query(
       // Two more columns, no new predicate: this is the same single ordered
       // scan of the whole table it always was, so it needs no new index (the
       // recorded deferral about paginating this read with a keyset cursor once
@@ -1692,10 +1731,10 @@ async function main() {
          FROM bank_ledger
         ORDER BY id`,
     );
-    const chars = await pool.query(CHARACTERS_SQL);
+    const chars = await client.query(CHARACTERS_SQL);
     const characters = chars.rows.map((r) => ({ id: r.id, realm: r.realm, state: r.state }));
     // Guild books for the guild-container reconciliation (Guild Bank Phase 3).
-    const banks = await pool.query('SELECT guild_id, realm, data FROM guild_banks');
+    const banks = await client.query('SELECT guild_id, realm, data FROM guild_banks');
     const findings = auditBank({ ledgerRows: ledger.rows, characters, guildBanks: banks.rows });
     console.log(formatReport(ledger.rows, findings));
 
@@ -1714,12 +1753,12 @@ async function main() {
     // is also LIMITED, because the incident that makes this report interesting
     // is exactly the one that could make it enormous, and a tool that balloons
     // in memory during an incident is no use during an incident.
-    const storagePresent = await pool.query(
+    const storagePresent = await client.query(
       `SELECT to_regclass('storage_purchases') IS NOT NULL AS present`,
     );
     let storageFindings = [];
     if (storagePresent.rows[0]?.present) {
-      const purchases = await pool.query(
+      const purchases = await client.query(
         `SELECT id, realm, account_id, character_id, item_id, expected_cost_claudium,
                 idempotency_key, status, created_at, resolved_at
            FROM storage_purchases
@@ -1735,7 +1774,7 @@ async function main() {
       // exact incident that caused the truncation, and an operator reading
       // "unresolved 3" during a mass-pending event would act on a number that
       // means "3 of the first 500 rows".
-      const totals = await pool.query(
+      const totals = await client.query(
         `SELECT status, count(*)::int AS n
            FROM storage_purchases
           WHERE status <> 'applied'
@@ -1750,7 +1789,19 @@ async function main() {
       );
     }
     process.exitCode = findings.length + storageFindings.length > 0 ? 1 : 0;
+    await client.query('COMMIT');
+    transactionOpen = false;
+  } catch (error) {
+    if (client && transactionOpen) {
+      try {
+        await client.query('ROLLBACK');
+      } catch {
+        // Preserve the audit failure that made rollback necessary.
+      }
+    }
+    throw error;
   } finally {
+    client?.release();
     await pool.end();
   }
 }

@@ -852,10 +852,11 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     // and must update this pin, the matcher arm, and the frame pins together.
     expect(exported?.[1]).toBe('message rate exceeded');
 
-    // All five flood kick arms (the pre-parse gate in handleMessage, the
+    // All six flood kick arms (the pre-parse gate in handleMessage, the
     // post-parse lane path in consumeLane, the list-read guard path in
     // consumeListRead per the phase 06 maintainer ruling, the guild-bank
-    // op guard path in consumeGuildBankOp per the Guild Bank Phase 3 QA
+    // bank/vault retained-ledger refusal callback, the guild-bank op guard path
+    // in consumeGuildBankOp per the Guild Bank Phase 3 QA
     // database ruling, and the cosmetic-set guard path in consumeCosmeticOp
     // per the Reliquary border security review) pass the CONSTANT, never an
     // inline literal, with the grep-ability 'message flood' leaveReason label;
@@ -868,7 +869,7 @@ describe("R3: the flood-kick reason maps to the client matcher's exact bytes", (
     const kickArms = gameSrc.match(
       /kickSession\(session, MSG_RATE_KICK_REASON, 'message flood'\)/g,
     );
-    expect(kickArms, 'all five flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(5);
+    expect(kickArms, 'all six flood kick arms must pass MSG_RATE_KICK_REASON').toHaveLength(6);
     expect(gameSrc).toContain("kickSession(session, 'rejected by server', 'disconnected')");
 
     // The matcher arm recognizes the same bytes and returns the loading key. A

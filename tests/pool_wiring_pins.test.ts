@@ -224,7 +224,12 @@ const PINS: PoolWiringPin[] = [
   },
   {
     path: 'src/sim/materials_vault.ts',
-    sites: [{ fn: 'vaultWithdraw', what: 'the countFit gate on the payout into the bags' }],
+    sites: [
+      {
+        fn: 'vaultWithdraw',
+        what: 'the shared pools binding both countFit payout branches into the bags',
+      },
+    ],
     grantsOnly: true,
   },
   {

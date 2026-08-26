@@ -9,7 +9,8 @@
 // label (account/session/character/player/ip) ever appears.
 
 import { Registry } from 'prom-client';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { observeBankLedgerGrowthBudget } from '../../../server/bank_ledger_growth_budget';
 import { COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS } from '../../../server/economy_telemetry';
 import {
   FISHING_BANDS,
@@ -22,6 +23,9 @@ import {
   type TickPhaseMillis,
   WOC_ACCOUNTS_ONLINE,
   WOC_AUTH_GUARD_CACHE,
+  WOC_BACKGROUND_DB_GATE,
+  WOC_BANK_LEDGER_GROWTH_BUDGET,
+  WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
   WOC_BATTLEGROUND_CAPTURES_TOTAL,
   WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
   WOC_BATTLEGROUND_MATCHES_TOTAL,
@@ -55,6 +59,7 @@ import {
   WOC_SIM_ENTITIES,
   WOC_SIM_TICK_HZ,
   WOC_SIM_TICK_PHASE_SECONDS,
+  WOC_STORAGE_RECOVERY,
   WOC_TICK_PHASES,
   WOC_VAULT_LEDGER_INCIDENTS_TOTAL,
   WOC_WS_CONNECTIONS,
@@ -84,6 +89,31 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     simTickHz: () => 20,
     savePendingKeys: () => 6,
     escrowGateInFlight: () => 2,
+    backgroundDbGate: () => ({
+      inFlight: 0,
+      waiting: 0,
+      max: 8,
+      configuredHeadroom: 2,
+      acquired: 0,
+      refused: 0,
+      cancelled: 0,
+    }),
+    storageRecovery: () => ({
+      tracked: 0,
+      scanActive: 0,
+      scanQueued: 0,
+      driveActive: 0,
+      driveQueued: 0,
+      retryTimers: 0,
+      oldestTrackedAgeMs: 0,
+      oldestQueuedAgeMs: 0,
+      oldestActiveAgeMs: 0,
+      activePastSlotTarget: 0,
+      horizonBreached: false,
+      capacityRefusals: 0,
+      retriesScheduled: 0,
+      horizonBreaches: 0,
+    }),
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
@@ -133,7 +163,29 @@ function labelValues(text: string, label: string, metric?: string): Set<string> 
   return values;
 }
 
+/** Every fixed `measure` label and its numeric sample for one gauge family. */
+function measureValues(text: string, metric: string): Record<string, string> {
+  return Object.fromEntries(
+    [...text.matchAll(new RegExp(`^${metric}\\{measure="([^"]+)"\\} (\\S+)$`, 'gm'))].map(
+      ([, measure, value]) => [measure, value],
+    ),
+  );
+}
+
 describe('registerGameStateMetrics: gauges read the source at scrape time', () => {
+  it('exports an explicit cold bank-ledger observation without inventing freshness', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+
+    expect(measureValues(text, WOC_BANK_LEDGER_GROWTH_BUDGET)).toEqual({
+      hard_limit_rows: '10000000',
+      initialized: '0',
+      observation_age_seconds: '0',
+      observed_committed_rows: '0',
+    });
+  });
+
   it('exposes every gauge under its exact exported name and value', async () => {
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
@@ -147,6 +199,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(WOC_SIM_TICK_HZ).toBe('woc_sim_tick_hz');
     expect(WOC_SAVE_PENDING_KEYS).toBe('woc_character_save_pending_keys');
     expect(WOC_ESCROW_GATE_IN_FLIGHT).toBe('woc_escrow_gate_in_flight');
+    expect(WOC_BACKGROUND_DB_GATE).toBe('woc_background_db_gate');
+    expect(WOC_STORAGE_RECOVERY).toBe('woc_storage_recovery');
+    expect(WOC_BANK_LEDGER_GROWTH_BUDGET).toBe('woc_bank_ledger_growth_budget');
 
     for (const name of [
       WOC_PLAYERS_ONLINE,
@@ -156,6 +211,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       WOC_SIM_TICK_HZ,
       WOC_SAVE_PENDING_KEYS,
       WOC_ESCROW_GATE_IN_FLIGHT,
+      WOC_BACKGROUND_DB_GATE,
+      WOC_STORAGE_RECOVERY,
+      WOC_BANK_LEDGER_GROWTH_BUDGET,
     ]) {
       expect(text).toContain(`# TYPE ${name} gauge`);
     }
@@ -172,6 +230,145 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     // The realm escrow gate's occupancy (the fix round: an alert rule needs
     // it in /metrics, not only behind the dashboard secret).
     expect(sampleValue(text, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('2');
+  });
+
+  it('exports the fixed durable ledger limit and last database observation', async () => {
+    observeBankLedgerGrowthBudget(123, 10_000_000, Date.now() - 2_000);
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+
+    expect(labelValues(text, 'measure', WOC_BANK_LEDGER_GROWTH_BUDGET)).toEqual(
+      new Set([
+        'hard_limit_rows',
+        'initialized',
+        'observation_age_seconds',
+        'observed_committed_rows',
+      ]),
+    );
+    expect(
+      sampleValue(
+        text,
+        /^woc_bank_ledger_growth_budget\{measure="observed_committed_rows"\} (\d+)$/m,
+      ),
+    ).toBe('123');
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="hard_limit_rows"\} (\d+)$/m),
+    ).toBe('10000000');
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="initialized"\} (\d+)$/m),
+    ).toBe('1');
+    const ageSeconds = Number(
+      sampleValue(
+        text,
+        /^woc_bank_ledger_growth_budget\{measure="observation_age_seconds"\} ([\d.]+)$/m,
+      ),
+    );
+    expect(ageSeconds).toBeGreaterThanOrEqual(2);
+    expect(ageSeconds).toBeLessThan(3);
+  });
+
+  it('clamps a future bank-ledger observation timestamp to zero age', async () => {
+    expect(observeBankLedgerGrowthBudget(124, 10_000_000, Date.now() + 60_000)).toBe(true);
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+
+    expect(
+      sampleValue(
+        text,
+        /^woc_bank_ledger_growth_budget\{measure="observation_age_seconds"\} (\S+)$/m,
+      ),
+    ).toBe('0');
+  });
+
+  it('recomputes bank-ledger observation age on every later scrape', async () => {
+    expect(observeBankLedgerGrowthBudget(125, 10_000_000, 1_000)).toBe(true);
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const now = vi.spyOn(Date, 'now').mockReturnValue(2_000);
+
+    try {
+      const first = await registry.metrics();
+      expect(
+        sampleValue(
+          first,
+          /^woc_bank_ledger_growth_budget\{measure="observation_age_seconds"\} (\S+)$/m,
+        ),
+      ).toBe('1');
+
+      now.mockReturnValue(3_500);
+      const second = await registry.metrics();
+      expect(
+        sampleValue(
+          second,
+          /^woc_bank_ledger_growth_budget\{measure="observation_age_seconds"\} (\S+)$/m,
+        ),
+      ).toBe('2.5');
+    } finally {
+      now.mockRestore();
+    }
+  });
+
+  it('exports the named-producer gate and bounded recovery scheduler', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(
+      registry,
+      stubSource({
+        backgroundDbGate: () => ({
+          inFlight: 7,
+          waiting: 3,
+          max: 8,
+          configuredHeadroom: 2,
+          acquired: 19,
+          refused: 4,
+          cancelled: 5,
+        }),
+        storageRecovery: () => ({
+          tracked: 101,
+          scanActive: 102,
+          scanQueued: 103,
+          driveActive: 104,
+          driveQueued: 105,
+          retryTimers: 106,
+          oldestTrackedAgeMs: 107_500,
+          oldestQueuedAgeMs: 108_500,
+          oldestActiveAgeMs: 109_500,
+          activePastSlotTarget: 110,
+          horizonBreached: true,
+          capacityRefusals: 111,
+          retriesScheduled: 112,
+          horizonBreaches: 113,
+        }),
+      }),
+    );
+    const text = await registry.metrics();
+
+    expect(measureValues(text, WOC_BACKGROUND_DB_GATE)).toEqual({
+      acquired: '19',
+      cancelled: '5',
+      configured_headroom: '2',
+      in_flight: '7',
+      max: '8',
+      refused: '4',
+      waiting: '3',
+    });
+    expect(measureValues(text, WOC_STORAGE_RECOVERY)).toEqual({
+      active_past_slot_target: '110',
+      capacity_refusals: '111',
+      drive_active: '104',
+      drive_queued: '105',
+      horizon_breached: '1',
+      horizon_breaches: '113',
+      oldest_active_seconds: '109.5',
+      oldest_queued_seconds: '108.5',
+      oldest_tracked_seconds: '107.5',
+      retries_scheduled: '112',
+      retry_timers: '106',
+      scan_active: '102',
+      scan_queued: '103',
+      tracked: '101',
+    });
   });
 
   it('exports pg pool saturation by state from the source snapshot', async () => {
@@ -248,12 +445,40 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     // stay green if either were hoisted out of collect() and sampled once.
     let pendingKeys = 2;
     let gateInFlight = 1;
+    let backgroundDbGate = {
+      inFlight: 1,
+      waiting: 2,
+      max: 8,
+      configuredHeadroom: 2,
+      acquired: 3,
+      refused: 4,
+      cancelled: 5,
+    };
+    let storageRecovery = {
+      tracked: 1,
+      scanActive: 2,
+      scanQueued: 3,
+      driveActive: 4,
+      driveQueued: 5,
+      retryTimers: 6,
+      oldestTrackedAgeMs: 7_000,
+      oldestQueuedAgeMs: 8_000,
+      oldestActiveAgeMs: 9_000,
+      activePastSlotTarget: 10,
+      horizonBreached: false,
+      capacityRefusals: 11,
+      retriesScheduled: 12,
+      horizonBreaches: 13,
+    };
+    expect(observeBankLedgerGrowthBudget(130, 10_000_000, Date.now())).toBe(true);
     registerGameStateMetrics(
       registry,
       stubSource({
         playersOnline: () => players,
         savePendingKeys: () => pendingKeys,
         escrowGateInFlight: () => gateInFlight,
+        backgroundDbGate: () => backgroundDbGate,
+        storageRecovery: () => storageRecovery,
       }),
     );
 
@@ -261,13 +486,63 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(first, /^woc_players_online (\d+)$/m)).toBe('1');
     expect(sampleValue(first, /^woc_character_save_pending_keys (\d+)$/m)).toBe('2');
     expect(sampleValue(first, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('1');
+    expect(measureValues(first, WOC_BACKGROUND_DB_GATE)).toMatchObject({
+      in_flight: '1',
+      waiting: '2',
+    });
+    expect(measureValues(first, WOC_STORAGE_RECOVERY)).toMatchObject({
+      horizon_breached: '0',
+      oldest_tracked_seconds: '7',
+      tracked: '1',
+    });
+    expect(measureValues(first, WOC_BANK_LEDGER_GROWTH_BUDGET)).toMatchObject({
+      observed_committed_rows: '130',
+    });
     players = 9;
     pendingKeys = 7;
     gateInFlight = 4;
+    backgroundDbGate = {
+      inFlight: 6,
+      waiting: 7,
+      max: 9,
+      configuredHeadroom: 3,
+      acquired: 8,
+      refused: 9,
+      cancelled: 10,
+    };
+    storageRecovery = {
+      tracked: 14,
+      scanActive: 15,
+      scanQueued: 16,
+      driveActive: 17,
+      driveQueued: 18,
+      retryTimers: 19,
+      oldestTrackedAgeMs: 20_000,
+      oldestQueuedAgeMs: 21_000,
+      oldestActiveAgeMs: 22_000,
+      activePastSlotTarget: 23,
+      horizonBreached: true,
+      capacityRefusals: 24,
+      retriesScheduled: 25,
+      horizonBreaches: 26,
+    };
+    expect(observeBankLedgerGrowthBudget(131, 10_000_000, Date.now())).toBe(true);
     const second = await registry.metrics();
     expect(sampleValue(second, /^woc_players_online (\d+)$/m)).toBe('9');
     expect(sampleValue(second, /^woc_character_save_pending_keys (\d+)$/m)).toBe('7');
     expect(sampleValue(second, /^woc_escrow_gate_in_flight (\d+)$/m)).toBe('4');
+    expect(measureValues(second, WOC_BACKGROUND_DB_GATE)).toMatchObject({
+      in_flight: '6',
+      waiting: '7',
+    });
+    expect(measureValues(second, WOC_STORAGE_RECOVERY)).toMatchObject({
+      horizon_breached: '1',
+      oldest_tracked_seconds: '20',
+      tracked: '14',
+    });
+    expect(measureValues(second, WOC_BANK_LEDGER_GROWTH_BUDGET)).toMatchObject({
+      observed_committed_rows: '131',
+    });
   });
 
   it('maps a null tick Hz (rate-meter warmup) to 0 rather than omitting the series', async () => {
@@ -333,12 +608,16 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(WOC_WS_MESSAGES_TOTAL).toBe('woc_ws_messages_total');
     expect(WOC_CHAT_MESSAGES_TOTAL).toBe('woc_chat_messages_total');
     expect(WOC_CHARACTERS_CREATED_TOTAL).toBe('woc_characters_created_total');
+    expect(WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL).toBe(
+      'woc_bank_ledger_growth_limit_refusals_total',
+    );
 
     counters.wsMessage('in');
     counters.wsMessage('in');
     counters.wsMessage('out');
     counters.chatMessage();
     counters.characterCreated();
+    counters.bankLedgerGrowthLimitRefused();
     counters.characterCreated();
     counters.characterCreated();
 
@@ -349,6 +628,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_GENERAL_CHAT_QUOTA_TOTAL,
       WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL,
       WOC_CHARACTERS_CREATED_TOTAL,
+      WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
     ]) {
       expect(text).toContain(`# TYPE ${name} counter`);
     }
@@ -357,6 +637,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(sampleValue(text, /^woc_ws_messages_total\{direction="out"\} (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_chat_messages_total (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_characters_created_total (\d+)$/m)).toBe('3');
+    expect(sampleValue(text, /^woc_bank_ledger_growth_limit_refusals_total (\d+)$/m)).toBe('1');
   });
 
   it('pre-registers every drop cause series and the kick and missed counters at zero', async () => {
@@ -385,6 +666,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       'lane_command',
       'lane_chat',
       'list_read',
+      'bank_vault',
       'guild_bank',
       'cosmetic',
     ]);
@@ -410,6 +692,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     counters.wsMessageDropped('lane_movement');
     counters.wsMessageDropped('lane_chat');
     counters.wsMessageDropped('list_read');
+    counters.wsMessageDropped('bank_vault');
     counters.wsRateKick();
     // The seq-gap sink adds the whole observed gap, not one per call.
     counters.wsInputSeqGap(7);
@@ -430,11 +713,14 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="list_read"\} (\d+)$/m)).toBe(
       '1',
     );
+    expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="bank_vault"\} (\d+)$/m)).toBe(
+      '1',
+    );
     expect(sampleValue(text, /^woc_ws_rate_kicks_total (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('9');
   });
 
-  it('keeps the cause label bounded to the fixed six values', async () => {
+  it('keeps the cause label bounded to the fixed nine values', async () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
     counters.wsMessageDropped('rate');
@@ -472,9 +758,8 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       // an officer" and "the query failed", so without this a total read outage
       // looks exactly like ordinary refusals at the wire.
       'log_read_failed',
-      // A created guild whose creation fee never became durable: the charge
-      // lived only on a live purse whose session was abandoned, so the guild
-      // exists and was never paid for. A single-sample defect, not a rate.
+      // Legacy cardinality: the current atomic path cannot create an unpaid
+      // guild, so any new sample is a mixed-release/invariant defect.
       'create_fee_unpaid',
     ]);
 
@@ -656,6 +941,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_INPUT_FRAMES_MISSED_TOTAL,
       WOC_CHAT_MESSAGES_TOTAL,
       WOC_CHARACTERS_CREATED_TOTAL,
+      WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
       WOC_COPPER_CREDITED_TOTAL,
       WOC_COPPER_SPENT_TOTAL,
       WOC_GATHER_HARVESTS_TOTAL,
@@ -693,6 +979,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.generalChatQuota('allowed')).not.toThrow();
     expect(() => counters.generalChatQuotaDbCall('allowed', 0.1)).not.toThrow();
     expect(() => counters.characterCreated()).not.toThrow();
+    expect(() => counters.bankLedgerGrowthLimitRefused()).not.toThrow();
     expect(() => counters.copperCredited('quest', 50)).not.toThrow();
     expect(() => counters.copperSpent('vendor', 20)).not.toThrow();
     expect(() => counters.harvest('mirefen_marsh', '2')).not.toThrow();

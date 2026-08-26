@@ -82,6 +82,34 @@ describe('claudiumSpendDetailed: which failures may claim no debit is possible',
     expect((await claudiumSpendDetailed(SPEND)).neverReached).toBe(false);
   });
 
+  it('composes caller cancellation with the service timeout and aborts active fetch', async () => {
+    let requestSignal: AbortSignal | undefined;
+    fetchMock.mockImplementation((_url: unknown, init: RequestInit) => {
+      requestSignal = init.signal as AbortSignal;
+      return new Promise((_resolve, reject) => {
+        requestSignal?.addEventListener(
+          'abort',
+          () => reject(requestSignal?.reason ?? new DOMException('cancelled', 'AbortError')),
+          { once: true },
+        );
+      });
+    });
+    const controller = new AbortController();
+    const pending = claudiumSpendDetailed(SPEND, controller.signal);
+    await vi.waitFor(() => expect(requestSignal).toBeDefined());
+    expect(requestSignal).not.toBe(controller.signal);
+    expect(requestSignal?.aborted).toBe(false);
+
+    controller.abort(new DOMException('shutdown', 'AbortError'));
+    await expect(pending).resolves.toMatchObject({
+      result: { granted: false, reason: 'unavailable' },
+      // Cancellation can race bytes already sent, so it is never proof that
+      // the service did not debit.
+      neverReached: false,
+    });
+    expect(requestSignal?.aborted).toBe(true);
+  });
+
   it('a 2xx with an unreadable body is AMBIGUOUS, not never-reached', async () => {
     fetchMock.mockResolvedValue(new Response('{not json', { status: 200 }));
     const out = await claudiumSpendDetailed(SPEND);

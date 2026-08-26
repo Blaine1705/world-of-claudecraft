@@ -39,10 +39,9 @@ import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot } from './types';
 
 /** One-time fee the founder pays when a guild is created (1 gold).
- *  RESERVE-AT-GATE (revised by Phase 3 QA): deducted synchronously at the
- *  guild_create dispatch gate BEFORE any DB work and refunded on every
- *  refusal arm; charging after the commit left a deterministic fee-dodge
- *  exploit (see chargeGuildCreationFee below and docs/guild-bank/state.md). */
+ *  The server deducts it at the head of the founder's character-save FIFO and
+ *  persists that exact post-charge purse in the same transaction as the new
+ *  guild, leader, empty bank, and create_fee receipt. */
 export const GUILD_CREATION_FEE_COPPER = 10_000;
 
 /** Slots one treasury-bought expansion (ladder rungs 1 and up) adds. */
@@ -287,15 +286,11 @@ export function guildBankHoldings(
 }
 
 /** Deduct the guild creation fee from the acting player's purse, returning the
- *  copper actually charged. RESERVE-AT-GATE (Phase 3 QA, revising the original
- *  create-then-charge decision): the server charges this SYNCHRONOUSLY at the
- *  guild_create dispatch gate, BEFORE any DB work, and refunds it on every
- *  refusal arm (refundGuildCreationFee below). Charging after the commit left
- *  a deterministic exploit: a client could pipeline guild_create with a spend
- *  (or log out) so the deferred clamped charge collected residue or nothing.
- *  The gate refuses a poor founder first, so the clamp here is defensive
- *  only. Deliberately emits NO player line (the "You found the guild" arm is
- *  the celebration; the purse delta rides the normal self snapshot). */
+ *  copper actually charged. The server invokes this only after the paid create
+ *  reaches the head of the character-save FIFO, immediately before capturing
+ *  the state used by the atomic guild/member/bank/receipt transaction. The
+ *  dispatch check is UX-only; this clamp and the server's observed purse delta
+ *  are the authoritative proof. Deliberately emits no player line. */
 export function chargeGuildCreationFee(ctx: SimContext, pid: number): number {
   const r = resolveActor(ctx, pid);
   if (!r) return 0;
@@ -305,12 +300,11 @@ export function chargeGuildCreationFee(ctx: SimContext, pid: number): number {
   return charged;
 }
 
-/** Return a reserved guild creation fee to the acting player's purse (the
- *  refusal arm of the reserve-at-gate flow above: name invalid or taken,
- *  already in a guild, or the create's DB transaction failed). Clamped so the
- *  purse can never exceed the integer-safe bound; returns the copper actually
- *  refunded. Silent like the charge; refunding an unresolvable pid refunds
- *  nothing (the server logs that arm loudly for operator compensation). */
+/** Return a charged guild creation fee after the database layer proved the
+ *  atomic transaction did not commit. Ambiguous COMMIT outcomes never call
+ *  this: the session is quarantined and reloads durable truth. Clamped so the
+ *  purse can never exceed the integer-safe bound; returns the exact amount
+ *  actually refunded. */
 export function refundGuildCreationFee(ctx: SimContext, pid: number, amount: number): number {
   const r = resolveActor(ctx, pid);
   if (!r) return 0;

@@ -432,7 +432,10 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 10644,
+    // LOWERED 10644 -> 10632 after the paid guild creation, bounded lazy-load,
+    // guild mutation, ledger-prefix, and activity-log delivery coordinators
+    // moved behind narrow sibling seams. Exact count, zero slack.
+    ceiling: 10632,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -684,10 +687,12 @@ const MONOLITHS: MonolithRow[] = [
     // stop, the custom properties and the tooltip ATTACH. Measured after the
     // review round rather than after the extraction, the phase 17 rule.
     //
-    // The next clean extraction is the bag-socket row (buildSocketRow plus
-    // showUnlockSocketPrompt), whose cells are already a pure model in
-    // src/ui/bank_view.ts.
-    ceiling: 1941,
+    // The next clean extraction is the remaining bag-socket row
+    // (buildSocketRow), whose cells are already a pure model in bank_view.ts.
+    // LOWERED 1941 -> 1928 after the socket prompt's consent/echo state and
+    // DOM feedback moved behind bank_socket_purchase_core/controller, with the
+    // family live-region mechanics shared through bank_status_line.ts.
+    ceiling: 1928,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
 ];

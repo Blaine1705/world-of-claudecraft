@@ -8,6 +8,10 @@ import {
 import { assertStorageAppliedEffectBatch, type StorageAppliedEffect } from './storage_purchase_db';
 
 export const CHARACTER_SAVE_STATEMENT_TIMEOUT_MS = 60_000;
+/** Recovery-owned saves are retryable and carry a shutdown signal. Keep their
+ * detached-backend ceiling inside the ordinary pool budget instead of letting
+ * a cancelled heavy save linger for the full minute. */
+export const CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS = 15_000;
 export const CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS = 65_000;
 
 /** Validate bounded cross-effect input synchronously, before any pool checkout. */
@@ -27,6 +31,9 @@ export async function beginCharacterSaveTx(
   operation: string,
   signal?: AbortSignal,
 ): Promise<DbTransactionDeadline> {
+  const statementTimeoutMs = signal
+    ? CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS
+    : CHARACTER_SAVE_STATEMENT_TIMEOUT_MS;
   const transaction = createDbTransactionDeadline(client, {
     operation,
     timeoutMs: CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS,
@@ -35,7 +42,7 @@ export async function beginCharacterSaveTx(
   try {
     await transaction.query('BEGIN');
     await transaction.query(
-      `SET LOCAL statement_timeout = ${CHARACTER_SAVE_STATEMENT_TIMEOUT_MS};
+      `SET LOCAL statement_timeout = ${statementTimeoutMs};
        SET LOCAL lock_timeout = '2s';
        SET LOCAL idle_in_transaction_session_timeout = '10s'`,
     );

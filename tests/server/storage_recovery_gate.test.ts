@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createBackgroundDbGate } from '../../server/background_db_gate';
 import { AMBIGUITY_HOLD_MAX_MS, WEDGED_HOLD_MAX_MS } from '../../server/storage_ladder_hold';
 import type { StoragePurchaseRow } from '../../server/storage_purchase_db';
 import {
@@ -7,6 +8,7 @@ import {
   kickStoragePurchaseRecovery,
   resetStoragePurchasesForTests,
   type StoragePurchaseHost,
+  stopStoragePurchaseRecovery,
   storagePurchaseInFlight,
   storagePurchaseRecoveryMetrics,
 } from '../../server/storage_purchases';
@@ -204,6 +206,91 @@ describe('bounded storage recovery integration', () => {
       }
       clock.mockRestore();
     }
+  });
+
+  it('aborts an active applied save and releases its shared background permit on stop', async () => {
+    let saveSignal: AbortSignal | undefined;
+    const permitRelease = vi.fn();
+    const acquireBackgroundPermit = vi.fn(async () => ({ release: permitRelease }));
+    const runtime = host({
+      acquireBackgroundPermit,
+      grant: (_pid, _sku, _key, dryRun) =>
+        dryRun
+          ? { status: 'fits' }
+          : { status: 'applied', purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 },
+      saveCharacter: (_characterId, _shouldStart, signal) => {
+        saveSignal = signal;
+        return new Promise<boolean>((resolve) => {
+          signal?.addEventListener('abort', () => resolve(false), { once: true });
+        });
+      },
+      spend: async () => ({
+        result: { granted: true, balance: 900, costClaudium: 100, reason: null },
+        neverReached: false,
+      }),
+      db: {
+        ...host().db,
+        openFor: vi
+          .fn<StoragePurchaseHost['db']['openFor']>()
+          .mockResolvedValueOnce(row(74))
+          .mockResolvedValue(null),
+      },
+    });
+    configureStoragePurchaseRuntime(() => runtime);
+    kickStoragePurchaseRecovery(74);
+    await waitFor(() => saveSignal !== undefined);
+    expect(saveSignal?.aborted).toBe(false);
+    expect(permitRelease).toHaveBeenCalledTimes(3); // scan, claim, renewal; none spans save
+
+    await stopStoragePurchaseRecovery();
+    expect(saveSignal?.aborted).toBe(true);
+    expect(acquireBackgroundPermit).toHaveBeenCalledTimes(3);
+    expect(permitRelease).toHaveBeenCalledTimes(3);
+    expect(storagePurchaseRecoveryMetrics().tracked).toBe(0);
+  });
+
+  it('releases each DB permit before an economy RPC or character-FIFO save wait', async () => {
+    const gate = createBackgroundDbGate(1, 0);
+    const permitDepths: number[] = [];
+    const runtime = host({
+      acquireBackgroundPermit: (signal) => gate.acquire(signal),
+      grant: (_pid, _sku, _key, dryRun) =>
+        dryRun
+          ? { status: 'fits' }
+          : { status: 'applied', purchasedSlotsBefore: 0, purchasedSlotsAfter: 6 },
+      spend: async () => {
+        permitDepths.push(gate.stats().inFlight);
+        return {
+          result: { granted: true, balance: 900, costClaudium: 100, reason: null },
+          neverReached: false,
+        };
+      },
+      saveCharacter: async () => {
+        // The production host joins the character FIFO here and takes its own
+        // permit only once that thunk runs. The coordinator must arrive with
+        // no scan/claim/renew permit still held.
+        permitDepths.push(gate.stats().inFlight);
+        return true;
+      },
+      db: {
+        ...host().db,
+        openFor: vi
+          .fn<StoragePurchaseHost['db']['openFor']>()
+          .mockResolvedValueOnce(row(75))
+          .mockResolvedValue(null),
+      },
+    });
+    configureStoragePurchaseRuntime(() => runtime);
+
+    kickStoragePurchaseRecovery(75);
+    await waitFor(() => storagePurchaseRecoveryMetrics().tracked === 0);
+
+    expect(permitDepths).toEqual([0, 0]);
+    expect(gate.stats()).toMatchObject({
+      inFlight: 0,
+      waiting: 0,
+      acquired: 4, // scan, claim, post-RPC renewal, final settlement
+    });
   });
 
   it('never spends a new key while another key is open for the character', async () => {

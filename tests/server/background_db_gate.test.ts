@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { backgroundDbCapacity, createBackgroundDbGate } from '../../server/background_db_gate';
 
 describe('background DB gate', () => {
-  it('reserves two default-pool clients for interactive work', () => {
+  it('caps named major producers below the default pool maximum', () => {
     expect(backgroundDbCapacity(10)).toBe(8);
     const gate = createBackgroundDbGate(10);
     const holds = Array.from({ length: 8 }, () => gate.tryAcquire());
@@ -11,19 +11,19 @@ describe('background DB gate', () => {
     expect(gate.stats()).toMatchObject({
       inFlight: 8,
       max: 8,
-      interactiveReserve: 2,
+      configuredHeadroom: 2,
       refused: 1,
     });
     for (const hold of holds) hold?.release();
     expect(gate.stats().inFlight).toBe(0);
   });
 
-  it('keeps one durability lane on undersized pools and reports the real reserve', () => {
+  it('keeps one durability lane on undersized pools and reports composition headroom', () => {
     expect(backgroundDbCapacity(1)).toBe(1);
     expect(backgroundDbCapacity(2)).toBe(1);
-    expect(createBackgroundDbGate(1).stats()).toMatchObject({ max: 1, interactiveReserve: 0 });
-    expect(createBackgroundDbGate(2).stats()).toMatchObject({ max: 1, interactiveReserve: 1 });
-    expect(createBackgroundDbGate(3).stats()).toMatchObject({ max: 1, interactiveReserve: 2 });
+    expect(createBackgroundDbGate(1).stats()).toMatchObject({ max: 1, configuredHeadroom: 0 });
+    expect(createBackgroundDbGate(2).stats()).toMatchObject({ max: 1, configuredHeadroom: 1 });
+    expect(createBackgroundDbGate(3).stats()).toMatchObject({ max: 1, configuredHeadroom: 2 });
   });
 
   it('grants asynchronous waiters in FIFO order', async () => {
@@ -65,6 +65,24 @@ describe('background DB gate', () => {
     expect(survivorHold).not.toBeNull();
     survivorHold?.release();
     expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0 });
+  });
+
+  it('refuses an already-aborted acquire before allocating or queueing a permit', async () => {
+    const gate = createBackgroundDbGate(3);
+    const controller = new AbortController();
+    controller.abort();
+
+    await expect(gate.acquire(controller.signal)).resolves.toBeNull();
+    expect(gate.stats()).toMatchObject({
+      inFlight: 0,
+      waiting: 0,
+      acquired: 0,
+      cancelled: 1,
+    });
+
+    const live = gate.tryAcquire();
+    expect(live).not.toBeNull();
+    live?.release();
   });
 
   it('makes permit release idempotent', () => {

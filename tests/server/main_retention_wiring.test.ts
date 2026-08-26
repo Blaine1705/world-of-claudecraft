@@ -371,13 +371,16 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(bodyOf('resolveLiveCharacter: (accountId) => {')).toContain(
       's.left || s.escrowQuarantined',
     );
-    expect(bodyOf('saveCharacter: (characterId, shouldStart) => {')).toContain(
+    expect(bodyOf('saveCharacter: (characterId, shouldStart, signal) => {')).toContain(
       '!s.left && !s.escrowQuarantined',
+    );
+    expect(bodyOf('saveCharacter: (characterId, shouldStart, signal) => {')).toContain(
+      'game.saveCharacter(s, { shouldStart, signal, backgroundDbPermit: true })',
     );
 
     // Exactly one of each, so a second host wiring cannot ship unguarded.
     expect(count(MAIN, 'resolveLiveCharacter: (accountId) => {')).toBe(1);
-    expect(count(MAIN, 'saveCharacter: (characterId, shouldStart) => {')).toBe(1);
+    expect(count(MAIN, 'saveCharacter: (characterId, shouldStart, signal) => {')).toBe(1);
   });
 
   it('the storage purchase host stages the atomic save effect on the live game', () => {
@@ -392,6 +395,36 @@ describe('retention sweep wiring in server/main.ts', () => {
     );
   });
 
+  it('shares one major-background database gate across game, market, storage, and metrics', () => {
+    // Independent subsystem tests can each pass with independent gates while
+    // their combined production concurrency exceeds the pool headroom. Pin the
+    // composition root: one instance, threaded into every major producer and
+    // the readout that operators use to judge its aggregate pressure.
+    expect(count(MAIN, 'createBackgroundDbGate(')).toBe(1);
+    expect(MAIN).toContain(
+      'const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS)',
+    );
+    expect(MAIN).toContain('new GameServer(undefined, majorBackgroundDbGate)');
+    expect(MAIN).toContain('const permit = await majorBackgroundDbGate.acquire()');
+    expect(MAIN).toContain(
+      'acquireBackgroundPermit: (signal) => majorBackgroundDbGate.acquire(signal)',
+    );
+    expect(MAIN).toContain('tryAcquireBackgroundPermit: () => majorBackgroundDbGate.tryAcquire()');
+    expect(MAIN).toContain('backgroundDbGate: () => majorBackgroundDbGate.stats()');
+
+    const custodyStart = MAIN.indexOf('enqueueCharacterWrite: (characterId, job) =>');
+    const custodyEnd = MAIN.indexOf('serializeCharacterForPersist:', custodyStart);
+    const custody = MAIN.slice(custodyStart, custodyEnd);
+    expect(custodyStart).toBeGreaterThan(-1);
+    expect(custodyEnd).toBeGreaterThan(custodyStart);
+    expect(custody.indexOf('enqueueCharacterWrite(characterId, async () => {')).toBeLessThan(
+      custody.indexOf('majorBackgroundDbGate.acquire()'),
+    );
+    expect(custody.indexOf('majorBackgroundDbGate.acquire()')).toBeLessThan(
+      custody.indexOf('job()'),
+    );
+  });
+
   it('stops admitting storage recovery before the database pool closes', () => {
     const shutdown = MAIN.indexOf('const shutdown = async () => {');
     const stopRecovery = MAIN.indexOf('await stopStoragePurchaseRecovery();', shutdown);
@@ -400,5 +433,19 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(stopRecovery).toBeGreaterThan(shutdown);
     expect(stopRecovery).toBeLessThan(closePool);
     expect(count(MAIN, 'await stopStoragePurchaseRecovery();')).toBe(1);
+  });
+
+  it('starts the ledger-growth monitor after listen and drains it before pool close', () => {
+    const listen = MAIN.indexOf('server.listen(');
+    const start = MAIN.indexOf('bankLedgerGrowthMonitor.start()');
+    const shutdown = MAIN.indexOf('const shutdown = async () => {');
+    const stop = MAIN.indexOf('await bankLedgerGrowthMonitor.stop();', shutdown);
+    const closePool = MAIN.indexOf('await pool.end();', shutdown);
+    expect(listen).toBeGreaterThan(-1);
+    expect(start).toBeGreaterThan(listen);
+    expect(stop).toBeGreaterThan(shutdown);
+    expect(stop).toBeLessThan(closePool);
+    expect(count(MAIN, 'bankLedgerGrowthMonitor.start()')).toBe(1);
+    expect(count(MAIN, 'await bankLedgerGrowthMonitor.stop();')).toBe(1);
   });
 });

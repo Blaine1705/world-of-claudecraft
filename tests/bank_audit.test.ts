@@ -1,5 +1,42 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it, vi } from 'vitest';
+
+const cliDb = vi.hoisted(() => ({ events: [] as string[] }));
+
+vi.mock('pg', () => ({
+  Pool: class {
+    async connect() {
+      cliDb.events.push('connect');
+      return {
+        query: async (statement: string) => {
+          const sql = statement.replace(/\s+/g, ' ').trim();
+          cliDb.events.push(`query:${sql}`);
+          if (sql.includes('FROM storage_purchases') && sql.includes('ORDER BY')) {
+            throw new Error('forced storage read failure');
+          }
+          if (sql.includes("to_regclass('bank_ledger')")) {
+            return {
+              rows: [
+                { column_name: 'counterparty_copper_delta' },
+                { column_name: 'counterparty_count' },
+              ],
+            };
+          }
+          if (sql.includes("to_regclass('storage_purchases')")) {
+            return { rows: [{ present: true }] };
+          }
+          return { rows: [] };
+        },
+        release: () => cliDb.events.push('release'),
+      };
+    }
+
+    async end() {
+      cliDb.events.push('pool.end');
+    }
+  },
+}));
 
 import {
   BANK_SOCKET_PRICES as AUDIT_BANK_SOCKET_PRICES,
@@ -1481,7 +1518,7 @@ describe('the characters read (source pin)', () => {
       readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
     );
     // The constant is only load-bearing if main() still runs it.
-    expect(auditSrc).toContain('await pool.query(CHARACTERS_SQL)');
+    expect(auditSrc).toContain('await client.query(CHARACTERS_SQL)');
     // Then the declaration's own BODY, sliced to its closing backtick, so an
     // arm matching somewhere else in the file (a neighbouring query, a prose
     // mention) can never satisfy it.
@@ -1495,6 +1532,66 @@ describe('the characters read (source pin)', () => {
       "jsonb_build_object('bank', state->'bank', 'vault', state->'vault') AS state",
     );
     expect(body).toContain('FROM characters');
+  });
+});
+
+describe('the CLI snapshot boundary', () => {
+  it('reconciles every table through one read-only repeatable-read client', () => {
+    const auditSrc = codeOnly(
+      readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
+    );
+    expect(auditSrc).toContain(
+      "await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')",
+    );
+    expect(auditSrc).toContain("await client.query('COMMIT')");
+    expect(auditSrc).toContain("await client.query('ROLLBACK')");
+    expect(auditSrc).not.toContain('await pool.query(');
+  });
+
+  it('begins before every read and rolls back then releases after a failed read', async () => {
+    const scriptPath = fileURLToPath(new URL('../scripts/bank_audit.mjs', import.meta.url));
+    const previousArgv1 = process.argv[1];
+    const previousDatabaseUrl = process.env.DATABASE_URL;
+    const previousExitCode = process.exitCode;
+    const exit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    cliDb.events.length = 0;
+
+    try {
+      process.argv[1] = scriptPath;
+      process.env.DATABASE_URL = 'postgres://bank-audit-test';
+      vi.resetModules();
+      await import('../scripts/bank_audit.mjs');
+      await vi.waitFor(() => expect(exit).toHaveBeenCalledWith(1));
+
+      const queries = cliDb.events.filter((event) => event.startsWith('query:'));
+      expect(queries[0]).toBe('query:BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      const reads = queries.filter((event) => event.startsWith('query:SELECT'));
+      expect(reads).toHaveLength(6);
+      expect(reads.every((event) => queries.indexOf(event) > 0)).toBe(true);
+
+      const failedRead = cliDb.events.findIndex(
+        (event) => event.includes('FROM storage_purchases') && event.includes('ORDER BY'),
+      );
+      const rollback = cliDb.events.indexOf('query:ROLLBACK');
+      const release = cliDb.events.indexOf('release');
+      const poolEnd = cliDb.events.indexOf('pool.end');
+      expect(failedRead).toBeGreaterThan(0);
+      expect(rollback).toBeGreaterThan(failedRead);
+      expect(release).toBeGreaterThan(rollback);
+      expect(poolEnd).toBeGreaterThan(release);
+      expect(cliDb.events).not.toContain('query:COMMIT');
+    } finally {
+      process.argv[1] = previousArgv1;
+      if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+      else process.env.DATABASE_URL = previousDatabaseUrl;
+      process.exitCode = previousExitCode;
+      exit.mockRestore();
+      log.mockRestore();
+      error.mockRestore();
+      vi.resetModules();
+    }
   });
 });
 
@@ -1843,6 +1940,47 @@ describe('auditBank (guild container)', () => {
     expect(findings).toEqual([]);
   });
 
+  it('allows a delayed guild bystander row without hiding ladder-command regressions', () => {
+    const book = [
+      {
+        guild_id: 913,
+        realm: 'Claudemoon',
+        data: { treasury: 1_000, inventory: [], purchasedSlots: 30 },
+      },
+    ];
+    const delayedBystander = auditBank({
+      ledgerRows: [
+        G({ id: 1, op: 'open_bank', copper_delta: -90_000, purchased_slots_after: 24 }),
+        G({ id: 2, op: 'deposit_gold', copper_delta: 25_000, purchased_slots_after: 24 }),
+        G({ id: 3, op: 'buy_slots', copper_delta: -25_000, purchased_slots_after: 30 }),
+        // This officer acted before row 3 but saved afterwards. It moved no
+        // ladder state, so its captured rung is a legitimate stale witness.
+        G({ id: 4, op: 'deposit_gold', copper_delta: 1_000, purchased_slots_after: 24 }),
+      ],
+      characters: [],
+      guildBanks: book,
+    });
+    expect(delayedBystander).toEqual([]);
+
+    const regressedPurchase = auditBank({
+      ledgerRows: [
+        G({ id: 1, op: 'open_bank', copper_delta: -90_000, purchased_slots_after: 24 }),
+        G({ id: 2, op: 'deposit_gold', copper_delta: 50_000, purchased_slots_after: 24 }),
+        G({ id: 3, op: 'buy_slots', copper_delta: -25_000, purchased_slots_after: 30 }),
+        G({ id: 4, op: 'buy_slots', copper_delta: -25_000, purchased_slots_after: 24 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 0, inventory: [], purchasedSlots: 30 },
+        },
+      ],
+    });
+    expect(guildKindsFor(regressedPurchase, 913)).toContain('purchased_regression');
+  });
+
   it('conservation holds per GUILD, not per character: a cross-officer withdraw is clean', () => {
     // Officer 2 withdraws what officer 1 deposited. A per-character grouping
     // (the personal rule) would flag officer 2 with negative_net; the pipe
@@ -1855,6 +1993,35 @@ describe('auditBank (guild container)', () => {
       characters: [],
     });
     expect(findings).toEqual([]);
+  });
+
+  it('accepts a netted-rescue round trip while still rejecting a negative final guild net', () => {
+    const clean = auditBank({
+      ledgerRows: [
+        G({ id: 1, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+        G({ id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 3 }),
+        // A later transaction withdrew and returned the same copies. Its
+        // ordered replay can dip below zero, while the DB's netted rescue
+        // applies the equivalent zero-net batch safely.
+        G({ id: 3, op: 'withdraw', item_id: 'wolf_fang', count: 3 }),
+        G({ id: 4, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 0, inventory: [], purchasedSlots: 0 },
+        },
+      ],
+    });
+    expect(clean).toEqual([]);
+
+    const corrupt = auditBank({
+      ledgerRows: [G({ id: 1, op: 'withdraw', item_id: 'wolf_fang', count: 1 })],
+      characters: [],
+    });
+    expect(guildKindsFor(corrupt, 913)).toEqual(['negative_net']);
   });
 
   it('flags a guild withdraw of items that were never deposited (negative_net)', () => {
@@ -1875,6 +2042,24 @@ describe('auditBank (guild container)', () => {
       characters: [],
     });
     expect(guildKindsFor(findings, 913)).toEqual(['negative_treasury']);
+  });
+
+  it('accepts a transient negative treasury that later cross-officer activity restores', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 2, op: 'withdraw_gold', copper_delta: -8_000 }),
+        G({ id: 2, character_id: 1, op: 'deposit_gold', copper_delta: 10_000 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 2_000, inventory: [], purchasedSlots: 0 },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
   });
 
   it('create_fee and open_bank are PURSE copper, excluded from the treasury replay', () => {

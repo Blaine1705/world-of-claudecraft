@@ -20,15 +20,14 @@ import { ITEMS } from '../src/sim/data';
 import { exchangeBrowseCategory, exchangeBrowseSubcategory } from '../src/sim/exchange_eligibility';
 import type { ExtractRef, ExtractRefusal } from '../src/sim/inventory_extract';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
-import type { CharacterState } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
-import type { BankLedgerOutboxSnapshot } from './bank_ledger_outbox';
 import { throwProvedRollback } from './pg_rollback_proof';
 import {
   BOND_PAYOUT_BUDGET_MS,
   SWEEP_BATCH,
   WOC_MARKET_ME_READOUT_DEADLINE_MS,
 } from './woc_market_budgets';
+import type { CharacterSaveArgs } from './woc_market_character_save';
 import { createWocMarketDeliveryArms, type WocMarketDeliveryArms } from './woc_market_delivery';
 import { logSafe, WocWireDriftWarner } from './woc_market_drift_warn';
 import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_local_ledgers';
@@ -331,17 +330,7 @@ export interface WocSellerHistoryReadout {
   profile: WocSellerProfile | null;
 }
 
-export interface CharacterSaveArgs {
-  characterId: number;
-  level: number;
-  state: CharacterState;
-  leaseNonce: string | undefined;
-  storageEffects?: readonly import('./storage_purchase_db').StorageAppliedEffect[];
-  /** The exact immutable outbox prefix captured with this state. Never clone,
-   *  rebuild, or filter this object: its identity is the acknowledgement key
-   *  that leaves concurrent appends queued after COMMIT. */
-  bankLedgerSnapshot?: BankLedgerOutboxSnapshot;
-}
+export type { CharacterSaveArgs } from './woc_market_character_save';
 
 export interface WocMarketDb {
   // Listing custody edge: character UPDATE (the bags just lost the copy) and

@@ -11007,15 +11007,14 @@ export class Sim {
     return guildBankMod.guildBankHoldings(this.ctx, guildId);
   }
 
-  // Reserve-at-gate (state.md, revised by Phase 3 QA): the server charges this
-  // synchronously at the guild_create dispatch gate, before any DB work, and
-  // refunds on every refusal arm. Returns the copper actually charged.
+  // Paid guild creation charges at the head of the character-save FIFO, just
+  // before its atomic post-charge snapshot. Returns the copper actually charged.
   chargeGuildCreationFeeFor(pid: number): number {
     return guildBankMod.chargeGuildCreationFee(this.ctx, pid);
   }
 
-  // The refusal arm of the reserve-at-gate flow: return a reserved creation
-  // fee to the purse. Returns the copper actually refunded.
+  // Compensate only after the DB layer proves the atomic create rolled back.
+  // Ambiguous COMMIT outcomes reload durable truth instead of refunding.
   refundGuildCreationFeeFor(pid: number, amount: number): number {
     return guildBankMod.refundGuildCreationFee(this.ctx, pid, amount);
   }

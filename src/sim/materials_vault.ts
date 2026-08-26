@@ -428,6 +428,10 @@ export function vaultWithdraw(
   }
   if (typeof itemId !== 'string' || itemId === '') return;
   const vault = meta.vault;
+  // Both payout representations return to the same carried two-pool budget.
+  // Bind it once so the special and compact branches cannot drift onto
+  // different capacity models.
+  const carriedPools = bagPools(meta.bags);
   if (specialRef !== undefined) {
     const index = resolveVaultSpecialIndex(vault.special, itemId, specialRef);
     if (index < 0) return;
@@ -443,7 +447,7 @@ export function vaultWithdraw(
     if (slot.instance !== undefined && want !== held) return;
     const moved = countFit(
       meta.inventory,
-      bagPools(meta.bags),
+      carriedPools,
       itemId,
       want,
       slot.instance,
@@ -478,7 +482,7 @@ export function vaultWithdraw(
   // countFit models the bags exactly the way addStacked below fills them (#2139:
   // a capacity pre-check that models the grant differently re-opens the overflow
   // class) and already caps its answer at the requested count.
-  const moved = countFit(meta.inventory, bagPools(meta.bags), itemId, want);
+  const moved = countFit(meta.inventory, carriedPools, itemId, want);
   if (moved <= 0) {
     bagsFullError(ctx, meta.entityId);
     return;

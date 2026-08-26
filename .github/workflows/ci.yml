@@ -629,6 +629,7 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -643,6 +644,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -844,6 +846,7 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -858,6 +861,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -941,6 +945,7 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -955,6 +960,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -1221,6 +1227,7 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -1235,6 +1242,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -1316,6 +1324,7 @@ jobs:
             /docs/screenshots/admin-cheater-mark/
             /docs/screenshots/admin-guild-bank-panel/
             /docs/screenshots/bank-storage-charters/
+            /docs/screenshots/bank-vault-tab/
             /docs/screenshots/deed-border-cartouche/
             /docs/screenshots/eastbrook-grand-armoury/
             /docs/screenshots/eastbrook-vale-rebuild/
@@ -1330,6 +1339,7 @@ jobs:
             /docs/screenshots/r35-admin-professions-inspector/
             /docs/screenshots/release-v036-skill-normalization-2026-08-10/
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
+            /docs/screenshots/vault-fine-mark/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false

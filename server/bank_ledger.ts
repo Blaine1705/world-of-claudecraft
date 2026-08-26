@@ -50,10 +50,9 @@
 // the guild-only partial one. server/main.ts states the same story at the
 // retention sweep's table list, which is where an operator looks first.
 
-import type { BankInfo, GuildBankInfo, GuildBankLogOp, VaultInfo } from '../src/world_api';
+import type { BankInfo, GuildBankInfo, VaultInfo } from '../src/world_api';
 import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from './db';
-import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { gameMetricsCounters } from './http/game_signals';
 import { REALM } from './realm';
 
@@ -953,11 +952,10 @@ export function diffGuildBankOp(
   return out;
 }
 
-// Record a successful guild bank op's deltas fire-and-forget onto the shared
-// FIFO tail (never awaited by the game loop; a rejected insert logs and never
-// blocks or reorders anything). The caller computed the deltas via
-// diffGuildBankOp (it needs the success signal to mark the book dirty), so
-// this only enqueues; an empty array writes nothing.
+// Legacy asynchronous writer retained only for terminal anomaly evidence,
+// whose quarantined session can never save again. Normal guild commands use
+// buildGuildBankLedgerRows and the bounded character outbox so their rows
+// commit atomically with character + book. An empty array writes nothing.
 export function recordGuildBankDeltas(
   op: GuildBankRecordedOp,
   who: { characterId: number; accountId: number },
@@ -966,13 +964,6 @@ export function recordGuildBankDeltas(
 ): void {
   try {
     const rows = buildGuildBankLedgerRows(op, who, guildId, deltas);
-    // The inserts THIS call enqueues, so the post-write bust below can wait on
-    // exactly them. The module FIFO `tail` is process-global (every character's
-    // personal and guild rows share it), so chaining on the tail would make one
-    // op's bust fire behind every other insert queued since, potentially
-    // minutes later on a slow database, invalidating an entry that is fresh by
-    // then. That is an extra query at the worst possible moment.
-    const enqueued: Promise<void>[] = [];
     for (let index = 0; index < deltas.length; index++) {
       const delta = deltas[index];
       const row = rows[index];
@@ -1014,32 +1005,6 @@ export function recordGuildBankDeltas(
           gameMetricsCounters().guildBankIncident('ledger_write_failed');
           console.error('bank_ledger guild write failed:', err);
         });
-      enqueued.push(tail);
-    }
-    // The in-game activity log (server/guild_bank_log.ts) is a CACHE over the
-    // very rows this function writes, so its bust belongs HERE, at the one
-    // writer, rather than at each of the call sites: a future write site cannot
-    // forget it, and every op that produces a row invalidates the guild's
-    // window by construction.
-    //
-    // Only for an op a player can actually SEE. The two anomaly ops
-    // (escrow_deficit, counterparty_orphan) are filtered out in the read's SQL,
-    // so busting for them would force a refresh whose result is byte-identical,
-    // and it would do that during an escrow rollback, i.e. exactly when the
-    // process is already in trouble.
-    //
-    // TWICE, on purpose. The immediate bust retires any snapshot taken before
-    // this op. The second fires once THIS call's inserts have actually SETTLED,
-    // because a reader racing the write would otherwise refresh from a table
-    // that does not contain the new row yet and then serve that pre-op snapshot
-    // for a whole TTL: the op would be invisible to the guild precisely when
-    // somebody is watching for it. Failures are ignored on purpose (a rejected
-    // insert already logged and counted); the bust is correct either way. Note
-    // that a "bust" is now a coalescing MARK, not a drop, so a burst of writes
-    // cannot turn this into a refresh per op.
-    if (deltas.length > 0 && GUILD_BANK_LOG_VISIBLE_OPS.includes(op as GuildBankLogOp)) {
-      bustGuildBankLog(guildId);
-      void Promise.allSettled(enqueued).then(() => bustGuildBankLog(guildId));
     }
   } catch (err) {
     // The observer must never fault the dispatch path.
@@ -1219,12 +1184,11 @@ export function recordGuildBankCounterpartyOrphan(
   ]);
 }
 
-// The guild_create fee row (reserve-at-gate: the purse was charged at the
-// dispatch gate; the row is written only in the create's committed success
-// arm, which consumes that reservation). purchased_slots_after is 0: a
-// newborn guild has no expansions. copper_delta is the negated copper the
-// founder's PURSE paid (never treasury copper), so the audit script excludes
-// create_fee from the treasury replay.
+// The guild_create fee row is written atomically with the exact post-charge
+// character state, new guild, leader membership, and empty bank.
+// purchased_slots_after is 0: a newborn guild has no expansions. copper_delta
+// is the negated copper the founder's PURSE paid (never treasury copper), so
+// the audit script excludes create_fee from the treasury replay.
 export function guildCreateFeeDelta(chargedCopper: number, pursePaid: number): BankOpDelta {
   return {
     itemId: null,

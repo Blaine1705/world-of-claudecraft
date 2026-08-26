@@ -395,4 +395,33 @@ describe('createDepthWarnedSerialWriter', () => {
     expect(warnSpy).toHaveBeenCalledTimes(1);
     expect(message).toHaveBeenCalledTimes(1);
   });
+
+  it('unlinks an aborted queued write while preserving the shared FIFO', async () => {
+    const write = createDepthWarnedSerialWriter(3, (depth) => `market writer depth ${depth}`);
+    const parked = gate();
+    const order: string[] = [];
+    const first = write(async () => {
+      order.push('first:start');
+      await parked.held;
+      order.push('first:end');
+      return 'first';
+    });
+    const controller = new AbortController();
+    const cancelled = write.enqueueCancellable(controller.signal, async () => {
+      order.push('cancelled');
+      return 'cancelled';
+    });
+    const last = write(async () => {
+      order.push('last');
+      return 'last';
+    });
+
+    await Promise.resolve();
+    controller.abort();
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    parked.open();
+    await expect(first).resolves.toBe('first');
+    await expect(last).resolves.toBe('last');
+    expect(order).toEqual(['first:start', 'first:end', 'last']);
+  });
 });

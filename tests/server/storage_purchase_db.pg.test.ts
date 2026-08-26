@@ -46,6 +46,7 @@ d('storage_purchases against real PostgreSQL', () => {
     writeStorageAppliedEffectsOnClient: typeof import('../../server/storage_purchase_db').writeStorageAppliedEffectsOnClient;
     StoragePurchaseDbAborted: typeof import('../../server/storage_purchase_db').StoragePurchaseDbAborted;
     storagePurchaseSchema: typeof import('../../server/storage_purchase_db').storagePurchaseSchema;
+    STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS: number;
     STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS: number;
   };
   let storageSchema: string;
@@ -70,6 +71,7 @@ d('storage_purchases against real PostgreSQL', () => {
       max: 2,
       options: `-c search_path=${SCHEMA}`,
       application_name: SCHEMA,
+      statement_timeout: 15_000,
     });
     const admin = new Pool({ connectionString: url, max: 1 });
     await admin.query(`DROP SCHEMA IF EXISTS ${SCHEMA} CASCADE`);
@@ -663,6 +665,7 @@ d('storage_purchases against real PostgreSQL', () => {
         });
       let sawWait = false;
       for (let attempt = 0; attempt < 100 && !sawWait; attempt++) {
+        await resolver.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await resolver.query(
           `SELECT count(*)::int AS n
              FROM pg_stat_activity
@@ -810,7 +813,7 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(pool.idleCount).toBeGreaterThan(0);
   });
 
-  it('aborts a live recovery SELECT blocked on a table lock and destroys its socket', async () => {
+  it('settles an aborted recovery SELECT promptly and bounds its detached backend', async () => {
     const blocker = await pool.connect();
     const blockerPid = Number((await blocker.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
     const controller = new AbortController();
@@ -834,6 +837,7 @@ d('storage_purchases against real PostgreSQL', () => {
 
       let blockedPid: number | null = null;
       for (let attempt = 0; attempt < 100 && blockedPid === null; attempt++) {
+        await blocker.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await blocker.query(
           `SELECT pid
              FROM pg_stat_activity
@@ -852,10 +856,24 @@ d('storage_purchases against real PostgreSQL', () => {
       expect(blockedPid).not.toBeNull();
       expect(pool.totalCount).toBe(2);
 
+      const abortedAt = Date.now();
       controller.abort();
       expect((await settled).error).toBeInstanceOf(db.StoragePurchaseDbAborted);
+      expect(Date.now() - abortedAt).toBeLessThan(500);
+      for (let attempt = 0; attempt < 100 && pool.totalCount !== 1; attempt++) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 10));
+      }
+      expect(pool.totalCount).toBe(1);
+      expect(pool.idleCount).toBe(0);
+      expect(pool.waitingCount).toBe(0);
+
+      // Socket teardown settles Node promptly, but PostgreSQL may not notice a
+      // disconnect while lock-waiting. The session-level 2s timeout is the
+      // independent server bound; keep the blocker held while proving it.
       let backendAlive = true;
-      for (let attempt = 0; attempt < 100 && backendAlive; attempt++) {
+      const backendDeadline = Date.now() + db.STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS + 2_000;
+      while (Date.now() < backendDeadline && backendAlive) {
+        await blocker.query('SELECT pg_stat_clear_snapshot()');
         const active = await blocker.query(
           'SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE pid = $1) AS alive',
           [blockedPid],
@@ -864,12 +882,6 @@ d('storage_purchases against real PostgreSQL', () => {
         if (backendAlive) await new Promise<void>((resolve) => setTimeout(resolve, 10));
       }
       expect(backendAlive).toBe(false);
-      for (let attempt = 0; attempt < 100 && pool.totalCount !== 1; attempt++) {
-        await new Promise<void>((resolve) => setTimeout(resolve, 10));
-      }
-      expect(pool.totalCount).toBe(1);
-      expect(pool.idleCount).toBe(0);
-      expect(pool.waitingCount).toBe(0);
     } finally {
       controller.abort();
       if (settled) await settled;
@@ -877,7 +889,14 @@ d('storage_purchases against real PostgreSQL', () => {
       blocker.release();
     }
 
-    expect(await db.openStoragePurchaseForCharacter(pool, 1)).toBeNull();
+    const healthySignal = new AbortController();
+    expect(await db.openStoragePurchaseForCharacter(pool, 1, healthySignal.signal)).toBeNull();
+    const reused = await pool.connect();
+    try {
+      expect((await reused.query('SHOW statement_timeout')).rows[0].statement_timeout).toBe('15s');
+    } finally {
+      reused.release();
+    }
     expect(pool.waitingCount).toBe(0);
     expect(pool.idleCount).toBeGreaterThan(0);
   });
@@ -912,6 +931,7 @@ d('storage_purchases against real PostgreSQL', () => {
 
       let blockedPid: number | null = null;
       for (let attempt = 0; attempt < 100 && blockedPid === null; attempt++) {
+        await blocker.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await blocker.query(
           `SELECT pid
              FROM pg_stat_activity
@@ -937,7 +957,9 @@ d('storage_purchases against real PostgreSQL', () => {
         commitMayHaveSucceeded: false,
       });
       let backendAlive = true;
-      for (let attempt = 0; attempt < 100 && backendAlive; attempt++) {
+      const backendDeadline = Date.now() + db.STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS + 2_000;
+      while (Date.now() < backendDeadline && backendAlive) {
+        await blocker.query('SELECT pg_stat_clear_snapshot()');
         const active = await blocker.query(
           'SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE pid = $1) AS alive',
           [blockedPid],
@@ -986,7 +1008,7 @@ d('storage_purchases against real PostgreSQL', () => {
       await observer.query(`CREATE FUNCTION storage_purchase_test_delay_commit()
         RETURNS trigger LANGUAGE plpgsql AS $delay$
         BEGIN
-          PERFORM pg_sleep(30);
+          PERFORM pg_sleep(0.25);
           RETURN NEW;
         END
         $delay$`);
@@ -1013,6 +1035,7 @@ d('storage_purchases against real PostgreSQL', () => {
 
       let committingPid: number | null = null;
       for (let attempt = 0; attempt < 100 && committingPid === null; attempt++) {
+        await observer.query('SELECT pg_stat_clear_snapshot()');
         const committing = await observer.query(
           `SELECT pid
              FROM pg_stat_activity
@@ -1037,7 +1060,9 @@ d('storage_purchases against real PostgreSQL', () => {
         commitMayHaveSucceeded: true,
       });
       let backendAlive = true;
-      for (let attempt = 0; attempt < 100 && backendAlive; attempt++) {
+      const backendDeadline = Date.now() + 3_000;
+      while (Date.now() < backendDeadline && backendAlive) {
+        await observer.query('SELECT pg_stat_clear_snapshot()');
         const active = await observer.query(
           'SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE pid = $1) AS alive',
           [committingPid],
@@ -1046,14 +1071,6 @@ d('storage_purchases against real PostgreSQL', () => {
         if (backendAlive) await new Promise<void>((resolve) => setTimeout(resolve, 10));
       }
       expect(backendAlive).toBe(false);
-      expect(
-        (
-          await observer.query(
-            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
-            [key],
-          )
-        ).rows[0].n,
-      ).toBe(0);
     } finally {
       controller.abort();
       if (settled) await settled;
@@ -1065,6 +1082,15 @@ d('storage_purchases against real PostgreSQL', () => {
     }
 
     try {
+      const landedBeforeRetry = Number(
+        (
+          await pool.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [key],
+          )
+        ).rows[0].n,
+      );
+      expect([0, 1]).toContain(landedBeforeRetry);
       const retry = await db.beginStoragePurchase(pool, {
         ...ROW,
         accountId: 2,
@@ -1072,7 +1098,7 @@ d('storage_purchases against real PostgreSQL', () => {
         idempotencyKey: key,
         claimToken: '00000000-0000-4000-8000-000000000077',
       });
-      expect(retry.inserted).toBe(true);
+      expect(retry.inserted).toBe(landedBeforeRetry === 0);
       expect(
         (
           await pool.query(
@@ -1182,6 +1208,7 @@ d('storage_purchases against real PostgreSQL', () => {
       );
       let sawDeleteWait = false;
       for (let attempt = 0; attempt < 100 && !sawDeleteWait; attempt++) {
+        await writer.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await writer.query(
           `SELECT count(*)::int AS n
              FROM pg_stat_activity
@@ -1257,6 +1284,7 @@ d('storage_purchases against real PostgreSQL', () => {
         });
       let sawAdvisoryWait = false;
       for (let attempt = 0; attempt < 100 && !sawAdvisoryWait; attempt++) {
+        await saver.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await saver.query(
           `SELECT count(*)::int AS n
              FROM pg_stat_activity
@@ -1333,6 +1361,7 @@ d('storage_purchases against real PostgreSQL', () => {
         });
       let sawWait = false;
       for (let attempt = 0; attempt < 100 && !sawWait; attempt++) {
+        await saver.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await saver.query(
           `SELECT count(*)::int AS n
              FROM pg_stat_activity
@@ -1398,6 +1427,7 @@ d('storage_purchases against real PostgreSQL', () => {
         });
       let sawWait = false;
       for (let attempt = 0; attempt < 100 && !sawWait; attempt++) {
+        await writer.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await writer.query(
           `SELECT count(*)::int AS n
              FROM pg_stat_activity
@@ -1463,6 +1493,7 @@ d('storage_purchases against real PostgreSQL', () => {
         );
       let sawLegacyWait = false;
       for (let attempt = 0; attempt < 100 && !sawLegacyWait; attempt++) {
+        await saver.query('SELECT pg_stat_clear_snapshot()');
         const waiting = await saver.query(
           `SELECT count(*)::int AS n
                FROM pg_stat_activity
@@ -1562,7 +1593,7 @@ d('storage_purchases against real PostgreSQL', () => {
       realm: 'pgtest',
       accountId: 1,
       characterId: 1,
-      itemId: 'strongbox_rung_01',
+      itemId: 'strongbox_atomic_apply_test',
       expectedCostClaudium: 100,
       idempotencyKey: 'pg-atomic-apply',
       claimToken: ROW.claimToken,
@@ -1570,95 +1601,105 @@ d('storage_purchases against real PostgreSQL', () => {
       purchasedSlotsAfter: 6,
       spendClaimToken: ROW.claimToken,
     };
-    const budgetBefore = Number(
-      (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
-        .committed_rows,
-    );
-    await db.beginStoragePurchase(pool, effect);
-
-    const rolledBack = await pool.connect();
     try {
-      await rolledBack.query('BEGIN');
-      await db.lockStorageAppliedEffectAccountsOnClient(rolledBack, [effect]);
-      await db.writeStorageAppliedEffectsOnClient(rolledBack, [effect]);
-      await rolledBack.query('ROLLBACK');
-    } finally {
-      rolledBack.release();
-    }
-    expect((await db.storagePurchaseByKey(pool, effect.idempotencyKey))?.status).toBe('pending');
-    expect(
-      (
-        await pool.query('SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1', [
-          effect.itemId,
-        ])
-      ).rows[0].n,
-    ).toBe(0);
-    expect(
-      Number(
+      const budgetBefore = Number(
         (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
           .committed_rows,
-      ),
-    ).toBe(budgetBefore);
+      );
+      await db.beginStoragePurchase(pool, effect);
 
-    const committed = await pool.connect();
-    try {
-      await committed.query('BEGIN');
-      await db.lockStorageAppliedEffectAccountsOnClient(committed, [effect]);
-      await db.writeStorageAppliedEffectsOnClient(committed, [effect]);
-      await committed.query('COMMIT');
-    } finally {
-      committed.release();
-    }
-    expect(await db.storagePurchaseByKey(pool, effect.idempotencyKey)).toMatchObject({
-      characterId: 1,
-      status: 'applied',
-    });
-    expect(
-      (
-        await pool.query(
-          'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
-          [effect.idempotencyKey],
-        )
-      ).rows[0].n,
-    ).toBe(0);
-    expect(
-      (
-        await pool.query(
-          "SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1 AND instance->>'paidWith' = 'claudium'",
-          [effect.itemId],
-        )
-      ).rows[0].n,
-    ).toBe(1);
-    expect(
-      Number(
-        (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
-          .committed_rows,
-      ),
-    ).toBe(budgetBefore + 1);
+      const rolledBack = await pool.connect();
+      try {
+        await rolledBack.query('BEGIN');
+        await db.lockStorageAppliedEffectAccountsOnClient(rolledBack, [effect]);
+        await db.writeStorageAppliedEffectsOnClient(rolledBack, [effect]);
+        await rolledBack.query('ROLLBACK');
+      } finally {
+        rolledBack.release();
+      }
+      expect((await db.storagePurchaseByKey(pool, effect.idempotencyKey))?.status).toBe('pending');
+      expect(
+        (
+          await pool.query('SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1', [
+            effect.itemId,
+          ])
+        ).rows[0].n,
+      ).toBe(0);
+      expect(
+        Number(
+          (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+            .committed_rows,
+        ),
+      ).toBe(budgetBefore);
 
-    const replay = await pool.connect();
-    try {
-      await replay.query('BEGIN');
-      await db.lockStorageAppliedEffectAccountsOnClient(replay, [effect]);
-      await db.writeStorageAppliedEffectsOnClient(replay, [effect]);
-      await replay.query('COMMIT');
+      const committed = await pool.connect();
+      try {
+        await committed.query('BEGIN');
+        await db.lockStorageAppliedEffectAccountsOnClient(committed, [effect]);
+        await db.writeStorageAppliedEffectsOnClient(committed, [effect]);
+        await committed.query('COMMIT');
+      } finally {
+        committed.release();
+      }
+      expect(await db.storagePurchaseByKey(pool, effect.idempotencyKey)).toMatchObject({
+        characterId: 1,
+        status: 'applied',
+      });
+      expect(
+        (
+          await pool.query(
+            'SELECT count(*)::int AS n FROM storage_purchases WHERE idempotency_key = $1',
+            [effect.idempotencyKey],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+      expect(
+        (
+          await pool.query(
+            "SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1 AND instance->>'paidWith' = 'claudium'",
+            [effect.itemId],
+          )
+        ).rows[0].n,
+      ).toBe(1);
+      expect(
+        Number(
+          (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+            .committed_rows,
+        ),
+      ).toBe(budgetBefore + 1);
+
+      const replay = await pool.connect();
+      try {
+        await replay.query('BEGIN');
+        await db.lockStorageAppliedEffectAccountsOnClient(replay, [effect]);
+        await db.writeStorageAppliedEffectsOnClient(replay, [effect]);
+        await replay.query('COMMIT');
+      } finally {
+        replay.release();
+      }
+      expect(
+        (
+          await pool.query(
+            "SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1 AND instance->>'paidWith' = 'claudium'",
+            [effect.itemId],
+          )
+        ).rows[0].n,
+      ).toBe(1);
+      expect(
+        Number(
+          (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+            .committed_rows,
+        ),
+      ).toBe(budgetBefore + 1);
     } finally {
-      replay.release();
+      await pool.query('DELETE FROM storage_purchases WHERE idempotency_key = $1', [
+        effect.idempotencyKey,
+      ]);
+      await pool.query('DELETE FROM storage_purchase_applied_receipts WHERE idempotency_key = $1', [
+        effect.idempotencyKey,
+      ]);
+      await pool.query('DELETE FROM bank_ledger WHERE item_id = $1', [effect.itemId]);
     }
-    expect(
-      (
-        await pool.query(
-          "SELECT count(*)::int AS n FROM bank_ledger WHERE item_id = $1 AND instance->>'paidWith' = 'claudium'",
-          [effect.itemId],
-        )
-      ).rows[0].n,
-    ).toBe(1);
-    expect(
-      Number(
-        (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
-          .committed_rows,
-      ),
-    ).toBe(budgetBefore + 1);
   });
 
   it('rejects an incompressible key past the btree tuple bound at the raw layer', async () => {

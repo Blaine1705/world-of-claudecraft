@@ -161,11 +161,20 @@ function acquireStoragePurchaseClient(
   });
 }
 
+/** The server-side ceiling for a shutdown-cancellable recovery statement.
+ * Socket teardown makes the JavaScript caller settle promptly, but PostgreSQL
+ * may not notice that disconnect while it is waiting on a lock. Lower the
+ * checked-out session's statement timeout first so detached backend work has
+ * its own deterministic bound too. */
+export const STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS = 2_000;
+
 /**
- * Run one auto-commit statement on an owned client. Destroying the socket is
- * the only safe active-query cancellation available through node-postgres:
- * it cancels server work and ensures no desynchronized client or lock returns
- * to the pool. SQLSTATE failures that win remain reusable and are preserved.
+ * Run one auto-commit statement on an owned client. Abort evicts the client so
+ * an in-flight protocol can never return to the pool. PostgreSQL can continue
+ * server work briefly after socket teardown, so the session is first bounded
+ * to STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS. A reusable client is
+ * returned only after RESET restores its startup default; reset failure poisons
+ * the client without replacing an already-known target result or SQLSTATE.
  */
 async function storagePurchaseQuery(
   db: ConnectableQueryable,
@@ -217,16 +226,48 @@ async function storagePurchaseQuery(
 
   try {
     if (released) throw causalError ?? new StoragePurchaseDbAborted(operation);
-    const result = await client.query(text, values);
-    if (released && causalError) throw causalError;
+    try {
+      await client.query(`SET statement_timeout = ${STORAGE_PURCHASE_SIGNAL_STATEMENT_TIMEOUT_MS}`);
+    } catch (error) {
+      if (causalError) throw causalError;
+      // A failed SET can leave the session's GUC state unknown. Never reuse it.
+      release(errorForRelease(error));
+      throw error;
+    }
+    if (released) throw causalError ?? new StoragePurchaseDbAborted(operation);
+
+    let result: { rows: Record<string, unknown>[]; rowCount: number | null };
+    try {
+      result = await client.query(text, values);
+    } catch (error) {
+      if (causalError) throw causalError;
+      if (pgErrorCode(error) === undefined) {
+        // A codeless driver failure may still have a response in flight.
+        release(errorForRelease(error));
+      } else {
+        // A SQLSTATE means the auto-commit statement ended and the session is
+        // idle. Preserve that primary error even if restoring the GUC fails.
+        try {
+          await client.query('RESET statement_timeout');
+          release();
+        } catch (resetError) {
+          release(errorForRelease(resetError));
+        }
+      }
+      throw error;
+    }
+
+    // The target auto-commit result is already authoritative. Cleanup failure
+    // must discard only the client, never turn a known write into ambiguity.
+    if (!released) {
+      try {
+        await client.query('RESET statement_timeout');
+        release();
+      } catch (resetError) {
+        release(errorForRelease(resetError));
+      }
+    }
     return result;
-  } catch (error) {
-    if (causalError) throw causalError;
-    // A codeless driver timeout does not cancel the server query. Destroy its
-    // socket; a real PostgreSQL error with SQLSTATE leaves auto-commit idle.
-    if (pgErrorCode(error) === undefined) release(errorForRelease(error));
-    else release();
-    throw error;
   } finally {
     release();
   }
@@ -255,7 +296,7 @@ export function storagePurchaseSchema(schemaName = 'public'): string {
   }
   const schema = `"${schemaName}"`;
   return `
-SET LOCAL search_path = ${schema}, pg_catalog, pg_temp;
+SET LOCAL search_path = "__woc_storage_purchase_schema__", pg_catalog, pg_temp;
 
 CREATE TABLE IF NOT EXISTS storage_purchases (
   id BIGSERIAL PRIMARY KEY,
@@ -341,7 +382,7 @@ BEGIN
    WHERE i.indexrelid = to_regclass('storage_purchases_one_open_per_character');
   IF NOT COALESCE(open_index_ready, false) THEN
     SELECT character_id INTO duplicate_character_id
-      FROM ${schema}.storage_purchases
+      FROM "__woc_storage_purchase_schema__".storage_purchases
      WHERE status IN ('pending', 'unresolved')
      GROUP BY character_id
     HAVING count(*) > 1
@@ -416,19 +457,19 @@ $storage_purchase_claim_constraint$;
 CREATE OR REPLACE FUNCTION guard_pending_storage_purchase_parent_delete()
 RETURNS trigger
 LANGUAGE plpgsql
-SET search_path = pg_catalog, ${schema}, pg_temp
+SET search_path = pg_catalog, "__woc_storage_purchase_schema__", pg_temp
 AS $storage_purchase_parent_delete$
 DECLARE
   pending_key text;
 BEGIN
   IF TG_TABLE_NAME = 'characters' THEN
     SELECT idempotency_key INTO pending_key
-      FROM ${schema}.storage_purchases
+      FROM "__woc_storage_purchase_schema__".storage_purchases
      WHERE character_id = OLD.id AND status IN ('pending', 'unresolved')
      LIMIT 1;
   ELSIF TG_TABLE_NAME = 'accounts' THEN
     SELECT idempotency_key INTO pending_key
-      FROM ${schema}.storage_purchases
+      FROM "__woc_storage_purchase_schema__".storage_purchases
      WHERE account_id = OLD.id AND status IN ('pending', 'unresolved')
      LIMIT 1;
   ELSE
@@ -479,7 +520,7 @@ CREATE TABLE IF NOT EXISTS storage_purchase_schema_migrations (
 CREATE OR REPLACE FUNCTION archive_storage_purchase_applied_receipt()
 RETURNS trigger
 LANGUAGE plpgsql
-SET search_path = pg_catalog, ${schema}, pg_temp
+SET search_path = pg_catalog, "__woc_storage_purchase_schema__", pg_temp
 AS $storage_purchase_receipt$
 BEGIN
   IF NEW.status <> 'applied' THEN
@@ -494,7 +535,7 @@ BEGIN
   PERFORM pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(NEW.idempotency_key, 0)
   );
-  INSERT INTO ${schema}.storage_purchase_applied_receipts
+  INSERT INTO "__woc_storage_purchase_schema__".storage_purchase_applied_receipts
     (source_purchase_id, realm, account_id, character_id, item_id,
      expected_cost_claudium, idempotency_key, applied_at)
   VALUES
@@ -504,7 +545,7 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1
-      FROM ${schema}.storage_purchase_applied_receipts receipt
+      FROM "__woc_storage_purchase_schema__".storage_purchase_applied_receipts receipt
      WHERE receipt.idempotency_key = NEW.idempotency_key
        AND receipt.source_purchase_id = NEW.id
        AND receipt.realm = NEW.realm
@@ -563,20 +604,20 @@ $storage_purchase_receipt_migration$;
 CREATE OR REPLACE FUNCTION guard_storage_purchase_consumed_key()
 RETURNS trigger
 LANGUAGE plpgsql
-SET search_path = pg_catalog, ${schema}, pg_temp
+SET search_path = pg_catalog, "__woc_storage_purchase_schema__", pg_temp
 AS $storage_purchase_guard$
 BEGIN
   -- A pre-claim binary reaches this trigger without the ordered locks current
   -- begin takes. Acquire account -> character -> key here so its receipt probe
   -- gets a fresh snapshot after any conflicting receipt/delete transaction
   -- commits, and so parent deletion cannot invert the lock order.
-  PERFORM 1 FROM ${schema}.accounts WHERE id = NEW.account_id FOR KEY SHARE;
-  PERFORM 1 FROM ${schema}.characters WHERE id = NEW.character_id FOR UPDATE;
+  PERFORM 1 FROM "__woc_storage_purchase_schema__".accounts WHERE id = NEW.account_id FOR KEY SHARE;
+  PERFORM 1 FROM "__woc_storage_purchase_schema__".characters WHERE id = NEW.character_id FOR UPDATE;
   PERFORM pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended(NEW.idempotency_key, 0)
   );
   IF EXISTS (
-    SELECT 1 FROM ${schema}.storage_purchase_applied_receipts
+    SELECT 1 FROM "__woc_storage_purchase_schema__".storage_purchase_applied_receipts
      WHERE idempotency_key = NEW.idempotency_key
   ) THEN
     RETURN NULL;
@@ -680,7 +721,7 @@ BEGIN
   END IF;
 END;
 $storage_purchase_trigger_guard$;
-`;
+`.replaceAll('"__woc_storage_purchase_schema__"', schema);
 }
 
 export const STORAGE_PURCHASE_SCHEMA = storagePurchaseSchema();

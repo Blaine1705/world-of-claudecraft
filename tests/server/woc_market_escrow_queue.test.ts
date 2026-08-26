@@ -42,6 +42,7 @@ vi.mock('../../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { BankLedgerGrowthLimitExceeded } from '../../server/bank_ledger_growth_budget';
 import { type ClientSession, GameServer } from '../../server/game';
 import {
   noopGameMetricsCounters,
@@ -121,9 +122,11 @@ function fakeWs(): unknown {
 
 /** A socket that KEEPS what the server sent, for the kick wire pins (the plain
  *  fakeWs above drops every frame). */
-function recordingWs(): { sent: string[]; ws: unknown } {
+function recordingWs(): { close: ReturnType<typeof vi.fn>; sent: string[]; ws: unknown } {
   const sent: string[] = [];
+  const close = vi.fn();
   return {
+    close,
     sent,
     ws: {
       readyState: 1,
@@ -131,7 +134,7 @@ function recordingWs(): { sent: string[]; ws: unknown } {
       send: (payload: string) => {
         sent.push(payload);
       },
-      close: () => {},
+      close,
       terminate: () => {},
     },
   };
@@ -335,6 +338,8 @@ beforeEach(() => {
   dbMock.saveCharacterState.mockImplementation(async () => true);
   dbMock.saveCharacterAndGuildBankState.mockClear();
   dbMock.saveCharacterAndGuildBankState.mockImplementation(async () => true);
+  dbMock.saveCharacterAndMarketState.mockClear();
+  dbMock.saveCharacterAndMarketState.mockImplementation(async () => true);
 });
 
 afterEach(() => {
@@ -555,13 +560,17 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
 
   it('a lease-fenced write restores the copy and kicks the displaced zombie', async () => {
     const rig = makeRig();
+    const restores = vi.fn(rig.custody.restoreCopy);
+    rig.custody.restoreCopy = restores;
     rig.db.failNextEscrow = 'lease_lost';
     const res = await createListing(rig);
     expect(res).toEqual({ ok: false, reason: 'lease_lost' });
-    expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    expect(restores).toHaveBeenCalledTimes(1);
     // The fence-out signal is the same one saveCharacter sends: the zombie is
     // torn down rather than left playing an unsaveable session.
     await vi.waitFor(() => expect(rig.session.left).toBe(true));
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(dbMock.saveCharacterAndMarketState).not.toHaveBeenCalled();
   });
 
   it('an ambiguous escrow throw quarantines instead of restoring', async () => {
@@ -664,16 +673,30 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.server.hasDirtyGuildBooks(SELLER_CHAR)).toBe(false);
   });
 
-  it('refuses contended instead of tearing when the dirty books cannot flush clear', async () => {
+  it('quarantines when a dirty guild book has lost its live shadow', async () => {
     const rig = makeRig();
-    // A dirty mark for a guild with NO loaded book: the flush save SKIPS it
-    // (nothing to serialize), so the mark survives and the in-job re-check
-    // must refuse rather than commit a character row alone.
-    rig.session.dirtyGuildBanks.set(999, 1);
-    const res = await createListing(rig);
-    expect(res).toEqual({ ok: false, reason: 'contended' });
     expect(rig.bagsHold(EPIC_ITEM)).toBe(true);
+    // A dirty mark for a guild with NO loaded book is an impossible terminal
+    // state: the character half cannot be proved against its book half. The
+    // flush must abandon this live session instead of advertising a retry that
+    // can never make the missing shadow reappear.
+    rig.session.dirtyGuildBanks.set(999, 1);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await createListing(rig);
+    const logged = errSpy.mock.calls.map((call) => String(call[0]));
+    errSpy.mockRestore();
+    expect(res).toEqual({ ok: false, reason: 'character_invalid' });
+    // The terminal kick may already have removed the live player by the time
+    // the request settles. Durability is the proof that matters: neither the
+    // character/book save nor the listing write touched the pre-request row,
+    // which still contains the item established above.
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
     expect(rig.db.escrowSaves).toHaveLength(0);
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    expect(
+      logged.some((line) => line.includes('guild bank escrow rolled back for guild 999')),
+    ).toBe(true);
   });
 
   it('refuses contended when the guild-book flush THROWS, never a 500', async () => {
@@ -1381,6 +1404,106 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
   });
 
+  it('quarantines and counts a durable bank-ledger ceiling refusal', async () => {
+    const rig = makeRig();
+    const reservation = rig.session.bankLedgerJournal.reserveVaultConsumption(
+      [{ itemId: 'copper_ore', count: 1 }],
+      0,
+    );
+    if (!reservation) throw new Error('expected a ledger reservation');
+    reservation.commit();
+    let refusals = 0;
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        refusals++;
+      },
+    });
+    const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+    dbMock.saveCharacterState.mockRejectedValueOnce(refusal);
+
+    await expect(rig.server.saveCharacter(rig.session)).rejects.toBe(refusal);
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(refusals).toBe(1);
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1);
+  });
+
+  it('quarantines a market-only growth refusal and completes the terminal wire teardown', async () => {
+    const rig = makeRig();
+    const rec = recordingWs();
+    rig.session.ws = rec.ws as never;
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    const reservation = rig.session.bankLedgerJournal.reserveVaultConsumption(
+      [{ itemId: 'copper_ore', count: 1 }],
+      0,
+    );
+    if (!reservation) throw new Error('expected a ledger reservation');
+    reservation.commit();
+
+    let refusals = 0;
+    const guildIncidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        refusals++;
+      },
+      guildBankIncident(kind) {
+        guildIncidents.push(kind);
+      },
+    });
+    const refusal = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+    dbMock.saveCharacterAndMarketState.mockRejectedValueOnce(refusal);
+
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).rejects.toBe(refusal);
+    expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+    expect(dbMock.saveCharacterAndGuildBankState).not.toHaveBeenCalled();
+    expect(rig.session.escrowQuarantined).toBe(true);
+    expect(refusals).toBe(1);
+    expect(guildIncidents).toEqual([]);
+
+    await vi.waitFor(() => expect(rig.session.left).toBe(true));
+    expect(errorFrames(rec.sent)).toEqual([
+      { t: 'error', error: 'character state could not be saved' },
+    ]);
+    expect(rec.close).toHaveBeenCalledTimes(1);
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).resolves.toBe(false);
+    expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(1);
+  });
+
+  it('propagates an ordinary market-only save error without quarantining the session', async () => {
+    const rig = makeRig();
+    expect(rig.session.dirtyGuildBanks.size).toBe(0);
+    const reservation = rig.session.bankLedgerJournal.reserveVaultConsumption(
+      [{ itemId: 'copper_ore', count: 1 }],
+      0,
+    );
+    if (!reservation) throw new Error('expected a ledger reservation');
+    reservation.commit();
+
+    let refusals = 0;
+    const guildIncidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused() {
+        refusals++;
+      },
+      guildBankIncident(kind) {
+        guildIncidents.push(kind);
+      },
+    });
+    const dbError = new Error('market save unavailable');
+    dbMock.saveCharacterAndMarketState.mockRejectedValueOnce(dbError);
+
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).rejects.toBe(dbError);
+    expect(rig.session.escrowQuarantined).toBe(false);
+    expect(refusals).toBe(0);
+    expect(guildIncidents).toEqual([]);
+
+    await expect(rig.server.saveCharacter(rig.session, { withMarket: true })).resolves.toBe(true);
+    expect(dbMock.saveCharacterAndMarketState).toHaveBeenCalledTimes(2);
+  });
+
   it('a save queue never admits a second storage purchase behind its captured effect', async () => {
     const rig = makeRig();
     const meta = requirePlayerMeta(rig);
@@ -1406,7 +1529,7 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
   });
 
-  it('false and throwing saves retain staged storage effects for a later commit', async () => {
+  it('a throwing save retains staged storage effects for a later commit', async () => {
     const rig = makeRig();
     const effect = storageEffect('storage-retry');
     requirePlayerMeta(rig).bank.purchasedSlots = 6;
@@ -1416,17 +1539,25 @@ describe('the escrow critical section rides the per-character save queue (H5)', 
     await expect(rig.server.saveCharacter(rig.session)).rejects.toThrow('db down');
     expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
 
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
+    expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
+  });
+
+  it('a lease-fenced save never retries staged effects from the displaced session', async () => {
+    const rig = makeRig();
+    const effect = storageEffect('storage-fenced');
+    requirePlayerMeta(rig).bank.purchasedSlots = 6;
+    expect(rig.server.stageStorageAppliedEffect(effect)).toBe(true);
+
     // A real lease-fence miss stays false for the displaced lease. Mark this
-    // fixture as already departing so the one-shot false does not schedule a
-    // second, unrealistically successful leave save behind this assertion.
+    // fixture as already departing so the wire teardown is outside this pin.
     rig.session.left = true;
     dbMock.saveCharacterState.mockResolvedValueOnce(false);
     await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
     expect(rig.session.pendingStorageAppliedEffects).toEqual([effect]);
-
-    rig.session.left = false;
-    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(true);
-    expect(rig.session.pendingStorageAppliedEffects).toEqual([]);
+    expect(rig.session.escrowQuarantined).toBe(true);
+    await expect(rig.server.saveCharacter(rig.session)).resolves.toBe(false);
+    expect(dbMock.saveCharacterState).toHaveBeenCalledTimes(1);
   });
 
   it('a missing serializable character refuses while a storage effect is pending', async () => {

@@ -1,10 +1,10 @@
-// Shared authoritative-echo latch for the guild-bank and Materials Vault gold
-// ladders. Both commands are fire-and-forget and carry no quoted price. After
-// one confirmation, the online IWorld mirror can still show the old rung for a
-// tick; enabling that stale button lets a second activation buy the next rung
-// at a price the player never saw. The latch therefore releases only when the
-// mirrored rung reaches the expected revision, a matching refusal arrives, or
-// the bounded lost-echo timer expires.
+// Shared authoritative-echo latch for the personal-bank socket, guild-bank,
+// and Materials Vault gold ladders. All three commands are fire-and-forget and
+// carry no quoted price. After one confirmation, the online IWorld mirror can
+// still show the old rung for a tick; enabling that stale button lets a second
+// activation buy the next rung at a price the player never saw. The latch
+// therefore releases only when the mirrored rung reaches the expected
+// revision, a matching refusal arrives, or the bounded lost-echo timer expires.
 
 export const STORAGE_RUNG_ECHO_TIMEOUT_MS = 12_000;
 

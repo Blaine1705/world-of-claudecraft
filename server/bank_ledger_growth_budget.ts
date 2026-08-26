@@ -52,7 +52,7 @@ export function bankLedgerGrowthBudgetSchema(schemaName = 'public'): string {
   const accumulatorRegprocedure = `${schema}.accumulate_bank_ledger_growth_budget()`;
   const enforcerRegprocedure = `${schema}.enforce_bank_ledger_growth_budget()`;
   return `
-CREATE TABLE IF NOT EXISTS ${schema}.bank_ledger_growth_budget (
+CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget (
   singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
   committed_rows BIGINT NOT NULL CHECK (committed_rows >= 0),
   hard_limit_rows BIGINT NOT NULL CHECK (hard_limit_rows > 0),
@@ -62,15 +62,15 @@ CREATE TABLE IF NOT EXISTS ${schema}.bank_ledger_growth_budget (
 -- This table has no committed rows in healthy operation. Its one row per
 -- ledger-writing transaction exists only until the deferred trigger consumes
 -- it during COMMIT; rollback removes it together with the ledger insert.
-CREATE TABLE IF NOT EXISTS ${schema}.bank_ledger_growth_pending (
+CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending (
   transaction_id xid8 PRIMARY KEY,
   inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
 );
 
-CREATE OR REPLACE FUNCTION ${schema}.accumulate_bank_ledger_growth_budget()
+CREATE OR REPLACE FUNCTION "__woc_bank_ledger_growth_schema__".accumulate_bank_ledger_growth_budget()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = pg_catalog, ${schema}, pg_temp
+SET search_path = pg_catalog, "__woc_bank_ledger_growth_schema__", pg_temp
 AS $$
 DECLARE
   inserted_rows BIGINT;
@@ -80,19 +80,19 @@ BEGIN
     RETURN NULL;
   END IF;
 
-  INSERT INTO ${schema}.bank_ledger_growth_pending (transaction_id, inserted_rows)
+  INSERT INTO "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending (transaction_id, inserted_rows)
   VALUES (pg_catalog.pg_current_xact_id(), inserted_rows)
   ON CONFLICT (transaction_id) DO UPDATE
-    SET inserted_rows = ${schema}.bank_ledger_growth_pending.inserted_rows
+    SET inserted_rows = "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending.inserted_rows
                       + EXCLUDED.inserted_rows;
   RETURN NULL;
 END
 $$;
 
-CREATE OR REPLACE FUNCTION ${schema}.enforce_bank_ledger_growth_budget()
+CREATE OR REPLACE FUNCTION "__woc_bank_ledger_growth_schema__".enforce_bank_ledger_growth_budget()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SET search_path = pg_catalog, ${schema}, pg_temp
+SET search_path = pg_catalog, "__woc_bank_ledger_growth_schema__", pg_temp
 AS $$
 DECLARE
   attempted_rows BIGINT;
@@ -102,14 +102,14 @@ BEGIN
   -- Several ledger statements queue several deferred trigger events for the
   -- same transaction. Exactly one event wins this DELETE and applies the
   -- final accumulated count; every later event observes no row and is inert.
-  DELETE FROM ${schema}.bank_ledger_growth_pending
+  DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
    WHERE transaction_id = NEW.transaction_id
   RETURNING inserted_rows INTO attempted_rows;
   IF NOT FOUND THEN
     RETURN NULL;
   END IF;
 
-  UPDATE ${schema}.bank_ledger_growth_budget
+  UPDATE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
      SET committed_rows = committed_rows + attempted_rows,
          updated_at = now()
    WHERE singleton = TRUE
@@ -122,7 +122,7 @@ BEGIN
 
   SELECT committed_rows, hard_limit_rows
     INTO before_rows, stored_limit
-    FROM ${schema}.bank_ledger_growth_budget
+    FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
    WHERE singleton = TRUE;
   IF NOT FOUND THEN
     RAISE EXCEPTION USING
@@ -151,7 +151,7 @@ DECLARE
   budget_initialized BOOLEAN;
 BEGIN
   SELECT EXISTS (
-    SELECT 1 FROM ${schema}.bank_ledger_growth_budget WHERE singleton = TRUE
+    SELECT 1 FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget WHERE singleton = TRUE
   ) INTO budget_initialized;
   SELECT EXISTS (
     SELECT 1
@@ -224,7 +224,7 @@ BEGIN
       MESSAGE = 'initialized bank ledger growth budget is missing an enforcement trigger';
   END IF;
   IF budget_initialized AND EXISTS (
-    SELECT 1 FROM ${schema}.bank_ledger_growth_pending
+    SELECT 1 FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
   ) THEN
     RAISE EXCEPTION USING
       ERRCODE = '55000',
@@ -235,37 +235,37 @@ BEGIN
     -- CREATE TRIGGER holds this lock too, but spelling it before COUNT makes
     -- the mixed-release bootstrap boundary explicit and independent of DDL
     -- lock implementation details.
-    LOCK TABLE ${schema}.bank_ledger IN SHARE ROW EXCLUSIVE MODE;
-    DELETE FROM ${schema}.bank_ledger_growth_pending;
+    LOCK TABLE "__woc_bank_ledger_growth_schema__".bank_ledger IN SHARE ROW EXCLUSIVE MODE;
+    DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending;
 
     IF NOT valid_commit_trigger THEN
       EXECUTE 'CREATE CONSTRAINT TRIGGER bank_ledger_growth_budget_commit
-        AFTER INSERT OR UPDATE ON ${schema}.bank_ledger_growth_pending
+        AFTER INSERT OR UPDATE ON "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
         DEFERRABLE INITIALLY DEFERRED
         FOR EACH ROW
-        EXECUTE FUNCTION ${schema}.enforce_bank_ledger_growth_budget()';
+        EXECUTE FUNCTION "__woc_bank_ledger_growth_schema__".enforce_bank_ledger_growth_budget()';
     END IF;
 
     IF NOT valid_insert_trigger THEN
       EXECUTE 'CREATE TRIGGER bank_ledger_growth_budget_insert
-        AFTER INSERT ON ${schema}.bank_ledger
+        AFTER INSERT ON "__woc_bank_ledger_growth_schema__".bank_ledger
         REFERENCING NEW TABLE AS inserted_bank_ledger_rows
         FOR EACH STATEMENT
-        EXECUTE FUNCTION ${schema}.accumulate_bank_ledger_growth_budget()';
+        EXECUTE FUNCTION "__woc_bank_ledger_growth_schema__".accumulate_bank_ledger_growth_budget()';
     END IF;
 
-    INSERT INTO ${schema}.bank_ledger_growth_budget
+    INSERT INTO "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
       (singleton, committed_rows, hard_limit_rows)
     -- Deliberately allow committed_rows to start above the ceiling. The
     -- enforcement predicate then refuses every future insert without making
     -- unrelated gameplay unavailable during an emergency cap rollout.
     SELECT TRUE, COUNT(*)::bigint, ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}
-      FROM ${schema}.bank_ledger;
+      FROM "__woc_bank_ledger_growth_schema__".bank_ledger;
   END IF;
 
   IF EXISTS (
     SELECT 1
-      FROM ${schema}.bank_ledger_growth_budget
+      FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
      WHERE singleton = TRUE
        AND hard_limit_rows <> ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}
   ) THEN
@@ -277,9 +277,9 @@ END
 $$;
 
 SELECT committed_rows, hard_limit_rows
-  FROM ${schema}.bank_ledger_growth_budget
+  FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
  WHERE singleton = TRUE;
-`;
+`.replaceAll('"__woc_bank_ledger_growth_schema__"', schema);
 }
 
 export const BANK_LEDGER_GROWTH_BUDGET_SCHEMA = bankLedgerGrowthBudgetSchema();
@@ -302,9 +302,11 @@ export class BankLedgerGrowthLimitExceeded extends Error {
 export interface BankLedgerGrowthBudgetReadout {
   readonly committedRows: number | null;
   readonly hardLimitRows: number;
+  readonly observedAtMs: number | null;
 }
 
 let observedCommittedRows: number | null = null;
+let observedAtMs: number | null = null;
 
 function safeDbInteger(value: unknown): number | null {
   if (typeof value !== 'number' && typeof value !== 'string') return null;
@@ -317,17 +319,32 @@ function safeDbInteger(value: unknown): number | null {
 export function observeBankLedgerGrowthBudget(
   committedRows: unknown,
   hardLimitRows: unknown = BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS,
-): void {
+  nowMs: number = Date.now(),
+): boolean {
   const committed = safeDbInteger(committedRows);
   const limit = safeDbInteger(hardLimitRows);
-  if (committed === null || limit !== BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS) return;
+  if (
+    committed === null ||
+    limit !== BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS ||
+    !Number.isFinite(nowMs) ||
+    nowMs < 0
+  ) {
+    return false;
+  }
+  // The durable counter is monotonic. A refusal can report a newer value while
+  // a periodic SELECT that took its snapshot just before that COMMIT is still
+  // in flight; never let the late response move the exported gauge backward.
+  if (observedCommittedRows !== null && committed < observedCommittedRows) return true;
   observedCommittedRows = committed;
+  observedAtMs = nowMs;
+  return true;
 }
 
 export function bankLedgerGrowthBudgetReadout(): BankLedgerGrowthBudgetReadout {
   return Object.freeze({
     committedRows: observedCommittedRows,
     hardLimitRows: BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS,
+    observedAtMs,
   });
 }
 

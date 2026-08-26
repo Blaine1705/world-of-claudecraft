@@ -30,6 +30,12 @@ import {
   type BankLedgerBatchWriteResult,
 } from './bank_ledger_batch_db';
 import {
+  BANK_LEDGER_GROWTH_BUDGET_SCHEMA,
+  BankLedgerGrowthLimitExceeded,
+  bankLedgerGrowthLimitFromError,
+  observeBankLedgerGrowthBudget,
+} from './bank_ledger_growth_budget';
+import {
   attachBankLedgerCommittedPrefixToError,
   type BankLedgerSaveEffects,
   characterUpdateStatement,
@@ -1404,6 +1410,15 @@ export async function ensureSchema(): Promise<void> {
     // Apply storage purchase parent triggers last, so first-rollout table locks
     // are held only for this final fragment before COMMIT.
     await client.query(STORAGE_PURCHASE_SCHEMA);
+    // The first durable-ledger ceiling install takes a SHARE ROW EXCLUSIVE lock
+    // while it seeds an exact row count. Keep it as the final schema fragment so
+    // that lock is held across no unrelated boot work. Later boots validate the
+    // trigger/counter shape without taking the ledger table lock or scanning it.
+    const bankLedgerGrowthBudget = await client.query(BANK_LEDGER_GROWTH_BUDGET_SCHEMA);
+    observeBankLedgerGrowthBudget(
+      bankLedgerGrowthBudget.rows[0]?.committed_rows,
+      bankLedgerGrowthBudget.rows[0]?.hard_limit_rows,
+    );
     await client.query('COMMIT');
     // Open the market write gate only AFTER a successful COMMIT, so no market
     // write can land before the marker is durable. Opens on the no-op path too
@@ -3450,8 +3465,12 @@ export async function saveCharacterState(
     return true;
   } catch (err) {
     await transaction.rollback();
-    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
-    throw err;
+    const failure =
+      err instanceof BankLedgerGrowthLimitExceeded
+        ? err
+        : (bankLedgerGrowthLimitFromError(err) ?? err);
+    attachBankLedgerCommittedPrefixToError(failure, ledger, ledgerWrite);
+    throw failure;
   } finally {
     transaction.release();
   }
@@ -3528,8 +3547,12 @@ export async function saveCharacterAndMarketState(
     return true;
   } catch (err) {
     await transaction.rollback();
-    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
-    throw err;
+    const failure =
+      err instanceof BankLedgerGrowthLimitExceeded
+        ? err
+        : (bankLedgerGrowthLimitFromError(err) ?? err);
+    attachBankLedgerCommittedPrefixToError(failure, ledger, ledgerWrite);
+    throw failure;
   } finally {
     transaction.release();
   }
@@ -3598,8 +3621,12 @@ export async function saveCharacterAndGuildBankState(
     return true;
   } catch (err) {
     await transaction.rollback();
-    attachBankLedgerCommittedPrefixToError(err, ledger, ledgerWrite);
-    throw err;
+    const failure =
+      err instanceof BankLedgerGrowthLimitExceeded
+        ? err
+        : (bankLedgerGrowthLimitFromError(err) ?? err);
+    attachBankLedgerCommittedPrefixToError(failure, ledger, ledgerWrite);
+    throw failure;
   } finally {
     transaction.release();
   }
@@ -3641,6 +3668,35 @@ export interface GuildBankRow {
 // statement allowance like every other known-long boot read (a slow boot
 // must load the books, not fail into the all-banks-inert arm).
 export const GUILD_BANK_BOOT_BATCH = 500;
+
+/** Targeted load for a guild created after this process's boot snapshot (or
+ *  committed ambiguously on another process). Never synthesize an empty book
+ *  when the guild itself is absent: callers may only mirror a returned row. */
+export async function loadGuildBankRow(guildId: number): Promise<GuildBankRow | null> {
+  if (!Number.isSafeInteger(guildId) || guildId <= 0) {
+    throw new RangeError('guild bank guildId must be a positive safe integer');
+  }
+  const res = await pool.query(
+    `SELECT g.id AS guild_id,
+            (gb.guild_id IS NOT NULL) AS has_row,
+            b.data_bytes,
+            CASE WHEN b.data_bytes <= $2 THEN gb.data ELSE NULL END AS data
+       FROM guilds g
+       LEFT JOIN guild_banks gb ON gb.guild_id = g.id
+       LEFT JOIN LATERAL (SELECT COALESCE(octet_length(gb.data::text), 0) AS data_bytes) b
+         ON true
+      WHERE g.realm = $1 AND g.id = $3`,
+    [REALM, GUILD_BANK_ROW_MAX_BYTES, guildId],
+  );
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    guildId: Number(row.guild_id),
+    data: row.data ?? null,
+    oversized: row.has_row === true && Number(row.data_bytes) > GUILD_BANK_ROW_MAX_BYTES,
+    dataBytes: Number(row.data_bytes) || 0,
+  };
+}
 
 export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
   const out: GuildBankRow[] = [];
@@ -4808,53 +4864,61 @@ export async function loadGuildBankLogRows(
  *  the id sequence assigns in insert order. */
 export async function insertBankLedgerRows(rows: readonly BankLedgerRow[]): Promise<void> {
   if (rows.length === 0) return;
-  await pool.query(
-    `INSERT INTO bank_ledger
+  try {
+    await pool.query(
+      `INSERT INTO bank_ledger
        (realm, character_id, account_id, op, item_id, count, instance,
         copper_delta, purchased_slots_after, container, container_id,
         counterparty_copper_delta, counterparty_count)
-     SELECT * FROM unnest(
-       $1::text[], $2::int[], $3::int[], $4::text[], $5::text[], $6::int[], $7::jsonb[],
-       $8::bigint[], $9::int[], $10::text[], $11::bigint[], $12::bigint[], $13::int[])`,
-    [
-      rows.map((r) => r.realm),
-      rows.map((r) => r.characterId),
-      rows.map((r) => r.accountId),
-      rows.map((r) => r.op),
-      rows.map((r) => r.itemId),
-      rows.map((r) => r.count),
-      rows.map((r) => (r.instance == null ? null : JSON.stringify(r.instance))),
-      rows.map((r) => r.copperDelta),
-      rows.map((r) => r.purchasedSlotsAfter),
-      rows.map((r) => r.container),
-      rows.map((r) => r.containerId),
-      rows.map((r) => r.counterpartyCopperDelta ?? null),
-      rows.map((r) => r.counterpartyCount ?? null),
-    ],
-  );
+       SELECT * FROM unnest(
+         $1::text[], $2::int[], $3::int[], $4::text[], $5::text[], $6::int[], $7::jsonb[],
+         $8::bigint[], $9::int[], $10::text[], $11::bigint[], $12::bigint[], $13::int[])`,
+      [
+        rows.map((r) => r.realm),
+        rows.map((r) => r.characterId),
+        rows.map((r) => r.accountId),
+        rows.map((r) => r.op),
+        rows.map((r) => r.itemId),
+        rows.map((r) => r.count),
+        rows.map((r) => (r.instance == null ? null : JSON.stringify(r.instance))),
+        rows.map((r) => r.copperDelta),
+        rows.map((r) => r.purchasedSlotsAfter),
+        rows.map((r) => r.container),
+        rows.map((r) => r.containerId),
+        rows.map((r) => r.counterpartyCopperDelta ?? null),
+        rows.map((r) => r.counterpartyCount ?? null),
+      ],
+    );
+  } catch (error) {
+    throw bankLedgerGrowthLimitFromError(error) ?? error;
+  }
 }
 
 export async function insertBankLedgerRow(row: BankLedgerRow): Promise<void> {
-  await pool.query(
-    `INSERT INTO bank_ledger
+  try {
+    await pool.query(
+      `INSERT INTO bank_ledger
        (realm, character_id, account_id, op, item_id, count, instance,
         copper_delta, purchased_slots_after, container, container_id,
         counterparty_copper_delta, counterparty_count)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-    [
-      row.realm,
-      row.characterId,
-      row.accountId,
-      row.op,
-      row.itemId,
-      row.count,
-      row.instance == null ? null : JSON.stringify(row.instance),
-      row.copperDelta,
-      row.purchasedSlotsAfter,
-      row.container,
-      row.containerId,
-      row.counterpartyCopperDelta ?? null,
-      row.counterpartyCount ?? null,
-    ],
-  );
+      [
+        row.realm,
+        row.characterId,
+        row.accountId,
+        row.op,
+        row.itemId,
+        row.count,
+        row.instance == null ? null : JSON.stringify(row.instance),
+        row.copperDelta,
+        row.purchasedSlotsAfter,
+        row.container,
+        row.containerId,
+        row.counterpartyCopperDelta ?? null,
+        row.counterpartyCount ?? null,
+      ],
+    );
+  } catch (error) {
+    throw bankLedgerGrowthLimitFromError(error) ?? error;
+  }
 }

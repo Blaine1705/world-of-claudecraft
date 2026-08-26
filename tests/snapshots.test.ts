@@ -2,12 +2,17 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { completeCraftCast } from './helpers/enchant_family_cast';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndGuildBankState: vi.fn(async () => true),
   saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -24,10 +29,18 @@ vi.mock('../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { createBackgroundDbGate } from '../server/background_db_gate';
 import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
-import { saveCharacterState } from '../server/db';
+import {
+  saveCharacterAndGuildBankState,
+  saveCharacterAndMarketState,
+  saveCharacterState,
+  saveMailState,
+  saveMarketState,
+} from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -2054,6 +2067,14 @@ describe('autosaves', () => {
   beforeEach(() => {
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(true);
+    vi.mocked(saveCharacterAndGuildBankState).mockReset();
+    vi.mocked(saveCharacterAndGuildBankState).mockResolvedValue(true);
+    vi.mocked(saveCharacterAndMarketState).mockReset();
+    vi.mocked(saveCharacterAndMarketState).mockResolvedValue(true);
+    vi.mocked(saveMarketState).mockReset();
+    vi.mocked(saveMarketState).mockResolvedValue();
+    vi.mocked(saveMailState).mockReset();
+    vi.mocked(saveMailState).mockResolvedValue();
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
@@ -2109,6 +2130,209 @@ describe('autosaves', () => {
 
     const savedCharacterIds = vi.mocked(saveCharacterState).mock.calls.map((call) => call[0]);
     expect(savedCharacterIds.sort((a, b) => a - b)).toEqual([1, 1, 2, 2]);
+  });
+
+  it('holds each character save under the shared major-producer permit', async () => {
+    const gate = createBackgroundDbGate(3, 2); // one admitted producer
+    const server = new GameServer(undefined, gate);
+    joinServer(server, fakeWs(), 1, 'Testa');
+    joinServer(server, fakeWs(), 2, 'Testb');
+    joinServer(server, fakeWs(), 3, 'Testc');
+    let releaseDb!: () => void;
+    const dbHold = new Promise<void>((resolve) => {
+      releaseDb = resolve;
+    });
+    vi.mocked(saveCharacterState).mockImplementation(async () => {
+      await dbHold;
+      return true;
+    });
+
+    const saving = server.saveAll('autosave');
+    await vi.waitFor(() => {
+      expect(saveCharacterState).toHaveBeenCalledTimes(1);
+      expect(gate.stats()).toMatchObject({ inFlight: 1, waiting: 2, max: 1 });
+    });
+    releaseDb();
+    await saving;
+
+    expect(saveCharacterState).toHaveBeenCalledTimes(3);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 3 });
+  });
+
+  it('joins the character FIFO before taking the shared DB permit', async () => {
+    const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const order: string[] = [];
+    let markHeadStarted!: () => void;
+    const headStarted = new Promise<void>((resolve) => {
+      markHeadStarted = resolve;
+    });
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = server.enqueueCharacterWrite(session.characterId, async () => {
+      markHeadStarted();
+      await headHold;
+    });
+    await headStarted;
+
+    // Model the marketplace custody adapter: it already owns the character
+    // FIFO before asking for a background permit.
+    const custody = server.enqueueCharacterWrite(session.characterId, async () => {
+      const permit = await gate.acquire();
+      if (!permit) throw new Error('custody permit unexpectedly refused');
+      try {
+        order.push('custody');
+      } finally {
+        permit.release();
+      }
+    });
+    vi.mocked(saveCharacterState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('autosave');
+      return true;
+    });
+    const autosave = server.saveAll('autosave');
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // The old permit->FIFO order held this one permit here. Custody was ahead
+    // in the same FIFO and waited for it forever, while autosave waited behind
+    // custody. No producer may consume the permit until its FIFO turn begins.
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, custody, autosave]);
+    expect(order).toEqual(['custody', 'autosave']);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('joins the market FIFO before taking the shared DB permit', async () => {
+    const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const guildId = 913;
+    server.sim.loadGuildBank(guildId, {
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
+    session.dirtyGuildBanks.set(guildId, 1);
+
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => headHold) as Promise<void>;
+    const order: string[] = [];
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('character');
+      return true;
+    });
+    vi.mocked(saveMarketState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('market');
+    });
+
+    // The dirty-book autosave owns the character FIFO and queues first on the
+    // market writer. A periodic market save queues behind it. Neither may take
+    // the sole DB permit before its market-FIFO turn begins: the old
+    // permit->market order made the market save hold the permit while waiting
+    // behind a character save that needed that same permit.
+    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
+    const characterSave = server.saveAll('autosave');
+    await vi.waitFor(() => {
+      // The character FIFO is running and has reached the held market writer,
+      // so its market entry necessarily precedes the periodic one below.
+      expect(serialize).toHaveBeenCalled();
+    });
+    const marketSave = server.saveMarket();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, characterSave, marketSave]);
+    expect(order).toEqual(['character', 'market']);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('gates WOC dirty-book preflush and mail persistence at their innermost DB calls', async () => {
+    const gate = createBackgroundDbGate(1, 0);
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const guildId = 914;
+    server.sim.loadGuildBank(guildId, {
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
+    session.dirtyGuildBanks.set(guildId, 1);
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      return true;
+    });
+    vi.mocked(saveMailState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+    });
+
+    await server.flushDirtyGuildBooks(session.characterId);
+    await server.persistMailBlob();
+
+    expect(saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
+    expect(saveMailState).toHaveBeenCalledTimes(1);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('unlinks a cancelled recovery save before it starts in the character FIFO', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    vi.mocked(saveCharacterState).mockClear();
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = server.enqueueCharacterWrite(session.characterId, async () => headHold);
+    const controller = new AbortController();
+    const cancelled = server.saveCharacter(session, { signal: controller.signal });
+    await Promise.resolve();
+    controller.abort();
+
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+    releaseHead();
+    await head;
+  });
+
+  it('unlinks a cancelled recovery save before it starts in the market FIFO', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    let releaseMarket!: () => void;
+    const marketHold = new Promise<void>((resolve) => {
+      releaseMarket = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => marketHold) as Promise<void>;
+    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
+    const controller = new AbortController();
+    const cancelled = server.saveCharacter(session, {
+      withMarket: true,
+      signal: controller.signal,
+    });
+    await vi.waitFor(() => {
+      // The character FIFO is already running; its synchronous snapshot work
+      // completed before it queued behind the held market writer.
+      expect(serialize).toHaveBeenCalled();
+    });
+    controller.abort();
+
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(saveCharacterAndMarketState).not.toHaveBeenCalled();
+    releaseMarket();
+    await head;
   });
 });
 
@@ -5261,19 +5485,19 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
-  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from the self-block emitters (multi-line lockouts incl.)', () => {
-    // EVERY file that emits a self-block delta key, not just game.ts. Bank
-    // Storage phase 15 moved the bank family's emission into
-    // server/bank_wire.ts (game.ts sits at a zero-margin monolith ceiling, so
-    // new wire surface lands in a sibling), and that silently took `bank` and
-    // `bpsl` out of this guard's reach: the scrape came back 87 while the
-    // registry said 88, which is the only reason the move was noticed. A
-    // future extraction of another key group MUST add its file here, or this
-    // anti-drift pin quietly stops covering it.
-    const EMITTER_FILES = ['server/game.ts', 'server/bank_wire.ts'];
-    const raw = EMITTER_FILES.map((f) => readFileSync(resolve(process.cwd(), f), 'utf8')).join(
-      '\n',
-    );
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from every server emitter (multi-line lockouts incl.)', () => {
+    // Scan the whole recursive server tree: game.ts is the original emitter,
+    // while Bank Storage moved the bank family into bank_wire.ts and the
+    // Materials Vault family into vault_wire.ts. New wire surface belongs in
+    // siblings too, including nested ones, and must join this registry without
+    // relying on a hand-maintained emitter-file inventory.
+    const serverSources = tsFilesUnder(resolve(process.cwd(), 'server'));
+    expect(
+      serverSources.length,
+      'the delta-emitter scrape reads the whole server tree, not one level',
+    ).toBeGreaterThanOrEqual(300);
+    expect(serverSources.map(({ file }) => file)).toContain('vault_wire.ts');
+    const raw = serverSources.map(({ full }) => readFileSync(full, 'utf8')).join('\n');
     // Strip comments before scraping so a commented-out call cannot keep its key
     // in the scraped set (the `(^|[^:])` guard keeps protocol `://` intact).
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -5301,6 +5525,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // game.ts left this scrape one short and only the count said so.
     expect(scraped.has('bank')).toBe(true);
     expect(scraped.has('bpsl')).toBe(true);
+    expect(scraped.has('vault')).toBe(true);
+    expect(scraped.has('cvault')).toBe(true);
     // ...and the narrowing really narrows. A member `emit` is not a delta call,
     // and asserting it on a synthetic source keeps the claim honest even while
     // neither emitter file happens to contain one.
@@ -5334,6 +5560,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('bank')).toBe(true);
     expect(scraped.has('bpsl')).toBe(true);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('scans server emitters only through the shared recursive TypeScript walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
   it('mntOwn is encoded INSIDE the heavy self gate (its inputs sit behind it)', () => {

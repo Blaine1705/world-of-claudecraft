@@ -655,7 +655,7 @@ describe('guild pane actions round-trip through the facet', () => {
     expect(echoed.hasAttribute('aria-busy')).toBe(false);
   });
 
-  it('refuses a stale visible offer instead of consenting to the next rung', () => {
+  it('refuses a stale visible offer, announces the refreshed price, and focuses that offer', async () => {
     const h = harness(guildInfo());
     h.window.open();
     clickGuildTab(h);
@@ -670,9 +670,44 @@ describe('guild pane actions round-trip through the facet', () => {
 
     expect(h.calls).not.toContain('guildBankBuySlots');
     expect(document.querySelector('.gbank-buy-prompt')).toBeNull();
-    expect(h.root.querySelector('.bank-buy-btn')?.textContent).toContain(
-      String(GUILD_BANK_RUNG_PRICES[2]),
+    const refreshed = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+    expect(refreshed.textContent).toContain(String(GUILD_BANK_RUNG_PRICES[2]));
+    expect(document.activeElement).toBe(refreshed);
+    const visible = h.root.querySelector('.gbank-purchase-status');
+    const live = h.root.querySelector('[data-gbank-purchase-live]');
+    const message =
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.';
+    expect(visible?.textContent).toBe(message);
+    expect(visible?.getAttribute('aria-live')).toBeNull();
+    expect(live?.getAttribute('role')).toBe('status');
+    expect(live?.getAttribute('aria-live')).toBe('polite');
+    expect(live?.textContent).toBe('');
+    await Promise.resolve();
+    expect(live?.textContent).toBe(message);
+  });
+
+  it('rejects a same-rung price change and focuses the refreshed guild offer', async () => {
+    const h = harness(guildInfo());
+    h.window.open();
+    clickGuildTab(h);
+    (h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement).click();
+
+    // Hold purchasedSlots fixed so only the exact quoted-price guard can
+    // reject this mixed/stale snapshot; the command itself carries no price.
+    h.world.guildBankInfo = guildInfo({ nextExpansionPrice: 77_777 });
+    (document.querySelector('.gbank-buy-prompt .btn') as HTMLButtonElement).click();
+
+    expect(h.calls).not.toContain('guildBankBuySlots');
+    const refreshed = h.root.querySelector('.gbank-buy-row .bank-buy-btn') as HTMLButtonElement;
+    expect(refreshed.querySelector('.money-inline')?.textContent).toBe('77777');
+    expect(document.activeElement).toBe(refreshed);
+    expect(h.root.querySelector('.gbank-purchase-status')?.textContent).toBe(
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
     );
+    const live = h.root.querySelector('[data-gbank-purchase-live]');
+    expect(live?.textContent).toBe('');
+    await Promise.resolve();
+    expect(live?.textContent).toContain('The price changed before the purchase completed.');
   });
 
   it('keeps the latch across close, ignores generic errors, and releases on a guild refusal', () => {

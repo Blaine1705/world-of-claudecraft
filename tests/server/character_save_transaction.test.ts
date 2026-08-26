@@ -3,6 +3,7 @@ import type { QueryResult, QueryResultRow } from 'pg';
 import { describe, expect, it } from 'vitest';
 import {
   beginCharacterSaveTx,
+  CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS,
   CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
   CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS,
   prepareCharacterSaveEffects,
@@ -80,6 +81,19 @@ describe('bounded character save transaction', () => {
        SET LOCAL idle_in_transaction_session_timeout = '10s'`,
       'ROLLBACK',
     ]);
+    expect(client.releases).toEqual([undefined]);
+  });
+
+  it('uses the shorter server bound for a retry-safe recovery save', async () => {
+    const client = new FakeClient();
+    const controller = new AbortController();
+    const transaction = await beginCharacterSaveTx(client, 'recovery save', controller.signal);
+
+    expect(CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS).toBe(15_000);
+    expect(client.queries[1]).toContain('SET LOCAL statement_timeout = 15000');
+
+    await transaction.rollback();
+    transaction.release();
     expect(client.releases).toEqual([undefined]);
   });
 

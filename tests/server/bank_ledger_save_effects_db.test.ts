@@ -37,6 +37,12 @@ vi.mock('pg', () => ({
 }));
 
 import { BANK_LEDGER_BATCH_RECEIPTS_SCHEMA } from '../../server/bank_ledger_batch_db';
+import {
+  BANK_LEDGER_GROWTH_BUDGET_SCHEMA,
+  BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+  BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+  BankLedgerGrowthLimitExceeded,
+} from '../../server/bank_ledger_growth_budget';
 import type { SerializedBankLedgerOutboxRow } from '../../server/bank_ledger_outbox';
 import {
   bankLedgerCommittedPrefixForError,
@@ -201,12 +207,14 @@ interface ClientOptions {
   lostCommit?: boolean;
   claims?: readonly boolean[];
   abortOnCommit?: AbortController;
+  commitError?: unknown;
 }
 
 function clientStub(options: ClientOptions = {}) {
   const characterRows = options.characterRows ?? 1;
   const query = vi.fn(async (sql: string, values?: unknown[]) => {
     if (/^COMMIT/.test(sql) && options.abortOnCommit) options.abortOnCommit.abort();
+    if (/^COMMIT/.test(sql) && options.commitError) throw options.commitError;
     if (/SELECT id FROM accounts/i.test(sql)) {
       const requested = Array.isArray(values?.[0])
         ? (values[0] as number[])
@@ -323,6 +331,31 @@ describe('fenced character save ledger effects', () => {
     expect(sql.at(-1)).toBe('COMMIT');
     expect(h.pool.query).not.toHaveBeenCalled();
     expect(client.release).toHaveBeenCalledOnce();
+  });
+
+  it('translates the deferred growth ceiling refusal raised by COMMIT', async () => {
+    const raw = {
+      code: BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+      detail: JSON.stringify({
+        committed_rows: 10_000_000,
+        attempted_rows: 1,
+        hard_limit_rows: 10_000_000,
+      }),
+    };
+    const client = clientStub({ commitError: raw });
+    h.pool.connect.mockResolvedValueOnce(client);
+
+    await expect(
+      saveCharacterState(OWNER.characterId, 7, STATE, 'nonce-1', [], EFFECTS),
+    ).rejects.toMatchObject({
+      name: BankLedgerGrowthLimitExceeded.name,
+      committedRows: 10_000_000,
+      attemptedRows: 1,
+      hardLimitRows: 10_000_000,
+      cause: raw,
+    });
+    expect(sqlCalls(client)).toContain('ROLLBACK');
   });
 
   it('classifies a lost-COMMIT receipt before market/mail rows and COMMIT', async () => {
@@ -950,10 +983,13 @@ describe('bank ledger receipt schema boot wiring', () => {
       sql.includes('CREATE TABLE IF NOT EXISTS accounts'),
     );
     const receipts = h.bootCalls.indexOf(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
+    const growthBudget = h.bootCalls.indexOf(BANK_LEDGER_GROWTH_BUDGET_SCHEMA);
     const commit = h.bootCalls.indexOf('COMMIT');
     expect(core).toBeGreaterThanOrEqual(0);
     expect(core).toBeLessThan(receipts);
-    expect(receipts).toBeLessThan(commit);
-    expect(h.bootCalls.indexOf(STORAGE_PURCHASE_SCHEMA)).toBe(commit - 1);
+    expect(receipts).toBeLessThan(growthBudget);
+    expect(growthBudget).toBeLessThan(commit);
+    expect(h.bootCalls.indexOf(STORAGE_PURCHASE_SCHEMA)).toBe(growthBudget - 1);
+    expect(growthBudget).toBe(commit - 1);
   });
 });

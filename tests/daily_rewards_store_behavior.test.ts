@@ -112,13 +112,15 @@ function interceptStoreDecisions(
       body: string;
       onConfirm: () => void;
       onCancel?: () => void;
-    }) =>
+    }) => {
       capture({
         title: options.title,
         body: options.body,
         onOk: options.onConfirm,
         onCancel: options.onCancel,
-      }),
+      });
+      return true;
+    },
   });
 }
 
@@ -734,6 +736,9 @@ function charterHarness(
     rejectSpend?: boolean;
     /** Hold the spend open until the test resolves it, for the in-flight guard. */
     gate?: { wait: Promise<void> };
+    /** Exercise the real StoreDecisionPrompts path instead of recording the
+     *  decision, for prompt-stack ownership and collision coverage. */
+    realDecisions?: boolean;
     /** Give the stub world an identity, which is what turns DURABILITY on
      *  (src/ui/purchase_intent_durability.ts derives the storage row from
      *  `<class>_<name>` and writes nothing at all when the name is empty).
@@ -825,7 +830,9 @@ function charterHarness(
         },
     openClaudium: (onClosed) => claudiumReturns.push(onClosed),
   });
-  interceptStoreDecisions(window_, (decision) => dialogs.push(decision));
+  if (!options.realDecisions) {
+    interceptStoreDecisions(window_, (decision) => dialogs.push(decision));
+  }
   const internals = window_ as unknown as {
     renderStore(focus: 'open' | null, opts?: { background?: boolean }): Promise<void>;
     purchaseCharter(itemId: string): Promise<void>;
@@ -1899,6 +1906,53 @@ describe('WOC Store Strongbox charters', () => {
     h.dialogs[h.dialogs.length - 1].onCancel?.();
 
     expect(h.internals.charterFocus.peek()).toBeNull();
+  });
+
+  it('abandons the exact unsent charter intent when a competing confirm owns the stack', async () => {
+    const scope = { playerClass: 'warrior', name: 'PromptCollision' };
+    const rowName = `woc_purchase_intents_${scope.playerClass}_${scope.name}`;
+    const h = charterHarness({ purchasedSlots: 0, scope, realDecisions: true });
+    await h.internals.renderStore(null);
+    h.buyButton('strongbox_charter_1')?.focus();
+
+    // A global confirmation already owns the one dialog id. StoreDecisionPrompts
+    // must refuse a second modal instead of hiding or replacing that decision.
+    const competing = document.createElement('div');
+    competing.id = 'confirm-dialog';
+    document.body.appendChild(competing);
+
+    h.internals.requestCharterPurchase('strongbox_charter_1');
+
+    expect(document.getElementById('confirm-dialog')).toBe(competing);
+    expect(document.querySelector('.woc-store-prompt')).toBeNull();
+    expect(h.internals.charterIntents.isOpen('strongbox_charter_1')).toBe(false);
+    expect(h.internals.charterFocus.peek()).toBeNull();
+    expect(localStorage.getItem(rowName), 'the durable unsent intent was removed').toBeNull();
+    expect(h.spendCalls).toHaveLength(0);
+  });
+
+  it('keeps the intent and focus armed when the Store prompt opens successfully', async () => {
+    const scope = { playerClass: 'warrior', name: 'PromptOpened' };
+    const rowName = `woc_purchase_intents_${scope.playerClass}_${scope.name}`;
+    const h = charterHarness({ purchasedSlots: 0, scope, realDecisions: true });
+    await h.internals.renderStore(null);
+    h.buyButton('strongbox_charter_1')?.focus();
+
+    h.internals.requestCharterPurchase('strongbox_charter_1');
+
+    const prompt = document.querySelector<HTMLElement>('#confirm-dialog.woc-store-prompt');
+    expect(prompt).not.toBeNull();
+    expect(h.internals.charterIntents.isOpen('strongbox_charter_1')).toBe(true);
+    expect(h.internals.charterFocus.peek()).toBe('charter-strongbox_charter_1');
+    expect(localStorage.getItem(rowName)).toContain('strongbox_charter_1');
+    expect(h.root.inert).toBe(true);
+    expect(h.spendCalls).toHaveLength(0);
+
+    prompt?.querySelector<HTMLButtonElement>('[data-store-prompt-cancel]')?.click();
+    expect(h.internals.charterIntents.isOpen('strongbox_charter_1')).toBe(false);
+    expect(h.internals.charterFocus.peek()).toBeNull();
+    expect(h.root.inert).toBe(false);
+    expect(document.getElementById('confirm-dialog')).toBeNull();
   });
 
   it('close() bounds the focus stash to one visit, as it already bounds the refusals', async () => {

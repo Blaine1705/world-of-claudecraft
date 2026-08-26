@@ -1645,6 +1645,32 @@ describe('craft-from-vault stock delta (cvault)', () => {
     expect(meta.vault.stock.copper_ore).toBe(4);
   });
 
+  it('keeps every server-valid row past 256 keys through the snapshot decoder', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const { pid, meta } = seat(server, fw, 64, 'Cvaultwide', 0);
+    meta.vault.upgrades = 1;
+    meta.vault.stock = Object.fromEntries([
+      ...Array.from({ length: 300 }, (_, index) => [`future_material_${index}`, index + 1]),
+      ['x'.repeat(512), 1],
+      ['__proto__', 2],
+    ]);
+
+    broadcast(server);
+    const snap = lastSnap(fw.sent);
+    const wireStock = snap.self.cvault as Record<string, number>;
+    expect(Object.keys(wireStock)).toHaveLength(302);
+    expect(wireStock.future_material_299).toBe(300);
+    expect(wireStock['x'.repeat(512)]).toBe(1);
+    expect(Object.getOwnPropertyDescriptor(wireStock, '__proto__')?.value).toBe(2);
+
+    const client = bareClient(pid);
+    // biome-ignore lint/suspicious/noExplicitAny: applySnapshot is a ClientWorld internal
+    (client as any).applySnapshot(snap);
+    expect(client.craftVaultStock).toBe(wireStock);
+    expect(Object.keys(client.craftVaultStock ?? {})).toHaveLength(302);
+  });
+
   it("a DRAWABLE own '__proto__' row rides the cvault key end to end as data", () => {
     // The op ruling calls cvault '__proto__-safe end to end'; this arm pins
     // it on the wire, not just at the clone (the clone-side pin lives in

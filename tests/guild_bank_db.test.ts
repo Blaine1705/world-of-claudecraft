@@ -21,6 +21,7 @@ import {
   GUILD_BANK_BOOT_BATCH,
   GUILD_BANK_ROW_MAX_BYTES,
   type GuildBankWriteResult,
+  loadGuildBankRow,
   loadGuildBankRows,
   openMarketWriteGate,
   saveCharacterAndGuildBankState as saveGuildDb,
@@ -441,6 +442,28 @@ describe('saveCharacterAndMarketState carrying guild books (the leave flush)', (
 });
 
 describe('loadGuildBankRows (the bounded, batched boot read)', () => {
+  it('loads one post-boot guild without synthesizing a missing row', async () => {
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ guild_id: 77, has_row: true, data_bytes: 120, data: BOOK }],
+      rowCount: 1,
+    } as never);
+
+    await expect(loadGuildBankRow(77)).resolves.toEqual({
+      guildId: 77,
+      data: BOOK,
+      oversized: false,
+      dataBytes: 120,
+    });
+    const [sql, params] = dbMock.query.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('g.realm = $1 AND g.id = $3');
+    expect(sql).toContain('octet_length(gb.data::text)');
+    expect(params).toEqual([REALM, GUILD_BANK_ROW_MAX_BYTES, 77]);
+
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as never);
+    await expect(loadGuildBankRow(78)).resolves.toBeNull();
+    await expect(loadGuildBankRow(0)).rejects.toThrow(/positive safe integer/);
+  });
+
   // The boot read now rides runWithStatementTimeout (a client transaction
   // carrying SET LOCAL statement_timeout on the HEAVY allowance): a slow boot
   // must load the books, not fail into the all-banks-inert arm. The client

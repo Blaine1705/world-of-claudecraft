@@ -9,7 +9,10 @@
 // (never partial, never clawback, unresolved surfaces), the per-character
 // mutex, the next-login auto-apply, and the refuse-before-money gates.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createBankLedgerSessionJournal } from '../../server/bank_ledger_session';
+import { type BankSim, dispatchBankCommand } from '../../server/bank_wire';
 import type { ClaudiumSpendOutcome, ClaudiumSpendResult } from '../../server/claudium_proxy';
+import { REALM } from '../../server/realm';
 import {
   acknowledgeStorageAppliedEffects,
   snapshotStorageAppliedEffects,
@@ -24,6 +27,7 @@ import {
   resetStoragePurchasesForTests,
   resumeStoragePurchasesAtLogin,
   type StoragePurchaseHost,
+  storageAppliedEffectsCommitted,
   storagePurchaseCharacterOffline,
   storagePurchaseInFlight,
   storagePurchaseRecoveryMetrics,
@@ -192,12 +196,17 @@ function makeHarness(seed = 42) {
   // read the request object, and an untyped vi.fn() gives it an empty tuple.
   // A bare result is normalized to the REACHED outcome, so only a case that
   // deliberately scripts neverReached() exercises the transport arm.
-  const spend = vi.fn(async (_input: Parameters<StoragePurchaseHost['spend']>[0]) => {
-    const next = spendResults.shift();
-    if (next === undefined) throw new Error('spend called with no scripted result');
-    const value = typeof next === 'function' ? await next() : next;
-    return 'result' in value ? value : { result: value, neverReached: false };
-  });
+  const spend = vi.fn(
+    async (
+      _input: Parameters<StoragePurchaseHost['spend']>[0],
+      _signal?: Parameters<StoragePurchaseHost['spend']>[1],
+    ) => {
+      const next = spendResults.shift();
+      if (next === undefined) throw new Error('spend called with no scripted result');
+      const value = typeof next === 'function' ? await next() : next;
+      return 'result' in value ? value : { result: value, neverReached: false };
+    },
+  );
   const state = {
     live: true,
     saveResult: true as boolean | Promise<boolean>,
@@ -790,7 +799,9 @@ describe('executeStoragePurchase: the happy path and the ordering contract', () 
     // Both calls carried the identical fingerprint: same key, same item,
     // same declared cost. Never a second minted key.
     expect(h.spend).toHaveBeenCalledTimes(2);
-    expect(h.spend.mock.calls[0]).toEqual(h.spend.mock.calls[1]);
+    expect(h.spend.mock.calls[0]?.[0]).toEqual(h.spend.mock.calls[1]?.[0]);
+    expect(h.spend.mock.calls[0]?.[1]).toBeUndefined();
+    expect(h.spend.mock.calls[1]?.[1]).toBeInstanceOf(AbortSignal);
   });
 
   it('a same-key retry after a completed purchase answers already_granted without spending again', async () => {
@@ -1480,8 +1491,8 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     expect(h.meta.bank.appliedStorageKeys).toEqual([]);
   });
 
-  it('a wedged ledger-ordering hold and a lapsed ladder hold do not flood together', async () => {
-    // The two yield warnings used to share ONE map with mutually exclusive
+  it('a stalled ledger-ordering hold and a lapsed ladder hold do not flood together', async () => {
+    // The two warnings used to share ONE map with mutually exclusive
     // token shapes, and storagePurchaseInFlight can reach both arms in a single
     // call, so each overwrote the other's token and every later dedupe check
     // missed. A character in both states then emitted TWO synchronous warns per
@@ -1513,7 +1524,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       for (let i = 0; i < 20; i++) storagePurchaseInFlight(CHARACTER);
       const ladder = warns.mock.calls.filter((c) => String(c[0]).includes('ambiguous purchase'));
       const ordering = warns.mock.calls.filter((c) =>
-        String(c[0]).includes('WEDGED ledger-ordering hold'),
+        String(c[0]).includes('paid storage effect flood-ledger'),
       );
       expect(ladder.length).toBeLessThanOrEqual(1);
       expect(ordering.length).toBeLessThanOrEqual(1);
@@ -1523,7 +1534,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     }
   });
 
-  it('a wedged ledger-ordering window warns ONCE, not once per gold press', async () => {
+  it('a stalled ledger-ordering window warns ONCE and remains closed', async () => {
     // storagePurchaseInFlight runs on every gold bank_buy_slots command, which
     // a player drives by holding the buy button, on the thread that also runs
     // the 20 Hz world loop. A wedged save leaves the window permanently past
@@ -1542,11 +1553,77 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       clock.mockReturnValue(now + WEDGED_HOLD_MAX_MS + 1_000);
-      for (let i = 0; i < 25; i++) expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
+      for (let i = 0; i < 25; i++) expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
       const ordering = warns.mock.calls.filter((c) =>
-        String(c[0]).includes('WEDGED ledger-ordering hold'),
+        String(c[0]).includes('paid storage effect wedged-save'),
       );
       expect(ordering).toHaveLength(1);
+    } finally {
+      warns.mockRestore();
+      clock.mockRestore();
+    }
+  });
+
+  it('final-session teardown clears a paid-save stall and warning before relogged gold', async () => {
+    const h = makeHarness();
+    h.state.saveResult = new Promise<boolean>(() => {});
+    const start = 1_700_000_000_000;
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(start);
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      h.spendResults.push(granted());
+      await executeStoragePurchase(h.host, {
+        accountId: ACCOUNT,
+        itemId: 'strongbox_rung_01',
+        expectedCostClaudium: 100,
+        idempotencyKey: 'offline-stall-1',
+      });
+      clock.mockReturnValue(start + WEDGED_HOLD_MAX_MS + 1);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+      expect(
+        warns.mock.calls.filter((call) =>
+          String(call[0]).includes('paid storage effect offline-stall-1'),
+        ),
+      ).toHaveLength(1);
+
+      // A different save made the paid row durable, but the request-owned
+      // promise never delivered its process-local acknowledgement.
+      h.commitStaged(snapshotStorageAppliedEffects(h.stagedEffects));
+      expect(h.db.rows.get('offline-stall-1')?.status).toBe('applied');
+      h.state.live = false;
+      h.state.offlineCharacters.add(CHARACTER);
+      storagePurchaseCharacterOffline(CHARACTER);
+
+      // Do not read the gold guard yet: the next incident must prove teardown
+      // itself forgot the old warning token, rather than that a later empty
+      // guard read cleaned it up.
+      h.state.live = true;
+      h.state.offlineCharacters.delete(CHARACTER);
+      const relogStart = Date.now();
+      h.spendResults.push(granted());
+      const relogPurchase = await executeStoragePurchase(h.host, {
+        accountId: ACCOUNT,
+        itemId: 'strongbox_rung_02',
+        expectedCostClaudium: 100,
+        idempotencyKey: 'offline-stall-2',
+      });
+      expect(relogPurchase.granted).toBe(true);
+      clock.mockReturnValue(relogStart + WEDGED_HOLD_MAX_MS + 1);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+      const orderingWarnings = warns.mock.calls
+        .map((call) => String(call[0]))
+        .filter((message) => message.includes('paid storage effect offline-stall-'));
+      expect(orderingWarnings).toHaveLength(2);
+      expect(orderingWarnings[0]).toContain('offline-stall-1');
+      expect(orderingWarnings[1]).toContain('offline-stall-2');
+
+      // The exact predicate bank_wire checks before every gold slot purchase
+      // must reopen on the next final-session teardown too.
+      h.commitStaged(snapshotStorageAppliedEffects(h.stagedEffects));
+      h.state.live = false;
+      storagePurchaseCharacterOffline(CHARACTER);
+      h.state.live = true;
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
     } finally {
       warns.mockRestore();
       clock.mockRestore();
@@ -1814,7 +1891,7 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
     }
   });
 
-  it('the ledger-ordering window cannot shut the rail forever on a save that never settles', async () => {
+  it('keeps the ledger-ordering rail closed past a full save deadline until exact commit', async () => {
     const h = makeHarness();
     h.state.saveResult = new Promise<boolean>(() => {});
     const clock = vi.spyOn(Date, 'now');
@@ -1834,7 +1911,106 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
       clock.mockReturnValue(start + WEDGED_HOLD_MAX_MS - 1);
       expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
       clock.mockReturnValue(start + WEDGED_HOLD_MAX_MS);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+      clock.mockReturnValue(start + WEDGED_HOLD_MAX_MS * 10);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+
+      // A different queued save may commit the staged prefix before the
+      // request-owned promise settles. Only that exact acknowledgement reopens
+      // gold; age alone never does.
+      storageAppliedEffectsCommitted(CHARACTER, [{ idempotencyKey: 'wedged-save' }]);
       expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('blocks the real gold dispatch without state or ledger mutation until the paid row commits', async () => {
+    const h = makeHarness();
+    h.state.saveResult = new Promise<boolean>(() => {});
+    h.spendResults.push(granted());
+    await executeStoragePurchase(h.host, {
+      accountId: ACCOUNT,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'dispatch-ordering',
+    });
+    expect(h.meta.bank.purchasedSlots).toBe(6);
+
+    let purchasedSlots = 6;
+    let copper = 5_000;
+    let goldMutations = 0;
+    const errors: string[] = [];
+    const bankInfo = () => ({
+      slots: [],
+      capacity: 24 + purchasedSlots,
+      purchasedSlots,
+      bonusSlots: 0,
+      nextExpansionCost: purchasedSlots === 6 ? 1_000 : 2_000,
+      bonusSources: [],
+      socketsUnlocked: 0,
+      socketBags: [null, null, null],
+      nextSocketCost: 1_000_000,
+      generalCapacity: 24 + purchasedSlots,
+      materialsCapacity: 0,
+      generalUsed: 0,
+      materialsUsed: 0,
+    });
+    const bank: BankSim = {
+      ctx: {
+        resolve: () => ({ meta: { entityId: 99, bank: { purchasedSlots } } }),
+        error: (_entityId, text) => errors.push(text),
+      },
+      bankInfoFor: bankInfo,
+      bankBuySlots: () => {
+        goldMutations++;
+        copper -= 1_000;
+        purchasedSlots += 6;
+      },
+      bankDeposit: vi.fn(),
+      bankWithdraw: vi.fn(),
+      bankUnlockSocket: vi.fn(),
+      bankSocketBag: vi.fn(),
+      bankUnsocketBag: vi.fn(),
+    };
+    const journal = createBankLedgerSessionJournal(
+      { realm: REALM, characterId: CHARACTER, accountId: ACCOUNT },
+      { onProjectionFailure: vi.fn() },
+    );
+    const clock = vi.spyOn(Date, 'now');
+    clock.mockReturnValue(1_700_000_000_000 + WEDGED_HOLD_MAX_MS * 10);
+    try {
+      dispatchBankCommand(
+        bank,
+        { characterId: CHARACTER, accountId: ACCOUNT },
+        'bank_buy_slots',
+        {},
+        1,
+        journal.admission,
+      );
+      expect(errors).toEqual(['Your bank has a purchase in progress.']);
+      expect({ goldMutations, copper, purchasedSlots }).toEqual({
+        goldMutations: 0,
+        copper: 5_000,
+        purchasedSlots: 6,
+      });
+      expect(journal.outbox.snapshot().rowCount).toBe(0);
+
+      storageAppliedEffectsCommitted(CHARACTER, [{ idempotencyKey: 'dispatch-ordering' }]);
+      dispatchBankCommand(
+        bank,
+        { characterId: CHARACTER, accountId: ACCOUNT },
+        'bank_buy_slots',
+        {},
+        1,
+        journal.admission,
+      );
+      expect({ goldMutations, copper, purchasedSlots }).toEqual({
+        goldMutations: 1,
+        copper: 4_000,
+        purchasedSlots: 12,
+      });
+      expect(journal.outbox.snapshot().rowCount).toBe(1);
     } finally {
       clock.mockRestore();
     }

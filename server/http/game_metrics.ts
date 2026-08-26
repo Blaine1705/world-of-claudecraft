@@ -40,6 +40,7 @@
 // label reads against its metric, never across families.
 
 import { Counter, Gauge, Histogram, type Registry } from 'prom-client';
+import { bankLedgerGrowthBudgetReadout } from '../bank_ledger_growth_budget';
 import {
   BG_COMPOSITIONS,
   BG_END_CAUSES,
@@ -117,6 +118,12 @@ export const WOC_SAVE_PENDING_KEYS = 'woc_character_save_pending_keys';
  *  readout. */
 export const WOC_ESCROW_GATE_IN_FLIGHT = 'woc_escrow_gate_in_flight';
 
+/** Realm-wide cap across the named dominant background DB producers. */
+export const WOC_BACKGROUND_DB_GATE = 'woc_background_db_gate';
+
+/** Bounded storage-recovery scheduler occupancy, age, and lifetime events. */
+export const WOC_STORAGE_RECOVERY = 'woc_storage_recovery';
+
 /** Per-phase authoritative-loop timing in SECONDS, labeled by phase and stat (p95/max). */
 export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
 
@@ -149,6 +156,13 @@ export const WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS = 'woc_general_chat_quota_cac
 
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
+
+/** Last database-observed global bank-ledger budget, by fixed measure. */
+export const WOC_BANK_LEDGER_GROWTH_BUDGET = 'woc_bank_ledger_growth_budget';
+
+/** Database-wide bank-ledger hard-ceiling refusals in this process. */
+export const WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL =
+  'woc_bank_ledger_growth_limit_refusals_total';
 
 /** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
 export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
@@ -282,6 +296,31 @@ export interface GameStateSource {
   savePendingKeys(): number;
   /** The realm escrow gate's live in-flight count. */
   escrowGateInFlight(): number;
+  backgroundDbGate(): {
+    inFlight: number;
+    waiting: number;
+    max: number;
+    configuredHeadroom: number;
+    acquired: number;
+    refused: number;
+    cancelled: number;
+  };
+  storageRecovery(): {
+    tracked: number;
+    scanActive: number;
+    scanQueued: number;
+    driveActive: number;
+    driveQueued: number;
+    retryTimers: number;
+    oldestTrackedAgeMs: number;
+    oldestQueuedAgeMs: number;
+    oldestActiveAgeMs: number;
+    activePastSlotTarget: number;
+    horizonBreached: boolean;
+    capacityRefusals: number;
+    retriesScheduled: number;
+    horizonBreaches: number;
+  };
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
@@ -380,6 +419,47 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.escrowGateInFlight());
+    },
+  });
+
+  new Gauge({
+    name: WOC_BACKGROUND_DB_GATE,
+    help: 'Named major-background-producer gate by fixed measure. Configured headroom is not a reserved pool partition because other background jobs may bypass this gate.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const state = source.backgroundDbGate();
+      this.set({ measure: 'in_flight' }, state.inFlight);
+      this.set({ measure: 'waiting' }, state.waiting);
+      this.set({ measure: 'max' }, state.max);
+      this.set({ measure: 'configured_headroom' }, state.configuredHeadroom);
+      this.set({ measure: 'acquired' }, state.acquired);
+      this.set({ measure: 'refused' }, state.refused);
+      this.set({ measure: 'cancelled' }, state.cancelled);
+    },
+  });
+
+  new Gauge({
+    name: WOC_STORAGE_RECOVERY,
+    help: 'Bounded storage-purchase recovery state by fixed measure; ages are seconds and horizon_breached is 0/1.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const state = source.storageRecovery();
+      this.set({ measure: 'tracked' }, state.tracked);
+      this.set({ measure: 'scan_active' }, state.scanActive);
+      this.set({ measure: 'scan_queued' }, state.scanQueued);
+      this.set({ measure: 'drive_active' }, state.driveActive);
+      this.set({ measure: 'drive_queued' }, state.driveQueued);
+      this.set({ measure: 'retry_timers' }, state.retryTimers);
+      this.set({ measure: 'oldest_tracked_seconds' }, state.oldestTrackedAgeMs / 1000);
+      this.set({ measure: 'oldest_queued_seconds' }, state.oldestQueuedAgeMs / 1000);
+      this.set({ measure: 'oldest_active_seconds' }, state.oldestActiveAgeMs / 1000);
+      this.set({ measure: 'active_past_slot_target' }, state.activePastSlotTarget);
+      this.set({ measure: 'horizon_breached' }, state.horizonBreached ? 1 : 0);
+      this.set({ measure: 'capacity_refusals' }, state.capacityRefusals);
+      this.set({ measure: 'retries_scheduled' }, state.retriesScheduled);
+      this.set({ measure: 'horizon_breaches' }, state.horizonBreaches);
     },
   });
 
@@ -545,6 +625,29 @@ export function registerGameStateMetrics(
   const charactersCreated = new Counter({
     name: WOC_CHARACTERS_CREATED_TOTAL,
     help: 'Total characters successfully created.',
+    registers: [registry],
+  });
+
+  new Gauge({
+    name: WOC_BANK_LEDGER_GROWTH_BUDGET,
+    help: 'Database-wide bank-ledger budget by fixed measure. observed_committed_rows is refreshed at boot, once per minute, and on a hard-limit refusal; observation_age_seconds exposes a stalled refresh.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const readout = bankLedgerGrowthBudgetReadout();
+      this.set({ measure: 'hard_limit_rows' }, readout.hardLimitRows);
+      this.set({ measure: 'initialized' }, readout.committedRows === null ? 0 : 1);
+      this.set({ measure: 'observed_committed_rows' }, readout.committedRows ?? 0);
+      this.set(
+        { measure: 'observation_age_seconds' },
+        readout.observedAtMs === null ? 0 : Math.max(0, (Date.now() - readout.observedAtMs) / 1000),
+      );
+    },
+  });
+
+  const bankLedgerGrowthLimitRefusals = new Counter({
+    name: WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
+    help: 'Total database-wide bank-ledger hard-ceiling refusals observed by this process.',
     registers: [registry],
   });
 
@@ -809,6 +912,13 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    bankLedgerGrowthLimitRefused(): void {
+      try {
+        bankLedgerGrowthLimitRefusals.inc();
+      } catch {
+        // Observability must never fail the save-refusal path.
       }
     },
     wocEscrowQueue(outcome: WocEscrowQueueOutcome): void {

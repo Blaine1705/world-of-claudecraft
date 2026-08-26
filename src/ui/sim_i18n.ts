@@ -106,6 +106,11 @@ const baseEnTable = {
   'error.guildBankCarryCap': 'You cannot carry that much money.',
   'error.guildBankCannotAfford': 'Your guild cannot afford that expansion.',
   'error.guildBankMaxSlots': 'The guild bank cannot be expanded further.',
+  // Paid guild creation can be bounded by the process-wide transaction gate
+  // or the founder's exact ledger reservation. The server emits this through
+  // the social error seam, so it belongs in the same exact matcher as the sim
+  // refusals even though the originating authority lives in server/game.ts.
+  'error.guildCreateBusy': 'You are busy. Try again in a moment.',
   'log.guildBankOpened': 'You open the guild bank.',
   'log.guildBankSlotsPurchased': 'You purchase additional guild bank slots.',
   'log.guildBankDepositGold': 'You deposit {money} into the guild treasury.',

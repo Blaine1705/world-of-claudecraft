@@ -1204,9 +1204,10 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(dbSrc).toMatch(/SET LOCAL statement_timeout = \$\{timeoutMs\}/);
     expect(dbSrc).toContain('Number.isSafeInteger(timeoutMs)');
     const saveTxSrc = read('server/character_save_transaction.ts');
-    expect(saveTxSrc).toContain(
-      'SET LOCAL statement_timeout = $' + '{CHARACTER_SAVE_STATEMENT_TIMEOUT_MS}',
-    );
+    expect(saveTxSrc).toContain('const statementTimeoutMs = signal');
+    expect(saveTxSrc).toContain('CHARACTER_SAVE_SIGNAL_STATEMENT_TIMEOUT_MS');
+    expect(saveTxSrc).toContain('CHARACTER_SAVE_STATEMENT_TIMEOUT_MS');
+    expect(saveTxSrc).toContain('SET LOCAL statement_timeout = $' + '{statementTimeoutMs}');
     expect(saveTxSrc).toContain("SET LOCAL lock_timeout = '2s'");
     expect(saveTxSrc).toContain("SET LOCAL idle_in_transaction_session_timeout = '10s'");
     // Boot DDL disables the timeout entirely for its advisory-lock-serialized wait.

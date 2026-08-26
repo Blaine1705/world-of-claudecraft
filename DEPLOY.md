@@ -595,14 +595,21 @@ For off-box safety, sync the directory to S3 occasionally:
   target label in the scrape config, e.g.
   `static_configs: [{ targets: ['127.0.0.1:8787'], labels: { realm: 'emberfall' } }]`
   per realm port. Counters then sum cleanly across realms
-  (`sum(woc_fishing_catches_total)` is world-wide). The one exception:
-  `woc_rod_fee_copper` is a static content gauge published IDENTICALLY by
-  every realm process, so aggregate it with `max()` (or `avg()`), never
-  `sum()`. Both series carry a `recipe` label and the two rod fees DIFFER,
+  (`sum(woc_fishing_catches_total)` is world-wide, and the database-wide
+  `woc_bank_ledger_growth_limit_refusals_total` also sums). Gauges need their
+  own aggregation. `woc_rod_fee_copper` is static content published IDENTICALLY
+  by every realm process, so aggregate it with `max()` (or `avg()`), never
+  `sum()`. Both rod series carry a `recipe` label and the two rod fees DIFFER,
   so the aggregation must keep that label or the product multiplies every
   training by the single highest fee: the copper the rod fees took across
   realms is
   `sum(sum by (recipe) (woc_rod_fee_payments_total) * max by (recipe) (woc_rod_fee_copper))`.
+  `woc_bank_ledger_growth_budget` is another database-wide gauge exported by
+  every realm. Never sum its row count or capacity: use one target, or `max`
+  without the target `realm` label for `observed_committed_rows` and
+  `hard_limit_rows`. Use `max` for `observation_age_seconds` so the stalest realm
+  is visible, and `min` for `initialized` so one realm that has never observed
+  the singleton cannot hide behind healthy peers.
 - **Discord bot series (Grafana)**: the bot reports its rate-limit governor
   counters on the presence push it already sends, so `/metrics` carries them with
   no extra scrape target and no bot-side endpoint. Cumulative counters
@@ -776,10 +783,39 @@ For off-box safety, sync the directory to S3 occasionally:
   zero between autosave waves; that pair means pool saturation, not an auth outage.
   The response: raise `DB_POOL_MAX_CLIENTS` a few clients at a time (it accepts 1 to 97
   and rejects loudly outside that), never straight to the ceiling, and keep the budget
-  arithmetic in view: realms sharing one `DATABASE_URL` multiply, and each realm also
-  takes one boot client, so realms x pool + realms must stay at or under the 97 usable
-  connections on stock `postgres:16` (`max_connections` 100, 3 superuser-reserved).
-  The boot log warns when the configured multiplication breaks that budget.
+  arithmetic in view. Every realm sharing one `DATABASE_URL` has the main pool plus a
+  two-client general-chat quota pool and one dedicated quota `LISTEN` client, so steady
+  state is `realms x (DB_POOL_MAX_CLIENTS + 2 + 1)`. That total must stay below the 97
+  usable connections on stock `postgres:16` (`max_connections` 100, 3
+  superuser-reserved) with room left for tooling. Eight realms at the default are
+  already 104 steady connections and cannot fit. Boot temporarily adds a dedicated
+  schema client and a concurrent-index client for each starting realm; rolling deploys
+  can overlap both old and new process budgets. Size for those peaks, not only steady
+  state. The boot log warns when the configured steady multiplication alone breaks the
+  stock budget.
+- **`BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS`: database-wide lifetime ceiling.** The
+  default is 10,000,000 rows for the keep-forever anti-dupe ledger. First deployment
+  seeds an exact `COUNT(*)` while inserts are locked; PostgreSQL then accounts every
+  writer, including old binaries and raw SQL, in the inserting transaction and refuses
+  the COMMIT that would cross the ceiling. Every process sharing `DATABASE_URL` must use
+  the same value or boot fails. A first bootstrap that is already over the configured
+  value deliberately boots read-capable but refuses every later ledger insert; watch
+  `woc_bank_ledger_growth_budget` and
+  `woc_bank_ledger_growth_limit_refusals_total`. Reaching the limit is not permission to
+  prune the audit trail. Each realm refreshes the singleton with one indexed,
+  fail-fast point read per minute through the shared background gate; the monitor
+  never queues when that gate or the database pool is full. Shutdown aborts and
+  drains active monitor SQL before closing the pool; `pool.end()` then remains the
+  final bounded teardown for any new socket connection attempt already inside
+  node-postgres.
+  Alert if `measure="observation_age_seconds"` exceeds 180 (the refresh path is stale),
+  and page before `observed_committed_rows / hard_limit_rows` reaches 0.8 so capacity
+  work happens before save refusals quarantine sessions. Raising the ceiling requires
+  a maintenance window: quiesce writers,
+  update the singleton `hard_limit_rows`, deploy the identical environment value to all
+  realm processes, and verify the boot readout before reopening traffic. A missing,
+  disabled, or replaced enforcement trigger after initialization fails boot for manual
+  reconciliation rather than silently undercounting an unaudited write window.
 - **`STORAGE_PRICES`: the storage price override (server/storage_prices.ts).** One
   JSON object of copper price lists on ONE line, any subset of
   `{"bankExpansions":[12 ints],"bankSockets":[4 ints],"vaultUpgrades":[5 ints]}`
@@ -839,16 +875,23 @@ For off-box safety, sync the directory to S3 occasionally:
   are needed to fill it. There
   is no storage-purchase retention knob or old-binary sweep to disable: the
   release base predates both the table and the abandoned refused-row sweep.
-  PostgreSQL enforces one pending row per character and one leased outbound
-  spender per key. Recovery tracks at most 5,000 characters per realm process,
-  runs two scans and two drives concurrently, and paces outbound drives plus
-  failed-scan retries at 10 starts/second with a burst of two. A live character
-  beyond that bound remains blocked on both the gold and Claudium storage rails
-  and is retried incrementally from the session sweep; do not treat a capacity
-  refusal as proof that no older debit exists. Character and account deletion
-  are database-refused while a `pending` or `unresolved` purchase exists, using
-  the stable `storage_purchases_open_delete_guard` marker. Finish recovery or
-  resolve the operator case before retrying deletion.
+  PostgreSQL enforces one open pending-or-unresolved row per character and one
+  leased outbound spender per key. Recovery tracks at most 200 characters per
+  realm process, runs two scans and two drives concurrently, and paces outbound
+  drives plus failed-scan retries at 10 starts/second with a burst of two. A
+  cancelled recovery query returns its pool slot promptly and carries a 2-second
+  PostgreSQL `statement_timeout`; the connection is reusable only after its
+  15-second startup default is restored. PostgreSQL can retain a socket-destroyed
+  backend until that server timer fires, so leave transient connection headroom
+  for the four scan/drive slots during shutdown. A drive inside its retry-safe
+  character-save transaction uses a 15-second statement ceiling (rather than an
+  ordinary heavy save's 60 seconds), with at most two such drives. A live
+  character beyond the 200-entry tracking bound remains blocked on both the gold
+  and Claudium storage rails and is retried incrementally from the session sweep;
+  do not treat a capacity refusal as proof that no older debit exists. Character
+  and account deletion are database-refused while a `pending` or `unresolved`
+  purchase exists, using the stable `storage_purchases_open_delete_guard` marker.
+  Finish recovery or resolve the operator case before retrying deletion.
   Details in server/storage_purchase_db.ts. To find purchases that got stuck,
   run `node scripts/bank_audit.mjs`, which reports unresolved and stranded
   pending rows.

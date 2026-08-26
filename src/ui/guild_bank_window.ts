@@ -38,6 +38,7 @@ import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
+import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -126,6 +127,11 @@ export class GuildBankTab {
     itemDef: (id) => knownItemDef(ITEMS, id),
   });
   private readonly purchaseEcho: StorageRungEchoLatch;
+  // A stale confirmation result belongs to the purchase surface, not the
+  // global HUD log: keep the localized key-shaped state beside that surface
+  // so repaints/language switches preserve visible feedback without replaying
+  // an already-heard announcement.
+  private priceChangedStatus: BankStatusAnnouncementState | null = null;
 
   constructor(private readonly deps: GuildBankTabDeps) {
     this.purchaseEcho = new StorageRungEchoLatch(
@@ -156,6 +162,7 @@ export class GuildBankTab {
   resetView(): void {
     this.view = 'contents';
     this.prevReadOnly = null;
+    this.priceChangedStatus = null;
   }
 
   /**
@@ -229,6 +236,7 @@ export class GuildBankTab {
       this.logPane.renderInto(el, buildGuildBankLogView(this.deps.world().guildBankLog()));
       return;
     }
+    this.appendPriceChangedStatus(el);
     if (model.kind === 'unopened') {
       // No rung bought yet: the treasury works from day one, the item store
       // does not exist until an officer opens it from their own purse. A
@@ -305,6 +313,21 @@ export class GuildBankTab {
     }
     note.textContent = t(key);
     return note;
+  }
+
+  /** Paint stale-offer feedback immediately, then publish it into an empty
+   * mounted live region. The status identity plus connectivity guard prevents
+   * an intervening repaint from speaking through a detached node. */
+  private appendPriceChangedStatus(parent: HTMLElement): void {
+    const status = this.priceChangedStatus;
+    if (!status) return;
+    const text = t('hudChrome.wocStore.priceChanged');
+    appendBankStatusLine(parent, status, {
+      text,
+      visibleClass: 'gbank-purchase-status',
+      liveDataAttribute: 'data-gbank-purchase-live',
+      isCurrent: () => this.priceChangedStatus === status,
+    });
   }
 
   // The Contents / Log sub-strip: the shared WAI-ARIA tab strip core, the same
@@ -458,11 +481,13 @@ export class GuildBankTab {
               opts.offer.purchasedSlots + opts.offer.blockSlots,
             )
           ) {
+            this.priceChangedStatus = { announcedText: null };
             dismiss();
             this.deps.requestRender();
-            this.focusClose();
+            this.focusPurchaseOffer();
             return;
           }
+          this.priceChangedStatus = null;
           world.guildBankBuySlots();
           audio.coin();
           dismiss();
@@ -875,5 +900,13 @@ export class GuildBankTab {
   // rebuild detached the opener (the personal pane's idiom).
   private focusClose(): void {
     (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+  }
+
+  private focusPurchaseOffer(): void {
+    const root = this.deps.root();
+    const offer = root.querySelector<HTMLElement>(
+      '.gbank-open-row .bank-buy-btn, .gbank-buy-row .bank-buy-btn',
+    );
+    (offer ?? root.querySelector<HTMLElement>('[data-close]'))?.focus();
   }
 }

@@ -51,6 +51,7 @@ import {
   bankRungTopUpCopy,
   claudiumAmountText,
 } from './bank_rung_view';
+import { BankSocketPurchaseController } from './bank_socket_purchase_controller';
 import {
   type BankBuySlotsModel,
   type BankClaudiumInput,
@@ -297,6 +298,26 @@ export class BankWindow {
   private depositAllPending = false;
   private depositAllTimer: number | null = null;
 
+  // The consent/echo latch survives close; only its transient status is reset.
+  private readonly socketPurchase = new BankSocketPurchaseController({
+    timers: {
+      schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+      cancel: (handle) => window.clearTimeout(handle),
+    },
+    current: () => this.deps.world().bankInfo,
+    send: () => {
+      this.deps.world().bankUnlockSocket();
+      audio.coin();
+      this.deps.onInventoryChanged();
+    },
+    repaint: () => {
+      if (this.opened) this.render();
+    },
+    root: () => this.deps.root(),
+    installPromptDialog: (prompt, opener, close) => this.installPromptDialog(prompt, opener, close),
+    dismissSiblings: dismissBankPrompts,
+  });
+
   // --- The banker's Claudium rung purchase (Bank Storage phase 13) ---------
   // The money state machine lives in src/ui/bank_rung_purchase_core.ts (ruling
   // 30, taken by phase 17): the intent ledger, the sent latch, the in-flight
@@ -435,9 +456,12 @@ export class BankWindow {
   /** Observe raw authoritative refusals before Hud translates their text. */
   observeStorageText(text: string): string {
     const target = storageRungRefusalTargets(text);
+    const socketCleared = this.socketPurchase.observeText(text);
     const guildCleared = target.guild ? this.guildPane.onDefinitivePurchaseRefusal() : false;
     const vaultCleared = target.vault ? this.vaultPane.onDefinitivePurchaseRefusal() : false;
-    if ((guildCleared || vaultCleared) && this.opened) this.render();
+    if ((socketCleared || guildCleared || vaultCleared) && this.opened) {
+      this.render();
+    }
     return text;
   }
 
@@ -489,6 +513,7 @@ export class BankWindow {
     // must survive the close and let the next attempt replay under it. What is
     // cleared is only what would otherwise paint a stale result on the next open.
     this.rungPurchase.clearNotice();
+    this.socketPurchase.clearStatus();
     this.rungFocusReturnKey = null;
     this.rungAnnounceSeq++;
     this.rungPurchase.resetRepromptCap();
@@ -581,11 +606,9 @@ export class BankWindow {
     // captured here and both are written back, else a withdraw snaps the list
     // back to the top (the bags idiom) on one viewport and not the other.
     const prevScroll = this.captureScroll(el);
-    const model = buildBankView(
-      this.deps.world().bankInfo,
-      (id) => knownItemDef(ITEMS, id),
-      this.claudiumInput(),
-    );
+    const bankInfo = this.deps.world().bankInfo;
+    this.socketPurchase.observeRevision(bankInfo?.socketsUnlocked);
+    const model = buildBankView(bankInfo, (id) => knownItemDef(ITEMS, id), this.claudiumInput());
     // The Guild tab exists ONLY while guildBankInfo is non-null (any guild
     // member at a banker, online, book loaded; a plain member's pane renders
     // read-only). When it goes away mid-open (leave,
@@ -719,6 +742,7 @@ export class BankWindow {
     // coverage). The used/total readout lives in the footer meter below
     // (phase 08): no separate capacity band above the toolbar any more.
     el.appendChild(this.buildSocketRow(model.sockets));
+    this.socketPurchase.appendStatus(el);
     // Always mount the toolbar in the bank state: the deposit-all button belongs there
     // even over an empty bank, while buildFilterBar drops the search/category/sort
     // controls when there is nothing yet to filter.
@@ -1443,6 +1467,7 @@ export class BankWindow {
         locked.innerHTML = svgIcon('lock');
         if (cell.unlockCost !== null) {
           const cost = cell.unlockCost;
+          this.socketPurchase.markBusy(locked);
           locked.setAttribute(
             'aria-label',
             t('hudChrome.bank.socketUnlockAria', { price: formatMoney(cost) }),
@@ -1454,7 +1479,7 @@ export class BankWindow {
               this.deps.hideTooltip();
               return;
             }
-            this.showUnlockSocketPrompt(cost);
+            this.socketPurchase.show({ socketsUnlocked: cell.socket, cost });
           });
           this.deps.attachTooltip(
             locked,
@@ -1475,39 +1500,6 @@ export class BankWindow {
       }
     }
     return row;
-  }
-
-  // The socket-unlock confirm, on the buy-slots prompt chrome: the price is the
-  // wire's nextSocketCost passed through verbatim, and the sim re-validates
-  // order, proximity, and exact copper on the send.
-  private showUnlockSocketPrompt(cost: number): void {
-    showBuyConfirmPrompt(
-      {
-        installPromptDialog: (prompt, opener, close) =>
-          this.installPromptDialog(prompt, opener, close),
-        dismissSiblings: dismissBankPrompts,
-      },
-      {
-        text: t('hudChrome.bank.socketUnlockConfirm', { price: formatMoney(cost) }),
-        // The economy disclaimer rides every tunable-price commit (the
-        // buy-slots rule): since phase 09 the socket ladder is server-tunable
-        // (SimConfig.storagePrices), so the price on this confirm is live wire
-        // data the operator can retune between sessions.
-        secondaryText: t('hudChrome.bank.priceDisclaimer'),
-        confirmLabel: t('hudChrome.bank.socketUnlockAccept'),
-        cancelLabel: t('itemUi.vendor.sellQuantityCancel'),
-        onConfirm: (dismiss) => {
-          this.deps.world().bankUnlockSocket();
-          audio.coin();
-          // Coin just left the purse and the bags money row shows it (dep doc).
-          this.deps.onInventoryChanged();
-          dismiss();
-          // render() rebuilds the window, detaching the opener button, so land
-          // focus on the always-present close button (the buy-slots rule).
-          (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
-        },
-      },
-    );
   }
 
   // The one rigid band below the scroll region (phase 08): the capacity meter

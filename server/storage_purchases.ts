@@ -123,43 +123,71 @@ export interface StoragePurchaseHost {
    * memory, and the game loop retries flagged live sessions incrementally. */
   setRecoveryAdmissionPending?(characterId: number, pending: boolean): void;
   recoveryAdmissionPending?(characterId: number): boolean;
+  /** Realm-wide cap shared by autosave, market custody, and recovery. Recovery
+   * holds one permit around each direct DB call only—never an economy RPC or
+   * character FIFO wait. */
+  acquireBackgroundPermit?(signal: AbortSignal): Promise<{ release(): void } | null>;
   /** bankGrantStorageSlots against the live sim (the one rules body). */
   grant(pid: number, skuId: string, purchaseKey: string, dryRun: boolean): StorageGrantResult;
   /** Stage the receipt and audit payload on the live session before saving. */
   stageAppliedEffect(effect: StorageAppliedEffectDraft): boolean;
   /** Durably persist the character's live state (GameServer.saveCharacter:
-   *  per-character queued, so writes are ordered). false = not saved. */
-  saveCharacter(characterId: number, shouldStart?: () => boolean): Promise<boolean>;
+   * per-character queued, so writes are ordered). The production host acquires
+   * its background permit only inside that FIFO thunk. false = not saved. */
+  saveCharacter(
+    characterId: number,
+    shouldStart?: () => boolean,
+    signal?: AbortSignal,
+  ): Promise<boolean>;
   /** claudiumSpendDetailed. Fails closed with reason 'unavailable', never
    *  throws, and reports whether the request PROVABLY never reached the
    *  service (server/service_reachability.ts): the one failure shape under
    *  which no debit is possible. */
-  spend(input: ClaudiumSpendInput & { kind: 'storage' }): Promise<ClaudiumSpendOutcome>;
+  spend(
+    input: ClaudiumSpendInput & { kind: 'storage' },
+    signal?: AbortSignal,
+  ): Promise<ClaudiumSpendOutcome>;
   db: {
-    begin(row: {
-      realm: string;
-      accountId: number;
-      characterId: number;
-      itemId: string;
-      expectedCostClaudium: number;
-      idempotencyKey: string;
-      claimToken: string;
-    }): Promise<StoragePurchaseBeginResult>;
-    byKey(idempotencyKey: string): Promise<StoragePurchaseRow | null>;
-    claimSpend(idempotencyKey: string, claimToken: string): Promise<boolean>;
-    renewSpendClaim(idempotencyKey: string, claimToken: string): Promise<boolean>;
-    releaseSpendClaim(idempotencyKey: string, claimToken: string): Promise<boolean>;
+    begin(
+      row: {
+        realm: string;
+        accountId: number;
+        characterId: number;
+        itemId: string;
+        expectedCostClaudium: number;
+        idempotencyKey: string;
+        claimToken: string;
+      },
+      signal?: AbortSignal,
+    ): Promise<StoragePurchaseBeginResult>;
+    byKey(idempotencyKey: string, signal?: AbortSignal): Promise<StoragePurchaseRow | null>;
+    claimSpend(idempotencyKey: string, claimToken: string, signal?: AbortSignal): Promise<boolean>;
+    renewSpendClaim(
+      idempotencyKey: string,
+      claimToken: string,
+      signal?: AbortSignal,
+    ): Promise<boolean>;
+    releaseSpendClaim(
+      idempotencyKey: string,
+      claimToken: string,
+      signal?: AbortSignal,
+    ): Promise<boolean>;
     settle(
       idempotencyKey: string,
       status: 'applied' | 'unresolved',
       claimToken: string,
+      signal?: AbortSignal,
     ): Promise<boolean>;
-    discardWithoutDebit(idempotencyKey: string, claimToken: string): Promise<boolean>;
-    pendingFor(characterId: number): Promise<StoragePurchaseRow | null>;
+    discardWithoutDebit(
+      idempotencyKey: string,
+      claimToken: string,
+      signal?: AbortSignal,
+    ): Promise<boolean>;
+    pendingFor(characterId: number, signal?: AbortSignal): Promise<StoragePurchaseRow | null>;
     /** The authoritative pending-or-unresolved rail used at login. Keep this
      * required: a pending-only fallback would forget an unresolved debit on
      * final-session teardown and reopen the synchronous gold rail at relog. */
-    openFor(characterId: number): Promise<StoragePurchaseRow | null>;
+    openFor(characterId: number, signal?: AbortSignal): Promise<StoragePurchaseRow | null>;
   };
   realm: string;
   /** Dev-channel only; never player-visible text. */
@@ -222,7 +250,7 @@ function evictLapsedRecoveryHold(characterId: number, nowMs: number): void {
   if (!held || held.key !== RECOVERY_HOLD_KEY) return;
   if (ladderHoldBlocksGold(held, nowMs)) return;
   inFlightByCharacter.delete(characterId);
-  clearYieldWarning(characterId);
+  clearHoldWarnings(characterId);
 }
 
 /** The key currently holding this character's ladder, or undefined. */
@@ -245,10 +273,13 @@ function releaseLadderHold(characterId: number, key: string): void {
 // second Claudium effect may stage for this character until the first atomic
 // save commits, so writeStorageAppliedEffectsOnClient receives at most one new
 // effect from the live request path.
-// characterId -> the wall clock at which the window opened, so the same
-// stuck-promise backstop the ladder hold carries applies here too: this is the
-// OTHER structure the gold rail reads, its release lives in a `finally`, and a
-// save that never settles must not shut the rail forever.
+// characterId -> the wall clock at which the window opened, used only for a
+// rate-limited operator warning. This hold CANNOT yield on age: a legitimate
+// save may wait in the character FIFO and then consume its full transaction
+// deadline, and opening gold before the exact paid effect commits can place a
+// newer gold ledger row ahead of the older paid rung. Final-session teardown
+// clears the process-local entry; the next login's synchronous recovery scan
+// re-arms safety from the authoritative open row.
 interface LedgerOrderingHold {
   /** The purchase key that opened this window, so a CONCURRENT applied settle
    *  for the same character cannot close a window it does not own. */
@@ -294,18 +325,20 @@ export function storagePurchaseInFlight(characterId: number): boolean {
     // evictLapsedRecoveryHold. This is the reader that reliably runs again.
     evictLapsedRecoveryHold(characterId, now);
   }
-  const ledgerSince = ledgerOrderingHold.get(characterId)?.sinceMs;
-  if (ledgerSince === undefined) {
+  const ledgerHold = ledgerOrderingHold.get(characterId);
+  if (!ledgerHold) {
     // Nothing holds this character at all: forget any yield token so the map
     // stays proportional to live yields and a later incident logs again.
-    if (!hold) clearYieldWarning(characterId);
+    if (!hold) clearHoldWarnings(characterId);
     return false;
   }
-  const age = now - ledgerSince;
-  // Fails CLOSED on an unreadable age, exactly as the ladder-hold policy does.
-  if (!Number.isFinite(age) || age < WEDGED_HOLD_MAX_MS) return true;
-  noteLedgerOrderingYield(characterId, age);
-  return false;
+  const age = now - ledgerHold.sinceMs;
+  if (Number.isFinite(age) && age >= WEDGED_HOLD_MAX_MS) {
+    noteLedgerOrderingStall(characterId, ledgerHold, age);
+  }
+  // Queue age cannot prove the staged paid row durable. Always fail closed
+  // until exact commit acknowledgement or final-session teardown.
+  return true;
 }
 
 // A yield is the one place this module lets a gold rung past a claim that is
@@ -318,10 +351,7 @@ export function storagePurchaseInFlight(characterId: number): boolean {
 // Once per (character, hold KEY AND REASON) so a player mashing the button
 // cannot flood the log: the gold rail reads this predicate on every attempt.
 //
-// The reason belongs in the token for two independent cases the key alone got
-// wrong. Every recovery hold carries the SAME constant key, so keying on it
-// silenced every recovery yield after a character's first one, for the life of
-// the process, which is precisely the signal the phase added. And one purchase
+// The reason belongs in the token because one purchase
 // key legitimately yields TWICE with different meanings: a 'purchase' wedge
 // yield, then the 'settling' ambiguity yield after the retag; keyed on the key
 // alone the wedge message suppressed the money-relevant one that followed.
@@ -338,21 +368,16 @@ export function storagePurchaseInFlight(characterId: number): boolean {
 // promise into it.
 const warnedYields = new Map<number, string>();
 
-// The ledger-ordering yield keeps its OWN map rather than sharing the one
-// above. Sharing looked tidy and was a bug: the two writers hold mutually
-// exclusive token shapes, and storagePurchaseInFlight can call BOTH in one
-// invocation, so each overwrote the other's token, every later dedupe check
-// missed, and a character with both a lapsed ladder hold and a wedged
-// ledger-ordering hold emitted TWO synchronous warns per gold press. That is
-// the flood the dedupe exists to prevent, doubled.
-const warnedLedgerYields = new Set<number>();
+// Ledger-ordering stalls keep their OWN warning set rather than sharing the
+// ladder-yield map. A character can have both states in one guard read, and a
+// shared token made each overwrite the other and log on every gold press.
+const warnedLedgerStalls = new Set<number>();
 
-/** Clear a character's yield-warning tokens once nothing is yielding for it, so
- *  the maps track live yields rather than accumulating a row per character that
- *  ever had one, and so a later incident logs again. */
-function clearYieldWarning(characterId: number): void {
+/** Clear a character's hold-warning tokens once its owning state is gone, so
+ *  these sets track live incidents instead of all historical characters. */
+function clearHoldWarnings(characterId: number): void {
   warnedYields.delete(characterId);
-  warnedLedgerYields.delete(characterId);
+  warnedLedgerStalls.delete(characterId);
 }
 
 function noteLadderYield(characterId: number, hold: LadderHold, nowMs: number): void {
@@ -366,16 +391,6 @@ function noteLadderYield(characterId: number, hold: LadderHold, nowMs: number): 
     );
     return;
   }
-  if (hold.reason === 'recovery-drive') {
-    // Distinct from the arm above because the operator action differs: this
-    // one says the DRIVE QUEUE has been saturated for the whole window, which
-    // is a capacity signal (RECOVERY_DRIVE_CONCURRENCY) rather than a signal
-    // about one purchase.
-    console.warn(
-      `[storage-purchase] character ${characterId}: a scanned pending purchase waited ${ageSec}s for a recovery drive slot; yielding the gold rail. If that purchase did debit, a gold rung taken now settles it unresolved (scripts/bank_audit.mjs reports it). A persistent wait here means the drive gate is saturated.`,
-    );
-    return;
-  }
   // The wedge arm is a bound on a BUG, so it is the louder one: reaching it
   // means a promise that should have settled in seconds never did, and that
   // character's CLAUDIUM rail stays shut until this process restarts.
@@ -384,16 +399,18 @@ function noteLadderYield(characterId: number, hold: LadderHold, nowMs: number): 
   );
 }
 
-function noteLedgerOrderingYield(characterId: number, ageMs: number): void {
-  // Same once-per-claim rule as the ladder arm above, and for a sharper reason:
-  // storagePurchaseInFlight runs on EVERY gold bank_buy_slots command, which is
-  // a client-driven WS path sharing a thread with the 20 Hz world loop. A
-  // wedged save plus a player holding the buy button would otherwise emit a
-  // synchronous console.warn per press, indefinitely.
-  if (warnedLedgerYields.has(characterId)) return;
-  warnedLedgerYields.add(characterId);
+function noteLedgerOrderingStall(
+  characterId: number,
+  hold: LedgerOrderingHold,
+  ageMs: number,
+): void {
+  // Once per live character hold: storagePurchaseInFlight runs on EVERY
+  // client-driven bank_buy_slots command, on the same thread as the 20 Hz
+  // world loop. A slow save plus a held button must not log once per press.
+  if (warnedLedgerStalls.has(characterId)) return;
+  warnedLedgerStalls.add(characterId);
   console.warn(
-    `[storage-purchase] character ${characterId}: WEDGED ledger-ordering hold stuck ${Math.round(ageMs / 1000)}s; yielding the gold rail. A character save never settled, so a gold rung landing now can reorder the claudium audit row.`,
+    `[storage-purchase] character ${characterId}: paid storage effect ${hold.key} has waited ${Math.round(ageMs / 1000)}s for durable ledger ordering; gold remains closed until that exact effect commits. Inspect the character save queue and database pool.`,
   );
 }
 
@@ -405,7 +422,7 @@ export function resetStoragePurchasesForTests(): void {
   recoveryCoordinator.reset();
   recoveryHosts.clear();
   warnedYields.clear();
-  warnedLedgerYields.clear();
+  warnedLedgerStalls.clear();
   unresolvedByCharacter.clear();
   runtimeHostFactory = null;
 }
@@ -495,21 +512,61 @@ interface PurchaseRef {
   claimToken: string;
 }
 
+function recoveryCancelled(signal: AbortSignal | undefined): boolean {
+  return signal?.aborted === true;
+}
+
+/** Hold the shared producer permit around one direct recovery DB operation.
+ * Never call this around economy RPCs or a character FIFO wait: every
+ * character-scoped writer establishes FIFO -> permit ordering. */
+async function withRecoveryBackgroundPermit<T>(
+  host: StoragePurchaseHost,
+  signal: AbortSignal,
+  run: () => Promise<T>,
+): Promise<T> {
+  if (signal.aborted) throw new DOMException('storage recovery cancelled', 'AbortError');
+  const permit = host.acquireBackgroundPermit
+    ? await host.acquireBackgroundPermit(signal)
+    : { release() {} };
+  if (!permit) throw new DOMException('storage recovery cancelled', 'AbortError');
+  try {
+    return await run();
+  } finally {
+    permit.release();
+  }
+}
+
+/** Live request work has no recovery signal and keeps its existing direct DB
+ * path. A coordinator-owned signal marks the background path and gates exactly
+ * this one query. */
+function withRecoveryDbPermit<T>(
+  host: StoragePurchaseHost,
+  signal: AbortSignal | undefined,
+  run: () => Promise<T>,
+): Promise<T> {
+  return signal ? withRecoveryBackgroundPermit(host, signal, run) : run();
+}
+
 async function safeSettle(
   host: StoragePurchaseHost,
   p: PurchaseRef,
   status: 'applied' | 'unresolved',
+  signal?: AbortSignal,
 ): Promise<'settled' | 'lost' | 'failed'> {
   try {
     // A false result is deliberately not treated as terminal. Token ownership
     // may have rotated while this UPDATE waited, in which case this caller is
     // stale and must not infer anything about the row from its local reply.
-    const settled = await host.db.settle(p.key, status, p.claimToken);
+    const settled = await withRecoveryDbPermit(host, signal, () =>
+      host.db.settle(p.key, status, p.claimToken, signal),
+    );
     if (settled && status === 'unresolved') markUnresolvedPurchase(p.characterId, p.key);
     return settled ? 'settled' : 'lost';
   } catch (err) {
     // The row stays pending; the next login recovery converges it.
-    host.warn(`storage purchase ${p.key}: settle(${status}) failed, deferred: ${String(err)}`);
+    if (!recoveryCancelled(signal)) {
+      host.warn(`storage purchase ${p.key}: settle(${status}) failed, deferred: ${String(err)}`);
+    }
     return 'failed';
   }
 }
@@ -522,11 +579,18 @@ async function safeSettle(
 async function safeDiscardWithoutDebit(
   host: StoragePurchaseHost,
   p: PurchaseRef,
+  signal?: AbortSignal,
 ): Promise<'deleted' | 'unconfirmed'> {
   try {
-    return (await host.db.discardWithoutDebit(p.key, p.claimToken)) ? 'deleted' : 'unconfirmed';
+    return (await withRecoveryDbPermit(host, signal, () =>
+      host.db.discardWithoutDebit(p.key, p.claimToken, signal),
+    ))
+      ? 'deleted'
+      : 'unconfirmed';
   } catch (err) {
-    host.warn(`storage purchase ${p.key}: no-debit cleanup failed, deferred: ${String(err)}`);
+    if (!recoveryCancelled(signal)) {
+      host.warn(`storage purchase ${p.key}: no-debit cleanup failed, deferred: ${String(err)}`);
+    }
     return 'unconfirmed';
   }
 }
@@ -535,31 +599,52 @@ async function safeClaimSpend(
   host: StoragePurchaseHost,
   key: string,
   claimToken: string,
+  signal?: AbortSignal,
 ): Promise<boolean> {
   try {
-    return await host.db.claimSpend(key, claimToken);
+    return await withRecoveryDbPermit(host, signal, () =>
+      host.db.claimSpend(key, claimToken, signal),
+    );
   } catch (err) {
-    host.warn(`storage purchase ${key}: spend claim failed: ${String(err)}`);
+    if (!recoveryCancelled(signal)) {
+      host.warn(`storage purchase ${key}: spend claim failed: ${String(err)}`);
+    }
     return false;
   }
 }
 
-async function safeRenewSpendClaim(host: StoragePurchaseHost, p: PurchaseRef): Promise<boolean> {
+async function safeRenewSpendClaim(
+  host: StoragePurchaseHost,
+  p: PurchaseRef,
+  signal?: AbortSignal,
+): Promise<boolean> {
   try {
-    return await host.db.renewSpendClaim(p.key, p.claimToken);
+    return await withRecoveryDbPermit(host, signal, () =>
+      host.db.renewSpendClaim(p.key, p.claimToken, signal),
+    );
   } catch (err) {
-    host.warn(`storage purchase ${p.key}: spend claim renewal failed: ${String(err)}`);
+    if (!recoveryCancelled(signal)) {
+      host.warn(`storage purchase ${p.key}: spend claim renewal failed: ${String(err)}`);
+    }
     return false;
   }
 }
 
-async function safeReleaseSpendClaim(host: StoragePurchaseHost, p: PurchaseRef): Promise<void> {
+async function safeReleaseSpendClaim(
+  host: StoragePurchaseHost,
+  p: PurchaseRef,
+  signal?: AbortSignal,
+): Promise<void> {
   try {
-    await host.db.releaseSpendClaim(p.key, p.claimToken);
+    await withRecoveryDbPermit(host, signal, () =>
+      host.db.releaseSpendClaim(p.key, p.claimToken, signal),
+    );
   } catch (err) {
     // Expiry permits takeover, so a failed release is an availability delay,
     // never permission for this stale owner to mutate or delete.
-    host.warn(`storage purchase ${p.key}: spend claim release deferred: ${String(err)}`);
+    if (!recoveryCancelled(signal)) {
+      host.warn(`storage purchase ${p.key}: spend claim release deferred: ${String(err)}`);
+    }
   }
 }
 
@@ -574,6 +659,7 @@ function scheduleAppliedSave(
   p: PurchaseRef,
   bounds?: Pick<StorageAppliedEffect, 'purchasedSlotsBefore' | 'purchasedSlotsAfter'>,
   shouldStart?: () => boolean,
+  signal?: AbortSignal,
 ): Promise<boolean> {
   if (shouldStart && !shouldStart()) return Promise.resolve(false);
   const staged = host.stageAppliedEffect({
@@ -597,13 +683,15 @@ function scheduleAppliedSave(
   }
   ledgerOrderingHold.set(p.characterId, { key: p.key, sinceMs: Date.now() });
   return host
-    .saveCharacter(p.characterId, shouldStart)
+    .saveCharacter(p.characterId, shouldStart, signal)
     .then((saved) => {
       if (saved) storageAppliedEffectsCommitted(p.characterId, [{ idempotencyKey: p.key }]);
       return saved;
     })
     .catch((err) => {
-      host.warn(`storage purchase ${p.key}: atomic apply save deferred: ${String(err)}`);
+      if (!recoveryCancelled(signal)) {
+        host.warn(`storage purchase ${p.key}: atomic apply save deferred: ${String(err)}`);
+      }
       return false;
     });
 }
@@ -618,7 +706,7 @@ export function storageAppliedEffectsCommitted(
   const held = ledgerOrderingHold.get(characterId);
   if (!held || !effects.some((effect) => effect.idempotencyKey === held.key)) return;
   ledgerOrderingHold.delete(characterId);
-  warnedLedgerYields.delete(characterId);
+  warnedLedgerStalls.delete(characterId);
 }
 
 // Interpret a DEFINITIVE service answer (the caller has already routed
@@ -636,13 +724,14 @@ async function settleDefinitive(
   result: ClaudiumSpendResult,
   mode: 'request' | 'recovery',
   shouldStart?: () => boolean,
+  signal?: AbortSignal,
 ): Promise<DefinitiveSettlement> {
   if (!result.granted) {
     // A definitive refusal debits nothing (already_granted with granted
     // false included: that is the same-key different-fingerprint conflict).
     // Refusal history has no durable value, so report the specific refusal
     // only after the guarded pending-row DELETE confirms exactly one row.
-    if ((await safeDiscardWithoutDebit(host, p)) === 'deleted') {
+    if ((await safeDiscardWithoutDebit(host, p, signal)) === 'deleted') {
       return { response: result, retry: false, claim: 'closed' };
     }
     return { response: refusal('unavailable'), retry: true, claim: 'open' };
@@ -664,11 +753,11 @@ async function settleDefinitive(
   const applied = host.grant(live.pid, p.itemId, p.key, false);
   switch (applied.status) {
     case 'applied': {
-      const save = scheduleAppliedSave(host, p, applied, shouldStart);
+      const save = scheduleAppliedSave(host, p, applied, shouldStart, signal);
       if (mode === 'request') {
         void save.then((saved) => {
           if (!saved) {
-            void safeReleaseSpendClaim(host, p);
+            void safeReleaseSpendClaim(host, p, signal);
             kickStoragePurchaseRecovery(p.characterId);
           }
         });
@@ -682,11 +771,11 @@ async function settleDefinitive(
       // fresh save-confirm (the earlier settle may not have landed).
       {
         const response = { ...result, reason: result.reason ?? 'already_granted' };
-        const save = scheduleAppliedSave(host, p, undefined, shouldStart);
+        const save = scheduleAppliedSave(host, p, undefined, shouldStart, signal);
         if (mode === 'request') {
           void save.then((saved) => {
             if (!saved) {
-              void safeReleaseSpendClaim(host, p);
+              void safeReleaseSpendClaim(host, p, signal);
               kickStoragePurchaseRecovery(p.characterId);
             }
           });
@@ -704,7 +793,7 @@ async function settleDefinitive(
         `storage purchase ${p.key} (${p.itemId}) granted but could not apply: ${applied.status}`,
       );
       {
-        const settled = await safeSettle(host, p, 'unresolved');
+        const settled = await safeSettle(host, p, 'unresolved', signal);
         return settled === 'settled'
           ? {
               response: { ...result, reason: 'grant_unresolved' },
@@ -1032,7 +1121,7 @@ export async function executeStoragePurchase(
 
 // The production host is injected from server/main.ts. Tests may hand a host
 // directly to the awaitable seam or the ambiguous-spend defer path. The map is
-// bounded by the coordinator's own 5,000-key admission cap and cleared at the
+// bounded by the coordinator's own 200-key admission cap and cleared at the
 // same lifecycle edge as each entry.
 let runtimeHostFactory: (() => StoragePurchaseHost) | null = null;
 const recoveryHosts = new Map<number, StoragePurchaseHost>();
@@ -1071,10 +1160,17 @@ function releaseRecovery(characterId: number, row: StoragePurchaseRow | null): v
 }
 
 const recoveryCoordinator = new StorageRecoveryCoordinator<StoragePurchaseRow>({
-  scan: (characterId) => scanStoragePurchaseRecovery(recoveryHost(characterId), characterId),
+  scan: (characterId, signal) => {
+    const host = recoveryHost(characterId);
+    return withRecoveryBackgroundPermit(host, signal, () =>
+      scanStoragePurchaseRecovery(host, characterId, signal),
+    );
+  },
   reserve: reserveRecoveryRow,
-  drive: (characterId, row, isCurrent) =>
-    drivePendingPurchase(recoveryHost(characterId), characterId, row, isCurrent),
+  drive: (characterId, row, isCurrent, signal) => {
+    const host = recoveryHost(characterId);
+    return drivePendingPurchase(host, characterId, row, isCurrent, signal);
+  },
   prepareScan: prepareRecoveryScan,
   release: releaseRecovery,
   canEvict: (characterId) => {
@@ -1101,6 +1197,12 @@ export async function stopStoragePurchaseRecovery(): Promise<void> {
  * capacity-eviction candidate; login/request kicks mark it live again. */
 export function storagePurchaseCharacterOffline(characterId: number): void {
   unresolvedByCharacter.delete(characterId);
+  // This hook runs only after the final local session's awaited leave save.
+  // With no live character there is no gold command to guard; retaining the
+  // process-local ordering hold would leak a failed save forever. A later join
+  // arms its recovery-scan hold synchronously before accepting commands.
+  ledgerOrderingHold.delete(characterId);
+  warnedLedgerStalls.delete(characterId);
   recoveryCoordinator.characterOffline(characterId);
 }
 
@@ -1203,8 +1305,9 @@ export async function resumeStoragePurchasesAtLogin(
 async function scanStoragePurchaseRecovery(
   host: StoragePurchaseHost,
   characterId: number,
+  signal?: AbortSignal,
 ): Promise<StoragePurchaseRow | null> {
-  const row = await host.db.openFor(characterId);
+  const row = await host.db.openFor(characterId, signal);
   if (row?.status === 'unresolved') {
     markUnresolvedPurchase(characterId, row.idempotencyKey);
     return null;
@@ -1258,45 +1361,53 @@ async function drivePendingPurchase(
   characterId: number,
   row: StoragePurchaseRow,
   isCurrent: () => boolean,
+  signal?: AbortSignal,
 ): Promise<StorageRecoveryDriveResult> {
-  if (!isCurrent() || ladderHoldKey(characterId) !== row.idempotencyKey) return 'stop';
+  const shouldContinue = () => !signal?.aborted && isCurrent();
+  if (!shouldContinue() || ladderHoldKey(characterId) !== row.idempotencyKey) return 'stop';
   const live = host.resolveLiveCharacter(row.accountId);
   if (!live || live.characterId !== characterId) return 'stop';
   const p = purchaseRef(row);
-  if (!(await safeClaimSpend(host, p.key, p.claimToken))) return 'retry';
+  if (!(await safeClaimSpend(host, p.key, p.claimToken, signal))) return 'retry';
   let claimOpen = true;
   try {
+    if (!shouldContinue()) return 'stop';
     const pre = host.grant(live.pid, row.itemId, row.idempotencyKey, true);
     if (pre.status === 'already_applied') {
-      const saved = await scheduleAppliedSave(host, p, undefined, isCurrent);
+      const saved = await scheduleAppliedSave(host, p, undefined, shouldContinue, signal);
       if (saved) claimOpen = false;
       return saved ? 'done' : 'retry';
     }
-    if (!isCurrent()) return 'stop';
+    if (!shouldContinue()) return 'stop';
     // The exact key is reserved before this call. A recovered row's history is
     // unknowable, so even a never-reached retry cannot disprove an earlier
     // debit under the same key.
     retagLadderHold(characterId, row.idempotencyKey, 'purchase');
-    const { result } = await host.spend({
-      accountId: row.accountId,
-      itemId: row.itemId,
-      kind: 'storage',
-      expectedCostClaudium: row.expectedCostClaudium,
-      idempotencyKey: row.idempotencyKey,
-    });
-    if (!(await safeRenewSpendClaim(host, p))) return 'retry';
+    const { result } = await host.spend(
+      {
+        accountId: row.accountId,
+        itemId: row.itemId,
+        kind: 'storage',
+        expectedCostClaudium: row.expectedCostClaudium,
+        idempotencyKey: row.idempotencyKey,
+      },
+      signal,
+    );
+    if (!shouldContinue()) return 'stop';
+    if (!(await safeRenewSpendClaim(host, p, signal))) return 'retry';
     if (isAmbiguousSpendResult(result)) {
       retagLadderHold(characterId, row.idempotencyKey, 'settling');
       return 'retry';
     }
-    const settled = await settleDefinitive(host, p, result, 'recovery', isCurrent);
+    const settled = await settleDefinitive(host, p, result, 'recovery', shouldContinue, signal);
     claimOpen = settled.claim === 'open';
     return settled.retry ? 'retry' : 'done';
   } catch (err) {
+    if (recoveryCancelled(signal)) return 'stop';
     host.warn(`storage purchase recovery ${row.idempotencyKey} failed: ${String(err)}`);
     retagLadderHold(characterId, row.idempotencyKey, 'settling');
     return 'retry';
   } finally {
-    if (claimOpen) await safeReleaseSpendClaim(host, p);
+    if (claimOpen) await safeReleaseSpendClaim(host, p, signal);
   }
 }

@@ -451,9 +451,9 @@ function grantInto(w: World, itemId: string, amount: number): string {
 
 // ---------------------------------------------------------------------------
 // State reads. The two fingerprints are the byte-identical probes every
-// "nothing moved" assertion compares: slot ORDER and instance payloads on the
-// bags side, key ORDER and raw values on the vault side (a JSON round trip
-// would flatten both).
+// "nothing moved" assertion compares: slot order and instance payloads on the
+// bags side; pooled key order and raw values, plus special-row order and every
+// per-copy field, on the vault side.
 // ---------------------------------------------------------------------------
 function bagFingerprint(w: World): string {
   return metaOf(w.sim, w.pid)
@@ -465,10 +465,17 @@ function bagFingerprint(w: World): string {
 }
 
 function vaultFingerprint(w: World): string {
-  const stock = metaOf(w.sim, w.pid).vault.stock;
-  return Object.keys(stock)
-    .map((key) => `${key}=${String(stock[key])}`)
+  const vault = metaOf(w.sim, w.pid).vault;
+  const stock = Object.keys(vault.stock)
+    .map((key) => `${key}=${String(vault.stock[key])}`)
     .join(',');
+  const special = vault.special
+    .map(
+      (slot) =>
+        `${slot.itemId}:${slot.count}:${JSON.stringify(slot.instance ?? null)}:${slot.craftedRecipeId ?? ''}:${slot.slot ?? ''}`,
+    )
+    .join('|');
+  return `stock{${stock}};special[${special}]`;
 }
 
 function countCarried(w: World, itemId: string): number {
@@ -1093,10 +1100,96 @@ describe('fixture premises', () => {
   it('starts every run at a banker with an empty, locked vault and a full purse', () => {
     const w = makeWorld(1);
     expect(w.sim.vaultInfoFor(w.pid)).not.toBeNull();
-    expect(metaOf(w.sim, w.pid).vault).toEqual({ stock: {}, upgrades: 0 });
+    expect(metaOf(w.sim, w.pid).vault).toEqual({ stock: {}, special: [], upgrades: 0 });
     expect(copperOf(w)).toBe(START_COPPER);
     expect(conservationViolations(w)).toEqual([]);
     for (const id of MATERIALS) expect(`${id}:${countCarried(w, id)}`).toBe(`${id}:12`);
+  });
+
+  it('fingerprints stock values and every special-row field used by a no-op check', () => {
+    const w = makeWorld(1);
+    const vault = metaOf(w.sim, w.pid).vault;
+    const empty = vaultFingerprint(w);
+
+    vault.stock.wolf_fang = 1;
+    const oneStocked = vaultFingerprint(w);
+    expect(oneStocked).not.toBe(empty);
+    vault.stock.wolf_fang = 2;
+    expect(vaultFingerprint(w)).not.toBe(oneStocked);
+    delete vault.stock.wolf_fang;
+    expect(vaultFingerprint(w)).toBe(empty);
+    vault.stock.wolf_fang = 1;
+    vault.stock.bone_fragments = 2;
+    const orderedStock = vaultFingerprint(w);
+    delete vault.stock.wolf_fang;
+    delete vault.stock.bone_fragments;
+    vault.stock.bone_fragments = 2;
+    vault.stock.wolf_fang = 1;
+    expect(vaultFingerprint(w)).not.toBe(orderedStock);
+    delete vault.stock.bone_fragments;
+    delete vault.stock.wolf_fang;
+
+    vault.special.push({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: {
+        signer: 'Ada',
+        charges: { spark: 2 },
+        rolled: { quality: 'rare', stats: { sta: 2 }, masterwork: true },
+        enchant: 'enchant_a',
+        craftedRecipeId: 'instance_recipe',
+        boundTo: 7,
+        bindOnTrade: true,
+        locked: true,
+        rift: {
+          sourceEventId: 'event_a',
+          tier: 'C',
+          power: 3,
+          upgradeLevel: 1,
+          maxUpgradeLevel: 5,
+          baseStats: { sta: 2 },
+          enchant: { stat: 'sta', value: 1 },
+          gemSlots: 1,
+          gems: ['rift_gem_crimson'],
+        },
+      },
+      craftedRecipeId: 'recipe_eastbrook_arming_sword',
+    });
+    const oneSpecial = vaultFingerprint(w);
+    expect(oneSpecial).not.toBe(empty);
+    const special = vault.special[0];
+    const instance = special.instance;
+    if (!instance?.rolled || !instance.rift) throw new Error('expected full special fixture');
+    const changedInstances = [
+      { ...instance, signer: 'Bea' },
+      { ...instance, charges: { spark: 3 } },
+      { ...instance, rolled: { ...instance.rolled, stats: { sta: 3 } } },
+      { ...instance, enchant: 'enchant_b' },
+      { ...instance, craftedRecipeId: 'instance_recipe_changed' },
+      { ...instance, boundTo: 8 },
+      { ...instance, bindOnTrade: false },
+      { ...instance, locked: false },
+      { ...instance, rift: { ...instance.rift, power: 4 } },
+      { ...instance, rift: { ...instance.rift, baseStats: { sta: 3 } } },
+      { ...instance, rift: { ...instance.rift, enchant: { stat: 'sta', value: 2 } } },
+      { ...instance, rift: { ...instance.rift, gems: ['rift_gem_azure'] } },
+      { ...instance, futurePayload: { deep: 9 } } as typeof instance,
+    ];
+    for (const changed of [
+      { ...special, itemId: 'bone_fragments' },
+      { ...special, count: 2 },
+      ...changedInstances.map((changedInstance) => ({ ...special, instance: changedInstance })),
+      { ...special, craftedRecipeId: 'recipe_changed' },
+      { ...special, slot: 3 },
+    ]) {
+      vault.special[0] = changed;
+      expect(vaultFingerprint(w)).not.toBe(oneSpecial);
+    }
+    vault.special[0] = special;
+    vault.special.push({ ...special, instance: { signer: 'Bea' } });
+    const orderedSpecial = vaultFingerprint(w);
+    vault.special.reverse();
+    expect(vaultFingerprint(w)).not.toBe(orderedSpecial);
   });
 });
 
