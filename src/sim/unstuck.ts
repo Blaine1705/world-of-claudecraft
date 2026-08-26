@@ -13,7 +13,8 @@
 // to 5 minutes), and neither outcome can be reached by an attempt that started on
 // the other side of the life/death line (see cancelReason).
 
-import { moverHeight, resolvePosition } from './colliders';
+import { battlegroundColliders } from './battleground_layout';
+import { MANTLE_REACH, MOVE_TOP_EPS, moverHeight, resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
   bgOriginAt,
@@ -56,6 +57,7 @@ export const UNSTUCK_SUCCESS_COOLDOWN_SECONDS = 5 * 60;
 export { UNSTUCK_COOLDOWN_ID } from './unstuck_cooldown';
 
 const POSITION_EPS = 1e-4;
+const BG_GEOMETRY_CONTACT_MARGIN = 0.1;
 const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
 
@@ -208,8 +210,38 @@ function isFrozenCorpse(p: Entity): boolean {
   return p.dead && !p.ghost;
 }
 
+function pointInBattlegroundColliderContact(
+  p: Entity,
+  origin: { x: number; z: number },
+  contactMargin: number,
+): boolean {
+  const x = p.pos.x - origin.x;
+  const z = p.pos.z - origin.z;
+  const clearableTop = p.pos.y + (p.onGround ? 0 : MANTLE_REACH) + MOVE_TOP_EPS;
+  const radius = PLAYER_BODY_RADIUS + contactMargin;
+  for (const c of battlegroundColliders()) {
+    if (c.moveTopY !== undefined && c.moveTopY <= clearableTop) continue;
+    if (c.type === 'circle') {
+      if (Math.hypot(x - c.x, z - c.z) <= c.r + radius) return true;
+      continue;
+    }
+    const cos = Math.cos(-c.rot);
+    const sin = Math.sin(-c.rot);
+    const dx = x - c.x;
+    const dz = z - c.z;
+    const localX = dx * cos + dz * sin;
+    const localZ = -dx * sin + dz * cos;
+    if (Math.abs(localX) <= c.hw + radius && Math.abs(localZ) <= c.hd + radius) return true;
+  }
+  return false;
+}
+
 function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
   if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
+  const match = ctx.bgMatches.get(p.id);
+  if (!match) return false;
+  const origin = bgOriginAt(p.pos.z);
+  if (match.slot !== origin.slot) return false;
   const resolved = resolvePosition(
     ctx.cfg.seed,
     p.pos.x,
@@ -219,7 +251,10 @@ function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
     undefined,
     moverHeight(p),
   );
-  return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS;
+  return (
+    Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS ||
+    pointInBattlegroundColliderContact(p, origin, BG_GEOMETRY_CONTACT_MARGIN)
+  );
 }
 
 function motionBlock(ctx: SimContext, p: Entity): UnstuckBlockedReason | null {
