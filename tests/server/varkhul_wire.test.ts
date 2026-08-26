@@ -5,9 +5,14 @@ import { decodeVarkhulAssemblies } from '../../src/net/varkhul_assembly_wire';
 
 describe('Varkhul snapshot wire fragment', () => {
   it('builds the realm projection once per broadcast before viewer filtering', () => {
-    const source = readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8');
-    expect(source).toMatch(/const varkhulEncounterWorld:[\s\S]*?activeVarkhulAssemblies/);
-    expect(source).toMatch(/varkhulEncounterWireJson\(\s*varkhulEncounterWorld,/);
+    const gameSource = readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8');
+    expect(gameSource).toMatch(/const telegraphWorld = groundTelegraphWorld\(this\.sim,/);
+    const wireSource = readFileSync(
+      new URL('../../server/ground_telegraph_wire.ts', import.meta.url),
+      'utf8',
+    );
+    expect(wireSource).toMatch(/varkhulEncounter: \{[\s\S]*?activeVarkhulAssemblies/);
+    expect(wireSource).toMatch(/varkhulEncounterWireJson\(\s*world\.varkhulEncounter,/);
   });
 
   it('interest-scopes every mechanic family and preserves stable compact fields', () => {

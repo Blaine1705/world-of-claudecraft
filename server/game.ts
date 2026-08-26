@@ -212,6 +212,7 @@ import { claimDedupeKey, enqueueActivity, releaseDedupeKey } from './discord_act
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
+import { findDungeonDoorNear } from './dungeon_door';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -225,7 +226,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
-import { shouldDeliverCombatEventToViewer } from './event_delivery';
+import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import {
@@ -239,6 +240,7 @@ import {
 import { consumeGeneralChatQuota, type GeneralChatRateLimit } from './general_chat_quota_db';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
+import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import {
   type CounterpartyActor,
@@ -346,7 +348,7 @@ import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
-import { type VarkhulEncounterWireWorld, varkhulEncounterWireJson } from './varkhul_wire';
+import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -8234,14 +8236,7 @@ export class GameServer {
           break;
         }
         const e = sim.entities.get(pid);
-        const door = e
-          ? [...sim.entities.values()].find(
-              (x) =>
-                x.templateId === 'dungeon_door' &&
-                x.dungeonId === dungeonId &&
-                Math.hypot(e.pos.x - x.pos.x, e.pos.z - x.pos.z) < 8,
-            )
-          : undefined;
+        const door = e ? findDungeonDoorNear(sim.entities.values(), dungeonId, e.pos) : undefined;
         const succeeded = !!door && sim.enterDungeon(dungeonId, pid);
         this.sendCommandOutcome(session, msg, succeeded);
         break;
@@ -8395,28 +8390,12 @@ export class GameServer {
       }
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
-    const activeFrostRings = this.sim.activeFrostRings;
-    const activeIgnivarMeteors = this.sim.activeIgnivarMeteors;
-    const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
-    const activeConsecrations = this.sim.activeConsecrations;
-    const varkhulEncounterWorld: VarkhulEncounterWireWorld = {
-      activeVarkhulForgestormWarnings: this.sim.activeVarkhulForgestormWarnings,
-      activeVarkhulCinderFires: this.sim.activeVarkhulCinderFires,
-      activeVarkhulCinderOrbProjectiles: this.sim.activeVarkhulCinderOrbProjectiles,
-      activeVarkhulAnvilMeteors: this.sim.activeVarkhulAnvilMeteors,
-      activeVarkhulAssemblies: this.sim.activeVarkhulAssemblies,
-    };
-    let varkhulPortalReplayNeeded = false;
-    for (const session of this.clients.values()) {
-      if (session.needsVarkhulPortalReplay) {
-        varkhulPortalReplayNeeded = true;
-        break;
-      }
-    }
-    const varkhulPortalReplayEvents = varkhulPortalReplayNeeded
-      ? this.sim.activeVarkhulForgePortalTelegraphs
-      : [];
-    const varkhulPortalReplayFragments = serializeEventFragments(varkhulPortalReplayEvents);
+    const telegraphWorld = groundTelegraphWorld(this.sim, INTEREST_QUERY_RADIUS, EVENT_RADIUS);
+    const varkhulPortalReplay = buildVarkhulPortalReplayBatch(
+      this.clients.values(),
+      () => this.sim.activeVarkhulForgePortalTelegraphs,
+      EVENT_RADIUS,
+    );
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -8585,71 +8564,8 @@ export class GameServer {
         const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
-        // Ground-AoE warnings (frost rings, temporal hourglasses) are anonymous
-        // ground effects, not entities: they carry a position, radius and timer
-        // and no caster identity or team, and a player must be able to react to
-        // one wherever it lands. They therefore keep the widened match horizon
-        // inside the band, unlike the enemy PLAYERS above, whose records the
-        // narrowed rule holds to the open-world radii.
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
-        const frostRings = activeFrostRings
-          .filter((ring) => {
-            const dx = ring.x - anchorEntity.pos.x;
-            const dz = ring.z - anchorEntity.pos.z;
-            const limit = aoeBase + ring.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (ring) =>
-              `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
-          );
-        const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
-        const ignivarMeteors = activeIgnivarMeteors
-          .filter((meteor) => {
-            const dx = meteor.x - anchorEntity.pos.x;
-            const dz = meteor.z - anchorEntity.pos.z;
-            // Keep the persistent warning on the same delivery horizon as
-            // its world-point meteorImpact event, so a visible warning never
-            // disappears silently outside the event router's radius.
-            return dx * dx + dz * dz <= EVENT_RADIUS * EVENT_RADIUS;
-          })
-          .map(
-            (meteor) =>
-              `{"id":${JSON.stringify(meteor.id)},"x":${round2(meteor.x)},"z":${round2(meteor.z)},"r":${round2(meteor.radius)},"dur":${round2(meteor.duration)},"rem":${round2(meteor.remaining)},"lead":${round2(meteor.warningLead)}}`,
-          );
-        const ignivarMeteorsJson =
-          ignivarMeteors.length > 0 ? `,"ignivarMeteors":[${ignivarMeteors.join(',')}]` : '';
-        const varkhulEncounterJson = varkhulEncounterWireJson(
-          varkhulEncounterWorld,
-          anchorEntity.pos,
-          EVENT_RADIUS,
-        );
-        const temporalHourglasses = activeTemporalHourglasses
-          .filter((hourglass) => {
-            const dx = hourglass.x - anchorEntity.pos.x;
-            const dz = hourglass.z - anchorEntity.pos.z;
-            const limit = aoeBase + hourglass.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (hourglass) =>
-              `{"id":${JSON.stringify(hourglass.id)},"x":${round2(hourglass.x)},"z":${round2(hourglass.z)},"r":${round2(hourglass.radius)},"dur":${round2(hourglass.duration)},"rem":${round2(hourglass.remaining)}}`,
-          );
-        const temporalHourglassesJson =
-          temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
-        const consecrations = activeConsecrations
-          .filter((consecration) => {
-            const dx = consecration.x - anchorEntity.pos.x;
-            const dz = consecration.z - anchorEntity.pos.z;
-            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
-            return dx * dx + dz * dz <= limit * limit;
-          })
-          .map(
-            (consecration) =>
-              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
-          );
-        const consecrationsJson =
-          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
+        const telegraphJson = groundTelegraphWireJson(telegraphWorld, anchorEntity.pos, aoeBase);
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         const petSpecialWireJson =
           session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
@@ -8657,21 +8573,16 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${ignivarMeteorsJson}${varkhulEncounterJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}}`,
         );
         if (session.needsVarkhulPortalReplay) {
           session.needsVarkhulPortalReplay = false;
-          const portalReplay: string[] = [];
-          for (let index = 0; index < varkhulPortalReplayEvents.length; index++) {
-            const event = varkhulPortalReplayEvents[index];
-            const anchor = this.eventAnchor(event);
-            if (anchor && dist2d(anchorEntity.pos, anchor) > EVENT_RADIUS) continue;
-            const fragment = varkhulPortalReplayFragments[index];
-            if (fragment !== undefined) portalReplay.push(fragment);
-          }
-          if (portalReplay.length > 0) {
-            this.sendRaw(session, assembleEventsFrame(portalReplay));
-          }
+          const replayFrame = varkhulPortalReplayFrame(
+            varkhulPortalReplay,
+            anchorEntity.pos,
+            this.sim.entities,
+          );
+          if (replayFrame !== null) this.sendRaw(session, replayFrame);
         }
       },
       (err, resolved) =>
@@ -10035,7 +9946,7 @@ export class GameServer {
             continue;
           }
           // world events: only those near this player
-          const anchor = this.eventAnchor(ev);
+          const anchor = eventAnchor(ev, this.sim.entities);
           if (anchor === null || dist2d(anchorPos, anchor) <= EVENT_RADIUS) {
             mine.push(fragments[i]);
             if (ev.type === 'spellfxAt' && ev.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID) {
@@ -10141,20 +10052,6 @@ export class GameServer {
       else this.sim.tradeInvites.delete(ev.pid);
     }
     return suppressed;
-  }
-
-  private eventAnchor(ev: SimEvent): { x: number; y: number; z: number } | null {
-    let id: number | undefined;
-    if ('targetId' in ev && typeof ev.targetId === 'number') id = ev.targetId;
-    else if ('entityId' in ev && typeof ev.entityId === 'number') id = ev.entityId;
-    if (id !== undefined) return this.sim.entities.get(id)?.pos ?? null;
-    // world-coordinate events (spellfxAt: a ground-targeted impact) anchor at
-    // their own point so they interest-scope like entity-anchored fx instead
-    // of fanning out server-wide (dist2d ignores y)
-    if ('x' in ev && 'z' in ev && typeof ev.x === 'number' && typeof ev.z === 'number') {
-      return { x: ev.x, y: 0, z: ev.z };
-    }
-    return null; // chat/log etc: broadcast
   }
 
   private isSpectateLocalChat(session: ClientSession, text: string): boolean {
