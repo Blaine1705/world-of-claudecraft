@@ -26,37 +26,23 @@
 // 10,000,000 rows. At that size the audit's single ordered full scan is the
 // thing that breaks first (the recorded deferral there is a keyset cursor), and
 // whoever crosses it should re-decide the posture rather than discover it. That
-// threshold is ADVERSARIALLY REACHABLE, not only organic: ledger writes are
-// client-paced, and the cheapest sustained cycle is no longer one row per
-// command: 55 single-row vault withdraws to refill the bags plus one sweep
-// (110 rows over 56 commands, 1.96 rows/command) yields roughly 5.09M rows a
-// day at the command lane ceiling of 30 ops/s (about 1.85 GB/day of WAL at the
-// measured 364 B/row), reaching the threshold in about two days. Growth
-// monitoring here must not assume an organic pace, and any future BULK refill
-// command (a withdraw-all) would collapse the cycle to ~55 rows/command and
-// the threshold to HOURS: price that against this header before adding one.
-// Craft-from-vault (Phase 04) adds op 'craft_consume': one row per material
-// id drawn per COMPLETED CAST. That pace is cast-bound (a cast runs seconds
-// and a batch chain completes one cast at a time), at most about 2.29 rows/s
-// per character (the worst shipped recipe: 4 reagents over a 1.75s field
-// cast; enchanting tops out lower). Nothing gates crafting at the banker, so
-// this STACKS on the withdraw-refill cycle above rather than replacing it:
-// the combined adversarial ceiling is about 61.1 rows/s per character and
-// the two-day figure moves by under 4 percent. Price any future consumption
-// path the same way: as an addend to the cycle, never a substitute.
-// The socket trio (phase 07), priced as the header demands: unlock_socket
-// is bounded at four rows per character EVER (the ladder ends), and the
-// cheapest sustained socket cycle is two-bag swap-spam of one socket (bag A
-// then bag B into the same index; the differ suppresses the same-id
-// no-op), which yields EXACTLY 2.00 rows per command with no cast time and
-// no per-op gate. That beats the withdraw-refill cycle's 1.96 rows/command
-// and REPLACES it as the binding command-lane cycle (the two cycles share
-// one command lane, so they alternate rather than stack): at the 30 ops/s
-// lane ceiling that is 60.0 rows/s, roughly 5.18M rows/day and about 1.93
-// days to the revisit threshold (was about 2). The cast-bound craft_consume
-// addend lifts the combined adversarial ceiling to about 62.3 rows/s (was
-// 61.1), an under-4-percent move to those figures. A future socket verb
-// that moves more than one bag per command must re-derive this.
+// threshold is ADVERSARIALLY REACHABLE, not only organic. The personal-bank
+// and Materials Vault commands therefore sit behind the dual budget in
+// bank_vault_ledger_guard.ts: 10 commands of burst, 2 commands/s sustained,
+// 121 rows of burst, and 4 rows/s sustained. The row bucket prices the actual
+// worst cases (two rows for a socket swap and 112 for vault_deposit_all), so a
+// hostile account is bounded to 172,800 receipts and 345,600 retained rows
+// per day after its one-time burst. Craft-from-vault (Phase 04) adds op
+// 'craft_consume', one row per material id drawn per COMPLETED CAST, and shares
+// those same account command/row buckets rather than stacking another source.
+// Account state survives reconnect in-process. A separate process/realm bucket
+// admits 242 rows of burst and 8 rows/s sustained, at most 691,200 of these
+// rows per process-day after burst. The cross-process database trigger in
+// bank_ledger_growth_budget.ts is the final authority over every insert path:
+// it seeds an exact durable count, refuses the write that would cross
+// 10,000,000 committed rows, and never consumes capacity on rollback or an
+// idempotent receipt retry. Any future personal/vault bulk verb must still
+// join the fixed command-to-row map before it can mutate gameplay.
 // The Materials Vault rows (container 'vault', below)
 // join the SAME posture: same table, same never-delete rule, same 10,000,000-row
 // revisit threshold, and they are served by the per-character index rather than
@@ -64,6 +50,7 @@
 // retention sweep's table list, which is where an operator looks first.
 
 import type { BankInfo, GuildBankInfo, GuildBankLogOp, VaultInfo } from '../src/world_api';
+import { BankLedgerGrowthLimitExceeded } from './bank_ledger_growth_budget';
 import { type BankLedgerRow, insertBankLedgerRow, insertBankLedgerRows } from './db';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { gameMetricsCounters } from './http/game_signals';
@@ -239,6 +226,12 @@ let tail: Promise<void> = Promise.resolve();
 const UNSTAMPED_LOG_LIMIT = 5;
 let unstampedLogged = 0;
 
+function countBankLedgerGrowthRefusal(error: unknown): void {
+  if (error instanceof BankLedgerGrowthLimitExceeded) {
+    gameMetricsCounters().bankLedgerGrowthLimitRefused();
+  }
+}
+
 // Record a successful bank op fire-and-forget. Computes the diff and enqueues one
 // insert per element onto the FIFO tail. Returns void immediately (never a promise,
 // never awaited by the game loop); the whole body is guarded so it can never throw
@@ -255,6 +248,7 @@ export function recordBankOp(
       tail = tail
         .then(() => insertBankLedgerRow(row))
         .catch((err) => {
+          countBankLedgerGrowthRefusal(err);
           console.error('bank_ledger write failed:', err);
         });
     }
@@ -394,6 +388,7 @@ export function recordBankSocketOp(
     tail = tail
       .then(() => insertBankLedgerRows(rows))
       .catch((err) => {
+        countBankLedgerGrowthRefusal(err);
         console.error('bank_ledger write failed:', err);
       });
   } catch (err) {
@@ -638,6 +633,7 @@ export function recordVaultOp(
     tail = tail
       .then(() => insertBankLedgerRows(rows))
       .catch((err) => {
+        countBankLedgerGrowthRefusal(err);
         // A rejected insert is a HOLE in the keep-forever audit trail: the
         // op happened in the live vault but scripts/bank_audit.mjs can never
         // replay it, so that character reconciles as a permanent
@@ -757,6 +753,7 @@ export function recordVaultCraftConsume(consumptions: readonly VaultCraftConsump
     tail = tail
       .then(() => insertBankLedgerRows(rows))
       .catch((err) => {
+        countBankLedgerGrowthRefusal(err);
         // Same hole semantics as recordVaultOp above: once per LOST ROW so a
         // rejected batch sizes its whole audit hole, however many casts it
         // carried.
@@ -1008,6 +1005,7 @@ export function recordGuildBankDeltas(
       tail = tail
         .then(() => insertBankLedgerRow(row))
         .catch((err) => {
+          countBankLedgerGrowthRefusal(err);
           // A rejected insert is a HOLE in the keep-forever audit trail: the
           // op happened in the live book but scripts/bank_audit.mjs can never
           // replay it, so a real dupe investigation would come up clean.

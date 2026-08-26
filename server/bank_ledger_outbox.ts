@@ -12,13 +12,13 @@ export interface BankLedgerOutboxLimits {
   readonly maxEncodedBytes: number;
 }
 
-// The completed admission map derives a combined adversarial ceiling of about
-// 63.43 rows/s and the live character autosave interval is 30 seconds. That is
-// 1,903 rows per normal save window after rounding up. 2,048 leaves a small
-// scheduler margin while deliberately refusing to retain two failed-save windows
-// for one session. The byte cap gives those rows about 1 KiB each on average and
-// independently catches unusually large item instances before their object graphs
-// can become an unbounded memory queue.
+// One account's shared bank/vault/craft guard admits at most its 121-row burst
+// plus 4 rows/s, or 241 rows in a 30-second autosave window. This outbox also
+// carries guild, storage-purchase, and one-shot lifecycle evidence, so the 2,048
+// cap stays intentionally conservative until production mix measurements justify
+// shrinking it. It remains a hard per-session fuse. The byte cap independently
+// catches unusually large item instances before their object graphs can become
+// an unbounded memory queue.
 export const BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS: BankLedgerOutboxLimits = Object.freeze({
   maxRows: 2_048,
   maxEncodedBytes: 2 * 1024 * 1024,

@@ -32,6 +32,7 @@ import {
   recordBankSocketOp,
 } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
+import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
 import { storagePurchaseInFlight } from './storage_purchases';
 import { nextRungClaudiumPriceFor } from './storage_store_cache';
 
@@ -75,10 +76,10 @@ function reserveLedgerRows(
   admission: BankLedgerAdmission | null | undefined,
   sim: BankSim,
   pid: number,
-  maxRows: number,
+  command: BankCommandName,
 ): BankLedgerAdmissionHandle | null | undefined {
   if (admission === undefined) return undefined;
-  const reservation = admission?.tryReserve(maxRows, 0, 'personal') ?? null;
+  const reservation = admission?.tryReserve(bankVaultLedgerMaxRows(command), 0, 'personal') ?? null;
   if (!reservation) refuseLedgerAdmission(sim, pid);
   return reservation;
 }
@@ -134,7 +135,7 @@ export function dispatchBankCommand(
       if (typeof msg.slot === 'number') {
         const slot = msg.slot;
         const count = typeof msg.count === 'number' ? msg.count : undefined;
-        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_deposit');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
@@ -153,7 +154,7 @@ export function dispatchBankCommand(
       if (typeof msg.slot === 'number') {
         const slot = msg.slot;
         const count = typeof msg.count === 'number' ? msg.count : undefined;
-        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_withdraw');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
@@ -181,7 +182,7 @@ export function dispatchBankCommand(
         }
         break;
       }
-      const reservation = reserveLedgerRows(admission, sim, pid, 1);
+      const reservation = reserveLedgerRows(admission, sim, pid, 'bank_buy_slots');
       if (reservation === null) break;
       const before = runReservedSimCall(
         reservation,
@@ -209,7 +210,7 @@ export function dispatchBankCommand(
     case 'bank_unlock_socket': {
       // Argument-free like bank_buy_slots: the Sim charges the table price for
       // the next socket in order, or refuses without mutating anything.
-      const reservation = reserveLedgerRows(admission, sim, pid, 1);
+      const reservation = reserveLedgerRows(admission, sim, pid, 'bank_unlock_socket');
       if (reservation === null) break;
       const before = runReservedSimCall(
         reservation,
@@ -232,7 +233,7 @@ export function dispatchBankCommand(
         const socket =
           typeof msg.socket === 'number' && Number.isInteger(msg.socket) ? msg.socket : undefined;
         const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-        const reservation = reserveLedgerRows(admission, sim, pid, 2);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_socket_bag');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
@@ -249,7 +250,7 @@ export function dispatchBankCommand(
     case 'bank_unsocket_bag':
       if (typeof msg.socket === 'number' && Number.isInteger(msg.socket)) {
         const socket = msg.socket;
-        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'bank_unsocket_bag');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,

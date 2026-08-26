@@ -7,8 +7,14 @@ import { describe, expect, it } from 'vitest';
 import {
   BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
   type BankLedgerBatchOwner,
+  bankLedgerCommandBatchPayloadSha256,
   writeBankLedgerCommandBatches,
 } from '../../server/bank_ledger_batch_db';
+import {
+  BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+  BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+  type BankLedgerGrowthLimitExceeded,
+} from '../../server/bank_ledger_growth_budget';
 import type {
   BankLedgerCommandBatch,
   SerializedBankLedgerGuildEffect,
@@ -192,6 +198,7 @@ describe('writeBankLedgerCommandBatches', () => {
     const result = await writeBankLedgerCommandBatches(cap.db, OWNER, batches);
 
     expect(cap.calls).toHaveLength(1);
+    expect(bankLedgerCommandBatchPayloadSha256(first)).toBe(fingerprint(first));
     const call = cap.calls[0];
     expect(call.text).toContain('WITH receipt_input AS');
     expect(call.text).toContain('row_input AS');
@@ -243,6 +250,34 @@ describe('writeBankLedgerCommandBatches', () => {
       alreadyCommittedPrefix: [value],
     });
     expect(cap.calls).toHaveLength(1);
+  });
+
+  it('translates the database trigger refusal without retrying the statement', async () => {
+    const value = batch('session.growth-limit', [row(), row()]);
+    let calls = 0;
+    const pgError = {
+      code: BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+      detail: JSON.stringify({
+        committed_rows: 9_999_999,
+        attempted_rows: 2,
+        hard_limit_rows: 10_000_000,
+      }),
+    };
+    const db = {
+      async query(): Promise<{ rows: Record<string, unknown>[] }> {
+        calls++;
+        throw pgError;
+      },
+    };
+
+    await expect(writeBankLedgerCommandBatches(db, OWNER, [value])).rejects.toMatchObject({
+      name: 'BankLedgerGrowthLimitExceeded',
+      committedRows: 9_999_999,
+      attemptedRows: 2,
+      hardLimitRows: 10_000_000,
+    } satisfies Partial<BankLedgerGrowthLimitExceeded>);
+    expect(calls).toBe(1);
   });
 
   it.each([

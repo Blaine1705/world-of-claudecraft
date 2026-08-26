@@ -9,6 +9,10 @@ import {
   type BankLedgerOutboxRowInput,
   serializeBankLedgerCommandBatch,
 } from '../../server/bank_ledger_outbox';
+import {
+  BANK_VAULT_LEDGER_ROW_BURST,
+  BANK_VAULT_LEDGER_ROW_REFILL_PER_SECOND,
+} from '../../server/bank_vault_ledger_guard';
 import type { GuildBankOpDelta } from '../../src/sim/guild_bank';
 
 const LARGE_BYTES = 1_000_000;
@@ -84,22 +88,17 @@ function rig(
 }
 
 describe('BankLedgerOutbox limits and reservations', () => {
-  it('pins a one-autosave adversarial row allowance and conservative byte budgets', () => {
-    // The completed admission map prices the combined command plus craft ceiling
-    // at about 63.43 rows/s. A 30-second autosave window therefore admits 1,903
-    // rows after rounding up.
-    // 2,048 covers that interval plus a small scheduling margin without retaining
-    // multiple failed-save windows in memory.
+  it('pins a conservative multi-source fuse above one guarded manual save window', () => {
     expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS).toEqual({
       maxRows: 2_048,
       maxEncodedBytes: 2 * 1024 * 1024,
     });
-    const rowsPerAutosave = Math.ceil(63.43 * 30);
-    expect(rowsPerAutosave).toBe(1_903);
+    const manualRowsPerAutosave =
+      BANK_VAULT_LEDGER_ROW_BURST + BANK_VAULT_LEDGER_ROW_REFILL_PER_SECOND * 30;
+    expect(manualRowsPerAutosave).toBe(241);
     expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows).toBeGreaterThanOrEqual(
-      rowsPerAutosave,
+      manualRowsPerAutosave,
     );
-    expect(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows).toBeLessThan(rowsPerAutosave * 2);
     expect(BANK_LEDGER_OUTBOX_DEFAULT_GLOBAL_LIMITS).toEqual({
       maxRows: 65_536,
       maxEncodedBytes: 64 * 1024 * 1024,

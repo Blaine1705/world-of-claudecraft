@@ -16,6 +16,11 @@ import { fileURLToPath } from 'node:url';
 import type { Pool } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+  BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+  BankLedgerGrowthLimitExceeded,
+} from '../../server/bank_ledger_growth_budget';
+import {
   type BankLedgerOutboxSnapshot,
   serializeBankLedgerCommandBatch,
 } from '../../server/bank_ledger_outbox';
@@ -2279,6 +2284,38 @@ describe('the atomic save-and-book, in SQL', () => {
     await expect(
       new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-1'),
     ).rejects.toThrow('transaction never started');
+  });
+
+  it('translates a deferred bank-ledger ceiling refusal from COMMIT', async () => {
+    const raw = {
+      code: BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+      detail: JSON.stringify({
+        committed_rows: 9_999_999,
+        attempted_rows: 2,
+        hard_limit_rows: 10_000_000,
+      }),
+    };
+    const seen: string[] = [];
+    const query = vi.fn(async (text: string) => {
+      seen.push(text);
+      if (text === 'COMMIT') throw raw;
+      return { rows: [], rowCount: 1 };
+    });
+    const client = { query, release: vi.fn(), on: () => {}, removeListener: () => {} };
+    const pool = { query, connect: async () => client } as unknown as Pool;
+
+    await expect(
+      new PgWocMarketDb(pool).saveDeliveredCharacterBooked(SAVE, 'ref-growth-limit'),
+    ).rejects.toMatchObject({
+      name: BankLedgerGrowthLimitExceeded.name,
+      committedRows: 9_999_999,
+      attemptedRows: 2,
+      hardLimitRows: 10_000_000,
+      cause: raw,
+    });
+    expect(seen).toContain('COMMIT');
+    expect(seen.at(-1)).toBe('ROLLBACK');
   });
 });
 

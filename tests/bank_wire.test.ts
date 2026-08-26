@@ -5,9 +5,11 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
+  releaseCharacterLease: vi.fn(async () => true),
   loadAccountFlair: vi.fn(async () => ({ titleId: null, cosmetics: [] })),
   insertChatLogs: vi.fn(async () => {}),
   walletForAccount: vi.fn(async () => null),
@@ -19,6 +21,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
+import { gameMetricsCounters } from '../server/http/game_signals';
 import { bankGrantStorageSlots } from '../src/sim/bank';
 import { Sim } from '../src/sim/sim';
 import { COMMAND_NAMES } from '../src/world_api';
@@ -287,6 +290,87 @@ describe('bank wire round-trip', () => {
     send(server, s, { cmd: 'bank_buy_slots' });
     expect(meta.copper).toBe(1000);
     expect(meta.bank.purchasedSlots).toBe(0);
+  });
+
+  it('refuses the eleventh retained-ledger command before mutation and counts the drop', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-26T00:00:00Z'));
+    const dropped = vi.spyOn(gameMetricsCounters(), 'wsMessageDropped');
+    try {
+      const server = new GameServer();
+      const fw = fakeWs();
+      const session = joinAt(server, fw, 1, 'Ledgerguard');
+      const sim = server.sim as any;
+      bringBankerToPlayer(sim, session.pid);
+      sim.addItem('wolf_fang', 5, session.pid);
+      const meta = sim.players.get(session.pid);
+
+      // Shape-valid no-ops still spend the command budget, but their unused
+      // row reservations are refunded. The next real move is refused before
+      // it can change either side of the character-owned transfer.
+      for (let index = 0; index < 10; index++) {
+        send(server, session, { cmd: 'bank_deposit', slot: 999 });
+      }
+      const carriedSlot = wolfFangIndex(sim, session.pid);
+      send(server, session, { cmd: 'bank_deposit', slot: carriedSlot, count: 2 });
+
+      expect(meta.bank.inventory).toEqual([]);
+      expect(meta.inventory[carriedSlot]).toMatchObject({ itemId: 'wolf_fang', count: 5 });
+      expect(sim.events).toContainEqual({
+        type: 'error',
+        text: 'You are busy.',
+        pid: session.pid,
+      });
+      expect(dropped).toHaveBeenCalledWith('bank_vault');
+    } finally {
+      dropped.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not reset the account retained-ledger budget on leave and reconnect', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-26T00:00:00Z'));
+    try {
+      const server = new GameServer();
+      const firstWire = fakeWs();
+      const first = joinAt(server, firstWire, 1, 'Ledgerfirst');
+      const sim = server.sim as any;
+      bringBankerToPlayer(sim, first.pid);
+
+      for (let index = 0; index < 10; index++) {
+        send(server, first, { cmd: 'bank_deposit', slot: 999 });
+      }
+      await server.leave(first, 'test reconnect');
+
+      const secondWire = fakeWs();
+      const second = server.join(
+        secondWire.ws as any,
+        1,
+        2,
+        'Ledgersecond',
+        'warrior',
+        null,
+      ) as any;
+      if ('error' in second) throw new Error(second.error);
+      second.blockListLoaded = true;
+      bringBankerToPlayer(sim, second.pid);
+      sim.addItem('wolf_fang', 5, second.pid);
+      const meta = sim.players.get(second.pid);
+      const carriedSlot = wolfFangIndex(sim, second.pid);
+
+      send(server, second, { cmd: 'bank_deposit', slot: carriedSlot, count: 2 });
+
+      expect(meta.bank.inventory).toEqual([]);
+      expect(meta.inventory[carriedSlot]).toMatchObject({ itemId: 'wolf_fang', count: 5 });
+      expect(sim.events).toContainEqual({
+        type: 'error',
+        text: 'You are busy.',
+        pid: second.pid,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('vault dispatch plumbs slot/itemId/count into the right Sim delegates', () => {

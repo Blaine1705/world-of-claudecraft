@@ -41,6 +41,7 @@ import {
   type VaultCraftConsumption,
 } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
+import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
 
 /** The cvault snapshot cadence. The gate exists because cvault INVERTS the
  *  vault key's cost property: vaultInfoFor is null (cheap) away from a
@@ -195,10 +196,10 @@ function reserveLedgerRows(
   admission: BankLedgerAdmission | null | undefined,
   sim: VaultSim,
   pid: number,
-  maxRows: number,
+  command: VaultCommandName,
 ): BankLedgerAdmissionHandle | null | undefined {
   if (admission === undefined) return undefined;
-  const reservation = admission?.tryReserve(maxRows, 0, 'vault') ?? null;
+  const reservation = admission?.tryReserve(bankVaultLedgerMaxRows(command), 0, 'vault') ?? null;
   if (!reservation) refuseLedgerAdmission(sim, pid);
   return reservation;
 }
@@ -260,7 +261,7 @@ export function dispatchVaultCommand(
       if (typeof msg.slot === 'number') {
         const slot = msg.slot;
         const count = typeof msg.count === 'number' ? msg.count : undefined;
-        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'vault_deposit');
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
@@ -279,7 +280,7 @@ export function dispatchVaultCommand(
         const itemId = msg.itemId;
         const special = msg.special === undefined ? undefined : decodeVaultSpecialRef(msg.special);
         if (special === null) break;
-        const reservation = reserveLedgerRows(admission, sim, pid, 1);
+        const reservation = reserveLedgerRows(admission, sim, pid, 'vault_withdraw');
         if (reservation === null) break;
         const count = typeof msg.count === 'number' ? msg.count : undefined;
         const before = runReservedSimCall(
@@ -302,7 +303,7 @@ export function dispatchVaultCommand(
       // shape guard; the Sim owns every per-slot rule. ONE before/after diff
       // spans the whole batch, so recordVaultOp writes the sweep's rows (one
       // per material moved) as ONE batched insert.
-      const reservation = reserveLedgerRows(admission, sim, pid, 112);
+      const reservation = reserveLedgerRows(admission, sim, pid, 'vault_deposit_all');
       if (reservation === null) break;
       const before = runReservedSimCall(
         reservation,
@@ -317,7 +318,7 @@ export function dispatchVaultCommand(
       break;
     }
     case 'vault_buy_upgrade': {
-      const reservation = reserveLedgerRows(admission, sim, pid, 1);
+      const reservation = reserveLedgerRows(admission, sim, pid, 'vault_buy_upgrade');
       if (reservation === null) break;
       const before = runReservedSimCall(
         reservation,

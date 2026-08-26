@@ -24,10 +24,12 @@ vi.mock('../server/db', () => ({
 }));
 
 import { bankLedgerIdle } from '../server/bank_ledger';
+import { VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS } from '../server/bank_vault_ledger_guard';
 import { insertBankLedgerRow, insertBankLedgerRows } from '../server/db';
 import type { GameServer as GameServerType } from '../server/game';
 import { GameServer } from '../server/game';
 import {
+  gameMetricsCounters,
   noopGameMetricsCounters,
   setGameMetricsCounters,
   type VaultLedgerIncident,
@@ -42,8 +44,9 @@ import {
   VaultCraftConsumeBatch,
   type VaultSim,
 } from '../server/vault_wire';
+import { recipeById } from '../src/sim/content/recipes';
 import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
-import { vaultMaterialIds } from '../src/sim/materials_vault';
+import { resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { Sim } from '../src/sim/sim';
 import {
   bareClient,
@@ -209,6 +212,107 @@ beforeEach(async () => {
 });
 
 describe('materials vault wire round-trip', () => {
+  it('refuses a multi-material vault craft after the shared account burst without mutation or RNG', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-26T00:00:00Z'));
+    try {
+      const server = new GameServer();
+      const fw = fakeWs();
+      const { session, sim, pid, meta } = seat(server, fw, 1, 'Craftguard', 777, [
+        ['wolf_fang', 1],
+      ]);
+      meta.vault.upgrades = 1;
+      meta.vault.stock = { copper_ore: 4, smithing_flux: 9 };
+
+      // Ten real retained receipts, not malformed/no-op frames: five moves to
+      // the personal bank and five moves back consume the account burst.
+      for (let index = 0; index < 5; index++) {
+        send(server, session, {
+          cmd: 'bank_deposit',
+          slot: itemIndex(sim, pid, 'wolf_fang'),
+        });
+        send(server, session, { cmd: 'bank_withdraw', slot: 0 });
+      }
+
+      const recipe = recipeById('recipe_eastbrook_chain_vest');
+      if (!recipe) throw new Error('fixture recipe missing');
+      const before = {
+        inventory: structuredClone(meta.inventory),
+        vault: structuredClone(meta.vault),
+        copper: meta.copper,
+        craftSkills: structuredClone(meta.craftSkills),
+        equipment: structuredClone(meta.equipment),
+      };
+      let draws = 0;
+      sim.rng.setObserver(() => draws++);
+      try {
+        expect(resolveCraftForRecipe(sim.ctx, pid, recipe)).toEqual({
+          ok: false,
+          recipeId: 'recipe_eastbrook_chain_vest',
+          reason: 'busy',
+        });
+      } finally {
+        sim.rng.setObserver(null);
+      }
+
+      expect(draws).toBe(0);
+      expect({
+        inventory: meta.inventory,
+        vault: meta.vault,
+        copper: meta.copper,
+        craftSkills: meta.craftSkills,
+        equipment: meta.equipment,
+      }).toEqual(before);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('charges craft vault rows against a later manual vault sweep', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-26T00:00:00Z'));
+    try {
+      const server = new GameServer();
+      const fw = fakeWs();
+      const { session, sim, pid, meta } = seat(server, fw, 1, 'Craftshares', 777, [
+        ['wolf_fang', 1],
+        ['iron_ore', 1],
+      ]);
+      meta.vault.upgrades = 1;
+      meta.vault.stock = { copper_ore: 4, smithing_flux: 9 };
+
+      // Eight 1-row manual receipts leave 113 account-row tokens. The craft's
+      // two exact vault takes reduce that to 111, one short of a legal sweep's
+      // 112-row worst case, while one command token still remains.
+      for (let index = 0; index < 4; index++) {
+        send(server, session, {
+          cmd: 'bank_deposit',
+          slot: itemIndex(sim, pid, 'wolf_fang'),
+        });
+        send(server, session, { cmd: 'bank_withdraw', slot: 0 });
+      }
+      const recipe = recipeById('recipe_eastbrook_chain_vest');
+      if (!recipe) throw new Error('fixture recipe missing');
+      expect(resolveCraftForRecipe(sim.ctx, pid, recipe).ok).toBe(true);
+      expect(meta.vault.stock).toEqual({});
+
+      const beforeSweep = {
+        inventory: structuredClone(meta.inventory),
+        vault: structuredClone(meta.vault),
+      };
+      send(server, session, { cmd: 'vault_deposit_all' });
+
+      expect({ inventory: meta.inventory, vault: meta.vault }).toEqual(beforeSweep);
+      expect(sim.events).toContainEqual({
+        type: 'error',
+        text: 'You are busy.',
+        pid,
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('ACCEPTANCE: near-banker snapshot carries the vault delta and ClientWorld.vaultInfo mirrors it', () => {
     const server = new GameServer();
     const fw = fakeWs();
@@ -1132,14 +1236,10 @@ describe('materials vault wire round-trip', () => {
     expect(client.vaultInfo?.stock).toEqual({ copper_ore: 30, iron_ore: 4 });
   });
 
-  it('vault_deposit_all: the batch is bounded by the MATERIAL SET, never the slot count', async () => {
-    // The retention math's load-bearing bound: diffVaultOp keys rows on
-    // material id, so same-material slots COLLAPSE into one row and no
-    // inventory (112 total slots since the phase 05 catalog, 80 of them
-    // general, or an over-capacity tolerated save) can push a
-    // batch past vaultMaterialIds().size (55 today). A regression to
-    // per-slot rows would double this fixture's batch and break the
-    // documented 5.09M rows/day adversarial ceiling silently.
+  it('vault_deposit_all: byte-identical plain material stacks collapse in the batch', async () => {
+    // Plain slots key on material id and null identity, so equal stacks still
+    // collapse. Identity-bearing slots have a distinct 112-slot bound, pinned
+    // by the next regression rather than incorrectly using material-id count.
     const server = new GameServer();
     const fw = fakeWs();
     const { session, sim, pid, meta } = seat(server, fw, 1, 'Vaultbound', 20000, [
@@ -1164,7 +1264,99 @@ describe('materials vault wire round-trip', () => {
       ['copper_ore', 35],
       ['iron_ore', 3],
     ]);
-    expect(batch.length).toBeLessThanOrEqual(vaultMaterialIds().size);
+    expect(batch).toHaveLength(2);
+  });
+
+  it.each([56, 112])(
+    'vault_deposit_all: admits %i distinct signed identities in one batch',
+    (identityCount) => {
+      expect(VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS).toBe(112);
+      const server = new GameServer();
+      const fw = fakeWs();
+      const { session, sim, meta } = seat(server, fw, 1, 'Vaultsigners', 0);
+      meta.vault.upgrades = 5;
+      meta.inventory.push(
+        ...Array.from({ length: identityCount }, (_, index) => ({
+          itemId: 'pristine_hide',
+          count: 1,
+          instance: { signer: `Crafter ${index}` },
+        })),
+      );
+      const journalStart = journalBatchCount(session);
+      const eventStart = sim.events.length;
+
+      send(server, session, { cmd: 'vault_deposit_all' });
+
+      expect(
+        meta.inventory.filter((slot: { itemId: string }) => slot.itemId === 'pristine_hide'),
+      ).toEqual([]);
+      expect(meta.vault.special).toHaveLength(identityCount);
+      expect(journalBatchCount(session)).toBe(journalStart + 1);
+      const batch = journalLedgerRows(session, journalStart);
+      expect(batch).toHaveLength(identityCount);
+      expect(new Set(batch.map((ledgerRow) => JSON.stringify(ledgerRow.instance))).size).toBe(
+        identityCount,
+      );
+      expect(session.escrowQuarantined).toBe(false);
+      expect(sim.events.slice(eventStart)).not.toContainEqual({
+        type: 'error',
+        text: 'You are busy.',
+        pid: session.pid,
+      });
+    },
+  );
+
+  it('shares one production realm budget across three live accounts', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-08-26T00:00:00Z'));
+    const dropped = vi.spyOn(gameMetricsCounters(), 'wsMessageDropped');
+    try {
+      const server = new GameServer();
+      const players = [
+        seat(server, fakeWs(), 1, 'Realmsweepone', 0),
+        seat(server, fakeWs(), 2, 'Realmsweeptwo', 0),
+        seat(server, fakeWs(), 3, 'Realmsweepthree', 0),
+      ];
+      for (const [playerIndex, player] of players.entries()) {
+        player.meta.vault.upgrades = 5;
+        player.meta.inventory.push(
+          ...Array.from({ length: 112 }, (_, signerIndex) => ({
+            itemId: 'pristine_hide',
+            count: 1,
+            instance: { signer: `Account ${playerIndex} Crafter ${signerIndex}` },
+          })),
+        );
+      }
+
+      for (const player of players.slice(0, 2)) {
+        send(server, player.session, { cmd: 'vault_deposit_all' });
+        expect(player.meta.vault.special).toHaveLength(112);
+        expect(journalLedgerRows(player.session)).toHaveLength(112);
+      }
+
+      const third = players[2];
+      const beforeRefusal = structuredClone(third.meta.inventory);
+      send(server, third.session, { cmd: 'vault_deposit_all' });
+      expect(third.meta.inventory).toEqual(beforeRefusal);
+      expect(third.meta.vault.special).toEqual([]);
+      expect(journalBatchCount(third.session)).toBe(0);
+      expect(dropped).toHaveBeenCalledWith('bank_vault');
+
+      // The realm refusal refunded this account's command and row reservation,
+      // so its bounded one-row tail is still admitted immediately.
+      const slot = third.meta.inventory.findIndex(
+        (item: { itemId: string }) => item.itemId === 'pristine_hide',
+      );
+      send(server, third.session, { cmd: 'vault_deposit', slot });
+      expect(third.meta.vault.special).toHaveLength(1);
+      expect(journalLedgerRows(third.session)).toHaveLength(1);
+      expect(
+        third.meta.inventory.filter((item: { itemId: string }) => item.itemId === 'pristine_hide'),
+      ).toHaveLength(111);
+    } finally {
+      dropped.mockRestore();
+      vi.useRealTimers();
+    }
   });
 
   it('vault_deposit_all: a refused sweep (locked, then away) moves nothing and writes nothing', async () => {

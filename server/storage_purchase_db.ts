@@ -1,3 +1,4 @@
+import { bankLedgerGrowthLimitFromError } from './bank_ledger_growth_budget';
 import {
   createDbTransactionDeadline,
   type DbTransactionDeadlineClient,
@@ -248,7 +249,14 @@ const STORAGE_PURCHASE_CLAIM_TOKEN_PATTERN =
 // indexes support their FK cascades. The partial unique character index is
 // paid-rail authority for both pending and unresolved work and the hot
 // recovery access path: at most one open row can match.
-export const STORAGE_PURCHASE_SCHEMA = `
+export function storagePurchaseSchema(schemaName = 'public'): string {
+  if (!/^[a-z_][a-z0-9_]*$/.test(schemaName)) {
+    throw new Error('storage purchase schema must be a simple lowercase identifier');
+  }
+  const schema = `"${schemaName}"`;
+  return `
+SET LOCAL search_path = ${schema}, pg_catalog, pg_temp;
+
 CREATE TABLE IF NOT EXISTS storage_purchases (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -333,7 +341,7 @@ BEGIN
    WHERE i.indexrelid = to_regclass('storage_purchases_one_open_per_character');
   IF NOT COALESCE(open_index_ready, false) THEN
     SELECT character_id INTO duplicate_character_id
-      FROM storage_purchases
+      FROM ${schema}.storage_purchases
      WHERE status IN ('pending', 'unresolved')
      GROUP BY character_id
     HAVING count(*) > 1
@@ -408,18 +416,19 @@ $storage_purchase_claim_constraint$;
 CREATE OR REPLACE FUNCTION guard_pending_storage_purchase_parent_delete()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = pg_catalog, ${schema}, pg_temp
 AS $storage_purchase_parent_delete$
 DECLARE
   pending_key text;
 BEGIN
   IF TG_TABLE_NAME = 'characters' THEN
     SELECT idempotency_key INTO pending_key
-      FROM storage_purchases
+      FROM ${schema}.storage_purchases
      WHERE character_id = OLD.id AND status IN ('pending', 'unresolved')
      LIMIT 1;
   ELSIF TG_TABLE_NAME = 'accounts' THEN
     SELECT idempotency_key INTO pending_key
-      FROM storage_purchases
+      FROM ${schema}.storage_purchases
      WHERE account_id = OLD.id AND status IN ('pending', 'unresolved')
      LIMIT 1;
   ELSE
@@ -470,16 +479,22 @@ CREATE TABLE IF NOT EXISTS storage_purchase_schema_migrations (
 CREATE OR REPLACE FUNCTION archive_storage_purchase_applied_receipt()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = pg_catalog, ${schema}, pg_temp
 AS $storage_purchase_receipt$
 BEGIN
+  IF NEW.status <> 'applied' THEN
+    RETURN NEW;
+  END IF;
   -- Serialize mixed-release UPDATE-to-applied writers with current begin/save
   -- authority before probing or archiving the consumed key. An older UPDATE
   -- necessarily locks its child row before reaching this AFTER trigger, so a
   -- rare old/new interleave may deadlock and abort one transaction with 40P01;
   -- that is a fail-closed availability retry, never permission to weaken the
   -- key authority.
-  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.idempotency_key, 0));
-  INSERT INTO storage_purchase_applied_receipts
+  PERFORM pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(NEW.idempotency_key, 0)
+  );
+  INSERT INTO ${schema}.storage_purchase_applied_receipts
     (source_purchase_id, realm, account_id, character_id, item_id,
      expected_cost_claudium, idempotency_key, applied_at)
   VALUES
@@ -489,7 +504,7 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1
-      FROM storage_purchase_applied_receipts receipt
+      FROM ${schema}.storage_purchase_applied_receipts receipt
      WHERE receipt.idempotency_key = NEW.idempotency_key
        AND receipt.source_purchase_id = NEW.id
        AND receipt.realm = NEW.realm
@@ -548,17 +563,20 @@ $storage_purchase_receipt_migration$;
 CREATE OR REPLACE FUNCTION guard_storage_purchase_consumed_key()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = pg_catalog, ${schema}, pg_temp
 AS $storage_purchase_guard$
 BEGIN
   -- A pre-claim binary reaches this trigger without the ordered locks current
   -- begin takes. Acquire account -> character -> key here so its receipt probe
   -- gets a fresh snapshot after any conflicting receipt/delete transaction
   -- commits, and so parent deletion cannot invert the lock order.
-  PERFORM 1 FROM accounts WHERE id = NEW.account_id FOR KEY SHARE;
-  PERFORM 1 FROM characters WHERE id = NEW.character_id FOR UPDATE;
-  PERFORM pg_advisory_xact_lock(hashtextextended(NEW.idempotency_key, 0));
+  PERFORM 1 FROM ${schema}.accounts WHERE id = NEW.account_id FOR KEY SHARE;
+  PERFORM 1 FROM ${schema}.characters WHERE id = NEW.character_id FOR UPDATE;
+  PERFORM pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(NEW.idempotency_key, 0)
+  );
   IF EXISTS (
-    SELECT 1 FROM storage_purchase_applied_receipts
+    SELECT 1 FROM ${schema}.storage_purchase_applied_receipts
      WHERE idempotency_key = NEW.idempotency_key
   ) THEN
     RETURN NULL;
@@ -646,7 +664,7 @@ BEGIN
          AND octet_length(t.tgargs) = 0
          AND t.tgtype = 21
          AND t.tgattr::text = status_col.attnum::text
-         AND pg_get_expr(t.tgqual, t.tgrelid) = '(new.status = ''applied''::text)'
+         AND t.tgqual IS NULL
     INTO trigger_ready
     FROM pg_trigger t
     JOIN pg_attribute status_col
@@ -657,12 +675,15 @@ BEGIN
     DROP TRIGGER IF EXISTS storage_purchase_archive_applied ON storage_purchases;
     CREATE TRIGGER storage_purchase_archive_applied
     AFTER INSERT OR UPDATE OF status ON storage_purchases
-    FOR EACH ROW WHEN (NEW.status = 'applied')
+    FOR EACH ROW
     EXECUTE FUNCTION archive_storage_purchase_applied_receipt();
   END IF;
 END;
 $storage_purchase_trigger_guard$;
 `;
+}
+
+export const STORAGE_PURCHASE_SCHEMA = storagePurchaseSchema();
 
 export type StoragePurchaseStatus = 'pending' | 'applied' | 'unresolved';
 
@@ -901,20 +922,24 @@ export async function writeStorageAppliedEffectsOnClient(
       }
       assertReceiptMatches(raced, effect);
     } else {
-      await db.query(
-        `INSERT INTO bank_ledger
+      try {
+        await db.query(
+          `INSERT INTO bank_ledger
            (realm, character_id, account_id, op, item_id, count, instance,
             copper_delta, purchased_slots_after, container, container_id)
          VALUES ($1, $2, $3, 'buy_slots', $4, NULL, $5, 0, $6, 'personal', NULL)`,
-        [
-          effect.realm,
-          effect.characterId,
-          effect.accountId,
-          effect.itemId,
-          JSON.stringify({ paidWith: 'claudium' }),
-          effect.purchasedSlotsAfter,
-        ],
-      );
+          [
+            effect.realm,
+            effect.characterId,
+            effect.accountId,
+            effect.itemId,
+            JSON.stringify({ paidWith: 'claudium' }),
+            effect.purchasedSlotsAfter,
+          ],
+        );
+      } catch (error) {
+        throw bankLedgerGrowthLimitFromError(error) ?? error;
+      }
     }
 
     const closed = await db.query(

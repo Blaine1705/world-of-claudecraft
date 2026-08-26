@@ -21,6 +21,7 @@
 import type { Pool, PoolClient, QueryResult } from 'pg';
 import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
+import { bankLedgerGrowthLimitFromError } from './bank_ledger_growth_budget';
 import { lockCharacterSaveAccountParentOnClient } from './bank_ledger_save_effects_db';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
 import type {
@@ -1365,7 +1366,7 @@ export class PgWocMarketDb implements WocMarketDb {
       // pool a desynchronized client whose stale reply would be attributed
       // to the next borrower. Codeless therefore always discards.
       if (code(chosen) === undefined) codelessFailure = true;
-      throw chosen;
+      throw bankLedgerGrowthLimitFromError(chosen) ?? chosen;
     } finally {
       client.removeListener('error', onError);
       // A terminated, begin-broken, rollback-swallowed, or codeless-failed

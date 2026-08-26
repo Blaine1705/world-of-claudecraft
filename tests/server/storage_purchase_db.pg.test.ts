@@ -45,9 +45,10 @@ d('storage_purchases against real PostgreSQL', () => {
     lockStorageAppliedEffectAccountsOnClient: typeof import('../../server/storage_purchase_db').lockStorageAppliedEffectAccountsOnClient;
     writeStorageAppliedEffectsOnClient: typeof import('../../server/storage_purchase_db').writeStorageAppliedEffectsOnClient;
     StoragePurchaseDbAborted: typeof import('../../server/storage_purchase_db').StoragePurchaseDbAborted;
-    STORAGE_PURCHASE_SCHEMA: string;
+    storagePurchaseSchema: typeof import('../../server/storage_purchase_db').storagePurchaseSchema;
     STORAGE_PURCHASE_TX_LOCK_TIMEOUT_MS: number;
   };
+  let storageSchema: string;
 
   const ROW = {
     realm: 'pgtest',
@@ -91,12 +92,15 @@ d('storage_purchases against real PostgreSQL', () => {
       container_id BIGINT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`);
+    const growth = await import('../../server/bank_ledger_growth_budget');
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(SCHEMA));
     await pool.query('INSERT INTO accounts (id) VALUES (1), (2)');
     await pool.query('INSERT INTO characters (id) VALUES (1), (2)');
     // The DDL executes for real, twice: idempotency is part of the contract
     // (ensureSchema re-runs it at every boot).
-    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
-    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    storageSchema = db.storagePurchaseSchema(SCHEMA);
+    await pool.query(storageSchema);
+    await pool.query(storageSchema);
   }, 30_000);
 
   afterAll(async () => {
@@ -201,13 +205,165 @@ d('storage_purchases against real PostgreSQL', () => {
       'storage_purchase_archive_applied',
       'storage_purchase_guard_consumed_key',
     ]);
+
+    const functions = await pool.query(
+      `SELECT proname, proconfig
+         FROM pg_catalog.pg_proc
+        WHERE pronamespace = '${SCHEMA}'::pg_catalog.regnamespace
+          AND proname = ANY($1::text[])
+        ORDER BY proname`,
+      [
+        [
+          'archive_storage_purchase_applied_receipt',
+          'guard_pending_storage_purchase_parent_delete',
+          'guard_storage_purchase_consumed_key',
+        ],
+      ],
+    );
+    expect(functions.rows).toEqual([
+      {
+        proname: 'archive_storage_purchase_applied_receipt',
+        proconfig: [`search_path=pg_catalog, ${SCHEMA}, pg_temp`],
+      },
+      {
+        proname: 'guard_pending_storage_purchase_parent_delete',
+        proconfig: [`search_path=pg_catalog, ${SCHEMA}, pg_temp`],
+      },
+      {
+        proname: 'guard_storage_purchase_consumed_key',
+        proconfig: [`search_path=pg_catalog, ${SCHEMA}, pg_temp`],
+      },
+    ]);
+  });
+
+  it('keeps trigger authority under counterfeit and temporary relation shadows', async () => {
+    const counterfeit = `${SCHEMA}_counterfeit`;
+    await pool.query(`DROP SCHEMA IF EXISTS "${counterfeit}" CASCADE`);
+    await pool.query(`CREATE SCHEMA "${counterfeit}"`);
+    await pool.query(`CREATE TABLE "${counterfeit}".accounts (id INT PRIMARY KEY)`);
+    await pool.query(`CREATE TABLE "${counterfeit}".characters (id INT PRIMARY KEY)`);
+    await pool.query(`CREATE TABLE "${counterfeit}".storage_purchases (
+      account_id INT NOT NULL,
+      character_id INT NOT NULL,
+      idempotency_key TEXT NOT NULL,
+      status TEXT NOT NULL
+    )`);
+    await pool.query(
+      `CREATE TABLE "${counterfeit}".storage_purchase_applied_receipts AS
+       SELECT * FROM "${SCHEMA}".storage_purchase_applied_receipts WITH NO DATA`,
+    );
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('CREATE TEMP TABLE accounts (id INT PRIMARY KEY) ON COMMIT DROP');
+      await client.query('CREATE TEMP TABLE characters (id INT PRIMARY KEY) ON COMMIT DROP');
+      await client.query(`CREATE TEMP TABLE storage_purchases (
+        account_id INT NOT NULL,
+        character_id INT NOT NULL,
+        idempotency_key TEXT NOT NULL,
+        status TEXT NOT NULL
+      ) ON COMMIT DROP`);
+      await client.query(
+        `CREATE TEMP TABLE storage_purchase_applied_receipts
+         ON COMMIT DROP AS
+         SELECT * FROM "${SCHEMA}".storage_purchase_applied_receipts WITH NO DATA`,
+      );
+      await client.query(`SET LOCAL search_path = "${counterfeit}", "${SCHEMA}"`);
+      await client.query(`INSERT INTO "${SCHEMA}".accounts (id) VALUES (91), (92)`);
+      await client.query(`INSERT INTO "${SCHEMA}".characters (id) VALUES (91), (92)`);
+      await client.query(`INSERT INTO "${counterfeit}".accounts (id) VALUES (91), (92)`);
+      await client.query(`INSERT INTO "${counterfeit}".characters (id) VALUES (91), (92)`);
+      await client.query('INSERT INTO pg_temp.accounts (id) VALUES (91), (92)');
+      await client.query('INSERT INTO pg_temp.characters (id) VALUES (91), (92)');
+      await client.query(
+        `INSERT INTO "${counterfeit}".storage_purchases
+           (account_id, character_id, idempotency_key, status)
+         VALUES (91, 91, 'counterfeit-open', 'pending')`,
+      );
+      await client.query(
+        `INSERT INTO pg_temp.storage_purchases
+           (account_id, character_id, idempotency_key, status)
+         VALUES (91, 91, 'temporary-open', 'pending')`,
+      );
+
+      // The trusted parent-delete guard must not consult the counterfeit open
+      // row even though that schema appears first in the caller's path.
+      await expect(
+        client.query(`DELETE FROM "${SCHEMA}".characters WHERE id = 91`),
+      ).resolves.toMatchObject({ rowCount: 1 });
+
+      await client.query(
+        `INSERT INTO "${counterfeit}".storage_purchase_applied_receipts
+           (source_purchase_id, realm, account_id, character_id, item_id,
+            expected_cost_claudium, idempotency_key, purchased_slots_before,
+            purchased_slots_after, applied_at)
+         VALUES (999, 'counterfeit', 92, 92, 'fake', 1, 'trusted-authority-key',
+                 NULL, NULL, now())`,
+      );
+      await client.query(
+        `INSERT INTO pg_temp.storage_purchase_applied_receipts
+           (source_purchase_id, realm, account_id, character_id, item_id,
+            expected_cost_claudium, idempotency_key, purchased_slots_before,
+            purchased_slots_after, applied_at)
+         VALUES (998, 'temporary', 92, 92, 'fake', 1, 'trusted-authority-key',
+                 NULL, NULL, now())`,
+      );
+      const inserted = await client.query(
+        `INSERT INTO "${SCHEMA}".storage_purchases
+           (realm, account_id, character_id, item_id, expected_cost_claudium,
+            idempotency_key)
+         VALUES ('pgtest', 92, 92, 'strongbox_rung_01', 100, 'trusted-authority-key')`,
+      );
+      expect(inserted.rowCount).toBe(1);
+      await client.query(
+        `UPDATE "${SCHEMA}".storage_purchases
+            SET status = 'applied', resolved_at = now()
+          WHERE idempotency_key = 'trusted-authority-key'`,
+      );
+      expect(
+        Number(
+          (
+            await client.query(
+              `SELECT count(*) FROM "${SCHEMA}".storage_purchase_applied_receipts
+                WHERE idempotency_key = 'trusted-authority-key'`,
+            )
+          ).rows[0].count,
+        ),
+      ).toBe(1);
+      expect(
+        Number(
+          (
+            await client.query(
+              `SELECT count(*) FROM pg_temp.storage_purchase_applied_receipts
+                WHERE idempotency_key = 'trusted-authority-key'`,
+            )
+          ).rows[0].count,
+        ),
+      ).toBe(1);
+      expect(
+        Number(
+          (
+            await client.query(
+              `SELECT count(*) FROM "${counterfeit}".storage_purchase_applied_receipts
+                WHERE idempotency_key = 'trusted-authority-key'`,
+            )
+          ).rows[0].count,
+        ),
+      ).toBe(1);
+      await client.query('ROLLBACK');
+    } finally {
+      await client.query('ROLLBACK').catch(() => {});
+      client.release();
+      await pool.query(`DROP SCHEMA IF EXISTS "${counterfeit}" CASCADE`);
+    }
   });
 
   it('repairs a same-named but non-authoritative open-rail index', async () => {
     await pool.query('DROP INDEX storage_purchases_one_open_per_character');
     await pool.query(`CREATE UNIQUE INDEX storage_purchases_one_open_per_character
       ON storage_purchases (id) WHERE status = 'unresolved'`);
-    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    await pool.query(storageSchema);
     const repaired = await pool.query(
       `SELECT i.indisunique, a.attname,
               pg_get_expr(i.indpred, i.indrelid) AS predicate
@@ -244,7 +400,7 @@ d('storage_purchases against real PostgreSQL', () => {
       await db.settleStoragePurchase(pool, first.idempotencyKey, 'unresolved', first.claimToken);
       await db.beginStoragePurchase(pool, second);
 
-      await expect(pool.query(db.STORAGE_PURCHASE_SCHEMA)).rejects.toMatchObject({ code: '23505' });
+      await expect(pool.query(storageSchema)).rejects.toMatchObject({ code: '23505' });
       const preserved = await pool.query(
         `SELECT idempotency_key, status FROM storage_purchases
           WHERE character_id = 2 AND status IN ('pending', 'unresolved')
@@ -260,7 +416,7 @@ d('storage_purchases against real PostgreSQL', () => {
           WHERE idempotency_key = ANY($1::text[])`,
         [[first.idempotencyKey, second.idempotencyKey]],
       );
-      await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+      await pool.query(storageSchema);
     }
   });
 
@@ -269,7 +425,7 @@ d('storage_purchases against real PostgreSQL', () => {
     await pool.query(`ALTER TABLE storage_purchases
       ADD CONSTRAINT storage_purchases_claim_pair
       CHECK (spend_claim_token IS NULL OR spend_claim_token IS NOT NULL) NOT VALID`);
-    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    await pool.query(storageSchema);
     const repaired = await pool.query(
       `SELECT convalidated, pg_get_constraintdef(oid) AS def
          FROM pg_constraint
@@ -308,7 +464,7 @@ d('storage_purchases against real PostgreSQL', () => {
       AFTER DELETE ON storage_purchases
       FOR EACH STATEMENT EXECUTE FUNCTION storage_boot_note_delete()`);
     try {
-      await probe.query(db.STORAGE_PURCHASE_SCHEMA);
+      await probe.query(storageSchema);
       expect((await probe.query('SELECT calls FROM storage_boot_delete_probe')).rows[0].calls).toBe(
         0,
       );
@@ -342,7 +498,7 @@ d('storage_purchases against real PostgreSQL', () => {
     const indexBefore = await readIndexIdentity();
     expect(triggerBefore.rows).toHaveLength(4);
     expect(indexBefore.rows).toHaveLength(1);
-    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    await pool.query(storageSchema);
     expect((await readTriggerIdentity()).rows).toEqual(triggerBefore.rows);
     expect((await readIndexIdentity()).rows).toEqual(indexBefore.rows);
   });
@@ -369,7 +525,7 @@ d('storage_purchases against real PostgreSQL', () => {
         'FOR EACH ROW EXECUTE FUNCTION archive_storage_purchase_applied_receipt()',
     );
 
-    await pool.query(db.STORAGE_PURCHASE_SCHEMA);
+    await pool.query(storageSchema);
     const definitions = await pool.query(
       `SELECT c.relname,
               t.tgname,
@@ -417,7 +573,7 @@ d('storage_purchases against real PostgreSQL', () => {
         tgenabled: 'O',
         tgnargs: 0,
         arg_bytes: 0,
-        qualifier: "(new.status = 'applied'::text)",
+        qualifier: null,
         proname: 'archive_storage_purchase_applied_receipt',
       }),
       expect.objectContaining({
@@ -1414,6 +1570,10 @@ d('storage_purchases against real PostgreSQL', () => {
       purchasedSlotsAfter: 6,
       spendClaimToken: ROW.claimToken,
     };
+    const budgetBefore = Number(
+      (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+        .committed_rows,
+    );
     await db.beginStoragePurchase(pool, effect);
 
     const rolledBack = await pool.connect();
@@ -1433,6 +1593,12 @@ d('storage_purchases against real PostgreSQL', () => {
         ])
       ).rows[0].n,
     ).toBe(0);
+    expect(
+      Number(
+        (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+          .committed_rows,
+      ),
+    ).toBe(budgetBefore);
 
     const committed = await pool.connect();
     try {
@@ -1463,6 +1629,12 @@ d('storage_purchases against real PostgreSQL', () => {
         )
       ).rows[0].n,
     ).toBe(1);
+    expect(
+      Number(
+        (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+          .committed_rows,
+      ),
+    ).toBe(budgetBefore + 1);
 
     const replay = await pool.connect();
     try {
@@ -1481,6 +1653,12 @@ d('storage_purchases against real PostgreSQL', () => {
         )
       ).rows[0].n,
     ).toBe(1);
+    expect(
+      Number(
+        (await pool.query('SELECT committed_rows FROM bank_ledger_growth_budget')).rows[0]
+          .committed_rows,
+      ),
+    ).toBe(budgetBefore + 1);
   });
 
   it('rejects an incompressible key past the btree tuple bound at the raw layer', async () => {

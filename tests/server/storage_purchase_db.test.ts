@@ -6,6 +6,11 @@
 // the closed status vocabulary, and the DDL's recovery index. Each anchor is a
 // contiguous clause with its occurrence pinned, never a lone keyword.
 import { describe, expect, it, vi } from 'vitest';
+import {
+  BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+  BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+  BankLedgerGrowthLimitExceeded,
+} from '../../server/bank_ledger_growth_budget';
 import type { DbTransactionDeadlineClient } from '../../server/db_transaction_deadline';
 import {
   beginStoragePurchase,
@@ -20,6 +25,7 @@ import {
   STORAGE_PURCHASE_TRANSACTION_TIMEOUT_MS,
   settleStoragePurchase,
   storagePurchaseByKey,
+  storagePurchaseSchema,
   writeStorageAppliedEffectsOnClient,
 } from '../../server/storage_purchase_db';
 
@@ -78,6 +84,8 @@ const CLAIM_TOKEN = '00000000-0000-4000-8000-000000000001';
 describe('the DDL', () => {
   it('creates operational rows plus deletion-proof applied receipts', () => {
     const folded = STORAGE_PURCHASE_SCHEMA.replace(/\s+/g, ' ');
+    expect(folded).toContain('SET LOCAL search_path = "public", pg_catalog, pg_temp;');
+    expect(count(folded, 'SET search_path = pg_catalog, "public", pg_temp')).toBe(3);
     expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE TABLE IF NOT EXISTS storage_purchases')).toBe(1);
     expect(
       count(
@@ -164,7 +172,7 @@ describe('the DDL', () => {
       folded.indexOf('CREATE UNIQUE INDEX IF NOT EXISTS storage_purchases_one_open_per_character'),
     );
     expect(openGuard).toContain(
-      'IF NOT COALESCE(open_index_ready, false) THEN SELECT character_id INTO duplicate_character_id FROM storage_purchases',
+      'IF NOT COALESCE(open_index_ready, false) THEN SELECT character_id INTO duplicate_character_id FROM "public".storage_purchases',
     );
     expect(openGuard).toContain("WHERE status IN ('pending', 'unresolved')");
     expect(openGuard.indexOf('IF NOT COALESCE(open_index_ready, false)')).toBeLessThan(
@@ -202,18 +210,20 @@ describe('the DDL', () => {
       consumedGuard.indexOf('FOR UPDATE'),
     );
     expect(consumedGuard.indexOf('FOR UPDATE')).toBeLessThan(
-      consumedGuard.indexOf('PERFORM pg_advisory_xact_lock'),
+      consumedGuard.indexOf('PERFORM pg_catalog.pg_advisory_xact_lock'),
     );
-    expect(consumedGuard.indexOf('PERFORM pg_advisory_xact_lock')).toBeLessThan(
+    expect(consumedGuard.indexOf('PERFORM pg_catalog.pg_advisory_xact_lock')).toBeLessThan(
       consumedGuard.indexOf('IF EXISTS'),
     );
     const archiveGuard = folded.slice(
       folded.indexOf('CREATE OR REPLACE FUNCTION archive_storage_purchase_applied_receipt()'),
       folded.indexOf('$storage_purchase_receipt$;', folded.indexOf('archive_storage_purchase')),
     );
-    expect(archiveGuard.indexOf('PERFORM pg_advisory_xact_lock')).toBeLessThan(
-      archiveGuard.indexOf('INSERT INTO storage_purchase_applied_receipts'),
+    expect(archiveGuard.indexOf('PERFORM pg_catalog.pg_advisory_xact_lock')).toBeLessThan(
+      archiveGuard.indexOf('INSERT INTO "public".storage_purchase_applied_receipts'),
     );
+    expect(folded).toContain('pg_catalog.hashtextextended(NEW.idempotency_key, 0)');
+    expect(archiveGuard).toContain("IF NEW.status <> 'applied' THEN RETURN NEW; END IF;");
     const triggerGuard = folded.slice(folded.indexOf('DO $storage_purchase_trigger_guard$'));
     expect(triggerGuard).toContain('t.tgtype = 11');
     expect(triggerGuard).toContain('t.tgtype = 7');
@@ -221,9 +231,7 @@ describe('the DDL', () => {
     expect(triggerGuard).toContain("t.tgenabled = 'O'");
     expect(triggerGuard).toContain('NOT t.tgisinternal');
     expect(triggerGuard).toContain('t.tgnargs = 0');
-    expect(triggerGuard).toContain(
-      "pg_get_expr(t.tgqual, t.tgrelid) = '(new.status = ''applied''::text)'",
-    );
+    expect(count(triggerGuard, 't.tgqual IS NULL')).toBe(4);
     expect(folded.indexOf('DO $storage_purchase_trigger_guard$')).toBeGreaterThan(
       folded.indexOf('CREATE OR REPLACE FUNCTION guard_storage_purchase_consumed_key()'),
     );
@@ -243,6 +251,23 @@ describe('the DDL', () => {
     );
     expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE INDEX')).toBe(
       count(STORAGE_PURCHASE_SCHEMA, 'CREATE INDEX IF NOT EXISTS'),
+    );
+  });
+
+  it('qualifies fixed-path trigger authority for private schemas', () => {
+    const privateSchema = storagePurchaseSchema('isolated_storage');
+    const folded = privateSchema.replace(/\s+/g, ' ');
+    expect(folded).toContain('SET LOCAL search_path = "isolated_storage", pg_catalog, pg_temp;');
+    expect(count(folded, 'SET search_path = pg_catalog, "isolated_storage", pg_temp')).toBe(3);
+    expect(folded).toContain('pg_catalog.pg_advisory_xact_lock(');
+    expect(folded).toContain('pg_catalog.hashtextextended(NEW.idempotency_key, 0)');
+    expect(folded).toContain('FROM "isolated_storage".storage_purchases');
+    expect(folded).toContain('INSERT INTO "isolated_storage".storage_purchase_applied_receipts');
+    expect(folded).toContain('PERFORM 1 FROM "isolated_storage".accounts');
+    expect(folded).toContain('PERFORM 1 FROM "isolated_storage".characters');
+    expect(folded).toContain('FROM "isolated_storage".storage_purchase_applied_receipts');
+    expect(() => storagePurchaseSchema('public; DROP SCHEMA public')).toThrow(
+      /simple lowercase identifier/,
     );
   });
 });
@@ -559,6 +584,53 @@ describe('writeStorageAppliedEffectsOnClient', () => {
     expect(cap.calls[5].text).toContain('DELETE FROM storage_purchases');
     expect(cap.calls[5].text).toContain('AND spend_claim_token = $3');
     expect(cap.calls[5].values).toEqual([9, 'k-applied', EFFECT.spendClaimToken]);
+  });
+
+  it('translates the raw storage-ledger trigger refusal for caller rollback', async () => {
+    const pgError = {
+      code: BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
+      constraint: BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
+      detail: JSON.stringify({
+        committed_rows: 10_000_000,
+        attempted_rows: 1,
+        hard_limit_rows: 10_000_000,
+      }),
+    };
+    const db = {
+      async query(text: string): Promise<{ rows: Record<string, unknown>[]; rowCount: number }> {
+        if (text.includes('pg_advisory_xact_lock')) return { rows: [], rowCount: 0 };
+        if (text.includes('FROM storage_purchase_applied_receipts')) {
+          return { rows: [], rowCount: 0 };
+        }
+        if (text.includes('FROM storage_purchases') && text.includes('FOR UPDATE')) {
+          return {
+            rows: [
+              {
+                id: 9,
+                realm: 'r1',
+                account_id: 7,
+                character_id: 42,
+                item_id: 'strongbox_rung_01',
+                expected_cost_claudium: 100,
+                idempotency_key: 'k-applied',
+                spend_claim_token: EFFECT.spendClaimToken,
+                status: 'pending',
+              },
+            ],
+            rowCount: 1,
+          };
+        }
+        if (text.includes('INSERT INTO storage_purchase_applied_receipts')) {
+          return { rows: [{ source_purchase_id: 9 }], rowCount: 1 };
+        }
+        if (text.includes('INSERT INTO bank_ledger')) throw pgError;
+        throw new Error(`unexpected SQL: ${text}`);
+      },
+    };
+
+    await expect(writeStorageAppliedEffectsOnClient(db, [EFFECT])).rejects.toBeInstanceOf(
+      BankLedgerGrowthLimitExceeded,
+    );
   });
 
   it('rejects a staged save after recovery rotates its spend claim', async () => {

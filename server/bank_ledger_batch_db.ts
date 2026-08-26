@@ -5,6 +5,7 @@
 // only newly claimed commands, in caller order, in one PostgreSQL statement.
 
 import { createHash } from 'node:crypto';
+import { bankLedgerGrowthLimitFromError } from './bank_ledger_growth_budget';
 import {
   BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH,
   type BankLedgerCommandBatch,
@@ -143,7 +144,7 @@ function normalizedRow(row: SerializedBankLedgerOutboxRow): SerializedBankLedger
   };
 }
 
-function payloadSha256(batch: BankLedgerCommandBatch): string {
+export function bankLedgerCommandBatchPayloadSha256(batch: BankLedgerCommandBatch): string {
   return createHash('sha256').update(bankLedgerCommandBatchFingerprintJson(batch)).digest('hex');
 }
 
@@ -203,7 +204,7 @@ function prepareWrite(
     const guildEffect = batch.guildEffect
       ? serializeBankLedgerGuildEffect(batch.guildEffect)
       : null;
-    const hash = payloadSha256(batch);
+    const hash = bankLedgerCommandBatchPayloadSha256(batch);
     if (!bankLedgerBatchMatchesOwner(owner, batch)) {
       throw new Error(`bank ledger batch ${batch.batchKey} does not match owner`);
     }
@@ -385,7 +386,12 @@ async function executePreparedWrite(
   owner: BankLedgerBatchOwner,
   prepared: PreparedWrite,
 ): Promise<BankLedgerBatchWriteResult> {
-  const result = await tx.query(WRITE_BANK_LEDGER_COMMAND_BATCHES_SQL, prepared.values);
+  let result: Awaited<ReturnType<BankLedgerBatchQueryable['query']>>;
+  try {
+    result = await tx.query(WRITE_BANK_LEDGER_COMMAND_BATCHES_SQL, prepared.values);
+  } catch (error) {
+    throw bankLedgerGrowthLimitFromError(error) ?? error;
+  }
   if (result.rows.length !== prepared.receipts.length) {
     throw new Error(
       `bank ledger receipt verification result count mismatch: expected ${prepared.receipts.length}, got ${result.rows.length}`,
