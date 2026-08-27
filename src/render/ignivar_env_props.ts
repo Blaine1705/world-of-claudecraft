@@ -34,6 +34,19 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   press_machine: '/models/dungeon/ignivar_prop_press_machine.glb',
   shelf: '/models/dungeon/ignivar_prop_shelf.glb',
   square_wall: '/models/dungeon/ignivar_prop_square_wall.glb',
+  chain_link: '/models/dungeon/ignivar_prop_chain_link.glb',
+  hanging_hook: '/models/dungeon/ignivar_prop_hanging_hook.glb',
+  industrial_pipe: '/models/dungeon/ignivar_prop_industrial_pipe.glb',
+  lava_channel: '/models/dungeon/ignivar_prop_lava_channel.glb',
+  lava_channel_curved: '/models/dungeon/ignivar_prop_lava_channel_curved.glb',
+  lava_outlet: '/models/dungeon/ignivar_prop_lava_outlet.glb',
+  lava_outlet_2: '/models/dungeon/ignivar_prop_lava_outlet_2.glb',
+  lava_port: '/models/dungeon/ignivar_prop_lava_port.glb',
+  pressure_device: '/models/dungeon/ignivar_prop_pressure_device.glb',
+  radiator: '/models/dungeon/ignivar_prop_radiator.glb',
+  steam_machine: '/models/dungeon/ignivar_prop_steam_machine.glb',
+  steam_machine_round: '/models/dungeon/ignivar_prop_steam_machine_round.glb',
+  steam_pipes: '/models/dungeon/ignivar_prop_steam_pipes.glb',
 };
 
 /** Props whose silhouette earns a shadow; density props (beams, chains,
@@ -55,6 +68,15 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'lava_furnace',
   'press_machine',
   'square_wall',
+  'industrial_pipe',
+  'lava_outlet',
+  'lava_outlet_2',
+  'lava_port',
+  'pressure_device',
+  'radiator',
+  'steam_machine',
+  'steam_machine_round',
+  'steam_pipes',
 ]);
 
 interface IgnivarEnvPropTemplate {

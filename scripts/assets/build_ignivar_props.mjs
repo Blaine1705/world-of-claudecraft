@@ -104,6 +104,42 @@ const ITEMS = [
   { src: 'New_Assets/Press+Machine.glb', name: 'press_machine', tex: 1024, emissive: 1.4 },
   { src: 'New_Assets/Shelf.glb', name: 'shelf', tex: 1024, emissive: 0.28 },
   { src: 'New_Assets/Square+Wall.glb', name: 'square_wall', tex: 1024, emissive: 0.28 },
+  // The New_Assets_Demi drop (2026-08-27): same pre-decimated contract
+  // (~1k tris, single mesh, 1024 atlas). Lava carriers run hot, steam
+  // machinery gets the reactor-class accent glow, trim stays plain.
+  { src: 'New_Assets_Demi/chain-link.glb', name: 'chain_link', tex: 512, emissive: 0.28 },
+  { src: 'New_Assets_Demi/hanging-hook.glb', name: 'hanging_hook', tex: 512, emissive: 0.28 },
+  {
+    src: 'New_Assets_Demi/industrial-pipe.glb',
+    name: 'industrial_pipe',
+    tex: 1024,
+    emissive: 0.28,
+  },
+  {
+    src: 'New_Assets_Demi/lava-channel-curved.glb',
+    name: 'lava_channel_curved',
+    tex: 1024,
+    emissive: 1.5,
+  },
+  { src: 'New_Assets_Demi/lava-channel.glb', name: 'lava_channel', tex: 1024, emissive: 1.5 },
+  { src: 'New_Assets_Demi/lava-outlet-2.glb', name: 'lava_outlet_2', tex: 1024, emissive: 1.5 },
+  { src: 'New_Assets_Demi/lava-outlet.glb', name: 'lava_outlet', tex: 1024, emissive: 1.5 },
+  { src: 'New_Assets_Demi/lava-port.glb', name: 'lava_port', tex: 1024, emissive: 1.5 },
+  {
+    src: 'New_Assets_Demi/pressure-device.glb',
+    name: 'pressure_device',
+    tex: 1024,
+    emissive: 1.0,
+  },
+  { src: 'New_Assets_Demi/radiator.glb', name: 'radiator', tex: 1024, emissive: 0.28 },
+  {
+    src: 'New_Assets_Demi/steam-machine-round.glb',
+    name: 'steam_machine_round',
+    tex: 1024,
+    emissive: 1.0,
+  },
+  { src: 'New_Assets_Demi/steam-machine.glb', name: 'steam_machine', tex: 1024, emissive: 1.0 },
+  { src: 'New_Assets_Demi/steam-pipes.glb', name: 'steam_pipes', tex: 1024, emissive: 0.28 },
 ];
 const SRC_DIR = 'tmp/asset_src/_IGNAR_Environment_Assets';
 const OUT_DIR = 'public/models/dungeon';

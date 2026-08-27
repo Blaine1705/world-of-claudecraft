@@ -30,7 +30,20 @@ export type IgnivarEnvPropKey =
   | 'lava_furnace'
   | 'press_machine'
   | 'shelf'
-  | 'square_wall';
+  | 'square_wall'
+  | 'chain_link'
+  | 'hanging_hook'
+  | 'industrial_pipe'
+  | 'lava_channel'
+  | 'lava_channel_curved'
+  | 'lava_outlet'
+  | 'lava_outlet_2'
+  | 'lava_port'
+  | 'pressure_device'
+  | 'radiator'
+  | 'steam_machine'
+  | 'steam_machine_round'
+  | 'steam_pipes';
 
 export interface IgnivarPropPlacement {
   key: IgnivarEnvPropKey;
@@ -74,6 +87,19 @@ export const IGNIVAR_PROP_NATIVE: Record<
   press_machine: { len: 0.76, hei: 1.0, dep: 0.57 },
   shelf: { len: 0.83, hei: 1.0, dep: 0.39 },
   square_wall: { len: 0.99, hei: 1.0, dep: 0.2 },
+  chain_link: { len: 1.0, hei: 0.75, dep: 0.14 },
+  hanging_hook: { len: 0.76, hei: 1.0, dep: 0.4 },
+  industrial_pipe: { len: 1.0, hei: 0.81, dep: 0.38 },
+  lava_channel: { len: 1.0, hei: 0.2, dep: 0.42 },
+  lava_channel_curved: { len: 1.0, hei: 0.13, dep: 1.0 },
+  lava_outlet: { len: 0.4, hei: 1.0, dep: 0.28 },
+  lava_outlet_2: { len: 0.67, hei: 1.0, dep: 0.25 },
+  lava_port: { len: 0.89, hei: 1.0, dep: 0.34 },
+  pressure_device: { len: 0.64, hei: 1.0, dep: 0.27 },
+  radiator: { len: 1.0, hei: 0.67, dep: 0.29 },
+  steam_machine: { len: 0.65, hei: 1.0, dep: 0.48 },
+  steam_machine_round: { len: 0.51, hei: 1.0, dep: 0.47 },
+  steam_pipes: { len: 0.63, hei: 1.0, dep: 0.2 },
 };
 
 /** The raid rooms build at the double-height wall course. */
@@ -178,9 +204,19 @@ export function ignivarPropPlacements(
   return [];
 }
 
-/** Overhead or trim props that never block movement: chains hang from the
- *  roof darkness, and the beam courses are ankle-height wall skirting. */
-const NON_COLLIDING: ReadonlySet<IgnivarEnvPropKey> = new Set(['beam', 'chain', 'chain_hanging']);
+/** Overhead or trim props that never block movement: chains and hook rigs
+ *  hang from the roof darkness or the walls, the beam courses are
+ *  ankle-height wall skirting, and the lava channels are floor gutters a
+ *  body steps over. */
+const NON_COLLIDING: ReadonlySet<IgnivarEnvPropKey> = new Set([
+  'beam',
+  'chain',
+  'chain_hanging',
+  'chain_link',
+  'hanging_hook',
+  'lava_channel',
+  'lava_channel_curved',
+]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and
  *  the firepit bowl collide on their trunk, not their widest flange, so a
