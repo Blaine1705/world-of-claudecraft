@@ -72,6 +72,11 @@ const MONOLITHS: MonolithRow[] = [
     // window carries only state, handler arms and passthroughs. Exact
     // count, zero headroom; the sell-tab combobox block is the next
     // standing extraction candidate.
+    // Held at 2487 for the Solana wallet card (the Claudium card above the
+    // Browse filters): the card's markup landed in the chrome builder, and
+    // the window's gated wallet fan-out arm was paid for by moving the quote
+    // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
+    // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
     ceiling: 2487,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
@@ -148,7 +153,12 @@ const MONOLITHS: MonolithRow[] = [
     // actual state-machine logic and its own test coverage so hud.ts keeps
     // only thin delegators. Maintainer decision prepared for PR review; exact
     // count, any further growth reds again.
-    ceiling: 18527,
+    // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
+    // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
+    // Claudium panel's existing arm. Exact count.
+    // The v0.41.0 reconcile keeps both the wrapped-shell hand-off and the
+    // wallet-card fan-out, then re-pins to the exact merged count.
+    ceiling: 18522,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -297,7 +307,9 @@ const MONOLITHS: MonolithRow[] = [
     // paint logic live in settings.ts and target_swing_timer_bars.ts). The
     // merged tree lands below PR #3648's parent pin because the movement
     // harness extractions ride in too, so keep the exact merged count.
-    ceiling: 11567,
+    // The v0.41.0 reconcile lands below both parent pins, so the ratchet
+    // follows the exact merged count down.
+    ceiling: 11561,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
