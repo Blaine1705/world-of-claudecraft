@@ -359,21 +359,21 @@ holder's class at the Crucible Quartermaster.
 
 | Sigil | Classes | Redeems |
 |---|---|---|
-| Helm Sigil of the Anvil (`sigil_anvil_helmet`) | warrior, priest, druid | any helmet set piece for your class |
-| Helm Sigil of the Ember (`sigil_ember_helmet`) | paladin, rogue, shaman | any helmet set piece for your class |
-| Helm Sigil of the Tempest (`sigil_tempest_helmet`) | hunter, mage, warlock | any helmet set piece for your class |
-| Mantle Sigil of the Anvil (`sigil_anvil_shoulder`) | warrior, priest, druid | any shoulder set piece for your class |
-| Mantle Sigil of the Ember (`sigil_ember_shoulder`) | paladin, rogue, shaman | any shoulder set piece for your class |
-| Mantle Sigil of the Tempest (`sigil_tempest_shoulder`) | hunter, mage, warlock | any shoulder set piece for your class |
-| Robe Sigil of the Anvil (`sigil_anvil_chest`) | warrior, priest, druid | any chest set piece for your class |
-| Robe Sigil of the Ember (`sigil_ember_chest`) | paladin, rogue, shaman | any chest set piece for your class |
-| Robe Sigil of the Tempest (`sigil_tempest_chest`) | hunter, mage, warlock | any chest set piece for your class |
-| Grip Sigil of the Anvil (`sigil_anvil_gloves`) | warrior, priest, druid | any gloves set piece for your class |
-| Grip Sigil of the Ember (`sigil_ember_gloves`) | paladin, rogue, shaman | any gloves set piece for your class |
-| Grip Sigil of the Tempest (`sigil_tempest_gloves`) | hunter, mage, warlock | any gloves set piece for your class |
-| Legging Sigil of the Anvil (`sigil_anvil_legs`) | warrior, priest, druid | any legs set piece for your class |
-| Legging Sigil of the Ember (`sigil_ember_legs`) | paladin, rogue, shaman | any legs set piece for your class |
-| Legging Sigil of the Tempest (`sigil_tempest_legs`) | hunter, mage, warlock | any legs set piece for your class |
+| Helm Sigil of the Anvil (`sigil_anvil_helmet`) | warrior, druid, mage | any helmet set piece for your class |
+| Helm Sigil of the Ember (`sigil_ember_helmet`) | paladin, hunter, priest | any helmet set piece for your class |
+| Helm Sigil of the Tempest (`sigil_tempest_helmet`) | shaman, rogue, warlock | any helmet set piece for your class |
+| Mantle Sigil of the Anvil (`sigil_anvil_shoulder`) | warrior, druid, mage | any shoulder set piece for your class |
+| Mantle Sigil of the Ember (`sigil_ember_shoulder`) | paladin, hunter, priest | any shoulder set piece for your class |
+| Mantle Sigil of the Tempest (`sigil_tempest_shoulder`) | shaman, rogue, warlock | any shoulder set piece for your class |
+| Robe Sigil of the Anvil (`sigil_anvil_chest`) | warrior, druid, mage | any chest set piece for your class |
+| Robe Sigil of the Ember (`sigil_ember_chest`) | paladin, hunter, priest | any chest set piece for your class |
+| Robe Sigil of the Tempest (`sigil_tempest_chest`) | shaman, rogue, warlock | any chest set piece for your class |
+| Grip Sigil of the Anvil (`sigil_anvil_gloves`) | warrior, druid, mage | any gloves set piece for your class |
+| Grip Sigil of the Ember (`sigil_ember_gloves`) | paladin, hunter, priest | any gloves set piece for your class |
+| Grip Sigil of the Tempest (`sigil_tempest_gloves`) | shaman, rogue, warlock | any gloves set piece for your class |
+| Legging Sigil of the Anvil (`sigil_anvil_legs`) | warrior, druid, mage | any legs set piece for your class |
+| Legging Sigil of the Ember (`sigil_ember_legs`) | paladin, hunter, priest | any legs set piece for your class |
+| Legging Sigil of the Tempest (`sigil_tempest_legs`) | shaman, rogue, warlock | any legs set piece for your class |
 
 ## Off-set waist and feet, all ten variants
 
@@ -508,7 +508,8 @@ power.
 202 new item ids: 145 set pieces, 15 sigils, 20 waist/feet, 8 jewelry, 4
 shields/held offhands, 10 weapons. 192 icons through the assets:items
 pipeline (weapons register through the variant tables). Acceptance gates:
-the item_level.test.ts budget sweep over every piece above, the
-old-versus-new balance harness (full six-piece lineage versus full new
-kit per archetype, plus the blend paths), and the drop tables in the plan
-doc's boss sections.
+the item_level.test.ts budget sweep over every piece above, unit pins on
+the retuned lineage tables and constants, the static old-versus-new
+viability check in the plan doc, the IP name screen before the art wave,
+and the drop tables in the plan doc's boss sections (one ilvl-35 tier
+spread across Normal and Heroic; no heroic item-level layer).

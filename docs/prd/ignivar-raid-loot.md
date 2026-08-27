@@ -221,8 +221,8 @@ incumbent lineages. A transitional blend is the intended migration path,
 not abuse, and it tapers naturally: the new five-piece slots (helmet,
 shoulder, chest, gloves, legs) cut straight through both old tiers'
 slots, so a new four-piece leaves room for at most two or three lineage
-pieces, which pay only the 2-piece entry tier. The harness guard (below)
-pins full-new above the full six-piece capstone and every blend.
+pieces, which pay only the 2-piece entry tier. The static viability check
+(below) shows full-new above the full six-piece capstone and every blend.
 
 After both moves the deep seven-piece collector pays roughly 25 attack
 power plus the retuned Gravemight, 20 primary stats, 4 percent haste, 3
@@ -232,8 +232,8 @@ more item levels of budget over the heroic-33 copies, the 60/25 ratings
 step, and for casters and healers the Spell Damage and Healing Power
 affix debut (a five-piece caster set carries roughly 58 authored Spell
 Damage the old stack simply does not have). The 6-piece capstone values
-are the numbers the harness is most likely to shave further; exact
-margins are measured, not asserted (below).
+are the numbers most likely to need a further shave; the static check
+below is re-run whenever they move.
 
 ### Viability check (static)
 
@@ -272,7 +272,7 @@ Conclusions:
   immediately) makes the two-piece threshold fast. No further softening
   of the old capstone is needed for this.
 - **The melee margin leans on the 60/25 ratings step.** If that proposal
-  is trimmed later, melee viability thins first; the harness must re-run
+  is trimmed later, melee viability thins first; re-run this check
   whenever either side's numbers move.
 - **Hit is honest on both sides after the seed flip.** Before it, the old
   heroic kit carried about 280 Hit rating, mostly dead against Normal
@@ -283,13 +283,20 @@ Conclusions:
 
 ### Guard
 
-A new balance harness test (the warfare_balance_harness pattern) assembles
-the best old-stack kit and the best new-tier kit per representative
-archetype (Strength melee, Agility melee, damage caster, healer, tank) and
-pins that the new kit wins on the harness metric by a real margin, in
-absolute DPS and HPS. This test is the acceptance gate for both the retune
-numbers and the new tier's bonus numbers, and it keeps the next tier from
-recreating this problem silently.
+Settled 2026-08-27: no simulation harness. The viability contract is the
+two levers this plan already pulls, checked three simpler ways:
+
+1. The new gear carries Hit exactly where each role needs it (the Hit
+   acquisition guarantee above), so nobody is forced back into old gear
+   for Hit.
+2. The old set bonuses come down (the lineage retune) so the new set
+   bonuses are the draw.
+3. Checks: ordinary unit tests pin the retuned lineage tables and
+   constants so they cannot silently regress; the static viability check
+   below is re-run whenever numbers on either side move; and after
+   release the live parse service verifies adoption for real (the same
+   top-parse gear audit that exposed the problem shows whether top
+   loadouts migrate to the new sets).
 
 ### Sequencing
 
@@ -320,8 +327,12 @@ NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL already does:
 
 The current ladder this slots above: Nythraxis normal raid epics 29, five-man
 heroic epics 31, Heroic Nythraxis raid epics 33, legendaries 37. Ignivar
-normal at 35 is the new best pre-legendary tier; a later Heroic Ignivar pass
-(out of scope here) would follow the heroic_variants.ts pattern upward.
+normal at 35 is the new best pre-legendary tier. By maintainer decision
+this raid runs ONE loot tier across both difficulties: there is no heroic
+item-level layer and no heroic_variants pass for this raid. Heroic pays in
+ACCESS (the loot spreads across the Normal and Heroic layers, see the boss
+tables), which also keeps the tier below the item-level-37 legendary
+ceiling.
 
 ### Primary stat budgets at item level 35
 
@@ -400,8 +411,8 @@ which is the intended deliberate chase. The dual-wield white window
 against +3 (360) is explicitly not a target, matching the classic
 reality that dual-wield whites never cap against bosses.
 
-These are proposed constants on the existing curve, to be confirmed in the
-tuning pass with the DPS study harness before merge.
+These are proposed constants on the existing curve, confirmed against the
+static viability check in the tuning pass before merge.
 
 ### Two affix debuts
 
@@ -431,9 +442,10 @@ needs one small seam:
   chest/legs/helmet, 18 on shoulder/gloves/waist, 14 on feet/jewelry, 45 on
   staves, 30 on one-hand healer weapons, 18 on held offhands.
 
-If the maintainer prefers zero sim changes in the first slice, the fallback is
-healer pieces carrying spellPower at the healer magnitudes; the healPower
-seam is small enough that the plan of record is the real affix.
+Settled by the maintainer (2026-08-27): the real affix, with the classic
+directionality stated as the contract: Spell Power adds to healing, but
+Healing Power never adds to damage. The heal paths read spellPower plus
+healPower; the damage paths read spellPower only.
 
 ### Armor values
 
@@ -622,15 +634,16 @@ Implementation notes for the bonuses:
 
 ### The three sigil groups
 
-Five slots times three class groups = 15 token items. The class partition
-balances armor types and mirrors the proven three-way split for exactly these
-nine classes:
+Five slots times three class groups = 15 token items. The partition is
+balanced-mixed (settled 2026-08-27): every sigil group contains exactly one
+mail, one leather, and one cloth class, so any token that drops is
+contested across the whole raid rather than inside one armor class:
 
 | Sigil group | Classes |
 |---|---|
-| Sigil of the Anvil | warrior, priest, druid |
-| Sigil of the Ember | paladin, rogue, shaman |
-| Sigil of the Tempest | hunter, mage, warlock |
+| Sigil of the Anvil | warrior, druid, mage |
+| Sigil of the Ember | paladin, hunter, priest |
+| Sigil of the Tempest | shaman, rogue, warlock |
 
 Token items: "Helm Sigil of the Anvil", "Mantle Sigil of the Ember", "Robe
 Sigil of the Tempest", and so on for all 15 (slot nouns Helm, Mantle, Robe,
@@ -646,7 +659,7 @@ beside the raid entrance (id `crucible_quartermaster`). A new content module
 src/sim/instances/heroic_vendor.ts) lists all 145 set pieces, each priced at
 exactly one token of the matching slot and group. The buy path validates the
 buyer's class against the piece's requiredClass, so a priest holding a Helm
-Sigil of the Anvil sees and chooses among exactly three helms: Creed of
+Sigil of the Ember sees and chooses among exactly three helms: Creed of
 Embers, Benison Dawnweave, or Vesperash. A druid or shaman chooses among
 four, because their hybrid spec carries both a damage and a tank set. This
 is the per-spec choice moment, and it is deliberate: one token serves three
@@ -733,60 +746,81 @@ Every weapon gets its WEAPON_TYPE_BY_ITEM row (weapon_skin_rules.ts) and its
 variant art registration; Forgefather's Warhammer deliberately echoes the
 Varkhul encounter prop.
 
-## Boss loot tables
+## Boss loot tables: one tier, spread across Normal and Heroic
 
-Both bosses currently ship loot: []. The table below is the complete drop
-plan, authored as rollGroup entries (one rng draw per group, chances summing
-to 1.0 for guaranteed groups) appended in the listed order. Draw order is
-parity-sensitive: entries append, never reorder, and future additions go to
-the end.
+Both bosses currently ship loot: []. Settled 2026-08-27: this raid has NO
+heroic item-level layer. Instead the single ilvl-35 table spreads across
+the two difficulties: Normal pays four of the five sigil slots (enough for
+the 4-piece bonus), the off-set armor, and the smaller weapons; Heroic
+adds the Robe (chest) sigil, the marquee weapons, and the shields and
+held offhands on top of the Normal groups. A Heroic kill drops its Normal
+groups PLUS its heroic-only groups, so Heroic pays in access and volume,
+never in bigger numbers.
 
-### Ignivar, Herald of the Last Flame
+Tables are authored as rollGroup entries (one rng draw per group, chances
+summing to 1.0 for guaranteed groups) appended in the listed order. Draw
+order is parity-sensitive: entries append, never reorder, and future
+additions go to the end. These tables are a DRAFT pending #3684: its
+promoted Warden minibosses take over groups when it lands (below).
+
+### Ignivar, Herald of the Last Flame (both difficulties)
 
 | Group | Entries | Chance each |
 |---|---|---|
 | copper | 150000 copper | 1.0 |
 | ignivar_sigil_mantle | Mantle Sigil of the Anvil / Ember / Tempest | 1/3 each |
 | ignivar_sigil_grip | Grip Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| ignivar_sigil_legging | Legging Sigil of the Anvil / Ember / Tempest | 1/3 each |
 | ignivar_offset | the 10 waist pieces at 0.07 each, Cinderfang Kris 0.10, Slagrender Cleaver 0.10, Wand of Quenched Sparks 0.10 | sums to 1.0 |
 | ignivar_jewelry | the 4 necks | 0.25 each |
 
-Five guaranteed drops per kill: three tier tokens, one off-set piece or
-weapon, one neck.
+### Ignivar, heroic-only appends
 
-### Varkhul, Forgefather of the Last Flame
+| Group | Entries | Chance each |
+|---|---|---|
+| ignivar_h_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
+| ignivar_h_weapon | Forgefather's Warhammer, Anvilguard Blade, Emberflight Longbow, Springtouched Crozier | 0.25 each |
+
+### Varkhul, Forgefather of the Last Flame (both difficulties)
 
 | Group | Entries | Chance each |
 |---|---|---|
 | copper | 200000 copper | 1.0 |
+| varkhul_sigil_legging | Legging Sigil of the Anvil / Ember / Tempest | 1/3 each |
 | varkhul_sigil_helm | Helm Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| varkhul_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| varkhul_weapon | Forgefather's Warhammer 0.15, Anvilguard Blade 0.14, Heart of the End Greatblade 0.15, Emberflight Longbow 0.14, Staff of the Last Spring 0.14, Forgefire Spire 0.14, Springtouched Crozier 0.14 | sums to 1.0 |
-| varkhul_offset | the 10 feet pieces at 0.07 each, both shields at 0.075 each, both held offhands at 0.075 each | sums to 1.0 |
+| varkhul_offset | the 10 feet pieces at 0.07 each, both held offhands at 0.15 each | sums to 1.0 |
 | varkhul_rings | the 4 rings | 0.25 each |
 
-Five guaranteed drops per kill: two tier tokens (the end boss owns the chest
-and helm, the prestige slots), one weapon, one off-set piece, one ring.
+### Varkhul, heroic-only appends
 
-A full clear pays five tokens, so a 10-player group completes 29 five-piece
-sets over a long, classic-feeling campaign; later bosses accelerate this by
-taking over token slots (below).
+| Group | Entries | Chance each |
+|---|---|---|
+| varkhul_h_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
+| varkhul_h_weapon | Heart of the End Greatblade, Forgefire Spire, Staff of the Last Spring | 1/3 each |
+| varkhul_h_shields | Bulwark of the Inner Crucible, Ember Warden's Barrier | 0.5 each |
+
+A Normal kill pays five guaranteed drops (two sigils, one off-set piece or
+weapon, one jewelry piece, copper); a Heroic kill pays seven or eight. A
+Normal-only group can finish helmet, shoulder, gloves, and legs, exactly
+the 4-piece bonus; the Robe and the marquee weapons are the Heroic chase,
+which is what makes the fifth slot the prestige piece under the settled
+2/4 breakpoints.
 
 ## Future redistribution
 
-More bosses land in this content phase. The intended migration, so nothing
-here paints us into a corner:
+More drop surfaces are landing in this phase, starting with #3684's
+promoted Warden minibosses. The intended migration, so nothing here
+paints us into a corner:
 
-- Each new boss takes ownership of one token slot group (for example a third
-  boss takes the Grip and Legging sigils from Ignivar and adds a new off-set
-  group of its own).
-- The weapon group splits across bosses by theme.
-- Group names are boss-scoped (ignivar_*, varkhul_*), so moving an entry is
-  a delete-from-one, append-to-other change; the parity suite re-mints for
-  any rng reordering, which is expected and handled per
+- Minibosses take over the off-set and jewelry groups first (waists, feet,
+  necks, rings), then a sigil slot each as the boss count grows; the two
+  named bosses keep the prestige slots.
+- Group names are owner-scoped, so moving an entry is a delete-from-one,
+  append-to-other change; the parity suite re-mints for any rng
+  reordering, which is expected and handled per
   content-adds-shift-every-hunted-seed.
-- Drop cadence stays five guaranteed items per boss kill.
+- Drop cadence stays five guaranteed items per Normal boss kill.
+- The final tables are re-cut in one pass after #3684 merges into the
+  raid branch.
 
 ## Content obligations checklist
 
@@ -816,6 +850,9 @@ CLAUDE.md, content-obligations-reviewer):
 - **Parity**: loot entries append-only; new rng draws re-mint hunted seeds
   where the suite requires.
 - **Set procs**: SET_PROC_FX_BY_ID color rows for every new 4-piece proc.
+- **IP name screen**: before the art wave mints, every set and item name
+  is checked against the WoW item and set databases (the ip-pivot
+  discipline); any collision renames while renames are still cheap.
 
 The raid remains development-gated (the PRD keeps public Finder, Guide, and
 lockout out of scope until the launch pass), so the loot lands behind the
@@ -838,40 +875,41 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    program (tier-2 seed flips, the five-man heroic per-slot
    diversification, the vendor jewelry lane fix), their bonus-text and
    set-tooltip updates, and
-   the old-versus-new balance harness test (initially pinning the retuned
-   lineage values; the new-kit comparison arm lands with phase 5).
+   ordinary unit pins on the retuned lineage tables and constants.
 4. **Sets**: ITEM_SETS declarations for all 29 families with the shared
    bonus-family constants; the 145 set-piece ItemDefs in a new
    src/sim/content/ignivar_loot.ts (data-as-code, large is correct); the 15
    sigil tokens; vendor stock wiring.
 5. **Off-set, weapons, jewelry, boss tables**: the 42 direct-drop items and
-   both bosses' rollGroup tables; budget and progression tests green; the
-   harness test's old-versus-new comparison arm.
+   both bosses' rollGroup tables (Normal plus heroic-only appends, re-cut
+   after #3684); budget and progression tests green; the static viability
+   check re-run against the final numbers.
 6. **Art and i18n wave**: 192 icons via the pipeline, catalog names, M16
    fills, quartermaster entity names.
 7. **Obligations closeout**: deeds, reliquary, wiki regen, set proc FX rows,
    qa-checklist + content-obligations-reviewer pass.
-8. **Tuning pass**: DPS/HPS harness comparison against the Nythraxis-tier
-   baselines; confirm the proposed rating/affix constants and the retune
-   magnitudes; adjust set proc numbers.
+8. **Tuning pass**: re-run the static viability check against the final
+   numbers, confirm the proposed rating/affix constants and the retune
+   magnitudes, and stand up the post-release parse-service watch (top
+   Nythraxis and Ignivar loadouts should migrate to the new sets; the
+   audit recipe is in the Prerequisite section's evidence).
 
-## Open questions for the maintainer
+## Decisions (settled by the maintainer, 2026-08-27)
 
-1. **Healing Power affix**: confirm the new healPower field (plan of record)
-   over the spellPower-on-healer-gear fallback.
-2. **Breakpoints**: 2/4 on five-piece sets (fifth slot as a choice) versus
-   the house 2/3/4 pattern extended to 2/3/5. The plan assumes 2/4.
-3. **Token partition**: Anvil (warrior, priest, druid), Ember (paladin,
-   rogue, shaman), Tempest (hunter, mage, warlock). Any preferred regrouping
-   is a rename-level change at this stage.
-4. **Drop cadence**: five guaranteed items per boss kill (Nythraxis pays
-   four plus a bonus group from its single boss). Confirm for a two-boss
-   clear.
-5. **Set names**: the 29 names above are proposals; vetoes are cheap until
-   the art wave mints.
-6. **Retune shape and magnitudes**: the incumbent restructure (each
-   archetype's families merged into one 2/4/6 lineage ladder, throughput
-   topped by the 6-piece capstone) and the halved values in "Prerequisite:
-   retune the incumbent set stack" are design targets sized to turn the
-   double stack into one sized package and put it under a full new kit;
-   the harness test measures the real margin before any number ships.
+1. **Healing Power affix**: build the real healPower field, with the
+   classic directionality as the contract: Spell Power adds to healing;
+   Healing Power never adds to damage.
+2. **Breakpoints**: 2/4 on the five-piece sets, the shape WoW settled on
+   from TBC onward and never revisited.
+3. **Token partition**: balanced-mixed. Anvil (warrior, druid, mage),
+   Ember (paladin, hunter, priest), Tempest (shaman, rogue, warlock):
+   every group exactly one mail, one leather, one cloth class.
+4. **Difficulty**: no heroic item-level layer for this raid. One ilvl-35
+   table spread across Normal and Heroic: Normal pays four sigil slots
+   (the 4-piece bonus), Heroic adds the Robe sigil, the marquee weapons,
+   and the shields. Tables re-cut after #3684's minibosses land.
+5. **Set names**: approved, gated on the IP screen in the obligations
+   checklist (no Blizzard-infringing names reach the art wave).
+6. **Retune verification**: no simulation harness. Unit pins on the
+   retuned constants, the static viability check re-run when numbers
+   move, and post-release verification through the live parse service.
