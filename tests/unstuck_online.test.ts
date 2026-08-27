@@ -333,11 +333,12 @@ describe('online unstuck command wiring', () => {
     expect(server.sim.meta(pid)?.moveInput.forward).toBe(false);
   });
 
-  it('the Settings command completes for battleground wall-contact after ESC clears movement', () => {
+  it('the Settings command completes for a penetrated battleground wall trap after ESC clears movement', () => {
     const server = new GameServer();
     const { session } = join(server, 23);
     const { match, pid } = activeBattlegroundForSession(server, session);
-    forceIntoBgWallContact(server, match, pid, false);
+    forceIntoBgWallTrap(server, match, pid);
+    must(server.sim.meta(pid), 'wall-trapped player meta').moveInput.forward = false;
 
     send(server, session, { cmd: 'unstuck' });
 
@@ -358,6 +359,26 @@ describe('online unstuck command wiring', () => {
     );
     expect(server.sim.bgMatchFor(pid)).toBe(match);
     expect(inBgGraveyard(server, match, pid)).toBe(true);
+  });
+
+  it('the Settings command refuses idle clear battleground wall-contact as a shortcut', () => {
+    const server = new GameServer();
+    const { session } = join(server, 24);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    forceIntoBgWallContact(server, match, pid, false);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(server.sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
   });
 
   it('the slash alias pays the command lane (a drained lane refuses it)', () => {
