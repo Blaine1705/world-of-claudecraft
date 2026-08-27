@@ -6,7 +6,10 @@
 import { describe, expect, it } from 'vitest';
 import type { Collider, ObbCollider } from '../src/sim/colliders';
 import { DUNGEONS } from '../src/sim/data';
-import { IGNIVAR_FORGE_APPROACH_LAYOUT } from '../src/sim/dungeon_layout';
+import {
+  IGNIVAR_FORGE_APPROACH_LAYOUT,
+  IGNIVAR_SECOND_WING_LAYOUT,
+} from '../src/sim/dungeon_layout';
 import {
   IGNIVAR_PROP_COLLIDER_FOOTPRINT,
   IGNIVAR_PROP_NATIVE,
@@ -15,8 +18,22 @@ import {
 } from '../src/sim/ignivar_props';
 import { derivedInteriorColliders } from '../src/sim/interior_collider_sets';
 
-const APPROACH = 'ignivar_approach';
-const LAYOUT = IGNIVAR_FORGE_APPROACH_LAYOUT;
+/** Every room carrying a hand-placed floor pass rides the same contracts;
+ *  per-room floors pin the pass sizes so a gutted bake fails loudly. */
+const ROOMS = [
+  {
+    interior: 'ignivar_approach',
+    layout: IGNIVAR_FORGE_APPROACH_LAYOUT,
+    minFloorProps: 15,
+    minSpawnPoints: 4,
+  },
+  {
+    interior: 'ignivar_depths',
+    layout: IGNIVAR_SECOND_WING_LAYOUT,
+    minFloorProps: 20,
+    minSpawnPoints: 3,
+  },
+] as const;
 
 function pointInObb(collider: ObbCollider, x: number, z: number, pad = 0): boolean {
   // Same local-frame transform as the engine's OBB samplers in colliders.ts.
@@ -34,75 +51,86 @@ const obbs = (colliders: Collider[]): ObbCollider[] =>
 
 describe('ignivar prop colliders', () => {
   it('gives every floor prop an OBB matching its rendered footprint', () => {
-    const placements = ignivarPropPlacements(APPROACH, LAYOUT);
-    const colliders = obbs(ignivarPropColliders(APPROACH, LAYOUT));
-    const floorProps = placements.filter(
-      (placement) =>
-        placement.y === 0 && !placement.key.startsWith('chain') && placement.key !== 'beam',
-    );
-    expect(floorProps.length).toBeGreaterThanOrEqual(15);
-    expect(colliders.length).toBe(floorProps.length);
-    for (const placement of floorProps) {
-      const native = IGNIVAR_PROP_NATIVE[placement.key];
-      const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT[placement.key] ?? 1;
-      const match = colliders.find(
-        (collider) =>
-          collider.x === placement.x &&
-          collider.z === placement.z &&
-          collider.rot === placement.ry &&
-          Math.abs(collider.hw - (native.len * placement.scale * footprint) / 2) < 1e-9 &&
-          Math.abs(collider.hd - (native.dep * placement.scale * footprint) / 2) < 1e-9,
+    for (const room of ROOMS) {
+      const placements = ignivarPropPlacements(room.interior, room.layout);
+      const colliders = obbs(ignivarPropColliders(room.interior, room.layout));
+      const floorProps = placements.filter(
+        (placement) =>
+          placement.y === 0 && !placement.key.startsWith('chain') && placement.key !== 'beam',
       );
-      expect(match, `${placement.key} at (${placement.x}, ${placement.z})`).toBeDefined();
-      // Architecture, not parkour: full-height blockers.
-      expect(match?.moveTopY).toBeUndefined();
-      expect(match?.standable).toBeUndefined();
+      expect(floorProps.length, room.interior).toBeGreaterThanOrEqual(room.minFloorProps);
+      expect(colliders.length, room.interior).toBe(floorProps.length);
+      for (const placement of floorProps) {
+        const native = IGNIVAR_PROP_NATIVE[placement.key];
+        const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT[placement.key] ?? 1;
+        const match = colliders.find(
+          (collider) =>
+            collider.x === placement.x &&
+            collider.z === placement.z &&
+            collider.rot === placement.ry &&
+            Math.abs(collider.hw - (native.len * placement.scale * footprint) / 2) < 1e-9 &&
+            Math.abs(collider.hd - (native.dep * placement.scale * footprint) / 2) < 1e-9,
+        );
+        expect(
+          match,
+          `${room.interior}: ${placement.key} at (${placement.x}, ${placement.z})`,
+        ).toBeDefined();
+        // Architecture, not parkour: full-height blockers.
+        expect(match?.moveTopY).toBeUndefined();
+        expect(match?.standable).toBeUndefined();
+      }
     }
   });
 
   it('keeps chains and beam trim non-blocking, and quiet rooms empty', () => {
-    const placements = ignivarPropPlacements(APPROACH, LAYOUT);
-    expect(placements.some((placement) => placement.key === 'chain')).toBe(true);
-    const colliders = ignivarPropColliders(APPROACH, LAYOUT);
-    for (const collider of obbs(colliders)) {
-      for (const placement of placements) {
-        if (placement.key !== 'chain' && placement.key !== 'chain_hanging') continue;
-        expect(collider.x === placement.x && collider.z === placement.z).toBe(false);
+    for (const room of ROOMS) {
+      const placements = ignivarPropPlacements(room.interior, room.layout);
+      expect(placements.some((placement) => placement.key === 'chain')).toBe(true);
+      const colliders = ignivarPropColliders(room.interior, room.layout);
+      for (const collider of obbs(colliders)) {
+        for (const placement of placements) {
+          if (placement.key !== 'chain' && placement.key !== 'chain_hanging') continue;
+          expect(collider.x === placement.x && collider.z === placement.z).toBe(false);
+        }
       }
     }
-    expect(ignivarPropColliders('crypt', LAYOUT)).toEqual([]);
+    expect(ignivarPropColliders('crypt', ROOMS[0].layout)).toEqual([]);
   });
 
   it('rides the derived interior collider set', () => {
-    const derived = derivedInteriorColliders(null, APPROACH, {});
-    const props = obbs(ignivarPropColliders(APPROACH, LAYOUT));
-    for (const prop of props) {
-      expect(
-        derived.some(
-          (collider) => collider.type === 'obb' && collider.x === prop.x && collider.z === prop.z,
-        ),
-        `derived set missing prop collider at (${prop.x}, ${prop.z})`,
-      ).toBe(true);
+    for (const room of ROOMS) {
+      const derived = derivedInteriorColliders(null, room.interior, {});
+      const props = obbs(ignivarPropColliders(room.interior, room.layout));
+      for (const prop of props) {
+        expect(
+          derived.some(
+            (collider) => collider.type === 'obb' && collider.x === prop.x && collider.z === prop.z,
+          ),
+          `${room.interior}: derived set missing prop collider at (${prop.x}, ${prop.z})`,
+        ).toBe(true);
+      }
     }
   });
 
   it('never buries a spawn point inside a prop collider', () => {
-    const colliders = obbs(ignivarPropColliders(APPROACH, LAYOUT));
-    const approach = Object.values(DUNGEONS).find((dungeon) => dungeon.interior === APPROACH);
-    expect(approach).toBeDefined();
-    const points: Array<{ label: string; x: number; z: number }> = [];
-    if (approach?.entry) points.push({ label: 'player entry', ...approach.entry });
-    for (const spawn of approach?.spawns ?? [])
-      points.push({ label: `spawn ${spawn.mobId}`, x: spawn.x, z: spawn.z });
-    for (const npc of approach?.npcs ?? [])
-      points.push({ label: `npc ${npc.npcId}`, x: npc.x, z: npc.z });
-    expect(points.length).toBeGreaterThan(3);
-    for (const point of points) {
-      for (const collider of colliders) {
-        expect(
-          pointInObb(collider, point.x, point.z, 0.6),
-          `${point.label} at (${point.x}, ${point.z}) is inside a prop collider at (${collider.x}, ${collider.z})`,
-        ).toBe(false);
+    for (const room of ROOMS) {
+      const colliders = obbs(ignivarPropColliders(room.interior, room.layout));
+      const dungeon = Object.values(DUNGEONS).find((entry) => entry.interior === room.interior);
+      expect(dungeon, room.interior).toBeDefined();
+      const points: Array<{ label: string; x: number; z: number }> = [];
+      if (dungeon?.entry) points.push({ label: 'player entry', ...dungeon.entry });
+      for (const spawn of dungeon?.spawns ?? [])
+        points.push({ label: `spawn ${spawn.mobId}`, x: spawn.x, z: spawn.z });
+      for (const npc of dungeon?.npcs ?? [])
+        points.push({ label: `npc ${npc.npcId}`, x: npc.x, z: npc.z });
+      expect(points.length, room.interior).toBeGreaterThanOrEqual(room.minSpawnPoints);
+      for (const point of points) {
+        for (const collider of colliders) {
+          expect(
+            pointInObb(collider, point.x, point.z, 0.6),
+            `${room.interior}: ${point.label} at (${point.x}, ${point.z}) is inside a prop collider at (${collider.x}, ${collider.z})`,
+          ).toBe(false);
+        }
       }
     }
   });

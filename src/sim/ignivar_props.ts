@@ -181,10 +181,17 @@ export function ignivarArenaPropPlacements(_layout: DungeonLayout): IgnivarPropP
   ];
 }
 
-/** The Inner Crucible: roof chains only until the hand-placed pass lands
- *  (the hook chains still hang over the forge anchor the boss works). */
+/** The Inner Crucible: the hand-placed pass (baked from the /placer export,
+ *  2026-08-27) over the original roof chains. Furnace banks and steam stacks
+ *  line the east and west walls, a workshop face wraps the south door (wall
+ *  panels riding above pipes and lava ports, press machines on the corner
+ *  diagonals), the lava-fed north wall stands behind the forge anchor, and
+ *  chain drapes dress the wall feet. Every floor placement hugs the walls,
+ *  outside the trench-bounded fighting floor the encounter declares. */
 export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPropPlacement[] {
   return [
+    // Roof chains in the darkness (the hook chains hang over the forge
+    // anchor the boss works).
     at('chain', -24, -14, 0.4, 8, 12, true),
     at('chain', 24, -14, 1.3, 8, 12),
     at('chain', -27, 0, 2.1, 8, 12, true),
@@ -193,6 +200,72 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     at('chain', 24, 14, 4.8, 8, 12),
     at('chain_hanging', -5.5, 25, 0.5, 8, 10),
     at('chain_hanging', 5.5, 25, -0.5, 8, 10),
+    // The forge-anchor dressing: the anvil the boss works pre-pull, beside
+    // the assembly forge at (0, 22). The one deliberate floor placement
+    // inside the fighting circle; the clearance contracts carve out the
+    // forge-anchor radius for exactly this.
+    at('anvil', 8.2, 17.7, 225 * DEG, 8),
+    // East wall: furnace bank flanking the steam pipe stack.
+    at('steam_pipes', 39.25, -2.5, 270 * DEG, 15),
+    at('lava_furnace', 37.5, -10.5, 270 * DEG, 15),
+    at('lava_furnace', 37.5, 6.5, 270 * DEG, 15),
+    // South door wall: the workshop face. Wall panels ride high over the
+    // pipe runs and lava ports; the press machines hold the corner
+    // diagonals with lava outlets at their feet.
+    at('square_wall', 11.7, -39, 0, 8, 7.75),
+    at('square_wall', 3.7, -39, 0, 8, 7.75),
+    at('square_wall', -4.3, -39, 0, 8, 7.75),
+    at('square_wall', -11.3, -39, 0, 8, 7.75),
+    at('industrial_pipe', 9.3, -38.2, 0, 12),
+    at('industrial_pipe', -9.7, -38.2, 0, 12),
+    at('lava_outlet', -30.8, -30.3, 45 * DEG, 14),
+    at('lava_outlet', 29.2, -30.9, 315 * DEG, 14),
+    at('press_machine', -23.2, -33.5, 45 * DEG, 11),
+    at('lava_port', -10.1, -38.3, 0, 7),
+    at('lava_port', 9.1, -38.5, 0, 7),
+    at('press_machine', 22.6, -34.6, 315 * DEG, 11),
+    // East and west wall chain rigs: a link run with its hook below.
+    at('chain_link', 35.2, -20.95, 315 * DEG, 10, 8),
+    at('hanging_hook', 34.1, -24.9, 135 * DEG, 10, 5),
+    // West wall: the mirrored furnace bank.
+    at('lava_furnace', -38, -9.9, 90 * DEG, 15),
+    at('lava_furnace', -37.5, 7.1, 90 * DEG, 15),
+    at('steam_pipes', -38, -0.6, 90 * DEG, 15),
+    at('chain_link', -35.3, -19.1, 45 * DEG, 10, 8),
+    at('hanging_hook', -32.3, -24.1, 45 * DEG, 10, 5),
+    // North wall behind the forge anchor: lava outlets feed an elevated
+    // port over a stacked beam course, steam pipes at the wall feet.
+    at('lava_outlet', -15.8, 38, 180 * DEG, 15),
+    at('lava_outlet', 14.4, 38.5, 180 * DEG, 15),
+    at('lava_port', -0.5, 38, 180 * DEG, 13, 2.75),
+    at('beam', -10.6, 39.05, 180 * DEG, 9, 11),
+    at('beam', -9.6, 39.05, 180 * DEG, 9, 8.25),
+    at('beam', -9.6, 39.05, 180 * DEG, 9, 5),
+    at('beam', 9.4, 39.05, 180 * DEG, 9, 5),
+    at('beam', 9.4, 39.05, 180 * DEG, 9, 8.25),
+    at('beam', 8.4, 39.05, 180 * DEG, 9, 11),
+    at('steam_pipes', 8.9, 39.1, 180 * DEG, 10),
+    at('steam_pipes', -10.1, 39.1, 180 * DEG, 10),
+    at('beam', -0.6, 39.05, 180 * DEG, 13),
+    // Mid walls: one round steam machine per side.
+    at('steam_machine_round', -36.9, 16.05, 90 * DEG, 12),
+    at('steam_machine_round', 36.95, 14.85, 270 * DEG, 12),
+    // North corner wall panels on the octagon diagonals.
+    at('square_wall', 26.2, 33.2, 225 * DEG, 15),
+    at('square_wall', -28, 31.8, 135 * DEG, 15),
+    // Wall drapes: a long low chain with a short one beside it, at the
+    // door corners and the mid walls.
+    at('chain_hanging', 16.4, -36.2, 0, 15, 1),
+    at('chain_hanging', 18.4, -36.2, 0, 10, 6),
+    at('chain_hanging', -17.7, -37.5, 225 * DEG, 15, 1),
+    at('chain_hanging', -19.3, -36.7, 0, 10, 6.5),
+    at('chain_hanging', -35, 21.5, 0, 15, 1),
+    at('chain_hanging', -33.1, 22.1, 0, 10, 6.5),
+    at('chain_hanging', 34.1, 20.7, 0, 15, 1),
+    at('chain_hanging', 31, 21, 0, 10, 6.5),
+    // North corner pillars beside the forge wall.
+    at('pillar_slim', 18.9, 37.5, 135 * DEG, 12),
+    at('pillar_slim', -19.4, 35.9, 135 * DEG, 12),
   ];
 }
 

@@ -22,6 +22,7 @@ import {
   IGNIVAR_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../src/sim/dungeon_layout';
+import { VARKHUL_FORGE_LOCAL_POS } from '../src/sim/encounters/varkhul';
 import { IGNIVAR_CONDUITS } from '../src/sim/ignivar_arena';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -71,14 +72,26 @@ describe('ignivar dressing plan', () => {
 
   it('keeps the crucible fighting floor clear', () => {
     const plan = ignivarCruciblePropPlan(IGNIVAR_SECOND_WING_LAYOUT);
-    expect(plan.length).toBeGreaterThanOrEqual(8);
-    // The hook chains hang over the boss's forge anchor: allowed because
-    // they are high overhead, never floor placements.
+    // The hand-placed pass: furnace banks on the east and west walls, the
+    // workshop face around the south door, the lava-fed north wall, corner
+    // panels, wall drapes, and the roof chains over the forge anchor.
+    expect(plan.length).toBeGreaterThanOrEqual(40);
+    // Every floor placement hugs the walls: the trench-bounded fighting
+    // floor (the render rig declares clear radius 32) stays open for the
+    // Varkhul encounter, with margin. The one carve-out is the forge
+    // anchor: the anvil the boss works pre-pull stands beside the
+    // assembly forge, inside the circle by design.
     for (const placement of plan) {
+      if (!floorLevel(placement)) continue;
+      const forgeDistance = Math.hypot(
+        placement.x - VARKHUL_FORGE_LOCAL_POS.x,
+        placement.z - VARKHUL_FORGE_LOCAL_POS.z,
+      );
+      if (forgeDistance <= 10) continue;
       expect(
-        placement.y,
-        `${placement.key} must hang overhead in the interim plan`,
-      ).toBeGreaterThan(8);
+        Math.hypot(placement.x, placement.z),
+        `${placement.key} at ${placement.x},${placement.z} enters the fighting floor`,
+      ).toBeGreaterThan(32);
     }
   });
 

@@ -64,10 +64,7 @@ describe('expanded Ignivar raid dressing', () => {
     }
   });
 
-  it('keeps the crucible trenches while the interim chains-only prop plan is active', () => {
-    // The prop plans are chains-only while the maintainer hand-places the
-    // forge-mech props with /placer; the baked pass will restore the anvil
-    // and furnace placements here.
+  it('keeps the crucible trenches and fighting floor under the baked hand-placed pass', () => {
     const captured: IgnivarPropPlacement[] = [];
     const group = ignivarRaidDressingInternalsForTest.buildInnerCrucibleDressing(
       INNER_LAYOUT,
@@ -77,8 +74,23 @@ describe('expanded Ignivar raid dressing', () => {
     const trenches = group.getObjectByName('varkhulMoltenSideTrenches') as THREE.InstancedMesh;
 
     expect(group.name).toBe(VARKHUL_CRUCIBLE_DRESSING_NAME);
-    expect(captured.length).toBeGreaterThanOrEqual(8);
-    expect(captured.every((placement) => placement.key.startsWith('chain'))).toBe(true);
+    expect(captured.length).toBeGreaterThanOrEqual(40);
+    // The baked pass hugs the walls: every floor placement stays outside
+    // the fighting-floor clear radius the rig itself declares, except the
+    // forge-anchor dressing (the anvil the boss works pre-pull).
+    const clearRadius = group.userData.fightingFloorClearRadius as number;
+    for (const placement of captured) {
+      if (placement.y !== 0) continue;
+      const forgeDistance = Math.hypot(
+        placement.x - VARKHUL_FORGE_LOCAL_POS.x,
+        placement.z - VARKHUL_FORGE_LOCAL_POS.z,
+      );
+      if (forgeDistance <= 10) continue;
+      expect(
+        Math.hypot(placement.x, placement.z),
+        `${placement.key} at ${placement.x},${placement.z} enters the fighting floor`,
+      ).toBeGreaterThan(clearRadius);
+    }
     expect(trenches.count).toBe(2);
     expect(group.userData.fightingFloorClearRadius).toBeGreaterThanOrEqual(30);
   });
