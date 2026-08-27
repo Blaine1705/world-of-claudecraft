@@ -916,6 +916,12 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
+  // Healing Power affix (healer gear): flat healing-only power. Folds into
+  // Entity.healPower (spellPower + Healing Power), which the heal, HoT, and
+  // absorb riders read. The directionality contract: Spell Power adds to
+  // healing, but Healing Power never adds to damage (damage riders read
+  // Entity.spellPower only). See docs/prd/ignivar-raid-loot.md.
+  healPower?: number;
   // Combat ratings, converted to crit%/haste%/hit% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
@@ -1033,6 +1039,7 @@ export interface SetBonusEffect {
   spi?: number;
   ap?: number; // flat attack power
   sp?: number; // flat spell power (mirrors `ap` for the caster archetype)
+  healPower?: number; // flat Healing Power (heals only; see BaseItemDef.healPower)
   crit?: number; // flat crit chance, 0..1
   critRating?: number; // crit rating (converted to % in recalcPlayerStats)
   // Haste fraction (0.15 = 15% faster). ONE stat: it speeds melee and ranged
@@ -4288,6 +4295,11 @@ export interface Entity extends ClientMirroredEntityFields {
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
   spellPower: number; // casters: added to spell damage via per-spell coefficients
+  // Healing power: spellPower plus flat Healing Power from gear and set
+  // bonuses. Every heal, HoT, and absorb rider reads this; damage riders read
+  // spellPower, so Spell Power feeds healing but Healing Power never feeds
+  // damage.
+  healPower: number;
   // Haste fractions from item-set bonuses (0 = none). Melee/ranged haste speed up
   // the respective auto-attack swing; spell haste shortens cast and channel time.
   meleeHaste: number;

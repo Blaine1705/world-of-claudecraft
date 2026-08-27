@@ -142,7 +142,7 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
-import type { AbilityScaling } from './ability_damage';
+import { abilityScalingOf } from './ability_damage';
 import {
   abilityDisplayDescription,
   abilityEffectAuraInput,
@@ -5516,12 +5516,7 @@ export class Hud {
       abilityDescription: (id) => {
         const res = this.previewResolvedAbility(id);
         if (!res) return null;
-        const p = this.sim.player;
-        const scaling: AbilityScaling = {
-          spellPower: p.spellPower,
-          rangedPower: p.rangedPower,
-          attackPower: p.attackPower,
-        };
+        const scaling = abilityScalingOf(this.sim.player);
         return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling, a);
       },
       effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
@@ -6549,12 +6544,7 @@ export class Hud {
 
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
-    const p = this.sim.player;
-    const scaling: AbilityScaling = {
-      spellPower: p.spellPower,
-      rangedPower: p.rangedPower,
-      attackPower: p.attackPower,
-    };
+    const scaling = abilityScalingOf(this.sim.player);
     const damageText = abilityEffectText(res, scaling);
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;

@@ -52,6 +52,7 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       spi: 0,
       ap: 0,
       sp: 0,
+      healPower: 0,
       crit: 0,
       critRating: 0,
       haste: 0,

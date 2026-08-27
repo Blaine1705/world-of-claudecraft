@@ -1135,7 +1135,7 @@ export function runEffects(
           // Temporal Cascade's initial heal the same way it does every other heal.
           const healAmount =
             ctx.rng.range(eff.heal.min, eff.heal.max) +
-            directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
+            directHealBonus(p.healPower, res.castTime, false, talentHealMult);
           ctx.applyHeal(p, ally, healAmount, ability.name);
           if (devPlaytest) {
             const applied = ally.hp - before;
@@ -1230,7 +1230,7 @@ export function runEffects(
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
         const healAmount =
           eff.casterMaxHpPct === undefined
-            ? rolledAmount + directHealBonus(p.spellPower, res.castTime, false, talentHealMult)
+            ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
         if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
@@ -1317,7 +1317,7 @@ export function runEffects(
         if (first !== p && ctx.isHostileTo(p, first)) break;
         const baseAmount =
           ctx.rng.range(eff.min, eff.max) +
-          directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
+          directHealBonus(p.healPower, res.castTime, false, talentHealMult);
         const chain: Entity[] = [first];
         while (chain.length <= eff.jumps) {
           const from = chain[chain.length - 1];
@@ -1407,7 +1407,7 @@ export function runEffects(
         const hotSp = hybridHeal
           ? 0
           : hotTickBonus(
-              p.spellPower,
+              p.healPower,
               eff.duration,
               eff.interval,
               talentHealMult * (1 + mods.global.hotHealPct),
@@ -1442,7 +1442,7 @@ export function runEffects(
             eff.amount +
             Math.round(p.maxHp * (eff.casterMaxHpPct ?? 0)) +
             absorbBonus(
-              p.spellPower,
+              p.healPower,
               eff.spellPowerCoeff ?? 0,
               talentHealMult * (1 + mods.global.absorbPct),
             ),
@@ -2594,7 +2594,7 @@ export function runEffects(
           ability: ability.id,
         });
         // AoE heals take the same per-target coefficient penalty as AoE damage.
-        const aoeHealBonus = directHealBonus(p.spellPower, res.castTime, true, talentHealMult);
+        const aoeHealBonus = directHealBonus(p.healPower, res.castTime, true, talentHealMult);
         let effectiveHealingTargets = 0;
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
@@ -3380,7 +3380,7 @@ export function runEffects(
         if (eff.heal) {
           const healAmount =
             ctx.rng.range(eff.heal.min, eff.heal.max) +
-            directHealBonus(p.spellPower, res.castTime, false, talentHealMult);
+            directHealBonus(p.healPower, res.castTime, false, talentHealMult);
           ctx.applyHeal(p, target, healAmount, ability.name, ability.id);
         }
         break;

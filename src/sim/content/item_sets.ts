@@ -468,6 +468,7 @@ export interface AggregatedSetEffect {
   spi: number;
   ap: number;
   sp: number;
+  healPower: number;
   crit: number;
   critRating: number;
   haste: number;
@@ -490,6 +491,7 @@ function zeroEffect(): AggregatedSetEffect {
     spi: 0,
     ap: 0,
     sp: 0,
+    healPower: 0,
     crit: 0,
     critRating: 0,
     haste: 0,
@@ -523,6 +525,7 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       out.spi += e.spi ?? 0;
       out.ap += e.ap ?? 0;
       out.sp += e.sp ?? 0;
+      out.healPower += e.healPower ?? 0;
       out.crit += e.crit ?? 0;
       out.critRating += e.critRating ?? 0;
       out.haste += e.haste ?? 0;

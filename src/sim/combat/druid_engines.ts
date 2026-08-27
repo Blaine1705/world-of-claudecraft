@@ -297,7 +297,7 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
   if (!resolved || !hot || hot.type !== 'hot') return;
   const tickValue =
     Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))) +
-    hotTickBonus(player.spellPower, hot.duration, hot.interval);
+    hotTickBonus(player.healPower, hot.duration, hot.interval);
   ctx.applyAura(target, {
     id: 'rejuvenation',
     name: resolved.def.name,

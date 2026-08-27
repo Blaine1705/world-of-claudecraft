@@ -8853,6 +8853,7 @@ export class GameServer {
     maybe('copper', meta.copper);
     maybe('ap', p.attackPower);
     maybe('sp', p.spellPower);
+    maybe('hpw', p.healPower);
     maybe('sh', p.spellHaste);
     maybe('crit', p.critChance);
     maybe('dodge', p.dodgeChance);

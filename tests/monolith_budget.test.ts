@@ -126,7 +126,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
     // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
-    ceiling: 18389,
+    // Lowered 18389 -> 18379: the healPower seam replaced both inline
+    // AbilityScaling literals with the extracted abilityScalingOf constructor
+    // (src/ui/ability_damage.ts), so the coordinator shrank and the ratchet
+    // follows it down. Exact count, zero slack.
+    ceiling: 18379,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -299,7 +303,10 @@ const MONOLITHS: MonolithRow[] = [
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
     // the raid consolidation moved the ground-telegraph snapshot unit, the forge-portal replay lifecycle, eventAnchor, and the door gate out; exact count.
-    ceiling: 10604,
+    // Plus 1 for the Healing Power wire field: the ONE line is maybe('hpw')
+    // beside maybe('sp') in the delta-guarded self record; no clean extraction
+    // exists for a single serializer line. Exact count.
+    ceiling: 10605,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -319,7 +326,10 @@ const MONOLITHS: MonolithRow[] = [
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
     // the raid consolidation moved the ground-telegraph wire decoders (ground_telegraph_wire.ts) out; exact count.
-    ceiling: 5805,
+    // Plus 2 for the Healing Power mirror: the blankEntity default and the
+    // s.hpw ?? fallback beside the existing sp lines; thin wire wiring with no
+    // clean extraction. Exact count.
+    ceiling: 5807,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
