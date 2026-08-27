@@ -155,9 +155,16 @@ export type {
 // 20 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
 // 120 degrees to 42 yards and 140 degrees. Epoch 19 clients would display a
 // dangerously smaller warning than the authoritative server damage.
+// 21 = The Ignivar raid gained Molten Assembly as a compiled fourth room and
+// Varkhul's Assembly gained authoritative wave/enemy counters. Epoch 20 clients
+// do not know the new route or enough state to present its add phase safely.
+// 22 = Ignivar's compiled arena floor gained a lowered lethal lava perimeter
+// whose exact 4x4 stone-tile union and bridge footprint are shared by movement,
+// damage and rendering. Epoch 21 clients would render and stand on the old full
+// floor while the server burns and lowers the new perimeter.
 // (11 through 20 were numbered 9 through 18 on the pre-merge raid branch,
 // which forked before the Eastbrook program bumps above.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 20 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 22 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

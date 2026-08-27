@@ -39,11 +39,12 @@ const SYNTHETIC: MobTemplate = {
 };
 
 describe('heroic tuning data contract', () => {
-  it('covers the five five-player dungeons plus the raid arena, with their final bosses', () => {
+  it('covers the five five-player dungeons plus all three raid arenas and final bosses', () => {
     expect([...HEROIC_DUNGEON_IDS].sort()).toEqual([
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
+      'ignivar_inner_crucible',
       'ignivar_raid_arena',
       'nythraxis_boss_arena',
       'sunken_bastion',
@@ -59,6 +60,7 @@ describe('heroic tuning data contract', () => {
       wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
       ignivar_raid_arena: 'ignivar_herald_of_the_last_flame',
+      ignivar_inner_crucible: 'varkhul_forgefather_of_the_last_flame',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
       expect(tuning.level).toBe(22);
@@ -78,6 +80,7 @@ describe('heroic tuning data contract', () => {
       wildheart_basin: 1,
       nythraxis_boss_arena: 3,
       ignivar_raid_arena: 3,
+      ignivar_inner_crucible: 3,
     });
   });
 
@@ -114,7 +117,8 @@ describe('heroic tuning data contract', () => {
       // summoned 250 floor through damageMultiplierByMob, so the raid's
       // addDamageMultiplier stays an inert mirror of damageMultiplier.
       nythraxis_boss_arena: [3.2, 7.25, 7.25, 1.2],
-      ignivar_raid_arena: [2.5, 2, 2, 1.2],
+      ignivar_raid_arena: [1.75, 2, 2, 1.2],
+      ignivar_inner_crucible: [5 / 3, 1.2459633027522936, 1, 1.2],
     });
   });
 });
@@ -125,6 +129,7 @@ describe('claimDifficultyForDungeon', () => {
     expect(claimDifficultyForDungeon('gravewyrm_sanctum', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('nythraxis_boss_arena', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_raid_arena', 'heroic')).toBe('heroic');
+    expect(claimDifficultyForDungeon('ignivar_inner_crucible', 'heroic')).toBe('heroic');
     // The attunement dungeon is story content: normal even when heroic is selected.
     expect(claimDifficultyForDungeon('nythraxis_crypt', 'heroic')).toBe('normal');
     expect(claimDifficultyForDungeon('no_such_dungeon', 'heroic')).toBe('normal');

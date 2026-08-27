@@ -61,22 +61,55 @@ describe('ground telegraph snapshot decoders', () => {
 
   it('decodes a Varkhul Forgestorm warning and clamps remaining to duration', () => {
     expect(
-      decodeVarkhulForgestormWarnings([{ id: 4, sourceId: 9, x: 1, z: 2, r: 3, dur: 6, rem: 8 }]),
-    ).toEqual([{ id: 4, sourceId: 9, x: 1, z: 2, radius: 3, duration: 6, remaining: 6 }]);
+      decodeVarkhulForgestormWarnings([
+        {
+          id: 'varkhul-forgestorm:9:1:0:0',
+          sourceId: 9,
+          x: 1,
+          z: 2,
+          r: 3,
+          dur: 6,
+          rem: 8,
+          lead: 0,
+        },
+      ]),
+    ).toEqual([
+      {
+        id: 'varkhul-forgestorm:9:1:0:0',
+        sourceId: 9,
+        x: 1,
+        z: 2,
+        radius: 3,
+        duration: 6,
+        remaining: 6,
+        warningLead: 0,
+      },
+    ]);
   });
 
   it.each([
-    ['id', { id: -1 }],
-    ['string id', { id: '4' }],
+    ['id', { id: 4 }],
     ['sourceId', { sourceId: -1 }],
     ['z', { z: Number.POSITIVE_INFINITY }],
     ['radius', { r: 0 }],
     ['duration', { dur: 0 }],
     ['remaining', { rem: 0 }],
+    ['negative lead', { lead: -0.1 }],
+    ['lead at or past duration', { lead: 6 }],
   ])('drops a Forgestorm warning with an invalid %s', (_label, override) => {
     expect(
       decodeVarkhulForgestormWarnings([
-        { id: 4, sourceId: 9, x: 1, z: 2, r: 3, dur: 6, rem: 4, ...override },
+        {
+          id: 'varkhul-forgestorm:9:1:0:0',
+          sourceId: 9,
+          x: 1,
+          z: 2,
+          r: 3,
+          dur: 6,
+          rem: 4,
+          lead: 0,
+          ...override,
+        },
       ]),
     ).toEqual([]);
   });

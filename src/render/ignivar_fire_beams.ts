@@ -251,6 +251,7 @@ function fireMaterial(
   color: number,
   opacity: number,
   blending: THREE.Blending = THREE.NormalBlending,
+  thermalLayer?: string,
 ): THREE.MeshBasicMaterial {
   const material = new THREE.MeshBasicMaterial({
     color,
@@ -260,7 +261,9 @@ function fireMaterial(
     depthWrite: false,
     side: THREE.DoubleSide,
   });
+  material.forceSinglePass = true;
   material.userData.ignivarBeamBaseOpacity = opacity;
+  if (thermalLayer) material.userData.ignivarThermalLayer = thermalLayer;
   return material;
 }
 
@@ -269,7 +272,12 @@ function animatedFireMaterial(
   opacity: number,
   layer: 'outer' | 'veil',
 ): THREE.MeshBasicMaterial {
-  const material = fireMaterial(color, opacity);
+  const material = fireMaterial(
+    color,
+    opacity,
+    THREE.NormalBlending,
+    layer === 'outer' ? 'turbulentShell' : 'flameVeil',
+  );
   material.userData.ignivarFireTime = sharedUniforms.uTime;
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
@@ -287,17 +295,24 @@ function animatedFireMaterial(
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-float ignivarRise = fract(vIgnivarBeamPosition.y * 0.23 - uTime * 0.72);
-float ignivarLongWave = sin(vIgnivarBeamPosition.z * 0.72 - uTime * 5.4);
-float ignivarCrossWave = sin(vIgnivarBeamPosition.z * 1.57 + vIgnivarBeamPosition.x * 4.1 + uTime * 3.2);
-float ignivarTongues = smoothstep(0.08, 0.92, 0.52 + ignivarLongWave * 0.31 + ignivarCrossWave * 0.22);
-float ignivarFlicker = 0.68 + 0.32 * sin(uTime * 9.0 + vIgnivarBeamPosition.z * 0.83);
-float ignivarFade = 1.0 - smoothstep(0.62, 1.0, ignivarRise);
-diffuseColor.rgb *= 0.82 + ignivarTongues * 0.5;
-diffuseColor.a *= mix(0.48, 1.0, ignivarTongues) * mix(0.72, 1.0, ignivarFade) * ignivarFlicker;`,
+float ignivarHeight = clamp((vIgnivarBeamPosition.y - 0.08) / ${layer === 'outer' ? '3.27' : '4.02'}, 0.0, 1.0);
+float ignivarLongWave = sin(vIgnivarBeamPosition.z * 0.81 - uTime * 6.2);
+float ignivarCrossWave = sin(vIgnivarBeamPosition.z * 1.71 + vIgnivarBeamPosition.x * 4.8 + uTime * 3.7);
+float ignivarFineWave = sin(vIgnivarBeamPosition.z * 3.4 - vIgnivarBeamPosition.x * 7.2 - uTime * 8.4);
+float ignivarTongues = smoothstep(-0.18, 0.72, ignivarLongWave * 0.46 + ignivarCrossWave * 0.34 + ignivarFineWave * 0.2);
+float ignivarFlameTop = 0.2 + ignivarTongues * 0.66;
+float ignivarSilhouette = 1.0 - smoothstep(ignivarFlameTop - 0.12, ignivarFlameTop + 0.08, ignivarHeight);
+float ignivarFlicker = 0.72 + 0.28 * sin(uTime * 10.5 + vIgnivarBeamPosition.z * 0.91);
+float ignivarBaseHeat = 1.0 - smoothstep(0.04, 0.58, ignivarHeight);
+vec3 ignivarTipColor = vec3(0.52, 0.012, 0.001);
+vec3 ignivarBodyColor = vec3(1.0, 0.075, 0.003);
+vec3 ignivarCoreColor = vec3(1.0, 0.48, 0.045);
+diffuseColor.rgb = mix(ignivarTipColor, ignivarBodyColor, 1.0 - ignivarHeight);
+diffuseColor.rgb = mix(diffuseColor.rgb, ignivarCoreColor, ignivarBaseHeat * (0.42 + ignivarTongues * 0.58));
+diffuseColor.a *= ignivarSilhouette * (0.34 + ignivarTongues * 0.66) * ignivarFlicker;`,
       );
   };
-  material.customProgramCacheKey = () => `ignivar-fire-beam-${layer}-v1`;
+  material.customProgramCacheKey = () => `ignivar-fire-beam-${layer}-v2`;
   return material;
 }
 
@@ -339,50 +354,54 @@ export function buildIgnivarFireBeam(options: IgnivarFireBeamOptions): THREE.Gro
 
   const floorGlow = new THREE.Mesh(
     beamFloorGeometry(options, 0.98, 0.075),
-    fireMaterial(0x4a0502, 0.06),
+    fireMaterial(0x3a0301, 0.08, THREE.NormalBlending, 'floorHeat'),
   );
   floorGlow.name = IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME;
   floorGlow.renderOrder = 4;
 
   const floorBoundary = new THREE.Mesh(
     beamBoundaryGeometry(options, 0.09, 0.088),
-    fireMaterial(0xc63c16, 0.42),
+    fireMaterial(0xff5a12, 0.5, THREE.NormalBlending, 'floorBoundary'),
   );
   floorBoundary.name = IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME;
   floorBoundary.renderOrder = 5;
 
   const outer = new THREE.Mesh(
     beamPrismGeometry(options, 0.92, 0.1, 3.35),
-    animatedFireMaterial(0x4c0904, 0.045, 'outer'),
+    animatedFireMaterial(0xff4a0b, 0.2, 'outer'),
   );
   outer.name = IGNIVAR_FIRE_BEAM_OUTER_NAME;
   outer.renderOrder = 6;
 
   const core = new THREE.Mesh(
     beamPrismGeometry(options, 0.14, 0.12, 1.05),
-    fireMaterial(0xb84216, 0.12),
+    fireMaterial(0xffd36a, 0.38, THREE.AdditiveBlending, 'whiteHotCore'),
   );
   core.name = IGNIVAR_FIRE_BEAM_CORE_NAME;
   core.renderOrder = 8;
 
   const veil = new THREE.Mesh(
     beamVeilGeometry(options, 0.08, 4.1),
-    animatedFireMaterial(0x6e1808, 0.035, 'veil'),
+    animatedFireMaterial(0xff7412, 0.14, 'veil'),
   );
   veil.name = IGNIVAR_FIRE_BEAM_VEIL_NAME;
   veil.renderOrder = 7;
 
-  const flameCount = 14;
+  const flameCount = 28;
   const flameGeometry = new THREE.ConeGeometry(1, 1, 5, 1, true);
-  const flames = new THREE.InstancedMesh(flameGeometry, fireMaterial(0xa62a0a, 0.09), flameCount);
+  const flames = new THREE.InstancedMesh(
+    flameGeometry,
+    fireMaterial(0xffffff, 0.34, THREE.NormalBlending, 'thermalTongues'),
+    flameCount,
+  );
   flames.name = IGNIVAR_FIRE_BEAM_FLAMES_NAME;
   flames.renderOrder = 9;
   const dummy = new THREE.Object3D();
   for (let index = 0; index < flameCount; index++) {
     const progress = (index + 1) / (flameCount + 1);
     const halfWidth = THREE.MathUtils.lerp(options.startHalfWidth, options.endHalfWidth, progress);
-    const radius = Math.min(0.36, halfWidth * 0.2);
-    const height = 1.05 + ((index * 7) % 5) * 0.26;
+    const radius = Math.min(0.3, halfWidth * (0.12 + (index % 3) * 0.035));
+    const height = 0.82 + ((index * 7) % 7) * 0.25;
     dummy.position.set(
       Math.sin(index * 2.39996) * halfWidth * 0.56,
       0.1 + height / 2,
@@ -392,10 +411,15 @@ export function buildIgnivarFireBeam(options: IgnivarFireBeamOptions): THREE.Gro
     dummy.scale.set(radius, height, radius);
     dummy.updateMatrix();
     flames.setMatrixAt(index, dummy.matrix);
+    flames.setColorAt(
+      index,
+      new THREE.Color(index % 5 === 0 ? 0xfff2b0 : index % 2 === 0 ? 0xffb02e : 0xff5a0a),
+    );
   }
   flames.instanceMatrix.needsUpdate = true;
+  if (flames.instanceColor) flames.instanceColor.needsUpdate = true;
 
-  const emberCount = 24;
+  const emberCount = 48;
   const emberPositions = new Float32Array(emberCount * 3);
   for (let index = 0; index < emberCount; index++) {
     const progress = (index + 0.5) / emberCount;
@@ -410,7 +434,7 @@ export function buildIgnivarFireBeam(options: IgnivarFireBeamOptions): THREE.Gro
   }
   const emberGeometry = new THREE.BufferGeometry();
   emberGeometry.setAttribute('position', new THREE.BufferAttribute(emberPositions, 3));
-  const embers = new THREE.Points(emberGeometry, pointsMaterial(0xffa448, 0.2, 0.16));
+  const embers = new THREE.Points(emberGeometry, pointsMaterial(0xffa02a, 0.17, 0.46));
   embers.name = IGNIVAR_FIRE_BEAM_EMBERS_NAME;
   embers.renderOrder = 10;
 

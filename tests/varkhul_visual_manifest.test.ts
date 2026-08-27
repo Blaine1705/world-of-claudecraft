@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../src/sim/mob/dungeon_miniboss_stomp';
 
 describe('expanded Ignivar raid visual manifest', () => {
   it('routes the Forgefather to his authored smith body and strike clips', () => {
@@ -10,6 +11,7 @@ describe('expanded Ignivar raid visual manifest', () => {
       url: 'models/creatures/varkhul_forgefather.glb',
       height: 3,
       yaw: 0,
+      deathGroundOffset: 0.565,
       clips: {
         idle: 'Idle',
         walk: 'Walk',
@@ -62,8 +64,14 @@ describe('expanded Ignivar raid visual manifest', () => {
         walk: 'Walk',
         run: 'Run',
         attack: ['Attack'],
-        attackByAbility: { crucible_quake: 'JumpSlam' },
-        attackTimeScaleByAbility: { crucible_quake: 0.8 },
+        attackByAbility: {
+          crucible_quake: 'JumpSlam',
+          [DUNGEON_MINIBOSS_STOMP_ABILITY_ID]: 'JumpSlam',
+        },
+        attackTimeScaleByAbility: {
+          crucible_quake: 0.8,
+          [DUNGEON_MINIBOSS_STOMP_ABILITY_ID]: 1.35,
+        },
         hit: ['Hit'],
         death: 'Death',
       },

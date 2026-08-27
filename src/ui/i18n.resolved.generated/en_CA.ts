@@ -2450,6 +2450,7 @@ export const en_CA: EnTranslations = {
       "leftPillarCharging": "The left forge pillar is charging. It will ignite in 3 sec!",
       "rightPillarCharging": "The right forge pillar is charging. It will ignite in 3 sec!",
       "bothPillarsCharging": "The forge pillars are charging. They will ignite in 3 sec!",
+      "artificerApproaches": "A Cinder Artificer is approaching the forge!",
       "leftPillar": "The left forge pillar ignites!",
       "rightPillar": "The right forge pillar ignites!",
       "bothPillars": "The forge pillars ignite!",
@@ -2460,6 +2461,33 @@ export const en_CA: EnTranslations = {
       "worldfireBegins": "Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!",
       "worldfireClosing": "Worldfire closes in. Move toward the center!",
       "worldfireConsumed": "The entire crucible is burning!"
+    },
+    "varkhulWaveStatus": "Wave {wave}/{waves} | Enemies: {remaining}",
+    "raidBossGuide": {
+      "title": "Boss Guide",
+      "button": "Boss Guide: {boss}",
+      "subtitle": "{boss} | Normal and Heroic",
+      "close": "Close boss guide",
+      "ignivar": {
+        "brand": "Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.",
+        "movement": "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
+        "apocalypse": "Apocalypse: kill Ignivar Ashcaller before its cast completes.",
+        "judgment": "Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.",
+        "finale": "Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.",
+        "heroic": "Heroic: paired players stay close during Chains of the Forge, and Brand remains active inside Judgment."
+      },
+      "varkhul": {
+        "tanks": "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
+        "orbs": "Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.",
+        "pyre": "Shared Pyre: only a player without Red-hot Metal is selected. Stack four players in Normal or five in Heroic inside the moving circle.",
+        "forgestorm": "Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.",
+        "anvil": "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
+        "ray": "Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.",
+        "forge": "Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.",
+        "assembly": "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
+        "worldfire": "Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.",
+        "heroic": "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire."
+      }
     },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
@@ -8578,6 +8606,8 @@ export const en_CA: EnTranslations = {
         "riftEntrance": "Rift entrance: {name}",
         "hostileEnemy": "Hostile enemy",
         "aggressiveEnemy": "Enemy attacking you",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Lootable enemy",
         "corpse": "Your corpse",
         "deathZone": "Danger zone",
@@ -13867,7 +13897,7 @@ export const en_CA: EnTranslations = {
         "name": "Ignivar, Herald of the Last Flame"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Heart of the End"
+        "name": "Ignivar Ashcaller"
       },
       "ignivar_ember_sentinel": {
         "name": "Ember Sentinel"
@@ -15712,9 +15742,6 @@ export const en_CA: EnTranslations = {
           },
           "1": {
             "label": "Crucible Wardens destroyed"
-          },
-          "2": {
-            "label": "Cinder Artificers destroyed"
           }
         }
       },
@@ -17624,6 +17651,11 @@ export const en_CA: EnTranslations = {
         "name": "Crucible of the Last Spring",
         "enterText": "Heat shimmers above the sealed waters of the Crucible.",
         "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Molten Assembly",
+        "enterText": "The opened gate leads into a molten assembly hall.",
+        "leaveText": "You leave the assembly line and return to the Crucible."
       },
       "ignivar_inner_crucible": {
         "name": "The Inner Crucible",

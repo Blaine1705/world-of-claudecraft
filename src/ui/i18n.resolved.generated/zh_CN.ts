@@ -2450,6 +2450,7 @@ export const zh_CN: EnTranslations = {
       "leftPillarCharging": "左侧锻炉立柱正在充能，3秒后点燃！",
       "rightPillarCharging": "右侧锻炉立柱正在充能，3秒后点燃！",
       "bothPillarsCharging": "锻炉立柱正在充能，3秒后点燃！",
+      "artificerApproaches": "烬火工匠正在接近锻炉！",
       "leftPillar": "左侧锻炉立柱点燃了！",
       "rightPillar": "右侧锻炉立柱点燃了！",
       "bothPillars": "锻炉立柱点燃了！",
@@ -2460,6 +2461,33 @@ export const zh_CN: EnTranslations = {
       "worldfireBegins": "世界之火从房间边缘燃起，42秒后整个熔炉大厅将被吞没！",
       "worldfireClosing": "世界之火正在逼近，向中央移动！",
       "worldfireConsumed": "整个熔炉大厅都在燃烧！"
+    },
+    "varkhulWaveStatus": "波次 {wave}/{waves} | 敌人: {remaining}",
+    "raidBossGuide": {
+      "title": "首领指南",
+      "button": "指南: {boss}",
+      "subtitle": "{boss} | 普通与英雄",
+      "close": "关闭首领指南",
+      "ignivar": {
+        "brand": "柴堆印记: 分散站位。将灼热洪流引向可用水渠，然后独自穿过水流完成净化。",
+        "movement": "移动: 躲避烬雨的锥形攻击和陨石，跟随旋转炼狱移动，并利用熔炉波的两个缺口。",
+        "apocalypse": "末日: 在伊格尼瓦·唤灰者完成施法前将其击杀。",
+        "judgment": "熔炉审判: 预警时找出独特的庇护点，地面燃烧后在标记边界内集合。",
+        "finale": "最终炼狱: 在团灭前击杀伊格尼瓦尔，同时应对加速的陨石、正面攻击和旋转炼狱。",
+        "heroic": "英雄: 熔炉锁链期间成对玩家必须保持靠近，熔炉审判期间印记仍会持续。"
+      },
+      "varkhul": {
+        "tanks": "坦克: 制作者印记达到2层时换坦，并让瓦尔库尔保持在近战范围内。",
+        "orbs": "烬火宝珠: 被标记者分散到房间边缘。火池会持续存在，释放的宝珠会穿过房间。",
+        "pyre": "共享柴堆: 只选择没有炽热金属的玩家。在移动圆圈内，普通需要4人，英雄需要5人。",
+        "forgestorm": "熔炉风暴: 观察坠落的陨石，在三波陨石落地前离开每个标记区域。",
+        "anvil": "铁砧敕令: 瓦尔库尔移动到巨型熔炉并敲击三次，造成团队伤害。英雄模式还会落下标记陨石。",
+        "ray": "淬火射线: 另一名玩家通常由坦克在长时间预警结束前拦截移动射线。承受伤害者会获得淬火创伤。",
+        "forge": "熔炉柱: 在射线抵达熔炉前阻挡，并在坩埚暴露叠加后轮换。热量满时会触发熔炉熔毁。",
+        "assembly": "大师组装: 阻挡两道熔炉射线，击杀所有传送门波次，打断坩埚震击，并阻止烬火工匠治疗瓦尔库尔。",
+        "worldfire": "世界之火: 英雄最终阶段的燃烧边缘会向中央收缩。在整个坩埚燃烧前击败瓦尔库尔。",
+        "heroic": "英雄: 熔炉热量不会下降，铁砧敕令会增加陨石，最终阶段会集中应对世界之火。"
+      }
     },
     "auraEffect": {
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
@@ -8578,6 +8606,8 @@ export const zh_CN: EnTranslations = {
         "riftEntrance": "裂隙入口：{name}",
         "hostileEnemy": "敌对目标",
         "aggressiveEnemy": "正在攻击你的敌人",
+        "bossEnemy": "首领：{name}",
+        "bossAggressiveEnemy": "正在攻击你的首领：{name}",
         "lootableEnemy": "可拾取战利品的敌人",
         "corpse": "你的尸体",
         "deathZone": "危险区域",
@@ -13867,7 +13897,7 @@ export const zh_CN: EnTranslations = {
         "name": "伊格尼瓦，末焰使者"
       },
       "ignivar_heart_of_the_end": {
-        "name": "终焉之心"
+        "name": "伊格尼瓦·唤灰者"
       },
       "ignivar_ember_sentinel": {
         "name": "余烬哨兵"
@@ -15712,9 +15742,6 @@ export const zh_CN: EnTranslations = {
           },
           "1": {
             "label": "摧毁熔炉守卫"
-          },
-          "2": {
-            "label": "摧毁烬火工匠"
           }
         }
       },
@@ -17624,6 +17651,11 @@ export const zh_CN: EnTranslations = {
         "name": "最后泉源熔炉",
         "enterText": "热浪在熔炉封印的水源上方翻涌。",
         "leaveText": "你离开熔炉，终于再次畅快呼吸。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "熔火装配间",
+        "enterText": "开启的大门通向熔火装配大厅。",
+        "leaveText": "你离开装配线，返回熔炉厅。"
       },
       "ignivar_inner_crucible": {
         "name": "内环熔炉",

@@ -6,6 +6,7 @@
 // the IWorld surface resolves unchanged.
 import { type ActiveIgnivarMeteorWarning, activeIgnivarMeteorWarnings } from './ignivar_meteors';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
+import { activeIgnivarTrashMeteorWarning } from './mob/ignivar_trash_automata';
 import type { SimContext } from './sim_context';
 import { IGNIVAR_BOSS_ID } from './types';
 import {
@@ -46,8 +47,11 @@ export type { ActiveVarkhulForgestormWarning } from './varkhul_forgestorm';
 export function collectActiveIgnivarMeteors(ctx: SimContext): ActiveIgnivarMeteorWarning[] {
   const warnings: ActiveIgnivarMeteorWarning[] = [];
   for (const entity of ctx.entities.values()) {
-    if (entity.templateId !== IGNIVAR_BOSS_ID || !entity.ignivar) continue;
-    warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
+    if (entity.templateId === IGNIVAR_BOSS_ID && entity.ignivar) {
+      warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
+    }
+    const trashWarning = activeIgnivarTrashMeteorWarning(entity);
+    if (trashWarning) warnings.push(trashWarning);
   }
   return warnings;
 }

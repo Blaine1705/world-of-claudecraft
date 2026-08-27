@@ -915,6 +915,7 @@ describe('combat SFX policy', () => {
     expect(varkhulCalloutCue('rightPillar')).toBe('impact_fire');
     expect(varkhulCalloutCue('bothPillars')).toBe('impact_fire');
     expect(varkhulCalloutCue('portalsOpening')).toBe('rift_portal_spawn');
+    expect(varkhulCalloutCue('artificerApproaches')).toBe('rift_portal_spawn');
     expect(varkhulCalloutCue('heat75')).toBe('impact_metal');
     expect(varkhulCalloutCue('heat90')).toBe('meteor');
     expect(varkhulCalloutCue('addsDefeated')).toBe('ui_achievement');

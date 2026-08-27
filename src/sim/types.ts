@@ -36,6 +36,10 @@ export const INTERACT_RANGE = 5;
 // code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
 // Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
 export const YELL_RANGE = 100;
+// New ordinary entities enter a live client's interest set at this radius.
+// Presentation that enumerates the complete offline Sim must use the same edge
+// or it can reveal entities that an online client has not received yet.
+export const PLAYER_INTEREST_RADIUS = 90;
 // Shared host interest boundary: the renderer destroys ordinary entity views at
 // 96 yards, and the network keeps known entities through this slightly wider
 // hysteresis edge. Offline and server Sims may therefore skip only idle,
@@ -3451,6 +3455,13 @@ export interface GatherNodeDef {
   tier: number;
 }
 
+export interface DungeonSpawnMinibossTuning {
+  healthMultiplier: number;
+  scale: number;
+  ccImmune?: boolean;
+  slowImmune?: boolean;
+}
+
 export interface DungeonSpawn {
   mobId: string;
   x: number; // relative to instance origin
@@ -3460,6 +3471,12 @@ export interface DungeonSpawn {
   // pack holds its formation until pulled (see MobTemplate.idleStationary for the
   // template-level equivalent). Stored on the spawned Entity.idleStationary.
   idleStationary?: boolean;
+  /** Placement-authored pull identity. Mobs sharing this id in one claimed room
+   * enter combat together even when the pack mixes templates. */
+  packId?: string;
+  /** Per-placement promotion for a recurring trash template. The base template
+   * remains unchanged for ordinary encounter waves that reuse the same mob. */
+  miniboss?: DungeonSpawnMinibossTuning;
 }
 
 export interface DungeonNpcSpawn {
@@ -3513,6 +3530,9 @@ export interface DungeonDef {
   // corridor back; absent = no boss portal (every corridor dungeon).
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
+  /** Optional dungeon id whose mob difficulty tuning applies to this room's
+   * static spawn list. Rewards and lockouts still use this dungeon's own id. */
+  mobDifficultyTuningId?: string;
   npcs?: DungeonNpcSpawn[];
   objects?: DungeonObjectSpawn[];
   // renderer + collider interior builder key
@@ -4657,6 +4677,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // multiply by these AFTER the rng draw. undefined = 1 (normal difficulty).
   mechanicDamageMult?: number;
   mechanicHealMult?: number;
+  // Per-entity multiplier for mechanic-applied burn auras. Kept separate from
+  // the impact so Heroic Sentinel sweep and burn tuning can differ safely.
+  mechanicBurnDamageMult?: number;
   // Ranged petSpell scaling for a TUNED instance spawn, the third fire-time
   // multiplier beside the two above. A hostile mob's petSpell damage is rolled
   // from the base MOBS table and multiplied by petDamageMult, which returns a
@@ -4686,6 +4709,11 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTimeLeft?: number; // seconds left in the in-flight dash (undefined/0 = not dashing)
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
+  // Room-gated Sentinel cast state. Optional so unrelated entities and wire
+  // snapshots retain their existing shape.
+  ignivarTrashSpellTimer?: number;
+  ignivarTrashSpell?: 'cinderLance';
+  ignivarTrashCastKey?: number;
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
   varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
@@ -4719,6 +4747,8 @@ export interface Entity extends ClientMirroredEntityFields {
   /** Per-spawn dormancy override (DungeonSpawn.idleStationary): this mob never
    *  idle-wanders even if its template would. Set at spawn; see mob/locomotion.ts. */
   idleStationary?: boolean;
+  /** Runtime marker set only by DungeonSpawn.miniboss placement tuning. */
+  dungeonSpawnMiniboss?: boolean;
   /** Suicide-bomber fuse (MobTemplate.meleeBomb): seconds remaining in the arming
    *  windup after the mech reached melee range. >0 means it is standing up and
    *  about to detonate; owned by mob/derelict_bomber.ts. */
@@ -4801,6 +4831,9 @@ export interface Entity extends ClientMirroredEntityFields {
     wardedPlayerIds: number[];
   };
   dungeonId: string | null; // set on dungeon door/exit portals
+  /** Claim-local identity for authored dungeon packs. Sim authority only; the
+   * server resolves the pull and clients need no extra wire state. */
+  dungeonPackId?: string;
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;
@@ -5089,7 +5122,7 @@ export interface IgnivarEncounterState {
   apocalypseAddId: number | null;
   apocalypseCastRemaining: number;
   apocalypseResolved: boolean;
-  forgeJudgmentPhase: 'idle' | 'warning' | 'active' | 'done';
+  forgeJudgmentPhase: 'idle' | 'moving' | 'warning' | 'active' | 'done';
   forgeJudgmentRemaining: number;
   forgeJudgmentPulseTimer: number;
   forgeJudgmentRotation: number;
@@ -5132,7 +5165,11 @@ export interface VarkhulEncounterState {
   forgestormWaveIndex: number;
   forgestormWarningRemaining: number;
   forgestormPoints: Vec3[];
+  sharedPyreTimer: number;
+  sharedPyreTargetId: number | null;
+  sharedPyreRemaining: number;
   anvilTimer: number;
+  anvilWalking: boolean;
   anvilStrikeIndex: number;
   anvilStrikeRemaining: number;
   anvilMeteorCastKey: number;
@@ -5147,7 +5184,14 @@ export interface VarkhulEncounterState {
   interceptBeamCastRemaining: number;
   interceptBeamTargetId: number | null;
   interceptBeamBlockerId: number | null;
-  majorAbility: 'none' | 'frontal' | 'cinderOrbs' | 'forgestorm' | 'anvil' | 'interceptBeam';
+  majorAbility:
+    | 'none'
+    | 'frontal'
+    | 'cinderOrbs'
+    | 'forgestorm'
+    | 'sharedPyre'
+    | 'anvil'
+    | 'interceptBeam';
   assemblyTriggered: boolean;
   assemblyRuneDifficulty: VarkhulAssemblyDifficulty;
   assemblyPhase: VarkhulAssemblyPhase;
@@ -5179,6 +5223,7 @@ export interface VarkhulEncounterState {
   forgeBeamFinalTriggered: boolean;
   forgeHeatWarningMask: number;
   assemblyForgeBeamActiveMask: number;
+  assemblyForgeBeamWarningMask: number;
   assemblyForgeBeamWarmupRemaining: number;
   assemblyForgeBeamBlockerIds: Array<number | null>;
   assemblyForgeBeamDamageTimers: number[];
@@ -5187,6 +5232,7 @@ export interface VarkhulEncounterState {
   assemblyForgeHammerTimer: number;
   assemblyForgeVentedThisTick: boolean;
   assemblyPortalSpawns: Array<{ wave: number; spawnIndex: number; remaining: number }>;
+  assemblyOrdinaryAddWaves: Array<{ addId: number; wave: number }>;
   assemblyNextWaveIndex: number;
   assemblyNextWaveRemaining: number;
   assemblyIntermissionWaves: number;
@@ -5581,6 +5627,7 @@ export type SimEvent = { pid?: number } & (
         | 'rightPillar'
         | 'bothPillars'
         | 'portalsOpening'
+        | 'artificerApproaches'
         | 'heat75'
         | 'heat90'
         | 'addsDefeated'

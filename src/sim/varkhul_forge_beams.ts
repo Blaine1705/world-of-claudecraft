@@ -143,8 +143,12 @@ export function varkhulForgeBeamOverheatAfterTick(
   return Math.max(0, Math.min(1, current + deltaPerSecond * Math.max(0, dt)));
 }
 
-export function varkhulForgeOverheatAfterQuake(current: number): number {
-  return Math.max(0, Math.min(1, current + VARKHUL_FORGE_QUAKE_OVERHEAT));
+export function varkhulForgeOverheatAfterQuake(
+  current: number,
+  difficulty: VarkhulAssemblyDifficulty,
+): number {
+  const addedHeat = difficulty === 'heroic' ? 0.1 : VARKHUL_FORGE_QUAKE_OVERHEAT;
+  return Math.max(0, Math.min(1, current + addedHeat));
 }
 
 export function varkhulForgeBeamBlockDamageMaxHp(
@@ -152,7 +156,7 @@ export function varkhulForgeBeamBlockDamageMaxHp(
   exposureStack: number,
 ): number {
   const safeStack = Math.max(1, Math.floor(exposureStack));
-  const base = difficulty === 'heroic' ? 0.08 : 0.06;
+  const base = difficulty === 'heroic' ? 0.1 : 0.07;
   const growth = difficulty === 'heroic' ? 0.03 : 0.02;
   return base + (safeStack - 1) * growth;
 }

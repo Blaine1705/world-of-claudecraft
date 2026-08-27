@@ -253,6 +253,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
+  'src/ui/raid_boss_guide_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/playtime_view.ts',
   'src/ui/stat_tooltip_view.ts',
@@ -352,6 +353,7 @@ const UI_PURE_CORES = [
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/dungeon_map_view.ts',
   'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
@@ -484,6 +486,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 const RENDER_PURE_CORES = [
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/dungeon_banner_core.ts',
+  'src/render/dungeon_tile_kind_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/roof_darkness_core.ts',
   'src/render/varkhul_assembly_focus_core.ts',
@@ -499,6 +502,7 @@ const RENDER_PURE_CORES = [
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',
   'src/render/characters/anim_state_entity_core.ts',
+  'src/render/characters/death_grounding_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
@@ -2258,6 +2262,7 @@ const UI_DOM_MODULES = [
   // (a bare setTimeout sat in the sweep's blind spot, the whole-branch
   // review's note).
   'src/ui/professions_window.ts',
+  'src/ui/raid_boss_guide_window.ts',
   'src/ui/reconnect_overlay.ts',
   // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
   // pinned page set persists per character in localStorage (the deeds_window

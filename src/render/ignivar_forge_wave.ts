@@ -37,6 +37,20 @@ function additiveMaterial(color: number, opacity: number): THREE.MeshBasicMateri
   return material;
 }
 
+function safeLaneMaterial(): THREE.MeshBasicMaterial {
+  const opacity = 0.32;
+  const material = new THREE.MeshBasicMaterial({
+    color: 0x66ffb3,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    side: THREE.DoubleSide,
+  });
+  material.userData.baseOpacity = opacity;
+  return material;
+}
+
 function dangerArcGeometry(inner: number, outer: number, y: number): THREE.BufferGeometry {
   const positions: number[] = [];
   for (let segment = 0; segment < FORGE_WAVE_SEGMENTS; segment++) {
@@ -142,7 +156,7 @@ function buildSafeLane(rotation: number): THREE.Group {
     ),
   );
   geometry.setIndex([0, 1, 2]);
-  lane.add(new THREE.Mesh(geometry, additiveMaterial(0x7ce8ff, 0.16)));
+  lane.add(new THREE.Mesh(geometry, safeLaneMaterial()));
 
   const edge = Math.sin(IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE) * IGNIVAR_FORGE_WAVE_RANGE;
   const forward = Math.cos(IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE) * IGNIVAR_FORGE_WAVE_RANGE;
@@ -154,7 +168,7 @@ function buildSafeLane(rotation: number): THREE.Group {
         new THREE.Vector3(0, 0.1, 0),
         new THREE.Vector3(edge, 0.1, forward),
       ]),
-      new THREE.LineBasicMaterial({ color: 0xc6f8ff, transparent: true, opacity: 0.92 }),
+      new THREE.LineBasicMaterial({ color: 0xc8ffe3, transparent: true, opacity: 1 }),
     ),
   );
   return lane;

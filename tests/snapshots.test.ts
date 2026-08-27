@@ -38,6 +38,7 @@ import {
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -46,6 +47,10 @@ import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_NAME,
+} from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -6205,6 +6210,106 @@ describe('Consecration snapshot parity', () => {
   });
 });
 
+describe('Ignivar raid actionable reconnect state', () => {
+  it('rebuilds and clears Forge Judgment from the authoritative boss cast snapshot', () => {
+    const boss = createMob(
+      9900,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: 3, y: 0, z: 5 },
+    );
+    boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
+    boss.castTotal = 10;
+    boss.castRemaining = 8;
+    boss.channeling = false;
+    boss.facing = 1.25;
+    const client = bareClient(1);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castTotal: 10,
+      castRemaining: 8,
+      channeling: false,
+      facing: 1.25,
+    });
+
+    boss.castRemaining = 4;
+    boss.channeling = true;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: 4,
+      channeling: true,
+    });
+
+    boss.castingAbility = null;
+    boss.castTotal = 0;
+    boss.castRemaining = 0;
+    boss.channeling = false;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: null,
+      castTotal: 0,
+      castRemaining: 0,
+      channeling: false,
+    });
+  });
+
+  it('rebuilds and clears the Shared Pyre target mark after reconnect', () => {
+    const sim = new Sim({ seed: 9900, playerClass: 'priest', world: WIRE_TEST_WORLD });
+    sim.player.auras.push({
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: VARKHUL_SHARED_PYRE_NAME,
+      kind: 'vulnerability',
+      remaining: 4.5,
+      duration: 6,
+      value: 0,
+      stacks: 5,
+      sourceId: 9901,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    const client = bareClient(999);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+
+    expect(client.entities.get(sim.player.id)?.auras).toContainEqual(
+      expect.objectContaining({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        remaining: 4.5,
+        duration: 6,
+        stacks: 5,
+        sourceId: 9901,
+      }),
+    );
+
+    sim.player.auras = [];
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+    expect(
+      client.entities
+        .get(sim.player.id)
+        ?.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID),
+    ).toBe(false);
+  });
+});
+
 describe('Ignivar meteor snapshot parity', () => {
   it('rebuilds active warnings after reconnect and clears them after impact', () => {
     const client = bareClient(1);
@@ -6296,26 +6401,37 @@ describe('Varkhul Forgestorm snapshot parity', () => {
       t: 'snap',
       ents: [],
       varkhulForgestorm: [
-        { id: 9901000100, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 9 },
-        { id: 'bad', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1 },
-        { id: 1, sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1 },
-        { id: 2, sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1 },
-        { id: 20, sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1 },
-        { id: 3, sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1 },
-        { id: 30, sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1 },
-        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0 },
+        {
+          id: 'varkhul-forgestorm:9901:1:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 4,
+          dur: 2.5,
+          rem: 9,
+          lead: 0,
+        },
+        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad', sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:2', sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:3', sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:4', sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:5', sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1, lead: 0 },
+        { id: 'bad:6', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0, lead: 0 },
+        { id: 'bad:7', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: -1 },
       ],
     });
 
     expect(client.activeVarkhulForgestormWarnings).toEqual([
       {
-        id: 9901000100,
+        id: 'varkhul-forgestorm:9901:1:0:0',
         sourceId: 9901,
         x: 3,
         z: 5,
         radius: 4,
         duration: 2.5,
         remaining: 2.5,
+        warningLead: 0,
       },
     ]);
 
@@ -6323,7 +6439,7 @@ describe('Varkhul Forgestorm snapshot parity', () => {
     expect(client.activeVarkhulForgestormWarnings).toEqual([]);
   });
 
-  it('interest-scopes active warnings with stable numeric ids and authoritative time', () => {
+  it('interest-scopes active warnings with stable meteor ids and authoritative time', () => {
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Forgewire', 'warrior');
@@ -6351,11 +6467,12 @@ describe('Varkhul Forgestorm snapshot parity', () => {
 
     expect(lastSnap(fc.sent).varkhulForgestorm).toEqual([
       expect.objectContaining({
-        id: boss.id * 1_000_000 + 710,
+        id: `varkhul-forgestorm:${boss.id}:7:1:0`,
         sourceId: boss.id,
         r: 4,
         dur: 2.5,
         rem: 1.4,
+        lead: 0,
       }),
     ]);
   });
@@ -6395,7 +6512,7 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
             bx: 8,
             bz: 12,
             w: 1.35,
-            dur: 3.5,
+            dur: 5,
             rem: 2.25,
           },
           win: 0,
@@ -6454,7 +6571,7 @@ describe('Varkhul Cinder Orbs snapshot parity', () => {
       blockerX: 8,
       blockerZ: 12,
       width: 1.35,
-      duration: 3.5,
+      duration: 5,
       remaining: 2.25,
     });
     expect(client.activeVarkhulAssemblies[0].runes[2]).toMatchObject({

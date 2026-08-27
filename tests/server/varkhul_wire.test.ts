@@ -19,8 +19,26 @@ describe('Varkhul snapshot wire fragment', () => {
     const json = varkhulEncounterWireJson(
       {
         activeVarkhulForgestormWarnings: [
-          { id: 101, sourceId: 1, x: 3.126, z: 4.234, radius: 4, duration: 2.5, remaining: 1.4 },
-          { id: 102, sourceId: 1, x: 200, z: 4, radius: 4, duration: 2.5, remaining: 1 },
+          {
+            id: 'varkhul-forgestorm:1:1:0:0',
+            sourceId: 1,
+            x: 3.126,
+            z: 4.234,
+            radius: 4,
+            duration: 2.5,
+            remaining: 1.4,
+            warningLead: 0,
+          },
+          {
+            id: 'varkhul-forgestorm:1:1:0:1',
+            sourceId: 1,
+            x: 200,
+            z: 4,
+            radius: 4,
+            duration: 2.5,
+            remaining: 1,
+            warningLead: 0,
+          },
         ],
         activeVarkhulCinderFires: [
           { id: '1:cinder-fire:2:0', sourceId: 1, x: 5.126, z: 6.234, radius: 2.4 },
@@ -33,7 +51,18 @@ describe('Varkhul snapshot wire fragment', () => {
       50,
     );
     expect(JSON.parse(`{${json.slice(1)}}`)).toEqual({
-      varkhulForgestorm: [{ id: 101, sourceId: 1, x: 3.13, z: 4.23, r: 4, dur: 2.5, rem: 1.4 }],
+      varkhulForgestorm: [
+        {
+          id: 'varkhul-forgestorm:1:1:0:0',
+          sourceId: 1,
+          x: 3.13,
+          z: 4.23,
+          r: 4,
+          dur: 2.5,
+          rem: 1.4,
+          lead: 0,
+        },
+      ],
       varkhulCinderFires: [{ id: '1:cinder-fire:2:0', sourceId: 1, x: 5.13, z: 6.23, r: 2.4 }],
     });
   });
@@ -76,6 +105,9 @@ describe('Varkhul snapshot wire fragment', () => {
             forgeBeamActiveMask: 3,
             forgeBeamWarmupRemaining: 2.35,
             forgeMeltdownRemaining: 0,
+            addWave: 2,
+            addWaves: 4,
+            addsRemaining: 7,
             forgeBeams: [
               {
                 index: 0,
@@ -84,6 +116,7 @@ describe('Varkhul snapshot wire fragment', () => {
                 impactX: -8,
                 impactZ: 20,
                 active: true,
+                warning: false,
                 blocked: true,
                 blockerId: 9,
               },
@@ -94,6 +127,7 @@ describe('Varkhul snapshot wire fragment', () => {
                 impactX: 10,
                 impactZ: 20,
                 active: true,
+                warning: true,
                 blocked: false,
                 blockerId: null,
               },
@@ -109,7 +143,7 @@ describe('Varkhul snapshot wire fragment', () => {
               blockerX: 8.126,
               blockerZ: 11.234,
               width: 1.35,
-              duration: 3.5,
+              duration: 5,
               remaining: 2.25,
             },
             cores: [],
@@ -128,10 +162,10 @@ describe('Varkhul snapshot wire fragment', () => {
     const parsed = JSON.parse(`{${json.slice(1)}}`);
     const assembly = parsed.varkhulAssemblies[0];
     expect(assembly.hc).toBe(1);
-    expect(assembly).toMatchObject({ oh: 0.42, bm: 3, bw: 2.35, mr: 0 });
+    expect(assembly).toMatchObject({ oh: 0.42, bm: 3, bw: 2.35, mr: 0, aw: 2, aws: 4, ar: 7 });
     expect(assembly.beams).toEqual([
-      { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, a: 1, bid: 9 },
-      { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, a: 1, bid: null },
+      { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, a: 1, w: 0, bid: 9 },
+      { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, a: 1, w: 1, bid: null },
     ]);
     expect(assembly.ib).toEqual({
       sid: 7,
@@ -144,7 +178,7 @@ describe('Varkhul snapshot wire fragment', () => {
       bx: 8.13,
       bz: 11.23,
       w: 1.35,
-      dur: 3.5,
+      dur: 5,
       rem: 2.25,
     });
     expect(assembly.assign).toEqual([{ pid: 9, sym: 2, lock: 1 }]);
@@ -186,6 +220,7 @@ describe('Varkhul snapshot wire fragment', () => {
     );
     expect(JSON.stringify(assembly).length).toBeLessThan(2_250);
     const decodedAssembly = decodeVarkhulAssemblies(parsed.varkhulAssemblies)[0];
+    expect(decodedAssembly).toMatchObject({ addWave: 2, addWaves: 4, addsRemaining: 7 });
     expect(decodedAssembly.forgeBeamWarmupRemaining).toBe(2.35);
     expect(decodedAssembly.interceptBeam).toEqual({
       sourceId: 7,
@@ -198,7 +233,7 @@ describe('Varkhul snapshot wire fragment', () => {
       blockerX: 8.13,
       blockerZ: 11.23,
       width: 1.35,
-      duration: 3.5,
+      duration: 5,
       remaining: 2.25,
     });
     expect(decodedAssembly.runes[2]).toMatchObject({
@@ -237,6 +272,9 @@ describe('Varkhul snapshot wire fragment', () => {
             forgeBeamActiveMask: 3,
             forgeBeamWarmupRemaining: 0,
             forgeMeltdownRemaining: 4.35,
+            addWave: 0,
+            addWaves: 0,
+            addsRemaining: 0,
             forgeBeams: [],
             interceptBeam: null,
             cores: [],

@@ -14,16 +14,25 @@ export const VARKHUL_CINDER_REPAIR_NAME = 'Recalibrate';
 export const VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS = 6;
 export const VARKHUL_CINDER_REPAIR_RANGE = 4;
 export const VARKHUL_CINDER_REPAIR_RETRY_SECONDS = 2;
-export const VARKHUL_CINDER_REPAIR_BEAM_EVERY_SECONDS = 0.45;
-export const VARKHUL_CINDER_ARTIFICER_HEAL_PCT_NORMAL = 0.06;
-export const VARKHUL_CINDER_ARTIFICER_HEAL_PCT_HEROIC = 0.08;
+export const VARKHUL_CINDER_REPAIR_TICK_SECONDS = 1;
+export const VARKHUL_CINDER_ARTIFICER_HEAL_PCT_NORMAL = 0.02;
+export const VARKHUL_CINDER_ARTIFICER_HEAL_PCT_HEROIC = 0.03;
+export const VARKHUL_CINDER_ARTIFICER_MINIMUM_WINDOW_SECONDS =
+  VARKHUL_CINDER_ARTIFICER_PORTAL_TELEGRAPH_SECONDS + VARKHUL_CINDER_REPAIR_CHANNEL_SECONDS;
+
+export function varkhulCinderArtificerCanQueue(intermissionRemainingSeconds: number): boolean {
+  return (
+    Number.isFinite(intermissionRemainingSeconds) &&
+    intermissionRemainingSeconds >= VARKHUL_CINDER_ARTIFICER_MINIMUM_WINDOW_SECONDS
+  );
+}
 
 export function varkhulCinderArtificerPortalIndex(spawnIndex: number): number {
   const safeIndex = Math.max(0, Math.floor(spawnIndex));
   return safeIndex % 4;
 }
 
-export function varkhulCinderRepairAmount(
+export function varkhulCinderRepairTickAmount(
   bossMaxHp: number,
   difficulty: VarkhulAssemblyDifficulty,
 ): number {

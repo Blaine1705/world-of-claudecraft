@@ -168,6 +168,7 @@ function decodeForgeBeam(value: unknown): ActiveVarkhulAssembly['forgeBeams'][nu
     !(beam.i === 0 || beam.i === 1) ||
     ![beam.cx, beam.cz, beam.ix, beam.iz].every(finite) ||
     !(beam.a === undefined || beam.a === 0 || beam.a === 1) ||
+    !(beam.w === undefined || beam.w === 0 || beam.w === 1) ||
     !(beam.bid === null || nonNegativeInteger(beam.bid))
   ) {
     return null;
@@ -179,6 +180,7 @@ function decodeForgeBeam(value: unknown): ActiveVarkhulAssembly['forgeBeams'][nu
     impactX: beam.ix as number,
     impactZ: beam.iz as number,
     active: beam.a === undefined ? true : beam.a === 1,
+    warning: beam.w === 1,
     blocked: beam.bid !== null,
     blockerId: beam.bid as number | null,
   };
@@ -255,6 +257,10 @@ export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[]
       (assembly.mr as number) < 0 ||
       (assembly.win as number) < 0 ||
       (assembly.rem as number) < 0 ||
+      !(assembly.aw === undefined || nonNegativeInteger(assembly.aw)) ||
+      !(assembly.aws === undefined || nonNegativeInteger(assembly.aws)) ||
+      !(assembly.ar === undefined || nonNegativeInteger(assembly.ar)) ||
+      ((assembly.aw as number | undefined) ?? 0) > ((assembly.aws as number | undefined) ?? 0) ||
       !nonNegativeInteger(assembly.round) ||
       !nonNegativeInteger(assembly.rounds) ||
       (assembly.rounds as number) <= 0 ||
@@ -328,6 +334,9 @@ export function decodeVarkhulAssemblies(value: unknown): ActiveVarkhulAssembly[]
           (assembly.bm as number | undefined) ?? (assembly.phase === 'links' ? 3 : 0),
         forgeBeamWarmupRemaining: assembly.bw as number,
         forgeMeltdownRemaining: assembly.mr as number,
+        addWave: (assembly.aw as number | undefined) ?? 0,
+        addWaves: (assembly.aws as number | undefined) ?? 0,
+        addsRemaining: (assembly.ar as number | undefined) ?? 0,
         forgeBeams: decodedBeams,
         interceptBeam,
         cores: cores as ActiveVarkhulMoltenCore[],

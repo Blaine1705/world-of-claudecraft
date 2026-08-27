@@ -11,7 +11,6 @@ import {
 import { DUNGEONS, ITEMS, NPCS, QUESTS } from '../src/sim/data';
 import { createGroundObject } from '../src/sim/entity';
 import {
-  IGNIVAR_CINDER_ARTIFICER_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
@@ -98,7 +97,6 @@ describe('Ignivar raid lore content', () => {
       objectives: [
         { type: 'kill', targetMobId: IGNIVAR_EMBER_SENTINEL_ID, count: 2 },
         { type: 'kill', targetMobId: IGNIVAR_CRUCIBLE_WARDEN_ID, count: 2 },
-        { type: 'kill', targetMobId: IGNIVAR_CINDER_ARTIFICER_ID, count: 2 },
       ],
     });
     expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart]).toMatchObject({
@@ -155,7 +153,7 @@ describe('Ignivar raid lore content', () => {
     sim.events = [];
 
     expect(sim.pickUpObject(record.id, pid)).toBe(true);
-    expect(progress.counts).toEqual([0, 0, 0]);
+    expect(progress.counts).toEqual([0, 0]);
     expect(record.lootable).toBe(true);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
@@ -202,15 +200,10 @@ describe('Ignivar raid lore content', () => {
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_FORGE_APPROACH_ID);
     if (!instance) throw new Error('Ignivar approach did not claim an instance');
 
-    for (const templateId of [
-      IGNIVAR_EMBER_SENTINEL_ID,
-      IGNIVAR_CRUCIBLE_WARDEN_ID,
-      IGNIVAR_CINDER_ARTIFICER_ID,
-    ] as const) {
+    for (const templateId of [IGNIVAR_EMBER_SENTINEL_ID, IGNIVAR_CRUCIBLE_WARDEN_ID] as const) {
       const mobs = instance.mobIds
         .map((id) => sim.entities.get(id))
         .filter((entity): entity is Entity => entity?.templateId === templateId);
-      // The redesigned first-room packs carry 3 Sentinels, 3 Wardens, 2 Artificers.
       // The memory reveal is keyed on the LAST construct of a type dying, so drive
       // it off the actual pack count rather than a fixed pair.
       expect(mobs.length).toBeGreaterThanOrEqual(2);

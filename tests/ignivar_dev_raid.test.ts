@@ -4,7 +4,6 @@ import {
   IGNIVAR_BRAND_AURA_ID,
   IGNIVAR_BRAND_RADIUS,
   IGNIVAR_SOAK_RADIUS,
-  IGNIVAR_SOAK_SHARED_MAX_HP,
   updateIgnivarEncounter,
 } from '../src/sim/encounters/ignivar';
 import {
@@ -260,7 +259,7 @@ describe('/dev ignivarraid', () => {
     expect(dist2d(sim.player.pos, first.pos)).toBeGreaterThan(IGNIVAR_BRAND_RADIUS);
   });
 
-  it('lets the tester complete the four-player Shared Pyre by joining the marked pod', () => {
+  it('keeps legacy Shared Pyre inert on Ignivar even with the dev pod present', () => {
     const sim = devSim();
     sim.chat('/dev dungeon ignivar_raid_arena normal');
     sim.chat('/dev ignivarraid');
@@ -279,22 +278,16 @@ describe('/dev ignivarraid', () => {
     boss.ignivar.rotatingRaysTimer = 999;
     boss.ignivar.forgeWaveTimer = 999;
     boss.ignivar.meteorTimer = 999;
-    boss.ignivar.soakTimer = 0;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    expect(sim.players.get(marked?.id ?? -1)?.isDevBot).toBe(true);
-    if (!marked) throw new Error('Shared Pyre did not mark a test bot');
-    sim.player.pos = { ...marked.pos };
-    sim.player.prevPos = { ...sim.player.pos };
     sim.player.hp = sim.player.maxHp;
+    boss.ignivar.soakTimer = 0;
+    boss.ignivar.soakTargetId = sim.player.id;
     boss.ignivar.soakRemaining = DT;
 
     updateIgnivarEncounter(sim.ctx, boss);
 
-    expect(sim.player.hp).toBe(
-      sim.player.maxHp - Math.ceil(sim.player.maxHp * (IGNIVAR_SOAK_SHARED_MAX_HP / 4)),
-    );
+    expect(boss.ignivar.soakTargetId).toBeNull();
+    expect(boss.ignivar.soakRemaining).toBe(0);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
   });
 
   it('keeps its invulnerable mechanic bots alive through an Apocalypse wipe', () => {
@@ -373,6 +366,11 @@ describe('/dev ignivarraid', () => {
   it('enters the Normal forge approach with a full practice raid from the open world', () => {
     const sim = devSim();
     sim.chat('/dev ignivarraid');
+    expect(
+      sim
+        .drainEvents()
+        .some((event) => event.type === 'log' && event.text.includes('all five automaton packs')),
+    ).toBe(true);
     const bots = ignivarBots(sim);
     expect(bots).toHaveLength(9);
     expect(sim.partyOf(sim.playerId)).toMatchObject({ raid: true, leader: sim.playerId });

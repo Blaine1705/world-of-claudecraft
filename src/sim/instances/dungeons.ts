@@ -57,6 +57,8 @@ import {
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
+import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
+import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -826,18 +828,25 @@ function claimInstance(
   inst.enteredBy = new Set();
   inst.combatExitMemory = new Map();
   const origin = instanceOriginOf(inst);
+  const mobDifficultyTuningId = dungeon.mobDifficultyTuningId ?? inst.dungeonId;
   for (const spawn of dungeon.spawns) {
     const template = MOBS[spawn.mobId];
     const rolledLevel = ctx.rng.int(template.minLevel, template.maxLevel);
-    const spawnTemplate = mobTemplateForDungeonDifficulty(template, inst.dungeonId, difficulty);
-    const level = mobLevelForDungeonDifficulty(inst.dungeonId, difficulty, rolledLevel);
+    const spawnTemplate = mobTemplateForDungeonDifficulty(
+      template,
+      mobDifficultyTuningId,
+      difficulty,
+    );
+    const level = mobLevelForDungeonDifficulty(mobDifficultyTuningId, difficulty, rolledLevel);
     const mob = createMob(
       ctx.nextId++,
       spawnTemplate,
       level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
-    applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
+    applyDungeonMobTuning(mob, mobDifficultyTuningId, difficulty);
+    applyDungeonSpawnMinibossTuning(mob, spawn.miniboss);
+    if (spawn.packId) mob.dungeonPackId = `${inst.dungeonId}:${inst.slot}:${spawn.packId}`;
     mob.facing = spawn.facing ?? Math.PI; // most packs face the entrance; authored set-pieces may override
     mob.prevFacing = mob.facing;
     if (spawn.idleStationary) mob.idleStationary = true; // hand-placed pack holds formation
@@ -1158,6 +1167,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
+  tickIgnivarLavaHazard(ctx);
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     let occupied = false;

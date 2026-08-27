@@ -39,7 +39,7 @@ export interface VarkhulInterceptBeamProjectionState {
 export const VARKHUL_INTERCEPT_BEAM_CAST_ID = 'Tempering Ray';
 export const VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID = 'varkhul_tempered_wound';
 export const VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME = 'Tempered Wound';
-export const VARKHUL_INTERCEPT_BEAM_CAST_SECONDS = 3.5;
+export const VARKHUL_INTERCEPT_BEAM_CAST_SECONDS = 5;
 export const VARKHUL_INTERCEPT_BEAM_FIRST_SECONDS = 17;
 export const VARKHUL_INTERCEPT_BEAM_EVERY_SECONDS = 32;
 export const VARKHUL_INTERCEPT_BEAM_HALF_WIDTH = 1.35;

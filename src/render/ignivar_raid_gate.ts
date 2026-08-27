@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-import { IGNIVAR_GATE_LOCKED_TEMPLATE, IGNIVAR_SECOND_WING_ID } from '../sim/ignivar_raid_ids';
+import {
+  IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
+  IGNIVAR_SECOND_WING_ID,
+} from '../sim/ignivar_raid_ids';
 import { EMISSIVE_GLOW, surfaceMat } from './gfx';
 
 export const IGNIVAR_RAID_GATE_HEIGHT = 6.4;
@@ -16,7 +20,10 @@ export function ignivarRaidGatePlan(
   if (templateId === IGNIVAR_GATE_LOCKED_TEMPLATE) {
     return { open: false, height: IGNIVAR_RAID_GATE_HEIGHT };
   }
-  if (templateId === 'dungeon_door' && dungeonId === IGNIVAR_SECOND_WING_ID) {
+  if (
+    templateId === 'dungeon_door' &&
+    (dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID || dungeonId === IGNIVAR_SECOND_WING_ID)
+  ) {
     return { open: true, height: IGNIVAR_RAID_GATE_HEIGHT };
   }
   return null;
