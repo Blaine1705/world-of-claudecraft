@@ -364,21 +364,21 @@ holder's class at the Crucible Quartermaster.
 
 | Sigil | Classes | Redeems |
 |---|---|---|
-| Helm Sigil of the Anvil (`sigil_anvil_helmet`) | warrior, priest, druid | any helmet set piece for your class |
-| Helm Sigil of the Ember (`sigil_ember_helmet`) | paladin, rogue, shaman | any helmet set piece for your class |
-| Helm Sigil of the Tempest (`sigil_tempest_helmet`) | hunter, mage, warlock | any helmet set piece for your class |
-| Mantle Sigil of the Anvil (`sigil_anvil_shoulder`) | warrior, priest, druid | any shoulder set piece for your class |
-| Mantle Sigil of the Ember (`sigil_ember_shoulder`) | paladin, rogue, shaman | any shoulder set piece for your class |
-| Mantle Sigil of the Tempest (`sigil_tempest_shoulder`) | hunter, mage, warlock | any shoulder set piece for your class |
-| Robe Sigil of the Anvil (`sigil_anvil_chest`) | warrior, priest, druid | any chest set piece for your class |
-| Robe Sigil of the Ember (`sigil_ember_chest`) | paladin, rogue, shaman | any chest set piece for your class |
-| Robe Sigil of the Tempest (`sigil_tempest_chest`) | hunter, mage, warlock | any chest set piece for your class |
-| Grip Sigil of the Anvil (`sigil_anvil_gloves`) | warrior, priest, druid | any gloves set piece for your class |
-| Grip Sigil of the Ember (`sigil_ember_gloves`) | paladin, rogue, shaman | any gloves set piece for your class |
-| Grip Sigil of the Tempest (`sigil_tempest_gloves`) | hunter, mage, warlock | any gloves set piece for your class |
-| Legging Sigil of the Anvil (`sigil_anvil_legs`) | warrior, priest, druid | any legs set piece for your class |
-| Legging Sigil of the Ember (`sigil_ember_legs`) | paladin, rogue, shaman | any legs set piece for your class |
-| Legging Sigil of the Tempest (`sigil_tempest_legs`) | hunter, mage, warlock | any legs set piece for your class |
+| Helm Sigil of the Anvil (`sigil_anvil_helmet`) | warrior, druid, mage | any helmet set piece for your class |
+| Helm Sigil of the Ember (`sigil_ember_helmet`) | paladin, hunter, priest | any helmet set piece for your class |
+| Helm Sigil of the Tempest (`sigil_tempest_helmet`) | shaman, rogue, warlock | any helmet set piece for your class |
+| Mantle Sigil of the Anvil (`sigil_anvil_shoulder`) | warrior, druid, mage | any shoulder set piece for your class |
+| Mantle Sigil of the Ember (`sigil_ember_shoulder`) | paladin, hunter, priest | any shoulder set piece for your class |
+| Mantle Sigil of the Tempest (`sigil_tempest_shoulder`) | shaman, rogue, warlock | any shoulder set piece for your class |
+| Robe Sigil of the Anvil (`sigil_anvil_chest`) | warrior, druid, mage | any chest set piece for your class |
+| Robe Sigil of the Ember (`sigil_ember_chest`) | paladin, hunter, priest | any chest set piece for your class |
+| Robe Sigil of the Tempest (`sigil_tempest_chest`) | shaman, rogue, warlock | any chest set piece for your class |
+| Grip Sigil of the Anvil (`sigil_anvil_gloves`) | warrior, druid, mage | any gloves set piece for your class |
+| Grip Sigil of the Ember (`sigil_ember_gloves`) | paladin, hunter, priest | any gloves set piece for your class |
+| Grip Sigil of the Tempest (`sigil_tempest_gloves`) | shaman, rogue, warlock | any gloves set piece for your class |
+| Legging Sigil of the Anvil (`sigil_anvil_legs`) | warrior, druid, mage | any legs set piece for your class |
+| Legging Sigil of the Ember (`sigil_ember_legs`) | paladin, hunter, priest | any legs set piece for your class |
+| Legging Sigil of the Tempest (`sigil_tempest_legs`) | shaman, rogue, warlock | any legs set piece for your class |
 
 ## Off-set waist and feet, all ten variants
 
@@ -429,8 +429,8 @@ Held-slot budget 18 (offhand mult 0.75).
 
 | Piece | Kind | Stats | Affix | Ratings | Extra | Classes |
 |---|---|---|---|---|---|---|
-| Bulwark of the Inner Crucible | shield | Str 8, Sta 10 | none | crit 25 | armor 1250, block 30 | warrior, paladin, shaman |
-| Ember Warden's Barrier | shield | Int 9, Spi 9 | Healing Power 18 | haste 25 | armor 1250, block 22 | paladin, shaman |
+| Bulwark of the Inner Crucible | shield | Str 8, Sta 10 | none | crit 25 | armor 760, block 30 | warrior, paladin, shaman |
+| Ember Warden's Barrier | shield | Int 9, Spi 9 | Healing Power 18 | haste 25 | armor 760, block 22 | paladin, shaman |
 | Orb of the Last Spring | held offhand | Int 9, Spi 9 | Healing Power 18 | haste 25 | | priest, mage, druid, paladin, shaman |
 | Cinder of the First Design | held offhand | Int 12, Spi 6 | Spell Damage 10 | crit 25 | | mage, priest, warlock, druid |
 
