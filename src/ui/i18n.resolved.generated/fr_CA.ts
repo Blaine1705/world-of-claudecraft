@@ -2105,10 +2105,10 @@ export const fr_CA: EnTranslations = {
         "other": "{count} secondes restantes"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Il reste {count} amélioration active, mais son icône est masquée par ce préréglage graphique",
+        "few": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique",
+        "many": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique",
+        "other": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique"
       },
       "playtimeDays": {
         "one": "{count} jour",
@@ -4059,10 +4059,10 @@ export const fr_CA: EnTranslations = {
       "loading": "Chargement de la Bourse...",
       "loadFailed": "Impossible de contacter la Bourse. Réessayez dans un instant.",
       "disabledRealm": "La Bourse $WOC n'est pas disponible sur ce royaume.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Ouvrir la Bourse $WOC dans votre navigateur ?",
+      "browserOnlyConfirmBody": "La Bourse $WOC fonctionne uniquement dans la version navigateur de World of ClaudeCraft. Cela ouvre World of ClaudeCraft dans votre navigateur, où vous pouvez vous connecter et ouvrir la Bourse ; le jeu continue ici.",
+      "browserOnlyConfirmOpen": "Ouvrir dans le navigateur",
+      "browserOnlyConfirmCancel": "Annuler",
       "pausedBanner": "Les échanges sont en pause. Les enchères continuent de décompter ; les nouvelles annonces, enchères, offres et paiements attendent la reprise des échanges, et un paiement déjà envoyé se règle quand même.",
       "walletBanner": "Liez et vérifiez un portefeuille pour enchérir, acheter ou vendre sur la Bourse.",
       "walletBannerCta": "Connecter un portefeuille",

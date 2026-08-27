@@ -13754,8 +13754,22 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.',
   'hudChrome.mounts.name_rickshaw_mount': 'Benbunden Rickshaw',
   'hudChrome.options.showTargetSwingTimer': 'Visa målets svingtimer',
+  'hudChrome.plurals.buffsHidden.one':
+    'Ytterligare {count} förstärkning är aktiv men dold med denna grafikförinställning',
+  'hudChrome.plurals.buffsHidden.few':
+    'Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning',
+  'hudChrome.plurals.buffsHidden.many':
+    'Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning',
+  'hudChrome.plurals.buffsHidden.other':
+    'Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning',
   'hudChrome.steam.wishlist': 'Lägg till på önskelistan på Steam',
   'hudChrome.steam.wishlistAria':
     'Lägg till på önskelistan på Steam: öppna World of ClaudeCrafts butikssida',
   'hudChrome.steam.wishlistShort': 'Önskelista',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Öppna $WOC-börsen i webbläsaren?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC-börsen körs endast i webbläsarversionen av World of ClaudeCraft. Detta öppnar World of ClaudeCraft i din webbläsare, där du kan logga in och öppna börsen; spelet fortsätter att köras här.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Öppna i webbläsaren',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Avbryt',
 };

@@ -13868,8 +13868,22 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.',
   'hudChrome.mounts.name_rickshaw_mount': 'Becak Terikat Tulang',
   'hudChrome.options.showTargetSwingTimer': 'Tampilkan pengatur waktu ayunan target',
+  'hudChrome.plurals.buffsHidden.one':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.plurals.buffsHidden.few':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.plurals.buffsHidden.many':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.plurals.buffsHidden.other':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
   'hudChrome.steam.wishlist': 'Masukkan ke wishlist di Steam',
   'hudChrome.steam.wishlistAria':
     'Masukkan ke wishlist di Steam: buka halaman toko World of ClaudeCraft',
   'hudChrome.steam.wishlistShort': 'Wishlist',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Buka Bursa $WOC di browser?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Bursa $WOC hanya berjalan di versi browser World of ClaudeCraft. Ini membuka World of ClaudeCraft di browser, tempat kamu dapat masuk dan membuka Bursa; game tetap berjalan di sini.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Buka di Browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Batal',
 };

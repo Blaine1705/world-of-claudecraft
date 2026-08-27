@@ -852,6 +852,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': '分',
   'hudChrome.unitFrame.durationUnitHours': '時',
   'hudChrome.unitFrame.durationUnitDays': '天',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
   'hudChrome.unitFrame.partyLabel': '你的隊伍',
   'hudChrome.unitFrame.partyChip': '隊伍',
   'hudChrome.unitFrame.playerLabel': '你的角色',

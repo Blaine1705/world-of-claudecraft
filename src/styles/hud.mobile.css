@@ -2497,38 +2497,22 @@
      clicks). Deed/reliquary are progress chrome, not actionable combat info
      (no graphics-fairness concern), so they stand down here; the More tray
      (#mobile-extra-controls) and the rail's own Book of Deeds / Reliquary
-     launchers still open the full windows. #delve-tracker is the exception
+     launchers still open the full windows. #delve-tracker and #rift-tracker
+     are the exceptions
      (the stack's own re-seat below): a live delve run's objective and affix
-     info IS actionable. */
+     info, and a live rift run's pacing, ARE actionable. */
   body.mobile-touch.xhb-mode #deed-tracker,
   body.mobile-touch.xhb-mode #reliquary-tracker {
     display: none;
-  }
-  /* #rift-tracker's OWN comment (hud.css, "rift floor tracker") calls its
-     floor progress and closes-in countdown "actionable pacing info" too,
-     the identical reasoning that earns #delve-tracker its seat below, so
-     hiding it here is inconsistent, not a settled call: this pass only
-     re-derived the seat, party clearance, and UI Scale math for the one
-     tracker the review named, and doing the same for a second tracker
-     without also re-verifying it against that math is exactly the kind of
-     silent scope creep CLAUDE.md warns against. #rift-tracker sets its own
-     inline display (rift_floor_tracker_controller.ts, 'block' while a run
-     exists), so unlike deed/reliquary above it needs !important to win
-     here; same "hidden either way" idiom #daily-rewards-button uses,
-     pending that follow-up (delve and rift instances never coexist for one
-     player per src/sim/data.ts's isRiftPos/isDelvePos split, so the two
-     could plausibly share this exact seat once rift gets the same pass). */
-  body.mobile-touch.xhb-mode #rift-tracker {
-    display: none !important;
   }
   /* The stack itself re-seats to the left edge instead of standing down,
      mirroring the quest tracker's own left-side standdown seat (#quest-strip,
      above): that is the one corner this mode leaves clear (the touch
      move-zone/joystick it used to share it with are hidden in xhb-mode too,
      and Quick Actions' revived seat sits lower, at the bottom-left).
-     #delve-tracker is the stack's only child left visible above, so it is the
-     one that actually moves; no per-child override needed, since it is a
-     plain flex child of this box (not positioned on its own).
+     #delve-tracker and #rift-tracker are the live children left visible above,
+     so they move with the stack; no per-child positioning override needed,
+     since both are plain flex children of this box.
 
      BOTTOM-anchored, not top: both this stack and .xhb live inside the same
      #ui, which carries `zoom: var(--ui-scale)` (src/ui/ui_scale.ts), so every
@@ -2573,8 +2557,8 @@
     z-index: 4;
   }
   /* Bounded the same way #quest-strip's own objectives block is (above): a
-     run's objective/affix lines are unbounded in height
-     (delve_tracker_controller.ts writes the whole innerHTML per update), and
+     run's objective/affix/pacing lines are unbounded in height (the delve and
+     rift tracker controllers write the whole innerHTML per update), and
      this seat sits between the quest strip above and the XHB band below.
      Scale-aware, the same idiom #meters-window uses just above, but the
      subtraction order matters here: #quest-strip is NOT zoomed (it is a
@@ -2591,8 +2575,8 @@
      more of the fixed viewport than is actually free; content that still
      does not fit scrolls (below) rather than clipping silently or
      overlapping the strip. pointer-events: auto is required for that
-     scroll to be a real affordance, not decoration: #delve-tracker's OWN
-     base rule (hud.css) is pointer-events: none (every tracker in this
+     scroll to be a real affordance, not decoration: both live trackers' OWN
+     base rules (hud.css) are pointer-events: none (every tracker in this
      stack floats over the game world unclickable except its one
      interactive row), so without this a touch drag here falls through to
      the canvas instead of scrolling. It shares this corner only with
@@ -2601,7 +2585,8 @@
      own pointer-events, so claiming touches back here is safe the way it
      would not have been at the old right-side seat (the .dt-affix-row
      click-steal precedent this stack's z-index comment above describes). */
-  body.mobile-touch.xhb-mode #delve-tracker {
+  body.mobile-touch.xhb-mode #delve-tracker,
+  body.mobile-touch.xhb-mode #rift-tracker {
     max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);
     overflow-y: auto;
     pointer-events: auto;

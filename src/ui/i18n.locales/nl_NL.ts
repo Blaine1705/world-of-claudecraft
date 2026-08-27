@@ -13879,8 +13879,22 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt.',
   'hudChrome.mounts.name_rickshaw_mount': 'Beengebonden Riksja',
   'hudChrome.options.showTargetSwingTimer': 'Aanvalstimer van doelwit tonen',
+  'hudChrome.plurals.buffsHidden.one':
+    'Er is nog {count} verbetering actief, maar die is verborgen in deze grafische preset',
+  'hudChrome.plurals.buffsHidden.few':
+    'Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset',
+  'hudChrome.plurals.buffsHidden.many':
+    'Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset',
+  'hudChrome.plurals.buffsHidden.other':
+    'Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset',
   'hudChrome.steam.wishlist': 'Op verlanglijst zetten op Steam',
   'hudChrome.steam.wishlistAria':
     'Op verlanglijst zetten op Steam: open de winkelpagina van World of ClaudeCraft',
   'hudChrome.steam.wishlistShort': 'Verlanglijst',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'De $WOC-beurs in je browser openen?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'De $WOC-beurs werkt alleen in de browserversie van World of ClaudeCraft. Hiermee wordt World of ClaudeCraft in je browser geopend, waar je kunt inloggen en de beurs kunt openen; het spel blijft hier doorgaan.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Openen in browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annuleren',
 };

@@ -2105,10 +2105,10 @@ export const vi_VN: EnTranslations = {
         "other": "còn lại {count} giây"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này",
+        "few": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này",
+        "many": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này",
+        "other": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này"
       },
       "playtimeDays": {
         "one": "{count} ngày",
@@ -4059,10 +4059,10 @@ export const vi_VN: EnTranslations = {
       "loading": "Đang tải Sàn Giao Dịch...",
       "loadFailed": "Không thể kết nối tới Sàn Giao Dịch. Hãy thử lại sau ít phút.",
       "disabledRealm": "Sàn Giao Dịch $WOC không khả dụng trên thế giới này.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Mở Sàn giao dịch $WOC trong trình duyệt?",
+      "browserOnlyConfirmBody": "Sàn giao dịch $WOC chỉ chạy trên phiên bản trình duyệt của World of ClaudeCraft. Thao tác này mở World of ClaudeCraft trong trình duyệt, nơi bạn có thể đăng nhập và mở Sàn giao dịch; trò chơi vẫn tiếp tục chạy ở đây.",
+      "browserOnlyConfirmOpen": "Mở trong trình duyệt",
+      "browserOnlyConfirmCancel": "Hủy",
       "pausedBanner": "Giao dịch đang tạm dừng. Các phiên đấu giá vẫn tiếp tục đếm ngược, tin rao mới, giá thầu, đề nghị mua và thanh toán sẽ chờ đến khi giao dịch được nối lại, còn khoản thanh toán đã gửi thì vẫn được xử lý xong.",
       "walletBanner": "Liên kết và xác minh một ví để đặt giá thầu, mua hoặc bán trên Sàn Giao Dịch.",
       "walletBannerCta": "Kết nối ví",

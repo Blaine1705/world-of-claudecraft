@@ -162,8 +162,9 @@ describe('the revived micromenu rail stands down the progress trackers sharing i
   // compact-tier hit-box extension out-z-indexed it). That blanket hide also
   // took #delve-tracker with it, which is a live mid-run tracker (objectives,
   // active affixes), not progress chrome, so a pad player lost it exactly
-  // when a desktop pad player keeps it. Now only deed/reliquary/rift stand
-  // down, and the stack itself re-seats to the left instead.
+  // when a desktop pad player keeps it. #rift-tracker carries the same kind of
+  // active pacing info, so only deed/reliquary stand down and the stack itself
+  // re-seats to the left instead.
   it('hides #deed-tracker and #reliquary-tracker in xhb-mode (progress chrome, no graphics-fairness concern)', () => {
     const body = ruleBody(
       'body\\.mobile-touch\\.xhb-mode #deed-tracker,\\s*\\n\\s*' +
@@ -172,13 +173,9 @@ describe('the revived micromenu rail stands down the progress trackers sharing i
     expect(body.trim()).toBe('display: none;');
   });
 
-  it('hides #rift-tracker with !important (it sets its own inline display, unlike deed/reliquary which paint via innerHTML alone)', () => {
-    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #rift-tracker');
-    expect(body.trim()).toBe('display: none !important;');
-  });
-
-  it("does NOT hide #delve-tracker: it is a live mid-run tracker, the same class of actionable info #rift-tracker's own comment carves out for graphics tiers", () => {
+  it('does NOT hide #delve-tracker or #rift-tracker: both carry live mid-run actionable info', () => {
     expect(hudMobileCss).not.toMatch(/\.xhb-mode #delve-tracker\s*\{\s*\n?\s*display:\s*none/);
+    expect(hudMobileCss).not.toMatch(/\.xhb-mode #rift-tracker\s*\{\s*\n?\s*display:\s*none/);
   });
 
   // Amended per the PR #3658 third re-review: a flat top-anchor put the
@@ -215,8 +212,11 @@ describe('the revived micromenu rail stands down the progress trackers sharing i
   // the unzoomed quest-strip budget from --app-vh BEFORE dividing by
   // --ui-scale is what keeps this positive (not clamped to 0, invisible) at
   // UI Scale 1.4.
-  it("bounds #delve-tracker's own height in this seat with the app-vh/ui-scale idiom (not a flat px cap), so it stays positive at UI Scale 1.4 instead of clamping to 0 (invisible, the same loss this fix undoes)", () => {
-    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #delve-tracker');
+  it("bounds the live trackers' own height in this seat with the app-vh/ui-scale idiom (not a flat px cap), so they stay positive at UI Scale 1.4 instead of clamping to 0", () => {
+    const body = ruleBody(
+      'body\\.mobile-touch\\.xhb-mode #delve-tracker,\\s*\\n\\s*' +
+        'body\\.mobile-touch\\.xhb-mode #rift-tracker',
+    );
     expect(body).toContain(
       'max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);',
     );
@@ -228,8 +228,11 @@ describe('the revived micromenu rail stands down the progress trackers sharing i
   // decorative: a touch drag falls through to the canvas instead of moving
   // scrollTop (confirmed live with a real CDP wheel event, not just a
   // computed-style check).
-  it('makes #delve-tracker pointer-events: auto in this seat, so the scroll bound above is a real affordance rather than dead overflow:hidden', () => {
-    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #delve-tracker');
+  it('makes the live trackers pointer-events: auto in this seat, so the scroll bound above is a real affordance rather than dead overflow:hidden', () => {
+    const body = ruleBody(
+      'body\\.mobile-touch\\.xhb-mode #delve-tracker,\\s*\\n\\s*' +
+        'body\\.mobile-touch\\.xhb-mode #rift-tracker',
+    );
     expect(body).toContain('pointer-events: auto;');
   });
 });

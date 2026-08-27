@@ -2105,10 +2105,10 @@ export const id_ID: EnTranslations = {
         "other": "{count} detik tersisa"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "few": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "many": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "other": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini"
       },
       "playtimeDays": {
         "one": "{count} hari",
@@ -4059,10 +4059,10 @@ export const id_ID: EnTranslations = {
       "loading": "Memuat Bursa...",
       "loadFailed": "Bursa tidak dapat dihubungi. Coba lagi sebentar lagi.",
       "disabledRealm": "Bursa $WOC tidak tersedia di realm ini.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Buka Bursa $WOC di browser?",
+      "browserOnlyConfirmBody": "Bursa $WOC hanya berjalan di versi browser World of ClaudeCraft. Ini membuka World of ClaudeCraft di browser, tempat kamu dapat masuk dan membuka Bursa; game tetap berjalan di sini.",
+      "browserOnlyConfirmOpen": "Buka di Browser",
+      "browserOnlyConfirmCancel": "Batal",
       "pausedBanner": "Perdagangan sedang dijeda. Lelang tetap menghitung mundur; daftar baru, penawaran, tawaran, dan pembayaran menunggu sampai perdagangan berlanjut kembali, dan pembayaran yang sudah dikirim tetap dilunasi.",
       "walletBanner": "Tautkan dan verifikasi dompet untuk menawar, membeli, atau menjual di Bursa.",
       "walletBannerCta": "Hubungkan dompet",

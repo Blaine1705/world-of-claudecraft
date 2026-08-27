@@ -13638,8 +13638,22 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.',
   'hudChrome.mounts.name_rickshaw_mount': 'Kemikbağlı Çekçek',
   'hudChrome.options.showTargetSwingTimer': 'Hedefin savurma zamanlayıcısını göster',
+  'hudChrome.plurals.buffsHidden.one':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.plurals.buffsHidden.few':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.plurals.buffsHidden.many':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.plurals.buffsHidden.other':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
   'hudChrome.steam.wishlist': "Steam'de istek listesine ekle",
   'hudChrome.steam.wishlistAria':
     "Steam'de istek listesine ekle: World of ClaudeCraft mağaza sayfasını aç",
   'hudChrome.steam.wishlistShort': 'İstek listesi',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '$WOC Borsası tarayıcıda açılsın mı?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC Borsası yalnızca World of ClaudeCraft tarayıcı sürümünde çalışır. Bu, World of ClaudeCraft oyununu tarayıcınızda açar; orada giriş yapıp Borsayı açabilirsiniz. Oyun burada çalışmaya devam eder.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Tarayıcıda Aç',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'İptal',
 };

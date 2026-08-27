@@ -13950,8 +13950,22 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera.',
   'hudChrome.mounts.name_rickshaw_mount': 'Rickshaw Atahuesos',
   'hudChrome.options.showTargetSwingTimer': 'Mostrar temporizador de golpe del objetivo',
+  'hudChrome.plurals.buffsHidden.one':
+    'Hay {count} beneficio más activo, pero está oculto en este ajuste gráfico',
+  'hudChrome.plurals.buffsHidden.few':
+    'Hay {count} beneficios más activos, pero están ocultos en este ajuste gráfico',
+  'hudChrome.plurals.buffsHidden.many':
+    'Hay {count} beneficios más activos, pero están ocultos en este ajuste gráfico',
+  'hudChrome.plurals.buffsHidden.other':
+    'Hay {count} beneficios más activos, pero están ocultos en este ajuste gráfico',
   'hudChrome.steam.wishlist': 'Añadir a la lista de deseados en Steam',
   'hudChrome.steam.wishlistAria':
     'Añadir a la lista de deseados en Steam: abrir la página de World of ClaudeCraft en la tienda',
   'hudChrome.steam.wishlistShort': 'Lista de deseados',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '¿Abrir la Bolsa $WOC en el navegador?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'La Bolsa $WOC solo funciona en la versión para navegador de World of ClaudeCraft. Esto abre World of ClaudeCraft en tu navegador, donde puedes iniciar sesión y abrir la Bolsa; el juego sigue ejecutándose aquí.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Abrir en el navegador',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Cancelar',
 };

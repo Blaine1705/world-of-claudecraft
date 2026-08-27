@@ -2105,10 +2105,10 @@ export const de_DE: EnTranslations = {
         "other": "Noch {count} Sekunden"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "{count} weiterer Stärkungseffekt ist aktiv, aber in dieser Grafikvoreinstellung ausgeblendet",
+        "few": "{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet",
+        "many": "{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet",
+        "other": "{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet"
       },
       "playtimeDays": {
         "one": "{count} Tag",
@@ -4059,10 +4059,10 @@ export const de_DE: EnTranslations = {
       "loading": "Die Börse wird geladen...",
       "loadFailed": "Die Börse konnte nicht erreicht werden. Versuch es in Kürze erneut.",
       "disabledRealm": "Die $WOC-Börse ist auf dieser Welt nicht verfügbar.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "$WOC-Börse im Browser öffnen?",
+      "browserOnlyConfirmBody": "Die $WOC-Börse läuft nur in der Browserversion von World of ClaudeCraft. Dadurch wird World of ClaudeCraft im Browser geöffnet; dort kannst du dich anmelden und die Börse öffnen. Das Spiel läuft hier weiter.",
+      "browserOnlyConfirmOpen": "Im Browser öffnen",
+      "browserOnlyConfirmCancel": "Abbrechen",
       "pausedBanner": "Der Handel ist pausiert. Auktionen laufen weiter herunter; neue Angebote, Gebote, Offerten und Zahlungen warten, bis der Handel fortgesetzt wird, und eine bereits gesendete Zahlung wird trotzdem abgewickelt.",
       "walletBanner": "Verknüpfe und verifiziere eine Wallet, um auf der Börse zu bieten, zu kaufen oder zu verkaufen.",
       "walletBannerCta": "Wallet verbinden",

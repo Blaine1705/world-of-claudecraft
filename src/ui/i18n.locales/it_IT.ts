@@ -13959,8 +13959,22 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata.",
   'hudChrome.mounts.name_rickshaw_mount': 'Risciò Vincolato alle Ossa',
   'hudChrome.options.showTargetSwingTimer': 'Mostra timer degli attacchi del bersaglio',
+  'hudChrome.plurals.buffsHidden.one':
+    'È attivo {count} altro beneficio, ma è nascosto con questa preimpostazione grafica',
+  'hudChrome.plurals.buffsHidden.few':
+    'Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica',
+  'hudChrome.plurals.buffsHidden.many':
+    'Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica',
+  'hudChrome.plurals.buffsHidden.other':
+    'Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica',
   'hudChrome.steam.wishlist': 'Aggiungi alla lista desideri su Steam',
   'hudChrome.steam.wishlistAria':
     'Aggiungi alla lista desideri su Steam: apri la pagina del negozio di World of ClaudeCraft',
   'hudChrome.steam.wishlistShort': 'Lista desideri',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Aprire la Borsa $WOC nel browser?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'La Borsa $WOC funziona solo nella versione browser di World of ClaudeCraft. Questo apre World of ClaudeCraft nel browser, dove puoi accedere e aprire la Borsa; il gioco continua qui.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Apri nel browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annulla',
 };

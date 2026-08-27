@@ -2105,10 +2105,10 @@ export const pt_BR: EnTranslations = {
         "other": "{count} segundos restantes"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Mais {count} bônus está ativo, mas oculto nesta predefinição gráfica",
+        "few": "Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica",
+        "many": "Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica",
+        "other": "Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica"
       },
       "playtimeDays": {
         "one": "{count} dia",
@@ -4059,10 +4059,10 @@ export const pt_BR: EnTranslations = {
       "loading": "Carregando a Bolsa...",
       "loadFailed": "Não foi possível acessar a Bolsa. Tente novamente em instantes.",
       "disabledRealm": "A Bolsa $WOC não está disponível neste reino.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Abrir a Bolsa $WOC no navegador?",
+      "browserOnlyConfirmBody": "A Bolsa $WOC funciona apenas na versão de navegador de World of ClaudeCraft. Isto abre World of ClaudeCraft no seu navegador, onde você pode entrar e abrir a Bolsa; o jogo continua rodando aqui.",
+      "browserOnlyConfirmOpen": "Abrir no navegador",
+      "browserOnlyConfirmCancel": "Cancelar",
       "pausedBanner": "As negociações estão pausadas. Os leilões continuam a contagem regressiva; novas listagens, lances, ofertas e pagamentos aguardam até que as negociações sejam retomadas, e um pagamento já enviado ainda é liquidado.",
       "walletBanner": "Vincule e verifique uma carteira para dar lances, comprar ou vender na Bolsa.",
       "walletBannerCta": "Conectar carteira",

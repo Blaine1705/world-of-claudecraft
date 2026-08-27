@@ -2105,10 +2105,10 @@ export const pl_PL: EnTranslations = {
         "other": "pozostało {count} sekund"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Aktywne jest jeszcze {count} wzmocnienie, ale ukryte w tym ustawieniu grafiki",
+        "few": "Aktywne są jeszcze {count} wzmocnienia, ale ukryte w tym ustawieniu grafiki",
+        "many": "Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki",
+        "other": "Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki"
       },
       "playtimeDays": {
         "one": "{count} dzień",
@@ -4059,10 +4059,10 @@ export const pl_PL: EnTranslations = {
       "loading": "Wczytywanie Giełdy...",
       "loadFailed": "Nie udało się połączyć z Giełdą. Spróbuj ponownie za chwilę.",
       "disabledRealm": "Giełda $WOC nie jest dostępna na tym świecie.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Otworzyć Giełdę $WOC w przeglądarce?",
+      "browserOnlyConfirmBody": "Giełda $WOC działa tylko w przeglądarkowej wersji World of ClaudeCraft. Spowoduje to otwarcie World of ClaudeCraft w przeglądarce, gdzie możesz się zalogować i otworzyć Giełdę; gra będzie tu nadal działać.",
+      "browserOnlyConfirmOpen": "Otwórz w przeglądarce",
+      "browserOnlyConfirmCancel": "Anuluj",
       "pausedBanner": "Handel jest wstrzymany. Aukcje nadal odliczają czas; nowe wystawienia, oferty, propozycje i płatności czekają do wznowienia handlu, a płatność już wysłana zostanie mimo to rozliczona.",
       "walletBanner": "Podłącz i zweryfikuj portfel, aby licytować, kupować lub sprzedawać na Giełdzie.",
       "walletBannerCta": "Podłącz portfel",

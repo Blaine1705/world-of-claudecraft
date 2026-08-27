@@ -2105,10 +2105,10 @@ export const tr_TR: EnTranslations = {
         "other": "{count} saniye kaldı"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "few": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "many": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "other": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli"
       },
       "playtimeDays": {
         "one": "{count} gün",
@@ -4059,10 +4059,10 @@ export const tr_TR: EnTranslations = {
       "loading": "Borsa yükleniyor...",
       "loadFailed": "Borsa'ya ulaşılamadı. Kısa süre sonra tekrar dene.",
       "disabledRealm": "$WOC Borsası bu sunucuda kullanılamıyor.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "$WOC Borsası tarayıcıda açılsın mı?",
+      "browserOnlyConfirmBody": "$WOC Borsası yalnızca World of ClaudeCraft tarayıcı sürümünde çalışır. Bu, World of ClaudeCraft oyununu tarayıcınızda açar; orada giriş yapıp Borsayı açabilirsiniz. Oyun burada çalışmaya devam eder.",
+      "browserOnlyConfirmOpen": "Tarayıcıda Aç",
+      "browserOnlyConfirmCancel": "İptal",
       "pausedBanner": "Alım satım duraklatıldı. Açık artırmaların geri sayımı sürüyor; yeni ilanlar, teklifler, öneriler ve ödemeler alım satım devam edene kadar bekler, ve gönderilmiş bir ödeme yine de sonuçlanır.",
       "walletBanner": "Borsa'da teklif vermek, satın almak veya satmak için bir cüzdan bağla ve doğrula.",
       "walletBannerCta": "Cüzdanı bağla",

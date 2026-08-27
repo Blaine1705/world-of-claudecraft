@@ -13671,8 +13671,22 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.',
   'hudChrome.mounts.name_rickshaw_mount': 'Kostipoutaná rikša',
   'hudChrome.options.showTargetSwingTimer': 'Zobrazit časovač švihu cíle',
+  'hudChrome.plurals.buffsHidden.one':
+    'Je aktivní ještě {count} posílení, ale v tomto grafickém přednastavení je skryté',
+  'hudChrome.plurals.buffsHidden.few':
+    'Jsou aktivní ještě {count} posílení, ale v tomto grafickém přednastavení jsou skrytá',
+  'hudChrome.plurals.buffsHidden.many':
+    'Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta',
+  'hudChrome.plurals.buffsHidden.other':
+    'Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta',
   'hudChrome.steam.wishlist': 'Přidat na seznam přání ve Steamu',
   'hudChrome.steam.wishlistAria':
     'Přidat na seznam přání ve Steamu: otevřít stránku obchodu World of ClaudeCraft',
   'hudChrome.steam.wishlistShort': 'Seznam přání',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Otevřít burzu $WOC v prohlížeči?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Burza $WOC funguje pouze v prohlížečové verzi World of ClaudeCraft. Tím se World of ClaudeCraft otevře v prohlížeči, kde se můžete přihlásit a otevřít burzu; hra zde poběží dál.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Otevřít v prohlížeči',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Zrušit',
 };

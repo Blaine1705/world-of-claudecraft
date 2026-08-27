@@ -2105,10 +2105,10 @@ export const sv_SE: EnTranslations = {
         "other": "{count} sekunder kvar"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Ytterligare {count} förstärkning är aktiv men dold med denna grafikförinställning",
+        "few": "Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning",
+        "many": "Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning",
+        "other": "Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -4059,10 +4059,10 @@ export const sv_SE: EnTranslations = {
       "loading": "Laddar $WOC-börsen...",
       "loadFailed": "$WOC-börsen kunde inte nås. Försök igen om en liten stund.",
       "disabledRealm": "$WOC-börsen är inte tillgänglig på den här världen.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Öppna $WOC-börsen i webbläsaren?",
+      "browserOnlyConfirmBody": "$WOC-börsen körs endast i webbläsarversionen av World of ClaudeCraft. Detta öppnar World of ClaudeCraft i din webbläsare, där du kan logga in och öppna börsen; spelet fortsätter att köras här.",
+      "browserOnlyConfirmOpen": "Öppna i webbläsaren",
+      "browserOnlyConfirmCancel": "Avbryt",
       "pausedBanner": "Handeln är pausad. Auktioner fortsätter att räkna ner; nya annonser, bud, erbjudanden och betalningar väntar tills handeln återupptas, och en betalning som redan skickats slutförs ändå.",
       "walletBanner": "Länka och verifiera en plånbok för att bjuda, köpa eller sälja på $WOC-börsen.",
       "walletBannerCta": "Anslut plånbok",

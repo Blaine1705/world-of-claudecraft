@@ -13962,8 +13962,22 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht.',
   'hudChrome.mounts.name_rickshaw_mount': 'Knochengebundene Rikscha',
   'hudChrome.options.showTargetSwingTimer': 'Zielschwungtimer anzeigen',
+  'hudChrome.plurals.buffsHidden.one':
+    '{count} weiterer Stärkungseffekt ist aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.plurals.buffsHidden.few':
+    '{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.plurals.buffsHidden.many':
+    '{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.plurals.buffsHidden.other':
+    '{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
   'hudChrome.steam.wishlist': 'Auf Steam auf die Wunschliste setzen',
   'hudChrome.steam.wishlistAria':
     'Auf Steam auf die Wunschliste setzen: Shopseite von World of ClaudeCraft öffnen',
   'hudChrome.steam.wishlistShort': 'Wunschliste',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '$WOC-Börse im Browser öffnen?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Die $WOC-Börse läuft nur in der Browserversion von World of ClaudeCraft. Dadurch wird World of ClaudeCraft im Browser geöffnet; dort kannst du dich anmelden und die Börse öffnen. Das Spiel läuft hier weiter.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Im Browser öffnen',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Abbrechen',
 };

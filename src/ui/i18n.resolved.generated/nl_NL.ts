@@ -2105,10 +2105,10 @@ export const nl_NL: EnTranslations = {
         "other": "{count} seconden resterend"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Er is nog {count} verbetering actief, maar die is verborgen in deze grafische preset",
+        "few": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset",
+        "many": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset",
+        "other": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -4059,10 +4059,10 @@ export const nl_NL: EnTranslations = {
       "loading": "De Beurs laden...",
       "loadFailed": "De Beurs kon niet worden bereikt. Probeer het straks opnieuw.",
       "disabledRealm": "De $WOC-beurs is niet beschikbaar op deze wereld.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "De $WOC-beurs in je browser openen?",
+      "browserOnlyConfirmBody": "De $WOC-beurs werkt alleen in de browserversie van World of ClaudeCraft. Hiermee wordt World of ClaudeCraft in je browser geopend, waar je kunt inloggen en de beurs kunt openen; het spel blijft hier doorgaan.",
+      "browserOnlyConfirmOpen": "Openen in browser",
+      "browserOnlyConfirmCancel": "Annuleren",
       "pausedBanner": "Handel is gepauzeerd. Veilingen blijven aftellen; nieuwe aanbiedingen, biedingen, offertes en betalingen wachten tot de handel wordt hervat, en een betaling die al is verzonden, wordt nog steeds afgewikkeld.",
       "walletBanner": "Koppel en verifieer een portemonnee om te bieden, kopen of verkopen op de Beurs.",
       "walletBannerCta": "Portemonnee koppelen",

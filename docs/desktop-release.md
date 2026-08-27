@@ -398,8 +398,9 @@ Linux deep-link caveat: `worldofclaudecraft://` is owned by a `.desktop` entry, 
 an OS registry, so `electron/linux_url_handler.cjs` runs before
 `app.setAsDefaultProtocolClient` on both Linux channels. On the AppImage it writes
 `~/.local/share/applications/world-of-claudecraft-appimage.desktop` (the entry electron-builder
-bakes into the squashfs is never installed unless the player has AppImageLauncher) and
-runs `update-desktop-database` + `xdg-mime default`. It then repoints `CHROME_DESKTOP` at
+bakes into the squashfs is never installed unless the player has AppImageLauncher), runs
+`update-desktop-database` when those entry bytes change, and always re-runs
+`xdg-mime default`. It then repoints `CHROME_DESKTOP` at
 whichever entry belongs to the channel it is running as: ours on an AppImage run, the deb's
 (`world-of-claudecraft.desktop`, installed by dpkg) otherwise. That matters, because pointing
 it at ours unconditionally would make a deb launch register the AppImage's entry, which is the
@@ -434,10 +435,11 @@ Deliberate narrowings worth knowing before changing any of it:
   `xdg-settings`, which runs `xdg-mime default` itself against the same unlocked
   read-modify-write file; on a torn read `xdg-settings` restores the ORIGINAL association and
   fails, which is exactly the broken state this exists to remove.
-- An unchanged entry still re-runs the association commands. The file being identical does
-  not mean the association survived: another app can claim the scheme and a desktop
-  environment can reset `mimeapps.list`, and without the re-assert that breaks Discord
-  login permanently with no relaunch that recovers it.
+- An unchanged entry still re-runs `xdg-mime default`, while `update-desktop-database`
+  is reserved for changed desktop-entry bytes. The file being identical does not mean the
+  association survived: another app can claim the scheme and a desktop environment can reset
+  `mimeapps.list`, and without the re-assert that breaks Discord login permanently with no
+  relaunch that recovers it.
 - Not `app.setDesktopName()`, the public API for the same value: it also drives the
   Wayland app id and X11 `WM_CLASS`, which electron-builder independently writes as
   `StartupWMClass` from `productName`. Changing one without the other breaks the

@@ -125,7 +125,9 @@ describe('Necromancy Warlock', () => {
         spec: 'demonology',
       }).map((known) => known.def.id);
 
-    expect(at(1)).toEqual(expect.arrayContaining(['soul_harvest', 'raise_graveguard']));
+    expect(at(4)).not.toContain('soul_harvest');
+    expect(at(4)).not.toContain('raise_graveguard');
+    expect(at(5)).toEqual(expect.arrayContaining(['soul_harvest', 'raise_graveguard']));
     expect(at(4)).not.toContain('raise_skeletal_warrior');
     expect(at(5)).toEqual(expect.arrayContaining(['raise_skeletal_warrior', 'funeral_harvest']));
     expect(at(7)).not.toContain('searing_pain');
@@ -268,8 +270,8 @@ describe('Necromancy Warlock', () => {
 
     const boundaries = [
       { level: 1, learned: 'demon_skin' },
-      { level: 5, learned: 'umbral_anchor' },
-      { level: 6, learned: 'life_tap' },
+      { level: 3, learned: 'umbral_anchor' },
+      { level: 4, learned: 'life_tap' },
       { level: 9, learned: 'soul_lance' },
       { level: 10, learned: 'spell_lock' },
       { level: 12, learned: 'ossuary_mark' },

@@ -13814,8 +13814,22 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie.',
   'hudChrome.mounts.name_rickshaw_mount': 'Spętana Kośćmi Riksza',
   'hudChrome.options.showTargetSwingTimer': 'Pokaż licznik zamachu celu',
+  'hudChrome.plurals.buffsHidden.one':
+    'Aktywne jest jeszcze {count} wzmocnienie, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.plurals.buffsHidden.few':
+    'Aktywne są jeszcze {count} wzmocnienia, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.plurals.buffsHidden.many':
+    'Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.plurals.buffsHidden.other':
+    'Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki',
   'hudChrome.steam.wishlist': 'Dodaj do listy życzeń na Steam',
   'hudChrome.steam.wishlistAria':
     'Dodaj do listy życzeń na Steam: otwórz stronę World of ClaudeCraft w sklepie',
   'hudChrome.steam.wishlistShort': 'Lista życzeń',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Otworzyć Giełdę $WOC w przeglądarce?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Giełda $WOC działa tylko w przeglądarkowej wersji World of ClaudeCraft. Spowoduje to otwarcie World of ClaudeCraft w przeglądarce, gdzie możesz się zalogować i otworzyć Giełdę; gra będzie tu nadal działać.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Otwórz w przeglądarce',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Anuluj',
 };

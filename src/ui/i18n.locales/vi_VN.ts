@@ -13543,8 +13543,23 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.',
   'hudChrome.mounts.name_rickshaw_mount': 'Xe kéo Buộc Xương',
   'hudChrome.options.showTargetSwingTimer': 'Hiển thị bộ đếm vung đòn của mục tiêu',
+  'hudChrome.plurals.buffsHidden.one':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.plurals.buffsHidden.few':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.plurals.buffsHidden.many':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.plurals.buffsHidden.other':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
   'hudChrome.steam.wishlist': 'Thêm vào danh sách ước trên Steam',
   'hudChrome.steam.wishlistAria':
     'Thêm vào danh sách ước trên Steam: mở trang cửa hàng World of ClaudeCraft',
   'hudChrome.steam.wishlistShort': 'Danh sách ước',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle':
+    'Mở Sàn giao dịch $WOC trong trình duyệt?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Sàn giao dịch $WOC chỉ chạy trên phiên bản trình duyệt của World of ClaudeCraft. Thao tác này mở World of ClaudeCraft trong trình duyệt, nơi bạn có thể đăng nhập và mở Sàn giao dịch; trò chơi vẫn tiếp tục chạy ở đây.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Mở trong trình duyệt',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Hủy',
 };

@@ -2105,10 +2105,10 @@ export const da_DK: EnTranslations = {
         "other": "{count} sekunder tilbage"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Yderligere {count} styrkelse er aktiv, men skjult i denne grafikforudindstilling",
+        "few": "Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling",
+        "many": "Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling",
+        "other": "Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -4059,10 +4059,10 @@ export const da_DK: EnTranslations = {
       "loading": "Indlæser Børsen...",
       "loadFailed": "Børsen kunne ikke nås. Prøv igen om lidt.",
       "disabledRealm": "$WOC-Børsen er ikke tilgængelig på dette rige.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Åbn $WOC-børsen i browseren?",
+      "browserOnlyConfirmBody": "$WOC-børsen kører kun i browserversionen af World of ClaudeCraft. Dette åbner World of ClaudeCraft i din browser, hvor du kan logge ind og åbne børsen; spillet fortsætter her.",
+      "browserOnlyConfirmOpen": "Åbn i browser",
+      "browserOnlyConfirmCancel": "Annuller",
       "pausedBanner": "Handel er sat på pause. Auktioner tæller stadig ned; nye noteringer, bud, tilbud og betalinger venter, til handlen genoptages, og en betaling, der allerede er sendt, afregnes stadig.",
       "walletBanner": "Tilknyt og verificer en pung for at byde, købe eller sælge på Børsen.",
       "walletBannerCta": "Tilslut pung",

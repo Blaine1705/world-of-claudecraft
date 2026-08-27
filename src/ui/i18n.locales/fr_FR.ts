@@ -13912,8 +13912,23 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course.",
   'hudChrome.mounts.name_rickshaw_mount': "Rickshaw d'os liés",
   'hudChrome.options.showTargetSwingTimer': "Afficher le minuteur d'attaque de la cible",
+  'hudChrome.plurals.buffsHidden.one':
+    'Il reste {count} amélioration active, mais son icône est masquée par ce préréglage graphique',
+  'hudChrome.plurals.buffsHidden.few':
+    'Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique',
+  'hudChrome.plurals.buffsHidden.many':
+    'Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique',
+  'hudChrome.plurals.buffsHidden.other':
+    'Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique',
   'hudChrome.steam.wishlist': 'Ajouter à la liste de souhaits Steam',
   'hudChrome.steam.wishlistAria':
     'Ajouter à la liste de souhaits Steam : ouvrir la page World of ClaudeCraft dans la boutique',
   'hudChrome.steam.wishlistShort': 'Liste de souhaits',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle':
+    'Ouvrir la Bourse $WOC dans votre navigateur ?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'La Bourse $WOC fonctionne uniquement dans la version navigateur de World of ClaudeCraft. Cela ouvre World of ClaudeCraft dans votre navigateur, où vous pouvez vous connecter et ouvrir la Bourse ; le jeu continue ici.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Ouvrir dans le navigateur',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annuler',
 };

@@ -2105,10 +2105,10 @@ export const es: EnTranslations = {
         "other": "Quedan {count} segundos"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Hay {count} beneficio más activo, pero está oculto en este ajuste gráfico",
+        "few": "Hay {count} beneficios más activos, pero están ocultos en este ajuste gráfico",
+        "many": "Hay {count} beneficios más activos, pero están ocultos en este ajuste gráfico",
+        "other": "Hay {count} beneficios más activos, pero están ocultos en este ajuste gráfico"
       },
       "playtimeDays": {
         "one": "{count} día",
@@ -4059,10 +4059,10 @@ export const es: EnTranslations = {
       "loading": "Cargando la Bolsa...",
       "loadFailed": "No se pudo contactar con la Bolsa. Vuelve a intentarlo en breve.",
       "disabledRealm": "La Bolsa de $WOC no está disponible en este mundo.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "¿Abrir la Bolsa $WOC en el navegador?",
+      "browserOnlyConfirmBody": "La Bolsa $WOC solo funciona en la versión para navegador de World of ClaudeCraft. Esto abre World of ClaudeCraft en tu navegador, donde puedes iniciar sesión y abrir la Bolsa; el juego sigue ejecutándose aquí.",
+      "browserOnlyConfirmOpen": "Abrir en el navegador",
+      "browserOnlyConfirmCancel": "Cancelar",
       "pausedBanner": "El comercio está en pausa. Las subastas siguen contando hacia atrás; los anuncios, pujas, ofertas y pagos nuevos esperan hasta que el comercio se reanude, y un pago ya enviado se sigue liquidando.",
       "walletBanner": "Vincula y verifica una cartera para pujar, comprar o vender en la Bolsa.",
       "walletBannerCta": "Conectar cartera",

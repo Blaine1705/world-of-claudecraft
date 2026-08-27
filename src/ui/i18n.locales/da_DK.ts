@@ -13731,8 +13731,22 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring.',
   'hudChrome.mounts.name_rickshaw_mount': 'Knogebundet Rickshaw',
   'hudChrome.options.showTargetSwingTimer': 'Vis målets svingtimer',
+  'hudChrome.plurals.buffsHidden.one':
+    'Yderligere {count} styrkelse er aktiv, men skjult i denne grafikforudindstilling',
+  'hudChrome.plurals.buffsHidden.few':
+    'Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling',
+  'hudChrome.plurals.buffsHidden.many':
+    'Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling',
+  'hudChrome.plurals.buffsHidden.other':
+    'Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling',
   'hudChrome.steam.wishlist': 'Føj til ønskelisten på Steam',
   'hudChrome.steam.wishlistAria':
     'Føj til ønskelisten på Steam: åbn World of ClaudeCrafts butiksside',
   'hudChrome.steam.wishlistShort': 'Ønskeliste',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Åbn $WOC-børsen i browseren?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC-børsen kører kun i browserversionen af World of ClaudeCraft. Dette åbner World of ClaudeCraft i din browser, hvor du kan logge ind og åbne børsen; spillet fortsætter her.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Åbn i browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annuller',
 };

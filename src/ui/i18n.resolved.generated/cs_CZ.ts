@@ -2105,10 +2105,10 @@ export const cs_CZ: EnTranslations = {
         "other": "zbývá {count} sekund"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "Je aktivní ještě {count} posílení, ale v tomto grafickém přednastavení je skryté",
+        "few": "Jsou aktivní ještě {count} posílení, ale v tomto grafickém přednastavení jsou skrytá",
+        "many": "Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta",
+        "other": "Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta"
       },
       "playtimeDays": {
         "one": "{count} den",
@@ -4059,10 +4059,10 @@ export const cs_CZ: EnTranslations = {
       "loading": "Načítání Burzy…",
       "loadFailed": "Burzu se nepodařilo spojit. Zkus to znovu za chvíli.",
       "disabledRealm": "Burza $WOC není na tomto realmu dostupná.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Otevřít burzu $WOC v prohlížeči?",
+      "browserOnlyConfirmBody": "Burza $WOC funguje pouze v prohlížečové verzi World of ClaudeCraft. Tím se World of ClaudeCraft otevře v prohlížeči, kde se můžete přihlásit a otevřít burzu; hra zde poběží dál.",
+      "browserOnlyConfirmOpen": "Otevřít v prohlížeči",
+      "browserOnlyConfirmCancel": "Zrušit",
       "pausedBanner": "Obchodování je pozastaveno. Aukce dál odpočítávají čas; nové nabídky, příhozy, protinabídky a platby počkají, dokud se obchodování neobnoví, a už odeslaná platba se přesto vyrovná.",
       "walletBanner": "Propoj a ověř peněženku, abys mohl(a) na Burze přihazovat, kupovat nebo prodávat.",
       "walletBannerCta": "Připojit peněženku",

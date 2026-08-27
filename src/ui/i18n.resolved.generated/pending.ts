@@ -9,125 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "es_ES": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "fr_FR": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "fr_CA": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "de_DE": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "zh_CN": [
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "zh_TW": [
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "ko_KR": [
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "ja_JP": [
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "pt_BR": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "ru_RU": [
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "cs_CZ": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "nl_NL": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "pl_PL": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "id_ID": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "tr_TR": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "sv_SE": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "vi_VN": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ],
-  "da_DK": [
-    "hudChrome.plurals.buffsHidden.few",
-    "hudChrome.plurals.buffsHidden.many",
-    "hudChrome.plurals.buffsHidden.one",
-    "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
-  ]
+  "it_IT": [],
+  "de_DE": [],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
+  "pt_BR": [],
+  "ru_RU": [],
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

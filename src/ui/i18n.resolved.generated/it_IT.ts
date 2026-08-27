@@ -2105,10 +2105,10 @@ export const it_IT: EnTranslations = {
         "other": "{count} secondi rimanenti"
       },
       "buffsHidden": {
-        "one": "{count} more buff is active but hidden on this graphics preset",
-        "few": "{count} more buffs are active but hidden on this graphics preset",
-        "many": "{count} more buffs are active but hidden on this graphics preset",
-        "other": "{count} more buffs are active but hidden on this graphics preset"
+        "one": "È attivo {count} altro beneficio, ma è nascosto con questa preimpostazione grafica",
+        "few": "Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica",
+        "many": "Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica",
+        "other": "Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica"
       },
       "playtimeDays": {
         "one": "{count} giorno",
@@ -4059,10 +4059,10 @@ export const it_IT: EnTranslations = {
       "loading": "Caricamento della Borsa...",
       "loadFailed": "Impossibile raggiungere la Borsa. Riprova tra poco.",
       "disabledRealm": "La Borsa $WOC non è disponibile su questo reame.",
-      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
-      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
-      "browserOnlyConfirmOpen": "Open in Browser",
-      "browserOnlyConfirmCancel": "Cancel",
+      "browserOnlyConfirmTitle": "Aprire la Borsa $WOC nel browser?",
+      "browserOnlyConfirmBody": "La Borsa $WOC funziona solo nella versione browser di World of ClaudeCraft. Questo apre World of ClaudeCraft nel browser, dove puoi accedere e aprire la Borsa; il gioco continua qui.",
+      "browserOnlyConfirmOpen": "Apri nel browser",
+      "browserOnlyConfirmCancel": "Annulla",
       "pausedBanner": "Le contrattazioni sono in pausa. Le aste continuano il conto alla rovescia; nuove inserzioni, offerte, acquisti immediati e pagamenti attendono che le contrattazioni riprendano, e un pagamento già inviato viene comunque saldato.",
       "walletBanner": "Collega e verifica un portafoglio per fare offerte, acquistare o vendere sulla Borsa.",
       "walletBannerCta": "Collega portafoglio",
