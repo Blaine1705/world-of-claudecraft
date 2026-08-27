@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { IGNIVAR_LOOT_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
@@ -5287,7 +5288,12 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // bell icons are rendered from their own world models
 // (scripts/render_island_item_icons.mjs), so they ship with committed art like
 // every other item.
-export const ITEM_ART_PENDING = new Set<string>();
+//
+// The Ignivar raid loot table (content/ignivar_loot.ts) currently carries the
+// whole debt: 192 non-weapon items behind the development-only Crucible raid,
+// enumerated here until their painted wave lands (the raid itself ships with a
+// dev-only entrance, so no player-facing surface shows a procedural icon yet).
+export const ITEM_ART_PENDING = new Set<string>(IGNIVAR_LOOT_ITEM_IDS);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {

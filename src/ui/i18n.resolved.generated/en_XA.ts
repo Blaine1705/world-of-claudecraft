@@ -12892,6 +12892,582 @@ export const en_XA: EnTranslations = {
       "ps_passing_stone": {
         "name": "[Þáššíñĝ Šţóñé]"
       },
+      "slagbreaker_helmet": {
+        "name": "[Šļáĝƀŕéáķéŕ Ĥéļɱ]"
+      },
+      "slagbreaker_shoulder": {
+        "name": "[Šļáĝƀŕéáķéŕ Þáúļðŕóñš]"
+      },
+      "slagbreaker_chest": {
+        "name": "[Šļáĝƀŕéáķéŕ Ĥáúƀéŕķ]"
+      },
+      "slagbreaker_gloves": {
+        "name": "[Šļáĝƀŕéáķéŕ Ĝáúñţļéţš]"
+      },
+      "slagbreaker_legs": {
+        "name": "[Šļáĝƀŕéáķéŕ Ļéĝĝúáŕðš]"
+      },
+      "emberfury_helmet": {
+        "name": "[Éɱƀéŕƒúŕý Ĥéļɱ]"
+      },
+      "emberfury_shoulder": {
+        "name": "[Éɱƀéŕƒúŕý Þáúļðŕóñš]"
+      },
+      "emberfury_chest": {
+        "name": "[Éɱƀéŕƒúŕý Ĥáúƀéŕķ]"
+      },
+      "emberfury_gloves": {
+        "name": "[Éɱƀéŕƒúŕý Ĝáúñţļéţš]"
+      },
+      "emberfury_legs": {
+        "name": "[Éɱƀéŕƒúŕý Ļéĝĝúáŕðš]"
+      },
+      "forgewall_helmet": {
+        "name": "[Ƒóŕĝéŵáļļ Ĥéļɱ]"
+      },
+      "forgewall_shoulder": {
+        "name": "[Ƒóŕĝéŵáļļ Þáúļðŕóñš]"
+      },
+      "forgewall_chest": {
+        "name": "[Ƒóŕĝéŵáļļ Ĥáúƀéŕķ]"
+      },
+      "forgewall_gloves": {
+        "name": "[Ƒóŕĝéŵáļļ Ĝáúñţļéţš]"
+      },
+      "forgewall_legs": {
+        "name": "[Ƒóŕĝéŵáļļ Ļéĝĝúáŕðš]"
+      },
+      "dawnforged_helmet": {
+        "name": "[Ðáŵñƒóŕĝéð Ĥéļɱ]"
+      },
+      "dawnforged_shoulder": {
+        "name": "[Ðáŵñƒóŕĝéð Þáúļðŕóñš]"
+      },
+      "dawnforged_chest": {
+        "name": "[Ðáŵñƒóŕĝéð Ĥáúƀéŕķ]"
+      },
+      "dawnforged_gloves": {
+        "name": "[Ðáŵñƒóŕĝéð Ĝáúñţļéţš]"
+      },
+      "dawnforged_legs": {
+        "name": "[Ðáŵñƒóŕĝéð Ļéĝĝúáŕðš]"
+      },
+      "oathpyre_helmet": {
+        "name": "[Óáţĥþýŕé Ĥéļɱ]"
+      },
+      "oathpyre_shoulder": {
+        "name": "[Óáţĥþýŕé Þáúļðŕóñš]"
+      },
+      "oathpyre_chest": {
+        "name": "[Óáţĥþýŕé Ĥáúƀéŕķ]"
+      },
+      "oathpyre_gloves": {
+        "name": "[Óáţĥþýŕé Ĝáúñţļéţš]"
+      },
+      "oathpyre_legs": {
+        "name": "[Óáţĥþýŕé Ļéĝĝúáŕðš]"
+      },
+      "zealfire_helmet": {
+        "name": "[Žéáļƒíŕé Ĥéļɱ]"
+      },
+      "zealfire_shoulder": {
+        "name": "[Žéáļƒíŕé Þáúļðŕóñš]"
+      },
+      "zealfire_chest": {
+        "name": "[Žéáļƒíŕé Ĥáúƀéŕķ]"
+      },
+      "zealfire_gloves": {
+        "name": "[Žéáļƒíŕé Ĝáúñţļéţš]"
+      },
+      "zealfire_legs": {
+        "name": "[Žéáļƒíŕé Ļéĝĝúáŕðš]"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "[Þáçķļóŕð'š Çóŵļ]"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "[Þáçķļóŕð'š Šþáúļðéŕš]"
+      },
+      "packlord_emberhide_chest": {
+        "name": "[Þáçķļóŕð'š Ţúñíç]"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "[Þáçķļóŕð'š Ĝŕíþš]"
+      },
+      "packlord_emberhide_legs": {
+        "name": "[Þáçķļóŕð'š Ɓŕééçĥéš]"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "[Çóļðšíĝĥţ Çóŵļ]"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "[Çóļðšíĝĥţ Šþáúļðéŕš]"
+      },
+      "coldsight_trackers_chest": {
+        "name": "[Çóļðšíĝĥţ Ţúñíç]"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "[Çóļðšíĝĥţ Ĝŕíþš]"
+      },
+      "coldsight_trackers_legs": {
+        "name": "[Çóļðšíĝĥţ Ɓŕééçĥéš]"
+      },
+      "slagsnare_helmet": {
+        "name": "[Šļáĝšñáŕé Çóŵļ]"
+      },
+      "slagsnare_shoulder": {
+        "name": "[Šļáĝšñáŕé Šþáúļðéŕš]"
+      },
+      "slagsnare_chest": {
+        "name": "[Šļáĝšñáŕé Ţúñíç]"
+      },
+      "slagsnare_gloves": {
+        "name": "[Šļáĝšñáŕé Ĝŕíþš]"
+      },
+      "slagsnare_legs": {
+        "name": "[Šļáĝšñáŕé Ɓŕééçĥéš]"
+      },
+      "cinderfang_helmet": {
+        "name": "[Çíñðéŕƒáñĝ Çóŵļ]"
+      },
+      "cinderfang_shoulder": {
+        "name": "[Çíñðéŕƒáñĝ Šþáúļðéŕš]"
+      },
+      "cinderfang_chest": {
+        "name": "[Çíñðéŕƒáñĝ Ţúñíç]"
+      },
+      "cinderfang_gloves": {
+        "name": "[Çíñðéŕƒáñĝ Ĝŕíþš]"
+      },
+      "cinderfang_legs": {
+        "name": "[Çíñðéŕƒáñĝ Ɓŕééçĥéš]"
+      },
+      "smolderstrike_helmet": {
+        "name": "[Šɱóļðéŕšţŕíķé Çóŵļ]"
+      },
+      "smolderstrike_shoulder": {
+        "name": "[Šɱóļðéŕšţŕíķé Šþáúļðéŕš]"
+      },
+      "smolderstrike_chest": {
+        "name": "[Šɱóļðéŕšţŕíķé Ţúñíç]"
+      },
+      "smolderstrike_gloves": {
+        "name": "[Šɱóļðéŕšţŕíķé Ĝŕíþš]"
+      },
+      "smolderstrike_legs": {
+        "name": "[Šɱóļðéŕšţŕíķé Ɓŕééçĥéš]"
+      },
+      "ashveil_helmet": {
+        "name": "[Ášĥʋéíļ Çóŵļ]"
+      },
+      "ashveil_shoulder": {
+        "name": "[Ášĥʋéíļ Šþáúļðéŕš]"
+      },
+      "ashveil_chest": {
+        "name": "[Ášĥʋéíļ Ţúñíç]"
+      },
+      "ashveil_gloves": {
+        "name": "[Ášĥʋéíļ Ĝŕíþš]"
+      },
+      "ashveil_legs": {
+        "name": "[Ášĥʋéíļ Ɓŕééçĥéš]"
+      },
+      "emberscreed_helmet": {
+        "name": "[Çŕééð óƒ Éɱƀéŕš Ĥóóð]"
+      },
+      "emberscreed_shoulder": {
+        "name": "[Çŕééð óƒ Éɱƀéŕš Ɱáñţļé]"
+      },
+      "emberscreed_chest": {
+        "name": "[Çŕééð óƒ Éɱƀéŕš Ŕóƀé]"
+      },
+      "emberscreed_gloves": {
+        "name": "[Çŕééð óƒ Éɱƀéŕš Ĥáñðŵŕáþš]"
+      },
+      "emberscreed_legs": {
+        "name": "[Çŕééð óƒ Éɱƀéŕš Ļéĝĝíñĝš]"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "[Ðáŵñŵéáʋé Ĥóóð]"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "[Ðáŵñŵéáʋé Ɱáñţļé]"
+      },
+      "benison_dawnweave_chest": {
+        "name": "[Ðáŵñŵéáʋé Ŕóƀé]"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "[Ðáŵñŵéáʋé Ĥáñðŵŕáþš]"
+      },
+      "benison_dawnweave_legs": {
+        "name": "[Ðáŵñŵéáʋé Ļéĝĝíñĝš]"
+      },
+      "vesperash_helmet": {
+        "name": "[Ʋéšþéŕášĥ Ĥóóð]"
+      },
+      "vesperash_shoulder": {
+        "name": "[Ʋéšþéŕášĥ Ɱáñţļé]"
+      },
+      "vesperash_chest": {
+        "name": "[Ʋéšþéŕášĥ Ŕóƀé]"
+      },
+      "vesperash_gloves": {
+        "name": "[Ʋéšþéŕášĥ Ĥáñðŵŕáþš]"
+      },
+      "vesperash_legs": {
+        "name": "[Ʋéšþéŕášĥ Ļéĝĝíñĝš]"
+      },
+      "stormkindled_helmet": {
+        "name": "[Šţóŕɱķíñðļéð Ĥéļɱ]"
+      },
+      "stormkindled_shoulder": {
+        "name": "[Šţóŕɱķíñðļéð Þáúļðŕóñš]"
+      },
+      "stormkindled_chest": {
+        "name": "[Šţóŕɱķíñðļéð Ĥáúƀéŕķ]"
+      },
+      "stormkindled_gloves": {
+        "name": "[Šţóŕɱķíñðļéð Ĝáúñţļéţš]"
+      },
+      "stormkindled_legs": {
+        "name": "[Šţóŕɱķíñðļéð Ļéĝĝúáŕðš]"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "[Éɱƀéŕšçáļé Ĥéļɱ]"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "[Éɱƀéŕšçáļé Þáúļðŕóñš]"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "[Éɱƀéŕšçáļé Ĥáúƀéŕķ]"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "[Éɱƀéŕšçáļé Ĝáúñţļéţš]"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "[Éɱƀéŕšçáļé Ļéĝĝúáŕðš]"
+      },
+      "stonehearth_helmet": {
+        "name": "[Šţóñéĥéáŕţĥ Ĥéļɱ]"
+      },
+      "stonehearth_shoulder": {
+        "name": "[Šţóñéĥéáŕţĥ Þáúļðŕóñš]"
+      },
+      "stonehearth_chest": {
+        "name": "[Šţóñéĥéáŕţĥ Ĥáúƀéŕķ]"
+      },
+      "stonehearth_gloves": {
+        "name": "[Šţóñéĥéáŕţĥ Ĝáúñţļéţš]"
+      },
+      "stonehearth_legs": {
+        "name": "[Šţóñéĥéáŕţĥ Ļéĝĝúáŕðš]"
+      },
+      "springmender_helmet": {
+        "name": "[Šþŕíñĝɱéñðéŕ Ĥéļɱ]"
+      },
+      "springmender_shoulder": {
+        "name": "[Šþŕíñĝɱéñðéŕ Þáúļðŕóñš]"
+      },
+      "springmender_chest": {
+        "name": "[Šþŕíñĝɱéñðéŕ Ĥáúƀéŕķ]"
+      },
+      "springmender_gloves": {
+        "name": "[Šþŕíñĝɱéñðéŕ Ĝáúñţļéţš]"
+      },
+      "springmender_legs": {
+        "name": "[Šþŕíñĝɱéñðéŕ Ļéĝĝúáŕðš]"
+      },
+      "chronoweave_helmet": {
+        "name": "[Áéţĥéŕŵéáʋé Ĥóóð]"
+      },
+      "chronoweave_shoulder": {
+        "name": "[Áéţĥéŕŵéáʋé Ɱáñţļé]"
+      },
+      "chronoweave_chest": {
+        "name": "[Áéţĥéŕŵéáʋé Ŕóƀé]"
+      },
+      "chronoweave_gloves": {
+        "name": "[Áéţĥéŕŵéáʋé Ĥáñðŵŕáþš]"
+      },
+      "chronoweave_legs": {
+        "name": "[Áéţĥéŕŵéáʋé Ļéĝĝíñĝš]"
+      },
+      "pyroclast_helmet": {
+        "name": "[Þýŕóçļášţ Ĥóóð]"
+      },
+      "pyroclast_shoulder": {
+        "name": "[Þýŕóçļášţ Ɱáñţļé]"
+      },
+      "pyroclast_chest": {
+        "name": "[Þýŕóçļášţ Ŕóƀé]"
+      },
+      "pyroclast_gloves": {
+        "name": "[Þýŕóçļášţ Ĥáñðŵŕáþš]"
+      },
+      "pyroclast_legs": {
+        "name": "[Þýŕóçļášţ Ļéĝĝíñĝš]"
+      },
+      "frostquench_helmet": {
+        "name": "[Ƒŕóšţɋúéñçĥ Ĥóóð]"
+      },
+      "frostquench_shoulder": {
+        "name": "[Ƒŕóšţɋúéñçĥ Ɱáñţļé]"
+      },
+      "frostquench_chest": {
+        "name": "[Ƒŕóšţɋúéñçĥ Ŕóƀé]"
+      },
+      "frostquench_gloves": {
+        "name": "[Ƒŕóšţɋúéñçĥ Ĥáñðŵŕáþš]"
+      },
+      "frostquench_legs": {
+        "name": "[Ƒŕóšţɋúéñçĥ Ļéĝĝíñĝš]"
+      },
+      "hexthread_helmet": {
+        "name": "[Ĥéẋţĥŕéáð Ĥóóð]"
+      },
+      "hexthread_shoulder": {
+        "name": "[Ĥéẋţĥŕéáð Ɱáñţļé]"
+      },
+      "hexthread_chest": {
+        "name": "[Ĥéẋţĥŕéáð Ŕóƀé]"
+      },
+      "hexthread_gloves": {
+        "name": "[Ĥéẋţĥŕéáð Ĥáñðŵŕáþš]"
+      },
+      "hexthread_legs": {
+        "name": "[Ĥéẋţĥŕéáð Ļéĝĝíñĝš]"
+      },
+      "gravebrand_helmet": {
+        "name": "[Ĝŕáʋéƀŕáñð Ĥóóð]"
+      },
+      "gravebrand_shoulder": {
+        "name": "[Ĝŕáʋéƀŕáñð Ɱáñţļé]"
+      },
+      "gravebrand_chest": {
+        "name": "[Ĝŕáʋéƀŕáñð Ŕóƀé]"
+      },
+      "gravebrand_gloves": {
+        "name": "[Ĝŕáʋéƀŕáñð Ĥáñðŵŕáþš]"
+      },
+      "gravebrand_legs": {
+        "name": "[Ĝŕáʋéƀŕáñð Ļéĝĝíñĝš]"
+      },
+      "ruincaller_helmet": {
+        "name": "[Ŕúíñçáļļéŕ Ĥóóð]"
+      },
+      "ruincaller_shoulder": {
+        "name": "[Ŕúíñçáļļéŕ Ɱáñţļé]"
+      },
+      "ruincaller_chest": {
+        "name": "[Ŕúíñçáļļéŕ Ŕóƀé]"
+      },
+      "ruincaller_gloves": {
+        "name": "[Ŕúíñçáļļéŕ Ĥáñðŵŕáþš]"
+      },
+      "ruincaller_legs": {
+        "name": "[Ŕúíñçáļļéŕ Ļéĝĝíñĝš]"
+      },
+      "moonscorch_helmet": {
+        "name": "[Ɱóóñšçóŕçĥ Çóŵļ]"
+      },
+      "moonscorch_shoulder": {
+        "name": "[Ɱóóñšçóŕçĥ Šþáúļðéŕš]"
+      },
+      "moonscorch_chest": {
+        "name": "[Ɱóóñšçóŕçĥ Ţúñíç]"
+      },
+      "moonscorch_gloves": {
+        "name": "[Ɱóóñšçóŕçĥ Ĝŕíþš]"
+      },
+      "moonscorch_legs": {
+        "name": "[Ɱóóñšçóŕçĥ Ɓŕééçĥéš]"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "[Ŵíļðƒáñĝ Çóŵļ]"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "[Ŵíļðƒáñĝ Šþáúļðéŕš]"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "[Ŵíļðƒáñĝ Ţúñíç]"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "[Ŵíļðƒáñĝ Ĝŕíþš]"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "[Ŵíļðƒáñĝ Ɓŕééçĥéš]"
+      },
+      "cinderbark_helmet": {
+        "name": "[Çíñðéŕƀáŕķ Çóŵļ]"
+      },
+      "cinderbark_shoulder": {
+        "name": "[Çíñðéŕƀáŕķ Šþáúļðéŕš]"
+      },
+      "cinderbark_chest": {
+        "name": "[Çíñðéŕƀáŕķ Ţúñíç]"
+      },
+      "cinderbark_gloves": {
+        "name": "[Çíñðéŕƀáŕķ Ĝŕíþš]"
+      },
+      "cinderbark_legs": {
+        "name": "[Çíñðéŕƀáŕķ Ɓŕééçĥéš]"
+      },
+      "grovespring_helmet": {
+        "name": "[Ĝŕóʋéšþŕíñĝ Çóŵļ]"
+      },
+      "grovespring_shoulder": {
+        "name": "[Ĝŕóʋéšþŕíñĝ Šþáúļðéŕš]"
+      },
+      "grovespring_chest": {
+        "name": "[Ĝŕóʋéšþŕíñĝ Ţúñíç]"
+      },
+      "grovespring_gloves": {
+        "name": "[Ĝŕóʋéšþŕíñĝ Ĝŕíþš]"
+      },
+      "grovespring_legs": {
+        "name": "[Ĝŕóʋéšþŕíñĝ Ɓŕééçĥéš]"
+      },
+      "sigil_anvil_helmet": {
+        "name": "[Ĥéļɱ Šíĝíļ óƒ ţĥé Áñʋíļ]"
+      },
+      "sigil_ember_helmet": {
+        "name": "[Ĥéļɱ Šíĝíļ óƒ ţĥé Éɱƀéŕ]"
+      },
+      "sigil_tempest_helmet": {
+        "name": "[Ĥéļɱ Šíĝíļ óƒ ţĥé Ţéɱþéšţ]"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "[Ɱáñţļé Šíĝíļ óƒ ţĥé Áñʋíļ]"
+      },
+      "sigil_ember_shoulder": {
+        "name": "[Ɱáñţļé Šíĝíļ óƒ ţĥé Éɱƀéŕ]"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "[Ɱáñţļé Šíĝíļ óƒ ţĥé Ţéɱþéšţ]"
+      },
+      "sigil_anvil_chest": {
+        "name": "[Ŕóƀé Šíĝíļ óƒ ţĥé Áñʋíļ]"
+      },
+      "sigil_ember_chest": {
+        "name": "[Ŕóƀé Šíĝíļ óƒ ţĥé Éɱƀéŕ]"
+      },
+      "sigil_tempest_chest": {
+        "name": "[Ŕóƀé Šíĝíļ óƒ ţĥé Ţéɱþéšţ]"
+      },
+      "sigil_anvil_gloves": {
+        "name": "[Ĝŕíþ Šíĝíļ óƒ ţĥé Áñʋíļ]"
+      },
+      "sigil_ember_gloves": {
+        "name": "[Ĝŕíþ Šíĝíļ óƒ ţĥé Éɱƀéŕ]"
+      },
+      "sigil_tempest_gloves": {
+        "name": "[Ĝŕíþ Šíĝíļ óƒ ţĥé Ţéɱþéšţ]"
+      },
+      "sigil_anvil_legs": {
+        "name": "[Ļéĝĝíñĝ Šíĝíļ óƒ ţĥé Áñʋíļ]"
+      },
+      "sigil_ember_legs": {
+        "name": "[Ļéĝĝíñĝ Šíĝíļ óƒ ţĥé Éɱƀéŕ]"
+      },
+      "sigil_tempest_legs": {
+        "name": "[Ļéĝĝíñĝ Šíĝíļ óƒ ţĥé Ţéɱþéšţ]"
+      },
+      "cord_of_the_last_flame": {
+        "name": "[Çóŕð óƒ ţĥé Ļášţ Ƒļáɱé]"
+      },
+      "cindersoaked_slippers": {
+        "name": "[Çíñðéŕšóáķéð Šļíþþéŕš]"
+      },
+      "springbinder_sash": {
+        "name": "[Šþŕíñĝƀíñðéŕ Šášĥ]"
+      },
+      "steps_of_quiet_water": {
+        "name": "[Šţéþš óƒ Ɋúíéţ Ŵáţéŕ]"
+      },
+      "cinderbark_cinch": {
+        "name": "[Çíñðéŕƀáŕķ Çíñçĥ]"
+      },
+      "ashenbark_treads": {
+        "name": "[Ášĥéñƀáŕķ Ţŕéáðš]"
+      },
+      "slagstalker_belt": {
+        "name": "[Šļáĝšţáļķéŕ Ɓéļţ]"
+      },
+      "ashrunner_boots": {
+        "name": "[Ášĥŕúññéŕ Ɓóóţš]"
+      },
+      "moonscorch_waistwrap": {
+        "name": "[Ɱóóñšçóŕçĥ Ŵáíšţŵŕáþ]"
+      },
+      "scorchgrove_striders": {
+        "name": "[Šçóŕçĥĝŕóʋé Šţŕíðéŕš]"
+      },
+      "grovetender_belt": {
+        "name": "[Ĝŕóʋéţéñðéŕ Ɓéļţ]"
+      },
+      "dewfall_moccasins": {
+        "name": "[Ðéŵƒáļļ Ɱóççášíñš]"
+      },
+      "forgewall_girdle": {
+        "name": "[Ƒóŕĝéŵáļļ Ĝíŕðļé]"
+      },
+      "anvilstance_sabatons": {
+        "name": "[Áñʋíļšţáñçé Šáƀáţóñš]"
+      },
+      "warforged_waistguard": {
+        "name": "[Ŵáŕƒóŕĝéð Ŵáíšţĝúáŕð]"
+      },
+      "furnace_march_greaves": {
+        "name": "[Ƒúŕñáçé Ɱáŕçĥ Ĝŕéáʋéš]"
+      },
+      "stormkindled_chain": {
+        "name": "[Šţóŕɱķíñðļéð Çĥáíñ]"
+      },
+      "thundershock_treads": {
+        "name": "[Ţĥúñðéŕšĥóçķ Ţŕéáðš]"
+      },
+      "tidebinder_links": {
+        "name": "[Ţíðéƀíñðéŕ Ļíñķš]"
+      },
+      "springwarden_sabatons": {
+        "name": "[Šþŕíñĝŵáŕðéñ Šáƀáţóñš]"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "[Þéñðáñţ óƒ ţĥé Ƒíŕšţ Ţéɱþéŕíñĝ]"
+      },
+      "ignivars_ember_choker": {
+        "name": "[Íĝñíʋáŕ'š Éɱƀéŕ Çĥóķéŕ]"
+      },
+      "locket_of_the_last_flame": {
+        "name": "[Ļóçķéţ óƒ ţĥé Ļášţ Ƒļáɱé]"
+      },
+      "heartspring_amulet": {
+        "name": "[Ĥéáŕţšþŕíñĝ Áɱúļéţ]"
+      },
+      "seal_of_the_forgewall": {
+        "name": "[Šéáļ óƒ ţĥé Ƒóŕĝéŵáļļ]"
+      },
+      "band_of_marked_strikes": {
+        "name": "[Ɓáñð óƒ Ɱáŕķéð Šţŕíķéš]"
+      },
+      "circle_of_cinders": {
+        "name": "[Çíŕçļé óƒ Çíñðéŕš]"
+      },
+      "loop_of_quiet_springs": {
+        "name": "[Ļóóþ óƒ Ɋúíéţ Šþŕíñĝš]"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "[Ɓúļŵáŕķ óƒ ţĥé Íññéŕ Çŕúçíƀļé]"
+      },
+      "ember_wardens_barrier": {
+        "name": "[Éɱƀéŕ Ŵáŕðéñ'š Ɓáŕŕíéŕ]"
+      },
+      "orb_of_the_last_spring": {
+        "name": "[Óŕƀ óƒ ţĥé Ļášţ Šþŕíñĝ]"
+      },
+      "cinder_of_the_first_design": {
+        "name": "[Çíñðéŕ óƒ ţĥé Ƒíŕšţ Ðéšíĝñ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

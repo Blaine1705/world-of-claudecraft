@@ -12892,6 +12892,582 @@ export const ru_RU: EnTranslations = {
       "ps_passing_stone": {
         "name": "Камень Ухода"
       },
+      "slagbreaker_helmet": {
+        "name": "Шлем шлаколома"
+      },
+      "slagbreaker_shoulder": {
+        "name": "Наплечья шлаколома"
+      },
+      "slagbreaker_chest": {
+        "name": "Кольчуга шлаколома"
+      },
+      "slagbreaker_gloves": {
+        "name": "Рукавицы шлаколома"
+      },
+      "slagbreaker_legs": {
+        "name": "Набедренники шлаколома"
+      },
+      "emberfury_helmet": {
+        "name": "Шлем угольной ярости"
+      },
+      "emberfury_shoulder": {
+        "name": "Наплечья угольной ярости"
+      },
+      "emberfury_chest": {
+        "name": "Кольчуга угольной ярости"
+      },
+      "emberfury_gloves": {
+        "name": "Рукавицы угольной ярости"
+      },
+      "emberfury_legs": {
+        "name": "Набедренники угольной ярости"
+      },
+      "forgewall_helmet": {
+        "name": "Шлем кузнечной стены"
+      },
+      "forgewall_shoulder": {
+        "name": "Наплечья кузнечной стены"
+      },
+      "forgewall_chest": {
+        "name": "Кольчуга кузнечной стены"
+      },
+      "forgewall_gloves": {
+        "name": "Рукавицы кузнечной стены"
+      },
+      "forgewall_legs": {
+        "name": "Набедренники кузнечной стены"
+      },
+      "dawnforged_helmet": {
+        "name": "Шлем рассветной ковки"
+      },
+      "dawnforged_shoulder": {
+        "name": "Наплечья рассветной ковки"
+      },
+      "dawnforged_chest": {
+        "name": "Кольчуга рассветной ковки"
+      },
+      "dawnforged_gloves": {
+        "name": "Рукавицы рассветной ковки"
+      },
+      "dawnforged_legs": {
+        "name": "Набедренники рассветной ковки"
+      },
+      "oathpyre_helmet": {
+        "name": "Шлем клятвенного костра"
+      },
+      "oathpyre_shoulder": {
+        "name": "Наплечья клятвенного костра"
+      },
+      "oathpyre_chest": {
+        "name": "Кольчуга клятвенного костра"
+      },
+      "oathpyre_gloves": {
+        "name": "Рукавицы клятвенного костра"
+      },
+      "oathpyre_legs": {
+        "name": "Набедренники клятвенного костра"
+      },
+      "zealfire_helmet": {
+        "name": "Шлем пламенного рвения"
+      },
+      "zealfire_shoulder": {
+        "name": "Наплечья пламенного рвения"
+      },
+      "zealfire_chest": {
+        "name": "Кольчуга пламенного рвения"
+      },
+      "zealfire_gloves": {
+        "name": "Рукавицы пламенного рвения"
+      },
+      "zealfire_legs": {
+        "name": "Набедренники пламенного рвения"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "Клобук повелителя стаи"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "Наплечники повелителя стаи"
+      },
+      "packlord_emberhide_chest": {
+        "name": "Куртка повелителя стаи"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "Хваты повелителя стаи"
+      },
+      "packlord_emberhide_legs": {
+        "name": "Бриджи повелителя стаи"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "Клобук холодного взора"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "Наплечники холодного взора"
+      },
+      "coldsight_trackers_chest": {
+        "name": "Куртка холодного взора"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "Хваты холодного взора"
+      },
+      "coldsight_trackers_legs": {
+        "name": "Бриджи холодного взора"
+      },
+      "slagsnare_helmet": {
+        "name": "Клобук шлаковых силков"
+      },
+      "slagsnare_shoulder": {
+        "name": "Наплечники шлаковых силков"
+      },
+      "slagsnare_chest": {
+        "name": "Куртка шлаковых силков"
+      },
+      "slagsnare_gloves": {
+        "name": "Хваты шлаковых силков"
+      },
+      "slagsnare_legs": {
+        "name": "Бриджи шлаковых силков"
+      },
+      "cinderfang_helmet": {
+        "name": "Клобук пеплоклыка"
+      },
+      "cinderfang_shoulder": {
+        "name": "Наплечники пеплоклыка"
+      },
+      "cinderfang_chest": {
+        "name": "Куртка пеплоклыка"
+      },
+      "cinderfang_gloves": {
+        "name": "Хваты пеплоклыка"
+      },
+      "cinderfang_legs": {
+        "name": "Бриджи пеплоклыка"
+      },
+      "smolderstrike_helmet": {
+        "name": "Клобук тлеющего удара"
+      },
+      "smolderstrike_shoulder": {
+        "name": "Наплечники тлеющего удара"
+      },
+      "smolderstrike_chest": {
+        "name": "Куртка тлеющего удара"
+      },
+      "smolderstrike_gloves": {
+        "name": "Хваты тлеющего удара"
+      },
+      "smolderstrike_legs": {
+        "name": "Бриджи тлеющего удара"
+      },
+      "ashveil_helmet": {
+        "name": "Клобук пепельной завесы"
+      },
+      "ashveil_shoulder": {
+        "name": "Наплечники пепельной завесы"
+      },
+      "ashveil_chest": {
+        "name": "Куртка пепельной завесы"
+      },
+      "ashveil_gloves": {
+        "name": "Хваты пепельной завесы"
+      },
+      "ashveil_legs": {
+        "name": "Бриджи пепельной завесы"
+      },
+      "emberscreed_helmet": {
+        "name": "Капюшон догмата углей"
+      },
+      "emberscreed_shoulder": {
+        "name": "Оплечье догмата углей"
+      },
+      "emberscreed_chest": {
+        "name": "Одеяние догмата углей"
+      },
+      "emberscreed_gloves": {
+        "name": "Обмотки догмата углей"
+      },
+      "emberscreed_legs": {
+        "name": "Штаны догмата углей"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "Капюшон рассветного плетения"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "Оплечье рассветного плетения"
+      },
+      "benison_dawnweave_chest": {
+        "name": "Одеяние рассветного плетения"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "Обмотки рассветного плетения"
+      },
+      "benison_dawnweave_legs": {
+        "name": "Штаны рассветного плетения"
+      },
+      "vesperash_helmet": {
+        "name": "Капюшон вечернего пепла"
+      },
+      "vesperash_shoulder": {
+        "name": "Оплечье вечернего пепла"
+      },
+      "vesperash_chest": {
+        "name": "Одеяние вечернего пепла"
+      },
+      "vesperash_gloves": {
+        "name": "Обмотки вечернего пепла"
+      },
+      "vesperash_legs": {
+        "name": "Штаны вечернего пепла"
+      },
+      "stormkindled_helmet": {
+        "name": "Шлем грозового пламени"
+      },
+      "stormkindled_shoulder": {
+        "name": "Наплечья грозового пламени"
+      },
+      "stormkindled_chest": {
+        "name": "Кольчуга грозового пламени"
+      },
+      "stormkindled_gloves": {
+        "name": "Рукавицы грозового пламени"
+      },
+      "stormkindled_legs": {
+        "name": "Набедренники грозового пламени"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "Шлем углечешуи"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "Наплечья углечешуи"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "Кольчуга углечешуи"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "Рукавицы углечешуи"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "Набедренники углечешуи"
+      },
+      "stonehearth_helmet": {
+        "name": "Шлем каменного очага"
+      },
+      "stonehearth_shoulder": {
+        "name": "Наплечья каменного очага"
+      },
+      "stonehearth_chest": {
+        "name": "Кольчуга каменного очага"
+      },
+      "stonehearth_gloves": {
+        "name": "Рукавицы каменного очага"
+      },
+      "stonehearth_legs": {
+        "name": "Набедренники каменного очага"
+      },
+      "springmender_helmet": {
+        "name": "Шлем родникового целителя"
+      },
+      "springmender_shoulder": {
+        "name": "Наплечья родникового целителя"
+      },
+      "springmender_chest": {
+        "name": "Кольчуга родникового целителя"
+      },
+      "springmender_gloves": {
+        "name": "Рукавицы родникового целителя"
+      },
+      "springmender_legs": {
+        "name": "Набедренники родникового целителя"
+      },
+      "chronoweave_helmet": {
+        "name": "Капюшон эфирного плетения"
+      },
+      "chronoweave_shoulder": {
+        "name": "Оплечье эфирного плетения"
+      },
+      "chronoweave_chest": {
+        "name": "Одеяние эфирного плетения"
+      },
+      "chronoweave_gloves": {
+        "name": "Обмотки эфирного плетения"
+      },
+      "chronoweave_legs": {
+        "name": "Штаны эфирного плетения"
+      },
+      "pyroclast_helmet": {
+        "name": "Капюшон пирокласта"
+      },
+      "pyroclast_shoulder": {
+        "name": "Оплечье пирокласта"
+      },
+      "pyroclast_chest": {
+        "name": "Одеяние пирокласта"
+      },
+      "pyroclast_gloves": {
+        "name": "Обмотки пирокласта"
+      },
+      "pyroclast_legs": {
+        "name": "Штаны пирокласта"
+      },
+      "frostquench_helmet": {
+        "name": "Капюшон морозной закалки"
+      },
+      "frostquench_shoulder": {
+        "name": "Оплечье морозной закалки"
+      },
+      "frostquench_chest": {
+        "name": "Одеяние морозной закалки"
+      },
+      "frostquench_gloves": {
+        "name": "Обмотки морозной закалки"
+      },
+      "frostquench_legs": {
+        "name": "Штаны морозной закалки"
+      },
+      "hexthread_helmet": {
+        "name": "Капюшон проклятой нити"
+      },
+      "hexthread_shoulder": {
+        "name": "Оплечье проклятой нити"
+      },
+      "hexthread_chest": {
+        "name": "Одеяние проклятой нити"
+      },
+      "hexthread_gloves": {
+        "name": "Обмотки проклятой нити"
+      },
+      "hexthread_legs": {
+        "name": "Штаны проклятой нити"
+      },
+      "gravebrand_helmet": {
+        "name": "Капюшон могильного клейма"
+      },
+      "gravebrand_shoulder": {
+        "name": "Оплечье могильного клейма"
+      },
+      "gravebrand_chest": {
+        "name": "Одеяние могильного клейма"
+      },
+      "gravebrand_gloves": {
+        "name": "Обмотки могильного клейма"
+      },
+      "gravebrand_legs": {
+        "name": "Штаны могильного клейма"
+      },
+      "ruincaller_helmet": {
+        "name": "Капюшон зовущего руины"
+      },
+      "ruincaller_shoulder": {
+        "name": "Оплечье зовущего руины"
+      },
+      "ruincaller_chest": {
+        "name": "Одеяние зовущего руины"
+      },
+      "ruincaller_gloves": {
+        "name": "Обмотки зовущего руины"
+      },
+      "ruincaller_legs": {
+        "name": "Штаны зовущего руины"
+      },
+      "moonscorch_helmet": {
+        "name": "Клобук лунного ожога"
+      },
+      "moonscorch_shoulder": {
+        "name": "Наплечники лунного ожога"
+      },
+      "moonscorch_chest": {
+        "name": "Куртка лунного ожога"
+      },
+      "moonscorch_gloves": {
+        "name": "Хваты лунного ожога"
+      },
+      "moonscorch_legs": {
+        "name": "Бриджи лунного ожога"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "Клобук дикого клыка"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "Наплечники дикого клыка"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "Куртка дикого клыка"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "Хваты дикого клыка"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "Бриджи дикого клыка"
+      },
+      "cinderbark_helmet": {
+        "name": "Клобук пепельной коры"
+      },
+      "cinderbark_shoulder": {
+        "name": "Наплечники пепельной коры"
+      },
+      "cinderbark_chest": {
+        "name": "Куртка пепельной коры"
+      },
+      "cinderbark_gloves": {
+        "name": "Хваты пепельной коры"
+      },
+      "cinderbark_legs": {
+        "name": "Бриджи пепельной коры"
+      },
+      "grovespring_helmet": {
+        "name": "Клобук рощевого родника"
+      },
+      "grovespring_shoulder": {
+        "name": "Наплечники рощевого родника"
+      },
+      "grovespring_chest": {
+        "name": "Куртка рощевого родника"
+      },
+      "grovespring_gloves": {
+        "name": "Хваты рощевого родника"
+      },
+      "grovespring_legs": {
+        "name": "Бриджи рощевого родника"
+      },
+      "sigil_anvil_helmet": {
+        "name": "Печать наковальни: шлем"
+      },
+      "sigil_ember_helmet": {
+        "name": "Печать углей: шлем"
+      },
+      "sigil_tempest_helmet": {
+        "name": "Печать бури: шлем"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "Печать наковальни: оплечье"
+      },
+      "sigil_ember_shoulder": {
+        "name": "Печать углей: оплечье"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "Печать бури: оплечье"
+      },
+      "sigil_anvil_chest": {
+        "name": "Печать наковальни: одеяние"
+      },
+      "sigil_ember_chest": {
+        "name": "Печать углей: одеяние"
+      },
+      "sigil_tempest_chest": {
+        "name": "Печать бури: одеяние"
+      },
+      "sigil_anvil_gloves": {
+        "name": "Печать наковальни: рукавицы"
+      },
+      "sigil_ember_gloves": {
+        "name": "Печать углей: рукавицы"
+      },
+      "sigil_tempest_gloves": {
+        "name": "Печать бури: рукавицы"
+      },
+      "sigil_anvil_legs": {
+        "name": "Печать наковальни: поножи"
+      },
+      "sigil_ember_legs": {
+        "name": "Печать углей: поножи"
+      },
+      "sigil_tempest_legs": {
+        "name": "Печать бури: поножи"
+      },
+      "cord_of_the_last_flame": {
+        "name": "Шнур последнего пламени"
+      },
+      "cindersoaked_slippers": {
+        "name": "Прожжённые туфли"
+      },
+      "springbinder_sash": {
+        "name": "Кушак родниковых уз"
+      },
+      "steps_of_quiet_water": {
+        "name": "Поступь тихой воды"
+      },
+      "cinderbark_cinch": {
+        "name": "Пояс пепельной коры"
+      },
+      "ashenbark_treads": {
+        "name": "Ступни пепельного луба"
+      },
+      "slagstalker_belt": {
+        "name": "Ремень шлакового ловчего"
+      },
+      "ashrunner_boots": {
+        "name": "Сапоги бегущего по пеплу"
+      },
+      "moonscorch_waistwrap": {
+        "name": "Повязка лунного ожога"
+      },
+      "scorchgrove_striders": {
+        "name": "Скороходы палёной рощи"
+      },
+      "grovetender_belt": {
+        "name": "Ремень хранителя рощи"
+      },
+      "dewfall_moccasins": {
+        "name": "Мокасины росной пади"
+      },
+      "forgewall_girdle": {
+        "name": "Пояс кузнечной стены"
+      },
+      "anvilstance_sabatons": {
+        "name": "Ботфорты наковальни"
+      },
+      "warforged_waistguard": {
+        "name": "Пояс боевой ковки"
+      },
+      "furnace_march_greaves": {
+        "name": "Поножи горнового марша"
+      },
+      "stormkindled_chain": {
+        "name": "Цепь грозового пламени"
+      },
+      "thundershock_treads": {
+        "name": "Ступни громового удара"
+      },
+      "tidebinder_links": {
+        "name": "Звенья владыки приливов"
+      },
+      "springwarden_sabatons": {
+        "name": "Ботфорты стража родника"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "Подвеска первой закалки"
+      },
+      "ignivars_ember_choker": {
+        "name": "Ожерелье углей Игнивара"
+      },
+      "locket_of_the_last_flame": {
+        "name": "Медальон последнего пламени"
+      },
+      "heartspring_amulet": {
+        "name": "Амулет сердечного родника"
+      },
+      "seal_of_the_forgewall": {
+        "name": "Печатка кузнечной стены"
+      },
+      "band_of_marked_strikes": {
+        "name": "Кольцо метких ударов"
+      },
+      "circle_of_cinders": {
+        "name": "Круг тлеющих углей"
+      },
+      "loop_of_quiet_springs": {
+        "name": "Кольцо тихих родников"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "Бастион внутреннего горнила"
+      },
+      "ember_wardens_barrier": {
+        "name": "Заслон стража углей"
+      },
+      "orb_of_the_last_spring": {
+        "name": "Сфера последнего родника"
+      },
+      "cinder_of_the_first_design": {
+        "name": "Уголь первого замысла"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

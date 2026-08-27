@@ -12892,6 +12892,582 @@ export const zh_TW: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
+      "slagbreaker_helmet": {
+        "name": "破渣头盔"
+      },
+      "slagbreaker_shoulder": {
+        "name": "破渣肩铠"
+      },
+      "slagbreaker_chest": {
+        "name": "破渣锁甲"
+      },
+      "slagbreaker_gloves": {
+        "name": "破渣护手"
+      },
+      "slagbreaker_legs": {
+        "name": "破渣腿甲"
+      },
+      "emberfury_helmet": {
+        "name": "烬怒头盔"
+      },
+      "emberfury_shoulder": {
+        "name": "烬怒肩铠"
+      },
+      "emberfury_chest": {
+        "name": "烬怒锁甲"
+      },
+      "emberfury_gloves": {
+        "name": "烬怒护手"
+      },
+      "emberfury_legs": {
+        "name": "烬怒腿甲"
+      },
+      "forgewall_helmet": {
+        "name": "炉墙头盔"
+      },
+      "forgewall_shoulder": {
+        "name": "炉墙肩铠"
+      },
+      "forgewall_chest": {
+        "name": "炉墙锁甲"
+      },
+      "forgewall_gloves": {
+        "name": "炉墙护手"
+      },
+      "forgewall_legs": {
+        "name": "炉墙腿甲"
+      },
+      "dawnforged_helmet": {
+        "name": "晓铸头盔"
+      },
+      "dawnforged_shoulder": {
+        "name": "晓铸肩铠"
+      },
+      "dawnforged_chest": {
+        "name": "晓铸锁甲"
+      },
+      "dawnforged_gloves": {
+        "name": "晓铸护手"
+      },
+      "dawnforged_legs": {
+        "name": "晓铸腿甲"
+      },
+      "oathpyre_helmet": {
+        "name": "誓火头盔"
+      },
+      "oathpyre_shoulder": {
+        "name": "誓火肩铠"
+      },
+      "oathpyre_chest": {
+        "name": "誓火锁甲"
+      },
+      "oathpyre_gloves": {
+        "name": "誓火护手"
+      },
+      "oathpyre_legs": {
+        "name": "誓火腿甲"
+      },
+      "zealfire_helmet": {
+        "name": "炽诚头盔"
+      },
+      "zealfire_shoulder": {
+        "name": "炽诚肩铠"
+      },
+      "zealfire_chest": {
+        "name": "炽诚锁甲"
+      },
+      "zealfire_gloves": {
+        "name": "炽诚护手"
+      },
+      "zealfire_legs": {
+        "name": "炽诚腿甲"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "兽群领主罩帽"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "兽群领主肩甲"
+      },
+      "packlord_emberhide_chest": {
+        "name": "兽群领主外衣"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "兽群领主手甲"
+      },
+      "packlord_emberhide_legs": {
+        "name": "兽群领主皮裤"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "冷目罩帽"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "冷目肩甲"
+      },
+      "coldsight_trackers_chest": {
+        "name": "冷目外衣"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "冷目手甲"
+      },
+      "coldsight_trackers_legs": {
+        "name": "冷目皮裤"
+      },
+      "slagsnare_helmet": {
+        "name": "渣网罩帽"
+      },
+      "slagsnare_shoulder": {
+        "name": "渣网肩甲"
+      },
+      "slagsnare_chest": {
+        "name": "渣网外衣"
+      },
+      "slagsnare_gloves": {
+        "name": "渣网手甲"
+      },
+      "slagsnare_legs": {
+        "name": "渣网皮裤"
+      },
+      "cinderfang_helmet": {
+        "name": "烬牙罩帽"
+      },
+      "cinderfang_shoulder": {
+        "name": "烬牙肩甲"
+      },
+      "cinderfang_chest": {
+        "name": "烬牙外衣"
+      },
+      "cinderfang_gloves": {
+        "name": "烬牙手甲"
+      },
+      "cinderfang_legs": {
+        "name": "烬牙皮裤"
+      },
+      "smolderstrike_helmet": {
+        "name": "燎击罩帽"
+      },
+      "smolderstrike_shoulder": {
+        "name": "燎击肩甲"
+      },
+      "smolderstrike_chest": {
+        "name": "燎击外衣"
+      },
+      "smolderstrike_gloves": {
+        "name": "燎击手甲"
+      },
+      "smolderstrike_legs": {
+        "name": "燎击皮裤"
+      },
+      "ashveil_helmet": {
+        "name": "灰幕罩帽"
+      },
+      "ashveil_shoulder": {
+        "name": "灰幕肩甲"
+      },
+      "ashveil_chest": {
+        "name": "灰幕外衣"
+      },
+      "ashveil_gloves": {
+        "name": "灰幕手甲"
+      },
+      "ashveil_legs": {
+        "name": "灰幕皮裤"
+      },
+      "emberscreed_helmet": {
+        "name": "余烬信条兜帽"
+      },
+      "emberscreed_shoulder": {
+        "name": "余烬信条衬肩"
+      },
+      "emberscreed_chest": {
+        "name": "余烬信条长袍"
+      },
+      "emberscreed_gloves": {
+        "name": "余烬信条裹手"
+      },
+      "emberscreed_legs": {
+        "name": "余烬信条护腿"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "晓织兜帽"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "晓织衬肩"
+      },
+      "benison_dawnweave_chest": {
+        "name": "晓织长袍"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "晓织裹手"
+      },
+      "benison_dawnweave_legs": {
+        "name": "晓织护腿"
+      },
+      "vesperash_helmet": {
+        "name": "暮灰兜帽"
+      },
+      "vesperash_shoulder": {
+        "name": "暮灰衬肩"
+      },
+      "vesperash_chest": {
+        "name": "暮灰长袍"
+      },
+      "vesperash_gloves": {
+        "name": "暮灰裹手"
+      },
+      "vesperash_legs": {
+        "name": "暮灰护腿"
+      },
+      "stormkindled_helmet": {
+        "name": "燃雷头盔"
+      },
+      "stormkindled_shoulder": {
+        "name": "燃雷肩铠"
+      },
+      "stormkindled_chest": {
+        "name": "燃雷锁甲"
+      },
+      "stormkindled_gloves": {
+        "name": "燃雷护手"
+      },
+      "stormkindled_legs": {
+        "name": "燃雷腿甲"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "烬鳞头盔"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "烬鳞肩铠"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "烬鳞锁甲"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "烬鳞护手"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "烬鳞腿甲"
+      },
+      "stonehearth_helmet": {
+        "name": "石炉头盔"
+      },
+      "stonehearth_shoulder": {
+        "name": "石炉肩铠"
+      },
+      "stonehearth_chest": {
+        "name": "石炉锁甲"
+      },
+      "stonehearth_gloves": {
+        "name": "石炉护手"
+      },
+      "stonehearth_legs": {
+        "name": "石炉腿甲"
+      },
+      "springmender_helmet": {
+        "name": "泉愈头盔"
+      },
+      "springmender_shoulder": {
+        "name": "泉愈肩铠"
+      },
+      "springmender_chest": {
+        "name": "泉愈锁甲"
+      },
+      "springmender_gloves": {
+        "name": "泉愈护手"
+      },
+      "springmender_legs": {
+        "name": "泉愈腿甲"
+      },
+      "chronoweave_helmet": {
+        "name": "以太织兜帽"
+      },
+      "chronoweave_shoulder": {
+        "name": "以太织衬肩"
+      },
+      "chronoweave_chest": {
+        "name": "以太织长袍"
+      },
+      "chronoweave_gloves": {
+        "name": "以太织裹手"
+      },
+      "chronoweave_legs": {
+        "name": "以太织护腿"
+      },
+      "pyroclast_helmet": {
+        "name": "火砾兜帽"
+      },
+      "pyroclast_shoulder": {
+        "name": "火砾衬肩"
+      },
+      "pyroclast_chest": {
+        "name": "火砾长袍"
+      },
+      "pyroclast_gloves": {
+        "name": "火砾裹手"
+      },
+      "pyroclast_legs": {
+        "name": "火砾护腿"
+      },
+      "frostquench_helmet": {
+        "name": "霜淬兜帽"
+      },
+      "frostquench_shoulder": {
+        "name": "霜淬衬肩"
+      },
+      "frostquench_chest": {
+        "name": "霜淬长袍"
+      },
+      "frostquench_gloves": {
+        "name": "霜淬裹手"
+      },
+      "frostquench_legs": {
+        "name": "霜淬护腿"
+      },
+      "hexthread_helmet": {
+        "name": "咒线兜帽"
+      },
+      "hexthread_shoulder": {
+        "name": "咒线衬肩"
+      },
+      "hexthread_chest": {
+        "name": "咒线长袍"
+      },
+      "hexthread_gloves": {
+        "name": "咒线裹手"
+      },
+      "hexthread_legs": {
+        "name": "咒线护腿"
+      },
+      "gravebrand_helmet": {
+        "name": "墓印兜帽"
+      },
+      "gravebrand_shoulder": {
+        "name": "墓印衬肩"
+      },
+      "gravebrand_chest": {
+        "name": "墓印长袍"
+      },
+      "gravebrand_gloves": {
+        "name": "墓印裹手"
+      },
+      "gravebrand_legs": {
+        "name": "墓印护腿"
+      },
+      "ruincaller_helmet": {
+        "name": "唤灭兜帽"
+      },
+      "ruincaller_shoulder": {
+        "name": "唤灭衬肩"
+      },
+      "ruincaller_chest": {
+        "name": "唤灭长袍"
+      },
+      "ruincaller_gloves": {
+        "name": "唤灭裹手"
+      },
+      "ruincaller_legs": {
+        "name": "唤灭护腿"
+      },
+      "moonscorch_helmet": {
+        "name": "月灼罩帽"
+      },
+      "moonscorch_shoulder": {
+        "name": "月灼肩甲"
+      },
+      "moonscorch_chest": {
+        "name": "月灼外衣"
+      },
+      "moonscorch_gloves": {
+        "name": "月灼手甲"
+      },
+      "moonscorch_legs": {
+        "name": "月灼皮裤"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "野牙罩帽"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "野牙肩甲"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "野牙外衣"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "野牙手甲"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "野牙皮裤"
+      },
+      "cinderbark_helmet": {
+        "name": "烬皮罩帽"
+      },
+      "cinderbark_shoulder": {
+        "name": "烬皮肩甲"
+      },
+      "cinderbark_chest": {
+        "name": "烬皮外衣"
+      },
+      "cinderbark_gloves": {
+        "name": "烬皮手甲"
+      },
+      "cinderbark_legs": {
+        "name": "烬皮皮裤"
+      },
+      "grovespring_helmet": {
+        "name": "林泉罩帽"
+      },
+      "grovespring_shoulder": {
+        "name": "林泉肩甲"
+      },
+      "grovespring_chest": {
+        "name": "林泉外衣"
+      },
+      "grovespring_gloves": {
+        "name": "林泉手甲"
+      },
+      "grovespring_legs": {
+        "name": "林泉皮裤"
+      },
+      "sigil_anvil_helmet": {
+        "name": "铁砧头盔印记"
+      },
+      "sigil_ember_helmet": {
+        "name": "余烬头盔印记"
+      },
+      "sigil_tempest_helmet": {
+        "name": "风暴头盔印记"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "铁砧肩甲印记"
+      },
+      "sigil_ember_shoulder": {
+        "name": "余烬肩甲印记"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "风暴肩甲印记"
+      },
+      "sigil_anvil_chest": {
+        "name": "铁砧长袍印记"
+      },
+      "sigil_ember_chest": {
+        "name": "余烬长袍印记"
+      },
+      "sigil_tempest_chest": {
+        "name": "风暴长袍印记"
+      },
+      "sigil_anvil_gloves": {
+        "name": "铁砧手套印记"
+      },
+      "sigil_ember_gloves": {
+        "name": "余烬手套印记"
+      },
+      "sigil_tempest_gloves": {
+        "name": "风暴手套印记"
+      },
+      "sigil_anvil_legs": {
+        "name": "铁砧护腿印记"
+      },
+      "sigil_ember_legs": {
+        "name": "余烬护腿印记"
+      },
+      "sigil_tempest_legs": {
+        "name": "风暴护腿印记"
+      },
+      "cord_of_the_last_flame": {
+        "name": "终焰束带"
+      },
+      "cindersoaked_slippers": {
+        "name": "浸烬便鞋"
+      },
+      "springbinder_sash": {
+        "name": "缚泉腰带"
+      },
+      "steps_of_quiet_water": {
+        "name": "静水之履"
+      },
+      "cinderbark_cinch": {
+        "name": "烬皮束腰"
+      },
+      "ashenbark_treads": {
+        "name": "灰皮之靴"
+      },
+      "slagstalker_belt": {
+        "name": "渣行者腰带"
+      },
+      "ashrunner_boots": {
+        "name": "灰行者之靴"
+      },
+      "moonscorch_waistwrap": {
+        "name": "月灼缠腰"
+      },
+      "scorchgrove_striders": {
+        "name": "灼林行者之靴"
+      },
+      "grovetender_belt": {
+        "name": "护林者腰带"
+      },
+      "dewfall_moccasins": {
+        "name": "落露软鞋"
+      },
+      "forgewall_girdle": {
+        "name": "炉墙束带"
+      },
+      "anvilstance_sabatons": {
+        "name": "砧姿铁靴"
+      },
+      "warforged_waistguard": {
+        "name": "战铸护腰"
+      },
+      "furnace_march_greaves": {
+        "name": "熔炉行军胫甲"
+      },
+      "stormkindled_chain": {
+        "name": "燃雷锁链腰带"
+      },
+      "thundershock_treads": {
+        "name": "雷击之靴"
+      },
+      "tidebinder_links": {
+        "name": "缚潮链环"
+      },
+      "springwarden_sabatons": {
+        "name": "泉守铁靴"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "初次淬火坠饰"
+      },
+      "ignivars_ember_choker": {
+        "name": "伊格尼瓦余烬项圈"
+      },
+      "locket_of_the_last_flame": {
+        "name": "终焰小盒坠链"
+      },
+      "heartspring_amulet": {
+        "name": "心泉护符"
+      },
+      "seal_of_the_forgewall": {
+        "name": "炉墙印戒"
+      },
+      "band_of_marked_strikes": {
+        "name": "刻痕之击指环"
+      },
+      "circle_of_cinders": {
+        "name": "烬環"
+      },
+      "loop_of_quiet_springs": {
+        "name": "静泉指环"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "内炉壁垒"
+      },
+      "ember_wardens_barrier": {
+        "name": "烬卫屏障"
+      },
+      "orb_of_the_last_spring": {
+        "name": "终泉宝珠"
+      },
+      "cinder_of_the_first_design": {
+        "name": "初构之烬"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

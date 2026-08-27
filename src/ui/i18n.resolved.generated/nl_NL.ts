@@ -12892,6 +12892,582 @@ export const nl_NL: EnTranslations = {
       "ps_passing_stone": {
         "name": "Doorgangssteen"
       },
+      "slagbreaker_helmet": {
+        "name": "Slagbreaker Helm"
+      },
+      "slagbreaker_shoulder": {
+        "name": "Slagbreaker Pauldrons"
+      },
+      "slagbreaker_chest": {
+        "name": "Slagbreaker Hauberk"
+      },
+      "slagbreaker_gloves": {
+        "name": "Slagbreaker Gauntlets"
+      },
+      "slagbreaker_legs": {
+        "name": "Slagbreaker Legguards"
+      },
+      "emberfury_helmet": {
+        "name": "Emberfury Helm"
+      },
+      "emberfury_shoulder": {
+        "name": "Emberfury Pauldrons"
+      },
+      "emberfury_chest": {
+        "name": "Emberfury Hauberk"
+      },
+      "emberfury_gloves": {
+        "name": "Emberfury Gauntlets"
+      },
+      "emberfury_legs": {
+        "name": "Emberfury Legguards"
+      },
+      "forgewall_helmet": {
+        "name": "Forgewall Helm"
+      },
+      "forgewall_shoulder": {
+        "name": "Forgewall Pauldrons"
+      },
+      "forgewall_chest": {
+        "name": "Forgewall Hauberk"
+      },
+      "forgewall_gloves": {
+        "name": "Forgewall Gauntlets"
+      },
+      "forgewall_legs": {
+        "name": "Forgewall Legguards"
+      },
+      "dawnforged_helmet": {
+        "name": "Dawnforged Helm"
+      },
+      "dawnforged_shoulder": {
+        "name": "Dawnforged Pauldrons"
+      },
+      "dawnforged_chest": {
+        "name": "Dawnforged Hauberk"
+      },
+      "dawnforged_gloves": {
+        "name": "Dawnforged Gauntlets"
+      },
+      "dawnforged_legs": {
+        "name": "Dawnforged Legguards"
+      },
+      "oathpyre_helmet": {
+        "name": "Oathpyre Helm"
+      },
+      "oathpyre_shoulder": {
+        "name": "Oathpyre Pauldrons"
+      },
+      "oathpyre_chest": {
+        "name": "Oathpyre Hauberk"
+      },
+      "oathpyre_gloves": {
+        "name": "Oathpyre Gauntlets"
+      },
+      "oathpyre_legs": {
+        "name": "Oathpyre Legguards"
+      },
+      "zealfire_helmet": {
+        "name": "Zealfire Helm"
+      },
+      "zealfire_shoulder": {
+        "name": "Zealfire Pauldrons"
+      },
+      "zealfire_chest": {
+        "name": "Zealfire Hauberk"
+      },
+      "zealfire_gloves": {
+        "name": "Zealfire Gauntlets"
+      },
+      "zealfire_legs": {
+        "name": "Zealfire Legguards"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "Packlord's Cowl"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "Packlord's Spaulders"
+      },
+      "packlord_emberhide_chest": {
+        "name": "Packlord's Tunic"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "Packlord's Grips"
+      },
+      "packlord_emberhide_legs": {
+        "name": "Packlord's Breeches"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "Coldsight Cowl"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "Coldsight Spaulders"
+      },
+      "coldsight_trackers_chest": {
+        "name": "Coldsight Tunic"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "Coldsight Grips"
+      },
+      "coldsight_trackers_legs": {
+        "name": "Coldsight Breeches"
+      },
+      "slagsnare_helmet": {
+        "name": "Slagsnare Cowl"
+      },
+      "slagsnare_shoulder": {
+        "name": "Slagsnare Spaulders"
+      },
+      "slagsnare_chest": {
+        "name": "Slagsnare Tunic"
+      },
+      "slagsnare_gloves": {
+        "name": "Slagsnare Grips"
+      },
+      "slagsnare_legs": {
+        "name": "Slagsnare Breeches"
+      },
+      "cinderfang_helmet": {
+        "name": "Cinderfang Cowl"
+      },
+      "cinderfang_shoulder": {
+        "name": "Cinderfang Spaulders"
+      },
+      "cinderfang_chest": {
+        "name": "Cinderfang Tunic"
+      },
+      "cinderfang_gloves": {
+        "name": "Cinderfang Grips"
+      },
+      "cinderfang_legs": {
+        "name": "Cinderfang Breeches"
+      },
+      "smolderstrike_helmet": {
+        "name": "Smolderstrike Cowl"
+      },
+      "smolderstrike_shoulder": {
+        "name": "Smolderstrike Spaulders"
+      },
+      "smolderstrike_chest": {
+        "name": "Smolderstrike Tunic"
+      },
+      "smolderstrike_gloves": {
+        "name": "Smolderstrike Grips"
+      },
+      "smolderstrike_legs": {
+        "name": "Smolderstrike Breeches"
+      },
+      "ashveil_helmet": {
+        "name": "Ashveil Cowl"
+      },
+      "ashveil_shoulder": {
+        "name": "Ashveil Spaulders"
+      },
+      "ashveil_chest": {
+        "name": "Ashveil Tunic"
+      },
+      "ashveil_gloves": {
+        "name": "Ashveil Grips"
+      },
+      "ashveil_legs": {
+        "name": "Ashveil Breeches"
+      },
+      "emberscreed_helmet": {
+        "name": "Creed of Embers Hood"
+      },
+      "emberscreed_shoulder": {
+        "name": "Creed of Embers Mantle"
+      },
+      "emberscreed_chest": {
+        "name": "Creed of Embers Robe"
+      },
+      "emberscreed_gloves": {
+        "name": "Creed of Embers Handwraps"
+      },
+      "emberscreed_legs": {
+        "name": "Creed of Embers Leggings"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "Dawnweave Hood"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "Dawnweave Mantle"
+      },
+      "benison_dawnweave_chest": {
+        "name": "Dawnweave Robe"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "Dawnweave Handwraps"
+      },
+      "benison_dawnweave_legs": {
+        "name": "Dawnweave Leggings"
+      },
+      "vesperash_helmet": {
+        "name": "Vesperash Hood"
+      },
+      "vesperash_shoulder": {
+        "name": "Vesperash Mantle"
+      },
+      "vesperash_chest": {
+        "name": "Vesperash Robe"
+      },
+      "vesperash_gloves": {
+        "name": "Vesperash Handwraps"
+      },
+      "vesperash_legs": {
+        "name": "Vesperash Leggings"
+      },
+      "stormkindled_helmet": {
+        "name": "Stormkindled Helm"
+      },
+      "stormkindled_shoulder": {
+        "name": "Stormkindled Pauldrons"
+      },
+      "stormkindled_chest": {
+        "name": "Stormkindled Hauberk"
+      },
+      "stormkindled_gloves": {
+        "name": "Stormkindled Gauntlets"
+      },
+      "stormkindled_legs": {
+        "name": "Stormkindled Legguards"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "Emberscale Helm"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "Emberscale Pauldrons"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "Emberscale Hauberk"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "Emberscale Gauntlets"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "Emberscale Legguards"
+      },
+      "stonehearth_helmet": {
+        "name": "Stonehearth Helm"
+      },
+      "stonehearth_shoulder": {
+        "name": "Stonehearth Pauldrons"
+      },
+      "stonehearth_chest": {
+        "name": "Stonehearth Hauberk"
+      },
+      "stonehearth_gloves": {
+        "name": "Stonehearth Gauntlets"
+      },
+      "stonehearth_legs": {
+        "name": "Stonehearth Legguards"
+      },
+      "springmender_helmet": {
+        "name": "Springmender Helm"
+      },
+      "springmender_shoulder": {
+        "name": "Springmender Pauldrons"
+      },
+      "springmender_chest": {
+        "name": "Springmender Hauberk"
+      },
+      "springmender_gloves": {
+        "name": "Springmender Gauntlets"
+      },
+      "springmender_legs": {
+        "name": "Springmender Legguards"
+      },
+      "chronoweave_helmet": {
+        "name": "Aetherweave Hood"
+      },
+      "chronoweave_shoulder": {
+        "name": "Aetherweave Mantle"
+      },
+      "chronoweave_chest": {
+        "name": "Aetherweave Robe"
+      },
+      "chronoweave_gloves": {
+        "name": "Aetherweave Handwraps"
+      },
+      "chronoweave_legs": {
+        "name": "Aetherweave Leggings"
+      },
+      "pyroclast_helmet": {
+        "name": "Pyroclast Hood"
+      },
+      "pyroclast_shoulder": {
+        "name": "Pyroclast Mantle"
+      },
+      "pyroclast_chest": {
+        "name": "Pyroclast Robe"
+      },
+      "pyroclast_gloves": {
+        "name": "Pyroclast Handwraps"
+      },
+      "pyroclast_legs": {
+        "name": "Pyroclast Leggings"
+      },
+      "frostquench_helmet": {
+        "name": "Frostquench Hood"
+      },
+      "frostquench_shoulder": {
+        "name": "Frostquench Mantle"
+      },
+      "frostquench_chest": {
+        "name": "Frostquench Robe"
+      },
+      "frostquench_gloves": {
+        "name": "Frostquench Handwraps"
+      },
+      "frostquench_legs": {
+        "name": "Frostquench Leggings"
+      },
+      "hexthread_helmet": {
+        "name": "Hexthread Hood"
+      },
+      "hexthread_shoulder": {
+        "name": "Hexthread Mantle"
+      },
+      "hexthread_chest": {
+        "name": "Hexthread Robe"
+      },
+      "hexthread_gloves": {
+        "name": "Hexthread Handwraps"
+      },
+      "hexthread_legs": {
+        "name": "Hexthread Leggings"
+      },
+      "gravebrand_helmet": {
+        "name": "Gravebrand Hood"
+      },
+      "gravebrand_shoulder": {
+        "name": "Gravebrand Mantle"
+      },
+      "gravebrand_chest": {
+        "name": "Gravebrand Robe"
+      },
+      "gravebrand_gloves": {
+        "name": "Gravebrand Handwraps"
+      },
+      "gravebrand_legs": {
+        "name": "Gravebrand Leggings"
+      },
+      "ruincaller_helmet": {
+        "name": "Ruincaller Hood"
+      },
+      "ruincaller_shoulder": {
+        "name": "Ruincaller Mantle"
+      },
+      "ruincaller_chest": {
+        "name": "Ruincaller Robe"
+      },
+      "ruincaller_gloves": {
+        "name": "Ruincaller Handwraps"
+      },
+      "ruincaller_legs": {
+        "name": "Ruincaller Leggings"
+      },
+      "moonscorch_helmet": {
+        "name": "Moonscorch Cowl"
+      },
+      "moonscorch_shoulder": {
+        "name": "Moonscorch Spaulders"
+      },
+      "moonscorch_chest": {
+        "name": "Moonscorch Tunic"
+      },
+      "moonscorch_gloves": {
+        "name": "Moonscorch Grips"
+      },
+      "moonscorch_legs": {
+        "name": "Moonscorch Breeches"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "Wildfang Cowl"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "Wildfang Spaulders"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "Wildfang Tunic"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "Wildfang Grips"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "Wildfang Breeches"
+      },
+      "cinderbark_helmet": {
+        "name": "Cinderbark Cowl"
+      },
+      "cinderbark_shoulder": {
+        "name": "Cinderbark Spaulders"
+      },
+      "cinderbark_chest": {
+        "name": "Cinderbark Tunic"
+      },
+      "cinderbark_gloves": {
+        "name": "Cinderbark Grips"
+      },
+      "cinderbark_legs": {
+        "name": "Cinderbark Breeches"
+      },
+      "grovespring_helmet": {
+        "name": "Grovespring Cowl"
+      },
+      "grovespring_shoulder": {
+        "name": "Grovespring Spaulders"
+      },
+      "grovespring_chest": {
+        "name": "Grovespring Tunic"
+      },
+      "grovespring_gloves": {
+        "name": "Grovespring Grips"
+      },
+      "grovespring_legs": {
+        "name": "Grovespring Breeches"
+      },
+      "sigil_anvil_helmet": {
+        "name": "Helm Sigil of the Anvil"
+      },
+      "sigil_ember_helmet": {
+        "name": "Helm Sigil of the Ember"
+      },
+      "sigil_tempest_helmet": {
+        "name": "Helm Sigil of the Tempest"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "Mantle Sigil of the Anvil"
+      },
+      "sigil_ember_shoulder": {
+        "name": "Mantle Sigil of the Ember"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "Mantle Sigil of the Tempest"
+      },
+      "sigil_anvil_chest": {
+        "name": "Robe Sigil of the Anvil"
+      },
+      "sigil_ember_chest": {
+        "name": "Robe Sigil of the Ember"
+      },
+      "sigil_tempest_chest": {
+        "name": "Robe Sigil of the Tempest"
+      },
+      "sigil_anvil_gloves": {
+        "name": "Grip Sigil of the Anvil"
+      },
+      "sigil_ember_gloves": {
+        "name": "Grip Sigil of the Ember"
+      },
+      "sigil_tempest_gloves": {
+        "name": "Grip Sigil of the Tempest"
+      },
+      "sigil_anvil_legs": {
+        "name": "Legging Sigil of the Anvil"
+      },
+      "sigil_ember_legs": {
+        "name": "Legging Sigil of the Ember"
+      },
+      "sigil_tempest_legs": {
+        "name": "Legging Sigil of the Tempest"
+      },
+      "cord_of_the_last_flame": {
+        "name": "Cord of the Last Flame"
+      },
+      "cindersoaked_slippers": {
+        "name": "Cindersoaked Slippers"
+      },
+      "springbinder_sash": {
+        "name": "Springbinder Sash"
+      },
+      "steps_of_quiet_water": {
+        "name": "Steps of Quiet Water"
+      },
+      "cinderbark_cinch": {
+        "name": "Cinderbark Cinch"
+      },
+      "ashenbark_treads": {
+        "name": "Ashenbark Treads"
+      },
+      "slagstalker_belt": {
+        "name": "Slagstalker Belt"
+      },
+      "ashrunner_boots": {
+        "name": "Ashrunner Boots"
+      },
+      "moonscorch_waistwrap": {
+        "name": "Moonscorch Waistwrap"
+      },
+      "scorchgrove_striders": {
+        "name": "Scorchgrove Striders"
+      },
+      "grovetender_belt": {
+        "name": "Grovetender Belt"
+      },
+      "dewfall_moccasins": {
+        "name": "Dewfall Moccasins"
+      },
+      "forgewall_girdle": {
+        "name": "Forgewall Girdle"
+      },
+      "anvilstance_sabatons": {
+        "name": "Anvilstance Sabatons"
+      },
+      "warforged_waistguard": {
+        "name": "Warforged Waistguard"
+      },
+      "furnace_march_greaves": {
+        "name": "Furnace March Greaves"
+      },
+      "stormkindled_chain": {
+        "name": "Stormkindled Chain"
+      },
+      "thundershock_treads": {
+        "name": "Thundershock Treads"
+      },
+      "tidebinder_links": {
+        "name": "Tidebinder Links"
+      },
+      "springwarden_sabatons": {
+        "name": "Springwarden Sabatons"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "Pendant of the First Tempering"
+      },
+      "ignivars_ember_choker": {
+        "name": "Ignivar's Ember Choker"
+      },
+      "locket_of_the_last_flame": {
+        "name": "Locket of the Last Flame"
+      },
+      "heartspring_amulet": {
+        "name": "Heartspring Amulet"
+      },
+      "seal_of_the_forgewall": {
+        "name": "Seal of the Forgewall"
+      },
+      "band_of_marked_strikes": {
+        "name": "Band of Marked Strikes"
+      },
+      "circle_of_cinders": {
+        "name": "Circle of Cinders"
+      },
+      "loop_of_quiet_springs": {
+        "name": "Loop of Quiet Springs"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "Bulwark of the Inner Crucible"
+      },
+      "ember_wardens_barrier": {
+        "name": "Ember Warden's Barrier"
+      },
+      "orb_of_the_last_spring": {
+        "name": "Orb of the Last Spring"
+      },
+      "cinder_of_the_first_design": {
+        "name": "Cinder of the First Design"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },

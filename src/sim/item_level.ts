@@ -26,6 +26,7 @@ import {
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
+import { IGNIVAR_LOOT_ITEM_IDS, IGNIVAR_RAID_LOOT_SOURCE_LEVEL } from './content/ignivar_loot';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -229,6 +230,14 @@ function buildSourceIndex(): Map<string, ItemSource> {
       : HEROIC_VARIANT_SOURCE_LEVEL;
     bump(item.id, src, false);
   }
+  // Ignivar raid loot (content/ignivar_loot.ts): the whole Crucible table reads
+  // source 26 with the raid flag, so every gear piece lands at item level 35
+  // (26 + epic 6 + raid 3). The explicit registration is load-bearing twice
+  // over: the sigil-redeemed set pieces never appear on a mob loot table at
+  // all, and the direct boss drops would otherwise be priced by the level-20
+  // boss mobs (bump() is highest-level-wins, so this overrides that). Sigils
+  // are kind 'tool' with no slot and stay item-level ineligible.
+  for (const id of IGNIVAR_LOOT_ITEM_IDS) bump(id, IGNIVAR_RAID_LOOT_SOURCE_LEVEL, true);
   // Rift-only clear-time epics and legendaries: gated behind B+/A/S final-boss
   // kills (addRiftClearGearLoot), they never appear on static mob loot tables, so
   // the mob-loot block above never registers them. The epics register at

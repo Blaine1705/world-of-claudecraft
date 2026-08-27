@@ -12892,6 +12892,582 @@ export const ko_KR: EnTranslations = {
       "ps_passing_stone": {
         "name": "안식의 돌"
       },
+      "slagbreaker_helmet": {
+        "name": "슬래그브레이커 투구"
+      },
+      "slagbreaker_shoulder": {
+        "name": "슬래그브레이커 어깨갑옷"
+      },
+      "slagbreaker_chest": {
+        "name": "슬래그브레이커 사슬갑옷"
+      },
+      "slagbreaker_gloves": {
+        "name": "슬래그브레이커 건틀릿"
+      },
+      "slagbreaker_legs": {
+        "name": "슬래그브레이커 다리갑옷"
+      },
+      "emberfury_helmet": {
+        "name": "잿불격노 투구"
+      },
+      "emberfury_shoulder": {
+        "name": "잿불격노 어깨갑옷"
+      },
+      "emberfury_chest": {
+        "name": "잿불격노 사슬갑옷"
+      },
+      "emberfury_gloves": {
+        "name": "잿불격노 건틀릿"
+      },
+      "emberfury_legs": {
+        "name": "잿불격노 다리갑옷"
+      },
+      "forgewall_helmet": {
+        "name": "화로성벽 투구"
+      },
+      "forgewall_shoulder": {
+        "name": "화로성벽 어깨갑옷"
+      },
+      "forgewall_chest": {
+        "name": "화로성벽 사슬갑옷"
+      },
+      "forgewall_gloves": {
+        "name": "화로성벽 건틀릿"
+      },
+      "forgewall_legs": {
+        "name": "화로성벽 다리갑옷"
+      },
+      "dawnforged_helmet": {
+        "name": "새벽벼림 투구"
+      },
+      "dawnforged_shoulder": {
+        "name": "새벽벼림 어깨갑옷"
+      },
+      "dawnforged_chest": {
+        "name": "새벽벼림 사슬갑옷"
+      },
+      "dawnforged_gloves": {
+        "name": "새벽벼림 건틀릿"
+      },
+      "dawnforged_legs": {
+        "name": "새벽벼림 다리갑옷"
+      },
+      "oathpyre_helmet": {
+        "name": "맹세화염 투구"
+      },
+      "oathpyre_shoulder": {
+        "name": "맹세화염 어깨갑옷"
+      },
+      "oathpyre_chest": {
+        "name": "맹세화염 사슬갑옷"
+      },
+      "oathpyre_gloves": {
+        "name": "맹세화염 건틀릿"
+      },
+      "oathpyre_legs": {
+        "name": "맹세화염 다리갑옷"
+      },
+      "zealfire_helmet": {
+        "name": "열화신념 투구"
+      },
+      "zealfire_shoulder": {
+        "name": "열화신념 어깨갑옷"
+      },
+      "zealfire_chest": {
+        "name": "열화신념 사슬갑옷"
+      },
+      "zealfire_gloves": {
+        "name": "열화신념 건틀릿"
+      },
+      "zealfire_legs": {
+        "name": "열화신념 다리갑옷"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "무리군주 가죽두건"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "무리군주 어깨보호구"
+      },
+      "packlord_emberhide_chest": {
+        "name": "무리군주 튜닉"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "무리군주 손보호구"
+      },
+      "packlord_emberhide_legs": {
+        "name": "무리군주 가죽바지"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "냉정한 시선 가죽두건"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "냉정한 시선 어깨보호구"
+      },
+      "coldsight_trackers_chest": {
+        "name": "냉정한 시선 튜닉"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "냉정한 시선 손보호구"
+      },
+      "coldsight_trackers_legs": {
+        "name": "냉정한 시선 가죽바지"
+      },
+      "slagsnare_helmet": {
+        "name": "용재올가미 가죽두건"
+      },
+      "slagsnare_shoulder": {
+        "name": "용재올가미 어깨보호구"
+      },
+      "slagsnare_chest": {
+        "name": "용재올가미 튜닉"
+      },
+      "slagsnare_gloves": {
+        "name": "용재올가미 손보호구"
+      },
+      "slagsnare_legs": {
+        "name": "용재올가미 가죽바지"
+      },
+      "cinderfang_helmet": {
+        "name": "잿불송곳니 가죽두건"
+      },
+      "cinderfang_shoulder": {
+        "name": "잿불송곳니 어깨보호구"
+      },
+      "cinderfang_chest": {
+        "name": "잿불송곳니 튜닉"
+      },
+      "cinderfang_gloves": {
+        "name": "잿불송곳니 손보호구"
+      },
+      "cinderfang_legs": {
+        "name": "잿불송곳니 가죽바지"
+      },
+      "smolderstrike_helmet": {
+        "name": "그을음일격 가죽두건"
+      },
+      "smolderstrike_shoulder": {
+        "name": "그을음일격 어깨보호구"
+      },
+      "smolderstrike_chest": {
+        "name": "그을음일격 튜닉"
+      },
+      "smolderstrike_gloves": {
+        "name": "그을음일격 손보호구"
+      },
+      "smolderstrike_legs": {
+        "name": "그을음일격 가죽바지"
+      },
+      "ashveil_helmet": {
+        "name": "잿빛장막 가죽두건"
+      },
+      "ashveil_shoulder": {
+        "name": "잿빛장막 어깨보호구"
+      },
+      "ashveil_chest": {
+        "name": "잿빛장막 튜닉"
+      },
+      "ashveil_gloves": {
+        "name": "잿빛장막 손보호구"
+      },
+      "ashveil_legs": {
+        "name": "잿빛장막 가죽바지"
+      },
+      "emberscreed_helmet": {
+        "name": "잉걸불 신조 두건"
+      },
+      "emberscreed_shoulder": {
+        "name": "잉걸불 신조 어깨걸이"
+      },
+      "emberscreed_chest": {
+        "name": "잉걸불 신조 로브"
+      },
+      "emberscreed_gloves": {
+        "name": "잉걸불 신조 손싸개"
+      },
+      "emberscreed_legs": {
+        "name": "잉걸불 신조 다리싸개"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "새벽직조 두건"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "새벽직조 어깨걸이"
+      },
+      "benison_dawnweave_chest": {
+        "name": "새벽직조 로브"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "새벽직조 손싸개"
+      },
+      "benison_dawnweave_legs": {
+        "name": "새벽직조 다리싸개"
+      },
+      "vesperash_helmet": {
+        "name": "저녁잿빛 두건"
+      },
+      "vesperash_shoulder": {
+        "name": "저녁잿빛 어깨걸이"
+      },
+      "vesperash_chest": {
+        "name": "저녁잿빛 로브"
+      },
+      "vesperash_gloves": {
+        "name": "저녁잿빛 손싸개"
+      },
+      "vesperash_legs": {
+        "name": "저녁잿빛 다리싸개"
+      },
+      "stormkindled_helmet": {
+        "name": "폭풍점화 투구"
+      },
+      "stormkindled_shoulder": {
+        "name": "폭풍점화 어깨갑옷"
+      },
+      "stormkindled_chest": {
+        "name": "폭풍점화 사슬갑옷"
+      },
+      "stormkindled_gloves": {
+        "name": "폭풍점화 건틀릿"
+      },
+      "stormkindled_legs": {
+        "name": "폭풍점화 다리갑옷"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "잉걸비늘 투구"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "잉걸비늘 어깨갑옷"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "잉걸비늘 사슬갑옷"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "잉걸비늘 건틀릿"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "잉걸비늘 다리갑옷"
+      },
+      "stonehearth_helmet": {
+        "name": "돌화로 투구"
+      },
+      "stonehearth_shoulder": {
+        "name": "돌화로 어깨갑옷"
+      },
+      "stonehearth_chest": {
+        "name": "돌화로 사슬갑옷"
+      },
+      "stonehearth_gloves": {
+        "name": "돌화로 건틀릿"
+      },
+      "stonehearth_legs": {
+        "name": "돌화로 다리갑옷"
+      },
+      "springmender_helmet": {
+        "name": "샘물치유사 투구"
+      },
+      "springmender_shoulder": {
+        "name": "샘물치유사 어깨갑옷"
+      },
+      "springmender_chest": {
+        "name": "샘물치유사 사슬갑옷"
+      },
+      "springmender_gloves": {
+        "name": "샘물치유사 건틀릿"
+      },
+      "springmender_legs": {
+        "name": "샘물치유사 다리갑옷"
+      },
+      "chronoweave_helmet": {
+        "name": "에테르직조 두건"
+      },
+      "chronoweave_shoulder": {
+        "name": "에테르직조 어깨걸이"
+      },
+      "chronoweave_chest": {
+        "name": "에테르직조 로브"
+      },
+      "chronoweave_gloves": {
+        "name": "에테르직조 손싸개"
+      },
+      "chronoweave_legs": {
+        "name": "에테르직조 다리싸개"
+      },
+      "pyroclast_helmet": {
+        "name": "화쇄류 두건"
+      },
+      "pyroclast_shoulder": {
+        "name": "화쇄류 어깨걸이"
+      },
+      "pyroclast_chest": {
+        "name": "화쇄류 로브"
+      },
+      "pyroclast_gloves": {
+        "name": "화쇄류 손싸개"
+      },
+      "pyroclast_legs": {
+        "name": "화쇄류 다리싸개"
+      },
+      "frostquench_helmet": {
+        "name": "서리담금질 두건"
+      },
+      "frostquench_shoulder": {
+        "name": "서리담금질 어깨걸이"
+      },
+      "frostquench_chest": {
+        "name": "서리담금질 로브"
+      },
+      "frostquench_gloves": {
+        "name": "서리담금질 손싸개"
+      },
+      "frostquench_legs": {
+        "name": "서리담금질 다리싸개"
+      },
+      "hexthread_helmet": {
+        "name": "저주실타래 두건"
+      },
+      "hexthread_shoulder": {
+        "name": "저주실타래 어깨걸이"
+      },
+      "hexthread_chest": {
+        "name": "저주실타래 로브"
+      },
+      "hexthread_gloves": {
+        "name": "저주실타래 손싸개"
+      },
+      "hexthread_legs": {
+        "name": "저주실타래 다리싸개"
+      },
+      "gravebrand_helmet": {
+        "name": "무덤낙인 두건"
+      },
+      "gravebrand_shoulder": {
+        "name": "무덤낙인 어깨걸이"
+      },
+      "gravebrand_chest": {
+        "name": "무덤낙인 로브"
+      },
+      "gravebrand_gloves": {
+        "name": "무덤낙인 손싸개"
+      },
+      "gravebrand_legs": {
+        "name": "무덤낙인 다리싸개"
+      },
+      "ruincaller_helmet": {
+        "name": "파멸의 부름 두건"
+      },
+      "ruincaller_shoulder": {
+        "name": "파멸의 부름 어깨걸이"
+      },
+      "ruincaller_chest": {
+        "name": "파멸의 부름 로브"
+      },
+      "ruincaller_gloves": {
+        "name": "파멸의 부름 손싸개"
+      },
+      "ruincaller_legs": {
+        "name": "파멸의 부름 다리싸개"
+      },
+      "moonscorch_helmet": {
+        "name": "달그을림 가죽두건"
+      },
+      "moonscorch_shoulder": {
+        "name": "달그을림 어깨보호구"
+      },
+      "moonscorch_chest": {
+        "name": "달그을림 튜닉"
+      },
+      "moonscorch_gloves": {
+        "name": "달그을림 손보호구"
+      },
+      "moonscorch_legs": {
+        "name": "달그을림 가죽바지"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "야생송곳니 가죽두건"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "야생송곳니 어깨보호구"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "야생송곳니 튜닉"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "야생송곳니 손보호구"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "야생송곳니 가죽바지"
+      },
+      "cinderbark_helmet": {
+        "name": "잿불나무껍질 가죽두건"
+      },
+      "cinderbark_shoulder": {
+        "name": "잿불나무껍질 어깨보호구"
+      },
+      "cinderbark_chest": {
+        "name": "잿불나무껍질 튜닉"
+      },
+      "cinderbark_gloves": {
+        "name": "잿불나무껍질 손보호구"
+      },
+      "cinderbark_legs": {
+        "name": "잿불나무껍질 가죽바지"
+      },
+      "grovespring_helmet": {
+        "name": "숲의 샘 가죽두건"
+      },
+      "grovespring_shoulder": {
+        "name": "숲의 샘 어깨보호구"
+      },
+      "grovespring_chest": {
+        "name": "숲의 샘 튜닉"
+      },
+      "grovespring_gloves": {
+        "name": "숲의 샘 손보호구"
+      },
+      "grovespring_legs": {
+        "name": "숲의 샘 가죽바지"
+      },
+      "sigil_anvil_helmet": {
+        "name": "모루 투구 인장"
+      },
+      "sigil_ember_helmet": {
+        "name": "잉걸불 투구 인장"
+      },
+      "sigil_tempest_helmet": {
+        "name": "폭풍 투구 인장"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "모루 어깨 인장"
+      },
+      "sigil_ember_shoulder": {
+        "name": "잉걸불 어깨 인장"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "폭풍 어깨 인장"
+      },
+      "sigil_anvil_chest": {
+        "name": "모루 로브 인장"
+      },
+      "sigil_ember_chest": {
+        "name": "잉걸불 로브 인장"
+      },
+      "sigil_tempest_chest": {
+        "name": "폭풍 로브 인장"
+      },
+      "sigil_anvil_gloves": {
+        "name": "모루 장갑 인장"
+      },
+      "sigil_ember_gloves": {
+        "name": "잉걸불 장갑 인장"
+      },
+      "sigil_tempest_gloves": {
+        "name": "폭풍 장갑 인장"
+      },
+      "sigil_anvil_legs": {
+        "name": "모루 다리 인장"
+      },
+      "sigil_ember_legs": {
+        "name": "잉걸불 다리 인장"
+      },
+      "sigil_tempest_legs": {
+        "name": "폭풍 다리 인장"
+      },
+      "cord_of_the_last_flame": {
+        "name": "마지막 불꽃의 끈"
+      },
+      "cindersoaked_slippers": {
+        "name": "잿물배인 덧신"
+      },
+      "springbinder_sash": {
+        "name": "샘묶이 장식띠"
+      },
+      "steps_of_quiet_water": {
+        "name": "고요한 물의 발걸음"
+      },
+      "cinderbark_cinch": {
+        "name": "잿불나무껍질 허리끈"
+      },
+      "ashenbark_treads": {
+        "name": "잿빛나무껍질 신발"
+      },
+      "slagstalker_belt": {
+        "name": "용재추적자 허리띠"
+      },
+      "ashrunner_boots": {
+        "name": "재질주자 장화"
+      },
+      "moonscorch_waistwrap": {
+        "name": "달그을림 허리감개"
+      },
+      "scorchgrove_striders": {
+        "name": "그을린숲 활보자"
+      },
+      "grovetender_belt": {
+        "name": "숲지기 허리띠"
+      },
+      "dewfall_moccasins": {
+        "name": "이슬맺힌 신"
+      },
+      "forgewall_girdle": {
+        "name": "화로성벽 허리갑"
+      },
+      "anvilstance_sabatons": {
+        "name": "모루자세 강철신"
+      },
+      "warforged_waistguard": {
+        "name": "전쟁벼림 허리보호구"
+      },
+      "furnace_march_greaves": {
+        "name": "용광로 행군 다리보호구"
+      },
+      "stormkindled_chain": {
+        "name": "폭풍점화 사슬"
+      },
+      "thundershock_treads": {
+        "name": "천둥충격 신발"
+      },
+      "tidebinder_links": {
+        "name": "조수묶이 사슬고리"
+      },
+      "springwarden_sabatons": {
+        "name": "샘지기 강철신"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "첫 담금질의 목걸이"
+      },
+      "ignivars_ember_choker": {
+        "name": "이그니바르의 잉걸불 목걸이"
+      },
+      "locket_of_the_last_flame": {
+        "name": "마지막 불꽃의 로켓"
+      },
+      "heartspring_amulet": {
+        "name": "심장샘 부적"
+      },
+      "seal_of_the_forgewall": {
+        "name": "화로성벽 인장"
+      },
+      "band_of_marked_strikes": {
+        "name": "새겨진 일격의 반지"
+      },
+      "circle_of_cinders": {
+        "name": "잿불의 고리"
+      },
+      "loop_of_quiet_springs": {
+        "name": "고요한 샘의 고리"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "내부 도가니의 방벽"
+      },
+      "ember_wardens_barrier": {
+        "name": "잉걸불 수호자의 방벽"
+      },
+      "orb_of_the_last_spring": {
+        "name": "마지막 샘의 보주"
+      },
+      "cinder_of_the_first_design": {
+        "name": "최초 설계의 잿불"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

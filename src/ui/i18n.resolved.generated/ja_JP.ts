@@ -12892,6 +12892,582 @@ export const ja_JP: EnTranslations = {
       "ps_passing_stone": {
         "name": "たましいの石"
       },
+      "slagbreaker_helmet": {
+        "name": "スラグブレイカーの兜"
+      },
+      "slagbreaker_shoulder": {
+        "name": "スラグブレイカーの肩鎧"
+      },
+      "slagbreaker_chest": {
+        "name": "スラグブレイカーの鎖帷子"
+      },
+      "slagbreaker_gloves": {
+        "name": "スラグブレイカーのガントレット"
+      },
+      "slagbreaker_legs": {
+        "name": "スラグブレイカーの脚甲"
+      },
+      "emberfury_helmet": {
+        "name": "エンバーフューリーの兜"
+      },
+      "emberfury_shoulder": {
+        "name": "エンバーフューリーの肩鎧"
+      },
+      "emberfury_chest": {
+        "name": "エンバーフューリーの鎖帷子"
+      },
+      "emberfury_gloves": {
+        "name": "エンバーフューリーのガントレット"
+      },
+      "emberfury_legs": {
+        "name": "エンバーフューリーの脚甲"
+      },
+      "forgewall_helmet": {
+        "name": "フォージウォールの兜"
+      },
+      "forgewall_shoulder": {
+        "name": "フォージウォールの肩鎧"
+      },
+      "forgewall_chest": {
+        "name": "フォージウォールの鎖帷子"
+      },
+      "forgewall_gloves": {
+        "name": "フォージウォールのガントレット"
+      },
+      "forgewall_legs": {
+        "name": "フォージウォールの脚甲"
+      },
+      "dawnforged_helmet": {
+        "name": "ドーンフォージの兜"
+      },
+      "dawnforged_shoulder": {
+        "name": "ドーンフォージの肩鎧"
+      },
+      "dawnforged_chest": {
+        "name": "ドーンフォージの鎖帷子"
+      },
+      "dawnforged_gloves": {
+        "name": "ドーンフォージのガントレット"
+      },
+      "dawnforged_legs": {
+        "name": "ドーンフォージの脚甲"
+      },
+      "oathpyre_helmet": {
+        "name": "オースパイアの兜"
+      },
+      "oathpyre_shoulder": {
+        "name": "オースパイアの肩鎧"
+      },
+      "oathpyre_chest": {
+        "name": "オースパイアの鎖帷子"
+      },
+      "oathpyre_gloves": {
+        "name": "オースパイアのガントレット"
+      },
+      "oathpyre_legs": {
+        "name": "オースパイアの脚甲"
+      },
+      "zealfire_helmet": {
+        "name": "ジールファイアの兜"
+      },
+      "zealfire_shoulder": {
+        "name": "ジールファイアの肩鎧"
+      },
+      "zealfire_chest": {
+        "name": "ジールファイアの鎖帷子"
+      },
+      "zealfire_gloves": {
+        "name": "ジールファイアのガントレット"
+      },
+      "zealfire_legs": {
+        "name": "ジールファイアの脚甲"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "パックロードの頭巾"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "パックロードの肩当て"
+      },
+      "packlord_emberhide_chest": {
+        "name": "パックロードのチュニック"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "パックロードのグリップ"
+      },
+      "packlord_emberhide_legs": {
+        "name": "パックロードのブリーチズ"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "コールドサイトの頭巾"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "コールドサイトの肩当て"
+      },
+      "coldsight_trackers_chest": {
+        "name": "コールドサイトのチュニック"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "コールドサイトのグリップ"
+      },
+      "coldsight_trackers_legs": {
+        "name": "コールドサイトのブリーチズ"
+      },
+      "slagsnare_helmet": {
+        "name": "スラグスネアの頭巾"
+      },
+      "slagsnare_shoulder": {
+        "name": "スラグスネアの肩当て"
+      },
+      "slagsnare_chest": {
+        "name": "スラグスネアのチュニック"
+      },
+      "slagsnare_gloves": {
+        "name": "スラグスネアのグリップ"
+      },
+      "slagsnare_legs": {
+        "name": "スラグスネアのブリーチズ"
+      },
+      "cinderfang_helmet": {
+        "name": "シンダーファングの頭巾"
+      },
+      "cinderfang_shoulder": {
+        "name": "シンダーファングの肩当て"
+      },
+      "cinderfang_chest": {
+        "name": "シンダーファングのチュニック"
+      },
+      "cinderfang_gloves": {
+        "name": "シンダーファングのグリップ"
+      },
+      "cinderfang_legs": {
+        "name": "シンダーファングのブリーチズ"
+      },
+      "smolderstrike_helmet": {
+        "name": "スモルダーストライクの頭巾"
+      },
+      "smolderstrike_shoulder": {
+        "name": "スモルダーストライクの肩当て"
+      },
+      "smolderstrike_chest": {
+        "name": "スモルダーストライクのチュニック"
+      },
+      "smolderstrike_gloves": {
+        "name": "スモルダーストライクのグリップ"
+      },
+      "smolderstrike_legs": {
+        "name": "スモルダーストライクのブリーチズ"
+      },
+      "ashveil_helmet": {
+        "name": "アッシュヴェールの頭巾"
+      },
+      "ashveil_shoulder": {
+        "name": "アッシュヴェールの肩当て"
+      },
+      "ashveil_chest": {
+        "name": "アッシュヴェールのチュニック"
+      },
+      "ashveil_gloves": {
+        "name": "アッシュヴェールのグリップ"
+      },
+      "ashveil_legs": {
+        "name": "アッシュヴェールのブリーチズ"
+      },
+      "emberscreed_helmet": {
+        "name": "残り火の信条のフード"
+      },
+      "emberscreed_shoulder": {
+        "name": "残り火の信条の肩掛け"
+      },
+      "emberscreed_chest": {
+        "name": "残り火の信条のローブ"
+      },
+      "emberscreed_gloves": {
+        "name": "残り火の信条のハンドラップ"
+      },
+      "emberscreed_legs": {
+        "name": "残り火の信条のレギンス"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "ドーンウィーブのフード"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "ドーンウィーブの肩掛け"
+      },
+      "benison_dawnweave_chest": {
+        "name": "ドーンウィーブのローブ"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "ドーンウィーブのハンドラップ"
+      },
+      "benison_dawnweave_legs": {
+        "name": "ドーンウィーブのレギンス"
+      },
+      "vesperash_helmet": {
+        "name": "ヴェスパーアッシュのフード"
+      },
+      "vesperash_shoulder": {
+        "name": "ヴェスパーアッシュの肩掛け"
+      },
+      "vesperash_chest": {
+        "name": "ヴェスパーアッシュのローブ"
+      },
+      "vesperash_gloves": {
+        "name": "ヴェスパーアッシュのハンドラップ"
+      },
+      "vesperash_legs": {
+        "name": "ヴェスパーアッシュのレギンス"
+      },
+      "stormkindled_helmet": {
+        "name": "ストームキンドルの兜"
+      },
+      "stormkindled_shoulder": {
+        "name": "ストームキンドルの肩鎧"
+      },
+      "stormkindled_chest": {
+        "name": "ストームキンドルの鎖帷子"
+      },
+      "stormkindled_gloves": {
+        "name": "ストームキンドルのガントレット"
+      },
+      "stormkindled_legs": {
+        "name": "ストームキンドルの脚甲"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "エンバースケイルの兜"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "エンバースケイルの肩鎧"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "エンバースケイルの鎖帷子"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "エンバースケイルのガントレット"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "エンバースケイルの脚甲"
+      },
+      "stonehearth_helmet": {
+        "name": "ストーンハースの兜"
+      },
+      "stonehearth_shoulder": {
+        "name": "ストーンハースの肩鎧"
+      },
+      "stonehearth_chest": {
+        "name": "ストーンハースの鎖帷子"
+      },
+      "stonehearth_gloves": {
+        "name": "ストーンハースのガントレット"
+      },
+      "stonehearth_legs": {
+        "name": "ストーンハースの脚甲"
+      },
+      "springmender_helmet": {
+        "name": "スプリングメンダーの兜"
+      },
+      "springmender_shoulder": {
+        "name": "スプリングメンダーの肩鎧"
+      },
+      "springmender_chest": {
+        "name": "スプリングメンダーの鎖帷子"
+      },
+      "springmender_gloves": {
+        "name": "スプリングメンダーのガントレット"
+      },
+      "springmender_legs": {
+        "name": "スプリングメンダーの脚甲"
+      },
+      "chronoweave_helmet": {
+        "name": "エーテルウィーブのフード"
+      },
+      "chronoweave_shoulder": {
+        "name": "エーテルウィーブの肩掛け"
+      },
+      "chronoweave_chest": {
+        "name": "エーテルウィーブのローブ"
+      },
+      "chronoweave_gloves": {
+        "name": "エーテルウィーブのハンドラップ"
+      },
+      "chronoweave_legs": {
+        "name": "エーテルウィーブのレギンス"
+      },
+      "pyroclast_helmet": {
+        "name": "パイロクラストのフード"
+      },
+      "pyroclast_shoulder": {
+        "name": "パイロクラストの肩掛け"
+      },
+      "pyroclast_chest": {
+        "name": "パイロクラストのローブ"
+      },
+      "pyroclast_gloves": {
+        "name": "パイロクラストのハンドラップ"
+      },
+      "pyroclast_legs": {
+        "name": "パイロクラストのレギンス"
+      },
+      "frostquench_helmet": {
+        "name": "フロストクエンチのフード"
+      },
+      "frostquench_shoulder": {
+        "name": "フロストクエンチの肩掛け"
+      },
+      "frostquench_chest": {
+        "name": "フロストクエンチのローブ"
+      },
+      "frostquench_gloves": {
+        "name": "フロストクエンチのハンドラップ"
+      },
+      "frostquench_legs": {
+        "name": "フロストクエンチのレギンス"
+      },
+      "hexthread_helmet": {
+        "name": "ヘクススレッドのフード"
+      },
+      "hexthread_shoulder": {
+        "name": "ヘクススレッドの肩掛け"
+      },
+      "hexthread_chest": {
+        "name": "ヘクススレッドのローブ"
+      },
+      "hexthread_gloves": {
+        "name": "ヘクススレッドのハンドラップ"
+      },
+      "hexthread_legs": {
+        "name": "ヘクススレッドのレギンス"
+      },
+      "gravebrand_helmet": {
+        "name": "グレイブブランドのフード"
+      },
+      "gravebrand_shoulder": {
+        "name": "グレイブブランドの肩掛け"
+      },
+      "gravebrand_chest": {
+        "name": "グレイブブランドのローブ"
+      },
+      "gravebrand_gloves": {
+        "name": "グレイブブランドのハンドラップ"
+      },
+      "gravebrand_legs": {
+        "name": "グレイブブランドのレギンス"
+      },
+      "ruincaller_helmet": {
+        "name": "ルインコーラーのフード"
+      },
+      "ruincaller_shoulder": {
+        "name": "ルインコーラーの肩掛け"
+      },
+      "ruincaller_chest": {
+        "name": "ルインコーラーのローブ"
+      },
+      "ruincaller_gloves": {
+        "name": "ルインコーラーのハンドラップ"
+      },
+      "ruincaller_legs": {
+        "name": "ルインコーラーのレギンス"
+      },
+      "moonscorch_helmet": {
+        "name": "ムーンスコーチの頭巾"
+      },
+      "moonscorch_shoulder": {
+        "name": "ムーンスコーチの肩当て"
+      },
+      "moonscorch_chest": {
+        "name": "ムーンスコーチのチュニック"
+      },
+      "moonscorch_gloves": {
+        "name": "ムーンスコーチのグリップ"
+      },
+      "moonscorch_legs": {
+        "name": "ムーンスコーチのブリーチズ"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "ワイルドファングの頭巾"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "ワイルドファングの肩当て"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "ワイルドファングのチュニック"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "ワイルドファングのグリップ"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "ワイルドファングのブリーチズ"
+      },
+      "cinderbark_helmet": {
+        "name": "シンダーバークの頭巾"
+      },
+      "cinderbark_shoulder": {
+        "name": "シンダーバークの肩当て"
+      },
+      "cinderbark_chest": {
+        "name": "シンダーバークのチュニック"
+      },
+      "cinderbark_gloves": {
+        "name": "シンダーバークのグリップ"
+      },
+      "cinderbark_legs": {
+        "name": "シンダーバークのブリーチズ"
+      },
+      "grovespring_helmet": {
+        "name": "グローヴスプリングの頭巾"
+      },
+      "grovespring_shoulder": {
+        "name": "グローヴスプリングの肩当て"
+      },
+      "grovespring_chest": {
+        "name": "グローヴスプリングのチュニック"
+      },
+      "grovespring_gloves": {
+        "name": "グローヴスプリングのグリップ"
+      },
+      "grovespring_legs": {
+        "name": "グローヴスプリングのブリーチズ"
+      },
+      "sigil_anvil_helmet": {
+        "name": "金床の兜の印章"
+      },
+      "sigil_ember_helmet": {
+        "name": "残り火の兜の印章"
+      },
+      "sigil_tempest_helmet": {
+        "name": "大嵐の兜の印章"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "金床の肩の印章"
+      },
+      "sigil_ember_shoulder": {
+        "name": "残り火の肩の印章"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "大嵐の肩の印章"
+      },
+      "sigil_anvil_chest": {
+        "name": "金床のローブの印章"
+      },
+      "sigil_ember_chest": {
+        "name": "残り火のローブの印章"
+      },
+      "sigil_tempest_chest": {
+        "name": "大嵐のローブの印章"
+      },
+      "sigil_anvil_gloves": {
+        "name": "金床の篭手の印章"
+      },
+      "sigil_ember_gloves": {
+        "name": "残り火の篭手の印章"
+      },
+      "sigil_tempest_gloves": {
+        "name": "大嵐の篭手の印章"
+      },
+      "sigil_anvil_legs": {
+        "name": "金床の脚甲の印章"
+      },
+      "sigil_ember_legs": {
+        "name": "残り火の脚甲の印章"
+      },
+      "sigil_tempest_legs": {
+        "name": "大嵐の脚甲の印章"
+      },
+      "cord_of_the_last_flame": {
+        "name": "最後の炎のコード"
+      },
+      "cindersoaked_slippers": {
+        "name": "燃えかす染みのスリッパ"
+      },
+      "springbinder_sash": {
+        "name": "泉縛りのサッシュ"
+      },
+      "steps_of_quiet_water": {
+        "name": "静水のステップ"
+      },
+      "cinderbark_cinch": {
+        "name": "シンダーバークのシンチ"
+      },
+      "ashenbark_treads": {
+        "name": "灰樹皮のトレッド"
+      },
+      "slagstalker_belt": {
+        "name": "スラグストーカーのベルト"
+      },
+      "ashrunner_boots": {
+        "name": "アッシュランナーのブーツ"
+      },
+      "moonscorch_waistwrap": {
+        "name": "ムーンスコーチの腰帯"
+      },
+      "scorchgrove_striders": {
+        "name": "焦げ杜のストライダー"
+      },
+      "grovetender_belt": {
+        "name": "杜守りのベルト"
+      },
+      "dewfall_moccasins": {
+        "name": "露落ちのモカシン"
+      },
+      "forgewall_girdle": {
+        "name": "フォージウォールのガードル"
+      },
+      "anvilstance_sabatons": {
+        "name": "金床構えのサバトン"
+      },
+      "warforged_waistguard": {
+        "name": "ウォーフォージの腰当て"
+      },
+      "furnace_march_greaves": {
+        "name": "炉進軍のグリーヴ"
+      },
+      "stormkindled_chain": {
+        "name": "ストームキンドルのチェーン"
+      },
+      "thundershock_treads": {
+        "name": "サンダーショックのトレッド"
+      },
+      "tidebinder_links": {
+        "name": "潮縛りのリンク"
+      },
+      "springwarden_sabatons": {
+        "name": "泉守りのサバトン"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "最初の焼入れのペンダント"
+      },
+      "ignivars_ember_choker": {
+        "name": "イグニヴァルの燃えさし首飾り"
+      },
+      "locket_of_the_last_flame": {
+        "name": "最後の炎のロケット"
+      },
+      "heartspring_amulet": {
+        "name": "ハートスプリングのアミュレット"
+      },
+      "seal_of_the_forgewall": {
+        "name": "フォージウォールの印章指輪"
+      },
+      "band_of_marked_strikes": {
+        "name": "刻印打撃のバンド"
+      },
+      "circle_of_cinders": {
+        "name": "燃えかすのサークル"
+      },
+      "loop_of_quiet_springs": {
+        "name": "静かな泉のループ"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "内なる坩堝の防壁"
+      },
+      "ember_wardens_barrier": {
+        "name": "燃えさし番人のバリア"
+      },
+      "orb_of_the_last_spring": {
+        "name": "最後の泉のオーブ"
+      },
+      "cinder_of_the_first_design": {
+        "name": "最初の設計の燃えかす"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

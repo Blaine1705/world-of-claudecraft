@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import {
   ITEM_ART_PENDING,
@@ -302,9 +303,13 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
-      0,
-    );
+    // The ledger holds EXACTLY the commissioned Ignivar raid loot wave
+    // (src/sim/content/ignivar_loot.ts, behind the development-only Crucible
+    // raid) and nothing else: membership equality, so no other artless item can
+    // hide behind the open wave, and A2 above still forces each entry out as
+    // its painting lands. When the Crucible wave is fully painted this pin
+    // returns to the empty set.
+    expect([...ITEM_ART_PENDING].sort()).toEqual([...IGNIVAR_LOOT_ITEM_IDS].sort());
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
