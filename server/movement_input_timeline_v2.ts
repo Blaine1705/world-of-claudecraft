@@ -3,7 +3,7 @@
 import { isStunned } from '../src/sim/combat/cc';
 import { type MoveInputFrame, parseMoveInputFrame } from '../src/sim/move_input';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
-import type { Entity, MoveInput } from '../src/sim/types';
+import { type Entity, emptyMoveInput, type MoveInput } from '../src/sim/types';
 import {
   createMovementOverrideSessionState,
   type MovementOverrideSessionState,
@@ -84,7 +84,10 @@ export function consumeMovementFramesV2(
     const entity = sim.entities.get(session.pid);
     if (!meta || !entity) continue;
     const frame = session.movementTimeline.consumeNext();
-    if (!frame) continue;
+    if (!frame) {
+      Object.assign(meta.moveInput, emptyMoveInput());
+      continue;
+    }
     Object.assign(meta.moveInput, frame.mi);
     if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
       entity.facing = frame.facing;

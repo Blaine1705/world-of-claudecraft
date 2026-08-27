@@ -197,6 +197,40 @@ describe('MovementInputTimeline', () => {
     expect(timeline.starved).toBe(1);
   });
 
+  it('clears held input on null starvation ticks without advancing the ack', () => {
+    const timeline = new MovementInputTimeline();
+    const session = {
+      pid: 1,
+      lastInputAt: 0,
+      ...createMovementInputSessionState(2),
+      movementTimeline: timeline,
+    };
+    const meta = { moveInput: emptyMoveInput() };
+    const entity = { auras: [], dead: false, facing: 0, ghost: false };
+    const sim = {
+      time: 1,
+      meta: () => meta,
+      entities: new Map([[1, entity]]),
+    };
+    timeline.enqueue(frame(0, true));
+    timeline.enqueue({ ...frame(4), mi: { ...emptyMoveInput(), back: true } });
+
+    consumeMovementFramesV2(sim as never, [session]);
+    consumeMovementFramesV2(sim as never, [session]);
+    consumeMovementFramesV2(sim as never, [session]);
+    expect(meta.moveInput.forward).toBe(true);
+    expect(session.lastConsumedCt).toBe(2);
+
+    consumeMovementFramesV2(sim as never, [session]);
+    expect(meta.moveInput).toEqual(emptyMoveInput());
+    expect(session.lastConsumedCt).toBe(2);
+    expect(timeline.resyncs).toBe(1);
+
+    consumeMovementFramesV2(sim as never, [session]);
+    expect(meta.moveInput.back).toBe(true);
+    expect(session.lastConsumedCt).toBe(4);
+  });
+
   it('discards and counts a real frame whose client tick was extrapolated', () => {
     const timeline = new MovementInputTimeline();
     timeline.enqueue(frame(0, true));
