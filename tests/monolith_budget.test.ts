@@ -433,7 +433,7 @@ const MONOLITHS: MonolithRow[] = [
     // pillar-swap gate; then again after the banner picking moved to
     // dungeon_banner_core.ts (paying for the ignivar banner suppression
     // gates and the torch-tuck fix). Exact count, zero slack.
-    // Re-pinned 2715 -> 2467 for the lava-moat wiring: the floor/quad/wall kind
+    // Re-pinned 2715 -> 2463 for the lava-moat wiring: the floor/quad/wall kind
     // pickers moved to dungeon_tile_kind_core.ts (the banner-core pattern).
     // Exact count, zero slack.
     ceiling: 2463,

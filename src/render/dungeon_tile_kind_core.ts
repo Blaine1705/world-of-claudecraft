@@ -1,7 +1,8 @@
 // Pure kit floor/wall picking for the dungeon interior builder: which kit
 // piece a floor tile, a floor quad subdivision, or a wall slot gets for a
 // variant. Extracted from dungeon.ts (monolith ratchet); dungeon.ts is the
-// thin consumer. Deterministic and Three-free so it unit-tests headless.
+// thin consumer. Deterministic and DOM-free so it unit-tests headless (the
+// ignivar weight constants come from the tile kit module, which is not).
 import type { DungeonInteriorVariant } from './dungeon';
 import { pickKind } from './dungeon_banner_core';
 import { IGNIVAR_FLOOR_KIND_WEIGHTS, IGNIVAR_FLOOR_QUAD_KIND } from './ignivar_tile_kit';

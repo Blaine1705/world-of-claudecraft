@@ -107,5 +107,14 @@ describe('same-template social pull', () => {
     socialPullSameTemplate(gridOf(pulled, insideOverride), pulled, target);
 
     expect(insideOverride.aiState).toBe('chase');
+
+    // Negative control: the same 7 yard gap stays OUTSIDE the default radius,
+    // so the pull above proves the mudfin override rather than a raised default.
+    const wolfPulled = createMob(4, MOBS.forest_wolf, 5, { x: 100, y: 0, z: 0 });
+    const wolfSevenYards = createMob(5, MOBS.forest_wolf, 5, { x: 107, y: 0, z: 0 });
+
+    socialPullSameTemplate(gridOf(wolfPulled, wolfSevenYards), wolfPulled, target);
+
+    expect(wolfSevenYards.aiState).toBe('idle');
   });
 });
