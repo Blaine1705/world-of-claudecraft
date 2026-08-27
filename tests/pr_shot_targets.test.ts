@@ -79,16 +79,18 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
-  it('maps an options_view change to the graphics dial AND interface tab targets, in order', () => {
-    // Both targets key on 'ui/options_view'; the graphics-options entry sits
-    // first in the registry so the dial card is the lead capture. An
-    // ordering or selector regression here silently drops or duplicates the
+  it('maps an options_view change to the graphics dial, interface tab, and confirm-vendor-sell targets, in order', () => {
+    // All three targets key on 'ui/options_view'; registry order is the
+    // capture order (graphics dial, then interface tabs, then the
+    // confirm-vendor-sell toggle row, the last one added). An ordering or
+    // selector regression here silently drops or duplicates the
     // options-panel evidence.
     const plan = classifyDiff(['src/ui/options_view.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'graphics-options-shadow-dial',
       'interface-options-tabs',
+      'interface-options-confirm-vendor-sell',
     ]);
     expect(plan.generic).toHaveLength(0);
   });
