@@ -86,7 +86,10 @@ function allowGpuUnderSteamOverlay(deps = {}) {
   // for "did this launch relax the sandbox". It has to be false exactly when nothing happened.
   const appendSwitch = app?.commandLine?.appendSwitch;
   if (typeof appendSwitch !== 'function') {
-    deps.log?.warn?.('[steam] Steam overlay detected but the GPU sandbox could not be relaxed', {
+    // Deliberately does NOT contain OVERLAY_DETECTED_LOG: the docs make that string the
+    // operator's grep for "the guard fired", so a failure line carrying it would match on the
+    // one path where it did not.
+    deps.log?.warn?.('[steam] overlay present but the GPU sandbox could not be relaxed', {
       reason: 'no app.commandLine.appendSwitch',
     });
     return false;

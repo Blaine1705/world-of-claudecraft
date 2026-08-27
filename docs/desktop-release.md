@@ -394,7 +394,6 @@ Linux AppImage caveat: the updater requires the `APPIMAGE` env (set automaticall
 when running a real AppImage); running the raw unpacked binary logs an updater error
 and skips, by design.
 
-
 ## Steam
 
 Build: `npm run electron:build:steam` on each OS runner (signing env still applies on

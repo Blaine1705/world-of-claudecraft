@@ -137,6 +137,23 @@ describe('allowGpuUnderSteamOverlay', () => {
     expect(doc).toContain(OVERLAY_DETECTED_LOG);
   });
 
+  it('keeps the grep token OFF the failure path', () => {
+    // The doc makes this string the operator's "the guard fired" check, so a warn line
+    // containing it would match on the one launch where it did not fire: the same false-success
+    // shape as the return value, moved one layer out.
+    const log = { info: vi.fn(), warn: vi.fn() };
+    allowGpuUnderSteamOverlay({
+      platform: 'linux',
+      env: { LD_PRELOAD: STEAM_PRELOAD },
+      app: null,
+      log,
+    });
+
+    expect(log.warn).toHaveBeenCalled();
+    const warned = String(log.warn.mock.calls[0]?.[0] ?? '');
+    expect(warned).not.toContain(OVERLAY_DETECTED_LOG);
+  });
+
   it('never takes the app down if appending fails', () => {
     const log = { info: vi.fn(), warn: vi.fn() };
     const app = {
@@ -157,14 +174,27 @@ describe('allowGpuUnderSteamOverlay', () => {
     expect(log.warn).toHaveBeenCalled();
   });
 
-  it('survives a missing app object', () => {
-    expect(() =>
-      allowGpuUnderSteamOverlay({
-        platform: 'linux',
-        env: { LD_PRELOAD: STEAM_PRELOAD },
-        app: null,
-      }),
-    ).not.toThrow();
+  it.each([
+    ['a missing app object', null],
+    ['an app with no commandLine', {}],
+    ['a commandLine with no appendSwitch', { commandLine: {} }],
+    ['a non-function appendSwitch', { commandLine: { appendSwitch: 'nope' } }],
+  ])('reports FALSE when nothing was appended (%s)', (_label, app) => {
+    // Returning true here would log the operator's grep token on a launch where the switch
+    // never landed, so the one signal telling them the guard fired would be wrong exactly when
+    // it did not. The previous version of this test asserted only "does not throw", which
+    // passes either way, and that is how the regression stayed unpinned.
+    const log = { info: vi.fn(), warn: vi.fn() };
+    const applied = allowGpuUnderSteamOverlay({
+      platform: 'linux',
+      env: { LD_PRELOAD: STEAM_PRELOAD },
+      app: app as never,
+      log,
+    });
+
+    expect(applied).toBe(false);
+    expect(log.info).not.toHaveBeenCalled();
+    expect(log.warn).toHaveBeenCalled();
   });
 });
 
