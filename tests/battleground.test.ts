@@ -174,7 +174,12 @@ function forceIntoBgWallTrap(sim: Sim, match: BgMatch, pid: number): Entity {
   return e;
 }
 
-function forceReportedBgWallContactShortcut(sim: Sim, match: BgMatch, pid: number): Entity {
+function forceReportedBgWallContactShortcut(
+  sim: Sim,
+  match: BgMatch,
+  pid: number,
+  heldMovement = true,
+): Entity {
   const origin = battlegroundOrigin(match.slot);
   const e = must(sim.entities.get(pid), 'entity');
   e.pos = sim.ctx.groundPos(origin.x - 48.5, origin.z - 133.5);
@@ -189,7 +194,7 @@ function forceReportedBgWallContactShortcut(sim: Sim, match: BgMatch, pid: numbe
   e.inCombat = false;
   e.combatTimer = 999;
   const meta = must(sim.meta(pid), 'player meta');
-  meta.moveInput.forward = true;
+  meta.moveInput.forward = heldMovement;
   sim.ctx.rebucket(e);
   expectClearPlayerPosition(sim, e);
   expect(e.pos.x - origin.x).toBeCloseTo(-48.5, 6);
@@ -1341,6 +1346,35 @@ describe('Thornhollow Fields: the graveyard rite', () => {
         pid,
       }),
     );
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+  });
+
+  it('Unstuck accepts the reported battleground wall-contact rescue after ESC clears movement', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceReportedBgWallContactShortcut(sim, match, pid, false);
+    const meta = must(sim.meta(pid), 'player meta');
+
+    expect(sim.unstuck(pid)).toBe(true);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'started',
+        pid,
+      }),
+    );
+
     const events: SimEvent[] = [];
     for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
 
