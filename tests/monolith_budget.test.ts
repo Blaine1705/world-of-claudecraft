@@ -133,7 +133,9 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
-    ceiling: 18488,
+    // Lowered after extracting the managed-window position clamp into
+    // src/ui/window_position_core.ts. Exact count, zero slack.
+    ceiling: 18484,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
