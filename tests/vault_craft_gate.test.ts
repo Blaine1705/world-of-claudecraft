@@ -33,6 +33,9 @@ import {
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   instanceOrigin,
+  RIFT_BAND_X_MIN,
+  RIFT_REGION_HALF_X,
+  RIFT_X_MIN,
 } from '../src/sim/data';
 import { enterDungeon, instanceInfoAt } from '../src/sim/instances/dungeons';
 import { craftVaultStockFor } from '../src/sim/materials_vault';
@@ -378,7 +381,23 @@ describe('vaultDrawBlocked: the footprint arms decide on their own', () => {
   // floor origin is riftInstanceOrigin(slot, floorIndex), whose x is the
   // constant RIFT_X_MIN regardless of slot, so no rift footprint can be moved
   // west of the threshold without editing data.ts. Its coverage stays the
-  // composite per-context case above, plus the source pin below.
+  // composite per-context case above, plus the source pin below, plus the
+  // alignment pins here, which give the fast path's static rift band term the
+  // same data-derived discipline the dungeon half gets from claimWestReach.
+  it('the fast-path rift band term stays aligned with the rift claim geometry', () => {
+    // The band's west edge must contain the westmost reach a rift floor's
+    // detection region can have (RIFT_X_MIN - RIFT_REGION_HALF_X): a region
+    // half-width grown past the band margin would let a rift claim answer
+    // where isRiftPos reads false, and the arm's band guard would skip it.
+    expect(RIFT_BAND_X_MIN).toBeLessThanOrEqual(RIFT_X_MIN - RIFT_REGION_HALF_X);
+    // And the whole reachable rift geometry sits east of the threshold, the
+    // premise the fast path's static term (RIFT_BAND_X_MIN >
+    // DUNGEON_X_THRESHOLD) compiles in: derived here from the same symbols
+    // the region read uses, so moving the band or growing the region reddens
+    // this pin instead of silently widening the fast path.
+    expect(RIFT_X_MIN - RIFT_REGION_HALF_X).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+    expect(RIFT_BAND_X_MIN).toBeGreaterThan(DUNGEON_X_THRESHOLD);
+  });
 });
 
 describe('vaultDrawBlocked keeps all six arms', () => {

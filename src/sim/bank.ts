@@ -268,9 +268,17 @@ export function bankPools(bank: BankState): PoolCapacity {
 }
 
 export type MoveRefusal = 'invalid' | 'no_fit';
+/** Why a 'no_fit' refused: 'space' is genuine pool exhaustion for the request,
+ *  'instanced_units' is unit granularity, where SOME units would fit but an
+ *  instanced slot moves as one indivisible payload (a non-mergeable payload
+ *  absorbs one unit per fresh slot, so free slots can exist while the whole
+ *  stack still cannot land). The refusal LINE reads this so it never blames
+ *  pool allocation for a granularity refusal. */
+export type NoFitCause = 'space' | 'instanced_units';
 export interface MoveResult {
   moved: number;
   refusal?: MoveRefusal;
+  noFitCause?: NoFitCause;
 }
 
 /** Move one source slot's items into a destination container, ALL-OR-NOTHING: the
@@ -323,11 +331,18 @@ export function moveBetweenContainers(
   // about which stacks are mergeable, which is a no_fit-vs-overflow divergence
   // rather than a laundering one.
   if (slot.instance) {
-    if (
-      countFit(dest, destPools, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId) <
-      slot.count
-    ) {
-      return { moved: 0, refusal: 'no_fit' };
+    const fit = countFit(
+      dest,
+      destPools,
+      slot.itemId,
+      slot.count,
+      slot.instance,
+      slot.craftedRecipeId,
+    );
+    if (fit < slot.count) {
+      // fit > 0 means room exists for SOME units and only the payload's
+      // indivisibility refused; fit === 0 is genuine exhaustion.
+      return { moved: 0, refusal: 'no_fit', noFitCause: fit > 0 ? 'instanced_units' : 'space' };
     }
     addStacked(dest, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
     source.splice(sourceIndex, 1);
@@ -342,7 +357,9 @@ export function moveBetweenContainers(
   // laundering a crafted item's disenchant-gate provenance into a plain drop, the
   // same class of bug the trade/market fix closed.
   if (countFit(dest, destPools, slot.itemId, want, undefined, slot.craftedRecipeId) < want) {
-    return { moved: 0, refusal: 'no_fit' };
+    // A fungible shortfall is always pool space: the request is divisible, so
+    // any partial room simply is not enough room for the amount asked.
+    return { moved: 0, refusal: 'no_fit', noFitCause: 'space' };
   }
   addStacked(dest, slot.itemId, want, undefined, slot.craftedRecipeId);
   if (want >= slot.count) source.splice(sourceIndex, 1);
@@ -422,8 +439,16 @@ export function bankDeposit(
     // when the only room left is materials-only satchel capacity a
     // non-material item may not take. Same occupancy read as the fit gate
     // (bag_pools.ts poolOccupancyOf under the shared material taxonomy).
+    // The cause is DISCRIMINATED by the move itself (MoveResult.noFitCause):
+    // an 'instanced_units' refusal means room exists but the indivisible
+    // payload cannot land, so blaming pool allocation ("Only materials fit")
+    // would misread granularity as a materials-space story.
     const occupancy = poolOccupancyOf(meta.bank.inventory, pools, isMaterialItemId);
-    if (!isMaterialItemId(slot.itemId) && pools.materials - occupancy.materialsUsed > 0) {
+    if (
+      result.noFitCause !== 'instanced_units' &&
+      !isMaterialItemId(slot.itemId) &&
+      pools.materials - occupancy.materialsUsed > 0
+    ) {
       ctx.error(meta.entityId, 'Only materials fit in the space left in your bank.');
     } else {
       ctx.error(meta.entityId, 'Your bank is full.');

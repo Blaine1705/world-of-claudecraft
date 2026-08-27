@@ -196,6 +196,11 @@ those rather than a roster here. The ones whose CONTRACT you cannot infer from t
   at module evaluation from the gathering/salvage table leaves (importable by sim files,
   so its eval order is pinned by `tests/material_ids_eval_order.test.ts`, data-first
   arms included); `vaultMaterialIds()` delegates to the registry.
+- `professions/gathering_materials.ts` + `professions/salvage_materials.ts`: the two PURE
+  table leaves the eager `material_ids.ts` registry evaluates against
+  (`NODE_MATERIAL_TABLE`, `SALVAGE_MATERIAL_BY_QUALITY`; type-only imports by contract,
+  so classification reads them without pulling the gathering/salvage command bodies into
+  its module graph), covered by the registry's eval-order pin as its data-first arms.
 - `daily_rewards_stub.ts`: the offline daily-rewards readout constant, and the
   ONE file on the $WOC token-firewall allowlist (`tests/architecture.test.ts`
   pins its read-only-projection shape: one exported function, no control flow,
@@ -237,6 +242,15 @@ remove the declaration AND its binding in the same change, then re-run the parit
   tick-phase order, an entity-iteration order, or an early-bail that can draw rng shifts
   the global draw order and forks the world. Don't reorder `tick()` or a loop casually;
   the parity gate's draw-order log catches it.
+- The vault consumption admission (`SimConfig.vaultConsumptionAdmission`) is a HOST
+  INPUT the determinism contract is parameterized over, not part of the seeded world: a
+  server-side admission refusal early-returns in `resolveCraftForRecipe` BEFORE that
+  path's two output-side rng draws, so a realm whose admission refused draws a different
+  stream tail than an offline replay of the same inputs. Offline and headless hosts wire
+  the inert admission (never refuses), so no live parity gate sees the divergence; treat
+  "same seed, same world" as holding PER admission behavior, and if that ever stops
+  being acceptable, move the refusal after the draws rather than teaching replays about
+  the journal.
 
 ## sim.ts coordinator map (what `tick()` does, in order)
 `tick()` reads as a linear registry of system calls routed through `this.ctx`, in phase

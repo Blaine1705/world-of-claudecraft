@@ -284,6 +284,11 @@ export function delveMemberSpawnPos(ctx: SimContext, entry: Vec3, slotIndex: num
 }
 
 export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null {
+  // The vault craft gate's membership arm calls this at 4 Hz per connected
+  // session. With no live runs there is nothing either scan below could find
+  // (both are keyed into ctx.delveRuns), so return before minting the
+  // template-literal party key or touching the entity at all.
+  if (ctx.delveRuns.length === 0) return null;
   const e = ctx.entities.get(pid);
   if (!e) return null;
   const key = ctx.instanceKeyFor(pid);

@@ -222,7 +222,10 @@ function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
   if (instanceContains(origin, pos)) return true;
   if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
-  const bossSpawn = DUNGEONS.nythraxis_boss_arena.spawns.find(
+  // Looked up through the SAME constant the guard above compares, never a
+  // second hard-coded id: a rename via the constant would otherwise leave
+  // this literal lookup throwing on undefined.
+  const bossSpawn = DUNGEONS[WIDE_CLAIM_DUNGEON_ID].spawns.find(
     (spawn) => spawn.mobId === NYTHRAXIS_BOSS_ID,
   );
   // The raid room is wider than the generic instance footprint, so its claim

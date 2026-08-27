@@ -647,6 +647,10 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // Room exists for ONE unit (19 -> 20), so the refusal is the payload's
+      // indivisibility, never pool exhaustion; the refusal line must not
+      // blame pool allocation for it.
+      noFitCause: 'instanced_units',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
@@ -664,6 +668,8 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // Zero room anywhere (no byte-equal stack, no free slot): genuine space.
+      noFitCause: 'space',
     });
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
       moved: 1,
@@ -679,6 +685,8 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // A fungible shortfall is always pool space (the request is divisible).
+      noFitCause: 'space',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
@@ -692,6 +700,8 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      // A fungible shortfall is always pool space (the request is divisible).
+      noFitCause: 'space',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
@@ -856,6 +866,7 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
+      noFitCause: 'space',
     });
     expect(dst).toHaveLength(1);
     expect(src).toHaveLength(1); // nothing moved, nothing lost
@@ -1928,7 +1939,7 @@ describe('the instanced move keeps the slot-level crafted marker (round 5)', () 
     ];
     // capacity 1: full
     const r = moveBetweenContainers(source, 0, undefined, dest, { general: 1, materials: 0 });
-    expect(r).toEqual({ moved: 0, refusal: 'no_fit' });
+    expect(r).toEqual({ moved: 0, refusal: 'no_fit', noFitCause: 'space' });
     expect(source).toHaveLength(1); // all-or-nothing: nothing moved
   });
 });

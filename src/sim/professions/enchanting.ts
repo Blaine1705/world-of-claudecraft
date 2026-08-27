@@ -873,10 +873,18 @@ function applyEnchantReagentDraw(
   // bags-only enchant, so the pre-vault event stream is byte-identical.
   if (drawn.length > 0 && meta) {
     emitVaultCraftConsume(ctx, meta, drawn);
-    // The vault counts toward quest presence (quest_item_presence.ts), so a
-    // vault draw recomputes exactly as the carried removeItem calls above do
-    // (removeItem fires the hook itself; consumePlayerVaultStock does not).
-    // Latent today: no shipped quest names a material (crafting.ts's twin).
+    // What this fire is FOR on a vault draw: the wireRev bump, the dirty flag
+    // that makes hosts re-send the derived state whose inputs just moved. Its
+    // collect-objective recompute reads ctx.countItem (CARRIED inventory
+    // only), so the vault units themselves change no objective; and quest
+    // presence (quest_item_presence.ts playerHoldsQuestItem, which does read
+    // meta.vault) is a live predicate needing no recompute. DELIBERATE
+    // asymmetry with crafting.ts's fire-once-at-the-end shape: the carried
+    // takes above go through ctx.removeItem, which fires the hook itself as
+    // part of its contract for every caller, and forking that contract for
+    // this one call site is not worth the handful of redundant idempotent
+    // fires a per-enchant-command reagent list can produce (this path runs
+    // per player command, never per tick).
     ctx.onInventoryChangedForQuests(meta);
   }
   return drawn;

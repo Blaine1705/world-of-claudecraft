@@ -898,11 +898,14 @@ export function resolveCraftForRecipe(
   // (which fires this itself): fire it once for the whole reagent consumption,
   // the same one-call-at-the-end contract items.ts's own hand-rolled removal
   // walks (removePreferFungible, removeVendorSellUnits) follow. The gate
-  // covers BOTH pools: quest presence counts the vault too (quests/
-  // quest_item_presence.ts playerHoldsQuestItem reads meta.vault), so a
-  // vault-only draw reduces a store that presence reads and must recompute
-  // just like a carried draw. Only a craft that drew from neither pool skips
-  // the fire.
+  // covers BOTH pools, and be precise about WHY: the hook's collect-objective
+  // recompute reads ctx.countItem, which walks CARRIED inventory only, so a
+  // vault-only draw changes no collect objective; and quest PRESENCE
+  // (quests/quest_item_presence.ts playerHoldsQuestItem, which does read
+  // meta.vault) is a live predicate that needs no recompute at all. What a
+  // vault-only draw DOES need from this call is its wireRev bump: the dirty
+  // flag that makes hosts re-send the derived state whose inputs just moved.
+  // Only a craft that drew from neither pool skips the fire.
   if (meta && plans.some((plan) => plan.carried.length > 0 || plan.vault.length > 0)) {
     ctx.onInventoryChangedForQuests?.(meta);
   }

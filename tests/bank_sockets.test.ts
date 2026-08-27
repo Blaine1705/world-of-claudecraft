@@ -824,6 +824,30 @@ describe('bankUnsocketBag', () => {
 
 // ---------------------------------------------------------------------------
 describe('two-pool deposits through the real gate', () => {
+  it('a granularity refusal says "full", never the materials line (noFitCause discrimination)', () => {
+    // An instanced multi-unit stack whose byte-equal bank stack has room for
+    // ONE unit: some units would fit, but the indivisible payload cannot
+    // land whole (moveBetweenContainers noFitCause 'instanced_units').
+    // Materials headroom is ALSO free, which is exactly the shape where the
+    // pool-honest line used to misread granularity as a materials-space
+    // story and tell a non-material depositor "Only materials fit".
+    const sim = simWithSockets(1);
+    const m = meta(sim);
+    carry(sim, SATCHEL_8);
+    sim.bankSocketBag(SATCHEL_8);
+    const stack = stackSizeOf(ITEMS[BREAD]);
+    // General pool: 23 full plain stacks plus one byte-equal instanced stack
+    // one unit under cap = 24 slots, general full, one unit of merge room.
+    for (let i = 0; i < 23; i++) m.bank.inventory.push(fullStack(BREAD));
+    m.bank.inventory.push({ itemId: BREAD, count: stack - 1, instance: { signer: 'Ana' } });
+    const idx = carry(sim, BREAD, 1);
+    m.inventory[idx] = { itemId: BREAD, count: 3, instance: { signer: 'Ana' } };
+    sim.drainEvents();
+    sim.bankDeposit(idx);
+    expect(hasErr(sim.drainEvents(), 'Your bank is full.')).toBe(true);
+    expect(m.bank.inventory.length).toBe(24);
+  });
+
   it('a non-material is refused while only materials headroom is free; a material lands', () => {
     const sim = simWithSockets(1);
     const m = meta(sim);
