@@ -72,6 +72,11 @@ const MONOLITHS: MonolithRow[] = [
     // window carries only state, handler arms and passthroughs. Exact
     // count, zero headroom; the sell-tab combobox block is the next
     // standing extraction candidate.
+    // Held at 2487 for the Solana wallet card (the Claudium card above the
+    // Browse filters): the card's markup landed in the chrome builder, and
+    // the window's gated wallet fan-out arm was paid for by moving the quote
+    // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
+    // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
     ceiling: 2487,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
@@ -221,10 +226,17 @@ const MONOLITHS: MonolithRow[] = [
     // tree, never reconciled by arithmetic. Exact count, zero slack.
     // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
     // base (18488) this file is +3: the bank-storage feature's own store and
-    // vault chrome wiring, a maintainer-authored raise taken deliberately (the
-    // earlier notes about merged-tree arithmetic described branch history that
-    // the squash rebased away). The review round itself paid its Escape-rung
-    // addition by merging duplicate imports. Exact count, zero slack.
+    // vault chrome wiring (the earlier notes about merged-tree arithmetic
+    // described branch history that the squash rebased away). The review round
+    // itself paid its Escape-rung addition by merging duplicate imports. The
+    // raise is this PR's REQUEST, not a settled ruling: merging is what
+    // ratifies it. Exact count, zero slack.
+    // Re-pinned at the second release/v0.41.0 sync (release tip b02da096dd, the
+    // Exchange balance + client-perf batch). The release arm added the wallet
+    // card's onWalletChanged fan-out and the refreshWocBalance(force) hook and
+    // paid both lines by trimming the Exchange-window comment, so its arm and
+    // the merged tree both net zero against this row. Measured on the merged
+    // tree, never reconciled by arithmetic. Exact count, zero slack.
     ceiling: 18491,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -384,7 +396,7 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    ceiling: 11564,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -469,10 +481,11 @@ const MONOLITHS: MonolithRow[] = [
     // tree, never reconciled by arithmetic. Exact count, zero slack.
     // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
     // base (5855) this file is +66: the ClientWorld half of the new bank/vault
-    // IWorld members, thin wiring by design, a maintainer-authored raise (the
-    // earlier merged-tree notes described rebased-away history). The review
-    // round then LOWERED it from 5939 by folding the four self-key decode
-    // blocks into the bank_snapshot_wire sibling. Exact count, zero slack.
+    // IWorld members, thin wiring by design (the earlier merged-tree notes
+    // described rebased-away history). The review round then LOWERED it from
+    // 5939 by folding the four self-key decode blocks into the
+    // bank_snapshot_wire sibling. The raise is this PR's REQUEST, not a
+    // settled ruling: merging is what ratifies it. Exact count, zero slack.
     ceiling: 5921,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
