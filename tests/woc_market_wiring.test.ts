@@ -297,6 +297,9 @@ describe('woc_market_wiring: main.ts stays a firewall', () => {
     const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
     expect(main.match(/attachWocMarketExchange\(/g)?.length).toBe(1);
     expect(main).toContain("from './game/woc_market_wiring'");
+    // The attach is a promise now: the call must keep its catch so a wiring
+    // failure logs instead of dying as a silent unhandled rejection.
+    expect(main).toMatch(/attachWocMarketExchange\(\{[\s\S]*?\}\)\.catch\(/);
     // The pieces the module now owns must not creep back into the coordinator:
     // the client construction, the direct hook attach, and the shell gate.
     expect(main).not.toContain('WocMarketClient');

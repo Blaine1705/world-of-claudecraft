@@ -351,6 +351,20 @@ describe('resolveDesktopConfig', () => {
     });
   });
 
+  it('an unstamped PACKAGED build collapses to the website channel with the Exchange off', () => {
+    // The headline divergence of the two decisions on one config object: the
+    // channel collapse keeps the safe updater feed, the Exchange still denies.
+    const config = resolveDesktopConfig({ packagedMetadata: null, isPackaged: true });
+    expect(config).toEqual({
+      distribution: 'website',
+      updaterEnabled: true,
+      wocExchangeEnabled: false,
+      crashSubmitUrl: '',
+      updateChannel: 'latest',
+      ...defaultOrigins,
+    });
+  });
+
   it('keeps a bare dev checkout on website with the updater off and the Exchange off', () => {
     const config = resolveDesktopConfig({ isPackaged: false });
     expect(config).toEqual({
