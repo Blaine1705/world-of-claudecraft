@@ -5818,6 +5818,36 @@ export const TARGETS = [
     },
   },
   {
+    key: 'interface-options-confirm-vendor-sell',
+    label: 'Interface options panel: new "Confirm Before Selling" toggle',
+    when: ['ui/options_view', 'game/settings'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        // Clear any zone-greeting note an earlier target's teleport left up;
+        // incidental to this shot and would otherwise sit on top of it.
+        document.getElementById('tutorial-greeting')?.remove();
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Interface is the fourth button on the main options menu (offline).
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[3]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        document
+          .querySelector('[data-setting-key="confirmVendorSell"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     // The Key Bindings panel with the per-slot action-bar rows replaced by a
     // single "Edit action bar keys" entry (issue #1238).
     key: 'actionbar-keybind-menu-entry',
