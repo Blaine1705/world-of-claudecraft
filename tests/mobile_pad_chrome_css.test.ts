@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 // Mobile-controller chrome exclusivity: once a connected pad also takes the
 // cross-hotbar band, .xhb-mode stands the touch movement/camera/action-ring
 // chrome down and leaves the XHB as the one hotbar. These assertions pin both
-// halves: the shared main.ts syncPadChrome wiring that keeps .xhb-mode
+// halves: the shared main.ts syncXhbPadMode wiring that keeps .xhb-mode
 // truthful, and the CSS rule that actually hides the touch gameplay chrome.
 
 const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').replace(
@@ -20,20 +20,20 @@ function ruleBody(selector: string): string {
   return hudMobileCss.match(new RegExp(`${selector}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
 }
 
-describe('main.ts wires syncPadChrome to every pad connection-state change', () => {
+describe('main.ts wires syncXhbPadMode to every pad connection-state change', () => {
   it('keeps the shared pad chrome callback scoped to the cross-hotbar mode sync', () => {
-    const block = mainTs.match(/const syncPadChrome = \(\) => \{([\s\S]*?)\n\s*\};/)?.[1] ?? '';
-    expect(block, 'syncPadChrome callback body not found').toBeTruthy();
-    expect(block).toContain('crossHotbar.syncPadMode(gamepad)');
-    expect(block).not.toMatch(/applyPadConnectedClass|pad-connected/);
+    const block = mainTs.match(/const syncXhbPadMode = \(\) => ([^;]+);/)?.[1] ?? '';
+    expect(block, 'syncXhbPadMode callback body not found').toBeTruthy();
+    expect(block.trim()).toBe('crossHotbar.syncPadMode(gamepad)');
+    expect(mainTs).not.toMatch(/applyPadConnectedClass|pad-connected/);
   });
 
   it('calls it from GamepadManager.onConnectionChange', () => {
-    expect(mainTs).toContain('onConnectionChange: syncPadChrome,');
+    expect(mainTs).toMatch(/onConnectionChange:\s*syncXhbPadMode,/);
   });
 
   it('calls it from the gamepadEnabled setting applier too (start/stop is synchronous, no event fires)', () => {
-    expect(mainTs).toContain('createGamepadSettingApplier(gamepad, settings, syncPadChrome)');
+    expect(mainTs).toMatch(/createGamepadSettingApplier\(gamepad, settings, syncXhbPadMode\)/);
   });
 });
 
@@ -50,9 +50,15 @@ describe('body.mobile-touch.xhb-mode stands down the touch gameplay-input chrome
     expect(body.trim()).toBe('display: none;');
   });
 
-  it('does NOT touch the menu-access chrome (Quick Actions seat / mobile-combat-controls)', () => {
-    expect(hudMobileCss).not.toMatch(/\.xhb-mode[^{]*#mobile-combat-controls/);
-    expect(hudMobileCss).not.toMatch(/\.xhb-mode[^{]*#mobile-menu-anchor/);
+  it('may reposition the menu-access chrome but never hides it', () => {
+    for (const selector of [
+      'body\\.mobile-touch\\.xhb-mode:not\\(\\.mobile-left-handed\\) #mobile-combat-controls',
+      'body\\.mobile-touch\\.xhb-mode\\.mobile-left-handed #mobile-combat-controls',
+    ]) {
+      const body = ruleBody(selector);
+      if (body) expect(body).not.toMatch(/display:\s*none/);
+    }
+    expect(hudMobileCss).not.toMatch(/\.xhb-mode #mobile-menu-anchor\s*\{\s*\n?\s*display:\s*none/);
   });
 
   it('is no longer keyed off a separate pad-connected class', () => {
