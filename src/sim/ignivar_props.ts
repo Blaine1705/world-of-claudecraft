@@ -204,7 +204,7 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     // beside the assembly forge at (0, 22) under the hook chains. The one
     // deliberate floor placement inside the fighting circle; the clearance
     // contracts carve out the forge-anchor radius for exactly this.
-    at('anvil', -1.8, 25.9, 180 * DEG, 8),
+    at('anvil', 5.2, 20.9, 225 * DEG, 8),
     // East wall: furnace bank flanking the steam pipe stack.
     at('steam_pipes', 39.25, -2.5, 270 * DEG, 15),
     at('lava_furnace', 37.5, -10.5, 270 * DEG, 15),
