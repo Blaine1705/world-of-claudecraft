@@ -731,8 +731,13 @@ BEGIN
 END;
 $storage_purchase_trigger_guard$;
 
--- SET LOCAL lasts until COMMIT, not statement end: restore the session default
--- so the rest of the boot transaction runs on the ordinary search_path.
+-- SET LOCAL lasts until COMMIT, not statement end. TO DEFAULT does NOT restore
+-- the prior in-transaction value: it resets to the SESSION default (the
+-- role/database-configured search_path). That is correct here only because of
+-- a precondition this fragment relies on: the boot client never sets a
+-- transaction-scoped search_path before running it, so the session default IS
+-- the prior value. A caller that had its own SET LOCAL search_path in flight
+-- would lose it at this line.
 SET LOCAL search_path TO DEFAULT;
 `.replaceAll('"__woc_storage_purchase_schema__"', schema);
 }

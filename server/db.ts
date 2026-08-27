@@ -27,11 +27,13 @@ import {
 import type { BankBonusFacts } from './bank_entitlements';
 import {
   BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
+  BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL,
   type BankLedgerBatchWriteResult,
 } from './bank_ledger_batch_db';
 import {
   BANK_LEDGER_GROWTH_BUDGET_SCHEMA,
   BankLedgerGrowthLimitExceeded,
+  bankLedgerGrowthBudgetReadbackSql,
   bankLedgerGrowthLimitFromError,
   observeBankLedgerGrowthBudget,
 } from './bank_ledger_growth_budget';
@@ -1281,6 +1283,10 @@ export async function ensureSchema(): Promise<void> {
   // import would invalidate every one of those mocks.
   const { Client } = await import('pg');
   const client = new Client({ connectionString: DATABASE_URL });
+  // The schema fragments report through RAISE NOTICE (the storage-purchase
+  // refused-row sweep names what it removed); node-postgres discards notices
+  // that no listener consumes, so forward them to the boot log.
+  client.on('notice', (notice) => console.warn(`[schema] ${notice.message}`));
   try {
     // Inside the try so the finally's end() always runs, even on a connect
     // failure (end() on a never-connected client is a harmless no-op).
@@ -1408,15 +1414,22 @@ export async function ensureSchema(): Promise<void> {
     // an exact row count; keep it the final fragment so nothing else waits.
     await client.query(BANK_LEDGER_GROWTH_BUDGET_SCHEMA);
     // Readback issued separately before COMMIT (a multi-statement query returns
-    // an ARRAY of results, so the fragment's trailing SELECT is unreadable) and
-    // schema-qualified: boot always applies the fragment's default 'public'.
-    const bankLedgerGrowthBudget = await client.query(
-      'SELECT committed_rows, hard_limit_rows FROM public.bank_ledger_growth_budget WHERE singleton = TRUE',
-    );
-    observeBankLedgerGrowthBudget(
+    // an ARRAY of results, so the fragment's trailing SELECT is unreadable).
+    // The SQL is exported beside the schema builder, schema-parameterized the
+    // same way, so the two cannot drift; boot always applies the fragment's
+    // default 'public'.
+    const bankLedgerGrowthBudget = await client.query(bankLedgerGrowthBudgetReadbackSql());
+    const growthGaugeSeeded = observeBankLedgerGrowthBudget(
       bankLedgerGrowthBudget.rows[0]?.committed_rows,
       bankLedgerGrowthBudget.rows[0]?.hard_limit_rows,
     );
+    if (!growthGaugeSeeded) {
+      // The monitor refresh backstops the gauge within a minute, but a missing
+      // or malformed singleton right after the fragment ran deserves a name.
+      console.warn(
+        '[schema] bank ledger growth budget readback did not seed the gauge (missing or malformed singleton row)',
+      );
+    }
     await client.query('COMMIT');
     // Open the market write gate only AFTER a successful COMMIT (also on the
     // no-op path where the marker already existed): no market write lands
@@ -1487,6 +1500,12 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
         await client.query(migration.retireSql);
       }
     }
+    // The out-of-boot half of the receipts key-shape converge: ensureSchema
+    // re-adds a drifted constraint as NOT VALID so boot never scans the
+    // keep-forever table; this VALIDATE (SHARE UPDATE EXCLUSIVE, inserts keep
+    // flowing) proves the existing rows here instead, under the same
+    // loud-but-non-fatal, retried-next-boot contract as the index builds.
+    await client.query(BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL);
   } finally {
     if (locked) {
       await client

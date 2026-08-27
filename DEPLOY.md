@@ -832,10 +832,19 @@ For off-box safety, sync the directory to S3 occasionally:
   default is 10,000,000 rows for the keep-forever anti-dupe ledger. First deployment
   seeds an exact `COUNT(*)` while inserts are locked; PostgreSQL then accounts every
   writer, including old binaries and raw SQL, in the inserting transaction and refuses
-  the COMMIT that would cross the ceiling. The first install of this release is
-  instant: `bank_ledger` ships in the same release, so the seed counts an empty
-  table. Re-seeding after deleting the singleton on a grown ledger blocks ledger
-  inserts for the duration of a full count and is a maintenance-window operation.
+  the COMMIT that would cross the ceiling. `bank_ledger` PREDATES this release (it has
+  been accumulating since 2026-07-06), so the first install of this release seeds over
+  the real production history, never an empty table. The seeding boot warms the table
+  with an unlocked count first, then repeats the exact count under the insert-blocking
+  lock, so the locked window is the WARM scan, not a cold one. Measured on a synthetic
+  ledger at the 10,000,000-row ceiling (roughly 1 GB of heap, dev hardware, PostgreSQL
+  16): the warm parallel count runs in roughly 0.1 to 0.25 seconds; budget a few
+  seconds on the production box, dominated by reading the table once from disk for the
+  warm pass. Deploy the seeding boot with EVERY realm stopped (the standard
+  stop-then-cutover below): a realm left running during the seed stalls its in-flight
+  ledger inserts on the table lock for the locked count's duration, and character
+  saves then die at their 2s `lock_timeout`. Re-seeding after deleting the singleton
+  on a grown ledger pays the same shape and is a maintenance-window operation.
   Every process sharing `DATABASE_URL` must use
   the same value or boot fails. A first bootstrap that is already over the configured
   value deliberately boots read-capable but refuses every later ledger insert; watch

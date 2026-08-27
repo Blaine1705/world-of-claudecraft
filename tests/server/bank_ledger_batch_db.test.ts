@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
+  BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL,
   type BankLedgerBatchOwner,
   bankLedgerCommandBatchPayloadSha256,
   writeBankLedgerCommandBatches,
@@ -181,13 +182,34 @@ describe('bank ledger batch receipt DDL', () => {
     expect(folded).toContain(
       'ALTER TABLE bank_ledger_batch_receipts DROP CONSTRAINT bank_ledger_batch_receipts_key_shape;',
     );
+    // The re-install is NOT VALID: enforcement of new writes starts at once,
+    // but boot never pays the full-table validation scan of the keep-forever
+    // table (a constant edit or a pg_get_constraintdef rendering change would
+    // otherwise re-fire an unbounded ACCESS EXCLUSIVE scan at boot).
     expect(folded).toContain(
       'ALTER TABLE bank_ledger_batch_receipts ADD CONSTRAINT bank_ledger_batch_receipts_key_shape CHECK ( ' +
-        "char_length(batch_key) BETWEEN 1 AND 200 AND batch_key ~ '^[A-Za-z0-9_.:-]+$' );",
+        "char_length(batch_key) BETWEEN 1 AND 200 AND batch_key ~ '^[A-Za-z0-9_.:-]+$' ) NOT VALID;",
     );
+    // The probe must match on the DEFINITION alone: keying it on convalidated
+    // would re-fire the drop/add every boot for as long as the constraint sits
+    // in its NOT VALID window.
+    expect(folded).not.toContain('convalidated');
     // Both the inline CREATE TABLE constraint and the converge re-install must
     // carry the same bound: two occurrences of the full BETWEEN clause.
     expect(folded.split('char_length(batch_key) BETWEEN 1 AND 200').length - 1).toBe(2);
+  });
+
+  it('validates a NOT VALID key shape out of boot, and only then', () => {
+    const folded = BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL.replace(/\s+/g, ' ');
+    // Gated on an existing unvalidated constraint, so the steady-state
+    // post-listen pass reads only the catalog.
+    expect(folded).toContain("conname = 'bank_ledger_batch_receipts_key_shape'");
+    expect(folded).toContain('AND NOT convalidated');
+    expect(folded).toContain(
+      'ALTER TABLE bank_ledger_batch_receipts VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape;',
+    );
+    // VALIDATE must never appear in the boot-transaction fragment.
+    expect(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA).not.toContain('VALIDATE CONSTRAINT');
   });
 });
 

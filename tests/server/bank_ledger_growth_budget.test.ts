@@ -30,7 +30,14 @@ describe('bank ledger durable growth budget', () => {
 
   it('installs an exact accumulator and deferred commit ceiling under the bootstrap lock', () => {
     const folded = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/\s+/g, ' ');
+    // bank_ledger predates this budget in production, so the first install
+    // seeds over real history. The unlocked warm count runs BEFORE the
+    // insert-blocking lock so the exact locked count re-reads warm cache and
+    // the blocked window shrinks to the warm-scan time.
+    const warmCount = folded.indexOf('PERFORM pg_catalog.count(*) FROM "public".bank_ledger');
     const lock = folded.indexOf('LOCK TABLE "public".bank_ledger IN SHARE ROW EXCLUSIVE MODE');
+    expect(warmCount).toBeGreaterThanOrEqual(0);
+    expect(warmCount).toBeLessThan(lock);
     const createCommitTrigger = folded.indexOf(
       'CREATE CONSTRAINT TRIGGER bank_ledger_growth_budget_commit',
     );
@@ -115,31 +122,51 @@ describe('bank ledger durable growth budget', () => {
     expect(capacityRaise).toBeGreaterThan(driftArm);
   });
 
-  it('tunes the pending queue table for its dead-tuple churn', () => {
+  it('tunes both budget tables for their dead-tuple churn', () => {
     const folded = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/\s+/g, ' ');
 
     // One INSERT plus one DELETE per ledger transaction against zero committed
     // rows is the queue-table autovacuum shape: a scale-factor trigger against
-    // zero live rows barely ever fires, so the table pins a fixed dead-tuple
-    // threshold and fillfactor headroom for the ON CONFLICT accumulation.
-    const params =
-      '(autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100, fillfactor = 70)';
-    expect(folded).toContain(`) WITH ${params}`);
+    // zero live rows barely ever fires, so the pending table pins a fixed
+    // dead-tuple threshold. No fillfactor: its rows die inside their own
+    // transaction, so update headroom buys nothing.
+    const pendingParams = '(autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100)';
+    expect(folded).toContain(
+      `CREATE TABLE IF NOT EXISTS "public".bank_ledger_growth_pending ` +
+        `( transaction_id xid8 PRIMARY KEY, inserted_rows BIGINT NOT NULL ` +
+        `CHECK (inserted_rows > 0) ) WITH ${pendingParams}`,
+    );
+    // The singleton takes one UPDATE per ledger transaction forever against
+    // one live row, so IT is the table that needs the fixed-threshold vacuum
+    // backstop (HOT pruning in its nearly-empty page absorbs the rest).
+    const budgetParams =
+      '(autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000)';
+    expect(folded).toContain(`updated_at TIMESTAMPTZ NOT NULL DEFAULT now() ) WITH ${budgetParams}`);
     // The converge arm reaches tables created before the parameters existed,
     // gated behind a reloptions probe: a value-identical ALTER still takes
     // SHARE UPDATE EXCLUSIVE to COMMIT and writes pg_class, so steady-state
-    // boots must skip it. The ALTER stays for the absent/different arm.
-    expect(folded).toContain(`ALTER TABLE "public".bank_ledger_growth_pending SET ${params}`);
-    const probe = folded.indexOf('FROM pg_catalog.pg_class');
-    const gatedAlter = folded.indexOf('ALTER TABLE "public".bank_ledger_growth_pending SET');
-    expect(probe).toBeGreaterThanOrEqual(0);
-    expect(probe).toBeLessThan(gatedAlter);
-    expect(folded).toContain('oid = \'"public".bank_ledger_growth_pending\'::pg_catalog.regclass');
-    expect(folded).toContain(
-      "reloptions @> ARRAY[ 'autovacuum_vacuum_scale_factor=0', " +
-        "'autovacuum_vacuum_threshold=100', 'fillfactor=70' ]::pg_catalog.text[]",
-    );
-    expect(folded).toContain('IF NOT EXISTS ( SELECT 1 FROM pg_catalog.pg_class');
+    // boots must skip it. The probe compares PARSED values via
+    // pg_options_to_table, never stored text, so a '0' vs '0.0' rendering
+    // difference cannot re-fire the ALTER on every boot.
+    expect(folded).toContain(`ALTER TABLE "public".bank_ledger_growth_pending SET ${pendingParams}`);
+    expect(folded).toContain(`ALTER TABLE "public".bank_ledger_growth_budget SET ${budgetParams}`);
+    // Strip SQL comments before the absence pins: the prose deliberately
+    // EXPLAINS why fillfactor is gone, and a comment mention must not satisfy
+    // or defeat a code-level assertion.
+    const code = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/--[^\n]*/g, '').replace(/\s+/g, ' ');
+    expect(code).not.toContain('reloptions @>');
+    expect(code).not.toContain('fillfactor');
+    expect(folded.split('FROM pg_catalog.pg_options_to_table(c.reloptions) o')).toHaveLength(3);
+    for (const table of ['bank_ledger_growth_pending', 'bank_ledger_growth_budget']) {
+      const probe = folded.indexOf(`c.oid = '"public".${table}'::pg_catalog.regclass`);
+      const gatedAlter = folded.indexOf(`ALTER TABLE "public".${table} SET`);
+      expect(probe).toBeGreaterThanOrEqual(0);
+      expect(probe).toBeLessThan(gatedAlter);
+    }
+    expect(folded).toContain("o.option_name = 'autovacuum_vacuum_scale_factor'");
+    expect(folded).toContain('o.option_value::pg_catalog.numeric = 0');
+    expect(folded).toContain('o.option_value::pg_catalog.numeric = 100');
+    expect(folded).toContain('o.option_value::pg_catalog.numeric = 1000');
   });
 
   it('converts only the trigger fixed identity and exact JSON evidence', () => {

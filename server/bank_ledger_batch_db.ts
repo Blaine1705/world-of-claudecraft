@@ -48,14 +48,21 @@ CREATE INDEX IF NOT EXISTS bank_ledger_batch_receipts_account
 -- Converge the key-shape CHECK on existing databases: CREATE TABLE IF NOT
 -- EXISTS never revisits the inline constraint, so a changed
 -- BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH would otherwise silently keep the
--- old bound. Steady-state boots read only the catalog; a mismatched or
--- missing definition is dropped and re-added once.
+-- old bound. Steady-state boots read only the catalog (the probe matches the
+-- definition alone, valid or not, so the NOT VALID window below never
+-- re-fires it). A mismatched or missing definition is dropped and re-added
+-- once as NOT VALID: enforcement of NEW writes starts immediately, but boot
+-- never pays a full-table validation scan of this keep-forever table (a
+-- constant edit or a pg_get_constraintdef rendering change would otherwise
+-- re-fire it as an unbounded ACCESS EXCLUSIVE scan at boot). The existing
+-- rows are validated out of boot, post-listen, by
+-- BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL (db.ts runs it beside the
+-- concurrent index builds; loud and non-fatal there, retried next boot).
 DO $bank_ledger_batch_receipts_key_shape_converge$
 DECLARE
   key_shape_ready boolean;
 BEGIN
-  SELECT c.convalidated
-         AND c.contype = 'c'
+  SELECT c.contype = 'c'
          AND pg_get_constraintdef(c.oid) LIKE '%char_length(batch_key)%'
          AND pg_get_constraintdef(c.oid) LIKE '%<= ${BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH})%'
          AND position('^[A-Za-z0-9_.:-]+$' in pg_get_constraintdef(c.oid)) > 0
@@ -76,10 +83,35 @@ BEGIN
       ADD CONSTRAINT bank_ledger_batch_receipts_key_shape CHECK (
         char_length(batch_key) BETWEEN 1 AND ${BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH}
         AND batch_key ~ '^[A-Za-z0-9_.:-]+$'
-      );
+      ) NOT VALID;
   END IF;
 END;
 $bank_ledger_batch_receipts_key_shape_converge$;
+`;
+
+/**
+ * The out-of-boot half of the key-shape converge above: validate a NOT VALID
+ * key-shape constraint against the existing rows. VALIDATE takes only SHARE
+ * UPDATE EXCLUSIVE, so live inserts keep flowing while the keep-forever table
+ * is scanned. Run post-listen beside the concurrent index builds
+ * (runConcurrentIndexMigrations), where failure is loud, non-fatal, and
+ * retried on the next boot; a validation failure means rows violating the
+ * CURRENT key shape exist and an operator must reconcile them.
+ */
+export const BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL = `
+DO $bank_ledger_batch_receipts_key_shape_validate$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_constraint
+     WHERE conname = 'bank_ledger_batch_receipts_key_shape'
+       AND conrelid = 'bank_ledger_batch_receipts'::regclass
+       AND NOT convalidated
+  ) THEN
+    ALTER TABLE bank_ledger_batch_receipts
+      VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape;
+  END IF;
+END;
+$bank_ledger_batch_receipts_key_shape_validate$;
 `;
 
 export interface BankLedgerBatchOwner {
@@ -321,8 +353,11 @@ function prepareWrite(
 // Same-statement visibility is deliberate here. claimed RETURNING is the only
 // place a receipt inserted by this statement is visible. Plan shape verified
 // empirically (PG16, 1M seeded receipts, the 2,048-key max prefix): a Nested
-// Loop of per-key Index Only Scans on the PK, 9.7ms total, never a seq scan
+// Loop of per-key Index Scans on the PK, 9.7ms total, never a seq scan
 // (unnest's 2,048-row estimate keeps the planner on the point-probe side).
+// Not Index ONLY: existing_receipts selects realm/character/account/row_count/
+// payload_sha256, none covered by the batch_key PK, so each probe on the retry
+// path fetches its heap tuple. The cost stays one point probe per key.
 // existing_receipts
 // reads the statement-start snapshot, so an already committed retry is visible;
 // a concurrent conflict that ON CONFLICT can detect but the snapshot cannot see

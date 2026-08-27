@@ -49,15 +49,24 @@ export function bankLedgerGrowthBudgetSchema(schemaName = 'public'): string {
   const schema = `"${schemaName}"`;
   const ledgerRegclass = `${schema}.bank_ledger`;
   const pendingRegclass = `${schema}.bank_ledger_growth_pending`;
+  const budgetRegclass = `${schema}.bank_ledger_growth_budget`;
   const accumulatorRegprocedure = `${schema}.accumulate_bank_ledger_growth_budget()`;
   const enforcerRegprocedure = `${schema}.enforce_bank_ledger_growth_budget()`;
   return `
+-- The singleton takes one guarded UPDATE per ledger-writing transaction,
+-- forever, against one live row: dead singleton versions accumulate at the
+-- ledger write rate while the default scale-factor trigger, computed against
+-- one live row, would wait on the fixed 50-tuple floor plus nothing. HOT
+-- pruning inside the nearly-empty page absorbs most of that churn (fillfactor
+-- is a no-op for a one-row table), so the fixed threshold below is the
+-- backstop that keeps the page and the visibility map clean without vacuuming
+-- every few seconds.
 CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget (
   singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
   committed_rows BIGINT NOT NULL CHECK (committed_rows >= 0),
   hard_limit_rows BIGINT NOT NULL CHECK (hard_limit_rows > 0),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000);
 
 -- This table has no committed rows in healthy operation. Its one row per
 -- ledger-writing transaction exists only until the deferred trigger consumes
@@ -66,36 +75,57 @@ CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growt
 -- is the textbook queue-table autovacuum shape: dead tuples accumulate at the
 -- ledger write rate while a scale-factor trigger, computed against a table of
 -- zero live rows, would barely ever fire. Vacuum on a small fixed dead-tuple
--- threshold instead, and leave fillfactor headroom so the ON CONFLICT
--- accumulation updates stay HOT.
+-- threshold instead. No fillfactor: every row here dies inside its own
+-- transaction, so update headroom buys nothing (an install converged by an
+-- earlier build may still carry fillfactor=70; harmless, and the probe below
+-- deliberately ignores it).
 CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending (
   transaction_id xid8 PRIMARY KEY,
   inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
-) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100, fillfactor = 70);
+) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100);
 
 -- Converge tables created before the storage parameters existed, but only
 -- when a setting is absent or different: even a value-identical ALTER TABLE
 -- ... SET takes SHARE UPDATE EXCLUSIVE to COMMIT and writes pg_class, so
 -- steady-state boots probe reloptions first and skip the churn. The probe
--- matches the exact stored option text; a drifted or hand-edited value
--- converges once and is then skipped on every later boot (idempotent).
-DO $bank_ledger_growth_pending_reloptions_converge$
+-- compares PARSED option values via pg_options_to_table, never the stored
+-- text: PostgreSQL is free to render '0' as '0.0' (and an operator is free
+-- to write either), and a text-match probe would re-fire the ALTER on every
+-- boot of every realm on such a rendering, the exact churn it exists to
+-- avoid. A genuinely drifted or hand-edited VALUE converges once and is then
+-- skipped on every later boot (idempotent).
+DO $bank_ledger_growth_reloptions_converge$
 BEGIN
   IF NOT EXISTS (
     SELECT 1
-      FROM pg_catalog.pg_class
-     WHERE oid = '${pendingRegclass}'::pg_catalog.regclass
-       AND reloptions @> ARRAY[
-             'autovacuum_vacuum_scale_factor=0',
-             'autovacuum_vacuum_threshold=100',
-             'fillfactor=70'
-           ]::pg_catalog.text[]
+      FROM pg_catalog.pg_class c
+     WHERE c.oid = '${pendingRegclass}'::pg_catalog.regclass
+       AND (SELECT pg_catalog.count(*)
+              FROM pg_catalog.pg_options_to_table(c.reloptions) o
+             WHERE (o.option_name = 'autovacuum_vacuum_scale_factor'
+                    AND o.option_value::pg_catalog.numeric = 0)
+                OR (o.option_name = 'autovacuum_vacuum_threshold'
+                    AND o.option_value::pg_catalog.numeric = 100)) = 2
   ) THEN
     ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
-      SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100, fillfactor = 70);
+      SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100);
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1
+      FROM pg_catalog.pg_class c
+     WHERE c.oid = '${budgetRegclass}'::pg_catalog.regclass
+       AND (SELECT pg_catalog.count(*)
+              FROM pg_catalog.pg_options_to_table(c.reloptions) o
+             WHERE (o.option_name = 'autovacuum_vacuum_scale_factor'
+                    AND o.option_value::pg_catalog.numeric = 0)
+                OR (o.option_name = 'autovacuum_vacuum_threshold'
+                    AND o.option_value::pg_catalog.numeric = 1000)) = 2
+  ) THEN
+    ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
+      SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000);
   END IF;
 END
-$bank_ledger_growth_pending_reloptions_converge$;
+$bank_ledger_growth_reloptions_converge$;
 
 CREATE OR REPLACE FUNCTION "__woc_bank_ledger_growth_schema__".accumulate_bank_ledger_growth_budget()
 RETURNS TRIGGER
@@ -278,15 +308,26 @@ BEGIN
   END IF;
 
   IF NOT budget_initialized THEN
+    -- bank_ledger PREDATES this budget (it has shipped since bd51a6986c,
+    -- 2026-07-06), so the first production install seeds over weeks of real
+    -- ledger history, never an empty table. The exact COUNT(*) must run under
+    -- the insert-blocking lock, so warm the ledger's heap and visibility-map
+    -- pages with an identical UNLOCKED count first (plain MVCC read, blocks
+    -- nothing); the locked count below then re-reads warm cache and the
+    -- insert-blocked window shrinks to the warm-scan time. Measured at the
+    -- 10M-row ceiling: roughly 1 GB of heap, a warm parallel count in the
+    -- low hundreds of milliseconds (DEPLOY.md, the growth-limit section,
+    -- carries the numbers). The seeding deploy still requires every realm
+    -- stopped: a realm left running stalls its in-flight ledger inserts on
+    -- this lock for the locked count's duration, and character saves die at
+    -- their 2s lock_timeout.
+    PERFORM pg_catalog.count(*)
+      FROM "__woc_bank_ledger_growth_schema__".bank_ledger;
     -- CREATE TRIGGER holds this lock too, but spelling it before COUNT makes
     -- the mixed-release bootstrap boundary explicit and independent of DDL
-    -- lock implementation details.
-    -- bank_ledger itself ships in the same release as this budget, so the
-    -- first production install seeds from an EMPTY table and the COUNT(*)
-    -- below is instant. The unbounded scan only costs on a RE-seed (the
-    -- singleton deleted over a grown ledger), which holds this lock and
-    -- blocks ledger inserts for a full count: a maintenance-window operation
-    -- (DEPLOY.md, the growth-limit section).
+    -- lock implementation details. A RE-seed (the singleton deleted over a
+    -- grown ledger) pays the same shape and stays a maintenance-window
+    -- operation.
     LOCK TABLE "__woc_bank_ledger_growth_schema__".bank_ledger IN SHARE ROW EXCLUSIVE MODE;
     DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending;
 
@@ -346,6 +387,19 @@ SELECT committed_rows, hard_limit_rows
 }
 
 export const BANK_LEDGER_GROWTH_BUDGET_SCHEMA = bankLedgerGrowthBudgetSchema();
+
+/**
+ * The boot readback, exported beside the schema builder so the two cannot
+ * drift: db.ts issues this as its OWN single-statement query before COMMIT
+ * (the fragment's trailing SELECT is unreadable inside the multi-statement
+ * result array), against the same schema the fragment was built for.
+ */
+export function bankLedgerGrowthBudgetReadbackSql(schemaName = 'public'): string {
+  if (!/^[a-z_][a-z0-9_]*$/.test(schemaName)) {
+    throw new Error('bank ledger growth budget schema must be a simple lowercase identifier');
+  }
+  return `SELECT committed_rows, hard_limit_rows FROM "${schemaName}".bank_ledger_growth_budget WHERE singleton = TRUE`;
+}
 
 export class BankLedgerGrowthLimitExceeded extends Error {
   constructor(

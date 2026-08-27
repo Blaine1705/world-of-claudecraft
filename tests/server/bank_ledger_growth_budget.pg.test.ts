@@ -386,19 +386,174 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
     ).toBe(5);
   });
 
-  it('applies the queue-table storage parameters to the pending table', async () => {
+  it('applies the storage parameters to both budget tables', async () => {
     const opts = await pool.query(
-      `SELECT reloptions
+      `SELECT relname, reloptions
          FROM pg_catalog.pg_class
-        WHERE oid = '"${SCHEMA}".bank_ledger_growth_pending'::pg_catalog.regclass`,
+        WHERE oid IN ('"${SCHEMA}".bank_ledger_growth_pending'::pg_catalog.regclass,
+                      '"${SCHEMA}".bank_ledger_growth_budget'::pg_catalog.regclass)
+        ORDER BY relname`,
     );
-    expect(opts.rows[0].reloptions).toEqual(
+    expect(opts.rows).toEqual([
+      {
+        relname: 'bank_ledger_growth_budget',
+        reloptions: expect.arrayContaining([
+          'autovacuum_vacuum_scale_factor=0',
+          'autovacuum_vacuum_threshold=1000',
+        ]),
+      },
+      {
+        relname: 'bank_ledger_growth_pending',
+        reloptions: expect.arrayContaining([
+          'autovacuum_vacuum_scale_factor=0',
+          'autovacuum_vacuum_threshold=100',
+        ]),
+      },
+    ]);
+  });
+
+  it('converges a drifted receipts key shape as NOT VALID: boot survives bad rows, new writes enforce, VALIDATE proves out of boot', async () => {
+    const schema = 'bank_ledger_batch_key_shape_pg_test';
+    const { Client } = await import('pg');
+    const client = new Client({ connectionString: url });
+    await client.connect();
+    try {
+      await client.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+      await client.query(`CREATE SCHEMA "${schema}"`);
+      await client.query(`SET search_path = "${schema}"`);
+      await client.query('CREATE TABLE accounts (id INT PRIMARY KEY)');
+      await client.query(
+        'CREATE TABLE characters (id INT PRIMARY KEY, account_id INT NOT NULL REFERENCES accounts(id))',
+      );
+      await client.query('INSERT INTO accounts (id) VALUES (1)');
+      await client.query('INSERT INTO characters (id, account_id) VALUES (1, 1)');
+      // A pre-existing install whose key-shape constraint drifted PERMISSIVE,
+      // holding a row the CURRENT shape refuses.
+      await client.query(`CREATE TABLE bank_ledger_batch_receipts (
+        batch_key TEXT PRIMARY KEY,
+        realm TEXT NOT NULL,
+        character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+        account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+        row_count INT NOT NULL,
+        payload_sha256 TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        CONSTRAINT bank_ledger_batch_receipts_key_shape CHECK (char_length(batch_key) >= 1)
+      )`);
+      const insertReceipt = (key: string) =>
+        client.query(
+          `INSERT INTO bank_ledger_batch_receipts
+             (batch_key, realm, character_id, account_id, row_count, payload_sha256)
+           VALUES ($1, 'pg-growth', 1, 1, 1, $2)`,
+          [key, 'a'.repeat(64)],
+        );
+      await insertReceipt('violates!current!shape');
+
+      // Boot applies the schema WITHOUT scanning the existing rows: it must
+      // survive the violating row (the old drop-and-revalidate shape aborted
+      // boot here) and land the re-added constraint NOT VALID.
+      await client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
+      const converged = await client.query(
+        `SELECT convalidated FROM pg_constraint
+          WHERE conname = 'bank_ledger_batch_receipts_key_shape'
+            AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
+      );
+      expect(converged.rows).toEqual([{ convalidated: false }]);
+      // Enforcement of NEW writes is immediate despite NOT VALID.
+      await expect(insertReceipt('also!bad')).rejects.toMatchObject({ code: '23514' });
+      await expect(insertReceipt('good.key')).resolves.toMatchObject({ rowCount: 1 });
+      // The out-of-boot VALIDATE is loud on the surviving bad row, then
+      // proves the table once the operator reconciles it, and settles.
+      await expect(
+        client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL),
+      ).rejects.toMatchObject({ code: '23514' });
+      await client.query(
+        `DELETE FROM bank_ledger_batch_receipts WHERE batch_key = 'violates!current!shape'`,
+      );
+      await client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL);
+      const validated = await client.query(
+        `SELECT convalidated FROM pg_constraint
+          WHERE conname = 'bank_ledger_batch_receipts_key_shape'
+            AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
+      );
+      expect(validated.rows).toEqual([{ convalidated: true }]);
+      // Steady state: another boot apply leaves the validated constraint alone.
+      await client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
+      const settled = await client.query(
+        `SELECT convalidated FROM pg_constraint
+          WHERE conname = 'bank_ledger_batch_receipts_key_shape'
+            AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
+      );
+      expect(settled.rows).toEqual([{ convalidated: true }]);
+      await client.query(`DROP SCHEMA "${schema}" CASCADE`);
+    } finally {
+      await client.end();
+    }
+  });
+
+  it('converges by parsed reloption values, so a rendering difference never re-fires the ALTER', async () => {
+    const schema = 'bank_ledger_growth_reloptions_pg_test';
+    await pool.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+    await pool.query(`CREATE SCHEMA "${schema}"`);
+    // A pre-existing install: the pending table carries value-identical
+    // settings under a DIFFERENT text rendering ('0.0', plus the retired
+    // fillfactor an earlier build set), and the budget table predates any
+    // storage parameters.
+    await pool.query(`CREATE TABLE "${schema}".bank_ledger (id BIGSERIAL PRIMARY KEY)`);
+    await pool.query(
+      `CREATE TABLE "${schema}".bank_ledger_growth_pending (
+         transaction_id xid8 PRIMARY KEY,
+         inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
+       ) WITH (autovacuum_vacuum_scale_factor = 0.0, autovacuum_vacuum_threshold = 100, fillfactor = 70)`,
+    );
+    await pool.query(
+      `CREATE TABLE "${schema}".bank_ledger_growth_budget (
+         singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
+         committed_rows BIGINT NOT NULL CHECK (committed_rows >= 0),
+         hard_limit_rows BIGINT NOT NULL CHECK (hard_limit_rows > 0),
+         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+       )`,
+    );
+    const optionsOf = async (table: string): Promise<readonly string[]> =>
+      (
+        await pool.query(
+          `SELECT reloptions FROM pg_catalog.pg_class
+            WHERE oid = '"${schema}".${table}'::pg_catalog.regclass`,
+        )
+      ).rows[0].reloptions;
+    const versionOf = async (table: string): Promise<string> =>
+      (
+        await pool.query(
+          `SELECT xmin::text AS v FROM pg_catalog.pg_class
+            WHERE oid = '"${schema}".${table}'::pg_catalog.regclass`,
+        )
+      ).rows[0].v;
+
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(schema));
+    // The '0.0' rendering parses equal, so the pending ALTER must be skipped:
+    // an ALTER SET would have rewritten the stored text to '0' and this pin
+    // would see it. The retired fillfactor rides along untouched. The bare
+    // budget table converges once.
+    expect(await optionsOf('bank_ledger_growth_pending')).toEqual(
       expect.arrayContaining([
-        'autovacuum_vacuum_scale_factor=0',
+        'autovacuum_vacuum_scale_factor=0.0',
         'autovacuum_vacuum_threshold=100',
         'fillfactor=70',
       ]),
     );
+    expect(await optionsOf('bank_ledger_growth_budget')).toEqual(
+      expect.arrayContaining([
+        'autovacuum_vacuum_scale_factor=0',
+        'autovacuum_vacuum_threshold=1000',
+      ]),
+    );
+    // Steady state after convergence: a second apply touches neither table's
+    // pg_class row at all (triggers exist, tables exist, both probes skip).
+    const pendingAfter = await versionOf('bank_ledger_growth_pending');
+    const budgetAfter = await versionOf('bank_ledger_growth_budget');
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(schema));
+    expect(await versionOf('bank_ledger_growth_pending')).toBe(pendingAfter);
+    expect(await versionOf('bank_ledger_growth_budget')).toBe(budgetAfter);
+    await pool.query(`DROP SCHEMA "${schema}" CASCADE`);
   });
 
   it('raises config drift, not capacity, when the singleton limit moves under a running process', async () => {
