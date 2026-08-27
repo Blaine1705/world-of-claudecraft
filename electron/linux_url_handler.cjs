@@ -47,10 +47,9 @@ const nodePath = require('node:path');
 // read-only home still gets a working game, just no deep link (they can sign in with a
 // username and password, which never leaves the app).
 
-// The basename electron-builder gives the .deb's entry (LinuxPackager.executableName, which
-// is package.json `name` lowercased). The AppImage entry we write below deliberately reuses
-// it: one CHROME_DESKTOP value then serves both channels, and on a machine with both the
-// user-level AppImage entry cleanly shadows the system-level deb one per the XDG lookup order.
+// The basename electron-builder gives the .deb's entry (LinuxPackager.executableName, which is
+// package.json `name` lowercased), and the icon name dpkg installs into the icon theme. The
+// AppImage entry deliberately does NOT reuse it; APPIMAGE_ENTRY_NAME below says why.
 const DESKTOP_ENTRY_BASENAME = 'world-of-claudecraft';
 // What dpkg installs. We never write this file, only look for it.
 const DEB_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}.desktop`;
@@ -61,7 +60,6 @@ const DEB_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}.desktop`;
 // and the launcher refuses to load the entry at all, so a deb-installed game vanishes from the
 // applications menu and the scheme resolves to nothing, with `apt reinstall` unable to fix it
 // because the shadowing file lives in $HOME. A distinct name costs one branch below.
-const NO_ASSOCIATE = () => {};
 const APPIMAGE_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}-appimage.desktop`;
 
 // Rejected outright rather than escaped. A newline would let a crafted filename inject
@@ -71,6 +69,8 @@ const APPIMAGE_ENTRY_NAME = `${DESKTOP_ENTRY_BASENAME}-appimage.desktop`;
 // handler that runs the wrong command. No real download path contains any of them, so
 // refusing to install is both safer and honest.
 const PRODUCT_NAME = 'World of ClaudeCraft';
+/** Returned by every arm with nothing to associate, so the caller never null-checks. */
+const NO_ASSOCIATE = () => {};
 // Where a system package (the .deb) puts its copy. Read only to answer "does this name
 // resolve to anything at all", never written.
 const SYSTEM_APPLICATIONS_DIR = '/usr/share/applications';
@@ -201,14 +201,19 @@ function configureLinuxDesktopName(deps = {}) {
   // AppImageLauncher-integrated entry, say) with a dangling one: strictly worse than today.
   const fileExists = deps.fileExists ?? nodeExistsSync;
   const userDir = deps.dir ?? desktopEntryDir(env, deps.homeDir ?? nodeOs.homedir());
-  // Ours first: on a machine with both, the AppImage the player just launched is the one the
-  // scheme should resolve to. Falling back to the deb's entry keeps that channel working
-  // without our ever writing to /usr/share.
-  const found = fileExists(nodePath.join(userDir, APPIMAGE_ENTRY_NAME))
-    ? APPIMAGE_ENTRY_NAME
-    : fileExists(nodePath.join(SYSTEM_APPLICATIONS_DIR, DEB_ENTRY_NAME))
-      ? DEB_ENTRY_NAME
-      : null;
+  // Whichever entry belongs to the channel THIS process is, never just whichever exists. An
+  // AppImage run prefers ours; anything else (deb, Steam depot, dev) prefers the deb's and stops
+  // there. Preferring ours unconditionally re-created the shadowing this module already fixed
+  // once, by a different route: a deb launch on a box where the player had tried the AppImage
+  // would hand xdg-settings OUR filename, so the deb player's scheme resolved to the AppImage,
+  // re-asserted on every launch, and TryExec finished it off once the AppImage was deleted. The
+  // deb has no way back from that, because nothing rewrites the user-level file.
+  const onAppImage = (deps.appImagePath ?? appImagePathFrom(env)) !== null;
+  const ours = fileExists(nodePath.join(userDir, APPIMAGE_ENTRY_NAME)) ? APPIMAGE_ENTRY_NAME : null;
+  const theirs = fileExists(nodePath.join(SYSTEM_APPLICATIONS_DIR, DEB_ENTRY_NAME))
+    ? DEB_ENTRY_NAME
+    : null;
+  const found = onAppImage ? (ours ?? theirs) : theirs;
   if (!found) return noop;
 
   const had = Object.hasOwn(env, 'CHROME_DESKTOP');
@@ -238,7 +243,7 @@ function configureLinuxDesktopName(deps = {}) {
  *   'unsafe-dir'    the XDG applications dir did not resolve to an absolute path
  *   'unchanged'     the entry on disk already matches, so no write (the caller's associate
  *                   still re-asserts the default, see below)
- *   'installed'     the entry was written and the association commands were kicked off
+ *   'installed'     the entry was written; call `associate` to register it
  *   'failed'        the write itself failed (read-only home, no permission)
  *
  * The unchanged path matters: this runs on every launch, and re-running xdg-mime each time

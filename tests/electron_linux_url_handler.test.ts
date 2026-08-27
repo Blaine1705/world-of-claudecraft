@@ -583,10 +583,9 @@ describe('installDesktopEntry', () => {
 
 describe('defaultRunCommand (the real subprocess seam)', () => {
   // Every other test injects a fake runCommand, so without these the shipped path is never
-  // exercised. It is also the ONLY control on the no-shell invariant: the module imports
-  // execFile under an alias, so the malware scanner's call-site regex does not match it, and
-  // scripts/malware_scan.mjs demotes this file's child_process import to medium. A later
-  // `shell: true` would pass the gate silently; it must fail HERE instead.
+  // exercised. It is also the control on the no-shell invariant: the scanner DOES see this call
+  // (it reports linux_url_handler.cjs at the execFile line, demoted to medium), but it cannot
+  // judge the OPTIONS object, so a later `shell: true` would pass the gate. It must fail HERE.
   function capture() {
     const calls: Array<{ command: string; args: unknown; options: Record<string, unknown> }> = [];
     const unref = vi.fn();
@@ -657,6 +656,7 @@ describe('configureLinuxDesktopName', () => {
     // electron-builder names the real file after executableName. Without this correction
     // setAsDefaultProtocolClient hands xdg-settings a name matching nothing, on the deb too.
     const env: Record<string, string | undefined> = {
+      APPIMAGE,
       CHROME_DESKTOP: 'World of ClaudeCraft.desktop',
     };
     const out = configureLinuxDesktopName({
@@ -705,8 +705,53 @@ describe('configureLinuxDesktopName', () => {
     expect(seen).toContain(`/usr/share/applications/${DEB_ENTRY_NAME}`);
   });
 
+  it.each([
+    ['an AppImage run picks OURS', { APPIMAGE }, APPIMAGE_ENTRY_NAME],
+    ['a deb run picks THEIRS, even with ours present', {}, DEB_ENTRY_NAME],
+  ])('%s when both entries exist', (_label, env, expected) => {
+    // The channel decides, not merely which file exists. Preferring ours unconditionally made a
+    // deb launch hand xdg-settings the AppImage's filename, so the deb player's scheme resolved
+    // to the AppImage and TryExec finished it off once that AppImage was deleted. Same
+    // shadowing the distinct filename prevents, reached through CHROME_DESKTOP instead.
+    const out = configureLinuxDesktopName({
+      platform: 'linux',
+      env: env as Record<string, string | undefined>,
+      dir: APPS_DIR,
+      fileExists: () => true,
+    });
+    expect(out.desktopName).toBe(expected);
+  });
+
+  it('a deb run with ONLY a stale AppImage entry registers nothing', () => {
+    // The dangerous shape: the player tried the AppImage once, then installed the deb. Naming
+    // our entry here would point the deb's scheme at a file it does not own and cannot repair.
+    const env: Record<string, string | undefined> = {};
+    const out = configureLinuxDesktopName({
+      platform: 'linux',
+      env,
+      dir: APPS_DIR,
+      fileExists: (p: string) => p.includes('-appimage.desktop'),
+    });
+
+    expect(out.desktopName).toBeNull();
+    expect(env.CHROME_DESKTOP).toBeUndefined();
+  });
+
+  it('an AppImage run falls back to the deb entry when ours is missing', () => {
+    const out = configureLinuxDesktopName({
+      platform: 'linux',
+      env: { APPIMAGE },
+      dir: APPS_DIR,
+      fileExists: (p: string) => p === `/usr/share/applications/${DEB_ENTRY_NAME}`,
+    });
+    expect(out.desktopName).toBe(DEB_ENTRY_NAME);
+  });
+
   it('restore() puts a previous value back exactly', () => {
-    const env: Record<string, string | undefined> = { CHROME_DESKTOP: 'previous.desktop' };
+    const env: Record<string, string | undefined> = {
+      APPIMAGE,
+      CHROME_DESKTOP: 'previous.desktop',
+    };
     const out = configureLinuxDesktopName({
       platform: 'linux',
       env,

@@ -397,16 +397,21 @@ and skips, by design.
 Linux deep-link caveat: `worldofclaudecraft://` is owned by a `.desktop` entry, not by
 an OS registry, so `electron/linux_url_handler.cjs` runs before
 `app.setAsDefaultProtocolClient` on both Linux channels. On the AppImage it writes
-`~/.local/share/applications/world-of-claudecraft.desktop` (the entry electron-builder
+`~/.local/share/applications/world-of-claudecraft-appimage.desktop` (the entry electron-builder
 bakes into the squashfs is never installed unless the player has AppImageLauncher) and
-runs `update-desktop-database` + `xdg-mime default`. It then repoints `CHROME_DESKTOP`
-at that filename, because Electron resolves the name it hands `xdg-settings` from that
-variable and, with no `desktopName` in `package.json`, the name it infers comes from
-`app.name` (`World of ClaudeCraft.desktop`) while electron-builder names the real file
-after `executableName` (`world-of-claudecraft.desktop`). Those two names MUST stay
-equal: `tests/electron_linux_url_handler.test.ts` derives the expected basename from
-`package.json` `name` AND pins that no `executableName` / `desktopName` override exists,
-so either kind of rename fails there rather than silently breaking Discord login.
+runs `update-desktop-database` + `xdg-mime default`. It then repoints `CHROME_DESKTOP` at
+whichever entry belongs to the channel it is running as: ours on an AppImage run, the deb's
+(`world-of-claudecraft.desktop`, installed by dpkg) otherwise. That matters, because pointing
+it at ours unconditionally would make a deb launch register the AppImage's entry, which is the
+same shadowing the distinct filename exists to prevent, reached through `CHROME_DESKTOP`
+instead of the desktop-file ID.
+
+The repoint is needed at all because Electron resolves the name it hands `xdg-settings` from
+that variable, and with no `desktopName` in `package.json` the name it infers comes from
+`app.name` (`World of ClaudeCraft.desktop`), which matches no file on disk. The deb's basename
+MUST keep tracking `executableName`: `tests/electron_linux_url_handler.test.ts` derives it from
+`package.json` `name` AND pins that no `executableName` / `desktopName` override exists, so
+either kind of rename fails there rather than silently breaking Discord login.
 
 Deliberate narrowings worth knowing before changing any of it:
 - `CHROME_DESKTOP` is set only when the entry actually exists on disk (ours or the
@@ -698,9 +703,13 @@ product exist. Coding and merge stay dark-safe without those credentials.
    stock SteamOS or Bazzite box is the realistic case): the AppImage must register its
    own handler on first launch. Confirm with
    `xdg-mime query default x-scheme-handler/worldofclaudecraft` returning
-   `world-of-claudecraft.desktop`, then `xdg-open "worldofclaudecraft://desktop-login?code=x"`
-   reaching the running game. A regression here shows up as the OS "choose an
-   application" dialog, which cannot select an AppImage at all.
+   `world-of-claudecraft-appimage.desktop` (the AppImage entry is deliberately NOT the deb's
+   basename), then `gio open "worldofclaudecraft://desktop-login?code=x"` reaching the running
+   game. Use `gio open`, not `xdg-open`: on stock SteamOS, which is the box this step names,
+   `xdg-open` takes its KDE branch and calls a `kfmclient` that is not installed, so it fails
+   for reasons unrelated to the handler. `gio open` is also the path a GTK browser takes.
+   A regression here shows up as the OS "choose an application" dialog, which cannot select an
+   AppImage at all.
 4. Play 5 minutes: steady frame rate, alt-tab out/in does not hitch or freeze the
    world (backgroundThrottling stays off).
 5. Website channel only: with a higher-version build on the feed, the update toast
