@@ -136,7 +136,8 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
-    ceiling: 18488,
+    // Lowered after empowered hold state and slot lookup moved to src/ui/empower_hold_core.ts.
+    ceiling: 18486,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -265,7 +266,8 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    ceiling: 11563,
+    // Lowered after pad cast routing moved to src/game/pad_cast_routing.ts.
+    ceiling: 11562,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
