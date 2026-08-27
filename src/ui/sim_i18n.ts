@@ -43,12 +43,16 @@ const baseEnTable = {
   // refusal toasts; log.bankSlotsPurchased is the purchase notice.
   'error.bankQuestItem': 'You cannot store quest items in the bank.',
   'error.bankFull': 'Your bank is full.',
+  // The pool-honest no_fit refusal (src/sim/bank.ts bankDeposit): a
+  // non-material deposit refused while only materials-only satchel capacity
+  // remains, so "full" would contradict the two-pool meter on screen.
+  'error.bankOnlyMaterialsSpace': 'Only materials fit in the space left in your bank.',
   'error.bankCannotAfford': 'You cannot afford that bank expansion.',
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
-  // The gold-buy refusal while a Claudium storage purchase holds the
-  // per-character mutex (server/bank_wire.ts, Bank Storage phase 11).
-  'error.bankPurchaseInProgress': 'Your bank has a purchase in progress.',
+  // The purchase-mutex refusal ('Your bank has a purchase in progress.') is a
+  // SERVER emit (server/bank_wire.ts) and lives in server_i18n.ts beside its
+  // origin; the client's error chain runs that matcher first.
   'log.bankSlotsPurchased': 'You purchase additional bank slots.',
   // Bank bag sockets (src/sim/bank_sockets.ts, Bank Storage phase 06). The
   // too-far, no-such-item, and bags-full refusals deliberately REUSE the rows
@@ -68,7 +72,6 @@ const baseEnTable = {
   // refusal deliberately REUSE the bank/bags rows above, since the vault is
   // gated by the same banker and fills the same bags.
   'error.vaultOnlyMaterials': 'Only materials can be stored in the Materials Vault.',
-  'error.vaultCannotStore': 'That item cannot be stored in the Materials Vault.',
   'error.vaultLocked': 'You have not unlocked the Materials Vault.',
   'error.vaultMaterialFull': 'Your vault cannot hold any more of that material.',
   'error.vaultCannotAfford': 'You cannot afford that vault upgrade.',
@@ -1381,6 +1384,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Poder de la Serpiente',
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
+    'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
     'error.bankCannotAfford': 'No puedes permitirte esa ampliación del banco.',
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
@@ -1837,6 +1841,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Poder de la Serpiente',
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
+    'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
     'error.bankCannotAfford': 'No puedes permitirte esa ampliación del banco.',
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
@@ -2306,6 +2311,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Puissance du Serpent',
     'error.bankQuestItem': "Vous ne pouvez pas déposer d'objets de quête à la banque.",
     'error.bankFull': 'Votre banque est pleine.',
+    'error.bankOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
     'error.bankCannotAfford': "Vous n'avez pas les moyens de payer cette extension de banque.",
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
@@ -2775,6 +2782,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Puissance du Serpent',
     'error.bankQuestItem': "Vous ne pouvez pas déposer d'objets de quête à la banque.",
     'error.bankFull': 'Votre banque est pleine.',
+    'error.bankOnlyMaterialsSpace':
+      "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
     'error.bankCannotAfford': "Vous n'avez pas les moyens de payer cette extension de banque.",
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
@@ -3437,6 +3446,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Potenza del Serpente',
     'error.bankQuestItem': 'Non puoi depositare oggetti missione in banca.',
     'error.bankFull': 'La tua banca è piena.',
+    'error.bankOnlyMaterialsSpace':
+      "Nello spazio rimasto nella tua banca c'è posto solo per i materiali.",
     'error.bankCannotAfford': "Non puoi permetterti quell'ampliamento della banca.",
     'error.bankMaxSlots': 'La tua banca non può essere ampliata oltre.',
     'error.bankTooFar': 'Sei troppo lontano dal banchiere.',
@@ -3902,6 +3913,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Macht der Schlange',
     'error.bankQuestItem': 'Ihr könnt keine Questgegenstände in der Bank lagern.',
     'error.bankFull': 'Eure Bank ist voll.',
+    'error.bankOnlyMaterialsSpace': 'In Eurer Bank ist nur noch Platz für Materialien.',
     'error.bankCannotAfford': 'Ihr könnt Euch diese Bankerweiterung nicht leisten.',
     'error.bankMaxSlots': 'Eure Bank kann nicht weiter erweitert werden.',
     'error.bankTooFar': 'Ihr seid zu weit vom Bankier entfernt.',
@@ -4305,9 +4317,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': '你无法将任务物品存入公会银行。',
     'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
+    'error.bankOnlyMaterialsSpace': '你的银行剩余空间只能存放材料。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
-    'error.bankPurchaseInProgress': '你的银行有一笔购买正在处理中。',
     'error.bankTooFar': '你距离银行家太远。',
     'log.bankSlotsPurchased': '你购买了额外的银行栏位。',
     'error.bagSocketsFull': '你的所有背包栏位都已占用。',
@@ -4752,9 +4764,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': '你無法將任務物品存入公會銀行。',
     'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
+    'error.bankOnlyMaterialsSpace': '你的銀行剩餘空間只能存放材料。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
-    'error.bankPurchaseInProgress': '你的銀行有一筆購買正在處理中。',
     'error.bankTooFar': '你距離銀行家太遠。',
     'log.bankSlotsPurchased': '你購買了額外的銀行欄位。',
     'error.bagSocketsFull': '你的所有背包欄位都已佔用。',
@@ -5206,9 +5218,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': '퀘스트 아이템은 길드 은행에 보관할 수 없습니다.',
     'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
+    'error.bankOnlyMaterialsSpace': '은행에 남은 공간에는 재료만 보관할 수 있습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
-    'error.bankPurchaseInProgress': '은행에 처리 중인 구매가 있습니다.',
     'error.bankTooFar': '은행원과 너무 멀리 떨어져 있습니다.',
     'log.bankSlotsPurchased': '추가 은행 칸을 구매했습니다.',
     'error.bagSocketsFull': '모든 가방 칸이 사용 중입니다.',
@@ -5671,9 +5683,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': 'クエストアイテムはギルド銀行に預けられません。',
     'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
+    'error.bankOnlyMaterialsSpace': '銀行の残りのスペースには素材しか入りません。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
-    'error.bankPurchaseInProgress': '銀行で処理中の購入があります。',
     'error.bankTooFar': '銀行員から遠すぎます。',
     'log.bankSlotsPurchased': '追加の銀行スロットを購入しました。',
     'error.bagSocketsFull': 'バッグスロットはすべて使用中です。',
@@ -6176,6 +6188,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Força da Serpente',
     'error.bankQuestItem': 'Você não pode guardar itens de missão no banco.',
     'error.bankFull': 'Seu banco está cheio.',
+    'error.bankOnlyMaterialsSpace': 'No espaço restante do seu banco só cabem materiais.',
     'error.bankCannotAfford': 'Você não pode pagar por essa expansão do banco.',
     'error.bankMaxSlots': 'Seu banco não pode ser expandido além disso.',
     'error.bankTooFar': 'Você está longe demais do banqueiro.',
@@ -6594,9 +6607,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankQuestItem': 'Предметы заданий нельзя хранить в банке гильдии.',
     'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
+    'error.bankOnlyMaterialsSpace': 'В вашем банке осталось место только для материалов.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
-    'error.bankPurchaseInProgress': 'В вашем банке уже выполняется покупка.',
     'error.bankTooFar': 'Вы слишком далеко от банкира.',
     'log.bankSlotsPurchased': 'Вы покупаете дополнительные ячейки банка.',
     'error.bagSocketsFull': 'Все ячейки для сумок заняты.',

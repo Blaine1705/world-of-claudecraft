@@ -562,6 +562,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.doesNotFit': 'В банке этого персонажа не поместятся все ячейки этой грамоты.',
   'hudChrome.wocStore.charter.notPurchasable': 'Эту грамоту сейчас нельзя купить.',
   'hudChrome.wocStore.charter.noCharterFits': 'Ни одна грамота не помещается в оставшееся место в банке этого персонажа.',
+  'hudChrome.wocStore.charter.someHiddenByFit':
+    'Грамоты, слишком большие для оставшегося места в банке этого персонажа, не показываются.',
   'hudChrome.wocStore.charter.noRoom': 'В банке этого персонажа больше нет места ни для одной грамоты.',
   'hudChrome.wocStore.charter.outage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
   'hudChrome.wocStore.charter.outageStale': 'Вернитесь в магазин и снова используйте то же действие «Купить грамоту». Средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
@@ -9768,6 +9770,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositQuantityInput': 'Количество для внесения',
   'hudChrome.bank.depositQuantityConfirm': 'Положить',
   'hudChrome.bank.withdrawQuantityTitle': 'Забрать {item}',
+  'hudChrome.bank.vaultRowWithdrawName': 'Забрать {item}',
+  'hudChrome.bank.priceChanged':
+    'Цена изменилась до завершения покупки. Проверьте обновлённую цену и подтвердите покупку ещё раз.',
   'hudChrome.bank.withdrawQuantityInput': 'Количество для получения',
   'hudChrome.bank.withdrawQuantityConfirm': 'Забрать',
   'hudChrome.bank.withdrawQuantityAction': 'Выбрать количество для получения: {item}',

@@ -1254,7 +1254,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // file's sites was invisible to the guard before this entry.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/quests/quest_commands.ts'), 'utf8'),
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
-    // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
+    // emit the quest-item/full/only-materials-space/afford/max-slots refusals
+    // + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
     // Materials Vault: the deposit/withdraw/buy-upgrade command bodies emit the
     // only-materials/locked/material-full/afford/max-upgrades refusals plus the
@@ -1316,9 +1317,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // server/bank_wire.ts (Bank Storage phase 11): the FIRST server module
     // outside game.ts to emit player text, via sim.ctx.error (the storage
     // purchase-mutex refusal of a gold rung buy). It rides the ordinary sim
-    // error stream and localizes through the sim matcher, so it belongs in
-    // THIS corpus (the ctx.error scan below catches sim.ctx.error), keeping
-    // a reword of the emit or the matcher from drifting apart silently.
+    // error stream, but its matcher ROW lives in server_i18n.ts beside its
+    // true origin (a server module's emit): the client's error chain runs
+    // localizeServerText before localizeSimText, and recognized() below
+    // accepts either matcher, so the row's home is a provenance question,
+    // not a mechanism one. The file stays in THIS corpus (the ctx.error
+    // scan below catches sim.ctx.error), keeping a reword of the emit or
+    // the matcher from drifting apart silently.
     fs.readFileSync(path.resolve(process.cwd(), 'server/bank_wire.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The

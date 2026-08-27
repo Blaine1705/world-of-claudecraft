@@ -31,6 +31,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -64,6 +65,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -97,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "es_ES": [
@@ -121,6 +124,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -154,6 +158,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -187,6 +192,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "fr_FR": [
@@ -211,6 +217,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -244,6 +251,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -277,6 +285,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "fr_CA": [
@@ -301,6 +310,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -334,6 +344,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -367,6 +378,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "en_CA": [],
@@ -392,6 +404,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -425,6 +438,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -458,6 +472,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "de_DE": [
@@ -482,6 +497,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -515,6 +531,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -548,6 +565,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "zh_CN": [
@@ -584,6 +602,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -617,6 +636,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -650,6 +670,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "ru_RU": [
@@ -677,6 +698,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -710,6 +732,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -743,6 +766,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "nl_NL": [
@@ -767,6 +791,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -800,6 +825,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -833,6 +859,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "pl_PL": [
@@ -857,6 +884,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -890,6 +918,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -923,6 +952,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "id_ID": [
@@ -947,6 +977,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -980,6 +1011,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -1013,6 +1045,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "tr_TR": [
@@ -1037,6 +1070,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -1070,6 +1104,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -1103,6 +1138,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "sv_SE": [
@@ -1127,6 +1163,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -1160,6 +1197,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -1193,6 +1231,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "vi_VN": [
@@ -1217,6 +1256,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -1250,6 +1290,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -1283,6 +1324,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ],
   "da_DK": [
@@ -1307,6 +1349,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.meterPoolGeneral",
     "hudChrome.bank.meterPoolMaterials",
     "hudChrome.bank.meterPoolsAria",
+    "hudChrome.bank.priceChanged",
     "hudChrome.bank.priceDisclaimer",
     "hudChrome.bank.rungAlreadyGranted",
     "hudChrome.bank.rungApplyDeferred",
@@ -1340,6 +1383,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.vaultEmpty",
     "hudChrome.bank.vaultLockedIntro",
     "hudChrome.bank.vaultRowAria",
+    "hudChrome.bank.vaultRowWithdrawName",
     "hudChrome.bank.vaultTab",
     "hudChrome.bank.vaultUnlockButton",
     "hudChrome.bank.vaultUnlockConfirm",
@@ -1373,6 +1417,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.outageStale",
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
+    "hudChrome.wocStore.charter.someHiddenByFit",
     "hudChrome.wocStore.charter.title"
   ]
 };

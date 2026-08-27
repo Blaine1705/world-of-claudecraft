@@ -482,6 +482,12 @@ export const hudChromeStrings = {
       notPurchasable: 'This charter cannot be purchased right now.',
       noRoom: 'The bank of this character has no room left for a charter.',
       noCharterFits: 'No charter fits the room left in the bank of this character.',
+      // The hidden-charter silence-breaker: the fit gates drop charters one
+      // by one, so a list can render some rungs while hiding others, and even
+      // the fit-unknown arm renders it when the refusal prune hid rows. (Wordy
+      // value, M16: the five non-Latin fills land in this same change.)
+      someHiddenByFit:
+        'Charters too large for the room left in the bank of this character are not shown.',
       outage:
         'The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.',
       outageStale:
@@ -3995,6 +4001,18 @@ export const hudChromeStrings = {
     withdrawQuantityTitle: 'Withdraw {item}',
     withdrawQuantityInput: 'Quantity to withdraw',
     withdrawQuantityConfirm: 'Withdraw',
+    // The vault row's accessible ACTION name (its aria-label). Same English as
+    // withdrawQuantityTitle on purpose, but a distinct key: that one titles the
+    // quantity PROMPT, and rewording a dialog title must not silently rename
+    // every vault row. (The five non-Latin fills land in this same change.)
+    vaultRowWithdrawName: 'Withdraw {item}',
+    // The gold-ladder stale-price notice (vault upgrade, guild bank slots, bag
+    // sockets). Same English as hudChrome.wocStore.priceChanged, but its own
+    // key: those are sim-priced GOLD surfaces, and rewording the Claudium
+    // store's notice must not silently reword them. (Wordy value, M16: the
+    // five non-Latin fills land in this same change.)
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
     // Item-qualified accessible name/title for every stocked-row partial action.
     // (Wordy value, M16: the five non-Latin fills land in this same change.)
     withdrawQuantityAction: 'Choose withdrawal quantity for {item}',
@@ -4059,8 +4077,9 @@ export const hudChromeStrings = {
     // from the WIRE snapshot (nextUpgradeCost / perMaterialCap), never a
     // client constant. Withdraw hints, the quantity prompts, the confirm
     // accept, and the maxed label all REUSE the personal keys above; the
-    // bags-side click denies voice the sim's own error.vaultOnlyMaterials /
-    // error.vaultCannotStore lines, so no deny copy lives here. {count} in
+    // bags-side click denies voice the sim's own error.vaultOnlyMaterials
+    // line (its cannot-store sibling retired with the identity-preserving
+    // deposit rework), so no deny copy lives here. {count} in
     // the deposit-all summaries is the number of ITEMS moved (pooled counts,
     // not stacks; the bank's summary counts stacks because slots are its
     // unit). (Wordy values, M16: the five non-Latin fills land in this same
