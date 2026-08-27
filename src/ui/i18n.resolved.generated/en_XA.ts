@@ -925,7 +925,8 @@ export const en_XA: EnTranslations = {
       "durationUnitSeconds": "[š]",
       "durationUnitMinutes": "[ɱ]",
       "durationUnitHours": "[ĥ]",
-      "durationUnitDays": "[ð]"
+      "durationUnitDays": "[ð]",
+      "buffOverflowLabel": "[+{n}]"
     },
     "character": {
       "modelPreview": "[Çĥáŕáçţéŕ Ɱóðéļ Þŕéʋíéŵ]"
@@ -2102,6 +2103,12 @@ export const en_XA: EnTranslations = {
         "few": "[{count} šéçóñðš ŕéɱáíñíñĝ]",
         "many": "[{count} šéçóñðš ŕéɱáíñíñĝ]",
         "other": "[{count} šéçóñðš ŕéɱáíñíñĝ]"
+      },
+      "buffsHidden": {
+        "one": "[{count} ɱóŕé ƀúƒƒ íš áçţíʋé ƀúţ ĥíððéñ óñ ţĥíš ĝŕáþĥíçš þŕéšéţ]",
+        "few": "[{count} ɱóŕé ƀúƒƒš áŕé áçţíʋé ƀúţ ĥíððéñ óñ ţĥíš ĝŕáþĥíçš þŕéšéţ]",
+        "many": "[{count} ɱóŕé ƀúƒƒš áŕé áçţíʋé ƀúţ ĥíððéñ óñ ţĥíš ĝŕáþĥíçš þŕéšéţ]",
+        "other": "[{count} ɱóŕé ƀúƒƒš áŕé áçţíʋé ƀúţ ĥíððéñ óñ ţĥíš ĝŕáþĥíçš þŕéšéţ]"
       },
       "playtimeDays": {
         "one": "[{count} ðáý]",

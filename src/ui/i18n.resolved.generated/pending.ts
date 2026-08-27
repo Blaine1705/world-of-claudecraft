@@ -10,99 +10,124 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "es_ES": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "fr_FR": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "fr_CA": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "de_DE": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.unitFrame.buffOverflowLabel"
+  ],
+  "zh_TW": [
+    "hudChrome.unitFrame.buffOverflowLabel"
+  ],
+  "ko_KR": [
+    "hudChrome.unitFrame.buffOverflowLabel"
+  ],
+  "ja_JP": [
+    "hudChrome.unitFrame.buffOverflowLabel"
+  ],
   "pt_BR": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.unitFrame.buffOverflowLabel"
+  ],
   "cs_CZ": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "nl_NL": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "pl_PL": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "id_ID": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "tr_TR": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "sv_SE": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "vi_VN": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "da_DK": [
-    "hudChrome.wocMarket.browserOnlyConfirmBody",
-    "hudChrome.wocMarket.browserOnlyConfirmCancel",
-    "hudChrome.wocMarket.browserOnlyConfirmOpen",
-    "hudChrome.wocMarket.browserOnlyConfirmTitle"
+    "hudChrome.plurals.buffsHidden.few",
+    "hudChrome.plurals.buffsHidden.many",
+    "hudChrome.plurals.buffsHidden.one",
+    "hudChrome.plurals.buffsHidden.other",
+    "hudChrome.unitFrame.buffOverflowLabel"
   ]
 };

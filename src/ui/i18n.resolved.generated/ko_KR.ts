@@ -925,7 +925,8 @@ export const ko_KR: EnTranslations = {
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
       "durationUnitHours": "시",
-      "durationUnitDays": "일"
+      "durationUnitDays": "일",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "캐릭터 모델 미리보기"
@@ -2102,6 +2103,12 @@ export const ko_KR: EnTranslations = {
         "few": "{count}초 남음",
         "many": "{count}초 남음",
         "other": "{count}초 남음"
+      },
+      "buffsHidden": {
+        "one": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "few": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "many": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "other": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다"
       },
       "playtimeDays": {
         "one": "{count}일",

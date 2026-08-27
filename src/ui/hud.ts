@@ -4526,9 +4526,8 @@ export class Hud {
     this.buffBarEl,
     this.buffBarPainterDeps,
     document,
-    // Cap the visible aura count on the LOW static preset (never the
-    // governor).
     () => this.fxTier(),
+    true, // the buff bar is the one instance that shows the low-tier overflow badge
   );
   private readonly debuffBarPainter = new AurasPainter(
     this.writerFacet,
