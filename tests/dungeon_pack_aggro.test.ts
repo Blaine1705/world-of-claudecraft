@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { MOBS } from '../src/sim/data';
 import { createMob, createPlayer } from '../src/sim/entity';
-import { aggroDungeonPackmates } from '../src/sim/mob/dungeon_pack_aggro';
+import { aggroDungeonPackmates, socialPullSameTemplate } from '../src/sim/mob/dungeon_pack_aggro';
 import { Sim } from '../src/sim/sim';
+import { SpatialGrid } from '../src/sim/spatial';
 
 describe('authored dungeon pack aggro', () => {
   it('pulls idle claim-local packmates without crossing room or slot namespaces', () => {
@@ -65,5 +66,46 @@ describe('authored dungeon pack aggro', () => {
       inCombat: true,
     });
     expect(otherPack.aiState).toBe('idle');
+  });
+});
+
+describe('same-template social pull', () => {
+  function gridOf(...entities: Parameters<SpatialGrid['insert']>[0][]): SpatialGrid {
+    const grid = new SpatialGrid();
+    for (const e of entities) grid.insert(e);
+    return grid;
+  }
+
+  it('pulls only idle same-template neighbours inside the default radius', () => {
+    const target = createPlayer(1, 'warrior', { x: 0, y: 0, z: 0 }, 'Tank');
+    const pulled = createMob(2, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
+    const near = createMob(3, MOBS.forest_wolf, 5, { x: 3, y: 0, z: 0 });
+    const far = createMob(4, MOBS.forest_wolf, 5, { x: 9, y: 0, z: 0 });
+    const otherTemplate = createMob(5, MOBS.downs_bandit, 5, { x: 2, y: 0, z: 0 });
+    const busy = createMob(6, MOBS.forest_wolf, 5, { x: 2, y: 0, z: 2 });
+    busy.aiState = 'chase';
+
+    socialPullSameTemplate(gridOf(pulled, near, far, otherTemplate, busy), pulled, target);
+
+    expect(near).toMatchObject({
+      aiState: 'chase',
+      aggroTargetId: target.id,
+      inCombat: true,
+      leashAnchor: near.pos,
+    });
+    expect(near.threat.get(target.id)).toBe(1);
+    expect(far.aiState).toBe('idle');
+    expect(otherTemplate.aiState).toBe('idle');
+    expect(busy.aggroTargetId).toBeNull();
+  });
+
+  it('applies the per-family radius override (mudfin pulls to 8 yards)', () => {
+    const target = createPlayer(1, 'warrior', { x: 0, y: 0, z: 0 }, 'Tank');
+    const pulled = createMob(2, MOBS.deepfen_murloc, 5, { x: 0, y: 0, z: 0 });
+    const insideOverride = createMob(3, MOBS.deepfen_murloc, 5, { x: 7, y: 0, z: 0 });
+
+    socialPullSameTemplate(gridOf(pulled, insideOverride), pulled, target);
+
+    expect(insideOverride.aiState).toBe('chase');
   });
 });

@@ -486,6 +486,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 const RENDER_PURE_CORES = [
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/dungeon_banner_core.ts',
+  'src/render/dungeon_tile_kind_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/roof_darkness_core.ts',
   'src/render/varkhul_assembly_focus_core.ts',

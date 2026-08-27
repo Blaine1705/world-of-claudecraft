@@ -11,6 +11,7 @@
 
 import type { BiomeId } from '../sim/types';
 import { resumeWhenAllowed } from './audio_unlock';
+import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
 import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
@@ -118,19 +119,9 @@ export function riftMusicZoneForTheme(themeName: string): MusicZone {
   return RIFT_MUSIC[themeName] ?? 'rift_void';
 }
 
-const DUNGEON_MUSIC: Record<string, MusicZone> = {
-  hollow_crypt: 'dungeon_hollow_crypt',
-  sunken_bastion: 'dungeon_sunken_bastion',
-  gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
-  ignivar_forge_approach: 'ignivar_forge_approach',
-  ignivar_raid_arena: 'ignivar_raid_arena',
-  ignivar_molten_assembly: 'ignivar_forge_approach',
-  ignivar_inner_crucible: 'ignivar_inner_crucible',
-};
-
-export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {
-  return DUNGEON_MUSIC[dungeonId] ?? 'dungeon_hollow_crypt';
-}
+// DUNGEON_MUSIC moved to dungeon_music_zones.ts; re-exported for the existing
+// music.ts consumers (tests and instance music).
+export { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
 
 export function shouldResetMusicForDungeonEntry(
   previousDungeonId: string | null,

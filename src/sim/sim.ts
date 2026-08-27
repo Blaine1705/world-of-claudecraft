@@ -318,7 +318,7 @@ import {
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
-import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
+import { aggroDungeonPackmates, socialPullSameTemplate } from './mob/dungeon_pack_aggro';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
@@ -923,15 +923,8 @@ export { DELVE_IMPLEMENTED_AFFIXES, DELVE_MODULE_NAMES } from './delves/runs';
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 // STEEP_SLIDE_SPEED moved to player_motion.ts (MV1; movement-kernel-only).
 
-// How far a mob pulls same-family neighbours into a fight ("social aggro").
-// Murlocs (the clustered water mobs players call "frogs") used to pull too much,
-// chain-aggroing the whole pond and making solo pulls impossible (#102). Tune
-// per family here; everything else falls back to the default.
+// SOCIAL_PULL_RADIUS moved to mob/dungeon_pack_aggro.ts with socialPullSameTemplate.
 // POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
-const DEFAULT_SOCIAL_PULL_RADIUS = 5;
-const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
-  mudfin: 8,
-};
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
 // swimSurfaceY / SWIM_SPEED_MULT moved to player_motion.ts (MV1) and imported back
@@ -7923,28 +7916,7 @@ export class Sim {
     // the non-social aggro path used by taunts. Keep this separate from the generic
     // same-template radius below: `social` only controls that legacy propagation.
     if (playerPull) aggroDungeonPackmates(this.entities.values(), mob, target);
-    if (social) {
-      const family = MOBS[mob.templateId]?.family;
-      const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
-      this.grid.forEachInRadius(mob.pos.x, mob.pos.z, pullRadius, (m, d2) => {
-        if (
-          m.kind === 'mob' &&
-          m.id !== mob.id &&
-          !m.dead &&
-          m.hostile &&
-          m.aiState === 'idle' &&
-          m.ownerId === null &&
-          m.templateId === mob.templateId &&
-          d2 < pullRadius * pullRadius
-        ) {
-          m.aiState = 'chase';
-          m.aggroTargetId = target.id;
-          m.inCombat = true;
-          m.leashAnchor = { ...m.pos };
-          addThreat(m, target.id, 1);
-        }
-      });
-    }
+    if (social) socialPullSameTemplate(this.grid, mob, target);
     return true;
   }
 
