@@ -2740,6 +2740,7 @@ export const zh_TW: EnTranslations = {
         "actionBar1": "動作條",
         "actionBar2": "動作條 2",
         "actionBar3": "動作條 3",
+        "steamWishlist": "願望清單提醒",
         "menu": "Menu",
         "minimap": "小地圖",
         "stanceBar": "姿態欄",
@@ -2757,6 +2758,9 @@ export const zh_TW: EnTranslations = {
       "buffsLeftToRight": "增益從左到右",
       "debuffsLeftToRight": "減益從左到右",
       "lockPlayerFrameToBar": "玩家框體鎖定在動作列上方",
+      "actionBarsVertical": "動作條縱向排列",
+      "menuRailHorizontal": "選單橫向排列",
+      "resetFrameSizes": "重置框體尺寸",
       "previewSpell": "示範法術"
     },
     "transfer": {

@@ -753,6 +753,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.actionBar1': '动作条',
   'hudChrome.interfaceUnlock.frameNames.actionBar2': '动作条 2',
   'hudChrome.interfaceUnlock.frameNames.actionBar3': '动作条 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': '愿望单提醒',
   'hudChrome.interfaceUnlock.frameNames.minimap': '小地图',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '姿态栏',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '玩家',
@@ -766,6 +767,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.buffsLeftToRight': '增益从左到右',
   'hudChrome.interfaceUnlock.debuffsLeftToRight': '减益从左到右',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': '玩家框体锁定在动作条上方',
+  'hudChrome.interfaceUnlock.actionBarsVertical': '动作条纵向排列',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': '菜单横向排列',
+  'hudChrome.interfaceUnlock.resetFrameSizes': '重置框体尺寸',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。',
   'hudChrome.interfaceUnlock.previewSpell': '示例法术',

@@ -201,6 +201,12 @@ export const BOOL_SETTINGS = {
   // --buff-bar-direction / --debuff-bar-direction in main.ts.
   buffsLeftToRight: { def: false },
   debuffsLeftToRight: { def: false },
+  // Orientation flips (the Frames Settings menu): lay the desktop action
+  // bars out as COLUMNS instead of rows (the combined block then sets its
+  // columns side by side), and the corner menu rail as a ROW instead of its
+  // stock two stacked columns. Pure CSS via body classes in main.ts.
+  actionBarsVertical: { def: false },
+  menuRailHorizontal: { def: false },
   // Glue the player frame to the TOP of the action bars (the Frames Settings
   // menu): the frame gives up its own dragged spot (kept in storage for
   // switching back) and re-docks over the bars, riding along when the

@@ -768,6 +768,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.actionBar1': 'Панель команд',
   'hudChrome.interfaceUnlock.frameNames.actionBar2': 'Панель команд 2',
   'hudChrome.interfaceUnlock.frameNames.actionBar3': 'Панель команд 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'Напоминание о списке желаемого',
   'hudChrome.interfaceUnlock.frameNames.minimap': 'Мини-карта',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Панель стоек',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
@@ -781,6 +782,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.buffsLeftToRight': 'Усиления слева направо',
   'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Ослабления слева направо',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'Закрепить фрейм игрока над панелью действий',
+  'hudChrome.interfaceUnlock.actionBarsVertical': 'Вертикальные панели действий',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': 'Горизонтальное меню',
+  'hudChrome.interfaceUnlock.resetFrameSizes': 'Сбросить размеры фреймов',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     'Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.',
   'hudChrome.interfaceUnlock.previewSpell': 'Пример заклинания',

@@ -2075,6 +2075,8 @@ export class Hud {
         ['buffsLeftToRight', 'hudChrome.interfaceUnlock.buffsLeftToRight'],
         ['debuffsLeftToRight', 'hudChrome.interfaceUnlock.debuffsLeftToRight'],
         ['lockPlayerFrameToActionBar', 'hudChrome.interfaceUnlock.lockPlayerFrameToBar'],
+        ['actionBarsVertical', 'hudChrome.interfaceUnlock.actionBarsVertical'],
+        ['menuRailHorizontal', 'hudChrome.interfaceUnlock.menuRailHorizontal'],
       ] as const;
       return rows.map(([key, labelKey]) => ({
         id: key,
@@ -2112,6 +2114,39 @@ export class Hud {
       return [
         selectFor('partyFrameColumns', 'hudChrome.partyFrames.columns'),
         selectFor('partyFrameSpacing', 'hudChrome.partyFrames.spacing'),
+      ];
+    },
+    // One-shot Reset Frame Sizes (owner request): every frame's grip/corner
+    // zoom and side stretch drops back to stock while POSITIONS stay put,
+    // and the settings-backed sizes (the dimension drags, the per-frame
+    // scale factors, the party profile) return to their defaults through
+    // the same persist-and-apply pair the sliders use.
+    menuActions: () => {
+      const hooks = this.optionsHooks;
+      if (!hooks) return [];
+      return [
+        {
+          id: 'resetFrameSizes',
+          label: t('hudChrome.interfaceUnlock.resetFrameSizes'),
+          run: () => {
+            const sizeKeys = [
+              'playerFrameScale',
+              'targetFrameScale',
+              'partyFrameScale',
+              'playerFrameWidth',
+              'playerFrameHeight',
+              'targetFrameWidth',
+              'targetFrameHeight',
+              'partyFrameWidth',
+              'partyFrameHeight',
+            ] as const;
+            hooks.settings.reset([...sizeKeys]);
+            for (const key of sizeKeys) hooks.onSettingChange(key, hooks.settings.get(key));
+            // Covers every registered mover: the HUD frame table AND the
+            // three unit frames, which join the same registry.
+            this.interfaceUnlock.resetAllSizes();
+          },
+        },
       ];
     },
   });
@@ -3988,9 +4023,9 @@ export class Hud {
         onPositioned,
       });
       // The optional bars' menu row toggles the bar's ENABLED setting (the
-      // same state the on-bar plus/minus drives), listed whenever the bars are
-      // split, so the Frames Settings menu can turn bar 2 or 3 on, not only
-      // hide a shown one. Combined, the rows fold away with the shape.
+      // same state the on-bar plus/minus drives), listed in BOTH shapes
+      // (owner request): split it shows/enables the standalone row, combined
+      // it grows or shrinks the combined block exactly like its plus/minus.
       const optionalBarKey =
         spec.id === 'actionBar2'
           ? ('showSecondaryActionBar' as const)
@@ -4004,7 +4039,10 @@ export class Hud {
         ...(optionalBarKey
           ? {
               rowOverride: {
-                listed: () => !this.combineActionBars,
+                // Listed in BOTH shapes (owner request): while combined the
+                // rows still toggle the bar's ENABLED setting, which grows or
+                // shrinks the combined block exactly like its plus/minus.
+                listed: () => true,
                 value: () => !!this.optionsHooks?.settings.get(optionalBarKey),
                 set: (checked: boolean) => {
                   // Re-showing via the menu also clears a stale menu-hide, so

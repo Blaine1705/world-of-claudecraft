@@ -771,6 +771,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.actionBar1': 'アクションバー',
   'hudChrome.interfaceUnlock.frameNames.actionBar2': 'アクションバー 2',
   'hudChrome.interfaceUnlock.frameNames.actionBar3': 'アクションバー 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'ウィッシュリストの通知',
   'hudChrome.interfaceUnlock.frameNames.minimap': 'ミニマップ',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'スタンスバー',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'プレイヤー',
@@ -784,6 +785,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.buffsLeftToRight': 'バフを左から右へ',
   'hudChrome.interfaceUnlock.debuffsLeftToRight': 'デバフを左から右へ',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'プレイヤーフレームをアクションバーに固定',
+  'hudChrome.interfaceUnlock.actionBarsVertical': 'アクションバーを縦向きに',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': 'メニューを横向きに',
+  'hudChrome.interfaceUnlock.resetFrameSizes': 'フレームサイズをリセット',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。',
   'hudChrome.interfaceUnlock.previewSpell': 'サンプル呪文',

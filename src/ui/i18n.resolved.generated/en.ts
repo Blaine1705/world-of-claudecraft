@@ -2740,6 +2740,7 @@ export const en: EnTranslations = {
         "actionBar1": "Action Bar",
         "actionBar2": "Action Bar 2",
         "actionBar3": "Action Bar 3",
+        "steamWishlist": "Wishlist Reminder",
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Stance Bar",
@@ -2757,6 +2758,9 @@ export const en: EnTranslations = {
       "buffsLeftToRight": "Buffs left to right",
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
+      "actionBarsVertical": "Vertical Action Bars",
+      "menuRailHorizontal": "Horizontal Menu",
+      "resetFrameSizes": "Reset Frame Sizes",
       "previewSpell": "Example Spell"
     },
     "transfer": {

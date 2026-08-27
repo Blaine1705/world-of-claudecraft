@@ -2740,6 +2740,7 @@ export const en_XA: EnTranslations = {
         "actionBar1": "[Áçţíóñ Ɓáŕ]",
         "actionBar2": "[Áçţíóñ Ɓáŕ 2]",
         "actionBar3": "[Áçţíóñ Ɓáŕ 3]",
+        "steamWishlist": "[Ŵíšĥļíšţ Ŕéɱíñðéŕ]",
         "menu": "[Ɱéñú]",
         "minimap": "[Ɱíñíɱáþ]",
         "stanceBar": "[Šţáñçé Ɓáŕ]",
@@ -2757,6 +2758,9 @@ export const en_XA: EnTranslations = {
       "buffsLeftToRight": "[Ɓúƒƒš ļéƒţ ţó ŕíĝĥţ]",
       "debuffsLeftToRight": "[Ðéƀúƒƒš ļéƒţ ţó ŕíĝĥţ]",
       "lockPlayerFrameToBar": "[Ļóçķ Þļáýéŕ Ƒŕáɱé ţó Áçţíóñ Ɓáŕ]",
+      "actionBarsVertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕš]",
+      "menuRailHorizontal": "[Ĥóŕížóñţáļ Ɱéñú]",
+      "resetFrameSizes": "[Ŕéšéţ Ƒŕáɱé Šížéš]",
       "previewSpell": "[Éẋáɱþļé Šþéļļ]"
     },
     "transfer": {

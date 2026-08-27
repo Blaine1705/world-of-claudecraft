@@ -1541,6 +1541,8 @@ export class OptionsWindow {
         'buffsLeftToRight',
         'debuffsLeftToRight',
         'lockPlayerFrameToActionBar',
+        'actionBarsVertical',
+        'menuRailHorizontal',
         'combineActionBars',
         'hideUnusedActionSlots',
         'mouseoverCast',

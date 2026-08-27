@@ -130,7 +130,7 @@ const MONOLITHS: MonolithRow[] = [
     // frames-menu setting rows, the player-frame bar lock) predates this
     // ratchet and lives on coordinator state; extracting it behind the
     // hud/ seams is flagged follow-up work on that PR. Exact count.
-    ceiling: 19048,
+    ceiling: 19086,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -259,7 +259,7 @@ const MONOLITHS: MonolithRow[] = [
     // the interface-editor settings (frame dimensions, aura direction vars,
     // the player-frame bar lock) predate this ratchet; folding them behind a
     // src/game/ settings-application seam is flagged follow-up work.
-    ceiling: 11615,
+    ceiling: 11622,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

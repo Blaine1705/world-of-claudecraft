@@ -772,6 +772,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.actionBar1': '행동 단축바',
   'hudChrome.interfaceUnlock.frameNames.actionBar2': '행동 단축바 2',
   'hudChrome.interfaceUnlock.frameNames.actionBar3': '행동 단축바 3',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': '찜 목록 알림',
   'hudChrome.interfaceUnlock.frameNames.minimap': '미니맵',
   'hudChrome.interfaceUnlock.frameNames.stanceBar': '태세 바',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': '플레이어',
@@ -785,6 +786,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.buffsLeftToRight': '버프 왼쪽에서 오른쪽으로',
   'hudChrome.interfaceUnlock.debuffsLeftToRight': '디버프 왼쪽에서 오른쪽으로',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': '플레이어 프레임을 액션 바에 고정',
+  'hudChrome.interfaceUnlock.actionBarsVertical': '액션 바 세로 배치',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': '메뉴 가로 배치',
+  'hudChrome.interfaceUnlock.resetFrameSizes': '프레임 크기 초기화',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.',
   'hudChrome.interfaceUnlock.previewSpell': '예시 주문',

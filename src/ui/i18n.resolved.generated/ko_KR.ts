@@ -2740,6 +2740,7 @@ export const ko_KR: EnTranslations = {
         "actionBar1": "행동 단축바",
         "actionBar2": "행동 단축바 2",
         "actionBar3": "행동 단축바 3",
+        "steamWishlist": "찜 목록 알림",
         "menu": "Menu",
         "minimap": "미니맵",
         "stanceBar": "태세 바",
@@ -2757,6 +2758,9 @@ export const ko_KR: EnTranslations = {
       "buffsLeftToRight": "버프 왼쪽에서 오른쪽으로",
       "debuffsLeftToRight": "디버프 왼쪽에서 오른쪽으로",
       "lockPlayerFrameToBar": "플레이어 프레임을 액션 바에 고정",
+      "actionBarsVertical": "액션 바 세로 배치",
+      "menuRailHorizontal": "메뉴 가로 배치",
+      "resetFrameSizes": "프레임 크기 초기화",
       "previewSpell": "예시 주문"
     },
     "transfer": {

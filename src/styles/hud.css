@@ -1920,6 +1920,13 @@
     font: inherit;
     padding: 1px 4px;
   }
+  /* The one-shot action buttons at the dropdown's foot (Reset Frame Sizes):
+     full-width small .btn rows, separated from the toggles above. */
+  .frames-menu-action {
+    margin-top: 4px;
+    width: 100%;
+    font-size: 12px;
+  }
   /* The show/hide sub-menu: a native details/summary fold, styled to read as
      a menu heading, with the frame rows indented beneath it. */
   .frames-menu-sub summary {
@@ -3329,6 +3336,20 @@
   body.show-actionbar3 #actionbar3 {
     display: flex;
   }
+  /* Vertical action bars (actionBarsVertical, the Frames Settings menu): each
+     bar lays its slots out as a COLUMN, and the combined block sets its
+     columns side by side (bottom-aligned so bar 1 keeps the ground line the
+     plus/minus buttons live on). Everything else (slots, keycaps, toggles,
+     the movable-frame chrome) rides the flex flip unchanged. */
+  body.actionbars-vertical #actionbar,
+  body.actionbars-vertical #actionbar2,
+  body.actionbars-vertical #actionbar3 {
+    flex-direction: column;
+  }
+  body.actionbars-vertical.combined-action-bars #actionbar-group {
+    flex-direction: row;
+    align-items: flex-end;
+  }
   /* The three action bars share a wrapper so the "Combine Action Bars" option
      can move them as ONE frame. Off (the default) the wrapper has no box at
      all, so the stack lays the three rows out exactly as it always did and each
@@ -3771,6 +3792,20 @@
   #side-buttons-col-b {
     position: relative;
     z-index: 1;
+  }
+  /* Horizontal menu rail (menuRailHorizontal, the Frames Settings menu): the
+     rail's two stacked columns become two side-by-side ROWS, reading as one
+     horizontal strip. The explicit 34px column width is dropped (a row sizes
+     to its buttons), and the rows bottom-align so the taller daily-rewards
+     chest never staggers the strip. */
+  body.menu-rail-horizontal #side-buttons {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  body.menu-rail-horizontal .side-buttons-col {
+    flex-direction: row;
+    align-items: flex-end;
+    width: auto;
   }
   .micro-btn {
     width: 34px;

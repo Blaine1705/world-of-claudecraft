@@ -2740,6 +2740,7 @@ export const ru_RU: EnTranslations = {
         "actionBar1": "Панель команд",
         "actionBar2": "Панель команд 2",
         "actionBar3": "Панель команд 3",
+        "steamWishlist": "Напоминание о списке желаемого",
         "menu": "Menu",
         "minimap": "Мини-карта",
         "stanceBar": "Панель стоек",
@@ -2757,6 +2758,9 @@ export const ru_RU: EnTranslations = {
       "buffsLeftToRight": "Усиления слева направо",
       "debuffsLeftToRight": "Ослабления слева направо",
       "lockPlayerFrameToBar": "Закрепить фрейм игрока над панелью действий",
+      "actionBarsVertical": "Вертикальные панели действий",
+      "menuRailHorizontal": "Горизонтальное меню",
+      "resetFrameSizes": "Сбросить размеры фреймов",
       "previewSpell": "Пример заклинания"
     },
     "transfer": {

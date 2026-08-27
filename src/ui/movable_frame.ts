@@ -436,6 +436,19 @@ export class MovableFrame {
     if (this.pos) this.applyPos();
   }
 
+  /** Drop the frame's SIZE adjustments only (the grip and corner zoom, a side
+   *  stretch), keeping its position: the Frames Settings menu's Reset Frame
+   *  Sizes action. Dimensions-mode frames carry their sizes in real settings,
+   *  which the caller resets alongside; stripping the pos fields here still
+   *  matters for them (a pre-mode legacy stretch must not survive a reset).
+   *  A frame with no saved position has nothing to strip. */
+  resetSize(): void {
+    if (!this.pos) return;
+    this.pos = { left: this.pos.left, top: this.pos.top, vw: this.pos.vw, vh: this.pos.vh };
+    this.applyPos();
+    this.persistPos();
+  }
+
   /** Snap the frame back to its stock CSS spot: forget the saved position,
    *  clear the inline styles, undo any detach (onPositioned(false)), and lock
    *  the frame. Wired to the "Reset Frame Positions" interface option. */

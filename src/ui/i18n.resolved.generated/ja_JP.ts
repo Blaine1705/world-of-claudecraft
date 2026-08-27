@@ -2740,6 +2740,7 @@ export const ja_JP: EnTranslations = {
         "actionBar1": "アクションバー",
         "actionBar2": "アクションバー 2",
         "actionBar3": "アクションバー 3",
+        "steamWishlist": "ウィッシュリストの通知",
         "menu": "Menu",
         "minimap": "ミニマップ",
         "stanceBar": "スタンスバー",
@@ -2757,6 +2758,9 @@ export const ja_JP: EnTranslations = {
       "buffsLeftToRight": "バフを左から右へ",
       "debuffsLeftToRight": "デバフを左から右へ",
       "lockPlayerFrameToBar": "プレイヤーフレームをアクションバーに固定",
+      "actionBarsVertical": "アクションバーを縦向きに",
+      "menuRailHorizontal": "メニューを横向きに",
+      "resetFrameSizes": "フレームサイズをリセット",
       "previewSpell": "サンプル呪文"
     },
     "transfer": {

@@ -3568,6 +3568,7 @@ export const hudChromeStrings = {
       actionBar1: 'Action Bar',
       actionBar2: 'Action Bar 2',
       actionBar3: 'Action Bar 3',
+      steamWishlist: 'Wishlist Reminder',
       menu: 'Menu',
       minimap: 'Minimap',
       stanceBar: 'Stance Bar',
@@ -3601,6 +3602,11 @@ export const hudChromeStrings = {
     // bars and stops being individually movable. Wordy (M16): non-Latin
     // fills land in this change.
     lockPlayerFrameToBar: 'Lock Player Frame to Action Bar',
+    // Orientation flips + the one-shot size reset (all wordy, M16: non-Latin
+    // fills land in this change).
+    actionBarsVertical: 'Vertical Action Bars',
+    menuRailHorizontal: 'Horizontal Menu',
+    resetFrameSizes: 'Reset Frame Sizes',
     // The sample spell name on the edit mode's filled cast-bar preview.
     previewSpell: 'Example Spell',
   },

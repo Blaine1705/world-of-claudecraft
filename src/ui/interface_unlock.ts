@@ -62,6 +62,9 @@ export interface InterfaceUnlockDeps {
    *  compact label + select rows (the party columns count). Same resolve-per-
    *  rebuild and persist-and-apply contract as settingToggles. */
   settingSelects?: () => FramesMenuSelect[];
+  /** One-shot actions rendered as buttons at the dropdown's foot (Reset Frame
+   *  Sizes). The menu rebuilds after a run so every row reflects the result. */
+  menuActions?: () => FramesMenuAction[];
   /** Fired after every flip with the new state (and from relocalize with the
    *  current one). The host hangs the edit-mode preview samples off it. */
   onUnlockedChanged?: (unlocked: boolean) => void;
@@ -84,6 +87,13 @@ export interface FramesMenuSelect {
   value: number;
   options: { value: number; label: string }[];
   set(value: number): void;
+}
+
+/** One button row at the dropdown's foot: a one-shot action over the frames. */
+export interface FramesMenuAction {
+  id: string;
+  label: string;
+  run(): void;
 }
 
 /** Body class the stylesheet gates the unlocked affordances on (the frame
@@ -257,13 +267,27 @@ export class InterfaceUnlock {
     menu.appendChild(sub);
     const toggles = this.deps.settingToggles ? this.deps.settingToggles() : [];
     const selects = this.deps.settingSelects ? this.deps.settingSelects() : [];
-    if (toggles.length > 0 || selects.length > 0) {
+    const actions = this.deps.menuActions ? this.deps.menuActions() : [];
+    if (toggles.length > 0 || selects.length > 0 || actions.length > 0) {
       const settings = doc.createElement('div');
       settings.className = 'frames-menu-settings';
       for (const toggle of toggles) {
         settings.appendChild(this.checkRow(toggle.label, toggle.value, (v) => toggle.set(v)));
       }
       for (const select of selects) settings.appendChild(this.selectRow(select));
+      for (const action of actions) {
+        const btn = doc.createElement('button');
+        btn.type = 'button';
+        btn.className = 'frames-menu-action btn';
+        btn.textContent = action.label;
+        // Rebuild after the run so every row reflects the action's result
+        // (a size reset moves the selects and the live frames alike).
+        btn.addEventListener('click', () => {
+          action.run();
+          this.rebuildFramesMenu();
+        });
+        settings.appendChild(btn);
+      }
       menu.appendChild(settings);
     }
   }
@@ -325,6 +349,14 @@ export class InterfaceUnlock {
     for (const entry of this.entries) {
       if (entry.id === id) entry.mover.restoreSavedPosition();
     }
+  }
+
+  /** Drop every registered frame's SIZE adjustments while keeping positions:
+   *  the Reset Frame Sizes menu action. The host resets the settings-backed
+   *  dimension and scale keys alongside (dimensions-mode frames store their
+   *  sizes there). */
+  resetAllSizes(): void {
+    for (const entry of this.entries) entry.mover.resetSize();
   }
 
   /** Lock everything and forget every saved box. Wired to the existing
