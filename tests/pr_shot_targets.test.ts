@@ -18,6 +18,7 @@ describe('classifyDiff', () => {
       4,
     );
     expect(script).toContain('localStorage.removeItem(key)');
+    expect(script).toContain("waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0'");
 
     const sliceBetween = (start: string, end: string, from = 0) => {
       const startIndex = script.indexOf(start, from);
@@ -76,6 +77,48 @@ describe('classifyDiff', () => {
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('inventory');
     // A specific window was found, so no generic HUD fallback.
+    expect(plan.generic).toHaveLength(0);
+  });
+
+  it('maps the Steam wishlist owner to current web and borderless landing evidence', () => {
+    const plan = classifyDiff(['src/ui/steam_wishlist.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((target: { key: string }) => target.key)).toContain('steam-wishlist');
+    const target = plan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'steam-wishlist',
+    );
+    expect(target?.variants).toEqual([
+      { key: 'homepage-header-web', landing: true, beforeLoad: expect.any(Function) },
+      {
+        key: 'homepage-header-borderless-1366',
+        landing: true,
+        beforeLoad: expect.any(Function),
+        borderless: true,
+      },
+      {
+        key: 'homepage-footer-web',
+        landing: true,
+        beforeLoad: expect.any(Function),
+        footer: true,
+      },
+      {
+        key: 'desktop-community-tray',
+        beforeLoad: expect.any(Function),
+        communityTray: true,
+        charClass: 'warrior',
+        charName: 'Thorgar',
+      },
+      {
+        key: 'mobile-more-tray',
+        landing: true,
+        mobile: true,
+        beforeLoad: expect.any(Function),
+        moreTray: true,
+      },
+    ]);
+    expect(target?.variants[1].beforeLoad.toString()).toContain(
+      "localStorage.setItem('locale', 'de_DE')",
+    );
     expect(plan.generic).toHaveLength(0);
   });
 

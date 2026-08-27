@@ -2266,6 +2266,7 @@ const UI_DOM_MODULES = [
   'src/ui/spellbook_window.ts',
   'src/ui/start_skin_picker_portraits.ts',
   'src/ui/steam_link.ts',
+  'src/ui/steam_wishlist.ts',
   'src/ui/store_stack_diag.ts',
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',

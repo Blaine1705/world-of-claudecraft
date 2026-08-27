@@ -2979,7 +2979,10 @@ export const ko_KR: EnTranslations = {
       "unlink": "Steam 연동 해제",
       "linked": "Steam 계정 {id}에 연동됨",
       "benefits": "데스크톱 앱에서 Steam 계정을 연동하면 획득한 업적이 Steam 도전 과제로 반영됩니다.",
-      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요."
+      "noTicket": "Steam에서 연동 티켓을 받지 못했습니다. Steam을 실행한 뒤 다시 시도해 주세요.",
+      "wishlist": "Steam에서 위시리스트에 추가",
+      "wishlistAria": "Steam에서 위시리스트에 추가: World of ClaudeCraft 상점 페이지 열기",
+      "wishlistShort": "위시리스트"
     },
     "epic": {
       "title": "Epic",

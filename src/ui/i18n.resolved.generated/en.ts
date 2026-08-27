@@ -2979,7 +2979,10 @@ export const en: EnTranslations = {
       "unlink": "Unlink Steam",
       "linked": "Linked to Steam account {id}",
       "benefits": "Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.",
-      "noTicket": "Steam did not provide a link ticket. Start Steam, then try again."
+      "noTicket": "Steam did not provide a link ticket. Start Steam, then try again.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

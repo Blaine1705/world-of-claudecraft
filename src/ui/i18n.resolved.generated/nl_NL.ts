@@ -2979,7 +2979,10 @@ export const nl_NL: EnTranslations = {
       "unlink": "Steam ontkoppelen",
       "linked": "Gekoppeld aan Steam-account {id}",
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
-      "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw."
+      "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

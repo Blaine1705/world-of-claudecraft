@@ -2979,7 +2979,10 @@ export const cs_CZ: EnTranslations = {
       "unlink": "Odpojit Steam",
       "linked": "Propojeno s účtem Steam {id}",
       "benefits": "Propoj svůj účet Steam z desktopové aplikace a skutky, které vykonáš, se budou zrcadlit do achievementů ve službě Steam.",
-      "noTicket": "Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu."
+      "noTicket": "Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",

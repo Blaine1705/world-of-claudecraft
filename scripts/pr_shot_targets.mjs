@@ -416,6 +416,22 @@ async function stubDesktopUpdateBridge(page) {
   })()`);
 }
 
+// The landing-header wishlist shares space with the borderless desktop shell's
+// Exit Game control. Seed the exact host shape which reveals that control and
+// choose German, whose longer navigation/action labels exercise the supported
+// compact desktop boundary in the screenshot rather than only in geometry tests.
+async function stubBorderlessDesktopBridge(page) {
+  await lowGraphicsSeed(page);
+  await stubDesktopUpdateBridge(page);
+  await page.evaluateOnNewDocument(`(() => {
+    try { localStorage.setItem('locale', 'de_DE'); } catch {}
+    Object.assign(window.wocDesktop, {
+      getDisplayMode: () => Promise.resolve('borderless'),
+      quitApp: () => Promise.resolve(true),
+    });
+  })()`);
+}
+
 // ---------------------------------------------------------------------------
 // The Reliquary HUD tracker (#reliquary-tracker) bring-up, shared by every
 // variant of the reliquary-tracker target below. The strip paints only when it
@@ -9482,7 +9498,12 @@ export const TARGETS = [
     ],
     async capture(page, variant) {
       if (variant?.moreTray) {
+        await dismissEntryOverlays(page);
         await page.evaluate(() => {
+          // A fresh offline character may receive Ferryman Odo's one-time
+          // arrival note after the shared entry helper has settled. It is
+          // unrelated to chrome-icon review and otherwise covers the tray.
+          document.querySelector('#tutorial-greeting')?.remove();
           document.querySelector('#mobile-more')?.click();
         });
         if (!(await pollForSize(page, '#mobile-extra-controls')))
@@ -9496,6 +9517,109 @@ export const TARGETS = [
       const sel = variant?.mobile ? '#mobile-combat-controls' : '#side-buttons';
       if (!(await pollForSize(page, sel))) throw new Error(`${sel} never laid out`);
       return { clip: sel };
+    },
+  },
+  {
+    key: 'steam-wishlist',
+    label: 'Steam wishlist reminder on the landing shell and desktop/mobile chrome',
+    when: ['src/ui/steam_wishlist'],
+    variants: [
+      { key: 'homepage-header-web', landing: true, beforeLoad: lowGraphicsSeed },
+      {
+        key: 'homepage-header-borderless-1366',
+        landing: true,
+        beforeLoad: stubBorderlessDesktopBridge,
+        borderless: true,
+      },
+      { key: 'homepage-footer-web', landing: true, beforeLoad: lowGraphicsSeed, footer: true },
+      {
+        key: 'desktop-community-tray',
+        beforeLoad: lowGraphicsSeed,
+        communityTray: true,
+        charClass: 'warrior',
+        charName: 'Thorgar',
+      },
+      {
+        key: 'mobile-more-tray',
+        landing: true,
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+        moreTray: true,
+      },
+    ],
+    async capture(page, variant) {
+      if (variant?.communityTray) {
+        await page.setViewport({ width: 1120, height: 560 });
+        await dismissEntryOverlays(page);
+        await page.waitForFunction(
+          () => !document.body.classList.contains('steam-wishlist-pending'),
+          { timeout: 10000, polling: 100 },
+        );
+        await page.evaluate(() => {
+          document.querySelector('#tutorial-greeting')?.remove();
+          const menu = document.querySelector('#community-menu');
+          if (menu instanceof HTMLDetailsElement) menu.open = true;
+        });
+        if (!(await pollForSize(page, '#community-hud .community-tray'))) {
+          const state = await page.evaluate(() => {
+            const box = (selector) => {
+              const element = document.querySelector(selector);
+              if (!(element instanceof HTMLElement)) return null;
+              const rect = element.getBoundingClientRect();
+              return {
+                display: getComputedStyle(element).display,
+                width: rect.width,
+                height: rect.height,
+              };
+            };
+            return {
+              start: box('#start-screen'),
+              ui: box('#ui'),
+              hud: box('#community-hud'),
+              tray: box('#community-hud .community-tray'),
+            };
+          });
+          throw new Error(`desktop Community tray did not open: ${JSON.stringify(state)}`);
+        }
+        await wait(400);
+        return { clip: '#community-hud .community-tray' };
+      }
+      if (variant?.moreTray) {
+        await page.evaluate(() => {
+          // This frame reviews the static tray composition, not world state.
+          // Stage the same open classes/ARIA that Hud's real mobile-more click
+          // owns, while staying on the landing boot so a cold renderer cannot
+          // make a UI-only screenshot nondeterministic.
+          document.body.classList.add('game-active', 'mobile-touch', 'mobile-more-open');
+          const ui = document.querySelector('#ui');
+          if (ui instanceof HTMLElement) ui.style.display = 'block';
+          document.querySelector('#mobile-extra-controls')?.setAttribute('aria-hidden', 'false');
+          document.querySelector('#mobile-more')?.setAttribute('aria-expanded', 'true');
+        });
+        if (!(await pollForSize(page, '#mobile-extra-controls'))) {
+          throw new Error('mobile More tray did not open');
+        }
+        await wait(400);
+        return { clip: '#mobile-extra-controls' };
+      }
+      if (variant?.borderless) {
+        await page.setViewport({ width: 1366, height: 768 });
+        await page.waitForFunction(
+          () => document.querySelector('#desktop-login-exit')?.hidden === false,
+          { timeout: 10000, polling: 100 },
+        );
+      }
+      if (variant?.footer) {
+        await page.evaluate(() => {
+          document.querySelector('.homepage-footer')?.scrollIntoView({ block: 'end' });
+        });
+        await wait(300);
+        return { clip: '.homepage-footer' };
+      }
+      if (!(await pollForSize(page, '.homepage-header', 10, 200))) {
+        throw new Error('home-page header did not render');
+      }
+      return { clip: '.homepage-header' };
     },
   },
   {

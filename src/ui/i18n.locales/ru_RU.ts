@@ -9986,6 +9986,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Привяжите аккаунт Steam в настольном приложении, чтобы ваши деяния отражались в достижениях Steam.',
   'hudChrome.steam.noTicket':
     'Steam не выдал билет для привязки. Запустите Steam и повторите попытку.',
+  'hudChrome.steam.wishlist': 'Добавить в желаемое в Steam',
+  'hudChrome.steam.wishlistAria': 'Добавить в желаемое в Steam: открыть страницу World of ClaudeCraft в магазине',
+  'hudChrome.steam.wishlistShort': 'В желаемое',
   'hudChrome.epic.link': 'Привязать Epic',
   'hudChrome.epic.unlink': 'Отвязать Epic',
   'hudChrome.epic.linked': 'Привязан аккаунт Epic {id}',

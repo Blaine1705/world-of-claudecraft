@@ -2979,7 +2979,10 @@ export const id_ID: EnTranslations = {
       "unlink": "Putuskan Tautan Steam",
       "linked": "Tertaut ke akun Steam {id}",
       "benefits": "Tautkan akun Steam-mu dari aplikasi desktop agar jasa yang kamu raih tercermin sebagai pencapaian Steam.",
-      "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi."
+      "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi.",
+      "wishlist": "Wishlist on Steam",
+      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlistShort": "Wishlist"
     },
     "epic": {
       "title": "Epic",
