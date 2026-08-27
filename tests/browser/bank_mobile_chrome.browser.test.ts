@@ -157,6 +157,35 @@ function openBank(info: BankInfo, band?: { granted: boolean; reason: string | nu
   return openBankWindow(info, band).root;
 }
 
+describe('the desktop bank toolbar (no mobile-touch)', () => {
+  it('WRAPS at the resize floor in a wordy locale instead of clipping off the edge', async () => {
+    // The other half of the one-row contract's scoping: on desktop the
+    // nowrap regime must NOT apply (the generic .bag-tools wrap survives),
+    // so a bank window resized toward its 220px floor
+    // (window_resize_core.ts WINDOW_MIN_WIDTH) in a wordy locale drops the
+    // deposit button to a second row, information-preserving, rather than
+    // pushing it past the window's clipped edge.
+    document.body.className = 'game-active';
+    const root = openBank(stockedBank());
+    root.style.width = '220px';
+    const tools = root.querySelector('.bag-tools') as HTMLElement;
+    expect(getComputedStyle(tools).flexWrap).toBe('wrap');
+    const deposit = root.querySelector('.bank-deposit-all') as HTMLElement;
+    let wordiest = '';
+    for (const [, copy] of await allDepositAllCopies()) {
+      if (copy.length > wordiest.length) wordiest = copy;
+    }
+    deposit.textContent = wordiest;
+    const search = root.querySelector('.bag-search') as HTMLElement;
+    // Wrapped: the deposit control sits on a LOWER row than the search box.
+    expect(deposit.getBoundingClientRect().top).toBeGreaterThan(
+      search.getBoundingClientRect().top + 10,
+    );
+    // And nothing overflowed the toolbar's own box horizontally.
+    expect(tools.scrollWidth).toBeLessThanOrEqual(tools.clientWidth);
+  });
+});
+
 /** How far past the window's own bottom border an element's bottom edge sits.
  *  Positive is the defect; the phase's contract is that it stays at or below
  *  -CLEARANCE. */

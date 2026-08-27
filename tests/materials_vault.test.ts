@@ -2267,3 +2267,49 @@ describe('emitVaultCraftConsume (the sort-and-aggregate contract, Phase 04 revie
     expect(emitted([])).toEqual([]);
   });
 });
+
+describe('the cvault wire signature premise: stock writers are confined', () => {
+  it('no module outside materials_vault.ts writes vault.stock (the rev-bump enumeration guard)', async () => {
+    // The cvault key's elision rests on "every stock mutation bumps
+    // vaultWireRev", which is an ENUMERATION over materials_vault.ts's own
+    // writers now that the 4 Hz cadence self-heal is gone. Keep the
+    // enumeration checkable: any new module that writes vault.stock (or
+    // vault.special / vault.upgrades) must red here and join the
+    // bumpVaultWireRev discipline, or the projection goes stale forever.
+    const { readdirSync, readFileSync, statSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const root = new URL('../src/sim', import.meta.url).pathname;
+    const writes = [
+      /vault\.(?:stock|special|upgrades)(?:\[[^\]]*\])?\s*(?:=(?!=)|\+=|-=)/,
+      /vault\.(?:stock|special)\.(?:push|splice|pop|shift|unshift)\(/,
+      /delete\s+[A-Za-z_$][\w$.]*vault\.stock/,
+    ];
+    // POSITIVE CONTROL first: the patterns must recognize the sanctioned
+    // writer's own mutations, or an offenders list of [] proves nothing.
+    const sanctioned = readFileSync(join(root, 'materials_vault.ts'), 'utf8');
+    expect(writes.some((pattern) => pattern.test(sanctioned))).toBe(true);
+    const offenders: string[] = [];
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir)) {
+        const full = join(dir, entry);
+        if (statSync(full).isDirectory()) {
+          walk(full);
+          continue;
+        }
+        if (!entry.endsWith('.ts') || entry === 'materials_vault.ts') continue;
+        const src = readFileSync(full, 'utf8');
+        // WRITES only: an indexed or whole-field assignment, a compound
+        // assignment, an array mutator, or a delete. Plain reads
+        // (quest_item_presence's presence probe) are legal everywhere. The
+        // whole-record `meta.vault = ...` replacement is excluded by
+        // construction: it happens only in Sim.addPlayer, where a fresh
+        // session's undefined lastSent covers the signature.
+        if (writes.some((pattern) => pattern.test(src))) offenders.push(full);
+      }
+    };
+    walk(root);
+    const serverRoot = new URL('../server', import.meta.url).pathname;
+    walk(serverRoot);
+    expect(offenders).toEqual([]);
+  });
+});

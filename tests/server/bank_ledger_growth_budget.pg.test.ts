@@ -468,9 +468,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
           WHERE conname = 'bank_ledger_batch_receipts_key_shape'
             AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
       );
-      expect(midWindow.rows).toEqual([
-        { oid: converged.rows[0].oid, convalidated: false },
-      ]);
+      expect(midWindow.rows).toEqual([{ oid: converged.rows[0].oid, convalidated: false }]);
       // Enforcement of NEW writes is immediate despite NOT VALID.
       await expect(insertReceipt('also!bad')).rejects.toMatchObject({ code: '23514' });
       await expect(insertReceipt('good.key')).resolves.toMatchObject({ rowCount: 1 });
@@ -560,6 +558,18 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
         'autovacuum_enabled=false',
       ]),
     );
+    expect(await optionsOf('bank_ledger_growth_budget')).toEqual(
+      expect.arrayContaining([
+        'autovacuum_vacuum_scale_factor=0',
+        'autovacuum_vacuum_threshold=1000',
+      ]),
+    );
+    // PARTIAL drift: one option right, one wrong. The count-of-two probe
+    // must see 1 and FIRE the ALTER (a probe that any-matched would skip).
+    await pool.query(
+      `ALTER TABLE "${schema}".bank_ledger_growth_budget SET (autovacuum_vacuum_threshold = 7)`,
+    );
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(schema));
     expect(await optionsOf('bank_ledger_growth_budget')).toEqual(
       expect.arrayContaining([
         'autovacuum_vacuum_scale_factor=0',

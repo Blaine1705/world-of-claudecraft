@@ -7,6 +7,7 @@ import {
   BANK_LEDGER_GROWTH_LIMIT_ENV,
   BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
   BankLedgerGrowthLimitExceeded,
+  bankLedgerGrowthBudgetReadbackSql,
   bankLedgerGrowthBudgetReadout,
   bankLedgerGrowthBudgetSchema,
   bankLedgerGrowthHardLimitFromEnv,
@@ -36,7 +37,8 @@ describe('bank ledger durable growth budget', () => {
     // holds ACCESS EXCLUSIVE on the ledger from the core schema's ADD COLUMN
     // converges, so there is no unlocked place inside it and a second pass
     // only lengthened the blocked window (measured 1.85x).
-    expect(folded).not.toContain('PERFORM pg_catalog.count(*)');
+    const code = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/--[^\n]*/g, '').replace(/\s+/g, ' ');
+    expect(code).not.toContain('PERFORM');
     const lock = folded.indexOf('LOCK TABLE "public".bank_ledger IN SHARE ROW EXCLUSIVE MODE');
     const createCommitTrigger = folded.indexOf(
       'CREATE CONSTRAINT TRIGGER bank_ledger_growth_budget_commit',
@@ -89,6 +91,15 @@ describe('bank ledger durable growth budget', () => {
     expect(bankLedgerGrowthBudgetSchema('isolated_test')).toContain(
       '"isolated_test".bank_ledger_growth_budget',
     );
+    // The boot readback's LITERAL, pinned here so the exported-builder
+    // equality pins in schema_wiring and the save-effects boot test are
+    // anchored to real SQL rather than comparing the builder to itself.
+    expect(bankLedgerGrowthBudgetReadbackSql()).toBe(
+      'SELECT committed_rows, hard_limit_rows FROM "public".bank_ledger_growth_budget WHERE singleton = TRUE',
+    );
+    expect(() => bankLedgerGrowthBudgetReadbackSql('bad; DROP')).toThrow(
+      /simple lowercase identifier/,
+    );
     expect(() => bankLedgerGrowthBudgetSchema('public; DROP TABLE bank_ledger')).toThrow(
       /simple lowercase identifier/,
     );
@@ -139,16 +150,19 @@ describe('bank ledger durable growth budget', () => {
     // The singleton takes one UPDATE per ledger transaction forever against
     // one live row, so IT is the table that needs the fixed-threshold vacuum
     // backstop (HOT pruning in its nearly-empty page absorbs the rest).
-    const budgetParams =
-      '(autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000)';
-    expect(folded).toContain(`updated_at TIMESTAMPTZ NOT NULL DEFAULT now() ) WITH ${budgetParams}`);
+    const budgetParams = '(autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000)';
+    expect(folded).toContain(
+      `updated_at TIMESTAMPTZ NOT NULL DEFAULT now() ) WITH ${budgetParams}`,
+    );
     // The converge arm reaches tables created before the parameters existed,
     // gated behind a reloptions probe: a value-identical ALTER still takes
     // SHARE UPDATE EXCLUSIVE to COMMIT and writes pg_class, so steady-state
     // boots must skip it. The probe compares PARSED values via
     // pg_options_to_table, never stored text, so a '0' vs '0.0' rendering
     // difference cannot re-fire the ALTER on every boot.
-    expect(folded).toContain(`ALTER TABLE "public".bank_ledger_growth_pending SET ${pendingParams}`);
+    expect(folded).toContain(
+      `ALTER TABLE "public".bank_ledger_growth_pending SET ${pendingParams}`,
+    );
     expect(folded).toContain(`ALTER TABLE "public".bank_ledger_growth_budget SET ${budgetParams}`);
     // Strip SQL comments before the absence pins: the prose deliberately
     // EXPLAINS why fillfactor is gone, and a comment mention must not satisfy

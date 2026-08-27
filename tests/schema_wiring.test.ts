@@ -81,6 +81,7 @@ const h = vi.hoisted(() => {
     query,
     connect: vi.fn(() => Promise.resolve({ query, release: vi.fn() })),
     clientConfigs: [] as unknown[],
+    noticeListeners: [] as Array<(notice: unknown) => void>,
   };
 });
 vi.mock('pg', () => ({
@@ -96,6 +97,9 @@ vi.mock('pg', () => ({
       connect: vi.fn(() => Promise.resolve()),
       query: h.query,
       end: vi.fn(() => Promise.resolve()),
+      on: vi.fn((event: string, listener: (notice: unknown) => void) => {
+        if (event === 'notice') h.noticeListeners.push(listener);
+      }),
     };
   }),
 }));
@@ -518,6 +522,52 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(observeBankLedgerGrowthBudget).toHaveBeenCalledWith('7', '10000000');
   });
 
+  it('warns when the growth readback cannot seed the gauge', async () => {
+    // The monitor refresh backstops the gauge inside a minute, but a missing
+    // or malformed singleton right after the fragment ran deserves a name in
+    // the boot log rather than silence.
+    vi.mocked(observeBankLedgerGrowthBudget).mockReturnValueOnce(false);
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await ensureSchema();
+      expect(
+        warns.mock.calls.some((call) =>
+          String(call[0]).includes('growth budget readback did not seed the gauge'),
+        ),
+      ).toBe(true);
+    } finally {
+      warns.mockRestore();
+    }
+  });
+
+  it('forwards fragment RAISE NOTICE reports to the boot log, filtering the no-op DDL wall', async () => {
+    // The schema fragments report through RAISE NOTICE (the storage-purchase
+    // refused-row sweep names what it removed); node-postgres discards
+    // unconsumed notices, so ensureSchema must register a listener, and the
+    // listener must drop the ~400 already-exists-skipping notices every
+    // steady-state boot emits or the one real report drowns.
+    h.noticeListeners.length = 0;
+    await ensureSchema();
+    expect(h.noticeListeners.length).toBeGreaterThan(0);
+    const listener = h.noticeListeners[h.noticeListeners.length - 1];
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      listener({ code: '42P07', message: 'relation "accounts" already exists, skipping' });
+      listener({ code: '42701', message: 'column "locale" already exists, skipping' });
+      listener({ code: '42P06', message: 'schema already exists, skipping' });
+      expect(warns).not.toHaveBeenCalled();
+      listener({
+        code: '01000',
+        message:
+          'storage_purchases: removed 3 legacy refused row(s) before installing the closed status constraint',
+      });
+      expect(warns).toHaveBeenCalledTimes(1);
+      expect(String(warns.mock.calls[0][0])).toMatch(/^\[schema\] storage_purchases: removed 3/);
+    } finally {
+      warns.mockRestore();
+    }
+  });
+
   it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
     // PROGRESS_EVENTS_SCHEMA (server/progress_events_db.ts),
     // ACCOUNT_ATTRIBUTION_SCHEMA (server/attribution_db.ts), and
@@ -581,6 +631,18 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(postCommitTimeoutOff).toBeGreaterThan(commitIndex);
     expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
+
+    // The out-of-boot half of the receipts key-shape converge: db.ts must
+    // actually ISSUE the VALIDATE fragment here, under the session lock and
+    // never inside the boot transaction, or a NOT VALID constraint the boot
+    // converge re-added stays unvalidated forever (the pg suite proves the
+    // fragment's behavior; this pin proves the wiring).
+    const receiptsValidate = h.calls.findIndex((sql) =>
+      sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape'),
+    );
+    expect(receiptsValidate).toBeGreaterThan(sessionLock);
+    expect(receiptsValidate).toBeLessThan(sessionUnlock);
+    expect(receiptsValidate).toBeGreaterThan(commitIndex);
 
     // The invalid-carcass check runs under the session lock, before the create
     // it protects; on a healthy boot (no carcass) nothing is dropped. Scoped

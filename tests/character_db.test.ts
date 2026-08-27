@@ -290,6 +290,12 @@ describe('deleteCharacter', () => {
       order.push('permit_acquired');
       return { release };
     });
+    // Record the CLIENT release into the same order stream, so the
+    // permit-outlives-the-client contract is a real ordering pin rather than
+    // an unobserved claim (swapping the two finally arms must red here).
+    client.release.mockImplementation(() => {
+      order.push('client_released');
+    });
     dbMock.connect.mockImplementationOnce(async () => {
       order.push('connect');
       return client;
@@ -302,7 +308,7 @@ describe('deleteCharacter', () => {
     }
     // Gate-then-checkout, and the permit outlives the client (the
     // clientWithPermit lifetime contract from the paid-guild sibling).
-    expect(order).toEqual(['permit_acquired', 'connect', 'permit_released']);
+    expect(order).toEqual(['permit_acquired', 'connect', 'client_released', 'permit_released']);
     expect(client.release).toHaveBeenCalledOnce();
   });
 
@@ -320,6 +326,46 @@ describe('deleteCharacter', () => {
     }
     expect(dbMock.connect).not.toHaveBeenCalled();
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+  });
+
+  it('bounds the permit wait at 15s and lets the caller signal cut it shorter', async () => {
+    vi.useFakeTimers();
+    try {
+      // The gate acquirer receives ONE composed signal (the caller's, if any,
+      // joined with the wait timer): resolve null only when it aborts, the
+      // real majorBackgroundDbGate contract.
+      const seenSignals: AbortSignal[] = [];
+      const acquire = vi.fn(
+        (signal: AbortSignal) =>
+          new Promise<null>((resolve) => {
+            seenSignals.push(signal);
+            signal.addEventListener('abort', () => resolve(null), { once: true });
+          }),
+      );
+      configureCharacterDeleteBackgroundGate(acquire as never);
+      const refused = deleteCharacter(7, 42);
+      // Under the wall, the wait holds; AT the wall it aborts and refuses.
+      await vi.advanceTimersByTimeAsync(14_999);
+      expect(seenSignals[0]?.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(refused).rejects.toMatchObject({
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+      });
+      expect(dbMock.connect).not.toHaveBeenCalled();
+
+      // A caller-side abort composes in and cuts the wait short of the wall.
+      const controller = new AbortController();
+      const early = deleteCharacter(7, 42, controller.signal);
+      await vi.advanceTimersByTimeAsync(1_000);
+      controller.abort();
+      await expect(early).rejects.toMatchObject({
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+      });
+      expect(seenSignals[1]?.aborted).toBe(true);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+      vi.useRealTimers();
+    }
   });
 
   it('releases the permit when the checkout itself rejects', async () => {

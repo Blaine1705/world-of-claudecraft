@@ -15,7 +15,11 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { assembleEventsFrame, serializeEventFragments } from '../server/event_frame';
+import {
+  assembleEventsFrame,
+  filterRoutableEvents,
+  serializeEventFragments,
+} from '../server/event_frame';
 import { type ClientSession, GameServer } from '../server/game';
 import type { PlayerClass, SimEvent } from '../src/sim/types';
 
@@ -589,6 +593,14 @@ describe('routeEvents bot-detector observation and serialize-once shape', () => 
 // caller's mine.length > 0 guard keeps the integration path from reaching (an empty list,
 // a single fragment) and the length-alignment serializeEventFragments must hold.
 describe('event_frame pure assembly', () => {
+  it('filterRoutableEvents returns the SAME array when nothing matches (allocation-free common case)', () => {
+    const events = [
+      { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },
+    ] as unknown as SimEvent[];
+    expect(filterRoutableEvents(events)).toBe(events);
+    expect(filterRoutableEvents([])).toEqual([]);
+  });
+
   it('serializeEventFragments stringifies each event once, index-aligned', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },

@@ -192,8 +192,10 @@ describe('bank ledger batch receipt DDL', () => {
     );
     // The probe must match on the DEFINITION alone: keying it on convalidated
     // would re-fire the drop/add every boot for as long as the constraint sits
-    // in its NOT VALID window.
-    expect(folded).not.toContain('convalidated');
+    // in its NOT VALID window. Comments are stripped first so an explanatory
+    // mention cannot red the absence pin for the wrong reason.
+    const code = BANK_LEDGER_BATCH_RECEIPTS_SCHEMA.replace(/--[^\n]*/g, '').replace(/\s+/g, ' ');
+    expect(code).not.toContain('convalidated');
     // Both the inline CREATE TABLE constraint and the converge re-install must
     // carry the same bound: two occurrences of the full BETWEEN clause.
     expect(folded.split('char_length(batch_key) BETWEEN 1 AND 200').length - 1).toBe(2);
@@ -208,8 +210,11 @@ describe('bank ledger batch receipt DDL', () => {
     expect(folded).toContain(
       'ALTER TABLE bank_ledger_batch_receipts VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape;',
     );
-    // VALIDATE must never appear in the boot-transaction fragment.
-    expect(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA).not.toContain('VALIDATE CONSTRAINT');
+    // VALIDATE must never appear in the boot-transaction fragment (comments
+    // stripped, so prose naming the post-listen half stays legal).
+    expect(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA.replace(/--[^\n]*/g, '')).not.toContain(
+      'VALIDATE CONSTRAINT',
+    );
   });
 });
 

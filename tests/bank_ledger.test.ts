@@ -843,10 +843,16 @@ describe('the bounded insert FIFO (tail cap)', () => {
   });
 
   it('admits to the cap, drops and counts past it, and recovers after a drain', async () => {
+    // The literal cap: the 10s shutdown drain (BANK_LEDGER_SHUTDOWN_DRAIN_MS)
+    // settles 2,000 inserts at a conservative 200/s, the comment's own
+    // arithmetic; a silent cap edit moves that trade and must red here.
+    expect(BANK_LEDGER_TAIL_MAX_DEPTH).toBe(2_000);
     const baselineDropped = bankLedgerTailStats().droppedRows;
     let release!: () => void;
     // Wedge the chain: the first insert stays pending, so every later insert
-    // queues behind it and depth grows while no db call resolves.
+    // queues behind it and depth grows while no db call resolves. release()
+    // rides a finally so a failing assertion cannot leave the module-global
+    // tail wedged for every later bankLedgerIdle() in this file.
     insertMock.mockImplementationOnce(
       () =>
         new Promise<void>((resolve) => {
@@ -856,35 +862,53 @@ describe('the bounded insert FIFO (tail cap)', () => {
     const who = { characterId: 42, accountId: 7 };
     const deposit = () =>
       recordBankOp('deposit', who, info([]), info([{ itemId: 'wolf_fang', count: 1 }]));
-    for (let i = 0; i < BANK_LEDGER_TAIL_MAX_DEPTH; i++) deposit();
-    expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
-
-    // Past the cap the op is dropped, counted in ROWS (the audit's unit), and
-    // the depth stays pinned instead of growing without bound.
     const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const incidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      vaultLedgerIncident: (kind) => incidents.push(kind),
+    });
     try {
+      for (let i = 0; i < BANK_LEDGER_TAIL_MAX_DEPTH; i++) deposit();
+      expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
+
+      // Past the cap the op is dropped, counted in ROWS (the audit's unit),
+      // and the depth stays pinned instead of growing without bound.
       deposit();
       expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
       expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 1);
       expect(errs).toHaveBeenCalledTimes(1);
       expect(String(errs.mock.calls[0][0])).toContain('cap');
+
+      // A MULTI-row drop counts every row, never one per op (the decisive
+      // arm for the rows-not-ops claim), and the vault site's drop gets the
+      // SAME per-row incident accounting its rejected insert gets: a cap
+      // drop is the same audit hole.
+      recordVaultOp('deposit', who, vinfo({}), vinfo({ copper_ore: 2, iron_ore: 1, tin_ore: 4 }));
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 4);
+      expect(incidents).toEqual([
+        'ledger_write_failed',
+        'ledger_write_failed',
+        'ledger_write_failed',
+      ]);
     } finally {
+      setGameMetricsCounters(noopGameMetricsCounters);
       errs.mockRestore();
+      // One microtask turn first: the wedge insert runs off the chain's
+      // .then, so `release` is only assigned once the chain head executed.
+      await Promise.resolve();
+      release();
     }
 
     // Releasing the wedge drains the whole backlog and the FIFO recovers:
     // depth returns to zero and a new op is admitted and actually writes.
-    // (One microtask turn first: the wedge insert runs off the chain's .then,
-    // so `release` is only assigned once the chain head has executed.)
-    await Promise.resolve();
-    release();
     await bankLedgerIdle();
     expect(bankLedgerTailStats().depth).toBe(0);
     deposit();
     await bankLedgerIdle();
     expect(bankLedgerTailStats().depth).toBe(0);
     expect(insertMock).toHaveBeenCalledTimes(BANK_LEDGER_TAIL_MAX_DEPTH + 1);
-    expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 1);
+    expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 4);
   });
 });
 
@@ -1401,6 +1425,61 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
   beforeEach(() => {
     insertMock.mockClear();
     insertMock.mockResolvedValue(undefined);
+  });
+
+  it('a tail-cap drop counts the guild incident, the same audit hole a rejected insert is', async () => {
+    await bankLedgerIdle();
+    let release!: () => void;
+    insertMock.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const incidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      guildBankIncident: (kind) => incidents.push(kind),
+    });
+    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      // Wedge, fill to the cap with personal rows, then a guild delta at the
+      // cap must drop AND count its incident (one per row at this site).
+      recordBankOp(
+        'deposit',
+        { characterId: 42, accountId: 7 },
+        info([]),
+        info([{ itemId: 'wolf_fang', count: 1 }]),
+      );
+      for (let i = 1; i < BANK_LEDGER_TAIL_MAX_DEPTH; i++) {
+        recordBankOp(
+          'deposit',
+          { characterId: 42, accountId: 7 },
+          info([]),
+          info([{ itemId: 'wolf_fang', count: 1 }]),
+        );
+      }
+      expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
+      recordGuildBankDeltas('deposit_gold', { characterId: 42, accountId: 7 }, 913, [
+        {
+          itemId: null,
+          count: null,
+          instance: null,
+          copperDelta: 2500,
+          purchasedSlotsBefore: 0,
+          purchasedSlotsAfter: 0,
+          counterpartyCopperDelta: -2500,
+        },
+      ]);
+      expect(incidents).toEqual(['ledger_write_failed']);
+    } finally {
+      setGameMetricsCounters(noopGameMetricsCounters);
+      errs.mockRestore();
+      await Promise.resolve();
+      release();
+    }
+    await bankLedgerIdle();
+    expect(bankLedgerTailStats().depth).toBe(0);
   });
 
   it('writes container=guild rows with the guild id and the caller identity', async () => {

@@ -1997,7 +1997,9 @@ describe('vault_wire module units', () => {
       lastVaultWireRev: 8 as number | null,
       lastCvaultWirePid: 9 as number | null,
       lastCvaultWireRev: 7 as number | null,
-      lastCvaultWireBlocked: false as boolean | null,
+      // Seeded NULL so the post-throw assertion is decisive: a stamp that
+      // slipped through would move it to false.
+      lastCvaultWireBlocked: null as boolean | null,
     };
     const sim = {
       vaultInfoWireRevFor: () => 8,
@@ -2017,7 +2019,7 @@ describe('vault_wire module units', () => {
       ),
     ).toThrow('wire rejected');
     expect(session.lastCvaultWireRev).toBe(7);
-    expect(session.lastCvaultWireBlocked).toBe(false);
+    expect(session.lastCvaultWireBlocked).toBeNull();
 
     // The gate-flip arm keeps the same contract: a rejected emit leaves the
     // blocked tracker unstamped, so the flip re-ships on the next pass.
@@ -2034,7 +2036,7 @@ describe('vault_wire module units', () => {
         9,
       ),
     ).toThrow('gate wire rejected');
-    expect(session.lastCvaultWireBlocked).toBe(false);
+    expect(session.lastCvaultWireBlocked).toBeNull();
   });
 });
 
