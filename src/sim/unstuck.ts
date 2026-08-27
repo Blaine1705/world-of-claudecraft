@@ -61,6 +61,16 @@ const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
 const BG_WALL_PRESS_PROBE_DISTANCE = 0.35;
 const BG_WALL_PRESS_MIN_PROGRESS = 0.05;
+const BG_WALL_CONTACT_DIRECTIONS = [
+  { x: 1, z: 0 },
+  { x: -1, z: 0 },
+  { x: 0, z: 1 },
+  { x: 0, z: -1 },
+  { x: Math.SQRT1_2, z: Math.SQRT1_2 },
+  { x: -Math.SQRT1_2, z: Math.SQRT1_2 },
+  { x: Math.SQRT1_2, z: -Math.SQRT1_2 },
+  { x: -Math.SQRT1_2, z: -Math.SQRT1_2 },
+] as const;
 
 export interface PendingUnstuck {
   startedAt: number;
@@ -250,6 +260,14 @@ function battlegroundBlockedWallPress(ctx: SimContext, meta: PlayerMeta, p: Enti
   if (!activeBattlegroundAt(ctx, p)) return false;
   const wish = moveInputVector(meta, p);
   if (!wish) return false;
+  return battlegroundBlockedProbe(ctx, p, wish);
+}
+
+function battlegroundBlockedProbe(
+  ctx: SimContext,
+  p: Entity,
+  wish: { x: number; z: number },
+): boolean {
   const probe = {
     x: p.pos.x + wish.x * BG_WALL_PRESS_PROBE_DISTANCE,
     z: p.pos.z + wish.z * BG_WALL_PRESS_PROBE_DISTANCE,
@@ -270,8 +288,17 @@ function battlegroundBlockedWallPress(ctx: SimContext, meta: PlayerMeta, p: Enti
   return pushed && progress < BG_WALL_PRESS_MIN_PROGRESS;
 }
 
+function battlegroundWallContact(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
+  if (!activeBattlegroundAt(ctx, p) || hasMoveInput(meta)) return false;
+  return BG_WALL_CONTACT_DIRECTIONS.some((wish) => battlegroundBlockedProbe(ctx, p, wish));
+}
+
 function battlegroundGeometryTrap(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
-  return battlegroundWallTrap(ctx, p) || battlegroundBlockedWallPress(ctx, meta, p);
+  return (
+    battlegroundWallTrap(ctx, p) ||
+    battlegroundBlockedWallPress(ctx, meta, p) ||
+    battlegroundWallContact(ctx, meta, p)
+  );
 }
 
 function activeBattlegroundAt(ctx: SimContext, p: Entity): boolean {
