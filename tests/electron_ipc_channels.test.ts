@@ -259,6 +259,19 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(quitAt).toBeGreaterThan(destroyedWindowAt);
   });
 
+  it('the exchange-capability handler is trusted-sender gated and answers a strict boolean', () => {
+    // The $WOC Exchange store gate (issue #3692): an untrusted frame and a
+    // store build must both read false, and the answer is the pure
+    // desktop_config verdict compared strictly, never a truthy passthrough.
+    const main = read('electron/main.cjs');
+    const start = main.indexOf("ipcMain.handle('desktop-exchange-capability'");
+    expect(start).toBeGreaterThan(-1);
+    const body = main.slice(start, main.indexOf('\n});', start));
+    expect(body).toContain('if (!trustedSender(event)) return false;');
+    expect(body).not.toContain('if (trustedSender(event)) return false;');
+    expect(body).toContain('return desktopConfig.wocExchangeEnabled === true;');
+  });
+
   it('the show-notification handler validates, re-checks focus, then paces the OS surface', () => {
     // Everything this handler refuses is refused ONLY here: it is the one path
     // from the page to a surface outside the game, so an untrusted frame, an

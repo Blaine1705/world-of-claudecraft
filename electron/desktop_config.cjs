@@ -108,7 +108,11 @@ function walletConnectionSupported({ distribution }) {
 // must carry a literal 'website' stamp, an unpackaged checkout must name the
 // channel via WOC_DISTRIBUTION=website, and anything else (absent, unknown,
 // tampered, a store stamp) answers false. As with the updater there is no
-// env escape hatch on packaged builds.
+// env escape hatch on packaged builds. Accepted residual, same as the other
+// stances here: an attacker with full local control can run the bundle
+// unpackaged with the env set, which only surfaces UI; the server's
+// WOC_MARKET_ENABLED gate and the player's own wallet signature stay the
+// real authority.
 function wocExchangeSupported({ packagedMetadata, env, isPackaged } = {}) {
   if (isPackaged === true) return packagedMetadata?.wocDesktop?.distribution === 'website';
   return env?.WOC_DISTRIBUTION === 'website';

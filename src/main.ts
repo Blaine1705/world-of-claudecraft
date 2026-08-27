@@ -3412,12 +3412,12 @@ async function startGame(
         };
       },
     };
-    void attachWocMarketExchange({
+    attachWocMarketExchange({
       hud,
       api,
       online,
       wallet: { linkedPubkey: () => linkedWalletPubkey, load: loadWallet },
-    });
+    }).catch((err) => console.warn('[woc] exchange attach failed', err));
     if (!NATIVE_APP) {
       hud.attachClaudium(claudiumHooks);
       if (
