@@ -410,7 +410,13 @@ export function bankDeposit(
   // allocation rule the carried bags use (bag_pools.ts). Computed once; the
   // no_fit refusal below reads the SAME split so line and gate cannot drift.
   const pools = bankPools(meta.bank);
-  const result = moveBetweenContainers(meta.inventory, slotIndex, count, meta.bank.inventory, pools);
+  const result = moveBetweenContainers(
+    meta.inventory,
+    slotIndex,
+    count,
+    meta.bank.inventory,
+    pools,
+  );
   if (result.refusal === 'no_fit') {
     // Pool-honest refusal: with the two-pool meter on screen, "full" is a lie
     // when the only room left is materials-only satchel capacity a
