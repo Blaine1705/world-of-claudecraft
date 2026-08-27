@@ -163,11 +163,101 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(p.castingAbility).toBeNull(); // interrupted immediately, never ran to completion
     expect(p.castTargetId).toBeNull();
     expect(p.castRemaining).toBe(0);
-    const stops = sim
-      .drainEvents()
-      .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
+    const events = sim.drainEvents();
+    const stops = events.filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
     expect(stops.some((e: any) => e.success === false)).toBe(true); // a genuine cancel
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        text: 'You have no target.',
+        reason: 'target_dead',
+      }),
+    );
     expect(sim.ctx.pendingProjectiles.length).toBe(0); // the cast never resolved into a hit
+  });
+
+  it('cancels a plain timed hostile cast when its locked target is removed from the world entirely (not merely marked dead)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castTargetId).toBe(mob.id);
+    sim.drainEvents();
+
+    sim.entities.delete(mob.id); // despawned/removed outright, never marked .dead
+    updateCasting(sim.ctx, p, meta);
+
+    expect(p.castingAbility).toBeNull();
+    const events = sim.drainEvents();
+    expect(
+      events.some((e: any) => e.type === 'castStop' && e.entityId === p.id && e.success === false),
+    ).toBe(true);
+    // A target that vanished, rather than one confirmed dead, carries no
+    // target_dead reason (mirrors castAbility's own start-time gate).
+    const errEvent = events.find((e: any) => e.type === 'error') as any;
+    expect(errEvent?.text).toBe('You have no target.');
+    expect(errEvent?.reason).toBeUndefined();
+  });
+
+  it('does NOT cancel a channeling cast via the new tick-level check (channels keep their own per-pulse target check)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    expect(sim.setSpec('arcane')).toBe(true);
+    const mob = spawnTarget(sim, p, 12, 6);
+    p.resource = p.maxResource;
+    castAbility(sim.ctx, 'arcane_missiles', p.id);
+    expect(p.channeling).toBe(true);
+    expect(p.castTargetId).toBe(mob.id);
+
+    handleDeath(sim.ctx, mob, p); // dies well before the 1s-interval first pulse
+    updateCasting(sim.ctx, p, meta); // one tick later: the new timed-cast check must not fire here
+
+    expect(p.castingAbility).toBe('arcane_missiles'); // still running; only the per-pulse check may cancel it
+    expect(p.channeling).toBe(true);
+  });
+
+  it('does not cancel a combat-resurrection cast even though its (deliberately dead) target stays dead', () => {
+    const { sim, p, meta } = makeSim('mage', 20);
+    expect(sim.setSpec('arcane')).toBe(true);
+    const ally = sim.entities.get(sim.addPlayer('warrior', 'Fallen')) as AnyEntity;
+    placePlayerInOpenField(sim, ally.id, { x: 2 });
+    sim.partyInvite(ally.id, p.id);
+    sim.partyAccept(ally.id);
+    ally.dead = true;
+    ally.hp = 0;
+    ally.corpsePos = { ...ally.pos };
+    p.resource = p.maxResource;
+    sim.targetEntity(ally.id, p.id);
+    castAbility(sim.ctx, 'temporal_reversal', p.id);
+    expect(p.castingAbility).toBe('temporal_reversal');
+    expect(p.castTargetId).toBe(ally.id);
+
+    for (let i = 0; i < 10; i++) updateCasting(sim.ctx, p, meta); // well inside the 2s cast
+
+    // The new dead/gone-target check is excluded for targetsDead casts (its own
+    // reach/dead-ally gate above already owns this); it must still be running.
+    expect(p.castingAbility).toBe('temporal_reversal');
+  });
+
+  it('does not cancel a friendly heal when its target dies mid-cast (still falls back to self at completion)', () => {
+    const { sim, p, meta } = makeSim('priest', 12);
+    const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;
+    placePlayerInOpenField(sim, ally.id, { x: 2 });
+    p.hp = Math.max(1, p.maxHp - 500);
+    const selfHp0 = p.hp;
+    sim.targetEntity(ally.id, p.id);
+    castAbility(sim.ctx, 'lesser_heal', p.id);
+    expect(p.castingAbility).toBe('lesser_heal');
+    expect(p.castTargetId).toBe(ally.id);
+
+    handleDeath(sim.ctx, ally, null); // the heal target dies mid-cast
+
+    for (let i = 0; i < 3; i++) {
+      updateCasting(sim.ctx, p, meta);
+      expect(p.castingAbility).toBe('lesser_heal'); // never cancelled early by the new check
+    }
+    drainCast(sim, p, meta);
+
+    expect(p.castingAbility).toBeNull(); // ran to its natural completion
+    expect(p.hp).toBeGreaterThan(selfHp0); // resolveFriendlyTarget fell back to the caster
   });
 
   it('resolves a completed friendly heal against the target locked at cast start', () => {
