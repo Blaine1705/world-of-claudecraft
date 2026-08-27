@@ -2023,7 +2023,7 @@
     border-bottom-color: #c8a34a;
   }
   .woc-store-tabs button:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: -2px;
   }
   .woc-store-loading {
@@ -2246,7 +2246,7 @@
   }
   .woc-store-card button:focus-visible,
   .woc-store-balance button:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .woc-store-card button img {
@@ -2800,7 +2800,7 @@
     cursor: default;
   }
   .charter-buy:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .charter-disclaimer {
@@ -6982,7 +6982,7 @@
     background: #4ac9ef28;
   }
   .claudium-launcher:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .claudium-coin {
@@ -7876,7 +7876,7 @@
     padding: 4px 7px;
     border-radius: 4px;
     border: 1px solid var(--color-border-showcase);
-    background: #1c1812;
+    background: color-mix(in srgb, var(--panel-base) 84%, var(--panel-edge));
     color: var(--gold-dim);
     font-family: var(--ui-font);
     font-size: 12px;
@@ -8548,6 +8548,9 @@
   }
   .vault-row-partial-label {
     max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   @media (pointer: coarse) {
     .vault-row,
@@ -16634,7 +16637,7 @@
   }
   .dev-command-run:focus-visible,
   .dev-command-tabs button:focus-visible {
-    outline: 2px solid var(--focus-ring);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
   .dev-command-footer {

@@ -138,7 +138,11 @@ export function charterCardHtml(row: CharterRow, inFlight: boolean): string {
  *  THREE SILENCES, and they are not interchangeable. `fitUnknown` means the fit
  *  gate could not run at all (bankInfo is banker-gated and the store opens
  *  anywhere, so this is the COMMON case): nothing is known, so nothing is
- *  claimed and the category is omitted. `ladderFull` means nothing can EVER fit
+ *  claimed and the category is omitted, UNLESS the server-refused prune (which
+ *  runs independently of the count gate) hid rows: hiddenByFit > 0 with an
+ *  empty list still renders the hidden-count line, because rows were dropped
+ *  and vanishing them without a word is the exact silence the line exists to
+ *  break. `ladderFull` means nothing can EVER fit
  *  again. An empty list that is neither means only that no CHARTER fits the room
  *  left, and the bursar can still sell the rest for gold, which is why the scope
  *  line rides that arm and NOT the ceiling one: at the ceiling neither rail has
@@ -154,7 +158,18 @@ export function charterSectionHtml(section: CharterSection, inFlight: ReadonlySe
     `<header><div><span>${esc(t('hudChrome.wocStore.charter.eyebrow'))}</span>` +
     `<h3>${esc(t('hudChrome.wocStore.charter.title'))}</h3></div></header>`;
   if (section.rows.length === 0) {
-    if (section.fitUnknown) return '';
+    if (section.fitUnknown) {
+      // The refusal prune runs even with the count gate off, so an all-pruned
+      // list under fitUnknown still has something TRUE to say: rows were
+      // hidden. Only the nothing-known-nothing-hidden case stays silent.
+      if (section.hiddenByFit === 0) return '';
+      return (
+        `${header}<div class="charter-body">` +
+        `<p class="charter-scope">${esc(t('hudChrome.wocStore.charter.scope'))}</p>` +
+        `<p class="charter-scope">${esc(t('hudChrome.wocStore.charter.someHiddenByFit'))}</p>` +
+        `</div></section>`
+      );
+    }
     if (section.ladderFull) {
       return (
         `${header}<div class="charter-body">` +
@@ -170,10 +185,19 @@ export function charterSectionHtml(section: CharterSection, inFlight: ReadonlySe
     );
   }
   const cards = section.rows.map((row) => charterCardHtml(row, inFlight.has(row.itemId))).join('');
+  // A NON-empty list can still be silently missing rungs (the fit gates drop
+  // per charter), so the hidden count gets its own explanatory line. It rides
+  // the returned markup, per this function's own rule above: presence flips
+  // with the count, so the markup-identity check repaints the transition.
+  const hidden =
+    section.hiddenByFit > 0
+      ? `<p class="charter-scope">${esc(t('hudChrome.wocStore.charter.someHiddenByFit'))}</p>`
+      : '';
   return (
     `${header}<div class="charter-body">` +
     `<p class="charter-scope">${esc(t('hudChrome.wocStore.charter.scope'))}</p>` +
     `<div class="charter-grid">${cards}</div>` +
+    hidden +
     `<p class="charter-disclaimer">${esc(t('hudChrome.bank.priceDisclaimer'))}</p>` +
     `</div></section>`
   );

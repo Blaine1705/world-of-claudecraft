@@ -321,7 +321,7 @@ export class GuildBankTab {
   private appendPriceChangedStatus(parent: HTMLElement): void {
     const status = this.priceChangedStatus;
     if (!status) return;
-    const text = t('hudChrome.wocStore.priceChanged');
+    const text = t('hudChrome.bank.priceChanged');
     appendBankStatusLine(parent, status, {
       text,
       visibleClass: 'gbank-purchase-status',
@@ -905,7 +905,8 @@ export class GuildBankTab {
   private focusPurchaseOffer(): void {
     const root = this.deps.root();
     const offer = root.querySelector<HTMLElement>(
-      '.gbank-open-row .bank-buy-btn, .gbank-buy-row .bank-buy-btn',
+      '.gbank-open-row .bank-buy-btn:not(:disabled):not([aria-disabled="true"]), ' +
+        '.gbank-buy-row .bank-buy-btn:not(:disabled):not([aria-disabled="true"])',
     );
     (offer ?? root.querySelector<HTMLElement>('[data-close]'))?.focus();
   }

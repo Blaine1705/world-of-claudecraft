@@ -8,7 +8,45 @@
 
 import { esc } from './esc';
 import { installPromptDialog, type PromptDialogHandle } from './prompt_dialog';
+import type { StorageRungEchoTimers } from './storage_rung_echo_core';
 import { svgIcon } from './ui_icons';
+
+/** How long the nonmodal result may sit on screen unattended. It is nonmodal
+ *  chrome with pointer-events on mobile, published from an async purchase that
+ *  can finish after its Store surface is gone, so with no expiry (and before
+ *  the closeAll rung below) a result nobody dismissed sat over the world
+ *  eating touches indefinitely. Generous on purpose: it is a purchase outcome
+ *  the player should get a fair chance to read. */
+export const STORE_RESULT_EXPIRY_MS = 60_000;
+
+/** The registry Hud's single Escape dispatcher asks (the tap_menu shape), so
+ *  Escape stays with closeAll and this module never grows its own key
+ *  handler. A Set, insertion-ordered: construction registers, the returned
+ *  handle unregisters, so a torn-down owner's panel is never walked again,
+ *  and the closeAll rung below can peel the MOST RECENTLY REGISTERED open
+ *  result instead of sweeping every registrant. One instance exists in
+ *  production (the Store surface runtime's). */
+const resultPanels = new Set<StoreDecisionPrompts>();
+
+function registerResultPanel(panel: StoreDecisionPrompts): () => void {
+  resultPanels.add(panel);
+  return () => {
+    resultPanels.delete(panel);
+  };
+}
+
+/** Clear the most recently registered panel's open nonmodal purchase result,
+ *  reporting whether one cleared. Topmost-first and ONE panel only: panels
+ *  stack in registration order, and an Escape should dismiss the top of the
+ *  stack, never every registrant's result at once (the next Escape takes the
+ *  next one). Wired as a closeAll rung in src/ui/hud.ts. */
+export function clearOpenStoreResult(): boolean {
+  const panels = [...resultPanels];
+  for (let i = panels.length - 1; i >= 0; i--) {
+    if (panels[i].clearResult()) return true;
+  }
+  return false;
+}
 
 export interface StoreDecisionPromptOptions {
   title: string;
@@ -36,8 +74,23 @@ let promptSeq = 0;
 export class StoreDecisionPrompts {
   private active: ActiveDecision | null = null;
   private result: HTMLElement | null = null;
+  private resultExpiry: number | null = null;
 
-  constructor(private readonly root: () => HTMLElement) {}
+  /** Removes this panel from the module Escape registry. An owner with a real
+   *  teardown calls it there; an owner that lives for the whole client session
+   *  keeps the handle here, on the instance, unfired. */
+  readonly unregister: () => void;
+
+  constructor(
+    private readonly root: () => HTMLElement,
+    // Injectable for deterministic tests; production takes the window clock.
+    private readonly timers: StorageRungEchoTimers = {
+      schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+      cancel: (handle) => window.clearTimeout(handle),
+    },
+  ) {
+    this.unregister = registerResultPanel(this);
+  }
 
   open(options: StoreDecisionPromptOptions): boolean {
     this.dismiss(true);
@@ -125,6 +178,14 @@ export class StoreDecisionPrompts {
     stack.classList.add('store-result-active');
     stack.appendChild(result);
     this.result = result;
+    // Bounded lifetime. clearResult() above cancelled any earlier timer, so a
+    // result shown twice restarts the full window rather than inheriting the
+    // stale deadline; manual close and the closeAll rung cancel it the same
+    // way.
+    this.resultExpiry = this.timers.schedule(() => {
+      this.resultExpiry = null;
+      this.clearResult();
+    }, STORE_RESULT_EXPIRY_MS);
     // A live region created with its final text in the same DOM mutation is
     // routinely missed by screen readers. Mount it empty first, then publish
     // on the next microtask; identity-checking keeps a replaced result from
@@ -136,9 +197,15 @@ export class StoreDecisionPrompts {
     });
   }
 
-  clearResult(): void {
-    this.result?.parentElement?.classList.remove('store-result-active');
-    this.result?.remove();
+  /** Remove the nonmodal result (button, Escape rung, expiry, or a replacing
+   *  showResult), reporting whether one was actually showing. */
+  clearResult(): boolean {
+    if (this.resultExpiry !== null) this.timers.cancel(this.resultExpiry);
+    this.resultExpiry = null;
+    if (this.result === null) return false;
+    this.result.parentElement?.classList.remove('store-result-active');
+    this.result.remove();
     this.result = null;
+    return true;
   }
 }

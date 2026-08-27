@@ -3,6 +3,7 @@
 // live mirror before sending and then hold that offer until an authoritative
 // echo or command-specific refusal releases the shared bounded latch.
 
+import { DICT } from './sim_i18n';
 import { StorageRungEchoLatch, type StorageRungEchoTimers } from './storage_rung_echo_core';
 
 export interface BankSocketPurchaseOffer {
@@ -17,9 +18,14 @@ export interface BankSocketPurchaseSnapshot {
 
 export type BankSocketConfirmDecision = 'send' | 'pending' | 'changed';
 
+// Derived BY KEY from the sim matcher's English table (the
+// storage_rung_echo_core.ts rule): a sim reword moves the S3-guarded row and
+// this set follows it, instead of a stale literal silently unlatching the
+// echo. The literal pins in tests/bank_socket_purchase_core.test.ts still red
+// on a reword so the change is reviewed rather than silent.
 const SOCKET_PURCHASE_REFUSALS = new Set([
-  'Your bank has no more bag sockets to unlock.',
-  'You cannot afford that bag socket.',
+  DICT.en['error.bankSocketMax'],
+  DICT.en['error.bankSocketCannotAfford'],
 ]);
 
 export class BankSocketPurchaseCore {

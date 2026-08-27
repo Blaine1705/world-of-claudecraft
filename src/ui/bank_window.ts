@@ -808,10 +808,10 @@ export class BankWindow {
       tab.dataset.focusKey = `gbank:view:${tab.dataset.tab}`;
     }
     const slotKeys = model.kind === 'guild' ? guildBankSlotFocusKeys(model.slots) : [];
-    let renderedIndex = 0;
-    for (const cell of el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)')) {
-      cell.dataset.focusKey = slotKeys[renderedIndex++] ?? '';
-    }
+    // A key miss stamps NOTHING: '' would still satisfy the restore ladder.
+    el.querySelectorAll<HTMLElement>('.bank-grid .bank-item:not(.empty)').forEach((cell, i) => {
+      if (slotKeys[i] !== undefined) cell.dataset.focusKey = slotKeys[i];
+    });
     const [deposit, withdraw] = Array.from(el.querySelectorAll<HTMLElement>('.gbank-gold-btn'));
     if (deposit) deposit.dataset.focusKey = 'gbank:deposit-gold';
     if (withdraw) withdraw.dataset.focusKey = 'gbank:withdraw-gold';

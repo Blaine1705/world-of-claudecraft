@@ -12,6 +12,10 @@ export class StoreSurfaceRuntime {
   private readonly prompts: StoreDecisionPrompts;
 
   constructor(private readonly root: () => HTMLElement) {
+    // Construction registers the prompts panel with the module Escape
+    // registry. This runtime has no teardown (its owning window lives for the
+    // whole client session), so the unregister handle stays where it was
+    // minted: on the prompts instance (StoreDecisionPrompts.unregister).
     this.prompts = new StoreDecisionPrompts(root);
   }
 

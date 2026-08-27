@@ -85,10 +85,14 @@ interface VaultStatus extends BankStatusAnnouncementState {
   at: number;
 }
 
-/** Stable across row insertion and sorting. A special row retains its wire
- * selector as a disambiguator, while itemId prevents an index reuse from
- * resolving to another material. Resolution uses dataset equality, so an
- * arbitrary tolerated item id never enters a selector. */
+/** A pooled key is stable across row insertion and sorting (pure item
+ * identity). A special key is NOT fully stable: it interpolates the raw
+ * snapshot index, so removing an EARLIER special slot shifts every later
+ * key and the exact-key restore misses (behaviorally safe: the restore
+ * ladder falls back instead of landing on a different physical copy, and
+ * itemId in the key prevents an index reuse from resolving to another
+ * material). Resolution uses dataset equality, so an arbitrary tolerated
+ * item id never enters a selector. */
 function vaultFocusKey(model: VaultRowModel, role: VaultFocusRole): string {
   const identity =
     model.kind === 'pooled'
@@ -301,6 +305,12 @@ export class VaultTab {
   // (known, qualityKey, atCap, overCap) comes from the core; the painter
   // resolves the ItemDef only for the icon/name/tooltip PAINTERS, which need
   // the def itself rather than a decision about it.
+  //
+  // No node pooling, as a DECISION rather than an omission: the row count is
+  // bounded (one row per stocked pooled material id, capped by the sim's
+  // storable-material set, plus one per special slot), and this is a cold
+  // path: rows mint only when BankWindow's refreshIfChanged signature moves
+  // (the HUD's 500ms slow band while the tab is open), never per frame.
   private appendRow(list: HTMLElement, model: VaultRowModel): void {
     const { itemId, count, storedTotal, cap } = model;
     const ordinal = list.childElementCount;
@@ -334,7 +344,7 @@ export class VaultTab {
     const capLabel = formatCount(cap);
     const rowStateId = `vault-row-state-${ordinal}`;
     const instanceStateId = `vault-row-instance-${ordinal}`;
-    row.setAttribute('aria-label', t('hudChrome.bank.withdrawQuantityTitle', { item: name }));
+    row.setAttribute('aria-label', t('hudChrome.bank.vaultRowWithdrawName', { item: name }));
     row.setAttribute(
       'aria-describedby',
       glyphKind ? `${rowStateId} ${instanceStateId}` : rowStateId,
@@ -395,7 +405,13 @@ export class VaultTab {
       partial.setAttribute(FOCUS_KEY_ATTR, vaultFocusKey(model, 'partial'));
       const partialLabel = t('hudChrome.bank.withdrawQuantityAction', { item: name });
       partial.setAttribute('aria-label', partialLabel);
-      partial.title = partialLabel;
+      // The shared tooltip, not a native title (every sibling control's rule);
+      // re-resolved at show time so a language switch relocalizes it.
+      this.deps.attachTooltip(
+        partial,
+        () =>
+          `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawQuantityAction', { item: name }))}</div>`,
+      );
       partial.innerHTML =
         svgIcon('more') +
         `<span class="vault-row-partial-label">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</span>`;
@@ -714,7 +730,7 @@ export class VaultTab {
             info.nextUpgradeCost !== offer.cost ||
             !this.purchaseEcho.arm(offer.upgrades, offer.upgrades + 1)
           ) {
-            this.setStatus('hudChrome.wocStore.priceChanged');
+            this.setStatus('hudChrome.bank.priceChanged');
             dismiss();
             this.deps.requestRender();
             this.focusPurchaseOffer();
@@ -743,7 +759,10 @@ export class VaultTab {
    * window close remains the safe, always-present fallback. */
   private focusPurchaseOffer(): void {
     const root = this.deps.root();
-    const offer = root.querySelector<HTMLElement>('.vault-unlock-btn, .vault-upgrade-btn');
+    const offer = root.querySelector<HTMLElement>(
+      '.vault-unlock-btn:not(:disabled):not([aria-disabled="true"]), ' +
+        '.vault-upgrade-btn:not(:disabled):not([aria-disabled="true"])',
+    );
     (offer ?? root.querySelector<HTMLElement>('[data-close]'))?.focus();
   }
 }

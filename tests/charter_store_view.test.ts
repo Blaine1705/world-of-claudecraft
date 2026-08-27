@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import { charterSectionHtml } from '../src/ui/charter_card_view';
 import {
   buildCharterSection,
   type CharterDef,
   type WocStoreItemInput,
 } from '../src/ui/woc_store_view';
+
+// The English silence-breaker line (hudChrome.wocStore.charter.someHiddenByFit),
+// pinned as a literal so a catalog reword is a deliberate test update.
+const HIDDEN_LINE =
+  'Charters too large for the room left in the bank of this character are not shown.';
 
 // The live catalog shape (src/sim/content/storage_charters.ts), restated as
 // fixture literals: the view core takes the ladder numbers as INPUTS, so the
@@ -64,6 +70,94 @@ describe('buildCharterSection fit gate', () => {
     expect(section.rows).toEqual([]);
     expect(section.ladderFull).toBe(false);
     expect(section.fitUnknown).toBe(false);
+  });
+
+  it('counts every fit-gated omission in hiddenByFit, and zero when all fit', () => {
+    // All four fit from zero purchased: nothing hidden.
+    const allFit = buildCharterSection(0, [], {
+      purchasedSlots: 0,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+    });
+    expect(allFit.rows).toHaveLength(4);
+    expect(allFit.hiddenByFit).toBe(0);
+    // 25 purchased: the 48 and 72 grants overshoot, two hidden beside two shown.
+    const someHidden = buildCharterSection(0, [], {
+      purchasedSlots: 25,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+    });
+    expect(ids(someHidden)).toEqual(['strongbox_charter_1', 'strongbox_charter_2']);
+    expect(someHidden.hiddenByFit).toBe(2);
+    // 66 purchased: every charter overshoots, all four hidden, none shown.
+    const allHidden = buildCharterSection(0, [], {
+      purchasedSlots: 66,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+    });
+    expect(allHidden.rows).toEqual([]);
+    expect(allHidden.hiddenByFit).toBe(4);
+    // A fit gate that could not run hides nothing (rows are NOT fit-gated).
+    const unknown = buildCharterSection(0, [], {
+      purchasedSlots: null,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+    });
+    expect(unknown.fitUnknown).toBe(true);
+    expect(unknown.hiddenByFit).toBe(0);
+  });
+
+  it('counts the server-refused prune in hiddenByFit too, even with the fit gate off', () => {
+    // The refusal tail (grants >= 48) prunes two charters while the count gate
+    // cannot run at all; the pruned rungs still report as hidden.
+    const section = buildCharterSection(0, [], {
+      purchasedSlots: null,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+      refusedGrantSlots: new Set([48]),
+    });
+    expect(ids(section)).toEqual(['strongbox_charter_1', 'strongbox_charter_2']);
+    expect(section.fitUnknown).toBe(true);
+    expect(section.hiddenByFit).toBe(2);
+    // ...and the hidden count reaches the rendered markup on this arm too.
+    expect(charterSectionHtml(section, new Set())).toContain(HIDDEN_LINE);
+  });
+
+  it('renders the hidden-count line when the refusal prune empties a fitUnknown list', () => {
+    // The refusal of the smallest grant prunes ALL four charters while the
+    // count gate cannot run: an empty list under fitUnknown used to return ''
+    // and vanish every pruned row silently, the exact silence the hidden-count
+    // line exists to break.
+    const section = buildCharterSection(0, [], {
+      purchasedSlots: null,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+      refusedGrantSlots: new Set([12]),
+    });
+    expect(section.rows).toEqual([]);
+    expect(section.fitUnknown).toBe(true);
+    expect(section.hiddenByFit).toBe(4);
+    const html = charterSectionHtml(section, new Set());
+    expect(html).toContain(HIDDEN_LINE);
+    // The scope line rides along, and it is a real section, not a fragment.
+    expect(html).toContain('charter-section');
+    expect(html).toContain('charter-scope');
+
+    // The TRUE nothing-known-nothing-hidden silence stays silent.
+    const silent = buildCharterSection(0, [], {
+      purchasedSlots: null,
+      ceilingSlots: CEILING,
+      charters: ALL_CHARTERS,
+    });
+    expect(silent.rows).not.toEqual([]);
+    const empty = buildCharterSection(0, [], {
+      purchasedSlots: null,
+      ceilingSlots: CEILING,
+      charters: [],
+    });
+    expect(empty.fitUnknown).toBe(true);
+    expect(empty.hiddenByFit).toBe(0);
+    expect(charterSectionHtml(empty, new Set())).toBe('');
   });
 
   it('reports ladderFull with no rows once the ceiling is reached', () => {

@@ -1247,6 +1247,52 @@ describe('WOC Store Strongbox charters', () => {
     expect(h.html()).toContain('The bursar sells the same slots for gold.');
   });
 
+  it('explains hidden rungs on a NON-empty list, and only there (per-arm)', async () => {
+    const hiddenLine =
+      'Charters too large for the room left in the bank of this character are not shown.';
+    // 0 hidden: everything fits, so nothing needs explaining.
+    const allFit = charterHarness({ purchasedSlots: 0 });
+    await allFit.internals.renderStore(null);
+    expect(allFit.buttons()).toHaveLength(4);
+    expect(allFit.html()).not.toContain(hiddenLine);
+
+    // Some hidden: one rung renders while larger ones are fit-gated away; the
+    // section must say so instead of silently showing a shorter ladder.
+    const someHidden = charterHarness({
+      purchasedSlots: LADDER_CEILING_SLOTS - SMALLEST_CHARTER_GRANT,
+    });
+    await someHidden.internals.renderStore(null);
+    expect(someHidden.buttons()).toHaveLength(1);
+    expect(someHidden.html()).toContain(hiddenLine);
+
+    // All hidden: the EMPTY arm already explains itself (no-charter-fits), so
+    // the hidden line stays off it.
+    const allHidden = charterHarness({
+      purchasedSlots: LADDER_CEILING_SLOTS - SMALLEST_CHARTER_GRANT + 1,
+    });
+    await allHidden.internals.renderStore(null);
+    expect(allHidden.html()).toContain(
+      'No charter fits the room left in the bank of this character.',
+    );
+    expect(allHidden.html()).not.toContain(hiddenLine);
+  });
+
+  it('repaints the transition into a hidden-rung state behind an identical row set', async () => {
+    // The file's own markup-identity rule: every flag that changes what is
+    // VISIBLE must reach the section string. The hidden line's presence is
+    // part of the returned HTML, so two sections with the same rows but a
+    // different hidden count can never be elided as byte-identical paints.
+    const h = charterHarness({ purchasedSlots: 0 });
+    await h.internals.renderStore(null);
+    const before = h.html();
+    h.state.purchasedSlots = LADDER_CEILING_SLOTS - SMALLEST_CHARTER_GRANT;
+    await h.internals.renderStore(null);
+    expect(h.html()).not.toEqual(before);
+    expect(h.html()).toContain(
+      'Charters too large for the room left in the bank of this character are not shown.',
+    );
+  });
+
   it('says the bank is out of room only when the ladder is actually full', async () => {
     // The other half of the empty branch, and the discriminator between the two
     // sentences: at the ceiling nothing can EVER fit, so "no room left" is true

@@ -96,22 +96,10 @@ import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/s
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
-import type {
-  AbilityDef,
-  CalendarResultCode,
-  EquipSlot,
-  HonorReason,
-  InvSlot,
-  ItemInstancePayload,
-  MailResultCode,
-  MotdResultCode,
-  PetMode,
-  PlayerClass,
-  ResourceType,
-  SkinCatalog,
-} from '../sim/types';
 import {
+  type AbilityDef,
   type AuraKind,
+  type CalendarResultCode,
   CONSUME_DURATION,
   CRAFT_CAST_ID,
   canPrestige,
@@ -119,14 +107,24 @@ import {
   dist2d,
   ENCHANT_CAST_ID,
   type Entity,
+  type EquipSlot,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
+  type HonorReason,
+  type InvSlot,
   type ItemDef,
+  type ItemInstancePayload,
   isMechWearer,
   MAX_LEVEL,
+  type MailResultCode,
   MILESTONES,
+  type MotdResultCode,
+  type PetMode,
+  type PlayerClass,
+  type ResourceType,
   SALVAGE_CAST_ID,
   type SimEvent,
+  type SkinCatalog,
   TICK_RATE,
   TOOL_RECHARGE_CAST_ID,
   virtualLevel,
@@ -197,8 +195,7 @@ import { cheaterTagLabel } from './cheater_tag';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
-import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
-import { ClaudiumWindow } from './claudium_window';
+import { type ClaudiumRail, type ClaudiumSnapshot, ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
@@ -721,6 +718,7 @@ import {
   statNameKey,
   statTooltipHtml,
 } from './stat_tooltip_view';
+import { clearOpenStoreResult } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
@@ -18217,6 +18215,7 @@ export class Hud {
 
   // Closes the topmost UI. Returns true if something was closed.
   closeAll(): boolean {
+    if (clearOpenStoreResult()) return true;
     if (closeOpenTouchMenu()) return true;
     if (this.lootWindow.hasOpenChest) {
       this.closeLoot();

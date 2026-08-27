@@ -49,6 +49,8 @@ function vaultInfo(over: Partial<VaultInfo> = {}): VaultInfo {
 interface Harness {
   window: BankWindow;
   root: HTMLElement;
+  /** attachTooltip recordings, keyed by element (the shared-tooltip pins). */
+  tooltips: Map<HTMLElement, () => string>;
   world: {
     bankInfo: BankInfo | null;
     vaultInfo: VaultInfo | null;
@@ -93,11 +95,14 @@ function harness(vault: VaultInfo | null, opts: { consumePeek?: () => boolean } 
     vaultBuyUpgrade: () => calls.push('vaultBuyUpgrade'),
   };
   const noop = (): void => {};
+  // Recorded so a control's hover affordance (the shared tooltip, never a
+  // native title) is assertable per element.
+  const tooltips = new Map<HTMLElement, () => string>();
   const deps: BankWindowDeps = {
     itemIcon: () => '<span class="item-icon"></span>',
     moneyHtml: (c: number) => `<span class="money-inline">${c}</span>`,
     itemTooltip: () => '',
-    attachTooltip: noop,
+    attachTooltip: (el, html) => tooltips.set(el, html),
     root: () => root,
     world: () => world as unknown as IWorld,
     closeOthers: noop,
@@ -108,7 +113,7 @@ function harness(vault: VaultInfo | null, opts: { consumePeek?: () => boolean } 
     onClosed: noop,
     onInventoryChanged: noop,
   };
-  return { window: new BankWindow(deps), root, world, calls };
+  return { window: new BankWindow(deps), root, world, calls, tooltips };
 }
 
 const vaultTabButton = (h: Harness): HTMLElement | null =>
@@ -428,7 +433,11 @@ describe('the stocked pane', () => {
     ]);
     expect(new Set(accessibleLabels)).toHaveLength(partials.length);
     expect(partials[0].getAttribute('aria-label')).not.toBe(full?.getAttribute('aria-label'));
-    expect(partials.map((partial) => partial.title)).toEqual(accessibleLabels);
+    // The hover affordance is the SHARED tooltip (deps.attachTooltip, every
+    // sibling control's rule), never a native title beside it.
+    expect(partials.map((partial) => partial.title)).toEqual(['', '']);
+    expect(h.tooltips.get(partials[0])?.()).toContain('Choose withdrawal quantity for Copper Ore');
+    expect(h.tooltips.get(partials[1])?.()).toContain('Choose withdrawal quantity for Iron Ore');
     for (const partial of partials) {
       expect(partial.textContent).toContain('Quantity to withdraw');
     }

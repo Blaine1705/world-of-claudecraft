@@ -51,7 +51,7 @@ import {
   buildCharterSection,
   type CharterDef,
   type CharterRow,
-  type CharterSection,
+  emptyCharterSection,
   type WocStoreItemInput,
 } from './woc_store_view';
 
@@ -204,7 +204,7 @@ export class DailyRewardsWindow {
   private storePriceChanged = false;
   private paintedStoreBody: HTMLElement | null = null;
   private paintedStoreMarkup: string | null = null;
-  private charterSection: CharterSection = { rows: [], ladderFull: false, fitUnknown: true };
+  private charterSection = emptyCharterSection();
   private charterNotice: CharterNotice | null = null;
   private charterAnnounceSeq = 0;
   // ONE idempotency key per charter purchase INTENT, held across retries with

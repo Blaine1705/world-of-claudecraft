@@ -42,8 +42,9 @@ export class BankSocketPurchaseController {
 
   markBusy(button: HTMLButtonElement): void {
     if (!this.core.pending) return;
+    // disabled + aria-busy, the vault/guild busy form: aria-disabled on a
+    // natively disabled button is redundant and the three ladders align.
     button.disabled = true;
-    button.setAttribute('aria-disabled', 'true');
     button.setAttribute('aria-busy', 'true');
   }
 
@@ -51,7 +52,7 @@ export class BankSocketPurchaseController {
     const status = this.status;
     if (!status) return;
     appendBankStatusLine(parent, status, {
-      text: t('hudChrome.wocStore.priceChanged'),
+      text: t('hudChrome.bank.priceChanged'),
       visibleClass: 'bank-socket-purchase-status',
       liveDataAttribute: 'data-bank-socket-purchase-live',
       isCurrent: () => this.status === status,

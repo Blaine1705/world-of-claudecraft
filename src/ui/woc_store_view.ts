@@ -208,6 +208,20 @@ export interface CharterSection {
   ladderFull: boolean;
   /** True when the fit gate could not run, so rows were NOT fit-gated. */
   fitUnknown: boolean;
+  /** How many charters the two fit gates dropped (the count-gate overshoots
+   *  plus the server-refused prune). The non-empty arm renders an explanatory
+   *  line when it is > 0, and so does the empty fitUnknown arm (the refusal
+   *  prune runs with the count gate off, so rows can vanish there too); the
+   *  other empty arms already explain themselves. It must reach the returned
+   *  markup (charterSectionHtml) so the store's markup-identity repaint
+   *  elision sees the transition. */
+  hiddenByFit: number;
+}
+
+/** The nothing-known-yet section (a fresh window, before any snapshot): no
+ *  rows, fit unknown, nothing hidden. */
+export function emptyCharterSection(): CharterSection {
+  return { rows: [], ladderFull: false, fitUnknown: true, hiddenByFit: 0 };
 }
 
 /** Defensive coercion, stated once for both inputs: a count that is not a
@@ -256,9 +270,14 @@ export function buildCharterSection(
   // rather than needing a verdict per charter.
   const refusedFrom = smallestRefusedGrant(ctx.refusedGrantSlots);
   const rows: CharterRow[] = [];
+  let hiddenByFit = 0;
   for (const charter of ctx.charters) {
-    if (refusedFrom !== null && charter.grantSlots >= refusedFrom) continue;
+    if (refusedFrom !== null && charter.grantSlots >= refusedFrom) {
+      hiddenByFit += 1;
+      continue;
+    }
     if (purchased !== null && ceiling !== null && purchased + charter.grantSlots > ceiling) {
+      hiddenByFit += 1;
       continue;
     }
     const service = serviceRows.get(charter.id);
@@ -280,5 +299,6 @@ export function buildCharterSection(
     rows,
     ladderFull: purchased !== null && ceiling !== null && purchased >= ceiling,
     fitUnknown,
+    hiddenByFit,
   };
 }

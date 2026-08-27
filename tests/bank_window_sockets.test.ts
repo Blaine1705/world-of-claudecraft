@@ -215,7 +215,9 @@ describe('the socket clicks dispatch the IWorld verbs (the real player callers)'
     expect(h.calls.filter((call) => call === 'bankUnlockSocket')).toHaveLength(1);
     expect(h.root.querySelector('.bank-socket-purchase-status')).toBeNull();
     expect(stale.disabled).toBe(true);
-    expect(stale.getAttribute('aria-disabled')).toBe('true');
+    // disabled + aria-busy, the vault/guild busy form: aria-disabled on a
+    // natively disabled button is redundant, so markBusy must not add it.
+    expect(stale.hasAttribute('aria-disabled')).toBe(false);
     expect(stale.getAttribute('aria-busy')).toBe('true');
     expect(document.activeElement).toBe(h.root.querySelector('[data-close]'));
 

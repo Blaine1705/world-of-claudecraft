@@ -6,6 +6,8 @@
 // therefore releases only when the mirrored rung reaches the expected
 // revision, a matching refusal arrives, or the bounded lost-echo timer expires.
 
+import { DICT } from './sim_i18n';
+
 export const STORAGE_RUNG_ECHO_TIMEOUT_MS = 12_000;
 
 export interface StorageRungEchoTimers {
@@ -76,13 +78,20 @@ export interface StorageRungRefusalTargets {
   vault: boolean;
 }
 
+// Derived BY KEY from the sim matcher's English table rather than duplicated
+// as literals: the sim emits these refusals in raw English, and the S3 guard
+// (tests/localization_fixes.test.ts) forces the sim_i18n row to move with any
+// sim reword. Deriving from the same rows means a reword can never leave these
+// sets silently unmatched (which would latch the buy button for the full
+// lost-echo timeout); the literal pins in tests/storage_rung_echo_core.test.ts
+// still red on a reword so the change is reviewed, not silent.
 const GUILD_REFUSALS = new Set([
-  'Your guild cannot afford that expansion.',
-  'The guild bank cannot be expanded further.',
+  DICT.en['error.guildBankCannotAfford'],
+  DICT.en['error.guildBankMaxSlots'],
 ]);
 const VAULT_REFUSALS = new Set([
-  'You cannot afford that vault upgrade.',
-  'Your vault cannot be upgraded further.',
+  DICT.en['error.vaultCannotAfford'],
+  DICT.en['error.vaultMaxUpgrades'],
 ]);
 
 export function storageRungRefusalTargets(text: string): StorageRungRefusalTargets {
