@@ -660,8 +660,11 @@ product exist. Coding and merge stay dark-safe without those credentials.
    tradeable-token functionality violates both stores' terms. The gate is the
    `desktop-exchange-capability` IPC over the distribution stamp
    (`electron/desktop_config.cjs` `wocExchangeSupported`, consumed by
-   `src/game/woc_market_wiring.ts`); a build with an absent or unknown stamp
-   must behave like a store build.
+   `src/game/woc_market_wiring.ts`); for this gate specifically, a build with
+   an absent or unknown stamp behaves like a store build (the wallet-connect
+   and updater gates read the collapsed channel and are unchanged). On the
+   website channel the launcher appears one IPC round trip after world entry,
+   so give it a beat before calling it missing.
 7. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded

@@ -270,6 +270,11 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(body).toContain('if (!trustedSender(event)) return false;');
     expect(body).not.toContain('if (trustedSender(event)) return false;');
     expect(body).toContain('return desktopConfig.wocExchangeEnabled === true;');
+    // And the preload method must invoke THIS channel, not a sibling
+    // capability whose decision reads the collapsed distribution.
+    expect(preload).toContain(
+      "wocExchangeSupported: () => ipcRenderer.invoke('desktop-exchange-capability'),",
+    );
   });
 
   it('the show-notification handler validates, re-checks focus, then paces the OS surface', () => {
