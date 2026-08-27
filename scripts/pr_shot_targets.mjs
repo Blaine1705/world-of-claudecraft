@@ -626,6 +626,23 @@ const saturdayClockSeed = async (page) => {
   );
 };
 
+// fakePadSeed's pad reports fixed axes; the placement shot steers the reticle
+// with the left stick, so wrap the installed fake to read live axes from the
+// same __fakePad handle the pressed list uses.
+const fakePadAxesSeed = async (page) => {
+  await fakePadSeed(page);
+  await page.evaluateOnNewDocument(
+    `var basePads = navigator.getGamepads.bind(navigator);
+     var withAxes = function () {
+       var pads = basePads();
+       if (pads && pads[0]) pads[0].axes = window.__fakePad.axes || [0, 0, 0, 0];
+       return pads;
+     };
+     try { Object.defineProperty(Navigator.prototype, 'getGamepads', { value: withAxes, configurable: true, writable: true }); } catch (e) {}
+     try { Object.defineProperty(navigator, 'getGamepads', { value: withAxes, configurable: true, writable: true }); } catch (e) {}`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -10568,8 +10585,21 @@ export const TARGETS = [
         charName: 'Aimwright',
         beforeLoad: lowGraphicsSeed,
       },
+      // Pad: the cross hotbar stands up off the fake pad, the armed aim enters
+      // the placement mode for real, and the fake left stick steers the
+      // reticle. On a BASE build the stick does nothing and no reticle paints,
+      // which is the honest before frame beside the same visible bar.
+      {
+        key: 'pad',
+        charClass: 'mage',
+        charName: 'Aimwright',
+        beforeLoad: async (page) => {
+          await lowGraphicsSeed(page);
+          await fakePadAxesSeed(page);
+        },
+      },
     ],
-    async capture(page) {
+    async capture(page, variant) {
       for (let i = 0; i < 12; i++) {
         await page.evaluate(() => {
           document.querySelector('.camera-prompt-confirm')?.click();
@@ -10624,6 +10654,15 @@ export const TARGETS = [
         hud?.closeAll?.();
         if (hud?.isGroundAimActive?.() !== true) hud?.castSlot?.(1);
       });
+      if (variant?.key === 'pad') {
+        // Steer with the fake left stick through the live placement mode, then
+        // hold LT so the cross hotbar lights its held half for the frame.
+        await page.evaluate('window.__fakePad.axes = [0.85, -0.35, 0, 0]');
+        await wait(700);
+        await page.evaluate('window.__fakePad.axes = [0, 0, 0, 0]');
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(400);
+      }
       await wait(800);
       return { clip: '#ui' };
     },
