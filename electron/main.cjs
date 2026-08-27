@@ -65,6 +65,7 @@ const {
 } = require('./diagnostics.cjs');
 const { initLogging } = require('./logging.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
+const { registerLinuxUrlHandler } = require('./linux_url_handler.cjs');
 const { attachRendererCrashRecovery, installProcessCrashGuards } = require('./crash_guard.cjs');
 const { initUpdater } = require('./updater.cjs');
 const {
@@ -1183,12 +1184,34 @@ ipcMain.on('desktop-renderer-error', (event, payload) => {
   log.error('[renderer]', entry);
 });
 
-if (process.defaultApp) {
-  app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
-    path.resolve(process.argv[1]),
-  ]);
-} else {
-  app.setAsDefaultProtocolClient(deepLinkProtocol);
+// Linux has no OS-level protocol registry to write: the scheme is owned by a .desktop
+// entry, which an AppImage never installs and which Electron's own registration misnames.
+// electron/linux_url_handler.cjs fixes both, and MUST run first so the file and the
+// CHROME_DESKTOP name are in place before setAsDefaultProtocolClient shells out to
+// xdg-settings. No-op on win32/darwin and on every non-AppImage Linux channel.
+const linuxUrlHandler = registerLinuxUrlHandler({ scheme: deepLinkProtocol, log });
+
+// CHROME_DESKTOP is process-wide and inherited by every child, including the browser we open
+// for the Discord login itself. It exists only for the registration below, so the restore runs
+// in a finally: a throw from setAsDefaultProtocolClient would otherwise leave our app identity
+// set for every child, which is the exact outcome the module documents as the reason to
+// restore it. No-op on win32/darwin, and when nothing was set.
+try {
+  if (process.defaultApp) {
+    app.setAsDefaultProtocolClient(deepLinkProtocol, process.execPath, [
+      path.resolve(process.argv[1]),
+    ]);
+  } else {
+    app.setAsDefaultProtocolClient(deepLinkProtocol);
+  }
+} finally {
+  linuxUrlHandler.restore();
+  // AFTER setAsDefaultProtocolClient, never alongside it. Electron's Linux path shells out to
+  // xdg-settings, which runs `xdg-mime default` itself against the same unlocked file, and a
+  // torn read there makes it restore the ORIGINAL association and fail: exactly the broken
+  // state this is meant to fix. Ours stays as the fallback for when Electron's registration
+  // does not take.
+  linuxUrlHandler.associate();
 }
 
 const singleInstance = app.requestSingleInstanceLock();

@@ -394,6 +394,60 @@ Linux AppImage caveat: the updater requires the `APPIMAGE` env (set automaticall
 when running a real AppImage); running the raw unpacked binary logs an updater error
 and skips, by design.
 
+Linux deep-link caveat: `worldofclaudecraft://` is owned by a `.desktop` entry, not by
+an OS registry, so `electron/linux_url_handler.cjs` runs before
+`app.setAsDefaultProtocolClient` on both Linux channels. On the AppImage it writes
+`~/.local/share/applications/world-of-claudecraft-appimage.desktop` (the entry electron-builder
+bakes into the squashfs is never installed unless the player has AppImageLauncher) and
+runs `update-desktop-database` + `xdg-mime default`. It then repoints `CHROME_DESKTOP` at
+whichever entry belongs to the channel it is running as: ours on an AppImage run, the deb's
+(`world-of-claudecraft.desktop`, installed by dpkg) otherwise. That matters, because pointing
+it at ours unconditionally would make a deb launch register the AppImage's entry, which is the
+same shadowing the distinct filename exists to prevent, reached through `CHROME_DESKTOP`
+instead of the desktop-file ID.
+
+The repoint is needed at all because Electron resolves the name it hands `xdg-settings` from
+that variable, and with no `desktopName` in `package.json` the name it infers comes from
+`app.name` (`World of ClaudeCraft.desktop`), which matches no file on disk. The deb's basename
+MUST keep tracking `executableName`: `tests/electron_linux_url_handler.test.ts` derives it from
+`package.json` `name` AND pins that no `executableName` / `desktopName` override exists, so
+either kind of rename fails there rather than silently breaking Discord login.
+
+Deliberate narrowings worth knowing before changing any of it:
+- `CHROME_DESKTOP` is set only when the entry actually exists on disk (ours or the
+  deb's), and is restored immediately after the registration call. Setting it
+  unconditionally would make a Steam depot, an Epic package, or a dev run point
+  `xdg-settings` at a dangling name, which can REPLACE a working association; leaving it
+  set leaks our app identity to every child process, including the browser opened for
+  the Discord login itself.
+- The entry is written temp-then-`rename` (with `wx` on the temp), so a concurrent second
+  instance cannot leave a torn file and a symlink at either path is refused or replaced rather
+  than followed.
+- The AppImage entry is `world-of-claudecraft-appimage.desktop`, deliberately NOT the deb's
+  basename. Same basename means the same desktop-file ID, and a user-level file wins outright,
+  so reusing it would let one AppImage run replace the deb's entry everywhere; with `TryExec`
+  that becomes a silent removal once the AppImage is deleted, and `apt reinstall` cannot fix it
+  because the shadowing file is in `$HOME`. `CHROME_DESKTOP` is pointed at whichever entry
+  actually exists, ours first, the deb's second.
+- The association (`update-desktop-database` and `xdg-mime`) runs AFTER
+  `app.setAsDefaultProtocolClient`, never alongside it. Electron's Linux path shells out to
+  `xdg-settings`, which runs `xdg-mime default` itself against the same unlocked
+  read-modify-write file; on a torn read `xdg-settings` restores the ORIGINAL association and
+  fails, which is exactly the broken state this exists to remove.
+- An unchanged entry still re-runs the association commands. The file being identical does
+  not mean the association survived: another app can claim the scheme and a desktop
+  environment can reset `mimeapps.list`, and without the re-assert that breaks Discord
+  login permanently with no relaunch that recovers it.
+- Not `app.setDesktopName()`, the public API for the same value: it also drives the
+  Wayland app id and X11 `WM_CLASS`, which electron-builder independently writes as
+  `StartupWMClass` from `productName`. Changing one without the other breaks the
+  window-to-launcher association that works today.
+
+An AppImageLauncher user ends up with two entries (theirs, `appimagekit_*.desktop`, plus
+ours); ours takes the scheme default, which is the working one. All of it is best-effort:
+a player with no `xdg-utils` or a read-only home still signs in with a username and
+password, which never leaves the shell.
+
 ## Steam
 
 Build: `npm run electron:build:steam` on each OS runner (signing env still applies on
@@ -645,6 +699,17 @@ product exist. Coding and merge stay dark-safe without those credentials.
 3. Login both paths: email/password in-app, and Discord via the external browser +
    `worldofclaudecraft://desktop-login` deep link handoff (app focuses and enters
    the world; second-instance and cold-start deep links both work).
+   On Linux run this on a machine with NO prior install and no AppImageLauncher (a
+   stock SteamOS or Bazzite box is the realistic case): the AppImage must register its
+   own handler on first launch. Confirm with
+   `xdg-mime query default x-scheme-handler/worldofclaudecraft` returning
+   `world-of-claudecraft-appimage.desktop` (the AppImage entry is deliberately NOT the deb's
+   basename), then `gio open "worldofclaudecraft://desktop-login?code=x"` reaching the running
+   game. Use `gio open`, not `xdg-open`: on stock SteamOS, which is the box this step names,
+   `xdg-open` takes its KDE branch and calls a `kfmclient` that is not installed, so it fails
+   for reasons unrelated to the handler. `gio open` is also the path a GTK browser takes.
+   A regression here shows up as the OS "choose an application" dialog, which cannot select an
+   AppImage at all.
 4. Play 5 minutes: steady frame rate, alt-tab out/in does not hitch or freeze the
    world (backgroundThrottling stays off).
 5. Website channel only: with a higher-version build on the feed, the update toast
