@@ -72,6 +72,11 @@ const MONOLITHS: MonolithRow[] = [
     // window carries only state, handler arms and passthroughs. Exact
     // count, zero headroom; the sell-tab combobox block is the next
     // standing extraction candidate.
+    // Held at 2487 for the Solana wallet card (the Claudium card above the
+    // Browse filters): the card's markup landed in the chrome builder, and
+    // the window's gated wallet fan-out arm was paid for by moving the quote
+    // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
+    // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
     ceiling: 2487,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
@@ -125,6 +130,9 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
+    // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
+    // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
+    // Claudium panel's existing arm. Exact count.
     ceiling: 18488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -256,7 +264,10 @@ const MONOLITHS: MonolithRow[] = [
     // first-spawn intro's seen-marker persistence moved out into
     // src/game/spawn_intro_seen.ts (the establishing-shot entry wait needed
     // one line here, and the ratchet pays for it by extraction).
-    ceiling: 11563,
+    // Re-pinned again at the second v0.41.0 sync merge: the release arm's own
+    // row came down to 11564 and the branch extraction still applies, so the
+    // merged file lands at 11561. Exact merged count, zero headroom.
+    ceiling: 11561,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
