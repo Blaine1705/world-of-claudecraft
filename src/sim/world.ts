@@ -9,6 +9,7 @@ import {
   castleSkirtWeight,
   LAST_SPRING,
 } from './castle_layout';
+import { EMBER_BAYS, EMBER_LAND_LOBES } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
@@ -457,51 +458,12 @@ export function hollowLandness(x: number, z: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// The Drakelands' landmass: a gatewood shore fused to the causeway landing,
-// widening into the desert body, then a broad volcanic belt spanning the far
-// north (the Drakemaw range doubles as the sealed wall's footing where it
-// meets land; over the flanks the range simply runs into the sea).
+// The Drakelands' landmass tables live in content/ember_coast.ts (the
+// vale_coast.ts pattern): edit lobes and bays there, the field math stays
+// here.
 // ---------------------------------------------------------------------------
 const DRAKE_ZMIN = 1820; // keep in sync with DRAKELANDS_ZONE.zMin (east column)
 const DRAKE_ZMAX = 2420; // ...and zMax
-const EMBER_LAND_LOBES = [
-  { x: 404, z: 1825, r: 40 }, // the causeway landing, fused across the border
-  { x: 404, z: 1858, r: 52 }, // the Wyrmgate shore and Wyrmwatch
-  { x: 360, z: 1900, r: 70 }, // the Gatewood
-  { x: 450, z: 1920, r: 55 }, // eastern gatewood shore
-  { x: 455, z: 1995, r: 55 }, // the Last Spring headland
-  { x: 290, z: 1940, r: 60 }, // western gatewood shore
-  { x: 380, z: 2030, r: 90 }, // the drying midlands
-  { x: 280, z: 2080, r: 65 }, // Mirage Hollow's dune shelf
-  { x: 262, z: 2020, r: 46 }, // ...its southern shoulder under the dune road
-  { x: 274, z: 2170, r: 48 }, // ...and the shelf road's western shoulder
-  { x: 470, z: 2070, r: 70 }, // eastern dunes
-  { x: 465, z: 2150, r: 60 }, // Trollmoot's rise
-  { x: 405, z: 2170, r: 55 }, // the dune saddle carrying the Trollmoot fork
-  { x: 340, z: 2160, r: 85 }, // the Cinder Dunes' heart
-  { x: 420, z: 2260, r: 80 }, // approach to the Drakemaw
-  { x: 360, z: 2238, r: 45 }, // the saddle carrying the Snowline road
-  { x: 290, z: 2250, r: 75 }, // the Bloodglass shelf
-  { x: 360, z: 2355, r: 95 }, // the Drakemaw belt
-  { x: 490, z: 2330, r: 60 }, // eastern volcanic spur
-  { x: 220, z: 2340, r: 55 }, // western volcanic spur
-  { x: 450, z: 2400, r: 70 }, // the rim belt, wide under the sealed range
-  { x: 270, z: 2400, r: 70 },
-  { x: 360, z: 2410, r: 80 },
-  { x: 242, z: 2080, r: 42 }, // the Snowline crossing's waste-side shoulder
-  { x: 208, z: 2080, r: 40 }, // ...carried to the column border
-  { x: 216, z: 1930, r: 44 }, // the Snowline's waste-side shoulder
-  { x: 236, z: 1972, r: 46 }, // ...rising onto the dune shelf road
-  { x: 376, z: 1952, r: 42 }, // the town road's western shoulder
-  { x: 242, z: 1858, r: 46 }, // the cap's shore joining the Gatewood...
-  { x: 264, z: 1908, r: 44 }, // ...so no channel runs behind it to the sound
-  { x: 492, z: 2390, r: 48 }, // the Goldmelt Water's east cap, waste side
-] as const;
-const EMBER_BAYS = [
-  { x: 195, z: 1980, r: 50 }, // the west bight
-  { x: 535, z: 2180, r: 55 }, // the east reach
-  { x: 205, z: 2230, r: 40 }, // a western cove under the spur
-] as const;
 
 const EMBER_LAND_FIELD = boundedBlobs(EMBER_LAND_LOBES);
 const EMBER_BAY_FIELD = boundedBlobs(EMBER_BAYS);
@@ -2299,6 +2261,10 @@ export const EMBER_VOLCANOES = [
   // its crater pool) to the seabed after every shaping pass
   { x: 487, z: 2356, r: 32, h: 18, craterR: 7, craterD: 7 },
   { x: 318, z: 2392, r: 30, h: 14, craterR: 0, craterD: 0 },
+  // the Forgefather's Isle cone (the Ignivar raid entrance): peak set
+  // northwest so the southeast face slopes down toward the gate forecourt
+  // and the bridge strait
+  { x: 214, z: 2254, r: 22, h: 15, craterR: 4, craterD: 4 },
 ] as const;
 // the Snowline crossing's drake-side footing (appended to the ember lobes
 // below via EMBER_GATE_LOBES; the fire road to the ice)
