@@ -2447,13 +2447,117 @@
      overlapped by ~50px at the reference viewport, and the deed/reliquary
      tracker's compact-tier hit-box extension, z-index 20 to the rail's 19,
      painted over the rail's top buttons and stole their taps and pad-cursor
-     clicks). The tracker is progress chrome, not actionable combat info (no
-     graphics-fairness concern), so it stands down here rather than the rail
-     re-deriving a seat around whatever height its content happens to render
-     at this tick; #mobile-extra-controls' More tray and the rail's own
-     Book of Deeds / Reliquary launchers still open the full windows. */
-  body.mobile-touch.xhb-mode #right-tracker-stack {
+     clicks). Deed/reliquary are progress chrome, not actionable combat info
+     (no graphics-fairness concern), so they stand down here; the More tray
+     (#mobile-extra-controls) and the rail's own Book of Deeds / Reliquary
+     launchers still open the full windows. #delve-tracker is the exception
+     (the stack's own re-seat below): a live delve run's objective and affix
+     info IS actionable. */
+  body.mobile-touch.xhb-mode #deed-tracker,
+  body.mobile-touch.xhb-mode #reliquary-tracker {
     display: none;
+  }
+  /* #rift-tracker's OWN comment (hud.css, "rift floor tracker") calls its
+     floor progress and closes-in countdown "actionable pacing info" too,
+     the identical reasoning that earns #delve-tracker its seat below, so
+     hiding it here is inconsistent, not a settled call: this pass only
+     re-derived the seat, party clearance, and UI Scale math for the one
+     tracker the review named, and doing the same for a second tracker
+     without also re-verifying it against that math is exactly the kind of
+     silent scope creep CLAUDE.md warns against. #rift-tracker sets its own
+     inline display (rift_floor_tracker_controller.ts, 'block' while a run
+     exists), so unlike deed/reliquary above it needs !important to win
+     here; same "hidden either way" idiom #daily-rewards-button uses,
+     pending that follow-up (delve and rift instances never coexist for one
+     player per src/sim/data.ts's isRiftPos/isDelvePos split, so the two
+     could plausibly share this exact seat once rift gets the same pass). */
+  body.mobile-touch.xhb-mode #rift-tracker {
+    display: none !important;
+  }
+  /* The stack itself re-seats to the left edge instead of standing down,
+     mirroring the quest tracker's own left-side standdown seat (#quest-strip,
+     above): that is the one corner this mode leaves clear (the touch
+     move-zone/joystick it used to share it with are hidden in xhb-mode too,
+     and Quick Actions' revived seat sits lower, at the bottom-left).
+     #delve-tracker is the stack's only child left visible above, so it is the
+     one that actually moves; no per-child override needed, since it is a
+     plain flex child of this box (not positioned on its own).
+
+     BOTTOM-anchored, not top: both this stack and .xhb live inside the same
+     #ui, which carries `zoom: var(--ui-scale)` (src/ui/ui_scale.ts), so every
+     author length here is multiplied by the live UI Scale setting (0.85 to
+     1.4, src/game/settings.ts) when rendered. .xhb's own seat (`bottom:
+     var(--xhb-bottom, 18px)`) plus its measured rest height (confirmed live:
+     142px at UI Scale 1) puts its rendered top at approximately
+     `#ui`'s-bottom-edge minus 160px times the SAME scale. Anchoring this
+     stack from the bottom by the same kind of flat, unscaled-by-app-vh
+     literal (172px: that 160px footprint plus a 12px gap) means both boxes
+     move in lockstep under any UI Scale, so the gap between them stays
+     proportional instead of a flat `top` (tried first; confirmed live to
+     land the tracker fully inside the XHB band at UI Scale 1.4, since a
+     top-anchored box does not move as .xhb's bottom-anchored one does).
+     !important: top is otherwise a live DOM write from
+     tracker_stack_anchor.ts (re-seating the box under the minimap column
+     every 500ms), and an inline style beats any plain rule regardless of
+     specificity, the same reason --xhb-lift above needs it; bottom/left/
+     right have no competing writer.
+
+     left matches the column's own convention (#target-frame, #party-frames
+     both use this exact expression), not a new one-off value, so the seat
+     lines up with its column neighbours on a notched phone instead of
+     sitting 10px further in.
+
+     z-index drops from the stack's usual 20 (the rail click-steal fix
+     above) to UNDER #party-frames' 5: an expanded duo party (delves cap at
+     2 players, src/sim/delves/runs.ts's maxPlayers gate) can reach into
+     this same corner (confirmed live: a 2-member #party-frames reaches
+     y180 at UI Scale 1, and this seat's own content can start as high as
+     y128), and party HP is the kind of actionable info the graphics-
+     fairness rule protects, so it must win the paint order over a
+     progress-style delve tracker on the rare overlap rather than the other
+     way around; #right-tracker-stack carries no clickable full-width area
+     here to lose by yielding (only .dt-affix-row, itself unaffected by
+     paint order for its own hit-testing). */
+  body.mobile-touch.xhb-mode #right-tracker-stack {
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    right: auto;
+    top: auto !important;
+    bottom: 172px;
+    z-index: 4;
+  }
+  /* Bounded the same way #quest-strip's own objectives block is (above): a
+     run's objective/affix lines are unbounded in height
+     (delve_tracker_controller.ts writes the whole innerHTML per update), and
+     this seat sits between the quest strip above and the XHB band below.
+     Scale-aware, the same idiom #meters-window uses just above, but the
+     subtraction order matters here: #quest-strip is NOT zoomed (it is a
+     sibling of #ui, inside the unzoomed #mobile-controls, so its ~128px
+     real footprint never moves), while this box and its 172px bottom anchor
+     ARE (both live inside #ui, zoomed by --ui-scale). Subtracting the
+     unzoomed 128px from --app-vh FIRST, in real px, then dividing the
+     REMAINDER by --ui-scale, converts that fixed real budget into the
+     logical units this box is measured in; dividing the whole --app-vh (as
+     a first attempt did) instead scales the quest-strip clearance right
+     along with everything else and goes negative at UI Scale 1.4 (clamping
+     max-height to 0: invisible, the same loss this fix exists to undo).
+     This shrinks the cap as the footprint grows, so the box never claims
+     more of the fixed viewport than is actually free; content that still
+     does not fit scrolls (below) rather than clipping silently or
+     overlapping the strip. pointer-events: auto is required for that
+     scroll to be a real affordance, not decoration: #delve-tracker's OWN
+     base rule (hud.css) is pointer-events: none (every tracker in this
+     stack floats over the game world unclickable except its one
+     interactive row), so without this a touch drag here falls through to
+     the canvas instead of scrolling. It shares this corner only with
+     #party-frames on an expanded duo party (the z-index note above), which
+     already wins the paint order there and is unaffected by this element's
+     own pointer-events, so claiming touches back here is safe the way it
+     would not have been at the old right-side seat (the .dt-affix-row
+     click-steal precedent this stack's z-index comment above describes). */
+  body.mobile-touch.xhb-mode #delve-tracker {
+    max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);
+    overflow-y: auto;
+    pointer-events: auto;
   }
   /* Trimmed to the launchers with no other pad-reachable path: Quick Actions'
      own strip (#mobile-menu-strip, kept up alongside this rail per the review
