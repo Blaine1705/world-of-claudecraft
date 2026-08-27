@@ -1,9 +1,12 @@
-// Materials Vault wire glue: the vault command dispatch bodies, the cvault
-// snapshot cadence rule, and the per-tick vaultCraftConsume batch, extracted
-// from server/game.ts behind narrow host interfaces (the module-first seam:
-// none of this needs GameServer's private state). game.ts stays a thin
-// consumer: its dispatch cases, self-block emission, and event drain each
-// keep a one-line call into this module.
+// Materials Vault wire glue: the vault command dispatch bodies and the cvault
+// snapshot cadence rule, extracted from server/game.ts behind narrow host
+// interfaces (the module-first seam: none of this needs GameServer's private
+// state). game.ts stays a thin consumer: its dispatch cases and self-block
+// emission each keep a one-line call into this module. (The per-tick
+// vaultCraftConsume batch that once lived here was the fire-and-forget
+// observer the reservation journal replaced; the sim-side event stays, as
+// the conservation sweep's expectation source, and routeEvents drops it from
+// the client relay.)
 //
 // Wire posture (moved verbatim from the game.ts self-block emission):
 // - `vault` rides beside `bank` on the same proximity gate and is
@@ -31,15 +34,9 @@
 //   the client reads as unchanged.
 
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
-import type { SimEvent } from '../src/sim/types';
 import { DT } from '../src/sim/types';
 import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
-import {
-  buildVaultLedgerRows,
-  recordVaultCraftConsume,
-  recordVaultOp,
-  type VaultCraftConsumption,
-} from './bank_ledger';
+import { buildVaultLedgerRows, recordVaultOp } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
 
@@ -360,42 +357,4 @@ export function takeCvaultWireTurn(
     return true;
   }
   return false;
-}
-
-/** The per-tick vaultCraftConsume drain (Bank Storage Phase 04): observer
- *  only. The craft resolved inside sim.tick(), so the event IS the
- *  dispatch-bracket-less record of what left the vault. Consumptions
- *  accumulate across the event loop (the deed-unlock idiom) and flush as ONE
- *  batched ledger insert, so a tick where N players complete casts costs one
- *  insert instead of N sequential FIFO round trips. Bots have no session, so
- *  the clients lookup filters them naturally, and no client message reaches
- *  this path: the sim alone emits vaultCraftConsume. Flush is fire-and-forget
- *  FIFO inside the recorder (the recordVaultOp discipline; event order within
- *  the tick is preserved). */
-export class VaultCraftConsumeBatch {
-  private readonly consumes: VaultCraftConsumption[] = [];
-
-  constructor(
-    private readonly clients: ReadonlyMap<number, { characterId: number; accountId: number }>,
-  ) {}
-
-  // SimEvent, not a widened structural shape: a sim-side reshape of the
-  // vaultCraftConsume variant must break the build here, never degrade into
-  // silently skipped audit rows (takes and upgrades are REQUIRED on the
-  // narrowed variant, so no fallback defaults exist to hide one).
-  offer(ev: SimEvent): void {
-    if (ev.type !== 'vaultCraftConsume' || ev.pid === undefined) return;
-    const who = this.clients.get(ev.pid);
-    if (who) {
-      this.consumes.push({ who, takes: ev.takes, upgrades: ev.upgrades });
-    }
-  }
-
-  flush(): void {
-    if (this.consumes.length > 0) recordVaultCraftConsume(this.consumes);
-    // Drain on flush so a reused instance (a plausible phase 06+ per-tick
-    // allocation cleanup) can never re-insert prior ticks' rows or grow
-    // without bound.
-    this.consumes.length = 0;
-  }
 }

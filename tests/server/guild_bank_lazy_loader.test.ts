@@ -18,6 +18,7 @@ import {
   type GuildBankLazyLoadScheduleRetry,
 } from '../../server/guild_bank_lazy_loader';
 import { GUILD_BANK_ROW_MAX_BYTES } from '../../server/guild_bank_receipt_db';
+import { stripComments } from '../helpers/strip_comments';
 
 interface TestRow extends GuildBankLazyLoadRow {
   readonly data: string;
@@ -83,7 +84,10 @@ function fakeRetryScheduler(advanceNow: (delayMs: number) => void = () => undefi
 
 describe('guild bank lazy loader', () => {
   it('wires unref retry timers and shutdown cancellation into GameServer', () => {
-    const game = readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8');
+    // Strip comments so commented-out code cannot satisfy the positive pins below.
+    const game = stripComments(
+      readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8'),
+    );
 
     expect(game).toContain('const timer = setTimeout(retry, delayMs).unref();');
     expect(game).toContain('return () => clearTimeout(timer);');

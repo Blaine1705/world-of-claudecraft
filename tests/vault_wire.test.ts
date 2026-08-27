@@ -41,7 +41,6 @@ import {
   dispatchVaultCommand,
   emitVaultSelfKeys,
   takeCvaultWireTurn,
-  VaultCraftConsumeBatch,
   type VaultSim,
 } from '../server/vault_wire';
 import { recipeById } from '../src/sim/content/recipes';
@@ -1306,7 +1305,11 @@ describe('materials vault wire round-trip', () => {
     },
   );
 
-  it('shares one production realm budget across three live accounts', () => {
+  it('realm-budget exhaustion admits the third account and counts a breach; the account bucket still refuses', () => {
+    // PR #3670: the realm row bucket is TELEMETRY ONLY (two accounts at their
+    // own ceilings drain it, so refusing on it turned ordinary co-play into a
+    // realm-wide 'You are busy.'). The database-wide growth ceiling is the
+    // authoritative aggregate bound; the per-account bucket keeps refusing.
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-08-26T00:00:00Z'));
     const dropped = vi.spyOn(gameMetricsCounters(), 'wsMessageDropped');
@@ -1334,25 +1337,30 @@ describe('materials vault wire round-trip', () => {
         expect(journalLedgerRows(player.session)).toHaveLength(112);
       }
 
+      // The THIRD legitimate account's sweep lands past the realm burst: it
+      // ADMITS, its rows commit, no drop is counted, and the breach counter
+      // records the admission the old refusing guard would have dropped.
       const third = players[2];
+      send(server, third.session, { cmd: 'vault_deposit_all' });
+      expect(third.meta.vault.special).toHaveLength(112);
+      expect(journalLedgerRows(third.session)).toHaveLength(112);
+      expect(dropped).not.toHaveBeenCalledWith('bank_vault');
+      // biome-ignore lint/suspicious/noExplicitAny: private coordinator probe
+      const snapshot = (server as any).bankVaultLedgerGuardCoordinator.snapshot();
+      expect(snapshot.realmRowBreaches).toBe(1);
+      expect(snapshot.realmRowTokens).toBeLessThan(0); // overload depth gauge
+
+      // The ACCOUNT bucket is untouched by the conversion: the same account
+      // sweeping again inside the second is out of account rows and refuses
+      // before the sim runs, which is what reaches the drop counter.
       const beforeRefusal = structuredClone(third.meta.inventory);
       send(server, third.session, { cmd: 'vault_deposit_all' });
       expect(third.meta.inventory).toEqual(beforeRefusal);
-      expect(third.meta.vault.special).toEqual([]);
-      expect(journalBatchCount(third.session)).toBe(0);
+      expect(third.meta.vault.special).toHaveLength(112);
       expect(dropped).toHaveBeenCalledWith('bank_vault');
-
-      // The realm refusal refunded this account's command and row reservation,
-      // so its bounded one-row tail is still admitted immediately.
-      const slot = third.meta.inventory.findIndex(
-        (item: { itemId: string }) => item.itemId === 'pristine_hide',
-      );
-      send(server, third.session, { cmd: 'vault_deposit', slot });
-      expect(third.meta.vault.special).toHaveLength(1);
-      expect(journalLedgerRows(third.session)).toHaveLength(1);
-      expect(
-        third.meta.inventory.filter((item: { itemId: string }) => item.itemId === 'pristine_hide'),
-      ).toHaveLength(111);
+      // An account refusal never reaches the realm bucket: still one breach.
+      // biome-ignore lint/suspicious/noExplicitAny: private coordinator probe
+      expect((server as any).bankVaultLedgerGuardCoordinator.snapshot().realmRowBreaches).toBe(1);
     } finally {
       dropped.mockRestore();
       vi.useRealTimers();
@@ -2022,38 +2030,6 @@ describe('vault_wire module units', () => {
       ),
     ).toThrow('cadence wire rejected');
     expect(session.lastCvaultWireTick).toBe(20);
-  });
-
-  it('the consume batch filters sessionless pids, keeps rows, and drains on flush', async () => {
-    const clients = new Map([[7, WHO]]);
-    const batch = new VaultCraftConsumeBatch(clients);
-    const insert = vi.mocked(insertBankLedgerRows);
-    const before = insert.mock.calls.length;
-    batch.offer({
-      type: 'vaultCraftConsume',
-      pid: 7,
-      takes: [{ itemId: 'copper_ore', count: 3 }],
-      upgrades: 2,
-    });
-    // A bot (no session for the pid) and a foreign event type: both ignored.
-    batch.offer({
-      type: 'vaultCraftConsume',
-      pid: 8,
-      takes: [{ itemId: 'ashwood_log', count: 1 }],
-      upgrades: 2,
-    });
-    batch.offer({ type: 'log', text: 'noise' });
-    batch.flush();
-    await bankLedgerIdle();
-    const newCalls = insert.mock.calls.slice(before);
-    expect(newCalls).toHaveLength(1);
-    const rows = newCalls[0][0] as readonly { characterId: number; itemId: string }[];
-    expect(rows.map((r) => [r.characterId, r.itemId])).toEqual([[11, 'copper_ore']]);
-    // Drain-on-flush: the batch is empty now, so a reused instance cannot
-    // re-insert prior ticks' rows.
-    batch.flush();
-    await bankLedgerIdle();
-    expect(insert.mock.calls.length).toBe(before + 1);
   });
 });
 

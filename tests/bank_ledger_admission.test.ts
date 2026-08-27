@@ -21,9 +21,7 @@ vi.mock('../server/storage_store_cache', () => ({
 import {
   bankLedgerIdle,
   buildGuildBankLedgerRows,
-  buildVaultCraftConsumeLedgerRows,
   recordGuildBankDeltas,
-  recordVaultCraftConsume,
 } from '../server/bank_ledger';
 import {
   BANK_LEDGER_SYNC_BATCH_ENVELOPE_BYTES,
@@ -308,24 +306,11 @@ describe('BankLedgerOutboxAdmission', () => {
     expect(handle.commit([ledgerRow()])).toBe(false);
   });
 
-  it('keeps legacy guild and craft writers byte-shaped with their pure row builders', async () => {
-    const craftInput = [
-      {
-        who: WHO,
-        takes: [
-          { itemId: 'peacebloom', count: 2 },
-          { itemId: 'silverleaf', count: 1 },
-        ],
-        upgrades: 3,
-      },
-    ];
-    const craftRows = buildVaultCraftConsumeLedgerRows(craftInput);
-    recordVaultCraftConsume(craftInput);
-    await bankLedgerIdle();
-    expect(insertMany).toHaveBeenCalledTimes(1);
-    expect(insertMany).toHaveBeenCalledWith(craftRows);
-
-    insertMany.mockClear();
+  it('keeps the legacy guild writer byte-shaped with its pure row builder', async () => {
+    // The craft-consume arm retired with recordVaultCraftConsume: vault craft
+    // rows now ride the session journal (server/bank_ledger_session.ts, built
+    // on buildVaultCraftConsumeLedgerRows), and their row shape is pinned in
+    // tests/server/bank_ledger_session.test.ts.
     const deltas = [
       {
         itemId: 'linen_cloth',

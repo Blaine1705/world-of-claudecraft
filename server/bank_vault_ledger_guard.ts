@@ -8,14 +8,24 @@
 // socket swap can retain two rows, so 4 rows per second is the account ceiling:
 // 172,800 receipts and 345,600 rows per account-day after the one-time burst.
 // The state survives character swaps and reconnects within this process.
+// Account-bucket exhaustion REFUSES the command before the sim runs; it is the
+// per-account abuse bound.
 //
-// A separate process/realm row bucket prevents many accounts from multiplying
-// that ceiling without limit. It admits two simultaneous maximum legal sweeps,
-// then refills at 8 rows per second: at most 691,200 personal/vault rows per
-// process-day after the one-time burst. The database-wide hard ceiling in
-// bank_ledger_growth_budget.ts remains authoritative across processes and all
-// writer paths. Operators watch both its fixed growth-budget series and the
-// fixed woc_ws_messages_dropped_total{cause="bank_vault"} refusal series.
+// The process/realm row bucket is TELEMETRY ONLY. It keeps the full token
+// accounting (burst sized to two simultaneous maximum legal sweeps, an 8
+// rows/s refill, worst-case reservation with post-commit refund of the unused
+// tail), but exhausting it never refuses a player command: two accounts at
+// their own 4 rows/s ceilings already saturate a burst-242/refill-8 bucket,
+// and fifty players banking once per five seconds sit 2x over it, so refusing
+// on it turned ordinary co-play into 'You are busy.' realm-wide. The
+// AUTHORITATIVE aggregate bound is the database-wide growth ceiling in
+// bank_ledger_growth_budget.ts (which has its own alerting) across processes
+// and all writer paths; per-account abuse is bounded by the account bucket
+// above. What the realm bucket contributes is the operator signal: every
+// admission that WOULD have been refused increments the breach counter on the
+// coordinator snapshot (realmRowBreaches), and the token gauge may run
+// negative to show overload depth. Account refusals still ride the fixed
+// woc_ws_messages_dropped_total{cause="bank_vault"} series.
 //
 // vault_deposit_all is the legitimate bulk exception. Plain stacks collapse by
 // material id, but signed/crafted materials retain a distinct ledger identity
@@ -51,6 +61,9 @@ export type BankVaultLedgerRefusalReason =
   | 'account_command'
   | 'account_rows'
   | 'account_registry'
+  // Kept in the union for callers that switch over it, but NO LONGER PRODUCED:
+  // realm-bucket exhaustion admits and counts a breach instead of refusing
+  // (see the header).
   | 'realm_rows';
 
 export const BANK_VAULT_LEDGER_COMMAND_BURST = 10;
@@ -65,9 +78,11 @@ export const VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS = 112;
 export const BANK_VAULT_LEDGER_ROW_BURST =
   VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS + BANK_VAULT_LEDGER_COMMAND_BURST - 1;
 
-// Two accounts may land a maximum sweep together. The 8 rows/s refill admits
-// two accounts at their individual 4 rows/s ceilings while bounding aggregate
-// retained growth independently of WebSocket or account count.
+// Two accounts may land a maximum sweep together before the accounting dips
+// negative. The 242/8 pair is the MEASUREMENT BASIS for the breach counter
+// (see the header: the realm bucket observes, it does not refuse), kept at the
+// values the original refusing guard shipped with so the series stays
+// comparable across the conversion.
 export const BANK_VAULT_LEDGER_REALM_ROW_BURST = BANK_VAULT_LEDGER_ROW_BURST * 2;
 export const BANK_VAULT_LEDGER_REALM_ROW_REFILL_PER_SECOND = 8;
 
@@ -75,7 +90,40 @@ export const BANK_VAULT_LEDGER_REALM_ROW_REFILL_PER_SECOND = 8;
 // seconds. The larger ordinary TTL avoids churn; pressure cleanup may safely
 // evict any fully-refilled idle entry sooner without minting capacity.
 export const BANK_VAULT_LEDGER_ACCOUNT_IDLE_TTL_SECONDS = 60;
-export const BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES = 4_096;
+// Sized ABOVE the DEFAULT realm admission cap (server/http/config.ts
+// DEFAULT_MAX_PLAYERS_PER_REALM, 5000; ws_auth receives the resolved value):
+// live-bound entries are unprunable, so a cache smaller than the number of
+// concurrently admitted accounts would refuse the (cap+1)th account's every
+// bank command on bind failure. 5120 is the FLOOR; game.ts derives the real
+// capacity from the resolved cap via the resolver below.
+export const BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES = 5_120;
+
+/** Mirror of server/http/config.ts DEFAULT_MAX_PLAYERS_PER_REALM (not
+ * imported: config.ts fails fast without DATABASE_URL, and this module must
+ * construct in DB-less unit worlds). */
+const DEFAULT_REALM_PLAYER_CAP = 5_000;
+
+/** Account-registry capacity from the RESOLVED realm player cap, so an
+ * env-raised MAX_PLAYERS_PER_REALM cannot outgrow the registry: cap + 128
+ * headroom, never below the shipped floor. The raw value is read with
+ * config.ts's maxPlayersPerRealm contract (trimmed; unset, empty, or
+ * non-finite falls back to the default). A cap of 0 or negative DISABLES
+ * realm admission capping entirely (ws_auth admits unbounded fresh joins),
+ * so there is no cap to size from and the floor stands. */
+export function resolveBankVaultLedgerMaxAccountStates(
+  rawMaxPlayersPerRealm: string | undefined,
+): number {
+  const trimmed = rawMaxPlayersPerRealm?.trim();
+  const parsed =
+    trimmed === undefined || trimmed === '' ? DEFAULT_REALM_PLAYER_CAP : Number(trimmed);
+  const resolvedCap = Number.isFinite(parsed) ? parsed : DEFAULT_REALM_PLAYER_CAP;
+  return Math.max(
+    BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES,
+    resolvedCap > 0
+      ? Math.min(Math.ceil(resolvedCap) + 128, Number.MAX_SAFE_INTEGER)
+      : BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES,
+  );
+}
 
 const COMMAND_MAX_ROWS = Object.freeze({
   bank_deposit: 1,
@@ -97,8 +145,15 @@ export interface BankVaultLedgerGuardState {
 }
 
 export interface BankVaultLedgerRealmGuardState {
+  /** May run NEGATIVE: the telemetry bucket debits every admission in full so
+   *  the gauge shows overload depth (refill clamps only the ceiling). */
   rowTokens: number;
   lastRefillSec: number;
+  /** Admissions that the old refusing guard would have refused (rowTokens
+   *  short at reservation time). Monotonic; the operator signal. */
+  breaches: number;
+  /** Optional per-breach hook (a metrics counter); set at creation. */
+  onBreach?: () => void;
 }
 
 export interface BankVaultLedgerGuardReservation {
@@ -125,12 +180,17 @@ interface AccountEntry {
 export interface BankVaultLedgerCoordinatorOptions {
   readonly maxAccountStates?: number;
   readonly accountIdleTtlSeconds?: number;
+  /** Fires once per realm-bucket breach (an admission the old refusing guard
+   *  would have dropped); the host exports it as a monotone counter. */
+  readonly onRealmRowBreach?: () => void;
 }
 
 export interface BankVaultLedgerCoordinatorSnapshot {
   readonly accountStates: number;
   readonly realmRowTokens: number;
   readonly realmLastRefillSec: number;
+  /** Monotonic count of admissions the refusing guard would have dropped. */
+  readonly realmRowBreaches: number;
 }
 
 function checkedNow(nowSec: number): number {
@@ -188,10 +248,15 @@ export function createBankVaultLedgerGuard(nowSec: number): BankVaultLedgerGuard
   };
 }
 
-export function createBankVaultLedgerRealmGuard(nowSec: number): BankVaultLedgerRealmGuardState {
+export function createBankVaultLedgerRealmGuard(
+  nowSec: number,
+  onBreach?: () => void,
+): BankVaultLedgerRealmGuardState {
   return {
     rowTokens: BANK_VAULT_LEDGER_REALM_ROW_BURST,
     lastRefillSec: checkedNow(nowSec),
+    breaches: 0,
+    onBreach,
   };
 }
 
@@ -224,17 +289,23 @@ export function reserveBankVaultLedgerCommand(
   return reserveAccountRows(state, bankVaultLedgerMaxRows(command), nowSec).reservation;
 }
 
-function reserveRealmRows(
+/** TELEMETRY debit: always succeeds. The full worst case is debited (tokens
+ *  may run negative) and a shortfall at reservation time counts one breach,
+ *  which is exactly the admission the old refusing guard would have dropped. */
+function debitRealmRows(
   state: BankVaultLedgerRealmGuardState,
   maxRows: number,
   nowSec: number,
-): RealmReservation | null {
+): RealmReservation {
   checkedPositiveInteger(maxRows, 'bank-vault realm reservation row count');
   if (maxRows > BANK_VAULT_LEDGER_REALM_ROW_BURST) {
     throw new RangeError('bank-vault ledger reservation exceeds the realm row burst');
   }
   refillRealm(state, nowSec);
-  if (state.rowTokens < maxRows) return null;
+  if (state.rowTokens < maxRows) {
+    state.breaches++;
+    state.onBreach?.();
+  }
   state.rowTokens -= maxRows;
   return { maxRows, settled: false };
 }
@@ -303,11 +374,9 @@ function reserveCombinedRows(
 ): { reservation: CombinedReservation | null; reason?: BankVaultLedgerRefusalReason } {
   const accountResult = reserveAccountRows(account, maxRows, nowSec);
   if (!accountResult.reservation) return { reservation: null, reason: accountResult.reason };
-  const realmReservation = reserveRealmRows(realm, maxRows, nowSec);
-  if (!realmReservation) {
-    refundBankVaultLedgerCommand(account, accountResult.reservation);
-    return { reservation: null, reason: 'realm_rows' };
-  }
+  // The realm debit cannot refuse (telemetry only, see the header); only the
+  // account bucket above decides admission.
+  const realmReservation = debitRealmRows(realm, maxRows, nowSec);
   return { reservation: { account: accountResult.reservation, realm: realmReservation } };
 }
 
@@ -506,7 +575,7 @@ export function createBankVaultLedgerGuardCoordinator(
     throw new RangeError('bank-vault ledger idle TTL must be finite and non-negative');
   }
   const initialNow = checkedNow(nowSec());
-  const realm = createBankVaultLedgerRealmGuard(initialNow);
+  const realm = createBankVaultLedgerRealmGuard(initialNow, options.onRealmRowBreach);
   const accounts = new Map<number, AccountEntry>();
   let lastPruneSec = initialNow;
 
@@ -618,6 +687,7 @@ export function createBankVaultLedgerGuardCoordinator(
         accountStates: accounts.size,
         realmRowTokens: realm.rowTokens,
         realmLastRefillSec: realm.lastRefillSec,
+        realmRowBreaches: realm.breaches,
       });
     },
   });

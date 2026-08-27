@@ -63,14 +63,18 @@ function batch(
 }
 
 function fingerprint(value: BankLedgerCommandBatch): string {
+  // Independent re-implementation of the canonical fingerprint json: the
+  // serialized guild effect carries {guildId, deltas, actorAccountId} in that
+  // key order, actorAccountId normalized to null when the input omits it.
+  const effect = value.guildEffect
+    ? {
+        guildId: value.guildEffect.guildId,
+        deltas: value.guildEffect.deltas,
+        actorAccountId: value.guildEffect.actorAccountId ?? null,
+      }
+    : null;
   return createHash('sha256')
-    .update(
-      JSON.stringify({
-        batchKey: value.batchKey,
-        rows: value.rows,
-        guildEffect: value.guildEffect ?? null,
-      }),
-    )
+    .update(JSON.stringify({ batchKey: value.batchKey, rows: value.rows, guildEffect: effect }))
     .digest('hex');
 }
 
@@ -158,6 +162,32 @@ describe('bank ledger batch receipt DDL', () => {
       'CREATE INDEX IF NOT EXISTS bank_ledger_batch_receipts_account ON bank_ledger_batch_receipts (account_id);',
     );
     expect(folded).not.toMatch(/bank_ledger_batch_receipts_(?:character|account)[^;]+WHERE/i);
+  });
+
+  it('converges the key-shape CHECK bound on existing databases', () => {
+    // CREATE TABLE IF NOT EXISTS never revisits the inline constraint, so a
+    // changed BANK_LEDGER_OUTBOX_BATCH_KEY_MAX_LENGTH would silently keep the
+    // old bound without the DO-block converge. Literal pins (200, not the
+    // constant), so a bound change is a conscious edit here too.
+    const folded = BANK_LEDGER_BATCH_RECEIPTS_SCHEMA.replace(/\s+/g, ' ');
+    expect(folded).toContain("c.conname = 'bank_ledger_batch_receipts_key_shape'");
+    expect(folded).toContain("c.conrelid = 'bank_ledger_batch_receipts'::regclass");
+    // The probe compares the deployed definition against the compiled bound
+    // (pg_get_constraintdef normalizes BETWEEN into >= / <= comparisons) and
+    // the exact key regexp.
+    expect(folded).toContain("pg_get_constraintdef(c.oid) LIKE '%char_length(batch_key)%'");
+    expect(folded).toContain("pg_get_constraintdef(c.oid) LIKE '%<= 200)%'");
+    expect(folded).toContain("position('^[A-Za-z0-9_.:-]+$' in pg_get_constraintdef(c.oid)) > 0");
+    expect(folded).toContain(
+      'ALTER TABLE bank_ledger_batch_receipts DROP CONSTRAINT bank_ledger_batch_receipts_key_shape;',
+    );
+    expect(folded).toContain(
+      'ALTER TABLE bank_ledger_batch_receipts ADD CONSTRAINT bank_ledger_batch_receipts_key_shape CHECK ( ' +
+        "char_length(batch_key) BETWEEN 1 AND 200 AND batch_key ~ '^[A-Za-z0-9_.:-]+$' );",
+    );
+    // Both the inline CREATE TABLE constraint and the converge re-install must
+    // carry the same bound: two occurrences of the full BETWEEN clause.
+    expect(folded.split('char_length(batch_key) BETWEEN 1 AND 200').length - 1).toBe(2);
   });
 });
 
@@ -364,6 +394,37 @@ describe('writeBankLedgerCommandBatches', () => {
         /receipt verification failed/,
       );
     }
+  });
+
+  it('refuses a lost-COMMIT retry against a receipt hashed with the PRE-attribution shape', async () => {
+    // The guild-effect fingerprint gained actorAccountId in this same release,
+    // and the receipts table ships first in this release, so no production
+    // receipt with the OLD canonical json exists to collide (the DEPLOY.md
+    // batch-receipts note documents that empty window). If one ever did (a
+    // hand-applied preview install), the deliberate outcome is this refusal,
+    // never a silent acceptance of a batch the stored hash does not cover.
+    const rows = [row({ container: 'guild', containerId: 7 })];
+    const value = batch('guild:pre-attribution', rows, guildEffect(7, rows));
+    // The pre-change canonical json: identical except the guild effect ends at
+    // deltas (no actorAccountId key existed to serialize).
+    const preChangeSha = createHash('sha256')
+      .update(
+        JSON.stringify({
+          batchKey: value.batchKey,
+          rows: value.rows,
+          guildEffect: { guildId: 7, deltas: value.guildEffect?.deltas },
+        }),
+      )
+      .digest('hex');
+    expect(preChangeSha).not.toBe(fingerprint(value));
+
+    const cap = captureWith(() => [
+      { ...successfulVerification([value], [false])[0], stored_payload_sha256: preChangeSha },
+    ]);
+    await expect(writeBankLedgerCommandBatches(cap.db, OWNER, [value])).rejects.toThrow(
+      /receipt verification failed for batch guild:pre-attribution/,
+    );
+    expect(cap.calls).toHaveLength(1);
   });
 
   it('validates owner, keys, nonempty rows, and row ownership before querying', () => {

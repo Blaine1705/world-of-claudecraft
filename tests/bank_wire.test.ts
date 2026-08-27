@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // Postgres is mocked (hoisted above the server/game import), same block as
 // loot_roll_wire.test.ts, so GameServer runs with no live DB.
@@ -20,6 +20,20 @@ vi.mock('../server/db', () => ({
   insertBankLedgerRows: vi.fn(async () => {}),
 }));
 
+// Controllable next-rung Claudium quote: the real cache needs a live service,
+// and the gated `bank` key must re-emit on a SERVER-side price retune that
+// moves no sim revision. Default undefined = absent, the rig's old behavior.
+// Spread of the real module so STORAGE_PRICE_MAX_STALE_MS keeps its real
+// value for the storage_ladder_hold importer inside the server graph.
+const { bankWirePriceRef } = vi.hoisted(() => ({
+  bankWirePriceRef: { value: undefined as number | undefined },
+}));
+vi.mock('../server/storage_store_cache', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  nextRungClaudiumPriceFor: () => bankWirePriceRef.value,
+}));
+
+import { emitBankSelfKeys } from '../server/bank_wire';
 import { GameServer } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { bankGrantStorageSlots } from '../src/sim/bank';
@@ -1177,5 +1191,227 @@ describe('the always-available ladder wire key', () => {
     // that keyed both on the anchor would make these equal.
     expect(snap.self.bank.purchasedSlots).toBe(0);
     expect(snap.self.bpsl).toBe(12);
+  });
+});
+
+// The revision + composed-price gate on the owner-only `bank` key (the vault
+// gate's twin, server/bank_wire.ts emitBankSelfKeys). The mutator classes
+// (deposit / withdraw / buy-slots / sockets / bonus stamp) are proven by the
+// per-step snapshot mirrors in the round-trip suites above, which go stale if
+// any bumpBankWireRev site is missed; this describe adds the gate's own
+// build-elision arms plus the two writers those suites do not drive: the
+// server-side price retune and the Claudium storage grant.
+describe('the revision-gated bank self key', () => {
+  afterEach(() => {
+    bankWirePriceRef.value = undefined;
+  });
+
+  it('probes revision and price every pass but builds bank payloads only on first send, change, open/close, or price move', () => {
+    let rev: number | null = 3;
+    let builds = 0;
+    const sim: any = {
+      ctx: {
+        resolve: () => ({ meta: { entityId: 9, bank: { purchasedSlots: 12 } } }),
+        error: () => {},
+      },
+      bankInfoWireRevFor: () => rev,
+      bankInfoFor: () => {
+        builds++;
+        return {
+          slots: [],
+          capacity: 36,
+          purchasedSlots: 12,
+          bonusSlots: 0,
+          nextExpansionCost: 2500,
+          bonusSources: [],
+          socketsUnlocked: 0,
+          socketBags: [null, null, null, null],
+          nextSocketCost: 1000000,
+          generalCapacity: 36,
+          materialsCapacity: 0,
+          generalUsed: 0,
+          materialsUsed: 0,
+        };
+      },
+    };
+    const session = {
+      pid: 9,
+      lastSent: {} as Record<string, string>,
+      lastBankWirePid: null as number | null,
+      lastBankWireRev: null as number | null,
+      lastBankWirePrice: null as number | null,
+    };
+    const emitted: [string, unknown][] = [];
+    const emit = (key: string, value: unknown): void => {
+      session.lastSent[key] = JSON.stringify(value ?? null);
+      emitted.push([key, value]);
+    };
+    const bankEmits = () => emitted.filter(([k]) => k === 'bank');
+
+    emitBankSelfKeys(emit, sim, session, { pid: 9, accountId: 22 });
+    expect(bankEmits().length).toBe(1); // first send always ships
+    expect(builds).toBe(1);
+
+    emitBankSelfKeys(emit, sim, session, { pid: 9, accountId: 22 });
+    expect(bankEmits().length).toBe(1); // unchanged: probed, never rebuilt
+    expect(builds).toBe(1);
+
+    rev = 4; // a sim-side mutation
+    emitBankSelfKeys(emit, sim, session, { pid: 9, accountId: 22 });
+    expect(bankEmits().length).toBe(2);
+    expect(builds).toBe(2);
+
+    // A spectate retarget is part of the signature even when both characters
+    // happen to share a revision and lastSent stays populated.
+    emitBankSelfKeys(emit, sim, session, { pid: 10, accountId: 22 });
+    expect(bankEmits().length).toBe(3);
+    expect(builds).toBe(3);
+
+    rev = null; // walked away: an explicit null, never a build
+    emitBankSelfKeys(emit, sim, session, { pid: 10, accountId: 22 });
+    expect(bankEmits().at(-1)?.[1]).toBeNull();
+    expect(builds).toBe(3);
+
+    rev = 4; // back at the banker: immediate
+    emitBankSelfKeys(emit, sim, session, { pid: 10, accountId: 22 });
+    expect(builds).toBe(4);
+
+    bankWirePriceRef.value = 90; // server-side retune, NO sim revision moved
+    emitBankSelfKeys(emit, sim, session, { pid: 10, accountId: 22 });
+    expect(builds).toBe(5);
+    expect(
+      (bankEmits().at(-1)?.[1] as { nextRungClaudiumPrice?: number } | undefined)
+        ?.nextRungClaudiumPrice,
+    ).toBe(90);
+
+    emitBankSelfKeys(emit, sim, session, { pid: 10, accountId: 22 });
+    expect(builds).toBe(5); // steady again behind the price tracker
+  });
+
+  it('a server-side price retune re-emits the gated key with the new quote over the wire', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const s = joinAt(server, fw, 1, 'Pricegate');
+    const pid = s.pid;
+    const sim = server.sim as any;
+    bringBankerToPlayer(sim, pid);
+
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const snap1 = lastSnap(fw.sent);
+    expect(snap1.self.bank).not.toBeNull();
+    expect(snap1.self.bank).not.toHaveProperty('nextRungClaudiumPrice');
+
+    // Unchanged: the key is omitted entirely (never rebuilt, never resent).
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    expect(lastSnap(fw.sent).self).not.toHaveProperty('bank');
+
+    // The store cache moves while the sim does not: the gate must not strand
+    // the retune behind the sim revision.
+    bankWirePriceRef.value = 77;
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const snap3 = lastSnap(fw.sent);
+    expect(snap3.self.bank.nextRungClaudiumPrice).toBe(77);
+
+    // And the quote aging back out (service outage past MAX_STALE) re-emits
+    // WITHOUT the field, so the client degrades to gold alone.
+    bankWirePriceRef.value = undefined;
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const snap4 = lastSnap(fw.sent);
+    expect(snap4.self.bank).not.toBeNull();
+    expect(snap4.self.bank).not.toHaveProperty('nextRungClaudiumPrice');
+  });
+
+  it('a Claudium storage grant beside a banker re-emits the gated key with the new ladder', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const s = joinAt(server, fw, 1, 'Grantgate');
+    const pid = s.pid;
+    const sim = server.sim as any;
+    bringBankerToPlayer(sim, pid);
+
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    expect(lastSnap(fw.sent).self.bank.purchasedSlots).toBe(0);
+
+    // The server-originated grant rail (no ws command exists for it): the one
+    // bank mutator the round-trip suites above never drive.
+    const result = bankGrantStorageSlots(sim.ctx, pid, 'strongbox_rung_01', 'grant-key-1');
+    expect(result.status).toBe('applied');
+
+    fw.sent.length = 0;
+    (server as any).broadcastSnapshots();
+    const snap = lastSnap(fw.sent);
+    expect(snap.self.bank.purchasedSlots).toBe(6);
+    expect(snap.self.bank.capacity).toBe(30); // 24 base + the granted rung
+    expect(snap.self.bpsl).toBe(6);
+  });
+});
+
+// The pool-honest deposit refusal (src/sim/bank.ts bankDeposit): a no_fit on a
+// non-material while the two-pool meter shows free materials-satchel room must
+// say so, not claim the bank is "full". Driven on the offline Sim (the emit is
+// sim-side; the S3 guard pins the literal's matcher registration).
+describe('pool-honest bank deposit refusal', () => {
+  function bankWithMaterialsRoomOnly() {
+    const sim: any = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    bringBankerToPlayer(sim, pid);
+    const meta = sim.players.get(pid);
+    // A materials-only satchel in socket 0 (8 materials slots) and a general
+    // pool packed to its 24-slot base with distinct non-material stacks.
+    meta.bank.unlockedSockets = 1;
+    meta.bank.socketBags[0] = 'burlap_reagent_pouch';
+    meta.bank.inventory = Array.from({ length: 24 }, (_, i) => ({
+      itemId: i % 2 === 0 ? 'worn_sword' : 'rusty_dagger',
+      count: 1,
+      instance: { rolled: { pad: i } }, // distinct payloads: nothing merges
+    }));
+    sim.drainEvents();
+    return { sim, pid, meta };
+  }
+
+  it('a non-material refused with materials room left gets the distinct line', () => {
+    const { sim, pid, meta } = bankWithMaterialsRoomOnly();
+    sim.addItem('worn_sword', 1, pid);
+    const slot = meta.inventory.findIndex((s: any) => s.itemId === 'worn_sword');
+    sim.drainEvents();
+    sim.bankDeposit(slot, undefined, pid);
+    const errors = sim.drainEvents().filter((ev: any) => ev.type === 'error');
+    expect(errors.map((ev: any) => ev.text)).toEqual([
+      'Only materials fit in the space left in your bank.',
+    ]);
+    expect(meta.bank.inventory.length).toBe(24); // nothing moved
+  });
+
+  it('CONTROL: a material still deposits into the satchel room', () => {
+    const { sim, pid, meta } = bankWithMaterialsRoomOnly();
+    sim.addItem('wolf_fang', 3, pid);
+    const slot = meta.inventory.findIndex((s: any) => s.itemId === 'wolf_fang');
+    sim.drainEvents();
+    sim.bankDeposit(slot, undefined, pid);
+    expect(sim.drainEvents().filter((ev: any) => ev.type === 'error')).toEqual([]);
+    expect(meta.bank.inventory.some((s: any) => s.itemId === 'wolf_fang')).toBe(true);
+  });
+
+  it('CONTROL: with BOTH pools packed the classic full line stands', () => {
+    const { sim, pid, meta } = bankWithMaterialsRoomOnly();
+    // Pack the 8 materials slots with distinct-payload material rows too.
+    for (let i = 0; i < 8; i++) {
+      meta.bank.inventory.push({
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { rolled: { pad: 100 + i } },
+      });
+    }
+    sim.addItem('worn_sword', 1, pid);
+    const slot = meta.inventory.findIndex((s: any) => s.itemId === 'worn_sword');
+    sim.drainEvents();
+    sim.bankDeposit(slot, undefined, pid);
+    const errors = sim.drainEvents().filter((ev: any) => ev.type === 'error');
+    expect(errors.map((ev: any) => ev.text)).toEqual(['Your bank is full.']);
   });
 });

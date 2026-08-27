@@ -54,14 +54,24 @@ describe('bank ledger session journal', () => {
     committed?.commit();
     const snapshot = j.outbox.snapshot();
     expect(snapshot.rowCount).toBe(1);
-    expect(snapshot.batches[0]?.rows[0]).toMatchObject({
+    // Full-row toEqual, deliberately: the old writer suite pinned the whole
+    // craft_consume row shape (realm, null instanceJson, zero copperDelta, null
+    // containerId included), and a partial match would let one of those
+    // invariant fields drift unpinned.
+    expect(snapshot.batches[0]?.rows[0]).toEqual({
+      realm: OWNER.realm,
       characterId: OWNER.characterId,
       accountId: OWNER.accountId,
       op: 'craft_consume',
       itemId: 'fine_copper_ore',
       count: 1,
+      instanceJson: null,
+      copperDelta: 0,
+      counterpartyCount: null,
+      counterpartyCopperDelta: null,
       purchasedSlotsAfter: 3,
       container: 'vault',
+      containerId: null,
     });
   });
 

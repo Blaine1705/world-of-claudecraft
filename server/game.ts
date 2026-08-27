@@ -20,7 +20,6 @@ import { MECH_CHROMAS, mechChromaSkinIndex } from '../src/sim/content/skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
-  bgOriginAt,
   DELVES,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
@@ -139,6 +138,7 @@ import {
   type BankVaultLedgerGuardCoordinator,
   type BankVaultLedgerGuardRuntime,
   createBankVaultLedgerGuardCoordinator,
+  resolveBankVaultLedgerMaxAccountStates,
 } from './bank_vault_ledger_guard';
 import { dispatchBankCommand, emitBankSelfKeys } from './bank_wire';
 import { reportBgOutcomes } from './battleground_telemetry';
@@ -271,7 +271,7 @@ import {
 } from './guild_bank_state';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
-import { buildSharedInterestCandidates } from './interest_candidates';
+import { bgWideInterestApplies, buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
@@ -1105,6 +1105,10 @@ export interface ClientSession {
   lastMailWireTick: number;
   lastMailRev: number | null;
   lastMailRebuildTick: number;
+  // Personal bank projection: revision + composed-price gated (bank_wire.ts).
+  lastBankWirePid: number | null;
+  lastBankWireRev: number | null;
+  lastBankWirePrice: number | null;
   // Materials Vault projections: revision-gated, with cvault also cadence-gated.
   lastVaultWirePid: number | null;
   lastVaultWireRev: number | null;
@@ -1585,32 +1589,6 @@ function isStealthed(e: Entity): boolean {
   return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
 }
 
-// Both endpoints inside the SAME battleground slot: the necessary condition for
-// the raised match-wide interest (never across slots, never to the open world).
-function inSameBgSlot(a: Entity, b: Entity): boolean {
-  if (!isBgPos(a.pos.x) || !isBgPos(b.pos.x)) return false;
-  return bgOriginAt(a.pos.z).slot === bgOriginAt(b.pos.z).slot;
-}
-
-// The raised battleground interest, narrowed to what the mode actually needs a
-// client to hold (see BG_MATCH_INTEREST_RADIUS): a same-slot TEAMMATE, or a
-// same-slot non-player entity (flag, rune, prop). `viewerBgTeam` is the pid
-// list of the viewer's own team, or null when the viewer is not in a match.
-// An enemy player, and anything an enemy owns, returns false and falls back to
-// the open-world radii in interestLimitSq.
-function bgWideInterestApplies(
-  viewer: Entity,
-  e: Entity,
-  viewerBgTeam: readonly number[] | null,
-): boolean {
-  if (!inSameBgSlot(viewer, e)) return false;
-  // A summoned mob (pet, guardian, totem) inherits its OWNER's arm: an enemy's
-  // pet trails the enemy, so widening it would leak the same position by proxy.
-  const subjectId = e.kind === 'player' ? e.id : e.ownerId;
-  if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
-  return viewerBgTeam?.includes(subjectId) ?? false;
-}
-
 // Per-entity wire fragments, refreshed lazily at most once per tick and
 // shared by every recipient. The version counters bump only when the
 // serialized form actually changes, making per-session diffing O(1).
@@ -1760,7 +1738,11 @@ export class GameServer {
   private readonly storageRecoverySweep = new RecoverySweep(this.sessionsByCharacterId);
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly bankVaultLedgerGuardCoordinator: BankVaultLedgerGuardCoordinator =
-    createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000);
+    createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000, {
+      // Sized from the resolved realm player cap; cap<=0 (disabled) keeps the floor.
+      maxAccountStates: resolveBankVaultLedgerMaxAccountStates(process.env.MAX_PLAYERS_PER_REALM),
+      onRealmRowBreach: () => gameMetricsCounters().bankVaultRealmRowBreach(),
+    });
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
   // Combat parse capture; constructed in the constructor (needs this.sim).
@@ -1773,14 +1755,11 @@ export class GameServer {
   readonly social: SocialService;
   private readonly paidGuildCreation: PaidGuildCreationCoordinator;
   private readonly guildBankLazyLoader: GuildBankLazyLoader;
-  // Guilds whose bank is CLOSED because a guild-delete is in flight: the
-  // window between the empty-bank guard passing and the guilds DELETE (which
-  // cascades the guild_banks row away) plus its post-commit hooks. Guild bank
-  // ops for a guild in this set are refused, so nothing can be deposited into
-  // a bank that is about to stop existing (server/social.ts
-  // beginGuildBankDelete / endGuildBankDelete). Entries live for the two
-  // awaited DB steps of one command and are removed on every arm, including
-  // a throw.
+  // Guilds whose bank is CLOSED because a guild-delete is in flight (the
+  // window from the empty-bank guard passing through the guilds DELETE
+  // cascade and its post-commit hooks): bank ops for these guilds are refused
+  // so nothing lands in a bank about to stop existing (server/social.ts
+  // beginGuildBankDelete / endGuildBankDelete); removed on every arm.
   private readonly guildBankDeleteWindows = new Set<number>();
   private readonly moderation: ModerationService<ClientSession>;
   private readonly generalChatQuota: GeneralChatQuotaCoordinator;
@@ -3862,6 +3841,9 @@ export class GameServer {
       lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
       lastMailRev: null,
       lastMailRebuildTick: 0,
+      lastBankWirePid: null,
+      lastBankWireRev: null,
+      lastBankWirePrice: null,
       lastVaultWirePid: null,
       lastVaultWireRev: null,
       lastCvaultWirePid: null,
@@ -9877,6 +9859,9 @@ export class GameServer {
         const mine: string[] = [];
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
+          // Server-side evidence only, no client consumer since the reservation
+          // journal replaced the observer (see emitVaultCraftConsume): never relay.
+          if (ev.type === 'vaultCraftConsume') continue;
           if (suppressedInvites?.has(ev)) continue;
           if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) continue;
           // ignore list: drop chat originating from a character this player has

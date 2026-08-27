@@ -424,6 +424,7 @@ export function resetStoragePurchasesForTests(): void {
   warnedYields.clear();
   warnedLedgerStalls.clear();
   unresolvedByCharacter.clear();
+  sweepKickEarliestNextMs.clear();
   runtimeHostFactory = null;
 }
 
@@ -1202,9 +1203,38 @@ export function storagePurchaseCharacterOffline(characterId: number): void {
   // process-local ordering hold would leak a failed save forever. A later join
   // arms its recovery-scan hold synchronously before accepting commands.
   ledgerOrderingHold.delete(characterId);
-  warnedLedgerStalls.delete(characterId);
+  // The LADDER hold goes too, WHATEVER its reason. A 'recovery-drive' hold is
+  // POSITIVE_INFINITY-bounded and keyed by the row's idempotency key, so
+  // evictLapsedRecoveryHold can never reach it: any coordinator path that
+  // drops the entry without a finish would otherwise shut this character's
+  // gold rail forever and leak the Map entry. Releasing here is safe by the
+  // login covenant: with no live session there are no gold commands to guard,
+  // and the ws_auth fresh-join kick re-arms a provisional hold SYNCHRONOUSLY
+  // before the next session's first command can race the pending-row scan
+  // (tests/server/ws_auth_login_covenant.test.ts pins it).
+  inFlightByCharacter.delete(characterId);
+  // Both warning latches (warnedYields + warnedLedgerStalls): documented as
+  // tracking live incidents, and with the holds gone the incident is over; a
+  // recurrence after the next join should log again.
+  clearHoldWarnings(characterId);
+  sweepKickEarliestNextMs.delete(characterId);
   recoveryCoordinator.characterOffline(characterId);
 }
+
+/** Minimum spacing between SWEEP-driven kick attempts per character. During a
+ *  restart storm the coordinator sits saturated while the session sweep
+ *  re-enters flagged sessions at up to 40 calls/s realm-wide; without spacing,
+ *  every one of those re-entries built a fresh host object just to fail
+ *  admission again. One attempt per second per character loses nothing (the
+ *  session-owned pending bit keeps both rails guarded between attempts). */
+export const SWEEP_KICK_RETRY_MS = 1_000;
+
+// characterId -> earliest wall clock at which the SESSION SWEEP may attempt
+// another kick. Consulted ONLY by the sweep-driven path (login/settle kicks
+// stay immediate); stamped at each sweep attempt, deleted on a successful
+// admission and on final-session teardown, so it stays proportional to live
+// saturated sessions.
+const sweepKickEarliestNextMs = new Map<number, number>();
 
 /** The fresh-join hook (server/ws_auth.ts): fire-and-forget recovery of this
  *  character's pending purchases against the configured runtime host. Never
@@ -1213,9 +1243,22 @@ export function storagePurchaseCharacterOffline(characterId: number): void {
  *  deliver a first gold buy), so the gold rail is closed until this kick's
  *  scan answers. A player's own first purchase in that window sees
  *  purchase_in_progress and retries. The window is the queue wait plus the
- *  scan, not the scan alone (see RECOVERY_HOLD_KEY). */
-export function kickStoragePurchaseRecovery(characterId: number): boolean {
+ *  scan, not the scan alone (see RECOVERY_HOLD_KEY).
+ *
+ *  `viaSweep` marks the bounded session sweep's retry lane
+ *  (storage_recovery_session_sweep.ts) and is the ONLY caller the dueness
+ *  stamp above throttles. */
+export function kickStoragePurchaseRecovery(
+  characterId: number,
+  opts: { viaSweep?: boolean } = {},
+): boolean {
   if (!runtimeHostFactory) return false;
+  if (opts.viaSweep) {
+    const now = Date.now();
+    const earliest = sweepKickEarliestNextMs.get(characterId);
+    if (earliest !== undefined && now < earliest) return false;
+    sweepKickEarliestNextMs.set(characterId, now + SWEEP_KICK_RETRY_MS);
+  }
   if (!inFlightByCharacter.has(characterId)) {
     takeLadderHold(characterId, RECOVERY_HOLD_KEY, 'recovery-scan');
   }
@@ -1223,7 +1266,10 @@ export function kickStoragePurchaseRecovery(characterId: number): boolean {
   // already owns the pinned host for this key and records the coalesced kick.
   if (recoveryCoordinator.tracks(characterId)) {
     const admitted = recoveryCoordinator.kick(characterId);
-    if (admitted) recoveryHosts.get(characterId)?.setRecoveryAdmissionPending?.(characterId, false);
+    if (admitted) {
+      sweepKickEarliestNextMs.delete(characterId);
+      recoveryHosts.get(characterId)?.setRecoveryAdmissionPending?.(characterId, false);
+    }
     return admitted;
   }
   let host: StoragePurchaseHost;
@@ -1243,6 +1289,7 @@ export function kickStoragePurchaseRecovery(characterId: number): boolean {
     releaseRecovery(characterId, null);
     return false;
   }
+  sweepKickEarliestNextMs.delete(characterId);
   host.setRecoveryAdmissionPending?.(characterId, false);
   return true;
 }

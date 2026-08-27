@@ -464,9 +464,11 @@ describe('craft-from-vault online (Phase 04)', () => {
     expect(saveCall[2]).toMatchObject({ vault: { upgrades: 1, stock: { wolf_fang: 3 } } });
     expect(saveCall[5]).toEqual({ owner: staged.owner, batches: staged.batches });
     expect(session.bankLedgerJournal.outbox.snapshot().rowCount).toBe(0);
-    // The personal event reached the owner's wire (routeEvents relays every
-    // pid-tagged event to its owner; the payload is the owner's own data).
-    expect(JSON.stringify(fw.sent)).toContain('vaultCraftConsume');
+    // The event is server-side evidence only: no client consumer exists since
+    // the reservation journal replaced the observer, so routeEvents DROPS it
+    // from the relay (the sim-side emit above stays: it is the conservation
+    // sweep's expectation source).
+    expect(JSON.stringify(fw.sent)).not.toContain('vaultCraftConsume');
 
     // The cvault self delta converges the owner's mirror on the next snapshot.
     broadcast(server);

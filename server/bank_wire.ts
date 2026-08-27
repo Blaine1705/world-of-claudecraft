@@ -290,14 +290,39 @@ export function bankInfoForWire(
   return price === undefined ? info : { ...info, nextRungClaudiumPrice: price };
 }
 
+/** Narrow snapshot host for the gated `bank` key: the cheap revision probe
+ *  stays separate from the large projection it guards (the VaultSelfWireSim
+ *  pattern). */
+export interface BankSelfWireSim extends BankSim {
+  bankInfoWireRevFor(pid: number): number | null;
+}
+
+/** The per-session trackers behind the `bank` gate (the VaultSelfWireSession
+ *  twin). `lastBankWirePrice` keeps the last-emitted composed next-rung
+ *  Claudium price: bankInfoForWire joins a SERVER-side store-cache price into
+ *  the payload, so a price retune must re-emit even though no sim revision
+ *  moved. */
+export interface BankSelfWireSession {
+  lastSent: Readonly<Record<string, string>>;
+  lastBankWirePid: number | null;
+  lastBankWireRev: number | null;
+  lastBankWirePrice: number | null;
+}
+
 /** The bank family's two owner-only self-block keys, emitted through the
  *  caller's delta-eliding `maybe`. game.ts keeps a one-line call; the posture of
  *  each key is documented HERE, beside the emission, so a reader who changes one
  *  sees why the two are keyed differently.
  *
  *  - `bank` is null unless the player stands at a banker, so it only rides the
- *    wire for players browsing their deposit box (the mail pattern). Not
- *    heavy-gated: it appears from proximity, not this session's own commands.
+ *    wire for players browsing their deposit box (the mail pattern).
+ *    REVISION-GATED (the `vault` twin): bankInfoFor walks the banker scan,
+ *    pools, occupancy, and a full inventory clone, so the projection is built
+ *    only when lastSent has no value, the anchor changed, the sim revision
+ *    (bankInfoWireRevFor: null away from a banker, PlayerMeta.bankWireRev
+ *    beside one) moved, or the composed next-rung Claudium price changed.
+ *    Proximity and price are still probed every snapshot, so open/close stays
+ *    immediate and the store cache keeps its refresh liveness.
  *    bankInfoForWire joins the cached next-rung Claudium price. Keyed on the
  *    ANCHOR session, so a spectating moderator sees the SPECTATED character's
  *    box, the posture every proximity-gated owner-only key shares.
@@ -333,10 +358,36 @@ export function bankInfoForWire(
  *  "follows the VIEWER, not the spectate anchor" arm in tests/bank_wire.test.ts. */
 export function emitBankSelfKeys(
   emit: (key: string, value: unknown) => void,
-  sim: BankSim,
-  session: { pid: number },
+  sim: BankSelfWireSim,
+  session: BankSelfWireSession & { pid: number },
   anchorSession: { pid: number; accountId: number },
 ): void {
-  emit('bank', bankInfoForWire(sim, anchorSession));
+  const rev = sim.bankInfoWireRevFor(anchorSession.pid);
+  // The price probe is two Map reads plus the cache-refresh kick the 20 Hz
+  // path always performed; bankInfoForWire recomputes it on the (rare) emit
+  // pass, which keeps its signature and the graceful-degradation contract
+  // unchanged.
+  const price =
+    rev === null
+      ? null
+      : (nextRungClaudiumPriceFor(
+          bankPurchasedSlotsFor(sim.ctx, anchorSession.pid) ?? 0,
+          anchorSession.accountId,
+        ) ?? null);
+  if (
+    session.lastSent.bank === undefined ||
+    anchorSession.pid !== session.lastBankWirePid ||
+    rev !== session.lastBankWireRev ||
+    price !== session.lastBankWirePrice
+  ) {
+    emit('bank', rev === null ? null : bankInfoForWire(sim, anchorSession));
+    session.lastBankWirePid = anchorSession.pid;
+    session.lastBankWireRev = rev;
+    session.lastBankWirePrice = price;
+  }
+  // `bpsl` deliberately stays OUTSIDE the gate: it is a cheap scalar with its
+  // own no-cadence rationale above, and it is keyed on the VIEWER while the
+  // gate's trackers follow the ANCHOR, so folding it in would couple the
+  // viewer's charter-fit counter to the spectated character's revisions.
   emit('bpsl', bankPurchasedSlotsFor(sim.ctx, session.pid));
 }

@@ -51,6 +51,11 @@ export type BankLedgerOutboxRowInput = Readonly<BankLedgerRow>;
 export interface BankLedgerGuildEffectInput {
   readonly guildId: number;
   readonly deltas: readonly GuildBankOpDelta[];
+  /** The staff account that ORDERED an operator-attributed command (the admin
+   *  purge). Absent/null on every player-target command. The owner check
+   *  validates rows against THIS declared value, never against the rows'
+   *  own accountId (which would prove only self-consistency). */
+  readonly actorAccountId?: number | null;
 }
 
 export type SerializedBankLedgerGuildDelta = Readonly<
@@ -65,6 +70,11 @@ export type SerializedBankLedgerGuildDelta = Readonly<
 export interface SerializedBankLedgerGuildEffect {
   readonly guildId: number;
   readonly deltas: readonly SerializedBankLedgerGuildDelta[];
+  /** Normalized operator attribution: null on player-target commands.
+   *  Optional so older typed fixtures may omit it; receipt normalization
+   *  (serializeBankLedgerGuildEffect) treats omission exactly as null, the
+   *  same rule the batch's own guildEffect field follows. */
+  readonly actorAccountId?: number | null;
 }
 
 export type SerializedBankLedgerOutboxRow = Readonly<
@@ -99,12 +109,18 @@ export function bankLedgerBatchMatchesOwner(
   );
   if (!sameCharacter) return false;
   if (batch.rows.every((row) => row.accountId === owner.accountId)) return true;
+  // The staff attribution is the effect's DECLARED actorAccountId, threaded
+  // from the admin route through runGuildBankOp; validating rows against
+  // rows[0].accountId proved only that the rows agreed with themselves, so a
+  // batch forged under any single wrong account passed. A batch whose rows
+  // name any other account than the declared actor now refuses.
   const effect = batch.guildEffect;
-  const actorAccountId = batch.rows[0]?.accountId;
+  const actorAccountId = effect?.actorAccountId ?? null;
   return Boolean(
     effect &&
+      actorAccountId !== null &&
       Number.isSafeInteger(actorAccountId) &&
-      (actorAccountId ?? 0) > 0 &&
+      actorAccountId > 0 &&
       effect.deltas.length > 0 &&
       effect.deltas.every((delta) => delta.op === 'admin_purge') &&
       batch.rows.length === effect.deltas.length &&
@@ -439,7 +455,11 @@ export function serializeBankLedgerGuildEffect(
       return serializeGuildDelta(delta as GuildBankOpDelta);
     }),
   );
-  return Object.freeze({ guildId: effect.guildId, deltas });
+  const actorAccountId = effect.actorAccountId ?? null;
+  if (actorAccountId !== null && (!Number.isSafeInteger(actorAccountId) || actorAccountId <= 0)) {
+    throw new RangeError('guild effect.actorAccountId must be a positive safe integer or null');
+  }
+  return Object.freeze({ guildId: effect.guildId, deltas, actorAccountId });
 }
 
 const utf8Encoder = new TextEncoder();

@@ -132,6 +132,9 @@ const ADMIN_PURGE_EFFECTS: BankLedgerSaveEffects = {
       encodedBytes: 256,
       guildEffect: {
         guildId: 19,
+        // The DECLARED staff attribution (PR #3670): the owner check
+        // validates rows against this value, never against rows[0].
+        actorAccountId: 99,
         deltas: [
           {
             op: 'admin_purge',
@@ -990,6 +993,78 @@ describe('bank ledger receipt schema boot wiring', () => {
     expect(receipts).toBeLessThan(growthBudget);
     expect(growthBudget).toBeLessThan(commit);
     expect(h.bootCalls.indexOf(STORAGE_PURCHASE_SCHEMA)).toBe(growthBudget - 1);
-    expect(growthBudget).toBe(commit - 1);
+    // The growth fragment is followed by ONE single-statement counter readback
+    // (multi-statement queries return an ARRAY of results, so db.ts reads the
+    // counters back separately), then COMMIT. Pin both so a fragment inserted
+    // between the growth DDL and COMMIT cannot ride in unnoticed.
+    const readback = h.bootCalls.findIndex(
+      (sql) =>
+        typeof sql === 'string' &&
+        sql.includes(
+          'SELECT committed_rows, hard_limit_rows FROM public.bank_ledger_growth_budget',
+        ),
+    );
+    expect(readback).toBe(growthBudget + 1);
+    expect(growthBudget).toBe(commit - 2);
+  });
+});
+
+describe('storage effect identity guard, one negative per dimension', () => {
+  // The guard at prepareBankLedgerSaveEffects is a 19-clause OR (the nullish
+  // arm included); realm was the only dimension with a negative, so deleting
+  // any other clause stayed green. Each row breaks exactly one clause against
+  // an otherwise valid effect.
+  const breakOne: Array<[string, Partial<Record<keyof StorageAppliedEffect, unknown>>]> = [
+    ['realm mismatch', { realm: 'other-realm' }],
+    ['characterId mismatch', { characterId: OWNER.characterId + 1 }],
+    ['accountId not a safe integer', { accountId: 1.5 }],
+    ['accountId not positive', { accountId: 0 }],
+    ['itemId not a string', { itemId: 7 }],
+    ['itemId empty', { itemId: '' }],
+    ['cost not a safe integer', { expectedCostClaudium: 1.5 }],
+    ['cost not positive', { expectedCostClaudium: 0 }],
+    ['idempotency key not a string', { idempotencyKey: 7 }],
+    ['idempotency key empty', { idempotencyKey: '' }],
+    ['spend claim token not a string', { spendClaimToken: 7 }],
+    ['spend claim token empty', { spendClaimToken: '' }],
+    ['purchasedSlotsBefore not a safe integer', { purchasedSlotsBefore: 0.5 }],
+    ['purchasedSlotsBefore negative', { purchasedSlotsBefore: -6 }],
+    // 6.5 is above before (0), so only the safe-integer clause catches it.
+    ['purchasedSlotsAfter not a safe integer', { purchasedSlotsAfter: 6.5 }],
+    ['purchasedSlotsAfter not above before', { purchasedSlotsAfter: 0 }],
+    [
+      'purchasedSlotsAfter equal to before',
+      { purchasedSlotsAfter: STORAGE_EFFECT.purchasedSlotsBefore },
+    ],
+  ];
+  it.each(breakOne)('refuses a storage effect with %s', (_label, patch) => {
+    const effect = { ...STORAGE_EFFECT, ...patch } as StorageAppliedEffect;
+    expect(() => prepareBankLedgerSaveEffects(OWNER.characterId, [effect], undefined, [])).toThrow(
+      /does not match the character save/,
+    );
+  });
+  it('refuses a nullish effect row and the two unreachable characterId shapes', () => {
+    expect(() =>
+      prepareBankLedgerSaveEffects(
+        OWNER.characterId,
+        [undefined as unknown as StorageAppliedEffect],
+        undefined,
+        [],
+      ),
+    ).toThrow(/does not match the character save/);
+    // The non-safe-integer and non-positive characterId clauses can only fire
+    // when the SAVE's own characterId is malformed the same way (the mismatch
+    // clause fires first otherwise); drive both anyway so the clauses are hot.
+    expect(() =>
+      prepareBankLedgerSaveEffects(1.5, [{ ...STORAGE_EFFECT, characterId: 1.5 }], undefined, []),
+    ).toThrow(/does not match the character save/);
+    expect(() =>
+      prepareBankLedgerSaveEffects(0, [{ ...STORAGE_EFFECT, characterId: 0 }], undefined, []),
+    ).toThrow(/does not match the character save/);
+  });
+  it('accepts the unmodified control effect', () => {
+    expect(
+      prepareBankLedgerSaveEffects(OWNER.characterId, [STORAGE_EFFECT], undefined, []),
+    ).toBeUndefined();
   });
 });

@@ -198,7 +198,14 @@ export function runGuildBankOp(
       ...buildGuildBankLedgerRows(effectiveOp, who, guildId, deltas),
       ...orphanRows(unaccounted),
     ];
-    reservation.commit(rows, { guildId, deltas: guildDeltas });
+    // Operator targets declare their staff attribution on the effect so the
+    // outbox owner check validates rows against the PASSED actor, never
+    // against the rows' own self-consistent accountId.
+    reservation.commit(rows, {
+      guildId,
+      deltas: guildDeltas,
+      ...(playerTarget ? {} : { actorAccountId: target.actorAccountId }),
+    });
     if (host.bankLedgerNeedsSave()) host.scheduleBankLedgerHighWaterSave();
   } catch (error) {
     reservation.failAfterMutation(error);

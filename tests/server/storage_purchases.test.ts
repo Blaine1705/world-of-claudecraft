@@ -27,6 +27,7 @@ import {
   resetStoragePurchasesForTests,
   resumeStoragePurchasesAtLogin,
   type StoragePurchaseHost,
+  SWEEP_KICK_RETRY_MS,
   storageAppliedEffectsCommitted,
   storagePurchaseCharacterOffline,
   storagePurchaseInFlight,
@@ -2011,6 +2012,139 @@ describe('phase 14: the gold rail survives the Claudium machinery', () => {
         purchasedSlots: 12,
       });
       expect(journal.outbox.snapshot().rowCount).toBe(1);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+});
+
+// PR #3670: final-session teardown must release the LADDER hold whatever its
+// reason (a recovery-drive hold is POSITIVE_INFINITY-bounded and unreachable
+// by evictLapsedRecoveryHold, so a coordinator path dropping it without a
+// finish shut the character's gold rail forever), and the saturated-coordinator
+// sweep lane must not rebuild a host object 40 times a second.
+describe('offline hold release and sweep-kick throttling', () => {
+  it('final-session teardown releases a recovery-drive hold that nothing else can reach', async () => {
+    const h = makeHarness();
+    // A durable pending row whose recovery drive parks BEFORE the service
+    // call: db.claimSpend hangs, so the hold keeps its non-yielding
+    // 'recovery-drive' reason (POSITIVE_INFINITY bound, keyed by the row's
+    // idempotency key, out of evictLapsedRecoveryHold's reach). The 'purchase'
+    // retag happens only at the spend, which is never reached.
+    await h.db.begin({
+      realm: 'testrealm',
+      accountId: ACCOUNT,
+      characterId: CHARACTER,
+      itemId: 'strongbox_rung_01',
+      expectedCostClaudium: 100,
+      idempotencyKey: 'drive-hold-leak',
+    });
+    h.db.claimSpend.mockImplementation(() => new Promise<boolean>(() => {}));
+    configureStoragePurchaseRuntime(() => h.host);
+    kickStoragePurchaseRecovery(CHARACTER);
+    await waitFor(() => h.db.claimSpend.mock.calls.length === 1);
+
+    const base = Date.now();
+    const clock = vi.spyOn(Date, 'now');
+    try {
+      // Only the drive hold still refuses gold arbitrarily far past every
+      // other bound.
+      clock.mockReturnValue(base + WEDGED_HOLD_MAX_MS * 100);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(true);
+
+      h.state.live = false;
+      h.state.offlineCharacters.add(CHARACTER);
+      storagePurchaseCharacterOffline(CHARACTER);
+      // With no live session there is no gold command to guard, and the next
+      // join's ws_auth covenant re-arms a hold synchronously before the first
+      // command (tests/server/ws_auth_login_covenant.test.ts): the hold and
+      // its Map entry must not outlive the character.
+      clock.mockReturnValue(base + WEDGED_HOLD_MAX_MS * 100);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('final-session teardown forgets the yield latch so the next incident logs again', async () => {
+    const h = makeHarness();
+    h.spendResults.push({ result: unavailable(), neverReached: false });
+    const armed = Date.now();
+    const clock = vi.spyOn(Date, 'now');
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      clock.mockReturnValue(armed);
+      await executeStoragePurchase(h.host, {
+        accountId: ACCOUNT,
+        itemId: 'strongbox_rung_01',
+        expectedCostClaudium: 100,
+        idempotencyKey: 'latch-1',
+      });
+      // The ambiguity handoff holds 'settling'; past its bound it yields once.
+      clock.mockReturnValue(armed + AMBIGUITY_HOLD_MAX_MS + 1_000);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
+      const yields = () =>
+        warns.mock.calls.filter((c) => String(c[0]).includes('ambiguous purchase latch-1'));
+      expect(yields()).toHaveLength(1);
+
+      // Teardown, then the next login's recovery drives the SAME row to the
+      // SAME ambiguous handoff: an identical (reason, key) incident. Without
+      // the offline clear the process-lifetime token swallows its warning.
+      h.state.live = false;
+      h.state.offlineCharacters.add(CHARACTER);
+      storagePurchaseCharacterOffline(CHARACTER);
+      h.state.live = true;
+      h.state.offlineCharacters.delete(CHARACTER);
+
+      h.spendResults.push({ result: unavailable(), neverReached: false });
+      configureStoragePurchaseRuntime(() => h.host);
+      const relog = Date.now();
+      clock.mockReturnValue(relog);
+      kickStoragePurchaseRecovery(CHARACTER);
+      await waitFor(() => h.spend.mock.calls.length === 2);
+      await waitFor(() => storagePurchaseInFlight(CHARACTER) === true);
+      clock.mockReturnValue(relog + AMBIGUITY_HOLD_MAX_MS + WEDGED_HOLD_MAX_MS + 2_000);
+      expect(storagePurchaseInFlight(CHARACTER)).toBe(false);
+      expect(yields()).toHaveLength(2);
+    } finally {
+      warns.mockRestore();
+      clock.mockRestore();
+    }
+  });
+
+  it('sweep-driven kicks build at most one host per second per character while saturated', () => {
+    const h = makeHarness();
+    // Scans that never answer keep every coordinator slot occupied.
+    h.db.openFor.mockImplementation(() => new Promise<FakeRow | null>(() => {}));
+    let constructions = 0;
+    configureStoragePurchaseRuntime(() => {
+      constructions++;
+      return h.host;
+    });
+    for (let offset = 0; offset < STORAGE_RECOVERY_MAX_TRACKED; offset++) {
+      kickStoragePurchaseRecovery(30_000 + offset);
+    }
+    const base = constructions;
+
+    const start = 1_700_000_000_000;
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(start);
+    try {
+      // First sweep attempt: one host construction, admission fails, pending set.
+      expect(kickStoragePurchaseRecovery(CHARACTER, { viaSweep: true })).toBe(false);
+      expect(constructions).toBe(base + 1);
+      // A restart-storm second of sweep re-entries: ZERO further constructions.
+      for (let i = 0; i < 39; i++) {
+        expect(kickStoragePurchaseRecovery(CHARACTER, { viaSweep: true })).toBe(false);
+      }
+      expect(constructions).toBe(base + 1);
+      // The stamp lapses after SWEEP_KICK_RETRY_MS: exactly one more attempt.
+      clock.mockReturnValue(start + SWEEP_KICK_RETRY_MS);
+      expect(kickStoragePurchaseRecovery(CHARACTER, { viaSweep: true })).toBe(false);
+      expect(constructions).toBe(base + 2);
+      // A login/settle kick bypasses the stamp entirely.
+      expect(kickStoragePurchaseRecovery(CHARACTER)).toBe(false);
+      expect(constructions).toBe(base + 3);
     } finally {
       clock.mockRestore();
     }

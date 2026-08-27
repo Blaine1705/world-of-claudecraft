@@ -214,6 +214,24 @@ describe('guild ledger prefix verification', () => {
     }
   });
 
+  it('is INDIFFERENT to the effect actorAccountId: attribution never gates replay', () => {
+    // The operator attribution (PR #3670) rides the durable effect for the
+    // OWNER CHECK (bankLedgerBatchMatchesOwner); the fenced carrier applies
+    // the book delta regardless of who ordered it, so the prefix match must
+    // neither require nor compare it.
+    const live = liveDelta({ op: 'admin_purge' });
+    const source = { unflushedGuildBankOps: new Map([[7, [live]]]) };
+    const durable = durableDelta(live);
+    const attributed = {
+      ...guildBatch('purge.attributed', 7, [durable]),
+      guildEffect: { guildId: 7, deltas: [durable], actorAccountId: 909 },
+    };
+    expect(guildLedgerPrefixCounts(source, [attributed])).toEqual(new Map([[7, 1]]));
+    expect(guildLedgerPrefixCounts(source, [guildBatch('purge.bare', 7, [durable])])).toEqual(
+      new Map([[7, 1]]),
+    );
+  });
+
   it('normalizes an omitted live crafted recipe only to durable null', () => {
     const live = liveDelta({ craftedRecipeId: undefined });
     const source = { unflushedGuildBankOps: new Map([[7, [live]]]) };

@@ -20,11 +20,11 @@ describe('StorageRecoverySessionSweep', () => {
 
     sweep.run();
     expect(kickStoragePurchaseRecovery).toHaveBeenCalledTimes(1);
-    expect(kickStoragePurchaseRecovery).toHaveBeenLastCalledWith(101);
+    expect(kickStoragePurchaseRecovery).toHaveBeenLastCalledWith(101, { viaSweep: true });
 
     sweep.run();
     expect(kickStoragePurchaseRecovery).toHaveBeenCalledTimes(2);
-    expect(kickStoragePurchaseRecovery).toHaveBeenLastCalledWith(104);
+    expect(kickStoragePurchaseRecovery).toHaveBeenLastCalledWith(104, { viaSweep: true });
 
     // The exhausted iterator resets without inspecting a new session in the
     // same turn. The next call starts another bounded pass.
@@ -32,6 +32,6 @@ describe('StorageRecoverySessionSweep', () => {
     expect(kickStoragePurchaseRecovery).toHaveBeenCalledTimes(2);
     sweep.run();
     expect(kickStoragePurchaseRecovery).toHaveBeenCalledTimes(3);
-    expect(kickStoragePurchaseRecovery).toHaveBeenLastCalledWith(101);
+    expect(kickStoragePurchaseRecovery).toHaveBeenLastCalledWith(101, { viaSweep: true });
   });
 });

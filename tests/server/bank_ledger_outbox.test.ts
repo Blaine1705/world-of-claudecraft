@@ -7,6 +7,7 @@ import {
   BankLedgerOutboxBudget,
   type BankLedgerOutboxOwner,
   type BankLedgerOutboxRowInput,
+  bankLedgerBatchMatchesOwner,
   serializeBankLedgerCommandBatch,
 } from '../../server/bank_ledger_outbox';
 import {
@@ -744,5 +745,80 @@ describe('BankLedgerOutbox captured-prefix lifecycle', () => {
     ).toThrow(/discarded/i);
     outbox.discard();
     expect(budget.usage).toEqual({ rows: 0, encodedBytes: 0 });
+  });
+});
+
+// Operator attribution on the cross-account admin purge (PR #3670): the owner
+// check must validate rows against the effect's DECLARED actorAccountId,
+// threaded from the admin route, never against the rows' own accountId (which
+// proves only that a forged batch agrees with itself).
+describe('bankLedgerBatchMatchesOwner: admin purge staff attribution', () => {
+  const STAFF = 909;
+  const GUILD = 7;
+  const purgeRow = (accountId: number) =>
+    ledgerRow({
+      accountId,
+      op: 'admin_purge',
+      container: 'guild',
+      containerId: GUILD,
+      itemId: 'cursed_relic',
+    });
+  const purgeDelta = () => guildDelta({ op: 'admin_purge', itemId: 'cursed_relic' });
+
+  it('admits a purge whose rows all name the DECLARED staff actor', () => {
+    const batch = serializeBankLedgerCommandBatch('purge:ok', [purgeRow(STAFF)], {
+      guildId: GUILD,
+      deltas: [purgeDelta()],
+      actorAccountId: STAFF,
+    });
+    expect(batch.guildEffect?.actorAccountId).toBe(STAFF);
+    expect(bankLedgerBatchMatchesOwner(OWNER, batch)).toBe(true);
+  });
+
+  it('refuses rows naming ANY other account than the declared actor', () => {
+    // Self-consistent rows under the wrong account: exactly the batch the old
+    // rows[0]-derived check admitted.
+    const batch = serializeBankLedgerCommandBatch('purge:forged', [purgeRow(777)], {
+      guildId: GUILD,
+      deltas: [purgeDelta()],
+      actorAccountId: STAFF,
+    });
+    expect(bankLedgerBatchMatchesOwner(OWNER, batch)).toBe(false);
+  });
+
+  it('refuses a cross-account purge with NO declared actor at all', () => {
+    const batch = serializeBankLedgerCommandBatch('purge:unattributed', [purgeRow(STAFF)], {
+      guildId: GUILD,
+      deltas: [purgeDelta()],
+    });
+    expect(batch.guildEffect?.actorAccountId).toBeNull(); // omission normalizes to null
+    expect(bankLedgerBatchMatchesOwner(OWNER, batch)).toBe(false);
+  });
+
+  it('rejects a non-positive declared actor at serialization', () => {
+    expect(() =>
+      serializeBankLedgerCommandBatch('purge:bad-actor', [purgeRow(STAFF)], {
+        guildId: GUILD,
+        deltas: [purgeDelta()],
+        actorAccountId: 0,
+      }),
+    ).toThrow(/actorAccountId/);
+  });
+
+  it('rejects a non-integer declared actor at serialization', () => {
+    // The guard is safe-integer AND positive; 1.5 passes the positive half,
+    // so this negative holds the safe-integer clause on its own.
+    expect(() =>
+      serializeBankLedgerCommandBatch('purge:fractional-actor', [purgeRow(STAFF)], {
+        guildId: GUILD,
+        deltas: [purgeDelta()],
+        actorAccountId: 1.5,
+      }),
+    ).toThrow(/actorAccountId/);
+  });
+
+  it('ordinary same-account batches never need an actor', () => {
+    const batch = serializeBankLedgerCommandBatch('personal:1', [ledgerRow()]);
+    expect(bankLedgerBatchMatchesOwner(OWNER, batch)).toBe(true);
   });
 });

@@ -674,6 +674,18 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
 
       expect(await bookOf(guildId)).not.toBeNull();
 
+      // TWO writers put guild rows here before the disband: the save's claim
+      // replay (the deposit_gold delta) and this test's manual audit row. The
+      // property under proof is PRESERVATION, so capture the exact pre-disband
+      // count and require it to survive the cascade untouched.
+      const guildRowsBefore = (
+        await pool.query(
+          "SELECT 1 FROM bank_ledger WHERE container = 'guild' AND container_id = $1",
+          [guildId],
+        )
+      ).rowCount;
+      expect(guildRowsBefore).toBeGreaterThanOrEqual(2);
+
       // The REAL statement PgSocialDb.deleteGuild issues.
       await new socialDb.PgSocialDb(pool as never).deleteGuild(guildId);
 
@@ -687,9 +699,17 @@ describeDb('guild bank persistence (REAL Postgres)', () => {
       // BIGINT), so the keep-forever anti-dupe audit trail SURVIVES the
       // disband. Pinned because a well-meaning future FK here would silently
       // delete the evidence a dupe investigation depends on.
+      // Scoped to the guild container: container_id is a plain BIGINT shared
+      // with the personal and vault containers (where it carries a character
+      // id that can collide with a fresh guild serial).
       expect(
-        (await pool.query('SELECT 1 FROM bank_ledger WHERE container_id = $1', [guildId])).rowCount,
-      ).toBe(1);
+        (
+          await pool.query(
+            "SELECT 1 FROM bank_ledger WHERE container = 'guild' AND container_id = $1",
+            [guildId],
+          )
+        ).rowCount,
+      ).toBe(guildRowsBefore);
     });
 
     it('the empty-bank guard refuses the DELETE while the book holds value', async () => {

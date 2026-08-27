@@ -28,7 +28,10 @@ export class StorageRecoverySessionSweep<Session extends RecoverySession> {
         return;
       }
       if (!next.value.left && next.value.storageRecoveryAdmissionPending) {
-        kickStoragePurchaseRecovery(next.value.characterId);
+        // viaSweep marks this as the throttled retry lane: a saturated
+        // coordinator costs at most one host construction per character per
+        // SWEEP_KICK_RETRY_MS from here; login/settle kicks stay immediate.
+        kickStoragePurchaseRecovery(next.value.characterId, { viaSweep: true });
       }
     }
   }

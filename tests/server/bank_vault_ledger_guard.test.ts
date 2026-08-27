@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import type { BankLedgerAdmission } from '../../server/bank_ledger_admission';
 import {
@@ -14,10 +15,12 @@ import {
   createBankVaultLedgerGuardCoordinator,
   refundBankVaultLedgerCommand,
   reserveBankVaultLedgerCommand,
+  resolveBankVaultLedgerMaxAccountStates,
   settleBankVaultLedgerCommand,
   VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS,
 } from '../../server/bank_vault_ledger_guard';
 import type { BankLedgerRow } from '../../server/db';
+import { loadConfig } from '../../server/http/config';
 
 function reserveRequired(
   state: ReturnType<typeof createBankVaultLedgerGuard>,
@@ -54,7 +57,17 @@ describe('bank and vault retained-ledger guard', () => {
     expect(BANK_VAULT_LEDGER_REALM_ROW_BURST).toBe(242);
     expect(BANK_VAULT_LEDGER_REALM_ROW_REFILL_PER_SECOND).toBe(8);
     expect(BANK_VAULT_LEDGER_ACCOUNT_IDLE_TTL_SECONDS).toBe(60);
-    expect(BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES).toBe(4_096);
+    // Above the DEFAULT realm admission cap (server/http/config.ts owns the
+    // 5000 default; ws_auth only receives the resolved value): live-bound
+    // entries are unprunable, so the cache must fit every concurrently
+    // admitted account or the overflow account is refused on every command.
+    // The default is read live from config.ts so the pair cannot drift apart.
+    expect(BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES).toBe(5_120);
+    const configDefaultPlayersCap = loadConfig({
+      DATABASE_URL: 'postgres://config-default-probe',
+    } as NodeJS.ProcessEnv).maxPlayersPerRealm;
+    expect(configDefaultPlayersCap).toBe(5_000);
+    expect(BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES).toBeGreaterThan(configDefaultPlayersCap);
     expect(BANK_VAULT_LEDGER_ROW_BURST).toBe(
       VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS + BANK_VAULT_LEDGER_COMMAND_BURST - 1,
     );
@@ -135,12 +148,16 @@ describe('bank and vault retained-ledger guard', () => {
     expect(firstRefusals).not.toHaveBeenCalled();
   });
 
-  it('shares one 242-row process burst across accounts and refunds a realm refusal', () => {
-    const coordinator = createBankVaultLedgerGuardCoordinator(() => 0);
+  it('realm exhaustion ADMITS the command and counts a breach; the account arm still refuses', () => {
+    // The metrics hook must fire once per breach and never on a covered
+    // admission (game.ts wires it to bankVaultRealmRowBreach).
+    const onRealmRowBreach = vi.fn();
+    const coordinator = createBankVaultLedgerGuardCoordinator(() => 0, { onRealmRowBreach });
     const first = fakeAdmission();
     const second = fakeAdmission();
     const third = fakeAdmission();
-    const firstRuntime = coordinator.createRuntime(1, first.admission, vi.fn());
+    const firstRefusals = vi.fn();
+    const firstRuntime = coordinator.createRuntime(1, first.admission, firstRefusals);
     const secondRuntime = coordinator.createRuntime(2, second.admission, vi.fn());
     const thirdRefusals = vi.fn();
     const thirdRuntime = coordinator.createRuntime(3, third.admission, thirdRefusals);
@@ -149,17 +166,32 @@ describe('bank and vault retained-ledger guard', () => {
     expect(firstRuntime.admission.tryReserve(112, 0, 'vault')?.commit(fullSweep)).toBe(true);
     expect(secondRuntime.admission.tryReserve(112, 0, 'vault')?.commit(fullSweep)).toBe(true);
     expect(coordinator.snapshot().realmRowTokens).toBe(18);
+    expect(coordinator.snapshot().realmRowBreaches).toBe(0);
+    expect(onRealmRowBreach).not.toHaveBeenCalled();
 
-    expect(thirdRuntime.admission.tryReserve(112, 0, 'vault')).toBeNull();
-    expect(thirdRefusals).toHaveBeenCalledWith('realm_rows', 0);
-    expect(third.tryReserve).not.toHaveBeenCalled();
+    // Two accounts at their own ceilings have drained the realm bucket; a
+    // THIRD legitimate account is exactly the co-play the old refusing guard
+    // turned into a realm-wide 'You are busy.'. It now admits, debits the
+    // full worst case (the gauge runs negative to show overload depth), and
+    // counts the one admission the old guard would have dropped.
+    expect(thirdRuntime.admission.tryReserve(112, 0, 'vault')?.commit(fullSweep)).toBe(true);
+    expect(thirdRefusals).not.toHaveBeenCalled();
+    expect(coordinator.snapshot().realmRowTokens).toBe(18 - 112);
+    expect(coordinator.snapshot().realmRowBreaches).toBe(1);
+    expect(onRealmRowBreach).toHaveBeenCalledTimes(1);
 
-    // The failed realm reservation refunded the account command and row tail.
-    expect(thirdRuntime.admission.tryReserve(1, 0, 'personal')?.commit([row])).toBe(true);
-    expect(coordinator.snapshot().realmRowTokens).toBe(17);
+    // The ACCOUNT bucket still refuses exactly as before: the same account
+    // sweeping twice inside one second is out of account rows, and that
+    // refusal (not the realm's) is what reaches the player and the drop
+    // counter.
+    expect(firstRuntime.admission.tryReserve(112, 0, 'vault')).toBeNull();
+    expect(firstRefusals).toHaveBeenCalledWith('account_rows', 0);
+    expect(first.tryReserve).toHaveBeenCalledTimes(1);
+    // The account refusal never reached the realm bucket: no second breach.
+    expect(coordinator.snapshot().realmRowBreaches).toBe(1);
   });
 
-  it('refills the shared realm budget at exactly eight rows per second', () => {
+  it('refills the telemetry realm budget at exactly eight rows per second, negative included', () => {
     let now = 0;
     const coordinator = createBankVaultLedgerGuardCoordinator(() => now);
     const fullSweep = Array.from({ length: 112 }, () => row);
@@ -172,13 +204,18 @@ describe('bank and vault retained-ledger guard', () => {
     expect(second.admission.tryReserve(112, 0, 'vault')?.commit(fullSweep)).toBe(true);
     expect(coordinator.snapshot().realmRowTokens).toBe(18);
 
+    // 11.625s of 8 rows/s refill reaches 111, ONE row short of the sweep:
+    // still a breach (the old guard would have refused), still admitted.
     now = 11.625;
-    expect(third.admission.tryReserve(112, 0, 'vault')).toBeNull();
-    expect(thirdRefusals).toHaveBeenLastCalledWith('realm_rows', 11.625);
-    expect(coordinator.snapshot().realmRowTokens).toBe(111);
-
-    now = 11.75;
     expect(third.admission.tryReserve(112, 0, 'vault')?.commit(fullSweep)).toBe(true);
+    expect(thirdRefusals).not.toHaveBeenCalled();
+    expect(coordinator.snapshot()).toMatchObject({
+      realmRowTokens: -1,
+      realmRowBreaches: 1,
+    });
+
+    // The negative gauge recovers at the same 8 rows/s.
+    now = 11.75;
     expect(coordinator.snapshot()).toMatchObject({
       realmRowTokens: 0,
       realmLastRefillSec: 11.75,
@@ -190,6 +227,11 @@ describe('bank and vault retained-ledger guard', () => {
       realmRowTokens: 0,
       realmLastRefillSec: 11.75,
     });
+
+    // A covered reservation counts NO breach.
+    now = 30;
+    expect(third.admission.tryReserve(1, 0, 'personal')?.commit([row])).toBe(true);
+    expect(coordinator.snapshot().realmRowBreaches).toBe(1);
   });
 
   it('hard-bounds account state and admits a waiting runtime after safe idle refill cleanup', () => {
@@ -420,5 +462,47 @@ describe('bank and vault retained-ledger guard', () => {
 
     expect(() => craft?.commit()).toThrow('journal quarantine');
     expect(coordinator.snapshot().realmRowTokens).toBe(240);
+  });
+});
+
+describe('resolveBankVaultLedgerMaxAccountStates', () => {
+  it('derives cap + 128 headroom above the floor with the config trimmed-read contract', () => {
+    // Unset, empty, whitespace-only, and garbage all resolve to the 5000
+    // default (server/http/config.ts numberOr over a trimmed read), which
+    // derives 5128; an explicit larger cap derives cap + 128.
+    expect(resolveBankVaultLedgerMaxAccountStates(undefined)).toBe(5_128);
+    expect(resolveBankVaultLedgerMaxAccountStates('')).toBe(5_128);
+    expect(resolveBankVaultLedgerMaxAccountStates('   ')).toBe(5_128);
+    expect(resolveBankVaultLedgerMaxAccountStates('not-a-number')).toBe(5_128);
+    expect(resolveBankVaultLedgerMaxAccountStates(' 8000 ')).toBe(8_128);
+    // A fractional cap still yields the integer capacity the coordinator's
+    // positive-safe-integer check demands.
+    expect(resolveBankVaultLedgerMaxAccountStates('6000.5')).toBe(6_129);
+  });
+
+  it('keeps the shipped floor when the cap is small, zero, or negative', () => {
+    // A cap below the floor never SHRINKS the registry, and cap <= 0 disables
+    // realm admission capping entirely (unbounded fresh joins), so there is
+    // no cap to size from: the floor stands on that arm too.
+    expect(resolveBankVaultLedgerMaxAccountStates('100')).toBe(
+      BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES,
+    );
+    expect(resolveBankVaultLedgerMaxAccountStates('0')).toBe(BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES);
+    expect(resolveBankVaultLedgerMaxAccountStates('-5')).toBe(BANK_VAULT_LEDGER_MAX_ACCOUNT_STATES);
+  });
+
+  it('is wired into the game.ts coordinator construction (source pin)', async () => {
+    // The derivation only protects the realm if game.ts actually passes it;
+    // pin the wiring over comment-stripped source so a dropped option fails.
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8'),
+    );
+    const call = src.indexOf('createBankVaultLedgerGuardCoordinator(() => Date.now() / 1000');
+    expect(call).toBeGreaterThan(-1);
+    const options = src.slice(call, src.indexOf('});', call));
+    expect(options).toContain(
+      'maxAccountStates: resolveBankVaultLedgerMaxAccountStates(process.env.MAX_PLAYERS_PER_REALM)',
+    );
   });
 });

@@ -495,6 +495,9 @@ describe('guild-bank op coordinator', () => {
     ]);
     expect(sidecar).toEqual({
       guildId: 41,
+      // The staff attribution rides the effect explicitly (PR #3670): the
+      // outbox owner check validates rows against THIS declared value.
+      actorAccountId: 97,
       deltas: [
         expect.objectContaining({
           op: 'admin_purge',
