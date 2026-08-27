@@ -6,7 +6,6 @@ import {
   initVarkhulEngage,
   startVarkhulEngage,
   tickVarkhulEngage,
-  VARKHUL_ENGAGE_HAMMER_EVERY_SECONDS,
   VARKHUL_ENGAGE_LEAP_PEAK_Y,
   VARKHUL_ENGAGE_LEAP_SECONDS,
   VARKHUL_ENGAGE_TAUNT_SECONDS,
