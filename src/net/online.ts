@@ -163,7 +163,7 @@ import type {
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { computeBackoffDelay } from './backoff';
-import { decodeBankPurchasedSlotsWire, decodeCraftVaultStockWire } from './bank_snapshot_wire';
+import { applyBankSelfWire } from './bank_snapshot_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -183,7 +183,7 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
-import { decodeVaultInfoWire, vaultWithdrawPayload } from './vault_snapshot_wire';
+import { vaultWithdrawPayload } from './vault_snapshot_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -3727,29 +3727,11 @@ export class ClientWorld implements IWorld {
       if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
-      // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
-      // "no bank"); away from a banker the server encodes it as null. Never default
-      // to null/empty on omission, that would wipe an open bank window's mirror.
-      if (s.bank !== undefined) this.bankInfo = s.bank;
-      // `vault` follows the same delta contract as `bank`: omitted means
-      // unchanged (never "no vault", so an omission must not wipe an open vault
-      // window's mirror), and away from a banker the server encodes it as an
-      // explicit null that clears it. The parsed object is adopted BY REFERENCE:
-      // a tolerated save can carry a dormant own '__proto__' key in `stock`, so
-      // this must never be rebuilt by keyed assignment or Object.assign.
-      if (s.vault !== undefined) this.vaultInfo = decodeVaultInfoWire(s.vault);
-      // Both owner-only fields are delta-omitted, so omission retains prior mirrors.
-      // Explicit null clears them; malformed values leave the last valid state intact.
-      // Valid cvault records are adopted by reference so an own `__proto__` row
-      // stays inert data rather than reaching a prototype-setting assignment.
-      if (s.cvault !== undefined) {
-        const decoded = decodeCraftVaultStockWire(s.cvault);
-        if (decoded !== undefined) this.craftVaultStock = decoded;
-      }
-      if (s.bpsl !== undefined) {
-        const decoded = decodeBankPurchasedSlotsWire(s.bpsl);
-        if (decoded !== undefined) this.bankPurchasedSlots = decoded;
-      }
+      // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
+      // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
+      // module, where the delta contract, the by-reference adoption rationale,
+      // and each key's malformed policy (vault clears, the rest retain) live.
+      applyBankSelfWire(this, s);
       // `guildBank` follows the same delta contract; the server encodes null
       // away from a banker, on death, and outside a guild (the proximity +
       // membership gate lives in sim guildBankInfoFor; any rank sees it, the
