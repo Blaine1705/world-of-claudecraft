@@ -24,6 +24,9 @@ Scope decisions fixed by the maintainer:
   recipes, 125 for the legendary hammer.
 - Core reagent costs: 3 per enchant application, 6 per epic gear craft, 15
   for the hammer. The core is never discounted (see The discount exemption).
+- Crafted epic gear is item level 37, two above the dropped tier, so the
+  crafted piece is a genuine chase upgrade and not a sidegrade: the point of
+  the whole arm is to make crafting worth organizing a raid around.
 - The hammer is a level 39 two-handed weapon by item-level derivation,
   soulbound, and reached through a quest chain: it must be self-crafted.
 
@@ -147,28 +150,32 @@ fifth-slot swap: it composes with 4pc instead of competing with it.
 
 | Craft | Output | Notes |
 |---|---|---|
-| Armorcrafting | epic mail helm, item level 35 | mail wearers swap helm |
-| Leatherworking | epic leather legs, item level 35 | leather wearers swap legs |
-| Tailoring | epic robe, item level 35 | cloth wearers swap chest |
+| Armorcrafting | epic mail helm, item level 37 | mail wearers swap helm |
+| Leatherworking | epic leather legs, item level 37 | leather wearers swap legs |
+| Tailoring | epic robe, item level 37 | cloth wearers swap chest |
 | Enchanting | proc weapon enchant | the tier's weapon enchant ceiling |
 | Weaponcrafting | legendary two-hand hammer, item level 39 | quest chain, soulbound |
 
 Stat rules:
 
 - Every piece is budget-true through the same item_budget derivation the rest
-  of the catalog uses. The crafted edge over the dropped alternative in the
-  same slot is a deliberately sharper secondary profile for the wearer's
-  role, not a bigger budget.
+  of the catalog uses, at item level 37: the crafted edge over the dropped
+  alternative in the same slot is a real two-level budget step, on top of a
+  secondary profile tuned for the wearer's role.
 - No crafted piece carries hit. The hit program in the loot plan is settled
   and crafted carriers would reopen it.
 - The robe is where the spellPower and healPower affix debut does the work;
   whether the healer line is a second robe or a hybrid line is decided at
   authoring.
-- The hammer's item level is derived, not authored: the raid source level
-  plus the legendary quality bonus plus the raid bonus lands on 39 exactly
-  (QUALITY_ILVL_BONUS and RAID_ILVL_BONUS in src/sim/item_budget.ts and
-  src/sim/item_level.ts), one quality rung above the tier. Its proc rides the
-  existing legendary weapon proc seam.
+- Item levels are derived, not authored. A crafted item's source level is its
+  recipe's own level field, through the recipe arm of the source index in
+  src/sim/item_level.ts (that arm carries no raid bonus), plus the quality
+  bonus (QUALITY_ILVL_BONUS in src/sim/item_budget.ts). The epic recipes are
+  authored at level 31 (31 plus the epic bonus is 37) and the hammer recipe
+  at level 29 (29 plus the legendary bonus is 39), so both numbers are plain
+  content edits with no new registration machinery. The hammer stays one
+  quality rung and two item levels above the crafted epics, and its proc
+  rides the existing legendary weapon proc seam.
 
 The hammer chain: the starter reagent drops from Varkhul, Forgefather of the
 Last Flame (the forge boss starts the forging quest), the chain runs collect
