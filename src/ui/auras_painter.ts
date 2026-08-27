@@ -215,8 +215,8 @@ export class AurasPainter {
     // is the actionable half of the bar and a short buff the actively-timed half; a
     // long buff is the one truly cosmetic case, so the budget is spent there first.
     // (Scope: a debuff is anything the core flags isDebuff -- every allowlisted KIND in
-    // both worlds, AND a negative-value buff_* stat-sap, AND an id-styled override like
-    // Stormsurge's proc-lockout marker (aura_classify.ts DEBUFF_STYLED_AURA_IDS). The
+    // both worlds, AND a negative-value buff_* stat-sap, AND a display override like
+    // Stormsurge's proc-lockout marker. The
     // sap classifies as a debuff online too because the wire carries its negative value
     // (server/game.ts sends it sparsely, src/net/online.ts decodes it), so no sap can
     // ride the low buff budget on either host. See auras_view.isAuraDebuff.)

@@ -262,7 +262,7 @@ export function targetBuffsReadout(ctx: SimContext, self: Entity): string {
   if (auras.length === 0) return `${target.name} has no active effects.`;
   const parts = auras.map((a) => {
     const stack = (a.stacks ?? 1) > 1 ? ` x${a.stacks}` : '';
-    const tag = isDebuffAura(a.kind, a.value, a.id) ? 'debuff' : 'buff';
+    const tag = isDebuffAura(a.kind, a.value) ? 'debuff' : 'buff';
     return `${a.name}${stack} [${tag}] (${Math.ceil(a.remaining)}s)`;
   });
   return `Effects on ${target.name} (${auras.length}): ${parts.join(', ')}.`;

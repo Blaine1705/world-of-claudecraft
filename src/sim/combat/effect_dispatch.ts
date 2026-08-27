@@ -1688,7 +1688,7 @@ export function runEffects(
         // and the dispel executor both answer to.
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
-          if (isDebuffAura(aura.kind, aura.value, aura.id) && isPlayerRemovableAura(aura)) {
+          if (isDebuffAura(aura.kind, aura.value) && isPlayerRemovableAura(aura)) {
             p.auras.splice(i, 1);
             ctx.emit({
               type: 'aura',

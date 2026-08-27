@@ -15,11 +15,11 @@
 // tests/util/alloc_probe.ts). Two modes yield two independent views (the buff bar and
 // the target debuffs are two instances, not a code fork).
 //
-// The DEBUFF allowlist lives in the host-agnostic sim/aura_classify leaf shared by
-// the view, chat readouts, and player cancellation. This core stays DOM-free and
-// i18n-MECHANISM-free (no i18n runtime import): the localized aura name + the
-// formatted stack count are produced by INJECTED deps each frame (so the i18n keys
-// keep firing and the painter never concats), while icon identity and duration are pure.
+// The DEBUFF display allowlist lives in the host-agnostic sim/aura_classify leaf.
+// This core stays DOM-free and i18n-MECHANISM-free (no i18n runtime import): the
+// localized aura name + the formatted stack count are produced by INJECTED deps
+// each frame (so the i18n keys keep firing and the painter never concats), while
+// icon identity and duration are pure.
 //
 // Parity: the input is a structural subset of IWorld's Entity.auras that
 // BOTH the offline Sim and the online ClientWorld mirror expose. Aura.stacks is
@@ -27,15 +27,17 @@
 // same as 1 (no stacks badge), and a Sim-shaped aura {stacks:1} and a ClientWorld
 // mirror aura {stacks:undefined} derive identical output.
 
-import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import {
+  isDebuffDisplayAura as classifyDebuffDisplayAura,
+  DEBUFF_AURA_KINDS,
+} from '../sim/aura_classify';
 import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
 // Re-export the shared set for the view contract and its exact-set regression test.
-// Classification itself stays in the sim leaf so the HUD, chat readouts, and aura
-// cancellation cannot drift apart.
+// Classification itself stays in the sim leaf so HUD display surfaces cannot drift.
 export { DEBUFF_AURA_KINDS };
 
 // Toggle auras (cast again to cancel: stealth, the druid forms, stances, Ghost
@@ -293,7 +295,7 @@ export interface AurasView {
 /** Whether an aura reads as a debuff: an allowlisted kind, a negative-value stat
  *  buff (a buff_* kind whose value saps rather than grants, e.g. a mob stat-sap riding
  *  buff_int/buff_ap with a negative value), or an id-allowlisted proc/cooldown
- *  marker riding a shared buff-coded kind (aura_classify.ts DEBUFF_STYLED_AURA_IDS,
+ *  marker riding a shared buff-coded kind (aura_classify.ts display override,
  *  e.g. Stormsurge's "cannot proc again until Ancestral Strike is back on
  *  cooldown" marker). Byte-faithful to the old inline classification, lifted into
  *  the core.
@@ -310,7 +312,7 @@ export interface AurasView {
  *  in both worlds (the kind is on the wire). The end-to-end encode/decode round trip is
  *  pinned in tests/snapshots.test.ts. */
 export function isAuraDebuff(aura: AuraInput): boolean {
-  return classifyDebuffAura(aura.kind, aura.value, aura.id);
+  return classifyDebuffDisplayAura(aura.kind, aura.value, aura.id);
 }
 
 // Expiring-blink threshold (QoL: a DoT/buff about to run out flashes its icon).

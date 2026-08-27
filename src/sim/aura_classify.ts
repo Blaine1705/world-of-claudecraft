@@ -51,28 +51,27 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'cheater_mark',
 ]);
 
+// A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
+// an Intellect-draining curse) is a debuff even though it reuses a buff_* kind.
+export function isDebuffAura(kind: AuraKind, value: number): boolean {
+  return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
+}
+
 // Auras that ride a shared, mostly-buff kind ('internal_cd': Heating Up,
 // Convergence Mark, Warspirit Cadence, and a dozen other class-specific
-// cooldown/proc-window markers) but individually read as a "you just spent the
-// good thing, wait for the next one" state, the same shape as 'sated'
-// (Bloodlust exhaustion) above. Reclassifying the whole 'internal_cd' kind
-// would wrongly turn every one of those OTHER progress-toward-proc markers into
-// a debuff, so this is a per-id override, checked ahead of the kind test.
+// cooldown/proc-window markers) but should be presented on the debuff surface.
+// This is VISUAL ONLY. It must not make the aura a player-removable harmful
+// effect for dispel, cleanseSelf, or right-click cancel classification.
 // Player feedback on PR #3668: Stormsurge's 6 sec "Ancestral Strike's cooldown
 // was just reset, and it cannot happen again until you use it and it goes back
 // on cooldown" marker (shaman_warspirit.ts STORMSURGE_READY_ID) read as a buff,
 // which hid it behind the buff bar's low-tier overflow cap alongside ordinary
 // stat buffs even though missing it costs the player a timing window, not just
 // a cosmetic icon.
-const DEBUFF_STYLED_AURA_IDS: ReadonlySet<string> = new Set(['shaman_stormsurge_ready']);
+const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set(['shaman_stormsurge_ready']);
 
-// A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or
-// an Intellect-draining curse) is a debuff even though it reuses a buff_* kind.
-// `id` is optional and checked only against DEBUFF_STYLED_AURA_IDS above; every
-// existing 2-arg call site keeps its prior answer unchanged.
-export function isDebuffAura(kind: AuraKind, value: number, id?: string): boolean {
-  if (id !== undefined && DEBUFF_STYLED_AURA_IDS.has(id)) return true;
-  return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
+export function isDebuffDisplayAura(kind: AuraKind, value: number, id?: string): boolean {
+  return isDebuffAura(kind, value) || (id !== undefined && DEBUFF_DISPLAY_AURA_IDS.has(id));
 }
 
 // The one rule for "may a player counter take this aura off at all", ahead of any
@@ -102,9 +101,10 @@ export function isDispellableAura(
   // not a transferable magic buff. Letting dispel/steal remove only the synthetic
   // icon would leave its charges active invisibly (or copy a mechanically inert icon).
   if (aura.id === 'divine_ascension' || aura.permanent) return false;
+  if (aura.id !== undefined && DEBUFF_DISPLAY_AURA_IDS.has(aura.id)) return false;
   if (!isPlayerRemovableAura(aura)) return false;
   if (aura.school === 'physical') return false;
-  const harmful = isDebuffAura(aura.kind, aura.value, aura.id);
+  const harmful = isDebuffAura(aura.kind, aura.value);
   return offensive ? !harmful : harmful;
 }
 
@@ -153,7 +153,7 @@ export function isPartyFrameRelevantAura(aura: {
 }): boolean {
   if (PARTY_FRAME_EXCLUDED_KINDS.has(aura.kind)) return false;
   const value = aura.neg ? -1 : (aura.value ?? 1);
-  // Deliberately the 2-arg call (no id): a DEBUFF_STYLED_AURA_IDS override is a
+  // Deliberately the harmful classifier, not isDebuffDisplayAura: a display override is a
   // personal proc/cooldown marker no healer acts on, exactly like 'sated' and
   // 'cheater_mark' above, which PARTY_FRAME_EXCLUDED_KINDS already keeps off a
   // raid frame despite being real debuffs. Passing the id here would newly spend

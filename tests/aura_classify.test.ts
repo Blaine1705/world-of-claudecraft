@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isDebuffAura, isDispellableAura } from '../src/sim/aura_classify';
+import { isDebuffAura, isDebuffDisplayAura, isDispellableAura } from '../src/sim/aura_classify';
 import type { Aura, AuraKind } from '../src/sim/types';
 
 // Every harmful kind the HUD and /targetbuffs treat as a debuff. Keeping this
@@ -90,19 +90,19 @@ describe('isDebuffAura', () => {
     expect(isDebuffAura('slow', 0.5)).toBe(true);
   });
 
-  it('id override: shaman_stormsurge_ready reads as a debuff on its shared internal_cd kind', () => {
+  it('keeps shared internal_cd markers non-harmful', () => {
+    expect(isDebuffAura('internal_cd', 1)).toBe(false);
+    expect(isDebuffAura('internal_cd', 0)).toBe(false);
+  });
+
+  it('id display override: shaman_stormsurge_ready uses the debuff surface', () => {
     // Player feedback on PR #3668: Stormsurge's "cannot proc again until
     // Ancestral Strike is back on cooldown" marker (shaman_warspirit.ts
-    // STORMSURGE_READY_ID) should read as a debuff, not a buff.
-    expect(isDebuffAura('internal_cd', 1, 'shaman_stormsurge_ready')).toBe(true);
-    // The 2-arg call (no id) is unaffected: every existing caller that has not
-    // been updated to pass an id keeps its prior answer.
-    expect(isDebuffAura('internal_cd', 1)).toBe(false);
-    // The override is per-id, never kind-wide: 'internal_cd' backs a dozen
-    // other class markers (Heating Up, Convergence Mark, Warspirit Cadence)
-    // that must stay buffs even when their id IS passed through.
-    expect(isDebuffAura('internal_cd', 1, 'heating_up')).toBe(false);
-    expect(isDebuffAura('internal_cd', 0, 'shaman_warspirit_cadence')).toBe(false);
+    // STORMSURGE_READY_ID) should use debuff-bar styling, but it is not a
+    // player-removable harmful aura.
+    expect(isDebuffDisplayAura('internal_cd', 1, 'shaman_stormsurge_ready')).toBe(true);
+    expect(isDebuffDisplayAura('internal_cd', 1, 'heating_up')).toBe(false);
+    expect(isDebuffDisplayAura('internal_cd', 0, 'shaman_warspirit_cadence')).toBe(false);
   });
 });
 
@@ -129,18 +129,16 @@ describe('isDispellableAura', () => {
     expect(isDispellableAura(ascension, false)).toBe(false);
   });
 
-  it('routes the id-styled debuff override through, so an offensive dispel can strip Stormsurge Ready', () => {
+  it('does not route the Stormsurge Ready display override into dispel eligibility', () => {
     const stormsurgeReady = {
       id: 'shaman_stormsurge_ready',
       kind: 'internal_cd' as const,
       value: 1,
       school: 'nature' as const,
     };
-    // Harmful (per the id override above) + player-removable + non-physical:
-    // a FRIENDLY dispel/cleanse targets it (it strips harm off an ally, and
-    // this reads as harm), an OFFENSIVE one does not (offensive dispel strips
-    // a benefit off an enemy, and this is not styled as one).
+    // The debuff-bar styling override is visual only. Friendly dispel/cleanse
+    // must not read this personal proc indicator as a harmful effect.
     expect(isDispellableAura(stormsurgeReady, true)).toBe(false);
-    expect(isDispellableAura(stormsurgeReady, false)).toBe(true);
+    expect(isDispellableAura(stormsurgeReady, false)).toBe(false);
   });
 });
