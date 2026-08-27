@@ -1350,7 +1350,7 @@ export const id_ID: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Becak Terikat Tulang",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -1360,7 +1360,7 @@ export const id_ID: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1546,7 +1546,7 @@ export const id_ID: EnTranslations = {
       "hideUnusedActionSlots": "Sembunyikan Slot Aksi yang Tidak Terpakai",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Tampilkan pengatur waktu ayunan target",
       "showPetFrame": "Tampilkan Peliharaan Anda",
       "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",
@@ -2930,8 +2930,8 @@ export const id_ID: EnTranslations = {
       "linked": "Tertaut ke akun Steam {id}",
       "benefits": "Tautkan akun Steam-mu dari aplikasi desktop agar jasa yang kamu raih tercermin sebagai pencapaian Steam.",
       "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlist": "Masukkan ke wishlist di Steam",
+      "wishlistAria": "Masukkan ke wishlist di Steam: buka halaman toko World of ClaudeCraft",
       "wishlistShort": "Wishlist"
     },
     "epic": {
@@ -3549,8 +3549,8 @@ export const id_ID: EnTranslations = {
       "disenchant": "Hancurkan Pemantraan",
       "salvage": "Salvasi",
       "applyEnchant": "Terapkan Mantrai",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Jual",
+      "sellAll": "Jual semua ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
@@ -12823,7 +12823,7 @@ export const id_ID: EnTranslations = {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Kendali Terikat: Becak Terikat Tulang"
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"

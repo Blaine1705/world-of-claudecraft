@@ -13723,4 +13723,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Overtrækker målet i natskygge, giver {damage} naturskade og reducerer helingen, den modtager med 25 % i 12 sek.",
   "entities.abilities.nightshade_coating.name": "Natskygge belægning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-trackeren (dine fastgjorte sider og deres fremskridt) sidder på din HUD. Reliquary-vinduet har en matchende øjenknap, og fastgørelse af en side tænder trackeren igen.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Bundne tøjler: Knogebundet Rickshaw',
+  'hudChrome.itemMenu.sell': 'Sælg',
+  'hudChrome.itemMenu.sellAll': 'Sælg alle ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Knogebundet Rickshaw',
+  'hudChrome.options.showTargetSwingTimer': 'Vis målets svingtimer',
+  'hudChrome.steam.wishlist': 'Føj til ønskelisten på Steam',
+  'hudChrome.steam.wishlistAria':
+    'Føj til ønskelisten på Steam: åbn World of ClaudeCrafts butiksside',
+  'hudChrome.steam.wishlistShort': 'Ønskeliste',
 };

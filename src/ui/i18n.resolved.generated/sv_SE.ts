@@ -1350,7 +1350,7 @@ export const sv_SE: EnTranslations = {
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Benbunden Rickshaw",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
@@ -1360,7 +1360,7 @@ export const sv_SE: EnTranslations = {
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
       "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -1546,7 +1546,7 @@ export const sv_SE: EnTranslations = {
       "hideUnusedActionSlots": "Dölj oanvända åtgärdsrutor",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Visa målets svingtimer",
       "showPetFrame": "Visa ditt djur",
       "waterRipples": "Vattenkrusningar (kölvatten)",
       "showAttackButton": "Visa attackknapp",
@@ -2930,9 +2930,9 @@ export const sv_SE: EnTranslations = {
       "linked": "Länkat till Steam-kontot {id}",
       "benefits": "Länka ditt Steam-konto från skrivbordsappen så speglas bedrifterna du fullbordar som Steam-prestationer.",
       "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Lägg till på önskelistan på Steam",
+      "wishlistAria": "Lägg till på önskelistan på Steam: öppna World of ClaudeCrafts butikssida",
+      "wishlistShort": "Önskelista"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const sv_SE: EnTranslations = {
       "disenchant": "Avförtrylla",
       "salvage": "Bärga",
       "applyEnchant": "Applicera förtrollning",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Sälj",
+      "sellAll": "Sälj alla ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
@@ -12823,7 +12823,7 @@ export const sv_SE: EnTranslations = {
         "name": "Tändningsnyckel: Skräckgnista, markskakaren"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Bundna tyglar: Benbunden Rickshaw"
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"

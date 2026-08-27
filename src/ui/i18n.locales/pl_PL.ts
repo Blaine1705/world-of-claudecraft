@@ -13806,4 +13806,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Pokrywa cel psianką, zadając {damage} obrażeń natury i redukując otrzymywane leczenie o 25% na 12 sek.",
   "entities.abilities.nightshade_coating.name": "Powłoka Nocnego Cienia",
   "guide.settingsPage.ifShowReliquaryTracker": "Czy moduł śledzenia Relikwiarza (przypięte strony i ich postęp) znajduje się na Twoim HUD-ie. Okno Relikwiarza ma pasujący przycisk oka, a przypięcie strony powoduje ponowne włączenie modułu śledzącego.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Spętane lejce: Spętana Kośćmi Riksza',
+  'hudChrome.itemMenu.sell': 'Sprzedaj',
+  'hudChrome.itemMenu.sellAll': 'Sprzedaj wszystko ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Spętana Kośćmi Riksza',
+  'hudChrome.options.showTargetSwingTimer': 'Pokaż licznik zamachu celu',
+  'hudChrome.steam.wishlist': 'Dodaj do listy życzeń na Steam',
+  'hudChrome.steam.wishlistAria':
+    'Dodaj do listy życzeń na Steam: otwórz stronę World of ClaudeCraft w sklepie',
+  'hudChrome.steam.wishlistShort': 'Lista życzeń',
 };

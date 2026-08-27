@@ -13871,4 +13871,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Bestrijkt het doelwit met nachtschade, richt {damage} natuurschade aan en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden.",
   "entities.abilities.nightshade_coating.name": "Nachtschade-coating",
   "guide.settingsPage.ifShowReliquaryTracker": "Of de Reliquary-tracker (uw vastgezette pagina's en hun voortgang) op uw HUD staat. Het Reliquary-venster heeft een bijpassende oogknop, en als u een pagina vastzet, wordt de tracker weer ingeschakeld.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Gebonden teugels: Beengebonden Riksja',
+  'hudChrome.itemMenu.sell': 'Verkopen',
+  'hudChrome.itemMenu.sellAll': 'Alles verkopen ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Beengebonden Riksja',
+  'hudChrome.options.showTargetSwingTimer': 'Aanvalstimer van doelwit tonen',
+  'hudChrome.steam.wishlist': 'Op verlanglijst zetten op Steam',
+  'hudChrome.steam.wishlistAria':
+    'Op verlanglijst zetten op Steam: open de winkelpagina van World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Verlanglijst',
 };

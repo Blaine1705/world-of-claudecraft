@@ -13954,4 +13954,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Hüllt das Ziel in Nachtschatten, verursacht {damage} Naturschaden und verringert die erhaltene Heilung 12 Sek. lang um 25 %.",
   "entities.abilities.nightshade_coating.name": "Nachtschattenbeschichtung",
   "guide.settingsPage.ifShowReliquaryTracker": "Ob sich der Reliquiar-Tracker (Ihre angehefteten Seiten und deren Fortschritt) auf Ihrem HUD befindet. Das Reliquiar-Fenster verfügt über eine entsprechende Augenschaltfläche und durch das Anheften einer Seite wird der Tracker wieder aktiviert.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Gebundene Zügel: Knochengebundene Rikscha',
+  'hudChrome.itemMenu.sell': 'Verkaufen',
+  'hudChrome.itemMenu.sellAll': 'Alles verkaufen ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Knochengebundene Rikscha',
+  'hudChrome.options.showTargetSwingTimer': 'Zielschwungtimer anzeigen',
+  'hudChrome.steam.wishlist': 'Auf Steam auf die Wunschliste setzen',
+  'hudChrome.steam.wishlistAria':
+    'Auf Steam auf die Wunschliste setzen: Shopseite von World of ClaudeCraft öffnen',
+  'hudChrome.steam.wishlistShort': 'Wunschliste',
 };

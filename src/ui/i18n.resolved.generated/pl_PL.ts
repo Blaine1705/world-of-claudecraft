@@ -1350,7 +1350,7 @@ export const pl_PL: EnTranslations = {
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1360,7 +1360,7 @@ export const pl_PL: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1546,7 +1546,7 @@ export const pl_PL: EnTranslations = {
       "hideUnusedActionSlots": "Ukryj nieużywane pola akcji",
       "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Pokaż licznik zamachu celu",
       "showPetFrame": "Pokaż swoje zwierzę",
       "waterRipples": "Zmarszczki na wodzie (kilwater)",
       "showAttackButton": "Pokaż Przycisk Ataku",
@@ -2930,9 +2930,9 @@ export const pl_PL: EnTranslations = {
       "linked": "Połączono z kontem Steam {id}",
       "benefits": "Połącz swoje konto Steam z poziomu aplikacji na komputer, aby zdobywane czyny znajdowały odbicie w osiągnięciach Steam.",
       "noTicket": "Steam nie wystawił biletu połączenia. Uruchom Steam i spróbuj ponownie.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Dodaj do listy życzeń na Steam",
+      "wishlistAria": "Dodaj do listy życzeń na Steam: otwórz stronę World of ClaudeCraft w sklepie",
+      "wishlistShort": "Lista życzeń"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const pl_PL: EnTranslations = {
       "disenchant": "Rozbroić",
       "salvage": "Odzyskaj",
       "applyEnchant": "Zastosuj zaklinanie",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Sprzedaj",
+      "sellAll": "Sprzedaj wszystko ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
@@ -12823,7 +12823,7 @@ export const pl_PL: EnTranslations = {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Spętane lejce: Spętana Kośćmi Riksza"
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"

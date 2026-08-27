@@ -1350,7 +1350,7 @@ export const cs_CZ: EnTranslations = {
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Kostipoutaná rikša",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -1360,7 +1360,7 @@ export const cs_CZ: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
       "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -1546,7 +1546,7 @@ export const cs_CZ: EnTranslations = {
       "hideUnusedActionSlots": "Skrýt nepoužitá políčka akcí",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Zobrazit časovač švihu cíle",
       "showPetFrame": "Zobrazit tvého mazlíčka",
       "waterRipples": "Vlnky na vodě (brázdy)",
       "showAttackButton": "Zobrazit tlačítko útoku",
@@ -2930,9 +2930,9 @@ export const cs_CZ: EnTranslations = {
       "linked": "Propojeno s účtem Steam {id}",
       "benefits": "Propoj svůj účet Steam z desktopové aplikace a skutky, které vykonáš, se budou zrcadlit do achievementů ve službě Steam.",
       "noTicket": "Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Přidat na seznam přání ve Steamu",
+      "wishlistAria": "Přidat na seznam přání ve Steamu: otevřít stránku obchodu World of ClaudeCraft",
+      "wishlistShort": "Seznam přání"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const cs_CZ: EnTranslations = {
       "disenchant": "Rozzačarovat",
       "salvage": "Rozebrat",
       "applyEnchant": "Aplikovat okouzlení",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Prodat",
+      "sellAll": "Prodat vše ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
@@ -12823,7 +12823,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Spoutané otěže: Kostipoutaná rikša"
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"

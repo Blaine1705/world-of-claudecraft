@@ -13904,4 +13904,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Enduit la cible de morelle, infligeant {damage} dégâts de Nature et réduisant les soins qu'elle reçoit de 25% pendant 12 s.",
   "entities.abilities.nightshade_coating.name": "Revêtement Morelle",
   "guide.settingsPage.ifShowReliquaryTracker": "Si le tracker Reliquaire (vos pages épinglées et leur progression) se trouve sur votre HUD. La fenêtre Reliquaire a un bouton en forme d'œil correspondant, et épingler une page réactive le tracker.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': "Rênes liées : Rickshaw d'os liés",
+  'hudChrome.itemMenu.sell': 'Vendre',
+  'hudChrome.itemMenu.sellAll': 'Tout vendre ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course.",
+  'hudChrome.mounts.name_rickshaw_mount': "Rickshaw d'os liés",
+  'hudChrome.options.showTargetSwingTimer': "Afficher le minuteur d'attaque de la cible",
+  'hudChrome.steam.wishlist': 'Ajouter à la liste de souhaits Steam',
+  'hudChrome.steam.wishlistAria':
+    'Ajouter à la liste de souhaits Steam : ouvrir la page World of ClaudeCraft dans la boutique',
+  'hudChrome.steam.wishlistShort': 'Liste de souhaits',
 };

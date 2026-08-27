@@ -13504,4 +13504,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': '夜影塗層',
   'entities.abilities.nightshade_coating.description':
     '用夜影覆蓋目標，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': '出售',
+  'hudChrome.itemMenu.sellAll': '全部出售（{count}）',
 };

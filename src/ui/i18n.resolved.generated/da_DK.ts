@@ -1350,7 +1350,7 @@ export const da_DK: EnTranslations = {
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
       "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
       "name_drakemaw_raptor": "Dragegabets Raptor",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Knogebundet Rickshaw",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
@@ -1360,7 +1360,7 @@ export const da_DK: EnTranslations = {
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -1546,7 +1546,7 @@ export const da_DK: EnTranslations = {
       "hideUnusedActionSlots": "Skjul ubrugte handlingsfelter",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Vis målets svingtimer",
       "showPetFrame": "Vis dit kæledyr",
       "waterRipples": "Vandkrusninger (kølvand)",
       "showAttackButton": "Vis angrebsknap",
@@ -2930,9 +2930,9 @@ export const da_DK: EnTranslations = {
       "linked": "Tilknyttet Steam-kontoen {id}",
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
       "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Føj til ønskelisten på Steam",
+      "wishlistAria": "Føj til ønskelisten på Steam: åbn World of ClaudeCrafts butiksside",
+      "wishlistShort": "Ønskeliste"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const da_DK: EnTranslations = {
       "disenchant": "Affortrylle",
       "salvage": "Bjærg",
       "applyEnchant": "Anvend fortryllelse",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Sælg",
+      "sellAll": "Sælg alle ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du affortrylles {item}.",
@@ -12823,7 +12823,7 @@ export const da_DK: EnTranslations = {
         "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Bundne tøjler: Knogebundet Rickshaw"
       },
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"

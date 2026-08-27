@@ -1350,7 +1350,7 @@ export const fr_CA: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Rickshaw d'os liés",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -1360,7 +1360,7 @@ export const fr_CA: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -1546,7 +1546,7 @@ export const fr_CA: EnTranslations = {
       "hideUnusedActionSlots": "Masquer les emplacements d'action inutilisés",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Afficher le minuteur d'attaque de la cible",
       "showPetFrame": "Afficher votre familier",
       "waterRipples": "Ondulations de l'eau (sillages)",
       "showAttackButton": "Afficher le bouton d'attaque",
@@ -2930,9 +2930,9 @@ export const fr_CA: EnTranslations = {
       "linked": "Lié au compte Steam {id}",
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
       "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Ajouter à la liste de souhaits Steam",
+      "wishlistAria": "Ajouter à la liste de souhaits Steam : ouvrir la page World of ClaudeCraft dans la boutique",
+      "wishlistShort": "Liste de souhaits"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const fr_CA: EnTranslations = {
       "disenchant": "Désenchanter",
       "salvage": "Récupérer",
       "applyEnchant": "Appliquer un enchantement",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Vendre",
+      "sellAll": "Tout vendre ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
@@ -12823,7 +12823,7 @@ export const fr_CA: EnTranslations = {
         "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Rênes liées : Rickshaw d'os liés"
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"

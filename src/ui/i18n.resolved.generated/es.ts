@@ -1350,7 +1350,7 @@ export const es: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
       "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Rickshaw Atahuesos",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
@@ -1360,7 +1360,7 @@ export const es: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
@@ -1546,7 +1546,7 @@ export const es: EnTranslations = {
       "hideUnusedActionSlots": "Ocultar espacios de acción no utilizados",
       "lockActionBars": "Bloquear barras de acción",
       "showTargetOfTarget": "Mostrar el objetivo del objetivo",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Mostrar temporizador de golpe del objetivo",
       "showPetFrame": "Mostrar tu mascota",
       "waterRipples": "Ondas en el agua (estelas)",
       "showAttackButton": "Mostrar boton de ataque",
@@ -2930,9 +2930,9 @@ export const es: EnTranslations = {
       "linked": "Vinculado a la cuenta de Steam {id}",
       "benefits": "Vincula tu cuenta de Steam desde la aplicación de escritorio para reflejar las gestas que consigas como logros de Steam.",
       "noTicket": "Steam no proporcionó un ticket de vinculación. Inicia Steam y vuelve a intentarlo.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Añadir a la lista de deseados en Steam",
+      "wishlistAria": "Añadir a la lista de deseados en Steam: abrir la página de World of ClaudeCraft en la tienda",
+      "wishlistShort": "Lista de deseados"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const es: EnTranslations = {
       "disenchant": "Desencatar",
       "salvage": "Desguazar",
       "applyEnchant": "Aplicar encantamiento",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Vender",
+      "sellAll": "Vender todo ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Desencatas {item}.",
@@ -12823,7 +12823,7 @@ export const es: EnTranslations = {
         "name": "Llave de encendido: Aterrachispa, Sacudetierras"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Riendas vinculadas: Rickshaw Atahuesos"
       },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"

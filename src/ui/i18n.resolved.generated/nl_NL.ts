@@ -1350,7 +1350,7 @@ export const nl_NL: EnTranslations = {
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Beengebonden Riksja",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -1360,7 +1360,7 @@ export const nl_NL: EnTranslations = {
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
       "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1546,7 +1546,7 @@ export const nl_NL: EnTranslations = {
       "hideUnusedActionSlots": "Ongebruikte actievakjes verbergen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Aanvalstimer van doelwit tonen",
       "showPetFrame": "Je huisdier tonen",
       "waterRipples": "Waterrimpels (kielzog)",
       "showAttackButton": "Aanvalsknop Tonen",
@@ -2930,9 +2930,9 @@ export const nl_NL: EnTranslations = {
       "linked": "Gekoppeld aan Steam-account {id}",
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
       "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Op verlanglijst zetten op Steam",
+      "wishlistAria": "Op verlanglijst zetten op Steam: open de winkelpagina van World of ClaudeCraft",
+      "wishlistShort": "Verlanglijst"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const nl_NL: EnTranslations = {
       "disenchant": "Onbetoveren",
       "salvage": "Salvagen",
       "applyEnchant": "Betovering aanbrengen",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Verkopen",
+      "sellAll": "Alles verkopen ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
@@ -12823,7 +12823,7 @@ export const nl_NL: EnTranslations = {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Gebonden teugels: Beengebonden Riksja"
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"

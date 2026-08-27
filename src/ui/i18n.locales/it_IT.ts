@@ -13951,4 +13951,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Ricopre il bersaglio di ombra notturna, infliggendo {damage} danni da natura e riducendo le cure ricevute del 25% per 12 sec.",
   "entities.abilities.nightshade_coating.name": "Rivestimento Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Se il tracker del Reliquiario (le tue pagine appuntate e il loro progresso) si trova sul tuo HUD. La finestra del Reliquiario ha un pulsante a forma di occhio corrispondente e il blocco di una pagina riattiva il tracker.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Redini vincolate: Risciò Vincolato alle Ossa',
+  'hudChrome.itemMenu.sell': 'Vendi',
+  'hudChrome.itemMenu.sellAll': 'Vendi tutto ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata.",
+  'hudChrome.mounts.name_rickshaw_mount': 'Risciò Vincolato alle Ossa',
+  'hudChrome.options.showTargetSwingTimer': 'Mostra timer degli attacchi del bersaglio',
+  'hudChrome.steam.wishlist': 'Aggiungi alla lista desideri su Steam',
+  'hudChrome.steam.wishlistAria':
+    'Aggiungi alla lista desideri su Steam: apri la pagina del negozio di World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Lista desideri',
 };

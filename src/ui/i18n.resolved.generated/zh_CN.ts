@@ -3549,8 +3549,8 @@ export const zh_CN: EnTranslations = {
       "disenchant": "分解",
       "salvage": "拆解",
       "applyEnchant": "施加附魔",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "出售",
+      "sellAll": "全部出售（{count}）"
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",

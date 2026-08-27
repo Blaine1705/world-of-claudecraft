@@ -1350,7 +1350,7 @@ export const tr_TR: EnTranslations = {
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -1360,7 +1360,7 @@ export const tr_TR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1546,7 +1546,7 @@ export const tr_TR: EnTranslations = {
       "hideUnusedActionSlots": "Kullanılmayan Eylem Alanlarını Gizle",
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Hedefin savurma zamanlayıcısını göster",
       "showPetFrame": "Yoldaşını Göster",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",
@@ -2930,9 +2930,9 @@ export const tr_TR: EnTranslations = {
       "linked": "Bağlı Steam hesabı: {id}",
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Steam'de istek listesine ekle",
+      "wishlistAria": "Steam'de istek listesine ekle: World of ClaudeCraft mağaza sayfasını aç",
+      "wishlistShort": "İstek listesi"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const tr_TR: EnTranslations = {
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
       "applyEnchant": "Büyü Uygula",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Sat",
+      "sellAll": "Tümünü sat ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
@@ -12823,7 +12823,7 @@ export const tr_TR: EnTranslations = {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Bağlı Dizginler: Kemikbağlı Çekçek"
       },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"

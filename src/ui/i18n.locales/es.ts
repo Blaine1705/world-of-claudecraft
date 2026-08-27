@@ -13942,4 +13942,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Cubre al objetivo con belladona, lo que inflige {damage} daño de Naturaleza y reduce la curación que recibe en un 25 % durante 12 s.",
   "entities.abilities.nightshade_coating.name": "Recubrimiento de solanáceas",
   "guide.settingsPage.ifShowReliquaryTracker": "Si el rastreador del Relicario (tus páginas fijadas y su progreso) se encuentra en tu HUD. La ventana del Relicario tiene un botón de ojo a juego y al fijar una página se vuelve a activar el rastreador.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Riendas vinculadas: Rickshaw Atahuesos',
+  'hudChrome.itemMenu.sell': 'Vender',
+  'hudChrome.itemMenu.sellAll': 'Vender todo ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Rickshaw Atahuesos',
+  'hudChrome.options.showTargetSwingTimer': 'Mostrar temporizador de golpe del objetivo',
+  'hudChrome.steam.wishlist': 'Añadir a la lista de deseados en Steam',
+  'hudChrome.steam.wishlistAria':
+    'Añadir a la lista de deseados en Steam: abrir la página de World of ClaudeCraft en la tienda',
+  'hudChrome.steam.wishlistShort': 'Lista de deseados',
 };

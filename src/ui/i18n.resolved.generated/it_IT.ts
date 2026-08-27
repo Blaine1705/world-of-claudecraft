@@ -1350,7 +1350,7 @@ export const it_IT: EnTranslations = {
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Risciò Vincolato alle Ossa",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
@@ -1360,7 +1360,7 @@ export const it_IT: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
       "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata."
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
@@ -1546,7 +1546,7 @@ export const it_IT: EnTranslations = {
       "hideUnusedActionSlots": "Nascondi gli slot azione inutilizzati",
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Mostra timer degli attacchi del bersaglio",
       "showPetFrame": "Mostra il tuo famiglio",
       "waterRipples": "Increspature dell'acqua (scie)",
       "showAttackButton": "Mostra Pulsante Attacco",
@@ -2930,9 +2930,9 @@ export const it_IT: EnTranslations = {
       "linked": "Collegato all'account Steam {id}",
       "benefits": "Collega il tuo account Steam dall'app desktop per rispecchiare le imprese che ottieni negli obiettivi di Steam.",
       "noTicket": "Steam non ha fornito un ticket di collegamento. Avvia Steam e riprova.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Aggiungi alla lista desideri su Steam",
+      "wishlistAria": "Aggiungi alla lista desideri su Steam: apri la pagina del negozio di World of ClaudeCraft",
+      "wishlistShort": "Lista desideri"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const it_IT: EnTranslations = {
       "disenchant": "Disincanta",
       "salvage": "Smantella",
       "applyEnchant": "Applica Incantesimo",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Vendi",
+      "sellAll": "Vendi tutto ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",
@@ -12823,7 +12823,7 @@ export const it_IT: EnTranslations = {
         "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Redini vincolate: Risciò Vincolato alle Ossa"
       },
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"

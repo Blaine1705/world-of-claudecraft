@@ -13965,4 +13965,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': 'Покрытие паслёном',
   'entities.abilities.nightshade_coating.description':
     'Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': 'Продать',
+  'hudChrome.itemMenu.sellAll': 'Продать все ({count})',
 };

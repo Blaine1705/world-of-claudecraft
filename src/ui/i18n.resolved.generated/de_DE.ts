@@ -1350,7 +1350,7 @@ export const de_DE: EnTranslations = {
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Knochengebundene Rikscha",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
@@ -1360,7 +1360,7 @@ export const de_DE: EnTranslations = {
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
@@ -1546,7 +1546,7 @@ export const de_DE: EnTranslations = {
       "hideUnusedActionSlots": "Ungenutzte Aktionsfelder ausblenden",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Zielschwungtimer anzeigen",
       "showPetFrame": "Euren Begleiter anzeigen",
       "waterRipples": "Wasserwellen (Kielwasser)",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
@@ -2930,9 +2930,9 @@ export const de_DE: EnTranslations = {
       "linked": "Mit Steam-Konto {id} verknüpft",
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
       "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Auf Steam auf die Wunschliste setzen",
+      "wishlistAria": "Auf Steam auf die Wunschliste setzen: Shopseite von World of ClaudeCraft öffnen",
+      "wishlistShort": "Wunschliste"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const de_DE: EnTranslations = {
       "disenchant": "Entzaubern",
       "salvage": "Zerlegen",
       "applyEnchant": "Verzauberung anwenden",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Verkaufen",
+      "sellAll": "Alles verkaufen ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
@@ -12823,7 +12823,7 @@ export const de_DE: EnTranslations = {
         "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Gebundene Zügel: Knochengebundene Rikscha"
       },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"

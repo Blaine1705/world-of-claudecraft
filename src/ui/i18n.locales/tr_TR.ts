@@ -13630,4 +13630,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Hedefi itüzümüyle kaplayarak {damage} Nature hasarı verir ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır.",
   "entities.abilities.nightshade_coating.name": "Gece Gölgesi Kaplama",
   "guide.settingsPage.ifShowReliquaryTracker": "Reliquary izleyicinin (sabitlenmiş sayfalarınız ve ilerlemeleri) HUD'nizde bulunup bulunmadığı. Reliquary penceresinde eşleşen bir göz düğmesi bulunur ve bir sayfayı sabitlemek izleyiciyi tekrar açar.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Bağlı Dizginler: Kemikbağlı Çekçek',
+  'hudChrome.itemMenu.sell': 'Sat',
+  'hudChrome.itemMenu.sellAll': 'Tümünü sat ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Kemikbağlı Çekçek',
+  'hudChrome.options.showTargetSwingTimer': 'Hedefin savurma zamanlayıcısını göster',
+  'hudChrome.steam.wishlist': "Steam'de istek listesine ekle",
+  'hudChrome.steam.wishlistAria':
+    "Steam'de istek listesine ekle: World of ClaudeCraft mağaza sayfasını aç",
+  'hudChrome.steam.wishlistShort': 'İstek listesi',
 };

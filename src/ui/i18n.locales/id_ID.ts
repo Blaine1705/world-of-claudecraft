@@ -13860,4 +13860,16 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Melapisi target dalam nightshade, menimbulkan {damage} Kerusakan alam dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik.",
   "entities.abilities.nightshade_coating.name": "Lapisan Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Apakah pelacak Reliquary (halaman yang Anda sematkan dan kemajuannya) ada di HUD Anda. Jendela Reliquary memiliki tombol mata yang cocok, dan menyematkan halaman akan mengaktifkan kembali pelacak.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Kendali Terikat: Becak Terikat Tulang',
+  'hudChrome.itemMenu.sell': 'Jual',
+  'hudChrome.itemMenu.sellAll': 'Jual semua ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Becak Terikat Tulang',
+  'hudChrome.options.showTargetSwingTimer': 'Tampilkan pengatur waktu ayunan target',
+  'hudChrome.steam.wishlist': 'Masukkan ke wishlist di Steam',
+  'hudChrome.steam.wishlistAria':
+    'Masukkan ke wishlist di Steam: buka halaman toko World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Wishlist',
 };

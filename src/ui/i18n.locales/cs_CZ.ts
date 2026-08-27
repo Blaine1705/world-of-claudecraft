@@ -13663,4 +13663,16 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Pokryje cíl v nočním stínu, způsobí {damage} poškození přírody a sníží léčení, které obdrží, o 25 % po dobu 12 sekund.",
   "entities.abilities.nightshade_coating.name": "Nátěr Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Zda je sledovač relikviářů (vaše připnuté stránky a jejich průběh) umístěn na vašem HUD. Okno Relikviář má odpovídající tlačítko oka a připnutím stránky se sledovač opět zapne.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Spoutané otěže: Kostipoutaná rikša',
+  'hudChrome.itemMenu.sell': 'Prodat',
+  'hudChrome.itemMenu.sellAll': 'Prodat vše ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Kostipoutaná rikša',
+  'hudChrome.options.showTargetSwingTimer': 'Zobrazit časovač švihu cíle',
+  'hudChrome.steam.wishlist': 'Přidat na seznam přání ve Steamu',
+  'hudChrome.steam.wishlistAria':
+    'Přidat na seznam přání ve Steamu: otevřít stránku obchodu World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Seznam přání',
 };

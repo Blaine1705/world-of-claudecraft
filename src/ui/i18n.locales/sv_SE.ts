@@ -13746,4 +13746,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Belägger målet i nattskugga, gör {damage} naturskada och minskar läkningen den får med 25 % under 12 sek.",
   "entities.abilities.nightshade_coating.name": "Nightshade beläggning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-spåraren (dina fästa sidor och deras framsteg) sitter på din HUD. Reliquary-fönstret har en matchande ögonknapp, och genom att fästa en sida slås spåraren på igen.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Bundna tyglar: Benbunden Rickshaw',
+  'hudChrome.itemMenu.sell': 'Sälj',
+  'hudChrome.itemMenu.sellAll': 'Sälj alla ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Benbunden Rickshaw',
+  'hudChrome.options.showTargetSwingTimer': 'Visa målets svingtimer',
+  'hudChrome.steam.wishlist': 'Lägg till på önskelistan på Steam',
+  'hudChrome.steam.wishlistAria':
+    'Lägg till på önskelistan på Steam: öppna World of ClaudeCrafts butikssida',
+  'hudChrome.steam.wishlistShort': 'Önskelista',
 };

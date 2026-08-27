@@ -1350,7 +1350,7 @@ export const pt_BR: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
-      "name_rickshaw_mount": "Bonebound Rickshaw",
+      "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -1360,7 +1360,7 @@ export const pt_BR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas.",
-      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
+      "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -1546,7 +1546,7 @@ export const pt_BR: EnTranslations = {
       "hideUnusedActionSlots": "Ocultar Espaços de Ação Não Utilizados",
       "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
-      "showTargetSwingTimer": "Show Target Swing Timer",
+      "showTargetSwingTimer": "Mostrar temporizador de ataque do alvo",
       "showPetFrame": "Mostrar seu mascote",
       "waterRipples": "Ondulações na água (esteiras)",
       "showAttackButton": "Exibir Botão de Ataque",
@@ -2930,9 +2930,9 @@ export const pt_BR: EnTranslations = {
       "linked": "Vinculado à conta Steam {id}",
       "benefits": "Vincule sua conta Steam pelo aplicativo para desktop para espelhar os feitos que você ganhar como conquistas do Steam.",
       "noTicket": "O Steam não forneceu um tíquete de vinculação. Inicie o Steam e tente novamente.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Adicionar à lista de desejos no Steam",
+      "wishlistAria": "Adicionar à lista de desejos no Steam: abrir a página de World of ClaudeCraft na loja",
+      "wishlistShort": "Lista de desejos"
     },
     "epic": {
       "title": "Epic",
@@ -3549,8 +3549,8 @@ export const pt_BR: EnTranslations = {
       "disenchant": "Desencantar",
       "salvage": "Recuperar",
       "applyEnchant": "Aplicar Encantamento",
-      "sell": "Sell",
-      "sellAll": "Sell all ({count})"
+      "sell": "Vender",
+      "sellAll": "Vender tudo ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
@@ -12823,7 +12823,7 @@ export const pt_BR: EnTranslations = {
         "name": "Chave de ignição: Faíscaterror, Abala-Terra"
       },
       "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
+        "name": "Rédeas vinculadas: Riquixá de Ossos Vinculados"
       },
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"
