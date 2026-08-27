@@ -119,17 +119,20 @@ export async function handleDesktopWalletHandoffCreate(
     const expectedAddress =
       typeof body.expectedAddress === 'string' ? body.expectedAddress.trim() : '';
     const reference = typeof body.reference === 'string' ? body.reference.trim() : '';
-    if (
-      body.kind !== 'transaction' ||
-      !isSolanaAddress(expectedAddress) ||
-      !reference ||
-      reference.length > 256
-    ) {
+    const nonce = typeof body.nonce === 'string' ? body.nonce.trim() : '';
+    const validShape =
+      isSolanaAddress(expectedAddress) &&
+      (body.kind === 'transaction'
+        ? !!reference && reference.length <= 256
+        : body.kind === 'stepup' && /^[0-9a-f]{32}$/.test(nonce));
+    if (!validShape) {
       return json(res, 400, {
         error: 'invalid desktop wallet operation',
         code: 'wallet.handoff_invalid',
       });
     }
+    // Both kinds require the requesting account's LINKED wallet to be the
+    // expected signer: a handoff can never be minted for a foreign wallet.
     const linkedWallet = await walletForAccount(accountId);
     if (!linkedWallet || linkedWallet.pubkey !== expectedAddress) {
       return json(res, 400, {
@@ -137,14 +140,17 @@ export async function handleDesktopWalletHandoffCreate(
         code: 'wallet.handoff_invalid',
       });
     }
-    return json(
-      res,
-      200,
-      desktopWalletHandoffs.createTransaction(accountId, requestIp(req), {
-        reference,
-        expectedAddress,
-      }),
-    );
+    const created =
+      body.kind === 'transaction'
+        ? desktopWalletHandoffs.createTransaction(accountId, requestIp(req), {
+            reference,
+            expectedAddress,
+          })
+        : desktopWalletHandoffs.createStepUp(accountId, requestIp(req), {
+            nonce,
+            expectedAddress,
+          });
+    return json(res, 200, created);
   } catch (error) {
     return handoffFailure(res, error);
   }
@@ -158,7 +164,9 @@ export async function handleDesktopWalletHandoffClaim(
   const body = await readBody(req);
   try {
     const action = desktopWalletHandoffs.claim(body.code, requestIp(req));
-    if (action.kind === 'transaction') return json(res, 200, action);
+    // Transaction and step-up claims return the full server-registered action
+    // (the signable bytes/message come from the store, never the renderer).
+    if (action.kind === 'transaction' || action.kind === 'stepup') return json(res, 200, action);
     const address = typeof body.address === 'string' ? body.address.trim() : '';
     if (!address) return json(res, 200, { kind: 'link' });
     if (!isSolanaAddress(address)) {
@@ -197,6 +205,7 @@ export async function handleDesktopWalletHandoffComplete(
   let result: DesktopWalletHandoffResult;
   if (body.kind === 'link') result = { kind: 'link', address, signature, nonce };
   else if (body.kind === 'transaction') result = { kind: 'transaction', address, signature };
+  else if (body.kind === 'stepup') result = { kind: 'stepup', address, signature };
   else {
     return json(res, 400, {
       error: 'invalid wallet authorization result',

@@ -301,7 +301,13 @@ bank gate on.
   those builds must never show any Exchange surface, even disabled or teased.
   The desktop gate reads the shell's distribution stamp through the preload
   bridge (`wocExchangeSupported`) and fails closed when the stamp is absent,
-  unknown, or unreadable, treating such a build as a store build.
+  unknown, or unreadable, treating such a build as a store build. On the
+  website desktop build both Exchange signatures (the step-up challenge and
+  the payment transaction) ride the existing external-browser wallet handoff:
+  the server pre-registers each issued challenge and payable quote, the
+  desktop app opens the player's browser with a single-use code, and the
+  browser wallet signs the server-stored bytes (never renderer-supplied
+  ones). Browser web keeps the in-page wallet flow unchanged.
 - Listings, custody, and sales history are realm-scoped like the World Market;
   wallets, bonds, strikes, and suspensions are account-scoped.
 - The service is configurable by server: the existing server runs the

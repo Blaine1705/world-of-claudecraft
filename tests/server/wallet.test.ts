@@ -366,6 +366,103 @@ describe('desktop browser wallet handoff routes', () => {
       code: 'wallet.handoff_invalid',
     });
   });
+
+  it('relays a step-up signature for the authenticated desktop account', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    const nonce = 'ab'.repeat(16);
+    desktopWalletHandoffs.authorizeStepUp(7, {
+      nonce,
+      message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+      expectedAddress: address,
+      expiresAtMs: Date.now() + 60_000,
+    });
+    const created = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'stepup', expectedAddress: address, nonce },
+    });
+    expect(created.status).toBe(200);
+    const code = String(bodyRecord(created.body).code);
+
+    // The claim serves the SERVER-stored challenge message, never renderer text.
+    const claimed = await runRoute('POST', '/api/desktop-wallet/claim', { body: { code } });
+    expect(claimed.body).toEqual({
+      kind: 'stepup',
+      nonce,
+      message: 'World of ClaudeCraft $WOC Exchange: authorize moving an item into escrow.',
+      expectedAddress: address,
+    });
+
+    const completed = await runRoute('POST', '/api/desktop-wallet/complete', {
+      body: { code, kind: 'stepup', address, signature: 'msg-signature' },
+    });
+    expect(completed.body).toEqual({ completed: true });
+
+    const result = await runRoute('POST', '/api/desktop-wallet/result', {
+      headers: { authorization: BEARER },
+      body: { code },
+    });
+    expect(result.body).toEqual({
+      status: 'complete',
+      result: { kind: 'stepup', address, signature: 'msg-signature' },
+    });
+  });
+
+  it('rejects a step-up handoff for a wallet other than the account link', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    const response = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: {
+        kind: 'stepup',
+        expectedAddress: '11111111111111111111111111111111',
+        nonce: 'cd'.repeat(16),
+      },
+    });
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'transaction wallet does not match the linked account wallet',
+      code: 'wallet.handoff_invalid',
+    });
+  });
+
+  it('rejects a step-up handoff with a malformed nonce or no issued challenge', async () => {
+    authedDb();
+    vi.mocked(walletForAccount).mockResolvedValue({
+      account_id: 7,
+      pubkey: address,
+      linked_at: '2026-07-01T00:00:00.000Z',
+    });
+    // Malformed nonce: refused at shape screening (renderer-supplied message
+    // text has no field to ride at all).
+    const malformed = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'stepup', expectedAddress: address, nonce: 'nope' },
+    });
+    expect(malformed.status).toBe(400);
+    expect(malformed.body).toEqual({
+      error: 'invalid desktop wallet operation',
+      code: 'wallet.handoff_invalid',
+    });
+    // Well-formed but never issued: refused by the store.
+    const unissued = await runRoute('POST', '/api/desktop-wallet/create', {
+      headers: { authorization: BEARER },
+      body: { kind: 'stepup', expectedAddress: address, nonce: 'ef'.repeat(16) },
+    });
+    expect(unissued.status).toBe(400);
+    expect(unissued.body).toEqual({
+      error: 'step-up is not backed by an issued Exchange challenge',
+      code: 'wallet.handoff_invalid',
+    });
+  });
 });
 
 // ---------------------------------------------------------------------------

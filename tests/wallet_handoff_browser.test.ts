@@ -89,6 +89,16 @@ describe('desktop browser wallet handoff options', () => {
     ]);
   });
 
+  it('offers message-only wallets for the Exchange step-up (message signing only)', () => {
+    registerWallet('Message Wallet', false);
+    registerWallet('Transaction Wallet', true);
+
+    expect(browserWalletOptions('stepup').map((wallet) => wallet.name)).toEqual([
+      'Message Wallet',
+      'Transaction Wallet',
+    ]);
+  });
+
   it('rejects a message-only account before transaction authorization begins', async () => {
     registerWallet('Message Wallet', false);
 

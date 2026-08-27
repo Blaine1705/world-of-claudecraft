@@ -28,6 +28,7 @@ vi.mock('../src/net/woc_market_sdk', () => ({
 import {
   attachWocMarketExchange,
   type WocMarketShell,
+  type WocMarketWiringDeps,
   wocMarketAttachAllowed,
 } from '../src/game/woc_market_wiring';
 import type { WocMarketHooks } from '../src/ui/woc_market_window';
@@ -92,6 +93,8 @@ function makeDeps() {
         loads++;
         return walletModule;
       },
+      // Browser web: no desktop external-browser signer.
+      desktopAuthorize: null as WocMarketWiringDeps['wallet']['desktopAuthorize'],
     },
   };
   return {
@@ -271,7 +274,7 @@ describe('woc_market_wiring: the hook composition on allowed shells', () => {
     // The wallet bridge loads on first sign, never at attach time (attach runs
     // on the boot path; the bridge is a lazy chunk).
     expect(rig.loads()).toBe(0);
-    await expect(hooks.signAndSendTransactionBase64('AQID')).resolves.toBe('sig:AQID');
+    await expect(hooks.signAndSendTransactionBase64('AQID', 'WOC_ref_1')).resolves.toBe('sig:AQID');
     expect(rig.loads()).toBe(1);
     expect(rig.signCalls).toEqual(['AQID']);
   });
@@ -282,12 +285,105 @@ describe('woc_market_wiring: the hook composition on allowed shells', () => {
     const hooks = rig.attached[0];
     // The step-up signer must not eagerly load the bridge either.
     expect(rig.loads()).toBe(0);
-    await expect(hooks.signMessageBase58('challenge text')).resolves.toBe('msgsig:challenge text');
+    await expect(hooks.signMessageBase58('challenge text', 'ab'.repeat(16))).resolves.toBe(
+      'msgsig:challenge text',
+    );
     expect(rig.loads()).toBe(1);
     expect(rig.messageSignCalls).toEqual(['challenge text']);
     // Both signers delegate through the same wallet.load() seam (the real
     // loader memoizes the dynamic import; the rig counts delegations).
-    await hooks.signAndSendTransactionBase64('AQID');
+    await hooks.signAndSendTransactionBase64('AQID', 'WOC_ref_1');
+    expect(rig.loads()).toBe(2);
+  });
+});
+
+describe('woc_market_wiring: the desktop external-browser signer arm', () => {
+  const NONCE = 'ab'.repeat(16);
+  const LINKED = 'WaLLet111111111111111111111111111111111111';
+
+  function desktopRig(results?: {
+    transaction?: { kind: string; address: string; signature: string };
+    stepup?: { kind: string; address: string; signature: string };
+  }) {
+    const rig = makeDeps();
+    const actions: unknown[] = [];
+    rig.setLinked(LINKED);
+    rig.deps.wallet.desktopAuthorize = (async (action: { kind: string }) => {
+      actions.push(action);
+      if (action.kind === 'transaction') {
+        return results?.transaction ?? { kind: 'transaction', address: LINKED, signature: 'txsig' };
+      }
+      return results?.stepup ?? { kind: 'stepup', address: LINKED, signature: 'msgsig' };
+    }) as WocMarketWiringDeps['wallet']['desktopAuthorize'];
+    return { ...rig, actions };
+  }
+
+  it('routes the payment signer through the handoff by quote reference, never the bytes', async () => {
+    const rig = desktopRig();
+    await attachWocMarketExchange(rig.deps, stampedDesktopShell('website'));
+    const hooks = rig.attached[0];
+    await expect(hooks.signAndSendTransactionBase64('AQID', 'WOC_ref_1')).resolves.toBe('txsig');
+    expect(rig.actions).toEqual([
+      { kind: 'transaction', reference: 'WOC_ref_1', expectedAddress: LINKED },
+    ]);
+    // The in-renderer wallet is never loaded on the desktop arm.
+    expect(rig.loads()).toBe(0);
+    expect(rig.signCalls).toEqual([]);
+  });
+
+  it('routes the step-up signer through the handoff by challenge nonce', async () => {
+    const rig = desktopRig();
+    await attachWocMarketExchange(rig.deps, stampedDesktopShell('website'));
+    const hooks = rig.attached[0];
+    await expect(hooks.signMessageBase58('challenge text', NONCE)).resolves.toBe('msgsig');
+    expect(rig.actions).toEqual([{ kind: 'stepup', nonce: NONCE, expectedAddress: LINKED }]);
+    expect(rig.loads()).toBe(0);
+    expect(rig.messageSignCalls).toEqual([]);
+  });
+
+  it('refuses to sign without a linked wallet or a server reference/nonce', async () => {
+    const rig = desktopRig();
+    await attachWocMarketExchange(rig.deps, stampedDesktopShell('website'));
+    const hooks = rig.attached[0];
+    rig.setLinked(null);
+    await expect(hooks.signAndSendTransactionBase64('AQID', 'WOC_ref_1')).rejects.toThrow(
+      'connect a wallet first',
+    );
+    await expect(hooks.signMessageBase58('challenge', NONCE)).rejects.toThrow(
+      'connect a wallet first',
+    );
+    rig.setLinked(LINKED);
+    await expect(hooks.signAndSendTransactionBase64('AQID', null)).rejects.toThrow(
+      'server returned an invalid wallet authorization',
+    );
+    await expect(hooks.signMessageBase58('challenge', '')).rejects.toThrow(
+      'server returned an invalid wallet authorization',
+    );
+    expect(rig.actions).toEqual([]);
+  });
+
+  it('refuses a handoff result of the wrong kind (classified, per signer)', async () => {
+    const rig = desktopRig({
+      transaction: { kind: 'link', address: LINKED, signature: 'x' },
+      stepup: { kind: 'transaction', address: LINKED, signature: 'x' },
+    });
+    await attachWocMarketExchange(rig.deps, stampedDesktopShell('website'));
+    const hooks = rig.attached[0];
+    await expect(hooks.signAndSendTransactionBase64('AQID', 'WOC_ref_1')).rejects.toThrow(
+      'wallet returned an invalid transaction authorization',
+    );
+    await expect(hooks.signMessageBase58('challenge', NONCE)).rejects.toThrow(
+      'wallet returned an invalid step-up authorization',
+    );
+  });
+
+  it('falls back to the in-renderer wallet when no desktop signer is wired', async () => {
+    const rig = makeDeps();
+    rig.setLinked(LINKED);
+    await attachWocMarketExchange(rig.deps, WEB);
+    const hooks = rig.attached[0];
+    await expect(hooks.signAndSendTransactionBase64('AQID', 'WOC_ref_1')).resolves.toBe('sig:AQID');
+    await expect(hooks.signMessageBase58('challenge', NONCE)).resolves.toBe('msgsig:challenge');
     expect(rig.loads()).toBe(2);
   });
 });
@@ -298,8 +394,19 @@ describe('woc_market_wiring: main.ts stays a firewall', () => {
     expect(main.match(/attachWocMarketExchange\(/g)?.length).toBe(1);
     expect(main).toContain("from './game/woc_market_wiring'");
     // The attach is a promise now: the call must keep its catch so a wiring
-    // failure logs instead of dying as a silent unhandled rejection.
-    expect(main).toMatch(/attachWocMarketExchange\(\{[\s\S]*?\}\)\.catch\(/);
+    // failure logs instead of dying as a silent unhandled rejection. The span
+    // is bounded to the statement ([^;] cannot cross the call's semicolon), so
+    // an unrelated `}).catch(` added later in main.ts cannot satisfy the pin
+    // with the attach's own catch removed; and the handler must LOG, not
+    // swallow, so the warn line is pinned too.
+    expect(main).toMatch(/attachWocMarketExchange\(\{[^;]*?\}\)\.catch\(/);
+    expect(main).toContain("console.warn('[woc] exchange attach failed'");
+    // The desktop signer arm is wired from the live handoff availability
+    // probe at the attach site; a dropped wire would strand website desktop
+    // on the in-renderer wallet, which throws at first sign there.
+    expect(main).toMatch(
+      /desktopAuthorize: desktopWalletBrowserHandoffAvailable\(\)\s*\?\s*authorizeWocMarketDesktopHandoff\s*:\s*null/,
+    );
     // The pieces the module now owns must not creep back into the coordinator:
     // the client construction, the direct hook attach, and the shell gate.
     expect(main).not.toContain('WocMarketClient');

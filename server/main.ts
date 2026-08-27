@@ -213,6 +213,7 @@ import {
   handleDesktopLoginExchange,
   issueDesktopLoginCode,
 } from './desktop_login';
+import { desktopWalletHandoffs } from './desktop_wallet_handoff';
 import {
   configureDiscordRuntime,
   handleDiscordCallback,
@@ -2890,6 +2891,9 @@ const wocMarketService = new WocMarketService({
   // The step-up devsig arm rides the SAME double-gated switch as the dev
   // economy: impossible to reach in production, and one truth for "dev".
   stepUpDevSig: wocMarketDevService,
+  // Desktop browser-signing: quotes and step-up challenges pre-register in
+  // the process handoff store so /api/desktop-wallet/create can mint them.
+  desktopHandoff: desktopWalletHandoffs,
   custody: createWocMarketCustody(
     {
       get sim() {

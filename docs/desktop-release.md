@@ -39,7 +39,11 @@ entirely (the stamp is final), so a local env var cannot steer an installed app 
 another API, login page, updater state, or crash endpoint. The updater runs only
 for a PACKAGED WEBSITE build; there is deliberately no way to force it on in a
 Steam or Epic build. To try a channel unpacked, set
-`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`.
+`WOC_DISTRIBUTION=website|steam|epic` on `npm run electron:dev`. That env opt-in
+is also what makes the $WOC Exchange visible in the dev shell: the Exchange gate
+requires an explicit website verdict even on unpackaged checkouts
+(`wocExchangeSupported` in `electron/desktop_config.cjs`), so without
+`WOC_DISTRIBUTION=website` the dev shell shows no Exchange launcher.
 
 Update tracks (prod/dev split): the publish channel is derived from the baked
 `apiOrigin` by one rule shared between build and runtime
@@ -664,7 +668,13 @@ product exist. Coding and merge stay dark-safe without those credentials.
    an absent or unknown stamp behaves like a store build (the wallet-connect
    and updater gates read the collapsed channel and are unchanged). On the
    website channel the launcher appears one IPC round trip after world entry,
-   so give it a beat before calling it missing.
+   so give it a beat before calling it missing. The shell startup banner logs
+   `wocExchangeEnabled` per channel, so the log alone answers this step (on an
+   unstamped build `distribution` collapses to website while
+   `wocExchangeEnabled` correctly says false). Also smoke one signature on the
+   website channel: starting a listing (or paying a bond) must hand off to the
+   default browser for the wallet signature and complete on return, the same
+   handoff the Claudium checkout uses.
 7. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded

@@ -267,7 +267,12 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // mainSide so a commented-out verdict line cannot satisfy the pin.
     const start = mainSide.indexOf("ipcMain.handle('desktop-exchange-capability'");
     expect(start).toBeGreaterThan(-1);
-    const body = mainSide.slice(start, mainSide.indexOf('\n});', start));
+    const end = mainSide.indexOf('\n});', start);
+    // An unfound close would make the slice run to end-of-file, letting the
+    // pins below be satisfied by later handlers' text (the show-notification
+    // pin carries the same guard for the same reason).
+    expect(end).toBeGreaterThan(start);
+    const body = mainSide.slice(start, end);
     expect(body).toContain('if (!trustedSender(event)) return false;');
     expect(body).toContain('return desktopConfig.wocExchangeEnabled === true;');
     // And the preload method must invoke THIS channel, not a sibling

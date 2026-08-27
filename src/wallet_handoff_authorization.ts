@@ -2,7 +2,8 @@ import type { BrowserWalletSession } from './net/wallet_handoff_browser';
 
 export type WalletHandoffClaim =
   | { kind: 'link'; address?: string; nonce?: string; message?: string }
-  | { kind: 'transaction'; transactionBase64: string; expectedAddress: string };
+  | { kind: 'transaction'; transactionBase64: string; expectedAddress: string }
+  | { kind: 'stepup'; message: string; expectedAddress: string };
 
 export type WalletHandoffPost = (path: string, body: Record<string, unknown>) => Promise<unknown>;
 
@@ -37,7 +38,20 @@ export async function authorizeWalletHandoff(input: {
     return;
   }
 
+  // Transaction and step-up both bind to the linked wallet the server
+  // registered; the signable bytes/message came from the CLAIM (the server's
+  // own store), never from the desktop renderer.
   if (wallet.address !== claim.expectedAddress) throw new Error('wallet does not match');
+  if (claim.kind === 'stepup') {
+    const signature = await wallet.signMessage(claim.message);
+    await post('/api/desktop-wallet/complete', {
+      code,
+      kind: 'stepup',
+      address: wallet.address,
+      signature,
+    });
+    return;
+  }
   const signature = await wallet.signAndSendTransaction(claim.transactionBase64);
   await post('/api/desktop-wallet/complete', {
     code,

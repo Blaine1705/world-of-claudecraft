@@ -12,6 +12,10 @@
 // staying injectable so the gate is unit-testable without a Capacitor or
 // Electron host.
 import { DESKTOP_APP, NATIVE_APP } from '../client_origin';
+import type {
+  DesktopWalletBrowserAction,
+  DesktopWalletBrowserResult,
+} from '../net/desktop_wallet_handoff';
 import { WocMarketClient } from '../net/woc_market_sdk';
 import { desktopBridge } from '../runtime';
 import type { WocMarketHooks } from '../ui/woc_market_window';
@@ -40,6 +44,14 @@ export interface WocMarketWiringDeps {
       signAndSendTransactionBase64(transactionBase64: string): Promise<string>;
       signMessageBase58(message: string): Promise<string>;
     }>;
+    /** The desktop shell's external-browser wallet signer (main.ts wires it
+     *  from the live handoff bridge), or null outside the desktop shell. When
+     *  present it REPLACES the in-renderer wallet for both Exchange signers:
+     *  the desktop shell never has an in-renderer wallet selected, so the
+     *  `load()` arm there would always throw at sign time. */
+    desktopAuthorize:
+      | ((action: DesktopWalletBrowserAction) => Promise<DesktopWalletBrowserResult>)
+      | null;
   };
 }
 
@@ -72,11 +84,38 @@ export async function attachWocMarketExchange(
     client: new WocMarketClient({ token: () => api.token, base: api.base }),
     characterId: () => online.characterId,
     walletLinked: () => wallet.linkedPubkey() !== null,
-    signAndSendTransactionBase64: async (transactionBase64) =>
-      (await wallet.load()).signAndSendTransactionBase64(transactionBase64),
-    // The step-up prompt's signer (B6/R1): same lazy bridge, loaded on first
-    // sign, so attaching the Exchange still costs no wallet code.
-    signMessageBase58: async (message) => (await wallet.load()).signMessageBase58(message),
+    // Both signers: the desktop shell rides the external-browser handoff (the
+    // server resolves the signable bytes from its own registered quote or
+    // step-up challenge, never from these arguments); browser web keeps the
+    // in-renderer wallet, loaded lazily on first sign so attaching the
+    // Exchange still costs no wallet code. The throw strings here are
+    // classified by src/ui/wallet_bridge_reason_text.ts, keep them stable.
+    signAndSendTransactionBase64: async (transactionBase64, reference) => {
+      const authorize = wallet.desktopAuthorize;
+      if (!authorize) return (await wallet.load()).signAndSendTransactionBase64(transactionBase64);
+      const expectedAddress = wallet.linkedPubkey();
+      if (!expectedAddress) throw new Error('connect a wallet first');
+      if (!reference) throw new Error('server returned an invalid wallet authorization');
+      const result = await authorize({ kind: 'transaction', reference, expectedAddress });
+      if (result.kind !== 'transaction') {
+        throw new Error('wallet returned an invalid transaction authorization');
+      }
+      return result.signature;
+    },
+    // The step-up prompt's signer (B6/R1): the desktop arm sends only the
+    // challenge NONCE (the server resolves the stored message it issued).
+    signMessageBase58: async (message, stepUpNonce) => {
+      const authorize = wallet.desktopAuthorize;
+      if (!authorize) return (await wallet.load()).signMessageBase58(message);
+      const expectedAddress = wallet.linkedPubkey();
+      if (!expectedAddress) throw new Error('connect a wallet first');
+      if (!stepUpNonce) throw new Error('server returned an invalid wallet authorization');
+      const result = await authorize({ kind: 'stepup', nonce: stepUpNonce, expectedAddress });
+      if (result.kind !== 'stepup') {
+        throw new Error('wallet returned an invalid step-up authorization');
+      }
+      return result.signature;
+    },
   });
   return true;
 }

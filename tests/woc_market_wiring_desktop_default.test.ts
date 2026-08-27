@@ -49,6 +49,7 @@ function makeDeps() {
           signAndSendTransactionBase64: async () => 'sig',
           signMessageBase58: async () => 'msgsig',
         }),
+        desktopAuthorize: null,
       },
     },
   };

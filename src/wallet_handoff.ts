@@ -68,7 +68,11 @@ function renderWallets(): void {
       `<p class="wallet-handoff-eyebrow">${escapeHtml(t('wallet.browser.eyebrow'))}</p>` +
       `<h1>${escapeHtml(t('wallet.browser.title'))}</h1>` +
       `<p>${escapeHtml(
-        claim.kind === 'link' ? t('wallet.browser.linkBody') : t('wallet.browser.paymentBody'),
+        claim.kind === 'link'
+          ? t('wallet.browser.linkBody')
+          : claim.kind === 'stepup'
+            ? t('wallet.browser.stepUpBody')
+            : t('wallet.browser.paymentBody'),
       )}</p>` +
       `<div class="wallet-handoff-options">${buttons}</div>` +
       (wallets.length === 0

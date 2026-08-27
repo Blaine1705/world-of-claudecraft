@@ -14,13 +14,25 @@ export interface DesktopWalletTransactionAuthorization {
   expiresAtMs: number;
 }
 
+/** A step-up challenge the woc-market issuer pre-registered for the desktop
+ *  browser-signing path: the browser signs the SERVER-STORED message resolved
+ *  by nonce, never renderer-supplied text (the transaction stance). */
+export interface DesktopWalletStepUpAuthorization {
+  nonce: string;
+  message: string;
+  expectedAddress: string;
+  expiresAtMs: number;
+}
+
 export type DesktopWalletHandoffAction =
   | { kind: 'link' }
-  | ({ kind: 'transaction' } & Omit<DesktopWalletTransactionAuthorization, 'expiresAtMs'>);
+  | ({ kind: 'transaction' } & Omit<DesktopWalletTransactionAuthorization, 'expiresAtMs'>)
+  | ({ kind: 'stepup' } & Omit<DesktopWalletStepUpAuthorization, 'expiresAtMs'>);
 
 export type DesktopWalletHandoffResult =
   | { kind: 'link'; address: string; nonce: string; signature: string }
-  | { kind: 'transaction'; address: string; signature: string };
+  | { kind: 'transaction'; address: string; signature: string }
+  | { kind: 'stepup'; address: string; signature: string };
 
 export type DesktopWalletHandoffStatus =
   | { status: 'missing' }
@@ -61,6 +73,12 @@ export interface DesktopWalletHandoffStore {
     ip: string,
     request: { reference: string; expectedAddress: string },
   ): HandoffCreated;
+  authorizeStepUp(accountId: number, authorization: DesktopWalletStepUpAuthorization): void;
+  createStepUp(
+    accountId: number,
+    ip: string,
+    request: { nonce: string; expectedAddress: string },
+  ): HandoffCreated;
   claim(code: unknown, ip: string): DesktopWalletHandoffAction;
   claimLink(
     code: unknown,
@@ -85,6 +103,12 @@ interface AuthorizedTransaction extends DesktopWalletTransactionAuthorization {
   accountId: number;
 }
 
+interface AuthorizedStepUp extends DesktopWalletStepUpAuthorization {
+  accountId: number;
+}
+
+const STEPUP_NONCE = /^[0-9a-f]{32}$/;
+
 function encodeBase64Url(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString('base64url');
 }
@@ -106,9 +130,11 @@ export function createDesktopWalletHandoffStore(
   const randomBytes = options.randomBytes ?? nodeRandomBytes;
   const entries = new Map<string, HandoffEntry>();
   const authorizedTransactions = new Map<string, AuthorizedTransaction>();
+  const authorizedStepUps = new Map<string, AuthorizedStepUp>();
 
   const transactionKey = (accountId: number, reference: string): string =>
     `${accountId}:${reference}`;
+  const stepUpKey = (accountId: number, nonce: string): string => `${accountId}:${nonce}`;
 
   const prune = (): void => {
     const currentTime = now();
@@ -117,6 +143,9 @@ export function createDesktopWalletHandoffStore(
     }
     for (const [key, authorization] of authorizedTransactions) {
       if (authorization.expiresAtMs <= currentTime) authorizedTransactions.delete(key);
+    }
+    for (const [key, authorization] of authorizedStepUps) {
+      if (authorization.expiresAtMs <= currentTime) authorizedStepUps.delete(key);
     }
   };
 
@@ -215,6 +244,50 @@ export function createDesktopWalletHandoffStore(
       );
     },
 
+    authorizeStepUp(accountId, authorization) {
+      prune();
+      if (authorizedStepUps.size >= MAX_ACTIVE_HANDOFFS) {
+        throw handoffError('too many active wallet handoffs');
+      }
+      if (
+        !STEPUP_NONCE.test(authorization.nonce) ||
+        !authorization.message ||
+        authorization.message.length > 8_192 ||
+        !authorization.expectedAddress ||
+        !Number.isFinite(authorization.expiresAtMs) ||
+        authorization.expiresAtMs <= now()
+      ) {
+        throw handoffError('invalid step-up authorization');
+      }
+      authorizedStepUps.set(stepUpKey(accountId, authorization.nonce), {
+        accountId,
+        ...authorization,
+      });
+    },
+
+    createStepUp(accountId, ip, request) {
+      prune();
+      const authorization = authorizedStepUps.get(stepUpKey(accountId, request.nonce));
+      if (
+        !authorization ||
+        authorization.expectedAddress !== request.expectedAddress ||
+        authorization.expiresAtMs <= now()
+      ) {
+        throw handoffError('step-up is not backed by an issued Exchange challenge');
+      }
+      return createEntry(
+        accountId,
+        ip,
+        {
+          kind: 'stepup',
+          nonce: authorization.nonce,
+          message: authorization.message,
+          expectedAddress: authorization.expectedAddress,
+        },
+        authorization.expiresAtMs,
+      );
+    },
+
     claim(code, ip) {
       const entry = browserEntry(code, ip);
       if (entry.result) throw handoffError('wallet handoff is already complete');
@@ -264,7 +337,9 @@ export function createDesktopWalletHandoffStore(
           throw handoffError('wallet handoff link challenge mismatch');
         }
       } else {
-        if (entry.action.kind !== 'transaction') {
+        // 'transaction' and 'stepup' both bind the completing wallet to the
+        // expected (linked) address the authorization was registered with.
+        if (entry.action.kind !== 'transaction' && entry.action.kind !== 'stepup') {
           throw handoffError('wallet handoff action mismatch');
         }
         if (entry.action.expectedAddress !== result.address) {
@@ -286,6 +361,7 @@ export function createDesktopWalletHandoffStore(
     clear() {
       entries.clear();
       authorizedTransactions.clear();
+      authorizedStepUps.clear();
     },
   };
 }

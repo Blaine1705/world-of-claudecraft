@@ -1301,6 +1301,10 @@ app.whenReady().then(() => {
     distribution: desktopConfig.distribution,
     updaterEnabled: desktopConfig.updaterEnabled,
     updateChannel: desktopConfig.updateChannel,
+    // Logged so the per-channel release smoke (docs/desktop-release.md step 6)
+    // has a field to read; on an unstamped packaged build `distribution` says
+    // website (the channel collapse) while this correctly says false.
+    wocExchangeEnabled: desktopConfig.wocExchangeEnabled,
     crashUpload: desktopConfig.crashSubmitUrl !== '',
     crashDumpDir: app.getPath('crashDumps'),
     logFile: logFilePath,
