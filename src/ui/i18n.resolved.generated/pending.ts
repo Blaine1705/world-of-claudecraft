@@ -16,7 +16,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "es_ES": [
     "hudChrome.controller.reticleSpeed",
@@ -25,7 +26,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "fr_FR": [
     "hudChrome.controller.reticleSpeed",
@@ -34,7 +36,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "fr_CA": [
     "hudChrome.controller.reticleSpeed",
@@ -43,7 +46,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "en_CA": [],
   "it_IT": [
@@ -53,7 +57,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "de_DE": [
     "hudChrome.controller.reticleSpeed",
@@ -62,7 +67,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "zh_CN": [
     "hudChrome.wocMarket.walletUsdBalance"
@@ -83,7 +89,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "ru_RU": [
     "hudChrome.wocMarket.walletUsdBalance"
@@ -95,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "nl_NL": [
     "hudChrome.controller.reticleSpeed",
@@ -104,7 +112,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "pl_PL": [
     "hudChrome.controller.reticleSpeed",
@@ -113,7 +122,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "id_ID": [
     "hudChrome.controller.reticleSpeed",
@@ -122,7 +132,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "tr_TR": [
     "hudChrome.controller.reticleSpeed",
@@ -131,7 +142,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "sv_SE": [
     "hudChrome.controller.reticleSpeed",
@@ -140,7 +152,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "vi_VN": [
     "hudChrome.controller.reticleSpeed",
@@ -149,7 +162,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "da_DK": [
     "hudChrome.controller.reticleSpeed",
@@ -158,6 +172,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ]
 };
