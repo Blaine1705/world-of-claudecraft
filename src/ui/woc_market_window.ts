@@ -49,7 +49,6 @@ import {
   walletBridgeReason,
   walletBridgeReasonText,
 } from './wallet_bridge_reason_text';
-import type { WalletConnectionKind } from './wallet_connection_view';
 import { overWalletBalance } from './woc_affordable_core';
 import { wocActivityHtml } from './woc_market_activity_html';
 import {
@@ -66,6 +65,7 @@ import {
   wocSellEmptyHtml,
   wocSellerPaneHtml,
   wocSpinnerHtml,
+  wocWalletCardSig,
 } from './woc_market_chrome';
 import { anyBondAwaitingChain, shouldPollWocMarket } from './woc_market_poll_core';
 import {
@@ -112,11 +112,10 @@ export interface WocMarketWindowDeps {
   hooks(): WocMarketHooks | null;
   closeOthers(): void;
   hideTooltip(): void;
-  /** Open the shared wallet connect flow (the woc:wallet-verify event the
-   *  store, bags and daily rewards buttons dispatch): the unlinked-wallet
-   *  banner's shortcut, so the window never says 'link a wallet' without a
-   *  way to do it right there. */
+  /** Open the shared wallet connect flow, giving the unlinked-wallet banner a
+   *  direct path to link through the same event as the other wallet surfaces. */
   openWallet(): void;
+  refreshWocBalance(): void;
   /** The shared hover/focus tooltip binder (Hud.attachTooltip). It owns the
    *  positioning and the only forced-reflow reads involved, which is what keeps
    *  this cold window's no-layout-read contract intact. */
@@ -289,12 +288,10 @@ export class WocMarketWindow {
    *  because the detail's estimate covers the current bid, not the buy-now. */
   private buyNowTokens: number | null = null;
 
-  /** The VERIFIED wallet's balance: the account-linked wallet is the one that
-   *  will actually pay, so a merely-connected figure would gate the wrong one. */
   private walletTokens(): number | null {
     return verifiedWocBalance();
   }
-  private paintedWalletKind: WalletConnectionKind | null = null;
+  private paintedWalletSig = '';
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   /** Bumped every time a mutation starts AND every time the window closes. A
@@ -343,6 +340,7 @@ export class WocMarketWindow {
     this.opener = this.deps.captureFocus();
     this.deps.closeOthers();
     this.deps.root().style.display = 'flex';
+    this.deps.refreshWocBalance();
     void this.reload();
   }
 
@@ -586,11 +584,9 @@ export class WocMarketWindow {
     this.render();
   }
 
-  /** Wallet fan-out arm (Hud's onWalletUiChange, the Claudium panel's twin): the
-   *  card is module state the view digest never sees, so a connect repaints here.
-   *  Gated on the card's own state, so a balance tick alone rebuilds nothing. */
+  /** Wallet fan-out arm: the card is module state the view digest never sees. */
   onWalletChanged(): void {
-    if (walletConnectionView().kind === this.paintedWalletKind) return;
+    if (wocWalletCardSig(walletConnectionView()) === this.paintedWalletSig) return;
     this.relocalize();
   }
 
@@ -841,10 +837,13 @@ export class WocMarketWindow {
     // The standing banners and the footer are chrome builders (the pure-core
     // split); the window resolves its own state (notice sentence, busy label)
     // and the builders own the markup.
-    // The wallet card is shared connection state, not model state: onWalletChanged() repaints it.
     const wallet = walletConnectionView();
-    this.paintedWalletKind = wallet.kind;
-    const bannerStrip = wocMarketBannersHtml({ paused: model.paused, wallet });
+    this.paintedWalletSig = wocWalletCardSig(wallet);
+    const bannerStrip = wocMarketBannersHtml({
+      paused: model.paused,
+      wallet,
+      tokensPerUsd: model.tokensPerUsd,
+    });
     const foot = wocMarketFootHtml({
       paused: model.paused,
       tokensPerUsd: model.tokensPerUsd,

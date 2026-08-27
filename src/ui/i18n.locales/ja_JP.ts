@@ -8936,6 +8936,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletBanner':
     'ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。',
   'hudChrome.wocMarket.walletBannerCta': 'ウォレットを接続',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    '公開アドレスはリンク済みです。$WOC で支払う際は、そのウォレットアプリに再接続してください。',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。',
   'hudChrome.wocMarket.rateNote': 'レート: {time} 時点で 1 USD あたり約 {tokens} $WOC。',
   'hudChrome.wocMarket.estimateNote': '{usd} は現在のレートで約 {tokens} $WOC です。',
   'hudChrome.wocMarket.browseEmpty': '現在出品はありません。また後で確認してください。',

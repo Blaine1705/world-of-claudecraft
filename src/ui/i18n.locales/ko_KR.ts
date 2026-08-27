@@ -8903,6 +8903,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletBanner':
     '지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.',
   'hudChrome.wocMarket.walletBannerCta': '지갑 연결',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    '공개 주소가 연결되어 있습니다. $WOC로 결제하려면 해당 지갑 앱을 다시 연결하세요.',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    '연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.',
   'hudChrome.wocMarket.rateNote': '환율: {time} 기준 1 USD당 약 {tokens} $WOC.',
   'hudChrome.wocMarket.estimateNote': '{usd}는 현재 환율로 약 {tokens} $WOC입니다.',
   'hudChrome.wocMarket.browseEmpty': '지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.',

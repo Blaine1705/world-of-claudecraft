@@ -9,25 +9,95 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "es_ES": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "fr_FR": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "fr_CA": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "de_DE": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "zh_CN": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "zh_TW": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "ko_KR": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "ja_JP": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "pt_BR": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "ru_RU": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "cs_CZ": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "nl_NL": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "pl_PL": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "id_ID": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "tr_TR": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "sv_SE": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "vi_VN": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "da_DK": [
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance"
+  ]
 };

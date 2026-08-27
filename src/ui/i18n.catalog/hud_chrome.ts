@@ -5605,6 +5605,10 @@ export const hudChromeStrings = {
     // woc:wallet-verify event the store and daily rewards buttons dispatch),
     // so an unlinked player is never told to link with nowhere to do it.
     walletBannerCta: 'Connect wallet',
+    walletLinkedDisconnected:
+      'Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.',
+    walletLinkedConnected: 'Your linked wallet app is connected and ready for $WOC purchases.',
+    walletUsdBalance: '{amount} USD',
     // The rate is per ONE dollar, said outright: 'per USD' read as a unit
     // label and players asked per how many.
     rateNote: 'Rate: about {tokens} $WOC per $1.00 USD as of {time}.',
