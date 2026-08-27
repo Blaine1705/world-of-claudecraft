@@ -70,6 +70,7 @@ import {
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
 import { dungeonBannerKind, hangsKitBanners, pickKind } from './dungeon_banner_core';
+import { addTorchFire, type TorchFireTuning } from './dungeon_torch_rig';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
@@ -577,7 +578,6 @@ export function scaleUv(geo: THREE.BufferGeometry, su: number, sv: number): THRE
 }
 
 export class DungeonInteriors {
-  private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
   /**
    * Every tinted grade of a pack material, keyed `${pack}:${tint}`: the marsh
@@ -878,7 +878,12 @@ export class DungeonInteriors {
         if (interior === 'ignivar') {
           group.add(buildIgnivarArenaAtmosphere({ lowGfx: this.lowGfx }));
         }
-        const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx);
+        const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx, {
+          flames: this.flames,
+          fireLights: this.fireLights,
+          colors: TORCH_COLORS[variant],
+          tuning: this.torchFireTuning(),
+        });
         if (raidDressing) group.add(raidDressing);
         if (arenaWalls) {
           for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
@@ -2155,34 +2160,26 @@ export class DungeonInteriors {
     const dir = pt.x < 0 ? 1 : -1; // toward the centre aisle
     const mountX = pt.x + dir * (0.98 + extraOffset);
     p.add('torch_mounted', mountX, 5.5, pt.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 1.6);
-
-    this.flameGeo ??= markSharedGeometry(new THREE.ConeGeometry(0.22, 0.6, 6));
-    const flame = new THREE.Mesh(
-      this.flameGeo,
-      new THREE.MeshLambertMaterial({
-        color: colors.flame,
-        emissive: colors.emissive,
-        emissiveIntensity: this.lowGfx ? 1.6 : FLAME_EMISSIVE_HIGH,
-        transparent: true,
-        opacity: 0.92,
-      }),
+    addTorchFire(
+      { group, flames: this.flames, fireLights: this.fireLights },
+      {
+        flame: [pt.x + dir * (1.7 + extraOffset), 6.6, pt.z],
+        light: [pt.x + dir * (1.2 + extraOffset), this.lowGfx ? 8.2 : DUNGEON_LIGHT_Y, pt.z],
+        colors,
+        tuning: this.torchFireTuning(),
+        glowAt: [pt.x + dir * (1.7 + extraOffset), pt.z],
+      },
     );
-    flame.position.set(pt.x + dir * (1.7 + extraOffset), 6.6, pt.z);
-    group.add(flame);
-    this.flames.push(flame);
+  }
 
-    const light = new THREE.PointLight(
-      colors.light,
-      10,
-      this.lowGfx ? 22 : DUNGEON_LIGHT_DISTANCE,
-      2,
-    );
-    if (!this.lowGfx) light.userData.baseIntensity = DUNGEON_LIGHT_INTENSITY;
-    light.position.set(pt.x + dir * (1.2 + extraOffset), this.lowGfx ? 8.2 : DUNGEON_LIGHT_Y, pt.z);
-    group.add(light);
-    this.fireLights.push(light);
-
-    this.addTorchGlow(group, pt.x + dir * (1.7 + extraOffset), pt.z, colors.light);
+  /** The tier arms addTorchFire keeps verbatim from the pillar torches. */
+  private torchFireTuning(): TorchFireTuning {
+    return {
+      flameEmissive: this.lowGfx ? 1.6 : FLAME_EMISSIVE_HIGH,
+      lightDistance: this.lowGfx ? 22 : DUNGEON_LIGHT_DISTANCE,
+      lightBaseIntensity: this.lowGfx ? undefined : DUNGEON_LIGHT_INTENSITY,
+      glow: !this.lowGfx,
+    };
   }
 
   // Additive light-pool decal under a torch: the point-light budget only keeps

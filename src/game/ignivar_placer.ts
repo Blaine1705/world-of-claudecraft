@@ -7,6 +7,7 @@
 // instance-local records used to bake the authored plan
 // (ignivar_dressing_plan_core.ts).
 import * as THREE from 'three';
+import { addIgnivarPlacedTorchFires } from '../render/dungeon_torch_rig';
 import {
   IGNIVAR_PROP_NATIVE,
   type IgnivarEnvPropKey,
@@ -177,7 +178,17 @@ function rebuildGroup(): void {
   }
   state.group.position.set(room.ox, 0, OZ);
   state.group.clear();
-  appendIgnivarEnvProps(state.group, state.entries.map(toPlacement), false);
+  const placements = state.entries.map(toPlacement);
+  appendIgnivarEnvProps(state.group, placements, false);
+  // Live fire preview for placed torches so lighting can be judged while
+  // placing. Preview lights bypass the renderer's fire-light budget (throwaway
+  // sink arrays), which is fine for a dev tool with a handful of torches.
+  addIgnivarPlacedTorchFires(
+    { group: state.group, flames: [], fireLights: [] },
+    placements,
+    { flame: 0xffd06a, emissive: 0xe05a16, light: 0xff7a2e },
+    { flameEmissive: 3.2, lightDistance: 34, glow: true },
+  );
   const selected = state.entries[state.selected];
   if (selected) {
     if (!state.marker) {

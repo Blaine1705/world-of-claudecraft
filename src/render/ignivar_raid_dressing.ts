@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import type { DungeonLayout } from '../sim/dungeon_layout';
 import { VARKHUL_FORGE_LOCAL_POS } from '../sim/encounters/varkhul';
+import {
+  addIgnivarPlacedTorchFires,
+  type TorchFireColors,
+  type TorchFireTuning,
+} from './dungeon_torch_rig';
 import { surfaceMat } from './gfx';
 import {
   filterIgnivarPropPlacements,
@@ -11,6 +16,7 @@ import {
   ignivarCruciblePropPlan,
 } from './ignivar_dressing_plan_core';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
+import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { addTorchGlowDecal } from './torch_glow_decal';
 
@@ -179,15 +185,45 @@ function buildInnerCrucibleDressing(
   return group;
 }
 
+export interface IgnivarTorchFire {
+  flames: THREE.Mesh[];
+  fireLights: FireLightSink;
+  colors: TorchFireColors;
+  tuning: TorchFireTuning;
+}
+
+function ignivarRoomPropPlan(interior: string, layout: DungeonLayout): IgnivarPropPlacement[] {
+  if (interior === 'ignivar_approach') return ignivarApproachPropPlan(layout);
+  if (interior === 'ignivar') return ignivarArenaPropPlan(layout);
+  if (interior === 'ignivar_depths') return ignivarCruciblePropPlan(layout);
+  return [];
+}
+
 export function buildIgnivarRaidDressing(
   interior: string,
   layout: DungeonLayout,
   lowGfx: boolean,
+  torchFire?: IgnivarTorchFire,
 ): THREE.Group | null {
-  if (interior === 'ignivar_approach') return buildForgeApproachDressing(layout, lowGfx);
-  if (interior === 'ignivar') return buildCrucibleArenaDressing(layout, lowGfx);
-  if (interior === 'ignivar_depths') return buildInnerCrucibleDressing(layout, lowGfx);
-  return null;
+  const group =
+    interior === 'ignivar_approach'
+      ? buildForgeApproachDressing(layout, lowGfx)
+      : interior === 'ignivar'
+        ? buildCrucibleArenaDressing(layout, lowGfx)
+        : interior === 'ignivar_depths'
+          ? buildInnerCrucibleDressing(layout, lowGfx)
+          : null;
+  if (group && torchFire) {
+    // Fire for the plan's placed torches, on the same tier filtering the
+    // meshes get so a dropped density torch never leaves an orphan flame.
+    addIgnivarPlacedTorchFires(
+      { group, flames: torchFire.flames, fireLights: torchFire.fireLights },
+      filterIgnivarPropPlacements(ignivarRoomPropPlan(interior, layout), lowGfx),
+      torchFire.colors,
+      torchFire.tuning,
+    );
+  }
+  return group;
 }
 
 export const ignivarRaidDressingInternalsForTest = {

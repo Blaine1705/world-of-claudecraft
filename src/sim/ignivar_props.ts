@@ -43,7 +43,8 @@ export type IgnivarEnvPropKey =
   | 'radiator'
   | 'steam_machine'
   | 'steam_machine_round'
-  | 'steam_pipes';
+  | 'steam_pipes'
+  | 'torch';
 
 export interface IgnivarPropPlacement {
   key: IgnivarEnvPropKey;
@@ -100,6 +101,7 @@ export const IGNIVAR_PROP_NATIVE: Record<
   steam_machine: { len: 0.65, hei: 1.0, dep: 0.48 },
   steam_machine_round: { len: 0.51, hei: 1.0, dep: 0.47 },
   steam_pipes: { len: 0.63, hei: 1.0, dep: 0.2 },
+  torch: { len: 0.62, hei: 1.06, dep: 0.55 },
 };
 
 /** The raid rooms build at the double-height wall course. */
@@ -216,6 +218,7 @@ const NON_COLLIDING: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'hanging_hook',
   'lava_channel',
   'lava_channel_curved',
+  'torch',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and

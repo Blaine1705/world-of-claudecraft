@@ -427,7 +427,7 @@ const MONOLITHS: MonolithRow[] = [
     // pillar-swap gate; then again after the banner picking moved to
     // dungeon_banner_core.ts (paying for the ignivar banner suppression
     // gates and the torch-tuck fix). Exact count, zero slack.
-    ceiling: 2718,
+    ceiling: 2715,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];

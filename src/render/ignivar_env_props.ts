@@ -47,6 +47,9 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   steam_machine: '/models/dungeon/ignivar_prop_steam_machine.glb',
   steam_machine_round: '/models/dungeon/ignivar_prop_steam_machine_round.glb',
   steam_pipes: '/models/dungeon/ignivar_prop_steam_pipes.glb',
+  // The dungeon kit's own sconce, shared verbatim: the placed-torch fire
+  // (flame, light, floor pool) rides dungeon_torch_rig.ts per placement.
+  torch: '/models/dungeon/torch_mounted.glb',
 };
 
 /** Props whose silhouette earns a shadow; density props (beams, chains,
