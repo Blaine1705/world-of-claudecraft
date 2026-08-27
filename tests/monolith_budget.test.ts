@@ -233,11 +233,11 @@ const MONOLITHS: MonolithRow[] = [
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
     // the raid consolidation moved the raid readout getter bodies (ignivar_raid_readouts.ts) plus the same-family ground-AoE and partyInfo projections out; exact count.
-    // Re-pinned 12473 -> 12450 for the PR 3684 raid restoration: the authored
+    // Re-pinned 12473 -> 12451 for the PR 3684 raid restoration: the authored
     // pack-aggro call paid for itself by moving the legacy same-template
-    // social pull (and its per-family radius table) to mob/dungeon_pack_aggro.ts.
+    // social pull (and its per-family radius table) to mob/social_aggro.ts.
     // Exact count.
-    ceiling: 12450,
+    ceiling: 12451,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

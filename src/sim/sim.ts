@@ -318,7 +318,7 @@ import {
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
-import { aggroDungeonPackmates, socialPullSameTemplate } from './mob/dungeon_pack_aggro';
+import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
@@ -336,6 +336,7 @@ import {
   type MobScanCounters,
   resetMobScanCounters,
 } from './mob/scan_counters';
+import { socialPullSameTemplate } from './mob/social_aggro';
 import {
   retargetMob as retargetMobFn,
   updateMobTarget as updateMobTargetFn,
@@ -923,7 +924,7 @@ export { DELVE_IMPLEMENTED_AFFIXES, DELVE_MODULE_NAMES } from './delves/runs';
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 // STEEP_SLIDE_SPEED moved to player_motion.ts (MV1; movement-kernel-only).
 
-// SOCIAL_PULL_RADIUS moved to mob/dungeon_pack_aggro.ts with socialPullSameTemplate.
+// SOCIAL_PULL_RADIUS moved to mob/social_aggro.ts with socialPullSameTemplate.
 // POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
@@ -7916,7 +7917,7 @@ export class Sim {
     // the non-social aggro path used by taunts. Keep this separate from the generic
     // same-template radius below: `social` only controls that legacy propagation.
     if (playerPull) aggroDungeonPackmates(this.entities.values(), mob, target);
-    if (social) socialPullSameTemplate(this.grid, mob, target);
+    if (social) socialPullSameTemplate(this.ctx, mob, target);
     return true;
   }
 
