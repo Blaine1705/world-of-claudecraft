@@ -72,6 +72,11 @@ const MONOLITHS: MonolithRow[] = [
     // window carries only state, handler arms and passthroughs. Exact
     // count, zero headroom; the sell-tab combobox block is the next
     // standing extraction candidate.
+    // Held at 2487 for the Solana wallet card (the Claudium card above the
+    // Browse filters): the card's markup landed in the chrome builder, and
+    // the window's gated wallet fan-out arm was paid for by moving the quote
+    // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
+    // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
     ceiling: 2487,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
@@ -125,6 +130,9 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
+    // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
+    // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
+    // Claudium panel's existing arm. Exact count.
     // Raised 18488 -> 18501 (+13) for the buff-bar priority/opt-out follow-up
     // to PR #3668 (player feedback): the alwaysShowAllBuffs field, its setter,
     // and buffBarFxTier() are Hud-owned coordinator state (a per-session flag
@@ -256,12 +264,12 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    // Raised 11566 -> 11569 (+3) for the alwaysShowAllBuffs case in
+    // Raised 11564 -> 11567 (+3) for the alwaysShowAllBuffs case in
     // applySetting's dispatch switch (PR #3668 follow-up): a single
     // settings-key case, the same 3-line shape every other boolToggle case in
     // this switch already takes; the switch itself IS the seam. Maintainer
     // decision, exact merged count.
-    ceiling: 11569,
+    ceiling: 11567,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

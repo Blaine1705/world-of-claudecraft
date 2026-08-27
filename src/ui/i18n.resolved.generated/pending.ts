@@ -16,7 +16,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "es_ES": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -25,7 +29,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "fr_FR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -34,7 +42,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "fr_CA": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -43,7 +55,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "en_CA": [],
   "it_IT": [
@@ -53,7 +69,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "de_DE": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -62,19 +82,27 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "zh_CN": [
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "zh_TW": [
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "ko_KR": [
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "ja_JP": [
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "pt_BR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -83,10 +111,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "ru_RU": [
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "cs_CZ": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -95,7 +128,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "nl_NL": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -104,7 +141,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "pl_PL": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -113,7 +154,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "id_ID": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -122,7 +167,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "tr_TR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -131,7 +180,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "sv_SE": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -140,7 +193,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "vi_VN": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -149,7 +206,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "da_DK": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -158,6 +219,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
     "hudChrome.plurals.buffsHidden.other",
-    "hudChrome.unitFrame.buffOverflowLabel"
+    "hudChrome.unitFrame.buffOverflowLabel",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ]
 };
