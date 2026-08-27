@@ -27,6 +27,13 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   forge: '/models/dungeon/ignivar_prop_forge.glb',
   chain: '/models/dungeon/ignivar_prop_chain.glb',
   chain_hanging: '/models/dungeon/ignivar_prop_chain_hanging.glb',
+  control_machine: '/models/dungeon/ignivar_prop_control_machine.glb',
+  furnace_small: '/models/dungeon/ignivar_prop_furnace_small.glb',
+  gear_pile: '/models/dungeon/ignivar_prop_gear_pile.glb',
+  lava_furnace: '/models/dungeon/ignivar_prop_lava_furnace.glb',
+  press_machine: '/models/dungeon/ignivar_prop_press_machine.glb',
+  shelf: '/models/dungeon/ignivar_prop_shelf.glb',
+  square_wall: '/models/dungeon/ignivar_prop_square_wall.glb',
 };
 
 /** Props whose silhouette earns a shadow; density props (beams, chains,
@@ -43,6 +50,11 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'lava_face',
   'forge',
   'anvil',
+  'control_machine',
+  'furnace_small',
+  'lava_furnace',
+  'press_machine',
+  'square_wall',
 ]);
 
 interface IgnivarEnvPropTemplate {

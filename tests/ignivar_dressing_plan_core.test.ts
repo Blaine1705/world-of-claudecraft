@@ -108,7 +108,7 @@ describe('ignivar dressing plan', () => {
       expect(bytes, `${url} exceeds the per-prop budget`).toBeLessThanOrEqual(400_000);
       total += bytes;
     }
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(3_900_000);
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(4_800_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

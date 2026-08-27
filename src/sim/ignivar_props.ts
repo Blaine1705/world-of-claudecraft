@@ -23,7 +23,14 @@ export type IgnivarEnvPropKey =
   | 'anvil'
   | 'forge'
   | 'chain'
-  | 'chain_hanging';
+  | 'chain_hanging'
+  | 'control_machine'
+  | 'furnace_small'
+  | 'gear_pile'
+  | 'lava_furnace'
+  | 'press_machine'
+  | 'shelf'
+  | 'square_wall';
 
 export interface IgnivarPropPlacement {
   key: IgnivarEnvPropKey;
@@ -60,6 +67,13 @@ export const IGNIVAR_PROP_NATIVE: Record<
   forge: { len: 0.99, hei: 1.0, dep: 0.71 },
   chain: { len: 0.12, hei: 1.0, dep: 0.11 },
   chain_hanging: { len: 0.14, hei: 1.0, dep: 0.1 },
+  control_machine: { len: 0.86, hei: 1.0, dep: 0.62 },
+  furnace_small: { len: 1.0, hei: 0.99, dep: 0.72 },
+  gear_pile: { len: 1.0, hei: 0.69, dep: 0.97 },
+  lava_furnace: { len: 0.6, hei: 1.0, dep: 0.32 },
+  press_machine: { len: 0.76, hei: 1.0, dep: 0.57 },
+  shelf: { len: 0.83, hei: 1.0, dep: 0.39 },
+  square_wall: { len: 0.99, hei: 1.0, dep: 0.2 },
 };
 
 /** The raid rooms build at the double-height wall course. */
@@ -176,6 +190,11 @@ export const IGNIVAR_PROP_COLLIDER_FOOTPRINT: Partial<Record<IgnivarEnvPropKey, 
   pillar_slim: 0.68,
   pillar_broad: 0.8,
   firepit: 0.85,
+  // The console's side pipe loops and the rack's hanging hooks widen the
+  // AABB past the solid body; the gear pile's skirt slopes off low.
+  control_machine: 0.8,
+  shelf: 0.75,
+  gear_pile: 0.85,
 };
 
 /** Full-height OBB colliders for every floor-standing dressing prop, in the

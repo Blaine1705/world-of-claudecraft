@@ -14,7 +14,10 @@
 // After this, run the mandatory KTX2 step + manifest regen:
 //   node scripts/assets/compress_glb_textures.mjs
 //   node scripts/build_media_manifest.mjs generate
-// Usage: node scripts/assets/build_ignivar_props.mjs
+// Usage: node scripts/assets/build_ignivar_props.mjs [name...]
+// With name arguments only those items rebuild (the shipped set stays
+// byte-identical; a full run reverts every prop to webp until the KTX2
+// step re-runs over all of them).
 import fs from 'node:fs';
 import path from 'node:path';
 import { NodeIO } from '@gltf-transform/core';
@@ -87,6 +90,20 @@ const ITEMS = [
   { src: '_Raid_Room/Forge.glb', name: 'forge', target: 16000, tex: 1024, emissive: 1.4 },
   { src: '_Roof/Chain.glb', name: 'chain', tex: 512, darken: 0.45 },
   { src: '_Roof/Chain_Hanging.glb', name: 'chain_hanging', tex: 512, darken: 0.45 },
+  // The New_Assets drop (2026-08-27) arrives pre-decimated (1k-3k tris), so
+  // no simplify targets: weld only, texture sizing and the emissive pass.
+  {
+    src: 'New_Assets/Control_Machine.glb',
+    name: 'control_machine',
+    tex: 1024,
+    emissive: 1.0,
+  },
+  { src: 'New_Assets/Furnace_Small.glb', name: 'furnace_small', tex: 1024, emissive: 1.4 },
+  { src: 'New_Assets/Gear+Pile.glb', name: 'gear_pile', tex: 512, emissive: 0.28 },
+  { src: 'New_Assets/Lava_Furnace.glb', name: 'lava_furnace', tex: 1024, emissive: 1.5 },
+  { src: 'New_Assets/Press+Machine.glb', name: 'press_machine', tex: 1024, emissive: 1.4 },
+  { src: 'New_Assets/Shelf.glb', name: 'shelf', tex: 1024, emissive: 0.28 },
+  { src: 'New_Assets/Square+Wall.glb', name: 'square_wall', tex: 1024, emissive: 0.28 },
 ];
 const SRC_DIR = 'tmp/asset_src/_IGNAR_Environment_Assets';
 const OUT_DIR = 'public/models/dungeon';
@@ -107,7 +124,12 @@ function countTris(doc) {
   return tris;
 }
 
+const only = process.argv.slice(2);
+const unknown = only.filter((name) => !ITEMS.some((item) => item.name === name));
+if (unknown.length) throw new Error(`unknown item name(s): ${unknown.join(', ')}`);
+
 for (const item of ITEMS) {
+  if (only.length && !only.includes(item.name)) continue;
   const doc = await io.read(path.join(SRC_DIR, item.src));
   const before = countTris(doc);
   if (item.target && item.target < before) {
