@@ -262,7 +262,7 @@ design targets for the tuning pass.
 | Chronoweave Handwraps (`chronoweave_gloves`) | gloves | 75 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 |
 | Chronoweave Leggings (`chronoweave_legs`) | legs | 95 | Int 11, Spi 11 | Healing Power 25 | haste 60, crit 25 |
 
-**Pyroclast Regalia** (`pyroclast`), fire (Pyromancy), cloth. 2 pieces: Cinderfall gains a second charge. Damage taken no longer delays your spellcasting. 4 pieces: A Pyrelance spent on Hot Streak leaves its Ignite burning 50% hotter.
+**Pyroclast Regalia** (`pyroclast`), fire (Pyromancy), cloth. 2 pieces: Phoenix Trance instantly refills every recharging Cinderfall charge instead of one. Damage taken no longer delays your spellcasting. 4 pieces: A Pyrelance spent on Hot Streak leaves its Ignite burning 50% hotter.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|

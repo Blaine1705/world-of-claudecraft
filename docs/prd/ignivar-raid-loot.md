@@ -608,7 +608,7 @@ at least matching the retired flat-stat package it replaces.
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
 | Chronoweave Vestments (chronoweave) | arcane, Chronomancy | Temporal Echo converts 50% of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. | While at 4 Arcane Charges, Aether Surge's chance to arm Aether Rush doubles to 50%. |
-| Pyroclast Regalia (pyroclast) | fire, Pyromancy | Cinderfall gains a second charge. Damage taken no longer delays your spellcasting. | A Pyrelance spent on Hot Streak leaves its Ignite burning 50% hotter. |
+| Pyroclast Regalia (pyroclast) | fire, Pyromancy | Phoenix Trance instantly refills every recharging Cinderfall charge instead of one. Damage taken no longer delays your spellcasting. | A Pyrelance spent on Hot Streak leaves its Ignite burning 50% hotter. |
 | Frostquench Weave (frostquench) | frost, Cryomancy | Rimelance critical strikes bank a second Icicle. Damage taken no longer delays your spellcasting. | Glacial Spike grants 2 Fingers of Frost, and an Ice Lance spent on Winter's Chill shaves 2 sec off Winterlash's cooldown. |
 
 **Warlock (cloth)**
