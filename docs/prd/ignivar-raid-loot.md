@@ -615,7 +615,7 @@ at least matching the retired flat-stat package it replaces.
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Hexthread Shroud (hexthread) | affliction, Hexcraft | Evil Eye lasts 30 sec. Damage taken no longer delays your spellcasting. | A Sentence passed at 80 or more Condemnation refunds 25, and each Fate Thread adds 8% to its damage. |
+| Hexthread Shroud (hexthread) | affliction, Hexcraft | Your Maledict Gaze strikes every 2 sec instead of every 2.5. Damage taken no longer delays your spellcasting. | A Sentence passed at 80 or more Condemnation refunds 25, and each Fate Thread adds 8% to its damage. |
 | Gravebrand Regalia (gravebrand) | demonology, Necromancy | Essence Reap creates a second Soul Fragment on critical strikes. Damage taken no longer delays your spellcasting. | Reaping Command costs 1 Soul Fragment, and detonating your Ossuary Mark grants 2 Soul Fragments. |
 | Ruincaller Vestments (ruincaller) | destruction, Ruination | Conflagrate gains a third charge. Damage taken no longer delays your spellcasting. | Ruinbolt spends every banked Wrack, dealing 12% more damage for each point beyond the third. |
 

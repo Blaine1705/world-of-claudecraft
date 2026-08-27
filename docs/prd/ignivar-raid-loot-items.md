@@ -284,7 +284,7 @@ design targets for the tuning pass.
 
 ### Warlock
 
-**Hexthread Shroud** (`hexthread`), affliction (Hexcraft), cloth. 2 pieces: Evil Eye lasts 30 sec. Damage taken no longer delays your spellcasting. 4 pieces: A Sentence passed at 80 or more Condemnation refunds 25, and each Fate Thread adds 8% to its damage.
+**Hexthread Shroud** (`hexthread`), affliction (Hexcraft), cloth. 2 pieces: Your Maledict Gaze strikes every 2 sec instead of every 2.5. Damage taken no longer delays your spellcasting. 4 pieces: A Sentence passed at 80 or more Condemnation refunds 25, and each Fate Thread adds 8% to its damage.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
