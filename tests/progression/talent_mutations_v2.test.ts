@@ -3,9 +3,15 @@ import { updateTimers } from '../../src/sim/combat/auras';
 import { onCastCompleted } from '../../src/sim/combat/talent_procs';
 import { rowForLevel, talentsFor } from '../../src/sim/content/talents';
 import { Sim } from '../../src/sim/sim';
+import { EMPTY_TEST_WORLD } from '../sim_shared';
 
 function maxLevelWarrior(): Sim {
-  const sim = new Sim({ seed: 71, playerClass: 'warrior', autoEquip: false });
+  const sim = new Sim({
+    seed: 71,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   return sim;
 }
@@ -68,7 +74,12 @@ describe('canonical Talent V2 live mutations', () => {
     expect(source.selectTalentRow(5, option.id)).toBe(true);
     const state = source.serializeCharacter(source.player.id)!;
 
-    const restored = new Sim({ seed: 72, playerClass: 'warrior', noPlayer: true });
+    const restored = new Sim({
+      seed: 72,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = restored.addPlayer('warrior', 'Restored', { state });
     const meta = restored.meta(pid)!;
     const events = restored.tick();
@@ -114,7 +125,12 @@ describe('canonical Talent V2 live mutations', () => {
   it('normalizes spent talent charges when a row is cleared without touching native charges', () => {
     // The rogue v0.29 redesign removed the rogue charge-model row, so the
     // mage Twin Icebind option (frost_nova bonusCharges) carries this test.
-    const mage = new Sim({ seed: 73, playerClass: 'mage', autoEquip: false });
+    const mage = new Sim({
+      seed: 73,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     mage.setPlayerLevel(20);
     expect(mage.selectTalentRow(11, 'mag_r11_twin_nova')).toBe(true);
     mage.player.resource = mage.player.maxResource;
@@ -137,7 +153,12 @@ describe('canonical Talent V2 live mutations', () => {
     // Picking the row while the ability sits on a plain cooldown converts that
     // cooldown into a recharge with ONE use spent: the new extra use is stored
     // and castable, the running timer is neither wiped nor reset.
-    const adding = new Sim({ seed: 75, playerClass: 'mage', autoEquip: false });
+    const adding = new Sim({
+      seed: 75,
+      playerClass: 'mage',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     adding.setPlayerLevel(20);
     adding.player.resource = adding.player.maxResource;
     adding.castAbility('frost_nova');
@@ -205,7 +226,12 @@ describe('canonical Talent V2 live mutations', () => {
   });
 
   it('cleans removed proc payoffs and partial counters at the recompute choke point', () => {
-    const rogue = new Sim({ seed: 74, playerClass: 'rogue', autoEquip: false });
+    const rogue = new Sim({
+      seed: 74,
+      playerClass: 'rogue',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     rogue.setPlayerLevel(20);
     expect(rogue.selectTalentRow(17, 'rog_r17_ghostfoot_gambit')).toBe(true);
     onCastCompleted(rogue.ctx, rogue.player, 'evasion', rogue.player);

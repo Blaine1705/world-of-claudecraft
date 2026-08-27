@@ -3,6 +3,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { petPickTarget } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import {
   addThreat,
@@ -181,7 +182,7 @@ describe('threat from damage', () => {
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(100 * BEAR_FORM_THREAT_MULT + 1, 5);
   });
 
-  it('Burning Oath passively multiplies Protection Holy-damage threat by 1.6', () => {
+  it('Burning Oath passively multiplies Protection Holy-damage threat by 1.3', () => {
     const sim = makeSim('paladin');
     sim.setPlayerLevel(16);
     expect(sim.setSpec('protection')).toBe(true);
@@ -191,7 +192,8 @@ describe('threat from damage', () => {
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     hit(sim, sim.player, wolf, 100, 'holy');
-    const protectionMasteryThreat = 1.4;
+    // Oathward threatPct 0.4 scaled by the level-16 mastery ramp (16/20).
+    const protectionMasteryThreat = 1.32;
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
       100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT + 1,
       5,
@@ -241,7 +243,61 @@ describe('threat from damage', () => {
     expect(expectDefined(sim.resolvedAbility('heroic_strike')).threatFlat).toBe(39);
     sim.setPlayerLevel(10);
     expect(sim.setSpec('prot')).toBe(true);
-    expect(expectDefined(sim.resolvedAbility('sunder_armor')).threatFlat).toBe(100);
+    expect(expectDefined(sim.resolvedAbility('sunder_armor')).threatFlat).toBe(120);
+  });
+
+  // v0.38 tank threat parity converted the warrior and bear signatures from a
+  // pure flat add to `damage * mult + flat`, so the tank scales with gear like
+  // the Faithwarden kit does. Measure the DELTA of a second hit so the aggro
+  // seed cannot mask a dropped term: a lost mult reads as flat-only, a lost
+  // flat reads as mult-only, and either fails here.
+  it('composes the converted tank signatures as damage * mult + flat', () => {
+    const sim = makeSim('warrior');
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('prot')).toBe(true);
+    const slam = expectDefined(sim.resolvedAbility('shield_slam'));
+    expect(slam.threatFlat).toBe(110);
+    expect(slam.threatMult).toBe(3.5);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    const slamOpts = { flat: slam.threatFlat, mult: slam.threatMult };
+    // Prime aggro first, then measure only the second hit.
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
+    const primed = wolf.threat.get(sim.playerId) ?? 0;
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
+    // Recompense grants +80% threat, at full value once the level-20 mastery
+    // ramp (min(1, level / 20)) is complete.
+    const recompense = 1.8;
+    expect((wolf.threat.get(sim.playerId) ?? 0) - primed).toBeCloseTo(
+      (100 * 3.5 + 110) * recompense,
+      5,
+    );
+  });
+
+  it('composes Bonecrush the same way, on top of the bear form modifier', () => {
+    const sim = makeSim('druid');
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('feral')).toBe(true);
+    sim.castAbility('bear_form');
+    sim.tick();
+    expect(sim.player.auras.some((a) => a.kind === 'form_bear')).toBe(true);
+    const maul = expectDefined(sim.resolvedAbility('maul'));
+    expect(maul.threatFlat).toBe(20); // rank 2 from level 16
+    expect(maul.threatMult).toBe(2.5);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    beefUp(wolf);
+    const maulOpts = { flat: maul.threatFlat, mult: maul.threatMult };
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Bonecrush', 'hit', true, maulOpts);
+    const primed = wolf.threat.get(sim.playerId) ?? 0;
+    sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Bonecrush', 'hit', true, maulOpts);
+    // Bear Form x1.3 composed with the feral threat total: Primal Heart's +45%
+    // mastery PLUS the +20% feral baseline, which is additive with it (the
+    // warrior has no such baseline, so Recompense stands alone above).
+    const bearAndMastery = BEAR_FORM_THREAT_MULT * 1.65;
+    expect((wolf.threat.get(sim.playerId) ?? 0) - primed).toBeCloseTo(
+      (100 * 2.5 + 20) * bearAndMastery,
+      5,
+    );
   });
 });
 
@@ -986,17 +1042,60 @@ describe('hunter pets', () => {
     expect(pet.inCombat).toBe(false);
   });
 
-  it('blocks hunter pet damage against an undetected stealthed enemy player', () => {
+  it('blocks hunter pet damage against a stealthed enemy player at ANY range', () => {
     const { sim, pet, rogue } = activePetDuel();
     teleport(sim, pet, 0, 0);
-    teleport(sim, rogue, 30, 0);
     sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
     const stealthedHp = rogue.hp;
 
+    // Far: blocked, as before.
+    teleport(sim, rogue, 30, 0);
     hit(sim, pet, rogue, 100);
     expect(rogue.hp).toBe(stealthedHp);
 
-    teleport(sim, rogue, 2, 0);
+    // Point-blank: STILL blocked. A pet gets no close-range stealth detection.
+    teleport(sim, rogue, 1, 0);
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBe(stealthedHp);
+
+    // Step out of stealth and the pet lands its swing.
+    rogue.auras = rogue.auras.filter((a) => a.kind !== 'stealth');
+    rogue.stealthed = false;
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBeLessThan(stealthedHp);
+  });
+
+  it('pet target-pick and pet damage agree: both fully block stealth, both clear on unstealth', () => {
+    const { sim, pet, rogue } = activePetDuel();
+    sim.setPetMode('aggressive');
+    expectDefined(sim.meta(sim.playerId)).lastActiveTick = sim.tickCount;
+    sim.player.targetId = null;
+    sim.player.autoAttack = false;
+    rogue.inCombat = false;
+    // Re-anchored 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the forest_wolf camp moved to
+    // (-10, 6) r28.5, covering the old (0, 0) anchor, so an aggressive-stance
+    // pet pick grabbed a wild wolf instead of exercising the stealth boundary.
+    // Anchor at (200, 0) — this file's "far away first" offset — where the
+    // nearest wild mob sits ~52yd out, beyond PET_AGGRESSIVE_RANGE.
+    teleport(sim, pet, 200, 0);
+    teleport(sim, rogue, 203, 0); // point-blank, well inside any aggressive range
+    sim.castAbility('stealth', rogue.id);
+    expect(rogue.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    sim.ctx.grid.refresh(sim.entities.values());
+    const stealthedHp = rogue.hp;
+
+    // Hidden: neither the picker nor the damage path may touch them.
+    expect(petPickTarget(sim.ctx, pet, sim.player)).toBeNull();
+    hit(sim, pet, rogue, 100);
+    expect(rogue.hp).toBe(stealthedHp);
+
+    // Visible: both paths engage the same point-blank enemy.
+    rogue.auras = rogue.auras.filter((a) => a.kind !== 'stealth');
+    rogue.stealthed = false;
+    sim.ctx.grid.refresh(sim.entities.values());
+    expect(petPickTarget(sim.ctx, pet, sim.player)?.id).toBe(rogue.id);
     hit(sim, pet, rogue, 100);
     expect(rogue.hp).toBeLessThan(stealthedHp);
   });
@@ -1513,7 +1612,7 @@ describe('druid forms', () => {
     expect(sim.player.comboPoints).toBe(0);
   });
 
-  it('caster spells are locked while shapeshifted', () => {
+  it('utility spells are locked while shapeshifted', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);
     sim.castAbility('bear_form');
@@ -1523,7 +1622,10 @@ describe('druid forms', () => {
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.player.resource = 100;
-    sim.castAbility('wrath');
+    // Wildward, not Wildbolt: a healing or damaging spell now auto-unshifts and
+    // casts (src/sim/combat/form_auto_unshift.ts), so the spell that pins the
+    // form lock must be one outside that set. A buff still refuses in form.
+    sim.castAbility('mark_of_the_wild');
     const events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /shapeshifted/.test(e.text))).toBe(true);
   });
@@ -1540,7 +1642,10 @@ describe('druid forms', () => {
     sim.castAbility('cat_form');
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
-    sim.castAbility('wrath');
+    // Wildward, not Wildbolt: a nuke would auto-unshift and start casting here
+    // (src/sim/combat/form_auto_unshift.ts), which both drops the cat form the
+    // Maul check below depends on and turns its refusal into "You are busy."
+    sim.castAbility('mark_of_the_wild');
     let events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /shapeshifted/.test(e.text))).toBe(true);
     sim.castAbility('maul');

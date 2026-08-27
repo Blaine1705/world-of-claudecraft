@@ -36,6 +36,21 @@ registerDeferredPreload(() =>
   }),
 );
 
+/**
+ * The renderer's point-light seam. Every point light this fx adds to the world
+ * MUST be ranked inside the renderer's pinned visible point-light count: that
+ * count is part of every lit material's program cache key, so one unranked
+ * visible light relinks every lit material in view synchronously (the first
+ * infernal of a session used to stall mid-combat that way).
+ *
+ * The registry owns the budget bookkeeping (see `Renderer.registerBudgetPointLight`);
+ * the fx only says when a light joins the world and when it leaves it.
+ */
+export interface WarlockMeteorLightRegistry {
+  register(light: THREE.PointLight): void;
+  release(light: THREE.PointLight): void;
+}
+
 export interface WarlockMeteorImpact {
   kind: 'rain' | 'infernal';
   x: number;
@@ -57,8 +72,16 @@ interface ActiveMeteor {
   impactRadius: number;
   eventRadius: number;
   sourceId?: number;
+  light?: THREE.PointLight;
   materials: THREE.Material[];
   geometries: THREE.BufferGeometry[];
+  ending: boolean;
+  rootDetached: boolean;
+  lightReleased: boolean;
+  lightDisposed: boolean;
+  disposedMaterials: Set<THREE.Material>;
+  disposedGeometries: Set<THREE.BufferGeometry>;
+  endReason?: VfxEndReason;
 }
 
 interface ActiveImpactRing {
@@ -78,6 +101,13 @@ interface ActiveImpact {
   powerfulBurst: THREE.Sprite | null;
   materials: THREE.Material[];
   geometries: THREE.BufferGeometry[];
+  ending: boolean;
+  rootDetached: boolean;
+  lightReleased: boolean;
+  lightDisposed: boolean;
+  disposedMaterials: Set<THREE.Material>;
+  disposedGeometries: Set<THREE.BufferGeometry>;
+  endReason?: VfxEndReason;
 }
 
 interface ActiveShower {
@@ -89,10 +119,56 @@ interface ActiveShower {
   duration: number;
   sourceId?: number;
   cosmeticsEnabled: boolean;
+  disposed: boolean;
+  ending: boolean;
+  rootDetached: boolean;
+  boundaryMaterialDisposed: boolean;
+  boundaryGeometryDisposed: boolean;
+  endReason?: VfxEndReason;
 }
 
-function disposeMaterials(materials: readonly THREE.Material[]): void {
-  for (const material of new Set(materials)) material.dispose();
+type VfxEndReason = 'expired' | 'disposed' | 'dropped';
+
+function attemptCleanup(cleanup: () => void, errors?: unknown[]): boolean {
+  try {
+    cleanup();
+    return true;
+  } catch (error) {
+    if (errors) errors.push(error);
+    else throw error;
+    return false;
+  }
+}
+
+function detachRoot(root: THREE.Object3D, errors?: unknown[]): boolean {
+  const parent = root.parent;
+  let success = attemptCleanup(() => root.removeFromParent(), errors);
+  if (errors && root.parent === parent && parent) {
+    success = attemptCleanup(() => parent.remove(root), errors) && success;
+  }
+  return success && root.parent === null;
+}
+
+function disposeMaterials(materials: readonly THREE.Material[], errors?: unknown[]): number {
+  let disposed = 0;
+  for (const material of new Set(materials)) {
+    if (attemptCleanup(() => material.dispose(), errors)) disposed++;
+  }
+  return disposed;
+}
+
+function disposeTracked<T>(
+  values: readonly T[],
+  disposed: Set<T>,
+  cleanup: (value: T) => void,
+  errors?: unknown[],
+): boolean {
+  const unique = new Set(values);
+  for (const value of unique) {
+    if (disposed.has(value)) continue;
+    if (attemptCleanup(() => cleanup(value), errors)) disposed.add(value);
+  }
+  return disposed.size === unique.size;
 }
 
 export class WarlockMeteorFx {
@@ -138,15 +214,19 @@ export class WarlockMeteorFx {
   private readonly meteors: ActiveMeteor[] = [];
   private readonly impacts: ActiveImpact[] = [];
   private readonly showers: ActiveShower[] = [];
+  private disposed = false;
+  private staticDisposalComplete = false;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly heightAt: (x: number, z: number) => number,
     private readonly onImpact: (impact: WarlockMeteorImpact) => void,
     private readonly powerfulImpactTexture: THREE.Texture | null = powerfulFelMeteorTexture,
+    private readonly lightRegistry?: WarlockMeteorLightRegistry,
   ) {}
 
   spawnRain(spawn: WarlockMeteorSpawn): void {
+    if (this.disposed) return;
     const root = new THREE.Group();
     root.name = 'warlock-fel-meteor-rain';
     this.scene.add(root);
@@ -173,19 +253,31 @@ export class WarlockMeteorFx {
       duration: plan.duration,
       sourceId: spawn.sourceId,
       cosmeticsEnabled: true,
+      disposed: false,
+      ending: false,
+      rootDetached: false,
+      boundaryMaterialDisposed: false,
+      boundaryGeometryDisposed: false,
     });
     this.trimCosmeticShowers();
   }
 
   stopRain(sourceId: number): void {
-    for (let index = this.showers.length - 1; index >= 0; index--) {
-      if (this.showers[index].sourceId !== sourceId) continue;
-      this.disposeShower(this.showers[index]);
-      this.showers.splice(index, 1);
+    if (this.disposed) return;
+    for (let index = 0; index < this.showers.length; ) {
+      if (this.showers[index].sourceId !== sourceId) {
+        index++;
+        continue;
+      }
+      const shower = this.showers[index];
+      shower.ending = true;
+      shower.endReason = 'disposed';
+      if (this.disposeShower(shower, undefined, 'disposed')) this.showers.splice(index, 1);
     }
   }
 
   spawnInfernal(spawn: WarlockMeteorSpawn): void {
+    if (this.disposed) return;
     const root = this.addMeteor({
       parent: this.scene,
       name: 'warlock-fel-infernal-meteor',
@@ -216,12 +308,17 @@ export class WarlockMeteorFx {
   }
 
   update(dt: number, reducedMotion = false): void {
+    if (this.disposed) return;
     const step = Math.max(0, dt);
     this.updateImpacts(step, reducedMotion);
     this.updateShowers(step, reducedMotion);
 
     for (let index = this.meteors.length - 1; index >= 0; index--) {
       const meteor = this.meteors[index];
+      if (meteor.ending) {
+        if (this.disposeMeteor(meteor, [], meteor.endReason)) this.meteors.splice(index, 1);
+        continue;
+      }
       meteor.age += step;
       if (meteor.age < meteor.delay) {
         meteor.root.visible = false;
@@ -249,6 +346,11 @@ export class WarlockMeteorFx {
         radius: meteor.impactRadius,
         sourceId: meteor.sourceId,
       });
+      this.meteors.splice(index, 1);
+      meteor.ending = true;
+      meteor.endReason = 'expired';
+      const cleanupErrors: unknown[] = [];
+      if (!this.disposeMeteor(meteor, cleanupErrors, 'expired')) this.meteors.push(meteor);
       this.onImpact({
         kind: meteor.kind,
         x: meteor.end.x,
@@ -256,34 +358,66 @@ export class WarlockMeteorFx {
         radius: meteor.eventRadius,
         sourceId: meteor.sourceId,
       });
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
-      this.meteors.splice(index, 1);
+      if (cleanupErrors.length > 0)
+        throw new AggregateError(cleanupErrors, 'WarlockMeteorFx expiry cleanup failed');
     }
   }
 
   dispose(): void {
-    for (const meteor of this.meteors) {
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
+    this.disposed = true;
+    const errors: unknown[] = [];
+    // Showers own their rain fragment roots. Dispose those first so the
+    // shower's cosmetic sweep removes each child from `meteors` exactly once;
+    // the remaining meteor pass then handles only standalone infernals.
+    for (let index = this.showers.length - 1; index >= 0; index--) {
+      const shower = this.showers[index];
+      shower.ending = true;
+      shower.endReason ??= 'disposed';
+      if (this.disposeShower(shower, errors, 'disposed')) this.showers.splice(index, 1);
     }
-    for (const impact of this.impacts) this.disposeImpact(impact);
-    for (const shower of this.showers) this.disposeShower(shower);
-    this.meteors.length = 0;
-    this.impacts.length = 0;
-    this.showers.length = 0;
-    this.meteorGeometry.dispose();
-    this.coreGeometry.dispose();
-    this.trailGeometry.dispose();
-    this.sparkGeometry.dispose();
-    this.smokeGeometry.dispose();
-    this.ringGeometry.dispose();
-    this.rainRockMaterial.dispose();
-    this.infernalRockMaterial.dispose();
-    this.coreMaterial.dispose();
-    disposeMaterials(this.trailMaterials);
+    for (let index = 0; index < this.meteors.length; ) {
+      const meteor = this.meteors[index];
+      meteor.ending = true;
+      meteor.endReason ??= 'disposed';
+      if (this.disposeMeteor(meteor, errors, 'disposed')) this.meteors.splice(index, 1);
+      else index++;
+    }
+    for (let index = 0; index < this.impacts.length; ) {
+      const impact = this.impacts[index];
+      if (impact.ending) {
+        if (this.disposeImpact(impact, [], impact.endReason)) this.impacts.splice(index, 1);
+        else index++;
+        continue;
+      }
+      impact.ending = true;
+      impact.endReason ??= 'disposed';
+      if (this.disposeImpact(impact, errors, 'disposed')) this.impacts.splice(index, 1);
+      else index++;
+    }
+    if (!this.staticDisposalComplete) {
+      let staticOk = true;
+      for (const geometry of [
+        this.meteorGeometry,
+        this.coreGeometry,
+        this.trailGeometry,
+        this.sparkGeometry,
+        this.smokeGeometry,
+        this.ringGeometry,
+      ]) {
+        staticOk = attemptCleanup(() => geometry.dispose(), errors) && staticOk;
+      }
+      for (const material of [
+        this.rainRockMaterial,
+        this.infernalRockMaterial,
+        this.coreMaterial,
+      ]) {
+        staticOk = attemptCleanup(() => material.dispose(), errors) && staticOk;
+      }
+      staticOk =
+        disposeMaterials(this.trailMaterials, errors) === this.trailMaterials.length && staticOk;
+      if (staticOk) this.staticDisposalComplete = true;
+    }
+    if (errors.length > 0) throw new AggregateError(errors, 'WarlockMeteorFx disposal failed');
   }
 
   private addMeteor(options: {
@@ -345,10 +479,18 @@ export class WarlockMeteorFx {
     );
     body.position.copy(start);
 
+    // The fall light burns at a fixed level for the whole descent: nothing here
+    // writes its intensity again, so once the budget zeroes an unchosen light it
+    // stays dark. That is deliberate. This fx updates AFTER the renderer's
+    // budget pass in the frame, so any upward write here would relight a light
+    // the budget had just ruled out (weapon_vfx.ts drives its own level because
+    // it updates BEFORE the pass).
+    let light: THREE.PointLight | undefined;
     if (options.kind === 'infernal') {
-      const light = new THREE.PointLight(FEL_FLAME, 9, 26, 1.7);
+      light = new THREE.PointLight(FEL_FLAME, 9, 26, 1.7);
       light.name = 'warlock-fel-meteor-light';
       body.add(light);
+      this.lightRegistry?.register(light);
     }
 
     this.meteors.push({
@@ -364,8 +506,15 @@ export class WarlockMeteorFx {
       impactRadius: options.impactRadius,
       eventRadius: options.eventRadius,
       sourceId: options.sourceId,
+      light,
       materials,
       geometries: [],
+      ending: false,
+      rootDetached: false,
+      lightReleased: false,
+      lightDisposed: false,
+      disposedMaterials: new Set(),
+      disposedGeometries: new Set(),
     });
     root.visible = options.delay === 0;
     return root;
@@ -487,6 +636,7 @@ export class WarlockMeteorFx {
     if (light) {
       light.position.y = 0.8;
       root.add(light);
+      this.lightRegistry?.register(light);
     }
 
     this.impacts.push({
@@ -501,6 +651,12 @@ export class WarlockMeteorFx {
       powerfulBurst,
       materials,
       geometries: [fissureGeometry],
+      ending: false,
+      rootDetached: false,
+      lightReleased: false,
+      lightDisposed: false,
+      disposedMaterials: new Set(),
+      disposedGeometries: new Set(),
     });
     this.trimImpactPool();
   }
@@ -527,6 +683,9 @@ export class WarlockMeteorFx {
         ring.material.opacity = (0.72 - ringIndex * 0.12) * (1 - progress);
       }
       impact.smoke.opacity = 0.58 * (1 - progress);
+      // Multiplicative on purpose: this update runs AFTER the renderer's
+      // point-light budget pass, and a decay can only ever take the flash
+      // further down, never relight a light the budget zeroed out.
       if (impact.light) impact.light.intensity *= Math.max(0, 1 - dt * 5);
       if (!reducedMotion) {
         for (const child of impact.sparks.children) {
@@ -536,14 +695,22 @@ export class WarlockMeteorFx {
         }
       }
       if (progress < 1) continue;
-      this.disposeImpact(impact);
-      this.impacts.splice(index, 1);
+      impact.ending = true;
+      impact.endReason = 'expired';
+      const cleanupErrors: unknown[] = [];
+      if (this.disposeImpact(impact, cleanupErrors, 'expired')) this.impacts.splice(index, 1);
+      if (cleanupErrors.length > 0)
+        throw new AggregateError(cleanupErrors, 'WarlockMeteorFx impact cleanup failed');
     }
   }
 
   private updateShowers(dt: number, reducedMotion: boolean): void {
     for (let index = this.showers.length - 1; index >= 0; index--) {
       const shower = this.showers[index];
+      if (shower.ending) {
+        if (this.disposeShower(shower, [], shower.endReason)) this.showers.splice(index, 1);
+        continue;
+      }
       shower.age += dt;
       const progress = Math.min(1, shower.age / shower.duration);
       while (shower.pending.length > 0 && shower.pending[0].at <= shower.age) {
@@ -571,17 +738,26 @@ export class WarlockMeteorFx {
           : 0.12 + Math.sin(progress * Math.PI * 12) * 0.06;
         if (!reducedMotion) shower.boundary.rotation.z += dt * 0.18;
       } else if (!shower.boundaryDisposed) {
-        shower.boundary.removeFromParent();
-        shower.boundary.material.dispose();
-        shower.boundary.geometry.dispose();
-        shower.boundaryDisposed = true;
+        const detached = attemptCleanup(() => shower.boundary.removeFromParent());
+        const materialDisposed =
+          shower.boundaryMaterialDisposed ||
+          attemptCleanup(() => shower.boundary.material.dispose());
+        const geometryDisposed =
+          shower.boundaryGeometryDisposed ||
+          attemptCleanup(() => shower.boundary.geometry.dispose());
+        if (materialDisposed) shower.boundaryMaterialDisposed = true;
+        if (geometryDisposed) shower.boundaryGeometryDisposed = true;
+        if (detached && materialDisposed && geometryDisposed) {
+          shower.boundaryDisposed = true;
+        }
       }
       const hasFragments = shower.root.children.some(
         (child) => child.name === 'warlock-fel-meteor-fragment',
       );
       if (progress < 1 || hasFragments || shower.pending.length > 0) continue;
-      this.disposeShower(shower);
-      this.showers.splice(index, 1);
+      shower.ending = true;
+      shower.endReason = 'expired';
+      if (this.disposeShower(shower, undefined, 'expired')) this.showers.splice(index, 1);
     }
   }
 
@@ -617,9 +793,12 @@ export class WarlockMeteorFx {
       const rainIndex = this.meteors.findIndex((meteor) => meteor.kind === 'rain');
       if (rainIndex < 0) return;
       const [meteor] = this.meteors.splice(rainIndex, 1);
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
+      meteor.ending = true;
+      meteor.endReason = 'dropped';
+      if (!this.disposeMeteor(meteor, undefined, 'dropped')) {
+        this.meteors.push(meteor);
+        return;
+      }
     }
   }
 
@@ -628,7 +807,12 @@ export class WarlockMeteorFx {
       const rainIndex = this.impacts.findIndex((impact) => impact.kind === 'rain');
       const index = rainIndex >= 0 ? rainIndex : 0;
       const [impact] = this.impacts.splice(index, 1);
-      this.disposeImpact(impact);
+      impact.ending = true;
+      impact.endReason = 'dropped';
+      if (!this.disposeImpact(impact, undefined, 'dropped')) {
+        this.impacts.push(impact);
+        return;
+      }
     }
   }
 
@@ -637,38 +821,134 @@ export class WarlockMeteorFx {
     for (const shower of this.showers) {
       if (cosmeticCount <= MAX_COSMETIC_SHOWERS) return;
       if (!shower.cosmeticsEnabled) continue;
-      this.disposeShowerCosmetics(shower);
+      this.disposeShowerCosmetics(shower, undefined, 'dropped');
       cosmeticCount--;
     }
   }
 
-  private disposeShowerCosmetics(shower: ActiveShower): void {
+  private disposeShowerCosmetics(
+    shower: ActiveShower,
+    errors?: unknown[],
+    reason: VfxEndReason = 'disposed',
+  ): boolean {
+    let cleanupSucceeded = true;
     for (let index = this.meteors.length - 1; index >= 0; index--) {
       const meteor = this.meteors[index];
       if (meteor.kind !== 'rain' || meteor.root.parent !== shower.root) continue;
-      meteor.root.removeFromParent();
-      disposeMaterials(meteor.materials);
-      for (const geometry of meteor.geometries) geometry.dispose();
-      this.meteors.splice(index, 1);
+      meteor.ending = true;
+      meteor.endReason ??= reason;
+      const cleaned = this.disposeMeteor(meteor, errors, reason);
+      cleanupSucceeded = cleanupSucceeded && cleaned;
+      if (cleaned) this.meteors.splice(index, 1);
     }
     shower.pending.length = 0;
     shower.cosmeticsEnabled = false;
     shower.root.userData.cosmeticsEnabled = false;
+    return cleanupSucceeded;
   }
 
-  private disposeShower(shower: ActiveShower): void {
-    this.disposeShowerCosmetics(shower);
-    shower.root.removeFromParent();
-    if (shower.boundaryDisposed) return;
-    shower.boundary.removeFromParent();
-    shower.boundary.material.dispose();
-    shower.boundary.geometry.dispose();
-    shower.boundaryDisposed = true;
+  private disposeShower(
+    shower: ActiveShower,
+    errors?: unknown[],
+    reason: VfxEndReason = 'disposed',
+  ): boolean {
+    if (shower.disposed) return true;
+    shower.ending = true;
+    shower.endReason ??= reason;
+    const cosmeticsSucceeded = this.disposeShowerCosmetics(shower, errors, reason);
+    if (!shower.rootDetached) shower.rootDetached = detachRoot(shower.root, errors);
+    let cleanupSucceeded = cosmeticsSucceeded && shower.rootDetached;
+    if (!shower.boundaryDisposed) {
+      const boundaryDetached = detachRoot(shower.boundary, errors);
+      const materialDisposed =
+        shower.boundaryMaterialDisposed ||
+        attemptCleanup(() => shower.boundary.material.dispose(), errors);
+      const geometryDisposed =
+        shower.boundaryGeometryDisposed ||
+        attemptCleanup(() => shower.boundary.geometry.dispose(), errors);
+      if (materialDisposed) shower.boundaryMaterialDisposed = true;
+      if (geometryDisposed) shower.boundaryGeometryDisposed = true;
+      cleanupSucceeded =
+        cleanupSucceeded && boundaryDetached && materialDisposed && geometryDisposed;
+      if (boundaryDetached && materialDisposed && geometryDisposed) {
+        shower.boundaryDisposed = true;
+      }
+    }
+    if (cleanupSucceeded) {
+      shower.disposed = true;
+    }
+    return cleanupSucceeded;
   }
 
-  private disposeImpact(impact: ActiveImpact): void {
-    impact.root.removeFromParent();
-    disposeMaterials(impact.materials);
-    for (const geometry of impact.geometries) geometry.dispose();
+  /** The single teardown for a meteor: every removal path (impact, pool trim,
+   *  cancelled shower, dispose) runs through here so the fall light is released
+   *  from the point-light budget exactly once, wherever it dies. A failed
+   *  cleanup keeps the ending record retryable until it succeeds. */
+  private disposeMeteor(
+    meteor: ActiveMeteor,
+    errors?: unknown[],
+    reason: VfxEndReason = 'disposed',
+  ): boolean {
+    meteor.ending = true;
+    meteor.endReason ??= reason;
+    if (!meteor.rootDetached) meteor.rootDetached = detachRoot(meteor.root, errors);
+    let cleanupSucceeded = meteor.rootDetached;
+    const light = meteor.light;
+    if (light) {
+      if (!meteor.lightReleased)
+        meteor.lightReleased = attemptCleanup(() => this.lightRegistry?.release(light), errors);
+      if (!meteor.lightDisposed)
+        meteor.lightDisposed = attemptCleanup(() => light.dispose(), errors);
+      const lightSucceeded = meteor.lightReleased && meteor.lightDisposed;
+      cleanupSucceeded = cleanupSucceeded && lightSucceeded;
+    }
+    const materialsSucceeded = disposeTracked(
+      meteor.materials,
+      meteor.disposedMaterials,
+      (material) => material.dispose(),
+      errors,
+    );
+    const geometriesSucceeded = disposeTracked(
+      meteor.geometries,
+      meteor.disposedGeometries,
+      (geometry) => geometry.dispose(),
+      errors,
+    );
+    cleanupSucceeded = cleanupSucceeded && materialsSucceeded && geometriesSucceeded;
+    return cleanupSucceeded;
+  }
+
+  private disposeImpact(
+    impact: ActiveImpact,
+    errors?: unknown[],
+    reason: VfxEndReason = 'disposed',
+  ): boolean {
+    impact.ending = true;
+    impact.endReason ??= reason;
+    if (!impact.rootDetached) impact.rootDetached = detachRoot(impact.root, errors);
+    let cleanupSucceeded = impact.rootDetached;
+    const light = impact.light;
+    if (light) {
+      if (!impact.lightReleased)
+        impact.lightReleased = attemptCleanup(() => this.lightRegistry?.release(light), errors);
+      if (!impact.lightDisposed)
+        impact.lightDisposed = attemptCleanup(() => light.dispose(), errors);
+      const lightSucceeded = impact.lightReleased && impact.lightDisposed;
+      cleanupSucceeded = cleanupSucceeded && lightSucceeded;
+    }
+    const materialsSucceeded = disposeTracked(
+      impact.materials,
+      impact.disposedMaterials,
+      (material) => material.dispose(),
+      errors,
+    );
+    const geometriesSucceeded = disposeTracked(
+      impact.geometries,
+      impact.disposedGeometries,
+      (geometry) => geometry.dispose(),
+      errors,
+    );
+    cleanupSucceeded = cleanupSucceeded && materialsSucceeded && geometriesSucceeded;
+    return cleanupSucceeded;
   }
 }

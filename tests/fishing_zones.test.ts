@@ -52,6 +52,7 @@ import {
 } from '../src/sim/types';
 import { isInWaterBody, terrainHeight, waterLevel, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // DERIVED from the authored tables' own keys, never a hand list: the
 // shortfall-schedule sweep below must conscript a NEW zone's catch table the
@@ -97,7 +98,7 @@ const surplusFor = (zoneId: string, band: number): number =>
   Math.min(2, Math.max(0, band - requiredBandFor(zoneId)));
 
 function makeSim(seed = 4242): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
 }
 
 function teleportTo(sim: Sim, x: number, z: number): void {
@@ -188,10 +189,17 @@ describe('the rod a zone takes', () => {
     expect(rodTierRequiredForZone('thornpeak_heights')).toBe(3);
   });
 
-  it('covers every zone the world ships, and floors an unknown one at tier 1', () => {
+  it('covers every professions zone the world ships, and floors an unknown one at tier 1', () => {
+    // The Proving Shore (the tutorial island) is the one deliberate absence:
+    // its R37 rollout row is 'none' (professions-free, no lakes), so it has
+    // NO rod row by design and resolves through the tier-1 floor like any
+    // unknown zone (tests/professions_zone_rollout.test.ts pins the absence).
     for (const zone of ZONES) {
+      if (zone.id === 'proving_shore') continue;
       expect(FISHING_ZONE_ROD_TIERS[zone.id], zone.id).toBeDefined();
     }
+    expect(FISHING_ZONE_ROD_TIERS.proving_shore).toBeUndefined();
+    expect(rodTierRequiredForZone('proving_shore')).toBe(DEFAULT_FISHING_ROD_TIER);
     expect(Object.keys(FISHING_ZONE_ROD_TIERS).sort()).toEqual(
       [...ZONE_IDS, ...EXPANSION_ZONE_IDS].sort(),
     );

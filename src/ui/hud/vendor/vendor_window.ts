@@ -9,6 +9,7 @@
 
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
+import { currencyIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -102,7 +103,9 @@ function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
   const parts: string[] = [];
   if (row.price.copper > 0) parts.push(deps.moneyHtml(row.price.copper));
   if (row.price.honor > 0) {
-    parts.push(`<span class="warfare-price">${esc(honorText(row.price.honor))}</span>`);
+    parts.push(
+      `<span class="warfare-price">${currencyIconHtml('honor')}${esc(honorText(row.price.honor))}</span>`,
+    );
   }
   return parts.join('<span aria-hidden="true"> + </span>');
 }
@@ -140,9 +143,11 @@ export function renderVendorWindow(
   if (view.hasHonorGoods) {
     const balance = document.createElement('div');
     balance.className = 'warfare-balance';
-    balance.textContent = t('hudChrome.warfare.balance', {
-      amount: formatNumber(view.honorBalance, { maximumFractionDigits: 0 }),
-    });
+    balance.innerHTML = `${currencyIconHtml('honor')}${esc(
+      t('hudChrome.warfare.balance', {
+        amount: formatNumber(view.honorBalance, { maximumFractionDigits: 0 }),
+      }),
+    )}`;
     el.appendChild(balance);
   }
 
@@ -192,6 +197,10 @@ export function renderVendorWindow(
     // than decoration. Never disabled for it: the sale is real, the gate is
     // at the harvest.
     row.className = goods.requirementUnmet ? 'vendor-item vendor-locked' : 'vendor-item';
+    // Item identity for the island coach's press-this-next glow (bootcamp.ts
+    // toggles .qd-coach by this attribute; distinct from the focus-key
+    // namespace, which stays focus_restore's alone).
+    row.dataset.coachItem = itemId;
     // The disable state tracks the SELECTED multiple (phase 21): a count row
     // gates on the whole-count total; force-1 and custom rows keep the 1x
     // baseline (the custom prompt's typed amount decides the rest).

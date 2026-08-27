@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: '庭園に開かれた扉',
+    desc: 'ドーンホールド城を訪ね、日差しあふれる庭園の広間を巡ろう。',
+  },
+  exp_the_last_keep: {
+    name: '静寂の広間',
+    desc: '最後の砦の扉をくぐり、静まり返った広間を歩こう。',
+  },
   pvp_bg_first_capture: {
     name: '手中の軍旗',
     desc: 'ソーンホロウ平原で旗を奪う。',
@@ -32,6 +40,25 @@ export const table: DeedLocaleTable = {
     name: 'リフトの君主',
     desc: 'Sランクのリフトを攻略する。リフトポータルが出現させうる最高難度の階級だ。',
   },
+  col_reliquary_rank_2: {
+    name: '戦利品の守り手',
+    desc: '聖遺物庫でキュレーターランク2に到達する（固有の聖遺物10種を収蔵）。',
+    title: '戦利品の守り手',
+  },
+  col_reliquary_rank_3: {
+    name: '目録編纂者',
+    desc: '聖遺物庫でキュレーターランク3に到達する（固有の聖遺物25種を収蔵）。',
+    title: '目録編纂者',
+  },
+  col_reliquary_rank_4: {
+    name: '首席キュレーター',
+    desc: '聖遺物庫でキュレーターランク4に到達する（固有の聖遺物50種を収蔵）。',
+    title: '首席キュレーター',
+  },
+  col_reliquary_rank_5: {
+    name: '永遠の戦利品',
+    desc: '聖遺物庫でキュレーターランク5に到達する（固有の聖遺物100種を収蔵）。',
+  },
   pvp_honor_sergeant: {
     name: '陣砕き',
     desc: '生涯名誉10,000を獲得する。使っても階級を失うことはない。',
@@ -46,6 +73,31 @@ export const table: DeedLocaleTable = {
     name: '戦の冠',
     desc: '生涯名誉150,000を獲得する。どのレルムでも希少であり、それでいい。',
     title: '戦の冠',
+  },
+  col_reliquary_complete: {
+    name: '大いなる聖遺物庫',
+    desc: 'キャラクターが所蔵できる聖遺物庫のすべての聖遺物を収蔵する。のちに目録が増えても、この記録が取り消されることはない。',
+    title: '宝物庫のキュレーター',
+  },
+  col_reliquary_conquerors: {
+    name: '征服者の棚',
+    desc: '聖遺物庫の征服者の棚にあるすべての聖遺物を収蔵する。のちに目録が増えても、この記録が取り消されることはない。',
+    title: '宝物庫破り',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'ナイスラクシスの照耀',
+    desc: '聖遺物庫の「英雄: ナイスラクシスのレイド」のページを照耀する。',
+    title: 'ナイスラクシスの光',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'サンザールの照耀',
+    desc: '聖遺物庫の「サンザール、目覚めし峰」のページを照耀する。',
+    title: 'サンザールの光',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '聖所の照耀',
+    desc: '聖遺物庫の「英雄: 墓ワームの聖所」のページを照耀する。',
+    title: '聖所の光',
   },
   chr_drakemaw_broodlord: {
     name: '卵砕き',
@@ -852,5 +904,9 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: '完璧な装甲',
     desc: '防具鍛冶で初めてのレア級アイテムを作る。',
+  },
+  prog_ready_for_an_adventure: {
+    name: '冒険の準備は万端',
+    desc: '修練の浜を卒業する。島でのすべての課題を終え、渡しの鐘を鳴らしてイーストブルックへ帰る。',
   },
 };

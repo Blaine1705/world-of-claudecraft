@@ -7,6 +7,18 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Pronto para uma Aventura',
+    desc: 'Forme-se na Costa da Provação: termine cada lição na ilha e depois toque o sino da balsa para voltar a Eastbrook.',
+  },
+  exp_dawnhold_castle: {
+    name: 'Uma Porta Aberta no Jardim',
+    desc: 'Visite o Castelo Dawnhold e passeie por seus salões ensolarados do jardim.',
+  },
+  exp_the_last_keep: {
+    name: 'Os Salões Silenciosos',
+    desc: 'Atravesse as portas do Último Reduto e percorra seus salões silenciosos.',
+  },
   pvp_bg_first_capture: {
     name: 'Bandeira em Mãos',
     desc: 'Capture uma bandeira em Campos de Thornhollow.',
@@ -989,5 +1001,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Blindado à Perfeição',
     desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armaduras.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Guardião de Espólios',
+    desc: "Alcance o grau de Curador 2 n'O Relicário (10 relíquias únicas catalogadas).",
+    title: 'Guardião de Espólios',
+  },
+  col_reliquary_rank_3: {
+    name: 'O Catalogador',
+    desc: "Alcance o grau de Curador 3 n'O Relicário (25 relíquias únicas catalogadas).",
+    title: 'o Catalogador',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arquicurador',
+    desc: "Alcance o grau de Curador 4 n'O Relicário (50 relíquias únicas catalogadas).",
+    title: 'Arquicurador',
+  },
+  col_reliquary_rank_5: {
+    name: 'Espólios Eternos',
+    desc: "Alcance o grau de Curador 5 n'O Relicário (100 relíquias únicas catalogadas).",
+  },
+  col_reliquary_complete: {
+    name: 'O Grande Relicário',
+    desc: "Catalogue todas as relíquias d'O Relicário que um personagem possa guardar. O catálogo crescer depois nunca tira isso de você.",
+    title: 'Curador da Câmara',
+  },
+  col_reliquary_conquerors: {
+    name: 'Estante dos Conquistadores',
+    desc: "Catalogue todas as relíquias da estante Conquistadores d'O Relicário. O catálogo crescer depois nunca tira isso de você.",
+    title: 'Quebra-câmaras',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminada',
+    desc: "Ilumine a página Heroico: Raide de Nythraxis d'O Relicário.",
+    title: 'Luz de Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminada',
+    desc: "Ilumine a página Thunzharr, o Pico Desperto d'O Relicário.",
+    title: 'Luz de Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Santuário iluminado',
+    desc: "Ilumine a página Heroico: Santuário do Gravewyrm d'O Relicário.",
+    title: 'Luz do Santuário',
   },
 };

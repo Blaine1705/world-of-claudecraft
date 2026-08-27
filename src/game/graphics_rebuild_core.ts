@@ -80,8 +80,8 @@ export const GRAPHICS_DIAL_KEYS: readonly GraphicsDialKey[] = Object.freeze(
  * - ultra: full relief/carpet/worn layers at the ultra execution, full-res
  *   AO, the 128-cell water field.
  * - insane: ultra plus the 4-tap full-clamp worn walk and the 8yd vista grid
- *   (the ladder tops shadows at 4096, dial level 2's 8192 map is
- *   deliberately Advanced-only territory).
+ *   (shadows top out at High's 4096 map everywhere: the shadow dial is
+ *   capped at level 1 and the retired 8192 rung clamps down to it).
  * The per-effect binaries (antiAliasing, bloomQuality, characterDetail) read
  * 0 Off / 1 On; ambientOcclusion adds the 0.5 half-resolution middle; the
  * viewDistance and waterQuality ladders map 0/0.5/1/2 onto whole render
@@ -109,7 +109,10 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     surfaceDetail: 0,
     effectsQuality: 0,
     shadowQuality: 0.5,
-    antiAliasing: 0,
+    // On at Medium, off at Low: the medium tier's own AA is the FXAA fused
+    // into the grade pass, which the grade-only effects level above keeps and
+    // the low tier (no grade pass, and a policy of no post AA) never had.
+    antiAliasing: 1,
     bloomQuality: 0,
     ambientOcclusion: 0,
     viewDistance: 0.5,

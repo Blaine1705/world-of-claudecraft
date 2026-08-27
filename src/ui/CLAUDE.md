@@ -1,4 +1,4 @@
-<!-- src/ui/: classic HUD, i18n, procedural icons. Local detail only; the
+﻿<!-- src/ui/: classic HUD, i18n, procedural icons. Local detail only; the
      IWorld seam, dependency rules, and "files-can-be-huge" convention are in
      root + src/ CLAUDE.md, don't repeat them here. -->
 
@@ -50,7 +50,19 @@ mobile portrait *and* landscape before calling UI work done.
     the opener on close, via the one shared `FocusManager` (`src/ui/focus_manager.ts`), which
     `Hud` drives through `windowFocus(rootSel)`. The trap intercepts Tab ONLY when focus is
     already inside (Tab is the game's target-nearest key; an unconditional trap would hijack
-    it). Esc stays with the single `closeAll` dispatcher, not the manager.
+    it). Esc stays with the single `closeAll` dispatcher, not the manager. The opener is
+    modality-dependent by design: a KEYBOARD open (click `detail === 0`) records the focused
+    trigger; a MOUSE open ran the pointer-only focus drop first (`src/ui/pointer_blur.ts`,
+    wired by `src/ui/chrome_focus_wiring.ts`), so the recorded opener is never the clicked
+    button: a rail click blurs to the body and records nothing; a click inside a
+    dialog-rooted window parks focus on that window's root, which keeps its Tab trap armed,
+    and the next window records THAT root as its opener (`activeFocusable` accepts any
+    rendered element; returning focus to a still-open window's root re-arms its trap, a
+    closed one fails `canFocus` and restores nothing). Repaint ladders are the other reader
+    of the parked root and never treat it as a focused control (`focusedWithin` refuses the
+    root it is handed and any root matching the park selector). Two modality discriminators coexist on purpose: `UIEvent.detail` for click
+    activation (this), and the pointerdown flag for focus-driven tooltips (`hud.ts`); pick by
+    what the handler receives, a click or a focus event.
   - **Focus across a REBUILD is the other half, and a different module:** a painter that wipes
     its own subtree carries the focused control's identity across with `captureFocusKey` /
     `restoreFirstEnabled` (`src/ui/focus_restore.ts`), never a hand-rolled `activeElement`
@@ -64,9 +76,8 @@ mobile portrait *and* landscape before calling UI work done.
   - **Skip links** ("Skip to Main HUD" / "Skip to Chat") are the first focusable elements;
     **live regions** announce chat (`#chatlog` role=log) and combat (off-screen `#combat-live`
     role=status, throttled per type).
-  - **`forced-colors: active`** is the only AUTOMATIC contrast adaptation (no
-    `prefers-color-scheme` auto-switch): borders + the focus ring survive via system-color
-    keywords. (The theme picker also offers user-selectable presets; see `src/styles/CLAUDE.md`.)
+  - **`forced-colors: active`** is the only AUTOMATIC contrast adaptation; the mechanism,
+    and the user-selectable theme presets, live in `src/styles/CLAUDE.md`.
   - **No viewport scale-lock:** `user-scalable=no` / `maximum-scale` are dropped; the 16px
     input-font floor is the anti-zoom guard.
   - Enforced always-on by the `tests/focus_*` / `live_region_politeness` / `combat_announcer` /
@@ -91,42 +102,31 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   **Where the guard actually reaches.** The rule above is the standard for anything reached
   from `Hud.update()`; the source scan that enforces it covers the painters registered in
   `HOT_PAINTERS` / `CANVAS_PAINTERS`, not every module `update()` touches. `Hud.update()` also
-  polls about half the `*_window.ts` painters (`spellbook_window.tickOpen()` runs every frame
-  while open; arena / dungeon_finder / vale_cup / card_duel `render()` on the 250ms band; the
-  rest get `refreshIfChanged()` on the 500ms band). Those rebuild behind their own invalidation
-  signature, which no per-file scan can see: it lives either inside the window module or on the
-  `Hud` method that polls it (`refreshOpenTownFocusIfChanged`). `town_focus_window` was the
-  standing counter-example until #2500 gave it one; a window polled from `update()` with no
-  signature is a defect, not a style choice.
-  **WHICH windows those are is now a registry**, not folklore: `tests/hud_update_drive.test.ts`
-  holds a row per call `Hud.update()` EVALUATES, with its cadence band, the exact condition text
-  gating it, what it repaints, and (for a window) the source line its invalidation guard is
-  spelled on, diffed BOTH ways against a TypeScript AST walk of the real method. Adding,
-  removing, re-banding or re-gating a call in `update()` fails it, and so does deleting a
-  guard it names. Three things it does not do, so nothing here is read as more than it is: it
-  sees `update()`'s own body only (a repaint added inside an already-registered private method
-  is invisible to it), a guard proof catches DELETION and not a guard neutered while its field
-  survives, and the band it records is the CALL SITE's, not any further self-throttling the
-  callee adds. So a window on a poll is now NAMED by the gate and still held to the
-  write-elision standard by review: give it a signature guard and keep it, and if you add a
-  genuinely per-frame write path, route it through the facet and move the module into
-  `HOT_PAINTERS`. **A signature over the REBUILD does not cover the fall-through**, which is
-  the hole #2519 closed in `spellbook_window` (the one window on the frame band): behind a
-  correct `lastKnownSig` its cheap branch still walked the subtree, allocated, and wrote a
-  property per row on every frame. Every branch a per-frame entry point takes needs its own
-  change check, so an unchanged frame does nothing at all. That module is also the worked
-  answer to "should a per-frame window move to `HOT_PAINTERS`", and it is NO here for two
-  reasons, neither of them "windows are cold": the full write contract is a per-FILE token
-  count pinned exactly, which churns on every ordinary markup edit while saying nothing about
-  CADENCE (it cannot tell a repaint write from a build-time one in the same file), and the
-  facet's writers elide through Maps keyed by ELEMENT, so a window that replaces its whole row
-  set per rebuild would strand a cache entry per destroyed node. What holds a per-frame window instead is a behavioral test
-  that drives it across repeated identical frames and asserts zero queries, reads and writes
-  (`tests/spellbook_tick_repaint.test.ts`); note the READ half, since once every write is
-  elided per row an ungated repaint still writes nothing and only the elision checks show up.
+  polls many of the `*_window.ts` painters on its cadence bands; those rebuild behind their
+  own invalidation signature, which no per-file scan can see. A window polled from `update()`
+  with no signature is a defect, not a style choice. **WHICH windows those are is a
+  registry**, not folklore: `tests/hud_update_drive.test.ts` holds a row per call
+  `Hud.update()` EVALUATES, with its cadence band, the exact condition text gating it, what it
+  repaints, and (for a window) where its invalidation guard is spelled, diffed BOTH ways
+  against a TypeScript AST walk of the real method. Adding, removing, re-banding or re-gating
+  a call in `update()` fails it, and so does deleting a guard it names (the registry's own
+  blind spots are documented in the test file; read them there).
+  **A signature over the REBUILD does not cover the fall-through:** every branch a per-frame
+  entry point takes needs its own change check, so an unchanged frame does nothing at all
+  (the `spellbook_window` lesson: behind a correct `lastKnownSig` its cheap branch still
+  walked the subtree, allocated, and wrote a property per row on every frame). What holds a
+  per-frame window is a behavioral test that drives it across repeated identical frames and
+  asserts zero queries, reads AND writes (`tests/spellbook_tick_repaint.test.ts`; the READ
+  half matters because once every write is elided per row, an ungated repaint still writes
+  nothing and only the elision checks show up), NEVER promotion to `HOT_PAINTERS`: the full
+  write contract is a per-FILE token count that churns on every ordinary markup edit while
+  saying nothing about CADENCE, and the facet's writers elide through Maps keyed by ELEMENT,
+  so a window that replaces its whole row set per rebuild would strand a cache entry per
+  destroyed node. A module that grows a genuinely per-frame write path routes it through the
+  facet and moves into `HOT_PAINTERS`.
   A module that arms its own repeating driver owes the same care INSIDE the
   callback, and since #2518 that is a scanned contract too: granting a driver in
-  `tests/hud_perf_budget.test.ts` now costs a `drivers` entry per call site recording the
+  `tests/hud_perf_budget.test.ts` costs a `drivers` entry per call site recording the
   cadence (pinned against the literal in the source), why the driver exists, and the EXACT
   count of raw writes, element re-queries and IDL-property writes one tick performs. The unit
   is not the callback body, which is empty in every live case and would have been green on the
@@ -134,28 +134,30 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   reach (`tests/helpers/driver_callback_bodies.ts`). Its REACH is the gate's, so read it with
   the same limit: only the three sanctioned adapter filenames are swept, so a driver in a
   bare-named module (`reconnect_overlay.ts`, `icon_prewarm.ts`, `hud.ts`) is outside it, the
-  same way those modules are already outside the per-file painter scans. `lockpick_window` re-resolved three element
-  refs on a 100ms tick until #2498, and the fix had to re-resolve them per board REBUILD
-  rather than once at construction, because `renderBoard` replaces that subtree on a signature
-  the clock does not restart on (`tests/lockpick_timer_repaint.test.ts` pins both halves).
+  same way those modules are already outside the per-file painter scans.
 - **Allocation-light cores.** A per-frame view-core returns a REUSED, preallocated container +
   slots (no per-frame array/object garbage); jitter/clock stay in the painter, never the core.
   Guarded always-on by the reference-stability probe `tests/util/alloc_probe.ts`.
-- **The perf gate.** `scripts/perf_tour.mjs` (run per per-frame phase against the recorded
-  baseline) asserts `frameP95 <= baseline` and a bounded AoE-burst FCT node count; each
-  green-gate commit is TAGGED so a cumulative regression bisects. The STANDING vitest budget
-  is `tests/hud_perf_budget.test.ts`, split by host: it scans every painter under all three
-  DOM-adapter names for raw writes AND forced-reflow layout reads
+- **The perf gate.** The STANDING vitest budget is `tests/hud_perf_budget.test.ts`, split by
+  host: it scans every painter under all three DOM-adapter names for raw writes AND
+  forced-reflow layout reads
   (`offsetWidth`/`getBoundingClientRect`/`getComputedStyle`/..., the layout-thrash killer, and
   note that this tree calls `getComputedStyle` BARE, never as a member); drives the non-pooled
   painters through a `makeWriterFacet` loop
   asserting establishing-write + elision for BOTH a Sim- and a `ClientWorld`-shaped input; and
-  (gated behind `HUD_PERF_BUDGET_TOUR=1`) asserts on EVERY viewport the run-length-INDEPENDENT
-  elision-bypass COUNT `hudHotDomWrites` at or below the committed baseline anchor (a COUNT,
-  NOT the skip RATIO, whose denominator is the frame count and jitters run-to-run), plus the
-  FCT pool stays at/under `FCT_POOL_CAP`.
-  The committed baseline (`tests/hud_perf_budget.baseline.md`) is READ for both anchors (it
-  throws if absent, never defaults).
+  (gated behind `HUD_PERF_BUDGET_TOUR=1`, reading a real-browser `scripts/perf_tour.mjs`
+  artifact) asserts on EVERY viewport the run-length-INDEPENDENT elision-bypass COUNT
+  `hudHotDomWrites` at or below the committed baseline anchor (a COUNT, NOT the skip RATIO,
+  whose denominator is the frame count and jitters run-to-run), that the tour rendered at
+  least `tourMinFrames` real frames while keeping the long-frame count `frameLong50` at or
+  under its committed anchor (both same-machine captures; override the long-frame anchor on
+  other hardware via `HUD_PERF_BUDGET_TOUR_LONG50_BASELINE`; the old `frameP95` gate was
+  RETIRED as mathematically unfailable, its threshold equaled the sample clamp, and frameP95
+  is console context only now), plus the FCT pool stays at/under `FCT_POOL_CAP` under the
+  scripted AoE burst.
+  The committed baseline (`tests/hud_perf_budget.baseline.md`) is READ for the anchors (it
+  throws if absent, never defaults); each green-gate commit is TAGGED so a cumulative
+  regression bisects.
 - **Two controllers stay separate.** HUD tier knobs read the STATIC graphics preset via
   `src/game/ui_effects_profile.ts` (the `data-fx-level` stamp), NEVER `governor.state()`;
   `Hud.fxTier()` resolves the static stamp through `coerceFxTier`. This is the perf half of the
@@ -169,7 +171,7 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
 - **Resolve element refs ONCE** into a field at construction, never `$()`/`querySelector` from
   a per-frame path (a re-query every frame was a real leak; `hud.ts` caches `xpbarEl` etc.).
   For a window whose nodes are REBUILT, "at construction" is wrong and re-resolving at the
-  rebuild is the fix (`lockpick_window`, above). Better still when the module mints the nodes
+  rebuild is the fix (`hud/delve/lockpick_window`). Better still when the module mints the nodes
   itself: COLLECT the ref as the node is created and clear the collection at the top of the
   rebuild, which costs zero queries even on a rebuild and carries each node's key with it
   (`spellbook_window`'s toggle list, which no longer reads `dataset` per row either).
@@ -183,10 +185,9 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
   `minimapBg` terrain canvas).
 - **Set loop-invariant canvas state once**, and for TEXT go further. Hoisting `fillStyle` /
   `lineWidth` above a draw loop is ordinary hygiene, but hoisting `ctx.font` does NOT fix a hot
-  text loop and the "font string re-parsing" story is wrong. Measured (17 iterations, dirty style
-  tree): bare `ctx.font` 0.033ms, `fillText` with the font already set 0.037ms, `measureText`
-  0.0368ms, `drawImage` 0.0062ms; hoisted-vs-inline `ctx.font` is 0.0385 vs 0.036, i.e. no
-  better. EVERY canvas text entry point (the `font` setter, `fillText`, `measureText`) re-resolves
+  text loop and the "font string re-parsing" story is wrong (measured: hoisted and inline cost
+  the same, and `fillText`/`measureText` cost as much as the setter). EVERY canvas text entry
+  point (the `font` setter, `fillText`, `measureText`) re-resolves
   font state against the document, so the cost tracks how dirty the style tree is, not the font
   string. The only fix for a per-item text loop is to leave the text API: rasterize each distinct
   (glyph, color) ONCE into an offscreen sprite and `drawImage` it, with the destination
@@ -239,9 +240,8 @@ extracted HUD domain lands under `src/ui/hud/<domain>/` instead, exposed through
 `index.ts` barrel; the domain shape (controllers with narrow dependency bags, never importing
 `Hud`) and the preservation contract live in `src/ui/hud/CLAUDE.md`. Components with no
 extracted domain stay flat `src/ui/` modules. Its test is a Vitest in `tests/<name>.test.ts`
-driving the pure core directly. Bug fixes are test-first: a failing test that reproduces the
-bug (extract the buried unit into its own module if needed), then the smallest change that
-turns it green.
+driving the pure core directly. Bug fixes are test-first (root `CLAUDE.md` and the
+`extract-and-test` skill own that workflow).
 
 ### Authoring a new HUD component (the recipe)
 One recipe for a new window/panel or a per-frame frame/bar, and for migrating one out of
@@ -259,7 +259,8 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
 - **Thin painter** `src/ui/<name>_window.ts` (or `_painter.ts`): paints/updates nodes and wires
   callbacks via an injected `deps` object; owns no state and never imports `Hud`. It drives
   tokens / CSS vars, never a literal hex/px/color in TS (the per-painter no-magic-values source
-  guard). Interpolated names pass through `esc()`; a pure extraction reuses existing `t()` keys
+  guard; the exception list and guard-test names live in `src/styles/CLAUDE.md`).
+  Interpolated names pass through `esc()`; a pure extraction reuses existing `t()` keys
   and adds none. BOTH names are swept by the painter gate (`tests/hud_perf_budget.test.ts`,
   `PAINTER_FILE_RE`), which sorts every painter into exactly one of three buckets:
   - **facet-routed** (`HOT_PAINTERS`): the painters held to the FULL write contract. Usually
@@ -294,7 +295,7 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   reads as more than it is: the scans are per FILE, so a layout read one hop away in a shared
   helper is invisible unless the helper is named as a proxy token (`getUiScale` and
   `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
-  (`vale_cup_hud.ts`, `dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
+  (`dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
   by the module sweep in `tests/architecture.test.ts`.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
@@ -313,7 +314,12 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
 - **For chrome:** satisfy the HUD-chrome WCAG 2.2 AA contract above; mark the window root with
   `markDialogRoot` (`src/ui/dialog_root.ts`): role=dialog + aria-modal + exactly ONE accessible
   name (labelledBy wins and clears aria-label), cold-path raw `setAttribute` BY DESIGN (not
-  `PainterHost`, not a registered pure core; `tests/dialog_root.test.ts`). **For a hot
+  `PainterHost`, not a registered pure core; `tests/dialog_root.test.ts`). An ad-hoc
+  confirm/quantity prompt mounted into `#prompt-stack` reuses the shared modal recipe
+  `prompt_dialog.ts` (`installPromptDialog`: the window behind it goes inert while open, EVERY
+  teardown path routes through the returned `dismiss()`, focus returns to the opener), never a
+  hand-rolled trap; a caller whose window can be force-closed under an open prompt also clears
+  `inert` in its own teardown as a backstop, so a root is never left inert while hidden. **For a hot
   component:** keep the core allocation-light, pass the perf gate, read the static preset (not
   the governor), and apply the matching canvas hot-path technique.
 - **Reuse a FAMILY before building bespoke:** a unit-style frame is a new `UnitFramePainter`
@@ -349,7 +355,9 @@ The locale data is split; touch the right file (full model + locked-terms glossa
 `docs/i18n-scaling/translation-workflow.md`):
 - **`i18n.catalog/`** is the authoritative English source catalog (nested domain modules
   `shell`/`hud`/`hud_chrome`/`abilities`/`quests`/`items`/`game`/`merge`/`guide`/`editor`/
-  `api_error` + an `index.ts` barrel, which also defines a few namespaces inline in `en`, for
+  `api_error`/`armory` (the Season 1 Armory skin names + look/lore prose, merged by
+  `hud_chrome.ts` into the `hudChrome` namespace) + an `index.ts` barrel, which also defines a
+  few namespaces inline in `en`, for
   example `meta`, `realmTypes`, and the dev command GUI's `devCommand`, next to the
   `worldEntityText` merge) that drives `TranslationKey`, the dotted-path type every
   `t()` uses. `TranslationKey` re-exports the BUILD-GENERATED flat literal union of every `en`
@@ -447,8 +455,9 @@ per-surface behavior lives in `tests/language_fanout_relocalize.test.ts`.
 **Catalog-domain gotcha (where to put a new client key).** Most catalog domains carry
 per-locale data that `tsc` ENFORCES (locale blocks typed against the `en` shape, e.g.
 `game.ts`'s `typeof gameStrings` exports), so adding a key to their `en` block red-fails `tsc`
-until every non-en block is filled too. Five domains are consumed `en`-only, so an
-English-only add compiles: `hud_chrome.ts`, `shell.ts`, `guide.ts`, `editor.ts`,
+until every non-en block is filled too. The domains consumed `en`-only, where an
+English-only add compiles, are `hud_chrome.ts` (including the `armory.ts` strings it merges),
+`shell.ts`, `guide.ts`, `editor.ts`,
 `api_error.ts`; their translations live solely in the overlays (`shell.ts` still carries
 inline non-English blocks, but they are dead LEGACY the build never reads: reword the OVERLAY
 translations, never those blocks). New HUD chrome keys go in `i18n.catalog/hud_chrome.ts`
@@ -461,10 +470,12 @@ byte-identical to a historical hand-rolled form, pass `useGrouping: false` + mat
 fraction-digit options (see `coords.ts`, `meters.ts`, `xp_bar.ts`, `clock.ts`).
 
 **Three client-side matchers re-localize `src/sim`/`server` English** (which stay
-language-agnostic): the hud-local `localizeErrorText`/`localizeSystemText`/`localizeLootText`,
-then `server_i18n.ts` (`localizeServerText`), then `sim_i18n.ts` (`localizeSimText`), in that
-order; the S3 drift guard accepts recognition by any of the three. Dev-channel text
-(`console.*`, thrown errors) stays English and is NOT matched.
+language-agnostic): `localizeErrorText` (the registered pure core
+`error_text_i18n_core.ts`; Hud keeps a thin delegator) plus the hud-local
+`localizeSystemText`/`localizeLootText`, then `server_i18n.ts` (`localizeServerText`), then
+`sim_i18n.ts` (`localizeSimText`), in that order; the S3 drift guard resolves each arm
+through its per-arm file table and accepts recognition by any of the three. Dev-channel
+text (`console.*`, thrown errors) stays English and is NOT matched.
 
 **Entity & talent names** localize through their own resolvers, not raw `t()`:
 `world_entity_i18n.ts` is the single ENGLISH source for mob/NPC/quest/zone/dungeon names +
@@ -555,6 +566,25 @@ touch the DOM is indexed in the sibling `UI_PAINTER_HELPERS` / `UI_DOM_MODULES` 
 same file), and each module's header carries its own contract.
 - **unit_portrait.ts** / **unit_portrait_painter.ts**: the canonical template pair (DOM-free
   geometry + crest-id core, thin DPR-aware painter); player and target frames share it.
+- **pet_frame_view.ts** (+ **pet_entity.ts**, **hud/pet_bar_core.ts**, **pet_action_icons.ts**):
+  the pet unit frame and pet action bar. The pet frame is a further INSTANCE of the
+  `unit_frame.ts` / `unit_frame_painter.ts` family: the pure core only decides WHICH roster
+  entity is the pet (a pet is an ordinary mob whose `ownerId` is its owner's entity id) and
+  fills a caller-owned descriptor. The resolution rule has ONE authority, the sim's
+  `isPrimaryOwnedPetEntity` (`src/sim/pet/pet_selection.ts`): `hud/pet_bar_core.ts` imports it
+  directly, and `findOwnPet` / `isControllableOwnedPet` mirror its exclusions (delve
+  companions and temporary summons carry an `ownerId` too), so the frame, the pet bar, and
+  the target-pet keybind in `main.ts` always select the same entity
+  (`tests/pet_bar_core.test.ts`, `tests/pet_frame_view.test.ts`). DEAD pets stay in the frame
+  deliberately (a revivable corpse; the pet ACTION bar hides itself instead). Party PET
+  slivers reuse the party-frame family, not a new one: `findPetsByOwner` attaches a member's
+  pet CLIENT-SIDE from the interest-scoped entity roster (never the party wire; an
+  out-of-scope pet is deliberately absent), the sliver joins the row's repaint signature
+  INCLUDING the pet name (`renamePet` can change it with every other field identical), and
+  the sliver click handler reads the slot at CLICK time because rows are recycled across
+  members (a captured pet id would go stale). The sliver is deliberately NOT class `bar`
+  (two shipped rules select every non-hp `.bar` child of a row) and not role=button (the row
+  is the button; a nested control is the axe nested-interactive violation).
 - **hud/vendor/vendor_view.ts** / **vendor_window.ts**: the first window migrated out of
   `hud.ts` by the recipe above (pure view decides the rows; thin consumer paints from
   injected `deps`).
@@ -586,16 +616,101 @@ same file), and each module's header carries its own contract.
   helper in `target_frame_pos.ts` (`scaleFromKeyStep`). A frame gesture with no keyboard path is
   a defect: unlocking is the only route to these frames, so a pointer-only affordance leaves a
   keyboard-only player unable to reach what it changes at all.
-- **deeds_view.ts** / **deeds_window.ts** (+ **deed_tracker_painter.ts**,
-  **deeds_leaderboard_view.ts**, **deed_i18n.ts**, **deed_i18n.locales/**,
-  **deed_image_ids.ts**): the Book of Deeds achievements window. The DOM-free core builds
-  the category/entry model, search, progress fractions, crest-id resolution, and the
-  drain-batched unlock moment (banners coalesce, retro grants fold to one summary line);
-  the painter is a cold window plus the write-elided HUD watch tracker. `deed_i18n.ts`
-  re-localizes deed names/descriptions/titles/broadcast lines from ids (the
-  `talent_i18n.ts` entity-style pattern; per-base-locale release-fill chunks under
-  `deed_i18n.locales/` fetched lazily via `DEED_LOCALE_LOADERS`);
-  `deeds_leaderboard_view.ts` is the Renown-board tab's pure core.
+- **deeds_view.ts** / **deeds_window.ts** (+ the `deed_*` siblings): the Book of Deeds
+  window: DOM-free category/entry/unlock model, a cold window painter, and the write-elided
+  HUD watch tracker. `deed_i18n.ts` re-localizes deed names/descriptions/titles from ids
+  (the `talent_i18n.ts` pattern; lazy per-base-locale chunks under `deed_i18n.locales/` via
+  `DEED_LOCALE_LOADERS`). `deed_border_view.ts` is the worn-border channel BOTH the overhead
+  nameplate canvas and the unit-frame portrait ring paint from; it is the one sanctioned
+  home of those accent literals, an exception `src/styles/CLAUDE.md` documents.
+- **reliquary_view.ts** / **reliquary_window.ts** (+ the `reliquary_*` siblings): the
+  Reliquary collection window, the Book of Deeds family exactly (cold, event-driven window
+  off a refresh signature; `reliquary_i18n.ts` is the same lazy-chunk channel via
+  `RELIQUARY_LOCALE_LOADERS`). A view model's `name` field is raw catalog English that NO
+  render site may print: resolve through `reliquaryPageName(pageId)` at paint time. The
+  `_tracker_` pair memoizes its whole-catalog default scan on an ownership signature because
+  `reliquaryPageCompletion` mints a fresh ownership bag per call in BOTH hosts; per-cell art
+  resolution and the opaque-cell carve-out live in `reliquary_cell_art.ts` (see its header).
+- **woc_market_window.ts** over the pure **woc_market_view.ts** core: the $WOC Exchange
+  (config-off behind `WOC_MARKET_ENABLED`; `docs/prd/woc/marketplace.md`). Everything
+  economic is a passthrough of server numbers; the terms-acceptance checkbox lives here.
+  **woc_market_chrome.ts** is the emit-only markup seam the window composes (browse
+  strip, sales list, sell-empty caption, bond disclosure notes); it spells its focus
+  keys through `FOCUS_KEY_ATTR` from `focus_restore.ts`.
+  Custody moves run the wallet STEP-UP first (B6/R1): the submit mints a challenge,
+  hands the SERVER-built message to `hooks.signMessageBase58` (same lazy bridge as the
+  payment signer), and sends the proof with the request; the trade window's $WOC arm
+  does the same on the SELLER's acceptance only. Devsig skips the wallet ONLY on an
+  explicit `signatureRequired: false`; absent means sign.
+  Payment-verdict words (the server's screened vocabulary: pending kinds incl. the
+  bond leg's own voice, settlement fail reasons) localize through
+  `woc_market_reason_text.ts`, which owns the word-to-copy maps with a generic
+  fallback in each direction; never map a verdict word to text inline in a painter.
+  Wallet-bridge failures classify through `wallet_bridge_reason_text.ts` (structural
+  cancel names, a byte-exact map over the bridge's thrown strings with a drift pin
+  over src/net plus `mobile_wallet_launcher.ts` and the desktop hand-off's throw
+  sites, caller-flavored generics): a catch site never renders `err.message`, it logs
+  the raw error on the dev channel and renders the classified line; rewording one of
+  those throws updates the map in the same change. The window's toast
+  (`notice`) stores UNRESOLVED state (keys, codes, screened words) and resolves at
+  render via `resolveNotice`, so a language switch never strands stale text. USD
+  amounts spell through `usd_text.ts` (Intl currency; the src/{ui,game,net} grep pin in
+  `tests/usd_text.test.ts` keeps the hardcoded-`$` and appended-code classes extinct);
+  multi-unit durations (countdowns, the claim cooldown's retry time, the p2p payment
+  hold) through `duration_text.ts`, never a raw `formatDuration` seconds count. The
+  seller's Cancel gate is ONE predicate, `canCancelListing` in the view core, for the
+  browse detail pane and the Activity rows alike. TOKEN figures spell through
+  `woc_tokens_text.ts` (one fraction-digit count for the Exchange, the trade arm and the
+  bag chip, which each formatted their own; `tests/woc_tokens_text.test.ts` pins that no
+  caller re-spells them), and the bag's balance chip itself is `woc_balance_chip.ts`, not
+  a `hud.ts` member. BEHAVIOR lives in `tests/woc_market_window_rig.test.ts` (the real
+  window over happy-dom with a recording fake client: the busyGen close guard, the poll
+  gate, the draft and focus carry, the combobox, the settlement faces);
+  `tests/woc_market_window.test.ts` is its source-scan twin and holds only what a regex
+  can (no magic values, no layout read, no driver, CSS specificity order, class
+  coverage). Copy that spells a server rule in words (the anti-snipe window, the Buy Now
+  hold and cooldowns, the strike ladder) is pinned to those constants in
+  `tests/woc_market_copy_figures.test.ts`; the seller's fee is RESOLVED from the
+  estimate's split rather than named as a percentage, because the schedule is economy
+  SERVICE configuration and is not on `/status`.
+  The trade window's $WOC arm is `trade_woc_view.ts` (pure model: faces, the fee block
+  for both sides, the buyer's commitment note, review/delivering status keys) plus the
+  cold painter `trade_woc_arm_painter.ts`, driven by `hud/woc_trade/` (the controller and
+  `woc_trade_offer_view.ts`, which owns `wocOfferPhase`/`wocOfferClosedReason`: 'settled'
+  requires resolution 'sold', a closed-not-sold listing is 'closed', a delivered or
+  review-parked settlement is still 'paying'). The controller keys the claimed
+  settlement and the staged quote to their offer id, guards every post-await write on
+  the deal still standing, and holds the local 'paying' face only while a signature is
+  out with the wallet (never through the claim round trips).
+  Both consent controls satisfy draft Terms 10.3: the Exchange checkbox and the
+  trade arm's consent row (`trade_woc_arm_painter.ts`) share ONE label key, link the
+  Marketplace terms, and send the player's REAL choice; the R9 hard-coded
+  `acceptTerms: true` posture is closed (`docs/woc-marketplace-hardening/state.md`).
+  The link's href comes from `terms_link.ts` (same-origin on the site, the canonical
+  page from the packaged desktop and Capacitor shells, where a bare '/terms' was a
+  dead link or an in-app navigation); the DOM host passes the origin in.
+  CAVEAT the code cannot show: the deployed `public/terms.html` does not yet carry
+  its Marketplace section (the draft lives at the repo root), so the link points at
+  a page missing the terms being accepted until the pre-enable Terms publication
+  lands (owned by the packet's close-out audit; the market ships config-off).
+- **woc_store_view.ts** (+ **char_skin_window.ts**, **armory_inspect.ts**,
+  **armory_labels.ts**, **store_promo_card.ts**, **preview_prewarm_core.ts**): the WOC Store
+  and Season 1 Armory. The pure projection reads the skin catalog
+  (`src/sim/content/weapon_skins.ts` + the apply rules); the economy service stays
+  authoritative for availability, prices, balances, and grants. `armory_inspect.ts` is a
+  body-level overlay opened from a store card, with a live 3D try-on viewport via
+  `src/render/armory_preview` (the player's own character under a scene, or the weapon on a
+  turntable). EVERY player-visible skin string (names, collections, look and lore lines)
+  resolves through the runtime locale catalog (`i18n.catalog/armory.ts`, merged into the
+  `hudChrome` namespace), never a raw catalog field. `preview_prewarm_core.ts` owns the
+  post-entry prewarm schedule: the paperdoll and portrait prewarms run AFTER the world
+  reveal through the renderer's background GPU queue (never awaited behind the loading
+  screen), pause while the owning window is open, and cancel on a graphics rebuild. The
+  Armory catalog is deliberately NOT in that schedule and is warmed nowhere ahead of time:
+  it is built per inspected card, on the click that opens it. Measured, warming it cost
+  every online session about 2.1 to 2.6 s of live-frame hitches for a window only some
+  players open, and the cost was positional rather than per skin, so no gentler schedule
+  existed (`docs/design/armory-preview-warming.md`).
 - **bank_filter.ts** (with **bank_view.ts** / **bank_window.ts**): the bank search/sort
   preserves live `slotIndex` values verbatim, so a filtered row still names the exact wire
   argument for deposit/withdraw.

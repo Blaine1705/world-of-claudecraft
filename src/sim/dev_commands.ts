@@ -1,3 +1,4 @@
+import { applyCourserDaze } from './combat/hunter_shared';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
@@ -191,6 +192,38 @@ export function handleDevChat(
       ctx.handleDeath(target, player ?? null);
       emitDevLog(ctx, pid, `[dev] Killed ${target.name}.`);
     }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+daze|devdaze)\s*$/i.test(raw)) {
+    const player = ctx.entities.get(pid);
+    if (!player) return null;
+    applyCourserDaze(ctx, player);
+    emitDevLog(ctx, pid, "[dev] Applied the Courser's Guise daze (movement speed halved for 4s).");
+    return null;
+  }
+
+  if (/^\/(?:dev\s+fear|devfear)\s*$/i.test(raw)) {
+    // A movement-only test hook for the fear wall guard: it deliberately omits the
+    // breaksOnDamage / breakThreshold / DR handling a real cast fear sets, so the
+    // flee window is stable to watch. Do not "complete" it into a real fear.
+    const player = ctx.entities.get(pid);
+    if (!player) return null;
+    ctx.applyAura(player, {
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 8,
+      duration: 8,
+      value: player.facing, // flee straight along your facing: aim at a wall to test the guard
+      sourceId: player.id,
+      school: 'shadow',
+    });
+    emitDevLog(
+      ctx,
+      pid,
+      '[dev] Feared for 8s along your facing. Face a wall to watch the guard steer you around it.',
+    );
     return null;
   }
 
@@ -679,6 +712,39 @@ export function handleDevChat(
     emitDevLog(ctx, pid, '[dev] Health restored.');
     return null;
   }
+  const hpMatch = /^\/(?:dev\s+hp|devhp)\s+(\d+)\s*$/i.exec(raw);
+  if (hpMatch) {
+    const percent = clampInteger(Number(hpMatch[1]), 1, 100);
+    const player = ctx.entities.get(pid);
+    if (!player) return null;
+    const targeted = player.targetId === null ? null : ctx.entities.get(player.targetId);
+    // Never another tester's BODY: on a shared realm with dev commands enabled,
+    // this would be one tester rewriting another tester's fight. That covers
+    // their controlled pet too, which is a mob carrying their id as ownerId, not
+    // a player entity. Yourself, your own pet, or an unowned non-player body
+    // only, and a named-but-unusable target refuses rather than silently falling
+    // back to self (an automation caller whose target did not land would
+    // otherwise measure its own hp and never know).
+    const someoneElses =
+      !!targeted &&
+      ((targeted.kind === 'player' && targeted.id !== pid) ||
+        (targeted.ownerId !== null && targeted.ownerId !== pid));
+    if (targeted && (targeted.dead || someoneElses)) {
+      ctx.error(pid, '[dev] Target yourself, your own pet, or a living unowned body.');
+      return null;
+    }
+    const entity = targeted ?? (player.dead ? null : player);
+    if (!entity) {
+      ctx.error(pid, '[dev] No living target.');
+      return null;
+    }
+    // Sets hp directly: no threat, no damage event, no death check, and raising
+    // it does not rewind an encounter script that already advanced on the way
+    // down. A playtest cheat, not a combat path.
+    entity.hp = Math.max(1, Math.floor((entity.maxHp * percent) / 100));
+    emitDevLog(ctx, pid, `[dev] Set ${entity.name} to ${percent}% health.`);
+    return null;
+  }
   if (/^\/(?:dev\s+resource|devresource)\s*$/i.test(raw)) {
     const entity = ctx.entities.get(pid);
     if (entity && !entity.dead) entity.resource = entity.maxResource;
@@ -716,7 +782,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

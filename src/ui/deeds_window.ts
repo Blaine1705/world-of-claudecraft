@@ -11,6 +11,14 @@ import { audio } from '../game/audio';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
+import {
+  borderAccent,
+  DEED_HERALDRY_ATTR,
+  DEED_HERALDRY_MOTIF_ATTR,
+  deedBorderSlug,
+  deedHeraldryMotifSvg,
+  deedHeraldryStyle,
+} from './deed_border_view';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
 import {
   buildDeedsView,
@@ -29,9 +37,12 @@ import {
   toggleWatch,
 } from './deeds_view';
 import { markDialogRoot } from './dialog_root';
+import { poiMarkLabel } from './entity_i18n';
 import { esc } from './esc';
+import { focusedWithin } from './focus_restore';
 import {
   formatDateTime,
+  formatList,
   formatNumber,
   getLanguage,
   languageTag,
@@ -80,7 +91,14 @@ const FILTER_LABEL_KEYS: Record<DeedsFilter, TranslationKey> = {
  */
 export function refocusSelector(active: Element | null): string | null {
   if (active === null) return null;
-  for (const attr of ['data-cat', 'data-filter', 'data-watch', 'data-title', 'data-recent']) {
+  for (const attr of [
+    'data-cat',
+    'data-filter',
+    'data-watch',
+    'data-title',
+    'data-border-pick',
+    'data-recent',
+  ]) {
     const value = active.getAttribute(attr);
     if (value !== null) {
       const cssValue = value.replace(/["\\]/g, '\\$&');
@@ -303,6 +321,7 @@ export class DeedsWindow {
       renown: world.renown,
       earnedCount: world.deedsEarned.size,
       activeTitle: world.activeTitle,
+      activeBorder: world.activeBorder,
       filter: this.filter,
       search: this.search,
       category: this.category,
@@ -331,7 +350,10 @@ export class DeedsWindow {
     if (!this.opened) return;
     this.pruneWatchedIfStale();
     const active = document.activeElement as HTMLElement | null;
-    const hadFocus = el.contains(active);
+    // The shared reader, not a bare root-containment check: the pointer-only
+    // focus drop parks pointer focus on this root, and the root is not a control
+    // to restore (it would resolve no selector and fall through to Close).
+    const hadFocus = focusedWithin(el) !== null;
     const searchEl = el.querySelector('.deed-search') as HTMLInputElement | null;
     const searchFocus =
       searchEl !== null && active === searchEl
@@ -422,6 +444,7 @@ export class DeedsWindow {
       deedStats: world.deedStats,
       renown: world.renown,
       activeTitle: world.activeTitle,
+      activeBorder: world.activeBorder,
       deeds: DEEDS,
       order: DEED_ORDER,
       category: this.category,
@@ -497,9 +520,11 @@ export class DeedsWindow {
       })
       .join('');
     const titlesOn = this.category === 'titles';
+    // The shelf holds both worn cosmetics, so the rail names both: a player
+    // hunting for the border picker must be able to see where it lives.
     const titlesRow =
       `<button type="button" class="deeds-cat deeds-cat-titles${titlesOn ? ' active' : ''}" data-cat="titles" aria-pressed="${titlesOn}">` +
-      `<span class="deeds-cat-name">${esc(t('hudChrome.deeds.titlesSection'))}</span></button>`;
+      `<span class="deeds-cat-name">${esc(t('hudChrome.deeds.cosmeticsSection'))}</span></button>`;
     return `<nav class="deeds-rail" aria-label="${esc(t('hudChrome.deeds.categoriesAria'))}">${rows}${titlesRow}</nav>`;
   }
 
@@ -508,6 +533,19 @@ export class DeedsWindow {
     if (model.entries.length === 0)
       return `<div class="deeds-empty">${esc(t('hudChrome.deeds.emptyCategory'))}</div>`;
     return `<div class="deeds-list">${model.entries.map((entry) => this.entryHtml(entry)).join('')}</div>`;
+  }
+
+  /** Resolve poi:<zoneId>:<poiId> marks (the core's missingPoiMarkIds) to
+   *  their localized display names via the shared poiMarkLabel resolver
+   *  (entity_i18n.ts), which drops a mark whose zone/poi no longer resolves
+   *  rather than showing a raw id. */
+  private missingPoiLabels(markIds: readonly string[]): string[] {
+    const labels: string[] = [];
+    for (const markId of markIds) {
+      const label = poiMarkLabel(markId);
+      if (label !== null) labels.push(label);
+    }
+    return labels;
   }
 
   private entryHtml(entry: DeedEntryModel): string {
@@ -524,6 +562,13 @@ export class DeedsWindow {
     if (entry.titleReward)
       chips.push(
         `<span class="deed-chip deed-title-chip">${esc(t('hudChrome.deeds.titleChip'))}</span>`,
+      );
+    // Deliberate family reuse: the border chip wears the shipped
+    // deed-title-chip class rather than a bespoke one, so the two worn-cosmetic
+    // rewards read as one family on a card and neither can drift in styling.
+    if (entry.borderReward)
+      chips.push(
+        `<span class="deed-chip deed-title-chip">${esc(t('hudChrome.deeds.borderChip'))}</span>`,
       );
     // Feats carry no Renown chip (they are zero Renown by rule).
     if (!entry.feat)
@@ -560,6 +605,19 @@ export class DeedsWindow {
       });
       body += `<div class="deed-rarity">${esc(t('hudChrome.deeds.rarityLine', { percent }))}</div>`;
     }
+    // Which named places are still outstanding on an exploration wayfarer
+    // deed (single-zone like Wayfarer of the Heights, or cross-zone like The
+    // Long Road North), so a player is never left re-walking ground to find
+    // the one mark that never registered (it did; they just could not see
+    // which one). The .deed-rarity class is reused rather than a bespoke
+    // one: both lines are the same "muted secondary fact under the blurb"
+    // role.
+    const missingPlaces = this.missingPoiLabels(entry.missingPoiMarkIds);
+    if (missingPlaces.length > 0) {
+      body += `<div class="deed-rarity">${esc(
+        t('hudChrome.deeds.stillToVisit', { places: formatList(missingPlaces) }),
+      )}</div>`;
+    }
     let foot = '';
     if (entry.earnedDay !== null) {
       const date = formatDateTime(new Date(`${entry.earnedDay}T00:00:00Z`), {
@@ -595,19 +653,119 @@ export class DeedsWindow {
     return `<b>${esc(deedName(id))}</b><div class="tt-sub">${esc(deedDesc(id))}</div>`;
   }
 
+  /** The worn-cosmetics shelf: the title picker, then the nameplate-border
+   *  picker. Two labelled groups of the same option button (one class, so the
+   *  mobile tap floor and the focus ring already cover both); the pick
+   *  ATTRIBUTE is what keeps their click delegations apart. */
   private titlesHtml(model: DeedsViewModel): string {
-    const rows = model.titles
+    const activeBorder = model.borders.find((option) => option.active)?.id ?? null;
+    return (
+      this.pickerGroupHtml({
+        cls: 'deeds-titles',
+        pickAttr: 'data-title',
+        headingKey: 'hudChrome.deeds.titlesSection',
+        emptyKey: 'hudChrome.deeds.titlesEmpty',
+        options: model.titles,
+        // A title deed carries its own display text; a border deed carries a
+        // slug with no player-facing words, so its option is named by the deed.
+        label: (id) => (id === null ? t('hudChrome.deeds.titlesNone') : deedTitleText(id)),
+      }) +
+      this.pickerGroupHtml({
+        cls: 'deeds-borders',
+        pickAttr: 'data-border-pick',
+        headingKey: 'hudChrome.deeds.bordersSection',
+        emptyKey: 'hudChrome.deeds.bordersEmpty',
+        options: model.borders,
+        label: (id) => (id === null ? t('hudChrome.deeds.bordersNone') : deedName(id)),
+        decorate: (id, label) => this.borderOptionInner(id, label),
+      }) +
+      `<div class="deeds-border-preview-slot">${this.borderPreviewHtml(activeBorder)}</div>`
+    );
+  }
+
+  /** Canonical seal plus a small material sample and the existing deed name.
+   *  None retains the same footprint but contains no earned material. */
+  private borderOptionInner(id: string | null, label: string): string {
+    const name = esc(label);
+    if (!id) {
+      return `<span class="deed-border-swatch deed-border-swatch-empty" aria-hidden="true"></span>${name}`;
+    }
+    const accent = borderAccent(deedBorderSlug(id));
+    if (!accent) {
+      return `<span class="deed-border-swatch deed-border-swatch-empty" aria-hidden="true"></span>${name}`;
+    }
+    return (
+      `<span class="deed-border-swatch" aria-hidden="true" ${DEED_HERALDRY_ATTR}="${esc(deedBorderSlug(id))}" ${DEED_HERALDRY_MOTIF_ATTR}="${accent.motif}" style="${esc(deedHeraldryStyle(accent))}">` +
+      `<span class="deed-heraldry-seal">${deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-seal-art')}</span>` +
+      `<span class="deed-border-material">${deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-pattern')}</span></span>` +
+      name
+    );
+  }
+
+  /** Representative world token plus interaction reveal. This is rebuilt only
+   *  on picker hover/focus events and carries no command path. */
+  private borderPreviewHtml(id: string | null): string {
+    const slug = deedBorderSlug(id);
+    const accent = borderAccent(slug);
+    const deedId = id ?? '';
+    if (!id || !accent) {
+      return `<div class="deed-heraldry-preview" data-preview-deed="${esc(deedId)}" ${DEED_HERALDRY_ATTR}="" aria-hidden="true"></div>`;
+    }
+    const playerName = esc(this.deps.world().player.name);
+    const grantingDeed = esc(deedName(id));
+    const seal =
+      `<span class="deed-heraldry-seal">` +
+      deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-seal-art') +
+      `</span>`;
+    const pattern = deedHeraldryMotifSvg(accent.motif, 'deed-heraldry-pattern');
+    return (
+      `<div class="deed-heraldry-preview" data-preview-deed="${esc(id)}" ${DEED_HERALDRY_ATTR}="${esc(slug)}" ${DEED_HERALDRY_MOTIF_ATTR}="${accent.motif}" style="${esc(deedHeraldryStyle(accent))}" aria-hidden="true">` +
+      `<div class="deed-heraldry-preview-world">${seal}<span class="deed-heraldry-preview-ribbon deed-heraldry-plaque">${playerName}</span></div>` +
+      `<div class="deed-heraldry-preview-interaction"><span class="deed-heraldry-preview-portrait"></span>${seal}` +
+      `<span class="deed-heraldry-preview-header deed-heraldry-plaque">${pattern}<span class="deed-heraldry-preview-name">${playerName}</span>` +
+      `<span class="deed-heraldry-preview-deed">${grantingDeed}</span></span></div></div>`
+    );
+  }
+
+  private paintBorderPreview(id: string | null): void {
+    const slot = this.deps.root().querySelector<HTMLElement>('.deeds-border-preview-slot');
+    if (slot) slot.innerHTML = this.borderPreviewHtml(id);
+  }
+
+  /** One cosmetic picker group. The option array arrives in catalog order
+   *  behind its None head and renders verbatim; only the None head exists when
+   *  nothing is earned, which is what the empty line reports.
+   *
+   *  The visible head is a real h3 (the window family's section-heading
+   *  level) and the group is named BY it (aria-labelledby), not by a second
+   *  aria-label string: one accessible name, matching the visible text, plus
+   *  a heading a screen reader can navigate to. The id is derived from the
+   *  group class, which is unique per group inside the single-instance
+   *  window. */
+  private pickerGroupHtml(group: {
+    cls: string;
+    pickAttr: string;
+    headingKey: TranslationKey;
+    emptyKey: TranslationKey;
+    options: readonly { id: string | null; active: boolean }[];
+    label(id: string | null): string;
+    decorate?(id: string | null, label: string): string;
+  }): string {
+    const rows = group.options
       .map((option) => {
-        const label =
-          option.id === null ? t('hudChrome.deeds.titlesNone') : deedTitleText(option.id);
-        return `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" data-title="${esc(option.id ?? '')}" aria-pressed="${option.active}">${esc(label)}</button>`;
+        const label = group.label(option.id);
+        const inner = group.decorate ? group.decorate(option.id, label) : esc(label);
+        return `<button type="button" class="deed-title-option${option.active ? ' active' : ''}" ${group.pickAttr}="${esc(option.id ?? '')}" aria-pressed="${option.active}">${inner}</button>`;
       })
       .join('');
     const empty =
-      model.titles.length <= 1
-        ? `<div class="deeds-empty">${esc(t('hudChrome.deeds.titlesEmpty'))}</div>`
-        : '';
-    return `<div class="deeds-titles" role="group" aria-label="${esc(t('hudChrome.deeds.titlesAria'))}">${rows}${empty}</div>`;
+      group.options.length <= 1 ? `<div class="deeds-empty">${esc(t(group.emptyKey))}</div>` : '';
+    const headId = `${group.cls}-head`;
+    return (
+      `<div class="${group.cls}" role="group" aria-labelledby="${headId}">` +
+      `<h3 class="deeds-picker-head" id="${headId}">${esc(t(group.headingKey))}</h3>` +
+      `${rows}${empty}</div>`
+    );
   }
 
   private filterBarHtml(): string {
@@ -694,6 +852,32 @@ export class DeedsWindow {
         // No optimistic local copy: the facet echoes the accepted change (the
         // offline sim synchronously, the mirror on the snapshot echo).
         this.deps.world().setActiveTitle(id === '' ? null : id);
+        audio.click();
+        this.render();
+      });
+    }
+    for (const btn of el.querySelectorAll<HTMLElement>('[data-border-pick]')) {
+      const preview = (): void => this.paintBorderPreview(btn.dataset.borderPick || null);
+      const restorePreview = (): void => {
+        const focused = el.querySelector<HTMLElement>('[data-border-pick]:focus');
+        const focusedId = focused?.dataset.borderPick;
+        this.paintBorderPreview(
+          focusedId !== undefined ? focusedId || null : this.deps.world().activeBorder,
+        );
+      };
+      btn.addEventListener('mouseenter', preview);
+      btn.addEventListener('focus', preview);
+      btn.addEventListener('mouseleave', restorePreview);
+      btn.addEventListener('blur', restorePreview);
+      btn.addEventListener('click', () => {
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
+        const id = btn.dataset.borderPick ?? '';
+        // No optimistic local copy: the facet echoes the accepted change (the
+        // offline sim synchronously, the mirror on the snapshot echo).
+        this.deps.world().setActiveBorder(id === '' ? null : id);
         audio.click();
         this.render();
       });

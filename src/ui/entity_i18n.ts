@@ -6,6 +6,9 @@ import {
   MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+  WOC_MARKET_RETURN_LETTER,
+  WOC_MARKET_SOLD_LETTER,
 } from '../sim/content/letters';
 import {
   ABILITIES,
@@ -25,6 +28,7 @@ import {
   getLanguage,
   hasTranslation,
   type InterpolationValues,
+  isPendingTranslation,
   type SupportedLanguage,
   supportedLanguages,
   t,
@@ -71,6 +75,7 @@ export function itemSetBonusField(pieces: number): ItemSetBonusField {
 export type EntityTranslationField =
   | 'name'
   | 'description'
+  | 'descriptionNoStealth'
   | 'title'
   | 'text'
   | 'completion'
@@ -101,7 +106,7 @@ export type EntityTranslationRequest =
   | {
       kind: 'ability';
       id: string;
-      field: 'name' | 'description' | AbilitySpecNoteField;
+      field: 'name' | 'description' | 'descriptionNoStealth' | AbilitySpecNoteField;
       values?: InterpolationValues;
     }
   | { kind: 'item'; id: string; field: 'name'; values?: InterpolationValues }
@@ -204,6 +209,9 @@ const LETTERS_BY_ID: Record<string, LetterDef> = {
   [WELCOME_LETTER.letterId]: WELCOME_LETTER,
   [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
   [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
+  [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
+  [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
+  [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
 };
 for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
 for (const letter of Object.values(GUILD_TREND_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
@@ -460,6 +468,25 @@ export function tEntity(request: EntityTranslationRequest): string {
   return fallback;
 }
 
+/** Bundle-only entity resolution for an OPTIONAL variant field: the ACTIVE
+ *  locale's own translation, or null when it does not have one, WITHOUT falling
+ *  back to English. Null on both misses that matter: the key is absent from the
+ *  bundle, or the locale has not translated it yet (a `pending` row, which the
+ *  dense table English-FILLS - tOptional alone would hand that fill straight
+ *  back).
+ *
+ *  The caller resolves a different base field on null (a talent-conditional
+ *  ability description falling back to the plain description), so an untranslated
+ *  locale reads its own prose rather than one English sentence spliced into an
+ *  otherwise localized string. This is also why declining the fill is safe here
+ *  and not in t(): an optional variant always has a translated base field to fall
+ *  back to. */
+export function tEntityOptional(request: EntityTranslationRequest): string | null {
+  const key = cachedEntityTranslationKey(request);
+  if (isPendingTranslation(key)) return null;
+  return tOptional(key, request.values);
+}
+
 export function itemDisplayName(item: ItemDef): string {
   // Heroic upgraded variants share the base item's name (classic behavior: a heroic
   // drop reads the same as its normal counterpart). The heroic distinction shows as
@@ -486,6 +513,25 @@ export function zoneDisplayName(zoneId: string): string {
 
 export function zonePoiLabel(zoneId: string, poiIndex: number): string {
   return tEntity({ kind: 'zonePoi', zoneId, poiIndex, field: 'label' });
+}
+
+/** Resolve a deed poi:<zoneId>:<poiId> mark (src/sim/deeds.ts markVisited) to
+ *  its localized display name, the one place the mark's stable-id keying
+ *  (deeds.ts) and the map label's positional keying (zonePoiLabel above)
+ *  meet: the sim intentionally keys on poi.id, never array position, so a
+ *  content edit that reorders a zone's pois must not silently mislabel an
+ *  old mark, and this is where that id -> index bridge is pinned instead of
+ *  re-derived ad hoc at each call site. Returns null for a malformed mark, an
+ *  unknown zone, or a poi id no longer in that zone (content can retire one;
+ *  the mark itself stays parked in an old save either way). */
+export function poiMarkLabel(markId: string): string | null {
+  const parts = markId.split(':');
+  if (parts.length !== 3 || parts[0] !== 'poi') return null;
+  const [, zoneId, poiId] = parts;
+  const zone = ZONES.find((z) => z.id === zoneId);
+  const poiIndex = zone?.pois.findIndex((p) => p.id === poiId) ?? -1;
+  if (poiIndex < 0) return null;
+  return zonePoiLabel(zoneId, poiIndex);
 }
 
 export function dungeonDisplayName(dungeonId: string): string {

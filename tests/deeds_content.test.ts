@@ -63,24 +63,35 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 262 deeds worth 3145 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(262);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3145);
+  it('ships exactly 274 deeds worth 3160 total Renown', () => {
+    // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
+    // four Reliquary Curator rank bridges and the five Phase 18 completion
+    // ladder deeds (all nine renown 0: catalog prestige never scores the
+    // board), the walk-in castle visit pair (exp_the_last_keep,
+    // exp_dawnhold_castle, renown 5 each), and the Proving Shore graduation
+    // deed (prog_ready_for_an_adventure, renown 5).
+    expect(DEED_ORDER.length).toBe(274);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3160);
   });
 
   it('ships the audited per-category counts', () => {
     const byCategory: Record<string, number> = {};
     for (const d of ALL) byCategory[d.category] = (byCategory[d.category] ?? 0) + 1;
     expect(byCategory).toEqual({
-      progression: 57,
+      // +1 the Proving Shore graduation (prog_ready_for_an_adventure).
+      progression: 58,
       combat: 10,
+      // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
       delve: 13,
       chronicle: 49,
-      collection: 28,
+      // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
+      // deeds on top of the release collection set.
+      collection: 37,
+      // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
-      exploration: 9,
+      exploration: 11,
       feat: 3,
       hidden: 9,
     });
@@ -188,9 +199,31 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_palmreach_first_cast',
       'chr_evergarden_gatherer',
       'chr_evergarden_first_cast',
+      // Reliquary Curator rank bridges (zero Renown; catalog prestige never
+      // scores the board). Manual grant via syncCuratorRankDeeds. Appended
+      // after the starter-zone chronicle block across the release merge.
+      'col_reliquary_rank_2',
+      'col_reliquary_rank_3',
+      'col_reliquary_rank_4',
+      'col_reliquary_rank_5',
+      // WARFARE lifetime-honor ladder, the release side of the same merge.
       'pvp_honor_sergeant',
       'pvp_honor_knight_lieutenant',
       'pvp_honor_field_marshal',
+      // The Reliquary completion ladder (Phase 18; zero Renown, manual grant
+      // via syncReliquaryCompletionDeeds, sticky against catalog growth).
+      'col_reliquary_complete',
+      'col_reliquary_conquerors',
+      'col_reliquary_illum_nythraxis_heroic',
+      'col_reliquary_illum_thunzharr',
+      'col_reliquary_illum_gravewyrm_heroic',
+      // The walk-in castle visit pair: the Last Keep's deed retro-fixes its
+      // shipped-without-deeds gap, Dawnhold's lands with its castle (both
+      // keyed on the enterDungeon markVisited emit).
+      'exp_the_last_keep',
+      'exp_dawnhold_castle',
+      // The Proving Shore graduation closes the merged tail.
+      'prog_ready_for_an_adventure',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -285,6 +318,22 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
     expect(DEEDS.dgn_rift_s_rank.hidden ?? false).toBe(false);
     expect(DEEDS.dgn_rift_s_rank.feat ?? false).toBe(false);
+  });
+
+  it('pins the walk-in castle visits: renown and trigger literals', () => {
+    // The castle visit pair: routine renown-5 walk-ins, no reward beyond it.
+    expect(DEEDS.exp_the_last_keep.renown).toBe(5);
+    expect(DEEDS.exp_the_last_keep.trigger).toEqual({
+      kind: 'visit',
+      markId: 'dungeon:the_last_keep',
+    });
+    expect(DEEDS.exp_the_last_keep.reward).toBeUndefined();
+    expect(DEEDS.exp_dawnhold_castle.renown).toBe(5);
+    expect(DEEDS.exp_dawnhold_castle.trigger).toEqual({
+      kind: 'visit',
+      markId: 'dungeon:dawnhold_castle',
+    });
+    expect(DEEDS.exp_dawnhold_castle.reward).toBeUndefined();
   });
 
   it('pins the professions additions: renown and trigger literals', () => {
@@ -438,16 +487,24 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     }
   });
 
-  it('ships exactly 34 titles and 3 borders', () => {
+  it('ships exactly 42 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(34);
-    expect(borders.length).toBe(3);
+    // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
+    // ladder 3 more titles, and the Phase 18 Reliquary completion ladder 5
+    // more on top of the release base (31 + 3).
+    expect(titles.length).toBe(42);
+    expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(34);
+    expect(new Set(titleTexts).size).toBe(42);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
-    expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
+    expect([...borderSlugs].sort()).toEqual([
+      'curators_gilt',
+      'deepward',
+      'prestige_laurels',
+      'reliquary_gilt',
+    ]);
   });
 
   it('pins the launch era constant', () => {
@@ -510,9 +567,26 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // remaining bottom-map chronicle pairs: twelve more appended deeds after the
   // profession-rare block, the gatherer and first-cast pair for frostveil,
   // amberfall, nightbloom, wraithwood, palmreach, and evergarden (drakelands
-  // already covered by the brood rework above). No shipped trigger or renown
+  // already covered by the brood rework above). Re-baselined at the v0.35.0
+  // sync merges: first for the union with the Reliquary Curator rank bridges,
+  // then again when the WARFARE honor ladder joined from the release side.
+  // No shipped trigger or renown changed on any side of either merge.
+  // Re-baselined 2026-08-08 for Reliquary Phase 18 (the completion ladder):
+  // five appended zero-Renown manual deeds (col_reliquary_complete,
+  // col_reliquary_conquerors, and the three flagship Illumination deeds),
+  // and ONE deliberate shipped-trigger change the hash correctly caught:
+  // feat_book_complete's meta list gained the FOUR earnable ladder deeds and
+  // deliberately did NOT gain the capstone, which took feat: true (unearnable
+  // while three catalog slots stay owner-pended; a non-feat capstone would
+  // dead-end The Whole Book; see the reachability pin below). No other
+  // trigger or renown changed (verified by reconstructing the pre-phase
+  // catalog, which reproduces the previous literal exactly).
+  // Re-baselined at the release/v0.39.0 sync merge, which interleaves the
+  // walk-in castle visit pair (exp_the_last_keep, exp_dawnhold_castle) and
+  // the Proving Shore graduation deed (prog_ready_for_an_adventure, on the
+  // new tutorialGraduations stat) at the tail; no shipped trigger or renown
   // changed on either side.
-  const FROZEN_CATALOG_SHA256 = 'aad4cbd25ba6b1f12b31a4a385ed5cf65e454e31eade389653676f659634eb8c';
+  const FROZEN_CATALOG_SHA256 = '7041f4aec1341ec1d5eded75768567af4b5ab12f22745a7807811da40b6add61';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -705,12 +779,14 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the evergarden
-    // first-cast closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and exp_dawnhold_castle
+    // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('pvp_honor_field_marshal');
+    // The Proving Shore graduation deed closes the merged tail (appended at
+    // the release merge behind the walk-in castle visit pair).
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_ready_for_an_adventure');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -727,8 +803,18 @@ describe('table shape', () => {
   });
 
   it('every feat has renown 0 and the feat/hidden flags stay on their prefixes, disjoint', () => {
+    // The ONE sanctioned off-prefix feat: the Reliquary completion capstone
+    // keeps its col_ id and Collection shelf beside its ladder, but carries
+    // feat: true because it is a dynamic meta over a growing catalog (the
+    // feat_book_complete class) and the flag is what keeps it out of
+    // BOOK_COMPLETE_REQUIREMENTS: three catalog slots are owner-pended today
+    // (masterwork:engineering, both pending reins), so a non-feat capstone
+    // would dead-end The Whole Book for every player. Growing this set is a
+    // deliberate design act; prefer the feat_ prefix for anything new.
+    const OFF_PREFIX_FEATS = new Set(['col_reliquary_complete']);
     for (const def of ALL) {
-      expect(def.feat === true, def.id).toBe(def.id.startsWith('feat_'));
+      const expectFeat = def.id.startsWith('feat_') || OFF_PREFIX_FEATS.has(def.id);
+      expect(def.feat === true, def.id).toBe(expectFeat);
       expect(def.hidden === true, def.id).toBe(def.id.startsWith('hid_'));
       if (def.feat) expect(def.renown, def.id).toBe(0);
       expect(def.feat === true && def.hidden === true, `${def.id} both feat and hidden`).toBe(
@@ -745,6 +831,13 @@ describe('table shape', () => {
       expect(banned.test(def.name), `${def.id} name`).toBe(false);
       expect(banned.test(def.desc), `${def.id} desc`).toBe(false);
     }
+  });
+
+  it('the Brightwood relic feat desc states the relics can no longer be found', () => {
+    // feat_brightwood_relic is permanently unobtainable by design (both source
+    // items only ever dropped from retired Brightwood content); players who
+    // read a stuck 0/1 without this caveat report it as a broken achievement.
+    expect(DEEDS.feat_brightwood_relic.desc).toContain('no longer drop');
   });
 
   it('the Peaks chapter descs carry the renamed Thornpeak chronicler', () => {
@@ -1087,5 +1180,46 @@ describe('the completionist feat', () => {
     expect(t.deedIds).toEqual(expected);
     expect(DEEDS.feat_book_complete.feat).toBe(true);
     expect(DEEDS.feat_book_complete.renown).toBe(0);
+  });
+
+  it('stays reachable: the unearnable Reliquary capstone is OUT, its earnable ladder is IN', () => {
+    // col_reliquary_complete is unearnable while three catalog slots stay
+    // owner-pended (masterwork:engineering, reins_drakemaw_raptor,
+    // reins_terrorspark_groundshaker); as a Book requirement it would
+    // dead-end The Whole Book for every player, the exact failure the
+    // retroFallbackGrants stranded-heal doctrine names. The feat flag is the
+    // exclusion mechanism; this arm reds the moment anyone drops it. The
+    // derivation pin above cannot catch that regression on its own, because
+    // both its sides read the same flag.
+    const t = DEEDS.feat_book_complete.trigger;
+    if (t.kind !== 'meta') throw new Error('feat_book_complete lost its meta trigger');
+    expect(t.deedIds).not.toContain('col_reliquary_complete');
+    for (const id of [
+      'col_reliquary_conquerors',
+      'col_reliquary_illum_nythraxis_heroic',
+      'col_reliquary_illum_thunzharr',
+      'col_reliquary_illum_gravewyrm_heroic',
+    ]) {
+      expect(t.deedIds, `${id} is earnable and belongs in the Book`).toContain(id);
+    }
+  });
+});
+
+describe('the border-reward set (a public Discord feed surface since Phase 18)', () => {
+  it('pins every border deed by id, all non-hidden', () => {
+    // discordFeedDeed cards EVERY border-reward deed name-only, so border
+    // rewards are a public third-party surface: adding one must be a
+    // deliberate, reviewed act, never a side effect of authoring a reward.
+    // A hidden border deed would be dropped by the fail-closed
+    // isPubliclyListableDeedId gate (the hid_saul_footnote title precedent
+    // pins that ordering), but it should not exist in the first place.
+    const borderIds = DEED_ORDER.filter((id) => DEEDS[id].reward?.kind === 'border').sort();
+    expect(borderIds).toEqual([
+      'col_discovery_250',
+      'col_reliquary_rank_5',
+      'dgn_deepward',
+      'prog_prestige_10',
+    ]);
+    for (const id of borderIds) expect(DEEDS[id].hidden, id).not.toBe(true);
   });
 });

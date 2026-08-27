@@ -36,7 +36,13 @@ describe('banker chest classification', () => {
     const bankerIds = Object.values(BUILTIN_WORLD.npcs)
       .filter((definition) => definition.banker)
       .map((definition) => definition.id);
-    expect(bankerIds).toEqual(['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane']);
+    expect(bankerIds).toEqual([
+      'bursar_fernando',
+      'bursar_petra_vell',
+      'bursar_aldous_crane',
+      // the Proving Shore tutorial island's strongbox desk
+      'bursar_wick',
+    ]);
     for (const templateId of bankerIds) {
       expect(isBankerNpcForRender(banker(templateId))).toBe(true);
     }
@@ -312,7 +318,9 @@ describe('banker chest renderer integration', () => {
     );
     const attachAt = rendererSource.indexOf('const bankerChest = attachBankerChestToNpcView(');
     const clickTargetAt = rendererSource.indexOf('let clickTarget: THREE.Object3D;', attachAt);
-    expect(attachAt).toBeGreaterThan(rendererSource.indexOf('private createView(e: Entity): void'));
+    expect(attachAt).toBeGreaterThan(
+      rendererSource.indexOf('private createView(e: Entity, opts?: AssembleOptions): void'),
+    );
     expect(clickTargetAt).toBeGreaterThan(attachAt);
     expect(rendererSource.slice(attachAt, clickTargetAt)).toContain('this.sim.cfg.seed');
     expect(rendererSource.slice(attachAt, clickTargetAt)).toContain('this.sim.cfg.world?.npcs');

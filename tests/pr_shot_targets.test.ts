@@ -2,12 +2,68 @@
 // visual changes, and only the sections they touch" policy, kept pure so it needs no
 // browser. The .mjs script has no TS/browser imports at module load, so vitest can import
 // it directly.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error - plain Node ESM script, no types
 import { classifyDiff, diffChangedPaths, resolveTargets } from '../scripts/pr_shot_targets.mjs';
 import { ABILITIES } from '../src/sim/data';
 
 describe('classifyDiff', () => {
+  it('clears the intentional prior-page entry probe before every isolated screenshot boot', () => {
+    const script = readFileSync(join(__dirname, '../scripts/pr_screenshots.mjs'), 'utf8');
+    expect(script).toContain("const ENTRY_PROBE_KEY = 'woc_entry_probe';");
+    expect(script).toContain('async function clearIntentionalPageCloseProbe(page)');
+    expect(script.match(/await clearIntentionalPageCloseProbe\((?:page|mobile)\);/g)).toHaveLength(
+      4,
+    );
+    expect(script).toContain('localStorage.removeItem(key)');
+
+    const sliceBetween = (start: string, end: string, from = 0) => {
+      const startIndex = script.indexOf(start, from);
+      const endIndex = script.indexOf(end, startIndex + start.length);
+      expect(startIndex).toBeGreaterThanOrEqual(0);
+      expect(endIndex).toBeGreaterThan(startIndex);
+      return script.slice(startIndex, endIndex);
+    };
+    const expectClearBeforeLoad = (
+      block: string,
+      pageName: 'page' | 'mobile',
+      firstLoad: string,
+    ) => {
+      const createdAt = block.indexOf(`await browser.newPage()`);
+      const clearedAt = block.indexOf(`await clearIntentionalPageCloseProbe(${pageName});`);
+      const loadedAt = block.indexOf(firstLoad);
+      expect(createdAt).toBeGreaterThanOrEqual(0);
+      expect(clearedAt).toBeGreaterThan(createdAt);
+      expect(loadedAt).toBeGreaterThan(clearedAt);
+    };
+
+    const specificStart = script.indexOf('async function shootSpecific');
+    const standalone = sliceBetween('if (standalone) {', '} else if (!page) {', specificStart);
+    const shared = sliceBetween(
+      '} else if (!page) {',
+      'const region = await t.capture',
+      specificStart,
+    );
+    const genericStart = script.indexOf('async function shootGenericHud');
+    const desktop = sliceBetween(
+      "if (frames.includes('hud-desktop')) {",
+      "if (frames.includes('hud-mobile')) {",
+      genericStart,
+    );
+    const mobile = sliceBetween(
+      "if (frames.includes('hud-mobile')) {",
+      '\n}\n\ntry {',
+      genericStart,
+    );
+
+    expectClearBeforeLoad(standalone, 'page', 'await variant.beforeLoad?.(page);');
+    expectClearBeforeLoad(shared, 'page', 'await page.goto(');
+    expectClearBeforeLoad(desktop, 'page', 'await page.goto(');
+    expectClearBeforeLoad(mobile, 'mobile', 'await mobile.goto(');
+  });
+
   it('treats a backend/data-only diff as non-visual (captures nothing)', () => {
     const plan = classifyDiff(['server/game.ts', 'src/sim/spirit.ts', 'server/db.ts']);
     expect(plan.isVisual).toBe(false);
@@ -20,6 +76,20 @@ describe('classifyDiff', () => {
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('inventory');
     // A specific window was found, so no generic HUD fallback.
+    expect(plan.generic).toHaveLength(0);
+  });
+
+  it('maps an options_view change to the graphics dial AND interface tab targets, in order', () => {
+    // Both targets key on 'ui/options_view'; the graphics-options entry sits
+    // first in the registry so the dial card is the lead capture. An
+    // ordering or selector regression here silently drops or duplicates the
+    // options-panel evidence.
+    const plan = classifyDiff(['src/ui/options_view.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'graphics-options-shadow-dial',
+      'interface-options-tabs',
+    ]);
     expect(plan.generic).toHaveLength(0);
   });
 
@@ -142,11 +212,13 @@ describe('classifyDiff', () => {
     }
   });
 
-  it('captures the market overview, collect ledger, buy confirmation, and expanded armor filters for market window changes', () => {
+  it('captures the market overview, browse collapse, sell price ref, collect ledger, buy confirmation, and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'market-window',
+      'market-collapse-toggle',
+      'market-sell-price-ref',
       'market-collect-ledger',
       'market-buy-confirm',
       'market-armor-filters',
@@ -185,6 +257,37 @@ describe('classifyDiff', () => {
     // paladin-desktop, druid-desktop, paladin-mobile, paladin-retribution-desktop:
     // the target widened past the tank when Dawnreaver grew Debt of Light.
     expect(plan.specific[0].variants).toHaveLength(4);
+  });
+
+  it('maps an ability-copy change to the tooltip target, per owning module', () => {
+    // An ability's player-facing surface is its spellbook row and hovered
+    // tooltip; nothing else in the registry shoots that. Pin the routing per
+    // module so a when-list trim silently stops capturing the copy.
+    for (const file of [
+      'src/ui/hud/action_bar/ability_requirement_keys.ts',
+      'src/sim/incapacitate_dr.ts',
+      'src/sim/combat/stealth_focus.ts',
+    ]) {
+      const plan = classifyDiff([file]);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        file,
+      ).toContain('ability-tooltip');
+    }
+    const target = resolveTargets(['src/sim/incapacitate_dr.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'ability-tooltip',
+    );
+    expect((target?.variants ?? []).map((v: { key: string } | null) => v?.key)).toEqual([
+      'melting-acid',
+      'nightshade-coating',
+      'sap',
+      'shadeslip',
+      'shadeslip-mobile',
+    ]);
+    // The tooltip is the point, so the recipe must hover the row and prove the
+    // shared #tooltip actually painted rather than shooting the row alone.
+    expect(target?.capture.toString()).toContain('#tooltip');
+    expect(target?.capture.toString()).toContain('mouseenter');
   });
 
   it('maps a zone/terrain change to the world-map target', () => {
@@ -232,6 +335,105 @@ describe('classifyDiff', () => {
       (t: { key: string }) => t.key,
     );
     expect(keys).toEqual(['inventory', 'world-map']);
+  });
+
+  it('stages unit-frame heraldry with deed ids across every required presentation', () => {
+    const script = readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8');
+    const lowSeed = script.slice(
+      script.indexOf('async function seedLowGraphicsPreset'),
+      script.indexOf('async function seedHighGraphicsPreset'),
+    );
+    const highSeed = script.slice(
+      script.indexOf('async function seedHighGraphicsPreset'),
+      script.indexOf('async function seedClassicOnLowPreset'),
+    );
+    for (const seed of [lowSeed, highSeed]) {
+      expect(seed).toContain('s.graphicsDefaultApplied = true');
+      expect(seed).toContain("localStorage.setItem('woc_settings'");
+    }
+    const target = resolveTargets(['src/ui/unit_frame_painter.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'deed-heraldry-unit-frames',
+    );
+    expect(target?.variants).toEqual([
+      { key: 'desktop-low', beforeLoad: expect.any(Function) },
+      { key: 'desktop-high', beforeLoad: expect.any(Function) },
+      { key: 'mobile', mobile: true, beforeLoad: expect.any(Function) },
+      { key: 'parchment', beforeLoad: expect.any(Function) },
+    ]);
+    const capture = target?.capture.toString() ?? '';
+    expect(capture).toContain("staged.selfBorder !== 'col_discovery_250'");
+    expect(capture).toContain("staged.peerBorder !== 'col_discovery_250'");
+    expect(capture).not.toContain("staged.peerBorder !== 'curators_gilt'");
+    expect(capture).toContain("chat.value = '/daynight day'");
+    expect(capture).toContain('chat instanceof HTMLTextAreaElement');
+    expect(capture).toContain('chat composer is unavailable for daylight staging');
+    expect(capture).toContain('await wait(8000)');
+    expect(capture).toContain("variant.key === 'desktop-high' ? 3 : 1");
+    expect(capture).toContain('staged.graphicsPreset !== expectedGraphicsPreset');
+    expect(capture).toContain("variant.key === 'desktop-high' ? 'high' : 'low'");
+    expect(capture).toContain("variant.key === 'desktop-high' ? '1' : '0'");
+    expect(capture).toContain('staged.fxLevel !== expectedFxLevel');
+    expect(capture).toContain('staged.fxShadow !== expectedFxShadow');
+    expect(capture).toContain("document.querySelector('#options-menu')");
+    expect(capture).toContain(
+      "menu instanceof HTMLElement && getComputedStyle(menu).display !== 'none'",
+    );
+    expect(capture).toContain('window.__game?.hud?.toggleOptionsMenu?.()');
+    for (const variant of target?.variants ?? []) {
+      expect(String(variant.beforeLoad)).toContain(
+        variant.key === 'parchment' ? "themeSeed('parchment')" : "themeSeed('classic')",
+      );
+    }
+  });
+
+  it('stages the picker and inspect heraldry recipes through their real UI flows', () => {
+    const picker = resolveTargets(['src/ui/deeds_window.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'deed-border-picker',
+    );
+    expect(picker?.variants).toEqual([
+      { key: 'desktop', beforeLoad: expect.any(Function) },
+      { key: 'mobile', mobile: true, beforeLoad: expect.any(Function) },
+      { key: 'parchment', beforeLoad: expect.any(Function) },
+    ]);
+    const pickerCapture = picker?.capture.toString() ?? '';
+    for (const deed of [
+      'prog_prestige_10',
+      'dgn_deepward',
+      'col_discovery_250',
+      'col_reliquary_rank_5',
+    ]) {
+      expect(pickerCapture).toContain(deed);
+    }
+    expect(pickerCapture).toContain("openDeeds?.('titles')");
+    expect(pickerCapture).toContain('option.focus()');
+    expect(pickerCapture).toContain('previewed.after !== previewed.before');
+    expect(pickerCapture).toContain("previewed.previewBorder !== 'reliquary_gilt'");
+    for (const variant of picker?.variants ?? []) {
+      expect(String(variant.beforeLoad)).toContain(
+        variant.key === 'parchment' ? "themeSeed('parchment')" : "themeSeed('classic')",
+      );
+    }
+
+    const inspect = resolveTargets(['src/ui/inspect_window.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'inspect-border-cartouche',
+    );
+    expect(inspect?.variants).toEqual([
+      { key: 'desktop', beforeLoad: expect.any(Function) },
+      { key: 'mobile', mobile: true, beforeLoad: expect.any(Function) },
+      { key: 'parchment', beforeLoad: expect.any(Function) },
+    ]);
+    const inspectCapture = inspect?.capture.toString() ?? '';
+    expect(inspectCapture).toContain("deedsEarned.set('col_reliquary_rank_5'");
+    expect(inspectCapture).toContain("setActiveBorder('col_reliquary_rank_5')");
+    expect(inspectCapture).toContain("deedsEarned.set('prog_grandmaster_armorcrafting'");
+    expect(inspectCapture).toContain("setActiveTitle('prog_grandmaster_armorcrafting')");
+    expect(inspectCapture).toContain('openInspect(sim.playerId)');
+    expect(inspectCapture).toContain('inspect Deed Heraldry staging failed');
+    for (const variant of inspect?.variants ?? []) {
+      expect(String(variant.beforeLoad)).toContain(
+        variant.key === 'parchment' ? "themeSeed('parchment')" : "themeSeed('classic')",
+      );
+    }
   });
 
   it('stages a complete profession identity for refresh-aware captures', () => {
@@ -282,35 +484,104 @@ describe('classifyDiff', () => {
     ]);
   });
 
-  it('maps the Vale Cup unrated-gates UI change to its two targets, per path (#2767)', () => {
-    // One classifyDiff per path, so each target's `when` routing is proven on
-    // its own rather than through the OR of the union.
-    const windowKeys = classifyDiff(['src/ui/vale_cup_window.ts']).specific.map(
-      (t: { key: string }) => t.key,
+  it('routes the shared Reliquary label module to both Reliquary targets', () => {
+    // reliquary_labels.ts resolves every relic display name AND the missing-cell
+    // source line, so it changes what BOTH captures show: the Overview recent
+    // chips and the page grid's cells, tooltips, and labels. Without it in the
+    // when lists a source-line or display-name change ships with no screenshot.
+    const plan = classifyDiff(['src/ui/reliquary_labels.ts']);
+    // The negative keeps isVisual meaningful here: every src/ui path is
+    // visual by prefix, so only the discriminating pair proves the flag.
+    expect(classifyDiff(['docs/qa-gate.md']).isVisual).toBe(false);
+    expect(plan.isVisual).toBe(true);
+    // Cross-file contract for the reliquary-page cell picker: the script
+    // selects on the data marker the painter stamps (never English aria
+    // text), so both ends must spell the same attribute or the capture
+    // silently degrades to the fallback cell. The painter side is pinned
+    // behaviorally in tests/reliquary_window_behavior.test.ts. Both reads are
+    // COMMENT-STRIPPED so prose mentioning the tokens can never satisfy them.
+    const stripSource = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const script = stripSource(
+      readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8'),
     );
-    expect(windowKeys).toContain('vale-cup-unrated-notes');
-    expect(windowKeys).not.toContain('vale-cup-briefing-unrated');
-    const briefingPlan = classifyDiff(['src/ui/vale_cup_briefing.ts']);
-    const briefingKeys = briefingPlan.specific.map((t: { key: string }) => t.key);
-    expect(briefingKeys).toContain('vale-cup-briefing-unrated');
-    expect(briefingKeys).not.toContain('vale-cup-unrated-notes');
-    for (const key of ['vale-cup-unrated-notes', 'vale-cup-briefing-unrated']) {
-      const target = classifyDiff([
-        'src/ui/vale_cup_window.ts',
-        'src/ui/vale_cup_briefing.ts',
-      ]).specific.find((candidate: { key: string }) => candidate.key === key);
-      expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+    expect(script).toContain("hasAttribute('data-cell-source')");
+    const painterSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/reliquary_window.ts'), 'utf8'),
+    );
+    // The attribute carries the number of source lines the cell RESOLVES, not
+    // a constant marker: the picker below reads it as a number to land the
+    // shot on the richest multi-source cell, so a painter that went back to
+    // "1" would leave the capture on an arbitrary one-line relic.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
+    expect(painterSrc).toContain('data-cell-source="${sourceLines.length}"');
+    expect(script).toContain("Number.parseInt(node.getAttribute('data-cell-source')");
+    expect(script).toContain('if (count > bestCount)');
+    const keys = plan.specific.map((t: { key: string }) => t.key);
+    expect(keys).toContain('reliquary-window');
+    expect(keys).toContain('reliquary-page');
+    for (const key of ['reliquary-window', 'reliquary-page']) {
+      const target = plan.specific.find(
+        (candidate: { key: string; variants: { key: string; mobile?: boolean }[] }) =>
+          candidate.key === key,
+      );
+      expect(
+        target?.variants.map((v: { key: string }) => v.key),
+        key,
+      ).toEqual(['desktop', 'mobile']);
+      expect(target?.variants[1]?.mobile, key).toBe(true);
+      // The capture rule (Phase 22): every reliquary rig seeds the LOW preset
+      // before the document loads, so shots stay comparable across machines.
+      for (const variant of target?.variants ?? []) {
+        expect(String(variant.beforeLoad), `${key} ${variant.key} seeds the low preset`).toContain(
+          'graphicsPreset = 1',
+        );
+      }
     }
   });
 
-  it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
-    const plan = classifyDiff(['src/sim/content/deeds.ts']);
-    expect(plan.isVisual).toBe(true);
-    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('vale-cup-skill-deed-copy');
-    const target = plan.specific.find(
-      (candidate: { key: string }) => candidate.key === 'vale-cup-skill-deed-copy',
+  it('holds the reliquary-tracker capture to the window contracts it borrows', () => {
+    // The tracker capture stages pins through the window's OWN controls, so it
+    // rests on cross-file spellings the script cannot import. Both reads are
+    // COMMENT-STRIPPED so prose mentioning the tokens can never satisfy them.
+    const stripSource = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const script = stripSource(
+      readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8'),
     );
-    expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+    const windowSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/reliquary_window.ts'), 'utf8'),
+    );
+    // The between-variant cleanup sweeps the same storage prefix the window
+    // persists under. A prefix drift would leave a prior variant's pins in
+    // place, and the pin control is a TOGGLE, so a stale pin would be flipped
+    // OFF and the capture would corrupt silently.
+    expect(windowSrc).toContain("RELIQUARY_PIN_KEY_PREFIX = 'woc_reliquary_pins'");
+    expect(script).toContain("indexOf('woc_reliquary_pins')");
+    // The staging drives the window's markup: the pin toggle (skipped when
+    // refused in EITHER form, or pressed), and the shelf rows' data-page.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
+    expect(windowSrc).toContain('data-pin="${esc(pageId)}"');
+    expect(script).toContain('[data-pin=');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserts on source text that contains a template literally.
+    expect(windowSrc).toContain('aria-pressed="${pinned}"');
+    expect(windowSrc).toContain('aria-disabled="true"');
+    expect(script).toContain("getAttribute('aria-disabled') === 'true'");
+    expect(script).toContain("getAttribute('aria-pressed') === 'true'");
+    expect(windowSrc).toContain('class="reliquary-page-row" data-page=');
+    expect(script).toContain('.reliquary-page-row');
+    // And the routing: both halves of the tracker pair reach the target.
+    for (const path of [
+      'src/ui/reliquary_tracker_painter.ts',
+      'src/ui/reliquary_tracker_view.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toContain('reliquary-tracker');
+    }
   });
 });
 
@@ -434,5 +705,45 @@ describe('diffChangedPaths', () => {
     for (const variant of target?.variants ?? []) {
       expect(typeof variant.beforeLoad, `${variant.key} beforeLoad`).toBe('function');
     }
+  });
+});
+
+describe('the druid auto-unshift target', () => {
+  it('fires on the sim rule and on the bar gate that has to agree with it', () => {
+    // The behavior lives in the sim and its visible consequence lives on the
+    // bar, so BOTH paths must select the target: a change to either one alone
+    // still needs the evidence.
+    for (const path of [
+      'src/sim/combat/form_auto_unshift.ts',
+      'src/ui/hud/action_bar/action_bar_view.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual).toBe(true);
+      expect(plan.specific.map((t: { key: string }) => t.key)).toContain('druid-auto-unshift');
+      expect(plan.generic).toHaveLength(0);
+    }
+  });
+
+  it('covers both bar-swapping and travel forms, on desktop and mobile', () => {
+    // Bruin parks the mana pool and Fleet does not, which is the split the rule
+    // turns on, so a variant list that lost either one would stop proving it.
+    const target = classifyDiff(['src/sim/combat/form_auto_unshift.ts']).specific.find(
+      (t: { key: string }) => t.key === 'druid-auto-unshift',
+    );
+    expect(target.variants.map((v: { key: string }) => v.key)).toEqual([
+      'bruin-form-desktop',
+      'fleet-form-desktop',
+      'bruin-form-mobile',
+    ]);
+    expect(target.variants.map((v: { formAbility: string }) => v.formAbility)).toEqual([
+      'bear_form',
+      'travel_form',
+      'bear_form',
+    ]);
+    expect(target.variants.filter((v: { mobile?: boolean }) => v.mobile)).toHaveLength(1);
+    // Every variant drives the real druid kit, not a stand-in class.
+    for (const v of target.variants) expect(v.charClass).toBe('druid');
+    expect(ABILITIES.healing_touch.class).toBe('druid');
+    expect(ABILITIES.healing_touch.castTime).toBeGreaterThan(1);
   });
 });

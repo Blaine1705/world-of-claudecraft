@@ -9,6 +9,7 @@
 // painter's canvas draws (continent_map_painter.ts) need a real 2D context and
 // getComputedStyle and are exercised in the game, not here.
 
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z, ZONES, zoneAt } from '../src/sim/data';
@@ -100,7 +101,7 @@ describe('CONTINENT_FALLBACK_ASPECT tracks the shipped plate', () => {
   // constant itself).
   it('equals the real pixel aspect of public/map_art/world_overview.webp', async () => {
     const meta = await sharp(
-      new URL('../public/map_art/world_overview.webp', import.meta.url).pathname,
+      fileURLToPath(new URL('../public/map_art/world_overview.webp', import.meta.url)),
     ).metadata();
     expect(meta.format).toBe('webp');
     expect(meta.width).toBeGreaterThan(0);
@@ -204,15 +205,18 @@ describe('continentZoneAt: point hit-test', () => {
     expect(continentZoneAt(m.regions, CANVAS + 5, CANVAS + 5)).toBeNull();
   });
 
-  it('returns null over an ocean gap between columns', () => {
-    // The eastbrook band (z in [-180,180]) has no zone in the WEST column
-    // (x in [-540,-180]); +X maps left, so west is to the RIGHT of eastbrook.
+  it('resolves the island west of Eastbrook, and null past the plate edge', () => {
+    // The eastbrook band's WEST column (x in [-540,-180]) used to be an
+    // ocean gap; the Proving Shore tutorial island owns it now, so the
+    // hit-test resolves the island there instead of falling through to
+    // null. Past the plate's edge stays null as ever.
     const eb = m.regions.find((r) => r.zoneId === 'eastbrook_vale');
     if (!eb) throw new Error('expected eastbrook_vale');
     const gapMx = eb.rect.mx + eb.rect.w + 20; // just west (right) of eastbrook
     const bandMy = eb.rect.my + eb.rect.h / 2;
     expect(gapMx).toBeLessThan(m.image.mx + m.image.w); // still inside the plate
-    expect(continentZoneAt(m.regions, gapMx, bandMy)).toBeNull();
+    expect(continentZoneAt(m.regions, gapMx, bandMy)).toBe('proving_shore');
+    expect(continentZoneAt(m.regions, m.image.mx + m.image.w + 20, bandMy)).toBeNull();
   });
 });
 

@@ -1,6 +1,7 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { beaconSpiralLift } from './beacon_spiral';
 import { BORDER_EDGES } from './border_edges';
+import { bulwarkLift, bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
 import {
   castleLift,
   castlePadTarget,
@@ -10,6 +11,7 @@ import {
 } from './castle_layout';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
+import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
 import {
   bgOriginAt,
   CAMPS,
@@ -34,9 +36,11 @@ import {
   ZONES,
   zoneAt,
 } from './data';
-import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
+import { dockSurfaceHeight } from './deck_surfaces';
 import { dungeonFloorLift } from './dungeon_floor';
-import { lastKeepLiftAt } from './dungeon_layout';
+import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
+import { eastbrookDeckSurface } from './eastbrook_harbor';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -63,7 +67,6 @@ import {
 } from './terrain_region_index';
 import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
-import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -1263,6 +1266,10 @@ const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): 
   ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
 ];
 export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
+  // (Dawnhold's own planting is the flower court's procedural fields, which
+  // stand on the castle pad's dead-flat ground and need no pad of their own.
+  // Every entry below is a MODELED bed, mirrored one-to-one against
+  // PARTERRE_PLOTS and the content decorProps by tests/garden_parterre.)
   ...bedGroup(322, 878, 10, [
     [322, 892.8],
     [322, 863.2],
@@ -1375,6 +1382,32 @@ function applyGardenCoast(x: number, z: number, h: number): number {
   return h + (out - h) * seam * zSeam;
 }
 
+// The Gardenwalk pass floor, mirrored onto the Thornpeak (west/strip) side
+// of the border: applyGardenCoast's passW above only reaches the east
+// column (its blend rides "seam", the coastal cross-fade into the strip,
+// which is near zero west of the border). Without a matching flatten here
+// the peaks biome's full hill/crag/detail noise (baseHeight) runs right up
+// to the crossing: player report, a small unclimbable step around x=173,
+// z=797. A pure function of (x, z), like every applier in this file: it
+// touches no content table, so it cannot move roadDistance calming or any
+// other rng-consuming system.
+function applyGardenwalkWestPass(x: number, z: number, h: number): number {
+  // Symmetric around the border line itself (not a one-sided cutoff at
+  // STRIP_MAX_X): a hard x < STRIP_MAX_X gate left a seam exactly at the
+  // border, where this window's near-full weight met applyGardenCoast's
+  // own passW at whatever partial "seam" it had reached there, and the two
+  // land on different baseline math (this blends raw h; that blends a
+  // coastal "out" value), so the join was not even C0. Peaking gently AT the
+  // border and fading both directions instead overlaps applyGardenCoast's
+  // effect on the east side, but both blends pull the same direction (down
+  // toward the ~6 pass floor), so composing them stays smooth.
+  const w =
+    (1 - smoothstep(26, 52, Math.abs(z - 800))) *
+    (1 - smoothstep(0, 58, Math.abs(x - STRIP_MAX_X)));
+  if (w <= 0) return h;
+  return h + (6 + (h - 6) * 0.08 - h) * w;
+}
+
 // The Great Maze. '#' cells are modeled hedge walls; '.' cells are lawn
 // corridors. Row 0 is the NORTH row (the map's top): the entrance is the
 // gap in the south row, the exit the gap in the north row, and the open
@@ -1418,6 +1451,12 @@ export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
 // corners/junctions read as crossing pieces. Collision is the union of the
 // same boxes, so the blocked ground IS the modeled hedge's footprint.
 export const MAZE_WALL_DEPTH = 4.2; // yd across a hedge piece (tracks the modeled hedge scale)
+// The piece's drawn size, kept HERE rather than beside the renderer because
+// colliders.ts needs the height for the camera top and src/sim may not import
+// src/render. render/garden_maze_core.ts re-exports all three.
+export const MAZE_WALL_OVERLAP = 0.75; // yd each piece reaches into its neighbor
+export const MAZE_WALL_SCALE = (MAZE_CELL + 2 * MAZE_WALL_OVERLAP) / 0.98; // 10.5 x 6.1 x 4.1
+export const MAZE_WALL_HEIGHT = 0.57 * MAZE_WALL_SCALE; // 6.1yd, the hedges' visual top
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {
@@ -1569,28 +1608,6 @@ function applyGaleCoast(x: number, z: number, h: number): number {
 // applier returns it untouched and every seed-pinned fixture keeps its exact
 // ground. Only the far edges (low landness) become shore and water.
 // ---------------------------------------------------------------------------
-const VALE_LAND_LOBES = [
-  { x: 0, z: 30, r: 128 }, // the heartland: the town, the roads, the fields
-  { x: 0, z: 155, r: 100 }, // the north reach to the Mirefen border
-  { x: -95, z: 170, r: 52 }, // ...its northwest fill (the border stays land)
-  { x: 95, z: 170, r: 52 }, // ...and northeast fill
-  { x: -168, z: 172, r: 42 }, // the northwest border corner
-  { x: 168, z: 172, r: 42 }, // the northeast border corner
-  { x: -100, z: 85, r: 70 }, // the western downs and Mirror Lake's shore
-  { x: -95, z: -55, r: 70 }, // the southwest pastures (Grix's tunnel)
-  { x: 45, z: -85, r: 84 }, // the south fields (the bandit camp)
-  { x: 108, z: -52, r: 60 }, // the southwest rise (mogger's hollow)
-  { x: 100, z: 70, r: 62 }, // the west meadows
-  { x: 60, z: 138, r: 55 }, // Brightwood Glade's north wood
-  { x: 150, z: -46, r: 44 }, // the west point: the causeway's mainland root
-] as const;
-const VALE_BAYS = [
-  { x: -192, z: 25, r: 60 }, // the west bay
-  { x: 30, z: -196, r: 66 }, // the south bay
-  { x: 196, z: 104, r: 56 }, // the east bay, north of the causeway
-  { x: -142, z: -152, r: 48 }, // the southwest cove
-  { x: 178, z: -128, r: 42 }, // the south cove, east of the point
-] as const;
 
 const VALE_LAND_FIELD = boundedBlobs(VALE_LAND_LOBES);
 const VALE_BAY_FIELD = boundedBlobs(VALE_BAYS);
@@ -1618,7 +1635,25 @@ function applyValeCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
-  return h + (floor + (h - floor) * t - h) * w;
+  let out = h + (floor + (h - floor) * t - h) * w;
+  // At the vale's northwest coast a low beach shelf (a few yards above water)
+  // aprons the foot of the steep grey cliff and reads as a proud triangle spit
+  // where it meets the bay (player report). Submerge that shelf so the bay water
+  // runs right up to the cliff foot with no spit. The height gate lowers ONLY
+  // the low shelf and never the cliff it fronts (protected from 12.5yd up); the
+  // z window covers the shelf and fades out before the cliff shoulder (z ~146),
+  // and the x window spans the shelf around x = -172. Deepened to open-sea level
+  // so it reads as bay water, not a submerged sandbar.
+  const spitW =
+    smoothstep(116, 122, z) *
+    (1 - smoothstep(141, 146, z)) *
+    (1 - smoothstep(22, 40, Math.abs(x + 172))) *
+    (1 - smoothstep(9.5, 12.5, out));
+  if (spitW > 0) {
+    const sea = Math.min(out, WATER_LEVEL - 2);
+    out = out + (sea - out) * spitW;
+  }
+  return out;
 }
 
 // The Ferrywalk: a natural sandbar causeway from the vale's west point across
@@ -1760,6 +1795,86 @@ function applyIsleCoast(x: number, z: number, h: number): number {
   const dCrown = Math.hypot(x - 375, z + 5);
   out += 14 * (1 - smoothstep(18, 128, dCrown)) * smoothstep(0.02, 0.2, land);
   return h + (out - h) * seam * zSeam;
+}
+
+// ---------------------------------------------------------------------------
+// The Proving Shore: the tutorial island in the starter sea west of Eastbrook
+// Vale (negative x; the Farshore recipe mirrored into the opposite column).
+// No land border and no causeway: the only ways over are the tutorial
+// greeting's ferry and the clicked ferry bells (PROVING_SHORE_PORTALS ships
+// empty on purpose: no walk-in portal ring, so the per-tick portal loop
+// never pays for the island), and swim fatigue guards the strait. Beaches
+// all around, rising gently toward the heart.
+// ---------------------------------------------------------------------------
+const PS_LAND_LOBES = [
+  { x: -330, z: 20, r: 70 }, // the island's heart
+  { x: -292, z: 58, r: 45 }, // Dawnrest Camp's shelf
+  { x: -272, z: 66, r: 34 }, // the Old Pier's point, facing the vale (east)
+  { x: -352, z: -28, r: 50 }, // the practice downs
+  { x: -286, z: -6, r: 40 }, // the wreck line's strand
+] as const;
+const PS_BAYS = [
+  { x: -258, z: 34, r: 26 }, // the ferry cove, between pier and strand
+  { x: -380, z: 60, r: 34 }, // the far bight
+] as const;
+
+const PS_LAND_FIELD = boundedBlobs(PS_LAND_LOBES);
+const PS_BAY_FIELD = boundedBlobs(PS_BAYS);
+export function provingLandness(x: number, z: number): number {
+  return metaballLandness(PS_LAND_FIELD, PS_BAY_FIELD, x, z);
+}
+
+// The tutorial island's coast: the applyIsleCoast recipe with the vale-facing
+// seam mirrored to the cell's vale-side edge (x = -180). Every window edge
+// fades.
+function applyProvingCoast(x: number, z: number, h: number): number {
+  if (x < -566 || x > -166) return h;
+  const zSeam = smoothstep(-188, -172, z) * (1 - smoothstep(172, 188, z));
+  if (zSeam <= 0) return h;
+  const seam = smoothstep(172, 188, -x);
+  if (seam <= 0) return h;
+  const land = provingLandness(x, z);
+  const t = smoothstep(0.02, 0.3, land);
+  const shelf = smoothstep(-0.4, 0.06, land);
+  const floor = WATER_LEVEL - 3.2 + (WATER_LEVEL - 0.8 - (WATER_LEVEL - 3.2)) * shelf;
+  let out = floor + (h - floor) * t;
+  // the beach apron: low shores pressed flat, the Palmreach recipe
+  const beachT = 1 - smoothstep(0.05, 0.28, land);
+  if (beachT > 0 && out > 1.4) out = out + (1.4 + (out - 1.4) * 0.2 - out) * beachT;
+  // a gentle rise toward the heart, kept small so the camp stays near-flat
+  const dHeart = Math.hypot(x + 340, z);
+  out += 8 * (1 - smoothstep(15, 90, dHeart)) * smoothstep(0.02, 0.2, land);
+  return h + (out - h) * seam * zSeam;
+}
+
+// Clean open water framing the Proving Shore: applyStarterMoat mirrored to
+// the east column (x -> -x, no causeway exemption). The vale/island border
+// strait keeps the x = -180 line honest sea, the north channel sinks the
+// Willowfen border ridge over water, and the south band opens the sea below
+// the island out to the map edge. Every window edge is a fade, never a cut.
+function applyProvingMoat(x: number, z: number, h: number): number {
+  if (x >= -196 && x <= -177 && z < 158 && z > -184) {
+    const wb =
+      smoothstep(177, 182, -x) *
+      (1 - smoothstep(188, 196, -x)) *
+      (1 - smoothstep(148, 158, z)) *
+      smoothstep(-184, -172, z);
+    if (wb > 0) {
+      const sea2 = Math.min(h, WATER_LEVEL - 5);
+      h = h + (sea2 - h) * wb;
+    }
+  }
+  if (x > -172 || x < -548) return h;
+  const xw = smoothstep(172, 184, -x);
+  // the north channel: the border band with the Willowfen (z 164..186),
+  // fading back to the fen's own south shore north of z 200
+  const north = smoothstep(150, 164, z) * (1 - smoothstep(186, 200, z));
+  // the south: open sea below the island's strand, out to the map edge
+  const south = smoothstep(-150, -166, z);
+  const w = Math.max(north, south) * xw;
+  if (w <= 0) return h;
+  const sea = Math.min(h, WATER_LEVEL - 5);
+  return h + (sea - h) * w;
 }
 
 // The border meres between columns: the seam blend of two adjacent coasts
@@ -2417,7 +2532,10 @@ function applyEmberLavaNetwork(x: number, z: number, h: number): number {
   }
   for (const link of EMBER_LAVA_LINKS) {
     const s = emberNearestOnLink(link, x, z);
-    const half = link.w * 0.62; // the channel model overhangs its melt line
+    // the river model now spans exactly link.w across the flow (the
+    // render scales it by its cross extent), so the bed only needs a
+    // shoulder either side rather than the old generous overhang
+    const half = link.w * 0.55;
     if (s.dist < half + 6.5) {
       const w = 1 - smoothstep(half, half + 3.5, s.dist);
       // low banks shouldering the channel, parted at every pool mouth
@@ -2496,6 +2614,14 @@ function applyCastlePad(x: number, z: number, h: number): number {
   return h + (castlePadTarget(x, z) - h) * w;
 }
 
+// The Ashen Bulwark's graded grounds on the Drakelands west headland (the
+// castle pad idiom at barracks scale; the plan lives in bulwark_layout.ts).
+function applyBulwarkPad(x: number, z: number, h: number): number {
+  const w = bulwarkPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (bulwarkPadTarget() - h) * w;
+}
+
 // The pad's northeast apron meets the Last Spring pool, and the pad yields to
 // the pool over castlePadWeight's own ring: the bailey's level floor ends on an
 // arc about 16yd out from the pool center and the ground then falls to the pool
@@ -2541,6 +2667,14 @@ function applyLastSpringBank(x: number, z: number, h: number): number {
   const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
   if (w <= 0) return h;
   return h + (target - h) * w;
+}
+
+// Dawnhold Castle's graded grounds in the Evergarden (the same idiom at a
+// smaller scale; the plan lives in dawnhold_layout.ts).
+function applyDawnholdPad(x: number, z: number, h: number): number {
+  const w = dawnholdPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (dawnholdPadTarget() - h) * w;
 }
 
 // ---------------------------------------------------------------------------
@@ -2856,7 +2990,7 @@ export function inHollowOpenSea(x: number, z: number): boolean {
     // walk, never open sea.
     if (Math.abs(x) > 620 || z < -215) return false; // the far void keeps legacy rules
     if (onCauseway(x, z)) return false;
-    return valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02;
+    return valeLandness(x, z) < 0.02 && isleLandness(x, z) < 0.02 && provingLandness(x, z) < 0.02;
   }
   if (z <= 960) {
     // the columns' southern outer coasts: open ocean to the world edge
@@ -3601,24 +3735,6 @@ function applyEditLayer(x: number, z: number, h0: number): number {
   return h;
 }
 
-// The Sowfield boarball ground (docs/prd/vale-cup.md): the southern Eastbrook
-// basin leveled into a crisp rectangular plateau with a smoothstep apron ring.
-// Blend weight of the flatten at (x, z): 1 inside the rectangle, easing to 0
-// over SOWFIELD_FLAT.falloff yards outside it. Height stamps are circles-only,
-// so like MIREFEN_IMPACT_CRATER this is a bespoke hand-authored arm; it applies
-// for ANY active content. The apron's influence ends at z = SOWFIELD_FLAT.zMin -
-// falloff (-149), north of the world rim's z = -150 onset, so the rim wall is
-// untouched by construction (tests/terrain_walls.test.ts sweeps that band).
-export function sowfieldFlattenWeight(x: number, z: number): number {
-  const f = SOWFIELD_FLAT;
-  const dx = Math.max(0, f.xMin - x, x - f.xMax);
-  const dz = Math.max(0, f.zMin - z, z - f.zMax);
-  if (dx === 0 && dz === 0) return 1;
-  const d = Math.sqrt(dx * dx + dz * dz);
-  if (d >= f.falloff) return 0;
-  return 1 - smoothstep(0, 1, d / f.falloff);
-}
-
 // The Highwatch stables paddock plateau (STABLE_FLAT): the worked yard leveled
 // to one height so the show-jumping course sits on fair, flat ground. The
 // smooth apron keeps movement, collision, props, and terrain rendering on the
@@ -3631,37 +3747,6 @@ export function stableFlattenWeight(x: number, z: number): number {
   const d = Math.sqrt(dx * dx + dz * dz);
   if (d >= f.falloff) return 0;
   return 1 - smoothstep(0, 1, d / f.falloff);
-}
-
-// The renderer seats each dock section relative to its shore anchor, then uses
-// the plank top as a raised walkable surface. Return the matching absolute
-// surface height, or -Infinity outside every deck footprint.
-function dockSurfaceHeight(x: number, z: number, seed: number): number {
-  // Wickharbor's stilt piers and boardwalk ride the same raised-surface arm
-  // (an absolute plank plane, never a terrain lift; see sim/gale_harbor.ts).
-  let surface = galeDeckSurface(
-    x,
-    z,
-    (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
-    WATER_LEVEL,
-  );
-  // ...and the Palmreach's river bridges and lagoon decks, the same idiom
-  surface = Math.max(
-    surface,
-    reachDeckSurface(
-      x,
-      z,
-      (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed),
-      WATER_LEVEL,
-    ),
-  );
-  for (const dock of getActiveWorldContent().props.docks) {
-    const local = dockLocalPoint(dock, x, z);
-    if (dockSectionAtLocal(local.x, local.z) < 0) continue;
-    const line = dockSurfaceLine(dock, (sampleX, sampleZ) => terrainHeight(sampleX, sampleZ, seed));
-    surface = Math.max(surface, dockSurfaceYAt(line, local.z));
-  }
-  return surface;
 }
 
 // ---------------------------------------------------------------------------
@@ -3902,6 +3987,13 @@ export function groundHeight(x: number, z: number, seed: number): number {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
     }
+    if (dungeon?.interior === 'dawnhold') {
+      // Dawnhold Castle's interior rides the same authored-lift idiom as the
+      // Last Keep: the solar story and its stair ramps come from the shared
+      // room plan (src/sim/dungeon_layout.ts).
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + dawnholdKeepLiftAt(x - origin.x, z - origin.z);
+    }
     // Every other interior is the flat room floor plus the raised boss dais
     // where its room plan stacks one (dungeon_floor.ts).
     return DUNGEON_FLOOR_Y + dungeonFloorLift(x, z);
@@ -3920,8 +4012,21 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // (castleLift): the wall mass is a sheer riser the climb gate refuses,
   // and its flat top is the wall-walk.
   const terrain =
-    terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
-  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
+    terrainHeight(x, z, seed) +
+    beaconSpiralLift(x, z) +
+    castleLift(x, z) +
+    dawnholdLift(x, z) +
+    bulwarkLift(x, z);
+  return Math.max(
+    terrain,
+    dockSurfaceHeight(
+      x,
+      z,
+      (sx, sz) => terrainHeight(sx, sz, seed),
+      WATER_LEVEL,
+      getActiveWorldContent().props.docks,
+    ),
+  );
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
@@ -3957,6 +4062,10 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   // after the shore grading that forms them (see REACH_POOL_RIM_EASE for the freeze
   // it closes and REACH_POOL_DECK_TIE_IN for the one-way edge it closes).
   h = applyReachPoolWalkwayBed(x, z, h);
+  // Dawnhold Castle's garden pad, same late application.
+  h = applyDawnholdPad(x, z, h);
+  // the Drakelands' headland barracks, graded the same way
+  h = applyBulwarkPad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -3969,7 +4078,12 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
       const padGate = pad.r + 4;
       if (dx * dx + dz * dz >= padGate * padGate) continue;
       const d = Math.sqrt(dx * dx + dz * dz);
-      const ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      // the anchor height honors Dawnhold's castle pad (the courtyard
+      // parterres must sit on the graded bailey, not dig back down to the
+      // raw lawn beneath it); beds outside the pad are unaffected (w 0)
+      let ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      const dw = dawnholdPadWeight(pad.ax, pad.az);
+      if (dw > 0) ch = ch + (dawnholdPadTarget() - ch) * dw;
       const blend = smoothstep(pad.r + 1, pad.r + 4, d);
       h = h * blend + ch * (1 - blend);
     }
@@ -4308,6 +4422,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.gardenCoast)) {
     h = applyGardenCoast(x, z, h);
   }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.gardenwalkWestPass)) {
+    h = applyGardenwalkWestPass(x, z, h);
+  }
   if (terrainRegionHas(region, TERRAIN_APPLIER.galeCoast)) {
     h = applyGaleCoast(x, z, h);
   }
@@ -4322,6 +4439,12 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.starterMoat)) {
     h = applyStarterMoat(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.provingCoast)) {
+    h = applyProvingCoast(x, z, h);
+  }
+  if (terrainRegionHas(region, TERRAIN_APPLIER.provingMoat)) {
+    h = applyProvingMoat(x, z, h);
   }
   if (terrainRegionHas(region, TERRAIN_APPLIER.columnStraits)) {
     h = applyColumnStraits(x, z, h);
@@ -4541,12 +4664,6 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.fenSouthShore)) {
     h = applyFenSouthShore(x, z, h);
   }
-  // The Sowfield plateau (Vale Cup) is the LAST word on the southern-vale
-  // terrain: a LEVEL pull toward the pitch height applied AFTER every coast, rim,
-  // and sea pass (like the Tablecrag / Veilspires bespoke plateaus above), so the
-  // football pitch stays dead flat and dry no matter what the grid's vale coast
-  // does beneath it. Its influence ends north of the world-rim onset (z >= -149,
-  // see sowfieldFlattenWeight), so it never fights the rim wall.
   // Gradual shores on every declared lake: the last shaping word before the
   // stand lift and the editor's stamps, so nothing above can re-steepen a
   // shore a player must wade out of.
@@ -4557,10 +4674,6 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   if (terrainRegionHas(region, TERRAIN_APPLIER.glacierTarnRamp)) {
     h = applyGlacierTarnRamp(x, z, h);
   }
-  const sow = terrainRegionHas(region, TERRAIN_APPLIER.sowfieldFlatten)
-    ? sowfieldFlattenWeight(x, z)
-    : 0;
-  if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
   // The Highwatch paddock is another authored level pull. It sits deep inside
   // Thornpeak, so it does not compete with a realm border or coast.
   const stable = terrainRegionHas(region, TERRAIN_APPLIER.stableFlatten)
@@ -4588,7 +4701,7 @@ export const STEEPNESS_SAMPLE = 0.35; // yards; about one movement tick of run
 // (the bug that made the lighthouse stair unclimbable for a real player).
 function steepnessGroundHeight(x: number, z: number, seed: number): number {
   if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
-  return terrainHeight(x, z, seed) + sowfieldStandLift(x, z);
+  return terrainHeight(x, z, seed);
 }
 export function terrainSteepness(x: number, z: number, seed: number): number {
   const e = STEEPNESS_SAMPLE;
@@ -5031,6 +5144,9 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
     // the Last Keep's graded grounds carry no wild scatter
     if (castlePadWeight(gx, gz) > 0) return null;
+    // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
+    // is also a stray collider standing in the muster lane)
+    if (bulwarkPadWeight(gx, gz) > 0) return null;
     for (const pool of EMBER_FLAT_POOLS) {
       if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
     }
@@ -5065,8 +5181,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
   } else if (biome === 'garden') {
     // open parkland: sparse specimen trees on the lawns, and the maze
-    // keeps its corridors clear (the hedges are terrain, not dressing)
+    // keeps its corridors clear (the hedges are terrain, not dressing);
+    // Dawnhold's graded grounds take no wild scatter either
     if (inGardenMaze(gx, gz)) return null;
+    if (dawnholdPadWeight(gx, gz) > 0) return null;
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {
@@ -5092,9 +5210,6 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   const x = gx + ox,
     z = gz + oz;
   if (isExcludedDecoration(x, z)) return null;
-  // The Sowfield stadium footprint grows no trees or rocks (hash-based
-  // placement, so skipping here shifts no other decoration or rng draw).
-  if (isInSowfieldShell(x, z)) return null;
   // The Galecrest paddock is a worked yard and race course. Keep the same
   // deterministic decoration field out of its apron so no tree becomes an
   // invisible obstacle across a jump line.
@@ -5106,8 +5221,14 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   ) {
     return null;
   }
-  // No rock or stunted tree grows up through Wickharbor's boardwalk planks.
+  // No rock or stunted tree grows up through Wickharbor's boardwalk planks,
+  // nor New Eastbrook's quay and piers.
   if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
+    return null;
+  }
+  if (
+    eastbrookDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity
+  ) {
     return null;
   }
   if (!reachDeckClear(x, z, 1)) return null;

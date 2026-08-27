@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { NIGHTLY_LANES_PER_REF } from '../scripts/lib/nightly_plan.mjs';
+import { PLAYWRIGHT_INSTALL_BLOCK } from './helpers/playwright_install_block';
 
 const workflow = readFileSync(new URL('../.github/workflows/nightly.yml', import.meta.url), 'utf8');
 const ciWorkflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
@@ -128,6 +129,23 @@ describe('nightly gate workflow', () => {
     expect(tests).toContain(
       'run: npm test -- --maxWorkers="$(node -p \'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))\')"',
     );
+    // The nightly is the ONE run that restores the balance harnesses' full
+    // sweep configuration (docs/qa-gate.md, "The balance-harness diet"): the
+    // PR-tier long-sims lanes run the diet configuration, and this env flag
+    // is what keeps the full five-seed depth running anywhere at all.
+    // Name-to-env-to-run adjacency (comment lines allowed) so a commented-out
+    // or step-detached copy cannot satisfy it.
+    expect(tests).toMatch(
+      new RegExp(
+        String.raw`- name: Run tests \(full suite, PR tier\)\n` +
+          String.raw`(?: {8}#[^\n]*\n)* {8}env:\n` +
+          String.raw` {10}WOC_FULL_BALANCE_SWEEP: '1'\n` +
+          String.raw` {8}run: npm test -- --maxWorkers=`,
+      ),
+    );
+    // Nowhere else: the flag is nightly-depth-only by design, so a copy on
+    // the checks or browser lanes (or a second one in tests) is a mistake.
+    expect(workflow.match(/WOC_FULL_BALANCE_SWEEP/g)).toHaveLength(1);
     // Unsharded by design: a --shard flag here would quietly turn the nightly
     // proof into a partial run.
     expect(tests).not.toContain('--shard');
@@ -162,7 +180,11 @@ describe('nightly gate workflow', () => {
     expect(runLines(checks)).toEqual(runLines(releaseChecks));
     expect(checks).not.toContain('run: npm test');
     const browser = jobSource('browser');
-    expect(browser).toMatch(stepLine('run: npx playwright install --with-deps chromium'));
+    // Same split shape as ci.yml's browser-gate step, pinned to the identical
+    // whole block scalar (shared helper) so the two jobs cannot drift apart
+    // and neither can grow a fallback on the hard-failing browser install.
+    expect(browser).toContain(PLAYWRIGHT_INSTALL_BLOCK);
+    expect(browser).not.toContain('--with-deps');
     expect(browser).toMatch(stepLine('run: npm run test:browser'));
     expect(browser).toContain('path: ~/.cache/ms-playwright');
     expect(browser).toContain("require('playwright/package.json').version");

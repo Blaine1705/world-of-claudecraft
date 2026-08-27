@@ -9,7 +9,8 @@ import {
 } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
-import { loadTexture } from './assets/loader';
+import { ktx2SiblingUrl } from './assets/ktx2_sibling';
+import { loadKtx2Texture, loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   BIOME_HAZE_DECLARATIONS,
@@ -17,8 +18,15 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
+import { runBoundedLane } from './build_lane_core';
+import { isCanvasDrawableImage } from './canvas_drawable';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, type GfxSettings, SUN_DIR, sharedUniforms } from './gfx';
+import {
+  cellCountsAsPending,
+  islandIsolationActive,
+  islandScopeStreamsZone,
+} from './island_isolation_core';
 import {
   hasNightLightField,
   NIGHT_LIGHT_DECLARATIONS,
@@ -57,7 +65,6 @@ import {
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';
-import { terrainChunkPool } from './terrain_chunk_pool';
 import { meshTerrainHeight } from './terrain_mesh_height';
 import {
   chunkIntersectsRegion,
@@ -68,6 +75,7 @@ import {
 } from './terrain_region_core';
 import { terrainSplatPresence, terrainSplatPresenceMask } from './terrain_splat_presence_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
+import { disposeZoneBuildPool, zoneBuildPool } from './zone_build_pool';
 
 // Chunked terrain across the whole 360x1080 zone strip.
 //
@@ -89,7 +97,9 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 //   normal map baked from the mesh height view (terrain_mesh_height.ts).
 // - Low tier: the legacy vertex-color Lambert look, still chunked for culling.
 
-const CHUNK_SIZE = 60;
+// Exported for tests that reason about chunk-grid geometry without building a
+// full TerrainView (e.g. zone_eviction_core's cell-ownership overshoot pin).
+export const CHUNK_SIZE = 60;
 // An 'idle'-paced zone build waits for a browser idle slot between batches;
 // this timeout forces one batch through anyway under sustained frame load.
 const IDLE_BUILD_TIMEOUT_MS = 200;
@@ -109,8 +119,27 @@ function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<vo
   if (TERRAIN_TEX[key]) return Promise.resolve();
   const existing = terrainTexTasks.get(key);
   if (existing) return existing;
-  const task = loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true })
-    .then((tex) => {
+  const url = `/textures/terrain/${file}`;
+  // The ambientCG NORMAL maps ship a KTX2 sibling and are requested
+  // compressed: they stay GPU-compressed instead of decoding to a full
+  // 1024x1024 RGBA bitmap each, and they bind directly as samplers. The
+  // vertical flip is baked into the container at compress time, so `srgb`
+  // here only still selects the anisotropy budget.
+  // The six COLOUR layers deliberately stay raw JPG: buildSplatAlbedoArray
+  // drawImages them into the packed DataArrayTexture (a CompressedTexture's
+  // image is not a CanvasImageSource, and binding one here took the renderer
+  // down at world build), and on every tier that loads them the packed array
+  // is the resident form anyway, so compressing the pack SOURCE bought
+  // nothing. GroundAO_Packed.png is also NOT converted: it is a packed DATA
+  // texture whose measured per-channel statistics are baked into shader
+  // constants (see the "Measured sds" comment below), and a lossy block
+  // encode would shift them.
+  const task = (
+    url.toLowerCase().endsWith('.jpg') && !srgb
+      ? loadKtx2Texture(ktx2SiblingUrl(url), { repeat: true })
+      : loadTexture(url, { srgb, repeat: true })
+  )
+    .then((tex: THREE.Texture) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
     })
@@ -725,6 +754,7 @@ let splatAlbedoCache: SplatAlbedoArray | null = null;
  * that had to fill any placeholder re-packs on the next world build, when
  * the deferred preload has had time to land.
  */
+
 function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArray {
   if (splatAlbedoCache?.complete) return splatAlbedoCache;
   const size = SPLAT_ALBEDO_SIZE;
@@ -736,7 +766,8 @@ function buildSplatAlbedoArray(t: Record<string, THREE.Texture>): SplatAlbedoArr
   let complete = true;
   let grassMean: [number, number, number] | null = null;
   for (let layer = 0; layer < SPLAT_ALBEDO_LAYERS.length; layer++) {
-    const img = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as CanvasImageSource | undefined;
+    const raw = t[SPLAT_ALBEDO_LAYERS[layer]]?.image as unknown;
+    const img = isCanvasDrawableImage(raw) ? raw : undefined;
     const w = (img as { width?: number } | undefined)?.width;
     const dst = data.subarray(layer * size * size * 4, (layer + 1) * size * size * 4);
     if (!ctx || !img || !w) {
@@ -1658,6 +1689,15 @@ function buildLambertMaterial(brush: BrushUniforms): THREE.MeshLambertMaterial {
 // Entry point
 // ---------------------------------------------------------------------------
 
+/** One chunk's geometry job: the rectangle it covers and the vertex spacing
+ *  its LOD band asks for. A far-band super-chunk is one job over a 2x2 block. */
+interface ChunkJob {
+  x0: number;
+  z0: number;
+  size: number;
+  spacing: number;
+}
+
 export interface EnsureZoneOptions {
   /** Build the cells nearest this point first (e.g. the entry position).
    *  Falls back to buildTerrain's priorityPoint when omitted. */
@@ -1698,9 +1738,26 @@ export interface TerrainView {
    * rectangle, and so retiring zone residency later is one implementation swap.
    * The returned object is stable across calls: it is read every frame.
    */
-  groundResidency(): { grid: ChunkGrid; isPending: GroundPendingAt };
+  /**
+   * Ground residency for the outdoor fog clamp, scoped to the viewpoint: on
+   * the Proving Shore a cell owned by any other zone stops counting as
+   * pending, because this scope will never build it, and calling it pending
+   * would wall the island in at the unbuilt mainland (island_isolation_core).
+   */
+  groundResidency(view: { x: number; z: number }): { grid: ChunkGrid; isPending: GroundPendingAt };
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
+  /**
+   * Releases every chunk owned by `zone`: removes its mesh from `group`,
+   * disposes its geometry (the material is shared across every chunk and
+   * outlives this), and resets the cells' ground residency to "pending", the
+   * same state an unvisited zone starts in. A later `ensureZone` for the same
+   * zone rebuilds from scratch through the ordinary streaming path. Used only
+   * by the constrained-memory zone-eviction pass (see zone_eviction_core.ts);
+   * a no-op for a zone with nothing built, or one whose `ensureZone` is still
+   * in flight (safe to call in any state).
+   */
+  unloadZone(zone: ZoneDef): void;
   /**
    * Editor-only: re-mesh ONLY the chunks intersecting the world-space region
    * (a sculpt brush footprint), swapping each geometry in place on the existing
@@ -1906,36 +1963,37 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       spacing,
     );
   };
-  // One pool per view, torn down with it. Null wherever module workers are
-  // unavailable (Vitest under Node, an old WebView, a blocked CSP), in which
-  // case every build below takes the main-thread path exactly as before.
-  let pool: ReturnType<typeof terrainChunkPool> | null | undefined;
-  const chunkPool = (): ReturnType<typeof terrainChunkPool> => {
-    if (pool === undefined) pool = terrainChunkPool();
-    return pool;
-  };
-  // A background chunk built OFF-THREAD. Generation is pure arithmetic, so the
-  // only reason the idle path yields constantly is to protect frames; with no
-  // frame to protect it runs flat out. Returns false only when the caller
-  // should fall back, never on cancellation, which the caller checks itself.
+  // A chunk built OFF-THREAD, on the client-wide pool (water.ts submits its
+  // shore-attribute bake to the same workers), which this view tears down.
+  // Generation is pure arithmetic, so the only reason the main-thread paths
+  // yield constantly is to protect frames; with no frame to protect it runs
+  // flat out. The pool is null wherever module workers are unavailable (Vitest
+  // under Node, an old WebView, a blocked CSP), and then this returns false and
+  // the caller builds on the main thread exactly as before. Returns false ONLY
+  // when the caller should fall back, never on cancellation, which the caller
+  // checks itself.
   const addChunkInWorker = async (
     x0: number,
     z0: number,
     size: number,
     spacing: number,
+    urgent = false,
   ): Promise<boolean> => {
-    const active = chunkPool();
+    const active = zoneBuildPool();
     if (!active) return false;
-    const arrays = await active.build({
-      x0,
-      z0,
-      size,
-      spacing,
-      seed,
-      withSplat: !lowGfx,
-      skirtSpan,
-      lowShade,
-    });
+    const arrays = await active.buildChunk(
+      {
+        x0,
+        z0,
+        size,
+        spacing,
+        seed,
+        withSplat: !lowGfx,
+        skirtSpan,
+        lowShade,
+      },
+      { urgent },
+    );
     if (!arrays) return false;
     if (cancelled) return true; // discarded view: drop the result, do not attach
     attachChunk(finishChunkGeometry(arrays), x0, z0, size, spacing);
@@ -1990,9 +2048,30 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     return ZONES[owningRectIndex(x, z, zoneRects)].id;
   };
   groundPending.fill(1);
+  let islandScoped = false;
+  // Which cells the island scope would still build, precomputed ONCE: the
+  // grid and the zone rectangles are both fixed for the life of the view, and
+  // isPending is called in the clamp's tight grid walk (every frame, over
+  // hundreds of cells), so resolving the owning rectangle per call would put
+  // a rect scan on that hot path.
+  const islandCell = new Uint8Array(chunksX * chunksZ);
+  for (let cz = 0; cz < chunksZ; cz++) {
+    for (let cx = 0; cx < chunksX; cx++) {
+      islandCell[cz * chunksX + cx] = islandScopeStreamsZone(cellOwnerId(cx, cz)) ? 1 : 0;
+    }
+  }
+  // "Pending" means ground that WILL be built and is not yet, never merely
+  // ground that exists in the grid: the outdoor fog clamp pins the horizon at
+  // the nearest pending cell, so a cell nobody intends to build would wall the
+  // player in for free. That distinction is what lets the Proving Shore's
+  // isolated scope open its horizon over the sea instead of stopping at the
+  // unbuilt mainland 101 yd east (island_isolation_core.ts).
   const residency = {
     grid,
-    isPending: (cx: number, cz: number): boolean => groundPending[cz * chunksX + cx] === 1,
+    isPending: (cx: number, cz: number): boolean => {
+      const i = cz * chunksX + cx;
+      return cellCountsAsPending(groundPending[i] === 1, islandCell[i] === 1, islandScoped);
+    },
   };
   const zoneCells = (zone: ZoneDef): [number, number][] => {
     const out: [number, number][] = [];
@@ -2002,6 +2081,39 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       }
     }
     return out;
+  };
+  // One cell's claim: decides super-chunk vs single, marks every cell the
+  // resulting chunk will cover as built, and returns its geometry job (null
+  // when the cell is already owned). Synchronous on purpose, so the pipelined
+  // fast arm claims cells in exactly the order it submits them.
+  const claimCell = (zoneId: string, cx: number, cz: number): ChunkJob | null => {
+    const cell = cz * chunksX + cx;
+    if (built.has(cell)) return null;
+    const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+    const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
+    const superCells = [
+      [cx, cz],
+      [cx + 1, cz],
+      [cx, cz + 1],
+      [cx + 1, cz + 1],
+    ] as const;
+    const superOk =
+      cx % 2 === 0 &&
+      cz % 2 === 0 &&
+      cx + 1 < chunksX &&
+      cz + 1 < chunksZ &&
+      superCells.every(
+        ([sx, sz]) =>
+          cellOwnerId(sx, sz) === zoneId &&
+          !built.has(sz * chunksX + sx) &&
+          bandIndexAt(sx, sz) === farBand,
+      );
+    if (superOk) {
+      for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
+      return { x0, z0, size: CHUNK_SIZE * 2, spacing: bands[farBand].spacing };
+    }
+    built.add(cell);
+    return { x0, z0, size: CHUNK_SIZE, spacing: bands[bandIndexAt(cx, cz)].spacing };
   };
   const yieldBuild = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
   // Background ('idle') builds advance one batch per idle slot instead: the
@@ -2068,9 +2180,11 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     const yieldSlice = idlePace
       ? (): Promise<void> => (escalatedZones.has(zone.id) ? yieldBuild() : yieldIdle())
       : yieldBuild;
-    // Gating builds race in batches of four. Idle geometry has its own
-    // row/time-sliced builder, preserving one mesh per cell without a blocking
-    // 60 yd build or the old four-mesh subdivision workaround.
+    // How many main-thread chunk builds run between yields. Only the gating
+    // arm's FALLBACK path uses it now (its pooled path has no synchronous build
+    // to slice up). Idle geometry has its own row/time-sliced builder,
+    // preserving one mesh per cell without a blocking 60 yd build or the old
+    // four-mesh subdivision workaround.
     const cellsPerSlice = 4;
     const task = (async () => {
       // Build order is the "which chunk next" seam, and it lives in the pure
@@ -2108,51 +2222,53 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
         }
         normalTex.needsUpdate = true;
       }
-      for (const [cx, cz] of cells) {
-        if (cancelled) return;
-        const cell = cz * chunksX + cx;
-        if (!built.has(cell)) {
-          const superCells = [
-            [cx, cz],
-            [cx + 1, cz],
-            [cx, cz + 1],
-            [cx + 1, cz + 1],
-          ] as const;
-          const superOk =
-            cx % 2 === 0 &&
-            cz % 2 === 0 &&
-            cx + 1 < chunksX &&
-            cz + 1 < chunksZ &&
-            superCells.every(
-              ([sx, sz]) =>
-                cellOwnerId(sx, sz) === zone.id &&
-                !built.has(sz * chunksX + sx) &&
-                bandIndexAt(sx, sz) === farBand,
-            );
-          if (superOk) {
-            for (const [sx, sz] of superCells) built.add(sz * chunksX + sx);
-            const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
-            const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
-            if (idlePace) {
-              if (!(await addChunkIdle(x0, z0, CHUNK_SIZE * 2, bands[farBand].spacing, yieldSlice)))
-                return;
-            } else {
-              addChunk(x0, z0, CHUNK_SIZE * 2, bands[farBand].spacing);
-            }
-          } else {
-            built.add(cell);
-            const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
-            const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
-            const spacing = bands[bandIndexAt(cx, cz)].spacing;
-            if (idlePace) {
-              if (!(await addChunkIdle(x0, z0, CHUNK_SIZE, spacing, yieldSlice))) return;
-            } else {
-              addChunk(x0, z0, CHUNK_SIZE, spacing);
-            }
-          }
+      if (idlePace) {
+        for (const [cx, cz] of cells) {
+          if (cancelled) return;
+          const job = claimCell(zone.id, cx, cz);
+          if (job && !(await addChunkIdle(job.x0, job.z0, job.size, job.spacing, yieldSlice)))
+            return;
+          onProgress?.(++done, total);
         }
-        onProgress?.(++done, total);
-        if (!idlePace && done % cellsPerSlice === 0) await yieldSlice();
+      } else {
+        // Gating pacing PIPELINES: one job per pool worker in flight, submitted
+        // in the nearest-first order above, attached on this thread as each one
+        // lands (so completion order can differ from submission order, which
+        // only decides which nearby chunk appears a frame sooner). Without a
+        // pool, or for a cell whose worker build failed, the chunk is built
+        // here exactly as before, and THAT arm keeps the periodic yield: it is
+        // the only one that can eat a frame.
+        let sinceYield = 0;
+        // The first error is rethrown after the lane so a failed cell keeps the
+        // pre-pipeline semantics: the zone is NOT marked loaded and the gating
+        // caller's own catch (the arrival chain's fatal overlay) sees it,
+        // instead of a silent permanent hole under the fog clamp.
+        let firstError: unknown;
+        await runBoundedLane(
+          cells,
+          zoneBuildPool()?.size ?? 1,
+          async ([cx, cz]) => {
+            const job = claimCell(zone.id, cx, cz);
+            if (job && !(await addChunkInWorker(job.x0, job.z0, job.size, job.spacing, true))) {
+              if (cancelled) return;
+              addChunk(job.x0, job.z0, job.size, job.spacing);
+            }
+            if (cancelled) return;
+            onProgress?.(++done, total);
+            // Counted per CELL, not per fallback build: the pre-pipeline loop
+            // yielded every four cells whatever their state, and a re-ensure
+            // over an already-claimed zone must not walk every cell yieldless.
+            if (++sinceYield % cellsPerSlice === 0) await yieldSlice();
+          },
+          {
+            shouldStop: () => cancelled || firstError !== undefined,
+            onError: (error) => {
+              firstError ??= error;
+            },
+          },
+        );
+        if (firstError !== undefined) throw firstError;
+        if (cancelled) return;
       }
       loadedZones.add(zone.id);
       onProgress?.(total, total);
@@ -2167,10 +2283,54 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       escalatedZones.add(zoneId);
     },
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
-    groundResidency: () => residency,
+    groundResidency: (view: { x: number; z: number }) => {
+      islandScoped = islandIsolationActive(view.x, view.z);
+      return residency;
+    },
     cancelStreaming(): void {
       cancelled = true;
-      pool?.dispose();
+      disposeZoneBuildPool();
+    },
+    unloadZone(zone: ZoneDef): void {
+      // A zone with an in-flight ensureZone is not resident yet (it only
+      // reaches preparedZones, the sole caller's eligibility source, once
+      // that task resolves), so this never fires mid-build today. Guard it
+      // anyway: tearing down cells a live build is still attaching would let
+      // the build's trailing loadedZones.add(zone.id) mark a half-built zone
+      // loaded, with nothing left to repair it.
+      if (pendingZones.has(zone.id)) return;
+      const ownedCells = new Set(zoneCells(zone).map(([cx, cz]) => cz * chunksX + cx));
+      if (ownedCells.size === 0) return;
+      for (let i = chunks.length - 1; i >= 0; i--) {
+        const chunk = chunks[i];
+        // Same span/cell-index math attachChunk used to claim these cells: a
+        // far-band super-chunk covers a 2x2 block, so its release must clear
+        // every cell it attached, not just the one nearest its origin.
+        const span = Math.max(1, Math.round(chunk.size / CHUNK_SIZE));
+        const cx0 = Math.round((chunk.x0 + WORLD_MAX_X) / CHUNK_SIZE);
+        const cz0 = Math.round((chunk.z0 - WORLD_MIN_Z) / CHUNK_SIZE);
+        // The origin cell alone decides ownership: attachChunk's superOk gate
+        // only ever forms a super-chunk when all four of its cells already
+        // share one owner (see ensureZone above), so a mixed-ownership
+        // super-chunk cannot exist and scanning the other span cells here
+        // would be redundant.
+        if (!ownedCells.has(cz0 * chunksX + cx0)) continue;
+        group.remove(chunk.mesh);
+        chunk.mesh.geometry.dispose();
+        chunks.splice(i, 1);
+        for (let dz = 0; dz < span; dz++) {
+          for (let dx = 0; dx < span; dx++) {
+            const cx = cx0 + dx;
+            const cz = cz0 + dz;
+            if (cx < 0 || cx >= chunksX || cz < 0 || cz >= chunksZ) continue;
+            const idx = cz * chunksX + cx;
+            groundPending[idx] = 1;
+            built.delete(idx);
+          }
+        }
+      }
+      loadedZones.delete(zone.id);
+      escalatedZones.delete(zone.id);
     },
     update(camX: number, camZ: number, fogFar: number): void {
       if (

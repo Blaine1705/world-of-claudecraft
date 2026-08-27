@@ -86,6 +86,7 @@ function view(): EntityView {
 
 interface PainterStateAccess {
   states: Map<number, NameplateCanvasState>;
+  anchorScratch: Array<{ id: number; extraLift?: number }>;
 }
 
 function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
@@ -94,10 +95,20 @@ function stateOf(painter: NameplatePainter, id: number): NameplateCanvasState {
   return state;
 }
 
+function anchorOf(painter: NameplatePainter, id: number): { id: number; extraLift?: number } {
+  const anchor = (painter as unknown as PainterStateAccess).anchorScratch.find(
+    (candidate) => candidate.id === id,
+  );
+  if (!anchor) throw new Error(`Missing nameplate anchor for ${id}`);
+  return anchor;
+}
+
 function harness(
   targets: Entity[],
   options: {
     me?: Partial<Entity>;
+    includeSelf?: boolean;
+    showOwnNameplate?: () => boolean;
     isHostilePlayer?: (e: Entity) => boolean;
     markerFor?: (entityId: number) => number | null;
     questState?: (questId: string) => string;
@@ -110,6 +121,7 @@ function harness(
     ...options.me,
   });
   const views = new Map<number, EntityView>();
+  if (options.includeSelf) views.set(me.id, view());
   for (const target of targets) views.set(target.id, view());
   const camera = new THREE.PerspectiveCamera(60, VIEWPORT.width / VIEWPORT.height, 0.1, 500);
   camera.position.set(0, 3, 12);
@@ -133,7 +145,7 @@ function harness(
     getDevicePixelRatio: () => 1,
     showNameplates: () => true,
     showDevBadges: () => true,
-    showOwnNameplate: () => false,
+    showOwnNameplate: options.showOwnNameplate ?? (() => false),
     showPlayerNameplates: () => true,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
@@ -225,6 +237,7 @@ describe('batched canvas nameplate state', () => {
       id: 2,
       guild: 'Canvas Raiders',
       title: 'prog_veteran',
+      border: 'prog_prestige_10',
       overheadEmoteId: 'wave',
       holderTier: 1,
       devTier: 4,
@@ -245,8 +258,12 @@ describe('batched canvas nameplate state', () => {
     // and the per-frame draw path never allocates it.
     expect(state.guildLabel).toBe('<Canvas Raiders>');
     expect(state.title).toBe('Veteran');
+    // The wire carries the DEED ID; the plate carries the resolved SLUG.
+    expect(state.border).toBe('prestige_laurels');
     expect(state.opacity).toBe(0.55);
     expect(state.badges).toHaveLength(3);
+    expect(state.badges[0]?.size).toBe(15);
+    expect(state.badges[1]?.size).toBe(15);
     expect(state.badges[2]).toMatchObject({
       url: 'https://example.com/avatar.png',
       size: 24,
@@ -315,6 +332,126 @@ describe('batched canvas nameplate state', () => {
     expect(state.guildLabel).toBe('');
   });
 
+  it('E42: empty, stale, removed, and title-reward ids clear the world heraldry slug', () => {
+    // The slug is resolved on the SAME tier-cadenced resolveContent pass as the
+    // title, so a border change repaints exactly like a title change. Every arm
+    // here is a way a stale slug could survive onto the wrong plate.
+    const bordered = entity({ id: 2, border: 'col_reliquary_rank_5' });
+    const { painter } = harness([bordered]);
+
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+    expect(anchorOf(painter, 2).extraLift).toBe(8);
+
+    // The painter and canvas must agree on whether a resolved slug can paint
+    // heraldry. An unknown truthy slug paints no plaque, so it must reserve no
+    // collision lift either.
+    stateOf(painter, 2).border = 'retired_border_slug';
+    bordered.pos = { x: 20, y: 0, z: 0 } as Entity['pos'];
+    painter.update(false);
+    expect(anchorOf(painter, 2).extraLift).toBe(0);
+
+    // Empty and null selections: the reset must blank the slug the plate
+    // already holds instead of leaking a previous seal and ribbon.
+    bordered.border = '';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+    expect(anchorOf(painter, 2).extraLift).toBe(0);
+    bordered.border = 'col_reliquary_rank_5';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+    bordered.border = null;
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+
+    // A TITLE-reward deed is not heraldry, and an id the catalog no longer has
+    // (a save that outlived its content record) resolves to no world token.
+    bordered.border = 'prog_veteran';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+    bordered.border = 'deed_that_no_longer_exists';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+  });
+
+  it('E43: heraldry stays player-only while target, reaction, dead, and stealth state survive', () => {
+    let hostile = false;
+    const bordered = entity({
+      id: 2,
+      border: 'col_reliquary_rank_5',
+      auras: [{ kind: 'stealth' } as Entity['auras'][number]],
+    });
+    const mob = entity({
+      id: 3,
+      kind: 'mob',
+      templateId: 'wolf',
+      hostile: true,
+      border: 'col_reliquary_rank_5',
+    });
+    const object = entity({
+      id: 4,
+      kind: 'object',
+      templateId: 'delve_locked_chest',
+      border: 'col_reliquary_rank_5',
+    });
+    const npc = entity({
+      id: 5,
+      kind: 'npc',
+      templateId: 'marshal_redbrook',
+      border: 'col_reliquary_rank_5',
+    });
+    const { painter } = harness([bordered, mob, object, npc], {
+      me: { targetId: bordered.id },
+      isHostilePlayer: () => hostile,
+    });
+
+    painter.update(true);
+    const state = stateOf(painter, bordered.id);
+    expect(state).toMatchObject({
+      border: 'reliquary_gilt',
+      currentTarget: true,
+      hostile: false,
+      deadEnemy: false,
+      hpVisible: true,
+      opacity: 0.55,
+      nameColor: '#7fb8ff',
+    });
+    // A mob, NPC, and world object cannot inherit a valid player deed id.
+    expect(stateOf(painter, mob.id).border).toBe('');
+    expect(stateOf(painter, object.id).border).toBe('');
+    expect(stateOf(painter, npc.id).border).toBe('');
+
+    hostile = true;
+    bordered.dead = true;
+    painter.update(true);
+    expect(state).toMatchObject({
+      border: 'reliquary_gilt',
+      currentTarget: true,
+      hostile: true,
+      deadEnemy: true,
+      hpVisible: false,
+      opacity: 0.55,
+      // Reaction is carried separately. The canvas applies hostile/dead name
+      // color without overwriting the player's independent role/friendly color.
+      nameColor: '#7fb8ff',
+    });
+  });
+
+  it('E43: a hidden self plate with an emote never keeps worn heraldry', () => {
+    // Own-nameplate off still shows the self emote bubble, so resolveContent
+    // runs. suppressSelf must return after the reset blanks the slug, or the
+    // bubble path would leak a seal and ribbon onto a hidden identity plate.
+    const { painter } = harness([], {
+      includeSelf: true,
+      showOwnNameplate: () => false,
+      me: { border: 'col_reliquary_rank_5', overheadEmoteId: 'wave' },
+    });
+    painter.update(true);
+    expect(stateOf(painter, 1).border).toBe('');
+    expect(stateOf(painter, 1).name).toBe('');
+    expect(stateOf(painter, 1).emoteIconUrl).not.toBe('');
+  });
+
   it('maps object, quest NPC, boss, and lootable corpse presentation', () => {
     const questNpc = entity({
       id: 2,
@@ -324,6 +461,7 @@ describe('batched canvas nameplate state', () => {
     });
     const object = entity({ id: 3, kind: 'object', templateId: 'delve_locked_chest' });
     const boss = entity({ id: 4, kind: 'mob', templateId: 'gorrak', hostile: true });
+    const elite = entity({ id: 6, kind: 'mob', templateId: 'mogger', hostile: true });
     const corpse = entity({
       id: 5,
       kind: 'mob',
@@ -332,7 +470,7 @@ describe('batched canvas nameplate state', () => {
       dead: true,
       lootable: true,
     });
-    const { painter } = harness([questNpc, object, boss, corpse]);
+    const { painter } = harness([questNpc, object, boss, elite, corpse]);
 
     painter.update(true);
 
@@ -340,9 +478,15 @@ describe('batched canvas nameplate state', () => {
     expect(stateOf(painter, object.id)).toMatchObject({ nameColor: '#c084ff', badges: [] });
     expect(stateOf(painter, object.id).name).not.toBe('');
     expect(stateOf(painter, boss.id)).toMatchObject({ frame: 'boss', hpVisible: true });
+    expect(stateOf(painter, elite.id)).toMatchObject({
+      frame: 'elite',
+      marker: '◆',
+      markerTone: 'none',
+      hpVisible: true,
+    });
     expect(stateOf(painter, corpse.id)).toMatchObject({
       frame: '',
-      marker: '$',
+      marker: 'loot',
       markerTone: 'loot',
       hpVisible: false,
     });

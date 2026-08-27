@@ -76,6 +76,7 @@ function makeInput(userAgent?: string) {
   };
   const cb = {
     onTab: vi.fn(),
+    onTabPrev: vi.fn(),
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
@@ -331,6 +332,26 @@ describe('Input pet bar chords', () => {
       // The chord carries Ctrl, so the browser accelerator default is cancelled.
       expect(preventDefault).toHaveBeenCalled();
     }
+  });
+
+  it('routes bare Tab forward and Shift+Tab backward through the target cycle', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+
+    windowListeners.get('keydown')!({ code: 'Tab', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onTab).toHaveBeenCalledTimes(1);
+    expect(cb.onTabPrev).not.toHaveBeenCalled();
+
+    // Edge actions match the FULL chord, so the shifted press is its own action
+    // and does not also fire the forward cycle.
+    windowListeners.get('keydown')!({
+      code: 'Tab',
+      shiftKey: true,
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    expect(cb.onTabPrev).toHaveBeenCalledTimes(1);
+    expect(cb.onTab).toHaveBeenCalledTimes(1);
   });
 
   it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {
@@ -1146,6 +1167,121 @@ describe('Input Space handling', () => {
 
     expect(preventDefault).toHaveBeenCalledTimes(1);
     expect(input.readMoveInput().jump).toBe(true);
+  });
+});
+
+describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space/Enter)', () => {
+  it('blurs a HUD button left focused by a real mouse click', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A real mouse click reports a click count (detail) of 1 or more.
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('parks mouse-click focus on an enclosing dialog root instead of blurring to the body', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const focus = vi.fn();
+    const root = {
+      focus,
+      hasAttribute: (name: string) => name === 'tabindex',
+    };
+    const button = {
+      tagName: 'BUTTON',
+      blur,
+      closest: (selector: string) => (selector === '[role="dialog"]' ? root : null),
+    };
+    (globalThis as any).document.activeElement = button;
+
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('leaves a button focused and activated via keyboard (Tab then Enter/Space) alone', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A keyboard-synthesized click reports detail 0 (no mouse click count).
+    windowListeners.get('click')!({ type: 'click', detail: 0 });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('does not touch focus when nothing HUD-button-like is focused', () => {
+    const { windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+
+    // Would throw if the guard assumed activeElement always has a blur().
+    expect(() => windowListeners.get('click')!({ type: 'click', detail: 1 })).not.toThrow();
+  });
+
+  it('blurs a focused role="button" control left focused by a real mouse click (chat quest/deed links, the quest tracker header)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const link = {
+      tagName: 'SPAN',
+      getAttribute: (name: string) => (name === 'role' ? 'button' : null),
+      blur,
+    };
+    (globalThis as any).document.activeElement = link;
+
+    windowListeners.get('click')?.({ type: 'click', detail: 1, target: link });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a role="button" control focused and activated via keyboard (Tab then Enter/Space) alone', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const link = {
+      tagName: 'SPAN',
+      getAttribute: (name: string) => (name === 'role' ? 'button' : null),
+      blur,
+    };
+    (globalThis as any).document.activeElement = link;
+
+    // A keyboard-synthesized click reports detail 0 (no mouse click count).
+    windowListeners.get('click')?.({ type: 'click', detail: 0 });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('does not touch a focused element with neither BUTTON tag nor role="button"', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    const span = { tagName: 'SPAN', getAttribute: () => null, blur };
+    (globalThis as any).document.activeElement = span;
+
+    windowListeners.get('click')?.({ type: 'click', detail: 1, target: span });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('blurs a focused HUD button on a right-click release (equip-via-right-click has no click event)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a primary-button mouseup to the click handler (no double-fire)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 0, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).not.toHaveBeenCalled();
   });
 });
 

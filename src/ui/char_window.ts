@@ -24,10 +24,12 @@ import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { craftNameText } from './craft_name_view';
+import { currencyIconHtml } from './currency_art';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
+import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
@@ -36,7 +38,13 @@ import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
-import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
+import {
+  hydratePortraits,
+  isComposedPortraitKey,
+  modularLookFor,
+  onPortraitUpdate,
+  portraitChipHtml,
+} from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
@@ -156,6 +164,8 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPrestige(): void;
   /** Open the Book of Deeds (the active-title line's button). */
   openDeeds(): void;
+  /** Open The Reliquary (the sheet completion line's button). */
+  openReliquary(): void;
   /** The shared in-flight bag-item drag (published by the bags grid). The paperdoll
    *  sockets read it during dragover, where the DataTransfer payload is unreadable. */
   dragState: ItemDragState;
@@ -163,6 +173,10 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderBags(): void;
   /** Refusal toast for a drop the socket will not take. */
   showError(text: string): void;
+  /** Whether the player's composed kit has a head piece to hide at all: some
+   *  class kits ship no head geometry (a helmless set, see ARMOR_BY_SET), and
+   *  the eye must not offer a toggle that can never change anything. */
+  helmSlotAvailable(): boolean;
   /** The paperdoll eye toggle's current state: is the composed kit helm hidden? */
   helmHidden(): boolean;
   /** Flip the helmet-visibility preference. HUD-owned side effects (wire
@@ -183,7 +197,9 @@ const SHARE_GLYPH =
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
 
-  constructor(private readonly deps: CharWindowDeps) {}
+  constructor(private readonly deps: CharWindowDeps) {
+    this.watchComposedPortrait();
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -213,8 +229,33 @@ export class CharWindow {
     if (this.isOpen) this.render();
   }
 
+  /** The title chip carries the player's own COMPOSED face, and that portrait
+   *  is captured off the frame that asks for it: a miss paints the class crest,
+   *  so the open sheet rebuilds once the real headshot lands. hydratePortraits
+   *  cannot upgrade this one in place (a look does not fit in the chip's data
+   *  attributes, which is why it is marked composed and skipped there). */
+  private watchComposedPortrait(): void {
+    onPortraitUpdate((_visualKey, _skin, key) => {
+      if (isComposedPortraitKey(key)) this.renderIfOpen();
+    });
+  }
+
   render(): void {
     const el = this.deps.root();
+    // The 2 Hz staleness latch (Hud.refreshCharSheetIfChanged) makes mid-focus
+    // rebuilds ROUTINE: a loot, a deed earn, or a mount gain repaints the open
+    // sheet within 500 ms, and the innerHTML wipe below would park a keyboard
+    // user's focus on <body> (the FocusManager trap is focus-inside-only, so
+    // the next Tab would target the world, not the dialog). Carry it the way
+    // the profession sibling on the same band does: the same control by its
+    // static data-act identity, else Close, and deliberately no rung in
+    // between. Close's accidental Enter SPENDS nothing (it just shuts the
+    // sheet, a free reopen), which is what makes it the safe landing; every
+    // sheet control that triggers a repaint carries a data-act so the
+    // fallback stays the exception.
+    const focusedControl = focusedWithin(el);
+    const focusedAct = focusedControl?.dataset.act ?? null;
+    const hadFocus = focusedControl !== null;
     const world = this.deps.world();
     const p = world.player;
     const className = classDisplayName(world.cfg.playerClass);
@@ -231,7 +272,7 @@ export class CharWindow {
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -265,6 +306,10 @@ export class CharWindow {
     el.querySelector('[data-act="open-deeds"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openDeeds();
+    });
+    el.querySelector('[data-act="open-reliquary"]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openReliquary();
     });
     el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();
@@ -307,6 +352,17 @@ export class CharWindow {
     this.deps.renderPreview();
     this.deps.renderSkinPicker();
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    if (hadFocus) {
+      // Matched by comparison over the repainted controls, not by building an
+      // attribute selector out of the captured value (the professions rule:
+      // a comparison cannot throw or escape its quotes).
+      const sameAct = focusedAct
+        ? [...el.querySelectorAll<HTMLElement>('[data-act]')].find(
+            (control) => control.dataset.act === focusedAct,
+          )
+        : undefined;
+      restoreFirstEnabled([sameAct, el.querySelector<HTMLElement>('[data-close]')]);
+    }
   }
 
   // The "Gathering" section (issue 1124): one row per gathering profession, showing
@@ -380,7 +436,7 @@ export class CharWindow {
     // because that is where the player looks for "my helmet". State + side
     // effects are HUD-owned through deps (the wire command, the stored choice,
     // the portrait re-snapshot).
-    if (slot === 'helmet') {
+    if (slot === 'helmet' && this.deps.helmSlotAvailable()) {
       const hidden = this.deps.helmHidden();
       const labelKey = hidden
         ? 'hudChrome.paperdoll.showHelmAria'
@@ -388,6 +444,10 @@ export class CharWindow {
       const eye = document.createElement('button');
       eye.type = 'button';
       eye.className = 'equip-helm-eye';
+      // data-act is the focus-carry identity: the helm toggle repaints the
+      // sheet synchronously, and without it the ladder below would land a
+      // repeated press on Close instead of the eye.
+      eye.dataset.act = 'toggle-helm';
       eye.innerHTML = svgIcon(hidden ? 'eye-off' : 'eye');
       eye.setAttribute('aria-label', t(labelKey));
       eye.setAttribute('aria-pressed', hidden ? 'true' : 'false');
@@ -419,7 +479,7 @@ export class CharWindow {
       const unequip = document.createElement('button');
       unequip.type = 'button';
       unequip.className = 'equip-unequip-btn';
-      unequip.textContent = '×';
+      unequip.innerHTML = svgIcon('close');
       unequip.setAttribute(
         'aria-label',
         t('hudChrome.paperdoll.unequipAria', { item: itemDisplayName(item) }),

@@ -69,12 +69,12 @@ import type { IWorldPet } from '../src/world_api/pet';
 import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
+import type { IWorldReliquary } from '../src/world_api/reliquary';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
-import type { IWorldValeCup } from '../src/world_api/vale_cup';
 
 type IWorldMemberKind = 'method' | 'data';
 
@@ -125,6 +125,7 @@ export const IWORLD_MEMBERS = [
   { name: 'cancelAura', kind: 'method' },
   { name: 'targetEntity', kind: 'method' },
   { name: 'tabTarget', kind: 'method' },
+  { name: 'tabTargetPrev', kind: 'method' },
   { name: 'targetNearestFriendly', kind: 'method' },
   { name: 'friendlyTabTarget', kind: 'method' },
   { name: 'setStopAutoAttackOnTargetSwitch', kind: 'method' },
@@ -140,9 +141,11 @@ export const IWORLD_MEMBERS = [
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
+  { name: 'civicServicePlacements', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
   { name: 'turnInQuest', kind: 'method' },
+  { name: 'startTutorial', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
@@ -153,6 +156,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipItem', kind: 'method' },
   { name: 'useItem', kind: 'method' },
   { name: 'discardItem', kind: 'method' },
+  { name: 'setItemLocked', kind: 'method' },
   { name: 'buyItem', kind: 'method' },
   { name: 'sellItem', kind: 'method' },
   { name: 'sellAllJunk', kind: 'method' },
@@ -203,7 +207,6 @@ export const IWORLD_MEMBERS = [
   { name: 'leaveCardDuelQueue', kind: 'method' },
   { name: 'playCardInDuel', kind: 'method' },
   { name: 'forfeitCardDuel', kind: 'method' },
-  { name: 'cupInfo', kind: 'data' },
   { name: 'marketInfo', kind: 'data' },
   { name: 'marketCollectPending', kind: 'data' },
   // --- party / raid commands + marker read ---
@@ -227,6 +230,7 @@ export const IWORLD_MEMBERS = [
   { name: 'tradeSetOffer', kind: 'method' },
   { name: 'tradeConfirm', kind: 'method' },
   { name: 'tradeCancel', kind: 'method' },
+  { name: 'tradeClose', kind: 'method' },
   { name: 'duelRequest', kind: 'method' },
   { name: 'duelAccept', kind: 'method' },
   { name: 'duelDecline', kind: 'method' },
@@ -242,6 +246,10 @@ export const IWORLD_MEMBERS = [
   { name: 'ignoreRemove', kind: 'method' },
   { name: 'guildCreate', kind: 'method' },
   { name: 'guildInvite', kind: 'method' },
+  { name: 'guildPledge', kind: 'method' },
+  { name: 'guildPledgeWithdraw', kind: 'method' },
+  { name: 'guildPledgeDecide', kind: 'method' },
+  { name: 'setGuildPledgeSettings', kind: 'method' },
   { name: 'guildAccept', kind: 'method' },
   { name: 'guildDecline', kind: 'method' },
   { name: 'guildLeave', kind: 'method' },
@@ -267,15 +275,9 @@ export const IWORLD_MEMBERS = [
   { name: 'bgQueueLeave', kind: 'method' },
   { name: 'bgRespond', kind: 'method' },
   { name: 'bgFlagAction', kind: 'method' },
-  // --- the Vale Cup boarball minigame (IWorldValeCup) ---
-  { name: 'vcupQueueJoin', kind: 'method' },
-  { name: 'vcupQueueLeave', kind: 'method' },
-  { name: 'vcupSetRole', kind: 'method' },
-  { name: 'vcupReady', kind: 'method' },
-  { name: 'vcupBet', kind: 'method' },
-  { name: 'vcupPracticeStart', kind: 'method' },
   // --- market commands ---
   { name: 'marketSearch', kind: 'method' },
+  { name: 'marketSellPriceCheck', kind: 'method' },
   { name: 'marketList', kind: 'method' },
   { name: 'marketListInstance', kind: 'method' },
   { name: 'marketBuy', kind: 'method' },
@@ -368,6 +370,7 @@ export const IWORLD_MEMBERS = [
   { name: 'buyHeroicVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
+  { name: 'guildRoster', kind: 'method' }, // async
   { name: 'devLeaderboard', kind: 'method' }, // async
   { name: 'prestige', kind: 'method' },
   // --- daily WOC-holder rewards (IWorldDailyRewards; all async) ---
@@ -414,16 +417,29 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonFinderApply', kind: 'method' },
   { name: 'dungeonFinderApplyCancel', kind: 'method' },
   { name: 'dungeonFinderApplicationRespond', kind: 'method' },
-  // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title reads + the
-  // title selection command ---
+  // --- the Book of Deeds (IWorldDeeds): earned/stats/renown/title/border
+  // reads + the two cosmetic selection commands ---
   { name: 'deedsEarned', kind: 'data' },
   { name: 'deedStats', kind: 'data' },
   { name: 'renown', kind: 'data' },
   { name: 'activeTitle', kind: 'data' },
   { name: 'setActiveTitle', kind: 'method' },
+  { name: 'activeBorder', kind: 'data' },
+  { name: 'setActiveBorder', kind: 'method' },
   { name: 'deedsRarity', kind: 'method' },
   { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
+  // --- The Reliquary (IWorldReliquary): sparse firstFind / marks / recent +
+  // pure completion helpers (item ownership still rides deedStats) ---
+  { name: 'reliquaryFirstFind', kind: 'data' },
+  { name: 'reliquaryMarks', kind: 'data' },
+  { name: 'reliquaryRecent', kind: 'data' },
+  { name: 'reliquaryObtainCounts', kind: 'data' },
+  { name: 'reliquaryPageCompletion', kind: 'method' },
+  { name: 'reliquaryCatalogCompletion', kind: 'method' },
+  { name: 'reliquaryCuratorRank', kind: 'method' },
+  { name: 'reliquaryPageClearCount', kind: 'method' },
+  { name: 'reliquaryRarity', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
@@ -552,24 +568,53 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
     // payload on demand: it has no snapshot key), leaving 288. Thornhollow
-    // Fields adds the four battleground facet members (bgInfo data plus the
-    // bgQueueJoin / bgQueueLeave / bgFlagAction commands), the
-    // stop-auto-attack-on-target-switch setting adds
-    // setStopAutoAttackOnTargetSwitch (method), the commission order board
-    // (issue #1298) adds commissionOrders (data) plus openCommissionOrder/
-    // cancelCommissionOrder/acceptCommissionOrder/deliverCommissionOrder
-    // (methods), and the paperdoll helmet-visibility eye adds setHelmHidden
-    // (method), leaving 300 on the v0.35.0 base. Composed with the
-    // class-overhauls wave: activeConsecrations, petSpecialCommandsSupported,
-    // and accountAdmin add three data members; the pet's signature-skill
-    // command and autocast toggle add two methods (305). The bag clean-up button adds sortInventory
-    // (IWorldInventory, a method, 306), and the character sheet's Time Played
-    // line adds playtimeSeconds (IWorldProgressionXp, data), leaving 307.
-    // The release's battleground queue-pop confirmation adds bgRespond
-    // (IWorldBattleground, a method), leaving 308.
-    expect(IWORLD_MEMBERS.length).toBe(308);
-    expect(DATA_MEMBERS.length).toBe(80);
-    expect(METHOD_MEMBERS.length).toBe(228);
+    // Fields adds the four battleground facet members on top of that base:
+    // the bgInfo data member plus the bgQueueJoin / bgQueueLeave / bgFlagAction
+    // commands, leaving 292. The stop-auto-attack-on-target-switch setting
+    // adds setStopAutoAttackOnTargetSwitch (method), leaving 293. This
+    // branch's commission order board (issue #1298) adds commissionOrders
+    // (data) plus openCommissionOrder/cancelCommissionOrder/
+    // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
+    // The v0.36.0 base's paperdoll helmet-visibility eye adds setHelmHidden
+    // (IWorldCosmetics, a method), leaving 300. The bag clean-up button adds
+    // sortInventory (IWorldInventory, a method), leaving 301. The character
+    // sheet's Time Played line adds playtimeSeconds (IWorldProgressionXp,
+    // data), leaving 302. The battleground queue-pop confirmation adds
+    // bgRespond (IWorldBattleground, a method), leaving 303. The release's
+    // class-overhauls wave then adds activeConsecrations and
+    // petSpecialCommandsSupported (data) plus the pet signature-skill command
+    // and the autocast toggle (methods), leaving 307 on pure release.
+    // The Reliquary facet adds nine members (4 data + 5 methods, the fifth
+    // method being the Phase 22 reliquaryRarity), leaving 317. The fourth data
+    // member is reliquaryObtainCounts, the Phase 17 per-relic obtain tally.
+    // The Phase 19 nameplate border adds the IWorldDeeds pair activeBorder
+    // (data) + setActiveBorder (method), leaving 319. The v0.37.0 release's
+    // backward target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a
+    // method), and its player item lock (issue #3042) adds setItemLocked
+    // (IWorldInventory, a method). The v0.38.0 release's civic service
+    // anchors add civicServicePlacements (IWorldInteraction, data), and its
+    // market Sell-tab price reference adds marketSellPriceCheck (IWorldMarket,
+    // a method). The release arm's neutral trade close (tradeClose, a sibling
+    // of tradeCancel that ends a session without calling it a cancellation)
+    // adds one command member. The signpost guild board's roster drill-in
+    // adds guildRoster (IWorldProgressionXp, a method). On this branch the
+    // New Eastbrook program
+    // retires the Vale Cup facet (docs/design/eastbrook-revamp/master-plan.md),
+    // removing cupInfo (data) plus the cup methods, and the tutorial greeting
+    // adds startTutorial (IWorldQuests, a method). The merged tree carries
+    // both arms.
+    //
+    // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
+    // it independently every cycle. Twice git merged identical numbers with no
+    // conflict while the real total was one higher; twice the sides differed so
+    // the conflict was at least visible. A counter each branch can increment is
+    // a silent off-by-one at merge time, and the data/method split can disagree
+    // even when the total agrees. Only running the suite says what these
+    // numbers really are; never reconcile them by arithmetic in the diff (the
+    // numbers below were set from a suite run, not from this narrative).
+    expect(IWORLD_MEMBERS.length).toBe(323);
+    expect(DATA_MEMBERS.length).toBe(85);
+    expect(METHOD_MEMBERS.length).toBe(238);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -588,6 +633,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountAdmin',
       'accountCosmetics',
       'accountFlair',
+      'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
@@ -633,6 +679,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'civicServicePlacements',
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
@@ -646,7 +693,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'craftItem',
       'craftSkills',
       'craftingIdentity',
-      'cupInfo',
       'dailyRewardHistory',
       'dailyRewardLeaderboard',
       'dailyRewards',
@@ -716,7 +762,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildKick',
       'guildLeaderboard',
       'guildLeave',
+      'guildPledge',
+      'guildPledgeDecide',
+      'guildPledgeWithdraw',
       'guildPromote',
+      'guildRoster',
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
@@ -764,6 +814,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -809,6 +860,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryCatalogCompletion',
+      'reliquaryCuratorRank',
+      'reliquaryFirstFind',
+      'reliquaryMarks',
+      'reliquaryObtainCounts',
+      'reliquaryPageClearCount',
+      'reliquaryPageCompletion',
+      'reliquaryRarity',
+      'reliquaryRecent',
       'renamePet',
       'renown',
       'reportTelemetry',
@@ -830,9 +890,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setGuildPledgeSettings',
       'setHelmHidden',
+      'setItemLocked',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoSpecial',
@@ -848,11 +911,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startTutorial',
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
+      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'talentRole',
@@ -866,6 +931,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'townFocus',
       'tradeAccept',
       'tradeCancel',
+      'tradeClose',
       'tradeConfirm',
       'tradeInfo',
       'tradeRequest',
@@ -880,12 +946,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
-      'vcupBet',
-      'vcupPracticeStart',
-      'vcupQueueJoin',
-      'vcupQueueLeave',
-      'vcupReady',
-      'vcupSetRole',
       'vendorBuyback',
       'xp',
     ]);
@@ -895,6 +955,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
       'accountAdmin',
       'accountCosmetics',
+      'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
       'activeLoadout',
@@ -909,13 +970,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'civicServicePlacements',
       'commissionOrders',
       'companionState',
       'companionUpgrades',
       'copper',
       'craftSkills',
       'craftingIdentity',
-      'cupInfo',
       'deedStats',
       'deedsEarned',
       'delveDaily',
@@ -958,6 +1019,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questsDone',
       'realm',
       'recipeList',
+      'reliquaryFirstFind',
+      'reliquaryMarks',
+      'reliquaryObtainCounts',
+      'reliquaryRecent',
       'renown',
       'restedXp',
       'riftCollisionToken',
@@ -1078,7 +1143,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildKick',
       'guildLeaderboard',
       'guildLeave',
+      'guildPledge',
+      'guildPledgeDecide',
+      'guildPledgeWithdraw',
       'guildPromote',
+      'guildRoster',
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
@@ -1109,6 +1178,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketList',
       'marketListInstance',
       'marketSearch',
+      'marketSellPriceCheck',
       'mountLessonActive',
       'mountRaceCancel',
       'mountRaceStart',
@@ -1142,6 +1212,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'rechargeToolEffect',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryCatalogCompletion',
+      'reliquaryCuratorRank',
+      'reliquaryPageClearCount',
+      'reliquaryPageCompletion',
+      'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
       'respec',
@@ -1159,9 +1234,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'selectTalentRow',
       'sellAllJunk',
       'sellItem',
+      'setActiveBorder',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setGuildPledgeSettings',
       'setHelmHidden',
+      'setItemLocked',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoSpecial',
@@ -1176,10 +1254,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startTutorial',
       'stopAutoAttack',
       'submitLootRoll',
       'switchLoadout',
       'tabTarget',
+      'tabTargetPrev',
       'takeActionBarLayoutRestore',
       'talentPoints',
       'targetEntity',
@@ -1188,6 +1268,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleWeaponStow',
       'tradeAccept',
       'tradeCancel',
+      'tradeClose',
       'tradeConfirm',
       'tradeRequest',
       'tradeSetOffer',
@@ -1200,12 +1281,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
-      'vcupBet',
-      'vcupPracticeStart',
-      'vcupQueueJoin',
-      'vcupQueueLeave',
-      'vcupReady',
-      'vcupSetRole',
     ]);
   });
 });
@@ -1241,8 +1316,8 @@ describe('membership, not equality: world extras do not fail the gate', () => {
   });
 });
 
-// --- W1: aggregate == disjoint union of the 28 facet member sets --------------------
-// After the facet split (W1), `interface IWorld extends` 28 domain facet interfaces
+// --- W1: aggregate == disjoint union of the facet member sets -----------------------
+// After the facet split (W1), `interface IWorld extends` the domain facet interfaces
 // (src/world_api/<facet>.ts; the owner-backed facets plus IWorldTelemetry, the
 // bank-system's IWorldBank, the Book of Deeds' IWorldDeeds, and the Dungeon Finder's
 // IWorldDungeonFinder). This block proves the split dropped nothing and duplicated
@@ -1302,6 +1377,7 @@ type _ExhaustCombat = AssertNever<Exclude<keyof IWorldCombat, (typeof FACET_COMB
 const FACET_TARGETING = [
   'targetEntity',
   'tabTarget',
+  'tabTargetPrev',
   'targetNearestFriendly',
   'friendlyTabTarget',
   'setStopAutoAttackOnTargetSwitch',
@@ -1311,6 +1387,7 @@ type _ExhaustTargeting = AssertNever<
 >;
 
 const FACET_INTERACTION = [
+  'civicServicePlacements',
   'interact',
   'lootCorpse',
   'harvestCorpse',
@@ -1346,6 +1423,7 @@ const FACET_INVENTORY = [
   'unequipItem',
   'useItem',
   'discardItem',
+  'setItemLocked',
   'buyItem',
   'sellItem',
   'sellAllJunk',
@@ -1381,6 +1459,7 @@ const FACET_QUESTS = [
   'turnInQuest',
   'abandonQuest',
   'acceptLinkedQuest',
+  'startTutorial',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -1395,6 +1474,7 @@ const FACET_PROGRESSION_XP = [
   'gatheringProficiency',
   'leaderboard',
   'guildLeaderboard',
+  'guildRoster',
   'devLeaderboard',
   'prestige',
 ] as const satisfies readonly (keyof IWorldProgressionXp)[];
@@ -1464,6 +1544,7 @@ const FACET_TRADE = [
   'tradeSetOffer',
   'tradeConfirm',
   'tradeCancel',
+  'tradeClose',
 ] as const satisfies readonly (keyof IWorldTrade)[];
 type _ExhaustTrade = AssertNever<Exclude<keyof IWorldTrade, (typeof FACET_TRADE)[number]>>;
 
@@ -1518,6 +1599,10 @@ const FACET_SOCIAL_GRAPH = [
   'ignoreRemove',
   'guildCreate',
   'guildInvite',
+  'guildPledge',
+  'guildPledgeWithdraw',
+  'guildPledgeDecide',
+  'setGuildPledgeSettings',
   'guildAccept',
   'guildDecline',
   'guildLeave',
@@ -1541,6 +1626,7 @@ const FACET_MARKET = [
   'marketInfo',
   'marketCollectPending',
   'marketSearch',
+  'marketSellPriceCheck',
   'marketList',
   'marketListInstance',
   'marketBuy',
@@ -1630,17 +1716,6 @@ type _ExhaustTelemetry = AssertNever<
   Exclude<keyof IWorldTelemetry, (typeof FACET_TELEMETRY)[number]>
 >;
 
-const FACET_VALE_CUP = [
-  'cupInfo',
-  'vcupQueueJoin',
-  'vcupQueueLeave',
-  'vcupSetRole',
-  'vcupReady',
-  'vcupBet',
-  'vcupPracticeStart',
-] as const satisfies readonly (keyof IWorldValeCup)[];
-type _ExhaustValeCup = AssertNever<Exclude<keyof IWorldValeCup, (typeof FACET_VALE_CUP)[number]>>;
-
 const FACET_MOUNTS = [
   'ownedMounts',
   'ridingTrained',
@@ -1712,11 +1787,28 @@ const FACET_DEEDS = [
   'renown',
   'activeTitle',
   'setActiveTitle',
+  'activeBorder',
+  'setActiveBorder',
   'deedsRarity',
   'deedsRecent',
   'deedsLeaderboard',
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
+
+const FACET_RELIQUARY = [
+  'reliquaryFirstFind',
+  'reliquaryMarks',
+  'reliquaryRecent',
+  'reliquaryObtainCounts',
+  'reliquaryPageCompletion',
+  'reliquaryCatalogCompletion',
+  'reliquaryCuratorRank',
+  'reliquaryPageClearCount',
+  'reliquaryRarity',
+] as const satisfies readonly (keyof IWorldReliquary)[];
+type _ExhaustReliquary = AssertNever<
+  Exclude<keyof IWorldReliquary, (typeof FACET_RELIQUARY)[number]>
+>;
 
 const FACET_ACTION_BAR = [
   'saveActionBarLayout',
@@ -1755,15 +1847,18 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   dailyRewards: FACET_DAILY_REWARDS,
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
-  valeCup: FACET_VALE_CUP,
   mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
+  reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
+    // +1 battleground facet (Thornhollow Fields) on the release line; +1
+    // Reliquary facet on this branch: 33 total; -1 for the New Eastbrook
+    // program's Vale Cup retirement: 32 total.
     expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(32);
   });
 
@@ -1774,7 +1869,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     }
   });
 
-  it('the 28 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1792,8 +1887,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(308);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(308);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

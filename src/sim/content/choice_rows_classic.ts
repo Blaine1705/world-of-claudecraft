@@ -1081,7 +1081,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r5_twisted_faith',
           name: 'Processional Grace',
           description: 'Veilstep allows the Priest to cast while moving for 4 sec.',
-          icon: 'veilstep',
+          icon: 'choir_of_deliverance',
           effect: {
             intrinsic: { mechanic: 'priest_processional_grace', metrics: { duration: 4 } },
           },
@@ -1123,7 +1123,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Wounded Halo',
           description:
             'A hit for at least 15% maximum health grants a 15% absorb for 10 sec. 20 sec internal cooldown.',
-          icon: 'power_word_shield',
+          icon: 'martyrs_aegis',
           effect: {
             proc: {
               id: 'pri_inner_fire',
@@ -1337,7 +1337,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r5_improved_lightning_shield',
           name: 'Gathering Winds',
           description: 'Entering Shadewolf grants 60% movement speed for 3 sec, once every 20 sec.',
-          icon: 'ghost_wolf',
+          icon: 'galeheart_weapon',
           effect: { runtime: { speedPercent: 60, duration: 3, internalCooldown: 20 } },
         },
         {
@@ -1360,7 +1360,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Stoneward',
           description:
             'Grants Stoneward, a 60 sec ally shield with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec.',
-          icon: 'lightning_shield',
+          icon: 'stoneward',
           effect: { grant: { ability: 'stoneward' } },
         },
         {
@@ -1574,9 +1574,9 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
       options: [
         {
           id: 'wlk_r8_voidfeast',
-          name: 'Abyssal Gag',
+          name: 'Improved Abyssal Gag',
           description:
-            'Grants Abyssal Gag early. It interrupts the enemy and silences all of its spells for 4 sec.',
+            'Improves Abyssal Gag and grants it two levels early. It interrupts the enemy and silences all of its spells for 4 sec.',
           icon: 'wlk_r8_voidfeast',
           effect: {
             grant: { ability: 'spell_lock' },
@@ -1592,7 +1592,7 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_howl_of_terror',
           name: 'Dread Chorus',
           description:
-            'Grants Dread Chorus: frighten enemies within 8 yards for up to 3 sec. Damage may break the effect. 40 sec cooldown.',
+            "Grants Dread Chorus: frighten enemies within 8 yards for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. 40 sec cooldown.",
           icon: 'wlk_r8_howl_of_terror',
           effect: { grant: { ability: 'howl_of_terror' } },
         },
@@ -1600,14 +1600,14 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_curse_of_exhaustion',
           name: 'Leaden Hex',
           description:
-            'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 1.5 sec and consumes them. A target can be rooted once every 15 sec.',
+            'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
           icon: 'wlk_r8_curse_of_exhaustion',
           effect: {
             global: { warlockLeadenHex: 0.05 },
             tuning: {
               maxStacks: 3,
               slowDuration: 5,
-              rootDuration: 1.5,
+              rootDuration: 3.5,
               rootLockDuration: 15,
             },
           },

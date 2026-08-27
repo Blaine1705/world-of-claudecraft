@@ -35,12 +35,12 @@ const CHROME_ICON_DIR = '/ui/chrome';
 export const CHROME_ART_IDS: ReadonlySet<UiIconName> = new Set<UiIconName>([
   'arena',
   'bags',
-  'ball',
   'book',
   'cards',
   'character',
   'chest',
   'crafting',
+  'crown',
   'dfinder',
   'donate',
   'emote',

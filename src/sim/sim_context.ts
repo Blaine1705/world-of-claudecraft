@@ -46,7 +46,6 @@ import type { BgOutcomeRecord } from './social/battleground_outcomes';
 import type { BgProposal } from './social/battleground_proposal';
 import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
-import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
 import type {
   AbilityDef,
@@ -247,6 +246,12 @@ export interface SimContextPrimitives {
   // daily boundary. '' means the host set no calendar, so nothing ever rolls over
   // and same-seed replays stay reproducible.
   readonly resetDay: string;
+  // Host-supplied early-open probe for the weekend Double Honor window ('' =
+  // unknown): the reset-day key the realm will be in DOUBLE_HONOR_LEAD_HOURS
+  // from now, so the event opens that many hours before the Saturday window
+  // (src/sim/pvp/honor_event.ts). Only the event reads this; every daily
+  // rollover stays on `resetDay` above.
+  readonly eventLeadDay: string;
   // Wild-respawn queue (P1b: completeTame pushes the tamed beast's respawn). Live view;
   // the backing array stays on Sim, mutated in place (push), so read-only ref.
   readonly pendingMobRespawns: PendingMobRespawn[];
@@ -278,6 +283,10 @@ export interface SimContextPrimitives {
   // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
+  // The compulsory-tutorial host opt-in (SimConfig.compulsoryTutorial): the
+  // greeting sweep only force-ferries fresh characters where a live world
+  // turned it on; tests, parity traces, and the RL env keep it off.
+  readonly compulsoryTutorial: boolean;
   readonly marketListings: MarketListing[];
   // Bank system: the live array of every `banker: true` NPC id, seeded by
   // the Sim ctor NPC loop. bank.ts reads it to gate deposit/withdraw/buy-slots on
@@ -290,11 +299,6 @@ export interface SimContextPrimitives {
   // reassigned, so a live read-only view like bankerIds. Always empty offline
   // (guilds are a server social system).
   readonly guildBanks: Map<number, GuildBankState>;
-  // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object on Sim
-  // (queues/deserters/botPids mutated in place, the match slot reassigned INSIDE
-  // the holder), so a read-only live view suffices. Consumed by the vale_cup
-  // module, the damage no-damage floor, and targeting's candidate arm.
-  readonly vcup: VcState;
   // Book of Deeds: players whose deed-relevant state changed this tick,
   // evaluated and cleared at the tick tail (deeds.ts updateDeeds). Sim-owned
   // Set mutated in place, so a read-only live view.
@@ -441,7 +445,11 @@ export interface SimContextCallbacks {
   // hasPendingSocialInvite are core; the five fiesta* hooks are A3-owned), plus the
   // arena bodies EXPOSED for the Fiesta slice (A3): readyArenaFighter / resetForArena
   // / isArenaTeamWiped / arenaIsDown / arenaAllPids (arenaTeamOf already above).
-  clearAurasFromSource(target: Entity, sourceId: number): void;
+  clearAurasFromSource(
+    target: Entity,
+    sourceId: number,
+    shouldClear?: (aura: Aura) => boolean,
+  ): void;
   entityInDungeon(e: Entity, dungeonId: string): boolean;
   hasPendingSocialInvite(targetPid: number): boolean;
   createFiestaState(): FiestaState;
@@ -531,7 +539,7 @@ export interface SimContextCallbacks {
   breakStealth(entity: Entity): void;
 
   // Shared entry point (stays on Sim, exposed here): taunt forces a mob's target.
-  applyTaunt(target: Entity, mob: Entity): void;
+  applyTaunt(target: Entity, mob: Entity): boolean;
 
   // P1 pet lifecycle.
   summonPet(owner: Entity, templateId: string): void;
@@ -634,7 +642,7 @@ export interface SimContextCallbacks {
   // except dealDamage/handleDeath/grantXp, which delegate to the module). enterCombat
   // is a shared combat-entry helper that STAYS on Sim, exposed here for the hub.
   grantXp(amount: number, meta: PlayerMeta, opts?: { fromKill?: boolean }): void;
-  enterCombat(a: Entity, b: Entity): void;
+  enterCombat(a: Entity, b: Entity): boolean;
   hexOutputMult(source: Entity | null): number;
   critVulnBonus(target: Entity): number;
   pvpController(e: Entity | null): Entity | null;
@@ -692,7 +700,7 @@ export interface SimContextCallbacks {
   fleeMoveSpeed(e: Entity): number;
   // --- mob-AI helpers the dispatcher consults ---
   maybeFlee(mob: Entity, target: Entity): boolean;
-  aggroMob(mob: Entity, target: Entity, social: boolean): void;
+  aggroMob(mob: Entity, target: Entity, social: boolean): boolean;
   isStunned(e: Entity): boolean;
   isRooted(e: Entity): boolean;
   moveSpeedMult(e: Entity): number;
@@ -767,11 +775,19 @@ export interface SimContextCallbacks {
   // opts.silent / opts.callerLogs: see Sim.addItem's matching params, same
   // contract (suppress the client's default loot audio cue, and its default
   // "You receive:" text line when the caller owns the line for this grant).
+  // opts.movement: also Sim.addItem's, same contract (this grant relocates or
+  // re-mints copies somebody already held, so it never bumps a Reliquary
+  // obtain count; discovery still fires).
   addItem(
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: Readonly<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    }>,
   ): void;
   // Equip passthroughs for the /dev kit presets (src/sim/dev_kit.ts), which equip
   // bags before gear so pooled bag capacity exists before the pieces land. Plain
@@ -789,7 +805,12 @@ export interface SimContextCallbacks {
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
+    opts?: Readonly<{
+      silent?: boolean;
+      callerLogs?: boolean;
+      craftedRecipeId?: string;
+      movement?: boolean;
+    }>,
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
@@ -1021,35 +1042,24 @@ export interface SimContextCallbacks {
   // lifetime-XP accrual, and similar); grantDeed is the idempotent unlock
   // every path shares (the evaluator and the bespoke manual-deed sites).
   bumpDeedStat(meta: PlayerMeta, stat: DeedStatKey, delta: number): void;
+  // No retro opts here on purpose: the join-time seed pass calls the deeds
+  // module function directly (deeds.ts seedItemDiscovery), so a future caller
+  // reaching through this seam cannot ask for a silent fill and gets live
+  // find semantics, which is the safe default for a live acquisition site.
+  // Same rule for movement provenance: a site that must flag a discovery as a
+  // relocation (vendor buyback, items.ts BUYBACK_MOVEMENT) imports the deeds
+  // module function, which carries the opts bag; this seam stays opts-free.
+  // As of Phase 17 the grant hubs also call the module function, so this
+  // member has NO production caller left; it stays because callbacks are
+  // append-only, but new call sites should use the module function. The two
+  // tests/deeds.test.ts arms are now the ONLY exercisers of the delegate,
+  // so a drift between the seam default and the module default shows up
+  // there and nowhere on a production path.
   markItemDiscovered(meta: PlayerMeta, itemId: string, rolledQuality?: string): void;
   markVisited(meta: PlayerMeta, markId: string): void;
   markDeedsDirty(pid: number): void;
   grantDeed(meta: PlayerMeta, deedId: string, opts?: { retro?: boolean }): boolean;
 
-  // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts). True when
-  // pid is seated in a live Vale Cup match (rated or practice) or waiting in a
-  // Vale Cup bracket queue. social/arena.ts calls this from arenaQueueJoin and
-  // the 1v1/2v2/fiesta prune predicates so a player already committed to Vale
-  // Cup can never be pulled into an Arena queue or match, and vice versa (the
-  // mirror check, isArenaQueued, is a direct import since vale_cup.ts already
-  // imports arena.ts one direction).
-  vcupSeatedOrQueued(pid: number): boolean;
-
-  // The Vale Cup sport-move arms (owned by social/vale_cup.ts; consumed by
-  // combat/effect_dispatch.ts). All three silently no-op unless the caster is
-  // seated in the live Sowfield match's play phase. vcupBallKick launches the
-  // match ball toward the caster's castAim; vcupSportDash lunges the CASTER
-  // along the aim via the applyKnockback step-walker (catchBall grips a
-  // crossing ball); vcupSportShove bumps a cup OPPONENT back the same way.
-  vcupBallKick(caster: Entity, power: number, loft: number, range: number): void;
-  // vcupBallPass auto-paces a lead pass to the caster's targeted team-mate (else
-  // the best mate toward the aim).
-  vcupBallPass(caster: Entity, power: number, loft: number, range: number): void;
-  // vcupShoot fires the ball at the enemy goal; the client-encoded charge (aim
-  // distance) scales both power and loft, so a max shot sails over the bar.
-  vcupShoot(caster: Entity, power: number, loft: number, range: number): void;
-  vcupSportDash(caster: Entity, distance: number, catchBall: boolean): void;
-  vcupSportShove(caster: Entity, target: Entity, distance: number): void;
   // Thornhollow Fields battleground (social/battleground.ts). bgOnPlayerDeath is the
   // death hook the damage hub calls for a fallen battleground player (carrier
   // death drops the flag in place; releasing sends the spirit to the warded
@@ -1298,6 +1308,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get resetDay() {
       return host.resetDay;
     },
+    get eventLeadDay() {
+      return host.eventLeadDay;
+    },
     get utcDay() {
       return host.utcDay;
     },
@@ -1331,6 +1344,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get devCommands() {
       return host.devCommands;
     },
+    get compulsoryTutorial() {
+      return host.compulsoryTutorial;
+    },
     get marketListings() {
       return host.marketListings;
     },
@@ -1339,9 +1355,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get guildBanks() {
       return host.guildBanks;
-    },
-    get vcup() {
-      return host.vcup;
     },
     get deedDirtyPids() {
       return host.deedDirtyPids;
@@ -1608,14 +1621,6 @@ export function createSimContext(host: SimContextHost): SimContext {
     markVisited: host.markVisited,
     markDeedsDirty: host.markDeedsDirty,
     grantDeed: host.grantDeed,
-    // Vale Cup <-> Arena queue exclusion (points at social/vale_cup.ts).
-    vcupSeatedOrQueued: host.vcupSeatedOrQueued,
-    // The Vale Cup sport-move arms (points at social/vale_cup.ts).
-    vcupBallKick: host.vcupBallKick,
-    vcupBallPass: host.vcupBallPass,
-    vcupShoot: host.vcupShoot,
-    vcupSportDash: host.vcupSportDash,
-    vcupSportShove: host.vcupSportShove,
     // Thornhollow Fields battleground hooks (points at social/battleground.ts via Sim).
     bgOnPlayerDeath: host.bgOnPlayerDeath,
     bgOnPlayerDamaged: host.bgOnPlayerDamaged,

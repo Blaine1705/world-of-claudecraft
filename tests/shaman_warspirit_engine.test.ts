@@ -7,6 +7,7 @@ import {
   onStormcastConsumed,
   STONEBOUND_ARMOR_ID,
   STONEBOUND_DR_ID,
+  STONEBOUND_STAMINA_ID,
   STORMCAST_CHEAP_ID,
   STORMCAST_ID,
   STORMSURGE_READY_ID,
@@ -45,7 +46,7 @@ describe('Warspirit engine', () => {
       .drainEvents()
       .filter((event) => event.type === 'damage' && event.ability === 'Galeheart Echo');
     expect(echoes).toHaveLength(2);
-    expect(echoes.map((event) => (event.type === 'damage' ? event.amount : 0))).toEqual([50, 50]);
+    expect(echoes.map((event) => (event.type === 'damage' ? event.amount : 0))).toEqual([25, 25]);
     expect(shaman.auras.find((aura) => aura.id === STORMCAST_ID)?.duration).toBe(12);
     expect(shaman.auras.find((aura) => aura.id === STORMCAST_CHEAP_ID)?.value).toBe(0.5);
   });
@@ -91,10 +92,22 @@ describe('Warspirit engine', () => {
 
   it('makes Stonebound exclusive, respects taunt immunity, and cleans every rider', () => {
     const { sim, shaman, target } = setup();
+    const casterFormMaxHp = shaman.maxHp;
     applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
     expect(warspiritPosture(shaman)).toBe('stonebound');
-    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(30);
-    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.1);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_ARMOR_ID)?.value).toBe(40);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_STAMINA_ID)?.value).toBe(20);
+    expect(shaman.auras.find((aura) => aura.id === STONEBOUND_DR_ID)?.value).toBe(0.15);
+    // Stonebound Vigor is a real health component: the stamina percent must
+    // raise the pool, and swapping to Galeheart must shed it with the rest of
+    // the posture riders.
+    sim.ctx.recalcPlayer(shaman);
+    expect(shaman.maxHp).toBeGreaterThan(casterFormMaxHp);
+    applyWarspiritPosture(sim.ctx, shaman, 'galeheart');
+    expect(shaman.auras.some((aura) => aura.id === STONEBOUND_STAMINA_ID)).toBe(false);
+    sim.ctx.recalcPlayer(shaman);
+    expect(shaman.maxHp).toBe(casterFormMaxHp);
+    applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
     applyStoneboundJolt(sim.ctx, shaman, target);
     expect(target.forcedTargetId).toBeNull();
 
@@ -106,9 +119,31 @@ describe('Warspirit engine', () => {
 
     clearWarspiritState(sim.ctx, shaman);
     expect(warspiritPosture(shaman)).toBeNull();
+    expect(shaman.auras.some((aura) => aura.id === STONEBOUND_STAMINA_ID)).toBe(false);
     expect(target.forcedTargetId).toBeNull();
     expect(target.forcedTargetTimer).toBe(0);
     expect(wolf.forcedTargetId).toBeNull();
     expect(wolf.forcedTargetTimer).toBe(0);
+  });
+
+  it('never force-targets a quest-gated mob for a non-questing shaman, but does once questing', () => {
+    const { sim, shaman } = setup();
+    applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
+    const egg = createMob(91_023, MOBS.spider_egg, 10, sim.groundPos(0, 3));
+    egg.hostile = true;
+    sim.entities.set(egg.id, egg);
+
+    applyStoneboundJolt(sim.ctx, shaman, egg);
+    expect(egg.forcedTargetId).toBeNull();
+    expect(egg.threat.size).toBe(0);
+
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    applyStoneboundJolt(sim.ctx, shaman, egg);
+    expect(egg.forcedTargetId).toBe(shaman.id);
+    expect(egg.threat.get(shaman.id)).toBeGreaterThan(0);
   });
 });

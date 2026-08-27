@@ -26,6 +26,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { localizeSimText } from '../src/ui/sim_i18n';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Direct unit tests for the extracted pet command/lifecycle module (P1b). They drive
 // the moved functions through the real Sim.ctx seam (so the still-on-Sim helpers they
@@ -36,7 +37,12 @@ type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
 function hunterWorld(seed = 11): { sim: AnySim; hid: number; hunter: AnyEntity } {
-  const sim = new Sim({ seed, playerClass: 'hunter', noPlayer: true }) as AnySim;
+  const sim = new Sim({
+    seed,
+    playerClass: 'hunter',
+    noPlayer: true,
+    world: EMPTY_TEST_WORLD,
+  }) as AnySim;
   const hid = sim.addPlayer('hunter', 'Owner') as number;
   sim.setPlayerLevel(12, hid);
   const hunter = sim.entities.get(hid) as AnyEntity;
@@ -56,9 +62,25 @@ function spawnWolf(sim: AnySim, near: AnyEntity, level = 2): AnyEntity {
   return wolf;
 }
 
+function spawnBroodmotherEgg(sim: AnySim, near: AnyEntity): AnyEntity {
+  const egg = createMob(sim.nextId++, MOBS.spider_egg, 12, {
+    x: near.pos.x + 3,
+    y: near.pos.y,
+    z: near.pos.z,
+  }) as AnyEntity;
+  egg.hostile = true;
+  sim.addEntity(egg);
+  return egg;
+}
+
 describe('pet_commands module (P1b)', () => {
   it('commands Gloomshade signature skill and exposes its independent autocast toggle', () => {
-    const sim = new Sim({ seed: 13, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 13,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('warlock', 'Demonist') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, owner, 'gloomshade');
@@ -79,7 +101,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('routes a summoned Emberkin through the real damage-special command and never taunts', () => {
-    const sim = new Sim({ seed: 130, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 130,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('warlock', 'Demonist') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, owner, 'emberkin');
@@ -107,8 +134,40 @@ describe('pet_commands module (P1b)', () => {
     expect(target.forcedTargetId).not.toBe(pet.id);
   });
 
+  it('does not seed pet attack threat against a quest-gated mob for a non-quester', () => {
+    const { sim, hid, hunter } = hunterWorld(1311);
+    summonPet(sim.ctx, hunter, 'forest_wolf');
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    hunter.targetId = egg.id;
+
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.threat.has(pet.id)).toBe(false);
+
+    sim.players.get(hid)?.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBe(egg.id);
+    expect(pet.inCombat).toBe(true);
+    expect(egg.threat.has(pet.id)).toBe(true);
+  });
+
   it('preserves an explicit autocast preference and defaults legacy pet state safely', () => {
-    const sim = new Sim({ seed: 131, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 131,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('warlock', 'Demonist') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, owner, 'gloomshade');
@@ -139,7 +198,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('rejects manual signature commands without a live hostile owner target', () => {
-    const sim = new Sim({ seed: 132, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 132,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('warlock', 'Demonist') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, owner, 'gloomshade');
@@ -168,7 +232,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('does not let a stunned pet use its signature skill through a manual command', () => {
-    const sim = new Sim({ seed: 14, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 14,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('warlock', 'Demonist') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, owner, 'gloomshade');
@@ -286,7 +355,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('an unbreakable owner movement lock cannot spend mana or arm Demon Heal', () => {
-    const sim = new Sim({ seed: 12, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 12,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('warlock', 'Demonist') as number;
     const owner = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, owner, 'emberkin');
@@ -421,7 +495,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('warlock demon swap: fresh demon answers on swap + resummon + Demon Heal tick', () => {
-    const sim = new Sim({ seed: 13, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 13,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const wpid = sim.addPlayer('warlock', 'Demonist') as number;
     sim.setPlayerLevel(12, wpid);
     const warlock = sim.entities.get(wpid) as AnyEntity;
@@ -462,7 +541,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('petTaunt is a permanent no-op for a ranged warlock pet, near or far (never gets stuck pending)', () => {
-    const sim = new Sim({ seed: 21, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 21,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const wpid = sim.addPlayer('warlock', 'Demonist') as number;
     sim.setPlayerLevel(12, wpid);
     const warlock = sim.entities.get(wpid) as AnyEntity;
@@ -489,8 +573,181 @@ describe('pet_commands module (P1b)', () => {
     expect(target.forcedTargetId).not.toBe(pet.id);
   });
 
+  it('manual hunter Growl does not seed combat, threat, cooldown, or pending against quest-gated eggs', () => {
+    const { sim, hid, hunter } = hunterWorld();
+    const tame = spawnWolf(sim, hunter);
+    completeTame(sim.ctx, hunter, tame);
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    hunter.targetId = egg.id;
+
+    pet.pos = { ...egg.pos };
+    pet.prevPos = { ...pet.pos };
+    pet.petTauntTimer = 0;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    petTaunt(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.forcedTargetId).not.toBe(pet.id);
+
+    pet.pos = { x: egg.pos.x + 24, y: egg.pos.y, z: egg.pos.z };
+    pet.prevPos = { ...pet.pos };
+    petTaunt(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.forcedTargetId).not.toBe(pet.id);
+  });
+
+  it('manual hunter petAttack does not seed combat or threat against quest-gated eggs', () => {
+    const { sim, hid, hunter } = hunterWorld();
+    const tame = spawnWolf(sim, hunter);
+    completeTame(sim.ctx, hunter, tame);
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    hunter.targetId = egg.id;
+
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(egg.forcedTargetId).not.toBe(pet.id);
+
+    sim.players.get(hid)?.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    petAttack(sim.ctx, hid);
+
+    expect(pet.aggroTargetId).toBe(egg.id);
+    expect(pet.inCombat).toBe(true);
+    expect(egg.threat.has(pet.id)).toBe(true);
+  });
+
+  it('manual Gloomshade chain does not move or aggro quest-gated eggs', () => {
+    const sim = new Sim({
+      seed: 24,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
+    const pid = sim.addPlayer('warlock', 'Demonist') as number;
+    sim.setPlayerLevel(12, pid);
+    const warlock = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'gloomshade');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    egg.pos = { x: pet.pos.x, y: pet.pos.y, z: pet.pos.z + 12 };
+    egg.prevPos = { ...egg.pos };
+    warlock.targetId = egg.id;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    const eggBefore = { ...egg.pos };
+
+    petSpecial(sim.ctx, pid);
+
+    expect(egg.pos).toEqual(eggBefore);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petSkillTimer).toBe(0);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((event: SimEvent) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+  });
+
+  it('manual ranged pet special does not fire or aggro quest-gated eggs', () => {
+    const sim = new Sim({
+      seed: 25,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
+    const pid = sim.addPlayer('warlock', 'Demonist') as number;
+    const warlock = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, warlock, 'emberkin');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    egg.pos = { x: pet.pos.x, y: pet.pos.y, z: pet.pos.z + 12 };
+    egg.prevPos = { ...egg.pos };
+    warlock.targetId = egg.id;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    const projectilesBefore = sim.ctx.pendingProjectiles.length;
+
+    petSpecial(sim.ctx, pid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.petSkillTimer).toBe(0);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(projectilesBefore);
+    expect(
+      sim
+        .drainEvents()
+        .some((event: SimEvent) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+  });
+
+  it('manual Water Jet does not channel, aura, or aggro quest-gated eggs', () => {
+    const sim = new Sim({
+      seed: 26,
+      playerClass: 'mage',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
+    const pid = sim.addPlayer('mage', 'Frostbite') as number;
+    const mage = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, mage, 'water_elemental');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    const egg = spawnBroodmotherEgg(sim, pet);
+    egg.pos = { x: pet.pos.x, y: pet.pos.y, z: pet.pos.z + 12 };
+    egg.prevPos = { ...egg.pos };
+    mage.targetId = egg.id;
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+
+    petWaterJet(sim.ctx, pid);
+
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(pet.castingAbility).toBeNull();
+    expect(pet.channeling).toBe(false);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(egg.auras.some((a) => a.id === 'water_jet' || a.id === 'water_jet_slow')).toBe(false);
+    expect(egg.threat.has(pet.id)).toBe(false);
+    expect(egg.inCombat).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((event: SimEvent) => event.type === 'spellfx' && event.sourceId === pet.id),
+    ).toBe(false);
+  });
+
   it('setPetAutoTaunt cannot arm auto-taunt on a ranged warlock pet', () => {
-    const sim = new Sim({ seed: 22, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 22,
+      playerClass: 'warlock',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const wpid = sim.addPlayer('warlock', 'Demonist') as number;
     const warlock = sim.entities.get(wpid) as AnyEntity;
     summonPet(sim.ctx, warlock, 'emberkin');
@@ -502,7 +759,12 @@ describe('pet_commands module (P1b)', () => {
   });
 
   it('petTaunt/setPetAutoTaunt/petTauntReadout stay no-op for the mage Water Elemental (regression)', () => {
-    const sim = new Sim({ seed: 23, playerClass: 'mage', noPlayer: true }) as AnySim;
+    const sim = new Sim({
+      seed: 23,
+      playerClass: 'mage',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    }) as AnySim;
     const pid = sim.addPlayer('mage', 'Frostbite') as number;
     const mage = sim.entities.get(pid) as AnyEntity;
     summonPet(sim.ctx, mage, 'water_elemental');

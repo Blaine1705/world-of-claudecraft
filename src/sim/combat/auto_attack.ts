@@ -27,7 +27,8 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, isArenaPos, MOBS } from '../data';
+import { isArenaPos, MOBS } from '../data';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
@@ -35,6 +36,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import {
   angleTo,
   armorReduction,
@@ -56,7 +58,13 @@ import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
-import { baseSwingSpeed, normalizedInstantSpeed, rangedAutoProfile } from './form_swing';
+import {
+  baseSwingSpeed,
+  catAutoWeaponRollMult,
+  catFormDamageMult,
+  normalizedInstantSpeed,
+  rangedAutoProfile,
+} from './form_swing';
 import { isTravelFormAuraKind } from './forms';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
@@ -161,8 +169,16 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
     t.ownerId === null &&
     t.aiState !== 'evade'
   ) {
-    if (t.aiState === 'idle') ctx.aggroMob(t, p, true);
-    else if (t.aggroTargetId === null) t.aggroTargetId = p.id;
+    if (questGateBlocksAggro(ctx.players, t, p)) {
+      p.autoAttack = false;
+      return;
+    }
+    if (t.aiState === 'idle' && !ctx.aggroMob(t, p, true)) {
+      p.autoAttack = false;
+      return;
+    } else if (t.aggroTargetId === null) {
+      t.aggroTargetId = p.id;
+    }
     addThreat(t, p.id, 1);
     p.combatTimer = 0;
     p.inCombat = true;
@@ -276,6 +292,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
       autoAttack: true,
     });
+    // The island's ability drill (tutorial/ability_drill.ts). An onNextSwing
+    // ability (Reaver Strike) rides the SWING and never reaches runEffects,
+    // where the drill's other credit site lives, so it is credited here on
+    // the swing that carried it. A plain white swing has abilityId null and
+    // credits nothing, which is the lesson.
+    if (connected && abilityId) creditAbilityDrill(ctx, p, t, abilityId);
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
     // for everyone without the mastery, and the extra swing cannot chain.
@@ -289,7 +311,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);
-    // Wolf Form swings at the rogue's fixed feral cadence, not the carried weapon's
+    // Wolf Form swings at the fixed fast cat cadence, not the carried weapon's
     // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
     // Melee haste (item sets + Enrage + haste buffs) lives in the ONE additive
     // bucket inside swingIntervalMult (v0.27.1); only the stance-mastery auto
@@ -546,12 +568,18 @@ export function meleeSwing(
     opts.normalizedInstant && opts.autoAttackHand === undefined
       ? normalizedInstantSpeed(weapon)
       : undefined;
+  // The cat mainhand auto is the one REAL auto attack that normalizes: Wolf
+  // Form swings its claws at the fixed cat cadence, so the carried weapon's
+  // roll is rescaled to that cadence (catAutoWeaponRollMult, the same shape as
+  // the instant rescale above) and white DPS equals the weapon's authored dps
+  // whatever its speed. Every other auto keeps the raw per-swing contract.
   const weaponRollMult =
     opts.autoAttackHand === undefined
       ? normSpeed !== undefined
         ? normSpeed / Math.max(0.1, weapon.speed)
         : 1
-      : autoAttackWeaponDamageMult(opts.autoAttackHand);
+      : autoAttackWeaponDamageMult(opts.autoAttackHand) *
+        (opts.autoAttackHand === 'mainhand' ? catAutoWeaponRollMult(attacker, weapon) : 1);
   const apSwingSpeed = opts.apSwingSpeed ?? normSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
@@ -559,11 +587,14 @@ export function meleeSwing(
   let dmg =
     (ctx.rng.range(weapon.min, weapon.max) * weaponRollMult +
       // Normalize the attack-power contribution to the SAME cadence the swing
-      // fires at: Wolf Form swings at the rogue speed (baseSwingSpeed), so its
-      // AP-per-swing must use that speed too, not the slow staff's, or feral
-      // would double-dip (fast swings AND heavy slow-weapon AP weighting).
+      // fires at: Wolf Form swings at the fixed cat speed (baseSwingSpeed), so
+      // its AP-per-swing must use that speed too, not the slow staff's, or
+      // feral would double-dip (fast swings AND heavy slow-weapon AP weighting).
       (ctx.effectiveAttackPower(attacker) / 14) * apSwingSpeed) *
-      mult +
+      mult *
+      // The feral form damage knob (form_swing.ts): the one bench-neutrality
+      // constant for the cat cadence standardization; 1 for everyone else.
+      catFormDamageMult(attacker) +
     bonus +
     imbueBonus;
   const critChance = Math.max(

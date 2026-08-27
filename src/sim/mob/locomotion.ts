@@ -32,7 +32,6 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
-import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -41,9 +40,12 @@ import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
+import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
+import { corpseHasDecayed } from '../respawn_policy';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
+  riftDeathZoneFuse,
   riftMechanicSuppressed,
   riftRankForBaseLevel,
 } from '../rift/ranks';
@@ -90,6 +92,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
   openRiftEscapeWindow,
@@ -128,6 +131,51 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_rogue_add',
 ]);
 
+function expireDecayedCorpseInteractions(ctx: SimContext, mob: Entity): void {
+  if (!corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
+  if (!mob.lootable) return;
+  mob.lootable = false;
+  for (const meta of ctx.players.values()) {
+    const player = ctx.entities.get(meta.entityId);
+    if (player?.targetId === mob.id) player.targetId = null;
+  }
+}
+
+/**
+ * Is this dead mob an INSTANCE corpse whose per-tick dead-branch has become a
+ * provable no-op? Instance mobs (dungeon/rift/delve bands) never corpse-decay
+ * or respawn in place (the `!isInstanceMob` gates in updateMob's dead branch),
+ * so once the detonate fuse is spent and the FFA loot window has lapsed, the
+ * only thing the dead branch does is decrement two timers nothing reads. The
+ * Sim idle-cull uses this to stop far-from-player corpse fields (a cleared
+ * rift floor's packs) from paying updateMob every tick for the rest of the
+ * run. Exclusions, each load-bearing:
+ * - owned corpses: pets/demons unravel via their corpseTimer;
+ * - detonate fuses: Death Throes must still burst;
+ * - FFA windows: the owner-lock lapse must still count down;
+ * - auras: the caller would also skip updateAuras (whose dead arm still
+ *   recomputes `stealthed`), and unbreakable-control auras survive death, so
+ *   such corpses simply keep ticking rather than risk frozen aura state;
+ * - a stealth-flagged corpse: the dead updateAuras arm is what clears the
+ *   flag, so it must run at least until the flag settles;
+ * - Nythraxis: onBossDeath drives its death dialogue from the dead branch;
+ * - worldBoss templates: the world-boss scheduler reads boss.corpseTimer to
+ *   reclaim the corpse (none spawn in an instance band today; insurance).
+ */
+export function isInertInstanceCorpse(mob: Entity): boolean {
+  return (
+    mob.dead &&
+    mob.spawnPos.x > DUNGEON_X_THRESHOLD &&
+    mob.ownerId === null &&
+    mob.detonateTimer === Infinity &&
+    mob.lootFfaTimer <= 0 &&
+    mob.auras.length === 0 &&
+    !mob.stealthed &&
+    !mob.nythraxis &&
+    MOBS[mob.templateId]?.worldBoss !== true
+  );
+}
+
 export function updateMob(ctx: SimContext, mob: Entity): void {
   // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
   // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
@@ -145,6 +193,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
+    expireDecayedCorpseInteractions(ctx, mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;
@@ -164,6 +213,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // owner (pet/pet_match_return.ts). Recorded before the entity goes, since
         // afterwards it is unknowable. Pure state, no rng.
         noteMatchPetUnravelled(ctx, mob);
+        // The same fact for the owner's own death: a demon that leaves no corpse
+        // has to be REBUILT when its owner is resurrected, not revived in place
+        // (pet/pet_owner_revive.ts). Also pure state, no rng.
+        notePetUnravelledOnOwnerDeath(ctx, mob);
         ctx.despawnPet(mob);
       }
       return;
@@ -175,7 +228,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     // wherever its summoner stood when the wave erupted (a kited boss hatches
     // adds far from any camp, e.g. Grix dragged to the Eastbrook town square),
     // and the only other cleanup is despawnSummonedAdds on the summoner's own
-    // respawn, hours away for a rare. The corpse keeps its full loot window.
+    // respawn, which for a long-cadence rare (the six-hour Voskar Emberwing)
+    // can be hours away. The corpse keeps its full loot window.
     if (!isInstanceMob && mob.summonedAdd) {
       if (mob.corpseTimer <= 0) ctx.dropEntity(mob.id);
       return;
@@ -194,11 +248,28 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   mob.combatTimer += DT;
 
-  if (MOBS[mob.templateId]?.dummy) {
+  const dummyTemplate = MOBS[mob.templateId];
+  if (dummyTemplate?.dummy) {
     // Training dummy: stays hostile/attackable so it counts for damage and shows on
     // the meters, but is otherwise inert (never aggros, moves, or fights back). It
     // drops combat and heals to full a few seconds after the last hit, so the player
     // leaves combat while the meter retains the finished encounter's DPS.
+    //
+    // A FRIENDLY dummy is the same target from the other side: nothing ever damages
+    // it, so instead of healing to full it SHEDS healing back toward its resting
+    // mark. That is what keeps it healable, both for the healer working on it (a
+    // full-health target returns nothing but overheal) and for whoever walks up
+    // next. It is never put in combat, so healing it costs the healer no regen.
+    if (dummyTemplate.friendlyPracticeTarget) {
+      mob.inCombat = false;
+      mob.hp = playerDummyShedHp(mob.hp, mob.maxHp, DT);
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
+      return;
+    }
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
@@ -226,19 +297,6 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // by the boss driver: no aggro, no wander, no evade-home, and the hostility
   // safety net below must not re-hostile them.
   if (mob.templateId === TOLLING_BELL_TEMPLATE_ID) {
-    mob.hostile = false;
-    mob.aiState = 'idle';
-    mob.inCombat = false;
-    mob.aggroTargetId = null;
-    clearThreat(mob);
-    return;
-  }
-
-  // The Vale Cup boarball is moved exclusively by the match driver
-  // (social/vale_cup.ts): no aggro, no wander (an idle wander would also draw
-  // rng inside golden-scenario ticks), no evade-home, and the hostility safety
-  // net below must not re-hostile it. Bell pattern, verbatim.
-  if (mob.templateId === VALE_CUP_BALL_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -1040,9 +1098,13 @@ function runMobAttackMechanics(ctx: SimContext, mob: Entity): void {
         // deathZoneStrike becomes a barrage (a zone under every living member).
         // Applied AFTER the rng target draw so the draw count and order stay
         // identical across ranks (the difficulty.ts multiplier precedent).
-        const heroicS = riftRankForBaseLevel(inst.baseLevel) === 'S';
+        const rank = riftRankForBaseLevel(inst.baseLevel);
+        const heroicS = rank === 'S';
         const tempo = heroicS ? RIFT_S_ZONE_TEMPO : 1;
-        const fuse = def.castTime * tempo;
+        // Via the shared helper so the reaction-budget guard in
+        // rift_boss_reactable_mechanics.test.ts pins THIS fuse, not a copy of
+        // the formula that could drift away from it.
+        const fuse = riftDeathZoneFuse(def.castTime, rank);
         if (heroicS) mob[timerKey] = (def.every + def.castTime) * tempo;
         const instPids = instancePlayerIds(ctx, inst).filter((pid) => {
           const e = ctx.entities.get(pid);

@@ -23,6 +23,7 @@ import { terrainHeight } from '../src/sim/world';
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 type LootSlotLike = { itemId: string; count: number; openToAll?: boolean; personalFor?: number[] };
+const FRESH_CORPSE_TIMER = 60;
 
 function ctxOf(sim: Sim) {
   return (sim as AnySim).ctx;
@@ -57,6 +58,7 @@ function corpse(
     z,
   }) as AnyEntity;
   mob.dead = true;
+  mob.corpseTimer = FRESH_CORPSE_TIMER;
   mob.lootable = true;
   mob.tappedById = tappedById;
   mob.loot = { copper: 0, items };
@@ -159,6 +161,27 @@ describe('interaction.lootCorpse', () => {
     expect(mob.loot).toBeNull(); // pruneCorpseLoot cleared the emptied corpse
     expect(player.targetId).toBeNull();
   });
+
+  it('keeps a fresh hand-built lootable corpse eligible before explicit corpse decay', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    expect(mob.corpseTimer).toBe(FRESH_CORPSE_TIMER);
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(true);
+
+    expect(sim.countItem('worn_sword', a)).toBe(1);
+  });
+
+  it('refuses an explicitly decayed lootable corpse', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 22, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+
+    expect(interaction.lootCorpse(ctxOf(sim), mob.id, a)).toBe(false);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(mob.loot?.items[0].count).toBe(1);
+  });
 });
 
 describe('interaction.pickUpObject', () => {
@@ -242,6 +265,39 @@ describe('interaction.interact dispatch', () => {
     expect(errors(sim)).not.toContain("You don't have permission to loot that.");
   });
 
+  it('target-path: skips a decayed corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, [{ itemId: 'worn_sword', count: 1 }]);
+    mob.corpseTimer = 0;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('worn_sword', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
+  });
+
+  it('target-path: skips an owned tagged corpse and falls through to a nearby object', () => {
+    const { sim, a } = twoPlayers();
+    const mob = corpse(sim, 20, 21, a, []);
+    mob.ownerId = a;
+    mob.lootable = false;
+    mob.loot = null;
+    const obj = groundObj(sim, 'wolf_fang', 20, 21.5);
+    const player = sim.entities.get(a) as AnyEntity;
+    player.targetId = mob.id;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(sim.countItem('rough_hide', a)).toBe(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    expect(obj.lootable).toBe(false);
+  });
+
   it('nearest-scan: with no target, picks up the nearest lootable object', () => {
     const { sim, a } = twoPlayers();
     const obj = groundObj(sim, 'wolf_fang', 20, 21);
@@ -249,6 +305,40 @@ describe('interaction.interact dispatch', () => {
     interaction.interact(ctxOf(sim), a);
     expect(sim.countItem('wolf_fang', a)).toBe(1);
     expect(obj.lootable).toBe(false);
+  });
+
+  // The interact key must agree with what the player can see. A quest collectable
+  // they are not on the quest for is withheld from their client entirely, so the
+  // scan must not select it: pickUpObject would refuse it anyway, and an object
+  // nobody can see must never outrank a visible one standing further away.
+  it('nearest-scan: skips an off-quest collectable and takes the farther visible object', () => {
+    const { sim, a } = twoPlayers();
+    const crate = groundObj(sim, 'supply_crate', 20, 20.5); // nearer, but off-quest
+    groundObj(sim, 'wolf_fang', 20, 21.5); // farther, plainly visible
+    (sim.entities.get(a) as AnyEntity).targetId = null;
+    sim.events = [];
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('supply_crate', a)).toBe(0);
+    expect(crate.lootable).toBe(true);
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    // No denial either: the press never reached the hidden crate at all.
+    expect(errors(sim)).toEqual([]);
+  });
+
+  it('nearest-scan: takes that same collectable once its quest is active', () => {
+    const { sim, a } = twoPlayers();
+    const crate = groundObj(sim, 'supply_crate', 20, 20.5);
+    const questId = ITEMS.supply_crate?.questId;
+    if (!questId) throw new Error('expected supply_crate to name its quest');
+    sim.players.get(a)?.questLog.set(questId, { questId, counts: [0], state: 'active' });
+    (sim.entities.get(a) as AnyEntity).targetId = null;
+
+    interaction.interact(ctxOf(sim), a);
+
+    expect(sim.countItem('supply_crate', a)).toBe(1);
+    expect(crate.lootable).toBe(false);
   });
 
   it('nearest-scan: a nearer corpse wins over a farther object', () => {
@@ -343,9 +433,20 @@ describe('interaction.interact dispatch', () => {
   it('routes a nearby quest NPC to talkToNpc via the ctx callbacks (quest accepted)', () => {
     // Single-player world at the q_wolves giver: interact's quest-entity arm fans
     // into ctx.isQuestInteractionEntity + ctx.talkToNpc, both bound to Sim.
+    // Re-pinned 2026-08 for the harbor move, then for owner refinement round
+    // 4: marshal_redbrook keeps watch at (3.6, -95.6) beside his notice
+    // board; the same 2yd offset south keeps him the nearest NPC (2.0yd, vs
+    // bursar_fernando 4.9) with no lootable in scan range (the board sits
+    // 8.7yd off).
+    // Re-pinned again for owner refinement round 6b, which redistributed the
+    // town's NPCs by role along the dock road: the q_wolves giver moved out to
+    // the harbour market at (-58, -102), so the probe follows him. The same 2yd
+    // offset south holds every premise this test needs: he is the only entity
+    // of any kind within 12yd of the stand, so he is the nearest quest NPC and
+    // no lootable or ground object is in interact's scan range.
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true }) as AnySim;
     const p = sim.player;
-    place(sim, p, 4, 4);
+    place(sim, p, -58, -100);
     expect(sim.questState('q_wolves')).toBe('available');
     interaction.interact(ctxOf(sim), p.id);
     expect(sim.questState('q_wolves')).toBe('active');

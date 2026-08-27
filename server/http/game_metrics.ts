@@ -37,7 +37,7 @@
 // depends on either yet; they still must not be renamed apart later, and the
 // label reads against its metric, never across families.
 
-import { Counter, Gauge, type Registry } from 'prom-client';
+import { Counter, Gauge, Histogram, type Registry } from 'prom-client';
 import {
   BG_COMPOSITIONS,
   BG_END_CAUSES,
@@ -62,10 +62,17 @@ import {
   ROD_FEE_RECIPE_IDS,
   rodFeeForRecipe,
 } from '../fishing_telemetry';
+import { wocAuthGuardCacheStats } from '../woc_auth_guard_cache';
 import {
   type GameMetricsCounters,
+  GENERAL_CHAT_QUOTA_DB_OUTCOMES,
+  GENERAL_CHAT_QUOTA_OUTCOMES,
+  type GeneralChatQuotaDbOutcome,
+  type GeneralChatQuotaOutcome,
   GUILD_BANK_INCIDENTS,
   type GuildBankIncident,
+  WOC_ESCROW_QUEUE_OUTCOMES,
+  type WocEscrowQueueOutcome,
   WS_DROP_CAUSES,
   type WsDropCause,
   type WsMessageDirection,
@@ -91,6 +98,21 @@ export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
  *  family (a regression in its rate shows up here first in production). */
 export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
 
+/** Character-save FIFO keys with a queued or running write (the per-character
+ *  serial writer's live map size). The escrow write-path rider's gauge. The
+ *  alert threshold is SUSTAINED values above the autosave wave's own
+ *  SAVE_CONCURRENCY (4): the wave bounds how many wave-driven saves run at
+ *  once, so a persistently higher reading means out-of-band writers are
+ *  queueing, the precursor the wocEscrowQueue refusal counters alert on. */
+export const WOC_SAVE_PENDING_KEYS = 'woc_character_save_pending_keys';
+
+/** The realm escrow gate's live occupancy (the write-path rider's
+ *  realm-global bound): the instantaneous truth the wocEscrowQueue counter
+ *  kinds approximate, exported to Prometheus so an alert rule can watch
+ *  sustained inFlight at the cap instead of scraping the secret-gated ops
+ *  readout. */
+export const WOC_ESCROW_GATE_IN_FLIGHT = 'woc_escrow_gate_in_flight';
+
 /** Per-phase authoritative-loop timing in SECONDS, labeled by phase and stat (p95/max). */
 export const WOC_SIM_TICK_PHASE_SECONDS = 'woc_sim_tick_phase_seconds';
 
@@ -109,16 +131,42 @@ export const WOC_INPUT_FRAMES_MISSED_TOTAL = 'woc_input_frames_missed_total';
 /** Total player chat messages routed to other players (any channel). */
 export const WOC_CHAT_MESSAGES_TOTAL = 'woc_chat_messages_total';
 
+/** Configured General quota decisions, labeled by bounded outcome. */
+export const WOC_GENERAL_CHAT_QUOTA_TOTAL = 'woc_general_chat_quota_total';
+
+/** Current General quota database calls in flight in this realm process. */
+export const WOC_GENERAL_CHAT_QUOTA_IN_FLIGHT = 'woc_general_chat_quota_in_flight';
+export const WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL = 'woc_general_chat_quota_db_calls_total';
+export const WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS =
+  'woc_general_chat_quota_db_duration_seconds';
+export const WOC_GENERAL_CHAT_QUOTA_DB_POOL = 'woc_general_chat_quota_db_pool';
+export const WOC_GENERAL_CHAT_QUOTA_LISTENER = 'woc_general_chat_quota_listener';
+export const WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS = 'woc_general_chat_quota_cache_accounts';
+
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
 
 /** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
 export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
 
+/** Rift forge wire commands refused while the gate is closed (server/rift_forge_gate.ts). */
+export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
+
+/** Marketplace escrow-queue outcomes (the listing entry on the per-character
+ *  save FIFO), by kind. */
+export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
+
 /** Guild bank activity log cache readout, labeled by counter name. ONE metric
  *  with a `kind` label rather than six names: the vocabulary is closed and
  *  fixed, and an operator reads them together or not at all. */
 export const WOC_GUILD_BANK_LOG_CACHE = 'woc_guild_bank_log_cache';
+
+/** Marketplace auth-guard read cache readout (token and moderation arms),
+ *  labeled by arm and counter name. This is the one cache whose degradation
+ *  is a CLIFF (an over-cap working set evicts every entry before its next
+ *  poll), so the alertable series exists precisely to see the cliff form:
+ *  watch refreshes approaching reads, and evictions climbing. */
+export const WOC_AUTH_GUARD_CACHE = 'woc_auth_guard_cache';
 
 /** Total copper credited to acting players, labeled by economic surface. */
 export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
@@ -221,10 +269,18 @@ export interface GameStateSource {
   simEntities(): number;
   /** Achieved sim Hz, or null while the rate meter is still warming up. */
   simTickHz(): number | null;
+  /** Character-save FIFO keys with a queued or running write. */
+  savePendingKeys(): number;
+  /** The realm escrow gate's live in-flight count. */
+  escrowGateInFlight(): number;
   /** Per-phase p95/max in MILLISECONDS, keyed by phase name; missing phases are skipped. */
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
   dbPool(): { total: number; idle: number; waiting: number };
+  generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
+  generalChatQuotaInFlight(): number;
+  generalChatQuotaCachedAccounts(): number;
+  generalChatQuotaListener(): { connected: number; reconnects: number; pendingRefreshes: number };
   /**
    * Wall clock (epoch millis) of the last COMPLETED tick pass, null during warmup.
    * This one is NOT a Prometheus gauge (loop rate is already covered by
@@ -297,6 +353,24 @@ export function registerGameStateMetrics(
     registers: [registry],
     collect() {
       this.set(source.wsConnections());
+    },
+  });
+
+  new Gauge({
+    name: WOC_SAVE_PENDING_KEYS,
+    help: 'Character-save FIFO keys with a queued or running write.',
+    registers: [registry],
+    collect() {
+      this.set(source.savePendingKeys());
+    },
+  });
+
+  new Gauge({
+    name: WOC_ESCROW_GATE_IN_FLIGHT,
+    help: 'Realm escrow gate occupancy (listing sequences holding a slot).',
+    registers: [registry],
+    collect() {
+      this.set(source.escrowGateInFlight());
     },
   });
 
@@ -379,10 +453,84 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const riftForgeRefusals = new Counter({
+    name: WOC_RIFT_FORGE_REFUSED_TOTAL,
+    help: 'Total rift forge wire commands refused while the gate is closed; the stock client sends none, so a non-zero rate means a modified client is probing.',
+    registers: [registry],
+  });
+
   const chatMessages = new Counter({
     name: WOC_CHAT_MESSAGES_TOTAL,
     help: 'Total player chat messages routed to other players (any channel).',
     registers: [registry],
+  });
+
+  const generalChatQuota = new Counter({
+    name: WOC_GENERAL_CHAT_QUOTA_TOTAL,
+    help: 'Configured General chat quota decisions by bounded outcome.',
+    labelNames: ['outcome'],
+    registers: [registry],
+  });
+  for (const outcome of GENERAL_CHAT_QUOTA_OUTCOMES) generalChatQuota.inc({ outcome }, 0);
+
+  const generalChatQuotaDbCalls = new Counter({
+    name: WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL,
+    help: 'Dedicated General quota database calls by bounded outcome.',
+    labelNames: ['outcome'],
+    registers: [registry],
+  });
+  const generalChatQuotaDbDuration = new Histogram({
+    name: WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS,
+    help: 'End-to-end dedicated General quota database call duration.',
+    labelNames: ['outcome'],
+    buckets: [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 1.5],
+    registers: [registry],
+  });
+  for (const outcome of GENERAL_CHAT_QUOTA_DB_OUTCOMES) {
+    generalChatQuotaDbCalls.inc({ outcome }, 0);
+    // Pre-seed the histogram series too, so the first post-boot scrape has it.
+    generalChatQuotaDbDuration.zero({ outcome });
+  }
+
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_IN_FLIGHT,
+    help: 'Current General chat quota database calls in flight in this realm process.',
+    registers: [registry],
+    collect() {
+      this.set(source.generalChatQuotaInFlight());
+    },
+  });
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_DB_POOL,
+    help: 'Dedicated General quota pool clients by fixed state.',
+    labelNames: ['state'],
+    registers: [registry],
+    collect() {
+      const state = source.generalChatQuotaDbPool();
+      this.set({ state: 'total' }, state.total);
+      this.set({ state: 'idle' }, state.idle);
+      this.set({ state: 'waiting' }, state.waiting);
+    },
+  });
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_LISTENER,
+    help: 'General quota policy listener state by fixed measure.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const state = source.generalChatQuotaListener();
+      this.set({ measure: 'connected' }, state.connected);
+      this.set({ measure: 'reconnects' }, state.reconnects);
+      this.set({ measure: 'pending_refreshes' }, state.pendingRefreshes);
+    },
+  });
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS,
+    help: 'Accounts retained in the bounded local General quota refusal/notice cache.',
+    registers: [registry],
+    collect() {
+      this.set(source.generalChatQuotaCachedAccounts());
+    },
   });
 
   const charactersCreated = new Counter({
@@ -401,6 +549,13 @@ export function registerGameStateMetrics(
   // operator alerts on, and an alert rule cannot fire on a series that does
   // not exist until its first incident.
   for (const kind of GUILD_BANK_INCIDENTS) guildBankIncidents.inc({ kind }, 0);
+  const wocEscrowQueue = new Counter({
+    name: WOC_ESCROW_QUEUE_TOTAL,
+    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO custody entries (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed, realm_refused, settled, grant_busy), by kind.',
+    labelNames: ['kind'],
+    registers: [registry],
+  });
+  for (const kind of WOC_ESCROW_QUEUE_OUTCOMES) wocEscrowQueue.inc({ kind }, 0);
   new Gauge({
     name: WOC_GUILD_BANK_LOG_CACHE,
     help: 'Guild bank activity log read cache: reads, refreshes (the query rate), evictions, busts, live entries, and guilds inside the coalescing floor.',
@@ -414,6 +569,30 @@ export function registerGameStateMetrics(
       this.set({ kind: 'busts' }, stats.busts);
       this.set({ kind: 'entries' }, stats.entries);
       this.set({ kind: 'dirty_guilds' }, stats.dirtyGuilds);
+    },
+  });
+  new Gauge({
+    name: WOC_AUTH_GUARD_CACHE,
+    help: 'Marketplace auth-guard read cache: reads, refreshes (the residual query rate), evictions, busts, and live entries, per arm (tokens, accounts), plus the two soft-bounded internal collections (arm=index and arm=recent_busts, kind=entries): their bounds are soft BY DESIGN, so an excursion must be a series, not a claim. Zero until the boot wiring arms the cache.',
+    labelNames: ['arm', 'kind'],
+    registers: [registry],
+    collect() {
+      // The process singleton's stats accessor, null before the boot wiring
+      // arms the cache: the zero fallback keeps every series alive so an
+      // alert rule can fire on its first real sample (the zero-backfill rule
+      // the counters above follow).
+      const stats = wocAuthGuardCacheStats();
+      for (const arm of ['tokens', 'accounts'] as const) {
+        const armStats = stats?.[arm] ?? null;
+        this.set({ arm, kind: 'reads' }, armStats?.reads ?? 0);
+        this.set({ arm, kind: 'refreshes' }, armStats?.refreshes ?? 0);
+        this.set({ arm, kind: 'evictions' }, armStats?.evictions ?? 0);
+        this.set({ arm, kind: 'busts' }, armStats?.busts ?? 0);
+        this.set({ arm, kind: 'entries' }, armStats?.entries ?? 0);
+      }
+      this.set({ arm: 'index', kind: 'entries' }, stats?.index ?? 0);
+      this.set({ arm: 'recent_busts', kind: 'entries' }, stats?.recentBusts ?? 0);
+      this.set({ arm: 'join_veto', kind: 'refetches' }, stats?.joinVetoRefetches ?? 0);
     },
   });
   const copperCredited = new Counter({
@@ -573,9 +752,35 @@ export function registerGameStateMetrics(
         // Drop the sample rather than propagate into the input path.
       }
     },
+    riftForgeRefused(): void {
+      try {
+        riftForgeRefusals.inc();
+      } catch {
+        // Drop the sample rather than propagate into the dispatch path.
+      }
+    },
     chatMessage(): void {
       try {
         chatMessages.inc();
+      } catch {
+        // Drop the sample rather than propagate into the chat path.
+      }
+    },
+    generalChatQuota(outcome: GeneralChatQuotaOutcome): void {
+      try {
+        if (!GENERAL_CHAT_QUOTA_OUTCOMES.includes(outcome)) return;
+        generalChatQuota.inc({ outcome });
+      } catch {
+        // Drop the sample rather than propagate into the chat path.
+      }
+    },
+    generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void {
+      try {
+        if (!GENERAL_CHAT_QUOTA_DB_OUTCOMES.includes(outcome)) return;
+        generalChatQuotaDbCalls.inc({ outcome });
+        if (Number.isFinite(durationSeconds) && durationSeconds >= 0) {
+          generalChatQuotaDbDuration.observe({ outcome }, durationSeconds);
+        }
       } catch {
         // Drop the sample rather than propagate into the chat path.
       }
@@ -585,6 +790,13 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    wocEscrowQueue(outcome: WocEscrowQueueOutcome): void {
+      try {
+        wocEscrowQueue.inc({ kind: outcome });
+      } catch {
+        // Observability must never fail a listing request.
       }
     },
     guildBankIncident(kind: GuildBankIncident): void {

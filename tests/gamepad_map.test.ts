@@ -8,6 +8,7 @@ import {
   GAMEPAD_ZOOM_OUT,
   GP,
   gamepadButtonLabel,
+  gamepadKindOverride,
   risingEdges,
   stickToLook,
   stickToMoveFlags,
@@ -137,26 +138,38 @@ describe('risingEdges', () => {
 
 describe('default layout', () => {
   it('binds every console-MMO button to a known action and stays within the bindable set', () => {
-    expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('jump');
+    // Console-MMO face layout: bottom confirms, top jumps.
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('confirm');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.Y]).toBe('jump');
+    // The left face button opens the target's subcommands (falling back to the
+    // map). Targeting does not need a button of its own: confirm selects, and the
+    // bare d-pad cycles.
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.X]).toBe('subcommands');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.B]).toBe('cancel');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.BACK]).toBe('bags');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.R3]).toBe('cycleHud');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.START]).toBe('escape');
     for (const idx of Object.keys(DEFAULT_GAMEPAD_BINDINGS).map(Number)) {
       expect(BINDABLE_BUTTONS).toContain(idx);
     }
   });
 
-  it('assigns a default to every bindable button (catches a dropped binding)', () => {
+  it('leaves the modifiers and the ability-free cross-hotbar buttons unbound', () => {
     const bound = Object.keys(DEFAULT_GAMEPAD_BINDINGS)
       .map(Number)
       .sort((a, b) => a - b);
-    expect(bound).toEqual(BINDABLE_BUTTONS);
+    // The triggers are the cross hotbar's modifiers. A modifier that also fires an
+    // ability reads as a random cast every time the player reaches for the bar, so
+    // they ship unbound and stay free for anyone who turns the cross hotbar off.
+    const unbound: number[] = [GP.LT, GP.RT, GP.DPAD_UP, GP.DPAD_DOWN, GP.DPAD_LEFT, GP.DPAD_RIGHT];
+    expect(bound).toEqual(BINDABLE_BUTTONS.filter((b) => !unbound.includes(b)));
+    for (const b of unbound) expect(DEFAULT_GAMEPAD_BINDINGS[b]).toBeUndefined();
   });
 
-  it('covers action-bar slots 0..8 exactly once (catches a dropped or duplicated slotN)', () => {
+  it('reserves abilities for the cross hotbar instead of shipping a misleading bare slot', () => {
     const values = Object.values(DEFAULT_GAMEPAD_BINDINGS);
-    for (let slot = 0; slot <= 8; slot++) {
-      // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot
-      // (additive or displacing). The default layout binds each slot to one button.
-      expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(1);
+    for (const slot of [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
+      expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(0);
     }
   });
 
@@ -199,6 +212,13 @@ describe('detectGamepadKind', () => {
   it('classifies Xbox pads reported with hyphenated or XInput-only names', () => {
     expect(detectGamepadKind('Xbox 360 Controller (XInput STANDARD GAMEPAD)')).toBe('xbox');
     expect(detectGamepadKind('Microsoft X-Box 360 pad')).toBe('xbox');
+    expect(detectGamepadKind('Microsoft Controller')).toBe('xbox');
+  });
+
+  it('accepts decimal vendor ids used by some platform game-controller layers', () => {
+    expect(detectGamepadKind('Controller (Vendor: 1118 Product: 2835)')).toBe('xbox');
+    expect(detectGamepadKind('Controller (Vendor: 1356 Product: 3302)')).toBe('playstation');
+    expect(detectGamepadKind('Controller (Vendor: 1406 Product: 8201)')).toBe('nintendo');
   });
 
   it('reads the vendor id from the Firefox "vendor-product-name" id format', () => {
@@ -231,6 +251,16 @@ describe('detectGamepadKind', () => {
   it('falls back to generic for an unknown or empty id', () => {
     expect(detectGamepadKind('Some Random Pad (Vendor: 1234 Product: 5678)')).toBe('generic');
     expect(detectGamepadKind('')).toBe('generic');
+  });
+});
+
+describe('gamepadKindOverride', () => {
+  it('keeps Auto on detected labels and maps each explicit controller family', () => {
+    expect(gamepadKindOverride(0)).toBeNull();
+    expect(gamepadKindOverride(1)).toBe('xbox');
+    expect(gamepadKindOverride(2)).toBe('playstation');
+    expect(gamepadKindOverride(3)).toBe('nintendo');
+    expect(gamepadKindOverride(99)).toBeNull();
   });
 });
 

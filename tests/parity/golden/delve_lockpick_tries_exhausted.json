@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "56ea11a2",
+      "nextId": 998,
+      "state": "64b3a340",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,7 +53,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -71,6 +71,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -87,10 +91,10 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 959,
+          "id": 993,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -108,17 +112,17 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "potionCooldownUntil": -1,
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -142,9 +146,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 978,
-      "state": "280e963a",
-      "events": "682fd366",
+      "nextId": 1012,
+      "state": "e38ceec1",
+      "events": "8bff4d15",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -153,9 +157,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 978,
-      "state": "038b6104",
-      "events": "cc147418",
+      "nextId": 1012,
+      "state": "943b481f",
+      "events": "7fe4245a",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -164,8 +168,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 978,
-      "state": "313dcd72",
+      "nextId": 1012,
+      "state": "3c02d669",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -175,8 +179,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 978,
-      "state": "bb037bf8",
+      "nextId": 1012,
+      "state": "d207339b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -186,8 +190,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 978,
-      "state": "993a985a",
+      "nextId": 1012,
+      "state": "112094a1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -197,8 +201,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 978,
-      "state": "9cbd9794",
+      "nextId": 1012,
+      "state": "80ea1b2f",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -208,9 +212,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 979,
-      "state": "2f37661e",
-      "events": "af3f35f7",
+      "nextId": 1013,
+      "state": "13a5591f",
+      "events": "e3146949",
       "rng": {
         "draws": 5,
         "digest": "50aeceb5"
@@ -287,7 +291,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 959,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -306,6 +310,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -326,7 +334,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 959,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -352,9 +360,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -383,7 +391,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 977,
+          "id": 1011,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -416,8 +424,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 979,
-      "state": "cd7fec20",
+      "nextId": 1013,
+      "state": "5ab4e845",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -427,8 +435,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 979,
-      "state": "a441ef16",
+      "nextId": 1013,
+      "state": "38fc9f87",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -506,7 +514,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 959,
+          "entityId": 993,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -525,6 +533,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -545,7 +557,7 @@
           "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 959,
+          "id": 993,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -571,9 +583,9 @@
           "resource": 100,
           "resourceType": "energy",
           "spawnPos": {
-            "x": 2,
-            "y": 1.5,
-            "z": -2
+            "x": -94,
+            "y": -2,
+            "z": -58
           },
           "spellPower": 6,
           "stats": {
@@ -602,7 +614,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 977,
+          "id": 1011,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

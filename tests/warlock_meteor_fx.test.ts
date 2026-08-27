@@ -1,12 +1,53 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { POWERFUL_FEL_METEOR_TEXTURE_URL, WarlockMeteorFx } from '../src/render/warlock_meteor_fx';
+import {
+  POWERFUL_FEL_METEOR_TEXTURE_URL,
+  WarlockMeteorFx,
+  type WarlockMeteorLightRegistry,
+} from '../src/render/warlock_meteor_fx';
 import {
   planRainMeteorShower,
   routeWarlockMeteorSpellfxAt,
   warlockMeteorDensityScale,
 } from '../src/render/warlock_meteor_fx_core';
+
+/** A call-logging stand-in for the renderer's point-light budget seam, so the
+ *  registration contract is asserted without reaching into renderer internals. */
+function fakeLightRegistry(): {
+  registry: WarlockMeteorLightRegistry;
+  registered: THREE.PointLight[];
+  released: THREE.PointLight[];
+} {
+  const registered: THREE.PointLight[] = [];
+  const released: THREE.PointLight[] = [];
+  return {
+    registry: {
+      register: (light) => {
+        registered.push(light);
+      },
+      release: (light) => {
+        released.push(light);
+      },
+    },
+    registered,
+    released,
+  };
+}
+
+/** Identity-wise, in order: two distinct lights with the same shape must fail. */
+function expectLightOrder(actual: THREE.PointLight[], expected: THREE.PointLight[]): void {
+  expect(actual).toHaveLength(expected.length);
+  for (let index = 0; index < expected.length; index++) expect(actual[index]).toBe(expected[index]);
+}
+
+function pointLightsUnder(root: THREE.Object3D): THREE.PointLight[] {
+  const lights: THREE.PointLight[] = [];
+  root.traverse((child) => {
+    if ((child as THREE.PointLight).isPointLight) lights.push(child as THREE.PointLight);
+  });
+  return lights;
+}
 
 describe('Warlock fel meteor visuals', () => {
   it('layers the POWERFUL VFX texture into fel-green meteor impacts', () => {
@@ -363,6 +404,255 @@ describe('Warlock fel meteor visuals', () => {
     expect(scene.getObjectByName('warlock-fel-rain-boundary')).toBeUndefined();
     expect(boundaryGeometryDispose).toHaveBeenCalledOnce();
     expect(boundaryMaterialDispose).toHaveBeenCalledOnce();
+  });
+
+  it('ranks the infernal fall and impact lights through the renderer light budget', () => {
+    // Both infernal lights go straight into the world scene. Outside the ranked
+    // budget they would raise the visible point-light count, and that count is
+    // part of every lit material's program cache key: the first infernal of a
+    // session used to relink every lit material in view, mid-combat.
+    const scene = new THREE.Scene();
+    const log = fakeLightRegistry();
+    const fx = new WarlockMeteorFx(scene, () => 0, vi.fn(), null, log.registry);
+
+    fx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 0.2, sourceId: 4 });
+
+    const fallLight = scene.getObjectByName('warlock-fel-meteor-light') as THREE.PointLight;
+    expect(fallLight.isPointLight).toBe(true);
+    expectLightOrder(log.registered, [fallLight]);
+    expect(log.released).toHaveLength(0);
+    // The fx states no budget policy of its own: every budget field (the
+    // dynamic marker, the hidden-until-ranked flag) belongs to the registry, so
+    // the ranking rules stay in one place.
+    expect(fallLight.userData).toEqual({});
+    expect(fallLight.visible).toBe(true);
+
+    fx.update(0.2);
+
+    const impactLight = pointLightsUnder(
+      scene.getObjectByName('warlock-fel-meteor-impact') as THREE.Group,
+    )[0];
+    expect(impactLight.isPointLight).toBe(true);
+    expect(impactLight).not.toBe(fallLight);
+    expectLightOrder(log.registered, [fallLight, impactLight]);
+    // The fall light leaves the budget the moment its meteor lands.
+    expectLightOrder(log.released, [fallLight]);
+    expect(impactLight.userData).toEqual({});
+
+    fx.update(1.6);
+    expect(scene.getObjectByName('warlock-fel-meteor-impact')).toBeUndefined();
+    expectLightOrder(log.registered, [fallLight, impactLight]);
+    expectLightOrder(log.released, [fallLight, impactLight]);
+    expect(pointLightsUnder(scene)).toHaveLength(0);
+  });
+
+  it('keeps the Rain of Fire path off the point-light budget entirely', () => {
+    const scene = new THREE.Scene();
+    const log = fakeLightRegistry();
+    const fx = new WarlockMeteorFx(scene, () => 0, vi.fn(), null, log.registry);
+
+    fx.spawnRain({ x: 0, z: 0, radius: 7, duration: 4, sourceId: 5 });
+    for (let step = 0; step < 60; step++) fx.update(0.1);
+
+    expect(log.registered).toHaveLength(0);
+    expect(log.released).toHaveLength(0);
+    expect(pointLightsUnder(scene)).toHaveLength(0);
+  });
+
+  it('releases every registered light on every teardown path, exactly once', () => {
+    // Falling meteor torn down by dispose(), impact torn down by dispose(), and
+    // both torn down by the end-of-life path, on the reduced-motion arm too: a
+    // light left registered would hold a rank slot for a light that no longer
+    // exists in the scene.
+    const midFallScene = new THREE.Scene();
+    const midFall = fakeLightRegistry();
+    const midFallFx = new WarlockMeteorFx(midFallScene, () => 0, vi.fn(), null, midFall.registry);
+    midFallFx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 4, sourceId: 1 });
+    midFallFx.update(0.1, true);
+    expect(midFall.released).toHaveLength(0);
+    midFallFx.dispose();
+    expect(midFall.registered).toHaveLength(1);
+    expectLightOrder(midFall.released, midFall.registered);
+
+    const midImpactScene = new THREE.Scene();
+    const midImpact = fakeLightRegistry();
+    const midImpactFx = new WarlockMeteorFx(
+      midImpactScene,
+      () => 0,
+      vi.fn(),
+      null,
+      midImpact.registry,
+    );
+    midImpactFx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 0.1, sourceId: 2 });
+    midImpactFx.update(0.1, true);
+    midImpactFx.dispose();
+    expect(midImpact.registered).toHaveLength(2);
+    expectLightOrder(midImpact.released, midImpact.registered);
+    expect(new Set(midImpact.released).size).toBe(midImpact.released.length);
+
+    const lifetimeScene = new THREE.Scene();
+    const lifetime = fakeLightRegistry();
+    const lifetimeFx = new WarlockMeteorFx(
+      lifetimeScene,
+      () => 0,
+      vi.fn(),
+      null,
+      lifetime.registry,
+    );
+    for (let cast = 0; cast < 3; cast++) {
+      lifetimeFx.spawnInfernal({
+        x: cast * 30,
+        z: 0,
+        radius: 6,
+        duration: 0.2,
+        sourceId: cast + 3,
+      });
+      for (let step = 0; step < 20; step++) lifetimeFx.update(0.1, true);
+    }
+    expect(lifetime.registered).toHaveLength(6);
+    expectLightOrder(lifetime.released, lifetime.registered);
+    expect(new Set(lifetime.released).size).toBe(lifetime.released.length);
+    expect(pointLightsUnder(lifetimeScene)).toHaveLength(0);
+  });
+
+  it('makes terminal disposal idempotent for static resources and active lights', () => {
+    const scene = new THREE.Scene();
+    const log = fakeLightRegistry();
+    const fx = new WarlockMeteorFx(scene, () => 0, vi.fn(), null, log.registry);
+    fx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 4, sourceId: 19 });
+
+    const fallLight = scene.getObjectByName('warlock-fel-meteor-light') as THREE.PointLight;
+    const fallLightDispose = vi.spyOn(fallLight, 'dispose');
+    const coreMaterial = (fx as unknown as { coreMaterial: THREE.Material }).coreMaterial;
+    const coreDispose = vi.spyOn(coreMaterial, 'dispose');
+
+    fx.dispose();
+    fx.dispose();
+
+    expect(log.released).toHaveLength(1);
+    expect(log.released).toEqual(log.registered);
+    expect(fallLightDispose).toHaveBeenCalledOnce();
+    expect(coreDispose).toHaveBeenCalledOnce();
+    expect(scene.children).toHaveLength(0);
+  });
+
+  it('continues terminal cleanup after a root and light-release failure', () => {
+    const scene = new THREE.Scene();
+    const registered: THREE.PointLight[] = [];
+    const released: THREE.PointLight[] = [];
+    let releaseAttempts = 0;
+    const registry: WarlockMeteorLightRegistry = {
+      register: (light) => registered.push(light),
+      release: (light) => {
+        releaseAttempts++;
+        if (releaseAttempts === 1) throw new Error('light release');
+        released.push(light);
+      },
+    };
+    const fx = new WarlockMeteorFx(scene, () => 0, vi.fn(), null, registry);
+    fx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 4, sourceId: 19 });
+    fx.spawnInfernal({ x: 10, z: 0, radius: 6, duration: 4, sourceId: 20 });
+
+    const firstRoot = scene.children[0];
+    const rootDetach = vi.spyOn(firstRoot, 'removeFromParent').mockImplementationOnce(() => {
+      throw new Error('root detach');
+    });
+    const lights = registered;
+    expect(lights).toHaveLength(2);
+    const firstLightDispose = vi.spyOn(lights[0], 'dispose');
+    const secondLightDispose = vi.spyOn(lights[1], 'dispose');
+
+    expect(() => fx.dispose()).toThrow(AggregateError);
+    expect(rootDetach).toHaveBeenCalledOnce();
+    expect(releaseAttempts).toBe(2);
+    expect(released).toEqual([lights[1]]);
+    expect(firstLightDispose).toHaveBeenCalledOnce();
+    expect(secondLightDispose).toHaveBeenCalledOnce();
+    expect(scene.children).toHaveLength(0);
+    // Failed cleanup is quarantined for retry: the logical meteor is already
+    // terminal and cannot replay impact, but its failed root/light ownership
+    // remains retryable until the next dispose succeeds.
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(1);
+    fx.dispose();
+    expect(releaseAttempts).toBe(3);
+    expect(released).toEqual([lights[1], lights[0]]);
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
+    expect(firstLightDispose).toHaveBeenCalledOnce();
+    expect(secondLightDispose).toHaveBeenCalledOnce();
+  });
+
+  it('ignores late spawns and frame updates after terminal disposal', () => {
+    const scene = new THREE.Scene();
+    const impact = vi.fn();
+    const log = fakeLightRegistry();
+    const fx = new WarlockMeteorFx(scene, () => 0, impact, null, log.registry);
+    const sceneAdd = vi.spyOn(scene, 'add');
+
+    fx.dispose();
+    fx.spawnRain({ x: 0, z: 0, radius: 7, duration: 4, sourceId: 7 });
+    fx.spawnInfernal({ x: 10, z: 0, radius: 6, duration: 0.1, sourceId: 8 });
+    fx.stopRain(7);
+    fx.update(10);
+
+    expect(scene.children).toHaveLength(0);
+    expect(sceneAdd).not.toHaveBeenCalled();
+    expect(impact).not.toHaveBeenCalled();
+    expect(log.registered).toHaveLength(0);
+    expect(log.released).toHaveLength(0);
+    expect((fx as unknown as { meteors: unknown[] }).meteors).toHaveLength(0);
+    expect((fx as unknown as { impacts: unknown[] }).impacts).toHaveLength(0);
+    expect((fx as unknown as { showers: unknown[] }).showers).toHaveLength(0);
+  });
+
+  it('records meteor expiry and removes it before a throwing impact callback', () => {
+    const scene = new THREE.Scene();
+    const impact = vi.fn(() => {
+      throw new Error('impact callback');
+    });
+    const fx = new WarlockMeteorFx(scene, () => 0, impact, null);
+    fx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 0.1, sourceId: 17 });
+
+    expect(() => fx.update(0.1)).toThrow('impact callback');
+    expect(impact).toHaveBeenCalledOnce();
+    expect(() => fx.update(0.1)).not.toThrow();
+    expect(impact).toHaveBeenCalledOnce();
+  });
+
+  it('retries failed expiry cleanup without replaying the impact callback', () => {
+    const scene = new THREE.Scene();
+    const impact = vi.fn();
+    let releaseAttempts = 0;
+    const registry: WarlockMeteorLightRegistry = {
+      register: vi.fn(),
+      release: vi.fn(() => {
+        releaseAttempts++;
+        if (releaseAttempts === 1) throw new Error('release once');
+      }),
+    };
+    const fx = new WarlockMeteorFx(scene, () => 0, impact, null, registry);
+    fx.spawnInfernal({ x: 0, z: 0, radius: 6, duration: 0.1, sourceId: 18 });
+
+    expect(() => fx.update(0.1)).toThrow(AggregateError);
+    expect(impact).toHaveBeenCalledOnce();
+    expect(() => fx.update(0.1)).not.toThrow();
+    expect(impact).toHaveBeenCalledOnce();
+  });
+
+  it('keeps a stopped rain shower retryable when boundary disposal throws', () => {
+    const scene = new THREE.Scene();
+    const fx = new WarlockMeteorFx(scene, () => 0, vi.fn(), null);
+    fx.spawnRain({ x: 0, z: 0, radius: 7, duration: 4, sourceId: 27 });
+    const shower = (fx as unknown as { showers: { boundary: THREE.LineLoop }[] }).showers[0];
+    vi.spyOn(shower.boundary.material as THREE.LineBasicMaterial, 'dispose').mockImplementationOnce(
+      () => {
+        throw new Error('boundary material once');
+      },
+    );
+
+    expect(() => fx.stopRain(27)).toThrow();
+    expect((fx as unknown as { showers: unknown[] }).showers).toHaveLength(1);
+    expect(() => fx.stopRain(27)).not.toThrow();
+    expect((fx as unknown as { showers: unknown[] }).showers).toHaveLength(0);
   });
 
   it('reduces density and continuous motion on the low-accessibility path', () => {

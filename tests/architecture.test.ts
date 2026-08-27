@@ -62,8 +62,12 @@ function onDiskCores(dir: string): string[] {
 
 // Blank out comments while preserving line count and column positions, so prose
 // (a code comment that names Math.random, or "the search window") cannot create a
-// false positive. String literals are left intact: the dotted patterns matched
-// below (Math.random, window., ...) do not appear inside the sim's player text.
+// false positive. A shared twin lives at tests/helpers/strip_comments.ts; this
+// copy stays local ON PURPOSE (a load-bearing guard stays self-contained) and
+// the two may drift independently. String literals are left intact: the dotted patterns matched
+// below (Math.random, window., ...) do not appear inside the sim's player text, and neither does
+// the $WOC firewall's vocabulary, whose two words the game DOES use of its own accord (treasury,
+// signature) are matched only in their money-affixed compound forms for exactly that reason.
 // One alternation, so leftmost-first matching decides precedence: a line comment
 // whose text contains /* is consumed AS a line comment instead of opening a
 // bogus block that swallows everything to the next */ elsewhere in the file
@@ -202,17 +206,23 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/map_entity_disclosure_core.ts',
+  'src/ui/map_navigation_landmarks_core.ts',
+  'src/ui/map_marker_profile_core.ts',
+  'src/ui/map_marker_semantics_core.ts',
+  'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
   'src/ui/aura_overlay_view.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/proc_overlay_view.ts',
-  'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
+  'src/ui/error_text_i18n_core.ts',
+  'src/ui/general_chat_quota_view.ts',
   'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
@@ -231,12 +241,15 @@ const UI_PURE_CORES = [
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud/quest/quest_strip_core.ts',
+  'src/ui/hud/action_bar/item_bags_line_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/rift/rift_map_core.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
   'src/ui/hud/battleground/battleground_proposal_view.ts',
@@ -254,6 +267,7 @@ const UI_PURE_CORES = [
   'src/ui/threat_subject_core.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
+  'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
@@ -302,22 +316,48 @@ const UI_PURE_CORES = [
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/crafting_deny_core.ts',
   'src/ui/commission_order_view.ts',
   'src/ui/craft_cast_view.ts',
   'src/ui/profession_event_lines_core.ts',
   'src/ui/profession_identity_view.ts',
   'src/ui/profession_tutorial_view.ts',
   'src/ui/professions_view.ts',
+  'src/ui/tutorial_greeting_view.ts',
+  'src/ui/bootcamp_view.ts',
+  'src/ui/coach_prompt_view.ts',
+  'src/ui/objective_glow_view.ts',
+  'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_price_view.ts',
+  'src/ui/market_name_color.ts',
+  'src/ui/market_armor_badge.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/guild_tag.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/terms_link.ts',
+  'src/ui/duration_text.ts',
+  'src/ui/woc_affordable_core.ts',
+  'src/ui/woc_market_poll_core.ts',
+  'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
   'src/ui/char_stats_view.ts',
+  'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
+  'src/ui/castle_plan_core.ts',
   'src/ui/map_gather_tip_memo.ts',
   'src/ui/map_window_view.ts',
   'src/ui/continent_land_mask_core.ts',
@@ -330,30 +370,35 @@ const UI_PURE_CORES = [
   'src/ui/pvp_tabs_view.ts',
   'src/ui/dungeon_finder_view.ts',
   'src/ui/yumi_match_view.ts',
-  'src/ui/vale_cup_window_view.ts',
-  'src/ui/vale_cup_indicator_view.ts',
-  'src/ui/vale_cup_hud_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
-  'src/ui/vale_cup_briefing_view.ts',
-  'src/ui/vale_cup_betting_view.ts',
-  'src/ui/vale_cup_charge_view.ts',
   'src/ui/leaderboard_view.ts',
   'src/ui/guild_leaderboard_view.ts',
+  // The signpost guild board's roster drill-in core (the board itself reuses
+  // guild_leaderboard_view above).
+  'src/ui/hud/guild_board/guild_roster_view.ts',
   'src/ui/dev_leaderboard_view.ts',
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
   'src/ui/daily_rewards_view.ts',
+  'src/ui/deed_border_view.ts',
+  'src/ui/deed_heraldry_plaque_core.ts',
   'src/ui/deeds_view.ts',
+  'src/ui/reliquary_cell_art.ts',
+  'src/ui/reliquary_view.ts',
+  'src/ui/reliquary_sheet_view.ts',
+  'src/ui/reliquary_tracker_view.ts',
+  'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
   'src/ui/hud_frames.ts',
   'src/ui/stance_bar_view.ts',
+  'src/ui/hud/stance/stance_radial_core.ts',
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
@@ -361,6 +406,12 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_bind_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
+  'src/ui/hud/action_bar/consumable_strip_core.ts',
+  'src/ui/hud/action_bar/radial_action_core.ts',
+  'src/ui/hud/action_bar/bar_editor/bar_editor_core.ts',
+  'src/ui/hud/menu/menu_strip_core.ts',
+  'src/ui/hud/action_bar/radial_gesture_core.ts',
+  'src/ui/hud/tap_menu_core.ts',
   'src/ui/hud/warlock/destruction_resource_view.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/mobile_fullscreen_window_core.ts',
@@ -390,15 +441,23 @@ const UI_PURE_CORES = [
   'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/pet_frame_view.ts',
+  'src/ui/loading_backdrop_core.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
+  'src/ui/hud/cross_hotbar/cross_hotbar_view.ts',
+  'src/ui/dpad_nav_core.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/presentation_gate.ts',
+  'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',
+  'src/game/post_entry_warmups_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
+  'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
+  'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
   'src/ui/safe_local_storage.ts',
 ].map((rel) => join(repoRoot, rel));
 
@@ -426,8 +485,38 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/delve_interior_cache_core.ts',
+  'src/render/entity_gate_stand_in_core.ts',
+  'src/render/entity_view_policy_core.ts',
+  'src/render/quest_object_gate_core.ts',
+  'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
+  'src/render/arrival_event_core.ts',
+  'src/render/build_lane_core.ts',
+  'src/render/build_ledger_core.ts',
+  'src/render/hitch_frame_align_core.ts',
+  'src/render/initial_frame_core.ts',
+  'src/render/entry_detail_horizon_core.ts',
+  'src/render/characters/portrait_bitmap_transfer_core.ts',
+  'src/render/characters/portrait_capture_lane_core.ts',
+  'src/render/quest_beacon_core.ts',
+  'src/render/coach_trail_core.ts',
+  'src/render/island_isolation_core.ts',
+  'src/render/characters/portrait_prewarm_core.ts',
+  'src/render/characters/portrait_readback_core.ts',
+  'src/render/characters/preview_open_gate_core.ts',
+  'src/render/characters/soul_rend_prewarm_core.ts',
+  'src/render/characters/design_code_core.ts',
+  'src/render/live_program_watch_core.ts',
+  'src/render/reveal_gate_core.ts',
+  'src/render/town_reveal_core.ts',
+  'src/render/foliage_bucket_reveal_core.ts',
+  'src/render/foliage_prewarm_twins_core.ts',
+  'src/render/character_effect_prewarm_core.ts',
+  'src/render/frame_ms_stats_core.ts',
   'src/render/ability_vfx_core.ts',
+  'src/render/characters/player_look_core.ts',
+  'src/render/characters/far_lod_reveal_core.ts',
   'src/render/ability_vfx_longbuff_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/biome_haze_field_core.ts',
@@ -436,8 +525,11 @@ const RENDER_PURE_CORES = [
   'src/render/battleground_lantern_fx_core.ts',
   'src/render/battleground_rune_vfx_core.ts',
   'src/render/blade_grass_dense_core.ts',
+  'src/render/blob_shadow_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
+  'src/render/link_piece_core.ts',
+  'src/render/program_variant_settle_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
@@ -453,14 +545,29 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
   'src/render/fishing_bobber_core.ts',
+  'src/render/flower_meadows_core.ts',
   'src/render/foliage_core.ts',
+  'src/render/foliage_decimation_core.ts',
+  'src/render/foliage_shore_gate_core.ts',
+  'src/render/gpu_queue_window_core.ts',
+  'src/render/compile_priority_core.ts',
+  'src/render/view_create_budget_core.ts',
+  'src/render/gpu_prep_budget_core.ts',
   'src/render/evil_eye_marker_core.ts',
+  'src/render/kit_uv_surface_core.ts',
+  'src/render/kit_window_panes_core.ts',
   'src/render/lich_audio_state_core.ts',
   'src/render/needle_of_fate_vfx_core.ts',
+  'src/render/prewarm_resume_ledger_core.ts',
+  'src/render/prewarm_resume_start_gate_core.ts',
+  'src/render/preview_prewarm_lane.ts',
   'src/render/sentence_vfx_core.ts',
   'src/render/umbral_anchor_vfx_core.ts',
   'src/render/foliage_shader_core.ts',
   'src/render/foliage_shadow_core.ts',
+  'src/render/frame_present.ts',
+  'src/render/shadow_cadence_core.ts',
+  'src/render/shadow_texel_snap_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/frost_sky_fade_core.ts',
   'src/render/gfx_aa_policy_core.ts',
@@ -483,10 +590,22 @@ const RENDER_PURE_CORES = [
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
+  'src/render/nameplate_heraldry_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
+  'src/render/prewarm_compile_submission_core.ts',
+  'src/render/prewarm_submit_stop_core.ts',
+  // Bare-named, so the on-disk *_core sweep cannot find them: registered
+  // voluntarily (the prewarm_policy.ts precedent). Both are injected-clock pure
+  // logic with no three and no DOM, and the pacing pair is exactly the kind of
+  // module that grows a `performance.now()` the first time someone is in a hurry.
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_policy.ts',
+  // Same reason, one seam over: the per-interior encounter prewarm's decision
+  // layer (which interior warms what, the kill switch, the live-queue verdict).
+  'src/render/interior_encounter_prewarm.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
   'src/render/night_light_field_core.ts',
@@ -494,6 +613,7 @@ const RENDER_PURE_CORES = [
   'src/render/opaque_draw_order_core.ts',
   'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',
+  'src/render/prop_cull_core.ts',
   'src/render/race_line_core.ts',
   'src/render/renderer_frame_telemetry_core.ts',
   'src/render/rift_death_zone_core.ts',
@@ -502,6 +622,7 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/terrain_region_core.ts',
+  'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
   'src/render/vfx_pool_core.ts',
   'src/render/view_candidate_pool_core.ts',
@@ -518,11 +639,13 @@ const RENDER_PURE_CORES = [
   'src/render/far_surface_core.ts',
   'src/render/far_terrain_core.ts',
   'src/render/foliage_impostor_core.ts',
+  'src/render/lava_chain_core.ts',
   'src/render/foliage_lod.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
   'src/render/resident_scenery_core.ts',
+  'src/render/sky_residency_core.ts',
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
@@ -531,7 +654,10 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_apply_queue_core.ts',
   'src/render/weapon_vfx_emissive_core.ts',
   'src/render/zone_feature_visibility_core.ts',
+  'src/render/zone_eviction_core.ts',
+  'src/render/zone_prewarm_templates_core.ts',
   'src/render/characters/skeleton_update_core.ts',
+  'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
@@ -549,11 +675,31 @@ const BARE_NAMED = [
   'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/item_name_color.ts',
+  'src/ui/market_name_color.ts',
+  'src/ui/market_armor_badge.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/woc_tokens_text.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/guild_tag.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/terms_link.ts',
+  'src/ui/duration_text.ts',
+  'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
+  'src/render/frame_present.ts',
+  'src/game/presentation_gate.ts',
+  'src/game/stale_chrome_focus.ts',
   'src/render/compile_gate.ts',
+  'src/render/link_rate_budget.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
+  'src/render/interior_encounter_prewarm.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
+  'src/render/preview_prewarm_lane.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/tool_effect_tooltip.ts',
@@ -591,6 +737,7 @@ const BARE_NAMED = [
   'src/ui/mobile_hud_layout.ts',
   'src/ui/pet_action_icons.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/reliquary_cell_art.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
@@ -774,6 +921,206 @@ function posixRel(rel: string): string {
   return rel.split('\\').join('/');
 }
 
+// ---------------------------------------------------------------------------
+// Reliquary state mutation scope: every write to the sparse blob's surfaces
+// lives in ONE module, because the wire memo depends on it.
+// ---------------------------------------------------------------------------
+//
+// src/sim/reliquary.ts memoizes the serialized `reliq` self blob per state
+// revision, and every writer inside it bumps that revision. A write from
+// anywhere else would not bump, and the failure mode is SILENT: the server
+// compares the memo's string against session.lastSent, so a stale build ships
+// NOTHING and the client keeps the old blob forever with no error on any
+// surface. Nothing reds, nothing logs, the player just stops seeing finds.
+//
+// So the invariant is scope, not spelling: the five mutable surfaces
+// (firstFind, marks, recent, counts, illuminatedPages) are written only by
+// the module that owns the revision counter. REPLACING the whole
+// `meta.reliquary` object is deliberately allowed (sim.ts does it on
+// character load) and is safe for the opposite reason: a fresh object has a
+// fresh identity, so the identity-keyed cache simply has no entry for it.
+const RELIQUARY_STATE_OWNER = join(simRoot, 'reliquary.ts');
+const RELIQUARY_SURFACES = 'firstFind|marks|recent|counts|illuminatedPages';
+// Every assignment operator spelling: plain `=`, the compound forms
+// (`+=`, `??=`, `||=`, `&&=`, `**=`, shifts, bitwise), guarded so `==`,
+// `===`, `>=`, `<=`, and `!=` comparisons never fire (the operator class
+// excludes `<`, `>`, and `!`, and the trailing `[^=]` excludes `==`).
+const ASSIGN_OP = `(?:\\*\\*|<<|>>>|>>|\\?\\?|\\|\\||&&|[+\\-*/%&|^])?=[^=]`;
+/** Assignment or in-place mutation of a Reliquary state surface. */
+const RELIQUARY_WRITE_RE = new RegExp(
+  `\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\s*` +
+    `(?:(?:\\.length\\s*)?${ASSIGN_OP}` +
+    `|\\[[^\\]]*\\]\\s*${ASSIGN_OP}` +
+    `|(?:\\[[^\\]]*\\]|\\.length)?\\s*(?:\\+\\+|--)` +
+    `|\\.(?:add|delete|clear|set|push|pop|shift|unshift|splice|sort|reverse|fill|copyWithin)\\s*\\()`,
+);
+/** `delete x.reliquary.firstFind[id]`, which the shape above cannot see. */
+const RELIQUARY_DELETE_RE = new RegExp(
+  `\\bdelete\\s+[^;]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+/** Prefix increment and Object.assign, which put the surface AFTER the verb. */
+const RELIQUARY_PREFIX_RE = new RegExp(
+  `(?:\\+\\+|--)\\s*[\\w.$]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+const RELIQUARY_OBJASSIGN_RE = new RegExp(
+  `Object\\.assign\\(\\s*[^,)]*\\.reliquary\\.(?:${RELIQUARY_SURFACES})\\b`,
+);
+// ACCEPTED LIMITATION: a line regex cannot see identity-level aliasing, so a
+// write through a stored alias (`const st = meta.reliquary; st.counts[id] = 1`)
+// or through a held surface reference (`ownership.marks.add(id)`) escapes this
+// scan. The owning module itself uses exactly those shapes internally, which is
+// legal (its writers bump the wire revision); outside it, none exist today
+// (verified by hand at Phase 17). This guard is a tripwire for the common
+// spellings, not a proof: treat a new alias-shaped write as a review item.
+function reliquaryStateWrite(line: string): boolean {
+  return (
+    RELIQUARY_WRITE_RE.test(line) ||
+    RELIQUARY_DELETE_RE.test(line) ||
+    RELIQUARY_PREFIX_RE.test(line) ||
+    RELIQUARY_OBJASSIGN_RE.test(line)
+  );
+}
+
+describe('Reliquary sparse-state writes stay inside their owning module', () => {
+  // headless/ joins the walk: the RL env server holds a live Sim and could
+  // grow a surface write as easily as server/ (it has none today).
+  const scanned = [
+    ...walk(simRoot),
+    ...walk(join(repoRoot, 'server')),
+    ...walk(join(repoRoot, 'headless')),
+  ].filter((f) => f !== RELIQUARY_STATE_OWNER);
+
+  it('finds all three trees to scan', () => {
+    // Floor ABOVE the flat top-level file count of either large root ALONE
+    // (about 139 for src/sim and 167 for server at authoring, recursive total
+    // about 650), so a walk that silently stopped recursing, or lost one of
+    // the two LARGE roots, cannot pass (headless is two files; only its
+    // membership arm below catches losing it). The .some() arms pin the
+    // recursion reaching a nested directory in each large root and the
+    // headless root being present at all.
+    expect(scanned.length).toBeGreaterThan(500);
+    expect(scanned.some((f) => f.includes(join('src', 'sim', 'professions')))).toBe(true);
+    expect(scanned.some((f) => f.includes(join('server', 'http')))).toBe(true);
+    // Anchored on a real file, not a bare path fragment: a checkout whose own
+    // absolute path contains a `headless` component must not satisfy this.
+    expect(scanned.some((f) => f.endsWith(join('headless', 'env_server.ts')))).toBe(true);
+    // The owner itself is excluded, and it really exists (an excluded path that
+    // is simply a typo would make this whole guard vacuous).
+    expect(existsSync(RELIQUARY_STATE_OWNER)).toBe(true);
+    expect(scanned).not.toContain(RELIQUARY_STATE_OWNER);
+  });
+
+  it('no module outside src/sim/reliquary.ts writes firstFind / marks / recent / counts / illuminatedPages', () => {
+    const violations = scanLines(scanned, RELIQUARY_WRITE_RE)
+      .concat(scanLines(scanned, RELIQUARY_DELETE_RE))
+      .concat(scanLines(scanned, RELIQUARY_PREFIX_RE))
+      .concat(scanLines(scanned, RELIQUARY_OBJASSIGN_RE));
+    expect(
+      violations,
+      'a Reliquary state write outside its owning module skips the wire-memo revision bump,\n' +
+        'which ships a STALE blob silently (see src/sim/reliquary.ts reliquaryWireJson):\n' +
+        `${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('noteRelicObtain is called from exactly the two grant hubs (caller-set pin)', () => {
+    // The tally writer takes `meta` directly (no SimContext hop), so a NEW
+    // caller adopts whatever movement policy it likes with no seam forcing
+    // the question, and the line-regex ban above cannot see it (the write
+    // happens inside the owning module on the caller's behalf). Pin the
+    // caller set AND the call text: both call sites must be the hub line
+    // with its movement gate intact, so a dropped `!opts?.movement` prefix,
+    // a changed copies argument, or a replacement arm elsewhere in sim.ts
+    // all red here, not just a third file. A new caller is not banned, it is
+    // a REVIEW ITEM: extend this pin only after classifying the new site
+    // against the movement rule. Scope: all of src/ (ClientWorld and the UI
+    // import from the owning module already, so a caller there is one import
+    // away) plus server/ and headless/; the owner file is excluded, which is
+    // also what keeps its own `export function noteRelicObtain(` definition
+    // line from matching. Accepted limitation: an aliased import
+    // (`import { noteRelicObtain as x }`) escapes the regex; treat one as a
+    // review item, the same standing as the write-ban's alias blind spot.
+    const callerScanned = [
+      ...walk(join(repoRoot, 'src')),
+      ...walk(join(repoRoot, 'server')),
+      ...walk(join(repoRoot, 'headless')),
+    ].filter((f) => f !== RELIQUARY_STATE_OWNER);
+    const callers = scanLines(callerScanned, /\bnoteRelicObtain\s*\(/);
+    const files = [...new Set(callers.map((v) => v.split(':')[0]))].sort();
+    expect(files, `unexpected noteRelicObtain callers:\n${callers.join('\n')}`).toEqual([
+      relative(repoRoot, join(simRoot, 'sim.ts')),
+    ]);
+    const texts = callers.map((v) => v.slice(v.indexOf('  ') + 2));
+    expect(texts, 'both hub arms carry the movement gate and per-copy count').toEqual([
+      'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
+      'if (!opts?.movement) noteRelicObtain(meta, itemId, count);',
+    ]);
+  });
+
+  it('the ban FIRES on every write spelling, and spares reads and whole-object replacement', () => {
+    // A guard with no self-test is a guard nobody has seen fail.
+    for (const line of [
+      'meta.reliquary.marks.add(markId);',
+      'meta.reliquary.marks.delete(markId);',
+      'meta.reliquary.marks.clear();',
+      'meta.reliquary.recent.push(id);',
+      'meta.reliquary.recent.shift();',
+      'meta.reliquary.recent.splice(i, 1);',
+      'meta.reliquary.recent.sort();',
+      'state.reliquary.firstFind[itemId] = {};',
+      'r.meta.reliquary.counts[id] = 3;',
+      'meta.reliquary.counts = {};',
+      'this.primary.reliquary.recent = [];',
+      'delete meta.reliquary.firstFind[itemId];',
+      // Compound assignment, increment, and after-the-verb spellings: the
+      // shapes a tally write from another module would most plausibly use.
+      'meta.reliquary.counts[id] += 1;',
+      'meta.reliquary.counts[itemId]++;',
+      '++meta.reliquary.counts[id];',
+      'meta.reliquary.firstFind[id] ??= {};',
+      'meta.reliquary.recent.length = 0;',
+      'Object.assign(meta.reliquary.counts, saved);',
+      // The Phase 18 sticky illumination record: every write spelling an
+      // outside module would plausibly use against the Set surface.
+      'meta.reliquary.illuminatedPages.add(pageId);',
+      'meta.reliquary.illuminatedPages.delete(pageId);',
+      'meta.reliquary.illuminatedPages.clear();',
+      'meta.reliquary.illuminatedPages = new Set();',
+    ]) {
+      expect(reliquaryStateWrite(line), line).toBe(true);
+    }
+    // ...and does NOT fire on reads, which are everywhere and legitimate, nor
+    // on replacing the whole state object (safe: fresh identity, fresh cache).
+    for (const line of [
+      'return this.primary.reliquary.firstFind;',
+      'return this.primary.reliquary.counts;',
+      'if (meta.reliquary.marks.has(markId)) return false;',
+      'const n = meta.reliquary.counts[id] ?? 0;',
+      'expect(meta.reliquary.recent).toEqual([]);',
+      'meta.reliquary = restoreReliquaryState(s.reliquary);',
+      'marks: this.primary.reliquary.marks,',
+      'if (meta.reliquary.firstFind[itemId] === undefined) return;',
+      // Comparison and arithmetic READS that the widened operator arm must
+      // keep sparing: >= and <= and != end in the same '=' a lazy regex trips on.
+      'if (meta.reliquary.counts[id] >= 1) return;',
+      'while (meta.reliquary.recent.length > cap) {',
+      'const more = meta.reliquary.counts[id] + 1;',
+      'if (meta.reliquary.counts[id] != null) draw();',
+      // Reads of the illumination record are everywhere-legal like the rest.
+      'if (meta.reliquary.illuminatedPages.has(pageId)) continue;',
+      // The NEAR-MISS identifier: `illuminatedPageId` is the reliquaryUnlock
+      // EVENT field, not a state surface, and the surface name was chosen so
+      // neither is a prefix of the other. Even a write spelled through it
+      // must not match (tsc rejects the field anyway); a sloppy prefix-style
+      // alternation would false-positive on exactly these lines.
+      'meta.reliquary.illuminatedPageId = pageId;',
+      'const bannerPage = ev.illuminatedPageId;',
+    ]) {
+      expect(reliquaryStateWrite(line), line).toBe(false);
+    }
+  });
+});
+
 describe('src/world_api IWorld seam purity invariants', () => {
   it('finds the IWorld seam (world_api.ts + every facet file)', () => {
     expect(worldApiFiles).toContain(worldApiEntry);
@@ -859,6 +1206,259 @@ describe('server host-layer import invariants', () => {
       violations,
       `the authoritative server must not import browser host layers:\n${violations.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+// The $WOC token firewall (docs/prd/woc/marketplace.md "Constraints"): no
+// wallet, token, or settlement code may live in src/sim. The PRD names this
+// scan as the mechanical enforcement, so it exists here rather than as prose.
+// The allowlist is read-only projections of chain state, never money logic.
+describe('the $WOC token firewall over src/sim', () => {
+  // The ONE tenant: daily_rewards_stub.ts, the offline daily-rewards readout
+  // (#1307), which is a constant literal with no logic behind it. It was carved
+  // out of sim.ts precisely so the coordinator is scanned like every other
+  // file. holder_tier.ts and types.ts came OFF this list when they were
+  // measured against the pattern: the cosmetic holder ladder and the holder
+  // field declarations name none of this vocabulary outside comments, and an
+  // allowlist entry that is not covering a real hit only hides the next one.
+  // A NEW file wanting on this list is the signal the firewall is being
+  // breached, not extended.
+  const FIREWALL_ALLOWED = new Set(['src/sim/daily_rewards_stub.ts']);
+  // The shape every allowlisted file must keep to stay exempt: a read-only
+  // projection. Exactly ONE `export function`, and the only other statements
+  // allowed are type-only lines (`export type`, `import type`). Everything
+  // that could grow money LOGIC behind the exemption is refused by name:
+  // any other export form (const/let/var/class/default/interface/enum), a
+  // re-export (`export {}` / `export *`, which would let the file front a
+  // module nothing scans), a generator, control flow, try/catch, the logical
+  // operators, a ternary or optional, a value import, and a dynamic
+  // `import(...)`. Each rule is proven to bite against a synthetic offender
+  // below, so none of them is passing merely because the file never had the
+  // construct; the non-vacuity check additionally requires each entry to
+  // still carry a real pattern hit, so a stale entry cannot linger as a
+  // whole-file blind spot.
+  const PROJECTION_RULES: [string, RegExp][] = [
+    ['a non-function export', /\bexport\s+(?!(?:async\s+)?function\b|type\b)/],
+    ['a re-export', /\bexport\s*[{*]/],
+    ['a generator', /\bfunction\s*\*/],
+    ['control flow', /\b(?:if|for|while|switch)\s*\(/],
+    ['a try or catch', /\b(?:try|catch)\b/],
+    ['a logical operator', /&&|\|\||\?\?/],
+    ['a ternary or optional', /\?/],
+    ['a value import', /^import\b(?!\s+type\s)/m],
+    ['a dynamic import', /\bimport\s*\(/],
+  ];
+  const projectionViolations = (src: string): string[] =>
+    PROJECTION_RULES.filter(([, re]) => re.test(src)).map(([rule]) => rule);
+  // Identifier-shaped money/chain vocabulary. Deliberately NOT matched inside
+  // comments (the escrow prose in market.ts and inventory_extract.ts is fine):
+  // the scan strips comments first, exactly like the sibling purity scans.
+  // No trailing \b on purpose: the leak shapes are COMPOUND identifiers
+  // (sellerWallet, walletForAccount, quoteUsdCents), which a closed word
+  // boundary would miss entirely.
+  // The compound arms carry NO LEFT boundary either, and that asymmetry is
+  // deliberate: a sim file named orderSignature or blockHash over-matches and
+  // reds at PR time, which costs one reviewer glance, while a missed leak
+  // costs the firewall. Failing toward MORE scanning is the direction this
+  // guard prefers.
+  // `treasury` carries a REQUIRED money suffix, unlike the rest. A bare match was
+  // too broad to survive contact with the game's own vocabulary: v0.34.0 added a
+  // keep room whose id is literally 'treasury' (src/sim/dungeon_layout.ts), which
+  // is a place on a map, not a fee destination. Every shape this firewall exists
+  // to catch is compound anyway (treasuryWallet, treasuryBps), and the bare word
+  // was the one token here that could flag ordinary content.
+  // `signature` is narrowed the same way and for the same reason: the bare word
+  // is the game's own vocabulary (the talent-spec `signature` field, ability and
+  // reliquary descriptions calling something a signature move), while every leak
+  // shape is a money-affixed compound (txSignature, signature_reused,
+  // signatureRequired). Bare `token` is left out entirely on the same grounds
+  // (riftToken, chatTokens).
+  // The affix sets are calibrated against the REAL identifier corpus of the
+  // excluded modules (server/woc_market_*, claudium_proxy, native_attestation,
+  // woc_balance), not invented examples: treasuryBase, signatureAtMs,
+  // derSignature, signatureHeader, bs58 (the npm package name, which the
+  // literal 'base58' misses), keypair, the secret- and private-key shapes,
+  // blockhash, and the transaction verbs all exist server-side today. (The
+  // key shapes are spelled with their optional separator in the pattern
+  // below and hyphenated here so the malware scanner's own key-exfil
+  // signature, which hunts the contiguous identifiers, does not flag the
+  // very guard that forbids them in the sim.)
+  const FIREWALL_RE =
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share|base|cut|fee|account)|custodyclaim|lamports|base58|bs58|keypair|secret[_-]?key|private[_-]?key|blockhash|spl[_-]?token|(?:send|sign)[_-]?transaction|woc[_-]?(?:balance|price|amount|payout|transfer)|(?:tx|txn|bond|settlement|burn|transfer|der|escrow|payer|seller|mint)[_-]?signature|signature[_-]?(?:reused|required|field|header|verified|at[_-]?ms|bytes))/i;
+
+  it('exempts exactly one file, by exact membership', () => {
+    // Set EQUALITY, not a lower bound: widening the exemption has to be a
+    // deliberate visible edit to this line, never a quiet extra entry that
+    // takes a whole sim file out of the scan.
+    expect([...FIREWALL_ALLOWED]).toEqual(['src/sim/daily_rewards_stub.ts']);
+    expect(FIREWALL_ALLOWED.size).toBe(1);
+  });
+
+  it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
+    const offenders: string[] = [];
+    for (const file of simFiles) {
+      const rel = relative(repoRoot, file).replace(/\\/g, '/');
+      if (FIREWALL_ALLOWED.has(rel)) continue;
+      const stripped = stripComments(readFileSync(file, 'utf8'));
+      const hit = FIREWALL_RE.exec(stripped);
+      if (hit) offenders.push(`${rel}: ${hit[0]}`);
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('is non-vacuous: the scan sees the sim tree and its own pattern bites', () => {
+    // Near the real count (492 today) per the tests/CLAUDE.md floor rule: a
+    // walk that quietly lost most of the tree must fail here, because with
+    // sim.ts off the allowlist the corpus IS the firewall.
+    expect(simFiles.length).toBeGreaterThan(480);
+    // Every allowlisted file still exists, still trips the pattern (a stale
+    // entry is a whole-file blind spot), and still has the read-only
+    // projection shape spelled out at PROJECTION_RULES above.
+    for (const rel of FIREWALL_ALLOWED) {
+      const src = readFileSync(join(repoRoot, rel), 'utf8');
+      const stripped = stripComments(src);
+      expect(FIREWALL_RE.test(stripped), `${rel} no longer trips the pattern`).toBe(true);
+      // \b, not a trailing space: `export function* rows()` is a generator
+      // whose exported name a space-anchored count never sees.
+      expect(
+        stripped.match(/\bexport\s+(?:async\s+)?function\b/g),
+        `${rel} export count`,
+      ).toHaveLength(1);
+      expect(projectionViolations(stripped), `${rel} left the read-only projection shape`).toEqual(
+        [],
+      );
+      // Inline type imports (import { type X }) are deliberately refused by
+      // the value-import rule too: write them as import type instead.
+    }
+    // Both compound shapes must bite, and ordinary custody vocabulary must not.
+    expect(FIREWALL_RE.test('const w = walletForAccount(id);')).toBe(true);
+    expect(FIREWALL_RE.test('const k = row.sellerWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const escrowed = extractTradableCopy(inv, ref, def);')).toBe(false);
+    // The narrowed treasury arm, both directions: a fee destination or a split
+    // still bites, a room on a dungeon map does not.
+    expect(FIREWALL_RE.test('const dest = cfg.treasuryWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const bps = TREASURY_BPS;')).toBe(true);
+    expect(FIREWALL_RE.test("{ id: 'treasury', x0: 32, x1: 42 }")).toBe(false);
+    // The chain-settlement arms: an on-chain amount, an address encoding, and
+    // both compound signature shapes.
+    expect(FIREWALL_RE.test('const sig = row.txSignature;')).toBe(true);
+    expect(FIREWALL_RE.test('const b = toBase58(pk);')).toBe(true);
+    expect(FIREWALL_RE.test('const fee = LAMPORTS_PER_SOL / 2;')).toBe(true);
+    expect(FIREWALL_RE.test("if (reason === 'signature_reused') {")).toBe(true);
+    // ...and the game's own `signature`, which the narrowing must leave alone:
+    // player copy, the talent-spec field, and an ordinary derived-key helper.
+    expect(
+      FIREWALL_RE.test("description: 'Blasts nearby enemies with frost. (Frost signature)'"),
+    ).toBe(false);
+    expect(FIREWALL_RE.test("signature: 'mortal_strike',")).toBe(false);
+    expect(FIREWALL_RE.test('stationTypesSignature(types)')).toBe(false);
+  });
+
+  // One realistic usage per pattern arm the checks above do not already reach.
+  // An arm nobody probes is an arm a careless narrowing can delete for free,
+  // which is how a firewall loses a lane while staying green.
+  //
+  // The key shapes and the two transaction verbs are ASSEMBLED from fragments
+  // rather than spelled contiguously: the repo's malware scanner hunts exactly
+  // those source shapes (its key-exfil and web3-drain signatures), and the
+  // guard that forbids them in the sim must not read as one itself (the same
+  // hyphenation workaround the pattern comment describes). Each probe still
+  // carries the whole identifier at RUNTIME, which is what the pattern sees.
+  const CAMEL_KEY = 'Key';
+  const SNAKE_KEY = '_key';
+  const TX = 'Transaction';
+  const FIREWALL_ARM_PROBES: [string, string][] = [
+    ['bs58', 'const enc = bs58.encode(bytes);'],
+    ['keypair', 'const kp = keypairFromSeed(seed);'],
+    ['a camel-cased secret key', `const k = cfg.secret${CAMEL_KEY};`],
+    ['a snake-cased secret key', `const k = row.secret${SNAKE_KEY};`],
+    ['a private key', `const k = cfg.private${CAMEL_KEY};`],
+    ['blockhash', 'const { blockhash } = await conn.getLatest();'],
+    ['splToken', 'const mint = splToken.createMint(conn, payer);'],
+    ['sendTransaction', `await conn.send${TX}(tx);`],
+    ['signTransaction', `const signed = await provider.sign${TX}(tx);`],
+    ['wocBalance', 'const bal = row.wocBalance;'],
+    ['wocPrice', 'const price = quote.wocPrice;'],
+    ['wocAmount', 'const amount = order.wocAmount;'],
+    ['wocPayout', 'const payout = leg.wocPayout;'],
+    ['wocTransfer', 'await wocTransfer(from, to, amount);'],
+    ['treasuryPubkey', 'const dest = cfg.treasuryPubkey;'],
+    ['treasuryAddress', 'const dest = cfg.treasuryAddress;'],
+    ['treasuryBase', 'const base = split.treasuryBase;'],
+    ['treasuryCents', 'const cents = split.treasuryCents;'],
+    ['treasuryLeg', 'const leg = split.treasuryLeg;'],
+    ['treasuryShare', 'const share = split.treasuryShare;'],
+    ['treasuryCut', 'const cut = split.treasuryCut;'],
+    ['treasuryFee', 'const fee = split.treasuryFee;'],
+    ['treasuryAccount', 'const acct = cfg.treasuryAccount;'],
+    ['txnSignature', 'const sig = row.txnSignature;'],
+    ['derSignature', 'const sig = row.derSignature;'],
+    ['bondSignature', 'const sig = row.bondSignature;'],
+    ['settlementSignature', 'const sig = row.settlementSignature;'],
+    ['burnSignature', 'const sig = row.burnSignature;'],
+    ['transferSignature', 'const sig = row.transferSignature;'],
+    ['escrowSignature', 'const sig = row.escrowSignature;'],
+    ['payerSignature', 'const sig = row.payerSignature;'],
+    ['sellerSignature', 'const sig = row.sellerSignature;'],
+    ['mintSignature', 'const sig = row.mintSignature;'],
+    ['signatureRequired', 'const need = rules.signatureRequired;'],
+    ['signatureField', 'const field = body.signatureField;'],
+    ['signatureHeader', 'const header = req.signatureHeader;'],
+    ['signatureVerified', 'const ok = row.signatureVerified;'],
+    ['signatureAtMs', 'const at = row.signatureAtMs;'],
+    ['signatureBytes', 'const raw = row.signatureBytes;'],
+    ['custodyClaim', 'const claim = row.custodyClaim;'],
+    ['usdCents', 'const usd = quote.usdCents;'],
+    ['priceCents', 'const price = row.priceCents;'],
+    ['bondCents', 'const bond = order.bondCents;'],
+    ['amountBase', 'const amount = order.amountBase;'],
+    ['settlementQuote', 'const quote = order.settlementQuote;'],
+    ['pubkey', 'const pk = session.pubkey;'],
+    ['solana', 'const rpc = cfg.solanaRpcUrl;'],
+  ];
+
+  it.each(FIREWALL_ARM_PROBES)('bites on %s', (_arm, probe) => {
+    expect(FIREWALL_RE.test(probe)).toBe(true);
+  });
+
+  // The read-only-projection shape, proven rule by rule. Each offender names
+  // the rule it must trip, so deleting or loosening one rule reds here even
+  // though the one allowlisted file never carried the construct.
+  const PROJECTION_OFFENDERS: [string, string, string][] = [
+    ['a generator export', 'export function* rows() { yield 1; }', 'a generator'],
+    ['a named re-export', "export { dailyRewardsStub } from './other';", 'a re-export'],
+    ['a star re-export', "export * from './other';", 'a re-export'],
+    ['an exported interface', 'export interface Shape { a: number }', 'a non-function export'],
+    ['an exported enum', 'export enum Tier { One }', 'a non-function export'],
+    ['an exported const', 'export const rate = 1;', 'a non-function export'],
+    ['a loop', 'for (const row of rows) sum += row.a;', 'control flow'],
+    ['a try block', 'try { run(); } catch { }', 'a try or catch'],
+    ['a logical and', 'const v = a && b;', 'a logical operator'],
+    ['a logical or', 'const v = a || b;', 'a logical operator'],
+    ['a nullish fallback', 'const v = a ?? b;', 'a logical operator'],
+    ['a ternary', 'const v = a > 1 ? a : b;', 'a ternary or optional'],
+    ['a value import', "import { ITEMS } from './data';", 'a value import'],
+    ['a dynamic import', "const m = await import('./other');", 'a dynamic import'],
+  ];
+
+  it.each(PROJECTION_OFFENDERS)('refuses %s in an allowlisted file', (_label, src, rule) => {
+    expect(projectionViolations(src)).toContain(rule);
+  });
+
+  it('probes every projection rule, and still allows the one sanctioned shape', () => {
+    // Completeness both ways: a new rule with no offender above is unproven
+    // (the distinct rule names the offenders trip must cover the whole list),
+    // and the shape the exemption exists for must keep passing.
+    const probed = new Set(PROJECTION_OFFENDERS.map(([, , rule]) => rule));
+    expect(probed.size).toBe(PROJECTION_RULES.length);
+    const sanctioned = [
+      "import type { DailyRewardStatus } from '../world_api';",
+      'export type Readout = DailyRewardStatus;',
+      'export function readout(): Promise<Readout> {',
+      "  return Promise.resolve({ day: '1970-01-01' } as Readout);",
+      '}',
+    ].join('\n');
+    expect(projectionViolations(sanctioned)).toEqual([]);
   });
 });
 
@@ -1138,11 +1738,18 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
 // allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
 // instead of only agreeing with itself.
 const EXPECTED_BARE_NAMED = [
+  'src/game/presentation_gate.ts',
+  'src/game/stale_chrome_focus.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
   'src/render/compile_gate.ts',
   'src/render/foliage_lod.ts',
+  'src/render/frame_present.ts',
+  'src/render/interior_encounter_prewarm.ts',
+  'src/render/link_rate_budget.ts',
+  'src/render/preview_prewarm_lane.ts',
+  'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
@@ -1155,11 +1762,13 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/duration_text.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
+  'src/ui/guild_tag.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud_frames.ts',
@@ -1173,6 +1782,8 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
   'src/ui/map_gather_tip_memo.ts',
+  'src/ui/market_armor_badge.ts',
+  'src/ui/market_name_color.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/mobile_hud_layout.ts',
@@ -1181,13 +1792,23 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/pet_action_icons.ts',
   'src/ui/quality_glow.ts',
   'src/ui/quest_marker_tags.ts',
+  'src/ui/reliquary_cell_art.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/roving_index.ts',
   'src/ui/safe_local_storage.ts',
   'src/ui/swing_timer.ts',
+  'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
+  'src/ui/usd_text.ts',
+  'src/ui/wallet_bridge_reason_text.ts',
+  'src/ui/woc_balance_chip.ts',
+  'src/ui/woc_log_tones.ts',
+  'src/ui/woc_market_activity_html.ts',
+  'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_tokens_text.ts',
   'src/ui/xp_bar.ts',
 ];
 
@@ -1380,12 +2001,13 @@ const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-
 // Assigned, passed, returned, spread, shorthanded, probed or cast rather than
 // dereferenced: `= document)`, `(document)`, `return document;`, `() => window`,
 // `{ document }`, `[document, window]`, `{ ...globalThis }`,
-// `typeof window !== 'undefined'`, `(window as X).y`. Anchored on a code delimiter
-// at BOTH ends so prose ("close the window, then click") cannot match, and the
-// open brace refuses a `${...}` interpolation so a template variable named
-// `window` (talent_i18n has one) is not mistaken for the global.
+// `typeof window !== 'undefined'`, `(window as X).y`, and ternary value arms such
+// as `enabled ? window : fallback`. Anchored on a code delimiter at BOTH ends so
+// prose ("close the window, then click") cannot match, and the open brace refuses
+// a `${...}` interpolation so a template variable named `window` (talent_i18n has
+// one) is not mistaken for the global.
 const UI_HOST_VALUE_RE = new RegExp(
-  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|\\?\\s*(?:${UI_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
   'm',
 );
 // window.location reached bare. Pinned to the real Location members so a game
@@ -1446,7 +2068,7 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   [
     'a browser global, passed or probed',
     new RegExp(
-      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|\\?\\s*(?:${HELPER_HOST_GLOBALS})\\s*:|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
       'm',
     ),
   ],
@@ -1463,7 +2085,8 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
 // (the painter reads the --color-* CSS vars once per redraw), so a baked color in
 // the helper is a token-discipline break. Deliberately NOT applied to the default
 // bucket, where a tier or art palette IS the module (holder_tier, dev_tier,
-// percentile_tier, discord_tier, perf_overlay_model all bake theirs on purpose).
+// percentile_tier, discord_tier, curator_sigil, perf_overlay_model all bake
+// theirs on purpose).
 const COLOR_HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
 const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 
@@ -1508,6 +2131,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
@@ -1517,10 +2141,22 @@ const UI_DOM_MODULES = [
   'src/ui/bank_window.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
-  'src/ui/camera_prompt.ts',
+  'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
+  'src/ui/hud/action_bar/consumable_seat_controller.ts',
+  'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
+  'src/ui/hud/action_bar/radial_gesture_controller.ts',
+  'src/ui/hud/menu/menu_control_controller.ts',
+  'src/ui/hud/stance/stance_bar_controller.ts',
+  'src/ui/hud/stance/stance_control_controller.ts',
+  'src/ui/hud/tap_menu.ts',
+  'src/ui/hud/strip_gesture_controller.ts',
+  'src/ui/hud/quest/quest_strip_controller.ts',
+  'src/ui/hud/quest/quest_strip_gesture_controller.ts',
+  'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
+  'src/ui/charselect_redesign.ts',
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',
@@ -1565,6 +2201,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vendor/unbind_window.ts',
   'src/ui/hud/vendor/vendor_window.ts',
   'src/ui/hud/vendor/warfare_vendor_window.ts',
+  'src/ui/hud/woc_trade/woc_trade_controller.ts',
   'src/ui/i18n.ts',
   'src/ui/icon_prewarm.ts',
   'src/ui/icon_prewarm_worker.ts',
@@ -1573,16 +2210,21 @@ const UI_DOM_MODULES = [
   'src/ui/interface_unlock.ts',
   'src/ui/settings_transfer.ts',
   'src/ui/item_drop_hit_test.ts',
+  'src/ui/loading_backdrop.ts',
   'src/ui/loading_slow_hint.ts',
   'src/ui/loading_tips.ts',
   'src/ui/mailbox_window.ts',
   'src/ui/map_art.ts',
   'src/ui/map_bg.ts',
+  'src/ui/map_marker_icon_loader.ts',
+  'src/ui/map_marker_palette_lifecycle.ts',
   'src/ui/market_window.ts',
+  'src/ui/woc_market_window.ts',
   'src/ui/meters.ts',
   'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/wallet_verify_request.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',
   'src/ui/aura_overlay_config.ts',
@@ -1590,7 +2232,9 @@ const UI_DOM_MODULES = [
   'src/ui/aura_overlay_settings.ts',
   'src/ui/movable_frame.ts',
   'src/ui/native_update_prompt.ts',
+  'src/ui/noticeboard_popup.ts',
   'src/ui/options_window.ts',
+  'src/ui/ota_update_overlay.ts',
   'src/ui/perf_metrics_sampler.ts',
   'src/ui/perf_nudge_toast.ts',
   'src/ui/perf_ornament_svg.ts',
@@ -1602,7 +2246,9 @@ const UI_DOM_MODULES = [
   'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
+  'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  'src/ui/tutorial_greeting_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
@@ -1610,6 +2256,10 @@ const UI_DOM_MODULES = [
   // review's note).
   'src/ui/professions_window.ts',
   'src/ui/reconnect_overlay.ts',
+  // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
+  // pinned page set persists per character in localStorage (the deeds_window
+  // watchlist shape), which is browser state this module owns.
+  'src/ui/reliquary_window.ts',
   'src/ui/settings_controls.ts',
   'src/ui/social_window.ts',
   'src/ui/spectate_badge.ts',
@@ -1623,14 +2273,16 @@ const UI_DOM_MODULES = [
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',
+  // The tracker-stack seat applier: owns a resize listener and bounded
+  // getBoundingClientRect reads by design (the module comment carries the
+  // cadence contract); the seat math itself is the tracker_stack_anchor_core
+  // pure core.
+  'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
+  'src/ui/bootcamp.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',
   'src/ui/ui_scale.ts',
-  'src/ui/vale_cup_betting.ts',
-  'src/ui/vale_cup_briefing.ts',
-  'src/ui/vale_cup_charge.ts',
-  'src/ui/vale_cup_hud.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
@@ -1841,6 +2493,8 @@ describe('src/ui module classification (every module is swept by exactly one gat
       'const deps = { document };',
       'const hosts = [document, window];',
       'const merged = { ...globalThis };',
+      'const host = enabled ? window : fallback;',
+      'const doc = enabled ? document : fallback;',
     ]) {
       expect(UI_HOST_VALUE_RE.test(positive), positive).toBe(true);
     }
@@ -1916,6 +2570,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
     expect(HELPER_HOST_PATTERNS[0][1].test('document.createElement(x)')).toBe(false);
     expect(HELPER_HOST_PATTERNS[0][1].test('window.innerWidth')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test("typeof localStorage !== 'undefined'")).toBe(true);
+    expect(HELPER_HOST_PATTERNS[1][1].test('const host = enabled ? window : fallback;')).toBe(true);
     expect(HELPER_HOST_PATTERNS[1][1].test('return document;')).toBe(false);
     // The helper document rule counts every access, so a second, live-tree call
     // cannot hide behind the sanctioned one.

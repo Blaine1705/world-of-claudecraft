@@ -26,9 +26,31 @@ import {
 import { Sim } from '../src/sim/sim';
 import { type InvSlot, xpForLevel } from '../src/sim/types';
 import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
+// Every case here drives disenchant/applyEnchant directly against items the
+// test itself grants via addItem/addItemInstance, on the player entity Sim
+// always creates; nothing ever reads a camp, npc, or ground object, and no
+// test ever levels through zone/travel/vendor logic. EMPTY_TEST_WORLD keeps
+// zones/roads/props/services and drops only camps/npcs/groundObjects, so
+// Sim construction skips spawning every built-in camp mob.
 function makeSim(seed = 7) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+}
+
+// The tests/professions_capacity.test.ts idiom: count rng draws over a call
+// so a "yields only the primary" claim is provably zero-draw, not just
+// unchecked.
+function countDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number } {
+  let draws = 0;
+  sim.ctx.rng.setObserver(() => {
+    draws += 1;
+  });
+  try {
+    return { result: fn(), draws };
+  } finally {
+    sim.ctx.rng.setObserver(null);
+  }
 }
 
 describe('disenchant', () => {
@@ -47,6 +69,63 @@ describe('disenchant', () => {
     const result = resolveDisenchant(sim.ctx, sim.playerId, 'eastbrook_arming_sword');
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('not_held');
+  });
+
+  // A held offhand is equipment (quality, requiredClass) exactly like a
+  // weapon or armor piece, so it must be disenchantable the same way: this
+  // warrior can never equip valefire_lantern (CASTER_ALL only), which is
+  // exactly the case where disenchant is the only way to get value from it.
+  it('a held offhand disenchants like any other equipment piece', () => {
+    expect(isDisenchantable(ITEMS.valefire_lantern)).toBe(true);
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('valefire_lantern', 1, pid);
+    const result = resolveDisenchant(sim.ctx, pid, 'valefire_lantern');
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_dust');
+    expect(result.count).toBeGreaterThan(0);
+    expect(sim.countItem('valefire_lantern', pid)).toBe(0);
+  });
+
+  // resolveDisenchant above proves the resolver arm; the player actually hits
+  // the disenchantItem COMMAND, which calls the very same isDisenchantable
+  // through evaluateDisenchantAdmission at cast start (and again at
+  // complete). This is not a second predicate to fix, but it IS a separately
+  // hand-copied deny chain around that shared call (see
+  // tests/professions_admission_drift.test.ts), so it closes the loop end to
+  // end rather than assuming the resolver's behavior carries through.
+  it('the disenchantItem command entry point admits a held offhand', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('valefire_lantern', 1, pid);
+    sim.disenchantItem('valefire_lantern');
+    expect(sim.lastDisenchantResult).toBeNull();
+    completeEnchantFamilyCast(sim);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem('valefire_lantern', pid)).toBe(0);
+  });
+
+  // The uncommon valefire_lantern above only reaches the sub-rare arm. An
+  // epic held offhand reaches the isRarePlus branch, where
+  // typedSecondaryFor falls through to null (neither armor nor weapon): the
+  // resolve must yield the FIXED single primary and draw ZERO rng, the same
+  // shape jewelry gets, never silently rolling a phantom secondary.
+  it('an epic held offhand disenchants to the primary alone with zero rng draws', () => {
+    expect(ITEMS.wraithfire_orb.quality).toBe('epic');
+    expect(ITEMS.wraithfire_orb.kind).toBe('held_offhand');
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('wraithfire_orb', 1, pid);
+    const { result, draws } = countDraws(sim, () =>
+      resolveDisenchant(sim.ctx, pid, 'wraithfire_orb'),
+    );
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_shard');
+    expect(result.count).toBe(1);
+    expect(result.secondaryItemId).toBeUndefined();
+    expect(result.secondaryCount).toBeUndefined();
+    expect(draws).toBe(0);
+    expect(sim.countItem('wraithfire_orb', pid)).toBe(0);
   });
 
   it('disenchanting consumes the item and yields the dedicated arcane material, not plain salvage junk', () => {
@@ -525,7 +604,12 @@ describe('applyEnchant', () => {
     expect(state).not.toBeNull();
     expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
 
-    const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const reloadedSim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Reload', { state: state! });
     const reloadedMeta = reloadedSim.meta(reloadedPid)!;
     const reloadedEntity = reloadedSim.entities.get(reloadedPid)!;
@@ -541,7 +625,12 @@ describe('applyEnchant', () => {
     // absent entirely, not just empty.
     delete (state as { equipmentInstance?: unknown }).equipmentInstance;
 
-    const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const reloadedSim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     expect(() => reloadedSim.addPlayer('warrior', 'Legacy', { state })).not.toThrow();
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Legacy2', { state });
     const meta = reloadedSim.meta(reloadedPid)!;
@@ -954,7 +1043,12 @@ function wearing(
   itemId: string,
   opts: { cls?: 'warrior' | 'rogue'; dust?: number; instance?: Record<string, unknown> } = {},
 ) {
-  const sim = new Sim({ seed: 7, playerClass: opts.cls ?? 'rogue', autoEquip: false });
+  const sim = new Sim({
+    seed: 7,
+    playerClass: opts.cls ?? 'rogue',
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+  });
   const pid = sim.playerId;
   if (opts.instance) sim.ctx.addItemInstance(itemId, opts.instance as never, pid);
   else sim.addItem(itemId, 1, pid);
@@ -1119,7 +1213,12 @@ describe('apply enchant to WORN gear (in place)', () => {
   it('two rings, identical copies: the ring2 slot enchants ONLY the ring2 copy', () => {
     const RING = 'seal_of_the_nine_oaths'; // slot 'ring', covers ring1 AND ring2
     const RING_ENCHANT = 'enchant_ring_spirit';
-    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: false });
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'rogue',
+      autoEquip: false,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.playerId;
     while (sim.player.level < 20) sim.grantXp(xpForLevel(sim.player.level));
     sim.addItem(RING, 2, pid);
@@ -1161,7 +1260,12 @@ describe('apply enchant to WORN gear (in place)', () => {
     expect(state!.equipmentInstance?.mainhand?.enchant).toBe(WORN_ENCHANT);
     expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
 
-    const reloadedSim = new Sim({ seed: 7, playerClass: 'rogue', noPlayer: true });
+    const reloadedSim = new Sim({
+      seed: 7,
+      playerClass: 'rogue',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const reloadedPid = reloadedSim.addPlayer('rogue', 'Reload', { state: state! });
     expect(reloadedSim.meta(reloadedPid)!.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
     expect(reloadedSim.entities.get(reloadedPid)!.stats.str).toBe(boostedStr);
@@ -1642,7 +1746,12 @@ describe('replacing an enchant behind explicit confirmation (#2415)', () => {
     expect(saved?.instance?.signer).toBe('Tester');
     expect(saved?.instance?.bindOnTrade).toBe(true);
 
-    const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const reloadedSim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Reload', { state: state! });
     const loaded = reloadedSim.meta(reloadedPid)!.inventory.find((s) => s.itemId === SWORD);
     expect(loaded?.instance?.enchant).toBe(AGILITY);

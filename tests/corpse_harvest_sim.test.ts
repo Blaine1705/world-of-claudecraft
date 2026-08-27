@@ -363,6 +363,26 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(mob.harvestClaimedBy).toBe(b);
   });
 
+  it('direct harvest refuses an owned tagged corpse without consuming or minting materials', () => {
+    const { sim, mob, a, b } = setup();
+    mob.ownerId = a;
+    mob.lootable = false;
+    sim.drainEvents();
+    let draws = 0;
+    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    sim.harvestCorpse(mob.id, undefined, b);
+    rng.setObserver(null);
+
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(draws).toBe(0);
+    expect(sim.countItem('rough_hide', b)).toBe(0);
+    expect(sim.countItem('wolf_fang', b)).toBe(0);
+    expect(sim.drainEvents()).toEqual([]);
+  });
+
   it('a full-bags harvest is refused and does not consume the claim', () => {
     const { sim, internals, mob, a, b } = setup();
     fillBags(sim, internals, a);
@@ -3458,9 +3478,18 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // all-unmapped subsets fall out of refused and land in spent instead.
     // Exact totals are pinned against the shipped catalog, not derived, so a
     // template that gains or loses a mapped tag moves one of them.
-    expect(spent).toBe(188);
+    // 188 to 196 when frostmane_yeti left the ogre family for beast: the
+    // every-beast-pays-in-components rule then owes it hide/fang/meat, and three
+    // mapped families contribute all 8 of its masks to spent and none to
+    // refused (all three are mapped), exactly +8/+0.
+    // 196 to 200 for the Proving Shore: shore_scuttler AND its tide-pool king
+    // mister_crabs each carry the meat tag the tide_scuttler twin already has,
+    // so all four of their subsets spend and none refuse, exactly +2/+0 per
+    // template (training_effigy has no tags and never enters the sweep, and
+    // neither do the Highwatch practice dummies).
+    expect(spent).toBe(200);
     expect(refused).toBe(6);
-    expect(spent + refused).toBe(194);
+    expect(spent + refused).toBe(206);
   });
 
   // The eight mapped families and their item ids, spelled out. Deriving them
@@ -3550,9 +3579,13 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // `unmappedOffered` to only the subsets naming gills or horn on the
     // templates left, while `extracted` rises with the extra families each
     // affected subset now extracts. Exact totals are pinned against the
-    // shipped catalog, not derived.
+    // shipped catalog, not derived. frostmane_yeti's move from the ogre family
+    // to beast then adds its hide/fang/meat subsets to `extracted` (286 to 301)
+    // and nothing to `unmappedOffered`, since all three tags are mapped.
     expect(unmappedOffered).toBe(14);
-    expect(extracted).toBe(286);
+    // 301 to 305 with the Proving Shore's two meat-tagged templates
+    // (shore_scuttler and mister_crabs) and their mapped-family extractions.
+    expect(extracted).toBe(305);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

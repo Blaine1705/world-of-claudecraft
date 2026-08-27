@@ -41,6 +41,7 @@ import { isTemporaryNecromancyUndead } from '../combat/necromancy';
 import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import { consumeSelectedInventorySlot } from '../item_copy_ref';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
@@ -68,6 +69,11 @@ const DEMON_HEAL_MANA_COST = 55;
 const DEMON_HEAL_DURATION = 5;
 const DEMON_HEAL_TICK = 1;
 const TAMED_TARGET_RESPAWN_SECONDS = 60;
+// Share of its pool a revived pet stands up with. The Revive Pet command's number,
+// named here because the owner's own resurrection now performs the same work for
+// free and must hand the pet back at exactly what the command would have given
+// (pet/pet_owner_revive.ts).
+export const PET_REVIVE_HP_FRACTION = 0.35;
 const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
 
 function templateHasPetSpecial(templateId: string): boolean {
@@ -103,7 +109,7 @@ function nonPlayerAuraHp(aura: Aura): number {
 }
 
 export function applyNonPlayerStatAura(
-  ctx: SimContext,
+  _ctx: SimContext,
   target: Entity,
   aura: Aura,
   direction: 1 | -1,
@@ -606,7 +612,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
   pet.pos = ctx.groundPos(r.e.pos.x + 2, r.e.pos.z + 1);
   pet.prevPos = { ...pet.pos };
   ctx.rebucket(pet);
-  pet.hp = Math.max(1, Math.round(pet.maxHp * 0.35));
+  pet.hp = Math.max(1, Math.round(pet.maxHp * PET_REVIVE_HP_FRACTION));
   ctx.emit({
     type: 'log',
     text: `${pet.name} returns to your side.`,
@@ -634,7 +640,11 @@ export function petAttack(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pets[0])) return;
   for (const pet of pets) {
+    if (target.kind === 'mob' && target.hostile && questGateBlocksAggro(ctx.players, target, pet)) {
+      continue;
+    }
     pet.aggroTargetId = target.id;
     pet.inCombat = true;
     if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
@@ -670,6 +680,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   pet.aggroTargetId = target.id;
   pet.inCombat = true;
   addThreat(target, pet.id, 1);
@@ -677,7 +688,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     pet.petManualTauntPending = true;
     return;
   }
-  ctx.applyTaunt(pet, target);
+  if (!ctx.applyTaunt(pet, target)) return;
   pet.petManualTauntPending = false;
   pet.petTauntTimer = PET_GROWL_INTERVAL;
 }
@@ -691,6 +702,7 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   if (!pet || !jet || pet.dead || pet.castingAbility || pet.petTauntTimer > 0) return;
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(pet, target)) return;
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
   if (dist2d(pet.pos, target.pos) > range) return;
   pet.aggroTargetId = target.id;
@@ -723,6 +735,7 @@ export function petSpecial(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   if (!useWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
   pet.aggroTargetId = target.id;
   pet.inCombat = true;

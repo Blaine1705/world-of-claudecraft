@@ -1,3 +1,4 @@
+import { isOnProvingShore } from '../../../sim/content/proving_shore';
 import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
@@ -6,6 +7,7 @@ import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/qu
 import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
+import { currencyIconHtml, heroicMarkIconHtml } from '../../currency_art';
 import { decorativeArtImg } from '../../decorative_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
@@ -75,7 +77,6 @@ export interface QuestDialogControllerDeps {
   openCrafting(craftId: string): void;
   openMarket(): void;
   openDelveBoard(npcId: number): void;
-  openValeCup(): void;
   openCardDuel(): void;
   onOpenChange(open: boolean): void;
   voice: {
@@ -376,7 +377,6 @@ export class QuestDialogController {
     const hasDelveBoard = Object.values(DELVES).some(
       (delve) => delve.boardNpcId === npc.templateId,
     );
-    const hasValeCup = npc.templateId === 'groundskeeper_bram';
     const hasCardMaster = !!definition?.cardMaster;
     if (
       closeIfEmpty &&
@@ -388,7 +388,6 @@ export class QuestDialogController {
         hasHeroicVendor,
         hasWarfareVendor,
         hasDelveBoard,
-        hasVcup: hasValeCup,
         hasCardMaster,
         hasTraining,
       })
@@ -420,6 +419,10 @@ export class QuestDialogController {
         }),
       )}</div>`;
     }
+    // The Proving Shore's press-this-next glow: on the island every quest row
+    // pulses gold so a brand-new player never hunts for the next click
+    // (styles/components.css .qd-coach; the coach card family's island gate).
+    const coachClass = this.coachGlow() ? ' qd-coach' : '';
     for (const { questId, kind } of interesting) {
       const icon =
         kind === 'ready'
@@ -434,14 +437,14 @@ export class QuestDialogController {
           : kind === 'repeat'
             ? t('questUi.dialog.repeatableQuestAria', { name: title })
             : t('questUi.dialog.availableQuestAria', { name: title });
-      html += `<button type="button" class="qd-list-item" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
+      html += `<button type="button" class="qd-list-item${coachClass}" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
     }
     for (const questId of discussionQuests) {
       const title = this.deps.text.questTitle(questId);
       html += `<button type="button" class="qd-list-item" data-discuss="${esc(questId)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
     }
     if (hasVendor) {
-      html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     // Crafting shortcut: the master's Crafting option opens the crafting
     // window straight to their own craft's tab (the viewer's stronger craft
@@ -473,20 +476,17 @@ export class QuestDialogController {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
     if (hasHeroicVendor) {
-      html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     if (hasWarfareVendor) {
       // Its OWN label and accessible name: this row sits beside the generic
       // goods row above at a flagged NPC, so it can never reuse "Browse Goods".
-      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
+      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}">${currencyIconHtml('honor')} ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
     }
     if (hasDelveBoard) {
       const delve = Object.values(DELVES).find((entry) => entry.boardNpcId === npc.templateId);
       const label = delve ? this.deps.text.delveName(delve.id) : t('delveUi.board.openDelve');
       html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(label)}</button>`;
-    }
-    if (hasValeCup) {
-      html += `<button type="button" class="qd-list-item" data-vcup="1" aria-label="${esc(t('hudChrome.vcup.gossipOpenAria'))}"><span class="gold">${svgIcon('ball')}</span> ${esc(t('hudChrome.vcup.gossipOpen'))}</button>`;
     }
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
@@ -513,7 +513,6 @@ export class QuestDialogController {
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
-    this.bindRoute('[data-vcup]', this.deps.openValeCup);
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
     this.bindClose();
     this.showAndFocus();
@@ -648,6 +647,9 @@ export class QuestDialogController {
     this.attachRewardTooltip(questId);
     if (state === 'available') {
       const button = this.makeButton(t('questUi.dialog.accept'));
+      // Island Accept glows gold: the same press-this-next treatment as the
+      // gossip rows, so the accept step reads as the obvious next click.
+      if (this.coachGlow()) button.classList.add('qd-coach');
       if (quest.completionEffect && professionTargets.length === 0) button.disabled = true;
       button.addEventListener('click', () => {
         const liveWorld = this.deps.world();
@@ -664,6 +666,7 @@ export class QuestDialogController {
       this.deps.element.appendChild(button);
     } else if (state === 'ready') {
       const button = this.makeButton(t('questUi.dialog.completeQuest'));
+      if (this.coachGlow()) button.classList.add('qd-coach');
       button.addEventListener('click', () => {
         const liveWorld = this.deps.world();
         liveWorld.turnInQuest(questId);
@@ -708,6 +711,13 @@ export class QuestDialogController {
     button.type = 'button';
     button.textContent = label;
     return button;
+  }
+
+  /** The Proving Shore's press-this-next gate: island dialogs pulse their
+   *  quest rows and accept step gold (styles/components.css .qd-coach). */
+  private coachGlow(): boolean {
+    const player = this.deps.world().player;
+    return !!player && isOnProvingShore(player.pos.x, player.pos.z);
   }
 
   private paintProfessionPreview(element: HTMLElement, content: ProfessionPreviewContent): void {

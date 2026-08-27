@@ -5,6 +5,7 @@ import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
+import type { RespawnWindow } from './respawn_policy';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -77,6 +78,11 @@ export function hitFractionFromRating(rating: number): number {
 
 export type HonorReason =
   | 'arena_win'
+  // A ranked arena bout that did not end in a win: a loss, or a draw, which pays
+  // both sides the loss award. One reason for both, mirroring the battleground's
+  // own `battleground_complete`, because the player-facing fact is the same one
+  // (the match was fought and it paid) and a drawn bout has no loser to name.
+  | 'arena_complete'
   | 'fiesta_kill'
   | 'fiesta_complete'
   | 'fiesta_win'
@@ -94,6 +100,12 @@ export type HonorReason =
 export interface HonorArenaDailyState {
   date: string;
   winsByOpponent: Record<string, number>;
+  // Ranked LOSSES (and draws) per bracket plus opposing-team identity, on the
+  // same ARENA_REPEAT_DR curve as the wins beside it but on its OWN counter, so
+  // losing to a team first does not spend the win award for beating it later
+  // (optional so pre-loss-award saves stay byte-equal; absent until the first
+  // paying loss).
+  lossesByOpponent?: Record<string, number>;
   fiestaCompletionsByOpponent: Record<string, number>;
   // Thornhollow Fields results per opposing-team identity (optional so pre-battleground
   // saves stay byte-equal; absent until the first battleground result).
@@ -118,7 +130,6 @@ export const CAST_COMPLETE_EPS = 1e-9;
 // erroring, and fires the instant the current cast completes.
 export const CAST_QUEUE_WINDOW_SEC = 0.4;
 export const FISHING_CAST_ID = 'fishing';
-export const FISHING_CAST_NAME = 'Fishing';
 // The constant castTotal/castRemaining of a fishing session (Professions 2.0,
 // retiring the fixed FISHING_CAST_TIME cast): a generous cap that
 // carries ZERO information about the hidden bite (max bite delay plus max
@@ -219,20 +230,6 @@ export type DungeonDifficulty = 'normal' | 'heroic';
 export function isDungeonDifficulty(value: unknown): value is DungeonDifficulty {
   return value === 'normal' || value === 'heroic';
 }
-
-// The Vale Cup boarball minigame (docs/prd/vale-cup.md): transient match
-// sides pick a banner nation and each fighter picks a sport role.
-export type VcNationId =
-  | 'vale'
-  | 'mirefen'
-  | 'thornpeak'
-  | 'coliseum'
-  | 'choir'
-  | 'ogre'
-  | 'moon'
-  | 'copperdig';
-export type SportRole = 'allrounder' | 'striker' | 'sweeper' | 'keeper';
-export type VcBracket = 1 | 2 | 3 | 4 | 5;
 
 export interface ArenaStanding {
   rating: number;
@@ -455,6 +452,11 @@ export type AuraKind =
   // Sunder Armor (effectiveArmor takes the larger of the two percents). Own kind so
   // it is never summed flat with sunder.
   | 'faerie_fire'
+  // Rogue Melting Acid: a percent armor reduction whose fraction rides the
+  // aura's own `value` (unlike faerie_fire's constant). Joins the same
+  // max-combine group in effectiveArmor, so it never stacks with Sunder Armor
+  // or Faerie Fire.
+  | 'melting_acid'
   | 'mortal_wound'
   | 'silence'
   | 'blind'
@@ -488,6 +490,13 @@ export type AuraKind =
   // boosts max-hp when >1); `buff_jump` value = jump-height multiplier.
   | 'buff_scale'
   | 'buff_jump'
+  // The operator-applied Cheater mark's countdown readout (src/sim/moderation/
+  // cheater_mark.ts). DELIBERATELY INERT: no stat fold, no combat branch, and no
+  // recalc reads it, so the sanction is visibility and never a handicap. It is a
+  // distinct kind rather than a zeroed borrow of a real debuff so that intent is
+  // unmistakable and no later tuning pass can quietly give it a mechanical
+  // effect. Classified as a debuff for the buff-bar sort only.
+  | 'cheater_mark'
   // Percent raid buffs (vanilla group-buff style). Value is stored as integer percent
   // POINTS (5 = +5%, 10 = +10%) so it survives the integer-rounding talent value
   // multiplier; divided by 100 when folded in recalcPlayerStats. Distinct from
@@ -671,10 +680,10 @@ export interface Aura {
   // review finding: a 300 bank paid 330 under a +10% damage buff).
   finalDamage?: boolean;
   // Chronomancy Temporal Echo bookkeeping (temporal_echo auras only). echoGroup
-  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (35% ST /
+  // marks the ORIGIN: false/undefined = the single-target Temporal Echo (40% ST /
   // 15% AoE conversion), true = a Cascada temporal group echo (13% ST / 6% AoE).
   // echoConvertRate stores the single-target coefficient the mark converts at
-  // (0.35 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
+  // (0.4 or 0.13); the AoE rate is derived from echoGroup. Both are read only by
   // combat/chronomancy.ts during Arcane-damage conversion (server-authoritative and
   // offline), so they never need to ride the wire.
   echoGroup?: boolean;
@@ -694,6 +703,7 @@ export interface DamageBreakBudget {
 
 export type CrowdControlDrCategory =
   | 'root'
+  | 'incapacitate'
   | 'polymorph'
   | 'fear'
   | 'lockout'
@@ -830,6 +840,15 @@ export type ItemUse =
   // Thrown at the nearest murloc hut to torch it (q_deepfen_purge); see
   // src/sim/interactions/firebottle_hut.ts. Reusable, so it is never consumed.
   | { type: 'throw' }
+  // Used at its quest's summon site to call the named foe out (the Proving
+  // Shore's tide-pool miniboss); see src/sim/interactions/crab_summon.ts.
+  // Reusable like the firebottle, so a wipe can always retry.
+  | { type: 'summon' }
+  // The Proving Shore's death lesson (src/sim/tutorial/death_lesson.ts): a
+  // single-use rite stone that lays its user down where they stand, so a new
+  // player meets their first death somewhere nothing is hunting them.
+  // Consumed on use and refused unless the lesson is active.
+  | { type: 'passingStone' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
@@ -1212,6 +1231,14 @@ export interface ItemInstancePayload {
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
+  /** Player-toggled safety mark (issue 3042, item_lock.ts isItemLocked): while
+   *  true this specific copy refuses salvage, profession-craft reagent
+   *  consumption, and vendor sell (single and bulk) until the player unlocks
+   *  it again. Nothing to do with boundTo/bindOnTrade above (a content/trade
+   *  rule nobody chooses) or the def-level noVendorSell/noDiscard flags
+   *  (items.ts): this is an optional mark the owner sets on an otherwise
+   *  ordinary copy. */
+  locked?: boolean;
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate bonus consumed by recalcPlayerStats; this record explains how it
    * was earned and lets forge operations rebuild it deterministically. */
@@ -1396,6 +1423,13 @@ export const DEFAULT_PARTY_LOOT_STRATEGIES: LootStrategies = {
 export interface LootEntry {
   itemId?: string;
   copper?: number;
+  // Heroic-claim money base: when the kill carries a live heroic instance
+  // claim, the loot roller substitutes this for `copper` as the roll base
+  // (same 0.6x to 1.4x band on the same single draw). Authored only on
+  // dungeon final bosses via the HEROIC_FINALE_COPPER /
+  // NYTHRAXIS_HEROIC_COPPER bases in content/dungeon_difficulty.ts, and it
+  // always rides a truthy `copper` (the roller's money arm gates on copper).
+  heroicCopper?: number;
   chance: number; // 0..1
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
@@ -1494,6 +1528,11 @@ export interface MobTemplate {
   // Ignores taunt/growl forced-target windows. Used by special add AI only.
   ignoreTaunt?: boolean;
   respawnMult?: number;
+  // A RANDOM respawn window authored INSTEAD of respawnMult, in the same
+  // 25s-base units: each death draws its multiplier uniformly in the half-open
+  // [minMult, maxMult) (src/sim/respawn_policy.ts). Both bounds in one field, so
+  // a lone bound or an inverted window cannot be written.
+  respawnWindow?: RespawnWindow;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
   respawnSeconds?: number;
@@ -1502,6 +1541,12 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // A `dummy` that is an ALLY rather than a target: spawns non-hostile and
+  // carries Entity.friendlyPracticeTarget, which is what opens it to heals in
+  // sim.isFriendlyTo. It rests below full health and sheds healing back down
+  // (mob/practice_dummies.ts) so a healer always has something real to heal and
+  // the target resets itself for the next player.
+  friendlyPracticeTarget?: boolean;
   // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
   // CampDef.offStream covers a wholly new camp; this covers a template that
   // REPLACED shipped content in an existing camp slot, where the spawn draws
@@ -2658,7 +2703,10 @@ export type AbilityEffect =
       falloff: number;
       radius: number;
     }
-  | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
+  // pctOfMax: when set, the heal total is this fraction of the TARGET's max
+  // health at cast time instead of the flat total, so the heal scales with
+  // gear and any future pool retune (Savage Mending is the first user).
+  | { type: 'hot'; total: number; duration: number; interval: number; pctOfMax?: number } // renew, rejuvenation
   | {
       type: 'absorb';
       amount: number;
@@ -2879,20 +2927,6 @@ export type AbilityEffect =
       dazeMult: number;
       dazeDuration: number;
     }
-  // The Vale Cup boarball moves (docs/prd/vale-cup.md). ballKick launches the
-  // match ball toward the caster's castAim (power = ground speed yd/s, loft =
-  // initial vertical speed); sportDash is a targetless directional lunge along
-  // the aim direction (catchBall lets a keeper's Dive catch a crossing ball);
-  // sportShove bumps the target back via the knockback walker. ballPass rolls a
-  // firm auto-paced ground pass to the caster's targeted teammate (else the best
-  // teammate toward the aim), leading their run. All no-damage.
-  | { type: 'ballKick'; power: number; loft: number }
-  | { type: 'ballPass'; power: number; loft: number }
-  // ballShoot fires the ball at the enemy goal; power (ground speed) and loft
-  // both scale with the caster's charge, so a max-power shot sails OVER the bar.
-  | { type: 'ballShoot'; power: number; loft: number }
-  | { type: 'sportDash'; distance: number; catchBall?: boolean }
-  | { type: 'sportShove'; distance: number }
   | {
       type: 'consumeAura';
       auraIds?: string[];
@@ -3193,6 +3227,12 @@ export interface AbilityDef {
    *  held still strengthen it (Redharvest: the bank is the real payment). */
   comboOptional?: boolean;
   fearDr?: boolean; // incapacitate effects that use fear diminishing returns
+  /** The cast never puts the caster or the victim into combat. Classic Sap:
+   *  the rogue stays out of combat and hidden, and the victim wakes up where
+   *  it stood instead of being handed an aggro target it never saw. Only
+   *  meaningful on an ability whose effect arm would otherwise call
+   *  `enterCombat`. */
+  noCombatEntry?: boolean;
   requiresDodgeProc?: boolean; // overpower
   requiresTargetHpBelow?: number; // execute-style (fraction)
   executeThreshold?: number; // strict execute threshold: target health must be below this fraction
@@ -3284,6 +3324,13 @@ export interface NpcDef {
   // sells its stock for free when the realm has ALLOW_DEV_COMMANDS. Never placed
   // as permanent content; spawned on demand by /dev vendor.
   devVendor?: boolean;
+  // Quest-gated vendor rows: itemId -> the quest that must be in the buyer's
+  // log (or done) before the row is sold OR shown. Validated sim-side in
+  // items.ts buyItem and filtered client-side by ui/vendor_stock_gate_core.ts,
+  // both off this same def, so no wire field is needed. First user: the
+  // tutorial island's Linen Pouch (q_ps_pouch_and_purse), so an early
+  // purchase cannot strand the lesson's copper.
+  vendorQuestGates?: Record<string, string>;
   // The Merchant: talking to this NPC opens the player-driven World Market
   // (auction house) instead of a fixed vendor stock.
   market?: boolean;
@@ -3381,6 +3428,13 @@ export interface DungeonObjectSpawn {
   z: number;
   templateId?: 'dungeon_door' | 'dungeon_exit';
   dungeonId?: string;
+  /**
+   * This object is an encounter mechanic players INTERACT with, never a pickup, even
+   * though its item id is a quest collectable elsewhere in the world (the Nythraxis
+   * arena wardstones reuse the Sunken Bastion ward stone). The quest-collectable
+   * display gate (quest_gated_entity.ts) never hides a flagged object.
+   */
+  interactOnly?: boolean;
 }
 
 export interface DungeonDef {
@@ -3388,6 +3442,12 @@ export interface DungeonDef {
   name: string;
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
+  /** where leaving drops the player, relative to doorPos (default 0,-4);
+   *  doors flush against a building face need a FORWARD drop instead */
+  leaveOffset?: { x: number; z: number };
+  /** render the entrance membrane still (no swirl spin): for doors that
+   *  read as a building's own doorway rather than a magic portal */
+  staticDoor?: boolean;
   overworldDoor?: boolean; // false for rooms only reached by internal instance doors
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
@@ -3397,7 +3457,8 @@ export interface DungeonDef {
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep'; // renderer + collider interior builder key
+  // renderer + collider interior builder key
+  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep' | 'dawnhold';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -3474,7 +3535,11 @@ export interface ZoneDef {
   // it, so it must never change once shipped); label is display-only and may be
   // re-worded freely. Optional because user-authored custom maps (MapDocContent
   // reuses ZoneDef) omit it; every static ZONES poi carries one (content-guarded).
-  pois: { x: number; z: number; label: string; id?: string }[];
+  /** Named places. `id` is a STABLE key: deed visit marks reference it, so a
+   *  shipped id is never renamed or removed. `hideOnMap` drops the label from
+   *  the world map while keeping the record (and its marks) alive, for a place
+   *  that no longer reads as a landmark. */
+  pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
   // The zone's southern border ridge has NO road pass and is raised past the
@@ -3601,11 +3666,21 @@ export interface ZonePropsDef {
     x: number;
     z: number;
     rot: number;
+    /** Uniform size multiplier for the whole pier (planks, posts, dressing,
+     *  rowboat). Omitted means the classic 1; the walkable deck maths in
+     *  dock_layout.ts normalizes through it, so render, collision ground,
+     *  and footstep routing all scale together. */
+    scale?: number;
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
   tents: { x: number; z: number; rot: number; scale: number }[];
   marshReeds: [number, number][];
-  crates: [number, number][];
+  /** [x, z, stack?]: camp clutter crates/barrels. The optional third element
+   *  stacks that many identical units at the point (default 1); a stack of 2
+   *  puts the top in the ledge-climb band (src/sim/climb.ts), the Gauntlet's
+   *  parkour lesson. Collider top and drawn meshes stay in lockstep through
+   *  campCrateShape (prop_layout.ts). */
+  crates: [number, number, number?][];
   campfires: [number, number][];
   mudHuts: [number, number][];
   ruinRings: { x: number; z: number; ringR: number; columns: number }[];
@@ -3659,6 +3734,16 @@ export interface ZonePropsDef {
     r?: number;
     h?: number;
     scale?: number;
+    /** Rectangular collider half-extents in the model's LOCAL axes, already
+     * scaled. Supply BOTH to collide as the model's real box instead of a
+     * circle: these models are rectangles, and a circle that contains one
+     * bulges past its flat walls (an invisible wall a stride out) while a
+     * circle inside one cuts its corners off. `rot` orients the box, so these
+     * never need swapping for a rotated building. `r` is unchanged and still
+     * the CLEARANCE radius that scatter, roads and parterre keep-outs read, so
+     * it must stay set even when a box is given. */
+    hw?: number;
+    hd?: number;
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
@@ -3793,6 +3878,15 @@ export interface QuestDef {
   // (e.g. the paladin-only Divine Tome chain). Availability enforced in computeQuestState.
   minLevel?: number;
   retired?: boolean; // remains finishable if already accepted, but cannot be newly accepted
+  // OWNERSHIP collect objectives instead of DELIVERY ones: the collect count
+  // includes copies worn in a bag socket (quests/quest_owned_count.ts) and the
+  // turn-in never consumes them. For a quest that asks the player to acquire
+  // and KEEP a thing rather than fetch it, e.g. the tutorial island's Pouch
+  // and Purse: it tells the player to buy a Linen Pouch and buckle it on, so
+  // taking it back at the turn-in would undo the lesson it just taught, and
+  // counting carried copies alone made the objective unfinishable the moment
+  // they equipped it.
+  keepsCollectedItems?: boolean;
   shareable?: boolean; // quest-link sharing allowed (default true; set false to opt out)
   suggestedPlayers?: number; // group quests ("Suggested players: 5")
   // Repeatable quests remain in questsDone as history but become available
@@ -4065,11 +4159,24 @@ export interface Entity extends ClientMirroredEntityFields {
   name: string;
   level: number;
   guild: string;
+  // Guild pledge (docs/prd/guild-pledge-board.md): the guild this character
+  // has publicly pledged to JOIN, '' for none and always '' for members (a
+  // pledge clears on joining any guild). Server-set display only, like guild.
+  pledgeGuild: string;
+  // The guild colour tier for the guild line (sim/guild_tier.ts): derived
+  // from the guild's (or pledged guild's) collective lifetime XP. 0 for the
+  // base look and for the unguilded. Server-set display only.
+  guildTier: number;
   // Book of Deeds display title: a deed id (never display text), null/absent
   // for untitled players and every mob/npc. Written by the sim title setter
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
   // rides the identity wire only when non-null.
   title?: string | null;
+  // Book of Deeds nameplate border: a deed id (never a slug, never display
+  // text), null/absent for borderless players and every mob/npc. Written by
+  // the sim border setter (src/sim/deeds.ts setActiveBorder) and player spawn
+  // from persisted state; rides the identity wire only when non-null.
+  border?: string | null;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -4365,6 +4472,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // piece. A standing wardrobe preference (never auto-cleared), it rides the
   // entity wire (`hh` bit) so peers and portraits present the chosen look.
   helmHidden: boolean;
+  // The authored modular-creator look (characters.appearance column), riding
+  // the identity wire (`app`) so every client in view composes this player's
+  // real body. Deliberately opaque here: the sim never reads it, and typing it
+  // as the render layer's ModularAppearance would put a src/render import into
+  // the sim. Consumers normalize it (normalizeAppearance) before composing.
+  // Null/absent = no authored look; the legacy class rig renders.
+  modularAppearance?: Record<string, unknown> | null;
   // /afk display mirror: true while this player's PlayerMeta.away is in `afk`
   // mode. Kept in lockstep with meta.away by src/sim/social/away.ts so the flag
   // rides the entity (wire `ak` bit) to other clients' nameplates and the social
@@ -4539,6 +4653,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */
   jailed?: boolean;
+  /** Wearing the operator-applied Cheater tag (src/sim/moderation/). Server-set
+   *  via setCheaterMark at join restore and when an operator applies or lifts a
+   *  mark; never true offline, never user-settable. Cosmetic: nothing reads it
+   *  for power, and the countdown lives on the mark's own aura. */
+  cheaterMark?: boolean;
   /** True for a mob spawned BY a delve affix (e.g. Restless Graves' Raised
    *  Bonewalker). Affix re-trigger checks exclude these so an affix-spawned mob's
    *  own death can never re-trigger the same affix (would otherwise chain forever). */
@@ -4586,6 +4705,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // through objectItemId; this authority data never needs to reach clients.
   soulwell?: {
     ownerId: number;
+    partyId: number | null;
     eligiblePlayerIds: number[];
     wardAbsorbPctMax: number;
     wardedPlayerIds: number[];
@@ -4764,6 +4884,17 @@ export interface Entity extends ClientMirroredEntityFields {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  // Curator standing flair (cosmetic, server-set from the character's LIVE
+  // Reliquary ownership; the sim never reads any of it): the Curator rank
+  // (0/undefined = unranked, 1-5 = Apprentice…Eternal Curator) and the
+  // character-scoped completion pair behind it, for the inspect card's
+  // Reliquary line and the rank-5 sigil. Stamped and cleared together
+  // server-side; the wire omits all three for an unranked character, and the
+  // client mirror resolves that to rank 0 with the pair undefined, the same
+  // 0/undefined split as the dev fields above.
+  curatorRank?: number;
+  relicsOwned?: number;
+  relicsTotal?: number;
   // Account flair (cosmetic, operator-set from the admin dashboard; the sim
   // never reads either): the AI-operated mark that prefixes the name with [AI],
   // and an official streamer's platform links for the player menu. `streamerLinks`
@@ -4820,6 +4951,10 @@ export interface NythraxisEncounterState {
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
+  // Players seen alive inside the arena during this pull. Session-only attempt
+  // roster used for raid-wipe recovery, so a remote group member cannot farm
+  // cooldown resets without participating.
+  attemptParticipantIds?: number[];
 }
 
 export type ErrorReason = 'target_dead';
@@ -4919,7 +5054,7 @@ export interface MountRaceSession {
 // coordinates and content-local coordinates at invocation time so operators can
 // group repeated problem spots across separate instance slots. Stable codes only:
 // player-facing prose is assembled by the client i18n catalog.
-export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift';
+export type UnstuckAreaKind = 'overworld' | 'dungeon' | 'delve' | 'rift' | 'battleground';
 
 export interface UnstuckArea {
   kind: UnstuckAreaKind;
@@ -5004,12 +5139,15 @@ export type UnstuckEvent =
 
 // A player resurrection that has been offered but not yet accepted. The Sim owns
 // one authoritative offer per dead target. The cast-time destination is retained
-// only as a fallback if the caster no longer exists when the target accepts.
+// as a fallback if the caster no longer exists, has died, or has left resurrection
+// reach of the body when the target accepts; maxRange is the reach the producing
+// cast enforced, re-applied to the arrival anchor at accept time.
 export interface PendingResurrection {
   casterId: number;
   hpFrac: number;
   fallbackDestination: Vec3;
   expiresAt: number;
+  maxRange: number;
 }
 
 export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist' | 'evade';
@@ -5082,6 +5220,30 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
+  // one of itemId / markId is set for a catalogued relic or authored mark.
+  // pageIds list pages that list the relic; illuminatedPageId is set when a
+  // page became complete on this fill. Never English; presentation only
+  // (sparse self blob is the membership authority).
+  | {
+      type: 'reliquaryUnlock';
+      itemId?: string;
+      markId?: string;
+      pageIds?: string[];
+      illuminatedPageId?: string;
+      /** New cosmetic Curator rank index when this fill crossed a threshold. */
+      curatorRank?: number;
+      /**
+       * Set on the on-join seed pass: the client batches these into one
+       * summary line instead of a toast per relic. The event itself stays
+       * self-scoped (a HEAVY_SELF_EVENTS member), but since Phase 18 the flag
+       * also gates the server's illumination fan-out exactly like
+       * deedUnlocked's: detectActivity broadcasts a first-ever
+       * illuminatedPageId to the earner's guildmates and followers only when
+       * retro is not true (a veteran's on-join seed pass must never marquee).
+       */
+      retro?: boolean;
+    }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from
   // Sim.addItem/addItemInstance's opts param (the one place either gets set):
@@ -5117,7 +5279,16 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
-  | { type: 'error'; text: string; reason?: ErrorReason }
+  | {
+      type: 'error';
+      text: string;
+      reason?: ErrorReason;
+      // Optional stable identity and data for server-authored error events.
+      // `text` remains the compatibility fallback for older or unknown clients.
+      code?: string;
+      channel?: string;
+      retryAfterSeconds?: number;
+    }
   | { type: 'questAccepted'; questId: string }
   | {
       type: 'questProgress';
@@ -5193,7 +5364,16 @@ export type SimEvent = { pid?: number } & (
   | { type: 'bank' }
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
+  // 'listings' carries the board's posted notices verbatim (guild names and
+  // notes are world data, spliced by the client like player names, never
+  // translated); a board with nothing posted stays the bare 'empty' shape.
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  | {
+      type: 'noticeboard';
+      noticeboardId: string;
+      state: 'listings';
+      listings: readonly NoticeboardListing[];
+    }
   | {
       // A world object (a torched murloc hut, q_deepfen_purge) bursts into flames.
       // The renderer plays a fire burst at (x, z). Visual-only.
@@ -5218,6 +5398,12 @@ export type SimEvent = { pid?: number } & (
   // switch stays exhaustively typed. Carries ids and the earner's name only,
   // never deed text: the client composes the line from deed_i18n.
   | { type: 'deedBroadcast'; characterName: string; deedId: string }
+  // A guildmate's or followed friend's FIRST-EVER Reliquary page Illumination
+  // (Phase 18). Emitted only by the server's SocialService, declared here
+  // like deedBroadcast so the one client event switch stays exhaustively
+  // typed. Carries the earner's name and the page id only, never page text:
+  // the client composes the line from reliquary_i18n plus its own chrome key.
+  | { type: 'reliquaryIlluminationBroadcast'; characterName: string; pageId: string }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is
@@ -5238,6 +5424,10 @@ export type SimEvent = { pid?: number } & (
         | 'whisper'
         | 'general'
         | 'party'
+        // Everyone in the sender's battleground, BOTH teams. Cross-team on
+        // purpose: talking to the opposing side is the whole reason it exists
+        // (players were falling back to General for it).
+        | 'battleground'
         | 'guild'
         | 'officer'
         | 'world'
@@ -5437,57 +5627,6 @@ export type SimEvent = { pid?: number } & (
       duration: number;
     }
   // The Vale Cup (docs/prd/vale-cup.md). Queue lifecycle events carry pid
-  // (personal). Match-theatre events (kickoff/goal/save/golden/end) carry a
-  // WORLD x/z anchor at the pitch instead, so walk-up spectators in the
-  // Sowfield stands see the banners and fireworks too (routeEvents delivers
-  // anchored pid-less events to everyone within 90yd).
-  | { type: 'vcupQueued'; bracket: VcBracket; position: number }
-  | { type: 'vcupUnqueued' }
-  | {
-      type: 'vcupFound';
-      bracket: VcBracket;
-      nationA: VcNationId;
-      nationB: VcNationId;
-      team: 'A' | 'B';
-      allies: ArenaCombatant[];
-      enemies: ArenaCombatant[];
-    }
-  | { type: 'vcupCountdown'; seconds: number; x: number; z: number }
-  | { type: 'vcupKickoff'; x: number; z: number }
-  | {
-      type: 'vcupGoal';
-      scorerName: string;
-      team: 'A' | 'B';
-      scoreA: number;
-      scoreB: number;
-      nationA: VcNationId;
-      nationB: VcNationId;
-      x: number;
-      z: number;
-    }
-  | { type: 'vcupSave'; keeperName: string; x: number; z: number }
-  // A spectator's parimutuel wager settled: pid-scoped so it refreshes their purse
-  // and toasts the outcome. payout is the total copper credited (0 on a loss).
-  | {
-      type: 'vcupBetSettled';
-      pid: number;
-      outcome: 'won' | 'lost' | 'refunded';
-      stake: number;
-      payout: number;
-    }
-  | { type: 'vcupGolden'; x: number; z: number }
-  | {
-      type: 'vcupEnd';
-      scoreA: number;
-      scoreB: number;
-      nationA: VcNationId;
-      nationB: VcNationId;
-      winner: 'A' | 'B' | null;
-      x: number;
-      z: number;
-    }
-  // personal outcome line for each fighter (rides beside the anchored vcupEnd)
-  | { type: 'vcupResult'; won: boolean; draw: boolean }
   // Card Duel minigame (src/sim/social/card_duel.ts). Personal (pid), text-free
   // on purpose (the client picks its own audio/copy off the structured
   // fields, same as gatherResult/craftResult above).
@@ -5821,6 +5960,7 @@ export type SimEvent = { pid?: number } & (
       reason?:
         | 'unknown_recipe'
         | 'insufficient_materials'
+        | 'locked'
         | 'combo_requirement_unmet'
         | 'recipe_not_learned'
         | 'throttled'
@@ -5903,7 +6043,8 @@ export type SimEvent = { pid?: number } & (
         | 'not_held'
         | 'throttled'
         | 'no_bag_space'
-        | 'busy';
+        | 'busy'
+        | 'locked';
     }
   // Tool-effect action outcome (the acquisition craft): the one result event
   // for the slot_tool_effect and recharge_tool_effect commands, mirroring
@@ -6388,6 +6529,26 @@ export type SimEvent = { pid?: number } & (
   // the client renders its own one-shot tier-up explainer. Carries no ids beyond
   // the recipient; the persisted one-shot flag guarantees it never re-fires.
   | { type: 'profTierTutorial'; pid: number }
+  // Spawn greeting (tutorial island): fired exactly once per character, on a
+  // genuinely fresh character's first swept tick (sim/tutorial/greeting.ts).
+  // Personal (pid = the newcomer) and text-free: the client renders the
+  // greeter dialog itself, choosing first-character vs refresher copy off
+  // `firstCharacter` (a server-recomputed account fact, never persisted).
+  // The persisted one-shot flag guarantees it never re-fires.
+  | { type: 'tutorialGreeting'; pid: number; firstCharacter: boolean }
+  // Ferry bell homecoming (tutorial island): fired every time the island's
+  // bell sets a player down in Eastbrook town (interactions/ferry_bell.ts).
+  // Personal and text-free: the client decides ONCE per device (localStorage)
+  // to point out the town's twin bell, in case the ride was a misclick.
+  | { type: 'ferryBellHome'; pid: number }
+  // Ferry island arrival (tutorial island): fired every time a ride sets a
+  // player down at the Proving Shore arrival (the greeting ferry and the town
+  // bell alike). Personal and text-free: the client renders Ferryman Odo's
+  // welcome note, which carries the walk and talk controls, whenever
+  // `firstVisit` says this character has not started the shore's rail yet
+  // (interactions/ferry_bell.ts isFirstIslandVisit). Per CHARACTER, not per
+  // device: a new character on a browser that has seen it still gets taught.
+  | { type: 'ferryIslandArrival'; pid: number; firstVisit: boolean }
   // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and
@@ -6504,6 +6665,10 @@ export interface StationDef {
 export interface MailboxDef {
   x: number;
   z: number;
+  /** Optional yaw for the spawned pillar entity (the renderer rotates every
+   *  object by its facing). Omitted means the default 0 the pillars have
+   *  always had; content sets it only where a slot faces the wrong way. */
+  facing?: number;
 }
 
 // Noticeboards currently have one complete cross-platform implementation. Keep
@@ -6543,6 +6708,16 @@ export interface NoticeboardDef {
   height: (typeof EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS)['height'];
   interactionRadius: typeof EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS;
   frontStandingPoint: { x: number; z: number };
+}
+
+/** One posted notice on an interactable noticeboard, carried verbatim on the
+ *  'listings' arm of the noticeboard event: guild names and notes are world
+ *  data the client splices like player names, never translation keys. (A
+ *  board with NO authored listings opens the guild board window instead,
+ *  src/ui/hud/guild_board/; this shape is the authored-notice card only.) */
+export interface NoticeboardListing {
+  guild: string;
+  note: string;
 }
 
 /** A non-interactive authored muster board whose visible footprint is solid. */
@@ -6689,6 +6864,12 @@ export interface SimConfig {
   // scheduler (rift/portals.ts). Default OFF so deterministic tests, parity
   // traces, and the RL env keep a portal-free world unless they opt in.
   riftPortals?: boolean;
+  // Live worlds (server + offline client): the tutorial is COMPULSORY for a
+  // genuinely fresh character (never asked, never skippable): the greeting
+  // sweep ferries a fresh mainland character straight to the Proving Shore.
+  // Default OFF so deterministic tests, parity traces, and the RL env never
+  // teleport a fresh character mid-scenario unless they opt in.
+  compulsoryTutorial?: boolean;
   // Host-computed next raid-reset instant for a given lockout "now" (epoch ms). The
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
@@ -6720,7 +6901,6 @@ export interface SimConfig {
   // of no queue activity, so a walk-up spectator always has a game to watch (and
   // bet on). Server + offline game enable it; tests/goldens leave it off so the
   // idle timer never perturbs a deterministic scenario.
-  valeCupShowcase?: boolean;
 }
 
 export function emptyMoveInput(): MoveInput {
@@ -6955,7 +7135,10 @@ export type DeedStatKey =
   | 'masterworksCrafted'
   | 'salvagesPerformed'
   | 'riftClears'
-  | 'riftSRankClears';
+  | 'riftSRankClears'
+  // Rides home rung on the island ferry bell AFTER the Proving Shore rail is
+  // fully handed in (interactions/ferry_bell.ts): the graduation moment.
+  | 'tutorialGraduations';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -6986,6 +7169,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'salvagesPerformed',
   'riftClears',
   'riftSRankClears',
+  'tutorialGraduations',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new
@@ -7553,12 +7737,6 @@ export interface DrownedLitanyBaptistryState {
   burstIds: number[];
 }
 
-export interface DelveDailyState {
-  date: string;
-  firstClearXp: string[];
-  markClears: number;
-}
-
 export interface DelveCompanionDef {
   id: string;
   name: string;
@@ -7653,8 +7831,6 @@ export const RITE_SHRINE_KINDS: RiteShrineKind[] = [
 /** Player-chosen rite difficulty: more playbacks + shorter for Easy, fewer + longer
  * for Hard. Loot ceiling rises with difficulty (Easy=low, Medium=medium, Hard=premium). */
 export type RiteIntensity = 'easy' | 'medium' | 'hard';
-
-export const RITE_INTENSITIES: RiteIntensity[] = ['easy', 'medium', 'hard'];
 
 /** Per-run Drowned Reliquary Rite puzzle state (DelveRun.drownedLitanyRite). */
 export interface DrownedLitanyRiteState {

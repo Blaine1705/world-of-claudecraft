@@ -180,13 +180,6 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.arenaPage.intro',
   },
   {
-    id: 'vale-cup',
-    sub: 'vale-cup',
-    navKey: 'guide.nav.valeCup',
-    group: 'compete',
-    descKey: 'guide.valeCupPage.intro',
-  },
-  {
     id: 'thornhollow-fields',
     sub: 'thornhollow-fields',
     navKey: 'guide.nav.thornhollow',
@@ -199,6 +192,15 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     navKey: 'guide.nav.deeds',
     group: 'endgame',
     descKey: 'guide.deedsPage.intro',
+  },
+  {
+    id: 'reliquary',
+    sub: 'reliquary',
+    navKey: 'guide.nav.reliquary',
+    // Filed with deeds/dungeons/delves/rifts: the release's sidebar regroup
+    // retired the old catch-all 'compendium' this page was authored into.
+    group: 'endgame',
+    descKey: 'guide.reliquaryPage.intro',
   },
   {
     id: 'controls',

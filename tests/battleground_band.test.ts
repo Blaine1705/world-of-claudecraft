@@ -77,6 +77,7 @@ import {
   TH_PLACEMENTS,
 } from '../src/sim/thornhollow_field.generated';
 import { groundHeight, terrainHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SEED = 42;
 const ORIGIN = battlegroundOrigin(0);
@@ -729,9 +730,10 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
     // deleting the isBgPos guard would leave this green. At seed 42 this span
     // runs into a world prop whose top sits just above the ground eye line and
     // well under a lifted one, so the two arms are only equal because the open
-    // world ignores y.
-    const OPEN_A = { x: -186, z: 168 };
-    const OPEN_B = { x: -166, z: 168 };
+    // world ignores y. (Re-sited from the Eastbrook strait when the Proving
+    // Shore island reshaped that shoreline and cleared the old span's prop.)
+    const OPEN_A = { x: -10, z: 303 };
+    const OPEN_B = { x: 10, z: 303 };
     expect(isBgPos(OPEN_A.x), 'the open-world probe must not be in the band').toBe(false);
     const openGround = lineOfSightClear(
       SEED,
@@ -846,7 +848,13 @@ describe('Thornhollow Fields layout: the combat shape the dressing is laid over'
   });
 
   it('the perimeter rampart holds a mover inside the field', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true, noPlayer: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     for (const [dx, dz] of [
       [1, 0],
       [-1, 0],

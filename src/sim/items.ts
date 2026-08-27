@@ -25,7 +25,8 @@ import {
   stackSizeOf,
 } from './bags';
 import { isRawCookingCatch } from './content/items';
-import { ITEMS } from './data';
+import { ITEMS, NPCS } from './data';
+import { markItemDiscovered } from './deeds';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -41,6 +42,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
@@ -51,12 +53,14 @@ import {
 } from './item_copy_ref';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
+import { isItemLocked } from './item_lock';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
   CONSUME_DURATION,
@@ -67,6 +71,7 @@ import {
   type EquipSlot,
   INTERACT_RANGE,
   type InventoryUnit,
+  type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
   isNonSpellCast,
@@ -81,6 +86,12 @@ import {
 } from './vendor_buy_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+/** Buyback is a movement path (see buyBackItem): it never counts toward a
+ *  Reliquary obtain tally, and a first find it happens to produce lands with
+ *  no clear-count provenance. Shared frozen object so the vendor path does not
+ *  allocate per buyback, mirroring MOVEMENT_GRANT on the inventory hub. */
+const BUYBACK_MOVEMENT = { movement: true } as const;
 
 // The one shared shape (types.ts InventoryUnit): both provenance channels of a
 // single unit lifted out of a slot. Kept as a local alias rather than a second
@@ -273,21 +284,25 @@ export function sellerSignedCharmDeprioritize(
 // a caller switching from those to this is a behavior-preserving swap). The
 // optional `skip` predicate spares any instanced copy it matches, same
 // contract as removePreferFungible's.
-export function removeVendorSellUnits(
-  ctx: SimContext,
+//
+// The INVENTORY-first core is exported separately so the trade window's
+// stage-time preview (social/trade.ts stagedOfferSlots) can run the EXACT
+// selection the swap will run, over a scratch copy of the bags: one walk
+// definition is what keeps the staged display and the moved copies from
+// drifting. The body is a behavior-identical move of the old ctx-taking walk
+// (meta.inventory became the inventory param; the quest hook hoisted to the
+// removeVendorSellUnits wrapper, preserving walk-then-hook order).
+export function removeSellUnitsFromInventory(
+  inventory: InvSlot[],
   itemId: string,
   count: number,
-  pid: number,
   skip?: (instance: ItemInstancePayload) => boolean,
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): VendorRemovedUnit[] {
-  const r = ctx.resolve(pid);
-  if (!r) return [];
-  const { meta } = r;
   const consumed: VendorRemovedUnit[] = [];
   let left = count;
-  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-    const s = meta.inventory[i];
+  for (let i = inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = inventory[i];
     if (s.itemId !== itemId || s.instance) continue;
     const take = Math.min(s.count, left);
     for (let unit = 0; unit < take; unit++) {
@@ -295,7 +310,7 @@ export function removeVendorSellUnits(
     }
     s.count -= take;
     left -= take;
-    if (s.count <= 0) meta.inventory.splice(i, 1);
+    if (s.count <= 0) inventory.splice(i, 1);
   }
   // Two instanced passes over the same highest-index-first order, mirroring
   // removePreferFungible: the preferred class first, then (only if still
@@ -303,8 +318,8 @@ export function removeVendorSellUnits(
   // self-signed charm copies exactly the way a trade does. With no predicate
   // the first pass is the whole old walk.
   const instancedWalk = (takeDeprioritized: boolean): void => {
-    for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
-      const s = meta.inventory[i];
+    for (let i = inventory.length - 1; i >= 0 && left > 0; i--) {
+      const s = inventory[i];
       if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
       if ((deprioritize?.(s.instance) ?? false) !== takeDeprioritized) continue;
       const take = Math.min(s.count, left);
@@ -317,12 +332,32 @@ export function removeVendorSellUnits(
       }
       s.count -= take;
       left -= take;
-      if (s.count <= 0) meta.inventory.splice(i, 1);
+      if (s.count <= 0) inventory.splice(i, 1);
     }
   };
   instancedWalk(false);
   if (deprioritize && left > 0) instancedWalk(true);
-  ctx.onInventoryChangedForQuests?.(meta);
+  return consumed;
+}
+
+export function removeVendorSellUnits(
+  ctx: SimContext,
+  itemId: string,
+  count: number,
+  pid: number,
+  skip?: (instance: ItemInstancePayload) => boolean,
+  deprioritize?: (instance: ItemInstancePayload) => boolean,
+): VendorRemovedUnit[] {
+  const r = ctx.resolve(pid);
+  if (!r) return [];
+  const consumed = removeSellUnitsFromInventory(
+    r.meta.inventory,
+    itemId,
+    count,
+    skip,
+    deprioritize,
+  );
+  ctx.onInventoryChangedForQuests?.(r.meta);
   return consumed;
 }
 
@@ -758,6 +793,14 @@ export function useItem(
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;
   }
+  if (def.use?.type === 'summon') {
+    useBrinyLure(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'passingStone') {
+    usePassingStone(ctx, p, meta);
+    return;
+  }
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
@@ -938,6 +981,16 @@ export function buyItem(
   }
   if (!npc.vendorItems.includes(itemId)) {
     ctx.error(meta.entityId, 'That item is not sold here.');
+    return;
+  }
+  // Quest-gated stock (NpcDef.vendorQuestGates): the row is sold only once
+  // the gating quest is in the buyer's log or done, so a tutorial purchase
+  // cannot be made early and strand the lesson's copper. The vendor window
+  // hides the row off the same def (ui/vendor_stock_gate_core.ts); this is
+  // the authoritative half.
+  const gateQuest = NPCS[npc.templateId ?? '']?.vendorQuestGates?.[itemId];
+  if (gateQuest && !meta.questLog.has(gateQuest) && !meta.questsDone.has(gateQuest)) {
+    ctx.error(meta.entityId, 'That item is not for sale to you yet.');
     return;
   }
   // Dev free-epic vendor: on a dev-command realm this vendor sells its whole
@@ -1175,13 +1228,26 @@ export function sellItem(
   // `?? []`: same contract as social/trade.ts boundCount, a decoupled test ctx
   // may model counts elsewhere and carry no inventory array; its bound count
   // is simply zero and every copy stays sellable.
+  // Locked copies (issue 3042, item_lock.ts) are excluded the same way, and
+  // for the same reason: a player-locked copy is not sellable until unlocked,
+  // exactly like a bound copy is never sellable at all. Classified mutually
+  // exclusive (bound wins when a copy is somehow both) so the exclusion tally
+  // below never double-subtracts one slot's units.
   let boundHeld = 0;
+  let lockedHeld = 0;
   for (const s of meta.inventory ?? []) {
-    if (s.itemId === itemId && s.instance?.boundTo !== undefined) boundHeld += s.count;
+    if (s.itemId !== itemId) continue;
+    if (s.instance?.boundTo !== undefined) boundHeld += s.count;
+    else if (isItemLocked(s.instance)) lockedHeld += s.count;
   }
-  const sellableCount = Math.min(sellCount, available - boundHeld);
+  const sellableCount = Math.min(sellCount, available - boundHeld - lockedHeld);
   if (sellableCount <= 0) {
-    ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
+    ctx.error(
+      meta.entityId,
+      boundHeld > 0
+        ? 'That item is bound and cannot be sold.'
+        : 'That item is locked and cannot be sold.',
+    );
     return;
   }
   // The skip predicate is defence in depth (same as the trade swap): the clamp
@@ -1214,6 +1280,10 @@ export function sellItem(
       ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
       return;
     }
+    if (named?.itemId === itemId && isItemLocked(named.instance)) {
+      ctx.error(meta.entityId, 'That item is locked and cannot be sold.');
+      return;
+    }
     // `!taken` rather than `=== null`: the undefined arm cannot occur inside this
     // branch (slotIndex is defined), and narrowing on it keeps the type honest
     // without an assertion.
@@ -1230,7 +1300,7 @@ export function sellItem(
       itemId,
       sellableCount,
       meta.entityId,
-      (instance) => instance.boundTo !== undefined,
+      (instance) => instance.boundTo !== undefined || isItemLocked(instance),
       // The copy-choice rule on the vendor arm too (the phase 18 whole-branch
       // review): the seller's own self-signed charm copies go last, so selling
       // one of two charms never silently retires the recharge discount.
@@ -1267,10 +1337,11 @@ export function sellItem(
 // The junk-sweep eligibility rule for ONE bag slot, shared by the sim sweep
 // (sellAllJunk below) and the HUD vendor preview (hud.ts renderVendor) so the
 // two surfaces can never drift: gray quality, a sellable kind, and never a
-// soulbound def or a bound copy (instance payload carrying boundTo, the same
-// Maker's Bond gate sellItem applies). No poor-quality def binds or is
-// soulbound in shipped content; the instance arm closes the recorded future
-// hole before content can reopen the buyback wash.
+// soulbound def, a bound copy (instance payload carrying boundTo, the same
+// Maker's Bond gate sellItem applies), or a player-locked copy (issue 3042,
+// item_lock.ts isItemLocked). No poor-quality def binds or is soulbound in
+// shipped content; the instance arms close the recorded future hole before
+// content (or a player's own lock) can reopen the buyback wash.
 export function junkSellableSlot(
   def: ItemDef | undefined,
   slot: { count: number; instance?: ItemInstancePayload },
@@ -1282,6 +1353,7 @@ export function junkSellableSlot(
     !def.noVendorSell &&
     !def.soulbound &&
     slot.instance?.boundTo === undefined &&
+    !isItemLocked(slot.instance) &&
     slot.count > 0
   );
 }
@@ -1321,7 +1393,7 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
       itemId,
       count,
       meta.entityId,
-      (instance) => instance.boundTo !== undefined,
+      (instance) => instance.boundTo !== undefined || isItemLocked(instance),
       // Same copy-choice rule as sellItem; unreachable for charms today
       // (rare quality, never poor), carried for the same-walk symmetry.
       sellerSignedCharmDeprioritize(meta.name, itemId),
@@ -1428,8 +1500,31 @@ export function buyBackItem(
   // inventory slot, so the buyback row's own copy is never aliased.
   addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
   // The silent add bypasses the inventory hub, so credit the discovery
-  // ledger here (an acquisition like any other; the mark is idempotent).
-  ctx.markItemDiscovered(meta, itemId, instance?.rolled?.quality);
+  // ledger here (an acquisition like any other; the mark is idempotent), and
+  // carry the SAME movement provenance the hub would have carried.
+  //
+  // Buyback is MOVEMENT (maintainer, 2026-08-08, superseding the phase file's
+  // grant-path list), which buys two things. No obtain tally: sellItem credits
+  // sellValue and this command charges the same sellValue back, so a
+  // sell/buyback cycle is copper neutral and repeatable without limit, and
+  // counting it would let one player inflate a relic's tally for free, the
+  // same false reading the two-player trade ban exists to prevent. And no
+  // fabricated first-find provenance, which is what the flag below is for.
+  //
+  // A buyback USUALLY cannot produce a first find, because a row gets into the
+  // book through sellItem, which requires the player to have been holding the
+  // item, and anything held has been through a grant or the join-time seed
+  // (which sweeps vendorBuyback itself). But that is not a guarantee: guild
+  // bank withdrawals move items through moveBetweenContainers and never touch
+  // the discovery ledger, so an UNDISCOVERED relic can reach a player's bags,
+  // and selling then buying it back would fire its first-ever discovery here.
+  // Without the flag that first find would stamp whatever the live clear meter
+  // happens to read, inventing provenance on a pure transfer path.
+  //
+  // Called as the deeds MODULE function rather than through ctx, which is the
+  // Phase 10 pattern exactly: the module function carries the opts and the
+  // SimContext seam stays opts-free.
+  markItemDiscovered(ctx, meta, itemId, instance?.rolled?.quality, BUYBACK_MOVEMENT);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({

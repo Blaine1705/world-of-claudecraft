@@ -38,11 +38,13 @@ import {
   configureAdminPlayersCap,
   configureAdminRuntime,
   resetAdminDbForTests,
+  resetAdminGeneralChatRateLimitDepsForTests,
   resetAdminGuildBoardCacheBustForTests,
   resetAdminPlayersCapForTests,
   resetAdminRuntimeForTests,
   routes,
   setAdminDbForTests,
+  setAdminGeneralChatRateLimitDepsForTests,
 } from '../../server/admin';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
 import { characterProfessionsSheet } from '../../server/character_professions';
@@ -134,6 +136,7 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     muteAccountChat: vi.fn(),
     liftChatMuteLive: vi.fn(),
     resetChatStrikesLive: vi.fn(),
+    applyGeneralChatRateLimitLive: vi.fn(),
     reloadChatFilter: vi.fn(async () => {}),
     reloadBlockedIps: vi.fn(async () => {}),
     disconnectByIp: vi.fn(),
@@ -228,6 +231,10 @@ beforeEach(() => {
   resetRateLimits();
   resetAuthFailures();
   resetAdminDbForTests();
+  setAdminGeneralChatRateLimitDepsForTests({
+    set: async (input) => ({ before: null, after: input.rateLimit, changed: true }),
+    isAdminAccount: async () => false,
+  });
 });
 
 afterEach(() => {
@@ -235,6 +242,7 @@ afterEach(() => {
   resetAuthFailures();
   resetRateLimitClock();
   resetAdminDbForTests();
+  resetAdminGeneralChatRateLimitDepsForTests();
   resetAdminRuntimeForTests();
   resetAdminGuildBoardCacheBustForTests();
   resetAdminPlayersCapForTests();
@@ -820,7 +828,10 @@ describe('page/limit pagination contract', () => {
       limit,
       search,
     }));
-    authedAdminDb({ listAccounts });
+    // The caller here is a superadmin (moderation.read held), so the handler
+    // stamps each row's active suspicion-flag count after the list read.
+    const activeSuspicionFlagCounts = vi.fn(async () => new Map<number, number>([[1, 2]]));
+    authedAdminDb({ listAccounts, activeSuspicionFlagCounts });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/accounts', {
       url: '/admin/api/accounts?page=2&limit=10&search=bob',
@@ -828,9 +839,16 @@ describe('page/limit pagination contract', () => {
     });
     expect(r.status).toBe(200);
     expect(listAccounts).toHaveBeenCalledWith('bob', 2, 10, 'id', 'desc');
+    expect(activeSuspicionFlagCounts).toHaveBeenCalledWith([1]);
     expect(r.body).toEqual({
       success: true,
-      data: { rows: [{ id: 1 }], total: 1, page: 2, limit: 10, search: 'bob' },
+      data: {
+        rows: [{ id: 1, activeFlagCount: 2 }],
+        total: 1,
+        page: 2,
+        limit: 10,
+        search: 'bob',
+      },
       error: null,
     });
   });
@@ -866,6 +884,7 @@ describe('page/limit pagination contract', () => {
 
   it('clamps limit to MAX_PAGE_LIMIT (200) and floors page at 1', async () => {
     const listAccounts = vi.fn(async (_s: string, page: number, limit: number) => ({
+      rows: [],
       page,
       limit,
     }));
@@ -880,6 +899,7 @@ describe('page/limit pagination contract', () => {
 
   it('is LENIENT: a non-numeric page/limit DEFAULTS (never 422)', async () => {
     const listAccounts = vi.fn(async (_s: string, page: number, limit: number) => ({
+      rows: [],
       page,
       limit,
     }));
@@ -1948,6 +1968,7 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     const detail = {
       id: 5,
       username: 'bob',
+      generalChatRateLimit: { messages: 5, windowMinutes: 2 },
       lastLoginIp: '1.1.1.1',
       recentSessions: [{ ip: '2.2.2.2' }, { ip: null }],
     };
@@ -1969,7 +1990,10 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     expect(r.body).toEqual({
       success: true,
       data: {
-        account: { ...detail, online: true },
+        account: {
+          ...detail,
+          online: true,
+        },
         reports: [{ id: 11 }],
         chat: { strikes: 1 },
         blockedIps: ['2.2.2.2'],
@@ -1994,7 +2018,9 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
   });
 
   it('accounts/:id merges the live online flag into the detail', async () => {
-    authedAdminDb({ accountDetail: async () => ({ id: 5, username: 'bob' }) });
+    authedAdminDb({
+      accountDetail: async () => ({ id: 5, username: 'bob', generalChatRateLimit: null }),
+    });
     installAdminRuntime({ liveAccountIds: vi.fn(() => new Set([5])) });
     const r = await runRoute('GET', '/admin/api/accounts/:id', {
       headers: { authorization: BEARER },
@@ -2002,7 +2028,7 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
     });
     expect(r.body).toEqual({
       success: true,
-      data: { id: 5, username: 'bob', online: true },
+      data: { id: 5, username: 'bob', generalChatRateLimit: null, online: true },
       error: null,
     });
   });

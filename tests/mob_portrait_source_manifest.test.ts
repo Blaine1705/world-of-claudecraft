@@ -5,6 +5,11 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  type DriftManifest,
+  describeManifestDrift,
+  formatManifestDrift,
+} from '../scripts/lib/mob_portrait_manifest_diff.mjs';
+import {
   assertManifestWriteAuthorized,
   changedPortraitIds,
 } from '../scripts/lib/mob_portrait_manifest_guard.mjs';
@@ -54,20 +59,35 @@ interface PortraitSourceManifest {
 
 const digestPattern = /^[a-f0-9]{64}$/;
 
+function buildLiveManifest(targetPath: string): PortraitSourceManifest {
+  const result = spawnSync(
+    process.execPath,
+    [script, '--write', '--manifest', targetPath, '--bootstrap-reviewed'],
+    { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+  );
+  expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+  return JSON.parse(readFileSync(targetPath, 'utf8')) as PortraitSourceManifest;
+}
+
 describe('mob portrait source manifest', () => {
-  it('is byte-fresh against the live renderer, visual manifest, models, tints, and outputs', () => {
+  it('is fresh (or at worst a bookkeeping-only bundle drift) against the live renderer, visual manifest, models, tints, and outputs', () => {
     const result = spawnSync(process.execPath, [script, '--check'], {
       cwd: repoRoot,
       encoding: 'utf8',
       timeout: 30_000,
     });
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
+    expect(result.stdout).toMatch(/is fresh/);
   });
 
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    expect(liveIds).toHaveLength(230);
+    // 235: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
+    // the Vale Cup by the New Eastbrook program), plus the Proving Shore
+    // tutorial island's training_effigy, shore_scuttler, and mister_crabs
+    // tide-pool miniboss.
+    expect(liveIds).toHaveLength(235);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -222,11 +242,161 @@ describe('mob portrait source manifest', () => {
     );
   });
 
+  // The acceptance is a bundle digest, and esbuild labels bundled modules with paths
+  // relative to absWorkingDir (process.cwd() unless pinned). Before both build sites pinned
+  // it to the repo root, running --check from a subdirectory recomputed a DIFFERENT digest
+  // and reported a false staleness, and a --write from one minted a digest no other run
+  // could reproduce.
+  it('derives the renderer fingerprint independently of the launch directory', () => {
+    const probe = `
+      import { buildPortraitRendererContract, portraitRendererFingerprint } from ${JSON.stringify(
+        join(repoRoot, 'scripts/lib/mob_portrait_jobs.mjs'),
+      )};
+      const contract = await buildPortraitRendererContract(${JSON.stringify(repoRoot)});
+      process.stdout.write(portraitRendererFingerprint(contract));
+    `;
+    const run = (cwd: string) =>
+      spawnSync(process.execPath, ['--input-type=module', '-e', probe], {
+        cwd,
+        encoding: 'utf8',
+        timeout: 120_000,
+      });
+
+    const fromRepoRoot = run(repoRoot);
+    const fromSubdirectory = run(join(repoRoot, 'src'));
+    expect(fromRepoRoot.status, fromRepoRoot.stderr).toBe(0);
+    expect(fromSubdirectory.status, fromSubdirectory.stderr).toBe(0);
+    expect(fromRepoRoot.stdout).toMatch(digestPattern);
+    expect(fromSubdirectory.stdout).toBe(fromRepoRoot.stdout);
+  }, 150_000);
+
+  it('treats a bookkeeping-only renderer bundle drift as fresh instead of failing --check', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-check-'));
+    try {
+      const current = buildLiveManifest(join(tempDir, 'live.json'));
+      const bookkeepingDrifted = structuredClone(current);
+      bookkeepingDrifted.rendererFingerprint = 'stale-bookkeeping-fingerprint';
+      bookkeepingDrifted.renderer.browserBundle = {
+        ...bookkeepingDrifted.renderer.browserBundle,
+        sha256: 'stale-bookkeeping-bundle-hash',
+      };
+      const bookkeepingManifest = join(tempDir, 'bookkeeping.json');
+      writeFileSync(bookkeepingManifest, `${JSON.stringify(bookkeepingDrifted, null, 2)}\n`);
+
+      const bookkeepingResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', bookkeepingManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(
+        bookkeepingResult.status,
+        `${bookkeepingResult.stdout}\n${bookkeepingResult.stderr}`,
+      ).toBe(0);
+      expect(bookkeepingResult.stdout).toContain('bookkeeping-only');
+
+      const realDrift = structuredClone(bookkeepingDrifted);
+      realDrift.portraits[0] = {
+        ...realDrift.portraits[0],
+        output: { ...realDrift.portraits[0].output, sha256: 'a-real-changed-output-hash' },
+      };
+      const realDriftManifest = join(tempDir, 'real-drift.json');
+      writeFileSync(realDriftManifest, `${JSON.stringify(realDrift, null, 2)}\n`);
+
+      const realDriftResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', realDriftManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(realDriftResult.status).toBe(1);
+      expect(realDriftResult.stderr).toContain(realDrift.portraits[0].id);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a fingerprint-only corruption (bundle digest unchanged) as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-fingerprint-only-'));
+    try {
+      const current = buildLiveManifest(join(tempDir, 'live.json'));
+      const fingerprintOnlyCorrupted = structuredClone(current);
+      fingerprintOnlyCorrupted.rendererFingerprint = '0'.repeat(64);
+      const corruptedManifest = join(tempDir, 'fingerprint-only.json');
+      writeFileSync(corruptedManifest, `${JSON.stringify(fingerprintOnlyCorrupted, null, 2)}\n`);
+
+      const result = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', corruptedManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a changed browser bundle entry (non-digest metadata) as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-bundle-metadata-'));
+    try {
+      const current = buildLiveManifest(join(tempDir, 'live.json'));
+      const metadataCorrupted = structuredClone(current);
+      metadataCorrupted.rendererFingerprint = 'stale-bookkeeping-fingerprint';
+      metadataCorrupted.renderer.browserBundle = {
+        ...metadataCorrupted.renderer.browserBundle,
+        // A legitimate digest move, paired with a corrupted (never-legitimate) entry path.
+        // The check must still reject this: entry is provenance, not digest, and cannot be
+        // waved through just because the digest fields also changed.
+        sha256: 'stale-bookkeeping-bundle-hash',
+        entry: 'scripts/render_finder_portraits_corrupted.mjs',
+      };
+      const corruptedManifest = join(tempDir, 'bundle-metadata.json');
+      writeFileSync(corruptedManifest, `${JSON.stringify(metadataCorrupted, null, 2)}\n`);
+
+      const result = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', corruptedManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('never treats a missing or unparseable manifest as a bookkeeping-only drift', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-missing-'));
+    try {
+      const missingManifest = join(tempDir, 'does-not-exist.json');
+      const missingResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', missingManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(missingResult.status).toBe(1);
+      expect(missingResult.stderr).toContain('is stale');
+      expect(missingResult.stdout).not.toContain('bookkeeping-only');
+
+      const unparseableManifest = join(tempDir, 'not-json.json');
+      writeFileSync(unparseableManifest, 'not valid json');
+      const unparseableResult = spawnSync(
+        process.execPath,
+        [script, '--check', '--manifest', unparseableManifest],
+        { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
+      );
+      expect(unparseableResult.status).toBe(1);
+      expect(unparseableResult.stdout).not.toContain('bookkeeping-only');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   it('routes the real --write CLI through receipt authorization before touching its target', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'wocc-portrait-manifest-'));
     try {
-      const canonicalBytes = readFileSync(manifestPath);
-      const current = JSON.parse(canonicalBytes.toString('utf8')) as PortraitSourceManifest;
+      const liveManifestPath = join(tempDir, 'live.json');
+      const current = buildLiveManifest(liveManifestPath);
+      const liveBytes = readFileSync(liveManifestPath);
       const prior = structuredClone(current);
       prior.portraits[0].sourceFingerprint = 'stale-source-fingerprint';
       const tempManifest = join(tempDir, 'manifest.json');
@@ -269,9 +439,114 @@ describe('mob portrait source manifest', () => {
         { cwd: repoRoot, encoding: 'utf8', timeout: 30_000 },
       );
       expect(accepted.status, `${accepted.stdout}\n${accepted.stderr}`).toBe(0);
-      expect(readFileSync(tempManifest)).toEqual(canonicalBytes);
+      expect(readFileSync(tempManifest)).toEqual(liveBytes);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+});
+
+// A stale acceptance used to report only two hashes, which reads the same whether the
+// portraits regressed or an unrelated source edit moved the bundle. These pin the
+// classification that tells those apart, per dimension.
+describe('portrait manifest drift explanation', () => {
+  const baseline = (): DriftManifest => ({
+    schemaVersion: 2,
+    bootstrapReview: { path: 'review.md', bytes: 10, sha256: 'review-a' },
+    rendererFingerprint: 'fingerprint-a',
+    renderer: {
+      trackedFiles: [
+        { path: 'scripts/render_finder_portraits.mjs', bytes: 5, sha256: 'tracked-a' },
+      ],
+      browserBundle: {
+        entry: 'scripts/wiki/stills_render_entry.js',
+        bytes: 100,
+        sha256: 'bundle-a',
+      },
+    },
+    portraitCount: 2,
+    portraits: [
+      {
+        id: 'alpha',
+        sourceFingerprint: 'source-alpha',
+        output: { bytes: 10, sha256: 'out-alpha' },
+      },
+      { id: 'beta', sourceFingerprint: 'source-beta', output: { bytes: 20, sha256: 'out-beta' } },
+    ],
+  });
+
+  const withMovedBundle = (): DriftManifest => {
+    const next = baseline();
+    next.rendererFingerprint = 'fingerprint-b';
+    next.renderer.browserBundle = {
+      entry: 'scripts/wiki/stills_render_entry.js',
+      bytes: 101,
+      sha256: 'bundle-b',
+    };
+    return next;
+  };
+
+  const BOOKKEEPING_LINE = 'No portrait row and no shipped image byte changed';
+
+  it('calls a bundle-only drift bookkeeping, with no row and no tracked-file change', () => {
+    const drift = describeManifestDrift(baseline(), withMovedBundle());
+    expect(drift.bookkeepingOnly).toBe(true);
+    expect(drift.bundleChanged).toBe(true);
+    expect(drift.fingerprintChanged).toBe(true);
+    expect(drift.changedRows).toEqual([]);
+    expect(drift.changedTrackedFiles).toEqual([]);
+    expect(formatManifestDrift(drift)).toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict when a shipped portrait output moved', () => {
+    const next = withMovedBundle();
+    next.portraits[1].output = { bytes: 21, sha256: 'out-beta-2' };
+    const drift = describeManifestDrift(baseline(), next);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.changedRows).toEqual([{ id: 'beta', sourceChanged: false, outputChanged: true }]);
+    const text = formatManifestDrift(drift);
+    expect(text).toContain('beta');
+    expect(text).not.toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict when a portrait source fingerprint moved', () => {
+    const next = withMovedBundle();
+    next.portraits[0].sourceFingerprint = 'source-alpha-2';
+    const drift = describeManifestDrift(baseline(), next);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.changedRows).toEqual([{ id: 'alpha', sourceChanged: true, outputChanged: false }]);
+    expect(formatManifestDrift(drift)).not.toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict when a tracked renderer file moved', () => {
+    const next = withMovedBundle();
+    next.renderer.trackedFiles = [
+      { path: 'scripts/render_finder_portraits.mjs', bytes: 6, sha256: 'tracked-b' },
+    ];
+    const drift = describeManifestDrift(baseline(), next);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.changedTrackedFiles).toEqual(['scripts/render_finder_portraits.mjs']);
+    const text = formatManifestDrift(drift);
+    expect(text).toContain('scripts/render_finder_portraits.mjs');
+    expect(text).not.toContain(BOOKKEEPING_LINE);
+  });
+
+  it('withholds the bookkeeping verdict on a schema or portrait-count move', () => {
+    const migrated = withMovedBundle();
+    migrated.schemaVersion = 3;
+    expect(describeManifestDrift(baseline(), migrated).bookkeepingOnly).toBe(false);
+    expect(describeManifestDrift(baseline(), migrated).schemaChanged).toBe(true);
+
+    const grown = withMovedBundle();
+    grown.portraitCount = 3;
+    grown.portraits.push({
+      id: 'gamma',
+      sourceFingerprint: 'source-gamma',
+      output: { bytes: 30, sha256: 'out-gamma' },
+    });
+    const drift = describeManifestDrift(baseline(), grown);
+    expect(drift.bookkeepingOnly).toBe(false);
+    expect(drift.portraitCountChanged).toBe(true);
+    expect(drift.changedRows).toEqual([{ id: 'gamma', sourceChanged: true, outputChanged: true }]);
   });
 });

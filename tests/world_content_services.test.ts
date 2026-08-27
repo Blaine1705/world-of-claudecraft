@@ -8,7 +8,6 @@ import {
 } from '../src/sim/data';
 import { isAtStation, stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
-import { VALE_CUP_BRAM_ID } from '../src/sim/social/vale_cup';
 import {
   assertCanonicalEastbrookNoticeboardDef,
   emptyZoneProps,
@@ -17,6 +16,16 @@ import {
   type WorldContent,
 } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
+
+function civicPlacements(
+  mailboxes = BUILTIN_WORLD.services?.mailboxes ?? [],
+  noticeboards = BUILTIN_WORLD.services?.noticeboards ?? [],
+) {
+  return [
+    ...mailboxes.map(({ x, z }) => ({ kind: 'mailbox' as const, x, z })),
+    ...noticeboards.map(({ x, z }) => ({ kind: 'noticeboard' as const, x, z })),
+  ];
+}
 
 function worldWithoutServices(): WorldContent {
   return {
@@ -108,8 +117,10 @@ describe('WorldContent static gameplay services', () => {
     expect(entitiesWithTemplate(sim, 'noticeboard_eastbrook')).toHaveLength(
       BUILTIN_WORLD.services?.noticeboards?.length ?? 0,
     );
+    expect(sim.civicServicePlacements).toEqual(
+      civicPlacements([], BUILTIN_WORLD.services?.noticeboards ?? []),
+    );
     expect(entitiesWithTemplate(sim, 'spirit_healer')).toEqual([]);
-    expect(entitiesWithTemplate(sim, 'groundskeeper_bram')).toEqual([]);
     expect({ x: sim.player.pos.x, z: sim.player.pos.z }).toEqual(world.playerStart);
 
     sim.player.dead = true;
@@ -118,6 +129,22 @@ describe('WorldContent static gameplay services', () => {
 
     expect(sim.player.ghost).toBe(true);
     expect({ x: sim.player.pos.x, z: sim.player.pos.z }).toEqual(world.playerStart);
+  });
+
+  it('combines cfg-world mailboxes with the active noticeboards it actually spawns', () => {
+    const world = worldWithoutServices();
+    const mailbox = { x: 111, z: 44 };
+    world.services = { mailboxes: [mailbox] };
+
+    const sim = new Sim({ seed: 71, playerClass: 'warrior', world });
+
+    expect(sim.civicServicePlacements).toEqual(
+      civicPlacements([mailbox], BUILTIN_WORLD.services?.noticeboards ?? []),
+    );
+    expect(entitiesWithTemplate(sim, 'mailbox')).toHaveLength(1);
+    expect(entitiesWithTemplate(sim, 'noticeboard_eastbrook')).toHaveLength(
+      BUILTIN_WORLD.services?.noticeboards?.length ?? 0,
+    );
   });
 
   it('honors a cfg.world-only custom graveyard for healer spawn and spirit release', () => {
@@ -222,28 +249,6 @@ describe('WorldContent static gameplay services', () => {
     );
   });
 
-  it('spawns the groundskeeper definition from cfg.world rather than built-in data', () => {
-    const world = worldWithoutServices();
-    world.npcs = {
-      groundskeeper_bram: {
-        ...BUILTIN_WORLD.npcs.groundskeeper_bram,
-        name: 'Custom Groundskeeper',
-        pos: { x: 40, z: 40 },
-        facing: Math.PI / 3,
-      },
-    };
-
-    const sim = new Sim({ seed: 71, playerClass: 'warrior', world });
-    const bram = sim.entities.get(VALE_CUP_BRAM_ID);
-
-    expect(bram).toMatchObject({
-      kind: 'npc',
-      name: 'Custom Groundskeeper',
-      facing: Math.PI / 3,
-    });
-    expect({ x: bram?.pos.x, z: bram?.pos.z }).toEqual(world.npcs.groundskeeper_bram.pos);
-  });
-
   it('keeps built-in services unchanged after restoring the default world', () => {
     setActiveWorldContent(worldWithoutServices());
     setActiveWorldContent(null);
@@ -293,11 +298,15 @@ describe('WorldContent static gameplay services', () => {
       noPlayer: true,
       world: custom,
     });
+    const builtinCivic = builtin.civicServicePlacements;
+    const explicitCivic = explicit.civicServicePlacements;
 
     // The editor/render registry is mutable, but it cannot retarget gameplay
     // authorization, later joins, or release destinations in an existing Sim.
     setActiveWorldContent(custom);
     expect(builtin.stationPlacements).toBe(STATIONS);
+    expect(builtin.civicServicePlacements).toBe(builtinCivic);
+    expect(explicit.civicServicePlacements).toBe(explicitCivic);
     const builtinPid = builtin.addPlayer('warrior', 'Builtin');
     const builtinPlayer = builtin.entities.get(builtinPid);
     expect(builtinPlayer && { x: builtinPlayer.pos.x, z: builtinPlayer.pos.z }).toEqual(
@@ -312,6 +321,8 @@ describe('WorldContent static gameplay services', () => {
 
     setActiveWorldContent(null);
     expect(explicit.stationPlacements).toEqual([customStation]);
+    expect(builtin.civicServicePlacements).toBe(builtinCivic);
+    expect(explicit.civicServicePlacements).toBe(explicitCivic);
     const customPid = explicit.addPlayer('warrior', 'Custom');
     const customPlayer = explicit.entities.get(customPid);
     expect(customPlayer && { x: customPlayer.pos.x, z: customPlayer.pos.z }).toEqual(

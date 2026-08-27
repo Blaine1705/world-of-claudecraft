@@ -15,6 +15,7 @@ import {
   runWithStatementTimeout,
   saveWorldState,
 } from './db';
+import type { GeneralChatRateLimit } from './general_chat_quota_db';
 import { REALM } from './realm';
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
@@ -697,6 +698,9 @@ export interface AdminAccountRow {
   characterCount: number;
   maxLevel: number;
   playtimeSeconds: number;
+  // The materialised account_wealth total (purse + mail/market escrow; see
+  // server/account_wealth_db.ts). 0 until the first sweep writes the row.
+  totalCopper: number;
   // Operator-set account flair. The list carries only the two flags (the links
   // themselves ride the detail response, where the edit form reads them).
   isAi: boolean;
@@ -911,7 +915,9 @@ const ACCOUNT_SORT_COLUMNS: Record<AdminAccountSort, string> = {
   playtime_seconds: 'playtime_seconds',
   created_at: 'a.created_at',
   last_login: 'a.last_login',
+  total_copper: 'total_copper',
 };
+const POSTGRES_INT_MAX = 2_147_483_647;
 
 export async function listAccounts(
   search: string,
@@ -920,7 +926,17 @@ export async function listAccounts(
   sort: AdminAccountSort = 'id',
   dir: AdminAccountSortDirection = sort === 'username' ? 'asc' : 'desc',
 ): Promise<Paginated<AdminAccountRow>> {
-  const pattern = search ? `%${escapeLike(search)}%` : '%';
+  // Trimmed ahead of the empty check so a whitespace-only search from either
+  // dispatch arm takes the no-search predicate below, never the search arm.
+  const term = search.trim();
+  const pattern = term ? `%${escapeLike(term)}%` : '%';
+  // An all-digits search additionally matches an exact account id or character
+  // id, so admins can paste an id from a report and land on the account; the
+  // username/character-name partial match still applies alongside.
+  const numericSearch =
+    /^\d+$/.test(term) && Number.isSafeInteger(Number(term)) && Number(term) <= POSTGRES_INT_MAX
+      ? Number(term)
+      : null;
   const offset = (page - 1) * limit;
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
   const column = ACCOUNT_SORT_COLUMNS[sort];
@@ -934,25 +950,46 @@ export async function listAccounts(
   // just repeat "a.id DESC, a.id DESC", so it is the whole ORDER BY on its own.
   const order =
     sort === 'id' ? `a.id ${direction}` : `${column} ${direction}${nullsPolicy}, a.id ${direction}`;
+  // Shared by the page and count queries so the two can never disagree.
+  // $1 = ILIKE pattern, and the last parameter is the exact-id arm (NULL when
+  // the search is not numeric). With NO search term the predicate stays the
+  // pre-search shape (a plain ILIKE '%' over username): the default listing is
+  // the most-opened page in the dashboard and must not pay the correlated
+  // character-match subqueries it is not using. The id parameter is still
+  // referenced (always NULL here) so both queries keep a fixed bind count.
+  const matchSql = (idParam: string) =>
+    term === ''
+      ? `(a.username ILIKE $1 AND ${idParam}::int IS NULL)`
+      : `(
+       a.username ILIKE $1
+       OR EXISTS (SELECT 1 FROM characters cs WHERE cs.account_id = a.id AND cs.name ILIKE $1)
+       OR (${idParam}::int IS NOT NULL AND (a.id = ${idParam}
+           OR EXISTS (SELECT 1 FROM characters ci WHERE ci.account_id = a.id AND ci.id = ${idParam})))
+     )`;
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
               a.banned_at, a.suspended_until, a.is_ai, a.is_streamer,
               count(c.id)::int AS character_count,
               COALESCE(max(c.level), 0)::int AS max_level,
+              COALESCE(w.total_copper, 0)::bigint AS total_copper,
               (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                          FROM play_sessions s WHERE s.account_id = a.id), 0)
                + COALESCE((SELECT sum(t.playtime_seconds)
                            FROM play_session_totals t WHERE t.account_id = a.id), 0))::bigint AS playtime_seconds
        FROM accounts a
        LEFT JOIN characters c ON c.account_id = a.id
-       WHERE a.username ILIKE $1
-       GROUP BY a.id
+       LEFT JOIN account_wealth w ON w.account_id = a.id
+       WHERE ${matchSql('$4')}
+       GROUP BY a.id, w.total_copper
        ORDER BY ${order}
        LIMIT $2 OFFSET $3`,
-      [pattern, limit, offset],
+      [pattern, limit, offset, numericSearch],
     ),
-    pool.query(`SELECT count(*)::int AS total FROM accounts WHERE username ILIKE $1`, [pattern]),
+    pool.query(`SELECT count(*)::int AS total FROM accounts a WHERE ${matchSql('$2')}`, [
+      pattern,
+      numericSearch,
+    ]),
   ]);
   return {
     rows: rows.rows.map((r) => ({
@@ -966,6 +1003,7 @@ export async function listAccounts(
       characterCount: r.character_count,
       maxLevel: r.max_level,
       playtimeSeconds: Number(r.playtime_seconds),
+      totalCopper: Number(r.total_copper),
       isAi: r.is_ai === true,
       isStreamer: r.is_streamer === true,
     })),
@@ -1126,6 +1164,7 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  generalChatRateLimit: GeneralChatRateLimit | null;
   // Operator-set account flair, as the dashboard's edit form needs to read it back:
   // the two flags plus the stored links. The links are re-normalized on the way out
   // (normalizeAccountFlair), so a value that could not survive the write gate is not
@@ -1135,6 +1174,11 @@ export interface AccountDetail {
   streamerLinks: StreamerLinks;
   dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
+  // The operator-applied Cheater mark (accounts.cheater_mark_*): the remaining
+  // played-second budget, the audited reason, and when it was applied. Null when
+  // the account is not marked, so the dashboard can branch apply-vs-lift the way
+  // it does for dailyRewardsBan.
+  cheaterMark: { secondsRemaining: number; reason: string; setAt: string | null } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -1442,15 +1486,22 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 COALESCE(chat_mute_reason, '') AS chat_mute_reason,
                 COALESCE(chat_strikes, 0) AS chat_strikes,
                 is_ai, is_streamer, streamer_links,
+                general_chat_quota.messages AS general_chat_quota_messages,
+                general_chat_quota.window_minutes AS general_chat_quota_window_minutes,
                 active_daily_rewards_ban.daily_rewards_ban_reason,
                 active_daily_rewards_ban.daily_rewards_banned_at,
                 active_daily_rewards_ban.daily_rewards_ban_expires_at,
+                cheater_mark_seconds,
+                COALESCE(cheater_mark_reason, '') AS cheater_mark_reason,
+                cheater_mark_set_at,
                 last_login_ip,
                 (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
                            FROM play_sessions s WHERE s.account_id = accounts.id), 0)
                  + COALESCE((SELECT sum(t.playtime_seconds)
                              FROM play_session_totals t WHERE t.account_id = accounts.id), 0))::bigint AS playtime_seconds
          FROM accounts
+         LEFT JOIN account_general_chat_rate_limits general_chat_quota
+           ON general_chat_quota.account_id = accounts.id
          LEFT JOIN LATERAL (
            SELECT reason AS daily_rewards_ban_reason,
                   created_at AS daily_rewards_banned_at,
@@ -1533,6 +1584,13 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
     chatMutedUntil: a.chat_muted_until,
     chatMuteReason: a.chat_mute_reason,
     chatStrikes: Number(a.chat_strikes ?? 0),
+    generalChatRateLimit:
+      a.general_chat_quota_messages == null
+        ? null
+        : {
+            messages: Number(a.general_chat_quota_messages),
+            windowMinutes: Number(a.general_chat_quota_window_minutes),
+          },
     isAi: flair.ai,
     isStreamer: flair.streamer,
     streamerLinks: flair.links,
@@ -1549,6 +1607,14 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       reason: String(row.reason),
       createdAt: row.created_at,
     })),
+    cheaterMark:
+      Number(a.cheater_mark_seconds) > 0
+        ? {
+            secondsRemaining: Number(a.cheater_mark_seconds),
+            reason: String(a.cheater_mark_reason),
+            setAt: a.cheater_mark_set_at ?? null,
+          }
+        : null,
     lastLoginIp: a.last_login_ip ?? null,
     playtimeSeconds: Number(a.playtime_seconds),
     characters: characters.rows.map((c) => ({

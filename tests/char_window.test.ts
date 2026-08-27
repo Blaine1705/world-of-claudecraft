@@ -67,6 +67,79 @@ describe('char_window: WCAG 2.2 AA', () => {
   });
 });
 
+describe('char_window: paperdoll helm-visibility eye', () => {
+  function renderHelmetSlot(helmSlotAvailable: boolean) {
+    let canvasContext: unknown;
+    canvasContext = new Proxy(
+      {},
+      {
+        get: () => () => canvasContext,
+        set: () => true,
+      },
+    );
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+    const root = document.createElement('div');
+    const world = {
+      cfg: { playerClass: 'rogue' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      professionsState: { skills: [] },
+    };
+    const win = new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmSlotAvailable: () => helmSlotAvailable,
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
+      itemIcon: () => '',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+    win.render();
+    return root;
+  }
+
+  it('omits the eye for a class kit with no head piece to hide (issue: hide helmet does nothing)', () => {
+    const root = renderHelmetSlot(false);
+    expect(root.querySelector('.equip-helm-eye')).toBeNull();
+  });
+
+  it('shows the eye for a class kit that has a head piece', () => {
+    const root = renderHelmetSlot(true);
+    expect(root.querySelector('.equip-helm-eye')).not.toBeNull();
+  });
+});
+
 describe('char_window: profession art placements', () => {
   it('renders gathering rows with their dedicated painted icons', () => {
     expect(painter).toMatch(/professionImageUrl\(`gather_\$\{r\.professionId\}`\)/);
@@ -81,7 +154,7 @@ describe('char_window: profession art placements', () => {
     expect(painter).toContain('alt=""');
   });
 
-  it('paints the exact four gathering assets and replaces the inline pair crest', () => {
+  it('paints the exact gathering, Honor, and archetype identities', () => {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -99,7 +172,7 @@ describe('char_window: profession art placements', () => {
       cfg: { playerClass: 'warrior' },
       player: { name: 'Aurelia', level: 60, skin: 0 },
       equipment: {},
-      honor: 0,
+      honor: 187,
       archetypeTitle: 'weaponcrafting+armorcrafting' as string | null,
       hobbyCraft: 'jewelcrafting',
       selectedMount: () => null,
@@ -135,9 +208,11 @@ describe('char_window: profession art placements', () => {
       openPlayerCard: vi.fn(),
       openPrestige: vi.fn(),
       openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => true,
@@ -149,6 +224,23 @@ describe('char_window: profession art placements', () => {
     });
 
     win.render();
+    const honorBalance = root.querySelector<HTMLElement>('.char-honor-balance');
+    expect(honorBalance?.textContent).toContain('187');
+    expect(
+      [...(honorBalance?.querySelectorAll<HTMLImageElement>('img') ?? [])].map((img) => ({
+        className: img.className,
+        src: img.getAttribute('src'),
+        alt: img.getAttribute('alt'),
+        draggable: img.getAttribute('draggable'),
+      })),
+    ).toEqual([
+      {
+        className: 'currency-inline currency-honor',
+        src: '/ui/currency/honor.webp',
+        alt: '',
+        draggable: 'false',
+      },
+    ]);
     expect(
       [...root.querySelectorAll<HTMLImageElement>('.char-gather-icon')].map((img) =>
         img.getAttribute('src'),
@@ -240,9 +332,11 @@ describe('char_window: profession art placements', () => {
       openPlayerCard: vi.fn(),
       openPrestige: vi.fn(),
       openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => true,
@@ -335,6 +429,139 @@ describe('char_window: paperdoll core + HUD-owned preview boundary', () => {
     expect(painter).not.toMatch(/from\s+['"]three['"]/);
     expect(painter).not.toMatch(/\bCharacterPreview\b/);
     expect(painter).not.toMatch(/\bMath\.random\b/);
+  });
+});
+
+describe('char_window: focus carried across the 2 Hz rebuild', () => {
+  function canvasStub(): void {
+    let canvasContext: unknown;
+    canvasContext = new Proxy({}, { get: () => () => canvasContext, set: () => true });
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(canvasContext as never);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue(
+      'data:image/png;base64,stub',
+    );
+  }
+
+  function makeWin(root: HTMLElement): CharWindow {
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Aurelia', level: 60, skin: 0 },
+      equipment: {},
+      honor: 0,
+      archetypeTitle: null,
+      hobbyCraft: null,
+      selectedMount: () => null,
+      ownedMounts: () => [],
+      selectMount: () => {},
+      professionsState: { skills: [] },
+    };
+    return new CharWindow({
+      root: () => root,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      slotName: (slot) => slot,
+      statCellHtml: () => '',
+      statTooltipHtml: () => '',
+      talentSummaryHtml: () => '',
+      progressionHtml: () => '',
+      unequip: vi.fn(),
+      beginUnequipDrag: vi.fn(),
+      endUnequipDrag: vi.fn(),
+      renderPreview: vi.fn(),
+      renderSkinPicker: vi.fn(),
+      openPlayerCard: vi.fn(),
+      openPrestige: vi.fn(),
+      openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
+      dragState: new ItemDragState(),
+      renderBags: vi.fn(),
+      showError: vi.fn(),
+      helmSlotAvailable: () => true,
+      helmHidden: () => false,
+      toggleHelm: vi.fn(),
+      playtimeVisible: () => true,
+      togglePlaytimeVisible: vi.fn(),
+      itemIcon: () => 'data:image/png;base64,stub',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: vi.fn(),
+    });
+  }
+
+  it('keeps focus on the same control when a signature repaint rebuilds the sheet', () => {
+    // The behavioral arm for the latch's new trigger rate: refreshCharSheetIfChanged
+    // calls renderIfOpen within 500 ms of any signed surface moving, so a
+    // keyboard user with focus inside the sheet hits this path ROUTINELY. The
+    // rebuilt-element inequality below is the proof this is a real innerHTML
+    // wipe and not a no-op the assertion would pass vacuously.
+    canvasStub();
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    try {
+      const win = makeWin(root);
+      win.render();
+      const share = root.querySelector<HTMLElement>('[data-act="share-card"]');
+      expect(share, 'the share control must exist to focus').not.toBeNull();
+      share?.focus();
+      expect(document.activeElement).toBe(share);
+      win.render();
+      const rebuilt = root.querySelector<HTMLElement>('[data-act="share-card"]');
+      expect(rebuilt).not.toBeNull();
+      expect(rebuilt, 'the repaint must really rebuild the control').not.toBe(share);
+      expect(document.activeElement).toBe(rebuilt);
+    } finally {
+      document.body.removeChild(root);
+    }
+  });
+
+  it('falls back to Close for a focused control without a data-act identity', () => {
+    // The ladder's second rung, pinned on the close button itself: it carries
+    // data-close and no data-act, so the same-act arm cannot match it and the
+    // fallback must land on the REBUILT close button (the not.toBe is the
+    // vacuity guard proving a real wipe happened). Trimming the fallback out
+    // of restoreFirstEnabled's candidate list reds here and nowhere else.
+    canvasStub();
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    try {
+      const win = makeWin(root);
+      win.render();
+      const close = root.querySelector<HTMLElement>('[data-close]');
+      expect(close, 'the close control must exist to focus').not.toBeNull();
+      close?.focus();
+      expect(document.activeElement).toBe(close);
+      win.render();
+      const rebuilt = root.querySelector<HTMLElement>('[data-close]');
+      expect(rebuilt).not.toBeNull();
+      expect(rebuilt, 'the repaint must really rebuild the control').not.toBe(close);
+      expect(document.activeElement).toBe(rebuilt);
+    } finally {
+      document.body.removeChild(root);
+    }
+  });
+
+  it('leaves focus alone when it sits OUTSIDE the sheet', () => {
+    // The negative arm: a repaint while the player types in chat or targets
+    // the world must not steal focus into the sheet.
+    canvasStub();
+    const root = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.appendChild(root);
+    document.body.appendChild(outside);
+    try {
+      const win = makeWin(root);
+      win.render();
+      outside.focus();
+      expect(document.activeElement).toBe(outside);
+      win.render();
+      expect(document.activeElement).toBe(outside);
+    } finally {
+      document.body.removeChild(root);
+      document.body.removeChild(outside);
+    }
   });
 });
 
@@ -534,9 +761,11 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       openPlayerCard: vi.fn(),
       openPrestige: vi.fn(),
       openDeeds: vi.fn(),
+      openReliquary: vi.fn(),
       dragState: new ItemDragState(),
       renderBags: vi.fn(),
       showError: vi.fn(),
+      helmSlotAvailable: () => true,
       helmHidden: () => false,
       toggleHelm: vi.fn(),
       playtimeVisible: () => visible,

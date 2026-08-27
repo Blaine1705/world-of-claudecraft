@@ -27,6 +27,17 @@
 // are never touched here, so folding the resource-type class into toggleClass does
 // not clobber the low-power pulse.
 
+import {
+  type BorderAccent,
+  borderAccent,
+  DEED_HERALDRY_ATTR,
+  DEED_HERALDRY_EDGE_PROP,
+  DEED_HERALDRY_FRAME_PROP,
+  DEED_HERALDRY_GLOW_PROP,
+  DEED_HERALDRY_MOTIF_ATTR,
+  DEED_HERALDRY_WELL_FILL,
+  DEED_HERALDRY_WELL_PROP,
+} from './deed_border_view';
 import type { PainterHostWriters } from './painter_host';
 import type { UnitFrameView } from './unit_frame';
 
@@ -38,6 +49,15 @@ const OVERSHIELD_CLASS = 'overshield';
 // Frame-state classes target/party need; the player always passes them off.
 const DEAD_CLASS = 'dead';
 const OUT_OF_RANGE_CLASS = 'oor';
+// The Book of Deeds portrait accent. The ATTRIBUTE carries the slug (the CSS ring
+// rule gates on a non-empty value) and the three custom properties carry that
+// slug's palette, so hud.css holds ONE ring treatment and zero per-slug colors:
+// deed_border_view.ts stays the single source of truth. Exported so the styles
+// test can pin the CSS against these exact names rather than a copy of them.
+export const PORTRAIT_BORDER_ATTR = DEED_HERALDRY_ATTR;
+export const PORTRAIT_BORDER_FRAME_PROP = DEED_HERALDRY_FRAME_PROP;
+export const PORTRAIT_BORDER_EDGE_PROP = DEED_HERALDRY_EDGE_PROP;
+export const PORTRAIT_BORDER_GLOW_PROP = DEED_HERALDRY_GLOW_PROP;
 
 /** The optional resource-bar elements (a target frame has none). */
 export interface UnitFrameResourceElements {
@@ -48,6 +68,20 @@ export interface UnitFrameResourceElements {
   /** The resource text node; omitted by a frame whose resource bar has no text
    *  label (a party frame shows the bar fill only, no "523 / 600" readout). */
   text?: HTMLElement;
+}
+
+/** Optional Deed Heraldry DOM hosts. Player and valid player-target instances
+ *  supply these beside `portraitBorder`; party, pet, and target-of-target omit
+ *  them and pay no writes. SVG paths are typed as HTMLElement because the shared
+ *  writer facet's setAttr slot accepts HTMLElement, while the runtime nodes only
+ *  require Element.setAttribute. */
+export interface UnitFrameHeraldryElements {
+  /** Name-row-only material and quiet pattern host. */
+  nameHeader: HTMLElement;
+  /** Motif path inside the circular seal at the portrait/name joint. */
+  sealMotif: HTMLElement;
+  /** Enlarged motif path behind the name header. */
+  headerPattern: HTMLElement;
 }
 
 /** The DOM element set one unit frame instance paints into. */
@@ -72,6 +106,19 @@ export interface UnitFrameElements {
    *  node (setText clobbers children). */
   titlePre?: HTMLElement;
   titlePost?: HTMLElement;
+  /** The operator-applied Cheater tag span on the name line, written from the
+   *  view's pre-localized `cheaterTag`; omitted by frames with no tag surface,
+   *  which then pay zero writes. Its own span, never folded into titlePre: a
+   *  sanction and a chosen title must be styled and cleared independently. */
+  cheaterTag?: HTMLElement;
+  /** The portrait accent host (the `.portrait-wrap`), which carries the Book of
+   *  Deeds border ring; omitted by frames with no border surface, which then pay
+   *  zero writes. Never the `.portrait` itself: its border-color / box-shadow are
+   *  claimed by the combat / elite / boss states. */
+  portraitBorder?: HTMLElement;
+  /** The joint seal and name-header reveal. Omitted with `portraitBorder` by
+   *  non-player frame instances. */
+  heraldry?: UnitFrameHeraldryElements;
   /** The absorb-shield overlay; omitted by a frame with no shield bar (party). */
   absorb?: HTMLElement;
   /** The resource bar group; omitted by a frame with no resource bar (target). */
@@ -126,6 +173,8 @@ export class UnitFramePainter {
     if (this.el.name) this.writers.setText(this.el.name, view.name);
     if (this.el.titlePre) this.writers.setText(this.el.titlePre, view.titlePre);
     if (this.el.titlePost) this.writers.setText(this.el.titlePost, view.titlePost);
+    if (this.el.cheaterTag) this.writers.setText(this.el.cheaterTag, view.cheaterTag);
+    this.paintHeraldry(view);
     this.gatePortrait(view.portraitKey);
     this.writers.setText(this.el.level, view.levelText ?? '');
     this.writers.setTransform(this.el.hpFill, this.barScaleX(view.hpFrac));
@@ -136,6 +185,31 @@ export class UnitFramePainter {
       this.writers.toggleClass(this.el.frame, DEAD_CLASS, view.dead);
       this.writers.toggleClass(this.el.frame, OUT_OF_RANGE_CLASS, view.outOfRange);
     }
+  }
+
+  // The two-scale player-frame reveal: fine portrait ring plus the canonical joint
+  // seal and a name-row-only motif. The PALETTE gates every host, so stale or
+  // uncolorable slugs clear to the exact borderless form. No local slug latch: every
+  // write goes through the multi-slot elision caches.
+  private paintHeraldry(view: UnitFrameView): void {
+    const accent = borderAccent(view.borderSlug);
+    const slug = accent ? view.borderSlug : '';
+    const portrait = this.el.portraitBorder;
+    if (portrait) this.paintHeraldryTokens(portrait, slug, accent);
+    const heraldry = this.el.heraldry;
+    if (!heraldry) return;
+    this.paintHeraldryTokens(heraldry.nameHeader, slug, accent);
+    this.writers.setAttr(heraldry.sealMotif, 'd', accent?.motifPath ?? '');
+    this.writers.setAttr(heraldry.headerPattern, 'd', accent?.motifPath ?? '');
+  }
+
+  private paintHeraldryTokens(host: HTMLElement, slug: string, accent: BorderAccent | null): void {
+    this.writers.setAttr(host, PORTRAIT_BORDER_ATTR, slug);
+    this.writers.setAttr(host, DEED_HERALDRY_MOTIF_ATTR, accent?.motif ?? '');
+    this.writers.setStyleProp(host, PORTRAIT_BORDER_FRAME_PROP, accent?.frame ?? '');
+    this.writers.setStyleProp(host, PORTRAIT_BORDER_EDGE_PROP, accent?.edge ?? '');
+    this.writers.setStyleProp(host, PORTRAIT_BORDER_GLOW_PROP, accent?.glow ?? '');
+    this.writers.setStyleProp(host, DEED_HERALDRY_WELL_PROP, accent ? DEED_HERALDRY_WELL_FILL : '');
   }
 
   // The shield overlay: a scaleX transform to (hp + absorb)/maxHp plus the

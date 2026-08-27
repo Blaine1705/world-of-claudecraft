@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed (mirrors tests/snapshots.test.ts).
 vi.mock('../server/db', () => ({
+  DATABASE_URL: 'postgres://metrics-test.invalid/test',
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
@@ -100,8 +101,14 @@ function sourceOver(server: GameServer): GameStateSource {
     wsConnections: () => server.clients.size,
     simEntities: () => server.sim.entities.size,
     simTickHz: () => server.simTickHz(),
+    savePendingKeys: () => server.characterSaveQueues.pendingKeys(),
+    escrowGateInFlight: () => 0,
     tickPhaseMillis: () => server.tickPhaseMillis(),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
+    generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
+    generalChatQuotaInFlight: () => server.generalChatQuotaInFlight(),
+    generalChatQuotaCachedAccounts: () => server.generalChatQuotaCachedAccounts(),
+    generalChatQuotaListener: () => ({ connected: 0, reconnects: 0, pendingRefreshes: 0 }),
     lastTickAt: () => server.lastTickAt(),
     loopStartedAt: () => server.loopStartedAt(),
     guildBankLogCache: () => ({
@@ -418,15 +425,21 @@ function recordingSink() {
     wsMessageDropped(cause) {
       dropped.push(cause);
     },
+    wocEscrowQueue() {},
     wsRateKick() {
       rateKicks++;
     },
     wsInputSeqGap(missed) {
       seqGaps.push(missed);
     },
+    // Not exercised here: the refusal site has its own recording-sink pins in
+    // tests/rift_forge_gate.test.ts.
+    riftForgeRefused() {},
     chatMessage() {
       chats++;
     },
+    generalChatQuota() {},
+    generalChatQuotaDbCall() {},
     characterCreated() {},
     guildBankIncident() {},
     copperCredited(source, amount) {

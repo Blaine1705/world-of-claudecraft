@@ -39,6 +39,7 @@
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
+import { CHEATER_MARK_AURA_ID } from '../moderation';
 import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -48,7 +49,11 @@ import { isStunned } from './cc';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
-import { detonateOssuaryMark, OSSUARY_MARK_ABILITY_ID } from './necromancy';
+import {
+  detonateOssuaryMark,
+  OSSUARY_MARK_ABILITY_ID,
+  regenerateSoulFragmentsOutOfCombat,
+} from './necromancy';
 import { tickPaladinOathChainPull } from './paladin_control';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
@@ -78,6 +83,7 @@ const FRIENDLY_NPC_REJECTED_AURA_KINDS: ReadonlySet<AuraKind> = new Set([
   'bleed_vuln',
   'corrode',
   'faerie_fire',
+  'melting_acid',
   'spellvuln',
   'vulnerability',
   'tongues',
@@ -92,6 +98,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
   regenerateRuinOutOfCombat(ctx, p, meta);
+  regenerateSoulFragmentsOutOfCombat(ctx, p, meta);
   // Lifesap restores whichever resource bar is currently live, including across
   // form changes. Hard control stills the sap rather than banking free resource.
   if (!isStunned(p)) {
@@ -414,6 +421,12 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       const liveIndex = e.auras.indexOf(a);
       if (liveIndex < 0) continue;
       e.auras.splice(liveIndex, 1);
+      // The Cheater mark's aura IS its countdown, so its natural expiry is the
+      // moment the sanction is served: drop the wire flag here rather than
+      // deriving it from a per-snapshot aura scan in identityFields, which would
+      // put an array walk on every entity of every snapshot to answer a question
+      // that changes twice in a sanction's life.
+      if (a.id === CHEATER_MARK_AURA_ID) e.cheaterMark = undefined;
       priestOnAuraEnded(ctx, e, a);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });

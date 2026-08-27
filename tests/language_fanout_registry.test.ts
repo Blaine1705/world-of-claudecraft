@@ -62,10 +62,24 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readMethodCallSites } from './helpers/method_call_sites';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const uiRoot = fileURLToPath(new URL('../src/ui/', import.meta.url));
 const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const strippedHudSource = stripComments(hudSource);
+const uiTsFiles = [...tsFilesUnder(uiRoot)];
+const uiSources = uiTsFiles.map(({ file, full }) => ({
+  file,
+  full,
+  source: stripComments(readFileSync(full, 'utf8')),
+}));
+const hudFieldsByClass = new Map<string, string[]>();
+for (const [, field, constructed] of strippedHudSource.matchAll(/(\w+)\s*=\s*new (\w+)\(/g)) {
+  const fields = hudFieldsByClass.get(constructed) ?? [];
+  fields.push(field);
+  hudFieldsByClass.set(constructed, fields);
+}
 
 // Raw source to the parser (a `//` inside one of hud.ts's regex literals or
 // template strings truncates a line for a comment stripper, and ts.createSourceFile
@@ -73,11 +87,11 @@ const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'ut
 // source only for the text pins further down.
 const scan = readMethodCallSites('src/ui/hud.ts', hudSource, 'Hud', 'refreshLocalizedDynamicUi');
 
-function stripComments(source: string): string {
-  // The `(^|[^:])` capture keeps a `://` in a URL from eating the rest of its
-  // line, the stripper bug this repo already shipped once (#2499).
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-}
+// Comment stripping goes through the shared single-pass helper
+// (tests/helpers/strip_comments.ts): line comments strip in the same pass as
+// block comments, so a bare /* inside a line comment cannot open a phantom
+// block that hides a gated module from the discovery sweep (the src/main.ts
+// hazard class), and the `(^|[^:])` guard keeps `://` URLs intact (#2499).
 
 // --- half 1: the fan-out's arms -------------------------------------------
 
@@ -85,17 +99,20 @@ function stripComments(source: string): string {
 const FANOUT_ARMS: readonly string[] = [
   'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
+  'this.wocMarketWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
-  'this.updateQuestTracker|',
+  'this.questTracker.relocalize|',
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
+  'this.riftPainter.relocalize|',
   // One arm for every MovableFrame in the HUD: the three unit frames and the
   // frames the "Unlock interface" option governs all register with the same
-  // coordinator, which forwards relocalize() to each of them.
+  // coordinator, which forwards relocalize() to each of them (superseding the
+  // three per-mover arms the pre-merge release listed).
   'this.interfaceUnlock.relocalize|',
   'this.targetAurasWindow.relocalize|',
   'this.doomMeter.relocalize|',
@@ -111,31 +128,36 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
+  // The Reliquary cold window is signature-gated (lastSig); language switch
+  // must force render while open so curator rank chrome and shelf labels re-t().
+  'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',
   // The crafting window's repaint memos are all text-independent (station
   // set, reagent sig, profession surface sig), so an open window kept the
   // previous locale until data moved; the forced rebuild re-runs every t(),
   // identity card included (the phase 22 QA arm).
   "this.renderCrafting|$('#crafting-window').style.display === 'flex'",
   'this.updateDeedTracker|',
+  // The Reliquary tracker is the same always-on strip: its header label, hints,
+  // and per-row page names all resolve at paint, so one forced repaint here
+  // keeps the strip from showing the previous language for up to a slow tick.
+  'this.updateReliquaryTracker|',
   'this.charWindow.renderIfOpen|',
   'this.arenaWindow.relocalize|',
   'this.dungeonFinderWindow.relocalize|',
   'this.dungeonFinderProposalPopup.relocalize|',
   'this.bgProposalPopup.relocalize|',
-  'this.valeCupWindow.relocalize|',
-  'this.vcupBetting.relocalize|',
-  'this.vcupIndicator.relocalize|',
-  'this.vcupMatchHud.relocalize|',
-  'this.vcupBriefing.relocalize|',
-  'this.vcupCharge.relocalize|',
   'this.questDialog.relocalize|',
   'this.calendarWindow.relocalize|',
   'this.mailboxWindow.relocalize|',
   'this.socialWindow.relocalize|',
   'this.cardDuelWindow.relocalize|',
   'this.spellbookWindow.relocalize|',
+  'this.barEditorWindow.relocalize|',
   'this.lockpickController.relocalize|',
   'this.tutorial.relocalize|',
+  'this.bootcamp.relocalize|',
+  'this.noticeboardPopup.relocalize|',
+  'this.guildBoardWindow.relocalize|',
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
@@ -165,8 +187,7 @@ interface GatedModule {
 
 function discoverGatedModules(): GatedModule[] {
   const out: GatedModule[] = [];
-  for (const { file, full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  for (const { file, source } of uiSources) {
     if (!EMITS_TEXT.test(source)) continue;
     const declared = [...source.matchAll(MEMO_DECL)].map((m) => m[1]);
     // A memo is only a REPAINT gate when the module compares it. A retained
@@ -214,6 +235,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the race id, the phase and the whole second remaining, so the time-left line never moves with the locale',
   },
   {
+    file: 'bootcamp.ts',
+    memos: ['lastCounts'],
+    answer: 'this.bootcamp.relocalize',
+    why: 'the gauntlet flag tally that keys the ferryman guide reactions; the locale never moves a flag count, and relocalize() repaints the card and clears the interact bubble memo so every localized string re-renders',
+  },
+  {
     file: 'arena_window.ts',
     memos: ['lastSig'],
     answer: 'this.arenaWindow.relocalize',
@@ -242,6 +269,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.deedsWindow.render',
     why: 'the earned/watched deed ids and their counters',
+  },
+  {
+    file: 'reliquary_window.ts',
+    memos: ['lastAnnounced', 'lastSig'],
+    answer: 'this.reliquaryWindow.render',
+    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome; lastAnnounced holds the LOCALIZED live-region line, but the fan-out render is argument-less (the player-driven arm), which recomputes and rewrites the region unconditionally, so the memo cannot pin stale-language text past a switch',
   },
   {
     file: 'dungeon_finder_proposal_popup.ts',
@@ -299,9 +332,15 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'market_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastSig', 'lastSellPriceRefSig'],
     answer: 'this.marketWindow.render',
-    why: 'the listing ids, prices and the active tab; render() carries no self-gate',
+    why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig',
+  },
+  {
+    file: 'woc_market_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.wocMarketWindow.relocalize',
+    why: 'the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature',
   },
   {
     file: 'professions_window.ts',
@@ -320,36 +359,6 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['knownIds', 'knownNums', 'lastAttackOnBar', 'lastHasFree', 'lastSlotIds'],
     answer: 'this.spellbookWindow.relocalize',
     why: 'the resolved ability ids and their rank/cost/cast/cooldown numbers, plus the hotbar toggle state (#2529)',
-  },
-  {
-    file: 'vale_cup_betting.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBetting.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and a skeleton of each team roster',
-  },
-  {
-    file: 'vale_cup_briefing.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupBriefing.relocalize',
-    why: 'the two nation ids, the away-palette flag, the local team and role, the format and a skeleton of each roster',
-  },
-  {
-    file: 'vale_cup_hud.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupMatchHud.relocalize',
-    why: 'the match id, the two nation ids, the away-palette flag and the local team, pipe-joined',
-  },
-  {
-    file: 'vale_cup_indicator.ts',
-    memos: ['lastSig'],
-    answer: 'this.vcupIndicator.relocalize',
-    why: 'a hidden sentinel or the bracket, queue position and waiting count. The clock is deliberately out of it and rides the elided setText instead',
-  },
-  {
-    file: 'vale_cup_window.ts',
-    memos: ['lastSig'],
-    answer: 'this.valeCupWindow.relocalize',
-    why: 'standing, queue state, bracket, position, queue sizes, the deserter timer, nation, role and the live match scores',
   },
 ];
 
@@ -373,9 +382,21 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
 }> = [
   {
     file: 'movable_frame.ts',
-    memos: ['lastHoverCursor'],
+    memos: ['lastBottom', 'lastHoverCursor'],
     reason:
-      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor keywords (ew-resize, nwse-resize, ...), which are never localized, and every MovableFrame label already rides the interface_unlock relocalize() fan-out arm. Nothing about this memo holds text.',
+      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor keywords (ew-resize, nwse-resize, ...), which are never localized. lastBottom retains the frame bottom edge in visual px for reanchorBottom, a pure coordinate. Every MovableFrame label already rides the interface_unlock relocalize() fan-out arm; neither memo holds text.',
+  },
+  {
+    file: 'map_semantic_accessibility_core.ts',
+    memos: ['lastHash', 'lastLanguage'],
+    reason:
+      'lastHash retains the text-independent marker summary signature, while lastLanguage is compared against getLanguage() in the same early-return guard. A locale switch always moves lastLanguage and rebuilds every localized label on the next map paint, so the gate is explicitly locale-aware rather than a stale-language hazard.',
+  },
+  {
+    file: 'hud/quest/quest_tracker_controller.ts',
+    memos: ['lastHtml'],
+    reason:
+      'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
   },
   {
     file: 'claudium_window.ts',
@@ -414,6 +435,18 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateDeedTracker.',
   },
   {
+    file: 'reliquary_tracker_painter.ts',
+    memos: ['lastChip'],
+    reason:
+      'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateReliquaryTracker.',
+  },
+  {
+    file: 'hud/woc_trade/woc_trade_controller.ts',
+    memos: ['lastTradeSig'],
+    reason:
+      'the trade window repaint signature: it reads no text at all (offer structs, staged items and copper, acceptance flags, partner, the staged quote and consent structural state), so a locale switch cannot move it, and there is deliberately no fan-out arm, exactly as when the method lived on hud.ts. A live trade re-renders in the new locale on the next data motion (either offer, stake, or acceptance change; the standing-offer poll adoption; the 2s poll makes an ACTIVE deal converge within a beat). RE-JUDGED TWICE by the UX-honesty pass, which added the consent row and the quote review to this arm: both of those faces are deliberately STATIC (the staged quote waits for a human and polls keep, the consent row keeps the price outside the signature), so each can sit indefinitely in a stale locale, including a player who switches language to READ the terms and then accepts a label rendered in the language they left. The posture still stands, on narrower grounds: the consent SEND carries a boolean judged by the server, never the label text, and the surface is the short-lived two-player trade window. The polish pass owns the real fix, a self-gated relocalize() with form_draft.ts carrying the price field, if the stale-idle residue is judged worth the behavior change.',
+  },
+  {
     file: 'hud.ts',
     memos: 'coordinator',
     reason:
@@ -440,12 +473,57 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     expect(main).toContain('async function changeLanguage(');
   });
 
-  it('wires the fan-out to the woc:languagechange event exactly once', () => {
-    const wiring = stripComments(hudSource).match(
-      /document\.addEventListener\('woc:languagechange'/g,
+  it('loads all three locale-chunk families before it flips the language', () => {
+    // This registry is about REPAINT, and a repaint cannot show bytes that are
+    // not resident: `changeLanguage` must await the catalog chunk AND every
+    // content channel (deed names, reliquary page names) before setLanguage,
+    // or the fan-out repaints the picked locale with the previous one's page
+    // and deed names. Nothing in half 1 or half 2 covers chunk loading, so a
+    // dropped loader would leave every other pin here green. The content
+    // channels ride CONTENT_LOCALE_CHANNEL_ENSURERS; the membership pin below
+    // holds that list, and this regex holds the await shape. Matched by regex
+    // over the function body so a reflow cannot break it.
+    const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+    const start = main.indexOf('async function changeLanguage(');
+    expect(start, 'changeLanguage was renamed or removed').toBeGreaterThan(-1);
+    const end = main.indexOf('\n}\n', start);
+    expect(end, 'changeLanguage body did not close').toBeGreaterThan(start);
+    const body = main.slice(start, end);
+    expect(body).toMatch(
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\s*\(ensure\)\s*=>\s*ensure\(selected\),?\s*\),?\s*\]\);/,
     );
+    // The await must PRECEDE the flip: hoisting setLanguage above it would
+    // repaint the picked locale with the previous locale's resident chunks.
+    // indexOf on a missing flip returns -1, which fails the comparison loudly.
+    expect(body.indexOf('await Promise.all([')).toBeLessThan(body.indexOf('setLanguage(selected)'));
+  });
+
+  it('registers both content channels in CONTENT_LOCALE_CHANNEL_ENSURERS, by identity', async () => {
+    // The await-shape regex above proves main.ts drains the registry; this pin
+    // proves the registry actually CONTAINS every content channel, so removing
+    // one from the list (which would quietly stop its chunk loading at all
+    // three main.ts sites) reds here. Identity, not name: a re-export of the
+    // wrong function would pass a name check.
+    const [{ CONTENT_LOCALE_CHANNEL_ENSURERS }, { ensureDeedLocalesLoaded }, reliquary] =
+      await Promise.all([
+        import('../src/ui/locale_channels'),
+        import('../src/ui/deed_i18n'),
+        import('../src/ui/reliquary_i18n'),
+      ]);
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(ensureDeedLocalesLoaded);
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(reliquary.ensureReliquaryLocalesLoaded);
+    // Distinctness: a channel re-exporting the other's ensure would satisfy
+    // both toContain rows and the length while loading only one table.
+    expect(ensureDeedLocalesLoaded).not.toBe(reliquary.ensureReliquaryLocalesLoaded);
+    // Snug: exactly the two shipped channels today, so an accidental duplicate
+    // (double fetch per flip) or a silent drop both fail.
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toHaveLength(2);
+  });
+
+  it('wires the fan-out to the woc:languagechange event exactly once', () => {
+    const wiring = strippedHudSource.match(/document\.addEventListener\('woc:languagechange'/g);
     expect(wiring, 'hud.ts no longer listens for woc:languagechange').toHaveLength(1);
-    expect(stripComments(hudSource)).toContain(
+    expect(strippedHudSource).toContain(
       "document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());",
     );
   });
@@ -506,7 +584,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // src/ui is the one DEEP scan root in this repo, so the floor has to sit
     // above what a NON-recursive read returns (about 300 top-level files today)
     // or it cannot detect the failure its own message names.
-    const corpus = tsFilesUnder(uiRoot);
+    const corpus = uiTsFiles;
     expect(corpus.length, 'the src/ui walk came back short').toBeGreaterThan(400);
     expect(
       corpus.filter((f) => f.file.includes('/')).length,
@@ -579,6 +657,21 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
         );
       }
     }
+    // The exempt rows hold the SAME pin: their own doc says the exemption was
+    // granted about specific fields, so a module that grows a second compared
+    // memo must not inherit an answer given about a different one. Without
+    // this arm the new gate would be absorbed silently ('coordinator' rows
+    // are the one shape with no field list to compare).
+    for (const row of NOT_A_LANGUAGE_GATE) {
+      if (row.memos === 'coordinator') continue;
+      const found = discoveredByFile.get(row.file);
+      if (!found) continue; // reported by the stale-row test above
+      if (found.memos.join(',') !== [...row.memos].sort().join(',')) {
+        drift.push(
+          `${row.file}: exemption ${row.memos.join(',')} vs source ${found.memos.join(',')}`,
+        );
+      }
+    }
     expect(
       drift,
       'a classified module gained or lost a repaint memo. A NEW memo is a NEW gate and needs the language question answered about it, not inherited from the answer given about a different field:\n' +
@@ -615,16 +708,35 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // the read-only note is a live region on the demotion-edge paint, never
       // what is drawn; BankWindow.render repaints the pane wholesale and the
       // fan-out already drives it).
-      // 7 as of the bags Sort button: bags_window's `lastSortBaseline`
+      // 7 as of the Reliquary HUD tracker: reliquary_tracker_painter carries the
+      // deed tracker's `lastChip` memo verbatim (the header ARIA presence swap,
+      // no player text), and the fan-out drives it through
+      // this.updateReliquaryTracker.
+      // 8 as of the bags Sort button: bags_window's `lastSortBaseline`
       // gates only whether the one-shot settle ANIMATION plays (which draws
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-      // 8 as of the edge-resize hover: movable_frame's `lastHoverCursor`
-      // elides an inline CSS cursor-keyword write and can never hold text;
-      // the frame's t() labels already ride the interface_unlock
-      // relocalize() arm.
-    ).toBe(8);
+      // 9 as of the woc_trade extraction: the trade window's `lastTradeSig`
+      // moved verbatim off the coordinator (where the blanket hud.ts row
+      // covered it) into hud/woc_trade/woc_trade_controller.ts, carrying the
+      // coordinator-era posture unchanged; the row states the reasoning and
+      // the deferred relocalize call.
+      // 10 as of the v0.38.0 sync merge, which brought in map semantic
+      // accessibility: lastHash is paired with lastLanguage in the same
+      // guard, so getLanguage() changing explicitly invalidates the
+      // localized summary without a separate fan-out arm. Each side of the
+      // merge had added one row (woc_trade above, the map core here), so the
+      // merged list carries both.
+      // 11 as of the quest tracker's lastHtml repaint memo (the island coach
+      // glow strobe fix): the memo holds the freshly BUILT html, which
+      // embeds every t() string, so a locale switch moves the comparison
+      // itself and the tracker repaints with no fan-out arm.
+      // 12 as of the v0.41.0 sync merge, which folded in the edge-resize
+      // hover row: movable_frame's `lastHoverCursor` elides an inline CSS
+      // cursor-keyword write and can never hold text; the frame's t() labels
+      // already ride the interface_unlock relocalize() arm.
+    ).toBe(12);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {
@@ -634,20 +746,17 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     const armCalls = new Set(scan.sites.map((s) => s.call));
     const uncalled: string[] = [];
     const scanned: string[] = [];
-    for (const { file, full } of tsFilesUnder(uiRoot)) {
-      const source = stripComments(readFileSync(full, 'utf8'));
+    const ownedRelocalizeClasses = relocalizeOwnedClasses(armCalls);
+    for (const { file, source } of uiSources) {
       if (!/^\s{2}relocalize\(/m.test(source)) continue;
       scanned.push(file);
       const cls = /export class (\w+)/.exec(source)?.[1] ?? '';
       // Map the class back to the Hud field that holds it, then look for an arm
       // on that field. A module whose relocalize is reached through a wrapper
       // (LockpickWindow via LockpickController) is credited by the wrapper's arm.
-      const fields = [...stripComments(hudSource).matchAll(/(\w+)\s*=\s*new (\w+)\(/g)]
-        .filter(([, , constructed]) => constructed === cls)
-        .map(([, field]) => field);
+      const fields = hudFieldsByClass.get(cls) ?? [];
       const credited =
-        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) ||
-        [...armCalls].some((c) => c.endsWith('.relocalize') && wrapperOwns(c, cls));
+        fields.some((f) => armCalls.has(`this.${f}.relocalize`)) || ownedRelocalizeClasses.has(cls);
       if (!credited) uncalled.push(`${file} (${cls || 'unnamed class'})`);
     }
     // The filter above is the whole test: an empty `uncalled` proves nothing if
@@ -673,19 +782,53 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
  * name, so renaming LockpickController to something else keeps working and
  * gutting its forwarding call does not.
  */
-function wrapperOwns(armCall: string, cls: string): boolean {
+/** The other way a Hud field gets filled: a BUILDER in a sibling module
+ *  constructs the painter and hands it back, which is how the mobile action ring
+ *  is composed now that its construction lives behind the action_bar seam. Chase
+ *  the same chain the coordinator does (field <- builder result <- builder
+ *  function <- the module that news the class) so the credit stays a proof, not
+ *  an exemption. */
+function relocalizeOwnedClasses(armCalls: ReadonlySet<string>): Set<string> {
+  const owned = new Set<string>();
+  for (const armCall of armCalls) {
+    if (!armCall.endsWith('.relocalize')) continue;
+    for (const cls of builderOwnedClasses(armCall)) owned.add(cls);
+    for (const cls of wrapperOwnedClasses(armCall)) owned.add(cls);
+  }
+  return owned;
+}
+
+function builderOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
   const field = armCall.slice('this.'.length, -'.relocalize'.length);
-  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(
-    stripComments(hudSource),
-  );
-  if (!constructed) return false;
-  for (const { full } of tsFilesUnder(uiRoot)) {
-    const source = stripComments(readFileSync(full, 'utf8'));
+  const hud = strippedHudSource;
+  const assigned = new RegExp(`\\b${field}\\s*=\\s*(\\w+)\\.\\w+;`).exec(hud);
+  if (!assigned) return owned;
+  const built = new RegExp(`\\b${assigned[1]}\\s*=\\s*(\\w+)\\(`).exec(hud);
+  if (!built) return owned;
+  for (const { source } of uiSources) {
+    if (!new RegExp(`export function ${built[1]}\\b`).test(source)) continue;
+    for (const [, cls] of source.matchAll(/\bnew (\w+)\(/g)) owned.add(cls);
+    return owned;
+  }
+  return owned;
+}
+
+function wrapperOwnedClasses(armCall: string): Set<string> {
+  const owned = new Set<string>();
+  const field = armCall.slice('this.'.length, -'.relocalize'.length);
+  const constructed = new RegExp(`\\b${field}\\s*=\\s*new (\\w+)\\(`).exec(strippedHudSource);
+  if (!constructed) return owned;
+  for (const { source } of uiSources) {
     if (!new RegExp(`export class ${constructed[1]}\\b`).test(source)) continue;
     // The wrapper must both hold one of these and forward to it.
-    return (
-      new RegExp(`:\\s*${cls}\\b|new ${cls}\\(`).test(source) && /\.relocalize\(\)/.test(source)
-    );
+    if (!/\.relocalize\(\)/.test(source)) return owned;
+    if (/:\s*\b/.test(source)) owned.add('');
+    for (const match of source.matchAll(/:\s*(\w+)\b|\bnew (\w+)\(/g)) {
+      const cls = match[1] ?? match[2];
+      if (cls) owned.add(cls);
+    }
+    return owned;
   }
-  return false;
+  return owned;
 }

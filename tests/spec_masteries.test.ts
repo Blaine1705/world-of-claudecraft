@@ -84,7 +84,7 @@ describe('spec masteries', () => {
     // crit-triggered burn (ignitionPct) plus a static +2% crit chance, not the old
     // Afterflame crit-damage bonus.
     expect(TALENTS.mage?.specs.find((s) => s.id === 'fire')?.mastery.effect).toEqual({
-      global: { ignitionPct: 0.4 },
+      global: { ignitionPct: 0.3 },
       stats: { crit: 0.02 },
     });
     expect(TALENTS.mage?.specs.find((s) => s.id === 'frost')?.mastery.effect).toEqual({
@@ -117,7 +117,7 @@ describe('spec masteries', () => {
     // on the warrior), and without a stamina multiplier Faithwarden sat at 76% of
     // the prot warrior's effective HP.
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
-      global: { threatPct: 0.5 },
+      global: { threatPct: 0.4 },
       stats: { armorPct: 0.2, staPct: 0.35 },
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
@@ -146,12 +146,13 @@ describe('spec masteries', () => {
         { ability: 'crippling_poison', dmgPct: 0.1 },
       ],
     });
-    // Balance pass: tuned down plus the Duskveil stealth-speed identity.
+    // Balance pass: tuned down plus the Duskveil stealth-speed identity, now the
+    // full removal of the stealth slow (buffPct 1 doubles the 0.5 aura to 1.0).
     expect(TALENTS.rogue?.specs.find((s) => s.id === 'subtlety')?.mastery.effect).toEqual({
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 0.5 },
-        { ability: 'vanish', buffPct: 0.5 },
+        { ability: 'stealth', buffPct: 1 },
+        { ability: 'vanish', buffPct: 1 },
       ],
     });
     expect(TALENTS.priest?.specs.find((s) => s.id === 'holy')?.mastery.effect).toEqual({
@@ -170,7 +171,7 @@ describe('spec masteries', () => {
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'feral')?.mastery.effect).toEqual({
-      global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.2 },
+      global: { meleeDmgPct: 0.5, dotDmgPct: 0.5, threatPct: 0.45 },
       // The v0.27 Dire Bruin retune rides the mastery now that the old
       // feral_choice_bear node is retired.
       stats: { armorPct: 0.15 },
@@ -266,6 +267,85 @@ describe('spec masteries', () => {
     const rangedNone = dealtRanged('marksmanship');
     expect(rangedNone).toBeGreaterThan(0);
     expect(rangedBm / rangedNone).toBeCloseTo(1.25, 2);
+  });
+
+  it("applies Unleashed Frenzy (+25% pet damage) at BOTH the melee and ranged pet damage sites, not only Pack Command/Unleash Beast's own strikes", () => {
+    // Regression: hunter_packlord.ts, hunter_shared.ts, pet_ai.ts, and sim.ts each had
+    // their own copy of "the pet damage multiplier", and only the hunter_packlord.ts
+    // copy (used by Pack Command/Unleash Beast/Frenzy Cleave's own petStrike calls)
+    // carried the Unleashed Frenzy 1.25x term. The pet's ordinary auto-attacks
+    // (mobSwing) and ranged bolts (updateRangedPetAttack), which are the bulk of its
+    // damage, silently kept dealing normal damage through the whole frenzy window.
+    // Same setup as the petDmgPct test above, marksmanship (0 petDmgPct) isolates the
+    // frenzy term specifically.
+    const setup = (frenzied: boolean) => {
+      const sim = new Sim({ seed: 13, playerClass: 'hunter', autoEquip: true });
+      sim.setPlayerLevel(20);
+      sim.setSpec('marksmanship');
+      (sim as unknown as { rng: { next: () => number } }).rng.next = () => 0.5;
+      if (frenzied) {
+        sim.player.auras.push({
+          id: 'pack_frenzy',
+          name: 'Unleashed Frenzy',
+          kind: 'hunter_frenzy',
+          remaining: 8,
+          duration: 8,
+          value: 0.25,
+          sourceId: sim.player.id,
+          school: 'physical',
+        });
+      }
+      const pet = createMob(9201, MOBS.forest_wolf, 20, sim.player.pos);
+      pet.ownerId = sim.player.id;
+      pet.weapon = { ...pet.weapon, min: 100, max: 100 };
+      pet.swingTimer = 0;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(pet);
+      const dummy = createMob(9202, MOBS.forest_wolf, 20, {
+        x: sim.player.pos.x,
+        y: sim.player.pos.y,
+        z: sim.player.pos.z + 2,
+      });
+      dummy.maxHp = dummy.hp = 100000;
+      (sim as unknown as { addEntity(e: Entity): void }).addEntity(dummy);
+      return { sim, pet, dummy };
+    };
+    const dealtMelee = (frenzied: boolean): number => {
+      const { sim, pet, dummy } = setup(frenzied);
+      const before = dummy.hp;
+      (sim as unknown as { mobSwing(a: Entity, b: Entity): void }).mobSwing(pet, dummy);
+      return before - dummy.hp;
+    };
+    const dealtRanged = (frenzied: boolean): number => {
+      const { sim, pet, dummy } = setup(frenzied);
+      const spell = {
+        name: 'Test Bolt',
+        school: 'nature' as const,
+        min: 100,
+        max: 100,
+        range: 100,
+        every: 2,
+      };
+      const before = dummy.hp;
+      (
+        sim as unknown as { updateRangedPetAttack(p: Entity, t: Entity, s: typeof spell): void }
+      ).updateRangedPetAttack(pet, dummy, spell);
+      return before - dummy.hp;
+    };
+
+    const meleeCalm = dealtMelee(false);
+    const meleeFrenzied = dealtMelee(true);
+    expect(meleeCalm).toBeGreaterThan(0);
+    // A wider window than toBeCloseTo(1.25, 2): both sites deal a small integer
+    // amount, so a single Math.round can move the ratio a few percent off 1.25.
+    // Still decisive against a missing multiplier (ratio ~1.0) or a doubled one.
+    expect(meleeFrenzied / meleeCalm).toBeGreaterThan(1.15);
+    expect(meleeFrenzied / meleeCalm).toBeLessThan(1.35);
+
+    const rangedCalm = dealtRanged(false);
+    const rangedFrenzied = dealtRanged(true);
+    expect(rangedCalm).toBeGreaterThan(0);
+    expect(rangedFrenzied / rangedCalm).toBeGreaterThan(1.15);
+    expect(rangedFrenzied / rangedCalm).toBeLessThan(1.35);
   });
 
   it('replaces Veinleech with the Evil Eye Condemnation signature', () => {
@@ -405,11 +485,11 @@ describe('spec masteries', () => {
       warrior: {
         arms: { global: 'masteryTwoHandDmgPct', value: 0.1 },
         fury: { stat: 'crit', value: 0.05 },
-        prot: { global: 'threatPct', value: 0.3 },
+        prot: { global: 'threatPct', value: 0.8 },
       },
       paladin: {
         holy: { global: 'critDmgHealPct', value: 0.5 },
-        protection: { global: 'threatPct', value: 0.5 },
+        protection: { global: 'threatPct', value: 0.4 },
         retribution: { global: 'meleeDmgPct', value: 0.2 },
       },
       hunter: {
@@ -420,7 +500,7 @@ describe('spec masteries', () => {
       mage: {
         // Mage rework: arcane is the Chronomancy healer (healing axis), fire is Ignition.
         arcane: { global: 'healPct', value: 0.15 },
-        fire: { global: 'ignitionPct', value: 0.4 },
+        fire: { global: 'ignitionPct', value: 0.3 },
         frost: { abilities: ['frostbolt', 'frost_nova'], dmgPct: 0.25 },
       },
       rogue: {

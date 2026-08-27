@@ -70,6 +70,7 @@ describe('registry', () => {
     expect(actionKind('emoteWheel')).toBe('held');
     expect(actionKind('autorun')).toBe('edge');
     expect(actionKind('target')).toBe('edge');
+    expect(actionKind('targetPrev')).toBe('edge');
     expect(actionKind('slot0')).toBe('edge');
     expect(actionKind('nope')).toBe(null);
   });
@@ -123,10 +124,6 @@ describe('registry', () => {
     });
     // The Vale Cup window is a rebindable Interface toggle (default T; J and
     // G are taken by targetFriendlyNext and the arena on this branch).
-    const valecup = BIND_ACTIONS.find((a) => a.id === 'valecup');
-    expect(valecup?.category).toBe('Interface');
-    expect(valecup?.kind).toBe('edge');
-    expect(valecup?.defaults).toEqual(['KeyY']);
     // The Book of Deeds is a rebindable Interface toggle on the shifted layer of
     // KeyZ, like Damage Meters does on H and the Shift+digit secondary bar.
     const deeds = BIND_ACTIONS.find((a) => a.id === 'deeds');
@@ -160,6 +157,9 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyD')).toBe('turnRight');
     expect(kb.actionForCode('Space')).toBe('jump');
     expect(kb.actionForCode('Tab')).toBe('target');
+    // Shift+Tab is the backward half of the same cycle: a distinct chord, so it
+    // never shadows bare Tab and bare Tab never shadows it.
+    expect(kb.actionForCode('Shift+Tab')).toBe('targetPrev');
     expect(kb.actionForCode('KeyB')).toBe('bags');
     expect(kb.actionForCode('KeyX')).toBe('emoteWheel');
     expect(kb.actionForCode('Digit1')).toBe('slot0'); // Attack
@@ -168,7 +168,7 @@ describe('Keybinds defaults', () => {
     expect(kb.actionForCode('KeyJ')).toBe('targetFriendlyNext');
     expect(kb.actionForCode('KeyU')).toBe('discord');
     expect(kb.actionForCode('KeyT')).toBe('crafting');
-    expect(kb.actionForCode('KeyY')).toBe('valecup');
+    expect(kb.actionForCode('KeyY')).toBe(null);
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');
@@ -196,6 +196,28 @@ describe('binding', () => {
     expect(kb.actionForCode('KeyR')).toBe('slot0');
     expect(kb.primaryLabel('slot0')).toBe('R');
     expect(kb.actionForCode('Digit1')).toBe(null); // old key freed
+  });
+
+  // Tab is rebindable, so its backward twin must be too: same registry, same
+  // bind()/clear() path, and rebinding one leaves the other alone.
+  it('rebinds the backward target cycle independently of Tab', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('targetPrev', 0, 'KeyM')).toBe(true);
+    expect(kb.actionForCode('KeyM')).toBe('targetPrev');
+    expect(kb.primaryLabel('targetPrev')).toBe('M');
+    expect(kb.actionForCode('Shift+Tab')).toBe(null); // old chord freed
+    expect(kb.actionForCode('Tab')).toBe('target'); // forward cycle untouched
+  });
+
+  // The converse arm: rebinding the FORWARD cycle must not evict the backward
+  // one. This is what would break if the eviction sweep ever compared bare
+  // physical codes instead of full chords.
+  it('rebinding Tab leaves Shift+Tab bound to the backward cycle', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('target', 0, 'KeyN')).toBe(true);
+    expect(kb.actionForCode('KeyN')).toBe('target');
+    expect(kb.actionForCode('Tab')).toBe(null);
+    expect(kb.actionForCode('Shift+Tab')).toBe('targetPrev');
   });
 
   it('rebinds a movement key', () => {
@@ -320,6 +342,8 @@ describe('Attack Move (shared key)', () => {
     expect(actionAllowsShared('turnLeft')).toBe(false);
     expect(kb.codeAt('attackMove', 0)).toBe('KeyA');
     expect(kb.codeAt('turnLeft', 0)).toBe('KeyA');
+    // Classic-era layout: A/D turn, Q/E strafe.
+    expect(kb.codeAt('strafeLeft', 0)).toBe('KeyQ');
     // actionForCode prefers Turn Left (earlier in the registry); Attack Move is
     // dispatched ahead of it by Input only while its mode is on.
     expect(kb.actionForCode('KeyA')).toBe('turnLeft');
@@ -378,6 +402,9 @@ describe('persistence', () => {
     expect(kb.actionForCode('Equal')).toBe('slot11');
     // sheathe postdates this save: it keeps its default Z, not unbound.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
+    // Same for the backward target cycle: an existing player gets Shift+Tab
+    // without touching their saved profile.
+    expect(kb.actionForCode('Shift+Tab')).toBe('targetPrev');
     expect(kb.actionForCode('Backquote')).toBe('mount');
   });
 

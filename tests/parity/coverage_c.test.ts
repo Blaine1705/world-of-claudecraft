@@ -117,14 +117,20 @@ describe('coverage: each scenario fires its subsystem', () => {
     // paladin consecration: a ground AoE was pushed (on-cast pulse path).
     expect((rec.sim as any).groundAoEs.length).toBeGreaterThanOrEqual(1);
     // warlock fear: the incapacitate aura landed on the warlock's mob (fear-angle draw).
-    const warlockMob = ents.find((e) => e.id === rec.notes.warlockMobId);
-    expect(warlockMob?.auras?.some((a: Ev) => a.kind === 'incapacitate')).toBe(true);
+    // Harrow is now a 5s fear, so the final snapshot can arrive after expiry.
+    expect(rec.notes.warlockFearApplied).toBe(true);
     // warlock summon_imp: a pet now belongs to the warlock (summonDemon -> summonPet).
     expect(ents.some((e) => e.ownerId === rec.notes.warlockId)).toBe(true);
-    // druid form switch: the LAST form (cat) is active and bear was stripped.
+    // druid form switch: cat replaced bear (exclusive), read at the instant of
+    // the switch because the Second Bloom that follows is a healing spell and
+    // auto-unshifts out of cat (src/sim/combat/form_auto_unshift.ts).
+    expect(rec.notes.druidCatFormActive).toBe(true);
+    expect(rec.notes.druidBearFormStripped).toBe(true);
+    // ...and that auto-unshift is what the closing state pins: no form left,
+    // and the heal-over-time the cast went on to plant.
     const druid = ents.find((e) => e.id === rec.notes.druidId);
-    expect(druid?.auras?.some((a: Ev) => a.kind === 'form_cat')).toBe(true);
-    expect(druid?.auras?.some((a: Ev) => a.kind === 'form_bear')).toBe(false);
+    expect(druid?.auras?.some((a: Ev) => String(a.kind).startsWith('form_'))).toBe(false);
+    expect(druid?.auras?.some((a: Ev) => a.id === 'rejuvenation')).toBe(true);
   });
 
   it('hit_rating_heroic pair: gear changes the threshold, never the RNG draw order', () => {
@@ -638,5 +644,51 @@ describe('coverage: each scenario fires its subsystem', () => {
     );
     expect({ x: far.pos.x, z: far.pos.z }).toEqual({ x: far.spawnPos.x, z: far.spawnPos.z });
     expect(trace.draws).toBe(0);
+  });
+
+  it('grix_respawn_window: both deaths roll an independent 15 to 30 minute timer', () => {
+    const rec = run('grix_respawn_window');
+    const first = rec.notes.firstRoll as number;
+    const second = rec.notes.secondRoll as number;
+    for (const roll of [first, second]) {
+      // rng.range(36, 72) x 25s: uniform in the half-open [900, 1800).
+      expect(roll).toBeGreaterThanOrEqual(900);
+      expect(roll).toBeLessThan(1800);
+    }
+    // Independent draws: equal rolls would mean the death site stopped
+    // consuming the stream per death (this seed pair does not collide).
+    expect(first).not.toBe(second);
+    // The in-place respawn between the kills really happened, so the second
+    // roll came from a genuine second death of the same entity id.
+    expect(rec.notes.respawned).toBe(true);
+    const deaths = (rec.allEvents as Ev[]).filter((e) => e.type === 'death');
+    expect(deaths.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('supported_elevation_line_of_sight: heals across the stall jump and denies airborne cover sight', () => {
+    const rec = run('supported_elevation_line_of_sight');
+    const events = rec.allEvents as Ev[];
+    const healerId = rec.notes.healerId as number;
+    const allyId = rec.notes.allyId as number;
+
+    const starts = events.filter(
+      (event) =>
+        event.type === 'castStart' &&
+        event.entityId === healerId &&
+        event.ability === 'lesser_heal',
+    );
+    expect(starts).toHaveLength(2);
+    const heals = events.filter(
+      (event) =>
+        event.type === 'heal2' &&
+        event.sourceId === healerId &&
+        event.targetId === allyId &&
+        event.ability === 'Whispered Prayer',
+    );
+    expect(heals).toHaveLength(2);
+    const lineOfSightErrors = events.filter(
+      (event) => event.type === 'error' && event.text === 'Line of sight.',
+    );
+    expect(lineOfSightErrors).toHaveLength(1);
   });
 });

@@ -6,6 +6,9 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers } from '../src/sim/content/talents';
+import { ABILITIES } from '../src/sim/data';
 import { type AbilityDef, type AuraKind, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
@@ -106,6 +109,9 @@ interface WorldOpts {
   stealthed?: boolean;
   fateThreads?: number;
   auras?: ActionBarAuraInput[];
+  /** Druid form bars: the live pool kind, plus the mana parked behind it. */
+  resourceType?: 'mana' | 'rage' | 'energy' | 'focus';
+  savedMana?: number;
   paladinDevotion?: {
     value: number;
     ascensionCharges: number;
@@ -125,6 +131,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       cooldowns: opts.cooldowns ?? new Map(),
       gcdRemaining: opts.gcdRemaining ?? 0,
       potionCdRemaining: opts.potionCdRemaining ?? 0,
+      resourceType: opts.resourceType ?? 'mana',
+      savedMana: opts.savedMana ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       abilityCharges: opts.abilityCharges,
@@ -643,6 +651,47 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(inStealth.usable).toBe(true);
   });
 
+  it('Cheap Trick keeps Gut Punch usable out of Duskveil', () => {
+    // The talent bakes ignoreStealthRequirement onto the RESOLVED ability
+    // (content/classes.ts applyTalentMods), which is what the sim's cast gate
+    // reads. The bar must read the same resolved flag, or the one button the
+    // talent exists to unlock paints unusable and aria-disabled while the cast
+    // it refuses to advertise goes through.
+    const known = ability('cheap_shot', { cost: 60, requiresStealth: true });
+    known.ignoreStealthRequirement = true;
+    const view = createActionBarView(descriptor(slot(1, { ability: known })), fakeDeps());
+    expect(view.tick(world({ stealthed: false })).slots[0].usable).toBe(true);
+    expect(view.tick(world({ stealthed: true })).slots[0].usable).toBe(true);
+  });
+
+  it('drives the same slot from the REAL Cheap Trick resolve, both row options', () => {
+    // Both worlds build `known` through abilitiesKnownAt (offline on the Sim,
+    // online in ClientWorld's snapshot rebuild), so pinning the real resolve
+    // here covers the bar in both hosts at once.
+    const resolve = (rowOption: string) => {
+      const mods = computeTalentModifiers('rogue', { spec: null, rows: { 11: rowOption } }, 20);
+      const known = abilitiesKnownAt('rogue', 20, mods).find((k) => k.def.id === 'cheap_shot');
+      if (!known) throw new Error('cheap_shot missing from the resolved rogue kit at level 20');
+      return known;
+    };
+    const withTalent = createActionBarView(
+      descriptor(slot(1, { ability: resolve('rog_r11_cheap_trick') })),
+      fakeDeps(),
+    );
+    expect(withTalent.tick(world({ stealthed: false, resource: 500 })).slots[0].usable).toBe(true);
+
+    const withoutTalent = createActionBarView(
+      descriptor(slot(1, { ability: resolve('rog_r11_foul_play') })),
+      fakeDeps(),
+    );
+    expect(withoutTalent.tick(world({ stealthed: false, resource: 500 })).slots[0].usable).toBe(
+      false,
+    );
+    expect(withoutTalent.tick(world({ stealthed: true, resource: 500 })).slots[0].usable).toBe(
+      true,
+    );
+  });
+
   it('an ability with no stealth requirement ignores the stealthed flag', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('sinister_strike', { cost: 45 }) })),
@@ -894,6 +943,75 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 });
 
 describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
+  it('glows Aether Darts only at four Arcane Charges', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('arcane_missiles', { cost: 105 }) }),
+        slot(2, { ability: ability('arcane_surge', { cost: 16 }) }),
+      ),
+      fakeDeps(),
+    );
+
+    const atThree = view.tick(
+      world({ auras: [{ kind: 'arcane_charge', value: 3, stacks: 3 }] }),
+    ).slots;
+    expect(atThree[0].procGlow).toBe(false);
+    expect(atThree[1].procGlow).toBe(false);
+    expect(atThree[0].ariaLabel).toBe(
+      'abilityUi.actionBar.slotAria(slot=2,ability=ability:arcane_missiles)',
+    );
+    expect(atThree[0].ariaDescription).toBe('');
+
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: 4 }] })).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4 }] })).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: 5 }] })).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(
+        world({
+          auras: [
+            { kind: 'fingers_of_frost', stacks: 2 },
+            { kind: 'arcane_charge', stacks: 4 },
+          ],
+        }),
+      ).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 3 }] })).slots[0]
+        .procGlow,
+    ).toBe(false);
+    expect(
+      view.tick(world({ auras: [{ kind: 'fingers_of_frost', value: 4, stacks: 4 }] })).slots[0]
+        .procGlow,
+    ).toBe(false);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: Number.POSITIVE_INFINITY }] }))
+        .slots[0].procGlow,
+    ).toBe(false);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: 3.9 }] })).slots[0].procGlow,
+    ).toBe(false);
+
+    const atFour = view.tick(
+      world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }),
+    ).slots;
+    expect(atFour[0].procGlow).toBe(true);
+    expect(atFour[1].procGlow).toBe(false);
+    expect(atFour[0].ariaLabel).toBe(
+      'abilityUi.actionBar.slotAria(slot=2,ability=ability:arcane_missiles)',
+    );
+    expect(atFour[0].ariaDescription).toBe('guide.glossary.procTerm');
+    expect(atFour[1].ariaLabel).toBe(
+      'abilityUi.actionBar.slotAria(slot=3,ability=ability:arcane_surge)',
+    );
+    expect(atFour[1].ariaDescription).toBe('');
+  });
+
   it('glows both Thundercall vents at a full five-charge bank', () => {
     const view = createActionBarView(
       descriptor(
@@ -1350,6 +1468,26 @@ describe('actionBarView: the aria-label is resolved in the core via the injected
     expect(view.tick(world()).slots[0].ariaLabel).toBe(expected);
     expect(view.tick(world()).slots[0].ariaLabel).not.toContain('abilityUi.actionBar');
   });
+
+  it('the proc aria description key exists in the real catalog and announces the ready state', () => {
+    const view = createActionBarView(
+      descriptor(slot(0, { ability: ability('arcane_missiles', { cost: 105 }) })),
+      { ...fakeDeps(), t: realT },
+    );
+    const procSlot = view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }))
+      .slots[0];
+    // The proc state keeps the stable slot label and announces readiness via
+    // the aria-description channel (the shared glossary term), so the label
+    // itself never churns mid-combat.
+    expect(procSlot.ariaLabel).toBe(
+      realT('abilityUi.actionBar.slotAria', {
+        slot: '1',
+        ability: 'ability:arcane_missiles',
+      }),
+    );
+    expect(procSlot.ariaDescription).toBe(realT('guide.glossary.procTerm'));
+    expect(procSlot.ariaDescription).not.toContain('guide.glossary');
+  });
 });
 
 describe('actionBarView: same input, same output + the many-spells flag', () => {
@@ -1459,5 +1597,56 @@ describe('actionBarView: instance-parameterized + parity', () => {
     const simState = structuredClone(createActionBarView(desc, fakeDeps()).tick(simWorld));
     const clientState = structuredClone(createActionBarView(desc, fakeDeps()).tick(clientWorld));
     expect(clientState).toEqual(simState);
+  });
+});
+
+// A druid pressing a heal or a nuke from a shapeshift leaves the form and casts
+// it, billed against the PARKED mana pool rather than the rage or energy bar the
+// button sits over (src/sim/combat/form_auto_unshift.ts). The bar has to weigh
+// the same pool the cast gate weighs, or a slot paints dead while the press
+// behind it works.
+describe('actionBarView: an auto-unshifting cast is affordable against parked mana', () => {
+  const bear: ActionBarAuraInput[] = [{ kind: 'form_bear' as AuraKind }];
+  const wildmend = (): ActionBarAbility => ({ def: ABILITIES.healing_touch, cost: 110 });
+
+  function usableInBear(opts: { resource: number; savedMana: number }): boolean {
+    return createActionBarView(descriptor(slot(0, { ability: wildmend() })), fakeDeps()).tick(
+      world({ auras: bear, resourceType: 'rage', ...opts }),
+    ).slots[0].usable;
+  }
+
+  it('reads the parked pool, not the rage bar, for a spell that unshifts', () => {
+    // Empty rage bar, full parked pool: the cast goes through, so the slot lives.
+    expect(usableInBear({ resource: 0, savedMana: 500 })).toBe(true);
+    // Full rage bar, empty parked pool: rage cannot pay for a mana spell.
+    expect(usableInBear({ resource: 100, savedMana: 5 })).toBe(false);
+  });
+
+  it('leaves a form ability reading the live form bar', () => {
+    // Maul is bear-locked: it never unshifts, so it spends rage as it always did
+    // and the parked pool must not rescue it.
+    const maulSlot = () =>
+      createActionBarView(
+        descriptor(slot(0, { ability: { def: ABILITIES.maul, cost: 15 } })),
+        fakeDeps(),
+      );
+    expect(
+      maulSlot().tick(world({ auras: bear, resourceType: 'rage', resource: 30, savedMana: 0 }))
+        .slots[0].usable,
+    ).toBe(true);
+    expect(
+      maulSlot().tick(world({ auras: bear, resourceType: 'rage', resource: 5, savedMana: 500 }))
+        .slots[0].usable,
+    ).toBe(false);
+  });
+
+  it('ignores the parked pool entirely once out of form', () => {
+    // The unshifted caster is the common path: a stale savedMana on the mirror
+    // must never pay for a spell the live mana bar cannot afford.
+    expect(
+      createActionBarView(descriptor(slot(0, { ability: wildmend() })), fakeDeps()).tick(
+        world({ auras: [], resourceType: 'mana', resource: 5, savedMana: 500 }),
+      ).slots[0].usable,
+    ).toBe(false);
   });
 });

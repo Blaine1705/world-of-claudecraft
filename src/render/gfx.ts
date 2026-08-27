@@ -15,6 +15,7 @@ import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
 } from './pbr_fragment_shader';
+import { markSharedMaterial } from './shared_resource';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -188,6 +189,13 @@ export interface GfxSettings {
   readonly aoFullRes: boolean;
   /** SMAA tail pass on the grade/composer output */
   readonly smaa: boolean;
+  /**
+   * FXAA fused into the output grade pass, the edge AA the region-safe
+   * grade-only chain can carry: a tail pass is full-frame and would cost that
+   * chain its dynamic resolution. Mutually exclusive with `smaa`, and
+   * meaningless without `gradePass`.
+   */
+  readonly fxaa: boolean;
   /** UnrealBloom pass on the composer */
   readonly bloom: boolean;
   /** terrain meshes cast into the sun shadow map */
@@ -196,6 +204,15 @@ export interface GfxSettings {
   readonly lowPlus: boolean;
   /** Use the cheaper low-foliage density/LOD policy while keeping the rest of the tier. */
   readonly leanFoliage: boolean;
+  /**
+   * Ground-dressing density compensation (foliage.ts: the denser dress step,
+   * the 1.24 density scale, the 1.08 spot boost). The lowPlus weak-GPU art
+   * cohort plus the leanFoliage MEDIUM session (weak integrated GPU keeping
+   * the lean model set at medium): the boost compensates the lean set's
+   * thinner ground read, so the medium-weak cohort keeps it even though plain
+   * low deliberately does not (low must stay monotonically lighter).
+   */
+  readonly denseDressing: boolean;
   readonly grassRadius: number;
   readonly grassStep: number;
   /** Stable-prefix floor for grass cards already inside their far alpha-fade band. */
@@ -380,18 +397,26 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: true,
     },
+    // Low's four governor-ladder buckets (grass, foliage, lighting, vfx; the other
+    // governable-flagged rows predate the rule and keep their own values) are derived
+    // FROM medium so the tier is monotonically lighter: baseline and max are
+    // medium's x 0.95 (2 decimals), and the minima equal
+    // medium's so low can always shed at least as far. These used to sit ABOVE medium
+    // (grass/foliage baseline 0.9 vs 0.78/0.74, floors 0.62/0.68 vs 0.5), which made
+    // plain low render more than medium. The caps floors in render_budget.ts mirror
+    // these minima.
     grass: {
-      min: 0.62,
-      baseline: 0.9,
-      max: 1.0,
+      min: 0.5,
+      baseline: 0.74,
+      max: 0.86,
       roi: 0.9,
       cost: 'gpu',
       governable: true,
     },
     foliage: {
-      min: 0.68,
-      baseline: 0.9,
-      max: 1.0,
+      min: 0.5,
+      baseline: 0.7,
+      max: 0.82,
       roi: 0.84,
       cost: 'gpu',
       governable: true,
@@ -405,9 +430,9 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     lighting: {
-      min: 0.78,
-      baseline: 1.0,
-      max: 1.0,
+      min: 0.45,
+      baseline: 0.68,
+      max: 0.78,
       roi: 0.72,
       cost: 'gpu',
       governable: true,
@@ -429,15 +454,18 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     vfx: {
-      min: 0.84,
-      baseline: 1.0,
-      max: 1.0,
+      min: 0.58,
+      baseline: 0.76,
+      max: 0.86,
       roi: 0.9,
       cost: 'mixed',
       governable: true,
     },
     characters: {
-      min: 1.0,
+      // Dormant while governable is false, but the shed floor still states how
+      // far the tier COULD go: low matches medium's so the monotonicity sweep
+      // holds on every row.
+      min: 0.86,
       baseline: 1.0,
       max: 1.0,
       roi: 1.0,
@@ -929,6 +957,8 @@ export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Mat
 function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettings {
   const bucketBands = GFX_BUCKET_BANDS[tier];
   const weakIntegratedGpu = isWeakIntegratedGpu(hints?.gpuRenderer);
+  // The one shared adapter classifier ('weak' already delegates to isWeakIntegratedGpu).
+  const gpuClass = classifyGpuRenderer(hints?.gpuRenderer);
   // WKWebView's WebContent/GPU process has a hard resident-memory ceiling which is independent
   // of frame rate. The runtime governor can reduce draw cost after a slow submit, but it cannot
   // reclaim already-created textures, programs, materials, or rigs. Keep the player's selected
@@ -969,6 +999,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     iosMemoryProfile,
     tightMemory: tightMemoryProfile,
   });
+  // lowPlus is art direction for fragment-bound weak GPUs (fatter grass cards, the
+  // terrain lowShade emissive), not a load reduction: applying it to EVERY low-tier
+  // session made plain low draw richer than medium. Gate it to the cohort it was
+  // authored for, reusing the file's one adapter classifier rather than a second
+  // regex set. classifyGpuRenderer returns 'unknown' for a masked or absent adapter
+  // string, so an unclassifiable session lands on plain low, the lighter default.
+  // Hoisted out of the literal so denseDressing below can extend the cohort.
+  const lowPlus =
+    iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software'));
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -1024,19 +1063,24 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
     smaa: aaPolicy.postAa === 'smaa',
+    fxaa: aaPolicy.postAa === 'fxaa-grade',
     bloom: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
-    lowPlus: tier === 'low' || iosMemoryProfile,
+    lowPlus,
     // Tree and rock placement must match across clients because those decorations
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
+    // The dressing compensation cohort (interface comment carries the why):
+    // lowPlus plus the leanFoliage medium session, which the lowPlus re-key
+    // had silently stripped of its denser-dressing compensation.
+    denseDressing: lowPlus || (tier === 'medium' && weakIntegratedGpu),
     grassRadius: tightMemoryProfile
       ? 34
       : iosMemoryProfile
         ? 52
         : tier === 'low'
-          ? 80
+          ? 72
           : tier === 'medium'
             ? constrainedMemory
               ? 62
@@ -1189,7 +1233,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = { ...settings, surfaceDetailTaps: 3, surfaceDetailClampK: 0.85 };
     else settings = { ...settings, surfaceDetailTaps: 4, surfaceDetailClampK: 1 };
     // Effects & Lighting: Low is the region-safe grade-only mini composer (the
-    // medium tier's post profile, without full-frame SMAA); Medium adds N8AO; High the full
+    // medium tier's post profile, with the grade-fused FXAA in place of
+    // full-frame SMAA); Medium adds N8AO; High the full
     // high-tier stack (AO + bloom + SMAA). The level-0 test keeps the shared
     // EFFECTS_QUALITY_LOW_CUTOFF constant so the HUD effect tier and the 3D
     // renderer still downgrade at the same threshold.
@@ -1204,23 +1249,33 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         aoFullRes: false,
         bloom: false,
         smaa: false,
+        // Dropping to the grade-only chain drops the SMAA tail with it, so the
+        // fused arm is what keeps this mix anti-aliased at all. Granted on any
+        // device whose policy grants post AA, not just the medium tier's own
+        // 'fxaa-grade': a memory-tight profile whose policy is 'none' still
+        // gets nothing. The AA dial below then applies.
+        fxaa: aaPolicy.postAa !== 'none',
         maxPointLights: Math.min(settings.maxPointLights, 3),
       };
     else if (effectsValue < 0.75)
       settings = { ...settings, ao: true, aoFullRes: false, bloom: false, smaa: false };
-    // Shadow Quality: pure map-size steps (1024 / 2560 / 4096 / 8192);
-    // terrain-cast shadows join at High, matching the tier ladder where every
-    // dynamic-shadow tier casts terrain.
+    // Shadow Quality: pure map-size steps (1024 / 2560 / 4096); terrain-cast
+    // shadows join at High, matching the tier ladder where every
+    // dynamic-shadow tier casts terrain. The ladder caps at High's 4096 map:
+    // the retired Insane rung's single 8192x8192 target was a ~256 MB-class
+    // GPU allocation redrawn every frame for marginal visible gain, so a
+    // historical stored Insane value falls through to the High base here
+    // (and the settings store clamps it to High on its next write).
     const shadowLevel = levelOf(hints.shadowQuality ?? 1);
     if (shadowLevel === 0) settings = { ...settings, shadowMap: 1024, terrainCastShadows: false };
     else if (shadowLevel === 1)
       settings = { ...settings, shadowMap: 2560, terrainCastShadows: false };
-    else if (shadowLevel === 3) settings = { ...settings, shadowMap: 8192 };
     // Per-effect switches (round 12), layered AFTER Effects & Lighting and
     // authoritative over its per-effect writes: Effects & Lighting stays the
     // post-CHAIN master (its Low arm sheds the composer, and with no composer
-    // there is no pass to run these on, so the whole block is skipped there),
-    // while these dials own the individual passes. A pre-round-12 mix stores
+    // there is no pass for AO or bloom to run on, so this block is skipped
+    // there and the else arm below takes over for the one dial that still has
+    // something to control), while these dials own the individual passes. A pre-round-12 mix stores
     // no values for them, so each dial's absent default DERIVES from the
     // stored effectsQuality and reproduces the old bundle byte for byte. The
     // AA dial can only DISABLE what the device policy grants (a memory-tight
@@ -1239,6 +1294,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bloom: bloomDial >= 0.5,
         smaa: aaPolicy.postAa === 'smaa' && aaDial >= 0.5,
       };
+    } else {
+      // The grade-fused FXAA is the only edge AA a grade-only mix can carry, so
+      // it answers to the same AA dial, which the block above cannot reach: that
+      // one is gated on a composer this mix has none of. Disable-only there,
+      // disable-only here. Its default is ON rather than deriving from
+      // effectsQuality, because this arm is new: there is no stored pre-round-12
+      // mix of it to reproduce byte for byte, and a grade-only mix that silently
+      // opted out of AA would be the surprising reading.
+      settings = { ...settings, fxaa: settings.fxaa && (hints.antiAliasing ?? 1) >= 0.5 };
     }
     // View Distance / Water Quality: whole-tier remaps for the two subsystems
     // that plan against a tier (the far-field policy still applies its own
@@ -1899,6 +1963,11 @@ export interface SurfaceMatOpts {
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
+  /** PBR metalness map (high/ultra only; ignored on the Lambert tier). An
+   *  OPTION rather than a post-hoc write on the returned material: slot
+   *  presence is a program-cache-key input, so writing it onto a shared cache
+   *  entry relinks every material already drawing with it. */
+  metalnessMap?: THREE.Texture;
   /** baked AO map — needs uv2 on the geometry (high/ultra only) */
   aoMap?: THREE.Texture;
   roughness?: number;
@@ -1959,6 +2028,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     map: opts.map?.uuid,
     normalMap: opts.normalMap?.uuid,
     roughnessMap: opts.roughnessMap?.uuid,
+    metalnessMap: opts.metalnessMap?.uuid,
     aoMap: opts.aoMap?.uuid,
     std: GFX.standardMaterials,
   });
@@ -1971,6 +2041,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
+        metalnessMap: opts.metalnessMap ?? null,
         aoMap: opts.aoMap ?? null,
         roughness: opts.roughness ?? 0.85,
         metalness: opts.metalness ?? 0,
@@ -1993,6 +2064,13 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   // on tiers without a field): props and buildings at range must haze with
   // the ground under them or the effect reads as nothing.
   attachBiomeHaze(mat);
+  // Every material handed back from this cache is SHARED by construction: one
+  // instance is reused by every caller with the same key, process-wide. Marking
+  // it here is what keeps a per-root terminal owner (the interior resource
+  // registry, a view teardown) from claiming and disposing a material the rest
+  // of the world is still drawing with, and it is marked at the source rather
+  // than per consumer so a new caller cannot forget.
+  markSharedMaterial(mat);
   matCache.set(key, mat);
   return mat;
 }

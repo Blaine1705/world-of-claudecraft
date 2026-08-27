@@ -70,7 +70,15 @@ const common: AbilityDef[] = [
     id: 'hammer_of_grace',
     name: 'Hammer of Grace',
     class: 'paladin',
-    learnLevel: 3,
+    // Level 1, not 3: a paladin was the ONE class that reached the Proving
+    // Shore's effigy yard with no offensive press at all. Their level-1 kit
+    // was Mending Light (a heal) and Divine Ascension, which needs 20
+    // Devotion that only healing generates, so the bar's other button did
+    // nothing when a new player pressed it. Vowkeeper Strike is Protection
+    // only and Crusader Strike is level 10, which left this, already
+    // spec-free, free to cast and ranked from here, as the honest fix. Its
+    // numbers are untouched; the change is two levels of availability.
+    learnLevel: 1,
     cost: 0,
     castTime: 0,
     cooldown: 7,
@@ -209,7 +217,7 @@ const common: AbilityDef[] = [
     requiresOutOfCombat: true,
     effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
     description:
-      'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
+      'Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight.',
   },
   {
     id: 'beacon_of_light',
@@ -554,7 +562,7 @@ const protection: AbilityDef[] = [
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    threat: { mult: 3 },
+    threat: { mult: 2.5 },
     effects: [{ type: 'weaponStrike', bonus: 21, weaponMult: 1 }],
     description:
       'Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield.',
@@ -593,7 +601,7 @@ const protection: AbilityDef[] = [
     projectileFx: 'paladinSunwardDisc',
     requiresTarget: true,
     requiresShield: true,
-    threat: { mult: 3 },
+    threat: { mult: 2.25 },
     effects: [
       { type: 'directDamage', min: 90, max: 110 },
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
@@ -632,7 +640,7 @@ const protection: AbilityDef[] = [
     school: 'holy',
     requiresTarget: false,
     requiresShield: true,
-    threat: { mult: 3.5 },
+    threat: { mult: 2.5 },
     effects: [
       {
         type: 'aoeDamage',
@@ -714,7 +722,7 @@ const protection: AbilityDef[] = [
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    threat: { mult: 3 },
+    threat: { mult: 1.75 },
     // Ranked from level 5. Nine ticks of the rank 3 numbers is ~225 damage in an
     // area, against ~50 for a single-target nuke of that level, so the early ranks
     // carry the ground control and threat while the damage arrives later.

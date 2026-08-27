@@ -25,11 +25,13 @@
 // Map, inventory is InvSlot[]); the core never reaches for a Sim-only field.
 
 import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
+import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
 import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
 import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
 } from '../../../sim/combat/empower_next';
+import { willAutoUnshift } from '../../../sim/combat/form_auto_unshift';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
 import {
@@ -59,6 +61,7 @@ import {
   type ItemDef,
   MELEE_RANGE,
   POTION_COOLDOWN,
+  type ResourceType,
   type Vec3,
 } from '../../../sim/types';
 import type { InterpolationValues, TranslationKey } from '../../i18n';
@@ -115,6 +118,11 @@ export interface ActionBarAbility {
    *  the sim gate checks, or a running shared clock is invisible while the
    *  button is transformed. */
   cooldownId?: string;
+  /** Talent-resolved drop of the def's stealth requirement (Cheap Trick on Gut
+   *  Punch). Baked by applyTalentMods, so BOTH worlds carry it on `known`, and
+   *  read by the sim's cast gate; the bar must read it too or the talent's one
+   *  button paints unusable while the cast it refuses to advertise succeeds. */
+  ignoreStealthRequirement?: boolean;
 }
 
 /** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
@@ -178,6 +186,14 @@ export interface ActionBarPlayerInput {
   autoAttack: boolean;
   dead: boolean;
   resource: number;
+  /** Which pool the live bar shows. A druid form swaps it to rage or energy and
+   *  parks the real mana pool in savedMana, so it is what tells an in-form bar
+   *  apart from an ordinary caster's. */
+  resourceType: ResourceType | null;
+  /** Mana set aside while shapeshifted (0 when unshifted). The pool an
+   *  auto-unshifting cast is billed against; mirrored online as the self
+   *  snapshot's sparse `sm` key. */
+  savedMana: number;
   cooldowns: { get(id: string): number | undefined };
   gcdRemaining: number;
   /** Shared combat-potion cooldown, remaining seconds (0 when ready). Painted as a
@@ -289,7 +305,9 @@ export interface ActionBarView {
   tick(world: ActionBarWorldInput): ActionBarState;
 }
 
-function makeSlotState(): ActionBarSlotState {
+/** A blank slot state. Exported so another bar family can hold a fallback cell
+ *  for a position its layout does not fill. */
+export function makeSlotState(): ActionBarSlotState {
   return {
     kind: 'empty',
     abilityId: null,
@@ -364,7 +382,10 @@ function hasForbiddenReflection(
   return false;
 }
 
-function inventoryCount(
+/** How many of `itemId` the player is carrying, summed across stacks. Exported
+ *  because the consumables seat needs the same number for its tooltip's in-bags
+ *  line, off the same snapshot the bar state is built from. */
+export function inventoryCount(
   inventory: readonly { itemId: string; count: number }[],
   itemId: string,
 ): number {
@@ -637,8 +658,18 @@ export function createActionBarView(
           dominionReady =
             dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
         }
+        // A druid pressing a heal or a nuke from Bruin/Wolf Form leaves the form
+        // and casts it, and the cast is billed against the PARKED mana pool, not
+        // the rage or energy bar the button is pressed from (the same predicate
+        // the sim's cast gate asks, so the bar cannot paint a slot unusable while
+        // the cast it refuses to advertise succeeds). Fleet Form never swapped the
+        // bar, so its pool is already the live one.
+        const castingPool =
+          player.resourceType !== 'mana' && willAutoUnshift(player.auras, def)
+            ? player.savedMana
+            : player.resource;
         slot.usable =
-          (!(player.resource < payableCost) || freeByProc || freeBySolarReprisal) &&
+          (!(castingPool < payableCost) || freeByProc || freeBySolarReprisal) &&
           (def.ruinCost ?? 0) <= ruin &&
           soulFragments >= (def.soulFragmentCost ?? 0) &&
           ascensionReady &&
@@ -647,16 +678,18 @@ export function createActionBarView(
           primaryEyeReady &&
           dominionReady &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
-          (!def.requiresStealth || world.stealthed);
+          (!def.requiresStealth || world.stealthed || ability.ignoreStealthRequirement === true);
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
           (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
-        // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
-        // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
-        // sim predicate idiom as freeCostAuraActive above).
+        // Spec resources/procs share pure sim predicates so the bar and combat
+        // agree: Frost lights Ice Lance on a banked Fingers of Frost and Flurry
+        // on an armed Brain Freeze (combat/frost_mage.ts), while a full
+        // Chronomancy charge bank lights Aether Darts as the actionable spender
+        // (combat/chronomancy.ts).
         const divineAscensionActive =
           (player.paladinDevotion?.ascensionCharges ?? 0) > 0 &&
           (player.paladinDevotion?.ascensionRemaining ?? 0) > 0;
@@ -673,6 +706,7 @@ export function createActionBarView(
           radiantResonanceActive ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
+          aetherDartsProcGlowActive(player.auras ?? [], def.id) ||
           destructionProcGlowActive(player.auras ?? [], def.id) ||
           packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||

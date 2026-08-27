@@ -22,6 +22,7 @@ const W6_TAGS: Readonly<Record<string, string>> = {
   resurrect_respond: 'IWorldCombat',
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
+  tabPrev: 'IWorldTargeting',
   targetNearestFriendly: 'IWorldTargeting',
   tabFriendly: 'IWorldTargeting',
   lootRoll: 'IWorldLoot',
@@ -175,6 +176,7 @@ const W9_TAGS: Readonly<Record<string, string>> = {
   trade_offer: 'IWorldTrade',
   trade_confirm: 'IWorldTrade',
   trade_cancel: 'IWorldTrade',
+  trade_close: 'IWorldTrade',
   duel_req: 'IWorldDuelArena',
   duel_accept: 'IWorldDuelArena',
   duel_decline: 'IWorldDuelArena',
@@ -187,6 +189,10 @@ const W9_TAGS: Readonly<Record<string, string>> = {
   block_remove: 'IWorldSocialGraph',
   guild_create: 'IWorldSocialGraph',
   guild_invite: 'IWorldSocialGraph',
+  guild_pledge: 'IWorldSocialGraph',
+  guild_pledge_withdraw: 'IWorldSocialGraph',
+  guild_pledge_decide: 'IWorldSocialGraph',
+  guild_pledge_settings: 'IWorldSocialGraph',
   guild_accept: 'IWorldSocialGraph',
   guild_decline: 'IWorldSocialGraph',
   guild_leave: 'IWorldSocialGraph',
@@ -228,6 +234,7 @@ describe('command facet tags (W9)', () => {
 // Append-only: never edit a tag.
 const W10_TAGS: Readonly<Record<string, string>> = {
   market_search: 'IWorldMarket',
+  market_sell_price_check: 'IWorldMarket',
   market_list: 'IWorldMarket',
   market_buy: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
@@ -375,19 +382,20 @@ describe('command facet tags (guild bank)', () => {
   });
 });
 
-// Deeds: append the Book of Deeds cluster's tag. The table-consistency
+// Deeds: append the Book of Deeds cluster's tags. The table-consistency
 // invariants in the W6 block above (no orphan tag, no dispatch-only leak)
-// already cover the new entry; this block pins the exact facet for the one
-// title-selection command and that the four snapshot reads stay untagged.
+// already cover the new entries; this block pins the exact facet for the two
+// cosmetic-selection commands and that the five snapshot reads stay untagged.
 // Append-only: never edit a tag.
 const DEEDS_TAGS: Readonly<Record<string, string>> = {
   deed_set_title: 'IWorldDeeds',
+  deed_set_border: 'IWorldDeeds',
 };
 
 describe('command facet tags (deeds)', () => {
   const tags = COMMAND_FACETS as Readonly<Record<string, string>>;
 
-  it('tags the title-selection command with the IWorldDeeds facet', () => {
+  it('tags the title- and border-selection commands with the IWorldDeeds facet', () => {
     for (const [cmd, facet] of Object.entries(DEEDS_TAGS)) {
       expect(tags[cmd], `facet tag for '${cmd}'`).toBe(facet);
     }
@@ -397,10 +405,13 @@ describe('command facet tags (deeds)', () => {
     expect('deed_set_title' in tags).toBe(true);
     expect('deedSetTitle' in tags).toBe(false);
     expect('setActiveTitle' in tags).toBe(false);
+    expect('deed_set_border' in tags).toBe(true);
+    expect('deedSetBorder' in tags).toBe(false);
+    expect('setActiveBorder' in tags).toBe(false);
   });
 
-  it('does not tag the snapshot reads (deedsEarned/deedStats/renown/activeTitle)', () => {
-    for (const read of ['deedsEarned', 'deedStats', 'renown', 'activeTitle']) {
+  it('does not tag the snapshot reads (deedsEarned/deedStats/renown/activeTitle/activeBorder)', () => {
+    for (const read of ['deedsEarned', 'deedStats', 'renown', 'activeTitle', 'activeBorder']) {
       expect(read in tags, `${read} should be untagged (no wire command)`).toBe(false);
     }
   });

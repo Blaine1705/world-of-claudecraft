@@ -3,6 +3,7 @@ import { isBlocked } from '../src/sim/colliders';
 import { Sim } from '../src/sim/sim';
 import type { Entity, Vec3 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { RL_TEST_WORLD } from './sim_shared';
 
 // Pets heel by pathfinding around obstacles (like a warrior charge route) rather
 // than greedily wedging on a wall and then snapping to the owner. These tests pin
@@ -20,7 +21,7 @@ function place(e: Entity, x: number, z: number): void {
 // and its owner explicitly. Passive mode guarantees the pet never picks a combat
 // target, so it stays in the heel branch under test.
 function setup(petAt: Vec3, ownerAt: Vec3): { sim: Sim; pet: Entity; owner: Entity } {
-  const sim = new Sim({ seed: SEED, playerClass: 'hunter', noPlayer: true });
+  const sim = new Sim({ seed: SEED, playerClass: 'hunter', noPlayer: true, world: RL_TEST_WORLD });
   const pid = sim.addPlayer('hunter', 'Aleph');
   const owner = sim.entities.get(pid)!;
   let pet: Entity | null = null;
@@ -113,9 +114,12 @@ describe('pet heel pathfinding', () => {
   });
 
   it('warps to the owner only as a last resort when no route exists', () => {
-    // 87yd apart with the spawn building breaking line of sight and the gap beyond
-    // the A* search window: no route can be found, so the pet snaps to heel.
-    const { sim, pet, owner } = setup({ x: 0, y: 0, z: -5 }, { x: 0, y: 0, z: 82 });
+    // 87yd apart with the harbor-town bank breaking line of sight and the gap
+    // beyond the A* search window: no route can be found, so the pet snaps to
+    // heel. Re-staged 2026-08-18 for the Eastbrook harbor move (d19aa33f76):
+    // the old (0,-5)/(0,82) pair spanned the vacated town ground, which is now
+    // open, so a clear straight line there let the pet path instead of warp.
+    const { sim, pet, owner } = setup({ x: 12, y: 0, z: -135 }, { x: 12, y: 0, z: -48 });
     expect(dist(pet.pos, owner.pos)).toBeGreaterThan(60);
     sim.tick();
     expect(dist(pet.pos, owner.pos)).toBeLessThan(1);

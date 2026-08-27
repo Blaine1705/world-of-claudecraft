@@ -18,7 +18,14 @@ import { ITEMS } from '../sim/data';
 import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '../sim/types';
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
-import { deedTitleText } from './deed_i18n';
+import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
+import {
+  DEED_HERALDRY_ATTR,
+  DEED_HERALDRY_MOTIF_ATTR,
+  deedHeraldryMotifSvg,
+  deedHeraldryStyle,
+} from './deed_border_view';
+import { deedName, deedTitleText } from './deed_i18n';
 import {
   devCardBadgeClass,
   devTierBadgeDataUrl,
@@ -41,13 +48,18 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import {
   buildInspectRemoteView,
   buildInspectView,
+  type InspectBorderModel,
+  type InspectCuratorBadgeModel,
+  type InspectCuratorModel,
   type InspectDevModel,
   type InspectDiscordModel,
+  type InspectHeaderModel,
   type InspectHolderModel,
 } from './inspect_view';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
+import { curatorRankNameKey } from './reliquary_view';
 import { svgIcon } from './ui_icons';
 
 /** The inspected entity fields the painter reads (a structural subset of the
@@ -61,6 +73,8 @@ export interface InspectEntity {
   skinCatalog?: SkinCatalog;
   /** Active Book of Deeds title (a deed id), if any. */
   title?: string | null;
+  /** Active Book of Deeds border (a deed id, never a slug), if any. */
+  border?: string | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   /** The server-resolved active Armory weapon skin (wire wsk), render-only. */
@@ -75,6 +89,11 @@ export interface InspectEntity {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  /** Server-computed Curator standing (wire crk/cro/crt): rank plus the
+   *  character-scoped completion pair behind it. */
+  curatorRank?: number;
+  relicsOwned?: number;
+  relicsTotal?: number;
 }
 
 /** The out-of-range remote-profile inputs (the public character sheet subset). */
@@ -136,8 +155,17 @@ export class InspectWindow {
   }
 
   /** Rich in-range inspect: compact header, identity badges, live class-colored
-   *  turntable, and the worn 6/6 paperdoll. */
-  openInspect(e: InspectEntity, now: number): void {
+   *  turntable, and the worn 6/6 paperdoll.
+   *
+   *  `selfStanding` is the viewer's own LIVE Curator standing, and Hud passes it
+   *  only when the inspected entity is the viewer (see Hud.openInspect). It is a
+   *  parameter rather than a field on InspectEntity deliberately: InspectEntity
+   *  mirrors the wire, and this standing never crosses the wire at all. */
+  openInspect(
+    e: InspectEntity,
+    now: number,
+    selfStanding?: { curatorRank: number; owned: number; total: number } | null,
+  ): void {
     const cls = e.templateId as PlayerClass;
     const el = this.deps.root();
     this.captureOpener();
@@ -150,6 +178,12 @@ export class InspectWindow {
         skin: e.skin ?? 0,
         skinCatalog: e.skinCatalog ?? 'class',
         deedTitleText: e.title ? deedTitleText(e.title) : '',
+        border: e.border ?? null,
+        borderDeedName: e.border ? deedName(e.border) : '',
+        curatorRank: e.curatorRank ?? 0,
+        relicsOwned: typeof e.relicsOwned === 'number' ? e.relicsOwned : null,
+        relicsTotal: typeof e.relicsTotal === 'number' ? e.relicsTotal : null,
+        selfStanding: selfStanding ?? null,
         equippedItems: e.equippedItems,
         holderTier: e.holderTier ?? 0,
         holderBalance: e.holderBalance ?? null,
@@ -168,23 +202,23 @@ export class InspectWindow {
     );
     markDialogRoot(el, { labelledBy: 'inspect-window-title' });
     const { header } = model;
-    const titleHtml = header.deedTitle
-      ? `<div class="inspect-title">${esc(header.deedTitle)}</div>`
-      : '';
-    el.innerHTML =
-      this.panelTitleHtml() +
-      `<div class="inspect-card">` +
-      `<div class="inspect-name">${esc(header.name)}</div>` +
-      titleHtml +
-      `<div class="inspect-meta">${esc(
-        t('itemUi.equipment.levelClass', {
-          level: formatNumber(header.level, { maximumFractionDigits: 0 }),
-          className: classDisplayName(cls),
-        }),
-      )}</div>` +
+    const standingHtml = `<div class="inspect-meta">${esc(
+      t('itemUi.equipment.levelClass', {
+        level: formatNumber(header.level, { maximumFractionDigits: 0 }),
+        className: classDisplayName(cls),
+      }),
+    )}</div>${this.curatorLineHtml(model.curator)}`;
+    const honorHtml =
       this.holderHtml(model.badges.holder) +
       this.discordHtml(model.badges.discord) +
       this.devHtml(model.badges.dev) +
+      this.curatorHtml(model.badges.curator);
+    el.innerHTML =
+      this.panelTitleHtml() +
+      `<div class="inspect-card">` +
+      this.headerHtml(header) +
+      `<div class="inspect-standing-row">${standingHtml}</div>` +
+      (honorHtml ? `<div class="inspect-honor-rail">${honorHtml}</div>` : '') +
       `</div>` +
       // The class-colored model stage, delivered as a CSS custom property so the
       // stylesheet paints the border / glow / haze in the inspected player's hue.
@@ -280,6 +314,90 @@ export class InspectWindow {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
     }
     return row;
+  }
+
+  private headerHtml(header: InspectHeaderModel): string {
+    const titleHtml = header.deedTitle
+      ? `<div class="inspect-title">${esc(header.deedTitle)}</div>`
+      : '';
+    const border = header.border;
+    if (!border) return `<div class="inspect-name">${esc(header.name)}</div>${titleHtml}`;
+    return (
+      `<div class="inspect-heraldry-banner"${this.borderAttrs(border)}>` +
+      `<div class="inspect-heraldry-face deed-heraldry-plaque deed-heraldry-plaque-ceremonial"${this.borderIdentityAttrs(border)}>` +
+      deedHeraldryMotifSvg(border.motif, 'deed-heraldry-pattern') +
+      `<div class="inspect-heraldry-copy">` +
+      `<div class="inspect-name">${esc(header.name)}</div>` +
+      titleHtml +
+      `</div></div>` +
+      `<span class="deed-heraldry-seal" aria-hidden="true">${deedHeraldryMotifSvg(border.motif, 'deed-heraldry-seal-art')}</span>` +
+      `<div class="inspect-heraldry-deed deed-heraldry-plaque deed-heraldry-plaque-tab"${this.borderIdentityAttrs(border)}>${esc(border.deedName)}</div>` +
+      `</div>`
+    );
+  }
+
+  // The pure core already palette-gated the slug. One shared style builder
+  // carries the exact material tokens every cold heraldry surface consumes.
+  private borderAttrs(border: InspectBorderModel | null): string {
+    if (!border) return '';
+    return `${this.borderIdentityAttrs(border)} style="${esc(deedHeraldryStyle(border))}"`;
+  }
+
+  private borderIdentityAttrs(border: InspectBorderModel): string {
+    return (
+      ` ${DEED_HERALDRY_ATTR}="${esc(border.slug)}"` +
+      ` ${DEED_HERALDRY_MOTIF_ATTR}="${border.motif}"`
+    );
+  }
+
+  // The Reliquary standing line: the labeled completion pair plus the named
+  // Curator rank. It reuses the character sheet's own three chrome keys
+  // (charCompletionLabel, charCompletion, and the rank-name key), so the LABEL,
+  // the pair wording, and the rung name are one source of text across both
+  // surfaces. The composition differs by design: the sheet lays these out as
+  // rows in the Reliquary block, the card packs them into one dot-separated
+  // meta line.
+  private curatorLineHtml(curator: InspectCuratorModel | null): string {
+    if (!curator) return '';
+    const pair = t('hudChrome.reliquary.charCompletion', {
+      owned: formatNumber(curator.owned, { maximumFractionDigits: 0 }),
+      total: formatNumber(curator.total, { maximumFractionDigits: 0 }),
+    });
+    const rankName = t(curatorRankNameKey(curator.rank), {
+      rank: formatNumber(curator.rank, { maximumFractionDigits: 0 }),
+    });
+    return (
+      `<div class="inspect-meta inspect-reliquary">` +
+      `${esc(t('hudChrome.reliquary.charCompletionLabel'))}: ${esc(pair)} · ${esc(rankName)}` +
+      `</div>`
+    );
+  }
+
+  // The Curator sigil badge: the Reliquary's rank-5 honor mark, rendered through
+  // the same .inspect-holder row family as the three flair badges above it so the
+  // four read as one column. Cosmetic identity only.
+  private curatorHtml(curator: InspectCuratorBadgeModel | null): string {
+    if (!curator) return '';
+    const rankName = t(curatorRankNameKey(curator.rank), {
+      rank: formatNumber(curator.rank, { maximumFractionDigits: 0 }),
+    });
+    return (
+      `<div class="inspect-holder">` +
+      // alt="" like the three sibling tier badges: the row already prints the
+      // rung name and a sub-line, so a localized alt on the art made a screen
+      // reader announce the same row three times. sigilCaption keeps the job of
+      // naming what the picture IS, but as the VISIBLE sub-line, which labels
+      // the mark for every reader at once (the key was named sigilAria until
+      // Phase 20 QA; the suffix misdeclared the render sink to translators once
+      // the string stopped being alt text). The sub used to repeat the window
+      // title ("The Reliquary"), which named the surface rather than the honor
+      // and was the least useful of the three announcements.
+      `<img class="${curatorSigilBadgeClass()}" style="--curator-glow:${CURATOR_SIGIL_GLOW}" src="${curatorSigilDataUrl()}" alt="" draggable="false">` +
+      `<div class="inspect-holder-text">` +
+      `<div class="inspect-holder-name">${esc(rankName)}</div>` +
+      `<div class="inspect-holder-sub">${esc(t('hudChrome.reliquary.sigilCaption'))}</div>` +
+      `</div></div>`
+    );
   }
 
   private holderHtml(holder: InspectHolderModel | null): string {

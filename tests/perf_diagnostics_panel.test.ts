@@ -18,6 +18,7 @@ function snapshot(): PerfSnapshot {
   return {
     seconds: 20,
     frames: 1200,
+    hiddenPresentSkips: 0,
     fps: 60,
     frameMs,
     windows: {
@@ -205,6 +206,55 @@ describe('PerfDiagnosticsPanel', () => {
     );
   });
 
+  it('restarts the scan when a shell-hidden gap shows up in the skip counter', () => {
+    // The desktop shell pins document.visibilityState at 'visible' while
+    // minimized, so the visibilitychange path above never fires there and the
+    // panel's driver (perf.tick) stops outright. The hiddenPresentSkips delta
+    // between two updates is the record that a hidden stretch happened, and
+    // it must restart the active-gameplay capture like a web tab pause
+    // (phase 4 QA F12). Pre-scan skips must NOT trip the detector.
+    setVisibility('visible');
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const startMeasurement = vi.fn();
+    const runSceneCensus = vi.fn(() => null);
+    const sample = snapshot();
+    sample.hiddenPresentSkips = 50;
+    const panel = new PerfDiagnosticsPanel({
+      startMeasurement,
+      snapshot: () => sample,
+      runSceneCensus,
+      desktopShell: true,
+    });
+    panel.setReady(true);
+    panel.onMonitorReset();
+
+    // Baseline update: 50 pre-scan skips are old news, the scan keeps going.
+    now += 4000;
+    panel.update(sample);
+    expect(document.body.textContent).toContain('11 seconds remaining');
+
+    // The window was minimized in between: skips grew, wall-clock jumped.
+    sample.hiddenPresentSkips = 260;
+    now += 12_000;
+    panel.update(sample);
+    expect(startMeasurement).toHaveBeenCalledTimes(1);
+    expect(runSceneCensus).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain(
+      'Tab restored. Restarting a clean 15-second active-gameplay capture.',
+    );
+    expect(document.querySelector('[role="progressbar"]')?.getAttribute('aria-valuenow')).toBe('0');
+
+    // A full clean window from the restart completes; the hidden stretch
+    // never counted toward the 15 seconds.
+    now += 7000;
+    panel.update(sample);
+    expect(runSceneCensus).not.toHaveBeenCalled();
+    now += 8000;
+    panel.update(sample);
+    expect(runSceneCensus).toHaveBeenCalledTimes(1);
+  });
+
   it('refreshes only census data on the frozen completed snapshot', () => {
     setVisibility('visible');
     let now = 1000;
@@ -275,6 +325,43 @@ describe('PerfDiagnosticsPanel', () => {
     expect(startMeasurement).toHaveBeenCalledTimes(1);
     expect(document.body.textContent).toContain('Collecting active gameplay');
     expect(start?.disabled).toBe(true);
+  });
+
+  it('shows the zone-build and off-frame hitch counts on their own metrics row', () => {
+    setVisibility('visible');
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const sample = snapshot();
+    sample.hitches = {
+      frames: 600,
+      hitches: 7,
+      byCause: {
+        'shader-compile': 1,
+        'texture-upload': 0,
+        'zone-build': 4,
+        'view-create': 0,
+        gc: 3,
+        'off-frame': 2,
+        other: 0,
+      },
+      programGrowthFrames: 1,
+      programsAdded: 1,
+      recent: [],
+    };
+    const panel = new PerfDiagnosticsPanel({
+      startMeasurement: vi.fn(),
+      snapshot: () => sample,
+      runSceneCensus: vi.fn(() => null),
+      desktopShell: false,
+    });
+    panel.setReady(true);
+    panel.onMonitorReset();
+    now += 15_000;
+    panel.update(sample);
+
+    const text = document.body.textContent ?? '';
+    expect(text).toContain('hitches 7 | shaders 1 | uploads 0 | views 0');
+    expect(text).toContain('zone builds 4 | off-frame 2 | gc 3');
   });
 
   it('fully collapses and expands the diagnostic body', () => {

@@ -36,6 +36,7 @@ const baseEnTable = {
   'error.bagSocketsFull': 'All your bag slots are full.',
   'error.bagSwapTooManyItems': 'You have too many items to swap to that bag.',
   'error.bagRemoveTooManyItems': 'You have too many items to remove that bag.',
+  'error.bagEquipHasProperty': 'That bag cannot be equipped while it carries a special property.',
   'error.tradeBagSpace': 'Trade failed: not enough bag space.',
   'log.bagsMigrated': 'Your belongings have been packed into new bags.',
   // Bank (guild-bank-ready pooled bank; src/sim/bank.ts). The error.* lines are the
@@ -142,6 +143,12 @@ const baseEnTable = {
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  // Tide-pool summon refusals (src/sim/interactions/crab_summon.ts
+  // REASON_MESSAGE). Placeholder-free, so they register in the EXACT matcher
+  // automatically.
+  'error.crabQuestDone': 'You have what you came for. Tidewarden Nel waits on your prize.',
+  'error.crabLureTooFar': 'Carry the lure to the tide pool west of the wreck line.',
+  'error.crabAlreadyUp': 'Mister Crabs already prowls the pool!',
   // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
   'error.firebottleNeeded': 'You need a firebottle to torch that.',
   'error.firebottleNotReady': 'Your firebottle is not ready yet.',
@@ -161,6 +168,9 @@ const baseEnTable = {
   // Bind invariant: sellItem refuses a bound (boundTo-stamped) copy so
   // the vendor can never launder the Maker's Bond into a plain buyback copy.
   'error.sellBound': 'That item is bound and cannot be sold.',
+  // Player item lock (issue 3042, src/sim/item_lock.ts): a player-locked
+  // copy, distinct from the Maker's Bond bind above.
+  'error.sellLocked': 'That item is locked and cannot be sold.',
   'error.noBuyback': 'That item is not available for buyback.',
   'error.nailedShut': 'It is nailed shut.',
   'error.enoughOfThose': 'You have enough of those.',
@@ -243,6 +253,8 @@ const baseEnTable = {
   'groundPickup.graveSealedDeny':
     'The grave is sealed against the living until the dead call you to it.',
   'groundPickup.cryptRitualCircleDeny': 'The ritual circle lies cold and dormant.',
+  'groundPickup.castawayCrateDeny': 'Barnacles seal the crate shut.',
+  'groundPickup.ferryBellDeny': 'The ferry bell hangs silent.',
   'groundPickup.supplyCrateEnough': 'You already have enough supply crates.',
   'groundPickup.gravecallerSigilEnough': "You already carry a Gravecaller's Sigil.",
   'groundPickup.ledgerPageEnough': 'You already have enough ledger pages.',
@@ -263,6 +275,8 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  'groundPickup.castawayCrateEnough': 'You already have enough castaway crates.',
+  'groundPickup.ferryBellEnough': 'The ferry bell has nothing to give.',
   // Murloc huts (q_deepfen_purge): the pickup deny arm is defensive (hut clicks
   // route to the firebottle handler first), but the lines exist per the
   // every-object-has-lines rule and localize like the rest.
@@ -350,10 +364,6 @@ const baseEnTable = {
   // distinct object, so this covers all of them (bells rung, lanterns relit,
   // banners planted, carts righted). Emitted from interactObjectForQuests.
   'groundPickup.objectAlreadyCredited': 'You have already done this one.',
-  'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
-  'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
-  'error.vcupNoNation': 'Pick a banner nation first.',
-  'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
   'log.talentsUpdated': 'Talents updated.',
   'log.talentsReset': 'Talents reset.',
   'log.cheatDeathSave': 'Cheat Death saves you!',
@@ -447,6 +457,8 @@ const baseEnTable = {
   'aura.sprintRune': 'Sprint',
   'aura.battleRune': 'Battle Rune',
   'aura.wardRune': 'Ward Rune',
+  // Aspect of the Cheetah (Courser's Guise) daze debuff (combat/hunter_shared.ts).
+  'aura.courserDaze': 'Dazed',
   'mechanic.warStomp': 'Shuddering Stomp',
   // Heroic warrior-mob anti-kite charge (MobTemplate.charge, src/sim/mob/charge.ts):
   // the stun debuff on the player and the {mechanic} in the "unleashes" line.
@@ -610,6 +622,21 @@ const baseEnTable = {
   'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
   'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
   'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+  // The Proving Shore (tutorial island): the greeting's ferry ride, the two
+  // clicked ferry bells, the startTutorial gate denials
+  // (sim/tutorial/greeting.ts + interactions/ferry_bell.ts), and the
+  // quest-gated vendor row denial (items.ts vendorQuestGates).
+  'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
+  'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
+  'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
+  'error.tutorialFromHere': 'You cannot set sail from here.',
+  'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
+  'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
+  'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
+  'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
+  'log.longWalkHealer':
+    'The Keeper set you on your feet. Next time, walk to your body: it costs you nothing.',
+  'error.vendorQuestGated': 'That item is not for sale to you yet.',
   'aura.bladedEcho': 'Bladed Echo',
   'aura.emboldened': 'Emboldened',
   'aura.enraged': 'Enraged',
@@ -622,6 +649,10 @@ const baseEnTable = {
   'aura.solarReprisal': 'Solar Reprisal',
   'aura.dawnsWrath': "Dawn's Wrath",
   'aura.moontide': 'Moontide',
+  // The operator-applied Cheater mark's countdown debuff (src/sim/moderation/).
+  // The sim authors the aura name in English; this row is what stops the debuff
+  // bar and combat log shipping that English to all 21 locales.
+  'aura.cheaterMark': 'Marked as a Cheater',
   'aura.oldBlood': 'Old Blood',
   'aura.verdance': 'Verdance',
   'aura.lopingStride': 'Loping Stride',
@@ -753,6 +784,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
     'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
     'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+    'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
+    'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
+    'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
+    'error.tutorialFromHere': 'You cannot set sail from here.',
+    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
+    'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
+    'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
+    'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
+    'log.longWalkHealer':
+      'The Keeper set you on your feet. Next time, walk to your body: it costs you nothing.',
+    'error.vendorQuestGated': 'That item is not for sale to you yet.',
     'log.deathwardSaves': 'A deathward saves you!',
     'error.lineOfSight': 'Line of sight.',
     'error.bagsFull': 'Your bags are full.',
@@ -785,6 +827,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -816,10 +859,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'That resource node does not exist.',
     'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
     'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
-    'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
-    'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
-    'error.vcupNoNation': 'Pick a banner nation first.',
-    'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
     'log.talentsUpdated': 'Talents updated.',
     'log.talentsReset': 'Talents reset.',
     'log.savedBuild': 'Saved build “{name}”.',
@@ -942,6 +981,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.unstuckSickness': 'Unstuck Sickness',
   },
   es: {
+    'log.passingStoneKneel':
+      'Cierras la mano sobre la Piedra de Paso, y la orilla te deja marchar.',
+    'error.tutorialFromHere': 'No puedes zarpar desde aquí.',
+    'error.tutorialOutleveled': 'La Costa de la Prueba ya no tiene nada que enseñarte.',
+    'error.passingStoneCold': 'La piedra está fría. La Instructora Maren no te ha pedido esto.',
+    'error.vendorQuestGated': 'Ese objeto no está a la venta para ti todavía.',
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
     'error.unknownAbility': 'No conoces esa habilidad.',
     'error.notEnoughRuin': '¡No hay suficiente Ruina!',
     'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
@@ -1072,6 +1121,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tumba está sellada para los vivos hasta que los muertos te llamen a ella.',
     'groundPickup.cryptRitualCircleDeny': 'El círculo ritual yace frío e inerte.',
+    'groundPickup.castawayCrateDeny': 'Los percebes mantienen la caja sellada.',
+    'groundPickup.ferryBellDeny': 'La campana del ferry cuelga en silencio.',
+    'groundPickup.ferryBellEnough': 'La campana del ferry no tiene nada que dar.',
+    'groundPickup.castawayCrateEnough': 'Ya tienes suficientes cajas de náufrago.',
     'groundPickup.supplyCrateEnough': 'Ya tienes suficientes cajones de suministros.',
     'groundPickup.gravecallerSigilEnough': 'Ya llevas un Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Ya tienes suficientes páginas del registro.',
@@ -1195,6 +1248,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Todos tus huecos de bolsa están ocupados.',
     'error.bagSwapTooManyItems': 'Tienes demasiados objetos para cambiar a esa bolsa.',
     'error.bagRemoveTooManyItems': 'Tienes demasiados objetos para quitar esa bolsa.',
+    'error.bagEquipHasProperty':
+      'No puedes equipar esa bolsa mientras tenga una propiedad especial.',
     'error.tradeBagSpace': 'Intercambio fallido: no hay suficiente espacio en las bolsas.',
     'log.bagsMigrated': 'Tus pertenencias se han guardado en bolsas nuevas.',
     'error.specLevel': 'Puedes elegir una especialización al nivel {level}.',
@@ -1223,6 +1278,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún vendedor cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado y no se puede abrir.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1250,11 +1306,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Ese nodo de recursos no existe.',
     'error.gatherNodeNotRespawned': 'Este nodo de recursos aún no ha reaparecido para ti.',
     'error.toolEffectSlotFromWindow': 'Engárzalo desde la ventana de Profesiones.',
-    'error.vcupDeserter': 'El Guardacampo lo recuerda. Vuelve más tarde.',
-    'error.vcupPartyTooBig': 'Esa categoría necesita un grupo más pequeño.',
-    'error.vcupNoNation': 'Primero elige una nación de estandarte.',
-    'error.vcupPracticeFull':
-      'Los campos de práctica están todos ocupados. Inténtalo de nuevo en un momento.',
     'log.talentsUpdated': 'Talentos actualizados.',
     'log.talentsReset': 'Talentos restablecidos.',
     'log.cheatDeathSave': '¡Burlar la muerte te salva!',
@@ -1389,6 +1440,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
   },
   es_ES: {
+    'log.passingStoneKneel':
+      'Cierras la mano sobre la Piedra de Paso, y la orilla te deja marchar.',
+    'error.tutorialFromHere': 'No puedes zarpar desde aquí.',
+    'error.tutorialOutleveled': 'La Costa de la Prueba ya no tiene nada que enseñarte.',
+    'error.passingStoneCold': 'La piedra está fría. La Instructora Maren no te ha pedido esto.',
+    'error.vendorQuestGated': 'Ese objeto no está a la venta para ti todavía.',
+    'error.arenaMinLevel': 'Debes ser nivel {level} para entrar en cola de arena.',
+    'error.arenaMinLevelMember':
+      '{name} debe ser al menos nivel {level} para entrar en cola de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Sales de la cola del Coliseo Cinéreo.',
     'error.unknownAbility': 'No conoces esa habilidad.',
     'error.notEnoughRuin': '¡No hay suficiente Ruina!',
     'error.burningPactRequired': 'Conflagrar requiere Pacto Ardiente en el objetivo.',
@@ -1516,6 +1577,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tumba está sellada a los vivos hasta que los muertos te llamen a ella.',
     'groundPickup.cryptRitualCircleDeny': 'El círculo ritual yace frío e inerte.',
+    'groundPickup.castawayCrateDeny': 'Los percebes mantienen la caja sellada.',
+    'groundPickup.ferryBellDeny': 'La campana del ferry cuelga en silencio.',
+    'groundPickup.ferryBellEnough': 'La campana del ferry no tiene nada que dar.',
+    'groundPickup.castawayCrateEnough': 'Ya tienes suficientes cajas de náufrago.',
     'groundPickup.supplyCrateEnough': 'Ya tienes suficientes cajones de suministros.',
     'groundPickup.gravecallerSigilEnough': 'Ya llevas un Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Ya tienes suficientes páginas del libro mayor.',
@@ -1639,6 +1704,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Todos tus huecos de bolsa están ocupados.',
     'error.bagSwapTooManyItems': 'Tienes demasiados objetos para cambiar a esa bolsa.',
     'error.bagRemoveTooManyItems': 'Tienes demasiados objetos para quitar esa bolsa.',
+    'error.bagEquipHasProperty':
+      'No puedes equipar esa bolsa mientras tenga una propiedad especial.',
     'error.tradeBagSpace': 'Intercambio fallido: no hay suficiente espacio en las bolsas.',
     'log.bagsMigrated': 'Tus pertenencias se han guardado en bolsas nuevas.',
     'error.specLevel': 'Podrás elegir una especialización en el nivel {level}.',
@@ -1667,6 +1734,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'No hay ningún mercader cerca.',
     'error.noSellQuest': 'No puedes vender objetos de misión.',
     'error.sellBound': 'Ese objeto está vinculado y no puede venderse.',
+    'error.sellLocked': 'Ese objeto está bloqueado y no puede venderse.',
     'error.noBuyback': 'Ese objeto no está disponible para recompra.',
     'error.nailedShut': 'Está clavado.',
     'error.enoughOfThose': 'Ya tienes suficientes de esos.',
@@ -1694,11 +1762,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Ese nodo de recursos no existe.',
     'error.gatherNodeNotRespawned': 'Este nodo de recursos aún no ha reaparecido para ti.',
     'error.toolEffectSlotFromWindow': 'Engárzalo desde la ventana de Profesiones.',
-    'error.vcupDeserter': 'El Guardacampo lo recuerda. Vuelve más tarde.',
-    'error.vcupPartyTooBig': 'Esa categoría necesita un grupo más pequeño.',
-    'error.vcupNoNation': 'Primero elige una nación de estandarte.',
-    'error.vcupPracticeFull':
-      'Los campos de práctica están todos ocupados. Inténtalo de nuevo en un momento.',
     'log.talentsUpdated': 'Talentos actualizados.',
     'log.talentsReset': 'Talentos restablecidos.',
     'log.cheatDeathSave': '¡Burlar la muerte te salva!',
@@ -1836,6 +1899,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
   },
   fr_FR: {
+    'log.passingStoneKneel':
+      'Vous refermez la main sur la Pierre de trépas, et le rivage vous laisse partir.',
+    'error.tutorialFromHere': 'Vous ne pouvez pas prendre le large depuis ici.',
+    'error.tutorialOutleveled': "Le Rivage de l'Épreuve n'a plus rien à vous apprendre.",
+    'error.passingStoneCold':
+      "La pierre est froide. L'Instructrice Maren ne vous a pas demandé cela.",
+    'error.vendorQuestGated': 'Cet objet ne vous est pas encore proposé à la vente.',
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
     'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
     'error.notEnoughRuin': 'Pas assez de Ruine !',
     'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
@@ -1971,6 +2045,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tombe reste scellée aux vivants tant que les morts ne vous y appellent pas.',
     'groundPickup.cryptRitualCircleDeny': 'Le cercle rituel demeure froid et endormi.',
+    'groundPickup.castawayCrateDeny': 'Les bernacles scellent la caisse.',
+    'groundPickup.ferryBellDeny': 'La cloche du bac pend en silence.',
+    'groundPickup.ferryBellEnough': "La cloche du bac n'a rien à donner.",
+    'groundPickup.castawayCrateEnough': "Vous avez déjà assez de caisses d'épave.",
     'groundPickup.supplyCrateEnough': 'Vous avez déjà assez de caisses de fournitures.',
     'groundPickup.gravecallerSigilEnough': 'Vous portez déjà un sceau de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Vous avez déjà assez de pages de registre.',
@@ -2094,6 +2172,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Tous vos emplacements de sac sont occupés.',
     'error.bagSwapTooManyItems': "Vous avez trop d'objets pour passer à ce sac.",
     'error.bagRemoveTooManyItems': "Vous avez trop d'objets pour retirer ce sac.",
+    'error.bagEquipHasProperty':
+      'Vous ne pouvez pas équiper ce sac tant qu’il possède une propriété spéciale.',
     'error.tradeBagSpace': 'Échange échoué : pas assez de place dans les sacs.',
     'log.bagsMigrated': 'Vos affaires ont été rangées dans de nouveaux sacs.',
     'error.specLevel': 'Vous pourrez choisir une spécialisation au niveau {level}.',
@@ -2122,6 +2202,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est condamné par des clous.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2150,11 +2231,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': "Ce nœud de ressources n'existe pas.",
     'error.gatherNodeNotRespawned': "Ce nœud de ressources n'est pas encore réapparu pour vous.",
     'error.toolEffectSlotFromWindow': 'Sertissez-le depuis la fenêtre des Métiers.',
-    'error.vcupDeserter': "Le Gardien du terrain s'en souvient. Revenez plus tard.",
-    'error.vcupPartyTooBig': 'Cette catégorie exige un groupe plus petit.',
-    'error.vcupNoNation': "Choisissez d'abord une nation de bannière.",
-    'error.vcupPracticeFull':
-      "Tous les terrains d'entraînement sont occupés. Réessayez dans un instant.",
     'log.talentsUpdated': 'Talents mis à jour.',
     'log.talentsReset': 'Talents réinitialisés.',
     'log.cheatDeathSave': 'Trompe-la-mort vous sauve !',
@@ -2292,6 +2368,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
   },
   fr_CA: {
+    'log.passingStoneKneel':
+      'Vous refermez la main sur la Pierre de trépas, et le rivage vous laisse partir.',
+    'error.tutorialFromHere': 'Vous ne pouvez pas prendre le large depuis ici.',
+    'error.tutorialOutleveled': "Le Rivage de l'Épreuve n'a plus rien à vous apprendre.",
+    'error.passingStoneCold':
+      "La pierre est froide. L'Instructrice Maren ne vous a pas demandé cela.",
+    'error.vendorQuestGated': 'Cet objet ne vous est pas encore proposé à la vente.',
+    'error.arenaMinLevel': "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+    'error.arenaMinLevelMember':
+      "{name} doit être au moins niveau {level} pour rejoindre la file d'arène.",
+    'log.arenaQueueAutoLeave1v1': 'Vous quittez la file du Colisée cendré.',
     'error.unknownAbility': 'Vous ne connaissez pas cette technique.',
     'error.notEnoughRuin': 'Pas assez de Ruine !',
     'error.burningPactRequired': 'Conflagration nécessite Pacte brûlant sur la cible.',
@@ -2426,6 +2513,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tombe est scellée aux vivants tant que les morts ne vous y appellent pas.',
     'groundPickup.cryptRitualCircleDeny': 'Le cercle rituel demeure froid et inerte.',
+    'groundPickup.castawayCrateDeny': 'Les bernacles scellent la caisse.',
+    'groundPickup.ferryBellDeny': 'La cloche du bac pend en silence.',
+    'groundPickup.ferryBellEnough': "La cloche du bac n'a rien à donner.",
+    'groundPickup.castawayCrateEnough': "Vous avez déjà assez de caisses d'épave.",
     'groundPickup.supplyCrateEnough': 'Vous avez déjà assez de caisses de fournitures.',
     'groundPickup.gravecallerSigilEnough': 'Vous portez déjà un Sceau de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Vous avez déjà assez de pages de registre.',
@@ -2549,6 +2640,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Tous vos emplacements de sac sont occupés.',
     'error.bagSwapTooManyItems': "Vous avez trop d'objets pour passer à ce sac.",
     'error.bagRemoveTooManyItems': "Vous avez trop d'objets pour retirer ce sac.",
+    'error.bagEquipHasProperty':
+      'Vous ne pouvez pas équiper ce sac tant qu’il possède une propriété spéciale.',
     'error.tradeBagSpace': 'Échange échoué : pas assez de place dans les sacs.',
     'log.bagsMigrated': 'Vos affaires ont été rangées dans de nouveaux sacs.',
     'error.specLevel': 'Vous pourrez choisir une spécialisation au niveau {level}.',
@@ -2577,6 +2670,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Il n'y a aucun marchand à proximité.",
     'error.noSellQuest': "Vous ne pouvez pas vendre d'objets de quête.",
     'error.sellBound': 'Cet objet est lié et ne peut pas être vendu.',
+    'error.sellLocked': 'Cet objet est verrouillé et ne peut pas être vendu.',
     'error.noBuyback': "Cet objet n'est pas disponible au rachat.",
     'error.nailedShut': "C'est cloué.",
     'error.enoughOfThose': 'Vous en avez assez.',
@@ -2606,11 +2700,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': "Ce nœud de ressources n'existe pas.",
     'error.gatherNodeNotRespawned': "Ce nœud de ressources n'est pas encore réapparu pour vous.",
     'error.toolEffectSlotFromWindow': 'Sertissez-le depuis la fenêtre des Métiers.',
-    'error.vcupDeserter': "Le Gardien du terrain s'en souvient. Revenez plus tard.",
-    'error.vcupPartyTooBig': 'Cette catégorie exige un groupe plus petit.',
-    'error.vcupNoNation': "Choisissez d'abord une nation de bannière.",
-    'error.vcupPracticeFull':
-      "Tous les terrains d'entraînement sont occupés. Réessayez dans un instant.",
     'log.talentsUpdated': 'Talents mis à jour.',
     'log.talentsReset': 'Talents réinitialisés.',
     'log.cheatDeathSave': 'Trompe-la-mort vous sauve !',
@@ -2754,6 +2843,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.veilLeave': 'The veil closes behind you, and the mountain air bites again.',
     'log.ferryEnter': 'The ferry bell rings once, and the Farshore rises out of the spray.',
     'log.ferryLeave': 'The bell answers from the vale, and the mainland takes you back.',
+    'log.provingFerry': 'The ferry sets you down on the Proving Shore.',
+    'log.provingEnter': 'The ferry bell tolls, and the Proving Shore rises to meet you.',
+    'log.provingLeave': 'The crossing takes hold, and Eastbrook Vale spreads out before you.',
+    'error.tutorialFromHere': 'You cannot set sail from here.',
+    'error.tutorialOutleveled': 'The Proving Shore has nothing left to teach you.',
+    'log.passingStoneKneel': 'You close your hand on the Passing Stone, and the shore lets you go.',
+    'error.passingStoneCold': 'The stone is cold. Instructor Maren has not asked this of you.',
+    'log.longWalkCorpse': 'You are whole again, and you found your own way back.',
+    'log.longWalkHealer':
+      'The Keeper set you on your feet. Next time, walk to your body: it costs you nothing.',
+    'error.vendorQuestGated': 'That item is not for sale to you yet.',
     'log.deathwardSaves': 'A deathward saves you!',
     'log.learnedAbility': 'You have learned a new ability: {name}.',
     'log.abilityRankUp': 'Your {name} has improved to Rank {rank}.',
@@ -2867,6 +2967,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'There is no merchant nearby.',
     'error.noSellQuest': 'You cannot sell quest items.',
     'error.sellBound': 'That item is bound and cannot be sold.',
+    'error.sellLocked': 'That item is locked and cannot be sold.',
     'error.noBuyback': 'That item is not available for buyback.',
     'error.nailedShut': 'It is nailed shut.',
     'error.enoughOfThose': 'You have enough of those.',
@@ -2896,10 +2997,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'That resource node does not exist.',
     'error.gatherNodeNotRespawned': 'This resource node has not respawned for you yet.',
     'error.toolEffectSlotFromWindow': 'Open Professions to slot that.',
-    'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
-    'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
-    'error.vcupNoNation': 'Pick a banner nation first.',
-    'error.vcupPracticeFull': 'The practice pitches are all in use. Try again shortly.',
     'log.talentsUpdated': 'Talents updated.',
     'log.talentsReset': 'Talents reset.',
     'log.savedBuild': 'Saved build “{name}”.',
@@ -2941,6 +3038,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirSerpent': 'Might of the Serpent',
   },
   it_IT: {
+    'log.passingStoneKneel':
+      'Chiudi la mano sulla Pietra del trapasso, e la riva ti lascia andare.',
+    'error.tutorialFromHere': 'Non puoi salpare da qui.',
+    'error.tutorialOutleveled': 'La Riva della Prova non ha più nulla da insegnarti.',
+    'error.passingStoneCold': "La pietra è fredda. L'Istruttrice Maren non te lo ha chiesto.",
+    'error.vendorQuestGated': "Quell'oggetto non è ancora in vendita per te.",
+    'error.arenaMinLevel': "Devi essere di livello {level} per metterti in coda per l'arena.",
+    'error.arenaMinLevelMember':
+      "{name} deve essere almeno di livello {level} per mettersi in coda per l'arena.",
+    'log.arenaQueueAutoLeave1v1': 'Esci dalla coda del Colosseo Cinereo.',
     'error.unknownAbility': 'Non conosci questa abilità.',
     'error.notEnoughRuin': 'Rovina insufficiente!',
     'error.burningPactRequired': 'Conflagrazione richiede Patto Ardente sul bersaglio.',
@@ -3070,6 +3177,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'La tomba è sigillata ai vivi finché i morti non ti chiamano a sé.',
     'groundPickup.cryptRitualCircleDeny': 'Il cerchio rituale giace freddo e dormiente.',
+    'groundPickup.castawayCrateDeny': 'I cirripedi tengono sigillata la cassa.',
+    'groundPickup.ferryBellDeny': 'La campana del traghetto pende silenziosa.',
+    'groundPickup.ferryBellEnough': 'La campana del traghetto non ha nulla da dare.',
+    'groundPickup.castawayCrateEnough': 'Hai già abbastanza casse alla deriva.',
     'groundPickup.supplyCrateEnough': 'Hai già abbastanza casse di rifornimenti.',
     'groundPickup.gravecallerSigilEnough': 'Porti già con te un Sigillo di Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Hai già abbastanza pagine di registro.',
@@ -3193,6 +3304,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Tutti gli alloggiamenti delle borse sono occupati.',
     'error.bagSwapTooManyItems': 'Hai troppi oggetti per passare a quella borsa.',
     'error.bagRemoveTooManyItems': 'Hai troppi oggetti per rimuovere quella borsa.',
+    'error.bagEquipHasProperty':
+      'Non puoi equipaggiare quella borsa finché possiede una proprietà speciale.',
     'error.tradeBagSpace': 'Scambio fallito: spazio insufficiente nelle borse.',
     'log.bagsMigrated': 'I tuoi averi sono stati riposti in nuove borse.',
     'error.specLevel': 'Puoi scegliere una specializzazione al livello {level}.',
@@ -3221,6 +3334,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': "Non c'è nessun mercante nelle vicinanze.",
     'error.noSellQuest': 'Non puoi vendere oggetti delle missioni.',
     'error.sellBound': "Quell'oggetto è legato e non può essere venduto.",
+    'error.sellLocked': "Quell'oggetto è bloccato e non può essere venduto.",
     'error.noBuyback': "Quell'oggetto non è disponibile per il riacquisto.",
     'error.nailedShut': 'È inchiodato.',
     'error.enoughOfThose': 'Ne hai già abbastanza.',
@@ -3248,10 +3362,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Quel nodo di risorse non esiste.',
     'error.gatherNodeNotRespawned': 'Questo nodo di risorse non è ancora ricomparso per te.',
     'error.toolEffectSlotFromWindow': 'Incastonalo dalla finestra Professioni.',
-    'error.vcupDeserter': 'Il Custode del campo ricorda. Torna più tardi.',
-    'error.vcupPartyTooBig': 'Quella categoria richiede un gruppo più piccolo.',
-    'error.vcupNoNation': 'Prima scegli una nazione della bandiera.',
-    'error.vcupPracticeFull': 'I campi di allenamento sono tutti occupati. Riprova tra poco.',
     'log.talentsUpdated': 'Talenti aggiornati.',
     'log.talentsReset': 'Talenti azzerati.',
     'log.cheatDeathSave': 'Ingannare la morte ti salva!',
@@ -3389,6 +3499,17 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
   },
   de_DE: {
+    'log.passingStoneKneel':
+      'Du schließt deine Hand um den Übergangsstein, und die Küste lässt dich ziehen.',
+    'error.tutorialFromHere': 'Von hier aus kannst du nicht in See stechen.',
+    'error.tutorialOutleveled': 'Die Bewährungsküste hat dir nichts mehr beizubringen.',
+    'error.passingStoneCold':
+      'Der Stein ist kalt. Ausbilderin Maren hat dies nicht von dir verlangt.',
+    'error.vendorQuestGated': 'Diesen Gegenstand kannst du noch nicht kaufen.',
+    'error.arenaMinLevel': 'Du musst Stufe {level} sein, um dich für die Arena einzureihen.',
+    'error.arenaMinLevelMember':
+      '{name} muss mindestens Stufe {level} sein, um sich für die Arena einzureihen.',
+    'log.arenaQueueAutoLeave1v1': 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
     'error.unknownAbility': 'Ihr beherrscht diese Fähigkeit nicht.',
     'error.notEnoughRuin': 'Nicht genug Verderben!',
     'error.burningPactRequired': 'Feuersbrunst erfordert Brennender Pakt auf dem Ziel.',
@@ -3519,6 +3640,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'Das Grab ist vor den Lebenden versiegelt, bis die Toten Euch zu ihm rufen.',
     'groundPickup.cryptRitualCircleDeny': 'Der Ritualkreis liegt kalt und erloschen da.',
+    'groundPickup.castawayCrateDeny': 'Seepocken halten die Kiste versiegelt.',
+    'groundPickup.ferryBellDeny': 'Die Fährglocke hängt stumm.',
+    'groundPickup.ferryBellEnough': 'Die Fährglocke hat nichts zu geben.',
+    'groundPickup.castawayCrateEnough': 'Ihr habt bereits genug Treibgutkisten.',
     'groundPickup.supplyCrateEnough': 'Ihr habt bereits genug Vorratskisten.',
     'groundPickup.gravecallerSigilEnough': 'Ihr tragt bereits ein Gravecaller-Siegel.',
     'groundPickup.ledgerPageEnough': 'Ihr habt bereits genug Buchseiten.',
@@ -3642,6 +3767,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Alle Eure Taschenplätze sind belegt.',
     'error.bagSwapTooManyItems': 'Ihr habt zu viele Gegenstände, um zu dieser Tasche zu wechseln.',
     'error.bagRemoveTooManyItems': 'Ihr habt zu viele Gegenstände, um diese Tasche abzulegen.',
+    'error.bagEquipHasProperty':
+      'Diese Tasche kann nicht angelegt werden, solange sie eine besondere Eigenschaft besitzt.',
     'error.tradeBagSpace': 'Handel fehlgeschlagen: nicht genug Taschenplatz.',
     'log.bagsMigrated': 'Eure Habseligkeiten wurden in neue Taschen gepackt.',
     'error.specLevel': 'Ihr könnt auf Stufe {level} eine Spezialisierung wählen.',
@@ -3670,6 +3797,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Es ist kein Händler in der Nähe.',
     'error.noSellQuest': 'Ihr könnt keine Questgegenstände verkaufen.',
     'error.sellBound': 'Dieser Gegenstand ist gebunden und kann nicht verkauft werden.',
+    'error.sellLocked': 'Dieser Gegenstand ist gesperrt und kann nicht verkauft werden.',
     'error.noBuyback': 'Dieser Gegenstand ist nicht zum Rückkauf verfügbar.',
     'error.nailedShut': 'Es ist vernagelt.',
     'error.enoughOfThose': 'Davon habt Ihr genug.',
@@ -3699,11 +3827,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeNotRespawned':
       'Dieses Ressourcenvorkommen ist für Euch noch nicht erneut erschienen.',
     'error.toolEffectSlotFromWindow': 'Öffnet die Berufe, um das anzubringen.',
-    'error.vcupDeserter': 'Der Platzwart vergisst nicht. Kommt später wieder.',
-    'error.vcupPartyTooBig': 'Diese Klasse braucht eine kleinere Gruppe.',
-    'error.vcupNoNation': 'Wählt zuerst eine Bannernation.',
-    'error.vcupPracticeFull':
-      'Alle Trainingsplätze sind gerade belegt. Versucht es gleich noch einmal.',
     'log.talentsUpdated': 'Talente aktualisiert.',
     'log.talentsReset': 'Talente zurückgesetzt.',
     'log.cheatDeathSave': 'Tod überlisten rettet Euch!',
@@ -3841,6 +3964,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
   },
   zh_CN: {
+    'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
+    'error.tutorialFromHere': '你无法从这里扬帆起航。',
+    'error.tutorialOutleveled': '试炼之滨已经没有什么能再教你的了。',
+    'error.passingStoneCold': '石头是凉的。教官玛伦并未要求你这么做。',
+    'error.vendorQuestGated': '这件物品暂时还不卖给你。',
+    'error.arenaMinLevel': '你必须达到等级 {level} 才能加入竞技场队列。',
+    'error.arenaMinLevelMember': '{name} 必须至少达到等级 {level} 才能加入竞技场队列。',
+    'log.arenaQueueAutoLeave1v1': '你离开了灰烬斗技场队列。',
     'error.unknownAbility': '你尚未学会该技能。',
     'error.notEnoughRuin': '毁灭不足！',
     'error.burningPactRequired': '燃尽需要目标身上有燃烧契约。',
@@ -4018,6 +4149,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.moongateRubbingDeny': '在守望者开口索要之前，这道铭文还轮不到你来拓印。',
     'groundPickup.graveSealedDeny': '坟墓向生者封闭，直到死者召唤你前来。',
     'groundPickup.cryptRitualCircleDeny': '仪式法阵冰冷沉寂。',
+    'groundPickup.castawayCrateDeny': '藤壶把货箱封得严严实实。',
+    'groundPickup.ferryBellDeny': '渡船铃静静垂着。',
+    'groundPickup.ferryBellEnough': '渡船铃没有什么可给你的。',
+    'groundPickup.castawayCrateEnough': '你已经有足够的漂流货箱了。',
     'groundPickup.supplyCrateEnough': '你已经有足够的补给箱了。',
     'groundPickup.gravecallerSigilEnough': '你身上已经带着一枚唤墓者徽记了。',
     'groundPickup.ledgerPageEnough': '你已经有足够的账页了。',
@@ -4144,6 +4279,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': '你的所有背包栏位都已占用。',
     'error.bagSwapTooManyItems': '物品太多，无法换成那个背包。',
     'error.bagRemoveTooManyItems': '物品太多，无法移除那个背包。',
+    'error.bagEquipHasProperty': '该背包带有特殊属性时无法装备。',
     'error.tradeBagSpace': '交易失败：背包空间不足。',
     'log.bagsMigrated': '你的物品已装入新背包。',
     'error.specLevel': '你将在{level}级时选择专精。',
@@ -4178,6 +4314,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近没有商人。',
     'error.noSellQuest': '你无法出售任务物品。',
     'error.sellBound': '该物品已绑定，无法出售。',
+    'error.sellLocked': '该物品已锁定，无法出售。',
     'error.noBuyback': '该物品无法回购。',
     'error.nailedShut': '它被钉死了。',
     'error.enoughOfThose': '你已经有足够多的这种物品了。',
@@ -4204,10 +4341,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': '那个资源点不存在。',
     'error.gatherNodeNotRespawned': '这个资源点尚未为你刷新。',
     'error.toolEffectSlotFromWindow': '请在专业窗口中镶嵌它。',
-    'error.vcupDeserter': '场地管理员记着呢。稍后再来吧。',
-    'error.vcupPartyTooBig': '这个赛级需要更小的队伍。',
-    'error.vcupNoNation': '请先选择一个旗帜国度。',
-    'error.vcupPracticeFull': '练习场地已全部占用。请稍后再试。',
     'log.talentsUpdated': '天赋已更新。',
     'log.talentsReset': '天赋已重置。',
     'log.cheatDeathSave': '死里逃生救了你！',
@@ -4277,6 +4410,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的专注重置已完成。',
   },
   zh_TW: {
+    'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
+    'error.tutorialFromHere': '你無法從這裡揚帆出海。',
+    'error.tutorialOutleveled': '試煉之濱已經沒有什麼能再教你的了。',
+    'error.passingStoneCold': '石頭是冷的。教官瑪倫並未要求你這麼做。',
+    'error.vendorQuestGated': '這件物品目前還不能賣給你。',
+    'error.arenaMinLevel': '你必須達到等級 {level} 才能加入競技場佇列。',
+    'error.arenaMinLevelMember': '{name} 必須至少達到等級 {level} 才能加入競技場佇列。',
+    'log.arenaQueueAutoLeave1v1': '你離開了灰燼競技場佇列。',
     'error.unknownAbility': '你尚未學會該技能。',
     'error.notEnoughRuin': '毀滅不足！',
     'error.burningPactRequired': '燃盡需要目標身上有燃燒契約。',
@@ -4454,6 +4595,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.moongateRubbingDeny': '在守望者開口索要之前，你無權拓印這道守護符文。',
     'groundPickup.graveSealedDeny': '在亡者召喚你之前，這座墳墓不容生者踏入。',
     'groundPickup.cryptRitualCircleDeny': '儀式法陣冰冷而沉寂。',
+    'groundPickup.castawayCrateDeny': '藤壺把貨箱封得嚴嚴實實。',
+    'groundPickup.ferryBellDeny': '渡船鈴靜靜垂著。',
+    'groundPickup.ferryBellEnough': '渡船鈴沒有什麼可給你的。',
+    'groundPickup.castawayCrateEnough': '你已經有足夠的漂流貨箱了。',
     'groundPickup.supplyCrateEnough': '你已經有足夠的補給箱了。',
     'groundPickup.gravecallerSigilEnough': '你身上已經帶著一枚喚墓者徽記了。',
     'groundPickup.ledgerPageEnough': '你已經有足夠的帳頁了。',
@@ -4580,6 +4725,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': '你的所有背包欄位都已佔用。',
     'error.bagSwapTooManyItems': '物品太多，無法換成那個背包。',
     'error.bagRemoveTooManyItems': '物品太多，無法移除那個背包。',
+    'error.bagEquipHasProperty': '此背包帶有特殊屬性時無法裝備。',
     'error.tradeBagSpace': '交易失敗：背包空間不足。',
     'log.bagsMigrated': '你的物品已裝入新背包。',
     'error.specLevel': '你必須達到等級 {level} 才能選擇專精。',
@@ -4614,6 +4760,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '附近沒有商人。',
     'error.noSellQuest': '你無法出售任務物品。',
     'error.sellBound': '該物品已綁定，無法出售。',
+    'error.sellLocked': '該物品已鎖定，無法出售。',
     'error.noBuyback': '那件物品無法購回。',
     'error.nailedShut': '它被釘死了。',
     'error.enoughOfThose': '你已經有足夠的那種物品了。',
@@ -4640,10 +4787,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': '那個資源點不存在。',
     'error.gatherNodeNotRespawned': '這個資源點尚未為你重新出現。',
     'error.toolEffectSlotFromWindow': '請在專業視窗中鑲嵌它。',
-    'error.vcupDeserter': '場地管理員記著呢。稍後再來吧。',
-    'error.vcupPartyTooBig': '這個賽級需要更小的隊伍。',
-    'error.vcupNoNation': '請先選擇一個旗幟國度。',
-    'error.vcupPracticeFull': '練習場地已全部佔用。請稍後再試。',
     'log.talentsUpdated': '天賦已更新。',
     'log.talentsReset': '天賦已重置。',
     'log.cheatDeathSave': '死裡逃生救了你！',
@@ -4713,6 +4856,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '你的專注重置已完成。',
   },
   ko_KR: {
+    'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
+    'error.tutorialFromHere': '여기서는 출항할 수 없습니다.',
+    'error.tutorialOutleveled': '수련의 해안은 더 이상 당신에게 가르칠 것이 없습니다.',
+    'error.passingStoneCold': '돌이 차갑습니다. 교관 마렌은 당신에게 이것을 요구하지 않았습니다.',
+    'error.vendorQuestGated': '그 아이템은 아직 당신에게 판매되지 않습니다.',
+    'error.arenaMinLevel': '투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'error.arenaMinLevelMember':
+      '{name}님은 투기장 대기열에 참가하려면 레벨 {level} 이상이어야 합니다.',
+    'log.arenaQueueAutoLeave1v1': '잿빛 원형경기장 대기열에서 나왔습니다.',
     'error.unknownAbility': '아직 배우지 않은 기술입니다.',
     'error.notEnoughRuin': '파멸이 부족합니다!',
     'error.burningPactRequired': '점화하려면 대상에게 불타는 계약이 있어야 합니다.',
@@ -4895,6 +5047,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       '죽은 자들이 당신을 부르기 전까지 무덤은 산 자에게 봉인되어 있습니다.',
     'groundPickup.cryptRitualCircleDeny': '의식진은 차갑게 식은 채 잠들어 있습니다.',
+    'groundPickup.castawayCrateDeny': '따개비가 상자를 단단히 봉하고 있습니다.',
+    'groundPickup.ferryBellDeny': '나룻배 종이 조용히 걸려 있습니다.',
+    'groundPickup.ferryBellEnough': '나룻배 종은 줄 것이 없습니다.',
+    'groundPickup.castawayCrateEnough': '표류 상자는 이미 충분히 갖고 있습니다.',
     'groundPickup.supplyCrateEnough': '보급 상자는 이미 충분히 갖고 있습니다.',
     'groundPickup.gravecallerSigilEnough': '무덤부름 인장은 이미 지니고 있습니다.',
     'groundPickup.ledgerPageEnough': '장부 페이지는 이미 충분히 갖고 있습니다.',
@@ -5022,6 +5178,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': '모든 가방 칸이 사용 중입니다.',
     'error.bagSwapTooManyItems': '소지품이 너무 많아 그 가방으로 교체할 수 없습니다.',
     'error.bagRemoveTooManyItems': '소지품이 너무 많아 그 가방을 해제할 수 없습니다.',
+    'error.bagEquipHasProperty': '특수 속성이 있는 가방은 장착할 수 없습니다.',
     'error.tradeBagSpace': '거래 실패: 가방 공간이 부족합니다.',
     'log.bagsMigrated': '소지품이 새 가방에 담겼습니다.',
     'error.specLevel': '{level}레벨에 전문화를 선택할 수 있습니다.',
@@ -5056,6 +5213,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '근처에 상인이 없습니다.',
     'error.noSellQuest': '퀘스트 아이템은 판매할 수 없습니다.',
     'error.sellBound': '그 아이템은 귀속되어 판매할 수 없습니다.',
+    'error.sellLocked': '그 아이템은 잠겨 있어 판매할 수 없습니다.',
     'error.noBuyback': '그 아이템은 되살 수 없습니다.',
     'error.nailedShut': '못으로 단단히 박혀 있습니다.',
     'error.enoughOfThose': '그것을 이미 충분히 가지고 있습니다.',
@@ -5082,10 +5240,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': '그 자원 지점은 존재하지 않습니다.',
     'error.gatherNodeNotRespawned': '이 자원 지점은 아직 당신에게 다시 생성되지 않았습니다.',
     'error.toolEffectSlotFromWindow': '전문 기술 창에서 장착하세요.',
-    'error.vcupDeserter': '경기장 관리인은 기억하고 있습니다. 나중에 다시 오세요.',
-    'error.vcupPartyTooBig': '해당 등급에는 더 작은 파티가 필요합니다.',
-    'error.vcupNoNation': '먼저 깃발 국가를 선택하세요.',
-    'error.vcupPracticeFull': '연습 경기장이 모두 사용 중입니다. 잠시 후 다시 시도하세요.',
     'log.talentsUpdated': '특성이 갱신되었습니다.',
     'log.talentsReset': '특성이 초기화되었습니다.',
     'log.cheatDeathSave': '죽음 기만이 당신을 구했습니다!',
@@ -5158,6 +5312,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
   },
   ja_JP: {
+    'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
+    'error.tutorialFromHere': 'ここから出航することはできません。',
+    'error.tutorialOutleveled': '修練の浜には、もう教えることは何も残っていません。',
+    'error.passingStoneCold': 'その石は冷たいままです。教官マレンはまだそれを求めていません。',
+    'error.vendorQuestGated': 'そのアイテムはまだあなたには売り物ではありません。',
+    'error.arenaMinLevel': 'アリーナのキューに参加するにはレベル{level}が必要です。',
+    'error.arenaMinLevelMember':
+      '{name}はアリーナのキューに参加するにはレベル{level}以上である必要があります。',
+    'log.arenaQueueAutoLeave1v1': '灰の闘技場のキューを離れました。',
     'error.unknownAbility': 'そのアビリティをまだ習得していません。',
     'error.notEnoughRuin': '破滅が足りません！',
     'error.burningPactRequired': 'コンフラグレートには対象に灼熱の契約が必要です。',
@@ -5343,6 +5506,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       '死者に呼ばれるそのときまで、墓は生者を拒んで封じられています。',
     'groundPickup.cryptRitualCircleDeny': '儀式の円は冷たく、眠りについています。',
+    'groundPickup.castawayCrateDeny': 'フジツボが木箱を固く閉ざしています。',
+    'groundPickup.ferryBellDeny': '渡しの鐘は静かに掛かっています。',
+    'groundPickup.ferryBellEnough': '渡しの鐘から得られるものはありません。',
+    'groundPickup.castawayCrateEnough': '漂着した木箱はすでに十分あります。',
     'groundPickup.supplyCrateEnough': '補給箱はすでに十分あります。',
     'groundPickup.gravecallerSigilEnough': 'グレイブコーラーの印章はすでに携えています。',
     'groundPickup.ledgerPageEnough': '帳簿のページはすでに十分あります。',
@@ -5475,6 +5642,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'バッグスロットはすべて使用中です。',
     'error.bagSwapTooManyItems': 'アイテムが多すぎてそのバッグに交換できません。',
     'error.bagRemoveTooManyItems': 'アイテムが多すぎてそのバッグを外せません。',
+    'error.bagEquipHasProperty': '特殊な特性が付いているバッグは装備できません。',
     'error.tradeBagSpace': '取引失敗：バッグの空きが足りません。',
     'log.bagsMigrated': '持ち物は新しいバッグに収納されました。',
     'error.specLevel': '専門化はレベル{level}で選択できます。',
@@ -5509,6 +5677,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': '近くに商人がいません。',
     'error.noSellQuest': 'クエストアイテムは売却できません。',
     'error.sellBound': 'そのアイテムはバインドされているため売却できません。',
+    'error.sellLocked': 'そのアイテムはロックされているため売却できません。',
     'error.noBuyback': 'そのアイテムは買い戻しできません。',
     'error.nailedShut': '釘で打ち付けられています。',
     'error.enoughOfThose': 'それはもう十分に持っています。',
@@ -5536,10 +5705,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'その資源ポイントは存在しません。',
     'error.gatherNodeNotRespawned': 'この資源ポイントは、あなたにはまだ再出現していません。',
     'error.toolEffectSlotFromWindow': '専門技能ウィンドウから装着してください。',
-    'error.vcupDeserter': '整備人は覚えている。また後で来なさい。',
-    'error.vcupPartyTooBig': 'その階級にはもっと小さなパーティーが必要だ。',
-    'error.vcupNoNation': 'まずは旗の国を選ぼう。',
-    'error.vcupPracticeFull': '練習ピッチはすべて使用中です。しばらくして再度お試しください。',
     'log.talentsUpdated': 'タレントを更新しました。',
     'log.talentsReset': 'タレントをリセットしました。',
     'log.cheatDeathSave': '死の欺きがあなたを救いました！',
@@ -5612,6 +5777,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
   },
   pt_BR: {
+    'log.passingStoneKneel':
+      'Você fecha a mão sobre a Pedra de Passagem, e a praia deixa você partir.',
+    'error.tutorialFromHere': 'Você não pode zarpar daqui.',
+    'error.tutorialOutleveled': 'A Costa da Provação não tem mais nada a te ensinar.',
+    'error.passingStoneCold': 'A pedra está fria. A Instrutora Maren não pediu isso de você.',
+    'error.vendorQuestGated': 'Esse item ainda não está à venda para você.',
+    'error.arenaMinLevel': 'Você precisa ser nível {level} para entrar na fila da arena.',
+    'error.arenaMinLevelMember':
+      '{name} precisa ser pelo menos nível {level} para entrar na fila da arena.',
+    'log.arenaQueueAutoLeave1v1': 'Você sai da fila do Coliseu Cinzento.',
     'error.unknownAbility': 'Você não conhece essa habilidade.',
     'error.notEnoughRuin': 'Ruína insuficiente!',
     'error.burningPactRequired': 'Conflagrar exige Pacto Ardente no alvo.',
@@ -5739,6 +5914,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'O túmulo está selado contra os vivos até que os mortos chamem você a ele.',
     'groundPickup.cryptRitualCircleDeny': 'O círculo ritual jaz frio e adormecido.',
+    'groundPickup.castawayCrateDeny': 'Cracas mantêm o caixote lacrado.',
+    'groundPickup.ferryBellDeny': 'O sino da balsa pende em silêncio.',
+    'groundPickup.ferryBellEnough': 'O sino da balsa não tem nada a dar.',
+    'groundPickup.castawayCrateEnough': 'Você já tem caixotes à deriva suficientes.',
     'groundPickup.supplyCrateEnough': 'Você já tem caixotes de suprimentos suficientes.',
     'groundPickup.gravecallerSigilEnough': 'Você já carrega um Sigilo de Gravecaller.',
     'groundPickup.ledgerPageEnough': 'Você já tem páginas de livro-caixa suficientes.',
@@ -5860,6 +6039,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Todos os seus espaços de bolsa estão ocupados.',
     'error.bagSwapTooManyItems': 'Você tem itens demais para trocar para essa bolsa.',
     'error.bagRemoveTooManyItems': 'Você tem itens demais para remover essa bolsa.',
+    'error.bagEquipHasProperty':
+      'Essa bolsa não pode ser equipada enquanto tiver uma propriedade especial.',
     'error.tradeBagSpace': 'Troca falhou: espaço insuficiente nas bolsas.',
     'log.bagsMigrated': 'Seus pertences foram guardados em bolsas novas.',
     'error.specLevel': 'Você pode escolher uma especialização no nível {level}.',
@@ -5888,6 +6069,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Não há nenhum comerciante por perto.',
     'error.noSellQuest': 'Você não pode vender itens de missão.',
     'error.sellBound': 'Esse item está vinculado e não pode ser vendido.',
+    'error.sellLocked': 'Esse item está bloqueado e não pode ser vendido.',
     'error.noBuyback': 'Esse item não está disponível para recompra.',
     'error.nailedShut': 'Está pregado e não abre.',
     'error.enoughOfThose': 'Você já tem o bastante desses.',
@@ -5915,11 +6097,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Esse ponto de recursos não existe.',
     'error.gatherNodeNotRespawned': 'Este ponto de recursos ainda não ressurgiu para você.',
     'error.toolEffectSlotFromWindow': 'Encaixe isso pela janela de Profissões.',
-    'error.vcupDeserter': 'O Zelador do campo se lembra. Volte mais tarde.',
-    'error.vcupPartyTooBig': 'Essa categoria exige um grupo menor.',
-    'error.vcupNoNation': 'Escolha primeiro uma nação de bandeira.',
-    'error.vcupPracticeFull':
-      'Os campos de treino estão todos ocupados. Tente novamente em instantes.',
     'log.talentsUpdated': 'Talentos atualizados.',
     'log.talentsReset': 'Talentos redefinidos.',
     'log.cheatDeathSave': 'Enganar a morte salva você!',
@@ -6057,6 +6234,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
   },
   ru_RU: {
+    'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
+    'error.tutorialFromHere': 'Вы не можете отплыть отсюда.',
+    'error.tutorialOutleveled': 'Берегу Испытаний больше нечему вас научить.',
+    'error.passingStoneCold': 'Камень холоден. Наставница Марен не просила вас об этом.',
+    'error.vendorQuestGated': 'Этот предмет пока не продаётся вам.',
+    'error.arenaMinLevel': 'Чтобы встать в очередь на арену, нужен {level} уровень.',
+    'error.arenaMinLevelMember':
+      'Для постановки {name} в очередь на арену нужен как минимум {level} уровень.',
+    'log.arenaQueueAutoLeave1v1': 'Вы покидаете очередь Пепельного Колизея.',
     'error.unknownAbility': 'Вы не знаете эту способность.',
     'error.notEnoughRuin': 'Недостаточно Погибели!',
     'error.burningPactRequired': 'Для Поджигания на цели должен быть Пылающий договор.',
@@ -6242,6 +6428,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.graveSealedDeny':
       'Могила запечатана от живых, пока мёртвые сами не призовут вас к ней.',
     'groundPickup.cryptRitualCircleDeny': 'Ритуальный круг остыл и дремлет.',
+    'groundPickup.castawayCrateDeny': 'Ракушки намертво запечатали ящик.',
+    'groundPickup.ferryBellDeny': 'Паромный колокол висит безмолвно.',
+    'groundPickup.ferryBellEnough': 'Паромному колоколу нечего вам дать.',
+    'groundPickup.castawayCrateEnough': 'У вас уже достаточно выброшенных морем ящиков.',
     'groundPickup.supplyCrateEnough': 'У вас уже достаточно ящиков с припасами.',
     'groundPickup.gravecallerSigilEnough': 'Вы уже несёте с собой Сигил Могильного Зова.',
     'groundPickup.ledgerPageEnough': 'У вас уже достаточно страниц погребальной книги.',
@@ -6374,6 +6564,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bagSocketsFull': 'Все ячейки для сумок заняты.',
     'error.bagSwapTooManyItems': 'У вас слишком много предметов, чтобы сменить эту сумку.',
     'error.bagRemoveTooManyItems': 'У вас слишком много предметов, чтобы снять эту сумку.',
+    'error.bagEquipHasProperty': 'Эту сумку нельзя экипировать, пока у неё есть особое свойство.',
     'error.tradeBagSpace': 'Обмен не удался: недостаточно места в сумках.',
     'log.bagsMigrated': 'Ваши вещи разложены по новым сумкам.',
     'error.specLevel': 'Выбрать специализацию можно на {level} уровне.',
@@ -6409,6 +6600,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.noMerchant': 'Поблизости нет торговца.',
     'error.noSellQuest': 'Вы не можете продавать предметы заданий.',
     'error.sellBound': 'Этот предмет привязан и не может быть продан.',
+    'error.sellLocked': 'Этот предмет заблокирован и не может быть продан.',
     'error.noBuyback': 'Этот предмет недоступен для выкупа.',
     'error.nailedShut': 'Заколочено наглухо.',
     'error.enoughOfThose': 'У вас достаточно таких предметов.',
@@ -6435,10 +6627,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Этого источника ресурсов не существует.',
     'error.gatherNodeNotRespawned': 'Этот источник ресурсов ещё не восстановился для вас.',
     'error.toolEffectSlotFromWindow': 'Установите его в окне профессий.',
-    'error.vcupDeserter': 'Смотритель поля помнит. Возвращайся позже.',
-    'error.vcupPartyTooBig': 'Для этой категории нужна группа поменьше.',
-    'error.vcupNoNation': 'Сначала выбери знамённую нацию.',
-    'error.vcupPracticeFull': 'Все тренировочные поля заняты. Повторите попытку позже.',
     'log.talentsUpdated': 'Таланты обновлены.',
     'log.talentsReset': 'Таланты сброшены.',
     'log.cheatDeathSave': 'Обман смерти спасает вас!',
@@ -6512,6 +6700,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   },
   ...BASE_NEW,
   cs_CZ: {
+    'log.passingStoneKneel': 'Sevřeš dlaň kolem Kamene přechodu a pobřeží tě pouští.',
+    'error.tutorialFromHere': 'Odsud nemůžeš vyplout.',
+    'error.tutorialOutleveled': 'Zkušební pobřeží tě už nemá co naučit.',
+    'error.passingStoneCold': 'Kámen je studený. Instruktorka Maren tě o tohle nepožádala.',
+    'error.vendorQuestGated': 'Tento předmět ti zatím není na prodej.',
+    'error.arenaMinLevel': 'Musíš být na úrovni {level}, abys se mohl(a) zařadit do fronty arény.',
+    'error.arenaMinLevelMember':
+      '{name} musí být alespoň na úrovni {level}, aby se mohl(a) zařadit do fronty arény.',
+    'log.arenaQueueAutoLeave1v1': 'Opouštíš frontu Popelavého kolosea.',
     'error.guildBankNoGuild': 'Pro použití cechovní banky musíš být v cechu.',
     'error.guildBankRank': 'Cechovní banku smí používat pouze důstojníci.',
     'error.guildBankFull': 'Cechovní banka je plná.',
@@ -6535,7 +6732,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Tohle už je hotové.',
     'error.emptyLoadoutName': 'Název sestavy nesmí být prázdný.',
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
+    'error.sellLocked': 'Tento předmět je zamčený a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.bagEquipHasProperty': 'Tuto tašku nelze vybavit, dokud má zvláštní vlastnost.',
     'error.unknownAbility': 'Tuto schopnost neznáš.',
     'error.notEnoughRuin': 'Nedostatek Zkázy!',
     'error.burningPactRequired': 'Vzplanutí vyžaduje Hořící pakt na cíli.',
@@ -6656,6 +6855,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Dokonalý okamžik',
   },
   nl_NL: {
+    'log.passingStoneKneel': 'Je sluit je hand om de Doorgangssteen, en het strand laat je gaan.',
+    'error.tutorialFromHere': 'Je kunt hier niet uitvaren.',
+    'error.tutorialOutleveled': 'De Beproevingskust heeft je niets meer te leren.',
+    'error.passingStoneCold': 'De steen is koud. Instructeur Maren heeft je dit niet gevraagd.',
+    'error.vendorQuestGated': 'Dat voorwerp is nog niet te koop voor jou.',
+    'error.arenaMinLevel':
+      'Je moet niveau {level} zijn om je aan te sluiten bij de wachtrij voor de arena.',
+    'error.arenaMinLevelMember':
+      '{name} moet minstens niveau {level} zijn om zich aan te sluiten bij de wachtrij voor de arena.',
+    'log.arenaQueueAutoLeave1v1': 'Je verlaat de wachtrij van het Ashen Coliseum.',
     'error.guildBankNoGuild': 'Je moet in een gilde zitten om de gildebank te gebruiken.',
     'error.guildBankRank': 'Alleen gildeofficieren mogen de gildebank gebruiken.',
     'error.guildBankFull': 'De gildebank is vol.',
@@ -6679,7 +6888,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Dit heb je al gedaan.',
     'error.emptyLoadoutName': 'De naam van een build mag niet leeg zijn.',
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
+    'error.sellLocked': 'Dat voorwerp is vergrendeld en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.bagEquipHasProperty':
+      'Je kunt deze tas niet uitrusten zolang hij een bijzondere eigenschap heeft.',
     'error.unknownAbility': 'Je kent die vaardigheid niet.',
     'error.notEnoughRuin': 'Niet genoeg Ruïne!',
     'error.burningPactRequired': 'Ontvlamming vereist Brandpact op het doelwit.',
@@ -6800,6 +7012,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Volmaakt Ogenblik',
   },
   pl_PL: {
+    'log.passingStoneKneel': 'Zaciskasz dłoń na Kamieniu Przejścia, a wybrzeże pozwala ci odejść.',
+    'error.tutorialFromHere': 'Nie możesz stąd podnieść żagli.',
+    'error.tutorialOutleveled': 'Wybrzeże Prób nie ma cię już czego nauczyć.',
+    'error.passingStoneCold': 'Kamień jest zimny. Instruktorka Maren nie prosiła cię o to.',
+    'error.vendorQuestGated': 'Ten przedmiot nie jest jeszcze dla ciebie na sprzedaż.',
+    'error.arenaMinLevel': 'Musisz mieć poziom {level}, aby dołączyć do kolejki na arenę.',
+    'error.arenaMinLevelMember':
+      '{name} musi mieć co najmniej poziom {level}, aby dołączyć do kolejki na arenę.',
+    'log.arenaQueueAutoLeave1v1': 'Opuszczasz kolejkę do Popielnego Koloseum.',
     'error.guildBankNoGuild': 'Musisz należeć do gildii, aby korzystać z banku gildii.',
     'error.guildBankRank': 'Tylko oficerowie gildii mogą korzystać z banku gildii.',
     'error.guildBankFull': 'Bank gildii jest pełny.',
@@ -6824,7 +7045,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'To już zrobiłeś.',
     'error.emptyLoadoutName': 'Nazwa buildu nie może być pusta.',
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
+    'error.sellLocked': 'Ten przedmiot jest zablokowany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.bagEquipHasProperty': 'Nie możesz założyć tej torby, dopóki ma specjalną właściwość.',
     'error.unknownAbility': 'Nie znasz tej zdolności.',
     'error.notEnoughRuin': 'Za mało Ruiny!',
     'error.burningPactRequired': 'Pożoga wymaga Płonącego paktu na celu.',
@@ -6947,6 +7170,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Idealna chwila',
   },
   id_ID: {
+    'log.passingStoneKneel':
+      'Kamu menggenggam Batu Pelepasan itu, dan pesisir ini melepaskanmu pergi.',
+    'error.tutorialFromHere': 'Kamu tidak bisa berlayar dari sini.',
+    'error.tutorialOutleveled':
+      'Pesisir Pembuktian tidak punya apa pun lagi untuk diajarkan padamu.',
+    'error.passingStoneCold': 'Batu itu dingin. Instruktur Maren belum memintamu melakukan ini.',
+    'error.vendorQuestGated': 'Barang itu belum dijual untukmu.',
+    'error.arenaMinLevel': 'Kamu harus level {level} untuk mengantre ke arena.',
+    'error.arenaMinLevelMember': '{name} harus setidaknya level {level} untuk mengantre ke arena.',
+    'log.arenaQueueAutoLeave1v1': 'Kamu meninggalkan antrean Koloseum Abu.',
     'error.guildBankNoGuild': 'Kamu harus berada dalam sebuah guild untuk menggunakan bank guild.',
     'error.guildBankRank': 'Hanya perwira guild yang boleh menggunakan bank guild.',
     'error.guildBankFull': 'Bank guild penuh.',
@@ -6970,7 +7203,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Kamu sudah melakukan ini.',
     'error.emptyLoadoutName': 'Nama bangun tidak boleh kosong.',
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
+    'error.sellLocked': 'Barang itu terkunci dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.bagEquipHasProperty': 'Tas itu tidak bisa dipakai selama memiliki atribut khusus.',
     'error.unknownAbility': 'Kamu belum mengetahui kemampuan itu.',
     'error.notEnoughRuin': 'Ruin tidak cukup!',
     'error.burningPactRequired': 'Kobaran Api membutuhkan Pakta Membara pada target.',
@@ -7092,6 +7327,16 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Momen Sempurna',
   },
   tr_TR: {
+    'log.passingStoneKneel':
+      "Elini Geçiş Taşı'nın üzerine kapatırsın, ve kıyı seni serbest bırakır.",
+    'error.tutorialFromHere': 'Buradan yelken açamazsın.',
+    'error.tutorialOutleveled': "Sınav Kıyısı'nın sana öğretecek bir şeyi kalmadı.",
+    'error.passingStoneCold': 'Taş soğuk. Eğitmen Maren senden bunu istemedi.',
+    'error.vendorQuestGated': 'O eşya henüz sana satılık değil.',
+    'error.arenaMinLevel': 'Arena sırasına girmek için {level}. seviyeye ulaşmalısın.',
+    'error.arenaMinLevelMember':
+      '{name} arena sırasına girmek için en az {level}. seviyede olmalı.',
+    'log.arenaQueueAutoLeave1v1': 'Kül Koliseumu sırasından ayrıldın.',
     'error.guildBankNoGuild': 'Lonca bankasını kullanmak için bir loncada olmalısın.',
     'error.guildBankRank': 'Lonca bankasını yalnızca subaylar kullanabilir.',
     'error.guildBankFull': 'Lonca bankası dolu.',
@@ -7115,7 +7360,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Bunu zaten yaptın.',
     'error.emptyLoadoutName': 'Derleme adı boş olamaz.',
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
+    'error.sellLocked': 'O eşya kilitli ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.bagEquipHasProperty': 'Bu çanta özel bir özelliğe sahip olduğu sürece kuşanılamaz.',
     'error.unknownAbility': 'Bu yeteneği bilmiyorsun.',
     'error.notEnoughRuin': 'Yeterli Harabiyet yok!',
     'error.burningPactRequired': 'Tutuşturma için hedefte Yanan Ahit olmalı.',
@@ -7237,6 +7484,14 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Mükemmel An',
   },
   sv_SE: {
+    'log.passingStoneKneel': 'Du sluter handen om Övergångsstenen, och stranden släpper dig.',
+    'error.tutorialFromHere': 'Du kan inte sätta segel härifrån.',
+    'error.tutorialOutleveled': 'Prövostranden har inget mer att lära dig.',
+    'error.passingStoneCold': 'Stenen är kall. Instruktör Maren har inte bett dig om detta.',
+    'error.vendorQuestGated': 'Det föremålet är inte till salu för dig ännu.',
+    'error.arenaMinLevel': 'Du måste vara nivå {level} för att köa till arenan.',
+    'error.arenaMinLevelMember': '{name} måste vara minst nivå {level} för att köa till arenan.',
+    'log.arenaQueueAutoLeave1v1': 'Du lämnar kön till Askgrå kolosseum.',
     'error.guildBankNoGuild': 'Du måste vara med i ett gille för att använda gillesbanken.',
     'error.guildBankRank': 'Endast gillesofficerare får använda gillesbanken.',
     'error.guildBankFull': 'Gillesbanken är full.',
@@ -7260,7 +7515,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Du har redan gjort det här.',
     'error.emptyLoadoutName': 'Byggets namn får inte vara tomt.',
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
+    'error.sellLocked': 'Det föremålet är låst och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.bagEquipHasProperty':
+      'Du kan inte utrusta den här väskan så länge den har en särskild egenskap.',
     'error.unknownAbility': 'Du kan inte den förmågan.',
     'error.notEnoughRuin': 'Inte tillräckligt med Ruin!',
     'error.burningPactRequired': 'Storbrand kräver Brinnande pakt på målet.',
@@ -7381,6 +7639,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Perfekt ögonblick',
   },
   vi_VN: {
+    'log.passingStoneKneel': 'Bạn siết chặt tay quanh Đá Từ Trần, và bờ biển để bạn ra đi.',
+    'error.tutorialFromHere': 'Bạn không thể ra khơi từ đây.',
+    'error.tutorialOutleveled': 'Bờ Biển Thử Thách không còn gì để dạy bạn nữa.',
+    'error.passingStoneCold': 'Viên đá lạnh ngắt. Giáo Quan Maren chưa yêu cầu bạn làm điều này.',
+    'error.vendorQuestGated': 'Vật phẩm đó chưa được bán cho bạn.',
+    'error.arenaMinLevel': 'Bạn phải đạt cấp {level} để xếp hàng vào đấu trường.',
+    'error.arenaMinLevelMember':
+      '{name} phải đạt tối thiểu cấp {level} để xếp hàng vào đấu trường.',
+    'log.arenaQueueAutoLeave1v1': 'Bạn rời hàng chờ Đấu Trường Tro Tàn.',
     'error.guildBankNoGuild': 'Bạn phải ở trong một bang hội để sử dụng ngân hàng bang hội.',
     'error.guildBankRank': 'Chỉ sĩ quan bang hội mới có thể sử dụng ngân hàng bang hội.',
     'error.guildBankFull': 'Ngân hàng bang hội đã đầy.',
@@ -7405,7 +7672,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Bạn đã làm cái này rồi.',
     'error.emptyLoadoutName': 'Tên build không được để trống.',
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
+    'error.sellLocked': 'Vật phẩm đó đã bị khóa và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.bagEquipHasProperty': 'Không thể trang bị túi này khi nó còn mang thuộc tính đặc biệt.',
     'error.unknownAbility': 'Bạn chưa học kỹ năng đó.',
     'error.notEnoughRuin': 'Không đủ Ruin!',
     'error.burningPactRequired': 'Bùng Cháy cần mục tiêu đang chịu Khế Ước Rực Cháy.',
@@ -7524,6 +7793,15 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
   },
   da_DK: {
+    'log.passingStoneKneel': 'Du lukker hånden om Hvilestenen, og kysten lader dig gå.',
+    'error.tutorialFromHere': 'Du kan ikke sætte sejl herfra.',
+    'error.tutorialOutleveled': 'Prøvestranden har intet tilbage at lære dig.',
+    'error.passingStoneCold': 'Stenen er kold. Instruktør Maren har ikke bedt dig om dette.',
+    'error.vendorQuestGated': 'Den genstand er endnu ikke til salg for dig.',
+    'error.arenaMinLevel': 'Du skal være niveau {level} for at stille dig i kø til arenaen.',
+    'error.arenaMinLevelMember':
+      '{name} skal være mindst niveau {level} for at stille sig i kø til arenaen.',
+    'log.arenaQueueAutoLeave1v1': 'Du forlader køen til Det Askegrå Kolosseum.',
     'error.guildBankNoGuild': 'Du skal være i et laug for at bruge laugsbanken.',
     'error.guildBankRank': 'Kun laugsofficerer må bruge laugsbanken.',
     'error.guildBankFull': 'Laugsbanken er fuld.',
@@ -7547,7 +7825,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'groundPickup.objectAlreadyCredited': 'Du har allerede gjort det her.',
     'error.emptyLoadoutName': 'Navnet på et build må ikke være tomt.',
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
+    'error.sellLocked': 'Den genstand er låst og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.bagEquipHasProperty':
+      'Du kan ikke iføre dig denne taske, så længe den har en særlig egenskab.',
     'error.unknownAbility': 'Du kender ikke den evne.',
     'error.notEnoughRuin': 'Ikke nok Ruin!',
     'error.burningPactRequired': 'Antændelse kræver Brændende Pagt på målet.',
@@ -7667,6 +7948,31 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
   },
+};
+
+const ARENA_QUEUE_AUTO_LEAVE_1V1: Record<SupportedLanguage, string> = {
+  en: 'You leave the Ashen Coliseum queue.',
+  en_CA: 'You leave the Ashen Coliseum queue.',
+  es: 'Sales de la cola del Coliseo Cinéreo.',
+  es_ES: 'Sales de la cola del Coliseo Cinéreo.',
+  fr_FR: 'Vous quittez la file du Colisée cendré.',
+  fr_CA: 'Vous quittez la file du Colisée cendré.',
+  it_IT: 'Esci dalla coda del Colosseo Cinereo.',
+  de_DE: 'Ihr verlasst die Warteschlange des Aschenen Kolosseums.',
+  zh_CN: '你离开了灰烬斗技场队列。',
+  zh_TW: '你離開了灰燼競技場佇列。',
+  ko_KR: '잿빛 원형경기장 대기열에서 나왔습니다.',
+  ja_JP: '灰の闘技場のキューを離れました。',
+  pt_BR: 'Você sai da fila do Coliseu Cinzento.',
+  ru_RU: 'Вы покидаете очередь Пепельного Колизея.',
+  cs_CZ: 'Opouštíš frontu Ashen Coliseum.',
+  nl_NL: 'Je verlaat de wachtrij van het Ashen Coliseum.',
+  pl_PL: 'Opuszczasz kolejkę Ashen Coliseum.',
+  id_ID: 'Kamu keluar dari antrean Ashen Coliseum.',
+  tr_TR: 'Ashen Coliseum sırasından ayrılıyorsun.',
+  sv_SE: 'Du lämnar Ashen Coliseums kö.',
+  vi_VN: 'Bạn rời hàng đợi Ashen Coliseum.',
+  da_DK: 'Du forlader Ashen Coliseum-køen.',
 };
 
 const PET_DICT_EN: Record<PetSimMessageKey, string> = {
@@ -8196,7 +8502,12 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
-    { ...baseEnTable, ...BASE_DICT[lang], ...PET_DICT[lang] },
+    {
+      ...baseEnTable,
+      ...BASE_DICT[lang],
+      ...PET_DICT[lang],
+      'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+    },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
@@ -8284,6 +8595,12 @@ function locPetGrowlAutoState(state: string): string {
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Moontide: 'aura.moontide',
+  // The operator-applied Cheater mark's countdown debuff (cheaterMarkAura in
+  // src/sim/moderation/cheater_mark.ts). Without this row localizeSimAuraName
+  // returns null and every caller falls back to the RAW ENGLISH aura name, which
+  // no gate catches: the sanction would read "Marked as a Cheater" in all 21
+  // locales. Keep this string byte-identical to the aura's `name`.
+  'Marked as a Cheater': 'aura.cheaterMark',
   'Old Blood': 'aura.oldBlood',
   Verdance: 'aura.verdance',
   'Loping Stride': 'aura.lopingStride',
@@ -8308,6 +8625,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Sprint: 'aura.sprintRune',
   'Battle Rune': 'aura.battleRune',
   'Ward Rune': 'aura.wardRune',
+  Dazed: 'aura.courserDaze',
   'Might of the Bear': 'aura.elixirBear',
   // Crafted alchemy elixir auras (content/profession_items.ts): the
   // buff_sta aura display name each crafted elixir pushes on use.
@@ -8783,6 +9101,37 @@ function tArenaExtra(key: ArenaExtraKey, params?: InterpolationValues): string {
   return interpolate(table[key] ?? ARENA_EXTRA.en[key], params);
 }
 
+const ARENA_MIN_LEVEL_QUEUE_ERROR: Record<SupportedLanguage, string> = {
+  en: 'You must be level {level} to queue for the arena.',
+  en_CA: 'You must be level {level} to queue for the arena.',
+  es: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  es_ES: 'Debes ser nivel {level} para entrar en la cola de la arena.',
+  fr_FR: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  fr_CA: "Vous devez être niveau {level} pour rejoindre la file d'arène.",
+  it_IT: "Devi essere di livello {level} per metterti in coda per l'arena.",
+  de_DE: 'Ihr müsst Stufe {level} sein, um Euch für die Arena anzumelden.',
+  zh_CN: '你必须达到 {level} 级才能加入竞技场队列。',
+  zh_TW: '你必須達到 {level} 級才能加入競技場佇列。',
+  ko_KR: '투기장 대기열에 들어가려면 레벨 {level}이어야 합니다.',
+  ja_JP: 'アリーナキューに入るにはレベル {level} が必要です。',
+  pt_BR: 'Você precisa estar no nível {level} para entrar na fila da arena.',
+  ru_RU: 'Чтобы встать в очередь арены, нужен уровень {level}.',
+  cs_CZ: 'Pro vstup do fronty arény musíš mít úroveň {level}.',
+  nl_NL: 'Je moet niveau {level} zijn om in de arena-wachtrij te gaan.',
+  pl_PL: 'Musisz mieć poziom {level}, aby dołączyć do kolejki areny.',
+  id_ID: 'Kamu harus level {level} untuk masuk antrean arena.',
+  tr_TR: 'Arena kuyruğuna girmek için seviye {level} olmalısın.',
+  sv_SE: 'Du måste vara nivå {level} för att gå med i arenakön.',
+  vi_VN: 'Bạn phải đạt cấp {level} để vào hàng đợi đấu trường.',
+  da_DK: 'Du skal være niveau {level} for at gå i arenakø.',
+};
+
+function tArenaMinLevelQueueError(level: string): string {
+  return interpolate(ARENA_MIN_LEVEL_QUEUE_ERROR[getLanguage()] ?? ARENA_MIN_LEVEL_QUEUE_ERROR.en, {
+    level,
+  });
+}
+
 // Thornhollow Fields 5v5 capture-the-flag emit strings (src/sim/social/battleground.ts).
 // English is authoritative; the non-Latin surfaces ship real fills (the M16
 // spirit) and the remaining locales fall back to English here until the
@@ -8804,6 +9153,7 @@ type BgExtraKey =
   | 'teamCrimson'
   | 'teamAzure'
   | 'errInBattleground'
+  | 'errNotInBattleground'
   | 'errQueueDead'
   | 'errQueueInMatch'
   | 'errMemberQueued'
@@ -8859,6 +9209,7 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   teamCrimson: 'Crimson',
   teamAzure: 'Azure',
   errInBattleground: 'You are already in a battleground.',
+  errNotInBattleground: 'You are not in a battleground.',
   errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
   errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
   errMemberQueued: 'A party member is already queued or in a match.',
@@ -8897,6 +9248,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '赤红队',
     teamAzure: '蔚蓝队',
     errInBattleground: '你已经在战场中了。',
+    errNotInBattleground: '你不在战场中。',
     errQueueDead: '死亡状态下无法排队进入荆谷原野。',
     errQueueInMatch: '比赛进行中无法排队进入荆谷原野。',
     errMemberQueued: '有队友已在队列或比赛中。',
@@ -8934,6 +9286,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '赤紅隊',
     teamAzure: '蔚藍隊',
     errInBattleground: '你已經在戰場中了。',
+    errNotInBattleground: '你不在戰場中。',
     errQueueDead: '死亡狀態下無法排隊進入荊谷原野。',
     errQueueInMatch: '比賽進行中無法排隊進入荊谷原野。',
     errMemberQueued: '有隊友已在佇列或比賽中。',
@@ -8976,6 +9329,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'クリムゾン',
     teamAzure: 'アズール',
     errInBattleground: 'すでに戦場にいます。',
+    errNotInBattleground: '戦場にいません。',
     errQueueDead: '死亡中はソーンホロウ平原のキューに参加できません。',
     errQueueInMatch: '別の試合中はソーンホロウ平原のキューに参加できません。',
     errMemberQueued: 'パーティメンバーがすでにキューまたは試合に参加しています。',
@@ -9021,6 +9375,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: '진홍팀',
     teamAzure: '청람팀',
     errInBattleground: '이미 전장에 있습니다.',
+    errNotInBattleground: '전장에 있지 않습니다.',
     errQueueDead: '죽은 상태로는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errQueueInMatch: '다른 경기 중에는 쏜할로우 평원 대기열에 참가할 수 없습니다.',
     errMemberQueued: '파티원이 이미 대기열이나 경기에 참가 중입니다.',
@@ -9066,6 +9421,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Багровых',
     teamAzure: 'Лазурных',
     errInBattleground: 'Вы уже находитесь на поле боя.',
+    errNotInBattleground: 'Вы не находитесь на поле боя.',
     errQueueDead: 'Нельзя встать в очередь Терновой Лощины, будучи мертвым.',
     errQueueInMatch: 'Нельзя встать в очередь Терновой Лощины во время другого матча.',
     errMemberQueued: 'Кто-то из группы уже в очереди или в матче.',
@@ -9112,6 +9468,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Crimson',
     teamAzure: 'Azure',
     errInBattleground: 'You are already in a battleground.',
+    errNotInBattleground: 'You are not in a battleground.',
     errQueueDead: 'You cannot queue for Thornhollow Fields while dead.',
     errQueueInMatch: 'You cannot queue for Thornhollow Fields while in another match.',
     errMemberQueued: 'A party member is already queued or in a match.',
@@ -9160,6 +9517,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9210,6 +9568,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
+    errNotInBattleground: 'No estás en un campo de batalla.',
     errQueueDead: 'No puedes entrar en la cola de los Campos de Thornhollow estando muerto.',
     errQueueInMatch:
       'No puedes entrar en la cola de los Campos de Thornhollow mientras estás en otro combate.',
@@ -9259,6 +9618,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9308,6 +9668,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
+    errNotInBattleground: "Vous n'êtes pas sur un champ de bataille.",
     errQueueDead: 'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow en étant mort.',
     errQueueInMatch:
       'Vous ne pouvez pas rejoindre la file des Champs de Thornhollow pendant un autre combat.',
@@ -9357,6 +9718,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'i Cremisi',
     teamAzure: 'gli Azzurri',
     errInBattleground: 'Sei già in un campo di battaglia.',
+    errNotInBattleground: 'Non sei in un campo di battaglia.',
     errQueueDead: 'Non puoi entrare in coda per i Campi di Thornhollow da morto.',
     errQueueInMatch:
       'Non puoi entrare in coda per i Campi di Thornhollow mentre sei in un’altra partita.',
@@ -9408,6 +9770,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'die Karmesinroten',
     teamAzure: 'die Azurblauen',
     errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
+    errNotInBattleground: 'Du bist auf keinem Schlachtfeld.',
     errQueueDead: 'Du kannst dich nicht für die Thornhollow-Felder anmelden, solange du tot bist.',
     errQueueInMatch:
       'Du kannst dich nicht für die Thornhollow-Felder anmelden, während du in einem anderen Match bist.',
@@ -9458,6 +9821,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Carmesins',
     teamAzure: 'Azuis',
     errInBattleground: 'Você já está em um campo de batalha.',
+    errNotInBattleground: 'Você não está em um campo de batalha.',
     errQueueDead: 'Você não pode entrar na fila dos Campos de Thornhollow enquanto estiver morto.',
     errQueueInMatch:
       'Você não pode entrar na fila dos Campos de Thornhollow durante outra partida.',
@@ -9507,6 +9871,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Rudé',
     teamAzure: 'Azurové',
     errInBattleground: 'Už jsi na bojišti.',
+    errNotInBattleground: 'Nejsi na bojišti.',
     errQueueDead: 'Do fronty na Thornhollowská pole se nemůžeš zařadit mrtvý.',
     errQueueInMatch: 'Do fronty na Thornhollowská pole se nemůžeš zařadit během jiného zápasu.',
     errMemberQueued: 'Někdo ze skupiny už je ve frontě nebo v zápase.',
@@ -9554,6 +9919,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmozijnen',
     teamAzure: 'de Azuren',
     errInBattleground: 'Je bent al op een slagveld.',
+    errNotInBattleground: 'Je bent niet op een slagveld.',
     errQueueDead: 'Je kunt je niet aanmelden voor de Doornholte-Velden terwijl je dood bent.',
     errQueueInMatch:
       'Je kunt je niet aanmelden voor de Doornholte-Velden tijdens een andere wedstrijd.',
@@ -9604,6 +9970,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Szkarłatnych',
     teamAzure: 'Lazurowych',
     errInBattleground: 'Jesteś już na polu bitwy.',
+    errNotInBattleground: 'Nie jesteś na polu bitwy.',
     errQueueDead: 'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny, będąc martwym.',
     errQueueInMatch:
       'Nie możesz dołączyć do kolejki na Pola Ciernistej Kotliny w trakcie innego meczu.',
@@ -9652,6 +10019,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Merah Tua',
     teamAzure: 'Biru Langit',
     errInBattleground: 'Kamu sudah berada di medan perang.',
+    errNotInBattleground: 'Kamu tidak berada di medan perang.',
     errQueueDead: 'Kamu tidak bisa mengantre Padang Thornhollow saat tewas.',
     errQueueInMatch:
       'Kamu tidak bisa mengantre Padang Thornhollow saat sedang dalam pertandingan lain.',
@@ -9699,6 +10067,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'Kızıllar',
     teamAzure: 'Gökmaviler',
     errInBattleground: 'Zaten bir savaş alanındasın.',
+    errNotInBattleground: 'Bir savaş alanında değilsin.',
     errQueueDead: 'Ölüyken Dikenvadi Ovaları sırasına giremezsin.',
     errQueueInMatch: 'Başka bir maçtayken Dikenvadi Ovaları sırasına giremezsin.',
     errMemberQueued: 'Grup üyelerinden biri zaten sırada ya da bir maçta.',
@@ -9742,6 +10111,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmosinröda',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du är redan på ett slagfält.',
+    errNotInBattleground: 'Du är inte på ett slagfält.',
     errQueueDead: 'Du kan inte köa till Törnhålefälten medan du är död.',
     errQueueInMatch: 'Du kan inte köa till Törnhålefälten under en annan match.',
     errMemberQueued: 'En gruppmedlem står redan i kö eller är i en match.',
@@ -9785,6 +10155,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'phe Đỏ Thẫm',
     teamAzure: 'phe Xanh Biếc',
     errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
+    errNotInBattleground: 'Bạn không ở trong chiến trường.',
     errQueueDead: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đã chết.',
     errQueueInMatch: 'Bạn không thể vào hàng chờ Cánh Đồng Thung Gai khi đang ở trận đấu khác.',
     errMemberQueued: 'Một thành viên tổ đội đã ở trong hàng chờ hoặc đang thi đấu.',
@@ -9831,6 +10202,7 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     teamCrimson: 'de Karmosinrøde',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du er allerede på en slagmark.',
+    errNotInBattleground: 'Du er ikke på en slagmark.',
     errQueueDead: 'Du kan ikke stille dig i kø til Tornehule Sletter, mens du er død.',
     errQueueInMatch: 'Du kan ikke stille dig i kø til Tornehule Sletter under en anden kamp.',
     errMemberQueued: 'Et gruppemedlem står allerede i kø eller er i en kamp.',
@@ -9878,7 +10250,8 @@ type QuestExtraKey =
   | 'awakens'
   | 'aldrenYell'
   | 'malricYell'
-  | 'vossYell';
+  | 'vossYell'
+  | 'crabsYell';
 
 export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string>> = {
   en: {
@@ -9899,6 +10272,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} yells, "None shall disturb the king\'s rest! For Thornpeak!"',
     malricYell: '{name} yells, "Death shall never claim my king! The ritual must endure!"',
     vossYell: '{name} yells, "You will not reach him! The king must endure!"',
+    crabsYell: '{name} yells, "MINE! The pearl is mine, and mine she stays!"',
   },
   en_CA: {
     ritualNeedsKey: 'The ritual circle is silent without the Crypt Keystone.',
@@ -9918,6 +10292,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} yells, "None shall disturb the king\'s rest! For Thornpeak!"',
     malricYell: '{name} yells, "Death shall never claim my king! The ritual must endure!"',
     vossYell: '{name} yells, "You will not reach him! The king must endure!"',
+    crabsYell: '{name} yells, "MINE! The pearl is mine, and mine she stays!"',
   },
   es: {
     ritualNeedsKey: 'El círculo ritual calla sin la Piedra clave de la cripta.',
@@ -9937,6 +10312,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "¡Nadie perturbará el descanso del rey! ¡Por Thornpeak!"',
     malricYell: '{name} grita: "¡La muerte nunca reclamará a mi rey! ¡El ritual debe perdurar!"',
     vossYell: '{name} grita: "¡No llegarás hasta él! ¡El rey debe perdurar!"',
+    crabsYell: '{name} grita: "MIA! La perla es mia, y mia se queda!"',
   },
   es_ES: {
     ritualNeedsKey: 'El círculo ritual calla sin la Piedra clave de la cripta.',
@@ -9956,6 +10332,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "¡Nadie perturbará el descanso del rey! ¡Por Thornpeak!"',
     malricYell: '{name} grita: "¡La muerte nunca reclamará a mi rey! ¡El ritual debe perdurar!"',
     vossYell: '{name} grita: "¡No llegarás hasta él! ¡El rey debe perdurar!"',
+    crabsYell: '{name} grita: "MIA! La perla es mia, y mia se queda!"',
   },
   fr_FR: {
     ritualNeedsKey: 'Le cercle rituel reste muet sans la clef de la crypte.',
@@ -9975,6 +10352,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} crie: "Nul ne troublera le repos du roi! Pour Thornpeak!"',
     malricYell: '{name} crie: "La mort ne prendra jamais mon roi! Le rituel doit durer!"',
     vossYell: '{name} crie: "Vous ne l’atteindrez pas! Le roi doit durer!"',
+    crabsYell: '{name} crie: "A MOI! La perle est a moi, et a moi elle restera!"',
   },
   fr_CA: {
     ritualNeedsKey: 'Le cercle rituel reste muet sans la clef de la crypte.',
@@ -9994,6 +10372,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} crie: "Nul ne troublera le repos du roi! Pour Thornpeak!"',
     malricYell: '{name} crie: "La mort ne prendra jamais mon roi! Le rituel doit durer!"',
     vossYell: '{name} crie: "Vous ne l’atteindrez pas! Le roi doit durer!"',
+    crabsYell: '{name} crie: "A MOI! La perle est a moi, et a moi elle restera!"',
   },
   it_IT: {
     ritualNeedsKey: 'Il cerchio rituale tace senza la Chiave di volta della cripta.',
@@ -10013,6 +10392,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grida: "Nessuno disturberà il riposo del re! Per Thornpeak!"',
     malricYell: '{name} grida: "La morte non reclamerà mai il mio re! Il rituale deve durare!"',
     vossYell: '{name} grida: "Non lo raggiungerai! Il re deve durare!"',
+    crabsYell: '{name} grida: "MIA! La perla e mia, e mia restera!"',
   },
   de_DE: {
     ritualNeedsKey: 'Der Ritualkreis schweigt ohne den Kryptenschlüsselstein.',
@@ -10032,6 +10412,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} ruft: "Niemand stört die Ruhe des Königs! Für Thornpeak!"',
     malricYell: '{name} ruft: "Der Tod soll meinen König nie fordern! Das Ritual muss bestehen!"',
     vossYell: '{name} ruft: "Ihr werdet ihn nicht erreichen! Der König muss bestehen!"',
+    crabsYell: '{name} ruft: "MEINS! Die Perle gehoert mir, und bei mir bleibt sie!"',
   },
   zh_CN: {
     ritualNeedsKey: '没有墓穴钥石，仪式法阵一片沉寂。',
@@ -10051,6 +10432,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}喊道：“谁也不得惊扰国王的安眠！为了 Thornpeak！”',
     malricYell: '{name}喊道：“死亡永远不能带走我的国王！仪式必须延续！”',
     vossYell: '{name}喊道：“你们到不了他身边！国王必须延续！”',
+    crabsYell: '{name}喊道：“我的！珍珠是我的，永远都是我的！”',
   },
   zh_TW: {
     ritualNeedsKey: '沒有墓穴鑰石，儀式法陣一片沉寂。',
@@ -10070,6 +10452,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}喊道：「誰也不得驚擾國王的安眠！為了 Thornpeak！」',
     malricYell: '{name}喊道：「死亡永遠不能帶走我的國王！儀式必須延續！」',
     vossYell: '{name}喊道：「你們到不了他身邊！國王必須延續！」',
+    crabsYell: '{name}喊道：「我的！珍珠是我的，永遠都是我的！」',
   },
   ko_KR: {
     ritualNeedsKey: '무덤 열쇠돌 없이는 의식진이 침묵합니다.',
@@ -10090,6 +10473,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     malricYell:
       '{name}이(가) 외칩니다. "죽음은 결코 내 왕을 데려가지 못한다! 의식은 계속되어야 한다!"',
     vossYell: '{name}이(가) 외칩니다. "너희는 그에게 닿지 못한다! 왕은 이어져야 한다!"',
+    crabsYell: '{name}이(가) 외칩니다. "내 거다! 진주는 내 것, 영원히 내 것이다!"',
   },
   ja_JP: {
     ritualNeedsKey: '墓所の要石がなければ、儀式陣は沈黙したままです。',
@@ -10109,6 +10493,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name}が叫ぶ。「王の眠りを乱す者は許さぬ！ Thornpeakのために！」',
     malricYell: '{name}が叫ぶ。「死は我が王を奪えぬ！ 儀式は続かねばならぬ！」',
     vossYell: '{name}が叫ぶ。「お前たちは王に届かぬ！ 王は永らえねばならぬ！」',
+    crabsYell: '{name}が叫ぶ。「わしのだ！真珠はわしのもの、ずっとわしのものじゃ！」',
   },
   pt_BR: {
     ritualNeedsKey: 'O círculo ritual fica em silêncio sem a Pedra-chave da cripta.',
@@ -10128,6 +10513,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     aldrenYell: '{name} grita: "Ninguém perturbará o descanso do rei! Por Thornpeak!"',
     malricYell: '{name} grita: "A morte jamais levará meu rei! O ritual deve perdurar!"',
     vossYell: '{name} grita: "Você não chegará até ele! O rei deve perdurar!"',
+    crabsYell: '{name} grita: "MINHA! A perola e minha, e minha ela fica!"',
   },
   ru_RU: {
     ritualNeedsKey: 'Ритуальный круг молчит без ключ-камня крипты.',
@@ -10148,6 +10534,7 @@ export const QUEST_EXTRA: Record<SupportedLanguage, Record<QuestExtraKey, string
     malricYell:
       '{name} кричит: "Смерть никогда не заберет моего короля! Ритуал должен сохраниться!"',
     vossYell: '{name} кричит: "Вы не доберетесь до него! Король должен сохраниться!"',
+    crabsYell: '{name} кричит: "МОЯ! Жемчужина моя, моей и останется!"',
   },
   ...QUEST_NEW,
 };
@@ -10795,6 +11182,10 @@ const RULES: Rule[] = [
     build: () => tQuestExtra('vossYell', { name: locMob('Deathstalker Voss') }),
   },
   {
+    re: /^Mister Crabs yells, "MINE! The pearl is mine, and mine she stays!"$/,
+    build: () => tQuestExtra('crabsYell', { name: locMob('Mister Crabs') }),
+  },
+  {
     re: /^You may choose a specialization at level (\d+)\.$/,
     build: (m) => tSim('error.specLevel', { level: m[1] }),
   },
@@ -10808,7 +11199,7 @@ const RULES: Rule[] = [
   },
   {
     re: /^You must be level (\d+) to queue for the arena\.$/,
-    build: (m) => tSim('error.arenaMinLevel', { level: m[1] }),
+    build: (m) => tArenaMinLevelQueueError(m[1]),
   },
   {
     re: /^(.+) must be at least level (\d+) to queue for the arena\.$/,
@@ -11060,6 +11451,7 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
   { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,
@@ -11175,6 +11567,7 @@ const RULES: Rule[] = [
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
   { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
   {
     re: /^You cannot queue for Thornhollow Fields while dead\.$/,
     build: () => tBg('errQueueDead'),
@@ -11275,6 +11668,10 @@ const RULES: Rule[] = [
   {
     re: /^The ([CBAS])-rank rift in (.+) collapses\.$/,
     build: (m) => t('sim.rift.portalCollapses', { tier: m[1], zone: locZone(m[2]) }),
+  },
+  {
+    re: /^The rift's entrance will hold a while yet: should your party fall, you may still walk back for what you earned\.$/,
+    build: () => t('sim.rift.lootRecoveryNotice'),
   },
   {
     re: /^Only adventurers of level (\d+) or higher may enter this rift\.$/,
@@ -11508,6 +11905,7 @@ const RULES: Rule[] = [
     build: () => t('sim.delve.cannotAffordCompanionUpgrade'),
   },
   { re: /^The passage is sealed\.$/, build: () => t('sim.delve.passageSealed') },
+  { re: /^Clear the remaining enemies first\.$/, build: () => t('sim.delve.enemiesRemain') },
   { re: /^Move closer to the passage\.$/, build: () => t('sim.delve.moveCloserPassage') },
   { re: /^Move closer to the chest\.$/, build: () => t('sim.delve.moveCloserChest') },
   { re: /^Move closer to the reliquary\.$/, build: () => t('sim.delve.moveCloserReliquary') },

@@ -98,7 +98,6 @@ function harness(
   const openWarfareVendor = vi.fn();
   const openMarket = vi.fn();
   const openDelveBoard = vi.fn();
-  const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
@@ -135,7 +134,6 @@ function harness(
     openWarfareVendor,
     openMarket,
     openDelveBoard,
-    openValeCup,
     openCardDuel,
     openTrain,
     openUnbind,
@@ -167,7 +165,6 @@ function harness(
     openWarfareVendor,
     openMarket,
     openDelveBoard,
-    openValeCup,
     openCardDuel,
     openTrain,
     openUnbind,
@@ -474,6 +471,7 @@ describe('QuestDialogController', () => {
     const vendor = harness(vendorNpc);
     vendor.controller.open(vendorNpc.id);
     const vendorButton = vendor.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(vendorButton?.innerHTML).toContain('/ui/currency/coin_gold.webp');
     vendorButton?.focus();
     vendorButton?.click();
     expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendor.trapOpener);
@@ -491,6 +489,7 @@ describe('QuestDialogController', () => {
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
     const heroicButton = heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]');
+    expect(heroicButton?.innerHTML).toContain('/ui/items/heroic_mark.webp');
     heroicButton?.focus();
     heroicButton?.click();
     expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42, heroic.trapOpener);
@@ -500,11 +499,6 @@ describe('QuestDialogController', () => {
     board.controller.open(43);
     board.element.querySelector<HTMLButtonElement>('[data-delve-board]')?.click();
     expect(board.openDelveBoard).toHaveBeenCalledWith(43);
-
-    const valeCup = harness(npc(44, 'groundskeeper_bram'));
-    valeCup.controller.open(44);
-    valeCup.element.querySelector<HTMLButtonElement>('[data-vcup]')?.click();
-    expect(valeCup.openValeCup).toHaveBeenCalledTimes(1);
 
     const cardMaster = harness(npc(45, 'card_master'));
     cardMaster.controller.open(45);
@@ -536,6 +530,7 @@ describe('QuestDialogController', () => {
     const shop = both.element.querySelector<HTMLButtonElement>('[data-warfare-shop]');
     expect(goods, 'no generic goods row at a flagged NPC, even with stock').toBeNull();
     expect(shop, 'the WARFARE shop row').not.toBeNull();
+    expect(shop?.innerHTML).toContain('/ui/currency/honor.webp');
     expect(shop?.textContent).toContain(t('hudChrome.warfareShop.gossipOption'));
     expect(shop?.getAttribute('aria-label')).toBe(
       t('hudChrome.warfareShop.gossipOptionAria', { name: `npc:${flaggedId}` }),

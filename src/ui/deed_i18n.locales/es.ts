@@ -7,6 +7,18 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Listo para la Aventura',
+    desc: 'Gradúate en la Costa de la Prueba: termina cada lección de la isla y luego toca la campana del transbordador para volver a Eastbrook.',
+  },
+  exp_dawnhold_castle: {
+    name: 'Una puerta abierta en el jardín',
+    desc: 'Visita el Castillo Dawnhold y pasea por sus soleados salones del jardín.',
+  },
+  exp_the_last_keep: {
+    name: 'Los salones silenciosos',
+    desc: 'Cruza las puertas de La Última Fortaleza y recorre sus salones silenciosos.',
+  },
   pvp_bg_first_capture: {
     name: 'Bandera en Mano',
     desc: 'Captura una bandera en Campos Espinosos.',
@@ -992,6 +1004,50 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Blindado a la perfección',
     desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armaduras.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Guardabotines',
+    desc: 'Alcanza el rango de Curador 2 en El Relicario (10 reliquias únicas catalogadas).',
+    title: 'Guardabotines',
+  },
+  col_reliquary_rank_3: {
+    name: 'El Catalogador',
+    desc: 'Alcanza el rango de Curador 3 en El Relicario (25 reliquias únicas catalogadas).',
+    title: 'el Catalogador',
+  },
+  col_reliquary_rank_4: {
+    name: 'Archicurador',
+    desc: 'Alcanza el rango de Curador 4 en El Relicario (50 reliquias únicas catalogadas).',
+    title: 'Archicurador',
+  },
+  col_reliquary_rank_5: {
+    name: 'Botines Eternos',
+    desc: 'Alcanza el rango de Curador 5 en El Relicario (100 reliquias únicas catalogadas).',
+  },
+  col_reliquary_complete: {
+    name: 'El Gran Relicario',
+    desc: 'Cataloga todas las reliquias de El Relicario que un personaje pueda conservar. Que el catálogo crezca después nunca te lo quita.',
+    title: 'Curador de la Cámara',
+  },
+  col_reliquary_conquerors: {
+    name: 'Estante de Conquistadores',
+    desc: 'Cataloga todas las reliquias del estante Conquistadores de El Relicario. Que el catálogo crezca después nunca te lo quita.',
+    title: 'Rompecámaras',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminada',
+    desc: 'Ilumina la página Heroico: Incursión de Nythraxis de El Relicario.',
+    title: 'Luz de Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminada',
+    desc: 'Ilumina la página Thunzharr, el Pico Despierto de El Relicario.',
+    title: 'Luz de Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Santuario iluminado',
+    desc: 'Ilumina la página Heroico: Santuario del Gravewyrm de El Relicario.',
+    title: 'Luz del Santuario',
   },
 };
 

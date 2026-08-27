@@ -7,6 +7,18 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Gotowy na Przygodę',
+    desc: 'Ukończ Wybrzeże Prób: wykonaj każdą lekcję na wyspie, a potem uderz w dzwon promu, by wrócić do domu, do Eastbrook.',
+  },
+  exp_dawnhold_castle: {
+    name: 'Otwarte drzwi w ogrodzie',
+    desc: 'Odwiedź zamek Dawnhold i przespaceruj się po jego słonecznych ogrodowych komnatach.',
+  },
+  exp_the_last_keep: {
+    name: 'Ciche komnaty',
+    desc: 'Przekrocz progi Ostatniej Twierdzy i przejdź się jej cichymi komnatami.',
+  },
   pvp_bg_first_capture: {
     name: 'Sztandar w dłoni',
     desc: 'Przechwyć flagę na Polach Ciernistej Kotliny.',
@@ -977,5 +989,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Opancerzone do perfekcji',
     desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Pancerzy.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Strażnik Łupów',
+    desc: 'Osiągnij rangę Kustosza 2 w Relikwiarzu (10 wyjątkowych skatalogowanych relikwii).',
+    title: 'Strażnik Łupów',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogista',
+    desc: 'Osiągnij rangę Kustosza 3 w Relikwiarzu (25 wyjątkowych skatalogowanych relikwii).',
+    title: 'Katalogista',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arcykustosz',
+    desc: 'Osiągnij rangę Kustosza 4 w Relikwiarzu (50 wyjątkowych skatalogowanych relikwii).',
+    title: 'Arcykustosz',
+  },
+  col_reliquary_rank_5: {
+    name: 'Wieczne Łupy',
+    desc: 'Osiągnij rangę Kustosza 5 w Relikwiarzu (100 wyjątkowych skatalogowanych relikwii).',
+  },
+  col_reliquary_complete: {
+    name: 'Wielki Relikwiarz',
+    desc: 'Skataloguj w Relikwiarzu każdą relikwię, którą postać może zachować. Późniejszy rozrost katalogu nigdy ci tego nie odbierze.',
+    title: 'Kustosz Skarbca',
+  },
+  col_reliquary_conquerors: {
+    name: 'Półka Zdobywców',
+    desc: 'Skataloguj każdą relikwię z półki Zdobywcy w Relikwiarzu. Późniejszy rozrost katalogu nigdy ci tego nie odbierze.',
+    title: 'Łamacz Skarbca',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminowany',
+    desc: 'Iluminuj w Relikwiarzu kartę Heroiczny: Rajd Nythraxis.',
+    title: 'Światło Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminowany',
+    desc: 'Iluminuj w Relikwiarzu kartę Thunzharr, Budzący się Szczyt.',
+    title: 'Światło Thunzharru',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Sanktuarium iluminowane',
+    desc: 'Iluminuj w Relikwiarzu kartę Heroiczne: Sanktuarium Grobowego Żmija.',
+    title: 'Światło Sanktuarium',
   },
 };

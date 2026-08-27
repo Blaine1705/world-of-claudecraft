@@ -46,8 +46,8 @@ export function selectCorpseExplosionServant<T extends CorpseExplosionServant>(
   );
   eligible.sort((a, b) => {
     const priority = (servant: CorpseExplosionServant): number => {
-      if (servant.templateId === 'necromancy_bone_mage') return 0;
-      if (servant.templateId === 'necromancy_skeletal_warrior') return 1;
+      if (servant.templateId === 'necromancy_skeletal_warrior') return 0;
+      if (servant.templateId === 'necromancy_bone_mage') return 1;
       return 2;
     };
     const priorityDifference = priority(a) - priority(b);
@@ -74,17 +74,6 @@ export function dominionSummonBlock(
   const living = livingDominionServants(servants);
   if (living.some((servant) => servant.templateId === templateId)) return 'duplicate';
   return living.length >= NECROMANCY_DOMINION_CAP ? 'full' : null;
-}
-
-export function dominionSummonBlockForOwner(
-  servants: Iterable<OwnedDominionServant>,
-  ownerId: number,
-  templateId: string,
-): DominionSummonBlock {
-  return dominionSummonBlockFromMask(
-    dominionCompositionMaskForOwner(servants, ownerId),
-    templateId,
-  );
 }
 
 function dominionTemplateBit(templateId: string): number {

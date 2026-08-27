@@ -94,6 +94,18 @@ export interface UnitFrameDescriptor {
    *  (player, party); absent means empty decoration. */
   titlePre?: string;
   titlePost?: string;
+  /** The operator-applied Cheater tag, PRE-LOCALIZED at the call site through
+   *  cheaterTagLabel (the core stays i18n-free), '' when the unit wears no mark.
+   *  Optional and absent for instances with no tag surface. A separate field from
+   *  titlePre on purpose: the title is a cosmetic REWARD the player chose and the
+   *  tag is a SANCTION they cannot, so they must never share a slot that a
+   *  reordering could make them contend for. */
+  cheaterTag?: string;
+  /** The Book of Deeds border SLUG (never a deed id), RESOLVED AT THE CALL SITE
+   *  via deedBorderSlug, exactly like titlePre's pre-localized decoration: the
+   *  core stays a pass-through and never touches the deed catalog. '' or absent
+   *  means no border, which is also what a stale or title-reward id resolves to. */
+  borderSlug?: string;
   /** The portrait identity. The PAINTER owns the repaint gate (repaint only when
    *  this key changes); the core just exposes it so target's lastPortraitTarget
    *  gating is the same code path. */
@@ -125,6 +137,12 @@ export interface UnitFrameView {
    *  the instance has no title surface). */
   titlePre: string;
   titlePost: string;
+  /** The pre-localized Cheater tag ('' when unmarked or the instance has no tag
+   *  surface). */
+  cheaterTag: string;
+  /** The call-site-resolved Book of Deeds border slug ('' when borderless or the
+   *  instance has no border surface). */
+  borderSlug: string;
   portraitKey: string;
   /** The absorb-shield overlay fraction (hp + absorb) / maxHp, clamped by
    *  absorbBarView; equals hpFrac when there is no shield. Kept for the player /
@@ -162,6 +180,8 @@ const HIDDEN: UnitFrameView = {
   name: '',
   titlePre: '',
   titlePost: '',
+  cheaterTag: '',
+  borderSlug: '',
   portraitKey: '',
   absorbFrac: 0,
   absorbStartFrac: 0,
@@ -216,6 +236,8 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     name: d.name,
     titlePre: d.titlePre ?? '',
     titlePost: d.titlePost ?? '',
+    cheaterTag: d.cheaterTag ?? '',
+    borderSlug: d.borderSlug ?? '',
     portraitKey: d.portraitKey,
     absorbFrac: absorb.fillFrac,
     absorbStartFrac: absorb.startFrac,
@@ -240,6 +262,8 @@ export function newUnitFrameBuffer(): UnitFrameBuffer {
       name: '',
       titlePre: '',
       titlePost: '',
+      cheaterTag: '',
+      borderSlug: '',
       portraitKey: '',
       absorbFrac: 0,
       absorbStartFrac: 0,
@@ -278,6 +302,8 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
     out.name = '';
     out.titlePre = '';
     out.titlePost = '';
+    out.cheaterTag = '';
+    out.borderSlug = '';
     out.portraitKey = '';
     out.absorbFrac = 0;
     out.absorbStartFrac = 0;
@@ -308,6 +334,8 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
   out.name = d.name;
   out.titlePre = d.titlePre ?? '';
   out.titlePost = d.titlePost ?? '';
+  out.cheaterTag = d.cheaterTag ?? '';
+  out.borderSlug = d.borderSlug ?? '';
   out.portraitKey = d.portraitKey;
   out.absorbFrac = absorb.fillFrac;
   out.absorbStartFrac = absorb.startFrac;

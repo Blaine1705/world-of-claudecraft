@@ -2,7 +2,7 @@
 // exporter (woc_ws_messages_total, woc_ws_messages_dropped_total,
 // woc_ws_rate_kicks_total, woc_input_frames_missed_total,
 // woc_chat_messages_total, woc_characters_created_total,
-// woc_guild_bank_incidents_total) reach the exporter
+// woc_guild_bank_incidents_total, woc_rift_forge_refused_total) reach the exporter
 // through this one process-wide slot instead of each emission site (game.ts
 // message dispatch and inbound gate/lanes, chat routing, characters.ts create
 // path) threading a sink through its constructors. main.ts
@@ -17,7 +17,7 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
-// inbound drop cause (the fixed seven-value WS_DROP_CAUSES set), the guild-bank
+// inbound drop cause (the fixed eight-value WS_DROP_CAUSES set), the guild-bank
 // incident kind (the fixed nine-value GUILD_BANK_INCIDENTS set), the copper-flow
 // source, the harvest band and node tier (the fixed sets in
 // server/economy_telemetry.ts), and the fishing band and rod recipe id (the
@@ -32,14 +32,38 @@ import type { FishingBandLabel } from '../fishing_telemetry';
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
 
+// 'pending' is a refused same-account overlap (a consume already in flight);
+// 'dropped' is an allowed consume whose session went stale before broadcast,
+// so a spent quota unit reached nobody. Labels sum to admission attempts.
+export const GENERAL_CHAT_QUOTA_OUTCOMES = [
+  'allowed',
+  'denied',
+  'pending',
+  'busy',
+  'error',
+  'dropped',
+] as const;
+export type GeneralChatQuotaOutcome = (typeof GENERAL_CHAT_QUOTA_OUTCOMES)[number];
+export const GENERAL_CHAT_QUOTA_DB_OUTCOMES = [
+  'allowed',
+  'denied',
+  'unlimited',
+  'acquire_timeout',
+  'query_timeout',
+  'error',
+] as const;
+export type GeneralChatQuotaDbOutcome = (typeof GENERAL_CHAT_QUOTA_DB_OUTCOMES)[number];
+
 /**
- * The fixed seven causes an inbound ws frame can be dropped for: the two
+ * The fixed eight causes an inbound ws frame can be dropped for: the two
  * pre-parse gate causes (server/msg_rate_limit.ts), the three post-parse
  * lanes (server/msg_lanes.ts), the list-read guard on the ignore/block
- * readouts (server/list_read_guard.ts), and the guild-bank op guard
+ * readouts (server/list_read_guard.ts), the guild-bank op guard
  * (server/guild_bank_op_guard.ts, each allowed op is a keep-forever ledger
- * write). This closed set IS the cause label's whole vocabulary; it never
- * grows per-player or per-message.
+ * write), and the cosmetic-set guard on the two Book of Deeds pickers
+ * (server/cosmetic_op_guard.ts, each allowed set re-wires a full identity
+ * record to every in-range viewer). This closed set IS the cause label's
+ * whole vocabulary; it never grows per-player or per-message.
  */
 export const WS_DROP_CAUSES = [
   'rate',
@@ -49,9 +73,10 @@ export const WS_DROP_CAUSES = [
   'lane_chat',
   'list_read',
   'guild_bank',
+  'cosmetic',
 ] as const;
 
-/** One of the fixed seven inbound drop causes. */
+/** One of the fixed eight inbound drop causes. */
 export type WsDropCause = (typeof WS_DROP_CAUSES)[number];
 
 /**
@@ -141,6 +166,37 @@ export const GUILD_BANK_INCIDENTS = [
 /** One of the fixed eleven guild-bank incident kinds. */
 export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
 
+/** The marketplace escrow-queue outcomes (the per-character save FIFO's
+ *  custody entries): one counter with a fixed kind label, the guild-bank
+ *  incident idiom. 'started' is the throughput baseline the refusal kinds
+ *  and the flush failure are read against. 'realm_refused' is the
+ *  realm-global gate at cap (the write-path rider's bound; the per-character
+ *  kinds cannot see realm-wide saturation). 'settled' is the terminal
+ *  sibling: a held listing sequence released its slot, whatever the
+ *  outcome. NOTE the wedge arithmetic: 'started' is a strict SUBSET of the
+ *  sequences that settle (a deadline, depth-passed flush failure, or
+ *  books-dirty refusal settles without starting), so started-minus-settled
+ *  trends negative; (started + flush_failed + books_dirty_refused +
+ *  deadline_refused) - settled APPROXIMATES in-flight (a deadline-cancelled
+ *  sequence whose flush then rejects books two entered kinds, drifting the
+ *  difference by one per occurrence), and the gate's own stats on the ops
+ *  readout are the instantaneous truth.
+ *  'grant_busy' is the delivered-save twin's head-of-line park (the
+ *  bounded grant entry found the buyer's FIFO wedged past the deadline and
+ *  the delivery row parked): the one failure mode the FIFO close
+ *  introduced, counted so it is never silent. */
+export const WOC_ESCROW_QUEUE_OUTCOMES = [
+  'started',
+  'deadline_refused',
+  'depth_refused',
+  'books_dirty_refused',
+  'flush_failed',
+  'realm_refused',
+  'settled',
+  'grant_busy',
+] as const;
+export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
+
 /**
  * The game-state throughput emission hooks. Implementations must never
  * throw: an observability write can never be allowed to break the message,
@@ -163,8 +219,20 @@ export interface GameMetricsCounters {
    * server-side loss on its own (soak-packet-3.md carries the scrape guidance).
    */
   wsInputSeqGap(missed: number): void;
+  /**
+   * One Rift forge wire command refused while the gate is closed
+   * (server/rift_forge_gate.ts). The stock client never sends these, so a
+   * non-zero rate means a modified client is probing the closed forge; the
+   * counter is deliberately label-free (nothing per-player, per-account, or
+   * per-token) so a prober cannot drive cardinality.
+   */
+  riftForgeRefused(): void;
   /** One player chat message routed to other players (any channel). */
   chatMessage(): void;
+  /** One configured General quota decision, under a fixed six-value label. */
+  generalChatQuota(outcome: GeneralChatQuotaOutcome): void;
+  /** One dedicated quota database call and its end-to-end duration. */
+  generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void;
   /** One character successfully created. */
   characterCreated(): void;
   /**
@@ -173,6 +241,10 @@ export interface GameMetricsCounters {
    * instead of it: the counter says how often, the log says which guild.
    */
   guildBankIncident(kind: GuildBankIncident): void;
+  /** One marketplace escrow-queue outcome (WOC_ESCROW_QUEUE_OUTCOMES): the
+   *  production readout for the listing FIFO coupling, since a refused or
+   *  slow queue is otherwise visible only as a throttled warn line. */
+  wocEscrowQueue(outcome: WocEscrowQueueOutcome): void;
   /**
    * `amount` copper (always positive) credited to the acting player during a
    * command attributed to `source`. Sampled as the player's own copper delta
@@ -247,9 +319,13 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   wsMessageDropped() {},
   wsRateKick() {},
   wsInputSeqGap() {},
+  riftForgeRefused() {},
   chatMessage() {},
+  generalChatQuota() {},
+  generalChatQuotaDbCall() {},
   characterCreated() {},
   guildBankIncident() {},
+  wocEscrowQueue() {},
   copperCredited() {},
   copperSpent() {},
   harvest() {},
