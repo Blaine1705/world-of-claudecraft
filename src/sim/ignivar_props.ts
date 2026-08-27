@@ -100,9 +100,25 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
     at('gear_wall_rusty', 28.5, 21.2, 270 * DEG, 12),
     at('pillar_slim', 26.5, -14.3, 270 * DEG, 26),
     at('pillar_slim', 24.4, -46.8, 315 * DEG, 26),
+    // Roof chains in the darkness, boss-room style: hook chains hang over
+    // the tempering-station lanes (the assembly line the Forgefather left
+    // running), straight drops stagger down the whole hall, tops vanishing
+    // above the wall line.
+    at('chain_hanging', -13, -40, 0.6, 8, 10),
+    at('chain_hanging', 13, -18, -0.8, 8, 10, true),
+    at('chain_hanging', -13, 8, 2.1, 8, 10),
+    at('chain_hanging', 13, 34, 1.2, 8, 10, true),
     at('chain', -14, -25, 0, 8, 12),
     at('chain', 16, 0, 0.9, 8, 12, true),
     at('chain', -12, 30, 2.2, 8, 12),
+    at('chain', 8, -44, 0.4, 7, 13),
+    at('chain', -18, -34, 1.6, 9, 11, true),
+    at('chain', 20, -12, 2.8, 8, 12),
+    at('chain', -6, -2, 3.7, 6, 14, true),
+    at('chain', 12, 18, 4.5, 9, 11),
+    at('chain', -20, 24, 5.3, 8, 12, true),
+    at('chain', 4, 40, 0.7, 7, 13),
+    at('chain', -10, 46, 1.9, 8, 11),
   ];
   // The centre torch pillars ride the layout so they stay glued to the
   // torch rigs dungeon.ts places at the same points.
