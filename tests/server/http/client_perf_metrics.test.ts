@@ -260,10 +260,44 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop"\} ([\d.]+)$/m,
       ),
     ).toBe(0);
-    // A NaN worst-10s cannot satisfy the jank threshold.
-    expect(text).not.toMatch(/^woc_client_jank_reports_total\{/m);
+    // A NaN worst-10s cannot satisfy the jank threshold (the series exists at
+    // its primed zero).
+    expect(
+      value(text, /^woc_client_jank_reports_total\{gfx_tier="high",device="desktop"\} (\d+)$/m),
+    ).toBe(0);
     // A negative loss count never decrements the counter.
     expect(text).not.toMatch(/^woc_client_context_losses_total\{/m);
+  });
+
+  it('never throws on a malformed direct-caller sample', () => {
+    // The ingest always passes a sanitized row; the guard exists for a direct
+    // caller, where a throw would otherwise 500 a beacon whose row is stored.
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    expect(() =>
+      sink.perfReportStored({ ...sample(), suggestionIds: null as unknown as string[] }),
+    ).not.toThrow();
+  });
+
+  it('pre-registers the counter cross products at zero so ratios read 0%', async () => {
+    const registry = new Registry();
+    registerClientPerfMetrics(registry);
+
+    const text = await registry.metrics();
+    // Both jank-share arms exist before any report; the histograms stay lazy.
+    expect(
+      value(
+        text,
+        /^woc_client_reports_total\{gfx_tier="insane",device="mobile",gpu_family="software"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+    expect(
+      value(text, /^woc_client_jank_reports_total\{gfx_tier="low",device="desktop"\} (\d+)$/m),
+    ).toBe(0);
+    expect(text).not.toMatch(/^woc_client_frame_p95_seconds_count\{/m);
+    expect(text).not.toMatch(/^woc_client_context_losses_total\{/m);
+    expect(text).not.toMatch(/^woc_client_suggestions_total\{/m);
   });
 
   it('skips benchmark-source reports entirely', async () => {
@@ -273,7 +307,15 @@ describe('registerClientPerfMetrics', () => {
     sink.perfReportStored(sample({ source: 'benchmark', zoneOrScenario: 'benchmark' }));
 
     const text = await registry.metrics();
-    expect(text).not.toMatch(/^woc_client_reports_total\{/m);
+    // The report's own cohort counter stays at its primed zero and no
+    // histogram series appears for it.
+    expect(
+      value(
+        text,
+        /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+    expect(text).not.toMatch(/^woc_client_frame_p95_seconds_count\{/m);
   });
 
   it('never mints labels outside the vocabularies for hostile field values', async () => {

@@ -241,8 +241,9 @@ const INSTANCE_SCENE_TOKENS: readonly ClientPerfSceneClass[] = [
 export function classifyClientPerfScene(zoneOrScenario: string): ClientPerfSceneClass {
   if (zoneOrScenario.startsWith('dungeon:')) return 'dungeon';
   if (zoneOrScenario.startsWith('delve:')) return 'delve';
-  const instanceToken = INSTANCE_SCENE_TOKENS.find((token) => token === zoneOrScenario);
-  if (instanceToken) return instanceToken;
+  if ((INSTANCE_SCENE_TOKENS as readonly string[]).includes(zoneOrScenario)) {
+    return zoneOrScenario as ClientPerfSceneClass;
+  }
   // The ingest defaults ('gameplay' for a stock client that sent nothing,
   // 'benchmark' for the harness) plus the empty string carry no scene at all.
   if (zoneOrScenario === '' || zoneOrScenario === 'gameplay' || zoneOrScenario === 'benchmark') {
@@ -336,34 +337,58 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     registers: [registry],
   });
 
+  // Pre-register the two COUNTER cross products at zero, the registry's house
+  // convention (game_metrics.ts; a Prometheus counter cannot backfill a
+  // scrape): the jank SHARE is a ratio over these two, and a lazily created
+  // numerator makes a healthy cohort read "no data" instead of 0%. The
+  // histograms stay lazy on purpose: they carry no ratio arm and priming them
+  // would be the bulk of the family's scrape payload for no query benefit.
+  for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
+    for (const device of CLIENT_PERF_DEVICE_CLASSES) {
+      jankReports.inc({ gfx_tier: gfxTier, device }, 0);
+      for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
+        reports.inc({ gfx_tier: gfxTier, device, gpu_family: gpuFamily }, 0);
+      }
+    }
+  }
+
   return {
     perfReportStored(sample: ClientPerfSample): void {
-      if (sample.source !== 'gameplay') return;
-      const gfxTier = tierIn(sample.gfxTier);
-      const device: ClientPerfDeviceClass = sample.mobileTouch ? 'mobile' : 'desktop';
-      const tierDevice = { gfx_tier: gfxTier, device };
+      // Guarded like every sibling sink on this registry (game_metrics.ts,
+      // metrics.ts): a throw here would 500 a beacon whose row is already
+      // stored, and the client then re-sends the same worst-10s window, so
+      // dropping one observation is the correct failure mode.
+      try {
+        if (sample.source !== 'gameplay') return;
+        const gfxTier = tierIn(sample.gfxTier);
+        const device: ClientPerfDeviceClass = sample.mobileTouch ? 'mobile' : 'desktop';
+        const tierDevice = { gfx_tier: gfxTier, device };
 
-      reports.inc({
-        ...tierDevice,
-        gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
-      });
-      frameP95.observe(tierDevice, finiteOrZero(sample.frameP95Ms) / MS_PER_SECOND);
-      fpsAvg.observe(tierDevice, finiteOrZero(sample.fpsAvg));
-      worst10s.observe(
-        { scene: classifyClientPerfScene(sample.zoneOrScenario), device },
-        finiteOrZero(sample.worst10sFrameP95Ms) / MS_PER_SECOND,
-      );
-      if (sample.worst10sFrameP95Ms >= CLIENT_PERF_JANK_THRESHOLD_MS) jankReports.inc(tierDevice);
-      longTask.observe({ gfx_tier: gfxTier }, finiteOrZero(sample.longTaskP95Ms) / MS_PER_SECOND);
-      renderScale.observe({ gfx_tier: gfxTier }, finiteOrZero(sample.effectiveRenderScale));
-      const lost = Math.max(0, Math.floor(finiteOrZero(sample.contextLostCount)));
-      if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily) }, lost);
-      for (const id of sample.suggestionIds) {
-        // The ingest allowlist already filtered these; membership is re-checked
-        // so a direct caller cannot mint a label value.
-        if ((CLIENT_PERF_SUGGESTION_IDS as readonly string[]).includes(id)) {
-          suggestions.inc({ suggestion: id });
+        reports.inc({
+          ...tierDevice,
+          gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
+        });
+        frameP95.observe(tierDevice, finiteOrZero(sample.frameP95Ms) / MS_PER_SECOND);
+        fpsAvg.observe(tierDevice, finiteOrZero(sample.fpsAvg));
+        worst10s.observe(
+          { scene: classifyClientPerfScene(sample.zoneOrScenario), device },
+          finiteOrZero(sample.worst10sFrameP95Ms) / MS_PER_SECOND,
+        );
+        if (sample.worst10sFrameP95Ms >= CLIENT_PERF_JANK_THRESHOLD_MS) jankReports.inc(tierDevice);
+        longTask.observe({ gfx_tier: gfxTier }, finiteOrZero(sample.longTaskP95Ms) / MS_PER_SECOND);
+        renderScale.observe({ gfx_tier: gfxTier }, finiteOrZero(sample.effectiveRenderScale));
+        const lost = Math.max(0, Math.floor(finiteOrZero(sample.contextLostCount)));
+        if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily) }, lost);
+        for (const id of sample.suggestionIds) {
+          // The ingest allowlist already filtered these; membership is re-checked
+          // so a direct caller cannot mint a label value.
+          if ((CLIENT_PERF_SUGGESTION_IDS as readonly string[]).includes(id)) {
+            suggestions.inc({ suggestion: id });
+          }
         }
+      } catch {
+        // Deliberately silent, matching the sibling sinks: the observation is
+        // lost, the beacon and its stored row are not.
       }
     },
   };
