@@ -46,9 +46,19 @@ describe('the touch-input chrome stands down for a pad only once it takes the XH
     expect(body.trim()).toBe('display: none;');
   });
 
-  it('does NOT touch the menu-access chrome (Quick Actions seat / mobile-combat-controls)', () => {
-    expect(hudMobileCss).not.toMatch(/\.xhb-mode #mobile-combat-controls/);
-    expect(hudMobileCss).not.toMatch(/\.xhb-mode #mobile-menu-anchor/);
+  it('may reposition the Quick Actions seat in xhb-mode (out of the XHB band it used to sit in) but never hides it', () => {
+    // Amended per the PR #3658 re-review: the seat sits inside the XHB's own
+    // band once the bar stands up (blocking finding), so it moves clear of it
+    // instead of standing down; #mobile-menu-anchor itself must never be
+    // toggled to display:none either, in xhb-mode or its left-handed mirror.
+    for (const selector of [
+      'body\\.mobile-touch\\.xhb-mode:not\\(\\.mobile-left-handed\\) #mobile-combat-controls',
+      'body\\.mobile-touch\\.xhb-mode\\.mobile-left-handed #mobile-combat-controls',
+    ]) {
+      const body = ruleBody(selector);
+      if (body) expect(body).not.toMatch(/display:\s*none/);
+    }
+    expect(hudMobileCss).not.toMatch(/\.xhb-mode #mobile-menu-anchor\s*\{\s*\n?\s*display:\s*none/);
   });
 
   it('is no longer keyed off a separate pad-connected class', () => {
@@ -85,16 +95,28 @@ describe('the cross hotbar overlay stands alone once it takes over: it does not 
 });
 
 describe('main.ts syncs xhb-mode alone on every pad connection-state change', () => {
-  it('keeps syncPadChrome as the one pad chrome callback, with no separate pad-connected state', () => {
-    const block = mainTs.match(/const syncPadChrome = \(\) => \{([\s\S]*?)\n\s*\};/)?.[1] ?? '';
-    expect(block, 'syncPadChrome callback body not found').toBeTruthy();
-    expect(block).toContain('crossHotbar.syncPadMode(gamepad)');
-    expect(block).not.toMatch(/applyPadConnectedClass|pad-connected|mobile_pad_chrome/);
+  it('no longer imports the redundant pad-connected module', () => {
+    expect(mainTs).not.toContain('mobile_pad_chrome');
   });
 
-  it('uses that callback for connection changes and the synchronous gamepadEnabled setting path', () => {
-    expect(mainTs).toContain('onConnectionChange: syncPadChrome,');
-    expect(mainTs).toContain('createGamepadSettingApplier(gamepad, settings, syncPadChrome)');
+  // The two call sites share one reference (syncXhbPadMode) rather than each
+  // inlining its own arrow function: a shared reference cannot smuggle extra
+  // pad-connected-shaped logic in at either site the way a repeated inline
+  // block body could, which is a STRONGER form of the invariant these tests
+  // used to pin against two separate inline closures.
+  it('defines exactly one syncXhbPadMode delegate to crossHotbar.syncPadMode(gamepad), with nothing else pad-connected-shaped in it', () => {
+    const block = mainTs.match(/const syncXhbPadMode = \(\) => ([^;]+);/)?.[1] ?? '';
+    expect(block, 'syncXhbPadMode declaration not found').toBeTruthy();
+    expect(block.trim()).toBe('crossHotbar.syncPadMode(gamepad)');
+    expect(mainTs).not.toMatch(/applyPadConnectedClass|pad-connected/);
+  });
+
+  it('wires syncXhbPadMode into GamepadManager.onConnectionChange', () => {
+    expect(mainTs).toMatch(/onConnectionChange:\s*syncXhbPadMode,/);
+  });
+
+  it('wires syncXhbPadMode into the gamepadEnabled setting applier too (start/stop is synchronous, no event fires)', () => {
+    expect(mainTs).toMatch(/createGamepadSettingApplier\(gamepad, settings, syncXhbPadMode\)/);
   });
 });
 
@@ -108,5 +130,73 @@ describe('the desktop micromenu rail stands back up for the pad, so its mouse mo
   it('keeps the standalone chest button hidden either way (its mobile equivalent lives in the More tray)', () => {
     const body = ruleBody('body\\.mobile-touch #daily-rewards-button');
     expect(body.trim()).toBe('display: none !important;');
+  });
+
+  it('never drops the revived rail buttons below the 24px WCAG 2.5.8 touch floor (src/ui/CLAUDE.md)', () => {
+    expect(hudMobileCss).not.toMatch(
+      /body\.mobile-touch\.xhb-mode #side-buttons \.micro-btn \{\s*\n\s*height: (?:1\d|2[0-3])px;/,
+    );
+  });
+
+  it('trims the rail to launchers with no Quick Actions equivalent, so the shorter columns clear the touch floor without a sub-floor button height', () => {
+    const selector =
+      'body\\.mobile-touch\\.xhb-mode #mm-char,\\s*\\n\\s*' +
+      'body\\.mobile-touch\\.xhb-mode #mm-spell,\\s*\\n\\s*' +
+      'body\\.mobile-touch\\.xhb-mode #mm-quest,\\s*\\n\\s*' +
+      'body\\.mobile-touch\\.xhb-mode #mm-map,\\s*\\n\\s*' +
+      'body\\.mobile-touch\\.xhb-mode #mm-bag,\\s*\\n\\s*' +
+      'body\\.mobile-touch\\.xhb-mode #mm-social,\\s*\\n\\s*' +
+      'body\\.mobile-touch\\.xhb-mode #mm-options';
+    const body = ruleBody(selector);
+    expect(
+      body,
+      'the seven-selector duplicate-launcher standdown was not found as expected',
+    ).toBeTruthy();
+    expect(body.trim()).toBe('display: none;');
+  });
+});
+
+describe('the revived micromenu rail stands down the deed/reliquary tracker sharing its corner', () => {
+  it('hides #right-tracker-stack in xhb-mode (it painted over the rail: same top:140px seat, and its compact-tier hit-box extension out-z-indexed the rail)', () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #right-tracker-stack');
+    expect(body.trim()).toBe('display: none;');
+  });
+});
+
+describe('the lift composes into the mobile #player-frame/#castbar transform in xhb-mode', () => {
+  // hud.css's body.xhb-mode rule only ever sets translateY: this file's own
+  // mobile transforms (later in the cascade, @layer hud-mobile) fully replace
+  // that single `transform` property rather than adding to it, so the lift
+  // has to be composed directly into the mobile rule or the frame never moves
+  // clear of a visible XHB bar.
+  it('composes the lift into #castbar (the only #castbar transform rule in this file)', () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #castbar');
+    expect(body).toContain('translateX(-50%)');
+    expect(body).toContain('translateY(calc(-1 * var(--xhb-lift, 56px)))');
+  });
+
+  it('composes the lift into the PORTRAIT #player-frame scale (0.82)', () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #player-frame');
+    expect(body).toContain('translateY(calc(-1 * var(--xhb-lift, 56px)))');
+    expect(body).toContain('scale(calc(0.82 * var(--mobile-chrome-scale, 1)))');
+  });
+
+  it('ALSO composes the lift into the LANDSCAPE #player-frame scale (0.6): the touch HUD is landscape-only, so this is the rule that actually governs real play, not the portrait one above', () => {
+    const landscapeOpenAt = hudMobileCss.indexOf('@media (orientation: landscape) {');
+    const bothRules = [
+      ...hudMobileCss.matchAll(/body\.mobile-touch\.xhb-mode #player-frame \{([^}]*)\}/g),
+    ];
+    expect(
+      bothRules.length,
+      'expected both the portrait and landscape xhb-mode #player-frame rules',
+    ).toBe(2);
+    const landscapeRule = bothRules.find((m) => (m.index ?? -1) > landscapeOpenAt);
+    expect(
+      landscapeRule,
+      'no xhb-mode #player-frame override found after the landscape media open',
+    ).toBeTruthy();
+    const body = landscapeRule?.[1] ?? '';
+    expect(body).toContain('translateY(calc(-1 * var(--xhb-lift, 56px)))');
+    expect(body).toContain('scale(calc(0.6 * var(--mobile-chrome-scale, 1)))');
   });
 });

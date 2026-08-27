@@ -460,6 +460,19 @@
     pointer-events: auto;
     z-index: 30;
   }
+  /* The seat above sits past the now-hidden movement wheel, squarely inside the
+     XHB's own centred band (confirmed live: fully inside the bar's box at the
+     844x390 reference landscape viewport). The wheel it seats next to is hidden
+     in this mode too, so sliding it further left, clear of the bar's left edge,
+     costs nothing: nothing else lives in that reclaimed strip while a pad drives
+     movement. Split in two because the left-handed mirror below flips left/right
+     rather than just re-deriving the same offset. */
+  body.mobile-touch.xhb-mode:not(.mobile-left-handed) #mobile-combat-controls {
+    left: max(12px, env(safe-area-inset-left));
+  }
+  body.mobile-touch.xhb-mode.mobile-left-handed #mobile-combat-controls {
+    right: max(12px, env(safe-area-inset-right));
+  }
   /* A true CIRCLE at the shared --menu-btn-size, not the row's 58x54 oval, and
      scaled by the same --btn-scale the ring uses about the seat's own bottom
      edge (which is the line the derived `bottom` above puts on Jump's centre). */
@@ -2320,6 +2333,16 @@
   body.mobile-touch #castbar .label {
     display: none;
   }
+  /* xhb-mode's lift (hud.css's body.xhb-mode #castbar, translateY only) never
+     reaches this bar: transform is a single property, this file loads after
+     components (hud-mobile outranks it in the cascade), and the rule right
+     above already claims transform for the mobile centring translate. Compose
+     the lift into THAT translate instead of relying on the desktop rule to
+     add it, or the bar stays parked on the button row's line while the XHB
+     visibly claims the same band. */
+  body.mobile-touch.xhb-mode #castbar {
+    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
+  }
   /* The swing timer had no mobile seat at all (unlike #castbar above): it fell
      back to the desktop `bottom: 234px` fixed value, which on a short mobile
      landscape viewport lands mid-screen and covers enemy nameplates and their
@@ -2441,19 +2464,18 @@
   /* Daily chest (issue 1577): the top-right rail button used to sit right next
      to the minimap and overlap the buff/debuff bars at the landscape breakpoint.
      It is folded into the More tray (#mobile-daily-rewards, styled with the rest
-     of #mobile-extra-grid) instead, so the whole #side-buttons rail (every
-     .micro-btn on it is already hidden below) and the standalone chest button
-     are hidden on mobile; the desktop rail and #daily-rewards-window are
-     untouched.
+     of #mobile-extra-grid) instead, so the whole #side-buttons rail and the
+     standalone chest button are hidden on mobile (below); the desktop rail and
+     #daily-rewards-window are untouched.
      UNLESS a pad is actively driving the XHB (.xhb-mode): its right-stick
      mouse mode (src/game/gamepad.ts) is the same pointer-plus-click scheme
      desktop uses to reach this rail, and Quick Actions' tap/hold/swipe touch
      gestures are not reachable one-handed off the pad. The rail stands back up
-     for the pad's cursor exactly as it does on desktop; the Quick Actions seat
-     stays available too, so the touch path and the pad path coexist. The
-     standalone chest button stays hidden either way (below): its mobile
-     equivalent already lives in the More tray, so it never needs the desktop
-     rail's copy back. */
+     for the pad's cursor exactly as it does on desktop (trimmed further below);
+     the Quick Actions seat stays available too, so the touch path and the pad
+     path coexist. The standalone chest button stays hidden either way (below):
+     its mobile equivalent already lives in the More tray, so it never needs the
+     desktop rail's copy back. */
   body.mobile-touch:not(.xhb-mode) #side-buttons {
     display: none;
   }
@@ -2462,20 +2484,42 @@
      corner (confirmed live: the two overlapped by ~65px at the standard
      844x390 landscape viewport). Re-anchored from the top instead, below the
      minimap, using the same 140px clearance #buff-bar/#debuff-bar already use
-     for this exact problem, rather than a second XHB-mode-only compaction
-     tier: the short-viewport rescue above (@media max-height: 600px) already
-     shrinks the rail enough that it fits in the remaining height either way. */
+     for this exact problem. */
   body.mobile-touch.xhb-mode #side-buttons {
     top: max(140px, env(safe-area-inset-top));
     bottom: auto;
   }
-  /* The desktop short-viewport rescue (24px buttons, 1px column gap) is not
-     quite enough headroom here: the tallest column plus the 140px top
-     clearance above leaves under 10px before env(safe-area-inset-bottom) on a
-     notched phone, too tight a margin for a home-indicator gesture area.
-     Trimmed a little further for this mode alone. */
-  body.mobile-touch.xhb-mode #side-buttons .micro-btn {
-    height: 20px;
+  /* #right-tracker-stack (below) rests at this SAME top:140px clearance, so the
+     revived rail sat squarely on top of it (confirmed live: their boxes
+     overlapped by ~50px at the reference viewport, and the deed/reliquary
+     tracker's compact-tier hit-box extension, z-index 20 to the rail's 19,
+     painted over the rail's top buttons and stole their taps and pad-cursor
+     clicks). The tracker is progress chrome, not actionable combat info (no
+     graphics-fairness concern), so it stands down here rather than the rail
+     re-deriving a seat around whatever height its content happens to render
+     at this tick; #mobile-extra-controls' More tray and the rail's own
+     Book of Deeds / Reliquary launchers still open the full windows. */
+  body.mobile-touch.xhb-mode #right-tracker-stack {
+    display: none;
+  }
+  /* Trimmed to the launchers with no other pad-reachable path: Quick Actions'
+     own strip (#mobile-menu-strip, kept up alongside this rail per the review
+     above) already covers Character, Spellbook, World Map, Bags, Quest Log,
+     Friends & Guild and the Game Menu, so duplicating them here would only
+     cost height the rail cannot spare at this floor (below) without also
+     re-litigating the touch-floor math the desktop short-viewport rescue
+     already settled. Every hidden id has a live Quick Actions equivalent:
+     mm-char/mm-spell/mm-quest/mm-map/mm-bag/mm-social/mm-options pair with
+     mobile-menu-char/mobile-menu-spellbook/mobile-quest/mobile-menu-map/
+     mobile-menu-bags/mobile-social/mobile-menu respectively. */
+  body.mobile-touch.xhb-mode #mm-char,
+  body.mobile-touch.xhb-mode #mm-spell,
+  body.mobile-touch.xhb-mode #mm-quest,
+  body.mobile-touch.xhb-mode #mm-map,
+  body.mobile-touch.xhb-mode #mm-bag,
+  body.mobile-touch.xhb-mode #mm-social,
+  body.mobile-touch.xhb-mode #mm-options {
+    display: none;
   }
   body.mobile-touch.xhb-mode .side-buttons-col {
     gap: 0;
@@ -2882,6 +2926,18 @@
     justify-content: flex-start;
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center top;
+  }
+  /* xhb-mode's lift (hud.css's body.xhb-mode #player-frame, translateY only)
+     never reaches this frame for the same reason as #castbar above: transform
+     is a single property and this rule already claims it for centring plus
+     the scale. Composed here instead of relying on the desktop rule to add
+     it, or the frame sits on the button row's line while the XHB visibly
+     claims the same band. The landscape-only touch HUD has its own scale
+     override further down (0.6, not 0.82) that needs the identical
+     treatment; see the matching rule inside @media (orientation: landscape). */
+  body.mobile-touch.xhb-mode #player-frame {
+    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)))
+      scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
   }
   body.mobile-touch .warlock-doom-frame {
     position: fixed;
@@ -7240,6 +7296,14 @@
       left: 50%;
       width: 300px;
       transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
+    /* Landscape's own scale (0.6, not the portrait rule's 0.82 above) needs the
+       SAME composed lift, or a pad paired on the landscape-only touch HUD (the
+       only orientation it ever runs in) gets the un-lifted frame regardless of
+       the portrait-scoped fix. */
+    body.mobile-touch.xhb-mode #player-frame {
+      transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)))
+        scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #player-frame .uf-bars {
       width: 224px;

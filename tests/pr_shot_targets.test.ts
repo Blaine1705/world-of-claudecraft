@@ -345,9 +345,10 @@ describe('classifyDiff', () => {
     expect(plan.generic).toEqual(['hud-desktop']);
   });
 
-  it('adds the mobile HUD when the visual change touches the mobile surface', () => {
+  it('maps the mobile HUD stylesheet to the cross-hotbar target it can visually change', () => {
     const plan = classifyDiff(['src/styles/hud.mobile.css']);
-    expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('cross-hotbar');
+    expect(plan.generic).toHaveLength(0);
   });
 
   it('keeps the desktop HUD fallback for the shared component stylesheet', () => {

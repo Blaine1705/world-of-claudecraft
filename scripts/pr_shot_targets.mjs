@@ -10603,6 +10603,7 @@ export const TARGETS = [
       // plus the body.mobile-touch .xhb standdown), so a change there is a
       // cross-hotbar visual change too.
       'styles/hud.css',
+      'styles/hud.mobile.css',
     ],
     // The bar only exists while a pad is connected, and headless Chrome has no
     // Gamepad API surface at all, so every variant except `no-pad` installs a
@@ -10615,9 +10616,8 @@ export const TARGETS = [
       { key: 'expanded', beforeLoad: fakePadSeed, expand: true },
       { key: 'arranging', beforeLoad: fakePadSeed, pad: [], arrange: true },
       // Pairing a pad to a phone: the touch interface AND a connected
-      // controller at once (an MFi/Bluetooth pad on iOS). The overlay must
-      // stand down here (body.mobile-touch .xhb { display: none }) so the
-      // mobile action ring's own touch buttons stay uncovered.
+      // controller at once (an MFi/Bluetooth pad on iOS). In .xhb-mode the XHB
+      // stands up as the pad surface while the touch action ring stands down.
       { key: 'mobile-controller', beforeLoad: fakePadSeed, pad: [], mobile: true },
     ],
     async capture(page, variant) {
