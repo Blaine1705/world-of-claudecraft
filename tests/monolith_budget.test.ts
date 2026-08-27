@@ -78,7 +78,10 @@ const MONOLITHS: MonolithRow[] = [
     // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
     // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2487,
+    // Down 2487 -> 2475 at the desktop-signing round: the WocMarketHooks
+    // contract moved to src/ui/woc_market_hooks.ts (wiring, window, and the
+    // trade arm all consume it), paying for the signer-reference plumbing.
+    ceiling: 2475,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -261,13 +264,11 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    // Lowered after the movement-harness extractions: the snapshot alpha
-    // formula (src/net/snapshot_alpha.ts), the input-echo/jitter EMAs
-    // (src/net/input_echo_tracker.ts), and the self-prediction gate plus its
-    // immobile-aura table (src/game/self_motion_gate.ts) all left the loop.
-    // Exact count, zero slack (both sides of the v0.41.0 batch merge shed
-    // lines; the ratchet follows the merged file).
-    ceiling: 11548,
+    // Lowered by the movement-harness extractions (snapshot_alpha,
+    // input_echo_tracker, self_motion_gate) on one side and the
+    // desktop-signing wallet-handoff hoist on the other; the ratchet
+    // follows the merged file. Exact count, zero slack.
+    ceiling: 11547,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -331,9 +332,10 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
-    // Lowered by the shared snapshot-alpha extraction
-    // (src/net/snapshot_alpha.ts). Exact count, zero slack.
-    ceiling: 5853,
+    // Lowered by the shared snapshot-alpha extraction on one side and the
+    // desktop-signing handoff-validation move on the other; the ratchet
+    // follows the merged file. Exact count, zero slack.
+    ceiling: 5815,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -397,7 +399,11 @@ const MONOLITHS: MonolithRow[] = [
     // Down 4032 -> 3989 at the second round: the stuck-custody monitor
     // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
     // paying for the seller-history read.
-    ceiling: 3989,
+    // Down 3989 -> 3929 at the desktop-signing round: the economy vocabulary
+    // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
+    // woc_market_economy_types.ts (the monitor-types pattern), paying for the
+    // desktopHandoff registrar dep and its four registration call sites.
+    ceiling: 3929,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
