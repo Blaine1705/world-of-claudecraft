@@ -88,6 +88,7 @@ const state: {
   infoEl: HTMLElement | null;
   group: THREE.Group | null;
   marker: THREE.Group | null;
+  worklight: THREE.AmbientLight | null;
   entries: PlacedEntry[];
   selected: number;
   room: PlacerRoom | null;
@@ -101,6 +102,7 @@ const state: {
   infoEl: null,
   group: null,
   marker: null,
+  worklight: null,
   entries: [],
   selected: -1,
   room: null,
@@ -109,6 +111,37 @@ const state: {
 };
 
 const storageKey = (interior: string) => `woc_ignivar_placer:${interior}`;
+
+// The placement work light: a flat ambient lift so prop placement stays
+// readable inside the deliberately dim forge grades. AmbientLight by design:
+// ambient is not a shader program-cache-key input, so attaching and removing
+// it after boot relinks nothing (the light census pin scans the keyed classes
+// only). On by default every open; toggle it off to preview the shipped mood.
+const WORKLIGHT_COLOR = 0xffe9c9;
+const WORKLIGHT_INTENSITY = 1.4;
+
+let worklightOn = true;
+
+const worklightLabel = (): string => (worklightOn ? 'work light: on' : 'work light: off');
+
+function applyWorklight(): void {
+  const deps = state.deps;
+  const wanted = worklightOn && state.panel !== null;
+  if (wanted && deps && !state.worklight) {
+    const light = new THREE.AmbientLight(WORKLIGHT_COLOR, WORKLIGHT_INTENSITY);
+    light.name = 'ignivarPlacerWorklight';
+    deps.scene.add(light);
+    state.worklight = light;
+  } else if (!wanted && state.worklight) {
+    state.worklight.parent?.remove(state.worklight);
+    state.worklight = null;
+  }
+}
+
+function setWorklight(on: boolean): void {
+  worklightOn = on;
+  applyWorklight();
+}
 
 function loadEntries(interior: string): PlacedEntry[] | null {
   try {
@@ -512,6 +545,10 @@ function buildPanel(): void {
       false,
     ),
   ]);
+  const worklightBtn = button(worklightLabel(), () => {
+    setWorklight(!worklightOn);
+    worklightBtn.textContent = worklightLabel();
+  });
   buttonRow(panel, [
     button(
       'toggle built dressing',
@@ -521,6 +558,7 @@ function buildPanel(): void {
       },
       true,
     ),
+    worklightBtn,
     button('close', closePlacer),
   ]);
 
@@ -558,6 +596,7 @@ function closePlacer(): void {
     state.group = null;
   }
   setDressingHidden(false);
+  applyWorklight();
   state.room = null;
   state.deps?.log('[placer] closed (placements stay saved locally)', '#8fd0ff');
 }
@@ -567,6 +606,7 @@ function openPlacer(deps: IgnivarPlacerDeps): void {
   void prepareIgnivarEnvProps().then(() => {
     if (state.panel) return;
     buildPanel();
+    applyWorklight();
     const room = roomForPlayer(deps.getPlayer());
     if (room) enterRoom(room);
     tickStatus();
