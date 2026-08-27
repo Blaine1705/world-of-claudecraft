@@ -7750,6 +7750,16 @@ export const ru_RU: EnTranslations = {
     "buyConfirmAccept": "Купить",
     "buyConfirmCancel": "Отмена"
   },
+  "crucibleShop": {
+    "balance": "Ваши печати: {list}",
+    "noSigils": "У вас нет печатей Горнила.",
+    "price": "1 x {sigil}",
+    "buyAria": "Обменять {sigil} на {item}",
+    "buyConfirmTitle": "Подтверждение обмена",
+    "buyConfirmBody": "Обменять {sigil} на {item}? Потраченную печать нельзя вернуть.",
+    "buyConfirmAccept": "Обменять",
+    "buyConfirmCancel": "Отмена"
+  },
   "cardDuel": {
     "title": "Карточная дуэль",
     "close": "Закрыть",
@@ -15129,6 +15139,11 @@ export const ru_RU: EnTranslations = {
         "name": "Углевая проекция Мэйлин",
         "title": "Углевая проекция",
         "greeting": "Угли несут голос Мэйлин всё дальше в глубины кузни."
+      },
+      "crucible_quartermaster": {
+        "name": "Интендант Бронн Уголёк",
+        "title": "Интендант Горнила",
+        "greeting": "Горн метит своих. Принеси мне печать из Горнила, и я снаряжу тебя для войны."
       },
       "brother_halven": {
         "name": "Брат Хальвен",

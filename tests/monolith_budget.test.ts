@@ -130,7 +130,11 @@ const MONOLITHS: MonolithRow[] = [
     // AbilityScaling literals with the extracted abilityScalingOf constructor
     // (src/ui/ability_damage.ts), so the coordinator shrank and the ratchet
     // follows it down. Exact count, zero slack.
-    ceiling: 18379,
+    // Lowered 18379 -> 18371: the Crucible sigil-shop wiring paid its way by
+    // moving the character-sheet progression views (milestoneName,
+    // talentSummaryHtml, progressionHtml) to src/ui/character_progression_view.ts,
+    // shrinking the coordinator below the previous pin. Exact count, zero slack.
+    ceiling: 18371,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -237,7 +241,11 @@ const MONOLITHS: MonolithRow[] = [
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
     // the raid consolidation moved the raid readout getter bodies (ignivar_raid_readouts.ts) plus the same-family ground-AoE and partyInfo projections out; exact count.
-    ceiling: 12473,
+    // Plus 7 for the Crucible sigil shop: the import plus the thin
+    // buyCrucibleVendorItem delegation to instances/crucible_vendor.ts (the
+    // buyHeroicVendorItem shape exactly); the logic itself lives in the
+    // instances module. Exact count, zero slack.
+    ceiling: 12480,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -306,7 +314,9 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Healing Power wire field: the ONE line is maybe('hpw')
     // beside maybe('sp') in the delta-guarded self record; no clean extraction
     // exists for a single serializer line. Exact count.
-    ceiling: 10605,
+    // Plus 7 for the crucible_buy command arm: the dispatch case is the
+    // heroic_buy shape exactly; validation lives sim-side. Exact count.
+    ceiling: 10612,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -329,7 +339,9 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 2 for the Healing Power mirror: the blankEntity default and the
     // s.hpw ?? fallback beside the existing sp lines; thin wire wiring with no
     // clean extraction. Exact count.
-    ceiling: 5807,
+    // Plus 3 for the buyCrucibleVendorItem command mirror (the
+    // buyHeroicVendorItem shape exactly). Exact count, zero slack.
+    ceiling: 5810,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

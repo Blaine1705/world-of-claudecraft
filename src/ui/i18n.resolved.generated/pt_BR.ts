@@ -7750,6 +7750,16 @@ export const pt_BR: EnTranslations = {
     "buyConfirmAccept": "Comprar",
     "buyConfirmCancel": "Cancelar"
   },
+  "crucibleShop": {
+    "balance": "Your sigils: {list}",
+    "noSigils": "You hold no Crucible sigils.",
+    "price": "1 {sigil}",
+    "buyAria": "Redeem {sigil} for {item}",
+    "buyConfirmTitle": "Confirm Redemption",
+    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
+    "buyConfirmAccept": "Redeem",
+    "buyConfirmCancel": "Cancel"
+  },
   "cardDuel": {
     "title": "Duelo de Cartas",
     "close": "Fechar",
@@ -15129,6 +15139,11 @@ export const pt_BR: EnTranslations = {
         "name": "Maelin's Ember Projection",
         "title": "Ember Projection",
         "greeting": "The embers carry Maelin's voice forward through the forge."
+      },
+      "crucible_quartermaster": {
+        "name": "Quartermaster Bronn Emberward",
+        "title": "Crucible Quartermaster",
+        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
       },
       "brother_halven": {
         "name": "Irmão Halven",

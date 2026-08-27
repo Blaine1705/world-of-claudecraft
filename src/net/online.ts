@@ -5299,6 +5299,9 @@ export class ClientWorld implements IWorld {
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
   }
+  buyCrucibleVendorItem(itemId: string): void {
+    this.cmd({ cmd: 'crucible_buy', itemId });
+  }
   // Live lethal death zones on the current rift boss floor. Mirrored from
   // riftDeathZoneSpawn events emitted at zone-placement time; the client counts
   // each zone down locally and drops it when remaining falls to zero.

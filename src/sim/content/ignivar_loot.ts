@@ -29,7 +29,7 @@
 // matching-slot set piece for the holder's class at the Crucible
 // Quartermaster (CRUCIBLE_VENDOR_STOCK).
 
-import type { ItemDef } from '../types';
+import type { ItemDef, NpcDef } from '../types';
 
 // Source level the whole Ignivar raid loot table reads as in the item-level
 // index: level-20 content two tiers above the five-man heroics, so epics land
@@ -3302,3 +3302,25 @@ export const CRUCIBLE_VENDOR_STOCK: readonly CrucibleVendorOffer[] = [
   { itemId: 'grovespring_gloves', sigilId: 'sigil_anvil_gloves' },
   { itemId: 'grovespring_legs', sigilId: 'sigil_anvil_legs' },
 ];
+
+// The Crucible Quartermaster herself. Dynamic on the Maelin pattern
+// (content/ignivar_raid_lore.ts): the overworld bootstrap never places her;
+// the Halls of the First Tempering lists her in its `npcs` array beside the
+// raid entrance. The crucibleVendor flag routes her dialog to the sigil shop.
+export const IGNIVAR_VENDOR_NPCS: Record<string, NpcDef> = {
+  [CRUCIBLE_VENDOR_NPC_ID]: {
+    id: CRUCIBLE_VENDOR_NPC_ID,
+    name: 'Quartermaster Bronn Emberward',
+    title: 'Crucible Quartermaster',
+    // Dynamic NPCs use an authored instance-local spawn; this placeholder is
+    // never read by the overworld placement loop.
+    pos: { x: 0, z: 0 },
+    facing: 0,
+    color: 0xb3702d,
+    questIds: [],
+    crucibleVendor: true,
+    greeting:
+      'The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war.',
+    dynamic: true,
+  },
+};

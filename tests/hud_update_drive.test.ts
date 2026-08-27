@@ -1062,6 +1062,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the heroic vendor window out of range',
   },
   {
+    call: 'this.closeCrucibleVendor',
+    band: 'medium',
+    gate: 'this.openCrucibleVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: 'closes the crucible vendor window out of range',
+  },
+  {
     call: 'this.closeWarfareVendor',
     band: 'medium',
     gate: 'this.openWarfareVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
@@ -1640,7 +1648,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // v0.40.0 sync merge back in.
       // chrome 82 -> 83: the controller-tutorial merge's gamepad control
       // hint apply.
-    ).toEqual({ window: 44, chrome: 83, none: 17 });
+      // window 44 -> 45: the crucible vendor's out-of-range close (the third
+      // #vendor-window tenant, on the heroic vendor's exact row shape).
+    ).toEqual({ window: 45, chrome: 83, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1668,7 +1678,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // with the v0.40.0 sync: the trade row's lastTradeSig latch now lives
       // in the woc_trade module.
       hud: 6,
-      callsite: 11,
+      // Up to 12 with the crucible vendor's out-of-range close: the same
+      // callsite-guarded shape as the copper and heroic vendor closes.
+      callsite: 12,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never

@@ -7750,6 +7750,16 @@ export const ja_JP: EnTranslations = {
     "buyConfirmAccept": "購入",
     "buyConfirmCancel": "キャンセル"
   },
+  "crucibleShop": {
+    "balance": "所持している印章: {list}",
+    "noSigils": "坩堝の印章を持っていません。",
+    "price": "{sigil} 1個",
+    "buyAria": "{sigil}を{item}と交換する",
+    "buyConfirmTitle": "交換の確認",
+    "buyConfirmBody": "{sigil}を{item}と交換しますか？消費した印章は払い戻せません。",
+    "buyConfirmAccept": "交換",
+    "buyConfirmCancel": "キャンセル"
+  },
   "cardDuel": {
     "title": "カードデュエル",
     "close": "閉じる",
@@ -15129,6 +15139,11 @@ export const ja_JP: EnTranslations = {
         "name": "メイリンの残り火の投影",
         "title": "残り火の投影",
         "greeting": "残り火がメイリンの声を鍛冶場の奥へと届ける。"
+      },
+      "crucible_quartermaster": {
+        "name": "主計官ブロン・エンバーワード",
+        "title": "坩堝の主計官",
+        "greeting": "炉は己の者に印を刻む。坩堝の印章を持って来い、戦支度を整えてやろう。"
       },
       "brother_halven": {
         "name": "ハルヴェン修道士",

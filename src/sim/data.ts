@@ -312,7 +312,7 @@ import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
-import { IGNIVAR_LOOT_ITEMS } from './content/ignivar_loot';
+import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
@@ -441,6 +441,9 @@ export const NPCS: Record<string, NpcDef> = {
   // for the same insertion-order stability reason as the realms above.
   ...PROVING_SHORE_NPCS,
   ...IGNIVAR_RAID_LORE_NPCS,
+  // The Crucible Quartermaster (dynamic: true, spawned by the raid's approach
+  // room), appended after the lore NPCs for insertion-order stability.
+  ...IGNIVAR_VENDOR_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.

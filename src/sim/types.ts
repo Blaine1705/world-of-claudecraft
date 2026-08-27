@@ -3395,6 +3395,11 @@ export interface NpcDef {
   // Purchasing itself stays emergent from the stock carrying priceHonor, so an
   // unflagged honor vendor still sells its stock through the ordinary grid.
   warfareVendor?: boolean;
+  // The Crucible Quartermaster: talking to this NPC opens the sigil-redemption
+  // shop for the Ignivar raid set pieces (src/sim/content/ignivar_loot.ts).
+  // A flag on the warfareVendor precedent so a second placement never widens a
+  // hard-keyed constant.
+  crucibleVendor?: boolean;
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;

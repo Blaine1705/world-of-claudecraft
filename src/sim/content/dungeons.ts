@@ -15,6 +15,7 @@ import {
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
+import { CRUCIBLE_VENDOR_NPC_ID } from './ignivar_loot';
 import {
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_MAELIN_NPC_ID,
@@ -1293,6 +1294,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     npcs: [
       { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
+      // The sigil-redemption vendor beside the raid entrance (APPEND-only:
+      // instance entity ids allocate in list order).
+      { npcId: CRUCIBLE_VENDOR_NPC_ID, x: 6, z: -47 },
     ],
     objects: [
       {

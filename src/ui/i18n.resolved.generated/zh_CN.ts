@@ -7750,6 +7750,16 @@ export const zh_CN: EnTranslations = {
     "buyConfirmAccept": "购买",
     "buyConfirmCancel": "取消"
   },
+  "crucibleShop": {
+    "balance": "你持有的印记: {list}",
+    "noSigils": "你没有持有任何熔炉印记。",
+    "price": "1枚{sigil}",
+    "buyAria": "用{sigil}兑换{item}",
+    "buyConfirmTitle": "确认兑换",
+    "buyConfirmBody": "用{sigil}兑换{item}？印记消耗后无法退还。",
+    "buyConfirmAccept": "兑换",
+    "buyConfirmCancel": "取消"
+  },
   "cardDuel": {
     "title": "纸牌对决",
     "close": "关闭",
@@ -15129,6 +15139,11 @@ export const zh_CN: EnTranslations = {
         "name": "梅琳的余烬投影",
         "title": "余烬投影",
         "greeting": "余烬将梅琳的声音传向锻炉深处。"
+      },
+      "crucible_quartermaster": {
+        "name": "军需官布隆恩·余烬守卫",
+        "title": "熔炉军需官",
+        "greeting": "熔炉会铭记自己人。把坩埚里的印记带给我，我就为你披挂上阵。"
       },
       "brother_halven": {
         "name": "哈尔文修士",

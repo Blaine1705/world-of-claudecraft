@@ -7750,6 +7750,16 @@ export const en_XA: EnTranslations = {
     "buyConfirmAccept": "[Ɓúý]",
     "buyConfirmCancel": "[Çáñçéļ]"
   },
+  "crucibleShop": {
+    "balance": "[Ýóúŕ šíĝíļš: {list}]",
+    "noSigils": "[Ýóú ĥóļð ñó Çŕúçíƀļé šíĝíļš.]",
+    "price": "[1 {sigil}]",
+    "buyAria": "[Ŕéðééɱ {sigil} ƒóŕ {item}]",
+    "buyConfirmTitle": "[Çóñƒíŕɱ Ŕéðéɱþţíóñ]",
+    "buyConfirmBody": "[Ŕéðééɱ ýóúŕ {sigil} ƒóŕ {item}? Á çóñšúɱéð šíĝíļ çáññóţ ƀé ŕéƒúñðéð.]",
+    "buyConfirmAccept": "[Ŕéðééɱ]",
+    "buyConfirmCancel": "[Çáñçéļ]"
+  },
   "cardDuel": {
     "title": "[Çáŕð Ðúéļ]",
     "close": "[Çļóšé]",
@@ -15129,6 +15139,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ɱáéļíñ'š Éɱƀéŕ Þŕóĵéçţíóñ]",
         "title": "[Éɱƀéŕ Þŕóĵéçţíóñ]",
         "greeting": "[Ţĥé éɱƀéŕš çáŕŕý Ɱáéļíñ'š ʋóíçé ƒóŕŵáŕð ţĥŕóúĝĥ ţĥé ƒóŕĝé.]"
+      },
+      "crucible_quartermaster": {
+        "name": "[Ɋúáŕţéŕɱášţéŕ Ɓŕóññ Éɱƀéŕŵáŕð]",
+        "title": "[Çŕúçíƀļé Ɋúáŕţéŕɱášţéŕ]",
+        "greeting": "[Ţĥé ƒóŕĝé ɱáŕķš íţš óŵñ. Ɓŕíñĝ ɱé á šíĝíļ ƒŕóɱ ţĥé Çŕúçíƀļé áñð Í ŵíļļ ƒíţ ýóú ƒóŕ ŵáŕ.]"
       },
       "brother_halven": {
         "name": "[Ɓŕóţĥéŕ Ĥáļʋéñ]",

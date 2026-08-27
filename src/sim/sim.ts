@@ -591,6 +591,7 @@ import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
 import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
+import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
@@ -11535,6 +11536,12 @@ export class Sim {
   // heroic_buy command dispatch and the offline HUD resolve it on the facade.
   buyHeroicVendorItem(itemId: string, pid?: number): void {
     buyHeroicVendorItemImpl(this.ctx, itemId, pid);
+  }
+
+  // Crucible Quartermaster sigil redemption (owned by instances/crucible_vendor.ts):
+  // the crucible_buy command dispatch and the offline HUD resolve it here.
+  buyCrucibleVendorItem(itemId: string, pid?: number): void {
+    buyCrucibleVendorItemImpl(this.ctx, itemId, pid);
   }
 
   private dungeonDifficultyForPid(pid: number): DungeonDifficulty {

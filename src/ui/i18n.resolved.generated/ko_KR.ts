@@ -7750,6 +7750,16 @@ export const ko_KR: EnTranslations = {
     "buyConfirmAccept": "구매",
     "buyConfirmCancel": "취소"
   },
+  "crucibleShop": {
+    "balance": "보유한 인장: {list}",
+    "noSigils": "도가니 인장을 갖고 있지 않습니다.",
+    "price": "{sigil} 1개",
+    "buyAria": "{sigil}(으)로 {item} 교환",
+    "buyConfirmTitle": "교환 확인",
+    "buyConfirmBody": "{sigil}(을)를 {item}(으)로 교환하시겠습니까? 소모된 인장은 환불되지 않습니다.",
+    "buyConfirmAccept": "교환",
+    "buyConfirmCancel": "취소"
+  },
   "cardDuel": {
     "title": "카드 대결",
     "close": "닫기",
@@ -15129,6 +15139,11 @@ export const ko_KR: EnTranslations = {
         "name": "마엘린의 잔불 투영체",
         "title": "잔불 투영체",
         "greeting": "잔불이 마엘린의 목소리를 대장간 깊숙이 전합니다."
+      },
+      "crucible_quartermaster": {
+        "name": "군수담당관 브론 엠버워드",
+        "title": "도가니 군수담당관",
+        "greeting": "화로는 제 사람을 알아본다. 도가니의 인장을 가져오면 전장에 맞게 무장시켜 주지."
       },
       "brother_halven": {
         "name": "브라더 할벤",

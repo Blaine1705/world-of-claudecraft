@@ -1117,6 +1117,22 @@ export const en = {
     buyConfirmAccept: 'Buy',
     buyConfirmCancel: 'Cancel',
   },
+  crucibleShop: {
+    // The Crucible Quartermaster window (Ignivar raid sigil redemption):
+    // title/close reuse the vendor keys; only the sigil-specific strings live
+    // here. {list} is the viewer's held sigils with counts; {sigil} is the
+    // one token a row costs.
+    balance: 'Your sigils: {list}',
+    noSigils: 'You hold no Crucible sigils.',
+    price: '1 {sigil}',
+    buyAria: 'Redeem {sigil} for {item}',
+    // Confirm dialog gating each redemption: a consumed sigil records no
+    // buyback, so a mis-tap would be unrefundable without it.
+    buyConfirmTitle: 'Confirm Redemption',
+    buyConfirmBody: 'Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.',
+    buyConfirmAccept: 'Redeem',
+    buyConfirmCancel: 'Cancel',
+  },
   // The Card Master window (Card Duel minigame): queue join/leave affordance
   // plus the in-match hand strip + round-score panel.
   cardDuel: {

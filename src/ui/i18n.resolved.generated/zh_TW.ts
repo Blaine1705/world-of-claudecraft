@@ -7750,6 +7750,16 @@ export const zh_TW: EnTranslations = {
     "buyConfirmAccept": "購買",
     "buyConfirmCancel": "取消"
   },
+  "crucibleShop": {
+    "balance": "你持有的印記: {list}",
+    "noSigils": "你沒有持有任何熔爐印記。",
+    "price": "1枚{sigil}",
+    "buyAria": "用{sigil}兌換{item}",
+    "buyConfirmTitle": "確認兌換",
+    "buyConfirmBody": "用{sigil}兌換{item}？印記消耗後無法退還。",
+    "buyConfirmAccept": "兌換",
+    "buyConfirmCancel": "取消"
+  },
   "cardDuel": {
     "title": "紙牌對決",
     "close": "關閉",
@@ -15129,6 +15139,11 @@ export const zh_TW: EnTranslations = {
         "name": "梅琳的餘燼投影",
         "title": "餘燼投影",
         "greeting": "餘燼將梅琳的聲音傳向鍛爐深處。"
+      },
+      "crucible_quartermaster": {
+        "name": "軍需官布隆恩·餘燼守衛",
+        "title": "熔爐軍需官",
+        "greeting": "熔爐會銘記自己人。把坩堝裡的印記帶給我，我就為你披掛上陣。"
       },
       "brother_halven": {
         "name": "哈爾文修士",

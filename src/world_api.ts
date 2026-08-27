@@ -522,6 +522,7 @@ export const COMMAND_NAMES = [
   'set_town_focus',
   'set_dungeon_difficulty',
   'heroic_buy',
+  'crucible_buy',
   'mount_toggle',
   'mount_train_begin',
   'mount_train_answer',

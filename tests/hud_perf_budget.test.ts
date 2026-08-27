@@ -959,6 +959,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
   { file: 'hud/vendor/heroic_vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  {
+    file: 'hud/vendor/crucible_vendor_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
