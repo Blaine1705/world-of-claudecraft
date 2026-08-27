@@ -102,7 +102,7 @@ export function applyIgnivarTilePackEmissive(pack: string, mat: THREE.Material):
     if (lit.map) {
       lit.emissiveMap = lit.map;
       lit.emissive = new THREE.Color(0xffffff);
-      lit.emissiveIntensity = 0.24;
+      lit.emissiveIntensity = 0.34;
     }
   }
 }

@@ -28,15 +28,24 @@ export const IGNIVAR_RAID_ENVIRONMENT: Readonly<
   Record<IgnivarRaidFogState, RaidEnvironmentProfile>
 > = Object.freeze({
   ignivarApproach: Object.freeze({
-    fogColor: 0x351708,
-    fogNear: 26,
-    fogFar: 100,
+    // The fog is the hall's dominant darkness term (the roof shadows swallow
+    // the key, and the near-black tile albedo barely answers the hemisphere),
+    // so the readability lift lives HERE: warmer, brighter smoke pushed a few
+    // yards out, which reads as a subtle ember ambient across the whole hall
+    // while the torch pools keep carrying the drama.
+    fogColor: 0x522608,
+    fogNear: 36,
+    fogFar: 122,
     sunColor: 0xffa851,
     sunIntensity: 1,
-    hemiSkyColor: 0x8f4526,
-    hemiGroundColor: 0x241009,
-    hemiIntensity: 0.42,
-    envIntensity: 0.1,
+    // The hall's roof shadows swallow most of the amber key, so the warm
+    // hemisphere IS the room's ambient: a brighter ember bounce with a
+    // lifted floor leg keeps the whole hall readable between the torch
+    // pools while the grade stays dark forge, not daylight.
+    hemiSkyColor: 0xa8552c,
+    hemiGroundColor: 0x361a0c,
+    hemiIntensity: 0.66,
+    envIntensity: 0.12,
     rimIntensity: 1.1,
     rimColor: 0xffb066,
   }),
