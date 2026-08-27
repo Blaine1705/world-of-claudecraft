@@ -1,11 +1,8 @@
-// /dev bis: outfit the caller with a deterministic best-in-slot epic set so
-// playtesting at the level cap never starts with a vendor shopping trip. Two
-// consumers: the dev-gated /dev bis command, and the friendly practice dummy's
-// reference vitals (mob/practice_dummies.ts), which run at every world
-// construction, production included, so this module is NOT dev-only despite
-// its home. Picks are pure functions of the item table, the player's class,
-// and the selected spec, so repeated runs equip the identical set. Draws no
-// rng.
+// /dev bis: outfit the caller with the strongest observed parse loadout for the
+// selected spec so level-cap playtesting matches real players. The generic epic
+// scorer remains the fallback for a character with no spec and the friendly
+// practice dummy's reference vitals (mob/practice_dummies.ts), which run at every
+// world construction, production included. Draws no rng.
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random or
 // Date.now (enforced by tests/architecture.test.ts).
@@ -16,6 +13,7 @@ import { canEquipItemInSlot } from '../equipment_rules';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
+import { parseBisGearFor } from './parse_bis_loadouts';
 
 // Rough single-number item power: weapon dps dominates for weapons, stat
 // budget plus armor carries the rest. Only used to ORDER epics per slot.
@@ -78,11 +76,16 @@ export function bestEpicGearFor(
 
 // Applies the picks to the caller: dev-only direct equipment write, cleared
 // crafted-instance payloads, one stat recalc. Returns the equipped count.
-export function equipBestInSlotForDev(ctx: SimContext, pid: number): number {
+export function equipBestInSlotForDev(ctx: SimContext, pid: number, selectedSpec?: string): number {
   const meta = ctx.players.get(pid);
   const player = ctx.entities.get(pid);
   if (!meta || !player) return 0;
-  const picks = bestEpicGearFor(meta.cls, meta.talents?.spec ?? null);
+  const spec = selectedSpec ?? meta.talents?.spec ?? null;
+  const picks = (spec ? parseBisGearFor(meta.cls, spec) : null) ?? bestEpicGearFor(meta.cls, spec);
+  for (const slot of ALL_EQUIP_SLOTS) {
+    delete meta.equipment[slot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+  }
   let equipped = 0;
   for (const [slot, itemId] of Object.entries(picks) as [EquipSlot, string][]) {
     meta.equipment[slot] = itemId;
