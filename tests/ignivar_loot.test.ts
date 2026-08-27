@@ -6,6 +6,7 @@
 // program appears only where authored, and Healing Power never rides a damage
 // identity.
 import { describe, expect, it } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   CRUCIBLE_VENDOR_STOCK,
   IGNIVAR_HELD_ITEMS,
@@ -17,7 +18,7 @@ import {
   IGNIVAR_SET_ITEMS,
   IGNIVAR_SIGIL_ITEMS,
 } from '../src/sim/content/ignivar_loot';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import {
   expectedStatBudget,
   itemFromRaid,
@@ -203,5 +204,112 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
     expect(healPieces).toBe(6 * 5 + 6 + 2 + 2);
     // 8 sd sets x 5 + 3 sd waist/feet pairs + 2 sd jewelry + the cinder held.
     expect(sdPieces).toBe(8 * 5 + 6 + 2 + 1);
+  });
+});
+
+describe('ignivar loot: the boss drop tables', () => {
+  const groupsOf = (
+    entries: readonly { itemId?: string; chance: number; rollGroup?: string }[],
+  ) => {
+    const groups = new Map<string, { ids: string[]; sum: number }>();
+    for (const entry of entries) {
+      if (!entry.rollGroup) continue;
+      const group = groups.get(entry.rollGroup) ?? { ids: [], sum: 0 };
+      if (entry.itemId) group.ids.push(entry.itemId);
+      group.sum += entry.chance;
+      groups.set(entry.rollGroup, group);
+    }
+    return groups;
+  };
+
+  it('Ignivar pays two sigil slots, a neck, and the raid copper on both difficulties', () => {
+    const loot = MOBS.ignivar_herald_of_the_last_flame.loot ?? [];
+    const money = loot[0];
+    expect(money).toMatchObject({ copper: 150000, chance: 1 });
+    expect(money.heroicCopper).toBeGreaterThan(0);
+    const groups = groupsOf(loot);
+    expect([...groups.keys()]).toEqual([
+      'ignivar_sigil_mantle',
+      'ignivar_sigil_grip',
+      'ignivar_jewelry',
+    ]);
+    expect(groups.get('ignivar_sigil_mantle')?.ids).toEqual([
+      'sigil_anvil_shoulder',
+      'sigil_ember_shoulder',
+      'sigil_tempest_shoulder',
+    ]);
+    expect(groups.get('ignivar_sigil_grip')?.ids).toEqual([
+      'sigil_anvil_gloves',
+      'sigil_ember_gloves',
+      'sigil_tempest_gloves',
+    ]);
+    expect(groups.get('ignivar_jewelry')?.ids).toEqual([
+      'pendant_of_the_first_tempering',
+      'ignivars_ember_choker',
+      'locket_of_the_last_flame',
+      'heartspring_amulet',
+    ]);
+    for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+  });
+
+  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, and copper', () => {
+    const loot = MOBS.varkhul_forgefather_of_the_last_flame.loot ?? [];
+    expect(loot[0]).toMatchObject({ copper: 200000, chance: 1 });
+    const groups = groupsOf(loot);
+    expect([...groups.keys()]).toEqual([
+      'varkhul_sigil_legging',
+      'varkhul_sigil_helm',
+      'varkhul_offset',
+      'varkhul_rings',
+    ]);
+    const offset = groups.get('varkhul_offset');
+    expect(offset?.ids.length).toBe(12); // the 10 feet pieces + both held offhands
+    expect(offset?.ids).toContain('orb_of_the_last_spring');
+    expect(offset?.ids).toContain('cinder_of_the_first_design');
+    for (const id of offset?.ids ?? []) {
+      expect(['feet', 'offhand'], id).toContain(ITEMS[id].slot);
+    }
+    expect(groups.get('varkhul_rings')?.ids).toEqual([
+      'seal_of_the_forgewall',
+      'band_of_marked_strikes',
+      'circle_of_cinders',
+      'loop_of_quiet_springs',
+    ]);
+    for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+  });
+
+  it('Heroic appends pay the Robe sigil on both bosses and the shields on Varkhul', () => {
+    const ignivar = HEROIC_BOSS_LOOT.ignivar_herald_of_the_last_flame ?? [];
+    const varkhul = HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? [];
+    const ignivarGroups = groupsOf(ignivar);
+    const varkhulGroups = groupsOf(varkhul);
+    expect(ignivarGroups.get('ignivar_h_sigil_robe')?.ids).toEqual([
+      'sigil_anvil_chest',
+      'sigil_ember_chest',
+      'sigil_tempest_chest',
+    ]);
+    expect(varkhulGroups.get('varkhul_h_sigil_robe')?.ids).toEqual([
+      'sigil_anvil_chest',
+      'sigil_ember_chest',
+      'sigil_tempest_chest',
+    ]);
+    expect(varkhulGroups.get('varkhul_h_shields')?.ids).toEqual([
+      'bulwark_of_the_inner_crucible',
+      'ember_wardens_barrier',
+    ]);
+    for (const groups of [ignivarGroups, varkhulGroups])
+      for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+  });
+
+  it('every drop-table id resolves in the merged item table', () => {
+    const all = [
+      ...(MOBS.ignivar_herald_of_the_last_flame.loot ?? []),
+      ...(MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []),
+      ...(HEROIC_BOSS_LOOT.ignivar_herald_of_the_last_flame ?? []),
+      ...(HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []),
+    ];
+    for (const entry of all) {
+      if (entry.itemId) expect(ITEMS[entry.itemId], entry.itemId).toBeTruthy();
+    }
   });
 });

@@ -92,7 +92,41 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 46,
     moveSpeed: 6.8,
     aggroRadius: 30,
-    loot: [],
+    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": two
+    // guaranteed sigil groups, the feet-and-held off-set group, a guaranteed
+    // ring, copper (the raid-finale base on the Ignivar wiring). Heroic-only
+    // appends (Robe sigils, shields) live in HEROIC_BOSS_LOOT; the weapon
+    // groups join at the end with the weapon wave. APPEND-only, never reorder.
+    loot: [
+      // Plain copper, no heroicCopper: only a registered heroic finale boss
+      // may carry the heroic money base (tests/heroic_finale_gold.test.ts),
+      // the Inner Crucible has no heroic tuning record yet, and the normal
+      // base already equals the shared 20g raid base so the substitution
+      // would be a no-op anyway.
+      { copper: 200000, chance: 1 },
+      { itemId: 'sigil_anvil_legs', chance: 0.34, rollGroup: 'varkhul_sigil_legging' },
+      { itemId: 'sigil_ember_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
+      { itemId: 'sigil_tempest_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
+      { itemId: 'sigil_anvil_helmet', chance: 0.34, rollGroup: 'varkhul_sigil_helm' },
+      { itemId: 'sigil_ember_helmet', chance: 0.33, rollGroup: 'varkhul_sigil_helm' },
+      { itemId: 'sigil_tempest_helmet', chance: 0.33, rollGroup: 'varkhul_sigil_helm' },
+      { itemId: 'cindersoaked_slippers', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'steps_of_quiet_water', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'ashenbark_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'ashrunner_boots', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'scorchgrove_striders', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'dewfall_moccasins', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'anvilstance_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'furnace_march_greaves', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'thundershock_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'springwarden_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'orb_of_the_last_spring', chance: 0.15, rollGroup: 'varkhul_offset' },
+      { itemId: 'cinder_of_the_first_design', chance: 0.15, rollGroup: 'varkhul_offset' },
+      { itemId: 'seal_of_the_forgewall', chance: 0.25, rollGroup: 'varkhul_rings' },
+      { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
+      { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
+      { itemId: 'loop_of_quiet_springs', chance: 0.25, rollGroup: 'varkhul_rings' },
+    ],
     scale: 3.2,
     color: 0x9f351c,
   },
@@ -224,7 +258,25 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // base, and a heroic-claim kill substitutes the shared 20g raid base on
     // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
     // still to be authored for the development raid tier.
-    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
+    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": two
+    // guaranteed sigil groups, a guaranteed neck, copper. Same table on both
+    // difficulties (this raid has NO heroic item-level layer); the heroic-only
+    // appends (Robe sigils) live in HEROIC_BOSS_LOOT. Draw order is
+    // parity-sensitive: entries APPEND, never reorder; the off-set group joins
+    // at the end with the weapon wave.
+    loot: [
+      { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
+      { itemId: 'sigil_anvil_shoulder', chance: 0.34, rollGroup: 'ignivar_sigil_mantle' },
+      { itemId: 'sigil_ember_shoulder', chance: 0.33, rollGroup: 'ignivar_sigil_mantle' },
+      { itemId: 'sigil_tempest_shoulder', chance: 0.33, rollGroup: 'ignivar_sigil_mantle' },
+      { itemId: 'sigil_anvil_gloves', chance: 0.34, rollGroup: 'ignivar_sigil_grip' },
+      { itemId: 'sigil_ember_gloves', chance: 0.33, rollGroup: 'ignivar_sigil_grip' },
+      { itemId: 'sigil_tempest_gloves', chance: 0.33, rollGroup: 'ignivar_sigil_grip' },
+      { itemId: 'pendant_of_the_first_tempering', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'ignivars_ember_choker', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'locket_of_the_last_flame', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'heartspring_amulet', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+    ],
     scale: 3.4,
     color: 0xd64316,
     // Deliberately NO hasteMult: the encounter script owns Ignivar's frenzy.

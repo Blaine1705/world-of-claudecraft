@@ -16,7 +16,8 @@
 // (elemental/resto shaman, holy paladin) and str plate get real coverage rather
 // than a single token piece.
 
-import type { ItemDef, LootEntry } from '../types';
+import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
+import { IGNIVAR_BOSS_ID, type ItemDef, type LootEntry } from '../types';
 import { FERAL } from './items';
 
 // Source level the heroic drop table reads as in the item-level index: the
@@ -754,5 +755,24 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // five-man uncommon paths; every heroic raider has a path to each.
     { itemId: 'reins_stormfeather_griffin', chance: HEROIC_GREEN_MOUNT_CHANCE },
     { itemId: 'reins_shadowjump_toad', chance: HEROIC_GREEN_MOUNT_CHANCE },
+  ],
+  // ============== Crucible of the Last Spring (Heroic-only appends) ==============
+  // The Ignivar raid has NO heroic item-level layer (docs/prd/ignivar-raid-loot.md):
+  // a Heroic kill drops its Normal groups PLUS these, so Heroic pays in access
+  // (the Robe sigil that finishes the 5-piece, the shields) at the same ilvl 35.
+  // The ids register at IGNIVAR_RAID_LOOT_SOURCE_LEVEL in item_level.ts, which
+  // out-ranks this table's default source. Heroic weapon groups join at the end
+  // with the weapon wave. APPEND-only, never reorder.
+  [IGNIVAR_BOSS_ID]: [
+    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'ignivar_h_sigil_robe' },
+    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
+    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
+  ],
+  [VARKHUL_BOSS_ID]: [
+    { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_sigil_robe' },
+    { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
+    { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
+    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.5, rollGroup: 'varkhul_h_shields' },
+    { itemId: 'ember_wardens_barrier', chance: 0.5, rollGroup: 'varkhul_h_shields' },
   ],
 };

@@ -247,8 +247,17 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
       ),
     );
     expect(raidIds.size).toBe(3); // the three heroic-only raid weapons
-    const ids = Object.values(HEROIC_BOSS_LOOT)
-      .flat()
+    // The Ignivar raid bosses' heroic-only appends live in this table too but
+    // read the Crucible tier (source 26, ilvl 35, sigil tokens with no item
+    // level at all); their pins live in tests/ignivar_loot.test.ts, so this
+    // sweep stays scoped to the five-man + Nythraxis tables.
+    const IGNIVAR_RAID_BOSSES = new Set([
+      'ignivar_herald_of_the_last_flame',
+      'varkhul_forgefather_of_the_last_flame',
+    ]);
+    const ids = Object.entries(HEROIC_BOSS_LOOT)
+      .filter(([bossId]) => !IGNIVAR_RAID_BOSSES.has(bossId))
+      .flatMap(([, entries]) => entries)
       .flatMap((e) => (e.itemId && isGearEntry(e.itemId) ? [e.itemId] : []));
     expect(ids.length).toBeGreaterThanOrEqual(12); // the full five-man heroic set + raid weapons
     for (const id of ids) {
