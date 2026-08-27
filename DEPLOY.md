@@ -570,6 +570,17 @@ For off-box safety, sync the directory to S3 occasionally:
   full cross product is still pre-registered at boot by design (a Prometheus
   counter cannot backfill a scrape), and no per-request cardinality bound
   changed: the vocabularies stay content-derived and bounded.
+  The `woc_client_*` family (server/http/client_perf_metrics.ts) distills the
+  public `/api/perf-report` beacons into fleet frame-health series: report and
+  heavy-jank counts, frame p95 / fps / worst-10s / long-task / render-scale
+  histograms, context losses, and perf-doctor suggestion counts, labeled only
+  by fixed vocabularies (graphics tier, device class, GPU family, OS family,
+  scene class, suggestion id). Series are created lazily on the first stored
+  report, so a fresh boot exposes none until players report. The values are
+  CLIENT-ATTESTED (the beacon is unauthenticated; the ingest clamps, per-IP
+  rate limit, and per-session insert throttle bound the write rate), so
+  corroborate a surprising shift against the client_perf_reports table before
+  treating it as fleet truth.
 - **Multi-realm scraping**: one server process hosts exactly one realm, and no
   exported series carries a `realm` label (pinned by the exporter tests; the
   DB-backed business family filters on the realm in its queries instead). Give
