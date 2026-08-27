@@ -803,7 +803,7 @@ export interface OptionsHooks {
   // Re-fetch the connected/linked wallet's $WOC balance (server cache-bypassed) so the
   // bag footer and player card reflect on-chain token changes. No-op when the wallet
   // feature is off or no wallet is connected/linked.
-  refreshWocBalance(): void;
+  refreshWocBalance(force?: boolean): void;
   // Account deed-broadcast opt-out seam (accounts.deed_broadcasts): whether a
   // marquee deed unlock fans out to guildmates and followers, and whether the
   // Discord activity feed posts the account's deed and masterwork cards (R58).
@@ -5175,7 +5175,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#woc-market-window'),
     hideTooltip: () => this.hideTooltip(),
     openWallet: requestWalletVerify,
-    refreshWocBalance: () => this.optionsHooks?.refreshWocBalance(),
+    refreshWocBalance: (force) => this.optionsHooks?.refreshWocBalance(force),
     ...this.windowFocus('#woc-market-window'),
   });
   // Daily rewards window painter. It owns the async rewards reads, spin action,

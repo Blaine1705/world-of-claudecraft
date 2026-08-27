@@ -243,6 +243,7 @@ describe('woc_market_chrome: the standing banners', () => {
     expect(connected).toContain('$WOC purchases');
     expect(connected).not.toContain('SOL or WOC');
     expect(t('hudChrome.wocStore.wallet.linkedConnected')).toContain('SOL or WOC');
+    expect(t('hudChrome.wocStore.wallet.linkedDisconnected')).toContain('pay with SOL or WOC');
     const mismatched = wocMarketBannersHtml({ paused: false, wallet: view('L', 'M') });
     expect(mismatched).toContain(`>${t('hudChrome.wocStore.wallet.verify')}</button>`);
   });

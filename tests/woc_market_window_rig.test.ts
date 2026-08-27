@@ -262,7 +262,7 @@ interface Rig {
   closeOthers: ReturnType<typeof vi.fn<() => void>>;
   restoreFocus: ReturnType<typeof vi.fn<(target: HTMLElement | null) => void>>;
   openWallet: ReturnType<typeof vi.fn<() => void>>;
-  refreshWocBalance: ReturnType<typeof vi.fn<() => void>>;
+  refreshWocBalance: ReturnType<typeof vi.fn<(force?: boolean) => void>>;
 }
 
 function rig(
@@ -286,7 +286,7 @@ function rig(
   const closeOthers = vi.fn<() => void>();
   const restoreFocus = vi.fn<(target: HTMLElement | null) => void>();
   const openWallet = vi.fn<() => void>();
-  const refreshWocBalance = vi.fn<() => void>();
+  const refreshWocBalance = vi.fn<(force?: boolean) => void>();
   const deps: WocMarketWindowDeps = {
     root: () => root,
     world: () => world as unknown as IWorld,
@@ -1240,6 +1240,53 @@ describe('WocMarketWindow live rig: the busyGen close guard', () => {
     expect(notice.textContent).not.toContain('payment');
     expect(q<HTMLButtonElement>(r.root, 'button[data-action="sell-submit"]').disabled).toBe(false);
   });
+});
+
+describe('WocMarketWindow live rig: payment balance refresh', () => {
+  it.each(['bond', 'settlement'] as const)(
+    'refreshes the verified balance after a successful %s confirmation',
+    async (kind) => {
+      const r = rig();
+      r.win.open();
+      await flush();
+      r.refreshWocBalance.mockClear();
+
+      r.hooks.client.confirmBond = vi.fn(async () => ({ ok: true as const, standing: true }));
+      r.hooks.client.confirmSettlement = vi.fn(async () => ({
+        ok: true as const,
+        state: 'delivered',
+      }));
+      const quote = {
+        signatureRequired: false as const,
+        reference: 'refresh-balance',
+        transactionBase64: 'dev-transaction',
+        amount: null,
+        seller: null,
+        burn: null,
+        treasury: null,
+        expiresAtMs: NOW + 60_000,
+      };
+      Reflect.set(
+        r.win,
+        'pendingQuote',
+        kind === 'bond'
+          ? { kind, bidId: 7, itemId: EPIC, usdCents: 250, quote }
+          : {
+              kind,
+              settlementId: 8,
+              itemId: EPIC,
+              usdCents: 2_500,
+              deadlineAtMs: NOW + 60_000,
+              quote,
+            },
+      );
+
+      await (r.win as unknown as { signPendingQuote(): Promise<void> }).signPendingQuote();
+
+      expect(r.refreshWocBalance).toHaveBeenCalledOnce();
+      expect(r.refreshWocBalance).toHaveBeenCalledWith(true);
+    },
+  );
 });
 
 describe('WocMarketWindow live rig: the platform gate', () => {

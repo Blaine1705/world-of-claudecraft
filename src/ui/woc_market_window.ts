@@ -115,7 +115,7 @@ export interface WocMarketWindowDeps {
   /** Open the shared wallet connect flow, giving the unlinked-wallet banner a
    *  direct path to link through the same event as the other wallet surfaces. */
   openWallet(): void;
-  refreshWocBalance(): void;
+  refreshWocBalance(force?: boolean): void;
   /** The shared hover/focus tooltip binder (Hud.attachTooltip). It owns the
    *  positioning and the only forced-reflow reads involved, which is what keeps
    *  this cold window's no-layout-read contract intact. */
@@ -2480,6 +2480,7 @@ export class WocMarketWindow {
         }
       }
       this.pendingQuote = null;
+      this.deps.refreshWocBalance(true); // Token-account changes emit no wallet event.
       await this.reload();
     });
   }
