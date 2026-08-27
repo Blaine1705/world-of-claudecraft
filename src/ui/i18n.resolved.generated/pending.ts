@@ -12,82 +12,152 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "es_ES": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "fr_FR": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "fr_CA": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "de_DE": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "zh_TW": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "ko_KR": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
+  "ja_JP": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
   "pt_BR": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.wocMarket.walletUsdBalance"
+  ],
   "cs_CZ": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "nl_NL": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "pl_PL": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "id_ID": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "tr_TR": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "sv_SE": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "vi_VN": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "da_DK": [
     "hudChrome.controller.reticleSpeed",
     "hudChrome.options.touchPreciseAim",
-    "hudChrome.options.touchPreciseAimNote"
+    "hudChrome.options.touchPreciseAimNote",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ]
 };
