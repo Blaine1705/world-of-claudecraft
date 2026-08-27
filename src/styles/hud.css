@@ -7054,7 +7054,7 @@
   .party-boss-guide-button:hover,
   .party-boss-guide-button:focus-visible {
     border-color: var(--gold);
-    color: var(--text);
+    color: var(--color-text-light);
   }
   .party-boss-guide-button .ui-icon {
     width: 15px;
@@ -7074,7 +7074,7 @@
   }
   #raid-boss-guide-window .rbg-subtitle {
     margin-top: 4px;
-    color: var(--text-dim);
+    color: var(--color-text-muted);
     font-family: var(--body-font);
     font-size: 12px;
     font-weight: 400;
@@ -7088,7 +7088,7 @@
   }
   #raid-boss-guide-window .rbg-list li {
     padding: 7px 4px;
-    color: var(--text);
+    color: var(--color-text-light);
     font-size: 13px;
     line-height: 1.45;
   }

@@ -57,6 +57,7 @@ function armOnlyInterceptBeam(sim: Sim, boss: Entity): NonNullable<Entity['varkh
   state.forgestormTimer = 999;
   state.sharedPyreTimer = 999;
   state.anvilTimer = 999;
+  state.sharedPyreTimer = 999;
   state.interceptBeamTimer = DT;
   return state;
 }
@@ -73,6 +74,7 @@ describe('Varkhul Tempering Ray encounter integration', () => {
     state.cinderOrbsTimer = 999;
     state.forgestormTimer = 999;
     state.anvilTimer = 999;
+    state.sharedPyreTimer = 999;
     state.interceptBeamTimer = 17;
 
     for (let tick = 0; tick < 339; tick++) {

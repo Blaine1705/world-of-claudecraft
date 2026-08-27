@@ -70,6 +70,9 @@ import {
   Placements,
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
+import { dungeonBannerKind, hangsKitBanners } from './dungeon_banner_core';
+import { dungeonFloorKind, dungeonFloorQuadKind, dungeonWallKind } from './dungeon_tile_kind_core';
+import { addTorchFire, type TorchFireTuning } from './dungeon_torch_rig';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
@@ -79,8 +82,6 @@ import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ign
 import {
   applyIgnivarTilePackEmissive,
   ensureIgnivarTileAssets,
-  IGNIVAR_FLOOR_KIND_WEIGHTS,
-  IGNIVAR_FLOOR_QUAD_KIND,
   ignivarTileKind,
   ignivarUpperWallKind,
 } from './ignivar_tile_kit';
@@ -99,6 +100,7 @@ import type { FireLightSink } from './point_light_budget';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 import { radialGlowTexture } from './textures';
+import { addTorchGlowDecal } from './torch_glow_decal';
 import { buildWildheartFieldInterior } from './wildheart_props';
 import { applySurfaceDetail } from './worn_stone';
 
@@ -484,19 +486,6 @@ function hash2(a: number, b: number): number {
   return s - Math.floor(s);
 }
 
-type WeightedKinds = [name: string, weight: number][];
-
-function pickKind(kinds: WeightedKinds, t: number): string {
-  let total = 0;
-  for (const [, w] of kinds) total += w;
-  let acc = 0;
-  for (const [name, w] of kinds) {
-    acc += w;
-    if (t * total < acc) return name;
-  }
-  return kinds[kinds.length - 1][0];
-}
-
 interface ArenaHideable {
   group: THREE.Group;
   mats: OccluderFadeMat[];
@@ -590,10 +579,6 @@ export function scaleUv(geo: THREE.BufferGeometry, su: number, sv: number): THRE
 }
 
 export class DungeonInteriors {
-  private glowDecalGeo: THREE.BufferGeometry | null = null;
-  private glowDecalTex: THREE.Texture | null = null;
-  private glowDecalMats = new Map<number, THREE.MeshBasicMaterial>();
-  private flameGeo: THREE.BufferGeometry | null = null;
   private packMats = new Map<Pack, THREE.Material>();
   /**
    * Every tinted grade of a pack material, keyed `${pack}:${tint}`: the marsh
@@ -896,7 +881,12 @@ export class DungeonInteriors {
           group.add(buildIgnivarLavaMoat({ lowGfx: this.lowGfx }));
           group.add(buildIgnivarArenaAtmosphere({ lowGfx: this.lowGfx }));
         }
-        const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx);
+        const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx, {
+          flames: this.flames,
+          fireLights: this.fireLights,
+          colors: TORCH_COLORS[variant],
+          tuning: this.torchFireTuning(),
+        });
         if (raidDressing) group.add(raidDressing);
         if (arenaWalls) {
           for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
@@ -1566,182 +1556,11 @@ export class DungeonInteriors {
   // -------------------------------------------------------------------------
 
   private floorKind(variant: Variant, t: number): string {
-    // The Drowned Court dresses as the temple (flooded flagstones, pale walls,
-    // faded banners); structural placement keys on the real variant elsewhere.
-    if (variant === 'arena_drowned') return this.floorKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['floor_tile_large', 56],
-          ['floor_tile_large_rocks', 5],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['grate', 8],
-          ['quad', 23],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['floor_tile_large', 68],
-          ['floor_tile_large_rocks', 7],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['quad', 17],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // flooded flagstones: more broken/weeded subdivisions, grate pits draining
-      return pickKind(
-        [
-          ['floor_tile_large', 52],
-          ['floor_tile_large_rocks', 6],
-          ['floor_dirt_large', 4],
-          ['floor_dirt_large_rocky', 4],
-          ['grate', 9],
-          ['quad', 25],
-        ],
-        t,
-      );
-    }
-    if (variant === 'lastkeep') {
-      // a KEPT castle floor: whole flags with decorated insets, no dirt, no
-      // weeds, no grates (the undercroft cells re-key to the crypt mix)
-      return pickKind(
-        [
-          ['floor_tile_large', 72],
-          ['floor_tile_large_rocks', 3],
-          ['quad', 25],
-        ],
-        t,
-      );
-    }
-    if (variant === 'dawnhold') {
-      // the garden palace floor: whole pale flags, even fewer breaks than the
-      // keep and a richer decorated share (sun-catching insets), no dirt, no
-      // weeds, no grates anywhere
-      return pickKind(
-        [
-          ['floor_tile_large', 70],
-          ['floor_tile_large_rocks', 2],
-          ['quad', 28],
-        ],
-        t,
-      );
-    }
-    if (variant === 'ignivar') return pickKind(IGNIVAR_FLOOR_KIND_WEIGHTS, t);
-    if (isDelveVariant(variant)) {
-      // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
-      return pickKind(
-        [
-          ['floor_tile_large', 54],
-          ['floor_tile_large_rocks', 10],
-          ['floor_dirt_large', 10],
-          ['floor_dirt_large_rocky', 8],
-          ['quad', 18],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['floor_tile_large', 70],
-        ['floor_tile_large_rocks', 6],
-        ['floor_dirt_large', 6],
-        ['floor_dirt_large_rocky', 5],
-        ['quad', 13],
-      ],
-      t,
-    );
+    return dungeonFloorKind(variant, t, isDelveVariant(variant));
   }
 
   private floorQuadKind(variant: Variant, t: number): string {
-    if (variant === 'ignivar') return IGNIVAR_FLOOR_QUAD_KIND;
-    if (variant === 'arena_drowned') return this.floorQuadKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['floor_tile_small', 30],
-          ['floor_tile_small_broken_A', 15],
-          ['floor_tile_small_broken_B', 15],
-          ['floor_tile_small_weeds_A', 18],
-          ['floor_tile_small_weeds_B', 18],
-          ['floor_tile_small_decorated', 4],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['floor_tile_small', 35],
-          ['floor_tile_small_broken_A', 12],
-          ['floor_tile_small_broken_B', 12],
-          ['floor_tile_small_weeds_A', 8],
-          ['floor_tile_small_weeds_B', 8],
-          ['floor_tile_small_decorated', 25],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // damp temple flags: heavy weed growth between cracked, broken tiles
-      return pickKind(
-        [
-          ['floor_tile_small', 26],
-          ['floor_tile_small_broken_A', 16],
-          ['floor_tile_small_broken_B', 16],
-          ['floor_tile_small_weeds_A', 18],
-          ['floor_tile_small_weeds_B', 18],
-          ['floor_tile_small_decorated', 6],
-        ],
-        t,
-      );
-    }
-    if (variant === 'lastkeep') {
-      // swept castle flags: mostly whole slabs. The decorated tile carries a
-      // baked candle cluster, so its share stays LOW: a lit votive here and
-      // there reads lived-in, a hall full of them reads like a vigil.
-      return pickKind(
-        [
-          ['floor_tile_small', 70],
-          ['floor_tile_small_decorated', 12],
-          ['floor_tile_small_broken_A', 9],
-          ['floor_tile_small_broken_B', 9],
-        ],
-        t,
-      );
-    }
-    if (variant === 'dawnhold') {
-      // garden-palace flags: swept whole slabs with soft weed tufts breaking
-      // through between them (green growing INTO the palace is the identity;
-      // the decorated votive tile stays a rare accent, same vigil rule)
-      return pickKind(
-        [
-          ['floor_tile_small', 62],
-          ['floor_tile_small_weeds_A', 13],
-          ['floor_tile_small_weeds_B', 13],
-          ['floor_tile_small_decorated', 8],
-          ['floor_tile_small_broken_A', 4],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['floor_tile_small', 40],
-        ['floor_tile_small_broken_A', 18],
-        ['floor_tile_small_broken_B', 18],
-        ['floor_tile_small_weeds_A', 7],
-        ['floor_tile_small_weeds_B', 7],
-        ['floor_tile_small_decorated', 10],
-      ],
-      t,
-    );
+    return dungeonFloorQuadKind(variant, t);
   }
 
   // 4u tile grid covering the room (x -24..24, z just past both end walls)
@@ -1926,147 +1745,11 @@ export class DungeonInteriors {
   }
 
   private wallKind(variant: Variant, t: number): string {
-    if (variant === 'arena_drowned') return this.wallKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['wall', 44],
-          ['wall_pillar', 22],
-          ['wall_cracked', 18],
-          ['wall_arched', 8],
-          ['wall_archedwindow_gated', 8],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['wall', 46],
-          ['wall_pillar', 22],
-          ['wall_cracked', 12],
-          ['wall_arched', 14],
-          ['wall_archedwindow_gated', 6],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // arched moon-windows let pale light into the flooded halls; weathered, cracked
-      return pickKind(
-        [
-          ['wall', 38],
-          ['wall_pillar', 20],
-          ['wall_cracked', 18],
-          ['wall_arched', 12],
-          ['wall_archedwindow_gated', 12],
-        ],
-        t,
-      );
-    }
-    if (variant === 'lastkeep') {
-      // the kept castle: clean coursed masonry, engaged pillars, arched bays
-      // and the odd barred window, and NO cracked stone (the undercroft's wall
-      // runs re-key to the crypt mix in placeAuthoredWalls)
-      return pickKind(
-        [
-          ['wall', 56],
-          ['wall_pillar', 24],
-          ['wall_arched', 13],
-          ['wall_archedwindow_gated', 7],
-        ],
-        t,
-      );
-    }
-    if (variant === 'dawnhold') {
-      // the garden palace: clean masonry thrown OPEN to the light: nearly a
-      // third of every run is arched bays and windows so the halls read
-      // daylit, and no cracked stone anywhere
-      return pickKind(
-        [
-          ['wall', 42],
-          ['wall_pillar', 26],
-          ['wall_arched', 20],
-          ['wall_archedwindow_gated', 12],
-        ],
-        t,
-      );
-    }
-    if (isDelveVariant(variant)) {
-      // long-sealed reliquary: heavily cracked masonry, the odd gated arch
-      return pickKind(
-        [
-          ['wall', 40],
-          ['wall_pillar', 20],
-          ['wall_cracked', 26],
-          ['wall_arched', 9],
-          ['wall_archedwindow_gated', 5],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['wall', 50],
-        ['wall_pillar', 22],
-        ['wall_cracked', 14],
-        ['wall_arched', 9],
-        ['wall_archedwindow_gated', 5],
-      ],
-      t,
-    );
+    return dungeonWallKind(variant, t, isDelveVariant(variant));
   }
 
   private bannerKind(variant: Variant, t: number): string {
-    if (variant === 'arena_drowned') return this.bannerKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['banner_shield_blue', 4],
-          ['banner_blue', 3],
-          ['banner_triple_blue', 3],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['banner_green', 4],
-          ['banner_patternC_green', 3],
-          ['banner_triple_green', 3],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // pale temple hangings, the odd faded-blue choir banner
-      return pickKind(
-        [
-          ['banner_white', 5],
-          ['banner_thin_white', 4],
-          ['banner_blue', 2],
-        ],
-        t,
-      );
-    }
-    if (isDelveVariant(variant)) {
-      // tattered funereal hangings, mostly thin and faded
-      return pickKind(
-        [
-          ['banner_thin_white', 7],
-          ['banner_white', 3],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['banner_thin_white', 6],
-        ['banner_white', 4],
-      ],
-      t,
-    );
+    return dungeonBannerKind(variant, t, isDelveVariant(variant));
   }
 
   // Side walls run along z at |x| = DUNGEON_WALL_X (8u modules at scale 2,
@@ -2099,7 +1782,11 @@ export class DungeonInteriors {
       for (const seg of segments) {
         const kind = this.wallKind(variant, hash2(side * 13.7, seg.z));
         target.add(kind, seg.x, 0, seg.z, seg.ry, [seg.halfLength / 2, MODULE_SCALE, MODULE_SCALE]);
-        if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+        if (
+          hangsKitBanners(variant) &&
+          i % bannerEvery === 2 &&
+          kind !== 'wall_archedwindow_gated'
+        ) {
           target.add(
             this.bannerKind(variant, hash2(seg.z, side * 7.3)),
             seg.x,
@@ -2127,16 +1814,18 @@ export class DungeonInteriors {
       }
     }
     // back wall banners flank the boss dais
-    const backTarget = arenaWalls?.back.placements ?? p;
-    for (const bx of [-12, -4, 4, 12]) {
-      backTarget.add(
-        this.bannerKind(variant, hash2(bx, layout.zMax)),
-        bx,
-        0,
-        layout.zMax,
-        Math.PI,
-        MODULE_SCALE,
-      );
+    if (hangsKitBanners(variant)) {
+      const backTarget = arenaWalls?.back.placements ?? p;
+      for (const bx of [-12, -4, 4, 12]) {
+        backTarget.add(
+          this.bannerKind(variant, hash2(bx, layout.zMax)),
+          bx,
+          0,
+          layout.zMax,
+          Math.PI,
+          MODULE_SCALE,
+        );
+      }
     }
   }
 
@@ -2172,7 +1861,7 @@ export class DungeonInteriors {
         const upper = ignivarUpperWallKind(hash2(z * 3.1, x));
         target.add(upper, x, DUNGEON_WALL_HEIGHT, z, rot, scale);
       }
-      if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+      if (hangsKitBanners(variant) && i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
         target.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
       }
       i++;
@@ -2196,8 +1885,13 @@ export class DungeonInteriors {
     const colors = torch ?? TORCH_COLORS[variant];
     for (const pt of layout.pillars) {
       const faceAisle = pt.x < 0 ? Math.PI / 2 : -Math.PI / 2;
-      p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
-      this.addPillarTorch(group, p, pt, colors);
+      // Ignivar swaps the stone pillar for the authored forge pillar (placed
+      // by the dressing plan); the torch rig stays, tucked to the pillar's
+      // SHAFT half-width at torch height (the old 1.15 push cleared the base
+      // flange instead and left the bracket floating in the aisle).
+      if (variant !== 'ignivar')
+        p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
+      this.addPillarTorch(group, p, pt, colors, variant === 'ignivar' ? 0.35 : 0);
     }
   }
 
@@ -2209,37 +1903,31 @@ export class DungeonInteriors {
     p: Placements,
     pt: GridPoint,
     colors: TorchColors,
+    extraOffset = 0,
   ): void {
     const dir = pt.x < 0 ? 1 : -1; // toward the centre aisle
-    p.add('torch_mounted', pt.x + dir * 0.98, 5.5, pt.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 1.6);
-
-    this.flameGeo ??= markSharedGeometry(new THREE.ConeGeometry(0.22, 0.6, 6));
-    const flame = new THREE.Mesh(
-      this.flameGeo,
-      new THREE.MeshLambertMaterial({
-        color: colors.flame,
-        emissive: colors.emissive,
-        emissiveIntensity: this.lowGfx ? 1.6 : FLAME_EMISSIVE_HIGH,
-        transparent: true,
-        opacity: 0.92,
-      }),
+    const mountX = pt.x + dir * (0.98 + extraOffset);
+    p.add('torch_mounted', mountX, 5.5, pt.z, dir > 0 ? Math.PI / 2 : -Math.PI / 2, 1.6);
+    addTorchFire(
+      { group, flames: this.flames, fireLights: this.fireLights },
+      {
+        flame: [pt.x + dir * (1.7 + extraOffset), 6.6, pt.z],
+        light: [pt.x + dir * (1.2 + extraOffset), this.lowGfx ? 8.2 : DUNGEON_LIGHT_Y, pt.z],
+        colors,
+        tuning: this.torchFireTuning(),
+        glowAt: [pt.x + dir * (1.7 + extraOffset), pt.z],
+      },
     );
-    flame.position.set(pt.x + dir * 1.7, 6.6, pt.z);
-    group.add(flame);
-    this.flames.push(flame);
+  }
 
-    const light = new THREE.PointLight(
-      colors.light,
-      10,
-      this.lowGfx ? 22 : DUNGEON_LIGHT_DISTANCE,
-      2,
-    );
-    if (!this.lowGfx) light.userData.baseIntensity = DUNGEON_LIGHT_INTENSITY;
-    light.position.set(pt.x + dir * 1.2, this.lowGfx ? 8.2 : DUNGEON_LIGHT_Y, pt.z);
-    group.add(light);
-    this.fireLights.push(light);
-
-    this.addTorchGlow(group, pt.x + dir * 1.7, pt.z, colors.light);
+  /** The tier arms addTorchFire keeps verbatim from the pillar torches. */
+  private torchFireTuning(): TorchFireTuning {
+    return {
+      flameEmissive: this.lowGfx ? 1.6 : FLAME_EMISSIVE_HIGH,
+      lightDistance: this.lowGfx ? 22 : DUNGEON_LIGHT_DISTANCE,
+      lightBaseIntensity: this.lowGfx ? undefined : DUNGEON_LIGHT_INTENSITY,
+      glow: !this.lowGfx,
+    };
   }
 
   // Additive light-pool decal under a torch: the point-light budget only keeps
@@ -2253,29 +1941,7 @@ export class DungeonInteriors {
     scale = 1,
   ): void {
     if (this.lowGfx) return;
-    this.glowDecalGeo ??= markSharedGeometry(
-      new THREE.CircleGeometry(6.6, 20).rotateX(-Math.PI / 2),
-    );
-    this.glowDecalTex ??= markSharedTexture(radialGlowTexture());
-    let mat = this.glowDecalMats.get(colorHex);
-    if (!mat) {
-      mat = markSharedMaterial(
-        new THREE.MeshBasicMaterial({
-          map: this.glowDecalTex,
-          color: colorHex,
-          transparent: true,
-          opacity: 0.46,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        }),
-      );
-      this.glowDecalMats.set(colorHex, mat);
-    }
-    const glow = new THREE.Mesh(this.glowDecalGeo, mat);
-    glow.position.set(x, y, z);
-    glow.scale.setScalar(scale);
-    glow.renderOrder = 1; // after the floor it floats over
-    group.add(glow);
+    addTorchGlowDecal(group, x, z, colorHex, y, scale);
   }
 
   /** A real, budgeted light plus its baked floor pool for the authored citadel.

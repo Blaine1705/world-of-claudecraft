@@ -80,6 +80,7 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { derivedInteriorColliders } from './interior_collider_sets';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -1436,23 +1437,10 @@ const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   dawnhold: DAWNHOLD_COLLIDERS,
 };
 
-// Per-DUNGEON interior sets: dungeons sharing a room plan (Hollow Crypt and
-// the Sunken Bastion are both 'crypt') dress their wall-side slots with
-// different furniture, so the standable tops differ per dungeon even where
-// the walls do not. Built lazily, cached by dungeon id.
-const interiorSetByDungeon = new Map<string, Collider[]>();
+// Per-dungeon interior sets: assembly extracted to interior_collider_sets.ts
+// (which also appends the Ignivar authored dressing-prop colliders).
 function interiorCollidersFor(dungeonId: string | null, interior: string): Collider[] {
-  const staticSet = STATIC_INTERIOR_COLLIDERS[interior];
-  if (staticSet) return staticSet;
-  const key = dungeonId ?? `interior:${interior}`;
-  let set = interiorSetByDungeon.get(key);
-  if (!set) {
-    const layout = INTERIOR_LAYOUTS[interior] ?? CRYPT_LAYOUT;
-    const dressing = dungeonId ? DUNGEONS[dungeonId]?.tombDressing : undefined;
-    set = layoutColliders(layout, dressing, DUNGEON_FLOOR_Y);
-    interiorSetByDungeon.set(key, set);
-  }
-  return set;
+  return derivedInteriorColliders(dungeonId, interior, STATIC_INTERIOR_COLLIDERS);
 }
 
 // ---------------------------------------------------------------------------

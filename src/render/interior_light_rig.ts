@@ -9,6 +9,7 @@
 // arrive here as the outdoor fallbacks); this module owns WHAT each state
 // means in light.
 import type * as THREE from 'three';
+import { sharedUniforms } from './gfx';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
 
@@ -180,6 +181,10 @@ export function applyInteriorLightRig(
   // it, and setting it first means leaving the raid restores it in the same
   // settle that restores the legs.
   targets.rimColor.value.setHex(RIM_GLOW_DEFAULT_COLOR);
+  // The roof darkness ramp is scoped to the HALLS only (the arena and
+  // crucible have other hands dressing them); zeroed by every other settle
+  // (same restore pattern as the rim tint).
+  sharedUniforms.uRoofDarkStrength.value = state === 'ignivarApproach' ? 1 : 0;
   if (wildheartSun) {
     targets.sun.color.setHex(WILDHEART_SUN_COLOR);
     targets.hemi.color.setHex(WILDHEART_HEMI_SKY_COLOR);
@@ -211,4 +216,5 @@ export function applyRiftLightRig(authored: boolean, targets: InteriorLightTarge
   targets.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
   targets.rim.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
   targets.rimColor.value.setHex(RIM_GLOW_DEFAULT_COLOR);
+  sharedUniforms.uRoofDarkStrength.value = 0;
 }
