@@ -12,6 +12,7 @@
 // by this painter-mount harness; their pixels get no faked per-marker aria.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { normalizeGraphicsSettingsSnapshot } from '../../src/game/graphics_rebuild_core';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
 import { ALL_CLASSES } from '../../src/sim/types';
@@ -421,6 +422,91 @@ describe('axe: options menu', () => {
     toggle('startAttackOnAbilityUse')?.click();
     expect(values.startAttackOnAbilityUse).toBe(false);
     expect(document.activeElement).toBe(toggle('startAttackOnAbilityUse'));
+  });
+
+  it('keeps keyboard focus on a graphics dial across its dependency-driven rebuild', () => {
+    // The test above covers an independent toggle (no rebuild); this one covers
+    // the DEPENDENCY-driven rebuild, where a control is re-rendered with a
+    // different disabled state. The interface no longer carries a boolToggle
+    // pair with a disabled: predicate (the gamepad cross-hotbar pair was
+    // checked: both toggles render independent), so the surviving dependent
+    // pair is the Graphics panel: every dial carries rerender, staging a value
+    // re-renders the WHOLE panel (destroying the clicked button), and the
+    // rebuilt footer's Apply button flips from disabled (draft clean) to
+    // enabled (draft dirty). Focus must ride the rebuild back onto the
+    // clicked dial's rebuilt equivalent (focus_restore.ts, data-focus-key).
+    const values: Record<string, number | boolean> = {};
+    const settings = {
+      get: (key: string) => values[key] ?? 0,
+      set: (key: string, value: number | boolean) => {
+        values[key] = value;
+        return value;
+      },
+    };
+    const hooks = {
+      settings,
+      onSettingChange: () => {},
+      graphicsApplied: () => normalizeGraphicsSettingsSnapshot({}),
+      theme: {
+        get: () => ({ preset: 'classic', custom: {} }),
+        setPreset: () => {},
+        setCustom: () => {},
+        resetCustom: () => {},
+      },
+      perfOverlay: { setPlacement: () => {} },
+    };
+    const root = host('options-menu');
+    root.style.display = 'none';
+    const win = new OptionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            realm: 'Claudemoon',
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+          }) as never,
+        options: () => hooks as never,
+        auraOverlays: () => ({ setPlacement: vi.fn() }) as never,
+        bugReport: () => null,
+        buildDropdown: () => document.createElement('div'),
+        captureFocus: () => null,
+      }),
+    );
+
+    win.toggle();
+    const graphicsButton = Array.from(root.querySelectorAll<HTMLButtonElement>('.opt-btn')).find(
+      (button) => button.textContent === t('hud.options.graphics'),
+    );
+    expect(graphicsButton, 'main menu renders the Graphics entry').toBeTruthy();
+    graphicsButton?.click();
+
+    // The dependent control starts DISABLED: the draft matches the applied
+    // snapshot, so there is nothing to apply yet.
+    const apply = () => root.querySelector<HTMLButtonElement>('[data-graphics-apply]');
+    expect(apply(), 'graphics panel renders the Apply action').toBeTruthy();
+    expect(apply()?.disabled).toBe(true);
+
+    // The controlling control: a shadow-quality dial value that is NOT the
+    // one currently displayed, so the click genuinely stages a change.
+    const dial = Array.from(
+      root.querySelectorAll<HTMLButtonElement>('[data-focus-key^="shadowQuality:"]'),
+    ).find((button) => button.getAttribute('aria-pressed') === 'false');
+    expect(dial, 'an unselected shadow-quality dial value exists').toBeTruthy();
+    const focusKey = dial?.dataset.focusKey ?? '';
+    dial?.focus();
+    dial?.click(); // stages the draft and re-renders the whole panel
+
+    // The dependent control was re-rendered ENABLED (re-queried: the old
+    // footer node was destroyed by the rebuild).
+    expect(apply()?.disabled).toBe(false);
+    // And keyboard focus survived the rebuild: the active element is the
+    // clicked dial's rebuilt equivalent (a NEW node with the same focus key),
+    // now showing the staged value as selected.
+    const rebuilt = root.querySelector<HTMLButtonElement>(`[data-focus-key="${focusKey}"]`);
+    expect(rebuilt, 'the dial was rebuilt with the same focus key').toBeTruthy();
+    expect(rebuilt).not.toBe(dial);
+    expect(rebuilt?.getAttribute('aria-pressed')).toBe('true');
+    expect(document.activeElement).toBe(rebuilt);
   });
 });
 

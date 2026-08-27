@@ -64,6 +64,9 @@ export interface InterfaceUnlockDeps {
   settingSelects?: () => FramesMenuSelect[];
   /** Label for the per-frame size-reset button on every show/hide row. */
   resetSizeLabel?: () => string;
+  /** Accessible name for that button, carrying WHICH frame it resets. Falls
+   *  back to the short resetSizeLabel text when absent. */
+  resetSizeLabelFor?: (name: string) => string;
   /** Fired after a row's size reset (mover.resetSize already ran), so the
    *  host can reset that frame's settings-backed sizes (the dimension drags,
    *  the scale factors) through the same persist-and-apply pair. */
@@ -265,8 +268,9 @@ export class InterfaceUnlock {
         reset.textContent = label;
         // The visible text is the shared action word; the accessible name
         // carries WHICH frame it resets.
-        reset.setAttribute('aria-label', `${name}: ${label}`);
-        reset.title = `${name}: ${label}`;
+        const accessibleName = this.deps.resetSizeLabelFor?.(name) ?? label;
+        reset.setAttribute('aria-label', accessibleName);
+        reset.title = accessibleName;
         reset.addEventListener('click', () => {
           mover.resetSize();
           this.deps.onSizeReset?.(id);

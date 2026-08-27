@@ -7796,4 +7796,19 @@
       font-size: 9px;
     }
   }
+
+  /* ---------- interface editor (suppressed on touch) ---------- */
+  /* Every frame-editing gesture no-ops on mobile (MovableFrame and the chat
+     controller refuse touch layouts), so without these rules a player who
+     reaches the Edit Frames option still gets the floating lock bar, the
+     Frames Settings menu, the name chips and the preview placeholders, all
+     inert. Hide the editor chrome wholesale under the touch HUD. */
+  body.mobile-touch #interface-edit-controls,
+  body.mobile-touch #interface-frames-menu,
+  body.mobile-touch .tf-frame-label,
+  body.mobile-touch .tf-preview-unit,
+  body.mobile-touch .tf-preview-bars,
+  body.mobile-touch .chat-move-btn {
+    display: none;
+  }
 }

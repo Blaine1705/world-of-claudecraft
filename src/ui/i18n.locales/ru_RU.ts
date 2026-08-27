@@ -788,6 +788,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.actionBar3Vertical': 'Вертикальная панель команд 3',
   'hudChrome.interfaceUnlock.menuRailHorizontal': 'Горизонтальное меню',
   'hudChrome.interfaceUnlock.resetFrameSize': 'Сбросить размер',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': 'Сбросить размер: {name}',
   'hudChrome.partyFrames.optionsSection': 'Настройки фреймов группы',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     'Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.',

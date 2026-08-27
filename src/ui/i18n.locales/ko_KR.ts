@@ -792,6 +792,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.actionBar3Vertical': '액션 바 3 세로 배치',
   'hudChrome.interfaceUnlock.menuRailHorizontal': '메뉴 가로 배치',
   'hudChrome.interfaceUnlock.resetFrameSize': '크기 초기화',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': '{name} 크기 초기화',
   'hudChrome.partyFrames.optionsSection': '파티 프레임 옵션',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.',

@@ -130,6 +130,9 @@ class FakeEl {
   dispatch(type: string, ev: unknown): void {
     for (const fn of this.listeners.get(type) ?? []) fn(ev);
   }
+  removeAttribute(k: string): void {
+    this.attrs.delete(k);
+  }
   setAttribute(k: string, v: string): void {
     this.attrs.set(k, v);
   }
@@ -147,10 +150,19 @@ class FakeEl {
   }
 }
 
+// Document-level listeners are recorded persistently AND attached to the
+// current body (tests dispatch document events via fakeDocument.body): the
+// controller arms its shared dispatcher ONCE per document, while this harness
+// swaps the body per test, so beforeEach re-attaches the recorded listeners
+// to each fresh body.
+const docListeners: Array<[string, Listener]> = [];
 const fakeDocument = {
   body: new FakeEl(),
   createElement: () => new FakeEl(),
-  addEventListener: (type: string, fn: Listener) => fakeDocument.body.addEventListener(type, fn),
+  addEventListener: (type: string, fn: Listener) => {
+    docListeners.push([type, fn]);
+    fakeDocument.body.addEventListener(type, fn);
+  },
 };
 const fakeWindow = {
   innerWidth: 1600,
@@ -178,6 +190,9 @@ let uiScaleStub = 1;
 
 // biome-ignore lint/suspicious/noExplicitAny: module handle loaded after the globals exist
 let MovableFrame: any;
+let setFrameSnapToGridProvider: (provider: () => boolean) => void;
+// Flipped by the snap test; beforeEach resets it so other drags stay exact.
+let snapOn = false;
 
 beforeAll(async () => {
   (globalThis as Record<string, unknown>).document = fakeDocument;
@@ -186,14 +201,18 @@ beforeAll(async () => {
   (globalThis as Record<string, unknown>).getComputedStyle = () => ({
     getPropertyValue: (p: string) => (p === '--ui-scale' ? String(uiScaleStub) : ''),
   });
-  ({ MovableFrame } = await import('../src/ui/movable_frame'));
+  ({ MovableFrame, setFrameSnapToGridProvider } = await import('../src/ui/movable_frame'));
+  setFrameSnapToGridProvider(() => snapOn);
 }, 30_000);
 
 beforeEach(() => {
   store.clear();
   uiScaleStub = 1;
+  snapOn = false;
   fakeDocument.body = new FakeEl();
-  fakeWindow.resizeListeners.length = 0;
+  for (const [type, fn] of docListeners) fakeDocument.body.addEventListener(type, fn);
+  // The shared dispatcher arms its ONE window resize listener the first time
+  // a frame is built for this document; it must survive across tests.
   fakeWindow.innerWidth = 1600;
   fakeWindow.innerHeight = 900;
 });
@@ -308,6 +327,20 @@ describe('MovableFrame', () => {
     });
     expect(frame.style.top).toBe('499px');
     expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 50, top: 499, vw: 1600, vh: 900 });
+  });
+
+  it('Snap to Grid lands a drag on the shared 16px grid, and only positions snap', () => {
+    snapOn = true;
+    const { frame, btn } = makeFrame();
+    btn.dispatch('click', pointer()); // unlock
+    frame.dispatch('pointerdown', pointer({ clientX: 100, clientY: 520 }));
+    // grab offset (60,20); moving to (503,327) would land at (443,307) raw,
+    // which the grid rounds to (448,304).
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 503, clientY: 327 }));
+    expect(frame.style.left).toBe('448px');
+    expect(frame.style.top).toBe('304px');
+    fakeDocument.body.dispatch('pointerup', pointer());
+    expect(JSON.parse(store.get(KEY) ?? '{}')).toEqual({ left: 448, top: 304, vw: 1600, vh: 900 });
   });
 
   it('ignores a drag while locked, and on the mobile layout even when unlocked', () => {

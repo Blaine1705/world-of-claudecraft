@@ -38,6 +38,7 @@ import {
   scaleFromKeyStep,
   serializeTargetFramePos,
   sizeFromEdgeDrag,
+  snapFrameCoord,
   type TargetFramePos,
 } from './target_frame_pos';
 import { getUiScale } from './ui_scale';
@@ -118,6 +119,16 @@ const HIDDEN_STORAGE_SUFFIX = '_hidden';
  *  transition's window metrics to settle. */
 const RESIZE_SETTLE_MS = 200;
 
+/** Whether the arrange-mode Snap to Grid setting is on: one provider for
+ *  every frame, wired once by hud (which owns the live settings hooks),
+ *  rather than a callback threaded through seventeen configs. Null until
+ *  wired; snapping stays off then. */
+let frameSnapEnabled: (() => boolean) | null = null;
+
+export function setFrameSnapToGridProvider(provider: () => boolean): void {
+  frameSnapEnabled = provider;
+}
+
 type MoveGesture = { kind: 'move'; pointerId: number; grabX: number; grabY: number };
 /** A transform resize: a side edge stretches its own axis, a corner (or the
  *  SE grip) zooms both proportionally. */
@@ -184,8 +195,50 @@ export class MovableFrame {
   private userHidden = false;
   private gesture: MoveGesture | ScaleGesture | StretchGesture | DimensionGesture | null = null;
   private lastHoverCursor = '';
-  /** Coalesces the trailing post-resize re-derive (RESIZE_SETTLE_MS). */
-  private resizeSettleTimer: ReturnType<typeof setTimeout> | undefined;
+  /** One shared document/window listener set per Document for EVERY frame
+   *  (review finding on PR #3284): with ~17 instances, per-instance
+   *  registration meant every pointermove ran seventeen DOM dispatches and a
+   *  viewport resize armed seventeen independent settle timers. The
+   *  dispatcher fans one event out over the registry instead; per-frame
+   *  gesture guards keep the fan-out cheap. Keyed per Document (a WeakMap)
+   *  so test harnesses that stub a fresh document per case each get their
+   *  own armed listeners and registry. */
+  private static readonly registries = new WeakMap<
+    Document,
+    { frames: Set<MovableFrame>; settleTimer?: ReturnType<typeof setTimeout> }
+  >();
+
+  private static registryFor(doc: Document): Set<MovableFrame> {
+    const existing = MovableFrame.registries.get(doc);
+    if (existing) return existing.frames;
+    const entry: { frames: Set<MovableFrame>; settleTimer?: ReturnType<typeof setTimeout> } = {
+      frames: new Set<MovableFrame>(),
+    };
+    MovableFrame.registries.set(doc, entry);
+    doc.addEventListener('pointermove', (ev) => {
+      for (const frame of entry.frames) frame.onPointerMove(ev as PointerEvent);
+    });
+    const end = (ev: Event) => {
+      for (const frame of entry.frames) frame.onPointerEnd(ev as PointerEvent);
+    };
+    doc.addEventListener('pointerup', end);
+    doc.addEventListener('pointercancel', end);
+    window.addEventListener('resize', () => {
+      // Once now and once after the metrics settle: a resize event fired
+      // mid-transition (an OS fullscreen exit, emulated viewports) can still
+      // observe the OLD innerWidth/Height, making the re-anchor a silent
+      // no-op with no follow-up event to correct it. The trailing pass
+      // re-derives from storage again, which is idempotent. ONE coalesced
+      // timer for the whole registry, not one per frame.
+      const rederiveAll = () => {
+        for (const frame of entry.frames) frame.rederiveFromSaved();
+      };
+      rederiveAll();
+      clearTimeout(entry.settleTimer);
+      entry.settleTimer = setTimeout(rederiveAll, RESIZE_SETTLE_MS);
+    });
+    return entry.frames;
+  }
   /** Bottom edge (visual px) at the last applyPos, for reanchorBottom(). */
   private lastBottom: number | null = null;
   private readonly btn: HTMLButtonElement;
@@ -253,43 +306,9 @@ export class MovableFrame {
       cfg.frame.addEventListener('pointermove', (ev) => this.onEdgeHover(ev));
       cfg.frame.addEventListener('pointerleave', () => this.setHoverCursor(''));
     }
-    document.addEventListener('pointermove', (ev) => this.onPointerMove(ev));
-    const end = (ev: PointerEvent) => this.onPointerEnd(ev);
-    document.addEventListener('pointerup', end);
-    document.addEventListener('pointercancel', end);
-    // Re-clamp into view when the viewport changes (mirrors the chat box
-    // logic), deriving from the SAVED spot rather than the last render:
-    // leaving fullscreen clamps a frame into the smaller window, and
-    // re-clamping from the already-clamped value would make that shrink
-    // permanent. From storage, growing the window back restores the exact
-    // saved location. A mid-gesture resize is left alone (the live drag owns
-    // the position; its drop re-applies and persists anyway), and a frame
-    // whose spot never reached storage keeps its in-memory one.
-    const rederiveFromSaved = () => {
-      if (this.gesture || !this.pos) return;
-      let savedNow: string | null = null;
-      try {
-        savedNow = localStorage.getItem(cfg.storageKey);
-      } catch {
-        /* storage unavailable */
-      }
-      const parsed = this.adoptPos(parseTargetFramePos(savedNow));
-      // A payload without the viewport stamp cannot re-anchor honestly; the
-      // in-memory pos carries the stamp of the viewport it was last applied
-      // under (the pre-change one), so it is the better basis then.
-      if (parsed && parsed.vw !== undefined) this.pos = parsed;
-      this.applyPos();
-    };
-    window.addEventListener('resize', () => {
-      // Once now and once after the metrics settle: a resize event fired
-      // mid-transition (an OS fullscreen exit, emulated viewports) can still
-      // observe the OLD innerWidth/Height, making the re-anchor a silent
-      // no-op with no follow-up event to correct it. The trailing pass
-      // re-derives from storage again, which is idempotent.
-      rederiveFromSaved();
-      clearTimeout(this.resizeSettleTimer);
-      this.resizeSettleTimer = setTimeout(rederiveFromSaved, RESIZE_SETTLE_MS);
-    });
+    // One SHARED listener set per document dispatches pointer and resize
+    // events over every registered frame (see registryFor above).
+    MovableFrame.registryFor(document).add(this);
 
     let saved: string | null = null;
     try {
@@ -701,10 +720,16 @@ export class MovableFrame {
     if (!g || g.pointerId !== ev.pointerId) return;
     ev.preventDefault();
     if (g.kind === 'move') {
+      // With Snap to Grid on (the arrange-mode setting, read through the
+      // provider hud wires), the dragged box lands on the shared grid so
+      // frames align without pixel hunting; sizes never snap.
+      const snap = frameSnapEnabled?.() ?? false;
+      const left = ev.clientX - g.grabX;
+      const top = ev.clientY - g.grabY;
       this.pos = {
         ...this.pos,
-        left: ev.clientX - g.grabX,
-        top: ev.clientY - g.grabY,
+        left: snap ? snapFrameCoord(left) : left,
+        top: snap ? snapFrameCoord(top) : top,
       };
     } else if (g.kind === 'scale') {
       // A side edge stretches only its own axis (the horizontal-only /
@@ -809,9 +834,12 @@ export class MovableFrame {
   }
 
   // The desktop-window hover affordance: the border band shows the matching
-  // resize cursor, the body keeps the stylesheet's move cursor. Inline so it can
-  // vary per edge, elided through lastHoverCursor so an unmoved hover writes
-  // nothing, and left alone mid-gesture so the grabbed edge's cursor sticks.
+  // resize cursor AND advertises itself with a per-side highlight (the
+  // data-resize-edge attribute the stylesheet paints; the review's live
+  // play-testing found a cursor change alone too subtle to discover). The
+  // body keeps the stylesheet's move cursor. Inline so it can vary per edge,
+  // elided through lastHoverCursor so an unmoved hover writes nothing, and
+  // left alone mid-gesture so the grabbed edge's cursor sticks.
   private onEdgeHover(ev: PointerEvent): void {
     if (this.gesture) return;
     if (!this.unlocked || this.cfg.isMobileLayout()) {
@@ -820,15 +848,43 @@ export class MovableFrame {
     }
     const rect = this.cfg.frame.getBoundingClientRect();
     const edge = frameEdgeAtPoint(rect, ev.clientX, ev.clientY);
-    this.setHoverCursor(edge ? cursorForFrameEdge(edge) : '');
+    this.setHoverCursor(edge ? cursorForFrameEdge(edge) : '', edge ?? undefined);
   }
 
-  private setHoverCursor(cursor: string): void {
+  private setHoverCursor(cursor: string, edge?: FrameEdge): void {
     if (cursor === this.lastHoverCursor) return;
     this.lastHoverCursor = cursor;
     // '' clears the inline value, handing the cursor back to the stylesheet's
     // move affordance on the frame body.
     this.cfg.frame.style.cursor = cursor;
+    if (edge) this.cfg.frame.setAttribute('data-resize-edge', edge);
+    else this.cfg.frame.removeAttribute('data-resize-edge');
+  }
+
+  // Re-clamp into view when the viewport changes (mirrors the chat box
+  // logic), deriving from the SAVED spot rather than the last render:
+  // leaving fullscreen clamps a frame into the smaller window, and
+  // re-clamping from the already-clamped value would make that shrink
+  // permanent. From storage, growing the window back restores the exact
+  // saved location. A mid-gesture resize is left alone (the live drag owns
+  // the position; its drop re-applies and persists anyway), and a frame
+  // whose spot never reached storage keeps its in-memory one. Driven by the
+  // shared per-document dispatcher (registryFor), never a per-instance
+  // resize listener.
+  private rederiveFromSaved(): void {
+    if (this.gesture || !this.pos) return;
+    let savedNow: string | null = null;
+    try {
+      savedNow = localStorage.getItem(this.cfg.storageKey);
+    } catch {
+      /* storage unavailable */
+    }
+    const parsed = this.adoptPos(parseTargetFramePos(savedNow));
+    // A payload without the viewport stamp cannot re-anchor honestly; the
+    // in-memory pos carries the stamp of the viewport it was last applied
+    // under (the pre-change one), so it is the better basis then.
+    if (parsed && parsed.vw !== undefined) this.pos = parsed;
+    this.applyPos();
   }
 
   // Once unlocked, arrow keys provide the same persisted positioning path as a

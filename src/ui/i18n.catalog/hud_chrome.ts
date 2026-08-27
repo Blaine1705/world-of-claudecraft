@@ -3615,7 +3615,10 @@ export const hudChromeStrings = {
     actionBar2Vertical: 'Vertical Action Bar 2',
     actionBar3Vertical: 'Vertical Action Bar 3',
     menuRailHorizontal: 'Horizontal Menu',
+    snapToGrid: 'Snap to Grid',
     resetFrameSize: 'Reset size',
+    // The per-frame accessible name for that button ({name} is the frame name).
+    resetFrameSizeFor: 'Reset size for {name}',
     // The sample spell name on the edit mode's filled cast-bar preview.
     previewSpell: 'Example Spell',
   },

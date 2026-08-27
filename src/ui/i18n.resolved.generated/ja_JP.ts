@@ -2764,7 +2764,9 @@ export const ja_JP: EnTranslations = {
       "actionBar2Vertical": "アクションバー 2 を縦向きに",
       "actionBar3Vertical": "アクションバー 3 を縦向きに",
       "menuRailHorizontal": "メニューを横向きに",
+      "snapToGrid": "Snap to Grid",
       "resetFrameSize": "サイズをリセット",
+      "resetFrameSizeFor": "{name}のサイズをリセット",
       "previewSpell": "サンプル呪文"
     },
     "transfer": {

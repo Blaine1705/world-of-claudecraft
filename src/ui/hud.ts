@@ -528,6 +528,12 @@ import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
 import { HUD_FRAME_SPECS } from './interface_unlock_core';
+import {
+  buildFramesMenuSelects,
+  buildFramesMenuToggles,
+  buildPartySampleMembers,
+  FRAME_SIZE_RESET_KEYS,
+} from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -605,7 +611,7 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
-import { type FrameDimension, MovableFrame } from './movable_frame';
+import { type FrameDimension, MovableFrame, setFrameSnapToGridProvider } from './movable_frame';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
@@ -1989,11 +1995,9 @@ export class Hud {
       healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
       sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
     };
-    // A full 10-member roster (owner request), so arranging is done against
-    // the largest stack the frame will realistically hold. The player's REAL
-    // party renders first, selected through the exact pipeline the live
-    // frames use, then dummy members pad the roster out to the total.
-    const SAMPLE_TOTAL = 10;
+    // The player's REAL party renders first, selected through the exact
+    // pipeline the live frames use; the pure core pads the roster out to the
+    // full sample stack (interface_unlock_menu_core.ts).
     const info = this.sim.partyInfo;
     const pets = config.showPets ? findPetsByOwner(this.sim.entities.values()) : undefined;
     const real = info
@@ -2006,51 +2010,7 @@ export class Hud {
           pets,
         )
       : [];
-    const classes = [
-      'warrior',
-      'priest',
-      'rogue',
-      'hunter',
-      'shaman',
-      'mage',
-      'warlock',
-      'paladin',
-      'druid',
-    ] as const;
-    const resourceFor: Record<(typeof classes)[number], ResourceType> = {
-      warrior: 'rage',
-      priest: 'mana',
-      rogue: 'energy',
-      hunter: 'focus',
-      shaman: 'mana',
-      mage: 'mana',
-      warlock: 'mana',
-      paladin: 'mana',
-      druid: 'mana',
-    };
-    const members = [...real];
-    for (let i = real.length; i < SAMPLE_TOTAL; i += 1) {
-      const cls = classes[i % classes.length];
-      members.push({
-        // Negative pids so a sample row key can never collide with a real member.
-        pid: -(i + 1),
-        name: `${t(`classes.${cls}` as TranslationKey)} ${formatNumber(i + 1)}`,
-        cls,
-        level: 20,
-        hp: 100,
-        mhp: 100,
-        res: cls === 'warrior' ? 0 : 100,
-        mres: 100,
-        rtype: resourceFor[cls],
-        x: 0,
-        z: 0,
-        dead: 0,
-        inCombat: 0,
-        group: 1 as const,
-        connected: 1,
-        oor: false,
-      });
-    }
+    const members = buildPartySampleMembers(real);
     painter.sync(members, info?.leader ?? members[0]?.pid ?? 0, false, config);
   });
   private readonly interfaceUnlock = new InterfaceUnlock({
@@ -2061,109 +2021,26 @@ export class Hud {
     framesMenuLabel: () => t('hudChrome.interfaceUnlock.framesMenu'),
     framesMenuTitle: () => t('hudChrome.interfaceUnlock.framesMenuTitle'),
     framesSubmenuLabel: () => t('hudChrome.interfaceUnlock.showHideFrames'),
-    // The frame-behavior settings the dropdown owns (their options-window rows
-    // are gone; see buildInterfaceControls). `set` persists AND applies, the
-    // same pair the options window's own toggle rows drive.
-    settingToggles: () => {
-      const hooks = this.optionsHooks;
-      if (!hooks) return [];
-      const rows = [
-        ['combineActionBars', 'hudChrome.options.combineActionBars'],
-        ['hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'],
-        ['mouseoverCast', 'hudChrome.options.mouseoverCast'],
-        ['lockActionBars', 'hudChrome.options.lockActionBars'],
-        ['buffsLeftToRight', 'hudChrome.interfaceUnlock.buffsLeftToRight'],
-        ['debuffsLeftToRight', 'hudChrome.interfaceUnlock.debuffsLeftToRight'],
-        ['lockPlayerFrameToActionBar', 'hudChrome.interfaceUnlock.lockPlayerFrameToBar'],
-        ['menuRailHorizontal', 'hudChrome.interfaceUnlock.menuRailHorizontal'],
-      ] as const;
-      const toggles = rows.map(([key, labelKey]) => ({
-        id: key as string,
-        label: t(labelKey),
-        value: !!hooks.settings.get(key),
-        set: (value: boolean) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
-      }));
-      // Bar orientation is PER BAR while split (owner request), and one
-      // toggle driving all three while combined, since the block moves and
-      // flips as a single shape then.
-      const barKeys = ['actionBar1Vertical', 'actionBar2Vertical', 'actionBar3Vertical'] as const;
-      if (this.combineActionBars) {
-        toggles.push({
-          id: 'actionBarsVertical',
-          label: t('hudChrome.interfaceUnlock.actionBarsVertical'),
-          value: !!hooks.settings.get('actionBar1Vertical'),
-          set: (value: boolean) => {
-            for (const key of barKeys) hooks.onSettingChange(key, hooks.settings.set(key, value));
-          },
-        });
-      } else {
-        const barLabels = [
-          'hudChrome.interfaceUnlock.actionBar1Vertical',
-          'hudChrome.interfaceUnlock.actionBar2Vertical',
-          'hudChrome.interfaceUnlock.actionBar3Vertical',
-        ] as const;
-        barKeys.forEach((key, i) => {
-          toggles.push({
-            id: key,
-            label: t(barLabels[i]),
-            value: !!hooks.settings.get(key),
-            set: (value: boolean) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
-          });
-        });
-      }
-      return toggles;
-    },
-    // Party frame columns lives here rather than the options window (owner
-    // request: the sizing knobs moved out of the Frames tab once the editor
-    // gained real-dimension drags; columns is the one discrete leftover).
-    settingSelects: () => {
-      const hooks = this.optionsHooks;
-      if (!hooks) return [];
-      // The discrete party layout knobs live here rather than the options
-      // window (owner request: the sizing sliders left the Frames tab once
-      // the editor gained real-dimension drags; columns and the row spacing
-      // join the editor's own menu as whole-px pickers).
-      const selectFor = (
-        key: 'partyFrameColumns' | 'partyFrameSpacing',
-        labelKey: TranslationKey,
-      ) => {
-        const range = SETTING_RANGES[key];
-        const options: { value: number; label: string }[] = [];
-        for (let value = range.min; value <= range.max; value += 1)
-          options.push({ value, label: formatNumber(value) });
-        return {
-          id: key,
-          label: t(labelKey),
-          value: Math.round(Number(hooks.settings.get(key) ?? range.def)),
-          options,
-          set: (value: number) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
-        };
-      };
-      return [
-        selectFor('partyFrameColumns', 'hudChrome.partyFrames.columns'),
-        selectFor('partyFrameSpacing', 'hudChrome.partyFrames.spacing'),
-      ];
-    },
-    // One-shot Reset Frame Sizes (owner request): every frame's grip/corner
-    // zoom and side stretch drops back to stock while POSITIONS stay put,
-    // and the settings-backed sizes (the dimension drags, the per-frame
-    // scale factors, the party profile) return to their defaults through
-    // the same persist-and-apply pair the sliders use.
+    // The menu's toggle/select tables and the reset-key table are the pure
+    // core interface_unlock_menu_core.ts (a Vitest drives the real tables,
+    // both orientation arms included); this stays the live-hooks supplier.
+    settingToggles: () => buildFramesMenuToggles(this.optionsHooks, this.combineActionBars),
+    settingSelects: () =>
+      buildFramesMenuSelects(this.optionsHooks, {
+        partyFrameColumns: SETTING_RANGES.partyFrameColumns,
+        partyFrameSpacing: SETTING_RANGES.partyFrameSpacing,
+      }),
     // Per-frame size reset on every show/hide row (owner request; replaces
     // the earlier single Reset Frame Sizes action): the coordinator already
     // ran mover.resetSize(); frames whose sizes live in real SETTINGS (the
     // dimension drags, the scale factors) reset those here through the same
     // persist-and-apply pair the sliders use.
     resetSizeLabel: () => t('hudChrome.interfaceUnlock.resetFrameSize'),
+    resetSizeLabelFor: (name) => t('hudChrome.interfaceUnlock.resetFrameSizeFor', { name }),
     onSizeReset: (id) => {
       const hooks = this.optionsHooks;
       if (!hooks) return;
-      const keysFor: Partial<Record<string, readonly NumericSettingKey[]>> = {
-        playerFrame: ['playerFrameScale', 'playerFrameWidth', 'playerFrameHeight'],
-        targetFrame: ['targetFrameScale', 'targetFrameWidth', 'targetFrameHeight'],
-        partyFrames: ['partyFrameScale', 'partyFrameWidth', 'partyFrameHeight'],
-      };
-      const keys = keysFor[id];
+      const keys = FRAME_SIZE_RESET_KEYS[id] as readonly NumericSettingKey[] | undefined;
       if (!keys) return;
       hooks.settings.reset([...keys]);
       for (const key of keys) hooks.onSettingChange(key, hooks.settings.get(key));
@@ -2255,6 +2132,9 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     hydrateCrestImageFallbacks(document);
+    // Arrange-mode Snap to Grid: one provider for every MovableFrame (and
+    // the chat controller's matching dep), read live per drag event.
+    setFrameSnapToGridProvider(() => !!this.optionsHooks?.settings.get('frameSnapToGrid'));
     this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim);
     this.mapMarkerInteraction = new MapMarkerInteractionController({
       names: {
@@ -2561,6 +2441,7 @@ export class Hud {
       hasStorePromoCard: () => this.storePromoCard !== null,
       uiScale: getUiScale,
       isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
+      snapToGrid: () => !!this.optionsHooks?.settings.get('frameSnapToGrid'),
     });
     this.chatWindow = new ChatWindowController({
       document,
@@ -6986,6 +6867,9 @@ export class Hud {
 
   private refreshLocalizedDynamicUi(): void {
     this.doomMeter.relocalize();
+    // The chat box's geometry chrome (move/resize labels, the arrange-mode
+    // name chip) is written once at init, so the switch must rewrite it.
+    this.chatGeometry.relocalize();
     // The player unit frame's hp/resource text is memoized on the raw value,
     // which does not change on a locale switch, so clear the memo to force
     // unitFrameCurrentMaxText to re-render for the new language (#2900 review).

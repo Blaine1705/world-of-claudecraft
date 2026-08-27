@@ -186,4 +186,95 @@ describe('ChatGeometryController interface unlock', () => {
     expect(harness.wrap.style.left).toBe('100px');
     expect(harness.wrap.style.top).toBe('80px');
   });
+
+  it('arrow keys on the move button step the box and persist (Shift for the fine step)', () => {
+    const harness = makeHarness({
+      woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}',
+    });
+    harness.controller.init();
+    const moveBtn = harness.wrap.querySelector('.chat-move-btn');
+    expect(moveBtn, 'the arrange-mode keyboard move button exists').toBeTruthy();
+    expect(moveBtn?.getAttribute('aria-keyshortcuts')).toBe(
+      'ArrowUp ArrowDown ArrowLeft ArrowRight',
+    );
+
+    moveBtn?.dispatchEvent(keyEvent('ArrowRight'));
+    expect(harness.wrap.style.left).toBe('110px');
+    moveBtn?.dispatchEvent(keyEvent('ArrowDown', true));
+    expect(harness.wrap.style.top).toBe('81px');
+    expect(JSON.parse(harness.storage.getItem('woc_chat_geometry') ?? '{}')).toMatchObject({
+      left: 110,
+      top: 81,
+    });
+  });
+
+  it('the resize grip is a real named button whose arrow keys size the box', () => {
+    const harness = makeHarness({
+      woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}',
+    });
+    harness.controller.init();
+    const grip = harness.frame.querySelector('.chat-resize-grip');
+    expect(grip?.tagName.toLowerCase()).toBe('button');
+    expect(grip?.getAttribute('aria-hidden')).toBeNull();
+    expect(grip?.getAttribute('aria-label')).toBeTruthy();
+
+    grip?.dispatchEvent(keyEvent('ArrowRight'));
+    expect(harness.wrap.style.width).toBe('380px');
+    grip?.dispatchEvent(keyEvent('ArrowUp', true));
+    expect(harness.frame.style.height).toBe('183px');
+    expect(JSON.parse(harness.storage.getItem('woc_chat_geometry') ?? '{}')).toMatchObject({
+      width: 380,
+      height: 183,
+    });
+  });
+
+  it('relocalize rewrites the chrome written once at init (the name chip is not stranded)', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+    const chip = harness.wrap.querySelector('.tf-frame-label');
+    expect(chip?.textContent).toBeTruthy();
+    const before = chip?.textContent;
+    if (chip) chip.textContent = 'stale-locale-text';
+
+    harness.controller.relocalize();
+    expect(chip?.textContent).toBe(before);
+  });
+
+  it('hovering the unlocked wrap hit-tests a cached box, not a rect read per move', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { unlocked: true },
+    );
+    harness.controller.init();
+    let reads = 0;
+    const original = harness.wrap.getBoundingClientRect.bind(harness.wrap);
+    harness.wrap.getBoundingClientRect = () => {
+      reads += 1;
+      return original();
+    };
+    for (let i = 0; i < 20; i += 1) {
+      harness.wrap.dispatchEvent(
+        pointerEvent('pointermove', { pointerId: 3, clientX: 101 + i, clientY: 90 }),
+      );
+    }
+    expect(reads).toBe(0);
+    // The cached box still answers correctly: the west border reports an edge
+    // cursor, the body clears it.
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 3, clientX: 101, clientY: 170 }),
+    );
+    expect(harness.wrap.style.cursor).not.toBe('');
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 3, clientX: 285, clientY: 170 }),
+    );
+    expect(harness.wrap.style.cursor).toBe('');
+  });
 });
+
+function keyEvent(key: string, shiftKey = false): Event {
+  const event = new Event('keydown', { cancelable: true });
+  for (const [name, value] of Object.entries({ key, shiftKey })) {
+    Object.defineProperty(event, name, { configurable: true, value });
+  }
+  return event;
+}

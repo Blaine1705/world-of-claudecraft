@@ -791,6 +791,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.actionBar3Vertical': 'アクションバー 3 を縦向きに',
   'hudChrome.interfaceUnlock.menuRailHorizontal': 'メニューを横向きに',
   'hudChrome.interfaceUnlock.resetFrameSize': 'サイズをリセット',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': '{name}のサイズをリセット',
   'hudChrome.partyFrames.optionsSection': 'パーティフレーム設定',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。',

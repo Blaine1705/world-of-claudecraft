@@ -2764,7 +2764,9 @@ export const ru_RU: EnTranslations = {
       "actionBar2Vertical": "Вертикальная панель команд 2",
       "actionBar3Vertical": "Вертикальная панель команд 3",
       "menuRailHorizontal": "Горизонтальное меню",
+      "snapToGrid": "Snap to Grid",
       "resetFrameSize": "Сбросить размер",
+      "resetFrameSizeFor": "Сбросить размер: {name}",
       "previewSpell": "Пример заклинания"
     },
     "transfer": {

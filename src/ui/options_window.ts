@@ -1551,6 +1551,7 @@ export class OptionsWindow {
         'actionBar2Vertical',
         'actionBar3Vertical',
         'menuRailHorizontal',
+        'frameSnapToGrid',
         'combineActionBars',
         'hideUnusedActionSlots',
         'mouseoverCast',

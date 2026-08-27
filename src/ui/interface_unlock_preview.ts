@@ -10,8 +10,8 @@
 // never a write into the frame's own painter-managed nodes (the aura painter
 // pools and reconciles its icon children; foreign nodes in that flow would
 // corrupt its order). Pointer-inert via the edit mode's own descendant sweep.
-// Registered in tests/architecture.test.ts UI_DOM_MODULES (it owns the
-// preview nodes it mints into the live document).
+// Deliberately unregistered in tests/architecture.test.ts: its module sweep
+// holds this file to no browser globals, satisfied by the injected Document.
 
 import { t } from './i18n';
 import { iconDataUrl } from './icons';

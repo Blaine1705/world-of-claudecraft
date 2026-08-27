@@ -13,6 +13,7 @@ import {
   FRAME_SCALE_KEY_STEP,
   FRAME_SCALE_MAX,
   FRAME_SCALE_MIN,
+  FRAME_SNAP_GRID,
   type FrameEdge,
   frameEdgeAtPoint,
   frameScales,
@@ -26,11 +27,49 @@ import {
   scaleFromKeyStep,
   serializeTargetFramePos,
   sizeFromEdgeDrag,
+  snapFrameCoord,
   TARGET_FRAME_MARGIN,
 } from '../src/ui/target_frame_pos';
 
 const viewport = { w: 1000, h: 800 };
 const size = { w: 220, h: 92 };
+
+// One literal pin per exported constant. The behavioral suites below express
+// their expectations in terms of these constants on purpose (they hold the
+// RELATIONSHIPS), which also means an accidental constant edit would move the
+// expectation with it and never fail; these pins are what makes such an edit
+// visible. Change a value here only when the change is intentional.
+describe('exported constants (literal pins)', () => {
+  it('pins the persisted-band and geometry constants to their shipped values', () => {
+    expect(TARGET_FRAME_MARGIN).toBe(8);
+    expect(MIN_FRAME_BOX).toBe(24);
+    expect(MAX_FRAME_BOX).toBe(4096);
+    expect(FRAME_SCALE_MIN).toBe(0.4);
+    expect(FRAME_SCALE_MAX).toBe(2);
+    expect(FRAME_SCALE_KEY_STEP).toBe(0.05);
+    expect(FRAME_SCALE_KEY_FINE_STEP).toBe(0.01);
+    expect(FRAME_EDGE_BAND).toBe(8);
+    expect(FRAME_LABEL_CLEARANCE).toBe(22);
+    expect(FRAME_SNAP_GRID).toBe(16);
+  });
+});
+
+describe('snapFrameCoord', () => {
+  it('rounds onto the arrange-mode grid, both directions', () => {
+    expect(snapFrameCoord(0)).toBe(0);
+    expect(snapFrameCoord(7)).toBe(0);
+    expect(snapFrameCoord(8)).toBe(16);
+    expect(snapFrameCoord(23)).toBe(16);
+    expect(snapFrameCoord(24)).toBe(32);
+    expect(snapFrameCoord(-9)).toBe(-16);
+  });
+
+  it('honors an explicit grid and refuses degenerate inputs', () => {
+    expect(snapFrameCoord(13, 10)).toBe(10);
+    expect(snapFrameCoord(13, 0)).toBe(13);
+    expect(snapFrameCoord(Number.NaN)).toBeNaN();
+  });
+});
 
 describe('clampTargetFramePos', () => {
   it('leaves an in-bounds position untouched', () => {

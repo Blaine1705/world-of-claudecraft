@@ -116,6 +116,10 @@ const FANOUT_ARMS: readonly string[] = [
   'this.interfaceUnlock.relocalize|',
   'this.targetAurasWindow.relocalize|',
   'this.doomMeter.relocalize|',
+  // The chat box's geometry chrome (the tab strip's move label, the resize
+  // grip's name, the arrange-mode name chip, the mobile handle) is written
+  // once at init by ChatGeometryController; its relocalize() rewrites them.
+  'this.chatGeometry.relocalize|',
   'this.questlogWindow.render|this.questlogWindow.isOpen',
   "this.renderBags|$('#bags').style.display !== 'none'",
   // The four service windows (copper vendor, heroic quartermaster, train,

@@ -72,6 +72,18 @@ export const FRAME_SCALE_MAX = 2;
 export const FRAME_SCALE_KEY_STEP = 0.05;
 export const FRAME_SCALE_KEY_FINE_STEP = 0.01;
 
+/** The arrange-mode snap grid (the frameSnapToGrid setting): coarse enough
+ *  that two frames dropped near a shared line land ON it, fine enough that a
+ *  layout never feels quantized. Applied to drag positions only, never to
+ *  sizes, and only while the setting is on. */
+export const FRAME_SNAP_GRID = 16;
+
+/** Round a dragged coordinate onto the snap grid. */
+export function snapFrameCoord(value: number, grid: number = FRAME_SNAP_GRID): number {
+  if (!Number.isFinite(value) || grid <= 0) return value;
+  return Math.round(value / grid) * grid;
+}
+
 /** Clamp a desired size multiplier into the legal band. A non-finite read (a
  *  corrupt store, a divide by a zero rect) falls back to 1 rather than blanking
  *  the frame with a degenerate transform. */

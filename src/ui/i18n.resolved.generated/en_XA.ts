@@ -2764,7 +2764,9 @@ export const en_XA: EnTranslations = {
       "actionBar2Vertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕ 2]",
       "actionBar3Vertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕ 3]",
       "menuRailHorizontal": "[Ĥóŕížóñţáļ Ɱéñú]",
+      "snapToGrid": "[Šñáþ ţó Ĝŕíð]",
       "resetFrameSize": "[Ŕéšéţ šížé]",
+      "resetFrameSizeFor": "[Ŕéšéţ šížé ƒóŕ {name}]",
       "previewSpell": "[Éẋáɱþļé Šþéļļ]"
     },
     "transfer": {

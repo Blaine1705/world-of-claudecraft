@@ -1,4 +1,4 @@
-﻿<!-- src/ui/: classic HUD, i18n, procedural icons. Local detail only; the
+<!-- src/ui/: classic HUD, i18n, procedural icons. Local detail only; the
      IWorld seam, dependency rules, and "files-can-be-huge" convention are in
      root + src/ CLAUDE.md, don't repeat them here. -->
 

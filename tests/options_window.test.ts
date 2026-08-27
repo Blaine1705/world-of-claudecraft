@@ -763,6 +763,67 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
   });
 });
 
+// The off-menu reset keys (renderInterface's offMenuTabKeys table) carry the
+// reset behavior for settings whose rows moved into the in-game editor's
+// Frames Settings menu or were retired outright: no options row renders them,
+// so each tab's Reset to Defaults is the ONLY interface surface that can still
+// clear a saved value. Dropping a key from the table strands every player who
+// set it before the rows moved, and no rendered-control test can notice (the
+// table is exactly the keys with no rendered control), so the table is pinned
+// here as literals, per tab.
+describe('options_window: off-menu reset keys are pinned per tab', () => {
+  // Extract the offMenuTabKeys object literal from the painter source and read
+  // each tab's quoted key list. Comments inside the literal are stripped first
+  // (one carries an apostrophe that would derail a quoted-string scan).
+  const start = painter.indexOf('const offMenuTabKeys');
+  const block = painter.slice(start, painter.indexOf('};', start)).replace(/^\s*\/\/.*$/gm, '');
+  const tabKeys = (tab: string): string[] => {
+    const list = block.match(new RegExp(`${tab}: \\[([^\\]]*)\\]`))?.[1] ?? '';
+    return [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  };
+
+  it('finds the table inside renderInterface', () => {
+    expect(start).toBeGreaterThan(painter.indexOf('private renderInterface(): void {'));
+  });
+
+  it('General owns exactly the retired UI Scale slider key', () => {
+    expect(tabKeys('general')).toEqual(['uiScale']);
+  });
+
+  it('Frames owns the retired sliders plus every Frames Settings menu key', () => {
+    expect(tabKeys('frames')).toEqual([
+      'playerFrameScale',
+      'targetFrameScale',
+      'partyFrameScale',
+      'playerFrameWidth',
+      'playerFrameHeight',
+      'targetFrameWidth',
+      'targetFrameHeight',
+      'partyFrameWidth',
+      'partyFrameHeight',
+      'partyFrameColumns',
+      'partyFrameSpacing',
+      'buffsLeftToRight',
+      'debuffsLeftToRight',
+      'lockPlayerFrameToActionBar',
+      'actionBar1Vertical',
+      'actionBar2Vertical',
+      'actionBar3Vertical',
+      'menuRailHorizontal',
+      'frameSnapToGrid',
+      'combineActionBars',
+      'hideUnusedActionSlots',
+      'mouseoverCast',
+      'lockActionBars',
+    ]);
+  });
+
+  it('Chat and Combat carry no off-menu keys today', () => {
+    expect(tabKeys('chat')).toEqual([]);
+    expect(tabKeys('combat')).toEqual([]);
+  });
+});
+
 // Key Bindings' Reset to Defaults used to reset only the rebindable key-code
 // map (Keybinds.reset()), silently leaving the seven GameSettings toggles the
 // same panel renders (mouse camera, click-to-move + its mouse button, attack

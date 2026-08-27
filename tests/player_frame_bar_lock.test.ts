@@ -11,12 +11,24 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { BOOL_SETTINGS } from '../src/game/settings';
 
-const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
-  /\r\n/g,
-  '\n',
+// Strip block comments and line comments before pinning, so a pin can never
+// be satisfied by commented-out code. Block comments go first (a non-greedy
+// match, replaced by a space so token boundaries survive); a line comment is
+// stripped only when its slashes follow start-of-line or whitespace, which
+// leaves string literals containing '//' (URLs like 'https://...') intact.
+// Pragmatic by design: good enough for these source-level pins.
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|\s)\/\/.*$/gm, '$1');
+}
+
+const hudTs = stripComments(readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8'));
+const hudCss = stripComments(
+  readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
-const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+const mainTs = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+const menuCore = stripComments(
+  readFileSync(new URL('../src/ui/interface_unlock_menu_core.ts', import.meta.url), 'utf8'),
+);
 
 describe('lockPlayerFrameToActionBar wiring', () => {
   it('is a real bool setting, off by default, applied through main.ts', () => {
@@ -67,7 +79,9 @@ describe('lockPlayerFrameToActionBar wiring', () => {
   });
 
   it('the Frames Settings dropdown lists the toggle', () => {
-    expect(hudTs).toContain(
+    // The toggle table moved out of hud.ts to the pure menu core (the
+    // review-round extraction); the row is pinned where it lives now.
+    expect(menuCore).toContain(
       "['lockPlayerFrameToActionBar', 'hudChrome.interfaceUnlock.lockPlayerFrameToBar']",
     );
   });

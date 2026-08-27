@@ -773,6 +773,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.actionBar3Vertical': '動作條 3 縱向',
   'hudChrome.interfaceUnlock.menuRailHorizontal': '選單橫向排列',
   'hudChrome.interfaceUnlock.resetFrameSize': '重置尺寸',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': '重置{name}的尺寸',
   'hudChrome.partyFrames.optionsSection': '隊伍框體選項',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。',

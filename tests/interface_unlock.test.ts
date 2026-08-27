@@ -144,6 +144,7 @@ function harness(
     settingToggles: () => toggles,
     settingSelects: () => selects,
     resetSizeLabel: () => 'Reset size',
+    resetSizeLabelFor: (name) => `Reset size for ${name}`,
     onSizeReset: (id) => sizeResets.push(id),
   });
   const movers = new Map<string, FakeMover>();
@@ -330,7 +331,7 @@ describe('InterfaceUnlock frames menu', () => {
     // WHICH frame the button resets.
     const reset = rowReset(rows[1]);
     expect(reset?.textContent).toBe('Reset size');
-    expect(reset?.attrs.get('aria-label')).toBe('minimap: Reset size');
+    expect(reset?.attrs.get('aria-label')).toBe('Reset size for minimap');
     reset?.fire('click');
     expect(movers.get('minimap')?.sizeResets).toBe(1);
     expect(movers.get('actionBar1')?.sizeResets).toBe(0);

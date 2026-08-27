@@ -53,7 +53,26 @@ describe('HUD_FRAME_SPECS', () => {
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
     expect(new Set(HUD_FRAME_STORAGE_KEYS).size).toBe(HUD_FRAME_SPECS.length);
-    for (const key of HUD_FRAME_STORAGE_KEYS) expect(key.startsWith('woc_hud_frame_')).toBe(true);
+    // The FULL key list, pinned as literals in spec order: these are persisted
+    // player data (localStorage), so renaming any one of them orphans every
+    // player's saved layout for that frame with no other test failing. A new
+    // frame appends a new key here; an existing key never changes.
+    expect(HUD_FRAME_STORAGE_KEYS).toEqual([
+      'woc_hud_frame_actionbar',
+      'woc_hud_frame_actionbar2',
+      'woc_hud_frame_actionbar3',
+      'woc_hud_frame_actionbar_group',
+      'woc_hud_frame_castbar',
+      'woc_hud_frame_swingbar',
+      'woc_hud_frame_community',
+      'woc_hud_frame_side_buttons',
+      'woc_hud_frame_minimap',
+      'woc_hud_frame_pet',
+      'woc_hud_frame_stancebar',
+      'woc_hud_frame_xpbar',
+      'woc_hud_frame_buffbar',
+      'woc_hud_frame_debuffbar',
+    ]);
   });
 
   it('marks exactly the frames that can sit under a transformed ancestor for re-homing', () => {

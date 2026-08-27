@@ -2764,7 +2764,9 @@ export const pt_BR: EnTranslations = {
       "actionBar2Vertical": "Vertical Action Bar 2",
       "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
+      "snapToGrid": "Snap to Grid",
       "resetFrameSize": "Reset size",
+      "resetFrameSizeFor": "Reset size for {name}",
       "previewSpell": "Example Spell"
     },
     "transfer": {

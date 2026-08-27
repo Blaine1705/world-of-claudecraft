@@ -211,6 +211,11 @@ export const BOOL_SETTINGS = {
   actionBar2Vertical: { def: false },
   actionBar3Vertical: { def: false },
   menuRailHorizontal: { def: false },
+  // Arrange-mode drag snapping (the editor's Snap to Grid toggle): dragged
+  // frames land on the shared FRAME_SNAP_GRID so layouts align without
+  // pixel hunting. Off by default: snapping surprises a player who wants
+  // pixel placement, and the toggle lives beside the gesture it changes.
+  frameSnapToGrid: { def: false },
   // Glue the player frame to the TOP of the action bars (the Frames Settings
   // menu): the frame gives up its own dragged spot (kept in storage for
   // switching back) and re-docks over the bars, riding along when the

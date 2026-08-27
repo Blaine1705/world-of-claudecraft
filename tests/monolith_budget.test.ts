@@ -125,12 +125,13 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    // Raised at the PR #3284 v0.41.0 sync merge: the interface-editor round
-    // (dimension-mode mover wiring, the edit-preview party closure, the
-    // frames-menu setting rows, the player-frame bar lock) predates this
-    // ratchet and lives on coordinator state; extracting it behind the
-    // hud/ seams is flagged follow-up work on that PR. Exact count.
-    ceiling: 19105,
+    // Raised at the PR #3284 v0.41.0 sync merge, then partially taken back
+    // by the review-round extraction: the frames-menu toggle/select tables,
+    // the reset-key table, and the party-sample roster builder moved to the
+    // pure core interface_unlock_menu_core.ts. What remains on coordinator
+    // state (dimension-mode mover wiring, the edit-preview painter closure,
+    // the player-frame bar lock) is the live-hooks half. Exact count.
+    ceiling: 18989,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -208,6 +208,10 @@ describe('steam wishlist markup', () => {
     // (the role split guarded whole-set by tests/chrome_icons.test.ts).
     expect(hasChromeIconArt('steam')).toBe(false);
     expect(svgIcon('steam')).toContain('viewBox="0 0 512 512"');
+    // The positive half first: the registry's Steam mark really does start
+    // with this path prefix, so the not-inlined guard below is checking for
+    // the actual path and not a vacuous never-present string.
+    expect(svgIcon('steam')).toContain('<path d="M11.979 0C5.678');
     for (const file of ENTRIES) {
       for (const tag of wishlistTags(entry(file))) {
         expect(tag, file).toContain('data-icon="steam"');
