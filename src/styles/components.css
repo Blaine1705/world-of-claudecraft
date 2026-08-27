@@ -7843,6 +7843,20 @@
   #bank-window .bag-filter-bar {
     flex: none;
   }
+  /* ONE toolbar row is the bank phase's CONTRACT (the browser arm pins the
+     shared top edge): the generic .bag-tools wrap exists for the half-width
+     pairings, but here a wider platform font stack (CI's Linux Chromium
+     measures the same labels wider than the box that tuned the row) wrapped
+     the row and stole a 46px band of grid. The bank row forbids the wrap and
+     makes the SEARCH BOX pay instead: a 96px flex basis keeps line fitting
+     from using the input's intrinsic width, and grow returns the slack, so
+     the box shrinks toward its floor exactly when the labels need the room. */
+  #bank-window .bag-tools {
+    flex-wrap: nowrap;
+  }
+  #bank-window .bag-search {
+    flex: 1 1 96px;
+  }
   .bank-deposit-all {
     flex: none;
     font-family: var(--ui-font);
