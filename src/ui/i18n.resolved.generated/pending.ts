@@ -69,7 +69,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "es_ES": [
     "hudChrome.actionBar.conflictAccept",
@@ -131,7 +136,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "fr_FR": [
     "hudChrome.actionBar.conflictAccept",
@@ -193,7 +203,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "fr_CA": [
     "hudChrome.actionBar.conflictAccept",
@@ -255,7 +270,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "en_CA": [],
   "it_IT": [
@@ -318,7 +338,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "de_DE": [
     "hudChrome.actionBar.conflictAccept",
@@ -380,31 +405,40 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "zh_CN": [
     "hudChrome.interfaceUnlock.frameNames.chat",
     "hudChrome.interfaceUnlock.frameNames.menu",
     "hudChrome.interfaceUnlock.frameNames.xpBar",
-    "hudChrome.interfaceUnlock.snapToGrid"
+    "hudChrome.interfaceUnlock.snapToGrid",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "zh_TW": [
     "hudChrome.interfaceUnlock.frameNames.chat",
     "hudChrome.interfaceUnlock.frameNames.menu",
     "hudChrome.interfaceUnlock.frameNames.xpBar",
-    "hudChrome.interfaceUnlock.snapToGrid"
+    "hudChrome.interfaceUnlock.snapToGrid",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "ko_KR": [
     "hudChrome.interfaceUnlock.frameNames.chat",
     "hudChrome.interfaceUnlock.frameNames.menu",
     "hudChrome.interfaceUnlock.frameNames.xpBar",
-    "hudChrome.interfaceUnlock.snapToGrid"
+    "hudChrome.interfaceUnlock.snapToGrid",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "ja_JP": [
     "hudChrome.interfaceUnlock.frameNames.chat",
     "hudChrome.interfaceUnlock.frameNames.menu",
     "hudChrome.interfaceUnlock.frameNames.xpBar",
-    "hudChrome.interfaceUnlock.snapToGrid"
+    "hudChrome.interfaceUnlock.snapToGrid",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "pt_BR": [
     "hudChrome.actionBar.conflictAccept",
@@ -466,13 +500,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "ru_RU": [
     "hudChrome.interfaceUnlock.frameNames.chat",
     "hudChrome.interfaceUnlock.frameNames.menu",
     "hudChrome.interfaceUnlock.frameNames.xpBar",
-    "hudChrome.interfaceUnlock.snapToGrid"
+    "hudChrome.interfaceUnlock.snapToGrid",
+    "hudChrome.wocMarket.walletUsdBalance"
   ],
   "cs_CZ": [
     "hudChrome.actionBar.conflictAccept",
@@ -534,7 +574,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "nl_NL": [
     "hudChrome.actionBar.conflictAccept",
@@ -596,7 +641,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "pl_PL": [
     "hudChrome.actionBar.conflictAccept",
@@ -658,7 +708,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "id_ID": [
     "hudChrome.actionBar.conflictAccept",
@@ -720,7 +775,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "tr_TR": [
     "hudChrome.actionBar.conflictAccept",
@@ -782,7 +842,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "sv_SE": [
     "hudChrome.actionBar.conflictAccept",
@@ -844,7 +909,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "vi_VN": [
     "hudChrome.actionBar.conflictAccept",
@@ -906,7 +976,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "da_DK": [
     "hudChrome.actionBar.conflictAccept",
@@ -968,6 +1043,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.transfer.importAction",
     "hudChrome.transfer.invalid",
     "hudChrome.transfer.pastePlaceholder",
-    "hudChrome.transfer.wrongKind"
+    "hudChrome.transfer.wrongKind",
+    "hudChrome.wocMarket.walletLinkedConnected",
+    "hudChrome.wocMarket.walletLinkedDisconnected",
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ]
 };
