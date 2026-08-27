@@ -48,7 +48,10 @@ afterEach(() => {
 });
 
 describe('CI shard weight harvester provenance', () => {
-  it('warns before replacing the checked-in mergedLocal/mergedFiles rows', async () => {
+  // Shared rig: a green full-mode run with the 8 shards + 2 lanes, and a
+  // fresh execution of the harvester (its whole body runs at import time, so
+  // every test must reset the module registry before importing again).
+  function primeGreenRun() {
     const jobs = [
       ...Array.from({ length: 8 }, (_, i) => ({
         id: i + 1,
@@ -63,6 +66,24 @@ describe('CI shard weight harvester provenance', () => {
         ? JSON.stringify(jobs)
         : 'changes-job decision: mode=full\n\u2713 tests/example.test.ts (1 test) 20ms',
     );
+    harvestIo.writeFileSync.mockClear();
+  }
+
+  async function runHarvester() {
+    vi.resetModules();
+    const priorArg = process.argv[2];
+    process.argv[2] = '123456789';
+    try {
+      // @ts-expect-error The executable intentionally has no public module API.
+      await import('../scripts/ci_shard_weights_harvest.mjs');
+    } finally {
+      if (priorArg === undefined) process.argv.splice(2, 1);
+      else process.argv[2] = priorArg;
+    }
+  }
+
+  it('warns before replacing the checked-in mergedLocal/mergedFiles rows', async () => {
+    primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
         __provenance: {
@@ -73,21 +94,71 @@ describe('CI shard weight harvester provenance', () => {
       }),
     );
     const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const priorArg = process.argv[2];
-    process.argv[2] = '123456789';
-    try {
-      // @ts-expect-error The executable intentionally has no public module API.
-      await import('../scripts/ci_shard_weights_harvest.mjs');
-    } finally {
-      if (priorArg === undefined) process.argv.splice(2, 1);
-      else process.argv[2] = priorArg;
-    }
+    await runHarvester();
 
     const replacement = logs.mock.calls
       .map(([line]) => String(line))
       .find((line) => line.includes('locally measured rows'));
     expect(replacement).toContain('46 locally measured rows');
     expect(replacement).toContain('2026-08-24');
+    expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
+  });
+
+  it('speaks up on an unrecognized provenance shape instead of a silent discard', async () => {
+    // A THIRD local-merge shape (neither sibling mergedLocal/mergedFiles nor
+    // nested localMerge) used to fall through the ?? chain and the bare
+    // catch, printing NOTHING while the rewrite discarded its rows.
+    primeGreenRun();
+    harvestIo.readFileSync.mockReturnValue(
+      JSON.stringify({
+        __provenance: {
+          run: '32621561241',
+          harvested: '2026-08-23',
+          files: 3188,
+          merged: { at: '2026-08-24', rows: 46 },
+        },
+      }),
+    );
+    const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await runHarvester();
+
+    const warning = warns.mock.calls
+      .map(([line]) => String(line))
+      .find((line) => line.includes('unrecognized __provenance shape'));
+    // Names the shape it could not parse and the consequence.
+    expect(warning).toContain('merged');
+    expect(warning).toContain('DISCARDS');
+    // The known-shape advisory must NOT also fire.
+    expect(
+      logs.mock.calls
+        .map(([line]) => String(line))
+        .find((l) => l.includes('locally measured rows')),
+    ).toBeUndefined();
+    // The rewrite itself still proceeds: the arm warns, it does not block.
+    expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
+  });
+
+  it('stays silent on the plain-harvest provenance this script writes itself', async () => {
+    // A prior table with ONLY run/harvested/files carries no locally measured
+    // rows, so neither the advisory nor the unrecognized-shape warning should
+    // fire (a warning here would cry wolf on every routine re-harvest).
+    primeGreenRun();
+    harvestIo.readFileSync.mockReturnValue(
+      JSON.stringify({
+        __provenance: { run: '32621561241', harvested: '2026-08-23', files: 3188 },
+      }),
+    );
+    const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await runHarvester();
+
+    expect(
+      logs.mock.calls
+        .map(([line]) => String(line))
+        .find((l) => l.includes('locally measured rows')),
+    ).toBeUndefined();
+    expect(warns.mock.calls).toHaveLength(0);
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
   });
 });

@@ -63,6 +63,9 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/ui/server_i18n*.ts',
       'src/ui/talent_i18n*.ts',
       'src/ui/world_entity_i18n.ts',
+      // Transitively imported by the sim/server DICTs (tEntity), so its edits
+      // change scan output; a warm cache must not survive them.
+      'src/ui/entity_i18n.ts',
       'src/admin/i18n.en.ts',
       'src/admin/i18n.locales/**',
       'src/admin/i18n.ts',

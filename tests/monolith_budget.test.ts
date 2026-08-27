@@ -219,7 +219,13 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 18492,
+    // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
+    // base (18488) this file is +3: the bank-storage feature's own store and
+    // vault chrome wiring, a maintainer-authored raise taken deliberately (the
+    // earlier notes about merged-tree arithmetic described branch history that
+    // the squash rebased away). The review round itself paid its Escape-rung
+    // addition by merging duplicate imports. Exact count, zero slack.
+    ceiling: 18491,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -355,7 +361,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after CharacterState and PetState moved to the type-only
     // character_state.ts leaf. Persistence callers keep the sim.ts re-export,
     // while the coordinator no longer owns the JSONB schema declaration.
-    ceiling: 12363,
+    // LOWERED again at the PR #3670 review-fix round: the named-slot target
+    // fold moved to item_copy_ref.ts, paying for the bankWireRev field and its
+    // delegate plus the corrected vault-load comments. Exact count, zero slack.
+    ceiling: 12352,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -435,7 +444,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 10644 -> 10632 after the paid guild creation, bounded lazy-load,
     // guild mutation, ledger-prefix, and activity-log delivery coordinators
     // moved behind narrow sibling seams. Exact count, zero slack.
-    ceiling: 10632,
+    // LOWERED again at the PR #3670 review-fix round: the interest-candidate
+    // helpers moved to server/interest_candidates.ts and the sweep dueness
+    // logic landed in storage_purchases.ts, paying for the ledger breach-hook
+    // wiring and the event-relay filter. Exact count, zero slack.
+    ceiling: 10617,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -454,7 +467,13 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 5939,
+    // Re-derived at the PR #3670 review-fix round. Against the release/v0.41.0
+    // base (5855) this file is +66: the ClientWorld half of the new bank/vault
+    // IWorld members, thin wiring by design, a maintainer-authored raise (the
+    // earlier merged-tree notes described rebased-away history). The review
+    // round then LOWERED it from 5939 by folding the four self-key decode
+    // blocks into the bank_snapshot_wire sibling. Exact count, zero slack.
+    ceiling: 5921,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

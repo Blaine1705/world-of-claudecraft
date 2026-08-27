@@ -1758,6 +1758,10 @@ async function main() {
     );
     let storageFindings = [];
     if (storagePresent.rows[0]?.present) {
+      // status <> 'applied' has no serving index BY DECISION: closed rows are
+      // deleted from this table synchronously at resolve time (applied history
+      // lives in storage_purchase_applied_receipts), so it only ever holds
+      // open or stuck rows (small by construction), and this is operator-run.
       const purchases = await client.query(
         `SELECT id, realm, account_id, character_id, item_id, expected_cost_claudium,
                 idempotency_key, status, created_at, resolved_at
@@ -1774,6 +1778,7 @@ async function main() {
       // exact incident that caused the truncation, and an operator reading
       // "unresolved 3" during a mass-pending event would act on a number that
       // means "3 of the first 500 rows".
+      // Same deliberate index-free scan bound as the report query above.
       const totals = await client.query(
         `SELECT status, count(*)::int AS n
            FROM storage_purchases

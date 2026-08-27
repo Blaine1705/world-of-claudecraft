@@ -33,8 +33,10 @@ const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 // cold Vite module graph), and the class cards only get their box once the
 // procedural icons have rendered, which outlasts enterOfflineGame's 15s
 // default and fails every target at once with "Waiting for selector ...
-// mini-class". The two escape hatches and their raise-only interaction live
-// in lib/pr_shot_entry_opts.mjs (unit-pinned); defaults leave CI untouched.
+// mini-class". The two escape hatches, their raise-only interaction, and the
+// fixed 60s selector floor (a LOW NAV_TIMEOUT_MS shortens page loads, never
+// the selector wait) live in lib/pr_shot_entry_opts.mjs (unit-pinned);
+// defaults leave CI untouched.
 const { navTimeoutMs: NAV_TIMEOUT, selectorTimeoutMs: ENTRY_SELECTOR_TIMEOUT } =
   resolveEntryTimeouts(process.env);
 const ENTRY_PROBE_KEY = 'woc_entry_probe';

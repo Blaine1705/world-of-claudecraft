@@ -121,6 +121,7 @@
         "src/ui/server_i18n*.ts",
         "src/ui/talent_i18n*.ts",
         "src/ui/world_entity_i18n.ts",
+        "src/ui/entity_i18n.ts",
         "src/admin/i18n.en.ts",
         "src/admin/i18n.locales/**",
         "src/admin/i18n.ts",

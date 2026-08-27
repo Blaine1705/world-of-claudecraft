@@ -33,4 +33,13 @@ describe('pr_screenshots entry-timeout resolution', () => {
       selectorTimeoutMs: 120000,
     });
   });
+
+  it('a LOW NAV_TIMEOUT_MS shortens page loads but never sinks the 60s selector floor', () => {
+    // Without the explicit 60000 floor term, max(15000, 20000) resolved to
+    // 20000 and quietly dropped the selector wait under the CI budget.
+    expect(resolveEntryTimeouts({ NAV_TIMEOUT_MS: '20000' })).toEqual({
+      navTimeoutMs: 20000,
+      selectorTimeoutMs: 60000,
+    });
+  });
 });

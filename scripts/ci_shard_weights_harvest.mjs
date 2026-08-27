@@ -86,6 +86,20 @@ try {
     console.log(
       `[harvest] replacing ${files} locally measured rows from ${measured} with CI-harvested weights`,
     );
+  } else if (
+    provenance &&
+    typeof provenance === 'object' &&
+    Object.keys(provenance).some((k) => !['run', 'harvested', 'files'].includes(k))
+  ) {
+    // The provenance carries keys beyond this script's own plain-harvest
+    // output, but neither known local-merge shape parsed: a THIRD shape the
+    // advisory above cannot see. Say so instead of silently overwriting
+    // whatever locally measured rows that shape recorded.
+    console.warn(
+      `[harvest] unrecognized __provenance shape (keys: ${Object.keys(provenance).join(', ')}); ` +
+        'the prior table may carry locally measured rows this rewrite DISCARDS. Inspect the ' +
+        'old provenance before trusting the new table.',
+    );
   }
 } catch {
   // No prior table (or unreadable): nothing to report.
