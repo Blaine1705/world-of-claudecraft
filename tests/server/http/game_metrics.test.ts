@@ -33,6 +33,7 @@ import {
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
   WOC_COPPER_SPENT_TOTAL,
+  WOC_DB_BACKEND_CANCELS,
   WOC_DB_POOL_CLIENTS,
   WOC_ESCROW_GATE_IN_FLIGHT,
   WOC_ESCROW_QUEUE_TOTAL,
@@ -116,6 +117,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     }),
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
+    dbBackendCancels: () => ({ requested: 3, failed: 1 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,
@@ -388,6 +390,20 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_db_pool_clients\{state="total"\} (\d+)$/m)).toBe('7');
     expect(sampleValue(text, /^woc_db_pool_clients\{state="idle"\} (\d+)$/m)).toBe('4');
     expect(sampleValue(text, /^woc_db_pool_clients\{state="waiting"\} (\d+)$/m)).toBe('1');
+  });
+
+  it('exports the dedicated-side-pool backend cancel counts by measure', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+    expect(WOC_DB_BACKEND_CANCELS).toBe('woc_db_backend_cancels');
+    expect(text).toContain(`# TYPE ${WOC_DB_BACKEND_CANCELS} gauge`);
+    // The stub returns requested 3, failed 1: a rising requested rate is the
+    // wall-deadline saturation precursor, failed means even the sub-second
+    // cancel path could not reach PostgreSQL. Both must surface, and per
+    // dimension: a swap of the labels would misdirect an operator mid-incident.
+    expect(sampleValue(text, /^woc_db_backend_cancels\{measure="requested"\} (\d+)$/m)).toBe('3');
+    expect(sampleValue(text, /^woc_db_backend_cancels\{measure="failed"\} (\d+)$/m)).toBe('1');
   });
 
   it('exports bounded quota pool, listener, cache, call, and duration observability', async () => {
@@ -906,6 +922,11 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       // entry found the buyer's FIFO wedged past its deadline (the one
       // failure mode the FIFO close introduced, counted so never silent).
       'grant_busy',
+      // The background-gate starvation arm inside the FIFO job: the bounded
+      // majorBackgroundDbGate wait returned no permit, so the settled
+      // caller's background chain terminated without running. Counted
+      // because a saturated gate was otherwise invisible here.
+      'permit_refused',
     ]);
 
     // Scrape BEFORE any increment: prom counters cannot backfill, so a rate

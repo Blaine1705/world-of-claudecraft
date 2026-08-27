@@ -4389,6 +4389,7 @@ export const cs_CZ: EnTranslations = {
       "rename_not_permitted": "Přejmenování této postavy není povoleno.",
       "delete_confirm": "Pro potvrzení smazání napiš jméno postavy.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Postava už je ve světě.",
       "taken_over": "Tvoje postava byla převzata jinou relací.",
       "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",

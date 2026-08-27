@@ -4389,6 +4389,7 @@ export const es: EnTranslations = {
       "rename_not_permitted": "No se permite cambiar el nombre de este personaje.",
       "delete_confirm": "Escribe el nombre del personaje para confirmar la eliminación.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "El personaje ya está en el mundo.",
       "taken_over": "Otra sesión tomó el control de tu personaje.",
       "rename_required": "Este personaje debe cambiar de nombre antes de entrar al mundo.",

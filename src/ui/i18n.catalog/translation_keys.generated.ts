@@ -117,6 +117,7 @@ export type TranslationKeyFlat =
   | 'apiError.body.too_large'
   | 'apiError.body.unsupported_media_type'
   | 'apiError.character.already_in_world'
+  | 'apiError.character.delete_busy'
   | 'apiError.character.delete_confirm'
   | 'apiError.character.invalid_appearance'
   | 'apiError.character.invalid_class'

@@ -183,6 +183,7 @@ import {
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
+  cancelDetachedBackend,
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
@@ -2023,6 +2024,7 @@ export class GameServer {
         createPaidGuildWithLeaderAtomic(
           {
             pool,
+            cancelBackend: cancelDetachedBackend,
             bustGuildRoster: (guildId) => this.socialDb.bustGuildRoster(guildId),
           },
           args,

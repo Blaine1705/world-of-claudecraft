@@ -4389,6 +4389,7 @@ export const vi_VN: EnTranslations = {
       "rename_not_permitted": "Không được phép đổi tên nhân vật này.",
       "delete_confirm": "Nhập tên nhân vật để xác nhận xóa.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Nhân vật đã ở trong thế giới.",
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",

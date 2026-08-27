@@ -8685,6 +8685,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.character.delete_confirm': '삭제를 확인하려면 캐릭터 이름을 입력하세요.',
   'apiError.character.storage_purchase_open':
     '이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.',
+  'apiError.character.delete_busy': '서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.',
   'apiError.character.already_in_world': '캐릭터가 이미 세계에 있습니다.',
   'apiError.character.taken_over': '다른 세션이 캐릭터를 넘겨받았습니다.',
   'apiError.character.rename_required': '이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.',

@@ -131,6 +131,10 @@ export interface PaidGuildCreateDeps {
   /** Overrides the module-registered gate acquirer (unit worlds). Production
    * wiring goes through configurePaidGuildCreateBackgroundGate in main.ts. */
   readonly acquireBackgroundPermit?: PaidGuildAcquireBackgroundPermit;
+  /** Overrides the pool-derived deadline canceller: production wires db.ts's
+   * dedicated side-pool hook so an expiry cancel never rides the saturated
+   * main pool it exists to relieve. */
+  readonly cancelBackend?: (processId: number) => Promise<void>;
   /** PgSocialDb owns this instance-local cache, so its owner supplies the bust. */
   readonly bustGuildRoster: (guildId: number) => void;
   /** Cache invalidation must not replace a known durability result. */
@@ -378,7 +382,13 @@ async function readPaidGuildReceiptOnce(
       controller.abort();
       const aborted = new DbTransactionAborted(operation, false);
       try {
-        client.release(aborted);
+        // Plain release, never release(error): nothing ran on this client,
+        // the only established fact is that the CHECKOUT was slow. A truthy
+        // release makes pg-pool destroy the connection, so under contention
+        // the three attempts would destroy three healthy connections and
+        // force three fresh TCP+auth handshakes into the already contended
+        // pool.
+        client.release();
       } catch (releaseError) {
         reportCleanupError(deps, releaseError);
       }
@@ -390,9 +400,11 @@ async function readPaidGuildReceiptOnce(
         operation,
         timeoutMs: transactionBudgetMs,
         signal: controller.signal,
-        cancelBackend: deps.pool.query
-          ? backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })
-          : undefined,
+        cancelBackend:
+          deps.cancelBackend ??
+          (deps.pool.query
+            ? backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })
+            : undefined),
       });
       unownedClient = null;
     } catch (error) {
@@ -725,10 +737,14 @@ export async function createPaidGuildWithLeaderAtomic(
   try {
     const client = await acquirePaidGuildCreateClient(deps, input.signal);
     // Same lock-drop story as db.ts's beginSaveTx wrapper: a destroyed socket
-    // also cancels the backend so held locks drop early.
-    const cancelBackend = deps.pool.query
-      ? backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })
-      : undefined;
+    // also cancels the backend so held locks drop early. Production supplies
+    // deps.cancelBackend (the dedicated side-pool hook); the pool-derived
+    // form is the fallback for narrow test worlds.
+    const cancelBackend =
+      deps.cancelBackend ??
+      (deps.pool.query
+        ? backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })
+        : undefined);
     transaction = await beginCharacterSaveTx(
       client,
       'paid guild create',

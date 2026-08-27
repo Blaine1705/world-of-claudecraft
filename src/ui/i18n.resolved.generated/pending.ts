@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -107,6 +108,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "es_ES": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -204,6 +206,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "fr_FR": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -301,6 +304,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "fr_CA": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -399,6 +403,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -496,6 +501,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "de_DE": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -609,6 +615,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext"
   ],
   "pt_BR": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -710,6 +717,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext"
   ],
   "cs_CZ": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -807,6 +815,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "nl_NL": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -904,6 +913,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "pl_PL": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -1001,6 +1011,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "id_ID": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -1098,6 +1109,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "tr_TR": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -1195,6 +1207,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "sv_SE": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -1292,6 +1305,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "vi_VN": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",
@@ -1389,6 +1403,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.title"
   ],
   "da_DK": [
+    "apiError.character.delete_busy",
     "apiError.character.storage_purchase_open",
     "entities.items.burlap_reagent_pouch.name",
     "entities.items.duskweave_bag.name",

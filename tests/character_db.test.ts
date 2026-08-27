@@ -20,7 +20,9 @@ vi.mock('../server/admin_guilds_read', () => ({
 }));
 
 import {
+  CharacterDeleteQueueSaturated,
   CharacterStoragePurchaseOpen,
+  configureCharacterDeleteBackgroundGate,
   DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
 } from '../server/character_delete_db';
 import { CHARACTER_SAVE_STATEMENT_TIMEOUT_MS } from '../server/character_save_transaction';
@@ -278,6 +280,58 @@ describe('deleteCharacter', () => {
     expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
     expect(client.release).toHaveBeenCalledOnce();
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+  });
+
+  it('composes under the registered background gate: permit before checkout, released after the client', async () => {
+    const client = deleteClient();
+    const order: string[] = [];
+    const release = vi.fn(() => order.push('permit_released'));
+    const acquire = vi.fn(async () => {
+      order.push('permit_acquired');
+      return { release };
+    });
+    dbMock.connect.mockImplementationOnce(async () => {
+      order.push('connect');
+      return client;
+    });
+    configureCharacterDeleteBackgroundGate(acquire);
+    try {
+      expect(await deleteCharacter(7, 42)).toBe(true);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    // Gate-then-checkout, and the permit outlives the client (the
+    // clientWithPermit lifetime contract from the paid-guild sibling).
+    expect(order).toEqual(['permit_acquired', 'connect', 'permit_released']);
+    expect(client.release).toHaveBeenCalledOnce();
+  });
+
+  it('refuses promptly with a retryable saturation error when the gate has no permit, touching no pool client', async () => {
+    const acquire = vi.fn(async () => null);
+    configureCharacterDeleteBackgroundGate(acquire);
+    try {
+      await expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: CharacterDeleteQueueSaturated.name,
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+        characterId: 42,
+      });
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    expect(dbMock.connect).not.toHaveBeenCalled();
+    expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+  });
+
+  it('releases the permit when the checkout itself rejects', async () => {
+    const release = vi.fn();
+    configureCharacterDeleteBackgroundGate(async () => ({ release }));
+    dbMock.connect.mockRejectedValueOnce(new Error('pool exhausted'));
+    try {
+      await expect(deleteCharacter(7, 42)).rejects.toThrow('pool exhausted');
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
+    }
+    expect(release).toHaveBeenCalledOnce();
   });
 });
 
@@ -1058,7 +1112,10 @@ describe('save-backend cancel wiring (db.ts and character_delete_db.ts source pi
     const { readFileSync } = await import('node:fs');
     const { stripComments } = await import('./helpers/strip_comments');
     const src = stripComments(readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8'));
-    expect(src).toContain('const cancelSaveBackend = backendCancelViaPool(pool);');
+    // The dedicated canceller, never backendCancelViaPool(pool): an expiry
+    // cancel fires exactly when the main pool is the saturated thing.
+    expect(src).toContain('const cancelSaveBackend = cancelDetachedBackend;');
+    expect(src).not.toContain('backendCancelViaPool(pool)');
     expect(src).toContain('beginCharacterSaveTx(c, op, s, cancelSaveBackend);');
     // Exactly one direct call: the wrapper. A new save path calling
     // beginCharacterSaveTx directly would bypass the cancel wiring.
@@ -1072,6 +1129,13 @@ describe('save-backend cancel wiring (db.ts and character_delete_db.ts source pi
     const src = stripComments(
       readFileSync(new URL('../server/character_delete_db.ts', import.meta.url), 'utf8'),
     );
-    expect(src).toContain('cancelBackend: db.query ? backendCancelViaPool(');
+    expect(src).toContain('db.cancelBackend ??');
+    expect(src).toContain('(db.query ? backendCancelViaPool(');
+    // db.ts hands the delete its dedicated side-pool canceller, so the
+    // pool-derived fallback only serves narrow test worlds.
+    const dbSrc = stripComments(readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8'));
+    expect(dbSrc).toContain(
+      '{ connect: () => pool.connect(), cancelBackend: cancelDetachedBackend }',
+    );
   });
 });

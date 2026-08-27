@@ -820,7 +820,11 @@ For off-box safety, sync the directory to S3 occasionally:
   and rejects loudly outside that), never straight to the ceiling, and keep the budget
   arithmetic in view. Every realm sharing one `DATABASE_URL` has the main pool plus a
   two-client general-chat quota pool and one dedicated quota `LISTEN` client, so steady
-  state is `realms x (DB_POOL_MAX_CLIENTS + 2 + 1)`. That total must stay below the 97
+  state is `realms x (DB_POOL_MAX_CLIENTS + 2 + 1)`. Each realm also carries a max-1
+  deadline-cancel side pool (`woc_db_backend_cancels` counts its use) that opens a
+  connection only in the seconds after a transaction wall deadline fires and releases
+  it on the driver's idle timeout; count it as one more TRANSIENT connection per realm
+  under load, alongside the boot clients below. That total must stay below the 97
   usable connections on stock `postgres:16` (`max_connections` 100, 3
   superuser-reserved) with room left for tooling. Eight realms at the default are
   already 104 steady connections and cannot fit. Boot temporarily adds a dedicated

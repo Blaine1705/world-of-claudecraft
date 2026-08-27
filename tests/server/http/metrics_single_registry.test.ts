@@ -57,6 +57,7 @@ function stubSource(): GameStateSource {
     }),
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
+    dbBackendCancels: () => ({ requested: 0, failed: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,

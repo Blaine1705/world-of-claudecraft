@@ -4389,6 +4389,7 @@ export const zh_TW: EnTranslations = {
       "rename_not_permitted": "不允許為此角色更名。",
       "delete_confirm": "輸入角色名稱以確認刪除。",
       "storage_purchase_open": "此儲物空間購買必須完成或解決後，才能刪除該角色。",
+      "delete_busy": "伺服器繁忙，請稍後再嘗試刪除該角色。",
       "already_in_world": "角色已在世界中。",
       "taken_over": "你的角色已被另一個工作階段接管。",
       "rename_required": "此角色必須先更名才能進入世界。",

@@ -4389,6 +4389,7 @@ export const tr_TR: EnTranslations = {
       "rename_not_permitted": "Bu karakterin yeniden adlandırılmasına izin verilmiyor.",
       "delete_confirm": "Silmeyi onaylamak için karakter adını yazın.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Karakter zaten dünyada.",
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
       "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",

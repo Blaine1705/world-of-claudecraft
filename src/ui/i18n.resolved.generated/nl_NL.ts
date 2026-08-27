@@ -4389,6 +4389,7 @@ export const nl_NL: EnTranslations = {
       "rename_not_permitted": "Dit personage hernoemen is niet toegestaan.",
       "delete_confirm": "Typ de personagenaam om de verwijdering te bevestigen.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Personage is al in de wereld.",
       "taken_over": "Je personage is overgenomen door een andere sessie.",
       "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",

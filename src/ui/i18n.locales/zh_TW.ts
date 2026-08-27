@@ -8342,6 +8342,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.character.rename_not_permitted': '不允許為此角色更名。',
   'apiError.character.delete_confirm': '輸入角色名稱以確認刪除。',
   'apiError.character.storage_purchase_open': '此儲物空間購買必須完成或解決後，才能刪除該角色。',
+  'apiError.character.delete_busy': '伺服器繁忙，請稍後再嘗試刪除該角色。',
   'apiError.character.already_in_world': '角色已在世界中。',
   'apiError.character.taken_over': '你的角色已被另一個工作階段接管。',
   'apiError.character.rename_required': '此角色必須先更名才能進入世界。',

@@ -4389,6 +4389,7 @@ export const sv_SE: EnTranslations = {
       "rename_not_permitted": "Det är inte tillåtet att byta namn på denna karaktär.",
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
       "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
       "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",

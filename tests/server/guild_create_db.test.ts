@@ -1295,13 +1295,14 @@ describe('createPaidGuildWithLeaderAtomic', () => {
         feeBatchKey: 'ledger:guild-create',
       });
       // No transaction was opened on the budgetless client: no BEGIN, no
-      // bounds, no SELECT. It was released promptly as a retryable abort.
+      // bounds, no SELECT. It was released promptly as a retryable abort, and
+      // released PLAIN: nothing ran on the client, only the checkout was
+      // slow, so a truthy release would make pg-pool destroy a healthy
+      // connection and force a fresh TCP+auth handshake into the already
+      // contended pool, once per starved attempt.
       expect(slowCheckoutReceipt.queries).toEqual([]);
       expect(slowCheckoutReceipt.release).toHaveBeenCalledTimes(1);
-      expect(slowCheckoutReceipt.release.mock.calls[0]?.[0]).toMatchObject({
-        name: 'DbTransactionAborted',
-        commitMayHaveSucceeded: false,
-      });
+      expect(slowCheckoutReceipt.release).toHaveBeenCalledWith();
       expect(provingReceipt.queries.map((query) => query.kind)).toEqual([
         'begin',
         'bounds',
@@ -1324,10 +1325,16 @@ describe('backend cancel wiring (source pins)', () => {
     );
     // The receipt-reconcile deadline and the create transaction both cancel the
     // backend when the deadline destroys the socket, so held locks drop early.
-    // The pool type is connect-only for narrow fakes, so the wiring guards on
-    // the optional query capability before building the cancel hook.
-    expect(src).toContain('cancelBackend: deps.pool.query');
+    // Production supplies deps.cancelBackend (db.ts's dedicated side-pool
+    // hook, wired in game.ts, so an expiry cancel never rides the saturated
+    // main pool); the pool-derived form is the guarded fallback for narrow
+    // connect-only test worlds.
+    expect(src.split('deps.cancelBackend ??').length - 1).toBe(2);
     expect(src).toContain('backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })');
+    const gameSrc = stripComments(
+      readFileSync(new URL('../../server/game.ts', import.meta.url), 'utf8'),
+    );
+    expect(gameSrc).toContain('cancelBackend: cancelDetachedBackend,');
     expect(src).toMatch(
       /beginCharacterSaveTx\(\s*client,\s*'paid guild create',\s*input\.signal,\s*cancelBackend,?\s*\)/,
     );

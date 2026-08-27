@@ -104,6 +104,12 @@ export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
  *  family (a regression in its rate shows up here first in production). */
 export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
 
+/** Lifetime deadline-expiry backend cancels through the dedicated side pool,
+ *  by measure (requested/failed). A rising requested rate means transactions
+ *  are hitting their wall deadlines (the saturation precursor); failures mean
+ *  even the sub-second cancel path could not reach PostgreSQL. */
+export const WOC_DB_BACKEND_CANCELS = 'woc_db_backend_cancels';
+
 /** Character-save FIFO keys with a queued or running write (the per-character
  *  serial writer's live map size). The escrow write-path rider's gauge. The
  *  alert threshold is SUSTAINED values above the autosave wave's own
@@ -327,6 +333,8 @@ export interface GameStateSource {
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
   dbPool(): { total: number; idle: number; waiting: number };
+  /** Lifetime detached-backend cancel attempts/failures (the side-pool hook). */
+  dbBackendCancels(): { requested: number; failed: number };
   generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
   generalChatQuotaInFlight(): number;
   generalChatQuotaCachedAccounts(): number;
@@ -495,6 +503,18 @@ export function registerGameStateMetrics(
       this.set({ state: 'total' }, p.total);
       this.set({ state: 'idle' }, p.idle);
       this.set({ state: 'waiting' }, p.waiting);
+    },
+  });
+
+  new Gauge({
+    name: WOC_DB_BACKEND_CANCELS,
+    help: 'Lifetime deadline-expiry backend cancels through the dedicated side pool, by measure (requested, failed). Rising requested means transactions are hitting wall deadlines; failed means the sub-second cancel path could not reach PostgreSQL.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const cancels = source.dbBackendCancels();
+      this.set({ measure: 'requested' }, cancels.requested);
+      this.set({ measure: 'failed' }, cancels.failed);
     },
   });
 
@@ -689,7 +709,7 @@ export function registerGameStateMetrics(
 
   const wocEscrowQueue = new Counter({
     name: WOC_ESCROW_QUEUE_TOTAL,
-    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO custody entries (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed, realm_refused, settled, grant_busy), by kind.',
+    help: 'Marketplace escrow-queue outcomes on the per-character save FIFO custody entries (started, deadline_refused, depth_refused, books_dirty_refused, flush_failed, realm_refused, settled, grant_busy, permit_refused), by kind.',
     labelNames: ['kind'],
     registers: [registry],
   });

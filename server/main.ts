@@ -149,6 +149,7 @@ import {
   characterCountsByRealm,
   charactersForDeedsBoard,
   chatMuteStatusForAccount,
+  closeBackendCancelPool,
   closeOrphanSessions,
   createAccount,
   createCharacterCapped,
@@ -160,6 +161,7 @@ import {
   findAccount,
   findCharacterReportTargetByName,
   getAccountsCount,
+  getBackendCancelCounts,
   getCharacter,
   getCharacterById,
   getCharactersCount,
@@ -247,6 +249,7 @@ import {
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { guildBankLogCacheStats } from './guild_bank_log';
+import { configureCharacterDeleteBackgroundGate } from './character_delete_db';
 import { configurePaidGuildCreateBackgroundGate } from './guild_create_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
@@ -558,6 +561,10 @@ const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS);
 // reconciliation) ride the SAME major-producer gate: game.ts builds the deps,
 // so the composition root registers the acquirer here (one gate instance).
 configurePaidGuildCreateBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal));
+// The character-delete cascade (a 65s wall over the two keep-forever ledger
+// tables) composes under the same realm background gate, so concurrent deletes
+// of ledger-heavy characters can never hold most of the pool at once.
+configureCharacterDeleteBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal));
 function liveGame(): GameServer {
   // LISTEN uses its own dedicated connection and quota consumes use their own
   // max-two pool. The coordinator cap equals that pool exactly, so it creates
@@ -2960,6 +2967,9 @@ const wocMarketService = new WocMarketService({
             AbortSignal.timeout(WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS),
           );
           if (!permit) {
+            // Counted: a saturated background gate refusing escrow work was
+            // otherwise invisible next to its counted refusal siblings.
+            gameMetricsCounters().wocEscrowQueue('permit_refused');
             throw new Error('woc escrow refused: no background database permit');
           }
           try {
@@ -3731,6 +3741,7 @@ export async function startServer(): Promise<http.Server> {
       idle: Number(pool.idleCount) || 0,
       waiting: Number(pool.waitingCount) || 0,
     }),
+    dbBackendCancels: () => getBackendCancelCounts(),
     generalChatQuotaInFlight: () => game.generalChatQuotaInFlight(),
     generalChatQuotaCachedAccounts: () => game.generalChatQuotaCachedAccounts(),
     generalChatQuotaDbPool: () => generalChatQuotaDbPoolState(),
@@ -4144,6 +4155,7 @@ export async function startServer(): Promise<http.Server> {
     await game.parseCapture.stop();
     await game.chatLog.stop();
     await closeGeneralChatQuotaPool();
+    await closeBackendCancelPool();
     await pool.end();
     process.exit(0);
   };

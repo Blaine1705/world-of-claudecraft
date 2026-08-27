@@ -186,7 +186,11 @@ export type GuildBankIncident = (typeof GUILD_BANK_INCIDENTS)[number];
  *  'grant_busy' is the delivered-save twin's head-of-line park (the
  *  bounded grant entry found the buyer's FIFO wedged past the deadline and
  *  the delivery row parked): the one failure mode the FIFO close
- *  introduced, counted so it is never silent. */
+ *  introduced, counted so it is never silent.
+ *  'permit_refused' is the background-gate starvation arm inside the FIFO
+ *  job (the bounded majorBackgroundDbGate wait returned no permit): realm
+ *  background-DB saturation seen from the escrow chain, counted because a
+ *  saturated gate is otherwise invisible next to its counted siblings. */
 export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'started',
   'deadline_refused',
@@ -196,6 +200,7 @@ export const WOC_ESCROW_QUEUE_OUTCOMES = [
   'realm_refused',
   'settled',
   'grant_busy',
+  'permit_refused',
 ] as const;
 export type WocEscrowQueueOutcome = (typeof WOC_ESCROW_QUEUE_OUTCOMES)[number];
 

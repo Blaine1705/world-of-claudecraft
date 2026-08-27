@@ -31,11 +31,77 @@ export class CharacterStoragePurchaseOpen extends Error {
   }
 }
 
+/** Retryable refusal: the realm's background-DB gate had no permit inside the
+ * bounded wait, so the delete never took a pool client. */
+export class CharacterDeleteQueueSaturated extends Error {
+  readonly code = 'CHARACTER_DELETE_QUEUE_SATURATED' as const;
+
+  constructor(readonly characterId: number) {
+    super(`character ${characterId} delete refused: background database gate saturated`);
+    this.name = 'CharacterDeleteQueueSaturated';
+  }
+}
+
+export interface CharacterDeleteBackgroundPermit {
+  release(): void;
+}
+
+export type CharacterDeleteAcquireBackgroundPermit = (
+  signal: AbortSignal,
+) => Promise<CharacterDeleteBackgroundPermit | null>;
+
+/** Same bounded wait as the paid-guild sibling: past it the player retries. */
+export const CHARACTER_DELETE_PERMIT_WAIT_MS = 15_000;
+
+let registeredAcquireBackgroundPermit: CharacterDeleteAcquireBackgroundPermit | null = null;
+
+/** main.ts registers the realm's one major-background gate here at boot, the
+ * configurePaidGuildCreateBackgroundGate pattern; null unregisters (tests). */
+export function configureCharacterDeleteBackgroundGate(
+  acquire: CharacterDeleteAcquireBackgroundPermit | null,
+): void {
+  registeredAcquireBackgroundPermit = acquire;
+}
+
 export interface CharacterDeletePool {
   connect(): Promise<DbTransactionDeadlineClient>;
   /** Optional so narrow fakes stay valid; with it, a deadline that destroys the
    * socket also fires pg_cancel_backend so the cascade's locks drop early. */
   query?(sql: string, values: unknown[]): Promise<unknown>;
+  /** Overrides the pool-derived canceller: db.ts wires its dedicated,
+   * side-pool-backed hook so an expiry cancel never rides the saturated main
+   * pool it exists to relieve. */
+  cancelBackend?(processId: number): Promise<void>;
+}
+
+/**
+ * Gate-then-checkout, the paid-guild-creation shape: a 65s wall over a 60s
+ * DELETE bound can hold a pool client for a minute on a player-reachable
+ * route, so a handful of concurrent deletes of ledger-heavy characters would
+ * otherwise hold most of the 10-client pool while holding accounts/characters
+ * row locks. Acquiring a major-background permit BEFORE the checkout composes
+ * the delete under the realm's one background gate instead. A null permit is
+ * a prompt retryable refusal that never touched the pool.
+ */
+async function acquireCharacterDeletePermit(
+  characterId: number,
+  signal: AbortSignal | undefined,
+): Promise<CharacterDeleteBackgroundPermit | null> {
+  const acquirePermit = registeredAcquireBackgroundPermit;
+  if (!acquirePermit) return null;
+  const waitController = new AbortController();
+  const waitTimer = setTimeout(() => waitController.abort(), CHARACTER_DELETE_PERMIT_WAIT_MS);
+  waitTimer.unref();
+  let permit: CharacterDeleteBackgroundPermit | null;
+  try {
+    permit = await acquirePermit(
+      signal ? AbortSignal.any([signal, waitController.signal]) : waitController.signal,
+    );
+  } finally {
+    clearTimeout(waitTimer);
+  }
+  if (!permit) throw new CharacterDeleteQueueSaturated(characterId);
+  return permit;
 }
 
 /**
@@ -49,12 +115,21 @@ export async function deleteOwnedCharacterRow(
   realm: string,
   signal?: AbortSignal,
 ): Promise<boolean> {
-  const client = await db.connect();
+  const permit = await acquireCharacterDeletePermit(characterId, signal);
+  let client: DbTransactionDeadlineClient;
+  try {
+    client = await db.connect();
+  } catch (error) {
+    permit?.release();
+    throw error;
+  }
   const transaction = createDbTransactionDeadline(client, {
     operation: 'character delete',
     timeoutMs: CHARACTER_DELETE_TRANSACTION_TIMEOUT_MS,
     signal,
-    cancelBackend: db.query ? backendCancelViaPool({ query: db.query.bind(db) }) : undefined,
+    cancelBackend:
+      db.cancelBackend ??
+      (db.query ? backendCancelViaPool({ query: db.query.bind(db) }) : undefined),
   });
   try {
     await transaction.query('BEGIN');
@@ -119,6 +194,12 @@ export async function deleteOwnedCharacterRow(
     await transaction.rollback();
     throw error;
   } finally {
-    transaction.release();
+    // Permit release AFTER the transaction returns its client: its lifetime
+    // covers the whole pool hold, the clientWithPermit contract.
+    try {
+      transaction.release();
+    } finally {
+      permit?.release();
+    }
   }
 }
