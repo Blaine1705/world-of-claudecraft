@@ -544,6 +544,13 @@ pieces, which is also where tanks pick up their threat Hit.
 
 ### The sets
 
+UNDER REDESIGN (2026-08-28): the maintainer-directed adversarial review
+(docs/prd/ignivar-set-bonus-review.md) verified all 58 bonuses below
+against the live sim and refuted most of them; 7 survive as designed.
+Do not implement from these tables until the rewrite lands; the review
+doc carries the per-bonus verdicts and the author's checklist every
+replacement must clear.
+
 Settled by the maintainer (2026-08-27): every bonus hooks the spec's
 UNDERLYING ENGINE (its rotation loop, resource bank, or signature
 mechanic, as implemented by the spec's combat module), never raw stats.
