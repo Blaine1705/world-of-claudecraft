@@ -1437,6 +1437,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '高コントラスト背景',
   'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
   'hudChrome.options.showReliquaryTracker': '聖遺物庫トラッカーを表示',
+  'hudChrome.options.confirmVendorSell': '売却前に確認する',
+  'hudChrome.options.confirmVendorSellNote':
+    'オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',

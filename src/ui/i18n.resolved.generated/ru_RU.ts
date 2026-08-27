@@ -1537,6 +1537,8 @@ export const ru_RU: EnTranslations = {
       "stickyTarget": "Сохранять цель при клике по земле",
       "showItemLevel": "Показывать уровень предмета",
       "showReliquaryTracker": "Показывать список Реликвария",
+      "confirmVendorSell": "Подтверждать продажу",
+      "confirmVendorSellNote": "Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",

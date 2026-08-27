@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "es_ES": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "fr_FR": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "fr_CA": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "de_DE": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "nl_NL": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "pl_PL": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "id_ID": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "tr_TR": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "sv_SE": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "vi_VN": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ],
+  "da_DK": [
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote"
+  ]
 };

@@ -9363,6 +9363,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.clickFeedback'
   | 'hudChrome.options.clickMoveLeft'
   | 'hudChrome.options.clickMoveRight'
+  | 'hudChrome.options.confirmVendorSell'
+  | 'hudChrome.options.confirmVendorSellNote'
   | 'hudChrome.options.discordPresence'
   | 'hudChrome.options.discordPresenceNote'
   | 'hudChrome.options.footstepSounds'

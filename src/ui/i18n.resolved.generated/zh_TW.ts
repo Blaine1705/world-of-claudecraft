@@ -1537,6 +1537,8 @@ export const zh_TW: EnTranslations = {
       "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "showReliquaryTracker": "顯示聖物庫追蹤器",
+      "confirmVendorSell": "出售前確認",
+      "confirmVendorSellNote": "關閉後，出售物品只需單擊即可完成，不再確認；如果背包格位發生變化，可能會賣錯物品。",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",

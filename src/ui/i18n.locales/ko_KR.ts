@@ -1433,6 +1433,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '고대비 배경',
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showReliquaryTracker': '성물고 추적기 표시',
+  'hudChrome.options.confirmVendorSell': '판매 전 확인',
+  'hudChrome.options.confirmVendorSellNote':
+    '이 설정을 끄면 확인 없이 한 번의 클릭으로 아이템을 판매하므로, 가방 칸이 바뀌면 잘못된 아이템이 팔릴 수 있습니다.',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
   'hudChrome.options.hideUnusedActionSlots': '사용하지 않는 행동 칸 숨기기',
