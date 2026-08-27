@@ -1543,6 +1543,8 @@ export const es_ES: EnTranslations = {
       "stickyTarget": "Mantener objetivo al hacer clic en el suelo",
       "showItemLevel": "Mostrar nivel de objeto",
       "showReliquaryTracker": "Mostrar rastreador de relicarios",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",

@@ -1446,6 +1446,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '高对比度背景',
   'hudChrome.options.showItemLevel': '显示物品等级',
   'hudChrome.options.showReliquaryTracker': '显示圣物库追踪器',
+  'hudChrome.options.confirmVendorSell': '出售前确认',
+  'hudChrome.options.confirmVendorSellNote':
+    '关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showThirdActionBar': '显示第三动作条',
   'hudChrome.options.hideUnusedActionSlots': '隐藏未使用的动作栏位',

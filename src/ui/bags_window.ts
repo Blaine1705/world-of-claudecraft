@@ -237,6 +237,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dragState: ItemDragState;
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
+  /** The confirmVendorSell setting (on by default): whether a vendor sale of
+   *  anything beyond true junk (vendorSellIsInstant) should confirm first.
+   *  False restores the classic one-click instant sale for every item. */
+  confirmVendorSell(): boolean;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
    *  the drag advertises where it can land. Cleared on every drag teardown. */
   markEquipDropTargets(itemId: string | null): void;
@@ -1761,7 +1765,15 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    // The confirmVendorSell setting folds into the same instant gate
+    // vendorSellIsInstant already uses: turning it off (a player accepting the
+    // risk in exchange for speed) treats every item as instant for
+    // CONFIRMATION purposes, restoring the classic one-click sale. HOW MUCH
+    // sells is still decided below exactly as it already is for true junk
+    // (one unit on a plain click, the whole stack on ctrl/meta).
+    const instant =
+      !this.deps.confirmVendorSell() ||
+      vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -1784,6 +1796,15 @@ export class BagsWindow {
       // The prompt's cap is every copy of this item across the whole bag, not just
       // the ONE slot that was clicked: a stackable item's per-slot count tops out at
       // its stackSize (commonly 20), so a player holding more sits in other slots.
+      const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+      this.showSellQuantityPrompt(slot.itemId, heldTotal);
+    } else if (!instant && count > 1) {
+      // Mirrors the ctrl-click arm above: a plain click on a STACK (not true
+      // junk) used to confirm exactly ONE unit per click (showSellConfirmPrompt
+      // never took a quantity), so clearing a whole stack demanded one prompt
+      // PER UNIT. Route through the same bulk quantity prompt instead, so a
+      // single confirmation covers the whole stack (or whatever amount the
+      // player edits it down to).
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else if (!instant) {
@@ -1902,7 +1923,10 @@ export class BagsWindow {
     input.min = '1';
     input.max = String(maxCount);
     input.step = '1';
-    input.value = '1';
+    // Defaults to the FULL held amount (a stray click on the confirm button
+    // sells the whole stack, the obvious intent of clearing it out), still
+    // editable down for anyone who wants to keep some.
+    input.value = String(maxCount);
     const confirm = document.createElement('button');
     confirm.className = 'btn';
     confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');

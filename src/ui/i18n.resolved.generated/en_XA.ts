@@ -1543,6 +1543,8 @@ export const en_XA: EnTranslations = {
       "stickyTarget": "[Ķééþ Ţáŕĝéţ óñ Ĝŕóúñð Çļíçķ]",
       "showItemLevel": "[Šĥóŵ Íţéɱ Ļéʋéļ]",
       "showReliquaryTracker": "[Šĥóŵ Ŕéļíɋúáŕý Ţŕáçķéŕ]",
+      "confirmVendorSell": "[Çóñƒíŕɱ Ɓéƒóŕé Šéļļíñĝ]",
+      "confirmVendorSellNote": "[Ţúŕñíñĝ ţĥíš óƒƒ šéļļš íţéɱš ŵíţĥ á šíñĝļé çļíçķ áñð ñó çóñƒíŕɱáţíóñ, šó á šĥíƒţéð ƀáĝ šļóţ çóúļð ʋéñðóŕ ţĥé ŵŕóñĝ íţéɱ.]",
       "itemLevelLine": "[Íţéɱ Ļéʋéļ {level}]",
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",

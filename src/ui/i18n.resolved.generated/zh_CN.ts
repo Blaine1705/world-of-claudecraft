@@ -1543,6 +1543,8 @@ export const zh_CN: EnTranslations = {
       "stickyTarget": "点击地面时保留目标",
       "showItemLevel": "显示物品等级",
       "showReliquaryTracker": "显示圣物库追踪器",
+      "confirmVendorSell": "出售前确认",
+      "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",

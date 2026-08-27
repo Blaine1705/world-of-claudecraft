@@ -1509,6 +1509,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': 'Фон высокой контрастности',
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showReliquaryTracker': 'Показывать список Реликвария',
+  'hudChrome.options.confirmVendorSell': 'Подтверждать продажу',
+  'hudChrome.options.confirmVendorSellNote':
+    'Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
   'hudChrome.options.hideUnusedActionSlots': 'Скрыть неиспользуемые ячейки действий',

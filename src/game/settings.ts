@@ -472,6 +472,13 @@ export const BOOL_SETTINGS = {
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
+  // on by default (the safety net from the enchanted-offhand-vanishes report,
+  // #3547): a vendor sale of anything beyond true junk (see vendorSellIsInstant
+  // in bags_view.ts) opens a confirm prompt first, since an unhinted bag stack
+  // can shift position between clicks. Off restores the classic one-click
+  // instant sale for every item, for a player who would rather trade that
+  // safety net for speed.
+  confirmVendorSell: { def: true },
   // on by default (today's behavior, unchanged out of the box): mirrors the desktop
   // shell's GPU preference store, whose stored field is the INVERSE opt-out. The
   // shell asks the OS for the dedicated gaming GPU at launch; a MUXless laptop panel

@@ -1448,6 +1448,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '高對比度背景',
   'hudChrome.options.showItemLevel': '顯示物品等級',
   'hudChrome.options.showReliquaryTracker': '顯示聖物庫追蹤器',
+  'hudChrome.options.confirmVendorSell': '出售前確認',
+  'hudChrome.options.confirmVendorSellNote':
+    '關閉後，出售物品只需單擊即可完成，不再確認；如果背包格位發生變化，可能會賣錯物品。',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
   'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',

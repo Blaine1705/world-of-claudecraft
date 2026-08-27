@@ -9402,6 +9402,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.clickMoveLeft'
   | 'hudChrome.options.clickMoveRight'
   | 'hudChrome.options.combineActionBars'
+  | 'hudChrome.options.confirmVendorSell'
+  | 'hudChrome.options.confirmVendorSellNote'
   | 'hudChrome.options.discordPresence'
   | 'hudChrome.options.discordPresenceNote'
   | 'hudChrome.options.footstepSounds'
