@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "79b5aba1",
+      "state": "bbd2a76e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,6 +95,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 13,
           "hp": 54,
           "id": 993,
           "kind": "player",
@@ -141,7 +142,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "843dc8aa",
+      "state": "153843ff",
       "events": "d31a54d7",
       "rng": {
         "draws": 2,
@@ -152,7 +153,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 999,
-      "state": "3a9b32c0",
+      "state": "de9b4cd7",
       "events": "157651c9",
       "rng": {
         "draws": 2,
@@ -163,7 +164,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 999,
-      "state": "06268b45",
+      "state": "7691c42e",
       "events": "cf64783f",
       "rng": {
         "draws": 136,
@@ -174,7 +175,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 999,
-      "state": "f8c8e7a5",
+      "state": "7a37eb02",
       "events": "b173b5fe",
       "rng": {
         "draws": 304,
@@ -185,7 +186,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 999,
-      "state": "09003205",
+      "state": "cd6c32fe",
       "events": "093a6bd1",
       "rng": {
         "draws": 507,
@@ -196,7 +197,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 999,
-      "state": "1cf477c6",
+      "state": "063481c7",
       "events": "eb7c6bb0",
       "rng": {
         "draws": 714,
@@ -207,7 +208,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 999,
-      "state": "84cdad33",
+      "state": "74acf0a6",
       "events": "741638a5",
       "rng": {
         "draws": 797,
@@ -314,6 +315,7 @@
           "fallStartY": 7.996591,
           "fiveSecondRule": 1.55,
           "gcdRemaining": 0.7,
+          "healPower": 26,
           "hp": 49984,
           "id": 993,
           "inCombat": true,

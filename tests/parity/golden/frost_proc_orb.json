@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "79b5aba1",
+      "state": "bbd2a76e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -96,6 +96,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 13,
           "hp": 54,
           "id": 993,
           "kind": "player",
@@ -142,7 +143,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "22dc0d66",
+      "state": "739fccb8",
       "events": "f90bcfb8",
       "rng": {
         "draws": 1,
@@ -153,7 +154,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 999,
-      "state": "ea91094b",
+      "state": "b9fd4d87",
       "events": "e9f6f385",
       "rng": {
         "draws": 2,
@@ -164,7 +165,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 999,
-      "state": "20326560",
+      "state": "bb4cf996",
       "events": "c31eb739",
       "rng": {
         "draws": 150,
@@ -175,7 +176,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 999,
-      "state": "b27110a2",
+      "state": "59a51e12",
       "events": "cde0c785",
       "rng": {
         "draws": 316,
@@ -186,7 +187,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 999,
-      "state": "77b01079",
+      "state": "da11ba55",
       "events": "18ec9a8a",
       "rng": {
         "draws": 356,
@@ -325,6 +326,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -2,
           "fiveSecondRule": 0.25,
+          "healPower": 41,
           "hp": 418,
           "id": 993,
           "inCombat": true,
@@ -444,7 +446,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 999,
-      "state": "77b01079",
+      "state": "da11ba55",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -583,6 +585,7 @@
           "dodgeChance": 0.056,
           "fallStartY": -2,
           "fiveSecondRule": 0.25,
+          "healPower": 41,
           "hp": 418,
           "id": 993,
           "inCombat": true,

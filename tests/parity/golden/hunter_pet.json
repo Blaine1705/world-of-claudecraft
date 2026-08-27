@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 998,
-      "state": "8249773b",
+      "state": "15fcc3c5",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -90,6 +90,7 @@
           "dodgeChance": 0.0625,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 7,
           "hp": 69,
           "id": 993,
           "kind": "player",
@@ -137,7 +138,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1001,
-      "state": "b6ee23d0",
+      "state": "2755b336",
       "events": "484cf07b",
       "rng": {
         "draws": 10,
@@ -148,7 +149,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1001,
-      "state": "b80ae89d",
+      "state": "d382fe8b",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -159,7 +160,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1001,
-      "state": "b038caf9",
+      "state": "17c54353",
       "events": "254b16e7",
       "rng": {
         "draws": 174,
@@ -170,7 +171,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1001,
-      "state": "74fe1d60",
+      "state": "03af5e3a",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -181,7 +182,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1001,
-      "state": "08b7e023",
+      "state": "78f86919",
       "events": "81ac8d33",
       "rng": {
         "draws": 533,
@@ -192,7 +193,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1001,
-      "state": "832eb746",
+      "state": "ac193fdc",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -203,7 +204,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1001,
-      "state": "832eb746",
+      "state": "ac193fdc",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -303,6 +304,7 @@
           "dodgeChance": 0.079,
           "fallStartY": -2,
           "fiveSecondRule": 105,
+          "healPower": 12,
           "hp": 49949,
           "id": 993,
           "inCombat": true,

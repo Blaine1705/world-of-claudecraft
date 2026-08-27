@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 999,
-      "state": "1105dfd0",
+      "state": "28874955",
       "events": "2e9cd542",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 999,
-      "state": "44afc2fb",
+      "state": "91a74bcc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 999,
-      "state": "e7f4a8f1",
+      "state": "9e0c0baa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 999,
-      "state": "f8b6786a",
+      "state": "a220eb17",
       "events": "7f81a8b0",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 999,
-      "state": "3f73a985",
+      "state": "64da235e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 999,
-      "state": "259aa214",
+      "state": "128a0511",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 999,
-      "state": "25d30a4c",
+      "state": "f806ef31",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 999,
-      "state": "b05658d1",
+      "state": "0f5a84da",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 999,
-      "state": "a3311dd8",
+      "state": "51854cfd",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -271,6 +271,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 5.203283,
           "fiveSecondRule": 101.05,
+          "healPower": 5,
           "hp": 100,
           "id": 997,
           "kind": "player",
@@ -321,6 +322,7 @@
           "dodgeChance": 0.056,
           "fallStartY": 5.203283,
           "fiveSecondRule": 101.05,
+          "healPower": 13,
           "hp": 54,
           "id": 998,
           "kind": "player",
