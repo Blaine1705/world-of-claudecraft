@@ -3412,7 +3412,7 @@ async function startGame(
         };
       },
     };
-    attachWocMarketExchange({
+    void attachWocMarketExchange({
       hud,
       api,
       online,

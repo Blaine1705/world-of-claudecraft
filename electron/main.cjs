@@ -949,6 +949,16 @@ ipcMain.handle('desktop-wallet-capability', (event) => {
   return walletConnectionSupported(desktopConfig);
 });
 
+// The $WOC Exchange may attach only in the website-distributed shell. Steam
+// and Epic builds, and any build without an explicit website stamp, answer
+// false so no Exchange UI exists there at all (desktop_config.cjs owns the
+// decision; the renderer gate in src/game/woc_market_wiring.ts fails closed
+// on a false, missing, or failing answer).
+ipcMain.handle('desktop-exchange-capability', (event) => {
+  if (!trustedSender(event)) return false;
+  return desktopConfig.wocExchangeEnabled === true;
+});
+
 ipcMain.handle('desktop-login-open-browser', (event) => {
   if (!trustedSender(event)) return null;
   openDesktopLogin();

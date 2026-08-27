@@ -653,13 +653,22 @@ product exist. Coding and merge stay dark-safe without those credentials.
    `apiOrigin` channel (`updateChannel: latest`). Steam and Epic channels: confirm
    the log says the updater is disabled and no update network traffic occurs
    (SteamPipe / BPT own patches).
-6. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
+6. $WOC Exchange gating: on the website channel, an online character with a
+   linked wallet sees the Exchange launcher (server `WOC_MARKET_ENABLED=1`);
+   on the Steam and Epic channels no Exchange UI exists anywhere (no launcher,
+   no menu entry, no trade-window $WOC arm), even with a linked wallet, since
+   tradeable-token functionality violates both stores' terms. The gate is the
+   `desktop-exchange-capability` IPC over the distribution stamp
+   (`electron/desktop_config.cjs` `wocExchangeSupported`, consumed by
+   `src/game/woc_market_wiring.ts`); a build with an absent or unknown stamp
+   must behave like a store build.
+7. Crash surfaces: `kill -SEGV <renderer pid>` THREE times within a minute (a
    task-manager "end task" is classified as a benign `killed` exit and does not
    trigger recovery). The first two SEGVs each produce a log entry and a bounded
    auto-reload; the third reaches the localized Reload/Quit dialog (the auto-
    reload budget is 2 per 60s, electron/diagnostics.cjs). Each SEGV lands a
    minidump in crashDumps.
-7. `npm test` green at the built commit; `tests/electron_*.test.ts` cover the
+8. `npm test` green at the built commit; `tests/electron_*.test.ts` cover the
    shell's pure logic.
 
 ## Version pinning
