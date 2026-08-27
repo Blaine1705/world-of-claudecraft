@@ -135,8 +135,8 @@ describe('Affliction Warlock', () => {
     );
     expect(ABILITIES.maledict_gaze.passive).toBe(true);
     expect(at(7)).toContain('cursed_accomplice');
-    expect(at(6)).not.toContain('drain_life');
-    expect(at(7)).toContain('drain_life');
+    expect(at(5)).not.toContain('drain_life');
+    expect(at(6)).toContain('drain_life');
     expect(at(7)).not.toContain('searing_pain');
     expect(at(7)).not.toContain('litany_of_guilt');
     expect(at(8)).toContain('litany_of_guilt');
