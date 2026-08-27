@@ -340,7 +340,7 @@ const MONOLITHS: MonolithRow[] = [
     // zero slack.
     // the ember coast tables extracted to content/ember_coast.ts (the
     // vale_coast.ts pattern); the Forgefather's Isle cone rode the freed room
-    ceiling: 5313,
+    ceiling: 5309,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

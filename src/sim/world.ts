@@ -2261,10 +2261,6 @@ export const EMBER_VOLCANOES = [
   // its crater pool) to the seabed after every shaping pass
   { x: 487, z: 2356, r: 32, h: 18, craterR: 7, craterD: 7 },
   { x: 318, z: 2392, r: 30, h: 14, craterR: 0, craterD: 0 },
-  // the Forgefather's Isle cone (the Ignivar raid entrance): peak set
-  // northwest so the southeast face slopes down toward the gate forecourt
-  // and the bridge strait
-  { x: 214, z: 2254, r: 22, h: 15, craterR: 4, craterD: 4 },
 ] as const;
 // the Snowline crossing's drake-side footing (appended to the ember lobes
 // below via EMBER_GATE_LOBES; the fire road to the ice)

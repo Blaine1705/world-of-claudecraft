@@ -1,3 +1,5 @@
+import type { HeightStamp } from '../types';
+
 // The Drakelands' coast tables: the metaball land lobes and carved bays
 // world.ts's ember coast applier builds its landness fields from (see the
 // banner comment above applyEmberCoast there). Data-as-code, extracted from
@@ -40,21 +42,51 @@ export const EMBER_LAND_LOBES = [
   { x: 242, z: 1858, r: 46 }, // the cap's shore joining the Gatewood...
   { x: 264, z: 1908, r: 44 }, // ...so no channel runs behind it to the sound
   { x: 492, z: 2390, r: 48 }, // the Goldmelt Water's east cap, waste side
-  // The Forgefather's Isle: the Ignivar raid entrance rises in the western
-  // cove (docs/design/ignivar-entrance/plan.md), a volcanic islet the
-  // owner's bridge asset will span from the Bloodglass shore.
-  { x: 214, z: 2256, r: 26 }, // the isle's volcanic body
-  { x: 205, z: 2271, r: 15 }, // ...its west shoulder
-  { x: 216, z: 2242, r: 12 }, // ...its southwest face, held against the cove
-  { x: 218, z: 2268, r: 12 }, // ...the north tip's beach ramp (bank gradient)
+  // The Forgefather's Isle: the Ignivar raid entrance rises off the
+  // Trollmoot coast (high x renders WEST on the world map), a terraced
+  // volcanic islet the owner's bridge asset will span from the mainland
+  // (docs/design/ignivar-entrance/plan.md). The fortress tier plateaus
+  // are stamped by FORGEFATHER_ISLE_TERRAIN_EDITS below.
+  { x: 511, z: 2218, r: 25 }, // the isle's body
+  { x: 508, z: 2240, r: 15 }, // ...its north shoulder (the summit's footing,
+  // wide enough that the high tiers' rims run out on dry ground)
+  { x: 517, z: 2201, r: 12 }, // ...its south shoulder (the bridgehead beach)
+  { x: 522, z: 2214, r: 10 }, // ...the east beach ramp (bank gradient)
+  { x: 518, z: 2230, r: 10 }, // ...the northeast beach ramp (bank gradient)
+  { x: 503, z: 2212, r: 14 }, // ...the west shoulder, stretched so the
+  // bridgehead beach climbs gently out of the strait (bank gradient)
 ] as const;
 export const EMBER_BAYS = [
   { x: 195, z: 1980, r: 50 }, // the west bight
-  { x: 535, z: 2180, r: 55 }, // the east reach
-  { x: 198, z: 2224, r: 36 }, // a western cove under the spur (pulled
-  // northwest so the Forgefather's Isle escapes its suppression)
-  // the Forgefather's Strait: keeps the isle an island (the bridge's
-  // water), the second eye severing the shelf's land bridge to the south
-  { x: 242, z: 2260, r: 14 },
-  { x: 236, z: 2238, r: 14 },
+  // the east reach, drawn north of its old eye so its suppression frees
+  // the Forgefather's Isle water while still carving the coast above
+  { x: 538, z: 2162, r: 46 },
+  { x: 205, z: 2230, r: 40 }, // a western cove under the spur
+  // the Forgefather's Strait: pulls the Trollmoot coast inland so the
+  // isle stands offshore (the bridge's water)
+  { x: 488, z: 2212, r: 18 },
 ] as const;
+
+/** The Forgefather's Isle fortress tiers: flat build plateaus with smooth
+ *  approach ramps (the quay-pad idiom, stacked). Each tier's centre drifts
+ *  north of the one below, so every tier keeps a broad south-facing
+ *  crescent of flat ground and the mountain climbs away from the strait:
+ *  bridgehead onto tier one, switchbacks up the south faces. Applied over
+ *  the isle lobes; the raid entrance slice furnishes them. */
+export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
+  // the bridgehead terrace: level the strait-side landing to a low dry
+  // beach first (3.3 over the waterline, above the coast sweep's
+  // shore-rooted band), so the climb onto tier one starts from exempt
+  // ground and the approach band's own steps stay small
+  { x: 501, z: 2210, radius: 14, delta: -1, falloff: 'smooth', mode: 'level' },
+  // ...and the northeast landing's twin, under the high tiers' seaward rims
+  { x: 516, z: 2232, radius: 10, delta: -1, falloff: 'smooth', mode: 'level' },
+  { x: 511, z: 2212, radius: 17, delta: 2, falloff: 'smooth', mode: 'level' },
+  { x: 511, z: 2212, radius: 12, delta: 2, falloff: 'flat', mode: 'level' },
+  { x: 509, z: 2221, radius: 15, delta: 6.5, falloff: 'smooth', mode: 'level' },
+  { x: 509, z: 2221, radius: 9.5, delta: 6.5, falloff: 'flat', mode: 'level' },
+  { x: 506, z: 2229, radius: 10.5, delta: 11, falloff: 'smooth', mode: 'level' },
+  { x: 506, z: 2229, radius: 6, delta: 11, falloff: 'flat', mode: 'level' },
+  { x: 504, z: 2236, radius: 6.5, delta: 15, falloff: 'smooth', mode: 'level' },
+  { x: 504, z: 2236, radius: 3, delta: 15, falloff: 'flat', mode: 'level' },
+];
