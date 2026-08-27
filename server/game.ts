@@ -9820,20 +9820,34 @@ export class GameServer {
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
     const suppressedInvites = this.suppressBlockedSocialInvites(events);
+    // vaultCraftConsume is server-side evidence only, with no client consumer
+    // since the reservation journal replaced the observer (see
+    // emitVaultCraftConsume): filter the batch ONCE before serialization, so
+    // consumer-less events are never JSON.stringify'd just to be skipped by
+    // every recipient. DELIBERATE side effect this filter shares with the
+    // per-session skip it replaces: vaultCraftConsume never reaches
+    // botDetector.observeEvent either; the detector reads player-visible
+    // behavior, and this event is duplicate server-side evidence of a craft
+    // the detector already observes through the craft command itself. The
+    // some() guard keeps the common no-craft tick allocation-free.
+    const routableEvents = events.some((ev) => ev.type === 'vaultCraftConsume')
+      ? events.filter((ev) => ev.type !== 'vaultCraftConsume')
+      : events;
     // Serialize each event exactly once for the whole batch (after the flair stamp
     // above, so the fragment carries the final wire shape). Every recipient's frame is
-    // then assembled by joining the fragments it selects, index-aligned with `events`,
-    // instead of re-stringifying a per-session { t:'events', list } object. Byte-for-byte
+    // then assembled by joining the fragments it selects, index-aligned with
+    // `routableEvents`, instead of re-stringifying a per-session { t:'events', list }
+    // object. Byte-for-byte
     // identical to the old per-session JSON.stringify; only the fan-out cost changes.
     // INVARIANT: nothing in the per-session loop below may mutate a SimEvent after this
     // point, or a recipient's fragment would stop matching its event. The one in-loop
     // visitor that takes `ev` is botDetector.observeEvent, an observer that writes the
     // tracking context and never the event; the once-per-batch flair stamp above is the
     // only event mutation and correctly precedes this serialization.
-    const fragments = serializeEventFragments(events);
+    const fragments = serializeEventFragments(routableEvents);
     // Resolved once per batch, applied per session below against that session's
     // ANCHOR pid (so a spectator watching a fighter refreshes with them).
-    const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
+    const bgRespawnRefresh = this.bgRespawnRefreshPids(routableEvents);
     // A pet acts for its owner, so combat-event delivery resolves each side to
     // its controller before comparing against the viewer or viewer party.
     const ownerOf = (entityId: number): number | null =>
@@ -9859,11 +9873,8 @@ export class GameServer {
         if (bgRespawnRefresh?.has(anchorPid)) session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
-        for (let i = 0; i < events.length; i++) {
-          const ev = events[i];
-          // Server-side evidence only, no client consumer since the reservation
-          // journal replaced the observer (see emitVaultCraftConsume): never relay.
-          if (ev.type === 'vaultCraftConsume') continue;
+        for (let i = 0; i < routableEvents.length; i++) {
+          const ev = routableEvents[i];
           if (suppressedInvites?.has(ev)) continue;
           if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) continue;
           // ignore list: drop chat originating from a character this player has

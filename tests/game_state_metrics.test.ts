@@ -132,6 +132,7 @@ function sourceOver(server: GameServer): GameStateSource {
     tickPhaseMillis: () => server.tickPhaseMillis(),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     dbBackendCancels: () => ({ requested: 0, failed: 0 }),
+    bankLedgerTail: () => ({ depth: 0, droppedRows: 0 }),
     generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     generalChatQuotaInFlight: () => server.generalChatQuotaInFlight(),
     generalChatQuotaCachedAccounts: () => server.generalChatQuotaCachedAccounts(),

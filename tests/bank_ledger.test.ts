@@ -19,7 +19,14 @@ vi.mock('../server/db', () => ({
   insertBankLedgerRows: vi.fn(async () => {}),
 }));
 
-import { bankLedgerIdle, diffBankOp, diffBankSocketOp, recordBankOp } from '../server/bank_ledger';
+import {
+  BANK_LEDGER_TAIL_MAX_DEPTH,
+  bankLedgerIdle,
+  bankLedgerTailStats,
+  diffBankOp,
+  diffBankSocketOp,
+  recordBankOp,
+} from '../server/bank_ledger';
 import { BankLedgerGrowthLimitExceeded } from '../server/bank_ledger_growth_budget';
 import { insertBankLedgerRow, insertBankLedgerRows, saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
@@ -826,6 +833,58 @@ describe('diffVaultOp (pure)', () => {
     expect(diffVaultOp('deposit', null, vinfo({ copper_ore: 1 }))).toEqual([]);
     expect(diffVaultOp('withdraw', vinfo({ copper_ore: 1 }), null)).toEqual([]);
     expect(diffVaultOp('buy_slots', null, null)).toEqual([]);
+  });
+});
+
+describe('the bounded insert FIFO (tail cap)', () => {
+  beforeEach(async () => {
+    await bankLedgerIdle();
+    insertMock.mockClear();
+  });
+
+  it('admits to the cap, drops and counts past it, and recovers after a drain', async () => {
+    const baselineDropped = bankLedgerTailStats().droppedRows;
+    let release!: () => void;
+    // Wedge the chain: the first insert stays pending, so every later insert
+    // queues behind it and depth grows while no db call resolves.
+    insertMock.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const who = { characterId: 42, accountId: 7 };
+    const deposit = () =>
+      recordBankOp('deposit', who, info([]), info([{ itemId: 'wolf_fang', count: 1 }]));
+    for (let i = 0; i < BANK_LEDGER_TAIL_MAX_DEPTH; i++) deposit();
+    expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
+
+    // Past the cap the op is dropped, counted in ROWS (the audit's unit), and
+    // the depth stays pinned instead of growing without bound.
+    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      deposit();
+      expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 1);
+      expect(errs).toHaveBeenCalledTimes(1);
+      expect(String(errs.mock.calls[0][0])).toContain('cap');
+    } finally {
+      errs.mockRestore();
+    }
+
+    // Releasing the wedge drains the whole backlog and the FIFO recovers:
+    // depth returns to zero and a new op is admitted and actually writes.
+    // (One microtask turn first: the wedge insert runs off the chain's .then,
+    // so `release` is only assigned once the chain head has executed.)
+    await Promise.resolve();
+    release();
+    await bankLedgerIdle();
+    expect(bankLedgerTailStats().depth).toBe(0);
+    deposit();
+    await bankLedgerIdle();
+    expect(bankLedgerTailStats().depth).toBe(0);
+    expect(insertMock).toHaveBeenCalledTimes(BANK_LEDGER_TAIL_MAX_DEPTH + 1);
+    expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 1);
   });
 });
 

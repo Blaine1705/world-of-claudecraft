@@ -183,6 +183,11 @@ export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
 export const WOC_VAULT_LEDGER_INCIDENTS_TOTAL = 'woc_vault_ledger_incidents_total';
 export const WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL = 'woc_bank_vault_realm_row_breaches_total';
 
+/** The per-process bank-ledger insert FIFO, by measure: live depth against
+ *  its cap, and lifetime rows dropped AT the cap (each dropped row is a
+ *  counted audit hole, the same hole a rejected insert leaves). */
+export const WOC_BANK_LEDGER_TAIL = 'woc_bank_ledger_tail';
+
 /** Marketplace escrow-queue outcomes (the listing entry on the per-character
  *  save FIFO), by kind. */
 export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
@@ -335,6 +340,8 @@ export interface GameStateSource {
   dbPool(): { total: number; idle: number; waiting: number };
   /** Lifetime detached-backend cancel attempts/failures (the side-pool hook). */
   dbBackendCancels(): { requested: number; failed: number };
+  /** Bank-ledger insert FIFO: live depth plus lifetime cap-dropped rows. */
+  bankLedgerTail(): { depth: number; droppedRows: number };
   generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
   generalChatQuotaInFlight(): number;
   generalChatQuotaCachedAccounts(): number;
@@ -503,6 +510,18 @@ export function registerGameStateMetrics(
       this.set({ state: 'total' }, p.total);
       this.set({ state: 'idle' }, p.idle);
       this.set({ state: 'waiting' }, p.waiting);
+    },
+  });
+
+  new Gauge({
+    name: WOC_BANK_LEDGER_TAIL,
+    help: 'Per-process bank-ledger insert FIFO by measure: depth is the live queue against its cap, dropped_rows is lifetime audit rows dropped at the cap (alert on any increase; each is a counted audit hole).',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const tail = source.bankLedgerTail();
+      this.set({ measure: 'depth' }, tail.depth);
+      this.set({ measure: 'dropped_rows' }, tail.droppedRows);
     },
   });
 

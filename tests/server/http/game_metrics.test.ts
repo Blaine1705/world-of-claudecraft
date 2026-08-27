@@ -33,6 +33,7 @@ import {
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
   WOC_COPPER_SPENT_TOTAL,
+  WOC_BANK_LEDGER_TAIL,
   WOC_DB_BACKEND_CANCELS,
   WOC_DB_POOL_CLIENTS,
   WOC_ESCROW_GATE_IN_FLIGHT,
@@ -118,6 +119,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     dbBackendCancels: () => ({ requested: 3, failed: 1 }),
+    bankLedgerTail: () => ({ depth: 12, droppedRows: 5 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,
@@ -390,6 +392,19 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_db_pool_clients\{state="total"\} (\d+)$/m)).toBe('7');
     expect(sampleValue(text, /^woc_db_pool_clients\{state="idle"\} (\d+)$/m)).toBe('4');
     expect(sampleValue(text, /^woc_db_pool_clients\{state="waiting"\} (\d+)$/m)).toBe('1');
+  });
+
+  it('exports the bank-ledger insert FIFO depth and cap-dropped rows by measure', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+    expect(WOC_BANK_LEDGER_TAIL).toBe('woc_bank_ledger_tail');
+    expect(text).toContain(`# TYPE ${WOC_BANK_LEDGER_TAIL} gauge`);
+    // The stub returns depth 12, dropped 5. Depth is the live backlog against
+    // the cap; dropped_rows only ever rises and each unit is an audit hole,
+    // so the two must surface as distinct labeled samples.
+    expect(sampleValue(text, /^woc_bank_ledger_tail\{measure="depth"\} (\d+)$/m)).toBe('12');
+    expect(sampleValue(text, /^woc_bank_ledger_tail\{measure="dropped_rows"\} (\d+)$/m)).toBe('5');
   });
 
   it('exports the dedicated-side-pool backend cancel counts by measure', async () => {

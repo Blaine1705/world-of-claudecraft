@@ -306,7 +306,12 @@ function debitRealmRows(
     state.breaches++;
     state.onBreach?.();
   }
-  state.rowTokens -= maxRows;
+  // Floor clamp at one burst width: this bucket is telemetry only, so one
+  // large event must depress it by at most a burst rather than driving it far
+  // negative and pinning the breach signal for hours, which would destroy the
+  // rate the conversion exists to report. (The matching refill clamps only
+  // the ceiling.)
+  state.rowTokens = Math.max(state.rowTokens - maxRows, -BANK_VAULT_LEDGER_REALM_ROW_BURST);
   return { maxRows, settled: false };
 }
 

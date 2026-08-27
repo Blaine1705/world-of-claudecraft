@@ -220,6 +220,65 @@ export function diffBankOp(
 // in order; a rejected insert is caught (logged) and the chain continues.
 let tail: Promise<void> = Promise.resolve();
 
+// The tail's depth bound. Inflow scales with connected-account count (the
+// per-account bucket admits 4 rows/s EACH) while the drain is one serialized
+// insert chain, so a busy realm could otherwise grow the tail without bound
+// until the 10s shutdown drain (BANK_LEDGER_SHUTDOWN_DRAIN_MS) cannot settle
+// and silently abandons the whole backlog. 2,000 pending inserts drains
+// inside that window at a conservative 200 inserts/s, so the cap trades a
+// COUNTED, VISIBLE drop under sustained overload for the silent wholesale
+// drop at shutdown. Depth counts queued insert operations (each 1..N rows);
+// the drop counter sizes holes in ROWS, the audit's own unit.
+export const BANK_LEDGER_TAIL_MAX_DEPTH = 2_000;
+let tailDepth = 0;
+let tailDroppedRows = 0;
+const TAIL_DROP_LOG_LIMIT = 5;
+let tailDropLogged = 0;
+
+/** Live depth and lifetime dropped rows of the insert FIFO (ops + metrics). */
+export function bankLedgerTailStats(): { depth: number; droppedRows: number } {
+  return { depth: tailDepth, droppedRows: tailDroppedRows };
+}
+
+/** Chain one insert onto the FIFO when the depth cap admits it. Returns false
+ *  on a cap drop (counted here in rows, logged under the shared latch idiom);
+ *  the call site then does its own audit-hole accounting, exactly as it would
+ *  for a rejected insert. onError must never throw; it is guarded anyway. */
+function enqueueOnTail(
+  rowCount: number,
+  run: () => Promise<void>,
+  onError: (err: unknown) => void,
+): boolean {
+  if (tailDepth >= BANK_LEDGER_TAIL_MAX_DEPTH) {
+    tailDroppedRows += rowCount;
+    if (tailDropLogged < TAIL_DROP_LOG_LIMIT) {
+      tailDropLogged += 1;
+      console.error(
+        `bank_ledger insert FIFO is at its ${BANK_LEDGER_TAIL_MAX_DEPTH}-insert cap: dropped ${rowCount} audit row(s)${
+          tailDropLogged === TAIL_DROP_LOG_LIMIT
+            ? ' (further drops are counted only, see woc_bank_ledger_tail{measure="dropped_rows"})'
+            : ''
+        }`,
+      );
+    }
+    return false;
+  }
+  tailDepth += 1;
+  tail = tail
+    .then(run)
+    .catch((err) => {
+      try {
+        onError(err);
+      } catch {
+        // A throwing error handler must never break the FIFO chain.
+      }
+    })
+    .finally(() => {
+      tailDepth -= 1;
+    });
+  return true;
+}
+
 // Log budget for the unstamped-delta detector below. The metric counts every
 // occurrence; the log prints the first few and then stops, so a write site that
 // forgot to stamp cannot flood a process's stderr for its whole uptime.
@@ -272,14 +331,16 @@ export function recordBankOp(
 ): void {
   try {
     for (const row of buildPersonalBankLedgerRows(op, who, before, after, opts)) {
-      tail = tail
-        .then(() => insertBankLedgerRow(row))
-        .catch((err) => {
+      enqueueOnTail(
+        1,
+        () => insertBankLedgerRow(row),
+        (err) => {
           countBankLedgerGrowthRefusal(err);
           if (shouldLogBankLedgerWriteFailure(err)) {
             console.error('bank_ledger write failed:', err);
           }
-        });
+        },
+      );
     }
   } catch (err) {
     // The observer must never fault the dispatch path.
@@ -414,14 +475,16 @@ export function recordBankSocketOp(
   try {
     const rows = buildBankSocketLedgerRows(who, before, after);
     if (rows.length === 0) return;
-    tail = tail
-      .then(() => insertBankLedgerRows(rows))
-      .catch((err) => {
+    enqueueOnTail(
+      rows.length,
+      () => insertBankLedgerRows(rows),
+      (err) => {
         countBankLedgerGrowthRefusal(err);
         if (shouldLogBankLedgerWriteFailure(err)) {
           console.error('bank_ledger write failed:', err);
         }
-      });
+      },
+    );
   } catch (err) {
     // The observer must never fault the dispatch path.
     console.error('bank_ledger recordBankSocketOp failed:', err);
@@ -661,9 +724,10 @@ export function recordVaultOp(
   try {
     const rows = buildVaultLedgerRows(op, who, before, after);
     if (rows.length === 0) return;
-    tail = tail
-      .then(() => insertBankLedgerRows(rows))
-      .catch((err) => {
+    const admitted = enqueueOnTail(
+      rows.length,
+      () => insertBankLedgerRows(rows),
+      (err) => {
         countBankLedgerGrowthRefusal(err);
         // A rejected insert is a HOLE in the keep-forever audit trail: the
         // op happened in the live vault but scripts/bank_audit.mjs can never
@@ -681,7 +745,15 @@ export function recordVaultOp(
         if (shouldLogBankLedgerWriteFailure(err)) {
           console.error(`bank_ledger vault write failed for character ${who.characterId}:`, err);
         }
-      });
+      },
+    );
+    // A cap drop is the same audit hole a rejected insert is; size it the
+    // same way so the incident series never under-reads sustained overload.
+    if (!admitted) {
+      for (let i = 0; i < rows.length; i++) {
+        gameMetricsCounters().vaultLedgerIncident('ledger_write_failed');
+      }
+    }
   } catch (err) {
     // The observer must never fault the dispatch path. This arm counts ONE
     // incident, not per-row: a synchronous throw here means the diff itself
@@ -971,9 +1043,10 @@ export function recordGuildBankDeltas(
           );
         }
       }
-      tail = tail
-        .then(() => insertBankLedgerRow(row))
-        .catch((err) => {
+      const admitted = enqueueOnTail(
+        1,
+        () => insertBankLedgerRow(row),
+        (err) => {
           countBankLedgerGrowthRefusal(err);
           // A rejected insert is a HOLE in the keep-forever audit trail: the
           // op happened in the live book but scripts/bank_audit.mjs can never
@@ -983,7 +1056,10 @@ export function recordGuildBankDeltas(
           if (shouldLogBankLedgerWriteFailure(err)) {
             console.error('bank_ledger guild write failed:', err);
           }
-        });
+        },
+      );
+      // A cap drop is the same audit hole a rejected insert is.
+      if (!admitted) gameMetricsCounters().guildBankIncident('ledger_write_failed');
     }
   } catch (err) {
     // The observer must never fault the dispatch path.

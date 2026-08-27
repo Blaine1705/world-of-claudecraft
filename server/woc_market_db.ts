@@ -23,6 +23,7 @@ import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
 import { bankLedgerGrowthLimitFromError } from './bank_ledger_growth_budget';
 import { lockCharacterSaveAccountParentOnClient } from './bank_ledger_save_effects_db';
+import { bankLedgerSaveEffects } from './bank_ledger_session';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
 import type {
   CharacterSaveArgs,
@@ -1498,7 +1499,10 @@ export class PgWocMarketDb implements WocMarketDb {
           save.state,
           save.leaseNonce,
           save.storageEffects,
-          save.bankLedgerSnapshot,
+          // Normalized through the one snapshot-to-effects seam (the
+          // paid_guild_creation shape), never the raw snapshot: the empty
+          // case collapses to undefined HERE, not inside the save.
+          save.bankLedgerSnapshot ? bankLedgerSaveEffects(save.bankLedgerSnapshot) : undefined,
           accountLock,
         );
         if (!saved) {
@@ -2703,7 +2707,9 @@ export class PgWocMarketDb implements WocMarketDb {
         save.state,
         save.leaseNonce,
         save.storageEffects,
-        save.bankLedgerSnapshot,
+        // Same normalization as the listing save above (the
+        // paid_guild_creation shape).
+        save.bankLedgerSnapshot ? bankLedgerSaveEffects(save.bankLedgerSnapshot) : undefined,
       );
       if (!saved) throw new TxAbort('lease_lost' as const);
       const booked = await client.query(

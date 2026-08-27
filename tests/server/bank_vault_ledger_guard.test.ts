@@ -191,6 +191,26 @@ describe('bank and vault retained-ledger guard', () => {
     expect(coordinator.snapshot().realmRowBreaches).toBe(1);
   });
 
+  it('floor-clamps the telemetry bucket at one burst width so a flood cannot pin the signal', () => {
+    const coordinator = createBankVaultLedgerGuardCoordinator(() => 0);
+    const fullSweep = Array.from({ length: 112 }, () => row);
+    // Six accounts sweep inside one second: unclamped, the debits would drive
+    // the bucket to -430 and the recovery (8 rows/s) would take most of a
+    // minute per extra sweep, pinning the breach counter long after the flood
+    // ended and destroying the rate signal the conversion exists to provide.
+    for (let account = 1; account <= 6; account++) {
+      const runtime = coordinator.createRuntime(account, fakeAdmission().admission, vi.fn());
+      expect(runtime.admission.tryReserve(112, 0, 'vault')?.commit(fullSweep)).toBe(true);
+    }
+    // 242 -> 130 -> 18 -> -94 -> -206 -> clamp(-242) -> clamp(-242): the
+    // floor is one burst width (the realm burst, 242), and every shortfall
+    // event still counts its own breach (sweeps 3 through 6).
+    expect(coordinator.snapshot()).toMatchObject({
+      realmRowTokens: -242,
+      realmRowBreaches: 4,
+    });
+  });
+
   it('refills the telemetry realm budget at exactly eight rows per second, negative included', () => {
     let now = 0;
     const coordinator = createBankVaultLedgerGuardCoordinator(() => now);

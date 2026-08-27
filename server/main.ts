@@ -98,7 +98,11 @@ import {
 import { configureAuthRuntime } from './auth_routes';
 import { createBackgroundDbGate } from './background_db_gate';
 import { computeBankBonus } from './bank_entitlements';
-import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle } from './bank_ledger';
+import {
+  BANK_LEDGER_SHUTDOWN_DRAIN_MS,
+  bankLedgerIdle,
+  bankLedgerTailStats,
+} from './bank_ledger';
 import { createBankLedgerGrowthMonitor } from './bank_ledger_growth_monitor';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import {
@@ -3742,6 +3746,7 @@ export async function startServer(): Promise<http.Server> {
       waiting: Number(pool.waitingCount) || 0,
     }),
     dbBackendCancels: () => getBackendCancelCounts(),
+    bankLedgerTail: () => bankLedgerTailStats(),
     generalChatQuotaInFlight: () => game.generalChatQuotaInFlight(),
     generalChatQuotaCachedAccounts: () => game.generalChatQuotaCachedAccounts(),
     generalChatQuotaDbPool: () => generalChatQuotaDbPoolState(),
