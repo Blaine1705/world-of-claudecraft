@@ -232,6 +232,33 @@ function countBankLedgerGrowthRefusal(error: unknown): void {
   }
 }
 
+// Log budget for growth-ceiling refusals, ONE latch shared across the five
+// insert arms below: once the database-wide ceiling refuses, every later
+// insert on paths that fire per bank op and per craft tick fails the same
+// way, so an unbounded console.error would flood stderr for the rest of the
+// process's uptime. Same idiom as UNSTAMPED_LOG_LIMIT above: the first few
+// lines identify the condition, then the counters carry the rest
+// (woc_bank_ledger_growth_limit_refusals_total plus the per-domain incident
+// series). Non-refusal errors keep unbounded logging: each one is
+// individually meaningful, not a standing condition.
+const GROWTH_REFUSAL_LOG_LIMIT = 5;
+let growthRefusalLogged = 0;
+
+/** True when the arm should still print its console.error for this failure.
+ *  Consumes one unit of the shared budget for a growth-ceiling refusal and
+ *  appends the counted-only notice on the last budgeted line. */
+function shouldLogBankLedgerWriteFailure(error: unknown): boolean {
+  if (!(error instanceof BankLedgerGrowthLimitExceeded)) return true;
+  if (growthRefusalLogged >= GROWTH_REFUSAL_LOG_LIMIT) return false;
+  growthRefusalLogged += 1;
+  if (growthRefusalLogged === GROWTH_REFUSAL_LOG_LIMIT) {
+    console.error(
+      'bank_ledger growth-limit refusals reached the log budget: further refusals are counted only (woc_bank_ledger_growth_limit_refusals_total)',
+    );
+  }
+  return true;
+}
+
 // Record a successful bank op fire-and-forget. Computes the diff and enqueues one
 // insert per element onto the FIFO tail. Returns void immediately (never a promise,
 // never awaited by the game loop); the whole body is guarded so it can never throw
@@ -249,7 +276,9 @@ export function recordBankOp(
         .then(() => insertBankLedgerRow(row))
         .catch((err) => {
           countBankLedgerGrowthRefusal(err);
-          console.error('bank_ledger write failed:', err);
+          if (shouldLogBankLedgerWriteFailure(err)) {
+            console.error('bank_ledger write failed:', err);
+          }
         });
     }
   } catch (err) {
@@ -389,7 +418,9 @@ export function recordBankSocketOp(
       .then(() => insertBankLedgerRows(rows))
       .catch((err) => {
         countBankLedgerGrowthRefusal(err);
-        console.error('bank_ledger write failed:', err);
+        if (shouldLogBankLedgerWriteFailure(err)) {
+          console.error('bank_ledger write failed:', err);
+        }
       });
   } catch (err) {
     // The observer must never fault the dispatch path.
@@ -647,7 +678,9 @@ export function recordVaultOp(
         // Name the character here because the metric never does (character id
         // is unbounded, so it is banned as a label): this line IS the
         // identifying detail the counter's docblock promises an operator.
-        console.error(`bank_ledger vault write failed for character ${who.characterId}:`, err);
+        if (shouldLogBankLedgerWriteFailure(err)) {
+          console.error(`bank_ledger vault write failed for character ${who.characterId}:`, err);
+        }
       });
   } catch (err) {
     // The observer must never fault the dispatch path. This arm counts ONE
@@ -686,33 +719,28 @@ export function buildVaultLedgerRows(
 // Vault craft-consumption rows (Bank Storage Phase 04). Craft-from-vault
 // consumes stock inside the sim at CAST COMPLETION, several ticks after the
 // craft_item dispatch, so there is no dispatch bracket to diff across and the
-// recordVaultOp shape above cannot apply. This recorder is the EVENT-DRIVEN
-// sibling instead (the server/deeds_records.ts precedent: the bank_ledger
-// runtime shape minus the diffing): the sim emits a personal
-// 'vaultCraftConsume' event carrying exactly what moved, the game loop's tick
-// observer resolves the owning session and hands the takes here verbatim, and
-// this function never edits the evidence (a malformed take would be the sim's
-// defect, and the audit's shape pass is where it gets flagged, not silently
-// repaired here).
+// recordVaultOp shape above cannot apply.
+//
+// The LIVE path is the reservation journal, not a fire-and-forget recorder:
+// SimConfig.vaultConsumptionAdmission (wired in server/game.ts over
+// bank_ledger_session.ts's createBankLedgerSessionJournal) reserves the exact
+// planned takes BEFORE the sim mutates vault stock, and the sim commits the
+// reservation once the draw lands, so the rows ride the character-save
+// transaction through the session outbox instead of this module's FIFO tail.
+// This module keeps only the PURE row builder the journal serializes with.
 //
 // Rows write op 'craft_consume', container 'vault', container_id null,
 // instance null, copper_delta 0; purchased_slots_after carries the rung the
-// event sampled at consumption time. One row per material id drawn, in the
-// event's sorted order, and the observer hands over the WHOLE TICK's
-// consumptions at once (the detectActivity deed-unlock idiom: accumulate
-// during the one event walk, record after the loop), so N players completing
-// casts on the same tick cost ONE batched insert on the shared FIFO tail
-// rather than N sequential round trips. Event order within the tick is
-// preserved by the flatten, so a character's cross-container op order still
-// holds. scripts/bank_audit.mjs replays 'craft_consume' as a REMOVAL beside
-// deposit/withdraw/admin_purge; without that row every crafting character
-// would reconcile as a permanent ledger_state_mismatch, which is why this
-// recorder exists at all.
+// reservation sampled at consumption time; one row per material id drawn, in
+// the canonical sorted take order (src/sim/sim_context.ts
+// reservePlannedVaultConsumption). scripts/bank_audit.mjs replays
+// 'craft_consume' as a REMOVAL beside deposit/withdraw/admin_purge; without
+// that row every crafting character would reconcile as a permanent
+// ledger_state_mismatch, which is why the row family exists at all.
 // ---------------------------------------------------------------------------
 
-/** One completed cast's vault consumption, as drained from its
- *  vaultCraftConsume event: the owning session's identity, the event's
- *  sorted takes, and the rung it sampled. */
+/** One completed cast's vault consumption: the owning session's identity, the
+ *  canonically sorted takes, and the rung it sampled. */
 export interface VaultCraftConsumption {
   who: { characterId: number; accountId: number };
   takes: readonly { itemId: string; count: number }[];
@@ -739,57 +767,6 @@ export function buildVaultCraftConsumeLedgerRows(
       containerId: null,
     })),
   );
-}
-
-/** Rows are built from `consumptions` SYNCHRONOUSLY, before this function
- *  returns: callers (VaultCraftConsumeBatch.flush) drain and reuse the array
- *  they pass, so moving the row build inside the FIFO promise chain would
- *  silently record empty inserts. The readonly type says "not mutated", this
- *  contract says "not retained"; keep both. */
-export function recordVaultCraftConsume(consumptions: readonly VaultCraftConsumption[]): void {
-  try {
-    const rows = buildVaultCraftConsumeLedgerRows(consumptions);
-    if (rows.length === 0) return;
-    tail = tail
-      .then(() => insertBankLedgerRows(rows))
-      .catch((err) => {
-        countBankLedgerGrowthRefusal(err);
-        // Same hole semantics as recordVaultOp above: once per LOST ROW so a
-        // rejected batch sizes its whole audit hole, however many casts it
-        // carried.
-        for (let i = 0; i < rows.length; i++) {
-          gameMetricsCounters().vaultLedgerIncident('ledger_write_failed');
-        }
-        // Distinct prefix from the recordVaultOp arm so a log line pins which
-        // recorder lost the rows; names every character in the batch because
-        // the metric never can (unbounded label). Bounded: a tick carries at
-        // most one consumption per casting player.
-        const characters = [...new Set(rows.map((row) => row.characterId))].join(', ');
-        console.error(
-          `bank_ledger vault craft-consume write failed for characters ${characters}:`,
-          err,
-        );
-      });
-  } catch (err) {
-    // Synchronous-throw arm. Unlike recordVaultOp's outer catch (where a sync
-    // throw means the diff evidence never existed), the takes here came from
-    // REAL sim events, so a throw inside the row build loses a real batch's
-    // audit rows: size the hole per lost row where the shapes still allow
-    // counting, and floor at ONE incident when the same caller drift that
-    // threw also defeats the count. The observer must never throw into the
-    // game loop's event pass.
-    let lost = 0;
-    try {
-      for (const c of consumptions) lost += Array.isArray(c.takes) ? c.takes.length : 0;
-    } catch {
-      lost = 0;
-    }
-    if (!Number.isFinite(lost) || lost < 1) lost = 1;
-    for (let i = 0; i < lost; i++) {
-      gameMetricsCounters().vaultLedgerIncident('ledger_write_failed');
-    }
-    console.error('bank_ledger recordVaultCraftConsume failed:', err);
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1003,7 +980,9 @@ export function recordGuildBankDeltas(
           // replay it, so a real dupe investigation would come up clean.
           // Counted beside the log so the hole is visible in production.
           gameMetricsCounters().guildBankIncident('ledger_write_failed');
-          console.error('bank_ledger guild write failed:', err);
+          if (shouldLogBankLedgerWriteFailure(err)) {
+            console.error('bank_ledger guild write failed:', err);
+          }
         });
     }
   } catch (err) {

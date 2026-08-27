@@ -62,10 +62,40 @@ CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growt
 -- This table has no committed rows in healthy operation. Its one row per
 -- ledger-writing transaction exists only until the deferred trigger consumes
 -- it during COMMIT; rollback removes it together with the ledger insert.
+-- That one-INSERT-one-DELETE-per-transaction churn against zero committed rows
+-- is the textbook queue-table autovacuum shape: dead tuples accumulate at the
+-- ledger write rate while a scale-factor trigger, computed against a table of
+-- zero live rows, would barely ever fire. Vacuum on a small fixed dead-tuple
+-- threshold instead, and leave fillfactor headroom so the ON CONFLICT
+-- accumulation updates stay HOT.
 CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending (
   transaction_id xid8 PRIMARY KEY,
   inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
-);
+) WITH (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100, fillfactor = 70);
+
+-- Converge tables created before the storage parameters existed, but only
+-- when a setting is absent or different: even a value-identical ALTER TABLE
+-- ... SET takes SHARE UPDATE EXCLUSIVE to COMMIT and writes pg_class, so
+-- steady-state boots probe reloptions first and skip the churn. The probe
+-- matches the exact stored option text; a drifted or hand-edited value
+-- converges once and is then skipped on every later boot (idempotent).
+DO $bank_ledger_growth_pending_reloptions_converge$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+      FROM pg_catalog.pg_class
+     WHERE oid = '${pendingRegclass}'::pg_catalog.regclass
+       AND reloptions @> ARRAY[
+             'autovacuum_vacuum_scale_factor=0',
+             'autovacuum_vacuum_threshold=100',
+             'fillfactor=70'
+           ]::pg_catalog.text[]
+  ) THEN
+    ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
+      SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100, fillfactor = 70);
+  END IF;
+END
+$bank_ledger_growth_pending_reloptions_converge$;
 
 CREATE OR REPLACE FUNCTION "__woc_bank_ledger_growth_schema__".accumulate_bank_ledger_growth_budget()
 RETURNS TRIGGER
@@ -128,6 +158,22 @@ BEGIN
     RAISE EXCEPTION USING
       ERRCODE = '55000',
       MESSAGE = 'bank ledger growth budget is not initialized';
+  END IF;
+
+  -- A RUNNING process whose baked limit stops matching the durable singleton
+  -- (the singleton was updated under it, or it was deployed with a different
+  -- env value) also fails the guarded UPDATE above, on the limit predicate
+  -- rather than the capacity one. Reporting that as the capacity error would
+  -- carry a self-contradicting DETAIL (committed + attempted visibly under the
+  -- stored limit), so name the config drift instead, with both values.
+  IF stored_limit <> ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS} THEN
+    RAISE EXCEPTION USING
+      ERRCODE = '22023',
+      MESSAGE = '${BANK_LEDGER_GROWTH_LIMIT_ENV} config drift: this process disagrees with the durable bank-ledger limit',
+      DETAIL = pg_catalog.json_build_object(
+        'stored_hard_limit_rows', stored_limit,
+        'configured_hard_limit_rows', ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}
+      )::text;
   END IF;
 
   RAISE EXCEPTION USING
@@ -235,6 +281,12 @@ BEGIN
     -- CREATE TRIGGER holds this lock too, but spelling it before COUNT makes
     -- the mixed-release bootstrap boundary explicit and independent of DDL
     -- lock implementation details.
+    -- bank_ledger itself ships in the same release as this budget, so the
+    -- first production install seeds from an EMPTY table and the COUNT(*)
+    -- below is instant. The unbounded scan only costs on a RE-seed (the
+    -- singleton deleted over a grown ledger), which holds this lock and
+    -- blocks ledger inserts for a full count: a maintenance-window operation
+    -- (DEPLOY.md, the growth-limit section).
     LOCK TABLE "__woc_bank_ledger_growth_schema__".bank_ledger IN SHARE ROW EXCLUSIVE MODE;
     DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending;
 
@@ -247,6 +299,13 @@ BEGIN
     END IF;
 
     IF NOT valid_insert_trigger THEN
+      -- REFERENCING NEW TABLE + count(*) is the only correct row-count source
+      -- for a statement-level trigger. The proposed alternative, GET
+      -- DIAGNOSTICS ROW_COUNT inside the trigger function, was evaluated and
+      -- rejected: ROW_COUNT there reflects the function's OWN last statement,
+      -- never the statement that fired the trigger, and a statement-level
+      -- trigger has no other affected-row count. The transition tuplestore's
+      -- cost is bounded by the 2,048-row outbox prefix cap on ledger batches.
       EXECUTE 'CREATE TRIGGER bank_ledger_growth_budget_insert
         AFTER INSERT ON "__woc_bank_ledger_growth_schema__".bank_ledger
         REFERENCING NEW TABLE AS inserted_bank_ledger_rows
@@ -276,6 +335,10 @@ BEGIN
 END
 $$;
 
+-- Readback for hand-applied installs. The BOOT readback is issued separately
+-- by db.ts as its own single-statement SELECT: sending this whole schema as
+-- one multi-statement query makes node-postgres return an ARRAY of results,
+-- so a .rows[0] read of the combined result would never see this statement.
 SELECT committed_rows, hard_limit_rows
   FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
  WHERE singleton = TRUE;

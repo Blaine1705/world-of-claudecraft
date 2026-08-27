@@ -1011,13 +1011,16 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
       );
     }
     // Character saves share one owner that bounds BEGIN through COMMIT, rather
-    // than the read-only wrapper used by aggregates.
+    // than the read-only wrapper used by aggregates. Since the pg_cancel
+    // wiring, every save path rides db.ts's beginSaveTx wrapper (the ONE
+    // direct beginCharacterSaveTx call, pinned with its cancel forwarding in
+    // tests/character_db.test.ts), so the per-body pin follows the wrapper.
     for (const decl of [
       'export async function saveCharacterState',
       'export async function saveCharacterAndMarketState',
       'export async function saveCharacterAndGuildBankState',
     ]) {
-      expect(bodyOf(dbSrc, decl)).toContain('beginCharacterSaveTx(');
+      expect(bodyOf(dbSrc, decl)).toContain('beginSaveTx(');
     }
     const adminSrc = read('server/admin_db.ts');
     expect(bodyOf(adminSrc, 'export async function overviewCounts')).toContain(
@@ -1283,6 +1286,28 @@ describe('the DB pool knob reaches the shipped container', () => {
     // Pinned on the bare commented name only, so the example JSON payload can
     // change without touching this arm.
     expect(read('.env.example')).toContain('#STORAGE_PRICES=');
+  });
+
+  it('passes BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS through to the game service, and documents it', () => {
+    const compose = read('docker-compose.yml');
+    // Same game-service slicing as the pool-knob arm above: bounded at the
+    // NEXT top-level service key so the row cannot sit on the wrong service.
+    const gameStart = compose.indexOf('\n  game:');
+    expect(gameStart).toBeGreaterThanOrEqual(0);
+    const rest = compose.slice(gameStart + '\n  game:'.length);
+    const next = rest.match(/\n {2}[a-z][a-z-]*:/);
+    expect(next).toBeTruthy();
+    const gameService = rest.slice(0, next?.index);
+    // Without this row the shipped compose path (explicit allowlist, no
+    // env_file) never hands a raised limit to the process: the compiled
+    // default then disagrees with the raised singleton and the boot DO block
+    // raises 22023, so every realm fails to boot.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins compose's own substitution syntax
+    expect(gameService).toContain(
+      'BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS: ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS:-}',
+    );
+    // Documented for operators, commented out so the built-in default applies.
+    expect(read('.env.example')).toContain('#BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS=10000000');
   });
 });
 

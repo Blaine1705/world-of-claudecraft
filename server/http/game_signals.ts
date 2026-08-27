@@ -276,6 +276,8 @@ export interface GameMetricsCounters {
    * bank's trail is still log-only.
    */
   vaultLedgerIncident(kind: VaultLedgerIncident): void;
+  /** One realm row-bucket breach (telemetry-only guard admission). */
+  bankVaultRealmRowBreach(): void;
   /**
    * `amount` copper (always positive) credited to the acting player during a
    * command attributed to `source`. Sampled as the player's own copper delta
@@ -359,6 +361,7 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   guildBankIncident() {},
   wocEscrowQueue() {},
   vaultLedgerIncident() {},
+  bankVaultRealmRowBreach() {},
   copperCredited() {},
   copperSpent() {},
   harvest() {},

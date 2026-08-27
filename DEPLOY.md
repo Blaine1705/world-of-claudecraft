@@ -262,7 +262,19 @@ For off-box safety, sync the directory to S3 occasionally:
   granted slots are NOT in this class: they land in `purchasedSlots`, which an old
   binary understands and preserves. Only `appliedStorageKeys` is stripped; the
   immutable `storage_purchase_applied_receipts` row is the durable replay guard
-  outside the character blob. Any FUTURE release that LENGTHENS the bank
+  outside the character blob. This release also installs six database triggers
+  that a binary rollback does NOT remove:
+  `storage_purchase_guard_character_delete` and
+  `storage_purchase_guard_account_delete` (on characters/accounts),
+  `storage_purchase_guard_consumed_key`, `storage_purchase_archive_applied`,
+  `bank_ledger_growth_budget_insert` (on bank_ledger), and
+  `bank_ledger_growth_budget_commit` (the DEFERRABLE constraint trigger on
+  bank_ledger_growth_pending). On a rolled-back binary a
+  character holding a pending storage purchase becomes UNDELETABLE: the 55006
+  delete guard still fires, the old deleteCharacter has no handler for it, and no
+  old-binary path can resolve the pending row. The remedy is a hand
+  `DELETE FROM storage_purchases` for that character's pending row. Any FUTURE
+  release that LENGTHENS the bank
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
   owes its own caveat here.
@@ -606,10 +618,18 @@ For off-box safety, sync the directory to S3 occasionally:
   `sum(sum by (recipe) (woc_rod_fee_payments_total) * max by (recipe) (woc_rod_fee_copper))`.
   `woc_bank_ledger_growth_budget` is another database-wide gauge exported by
   every realm. Never sum its row count or capacity: use one target, or `max`
-  without the target `realm` label for `observed_committed_rows` and
+  without the target `realm` label for `lifetime_inserted_rows` and
   `hard_limit_rows`. Use `max` for `observation_age_seconds` so the stalest realm
-  is visible, and `min` for `initialized` so one realm that has never observed
-  the singleton cannot hide behind healthy peers.
+  is visible, `max` for `limit_warning` so one realm that has observed the warn
+  crossing raises it, and `min` for `initialized` so one realm that has never
+  observed the singleton cannot hide behind healthy peers.
+  `lifetime_inserted_rows` is a lifetime INSERT counter, not a live row count:
+  it is never credited back when ledger rows disappear through the
+  characters/accounts `ON DELETE CASCADE`, so after deletion churn it reads
+  higher than a live `count(*)` of `bank_ledger`. The measure label was RENAMED
+  this release: any dashboard or alert keying `observed_committed_rows` must
+  move to `lifetime_inserted_rows` with this deploy (the old series stops
+  being exported).
 - **Discord bot series (Grafana)**: the bot reports its rate-limit governor
   counters on the presence push it already sends, so `/metrics` carries them with
   no extra scrape target and no bot-side endpoint. Cumulative counters
@@ -797,23 +817,45 @@ For off-box safety, sync the directory to S3 occasionally:
   default is 10,000,000 rows for the keep-forever anti-dupe ledger. First deployment
   seeds an exact `COUNT(*)` while inserts are locked; PostgreSQL then accounts every
   writer, including old binaries and raw SQL, in the inserting transaction and refuses
-  the COMMIT that would cross the ceiling. Every process sharing `DATABASE_URL` must use
+  the COMMIT that would cross the ceiling. The first install of this release is
+  instant: `bank_ledger` ships in the same release, so the seed counts an empty
+  table. Re-seeding after deleting the singleton on a grown ledger blocks ledger
+  inserts for the duration of a full count and is a maintenance-window operation.
+  Every process sharing `DATABASE_URL` must use
   the same value or boot fails. A first bootstrap that is already over the configured
   value deliberately boots read-capable but refuses every later ledger insert; watch
   `woc_bank_ledger_growth_budget` and
-  `woc_bank_ledger_growth_limit_refusals_total`. Reaching the limit is not permission to
-  prune the audit trail. Each realm refreshes the singleton with one indexed,
+  `woc_bank_ledger_growth_limit_refusals_total`. The per-process realm row bucket is
+  telemetry-only: `woc_bank_vault_realm_row_breaches_total` (sum across realms, alert on
+  rate) counts admissions the old refusing guard would have dropped; sustained growth there
+  means organic bank/vault traffic is outrunning the old per-process budget, not abuse (the
+  per-account bucket still refuses abuse). Reaching the limit is not permission to
+  prune the audit trail. The ceiling transitively bounds `bank_ledger_batch_receipts`
+  (also keep-forever; at least one ledger row per receipt batch, so it can never
+  outgrow the ledger ceiling). The receipt fingerprint gained the
+  operator-attribution field in this same release, and the receipts table ships
+  first here, so no pre-change receipt exists to collide; a hand-installed
+  pre-change receipt would surface as the deliberate receipt-verification
+  refusal (the cross-version test pins that shape). `storage_purchase_applied_receipts` is NOT under any
+  ceiling: one row per successful paid storage purchase, unbounded by design, with a
+  wide TEXT primary key, so put its size on the same dashboard rather than assuming
+  the ledger cap covers it. Each realm refreshes the singleton with one indexed,
   fail-fast point read per minute through the shared background gate; the monitor
   never queues when that gate or the database pool is full. Shutdown aborts and
   drains active monitor SQL before closing the pool; `pool.end()` then remains the
   final bounded teardown for any new socket connection attempt already inside
   node-postgres.
   Alert if `measure="observation_age_seconds"` exceeds 180 (the refresh path is stale),
-  and page before `observed_committed_rows / hard_limit_rows` reaches 0.8 so capacity
-  work happens before save refusals quarantine sessions. Raising the ceiling requires
-  a maintenance window: quiesce writers,
-  update the singleton `hard_limit_rows`, deploy the identical environment value to all
-  realm processes, and verify the boot readout before reopening traffic. A missing,
+  and page before `lifetime_inserted_rows / hard_limit_rows` reaches 0.8 so capacity
+  work happens before save refusals quarantine sessions; `measure="limit_warning"`
+  flips to 1 at exactly that 0.8 crossing (and the crossing realm logs one
+  console.warn per process), so an alert rule can key on it directly. Raising the
+  ceiling requires a maintenance window, and the order matters: STOP every realm
+  process (a quiesced-but-running realm still holds the old compiled value and
+  refuses its first write after the update as `BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS`
+  config drift), update the singleton `hard_limit_rows`, deploy every process with
+  the matching environment value, then start them and verify the boot readout
+  before reopening traffic. A missing,
   disabled, or replaced enforcement trigger after initialization fails boot for manual
   reconciliation rather than silently undercounting an unaudited write window.
 - **`STORAGE_PRICES`: the storage price override (server/storage_prices.ts).** One

@@ -15,6 +15,55 @@ export const BANK_LEDGER_GROWTH_MONITOR_INTERVAL_MS = 60_000;
 export const BANK_LEDGER_GROWTH_MONITOR_WALL_TIMEOUT_MS = 1_500;
 export const BANK_LEDGER_GROWTH_MONITOR_STATEMENT_TIMEOUT_MS = 1_000;
 
+/** Fraction of the hard limit at which the warn arm fires. Without it, the
+ * first operator signal for a filling ledger is players being refused at the
+ * ceiling; 0.8 matches the paging guidance in DEPLOY.md. */
+export const BANK_LEDGER_GROWTH_WARN_FRACTION = 0.8;
+
+/** Same tolerant integer decoding the budget observer applies to raw driver
+ * values (BIGINT arrives as a string). */
+function warnSafeCount(value: unknown): number | null {
+  if (typeof value !== 'number' && typeof value !== 'string') return null;
+  if (value === '') return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : null;
+}
+
+/** True when the observed lifetime insert count has crossed the warn fraction
+ * of the hard limit. Tolerates raw driver values; anything malformed reads as
+ * not-warning (the monitor separately fails the refresh on malformed rows). */
+export function bankLedgerGrowthWarningActive(
+  committedRows: unknown,
+  hardLimitRows: unknown,
+): boolean {
+  const committed = warnSafeCount(committedRows);
+  const limit = warnSafeCount(hardLimitRows);
+  if (committed === null || limit === null || limit <= 0) return false;
+  return committed >= limit * BANK_LEDGER_GROWTH_WARN_FRACTION;
+}
+
+/** One console.warn per process CROSSING of the warn fraction: latched while
+ * the condition holds, re-armed if the observation drops back below (a raised
+ * limit after a restarted process, or a re-seeded singleton). The gauge arm
+ * (limit_warning on woc_bank_ledger_growth_budget) is the alertable signal;
+ * this line is the human breadcrumb in the realm log. */
+export function createBankLedgerGrowthWarnLatch(
+  warn: (message: string) => void = (message) => console.warn(message),
+): (committedRows: unknown, hardLimitRows: unknown) => void {
+  let armed = true;
+  return (committedRows, hardLimitRows) => {
+    if (!bankLedgerGrowthWarningActive(committedRows, hardLimitRows)) {
+      armed = true;
+      return;
+    }
+    if (!armed) return;
+    armed = false;
+    warn(
+      `bank ledger growth budget crossed ${BANK_LEDGER_GROWTH_WARN_FRACTION} of the hard limit (${String(committedRows)} of ${String(hardLimitRows)} lifetime inserted rows): plan capacity work before the ceiling refuses ledger writes (woc_bank_ledger_growth_budget{measure="limit_warning"})`,
+    );
+  };
+}
+
 export interface BankLedgerGrowthMonitorClient {
   query<Row extends QueryResultRow = QueryResultRow>(
     text: string,
@@ -258,6 +307,8 @@ export interface BankLedgerGrowthMonitorDeps {
    * process's configured durable limit, which is a monitor failure. */
   readonly observe?: (committedRows: unknown, hardLimitRows: unknown) => boolean;
   readonly onError?: (error: unknown) => void;
+  /** Sink for the latched warn-fraction crossing line (default console.warn). */
+  readonly warn?: (message: string) => void;
   readonly intervalMs?: number;
 }
 
@@ -272,6 +323,7 @@ export function createBankLedgerGrowthMonitor(
 ): BankLedgerGrowthMonitor {
   const read = deps.read ?? readBankLedgerGrowthBudget;
   const observe = deps.observe ?? observeBankLedgerGrowthBudget;
+  const warnLatch = createBankLedgerGrowthWarnLatch(deps.warn);
   const intervalMs = deps.intervalMs ?? BANK_LEDGER_GROWTH_MONITOR_INTERVAL_MS;
   if (!Number.isSafeInteger(intervalMs) || intervalMs <= 0) {
     throw new RangeError('bank ledger growth monitor interval must be a positive safe integer');
@@ -314,6 +366,9 @@ export function createBankLedgerGrowthMonitor(
         if (!observe(row.committedRows, row.hardLimitRows)) {
           throw new Error('bank ledger growth monitor returned invalid durable budget values');
         }
+        // Only an accepted observation drives the warn latch: the values were
+        // just validated against this process's configured durable limit.
+        warnLatch(row.committedRows, row.hardLimitRows);
         failureStreak = false;
       } catch (error) {
         if (

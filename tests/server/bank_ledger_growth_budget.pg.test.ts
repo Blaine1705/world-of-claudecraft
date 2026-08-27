@@ -10,6 +10,7 @@ const SCHEMA = 'bank_ledger_growth_budget_pg_test';
 const OVER_CAP_SCHEMA = 'bank_ledger_growth_over_cap_pg_test';
 const MULTI_STATEMENT_SCHEMA = 'bank_ledger_growth_multi_statement_pg_test';
 const BOOTSTRAP_RACE_SCHEMA = 'bank_ledger_growth_bootstrap_race_pg_test';
+const CONFIG_DRIFT_SCHEMA = 'bank_ledger_growth_config_drift_pg_test';
 const priorLimit = process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS;
 if (url !== '') process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS = '4';
 
@@ -124,6 +125,8 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       await admin.query(`DROP SCHEMA IF EXISTS "${OVER_CAP_SCHEMA}" CASCADE`);
       await admin.query(`DROP SCHEMA IF EXISTS "${MULTI_STATEMENT_SCHEMA}" CASCADE`);
       await admin.query(`DROP SCHEMA IF EXISTS "${BOOTSTRAP_RACE_SCHEMA}" CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS "${CONFIG_DRIFT_SCHEMA}" CASCADE`);
+      await admin.query(`DROP SCHEMA IF EXISTS "${SCHEMA}_counterfeit" CASCADE`);
       await admin.end();
     }
     if (priorLimit === undefined) delete process.env.BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS;
@@ -318,6 +321,9 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
     expect(await budgetRows()).toBe(4);
 
     const counterfeit = `${SCHEMA}_counterfeit`;
+    // Self-healing against a prior local run that died before afterAll: CI
+    // always starts fresh, a developer database does not.
+    await pool.query(`DROP SCHEMA IF EXISTS "${counterfeit}" CASCADE`);
     await pool.query(`CREATE SCHEMA "${counterfeit}"`);
     await pool.query(`CREATE TABLE "${counterfeit}".bank_ledger_growth_budget (
       singleton BOOLEAN PRIMARY KEY,
@@ -378,6 +384,65 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
         (await pool.query(`SELECT count(*) FROM "${OVER_CAP_SCHEMA}".bank_ledger`)).rows[0].count,
       ),
     ).toBe(5);
+  });
+
+  it('applies the queue-table storage parameters to the pending table', async () => {
+    const opts = await pool.query(
+      `SELECT reloptions
+         FROM pg_catalog.pg_class
+        WHERE oid = '"${SCHEMA}".bank_ledger_growth_pending'::pg_catalog.regclass`,
+    );
+    expect(opts.rows[0].reloptions).toEqual(
+      expect.arrayContaining([
+        'autovacuum_vacuum_scale_factor=0',
+        'autovacuum_vacuum_threshold=100',
+        'fillfactor=70',
+      ]),
+    );
+  });
+
+  it('raises config drift, not capacity, when the singleton limit moves under a running process', async () => {
+    await pool.query(`CREATE SCHEMA "${CONFIG_DRIFT_SCHEMA}"`);
+    await pool.query(
+      `CREATE TABLE "${CONFIG_DRIFT_SCHEMA}".bank_ledger (id BIGSERIAL PRIMARY KEY)`,
+    );
+    await pool.query(growth.bankLedgerGrowthBudgetSchema(CONFIG_DRIFT_SCHEMA));
+    await pool.query(`INSERT INTO "${CONFIG_DRIFT_SCHEMA}".bank_ledger DEFAULT VALUES`);
+
+    // The operator raised the singleton while this process still holds its
+    // compiled limit of 4. The next insert is visibly UNDER both limits, so
+    // the generic capacity error would carry self-contradicting evidence; the
+    // enforcer must name the drift instead.
+    await pool.query(
+      `UPDATE "${CONFIG_DRIFT_SCHEMA}".bank_ledger_growth_budget SET hard_limit_rows = 9`,
+    );
+    let driftError: unknown;
+    try {
+      await pool.query(`INSERT INTO "${CONFIG_DRIFT_SCHEMA}".bank_ledger DEFAULT VALUES`);
+      expect.unreachable('the drifted insert must be refused');
+    } catch (error) {
+      driftError = error;
+    }
+    expect(driftError).toMatchObject({
+      code: '22023',
+      message: expect.stringContaining('BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS config drift'),
+    });
+    expect(JSON.parse(String((driftError as { detail?: string }).detail ?? 'null'))).toMatchObject({
+      stored_hard_limit_rows: 9,
+      configured_hard_limit_rows: 4,
+    });
+    // Drift is NOT a growth refusal: the client-side converter must leave it
+    // alone so it surfaces as the distinct operator emergency it is.
+    expect(growth.bankLedgerGrowthLimitFromError(driftError)).toBeNull();
+
+    // The refused transaction rolled back whole: no ledger row landed, no
+    // pending row leaked, and the singleton kept its pre-drift count.
+    const state = await pool.query(
+      `SELECT (SELECT count(*) FROM "${CONFIG_DRIFT_SCHEMA}".bank_ledger) AS ledger_rows,
+              (SELECT count(*) FROM "${CONFIG_DRIFT_SCHEMA}".bank_ledger_growth_pending) AS pending_rows,
+              (SELECT committed_rows FROM "${CONFIG_DRIFT_SCHEMA}".bank_ledger_growth_budget) AS committed_rows`,
+    );
+    expect(state.rows).toEqual([{ ledger_rows: '1', pending_rows: '0', committed_rows: '1' }]);
   });
 
   it('accumulates separate INSERT statements once per transaction and rejects their combined excess', async () => {

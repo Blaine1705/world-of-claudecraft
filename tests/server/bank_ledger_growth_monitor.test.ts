@@ -6,10 +6,13 @@ import {
   BANK_LEDGER_GROWTH_MONITOR_INTERVAL_MS,
   BANK_LEDGER_GROWTH_MONITOR_STATEMENT_TIMEOUT_MS,
   BANK_LEDGER_GROWTH_MONITOR_WALL_TIMEOUT_MS,
+  BANK_LEDGER_GROWTH_WARN_FRACTION,
   type BankLedgerGrowthMonitorClient,
   type BankLedgerGrowthMonitorPool,
   BankLedgerGrowthMonitorPoolBusy,
+  bankLedgerGrowthWarningActive,
   createBankLedgerGrowthMonitor,
+  createBankLedgerGrowthWarnLatch,
   readBankLedgerGrowthBudget,
 } from '../../server/bank_ledger_growth_monitor';
 
@@ -667,5 +670,94 @@ describe('bank-ledger growth monitor', () => {
     expect(stopReturned).toBe(true);
     expect(observe).not.toHaveBeenCalled();
     expect(release).toHaveBeenCalledTimes(1);
+  });
+});
+
+// The warn arm: without it the first operator signal for a filling ledger is
+// players being refused at the ceiling. The latch turns the once-per-minute
+// observation stream into ONE console.warn per process crossing; the alertable
+// signal is the limit_warning measure on woc_bank_ledger_growth_budget.
+describe('bank-ledger growth warn latch', () => {
+  it('pins the warn fraction and the crossing predicate boundary', () => {
+    expect(BANK_LEDGER_GROWTH_WARN_FRACTION).toBe(0.8);
+    // Raw driver values (BIGINT arrives as a string) and plain numbers both
+    // decode; the crossing is INCLUSIVE at exactly the fraction.
+    expect(bankLedgerGrowthWarningActive('7999999', '10000000')).toBe(false);
+    expect(bankLedgerGrowthWarningActive('8000000', '10000000')).toBe(true);
+    expect(bankLedgerGrowthWarningActive(8_000_000, 10_000_000)).toBe(true);
+    expect(bankLedgerGrowthWarningActive(10_000_001, 10_000_000)).toBe(true);
+    // Malformed values read as not-warning: the monitor separately fails the
+    // refresh on them, and the gauge must not invent a warning from garbage.
+    expect(bankLedgerGrowthWarningActive(null, 10_000_000)).toBe(false);
+    expect(bankLedgerGrowthWarningActive(undefined, 10_000_000)).toBe(false);
+    expect(bankLedgerGrowthWarningActive('not-a-count', '10000000')).toBe(false);
+    expect(bankLedgerGrowthWarningActive('8000000', '')).toBe(false);
+    expect(bankLedgerGrowthWarningActive('8000000', 0)).toBe(false);
+    expect(bankLedgerGrowthWarningActive(-1, 10_000_000)).toBe(false);
+  });
+
+  it('warns once per crossing, stays silent while held, and re-arms below', () => {
+    const warn = vi.fn<(message: string) => void>();
+    const latch = createBankLedgerGrowthWarnLatch(warn);
+
+    // Below the fraction: nothing.
+    latch('7999999', '10000000');
+    expect(warn).not.toHaveBeenCalled();
+
+    // The crossing: exactly one line, carrying the evidence and the series
+    // name an operator alerts on.
+    latch('8000000', '10000000');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]?.[0]).toContain('0.8');
+    expect(warn.mock.calls[0]?.[0]).toContain('8000000 of 10000000');
+    expect(warn.mock.calls[0]?.[0]).toContain('limit_warning');
+
+    // Held above: latched, no repeats however long the condition lasts.
+    latch('8000001', '10000000');
+    latch('9999999', '10000000');
+    expect(warn).toHaveBeenCalledTimes(1);
+
+    // Dropping back below re-arms (a raised limit after the mandated restart,
+    // or a re-seeded singleton), so the NEXT crossing warns again.
+    latch('7000000', '10000000');
+    expect(warn).toHaveBeenCalledTimes(1);
+    latch('8500000', '10000000');
+    expect(warn).toHaveBeenCalledTimes(2);
+  });
+
+  it('the monitor drives the latch only from an ACCEPTED observation', async () => {
+    const warn = vi.fn<(message: string) => void>();
+    const release = vi.fn();
+    let row = { committedRows: 9_000_000, hardLimitRows: 10_000_000 };
+    let accept = false;
+    const monitor = createBankLedgerGrowthMonitor({
+      pool: availablePool(),
+      tryAcquireBackgroundPermit: () => ({ release }),
+      read: async () => row,
+      observe: () => accept,
+      warn,
+      onError: () => {},
+    });
+
+    // A refused observation (malformed or drifted values) never reaches the
+    // latch: a warning must only ever come from validated durable values.
+    await monitor.refresh();
+    expect(warn).not.toHaveBeenCalled();
+
+    accept = true;
+    await monitor.refresh();
+    expect(warn).toHaveBeenCalledTimes(1);
+
+    // The latch is per process, not per refresh: the held condition stays at
+    // one line across later polls.
+    await monitor.refresh();
+    expect(warn).toHaveBeenCalledTimes(1);
+
+    // Below the fraction re-arms through the same wiring.
+    row = { committedRows: 1_000_000, hardLimitRows: 10_000_000 };
+    await monitor.refresh();
+    row = { committedRows: 9_500_000, hardLimitRows: 10_000_000 };
+    await monitor.refresh();
+    expect(warn).toHaveBeenCalledTimes(2);
   });
 });

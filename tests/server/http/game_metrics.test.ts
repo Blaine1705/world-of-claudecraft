@@ -181,8 +181,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(measureValues(text, WOC_BANK_LEDGER_GROWTH_BUDGET)).toEqual({
       hard_limit_rows: '10000000',
       initialized: '0',
+      limit_warning: '0',
       observation_age_seconds: '0',
-      observed_committed_rows: '0',
+      lifetime_inserted_rows: '0',
     });
   });
 
@@ -242,16 +243,21 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       new Set([
         'hard_limit_rows',
         'initialized',
+        'limit_warning',
         'observation_age_seconds',
-        'observed_committed_rows',
+        'lifetime_inserted_rows',
       ]),
     );
     expect(
       sampleValue(
         text,
-        /^woc_bank_ledger_growth_budget\{measure="observed_committed_rows"\} (\d+)$/m,
+        /^woc_bank_ledger_growth_budget\{measure="lifetime_inserted_rows"\} (\d+)$/m,
       ),
     ).toBe('123');
+    // 123 of 10,000,000 is far under the warn fraction.
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="limit_warning"\} (\d+)$/m),
+    ).toBe('0');
     expect(
       sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="hard_limit_rows"\} (\d+)$/m),
     ).toBe('10000000');
@@ -496,7 +502,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       tracked: '1',
     });
     expect(measureValues(first, WOC_BANK_LEDGER_GROWTH_BUDGET)).toMatchObject({
-      observed_committed_rows: '130',
+      lifetime_inserted_rows: '130',
     });
     players = 9;
     pendingKeys = 7;
@@ -541,7 +547,7 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       tracked: '14',
     });
     expect(measureValues(second, WOC_BANK_LEDGER_GROWTH_BUDGET)).toMatchObject({
-      observed_committed_rows: '131',
+      lifetime_inserted_rows: '131',
     });
   });
 
@@ -550,6 +556,28 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     registerGameStateMetrics(registry, stubSource({ simTickHz: () => null }));
     const text = await registry.metrics();
     expect(sampleValue(text, /^woc_sim_tick_hz (\d+)$/m)).toBe('0');
+  });
+
+  // LAST in this describe on purpose: the budget readout is module-global and
+  // monotonic, so observing 9,000,000 here would pin every earlier
+  // lifetime_inserted_rows assertion at this value if it ran first.
+  it('flips limit_warning to 1 when the observation crosses the warn fraction', async () => {
+    expect(observeBankLedgerGrowthBudget(9_000_000, 10_000_000, Date.now())).toBe(true);
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+
+    expect(
+      sampleValue(
+        text,
+        /^woc_bank_ledger_growth_budget\{measure="lifetime_inserted_rows"\} (\d+)$/m,
+      ),
+    ).toBe('9000000');
+    // 9,000,000 of 10,000,000 is past the 0.8 warn fraction: the alertable
+    // 0/1 signal an operator pages on before the ceiling refuses saves.
+    expect(
+      sampleValue(text, /^woc_bank_ledger_growth_budget\{measure="limit_warning"\} (\d+)$/m),
+    ).toBe('1');
   });
 });
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BANK_LEDGER_GROWTH_BUDGET_SCHEMA,
   BANK_LEDGER_GROWTH_DEFAULT_HARD_LIMIT_ROWS,
+  BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS,
   BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
   BANK_LEDGER_GROWTH_LIMIT_ENV,
   BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
@@ -84,6 +85,61 @@ describe('bank ledger durable growth budget', () => {
     expect(() => bankLedgerGrowthBudgetSchema('public; DROP TABLE bank_ledger')).toThrow(
       /simple lowercase identifier/,
     );
+  });
+
+  it('names enforcement-time config drift distinctly from the capacity refusal', () => {
+    const folded = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/\s+/g, ' ');
+
+    // An env/singleton mismatch on a RUNNING process fails the guarded UPDATE
+    // on the limit predicate, not the capacity one; reporting it as the
+    // generic P0001 would carry a self-contradicting DETAIL (committed +
+    // attempted visibly under the stored limit). The enforcer gives the
+    // mismatch its own arm, keyed on the stored limit disagreeing with this
+    // process's compiled value.
+    expect(folded).toContain(`IF stored_limit <> ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS} THEN`);
+    expect(folded).toContain(
+      "MESSAGE = 'BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS config drift: this process disagrees with the durable bank-ledger limit'",
+    );
+    expect(folded).toContain("'stored_hard_limit_rows', stored_limit");
+    expect(folded).toContain(`'configured_hard_limit_rows', ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS}`);
+    // The same 22023 class as the boot-time guard, so both drift detections
+    // read as invalid-parameter, never as capacity: once at boot, once at
+    // enforcement.
+    expect(folded.split("ERRCODE = '22023'")).toHaveLength(3);
+
+    // The drift arm decides BEFORE the capacity raise: a drifted process must
+    // never reach the generic refusal.
+    const driftArm = folded.indexOf('config drift: this process disagrees');
+    const capacityRaise = folded.indexOf("MESSAGE = 'bank ledger growth limit exceeded'");
+    expect(driftArm).toBeGreaterThanOrEqual(0);
+    expect(capacityRaise).toBeGreaterThan(driftArm);
+  });
+
+  it('tunes the pending queue table for its dead-tuple churn', () => {
+    const folded = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/\s+/g, ' ');
+
+    // One INSERT plus one DELETE per ledger transaction against zero committed
+    // rows is the queue-table autovacuum shape: a scale-factor trigger against
+    // zero live rows barely ever fires, so the table pins a fixed dead-tuple
+    // threshold and fillfactor headroom for the ON CONFLICT accumulation.
+    const params =
+      '(autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100, fillfactor = 70)';
+    expect(folded).toContain(`) WITH ${params}`);
+    // The converge arm reaches tables created before the parameters existed,
+    // gated behind a reloptions probe: a value-identical ALTER still takes
+    // SHARE UPDATE EXCLUSIVE to COMMIT and writes pg_class, so steady-state
+    // boots must skip it. The ALTER stays for the absent/different arm.
+    expect(folded).toContain(`ALTER TABLE "public".bank_ledger_growth_pending SET ${params}`);
+    const probe = folded.indexOf('FROM pg_catalog.pg_class');
+    const gatedAlter = folded.indexOf('ALTER TABLE "public".bank_ledger_growth_pending SET');
+    expect(probe).toBeGreaterThanOrEqual(0);
+    expect(probe).toBeLessThan(gatedAlter);
+    expect(folded).toContain('oid = \'"public".bank_ledger_growth_pending\'::pg_catalog.regclass');
+    expect(folded).toContain(
+      "reloptions @> ARRAY[ 'autovacuum_vacuum_scale_factor=0', " +
+        "'autovacuum_vacuum_threshold=100', 'fillfactor=70' ]::pg_catalog.text[]",
+    );
+    expect(folded).toContain('IF NOT EXISTS ( SELECT 1 FROM pg_catalog.pg_class');
   });
 
   it('converts only the trigger fixed identity and exact JSON evidence', () => {

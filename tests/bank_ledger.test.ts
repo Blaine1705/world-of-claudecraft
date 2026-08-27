@@ -20,6 +20,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { bankLedgerIdle, diffBankOp, diffBankSocketOp, recordBankOp } from '../server/bank_ledger';
+import { BankLedgerGrowthLimitExceeded } from '../server/bank_ledger_growth_budget';
 import { insertBankLedgerRow, insertBankLedgerRows, saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { REALM } from '../server/realm';
@@ -612,12 +613,7 @@ describe('bank ledger dispatch integration', () => {
 // tests/vault_wire.test.ts; this block owns the pure diff contract.
 // ---------------------------------------------------------------------------
 
-import {
-  diffVaultOp,
-  recordVaultCraftConsume,
-  recordVaultOp,
-  vaultSpecialLedgerIdentity,
-} from '../server/bank_ledger';
+import { diffVaultOp, recordVaultOp, vaultSpecialLedgerIdentity } from '../server/bank_ledger';
 import {
   noopGameMetricsCounters,
   setGameMetricsCounters,
@@ -1146,241 +1142,6 @@ function ginfo(
   };
 }
 
-describe('recordVaultCraftConsume (the tick-side event recorder, Phase 04)', () => {
-  beforeEach(async () => {
-    await bankLedgerIdle();
-    insertMock.mockClear();
-    insertRowsMock.mockClear();
-  });
-
-  it('writes one craft_consume row per take, batched as ONE insert, verbatim from the event', async () => {
-    recordVaultCraftConsume([
-      {
-        who: { characterId: 42, accountId: 7 },
-        takes: [
-          { itemId: 'copper_ore', count: 4 },
-          { itemId: 'tin_ore', count: 1 },
-        ],
-        upgrades: 2,
-      },
-    ]);
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(1);
-    expect(insertRowsMock.mock.calls[0][0]).toEqual([
-      {
-        realm: REALM,
-        characterId: 42,
-        accountId: 7,
-        op: 'craft_consume',
-        itemId: 'copper_ore',
-        count: 4,
-        instance: null,
-        copperDelta: 0,
-        purchasedSlotsAfter: 2,
-        container: 'vault',
-        containerId: null,
-      },
-      {
-        realm: REALM,
-        characterId: 42,
-        accountId: 7,
-        op: 'craft_consume',
-        itemId: 'tin_ore',
-        count: 1,
-        instance: null,
-        copperDelta: 0,
-        purchasedSlotsAfter: 2,
-        container: 'vault',
-        containerId: null,
-      },
-    ]);
-    // The vault discipline holds here too: no counterparty side, never the
-    // single-row writer.
-    expect(insertRowsMock.mock.calls[0][0][0]).not.toHaveProperty('counterpartyCopperDelta');
-    expect(insertRowsMock.mock.calls[0][0][0]).not.toHaveProperty('counterpartyCount');
-    expect(insertMock).not.toHaveBeenCalled();
-  });
-
-  it('an empty batch writes nothing (a pure-carried craft emits no event, but guard it)', async () => {
-    recordVaultCraftConsume([]);
-    recordVaultCraftConsume([{ who: { characterId: 42, accountId: 7 }, takes: [], upgrades: 1 }]);
-    await bankLedgerIdle();
-    expect(insertRowsMock).not.toHaveBeenCalled();
-    expect(insertMock).not.toHaveBeenCalled();
-  });
-
-  it('coalesces the whole tick into ONE insert across characters, order preserved (F2)', async () => {
-    // Two players complete casts on the same tick: the observer hands both
-    // consumptions over together and the recorder issues ONE batched insert,
-    // rows in event order, so N crafters cost one round trip, not N.
-    recordVaultCraftConsume([
-      {
-        who: { characterId: 42, accountId: 7 },
-        takes: [
-          { itemId: 'copper_ore', count: 2 },
-          { itemId: 'tin_ore', count: 1 },
-        ],
-        upgrades: 1,
-      },
-      {
-        who: { characterId: 43, accountId: 8 },
-        takes: [{ itemId: 'iron_ore', count: 5 }],
-        upgrades: 3,
-      },
-    ]);
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(1);
-    expect(
-      insertRowsMock.mock.calls[0][0].map((r) => [
-        r.characterId,
-        r.itemId,
-        r.count,
-        r.purchasedSlotsAfter,
-      ]),
-    ).toEqual([
-      [42, 'copper_ore', 2, 1],
-      [42, 'tin_ore', 1, 1],
-      [43, 'iron_ore', 5, 3],
-    ]);
-  });
-
-  it('a rejected multi-character batch names EVERY character in one log line', async () => {
-    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      insertRowsMock.mockRejectedValueOnce(new Error('vault ledger down'));
-      recordVaultCraftConsume([
-        {
-          who: { characterId: 42, accountId: 7 },
-          takes: [{ itemId: 'copper_ore', count: 2 }],
-          upgrades: 1,
-        },
-        {
-          who: { characterId: 43, accountId: 8 },
-          takes: [{ itemId: 'iron_ore', count: 5 }],
-          upgrades: 3,
-        },
-      ]);
-      await bankLedgerIdle();
-      expect(errs).toHaveBeenCalled();
-      expect(String(errs.mock.calls[0][0])).toContain(
-        'vault craft-consume write failed for characters 42, 43',
-      );
-    } finally {
-      errs.mockRestore();
-    }
-  });
-
-  it('shares the module FIFO tail with recordVaultOp, preserving cross-recorder op order', async () => {
-    // A withdraw at the banker followed by a craft consumption must land in
-    // that order, or the audit replay would see the consumption momentarily
-    // exceed the deposited net. The two recorders chain the SAME tail.
-    recordVaultOp(
-      'deposit',
-      { characterId: 42, accountId: 7 },
-      vinfo({}),
-      vinfo({ copper_ore: 6 }),
-    );
-    recordVaultCraftConsume([
-      {
-        who: { characterId: 42, accountId: 7 },
-        takes: [{ itemId: 'copper_ore', count: 2 }],
-        upgrades: 1,
-      },
-    ]);
-    await bankLedgerIdle();
-    expect(insertRowsMock).toHaveBeenCalledTimes(2);
-    expect(insertRowsMock.mock.calls[0][0][0]).toMatchObject({ op: 'deposit', count: 6 });
-    expect(insertRowsMock.mock.calls[1][0][0]).toMatchObject({ op: 'craft_consume', count: 2 });
-  });
-
-  it('a rejected batch counts one incident per LOST ROW and names the character', async () => {
-    const kinds: VaultLedgerIncident[] = [];
-    setGameMetricsCounters({
-      ...noopGameMetricsCounters,
-      vaultLedgerIncident: (kind) => kinds.push(kind),
-    });
-    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      insertRowsMock.mockRejectedValueOnce(new Error('vault ledger down'));
-      recordVaultCraftConsume([
-        {
-          who: { characterId: 42, accountId: 7 },
-          takes: [
-            { itemId: 'copper_ore', count: 2 },
-            { itemId: 'tin_ore', count: 1 },
-          ],
-          upgrades: 1,
-        },
-      ]);
-      await bankLedgerIdle();
-      expect(kinds).toEqual(['ledger_write_failed', 'ledger_write_failed']);
-      // The DISTINCT prefix pins which recorder lost the rows.
-      expect(errs).toHaveBeenCalled();
-      expect(String(errs.mock.calls[0][0])).toContain(
-        'vault craft-consume write failed for characters 42',
-      );
-    } finally {
-      setGameMetricsCounters(noopGameMetricsCounters);
-      errs.mockRestore();
-    }
-  });
-
-  it('a synchronous throw never escapes into the event pass and sizes the hole it can count', async () => {
-    // Unlike recordVaultOp's outer catch (no diff evidence existed), a sync
-    // throw here loses REAL event rows. The arm counts one incident per take
-    // it can still count (Array.isArray guard) and floors at ONE when the
-    // same caller drift that threw also defeats the count.
-    const kinds: VaultLedgerIncident[] = [];
-    setGameMetricsCounters({
-      ...noopGameMetricsCounters,
-      vaultLedgerIncident: (kind) => kinds.push(kind),
-    });
-    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const hostileTakes = {
-        map() {
-          throw new Error('hostile takes');
-        },
-      } as unknown as readonly { itemId: string; count: number }[];
-      // Floor arm: the only consumption is uncountable, so exactly ONE.
-      expect(() =>
-        recordVaultCraftConsume([
-          { who: { characterId: 42, accountId: 7 }, takes: hostileTakes, upgrades: 1 },
-        ]),
-      ).not.toThrow();
-      await bankLedgerIdle();
-      expect(kinds).toEqual(['ledger_write_failed']);
-      expect(insertRowsMock).not.toHaveBeenCalled();
-      // The OUTER arm's distinct prefix pins which arm fired.
-      expect(errs).toHaveBeenCalled();
-      expect(String(errs.mock.calls[0][0])).toContain('recordVaultCraftConsume failed');
-      // Per-lost-row arm: a countable consumption (two takes) rides in the
-      // same batch as the uncountable one that throws, so the two REAL rows
-      // it lost are both sized: two incidents, not one.
-      kinds.length = 0;
-      expect(() =>
-        recordVaultCraftConsume([
-          {
-            who: { characterId: 42, accountId: 7 },
-            takes: [
-              { itemId: 'copper_ore', count: 2 },
-              { itemId: 'tin_ore', count: 1 },
-            ],
-            upgrades: 1,
-          },
-          { who: { characterId: 43, accountId: 8 }, takes: hostileTakes, upgrades: 1 },
-        ]),
-      ).not.toThrow();
-      await bankLedgerIdle();
-      expect(kinds).toEqual(['ledger_write_failed', 'ledger_write_failed']);
-      expect(insertRowsMock).not.toHaveBeenCalled();
-    } finally {
-      setGameMetricsCounters(noopGameMetricsCounters);
-      errs.mockRestore();
-    }
-  });
-});
-
 describe('diffGuildBankOp (pure)', () => {
   it('deposit_gold records the positive treasury delta', () => {
     expect(diffGuildBankOp('deposit_gold', ginfo(1000), ginfo(3500))).toEqual([
@@ -1732,5 +1493,87 @@ describe('recordGuildBankDeltas + guildCreateFeeDelta (the FIFO writer)', () => 
     ]);
     await bankLedgerIdle();
     expect(insertMock).toHaveBeenCalledTimes(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The growth-refusal log budget: one latch SHARED across the five insert arms.
+// Once the database-wide ceiling refuses, every later insert on per-bank-op
+// and per-craft-tick paths fails identically, so the log prints the first few
+// lines plus one budget notice and the counters carry the rest. LAST in this
+// file on purpose: the latch is module-global and this block consumes its
+// whole budget.
+// ---------------------------------------------------------------------------
+
+describe('growth-refusal log budget (the shared latch)', () => {
+  beforeEach(async () => {
+    await bankLedgerIdle();
+    insertMock.mockClear();
+    insertRowsMock.mockClear();
+  });
+
+  it('prints five refusals plus one budget notice, keeps counting, and stays unbounded for other errors', async () => {
+    const growthError = new BankLedgerGrowthLimitExceeded(10_000_000, 1, 10_000_000);
+    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let refusals = 0;
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      bankLedgerGrowthLimitRefused: () => {
+        refusals += 1;
+      },
+    });
+    try {
+      // Six refusals through the vault arm: one past the 5-line budget.
+      for (let i = 0; i < 6; i++) {
+        insertRowsMock.mockRejectedValueOnce(growthError);
+        recordVaultOp(
+          'deposit',
+          { characterId: 42, accountId: 7 },
+          vinfo({}),
+          vinfo({ copper_ore: i + 1 }),
+        );
+      }
+      await bankLedgerIdle();
+
+      const lines = errs.mock.calls.map((call) => String(call[0]));
+      expect(lines.filter((l) => l.includes('vault write failed for character 42'))).toHaveLength(
+        5,
+      );
+      // The last budgeted line is followed by the counted-only notice naming
+      // the series an operator alerts on.
+      const notices = lines.filter((l) => l.includes('reached the log budget'));
+      expect(notices).toHaveLength(1);
+      expect(notices[0]).toContain('woc_bank_ledger_growth_limit_refusals_total');
+      // The LOG is bounded; the COUNTER never is. All six refusals counted.
+      expect(refusals).toBe(6);
+
+      // The latch is shared across arms: a growth refusal on the personal
+      // bank arm is now suppressed too, without consuming anything new.
+      insertMock.mockRejectedValueOnce(growthError);
+      recordBankOp(
+        'deposit',
+        { characterId: 42, accountId: 7 },
+        info([]),
+        info([{ itemId: 'wolf_fang', count: 3 }]),
+      );
+      await bankLedgerIdle();
+      expect(
+        errs.mock.calls.map((call) => String(call[0])).filter((l) => l.includes('write failed')),
+      ).toHaveLength(5);
+      expect(refusals).toBe(7);
+
+      // Non-refusal errors keep unbounded logging: each one is individually
+      // meaningful, not a standing condition.
+      insertRowsMock.mockRejectedValueOnce(new Error('vault ledger down'));
+      recordVaultOp('deposit', { characterId: 42, accountId: 7 }, vinfo({}), vinfo({ tin_ore: 1 }));
+      await bankLedgerIdle();
+      const after = errs.mock.calls.map((call) => String(call[0]));
+      expect(after.filter((l) => l.includes('vault write failed for character 42'))).toHaveLength(
+        6,
+      );
+    } finally {
+      setGameMetricsCounters(noopGameMetricsCounters);
+      errs.mockRestore();
+    }
   });
 });

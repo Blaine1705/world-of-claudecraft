@@ -71,6 +71,12 @@ services:
       # compiled defaults; a rejected dimension falls back by itself and is reported
       # on the console at boot.
       STORAGE_PRICES: ${STORAGE_PRICES:-}
+      # Runtime: database-wide lifetime insert ceiling for the keep-forever
+      # bank_ledger (server/bank_ledger_growth_budget.ts). Empty (unset) yields
+      # the built-in default of 10,000,000 rows. Every process sharing
+      # DATABASE_URL must use the same value as the stored singleton or boot
+      # fails; raising it is a maintenance-window operation (DEPLOY.md).
+      BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS: ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}

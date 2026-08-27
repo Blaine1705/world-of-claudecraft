@@ -470,6 +470,7 @@ function recordingSink() {
     bankLedgerGrowthLimitRefused() {},
     guildBankIncident() {},
     vaultLedgerIncident() {},
+    bankVaultRealmRowBreach() {},
     copperCredited(source, amount) {
       credited.push([source, amount]);
     },

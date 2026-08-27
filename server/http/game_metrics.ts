@@ -41,6 +41,7 @@
 
 import { Counter, Gauge, Histogram, type Registry } from 'prom-client';
 import { bankLedgerGrowthBudgetReadout } from '../bank_ledger_growth_budget';
+import { bankLedgerGrowthWarningActive } from '../bank_ledger_growth_monitor';
 import {
   BG_COMPOSITIONS,
   BG_END_CAUSES,
@@ -174,6 +175,7 @@ export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
  *  a kind on the guild series: the vault is a personal per-character store, so
  *  a guild-bank alert rule must never fire on it. */
 export const WOC_VAULT_LEDGER_INCIDENTS_TOTAL = 'woc_vault_ledger_incidents_total';
+export const WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL = 'woc_bank_vault_realm_row_breaches_total';
 
 /** Marketplace escrow-queue outcomes (the listing entry on the per-character
  *  save FIFO), by kind. */
@@ -630,14 +632,18 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_BANK_LEDGER_GROWTH_BUDGET,
-    help: 'Database-wide bank-ledger budget by fixed measure. observed_committed_rows is refreshed at boot, once per minute, and on a hard-limit refusal; observation_age_seconds exposes a stalled refresh.',
+    help: 'Database-wide bank-ledger budget by fixed measure. lifetime_inserted_rows counts every insert the durable singleton ever accounted and is NEVER credited when ledger rows disappear via the characters/accounts ON DELETE CASCADE, so it can exceed a live count(*); it is refreshed at boot, once per minute, and on a hard-limit refusal. observation_age_seconds exposes a stalled refresh; limit_warning flips to 1 when the observation crosses the warn fraction of the hard limit.',
     labelNames: ['measure'],
     registers: [registry],
     collect() {
       const readout = bankLedgerGrowthBudgetReadout();
       this.set({ measure: 'hard_limit_rows' }, readout.hardLimitRows);
       this.set({ measure: 'initialized' }, readout.committedRows === null ? 0 : 1);
-      this.set({ measure: 'observed_committed_rows' }, readout.committedRows ?? 0);
+      this.set({ measure: 'lifetime_inserted_rows' }, readout.committedRows ?? 0);
+      this.set(
+        { measure: 'limit_warning' },
+        bankLedgerGrowthWarningActive(readout.committedRows, readout.hardLimitRows) ? 1 : 0,
+      );
       this.set(
         { measure: 'observation_age_seconds' },
         readout.observedAtMs === null ? 0 : Math.max(0, (Date.now() - readout.observedAtMs) / 1000),
@@ -670,6 +676,16 @@ export function registerGameStateMetrics(
   });
   // Same zero-backfill reasoning as the guild kinds above.
   for (const kind of VAULT_LEDGER_INCIDENTS) vaultLedgerIncidents.inc({ kind }, 0);
+
+  // The realm row bucket is telemetry-only (bank_vault_ledger_guard.ts): a
+  // breach is an admission the old refusing guard would have dropped. Monotone
+  // per process; alert on rate, never on the absolute value.
+  const bankVaultRealmRowBreaches = new Counter({
+    name: WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL,
+    help: 'Total bank/vault realm row-bucket breaches (admissions past the telemetry bucket).',
+    registers: [registry],
+  });
+  bankVaultRealmRowBreaches.inc(0);
 
   const wocEscrowQueue = new Counter({
     name: WOC_ESCROW_QUEUE_TOTAL,
@@ -942,6 +958,13 @@ export function registerGameStateMetrics(
       } catch {
         // Drop the sample rather than propagate into the vault dispatch path
         // this measures.
+      }
+    },
+    bankVaultRealmRowBreach(): void {
+      try {
+        bankVaultRealmRowBreaches.inc();
+      } catch {
+        // Drop the sample rather than propagate into the reservation path.
       }
     },
     copperCredited(source: CopperFlowSource, amount: number): void {
