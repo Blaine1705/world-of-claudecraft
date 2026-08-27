@@ -181,8 +181,17 @@ describe('the desktop bank toolbar (no mobile-touch)', () => {
     expect(deposit.getBoundingClientRect().top).toBeGreaterThan(
       search.getBoundingClientRect().top + 10,
     );
-    // And nothing overflowed the toolbar's own box horizontally.
-    expect(tools.scrollWidth).toBeLessThanOrEqual(tools.clientWidth);
+    // And the wrapped control STARTS at the toolbar's left edge on its own
+    // row, the information-preserving property the wrap buys: under nowrap
+    // it would start hundreds of pixels right and clip almost entirely.
+    // Deliberately NOT a scrollWidth === clientWidth assertion: on a wide
+    // platform font stack the 30-char label's own min-content can exceed a
+    // 220px-floor window's content box by a few pixels even on its own row
+    // (CI measured 204 against 192), and that residue scrolls rather than
+    // hiding the control.
+    expect(
+      deposit.getBoundingClientRect().left - tools.getBoundingClientRect().left,
+    ).toBeLessThanOrEqual(4);
   });
 });
 

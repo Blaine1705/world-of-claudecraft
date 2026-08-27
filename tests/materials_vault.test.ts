@@ -2278,7 +2278,7 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
     // bumpVaultWireRev discipline, or the projection goes stale forever.
     const { readdirSync, readFileSync, statSync } = await import('node:fs');
     const { join } = await import('node:path');
-    const root = new URL('../src/sim', import.meta.url).pathname;
+    const root = fileURLToPath(new URL('../src/sim', import.meta.url));
     const writes = [
       /vault\.(?:stock|special|upgrades)(?:\[[^\]]*\])?\s*(?:=(?!=)|\+=|-=)/,
       /vault\.(?:stock|special)\.(?:push|splice|pop|shift|unshift)\(/,
@@ -2308,7 +2308,7 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
       }
     };
     walk(root);
-    const serverRoot = new URL('../server', import.meta.url).pathname;
+    const serverRoot = fileURLToPath(new URL('../server', import.meta.url));
     walk(serverRoot);
     expect(offenders).toEqual([]);
   });

@@ -343,24 +343,28 @@ describe('deleteCharacter', () => {
           }),
       );
       configureCharacterDeleteBackgroundGate(acquire as never);
-      const refused = deleteCharacter(7, 42);
+      // Attach the rejection handler BEFORE advancing the clock: the refusal
+      // fires inside the awaited timer flush, and a handler attached after
+      // that flush leaves the rejection momentarily unhandled, which CI's
+      // runner rightly reports as an unhandled error.
+      const refused = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
+      });
       // Under the wall, the wait holds; AT the wall it aborts and refuses.
       await vi.advanceTimersByTimeAsync(14_999);
       expect(seenSignals[0]?.aborted).toBe(false);
       await vi.advanceTimersByTimeAsync(1);
-      await expect(refused).rejects.toMatchObject({
-        code: 'CHARACTER_DELETE_QUEUE_SATURATED',
-      });
+      await refused;
       expect(dbMock.connect).not.toHaveBeenCalled();
 
       // A caller-side abort composes in and cuts the wait short of the wall.
       const controller = new AbortController();
-      const early = deleteCharacter(7, 42, controller.signal);
-      await vi.advanceTimersByTimeAsync(1_000);
-      controller.abort();
-      await expect(early).rejects.toMatchObject({
+      const early = expect(deleteCharacter(7, 42, controller.signal)).rejects.toMatchObject({
         code: 'CHARACTER_DELETE_QUEUE_SATURATED',
       });
+      await vi.advanceTimersByTimeAsync(1_000);
+      controller.abort();
+      await early;
       expect(seenSignals[1]?.aborted).toBe(true);
     } finally {
       configureCharacterDeleteBackgroundGate(null);
