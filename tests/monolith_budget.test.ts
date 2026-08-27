@@ -308,7 +308,9 @@ const MONOLITHS: MonolithRow[] = [
     // merged tree lands below PR #3648's parent pin because the movement
     // harness extractions ride in too, so keep the exact merged count.
     // The v0.41.0 reconcile lands below both parent pins, so the ratchet
-    // follows the exact merged count down.
+    // follows the exact merged count down. The PR #3647 batch-side movement
+    // extractions also shed lines, but the reconciled file keeps the
+    // showTargetSwingTimer dispatch, so the exact count remains 11561.
     ceiling: 11561,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
