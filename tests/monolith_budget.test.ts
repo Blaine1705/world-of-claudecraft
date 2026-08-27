@@ -261,7 +261,7 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-// Lowered after the movement-harness extractions: the snapshot alpha
+    // Lowered after the movement-harness extractions: the snapshot alpha
     // formula (src/net/snapshot_alpha.ts), the input-echo/jitter EMAs
     // (src/net/input_echo_tracker.ts), and the self-prediction gate plus its
     // immobile-aura table (src/game/self_motion_gate.ts) all left the loop.
