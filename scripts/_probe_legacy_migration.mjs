@@ -1,4 +1,4 @@
-﻿// Repro with the USER'S exact pre-stamp payloads: bars 2/3 at top 845, swing
+// Repro with the USER'S exact pre-stamp payloads: bars 2/3 at top 845, swing
 // and cast bars mid-screen, saved WITHOUT a viewport stamp. Boot at 1920x1080
 // (their fullscreen), verify the one-time migration stamps the saves, then
 // leave fullscreen (height 870) and verify the bars ride the bottom edge.

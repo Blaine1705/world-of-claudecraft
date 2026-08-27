@@ -18,10 +18,15 @@ describe('live UI Scale geometry refresh', () => {
   });
 
   it('includes the Affliction resource block in the unit-frame reset fanout', () => {
+    // The fanout grew (chat, meters, target auras, the combined-bars split),
+    // so pin the delegations by containment over the method body rather than
+    // an exact-body regex that reds on every legitimate addition.
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-    expect(hud).toMatch(
-      /resetUnitFrames\(\): void {\s*this\.interfaceUnlock\.resetAll\(\);\s*this\.doomMeter\.resetPosition\(\);\s*}/,
-    );
+    const start = hud.indexOf('resetUnitFrames(): void {');
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('\n  }\n', start));
+    expect(body).toContain('this.interfaceUnlock.resetAll();');
+    expect(body).toContain('this.doomMeter.resetPosition();');
   });
 
   it('registers all three unit-frame movers with the coordinator that drives them', () => {

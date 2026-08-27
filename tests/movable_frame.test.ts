@@ -1,4 +1,4 @@
-﻿// MovableFrame (src/ui/movable_frame.ts): the shared movable / lockable
+// MovableFrame (src/ui/movable_frame.ts): the shared movable / lockable
 // unit-frame controller behind the target AND player frames. These pin the
 // contract the player-frame instance leans on: the corner button toggles the
 // unlocked state (aria-pressed + tf-unlocked), a drag only works unlocked and

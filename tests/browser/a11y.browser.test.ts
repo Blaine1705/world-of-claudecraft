@@ -19,7 +19,6 @@ import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
-import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
 import { t } from '../../src/ui/i18n';
@@ -351,10 +350,15 @@ describe('axe: options menu', () => {
     await expectClean(root);
   });
 
-  it('enables the third action row through the secondary row and preserves keyboard focus', () => {
+  it('keeps keyboard focus on a combat toggle across its settings rebuild', () => {
+    // The optional-bar rows (showSecondaryActionBar / showThirdActionBar)
+    // deliberately have no options rows any more: the primary bar's plus and
+    // minus buttons are the one control for adding and removing them, and
+    // the edit mode's Frames Settings menu owns the other bar toggles. This
+    // pins the removal and keeps the focus-preservation coverage on a
+    // toggle the Combat tab still renders.
     const values: Record<string, number | boolean> = {
-      showSecondaryActionBar: false,
-      showThirdActionBar: false,
+      startAttackOnAbilityUse: false,
     };
     const settings = {
       get: (key: string) => values[key] ?? false,
@@ -365,19 +369,7 @@ describe('axe: options menu', () => {
     };
     const hooks = {
       settings,
-      onSettingChange: (key: string, value: number | boolean) => {
-        if (key !== 'showSecondaryActionBar' && key !== 'showThirdActionBar') return;
-        const visibility = resolveActionBarVisibility(
-          {
-            secondary: Boolean(values.showSecondaryActionBar),
-            third: Boolean(values.showThirdActionBar),
-          },
-          key,
-          Boolean(value),
-        );
-        values.showSecondaryActionBar = visibility.secondary;
-        values.showThirdActionBar = visibility.third;
-      },
+      onSettingChange: () => {},
       theme: {
         get: () => ({ preset: 'classic', custom: {} }),
         setPreset: () => {},
@@ -411,24 +403,24 @@ describe('axe: options menu', () => {
       (button) => button.textContent === t('hud.options.interface'),
     );
     interfaceButton?.click();
-    // The Interface panel is tabbed; both action-bar toggles live under Combat.
+    // The Interface panel is tabbed; the surviving auto-attack toggles live
+    // under Combat.
     root.querySelector<HTMLButtonElement>('.opt-tab[data-tab="combat"]')?.click();
 
-    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
-    const secondary = toggle('showSecondaryActionBar');
-    secondary?.focus();
-    secondary?.click();
-    expect(values.showSecondaryActionBar).toBe(true);
-    expect(toggle('showThirdActionBar')?.disabled).toBe(false);
-    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
+    // The optional-bar rows are gone from the options window by design.
+    expect(toggle('showSecondaryActionBar')).toBeNull();
+    expect(toggle('showThirdActionBar')).toBeNull();
 
-    toggle('showThirdActionBar')?.click();
-    expect(values.showThirdActionBar).toBe(true);
-    toggle('showSecondaryActionBar')?.click();
-    expect(values.showSecondaryActionBar).toBe(false);
-    expect(values.showThirdActionBar).toBe(false);
-    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
-    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
+    const attack = toggle('startAttackOnAbilityUse');
+    expect(attack, 'combat tab renders the auto-attack toggle').toBeTruthy();
+    attack?.focus();
+    attack?.click();
+    expect(values.startAttackOnAbilityUse).toBe(true);
+    expect(document.activeElement).toBe(toggle('startAttackOnAbilityUse'));
+
+    toggle('startAttackOnAbilityUse')?.click();
+    expect(values.startAttackOnAbilityUse).toBe(false);
+    expect(document.activeElement).toBe(toggle('startAttackOnAbilityUse'));
   });
 });
 

@@ -1,4 +1,4 @@
-﻿// Probe: the round-10 menu changes. Per-tab Reset to Defaults scope, the
+// Probe: the round-10 menu changes. Per-tab Reset to Defaults scope, the
 // removed UI Scale row, the theme preset dropdown (.ui-dd), and the always-on
 // action bar 2/3 rows in the Frames Settings dropdown. Needs `npm run dev`.
 import puppeteer from 'puppeteer-core';

@@ -1,4 +1,4 @@
-﻿// Options window painter: owns the #options-menu DOM, the window-local view-state
+// Options window painter: owns the #options-menu DOM, the window-local view-state
 // (which sub-panel is open, the key-capture buffer, the keybind note, the lazily
 // built performance panel), and the open/close lifecycle. It renders the nine
 // sub-panels off the declarative model in options_view.ts and dispatches every

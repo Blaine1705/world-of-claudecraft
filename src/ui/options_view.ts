@@ -1,4 +1,4 @@
-﻿// Pure, host-agnostic view-model for the Esc options window.
+// Pure, host-agnostic view-model for the Esc options window.
 //
 // The pure-core half of the cold-window pure-core + thin-painter split (root
 // CLAUDE.md Conventions; reference vendor_view.ts / social_view.ts). The options

@@ -1,4 +1,4 @@
-﻿// Probe: the edit-mode preview samples and the export/import rows. Drags the
+// Probe: the edit-mode preview samples and the export/import rows. Drags the
 // minimap, exports the frame layout, resets, imports the code back (which
 // reloads), and verifies the dragged spot returned. Needs `npm run dev`.
 import fs from 'node:fs';
