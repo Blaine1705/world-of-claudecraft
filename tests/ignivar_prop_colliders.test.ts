@@ -11,6 +11,7 @@ import {
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../src/sim/dungeon_layout';
 import {
+  IGNIVAR_NON_COLLIDING_PROPS,
   IGNIVAR_PROP_COLLIDER_FOOTPRINT,
   IGNIVAR_PROP_NATIVE,
   ignivarPropColliders,
@@ -54,9 +55,11 @@ describe('ignivar prop colliders', () => {
     for (const room of ROOMS) {
       const placements = ignivarPropPlacements(room.interior, room.layout);
       const colliders = obbs(ignivarPropColliders(room.interior, room.layout));
+      // Filter through the module's own non-colliding set, so a new
+      // walk-over prop kind (the lava gutters were the first) can never
+      // drift this census out of step with the derivation it checks.
       const floorProps = placements.filter(
-        (placement) =>
-          placement.y === 0 && !placement.key.startsWith('chain') && placement.key !== 'beam',
+        (placement) => placement.y === 0 && !IGNIVAR_NON_COLLIDING_PROPS.has(placement.key),
       );
       expect(floorProps.length, room.interior).toBeGreaterThanOrEqual(room.minFloorProps);
       expect(colliders.length, room.interior).toBe(floorProps.length);

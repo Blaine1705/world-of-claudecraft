@@ -200,11 +200,11 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     at('chain', 24, 14, 4.8, 8, 12),
     at('chain_hanging', -5.5, 25, 0.5, 8, 10),
     at('chain_hanging', 5.5, 25, -0.5, 8, 10),
-    // The forge-anchor dressing: the anvil the boss works pre-pull, beside
-    // the assembly forge at (0, 22). The one deliberate floor placement
-    // inside the fighting circle; the clearance contracts carve out the
-    // forge-anchor radius for exactly this.
-    at('anvil', 8.2, 17.7, 225 * DEG, 8),
+    // The forge-anchor dressing: the anvil the boss works pre-pull, seated
+    // beside the assembly forge at (0, 22) under the hook chains. The one
+    // deliberate floor placement inside the fighting circle; the clearance
+    // contracts carve out the forge-anchor radius for exactly this.
+    at('anvil', -1.8, 25.9, 180 * DEG, 8),
     // East wall: furnace bank flanking the steam pipe stack.
     at('steam_pipes', 39.25, -2.5, 270 * DEG, 15),
     at('lava_furnace', 37.5, -10.5, 270 * DEG, 15),
@@ -218,9 +218,9 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     at('square_wall', -11.3, -39, 0, 8, 7.75),
     at('industrial_pipe', 9.3, -38.2, 0, 12),
     at('industrial_pipe', -9.7, -38.2, 0, 12),
-    at('lava_outlet', -30.8, -30.3, 45 * DEG, 14),
+    at('lava_outlet', -28.55, -30.55, 45 * DEG, 14),
     at('lava_outlet', 29.2, -30.9, 315 * DEG, 14),
-    at('press_machine', -23.2, -33.5, 45 * DEG, 11),
+    at('press_machine', -22.45, -34.25, 45 * DEG, 11),
     at('lava_port', -10.1, -38.3, 0, 7),
     at('lava_port', 9.1, -38.5, 0, 7),
     at('press_machine', 22.6, -34.6, 315 * DEG, 11),
@@ -235,7 +235,7 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     at('hanging_hook', -32.3, -24.1, 45 * DEG, 10, 5),
     // North wall behind the forge anchor: lava outlets feed an elevated
     // port over a stacked beam course, steam pipes at the wall feet.
-    at('lava_outlet', -15.8, 38, 180 * DEG, 15),
+    at('lava_outlet', -16.55, 38, 180 * DEG, 15),
     at('lava_outlet', 14.4, 38.5, 180 * DEG, 15),
     at('lava_port', -0.5, 38, 180 * DEG, 13, 2.75),
     at('beam', -10.6, 39.05, 180 * DEG, 9, 11),
@@ -266,6 +266,31 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     // North corner pillars beside the forge wall.
     at('pillar_slim', 18.9, 37.5, 135 * DEG, 12),
     at('pillar_slim', -19.4, 35.9, 135 * DEG, 12),
+    // Lava gutters (walk-over floor trim, never colliders): a curved-fed
+    // channel run along each furnace bank, a fed loop under the north
+    // wall, straight runs at the door wall, and curved feeds into the
+    // press machines on the door diagonals.
+    at('lava_channel_curved', 37.35, -15.15, 0, 8),
+    at('lava_channel', 34.7, -8.6, 270 * DEG, 8),
+    at('lava_channel', 34.7, -1.35, 270 * DEG, 8),
+    at('lava_channel', 34.7, 5.9, 270 * DEG, 8),
+    at('lava_channel_curved', 36.55, 13.15, 90 * DEG, 8),
+    at('lava_channel_curved', -35.6, -14.05, 270 * DEG, 8),
+    at('lava_channel', -33.85, -6.8, 270 * DEG, 8),
+    at('lava_channel', -33.85, 0.45, 270 * DEG, 8),
+    at('lava_channel', -33.85, 7.7, 270 * DEG, 8),
+    at('lava_channel_curved', -36.45, 14.1, 180 * DEG, 8),
+    at('lava_channel', -0.7, 37.15, 270 * DEG, 12),
+    at('lava_channel_curved', 12.05, 34.9, 270 * DEG, 8),
+    at('lava_channel', 5.55, 32.15, 180 * DEG, 8),
+    at('lava_channel', -7.2, 32.4, 180 * DEG, 8),
+    at('lava_channel_curved', -14.4, 34.25, 0, 8),
+    at('lava_channel', -10.1, -37.25, 0, 8),
+    at('lava_channel', 9.15, -37.25, 0, 8),
+    at('lava_channel_curved', 24, -29.5, 135 * DEG, 8),
+    at('lava_channel', 17.65, -33.15, 315 * DEG, 8),
+    at('lava_channel_curved', -25.65, -29.75, 135 * DEG, 8),
+    at('lava_channel', -19.15, -32.5, 225 * DEG, 8),
   ];
 }
 
@@ -283,7 +308,7 @@ export function ignivarPropPlacements(
  *  hang from the roof darkness or the walls, the beam courses are
  *  ankle-height wall skirting, and the lava channels are floor gutters a
  *  body steps over. */
-const NON_COLLIDING: ReadonlySet<IgnivarEnvPropKey> = new Set([
+export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'beam',
   'chain',
   'chain_hanging',
@@ -315,7 +340,7 @@ export const IGNIVAR_PROP_COLLIDER_FOOTPRINT: Partial<Record<IgnivarEnvPropKey, 
 export function ignivarPropColliders(interior: string, layout: DungeonLayout): Collider[] {
   const colliders: Collider[] = [];
   for (const placement of ignivarPropPlacements(interior, layout)) {
-    if (placement.y !== 0 || NON_COLLIDING.has(placement.key)) continue;
+    if (placement.y !== 0 || IGNIVAR_NON_COLLIDING_PROPS.has(placement.key)) continue;
     const native = IGNIVAR_PROP_NATIVE[placement.key];
     const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT[placement.key] ?? 1;
     colliders.push({
