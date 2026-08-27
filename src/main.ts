@@ -2374,6 +2374,7 @@ async function startGame(
         break;
     }
   }
+  const syncXhbPadMode = () => crossHotbar.syncPadMode(gamepad);
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
@@ -2384,9 +2385,7 @@ async function startGame(
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
-    onConnectionChange: () => {
-      crossHotbar.syncPadMode(gamepad);
-    },
+    onConnectionChange: syncXhbPadMode,
     onActivity: createGamepadActivityNotifier(desktopBridge()),
     onCrossHotbarCast: (action) => {
       padTargetPick.autoTarget(action);
@@ -2396,9 +2395,7 @@ async function startGame(
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
   crossHotbar.attach(gamepad);
-  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, () => {
-    crossHotbar.syncPadMode(gamepad);
-  });
+  const applyPadSetting = createGamepadSettingApplier(gamepad, settings, syncXhbPadMode);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
   // which starts/stops the manager and pushes the saved deadzone/speed/vibration.
 
