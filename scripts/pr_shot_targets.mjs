@@ -10546,6 +10546,88 @@ export const TARGETS = [
       return { clip: '#bar-editor' };
     },
   },
+  {
+    key: 'ground-aim-placement',
+    when: [
+      'action_bar/ground_aim',
+      'render/ground_aim_reticle_visual',
+      'game/pad_ground_aim',
+      'combat/heroic_leap',
+    ],
+    // Arms a real ground aim (the first known position ability, seated on bar
+    // slot 1) and shoots the world reticle plus the owning button's aiming
+    // accent. On a BASE touch build the meteor-only gate instant-casts
+    // instead, so the armed poll exhausts and the frame is the honest BEFORE:
+    // spell fired, no reticle, no accent.
+    variants: [
+      { key: 'desktop', charClass: 'mage', charName: 'Aimwright', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        mobile: true,
+        charClass: 'mage',
+        charName: 'Aimwright',
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      let staged = { ok: false, reason: 'world is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          const hud = game?.hud;
+          if (!sim?.player || !hud) return { ok: false, reason: 'world is unavailable' };
+          sim.setPlayerLevel?.(20);
+          // Baseline position spells ride the spec kit (Blizzard is frost's).
+          sim.setSpec?.('frost');
+          const known = sim.known?.find?.(
+            (k) => k.def.targetMode === 'position' && !k.def.selfCentered,
+          );
+          if (!known)
+            return {
+              ok: false,
+              reason:
+                'no position ability known: class=' +
+                (sim.player.class ?? '?') +
+                ' level=' +
+                sim.player.level +
+                ' known=' +
+                (sim.known?.map?.((k) => k.def.id).join(',') ?? 'none'),
+            };
+          hud.closeAll?.();
+          const actions = hud.hotbarActions.slice();
+          actions[0] = { type: 'ability', id: known.def.id };
+          hud.hotbarActions = actions;
+          hud.castSlot(1);
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(500);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      for (let i = 0; i < 20; i++) {
+        const armed = await page.evaluate(() => window.__game?.hud?.isGroundAimActive?.() === true);
+        if (armed) break;
+        await wait(200);
+      }
+      // Let the entry deed banner and greeting fade; the aim stays armed.
+      await wait(4500);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        hud?.closeAll?.();
+        if (hud?.isGroundAimActive?.() !== true) hud?.castSlot?.(1);
+      });
+      await wait(800);
+      return { clip: '#ui' };
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
